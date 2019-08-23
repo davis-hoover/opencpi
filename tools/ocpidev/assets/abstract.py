@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 """
-Abstract classes that are used in other places within the assests module are defined in this file
+Abstract classes that are used in other places within the assets module are defined in this file
 """
 
 from abc import ABCMeta, abstractmethod
@@ -28,7 +28,6 @@ import _opencpi.hdltargets as hdltargets
 import _opencpi.util as ocpiutil
 
 class Asset(metaclass=ABCMeta):
-    #TODO add project top and package id as a variable here, maybe this becomes a method instead
     """
     Parent Class for all Asset objects.  Contains a factory to create each of the asset types.
     Not officially a virtual class but objects of this class are not intended to be directly
@@ -99,7 +98,6 @@ class Asset(metaclass=ABCMeta):
             raise ocpiutil.OCPIException("Expected directory of type \"" + dirtype + "\", but " +
                                          "found type \"" + str(ocpiutil.get_dirtype(directory)) +
                                          "\" for directory \"" + directory + "\"")
-    #@abstractmethod
     def delete(self, force=False):
         """
         Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
@@ -116,7 +114,7 @@ class Asset(metaclass=ABCMeta):
         """
         this is function is used by both projects and libraries  to find the component specs that
         are owned by that asset.
-        TODO move this function to a seperate class from asset and have project and library inherit
+        TODO move this function to a separate class from asset and have project and library inherit
              from that class???
         """
         ret_val = []
@@ -266,8 +264,8 @@ class ReportableAsset(Asset):
     Skeleton class providing get/show_utilization functions
     for reporting utilization of an asset.
 
-    get_utilization is generally overridden by subclasses, but
-    show_utilization is usually only overridden for subclasses that are collections
+    get_utilization is generally overridden by sub-classes, but
+    show_utilization is usually only overridden for sub-classes that are collections
     of OpenCPI assets (e.g. ones where show_utilization is called for children assets).
     """
     valid_formats = ["table", "latex"]
@@ -276,7 +274,7 @@ class ReportableAsset(Asset):
         Initializes ReportableAsset member data  and calls the super class __init__
         valid kwargs handled at this level are:
             output_format (str) - mode to output utilization info (table, latex)
-                                  output_formats not yet implenented: simple, json, csv
+                                  output_formats not yet implemented: simple, json, csv
         """
         super().__init__(directory, name, **kwargs)
 
@@ -285,7 +283,7 @@ class ReportableAsset(Asset):
     def get_utilization(self):
         """
         This is a placeholder function will be the function that returns ocpiutil.Report instance
-        for this asset. Subclasses should override this function to collect utilization information
+        for this asset. Sub-classes should override this function to collect utilization information
         for this asset into a Report object to return.
 
         The returned Report contains data_points, which is an array of dictionaries. Each
@@ -299,7 +297,7 @@ class ReportableAsset(Asset):
         """
         Show the utilization Report for this asset and print/record the results.
 
-        This default behavior is likely sufficient, but subclasses that are collections of OpenCPI
+        This default behavior is likely sufficient, but sub-classes that are collections of OpenCPI
         assets may override this function to instead iterate over children assets and call their
         show_utilization functions.
         """
@@ -341,6 +339,7 @@ class ReportableAsset(Asset):
                     util_file.write(latex_table)
                     logging.info("  LaTeX Utilization Table was written to: " + util_file_path +
                                  "\n")
+# TODO is this required ?
 # pylint:disable=wrong-import-position
 from .component import Component
 # pylint:disable=wrong-import-position

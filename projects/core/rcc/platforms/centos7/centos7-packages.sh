@@ -61,8 +61,6 @@ PKGS_D+=(time)
 #    -- (AV-1261, AV-1299): still python 2 or just for users?
 #    -- note that we also need python3 but that is from epel - below in $#4
 PKGS_D+=(python-matplotlib scipy numpy)
-#    for building init root file systems for embedded systems (enabled in devel?)
-PKGS_D+=(fakeroot)
 #    enable other packages in the epel repo, some required for devel (e.g. python34)
 PKGS_D+=(epel-release)
 #    for various 32-bit software tools we end up supporting (e.g. modelsim) in devel (AV-567)
@@ -99,17 +97,21 @@ PKGS_S+=(rpm-build)
 PKGS_S+=(swig python-devel)
 #    for general configuration/installation flexibility
 PKGS_S+=(nfs-utils)
-#    for OpenCL support (the switch for different actual drivers that are not installed here)
-PKGS_S+=(ocl-icd)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
 #    for devel.  For RPM installations we somehow rely on the user pre-installing epel
 #
+#    for ocpidev
+PKGS_E+=(python34 python34-jinja2)
 #    for various testing scripts
 #    AV-5478: If the minor version changes here, fix script below
 PKGS_E+=(python34-numpy)
+#    for building init root file systems for embedded systems (enabled in devel?)
+PKGS_E+=(fakeroot)
+#    for OpenCL support (the switch for different actual drivers that are not installed here)
+PKGS_E+=(ocl-icd)
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {
@@ -121,9 +123,9 @@ function ypkgs {
 # The list for RPMs: first line
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
 [ "$1" = yumlist ] && ypkgs PKGS_R && ypkgs PKGS_D && ypkgs PKGS_S && ypkgs PKGS_E && exit 0
-sudo yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
+sudo yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
 # Now those that depend on epel, e.g.
-sudo yum -y install $(ypkgs PKGS_E)
+sudo yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
 # AV-5478: Make sure the python3 link is present
 if ! command -v python3 >/dev/null; then
     if ! py34=$(command -v python3.4); then
