@@ -46,7 +46,7 @@ MAX_BYTES_OUT = int(os.environ.get("OCPI_TEST_ocpi_max_bytes_out"))
 #Generate enough samples to generate number_of_samples_messages max_bytes_out sized output messages
 number_of_samples_messages = 2
 bytes_per_sample = 4
-samples_to_generate = number_of_samples_messages*MAX_BYTES_OUT/bytes_per_sample*R
+samples_to_generate = int(number_of_samples_messages*MAX_BYTES_OUT/bytes_per_sample*R)
 # Select test data to generate: Impulse or Step 
 if TEST_CASE == 0: # Generate Impulse
     out_data = np.zeros(samples_to_generate, dtype=np.int32)
