@@ -174,6 +174,7 @@ function download_git {
         echo Download/clone complete.
         if [ -d $directory ]; then
           cd $directory
+	  git config core.autocrlf false
           git checkout $file && rm -r -f $directory.bak && return 0
           echo The git checkout failed.
         else

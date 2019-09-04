@@ -43,7 +43,7 @@ XilinxZynqPS7Version=$(subst _,.,$(subst processing_system7_v,,$(XilinxZynqCore)
 
 # ISE's core
 XilinxZynq_iseCore=processing_system7_v4_03_a
-XilinxZynq_ise=$(call OcpiXilinxIseEdkDir,infox)/hw/XilinxProcessorIPLib/pcores/$(XilinxZynq_iseCore)/hdl/verilog
+XilinxZynq_ise=$(call OcpiXilinxEdkDir,infox)/hw/XilinxProcessorIPLib/pcores/$(XilinxZynq_iseCore)/hdl/verilog
 # Since the wrapper file is verilog. we'll provide the verilog PS7
 #XilinxPS7=$(OcpiXilinxToolsDir)/ISE/verilog/src/unisims/PS7.v
 XilinxZynq_isePSFiles=atc aw_atc b_atc processing_system7 trace_buffer w_atc

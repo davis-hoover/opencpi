@@ -20,7 +20,7 @@
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
-ExcludeTargets=isim altera
+ExcludeTargets=isim altera xsim
 
 # For vivado we use vivado stubs with netlists
 # For xsim we use simulation netlists

@@ -174,7 +174,7 @@ namespace OCPI {
 
       // Mapped pointer to our state
       volatile BufferState*  m_myShadowsRemoteStates[MAX_PCONTRIBS];
-      void          *(m_rssVaddr[MAX_PCONTRIBS]);                // buffer state virtual address
+      void          *m_rssVaddr[MAX_PCONTRIBS]; // buffer state virtual address
 
       // Keeps track of when it produces
       bool m_produced;
