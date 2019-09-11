@@ -24,12 +24,15 @@
 #include <lzma.h>
 #include "XferManager.h"
 #include "HdlDevice.h"
+#include "HdlDriver.h"
+#include "HdlContainer.h"
 
 #define USE_LZMA 1
 namespace OCPI {
   namespace HDL {
     namespace OE = OCPI::Util::EzXml;
     namespace OU = OCPI::Util;
+    namespace OO = OCPI::OS;
 
     // The derived class will set up accessors after this constructor is done
     // So we can't perform accesses until that time, which is the "init" call.
@@ -127,6 +130,14 @@ namespace OCPI {
             (m_tsWorker->controlOperation(OU::Worker::OpStart, err)))
           return true;
       }
+      bool isGPS;
+      auto propOffset = offsetof(TimeService, timeNow);
+      OS::Time time = Driver::getSingleton().now(isGPS);
+      m_tsWorker->m_properties.set64RegisterOffset(propOffset, time.bits());
+      const char* name = m_name.c_str();
+      const char* m1 = "time_server.hdl timeNow was initialized to";
+      const char* m2 = isGPS ? "GPS time " : "non-GPS time";
+      ocpiInfo("HDL Device '%s': %s %s 0x%" PRIx64, name, m1, m2, time.bits());
       m_isAlive = true;
       if (configure(NULL, err))
         return true;

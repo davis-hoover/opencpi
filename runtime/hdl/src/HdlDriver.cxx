@@ -178,6 +178,12 @@ namespace OCPI {
 	ocpiBad("While probing %s: %s", which, error.c_str());
       return NULL;
     }      
+    // Get the best current OS time, independent of any device.
+    OS::Time Driver::
+    now(bool &isGps) {
+      isGps = false; /// @todo / FIXME - add gpsd support
+      return OS::Time::now();
+    }
     // Internal method common to "open" and "found"
     // Return true on error
     bool Driver::

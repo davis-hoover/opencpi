@@ -165,6 +165,14 @@ namespace OCPI {
     } OccpSpace;
 #ifdef __cplusplus
     inline uint64_t swap32(uint64_t x) {return (x <<32) | (x >> 32); }
+    // The properties of the time service (see projects/core/hdl/devices/time_server.hdl/time_server.xml)
+    struct TimeService {
+      uint64_t timeNow, delta;
+      uint32_t frequency; // float as 32 bit value - need type for guaranteed 32 bit float?
+      uint32_t control;
+      uint32_t status;
+      uint32_t tickspersecond;
+    };
   }
 }
 #endif

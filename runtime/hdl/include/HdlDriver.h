@@ -50,6 +50,7 @@ namespace OCPI {
       const OCPI::Util::PValue *m_params; // a temporary during discovery
       bool setup(Device &dev, ezxml_t &config, std::string &err);
     public:
+      OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
       // This driver method is called when container-discovery happens, to see if there
       // are any container devices supported by this driver
