@@ -39,16 +39,14 @@ function do_stop {
 }
 
 
-
 # We are being run in a sandbox directory
 export OCPI_CDK_DIR=`pwd`
 export OCPI_TOOL_PLATFORM=$(< swplatform)
-export OCPI_TOOL_PLATFORM
 export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
-export OCPI_SYSTEM_CONFIG=`pwd`/system.xml
 PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
 platform=$OCPI_TOOL_PLATFORM
+export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/$platform/system.xml
 
 echo Executing remote configuration command: $* >&2
 
@@ -75,6 +73,8 @@ case $1 in
 	  echo ocpiserve is still running. 2>&1
 	  exit 1
       fi
+      set -e
+      export LD_LIBRARY_PATH=$platform/c++
       ocpidriver unload >&2 || : # in case it was loaded from a different version
       ocpidriver load >&2
       log=$(date +%Y%m%d-%H%M%S).log

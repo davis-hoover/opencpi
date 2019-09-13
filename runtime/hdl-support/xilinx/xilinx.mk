@@ -99,7 +99,7 @@ OcpiXilinxIseInit=\
 
 # Looks for the Vivado SDK dir
 OcpiXilinxSdkDir=$(strip\
-$(foreach t,$(OcpiXilinxDir)/SDK,$(shell > /dev/tty echo vt:$t:$(OCPI_XILINX_VIVADO_SDK_VERSION))\
+$(foreach t,$(OcpiXilinxDir)/SDK,\
   $(foreach i,\
       $(foreach v,\
         $(if $(filter-out undefined,$(origin OCPI_XILINX_VIVADO_SDK_VERSION)),\

@@ -23,9 +23,10 @@
 # See that file for a description of valid variables and their defaults.
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
-# Here we require Vivado SDK version 2013.4 for platform xilinx13_3
+# Here we require and prefer Vivado SDK version 2013.4 for platform xilinx13_3 unless only the EDK is present
+# In which case we assume it is the final 14.7 version of the EDK
 OCPI_XILINX_VIVADO_SDK_VERSION:=2013.4
-tooldir:=$(OcpiXilinxEdkDir)/gnu/arm/lin/bin
+tooldir:=$(OcpiXilinxEdkOrDir)/gnu/arm/lin/bin
 ifeq ($(wildcard $(tooldir)),)
   $(error When setting up to build for zynq for $(OCPI_TARGET_PLATFORM), cannot find $(tooldir). Perhaps the EDK was not installed\
           when Xilinx tools were installed? The non-default Xilinx environment settings were: \

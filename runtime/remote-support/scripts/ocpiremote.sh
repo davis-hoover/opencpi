@@ -138,8 +138,10 @@ for op in $*; do
       # This list is not yet an official package like "development/runtime/deploy" etc., but it will be
       files="/etc/localtime scripts/ocpi_${os}_driver scripts/ocpiserver.sh \
       	     $platform/lib/*.ko $platform/lib/*.rules ${driverlibs[*]} \
-             $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/gdb $platform/system.xml"
+             $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/ocpihdl $platform/system.xml"
       [ -n "$vg" ] && files+=" ../prerequisites/valgrind/$platform"
+      [ -x $platform/bin/gdb ] && files+=" $platform/bin/gdb"
+      [ -x $platform/c++ ] && files+=" $platform/c++"
       tar -c -z -H -f $tmpdir/tar.tgz $files
       do_ssh "test -e $rdir && echo Directory exists && exit 1;
       	      date -u `date -u +%Y.%m.%d-%H:%M:%S`;
@@ -148,7 +150,7 @@ for op in $*; do
 	      tar -x -z -C $rdir -f - && pwd && TZ=\`pwd\`/$rdir/etc/localtime date" < $tmpdir/tar.tgz
 	;;
     unload|remove)
-	reload;;
+	unload;;
     start)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh $vg $log start";;
     log)

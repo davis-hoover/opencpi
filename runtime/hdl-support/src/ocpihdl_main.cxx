@@ -112,7 +112,7 @@ struct Command {
   { "get", get, DEVICE},
   { "getxml", getxml, DEVICE},
   { "load", load, 0},
-  { "unload", unload, DEVICE},
+  { "unload", unload, 0},
   { "probe", probe, SUDO | DEVICE | DISCOVERY},
   { "radmin", radmin, DEVICE },
   { "receiveData", receiveData, INTERFACE},
@@ -1936,6 +1936,14 @@ load(const char **ap) {
 }
 static void
 unload(const char **) {
+  // Some devices can be loaded even when they don't probe, so we open the device
+  // specially/softly here...
+  if (!device &&
+      !(device = getenv("OCPI_DEFAULT_HDL_DEVICE")))
+    bad("a device option is required with this command");
+  if (!(dev = getDriver().open(device, false, true, NULL, error)))
+    bad("error opening device %s", device);
   if (dev->unload(error))
     bad("error unloading device %s after load", device);
+
 }

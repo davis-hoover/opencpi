@@ -57,6 +57,12 @@ LD=$(OcpiCrossCompile)ld
 ifeq ($(OCPI_TARGET_ARCH),arm_cs)
   override OCPI_TARGET_ARCH=arm
 endif
+ifeq ($(OCPI_TARGET_ARCH),aarch32)
+  override OCPI_TARGET_ARCH=arm
+endif
+ifeq ($(OCPI_TARGET_ARCH),aarch64)
+  override OCPI_TARGET_ARCH=arm64
+endif
 
 # (No longer blocks, but code left in as example if we need to block other platforms/drivers)
 #    ifeq ($(OCPI_CROSS_HOST),arm-none-linux-gnueabi)
@@ -78,12 +84,15 @@ AT?=@
 # Compressed tar extensions for kernel headers
 TAR_EXTS:=tar tar.gz tgz tar.bz2 tbz2 tar.xz
 
+CLEANING:=$(filter cleandriver clean topclean cleanheaders,$(MAKECMDGOALS))
+
 # This conditional selects whether we are being included from the
 # kernel Makefile or not. (this in-kernel building is not regularly tested)
 ifdef KERNELRELEASE
   # called from kernel build system: just declare what our modules are
   obj-m := opencpi.o
 else
+ifndef CLEANING
 ifdef OCPI_TARGET_KERNEL_DIR
   KERNELDIR := $(OCPI_TARGET_KERNEL_DIR)
   # Auto-extract any found tarballs of kernel headers (AV-5018)
@@ -109,39 +118,38 @@ else
     $(error This is a cross-compiled platform, but OCPI_TARGET_KERNEL_DIR is not set, which is not supported.)
   endif
 
-  ifeq ($(filter clean topclean cleanheaders,$(MAKECMDGOALS)),)
-    # Find the kernel headers - they can be found:
-    #  1. Specified KERNELDIR (always chosen if given)
-    #  2. /usr/src/kernels/(uname -r)
-    #  3. /usr/src/kernels/(specific RPM-specified location based on the kernel-headers package)
-    OcpiKernelRelease:=$(shell uname -r)
-    # this command should be platform-specific (e.g. different for debian etc.)
-    OcpiKernelHeadersVersion:=$(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)
-    $(info --- The running kernel is release: $(OcpiKernelRelease))
-    $(info --- The current kernel-headers package is version: $(OcpiKernelHeadersVersion))
-    ifdef KERNELDIR
-      $(info --- The requested kernel header location (via KERNELDIR) is: $(KERNELDIR))
-      ifeq ($(wildcard $(KERNELDIR)),)
-        $(error The requested kernel header location ($(KERNELDIR)) is not found)
+  # Find the kernel headers - they can be found:
+  #  1. Specified KERNELDIR (always chosen if given)
+  #  2. /usr/src/kernels/(uname -r)
+  #  3. /usr/src/kernels/(specific RPM-specified location based on the kernel-headers package)
+  OcpiKernelRelease:=$(shell uname -r)
+  # this command should be platform-specific (e.g. different for debian etc.)
+  OcpiKernelHeadersVersion:=$(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)
+  $(info --- The running kernel is release: $(OcpiKernelRelease))
+  $(info --- The current kernel-headers package is version: $(OcpiKernelHeadersVersion))
+  ifdef KERNELDIR
+    $(info --- The requested kernel header location (via KERNELDIR) is: $(KERNELDIR))
+    ifeq ($(wildcard $(KERNELDIR)),)
+      $(error The requested kernel header location ($(KERNELDIR)) is not found)
+    endif
+  else
+    KERNELDIR=/usr/src/kernels/$(OcpiKernelRelease)
+    ifeq ($(wildcard $(KERNELDIR)),)
+      try1:=$(KERNELDIR)
+      KERNELDIR=/usr/src/kernels/$(OcpiKernelHeadersVersion)
+      ifneq ($(wildcard $(KERNELDIR)),)
+        $(info --- Using the kernel headers version at: $(KERNELDIR))
+      else
+        $(info XXX: $(shell ls -l /lib/modules ))
+        $(error Cannot find a kernel headers directory.  Tried $(try1) and $(KERNELDIR))
       endif
     else
-      KERNELDIR=/usr/src/kernels/$(OcpiKernelRelease)
-      ifeq ($(wildcard $(KERNELDIR)),)
-        try1:=$(KERNELDIR)
-        KERNELDIR=/usr/src/kernels/$(OcpiKernelHeadersVersion)
-        ifneq ($(wildcard $(KERNELDIR)),)
-          $(info --- Using the kernel headers version at: $(KERNELDIR))
-        else
-          $(info XXX: $(shell ls -l /lib/modules ))
-          $(error Cannot find a kernel headers directory.  Tried $(try1) and $(KERNELDIR))
-        endif
-      else
-        $(info --- Using the kernel release at: $(KERNELDIR))
-      endif
+      $(info --- Using the kernel release at: $(KERNELDIR))
     endif
-    $(info No OCPI_TARGET_KERNEL_DIR specified, so using: KERNELDIR=$(KERNELDIR))
   endif
+  $(info No OCPI_TARGET_KERNEL_DIR specified, so using: KERNELDIR=$(KERNELDIR))
 endif
+endif # end of if not cleaning
 ocpi_release:=$(shell cat $(OCPI_TARGET_KERNEL_DIR)/ocpi-release 2>/dev/null)
 # The current directory is passed to sub-makes as argument
 PWD := $(shell pwd)

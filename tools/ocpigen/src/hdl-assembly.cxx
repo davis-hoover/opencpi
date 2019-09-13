@@ -291,12 +291,8 @@ parseHdlAssy() {
     // Clocks: coalesce all WCI clock and clocks with same reqts, into one wci, all for the assy
     assert(wci->m_clock);
     Clock &clk = *wci->m_clock;
-    clk.m_signal =
-      clk.m_name =
-      a->m_nWCIs > 1 ? (m_language == VHDL ? "wci_in(0).Clk" : "wci0_Clk") : "wci_Clk";
-    clk.m_reset =
-      a->m_nWCIs > 1 ?
-      (m_language == VHDL ? "wci_in(0).MReset_n" : "wci0_MReset_n") : "wci_MReset_n";
+    clk.m_signal = clk.m_name = m_language == VHDL ? "wci_in(0).Clk" : "wci0_Clk";
+    clk.m_reset = m_language == VHDL ? "wci_in(0).MReset_n" : "wci0_MReset_n";
     clk.m_port = wci;
     wci->m_myClock = true;
     wci->m_clock = &clk;
