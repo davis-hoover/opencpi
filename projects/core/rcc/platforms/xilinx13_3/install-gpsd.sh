@@ -37,4 +37,4 @@ export CCFLAGS=$OcpiCFlags
 sysroot=$(echo $OcpiCrossCompile | sed "s|/bin[^/]*/$OcpiCrossHost-||")/$OcpiCrossHost/libc
 scons prefix=$OcpiInstallExecDir target=$OcpiCrossHost sysroot=$sysroot libgpsmm=True ncurses=False qt=False python=False usb=False bluez=False ntp=False manbuild=False
 scons install
-cp $OcpiThisPrerequisiteDir/prerequisites/$me/etc_initd_gpsd $OcpiInstallExecDir/bin
+#cp $OcpiThisPrerequisiteDir/prerequisites/$me/etc_initd_gpsd $OcpiInstallExecDir/bin
