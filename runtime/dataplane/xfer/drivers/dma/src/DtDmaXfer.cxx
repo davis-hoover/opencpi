@@ -174,8 +174,8 @@ namespace OCPI {
 	ocpiDebug("For ep %p, offset 0x%" PRIx32 " size %zu vaddr is %p to %p @ 0x%" PRIx64,
 		  &ep, offset, size, vaddr, (uint8_t *)vaddr + size, ep.m_address);
 	if (vaddr == MAP_FAILED)
-	  throw OU::Error("mmap failed on DMA region %zu at 0x%" PRIx64,
-			  size, ep.m_address + offset);
+	  throw OU::Error("mmap failed on DMA region %zu at 0x%" PRIx64 ": %d (%s)",
+			  size, ep.m_address + offset, errno, strerror(errno));
 	return (uint8_t*)vaddr;
       }
     public:
@@ -245,6 +245,7 @@ namespace OCPI {
 	  m_driver(XferFactory::getSingleton()) {
 	// For remote mappings all is deferred until mapping
 	if (ep.local()) {
+	  ocpiDebug("Finalizing local DMA ep %p: %s", &ep, ep.name().c_str());
 	  m_driver.getDmaRegion(ep);
 	  m_vaddr = m_driver.mapDmaRegion(ep, 0, ep.size());
 	  OU::format(ep.m_protoInfo, "%" PRIx64 ".%" PRIx32 ".%" PRIx32,
@@ -255,6 +256,7 @@ namespace OCPI {
       }
     public:
       virtual ~SmemServices () {
+	unMap();
       }
 
       void *map(DtOsDataTypes::Offset offset, size_t size ) {
@@ -290,8 +292,20 @@ namespace OCPI {
  		  vaddr, m_vaddr, m_vaddr1, offset, size, vaddr + size);
 	return (void*)vaddr;
       }
+      int32_t unMap() {
+	EndPoint &ep = m_dmaEndPoint;
+	if (ep.m_holeOffset) {
+	  if (m_vaddr)
+	    munmap(m_vaddr, ep.m_holeOffset);
+	  if (m_vaddr1)
+	    munmap(m_vaddr1, ep.size() - ep.m_holeEnd);
+	} else if (m_vaddr)
+	  munmap(m_vaddr, ep.size());
+	m_vaddr = m_vaddr1 = NULL;
+	return 0;
+      }
     };
-    
+
     XF::SmemServices & EndPoint::
     createSmemServices() {
       return *new SmemServices(*this);
