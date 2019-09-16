@@ -1,0 +1,6 @@
+<application done='time_server_tester'>
+  <instance component='av.test.time_server_tester'/>
+  <instance component='ocpi.core.devices.time_server'>
+    <!-- <property name='pps_sim_test' value='true'/> -->
+  </instance>
+</application>

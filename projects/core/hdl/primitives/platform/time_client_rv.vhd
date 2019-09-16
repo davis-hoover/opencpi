@@ -44,26 +44,43 @@ architecture rtl of time_client_rv is
       sRDY   : out std_logic);
   end component;
 
+  component reset is
+    port (
+      src_rst : in std_logic;
+      dst_clk : in std_logic;
+      dst_rst : out std_logic);
+  end component;
+
+  signal wci_reset          : std_logic;
+  signal wci2timebase_reset : std_logic;
+  signal sync_reg_in        : std_logic_vector(time_in.now'length downto 0);
+  signal sync_reg_out       : std_logic_vector(time_in.now'length downto 0);
+
 begin
 
-  -- We have no support yet for the time not being valid.
-  -- Thus it is assumed that the time is valid before workers using time are out of reset
-  -- If the infrastructure changed to support this, we would conditionally drive MCmd.
-  -- When "allow unavailable" is supported, it would mean that the system could allow workers
-  -- to be enabled (out of reset, or started) even if the time was not available.
+  wci_reset <= not wci_Reset_n;
 
+  wci2timebase_rst : reset
+    port map   (src_rst => wci_reset,
+                dst_clk => time_in.clk,
+                dst_rst => wci2timebase_reset);
+
+  sync_reg_in <= time_in.valid & std_logic_vector(time_in.now);
+  
   syncReg : SyncRegister
     generic map (
-      width => 64,
+      width => time_in.now'length+1,-- +1 is for the valid flag
       init  => 0)
     port map (
       sCLK   => time_in.clk,
       dCLK   => wti_in.Clk,
-      sRST   => time_in.reset,
-      sD_IN  => std_logic_vector(time_in.now),
+      sRST   => wci2timebase_reset,
+      sD_IN  => sync_reg_in,
       sEN    => '1',
-      dD_OUT => wti_out.MData,
+      dD_OUT => sync_reg_out,
       sRDY   => open);
 
-  wti_out.MCmd <= ocp.MCmd_WRITE; -- just for OCP compliance.
+  wti_out.MData <= sync_reg_out(time_in.now'length-1 downto 0);
+  wti_out.MCmd <= ocp.MCmd_WRITE when its(sync_reg_out(time_in.now'length)) else
+                  ocp.MCmd_IDLE;
 end architecture rtl;
