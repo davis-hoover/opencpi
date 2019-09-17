@@ -1,0 +1,17 @@
+# Example usage:
+
+pushd /opt/Xilinx/Vivado/2017.1/
+. ./settings74.sh
+popd
+
+make -j 16 -s run
+or simply:
+make -j 16 -s
+
+# Success Criteria
+make run (or simply make) returns an exit status of 0 (regardless of -j -s or any other make options).
+
+# For more info on an individual test's failures, see its README.
+
+# Example cleaning of buildtime and runtime artifacts:
+make -j 16 clean

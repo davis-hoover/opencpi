@@ -1,0 +1,54 @@
+.PHONY: \
+    all clean \
+    prims clean_prims \
+    run clean_run \
+    clean_adc_samp_drop_generator_scdcd
+
+all: run
+
+clean: clean_run
+
+################################################################################
+# prims
+################################################################################
+
+xsim.dir/misc_prims/adc_samp_drop_generator_scdcd.vdb: ../adc_samp_drop_generator_scdcd.vhd \
+    xsim.dir/misc_prims/misc_prims.vdb \
+    xsim.dir/misc_prims/adc_samp_drop_generator.vdb \
+    xsim.dir/cdc/fast_pulse_to_slow_sticky.vdb
+	./myxvhdl.sh -work misc_prims $<
+
+prims: \
+    xsim.dir/misc_prims/adc_samp_drop_generator_scdcd.vdb
+
+clean_prims:
+	rm -rf xsim.dir
+
+################################################################################
+# run
+################################################################################
+
+adc_samp_drop_generator_scdcd/xsim.dir/sim: adc_samp_drop_generator_scdcd \
+    prims
+	$(MAKE) -C $<
+
+results_adc_samp_drop_generator_scdcd.log: adc_samp_drop_generator_scdcd \
+    adc_samp_drop_generator_scdcd/xsim.dir/sim
+	./run_test.sh $< | tee results_$<.log
+
+run: prims \
+    results_adc_samp_drop_generator_scdcd.log
+	./run.sh
+
+clean_adc_samp_drop_generator_scdcd:
+	$(MAKE) -C adc_samp_drop_generator_scdcd clean
+
+clean_run: \
+    clean_prims \
+    clean_adc_samp_drop_detector_scdcd \
+    clean_data_widener \
+    clean_time_corrector
+	rm -rf results*log
+	rm -rf octave-workspace
+
+

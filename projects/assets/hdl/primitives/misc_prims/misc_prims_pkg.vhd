@@ -24,6 +24,57 @@ USE IEEE.MATH_COMPLEX.ALL;
 
 package misc_prims is
 
+constant DATA_ADC_BIT_WIDTH      : positive := 12;
+constant DATA_BIT_WIDTH          : positive := 16;
+constant METADATA_TIME_BIT_WIDTH : positive := 64;
+
+type file_writer_backpressure_select_t is (NO_BP, LFSR_BP);
+
+type data_complex_adc_t is record
+  i : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
+  q : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
+end record data_complex_adc_t;
+
+type data_complex_t is record
+  i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
+  q : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
+end record data_complex_t;
+
+type metadata_t is record
+  error_samp_drop : std_logic; -- one or more samples have been dropped
+  data_vld        : std_logic; -- allows for option of sending valid metadata in
+                               -- parallel with invalid data to output
+
+  -- if error_samp_drop and data_vld are both 1, samp drop is assumed to have
+  -- happened before the current valid data
+
+  time            : unsigned(METADATA_TIME_BIT_WIDTH-1 downto 0);
+  time_vld        : std_logic;
+end record metadata_t;
+
+constant METADATA_IDX_ERROR_SAMP_DROP : natural := METADATA_TIME_BIT_WIDTH+2;
+constant METADATA_IDX_DATA_VLD        : natural := METADATA_TIME_BIT_WIDTH+1;
+constant METADATA_IDX_TIME_L          : natural := METADATA_TIME_BIT_WIDTH;
+constant METADATA_IDX_TIME_R          : natural := 1;
+constant METADATA_IDX_TIME_VLD        : natural := 0;
+constant METADATA_BIT_WIDTH : positive := METADATA_IDX_ERROR_SAMP_DROP+1;
+
+function to_slv(metadata : in metadata_t) return std_logic_vector;
+function from_slv(slv : in std_logic_vector) return metadata_t;
+
+type adc_samp_drop_detector_status_t is record
+  error_samp_drop : std_logic;
+end record adc_samp_drop_detector_status_t;
+
+type time_corrector_ctrl_t is record
+  time_correction     : signed(METADATA_TIME_BIT_WIDTH-1 downto 0);
+  time_correction_vld : std_logic;
+end record time_corrector_ctrl_t;
+
+type time_corrector_status_t is record
+  overflow : std_logic;
+end record time_corrector_status_t;
+
 component round_conv
   generic (
     DIN_WIDTH  : positive;
@@ -78,6 +129,156 @@ component edge_detector
     din               : in  std_logic;
     rising_pulse      : out std_logic;
     falling_pulse     : out std_logic);
+end component;
+
+component counter is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk : in  std_logic;
+    rst : in  std_logic;
+    en  : in  std_logic;
+    cnt : out unsigned(BIT_WIDTH-1 downto 0));
+end component;
+
+component latest_reg is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk      : in  std_logic;
+    rst      : in  std_logic;
+    din      : in  std_logic;
+    din_vld  : in  std_logic;
+    dout     : out std_logic;
+    dout_vld : out std_logic);
+end component;
+
+component latest_reg_slv is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk      : in  std_logic;
+    rst      : in  std_logic;
+    din      : in  std_logic_vector(BIT_WIDTH-1 downto 0);
+    din_vld  : in  std_logic;
+    dout     : out std_logic_vector(BIT_WIDTH-1 downto 0);
+    dout_vld : out std_logic);
+end component;
+
+component latest_reg_signed is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk      : in  std_logic;
+    rst      : in  std_logic;
+    din      : in  signed(BIT_WIDTH-1 downto 0);
+    din_vld  : in  std_logic;
+    dout     : out signed(BIT_WIDTH-1 downto 0);
+    dout_vld : out std_logic);
+end component;
+
+component adc_maximal_lfsr_data_src is
+  generic(
+    DATA_BIT_WIDTH : positive); -- width of each of I/Q
+  port(
+    -- CTRL
+    clk                : in  std_logic;
+    rst                : in  std_logic;
+    stop_on_period_cnt : in  std_logic;
+    stopped            : out std_logic;
+    -- OUTPUT
+    odata              : out data_complex_adc_t;
+    ovld               : out std_logic;
+    ordy               : in  std_logic);
+end component;
+
+component maximal_lfsr_data_src is
+  port(
+    -- CTRL
+    clk                : in  std_logic;
+    rst                : in  std_logic;
+    stop_on_period_cnt : in  std_logic;
+    stopped            : out std_logic;
+    -- OUTPUT
+    odata              : out data_complex_t;
+    ovld               : out std_logic;
+    ordy               : in  std_logic);
+end component;
+
+component adc_samp_drop_detector is
+  generic(
+    DATA_PIPE_LATENCY_CYCLES : natural := 0);
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    status    : out adc_samp_drop_detector_status_t;
+    -- INPUT
+    idata     : in  data_complex_adc_t;
+    ivld      : in  std_logic;
+    -- OUTPUT
+    odata     : out data_complex_adc_t;
+    ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component data_widener is
+  generic(
+    DATA_PIPE_LATENCY_CYCLES : natural := 0;
+    BITS_PACKED_INTO_MSBS    : boolean := true);
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    -- INPUT
+    idata     : in  data_complex_adc_t;
+    imetadata : in  metadata_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_t;
+    ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component set_clr
+  port(
+    clk : in  std_logic;
+    rst : in  std_logic;
+    set : in  std_logic;
+    clr : in  std_logic;
+    q   : out std_logic;
+    q_r : out std_logic);
+end component set_clr;
+
+component clk_src is
+  generic(
+    CLK_PERIOD : time);
+  port(
+    clk : out std_logic);
+end component;
+
+component time_corrector is
+  generic(
+    DATA_PIPE_LATENCY_CYCLES : natural := 0);
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    ctrl      : in  time_corrector_ctrl_t;
+    status    : out time_corrector_status_t;
+    -- INPUT
+    idata     : in  data_complex_t;
+    imetadata : in  metadata_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_t;
+    ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
 end component;
 
 end package misc_prims;
