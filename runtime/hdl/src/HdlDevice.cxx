@@ -22,10 +22,13 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <lzma.h>
+#include <unistd.h>
 #include "XferManager.h"
 #include "HdlDevice.h"
 #include "HdlDriver.h"
 #include "HdlContainer.h"
+/// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
+//#include <libgpsmm.h>
 
 #define USE_LZMA 1
 namespace OCPI {
@@ -56,6 +59,75 @@ namespace OCPI {
 
     static sigjmp_buf jmpbuf;
     static void catchBusError(int) { siglongjmp(jmpbuf, 1); }
+    bool Device::
+    getPPSIsOkay(useconds_t timeout=2100e3, useconds_t sleepTime=100e3) {
+      bool ret = false;
+      useconds_t elapsed = 0;
+      auto propOffset = offsetof(TimeService, status);
+      Access *ts = timeServer();
+      const char* m2 = "usec for time_server.hdl ppsOK...";
+      ocpiInfo("%s '%s': waiting up to %i %s", m1, dd, (int)timeout, m2);
+      while(elapsed < timeout) {
+        usleep(sleepTime);
+        elapsed += sleepTime;
+        if(ts) {
+          uint64_t reg = ts->get64RegisterOffset(propOffset);
+          ret = (reg & TIME_SERVICE_PPS_OK) == TIME_SERVICE_PPS_OK;
+          if(ret) {
+            ocpiInfo("%s '%s': time_server.hdl ppsOK detected", m1, dd);
+            break;
+          }
+        }
+      }
+      return ret;
+    }
+    OS::Time Device::
+    now(bool &isGps) {
+      OS::Time ret;
+      Access *ts = timeServer();
+      const char* m1 = "HDL Device";
+      const char* dd = m_name.c_str();
+      if(!ts)
+        isGps = false;
+      if(isGps)
+        isGps = getPPSIsOkay();
+      else {
+        const char* m2 = "time_server.hdl ppsOK timeout occurred";
+        ocpiInfo("%s '%s': %s %s", m1, dd, m2);
+      }
+      if(isGps) {
+/// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
+/*        static gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
+        if(gps_rec.stream(WATCH_ENABLE|WATCH_JSON) == NULL) {
+          isGps = false;
+          ocpiInfo("%s '%s': no gpsd running"); /// @todo / FIXME - try to start it
+        }
+        else {
+          struct gps_data_t* gps_data;
+          for(;;) {
+            if(!gps_rec.waiting(2000000))
+              continue;
+            if((gps_data = gps_rec.read()) == NULL) {
+              ocpiInfo("%s '%s': gpsd read failure");*/
+              isGps = false;
+/// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
+/*              break;
+            }
+            else if(gps_data->fix.mode > MODE_NO_FIX) {
+              OS::Time::Timeval time_val = ((uint64_t)gps_data->fix.time << 32);
+              uint64_t lsbs = ts->get64RegisterOffset(propOffset, time.bits());
+              time_val |= (lsbs & 0xffffffff);
+              ret = OS::Time(time_val);
+            }
+            break;*/
+          }
+        }
+      }
+      if(!isGPS) {
+        ret = OS::Time::now();
+      }
+      return ret;
+    }
     // Called from derived constructor after accessors have been set up.
     // Also called after bitstream loading.
     bool Device::
@@ -129,15 +201,16 @@ namespace OCPI {
             (m_pfWorker->controlOperation(OU::Worker::OpStart, err)) ||
             (m_tsWorker->controlOperation(OU::Worker::OpStart, err)))
           return true;
+        bool isGPS;
+        auto propOffset = offsetof(TimeService, timeNow);
+        //OS::Time time = Driver::getSingleton().now(isGPS);
+        OS::Time time = now(isGPS);
+        m_tsWorker->m_properties.set64RegisterOffset(propOffset, time.bits());
+        const char* name = m_name.c_str();
+        const char* m1 = "time_server.hdl timeNow was initialized to";
+        const char* m2 = isGPS ? "GPS time " : "non-GPS time";
+        ocpiInfo("HDL Device '%s': %s %s 0x%" PRIx64, name, m1, m2, time.bits());
       }
-      bool isGPS;
-      auto propOffset = offsetof(TimeService, timeNow);
-      OS::Time time = Driver::getSingleton().now(isGPS);
-      m_tsWorker->m_properties.set64RegisterOffset(propOffset, time.bits());
-      const char* name = m_name.c_str();
-      const char* m1 = "time_server.hdl timeNow was initialized to";
-      const char* m2 = isGPS ? "GPS time " : "non-GPS time";
-      ocpiInfo("HDL Device '%s': %s %s 0x%" PRIx64, name, m1, m2, time.bits());
       m_isAlive = true;
       if (configure(NULL, err))
         return true;

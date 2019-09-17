@@ -173,6 +173,7 @@ namespace OCPI {
       uint32_t status;
       uint32_t tickspersecond;
     };
+#define TIME_SERVICE_PPS_OK UINT64_C(1 << 27)
   }
 }
 #endif
