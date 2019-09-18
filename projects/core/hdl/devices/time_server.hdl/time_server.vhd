@@ -67,7 +67,8 @@ begin
 
   ts : entity work.time_service
     generic map(
-      g_TIMECLK_FREQ => from_float(frequency))
+      g_TIMECLK_FREQ      => from_float(frequency),
+      g_PPS_tolerance_PPM => to_integer(PPS_tolerance_PPM))
     port map(
       CLK                 => ctl_in.clk,
       RST                 => ctl_in.reset,

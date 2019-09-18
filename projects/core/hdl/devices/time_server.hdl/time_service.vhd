@@ -42,7 +42,8 @@ library ocpi, util, bsv; use ocpi.all, ocpi.types.all, util.util.all, bsv.bsv.Sy
 library platform; use platform.platform_pkg.all;
 entity time_service is
   generic (
-    g_TIMECLK_FREQ      : integer := 200e6);
+    g_TIMECLK_FREQ      : integer  := 200e6;
+    g_PPS_tolerance_PPM : positive := 1000);
   port (
     CLK                 : in  std_logic;
     RST                 : in  std_logic;
@@ -98,7 +99,7 @@ architecture rtl of time_service is
   --   100M + 0.1% = 100100000 = x"5F7_67A0"
   --
   constant c_upperThresOfWindow : std_logic_vector(27 downto 0)
-    := std_logic_vector(to_unsigned(g_TIMECLK_FREQ + (g_TIMECLK_FREQ)/1000, 28));
+    := std_logic_vector(to_unsigned(g_TIMECLK_FREQ + (g_TIMECLK_FREQ)/g_PPS_tolerance_PPM, 28));
   --
   -----------------------------------------------------------------------------
   -- Lower Threshold of Window for detecting External PPS pulse:
@@ -110,7 +111,7 @@ architecture rtl of time_service is
   --   100M - 0.1% = 99900000 = x"5F4_5A60"
   --
   constant c_lowerThresOfWindow : std_logic_vector(27 downto 0)
-    := std_logic_vector(to_unsigned(g_TIMECLK_FREQ - (g_TIMECLK_FREQ)/1000, 28));
+    := std_logic_vector(to_unsigned(g_TIMECLK_FREQ - (g_TIMECLK_FREQ)/g_PPS_tolerance_PPM, 28));
   --
   -----------------------------------------------------------------------------
   -- Fraction Increment Value (Default):
