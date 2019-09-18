@@ -16,8 +16,8 @@
 
   <Property Name="frequency" Type="float" Parameter="true" Default="1e6"
 	    Description="Frequency in Hz of timebase clk input"/>
-  <Property Name="PPS_tolerance" Type="float" Parameter="true" Default="0.1"
-	    Description="Percentage value which rising edge of timebase PPS can deviate while still being considered valid"/>
+  <Property Name="PPS_tolerance_PPM" Parameter="true" Default="1000"
+	    Description="Parts-per-million (PPM) value which rising edge of timebase PPS can deviate while still being considered valid"/>
   <Property Name="PPS_sim_test" Type="bool" Parameter="true"
 	    Description="Insert simulation-only PPS generator for testing."/>
 
