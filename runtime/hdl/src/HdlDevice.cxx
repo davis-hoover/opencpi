@@ -59,22 +59,22 @@ namespace OCPI {
 
     static sigjmp_buf jmpbuf;
     static void catchBusError(int) { siglongjmp(jmpbuf, 1); }
+    /// @todo / FIXME - document justification for default timeout value
     bool Device::
     getPPSIsOkay(useconds_t timeout=2100e3, useconds_t sleepTime=100e3) {
       bool ret = false;
       useconds_t elapsed = 0;
-      auto propOffset = offsetof(TimeService, status);
       Access *ts = timeServer();
-      const char* m2 = "usec for time_server.hdl ppsOK...";
-      ocpiInfo("%s '%s': waiting up to %i %s", m1, dd, (int)timeout, m2);
+      const char* m2 = "usec for time_server.hdl PPS_ok...";
+      const char* dd = m_name.c_str();
+      ocpiInfo("HDL Device '%s': waiting up to %i %s", dd, (int)timeout, m2);
       while(elapsed < timeout) {
         usleep(sleepTime);
         elapsed += sleepTime;
         if(ts) {
-          uint64_t reg = ts->get64RegisterOffset(propOffset);
-          ret = (reg & TIME_SERVICE_PPS_OK) == TIME_SERVICE_PPS_OK;
+          ret = ts->get8RegisterOffset(offsetof(TimeService, PPS_ok));
           if(ret) {
-            ocpiInfo("%s '%s': time_server.hdl ppsOK detected", m1, dd);
+            ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok detected", dd);
             break;
           }
         }
@@ -93,7 +93,7 @@ namespace OCPI {
         isGps = getPPSIsOkay();
       else {
         const char* m2 = "time_server.hdl ppsOK timeout occurred";
-        ocpiInfo("%s '%s': %s %s", m1, dd, m2);
+        ocpiInfo("%s '%s': %s", m1, dd, m2);
       }
       if(isGps) {
 /// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
@@ -119,11 +119,11 @@ namespace OCPI {
               time_val |= (lsbs & 0xffffffff);
               ret = OS::Time(time_val);
             }
-            break;*/
+            break;
           }
-        }
+        }*/
       }
-      if(!isGPS) {
+      if(!isGps) {
         ret = OS::Time::now();
       }
       return ret;
@@ -202,12 +202,12 @@ namespace OCPI {
             (m_tsWorker->controlOperation(OU::Worker::OpStart, err)))
           return true;
         bool isGPS;
-        auto propOffset = offsetof(TimeService, timeNow);
+        auto propOffset = offsetof(TimeService, time_now);
         //OS::Time time = Driver::getSingleton().now(isGPS);
         OS::Time time = now(isGPS);
         m_tsWorker->m_properties.set64RegisterOffset(propOffset, time.bits());
         const char* name = m_name.c_str();
-        const char* m1 = "time_server.hdl timeNow was initialized to";
+        const char* m1 = "time_server.hdl time_now was initialized to";
         const char* m2 = isGPS ? "GPS time " : "non-GPS time";
         ocpiInfo("HDL Device '%s': %s %s 0x%" PRIx64, name, m1, m2, time.bits());
       }

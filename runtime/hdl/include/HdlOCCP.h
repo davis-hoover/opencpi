@@ -165,15 +165,32 @@ namespace OCPI {
     } OccpSpace;
 #ifdef __cplusplus
     inline uint64_t swap32(uint64_t x) {return (x <<32) | (x >> 32); }
-    // The properties of the time service (see projects/core/hdl/devices/time_server.hdl/time_server.xml)
-    struct TimeService {
-      uint64_t timeNow, delta;
-      uint32_t frequency; // float as 32 bit value - need type for guaranteed 32 bit float?
-      uint32_t control;
-      uint32_t status;
-      uint32_t tickspersecond;
+    enum  TimeService_PPS_out_source {
+      TIME_SERVICE_PPS_OUT_SOURCE_TIMESERVER_BASED,
+      TIME_SERVICE_PPS_OUT_SOURCE_COPY_OF_INPUT_PPS,
+      TIME_SERVICE_PPS_OUT_SOURCE_LOCAL_REFCLK_DIV2_DISABLED,
+      TIME_SERVICE_PPS_OUT_SOURCE_PAD_ = 0X7FFFFFFF
+    } __attribute__((__packed__));
+    // The properties of the Hardware Time Server
+    // (see projects/core/hdl/devices/time_server.hdl/time_server.xml)
+    struct __attribute__ ((__packed__)) TimeService {
+        uint64_t time_now; /* 0x00 */
+        uint64_t delta; /* 0x08 */
+        uint8_t  clr_status_sticky_bits; /* 0x10 */
+        uint8_t  force_time_now_to_free_running; /* 0x11 */
+        uint8_t  valid_requires_write_to_time_now; /* 0x12 */
+        uint8_t  enable_time_now_updates_from_PPS; /* 0x13 */
+        enum     TimeService_PPS_out_source PPS_out_source; /* 0x14 */
+        uint8_t  force_time_now_valid; /* 0x18 */
+        uint8_t  force_time_now_invalid; /* 0x19 */
+        uint8_t  PPS_lost_sticky_error; /* 0x1A */
+        uint8_t  time_now_updated_by_PPS_sticky; /* 0x1B */
+        uint8_t  time_now_set_sticky; /* 0x1C */
+        uint8_t  PPS_ok; /* 0x1D */
+        uint8_t  PPS_lost_last_second_error; /* 0x1E */
+        uint8_t  PPS_count; /* 0x1F */
+        uint32_t ticks_per_second; /* 0x20 */
     };
-#define TIME_SERVICE_PPS_OK UINT64_C(1 << 27)
   }
 }
 #endif
