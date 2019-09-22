@@ -28,6 +28,7 @@
 #include "HdlEtherDriver.h"
 #include "HdlPciDriver.h"
 #include "ContainerManager.h"
+#include "gpsd.h"
 
 namespace OCPI {
   namespace HDL {
@@ -48,7 +49,14 @@ namespace OCPI {
 	virtual protected OCPI::Util::SelfMutex
     {
       const OCPI::Util::PValue *m_params; // a temporary during discovery
+      struct gps_context_t       m_gps_context;
+      std::string                m_gps_device; // e.g. /dev/ttyPS1
+      static struct gps_device_t m_gps_session;
+      bool                       m_gps_fix_acquired;
       bool setup(Device &dev, ezxml_t &config, std::string &err);
+    protected:
+      void configure_gps();
+      void configure(ezxml_t xml);
     public:
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);

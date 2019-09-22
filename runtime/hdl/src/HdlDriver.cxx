@@ -32,9 +32,15 @@ namespace OCPI {
     namespace OA = OCPI::API;
     namespace OU = OCPI::Util;
     namespace OP = OCPI::HDL::PCI;
-
+    namespace OS = OCPI::OS;
+    namespace OD = OCPI::Driver;
 
     const char *hdl = "hdl";
+
+    Driver::Driver() : m_gps_fix_acquired(false),
+        m_gps_device("/dev/ttyPS1") { /// @todo / FIXME - read from system.xml
+      gpsd_context_init(&m_gps_context, "opencpi-libgpsd");
+    }
 
     OCPI::HDL::Device *Driver::
     open(const char *name, bool discovery, bool forLoad, const OA::PValue *params,
@@ -178,6 +184,22 @@ namespace OCPI {
 	ocpiBad("While probing %s: %s", which, error.c_str());
       return NULL;
     }      
+    // use libgpsd interface to configure gps
+    // (ref https://www.systutorials.com/docs/linux/man/3-libgpsd/)
+    // see https://gitlab.com/gpsd/gpsd/blob/release-3.14/gpsctl.c
+    // for example libgpsd usage
+    void Driver::
+    configure_gps() {
+      if(m_gps_fix_acquired) {
+        return;
+      }
+    }
+    void Driver::
+    configure(ezxml_t xml) {
+      // First, do the generic configuration, which configures discovered devices for this driver
+      OD::Driver::configure(xml);
+      configure_gps();
+    }
     // Get the best current OS time, independent of any device.
     OS::Time Driver::
     now(bool &isGps) {
