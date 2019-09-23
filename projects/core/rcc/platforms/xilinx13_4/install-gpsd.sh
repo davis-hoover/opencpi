@@ -1,1 +1,0 @@
-../xilinx13_3/install-gpsd.sh
