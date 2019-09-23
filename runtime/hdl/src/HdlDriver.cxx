@@ -37,9 +37,9 @@ namespace OCPI {
 
     const char *hdl = "hdl";
 
-    Driver::Driver() : m_gps_fix_acquired(false),
-        m_gps_device("/dev/ttyPS1") { /// @todo / FIXME - read from system.xml
-      gpsd_context_init(&m_gps_context, "opencpi-libgpsd");
+    Driver::Driver() : m_gps_device("/dev/ttyPS1"), /// @todo / FIXME - read from system.xml
+        m_gps_fix_acquired(false) {
+      gps_context_init(&m_gps_context, "opencpi-libgpsd");
     }
 
     OCPI::HDL::Device *Driver::

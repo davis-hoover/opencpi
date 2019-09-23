@@ -28,7 +28,7 @@
 #include "HdlEtherDriver.h"
 #include "HdlPciDriver.h"
 #include "ContainerManager.h"
-#include "gpsd.h"
+#include <gpsd.h>
 
 namespace OCPI {
   namespace HDL {
@@ -58,6 +58,7 @@ namespace OCPI {
       void configure_gps();
       void configure(ezxml_t xml);
     public:
+      Driver();
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
       // This driver method is called when container-discovery happens, to see if there
