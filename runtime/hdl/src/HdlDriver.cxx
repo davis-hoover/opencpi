@@ -40,8 +40,7 @@ namespace OCPI {
 
     const char *hdl = "hdl";
 
-    Driver::Driver() : m_gps_device("/dev/ttyPS1"), /// @todo / FIXME - read from system.xml
-        m_gps_configured(false), m_gps_max_fd(0) {
+    Driver::Driver() : m_gps_configured(false), m_gps_max_fd(0) {
     }
 
     OCPI::HDL::Device *Driver::
@@ -192,7 +191,6 @@ namespace OCPI {
     // for example libgpsd usage
     void Driver::
     configure_gps() {
-      ocpiInfo("HDL Driver: %s()", __func__);
       gps_context_init(&m_gps_context, "opencpi-libgpsd");
       m_gps_context.errout.debug = LOG_INF;
       m_gps_session.context = &m_gps_context;
@@ -209,15 +207,15 @@ namespace OCPI {
     }
     void Driver::
     configure(ezxml_t xml) {
-      ocpiInfo("HDL Driver: %s()", __func__);
       // First, do the generic configuration, which configures discovered devices for this driver
       OD::Driver::configure(xml);
+      if(xml)
+        m_gps_device.assign(ezxml_cattr(xml, "gpsdev"));
       configure_gps();
     }
     // Get the best current OS time, independent of any device.
     void Driver::
     gpsCallback(struct gps_device_t *device, gps_mask_t changed) {
-      ocpiInfo("HDL Driver: %s()", __func__);
       if(device) {
       }
       if(changed) {
@@ -231,7 +229,6 @@ namespace OCPI {
     // Get the best current OS time, independent of any device.
     OS::Time Driver::
     now(bool &isGps) {
-      ocpiInfo("HDL Driver: %s()", __func__);
       isGps = true;
       if(!m_gps_configured) {
         ocpiInfo("HDL Driver: GPS not configured");
