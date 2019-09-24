@@ -177,7 +177,8 @@ architecture rtl of time_service is
   signal s_rollingPPSIn_sD_IN                  : std_logic_vector(7 downto 0);
   signal s_rollingPPSIn_sRDY                   : std_logic;
   --
-  signal s_setRefF_dD_OUT                      : std_logic_vector(63 downto 0);
+  signal s_setRefF_sD_IN                       : std_logic_vector(64 downto 0);
+  signal s_setRefF_dD_OUT                      : std_logic_vector(64 downto 0);
   signal s_setRefF_sENQ                        : std_logic;
   signal s_setRefF_dDEQ                        : std_logic;
   signal s_setRefF_dEMPTY_N                    : std_logic;
@@ -223,8 +224,15 @@ architecture rtl of time_service is
   signal s_ppsEdgeCount                        : std_logic_vector(7 downto 0);
   signal s_ppsLost                             : std_logic;
   signal s_ppsOK                               : std_logic;
+  signal s_gpsDisabled                         : std_logic;
   signal RST_N                                 : std_logic;
   signal timeRST_N                             : std_logic;
+  signal s_secValid                            : std_logic;
+  signal s_fracValid                           : std_logic;
+  signal s_gpsSecWrite                         : std_logic;
+  signal s1_gpsSecWrite                        : std_logic;
+  signal s_force_time_service_valid            : std_logic;
+  signal s_force_time_service_invalid          : std_logic;
 begin
 
   -- For older SyncFIFO modules until they get fixed
@@ -247,8 +255,11 @@ begin
   -- Time Clock Domain
   time_service.now     <= ulonglong_t(s_nowTC);
   time_service.clk     <= timeCLK;
-  time_service.reset   <= timeRST;
-
+  time_service.valid   <= '1' when s_force_time_service_valid = '1' else
+                          '0' when s_force_time_service_invalid = '1' else
+                          s_secValid and s_fracValid;
+  s_fracValid          <= RST_N or timeRST_N when its(s_ppsDisablePPS_sD_IN_slv0(0)) else s_ppsOK;
+  s_secValid           <= RST_N or timeRST_N when its(s_gpsDisabled) else s1_gpsSecWrite;
   -----------------------------------------------------------------------------
   -- Input assignments
   -----------------------------------------------------------------------------
@@ -257,6 +268,12 @@ begin
                    std_logic_vector(to_ulonglong(timeControl));
   -- clear Clock domain status/sticky bits
   s_doClear <= '1' when timeControl_written and s_timeIn(31) = '1' else '0';
+
+  -- set GPS disabled bit
+  s_gpsDisabled <= timeControl(3);
+
+  s_force_time_service_valid   <= timeControl(5);
+  s_force_time_service_invalid <= timeControl(6);
 
   -----------------------------------------------------------------------------
   -- Calculate deltaTime based on 'now' and time adjustment provided by host
@@ -430,15 +447,19 @@ begin
   -----------------------------------------------------------------------------
   -- Register Second and Fraction counts in the Time clock domain
   -- Same Sec/Frac value reported in the Control clock domain
+  -- gpsSecWrite is used to drive time_service.valid, so it must be delayed to
+  -- align with nowTC which drives time_service.now
   -----------------------------------------------------------------------------
   reg_nowTC : process(timeCLK)
   begin
     if(rising_edge(timeCLK)) then
       if (timeRST = '1') then
         s_nowTC <= (others => '0');
+        s1_gpsSecWrite <= '0';
       else
         if (s_nowInCC_sRDY = '1') then
           s_nowTC <= s_refSecCount & s_fracSeconds(47 downto 16);
+          s1_gpsSecWrite <= s_gpsSecWrite;
         end if;
       end if;
     end if;
@@ -500,18 +521,19 @@ begin
   -----------------------------------------------------------------------------
   -- Control to Time clk domain: Clock 's_timeIn' into the Time clk domain
   -----------------------------------------------------------------------------
+  s_setRefF_sD_IN <= (not s_gpsDisabled) & s_timeIn;
   s_setRefF_sENQ <= timeNow_written;
   s_setRefF_dDEQ <= s_setRefF_dEMPTY_N;
   syncFifo_setRefF : SyncFIFO
     generic map (
-      dataWidth => 64,
+      dataWidth => 65,
       depth  => 2,
       indxWidth => 1)
     port map (
       sCLK   => CLK,
       dCLK   => timeCLK,
       sRST   => RST_N,
-      sD_IN  => s_timeIn,
+      sD_IN  => s_setRefF_sD_IN,
       sENQ   => s_setRefF_sENQ,
       dDEQ   => s_setRefF_dDEQ,
       dD_OUT => s_setRefF_dD_OUT,
@@ -531,11 +553,11 @@ begin
         s_rplTimeControl <= (others => '0');
         s_timeSetSticky  <= '0';
       else
-        if (s_doClear = '1') then s_gpsInSticky                                 <= '0'; end if;
-        if (s_doClear = '1' or s_ppsOKCC_dD_OUT = '1') then s_ppsInSticky       <= s_ppsOKCC_dD_OUT; end if;
-        if (s_doClear = '1' or s_ppsLostCC_dD_OUT = '1') then s_ppsLostSticky   <= s_ppsLostCC_dD_OUT; end if;
-        if (s_doClear = '1' or timeControl_written = '1') then s_rplTimeControl <= s_timeIn(4 downto 0); end if;
-        if (s_doClear = '1' or timeNow_written = '1') then s_timeSetSticky      <= not s_doClear; end if;
+        if (s_doClear = '1' or (timeNow_written = '1' and s_gpsDisabled = '0')) then s_gpsInSticky <= not s_doClear; end if;
+        if (s_doClear = '1' or s_ppsOKCC_dD_OUT = '1')                          then s_ppsInSticky <= s_ppsOKCC_dD_OUT; end if;
+        if (s_doClear = '1' or s_ppsLostCC_dD_OUT = '1')                        then s_ppsLostSticky <= s_ppsLostCC_dD_OUT; end if;
+        if (s_doClear = '1' or timeControl_written = '1')                       then s_rplTimeControl <= s_timeIn(4 downto 0); end if;
+        if (s_doClear = '1' or timeNow_written = '1')                           then s_timeSetSticky <= not s_doClear; end if;
       end if;
     end if;
   end process;
@@ -624,6 +646,8 @@ begin
   -- refSecCount : # of Seconds output by the time service
   -- refPerCount : # of cycles from start of PPS pulse (External or Internal/free-running)
   -- ppsDrive    : Active while count is < 0.9 of a second (90% HI, 10% LO)
+  -- gpsSecWrite : used for time_service.valid; delay timeNow_written and not
+  --               gpsDisabled to align with time_service.now update 
   -----------------------------------------------------------------------------
   reg_Second : process(timeCLK)
   begin
@@ -632,7 +656,12 @@ begin
         s_refSecCount <= (others => '0');
         s_refPerCount <= (others => '0');
         s_ppsDrive    <= '0';
+        s_gpsSecWrite <= '0';
       else
+        -- s_setRefF_dD_IN(64) = timeNow_written and not gpsDisabled
+        if (s_setRefF_dDEQ = '1') then
+          s_gpsSecWrite <= s_setRefF_dD_OUT(64);
+        end if;
         -- Set seconds counter if a value is provided by host,
         -- OR
         -- If External PPS present AND operating within expected valid range,

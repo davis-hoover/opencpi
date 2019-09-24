@@ -18,6 +18,7 @@
 
 # The xsim platform.
 HdlLibraries+=sdp
+Configurations=base cfg_pps_sim_test
 ExportFiles=runSimExec.xsim probe.exe.tgz
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
 

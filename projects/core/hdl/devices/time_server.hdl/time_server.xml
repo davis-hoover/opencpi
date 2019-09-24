@@ -34,7 +34,7 @@
        local_refclk_div_2 : output is local reference clock /2 (e.g. 100MHz for 200Mhz)
        disabled           : output is disabled (0) -->
   <Property Name="PPS_out_source" Type="enum" Writable="true"
-	    Enums="timeserver_based, copy_of_input_PPS, local_refclk_div2_disabled"
+	    Enums="timeserver_based, copy_of_input_PPS, local_refclk_div_2, disabled"
 	    Description="Source of timebase PPS output"/>
   <Property Name="force_time_now_valid" Type="bool" Writable="true"
 	    Description="When true, time service master's valid is always true"/>

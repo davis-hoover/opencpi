@@ -16,18 +16,13 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-HdlLibraries=bsv fixed_float ocpi util
-# We can't successfully elaborate this since it references the metadata stuff
-HdlNoElaboration=yes
-# FIXME FIXME: The low level primitives (FIFO etc.) are COPIED here due to an XST bug
-# that doesn't seem to find verilog modules in libraries when the elaboration is vhdl->verilog->verilog...
-# mkOCCP.v occp_rv.vhd
-SourceFiles=\
-platform_pkg.vhd platform_body.vhd \
-time_client_rv.vhd time_client_co_rv.vhd \
-mkTLPSerializer.v metadata_rv.vhd sim_dcp.vhd sim_clk.vhd sim_pulse_gen.vhd \
-wci_master.vhd ocscp_rv.vhd \
-mkPktFork.v mkPktMerge.v mkTLPSM.v unoc_node_rv.vhd \
-mkSimIO.v mkSimDCP.v \
-FIFO1.v FIFO2.v MakeResetA.v SyncResetA.v SyncHandshake.v arSRLFIFOD.v
-include $(OCPI_CDK_DIR)/include/hdl/hdl-lib.mk
+$(if $(realpath $(OCPI_CDK_DIR)),,\
+  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
+# This is the application Makefile for the "time_server_test_app" application
+# If there is a time_server_test_app.cc (or time_server_test_app.cxx) file, it will be assumed to be a C++ main program to build and run
+# If there is a time_server_test_app.xml file, it will be assumed to be an XML app that can be run with ocpirun.
+# The RunArgs variable can be set to a standard set of arguments to use when executing either.
+
+APP=test_app
+
+include $(OCPI_CDK_DIR)/include/application.mk

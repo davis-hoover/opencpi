@@ -1,0 +1,5 @@
+<hdlconfig>
+  <device name='time_server'>
+    <property name='pps_sim_test' value='true'/>
+  </device>
+</hdlconfig>
