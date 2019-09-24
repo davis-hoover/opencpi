@@ -85,47 +85,27 @@ namespace OCPI {
     now(bool &isGps) {
       OS::Time ret;
       Access *ts = timeServer();
-      const char* m1 = "HDL Device";
-      const char* dd = m_name.c_str();
       if(!ts)
         isGps = false;
       if(isGps)
         isGps = getPPSIsOkay();
       else {
+        const char* m1 = "HDL Device";
+        const char* dd = m_name.c_str();
         const char* m2 = "time_server.hdl ppsOK timeout occurred";
         ocpiInfo("%s '%s': %s", m1, dd, m2);
       }
       if(isGps) {
-/// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
-/*        static gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
-        if(gps_rec.stream(WATCH_ENABLE|WATCH_JSON) == NULL) {
-          isGps = false;
-          ocpiInfo("%s '%s': no gpsd running"); /// @todo / FIXME - try to start it
-        }
-        else {
-          struct gps_data_t* gps_data;
-          for(;;) {
-            if(!gps_rec.waiting(2000000))
-              continue;
-            if((gps_data = gps_rec.read()) == NULL) {
-              ocpiInfo("%s '%s': gpsd read failure");*/
-              isGps = false;
-/// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
-/*              break;
-            }
-            else if(gps_data->fix.mode > MODE_NO_FIX) {
-              OS::Time::Timeval time_val = ((uint64_t)gps_data->fix.time << 32);
-              uint64_t lsbs = ts->get64RegisterOffset(propOffset, time.bits());
-              time_val |= (lsbs & 0xffffffff);
-              ret = OS::Time(time_val);
-            }
-            break;
-          }
-        }*/
+        auto propOffset = offsetof(TimeService, time_now);
+        ret = Driver::getSingleton().now(isGps); // temp save
+        // write integer portion only (most significant 32 bits) from
+        // libgpsd-provided time from HDL::Driver to HTS
+        m_tsWorker->m_properties.set64RegisterOffset(propOffset, ret.bits());
+        // read current Q32.32 time from HTS now that HTS is fully sync'd to GPS
+        ret = m_tsWorker->m_properties.get64RegisterOffset(propOffset);
       }
-      if(!isGps) {
+      if(!isGps)
         ret = OS::Time::now();
-      }
       return ret;
     }
     // Called from derived constructor after accessors have been set up.
@@ -203,9 +183,7 @@ namespace OCPI {
           return true;
         bool isGPS;
         auto propOffset = offsetof(TimeService, time_now);
-        //OS::Time time = Driver::getSingleton().now(isGPS);
         OS::Time time = now(isGPS);
-        m_tsWorker->m_properties.set64RegisterOffset(propOffset, time.bits());
         const char* name = m_name.c_str();
         const char* m1 = "time_server.hdl time_now was initialized to";
         const char* m2 = isGPS ? "GPS time " : "non-GPS time";

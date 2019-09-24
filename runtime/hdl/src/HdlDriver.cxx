@@ -22,9 +22,12 @@
  * This file contains driver-level code that does not know about the guts of the 
  * container class.
  */
+#include <unistd.h> // alarm()
 #include "ContainerManager.h"
 #include "HdlContainer.h"
 #include "HdlDriver.h"
+
+bool OCPI::HDL::Driver::m_gps_timeout = false;
 
 namespace OCPI {
   namespace HDL {
@@ -38,8 +41,7 @@ namespace OCPI {
     const char *hdl = "hdl";
 
     Driver::Driver() : m_gps_device("/dev/ttyPS1"), /// @todo / FIXME - read from system.xml
-        m_gps_fix_acquired(false) {
-      gps_context_init(&m_gps_context, "opencpi-libgpsd");
+        m_gps_configured(false), m_gps_max_fd(0) {
     }
 
     OCPI::HDL::Device *Driver::
@@ -190,20 +192,92 @@ namespace OCPI {
     // for example libgpsd usage
     void Driver::
     configure_gps() {
-      if(m_gps_fix_acquired) {
-        return;
+      ocpiInfo("HDL Driver: %s()", __func__);
+      gps_context_init(&m_gps_context, "opencpi-libgpsd");
+      m_gps_context.errout.debug = LOG_INF;
+      m_gps_session.context = &m_gps_context;
+      gpsd_init(&m_gps_session, &m_gps_context, m_gps_device.c_str());
+      if(gpsd_activate(&m_gps_session, O_PROBEONLY) >= 0) {
+        m_gps_configured = true;
+        FD_SET(m_gps_session.gpsdata.gps_fd, &m_gps_all_fds);
+        if(m_gps_session.gpsdata.gps_fd > m_gps_max_fd)
+          m_gps_max_fd = m_gps_session.gpsdata.gps_fd;
+        gpsd_time_init(&m_gps_context, time(NULL));
+        bool isGps;
+        (void)now(isGps);
       }
     }
     void Driver::
     configure(ezxml_t xml) {
+      ocpiInfo("HDL Driver: %s()", __func__);
       // First, do the generic configuration, which configures discovered devices for this driver
       OD::Driver::configure(xml);
       configure_gps();
     }
     // Get the best current OS time, independent of any device.
+    void Driver::
+    gpsCallback(struct gps_device_t *device, gps_mask_t changed) {
+      ocpiInfo("HDL Driver: %s()", __func__);
+      if(device) {
+      }
+      if(changed) {
+      }
+      static int packet_counter = 0;
+      if(packet_counter++ >= 15) {
+        m_gps_timeout = true;
+        alarm(0);
+      }
+    }
+    // Get the best current OS time, independent of any device.
     OS::Time Driver::
     now(bool &isGps) {
-      isGps = false; /// @todo / FIXME - add gpsd support
+      ocpiInfo("HDL Driver: %s()", __func__);
+      isGps = true;
+      if(!m_gps_configured) {
+        ocpiInfo("HDL Driver: GPS not configured");
+        isGps = false;
+        return OS::Time::now();
+      }
+      fd_set rfds;
+      for(m_gps_timeout = false; !m_gps_timeout; ) {
+        fd_set efds;
+        switch(gpsd_await_data(&rfds, &efds, m_gps_max_fd, &m_gps_all_fds, &m_gps_context.errout)) {
+          case AWAIT_GOT_INPUT:
+            break;
+          case AWAIT_NOT_READY:
+            if(FD_ISSET(m_gps_session.gpsdata.gps_fd, &efds)) {
+              ocpiInfo("HDL Driver: libgpsd: bad file descriptor");
+              isGps = false;
+              return OS::Time::now();
+            }
+            continue;
+          case AWAIT_FAILED:
+            ocpiInfo("HDL Driver: libgpsd: gpsd_await_data() returned DEVICE_ERROR");
+            isGps = false;
+            return OS::Time::now();
+        }
+        switch(gpsd_multipoll(FD_ISSET(m_gps_session.gpsdata.gps_fd, &rfds), &m_gps_session, gpsCallback, 0)) {
+          case DEVICE_READY:
+            FD_SET(m_gps_session.gpsdata.gps_fd, &m_gps_all_fds);
+          case DEVICE_UNREADY:
+            FD_CLR(m_gps_session.gpsdata.gps_fd, &m_gps_all_fds);
+          case DEVICE_ERROR:
+            ocpiInfo("HDL Driver: libgpsd: gpsd_multipoll() returned DEVICE_ERROR");
+            isGps = false;
+            return OS::Time::now();
+          case DEVICE_EOF:
+            ocpiInfo("HDL Driver: libgpsd: gpsd_multipoll() returned DEVICE_EOF");
+            isGps = false;
+            return OS::Time::now();
+          default:
+            break;
+        }
+      }
+      if(m_gps_session.gpsdata.fix.mode >= MODE_2D)
+        return (OS::Time::TimeVal) m_gps_session.gpsdata.fix.time;
+      else
+        isGps = false;
+      ocpiInfo("HDL Driver: GPS fix not acquired");
       return OS::Time::now();
     }
     // Internal method common to "open" and "found"

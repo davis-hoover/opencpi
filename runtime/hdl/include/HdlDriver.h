@@ -49,16 +49,20 @@ namespace OCPI {
 	virtual protected OCPI::Util::SelfMutex
     {
       const OCPI::Util::PValue *m_params; // a temporary during discovery
-      struct gps_context_t       m_gps_context;
-      std::string                m_gps_device; // e.g. /dev/ttyPS1
-      static struct gps_device_t m_gps_session;
-      bool                       m_gps_fix_acquired;
+      static bool           m_gps_timeout;
+      struct gps_context_t  m_gps_context;
+      struct gps_device_t   m_gps_session;
+      std::string           m_gps_device; // e.g. /dev/ttyPS1
+      bool                  m_gps_configured;
+      fd_set                m_gps_all_fds;
+      int                   m_gps_max_fd;
       bool setup(Device &dev, ezxml_t &config, std::string &err);
     protected:
       void configure_gps();
       void configure(ezxml_t xml);
     public:
       Driver();
+      static void gpsCallback(struct gps_device_t *device, gps_mask_t changed);
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
       // This driver method is called when container-discovery happens, to see if there
