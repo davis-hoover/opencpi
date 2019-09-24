@@ -41,7 +41,7 @@ begin
   timeControl(4)          <= props_in.force_time_now_to_free_running;
   timeControl(3)          <= not props_in.valid_requires_write_to_time_now; --formerly disableGPS
   timeControl(2)          <= not props_in.enable_time_now_updates_from_PPS; --formerly disablePPS
-  timeControl(1 downto 0) <= "00" when props_in.PPS_out_source = timeserver_based_e else
+  timeControl(1 downto 0) <= "00" when props_in.PPS_out_source = derived_from_input_clk_e else
                              "01" when props_in.PPS_out_source = copy_of_input_pps_e else
                              "10" when props_in.PPS_out_source = local_refclk_div_2_e else
                              "11"; --disabled
