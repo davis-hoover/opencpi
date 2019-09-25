@@ -34,5 +34,5 @@ Configurations=\
 	zed_zipper_fmc_rx \
 	zed_zipper_fmc_tx
 
-ExportFiles=zed.xdc zed_bit.xdc zed.mk
+ExportFiles=zed.xdc zed_bit.xdc zed.mk zed.exports
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk

@@ -22,4 +22,3 @@
 =platforms/zynq/zynq_system.xml <target>/system.xml
 @<rcc_platform_dir>/release/zed/devicetree.dtb <target>/
 @<rcc_platform_dir>/release/zed/boot.bin <target>/
-

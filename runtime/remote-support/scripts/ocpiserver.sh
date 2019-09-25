@@ -39,14 +39,19 @@ function do_stop {
 }
 
 
-# We are being run in a sandbox directory
+# We are being run in a sandbox directory.
+# We'll write a file here in case someone also wants to do env setup
+cat > setup.sh <<'EOF'
 export OCPI_CDK_DIR=`pwd`
 export OCPI_TOOL_PLATFORM=$(< swplatform)
 export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
 PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
+export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/system.xml
+export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/c++
+EOF
+. ./setup.sh
 platform=$OCPI_TOOL_PLATFORM
-export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/$platform/system.xml
 
 echo Executing remote configuration command: $* >&2
 
@@ -74,7 +79,6 @@ case $1 in
 	  exit 1
       fi
       set -e
-      export LD_LIBRARY_PATH=$platform/c++
       ocpidriver unload >&2 || : # in case it was loaded from a different version
       ocpidriver load >&2
       log=$(date +%Y%m%d-%H%M%S).log

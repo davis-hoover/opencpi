@@ -80,7 +80,7 @@ else
   DIR=$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib
   DIR2=/opt/opencpi/driver/$(uname -r)
   MODFILE=$MODNAME-$LABEL.ko
-  MODFILE2=$MODNAME.ko
+  MODFILE2=$MODNAME*.ko
   if test -e $DIR/$MODFILE; then
     true # default
   elif test -e $DIR2/$MODFILE; then

@@ -79,7 +79,7 @@ $(if $(OCPI_XILINX_LAB_TOOLS_DIR),\
         $(call $(or $1,error), Directory $t/$v has no ISE or LabTools under it))))))
 
 # This looks for the (ISE) edk dir. It does not consider Vivado installations
-OcpiXilinxEdkDir=$(strip\
+OcpiXilinxIseEdkDir=$(strip\
  $(foreach d,$(or $(OCPI_XILINX_EDK_DIR),$(call OcpiXilinxIseDir,$1)/EDK),\
    $(infox EDK:$d)$(if $(shell test -d $d && echo 1),$d,\
                      $(call $(or $1,error), Directory "$d", for OCPI_XILINX_EDK_DIR, not found))))
