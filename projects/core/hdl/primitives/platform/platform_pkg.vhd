@@ -344,15 +344,16 @@ component sim_dcp is
     cp_out : out occp_in_t);
 end component sim_dcp;
 
-component sim_pulse_gen is
+component pulse_gen is
   generic(
-    g_clk_period   : time;
-    g_pulse_period : time;
-    g_pulse_width  : positive);
+    g_pulse_period : positive;
+    g_pulse_width  : positive;
+    g_pulse_delay  : positive);
   port(
+    i_clk          : in std_logic;
     i_reset        : in std_logic;
     o_pulse        : out std_logic);
-end component sim_pulse_gen;
+end component pulse_gen;
 
 component wci_master is
   generic(

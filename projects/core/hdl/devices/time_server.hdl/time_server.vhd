@@ -88,22 +88,27 @@ begin
       ppsOut              => timebase_out.PPS,
       time_service        => time_out);
 
-  no_pps_gen: if its(not pps_sim_test) generate
+  no_pps_gen: if its(not pps_test) generate
     ppsIn <= timebase_in.PPS;
   end generate;
   
-  pps_gen: if its(pps_sim_test) generate
+  pps_gen: if its(pps_test) generate
     -- To accelerate the speed of the time_server_test_app, clock the time server
     -- at 100 MHz, but declare frequency at 1 MHz and generate "PPS" at 10 ms. 
-    constant c_clk_period     : time := 10 ns;
-    constant c_pulse_period   : time := 10 ms;
-    constant c_pulse_width    : positive := 16;
+    constant c_pulse_period    : positive := 1000000;
+    constant c_pulse_width     : positive := 16;
+    -- For time_server test application, generate first PPS rising edge at
+    -- 1 second minus PPS_tolerance_PPM/2
+    constant c_pulse_delay     : positive := 1000000-to_integer(PPS_tolerance_PPM)/2;
+    signal   pulse_reset       : std_logic;
   begin
-    pps : component platform.platform_pkg.sim_pulse_gen
-      generic map(g_clk_period =>   c_clk_period,
-                  g_pulse_period => c_pulse_period,
-                  g_pulse_width  => c_pulse_width)
-      port map(i_reset => ctl2timebase_reset,
+    pulse_reset <= ctl2timebase_reset or props_in.time_now_written;
+    pps : component platform.platform_pkg.pulse_gen
+      generic map(g_pulse_period => c_pulse_period,
+                  g_pulse_width  => c_pulse_width,
+                  g_pulse_delay  => c_pulse_delay)
+      port map(i_clk => ctl_in.clk,
+               i_reset => pulse_reset,
                o_pulse => ppsIn);
   end generate;
 
