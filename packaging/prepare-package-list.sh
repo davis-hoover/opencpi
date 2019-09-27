@@ -120,7 +120,7 @@ done
 # This list could potentially be platform-specific
 # and then there are platform-specific prereqs
 # AV-5286
-prereqs="gmp lzma gtest patchelf inode64 ad9361 liquid"
+prereqs="gmp lzma gtest patchelf inode64 ad9361 liquid gpsd"
 case $type in
   all)
     for f in cdk/*; do
