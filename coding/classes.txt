@@ -1,5 +1,6 @@
 Ordering of declarations/definitions within classes, and their naming conventions is:
 
+all names with prefixes are initial-lower-camelcase after the prefixes.
 class name camel case initial capitalized
 types: camel case initial capitalized
 constants: - upper case or c_

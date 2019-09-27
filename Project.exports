@@ -250,6 +250,7 @@
 =platforms/zynq/createLinuxKernelHeaders.sh scripts/xilinx/
 =platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
 =platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
+=runtime/hdl-support/xilinx/normalizeXilinxReleases.sh scripts/xilinx/
 =runtime/hdl-support/xilinx/vivado* include/hdl/
 =runtime/hdl-support/scripts/loadFlash <target>/bin/
 =runtime/hdl-support/scripts/probeJtag <target>/bin/

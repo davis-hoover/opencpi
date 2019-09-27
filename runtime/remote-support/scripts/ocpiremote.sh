@@ -141,7 +141,7 @@ for op in $*; do
              $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/ocpihdl $platform/system.xml"
       [ -n "$vg" ] && files+=" ../prerequisites/valgrind/$platform"
       [ -x $platform/bin/gdb ] && files+=" $platform/bin/gdb"
-      [ -x $platform/c++ ] && files+=" $platform/c++"
+      [ -x $platform/lib/c++ ] && files+=" $platform/lib/c++"
       tar -c -z -H -f $tmpdir/tar.tgz $files
       do_ssh "test -e $rdir && echo Directory exists && exit 1;
       	      date -u `date -u +%Y.%m.%d-%H:%M:%S`;

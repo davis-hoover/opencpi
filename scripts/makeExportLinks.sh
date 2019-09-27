@@ -198,7 +198,12 @@ function do_addition {
   exp=${both[1]}
   [ -z "$exp" ] && bad unexpected empty second field
   # If not deployment(@) replace with just target else replace with deploy/target
-  [ "$2" != "--" ] && exp=${exp//<target>/$target2} || exp=${exp//<target>/deploy/$target2}
+  if [ "$2" = "--" ]; then
+      exp=${exp//<target>/deploy/$target2}
+  else
+      exp=${exp//<target>/$target2}
+  fi
+  exp=${exp//<platform>/$platform}
   [ -n "$rcc_platform" ] && exp=${exp//<rcc_platform>/$rcc_platform}
   set +f
   targets=$(match_pattern "$rawsrc")

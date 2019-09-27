@@ -25,8 +25,8 @@ cross=0
 shift
 hdl_rcc_platform=$1 && shift
 set -e
-
-my_loc=$(readlink -e "$(dirname $0)")
+source $OCPI_CDK_DIR/scripts/util.sh
+my_loc=$(ocpiReadLinkE "$(dirname $0)")
 tmpdir=$(mktemp -d)
 OCPI_CDK_DIR=$my_loc/../cdk
 # If there is no rcc platform set hdl_rcc_platform to no_sw

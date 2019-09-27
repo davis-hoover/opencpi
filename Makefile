@@ -295,9 +295,11 @@ DoRpmOrDeployHw=\
         $(foreach h,$(word 2,$(subst :, ,$(pair))),\
           $(foreach p,$(if $(filter-out -,$h),$h,$r),\
             $(if $(filter -,$h),\
-              ./packaging/make-sw-rpms.sh $(and $(RpmVerbose),-v) $p \
-                 "$(and $(call cross,$p),1)" $(Package) $(base) $(call name,$p,sw) \
-                  $(release) $(version) $(git_hash),\
+	      $(if $1,\
+	        echo 'Cannot make a deployment (SD card) for a software-only platform yet.' && exit 1, \
+               ./packaging/make-sw-rpms.sh $(and $(RpmVerbose),-v) $p \
+                  "$(and $(call cross,$p),1)" $(Package) $(base) $(call name,$p,sw) \
+                   $(release) $(version) $(git_hash)),\
               $(if $1,\
                 ./packaging/make-hw-deploy.sh $(and $(RpmVerbose),-v) $p \
                   "$(and $(call cross,$p),1)" $r,\

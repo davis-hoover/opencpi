@@ -18,13 +18,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <OcpiOsSpinLock.h>
-#include "OcpiOsPosixError.h"
 #include <cerrno>
 #include <cstdio>
 #include <string>
 #include <cstring>
 #include <pthread.h>
+#include "OcpiOsSpinLock.h"
+#include "OcpiOsPosixError.h"
+#include "OcpiOsAssert.h"
 
 namespace {
   pthread_mutex_t gemMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -55,5 +56,6 @@ OCPI::OS::Posix::getErrorMessage (int errorCode, const char *where)
     res += message;
   }
   pthread_mutex_unlock (&gemMutex);
+  ocpiDebug("POSIX ERROR: %s", res.c_str());
   return res;
 }

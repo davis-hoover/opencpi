@@ -66,9 +66,9 @@
 	     m_driver(driver), m_vaddr(NULL) {
 	   m_isAlive = false;
 	   m_endpointSize = sizeof(OccpSpace);
-	   if (OF::exists(fpgaMgrState) && OF::exists(fpgaMgrFlags)) // && OF::exists(fpgaMgrFirmware))
+	   if (OF::exists(fpgaMgrState)) // && OF::exists(fpgaMgrFirmware))
 	     m_fpgaManager = true;
-	   else if (OF::exists(xdevCfgState) && OF::exists(xdevCfgDevice))
+	   else if (OF::exists(xdevCfgState) && !::access(xdevCfgDevice, F_OK)) // need access() for char device
 	     m_fpgaManager = false;
 	   else {
 	     err = "FPGA support not present for Zynq PL, required files are missing";
@@ -250,22 +250,9 @@
 		  memmove(buf, p8, len);
 		// We've done as much as we can before opening the device, which
 		// does bad things to the Zynq PL (i.e. causes an "unload")
-		if (useManager) {
-#if 0 // old way that copies into yet another file
-		  if (!OF::exists(fpgaMgrDir)) {
-		    if (::mkdir(fpgaMgrDir, 0666)) {
-		      OU::format(a_error, "Cannot create directory %s (%s)",
-				 fpgaMgrDir, strerror(errno));
-		      return;
-		    }
-		  }
-		  OU::format(outputFile, "%s/opencpi_temp.bin", fpgaMgrDir);
-		  ocpiDebug("Creating temp file for the fpga manager: %s", outputFile.c_str());
-		  xfd = ::creat(outputFile.c_str(), 0666);
-#else // new way that loads from our memory
+		if (useManager)
 		  outputFile = OCPI_DRIVER_MEM;
-#endif
-		} else // use original/old Xilinx loading device driver, pre-fpga manager
+		else // use original/old Xilinx loading device driver, pre-fpga manager
 		  outputFile = xdevCfgDevice;
 		if ((xfd = ::open(outputFile.c_str(), O_RDWR)) < 0)
 		  OU::format(a_error, "Can't open %s for bitstream loading: %s(%d)",
@@ -389,12 +376,6 @@
 	     std::string &error) {
 	// Opening implies canonicalizing the name, which is needed for excludes
 	ocpiInfo("Searching for local Zynq/PL HDL device.");
-#if 0
-	bool verbose = false;
-	OU::findBool(params, "verbose", verbose);
-	if (verbose)
-	  printf("Searching for local Zynq/PL HDL device.\n");
-#endif
 	OCPI::HDL::Device *dev = open("0", true, params, error);
 	return dev && !found(*dev, exclude, discoveryOnly, error) ? 1 : 0;
       }
