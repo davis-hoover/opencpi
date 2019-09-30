@@ -53,7 +53,6 @@ begin
                              props_in.PPS_out_source_written;
   
   props_out.PPS_lost_sticky_error          <= timeStatus(31);
-  props_out.time_now_set_sticky            <= timeStatus(30); --formerly gpsIn
   props_out.time_now_updated_by_PPS_sticky <= timeStatus(29); --formerly ppsIn
   props_out.time_now_set_sticky            <= timeStatus(28);
   props_out.PPS_ok                         <= timeStatus(27);

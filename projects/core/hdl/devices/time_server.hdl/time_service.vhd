@@ -553,11 +553,11 @@ begin
         s_rplTimeControl <= (others => '0');
         s_timeSetSticky  <= '0';
       else
-        if (s_doClear = '1' or (timeNow_written = '1' and s_gpsDisabled = '0')) then s_gpsInSticky <= not s_doClear; end if;
-        if (s_doClear = '1' or s_ppsOKCC_dD_OUT = '1')                          then s_ppsInSticky <= s_ppsOKCC_dD_OUT; end if;
-        if (s_doClear = '1' or s_ppsLostCC_dD_OUT = '1')                        then s_ppsLostSticky <= s_ppsLostCC_dD_OUT; end if;
-        if (s_doClear = '1' or timeControl_written = '1')                       then s_rplTimeControl <= s_timeIn(4 downto 0); end if;
-        if (s_doClear = '1' or timeNow_written = '1')                           then s_timeSetSticky <= not s_doClear; end if;
+        if (s_doClear = '1')                              then s_gpsInSticky <= '0'; end if;
+        if (s_doClear = '1' or s_ppsOKCC_dD_OUT = '1')    then s_ppsInSticky <= s_ppsOKCC_dD_OUT; end if;
+        if (s_doClear = '1' or s_ppsLostCC_dD_OUT = '1')  then s_ppsLostSticky <= s_ppsLostCC_dD_OUT; end if;
+        if (s_doClear = '1' or timeControl_written = '1') then s_rplTimeControl <= s_timeIn(4 downto 0); end if;
+        if (s_doClear = '1' or timeNow_written = '1')     then s_timeSetSticky <= not s_doClear; end if;
       end if;
     end if;
   end process;
