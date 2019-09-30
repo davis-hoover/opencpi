@@ -44,7 +44,7 @@ endif
 include $(OCPI_CDK_DIR)/include/hdl/hdl-lib2.mk
 
 # if there isnt a install dir set assume we are in a primitives library ans install them in ../lib
-ifneq ($(HdlInstallDir)$(HdlInstallLibDir),)
+ifeq ($(HdlInstallDir)$(HdlInstallLibDir),)
   HdlInstallDir=../lib
   $(call OcpiIncludeAssetAndParent,..,hdl)
 endif

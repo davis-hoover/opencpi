@@ -37,5 +37,5 @@
 =platforms/zynq/zynq_system.xml <target>/system.xml
 +<platform_dir>/README <target>/
 # Deployment files
-@<platform_dir>/release/uramdisk.image.gz <target>/
-@<platform_dir>/release/uImage <target>/
+@<platform_dir>/release/uramdisk.image.gz /
+@<platform_dir>/release/uImage /

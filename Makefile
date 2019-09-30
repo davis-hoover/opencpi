@@ -113,7 +113,10 @@ DoExports=\
           $(infox x:$x r:$r h:$h)\
           $(if $(and $(filter-out -,$h),$(filter -,$r)),\
             $(warning The HDL platform "$h" has no RCC platform.  It will be ignored.))\
-          ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) $h $(HdlPlatformDir_$h) &&)))) :
+	  $(and $(filter-out -,$r),\
+            ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) &&) \
+          $(and $(filter-out -,$h),\
+            ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) $h $(HdlPlatformDir_$h) &&))))) :
 
 .PHONY: exports      framework      driver      testframework cleanpackaging \
         cleanexports cleanframework cleanprojects cleandriver clean distclean cleaneverything

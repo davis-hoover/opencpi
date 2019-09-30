@@ -30,10 +30,10 @@ VivadoZynqTargets=zynq
 # Older versions of vivado may use v4. These are not
 # directly supported
 XilinxZynqCore_base=processing_system7_v5_
-XilinxIpDir=$(call OcpiXilinxVivadoDir,infox)/data/ip/xilinx
+XilinxIpDir=$(call OcpiXilinxVivadoDir,error)/data/ip/xilinx
 # Look for the most recent version of ps7 in the vivado installation
 XilinxZynqCore=$(notdir $(lastword $(wildcard $(XilinxIpDir)/$(XilinxZynqCore_base)*)))
-XilinxZynq=$(call OcpiXilinxVivadoDir, infox)/data/ip/xilinx/$(XilinxZynqCore)/hdl/verilog
+XilinxZynq=$(call OcpiXilinxVivadoDir,error)/data/ip/xilinx/$(XilinxZynqCore)/hdl/verilog
 XilinxZynqPSFiles=atc aw_atc b_atc trace_buffer w_atc
 # The Vivado processing_system7 v5_5 verilog file must be generated.
 # This is done via a make rule below.
@@ -43,7 +43,7 @@ XilinxZynqPS7Version=$(subst _,.,$(subst processing_system7_v,,$(XilinxZynqCore)
 
 # ISE's core
 XilinxZynq_iseCore=processing_system7_v4_03_a
-XilinxZynq_ise=$(call OcpiXilinxEdkDir,infox)/hw/XilinxProcessorIPLib/pcores/$(XilinxZynq_iseCore)/hdl/verilog
+XilinxZynq_ise=$(call OcpiXilinxIseEdkDir,infox)/hw/XilinxProcessorIPLib/pcores/$(XilinxZynq_iseCore)/hdl/verilog
 # Since the wrapper file is verilog. we'll provide the verilog PS7
 #XilinxPS7=$(OcpiXilinxToolsDir)/ISE/verilog/src/unisims/PS7.v
 XilinxZynq_isePSFiles=atc aw_atc b_atc processing_system7 trace_buffer w_atc

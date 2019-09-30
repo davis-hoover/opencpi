@@ -47,13 +47,11 @@
        namespace OF = OCPI::OS::FileSystem;
 
        const char
-         fpgaMgrState[] =    "/sys/class/fpga_manager/fpga0/state",
-	 fpgaMgrFlags[] =    "/sys/class/fpga_manager/fpga0/flags",
-       	 fpgaMgrDevice[] =      "/amba/devcfg@f8007000", // from /sys/firmware/devicetree/base/...
-       // fpgaMgrDir[] =      "/lib/firmware",
-       // fpgaMgrFirmware[] = "/sys/class/fpga_manager/fpga0/firmware",
-	 xdevCfgState[] =    "/sys/class/xdevcfg/xdevcfg/device/prog_done",
-	 xdevCfgDevice[] =   "/dev/xdevcfg";
+         fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
+	 fpgaMgrFlags[]  = "/sys/class/fpga_manager/fpga0/flags",
+       	 fpgaMgrDevice[] = "/amba/devcfg@f8007000", // from /sys/firmware/devicetree/base/...
+	 xdevCfgState[]  = "/sys/class/xdevcfg/xdevcfg/device/prog_done",
+	 xdevCfgDevice[] = "/dev/xdevcfg";
        class Device
 	 : public OCPI::HDL::Device {
 	 Driver  &m_driver;

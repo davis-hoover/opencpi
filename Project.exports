@@ -44,6 +44,7 @@
 #+|runtime/ctests/target-<target>/libocpi_ctests.(so|dylib) bin/<target>/ctests/
 -tests library
 -runtime/dataplane/xfer/tests library
+# This is a broad, platform independent default...
 =tools/cdk/default-system.xml
 # More or less obsolete env scripts, left in for compatibility, put in runtime just to match
 # up with 1.3.1

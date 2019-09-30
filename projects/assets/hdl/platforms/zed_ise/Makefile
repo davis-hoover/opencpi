@@ -34,12 +34,13 @@ Configurations=\
 	zed_zipper_fmc_rx \
 	zed_zipper_fmc_tx
 
-ExportFiles=zed_ise.ucf zed_ise.ut zed_ise.mk testbias_zed_ise_base.bitz
+ExportFiles=zed_ise.ucf zed_ise.ut testbias_zed_ise_base.bitz 98-zedboard.rules
 
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
     test -e zed_ise.xml || sed "s/'zed'/'zed_ise'/" ../zed/zed.xml > zed_ise.xml; \
     test -e zed_ise.vhd || sed "s/zed_worker/zed_ise_worker/;" ../zed/zed.vhd > zed_ise.vhd; \
+    test -e zed_ise.exports || ln -s ../zed/zed.exports zed_ise.exports; \
     mkdir -p gen; \
     for c in $(filter-out base,$(Configurations)); do \
       test -e gen/$$c.xml || ln -s ../../zed/$${c//zed_ise/zed}.xml gen/$$c.xml; \
