@@ -87,13 +87,14 @@ namespace OCPI {
       Access *ts = timeServer();
       if(!ts)
         isGps = false;
-      if(isGps)
+      if(isGps) {
         isGps = getPPSIsOkay();
-      else {
-        const char* m1 = "HDL Device";
-        const char* dd = m_name.c_str();
-        const char* m2 = "time_server.hdl ppsOK timeout occurred";
-        ocpiInfo("%s '%s': %s", m1, dd, m2);
+        if(!isGps) {
+          const char* m1 = "HDL Device";
+          const char* dd = m_name.c_str();
+          const char* m2 = "time_server.hdl PPS_ok timeout occurred";
+          ocpiInfo("%s '%s': %s", m1, dd, m2);
+        }
       }
       if(isGps) {
         auto propOffset = offsetof(TimeService, time_now);
