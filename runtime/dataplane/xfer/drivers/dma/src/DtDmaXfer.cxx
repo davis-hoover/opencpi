@@ -115,7 +115,7 @@ namespace OCPI {
 	  const char *l_dma = getenv("OCPI_DMA_MEMORY");
 	  if (!l_dma)
 	    throw OU::Error("OCPI_DMA_MEMORY environment variable not set");
-	  unsigned sizeM, pagesize = getpagesize();
+	  unsigned sizeM, pagesize = (unsigned)getpagesize();
 	  uint64_t top;
 	  if (sscanf(l_dma, "%uM$0x%" SCNx64, &sizeM, &m_dmaBase) != 2)
 	    throw OU::Error("Bad format for OCPI_DMA_MEMORY environment variable: '%s'",
@@ -174,8 +174,8 @@ namespace OCPI {
 	ocpiDebug("For ep %p, offset 0x%" PRIx32 " size %zu vaddr is %p to %p @ 0x%" PRIx64,
 		  &ep, offset, size, vaddr, (uint8_t *)vaddr + size, ep.m_address);
 	if (vaddr == MAP_FAILED)
-	  throw OU::Error("mmap failed on DMA region %zu at 0x%" PRIx64,
-			  size, ep.m_address + offset);
+	  throw OU::Error("mmap failed on DMA region %zu at 0x%" PRIx64 ": %d (%s)",
+			  size, ep.m_address + offset, errno, strerror(errno));
 	return (uint8_t*)vaddr;
       }
     public:
@@ -245,13 +245,18 @@ namespace OCPI {
 	  m_driver(XferFactory::getSingleton()) {
 	// For remote mappings all is deferred until mapping
 	if (ep.local()) {
+	  ocpiDebug("Finalizing local DMA ep %p: %s", &ep, ep.name().c_str());
 	  m_driver.getDmaRegion(ep);
 	  m_vaddr = m_driver.mapDmaRegion(ep, 0, ep.size());
+	  OU::format(ep.m_protoInfo, "%" PRIx64 ".%" PRIx32 ".%" PRIx32,
+		     ep.m_busAddr, ep.m_holeOffset, ep.m_holeEnd);
+	  ep.setName();
 	  ocpiDebug("Finalized local DMA ep %p: %s", &ep, ep.name().c_str());
 	}
       }
     public:
       virtual ~SmemServices () {
+	unMap();
       }
 
       void *map(DtOsDataTypes::Offset offset, size_t size ) {
@@ -287,8 +292,20 @@ namespace OCPI {
  		  vaddr, m_vaddr, m_vaddr1, offset, size, vaddr + size);
 	return (void*)vaddr;
       }
+      int32_t unMap() {
+	EndPoint &ep = m_dmaEndPoint;
+	if (ep.m_holeOffset) {
+	  if (m_vaddr)
+	    munmap(m_vaddr, ep.m_holeOffset);
+	  if (m_vaddr1)
+	    munmap(m_vaddr1, ep.size() - ep.m_holeEnd);
+	} else if (m_vaddr)
+	  munmap(m_vaddr, ep.size());
+	m_vaddr = m_vaddr1 = NULL;
+	return 0;
+      }
     };
-    
+
     XF::SmemServices & EndPoint::
     createSmemServices() {
       return *new SmemServices(*this);

@@ -44,6 +44,7 @@
 #+|runtime/ctests/target-<target>/libocpi_ctests.(so|dylib) bin/<target>/ctests/
 -tests library
 -runtime/dataplane/xfer/tests library
+# This is a broad, platform independent default...
 =tools/cdk/default-system.xml
 # More or less obsolete env scripts, left in for compatibility, put in runtime just to match
 # up with 1.3.1
@@ -245,6 +246,12 @@
 =runtime/hdl-support/xilinx/getESNfromUSB_xilinx scripts/
 =runtime/hdl-support/scripts/loadBitStream scripts/
 =runtime/hdl-support/xilinx/xilinx.mk include/hdl/
+=runtime/hdl-support/xilinx/xilinx-rcc-platform.mk include/xilinx/
+=runtime/hdl-support/xilinx/xilinx-rcc-platform-definition.mk include/xilinx/
+=platforms/zynq/createLinuxKernelHeaders.sh scripts/xilinx/
+=platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
+=platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
+=runtime/hdl-support/xilinx/normalizeXilinxReleases.sh scripts/xilinx/
 =runtime/hdl-support/xilinx/vivado* include/hdl/
 =runtime/hdl-support/scripts/loadFlash <target>/bin/
 =runtime/hdl-support/scripts/probeJtag <target>/bin/
@@ -278,3 +285,6 @@
 ################################################################################
 # XML files required when building containers that are not real workers
 +projects/core/hdl/primitives/platform/*.xml include/hdl/
++runtime/remote-support/scripts/* scripts/
++runtime/remote-support/scripts/ocpiremote.sh <target>/bin/ocpiremote
+

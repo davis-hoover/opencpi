@@ -114,7 +114,7 @@ for l in `find -H . -type f -name "-*"`; do
   bad=1
   echo Found files starting with hyphen >&2
 done
-[ -n "$bad" ] && exit 1
+[ -n "$bad" ] && echo Errors found so no files produced >&2 && exit 1
 
 # FIXME: this list is redundant with "install-prerequisites.sh" and "places"
 # This list could potentially be platform-specific

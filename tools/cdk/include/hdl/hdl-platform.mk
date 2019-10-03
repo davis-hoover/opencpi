@@ -24,7 +24,7 @@
 HdlMode:=platform
 Model:=hdl
 ifdef ShellHdlPlatformVars
-  	__ONLY_TOOL_VARS__:=1
+  __ONLY_TOOL_VARS__:=1
 endif
 include $(OCPI_CDK_DIR)/include/util.mk
 $(OcpiIncludeAssetAndParent)
@@ -201,7 +201,7 @@ ifndef HdlSkip
   endif # have configurations
   # If the platform has special files to export to the CDK, do it
   # this is only done if we are building, so we don't export until we have actually built something
-  ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk))
+  ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk) $(wildcard $(Worker).exports))
   ifdef ExportFiles
     ExportLinks:=$(ExportFiles:%=lib/%)
     exports: $(ExportLinks)

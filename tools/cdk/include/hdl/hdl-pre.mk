@@ -238,12 +238,6 @@ endif
 $(call OcpiDbgVar,AuthoredSourceFiles,After searching: )
 endif
 
-ifndef HdlInstallDir
-HdlInstallDir=lib
-$(HdlInstallDir):
-	$(AT)mkdir -p $@
-endif
-
 ################################################################################
 # Now we decide whether to recurse, and run a sub-make per toolset, or, if we
 # have only one toolset for all our targets, we just build for those targets in

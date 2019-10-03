@@ -69,6 +69,12 @@ typedef struct {
 } ocpi_request_t;
 
 typedef struct {
+  uint8_t       *data;
+  ocpi_size_t    length;
+  char           device_path[100];
+} ocpi_load_fpga_request_t;
+
+typedef struct {
   ocpi_address_t bar0;
   ocpi_address_t bar1;
   ocpi_size_t    size0;
@@ -107,7 +113,8 @@ typedef struct sockaddr_ocpi {
 
 #define OCPI_CMD_STATUS		_IOR(OPENCPI_IOC_MAGIC,  1, ocpi_status_t)
 #define OCPI_CMD_REQUEST	_IOWR(OPENCPI_IOC_MAGIC, 2, ocpi_request_t)
-#define OCPI_CMD_PCI            _IOR(OPENCPI_IOC_MAGIC,  3, ocpi_pci_t) 
-#define OCPI_CMD_DISCOVER       _IOR(OPENCPI_IOC_MAGIC,  4, unsigned) 
+#define OCPI_CMD_PCI            _IOR(OPENCPI_IOC_MAGIC,  3, ocpi_pci_t)
+#define OCPI_CMD_DISCOVER       _IOR(OPENCPI_IOC_MAGIC,  4, unsigned)
+#define OCPI_CMD_LOAD_FPGA      _IOWR(OPENCPI_IOC_MAGIC, 5, ocpi_load_fpga_request_t)
 
 #endif /* OPENCPI_H_ */
