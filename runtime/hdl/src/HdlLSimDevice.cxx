@@ -229,9 +229,8 @@ protected:
     m_endpointSpecific = "ocpi-socket-rdma";
     m_endpointSize = OH::SDP::Header::max_addressable_bytes * OH::SDP::Header::max_nodes;
     cAccess().setAccess(NULL, this, OCPI_UTRUNCATE(RegisterOffset, 0));
-    // data offset overlays the control plane since it is SDP node 0.
+    // data offset overlays the control plane since the control plane is SDP node 0.
     dAccess().setAccess(NULL, this, OCPI_UTRUNCATE(RegisterOffset, 0));
-    //						   OH::SDP::Header::max_addressable_bytes));
     init(error);
     // Note we are emulating here, still not creating any file system dirs or fifos
   }

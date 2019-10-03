@@ -461,6 +461,8 @@ component unoc_node_rv is
     position         : ulong_t := to_ulong(0)
     );
   port (
+    wci_Clk     : in std_logic;
+    wci_Reset_n : in std_logic;
     up_in      : in  unoc_master_out_t;
     up_out     : out unoc_master_in_t;
     client_in  : in  unoc_master_in_t;

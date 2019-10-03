@@ -35,8 +35,9 @@ namespace OCPI {
     const size_t DEFAULT_BUFFER_SIZE = 2*1024;
     // FIXME: This constant should be negotiated by platforms.
     // It applies to both the base address of a set of buffers and the alignment of each buffer
-    // in the set
-    const unsigned BUFFER_ALIGNMENT = 16;
+    // in the set.
+    // Latest update to 128: prevent AXI bursts, which are 128 bytes, from crossing a 4K boundary
+    const unsigned BUFFER_ALIGNMENT = 128;
     // FIXME:  use a pointer to a protocol, and share protocols in the artifact xml
     class Worker;
     class Port : public Protocol {

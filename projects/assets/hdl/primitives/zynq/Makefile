@@ -33,7 +33,7 @@ XilinxZynqCore_base=processing_system7_v5_
 XilinxIpDir=$(call OcpiXilinxVivadoDir,infox)/data/ip/xilinx
 # Look for the most recent version of ps7 in the vivado installation
 XilinxZynqCore=$(notdir $(lastword $(wildcard $(XilinxIpDir)/$(XilinxZynqCore_base)*)))
-XilinxZynq=$(call OcpiXilinxVivadoDir, infox)/data/ip/xilinx/$(XilinxZynqCore)/hdl/verilog
+XilinxZynq=$(call OcpiXilinxVivadoDir,infox)/data/ip/xilinx/$(XilinxZynqCore)/hdl/verilog
 XilinxZynqPSFiles=atc aw_atc b_atc trace_buffer w_atc
 # The Vivado processing_system7 v5_5 verilog file must be generated.
 # This is done via a make rule below.

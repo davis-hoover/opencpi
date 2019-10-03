@@ -59,7 +59,7 @@ out_data['imag_idx'] = np.int16(ramp)
 # Write to file
 # Save data to file
 message_size = 2048 #This is the maximum allowed by current buffer negotiation system
-samples_per_message = message_size/bytes_per_sample
+samples_per_message = int(message_size/bytes_per_sample)
 with open(sys.argv[1], 'wb') as f:
     utu.add_msg(f, iqm.INTERVAL_OPCODE, array.array('I',(int('00000000',16), int('00002000',16)))) #8192
     utu.add_msg(f, iqm.TIME_OPCODE, array.array('I',(int('0000AAAA',16), int('0000BBBB',16))))

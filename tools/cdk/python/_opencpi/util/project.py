@@ -512,7 +512,7 @@ def throw_specify_lib_e():
 
 def get_component_filename(library, name):
     """
-    >>> os.mknod("/tmp/my_file-spec.xml")
+    >>> open("/tmp/my_file-spec.xml",'w').close()
     >>> get_component_filename("/tmp", "my_file-spec.xml")
     '/tmp/my_file-spec.xml'
     >>> get_component_filename("/tmp", "my_file-spec")
@@ -520,7 +520,7 @@ def get_component_filename(library, name):
     >>> get_component_filename("/tmp", "my_file")
     '/tmp/my_file-spec.xml'
     >>> os.remove("/tmp/my_file-spec.xml")
-    >>> os.mknod("/tmp/my_file_spec.xml")
+    >>> open("/tmp/my_file_spec.xml",'w').close()
     >>> get_component_filename("/tmp", "my_file")
     '/tmp/my_file_spec.xml'
     >>> os.remove("/tmp/my_file_spec.xml")

@@ -23,16 +23,52 @@ platform=$1 && shift
 cross=0
 [ -n "$1" ] && cross=1
 shift
-hdl_rcc_platform=$1 && shift
+rcc_platform=$1 && shift
 set -e
-
-my_loc=$(readlink -e "$(dirname $0)")
-tmpdir=$(mktemp -d)
-OCPI_CDK_DIR=$my_loc/../cdk
 # If there is no rcc platform set hdl_rcc_platform to no_sw
-[ "$hdl_rcc_platform" = "-" ] && hdl_rcc_platform=no_sw
-[ "$hdl_rcc_platform" != "no_sw" ] && OCPI_CDK_DIR=$OCPI_CDK_DIR $my_loc/create-sw-deploy.sh $tmpdir "$hdl_rcc_platform" "$cross"
-OCPI_CDK_DIR=$OCPI_CDK_DIR $my_loc/create-hw-deploy.sh $tmpdir "$platform" "$hdl_rcc_platform"
-mkdir -p cdk/$platform
-cp -R $tmpdir/$platform/. ./cdk/$platform/$platform-deploy
-rm -rf $tmpdir
+[ "$rcc_platform" = "-" ] && rcc_platform=
+cross=1
+platforms=$platform
+# copied functions
+function found_in {
+  local look=$1
+  shift
+  for i in $*; do [ $i = $look ] && return 0; done
+  return 1
+}
+
+function is_platform {
+ found_in `basename $1` $OCPI_ALL_RCC_PLATFORMS || found_in `basename $1` $OCPI_ALL_HDL_PLATFORMS
+}
+
+# 1. create the dir for the SD card
+sd=`pwd`/cdk/$platform/sdcard-$rcc_platform
+rm -r -f $sd
+mkdir -p $sd/opencpi
+# 2. copy runtime files into opencpi, preserving links that are within the same directory and skipping
+#    some things.  This is somewhat redundant with how the runtime packaging prepare-list works...
+for f in cdk/runtime/*; do
+  is_platform $f && [ $(basename $f) != $rcc_platform ] && continue; # Skip all platforms except our RCC
+  (cd cdk/runtime;
+   for x in $(find $(basename $f)); do
+       case $x in *env*|*include*) continue;; esac # not sure how to explain this
+       if [ -d $x ]; then
+	  mkdir $sd/opencpi/$x
+       elif [ -L $x ] && [[ $(readlink $x) != */* ]]; then
+	  cp -R $x $sd/opencpi/$x # keep symlink as is
+       else
+	  cp -R -H -L $x $sd/opencpi/$x # copy following links
+       fi
+   done)
+done
+# 3. move the sw deploy files into root
+[ -d cdk/deploy/$rcc_platform ] && cp -R -L cdk/deploy/$rcc_platform/* $sd
+# 4. mv the top level sw files on the hw deployment into root
+[ -d cdk/deploy/$platform/$rcc_platform ] && cp -R -L cdk/deploy/$platform/$rcc_platform/* $sd
+# 5. mv the top level hw files into root, moving system.xml into opencpi subdir
+for f in cdk/deploy/$platform/*; do
+  is_platform $f && continue;
+  cp -R -L -H $f $sd
+done
+# 6. move any HW-specific system.xml into $sd/opencpi
+[ -x cdk/runtime/$platform/system.xml ] && cp -R -L -H cdk/runtime/$platform/system.xml $sd/opencpi || :
