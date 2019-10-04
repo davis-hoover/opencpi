@@ -25,6 +25,7 @@ USE IEEE.MATH_COMPLEX.ALL;
 package misc_prims is
 
 constant DATA_ADC_BIT_WIDTH      : positive := 12;
+constant DATA_DAC_BIT_WIDTH      : positive := 16;
 constant DATA_BIT_WIDTH          : positive := 16;
 constant METADATA_TIME_BIT_WIDTH : positive := 64;
 
@@ -34,6 +35,11 @@ type data_complex_adc_t is record
   i : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
   q : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
 end record data_complex_adc_t;
+
+type data_complex_dac_t is record
+  i : std_logic_vector(DATA_DAC_BIT_WIDTH-1 downto 0);
+  q : std_logic_vector(DATA_DAC_BIT_WIDTH-1 downto 0);
+end record data_complex_dac_t;
 
 type data_complex_t is record
   i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
@@ -52,6 +58,16 @@ type metadata_t is record
   time_vld        : std_logic;
 end record metadata_t;
 
+type metadata_dac_t is record
+  underrun_error : std_logic; -- samples were not available for one or
+                              -- more dac clock cycles
+  ctrl_tx_on_off : std_logic; -- high when transmitter should be powered on
+                              -- low when transmitter should be powered off
+  data_vld       : std_logic; -- parallel with data to output
+                              -- if error and data_vld are both 1, error is
+                              -- assumed to have happened before the current valid data
+end record metadata_dac_t;
+
 constant METADATA_IDX_ERROR_SAMP_DROP : natural := METADATA_TIME_BIT_WIDTH+2;
 constant METADATA_IDX_DATA_VLD        : natural := METADATA_TIME_BIT_WIDTH+1;
 constant METADATA_IDX_TIME_L          : natural := METADATA_TIME_BIT_WIDTH;
@@ -65,6 +81,10 @@ function from_slv(slv : in std_logic_vector) return metadata_t;
 type adc_samp_drop_detector_status_t is record
   error_samp_drop : std_logic;
 end record adc_samp_drop_detector_status_t;
+
+type dac_underrun_detector_status_t is record
+  underrun_error : std_logic;
+end record dac_underrun_detector_status_t;
 
 type time_corrector_ctrl_t is record
   time_correction     : signed(METADATA_TIME_BIT_WIDTH-1 downto 0);
@@ -277,6 +297,46 @@ component time_corrector is
     -- OUTPUT
     odata     : out data_complex_t;
     ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component data_narrower is
+  generic(
+    DATA_PIPE_LATENCY_CYCLES : natural := 0;
+    BITS_PACKED_INTO_LSBS    : boolean := false);
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    -- INPUT
+    idata     : in  data_complex_t;
+    imetadata : in  metadata_dac_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_dac_t;
+    ometadata : out metadata_dac_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component dac_underrun_detector is
+  generic(
+    DATA_PIPE_LATENCY_CYCLES : natural := 0);
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    status    : out dac_underrun_detector_status_t;
+    -- INPUT
+    idata     : in  data_complex_t;
+    imetadata : in  metadata_dac_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_t;
+    ometadata : out metadata_dac_t;
     ovld      : out std_logic;
     ordy      : in  std_logic);
 end component;

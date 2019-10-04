@@ -85,7 +85,7 @@ begin
   out_out.give        <= fifo_not_empty;
   fifo : cdc.cdc.fifo
     generic map (width       => fifo_width_c,
-                 depth       => 2)
+                 depth       => 16)
     port map (   src_CLK     => in_in.clk,
                  src_RST     => in_reset,
                  src_ENQ     => fifo_enq,

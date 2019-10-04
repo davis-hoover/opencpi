@@ -1,0 +1,24 @@
+<build>
+  <configuration id='0'>
+    <parameter name='dac_clk_freq_hz' value='1e6'/>
+  </configuration>
+  <configuration id='1'>
+    <parameter name='dac_clk_freq_hz' value='100e6'/>
+  </configuration>
+  <configuration id='2'>
+    <parameter name='dac_clk_freq_hz' value='200e6'/>
+  </configuration>
+  <configuration id='3'>
+    <parameter name='dac_clk_freq_hz' value='1e6'/>
+    <parameter name='dac_width_bits' value='12'/>
+  </configuration>
+  <configuration id='4'>
+    <parameter name='dac_clk_freq_hz' value='100e6'/>
+    <parameter name='dac_width_bits' value='12'/>
+  </configuration>
+  <configuration id='5'>
+    <parameter name='dac_clk_freq_hz' value='100e6'/>
+    <parameter name='dac_width_bits' value='12'/>
+    <parameter name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='true'/>
+  </configuration>
+</build>

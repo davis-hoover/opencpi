@@ -43,6 +43,9 @@ SourceFiles=$(patsubst %,%.vhd,\
 	data_widener \
 	adc_maximal_lfsr_data_src \
 	ocpi_wsi_message_sizer \
+	data_narrower \
+	dac_underrun_detector \
+	ocpi_data_sink_dac \
 	set_clr \
 	clk_src )
 

@@ -37,6 +37,9 @@ INTERVAL_OPCODE = 2
 FLUSH_OPCODE    = 3
 SYNC_OPCODE     = 4
 
+# Declare samples bit width
+SAMPLES_BIT_WIDTH=16
+
 def add_samples(f, data, num_cycles,samples_per_message):
     """
     Write samples message data and metadata to a file in messagesInFile=true format

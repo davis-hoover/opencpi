@@ -26,7 +26,7 @@ library ocpi; use ocpi.types.all; -- ULong_t
 package ocpi is
 
 type complex_short_with_metadata_opcode_t is (
-  SAMPLES, TIME, INTERVAL, FLUSH, SYNC, USER);
+  SAMPLES, TIME, INTERVAL, FLUSH, SYNC, END_OF_SAMPLES, USER);
 
 component wsi_message_sizer is
   generic(
@@ -81,6 +81,45 @@ component data_src_adc_scdcd is
     adc_out_eom            : out Bool_t;
     adc_out_valid          : out Bool_t;
     adc_out_ready          : in  Bool_t);
+end component;
+
+component ocpi_data_sink_dac is
+  generic(
+    DAC_WIDTH_BITS                         : UChar_t;
+    DATA_PIPE_LATENCY_CYCLES               : ULong_t;
+    IN_PORT_DATA_WIDTH                     : ULong_t;
+    DAC_OUTPUT_IS_LSB_OF_IN_PORT           : Bool_t;
+    IN_PORT_MBYTEEN_WIDTH                  : positive);
+  port(
+    -- CTRL
+    ctrl_clk                               : in  std_logic;
+    ctrl_rst                               : in  bool_t;
+    ctrl_underrun_sticky_error             : out bool_t;
+    ctrl_clr_underrun_sticky_error         : in bool_t;
+    ctrl_unused_opcode_detected_sticky     : out bool_t;
+    ctrl_clr_unused_opcode_detected_sticky : in bool_t;
+    ctrl_finished                          : out bool_t;
+    -- INPUT
+    dac_in_clk                             : out std_logic;
+    dac_in_take                            : out bool_t;
+    dac_in_data                            : in  std_logic_vector(to_integer(unsigned(
+                                                                  IN_PORT_DATA_WIDTH))-1 downto 0);
+    dac_in_opcode                          : in  complex_short_with_metadata_opcode_t;
+    dac_in_ready                           : in  bool_t;
+    dac_in_valid                           : in  bool_t;
+    dac_in_eof                             : in  bool_t;
+    -- ON/OFF OUTPUT
+    on_off_out_reset                       : in  bool_t;
+    on_off_out_ready                       : in  bool_t;
+    on_off_out_opcode                      : out bool_t;
+    on_off_out_give                        : out bool_t;
+    -- DEV SIGNAL OUTPUT (Matches dac-16-signals bundle)
+    dac_dev_clk                            : in  std_logic;
+    dac_dev_data_i                         : out std_logic_vector(15 downto 0);
+    dac_dev_data_q                         : out std_logic_vector(15 downto 0);
+    dac_dev_valid                          : out std_logic;
+    dac_dev_take                           : in  std_logic;
+    dac_dev_present                        : out std_logic);
 end component;
 
 end package ocpi;

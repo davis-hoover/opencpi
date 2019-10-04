@@ -1,0 +1,16 @@
+<HdlDevice Language="vhdl" Emulate="data_sink_dac.hdl" Version="2">
+  <ComponentSpec>
+    <Port Name="out" Producer="true" Protocol="ComplexShortWithMetadata-prot"/>
+  </ComponentSpec>
+
+  <StreamInterface Name="out" 
+		   DataWidth="32" 
+		   MyOutputClock="true" 
+		   InsertEOM="true" 
+		   WorkerEOF="true"/>
+
+  <Supports Worker="data_sink_dac">
+    <Connect port="dev" to="dev"/>
+  </Supports>
+</HdlDevice>
+

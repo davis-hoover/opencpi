@@ -1,7 +1,7 @@
 # Example usage:
 
 pushd /opt/Xilinx/Vivado/2017.1/
-. ./settings74.sh
+. ./settings64.sh
 popd
 
 make -j 16 -s run

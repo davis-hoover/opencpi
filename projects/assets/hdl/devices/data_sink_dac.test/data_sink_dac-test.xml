@@ -1,0 +1,5 @@
+<Tests UseHdlFileIo='true' Spec='data_sink_dac'>
+  <!--property name='dac_clk_freq' values='1e6,10e6,100e6,500e6,1000e6'/-->
+  <Input  port='in'  Script='generate.py' MessageSize='16368'/>
+  <Output port='out' Script='verify.py' DisableBackpressure='true'/>
+</Tests>
