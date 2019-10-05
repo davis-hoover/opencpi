@@ -209,19 +209,26 @@ namespace OCPI {
     configure(ezxml_t xml) {
       // First, do the generic configuration, which configures discovered devices for this driver
       OD::Driver::configure(xml);
-      if(xml)
-        m_gps_device.assign(ezxml_cattr(xml, "gpsdev"));
-      configure_gps();
+      if (xml) {
+        ezxml_t xmldevice = ezxml_cchild(xml, "device");
+        if (xmldevice)  {
+          ezxml_t xmlgps = ezxml_cchild(xmldevice, "gps");
+          if (xmlgps)  {
+            m_gps_device.assign(ezxml_cattr(xmlgps, "device"));
+            configure_gps();
+          }
+        }
+      }
     }
     // Get the best current OS time, independent of any device.
     void Driver::
     gpsCallback(struct gps_device_t *device, gps_mask_t changed) {
-      if(device) {
+      if (device) {
       }
-      if(changed) {
+      if (changed) {
       }
       static int packet_counter = 0;
-      if(packet_counter++ >= 15) {
+      if (packet_counter++ >= 15) {
         m_gps_timeout = true;
         alarm(0);
       }
@@ -230,15 +237,15 @@ namespace OCPI {
     OS::Time Driver::
     now(bool &isGps) {
       isGps = true;
-      if(!m_gps_configured) {
+      if (!m_gps_configured) {
         ocpiInfo("HDL Driver: GPS not configured");
         isGps = false;
         return OS::Time::now();
       }
       fd_set rfds;
-      for(m_gps_timeout = false; !m_gps_timeout; ) {
+      for (m_gps_timeout = false; !m_gps_timeout; ) {
         fd_set efds;
-        switch(gpsd_await_data(&rfds, &efds, m_gps_max_fd, &m_gps_all_fds, &m_gps_context.errout)) {
+        switch (gpsd_await_data(&rfds, &efds, m_gps_max_fd, &m_gps_all_fds, &m_gps_context.errout)) {
           case AWAIT_GOT_INPUT:
             break;
           case AWAIT_NOT_READY:
@@ -253,7 +260,7 @@ namespace OCPI {
             isGps = false;
             return OS::Time::now();
         }
-        switch(gpsd_multipoll(FD_ISSET(m_gps_session.gpsdata.gps_fd, &rfds), &m_gps_session, gpsCallback, 0)) {
+        switch (gpsd_multipoll(FD_ISSET(m_gps_session.gpsdata.gps_fd, &rfds), &m_gps_session, gpsCallback, 0)) {
           case DEVICE_READY:
             FD_SET(m_gps_session.gpsdata.gps_fd, &m_gps_all_fds);
           case DEVICE_UNREADY:
@@ -270,7 +277,7 @@ namespace OCPI {
             break;
         }
       }
-      if(m_gps_session.gpsdata.fix.mode >= MODE_2D)
+      if (m_gps_session.gpsdata.fix.mode >= MODE_2D)
         return (OS::Time::TimeVal) m_gps_session.gpsdata.fix.time;
       else
         isGps = false;
