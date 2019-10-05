@@ -170,11 +170,14 @@ function download_git {
       echo Downloading/cloning the distribution/repo for $package: $url
       rm -r -f $directory.bak
       [ -d $directory ] && mv $directory{,.bak}
-      if git clone $url; then
+
+      # --no-checkout because an explicit checkout is done later
+      # this prevents a rare bug in git in which git thinks files are changed
+      # immediately after cloning a remote repo
+      if git clone --no-checkout $url; then
         echo Download/clone complete.
         if [ -d $directory ]; then
           cd $directory
-	  git config core.autocrlf false
           git checkout $file && rm -r -f $directory.bak && return 0
           echo The git checkout failed.
         else
@@ -183,6 +186,7 @@ function download_git {
       else
         echo The git clone failed from $url.
       fi
+
       rm -r -f $directory # in case of partial clone
       [ -d $directory.bak ] && mv $directory{.bak,}
       ;;
