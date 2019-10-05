@@ -82,7 +82,7 @@ prims: \
     xsim.dir/misc_prims/time_corrector.vdb
 
 clean_prims:
-	rm -rf xsim.dir
+	rm -rf xsim.dir *.pb
 
 ################################################################################
 # run
