@@ -95,6 +95,11 @@ function framework_test {
   cd $dir
 }
 
+# Some tests are designed to fail and as a result ouput usage/help that uses a
+# pager. This causes the tests to hang waiting for user input to exit the
+# pager. To prevent that, this sets the pager to `cat`.
+export PAGER=$(which cat)
+
 for t in $TESTS; do
   set -e # required inside a for;do;done to enable this case/esac to fail
   case $t in
