@@ -29,4 +29,3 @@ artifacts/
 # Some artifacts
 **/kernel-headers/**/*.cmd
 **/aciapps
-project.xml

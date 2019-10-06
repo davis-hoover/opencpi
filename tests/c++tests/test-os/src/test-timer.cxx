@@ -103,7 +103,7 @@ namespace
     for ( unsigned int i = 0; i < 10; i++ )
     {
       t.start ( );
-      OS::sleep ( 300 );
+      OS::sleep ( sleep_amount );
       t.stop ( );
     }
 
@@ -112,7 +112,7 @@ namespace
     for ( unsigned int i = 0; i < 10; i++ )
     {
       t.start ( );
-      OS::sleep ( 300 );
+      OS::sleep ( sleep_amount );
       t.stop ( );
       run_time += sleep_amount;
     }
