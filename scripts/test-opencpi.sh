@@ -95,9 +95,9 @@ function framework_test {
   cd $dir
 }
 
-# Some tests are designed to fail and as a result ouput usage/help that uses a
-# pager. This causes the tests to hang waiting for user input to exit the
-# pager. To prevent that, this sets the pager to `cat`.
+# Some tests are designed to fail and as a result ouput usage/help uses a pager.
+# This causes the tests to hang waiting for user input to exit the pager.
+# To prevent that, this sets the pager to `cat`.
 export PAGER=$(which cat)
 
 for t in $TESTS; do
