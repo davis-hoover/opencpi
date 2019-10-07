@@ -34,6 +34,18 @@ namespace OCPI {
   namespace HDL {
     extern const char *hdl;
 
+    struct GPSDParams {
+      struct gps_context_t     m_context;
+      const struct gps_type_t* m_forceType;
+      struct gps_device_t      m_session;
+      std::string              m_serialPort; // e.g. /dev/ttyPS1
+      bool                     m_configured;
+      fd_set                   m_allFds;
+      int                      m_maxFd;
+      GPSDParams() : m_forceType(NULL), m_configured(false), m_maxFd(0) {
+      }
+    };
+
     class Container;
     class Driver
       // Note DriverBase must be destructed before the specific Driver destructors
@@ -49,19 +61,15 @@ namespace OCPI {
 	virtual protected OCPI::Util::SelfMutex
     {
       const OCPI::Util::PValue *m_params; // a temporary during discovery
-      static bool           m_gps_timeout;
-      struct gps_context_t  m_gps_context;
-      struct gps_device_t   m_gps_session;
-      std::string           m_gps_device; // e.g. /dev/ttyPS1
-      bool                  m_gps_configured;
-      fd_set                m_gps_all_fds;
-      int                   m_gps_max_fd;
       bool setup(Device &dev, ezxml_t &config, std::string &err);
     protected:
-      void configure_gps();
+     static bool  m_gpsdTimeout;
+      GPSDParams  m_gpsdp;
+      //void configure_gpsctl(ezxml_t xml);
+      void configure_gpsd(struct GPSDParams& gpsd);
+      void loop_gpsctl(ezxml_t xml);
       void configure(ezxml_t xml);
     public:
-      Driver();
       static void gpsCallback(struct gps_device_t *device, gps_mask_t changed);
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
