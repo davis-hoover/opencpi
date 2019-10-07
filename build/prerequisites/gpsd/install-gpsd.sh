@@ -56,7 +56,7 @@ rm -rf $OcpiInstallExecDir/lib/*
 cp libtmp.a $OcpiInstallExecDir/lib/libgpsd.a
 
 echo "copying lower level headers which are necessary for use of libgpsd directly..."
-headers=(gpsd.h compiler.h gpsd_config.h gps.h ppsthread.h)
+headers=(gpsd.h compiler.h gpsd_config.h gps.h ppsthread.h os_compat.h)
 for header in "${headers[@]}"; do
   echo "...copying $header to $OcpiInstallExecDir/include/"
   cp $header $OcpiInstallExecDir/include/
