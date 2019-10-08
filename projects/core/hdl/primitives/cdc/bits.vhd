@@ -34,7 +34,7 @@ end bits;
 architecture rtl of bits is
 begin
     gen: for i in 0 to width-1 generate
-      sbit : component work.cdc.bit
+      sbit : component work.cdc.single_bit
         generic map (
           N => N, IREG => IREG, RST_LEVEL => RST_LEVEL)
         port map (
