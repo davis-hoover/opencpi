@@ -187,15 +187,10 @@ namespace OCPI {
     // see https://gitlab.com/gpsd/gpsd/blob/release-3.14/gpsctl.c
     // for example libgpsd usage
     void Driver::
-    configure_gpsd(struct GPSDParams& gpsd) {
+    configure_gpsd(ezxml_t xml, struct GPSDParams& gpsd) {
       gps_context_init(&gpsd.m_context, "opencpi-gpsd");
-      gpsd.m_context.errout.debug = LOG_INF;
+      gpsd.m_context.errout.debug = LOG_IO;
       gpsd.m_session.context = &gpsd.m_context;
-      if(gpsd.m_forceType) {
-        const char* dd = gpsd.m_forceType->type_name;
-        ocpiInfo("HDL Driver: assigning gpsd session device type to %s", dd);
-	      gpsd.m_session.device_type = gpsd.m_forceType;
-      }
       gpsd_init(&gpsd.m_session, &gpsd.m_context, gpsd.m_serialPort.c_str());
       if(gpsd_activate(&gpsd.m_session, O_PROBEONLY) >= 0) {
         gpsd.m_configured = true;
@@ -204,39 +199,38 @@ namespace OCPI {
           gpsd.m_maxFd = gpsd.m_session.gpsdata.gps_fd;
         gpsd_time_init(&gpsd.m_context, time(NULL));
       }
-    }
-    /*void Driver::
-    configure_gpsctl(ezxml_t xml) {
-      ocpiInfo("HDL Driver: configure_gpsctl");
-      GPSDParams gpsd;
-      ezxml_t xdt = ezxml_cattr(xml, "devicetype");
-      if(xdt) {
-        std::string devt(xdt);
-        ocpiInfo("HDL Driver: searching for gpsd driver %s", devt.c_str());
-        unsigned matchcount = 0;
-        const struct gps_type_t **dp;
-        for (dp = gpsd_drivers; *dp; dp++)
-          if (strstr((*dp)->type_name, devt.c_str()) != NULL) {
-            gpsd.m_forceType = *dp;
-            matchcount++;
+      m_gpsdp.m_session.device_type = m_gpsdp.m_forceType;
+      const char* dd = m_gpsdp.m_session.device_type->type_name;
+      ocpiInfo("HDL Driver: gpsd: devicetype: %s", dd);
+      // control is optional
+      ezxml_t x = ezxml_cchild(xml, "control");
+      for (ezxml_t x = ezxml_cchild(xml, "control"); x; x = ezxml_cnext(x)) {
+        char bb[BUFSIZ];
+        ssize_t len = 0;
+        m_gpsdp.m_context.readonly = false;
+        std::string control(ezxml_cattr(x, "value")); // mandatory
+        len = hex_escapes(bb, control.c_str());
+        if (len <= 0)
+          ocpiInfo("HDL Driver: gpsd error, len = %zu", len);
+        else
+          if (m_gpsdp.m_session.device_type) {
+            if (m_gpsdp.m_session.device_type->control_send(&m_gpsdp.m_session, bb, (size_t)len) == -1)
+              ocpiBad("HDL Driver: gpsd control_send error");
+            else
+              ocpiInfo("HDL Driver: gpsd: control: %s", control.c_str());
           }
-        if(matchcount != 1)
-          gpsd.m_forceType = NULL;
-        else {
-          std::string driver(gpsd.m_forceType->type_name);
-          ocpiInfo("HDL Driver: gpsd driver matches %s", driver.c_str());
-        }
+          else
+            throw std::string("HDL Driver: malformed system.xml - gpsd element must contain a valid devicetype attribute if control sub-element is used");
+        m_gpsdp.m_context.readonly = true;
       }
-      gpsd.m_serialPort.assign(ezxml_cattr(xml, "serialport"));
-      //configure_gpsd(gpsd);
-    }*/
+    }
     /*<!-- system XML -->
         <opencpi>
           <container>
             <hdl load='1'> <!-- hdl: optional,
                                 load: mandatory -->
               <gpsd devicetype='' serialport=''> <!-- gpsd: optional,
-                                                      devicetype: optional
+                                                      devicetype: mandatory only when using control
                                                       serialport: mandatory -->
                 <control value=''/> <!-- control: optional, value: mandatory -->
                 <control value=''/> <!-- control: optional, value: mandatory -->
@@ -250,9 +244,6 @@ namespace OCPI {
       // First, do the generic configuration, which configures discovered devices for this driver
       OD::Driver::configure(xml);
       bool do_gpsd = xml ? true : false;
-      /*if (do_gpsd)
-        for (ezxml_t x = ezxml_cchild(xml, "gpsctl"); x; x = ezxml_cnext(x))
-          configure_gpsctl(x);*/
       ezxml_t xx;
       if (do_gpsd)
         do_gpsd = (xx = ezxml_cchild(xml, "gpsd")) ? true : false;
@@ -272,32 +263,10 @@ namespace OCPI {
             }
           if(matchcount != 1)
             m_gpsdp.m_forceType = NULL;
-          else {
-            std::string driver(m_gpsdp.m_forceType->type_name);
-            ocpiInfo("HDL Driver: gpsd: devicetype: %s", driver.c_str());
-          }
         }
       }
       if (do_gpsd) {
-        // control is optional
-        for (ezxml_t x = ezxml_cchild(xx, "control"); x; x = ezxml_cnext(x)) {
-          char bb[BUFSIZ];
-          ssize_t len = 0;
-          m_gpsdp.m_context.readonly = false;
-          char* control = (char*) ezxml_cattr(x, "value"); // mandatory
-          ocpiInfo("HDL Driver: gpsd: control: %s", control);
-          if ((len = hex_escapes(bb, control)) <= 0)
-            ocpiInfo("HDL Driver: gpsd error");
-          else
-            if (m_gpsdp.m_session.device_type->control_send(&m_gpsdp.m_session, bb, (size_t)len) == -1)
-              ocpiInfo("HDL Driver: gpsd send error");
-            else
-              ocpiInfo("HDL Driver: gpsd: control: %s", control);
-          m_gpsdp.m_context.readonly = true;
-        }
-      }
-      if (do_gpsd) {
-        configure_gpsd(m_gpsdp);
+        configure_gpsd(xx, m_gpsdp);
         bool isGps;
         (void)now(isGps); // sync time
       }

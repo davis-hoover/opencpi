@@ -66,7 +66,7 @@ namespace OCPI {
      static bool  m_gpsdTimeout;
       GPSDParams  m_gpsdp;
       //void configure_gpsctl(ezxml_t xml);
-      void configure_gpsd(struct GPSDParams& gpsd);
+      void configure_gpsd(ezxml_t xml, struct GPSDParams& gpsd);
       void loop_gpsctl(ezxml_t xml);
       void configure(ezxml_t xml);
     public:
