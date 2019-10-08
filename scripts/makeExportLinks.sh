@@ -286,7 +286,7 @@ set -f
 platform_exports=$platform_dir/$platform.exports
 [ -f $platform_exports ] || platform_exports=
 [ -n "$verbose" ] && echo Collecting exclusions
-if [ $rcc_platform != - ]; then
+if [ -z "$hdl_platform" ]; then
   readExport exclusions - Project.exports
   [ -n "$verbose" ] && echo Collecting additions and runtimes
   [ -z "$hdl_platform" ] && readExport additions + Project.exports

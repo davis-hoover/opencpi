@@ -72,33 +72,38 @@ namespace
   // Test 3: Test that the timer can be re-started.
   TEST( TestOcpiOsTimer, test_3 )
   {
+    const unsigned int sleep_amount = 300;
     OS::Timer t;
+    unsigned int run_time = 0;
 
     for ( unsigned int i = 0; i < 10; i++ )
     {
       t.start ( );
-      OS::sleep ( 300 );
+      OS::sleep ( sleep_amount );
       t.stop ( );
-      OS::sleep ( 300 );
+      OS::sleep ( sleep_amount );
+      run_time += sleep_amount;
     }
 
     OS::ElapsedTime e = t.getElapsed();
     unsigned int msecs = e.seconds() * 1000 + e.nanoseconds() / 1000000;
-    // Allow for a 1% skew
-    EXPECT_GE( msecs, 2970u );
-    EXPECT_LE( msecs, 3095u );
+    // Allow for a 3% skew
+    EXPECT_GE( msecs, (unsigned int)(run_time * 0.97) );
+    EXPECT_LE( msecs, (unsigned int)(run_time * 1.03) );
   }
 
 
   // Test 4: Timer reset
   TEST( TestOcpiOsTimer, test_4 )
   {
+    const unsigned int sleep_amount = 300;
     OS::Timer t;
+    unsigned int run_time = 0;
 
     for ( unsigned int i = 0; i < 10; i++ )
     {
       t.start ( );
-      OS::sleep ( 300 );
+      OS::sleep ( sleep_amount );
       t.stop ( );
     }
 
@@ -107,15 +112,16 @@ namespace
     for ( unsigned int i = 0; i < 10; i++ )
     {
       t.start ( );
-      OS::sleep ( 300 );
+      OS::sleep ( sleep_amount );
       t.stop ( );
+      run_time += sleep_amount;
     }
 
     OS::ElapsedTime e = t.getElapsed();
     unsigned int msecs = e.seconds() * 1000 + e.nanoseconds() / 1000000;
-    // Allow for a 1% skew
-    EXPECT_GE( msecs, 2970u );
-    EXPECT_LE( msecs, 3095u );
+    // Allow for a 3% skew
+    EXPECT_GE( msecs, (unsigned int)(run_time * 0.97) );
+    EXPECT_LE( msecs, (unsigned int)(run_time * 1.03) );
   }
 
 
