@@ -1,0 +1,72 @@
+# vim: ts=2:sw=2:et
+#
+# GitLab's yaml reference:
+#   https://docs.gitlab.com/ee/ci/yaml/README.html
+#
+
+# Define the stages of the pipeline.
+stages:
+  - prereq
+  - build
+  - test
+
+# Define default cache key to use, allowing all jobs access to the same cache.
+default:
+  cache:
+    key: "$CI_PIPELINE_IID"
+
+# Define types of runners. If any job uses the 'tags' key, then these templates
+# will have no effect. If multiple templates are merged, '<<:', then the last
+# one referenced will win.
+.runner_defs:
+  .shell_runner: &shell_runner
+    tags:
+      - opencpi
+      - linux
+      - shell
+
+#------------------------------------------------------------------------------
+# JOBS
+#------------------------------------------------------------------------------
+
+install:prereqs:
+  <<: *shell_runner
+  stage: prereq
+  cache:
+    policy: push
+    paths:
+      - exports/
+      - prerequisites/
+      - prerequisites-build/
+  script:
+    - ./scripts/install-prerequisites.sh
+
+build:opencpi:
+  <<: *shell_runner
+  stage: build
+  cache:
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  script:
+    - ./scripts/build-opencpi.sh
+
+test:opencpi:
+  <<: *shell_runner
+  stage: test
+  cache:
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  script:
+    - ./scripts/test-opencpi.sh
+
