@@ -23,6 +23,7 @@
  * container class.
  */
 #include <unistd.h> // alarm()
+#include <cmath> // round
 #include "ContainerManager.h"
 #include "HdlContainer.h"
 #include "HdlDriver.h"
@@ -193,11 +194,11 @@ namespace OCPI {
       gpsd.m_session.context = &gpsd.m_context;
       gpsd_init(&gpsd.m_session, &gpsd.m_context, gpsd.m_serialPort.c_str());
       if(gpsd_activate(&gpsd.m_session, O_PROBEONLY) >= 0) {
-        gpsd.m_configured = true;
         FD_SET(gpsd.m_session.gpsdata.gps_fd, &gpsd.m_allFds);
         if(gpsd.m_session.gpsdata.gps_fd > gpsd.m_maxFd)
           gpsd.m_maxFd = gpsd.m_session.gpsdata.gps_fd;
         gpsd_time_init(&gpsd.m_context, time(NULL));
+        gpsd.m_configured = true;
       }
       m_gpsdp.m_session.device_type = m_gpsdp.m_forceType;
       const char* dd = m_gpsdp.m_session.device_type->type_name;
@@ -329,7 +330,7 @@ namespace OCPI {
         }
       }
       if (m_gpsdp.m_session.gpsdata.fix.mode >= MODE_2D)
-        return (OS::Time::TimeVal) m_gpsdp.m_session.gpsdata.fix.time;
+        return OS::Time(round(m_gpsdp.m_session.gpsdata.fix.time), 0);
       else
         isGps = false;
       ocpiInfo("HDL Driver: GPS fix not acquired");

@@ -85,27 +85,23 @@ namespace OCPI {
     now(bool &isGps) {
       OS::Time ret;
       Access *ts = timeServer();
-      if(!ts)
+      if (!ts)
         isGps = false;
-      if(isGps) {
+      if (isGps) {
+        auto os = offsetof(TimeService, enable_time_now_updates_from_PPS);
+        ts->set8RegisterOffset(os, 1);
         isGps = getPPSIsOkay();
-        if(!isGps) {
-          const char* m1 = "HDL Device";
-          const char* dd = m_name.c_str();
-          const char* m2 = "time_server.hdl PPS_ok timeout occurred";
-          ocpiInfo("%s '%s': %s", m1, dd, m2);
-        }
       }
-      if(isGps) {
+      if (isGps) {
         auto propOffset = offsetof(TimeService, time_now);
-        ret = Driver::getSingleton().now(isGps); // temp save
+        OS::Time time_now = Driver::getSingleton().now(isGps);
         // write integer portion only (most significant 32 bits) from
         // libgpsd-provided time from HDL::Driver to HTS
-        m_tsWorker->m_properties.set64RegisterOffset(propOffset, ret.bits());
+        ts->set64RegisterOffset(propOffset, time_now.bits());
         // read current Q32.32 time from HTS now that HTS is fully sync'd to GPS
-        ret = m_tsWorker->m_properties.get64RegisterOffset(propOffset);
+        ret = ts->get64RegisterOffset(propOffset);
       }
-      if(!isGps)
+      if (!isGps)
         ret = OS::Time::now();
       return ret;
     }
@@ -187,7 +183,7 @@ namespace OCPI {
         OS::Time time = now(isGPS);
         const char* name = m_name.c_str();
         const char* m1 = "time_server.hdl time_now was initialized to";
-        const char* m2 = isGPS ? "GPS time " : "non-GPS time";
+        const char* m2 = isGPS ? "GPS time" : "non-GPS time";
         ocpiInfo("HDL Device '%s': %s %s 0x%" PRIx64, name, m1, m2, time.bits());
       }
       m_isAlive = true;
