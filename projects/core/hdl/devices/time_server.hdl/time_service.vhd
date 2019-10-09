@@ -686,7 +686,7 @@ begin
         end if;
 
         -- Active while count is < 0.9 of a second (90% HI, 10% LO)
-        if (s_refPerCount < c_refPerCountTH) then
+        if (signed(s_refPerCount) < signed(c_refPerCountTH)) then
           s_ppsDrive <= '1';
         else
           s_ppsDrive <= '0';

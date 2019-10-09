@@ -21,13 +21,13 @@
   <Property Name="PPS_test" Type="bool" Parameter="true" Default="false"
 	    Description="Insert simulation-only PPS generator for testing."/>
 
-  <Property Name="clr_status_sticky_bits" Type="bool" Writable="true"
+  <Property Name="clr_status_sticky_bits" Type="bool" Writable="true" Default="false"
 	    Description="Writes of value true clear the sticky status bits"/>
-  <Property Name="force_time_now_to_free_running" Type="bool" Writable="true"
+  <Property Name="force_time_now_to_free_running" Type="bool" Writable="true" Default="false"
 	    Description="Suppress discipline of local time clock by software, PPS, or GPS (force time clock to be a free-running counter)"/>
-  <Property Name="valid_requires_write_to_time_now" Type="bool" Writable="true"
+  <Property Name="valid_requires_write_to_time_now" Type="bool" Writable="true" Default="false"
 	    Description="When true, timeservice master’s valid will not go high until time_now is written from software"/>
-  <Property Name="enable_time_now_updates_from_PPS" Type="bool" Writable="true"
+  <Property Name="enable_time_now_updates_from_PPS" Type="bool" Writable="true" Default="false"
 	    Description="When true, time_now fractional seconds can be disciplined by timebase PPS input"/>
   <!-- derived_from_input_clk : PPS output is derived from timebase input clock
        copy_of_input_PPS      : output is copy of input PPS (with some propagation delay)
@@ -36,9 +36,9 @@
   <Property Name="PPS_out_source" Type="enum" Writable="true"
 	    Enums="derived_from_input_clk, copy_of_input_PPS, local_refclk_div_2, disabled"
 	    Description="Source of timebase PPS output"/>
-  <Property Name="force_time_now_valid" Type="bool" Writable="true"
+  <Property Name="force_time_now_valid" Type="bool" Writable="true" Default="false"
 	    Description="When true, time service master's valid is always true"/>
-  <Property Name="force_time_now_invalid" Type="bool" Writable="true"
+  <Property Name="force_time_now_invalid" Type="bool" Writable="true" Default="false"
 	    Description="When true, time service master's valid is always false. Precedence given to force_time_now_valid if both properties are true."/>
 
   <Property Name="PPS_lost_sticky_error" Type="bool" Volatile="true"
