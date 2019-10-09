@@ -83,7 +83,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity bit is
+entity single_bit is
   generic (
     N         : natural   := 2;         -- Range 2 - 10
     IREG      : std_logic := '1';       -- 0=no, 1=yes input register
@@ -96,9 +96,9 @@ entity bit is
     dst_clk : in  std_logic;
     dst_rst : in  std_logic;           -- optional; if not required, tie '0'
     dst_out : out std_logic);
-end entity bit;
+end entity single_bit;
 
-architecture rtl of bit is
+architecture rtl of single_bit is
 
   signal s_src_reg  : std_logic;
   signal s_dest_reg : std_logic_vector(0 to N-1);

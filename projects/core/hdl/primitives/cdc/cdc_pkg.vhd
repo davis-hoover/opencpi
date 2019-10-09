@@ -47,7 +47,7 @@ package cdc is
       dst_EMPTY_N : out std_logic);
   end component fifo;
 
-  component bit is
+  component single_bit is
     generic (
       N         : natural   := 2;         -- Range 2 - 10
       IREG      : std_logic := '0';       -- 0=no, 1=yes input register
@@ -60,7 +60,7 @@ package cdc is
       dst_clk  : in  std_logic;
       dst_rst  : in  std_logic;           -- optional; if not required, tie '0'
       dst_out  : out std_logic);
-  end component bit;
+  end component single_bit;
 
   component bits is
     generic (
