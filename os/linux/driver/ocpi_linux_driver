@@ -41,6 +41,8 @@ if [ -x /sbin/udevcontrol ] ; then
 RELOAD="/sbin/udevcontrol reload_rules"
 elif [ -x /sbin/udevadm ] ; then
 RELOAD="/sbin/udevadm control --reload-rules"
+elif [ -x /bin/udevadm ] ; then
+RELOAD="/bin/udevadm control --reload-rules"
 elif [ -x /usr/bin/udevadm ] ; then
 RELOAD="/usr/bin/udevadm control --reload-rules"
 elif [ -x /sbin/mdev -o -x /root/opencpi/bin/mdev ] ; then
