@@ -84,6 +84,7 @@ namespace OCPI {
     OS::Time Device::
     now(bool &isGps) {
       OS::Time ret;
+      OS::Time current_time;
       Access *ts = timeServer();
       if (!ts)
         isGps = false;
@@ -93,13 +94,19 @@ namespace OCPI {
         isGps = getPPSIsOkay();
       }
       if (isGps) {
-        auto propOffset = offsetof(TimeService, time_now);
-        OS::Time time_now = Driver::getSingleton().now(isGps);
+        current_time = Driver::getSingleton().now(isGps);
+      }
+      if (isGps) {
+        // if system.xml has gpsd tag, WTI time valid=1 means time came from
+        // successful gps fix
+        auto os = offsetof(TimeService, valid_requires_write_to_time_now);
+        ts->set8RegisterOffset(os, 1);
+        os = offsetof(TimeService, time_now);
         // write integer portion only (most significant 32 bits) from
         // libgpsd-provided time from HDL::Driver to HTS
-        ts->set64RegisterOffset(propOffset, time_now.bits());
+        ts->set64RegisterOffset(os, current_time.bits());
         // read current Q32.32 time from HTS now that HTS is fully sync'd to GPS
-        ret = ts->get64RegisterOffset(propOffset);
+        ret = ts->get64RegisterOffset(os);
       }
       if (!isGps)
         ret = OS::Time::now();
