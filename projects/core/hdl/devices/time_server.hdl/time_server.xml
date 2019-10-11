@@ -29,12 +29,13 @@
 	    Description="When true, timeservice master’s valid will not go high until time_now is written from software"/>
   <Property Name="enable_time_now_updates_from_PPS" Type="bool" Writable="true" Default="false"
 	    Description="When true, time_now fractional seconds can be disciplined by timebase PPS input"/>
-  <!-- derived_from_input_clk : PPS output is derived from timebase input clock
-       copy_of_input_PPS      : output is copy of input PPS (with some propagation delay)
-       local_refclk_div_2     : output is local reference clock /2 (e.g. 100MHz for 200Mhz)
-       disabled               : output is disabled (0) -->
+  <!-- derived_from_clk_and_pps_inputs : PPS output is derived from timebase input clock and input PPS 
+                                         (if present and enable_time_now_updates_from_PPS = true)
+       copy_of_input_PPS               : output is copy of input PPS (with some propagation delay)
+       local_refclk_div_2              : output is local reference clock /2 (e.g. 100MHz for 200Mhz)
+       disabled                        : output is disabled (0) -->
   <Property Name="PPS_out_source" Type="enum" Writable="true"
-	    Enums="derived_from_input_clk, copy_of_input_PPS, local_refclk_div_2, disabled"
+	    Enums="derived_from_clk_and_PPS_inputs, copy_of_input_PPS, local_refclk_div_2, disabled"
 	    Description="Source of timebase PPS output"/>
   <Property Name="force_time_now_valid" Type="bool" Writable="true" Default="false"
 	    Description="When true, time service master's valid is always true"/>
