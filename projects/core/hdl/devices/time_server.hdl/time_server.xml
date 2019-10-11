@@ -1,6 +1,6 @@
 <HdlDevice Language="vhdl" Libraries="platform" SourceFiles="time_service.vhd">
   <ComponentSpec/>
-  <!-- These two properties must be first -->
+  <!-- These five properties must be first due to limitations of OCPI::HDL::LSim::Device::sdpRequest() -->
   <Property Name="time_now" Type="ulonglong" Writable="true" Volatile="true"
 	    Description="Local time clock of HTS. Format is fixed point GPS time (32 bit seconds, 32 fractional seconds)."/>
   <!-- Difference between last-written value and time_now (now - written value),
@@ -13,6 +13,12 @@
        and when step 2 occurred at the time service (t1). -->
   <Property Name="delta" Type="ulonglong" Writable="true" Volatile="true"
 	    Description="Difference between last-written value and time_now (now – written value)."/>
+  <Property Name="PPS_ok" Type="bool" Volatile="true"
+           Description="PPS fell within the valid window in the last second."/>
+  <Property Name="enable_time_now_updates_from_PPS" Type="bool" Writable="true"
+           Description="When true, time_now fractional seconds can be disciplined by timebase PPS input"/>
+  <Property Name="valid_requires_write_to_time_now" Type="bool" Writable="true"
+           Description="When true, timeservice master's valid will not go high until time_now is written from software"/>
 
   <Property Name="frequency" Type="float" Parameter="true" Default="1e6"
 	    Description="Frequency in Hz of timebase clk input"/>
@@ -25,10 +31,6 @@
 	    Description="Writes of value true clear the sticky status bits"/>
   <Property Name="force_time_now_to_free_running" Type="bool" Writable="true" Default="false"
 	    Description="Suppress discipline of local time clock by software, PPS, or GPS (force time clock to be a free-running counter)"/>
-  <Property Name="valid_requires_write_to_time_now" Type="bool" Writable="true" Default="false"
-	    Description="When true, timeservice master’s valid will not go high until time_now is written from software"/>
-  <Property Name="enable_time_now_updates_from_PPS" Type="bool" Writable="true" Default="false"
-	    Description="When true, time_now fractional seconds can be disciplined by timebase PPS input"/>
   <!-- derived_from_clk_and_pps_inputs : PPS output is derived from timebase input clock and input PPS 
                                          (if present and enable_time_now_updates_from_PPS = true)
        copy_of_input_PPS               : output is copy of input PPS (with some propagation delay)
@@ -48,8 +50,6 @@
 	    Description="At least one valid PPS input has disciplined time_now."/>
   <Property Name="time_now_set_sticky" Type="bool" Volatile="true"
 	    Description="Software has set time_now"/>
-  <Property Name="PPS_ok" Type="bool" Volatile="true"
-	    Description="PPS fell within the valid window in the last second."/>
   <Property Name="PPS_lost_last_second_error" Type="bool" Volatile="true"
 	    Description="PPS went missing from the valid window in the last second"/>
   <Property Name="PPS_count" Type="uchar" Volatile="true"
