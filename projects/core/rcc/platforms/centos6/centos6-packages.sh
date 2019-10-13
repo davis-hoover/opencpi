@@ -125,6 +125,11 @@ function ypkgs {
   eval echo \${$1[@]/%=*}
 }
 
+function err {
+  echo $@ >&2
+  exit 1
+}
+
 
 # The list for RPMs: first line
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
@@ -135,21 +140,18 @@ function ypkgs {
 SUDO=
 if [ "$(whoami)" != root ]; then
   SUDO=$(command -v sudo)
-  if [ $? -ne 0 ]; then
-    echo "\
+  [ $? -ne 0 ] && err "\
 Could not find 'sudo' and you are not root. Installing packages requires root
 permissions."
-    exit 1
-  fi
 fi
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source
 $SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
-[ $? -ne 0 ] && echo "Error installing required packages" && exit 1
+[ $? -ne 0 ] && err "Error installing required packages"
 
 # Now those that depend on epel, e.g.
 $SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
-[ $? -ne 0 ] && echo "Error installing EPEL packages" && exit 1
+[ $? -ne 0 ] && err "Error installing EPEL packages"
 
 exit 0
