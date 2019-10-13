@@ -9,7 +9,7 @@
 
   <StreamInterface name='out'
                    producer='true'
-                   clockdirection='out'
+                   myoutputclock='true'
                    datawidth='OUT_PORT_DATA_WIDTH'/>
   <DevSignal name='dev'
              signals='qadc-16-signals.xml'

@@ -23,12 +23,13 @@ xsim.dir/misc_prims/misc_prims.vdb: ../misc_prims_pkg.vhd ../misc_prims_body.vhd
 xsim.dir/cdc/cdc.vdb: ../../../../../core/hdl/primitives/cdc/cdc_pkg.vhd
 	./myxvhdl.sh -work cdc $<
 
-xsim.dir/cdc/bit.vdb: ../../../../../core/hdl/primitives/cdc/bit.vhd
+xsim.dir/cdc/single_bit.vdb: \
+	../../../../../core/hdl/primitives/cdc/single_bit.vhd
 	./myxvhdl.sh -work cdc $<
 
 xsim.dir/cdc/fast_pulse_to_slow_sticky.vdb: ../../../../../core/hdl/primitives/cdc/fast_pulse_to_slow_sticky.vhd \
     xsim.dir/cdc/cdc.vdb \
-    xsim.dir/cdc/bit.vdb
+    xsim.dir/cdc/single_bit.vdb
 	./myxvhdl.sh -work cdc $<
 
 xsim.dir/misc_prims/adc_samp_drop_detector.vdb: ../adc_samp_drop_detector.vhd \
@@ -71,7 +72,7 @@ xsim.dir/misc_prims/time_corrector.vdb: ../time_corrector.vhd \
 prims: \
     xsim.dir/misc_prims/misc_prims.vdb \
     xsim.dir/cdc/cdc.vdb \
-    xsim.dir/cdc/bit.vdb \
+    xsim.dir/cdc/single_bit.vdb \
     xsim.dir/cdc/fast_pulse_to_slow_sticky.vdb \
     xsim.dir/misc_prims/adc_samp_drop_detector.vdb \
     xsim.dir/misc_prims/counter.vdb \

@@ -12,6 +12,7 @@ The following must be true before application execution:
    file/shared object file) are contained within the directory list of the
    OCPI_LIBRARY_PATH environment variable
     - data_src_adc_ext_test_asm assembly
+    - file_read.rcc (from core project)
     - file_write.rcc (from core project)
   * The application itself is built.
   * The current directory is the applications/data_src_adc_ext_test_app

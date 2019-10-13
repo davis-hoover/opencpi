@@ -36,8 +36,11 @@ for msg in msgs:
     if(msg[utu.MESSAGE_OPCODE] == iqm.SAMPLES_OPCODE):
         first = True
         for sample in msg[utu.MESSAGE_DATA]:
-            i_or_q = sample & 0xffff
-            if(not first):
+            # take only magnitude bits from 12-bit value sign-extended to 16-bit
+            # value
+            i_or_q = sample & 0x7ff
+            print(i_or_q)
+            if((not first) and (i_or_q != 0)):
                 diff = i_or_q - last_i_or_q
                 if(diff != 1):
                     msg1 = "ERROR: sample-to-sample diff was"
