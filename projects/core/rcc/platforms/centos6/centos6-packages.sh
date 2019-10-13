@@ -152,6 +152,6 @@ $SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=sk
 
 # Now those that depend on epel, e.g.
 $SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
-[ $? -ne 0 ] && bad "Iinstalling EPEL packages failed"
+[ $? -ne 0 ] && bad "Installing EPEL packages failed"
 
 exit 0
