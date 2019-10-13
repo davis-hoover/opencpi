@@ -84,9 +84,7 @@ PKGS_D+=(bison)
 PKGS_D+=(flex)
 #    Needed to build gpsd
 PKGS_D+=(scons)
-# docker container missing this	libXdmcp.i686=/lib/libXdmcp.so.6) # AV-3645
-#    for bash completion - a noarch package  (AV-2398)
-# in epel for centos6 - see below PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
+
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
 # While some manual installations require git manually installed before this,
@@ -103,18 +101,18 @@ PKGS_S+=(rpm-build)
 PKGS_S+=(swig python-devel)
 #    for general configuration/installation flexibility
 PKGS_S+=(nfs-utils)
-#    for OpenCL support (the switch for different actual drivers that are not installed here)
-# not available in centos6: PKGS_S+=(ocl-icd)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
-#    for devel.  For RPM installations we somehow rely on the user pre-installing epel
-#
+#    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
 #    for ocpidev
 PKGS_E+=(python34 python34-jinja2)
 #    for various testing scripts
 PKGS_E+=(python34-numpy)
+#    for OpenCL support (the switch for different actual drivers that are not installed here)
+PKGS_E+=(ocl-icd)
 #    for bash completion - a noarch package  (AV-2398)
 PKGS_E+=(bash-completion=/etc/profile.d/bash_completion.sh)
 
@@ -122,12 +120,23 @@ PKGS_E+=(bash-completion=/etc/profile.d/bash_completion.sh)
 function rpkgs {
   eval echo \${$1[@]/#*=}
 }
+
 function ypkgs {
   eval echo \${$1[@]/%=*}
 }
+
+
 # The list for RPMs: first line
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
 [ "$1" = yumlist ] && ypkgs PKGS_R && ypkgs PKGS_D && ypkgs PKGS_S && ypkgs PKGS_E && exit 0
+
+# Install required packages, packages needed for development, and packages
+# needed for building from source
 sudo yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
+[ $? -ne 0 ] && echo "Error installing required packages" && exit 1
+
 # Now those that depend on epel, e.g.
 sudo yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
+[ $? -ne 0 ] && echo "Error installing EPEL packages" && exit 1
+
+exit 0

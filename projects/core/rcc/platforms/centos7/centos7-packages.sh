@@ -81,8 +81,7 @@ PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
-#    Needed to build gpsd
-PKGS_D+=(scons)
+
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
 # While some manual installations require git manually installed before this,
@@ -101,10 +100,10 @@ PKGS_S+=(swig python-devel)
 PKGS_S+=(nfs-utils)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
-#    for devel.  For RPM installations we somehow rely on the user pre-installing epel
-#
+#    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
 #    for ocpidev
 PKGS_E+=(python34 python34-jinja2)
 #    for various testing scripts
@@ -114,20 +113,32 @@ PKGS_E+=(python34-numpy)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd)
+#    Needed to build gpsd
+PKGS_E+=(python2-scons)
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {
   eval echo \${$1[@]/#*=}
 }
+
 function ypkgs {
   eval echo \${$1[@]/%=*}
 }
+
+
 # The list for RPMs: first line
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
 [ "$1" = yumlist ] && ypkgs PKGS_R && ypkgs PKGS_D && ypkgs PKGS_S && ypkgs PKGS_E && exit 0
+
+# Install required packages, packages needed for development, and packages
+# needed for building from source
 sudo yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
+[ $? -ne 0 ] && echo "Error installing required packages" && exit 1
+
 # Now those that depend on epel, e.g.
 sudo yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
+[ $? -ne 0 ] && echo "Error installing EPEL packages" && exit 1
+
 # AV-5478: Make sure the python3 link is present
 if ! command -v python3 >/dev/null; then
     if ! py34=$(command -v python3.4); then
@@ -140,3 +151,5 @@ if ! command -v python3 >/dev/null; then
     fi
     echo "Created the missing /usr/bin/python3 -> python3.4 link" 2>&1
 fi
+
+exit 0
