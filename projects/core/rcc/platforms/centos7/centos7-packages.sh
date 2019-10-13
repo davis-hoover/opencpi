@@ -125,8 +125,8 @@ function ypkgs {
   eval echo \${$1[@]/%=*}
 }
 
-function err {
-  echo $@ >&2
+function bad {
+  echo Error: $* >&2
   exit 1
 }
 
@@ -139,7 +139,7 @@ function err {
 SUDO=
 if [ "$(whoami)" != root ]; then
   SUDO=$(command -v sudo)
-  [ $? -ne 0 ] && err "\
+  [ $? -ne 0 ] && bad "\
 Could not find 'sudo' and you are not root. Installing packages requires root
 permissions."
 fi
@@ -147,20 +147,21 @@ fi
 # Install required packages, packages needed for development, and packages
 # needed for building from source
 $SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
-[ $? -ne 0 ] && err "Error installing required packages"
+[ $? -ne 0 ] && bad "Installing required packages failed"
 
 # Now those that depend on epel, e.g.
 $SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
-[ $? -ne 0 ] && err "Error installing EPEL packages"
+[ $? -ne 0 ] && bad "Installing EPEL packages failed"
 
 # AV-5478: Make sure the python3 link is present
 if ! command -v python3 >/dev/null; then
     if ! py34=$(command -v python3.4); then
-      err "Cannot find python3.4 after installing it"
+      bad "Cannot find python3.4 after installing it"
     fi
     if ! $SUDO ln -s $py34 /usr/bin/python3; then
-      err "Cannot create missing /usr/bin/python3 link to $py34"
+      bad "Cannot create missing /usr/bin/python3 link to $py34"
     fi
+    # Not an error, but sent to stderr
     echo "Created the missing /usr/bin/python3 -> python3.4 link" >&2
 fi
 
