@@ -37,7 +37,7 @@
 ##########################################################################################
 # R. yum-installed and rpm-required for runtime - minimal
 #    linux basics for general runtime scripts
-PKGS_R+=(util-linux coreutils ed findutils sudo initscripts)
+PKGS_R+=(util-linux coreutils ed findutils initscripts)
 #    for JTAG loading of FPGA bitstreams
 #    AV-3053 libusb.so is required to communicate with Xilinx programming dongle
 #    For some reason, that is only in the libusb-devel package in both C6 and C7
@@ -130,13 +130,26 @@ function ypkgs {
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
 [ "$1" = yumlist ] && ypkgs PKGS_R && ypkgs PKGS_D && ypkgs PKGS_S && ypkgs PKGS_E && exit 0
 
+# Docker doesn't have sudo installed by default and we run as root inside
+# a container anyway
+SUDO=
+if [ "$(whoami)" != root ]; then
+  SUDO=$(command -v sudo)
+  if [ $? -ne 0 ]; then
+    echo "\
+Could not find 'sudo' and you are not root. Installing packages requires root
+permissions."
+    exit 1
+  fi
+fi
+
 # Install required packages, packages needed for development, and packages
 # needed for building from source
-sudo yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
+$SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
 [ $? -ne 0 ] && echo "Error installing required packages" && exit 1
 
 # Now those that depend on epel, e.g.
-sudo yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
+$SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
 [ $? -ne 0 ] && echo "Error installing EPEL packages" && exit 1
 
 exit 0
