@@ -1,0 +1,25 @@
+# Description
+Tests the data_src_adc.hdl worker (and its primitive). Unit test for this worker
+fails to build tdue to a bug, so this application is the workaround.
+
+# Hardware Portability
+Intended for simulators only.
+
+# Execution Prerequisites
+The following must be true before application execution:
+ * A simulator is installed on the system.
+ * The following assets are built and their build artifacts (FPGA bitstream
+   file/shared object file) are contained within the directory list of the
+   OCPI_LIBRARY_PATH environment variable
+    - data_src_adc_ext_test_asm assembly
+    - file_write.rcc (from core project)
+  * The application itself is built.
+  * The current directory is the applications/data_src_adc_ext_test_app
+    directory.
+    directory.
+
+# Execution Commands
+./<target>/data_src_adc_ext_test_app
+
+# Verification
+Upon completion of successful test, the application returns an exit status of 0.

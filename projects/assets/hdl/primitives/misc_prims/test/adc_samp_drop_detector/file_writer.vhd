@@ -5,7 +5,8 @@ library misc_prims; use misc_prims.misc_prims.all;
 
 entity file_writer is
   generic(
-    FILENAME : string);
+    FILENAME          : string;
+    LFSR_BP_EN_PERIOD : positive := 1);
   port(
     -- CTRL
     clk                     : in  std_logic;
@@ -23,6 +24,9 @@ architecture rtl of file_writer is
   signal latest_backpressure_select         : std_logic := '0';
   signal lfsr_reg                           : std_logic_vector(11 downto 0) :=
                                               (others => '0');
+
+  signal counter_rst : std_logic := '0';
+  signal counter_cnt : unsigned(15 downto 0) := (others => '0');
 begin
 
   latest_backpressure_select_gen_val <=
@@ -41,6 +45,18 @@ begin
       dout     => latest_backpressure_select,
       dout_vld => open);
 
+  counter_rst <= '1' when (rst = '1') or
+                 (counter_cnt = to_unsigned(LFSR_BP_EN_PERIOD, 16))
+                 else '0';
+  counter : misc_prims.misc_prims.counter
+    generic map(
+      BIT_WIDTH => 16)
+    port map(
+      clk      => clk,
+      rst      => counter_rst,
+      en       => '1',
+      cnt      => counter_cnt);
+
   lfsr : misc_prims.misc_prims.lfsr
     generic map(
       POLYNOMIAL => "111000001000",
@@ -48,7 +64,7 @@ begin
     port map(
       clk => clk,
       rst => rst,
-      en  => '1',
+      en  => counter_rst,
       reg => lfsr_reg);
 
   irdy <= '1'         when (latest_backpressure_select = '1') else

@@ -32,6 +32,7 @@ SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_pkg \
 	misc_prims_body \
 	ocpi_pkg \
+	cdc_pkg \
 	lfsr/src/lfsr \
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
@@ -43,8 +44,14 @@ SourceFiles=$(patsubst %,%.vhd,\
 	data_widener \
 	adc_maximal_lfsr_data_src \
 	ocpi_wsi_message_sizer \
+	ocpi_cswm_prot_in_adapter_dw32_clkin \
+	ocpi_cswm_prot_in_adapter_dw32_clkout \
+	ocpi_cswm_prot_out_adapter_dw32_clkin \
+	ocpi_cswm_prot_out_adapter_dw32_clkout \
+	ocpi_data_src_adc \
 	set_clr \
-	clk_src )
+	clk_src \
+	cdc_fifo_info )
 
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:

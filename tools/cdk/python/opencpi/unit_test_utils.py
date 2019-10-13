@@ -75,7 +75,7 @@ def get_msg(msgs_in_file_array):
     opcode = msgs_in_file_array[MESSAGE_OPCODE]
     data   = None
     if length > 0:
-        data = msgs_in_file_array[MESSAGE_DATA:length/4+2]
+        data = msgs_in_file_array[MESSAGE_DATA:int(length/4+2)]
     return (length,opcode,data)
 
 def add_msg(f, opcode, data):

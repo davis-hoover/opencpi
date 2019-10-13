@@ -1,0 +1,17 @@
+<HdlDevice language='vhdl' Emulate='data_src_adc.hdl' Version='2'>
+
+  <ComponentSpec>
+    <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>
+  </ComponentSpec>
+
+  <StreamInterface name='in'
+                   datawidth='32'
+                   clockdirection='out'/>
+
+  <DevSignal name='dev' signals='qadc-16-signals.xml'/>
+
+  <Supports worker='data_src_adc'>
+    <Connect port='dev' to='dev'/>
+  </Supports>
+
+</HdlDevice>

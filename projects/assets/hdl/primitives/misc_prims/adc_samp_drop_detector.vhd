@@ -37,8 +37,10 @@ begin
     if(rising_edge(clk)) then
       if(rst = '1') then
         pending_xfer_error_samp_drop_r <= '0';
-      else
-        pending_xfer_error_samp_drop_r <= samp_drop;
+      elsif(samp_drop = '1') then
+        pending_xfer_error_samp_drop_r <= '1';
+      elsif(xfer_error_samp_drop = '1') then
+        pending_xfer_error_samp_drop_r <= '0';
       end if;
     end if;
   end process;

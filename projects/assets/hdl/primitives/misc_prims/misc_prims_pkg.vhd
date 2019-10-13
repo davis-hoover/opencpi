@@ -24,9 +24,10 @@ USE IEEE.MATH_COMPLEX.ALL;
 
 package misc_prims is
 
-constant DATA_ADC_BIT_WIDTH      : positive := 12;
-constant DATA_BIT_WIDTH          : positive := 16;
-constant METADATA_TIME_BIT_WIDTH : positive := 64;
+constant DATA_ADC_BIT_WIDTH             : positive := 12;
+constant DATA_BIT_WIDTH                 : positive := 16;
+constant METADATA_TIME_BIT_WIDTH        : positive := 64;
+constant METADATA_SAMP_PERIOD_BIT_WIDTH : positive := 64;
 
 type file_writer_backpressure_select_t is (NO_BP, LFSR_BP);
 
@@ -41,26 +42,52 @@ type data_complex_t is record
 end record data_complex_t;
 
 type metadata_t is record
-  error_samp_drop : std_logic; -- one or more samples have been dropped
-  data_vld        : std_logic; -- allows for option of sending valid metadata in
-                               -- parallel with invalid data to output
+  flush             : std_logic; -- one or more samples have been dropped
+  error_samp_drop   : std_logic; -- one or more samples have been dropped
+  data_vld          : std_logic; -- allows for option of sending valid metadata
+                                 -- in parallel with invalid data to output
 
   -- if error_samp_drop and data_vld are both 1, samp drop is assumed to have
   -- happened before the current valid data
 
-  time            : unsigned(METADATA_TIME_BIT_WIDTH-1 downto 0);
-  time_vld        : std_logic;
+  -- if data_vld=1 and time_vld=1 time of corresponding to current data value
+  -- if data_vld=0 and time_vld=1 time of next valid data value
+  time              : unsigned(METADATA_TIME_BIT_WIDTH-1 downto 0);
+
+  time_vld          : std_logic;
+  samp_period       : unsigned(METADATA_SAMP_PERIOD_BIT_WIDTH-1 downto 0);
+  samp_period_vld   : std_logic;
 end record metadata_t;
 
-constant METADATA_IDX_ERROR_SAMP_DROP : natural := METADATA_TIME_BIT_WIDTH+2;
-constant METADATA_IDX_DATA_VLD        : natural := METADATA_TIME_BIT_WIDTH+1;
-constant METADATA_IDX_TIME_L          : natural := METADATA_TIME_BIT_WIDTH;
-constant METADATA_IDX_TIME_R          : natural := 1;
-constant METADATA_IDX_TIME_VLD        : natural := 0;
-constant METADATA_BIT_WIDTH : positive := METADATA_IDX_ERROR_SAMP_DROP+1;
+type info_t is record
+  data     : data_complex_t;
+  metadata : metadata_t;
+end record info_t;
 
-function to_slv(metadata : in metadata_t) return std_logic_vector;
-function from_slv(slv : in std_logic_vector) return metadata_t;
+constant METADATA_IDX_SAMP_PERIOD_VLD : natural := 0;
+constant METADATA_IDX_SAMP_PERIOD_R   : natural := 1;
+constant METADATA_IDX_SAMP_PERIOD_L   : natural :=
+                                        METADATA_IDX_SAMP_PERIOD_R+
+                                        METADATA_SAMP_PERIOD_BIT_WIDTH-1;
+constant METADATA_IDX_TIME_VLD        : natural :=
+                                        METADATA_IDX_SAMP_PERIOD_L+1;
+constant METADATA_IDX_TIME_R          : natural := METADATA_IDX_TIME_VLD+1;
+constant METADATA_IDX_TIME_L          : natural := METADATA_IDX_TIME_R+
+                                                   METADATA_TIME_BIT_WIDTH-1;
+constant METADATA_IDX_DATA_VLD        : natural := METADATA_IDX_TIME_L+1;
+constant METADATA_IDX_ERROR_SAMP_DROP : natural := METADATA_IDX_DATA_VLD+1;
+constant METADATA_IDX_FLUSH           : natural := METADATA_IDX_ERROR_SAMP_DROP
+                                                   +1;
+constant METADATA_BIT_WIDTH : positive := METADATA_IDX_FLUSH+1;
+
+constant INFO_BIT_WIDTH : positive := (2*DATA_BIT_WIDTH)+METADATA_BIT_WIDTH;
+
+function to_slv(data     : in data_complex_t) return std_logic_vector;
+function from_slv(slv    : in std_logic_vector) return data_complex_t;
+function to_slv(metadata : in metadata_t)     return std_logic_vector;
+function from_slv(slv    : in std_logic_vector) return metadata_t;
+function to_slv(info     : in info_t)         return std_logic_vector;
+function from_slv(slv    : in std_logic_vector) return info_t;
 
 type adc_samp_drop_detector_status_t is record
   error_samp_drop : std_logic;

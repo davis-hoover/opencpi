@@ -3,7 +3,7 @@ library misc_prims; use misc_prims.misc_prims.all;
 library ocpi; use ocpi.types.all;
 
 -- sizes messages by counting gives
-entity ocpi_wsi_message_sizer is
+entity wsi_message_sizer is
   generic(
     SIZE_BIT_WIDTH : positive);
   port(
@@ -13,8 +13,8 @@ entity ocpi_wsi_message_sizer is
     message_size_num_gives : in  unsigned(SIZE_BIT_WIDTH-1 downto 0);
     som                    : out Bool_t;
     eom                    : out Bool_t);
-end entity ocpi_wsi_message_sizer;
-architecture rtl of ocpi_wsi_message_sizer is
+end entity wsi_message_sizer;
+architecture rtl of wsi_message_sizer is
   signal som_s            : std_logic := '0';
   signal eom_s            : std_logic := '0';
   signal give_counter_rst : std_logic := '0';

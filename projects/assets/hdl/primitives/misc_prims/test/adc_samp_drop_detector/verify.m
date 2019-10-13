@@ -68,12 +68,12 @@ function retval = verify_error_samp_drop(data_cell)
   end
 endfunction
 
-function retval = verify_subtest_0()
+function retval = verify_subtest_0(filename)
   
   retval = 0;
 
   %[data_i, data_q] = textread('uut_subtest_0_data.txt', '%d,%d');
-  tmp = csvread('uut_subtest_0_data.txt');
+  tmp = csvread(filename);
   data_i = tmp(:,1);
   data_q = tmp(:,2);
 
@@ -86,21 +86,21 @@ function retval = verify_subtest_0()
   end
 endfunction
 
-function retval = verify_subtest_1()
-  retval = verify_error_samp_drop(textread('uut_subtest_1_data.txt', '%s'));
-endfunction
-
 function verify()
 
   err = 0;
 
   if(!err)
     disp("***** --- SUBTEST 0 --- *****")
-    err = verify_subtest_0();
+    err = verify_subtest_0('uut_subtest_0_data.txt');
   end
   if(!err)
     disp("***** --- SUBTEST 1 --- *****")
-    err = verify_subtest_1();
+    err = verify_error_samp_drop(textread('uut_subtest_1_data.txt', '%s'));
+  end
+  if(!err)
+    disp("***** --- SUBTEST 2 --- *****")
+    err = verify_error_samp_drop(textread('uut_subtest_2_data.txt', '%s'));
   end
 
   if(err)

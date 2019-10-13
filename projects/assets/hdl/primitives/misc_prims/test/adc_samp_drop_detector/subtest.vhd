@@ -5,7 +5,8 @@ library misc_prims; use misc_prims.misc_prims.all;
 entity subtest is
   generic(
     FILENAME                 : string;
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
+    DATA_PIPE_LATENCY_CYCLES : natural  := 0;
+    LFSR_BP_EN_PERIOD        : positive := 1);
   port(
     backpressure_select     : in  file_writer_backpressure_select_t;
     backpressure_select_vld : in  std_logic);
@@ -74,7 +75,8 @@ begin
 
   file_writer : entity work.file_writer
     generic map(
-      FILENAME => FILENAME)
+      FILENAME          => FILENAME,
+      LFSR_BP_EN_PERIOD => LFSR_BP_EN_PERIOD)
     port map(
       -- CTRL
       clk                     => clk,
