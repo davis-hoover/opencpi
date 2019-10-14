@@ -86,10 +86,10 @@ namespace
     }
 
     OS::ElapsedTime e = t.getElapsed();
-    unsigned int msecs = e.seconds() * 1000 + e.nanoseconds() / 1000000;
-    // Allow for a 3% skew
-    EXPECT_GE( msecs, (unsigned int)(run_time * 0.97) );
-    EXPECT_LE( msecs, (unsigned int)(run_time * 1.03) );
+    const unsigned int msecs = e.seconds() * 1000 + e.nanoseconds() / 1000000;
+    // Allow for a 5% skew
+    EXPECT_GE( msecs, (unsigned int)(run_time * 0.95) );
+    EXPECT_LE( msecs, (unsigned int)(run_time * 1.05) );
   }
 
 
@@ -118,10 +118,10 @@ namespace
     }
 
     OS::ElapsedTime e = t.getElapsed();
-    unsigned int msecs = e.seconds() * 1000 + e.nanoseconds() / 1000000;
-    // Allow for a 3% skew
-    EXPECT_GE( msecs, (unsigned int)(run_time * 0.97) );
-    EXPECT_LE( msecs, (unsigned int)(run_time * 1.03) );
+    const unsigned int msecs = e.seconds() * 1000 + e.nanoseconds() / 1000000;
+    // Allow for a 5% skew
+    EXPECT_GE( msecs, (unsigned int)(run_time * 0.95) );
+    EXPECT_LE( msecs, (unsigned int)(run_time * 1.05) );
   }
 
 

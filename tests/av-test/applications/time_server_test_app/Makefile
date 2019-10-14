@@ -23,6 +23,14 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # If there is a time_server_test_app.xml file, it will be assumed to be an XML app that can be run with ocpirun.
 # The RunArgs variable can be set to a standard set of arguments to use when executing either.
 
+#Check for time_server_test_assy bitfiles before executing
+#This guard should be removed when Issue #99 is resolved
+ifeq ($(wildcard ../../artifacts/*time_server_test_assy*),)
+ $(info No time_server_test_assy assembly built in av-test. Skipping application run.)
+ OcpiAppNoRun=1
+ run:
+endif
+
 APP=test_app
 
 include $(OCPI_CDK_DIR)/include/application.mk
