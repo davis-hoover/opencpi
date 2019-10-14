@@ -130,17 +130,32 @@ unsigned int runApp(bool enable_time_now_updates_from_PPS, bool valid_requires_w
 
 int main(/*int argc, char **argv*/) {
   programRet = 0; 
+  bool hdl = false;
+  unsigned n = 0;
+  // When run in a build environment that is suppressing HDL platforms, respect that.
+  // This guard should be removed when Issue #99 is resolved
+  const char *env = getenv("HdlPlatforms");
+  if (!env || env[0])
+    for (OA::Container *c; (c = OA::ContainerManager::get(n)); n++) {
+      if (c->model() == "hdl") {
+        hdl = true;
+        std::cout << "INIT: found HDL container " << c->name() << ", will run HDL tests" << std::endl;
+      }
+    }
 
-  for(int a=0; a<NUM_TEST_CASES; a++){
-    bool enable_time_now_updates_from_PPS = testValues[a][0];
-    bool valid_requires_write_to_time_now = testValues[a][1];
+  if (hdl){
+    for(int a=0; a<NUM_TEST_CASES; a++){
+      bool enable_time_now_updates_from_PPS = testValues[a][0];
+      bool valid_requires_write_to_time_now = testValues[a][1];
 
-    programRet = runApp(enable_time_now_updates_from_PPS, valid_requires_write_to_time_now);
+      programRet = runApp(enable_time_now_updates_from_PPS, valid_requires_write_to_time_now);
 
-    if (programRet)
-      return programRet;
-    else
-      cout << "OK" << endl;
-  }
+      if (programRet)
+	return programRet;
+      else
+	cout << "OK" << endl;
+    }
+  } else
+    std::cout << "Application requires HDL container, but none found. Exiting." << std::endl;
   return programRet;
 }
