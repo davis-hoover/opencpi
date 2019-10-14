@@ -7,19 +7,9 @@
 # Define the stages of the pipeline.
 stages:
   - prep
-  #- prereq
-  #- build
-  #- test
-
-# Define types of runners. If any job uses the 'tags' key, then these templates
-# will have no effect. If multiple templates are merged, '<<:', then the last
-# one referenced will win.
-.runner_defs:
-  .shell_runner: &shell_runner
-    tags:
-      - opencpi
-      - linux
-      - shell
+  - prereq
+  - build
+  - test
 
 #------------------------------------------------------------------------------
 # JOBS
@@ -47,9 +37,12 @@ prep:centos7:
   - yum -y distro-sync
   - scripts/install-packages.sh
 
-.prereq:centos7:
-  <<: *shell_runner
+prereq:centos7:
   stage: prereq
+  tags:
+    - shell
+    - centos7
+    - opencpi
   cache:
     key: "$CI_PIPELINE_IID"
     policy: push
@@ -60,9 +53,12 @@ prep:centos7:
   script:
     - ./scripts/install-prerequisites.sh
 
-.build:opencpi:
-  <<: *shell_runner
+build:centos7:
   stage: build
+  tags:
+    - shell
+    - centos7
+    - opencpi
   cache:
     key: "$CI_PIPELINE_IID"
     paths:
@@ -75,9 +71,12 @@ prep:centos7:
   script:
     - ./scripts/build-opencpi.sh
 
-.test:opencpi:
-  <<: *shell_runner
+test:centos7:
   stage: test
+  tags:
+    - shell
+    - centos7
+    - opencpi
   cache:
     key: "$CI_PIPELINE_IID"
     policy: pull
