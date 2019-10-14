@@ -6,9 +6,10 @@
 
 # Define the stages of the pipeline.
 stages:
-  - prereq
-  - build
-  - test
+  - prep
+  #- prereq
+  #- build
+  #- test
 
 # Define types of runners. If any job uses the 'tags' key, then these templates
 # will have no effect. If multiple templates are merged, '<<:', then the last
@@ -24,7 +25,18 @@ stages:
 # JOBS
 #------------------------------------------------------------------------------
 
-install:prereqs:
+prep:centos6:
+  stage: prep
+  tags:
+    - docker
+    - linux
+    - opencpi
+  image: centos:6
+  script:
+  - yum -y distro-sync
+  - scripts/install-packages.sh
+
+.prereq:centos7:
   <<: *shell_runner
   stage: prereq
   cache:
@@ -37,7 +49,7 @@ install:prereqs:
   script:
     - ./scripts/install-prerequisites.sh
 
-build:opencpi:
+.build:opencpi:
   <<: *shell_runner
   stage: build
   cache:
@@ -52,7 +64,7 @@ build:opencpi:
   script:
     - ./scripts/build-opencpi.sh
 
-test:opencpi:
+.test:opencpi:
   <<: *shell_runner
   stage: test
   cache:
