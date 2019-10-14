@@ -778,6 +778,7 @@ opencpi_io_release(struct inode *inode, struct file *file) {
 #ifdef CONFIG_PCI
 static int get_pci(unsigned minor, ocpi_pci_t *pci);
 #endif
+
 // ioctl for getting memory status and requesting memory allocations
 // FIXME: do copy_to/from_user return the right error codes anyway?
 static
@@ -791,7 +792,6 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
   unsigned minor = iminor(inode);
 #endif
   int err;
-  log_debug("IOCTL CMD: x%x x%x x%x\n", cmd, OCPI_CMD_REQUEST, OCPI_CMD_LOAD_FPGA);
   switch (cmd) {
   case OCPI_CMD_PCI:
       if (minor == 0 || minor > opencpi_ndevices)
@@ -862,18 +862,23 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	struct device_node *node = of_find_node_by_path(request.device_path); // returns NULL on error
 	if (node) {
 	  struct fpga_manager *mgr = of_fpga_mgr_get(node); // returns IS_ERR on error
-	  log_debug("load fpga node: %px, path: %s, name: %s, full: %s\n",
-		    node, request.device_path, node->name, node->full_name);
-	  log_debug("load fpga mgr: %px\n", mgr);
+	  log_debug("load fpga node: %px, path: %s, name: %s, full: %s, mgr: %px\n",
+		    node, request.device_path, node->name, node->full_name, mgr);
 	  if (!IS_ERR(mgr)) {
-	    struct fpga_image_info *info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev);
+	    const char *buf;
 	    err = -ENOMEM;
-	    log_debug("load fpga info: %px\n", info);
-	    if (info) { // Struct is initialized to all zeros for us
-	      if ((info->buf = vmalloc(request.length))) {
-		err = -EFAULT;
-		log_debug("load fpga loading to: %px\n", info->buf);
-		if (!copy_from_user((void *)info->buf, (void __user *)request.data, request.length)) {
+	    if ((buf = vmalloc(request.length))) { // lock user mem and use sg someday?
+	      err = -EFAULT;
+	      log_debug("load fpga loading to: %px\n", buf);
+	      if (!copy_from_user((void *)buf, (void __user *)request.data, request.length)) {
+  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
+		err = fpga_mgs_buf_load(mgr, 0, buf, request.length);
+  #else
+		struct fpga_image_info *info;
+		err = -ENOMEM;
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
+		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {
+		  info->buf = buf;
 		  info->count = request.length;
 		  log_debug("loading fpga\n");
 		  err = -EBUSY;
@@ -881,12 +886,18 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 		    err = fpga_mgr_load(mgr, info);
 		    fpga_mgr_unlock(mgr);
 		  }
+		  fpga_image_info_free(info);
 		}
-		vfree(info->buf);
+    #else
+		if ((info = kzalloc(sizeof(struct fpga_image_info), GFP_KERNEL))) {
+		  err = fpga_mgr_buf_load(mgr, info, buf, request.length);
+		  kfree(info);
+		}
+    #endif
+  #endif
 	      }
-	      fpga_image_info_free(info);
-	    } else
-	      err = -ENOMEM;
+	      vfree(buf);
+	    }
 	    fpga_mgr_put(mgr);
 	  }
 	  of_node_put(node);
