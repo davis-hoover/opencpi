@@ -29,9 +29,20 @@ prep:centos6:
   stage: prep
   tags:
     - docker
-    - linux
+    - centos6
     - opencpi
   image: centos:6
+  script:
+  - yum -y distro-sync
+  - scripts/install-packages.sh
+
+prep:centos7:
+  stage: prep
+  tags:
+    - docker
+    - centos7
+    - opencpi
+  image: centos:7
   script:
   - yum -y distro-sync
   - scripts/install-packages.sh
