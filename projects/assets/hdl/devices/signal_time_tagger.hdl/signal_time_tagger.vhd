@@ -39,7 +39,7 @@ begin
               dst_clk => time_in.clk,
               dst_rst => ctl2time_reset);
 
-  is_op : component cdc.cdc.bit
+  is_op : component cdc.cdc.single_bit
     port map   (src_clk => ctl_in.clk,
                 src_rst => ctl_in.reset,
                 src_in  => ctl_in.is_operating,

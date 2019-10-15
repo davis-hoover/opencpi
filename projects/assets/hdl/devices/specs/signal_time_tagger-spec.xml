@@ -3,7 +3,7 @@
   <Property Name="MAX_NUM_TIME_TAGS_TO_COLLECT"
 	    Type="UShort"
 	    Parameter="true"
-	    Default="64"/>
+	    Default="128"/>
   <Property Name="num_time_tags_to_collect" 
 	    Type="UShort" 
 	    Initial="true"
