@@ -10,11 +10,6 @@ stages:
   - build
   - test
 
-# Define default cache key to use, allowing all jobs access to the same cache.
-default:
-  cache:
-    key: "$CI_PIPELINE_IID"
-
 # Define types of runners. If any job uses the 'tags' key, then these templates
 # will have no effect. If multiple templates are merged, '<<:', then the last
 # one referenced will win.
@@ -33,6 +28,7 @@ install:prereqs:
   <<: *shell_runner
   stage: prereq
   cache:
+    key: "$CI_PIPELINE_IID"
     policy: push
     paths:
       - exports/
@@ -45,6 +41,7 @@ build:opencpi:
   <<: *shell_runner
   stage: build
   cache:
+    key: "$CI_PIPELINE_IID"
     paths:
       - build/
       - exports/
@@ -59,6 +56,7 @@ test:opencpi:
   <<: *shell_runner
   stage: test
   cache:
+    key: "$CI_PIPELINE_IID"
     policy: pull
     paths:
       - build/
