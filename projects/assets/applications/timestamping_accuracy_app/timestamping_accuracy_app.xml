@@ -1,3 +1,12 @@
 <Application Done="signal_time_tagger">
+  <!-- must be instanced to be used as a slave to gps_time_proxy -->
+  <Instance Component="ocpi.core.devices.time_server">
+    <Property Name="force_time_now_to_free_running" Value="true"/>
+    <!-- <Property Name="enable_time_now_updates_from_PPS" Value="true"/> -->
+  </Instance>
+
+  <!-- <Instance Component="ocpi.bsp.e310.cards.e3xx_mimo_xcvr_gps_time_proxy"> -->
+  <!--   <Slave Name="time_server"/> -->
+  <!-- </Instance> -->
   <Instance Component="ocpi.assets.devices.signal_time_tagger"/>
 </Application>

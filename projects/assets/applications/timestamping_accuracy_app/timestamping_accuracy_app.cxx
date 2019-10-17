@@ -41,6 +41,7 @@
 #include <string.h>
 #include "OcpiApi.hh"
 #include <iostream>
+#include <sstream>
 #include <stdlib.h>
 #include <cmath>     //std::pow()
 #include <algorithm> // std::min_element, std::max_element
@@ -53,6 +54,95 @@ const int NUM_PICOSECONDS_PER_FRAC_SEC = 233;
 
 namespace OA = OCPI::API;
 using namespace std;
+
+class UQ32p32 {
+
+public:
+  UQ32p32(uint32_t int_32_val, uint32_t fract_32_val) :
+      m_int_32_val(int_32_val), m_fract_32_val(fract_32_val) {
+  }
+
+  std::string get_int_str() {
+
+    std::ostringstream oss;
+    oss << m_int_32_val;
+
+    return oss.str();
+  }
+
+  std::string get_fract_str() {
+
+    std::string ret;
+
+    // -----------------------------------------------
+    // lower 16 bits
+    // -----------------------------------------------
+
+    uint16_t xx = m_fract_32_val & 0x0000ffff;
+    uint64_t yy = 0;
+    uint16_t test_val = (1 << 15);
+
+    // 0.00000000000000005000000000000000
+    uint64_t zz = 5000000000000000; // 16 digits
+
+    for(size_t ii = 0; ii < 16; ii++) {
+      if(xx >= test_val) {
+        xx -= test_val;
+        yy += zz;
+      }
+      else {
+      }
+      test_val >>= 1;
+      zz /= 2;
+    }
+    uint64_t yy_low = yy;
+
+    // -----------------------------------------------
+    // upper 16 bits
+    // -----------------------------------------------
+
+    xx = (m_fract_32_val & 0xffff0000) >> 16;
+    yy = 0;
+    test_val = (1 << 15);
+
+    // 0.5000000000000000
+    zz = 5000000000000000; // 16 digits
+
+    for(size_t ii = 0; ii < 16; ii++) {
+      if(xx >= test_val) {
+        xx -= test_val;
+        yy += zz;
+      }
+      test_val >>= 1;
+      zz /= 2;
+    }
+    uint64_t yy_upp = yy;
+
+    // -----------------------------------------------
+    // get string
+    // -----------------------------------------------
+
+    std::ostringstream oss;
+    oss << yy_upp << yy_low;
+    std::string yy_str = oss.str();
+
+    for(size_t ii = 0; ii < 32 - yy_str.size(); ii++) {
+      ret += "0";
+    }
+
+    ret += yy_str;
+
+    return ret;
+  }
+
+  std::string get_str() {
+    return get_int_str() + "." + get_fract_str();
+  }
+
+protected:
+  uint32_t m_int_32_val, m_fract_32_val;
+
+}; // class Q32p32
 
 int programRet = 0; 
 
@@ -70,11 +160,13 @@ unsigned int computeStatistics(uint32_t collected_time_tags_frac[NUM_TIME_TAGS_T
        delta_from_nearest_sec[a] = -(std::pow(2.,32.) - collected_time_tags_frac[a]);
      avg_delta += (int64_t)(delta_from_nearest_sec[a]-avg_delta)/(a+1);
    }
+
    for (int a=0; a<NUM_TIME_TAGS_TO_COLLECT; a++)
      var += (int64_t)(delta_from_nearest_sec[a] - avg_delta) * (int64_t)(delta_from_nearest_sec[a] - avg_delta);
    var /= NUM_TIME_TAGS_TO_COLLECT;
    std_dev = sqrt(var);
 
+   cout << endl << endl;
    cout << "Min Delta from nearest second              " << 
      (double)*std::min_element(delta_from_nearest_sec,delta_from_nearest_sec+NUM_TIME_TAGS_TO_COLLECT-1)*
      NUM_PICOSECONDS_PER_FRAC_SEC/1000000 
@@ -142,12 +234,14 @@ unsigned int runApp()
 
   app.finish();
 
+  cout << "Collected Timestamps:" << endl;
   for (int a=0; a<NUM_TIME_TAGS_TO_COLLECT; a++){
     app.getPropertyValue<uint32_t>("signal_time_tagger", "collected_time_tags_sec", collected_time_tags_sec[a], {a});
     app.getPropertyValue<uint32_t>("signal_time_tagger", "collected_time_tags_frac", collected_time_tags_frac[a], {a});
+    cout << UQ32p32(collected_time_tags_sec[a],collected_time_tags_frac[a]).get_str() << endl;
   }
 
-  retVal = computeStatistics(collected_time_tags_frac);
+   retVal = computeStatistics(collected_time_tags_frac);
 
   return retVal;
 }
