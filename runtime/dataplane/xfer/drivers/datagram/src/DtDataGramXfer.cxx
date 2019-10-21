@@ -220,8 +220,14 @@ post() {
 	 frame.bytes_left -= msg_bytes, m++, nMsgs++, frame.msg_count++) {
       m->hdr.nextMsg = true;
       m->hdr.flagValue = flag;
-      *iov++ = { .iov_base = (void*)&m->hdr, .iov_len = sizeof(MsgHeader)};
-      *iov++ = { .iov_base = m->src_adr, .iov_len = msg_bytes - sizeof(MsgHeader)};
+
+      iov->iov_base = (void *)&m->hdr;
+      iov->iov_len = sizeof(MsgHeader);
+      ++iov;
+
+      iov->iov_base = m->src_adr;
+      iov->iov_len = msg_bytes - sizeof(MsgHeader);
+      ++iov;
     }
     frame.iovlen = OCPI_UTRUNCATE(unsigned, OCPI_SIZE_T_DIFF(iov, frame.iov));
     m[-1].hdr.nextMsg = false;
