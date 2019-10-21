@@ -50,7 +50,7 @@ PKGS_R+=(unzip)
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
 PKGS_D+=(make autoconf automake libtool gcc-c++)
 #    for our development scripts
-PKGS_D+=(which)
+PKGS_D+=(which wget)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
@@ -82,8 +82,6 @@ PKGS_D+=(hardlink)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
-#    Needed to build gpsd
-PKGS_D+=(scons)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
@@ -130,6 +128,36 @@ function bad {
   exit 1
 }
 
+function install_scons {
+  local need_scons=1
+  local scons_pkg=scons-2.5.1
+
+  if rpm -q scons &> /dev/null; then
+    # RPM is installed, remove and install scons manually as this version does
+    # not work with gpsd
+    $SUDO yum -y erase scons
+  elif command -v scons &> /dev/null; then
+    # SCons is in path
+    if scons --version | grep -q 'script: v2.5.1'; then
+      # Correct version
+      need_scons=0
+    fi
+  fi
+
+  # Download and install scons. Yes this is usually done with pip, but pip was
+  # failing on install.
+  if [ $need_scons -eq 1 ]; then
+    pushd /tmp
+    wget https://files.pythonhosted.org/packages/2c/ee/a9601b958c94e93410e635a5d67ed95300998ffdc36127b16d322b054ff0/${scons_pkg}.tar.gz
+    tar xf ${scons_pkg}.tar.gz
+    pushd $scons_pkg
+    $SUDO python setup.py install
+    popd
+    rm -rf ${scons_pkg}*
+    popd
+  fi
+}
+
 
 # The list for RPMs: first line
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
@@ -153,5 +181,10 @@ $SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=sk
 # Now those that depend on epel, e.g.
 $SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
 [ $? -ne 0 ] && bad "Installing EPEL packages failed"
+
+# On CentOS6, SCons has to be installed manually. The version provided by yum
+# is not new enough. Installation with pip was not working either.
+# SCons is needed by gpsd
+install_scons
 
 exit 0
