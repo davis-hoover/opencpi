@@ -344,7 +344,7 @@ begin
   -----------------------------------------------------------------------------
   -- Control to Time clk domain: Control monitoring of External PPS sync pulse
   -----------------------------------------------------------------------------
-  s_ppsDisablePPS_sD_IN_slv0 <= (0 downto 0 => s_rplTimeControl(2));
+  s_ppsDisablePPS_sD_IN_slv0 <= (0 downto 0 => timeControl(2));
   syncReg_ppsDisablePPS : SyncRegister
     generic map (
       width => 1,
