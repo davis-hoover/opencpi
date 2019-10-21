@@ -17,7 +17,8 @@ end from_slv;
 
 function to_slv(metadata : in metadata_t) return std_logic_vector is
 begin
-  return metadata.flush &
+  return metadata.eof &
+         metadata.flush &
          metadata.error_samp_drop &
          metadata.data_vld &
          std_logic_vector(metadata.time) &
@@ -29,6 +30,7 @@ end to_slv;
 function from_slv(slv : in std_logic_vector) return metadata_t is
   variable ret : metadata_t;
 begin
+  ret.eof               :=          slv(METADATA_IDX_EOF);
   ret.flush             :=          slv(METADATA_IDX_FLUSH);
   ret.error_samp_drop   :=          slv(METADATA_IDX_ERROR_SAMP_DROP);
   ret.data_vld          :=          slv(METADATA_IDX_DATA_VLD);

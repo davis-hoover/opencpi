@@ -32,6 +32,7 @@ SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_pkg \
 	misc_prims_body \
 	ocpi_pkg \
+	cdc_pkg \
 	lfsr/src/lfsr \
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
@@ -39,15 +40,22 @@ SourceFiles=$(patsubst %,%.vhd,\
 	counter \
 	latest_reg_slv \
 	latest_reg_unsigned \
+	latest_reg_signed \
 	adc_samp_drop_detector \
 	data_widener \
 	adc_maximal_lfsr_data_src \
+	time_downsampler \
+	time_corrector \
 	ocpi_wsi_message_sizer \
 	ocpi_cswm_prot_in_adapter_dw32_clkin \
 	ocpi_cswm_prot_in_adapter_dw32_clkout \
 	ocpi_cswm_prot_out_adapter_dw32_clkin \
+	ocpi_cswm_prot_out_adapter_dw32_clkin_old \
 	ocpi_cswm_prot_out_adapter_dw32_clkout \
+	ocpi_cswm_prot_out_adapter_dw32_clkout_old \
 	ocpi_data_src_adc \
+	level_to_pulse_converter \
+	cdc_fifo_info \
 	set_clr \
 	clk_src)
 

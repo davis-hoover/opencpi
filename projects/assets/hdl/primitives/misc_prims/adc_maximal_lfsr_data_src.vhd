@@ -23,7 +23,9 @@ architecture rtl of adc_maximal_lfsr_data_src is
   constant MAXIMAL_LFSR_16_BIT_PERIOD : positive := 65535;
 
 
-  signal data_i : std_logic_vector(odata.i'range) := (others => '0');
+  signal rst_r   : std_logic := '0';
+  signal vld_rst : std_logic := '0';
+  signal data_i  : std_logic_vector(odata.i'range) := (others => '0');
 
   signal cnt                       : unsigned(CNT_BIT_WIDTH-1 downto 0) :=
                                      (others => '0');
@@ -31,6 +33,15 @@ architecture rtl of adc_maximal_lfsr_data_src is
   signal stopped_s                 : std_logic := '0';
   signal maximal_period_samps_sent : std_logic := '0';
 begin
+
+  -- trying to obey axi4streaming TVALID rules
+  rst_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      rst_r <= rst;
+    end if;
+  end process;
+  vld_rst <= rst or rst_r;
 
   stopped_s <= (stop_on_period_cnt and maximal_period_samps_sent);
   counter_en <= ordy and not (stopped_s);
@@ -47,7 +58,21 @@ begin
 
   data_bit_width_12 : if(DATA_BIT_WIDTH = 12) generate
 
-    maximal_period_samps_sent <= '1' when (cnt = MAXIMAL_LFSR_12_BIT_PERIOD) else '0';
+    maximal_period_samps_sent_gen : process(clk)
+    begin
+      if(rising_edge(clk)) then
+        if(rst = '1') then
+          maximal_period_samps_sent <= '0';
+        elsif(ordy = '1') then
+          if((cnt = MAXIMAL_LFSR_12_BIT_PERIOD) or
+              (maximal_period_samps_sent = '1')) then
+            maximal_period_samps_sent <= '1';
+          else
+            maximal_period_samps_sent <= '0';
+          end if;
+        end if;
+      end if;
+    end process maximal_period_samps_sent_gen;
 
     data_i_src : misc_prims.misc_prims.lfsr
       generic map(
@@ -67,6 +92,6 @@ begin
     odata.q(odata.q'length-1-idx) <= data_i(idx);
   end generate;
 
-  ovld <= counter_en;
+  ovld <= counter_en and (not vld_rst);
 
 end rtl;

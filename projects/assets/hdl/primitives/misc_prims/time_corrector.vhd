@@ -51,6 +51,7 @@ architecture rtl of time_corrector is
   signal time_time                           : unsigned(METADATA_TIME_BIT_WIDTH-1
                                                downto 0) := (others => '0');
   signal overflow                            : std_logic := '0';
+--  signal overflow_sticky                     : std_logic := '0';
   signal time_correction_latest_reg_dout     : signed(METADATA_TIME_BIT_WIDTH-1
                                                downto 0) := (others => '0');
   signal time_correction_latest_reg_dout_vld : std_logic := '0';
@@ -78,8 +79,20 @@ begin
   tmp_lower_than_min  <= tmp(tmp'left); -- sign bit
   tmp_larger_than_max <= tmp(tmp'left-1); -- largest amplitude bit
   overflow <= tmp_lower_than_min or tmp_larger_than_max;
-  status.overflow <= overflow;
+  status.overflow        <= overflow;
+--  status.overflow_sticky <= overflow_sticky;
   time_time <= unsigned(tmp(tmp'left-2 downto 0));
+
+--  overflow_sticky_gen : process(clk)
+--  begin
+--    if(rising_edge(clk)) then
+--      if(rst = '1') then
+--        overflow_sticky <= '0';
+--      else
+--        overflow_sticky <= overflow and overflow_sticky and (not ctrl.clr_overflow_sticky);
+--      end if;
+--    end if;
+--  end process overflow_sticky_gen;
 
   data_pipe_latency_cycles_0 : if(DATA_PIPE_LATENCY_CYCLES = 0) generate
     odata.i <= idata.i;
@@ -87,8 +100,9 @@ begin
 
     imetadata_slv <= to_slv(imetadata);
 
-    metadata_gen : process(tmp, imetadata_slv, overflow,
-                           time_correction_latest_reg_dout_vld)
+    metadata_gen : process(time_time, imetadata, overflow,
+                           time_correction_latest_reg_dout_vld,
+                           imetadata_slv)
     begin
       for idx in metadata'range loop
         if((idx <= METADATA_IDX_TIME_L) and (idx >= METADATA_IDX_TIME_R)) then
@@ -102,7 +116,7 @@ begin
       end loop;
     end process metadata_gen;
 
-    ometadata <= from_slv(metadata);
+    ometadata <= imetadata when (ctrl.bypass = '1') else from_slv(metadata);
 
     ovld <= ivld;
     irdy <= ordy;

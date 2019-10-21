@@ -6,10 +6,9 @@ entity subtest is
   generic(
     FILENAME                 : string;
     BACKPRESSURE_SELECT      : file_writer_backpressure_select_t;
-    --INCLUDE_ERROR_SAMP_DROP  : boolean;
     BYPASS                   : std_logic;
-    TIME_TIME                : unsigned(METADATA_TIME_BIT_WIDTH-1 downto 0);
-    TIME_CORRECTION          : signed(METADATA_TIME_BIT_WIDTH-1 downto 0);
+    MIN_NUM_DATA_PER_TIME    : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1
+                               downto 0);
     DATA_PIPE_LATENCY_CYCLES : natural := 0);
 end entity subtest;
 architecture rtl of subtest is
@@ -19,7 +18,7 @@ architecture rtl of subtest is
   signal data_src_ometadata : metadata_t;
   signal data_src_ovld      : std_logic := '0';
   signal uut_irdy           : std_logic := '0';
-  signal uut_ctrl           : time_corrector_ctrl_t;
+  signal uut_ctrl           : time_downsampler_ctrl_t;
   signal uut_odata          : data_complex_t;
   signal uut_ometadata      : metadata_t;
   signal uut_ovld           : std_logic := '0';
@@ -45,9 +44,7 @@ begin
 
   data_src : entity work.data_src
     generic map(
-      DATA_BIT_WIDTH          => DATA_BIT_WIDTH,
-      --INCLUDE_ERROR_SAMP_DROP => INCLUDE_ERROR_SAMP_DROP,
-      TIME_TIME               => TIME_TIME)
+      DATA_BIT_WIDTH => DATA_BIT_WIDTH)
     port map(
       -- CTRL
       clk       => clk,
@@ -58,11 +55,11 @@ begin
       ovld      => data_src_ovld,
       ordy      => uut_irdy);
 
-  uut_ctrl.bypass              <= BYPASS;
-  uut_ctrl.time_correction     <= TIME_CORRECTION;
-  uut_ctrl.time_correction_vld <= '1';
+  uut_ctrl.bypass                    <= BYPASS;
+  uut_ctrl.min_num_data_per_time     <= MIN_NUM_DATA_PER_TIME;
+  uut_ctrl.min_num_data_per_time_vld <= '1';
 
-  uut : misc_prims.misc_prims.time_corrector
+  uut : misc_prims.misc_prims.time_downsampler
     generic map(
       DATA_PIPE_LATENCY_CYCLES => DATA_PIPE_LATENCY_CYCLES)
     port map(
@@ -70,7 +67,6 @@ begin
       clk       => clk,
       rst       => rst,
       ctrl      => uut_ctrl,
-      status    => open,
       -- INPUT
       idata     => data_src_odata,
       imetadata => data_src_ometadata,
