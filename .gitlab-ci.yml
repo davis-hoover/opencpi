@@ -7,19 +7,18 @@
 # Define the stages of the pipeline.
 stages:
   - prep
-  - prereq
   - build
   - test
 
 #------------------------------------------------------------------------------
-# JOBS
+# PREP
 #------------------------------------------------------------------------------
 
 prep:centos6:
   stage: prep
   tags:
     - docker
-    - centos6
+    - centos7  # yes, run this on centos7
     - opencpi
   image: centos:6
   script:
@@ -37,8 +36,24 @@ prep:centos7:
   - yum -y distro-sync
   - scripts/install-packages.sh
 
+prereq:centos6:
+  stage: prep
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    policy: push
+    paths:
+      - exports/
+      - prerequisites/
+      - prerequisites-build/
+  script:
+    - ./scripts/install-prerequisites.sh
+
 prereq:centos7:
-  stage: prereq
+  stage: prep
   tags:
     - shell
     - centos7
@@ -52,6 +67,28 @@ prereq:centos7:
       - prerequisites-build/
   script:
     - ./scripts/install-prerequisites.sh
+
+#------------------------------------------------------------------------------
+# BUILD
+#------------------------------------------------------------------------------
+
+build:centos6:
+  stage: build
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  script:
+    - ./scripts/build-opencpi.sh
 
 build:centos7:
   stage: build
@@ -70,6 +107,30 @@ build:centos7:
       - projects/
   script:
     - ./scripts/build-opencpi.sh
+
+#------------------------------------------------------------------------------
+# TEST
+#------------------------------------------------------------------------------
+
+test:centos6:
+  stage: test
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  script:
+    - ./scripts/test-opencpi.sh
+
 
 test:centos7:
   stage: test
