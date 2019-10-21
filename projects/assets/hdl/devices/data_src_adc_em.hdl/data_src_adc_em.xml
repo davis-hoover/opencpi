@@ -6,7 +6,7 @@
 
   <StreamInterface name='in'
                    datawidth='32'
-                   myoutputclock='true'/>
+                   clockdirection='out'/>
 
   <DevSignal name='dev' signals='qadc-16-signals.xml'/>
 
