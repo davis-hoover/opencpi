@@ -87,6 +87,7 @@ build:centos6:
       - prerequisites/
       - prerequisites-build/
       - projects/
+  needs: ["prereq:centos6"]
   script:
     - ./scripts/build-opencpi.sh
 
@@ -105,6 +106,7 @@ build:centos7:
       - prerequisites/
       - prerequisites-build/
       - projects/
+  needs: ["prereq:centos7"]
   script:
     - ./scripts/build-opencpi.sh
 
@@ -128,6 +130,7 @@ test:centos6:
       - prerequisites/
       - prerequisites-build/
       - projects/
+  needs: ["build:centos6"]
   script:
     - ./scripts/test-opencpi.sh
 
@@ -148,6 +151,7 @@ test:centos7:
       - prerequisites/
       - prerequisites-build/
       - projects/
+  needs: ["build:centos7"]
   script:
     - ./scripts/test-opencpi.sh
 
