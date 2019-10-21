@@ -208,8 +208,8 @@
 	  ocpiDebug("Loading file \"%s\" on zynq FPGA, with the %s.", fileName,
 		    m_fpgaManager ? "fpga manager" : "/dev/xdevcfg driver");
 	  struct Xld {
-	    const size_t IBUFSZ = 8*1024;  // when reading compressed from the stream
-	    const size_t OBUFSZ = 64*1024; // when filling an in-memory buffer
+            const size_t IBUFSZ;  // when reading compressed from the stream
+            const size_t OBUFSZ; // when filling an in-memory buffer
 	    int xfd, bfd;
 	    gzFile gz;
 	    uint8_t buf[8*1024];
@@ -219,14 +219,17 @@
 	    bool useManager;
 	    uint8_t *obase, *optr;  // used to buffer 
 	    size_t olength, oleft;
+
 	    void cleanup() { // used for constructor catch cleanup and in destructor
 	      if (xfd >= 0) ::close(xfd);
 	      if (bfd >= 0) ::close(bfd);
 	      if (gz) gzclose(gz);
 	    }
+
 	    Xld(const char *file, bool fpgaManager, std::string &a_error)
-	      : xfd(-1), bfd(-1), gz(NULL), inputFile(file), useManager(fpgaManager), obase(NULL), optr(NULL),
-		olength(), oleft(0) {
+	      : IBUFSZ(8*1024), OBUFSZ(64*1024), xfd(-1), bfd(-1), gz(NULL),
+                inputFile(file), useManager(fpgaManager), obase(NULL),
+                optr(NULL), olength(), oleft(0) {
 	      // Open the device LAST since just opening it may do bad things
 	      uint8_t *p8;
 	      int n;
@@ -321,7 +324,8 @@
 	      xfd = -1;
 	      return false;
 	    }
-	  };
+	  };  // end struct Xld
+
 	  Xld xld(fileName, m_fpgaManager, error);
 	  if (!error.empty() || xld.copy(error))
 	    return true;
@@ -357,7 +361,7 @@
 	  close(xfd);
 	  return false;
 	}
-      };
+      }; // end class Device
 
       Driver::
       Driver()

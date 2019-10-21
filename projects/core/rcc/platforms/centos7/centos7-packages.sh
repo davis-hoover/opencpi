@@ -52,7 +52,7 @@ PKGS_R+=(python)
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
 PKGS_D+=(make autoconf automake libtool gcc-c++)
 #    for our development scripts
-PKGS_D+=(which)
+PKGS_D+=(which wget)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
