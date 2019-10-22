@@ -94,8 +94,6 @@ begin
 
     overrun_generator :
         misc_prims.misc_prims.adc_samp_drop_detector
-      generic map(
-        DATA_PIPE_LATENCY_CYCLES => 0)
       port map(
         -- CTRL INTERFACE
         clk       => adc_dev_clk,
@@ -112,7 +110,6 @@ begin
 
     data_widener : misc_prims.misc_prims.data_widener
       generic map(
-        DATA_PIPE_LATENCY_CYCLES => 0,
         BITS_PACKED_INTO_MSBS    => BITS_PACKED_INTO_MSBS)
       port map(
         -- CTRL INTERFACE

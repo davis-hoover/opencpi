@@ -9,16 +9,14 @@ begin
 
   subtest_0 : entity work.subtest
     generic map(
-      FILENAME                 => "uut_subtest_0_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0)
+      FILENAME => "uut_subtest_0_data.txt")
     port map(
       backpressure_select      => NO_BP,
       backpressure_select_vld  => '1');
 
   subtest_1 : entity work.subtest
     generic map(
-      FILENAME                 => "uut_subtest_1_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0)
+      FILENAME => "uut_subtest_1_data.txt")
     port map(
       backpressure_select      => LFSR_BP,
       backpressure_select_vld  => '1');
@@ -26,7 +24,6 @@ begin
   subtest_2 : entity work.subtest
     generic map(
       FILENAME                 => "uut_subtest_2_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0,
       LFSR_BP_EN_PERIOD        => 1024)
     port map(
       backpressure_select      => LFSR_BP,

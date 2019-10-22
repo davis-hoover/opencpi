@@ -233,8 +233,6 @@ component maximal_lfsr_data_src is
 end component;
 
 component adc_samp_drop_detector is
-  generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
   port(
     -- CTRL
     clk       : in  std_logic;
@@ -252,8 +250,7 @@ end component;
 
 component data_widener is
   generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0;
-    BITS_PACKED_INTO_MSBS    : boolean := true);
+    BITS_PACKED_INTO_MSBS : boolean := true);
   port(
     -- CTRL
     clk       : in  std_logic;
@@ -279,26 +276,5 @@ component set_clr
     q   : out std_logic;
     q_r : out std_logic);
 end component set_clr;
-
-component time_corrector is
-  generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
-  port(
-    -- CTRL
-    clk       : in  std_logic;
-    rst       : in  std_logic;
-    ctrl      : in  time_corrector_ctrl_t;
-    status    : out time_corrector_status_t;
-    -- INPUT
-    idata     : in  data_complex_t;
-    imetadata : in  metadata_t;
-    ivld      : in  std_logic;
-    irdy      : out std_logic;
-    -- OUTPUT
-    odata     : out data_complex_t;
-    ometadata : out metadata_t;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
-end component;
 
 end package misc_prims;

@@ -36,8 +36,6 @@ begin
       ordy               => '1'); -- emulates forward pressure from ADC
 
   adc_samp_drop_detector : misc_prims.misc_prims.adc_samp_drop_detector
-    generic map(
-      DATA_PIPE_LATENCY_CYCLES => 0)
     port map(
       -- CTRL
       clk       => clk,
