@@ -52,6 +52,5 @@ out_data['real_idx'] = np.int16(ramp)
 out_data['imag_idx'] = np.int16(ramp)
 
 # Write to file
-f = open(sys.argv[1], 'wb')
-f.write(out_data)
-f.close()
+with open(sys.argv[1], 'wb') as f:
+    f.write(out_data)

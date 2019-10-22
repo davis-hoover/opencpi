@@ -1,3 +1,4 @@
+# this register latches the latest valid value
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 
 entity latest_reg is

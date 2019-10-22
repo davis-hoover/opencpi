@@ -1,15 +1,15 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
-library misc_prims; use misc_prims.misc_prims.all; use misc_prims.ocpi.all;
-library platform; use platform.platform_pkg.all;
+library misc_prims;
+library platform;
 architecture rtl of worker is
 
-  signal adc_clk                  : std_logic := '0';
-  signal adc_rst                  : std_logic := '0';
-  signal adc_opcode               : complex_short_with_metadata_opcode_t :=
-                                    SAMPLES;
-  signal adc_in_adapter_odata     : data_complex_t;
-  signal adc_in_adapter_ometadata : metadata_t;
+  signal adc_clk    : std_logic := '0';
+  signal adc_rst    : std_logic := '0';
+  signal adc_opcode : misc_prims.ocpi.complex_short_with_metadata_opcode_t :=
+                      misc_prims.ocpi.SAMPLES;
+  signal adc_in_adapter_odata     : misc_prims.misc_prims.data_complex_t;
+  signal adc_in_adapter_ometadata : misc_prims.misc_prims.metadata_t;
   signal adc_in_adapter_ovld      : std_logic := '0';
 
 
@@ -18,7 +18,7 @@ begin
   -- emulate ADC clock
   ------------------------------------------------------------------------------
 
-  adc_clk_gen : sim_clk
+  adc_clk_gen : platform.platform_pkg.sim_clk
     generic map(
       frequency => 30720000.0)
     port map(
@@ -29,16 +29,21 @@ begin
   -- in port
   ------------------------------------------------------------------------------
 
-  adc_opcode <=
-      SAMPLES   when in_in.opcode = ComplexShortWithMetadata_samples_op_e  else
-      TIME_TIME when in_in.opcode = ComplexShortWithMetadata_time_op_e     else
-      INTERVAL  when in_in.opcode = ComplexShortWithMetadata_interval_op_e else
-      FLUSH     when in_in.opcode = ComplexShortWithMetadata_flush_op_e    else
-      SYNC      when in_in.opcode = ComplexShortWithMetadata_sync_op_e     else
-      USER      when in_in.opcode = ComplexShortWithMetadata_user_op_e     else
-      SAMPLES;
+  adc_opcode <= misc_prims.ocpi.SAMPLES
+                when in_in.opcode = ComplexShortWithMetadata_samples_op_e  else
+                misc_prims.ocpi.TIME_TIME
+                when in_in.opcode = ComplexShortWithMetadata_time_op_e else
+                misc_prims.ocpi.INTERVAL
+                when in_in.opcode = ComplexShortWithMetadata_interval_op_e else
+                misc_prims.ocpi.FLUSH
+                when in_in.opcode = ComplexShortWithMetadata_flush_op_e else
+                misc_prims.ocpi.SYNC
+                when in_in.opcode = ComplexShortWithMetadata_sync_op_e else
+                misc_prims.ocpi.USER
+                when in_in.opcode = ComplexShortWithMetadata_user_op_e else
+                misc_prims.ocpi.SAMPLES;
 
-  in_adapter : cswm_prot_in_adapter_dw32_clkout
+  in_adapter : misc_prims.ocpi.cswm_prot_in_adapter_dw32_clkout
     port map(
       -- INPUT
       iclk      => in_out.clk,

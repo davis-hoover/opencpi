@@ -18,10 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Downsample: Verify output data
-
-Output is verified by downsampling input data in python and comparing to actual 
-output data
+Aids in viewing of file saved by file_write
 """
 import sys
 import os.path

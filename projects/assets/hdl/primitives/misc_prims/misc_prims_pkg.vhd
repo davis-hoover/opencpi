@@ -280,13 +280,6 @@ component set_clr
     q_r : out std_logic);
 end component set_clr;
 
-component clk_src is
-  generic(
-    CLK_PERIOD : time);
-  port(
-    clk : out std_logic);
-end component;
-
 component time_corrector is
   generic(
     DATA_PIPE_LATENCY_CYCLES : natural := 0);

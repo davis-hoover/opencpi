@@ -48,8 +48,7 @@ SourceFiles=$(patsubst %,%.vhd,\
 	ocpi_cswm_prot_out_adapter_dw32_clkin \
 	ocpi_cswm_prot_out_adapter_dw32_clkout \
 	ocpi_data_src_adc \
-	set_clr \
-	clk_src)
+	set_clr)
 
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:
