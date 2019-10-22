@@ -26,7 +26,7 @@ WtiPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
   : OcpPort(w, x, sp, ordinal, WTIPort, "wti", err),
     m_secondsWidth(32), m_fractionWidth(0) {
   if ((err = OE::checkAttrs(x, "Name", "Clock", "SecondsWidth", "FractionWidth", "myoutputclock",
-			    "AllowUnavailable", "Pattern", "master", "myclock", (void*)0)) ||
+			    "AllowUnavailable", "Pattern", "master", "myclock", "clockdirection", (void*)0)) ||
       (err = OE::getExprNumber(x, "SecondsWidth", m_secondsWidth, NULL, m_secondsWidthExpr,
 			       &w)) ||
       (err = OE::getExprNumber(x, "FractionWidth", m_fractionWidth, NULL, m_fractionWidthExpr,
