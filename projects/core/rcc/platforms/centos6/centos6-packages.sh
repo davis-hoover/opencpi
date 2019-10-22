@@ -153,7 +153,7 @@ function install_scons {
     pushd $scons_pkg
     $SUDO python setup.py install
     popd
-    rm -rf ${scons_pkg}*
+    $SUDO rm -rf ${scons_pkg}*
     popd
   fi
 }
