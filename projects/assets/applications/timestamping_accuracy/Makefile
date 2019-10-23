@@ -23,6 +23,6 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # If there is a timestamping_accuracy_app.xml file, it will be assumed to be an XML app that can be run with ocpirun.
 # The RunArgs variable can be set to a standard set of arguments to use when executing either.
 
-APP=timestamping_accuracy_app
+APP=timestamping_accuracy
 
 include $(OCPI_CDK_DIR)/include/application.mk

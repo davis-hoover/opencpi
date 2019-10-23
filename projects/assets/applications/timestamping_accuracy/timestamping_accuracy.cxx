@@ -20,7 +20,7 @@
 
 /*
  * The purpose of this application is to collect statistics related to the 
- * accuracy of timestamps presented to workers.
+ * accuracy of timestamps presented to workers which request time.
  * 
  * The application consists of a device worker with a single input signal. The
  * worker collects the timestamp from its WTI at every rising edge of the input
@@ -115,10 +115,9 @@ void computeStatistics(uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLEC
 }
 
 int main(/*int argc, char **argv*/) {
-  uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLECT];
 
   OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), OA::PVEnd };
-  OA::Application app("timestamping_accuracy_app.xml", pvs);
+  OA::Application app("timestamping_accuracy.xml", pvs);
   app.initialize();
   app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", NUM_TIME_TAGS_TO_COLLECT);
 
@@ -128,10 +127,12 @@ int main(/*int argc, char **argv*/) {
 
   app.finish();
 
-  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
-    app.getPropertyValue<uint32_t>("signal_time_tagger", 
-				   "collected_time_tags_frac", 
-				   collected_time_tags_frac[a], {a});
+  uint32_t max_num_time_tags_to_collect;
+  app.getPropertyValue("signal_time_tagger", "MAX_NUM_TIME_TAGS_TO_COLLECT", max_num_time_tags_to_collect);
+
+  uint32_t collected_time_tags_frac[max_num_time_tags_to_collect];
+  OA::Property collected_time_tags_frac_p(app, "signal_time_tagger", "collected_time_tags_frac");
+  collected_time_tags_frac_p.getULongSequenceValue(collected_time_tags_frac,max_num_time_tags_to_collect);
 
   computeStatistics(collected_time_tags_frac);
 
