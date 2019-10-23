@@ -41,7 +41,6 @@
 #include <string.h>
 #include "OcpiApi.hh"
 #include <iostream>
-#include <sstream>
 #include <stdlib.h>
 #include <cmath>     //std::pow()
 #include <algorithm> // std::min_element, std::max_element
@@ -49,184 +48,79 @@
 const int NUM_TIME_TAGS_TO_COLLECT=100;
 const int EXTRA_TIME_BUFFER=5; //Seconds buffer for application timeout
 //to prevent hanging application
-const int MAX_EXPECTED_RUN_TIME_USECS=(NUM_TIME_TAGS_TO_COLLECT+EXTRA_TIME_BUFFER)*1e6;
-const int NUM_PICOSECONDS_PER_FRAC_SEC = 233;
+const int    MAX_EXPECTED_RUN_TIME_USECS=(NUM_TIME_TAGS_TO_COLLECT+EXTRA_TIME_BUFFER)*1e6;
+const double NUM_MICROSECONDS_PER_FRAC_SEC = .000233;
 
 namespace OA = OCPI::API;
 using namespace std;
 
-class UQ32p32 {
-
-public:
-  UQ32p32(uint32_t int_32_val, uint32_t fract_32_val) :
-      m_int_32_val(int_32_val), m_fract_32_val(fract_32_val) {
-  }
-
-  std::string get_int_str() {
-
-    std::ostringstream oss;
-    oss << m_int_32_val;
-
-    return oss.str();
-  }
-
-  std::string get_fract_str() {
-
-    std::string ret;
-
-    // -----------------------------------------------
-    // lower 16 bits
-    // -----------------------------------------------
-
-    uint16_t xx = m_fract_32_val & 0x0000ffff;
-    uint64_t yy = 0;
-    uint16_t test_val = (1 << 15);
-
-    // 0.00000000000000005000000000000000
-    uint64_t zz = 5000000000000000; // 16 digits
-
-    for(size_t ii = 0; ii < 16; ii++) {
-      if(xx >= test_val) {
-        xx -= test_val;
-        yy += zz;
-      }
-      else {
-      }
-      test_val >>= 1;
-      zz /= 2;
-    }
-    uint64_t yy_low = yy;
-
-    // -----------------------------------------------
-    // upper 16 bits
-    // -----------------------------------------------
-
-    xx = (m_fract_32_val & 0xffff0000) >> 16;
-    yy = 0;
-    test_val = (1 << 15);
-
-    // 0.5000000000000000
-    zz = 5000000000000000; // 16 digits
-
-    for(size_t ii = 0; ii < 16; ii++) {
-      if(xx >= test_val) {
-        xx -= test_val;
-        yy += zz;
-      }
-      test_val >>= 1;
-      zz /= 2;
-    }
-    uint64_t yy_upp = yy;
-
-    // -----------------------------------------------
-    // get string
-    // -----------------------------------------------
-
-    std::ostringstream oss;
-    oss << yy_upp << yy_low;
-    std::string yy_str = oss.str();
-
-    for(size_t ii = 0; ii < 32 - yy_str.size(); ii++) {
-      ret += "0";
-    }
-
-    ret += yy_str;
-
-    return ret;
-  }
-
-  std::string get_str() {
-    return get_int_str() + "." + get_fract_str();
-  }
-
-protected:
-  uint32_t m_int_32_val, m_fract_32_val;
-
-}; // class Q32p32
-
-int programRet = 0; 
-
-unsigned int computeStatistics(uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLECT]){
-  int retVal = 0;
+void computeStatistics(uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLECT]){
   int64_t delta_from_nearest_sec[NUM_TIME_TAGS_TO_COLLECT];
   int64_t delta_corr[NUM_TIME_TAGS_TO_COLLECT];
   int64_t avg_delta, avg_delta_corr = 0;
-  double   var, var_corr, std_dev, std_dev_corr = 0;
+  double  var, var_corr, std_dev, std_dev_corr = 0;
 
-   for (int a=0; a<NUM_TIME_TAGS_TO_COLLECT; a++){
-     if(collected_time_tags_frac[a] <= std::pow(2.,32.)/2)
-       delta_from_nearest_sec[a] = collected_time_tags_frac[a];
-     else
-       delta_from_nearest_sec[a] = -(std::pow(2.,32.) - collected_time_tags_frac[a]);
-     avg_delta += (int64_t)(delta_from_nearest_sec[a]-avg_delta)/(a+1);
-   }
+  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++){
+    if(collected_time_tags_frac[a] <= std::pow(2.,32.)/2)
+      delta_from_nearest_sec[a] = collected_time_tags_frac[a];
+    else
+      delta_from_nearest_sec[a] = -(std::pow(2.,32.) - collected_time_tags_frac[a]);
+    avg_delta += (int64_t)(delta_from_nearest_sec[a] - avg_delta) / (a + 1);
+  }
 
-   for (int a=0; a<NUM_TIME_TAGS_TO_COLLECT; a++)
-     var += (int64_t)(delta_from_nearest_sec[a] - avg_delta) * (int64_t)(delta_from_nearest_sec[a] - avg_delta);
-   var /= NUM_TIME_TAGS_TO_COLLECT;
-   std_dev = sqrt(var);
+  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
+    var += (int64_t)(delta_from_nearest_sec[a] - avg_delta) * 
+      (int64_t)(delta_from_nearest_sec[a] - avg_delta);
+  var /= NUM_TIME_TAGS_TO_COLLECT;
+  std_dev = sqrt(var);
 
-   cout << endl << endl;
-   cout << "Min Delta from nearest second              " << 
-     (double)*std::min_element(delta_from_nearest_sec,delta_from_nearest_sec+NUM_TIME_TAGS_TO_COLLECT-1)*
-     NUM_PICOSECONDS_PER_FRAC_SEC/1000000 
-	<< " us" << endl;
-   cout << "Max Delta from nearest second              " << 
-     *std::max_element(delta_from_nearest_sec,delta_from_nearest_sec+NUM_TIME_TAGS_TO_COLLECT-1)*
-     NUM_PICOSECONDS_PER_FRAC_SEC/1000000
-	<< " us" << endl;
-   cout << "Average Delta from nearest second          " << 
-     avg_delta*NUM_PICOSECONDS_PER_FRAC_SEC/1000000 << " us" << endl;
-   cout << "Standard Deviation from nearest second     " << 
-     std_dev*NUM_PICOSECONDS_PER_FRAC_SEC/1000000 << " us" << endl;
+  cout << "Min Delta from nearest second              " << 
+    *std::min_element(delta_from_nearest_sec, delta_from_nearest_sec + NUM_TIME_TAGS_TO_COLLECT - 1) *
+    NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+  cout << "Max Delta from nearest second              " << 
+    *std::max_element(delta_from_nearest_sec, delta_from_nearest_sec + NUM_TIME_TAGS_TO_COLLECT - 1) *
+    NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+  cout << "Average Delta from nearest second          " << 
+    avg_delta * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+  cout << "Standard Deviation from nearest second     " << 
+    std_dev * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
 
-   for (int a=0; a<NUM_TIME_TAGS_TO_COLLECT; a++){
-     if(delta_from_nearest_sec[a] >= avg_delta)
-       delta_corr[a] = delta_from_nearest_sec[a] - avg_delta;
-     else
-       delta_corr[a] = -(avg_delta - delta_from_nearest_sec[a]);
-     avg_delta_corr += 
-       (int64_t)(delta_corr[a]-avg_delta_corr)/(a+1);
-   }
 
-   for (int a=0; a<NUM_TIME_TAGS_TO_COLLECT; a++)
+  //Report statistics with average subtracted
+
+  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++){
+    if(delta_from_nearest_sec[a] >= avg_delta)
+      delta_corr[a] = delta_from_nearest_sec[a] - avg_delta;
+    else
+      delta_corr[a] = -(avg_delta - delta_from_nearest_sec[a]);
+    avg_delta_corr += 
+      (int64_t)(delta_corr[a] - avg_delta_corr) / (a + 1);
+  }
+
+   for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
      var_corr += (int64_t)(delta_corr[a] - avg_delta_corr) * (int64_t)(delta_corr[a] - avg_delta_corr);
    var_corr /= NUM_TIME_TAGS_TO_COLLECT;
    std_dev_corr = sqrt(var_corr);
 
    cout << "Min Delta with average subtracted          " << 
-     (double)*std::min_element(delta_corr,delta_corr+NUM_TIME_TAGS_TO_COLLECT-1)*
-     NUM_PICOSECONDS_PER_FRAC_SEC/1000000
-	<< " us" << endl;
+     *std::min_element(delta_corr, delta_corr + NUM_TIME_TAGS_TO_COLLECT - 1) *
+     NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
    cout << "Max Delta with average subtracted          " << 
-     (double)*std::max_element(delta_corr,delta_corr+NUM_TIME_TAGS_TO_COLLECT-1)*
-     NUM_PICOSECONDS_PER_FRAC_SEC/1000000
-	<< " us" << endl;
+     *std::max_element(delta_corr, delta_corr + NUM_TIME_TAGS_TO_COLLECT - 1) *
+     NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
    cout << "Average Delta with average subtracted      " << 
-     (double)avg_delta_corr*NUM_PICOSECONDS_PER_FRAC_SEC/1000000 
-	<< " us" << endl;
+     avg_delta_corr * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
    cout << "Standard Deviation with average subtracted " << 
-     (double)std_dev_corr*NUM_PICOSECONDS_PER_FRAC_SEC/1000000
-	<< " us" << endl;
-
-  return retVal;
+     std_dev_corr * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
 }
 
-unsigned int runApp()
-{
-  int retVal = 0;
-  uint32_t collected_time_tags_sec[NUM_TIME_TAGS_TO_COLLECT];
+int main(/*int argc, char **argv*/) {
   uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLECT];
 
-  OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", true), OA::PVEnd };
+  OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), OA::PVEnd };
   OA::Application app("timestamping_accuracy_app.xml", pvs);
   app.initialize();
   app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", NUM_TIME_TAGS_TO_COLLECT);
-  
-  //Previous measurements show that it takes approximately 120 s for the PLL for the 
-  //fractional second component of time to settle
-  cout << "Sleep 120 sec to allow time server PLL to settle:" << endl;
-  sleep(120);
 
   app.start();
   app.wait(MAX_EXPECTED_RUN_TIME_USECS);
@@ -234,22 +128,12 @@ unsigned int runApp()
 
   app.finish();
 
-  cout << "Collected Timestamps:" << endl;
-  for (int a=0; a<NUM_TIME_TAGS_TO_COLLECT; a++){
-    app.getPropertyValue<uint32_t>("signal_time_tagger", "collected_time_tags_sec", collected_time_tags_sec[a], {a});
-    app.getPropertyValue<uint32_t>("signal_time_tagger", "collected_time_tags_frac", collected_time_tags_frac[a], {a});
-    cout << UQ32p32(collected_time_tags_sec[a],collected_time_tags_frac[a]).get_str() << endl;
-  }
+  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
+    app.getPropertyValue<uint32_t>("signal_time_tagger", 
+				   "collected_time_tags_frac", 
+				   collected_time_tags_frac[a], {a});
 
-   retVal = computeStatistics(collected_time_tags_frac);
+  computeStatistics(collected_time_tags_frac);
 
-  return retVal;
-}
-
-int main(/*int argc, char **argv*/) {
-  programRet = 0; 
-
-  programRet = runApp();
-
-  return programRet;
+  return 0;
 }
