@@ -47,7 +47,6 @@ SourceFiles=$(patsubst %,%.vhd,\
 	ocpi_cswm_prot_in_adapter_dw32_clkout \
 	ocpi_cswm_prot_out_adapter_dw32_clkin \
 	ocpi_cswm_prot_out_adapter_dw32_clkout \
-	ocpi_data_src_adc \
 	set_clr)
 
 

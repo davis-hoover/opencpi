@@ -175,38 +175,4 @@ component cswm_prot_out_adapter_dw32_clkout is
     oready       : in  Bool_t);
 end component;
 
-component data_src_adc is
-  generic(
-    OUT_PORT_DATA_WIDTH          : ulong_t;
-    OUT_PORT_MBYTEEN_WIDTH       : natural;
-    ADC_WIDTH_BITS               : ushort_t;
-    ADC_INPUT_IS_LSB_OF_OUT_PORT : Bool_t);
-  port(
-    -- CTRL
-    ctrl_clk                      : in std_logic;
-    ctrl_reset                    : in std_logic;
-    ctrl_overrun_sticky_error     : out Bool_t;
-    ctrl_clr_overrun_sticky_error : in  Bool_t;
-    -- DEV SIGNAL INPUT
-    adc_dev_clk                   : in  std_logic;
-    adc_dev_data_i                : in  std_logic_vector(15 downto 0);
-    adc_dev_data_q                : in  std_logic_vector(15 downto 0);
-    adc_dev_valid                 : in  std_logic;
-    adc_dev_present               : out std_logic;
-    -- OUTPUT
-    adc_out_clk                   : out std_logic;
-    adc_out_data                  : out std_logic_vector(
-                                    to_integer(unsigned(OUT_PORT_DATA_WIDTH))-1
-                                    downto 0);
-    adc_out_valid                 : out Bool_t;
-    adc_out_byte_enable           : out std_logic_vector(
-                                    OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
-    adc_out_give                  : out Bool_t;
-    adc_out_som                   : out Bool_t;
-    adc_out_eom                   : out Bool_t;
-    adc_out_opcode                : out complex_short_with_metadata_opcode_t;
-    adc_out_eof                   : out Bool_t;
-    adc_out_ready                 : in  Bool_t);
-end component;
-
 end package ocpi;
