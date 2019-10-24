@@ -1,0 +1,6 @@
+<hdlworker language='vhdl' version='2'>
+  <componentspec/>
+  <property name='timestamp_sec' volatile='true' arraylength='2'/>
+  <property name='timestamp_frac' volatile='true' arraylength='2'/>
+  <timeinterface name='time' secondswidth='32' fractionwidth='32' allowunavailable='true'/>
+</hdlworker>

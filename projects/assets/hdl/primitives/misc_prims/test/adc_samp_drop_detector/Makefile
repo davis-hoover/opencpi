@@ -35,7 +35,8 @@ xsim.dir/work/data_src.vdb: data_src.vhd \
 
 xsim.dir/work/file_writer.vdb: file_writer.vhd \
     ../xsim.dir/misc_prims/misc_prims.vdb \
-    ../xsim.dir/misc_prims/latest_reg.vdb
+    ../xsim.dir/misc_prims/latest_reg.vdb \
+    ../xsim.dir/misc_prims/counter.vdb
 	./myxvhdl.sh --lib misc_prims=../xsim.dir/misc_prims $<
 
 xsim.dir/work/subtest.vdb: subtest.vhd \

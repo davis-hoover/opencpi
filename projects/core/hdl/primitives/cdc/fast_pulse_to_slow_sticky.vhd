@@ -40,7 +40,7 @@ begin
     end if;
   end process fast_pulse_sticky_gen;
 
-  clr_two_reg_sync : cdc.cdc.bit
+  clr_two_reg_sync : cdc.cdc.single_bit
     generic map(
       N         => 2,
       IREG      => '1',
@@ -58,7 +58,7 @@ begin
   -- slow clock domain
   ------------------------------------------------------------------------------
 
-  sticky_two_reg_sync : cdc.cdc.bit
+  sticky_two_reg_sync : cdc.cdc.single_bit
     generic map(
       N         => 2,
       IREG      => '0', -- no input reg, since it is effectively done by

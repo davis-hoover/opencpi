@@ -4,7 +4,6 @@
     run clean_run \
     clean_adc_samp_drop_detector \
     clean_data_widener \
-    clean_time_corrector \
     clean_dac_underrun_detector \
     clean_data_narrower
 
@@ -25,7 +24,8 @@ xsim.dir/misc_prims/misc_prims.vdb: ../misc_prims_pkg.vhd ../misc_prims_body.vhd
 xsim.dir/cdc/cdc.vdb: ../../../../../core/hdl/primitives/cdc/cdc_pkg.vhd
 	./myxvhdl.sh -work cdc $<
 
-xsim.dir/cdc/bit.vdb: ../../../../../core/hdl/primitives/cdc/bit.vhd
+xsim.dir/cdc/bit.vdb: \
+	../../../../../core/hdl/primitives/cdc/single_bit.vhd
 	./myxvhdl.sh -work cdc $<
 
 xsim.dir/cdc/fast_pulse_to_slow_sticky.vdb: ../../../../../core/hdl/primitives/cdc/fast_pulse_to_slow_sticky.vhd \
@@ -73,11 +73,6 @@ xsim.dir/misc_prims/latest_reg.vdb: ../latest_reg.vhd
 xsim.dir/misc_prims/latest_reg_signed.vdb: ../latest_reg_signed.vhd
 	./myxvhdl.sh -work misc_prims $<
 
-xsim.dir/misc_prims/time_corrector.vdb: ../time_corrector.vhd \
-    xsim.dir/misc_prims/misc_prims.vdb \
-    xsim.dir/misc_prims/latest_reg_signed.vdb
-	./myxvhdl.sh -work misc_prims $<
-
 prims: \
     xsim.dir/misc_prims/misc_prims.vdb \
     xsim.dir/cdc/cdc.vdb \
@@ -89,11 +84,10 @@ prims: \
     xsim.dir/misc_prims/adc_maximal_lfsr_data_src.vdb \
     xsim.dir/misc_prims/latest_reg.vdb \
     xsim.dir/misc_prims/latest_reg_signed.vdb \
-    xsim.dir/misc_prims/time_corrector.vdb \
     xsim.dir/misc_prims/dac_underrun_detector.vdb
 
 clean_prims:
-	rm -rf xsim.dir
+	rm -rf xsim.dir *.pb
 
 ################################################################################
 # run
@@ -104,10 +98,6 @@ adc_samp_drop_detector/xsim.dir/sim: adc_samp_drop_detector \
 	$(MAKE) -C $<
 
 data_widener/xsim.dir/sim: data_widener \
-    prims
-	$(MAKE) -C $<
-
-time_corrector/xsim.dir/sim: time_corrector \
     prims
 	$(MAKE) -C $<
 
@@ -127,10 +117,6 @@ results_data_widener.log: data_widener \
     data_widener/xsim.dir/sim
 	./run_test.sh $< | tee results_$<.log
 
-results_time_corrector.log: time_corrector \
-    time_corrector/xsim.dir/sim
-	./run_test.sh $< | tee results_$<.log
-
 results_dac_underrun_detector.log: dac_underrun_detector \
     dac_underrun_detector/xsim.dir/sim
 	./run_test.sh $< | tee results_$<.log
@@ -142,9 +128,8 @@ results_data_narrower.log: data_narrower \
 run: prims \
     results_adc_samp_drop_detector.log \
     results_data_widener.log \
-    results_time_corrector.log \
     results_dac_underrun_detector.log \
-    results_data_narrower.log \
+    results_data_narrower.log
 	./run.sh
 
 clean_adc_samp_drop_detector:
@@ -159,17 +144,12 @@ clean_dac_underrun_detector:
 clean_data_narrower:
 	$(MAKE) -C data_narrower clean
 
-clean_time_corrector:
-	$(MAKE) -C time_corrector clean
-
 clean_run: \
     clean_prims \
     clean_adc_samp_drop_detector \
     clean_data_widener \
-    clean_time_corrector \
     clean_dac_underrun_detector \
     clean_data_narrower
 	rm -rf results*log
 	rm -rf octave-workspace
-
 

@@ -1,1 +1,1 @@
-../adc_samp_drop_generator/tcl.tcl
+../adc_samp_drop_detector/tcl.tcl

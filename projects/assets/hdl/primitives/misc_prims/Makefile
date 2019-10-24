@@ -46,8 +46,11 @@ SourceFiles=$(patsubst %,%.vhd,\
 	data_narrower \
 	dac_underrun_detector \
 	ocpi_data_sink_dac \
-	set_clr \
-	clk_src )
+	ocpi_cswm_prot_in_adapter_dw32_clkin \
+	ocpi_cswm_prot_in_adapter_dw32_clkout \
+	ocpi_cswm_prot_out_adapter_dw32_clkin \
+	ocpi_cswm_prot_out_adapter_dw32_clkout \
+	set_clr)
 
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:

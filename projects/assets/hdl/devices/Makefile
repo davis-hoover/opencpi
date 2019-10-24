@@ -43,6 +43,8 @@ Workers = \
 	ad9361_dac_sub.hdl \
 	ad9361_data_sub.hdl \
 	ad9361_spi.hdl \
+	data_src_adc.hdl \
+	data_src_adc_em.hdl \
 	cstest.hdl \
 	flash.hdl \
 	gps_uart.hdl \
@@ -65,6 +67,7 @@ Workers = \
 	tmp100.hdl \
 	tmp100_proxy.rcc \
         data_sink_dac.hdl \
-	data_sink_dac_em.hdl
+	data_sink_dac_em.hdl \
+	signal_time_tagger.hdl
 
 include $(OCPI_CDK_DIR)/include/library.mk

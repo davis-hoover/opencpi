@@ -135,7 +135,7 @@ ofile.close()
 enable = os.environ.get("OCPI_TEST_enable")
 
 #Throw away the first half of the output file to remove the start-up transients
-dout_normal = dout[num_samples/2:num_samples]
+dout_normal = dout[int(num_samples/2):num_samples]
 
 # Test #1 - Check that output data is not all zeros
 if all(dout_normal == 0):
@@ -158,7 +158,7 @@ if(enable=="true"): # => NORMAL MODE
     Fs = 100.
 
     complex_idata = np.array(np.zeros(num_samples), dtype=np.complex)
-    complex_odata = np.array(np.zeros(num_samples/2), dtype=np.complex)
+    complex_odata = np.array(np.zeros(int(num_samples/2)), dtype=np.complex)
     for i in range(0,num_samples):
         complex_idata[i] = complex(din['real_idx'][i], din['imag_idx'][i])
     for i in range(0,int(num_samples/2)):
@@ -189,7 +189,7 @@ if(enable=="true"): # => NORMAL MODE
     print ("\tResults (Normal Mode): Data matched expected results")
 else: # => BYPASS MODE
     #There is a 4 sample latency in processing, so the first 4 samples of the output are 0. Correcting for that here
-    din_bypass = din[0:num_samples-4]
+    din_bypass = din[0:int(num_samples-4)]
     dout_bypass = dout[4:num_samples]
     #Test that odata is the expected amount
     if (din_bypass != dout_bypass).all():

@@ -1,1 +1,1 @@
-../adc_samp_drop_generator/data_src.vhd
+../adc_samp_drop_detector/data_src.vhd

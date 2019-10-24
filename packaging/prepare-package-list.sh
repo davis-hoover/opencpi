@@ -114,13 +114,13 @@ for l in `find -H . -type f -name "-*"`; do
   bad=1
   echo Found files starting with hyphen >&2
 done
-[ -n "$bad" ] && exit 1
+[ -n "$bad" ] && echo Errors found so no files produced >&2 && exit 1
 
 # FIXME: this list is redundant with "install-prerequisites.sh" and "places"
 # This list could potentially be platform-specific
 # and then there are platform-specific prereqs
 # AV-5286
-prereqs="gmp lzma gtest patchelf inode64 ad9361 liquid"
+prereqs="gmp lzma gtest patchelf inode64 ad9361 liquid gpsd"
 case $type in
   all)
     for f in cdk/*; do

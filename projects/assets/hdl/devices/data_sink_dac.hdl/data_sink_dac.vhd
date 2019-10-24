@@ -53,7 +53,7 @@ begin
   begin
     case in_in.opcode is
       when ComplexShortWithMetadata_time_op_e =>
-        dac_in_opcode <= TIME;
+        dac_in_opcode <= TIME_TIME;
       when ComplexShortWithMetadata_interval_op_e =>
         dac_in_opcode <= INTERVAL;
       when ComplexShortWithMetadata_flush_op_e =>

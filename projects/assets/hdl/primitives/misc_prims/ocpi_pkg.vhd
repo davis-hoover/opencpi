@@ -22,11 +22,12 @@ USE IEEE.NUMERIC_STD.ALL;
 USE IEEE.MATH_REAL.ALL;
 USE IEEE.MATH_COMPLEX.ALL;
 library ocpi; use ocpi.types.all; -- ULong_t
+library misc_prims; use misc_prims.misc_prims.all;
 
 package ocpi is
 
 type complex_short_with_metadata_opcode_t is (
-  SAMPLES, TIME, INTERVAL, FLUSH, SYNC, END_OF_SAMPLES, USER);
+  SAMPLES, TIME_TIME, INTERVAL, FLUSH, SYNC, END_OF_SAMPLES, USER);
 
 component wsi_message_sizer is
   generic(
@@ -120,6 +121,97 @@ component ocpi_data_sink_dac is
     dac_dev_valid                          : out std_logic;
     dac_dev_take                           : in  std_logic;
     dac_dev_present                        : out std_logic);
+end component;
+
+-- for use w/ port clockdirection='input'
+component cswm_prot_in_adapter_dw32_clkin is
+  port(
+    -- INPUT
+    iclk      : in  std_logic;
+    irst      : in  std_logic;
+    idata     : in  std_logic_vector(31 downto 0);
+    ivalid    : in  Bool_t;
+    iready    : in  Bool_t;
+    isom      : in  Bool_t;
+    ieom      : in  Bool_t;
+    iopcode   : in  complex_short_with_metadata_opcode_t;
+    ieof      : in  Bool_t;
+    itake     : out Bool_t;
+    -- OUTPUT
+    odata     : out data_complex_t;
+    ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component cswm_prot_in_adapter_dw32_clkout is
+  port(
+    -- INPUT
+    iclk      : out std_logic;
+    idata     : in  std_logic_vector(31 downto 0);
+    ivalid    : in  Bool_t;
+    iready    : in  Bool_t;
+    isom      : in  Bool_t;
+    ieom      : in  Bool_t;
+    iopcode   : in  complex_short_with_metadata_opcode_t;
+    ieof      : in  Bool_t;
+    itake     : out Bool_t;
+    -- OUTPUT
+    oclk      : in  std_logic;
+    orst      : in  std_logic;
+    odata     : out data_complex_t;
+    ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+-- for use w/ port clockdirection='input'
+component cswm_prot_out_adapter_dw32_clkin is
+  generic(
+    OUT_PORT_MBYTEEN_WIDTH : positive);
+  port(
+    -- INPUT
+    idata        : in  data_complex_t;
+    imetadata    : in  metadata_t;
+    ivld         : in  std_logic;
+    irdy         : out std_logic;
+    -- OUTPUT
+    oclk         : in  std_logic;
+    orst         : in  std_logic;
+    odata        : out std_logic_vector(31 downto 0);
+    ovalid       : out Bool_t;
+    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
+    ogive        : out Bool_t;
+    osom         : out Bool_t;
+    oeom         : out Bool_t;
+    oopcode      : out complex_short_with_metadata_opcode_t;
+    oeof         : out Bool_t;
+    oready       : in  Bool_t);
+end component;
+
+-- for use w/ port clockdirection='output'
+component cswm_prot_out_adapter_dw32_clkout is
+  generic(
+    OUT_PORT_MBYTEEN_WIDTH : positive);
+  port(
+    -- INPUT
+    iclk         : in  std_logic;
+    irst         : in  std_logic;
+    idata        : in  data_complex_t;
+    imetadata    : in  metadata_t;
+    ivld         : in  std_logic;
+    irdy         : out std_logic;
+    -- OUTPUT
+    oclk         : out std_logic;
+    odata        : out std_logic_vector(31 downto 0);
+    ovalid       : out Bool_t;
+    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
+    ogive        : out Bool_t;
+    osom         : out Bool_t;
+    oeom         : out Bool_t;
+    oopcode      : out complex_short_with_metadata_opcode_t;
+    oeof         : out Bool_t;
+    oready       : in  Bool_t);
 end component;
 
 end package ocpi;

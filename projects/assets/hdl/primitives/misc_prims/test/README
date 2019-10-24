@@ -1,3 +1,16 @@
+# The motivation for these HDL tests is to provide OpenCPI-independent test
+# coverage for OpenCPI-independent code in a very-quick-to-build-and-run fashion.
+#
+# These HDL tests are intended to:
+# * build quickly (parallel builds - make -j is expected to work)
+# * run quickly (parallel testbenches via make -j, each testbench tests multiple
+#                cases simultaneously)
+# * run outside of OpenCPI
+#
+# These HDL tests are NOT intended to:
+# * test across multiple simulators, like OpenCPI does (this is xsim only)
+# * test OpenCPI-specific code, like OpenCPI does (this is non-OpenCPI tests only)
+
 # Example usage:
 
 pushd /opt/Xilinx/Vivado/2017.1/

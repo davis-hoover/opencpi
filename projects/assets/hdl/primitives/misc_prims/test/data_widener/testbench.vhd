@@ -10,7 +10,6 @@ begin
   subtest_0 : entity work.subtest
     generic map(
       FILENAME                 => "uut_subtest_0_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0,
       BITS_PACKED_INTO_MSBS    => true)
     port map(
       backpressure_select      => NO_BP,
@@ -19,7 +18,6 @@ begin
   subtest_1 : entity work.subtest
     generic map(
       FILENAME                 => "uut_subtest_1_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0,
       BITS_PACKED_INTO_MSBS    => true)
     port map(
       backpressure_select      => LFSR_BP,
@@ -28,7 +26,6 @@ begin
   subtest_2 : entity work.subtest
     generic map(
       FILENAME                 => "uut_subtest_2_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0,
       BITS_PACKED_INTO_MSBS    => false)
     port map(
       backpressure_select      => NO_BP,
@@ -37,7 +34,6 @@ begin
   subtest_3 : entity work.subtest
     generic map(
       FILENAME                 => "uut_subtest_3_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0,
       BITS_PACKED_INTO_MSBS    => false)
     port map(
       backpressure_select      => LFSR_BP,

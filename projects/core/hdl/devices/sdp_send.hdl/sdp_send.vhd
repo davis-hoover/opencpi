@@ -273,7 +273,7 @@ begin
   flag_out       <= to_integer(remote_idx_t(flag_out_slv));
   flag_deq       <= flag_not_empty; -- output of FIFO always processed immediately
 
-  is_op : component cdc.cdc.bit
+  is_op : component cdc.cdc.single_bit
     port map   (src_clk           => ctl_in.clk,
                 src_rst           => ctl_in.reset,
                 src_in            => ctl_in.is_operating,
@@ -599,7 +599,7 @@ g0: for i in 0 to sdp_width_c-1 generate
 --              bramb_addr_r <= bramb_addr_r + 1;
             end if;
           end if; -- if/else idle
-        end if; -- message available in fifo 
+        end if; -- message available in fifo
         -- Process doorbells
         if flag_not_empty = '1' and not (started_remote and flag_out = r) then
           sdp_remotes(flag_out).empty <= sdp_remotes(flag_out).empty + 1;

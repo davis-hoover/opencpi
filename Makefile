@@ -113,7 +113,10 @@ DoExports=\
           $(infox x:$x r:$r h:$h)\
           $(if $(and $(filter-out -,$h),$(filter -,$r)),\
             $(warning The HDL platform "$h" has no RCC platform.  It will be ignored.))\
-          ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) $h $(HdlPlatformDir_$h) &&)))) :
+	  $(and $(filter-out -,$r),\
+            ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) &&) \
+          $(and $(filter-out -,$h),\
+            ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) $h $(HdlPlatformDir_$h) &&))))) :
 
 .PHONY: exports      framework      driver      testframework cleanpackaging \
         cleanexports cleanframework cleanprojects cleandriver clean distclean cleaneverything
@@ -295,9 +298,11 @@ DoRpmOrDeployHw=\
         $(foreach h,$(word 2,$(subst :, ,$(pair))),\
           $(foreach p,$(if $(filter-out -,$h),$h,$r),\
             $(if $(filter -,$h),\
-              ./packaging/make-sw-rpms.sh $(and $(RpmVerbose),-v) $p \
-                 "$(and $(call cross,$p),1)" $(Package) $(base) $(call name,$p,sw) \
-                  $(release) $(version) $(git_hash),\
+	      $(if $1,\
+	        echo 'Cannot make a deployment (SD card) for a software-only platform yet.' && exit 1, \
+               ./packaging/make-sw-rpms.sh $(and $(RpmVerbose),-v) $p \
+                  "$(and $(call cross,$p),1)" $(Package) $(base) $(call name,$p,sw) \
+                   $(release) $(version) $(git_hash)),\
               $(if $1,\
                 ./packaging/make-hw-deploy.sh $(and $(RpmVerbose),-v) $p \
                   "$(and $(call cross,$p),1)" $r,\
@@ -347,7 +352,7 @@ Projects=core assets inactive assets_ts
 ProjectGoals=cleanhdl cleanrcc cleanocl rcc ocl hdl applications run runtest hdlprimitives \
              hdlportable components cleancomponents test
 # These are not done in parallel since we do not know the dependencies
-DoProjects=set -e; $(foreach p,$(Projects),\
+DoProjects=set -e; . cdk/opencpi-setup.sh -r; $(foreach p,$(Projects),\
                      echo Performing $1 on project $p && \
                      $(MAKE) -C projects/$p $(if $(filter build,$1),,$1) &&) :
 .PHONY: $(ProjectGoals) testprojects

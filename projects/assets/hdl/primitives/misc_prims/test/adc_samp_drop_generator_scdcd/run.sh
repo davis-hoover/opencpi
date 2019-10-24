@@ -1,1 +1,1 @@
-../adc_samp_drop_generator/run.sh
+../adc_samp_drop_detector/run.sh

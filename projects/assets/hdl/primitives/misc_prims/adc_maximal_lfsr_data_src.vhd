@@ -17,7 +17,7 @@ entity adc_maximal_lfsr_data_src is
     ordy               : in  std_logic);
 end adc_maximal_lfsr_data_src;
 architecture rtl of adc_maximal_lfsr_data_src is
-  constant CNT_BIT_WIDTH : integer := integer(ceil(real(DATA_BIT_WIDTH)))+1;
+  constant CNT_BIT_WIDTH : positive := DATA_BIT_WIDTH+1;
   -- https://en.wikipedia.org/wiki/Linear-feedback_shift_register#Some_polynomials_for_maximal_LFSRs
   constant MAXIMAL_LFSR_12_BIT_PERIOD : positive := 4095;
   constant MAXIMAL_LFSR_16_BIT_PERIOD : positive := 65535;

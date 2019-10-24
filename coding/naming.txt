@@ -57,27 +57,27 @@ C++ type/class names
 
 C++ names: the theory/purspose being you know by looking what it is.
            the downside is you have to change it in many places if this categorization changes.
--- globals
-   g_ prefix
+-- global data (not functions)
+   g_ prefix, then initial-lower-camelcase
 -- statics (not in class)
    no prefix, initial lower camelcase - i.e. not distinguished from member functions
 -- constants
-   c_ prefix for member data in a class.
+   c_ prefix for member data in a class, then initial-lower-camelcase
    All upper case for const globals (like MACROS)
 -- Enumeration values
-   Usually all upper case.  Sometimes <UPPER_PREFIX>_<lower>.
+   Usually all upper case with underscores.  Sometimes <UPPER_PREFIX>_<lower-camel-case>.
 -- MACROS
-   All upper case.
+   All upper case with underscores
 -- static member data
-   s_ prefix
+   s_ prefix, then initial-lower-camelcase
 -- static member functions
    initial-lower-camelcase - not distinguished from non-static member functions.
 -- member data
-   m_ prefix
+   m_ prefix, then initial-lower-camelcase
 -- arguments when they must be changed to avoid shadowing
-   a_ prefix
+   a_ prefix, then initial-lower-camelcase
 -- locals when they must be changed to avoid shadowing
-   l_ prefix
+   l_ prefix, then initial-lower-camelcase
 -- member functions
    initial-lower-camelcase
 -- arguments to functions and methods
