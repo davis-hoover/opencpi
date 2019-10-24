@@ -26,7 +26,10 @@ import sys
 import numpy as np
 import struct
 
-# Declare complex data type
+# !!!!! CAUTION !!!!! - this type is specific to the following protocol-specific
+# use case:
+# (port w/ iqstream-prot) -> file_write component, or
+# file_read component     -> (port w/ iqstream-prot)
 dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,0), 'imag_idx':(np.int16,2)}))
 
 def is_power2(num):

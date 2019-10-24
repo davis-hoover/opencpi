@@ -43,6 +43,8 @@ namespace OCPI {
     }
     Device::
     ~Device() {
+      if (m_endPoint)
+	m_endPoint->release();
       delete m_pfWorker;
       delete m_tsWorker;
       if (m_implXml)
@@ -338,10 +340,12 @@ namespace OCPI {
     }
     DataTransfer::EndPoint &Device::
     getEndPoint() {
-      return m_endPoint ? *m_endPoint :
-        *(m_endPoint = &DataTransfer::getManager().
-          allocateProxyEndPoint(m_endpointSpecific.c_str(), false,
-                                OCPI_UTRUNCATE(size_t, m_endpointSize)));
+      if (!m_endPoint) {
+	m_endPoint = &DataTransfer::getManager().allocateProxyEndPoint(m_endpointSpecific.c_str(), false,
+								       OCPI_UTRUNCATE(size_t, m_endpointSize));
+	m_endPoint->addRef();
+      }
+      return *m_endPoint;
     }
     void Device::
     connect(DataTransfer::EndPoint &/*ep*/, OCPI::RDT::Descriptors &/*mine*/,

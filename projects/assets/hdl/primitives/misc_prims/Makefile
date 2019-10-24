@@ -53,12 +53,9 @@ SourceFiles=$(patsubst %,%.vhd,\
 	ocpi_cswm_prot_out_adapter_dw32_clkin_old \
 	ocpi_cswm_prot_out_adapter_dw32_clkout \
 	ocpi_cswm_prot_out_adapter_dw32_clkout_old \
-	ocpi_data_src_adc \
 	level_to_pulse_converter \
 	cdc_fifo_info \
-	set_clr \
-	clk_src)
-
+	set_clr)
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:
 # 1. Any entity (VHDL) or module (verilog) must have a VHDL component declaration in misc_prims_pkg.vhd

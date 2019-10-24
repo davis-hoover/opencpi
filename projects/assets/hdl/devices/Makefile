@@ -64,6 +64,7 @@ Workers = \
 	si5351_proxy.rcc \
 	stm_mc24c02.hdl \
 	tmp100.hdl \
-	tmp100_proxy.rcc 
+	tmp100_proxy.rcc \
+	signal_time_tagger.hdl
 
 include $(OCPI_CDK_DIR)/include/library.mk

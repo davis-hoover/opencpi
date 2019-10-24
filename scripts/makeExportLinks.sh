@@ -69,11 +69,13 @@ platform=$rcc_platform
 platform_dir=$rcc_platform_dir
 [ "$hdl_platform" = - ] && hdl_platform=
 [ -n "$hdl_platform" ] && {
-  target2=$hdl_platform/$rcc_platform
+  target=$hdl_platform
+  target2=$hdl_platform
   platform=$hdl_platform
   platform_dir=$hdl_platform_dir
 }
 [ -z "$target" ] && target=$OCPI_TOOL_DIR
+[ -n "$verbose" ] && echo Exporting: rcc:$rcc_platform hdl:$hdl_platform target:$target target2:$target2 platform:$platform
 export OCPI_CDK_DIR=`pwd`/bootstrap
 # The only things we currently need from ocpitarget.sh is OcpiPlatformOs and OcpiPlatformPrerequisites
 [ $rcc_platform != - -a -z "$hdl_platform" ] && source $OCPI_CDK_DIR/scripts/ocpitarget.sh $rcc_platform
@@ -197,9 +199,22 @@ function do_addition {
   [ -n "$rcc_platform" ] && rawsrc=${rawsrc//<rcc_platform>/$rcc_platform}
   exp=${both[1]}
   [ -z "$exp" ] && bad unexpected empty second field
-  # If not deployment(@) replace with just target else replace with deploy/target
-  [ "$2" != "--" ] && exp=${exp//<target>/$target2} || exp=${exp//<target>/deploy/$target2}
-  [ -n "$rcc_platform" ] && exp=${exp//<rcc_platform>/$rcc_platform}
+  if [ "$2" = "--" ]; then
+      # If deployment(@) replace make sure there is deploy/<target>
+      if [[ "${exp}" =~ ^deploy/ ]]; then
+	  exp=${exp/%deploy\/<target>\//deploy\/<platform>\/}
+      else
+	  exp=deploy/$platform/$exp
+      fi
+  else
+      # If not deployment(@) replace with just target else replace with deploy/target
+      exp=${exp//<target>/$target2}
+  fi
+  exp=${exp//<platform>/$platform}
+  exp=${exp//<target>/$target2}
+  if [ -n "$rcc_platform" ]; then
+     exp=${exp//<rcc_platform>/$rcc_platform}
+  fi
   set +f
   targets=$(match_pattern "$rawsrc")
   for src in $targets; do
@@ -271,10 +286,12 @@ set -f
 platform_exports=$platform_dir/$platform.exports
 [ -f $platform_exports ] || platform_exports=
 [ -n "$verbose" ] && echo Collecting exclusions
-readExport exclusions - Project.exports
-[ -n "$verbose" ] && echo Collecting additions and runtimes
-[ -z "$hdl_platform" ] && readExport additions + Project.exports
-[ -z "$hdl_platform" ] && readExport runtimes = Project.exports
+if [ -z "$hdl_platform" ]; then
+  readExport exclusions - Project.exports
+  [ -n "$verbose" ] && echo Collecting additions and runtimes
+  [ -z "$hdl_platform" ] && readExport additions + Project.exports
+  [ -z "$hdl_platform" ] && readExport runtimes = Project.exports
+fi
 [ -n "$platform_exports" ] && {
   echo Using extra exports file for platform $platform: $platform_exports
   readExport additions + $platform_exports -
@@ -283,7 +300,7 @@ readExport exclusions - Project.exports
   readExport exclusions - $platform_exports -
 }
 set +f
-[ "$target" != - ] && {
+[ -z "$hdl_platform" ] && {
 [ -n "$verbose" ] && echo Processing framework source-code-based links
 while read path opts; do
   case "$path" in

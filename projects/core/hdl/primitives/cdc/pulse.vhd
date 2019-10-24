@@ -83,7 +83,7 @@ begin
     end if;
   end process;
 
-  nff_synchronizer : component work.cdc.bit
+  nff_synchronizer : component work.cdc.single_bit
     generic map (
       N    => N,
       IREG => '0')
@@ -107,7 +107,7 @@ begin
     end if;
   end process;
 
-  acknowledge_nff_synchronizer : component work.cdc.bit
+  acknowledge_nff_synchronizer : component work.cdc.single_bit
     generic map (
       N         => N,
       IREG      => '0',

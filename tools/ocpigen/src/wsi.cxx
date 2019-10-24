@@ -27,7 +27,7 @@ WsiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)
   : DataPort(w, x, sp, ordinal, WSIPort, err) {
   if (err)
     return;
-  if ((err = OE::checkAttrs(x, "Name", "Clock", "DataWidth", "PreciseBurst", "myoutputclock",
+  if ((err = OE::checkAttrs(x, "Name", "Clock", "DataWidth", "PreciseBurst", "myoutputclock", "clockdirection",
 			    "ImpreciseBurst", "Continuous", "Abortable",
 			    "EarlyRequest", "MyClock", "RegRequest", "InsertEOM", "workerEOF", "Pattern",
 			    "NumberOfOpcodes", "MaxMessageValues",
@@ -291,10 +291,10 @@ emitVhdlShell(FILE *f, ::Port *wci) {
   std::string clockName(m_clock->signal());
   if (m_clock->m_port) {
     if (m_clock->m_output) {
-      if (isDataProducer())
-	clockName = m_clock->m_port->typeNameOut + "_temp."; // clk in temp bundle
+      if (m_clock->m_port->isDataProducer())
+	clockName = m_clock->m_port->typeNameOut + "_temp.";
       else
-	clockName = cname(), clockName += "_";       // clk in temp signal
+	clockName = m_clock->m_port->pname(), clockName += "_";
     } else
       clockName = m_clock->m_port->typeNameIn + ".";
     clockName += "Clk";

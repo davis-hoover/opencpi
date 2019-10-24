@@ -29,8 +29,10 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include "zlib.h"
 #include "ocpi-config.h"
+#include "OcpiOsFileSystem.h"
 #include "HdlZynq.h"
 #include "HdlBusDriver.h"
 #ifdef OCPI_OS_macos
@@ -42,11 +44,19 @@
    namespace HDL {
      namespace Zynq {
        namespace OU = OCPI::Util;
+       namespace OF = OCPI::OS::FileSystem;
 
+       const char
+         fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
+	 fpgaMgrFlags[]  = "/sys/class/fpga_manager/fpga0/flags",
+       	 fpgaMgrDevice[] = "/amba/devcfg@f8007000", // from /sys/firmware/devicetree/base/...
+	 xdevCfgState[]  = "/sys/class/xdevcfg/xdevcfg/device/prog_done",
+	 xdevCfgDevice[] = "/dev/xdevcfg";
        class Device
 	 : public OCPI::HDL::Device {
-	 Driver    &m_driver;
-	 uint8_t  *m_vaddr;
+	 Driver  &m_driver;
+	 uint8_t *m_vaddr;
+	 bool     m_fpgaManager;
 	 friend class Driver;
 	 Device(Driver &driver, std::string &a_name, bool forLoad, const OU::PValue *params,
 		std::string &err)
@@ -54,6 +64,14 @@
 	     m_driver(driver), m_vaddr(NULL) {
 	   m_isAlive = false;
 	   m_endpointSize = sizeof(OccpSpace);
+	   if (OF::exists(fpgaMgrState)) // && OF::exists(fpgaMgrFirmware))
+	     m_fpgaManager = true;
+	   else if (OF::exists(xdevCfgState) && !::access(xdevCfgDevice, F_OK)) // need access() for char device
+	     m_fpgaManager = false;
+	   else {
+	     err = "FPGA support not present for Zynq PL, required files are missing";
+	     return;
+	   }
 	   if (isProgrammed(err)) {
 	     if (init(err)) {
 	       if (forLoad)
@@ -120,15 +138,23 @@
         // when false, err may be set or not
         bool
         isProgrammed(std::string &err) {
-          std::string val;
-          const char *e = OU::file2String(val, "/sys/class/xdevcfg/xdevcfg/device/prog_done", '|');
-          ocpiDebug("OCPI::HDL::Zynq::Device::isProgrammed: got %s%s (%s)", e ? "error: " : "",
-            e ? e : (val.c_str()[0] == '1' ? "done" : "not done"), val.c_str());
-          if (e) {
-            err = e;
-            return false;
-          }
-          return (val.c_str()[0] == '1');
+	  const char *e, *file, *value;
+	  if (m_fpgaManager) {
+	    file = fpgaMgrState;
+	    value = "operating";
+	  } else {
+	    file = xdevCfgState;
+	    value = "1";
+	  }
+	  bool done = false;
+	  std::string val;
+	  if ((e = OU::file2String(val, file, '|')))
+	    OU::format(err, "Could not retrieve FPGA status from \"%s\": %s", file, e);
+	  else
+	    done = val == value;
+	  ocpiDebug("OCPI::HDL::Zynq::Device::isProgrammed: %s%s",
+		    err.empty() ? (done ? "true" : "false") : "error: ", err.empty() ? "" : err.c_str());
+	  return done;
         }
 	bool getMetadata(std::vector<char> &xml, std::string &err) {
 	  if (isProgrammed(err))
@@ -179,22 +205,34 @@
 	// Load a bitstream
 	bool
 	load(const char *fileName, std::string &error) {
-	  ocpiDebug("Loading file \"%s\" on zynq FPGA", fileName);
-	  struct Xld { // struct allocated on the stack for easy cleanup
+	  ocpiDebug("Loading file \"%s\" on zynq FPGA, with the %s.", fileName,
+		    m_fpgaManager ? "fpga manager" : "/dev/xdevcfg driver");
+	  struct Xld {
+            const size_t IBUFSZ;  // when reading compressed from the stream
+            const size_t OBUFSZ; // when filling an in-memory buffer
 	    int xfd, bfd;
 	    gzFile gz;
 	    uint8_t buf[8*1024];
 	    int zerror;
 	    size_t len;
-	    int n;
+	    std::string inputFile, outputFile;
+	    bool useManager;
+	    uint8_t *obase, *optr;  // used to buffer 
+	    size_t olength, oleft;
+
 	    void cleanup() { // used for constructor catch cleanup and in destructor
 	      if (xfd >= 0) ::close(xfd);
 	      if (bfd >= 0) ::close(bfd);
 	      if (gz) gzclose(gz);
 	    }
-	    Xld(const char *file, std::string &a_error) : xfd(-1), bfd(-1), gz(NULL) {
-	      // Open the device LAST since just opening it will do bad things
+
+	    Xld(const char *file, bool fpgaManager, std::string &a_error)
+	      : IBUFSZ(8*1024), OBUFSZ(64*1024), xfd(-1), bfd(-1), gz(NULL),
+                inputFile(file), useManager(fpgaManager), obase(NULL),
+                optr(NULL), olength(), oleft(0) {
+	      // Open the device LAST since just opening it may do bad things
 	      uint8_t *p8;
+	      int n;
 	      if ((bfd = ::open(file, O_RDONLY)) < 0)
 		OU::format(a_error, "Can't open bitstream file '%s' for reading: %s(%d)",
 			   file, strerror(errno), errno);
@@ -205,30 +243,35 @@
 	      else if ((n = ::gzread(gz, buf, sizeof(buf))) <= 0)
 		OU::format(a_error, "Error reading initial bitstream buffer: %s(%u/%d)",
 			   gzerror(gz, &zerror), errno, n);
-	      else if (!(p8 = findsync(buf, sizeof(buf))))
+	      else if (!(p8 = findsync(buf, sizeof(buf)))) // this call is content-specific
 		OU::format(a_error, "Can't find sync pattern in compressed bit file");
 	      else {
-		len = buf + sizeof(buf) - p8;
+		len = OCPI_SIZE_T_DIFF(buf + sizeof(buf), p8);
 		if (p8 != buf)
-		  memcpy(buf, p8, len);
+		  memmove(buf, p8, len);
 		// We've done as much as we can before opening the device, which
-		// does bad things to the Zynq PL
-		if ((xfd = ::open("/dev/xdevcfg", O_RDWR)) < 0)
-		  OU::format(a_error, "Can't open /dev/xdevcfg for bitstream loading: %s(%d)",
-			     strerror(errno), errno);
+		// does bad things to the Zynq PL (i.e. causes an "unload")
+		if (useManager)
+		  outputFile = OCPI_DRIVER_MEM;
+		else // use original/old Xilinx loading device driver, pre-fpga manager
+		  outputFile = xdevCfgDevice;
+		if ((xfd = ::open(outputFile.c_str(), O_RDWR)) < 0)
+		  OU::format(a_error, "Can't open %s for bitstream loading: %s(%d)",
+			     outputFile.c_str(), strerror(errno), errno);
 	      }
 	    }
 	    ~Xld() {
 	      cleanup();
 	    }
 	    int gzread(uint8_t *&argBuf, std::string &a_error) {
+	      int n;
 	      if ((n = ::gzread(gz, buf + len, (unsigned)(sizeof(buf) - len))) < 0)
 		OU::format(a_error, "Error reading compressed bitstream: %s(%u/%d)",
 			   gzerror(gz, &zerror), errno, n);
 	      else {
 		n += OCPI_UTRUNCATE(int, len);
 		len = 0;
-		argBuf = buf; 
+		argBuf = buf;
 	      }
 	      return n;
 	    }
@@ -237,32 +280,55 @@
 	      // read back the value
 	      return 0;
 	    }
-	  };
-	  Xld xld(fileName, error);
-	  if (!error.empty())
+	    bool // return true on error
+	    copy(std::string &error) {
+	      do {
+		uint8_t *l_buf;
+		int r = gzread(l_buf, error);
+		if (r < 0)
+		  return true;
+		size_t n = (size_t)r;
+		if (n & 3)
+		  return OU::eformat(error, "Bitstream data in is '%s' not a multiple of 4 bytes",
+				     inputFile.c_str());
+		if (n == 0)
+		  break;
+		uint32_t *p32 = (uint32_t*)l_buf;
+		for (size_t nn = n; nn; nn -= 4, p32++)
+		  *p32 = OU::swap32(*p32); // part of bit-to-bin conversion
+		if (useManager) { // fill a contiguous buffer.  ostringstream and vector were worse than this.
+		  if (oleft < n) {
+		    size_t used = OCPI_SIZE_T_DIFF(optr, obase);
+		    obase = (uint8_t *)::realloc(obase, olength += OBUFSZ);
+		    oleft += OBUFSZ;
+		    optr = obase + used;
+		  }
+		  memcpy(optr, l_buf, n);
+		  optr += n, oleft -= n;
+		} else if (::write(xfd, l_buf, n) <= 0)
+		  return OU::eformat(error,
+				     "Error writing to %s for bitstream loading: %s(%u/%zu)",
+				     outputFile.c_str(), strerror(errno), errno, n);
+	      } while (1);
+	      if (useManager) {
+		ocpi_load_fpga_request_t request;
+		request.data = obase;
+		request.length = OCPI_UTRUNCATE(ocpi_size_t, optr - obase);
+		strncpy(request.device_path, fpgaMgrDevice, sizeof(request.device_path));
+		if (ioctl(xfd, OCPI_CMD_LOAD_FPGA, &request))
+		  return OU::eformat(error, "Error loading fpga: %s(%u)", strerror(errno), errno);
+	      }
+	      if (::close(xfd))
+		return OU::eformat(error, "Error closing %s: %s(%u)",
+				   outputFile.c_str(), strerror(errno), errno);
+	      xfd = -1;
+	      return false;
+	    }
+	  };  // end struct Xld
+
+	  Xld xld(fileName, m_fpgaManager, error);
+	  if (!error.empty() || xld.copy(error))
 	    return true;
-	  do {
-	    uint8_t *buf;
-	    int n = xld.gzread(buf, error);
-	    if (n < 0)
-	      return true;
-	    if (n & 3)
-	      return OU::eformat(error, "Bitstream data in is '%s' not a multiple of 4 bytes",
-				 fileName);
-	    if (n == 0)
-	      break;
-	    uint32_t *p32 = (uint32_t*)buf;
-	    for (unsigned nn = n; nn; nn -= 4, p32++)
-	      *p32 = OU::swap32(*p32);
-	    if (write(xld.xfd, buf, n) <= 0)
-	      return OU::eformat(error,
-				 "Error writing to /dev/xdevcfg for bitstream loading: %s(%u/%d)",
-				 strerror(errno), errno, n);
-	  } while (1);
-	  if (::close(xld.xfd))
-	    return OU::eformat(error, "Error closing /dev/xdevcfg: %s(%u)",
-			       strerror(errno), errno);
-	  xld.xfd = -1;
 	  ocpiDebug("Loading complete, testing for programming done and initialization");
 	  return isProgrammed(error) ? init(error) : true;
 #if 0
@@ -295,7 +361,7 @@
 	  close(xfd);
 	  return false;
 	}
-      };
+      }; // end class Device
 
       Driver::
       Driver()
@@ -312,22 +378,16 @@
 	     std::string &error) {
 	// Opening implies canonicalizing the name, which is needed for excludes
 	ocpiInfo("Searching for local Zynq/PL HDL device.");
-#if 0
-	bool verbose = false;
-	OU::findBool(params, "verbose", verbose);
-	if (verbose)
-	  printf("Searching for local Zynq/PL HDL device.\n");
-#endif
 	OCPI::HDL::Device *dev = open("0", true, params, error);
 	return dev && !found(*dev, exclude, discoveryOnly, error) ? 1 : 0;
       }
-      
+
       OCPI::HDL::Device *Driver::
       open(const char *busName, bool forLoad, const OU::PValue *params, std::string &error) {
 	(void)params;
 	std::string name("PL:");
 	name += busName;
-#if defined(OCPI_ARCH_arm) || defined(OCPI_ARCH_arm_cs)
+#if defined(OCPI_ARCH_arm) || defined(OCPI_ARCH_arm_cs) || defined(OCPI_ARCH_aarch32) || defined(OCPI_ARCH_aarch64)
 	Device *dev = new Device(*this, name, forLoad, params, error);
 	if (error.empty())
 	  return dev;
