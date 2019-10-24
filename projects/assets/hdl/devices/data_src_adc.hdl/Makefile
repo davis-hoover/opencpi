@@ -1,0 +1,2 @@
+HdlLibraries+=misc_prims
+include $(OCPI_CDK_DIR)/include/worker.mk

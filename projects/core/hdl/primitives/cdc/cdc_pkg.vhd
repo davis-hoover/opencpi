@@ -102,4 +102,19 @@ package cdc is
       dst_rst : in  std_logic;
       dst_out : out std_logic);
   end component pulse;
+
+  component fast_pulse_to_slow_sticky is
+    port(
+      -- fast clock domain
+      fast_clk    : in  std_logic;
+      fast_rst    : in  std_logic;
+      fast_pulse  : in  std_logic; -- pulse to be detected w/ sticky bit out
+      -- slow clock domain
+      slow_clk    : in  std_logic;
+      slow_rst    : in  std_logic;
+      slow_clr    : in  std_logic;  -- clears sticky bit
+      slow_sticky : out std_logic); -- sticky bit set when fast_pulse is high,
+                                    -- sync'd to slow clock domain
+  end component fast_pulse_to_slow_sticky;
+
 end package cdc;

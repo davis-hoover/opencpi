@@ -42,6 +42,8 @@ Workers = \
 	ad9361_dac_sub.hdl \
 	ad9361_data_sub.hdl \
 	ad9361_spi.hdl \
+	data_src_adc.hdl \
+	data_src_adc_em.hdl \
 	cstest.hdl \
 	flash.hdl \
 	gps_uart.hdl \

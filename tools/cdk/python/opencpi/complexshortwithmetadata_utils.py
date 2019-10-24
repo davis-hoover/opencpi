@@ -69,17 +69,14 @@ def parse_samples_data_from_msgs_in_file(file_to_be_parsed):
         msg.append(utu.get_msg(data[index:]))
         #print(msg[msg_count])
         if msg[msg_count][utu.MESSAGE_DATA] is None:
-            if(msg[msg_count][utu.MESSAGE_OPCODE]==SAMPLES_OPCODE):
-                print("    FAIL - ZLM on samples opcode detected.")
-                sys.exit(1)
-            else:
-                index = index + 2
+            index = index + 2
         else:
             index = index + len(msg[msg_count][utu.MESSAGE_DATA]) + 2
         msg_count += 1
     for i in range(0,len(msg)):
         if(msg[i][utu.MESSAGE_OPCODE]==SAMPLES_OPCODE):
-            samples_data_array.extend(msg[i][utu.MESSAGE_DATA])
+            if(msg[i][utu.MESSAGE_LENGTH] != 0):
+                samples_data_array.extend(msg[i][utu.MESSAGE_DATA])
     return np.array(samples_data_array, dtype=utu.dt_iq_pair)
 
 def parse_non_samples_msgs_from_msgs_in_file(file_to_be_parsed):
@@ -107,6 +104,31 @@ def parse_non_samples_msgs_from_msgs_in_file(file_to_be_parsed):
         if(msg[i][utu.MESSAGE_OPCODE]!=SAMPLES_OPCODE):
             non_samples_msg_array.append(msg[i])
     return non_samples_msg_array
+
+def parse_msgs_from_msgs_in_file(file_to_be_parsed):
+    """
+    Get messages (data and metadata) from file generated 
+    with messagesInFile=true
+    """
+    #Read data as uint32
+    f = open(file_to_be_parsed, 'rb')
+    data = np.fromfile(f, dtype=np.uint32, count=-1)
+    f.close()
+    #Parse messages
+    index = 0
+    msg_count = 0
+    msg = []
+    msg_array = []
+    while index < len(data):
+        msg.append(utu.get_msg(data[index:]))
+        if msg[msg_count][utu.MESSAGE_DATA] is None:
+            index = index + 2
+        else:
+            index = index + len(msg[msg_count][utu.MESSAGE_DATA]) + 2
+        msg_count += 1
+    for i in range(0,len(msg)):
+        msg_array.append(msg[i])
+    return msg_array
 
 def check_interval_division(in_int_msg,out_int_msg,divisor):
     """
