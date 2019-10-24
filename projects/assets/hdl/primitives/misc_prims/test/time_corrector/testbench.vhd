@@ -14,8 +14,7 @@ begin
       --INCLUDE_ERROR_SAMP_DROP  => false,
       BYPASS                   => '0',
       TIME_TIME                => to_unsigned(0, METADATA_TIME_BIT_WIDTH),
-      TIME_CORRECTION          => to_signed(0, METADATA_TIME_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+      TIME_CORRECTION          => to_signed(0, METADATA_TIME_BIT_WIDTH));
 
   subtest_1 : entity work.subtest
     generic map(
@@ -24,8 +23,7 @@ begin
       --INCLUDE_ERROR_SAMP_DROP  => false,
       BYPASS                   => '0',
       TIME_TIME                => to_unsigned(0, METADATA_TIME_BIT_WIDTH),
-      TIME_CORRECTION          => to_signed(1, METADATA_TIME_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+      TIME_CORRECTION          => to_signed(1, METADATA_TIME_BIT_WIDTH));
 
   subtest_2 : entity work.subtest
     generic map(
@@ -34,8 +32,7 @@ begin
       --INCLUDE_ERROR_SAMP_DROP  => false,
       BYPASS                   => '0',
       TIME_TIME                => to_unsigned(0, METADATA_TIME_BIT_WIDTH),
-      TIME_CORRECTION          => to_signed(-1, METADATA_TIME_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+      TIME_CORRECTION          => to_signed(-1, METADATA_TIME_BIT_WIDTH));
 
   subtest_3 : entity work.subtest
     generic map(
@@ -44,8 +41,7 @@ begin
       --INCLUDE_ERROR_SAMP_DROP  => false,
       BYPASS                   => '0',
       TIME_TIME                => to_unsigned(102, METADATA_TIME_BIT_WIDTH),
-      TIME_CORRECTION          => to_signed(0, METADATA_TIME_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+      TIME_CORRECTION          => to_signed(0, METADATA_TIME_BIT_WIDTH));
 
   subtest_4 : entity work.subtest
     generic map(
@@ -54,8 +50,7 @@ begin
       --INCLUDE_ERROR_SAMP_DROP  => false,
       BYPASS                   => '0',
       TIME_TIME                => to_unsigned(102, METADATA_TIME_BIT_WIDTH),
-      TIME_CORRECTION          => to_signed(1, METADATA_TIME_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+      TIME_CORRECTION          => to_signed(1, METADATA_TIME_BIT_WIDTH));
 
   subtest_5 : entity work.subtest
     generic map(
@@ -64,7 +59,6 @@ begin
       --INCLUDE_ERROR_SAMP_DROP  => false,
       BYPASS                   => '0',
       TIME_TIME                => to_unsigned(102, METADATA_TIME_BIT_WIDTH),
-      TIME_CORRECTION          => to_signed(-1, METADATA_TIME_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+      TIME_CORRECTION          => to_signed(-1, METADATA_TIME_BIT_WIDTH));
 
 end rtl;

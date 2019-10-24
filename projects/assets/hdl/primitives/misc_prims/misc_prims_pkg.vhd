@@ -298,8 +298,6 @@ component set_clr
 end component set_clr;
 
 component time_corrector is
-  generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
   port(
     -- CTRL
     clk       : in  std_logic;
@@ -320,8 +318,7 @@ end component;
 
 component time_downsampler is
   generic(
-    DATA_PIPE_LATENCY_CYCLES : natural  := 0;
-    DATA_COUNTER_BIT_WIDTH   : positive := 32);
+    DATA_COUNTER_BIT_WIDTH : positive := 32);
   port(
     -- CTRL
     clk       : in  std_logic;

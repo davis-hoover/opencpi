@@ -4,12 +4,11 @@ library misc_prims; use misc_prims.misc_prims.all;
 
 entity subtest is
   generic(
-    FILENAME                 : string;
-    BACKPRESSURE_SELECT      : file_writer_backpressure_select_t;
-    BYPASS                   : std_logic;
-    MIN_NUM_DATA_PER_TIME    : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1
-                               downto 0);
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
+    FILENAME              : string;
+    BACKPRESSURE_SELECT   : file_writer_backpressure_select_t;
+    BYPASS                : std_logic;
+    MIN_NUM_DATA_PER_TIME : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1
+                            downto 0));
 end entity subtest;
 architecture rtl of subtest is
   signal clk                : std_logic := '0';
@@ -60,8 +59,6 @@ begin
   uut_ctrl.min_num_data_per_time_vld <= '1';
 
   uut : misc_prims.misc_prims.time_downsampler
-    generic map(
-      DATA_PIPE_LATENCY_CYCLES => DATA_PIPE_LATENCY_CYCLES)
     port map(
       -- CTRL
       clk       => clk,

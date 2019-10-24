@@ -6,8 +6,8 @@ library misc_prims; use misc_prims.misc_prims.all;
 -- effectively downsampling time
 entity time_downsampler is
   generic(
-    DATA_PIPE_LATENCY_CYCLES : natural  := 0;
-    DATA_COUNTER_BIT_WIDTH   : positive := 32);
+    -- the DATA PIPE LATENCY CYCLES is currently 0
+    DATA_COUNTER_BIT_WIDTH : positive := 32);
   port(
     -- CTRL
     clk       : in  std_logic;
@@ -112,35 +112,35 @@ begin
   -- output data/metadata generation
   ------------------------------------------------------------------------------
 
-  data_pipe_latency_cycles_0 : if(DATA_PIPE_LATENCY_CYCLES = 0) generate
-    odata.i <= idata.i;
-    odata.q <= idata.q;
+  -- start the DATA PIPE LATENCY CYCLES is currently 0
+  odata.i <= idata.i;
+  odata.q <= idata.q;
 
-    imetadata_slv <= to_slv(imetadata);
+  imetadata_slv <= to_slv(imetadata);
 
-    metadata_gen : process(imetadata, latest_time, latest_time_vld,
-                           allow_time_xfer, imetadata_slv)
-    begin
-      for idx in metadata'range loop
-        if((idx <= METADATA_IDX_TIME_L) and (idx >= METADATA_IDX_TIME_R)) then
-          if(pending_time_xfer = '1') then
-            metadata(idx) <= latest_time(idx-METADATA_IDX_TIME_R);
-          else
-            metadata(idx) <= imetadata.time(idx-METADATA_IDX_TIME_R);
-          end if;
-        elsif(idx = METADATA_IDX_TIME_VLD) then
-          metadata(idx) <= allow_time_xfer and
-                           (imetadata.time_vld or latest_time_vld);
+  metadata_gen : process(imetadata, latest_time, latest_time_vld,
+                         allow_time_xfer, imetadata_slv)
+  begin
+    for idx in metadata'range loop
+      if((idx <= METADATA_IDX_TIME_L) and (idx >= METADATA_IDX_TIME_R)) then
+        if(pending_time_xfer = '1') then
+          metadata(idx) <= latest_time(idx-METADATA_IDX_TIME_R);
         else
-          metadata(idx) <= imetadata_slv(idx);
+          metadata(idx) <= imetadata.time(idx-METADATA_IDX_TIME_R);
         end if;
-      end loop;
-    end process metadata_gen;
+      elsif(idx = METADATA_IDX_TIME_VLD) then
+        metadata(idx) <= allow_time_xfer and
+                         (imetadata.time_vld or latest_time_vld);
+      else
+        metadata(idx) <= imetadata_slv(idx);
+      end if;
+    end loop;
+  end process metadata_gen;
 
-    ometadata <= imetadata when (ctrl.bypass = '1') else from_slv(metadata);
+  ometadata <= imetadata when (ctrl.bypass = '1') else from_slv(metadata);
 
-    ovld <= ivld;
-    irdy <= ordy;
-  end generate;
+  ovld <= ivld;
+  irdy <= ordy;
+  -- end the DATA PIPE LATENCY CYCLES is currently 0
 
 end rtl;

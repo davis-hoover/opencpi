@@ -9,8 +9,7 @@ entity subtest is
     --INCLUDE_ERROR_SAMP_DROP  : boolean;
     BYPASS                   : std_logic;
     TIME_TIME                : unsigned(METADATA_TIME_BIT_WIDTH-1 downto 0);
-    TIME_CORRECTION          : signed(METADATA_TIME_BIT_WIDTH-1 downto 0);
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
+    TIME_CORRECTION          : signed(METADATA_TIME_BIT_WIDTH-1 downto 0));
 end entity subtest;
 architecture rtl of subtest is
   signal clk                : std_logic := '0';
@@ -63,8 +62,6 @@ begin
   uut_ctrl.time_correction_vld <= '1';
 
   uut : misc_prims.misc_prims.time_corrector
-    generic map(
-      DATA_PIPE_LATENCY_CYCLES => DATA_PIPE_LATENCY_CYCLES)
     port map(
       -- CTRL
       clk       => clk,

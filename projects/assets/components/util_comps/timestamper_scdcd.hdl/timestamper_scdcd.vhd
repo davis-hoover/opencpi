@@ -207,8 +207,6 @@ begin
       iclk_is_operating;
 
   time_downsampler : misc_prims.misc_prims.time_downsampler
-    generic map(
-      DATA_PIPE_LATENCY_CYCLES => 0)
     port map(
       -- CTRL
       clk       => in_in.clk,
@@ -230,8 +228,6 @@ begin
   iclk_time_corrector_ctrl.time_correction_vld <= iclk_is_operating;
 
   time_corrector : misc_prims.misc_prims.time_corrector
-    generic map(
-      DATA_PIPE_LATENCY_CYCLES => 0)
     port map(
       -- CTRL
       clk       => in_in.clk,

@@ -13,8 +13,7 @@ begin
       BACKPRESSURE_SELECT      => NO_BP,
       BYPASS                   => '0',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(4,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
   subtest_1 : entity work.subtest
     generic map(
@@ -22,8 +21,7 @@ begin
       BACKPRESSURE_SELECT      => NO_BP,
       BYPASS                   => '0',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(8,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
   subtest_2 : entity work.subtest
     generic map(
@@ -31,8 +29,7 @@ begin
       BACKPRESSURE_SELECT      => LFSR_BP,
       BYPASS                   => '0',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(4,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
   subtest_3 : entity work.subtest
     generic map(
@@ -40,8 +37,7 @@ begin
       BACKPRESSURE_SELECT      => LFSR_BP,
       BYPASS                   => '0',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(8,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
   subtest_4 : entity work.subtest
     generic map(
@@ -49,8 +45,7 @@ begin
       BACKPRESSURE_SELECT      => NO_BP,
       BYPASS                   => '1',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(4,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
   subtest_5 : entity work.subtest
     generic map(
@@ -58,8 +53,7 @@ begin
       BACKPRESSURE_SELECT      => NO_BP,
       BYPASS                   => '1',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(8,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
   subtest_6 : entity work.subtest
     generic map(
@@ -67,8 +61,7 @@ begin
       BACKPRESSURE_SELECT      => LFSR_BP,
       BYPASS                   => '1',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(4,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
   subtest_7 : entity work.subtest
     generic map(
@@ -76,7 +69,6 @@ begin
       BACKPRESSURE_SELECT      => LFSR_BP,
       BYPASS                   => '1',
       MIN_NUM_DATA_PER_TIME    => to_unsigned(8,
-                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH),
-      DATA_PIPE_LATENCY_CYCLES => 0);
+                                  TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH));
 
 end rtl;

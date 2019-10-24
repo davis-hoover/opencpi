@@ -24,8 +24,7 @@ library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
 library misc_prims; use misc_prims.misc_prims.all;
 
 entity time_corrector is
-  generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
+  -- the DATA PIPE LATENCY CYCLES is currently 0
   port(
     -- CTRL
     clk       : in  std_logic;
@@ -94,32 +93,32 @@ begin
 --    end if;
 --  end process overflow_sticky_gen;
 
-  data_pipe_latency_cycles_0 : if(DATA_PIPE_LATENCY_CYCLES = 0) generate
-    odata.i <= idata.i;
-    odata.q <= idata.q;
+  -- start the DATA PIPE LATENCY CYCLES is currently 0
+  odata.i <= idata.i;
+  odata.q <= idata.q;
 
-    imetadata_slv <= to_slv(imetadata);
+  imetadata_slv <= to_slv(imetadata);
 
-    metadata_gen : process(time_time, imetadata, overflow,
-                           time_correction_latest_reg_dout_vld,
-                           imetadata_slv)
-    begin
-      for idx in metadata'range loop
-        if((idx <= METADATA_IDX_TIME_L) and (idx >= METADATA_IDX_TIME_R)) then
-          metadata(idx) <= time_time(idx-METADATA_IDX_TIME_R);
-        elsif(idx = METADATA_IDX_TIME_VLD) then
-          metadata(idx) <= imetadata.time_vld and (not overflow) and
-                           time_correction_latest_reg_dout_vld;
-        else
-          metadata(idx) <= imetadata_slv(idx);
-        end if;
-      end loop;
-    end process metadata_gen;
+  metadata_gen : process(time_time, imetadata, overflow,
+                         time_correction_latest_reg_dout_vld,
+                         imetadata_slv)
+  begin
+    for idx in metadata'range loop
+      if((idx <= METADATA_IDX_TIME_L) and (idx >= METADATA_IDX_TIME_R)) then
+        metadata(idx) <= time_time(idx-METADATA_IDX_TIME_R);
+      elsif(idx = METADATA_IDX_TIME_VLD) then
+        metadata(idx) <= imetadata.time_vld and (not overflow) and
+                         time_correction_latest_reg_dout_vld;
+      else
+        metadata(idx) <= imetadata_slv(idx);
+      end if;
+    end loop;
+  end process metadata_gen;
 
-    ometadata <= imetadata when (ctrl.bypass = '1') else from_slv(metadata);
+  ometadata <= imetadata when (ctrl.bypass = '1') else from_slv(metadata);
 
-    ovld <= ivld;
-    irdy <= ordy;
-  end generate;
+  ovld <= ivld;
+  irdy <= ordy;
+  -- end the DATA PIPE LATENCY CYCLES is currently 0
 
 end rtl;
