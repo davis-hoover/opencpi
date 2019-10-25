@@ -89,6 +89,12 @@ function from_slv(slv    : in std_logic_vector) return metadata_t;
 function to_slv(info     : in info_t)         return std_logic_vector;
 function from_slv(slv    : in std_logic_vector) return info_t;
 
+function calc_cdc_bit_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
+function calc_cdc_fifo_depth (src_dst_ratio : in real) return natural;
+function calc_cdc_pulse_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
+function calc_cdc_count_up_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
+function src_dst_ratio (sim_src_clk_hz : in real; sim_dst_clk_hz : in real; simulation : in std_logic; hw_src_dst_clk_ratio: in real) return real;
+
 type adc_samp_drop_detector_status_t is record
   error_samp_drop : std_logic;
 end record adc_samp_drop_detector_status_t;
@@ -276,5 +282,53 @@ component set_clr
     q   : out std_logic;
     q_r : out std_logic);
 end component set_clr;
+
+component gen_reset_sync
+generic (sim_src_clk_hz : real := 100000000.0;
+         sim_dst_clk_hz : real := 100000000.0;
+         simulation : std_logic := '1';
+         hw_src_dst_clk_ratio : real := 1.0);
+  port(
+    src_clk                   : in  std_logic;
+    src_rst                   : in  std_logic;
+    dst_clk                   : in  std_logic;
+    dst_rst                   : in  std_logic;
+    synced_dst_to_scr_rst     : out std_logic;
+    synced_src_to_dst_rst     : out std_logic);
+end component;
+
+
+component four_bit_lfsr
+generic (SEED : std_logic_vector := "1000");
+  port(
+    clk     : in std_logic;
+    rst     : in std_logic;
+    en      : in std_logic;
+    dout    : out std_logic_vector);
+end component;
+
+component one_shot_fifo
+generic (data_width : natural := 1;
+         fifo_depth : natural := 2;
+         num_output_samples : natural := 1);
+  port(
+    clk      : in std_logic;
+    rst      : in std_logic;
+    din      : in std_logic_vector;
+    en       : in std_logic;
+    rdy      : in std_logic;
+    data_vld : out std_logic;
+    done     : out std_logic;
+    dout     : out std_logic_vector);
+end component;
+
+component advance_counter
+generic (hold_width : natural := 1);
+  port(
+    clk       : in std_logic;
+    rst       : in std_logic;
+    en        : in std_logic;
+    advance   : out std_logic);
+end component;
 
 end package misc_prims;

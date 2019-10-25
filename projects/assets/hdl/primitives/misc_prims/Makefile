@@ -23,7 +23,7 @@
 # If they are in this project, they must be compiled first, and this requires that the
 # PrimitiveLibraries variable be set in the hdl/primitives/Makefile such that the
 # libraries are in dependency order.
-Libraries=ocpi fixed_float util cdc
+Libraries=ocpi fixed_float util cdc bsv platform
 
 # Set this variable to the list of source files in dependency order
 # If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
@@ -47,7 +47,11 @@ SourceFiles=$(patsubst %,%.vhd,\
 	ocpi_cswm_prot_in_adapter_dw32_clkout \
 	ocpi_cswm_prot_out_adapter_dw32_clkin \
 	ocpi_cswm_prot_out_adapter_dw32_clkout \
-	set_clr)
+	set_clr \
+	cdc_testing/src/gen_reset_sync \
+	cdc_testing/src/four_bit_lfsr \
+	cdc_testing/src/one_shot_fifo \
+	cdc_testing/src/advance_counter)
 
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:

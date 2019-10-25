@@ -1,0 +1,54 @@
+<build>
+  <!-- <configuration id='0'>
+    <parameter name='simulation' value='true'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='1'>
+    <parameter name='sim_src_clk_hz' value='50000000.0'/>
+    <parameter name='simulation' value='true'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='2'>
+    <parameter name='sim_src_clk_hz' value='50000000.0'/>
+    <parameter name='sim_dst_clk_hz' value='200000000.0'/>
+    <parameter name='simulation' value='true'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='3'>
+    <parameter name='sim_src_clk_hz' value='100000000.0'/>
+    <parameter name='sim_dst_clk_hz' value='50000000.0'/>
+    <parameter name='simulation' value='true'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='4'>
+    <parameter name='sim_src_clk_hz' value='200000000.0'/>
+    <parameter name='sim_dst_clk_hz' value='50000000.0'/>
+    <parameter name='simulation' value='true'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration> -->
+  <configuration id='0'>
+    <parameter name='simulation' value='false'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='1'>
+    <parameter name='hw_src_dst_clk_ratio' value='0.5'/>
+    <parameter name='simulation' value='false'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='2'>
+    <parameter name='hw_src_dst_clk_ratio' value='0.25'/>
+    <parameter name='simulation' value='false'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='3'>
+    <parameter name='hw_src_dst_clk_ratio' value='2.0'/>
+    <parameter name='simulation' value='false'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='4'>
+    <parameter name='hw_src_dst_clk_ratio' value='4.0'/>
+    <parameter name='simulation' value='false'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+
+</build>

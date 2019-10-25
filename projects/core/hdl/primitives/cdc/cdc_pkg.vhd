@@ -51,7 +51,7 @@ package cdc is
     generic (
       N         : natural   := 2;         -- Range 2 - 10
       IREG      : std_logic := '0';       -- 0=no, 1=yes input register
-      RST_LEVEL : std_logic := '1');      -- 0=low, 1=high
+      RST_LEVEL : std_logic := '0');      -- 0=low, 1=high
     port (
       src_clk  : in  std_logic;           -- optional; required when IREG='1'
       src_rst  : in  std_logic;           -- optional; required when IREG='1'
@@ -66,7 +66,7 @@ package cdc is
     generic (
       N         : natural   := 2;         -- Range 2 - 10
       IREG      : std_logic := '0';       -- 0=no, 1=yes input register
-      RST_LEVEL : std_logic := '1';       -- 0=low, 1=high
+      RST_LEVEL : std_logic := '0';       -- 0=low, 1=high
       WIDTH     : positive  := 1);
     port (
       src_clk   : in  std_logic;
@@ -85,6 +85,7 @@ package cdc is
       src_clk : in  std_logic;
       src_rst : in  std_logic;
       src_in  : in  std_logic;
+      src_rdy : out std_logic;
       dst_clk : in  std_logic;
       dst_rst : in  std_logic;           -- optional; if not required, tie '0'
       dst_out : out unsigned(WIDTH-1 downto 0));

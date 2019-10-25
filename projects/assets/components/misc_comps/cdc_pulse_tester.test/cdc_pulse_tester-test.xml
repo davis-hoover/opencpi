@@ -1,0 +1,54 @@
+
+<Tests UseHDLFileIo='true'>
+  <!-- <case OnlyPlatForms='*sim'>
+    <Output Port="out" Script="verify.py ../../pulse_golden1.bin"/>
+    <Property Name='sim_src_clk_hz' Value='100000000.0'/>
+    <Property Name='sim_dst_clk_hz' Value='100000000.0'/>
+  </case>
+  <case OnlyPlatForms='*sim'>
+    <Output Port="out" Script="verify.py ../../pulse_golden2.bin"/>
+    <Property Name='sim_src_clk_hz' Value='50000000.0'/>
+    <Property Name='sim_dst_clk_hz' Value='100000000.0'/>
+  </case>
+  <case OnlyPlatForms='*sim'>
+    <Output Port="out" Script="verify.py ../../pulse_golden3.bin"/>
+    <Property Name='sim_src_clk_hz' Value='50000000.0'/>
+    <Property Name='sim_dst_clk_hz' Value='200000000.0'/>
+  </case>
+  <case OnlyPlatForms='*sim'>
+    <Output Port="out" Script="verify.py ../../pulse_golden4.bin"/>
+    <Property Name='sim_src_clk_hz' Value='100000000.0'/>
+    <Property Name='sim_dst_clk_hz' Value='50000000.0'/>
+  </case>
+  <case OnlyPlatForms='*sim'>
+    <Output Port="out" Script="verify.py ../../pulse_golden5.bin"/>
+    <Property Name='sim_src_clk_hz' Value='200000000.0'/>
+    <Property Name='sim_dst_clk_hz' Value='50000000.0'/>
+  </case> -->
+  <case ExcludePlatforms='*sim'>
+   <Output Port="out" Script="verify.py ../../pulse_golden1.bin"/>
+   <Property Name='hw_src_dst_clk_ratio' Value='1.0'/>
+   <Property Name='simulation' Value='false'/>
+  </case>
+  <case ExcludePlatforms='*sim'>
+   <Output Port="out" Script="verify.py ../../pulse_golden2.bin"/>
+   <Property Name='hw_src_dst_clk_ratio' Value='0.5'/>
+   <Property Name='simulation' Value='false'/>
+  </case>
+  <case ExcludePlatforms='*sim'>
+   <Output Port="out" Script="verify.py ../../pulse_golden3.bin"/>
+   <Property Name='hw_src_dst_clk_ratio' Value='0.25'/>
+   <Property Name='simulation' Value='false'/>
+  </case>
+  <case  ExcludePlatforms='*sim'>
+   <Output Port="out" Script="verify.py ../../pulse_golden4.bin"/>
+   <Property Name='hw_src_dst_clk_ratio' Value='2.0'/>
+   <Property Name='simulation' Value='false'/>
+  </case>
+  <case  ExcludePlatforms='*sim'>
+   <Output Port="out" Script="verify.py ../../pulse_golden5.bin"/>
+   <Property Name='hw_src_dst_clk_ratio' Value='4.0'/>
+   <Property Name='simulation' Value='false'/>
+  </case>
+
+</Tests>

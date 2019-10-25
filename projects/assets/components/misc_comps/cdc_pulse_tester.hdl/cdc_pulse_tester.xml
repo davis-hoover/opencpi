@@ -1,0 +1,12 @@
+<HdlWorker language='vhdl' spec='cdc_pulse_tester-spec' DataWidth="32" Version='2' libraries='cdc'>
+
+  <Property Name="num_input_samples" Type="uchar"
+                                     Parameter="true"
+                                     Default="8"
+                                     Description="Number of input samples sent."/>
+
+  <StreamInterface Name="out"
+                  NumberOfOpcodes="256" DataValueWidth="8"
+                  ZeroLengthMessages="true" insertEOM="true" workerEOF='1' myoutputclock='1'/>
+
+</HdlWorker>
