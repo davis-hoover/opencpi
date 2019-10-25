@@ -300,7 +300,7 @@ fi
   readExport exclusions - $platform_exports -
 }
 set +f
-[ -z "$hdl_platform" ] && {
+[ -z "$hdl_platform" -a "$target" != - ] && {
 [ -n "$verbose" ] && echo Processing framework source-code-based links
 while read path opts; do
   case "$path" in
