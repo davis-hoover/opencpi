@@ -1,8 +1,5 @@
 <HdlDevice Language="vhdl" Spec="data_sink_dac-spec" Version="2">
 
-  <Property Name="DATA_PIPE_LATENCY_CYCLES"
-            Parameter="true"
-            Default="0"/>
   <Property Name="IN_PORT_DATA_WIDTH"
             Parameter="true"
             Default="32"/>
@@ -21,10 +18,10 @@
 
   <StreamInterface Name="in" 
 		   DataWidth="IN_PORT_DATA_WIDTH"
-		   MyOutputClock="true"/>
+		   ClockDirection="out"/>
 
   <DevSignal Name="dev" 
-             Signals="dac-16-signals.xml" 
+             Signals="qdac-16-signals.xml" 
              master="true"/> <!-- master must be lowercase -->
 
 </HdlDevice>

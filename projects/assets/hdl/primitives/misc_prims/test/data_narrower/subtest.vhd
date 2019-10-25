@@ -6,7 +6,6 @@ entity subtest is
   generic(
     DATA_SRC_OUTPUT_CONTINUOUS : boolean;
     FILENAME                   : string;
-    DATA_PIPE_LATENCY_CYCLES   : natural := 0;
     BITS_PACKED_INTO_LSBS      : boolean := false);
   port(
     backpressure_select     : in  file_writer_backpressure_select_t;
@@ -62,7 +61,6 @@ begin
 
   uut : misc_prims.misc_prims.data_narrower
     generic map(
-      DATA_PIPE_LATENCY_CYCLES => DATA_PIPE_LATENCY_CYCLES,
       BITS_PACKED_INTO_LSBS    => BITS_PACKED_INTO_LSBS)
     port map(
       -- CTRL

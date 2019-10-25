@@ -5,8 +5,7 @@ library misc_prims; use misc_prims.misc_prims.all;
 entity subtest is
   generic(
     DATA_SRC_OUTPUT_CONTINUOUS : boolean;
-    FILENAME                   : string;
-    DATA_PIPE_LATENCY_CYCLES   : natural := 0);
+    FILENAME                   : string);
   port(
     backpressure_select     : in  file_writer_backpressure_select_t;
     backpressure_select_vld : in  std_logic);
@@ -64,8 +63,6 @@ begin
   uut_imetadata.ctrl_tx_on_off <= not end_of_test;
     
   uut : misc_prims.misc_prims.dac_underrun_detector
-    generic map(
-      DATA_PIPE_LATENCY_CYCLES => DATA_PIPE_LATENCY_CYCLES)
     port map(
       -- CTRL
       clk       => clk,

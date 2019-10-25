@@ -4,7 +4,6 @@ library misc_prims; use misc_prims.misc_prims.all;
 -- narrows data bus
 entity data_narrower is
   generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0;
     BITS_PACKED_INTO_LSBS    : boolean := true);
   port(
     -- INPUT
@@ -23,22 +22,18 @@ end entity data_narrower;
 architecture rtl of data_narrower is
 begin
 
-  data_pipe_latency_cycles_0 : if(DATA_PIPE_LATENCY_CYCLES = 0) generate
-
-    bits_packed_into_lbsbs_false : if(BITS_PACKED_INTO_LSBS = false) generate
-      odata.i <= idata.i(idata.i'left downto idata.i'left-odata.i'length+1);
-      odata.q <= idata.q(idata.i'left downto idata.i'left-odata.i'length+1);
-    end generate;
-
-    bits_packed_into_lbsbs_true : if(BITS_PACKED_INTO_LSBS) generate
-      odata.i <= idata.i(odata.i'left downto 0);
-      odata.q <= idata.q(odata.i'left downto 0);
-    end generate;
-
-    ometadata <= imetadata;
-    ovld <= ivld;
-    irdy <= ordy;
-
+  bits_packed_into_lbsbs_false : if(BITS_PACKED_INTO_LSBS = false) generate
+    odata.i <= idata.i(idata.i'left downto idata.i'left-odata.i'length+1);
+    odata.q <= idata.q(idata.i'left downto idata.i'left-odata.i'length+1);
   end generate;
+
+  bits_packed_into_lbsbs_true : if(BITS_PACKED_INTO_LSBS) generate
+    odata.i <= idata.i(odata.i'left downto 0);
+    odata.q <= idata.q(odata.i'left downto 0);
+  end generate;
+
+  ometadata <= imetadata;
+  ovld <= ivld;
+  irdy <= ordy;
 
 end rtl;

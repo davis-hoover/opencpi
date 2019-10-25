@@ -1,72 +1,174 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
+library ocpi, cdc; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library misc_prims; use misc_prims.misc_prims.all;
-library misc_prims; use misc_prims.ocpi.all;
 architecture rtl of worker is
-  signal dac_in_opcode                          : complex_short_with_metadata_opcode_t := SAMPLES;
-  signal on_off_out_opcode                      : bool_t;
+
+  signal dac_clk, dac_rst                       : std_logic;
+  signal opcode_samples, opcode_eos             : std_logic := '0';
+
+  signal dac_metadata_status                    : dac_underrun_detector_status_t;
+
+  signal dac_underrun_detector_idata            : data_complex_t;
+  signal dac_underrun_detector_imetadata        : metadata_dac_t;
+  signal dac_underrun_detector_ivld             : std_logic := '0';
+  signal dac_underrun_detector_irdy             : std_logic := '0';
+  signal dac_underrun_detector_odata            : data_complex_t;
+  signal dac_underrun_detector_ometadata        : metadata_dac_t;
+  signal dac_underrun_detector_ovld             : std_logic := '0';
+
+  signal dac_data_narrower_irdy                 : std_logic := '0';
+  signal dac_data_narrower_ordy                 : std_logic := '0';
+  signal dac_data_narrower_odata                : data_complex_dac_t;
+  signal dac_data_narrower_ometadata            : metadata_dac_t;
+  signal dac_data_narrower_ovld                 : std_logic := '0';
+
+  signal dac_clk_unused_opcode_detected         : std_logic;
   signal ctrl_clr_underrun_sticky_error         : bool_t;
   signal ctrl_clr_unused_opcode_detected_sticky : bool_t;
+
+  signal tx_on_off_s, tx_on_off_r               : std_logic;
+  signal start_samples, end_samples             : std_logic;
+  signal event_pending, event_present           : std_logic;
+
 begin
+  dev_out.present <= '1';
+  dac_clk <= dev_in.clk;
+  in_out.clk <= dac_clk;
+  
+  -- DACs usally won't provide a reset along w/ their clock
+  dac_rst_gen : cdc.cdc.reset
+    port map(
+      src_rst => ctl_in.reset,
+      dst_clk => dac_clk,
+      dst_rst => dac_rst);
+  
+  out_port_data_width_32 : if(IN_PORT_DATA_WIDTH = 32) generate
+
+    dac_underrun_detector_idata.i <= in_in.data(15 downto  0);
+    dac_underrun_detector_idata.q <= in_in.data(31 downto 16);
+    
+
+    opcode_eos <= to_bool(in_in.opcode = ComplexShortWithMetadata_end_of_samples_op_e);
+    opcode_samples <= to_bool(in_in.opcode = ComplexShortWithMetadata_samples_op_e);
+    dac_clk_unused_opcode_detected <= in_in.ready and
+                                      not(opcode_eos or opcode_samples);
+    
+    --On/Off signal used to qualify underrun
+    start_samples <= in_in.ready and opcode_samples and not tx_on_off_r;
+    end_samples   <= (in_in.ready and opcode_eos) or in_in.eof;
+    tx_on_off_s   <= start_samples or (tx_on_off_r and not end_samples);
+
+    process(dac_clk)
+    begin
+      if rising_edge(dac_clk) then
+        if its(dac_rst) then
+          tx_on_off_r <= '0';
+        else
+          tx_on_off_r <= tx_on_off_s;
+        end if;
+      end if;
+    end process;
+
+    dac_underrun_detector_imetadata.ctrl_tx_on_off <= tx_on_off_s;
+
+    --On/Off port logic
+    event_present <= start_samples or end_samples;
+    
+    process(dac_clk)
+    begin
+      if rising_edge(dac_clk) then
+        --reset is used as a way to know whether port is connected
+        if its(dac_rst) or its(on_off_in.reset) then
+          event_pending <= '0';
+        elsif its(not on_off_in.ready) then
+          event_pending <= event_present;
+        else
+          event_pending <= '0';
+        end if;
+      end if;
+    end process;
+
+    on_off_out.give <= on_off_in.ready and (event_present or event_pending);
+    
+    dac_underrun_detector_ivld <= in_in.valid;
+    in_out.take                <= in_in.ready and dac_underrun_detector_irdy;
+    ctl_out.finished           <= in_in.eof;
+    
+    dac_underrun_detector : misc_prims.misc_prims.dac_underrun_detector
+      port map(
+        -- CTRL
+        clk       => dac_clk,
+        rst       => dac_rst,
+        status    => dac_metadata_status,
+        -- INPUT
+        idata     => dac_underrun_detector_idata,
+        imetadata => dac_underrun_detector_imetadata,
+        ivld      => dac_underrun_detector_ivld,
+        irdy      => dac_underrun_detector_irdy,
+        -- OUTPUT
+        odata     => dac_underrun_detector_odata,
+        ometadata => dac_underrun_detector_ometadata,
+        ovld      => dac_underrun_detector_ovld,
+        ordy      => dac_data_narrower_irdy);
+
+    data_narrower : misc_prims.misc_prims.data_narrower
+      generic map(
+        BITS_PACKED_INTO_LSBS    => to_boolean(DAC_OUTPUT_IS_LSB_OF_IN_PORT))
+      port map(
+        -- CTRL INTERFACE
+        clk       => dac_clk,
+        rst       => dac_rst,
+        -- INPUT INTERFACE
+        idata     => dac_underrun_detector_odata,
+        imetadata => dac_underrun_detector_ometadata,
+        ivld      => dac_underrun_detector_ovld,
+        irdy      => dac_data_narrower_irdy,
+        -- OUTPUT INTERFACE
+        odata     => dac_data_narrower_odata,
+        ometadata => dac_data_narrower_ometadata,
+        ovld      => dev_out.valid,
+        ordy      => dac_data_narrower_ordy);
+
+    dac_data_narrower_ordy <= not dac_rst;
+
+    BITS_PACKED_INTO_LSBS_true : if(DAC_OUTPUT_IS_LSB_OF_IN_PORT = btrue) generate
+      dev_out.data_i <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.i),16));
+      dev_out.data_q <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.i),16));
+    end generate;
+
+    BITS_PACKED_INTO_LSBS_false : if(DAC_OUTPUT_IS_LSB_OF_IN_PORT = bfalse) generate
+      dev_out.data_i <= std_logic_vector(
+        shift_left(unsigned(dac_data_narrower_odata.i), 16-to_integer(DAC_WIDTH_BITS)));
+      dev_out.data_q <= std_logic_vector(
+        shift_left(unsigned(dac_data_narrower_odata.q), 16-to_integer(DAC_WIDTH_BITS)));
+    end generate;
+    
+  end generate;
+      
   ctrl_clr_underrun_sticky_error <= props_in.clr_underrun_sticky_error_written and
                                     props_in.clr_underrun_sticky_error;
+
+  underrun : component cdc.cdc.fast_pulse_to_slow_sticky
+    port map(
+      fast_clk    => dac_clk,
+      fast_rst    => dac_rst,
+      fast_pulse  => dac_metadata_status.underrun_error,
+      slow_clk    => ctl_in.clk,
+      slow_rst    => ctl_in.reset,
+      slow_sticky => props_out.underrun_sticky_error,
+      slow_clr    => ctrl_clr_underrun_sticky_error);
+
   ctrl_clr_unused_opcode_detected_sticky <= props_in.clr_unused_opcode_detected_sticky_written and
                                             props_in.clr_unused_opcode_detected_sticky;
-  
-  prim : misc_prims.ocpi.ocpi_data_sink_dac
-    generic map(
-      DAC_WIDTH_BITS                         => DAC_WIDTH_BITS,
-      DATA_PIPE_LATENCY_CYCLES               => DATA_PIPE_LATENCY_CYCLES,
-      IN_PORT_DATA_WIDTH                     => IN_PORT_DATA_WIDTH,
-      DAC_OUTPUT_IS_LSB_OF_IN_PORT           => DAC_OUTPUT_IS_LSB_OF_IN_PORT,
-      IN_PORT_MBYTEEN_WIDTH                  => in_in.byte_enable'length)
-    port map(
-      -- CTRL
-      ctrl_clk                               => ctl_in.clk,
-      ctrl_rst                               => ctl_in.reset,
-      ctrl_underrun_sticky_error             => props_out.underrun_sticky_error,
-      ctrl_clr_underrun_sticky_error         => ctrl_clr_underrun_sticky_error,
-      ctrl_unused_opcode_detected_sticky     => props_out.unused_opcode_detected_sticky,
-      ctrl_clr_unused_opcode_detected_sticky => ctrl_clr_unused_opcode_detected_sticky,
-      ctrl_finished                          => ctl_out.finished,
-      -- INPUT
-      dac_in_clk                             => in_out.clk,
-      dac_in_take                            => in_out.take,
-      dac_in_data                            => in_in.data,
-      dac_in_opcode                          => dac_in_opcode,
-      dac_in_ready                           => in_in.ready,
-      dac_in_valid                           => in_in.valid,
-      dac_in_eof                             => in_in.eof,
-      -- ON/OFF OUTPUT
-      on_off_out_reset                       => on_off_in.reset,
-      on_off_out_ready                       => on_off_in.ready,
-      on_off_out_opcode                      => on_off_out_opcode,
-      on_off_out_give                        => on_off_out.give,
-      -- DEV SIGNAL OUTPUT
-      dac_dev_clk                            => dev_in.clk,
-      dac_dev_data_i                         => dev_out.data_i,
-      dac_dev_data_q                         => dev_out.data_q,
-      dac_dev_valid                          => dev_out.valid,
-      dac_dev_take                           => dev_in.take);
 
-  opcode_gen : process(in_in.opcode)
-  begin
-    case in_in.opcode is
-      when ComplexShortWithMetadata_time_op_e =>
-        dac_in_opcode <= TIME_TIME;
-      when ComplexShortWithMetadata_interval_op_e =>
-        dac_in_opcode <= INTERVAL;
-      when ComplexShortWithMetadata_flush_op_e =>
-        dac_in_opcode <= FLUSH;
-      when ComplexShortWithMetadata_sync_op_e =>
-        dac_in_opcode <= SYNC;
-      when ComplexShortWithMetadata_end_of_samples_op_e =>
-        dac_in_opcode <= END_OF_SAMPLES;
-      when ComplexShortWithMetadata_user_op_e =>
-        dac_in_opcode <= USER;
-      when others =>
-        dac_in_opcode <= SAMPLES;
-    end case;
-  end process opcode_gen;
+  unused_opcode : component cdc.cdc.fast_pulse_to_slow_sticky
+    port map(
+      fast_clk    => dac_clk,
+      fast_rst    => dac_rst,
+      fast_pulse  => dac_clk_unused_opcode_detected,
+      slow_clk    => ctl_in.clk,
+      slow_rst    => ctl_in.reset,
+      slow_sticky => props_out.unused_opcode_detected_sticky,
+      slow_clr    => ctrl_clr_unused_opcode_detected_sticky);
   
 end rtl;

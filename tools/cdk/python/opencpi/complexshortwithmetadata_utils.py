@@ -31,11 +31,12 @@ import struct
 import opencpi.unit_test_utils as utu
 
 # Declare ComplexShortWithMetadata opcode encoding
-SAMPLES_OPCODE  = 0
-TIME_OPCODE     = 1
-INTERVAL_OPCODE = 2
-FLUSH_OPCODE    = 3
-SYNC_OPCODE     = 4
+SAMPLES_OPCODE        = 0
+TIME_OPCODE           = 1
+INTERVAL_OPCODE       = 2
+FLUSH_OPCODE          = 3
+SYNC_OPCODE           = 4
+END_OF_SAMPLES_OPCODE = 5
 
 # Declare samples bit width
 SAMPLES_BIT_WIDTH=16

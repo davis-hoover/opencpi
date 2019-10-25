@@ -1,19 +1,17 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library platform; use platform.platform_pkg.all;
+library ocpi, platform; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 architecture rtl of worker is
   signal   dac_clk    : std_logic;
   signal   first, eof : bool_t;
 begin
   -- generate dac clock
-  clock : sim_clk
+  clock : platform.platform_pkg.sim_clk
     generic map(frequency => from_float(dac_clk_freq_hz))
     port map   (clk => dac_clk, reset => open);
 
   dev_out.clk <= dac_clk;
   out_out.clk <= dac_clk;
 
-  dev_out.take <= out_in.ready;
   out_out.valid <= out_in.ready and dev_in.valid;
   
   --TODO: Need data widener

@@ -5,7 +5,7 @@
 
   <StreamInterface Name="out" 
 		   DataWidth="32" 
-		   MyOutputClock="true" 
+		   ClockDirection="out" 
 		   InsertEOM="true" 
 		   WorkerEOF="true"/>
 

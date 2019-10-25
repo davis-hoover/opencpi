@@ -10,14 +10,6 @@
 	    Default="false"
             Description="Indicates whether DAC data is extracted from the most
                          significant or least significant DAC_WIDTH_BITS of the in port."/>
-  <Property Name="GP_CTRL_ARRAY_LENGTH"
-            Type="Ushort"
-            Parameter="true"
-            Default="1"/>
-  <Property Name="GP_STATUS_ARRAY_LENGTH"
-            Type="Ushort"
-            Parameter="true"
-            Default="1"/>
   <Property Name="underrun_sticky_error"
             Type="Bool"
             Volatile="true"
@@ -26,21 +18,9 @@
             Type="Bool"
             Writable="true"
             Description="Writing true clears underrun_sticky_error."/>
-  <Property Name="gp_ctrl"
-            Type="Ulonglong"
-            ArrayLength="GP_CTRL_ARRAY_LENGTH"
-            Writable="true"
-            Description="General purpose control. Value of all zeros results in
-                         no action."/>
-  <Property Name="gp_status"
-            Type="Ulonglong"
-            ArrayLength="GP_STATUS_ARRAY_LENGTH"
-            Volatile="true"
-            Description="General purpose status."/>
 
   <Port Name="in" 
-        Protocol="ComplexShortWithMetadata-prot"
-        Optional="1"/>
+        Protocol="ComplexShortWithMetadata-prot"/>
   <Port Name="on_off" 
         Protocol="tx_event-prot"
         Optional="1"

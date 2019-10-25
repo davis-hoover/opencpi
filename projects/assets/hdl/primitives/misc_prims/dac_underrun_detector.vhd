@@ -3,8 +3,6 @@ library misc_prims; use misc_prims.misc_prims.all;
 
 -- generates underrun indicator when data starvation occurs
 entity dac_underrun_detector is
-  generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
   port(
     -- CTRL
     clk       : in  std_logic;
@@ -45,14 +43,12 @@ begin
 
   xfer_underrun_error <= ordy and pending_xfer_underrun_error_r;
 
-  data_pipe_latency_cycles_0 : if(DATA_PIPE_LATENCY_CYCLES = 0) generate
-    odata.i                        <= idata.i;
-    odata.q                        <= idata.q;
-    ometadata.underrun_error       <= xfer_underrun_error;
-    ometadata.ctrl_tx_on_off       <= imetadata.ctrl_tx_on_off;
-    ometadata.data_vld             <= ordy and ivld;
-    ovld                           <= ordy and (ivld or xfer_underrun_error);
-    irdy                           <= ordy;
-  end generate;
+  odata.i                        <= idata.i;
+  odata.q                        <= idata.q;
+  ometadata.underrun_error       <= xfer_underrun_error;
+  ometadata.ctrl_tx_on_off       <= imetadata.ctrl_tx_on_off;
+  ometadata.data_vld             <= ordy and ivld;
+  ovld                           <= ordy and (ivld or xfer_underrun_error);
+  irdy                           <= ordy;
 
 end rtl;

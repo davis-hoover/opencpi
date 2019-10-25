@@ -299,7 +299,6 @@ end component set_clr;
 
 component data_narrower is
   generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0;
     BITS_PACKED_INTO_LSBS    : boolean := false);
   port(
     -- CTRL
@@ -318,8 +317,6 @@ component data_narrower is
 end component;
 
 component dac_underrun_detector is
-  generic(
-    DATA_PIPE_LATENCY_CYCLES : natural := 0);
   port(
     -- CTRL
     clk       : in  std_logic;

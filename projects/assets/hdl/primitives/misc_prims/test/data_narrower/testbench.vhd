@@ -11,7 +11,6 @@ begin
     generic map(
       DATA_SRC_OUTPUT_CONTINUOUS => true,
       FILENAME                   => "uut_subtest_0_data.txt",
-      DATA_PIPE_LATENCY_CYCLES   => 0,
       BITS_PACKED_INTO_LSBS      => false)
     port map(
       backpressure_select        => NO_BP, --no backpressure expected from DAC
@@ -21,7 +20,6 @@ begin
     generic map(
       DATA_SRC_OUTPUT_CONTINUOUS => false,
       FILENAME                   => "uut_subtest_1_data.txt",
-      DATA_PIPE_LATENCY_CYCLES   => 0,
       BITS_PACKED_INTO_LSBS      => false)
     port map(
       backpressure_select        => NO_BP, --no backpressure expected from DAC
@@ -31,7 +29,6 @@ begin
     generic map(
       DATA_SRC_OUTPUT_CONTINUOUS => true,
       FILENAME                 => "uut_subtest_2_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0,
       BITS_PACKED_INTO_LSBS    => true)
     port map(
       backpressure_select      => NO_BP, --no backpressure expected from DAC
@@ -41,7 +38,6 @@ begin
     generic map(
       DATA_SRC_OUTPUT_CONTINUOUS => false,
       FILENAME                 => "uut_subtest_3_data.txt",
-      DATA_PIPE_LATENCY_CYCLES => 0,
       BITS_PACKED_INTO_LSBS    => true)
     port map(
       backpressure_select      => NO_BP, --no backpressure expected from DAC

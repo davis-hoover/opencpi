@@ -69,8 +69,6 @@ begin
   dac_underrun_detector_idata.q <= std_logic_vector(cnt);
   
   dac_underrun_detector : misc_prims.misc_prims.dac_underrun_detector
-    generic map(
-      DATA_PIPE_LATENCY_CYCLES => 0)
     port map(
       -- CTRL
       clk       => clk,
