@@ -38,8 +38,8 @@ with open(sys.argv[1], 'rb') as f:
 with open(sys.argv[2], 'rb') as f:
     odata = np.fromfile(f, dtype=dt)
 
-print("src_clk frequency: " + os.environ.get("OCPI_TEST_sim_src_clk_hz"))
-print("dst_clk frequency: " + os.environ.get("OCPI_TEST_sim_dst_clk_hz"))
+print("src_clk frequency: " + os.environ.get("OCPI_TEST_src_clk_hz"))
+print("dst_clk frequency: " + os.environ.get("OCPI_TEST_dst_clk_hz"))
 print(odata)
 print(goldendata)
 
@@ -51,20 +51,11 @@ if len(odata) != len(goldendata):
 else:
     print("    Golden and output file lengths match")
 
-if (os.environ.get("OCPI_TEST_simulation") == "true"):
-    if np.array_equal(goldendata, odata):
-        print("    Golden and output file match")
-    else:
-        print("    Golden and output file do not match")
-        sys.exit(1)
-
-if (os.environ.get("OCPI_TEST_simulation") == "false"):
-    print("source to destiantion ratio: " + os.environ.get("OCPI_TEST_hw_src_dst_clk_ratio"))
-    correlation = np.corrcoef(odata,goldendata)[1,0]
-    print("correlation: " + str(correlation))
-    if (correlation >= 0.7):
-        print("    Output data and golden data correlation is greater than or equal to 70%")
-    else:
-        print("    Output data and golden data correlation is less than 70%")
-        print("    Correlation: " + str(correlation))
-        sys.exit(1)
+correlation = np.corrcoef(odata,goldendata)[1,0]
+print("    Correlation: " + str(correlation))
+if (correlation >= 0.7):
+    print("    Output data and golden data correlation is greater than or equal to 70%")
+else:
+    print("    Output data and golden data correlation is less than 70%")
+    print("    Correlation: " + str(correlation))
+    sys.exit(1)

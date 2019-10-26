@@ -22,10 +22,9 @@ library misc_prims; use misc_prims.misc_prims.all;
 
 architecture rtl of worker is
 
-  constant c_sim_src_clk_hz : real := from_float(sim_src_clk_hz);
-  constant c_sim_dst_clk_hz : real := from_float(sim_dst_clk_hz);
-  constant c_hw_src_dst_clk_ratio : real := from_float(hw_src_dst_clk_ratio);
-  constant c_src_dst_ratio : real := src_dst_ratio(c_sim_src_clk_hz, c_sim_dst_clk_hz, simulation, c_hw_src_dst_clk_ratio);
+  constant c_src_clk_hz : real := from_float(src_clk_hz);
+  constant c_dst_clk_hz : real := from_float(dst_clk_hz);
+  constant c_src_dst_ratio : real := c_src_clk_hz/c_dst_clk_hz;
   constant c_num_output_samples : natural := calc_cdc_count_up_dst_fifo_depth(c_src_dst_ratio, to_integer(num_input_samples));
   constant c_fifo_depth : natural := 2**width_for_max(c_num_output_samples -1);
   constant c_count_up_width : positive := width_for_max(to_integer(num_input_samples)-1);
@@ -48,25 +47,21 @@ architecture rtl of worker is
   signal s_count_up_fifo_dout : std_logic_vector(c_count_up_width-1 downto 0) := (others => '0');
 
   begin
+ 
+   gen_clk : entity work.gen_clk
+       generic map (src_clk_hz => c_src_clk_hz,
+                    dst_clk_hz => c_dst_clk_hz)
+       port map (
+               ctl_clk => ctl_in.clk,
+               ctl_rst => ctl_in.reset,
+               src_clk => s_src_clk,
+               src_rst => s_src_rst,
+               dst_clk => s_dst_clk,
+               dst_rst => s_dst_rst);
 
-  gen_clk : misc_prims.misc_prims.gen_clk
-      generic map (sim_src_clk_hz => c_sim_src_clk_hz,
-                   sim_dst_clk_hz => c_sim_dst_clk_hz,
-                   simulation => simulation,
-                   hw_src_dst_clk_ratio => c_hw_src_dst_clk_ratio)
-      port map (
-              ctl_clk => ctl_in.clk,
-              ctl_rst => ctl_in.reset,
-              src_clk => s_src_clk,
-              src_rst => s_src_rst,
-              dst_clk => s_dst_clk,
-              dst_rst => s_dst_rst);
-
-  gen_reset_sync : misc_prims.misc_prims.gen_reset_sync
-      generic map (sim_src_clk_hz => c_sim_src_clk_hz,
-                   sim_dst_clk_hz => c_sim_dst_clk_hz,
-                   simulation => simulation,
-                   hw_src_dst_clk_ratio => c_hw_src_dst_clk_ratio)
+   gen_reset_sync : misc_prims.misc_prims.gen_reset_sync
+      generic map (src_clk_hz => c_src_clk_hz,
+                   dst_clk_hz => c_dst_clk_hz)
       port map (
               src_clk => s_src_clk,
               src_rst => s_src_rst,
@@ -90,9 +85,9 @@ architecture rtl of worker is
                 dst_rst => s_dst_rst,
                 dst_out => s_count_up_dst_out);
 
-    s_data_gen_en <= s_advance and not s_synced_dst_to_scr_rst when (c_src_dst_ratio >= 1.0) else s_advance and not s_src_rst;
+    s_data_gen_en <= s_advance and not s_synced_dst_to_scr_rst when (c_src_clk_hz >= c_dst_clk_hz) else s_advance and not s_src_rst;
 
-    s_one_shot_fifo_en <= not s_dst_rst when (c_src_dst_ratio > 1.0) else not s_synced_src_to_dst_rst;
+    s_one_shot_fifo_en <= not s_dst_rst when (c_src_clk_hz > c_dst_clk_hz) else not s_synced_src_to_dst_rst;
 
     one_shot_fifo : misc_prims.misc_prims.one_shot_fifo
      generic map(

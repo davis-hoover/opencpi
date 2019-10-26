@@ -1,28 +1,15 @@
 <ComponentSpec>
 
 
- <Property Name="sim_src_clk_hz" Type="float"
+ <Property Name="src_clk_hz" Type="float"
                              Parameter="true"
                              Default="100000000.0"
-                             Description="Sim source clock frequency"/>
+                             Description="Source clock frequency"/>
 
-  <Property Name="sim_dst_clk_hz" Type="float"
+  <Property Name="dst_clk_hz" Type="float"
                               Parameter="true"
                               Default="100000000.0"
-                              Description="Sim destination clock frequency"/>
-
-
-  <Property Name="hw_src_dst_clk_ratio" Type="float"
-                              Parameter="true"
-                              Default="1.0"
-                              Description="Source clock frequency to destination clock frequency ratio. Used when
-                                           generating clocks for hardware."/>
-
-   <Property Name="simulation" Type="bool"
-                               Parameter="true"
-                               Default="false"
-                               Description="True - Generate circuits for simulation.
-                                            False - Generate circuits for hardware."/>
+                              Description="Destination clock frequency"/>
 
   <Port Name="out" Producer="true"/>
 

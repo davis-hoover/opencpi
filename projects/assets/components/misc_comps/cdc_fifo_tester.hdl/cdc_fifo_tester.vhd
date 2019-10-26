@@ -23,20 +23,9 @@ library misc_prims; use misc_prims.misc_prims.all;
 -- TODO: Replace four_bit_lfsr with a generic lfsr
 architecture rtl of worker is
 
-  component mmcm_100_to_50_and_25
-    port(
-      clk_in1           : in     std_logic;
-      clk_out1          : out    std_logic;
-      clk_out2          : out    std_logic;
-      reset             : in     std_logic;
-      locked            : out    std_logic);
-  end component;
-
-
-  constant c_sim_src_clk_hz : real := from_float(sim_src_clk_hz);
-  constant c_sim_dst_clk_hz : real := from_float(sim_dst_clk_hz);
-  constant c_hw_src_dst_clk_ratio : real := from_float(hw_src_dst_clk_ratio);
-  constant c_src_dst_ratio : real := src_dst_ratio(c_sim_src_clk_hz, c_sim_dst_clk_hz, simulation, c_hw_src_dst_clk_ratio);
+  constant c_src_clk_hz : real := from_float(src_clk_hz);
+  constant c_dst_clk_hz : real := from_float(dst_clk_hz);
+  constant c_src_dst_ratio : real := c_src_clk_hz/c_dst_clk_hz;
   constant c_cdc_fifo_depth : natural := 2**width_for_max(calc_cdc_fifo_depth(c_src_dst_ratio)-1);
   constant c_lfsr_width : natural := 4;
 
@@ -52,46 +41,19 @@ architecture rtl of worker is
   signal s_dst_counter : unsigned(width_for_max(to_integer(num_input_samples) -1) downto 0) := (others => '0');
   signal s_fifo_data_gen_out : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
   signal s_fifo_dst_out : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
-  signal s_clk_out1 : std_logic;
-  signal s_clk_out2 : std_logic;
-  signal s_locked : std_logic;
-  signal s_not_locked : std_logic;
-
+ 
   begin
-    s_src_clk <= ctl_in.clk;
-    s_not_locked <= not s_locked;
-    inst_mmcm_100_to_50_and_25 : component mmcm_100_to_50_and_25
-     port map (
-      clk_in1 => ctl_in.clk,
-      clk_out1 => s_dst_clk,
-      clk_out2 => open,
-      reset => ctl_in.reset,
-      locked => s_locked);
-
-      reset_sync_s_not_locked_to_dst : cdc.cdc.reset
-        port map   (
-          src_rst   => s_not_locked,
-          dst_clk   => s_dst_clk,
-          dst_rst   => s_dst_rst);
-
-      reset_sync_s_not_locked_to_src : cdc.cdc.reset
-        port map   (
-          src_rst   => s_not_locked,
-          dst_clk   => s_src_clk,
-          dst_rst   => s_src_rst);
-
-  -- gen_clk : misc_prims.misc_prims.gen_clk
-  --     generic map (sim_src_clk_hz => c_sim_src_clk_hz,
-  --                  sim_dst_clk_hz => c_sim_dst_clk_hz,
-  --                  simulation => simulation,
-  --                  hw_src_dst_clk_ratio => c_hw_src_dst_clk_ratio)
-  --     port map (
-  --             ctl_clk => ctl_in.clk,
-  --             ctl_rst => ctl_in.reset,
-  --             src_clk => s_src_clk,
-  --             src_rst => s_src_rst,
-  --             dst_clk => s_dst_clk,
-  --             dst_rst => s_dst_rst);
+    
+   gen_clk : entity work.gen_clk
+       generic map (src_clk_hz => c_src_clk_hz,
+                    dst_clk_hz => c_dst_clk_hz)
+       port map (
+               ctl_clk => ctl_in.clk,
+               ctl_rst => ctl_in.reset,
+               src_clk => s_src_clk,
+               src_rst => s_src_rst,
+               dst_clk => s_dst_clk,
+               dst_rst => s_dst_rst);
 
     out_out.clk <= s_dst_clk;
 

@@ -93,7 +93,6 @@ function calc_cdc_bit_dst_fifo_depth (src_dst_ratio : in real; num_input_samples
 function calc_cdc_fifo_depth (src_dst_ratio : in real) return natural;
 function calc_cdc_pulse_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
 function calc_cdc_count_up_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
-function src_dst_ratio (sim_src_clk_hz : in real; sim_dst_clk_hz : in real; simulation : in std_logic; hw_src_dst_clk_ratio: in real) return real;
 
 type adc_samp_drop_detector_status_t is record
   error_samp_drop : std_logic;
@@ -284,10 +283,8 @@ component set_clr
 end component set_clr;
 
 component gen_reset_sync
-generic (sim_src_clk_hz : real := 100000000.0;
-         sim_dst_clk_hz : real := 100000000.0;
-         simulation : std_logic := '1';
-         hw_src_dst_clk_ratio : real := 1.0);
+generic (src_clk_hz : real := 100000000.0;
+         dst_clk_hz : real := 100000000.0);
   port(
     src_clk                   : in  std_logic;
     src_rst                   : in  std_logic;

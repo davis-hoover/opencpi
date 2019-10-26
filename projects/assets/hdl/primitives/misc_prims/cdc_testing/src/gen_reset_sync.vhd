@@ -22,10 +22,8 @@ library cdc;
 library misc_prims; use misc_prims.misc_prims.all;
 
 entity gen_reset_sync is
-    generic (sim_src_clk_hz : real := 100000000.0;
-             sim_dst_clk_hz : real := 100000000.0;
-             simulation : std_logic := '1';
-             hw_src_dst_clk_ratio : real := 1.0);
+    generic (src_clk_hz : real := 100000000.0;
+             dst_clk_hz : real := 100000000.0);
     port (
         src_clk                   : in  std_logic;
         src_rst                   : in  std_logic;
@@ -38,23 +36,24 @@ end entity gen_reset_sync;
 
 architecture rtl of gen_reset_sync is
 
-constant c_src_dst_ratio : real := src_dst_ratio(sim_src_clk_hz, sim_dst_clk_hz, simulation, hw_src_dst_clk_ratio);
+constant c_src_dst_ratio : natural := natural(ceil(src_clk_hz/dst_clk_hz));
+constant c_dst_src_ratio : natural := natural(ceil(dst_clk_hz/src_clk_hz));
 
 begin
 
- gen_sync_rst_dst_to_src : if (c_src_dst_ratio >= 1.0) generate
+ gen_sync_rst_dst_to_src : if (src_clk_hz >= dst_clk_hz) generate
    -- faster or same clock frequency source needs to wait until slow or same
    -- clock frequency destination has come out of reset
-   gen_fast_to_slow : if (c_src_dst_ratio > 1.0) generate
+   gen_fast_to_slow : if (src_clk_hz > dst_clk_hz) generate
      reset_sync_dst_to_src : cdc.cdc.reset
-       generic map (RST_DELAY => natural(ceil(c_src_dst_ratio)))
+       generic map (RST_DELAY => c_src_dst_ratio)
        port map   (
          src_rst   => dst_rst,
          dst_clk   => src_clk,
          dst_rst   => synced_dst_to_scr_rst);
    end generate gen_fast_to_slow;
 
-   gen_equal_clk : if (c_src_dst_ratio = 1.0) generate
+   gen_equal_clk : if (src_clk_hz = dst_clk_hz) generate
      reset_sync_dst_to_src : cdc.cdc.reset
        generic map (RST_DELAY => 2)
        port map   (
@@ -65,19 +64,19 @@ begin
 
  end generate gen_sync_rst_dst_to_src;
 
- gen_sync_rst_src_to_dst : if (c_src_dst_ratio <= 1.0) generate
+ gen_sync_rst_src_to_dst : if (src_clk_hz <= dst_clk_hz) generate
  -- faster or same clock frequency destination needs to wait until slow or same
  -- clock frequency source has come out of reset
-   gen_slow_to_fast : if (c_src_dst_ratio < 1.0) generate
+   gen_slow_to_fast : if (src_clk_hz < dst_clk_hz) generate
      reset_sync_src_to_dst : cdc.cdc.reset
-       generic map (RST_DELAY => natural(ceil(1.0/c_src_dst_ratio)))
+       generic map (RST_DELAY => c_dst_src_ratio)
        port map   (
          src_rst   => src_rst,
          dst_clk   => dst_clk,
          dst_rst   => synced_src_to_dst_rst);
    end generate gen_slow_to_fast;
 
-   gen_equal_clk : if (c_src_dst_ratio = 1.0) generate
+   gen_equal_clk : if (src_clk_hz = dst_clk_hz) generate
      reset_sync_src_to_dst : cdc.cdc.reset
        generic map (RST_DELAY => 2)
        port map   (

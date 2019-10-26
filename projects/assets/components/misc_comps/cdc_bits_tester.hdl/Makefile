@@ -16,4 +16,25 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
+
+# "xilinx" covers xsim, zynq, etc.
+OnlyTargets=xilinx
+
+# For vivado we use vivado stubs with netlists
+# For xsim we use simulation netlists
+SourceFiles=\
+  gen_clk.vhd \
+  $(if $(filter xsim,$(HdlToolSet)),\
+      ./vivado_ip/mmcm_100_to_50_and_25_sim_netlist.vhd)
+
+# For vivado we use vivado stubs with netlists
+# For xsim we use simulation netlists
+Cores=\
+  $(if $(filter vivado,$(HdlToolSet)),\
+      ./vivado_ip/mmcm_100_to_50_and_25.dcp)
+      
 include $(OCPI_CDK_DIR)/include/worker.mk
+
+

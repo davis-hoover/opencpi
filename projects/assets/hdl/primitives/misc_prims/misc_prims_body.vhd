@@ -132,20 +132,4 @@ function calc_cdc_count_up_dst_fifo_depth (
     return result;
 end calc_cdc_count_up_dst_fifo_depth;
 
-function src_dst_ratio (
-    constant sim_src_clk_hz  : in real;
-    constant sim_dst_clk_hz  : in real;
-    constant simulation  : in std_logic;
-    constant hw_src_dst_clk_ratio : in real)
-    return real is
-    variable result : real;
-  begin
-    if (simulation = '1') then
-      result := sim_src_clk_hz/sim_dst_clk_hz;
-    else
-      result := hw_src_dst_clk_ratio;
-    end if;
-  return result;
-end src_dst_ratio;
-
 end misc_prims;

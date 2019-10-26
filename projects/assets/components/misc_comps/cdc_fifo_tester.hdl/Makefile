@@ -25,6 +25,7 @@ OnlyTargets=xilinx
 # For vivado we use vivado stubs with netlists
 # For xsim we use simulation netlists
 SourceFiles=\
+  gen_clk.vhd \
   $(if $(filter xsim,$(HdlToolSet)),\
       ./vivado_ip/mmcm_100_to_50_and_25_sim_netlist.vhd)
 
