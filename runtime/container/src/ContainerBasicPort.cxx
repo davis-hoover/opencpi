@@ -532,7 +532,7 @@ namespace OCPI {
 	      ocpiInfo("Rejecting output transport %s since %s was specified for the connection",
 		       ot.transport.c_str(), sConn.c_str());
 	    else if (roleOut != OR::NoRole && !((1 << roleOut) & ot.optionsOut))
-	      ocpiInfo("Rejecting input role %s for transport %s: container doesn't support it",
+	      ocpiInfo("Rejecting output role %s for transport %s: container doesn't support it",
 		       roleNames[roleOut], ot.transport.c_str());
 	    else {
 	      // Everything matches, negotiate roles

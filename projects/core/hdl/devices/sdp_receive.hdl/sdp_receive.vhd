@@ -280,7 +280,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   cpulse: component bsv.bsv.SyncPulse
     port map  (sCLK         => ctl_in.clk,
                sRST         => ctl_reset_n,
-               dCLK         => ctl_in.clk,
+               dCLK         => sdp_in.clk,
                sEN          => md_deq,
                dPulse       => buffer_consumed);
   --------------------------------------------------------------------------------
