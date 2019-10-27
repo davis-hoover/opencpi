@@ -47,7 +47,7 @@ begin
     generic map(width_in         => to_integer(width_in),
                 width_out        => width_out_c)
        port map(clk              => in_in.clk,
-                reset            => wci_reset,
+                reset            => in_reset,
                 in_som           => in_in.som,
                 in_valid         => in_in.valid,
                 in_eom           => in_in.eom,
