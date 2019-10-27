@@ -62,6 +62,8 @@ entity master is
     input_eof        : in  Bool_t;   -- an EOF is pending from (the first) input port
     buffer_size      : in  UShort_t; -- the buffer size property
     latency          : out UShort_t; -- the measured latency
+    messages         : out ULong_t;  -- the message count
+    bytes            : out ULong_t;  -- the byte count
     --====== Signals to and from the worker=====
     -- only used if abortable
     abort            : in  Bool_t; -- message is aborted
@@ -97,6 +99,8 @@ architecture rtl of master is
   signal opcode_now   : std_logic_vector(opcode'range);
   signal opcode_r     : std_logic_vector(opcode'range);
   signal latency_r    : unsigned(width_for_max(max_latency)-1 downto 0);
+  signal messages_r   : ulong_t;
+  signal bytes_r      : ulong_t;
   signal first_data_r : Bool_t; -- measuring latency
   signal last_data_r  : Bool_t; -- the last possible word in a message has been given.
   -- counter to check output length or insert eom automatically
@@ -113,6 +117,14 @@ begin
   reset   <= reset_i;
   ready   <= ready_r;
   latency <= resize(latency_r,latency'length);
+  gen_debug: if debug generate -- these will have no drivers
+     messages <= messages_r;
+     bytes    <= bytes_r;
+  end generate gen_debug;
+  gen_ndebug: if not debug generate -- these will have no drivers
+     messages <= (others => '0');
+     bytes    <= (others => '0');
+  end generate gen_ndebug;
   -- FIXME WHEN OWN CLOCK
   -- internal conveniences
   -- Version 2 allows valid only, and allows valid as well as give to lead ready, like AXI
@@ -124,7 +136,7 @@ begin
                         (eof and state_r = BEFORE_SOM_E) or
                         (eom and not its(eof_zlm)));
   -- A condition where we are not passing through to OCP, an early SOM without valid
-  early_som  <= som and not valid and not eom;
+  early_som  <= som and not valid and not eom and not eof;
   -- A condition where we are not passing through to OCP, an EOF ZLM
   eof_zlm    <= to_bool(hdl_version <= 1 and eom and not its(valid) and
                         opcode_now = slv0(opcode_now'length) and
@@ -164,6 +176,9 @@ begin
     procedure do_data is
     begin
       state_r <= AFTER_SOM_e;
+      if debug then
+        bytes_r  <= bytes_r + n_bytes;
+      end if;
       if its(last_data_r) then
         report "Output message, " & integer'image(to_integer(data_count_r)) &
           ", has exceeded the maximum size";
@@ -201,6 +216,10 @@ begin
         ready_r      <= bfalse;
         opcode_r     <= (others => '0'); -- perhaps unnecessary, but supresses a warning
         latency_r    <= (others => '0');
+        if debug then
+          messages_r   <= (others => '0');
+          bytes_r      <= (others => '0');
+        end if;
         first_data_r <= bfalse;
         last_data_r  <= bfalse;
         data_count_r <= (others => '0');
@@ -211,6 +230,9 @@ begin
           first_data_r <= btrue;
         end if;
         if its(ready_r) then
+          if ocp_give and ocp_eom and debug then
+            messages_r <= messages_r + 1;
+          end if;
           input_eof_r <= input_eof;
           if my_give and not its(som or valid or eom or abort or eof) then
             report "Illegal message metadata: no SOM or VALID or EOM" severity failure;

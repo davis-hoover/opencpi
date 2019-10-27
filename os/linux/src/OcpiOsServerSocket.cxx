@@ -135,7 +135,7 @@ getPortNo() throw (std::string) {
   int ret = ::getsockname (o2fd (m_osOpaque), (struct sockaddr *) &sin, &len);
 
   if (ret != 0 || len != sizeof (sin)) {
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "getsockname");
   }
 
   return ntohs (sin.sin_port);
@@ -192,7 +192,7 @@ ServerSocket::wait (long msecs)
   ocpiDebug("Server Socket %p waiting, res: %d errno: %d", this, res, errno);
 
   if (res < 0) {
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "select");
   }
 
   if (res == 0) {
@@ -227,7 +227,7 @@ ServerSocket::close ()
   ocpiAssert (o2fd (m_osOpaque) != -1);
 
   if (::close (o2fd (m_osOpaque))) {
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "server socket close");
   }
 
   o2fd (m_osOpaque) = -1;
@@ -240,7 +240,7 @@ sendmsg (const void * iovect, int flags  ) throw (std::string) {
   const struct msghdr * iov = static_cast<const struct msghdr *>(iovect);
   ssize_t ret = ::sendmsg (o2fd (m_osOpaque), iov, flags);
   if (ret == -1)
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "sendmsg");
   return static_cast<size_t>(ret);
 }
 
@@ -250,7 +250,7 @@ sendto (const char * data, size_t amount, int flags,  char * src_addr, size_t ad
   struct sockaddr * si_other = reinterpret_cast< struct sockaddr *>(src_addr);
   ssize_t ret = ::sendto (o2fd (m_osOpaque), data, amount, flags, si_other, (socklen_t)addrlen );
   if (ret == -1)
-    throw Posix::getErrorMessage(errno);
+    throw Posix::getErrorMessage(errno, "sentto");
   return static_cast<size_t>(ret);
 }
 
@@ -263,7 +263,7 @@ recvfrom(char  *buf, size_t amount, int flags,
     tv.tv_usec = (timeoutms % 1000) * 1000;
     ocpiDebug("[ServerSocket::recvfrom] Setting socket timeout to %u ms", timeoutms);
     if (setsockopt(o2fd (m_osOpaque), SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) != 0)
-      throw Posix::getErrorMessage (errno);
+      throw Posix::getErrorMessage (errno, "setsockopt/recvfrom");
     m_timeoutms = timeoutms;
   }
   struct sockaddr * si_other = reinterpret_cast< struct sockaddr *>(src_addr);
@@ -271,7 +271,7 @@ recvfrom(char  *buf, size_t amount, int flags,
   ret= ::recvfrom (o2fd (m_osOpaque), buf, amount, flags, si_other, (socklen_t*)addrlen);
   if (ret == -1) {
     if (errno != EAGAIN && errno != EINTR)
-      throw Posix::getErrorMessage(errno);
+      throw Posix::getErrorMessage(errno, "recvfrom");
     return 0;
   }
   return static_cast<size_t> (ret);

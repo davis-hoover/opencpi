@@ -79,10 +79,11 @@ elif test -f vsim.wlf; then
   exec $OCPI_MODELSIM_DIR/bin/vsim -view vsim.wlf
 elif test -f xsim.wdb; then
   setVarsFromMake $OCPI_CDK_DIR/include/hdl/xilinx.mk ShellIseVars=1 $verbose
-  [ -z "$OcpiXilinxVivadoDir" -o -z "$OcpiXilinxLicenseFile" ] && {
+  [ -z "$OcpiXilinxVivadoDir" ] && {
     echo Could not find the Xilinx Vivado tools directory or license file. >&2
     exit 1
   }
+  [ -z "$OcpiXilinxLicenseFile" ] && echo Warning: No Xilinx license file found, which is ok if this is a Vivado WebPack license. >&2 || :
   set -e
   . $OcpiXilinxVivadoDir/.settings64-Vivado.sh > /dev/null
   export LM_LICENSE_FILE=$OcpiXilinxLicenseFile

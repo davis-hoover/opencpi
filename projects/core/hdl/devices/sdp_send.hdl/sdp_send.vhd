@@ -77,7 +77,7 @@ architecture rtl of worker is
   signal buffer_maxed_r    : bool_t;         -- last buffer offset addressed last word in buffer
   signal buffer_index_r    : buffer_count_t;
   signal buffer_addr_r     : bram_addr_t;    -- base of current buffer
-  signal buffer_avail_r    : buffer_count_t; -- how local many buffers are empty?
+  signal buffer_avail_r    : buffer_count_t; -- how local many buffers are empty OR BEING FILLED
   signal buffer_consumed   : bool_t;         -- pulse for buffer consumption from sdp side
   ---- Metadata management
   signal md_in             : metadata_t;
@@ -124,10 +124,9 @@ architecture rtl of worker is
   signal doorbell_fault_r    : bool_t;
   signal truncation_fault_r  : bool_t;
   signal operating_r         : bool_t; -- were we operating in the last cycle?
-  signal messageCount        : ulong_t;
+  signal messageCount_r      : ulong_t;
   signal truncatedMessage_r  : ulong_t; -- first one
   signal truncatedData       : bool_t; -- first one
-  signal ctl_reset_n         : std_logic;
   signal sdp_reset_n         : std_logic;
   signal taking              : bool_t;
   function be2bytes (be : std_logic_vector) return unsigned is
@@ -140,7 +139,6 @@ architecture rtl of worker is
     return to_unsigned(be'length, nbytes_width_c);
   end be2bytes;
 begin
-  ctl_reset_n        <= not ctl_in.reset;
   bram_addr          <= buffer_addr_r + buffer_offset_r;
   bram_addr_actual   <= bram_addr(addr_width_c-1 downto 0);
   next_buffer_addr   <= buffer_addr_r +
@@ -157,6 +155,7 @@ begin
   in_out.clk         <= sdp_in.clk;
   ctl_out.finished   <= buffer_size_fault_r or doorbell_fault_r;
   props_out.faults(props_out.faults'length-1 downto 3) <= (others => '0');
+  props_out.local_buffers_ready <= (others => '0'); -- do not support passive yet
   props_out.sdp_id   <= resize(sdp_in.id, props_out.sdp_id'length);
   nbytes             <= be2bytes(in_in.byte_enable) when its(in_in.valid) else (others => '0');
   md_in.length       <= (resize(buffer_offset_r, meta_length_width_c) sll addr_shift_c) + nbytes;
@@ -206,7 +205,7 @@ begin
 
   -- Instance the message data BRAM
   -- Since the BRAM is single cycle, there is no handshake.
-  -- note this has different clocks on both ports which we do not need
+  -- note this primitive has different clocks on both ports which we do not need
   bram : component util.util.BRAM2
     generic map(PIPELINED  => 0,
                 ADDR_WIDTH => addr_width_c,
@@ -300,7 +299,7 @@ begin
         doorbell_fault_r    <= bfalse;
         truncation_fault_r  <= bfalse;
         truncatedMessage_r  <= (others => '0');
-        messageCount        <= (others => '0');
+        messageCount_r      <= (others => '0');
         eof_sent_r          <= bfalse;
       elsif not operating_r then
         -- initialization on first transition to operating.  poor man's "start".
@@ -313,12 +312,12 @@ begin
         buffer_avail_r <= resize(props_in.buffer_count, buffer_avail_r'length);
       elsif not sdp_is_operating then
         operating_r <= bfalse;
-      else
+      else -- we are operating
         if its(md_enq) then
           if its(in_in.eof) then
             eof_sent_r <= btrue;
           else
-            messageCount <= messageCount + 1;
+            messageCount_r <= messageCount_r + 1;
           end if;
         end if;
         if md_enq and not its(buffer_consumed) then
@@ -334,7 +333,7 @@ begin
           if its(in_in.valid) then
             if its(buffer_maxed_r) then
               if not truncation_fault_r then
-                truncatedMessage_r <= messageCount;
+                truncatedMessage_r <= messageCount_r;
               end if;
               truncation_fault_r <= '1';
             elsif buffer_offset_r = max_offset and not its(in_in.eom) then
@@ -439,9 +438,10 @@ g0: for i in 0 to sdp_width_c-1 generate
     -- Enter the flag phase
     procedure begin_flag(flag : dword_t) is
     begin
-      sdp_segment_count_r   <= (others => '0');
       sdp_remote_phase_r    <= flag_e;
       sdp_out_r(flag'range) <= flag;
+      sdp_out_valid_r       <= btrue;
+      begin_segment(to_unsigned(1, meta_dw_count_t'length));
       -- Advance the buffer pointer here (not in flag_e) to pipeline the bram address
       if r = sdp_last_remote then
         if sdp_msg_idx_r = props_in.buffer_count - 1 then
@@ -455,16 +455,15 @@ g0: for i in 0 to sdp_width_c-1 generate
       variable meta :std_logic_vector(55 downto 0)
         := slv(slv(md_out.truncate),8) & slv(slv(md_out.eof),8) & md_out.opcode &
         std_logic_vector(resize(md_out.length, 32));
-      variable metaflag : metadata_t;
     begin
       if props_in.readsAllowed(0) = '1' then
         begin_flag(meta2slv(md_out));
       else
-        sdp_out_r <= std_logic_vector(meta(sdp_out_r'range));
         sdp_remote_phase_r <= meta_e;
+        sdp_out_r          <= std_logic_vector(meta(sdp_out_r'range));
+        sdp_out_valid_r    <= btrue;
         begin_segment(to_unsigned(sdp_meta_ndws_c, meta_dw_count_t'length));
       end if;
-      sdp_out_valid_r    <= btrue;
     end procedure begin_meta;
     -- initialization for sending the current message to the indicated remote
     procedure begin_remote is
@@ -512,9 +511,7 @@ g0: for i in 0 to sdp_width_c-1 generate
     if rising_edge(sdp_in.clk) then
       r              := to_integer(sdp_remote_idx_r);
       started_remote := false;
-      -- FIXME deal properly with the potential of a separate CDP clk
-      -- THe control clock should reset this state, but it might not be the same as the SDP clk.
-      if its(ctl_in.reset) then
+      if its(sdp_reset) then
         -- Reset state for remotes
         for rr in 0 to max_remotes_c - 1 loop
           sdp_remotes(rr).index <= (others => '0');
@@ -553,7 +550,7 @@ g0: for i in 0 to sdp_width_c-1 generate
                   bramb_addr_r    <= bramb_addr + 1;
                   sdp_out_valid_r <= bfalse;
                 when meta_e => -- must be single word width
-                  sdp_out_r <= "00000000" & slv(slv(md_out.truncate), 8) &
+                  sdp_out_r <= "00000001" & slv(slv(md_out.truncate), 8) &
                                slv(slv(md_out.eof), 8) & md_out.opcode;
                   sdp_out_valid_r <= btrue;
                 when others => null;
