@@ -100,6 +100,7 @@ begin
   props_out.UUID              <= metadata_in.UUID;
   props_out.romData           <= metadata_in.romData;
   props_out.sdpDropCount      <= sdp_in.dropCount;
+  props_out.slotCardIsPresent <= (others => '0');
   metadata_out.clk            <= ctl_clk;
   metadata_out.romAddr        <= props_in.romAddr;
   metadata_out.romEn          <= props_in.romData_read;
