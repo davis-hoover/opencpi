@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.presentation">
- <office:meta><dc:creator>Lisa Zahn</dc:creator><meta:editing-cycles>1311</meta:editing-cycles><meta:print-date>2016-01-21T15:04:33</meta:print-date><meta:creation-date>2010-11-02T20:14:14</meta:creation-date><dc:date>2019-10-26T12:24:25.892331742</dc:date><meta:editing-duration>P108DT8H55M18S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:document-statistic meta:object-count="169"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/></office:meta>
+ <office:meta><dc:creator>Lisa Zahn</dc:creator><meta:editing-cycles>1314</meta:editing-cycles><meta:print-date>2016-01-21T15:04:33</meta:print-date><meta:creation-date>2010-11-02T20:14:14</meta:creation-date><dc:date>2019-10-27T16:04:00.801957462</dc:date><meta:editing-duration>P108DT8H55M53S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:document-statistic meta:object-count="169"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
    <config:config-item config:name="VisibleAreaTop" config:type="int">-698</config:config-item>
@@ -29,15 +29,15 @@
      <config:config-item config:name="NoColors" config:type="boolean">true</config:config-item>
      <config:config-item config:name="RulerIsVisible" config:type="boolean">false</config:config-item>
      <config:config-item config:name="PageKind" config:type="short">0</config:config-item>
-     <config:config-item config:name="SelectedPage" config:type="short">15</config:config-item>
+     <config:config-item config:name="SelectedPage" config:type="short">0</config:config-item>
      <config:config-item config:name="IsLayerMode" config:type="boolean">false</config:config-item>
      <config:config-item config:name="IsDoubleClickTextEdit" config:type="boolean">true</config:config-item>
      <config:config-item config:name="IsClickChangeRotation" config:type="boolean">true</config:config-item>
      <config:config-item config:name="SlidesPerRow" config:type="short">4</config:config-item>
      <config:config-item config:name="EditMode" config:type="int">0</config:config-item>
-     <config:config-item config:name="VisibleAreaTop" config:type="int">-698</config:config-item>
-     <config:config-item config:name="VisibleAreaLeft" config:type="int">-2033</config:config-item>
-     <config:config-item config:name="VisibleAreaWidth" config:type="int">29710</config:config-item>
+     <config:config-item config:name="VisibleAreaTop" config:type="int">-273</config:config-item>
+     <config:config-item config:name="VisibleAreaLeft" config:type="int">-2003</config:config-item>
+     <config:config-item config:name="VisibleAreaWidth" config:type="int">29650</config:config-item>
      <config:config-item config:name="VisibleAreaHeight" config:type="int">19757</config:config-item>
      <config:config-item config:name="GridCoarseWidth" config:type="int">2540</config:config-item>
      <config:config-item config:name="GridCoarseHeight" config:type="int">2540</config:config-item>
@@ -1929,7 +1929,6 @@
    </draw:frame>
   </style:handout-master>
   <style:master-page style:name="Title_2b_Content_2b_Picture" style:display-name="Title+Content+Picture" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -3107,7 +3106,6 @@
    </presentation:notes>
   </style:master-page>
   <style:master-page style:name="Title_20_and_20_Content" style:display-name="Title and Content" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -4280,7 +4278,6 @@
    </presentation:notes>
   </style:master-page>
   <style:master-page style:name="Blank" style:page-layout-name="PM1" draw:style-name="dp1">
-   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <draw:line draw:name="Line 19" draw:style-name="gr3" draw:text-style-name="P5" draw:layer="backgroundobjects" svg:x1="0.723cm" svg:y1="18.37cm" svg:x2="25.4cm" svg:y2="18.37cm">
     <text:p/>
    </draw:line>
@@ -7164,7 +7161,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="Creating an Assembly with the IDE" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.395cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P18"><text:span text:style-name="T21">Creating an Assembly with the IDE</text:span></text:p>
@@ -8237,7 +8233,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Assembly OHAD Examples" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.395cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P18"><text:span text:style-name="T21">HDL Assembly OHAD Examples</text:span></text:p>
@@ -8810,7 +8805,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Assembly OHAD Examples 2" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.395cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P18"><text:span text:style-name="T21">HDL Assembly OHAD Examples</text:span></text:p>
@@ -10169,7 +10163,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Assembly OHAD Examples 3" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.395cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P18"><text:span text:style-name="T21">HDL Assembly OHAD Examples</text:span></text:p>
@@ -11186,7 +11179,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Assemby OHAD Examples 4" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.395cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P18"><text:span text:style-name="T21">HDL Assembly OHAD Examples</text:span></text:p>
@@ -12042,7 +12034,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Assembly Makefile" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Assembly Makefile</text:span></text:p>
@@ -12113,7 +12104,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Assemblies Makefile" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Assemblies Makefile</text:span></text:p>
@@ -12192,7 +12182,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Container" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Container</text:span></text:p>
@@ -13003,7 +12992,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Container 2" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Container</text:span></text:p>
@@ -14050,7 +14038,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Assemblies Build Process" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Assemblies Build Process</text:span></text:p>
@@ -14114,7 +14101,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Default Container" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Default Container</text:span></text:p>
@@ -14159,7 +14145,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Containers" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Containers</text:span></text:p>
@@ -18697,7 +18682,6 @@
     </presentation:notes>
    </draw:page>
    <draw:page draw:name="HDL Containers 2" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content">
-    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr6" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.33cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T13">HDL Containers</text:span></text:p>
