@@ -43,7 +43,7 @@ Comments:
 
 Naming:
     Files that will be placed in a user's path should be a single word starting with 'ocpi'
-        they should also include #!/usr/bin/env python3 at the top and omit the '.py' extension when
+        they should also include #!/usr/bin/env python3.4 at the top and omit the '.py' extension when
         exported, the source for this file should still have the correct extention
     Avoid single-character names under all circumstances
     Avoid two-character names in most circumstances

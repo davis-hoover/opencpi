@@ -48,7 +48,7 @@ export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
 PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
 export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/system.xml
-export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/lib/c++
+export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/lib/sdk/lib
 EOF
 . ./setup.sh
 platform=$OCPI_TOOL_PLATFORM
@@ -85,10 +85,14 @@ case $1 in
       if [ -n "$vg" ] ; then
 	  export PATH=$PATH:prerequisites/valgrind/$platform/bin
           export VALGRIND_LIB=prerequisites/valgrind/$platform/lib/valgrind
+	  ldso=$(shopt -s nullglob && echo /lib/ld-*.so)
+          sdk=$platform/lib/sdk/lib/$(basename $ldso)
+	  [ -f $ldso -a -f $sdk ] && cp $sdk $ldso
       fi
       echo PATH=$PATH >&2
-      echo nohup ${vg:+valgrind }ocpiserve -v $logopt -p $(<port) \> $log >&2
-      nohup ${vg:+valgrind }ocpiserve -v $logopt -p $(<port) > $log 2>&1 &
+      echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH >&2
+      echo nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(<port) \> $log >&2
+      nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(<port) > $log 2>&1 &
       pid=$!
       sleep 1
       if kill -s CONT $pid; then

@@ -90,7 +90,6 @@ architecture rtl of worker is
   signal trailing_eom  : std_logic; -- detect trailing eoms in order to handle them appropriately
   signal lone_som      : std_logic; -- detect early soms in order to handle them appropriately
   signal swm_live      : std_logic; -- detect swms as they occur
-
 -- key for how states are named:
 --
 -- es: early start of message
@@ -213,6 +212,8 @@ begin
             in_som   <= in_in.som;
             in_valid <= in_in.valid;
             in_eom <= in_in.eom;
+          elsif data_ready_for_out_port  and out_valid then
+            in_valid <= '0';
           end if;
 
 
@@ -267,10 +268,10 @@ begin
             (out_in.ready = '1' and EOF = '1')) then
             state <= end_le_a;
             output_state <= early_som;
-         elsif (swm_detected = '1' and out_ready = '1') then
-           state <= es_val_le_a;
-           output_state <= early_som;
-         elsif (take_en = '1' and uut_ready = '1') then
+         elsif (swm_detected = '1' and out_ready = '1') or
+--           (out_ready = '1' and output_state = nil) or - no good at EOF...
+--           (take_en = '1' and uut_ready = '1') then
+             uut_ready = '1' then
            state <= es_val_le_a;
            output_state <= early_som;
          elsif (out_ready = '1') then
@@ -279,6 +280,7 @@ begin
   -- send data and/or no-ops between early start of message and late end of message
        when es_val_le_a =>
          if (out_in.ready = '1' and EOF = '1' and in_valid = '0') or
+             (out_ready = '1' and in_eom = '1' and zlm_queued = '0' and output_state = valid) or
              (out_ready = '1' and in_valid = '0' and zlm_queued = '1') then
            output_state <= late_eom;
            state <= start_es_b;
@@ -287,7 +289,9 @@ begin
              ((swm_detected = '1' or swm_live = '1') and out_ready = '1') then
            output_state <= valid_buf;
            state <= end_le_a;
-        elsif (take_en = '1' and uut_ready = '1') then
+        elsif (take_en = '1' and uut_ready = '1') or
+          (out_ready = '1' and in_valid = '1' and output_state = early_som and deferred_take = '0') then
+--          (deferred_take = '0' and out_ready = '1' and in_valid = '1') then
            output_state <= valid;
         elsif (out_ready = '1') then
            output_state <= nil;
@@ -328,6 +332,7 @@ begin
          -- we enter this state with taken data and early_som
          if out_ready = '1' then
            if ((output_state = early_som and in_eom = '1') or
+               (output_state = nil and ready_for_in_port_data = '1' and in_ready and in_in.eom) or
                (output_state = valid and in_ready and in_in.eom)) then
              output_state <= val_eom;
              if (props_in.insert_nop = '1') then
@@ -408,7 +413,8 @@ begin
              (val_take or output_state /= nil)) then
            output_state <= valid_buf;
            state <= end_le_c;
-         elsif (swm_detected = '1' and out_ready = '1') then
+         elsif (swm_detected = '1' and out_ready = '1') or
+           (out_ready = '1' and in_eom = '1' and zlm_queued = '0' and output_state = valid) then
            output_state <= late_eom;
            state <= start_sv_d;
          elsif (take_en = '1' and uut_ready = '1' and swm_take = '0') then
@@ -461,7 +467,8 @@ begin
          end if;
   -- send data and/or no-ops and output end of message with data after start of message with data
        when val_ve_d =>
-         if (in_in.eom = '1' and uut_ready = '1' and output_state /= nil) then
+         if (in_in.eom = '1' and uut_ready = '1' and output_state /= nil) or
+           (ready_for_in_port_data = '1' and in_in.eom) then
              if (props_in.allow_zlms = '1') then
                if (props_in.insert_nop = '1') then
                  state <= nil_s;
@@ -643,7 +650,10 @@ begin
   in_ready  <= in_in.ready;
   uut_ready <= out_ready and in_ready;
   enable <= ctl_in.is_operating and out_in.ready and in_in.ready;
-  ready_for_in_port_data <= ((enable and (deferred_take or val_take or swm_take or lone_som) and give_en))
+    ready_for_in_port_data <= (enable and (deferred_take or val_take or swm_take or lone_som) and give_en and
+                               -- don't take data if it will clobbber buffered data that is not being given
+                               (not in_valid or not in_in.valid or
+                              (data_ready_for_out_port and out_valid)))
                  when (props_in.mode = full_e or props_in.mode = metadata_e) else
                  (enable and take_en and give_en)
                  when (props_in.mode = data_e) else enable;

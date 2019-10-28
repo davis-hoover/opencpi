@@ -138,10 +138,10 @@ for op in $*; do
       # This list is not yet an official package like "development/runtime/deploy" etc., but it will be
       files="/etc/localtime scripts/ocpi_${os}_driver scripts/ocpiserver.sh \
       	     $platform/lib/*.ko $platform/lib/*.rules ${driverlibs[*]} \
-             $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/ocpihdl $platform/system.xml"
+             $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/ocpihdl $platform/bin/ocpizynq $platform/system.xml"
       [ -n "$vg" ] && files+=" ../prerequisites/valgrind/$platform"
       [ -x $platform/bin/gdb ] && files+=" $platform/bin/gdb"
-      [ -x $platform/lib/c++ ] && files+=" $platform/lib/c++"
+      [ -x $platform/lib/sdk ] && files+=" $platform/lib/sdk"
       tar -c -z -H -f $tmpdir/tar.tgz $files
       do_ssh "test -e $rdir && echo Directory exists && exit 1;
       	      date -u `date -u +%Y.%m.%d-%H:%M:%S`;

@@ -58,6 +58,12 @@ namespace OCPI {
       ezxml_free(m_lx);
       for (unsigned n = 0; n < m_containerApps.size(); n++)
 	delete m_containerApps[n];
+      OC::Launcher::Connection *c = &m_connections[0];
+      for (unsigned nn = 0; nn < m_connections.size(); nn++, c++) {
+	delete c->m_in.m_metaPort;
+	delete c->m_out.m_metaPort;
+	c->m_in.m_metaPort = c->m_out.m_metaPort = NULL;
+      }
     }
     Server::
     ~Server() {
@@ -196,8 +202,10 @@ namespace OCPI {
       if ((x = ezxml_cchild(px, "port"))) {
 	OU::Port *mp = new OU::Port(x);
 	if ((err = mp->parse()) ||
-	    (err = mp->postParse()))
+	    (err = mp->postParse())) {
+	  delete mp;
 	  return err;
+	}
 	p.m_metaPort = mp;
       }
       return NULL;

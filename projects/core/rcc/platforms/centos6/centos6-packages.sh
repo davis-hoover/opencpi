@@ -106,9 +106,10 @@ PKGS_S+=(glibc-devel.i686)
 # E. installations that have to happen after we run yum-install once, and also rpm-required
 #    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
 #    for ocpidev
-PKGS_E+=(python34 python34-jinja2)
+python3_ver=python34
+PKGS_E+=(${python3_ver} ${python3_ver}-jinja2)
 #    for various testing scripts
-PKGS_E+=(python34-numpy)
+PKGS_E+=(${python3_ver}-numpy)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd)
 #    for bash completion - a noarch package  (AV-2398)
