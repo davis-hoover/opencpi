@@ -104,11 +104,12 @@ PKGS_S+=(glibc-devel.i686)
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
 #    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
+python3_ver=python34
 #    for ocpidev
-PKGS_E+=(python34 python34-jinja2)
+PKGS_E+=(${python3_ver} ${python3_ver}-jinja2)
 #    for various testing scripts
 #    AV-5478: If the minor version changes here, fix script below
-PKGS_E+=(python34-numpy)
+PKGS_E+=(${python3_ver}-numpy)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
@@ -149,20 +150,8 @@ fi
 $SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
 [ $? -ne 0 ] && bad "Installing required packages failed"
 
-# Now those that depend on epel, e.g.
+# Now those that depend on epel
 $SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
 [ $? -ne 0 ] && bad "Installing EPEL packages failed"
-
-# AV-5478: Make sure the python3 link is present
-if ! command -v python3 >/dev/null; then
-    if ! py34=$(command -v python3.4); then
-      bad "Cannot find python3.4 after installing it"
-    fi
-    if ! $SUDO ln -s $py34 /usr/bin/python3; then
-      bad "Cannot create missing /usr/bin/python3 link to $py34"
-    fi
-    # Not an error, but sent to stderr
-    echo "Created the missing /usr/bin/python3 -> python3.4 link" >&2
-fi
 
 exit 0
