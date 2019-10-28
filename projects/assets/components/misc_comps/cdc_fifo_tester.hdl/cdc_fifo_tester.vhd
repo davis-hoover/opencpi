@@ -27,7 +27,7 @@ architecture rtl of worker is
   constant c_dst_clk_hz : real := from_float(dst_clk_hz);
   constant c_src_dst_ratio : real := c_src_clk_hz/c_dst_clk_hz;
   constant c_cdc_fifo_depth : natural := 2**width_for_max(calc_cdc_fifo_depth(c_src_dst_ratio)-1);
-  constant c_lfsr_width : natural := 4;
+  constant c_width : natural := 4;
 
   signal s_src_clk : std_logic;
   signal s_src_rst : std_logic := '0';
@@ -39,11 +39,11 @@ architecture rtl of worker is
   signal s_fifo_enq : std_logic := '0';
   signal s_fifo_deq : std_logic := '0';
   signal s_dst_counter : unsigned(width_for_max(to_integer(num_input_samples) -1) downto 0) := (others => '0');
-  signal s_fifo_data_gen_out : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
-  signal s_fifo_dst_out : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
- 
+  signal s_fifo_data_gen_out : std_logic_vector(c_width-1 downto 0) := (others => '0');
+  signal s_fifo_dst_out : std_logic_vector(c_width-1 downto 0) := (others => '0');
+
   begin
-    
+
    gen_clk : entity work.gen_clk
        generic map (src_clk_hz => c_src_clk_hz,
                     dst_clk_hz => c_dst_clk_hz)
@@ -66,7 +66,7 @@ architecture rtl of worker is
     s_fifo_enq <= s_fifo_not_full;
     cdc_fifo : cdc.cdc.fifo
         generic map (
-          WIDTH       => c_lfsr_width,
+          WIDTH       => c_width,
           DEPTH       => c_cdc_fifo_depth)
         port map (
           src_CLK     => s_src_clk,
@@ -92,7 +92,7 @@ architecture rtl of worker is
         end if;
       end process;
 
-      out_out.data(c_lfsr_width-1 downto 0) <= s_fifo_dst_out;
+      out_out.data(c_width-1 downto 0) <= s_fifo_dst_out;
       out_out.valid <= s_fifo_deq when (s_dst_counter < num_input_samples) else '0';
       out_out.eof <= '1' when (s_dst_counter = num_input_samples) else '0';
 

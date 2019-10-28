@@ -38,11 +38,6 @@ with open(sys.argv[1], 'rb') as f:
 with open(sys.argv[2], 'rb') as f:
     odata = np.fromfile(f, dtype=dt)
 
-print("src_clk frequency: " + os.environ.get("OCPI_TEST_src_clk_hz"))
-print("dst_clk frequency: " + os.environ.get("OCPI_TEST_dst_clk_hz"))
-print(odata)
-print(goldendata)
-
 # Ensure that output data is the expected amount of data
 if len(odata) != len(goldendata):
     print("    Output file length is unexpected")
@@ -52,7 +47,6 @@ else:
     print("    Golden and output file lengths match")
 
 correlation = np.corrcoef(odata,goldendata)[1,0]
-print("    Correlation: " + str(correlation))
 if (correlation >= 0.7):
     print("    Output data and golden data correlation is greater than or equal to 70%")
 else:

@@ -29,7 +29,7 @@ architecture rtl of worker is
   constant c_num_output_samples : natural := calc_cdc_bit_dst_fifo_depth(c_src_dst_ratio, to_integer(num_input_samples));
   constant c_fifo_depth : natural := 2**width_for_max(c_num_output_samples -1);
   constant c_hold_width : natural := natural(ceil((c_src_dst_ratio)*2.0));
-  constant c_lfsr_width : natural := 4;
+  constant c_width : natural := 4;
   constant c_bits_data_gen_seed : std_logic_vector(15 downto 0) := x"8421";
 
   signal s_src_clk : std_logic;
@@ -47,13 +47,13 @@ architecture rtl of worker is
   signal s_done : std_logic := '0';
 
 
-  signal s_bits_fifo_dout : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
-  signal s_bits_src_in : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
-  signal s_bits_dst_out : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
+  signal s_bits_fifo_dout : std_logic_vector(c_width-1 downto 0) := (others => '0');
+  signal s_bits_src_in : std_logic_vector(c_width-1 downto 0) := (others => '0');
+  signal s_bits_dst_out : std_logic_vector(c_width-1 downto 0) := (others => '0');
   signal s_bits_data_gen_out : std_logic_vector(15 downto 0) := (others => '0');
 
   begin
-   
+
    gen_clk : entity work.gen_clk
        generic map (src_clk_hz => c_src_clk_hz,
                     dst_clk_hz => c_dst_clk_hz)
@@ -78,7 +78,7 @@ architecture rtl of worker is
 
     out_out.clk <= s_dst_clk;
 
-    input_gen : for i in 0 to c_lfsr_width-1 generate
+    input_gen : for i in 0 to c_width-1 generate
       gen_src_data : misc_prims.misc_prims.four_bit_lfsr
         generic map (SEED => c_bits_data_gen_seed((i*4)+3 downto i*4))
         port map (clk => s_src_clk,
@@ -86,7 +86,7 @@ architecture rtl of worker is
                   en => s_data_gen_en,
                   dout => s_bits_data_gen_out((i*4)+4-1 downto i*4));
 
-      s_bits_src_in(i) <= s_bits_data_gen_out((i*c_lfsr_width));
+      s_bits_src_in(i) <= s_bits_data_gen_out((i*c_width));
 
     end generate input_gen;
 
@@ -95,7 +95,7 @@ architecture rtl of worker is
         N         => 2,
         IREG      => '1',
         RST_LEVEL => '0',
-        WIDTH     => c_lfsr_width)
+        WIDTH     => c_width)
       port map   (
         src_clk => s_src_clk,
         src_rst => s_src_rst,
@@ -122,7 +122,7 @@ architecture rtl of worker is
 
     one_shot_fifo : misc_prims.misc_prims.one_shot_fifo
       generic map(
-        data_width => c_lfsr_width,
+        data_width => c_width,
         fifo_depth => c_fifo_depth,
         num_output_samples => c_num_output_samples)
       port map(
@@ -135,7 +135,7 @@ architecture rtl of worker is
         done => s_done,
         dout => s_bits_fifo_dout);
 
-    out_out.data(c_lfsr_width-1 downto 0) <= s_bits_fifo_dout;
+    out_out.data(c_width-1 downto 0) <= s_bits_fifo_dout;
     out_out.valid <= s_data_vld;
     out_out.eof <= s_done;
 

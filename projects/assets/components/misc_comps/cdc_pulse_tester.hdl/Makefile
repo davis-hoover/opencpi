@@ -26,14 +26,16 @@ OnlyTargets=xilinx
 # For xsim we use simulation netlists
 SourceFiles=\
   gen_clk.vhd \
+  $(if $(filter vivado,$(HdlToolSet)),\
+      ./vivado_ip/mmcm_100_to_50_and_25_stub.vhd,\
   $(if $(filter xsim,$(HdlToolSet)),\
-      ./vivado_ip/mmcm_100_to_50_and_25_sim_netlist.vhd)
+      ./vivado_ip/mmcm_100_to_50_and_25_sim_netlist.vhd))
 
 # For vivado we use vivado stubs with netlists
 # For xsim we use simulation netlists
 Cores=\
   $(if $(filter vivado,$(HdlToolSet)),\
-      ./vivado_ip/mmcm_100_to_50_and_25.dcp)
+      ./vivado_ip/mmcm_100_to_50_and_25.edf)
       
 include $(OCPI_CDK_DIR)/include/worker.mk
 

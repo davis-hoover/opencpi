@@ -29,7 +29,7 @@ architecture rtl of worker is
   constant c_num_output_samples : natural := calc_cdc_bit_dst_fifo_depth(c_src_dst_ratio, to_integer(num_input_samples));
   constant c_fifo_depth : natural := 2**width_for_max(c_num_output_samples -1);
   constant c_hold_width : natural := natural(ceil((c_src_dst_ratio)*2.0));
-  constant c_lfsr_width : natural := 4;
+  constant c_width : natural := 4;
 
   signal s_src_clk : std_logic;
   signal s_src_rst : std_logic := '0';
@@ -45,13 +45,13 @@ architecture rtl of worker is
   signal s_data_vld : std_logic := '0';
   signal s_done : std_logic := '0';
 
-  signal s_bit_data_gen_out : std_logic_vector(c_lfsr_width-1 downto 0) := (others => '0');
+  signal s_bit_data_gen_out : std_logic_vector(c_width-1 downto 0) := (others => '0');
   signal s_bit_src_in : std_logic := '0';
   signal s_bit_dst_out : std_logic_vector(0 downto 0) := (others => '0');
   signal s_bit_fifo_dout : std_logic_vector(0 downto 0) := (others => '0');
 
   begin
-  
+
   gen_clk : entity work.gen_clk
        generic map (src_clk_hz => c_src_clk_hz,
                     dst_clk_hz => c_dst_clk_hz)
