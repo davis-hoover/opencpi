@@ -230,7 +230,7 @@ begin
           first_data_r <= btrue;
         end if;
         if its(ready_r) then
-          if ocp_give and ocp_eom and debug then
+          if its(ocp_give) and ocp_eom and debug then
             messages_r <= messages_r + 1;
           end if;
           input_eof_r <= input_eof;
