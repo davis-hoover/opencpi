@@ -41,6 +41,8 @@ if [ -x /sbin/udevcontrol ] ; then
 RELOAD="/sbin/udevcontrol reload_rules"
 elif [ -x /sbin/udevadm ] ; then
 RELOAD="/sbin/udevadm control --reload-rules"
+elif [ -x /bin/udevadm ] ; then
+RELOAD="/bin/udevadm control --reload-rules"
 elif [ -x /usr/bin/udevadm ] ; then
 RELOAD="/usr/bin/udevadm control --reload-rules"
 elif [ -x /sbin/mdev -o -x /root/opencpi/bin/mdev ] ; then
@@ -80,7 +82,7 @@ else
   DIR=$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib
   DIR2=/opt/opencpi/driver/$(uname -r)
   MODFILE=$MODNAME-$LABEL.ko
-  MODFILE2=$MODNAME.ko
+  MODFILE2=$MODNAME*.ko
   if test -e $DIR/$MODFILE; then
     true # default
   elif test -e $DIR2/$MODFILE; then

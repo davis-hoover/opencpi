@@ -18,5 +18,5 @@
 
 Libraries=axi zynq sdp
 Configurations=base matchstiq_z1_rx_tx matchstiq_z1_rx matchstiq_z1_tx
-ExportFiles=matchstiq_z1.xdc matchstiq_z1_bit.xdc matchstiq_z1.mk
+ExportFiles=matchstiq_z1.xdc matchstiq_z1_bit.xdc sd_card 97-matchstiq_z1.rules
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk

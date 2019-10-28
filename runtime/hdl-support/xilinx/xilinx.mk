@@ -32,7 +32,9 @@ OcpiXilinxDir=$(strip $(foreach t,$(or $(OCPI_XILINX_DIR),/opt/Xilinx),$(infox T
 OcpiXilinxLicenseFile=$(strip $(foreach t,$(or $(OCPI_XILINX_LICENSE_FILE),\
                                                $(call OcpiXilinxDir,$1)/Xilinx-License.lic),\
 			 $(if $(or $(findstring @,$t),$(findstring :,$t),$(shell test -f $t && echo 1)),$t,\
-                            $(call $(or $1,error), File "$t", for OCPI_XILINX_LICENSE_FILE, not found))))
+			    $(if $(OCPI_XILINX_LICENSE_FILE),\
+                              $(call $(or $1,error), File "$t", for OCPI_XILINX_LICENSE_FILE, not found),\
+			      $(warning, No license file specified in OCPI_XILINX_LICENSE_DIR and default one in $t is nonexistent.  Webpack installations may still work.)))))
 
 OcpiXilinxIseDir=$(strip\
 $(foreach t,$(OcpiXilinxDir),\
@@ -61,7 +63,7 @@ $(if $(OCPI_XILINX_LAB_TOOLS_DIR),\
   $(foreach d,$(OCPI_XILINX_LAB_TOOLS_DIR),\
     $(or $(shell test -d $d/LabTools && echo $d/LabTools),\
       $(call $(or $1,error),OCPI_XILINX_LAB_TOOLS_DIR, $d, missing or has no LabTools subdirectory))),\
-  $(foreach t,$(call OcpiXilinxDir,$1),$(info TOP:$t)\
+  $(foreach t,$(call OcpiXilinxDir,$1),$(infox TOP:$t)\
       $(foreach v,\
         $(if $(filter-out undefined,$(origin OCPI_XILINX_VERSION)),\
           $(foreach e,$(OCPI_XILINX_VERSION),\
@@ -76,16 +78,16 @@ $(if $(OCPI_XILINX_LAB_TOOLS_DIR),\
       $(or $(wildcard $t/$v/LabTools/LabTools),$(wildcard $t/$v/ISE_DS/ISE),\
         $(call $(or $1,error), Directory $t/$v has no ISE or LabTools under it))))))
 
-# This looks for the ISE edk dir. It does not consider Vivado installations
+# This looks for the (ISE) edk dir. It does not consider Vivado installations
 OcpiXilinxIseEdkDir=$(strip\
  $(foreach d,$(or $(OCPI_XILINX_EDK_DIR),$(call OcpiXilinxIseDir,$1)/EDK),\
    $(infox EDK:$d)$(if $(shell test -d $d && echo 1),$d,\
                      $(call $(or $1,error), Directory "$d", for OCPI_XILINX_EDK_DIR, not found))))
 
 # This looks for the Vivado SDK dir OR the ISE EDK dir
-OcpiXilinxEdkDir=$(strip\
+OcpiXilinxEdkOrSdkDir=$(strip\
  $(foreach d,\
-   $(or $(OCPI_XILINX_EDK_DIR),$(call OcpiXilinxVivadoSdkDir,warning),$(warning Checking for ISE EDK since Vivado SDK was not found)$(call OcpiXilinxIseEdkDir,$1)),\
+   $(or $(OCPI_XILINX_EDK_DIR),$(call OcpiXilinxSdkDir,warning),$(warning Checking for ISE EDK since Vivado SDK was not found)$(call OcpiXilinxIseEdkDir,$1)),\
    $(infox EDK:$d)$(if $(shell test -d $d && echo 1),$d,\
                      $(call $(or $1,error), Directory "$d", for OCPI_XILINX_EDK_DIR, not found))))
 
@@ -96,34 +98,35 @@ OcpiXilinxIseInit=\
   export LM_LICENSE_FILE=$(OcpiXilinxLicenseFile)
 
 # Looks for the Vivado SDK dir
-OcpiXilinxVivadoSdkDir=$(strip\
-$(foreach t,$(OcpiXilinxTryVivadoDir)/SDK,$(infox vt:$t)\
+OcpiXilinxSdkDir=$(strip\
+$(foreach t,$(OcpiXilinxDir)/SDK,\
   $(foreach i,\
       $(foreach v,\
         $(if $(filter-out undefined,$(origin OCPI_XILINX_VIVADO_SDK_VERSION)),\
           $(foreach e,$(OCPI_XILINX_VIVADO_SDK_VERSION),\
             $(if $(shell test -d $t/$e && echo 1),$e,\
-              $(call $(or $1,error), Directory "$t/$e", for OCPI_XILINX_SDK_VIVADO_VERSION, not found))),\
+              $(call $(or $1,error), Directory "$t/$e", for OCPI_XILINX_VIVADO_SDK_VERSION, not found))),\
           $(or $(shell for i in \
                         `shopt -s nullglob && echo $t/*  | tr ' ' '\n' | sort -n -r`; \
                        do \
-                         [ -d $$i -a -r $$i/settings64.sh ] && echo `basename $$i` && break; \
+                         [ -d $$i -a -r $$i/settings*.sh ] && echo `basename $$i` && break; \
                        done),\
-            $(call $(or $1,error), No version directory under $t/* for Xilinx Vivado SDK))),\
-        $(infox VV:$v)$(call OcpiXilinxTryVivadoDir,$1)/SDK/$v),\
+            $(call $(or $1,error), No valid version directory under $t/* for Xilinx Vivado SDK))),\
+        $(infox VV:$v)$(call OcpiXilinxDir,$1)/SDK/$v),\
     $(infox II:$i.)\
     $(if $(shell test -d $i && echo 1),$i,\
-      $(call $(or $1,error), Directory "$i", in OCPI_XILINX_DIR/SDK, not found)))))
+      $(call $(or $1,error), Directory "$i", in $$OCPI_XILINX_DIR/SDK, not found)))))
 
 
-OcpiXilinxTryVivadoDir=$(strip $(foreach t,$(or $(OCPI_XILINX_VIVADO_DIR),$(OCPI_XILINX_DIR),/opt/Xilinx),$(infox TT is $t)\
+# Return the directory where Vivado lives, which as a default is usually /opt/Xilinx/Vivado
+OcpiXilinxTryVivadoDir=$(strip $(foreach t,$(or $(OCPI_XILINX_VIVADO_DIR),$(foreach x,$(call OcpiXilinxDir,$1),$x/Vivado)),$(infox TT is $t)\
 		 $(if $(shell test -d $t && echo 1),$t,\
 		    $(call $(or $1,error), Directory "$t" for OCPI_VIVADO_XILINX_DIR or OCPI_XILINX_DIR not found))))
 
 # When getting the VIVADO_VERSION, first check OCPI_XILINX_VIVADO_VERSION,
 # then fall back on OCPI_XILINX_VERSION ONLY IF it does NOT start with '0' or '1' which are reserved for ISE.
 OcpiXilinxVivadoDir=$(strip\
-$(foreach t,$(OcpiXilinxTryVivadoDir)/Vivado,$(infox vt:$t)\
+$(foreach t,$(call OcpiXilinxTryVivadoDir,$1),$(infox vt:$t)\
   $(foreach i,\
     $(or $(OCPI_XILINX_VIVADO_TOOLS_DIR),\
       $(foreach v,\
@@ -137,7 +140,7 @@ $(foreach t,$(OcpiXilinxTryVivadoDir)/Vivado,$(infox vt:$t)\
                          [ -d $$i -a -r $$i/settings64.sh ] && echo `basename $$i` && break; \
                        done),\
             $(call $(or $1,error), No version directory under $t/* for Xilinx Vivado))),\
-        $(infox VV:$v)$(call OcpiXilinxTryVivadoDir,$1)/Vivado/$v)),\
+        $(infox VV:$v)$(call OcpiXilinxTryVivadoDir,$1)/$v)),\
     $(infox II:$i.)\
     $(if $(shell test -d $i && echo 1),$i,\
       $(call $(or $1,error), Directory "$i", in OCPI_XILINX_VIVADO_DIR, not found)))))
@@ -147,13 +150,15 @@ $(foreach t,$(OcpiXilinxTryVivadoDir)/Vivado,$(infox vt:$t)\
 # Finally, we resort to checking for the plain/ISE Xilinx license
 OcpiXilinxVivadoLicenseFile=$(strip\
   $(foreach t,$(or $(OCPI_XILINX_VIVADO_LICENSE_FILE),\
-                $(wildcard $(call OcpiXilinxTryVivadoDir,$1)/Vivado/Xilinx-License.lic),$(call OcpiXilinxLicenseFile,$1)),\
+                $(wildcard $(call OcpiXilinxTryVivadoDir,$1)/Xilinx-License.lic),$(call OcpiXilinxLicenseFile,$1)),\
     $(if $(or $(findstring @,$t),$(findstring :,$t),$(shell test -f $t && echo 1)),$t,\
       $($(or $1,error) File "$t", for OCPI_XILINX_VIVADO_LICENSE_FILE, not found))))
 
 OcpiXilinxVivadoInit=\
   set -e; \
   . $(OcpiXilinxVivadoDir)/.settings64-Vivado.sh $(and $1,> $1); \
+  $(if $(OcpiXilinxVivadoLicenseFile),,\
+    echo Warning: No Vivado license file specified or found, which is ok with recent WebPack versions/parts.;) \
   export LM_LICENSE_FILE=$(OcpiXilinxVivadoLicenseFile)
 
 
@@ -164,11 +169,11 @@ XilinxCheck=ignore
 all:
 
 $(info OcpiXilinxIseDir=$(call OcpiXilinxIseDir,$(XilinxCheck));\
-       OcpiXilinxEdkDir=$(call OcpiXilinxEdkDir,$(XilinxCheck));\
+       OcpiXilinxEdkOrSdkDir=$(call OcpiXilinxEdkOrSdkDir,$(XilinxCheck));\
        OcpiXilinxIseEdkDir=$(call OcpiXilinxIseEdkDir,$(XilinxCheck));\
        OcpiXilinxLabToolsDir=$(call OcpiXilinxLabToolsDir,$(XilinxCheck));\
        OcpiXilinxVivadoDir=$(call OcpiXilinxVivadoDir,$(XilinxCheck));\
-       OcpiXilinxVivadoSdkDir=$(call OcpiXilinxVivadoSdkDir,$(XilinxCheck));\
+       OcpiXilinxSdkDir=$(call OcpiXilinxSdkDir,$(XilinxCheck));\
        OcpiXilinxLicenseFile=$(call OcpiXilinxLicenseFile,$(XilinxCheck));\
        OcpiXilinxVivadoLicenseFile=$(call OcpiXilinxVivadoLicenseFile,$(XilinxCheck)))
 

@@ -27,7 +27,7 @@ WsiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)
   : DataPort(w, x, sp, ordinal, WSIPort, err) {
   if (err)
     return;
-  if ((err = OE::checkAttrs(x, "Name", "Clock", "DataWidth", "PreciseBurst", "myoutputclock",
+  if ((err = OE::checkAttrs(x, "Name", "Clock", "DataWidth", "PreciseBurst", "myoutputclock", "clockdirection",
 			    "ImpreciseBurst", "Continuous", "Abortable",
 			    "EarlyRequest", "MyClock", "RegRequest", "InsertEOM", "workerEOF", "Pattern",
 			    "NumberOfOpcodes", "MaxMessageValues",
@@ -46,9 +46,9 @@ WsiPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, const char *&err)
 
 // Our special copy constructor
 WsiPort::
-WsiPort(const WsiPort &other, Worker &w , std::string &a_name, size_t count,
+WsiPort(const WsiPort &other, Worker &w , std::string &a_name, size_t a_count,
 	OU::Assembly::Role *role, const char *&err)
-  : DataPort(other, w, a_name, count, role, err) {
+  : DataPort(other, w, a_name, a_count, role, err) {
   if (err)
     return;
   m_abortable = other.m_abortable;
@@ -61,10 +61,10 @@ WsiPort(const WsiPort &other, Worker &w , std::string &a_name, size_t count,
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &WsiPort::
-clone(Worker &w, std::string &a_name, size_t count, OCPI::Util::Assembly::Role *role,
+clone(Worker &w, std::string &a_name, size_t a_count, OCPI::Util::Assembly::Role *role,
       const char *&err) const {
   err = NULL;
-  return *new WsiPort(*this, w, a_name, count, role, err);
+  return *new WsiPort(*this, w, a_name, a_count, role, err);
 }
 
 WsiPort::
@@ -291,10 +291,10 @@ emitVhdlShell(FILE *f, ::Port *wci) {
   std::string clockName(m_clock->signal());
   if (m_clock->m_port) {
     if (m_clock->m_output) {
-      if (isDataProducer())
-	clockName = m_clock->m_port->typeNameOut + "_temp."; // clk in temp bundle
+      if (m_clock->m_port->isDataProducer())
+	clockName = m_clock->m_port->typeNameOut + "_temp.";
       else
-	clockName = cname(), clockName += "_";       // clk in temp signal
+	clockName = m_clock->m_port->pname(), clockName += "_";
     } else
       clockName = m_clock->m_port->typeNameIn + ".";
     clockName += "Clk";
@@ -341,11 +341,17 @@ emitVhdlShell(FILE *f, ::Port *wci) {
 	    "                input_eof        => %s%s,   -- from input port to output port\n"
 	    "                eof              => %s%s,   -- from worker to output port\n"
 	    "                latency          => %s%s,\n"
+	    "                messages         => %s%s,\n"
+	    "                bytes            => %s%s,\n"
 	    "                buffer_size      => %s%s,\n",
 	    firstIn ? firstIn : "bfalse", firstIn ? "_first_take" : "",
 	    firstIn ? firstIn : "bfalse", firstIn ? "_eof" : "",
 	    worker().version() > 1 ? cname() : "bfalse", worker().version() > 1 ? "_eof" : "",
 	    ::Port::m_worker->m_noControl ? "open" : "props_builtin_ocpi_latency_",
+	    ::Port::m_worker->m_noControl ? "" : cname(),
+	    ::Port::m_worker->m_noControl ? "open" : "props_builtin_ocpi_messages_",
+	    ::Port::m_worker->m_noControl ? "" : cname(),
+	    ::Port::m_worker->m_noControl ? "open" : "props_builtin_ocpi_bytes_",
 	    ::Port::m_worker->m_noControl ? "" : cname(),
 #if 0
 	    m_isUnbounded && !::Port::m_worker->m_noControl ?
@@ -986,6 +992,8 @@ finalize() {
     AP(blocked,     ULong,  true,  false, false, true,  true,  true);    // cycles when output was blocked
     AP(max_latency, UShort, false, true,  false, false, true,  false,  256); // maximum input-to-output latency 
     AP(latency,     UShort, false, false, false, true,  true,  true);   // measured latency
+    AP(messages,    ULong,  true,  false, false, true,  true,  true);   // messages crossing this port
+    AP(bytes,       ULong,  true,  false, false, true,  true,  true);   // bytes crossing this port
   }
   return NULL;
 }

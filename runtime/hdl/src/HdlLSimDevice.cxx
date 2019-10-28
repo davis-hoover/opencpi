@@ -229,9 +229,8 @@ protected:
     m_endpointSpecific = "ocpi-socket-rdma";
     m_endpointSize = OH::SDP::Header::max_addressable_bytes * OH::SDP::Header::max_nodes;
     cAccess().setAccess(NULL, this, OCPI_UTRUNCATE(RegisterOffset, 0));
-    // data offset overlays the control plane since it is SDP node 0.
+    // data offset overlays the control plane since the control plane is SDP node 0.
     dAccess().setAccess(NULL, this, OCPI_UTRUNCATE(RegisterOffset, 0));
-    //						   OH::SDP::Header::max_addressable_bytes));
     init(error);
     // Note we are emulating here, still not creating any file system dirs or fifos
   }
@@ -1071,6 +1070,7 @@ public:
     DT::EndPoint &ep =
       DT::getManager().allocateProxyEndPoint(m_endpointSpecific.c_str(), true,
 					     OCPI_UTRUNCATE(size_t, m_endpointSize));
+    ep.addRef();
     ep.finalize();
     // This is the hook that allows us to receive data/metadata/flags pushed to this
     // endpoint from elsewhere - from multiple other endpoints.
@@ -1240,7 +1240,7 @@ open(const char *name, const OA::PValue *params, std::string &err) {
     if (OS::FileSystem::exists("simtest", &isDir) && isDir)
       dir = "simtest";
   }
-  uint32_t simTicks = 100000000, sleepUsecs = 200000;
+  uint32_t simTicks = 200000000, sleepUsecs = 200000;
   uint8_t spinCount = 20;
   OU::findULong(params, "simTicks", simTicks);
 

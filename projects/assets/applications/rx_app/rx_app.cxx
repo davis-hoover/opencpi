@@ -576,11 +576,10 @@ int main(int argc, char **argv) {
   printf("Runtime               : %s s\n",   argv[8]);
   printf("Timestamps enabled    : %s \n",    timestamps ? "true" : "false");
   std::string value;
-  app.getProperty("time_server","status",value);
-  uint32_t valid1pps=atol(value.c_str())&0x08000000;
-  printf("Valid 1 PPS           : %s \n", valid1pps ? "true" : "false");
+  app.getProperty("time_server","PPS_ok",value);
+  printf("Valid 1 PPS           : %s \n", value.c_str());
 
-  app.setProperty("time_server","timeNow","0");
+  app.setProperty("time_server","time_now","0");
 
   app.start();
 

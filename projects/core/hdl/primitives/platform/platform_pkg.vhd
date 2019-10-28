@@ -128,15 +128,19 @@ end record metadata_out_t;
 -- Input from the platform worker to the time server.
 type time_base_out_t is record
   clk     : std_logic;
+  reset   : std_logic; --unused; deprecate in 2.0
+  ppsIn   : std_logic; --unused; deprecate in 2.0
   PPS     : std_logic;
 end record time_base_out_t;
 type time_base_in_t is record
+  ppsOut  : std_logic; --unused; deprecate in 2.0
   PPS     : std_logic;
 end record time_base_in_t;
 
 -- The time_server's (and platform worker's) output that is the time service.
 type time_service_t is record
   clk     : std_logic;
+  reset   : std_logic; --unused; deprecate in 2.0
   now     : ocpi.types.ulonglong_t;
   valid   : std_logic;
 end record time_service_t;
@@ -344,6 +348,17 @@ component sim_dcp is
     cp_out : out occp_in_t);
 end component sim_dcp;
 
+component pulse_gen is
+  generic(
+    g_pulse_period : positive;
+    g_pulse_width  : positive;
+    g_pulse_delay  : positive);
+  port(
+    i_clk          : in std_logic;
+    i_reset        : in std_logic;
+    o_pulse        : out std_logic);
+end component pulse_gen;
+
 component wci_master is
   generic(
     ocpi_debug   : bool_t;
@@ -460,6 +475,8 @@ component unoc_node_rv is
     position         : ulong_t := to_ulong(0)
     );
   port (
+    wci_Clk     : in std_logic;
+    wci_Reset_n : in std_logic;
     up_in      : in  unoc_master_out_t;
     up_out     : out unoc_master_in_t;
     client_in  : in  unoc_master_in_t;

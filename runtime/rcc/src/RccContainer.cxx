@@ -63,9 +63,9 @@ Container(const char *a_name, const OA::PValue* /* params */)
 {
   const char *system = OU::getSystemId().c_str();
   m_model = "rcc";
-  addTransport("ocpi-dma-pio", system, OR::ActiveMessage, OR::ActiveMessage,
+  addTransport("ocpi-dma-pio", system, OR::ActiveFlowControl, OR::ActiveMessage,
 	       //	       (1 << OR::FlagIsCounting) | // ask for counting flags
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
+	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMetaOptional),
 	       //	       (1 << OR::FlagIsCounting) | // ask for counting flags
 	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMetaOptional));
   addTransport("ocpi-smb-pio", system, OR::ActiveMessage, OR::ActiveMessage,
@@ -74,12 +74,17 @@ Container(const char *a_name, const OA::PValue* /* params */)
   addTransport("ocpi-scif-dma", system, OR::ActiveMessage, OR::ActiveMessage,
 	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
 	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive));
-  addTransport("ocpi-socket-rdma", NULL, OR::ActiveMessage, OR::ActiveMessage,
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMetaOptional));
-  addTransport("ocpi-udp-rdma", NULL, OR::ActiveMessage, OR::ActiveMessage,
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
-	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive));
+  addTransport("ocpi-socket-rdma", NULL, OR::ActiveFlowControl, OR::ActiveMessage,
+	       (1 << OR::ActiveFlowControl) | (1 << OR::FlagIsMeta),
+	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMeta));
+  //	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::Passive),
+  //	       (1 << OR::ActiveFlowControl) | (1 << OR::ActiveMessage) | (1 << OR::FlagIsMetaOptional));
+  addTransport("ocpi-udp-rdma", NULL, OR::ActiveFlowControl, OR::ActiveMessage,
+	       (1 << OR::ActiveFlowControl) | (1 << OR::FlagIsMeta),
+	       (1 << OR::ActiveMessage) | (1 << OR::FlagIsMeta)),
+  addTransport("ocpi-ether-rdma", NULL, OR::ActiveFlowControl, OR::ActiveMessage,
+	       (1 << OR::ActiveFlowControl) | (1 << OR::FlagIsMeta),
+	       (1 << OR::ActiveMessage) | (1 << OR::FlagIsMeta));
   m_dynamic = OC::Manager::dynamic();
   if (parent().m_platform.size())
     m_platform = parent().m_platform;

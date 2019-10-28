@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -172,7 +172,7 @@ class DFTCalculator():
             msg += ", supported values are None and dB_relative_to_unity"
             raise Exception(msg)
         nn = self.result.get_num_dft_points()
-        result_pos_freqs = self.result.amplitudes[0:(nn/2)-1]
+        result_pos_freqs = self.result.amplitudes[0:int(nn/2)-1]
         tmp = 20*np.log10(abs(result_pos_freqs) + eps)
         ret = tmp[np.argmax(tmp)]
         return ret
@@ -189,7 +189,7 @@ class DFTCalculator():
             msg += ", supported values are None and dB_relative_to_unity"
             raise Exception(msg)
         nn = self.result.get_num_dft_points()
-        result_neg_freqs = self.result.amplitudes[nn/2:nn-1]
+        result_neg_freqs = self.result.amplitudes[int(nn/2):nn-1]
         tmp = 20*np.log10(abs(result_neg_freqs) + eps)
         ret = tmp[np.argmax(tmp)]
         return ret

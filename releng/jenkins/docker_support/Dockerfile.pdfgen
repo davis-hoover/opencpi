@@ -66,9 +66,6 @@ RUN yum upgrade -y && yum install -y epel-release && yum install -y \
 RUN groupadd -g ${JENKINSGID} jenkins && useradd -g jenkins -m -s /sbin/nologin -u ${JENKINSUID} jenkins
 RUN groupadd -r opencpi && useradd -M -r -s /sbin/nologin -c "OpenCPI System Account" -n -g opencpi opencpi
 
-# Normally we shouldn't have to manually create this link? Why do we have to now?
-RUN cd /usr/bin && ln -s python3.4 python3
-
 # Import git repo's keys
 RUN mkdir /root/.ssh && ssh-keyscan -p ${GIT_PORT} ${GIT_SERVER} 2>/dev/null >> /root/.ssh/known_hosts
 

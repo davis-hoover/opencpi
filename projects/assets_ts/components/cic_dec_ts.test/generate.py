@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -51,7 +51,7 @@ MAX_BYTES_OUT = int(os.environ.get("OCPI_TEST_ocpi_max_bytes_out"))
 #Generate enough samples to generate number_of_samples_messages max_bytes_out sized output messages
 number_of_samples_messages = 1
 bytes_per_sample = 4
-samples_to_generate = number_of_samples_messages*MAX_BYTES_OUT/bytes_per_sample*R
+samples_to_generate = int(number_of_samples_messages*MAX_BYTES_OUT/bytes_per_sample*R)
 # Select test data to generate: Impulse or Step 
 if TEST_CASE == 0: # Generate Impulse
     out_data = np.zeros(samples_to_generate, dtype=np.int32)
@@ -61,7 +61,7 @@ elif TEST_CASE == 1: #Generate Step
 
 # Write to file
 message_size = 2048 #This is the maximum allowed by current buffer negotiation system
-samples_per_message = message_size / bytes_per_sample
+samples_per_message = int(message_size / bytes_per_sample)
 with open(sys.argv[1], 'wb') as f:
     utu.add_msg(f, iqm.INTERVAL_OPCODE, array.array('I',(int('00000000',16), int('00001FFF',16)))) #8191
     utu.add_msg(f, iqm.TIME_OPCODE, array.array('I',(int('0000AAAA',16), int('0000BBBB',16))))

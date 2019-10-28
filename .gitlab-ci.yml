@@ -1,0 +1,157 @@
+# vim: ts=2:sw=2:et
+#
+# GitLab's yaml reference:
+#   https://docs.gitlab.com/ee/ci/yaml/README.html
+#
+
+# Define the stages of the pipeline.
+stages:
+  - prep
+  - build
+  - test
+
+#------------------------------------------------------------------------------
+# PREP
+#------------------------------------------------------------------------------
+
+prep:centos6:
+  stage: prep
+  tags:
+    - docker
+    - centos7  # yes, run this on centos7
+    - opencpi
+  image: centos:6
+  script:
+  - yum -y distro-sync
+  - scripts/install-packages.sh
+
+prep:centos7:
+  stage: prep
+  tags:
+    - docker
+    - centos7
+    - opencpi
+  image: centos:7
+  script:
+  - yum -y distro-sync
+  - scripts/install-packages.sh
+
+prereq:centos6:
+  stage: prep
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    policy: push
+    paths:
+      - exports/
+      - prerequisites/
+      - prerequisites-build/
+  script:
+    - ./scripts/install-prerequisites.sh
+
+prereq:centos7:
+  stage: prep
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    policy: push
+    paths:
+      - exports/
+      - prerequisites/
+      - prerequisites-build/
+  script:
+    - ./scripts/install-prerequisites.sh
+
+#------------------------------------------------------------------------------
+# BUILD
+#------------------------------------------------------------------------------
+
+build:centos6:
+  stage: build
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["prereq:centos6"]
+  script:
+    - ./scripts/build-opencpi.sh
+
+build:centos7:
+  stage: build
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["prereq:centos7"]
+  script:
+    - ./scripts/build-opencpi.sh
+
+#------------------------------------------------------------------------------
+# TEST
+#------------------------------------------------------------------------------
+
+test:centos6:
+  stage: test
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["build:centos6"]
+  script:
+    - ./scripts/test-opencpi.sh
+
+
+test:centos7:
+  stage: test
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["build:centos7"]
+  script:
+    - ./scripts/test-opencpi.sh
+

@@ -30,7 +30,7 @@ function bad {
 [ "$1" = probe ] && {
   setVarsFromMake $OCPI_CDK_DIR/include/hdl/xilinx.mk ShellIseVars=1 $verbose
   [ -z "$OcpiXilinxVivadoDir" ] && bad Could not find the directory for XILINX Vivado.
-  [ -z "$OcpiXilinxVivadoLicenseFile" ] && bad Could not find the Xilinx license file.
+  [ -z "$OcpiXilinxVivadoLicenseFile" ] && echo Warning: could not find a Xilinx license file, which is OK for a WebPack installation. 1>&2
   [ -f $OcpiXilinxVivadoDir/.settings64-Vivado.sh ] ||
     bad No Xilinx settings file in $OcpiXilinxVivadoDir.
   [ -n "$verbose" ] && echo Attempting to run a tiny simulation to test xsim. 1>&2

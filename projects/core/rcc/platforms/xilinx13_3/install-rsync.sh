@@ -20,15 +20,15 @@
 # This server is unavailable:       https://ftp.gnu.org/gnu/gmp
 # Since we don't look at multiple URLs/mirrors (yet)
 # The one below is one of the advertised mirrors
-me=rsync
+me=rsync-3.1.1
 
 [ -z "$OCPI_CDK_DIR" ] && echo Environment variable OCPI_CDK_DIR not set && exit 1
 source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
        $me \
        "remote sync" \
-       git://git.samba.org/rsync.git \
-       master \
+       https://download.samba.org/pub/rsync/src \
+       ${me}.tar.gz \
        $me \
        1
 

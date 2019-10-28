@@ -23,18 +23,39 @@
 # If they are in this project, they must be compiled first, and this requires that the
 # PrimitiveLibraries variable be set in the hdl/primitives/Makefile such that the
 # libraries are in dependency order.
-Libraries=ocpi fixed_float util
+Libraries=ocpi fixed_float util cdc
 
 # Set this variable to the list of source files in dependency order
 # If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
 # except that any *_pkg.vhd files will be compiled first
 SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_pkg \
+	misc_prims_body \
+	ocpi_pkg \
+	cdc_pkg \
 	lfsr/src/lfsr \
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
-	edge_detector/src/edge_detector)
-
+	edge_detector/src/edge_detector \
+	counter \
+	latest_reg_slv \
+	latest_reg_unsigned \
+	latest_reg_signed \
+	adc_samp_drop_detector \
+	data_widener \
+	adc_maximal_lfsr_data_src \
+	time_downsampler \
+	time_corrector \
+	ocpi_wsi_message_sizer \
+	ocpi_cswm_prot_in_adapter_dw32_clkin \
+	ocpi_cswm_prot_in_adapter_dw32_clkout \
+	ocpi_cswm_prot_out_adapter_dw32_clkin \
+	ocpi_cswm_prot_out_adapter_dw32_clkin_old \
+	ocpi_cswm_prot_out_adapter_dw32_clkout \
+	ocpi_cswm_prot_out_adapter_dw32_clkout_old \
+	level_to_pulse_converter \
+	cdc_fifo_info \
+	set_clr)
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:
 # 1. Any entity (VHDL) or module (verilog) must have a VHDL component declaration in misc_prims_pkg.vhd
@@ -42,3 +63,4 @@ SourceFiles=$(patsubst %,%.vhd,\
 #    be the same as the entity/module name, and one entity/module per file.
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+

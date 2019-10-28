@@ -529,10 +529,10 @@ namespace OCPI {
 	      ocpiInfo("Rejecting output transport %s since input id is %s but output id is %s",
 		       ot.transport.c_str(), it.id.c_str(), ot.id.c_str());
 	    else if (sConn.length() && strcasecmp(sConn.c_str(), ot.transport.c_str()))
-	      ocpiInfo("Rejecting out transport %s since %s was specified for the connection",
+	      ocpiInfo("Rejecting output transport %s since %s was specified for the connection",
 		       ot.transport.c_str(), sConn.c_str());
 	    else if (roleOut != OR::NoRole && !((1 << roleOut) & ot.optionsOut))
-	      ocpiInfo("Rejecting input role %s for transport %s: container doesn't support it",
+	      ocpiInfo("Rejecting output role %s for transport %s: container doesn't support it",
 		       roleNames[roleOut], ot.transport.c_str());
 	    else {
 	      // Everything matches, negotiate roles
@@ -1006,7 +1006,7 @@ namespace OCPI {
       d.options = isProvider() ? t.optionsIn : t.optionsOut;
       if (!d.desc.oob.oep[0])
 	strcpy(d.desc.oob.oep, t.transport.c_str());
-      assert(!strncmp(d.desc.oob.oep, t.transport.c_str(), strlen(t.transport.c_str())));
+      ocpiAssert(!strncmp(d.desc.oob.oep, t.transport.c_str(), strlen(t.transport.c_str())));
       setBufferSize(a_bufferSize);
     }
 
