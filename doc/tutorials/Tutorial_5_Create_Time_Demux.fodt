@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>19</meta:editing-cycles><meta:creation-date>2019-10-04T14:32:29.050273351</meta:creation-date><meta:editing-duration>PT1H1M2S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-17T14:01:16.731082682</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:printed-by>Lisa Zahn</meta:printed-by><meta:print-date>2019-10-04T14:57:02.559267268</meta:print-date><meta:document-statistic meta:table-count="0" meta:image-count="17" meta:object-count="0" meta:page-count="14" meta:paragraph-count="167" meta:word-count="1207" meta:character-count="8728"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-04T14:32:28.906251091"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>21</meta:editing-cycles><meta:creation-date>2019-10-04T14:32:29.050273351</meta:creation-date><meta:editing-duration>PT1H4M22S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-28T13:08:15.344571443</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:printed-by>Lisa Zahn</meta:printed-by><meta:print-date>2019-10-04T14:57:02.559267268</meta:print-date><meta:document-statistic meta:table-count="0" meta:image-count="17" meta:object-count="0" meta:page-count="13" meta:paragraph-count="148" meta:word-count="1029" meta:character-count="7578" meta:non-whitespace-character-count="6077"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-04T14:32:28.906251091"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">381053</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">97</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">32066</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">32420</config:config-item>
    <config:config-item config:name="ViewAreaHeight" config:type="long">17482</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">5292</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">388493</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">6232</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">3464</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">381053</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">32064</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">398533</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">97</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">32419</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">17577</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -111,7 +111,7 @@
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">37495346</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">37598139</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
@@ -2731,18 +2731,18 @@
    </style:paragraph-properties>
    <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
-  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:paragraph-rsid="02361882"/>
-  </style:style>
-  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:paragraph-rsid="02321429"/>
-  </style:style>
-  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:paragraph-rsid="022410c2"/>
-  </style:style>
-  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
+  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
    <style:paragraph-properties style:page-number="auto" fo:break-before="page"/>
    <style:text-properties officeooo:paragraph-rsid="022410c2" style:font-name-asian="Times New Roman1"/>
+  </style:style>
+  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:paragraph-rsid="022410c2"/>
+  </style:style>
+  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="02361882"/>
+  </style:style>
+  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="02321429"/>
   </style:style>
   <style:style style:name="P23" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
@@ -2823,6 +2823,9 @@
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T25" style:family="text">
+   <style:text-properties officeooo:rsid="023db3bb"/>
+  </style:style>
+  <style:style style:name="T26" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
@@ -2850,12 +2853,12 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:footer>
-    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 5<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">14</text:page-number><text:s/>of <text:page-count>14</text:page-count></text:p>
+    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 5<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">11</text:page-number><text:s/>of <text:page-count>13</text:page-count></text:p>
    </style:footer>
   </style:master-page>
   <style:master-page style:name="MP0" style:page-layout-name="pm2">
    <style:footer>
-    <text:p text:style-name="P1"><text:span text:style-name="T2">Lab 5 with ZedBoard and FCOMMS2<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">0</text:page-number><text:s/>of <text:page-count>14</text:page-count></text:p>
+    <text:p text:style-name="P1"><text:span text:style-name="T2">Lab 5 with ZedBoard and FCOMMS2<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">0</text:page-number><text:s/>of <text:page-count>13</text:page-count></text:p>
    </style:footer>
   </style:master-page>
  </office:master-styles>
@@ -2870,20 +2873,20 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:h text:style-name="P22" text:outline-level="1"><text:span text:style-name="T1">Tutorial</text:span> 5: <text:span text:style-name="T10">Creating a Time Demux Component</text:span><text:span text:style-name="T10"><office:annotation>
+   <text:h text:style-name="P19" text:outline-level="1"><text:span text:style-name="T1">Tutorial</text:span> 5: <text:span text:style-name="T10">Creating a Time Demux Component</text:span><text:span text:style-name="T10"><office:annotation>
       <dc:creator>Lisa Zahn</dc:creator>
       <dc:date>2019-10-04T14:35:02.985400778</dc:date>
       <loext:sender-initials>LZ</loext:sender-initials>
-      <text:p text:style-name="P23"><text:span text:style-name="T25">The lab author provided this caveat here: “NOTICE: This lab is hit or miss. Generating and building your unit test only worked for CentOS 7 for me. I could not verify that this component works correctly because it would run in an infinite loop. I could not build or generate for Xilinux13_3. Even with the provided lab 2, I seem to have this issue. You will truly only see if this works if the final lab example works as intended.”</text:span></text:p>
+      <text:p text:style-name="P23"><text:span text:style-name="T26">The lab author provided this caveat here: “NOTICE: This lab is hit or miss. Generating and building your unit test only worked for CentOS 7 for me. I could not verify that this component works correctly because it would run in an infinite loop. I could not build or generate for Xilinux13_3. Even with the provided lab 2, I seem to have this issue. You will truly only see if this works if the final lab example works as intended.”</text:span></text:p>
      </office:annotation></text:span></text:h>
    <text:p text:style-name="P11"><text:span text:style-name="T11">This tutorial shows you how to create</text:span> <text:span text:style-name="T21">a</text:span> <text:span text:style-name="T21">t</text:span>ime <text:span text:style-name="T21">d</text:span>emux component. Th<text:span text:style-name="T22">e time demux</text:span> component receives I/Q sample data that has time stamps interleaved within it. <text:span text:style-name="T21">It </text:span>recovers the original data stream and writes it out while also providing a second stream <text:span text:style-name="T21">that </text:span>contain<text:span text:style-name="T21">s</text:span> only the timestamps. Having <text:span text:style-name="T12">the </text:span>data separated allows additional processing by tools expecting &quot;just data”; <text:span text:style-name="T12">for example,</text:span> plotting an FFT.</text:p>
    <text:p text:style-name="P10">The objectives of this <text:span text:style-name="T1">tutorial</text:span><office:annotation>
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-11T13:11:47.531114679</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P23"><text:span text:style-name="T25">To the authors of this improved lab: these were BIA’s objectives for this lab. Are they still relevant?</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T26">To the authors of this improved lab: these were BIA’s objectives for this lab. Are they still relevant?</text:span></text:p>
     </office:annotation> are to learn how RCC workers can:</text:p>
-   <text:list xml:id="list1730603183" text:style-name="WWNum32">
+   <text:list xml:id="list3484311537" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P15">Use different <text:span text:style-name="T23">p</text:span>rotocols on different <text:span text:style-name="T23">p</text:span>orts - Nonstandard input:output port ratio (1:2 vs. 1:1)</text:p>
     </text:list-item>
@@ -2892,7 +2895,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P10">This <text:span text:style-name="T1">tutorial</text:span> also reiterates:</text:p>
-   <text:list xml:id="list113611213447050" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list130833028619057" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P15">C++ conventions - <text:span text:style-name="T23">a</text:span>ccessing <text:span text:style-name="T23">p</text:span>ort data and <text:span text:style-name="T23">p</text:span>roperties</text:p>
     </text:list-item>
@@ -2900,7 +2903,7 @@
      <text:p text:style-name="List_20_Bullet">Framework interactions - RCC_ADVANCE vs. RCC_OK</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P5">Note: This <text:span text:style-name="T1">tutorial</text:span> builds on the previous <text:span text:style-name="T1">tutorial</text:span> as we are recreating training_project. </text:p>
+   <text:p text:style-name="P5">Note: This <text:span text:style-name="T1">tutorial</text:span> builds on the previous <text:span text:style-name="T1">tutorial</text:span> as we are recreating t<text:span text:style-name="T25">utorial-</text:span>project. </text:p>
    <text:p text:style-name="P5"/>
    <text:h text:style-name="P17" text:outline-level="2"><text:span text:style-name="T7">Step 1: </text:span>Create time_demux Component </text:h>
    <text:p text:style-name="P5">Create a component called time_demux:</text:p>
@@ -10761,8 +10764,8 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-04T14:43:17.774638007</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P23"><text:span text:style-name="T25">Is this still valid?</text:span></text:p>
-    </office:annotation>Create a unit test for time_demux by copying the time_demux.test folder from the GitLab training/provided/lab5 folder into the components library.<office:annotation-end office:name="__Annotation__626_285870955"/></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T26">Is this still valid? Need to update for how tutorial-project will be located.</text:span></text:p>
+    </office:annotation>Create a unit test for time_demux by copying the time_demux.test folder from the GitLab t<text:span text:style-name="T25">utorial-project</text:span>/provided/lab5 folder into the components library.<office:annotation-end office:name="__Annotation__626_285870955"/></text:p>
    <text:p text:style-name="P3"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T6"><draw:frame draw:style-name="fr1" draw:name="Picture 8" text:anchor-type="as-char" svg:y="0in" svg:width="4.4457in" style:rel-width="scale" svg:height="3.6772in" style:rel-height="scale" draw:z-index="14"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAiMAAAHFCAYAAAAg3/mzAAAAAXNSR0IArs4c6QAAAARnQU1B
          AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
@@ -11693,50 +11696,12 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-04T15:21:48.013479322</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P23"><text:span text:style-name="T25">This version of the lab (vs. the BIA version) doesn’t supply any “run unit test” information. The information here is from the post-1.5 updated lab from BIA. It’s possible that useful information could be missing.</text:span></text:p>
+     <text:p text:style-name="P23"><text:span text:style-name="T26">The CNF version of the lab (vs. the BIA version) doesn’t supply any “run unit test” information. The information here is from the post-1.5 updated lab from BIA. It’s possible that useful information could be missing.</text:span></text:p>
     </office:annotation></text:h>
    <text:p text:style-name="P7"><text:span text:style-name="T14">To run the unit test on development host, c</text:span>lick <text:span text:style-name="T19">the</text:span> &quot;prep + run + verify&quot; button. The test should run quickly. Upon completion, you should see &quot;PASSED&quot; along with final values for the min/max peaks.</text:p>
    <text:p text:style-name="P6">Click the &quot;view&quot; button to view the test results. Plots of input and output (time and frequency domain) will pop up.</text:p>
    <text:p text:style-name="P8"/>
-   <text:p text:style-name="Standard"/>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:span text:style-name="T15">Step 8: </text:span>Run Unit Test on Target Platform<office:annotation>
-     <dc:creator>Lisa Zahn</dc:creator>
-     <dc:date>2019-10-04T15:36:24.968456853</dc:date>
-     <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P23"><text:span text:style-name="T25">This is information from post 1.5 updated BIA Lab5 slide.</text:span></text:p>
-    </office:annotation></text:h>
-   <text:p text:style-name="P9">To run the unit test on the target SDR platform:</text:p>
-   <text:list xml:id="list113611365609101" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="P16">Build the Unit Test Suite for the target software platform: </text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="P13">Use the IDE to &quot;Add&quot; the Unit Test to the Project Operations panel</text:p>
-   <text:p text:style-name="P13">Highlight <text:span text:style-name="T8">xilinx13_4</text:span> <text:span text:style-name="T15">(E310) or </text:span><text:span text:style-name="T8">xilinx13_</text:span><text:span text:style-name="T9">3</text:span><text:span text:style-name="T8"> </text:span><text:span text:style-name="T16">(</text:span><text:span text:style-name="T15">Zedboard/FMCOMMS2) i</text:span>n the RCC Platforms panel.</text:p>
-   <text:p text:style-name="P13">Select <text:span text:style-name="T1">the </text:span>&quot;Tests&quot; <text:span text:style-name="T15">r</text:span>adio button.</text:p>
-   <text:p text:style-name="P13">Click gen + build.</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">Review the <text:span text:style-name="T15">c</text:span>onsole window messages and address any errors.</text:p>
-   <text:list xml:id="list113611351083598" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T20">Using the</text:span> <text:span text:style-name="T15">c</text:span>ommand-line terminal (of the <text:span text:style-name="T15">d</text:span>evelopment host) approach to running unit tests on remote platforms:</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="List_20_Bullet_20_3">Set OCPI_REMOTE_TEST_SYSTEMS, as shown:</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">$ export OCPI_REMOTE_TEST_SYSTEMS={<text:span text:style-name="T17">IP of </text:span><text:span text:style-name="T18">target platform</text:span>}=root=root=/mnt/training_project<office:annotation>
-     <dc:creator>Lisa Zahn</dc:creator>
-     <dc:date>2019-10-04T15:33:50.733391037</dc:date>
-     <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P23"><text:span text:style-name="T25">The BIA input specified the E310. I genericized it here.</text:span></text:p>
-    </office:annotation></text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">Browse to time_demux.test/ and execute <text:span text:style-name="T15">the following command:</text:span></text:p>
-   <text:p text:style-name="Code">$ ocpidev run --mode prep_run_verify –only-platforms <text:span text:style-name="T15">{</text:span>xil<text:span text:style-name="T15">i</text:span>nx13_4 <text:span text:style-name="T15">| xilinx_13_3}</text:span></text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">This <text:span text:style-name="T15">command</text:span> run<text:span text:style-name="T15">s</text:span> the unit test remotely (over ssh) on the <text:span text:style-name="T15">target platform.</text:span></text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">Also try:</text:p>
-   <text:p text:style-name="Code">$ ocpidev run --mode prep_run_verify --only-platform xilinx13_4 --view {limits platforms to test}</text:p>
-   <text:p text:style-name="Code">$ ocpidev run --mode prep_run_verify {run on all available platforms, no plotting}</text:p>
-   <text:p text:style-name="Code">$ ocpidev run --mode verify {verify previous results}</text:p>
-   <text:p text:style-name="Code">$ ocpidev run --mode view {plot previous results}</text:p>
-   <text:p text:style-name="P12"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T6"/></text:span></text:p>
+   <text:p text:style-name="Standard"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T6"/></text:span></text:p>
   </office:text>
  </office:body>
 </office:document>

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>31</meta:editing-cycles><meta:creation-date>2019-10-03T11:15:36.721175186</meta:creation-date><meta:editing-duration>PT1H53M52S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><dc:date>2019-10-18T11:07:45.024960049</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="16" meta:object-count="0" meta:page-count="16" meta:paragraph-count="95" meta:word-count="833" meta:character-count="5159" meta:non-whitespace-character-count="4421"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-03T11:15:36.561977532"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>35</meta:editing-cycles><meta:creation-date>2019-10-03T11:15:36.721175186</meta:creation-date><meta:editing-duration>PT3H41M31S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><dc:date>2019-10-28T12:11:17.253989488</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="17" meta:object-count="0" meta:page-count="15" meta:paragraph-count="71" meta:word-count="673" meta:character-count="4032" meta:non-whitespace-character-count="3422"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-03T11:15:36.561977532"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">223259</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">63950</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">29152</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">15893</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">29475</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">16760</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">19923</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">236573</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">11105</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">64124</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">223259</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">29150</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">239150</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">63950</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">29473</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">80709</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">1</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -111,7 +111,7 @@
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">37639372</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">37737967</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
@@ -3111,21 +3111,42 @@
    <style:text-properties officeooo:paragraph-rsid="0222cfca" style:font-name-asian="Times New Roman1"/>
   </style:style>
   <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:paragraph-rsid="02287487"/>
+   <style:text-properties officeooo:paragraph-rsid="0222cfca"/>
   </style:style>
   <style:style style:name="P25" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:paragraph-rsid="0222cfca"/>
+   <style:text-properties officeooo:rsid="023fd5ef" officeooo:paragraph-rsid="023fd5ef"/>
   </style:style>
   <style:style style:name="P26" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:paragraph-rsid="0222cfca"/>
   </style:style>
-  <style:style style:name="P27" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:rsid="022c26ef" officeooo:paragraph-rsid="022c26ef"/>
+  <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:paragraph-rsid="023fd5ef"/>
   </style:style>
   <style:style style:name="P28" style:family="paragraph" style:parent-style-name="List_20_Bullet">
    <style:text-properties officeooo:rsid="0223a142" officeooo:paragraph-rsid="0223a142"/>
   </style:style>
-  <style:style style:name="P29" style:family="paragraph">
+  <style:style style:name="P29" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:rsid="0223a142" officeooo:paragraph-rsid="023fd5ef"/>
+  </style:style>
+  <style:style style:name="P30" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:rsid="023fd5ef" officeooo:paragraph-rsid="023fd5ef"/>
+  </style:style>
+  <style:style style:name="P31" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="023fd5ef"/>
+  </style:style>
+  <style:style style:name="P32" style:family="paragraph" style:parent-style-name="Normal">
+   <style:text-properties officeooo:paragraph-rsid="023fd5ef"/>
+  </style:style>
+  <style:style style:name="P33" style:family="paragraph" style:parent-style-name="Standard">
+   <style:text-properties officeooo:paragraph-rsid="023fd5ef"/>
+  </style:style>
+  <style:style style:name="P34" style:family="paragraph">
+   <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
+    <style:tab-stops/>
+   </style:paragraph-properties>
+   <style:text-properties fo:hyphenate="false"/>
+  </style:style>
+  <style:style style:name="P35" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
@@ -3159,78 +3180,102 @@
    <style:text-properties fo:font-weight="normal" officeooo:rsid="0222cfca" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T10" style:family="text">
-   <style:text-properties officeooo:rsid="001492c8"/>
+   <style:text-properties fo:font-weight="normal" officeooo:rsid="023fd5ef" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
   <style:style style:name="T11" style:family="text">
-   <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+   <style:text-properties officeooo:rsid="001492c8"/>
   </style:style>
   <style:style style:name="T12" style:family="text">
-   <style:text-properties style:font-name="Arial2" officeooo:rsid="0222cfca"/>
+   <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T13" style:family="text">
-   <style:text-properties style:font-name="Arial2" officeooo:rsid="0222cfca" style:font-name-asian="Times New Roman1"/>
+   <style:text-properties fo:font-weight="bold" officeooo:rsid="023fd5ef" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="T14" style:family="text">
-   <style:text-properties style:font-name="Arial2" officeooo:rsid="02331913" style:font-name-asian="Times New Roman1"/>
+   <style:text-properties style:font-name="Arial2" officeooo:rsid="0222cfca"/>
   </style:style>
   <style:style style:name="T15" style:family="text">
-   <style:text-properties style:font-name="Arial2" officeooo:rsid="02331913"/>
+   <style:text-properties style:font-name="Arial2" officeooo:rsid="0222cfca" style:font-name-asian="Times New Roman1"/>
   </style:style>
   <style:style style:name="T16" style:family="text">
-   <style:text-properties style:font-name="Arial2" officeooo:rsid="023c65ed"/>
+   <style:text-properties style:font-name="Arial2" officeooo:rsid="02331913" style:font-name-asian="Times New Roman1"/>
   </style:style>
   <style:style style:name="T17" style:family="text">
-   <style:text-properties officeooo:rsid="0223a142"/>
+   <style:text-properties style:font-name="Arial2" officeooo:rsid="02331913"/>
   </style:style>
   <style:style style:name="T18" style:family="text">
-   <style:text-properties officeooo:rsid="02269814"/>
+   <style:text-properties style:font-name="Arial2" officeooo:rsid="023c65ed"/>
   </style:style>
   <style:style style:name="T19" style:family="text">
-   <style:text-properties officeooo:rsid="02279b47"/>
+   <style:text-properties officeooo:rsid="0223a142"/>
   </style:style>
   <style:style style:name="T20" style:family="text">
-   <style:text-properties officeooo:rsid="02287487"/>
+   <style:text-properties officeooo:rsid="02269814"/>
   </style:style>
   <style:style style:name="T21" style:family="text">
-   <style:text-properties style:font-name="Liberation Sans1"/>
+   <style:text-properties officeooo:rsid="02279b47"/>
   </style:style>
   <style:style style:name="T22" style:family="text">
-   <style:text-properties style:font-name="Liberation Sans1" officeooo:rsid="0233716c"/>
+   <style:text-properties officeooo:rsid="02287487"/>
   </style:style>
   <style:style style:name="T23" style:family="text">
-   <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
+   <style:text-properties style:font-name="Liberation Sans1"/>
   </style:style>
   <style:style style:name="T24" style:family="text">
-   <style:text-properties fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
+   <style:text-properties style:font-name="Liberation Sans1" officeooo:rsid="0233716c"/>
   </style:style>
   <style:style style:name="T25" style:family="text">
-   <style:text-properties officeooo:rsid="022a6602"/>
+   <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
   </style:style>
   <style:style style:name="T26" style:family="text">
-   <style:text-properties officeooo:rsid="02307eb1"/>
+   <style:text-properties fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
   </style:style>
   <style:style style:name="T27" style:family="text">
-   <style:text-properties officeooo:rsid="02331913"/>
+   <style:text-properties officeooo:rsid="022a6602"/>
   </style:style>
   <style:style style:name="T28" style:family="text">
-   <style:text-properties officeooo:rsid="0233716c"/>
+   <style:text-properties officeooo:rsid="02307eb1"/>
   </style:style>
   <style:style style:name="T29" style:family="text">
-   <style:text-properties officeooo:rsid="023548e1"/>
+   <style:text-properties officeooo:rsid="02331913"/>
   </style:style>
   <style:style style:name="T30" style:family="text">
-   <style:text-properties officeooo:rsid="02387aa8"/>
+   <style:text-properties officeooo:rsid="0233716c"/>
   </style:style>
   <style:style style:name="T31" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties officeooo:rsid="023548e1"/>
   </style:style>
   <style:style style:name="T32" style:family="text">
-   <style:text-properties officeooo:rsid="023c65ed"/>
+   <style:text-properties officeooo:rsid="02387aa8"/>
   </style:style>
   <style:style style:name="T33" style:family="text">
-   <style:text-properties officeooo:rsid="023e54cc"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T34" style:family="text">
+   <style:text-properties officeooo:rsid="023c65ed"/>
+  </style:style>
+  <style:style style:name="T35" style:family="text">
+   <style:text-properties officeooo:rsid="023e54cc"/>
+  </style:style>
+  <style:style style:name="T36" style:family="text">
+   <style:text-properties officeooo:rsid="023fd5ef"/>
+  </style:style>
+  <style:style style:name="T37" style:family="text">
+   <style:text-properties officeooo:rsid="0022570d"/>
+  </style:style>
+  <style:style style:name="T38" style:family="text">
+   <style:text-properties officeooo:rsid="023a5a27"/>
+  </style:style>
+  <style:style style:name="T39" style:family="text">
+   <style:text-properties officeooo:rsid="022b3b9a"/>
+  </style:style>
+  <style:style style:name="T40" style:family="text">
+   <style:text-properties officeooo:rsid="00235ff5"/>
+  </style:style>
+  <style:style style:name="T41" style:family="text">
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
+  <style:style style:name="T42" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
@@ -3261,12 +3306,12 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:footer>
-    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 0<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">16</text:page-number><text:s/>of <text:page-count>16</text:page-count></text:p>
+    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 0<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">15</text:page-number><text:s/>of <text:page-count>15</text:page-count></text:p>
    </style:footer>
   </style:master-page>
   <style:master-page style:name="MP0" style:page-layout-name="pm2">
    <style:footer>
-    <text:p text:style-name="P1"><text:span text:style-name="T2">Lab 0 OpenCPI Workspace Environment<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">0</text:page-number><text:s/>of <text:page-count>16</text:page-count></text:p>
+    <text:p text:style-name="P1"><text:span text:style-name="T2">Lab 0 OpenCPI Workspace Environment<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">0</text:page-number><text:s/>of <text:page-count>15</text:page-count></text:p>
    </style:footer>
   </style:master-page>
  </office:master-styles>
@@ -3281,82 +3326,463 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:h text:style-name="P23" text:outline-level="1"><text:span text:style-name="T27">Tutorial</text:span> 0: <text:span text:style-name="T26">Setting up an </text:span>OpenCPI WorkSpace Environment</text:h>
-   <text:p text:style-name="P6"><text:span text:style-name="T12">This </text:span><text:span text:style-name="T15">tutorial</text:span><text:span text:style-name="T12"> is a reference for procedures that </text:span><text:span text:style-name="T16">you will</text:span><text:span text:style-name="T12"> use </text:span><text:span text:style-name="T16">in subsequent OpenCPI tutorials</text:span><text:span text:style-name="T12">. The purpose of this </text:span><text:span text:style-name="T15">tutorial</text:span><text:span text:style-name="T12"> is to remove any repetitive steps that </text:span><text:span text:style-name="T16">may</text:span><text:span text:style-name="T12"> later seem redundant as you are completing the </text:span><text:span text:style-name="T15">other tutorials</text:span><text:span text:style-name="T12">.</text:span><text:span text:style-name="T13"> This </text:span><text:span text:style-name="T14">tutorial</text:span><text:span text:style-name="T13"> demonstrates how to:</text:span></text:p>
-   <text:list xml:id="list897375308" text:style-name="WWNum32">
+   <text:h text:style-name="P23" text:outline-level="1"><text:span text:style-name="T29">Tutorial</text:span> 0: <text:span text:style-name="T28">Setting up an </text:span>OpenCPI WorkSpace Environment</text:h>
+   <text:p text:style-name="P6"><text:span text:style-name="T14">This </text:span><text:span text:style-name="T17">tutorial</text:span><text:span text:style-name="T14"> is a reference for procedures that </text:span><text:span text:style-name="T18">you will</text:span><text:span text:style-name="T14"> use </text:span><text:span text:style-name="T18">in subsequent OpenCPI tutorials</text:span><text:span text:style-name="T14">. The purpose of this </text:span><text:span text:style-name="T17">tutorial</text:span><text:span text:style-name="T14"> is to remove any repetitive steps that </text:span><text:span text:style-name="T18">may</text:span><text:span text:style-name="T14"> later seem redundant as you are completing the </text:span><text:span text:style-name="T17">other tutorials</text:span><text:span text:style-name="T14">.</text:span><text:span text:style-name="T15"> This </text:span><text:span text:style-name="T16">tutorial</text:span><text:span text:style-name="T15"> demonstrates how to:</text:span></text:p>
+   <text:list xml:id="list1427674773" text:style-name="WWNum32">
+    <text:list-item>
+     <text:p text:style-name="P30">Create local copies of OpenCPI projects</text:p>
+    </text:list-item>
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Set up a new blank Eclipse workspace</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Import pre-built projects <text:span text:style-name="T20">for use in subsequent tutorials.</text:span></text:p>
+     <text:p text:style-name="List_20_Bullet">Import <text:span text:style-name="T36">the OpenCPI </text:span>projects <text:span text:style-name="T22">for use in subsequent tutorials</text:span></text:p>
     </text:list-item>
    </text:list>
-   <text:h text:style-name="P17" text:outline-level="2">About the <text:span text:style-name="T28">Tutorial </text:span>Environment<office:annotation>
+   <text:h text:style-name="P25" text:outline-level="2">Copying OpenCPI Projects to Your Workspace</text:h>
+   <text:p text:style-name="P33">The <text:span text:style-name="T19">following projects are</text:span> essential files <text:span text:style-name="T36">for OpenCPI application development</text:span>:</text:p>
+   <text:list xml:id="list121129809626245" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list-item>
+     <text:p text:style-name="P31">core – basic components (read and write files)</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P31">assets – various component libraries</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P29"><office:annotation office:name="__Annotation__377_5060934182">
+       <dc:creator>Lisa Zahn</dc:creator>
+       <dc:date>2019-10-03T12:00:41.026022466</dc:date>
+       <loext:sender-initials>LZ</loext:sender-initials>
+       <text:p text:style-name="P34"><text:span text:style-name="T41">This text is taken from the BIA lab. Does this project need to be mentioned here if it’s not used in the labs and isn’t displayed in the IDE?</text:span></text:p>
+      </office:annotation>assets_ts – components for timestamping<office:annotation-end office:name="__Annotation__377_5060934182"/></text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P31">bsp_e310 – unique device workers, card definition and the E310 BSP</text:p>
+    </text:list-item>
+   </text:list>
+   <text:p text:style-name="P33">This <text:span text:style-name="T38">tutorial</text:span> leverages the <text:span text:style-name="T39">core, assets and bsp_e310 </text:span>projects that <text:span text:style-name="T37">O</text:span>pen<text:span text:style-name="T37">CPI </text:span>provides. <text:span text:style-name="T36">You need to make local copies of them for use in the tutorials. To do this, you run the ocpi-copy-projects script and specify the location to which you want to copy the projects. In this example, we create a new folder called </text:span><text:span text:style-name="T13">lab1_tut</text:span><text:span text:style-name="T36"> as a place to put the projects for this tutorial. You can use the default location if nothing else is there. </text:span></text:p>
+   <text:p text:style-name="P27"/>
+   <text:p text:style-name="P32"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 43" text:anchor-type="as-char" svg:y="0in" svg:width="6.5in" style:rel-width="scale" svg:height="1.611in" style:rel-height="scale" draw:z-index="16"><draw:image loext:mime-type="image/png">
+        <office:binary-data>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
+         FbQ6tGnTxr388ss21a5d2yyg2dnZXqr9m0MOOcT17t3bVa9e3VsiAPH9n//8x11//fVu1qxZ
+         7tJLL3V33XVX3Nr0voauacHRuXNnd9ZZZ3lzQggh9hW2bt3q/doNlvFYivW4/9FI1qaNjik2
+         fCEisUyZMq5Pnz7ekt0gFF988UVzWSlevLh9EMaNG+fOOecc93//939eKuc+/fRTExQ//vij
+         O+yww9y5557runbt6ojWQhP2lVde6f72t7+5pk2bels4sxS++eab1mRfokQJW5ZoP0Huv/9+
+         d8QRR7gbb7zRW7IbxA0uC1h2fv31V3f44Ye7Sy65JJe1/x//+Idbv369q1Spkvvyyy9dyZIl
+         3YUXXuj+8Ic/eClyCJMfjsM53HvvvWaxp4miQoUK7oEHHrBjX3fddda0/Lvf/c7bIodbb73V
+         XXXVVe7EE08s0DzTxI01/sgjj3QTJ040X6bzzjvP9ezZ09b7kI/Bgwe7GTNmuN9++80qDz16
+         9HCtWrWy9WHyQxPNTTfd5M05179/f3fUUUd5c+Ep6Psw09x2222uefPme5Txxx9/7F599VX3
+         +OOPu4EDB7r77rvPzZkzx64/1ycsYe4f2JeuKSTLTyaeiw0bNrjLL7/c3Xnnne7UU0+1ZUAF
+         uV+/flb+FStW9JYmJuwzmOid0KhRo9DXi31v377dfp999tl2H8US5h2VqJw3b95srXTx6NWr
+         lz1jPu+++657//337VkqX768PUdUHIUQ4kAiGL6Qd3A8zjjjDO+XF77Q+50yb731lpswYYK7
+         4447TCzMnz/f/fTTT97aHD766CP3wgsvmCBCTNxwww32wkbgQNWqVd2xxx5r+wmCqDrttNN2
+         iZ9k+wnLJ5984t544w37+OJHTmHwwSXvQWbOnGnNvcOGDTOhjBibMmWKtza1/FAjwh8YcU2Z
+         3XPPPa5s2bImFvlYIcL5AD777LMmzBGDfDT5eEJB5/nrr782oUeeySt5/vbbb721Oedz9913
+         ux9++MEEzPPPP28f69jmlmT5qVOnjrkSIXb2hoK8DwsS/KsRsVQqgQpxy5YtUxLhEOb+2deu
+         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
+         AAAASUVORK5CYII=
+        </office:binary-data>
+       </draw:image>
+       <svg:desc>/C:/d4a283eb4d7ca6ab9260a926afc022b0</svg:desc>
+      </draw:frame></text:span></text:span></text:p>
+   <text:p text:style-name="P33"><office:annotation office:name="__Annotation__3270_3941342796">
      <dc:creator>Lisa Zahn</dc:creator>
-     <dc:date>2019-10-03T12:15:02.725671236</dc:date>
+     <dc:date>2019-10-28T12:07:01.491233297</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P29"><text:span text:style-name="T34">Is any of the information in this section still relevant? It’s taken from AV Course_04_Lab_Environment. It does not appear in CNF labs.</text:span></text:p>
-    </office:annotation></text:h>
-   <text:p text:style-name="P8">The <text:span text:style-name="T28">tutorial</text:span> environment uses the following setup:</text:p>
-   <text:list xml:id="list110745257821912" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Username: &quot;user&quot;, Password: &lt;see sticker&gt; </text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">CentOS 7.5 (1804)</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="P20">The <text:span text:style-name="T28">tutorial</text:span> serves /<text:span text:style-name="T24">home/user/training and /opt/opencpi via NFS.</text:span></text:p>
-    </text:list-item>
-   </text:list>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Installed Items</text:h>
-   <text:p text:style-name="P11"><text:span text:style-name="T25">The following items are i</text:span>nstalled:</text:p>
-   <text:list xml:id="list110745612222567" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">OpenCPI 1.5 (w/ ANGRYVIPER IDE)</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Xilinx Vivado and SDK (2017.1) </text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Various support utilities (python, matplotlib, git, etc)</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Configured SELinux and firewall for NFS export to Ettus E310</text:p>
-    </text:list-item>
-   </text:list>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Pre-built Projects</text:h>
-   <text:p text:style-name="P8">The <text:span text:style-name="T28">tutorial</text:span> environment contains the following pre-built projects: core, assets, assets_ts, bsp_310 (order is critical).</text:p>
-   <text:p text:style-name="P13">These pre-built projects are located at:</text:p>
-   <text:p text:style-name="P14">~/training/ocpi_projects/core</text:p>
-   <text:p text:style-name="P9">~/training/ocpi_projects/assets</text:p>
-   <text:p text:style-name="P9">~/training/ocpi_projects/assets_ts</text:p>
-   <text:p text:style-name="P8">~/training/ocpi_projects/bsp_e310</text:p>
-   <text:p text:style-name="P8">They are built:</text:p>
-   <text:list xml:id="list110746735996975" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Per instructions in the <text:span text:style-name="T23">OpenCPI Getting Started Guide</text:span> and the <text:span text:style-name="T23">OpenCPI Ettus E3xx Getting Started Guide</text:span>.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">With RCC workers built (x86_84 and xilinx13_4ARM).</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">With all HDL built (targeting e3xx and xsim platforms).</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="P12">The IDE is located at /<text:span text:style-name="T24">usr/bin/ocpigui.</text:span></text:p>
-   <text:p text:style-name="P15">Global variables for all users are:</text:p>
-   <text:p text:style-name="P15">OCPI_XILINX_LICENSE_FILE pre-configured for WebPACK</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:soft-page-break/>Falling Behind?</text:h>
-   <text:p text:style-name="P10">If you find yourself falling behind (you didn’t complete a <text:span text:style-name="T30">tutorial</text:span>), you can run the script in:</text:p>
-   <text:p text:style-name="P10"><text:s text:c="5"/>provided/scripts/complete_lab.sh</text:p>
-   <text:p text:style-name="P10">The script expects the number of the <text:span text:style-name="T30">tutorial</text:span> <text:span text:style-name="T30">up to which </text:span>you want to be completed and you need to EXPORT BUILD_HDL=1 to synthesize as well.</text:p>
-   <text:p text:style-name="P10">Note: this script has not been vigorously tested.</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Using the E310</text:h>
-   <text:p text:style-name="Standard"><text:span text:style-name="T21">The USB console connection is using a port intended by the </text:span>manufacturer for debug-only usage. It is very delicate and easily breaks, which is why the unit and the associated cables are affixed. Do not move them.</text:p>
-   <text:p text:style-name="Standard"><text:span text:style-name="T21">If sharing </text:span><text:span text:style-name="T22">an</text:span><text:span text:style-name="T21"> E310 between adjacent students, use the &quot;reboot&quot; </text:span>command when moving the USB cable. This <text:span text:style-name="T28">action </text:span>ensure<text:span text:style-name="T28">s that</text:span> its NFS mounts point to the correct student&apos;s laptop.</text:p>
-   <text:p text:style-name="Standard"><text:span text:style-name="T21">If needed, unplugging the power from the mains is preferred over the </text:span>connection on the front of the radio.</text:p>
-   <text:p text:style-name="Standard"/>
+     <text:p text:style-name="P35"><text:span text:style-name="T42">Should this be done before running copy projects?</text:span></text:p>
+    </office:annotation>Unregister any previous projects before continuing.<office:annotation-end office:name="__Annotation__3270_3941342796"/></text:p>
    <text:p text:style-name="P8"/>
    <text:h text:style-name="P18" text:outline-level="2">Procedure 1: Set up a Workspace </text:h>
    <text:p text:style-name="P6">Use this procedure to create a new, blank workspace each time you create a new project. This way, you don’t get confused with previous projects/ workspaces.</text:p>
@@ -7804,7 +8230,7 @@
        <svg:desc>/C:/d7ce4a83a161be3dd41c4cbf3141484f</svg:desc>
       </draw:frame></text:span></text:span></text:p>
    <text:h text:style-name="P19" text:outline-level="3"><text:span text:style-name="Strong"><text:span text:style-name="T8">Step 2: Select Directory Workspace</text:span></text:span></text:h>
-   <text:p text:style-name="P6">Click Browse. The following <text:span text:style-name="T18">dialog</text:span> pops up:</text:p>
+   <text:p text:style-name="P6">Click Browse. The following <text:span text:style-name="T20">dialog</text:span> pops up:</text:p>
    <text:p text:style-name="P3"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 14" text:anchor-type="as-char" svg:y="0in" svg:width="6.5in" style:rel-width="scale" svg:height="3.1382in" style:rel-height="scale" draw:z-index="2"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAA/cAAAHsCAYAAACXCF2+AAAAAXNSR0IArs4c6QAAAARnQU1B
          AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
@@ -8999,7 +9425,7 @@
        </draw:image>
        <svg:desc>/C:/ec92be7e5bd4575dca9269ecebd2004e</svg:desc>
       </draw:frame></text:span></text:span></text:p>
-   <text:h text:style-name="P19" text:outline-level="3"><text:span text:style-name="Strong"><text:span text:style-name="T8">Step 3:</text:span></text:span> Launch <text:span text:style-name="T10">Workspace</text:span></text:h>
+   <text:h text:style-name="P19" text:outline-level="3"><text:span text:style-name="Strong"><text:span text:style-name="T8">Step 3:</text:span></text:span> Launch <text:span text:style-name="T11">Workspace</text:span></text:h>
    <text:p text:style-name="P6">Once you know you are in the new directory you created, click Launch.</text:p>
    <text:p text:style-name="P3"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 12" text:anchor-type="as-char" svg:y="0in" svg:width="6.5in" style:rel-width="scale" svg:height="3.3846in" style:rel-height="scale" draw:z-index="4"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAk4AAAE0CAYAAADaCLzPAAAAAXNSR0IArs4c6QAAAARnQU1B
@@ -9988,7 +10414,7 @@
        <svg:desc>/C:/991009ebecc785b719434d083766dbf5</svg:desc>
       </draw:frame></text:span></text:span></text:p>
    <text:p text:style-name="P6"/>
-   <text:p text:style-name="P6">Highlight the ANGRYVIPER Perspective and <text:span text:style-name="T18">then click </text:span>Open:</text:p>
+   <text:p text:style-name="P6">Highlight the ANGRYVIPER Perspective and <text:span text:style-name="T20">then click </text:span>Open:</text:p>
    <text:p text:style-name="P3"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 10" text:anchor-type="as-char" svg:y="0in" svg:width="3.6366in" style:rel-width="scale" svg:height="4.7839in" style:rel-height="scale" draw:z-index="6"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAV4AAAHNCAYAAABW2RP3AAAAAXNSR0IArs4c6QAAAARnQU1B
          AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
@@ -12004,10 +12430,10 @@
        </draw:image>
        <svg:desc>/C:/40b0814d5a8de926f40115b519878f65</svg:desc>
       </draw:frame></text:span></text:span></text:p>
-   <text:p text:style-name="P6">NOTE: This is what a blank workspace looks like. You will need to start with this for every <text:span text:style-name="T30">tutorial</text:span>. </text:p>
-   <text:h text:style-name="P18" text:outline-level="2"><text:span text:style-name="Strong"><text:span text:style-name="T8">Procedure 2:</text:span></text:span> <text:span text:style-name="Strong"><text:span text:style-name="T8">Import </text:span></text:span><text:span text:style-name="Strong"><text:span text:style-name="T9">Pre-Built Projects</text:span></text:span></text:h>
-   <text:p text:style-name="P6">The <text:span text:style-name="T17">following projects are</text:span> essential files that allow you to build projects on different platforms with the build option in Eclipse:</text:p>
-   <text:list xml:id="list110746480680233" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:p text:style-name="P6">NOTE: This is what a blank workspace looks like. You will need to start with this for every <text:span text:style-name="T32">tutorial</text:span>. </text:p>
+   <text:h text:style-name="P18" text:outline-level="2"><text:span text:style-name="Strong"><text:span text:style-name="T8">Procedure 2:</text:span></text:span> <text:span text:style-name="Strong"><text:span text:style-name="T8">Import </text:span></text:span><text:span text:style-name="Strong"><text:span text:style-name="T10">OpenCPI</text:span></text:span><text:span text:style-name="Strong"><text:span text:style-name="T9"> Projects</text:span></text:span></text:h>
+   <text:p text:style-name="P6">The <text:span text:style-name="T19">following projects are</text:span> essential files that allow you to build projects on different platforms with the build option in Eclipse:</text:p>
+   <text:list xml:id="list121128753842561" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">core – basic components (read and write files)</text:p>
     </text:list-item>
@@ -12019,15 +12445,15 @@
        <dc:creator>Lisa Zahn</dc:creator>
        <dc:date>2019-10-03T12:00:41.026022466</dc:date>
        <loext:sender-initials>LZ</loext:sender-initials>
-       <text:p text:style-name="P29"><text:span text:style-name="T34">This text is taken from the BIA lab. Does this project need to be mentioned here if it’s not used in the labs and isn’t displayed in the IDE?</text:span></text:p>
+       <text:p text:style-name="P34"><text:span text:style-name="T41">This text is taken from the BIA lab. Does this project need to be mentioned here if it’s not used in the labs and isn’t displayed in the IDE?</text:span></text:p>
       </office:annotation>assets_ts – components for timestamping<office:annotation-end office:name="__Annotation__377_506093418"/></text:p>
     </text:list-item>
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">bsp_e310 – unique device workers, card definition and the E310 BSP</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P7">In this procedure, we’ll import the core, assets and bsp_310 projects, which <text:span text:style-name="T33">we’ll</text:span> need for subsequent <text:span text:style-name="T30">tutorial</text:span>s.</text:p>
-   <text:p text:style-name="P6"><text:span text:style-name="T17">Note: </text:span>Sometimes the target platforms aren’t <text:span text:style-name="T17">displayed </text:span>on the <text:span text:style-name="T32">O</text:span>perations panel. <text:span text:style-name="T17">You can also u</text:span>se this procedure to fix this problem.</text:p>
+   <text:p text:style-name="P7">In this procedure, we’ll import the core, assets and bsp_310 projects, which <text:span text:style-name="T35">we’ll</text:span> need for subsequent <text:span text:style-name="T32">tutorial</text:span>s.</text:p>
+   <text:p text:style-name="P6"><text:span text:style-name="T19">Note: </text:span>Sometimes the target platforms aren’t <text:span text:style-name="T19">displayed </text:span>on the <text:span text:style-name="T34">O</text:span>perations panel. <text:span text:style-name="T19">You can also u</text:span>se this procedure to fix this problem.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:span text:style-name="Strong">Step 1: Import </text:span><text:span text:style-name="Strong"><text:span text:style-name="T6">the Project</text:span></text:span><text:span text:style-name="Strong"> Files</text:span></text:h>
    <text:p text:style-name="P6">Import the files from the ocpi_projects directory: go to the top left corner and select <text:span text:style-name="Strong">File </text:span><text:span text:style-name="Strong"><text:span text:style-name="T8">&gt;</text:span></text:span><text:span text:style-name="Strong"> Import</text:span><text:span text:style-name="Strong"><text:span text:style-name="T8">:</text:span></text:span></text:p>
    <text:p text:style-name="P3"><text:soft-page-break/><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 8" text:anchor-type="as-char" svg:y="0in" svg:width="3.8in" style:rel-width="scale" svg:height="6.5154in" style:rel-height="scale" draw:z-index="8"><draw:image loext:mime-type="image/png">
@@ -13128,7 +13554,7 @@
        <svg:desc>/C:/ad35c74a03374111d6de0e834cc3e8ab</svg:desc>
       </draw:frame></text:span></text:span></text:p>
    <text:h text:style-name="P19" text:outline-level="3">Step 3: Browse Root Directory</text:h>
-   <text:p text:style-name="P6">In the window that pops up, check <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T11">select</text:span></text:span> <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T11">root</text:span></text:span> <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T11">directory</text:span></text:span> and then click Browse.</text:p>
+   <text:p text:style-name="P6">In the window that pops up, check <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T12">select</text:span></text:span> <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T12">root</text:span></text:span> <text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T12">directory</text:span></text:span> and then click Browse.</text:p>
    <text:p text:style-name="P3"><text:soft-page-break/><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 6" text:anchor-type="as-char" svg:y="0in" svg:width="4.3925in" style:rel-width="scale" svg:height="6.5307in" style:rel-height="scale" draw:z-index="10"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAgYAAAMDCAYAAADZhd2nAAAAAXNSR0IArs4c6QAAAARnQU1B
          AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
@@ -13973,8 +14399,8 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-03T11:59:02.149274318</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P29"><text:span text:style-name="T34">TODO: The following screenshot needs updating to show all 3 projects selected, if this is how they are displayed.</text:span></text:p>
-    </office:annotation><text:span text:style-name="Strong"><text:span text:style-name="T8">T</text:span></text:span>he following <text:span text:style-name="T18">dialog</text:span> pops up:<office:annotation-end office:name="__Annotation__376_506093418"/></text:p>
+     <text:p text:style-name="P34"><text:span text:style-name="T41">TODO: The following screenshot needs updating to show all 3 projects selected, if this is how they are displayed.</text:span></text:p>
+    </office:annotation><text:span text:style-name="Strong"><text:span text:style-name="T8">T</text:span></text:span>he following <text:span text:style-name="T20">dialog</text:span> pops up:<office:annotation-end office:name="__Annotation__376_506093418"/></text:p>
    <text:p text:style-name="P3"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 5" text:anchor-type="as-char" svg:y="0in" svg:width="6.5in" style:rel-width="scale" svg:height="1.9693in" style:rel-height="scale" draw:z-index="11"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAA9sAAAEsCAYAAADTgaBUAAAAAXNSR0IArs4c6QAAAARnQU1B
          AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
@@ -15940,13 +16366,13 @@
        <svg:desc>/C:/bb12b3cb3d886ace1c17825a5b8abb70</svg:desc>
       </draw:frame></text:span></text:span></text:p>
    <text:h text:style-name="P19" text:outline-level="3"><text:soft-page-break/><text:span text:style-name="Strong"><text:span text:style-name="T8">Step 5:</text:span></text:span> Select Projects</text:h>
-   <text:p text:style-name="P6"><text:span text:style-name="T18">Leave ocpi.core, ocpi.bsp_e310 and ocpi.assets and </text:span>checked <text:span text:style-name="T18">and</text:span> then click Finish.</text:p>
+   <text:p text:style-name="P6"><text:span text:style-name="T20">Leave ocpi.core, ocpi.bsp_e310 and ocpi.assets and </text:span>checked <text:span text:style-name="T20">and</text:span> then click Finish.</text:p>
    <text:p text:style-name="P6"><office:annotation office:name="__Annotation__375_506093418">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-03T11:56:08.499471291</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P29"><text:span text:style-name="T34">TODO: Need an updated screenshot showing ocpi.bsp_e310 project.</text:span></text:p>
-    </office:annotation>You should end up with th<text:span text:style-name="T18">ese three</text:span> projects in your Project Explorer and OpenCPI Projects window. <text:span text:style-name="T30">Here is an example:</text:span><office:annotation-end office:name="__Annotation__375_506093418"/></text:p>
+     <text:p text:style-name="P34"><text:span text:style-name="T41">TODO: Need an updated screenshot showing ocpi.bsp_e310 project.</text:span></text:p>
+    </office:annotation>You should end up with th<text:span text:style-name="T20">ese three</text:span> projects in your Project Explorer and OpenCPI Projects window. <text:span text:style-name="T32">Here is an example:</text:span><office:annotation-end office:name="__Annotation__375_506093418"/></text:p>
    <text:p text:style-name="P3"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:y="0in" svg:width="3.3154in" style:rel-width="scale" svg:height="6.9in" style:rel-height="scale" draw:z-index="14"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAXMAAAMDCAYAAABQB/V6AAAAAXNSR0IArs4c6QAAAARnQU1B
          AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
@@ -16319,7 +16745,7 @@
        </draw:image>
        <svg:desc>/C:/b58ffbabac7cd1cd8b62a55660df3e3c</svg:desc>
       </draw:frame></text:span></text:span></text:p>
-   <text:p text:style-name="P6">Click Refresh in the OpenCPI Projects window to display <text:span text:style-name="T30">all of the </text:span>projects:</text:p>
+   <text:p text:style-name="P6">Click Refresh in the OpenCPI Projects window to display <text:span text:style-name="T32">all of the </text:span>projects:</text:p>
    <text:p text:style-name="P3"><text:soft-page-break/><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T7"><draw:frame draw:style-name="fr1" draw:name="Picture 1" text:anchor-type="as-char" svg:y="0in" svg:width="2.2154in" style:rel-width="scale" svg:height="6.6382in" style:rel-height="scale" draw:z-index="15"><draw:image loext:mime-type="image/png">
         <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAPgAAALnCAYAAACkzopsAAAAAXNSR0IArs4c6QAAAARnQU1B
          AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
@@ -16652,13 +17078,13 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-17T12:07:56.047941647</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P29"><text:span text:style-name="T34">What is this step? It seems like it should be described here if the user should do it before continuing. It’s not described in any subsequent tutorials.</text:span></text:p>
-    </office:annotation>We recommend registering your <text:span text:style-name="T19">imported </text:span>projects before continuing with the <text:span text:style-name="T30">tutorial</text:span>s.<office:annotation-end office:name="__Annotation__5152_2512809426"/> <office:annotation office:name="__Annotation__5151_2512809426">
+     <text:p text:style-name="P34"><text:span text:style-name="T41">What is this step? It seems like it should be described here if the user should do it before continuing. It’s not described in any subsequent tutorials.</text:span></text:p>
+    </office:annotation>We recommend registering your <text:span text:style-name="T21">imported </text:span>projects before continuing with the <text:span text:style-name="T32">tutorial</text:span>s.<office:annotation-end office:name="__Annotation__5152_2512809426"/> <office:annotation office:name="__Annotation__5151_2512809426">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-17T12:07:10.010409268</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P29"><text:span text:style-name="T34">What is this step, exactly? Is it the same as Step 4: Build Assemblies in Tutorial 1? Should it be described here if they should do it?</text:span></text:p>
-    </office:annotation>It also helps if you go ahead and build <text:span text:style-name="T19">them </text:span>for <text:span text:style-name="T30">the</text:span> <text:span text:style-name="T30">target </text:span>platform <text:span text:style-name="T30">on which you plan to run them</text:span>.<office:annotation-end office:name="__Annotation__5151_2512809426"/> </text:p>
+     <text:p text:style-name="P34"><text:span text:style-name="T41">What is this step, exactly? Is it the same as Step 4: Build Assemblies in Tutorial 1? Should it be described here if they should do it?</text:span></text:p>
+    </office:annotation>It also helps if you go ahead and build <text:span text:style-name="T21">them </text:span>for <text:span text:style-name="T32">the</text:span> <text:span text:style-name="T32">target </text:span>platform <text:span text:style-name="T32">on which you plan to run them</text:span>.<office:annotation-end office:name="__Annotation__5151_2512809426"/> </text:p>
    <text:p text:style-name="P4"/>
    <text:p text:style-name="P4"/>
    <text:p text:style-name="P4"/>

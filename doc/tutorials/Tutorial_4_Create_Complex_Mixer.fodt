@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>15</meta:editing-cycles><meta:creation-date>2019-10-04T13:46:40.516151464</meta:creation-date><meta:editing-duration>PT46M10S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-18T11:34:49.964784700</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="23" meta:object-count="0" meta:page-count="20" meta:paragraph-count="401" meta:word-count="2398" meta:character-count="16227" meta:non-whitespace-character-count="13448"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-04T13:46:40.373723178"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>16</meta:editing-cycles><meta:creation-date>2019-10-04T13:46:40.516151464</meta:creation-date><meta:editing-duration>PT47M44S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-28T12:59:03.073920020</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="23" meta:object-count="0" meta:page-count="20" meta:paragraph-count="402" meta:word-count="2412" meta:character-count="16323" meta:non-whitespace-character-count="13531"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-04T13:46:40.373723178"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">551692</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">8363</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">32066</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">17482</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">32420</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">18438</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">21782</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">555987</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">7022</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">14690</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">551692</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">32064</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">569172</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">8363</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">32419</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">26799</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -111,7 +111,7 @@
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">36366610</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">36406106</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
@@ -2731,17 +2731,23 @@
    </style:paragraph-properties>
    <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
-  <style:style style:name="P17" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P17" style:family="paragraph" style:parent-style-name="Standard">
    <style:text-properties officeooo:paragraph-rsid="0222012e"/>
   </style:style>
-  <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
+  <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Standard">
+   <style:text-properties officeooo:rsid="022b835a" officeooo:paragraph-rsid="022b835a"/>
+  </style:style>
+  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
    <style:paragraph-properties style:page-number="auto"/>
    <style:text-properties officeooo:paragraph-rsid="0222012e"/>
   </style:style>
-  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="List_20_Number">
+  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="0222012e"/>
   </style:style>
-  <style:style style:name="P20" style:family="paragraph">
+  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="List_20_Number">
+   <style:text-properties officeooo:paragraph-rsid="0222012e"/>
+  </style:style>
+  <style:style style:name="P22" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
@@ -2814,6 +2820,9 @@
    <style:text-properties officeooo:rsid="022ae912"/>
   </style:style>
   <style:style style:name="T23" style:family="text">
+   <style:text-properties officeooo:rsid="022b835a"/>
+  </style:style>
+  <style:style style:name="T24" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
@@ -2855,6 +2864,7 @@
  </office:master-styles>
  <office:body>
   <office:text text:use-soft-page-breaks="true">
+   <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
    <text:sequence-decls>
     <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -2863,22 +2873,22 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:h text:style-name="P18" text:outline-level="1"><text:span text:style-name="T9">Tutorial</text:span><text:span text:style-name="T6"> 4: </text:span><text:span text:style-name="T7">Creating </text:span><text:span text:style-name="T8">a</text:span><text:span text:style-name="T7"> Complex Mixer Component</text:span></text:h>
+   <text:h text:style-name="P19" text:outline-level="1"><text:span text:style-name="T9">Tutorial</text:span><text:span text:style-name="T6"> 4: </text:span><text:span text:style-name="T7">Creating </text:span><text:span text:style-name="T8">a</text:span><text:span text:style-name="T7"> Complex Mixer Component</text:span></text:h>
    <text:p text:style-name="P10"><office:annotation office:name="__Annotation__4771_1935896537">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-11T11:31:40.788674853</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P20"><text:span text:style-name="T23">To the authors of the improved lab: I’m not sure what this sentence means. What is being built from scratch? The project or the component?</text:span></text:p>
+     <text:p text:style-name="P22"><text:span text:style-name="T24">To the authors of the improved lab: I’m not sure what this sentence means. What is being built from scratch? The project or the component?</text:span></text:p>
     </office:annotation><text:span text:style-name="T14">The goal of this tutorial is to create</text:span> <text:span text:style-name="T17">a</text:span> complex mixer <text:span text:style-name="T14">component</text:span> as a part of the project from <text:span text:style-name="T22">Tutorial</text:span> 2 <text:span text:style-name="T14">that </text:span>we are building from scratch.<office:annotation-end office:name="__Annotation__4771_1935896537"/><text:span text:style-name="T14"> </text:span></text:p>
    <text:p text:style-name="P12"><text:span text:style-name="T14">The complex mixer component receives I/Q data and multiplies this signal by a tone that is generated using a Numerically Controlled Oscillator (NCO). </text:span>This <text:span text:style-name="T18">action </text:span>causes the input signal to be shifted in the <text:span text:style-name="T18">f</text:span>requency <text:span text:style-name="T18">d</text:span>omain by the frequency of the NCO that is generated in the worker. Th<text:span text:style-name="T19">e worker’s properties control the </text:span>NCO <text:span text:style-name="T19">frequency</text:span>.</text:p>
    <text:p text:style-name="P11"><office:annotation office:name="__Annotation__11204_1935896537">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-11T13:10:12.888662056</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P20"><text:span text:style-name="T23">To the authors of this improved BIA lab: these were the BIA objectives for this lab. Are they still relevant?</text:span></text:p>
+     <text:p text:style-name="P22"><text:span text:style-name="T24">To the authors of this improved BIA lab: these were the BIA objectives for this lab. Are they still relevant?</text:span></text:p>
     </office:annotation><text:span text:style-name="T20">The objectives of this tutorial are to learn how RCC workers can import a third-party library (liquid dsp) functionality into a worker and to reiterate C++ conventions for accessing port data and properties and framework interactions RCC_ADVANCE vs. RCC_OK.</text:span><office:annotation-end office:name="__Annotation__11204_1935896537"/></text:p>
    <text:p text:style-name="P11">In this <text:span text:style-name="T1">tutorial</text:span>, we show you how to:</text:p>
-   <text:list xml:id="list32334619" text:style-name="WWNum32">
+   <text:list xml:id="list1468783709" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Create the complex mixer component, ports and properties.</text:p>
     </text:list-item>
@@ -2889,7 +2899,8 @@
      <text:p text:style-name="List_20_Bullet">Create, build and run the complex mixer worker unit test.</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P9"><text:span text:style-name="T14">T</text:span>his <text:span text:style-name="T1">tutorial</text:span> is a continuation of <text:span text:style-name="T1">Tutorial</text:span> 3. This means you will be using the same training_project as you used in <text:span text:style-name="T1">Tutorial</text:span> 3.</text:p>
+   <text:p text:style-name="P9"><text:span text:style-name="T14">T</text:span>his <text:span text:style-name="T1">tutorial</text:span> is a continuation of <text:span text:style-name="T1">Tutorial</text:span> 3. This means you will be using the same t<text:span text:style-name="T23">utorial-</text:span>project as you used in <text:span text:style-name="T1">Tutorial</text:span> 3.</text:p>
+   <text:p text:style-name="P18">Before you being this tutorial, we recommend reading Briefing 7, “Automated Test Suite Details”.</text:p>
    <text:h text:style-name="P13" text:outline-level="2"><text:span text:style-name="T10">Step 1: </text:span>Create Complex Mixer Component</text:h>
    <text:p text:style-name="P9">First, create a component called complex mixer with the following parameters:</text:p>
    <text:p text:style-name="P6"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T6"><draw:frame draw:style-name="fr1" draw:name="Picture 21" text:anchor-type="as-char" svg:y="0in" svg:width="5.3075in" style:rel-width="scale" svg:height="4.7154in" style:rel-height="scale" draw:z-index="1"><draw:image loext:mime-type="image/png">
@@ -15139,7 +15150,7 @@
        </draw:image>
        <svg:desc>/C:/bbf16e184782ab92674b19a9cea3a390</svg:desc>
       </draw:frame></text:span></text:span></text:p>
-   <text:list xml:id="list1146718058" text:style-name="Numbering_20_1">
+   <text:list xml:id="list1855301149" text:style-name="Numbering_20_1">
     <text:list-item>
      <text:p text:style-name="P15">Click gen + build.</text:p>
     </text:list-item>

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>60</meta:editing-cycles><meta:creation-date>2019-10-10T09:47:21.491909032</meta:creation-date><meta:editing-duration>PT3H23M16S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-18T12:21:35.213426036</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="3" meta:object-count="0" meta:page-count="24" meta:paragraph-count="319" meta:word-count="2955" meta:character-count="21530" meta:non-whitespace-character-count="18964"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-10T09:47:21.360527917"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>63</meta:editing-cycles><meta:creation-date>2019-10-10T09:47:21.491909032</meta:creation-date><meta:editing-duration>PT3H28M44S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-28T13:40:17.832052019</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="3" meta:object-count="0" meta:page-count="18" meta:paragraph-count="234" meta:word-count="2116" meta:character-count="15012" meta:non-whitespace-character-count="13174"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-10T09:47:21.360527917"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">396866</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">495679</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">29152</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">15893</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">29475</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">16760</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">6414</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">402814</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">3999</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">502509</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">396866</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">29150</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">412757</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">495679</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">29473</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">512438</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -111,7 +111,7 @@
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">39301458</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">39371103</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
@@ -2796,24 +2796,33 @@
    </style:paragraph-properties>
    <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
-  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
+  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Standard">
+   <style:text-properties fo:font-size="9pt" officeooo:paragraph-rsid="023f622d" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
+  </style:style>
+  <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
    <style:paragraph-properties style:page-number="auto"/>
   </style:style>
-  <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P51" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="02294f79"/>
   </style:style>
-  <style:style style:name="P51" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
+  <style:style style:name="P52" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
    <style:text-properties officeooo:paragraph-rsid="0225445a"/>
   </style:style>
-  <style:style style:name="P52" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
+  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
    <style:text-properties officeooo:paragraph-rsid="0250e1f5"/>
   </style:style>
-  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
+  <style:style style:name="P54" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
    <loext:graphic-properties draw:fill="none"/>
    <style:paragraph-properties fo:background-color="transparent"/>
    <style:text-properties officeooo:paragraph-rsid="0250e1f5"/>
   </style:style>
-  <style:style style:name="P54" style:family="paragraph">
+  <style:style style:name="P55" style:family="paragraph">
+   <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
+    <style:tab-stops/>
+   </style:paragraph-properties>
+   <style:text-properties fo:hyphenate="false"/>
+  </style:style>
+  <style:style style:name="P56" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
@@ -2955,6 +2964,12 @@
    <style:text-properties officeooo:rsid="0257b152"/>
   </style:style>
   <style:style style:name="T46" style:family="text">
+   <style:text-properties officeooo:rsid="0258c15f"/>
+  </style:style>
+  <style:style style:name="T47" style:family="text">
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
+  <style:style style:name="T48" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
@@ -2976,7 +2991,7 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:footer>
-    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 8<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">24</text:page-number><text:s/>of <text:page-count>24</text:page-count></text:p>
+    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 8<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">17</text:page-number><text:s/>of <text:page-count>18</text:page-count></text:p>
    </style:footer>
   </style:master-page>
  </office:master-styles>
@@ -2991,11 +3006,11 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:h text:style-name="P49" text:outline-level="1"><text:span text:style-name="T1">Tutorial</text:span> 8: <text:span text:style-name="T41">Creating an </text:span>HDL Worker <text:span text:style-name="T41">that Uses</text:span> Third-<text:span text:style-name="T41">p</text:span>arty Cores</text:h>
-   <text:p text:style-name="P1">This tutorial demonstrates how to design, build and test the complex_mixer.hdl worker for execution on a Xilinx XSIM simulator and Ettus E310 (Xilinx Zynq-7020) hardware. The <text:s/>worker is a “work-alike” to the RCC worker discussed in <text:span text:style-name="T1">Tutorial</text:span> 4.</text:p>
+   <text:h text:style-name="P50" text:outline-level="1"><text:span text:style-name="T1">Tutorial</text:span> 8: <text:span text:style-name="T41">Creating an </text:span>HDL Worker <text:span text:style-name="T41">that Uses</text:span> Third-<text:span text:style-name="T41">p</text:span>arty Cores</text:h>
+   <text:p text:style-name="P1">This tutorial demonstrates how to design, build and test the complex_mixer.hdl worker for execution on a Xilinx XSIM simulator. The <text:s/>worker is a “work-alike” to the RCC worker discussed in <text:span text:style-name="T1">Tutorial</text:span> 4.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Tutorial Objectives</text:h>
    <text:p text:style-name="P2">The tutorial shows you how to:</text:p>
-   <text:list xml:id="list1680225106" text:style-name="WWNum32">
+   <text:list xml:id="list3827064509" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Set OCS and OWD properties (XML)</text:p>
     </text:list-item>
@@ -3012,10 +3027,15 @@
      <text:p text:style-name="List_20_Bullet">Run automated unit testing on multiple platforms (XML, Python)</text:p>
     </text:list-item>
    </text:list>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">What’s Provided</text:h>
+   <text:h text:style-name="Heading_20_3" text:outline-level="3">What’s Provided<office:annotation>
+     <dc:creator>Lisa Zahn</dc:creator>
+     <dc:date>2019-10-28T13:35:32.139571354</dc:date>
+     <loext:sender-initials>LZ</loext:sender-initials>
+     <text:p text:style-name="P56"><text:span text:style-name="T48">Need to update this section to new “tutorial-project” directory structure</text:span></text:p>
+    </office:annotation></text:h>
    <text:p text:style-name="P3">In this tutorial, you will <text:span text:style-name="T38">re-use</text:span> the &quot;complex_mixer.test/&quot;directory. It’s the same as implemented in <text:span text:style-name="T1">Tutorial</text:span> 4. Re<text:span text:style-name="T38">member</text:span> that there is one {component}.test/ per OCS.</text:p>
    <text:p text:style-name="P3">The items provided for this tutorial are:</text:p>
-   <text:list xml:id="list122136250603559" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019365651795" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The <text:span text:style-name="T38">c</text:span>omponent <text:span text:style-name="T38">d</text:span>ata sheet located in /home/training/training_project/components/complex_mixer.test/doc/Complex_Mixer.pdf</text:p>
     </text:list-item>
@@ -3023,14 +3043,14 @@
      <text:p text:style-name="List_20_Bullet">The worker VHDL with &quot;commented&quot; instructions located in /home/training/provided/lab8/complex_mixer.vhd</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P51">The following third-party core files (Vivado IP output files)<text:span text:style-name="T4"> located in /home/training/provided/lab8/vivado_ip/*:</text:span></text:p>
+     <text:p text:style-name="P52">The following third-party core files (Vivado IP output files)<text:span text:style-name="T4"> located in /home/training/provided/lab8/vivado_ip/*:</text:span></text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="List_20_Bullet_20_3">complex_multiplier[_stub.vhd|.edf] and dds_complier[_stub.vhd|.edf]</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">complex_multiplier_sim_net.vhd and dds_compiler_sim_net.vhd</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Worker Development Flow</text:h>
    <text:p text:style-name="P4">Worker development for this tutorial consists of the following steps:</text:p>
-   <text:list xml:id="list599057616" text:style-name="Numbering_20_1">
+   <text:list xml:id="list1202813080" text:style-name="Numbering_20_1">
     <text:list-item>
      <text:p text:style-name="List_20_Number">Protocol (OPS): Use pre-existing or create new.</text:p>
     </text:list-item>
@@ -3056,7 +3076,7 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 1: Re-use or Create New O<text:span text:style-name="T6">P</text:span>S </text:h>
    <text:p text:style-name="P6">To determine whether to re-use an existing O<text:span text:style-name="T6">P</text:span>S or create a new one:</text:p>
-   <text:list xml:id="list122135513719659" text:continue-list="list122136250603559" text:style-name="WWNum32">
+   <text:list xml:id="list134018645498711" text:continue-list="list134019365651795" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Identify the OPS(es) declared by this component: <text:span text:style-name="T5">e</text:span>xamine the &quot;Component Ports&quot; table in the Component data sheet.</text:p>
     </text:list-item>
@@ -3067,7 +3087,7 @@
    <text:p text:style-name="List_20_Bullet_20_2">Current project&apos;s component library? /home/training/training_project/components/specs</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Other projects&apos; components/specs/ directories within scope</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Intersection of Project-registry and ProjectDependencies= in {my_project}/Project.mk</text:p>
-   <text:list xml:id="list122135487566426" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019514572320" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>If NO to all questions ⇨ Create new OPS</text:p>
     </text:list-item>
@@ -3076,7 +3096,7 @@
    <text:p text:style-name="P6"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 2: Re-use or Create New OCS</text:h>
    <text:p text:style-name="P7">To determine whether to re-use an existing OCS or create a new one:</text:p>
-   <text:list xml:id="list122136620376351" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134018931327338" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Review Component Spec Properties and Ports in <text:span text:style-name="T44">the c</text:span>omponent data sheet. Use <text:span text:style-name="T44">the </text:span>Properties and Ports information to answer the following questions.</text:p>
     </text:list-item>
@@ -3088,7 +3108,7 @@
    <text:p text:style-name="List_20_Bullet_20_2">/home/training/training_project/components/specs/</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Other projects&apos; components/specs/ directories within scope</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Intersection of Project-registry and ProjectDependencies= in {my_project}/Project.mk</text:p>
-   <text:list xml:id="list122137350693837" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019134116507" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>If NO to all questions ⇨ Create new OCS</text:p>
     </text:list-item>
@@ -3097,7 +3117,7 @@
    <text:p text:style-name="P7"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Create Worker</text:h>
    <text:p text:style-name="P8">In the IDE:</text:p>
-   <text:list xml:id="list122136894705028" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019315484255" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">File → New → Other → ANGRYVIPER → OpenCPI Asset Wizard</text:p>
     </text:list-item>
@@ -3109,7 +3129,7 @@
    <text:p text:style-name="List_20_Bullet_20_3">Programming Language: VHDL</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Add To Library: components</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Component: complex_mixer (ocpi.training)</text:p>
-   <text:list xml:id="list122136017941998" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019074301916" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T7">Click </text:span>Finish.</text:p>
     </text:list-item>
@@ -3130,12 +3150,12 @@
    <text:h text:style-name="P44" text:outline-level="2">Step 3: Build <text:span text:style-name="T39">Generated </text:span>Skeleton <text:span text:style-name="T39">Code</text:span></text:h>
    <text:p text:style-name="P9">Why? Because, although <text:span text:style-name="T1">it’s </text:span>not very exciting, this step proves that the skeleton source code is buildable and that the build engine is functional.</text:p>
    <text:p text:style-name="P9">To build generated skeleton code:</text:p>
-   <text:list xml:id="list122135951648348" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134018908758203" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the <text:span text:style-name="T8">w</text:span>orker to the Project Operations panel.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Check the HDL Targets box and highlight &quot;xsim&quot; and &quot;zynq&quot; under &quot;xilinx&quot;.</text:p>
+     <text:p text:style-name="List_20_Bullet">Check the HDL Targets box and highlight &quot;xsim&quot; <text:span text:style-name="T46">under</text:span> &quot;xilinx&quot;.</text:p>
     </text:list-item>
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Check <text:span text:style-name="T8">the</text:span> &quot;Assets&quot; radio button.</text:p>
@@ -3147,13 +3167,13 @@
      <text:p text:style-name="List_20_Bullet">Review the Console window messages to ensure this step is error free.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Refresh the Project Explorer panel and review the newly-generated build artifacts in target-xsim/ and target-zynq/.</text:p>
+     <text:p text:style-name="List_20_Bullet">Refresh the Project Explorer panel and review the newly-generated build artifacts in target-xsim/.</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Add Properties to Worker</text:h>
    <text:p text:style-name="P10">Now we’ll add the worker properties:</text:p>
-   <text:list xml:id="list122136453952628" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134018555989241" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Reference the &quot;Worker Properties&quot; table in the <text:span text:style-name="T1">c</text:span>omponent data sheet.</text:p>
     </text:list-item>
@@ -3162,7 +3182,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P42">data_select – Selects data to output when in bypass mode (input or NCO)</text:p>
-   <text:list xml:id="list122137046204766" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019411739663" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Ensure <text:span text:style-name="T9">that </text:span>all attributes and default values are set for each property/parameter.</text:p>
     </text:list-item>
@@ -3170,7 +3190,7 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Convert Data <text:span text:style-name="T39">P</text:span>ort Interface from Interleaved to Parallel</text:h>
    <text:p text:style-name="P11">Note: iqstream_protocol is by default interleaved 16-bit I/Q sample data.</text:p>
-   <text:list xml:id="list122136743544238" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019720799717" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Determine <text:span text:style-name="T11">the</text:span> port configuration settings by examining the &quot;Worker Interfaces&quot; table in the <text:span text:style-name="T11">c</text:span>omponent <text:span text:style-name="T11">d</text:span>ata sheet.</text:p>
     </text:list-item>
@@ -3188,11 +3208,11 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-10T10:37:16.820787613</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P54"><text:span text:style-name="T46">Is this step still necessary at V1.6?</text:span></text:p>
+     <text:p text:style-name="P55"><text:span text:style-name="T47">Is this step still necessary at V1.6?</text:span></text:p>
     </office:annotation>Step 3: Configure for Version 2 HDL API<office:annotation-end office:name="__Annotation__22596_3351151911"/></text:h>
    <text:p text:style-name="P13">The v1.5 release of the IDE does not provide a field for declaring Version 2 HDL API, so you must manually modify the XML <text:span text:style-name="T15">and then change the name of the architecture in the generated VHDL</text:span>.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:s/><text:span text:style-name="T15">Edit Worker XML</text:span></text:h>
-   <text:list xml:id="list122137348382759" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019879848565" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T15">In the IDE, e</text:span>dit <text:span text:style-name="T15">the </text:span>OWD using the HDL Worker OWD HDL Editor.</text:p>
     </text:list-item>
@@ -3213,7 +3233,7 @@
    <text:p text:style-name="P12">&lt;/HdlWorker&gt;</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Edit Generated VHDL</text:h>
    <text:p text:style-name="P12"><text:span text:style-name="T15">Now change </text:span>the name of the architecture in the generated VHDL file:</text:p>
-   <text:list xml:id="list122136115831652" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019472959268" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>Open the VHDL in a text editor.</text:p>
     </text:list-item>
@@ -3232,7 +3252,7 @@
    <text:p text:style-name="P14"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Rebuild Worker</text:h>
    <text:p text:style-name="P14">Using the IDE, build the worker with changes from OWD to update gen/*:</text:p>
-   <text:list xml:id="list122136510302666" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134018520687601" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Refresh the OpenCPI Projects panel.</text:p>
     </text:list-item>
@@ -3240,7 +3260,7 @@
      <text:p text:style-name="List_20_Bullet">Add the worker to the Project Operations panel.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Check the HDL Targets box and highlight &quot;xsim&quot; and &quot;zynq&quot;.</text:p>
+     <text:p text:style-name="List_20_Bullet">Check the HDL Targets box and highlight &quot;xsim&quot;.</text:p>
     </text:list-item>
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Check the &quot;Assets&quot; radio button.</text:p>
@@ -3256,14 +3276,14 @@
     </text:list-item>
    </text:list>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Copy Third-Party Cores to Worker</text:h>
-   <text:list xml:id="list122135764206276" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134018305282587" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T16">C</text:span>opy <text:span text:style-name="T16">the </text:span>provided <text:span text:style-name="T16">third-</text:span>party cores directory into {worker}.hdl directory:</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="Code">$ cd /home/training/training_project/components/complex_mixer.hdl/</text:p>
-   <text:p text:style-name="Code">$ cp -r /home/training/provided/lab8/vivado_ip/ .</text:p>
-   <text:list xml:id="list122136566699801" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:p text:style-name="Code">$ cd <text:span text:style-name="T46">~/tutorial-project</text:span>/components/complex_mixer.hdl/</text:p>
+   <text:p text:style-name="Code">$ cp -r <text:span text:style-name="T46">~/tutorial-project</text:span>/provided/lab8/vivado_ip/ .</text:p>
+   <text:list xml:id="list134018991060776" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Modify <text:span text:style-name="T16">the </text:span>worker Makefile to reference the cores&apos; VHDL files</text:p>
     </text:list-item>
@@ -3275,14 +3295,19 @@
    <text:p text:style-name="P12"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Create Worker (con’t.)</text:h>
    <text:p text:style-name="P5">The skeleton .vhd file is an empty architecture. The entity is generated VHDL based on OCS and OWD, and located in the gen/{worker}-impl.vhd. </text:p>
-   <text:list xml:id="list122135358684458" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019408363020" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Replace <text:span text:style-name="T40">the</text:span> skeleton .vhd file with <text:span text:style-name="T40">the </text:span>provided .vhd. <text:span text:style-name="T17">It c</text:span>ontains instructions to modify the VHDL source code:</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="Code">$ cd /home/training/training_project/components/complex_mixer.hdl/</text:p>
-   <text:p text:style-name="Code">$ cp -f /home/training/provided/lab8/complex_mixer.vhd .</text:p>
-   <text:list xml:id="list122136678990268" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:p text:style-name="Code"><office:annotation office:name="__Annotation__13658_1604793409">
+     <dc:creator>Lisa Zahn</dc:creator>
+     <dc:date>2019-10-28T13:38:24.967221731</dc:date>
+     <loext:sender-initials>LZ</loext:sender-initials>
+     <text:p text:style-name="P56"><text:span text:style-name="T48">Needs updating to ~/tutorial-project/...</text:span></text:p>
+    </office:annotation>$ cd /home/training/training_project/components/complex_mixer.hdl/</text:p>
+   <text:p text:style-name="Code">$ cp -f /home/training/provided/lab8/complex_mixer.vhd .<office:annotation-end office:name="__Annotation__13658_1604793409"/></text:p>
+   <text:list xml:id="list134018235020725" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Open the VHDL in a text editor. Starting at the top, modify the source code <text:span text:style-name="T40">following</text:span> the commented instructions (look for “TODO”). <text:span text:style-name="T40">These modifications are to</text:span>:</text:p>
     </text:list-item>
@@ -3293,7 +3318,7 @@
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 4: Build Worker</text:h>
    <text:p text:style-name="P26">Now build the HDL worker for ONLY XSIM <text:span text:style-name="T40">t</text:span>argets. </text:p>
    <text:p text:style-name="P26">In the IDE:</text:p>
-   <text:list xml:id="list122135570996671" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134018976635608" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Add the <text:span text:style-name="T44">w</text:span>orker to the Project Operations panel.</text:p>
     </text:list-item>
@@ -3313,7 +3338,12 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 4: Review Build Log and Artifacts</text:h>
    <text:p text:style-name="P8"><text:span text:style-name="T18">The e</text:span>nd of build log should <text:span text:style-name="T18">look like </text:span>the following <text:span text:style-name="T18">example</text:span>, if free of errors:</text:p>
-   <text:p text:style-name="P30">Configuration:</text:p>
+   <text:p text:style-name="P30"><office:annotation office:name="__Annotation__13659_1604793409">
+     <dc:creator>Lisa Zahn</dc:creator>
+     <dc:date>2019-10-28T13:38:54.725299080</dc:date>
+     <loext:sender-initials>LZ</loext:sender-initials>
+     <text:p text:style-name="P56"><text:span text:style-name="T48">Needs to be replace with something that shows tutorial-project and non-hardware results (I think).</text:span></text:p>
+    </office:annotation>Configuration:<office:annotation-end office:name="__Annotation__13659_1604793409"/></text:p>
    <text:p text:style-name="P30">build ocpi.training.components.complex_mixer.hdl HDL: xsim RCC: centos7 xilinx13_4</text:p>
    <text:p text:style-name="P30"/>
    <text:p text:style-name="P30">[ocpidev -d /home/training/training_project build worker complex_mixer.hdl -l components --hdl-target xsim]</text:p>
@@ -3332,7 +3362,7 @@
    <text:p text:style-name="P8">Observe <text:span text:style-name="T19">the </text:span>new artifacts <text:span text:style-name="T19">directory</text:span> {worker}.hdl/: &quot;target-xsim/&quot;. <text:span text:style-name="T18">T</text:span>his directory contains output files from their respective FPGA vendor tools (in this case, simply Xilinx Vivado) in addition to a framework auto-generated file <text:span text:style-name="T18">named</text:span> <text:span text:style-name="T13">generics.vhd</text:span> <text:span text:style-name="T18">that </text:span>contains parameter configuration settings of the HDL worker for the particular &quot;target-&quot;.</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Steps 5a to 7a: Unit Test – Simulation</text:h>
    <text:p text:style-name="P15">In this section, we demonstrate how to use the framework&apos;s <text:span text:style-name="T45">u</text:span>nit <text:span text:style-name="T45">t</text:span>est <text:span text:style-name="T45">s</text:span>uite to generate:</text:p>
-   <text:list xml:id="list122136055262735" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019102994145" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">OAS (OpenCPI Application Specification) XML file(s) - Used by the framework for running the executable on a simulation platform; in this case, the target simulation platform is Xilinx XSIM Simulation Server.</text:p>
     </text:list-item>
@@ -3355,7 +3385,7 @@
    <text:p text:style-name="P27"><text:s text:c="2"/>&lt;Property Name=&apos;enable&apos; Values=&apos;0,1&apos;&gt;&lt;/Property&gt;</text:p>
    <text:p text:style-name="P27">&lt;/Tests&gt;</text:p>
    <text:p text:style-name="P17">Now w<text:span text:style-name="T20">e’ll change </text:span>this XML <text:span text:style-name="T20">to add the OWD property:</text:span></text:p>
-   <text:list xml:id="list122137392783671" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019349489354" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Edit the unit test description file <text:span text:style-name="T13">complex_mixer-test.xml </text:span>to include the HDL worker-specific property (OWD) highlighted <text:span text:style-name="T21">in bold as shown below:</text:span></text:p>
     </text:list-item>
@@ -3372,7 +3402,7 @@
    <text:p text:style-name="P38">Now we’ll build the unit test and examine the generated artifacts.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Build Unit Test</text:h>
    <text:p text:style-name="P32"><text:span text:style-name="T25">To b</text:span>uild <text:span text:style-name="T23">the u</text:span>nit <text:span text:style-name="T24">t</text:span>est <text:span text:style-name="T24">s</text:span>uite for target simulation platform:</text:p>
-   <text:list xml:id="list122136345591224" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019610172903" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the <text:span text:style-name="T24">u</text:span>nit <text:span text:style-name="T24">t</text:span>est to the Project Operations panel.</text:p>
     </text:list-item>
@@ -3391,7 +3421,7 @@
    </text:list>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Review OCS Artifacts</text:h>
    <text:p text:style-name="P18"><text:span text:style-name="T25">Next, o</text:span>bserve <text:span text:style-name="T23">the </text:span>new artifacts in {OCS}.test/gen/:</text:p>
-   <text:list xml:id="list122136113049264" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134018431403873" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">cases.txt – &quot;Human-readable&quot; file listing various test configurations.</text:p>
     </text:list-item>
@@ -3410,7 +3440,7 @@
    </text:list>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Review Build Artifacts</text:h>
    <text:p text:style-name="P19"><text:span text:style-name="T40">Finally,</text:span> observe the new artifacts in complex_mixer.test/gen/assemblies/complex_mixer_0_frw/:</text:p>
-   <text:list xml:id="list122135663028201" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134019173197337" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">complex_mixer_0_frw.xml – generated assembly xml (OHAD).</text:p>
     </text:list-item>
@@ -3435,7 +3465,7 @@
    <text:p text:style-name="P20"><text:span text:style-name="T40">In this step,</text:span> we’ll run the unit test suite for the target simulation platform. To perform this step, you can use the IDE or run the <text:span text:style-name="T13">ocpidev</text:span> command from a terminal window.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Run Unit Test from IDE</text:h>
    <text:p text:style-name="P21">In the IDE:</text:p>
-   <text:list xml:id="list122136846764109" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list134020043647792" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T26">A</text:span>dd the Unit Test (.test) to the Project Operations panel.</text:p>
     </text:list-item>
@@ -7062,163 +7092,7 @@
       </office:binary-data>
      </draw:image>
     </draw:frame></text:p>
-   <text:p text:style-name="P22"/>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Steps 5b to 7b: Unit Test – Ettus E310</text:h>
-   <text:p text:style-name="P23"><text:span text:style-name="T40">In this procedure,</text:span> we’ll use the framework&apos;s unit test suite to generate:</text:p>
-   <text:list xml:id="list122136982912073" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">OAS (OpenCPI Application Specification) XML file(s) - Used by the framework for running the bitstream on hardware platform; <text:span text:style-name="T27">i</text:span>n this case, the target hardware platform is Ettus E310.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">OHAD (OpenCPI HDL Assembly Description) XML file(s) - Used by the framework to build a bitstream for the target hardware platform; <text:span text:style-name="T27">i</text:span>n this case, the target hardware platform is Ettus E310 (e3xx).</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Input test data file(s) based on user-provided scripts.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Various scripts to manage the execution of the applications onto the target platform(s).</text:p>
-    </text:list-item>
-   </text:list>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 5b: Modify HDL Worker to Reference Core VHDL Files</text:h>
-   <text:p text:style-name="P24">Recall the worker you created in Step 3, “Create HDL Worker”. You need to modify the worker Makefile to reference the cores&apos; VHDL files:</text:p>
-   <text:list xml:id="list122136925775205" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">PRIOR to the “include...” statement, CHANGE the SourceFiles and Cores variables to the following:</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="List_20_Bullet_20_3">SourceFiles=./vivado_ip/complex_multiplier_stub.vhd ./vivado_ip/dds_compiler_stub.vhd</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">Cores=./vivado_ip/complex_multiplier.edf ./vivado_ip/dds_compiler.edf</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">include $(OCPI_CDK_DIR)/include/worker.mk</text:p>
-   <text:p text:style-name="P24">NOTE: The <text:span text:style-name="T36">i</text:span>ncluded source files are ONLY valid for targeting HARDWARE.</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 5b: Build Worker for Zynq Targets</text:h>
-   <text:p text:style-name="P24">Recall the worker you built in Step 3, “Build HDL Worker”. You need to build it now for ONLY Zynq targets. </text:p>
-   <text:p text:style-name="P24">In the IDE:</text:p>
-   <text:list xml:id="list122137533495604" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Add the <text:span text:style-name="T28">w</text:span>orker to the Project Operations panel.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Check the HDL Targets box and highlight &quot;zynq&quot;.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Check <text:span text:style-name="T28">the</text:span> &quot;Assets&quot; <text:span text:style-name="T28">r</text:span>adio <text:span text:style-name="T28">b</text:span>utton.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Click &quot;Build&quot;.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Review the Console window messages and address any errors.</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="Standard"><text:span text:style-name="T29">Now review the artifacts. The e</text:span>nd of build log should <text:span text:style-name="T29">look like</text:span> the following <text:span text:style-name="T29">example</text:span> if free of errors:</text:p>
-   <text:p text:style-name="P30">Configuration:</text:p>
-   <text:p text:style-name="P30">build ocpi.training.components.complex_mixer.hdl HDL: e3xx RCC: centos7</text:p>
-   <text:p text:style-name="P30"/>
-   <text:p text:style-name="P30">[ocpidev -d /home/training/training_project build worker complex_mixer.hdl -l components --hdl-platform e3xx]</text:p>
-   <text:p text:style-name="P30"/>
-   <text:p text:style-name="P30">make: Entering directory `/home/training/training_project/components/complex_mixer.hdl&apos;</text:p>
-   <text:p text:style-name="P30">make[1]: Entering directory `/home/training/training_project/components&apos;</text:p>
-   <text:p text:style-name="P30">make[1]: Leaving directory `/home/training/training_project/components&apos;</text:p>
-   <text:p text:style-name="P30">Building worker core &quot;complex_mixer&quot; for target &quot;zynq&quot; 0:(complex_mixer_ocpi_max_opcode_out=0 complex_mixer_ocpi_max_bytes_in=8192</text:p>
-   <text:p text:style-name="P30"><text:s/>complex_mixer_ocpi_version=2 complex_mixer_ocpi_max_bytes_out=8192 complex_mixer_ocpi_endian=little complex_mixer_ocpi_max_latency_out=256</text:p>
-   <text:p text:style-name="P30"><text:s/>complex_mixer_ocpi_max_opcode_in=0 complex_mixer_ocpi_debug=false) target-zynq/complex_mixer.edf</text:p>
-   <text:p text:style-name="P30"><text:s/>Tool &quot;vivado&quot; for target &quot;zynq&quot; succeeded. <text:s/>0:37.32 at 12:26:19</text:p>
-   <text:p text:style-name="P30">Creating link to export worker binary: ../lib/hdl/zynq/complex_mixer.edf -&gt; target-zynq/complex_mixer.edf</text:p>
-   <text:p text:style-name="P30">Creating link from ../lib/hdl/zynq/complex_mixer.cores -&gt; target-zynq/complex_mixer.cores to expose the list of core dependencies for worker complex_mixer.</text:p>
-   <text:p text:style-name="P30">make: Leaving directory `/home/training/training_project/components/complex_mixer.hdl&apos;</text:p>
-   <text:p text:style-name="P30">Updating project metadata...</text:p>
-   <text:p text:style-name="P30">== &gt; Command completed. Rval = 0</text:p>
-   <text:p text:style-name="Standard"><text:span text:style-name="T29">Next, o</text:span>bserve new artifacts {worker}.hdl/: &quot;target-zynq/&quot;. This directory contains output files from their respective FPGA vendor tools (in this case, simply Xilinx Vivado) in addition to a framework auto-generated file <text:span text:style-name="T29">named </text:span><text:span text:style-name="T13">generics.vhd</text:span>, <text:span text:style-name="T29">which </text:span>contains parameter configuration settings of the HDL worker for the particular &quot;target-&quot;.</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 5b: Create Unit Test <text:span text:style-name="T31">(e3xx)</text:span></text:h>
-   <text:p text:style-name="Body"><text:span text:style-name="T30">Recall that we re-used the unit test from the </text:span>&quot;<text:span text:style-name="T30">w</text:span>ork-alike&quot; <text:span text:style-name="T30">RCC worker in Tutorial 4. Now we’ll re-use it from the simulation portion of this tutorial. It’s located in </text:span>&quot;complex_mixer.test/&quot; directory <text:span text:style-name="T30">and there’s no </text:span>change required to Test XML.</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 6b: Build Unit Test <text:span text:style-name="T32">and Review Artifacts </text:span>(e3xx)</text:h>
-   <text:p text:style-name="P36">As we did in Step 6a, we’ll build the test suite and then review the build logs and generated artifacts.</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Build Unit Test (e3xx)</text:h>
-   <text:p text:style-name="P34"><text:span text:style-name="T32">To </text:span>build the Unit Test Suite for the target hardware platform, <text:span text:style-name="T32">i</text:span>n the IDE:</text:p>
-   <text:list xml:id="list122135605687056" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Add the <text:span text:style-name="T31">u</text:span>nit <text:span text:style-name="T31">t</text:span>est to the Project Operations panel.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Highlight &quot;e3xx&quot; <text:span text:style-name="T31">in </text:span>the HDL Platforms panel (<text:span text:style-name="T31">leave the </text:span>HDL Targets box unchecked).</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Check <text:span text:style-name="T31">the</text:span> &quot;Tests&quot; radio button.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Click &quot;gen+build&quot; to build <text:span text:style-name="T31">the</text:span> tests.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Review the Console window messages and address any errors.</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="P33">NOTE: The build process takes 5-10 min<text:span text:style-name="T37">ute</text:span>s to complete.</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Review Artifacts</text:h>
-   <text:p text:style-name="P35">Now review the new artifacts in complex_mixer.test/gen/assemblies/<text:span text:style-name="T13">complex_mixer_0</text:span>/. They are:</text:p>
-   <text:list xml:id="list122137496667241" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">complex_mixer_0.xml – <text:span text:style-name="T37">the </text:span>generated assembly <text:span text:style-name="T37">XML</text:span> (OHAD).</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="P52">gen/ – <text:span text:style-name="T37">the </text:span>artifacts generated/used by <text:span text:style-name="T32">the </text:span>framework.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="P53">lib/ – <text:span text:style-name="T37">the </text:span>artifacts generated/used by <text:span text:style-name="T32">the </text:span>framework.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="P52">target-zynq/ <text:s/>– <text:span text:style-name="T37">the </text:span>artifacts generated/used by <text:span text:style-name="T32">the </text:span>framework and FPGA tools.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">container-complex_mixer_0_e3xx_base/:</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="P41">gen/ – <text:span text:style-name="T37">the </text:span>artifacts generated/used by <text:span text:style-name="T32">the </text:span>framework.</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">target_zynq/:</text:p>
-   <text:p text:style-name="P40">- <text:span text:style-name="T37">the </text:span>artifacts generated/used by <text:span text:style-name="T32">the </text:span>framework and output files from FPGA tools.</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">- <text:span text:style-name="T37">the b</text:span>itstream file for execution onto a hardware platform.</text:p>
-   <text:p text:style-name="Standard"/>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 7b: <text:span text:style-name="T34">Set up Deployment Platform and </text:span>Run Unit Test (e3xx)</text:h>
-   <text:p text:style-name="P37"><text:span text:style-name="T34">Now you set up the deployment platform and run the tests. Note: you can find details about the setup process in the </text:span><text:span text:style-name="T35">E3xx Getting Started Guide</text:span><text:span text:style-name="T34">.</text:span></text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Set up Deployment Platform</text:h>
-   <text:p text:style-name="P39">To set up the deployment platform:</text:p>
-   <text:list xml:id="list122135502389039" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Connect to <text:span text:style-name="T33">the </text:span>serial port via USB on <text:span text:style-name="T33">the</text:span> rear of Ettus E310 on the host: &quot;screen /dev/e3xx_0 115200&quot;.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Boot and log in into Petalinux on the E310. User/Password = root:root.</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Verify <text:span text:style-name="T33">that the h</text:span>ost and <text:span text:style-name="T33">the </text:span>E310 have valid IP addresses. For training, they should both be on the same subnet. </text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Run the setup script on <text:span text:style-name="T33">the </text:span>E310:</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="List_20_Bullet_20_3">&quot;source /mnt/card/opencpi/mynetsetup.sh &lt;Host <text:span text:style-name="T36">IP</text:span> address&gt;&quot;</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Run Unit Test on Deployment Platform</text:h>
-   <text:p text:style-name="P25">To run the unit test:</text:p>
-   <text:list xml:id="list122136667542765" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">in a terminal window, execute the following command sequence within the {component}.test/:</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="P31">$ OCPI_REMOTE_TEST_SYSTEMS={IP of Ettus E310}=root=root/mnt_training \ </text:p>
-   <text:p text:style-name="P31">ocpidev run --mode prep_run_verify --only-platform e3xx --keep-simulations –view</text:p>
-   <text:list xml:id="list122135418120820" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Next, perform an <text:span text:style-name="T13">md5sum</text:span> to ensure <text:span text:style-name="T34">that</text:span> the output of the XSIM and E310 tests are the same:</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="P30">complex_mixer.test$ md5sum run/*/*.hdl.out*</text:p>
-   <text:p text:style-name="P30">72c9e2f951fc9bf87c274ccab9e54e4c<text:tab/>run/e3xx/case00.00.complex_mixer.hdl.out.out</text:p>
-   <text:p text:style-name="P30">72c9e2f951fc9bf87c274ccab9e54e4c<text:tab/>run/xsim/case00.00.complex_mixer.hdl.out.out</text:p>
-   <text:p text:style-name="P30">f46a3921b843a4a4f0b35a030c0c3e01<text:tab/>run/e3xx/case00.01.complex_mixer.hdl.out.out</text:p>
-   <text:p text:style-name="P30">f46a3921b843a4a4f0b35a030c0c3e01<text:tab/>run/xsim/case00.01.complex_mixer.hdl.out.out</text:p>
-   <text:p text:style-name="P30">c48a7f15859e47004ad0d0beb72a57e5<text:tab/>run/e3xx/case00.02.complex_mixer.hdl.out.out</text:p>
-   <text:p text:style-name="P30">c48a7f15859e47004ad0d0beb72a57e5<text:tab/>run/xsim/case00.02.complex_mixer.hdl.out.out</text:p>
-   <text:p text:style-name="P30">c48a7f15859e47004ad0d0beb72a57e5<text:tab/>run/xsim/case00.03.complex_mixer.hdl.out.out</text:p>
-   <text:p text:style-name="P30">c48a7f15859e47004ad0d0beb72a57e5<text:tab/>run/e3xx/case00.03.complex_mixer.hdl.out.out</text:p>
+   <text:p text:style-name="P49"/>
   </office:text>
  </office:body>
 </office:document>
