@@ -426,7 +426,7 @@ function relative_link {
   [[ $to == /* ]] || to=`pwd`/$to
   mkdir -p $from
   [ -L $from/$link ] && rm $from/$link
-  to=$(python -c "import os.path; print os.path.relpath('$(dirname $to)', '$from')")
+  to=$(python3.4 -c "import os.path; print(os.path.relpath('$(dirname $to)', '$from'))")
   ln -s -f $to/$base $from/$link
 }
 OcpiSetup=

@@ -43,6 +43,6 @@ PKGS+=" swig python-dev"
 #    for various 32-bit software tools we end up using (e.g. modelsim)
 #PKGS+=" glibc.i686 libXft.i686 libXext.i686 ncurses-libs.i686 libXdmcp.i686"
 #    for various testing scripts
-PKGS+=" python-numpy python3 python3-numpy"
+PKGS+=" python-numpy python34 python34-numpy"
 [ "$1" = list ] && echo $PKGS && exit 0
 sudo apt install $PKGS -y
