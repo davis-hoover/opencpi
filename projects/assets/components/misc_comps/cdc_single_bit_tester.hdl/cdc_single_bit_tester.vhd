@@ -20,7 +20,9 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all; use ieee.ma
 library ocpi; use ocpi.types.all,  ocpi.util.all; -- remove this to avoid all ocpi name collisions
 library misc_prims; use misc_prims.misc_prims.all;
 
--- TODO: Replace four_bit_lfsr with a generic lfsr
+-- TODO: Replace four_bit_lfsr with a generic lfsr and add a mode
+-- for fast source to slow destination that intentionally doesn't hold input data
+-- long enough show that it fails when the primitive is not properly used.
 architecture rtl of worker is
 
   constant c_src_clk_hz : real := from_float(src_clk_hz);
