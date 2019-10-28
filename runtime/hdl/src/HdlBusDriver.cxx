@@ -224,6 +224,7 @@
 	      if (xfd >= 0) ::close(xfd);
 	      if (bfd >= 0) ::close(bfd);
 	      if (gz) gzclose(gz);
+	      ::free(obase);
 	    }
 
 	    Xld(const char *file, bool fpgaManager, std::string &a_error)
