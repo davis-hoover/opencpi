@@ -27,8 +27,8 @@
             type='bool'
             initial='true'
             default='false'
-            description='Q32.32 time correction value which is subtracted from
-            the applied time (note Qm.n implies existence of a sign bit).'/>
+            description='Forces worker into the unusable state if the time
+            invalid signal is low during the worker initialized state.'/>
   <Property name='min_num_samples_per_timestamp'
             type='ulong'
             writable='true'
