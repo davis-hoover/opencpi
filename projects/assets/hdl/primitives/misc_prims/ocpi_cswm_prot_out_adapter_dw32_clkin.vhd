@@ -1,3 +1,5 @@
+-- TODO / FIXME - this implementation will be affect by protocol changes (which are expected - see #124)
+-- TODO / FIXME - USER opcode is not supported!
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library misc_prims; use misc_prims.ocpi.all;
 library misc_prims; use misc_prims.misc_prims.all;
