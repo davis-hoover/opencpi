@@ -2,7 +2,7 @@
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2017.1 (lin64) Build 1846317 Fri Apr 14 18:54:47 MDT 2017
 -- Date        : Mon Oct 28 13:09:56 2019
--- Host        : localhost.localdomain running 64-bit CentOS Linux release 7.7.1908 (Core)
+-- Host        : running 64-bit CentOS Linux release 7.7.1908 (Core)
 -- Command     : write_vhdl -mode synth_stub mmcm_100_to_50_and_25_stub.vhd
 -- Design      : mmcm_100_to_50_and_25
 -- Purpose     : Stub declaration of top-level module interface
@@ -12,7 +12,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity mmcm_100_to_50_and_25 is
-  Port ( 
+  Port (
     clk_out1 : out STD_LOGIC;
     clk_out2 : out STD_LOGIC;
     reset : in STD_LOGIC;
