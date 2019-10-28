@@ -1,0 +1,37 @@
+--- compiler.h	2019-10-28 19:30:15.146220613 -0400
++++ compiler_new.h	2019-10-28 19:30:10.970147329 -0400
+@@ -65,21 +65,20 @@
+         assert(locresult != -23); \
+     } while (0)
+ 
+-#ifdef HAVE_STDATOMIC_H
+-#if !defined(__COVERITY__)
+-#if !defined(__cplusplus)
+-    #include <stdatomic.h>
+-#elif __cplusplus >= 201103L
+-    /* C++ before C++11 can not handle stdatomic.h or atomic */
+-    /* atomic is just C++ for stdatomic.h */
++#ifdef __COVERITY__
++    /* do nothing */
++#elif defined(__cplusplus)
++  /* we are C++ */
++  #if __cplusplus >= 201103L
++    /* C++11 and later has atomics, earlier do not */
+     #include <atomic>
+-#endif /* __cplusplus */
+-#endif /* __COVERITY__ */
+-#endif /* HAVE_STDATOMIC_H */
+-
+-#ifdef HAVE_OSATOMIC_H
+-#include <libkern/OSAtomic.h>
+-#endif /* HAVE_OSATOMIC_H */
++  #endif
++#elif defined HAVE_STDATOMIC_H
++    /* we are C and atomics are in C98 and newer */
++    #include <stdatomic.h>
++#elif defined(HAVE_OSATOMIC_H)
++    #include <libkern/OSAtomic.h>
++#endif
+ 
+ static inline void memory_barrier(void)
+ /* prevent instruction reordering across any call to this function */

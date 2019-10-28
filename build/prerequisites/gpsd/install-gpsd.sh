@@ -24,13 +24,15 @@ me=gpsd
 
 [ -z "$OCPI_CDK_DIR" ] && echo Environment variable OCPI_CDK_DIR not set && exit 1
 
+version=release-3.18 # NOTE: when updating gpsd version, "${OcpiCrossCompile}ar"
+                     # command below may be affected
 # Download gpsd source using git
 source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
        $me \
        "GPS (Global Positioning System) daemon" \
        https://git.savannah.gnu.org/git/gpsd.git \
-       release-3.18 \
+       $version \
        $me \
        1
 
@@ -39,6 +41,17 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
 here=$(basename $PWD)
 echo Making a copy of gpsd for platform $platform because gpsd does not yet support separate build directories.
 (cd ..; for i in *; do [ $i != $here ] && cp -R -p $i $here; done)
+
+pwd
+echo $OcpiThisPrerequisiteDir
+ls -alF .
+patchfile=compiler.patch
+patch -p0 < $OcpiThisPrerequisiteDir/compiler.patch || {
+  echo "*******************************************************" >&2
+  echo "ERROR: patch applied by compiler.patch failed!!" >&2
+  echo "*******************************************************" >&2
+  exit 1
+}
 
 # framework will error out w/ "recompile with -fPIC" if these aren't included
 export CFLAGS="-fPIC"
@@ -61,18 +74,28 @@ scons prefix=$OcpiInstallExecDir target=$OcpiCrossHost sysroot=$sysroot \
       bluez=False ntp=False manbuild=False shared=False nostrip=True \
       debug=True
 scons install
-${OcpiCrossCompile}ar rc libtmp.a ais_json.o bits.o gpsutils.o gpsdclient.o \
-    gps_maskdump.o hex.o json.o libgps_core.o libgps_dbus.o libgps_json.o \
-    libgps_shm.o libgps_sock.o netlib.o ntpshmread.o ntpshmwrite.o \
+# Because OpenCPI prerequisites must be statically compiled into a single
+# archive, and the scons build produces both libgps.a and libgpsd.a, a single
+# archive is manually constructed. The arguments to pass to ar were determined
+# by: 1) run scons build, 2) observe two ar commands sent to stdout, 3) combine
+# ar commands into one, 4) replace all *.a with a single libtmp.a
+${OcpiCrossCompile}ar rc libtmp.a ais_json.o bits.o gpsdclient.o \
+    gps_maskdump.o gpsutils.o \
+    hex.o json.o libgps_core.o libgps_dbus.o libgps_json.o \
+    libgps_shm.o libgps_sock.o netlib.o os_compat.o \
     rtcm2_json.o rtcm3_json.o shared_json.o libgpsmm.o bsd_base64.o \
-    crc24q.o gpsd_json.o geoid.o isgps.o libgpsd_core.o matrix.o net_dgpsip.o \
-    net_gnss_dispatch.o net_ntrip.o ppsthread.o packet.o pseudonmea.o \
-    pseudoais.o serial.o subframe.o timebase.o timespec_str.o drivers.o \
+    crc24q.o \
     driver_ais.o driver_evermore.o driver_garmin.o driver_garmin_txt.o \
-    driver_geostar.o driver_italk.o driver_navcom.o driver_nmea0183.o \
+    driver_geostar.o driver_greis.o driver_greis_checksum.o \
+    driver_italk.o driver_navcom.o driver_nmea0183.o \
     driver_nmea2000.o driver_oncore.o driver_rtcm2.o driver_rtcm3.o \
-    driver_sirf.o driver_superstar2.o driver_tsip.o driver_ubx.o \
-    driver_zodiac.o
+    drivers.o driver_sirf.o \
+    driver_skytraq.o driver_superstar2.o driver_tsip.o driver_ubx.o \
+    driver_zodiac.o \
+    geoid.o gpsd_json.o isgps.o libgpsd_core.o matrix.o net_dgpsip.o \
+    net_gnss_dispatch.o net_ntrip.o ntpshmread.o ntpshmwrite.o packet.o \
+    ppsthread.o pseudoais.o pseudonmea.o serial.o subframe.o timebase.o \
+    timespec_str.o
 ${OcpiCrossCompile}ranlib libtmp.a
 rm -rf $OcpiInstallExecDir/lib/*
 cp libtmp.a $OcpiInstallExecDir/lib/libgpsd.a
