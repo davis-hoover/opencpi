@@ -52,8 +52,8 @@ begin
       eozlm_pulse => open,
       eozlm       => eozlm);
 
-  iinfo <= '1' when ((iready = btrue) and ((ivalid = btrue) or (eozlm = '1'))) and
-           (ieof = bfalse)  else '0';
+  iinfo <= '1' when ((iready = btrue) and ((ivalid = btrue) or (eozlm = '1')))
+           else '0';
 
   take  <= iinfo and ordy;
   ixfer <= iinfo and itake_s;
@@ -96,6 +96,8 @@ begin
   arg_31_0 <= idata;
   arg_63_0 <= idata & data_r;
 
+  metadata.eof             <= '1' when (ieof = btrue) and (ixfer = '1')
+                              else '0';
   metadata.flush           <= '1' when (iopcode = FLUSH) and (ixfer = '1')
                               else '0';
   metadata.error_samp_drop <= '1' when (iopcode = SYNC) and (ixfer = '1')
@@ -125,23 +127,27 @@ begin
         ometadata.samp_period     <= (others => '0');
         ometadata.samp_period_vld <= '0';
         ovld <= '0';
-        itake_s <= '0';
-      elsif(ordy = '1') then
-      --else
-        odata.i   <= arg_31_0(15 downto 0);
-        odata.q   <= arg_31_0(31 downto 16);
-        ometadata <= metadata;
-
-        -- this is an optimization (don't declare valid unless we have to)
-        ovld <= metadata.flush or
-                metadata.error_samp_drop or
-                metadata.data_vld or
-                metadata.time_vld or
-                metadata.samp_period_vld;
-        itake_s <= take;
+        --itake_s <= '0';
+      else
+        --itake_s <= take;
+        if(ordy = '1') then
+        --else
+          odata.i   <= arg_31_0(15 downto 0);
+          odata.q   <= arg_31_0(31 downto 16);
+          ometadata <= metadata;
+  
+          -- this is an optimization (don't declare valid unless we have to)
+          ovld <= metadata.flush or
+                  metadata.error_samp_drop or
+                  metadata.data_vld or
+                  metadata.time_vld or
+                  metadata.samp_period_vld;
+         end if;
       end if;
     end if;
   end process pipeline;
+
+  itake_s <= take;
 
   itake <= itake_s;
   --itake <= take;

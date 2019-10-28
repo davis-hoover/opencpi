@@ -29,20 +29,20 @@ end entity;
 architecture rtl of cswm_prot_out_adapter_dw32_clkin is
 
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := 16;
-  type state_t is (SAMPLES, TIME_63_32, TIME_31_0, INTERVAL_63_32,
-                   INTERVAL_31_0, FLUSH, SYNC, IDLE); -- TODO / FIXME add USER
+  type state_t is (SAMPLES, SAMPLES_EOM_ONLY, TIME_63_32, TIME_31_0, INTERVAL_63_32,
+                   INTERVAL_31_0, FLUSH, SYNC, EOF, IDLE); -- TODO / FIXME add USER
 
-  signal idata_r : data_complex_t;
+  signal idata_r : data_complex_t := data_complex_zero;
 
-  signal ivld_r  : std_logic := '0';
-  signal ivld_r2 : std_logic := '0';
-
-  signal irdy_s : std_logic := '0';
+  signal in_xfer           : std_logic := '0';
+  signal in_xfer_r         : std_logic := '0';
+  signal irdy_s            : std_logic := '0';
+  signal mux_start         : std_logic := '0';
+  signal mux_end           : std_logic := '0';
 
   signal metadata_zeros : std_logic_vector(METADATA_BIT_WIDTH-1 downto 0) :=
                           (others => '0');
-  signal imetadata_r  : metadata_t;
-  signal imetadata_r2 : metadata_t;
+  signal imetadata_r  : metadata_t := metadata_zero;
 
   signal state        : state_t := IDLE;
   signal state_r      : state_t := IDLE;
@@ -60,151 +60,195 @@ architecture rtl of cswm_prot_out_adapter_dw32_clkin is
   signal force_end_of_samples_r : std_logic := '0';
 
   signal opcode : complex_short_with_metadata_opcode_t := SAMPLES;
-  signal pending_samples_eom : std_logic := '0';
+  signal pending_samples_eom_gen_set : std_logic := '0';
+  signal pending_samples_eom_gen_clr : std_logic := '0';
+  signal pending_samples_eom_r       : std_logic := '0';
 
 begin
 
-  pipeline : process(oclk)
+  in_xfer <= irdy_s and ivld;
+
+  in_xfer_reg : process(oclk)
+  begin
+    if(rising_edge(oclk)) then
+      if(orst = '1') then
+        in_xfer_r <= '0';
+      else
+        in_xfer_r <= in_xfer;
+      end if;
+    end if;
+  end process in_xfer_reg;
+
+  in_in_pipeline : process(oclk)
   begin
     if(rising_edge(oclk)) then
       if(orst = '1') then
         idata_r.i   <= (others => '0');
         idata_r.q   <= (others => '0');
         imetadata_r <= from_slv(metadata_zeros);
-        ivld_r      <= '0';
-        irdy        <= '0';
-      else
+      elsif(in_xfer = '1') then
         idata_r     <= idata;
         imetadata_r <= imetadata;
-        ivld_r      <= ivld;
-        irdy        <= irdy_s;
       end if;
     end if;
-  end process pipeline;
+  end process in_in_pipeline;
 
-  metadata_reg : process(oclk)
+  in_out_pipeline : process(oclk)
   begin
     if(rising_edge(oclk)) then
       if(orst = '1') then
-        imetadata_r2 <= from_slv(metadata_zeros);
-      elsif(ivld_r = '1') then
-        imetadata_r2 <= imetadata_r;
+        irdy_s <= '0';
+      else
+        if((state = IDLE) and (mux_end = '1')) then
+          irdy_s <= (not ivld) and oready;
+        else
+          irdy_s <= '0';
+        end if;
       end if;
     end if;
-  end process metadata_reg;
+  end process in_out_pipeline;
+
+  irdy <= irdy_s;
 
   regs : process(oclk)
   begin
     if(rising_edge(oclk)) then
       if(orst = '1') then
-        ivld_r2                <= '0';
         state_r                <= IDLE;
         force_end_of_samples_r <= '0';
       elsif(oready = '1') then
-        ivld_r2                <= ivld_r;
         state_r                <= state;
         force_end_of_samples_r <= force_end_of_samples;
       end if;
     end if;
   end process regs;
 
-  pending_samples_eom_gen : process(oclk)
-  begin
-    if(rising_edge(oclk)) then
-      if(orst = '1') then
-        pending_samples_eom <= '0';
-      elsif((give = '1') and (opcode = SAMPLES)) then
-        if(eom = '1') then
-          pending_samples_eom <= '0';
-        elsif(som = '1') then
-          pending_samples_eom <= '1';
-        end if;
-      end if;
-    end if;
-  end process pending_samples_eom_gen;
+  pending_samples_eom_gen_set <= '1' when (give = '1') and (som = '1') and
+                                 (opcode = SAMPLES) else '0';
+  pending_samples_eom_gen_clr <= '1' when (give = '1') and (eom = '1') and
+                                 (opcode = SAMPLES) else '0';
+
+  pending_samples_eom_gen : set_clr
+    port map(clk => oclk,
+             rst => orst,
+             set => pending_samples_eom_gen_set,
+             clr => pending_samples_eom_gen_clr,
+             q   => open,
+             q_r => pending_samples_eom_r);
+
+  mux_start <= in_xfer_r;
+  mux_end   <= '1' when (state_r = IDLE) and (in_xfer= '0') and
+               (in_xfer_r = '0') else '0';
 
   -- sets the priority of multiplexing of output messages
-  imetadata_demux : process(ivld_r, ivld_r2, oready, imetadata_r, state_r)
+  -- EOF, SYNC, TIME, INTERVAL, FLUSH, SAMPLES
+  mux : process(oready, imetadata_r, mux_start, state_r, pending_samples_eom_r)
   begin
     if(oready = '1') then
-      if(state_r = TIME_31_0) and (ivld_r2 = '1') then
-        irdy_s <= (not imetadata_r2.error_samp_drop) and
-                  (not imetadata_r2.data_vld) and
-                  (not imetadata_r2.samp_period_vld) and
-                  (not imetadata_r2.flush);
-        state <= TIME_63_32;
-        force_end_of_samples <= '0';
-      elsif(state_r = INTERVAL_31_0) and (ivld_r2 = '1') then
-        irdy_s <= (not imetadata_r2.error_samp_drop) and
-                  (not imetadata_r2.data_vld) and
-                  (not imetadata_r2.time_vld) and
-                  (not imetadata_r2.flush);
-        state <= INTERVAL_63_32;
-        force_end_of_samples <= '0';
-      elsif((imetadata_r.error_samp_drop = '1') or (force_end_of_samples_r = '1'))
-          and (ivld_r = '1') then
-        irdy_s <= (not imetadata_r.data_vld) and
-                  (not imetadata_r.time_vld) and
-                  (not imetadata_r.samp_period_vld) and
-                  (not imetadata_r.flush);
-        if(pending_samples_eom = '1') then
-          state <= SAMPLES;
-          force_end_of_samples <= '1';
+      if((imetadata_r.eof = '1') and (
+          (mux_start = '1') or
+          (state_r = SAMPLES_EOM_ONLY))) then
+        if(pending_samples_eom_r = '1') then
+          state <= SAMPLES_EOM_ONLY;
+        else
+          state <= EOF;
+        end if;
+        force_end_of_samples <= pending_samples_eom_r;
+      elsif((imetadata_r.error_samp_drop = '1') and (
+          (mux_start = '1') or
+          (state_r = SAMPLES_EOM_ONLY) or
+          (state_r = EOF))) then
+        if(pending_samples_eom_r = '1') then
+          state <= SAMPLES_EOM_ONLY;
         else
           state <= SYNC;
-          force_end_of_samples <= '0';
         end if;
-      elsif(imetadata_r.time_vld = '1') and (ivld_r = '1') then
-        irdy_s <= '0';
-        state <= TIME_31_0;
+        force_end_of_samples <= pending_samples_eom_r;
+      elsif((imetadata_r.time_vld = '1') and (
+          (mux_start = '1') or
+          (state_r = SAMPLES_EOM_ONLY) or
+          (state_r = EOF) or
+          (state_r = SYNC))) then
+        if(pending_samples_eom_r = '1') then
+          state <= SAMPLES_EOM_ONLY;
+        else
+          state <= TIME_31_0;
+        end if;
+        force_end_of_samples <= pending_samples_eom_r;
+      elsif(state_r = TIME_31_0) then
+        state                <= TIME_63_32;
         force_end_of_samples <= '0';
-      elsif(imetadata_r.data_vld = '1') and (ivld_r = '1') then
-        irdy_s <= (not imetadata_r.error_samp_drop) and
-                  (not imetadata_r.time_vld) and
-                  (not imetadata_r.samp_period_vld) and
-                  (not imetadata_r.flush);
-        state <= SAMPLES;
+      elsif((imetadata_r.samp_period_vld = '1') and (
+          (mux_start = '1') or
+          (state_r = SAMPLES_EOM_ONLY) or
+          (state_r = EOF) or
+          (state_r = SYNC) or
+          (state_r = TIME_63_32))) then
+        if(pending_samples_eom_r = '1') then
+          state <= SAMPLES_EOM_ONLY;
+        else
+          state <= INTERVAL_31_0;
+        end if;
+        force_end_of_samples <= pending_samples_eom_r;
+      elsif(state_r = INTERVAL_31_0) then
+        state                <= INTERVAL_63_32;
         force_end_of_samples <= '0';
-      elsif(imetadata_r.samp_period_vld = '1') and (ivld_r = '1') then
-        irdy_s <= '0';
-        state <= INTERVAL_31_0;
-        force_end_of_samples <= '0';
-      elsif(imetadata_r.flush = '1') and (ivld_r = '1') then
-        irdy_s <= '1';
-        state <= FLUSH;
+      elsif((imetadata_r.flush = '1') and (
+          (mux_start = '1') or
+          (state_r = SAMPLES_EOM_ONLY) or
+          (state_r = EOF) or
+          (state_r = SYNC) or
+          (state_r = TIME_63_32) or
+          (state_r = INTERVAL_63_32))) then
+        if(pending_samples_eom_r = '1') then
+          state <= SAMPLES_EOM_ONLY;
+        else
+          state <= FLUSH;
+        end if;
+        force_end_of_samples <= pending_samples_eom_r;
+      elsif((imetadata_r.data_vld = '1') and (
+          (mux_start = '1') or
+          (state_r = SAMPLES_EOM_ONLY) or
+          (state_r = EOF) or
+          (state_r = SYNC) or
+          (state_r = TIME_63_32) or
+          (state_r = INTERVAL_63_32) or
+          (state_r = FLUSH))) then
+        state                <= SAMPLES;
         force_end_of_samples <= '0';
       else
-        irdy_s <= '1';
-        state <= IDLE;
+        state                <= IDLE;
         force_end_of_samples <= '0';
       end if;
-    else
-      irdy_s <= '0';
-      state <= IDLE;
-      force_end_of_samples <= '0';
     end if;
-  end process imetadata_demux;
+  end process mux;
 
   -- TODO / FIXME - handle USER messages
-  ogen : process(state, idata_r, samples_som, samples_eom, imetadata_r2, imetadata_r)
+  ogen : process(state, idata_r, samples_som, samples_eom, imetadata_r, oready)
   begin
     case state is
       when SAMPLES =>
-        opcode    <= SAMPLES;
+        opcode  <= SAMPLES;
         odata   <= idata_r.q & idata_r.i;
         som     <= samples_som;
-
-        -- handles forced EOM due to data_vld=1 error_samp_drop=1
-        ovalid  <= not force_end_of_samples;
-
-        eom     <= message_sizer_eom or force_end_of_samples;
+        ovalid  <= '1';
+        eom     <= message_sizer_eom;
+        oeof    <= '0';
+        give    <= oready;
+      when SAMPLES_EOM_ONLY =>
+        opcode  <= SAMPLES;
+        som     <= '0';
+        ovalid  <= '0';
+        eom     <= '1';
+        oeof    <= '0';
         give    <= oready;
       when TIME_63_32 =>
         opcode    <= TIME_TIME;
-        odata <= std_logic_vector(imetadata_r2.time(63 downto 32));
+        odata <= std_logic_vector(imetadata_r.time(63 downto 32));
         som    <= '0';
         ovalid <= '1';
         eom    <= '1';
+        oeof   <= '0';
         give   <= oready;
       when TIME_31_0 =>
         opcode    <= TIME_TIME;
@@ -212,13 +256,15 @@ begin
         som    <= '1';
         ovalid <= '1';
         eom    <= '0';
+        oeof   <= '0';
         give   <= oready;
       when INTERVAL_63_32 =>
         opcode    <= INTERVAL;
-        odata <= std_logic_vector(imetadata_r2.samp_period(63 downto 32));
+        odata <= std_logic_vector(imetadata_r.samp_period(63 downto 32));
         som    <= '0';
         ovalid <= '1';
         eom    <= '1';
+        oeof   <= '0';
         give   <= oready;
       when INTERVAL_31_0 =>
         opcode    <= INTERVAL;
@@ -226,23 +272,33 @@ begin
         som    <= '1';
         ovalid <= '1';
         eom    <= '0';
+        oeof   <= '0';
         give   <= oready;
       when SYNC =>
         opcode    <= SYNC;
         som    <= '1';
         ovalid <= '0';
         eom    <= '1';
+        oeof   <= '0';
         give   <= oready;
       when FLUSH =>
-        opcode    <= FLUSH;
+        opcode <= FLUSH;
         som    <= '1';
         ovalid <= '0';
         eom    <= '1';
+        oeof   <= '0';
+        give   <= oready;
+      when EOF =>
+        som    <= '0';
+        ovalid <= '0';
+        eom    <= '0';
+        oeof   <= '1';
         give   <= oready;
       when others =>
         som    <= '0';
         ovalid <= '0';
         eom    <= '0';
+        oeof   <= '0';
         give   <= '0';
     end case;
   end process ogen;
@@ -266,7 +322,6 @@ begin
   ogive        <= give;
   osom         <= som;
   oeom         <= eom;
-  oeof         <= '0';
   obyte_enable <= (others => '1');
 
 end rtl;

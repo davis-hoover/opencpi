@@ -24,10 +24,11 @@ USE IEEE.MATH_COMPLEX.ALL;
 
 package misc_prims is
 
-constant DATA_ADC_BIT_WIDTH             : positive := 12;
-constant DATA_BIT_WIDTH                 : positive := 16;
-constant METADATA_TIME_BIT_WIDTH        : positive := 64;
-constant METADATA_SAMP_PERIOD_BIT_WIDTH : positive := 64;
+constant TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH : positive := 32;
+constant DATA_ADC_BIT_WIDTH                  : positive := 12;
+constant DATA_BIT_WIDTH                      : positive := 16;
+constant METADATA_TIME_BIT_WIDTH             : positive := 64;
+constant METADATA_SAMP_PERIOD_BIT_WIDTH      : positive := 64;
 
 type file_writer_backpressure_select_t is (NO_BP, LFSR_BP);
 
@@ -41,7 +42,10 @@ type data_complex_t is record
   q : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
 end record data_complex_t;
 
+constant data_complex_zero : data_complex_t := ((others => '0'), (others => '0'));
+
 type metadata_t is record
+  eof               : std_logic; -- End of File (from OpenCPI WSI)
   flush             : std_logic; -- one or more samples have been dropped
   error_samp_drop   : std_logic; -- one or more samples have been dropped
   data_vld          : std_logic; -- allows for option of sending valid metadata
@@ -59,10 +63,15 @@ type metadata_t is record
   samp_period_vld   : std_logic;
 end record metadata_t;
 
+constant metadata_zero : metadata_t := ('0', '0', '0', '0', (others => '0'),
+                                        '0', (others => '0'), '0');
+
 type info_t is record
   data     : data_complex_t;
   metadata : metadata_t;
 end record info_t;
+
+constant info_zero : info_t := (data_complex_zero, metadata_zero);
 
 constant METADATA_IDX_SAMP_PERIOD_VLD : natural := 0;
 constant METADATA_IDX_SAMP_PERIOD_R   : natural := 1;
@@ -78,7 +87,9 @@ constant METADATA_IDX_DATA_VLD        : natural := METADATA_IDX_TIME_L+1;
 constant METADATA_IDX_ERROR_SAMP_DROP : natural := METADATA_IDX_DATA_VLD+1;
 constant METADATA_IDX_FLUSH           : natural := METADATA_IDX_ERROR_SAMP_DROP
                                                    +1;
-constant METADATA_BIT_WIDTH : positive := METADATA_IDX_FLUSH+1;
+constant METADATA_IDX_EOF             : natural := METADATA_IDX_FLUSH
+                                                   +1;
+constant METADATA_BIT_WIDTH : positive := METADATA_IDX_EOF+1;
 
 constant INFO_BIT_WIDTH : positive := (2*DATA_BIT_WIDTH)+METADATA_BIT_WIDTH;
 
@@ -93,13 +104,22 @@ type adc_samp_drop_detector_status_t is record
   error_samp_drop : std_logic;
 end record adc_samp_drop_detector_status_t;
 
+type time_downsampler_ctrl_t is record
+  bypass                    : std_logic;
+  min_num_data_per_time     : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1
+                              downto 0);
+  min_num_data_per_time_vld : std_logic;
+end record time_downsampler_ctrl_t;
+
 type time_corrector_ctrl_t is record
+  bypass              : std_logic;
   time_correction     : signed(METADATA_TIME_BIT_WIDTH-1 downto 0);
   time_correction_vld : std_logic;
 end record time_corrector_ctrl_t;
 
 type time_corrector_status_t is record
   overflow : std_logic;
+  --overflow_sticky : std_logic;
 end record time_corrector_status_t;
 
 component round_conv
@@ -276,5 +296,52 @@ component set_clr
     q   : out std_logic;
     q_r : out std_logic);
 end component set_clr;
+
+component time_corrector is
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    ctrl      : in  time_corrector_ctrl_t;
+    status    : out time_corrector_status_t;
+    -- INPUT
+    idata     : in  data_complex_t;
+    imetadata : in  metadata_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_t;
+    ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component time_downsampler is
+  generic(
+    DATA_COUNTER_BIT_WIDTH : positive := 32);
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    ctrl      : in  time_downsampler_ctrl_t;
+    -- INPUT
+    idata     : in  data_complex_t;
+    imetadata : in  metadata_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_t;
+    ometadata : out metadata_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component level_to_pulse_converter is
+  port(
+    clk   : in  std_logic;
+    rst   : in  std_logic;
+    level : in  std_logic;
+    pulse : out std_logic);
+end component;
 
 end package misc_prims;
