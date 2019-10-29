@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Downsample: Verify output data
+Data Sink DAC: Verify output data
 
-Output is verified by downsampling input data in python and comparing to actual 
-output data
+Output is verified by: 
+1. Checking for underrun. It is expected when dac_clk_freq_hz > SDP_CLK_FREQ
+2. Comparing input and output data. Data should be the same when underrun 
+   hasn't occurred
 """
 import sys
 import os.path
@@ -65,8 +67,8 @@ else:
         print("    Comparing Expected Q data to Actual Q Data")
         utu.compare_arrays(idata['imag_idx'], odata['imag_idx'])
     else:
-        bitshift=iqm.SAMPLES_BIT_WIDTH-DAC_WIDTH_BITS
+        bitshift = iqm.SAMPLES_BIT_WIDTH - DAC_WIDTH_BITS
         print("    Comparing Expected I data to Actual I Data")
-        utu.compare_arrays(np.left_shift(idata['real_idx'],bitshift), odata['real_idx'])
+        utu.compare_arrays(np.right_shift(idata['real_idx'],bitshift), odata['real_idx'])
         print("    Comparing Expected Q data to Actual Q Data")
-        utu.compare_arrays(np.left_shift(idata['imag_idx'],bitshift), odata['imag_idx'])
+        utu.compare_arrays(np.right_shift(idata['imag_idx'],bitshift), odata['imag_idx'])

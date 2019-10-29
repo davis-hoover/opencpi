@@ -1,6 +1,6 @@
 #!/usr/bin/octave
 
-global DATA_DAC_BIT_WIDTH = 16;
+global DATA_DAC_BIT_WIDTH = 12;
 global DATA_BIT_WIDTH     = 16;
 global max_count_value    = 32767;
 

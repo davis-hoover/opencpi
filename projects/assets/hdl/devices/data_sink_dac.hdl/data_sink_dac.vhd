@@ -126,22 +126,14 @@ begin
         -- OUTPUT INTERFACE
         odata     => dac_data_narrower_odata,
         ometadata => dac_data_narrower_ometadata,
-        ovld      => dev_out.valid,
+        ovld      => dac_data_narrower_ovld,
         ordy      => dac_data_narrower_ordy);
 
     dac_data_narrower_ordy <= not dac_rst;
-
-    BITS_PACKED_INTO_LSBS_true : if(DAC_OUTPUT_IS_LSB_OF_IN_PORT = btrue) generate
-      dev_out.data_i <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.i),16));
-      dev_out.data_q <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.i),16));
-    end generate;
-
-    BITS_PACKED_INTO_LSBS_false : if(DAC_OUTPUT_IS_LSB_OF_IN_PORT = bfalse) generate
-      dev_out.data_i <= std_logic_vector(
-        shift_left(unsigned(dac_data_narrower_odata.i), 16-to_integer(DAC_WIDTH_BITS)));
-      dev_out.data_q <= std_logic_vector(
-        shift_left(unsigned(dac_data_narrower_odata.q), 16-to_integer(DAC_WIDTH_BITS)));
-    end generate;
+    dev_out.valid <= dac_data_narrower_ovld;
+  
+    dev_out.data_i <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.i),16));
+    dev_out.data_q <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.i),16));
     
   end generate;
       

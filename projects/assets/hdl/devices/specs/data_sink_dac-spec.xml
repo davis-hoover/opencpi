@@ -2,7 +2,7 @@
   <Property Name="DAC_WIDTH_BITS"
             Type="UChar"
             Parameter="True"
-            Default="16"
+            Default="12"
             Description="Number of bits in each of the I and Q values delivered to the DAC device"/>
   <Property Name="DAC_OUTPUT_IS_LSB_OF_IN_PORT" 
             Type="Bool" 

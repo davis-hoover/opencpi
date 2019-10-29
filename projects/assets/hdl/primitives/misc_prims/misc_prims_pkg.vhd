@@ -25,7 +25,7 @@ USE IEEE.MATH_COMPLEX.ALL;
 package misc_prims is
 
 constant DATA_ADC_BIT_WIDTH             : positive := 12;
-constant DATA_DAC_BIT_WIDTH             : positive := 16;
+constant DATA_DAC_BIT_WIDTH             : positive := 12;
 constant DATA_BIT_WIDTH                 : positive := 16;
 constant METADATA_TIME_BIT_WIDTH        : positive := 64;
 constant METADATA_SAMP_PERIOD_BIT_WIDTH : positive := 64;
