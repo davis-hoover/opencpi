@@ -1,12 +1,11 @@
--- TODO / FIXME - this implementation will be affect by protocol changes (which are expected - see #124)
--- TODO / FIXME - USER opcode is not supported!
+-- TODO / FIXME - consolidate w/ cswm_prot_out_adapter_dw32_clkout
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library misc_prims; use misc_prims.ocpi.all;
 library misc_prims; use misc_prims.misc_prims.all;
 library ocpi; use ocpi.types.all;
 
 -- for use w/ port clockdirection='output'
-entity cswm_prot_out_adapter_dw32_clkout is
+entity cswm_prot_out_adapter_dw32_clkout_old is
   generic(
     OUT_PORT_MBYTEEN_WIDTH : positive);
   port(
@@ -29,12 +28,12 @@ entity cswm_prot_out_adapter_dw32_clkout is
     oeof         : out Bool_t;
     oready       : in  Bool_t);
 end entity;
-architecture rtl of cswm_prot_out_adapter_dw32_clkout is
+architecture rtl of cswm_prot_out_adapter_dw32_clkout_old is
 begin
 
   oclk <= iclk;
 
-  adapter : cswm_prot_out_adapter_dw32_clkin
+  adapter : cswm_prot_out_adapter_dw32_clkin_old
     generic map(
       OUT_PORT_MBYTEEN_WIDTH => OUT_PORT_MBYTEEN_WIDTH)
     port map(

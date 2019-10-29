@@ -19,7 +19,9 @@ architecture rtl of maximal_lfsr_data_src is
   -- https://en.wikipedia.org/wiki/Linear-feedback_shift_register#Some_polynomials_for_maximal_LFSRs
   constant MAXIMAL_LFSR_16_BIT_PERIOD : positive := 65535;
 
-  signal data_i : std_logic_vector(odata.i'range) := (others => '0');
+  signal rst_r   : std_logic := '0';
+  signal vld_rst : std_logic := '0';
+  signal data_i  : std_logic_vector(odata.i'range) := (others => '0');
 
   signal cnt                       : unsigned(CNT_BIT_WIDTH-1 downto 0) :=
                                      (others => '0');
@@ -27,6 +29,15 @@ architecture rtl of maximal_lfsr_data_src is
   signal stopped_s                 : std_logic := '0';
   signal maximal_period_samps_sent : std_logic := '0';
 begin
+
+  -- trying to obey axi4streaming TVALID rules
+  rst_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      rst_r <= rst;
+    end if;
+  end process;
+  vld_rst <= rst or rst_r;
 
   stopped_s <= (stop_on_period_cnt and maximal_period_samps_sent);
   counter_en <= ordy and not (stopped_s);
@@ -49,7 +60,7 @@ begin
       SEED       => "0000000000000001")
     port map(
       clk => clk,
-      rst => rst,
+      rst => vld_rst,
       en  => ordy,
       reg => data_i);
 
@@ -59,6 +70,6 @@ begin
     odata.q(odata.q'length-1-idx) <= data_i(idx);
   end generate;
 
-  ovld <= counter_en;
+  ovld <= counter_en and (not vld_rst);
 
 end rtl;

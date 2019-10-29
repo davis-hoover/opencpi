@@ -44,12 +44,13 @@ architecture rtl of one_shot_fifo is
   signal s_not_rst   : std_logic;
   signal s_not_full  : std_logic := '0';
   signal s_not_empty : std_logic := '0';
+  signal s_done      : std_logic := '0';
   signal s_dout      : std_logic_vector(data_width-1 downto 0);
 
 
 begin
 
-  s_enq <= s_not_full and en;
+  s_enq <= s_not_full and en and not s_done;
   s_deq <= s_not_empty and rdy when (s_counter < num_output_samples) else '0';
   s_not_rst <= not rst;
 
@@ -78,6 +79,7 @@ begin
     end if;
   end process;
   dout <= s_dout;
-  done <= '1' when (s_counter = num_output_samples) else '0';
+  s_done <= '1' when (s_counter = num_output_samples) else '0';
+  done <= s_done;
   data_vld <= s_deq when (s_counter < num_output_samples) else '0';
 end rtl;
