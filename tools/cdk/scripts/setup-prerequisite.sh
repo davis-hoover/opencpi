@@ -245,8 +245,8 @@ function download_url {
       };;
     local)
       echo Trying to downloading the distribution file locally from:  $2/$3
-      echo Download command is: curl -O -L $2/$3
-      if curl -O -L $2/$file; then
+      echo Download command is: curl -f -O -L $2/$3
+      if curl -f -O -L $2/$file; then
         echo Download completed successfully from $2/$3
 	if [ -r $3 ] ; then
 	  [ "$3" != $file ] && mv -f $3 $file
@@ -261,8 +261,8 @@ function download_url {
       fi;;
     internet)
       echo Downloading the distribution file: $file
-      echo Download command is: curl -O -L $url/$file
-      curl -O -L $url/$file && {
+      echo Download command is: curl -f -O -L $url/$file
+      curl -f -O -L $url/$file && {
         echo Download complete.  Removing any existing build directories.
         unpack
 	return
@@ -426,7 +426,7 @@ function relative_link {
   [[ $to == /* ]] || to=`pwd`/$to
   mkdir -p $from
   [ -L $from/$link ] && rm $from/$link
-  to=$(python -c "import os.path; print os.path.relpath('$(dirname $to)', '$from')")
+  to=$(python3.4 -c "import os.path; print(os.path.relpath('$(dirname $to)', '$from'))")
   ln -s -f $to/$base $from/$link
 }
 OcpiSetup=

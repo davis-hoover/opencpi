@@ -18,6 +18,7 @@
 
 ##########################################################################################
 ThisMake := $(lastword $(MAKEFILE_LIST))
+include $(OCPI_CDK_DIR)/include/util.mk
 
 # We have two situations for building the linux kernel driver.
 # 1. One is simply part of the source tree, where building the driver happens in a CDK environment
@@ -103,7 +104,7 @@ ifdef OCPI_TARGET_KERNEL_DIR
       ) \
     ) \
    ))
-  ifeq ($(wildcard $(KERNELDIR)),)
+  ifeq ($(call OcpiExists,$(KERNELDIR)),)
     $(error OCPI_TARGET_KERNEL_DIR indicates '$(OCPI_TARGET_KERNEL_DIR)', which does not exist)
   endif
   ifdef OcpiCrossCompile

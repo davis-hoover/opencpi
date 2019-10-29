@@ -175,4 +175,53 @@ component cswm_prot_out_adapter_dw32_clkout is
     oready       : in  Bool_t);
 end component;
 
+-- TODO / FIXME - consolidate w/ cswm_prot_out_adapter_dw32_clkin
+component cswm_prot_out_adapter_dw32_clkin_old is
+  generic(
+    OUT_PORT_MBYTEEN_WIDTH : positive);
+  port(
+    -- INPUT
+    idata        : in  data_complex_t;
+    imetadata    : in  metadata_t;
+    ivld         : in  std_logic;
+    irdy         : out std_logic;
+    -- OUTPUT
+    oclk         : in  std_logic;
+    orst         : in  std_logic;
+    odata        : out std_logic_vector(31 downto 0);
+    ovalid       : out Bool_t;
+    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
+    ogive        : out Bool_t;
+    osom         : out Bool_t;
+    oeom         : out Bool_t;
+    oopcode      : out complex_short_with_metadata_opcode_t;
+    oeof         : out Bool_t;
+    oready       : in  Bool_t);
+end component;
+
+-- TODO / FIXME - consolidate w/ cswm_prot_out_adapter_dw32_clkout
+component cswm_prot_out_adapter_dw32_clkout_old is
+  generic(
+    OUT_PORT_MBYTEEN_WIDTH : positive);
+  port(
+    -- INPUT
+    iclk         : in  std_logic;
+    irst         : in  std_logic;
+    idata        : in  data_complex_t;
+    imetadata    : in  metadata_t;
+    ivld         : in  std_logic;
+    irdy         : out std_logic;
+    -- OUTPUT
+    oclk         : out std_logic;
+    odata        : out std_logic_vector(31 downto 0);
+    ovalid       : out Bool_t;
+    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
+    ogive        : out Bool_t;
+    osom         : out Bool_t;
+    oeom         : out Bool_t;
+    oopcode      : out complex_short_with_metadata_opcode_t;
+    oeof         : out Bool_t;
+    oready       : in  Bool_t);
+end component;
+
 end package ocpi;

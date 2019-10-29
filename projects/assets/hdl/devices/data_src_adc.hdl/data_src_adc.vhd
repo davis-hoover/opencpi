@@ -94,7 +94,7 @@ begin
         ovld      => adc_data_widener_ovld,
         ordy      => adc_out_adapter_irdy);
 
-    out_adapter : misc_prims.ocpi.cswm_prot_out_adapter_dw32_clkout
+    out_adapter : misc_prims.ocpi.cswm_prot_out_adapter_dw32_clkout_old
       generic map(
         OUT_PORT_MBYTEEN_WIDTH => out_out.byte_enable'length)
       port map(

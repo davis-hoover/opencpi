@@ -1,0 +1,35 @@
+<HdlWorker language='vhdl' spec='timestamper_scdcd-spec' controloperations='start' version='2'>
+
+  <Property name='IN_PORT_DATA_WIDTH'
+            type='uchar'
+            default='32'
+            parameter='true'/>
+  <Property name='OUT_PORT_DATA_WIDTH'
+            type='uchar'
+            default='32'
+            parameter='true'/>
+  <Property name='CTRL_IN_CDC_DEPTH'
+            type='ushort'
+            default='16'
+            parameter='true'/>
+
+  <Property name='DATA_CDC_DEPTH'
+            type='ushort'
+            default='2'
+            parameter='true'/>
+
+  <StreamInterface name='in'
+                   datawidth='IN_PORT_DATA_WIDTH'
+                   myclock='true'/>
+  <StreamInterface name='out'
+                   datawidth='OUT_PORT_DATA_WIDTH'
+                   workereof='true'
+                   myclock='true'/>
+
+  <TimeInterface name='time'
+                 secondswidth='32'
+                 fractionwidth='32'
+                 myoutputclock='true'
+                 allowunavailable='true'/>
+
+</HdlWorker>

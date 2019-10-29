@@ -506,15 +506,16 @@ set +f
 # Or change the python to do this and not use "make".
 
 # export the specs for each of the libraries
-python3 -c "import sys, os; 
+python3.4 -c "import sys, os;
 sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
 import _opencpi.util; _opencpi.util.export_libraries()"
 
 exit 0
-notes:
-assets:
- bitstream executables are exported
- device specs are exported as specs, as well as platform devices
- as well as all component library specs
-core
- top level specs +specs/
+
+# notes:
+# assets:
+#  bitstream executables are exported
+#  device specs are exported as specs, as well as platform devices
+#  as well as all component library specs
+# core
+#  top level specs +specs/

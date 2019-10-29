@@ -143,7 +143,7 @@ OCPI::OS::ThreadManager::start (void (*func) (void *), void * opaque)
   int res;
   if ((res = pthread_create (&td.th, 0, RunThread, p))) {
     pthread_sigmask (SIG_SETMASK, &oldSigSet, 0);
-    throw OCPI::OS::Posix::getErrorMessage (res);
+    throw OCPI::OS::Posix::getErrorMessage (res, "pthread_create");
   }
 
   td.running = true;
@@ -161,7 +161,7 @@ OCPI::OS::ThreadManager::join ()
     return;
   void * dummy;
   if ((res = pthread_join (td.th, &dummy))) {
-    throw OCPI::OS::Posix::getErrorMessage (res);
+    throw OCPI::OS::Posix::getErrorMessage (res, "pthread_join");
   }
 
 #if !defined(NDEBUG)
@@ -181,7 +181,7 @@ OCPI::OS::ThreadManager::detach ()
 #endif
 
   if ((res = pthread_detach (td.th))) {
-    throw OCPI::OS::Posix::getErrorMessage (res);
+    throw OCPI::OS::Posix::getErrorMessage (res, "pthread_detach");
   }
 
 #if !defined(NDEBUG)
