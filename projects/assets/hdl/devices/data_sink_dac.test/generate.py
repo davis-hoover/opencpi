@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Downsample : Generate test input data
+Data Sink DAC : Generate test input data
 
 Generate ramp of sufficient size to produce 2 maximum size output messages
 
@@ -34,6 +34,7 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 # from arguments to generate.py (-test.xml)
+#OCPI_TEST_ocpi_max_bytes_in is a preliminary interface and is subject to change
 max_bytes_in = int(os.environ.get("OCPI_TEST_ocpi_max_bytes_in"))
 
 # Generate enough samples to generate number_of_samples_messages max_bytes_in sized input messages
