@@ -1,6 +1,6 @@
 # Description
 Tests the data_src_adc.hdl worker (and its primitive). Unit test for this worker
-fails to build due to a bug, so this application is the workaround.
+fails to build due to a bug (Issue #103), so this application is the workaround.
 
 # Hardware Portability
 Intended for simulators only.

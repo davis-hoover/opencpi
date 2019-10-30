@@ -1,7 +1,7 @@
 <!--
   The dac_clk_freq_hz property is only used by the emulator worker,
   but currently, emulators can only be parameterized by properties
-  of the worker they are emulating.
+  of the worker they are emulating (Issue #131).
 -->
 <build>
   <configuration id='0'>
