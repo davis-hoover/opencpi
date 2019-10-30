@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>66</meta:editing-cycles><meta:creation-date>2019-10-09T10:12:47.952571796</meta:creation-date><meta:editing-duration>PT2H51M45S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-28T13:10:26.264594719</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="4" meta:object-count="0" meta:page-count="28" meta:paragraph-count="278" meta:word-count="2671" meta:character-count="19559" meta:non-whitespace-character-count="17243"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-09T10:12:47.822186124"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>68</meta:editing-cycles><meta:creation-date>2019-10-09T10:12:47.952571796</meta:creation-date><meta:editing-duration>PT2H54M22S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-30T12:18:20.984295306</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="4" meta:object-count="0" meta:page-count="28" meta:paragraph-count="278" meta:word-count="2671" meta:character-count="19559" meta:non-whitespace-character-count="17243"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-09T10:12:47.822186124"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">39</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">138</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
    <config:config-item config:name="ViewAreaWidth" config:type="long">32420</config:config-item>
    <config:config-item config:name="ViewAreaHeight" config:type="long">17482</config:config-item>
@@ -13,12 +13,12 @@
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">9102</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">3464</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">6992</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">34406</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">39</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">138</config:config-item>
      <config:config-item config:name="VisibleRight" config:type="long">32419</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">17519</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">17618</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -111,7 +111,7 @@
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">39464716</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">39595290</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
@@ -3253,50 +3253,50 @@
   <style:style style:name="P39" style:family="paragraph" style:parent-style-name="Heading_20_3">
    <style:text-properties officeooo:rsid="0254cf03" officeooo:paragraph-rsid="0254cf03"/>
   </style:style>
-  <style:style style:name="P40" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:paragraph-rsid="0225a7cd"/>
-  </style:style>
-  <style:style style:name="P41" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:paragraph-rsid="022b4cc1"/>
-  </style:style>
-  <style:style style:name="P42" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:paragraph-rsid="02561939"/>
-  </style:style>
-  <style:style style:name="P43" style:family="paragraph" style:parent-style-name="List_20_Number">
-   <style:text-properties officeooo:paragraph-rsid="02221f5f"/>
-  </style:style>
-  <style:style style:name="P44" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
-   <style:paragraph-properties style:page-number="auto"/>
-  </style:style>
-  <style:style style:name="P45" style:family="paragraph" style:parent-style-name="Heading_20_3">
-   <style:text-properties officeooo:rsid="0254cf03" officeooo:paragraph-rsid="0254cf03"/>
-  </style:style>
-  <style:style style:name="P46" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P40" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="02221f5f" officeooo:paragraph-rsid="02221f5f"/>
   </style:style>
-  <style:style style:name="P47" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P41" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="0225a7cd" officeooo:paragraph-rsid="0225a7cd"/>
   </style:style>
-  <style:style style:name="P48" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P42" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="02281926" officeooo:paragraph-rsid="02281926"/>
   </style:style>
-  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P43" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="02295477" officeooo:paragraph-rsid="02295477"/>
   </style:style>
-  <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P44" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="0230765b" officeooo:paragraph-rsid="0230765b"/>
   </style:style>
-  <style:style style:name="P51" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P45" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="02307cd9" officeooo:paragraph-rsid="02307cd9"/>
   </style:style>
-  <style:style style:name="P52" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P46" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="02364479" officeooo:paragraph-rsid="02364479"/>
   </style:style>
-  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P47" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="023dbc8a" officeooo:paragraph-rsid="023dbc8a"/>
   </style:style>
-  <style:style style:name="P54" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P48" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="024eb1c8" officeooo:paragraph-rsid="024eb1c8"/>
+  </style:style>
+  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
+   <style:paragraph-properties style:page-number="auto"/>
+  </style:style>
+  <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Heading_20_3">
+   <style:text-properties officeooo:rsid="0254cf03" officeooo:paragraph-rsid="0254cf03"/>
+  </style:style>
+  <style:style style:name="P51" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="0225a7cd"/>
+  </style:style>
+  <style:style style:name="P52" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="022b4cc1"/>
+  </style:style>
+  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="02561939"/>
+  </style:style>
+  <style:style style:name="P54" style:family="paragraph" style:parent-style-name="List_20_Number">
+   <style:text-properties officeooo:paragraph-rsid="02221f5f"/>
   </style:style>
   <style:style style:name="P55" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
@@ -3418,6 +3418,9 @@
   <style:style style:name="T38" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
+  <style:style style:name="T39" style:family="text">
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
    <style:graphic-properties style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
   </style:style>
@@ -3452,9 +3455,9 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:h text:style-name="P44" text:outline-level="1"><text:span text:style-name="T1">Tutorial</text:span> 6<text:span text:style-name="T37">hw</text:span>: <text:span text:style-name="T27">Creating a </text:span>Simple HDL Worker</text:h>
+   <text:h text:style-name="P49" text:outline-level="1"><text:span text:style-name="T1">Tutorial</text:span> 6<text:span text:style-name="T37">hw</text:span>: <text:span text:style-name="T27">Creating a </text:span>Simple HDL Worker</text:h>
    <text:p text:style-name="P7">The objective of this <text:span text:style-name="T29">tutorial</text:span> is to design, build and test an HDL application worker. The worker function is peak detection of a data stream (peak_detector.hdl) with the following properties:</text:p>
-   <text:list xml:id="list2267528921" text:style-name="WWNum32">
+   <text:list xml:id="list3921932991" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Volatile Properties: Signed Min/Max (OWD)</text:p>
     </text:list-item>
@@ -3468,8 +3471,13 @@
    <text:p text:style-name="P7">This tutorial demonstrates Automated Unit Testing on multiple platforms (XML, Python) with the Xilinx XSIM simulator on <text:span text:style-name="T1">the </text:span>Ettus E310 (Xilinx Zynq-7020) hardware. </text:p>
    <text:p text:style-name="P7">Th<text:span text:style-name="T27">e peak detector </text:span>HDL worker <text:span text:style-name="T27">performs the same function as</text:span> the simple RCC worker demonstrated in <text:span text:style-name="T1">Tutorial</text:span> 3.</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">What’s Provided</text:h>
-   <text:p text:style-name="P8">The following items are provided for this tutorial:</text:p>
-   <text:list xml:id="list131028283932669" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:p text:style-name="P8"><office:annotation office:name="__Annotation__9738_2219136942">
+     <dc:creator>Lisa Zahn</dc:creator>
+     <dc:date>2019-10-30T12:16:06.777365098</dc:date>
+     <loext:sender-initials>LZ</loext:sender-initials>
+     <text:p><text:span text:style-name="T39">Need to update these paths but first need to figure out what they should be in the new “tutorial-project” scheme. Is it opencpi/doc/tutorials/tutorial-project?</text:span></text:p>
+    </office:annotation>The following items are provided for this tutorial:<office:annotation-end office:name="__Annotation__9738_2219136942"/></text:p>
+   <text:list xml:id="list121822030371337" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Component <text:span text:style-name="T4">d</text:span>ata sheet <text:span text:style-name="T4">in</text:span> /home/training/provided/doc/Peak_Detector.pdf.</text:p>
     </text:list-item>
@@ -3484,7 +3492,7 @@
     </text:list-item>
    </text:list>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Worker Development Flow</text:h>
-   <text:list xml:id="list147908215" text:style-name="Numbering_20_1">
+   <text:list xml:id="list3909274282" text:style-name="Numbering_20_1">
     <text:list-item>
      <text:p text:style-name="List_20_Number"><text:s/>Component (OCS): Use pre-existing or create new.</text:p>
     </text:list-item>
@@ -3510,7 +3518,7 @@
    <text:h text:style-name="P25" text:outline-level="2">Overview</text:h>
    <text:p text:style-name="P1">What are the requirements of this component?</text:p>
    <text:p text:style-name="P1">Given an input of complex numbers, the &quot;peak_detector&quot; component is meant to find the biggest I or Q sample and the smallest I or Q sample. The basic idea is:</text:p>
-   <text:list xml:id="list131027819102643" text:continue-list="list131028283932669" text:style-name="WWNum32">
+   <text:list xml:id="list121822782312683" text:continue-list="list121822030371337" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">current_biggest = max(current_biggest,max(I,Q))</text:p>
     </text:list-item>
@@ -4036,7 +4044,7 @@
    <text:p text:style-name="P1"/>
    <text:p text:style-name="P1"/>
    <text:h text:style-name="P26" text:outline-level="2">Step 1: Use Pre-existing O<text:span text:style-name="T7">P</text:span>S or Create New</text:h>
-   <text:list xml:id="list131026802556225" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821332022426" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Identify the OPS(<text:span text:style-name="T6">e</text:span>s) declared by this component. Examine the &quot;Component Ports&quot; table in the Component <text:span text:style-name="T6">d</text:span>ata <text:span text:style-name="T6">s</text:span>heet:</text:p>
     </text:list-item>
@@ -4048,14 +4056,14 @@
    <text:p text:style-name="List_20_Bullet_20_3">/home/training/training_project/components/specs</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Other projects&apos; components/specs/ directories within scope</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Intersection of Project-registry and ProjectDependencies= in {my_project}/Project.mk</text:p>
-   <text:list xml:id="list131026927799289" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821801409470" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>If NO to all questions ⇨ Create new OPS</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Standard">ANSWER: <text:s/>REUSE. <text:span text:style-name="T29">The </text:span>OPS XML file is available from <text:span text:style-name="T29">the</text:span> framework.</text:p>
    <text:h text:style-name="P27" text:outline-level="2">Step 2: Use Pre-existing OCS or Create New</text:h>
-   <text:list xml:id="list131028315412497" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822736374460" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Review Component Spec Properties and Ports in <text:span text:style-name="T1">the c</text:span>omponent <text:span text:style-name="T7">d</text:span>ata sheet. Use <text:span text:style-name="T1">the </text:span>Properties and Ports information to answer the following questions</text:p>
     </text:list-item>
@@ -4067,7 +4075,7 @@
    <text:p text:style-name="List_20_Bullet_20_3">/home/training/training_project/components/specs/</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Other projects&apos; components/specs/ directories within scope</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Intersection of Project-registry and ProjectDependencies= in {my_project}/Project.mk</text:p>
-   <text:list xml:id="list131027713936825" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821621884271" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>If NO to all questions ⇨ Create new OCS</text:p>
     </text:list-item>
@@ -4075,7 +4083,7 @@
    <text:p text:style-name="Standard">ANSWER: REUSE. <text:span text:style-name="T29">The</text:span> OCS XML file is available from training_project.</text:p>
    <text:h text:style-name="P28" text:outline-level="2">Step 3: Create Worker</text:h>
    <text:p text:style-name="Standard">Via the IDE:</text:p>
-   <text:list xml:id="list131026612163121" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822619032460" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">File → New → Other → ANGRYVIPER → OpenCPI Asset Wizard</text:p>
     </text:list-item>
@@ -4118,7 +4126,7 @@
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:span text:style-name="T8">Step 3: </text:span>Build Skeleton Code</text:h>
    <text:p text:style-name="P2">Why? Because, although not very exciting, this step proves the skeleton source code is buildable and <text:span text:style-name="T29">that </text:span>the build engine is functional.</text:p>
    <text:p text:style-name="P2">To build <text:span text:style-name="T1">g</text:span>enerated <text:span text:style-name="T1">s</text:span>keleton <text:span text:style-name="T1">c</text:span>ode:</text:p>
-   <text:list xml:id="list131027410400017" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822770742612" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the <text:span text:style-name="T1">w</text:span>orker to the Project Operations panel.</text:p>
     </text:list-item>
@@ -4140,7 +4148,7 @@
    </text:list>
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:span text:style-name="T9">Step 3: </text:span>Configure Data Port for Parallel</text:h>
-   <text:list xml:id="list131028223157075" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822719878851" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Convert <text:span text:style-name="T9">the </text:span>data port interface from Interleaved to Parallel. <text:span text:style-name="T9">Note: iqstream_protocol is default interleaved 16-bit I/Q sample data.</text:span></text:p>
     </text:list-item>
@@ -4164,7 +4172,7 @@
      <loext:sender-initials>LZ</loext:sender-initials>
      <text:p text:style-name="P55"><text:span text:style-name="T38">Is this still true at V1.6?</text:span></text:p>
     </office:annotation>The v1.5 release of the IDE does not provide a field for declaring Version 2 HDL API, so the XML must be manually modified:<office:annotation-end office:name="__Annotation__11766_2512809426"/></text:p>
-   <text:list xml:id="list131027996047855" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822637744356" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Edit OWD via the IDE: HDL App Worker OWD HDL Editor.</text:p>
     </text:list-item>
@@ -4185,7 +4193,7 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:span text:style-name="T14">Step 3: </text:span>Modify Worker Source Code</text:h>
    <text:p text:style-name="P10">The skeleton .vhd file is an empty architecture. The entity is generated VHDL based on OCS and OWD, and located in the gen/{worker}-impl.vhd. We want to replace the skeleton .vhd file with the provided .vhd. This file contains instructions to modify the VHDL source code:</text:p>
-   <text:list xml:id="list131027978109621" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821554796200" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">$ cd /home/training/training_project/components/peak_detector.hdl/</text:p>
     </text:list-item>
@@ -4200,7 +4208,7 @@
    <text:p text:style-name="List_20_Bullet_20_3">Make general signal and data port assignments.</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Assign the volatile output properties.</text:p>
    <text:h text:style-name="P29" text:outline-level="2">Step 4: Build Worker Source Code</text:h>
-   <text:list xml:id="list131028468652180" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821181867795" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Build <text:span text:style-name="T15">the </text:span>HDL Worker for XSIM and Zynq <text:span text:style-name="T14">t</text:span>argets.</text:p>
     </text:list-item>
@@ -4250,7 +4258,7 @@
    <text:p text:style-name="P3">Now review artifacts {worker}.hdl/: &quot;target-xsim/&quot; and &quot;target-zynq/&quot;. These directories contain output files from their respective FPGA vendor tools (in this case, simply Xilinx Vivado) in addition to a framework auto-generated file, generics.vhd. which contains parameter configuration settings of the HDL worker for the particular &quot;target-*&quot;.</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 5a to 7a: Unit Test Simulation</text:h>
    <text:p text:style-name="P4"><text:span text:style-name="T29">Use</text:span> the framework&apos;s <text:span text:style-name="T30">u</text:span>nit <text:span text:style-name="T30">t</text:span>est <text:span text:style-name="T30">s</text:span>uite to generate:</text:p>
-   <text:list xml:id="list131026947183057" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822492507794" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">OAS (OpenCPI Application Specification) XML file(s). <text:span text:style-name="T17">This item is used by the framework for running the executable on a simulation platform. In this case, the target simulation platform is Xilinx XSIM Simulation Server.</text:span></text:p>
     </text:list-item>
@@ -4269,7 +4277,7 @@
    <text:p text:style-name="List_20_Bullet_20_3">&lt;Tests useHDLFileIo=&apos;true&apos;&gt;<text:line-break/> <text:s/>&lt;Input Port=&apos;in&apos; Script=&apos;generate.py 32768&apos;/&gt;<text:line-break/> <text:s/>&lt;Output Port=&apos;out&apos; Script=&apos;verify.py 32768&apos; View=&apos;view.sh&apos;/&gt;<text:line-break/>&lt;/Tests&gt;</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 6a: Build Unit Test (Xilinx XSIM)</text:h>
    <text:p text:style-name="P12">Build <text:span text:style-name="T1">the u</text:span>nit <text:span text:style-name="T30">t</text:span>est <text:span text:style-name="T30">s</text:span>uite for <text:span text:style-name="T1">the </text:span>target simulation platform:</text:p>
-   <text:list xml:id="list131026572553426" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821744404586" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the Unit Test to the Project Operations panel.</text:p>
     </text:list-item>
@@ -4287,7 +4295,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P12">Observe <text:span text:style-name="T1">the </text:span>new artifacts in {OCS}.test/gen/:</text:p>
-   <text:list xml:id="list131027235468103" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821158979564" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">cases.txt – &quot;Human-readable&quot; file listing various test configurations</text:p>
     </text:list-item>
@@ -4307,7 +4315,7 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 6a: Review Build Artifacts (XSIM)</text:h>
    <text:p text:style-name="P13">Observe the new artifacts in peak_detector.test/gen/assemblies/peak_detector_0_frw</text:p>
-   <text:list xml:id="list131027997895548" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821164370131" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">peak_detector_0_frw.xml – generated assembly XML (OHAD)</text:p>
     </text:list-item>
@@ -4331,7 +4339,7 @@
    <text:h text:style-name="P31" text:outline-level="2">Step 7a: Run Unit Test (Xilinx XSIM)</text:h>
    <text:p text:style-name="P22">You <text:span text:style-name="T1">can use</text:span> the IDE or the command line in a terminal window <text:span text:style-name="T1">to run the unit test for the target simulation platform.</text:span></text:p>
    <text:h text:style-name="P39" text:outline-level="3">From the IDE</text:h>
-   <text:list xml:id="list131027169163000" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822409718024" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the Unit Test (.test) to the Project Operations panel.</text:p>
     </text:list-item>
@@ -9230,7 +9238,7 @@
     </draw:frame></text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Steps 5b to 7b: Unit Test on Ettus E310</text:h>
    <text:p text:style-name="P15"><text:span text:style-name="T1">Use </text:span>the framework&apos;s <text:span text:style-name="T30">u</text:span>nit <text:span text:style-name="T30">t</text:span>est <text:span text:style-name="T30">s</text:span>uite to generate:</text:p>
-   <text:list xml:id="list131027376726959" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821459764483" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">OAS (OpenCPI Application Specification) XML file(s). <text:span text:style-name="T18">T</text:span>he framework <text:span text:style-name="T18">uses this item </text:span>for running the bitstream on hardware platform. In this case, the target hardware platform is Ettus E310</text:p>
     </text:list-item>
@@ -9248,7 +9256,7 @@
    <text:p text:style-name="P23"><text:span text:style-name="T31">We’ll re-use the unit test from the&quot;work-alike&quot; simple RCC worker we created in Tutorial 3 and used in the simulation step (5a) of this tutorial. The description file is located in the &quot;peak_detector.test/&quot; directory and is named peak</text:span><text:span text:style-name="T12">_</text:span><text:span text:style-name="T13">detector</text:span><text:span text:style-name="T12">-test.xml</text:span><text:span text:style-name="T34">. </text:span><text:span text:style-name="T35">There are no changes required.</text:span></text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 6<text:span text:style-name="T19">b</text:span>: Build Unit Test</text:h>
    <text:p text:style-name="P16">Build <text:span text:style-name="T1">the u</text:span>nit <text:span text:style-name="T30">t</text:span>est <text:span text:style-name="T30">s</text:span>uite for the<text:span text:style-name="T1"> t</text:span>arget hardware platform:</text:p>
-   <text:list xml:id="list131028007001462" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822545163378" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the Unit Test to the Project Operations panel.</text:p>
     </text:list-item>
@@ -9296,7 +9304,7 @@
    <text:p text:style-name="P17"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 6b: Review Build Artifacts (e3xx)</text:h>
    <text:p text:style-name="P17">Observe the new artifacts in peak_detector.test/gen/assemblies/peak_detector_0/:</text:p>
-   <text:list xml:id="list131026989880894" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822170664221" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">peak_detector_0.xml – generated assembly XML (OHAD)</text:p>
     </text:list-item>
@@ -9320,19 +9328,19 @@
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 7b: Run Unit Test (e3xx)</text:h>
    <text:p text:style-name="P18"><text:span text:style-name="T22">Note: more detail on this process can be found in the </text:span><text:span text:style-name="T23">Ettus E3xx Getting Started Guide</text:span><text:span text:style-name="T22">.</text:span></text:p>
    <text:p text:style-name="P18">Set up the deployment platform:</text:p>
-   <text:list xml:id="list131026854572454" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822057847525" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Connect to serial port via USB on rear of Ettus E310 on <text:span text:style-name="T21">h</text:span>ost:</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="List_20_Bullet_20_3">&quot;screen /dev/e3xx_0 115200&quot;</text:p>
-   <text:list xml:id="list131027893850909" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822234527775" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Boot and log in into Petalinux on E310:</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="List_20_Bullet_20_3">User/Password = root:root</text:p>
-   <text:list xml:id="list131026920738587" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821600166050" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Verify Host and E310 have valid IP addresses. For training, they should both be on the same subnet.</text:p>
     </text:list-item>
@@ -9343,7 +9351,7 @@
    <text:p text:style-name="List_20_Bullet_20_3">&quot;source /mnt/card/opencpi/mynetsetup.sh &lt;Host ip address&gt;&quot;</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 7b: Run Unit Test (e3xx)</text:h>
    <text:p text:style-name="P19">Using the IDE approach to running unit tests on remote platforms:</text:p>
-   <text:list xml:id="list131026859085096" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822267226605" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the “Project Operations” panel, select &quot;remotes&quot; radio button.</text:p>
     </text:list-item>
@@ -9355,7 +9363,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="List_20_Bullet_20_3">{IP of Ettus E310}=root=root=/mnt/training_project</text:p>
-   <text:list xml:id="list131028125566770" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121822505481464" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Select the newly created remote. This will be the target remote test system. Unselected remotes will not be targeted.</text:p>
     </text:list-item>
@@ -9376,7 +9384,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P20">Alternatively, from a terminal window:</text:p>
-   <text:list xml:id="list131027830618583" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list121821256249642" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Execute the following commands within the {component}.test/</text:p>
     </text:list-item>

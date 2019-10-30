@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>63</meta:editing-cycles><meta:creation-date>2019-10-10T09:47:21.491909032</meta:creation-date><meta:editing-duration>PT3H28M44S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-28T13:40:17.832052019</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="3" meta:object-count="0" meta:page-count="18" meta:paragraph-count="234" meta:word-count="2116" meta:character-count="15012" meta:non-whitespace-character-count="13174"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-10T09:47:21.360527917"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>67</meta:editing-cycles><meta:creation-date>2019-10-10T09:47:21.491909032</meta:creation-date><meta:editing-duration>PT4H19M52S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-30T11:55:20.634380707</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="3" meta:object-count="0" meta:page-count="18" meta:paragraph-count="234" meta:word-count="2116" meta:character-count="15036" meta:non-whitespace-character-count="13198"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-10T09:47:21.360527917"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">495679</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">496417</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
    <config:config-item config:name="ViewAreaWidth" config:type="long">29475</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">16760</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">15893</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">3999</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">502509</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">6274</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">458519</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">495679</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">496417</config:config-item>
      <config:config-item config:name="VisibleRight" config:type="long">29473</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">512438</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">512307</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -111,7 +111,7 @@
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">39371103</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">39512083</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
@@ -134,7 +134,9 @@
  </office:settings>
  <office:scripts>
   <office:script script:language="ooo:Basic">
-   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ooo:library-embedded ooo:name="Standard"/>
+   </ooo:libraries>
   </office:script>
  </office:scripts>
  <office:font-face-decls>
@@ -2724,80 +2726,80 @@
    <style:text-properties officeooo:paragraph-rsid="02524d06"/>
   </style:style>
   <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Standard">
-   <style:paragraph-properties fo:margin-left="0.5in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
-   <style:text-properties officeooo:rsid="0239000b" officeooo:paragraph-rsid="0239000b"/>
+   <style:text-properties fo:font-size="9pt" officeooo:paragraph-rsid="023f622d" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
   </style:style>
   <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Standard">
    <style:paragraph-properties fo:margin-left="0.5in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
+   <style:text-properties officeooo:rsid="0239000b" officeooo:paragraph-rsid="0239000b"/>
+  </style:style>
+  <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-left="0.5in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
    <style:text-properties officeooo:rsid="02394941" officeooo:paragraph-rsid="02394941"/>
   </style:style>
-  <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P30" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
   </style:style>
-  <style:style style:name="P30" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P31" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties fo:font-size="9pt" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
   </style:style>
-  <style:style style:name="P31" style:family="paragraph" style:parent-style-name="Code">
+  <style:style style:name="P32" style:family="paragraph" style:parent-style-name="Code">
    <style:text-properties fo:font-size="10pt" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
   </style:style>
-  <style:style style:name="P32" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P33" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:paragraph-rsid="023c77d9"/>
   </style:style>
-  <style:style style:name="P33" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P34" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:rsid="02485389" officeooo:paragraph-rsid="02485389"/>
   </style:style>
-  <style:style style:name="P34" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P35" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:rsid="02485389" officeooo:paragraph-rsid="0248606e"/>
   </style:style>
-  <style:style style:name="P35" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P36" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:rsid="0248606e" officeooo:paragraph-rsid="024f2f6e"/>
   </style:style>
-  <style:style style:name="P36" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P37" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:rsid="0248606e" officeooo:paragraph-rsid="0248606e"/>
   </style:style>
-  <style:style style:name="P37" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P38" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:paragraph-rsid="024d0f57"/>
   </style:style>
-  <style:style style:name="P38" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P39" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:rsid="023c77d9" officeooo:paragraph-rsid="023c77d9"/>
   </style:style>
-  <style:style style:name="P39" style:family="paragraph" style:parent-style-name="Body">
+  <style:style style:name="P40" style:family="paragraph" style:parent-style-name="Body">
    <style:text-properties officeooo:rsid="024d0f57" officeooo:paragraph-rsid="024d0f57"/>
   </style:style>
-  <style:style style:name="P40" style:family="paragraph" style:parent-style-name="List_20_Bullet_20_3">
+  <style:style style:name="P41" style:family="paragraph" style:parent-style-name="List_20_Bullet_20_3">
    <style:text-properties officeooo:paragraph-rsid="0248606e"/>
   </style:style>
-  <style:style style:name="P41" style:family="paragraph" style:parent-style-name="List_20_Bullet_20_3">
+  <style:style style:name="P42" style:family="paragraph" style:parent-style-name="List_20_Bullet_20_3">
    <style:text-properties officeooo:paragraph-rsid="0250e1f5"/>
   </style:style>
-  <style:style style:name="P42" style:family="paragraph" style:parent-style-name="List_20_Bullet_20_3">
+  <style:style style:name="P43" style:family="paragraph" style:parent-style-name="List_20_Bullet_20_3">
    <style:text-properties officeooo:paragraph-rsid="025237e4"/>
   </style:style>
-  <style:style style:name="P43" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="">
+  <style:style style:name="P44" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="">
    <style:paragraph-properties style:page-number="auto"/>
   </style:style>
-  <style:style style:name="P44" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P45" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="02294f79"/>
   </style:style>
-  <style:style style:name="P45" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+  <style:style style:name="P46" style:family="paragraph" style:parent-style-name="List_20_Bullet">
    <style:text-properties officeooo:paragraph-rsid="0225445a"/>
   </style:style>
-  <style:style style:name="P46" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+  <style:style style:name="P47" style:family="paragraph" style:parent-style-name="List_20_Bullet">
    <style:text-properties officeooo:paragraph-rsid="0250e1f5"/>
   </style:style>
-  <style:style style:name="P47" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+  <style:style style:name="P48" style:family="paragraph" style:parent-style-name="List_20_Bullet">
    <loext:graphic-properties draw:fill="none"/>
    <style:paragraph-properties fo:background-color="transparent"/>
    <style:text-properties officeooo:paragraph-rsid="0250e1f5"/>
   </style:style>
-  <style:style style:name="P48" style:family="paragraph" style:parent-style-name="Standard">
+  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Standard">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false" fo:line-height="100%" fo:text-align="start" style:justify-single-word="false" fo:hyphenation-ladder-count="no-limit" fo:text-indent="0in" style:auto-text-indent="false" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
    <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
-  </style:style>
-  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="Standard">
-   <style:text-properties fo:font-size="9pt" officeooo:paragraph-rsid="023f622d" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
   </style:style>
   <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
    <style:paragraph-properties style:page-number="auto"/>
@@ -2808,21 +2810,13 @@
   <style:style style:name="P52" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
    <style:text-properties officeooo:paragraph-rsid="0225445a"/>
   </style:style>
-  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
-   <style:text-properties officeooo:paragraph-rsid="0250e1f5"/>
-  </style:style>
-  <style:style style:name="P54" style:family="paragraph" style:parent-style-name="List_20_Bullet" style:list-style-name="WWNum32">
-   <loext:graphic-properties draw:fill="none"/>
-   <style:paragraph-properties fo:background-color="transparent"/>
-   <style:text-properties officeooo:paragraph-rsid="0250e1f5"/>
-  </style:style>
-  <style:style style:name="P55" style:family="paragraph">
+  <style:style style:name="P53" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
    <style:text-properties fo:hyphenate="false"/>
   </style:style>
-  <style:style style:name="P56" style:family="paragraph">
+  <style:style style:name="P54" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
@@ -2967,9 +2961,15 @@
    <style:text-properties officeooo:rsid="0258c15f"/>
   </style:style>
   <style:style style:name="T47" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties officeooo:rsid="025aabac"/>
   </style:style>
   <style:style style:name="T48" style:family="text">
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
+  <style:style style:name="T49" style:family="text">
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="italic" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
+  <style:style style:name="T50" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
@@ -2991,7 +2991,7 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:footer>
-    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 8<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">17</text:page-number><text:s/>of <text:page-count>18</text:page-count></text:p>
+    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 8<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">18</text:page-number><text:s/>of <text:page-count>18</text:page-count></text:p>
    </style:footer>
   </style:master-page>
  </office:master-styles>
@@ -3010,7 +3010,7 @@
    <text:p text:style-name="P1">This tutorial demonstrates how to design, build and test the complex_mixer.hdl worker for execution on a Xilinx XSIM simulator. The <text:s/>worker is a “work-alike” to the RCC worker discussed in <text:span text:style-name="T1">Tutorial</text:span> 4.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Tutorial Objectives</text:h>
    <text:p text:style-name="P2">The tutorial shows you how to:</text:p>
-   <text:list xml:id="list3827064509" text:style-name="WWNum32">
+   <text:list xml:id="list3191422329" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Set OCS and OWD properties (XML)</text:p>
     </text:list-item>
@@ -3031,11 +3031,11 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-28T13:35:32.139571354</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P56"><text:span text:style-name="T48">Need to update this section to new “tutorial-project” directory structure</text:span></text:p>
+     <text:p text:style-name="P53"><text:span text:style-name="T48">Need to update this section to new “tutorial-project” directory structure. Not sure what </text:span><text:span text:style-name="T49">home/training </text:span><text:span text:style-name="T48">maps to. For examples, I’ve used “home/developer/tutorial-project/”. I’ve also used ~/tutorial-project.</text:span></text:p>
     </office:annotation></text:h>
    <text:p text:style-name="P3">In this tutorial, you will <text:span text:style-name="T38">re-use</text:span> the &quot;complex_mixer.test/&quot;directory. It’s the same as implemented in <text:span text:style-name="T1">Tutorial</text:span> 4. Re<text:span text:style-name="T38">member</text:span> that there is one {component}.test/ per OCS.</text:p>
    <text:p text:style-name="P3">The items provided for this tutorial are:</text:p>
-   <text:list xml:id="list134019365651795" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522322114514" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">The <text:span text:style-name="T38">c</text:span>omponent <text:span text:style-name="T38">d</text:span>ata sheet located in /home/training/training_project/components/complex_mixer.test/doc/Complex_Mixer.pdf</text:p>
     </text:list-item>
@@ -3050,7 +3050,7 @@
    <text:p text:style-name="List_20_Bullet_20_3">complex_multiplier_sim_net.vhd and dds_compiler_sim_net.vhd</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Worker Development Flow</text:h>
    <text:p text:style-name="P4">Worker development for this tutorial consists of the following steps:</text:p>
-   <text:list xml:id="list1202813080" text:style-name="Numbering_20_1">
+   <text:list xml:id="list1937822475" text:style-name="Numbering_20_1">
     <text:list-item>
      <text:p text:style-name="List_20_Number">Protocol (OPS): Use pre-existing or create new.</text:p>
     </text:list-item>
@@ -3076,7 +3076,7 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 1: Re-use or Create New O<text:span text:style-name="T6">P</text:span>S </text:h>
    <text:p text:style-name="P6">To determine whether to re-use an existing O<text:span text:style-name="T6">P</text:span>S or create a new one:</text:p>
-   <text:list xml:id="list134018645498711" text:continue-list="list134019365651795" text:style-name="WWNum32">
+   <text:list xml:id="list115522718628734" text:continue-list="list115522322114514" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Identify the OPS(es) declared by this component: <text:span text:style-name="T5">e</text:span>xamine the &quot;Component Ports&quot; table in the Component data sheet.</text:p>
     </text:list-item>
@@ -3087,7 +3087,7 @@
    <text:p text:style-name="List_20_Bullet_20_2">Current project&apos;s component library? /home/training/training_project/components/specs</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Other projects&apos; components/specs/ directories within scope</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Intersection of Project-registry and ProjectDependencies= in {my_project}/Project.mk</text:p>
-   <text:list xml:id="list134019514572320" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522706100535" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>If NO to all questions ⇨ Create new OPS</text:p>
     </text:list-item>
@@ -3096,7 +3096,7 @@
    <text:p text:style-name="P6"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 2: Re-use or Create New OCS</text:h>
    <text:p text:style-name="P7">To determine whether to re-use an existing OCS or create a new one:</text:p>
-   <text:list xml:id="list134018931327338" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115520739961118" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Review Component Spec Properties and Ports in <text:span text:style-name="T44">the c</text:span>omponent data sheet. Use <text:span text:style-name="T44">the </text:span>Properties and Ports information to answer the following questions.</text:p>
     </text:list-item>
@@ -3108,7 +3108,7 @@
    <text:p text:style-name="List_20_Bullet_20_2">/home/training/training_project/components/specs/</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Other projects&apos; components/specs/ directories within scope</text:p>
    <text:p text:style-name="List_20_Bullet_20_2">Intersection of Project-registry and ProjectDependencies= in {my_project}/Project.mk</text:p>
-   <text:list xml:id="list134019134116507" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522690582352" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>If NO to all questions ⇨ Create new OCS</text:p>
     </text:list-item>
@@ -3117,19 +3117,19 @@
    <text:p text:style-name="P7"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Create Worker</text:h>
    <text:p text:style-name="P8">In the IDE:</text:p>
-   <text:list xml:id="list134019315484255" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522440356856" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">File → New → Other → ANGRYVIPER → OpenCPI Asset Wizard</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="List_20_Bullet_20_3">Asset Type: Worker</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Worker Name: complex_mixer</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">Add To Project: ocpi.training</text:p>
+   <text:p text:style-name="List_20_Bullet_20_3">Add To Project: ocpi.t<text:span text:style-name="T47">utorial-project</text:span></text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Model: HDL</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Programming Language: VHDL</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">Add To Library: components</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">Component: complex_mixer (ocpi.training)</text:p>
-   <text:list xml:id="list134019074301916" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:p text:style-name="List_20_Bullet_20_3">Component: complex_mixer (ocpi.t<text:span text:style-name="T47">utorial-project</text:span>)</text:p>
+   <text:list xml:id="list115521577025262" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T7">Click </text:span>Finish.</text:p>
     </text:list-item>
@@ -3144,13 +3144,13 @@
    <text:p text:style-name="List_20_Bullet_20_3">components/{worker}.hdl/Makefile - Includes a standard makefile fragment from the OCPI CDK</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">components/{worker}.hdl/{worker}.xml - OWD XML file</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">components/{worker}.hdl/{worker}.vhd - VHDL (architecture) skeleton file</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">components/{worker}.hdl/gen/ - OCPI worker build artifacts ({worker}-impl.vhd contains the Entity!)</text:p>
+   <text:p text:style-name="List_20_Bullet_20_3">components/{worker}.hdl/gen/ - OCPI worker build artifacts ({worker}-impl.vhd contains the <text:span text:style-name="T47">e</text:span>ntity)</text:p>
    <text:p text:style-name="P7"/>
    <text:p text:style-name="P7"/>
-   <text:h text:style-name="P44" text:outline-level="2">Step 3: Build <text:span text:style-name="T39">Generated </text:span>Skeleton <text:span text:style-name="T39">Code</text:span></text:h>
+   <text:h text:style-name="P45" text:outline-level="2">Step 3: Build <text:span text:style-name="T39">Generated </text:span>Skeleton <text:span text:style-name="T39">Code</text:span></text:h>
    <text:p text:style-name="P9">Why? Because, although <text:span text:style-name="T1">it’s </text:span>not very exciting, this step proves that the skeleton source code is buildable and that the build engine is functional.</text:p>
    <text:p text:style-name="P9">To build generated skeleton code:</text:p>
-   <text:list xml:id="list134018908758203" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115521988031892" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the <text:span text:style-name="T8">w</text:span>orker to the Project Operations panel.</text:p>
     </text:list-item>
@@ -3173,7 +3173,7 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Add Properties to Worker</text:h>
    <text:p text:style-name="P10">Now we’ll add the worker properties:</text:p>
-   <text:list xml:id="list134018555989241" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522166747561" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Reference the &quot;Worker Properties&quot; table in the <text:span text:style-name="T1">c</text:span>omponent data sheet.</text:p>
     </text:list-item>
@@ -3181,8 +3181,8 @@
      <text:p text:style-name="List_20_Bullet">Using <text:span text:style-name="T39">the</text:span> IDE <text:span text:style-name="T39">&gt; </text:span>OWD HDL Editor (&quot;Design&quot; tab), add <text:span text:style-name="T39">the </text:span>properties:</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P42">data_select – Selects data to output when in bypass mode (input or NCO)</text:p>
-   <text:list xml:id="list134019411739663" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:p text:style-name="P43">data_select – Selects data to output when in bypass mode (input or NCO)</text:p>
+   <text:list xml:id="list115522639601051" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Ensure <text:span text:style-name="T9">that </text:span>all attributes and default values are set for each property/parameter.</text:p>
     </text:list-item>
@@ -3190,7 +3190,7 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Convert Data <text:span text:style-name="T39">P</text:span>ort Interface from Interleaved to Parallel</text:h>
    <text:p text:style-name="P11">Note: iqstream_protocol is by default interleaved 16-bit I/Q sample data.</text:p>
-   <text:list xml:id="list134019720799717" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522725397320" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Determine <text:span text:style-name="T11">the</text:span> port configuration settings by examining the &quot;Worker Interfaces&quot; table in the <text:span text:style-name="T11">c</text:span>omponent <text:span text:style-name="T11">d</text:span>ata sheet.</text:p>
     </text:list-item>
@@ -3208,11 +3208,11 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-10T10:37:16.820787613</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P55"><text:span text:style-name="T47">Is this step still necessary at V1.6?</text:span></text:p>
+     <text:p text:style-name="P53"><text:span text:style-name="T48">Is this step still necessary at V1.6?</text:span></text:p>
     </office:annotation>Step 3: Configure for Version 2 HDL API<office:annotation-end office:name="__Annotation__22596_3351151911"/></text:h>
    <text:p text:style-name="P13">The v1.5 release of the IDE does not provide a field for declaring Version 2 HDL API, so you must manually modify the XML <text:span text:style-name="T15">and then change the name of the architecture in the generated VHDL</text:span>.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:s/><text:span text:style-name="T15">Edit Worker XML</text:span></text:h>
-   <text:list xml:id="list134019879848565" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522377640320" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T15">In the IDE, e</text:span>dit <text:span text:style-name="T15">the </text:span>OWD using the HDL Worker OWD HDL Editor.</text:p>
     </text:list-item>
@@ -3233,7 +3233,7 @@
    <text:p text:style-name="P12">&lt;/HdlWorker&gt;</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Edit Generated VHDL</text:h>
    <text:p text:style-name="P12"><text:span text:style-name="T15">Now change </text:span>the name of the architecture in the generated VHDL file:</text:p>
-   <text:list xml:id="list134019472959268" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522576712459" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:s/>Open the VHDL in a text editor.</text:p>
     </text:list-item>
@@ -3243,7 +3243,7 @@
    </text:list>
    <text:p text:style-name="Code">library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;</text:p>
    <text:p text:style-name="Code">library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions</text:p>
-   <text:p text:style-name="P29">architecture rtl of worker is</text:p>
+   <text:p text:style-name="P30">architecture rtl of worker is</text:p>
    <text:p text:style-name="Code">begin</text:p>
    <text:p text:style-name="Code"><text:s text:c="2"/>ctl_out.finished &lt;= btrue; -- remove or change this line for worker to be finished when appropriate</text:p>
    <text:p text:style-name="Code"><text:s text:c="29"/>-- workers that are never &quot;finished&quot; need not drive this signal</text:p>
@@ -3252,7 +3252,7 @@
    <text:p text:style-name="P14"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Rebuild Worker</text:h>
    <text:p text:style-name="P14">Using the IDE, build the worker with changes from OWD to update gen/*:</text:p>
-   <text:list xml:id="list134018520687601" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115521534492367" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Refresh the OpenCPI Projects panel.</text:p>
     </text:list-item>
@@ -3276,26 +3276,26 @@
     </text:list-item>
    </text:list>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Copy Third-Party Cores to Worker</text:h>
-   <text:list xml:id="list134018305282587" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115521682985421" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T16">C</text:span>opy <text:span text:style-name="T16">the </text:span>provided <text:span text:style-name="T16">third-</text:span>party cores directory into {worker}.hdl directory:</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Code">$ cd <text:span text:style-name="T46">~/tutorial-project</text:span>/components/complex_mixer.hdl/</text:p>
    <text:p text:style-name="Code">$ cp -r <text:span text:style-name="T46">~/tutorial-project</text:span>/provided/lab8/vivado_ip/ .</text:p>
-   <text:list xml:id="list134018991060776" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522809787870" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Modify <text:span text:style-name="T16">the </text:span>worker Makefile to reference the cores&apos; VHDL files</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="List_20_Bullet_20_3">Add the follow<text:span text:style-name="T36">ing</text:span> PRIOR to the “include...” statement:</text:p>
+   <text:p text:style-name="List_20_Bullet_20_3">Add the follow<text:span text:style-name="T36">ing</text:span> PRIOR <text:span text:style-name="T47">TO</text:span> the “include...” statement:</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">SourceFiles=./vivado_ip/complex_multiplier_sim_net.vhd ./vivado_ip/dds_compiler_sim_net.vhd</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">include $(OCPI_CDK_DIR)/include/worker.mk</text:p>
    <text:p text:style-name="P12">NOTE: <text:span text:style-name="T40">The i</text:span>ncluded source file<text:span text:style-name="T40">s</text:span> are ONLY valid for targeting <text:span text:style-name="T40">simulators</text:span>.</text:p>
    <text:p text:style-name="P12"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 3: Create Worker (con’t.)</text:h>
    <text:p text:style-name="P5">The skeleton .vhd file is an empty architecture. The entity is generated VHDL based on OCS and OWD, and located in the gen/{worker}-impl.vhd. </text:p>
-   <text:list xml:id="list134019408363020" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115520738597527" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Replace <text:span text:style-name="T40">the</text:span> skeleton .vhd file with <text:span text:style-name="T40">the </text:span>provided .vhd. <text:span text:style-name="T17">It c</text:span>ontains instructions to modify the VHDL source code:</text:p>
     </text:list-item>
@@ -3304,21 +3304,21 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-28T13:38:24.967221731</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P56"><text:span text:style-name="T48">Needs updating to ~/tutorial-project/...</text:span></text:p>
+     <text:p text:style-name="P53"><text:span text:style-name="T48">In this example, is it correct that you’re changing directory to your tutorial-project and then copying from “provided” in the supplied tutorial-project in the tutorials directory?</text:span></text:p>
     </office:annotation>$ cd /home/training/training_project/components/complex_mixer.hdl/</text:p>
    <text:p text:style-name="Code">$ cp -f /home/training/provided/lab8/complex_mixer.vhd .<office:annotation-end office:name="__Annotation__13658_1604793409"/></text:p>
-   <text:list xml:id="list134018235020725" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522175652648" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Open the VHDL in a text editor. Starting at the top, modify the source code <text:span text:style-name="T40">following</text:span> the commented instructions (look for “TODO”). <text:span text:style-name="T40">These modifications are to</text:span>:</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="List_20_Bullet_20_3">- Make general signal and data port assignments</text:p>
-   <text:p text:style-name="List_20_Bullet_20_3">- Wire signals to the <text:span text:style-name="T17">third-party </text:span>IP Cores instantiations</text:p>
+   <text:p text:style-name="List_20_Bullet_20_3">- Wire signals to the <text:span text:style-name="T17">third-party </text:span>IP <text:span text:style-name="T47">c</text:span>ores instantiations</text:p>
    <text:p text:style-name="P4"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 4: Build Worker</text:h>
    <text:p text:style-name="P26">Now build the HDL worker for ONLY XSIM <text:span text:style-name="T40">t</text:span>argets. </text:p>
    <text:p text:style-name="P26">In the IDE:</text:p>
-   <text:list xml:id="list134018976635608" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115521374053113" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Add the <text:span text:style-name="T44">w</text:span>orker to the Project Operations panel.</text:p>
     </text:list-item>
@@ -3338,31 +3338,36 @@
    <text:p text:style-name="Standard"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 4: Review Build Log and Artifacts</text:h>
    <text:p text:style-name="P8"><text:span text:style-name="T18">The e</text:span>nd of build log should <text:span text:style-name="T18">look like </text:span>the following <text:span text:style-name="T18">example</text:span>, if free of errors:</text:p>
-   <text:p text:style-name="P30"><office:annotation office:name="__Annotation__13659_1604793409">
+   <text:p text:style-name="P31">Configuration:</text:p>
+   <text:p text:style-name="P31"><office:annotation office:name="__Annotation__7058_2219136942">
      <dc:creator>Lisa Zahn</dc:creator>
-     <dc:date>2019-10-28T13:38:54.725299080</dc:date>
+     <dc:date>2019-10-30T11:49:53.394367143</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P56"><text:span text:style-name="T48">Needs to be replace with something that shows tutorial-project and non-hardware results (I think).</text:span></text:p>
-    </office:annotation>Configuration:<office:annotation-end office:name="__Annotation__13659_1604793409"/></text:p>
-   <text:p text:style-name="P30">build ocpi.training.components.complex_mixer.hdl HDL: xsim RCC: centos7 xilinx13_4</text:p>
-   <text:p text:style-name="P30"/>
-   <text:p text:style-name="P30">[ocpidev -d /home/training/training_project build worker complex_mixer.hdl -l components --hdl-target xsim]</text:p>
-   <text:p text:style-name="P30"/>
-   <text:p text:style-name="P30">make: Entering directory `/home/training/training_project/components/complex_mixer.hdl&apos;</text:p>
-   <text:p text:style-name="P30">make[1]: Entering directory `/home/training/training_project/components&apos;</text:p>
-   <text:p text:style-name="P30">make[1]: Leaving directory `/home/training/training_project/components&apos;</text:p>
-   <text:p text:style-name="P30">Generating the VHDL constants file for config 0: target-xsim/generics.vhd</text:p>
-   <text:p text:style-name="P30">Generating the Verilog constants file for config 0: target-xsim/generics.vh</text:p>
-   <text:p text:style-name="P30">Building the complex_mixer worker for xsim (target-xsim/complex_mixer) 0:(complex_mixer_ocpi_max_opcode_out=0 complex_mixer_ocpi_max_bytes_in=8192 complex_mixer_ocpi_version=2 complex_mixer_ocpi_max_bytes_out=8192 complex_mixer_ocpi_endian=little complex_mixer_ocpi_max_latency_out=256 complex_mixer_ocpi_max_opcode_in=0 complex_mixer_ocpi_debug=false)</text:p>
-   <text:p text:style-name="P30"><text:s/>Tool &quot;xsim&quot; for target &quot;xsim&quot; succeeded. <text:s/>0:13.93 at 11:43:57</text:p>
-   <text:p text:style-name="P30">Creating link to export worker binary: ../lib/hdl/xsim/complex_mixer -&gt; target-xsim/complex_mixer</text:p>
-   <text:p text:style-name="P30">make: Leaving directory `/home/training/training_project/components/complex_mixer.hdl&apos;</text:p>
-   <text:p text:style-name="P30">Updating project metadata...</text:p>
-   <text:p text:style-name="P30">== &gt; Command completed. Rval = 0</text:p>
+     <text:p text:style-name="P54"><text:span text:style-name="T50">Is the xilinx13_4 shown here correct for the non-hardware platform?</text:span></text:p>
+    </office:annotation>build ocpi.t<text:span text:style-name="T47">utorial-projects</text:span>.components.complex_mixer.hdl HDL: xsim RCC: centos7 xilinx13_4<office:annotation-end office:name="__Annotation__7058_2219136942"/></text:p>
+   <text:p text:style-name="P31"/>
+   <text:p text:style-name="P31"><office:annotation office:name="__Annotation__7059_2219136942">
+     <dc:creator>Lisa Zahn</dc:creator>
+     <dc:date>2019-10-30T11:50:54.827202421</dc:date>
+     <loext:sender-initials>LZ</loext:sender-initials>
+     <text:p text:style-name="P54"><text:span text:style-name="T50">Here I used “home/developer” as an example of where someone might have created their tutorial-project project.</text:span></text:p>
+    </office:annotation>[ocpidev -d /home/<text:span text:style-name="T47">developer</text:span>/<text:span text:style-name="T47">tutorial-project</text:span> build worker complex_mixer.hdl -l components --hdl-target xsim]<office:annotation-end office:name="__Annotation__7059_2219136942"/></text:p>
+   <text:p text:style-name="P31"/>
+   <text:p text:style-name="P31">make: Entering directory `/home/<text:span text:style-name="T47">developer</text:span>/training_project/components/complex_mixer.hdl&apos;</text:p>
+   <text:p text:style-name="P31">make[1]: Entering directory `/home/<text:span text:style-name="T47">developer</text:span>/t<text:span text:style-name="T47">utorial-</text:span>project/components&apos;</text:p>
+   <text:p text:style-name="P31">make[1]: Leaving directory `/home/<text:span text:style-name="T47">developer</text:span>/t<text:span text:style-name="T47">utorial-</text:span>project/components&apos;</text:p>
+   <text:p text:style-name="P31">Generating the VHDL constants file for config 0: target-xsim/generics.vhd</text:p>
+   <text:p text:style-name="P31">Generating the Verilog constants file for config 0: target-xsim/generics.vh</text:p>
+   <text:p text:style-name="P31">Building the complex_mixer worker for xsim (target-xsim/complex_mixer) 0:(complex_mixer_ocpi_max_opcode_out=0 complex_mixer_ocpi_max_bytes_in=8192 complex_mixer_ocpi_version=2 complex_mixer_ocpi_max_bytes_out=8192 complex_mixer_ocpi_endian=little complex_mixer_ocpi_max_latency_out=256 complex_mixer_ocpi_max_opcode_in=0 complex_mixer_ocpi_debug=false)</text:p>
+   <text:p text:style-name="P31"><text:s/>Tool &quot;xsim&quot; for target &quot;xsim&quot; succeeded. <text:s/>0:13.93 at 11:43:57</text:p>
+   <text:p text:style-name="P31">Creating link to export worker binary: ../lib/hdl/xsim/complex_mixer -&gt; target-xsim/complex_mixer</text:p>
+   <text:p text:style-name="P31">make: Leaving directory `/home/<text:span text:style-name="T47">developer</text:span>/t<text:span text:style-name="T47">utorial-</text:span>project/components/complex_mixer.hdl&apos;</text:p>
+   <text:p text:style-name="P31">Updating project metadata...</text:p>
+   <text:p text:style-name="P31">== &gt; Command completed. Rval = 0</text:p>
    <text:p text:style-name="P8">Observe <text:span text:style-name="T19">the </text:span>new artifacts <text:span text:style-name="T19">directory</text:span> {worker}.hdl/: &quot;target-xsim/&quot;. <text:span text:style-name="T18">T</text:span>his directory contains output files from their respective FPGA vendor tools (in this case, simply Xilinx Vivado) in addition to a framework auto-generated file <text:span text:style-name="T18">named</text:span> <text:span text:style-name="T13">generics.vhd</text:span> <text:span text:style-name="T18">that </text:span>contains parameter configuration settings of the HDL worker for the particular &quot;target-&quot;.</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Steps 5a to 7a: Unit Test – Simulation</text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2">Steps 5 to 7: Unit Test – Simulation</text:h>
    <text:p text:style-name="P15">In this section, we demonstrate how to use the framework&apos;s <text:span text:style-name="T45">u</text:span>nit <text:span text:style-name="T45">t</text:span>est <text:span text:style-name="T45">s</text:span>uite to generate:</text:p>
-   <text:list xml:id="list134019102994145" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115521427512567" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">OAS (OpenCPI Application Specification) XML file(s) - Used by the framework for running the executable on a simulation platform; in this case, the target simulation platform is Xilinx XSIM Simulation Server.</text:p>
     </text:list-item>
@@ -3376,33 +3381,33 @@
      <text:p text:style-name="List_20_Bullet">Various scripts to manage the execution of the applications onto the target platform(s).</text:p>
     </text:list-item>
    </text:list>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 5a: Create Unit Test</text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 5: Create Unit Test</text:h>
    <text:p text:style-name="P16">We will re-use the unit test from the&quot;work-alike&quot; third-party LiquidDSP RCC worker we created in <text:span text:style-name="T1">Tutorial</text:span> 4. Th<text:span text:style-name="T21">e description</text:span> file is located in the &quot;complex_mixer.test/&quot; directory <text:span text:style-name="T21">and is named </text:span><text:span text:style-name="T14">complex_mixer-test.xml</text:span><text:span text:style-name="T22">. Here is the current content:</text:span></text:p>
-   <text:p text:style-name="P27">&lt;Tests UseHDLFileIo=&apos;true&apos;&gt;</text:p>
-   <text:p text:style-name="P27"><text:s text:c="2"/>&lt;Input Port=&apos;in&apos; Script=&apos;generate.py 100 12.5 32767 16384&apos;&gt;&lt;/Input&gt;</text:p>
-   <text:p text:style-name="P27"><text:s text:c="2"/>&lt;Output Port=&apos;out&apos; Script=&apos;verify.py 100 16384&apos; View=&apos;view.sh&apos;&gt;&lt;/Output&gt;</text:p>
-   <text:p text:style-name="P27"><text:s text:c="2"/>&lt;Property Name=&apos;phs_inc&apos; Values=&apos;8192&apos;&gt;&lt;/Property&gt;</text:p>
-   <text:p text:style-name="P27"><text:s text:c="2"/>&lt;Property Name=&apos;enable&apos; Values=&apos;0,1&apos;&gt;&lt;/Property&gt;</text:p>
-   <text:p text:style-name="P27">&lt;/Tests&gt;</text:p>
-   <text:p text:style-name="P17">Now w<text:span text:style-name="T20">e’ll change </text:span>this XML <text:span text:style-name="T20">to add the OWD property:</text:span></text:p>
-   <text:list xml:id="list134019349489354" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Edit the unit test description file <text:span text:style-name="T13">complex_mixer-test.xml </text:span>to include the HDL worker-specific property (OWD) highlighted <text:span text:style-name="T21">in bold as shown below:</text:span></text:p>
-    </text:list-item>
-   </text:list>
    <text:p text:style-name="P28">&lt;Tests UseHDLFileIo=&apos;true&apos;&gt;</text:p>
    <text:p text:style-name="P28"><text:s text:c="2"/>&lt;Input Port=&apos;in&apos; Script=&apos;generate.py 100 12.5 32767 16384&apos;&gt;&lt;/Input&gt;</text:p>
    <text:p text:style-name="P28"><text:s text:c="2"/>&lt;Output Port=&apos;out&apos; Script=&apos;verify.py 100 16384&apos; View=&apos;view.sh&apos;&gt;&lt;/Output&gt;</text:p>
    <text:p text:style-name="P28"><text:s text:c="2"/>&lt;Property Name=&apos;phs_inc&apos; Values=&apos;8192&apos;&gt;&lt;/Property&gt;</text:p>
-   <text:p text:style-name="P28"><text:s text:c="2"/>&lt;Property Name=&apos;enable&apos; Values=&apos;0,1&apos;&gt;&lt;/Property&gt;&lt;/Property&gt;</text:p>
-   <text:p text:style-name="P28"><text:s text:c="2"/><text:span text:style-name="T13">&lt;Property Name=”data_select” Values=”0,1”/&gt;&lt;/Property&gt;</text:span></text:p>
+   <text:p text:style-name="P28"><text:s text:c="2"/>&lt;Property Name=&apos;enable&apos; Values=&apos;0,1&apos;&gt;&lt;/Property&gt;</text:p>
    <text:p text:style-name="P28">&lt;/Tests&gt;</text:p>
+   <text:p text:style-name="P17">Now w<text:span text:style-name="T20">e’ll change </text:span>this XML <text:span text:style-name="T20">to add the OWD property:</text:span></text:p>
+   <text:list xml:id="list115521539614832" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list-item>
+     <text:p text:style-name="List_20_Bullet">Edit the unit test description file <text:span text:style-name="T13">complex_mixer-test.xml </text:span>to include the HDL worker-specific property (OWD) highlighted <text:span text:style-name="T21">in bold as shown below:</text:span></text:p>
+    </text:list-item>
+   </text:list>
+   <text:p text:style-name="P29">&lt;Tests UseHDLFileIo=&apos;true&apos;&gt;</text:p>
+   <text:p text:style-name="P29"><text:s text:c="2"/>&lt;Input Port=&apos;in&apos; Script=&apos;generate.py 100 12.5 32767 16384&apos;&gt;&lt;/Input&gt;</text:p>
+   <text:p text:style-name="P29"><text:s text:c="2"/>&lt;Output Port=&apos;out&apos; Script=&apos;verify.py 100 16384&apos; View=&apos;view.sh&apos;&gt;&lt;/Output&gt;</text:p>
+   <text:p text:style-name="P29"><text:s text:c="2"/>&lt;Property Name=&apos;phs_inc&apos; Values=&apos;8192&apos;&gt;&lt;/Property&gt;</text:p>
+   <text:p text:style-name="P29"><text:s text:c="2"/>&lt;Property Name=&apos;enable&apos; Values=&apos;0,1&apos;&gt;&lt;/Property&gt;&lt;/Property&gt;</text:p>
+   <text:p text:style-name="P29"><text:s text:c="2"/><text:span text:style-name="T13">&lt;Property Name=”data_select” Values=”0,1”/&gt;&lt;/Property&gt;</text:span></text:p>
+   <text:p text:style-name="P29">&lt;/Tests&gt;</text:p>
    <text:p text:style-name="P17">When &quot;bypass&quot; is enabled, &quot;data_select&quot; routes either the input data or NCO output to the output data port.</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 6a: Build Unit Test <text:span text:style-name="T25">and its Artifacts</text:span></text:h>
-   <text:p text:style-name="P38">Now we’ll build the unit test and examine the generated artifacts.</text:p>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 6: Build Unit Test <text:span text:style-name="T25">and its Artifacts</text:span></text:h>
+   <text:p text:style-name="P39">Now we’ll build the unit test and examine the generated artifacts.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Build Unit Test</text:h>
-   <text:p text:style-name="P32"><text:span text:style-name="T25">To b</text:span>uild <text:span text:style-name="T23">the u</text:span>nit <text:span text:style-name="T24">t</text:span>est <text:span text:style-name="T24">s</text:span>uite for target simulation platform:</text:p>
-   <text:list xml:id="list134019610172903" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:p text:style-name="P33"><text:span text:style-name="T25">To b</text:span>uild <text:span text:style-name="T23">the u</text:span>nit <text:span text:style-name="T24">t</text:span>est <text:span text:style-name="T24">s</text:span>uite for target simulation platform:</text:p>
+   <text:list xml:id="list115521218190890" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">In the IDE, add the <text:span text:style-name="T24">u</text:span>nit <text:span text:style-name="T24">t</text:span>est to the Project Operations panel.</text:p>
     </text:list-item>
@@ -3421,7 +3426,7 @@
    </text:list>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Review OCS Artifacts</text:h>
    <text:p text:style-name="P18"><text:span text:style-name="T25">Next, o</text:span>bserve <text:span text:style-name="T23">the </text:span>new artifacts in {OCS}.test/gen/:</text:p>
-   <text:list xml:id="list134018431403873" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115521527994840" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">cases.txt – &quot;Human-readable&quot; file listing various test configurations.</text:p>
     </text:list-item>
@@ -3440,7 +3445,7 @@
    </text:list>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Review Build Artifacts</text:h>
    <text:p text:style-name="P19"><text:span text:style-name="T40">Finally,</text:span> observe the new artifacts in complex_mixer.test/gen/assemblies/complex_mixer_0_frw/:</text:p>
-   <text:list xml:id="list134019173197337" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115522437280267" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">complex_mixer_0_frw.xml – generated assembly xml (OHAD).</text:p>
     </text:list-item>
@@ -3461,11 +3466,11 @@
    <text:p text:style-name="List_20_Bullet_20_3">target_xsim/:</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">- artifacts generated/used by framework and output files from FPGA tools</text:p>
    <text:p text:style-name="List_20_Bullet_20_3">- <text:span text:style-name="T25">e</text:span>xecution file for execution onto a <text:span text:style-name="T25">s</text:span>imulation platform</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 7a: Run Unit Test (Xilinx XSIM)</text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2">Step 7: Run Unit Test (Xilinx XSIM)</text:h>
    <text:p text:style-name="P20"><text:span text:style-name="T40">In this step,</text:span> we’ll run the unit test suite for the target simulation platform. To perform this step, you can use the IDE or run the <text:span text:style-name="T13">ocpidev</text:span> command from a terminal window.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3">Run Unit Test from IDE</text:h>
    <text:p text:style-name="P21">In the IDE:</text:p>
-   <text:list xml:id="list134020043647792" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list115521647420633" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T26">A</text:span>dd the Unit Test (.test) to the Project Operations panel.</text:p>
     </text:list-item>
@@ -7092,7 +7097,7 @@
       </office:binary-data>
      </draw:image>
     </draw:frame></text:p>
-   <text:p text:style-name="P49"/>
+   <text:p text:style-name="P27"/>
   </office:text>
  </office:body>
 </office:document>
