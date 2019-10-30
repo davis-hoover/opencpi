@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+HdlLibraries+=platform
 OnlyTargets=isim modelsim xsim
 include $(OCPI_CDK_DIR)/include/worker.mk
 
