@@ -63,14 +63,16 @@ namespace OCPI {
       const OCPI::Util::PValue *m_params; // a temporary during discovery
       bool setup(Device &dev, ezxml_t &config, std::string &err);
     protected:
-     static bool  m_gpsdTimeout;
+      static bool m_gpsdTimeout;
+      bool m_do_gpsd;
+      std::vector<const char*> m_gpsd_xml;
       GPSDParams  m_gpsdp;
-      //void configure_gpsctl(ezxml_t xml);
-      void configure_gpsd(ezxml_t xml, struct GPSDParams& gpsd);
+      void configure_gpsd(struct GPSDParams& gpsd);
       void loop_gpsctl(ezxml_t xml);
       void configure(ezxml_t xml);
     public:
       static void gpsCallback(struct gps_device_t *device, gps_mask_t changed);
+      void configure_gpsd();
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
       // This driver method is called when container-discovery happens, to see if there

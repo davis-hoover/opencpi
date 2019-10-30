@@ -177,21 +177,22 @@ namespace OCPI {
     struct __attribute__ ((__packed__)) TimeService {
       uint64_t time_now; /* 0x00 */
       uint64_t delta; /* 0x08 */
-      uint64_t PPS_ok; /* 0x10 */
-      uint8_t clr_status_sticky_bits; /* 0x18 */
-      uint8_t force_time_now_to_free_running; /* 0x19 */
-      uint8_t valid_requires_write_to_time_now; /* 0x1A */
-      uint8_t enable_time_now_updates_from_PPS; /* 0x1B */
-      enum TimeService_PPS_out_source PPS_out_source; /* 0x1C */
-      uint8_t force_time_now_valid; /* 0x20 */
-      uint8_t force_time_now_invalid; /* 0x21 */
-      uint8_t S_lost_sticky_error; /* 0x22 */
-      uint8_t me_now_updated_by_PPS_sticky; /* 0x23 */
-      uint8_t me_now_set_sticky; /* 0x24 */
-      uint8_t S_lost_last_second_error; /* 0x25 */
-      uint8_t PPS_count; /* 0x26 */
-      char pad0_[1];
-      uint32_t ticks_per_second; /* 0x28 */
+      uint8_t PPS_ok; /* 0x10 */
+      uint8_t enable_time_now_updates_from_PPS; /* 0x11 */
+      uint8_t valid_requires_write_to_time_now; /* 0x12 */
+      uint8_t clr_status_sticky_bits; /* 0x13 */
+      uint8_t force_time_now_to_free_running; /* 0x14 */
+      char pad0_[3];
+      enum TimeService_PPS_out_source PPS_out_source; /* 0x18 */
+      uint8_t force_time_now_valid; /* 0x1C */
+      uint8_t force_time_now_invalid; /* 0x1D */
+      uint8_t PPS_lost_sticky_error; /* 0x1E */
+      uint8_t time_now_updated_by_PPS_sticky; /* 0x1F */
+      uint8_t time_now_set_sticky; /* 0x20 */
+      uint8_t PPS_lost_last_second_error; /* 0x21 */
+      uint8_t PPS_count; /* 0x22 */
+      char pad1_[1];
+      uint32_t ticks_per_second; /* 0x24 */
     };
   }
 }

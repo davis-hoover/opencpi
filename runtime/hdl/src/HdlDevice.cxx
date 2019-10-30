@@ -76,7 +76,7 @@ namespace OCPI {
         if(ts) {
           ret = ts->get8RegisterOffset(offsetof(TimeService, PPS_ok));
           if(ret) {
-            ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok detected", dd);
+            ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is true", dd);
             break;
           }
         }
@@ -88,12 +88,18 @@ namespace OCPI {
       OS::Time ret;
       OS::Time current_time;
       Access *ts = timeServer();
+      isGps = true;
       if (!ts)
         isGps = false;
       if (isGps) {
+        Driver::getSingleton().configure_gpsd(); // PPS pin init'd for PPS_ok
         auto os = offsetof(TimeService, enable_time_now_updates_from_PPS);
         ts->set8RegisterOffset(os, 1);
         isGps = getPPSIsOkay();
+        const char* msg = "time_server.hdl PPS_ok is false, forcing GPS time";
+        const char* dd = m_name.c_str();
+        if (!isGps)
+          ocpiInfo("HDL Device '%s': %s to be ignored", dd, msg);
       }
       if (isGps) {
         current_time = Driver::getSingleton().now(isGps);
@@ -187,13 +193,6 @@ namespace OCPI {
             (m_pfWorker->controlOperation(OU::Worker::OpStart, err)) ||
             (m_tsWorker->controlOperation(OU::Worker::OpStart, err)))
           return true;
-        bool isGPS;
-        auto propOffset = offsetof(TimeService, time_now);
-        OS::Time time = now(isGPS);
-        const char* name = m_name.c_str();
-        const char* m1 = "time_server.hdl time_now was initialized to";
-        const char* m2 = isGPS ? "GPS time" : "non-GPS time";
-        ocpiInfo("HDL Device '%s': %s %s 0x%" PRIx64, name, m1, m2, time.bits());
       }
       m_isAlive = true;
       if (configure(NULL, err))

@@ -191,6 +191,13 @@ namespace OCPI {
 	      wci.controlOperation(OU::Worker::OpInitialize);
 	      wci.controlOperation(OU::Worker::OpStart);
 	    }
+	  // attempts to sync time_server.hdl time_now to GPS
+	  bool isGPS;
+	  OS::Time time = c.hdlDevice().now(isGPS);
+	  const char* m1 = "For HDL container";
+	  const char* m2 = "time_server.hdl time_now was initialized to";
+	  const char* m3 = isGPS ? "GPS time" : "non-GPS time";
+	  ocpiInfo("%s %s: %s %s 0x%" PRIx64, m1, c.name().c_str(), m2, m3, time.bits());
 	}
       }
     };
