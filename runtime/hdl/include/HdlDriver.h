@@ -64,13 +64,14 @@ namespace OCPI {
       bool setup(Device &dev, ezxml_t &config, std::string &err);
     protected:
       static bool m_gpsdTimeout;
-      bool m_do_gpsd;
+      bool m_doGpsd;
       std::vector<const char*> m_gpsd_xml;
       GPSDParams  m_gpsdp;
       void configure_gpsd(struct GPSDParams& gpsd);
       void loop_gpsctl(ezxml_t xml);
       void configure(ezxml_t xml);
     public:
+      Driver();
       static void gpsCallback(struct gps_device_t *device, gps_mask_t changed);
       void configure_gpsd();
       OCPI::OS::Time now(bool &isGps);
