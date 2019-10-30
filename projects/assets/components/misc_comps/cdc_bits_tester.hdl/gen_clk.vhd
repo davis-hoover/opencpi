@@ -16,6 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+-- TODO Once there is a generic MMCM/PLL, modifiy this to use it instead and move this module to cdc_testing in misc prims 
 library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; use ieee.math_real.all; use ieee.std_logic_misc.all;
 library ocpi; use ocpi.types.all,  ocpi.util.all;
 library cdc;
@@ -79,7 +80,7 @@ begin
           src_rst   => s_not_locked,
           dst_clk   => s_dst_clk,
           dst_rst   => s_dst_rst);
-    
+
 
     gen_1_to_2_clk : if (src_clk_hz = 50000000.0) generate
 
@@ -106,7 +107,7 @@ begin
 	  locked => s_locked);
 
     end generate gen_1_to_4_clk;
-    
+
     gen_2_to_1_clk : if (dst_clk_hz = 50000000.0) generate
 
    	s_src_clk <= ctl_clk;

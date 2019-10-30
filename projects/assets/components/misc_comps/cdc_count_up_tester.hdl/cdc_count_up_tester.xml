@@ -2,7 +2,7 @@
 
   <Property Name="num_input_samples" Type="uchar"
                                      Parameter="true"
-                                     Default="8"
+                                     Default="5"
                                      Description="Number of input samples sent."/>
 
   <StreamInterface Name="out"
