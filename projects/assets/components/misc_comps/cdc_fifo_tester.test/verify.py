@@ -46,10 +46,8 @@ if len(odata) != len(goldendata):
 else:
     print("    Golden and output file lengths match")
 
-correlation = np.corrcoef(odata,goldendata)[1,0]
-if (correlation >= 0.7):
-    print("    Output data and golden data correlation is greater than or equal to 70%")
+if np.array_equal(goldendata, odata):
+    print("    Golden and output file match")
 else:
-    print("    Output data and golden data correlation is less than 70%")
-    print("    Correlation: " + str(correlation))
+    print("    Golden and output file do not match")
     sys.exit(1)
