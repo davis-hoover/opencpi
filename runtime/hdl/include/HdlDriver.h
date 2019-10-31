@@ -22,6 +22,7 @@
 #define HdlDriver_H
 
 #include <string>
+#include "ezxml.h"
 #include "HdlSimDriver.h"
 #include "HdlLSimDriver.h"
 #include "HdlBusDriver.h"

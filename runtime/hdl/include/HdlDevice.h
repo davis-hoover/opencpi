@@ -26,6 +26,7 @@
 
 #include <inttypes.h>
 #include <climits>
+#include "ezxml.h"
 #include "OcpiUuid.h"
 #include "XferEndPoint.h"
 #include "OcpiRDTInterface.h"
