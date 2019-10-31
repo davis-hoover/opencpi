@@ -28,23 +28,12 @@
 #include "HdlEtherDriver.h"
 #include "HdlPciDriver.h"
 #include "ContainerManager.h"
-#include <gpsd.h>
+
+struct GPSDParams;
 
 namespace OCPI {
   namespace HDL {
     extern const char *hdl;
-
-    struct GPSDParams {
-      struct gps_context_t     m_context;
-      const struct gps_type_t* m_forceType;
-      struct gps_device_t      m_session;
-      std::string              m_serialPort; // e.g. /dev/ttyPS1
-      bool                     m_configured;
-      fd_set                   m_allFds;
-      int                      m_maxFd;
-      GPSDParams() : m_forceType(NULL), m_configured(false), m_maxFd(0) {
-      }
-    };
 
     class Container;
     class Driver
@@ -62,17 +51,15 @@ namespace OCPI {
     {
       const OCPI::Util::PValue *m_params; // a temporary during discovery
       bool setup(Device &dev, ezxml_t &config, std::string &err);
+      struct GPSDParams* m_gpsdp;
     protected:
-      static bool m_gpsdTimeout;
       bool m_doGpsd;
       std::vector<const char*> m_gpsd_xml;
-      GPSDParams  m_gpsdp;
-      void configure_gpsd(struct GPSDParams& gpsd);
       void loop_gpsctl(ezxml_t xml);
       void configure(ezxml_t xml);
     public:
       Driver();
-      static void gpsCallback(struct gps_device_t *device, gps_mask_t changed);
+      static bool m_gpsdTimeout;
       void configure_gpsd();
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);

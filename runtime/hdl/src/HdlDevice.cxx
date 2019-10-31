@@ -67,16 +67,15 @@ namespace OCPI {
       bool ret = false;
       useconds_t elapsed = 0;
       Access *ts = timeServer();
-      const char* m2 = "usec for time_server.hdl PPS_ok...";
-      const char* dd = m_name.c_str();
-      ocpiInfo("HDL Device '%s': waiting up to %i %s", dd, (int)timeout, m2);
-      while(elapsed < timeout) {
+      ocpiInfo("HDL Device '%s': waiting up to %i usec for time_server.hdl PPS_ok...",
+               m_name.c_str(), (int)timeout);
+      while (elapsed < timeout) {
         usleep(sleepTime);
         elapsed += sleepTime;
-        if(ts) {
+        if (ts) {
           ret = ts->get8RegisterOffset(offsetof(TimeService, PPS_ok));
-          if(ret) {
-            ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is true", dd);
+          if (ret) {
+            ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is true", m_name.c_str());
             break;
           }
         }
@@ -96,10 +95,9 @@ namespace OCPI {
         auto os = offsetof(TimeService, enable_time_now_updates_from_PPS);
         ts->set8RegisterOffset(os, 1);
         isGps = getPPSIsOkay();
-        const char* msg = "time_server.hdl PPS_ok is false, forcing GPS time";
-        const char* dd = m_name.c_str();
         if (!isGps)
-          ocpiInfo("HDL Device '%s': %s to be ignored", dd, msg);
+          ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is false, forcing GPS time to be "
+                   "ignored", m_name.c_str());
       }
       if (isGps) {
         current_time = Driver::getSingleton().now(isGps);
