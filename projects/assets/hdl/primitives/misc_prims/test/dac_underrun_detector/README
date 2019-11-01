@@ -4,7 +4,7 @@ pushd /opt/Xilinx/Vivado/2017.1/
 . ./settings64.sh
 popd
 
-make -j 8 && run.sh
+make -j 8 && ./run.sh
 
 # Success Criteria
 run.sh returns exit status of 0.

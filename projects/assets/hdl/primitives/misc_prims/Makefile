@@ -47,6 +47,8 @@ SourceFiles=$(patsubst %,%.vhd,\
 	time_downsampler \
 	time_corrector \
 	ocpi_wsi_message_sizer \
+	data_narrower \
+	dac_underrun_detector \
 	ocpi_cswm_prot_in_adapter_dw32_clkin \
 	ocpi_cswm_prot_in_adapter_dw32_clkout \
 	ocpi_cswm_prot_out_adapter_dw32_clkin \

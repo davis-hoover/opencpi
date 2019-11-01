@@ -27,7 +27,8 @@
 # in this library belong in Library.mk
 
 Tests = \
-	lime_dac_ts.test 
+	lime_dac_ts.test \
+	data_sink_dac.test
 
 # Build Ordering Rules:
 # 1) Subdevices that support other devices must occur AFTER the devices they support.
@@ -65,6 +66,8 @@ Workers = \
 	stm_mc24c02.hdl \
 	tmp100.hdl \
 	tmp100_proxy.rcc \
+        data_sink_dac.hdl \
+	data_sink_dac_em.hdl \
 	signal_time_tagger.hdl
 
 include $(OCPI_CDK_DIR)/include/library.mk

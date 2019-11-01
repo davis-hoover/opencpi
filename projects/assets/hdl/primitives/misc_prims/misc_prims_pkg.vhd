@@ -26,6 +26,7 @@ package misc_prims is
 
 constant TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH : positive := 32;
 constant DATA_ADC_BIT_WIDTH                  : positive := 12;
+constant DATA_DAC_BIT_WIDTH                  : positive := 12;
 constant DATA_BIT_WIDTH                      : positive := 16;
 constant METADATA_TIME_BIT_WIDTH             : positive := 64;
 constant METADATA_SAMP_PERIOD_BIT_WIDTH      : positive := 64;
@@ -36,6 +37,11 @@ type data_complex_adc_t is record
   i : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
   q : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
 end record data_complex_adc_t;
+
+type data_complex_dac_t is record
+  i : std_logic_vector(DATA_DAC_BIT_WIDTH-1 downto 0);
+  q : std_logic_vector(DATA_DAC_BIT_WIDTH-1 downto 0);
+end record data_complex_dac_t;
 
 type data_complex_t is record
   i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
@@ -62,6 +68,16 @@ type metadata_t is record
   samp_period       : unsigned(METADATA_SAMP_PERIOD_BIT_WIDTH-1 downto 0);
   samp_period_vld   : std_logic;
 end record metadata_t;
+
+type metadata_dac_t is record
+  underrun_error : std_logic; -- samples were not available for one or
+                              -- more dac clock cycles
+  ctrl_tx_on_off : std_logic; -- high when transmitter should be powered on
+                              -- low when transmitter should be powered off
+  data_vld       : std_logic; -- parallel with data to output
+                              -- if error and data_vld are both 1, error is
+                              -- assumed to have happened before the current valid data
+end record metadata_dac_t;
 
 constant metadata_zero : metadata_t := ('0', '0', '0', '0', (others => '0'),
                                         '0', (others => '0'), '0');
@@ -103,6 +119,10 @@ function from_slv(slv    : in std_logic_vector) return info_t;
 type adc_samp_drop_detector_status_t is record
   error_samp_drop : std_logic;
 end record adc_samp_drop_detector_status_t;
+
+type dac_underrun_detector_status_t is record
+  underrun_error : std_logic;
+end record dac_underrun_detector_status_t;
 
 type time_downsampler_ctrl_t is record
   bypass                    : std_logic;
@@ -296,6 +316,43 @@ component set_clr
     q   : out std_logic;
     q_r : out std_logic);
 end component set_clr;
+
+component data_narrower is
+  generic(
+    BITS_PACKED_INTO_LSBS    : boolean := false);
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    -- INPUT
+    idata     : in  data_complex_t;
+    imetadata : in  metadata_dac_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_dac_t;
+    ometadata : out metadata_dac_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
+
+component dac_underrun_detector is
+  port(
+    -- CTRL
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    status    : out dac_underrun_detector_status_t;
+    -- INPUT
+    idata     : in  data_complex_t;
+    imetadata : in  metadata_dac_t;
+    ivld      : in  std_logic;
+    irdy      : out std_logic;
+    -- OUTPUT
+    odata     : out data_complex_t;
+    ometadata : out metadata_dac_t;
+    ovld      : out std_logic;
+    ordy      : in  std_logic);
+end component;
 
 component time_corrector is
   port(

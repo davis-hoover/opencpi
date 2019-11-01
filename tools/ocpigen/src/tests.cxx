@@ -286,7 +286,7 @@ namespace {
         return NULL;
       }
       if (matchSpec) {
-        if (w->m_signals.size()) {
+        if (w->m_isDevice) {
           if (verbose)
             fprintf(stderr, "Worker has device signals.  Looking for emulator worker.\n");
           std::string workerNames;
