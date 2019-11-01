@@ -929,7 +929,7 @@ public:
 	eaddr = &m_admin[offset];
       else if (offset >= offsetof(OccpSpace, config))
 	if ((offset - offsetof(OccpSpace, config)) >=
-	    OCCP_WORKER_CONFIG_SIZE + 2*sizeof(uint64_t))
+	    OCCP_WORKER_CONFIG_SIZE + 5*sizeof(uint64_t)) // bootstrapping, 5 props from time_server that must be accessible
 	  throwit("Read/write offset out of range1 when emulating: 0x%" PRIx64, offset);
 	else {
 	  offset -= offsetof(OccpSpace, config);
