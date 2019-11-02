@@ -4,8 +4,5 @@ fit. Usually a task is something that is not fixing a bug or implementing a
 feature.)
 
 
-### Links/references
-
-
 /label ~"type::task"
 /assign @nknowles88
