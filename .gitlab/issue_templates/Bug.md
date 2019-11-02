@@ -10,10 +10,6 @@
 (How has this bug affected you? What were you trying to accomplish?)
 
 
-### What is the current bug behavior
-(What actually happens)
-
-
 ### What is the expected correct behavior
 (What you should see instead)
 
