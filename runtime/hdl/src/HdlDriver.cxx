@@ -221,21 +221,23 @@ namespace OCPI {
     void Driver::
     configure_gpsd() {
       gps_context_init(&m_gpsdp->m_context, "opencpi-gpsd");
-      if(OS::logWillLog(OCPI_LOG_INFO))
+      if (OS::logWillLog(OCPI_LOG_INFO))
         m_gpsdp->m_context.errout.debug = LOG_IO;
       else
         m_gpsdp->m_context.errout.debug = LOG_ERROR;
       m_gpsdp->m_session.context = &m_gpsdp->m_context;
       gpsd_init(&m_gpsdp->m_session, &m_gpsdp->m_context, m_gpsdp->m_serialPort.c_str());
-      if(gpsd_activate(&m_gpsdp->m_session, O_PROBEONLY) >= 0) {
+      if (gpsd_activate(&m_gpsdp->m_session, O_PROBEONLY) >= 0) {
         FD_SET(m_gpsdp->m_session.gpsdata.gps_fd, &m_gpsdp->m_allFds);
         if(m_gpsdp->m_session.gpsdata.gps_fd > m_gpsdp->m_maxFd)
           m_gpsdp->m_maxFd = m_gpsdp->m_session.gpsdata.gps_fd;
         gpsd_time_init(&m_gpsdp->m_context, time(NULL));
         m_gpsdp->m_configured = true;
       }
-      m_gpsdp->m_session.device_type = m_gpsdp->m_forceType;
-      ocpiInfo("HDL Driver: gpsd: devicetype: %s", m_gpsdp->m_session.device_type->type_name);
+      if (m_gpsdp->m_forceType) {
+        m_gpsdp->m_session.device_type = m_gpsdp->m_forceType;
+        ocpiInfo("HDL Driver: gpsd: devicetype: %s", m_gpsdp->m_session.device_type->type_name);
+      }
       for (auto it = m_gpsd_xml.begin(); it != m_gpsd_xml.end(); ++it) {
         char bb[BUFSIZ];
         ssize_t len = 0;
