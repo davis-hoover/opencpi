@@ -1,5 +1,9 @@
 # for gpsd 3.18, C preprocessors in the compiler.h for the use of
 # std::atomic_thread_fence() did not match the preprocessors of #include<atomic>
+# this seems to have been addressed since:
+# https://gitlab.com/gpsd/gpsd/merge_requests/20
+# TODO / FIXME - update gpsd to a release version that includes the above merge
+#                request, which would make this patch unnecessary
 --- compiler.h	2019-10-28 19:30:15.146220613 -0400
 +++ compiler_new.h	2019-10-28 19:30:10.970147329 -0400
 @@ -65,21 +65,20 @@
