@@ -4,6 +4,8 @@
 #   https://docs.gitlab.com/ee/ci/yaml/README.html
 #
 
+# Job's with tag:opencpi run on our servers, not the cloud
+
 # Define the stages of the pipeline.
 stages:
   - prereq
@@ -11,6 +13,7 @@ stages:
   - test
   - cross-prereq
   - cross-build
+  - deploy
 
 #------------------------------------------------------------------------------
 # PREP
@@ -20,8 +23,6 @@ prep:centos6:
   stage: prereq
   tags:
     - docker
-    - centos7  # yes, run this on centos7
-    - opencpi
   image: centos:6
   script:
   - yum -y distro-sync
@@ -31,8 +32,6 @@ prep:centos7:
   stage: prereq
   tags:
     - docker
-    - centos7
-    - opencpi
   image: centos:7
   script:
   - yum -y distro-sync
@@ -131,6 +130,20 @@ build:centos7:
   needs: ["prereq:centos7"]
   script:
     - ./scripts/build-opencpi.sh
+
+build:docs:
+  stage: build
+  tags:
+    - docker
+  image: centos:7
+  artifacts:
+    paths:
+      - public/
+  script:
+    - yum -y distro-sync
+    - scripts/install-opencpi-docs.sh
+    - mkdir -p public
+    - mv doc/pdfs/* public/
 
 #------------------------------------------------------------------------------
 # TEST
@@ -348,3 +361,20 @@ cross-build:centos7:xilinx13_4:
   script:
     - ./scripts/build-opencpi.sh xilinx13_4
 
+#------------------------------------------------------------------------------
+# DEPLOY
+#------------------------------------------------------------------------------
+
+pages:
+  stage: deploy
+  tags:
+    - docker
+  image: centos:7
+  artifacts:
+    paths:
+      - public/
+  dependencies: ["build:docs"]
+  only:
+    - master
+  script:
+    - echo "Uploading OpenCPI docs to gitlab.io"
