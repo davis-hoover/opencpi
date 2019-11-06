@@ -42,7 +42,7 @@ def getmsg(m):
     opcode = m[1]
     data   = None
     if length > 0:
-        data = m[2:length/4+2]
+        data = m[2:int(length/4+2)]
     return (opcode, length, data)
 
 """
