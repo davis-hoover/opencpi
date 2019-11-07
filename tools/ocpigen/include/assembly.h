@@ -43,6 +43,7 @@ struct Connection {
   const char *attachPort(InstancePort &ip, size_t index = 0); //, size_t count = 0);
   bool setClock(Clock &c);
   const char *cname() const { return m_name.c_str(); }
+  InstancePort &otherIP(Attachment &at) const;
 };
 typedef std::list<Connection*> Connections;
 typedef Connections::const_iterator ConnectionsIter;
@@ -131,7 +132,7 @@ struct InstancePort {
     createConnectionSignals(FILE *f, Language lang),
     init(Instance *i, Port *p, OU::Assembly::External *ext),
     detach(Connection &c), // forget attachment for this connection
-    emitConnectionSignal(FILE *f, bool output, Language lang, bool clock = false),
+    emitConnectionSignal(FILE *f, bool output, Language lang/*, bool clock = false*/),
     emitTieoffAssignments(FILE *f);
 };
 class Assembly {

@@ -152,7 +152,7 @@ begin
   -- Take even if bad write to send the truncation error in the metadata
   taking             <= can_take and in_in.ready;
   in_out.take        <= taking;
-  in_out.clk         <= sdp_in.clk;
+--  in_out.clk         <= sdp_in.clk;
   ctl_out.finished   <= buffer_size_fault_r or doorbell_fault_r;
   props_out.faults(props_out.faults'length-1 downto 3) <= (others => '0');
   props_out.local_buffers_ready <= (others => '0'); -- do not support passive yet

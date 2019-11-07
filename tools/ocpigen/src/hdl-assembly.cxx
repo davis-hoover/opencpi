@@ -154,6 +154,19 @@ insertAdapter(Connection &c, InstancePort &from, InstancePort &to) {
   return NULL;
 }
 
+// Convenience to get the "other" InstancePort.
+InstancePort &Connection::
+otherIP(Attachment &at) const {
+  for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
+    InstancePort &ip = (**ai).m_instPort;
+    if (*ai != &at)
+      return ip;
+  }
+  ocpiCheck("Missing attachment" == NULL);
+  return at.m_instPort;
+}
+// Return false if it can't be done because an internal port already has a different one,
+// which may result in an adapter.
 bool Connection::
 setClock(Clock &c) {
   assert(!m_clock);
@@ -163,8 +176,13 @@ setClock(Clock &c) {
     InstancePort &ip = (**ai).m_instPort;
     if (!ip.m_external && ip.m_port->isOCP()) {
       size_t nc = ip.m_port->m_clock->m_ordinal; // the clock ordinal within the worker of the port
-      if (ip.m_instance->m_clocks[nc] && ip.m_instance->m_clocks[nc] != &c)
+      if (ip.m_instance->m_clocks[nc] && ip.m_instance->m_clocks[nc] != &c) {
+	ocpiInfo("Cannot set clock \"%s\" on connection \"%s\" since internal port \"%s\" of "
+		 "instance \"%s\" already has clock \"%s\"",
+		 c.cname(), cname(), ip.m_port->pname(), ip.m_instance->cname(),
+		 ip.m_instance->m_clocks[nc]->cname());
 	return false;
+      }
     }
   }
   for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
@@ -174,6 +192,12 @@ setClock(Clock &c) {
       assert(ip.m_instance->m_clocks);
       assert(!ip.m_instance->m_clocks[nc] || ip.m_instance->m_clocks[nc] == &c);
       ip.m_instance->m_clocks[nc] = &c;
+      // unless the other port has its own clock signal, we need a global clock signal
+      if (!otherIP(**ai).m_port->m_myClock)
+	ip.m_clockSignal = c.m_signal;
+      ocpiInfo("Setting clock \"%s\" on connection \"%s\" at internal port \"%s\" of "
+	       "instance \"%s\"",
+	       c.cname(), cname(), ip.m_port->pname(), ip.m_instance->cname());
       // If the clock was originally internal, it is now being propagated and becoming external.
       // So we externalize it
       if (c.m_internal && m_external) {
@@ -190,6 +214,8 @@ setClock(Clock &c) {
 	   m_external->m_instPort.m_port->m_clock == m_clock);
     m_external->m_instPort.m_port->m_clock = m_clock; // set external port's clock
     c.m_internal = false; // in case it started out as internal
+    ocpiInfo("Setting clock \"%s\" on connection \"%s\" at external port \"%s\"",
+	     c.cname(), cname(), m_external->m_instPort.m_port->pname());
   }
   return true;
 }
@@ -261,25 +287,50 @@ parseHdlAssy() {
     }
   Port *wci = NULL;
   unsigned n;
-  // Establish the m_wciClock for all wci slaves
+  // Establish the m_wciClock for all wci slaves, and the sdp clock for data ports of send/receive.
   if (m_type == Container) {
-    // The default WCI clock comes from the (single) wci master
-    for (n = 0, i = &a->m_instances[0]; !m_wciClock && n < a->m_instances.size(); n++, i++)
+    Clock
+      &wciClock = addClock("wci"), // global control clock
+      &sdpClock = addClock("sdp"); // global data clock
+    for (n = 0, i = &a->m_instances[0]; n < a->m_instances.size(); n++, i++) {
+      assert(i->m_worker);
       if (i->m_worker) {
 	unsigned nn = 0;
 	for (InstancePort *ip = &i->m_ports[0]; nn < i->m_worker->m_ports.size(); nn++, ip++) 
-	  if (ip->m_port->m_type == WCIPort && ip->m_port->m_master) {
-	    // Found the instance that is mastering the control plane
-	    m_wciClock = &addClock("wci");
-	    ocpiInfo("Adding the top level control clock, wci, for the container");
-	    // FIXME:  this should access the 0th clock more specifically for VHDL
-	    OU::format(m_wciClock->m_signal, "%s_%s_out_i(0).Clk", i->cname(), ip->m_port->pname());
-	    OU::format(m_wciClock->m_reset, "%s_%s_out_i(0).MReset_n", i->cname(), ip->m_port->pname());
-	    if (i->m_clocks)
-	      i->m_clocks[ip->m_port->m_clock->m_ordinal] = m_wciClock;
+	  switch (ip->m_port->m_type) {
+	  case WCIPort:
+	    if (ip->m_port->m_master) {
+	      assert(!m_wciClock);
+	      // Found the instance that is mastering the control plane
+	      ocpiInfo("Adding the top level control clock, wci, for the container");
+	      // FIXME:  this should access the 0th clock more specifically for VHDL
+	      OU::format(wciClock.m_signal, "%s_%s_out_i(0).Clk", i->cname(), ip->m_port->pname());
+	      OU::format(wciClock.m_reset, "%s_%s_out_i(0).MReset_n", i->cname(), ip->m_port->pname());
+	      assert(i->m_clocks);
+	      i->m_clocks[ip->m_port->m_clock->m_ordinal] = m_wciClock = &wciClock;
+	    }
 	    break;
+	  case SDPPort:
+	    if (ip->m_port->m_master && i->m_worker->m_type == Worker::Configuration) {
+	      OU::format(sdpClock.m_signal, "%s_%s_out_i.Clk", i->cname(), ip->m_port->pname());
+	      OU::format(sdpClock.m_reset, "%s_%s_out_i.Reset", i->cname(), ip->m_port->pname());
+	      ocpiInfo("Adding the top level SDP clock, for the container: %s %s %s",
+		       sdpClock.cname(), sdpClock.m_signal.c_str(), sdpClock.m_reset.c_str());
+	    } else if (!ip->m_port->m_master)
+	      ip->m_clockSignal = sdpClock.m_signal;
+	    break;
+	  case WSIPort:
+	    if (!strcasecmp(i->m_worker->cname(), "sdp_send") ||
+		!strcasecmp(i->m_worker->cname(), "sdp_receive")) {
+	      // Map the data port clocks on these to the global sdp clock
+	      assert(i->m_clocks);
+	      i->m_clocks[ip->m_port->m_clock->m_ordinal] = &sdpClock;
+	    }
+	    break;
+	  default:;
 	  }
       }
+    }
   } else if (a->m_nWCIs) {
     //    assert(m_ports.size() == 0);
     char *cp;
@@ -381,11 +432,11 @@ parseHdlAssy() {
 	  InstancePort &ip = (**ai).m_instPort;
 	  if (ip.m_external)
 	    continue;
+	  size_t nc = ip.m_port->m_clock ? ip.m_port->m_clock->m_ordinal : 0; // ordinal within worker of the port
 	  if (ip.m_port->m_type == WCIPort || ip.m_port->m_clock == ip.m_port->worker().m_wciClock) {
-	    size_t nc = ip.m_port->m_clock->m_ordinal; // clock ordinal within worker of the port
 	    ip.m_instance->m_clocks[nc] = m_wciClock;
 	    (wciClocked1 ? wciClocked2 : wciClocked1) = &ip;
-	  } else if (ip.m_port->m_myClock && !ip.m_port->m_clock->m_output)
+	  } else if (ip.m_port->m_myClock && !ip.m_port->m_clock->m_output && !ip.m_instance->m_clocks[nc])
 	    other = &ip;
 	}
 	if (wciClocked1 && (wciClocked2 || c.m_external || other))
@@ -404,8 +455,7 @@ parseHdlAssy() {
 	if (!ip.m_port->isOCP() || ip.m_external)
 	  continue;
 	assert(ip.m_port->m_clock);
-	if (ip.m_port->m_myClock) {
-	  assert(!ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]);
+	if (ip.m_port->m_myClock && !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
 	  if (c.m_external) { // look for external connection to owned clocks
 	    ocpiInfo("Promoting the port %s clock of instance %s port %s to be the assembly's clock "
 		     "for port %s", ip.m_port->m_clock->m_output ? "output" : "input",
@@ -529,7 +579,7 @@ Connection(OU::Assembly::Connection *connection, const char *name)
 }
 
 void InstancePort::
-emitConnectionSignal(FILE *f, bool output, Language lang, bool clock) {
+emitConnectionSignal(FILE *f, bool output, Language lang/*, bool clock*/) {
   std::string signal = m_instance->m_name;
   signal += '_';
   OU::formatAdd(signal,
@@ -537,8 +587,9 @@ emitConnectionSignal(FILE *f, bool output, Language lang, bool clock) {
 		(lang == VHDL ? m_port->typeNameOut.c_str() : m_port->fullNameOut.c_str()) :
 		(lang == VHDL ? m_port->typeNameIn.c_str() : m_port->fullNameIn.c_str()), "");
   signal += "_i"; // Use this to avoid colliding with port signals
-  m_port->emitConnectionSignal(f, output, lang, clock, signal);
-  (clock ? m_clockSignal : (output ? m_signalOut : m_signalIn)) = signal;
+  m_port->emitConnectionSignal(f, output, lang, false, signal);
+  //(false ? m_clockSignal : (output ? m_signalOut : m_signalIn)) = signal;
+  (output ? m_signalOut : m_signalIn) = signal;
 }
 
 // An instance port that is internal needs to be bound to ONE input and ONE output signal bundle,
@@ -613,7 +664,10 @@ adjustConnections(FILE *f, Language lang, size_t &unused) {
 	      // We found a port C, connected to B, that needs to use this Port A's clock.
 	      // The signal will either be driven by this worker (A's  myclock output)
 	      // or it will be a copy of the signal that is driven into A's clock input
-	      m_port->getClockSignal(*this, lang, c.m_clockSignal);
+	      if (!m_clockSignal.empty())
+		c.m_clockSignal = m_clockSignal;
+	      else
+		m_port->getClockSignal(*this, lang, c.m_clockSignal);
 	      assert(conn.m_clockName.empty());
 	      conn.m_clockName = c.m_clockSignal; // remember this for OCP adjustConnection
 	      goto break2;

@@ -166,7 +166,7 @@ parseClock(ezxml_t xml) {
 	return OU::esprintf("For port \"%s\", specifying a clock direction (\"%s\") when referring "
 			    "to another port's clock (\"%s\") is invalid",
 			    pname(), direction, clock);
-      if (!port->isOCP())
+      if (!port->isOCP() && port->m_type != SDPPort)
 	return OU::esprintf("For port \"%s\", specifying another port's clock (\"%s\") is invalid "
 			    "because that port is not a type that has a clock",
 			    pname(), clock);

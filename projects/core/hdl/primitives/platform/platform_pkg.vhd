@@ -352,7 +352,7 @@ component pulse_gen is
   generic(
     g_pulse_period : positive;
     g_pulse_width  : positive;
-    g_pulse_delay  : positive);
+    g_pulse_delay  : natural);
   port(
     i_clk          : in std_logic;
     i_reset        : in std_logic;

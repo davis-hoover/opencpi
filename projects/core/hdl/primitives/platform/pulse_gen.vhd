@@ -25,7 +25,7 @@ entity pulse_gen is
   generic (
     g_pulse_period : positive := 100000000;
     g_pulse_width  : positive := 16;
-    g_pulse_delay  : positive := 0
+    g_pulse_delay  : natural  := 0
   );
   port (
     i_clk          : in std_logic;
