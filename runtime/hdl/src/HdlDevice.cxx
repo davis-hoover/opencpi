@@ -120,8 +120,9 @@ namespace OCPI {
       isGps = true;
       if (!ts)
         isGps = false;
+      if (isGps)
+        isGps = Driver::getSingleton().configure_gpsd_if_enabled(); // PPS pin init'd for PPS_ok
       if (isGps) {
-        Driver::getSingleton().configure_gpsd(); // PPS pin init'd for PPS_ok
         auto os = offsetof(TimeService, enable_time_now_updates_from_PPS);
         ts->set8RegisterOffset(os, 1);
         isGps = getPPSIsOkay();
