@@ -218,8 +218,10 @@ namespace OCPI {
     // (ref https://www.systutorials.com/docs/linux/man/3-libgpsd/)
     // see https://gitlab.com/gpsd/gpsd/blob/release-3.14/gpsctl.c
     // for example libgpsd usage
-    void Driver::
-    configure_gpsd() {
+    bool Driver::
+    configure_gpsd_if_enabled() {
+      if (!m_doGpsd)
+        return false;
       gps_context_init(&m_gpsdp->m_context, "opencpi-gpsd");
       if (OS::logWillLog(OCPI_LOG_INFO))
         m_gpsdp->m_context.errout.debug = LOG_IO;
@@ -254,6 +256,7 @@ namespace OCPI {
             throw std::string("HDL Driver: system.xml: malformed - gpsd element must contain a valid devicetype attribute if control sub-element is used");
         m_gpsdp->m_context.readonly = true;
       }
+      return m_gpsdp->m_configured;
     }
     /*<!-- system XML -->
         <opencpi>
@@ -277,7 +280,11 @@ namespace OCPI {
       ezxml_t xx;
       if (!xml || !(xx = ezxml_cchild(xml, "gpsd"))) return;
       m_doGpsd = true;
-      m_gpsdp->m_serialPort.assign(ezxml_cattr(xx, "serialport")); // mandatory
+      auto sp = ezxml_cattr(xx, "serialport"); // mandatory
+      if (sp)
+        m_gpsdp->m_serialPort.assign(sp);
+      else
+        throw std::string("HDL Driver: system.xml: malformed - gpsd element must contain serialport attribute");
       ocpiInfo("HDL Driver: gpsd: system.xml: serialport=%s", m_gpsdp->m_serialPort.c_str());
       auto dtx = ezxml_cattr(xx, "devicetype"); // optional
       if(dtx) {
@@ -304,8 +311,7 @@ namespace OCPI {
     now(bool &isGps) {
       isGps = true;
       if (!m_gpsdp->m_configured) {
-        if (m_doGpsd)
-          configure_gpsd();
+        configure_gpsd_if_enabled();
         ocpiInfo("HDL Driver: GPS not configured");
         isGps = false;
         return OS::Time::now();

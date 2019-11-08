@@ -61,7 +61,7 @@ namespace OCPI {
     public:
       Driver();
       static bool m_gpsdTimeout;
-      void configure_gpsd();
+      bool configure_gpsd_if_enabled();
       OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
       // This driver method is called when container-discovery happens, to see if there
