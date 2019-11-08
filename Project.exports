@@ -44,6 +44,7 @@
 #+|runtime/ctests/target-<target>/libocpi_ctests.(so|dylib) bin/<target>/ctests/
 -tests library
 -runtime/dataplane/xfer/tests library
+# This is a broad, platform independent default...
 =tools/cdk/default-system.xml
 # More or less obsolete env scripts, left in for compatibility, put in runtime just to match
 # up with 1.3.1
@@ -80,11 +81,13 @@
 +tools/ocpidev/assets/registry.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/test.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/worker.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/template.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/component.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/ocpidev.sh <target>/bin/ocpidev
 +tools/ocpidev/ocpidev_run.py scripts/
 +tools/ocpidev/ocpishow.py scripts/
 +tools/ocpidev/ocpidev_utilization.py scripts/
++tools/ocpidev/ocpicreate.py scripts/
 # generic make scripts
 +tools/cdk/include/show.mk include/
 +tools/cdk/include/lib.mk include/
@@ -178,6 +181,10 @@
 =runtime/python/opencpi/__init__.py <target>/lib/opencpi/
 # Colors for verification scripts:
 +tools/cdk/python/opencpi/colors.py <target>/lib/opencpi/
+# Utilities for unit test scripts
++tools/cdk/python/opencpi/unit_test_utils.py <target>/lib/opencpi/
++tools/cdk/python/opencpi/complexshortwithmetadata_utils.py <target>/lib/opencpi/
++tools/cdk/python/opencpi/dsp_utils.py <target>/lib/opencpi/
 ################################################################################
 # RCC related exclusions and additions
 # We don't want everything so we are selective here.  was: +tools/cdk/include/rcc include/rcc
@@ -239,6 +246,12 @@
 =runtime/hdl-support/xilinx/getESNfromUSB_xilinx scripts/
 =runtime/hdl-support/scripts/loadBitStream scripts/
 =runtime/hdl-support/xilinx/xilinx.mk include/hdl/
+=runtime/hdl-support/xilinx/xilinx-rcc-platform.mk include/xilinx/
+=runtime/hdl-support/xilinx/xilinx-rcc-platform-definition.mk include/xilinx/
+=platforms/zynq/createLinuxKernelHeaders.sh scripts/xilinx/
+=platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
+=platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
+=runtime/hdl-support/xilinx/normalizeXilinxReleases.sh scripts/xilinx/
 =runtime/hdl-support/xilinx/vivado* include/hdl/
 =runtime/hdl-support/scripts/loadFlash <target>/bin/
 =runtime/hdl-support/scripts/probeJtag <target>/bin/
@@ -272,3 +285,6 @@
 ################################################################################
 # XML files required when building containers that are not real workers
 +projects/core/hdl/primitives/platform/*.xml include/hdl/
++runtime/remote-support/scripts/* scripts/
++runtime/remote-support/scripts/ocpiremote.sh <target>/bin/ocpiremote
+

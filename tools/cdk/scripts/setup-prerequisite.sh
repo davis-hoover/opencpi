@@ -170,7 +170,11 @@ function download_git {
       echo Downloading/cloning the distribution/repo for $package: $url
       rm -r -f $directory.bak
       [ -d $directory ] && mv $directory{,.bak}
-      if git clone $url; then
+
+      # --no-checkout because an explicit checkout is done later
+      # this prevents a rare bug in git in which git thinks files are changed
+      # immediately after cloning a remote repo
+      if git clone --no-checkout $url; then
         echo Download/clone complete.
         if [ -d $directory ]; then
           cd $directory
@@ -182,6 +186,7 @@ function download_git {
       else
         echo The git clone failed from $url.
       fi
+
       rm -r -f $directory # in case of partial clone
       [ -d $directory.bak ] && mv $directory{.bak,}
       ;;
@@ -199,7 +204,7 @@ function unpack {
   echo Unpacking download file $file into $directory.
   case $file in
     (*.tar.gz) tar xzf $file;;
-    (*.tar) tar xf $file;;
+    (*.tar|*.tar.bz2) tar xf $file;;
     (*.tar.xz) tar -x --xz -f $file;;
     (*.zip) unzip $file;;
     (*) echo Unknown suffix in $file.  Cannot unpack it.; exit 1
@@ -240,8 +245,8 @@ function download_url {
       };;
     local)
       echo Trying to downloading the distribution file locally from:  $2/$3
-      echo Download command is: curl -O -L $2/$3
-      if curl -O -L $2/$file; then
+      echo Download command is: curl -f -O -L $2/$3
+      if curl -f -O -L $2/$file; then
         echo Download completed successfully from $2/$3
 	if [ -r $3 ] ; then
 	  [ "$3" != $file ] && mv -f $3 $file
@@ -256,8 +261,8 @@ function download_url {
       fi;;
     internet)
       echo Downloading the distribution file: $file
-      echo Download command is: curl -O -L $url/$file
-      curl -O -L $url/$file && {
+      echo Download command is: curl -f -O -L $url/$file
+      curl -f -O -L $url/$file && {
         echo Download complete.  Removing any existing build directories.
         unpack
 	return
@@ -421,7 +426,7 @@ function relative_link {
   [[ $to == /* ]] || to=`pwd`/$to
   mkdir -p $from
   [ -L $from/$link ] && rm $from/$link
-  to=$(python -c "import os.path; print os.path.relpath('$(dirname $to)', '$from')")
+  to=$(python3.4 -c "import os.path; print(os.path.relpath('$(dirname $to)', '$from'))")
   ln -s -f $to/$base $from/$link
 }
 OcpiSetup=

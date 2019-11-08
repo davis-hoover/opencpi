@@ -49,7 +49,7 @@ class RccPlatformsCollection(ShowableAsset):
 
     def get_valid_platforms(self):
         """
-        Probes filesystem in order to determine the list of active platforms in the
+        Probes file-system in order to determine the list of active platforms in the
         platforms collection
         """
         return [(self.directory + "/" + dir) for dir in os.listdir(self.directory)
@@ -101,7 +101,7 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
                                                      mk_arg="ShellPlatformsVars=1 showplatforms",
                                                      verbose=True)["HdlPlatforms"]
 
-        # Collect list of assembly directories
+        # Collect list of platform directories
         for name in make_platforms:
             platform_list.append(self.directory + "/" + name)
         return platform_list
@@ -113,12 +113,23 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         for platform in self.platform_list:
             platform.show_utilization()
 
-    #placeholder function
     def build(self):
         """
         This is a placeholder function will be the function that builds this Asset
         """
         raise NotImplementedError("HdlPlatformsCollection.build() is not implemented")
+
+    @staticmethod
+    def get_working_dir(name, library, hdl_library, hdl_platform):
+        """
+        return the directory of an HDL Platform Collection given the name (name) and
+        library specifiers (library, hdl_library, hdl_platform)
+        """
+        ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
+        if name: ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
+            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
+        return ocpiutil.get_path_to_project_top() + "/hdl/platforms"
 
 # pylint:disable=too-many-ancestors
 class HdlPlatformWorker(HdlWorker, ReportableAsset):
@@ -150,7 +161,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         self.package_id = None
         config_list = self.get_make_vars()
         self.platform = hdltargets.HdlToolFactory.factory("hdlplatform", self.name, self.package_id)
-        #TODO this should be guarded by a init kwarg wariable, not always needed i.e. show project
+        #TODO this should be guarded by a init kwarg variable, not always needed i.e. show project
         self.init_configs(config_list)
 
 
@@ -171,7 +182,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
                                                     mk_arg="ShellHdlPlatformVars=1 showinfo",
                                                     verbose=False)
         except ocpiutil.OCPIException:
-            # if make shoots out an error asume configs are blank
+            # if the make call causes and error assume configs are blank
             plat_vars = {"Configurations" : "", "Package":"N/A"}
         if "Configurations" not in plat_vars:
             raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations " +
@@ -179,15 +190,13 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         self.package_id = plat_vars["Package"]
         # This should be a list of Configuration NAMES
         config_list = plat_vars["Configurations"]
-
         return config_list
 
     def init_configs(self, config_list):
         """
         Construct an HdlPlatformWorkerConfig for each and add to the self.configs map.
         """
-
-        # Directory for each config is <platform-worker-dir>/config-<configuration>
+        # Directory for each config is <platform-worker-directory>/config-<configuration>
         cfg_prefix = self.directory + "/config-"
         for config_name in config_list:
             # Construct the Config instance and add to map
@@ -216,20 +225,32 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             sub_report = self.configs[cfg_name].get_utilization()
             if sub_report:
                 # We want to add the container name as a report element
-                # Add this dataset to the list of utilization dictionaries. It will serve
+                # Add this data-set to the list of utilization dictionaries. It will serve
                 # as a single data-point/row in the report
                 sub_report.assign_for_all_points(key="Configuration", value=cfg_name)
                 util_report += sub_report
         return util_report
+
+    @staticmethod
+    def get_working_dir(name, library, hdl_library, hdl_platform):
+        """
+        return the directory of a HDL Platform given the name (name) and
+        library specifiers (library, hdl_library, hdl_platform)
+        """
+        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, hdl_platform)
+        if not name: ocpiutil.throw_not_blank_e("hdl-platform", "name", True)
+        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms", "hdl-platform"]:
+            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms", "hdl-platform"])
+        return ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + name
 # pylint:enable=too-many-ancestors
 
 class HdlPlatformWorkerConfig(HdlAssembly):
     """
-    HDL Platform Worker Configurations are buildable HDL Assemblies that contain their
+    HDL Platform Worker Configurations are build-able HDL Assemblies that contain their
     HDL Platform Worker as well as HDL Device Workers. Each configuration can only be
     built for the HDL Platform defined by the configuration's HDL Platform Worker.
 
-    Each instance has a target-<hdl-target> subdirectory where build artifacts can be found.
+    Each instance has a target-<hdl-target> sub-directory where build artifacts can be found.
 
     Each instance is bound to a single HdlPlatform instance (self.platform)
     """
@@ -511,6 +532,7 @@ class HdlPlatform(Platform):
         """
         return self.target.toolset
 
+    #TODO this can be static its not using cls
     @classmethod
     def get_all_dict(cls):
         """
@@ -530,6 +552,7 @@ class HdlPlatform(Platform):
 
         return plat_dict
 
+    #TODO this can be static its not using cls
     @classmethod
     def get_all_table(cls, plat_dict):
         """
@@ -545,6 +568,7 @@ class HdlPlatform(Platform):
                          plat_dict[plat]["part"], plat_dict[plat]["vendor"],
                          plat_dict[plat]["tool"]])
         return rows
+
     @classmethod
     def show_all(cls, details):
         """
@@ -614,6 +638,7 @@ class HdlTarget(object):
         else:
             return False
 
+    #TODO this can be static its not using cls
     @classmethod
     def get_all_dict(cls):
         """
@@ -629,6 +654,7 @@ class HdlTarget(object):
 
         return target_dict
 
+    #TODO this can be static its not using cls when get_all_dict is static
     @classmethod
     def show_all(cls, details):
         """

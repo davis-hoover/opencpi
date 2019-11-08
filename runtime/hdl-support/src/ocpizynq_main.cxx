@@ -75,7 +75,7 @@ static uint8_t *map(off_t addr, size_t arg_size) {
 
 int
 mymain(const char **argv) {
-#if !defined(OCPI_ARCH_arm) && !defined(OCPI_ARCH_arm_cs)
+#if !defined(OCPI_ARCH_arm) && !defined(OCPI_ARCH_arm_cs) && !defined(OCPI_ARCH_aarch32) && !defined(OCPI_ARCH_aarch64)
   fprintf(stderr, "This program is only functional on Zynq/Arm platforms\n");
   return 1;
 #endif

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -189,7 +189,8 @@ def set_init_values(args, dir_type):
     if args['noun'] == "tests":
         args['init_libs'] = True
         args['init_tests'] = True
-        if dir_type in ["library", "project"]:
+        args['init_libs_col'] = True
+        if dir_type in ["library", "project", "libraries"]:
             args['noun'] = dir_type
         else:
             raise ocpiutil.OCPIException("Use of tests noun in an invalid directory type: \"" +
@@ -208,8 +209,7 @@ def main():
             dir_type = ocpiutil.get_dirtype()
             # args['name'] could be None if no name is provided at the command line
             name = args['name']
-            directory = ocpiutil.get_ocpidev_working_dir(origin_path=".",
-                                                         noun=args.get("noun", ""),
+            directory = ocpiutil.get_ocpidev_working_dir(noun=args.get("noun", ""),
                                                          name=name,
                                                          library=args['library'],
                                                          hdl_library=args['hdl_library'],

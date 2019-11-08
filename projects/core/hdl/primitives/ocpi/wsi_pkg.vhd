@@ -88,7 +88,7 @@ package wsi is
       ready            : out Bool_t; -- data can be taken
       -- user visible metadata
       som, eom, valid, eof, abort : out Bool_t;
-      data             : out std_logic_vector(byte_width*n_bytes-1 downto 0);
+      data             : out std_logic_vector(ocpi.util.max(1,byte_width)*n_bytes-1 downto 0);
       -- only used if bytes are required (zlm or byte size < data width)
       byte_enable      : buffer std_logic_vector(n_bytes-1 downto 0);
       -- only used if precise is required
@@ -141,6 +141,8 @@ package wsi is
       input_eof        : in  Bool_t;   -- an EOF is pending from (the first) input port
       buffer_size      : in  UShort_t;
       latency          : out UShort_t;
+      messages         : out ULong_t;  -- the message count - if debug
+      bytes            : out ULong_t;  -- the byte count - if debug
     --====== Signals to and from the worker=====
       -- only used if abortable
       abort            : in  Bool_t; -- message is aborted
@@ -150,7 +152,7 @@ package wsi is
       opcode           : in  std_logic_vector(opcode_width-1 downto 0);
       eof              : in  Bool_t; -- an EOF is pending from worker for this port
       give             : in  Bool_t := bfalse;
-      data             : in  std_logic_vector(n_bytes * byte_width-1 downto 0);
+      data             : in  std_logic_vector(n_bytes * ocpi.util.max(1,byte_width)-1 downto 0);
       byte_enable      : in  std_logic_vector(n_bytes-1 downto 0) := (others => '1');
       som              : in  Bool_t := bfalse;
       eom              : in  Bool_t := bfalse;
@@ -277,25 +279,27 @@ package wsi is
   
   component delayline is
     generic (
-      LATENCY : integer);
+      g_latency     : integer);
     port (
-      CLK                : in std_logic;
-      RESET              : in std_logic;
-      IS_OPERATING       : in std_logic;
-      IN_READY           : in std_logic;
-      IN_SOM             : in std_logic;
-      IN_EOM             : in std_logic;
-      IN_OPCODE          : in std_logic_vector;
-      IN_VALID           : in std_logic;
-      IN_BYTE_ENABLE     : in std_logic_vector;
-      IN_DATA            : in std_logic_vector;
-      OUT_READY          : in std_logic;
-      OUT_SOM            : out std_logic;
-      OUT_EOM            : out std_logic;
-      OUT_OPCODE         : out std_logic_vector;
-      OUT_VALID          : out std_logic;
-      OUT_BYTE_ENABLE    : out std_logic_vector;
-      OUT_DATA           : out std_logic_vector
+      i_clk         : in std_logic;
+      i_reset       : in std_logic;
+      i_enable      : in std_logic;
+      i_ready       : in std_logic;
+      i_som         : in std_logic;
+      i_eom         : in std_logic;
+      i_opcode      : in std_logic_vector;
+      i_valid       : in std_logic;
+      i_byte_enable : in std_logic_vector;
+      i_data        : in std_logic_vector;
+      i_eof         : in std_logic;
+      o_ready       : out std_logic;
+      o_som         : out std_logic;
+      o_eom         : out std_logic;
+      o_opcode      : out std_logic_vector;
+      o_valid       : out std_logic;
+      o_byte_enable : out std_logic_vector;
+      o_data        : out std_logic_vector;
+      o_eof         : out std_logic
       );
   end component;
 end package wsi;

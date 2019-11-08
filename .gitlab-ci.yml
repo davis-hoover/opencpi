@@ -1,0 +1,380 @@
+# vim: ts=2:sw=2:et
+#
+# GitLab's yaml reference:
+#   https://docs.gitlab.com/ee/ci/yaml/README.html
+#
+
+# Job's with tag:opencpi run on our servers, not the cloud
+
+# Define the stages of the pipeline.
+stages:
+  - prereq
+  - build
+  - test
+  - cross-prereq
+  - cross-build
+  - deploy
+
+#------------------------------------------------------------------------------
+# PREP
+#------------------------------------------------------------------------------
+
+prep:centos6:
+  stage: prereq
+  tags:
+    - docker
+  image: centos:6
+  script:
+  - yum -y distro-sync
+  - scripts/install-packages.sh
+
+prep:centos7:
+  stage: prereq
+  tags:
+    - docker
+  image: centos:7
+  script:
+  - yum -y distro-sync
+  - scripts/install-packages.sh
+
+prereq:centos6:
+  stage: prereq
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-centos6"
+    policy: push
+    paths:
+      - exports/
+      - prerequisites/
+      - prerequisites-build/
+  script:
+    - ./scripts/install-prerequisites.sh
+
+prereq:centos7:
+  stage: prereq
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-centos7"
+    policy: push
+    paths:
+      - exports/
+      - prerequisites/
+      - prerequisites-build/
+  script:
+    - ./scripts/install-prerequisites.sh
+
+#------------------------------------------------------------------------------
+# BUILD
+#------------------------------------------------------------------------------
+
+build:centos6:
+  stage: build
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-centos6"
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  artifacts:
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+    when: on_success
+    expire_in: 2 hrs
+  needs: ["prereq:centos6"]
+  script:
+    - ./scripts/build-opencpi.sh
+
+build:centos7:
+  stage: build
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-centos7"
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  artifacts:
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+    when: on_success
+    expire_in: 2 hrs
+  needs: ["prereq:centos7"]
+  script:
+    - ./scripts/build-opencpi.sh
+
+build:docs:
+  stage: build
+  tags:
+    - docker
+  image: centos:7
+  artifacts:
+    paths:
+      - public/
+  script:
+    - yum -y distro-sync
+    - scripts/install-opencpi-docs.sh
+    - mkdir -p public
+    - mv doc/pdfs/* public/
+
+#------------------------------------------------------------------------------
+# TEST
+#------------------------------------------------------------------------------
+
+test:centos6:
+  stage: test
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-centos6"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["build:centos6"]
+  script:
+    - ./scripts/test-opencpi.sh
+
+test:centos7:
+  stage: test
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-centos7"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["build:centos7"]
+  script:
+    - ./scripts/test-opencpi.sh
+
+#------------------------------------------------------------------------------
+# CROSS PREREQ
+#------------------------------------------------------------------------------
+
+cross-prereq:centos6:xilinx13_3:
+  stage: cross-prereq
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_3"
+    policy: push
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  dependencies: ["build:centos6"]
+  needs: ["build:centos6"]
+  script:
+    - ./scripts/install-prerequisites.sh xilinx13_3
+
+cross-prereq:centos6:xilinx13_4:
+  stage: cross-prereq
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_4"
+    policy: push
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  dependencies: ["build:centos6"]
+  needs: ["build:centos6"]
+  script:
+    - ./scripts/install-prerequisites.sh xilinx13_4
+
+cross-prereq:centos7:xilinx13_3:
+  stage: cross-prereq
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_3"
+    policy: push
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  dependencies: ["build:centos7"]
+  needs: ["build:centos7"]
+  script:
+    - ./scripts/install-prerequisites.sh xilinx13_3
+
+cross-prereq:centos7:xilinx13_4:
+  stage: cross-prereq
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_4"
+    policy: push
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  dependencies: ["build:centos7"]
+  needs: ["build:centos7"]
+  script:
+    - ./scripts/install-prerequisites.sh xilinx13_4
+
+#------------------------------------------------------------------------------
+# CROSS BUILD
+#------------------------------------------------------------------------------
+
+cross-build:centos6:xilinx13_3:
+  stage: cross-build
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_3"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["cross-prereq:centos6:xilinx13_3"]
+  script:
+    - ./scripts/build-opencpi.sh xilinx13_3
+
+cross-build:centos6:xilinx13_4:
+  stage: cross-build
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_4"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["cross-prereq:centos6:xilinx13_4"]
+  script:
+    - ./scripts/build-opencpi.sh xilinx13_4
+
+cross-build:centos7:xilinx13_3:
+  stage: cross-build
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_3"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["cross-prereq:centos7:xilinx13_3"]
+  script:
+    - ./scripts/build-opencpi.sh xilinx13_3
+
+cross-build:centos7:xilinx13_4:
+  stage: cross-build
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xilinx13_4"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["cross-prereq:centos7:xilinx13_4"]
+  script:
+    - ./scripts/build-opencpi.sh xilinx13_4
+
+#------------------------------------------------------------------------------
+# DEPLOY
+#------------------------------------------------------------------------------
+
+pages:
+  stage: deploy
+  tags:
+    - docker
+  image: centos:7
+  artifacts:
+    paths:
+      - public/
+  dependencies: ["build:docs"]
+  only:
+    - master
+  script:
+    - echo "Uploading OpenCPI docs to gitlab.io"

@@ -41,7 +41,7 @@ endif
 #FIXME  this registration should be somewhere else nicer
 ifndef OCPI_PREREQUISITES_LIBS
   # Libraries used with ACI and our executables
-  export OCPI_PREREQUISITES_LIBS:=lzma gmp
+  export OCPI_PREREQUISITES_LIBS:=lzma gmp gpsd
 endif
 ifndef OCPI_PREREQUISITES
   # All prerequisites we need to build and use
@@ -381,12 +381,12 @@ OcpiConvertListToPythonList=$(strip \
 # Run the python code in $1
 # Usage: $(call OcpiCallPythonFunc,this_is_a_python_function_with_output())
 OcpiCallPythonFunc=\
-  $(shell python3 -c '$1')
+  $(shell python3.4 -c '$1')
 
 # Import the ocpiutil module and run the python code in $1
 # Usage: $(call OcpiCallPythonUtil,ocpiutil.utility_function(arg1, arg2))
 OcpiCallPythonUtil=$(infox OPYTHON:$1)\
-  $(shell python3 -c 'import sys;\
+  $(shell python3.4 -c 'import sys;\
 sys.path.append("$(OCPI_CDK_DIR)/$(OCPI_TOOL_PLATFORM)/lib/");\
 import _opencpi.util as ocpiutil;\
 $1')
@@ -1078,7 +1078,7 @@ endef
 # .test directories also support more generic targets, in particular "clean" and "cleanrun"
 OcpiTestGoals=test cleantest runtest verifytest cleansim runtests runonlytest cleanrun
 # Used globally when building executables
-OcpiPrereqLibs=lzma gmp
+OcpiPrereqLibs=lzma gmp gpsd
 
 OcpiCheckVars=$(and $($1),$(error The "$1" variable is set in both the Makefile and the *-build.xml file.))
 

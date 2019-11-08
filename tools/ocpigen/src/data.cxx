@@ -57,7 +57,7 @@ DataPort(Worker &w, ezxml_t x, DataPort *sp, int ordinal, WIPType type, const ch
 			 m_dataWidth, OU::Port::cname(), m_dataValueWidth);
       return;
     }
-  } else if ((!m_dataWidth && m_dataValueWidth) || (m_dataWidth && m_dataValueWidth % m_dataWidth)) {
+  } else if (m_dataWidth && m_dataValueWidth % m_dataWidth) {
     err =  OU::esprintf("DataValueWidth (%zu) on port '%s' not a multiple of DataWidth (%zu)",
 			m_dataValueWidth, OU::Port::cname(), m_dataWidth);
     return;
@@ -247,7 +247,7 @@ finalize() {
     if ((!m_dataValueWidth && m_dataWidth) || (m_dataValueWidth && m_dataWidth % m_dataValueWidth))
       return OU::esprintf("DataWidth (%zu) on port '%s' not a multiple of DataValueWidth (%zu)",
 			  m_dataWidth, cname(), m_dataValueWidth);
-  } else if ((!m_dataWidth && m_dataValueWidth) || (m_dataWidth && m_dataValueWidth % m_dataWidth))
+  } else if (m_dataWidth && m_dataValueWidth % m_dataWidth)
     return OU::esprintf("DataValueWidth (%zu) on port '%s' not a multiple of DataWidth (%zu)",
 			m_dataValueWidth, cname(), m_dataWidth);
   // If messages are always a multiple of datawidth and we don't have zlms, bytes are datawidth
@@ -277,14 +277,15 @@ finalize() {
   AP(max_opcode,  UChar, false, true, false, false, false, false,  m_nOpcodes - 1);
   AP(max_bytes,   ULong, false, true, false, false, false, false,  max_bytes);
   // 2. Runtime values provided to the worker
-  if (isDataProducer())
+  if (isDataProducer()) {
     // Add a runtime output size if the protocol does not bound it
     //    if (m_isUnbounded)
+    // name         type,  debug  param  initl  volatl impl   value
     AP(buffer_size, UShort,false, false, true, false, true);  // settable buffer size
-    //    else
-    //      AP(buffer_size, UShort,  false, true, false, false,  true);  // constant buffer size
+  }
+  //    else
+  //      AP(buffer_size, UShort,  false, true, false, false,  true);  // constant buffer size
   // 3. Statistics counters for all models, debug and volatile
-  // name         type,  debug  param  initl  volatl impl   value
   //  AP(messages,    ULong,  true, false, false, true,  false); // messages crossing this port
   //  AP(opcode,      ULong,  true, false, false, true,  false);  // opcode of current message
   //  AP(length,      ULong,  true, false, false, true,  false);  // length of current message

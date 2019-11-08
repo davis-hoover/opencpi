@@ -63,7 +63,7 @@
 # 1. The platform we are building (default is the current build machine)
 # 2. Whether it is a development platform or a runtime-only platform (default is development)
 # 3. Whether it is cross compiled or not (default is not cross compiled)
-prerequisites gmp lzma gtest
+prerequisites gmp lzma gtest gpsd
 # There is lots of leftover/unbuilt stuff in the foreign directories
 runtime/foreign -f -x .*/pwq/kern/.* -x .*/pwq/src/.*/.* -x .*/uuid/src/.*/.*
 # From old Makefiles:c and c++: for linux: -D_XOPEN_SOURCE=600 -D_FILE_OFFSET_BITS=64

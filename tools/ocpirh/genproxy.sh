@@ -54,7 +54,7 @@ OCPI_INCS="-I$OCPI_CDK_DIR/include/aci \
 pdir=${OCPI_PREREQUISITES_DIR:-/opt/opencpi/prerequisites}
 olibs="application container library transport rdma_driver_interface rdma_utils rdma_smb \
        msg_driver_interface util os"
-plibs="gmp lzma"
+plibs="gmp lzma gpsd"
 OCPI_LIB_DIR=$OCPI_CDK_DIR/lib/$OCPI_TARGET_DIR
 OCPI_LIBS="$(for l in $olibs; do echo -n ' '-locpi_$l; done) \
            $(for p in $plibs; do echo -n ' '$pdir/$p/$OCPI_TARGET_PLATFORM/lib/lib$p.a; done)"

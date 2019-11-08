@@ -25,7 +25,6 @@
 #include "assembly.h"
 #include "hdl.h"
 #include "hdl-container.h"
-
 static void
 emitTimeClient(std::string &assy, const char *instance, const char *portName, Port *port = NULL) {
   OU::formatAdd(assy,
@@ -38,7 +37,7 @@ emitTimeClient(std::string &assy, const char *instance, const char *portName, Po
 		"    <port instance='pfconfig' name='time'/>\n"
 		"    <port instance='%s_%s_time_client' name='time'/>\n"
 		"  </connection>\n",
-		port && port->myClock && !port->clock->m_output ?  "_co" : "",
+		port && port->m_myClock && !port->m_clock->m_output ?  "_co" : "",
 		instance, portName,
 		instance, portName,
 		instance, portName,
@@ -269,7 +268,7 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 	ocpiAssert(p.m_type == SDPPort || slave);
 #endif
 	uNocs.insert(std::make_pair(p.pname(),
-				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(), p.m_count)));
+				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(), p.count())));
       }
     }
   }
@@ -325,8 +324,8 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 		  "    <port instance='ocscp' name='wci'/>\n"
 		  "    <port instance='pfconfig' name='%s'/>\n"
 		  "  </connection>\n",
-		  p.m_count, p.pname());
-    nWCIs += p.m_count;
+		  p.count(), p.pname());
+    nWCIs += p.count();
   }
   if (m_appAssembly.m_assembly && m_appAssembly.m_assembly->m_instances.size() != 0) {
     // Instance the assembly and connect its wci
@@ -339,9 +338,9 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 		    "    <port instance='ocscp' name='wci' index='%zu'/>\n"
 		    "    <port instance='%s' name='%s'/>\n"
 		    "  </connection>\n",
-		    p.m_count, nWCIs,
+		    p.count(), nWCIs,
 		    m_appAssembly.m_implName, p.pname());
-      nWCIs += p.m_count;
+      nWCIs += p.count();
     }
   }
   if (icp && !cp) {
@@ -951,7 +950,7 @@ mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
 	std::string dname, ename;
 	if (di.slot && !inContainer)
 	  OU::format(dname, "%s_%s_%s", di.slot->m_name.c_str(), di.device.cname(), devSig.c_str());
-	else if (inContainer)
+	else if (inContainer || di.device.m_deviceType.m_type == Worker::Platform)
 	  dname = devSig.c_str();
 	else
 	  OU::format(dname, "%s_%s", di.device.cname(), devSig.c_str());
@@ -971,8 +970,8 @@ mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
 	} else
 	  ename = boardName;
 	//	if (ename.length())
-	  OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
-			dname.c_str(), ename.c_str());
+	OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
+		      dname.c_str(), ename.c_str());
       } else {
 	Signal *ns = new Signal(**i);
 	if (di.device.deviceType().m_type != Worker::Platform)

@@ -16,7 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-library ieee; use ieee.std_logic_1164.all;
+library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
 
 package util_prims is
 
@@ -81,5 +81,31 @@ component AGC
     DIN     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
     DOUT    : out std_logic_vector(DATA_WIDTH-1 downto 0));
 end component AGC;
+
+component divide_by_constant
+  generic(
+    g_const      : positive;
+    g_num_bits   : positive;
+    g_data_width : positive);
+  port(
+    i_clk        : in std_logic;
+    i_rst        : in std_logic;
+    i_din        : in unsigned(g_data_width-1 downto 0);
+    i_din_vld    : in std_logic;
+    o_din_rdy    : out std_logic;
+    o_dout       : out unsigned(g_data_width-1 downto 0);
+    o_dout_vld   : out std_logic;
+    i_dout_rdy   : in std_logic);
+end component divide_by_constant;
+
+component set_clr
+  port (
+    clk : in std_logic;
+    rst : in std_logic;
+    set : in std_logic;
+    clr : in std_logic;
+    q   : out std_logic;
+    q_r : out std_logic);
+end component set_clr;
 
 end package util_prims;

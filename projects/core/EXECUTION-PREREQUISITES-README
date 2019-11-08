@@ -1,0 +1,6 @@
+Ignore this file unless another README pointed here.
+
+# Execution Prerequisites
+ * Any aforementioned dependant build artifacts are contained with the directory
+   list of the OCPI_LIBRARY_PATH environment variable. (Note: completion of #105
+   will mitigate this requirement)

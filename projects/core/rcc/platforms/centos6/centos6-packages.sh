@@ -37,7 +37,7 @@
 ##########################################################################################
 # R. yum-installed and rpm-required for runtime - minimal
 #    linux basics for general runtime scripts
-PKGS_R+=(util-linux coreutils ed findutils sudo initscripts)
+PKGS_R+=(util-linux coreutils ed findutils initscripts)
 #    for JTAG loading of FPGA bitstreams
 #    AV-3053 libusb.so is required to communicate with Xilinx programming dongle
 #    For some reason, that is only in the libusb-devel package in both C6 and C7
@@ -50,7 +50,7 @@ PKGS_R+=(unzip)
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
 PKGS_D+=(make autoconf automake libtool gcc-c++)
 #    for our development scripts
-PKGS_D+=(which)
+PKGS_D+=(which wget)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
@@ -82,9 +82,7 @@ PKGS_D+=(hardlink)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
-# docker container missing this	libXdmcp.i686=/lib/libXdmcp.so.6) # AV-3645
-#    for bash completion - a noarch package  (AV-2398)
-# in epel for centos6 - see below PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
+
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
 # While some manual installations require git manually installed before this,
@@ -101,16 +99,19 @@ PKGS_S+=(rpm-build)
 PKGS_S+=(swig python-devel)
 #    for general configuration/installation flexibility
 PKGS_S+=(nfs-utils)
-#    for OpenCL support (the switch for different actual drivers that are not installed here)
-# not available in centos6: PKGS_S+=(ocl-icd)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
-#    for devel.  For RPM installations we somehow rely on the user pre-installing epel
-#
+#    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
+#    for ocpidev
+python3_ver=python34
+PKGS_E+=(${python3_ver} ${python3_ver}-jinja2)
 #    for various testing scripts
-PKGS_E+=(python34-numpy)
+PKGS_E+=(${python3_ver}-numpy)
+#    for OpenCL support (the switch for different actual drivers that are not installed here)
+PKGS_E+=(ocl-icd)
 #    for bash completion - a noarch package  (AV-2398)
 PKGS_E+=(bash-completion=/etc/profile.d/bash_completion.sh)
 
@@ -118,12 +119,73 @@ PKGS_E+=(bash-completion=/etc/profile.d/bash_completion.sh)
 function rpkgs {
   eval echo \${$1[@]/#*=}
 }
+
 function ypkgs {
   eval echo \${$1[@]/%=*}
 }
+
+function bad {
+  echo Error: $* >&2
+  exit 1
+}
+
+function install_scons {
+  local need_scons=1
+  local scons_pkg=scons-2.5.1
+
+  if rpm -q scons &> /dev/null; then
+    # RPM is installed, remove and install scons manually as this version does
+    # not work with gpsd
+    $SUDO yum -y erase scons
+  elif command -v scons &> /dev/null; then
+    # SCons is in path
+    if scons --version | grep -q 'script: v2.5.1'; then
+      # Correct version
+      need_scons=0
+    fi
+  fi
+
+  # Download and install scons. Yes this is usually done with pip, but pip was
+  # failing on install.
+  if [ $need_scons -eq 1 ]; then
+    pushd /tmp
+    wget https://files.pythonhosted.org/packages/2c/ee/a9601b958c94e93410e635a5d67ed95300998ffdc36127b16d322b054ff0/${scons_pkg}.tar.gz
+    tar xf ${scons_pkg}.tar.gz
+    pushd $scons_pkg
+    $SUDO python setup.py install
+    popd
+    $SUDO rm -rf ${scons_pkg}*
+    popd
+  fi
+}
+
+
 # The list for RPMs: first line
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
 [ "$1" = yumlist ] && ypkgs PKGS_R && ypkgs PKGS_D && ypkgs PKGS_S && ypkgs PKGS_E && exit 0
-sudo yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
+
+# Docker doesn't have sudo installed by default and we run as root inside
+# a container anyway
+SUDO=
+if [ "$(whoami)" != root ]; then
+  SUDO=$(command -v sudo)
+  [ $? -ne 0 ] && bad "\
+Could not find 'sudo' and you are not root. Installing packages requires root
+permissions."
+fi
+
+# Install required packages, packages needed for development, and packages
+# needed for building from source
+$SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
+[ $? -ne 0 ] && bad "Installing required packages failed"
+
 # Now those that depend on epel, e.g.
-sudo yum -y install $(ypkgs PKGS_E)
+$SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
+[ $? -ne 0 ] && bad "Installing EPEL packages failed"
+
+# On CentOS6, SCons has to be installed manually. The version provided by yum
+# is not new enough. Installation with pip was not working either.
+# SCons is needed by gpsd
+install_scons
+
+exit 0

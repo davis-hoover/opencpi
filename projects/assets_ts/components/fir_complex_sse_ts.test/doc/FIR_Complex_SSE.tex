@@ -74,7 +74,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 	The \verb+NUM_TAPS_p+ parameter defines the number of coefficient values. Care should be taken to ensure that the \verb+COEFF_WIDTH_p+ parameter is $\le$ the type (size) of the taps property. The taps property is type short, so \verb+COEFF_WIDTH_p+ must be between 1 and 16. Identical filter tap coefficients are applied to both real and imaginary input samples.\medskip
 
 	This implementation uses \verb+NUM_TAPS_p/2+ multipliers for each of the real and imaginary data paths and processes input data at the clock rate - i.e. this worker can handle a new input value every clock cycle.\medskip
-
+	
 	The FIR Complex SSE worker utilizes the OCPI \textit{Complex\_Short\_With\_Metadata} protocol for both input and output ports. The \textit{Complex\_Short\_With\_Metadata} protocol conveys sample data using an interface of 16-bit complex signed samples. The \verb+DATA_WIDTH_p+ parameter may be used to restrict the the number of bits processed on the input and the number of bits (sign-extended) produced on the input.
 \end{flushleft}
 {\centering\captionsetup{type=figure}\includegraphics[scale=0.65]{fir_systolic_sym_even}\par\captionof{figure}{FIR Complex SSE Block Diagram - 8-tap example per I/Q rail}\label{fig:circuit}}

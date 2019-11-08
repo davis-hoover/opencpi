@@ -657,15 +657,15 @@ emitDeviceSignalMappings(FILE *f, std::string &last) {
     Signal &s = **si;
     ocpiDebug("DeviceSignalMappings %s: %zu %u %d",
 	      s.cname(), m_paramConfig->nConfig, s.m_direction, m_type == Container);
-    if (s.m_directionExpr.size() && m_type != Container)
+    if ((s.m_directionExpr.size() || s.m_widthExpr.size()) && m_type != Container)
       anyExpr = true;
     else
       emitDeviceSignalMapping(f, last, s, "");
   }
   if (anyExpr) {
-    fputs(last.c_str(), f);
+    fputs("\n", f); // last.c_str(), f);
     fprintf(f,
-	    "  %s There are additional signals whose direction is parameterized and are not\n"
+	    "  %s There are additional signals whose direction or width are parameterized and are not\n"
 	    "  %s mapped here. They are defined in comments in the generics.vhd file for each\n"
 	    "  %s specific build configuration.  They are inserted below in the copy of this\n"
 	    "  %s file that is created in each target directory.\n"
@@ -678,14 +678,14 @@ void Worker::
 emitDeviceSignals(FILE *f, Language lang, std::string &last) {
   bool anyExpr = false;
   for (SignalsIter si = m_signals.begin(); si != m_signals.end(); si++)
-    if ((*si)->m_directionExpr.size() && lang == VHDL)
+    if (((*si)->m_directionExpr.size() || (*si)->m_widthExpr.size()) && lang == VHDL)
       anyExpr = true;
     else
       emitDeviceSignal(f, lang, last, **si, "");
   if (anyExpr) {
-    emitLastSignal(f, last, lang, false);
+    emitLastSignal(f, last, lang, true);  // we're still not sure there will non-UNUSED signals
     fprintf(f,
-	    "  %s There are additional signals whose direction is parameterized and are not\n"
+	    "  %s There are additional signals whose direction or width are parameterized and are not\n"
 	    "  %s defined here. They are defined in comments in the generics.vhd file for each\n"
 	    "  %s specific build configuration.  They are inserted below in the copy of this\n"
 	    "  %s file that is created in each target directory.\n"
@@ -706,9 +706,9 @@ emitSignals(FILE *f, Language lang, bool useRecords, bool inPackage, bool inWork
   std::string init = lang == VHDL ? "  port (\n" : "";
   std::string last = init;
   if (m_type != Container)
-    for (ClocksIter ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
+    for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       Clock &c = **ci;
-      if (!c.port && !c.m_internal) {
+      if (!c.m_port && !c.m_internal) {
 	if (last.empty())
 	  fprintf(f,
 		  "    %s Clock(s) not associated with one specific port:\n", comment);
@@ -1179,9 +1179,9 @@ emitDefsHDL(bool wrap) {
       m_ports[i]->emitVerilogPortParameters(f);
 #endif
     // Now we emit the declarations (input, output, width) for each module port
-    for (ClocksIter ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
+    for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       Clock &c = **ci;
-      if (!c.port && !c.m_internal) {
+      if (!c.m_port && !c.m_internal) {
 	fprintf(f, "  %s      %s;\n", c.m_output ? "output" : "input", c.signal());
 	if (c.m_reset.size())
 	  fprintf(f, "  input      %s;\n", c.reset());
@@ -1413,9 +1413,9 @@ emitVhdlShell(FILE *f) {
 	  "  port map(\n");
   std::string last;
   if (m_type != Container)
-    for (ClocksIter ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
+    for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       Clock *c = *ci;
-      if (!c->port) {
+      if (!c->m_port) {
 	fprintf(f, "%s    %s => %s", last.c_str(), c->signal(), c->signal());
 	last = ",\n";
 	if (c->m_reset.size()) {
@@ -1534,9 +1534,9 @@ emitVhdlSignalWrapper(FILE *f, const char *topinst) {
     std::string init = "    port map(\n";
     std::string last = init;
     if (m_type != Container)
-      for (ClocksIter ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
+      for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
 	Clock *c = *ci;
-	if (!c->port) {
+	if (!c->m_port) {
 	  if (last.empty())
 	    fprintf(f,
 		    "  -- Clock(s) not associated with one specific port:\n");
@@ -1614,9 +1614,9 @@ emitVhdlRecordWrapper(FILE *f) {
       fprintf(f, "\n    port map(\n");
       std::string last;
       if (m_type != Container)
-	for (ClocksIter ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
+	for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
 	  Clock *c = *ci;
-	  if (!c->port) {
+	  if (!c->m_port && !c->m_internal) {
 	    if (last.empty())
 	      fprintf(f,
 		      "  -- Clock(s) not associated with one specific port:\n");
@@ -1757,7 +1757,7 @@ emitImplHDL(bool wrap) {
   // Aliases for port-specific signals, or simple combinatorial "macros".
   for (unsigned i = 0; i < m_ports.size(); i++) {
     Port *p = m_ports[i];
-    for (unsigned n = 0; n < p->m_count; n++)
+    for (unsigned n = 0; n < p->count(); n++)
       p->emitImplAliases(f, n, lang);
   }
   if (m_language == VHDL) {
@@ -1811,7 +1811,7 @@ emitImplHDL(bool wrap) {
 	      maxPropName, "abort_control_op",
 #if 1
 	      ";"
-#else	      
+#else
 	      !m_scalable && m_ctl.nRunProperties == 0 ? " " : ";"
 #endif
 	      );
@@ -2801,4 +2801,3 @@ emitBsvHDL() {
 #endif
   return 0;
 }
-

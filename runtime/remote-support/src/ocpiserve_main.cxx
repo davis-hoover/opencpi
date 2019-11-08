@@ -133,7 +133,9 @@ public:
       if (m_needsBridging[n])
 	OU::formatAdd(discoveryInfo(), "%s,%s,%u,%u,0x%x,0x%x|",
 		      "ocpi-socket-rdma", " ", OT::ActiveFlowControl, OT::ActiveMessage,
-		      (1 << OT::ActiveFlowControl), (1 << OT::ActiveMessage));
+		      (1 << OT::ActiveFlowControl) | (1 << OT::FlagIsMeta),
+		      (1 << OT::ActiveMessage) | (1 << OT::FlagIsMeta));
+      //		      (1 << OT::ActiveFlowControl), (1 << OT::ActiveMessage));
       discoveryInfo() += "\n";
     }
   }

@@ -55,7 +55,7 @@ OCPI::OS::Posix::getHostname ()
 {
   char buffer[1024];
   if (gethostname (buffer, 1024) != 0) {
-    throw getErrorMessage (errno);
+    throw getErrorMessage (errno, "gethostname");
   }
   return buffer;
 }

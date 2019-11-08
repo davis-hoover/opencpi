@@ -109,7 +109,6 @@ int main(int argc, char **argv) {
   uint8_t runtime = atoi(argv[7]);
   char rx_sample_rate_str [25];
   double rx_sample_rate;
-  int n;
   std::string name, value;
 
   //Check arguments NOT associated with RF frontend
@@ -131,7 +130,7 @@ int main(int argc, char **argv) {
     OA::Application app(xml_name.c_str(), NULL);
     app.initialize();
 
-    bool isParameter;
+    //bool isParameter;
     // printf("Dump of all initial property values:\n");
     // for (unsigned n = 0; app.getProperty(n, name, value, false, &isParameter); n++)
     // printf("Property %2u: %s = \"%s\"%s\n", n, name.c_str(), value.c_str(),
@@ -172,7 +171,7 @@ int main(int argc, char **argv) {
     rx_rf_cutoff_frequency_min_MHz = atof(value.c_str());
     app.getProperty("rx","rf_cutoff_frequency_max_MHz", value);
     rx_rf_cutoff_frequency_max_MHz = atof(value.c_str());
-    if (rf_bw != rx_rf_cutoff_frequency_min_MHz && rf_bw != rx_rf_cutoff_frequency_max_MHz)
+    if (rf_bw < rx_rf_cutoff_frequency_min_MHz || rf_bw > rx_rf_cutoff_frequency_max_MHz)
       {
 	print_limits("Error: invalid rf_bw.\n", rf_bw, rx_rf_cutoff_frequency_min_MHz, rx_rf_cutoff_frequency_max_MHz);
       }
@@ -207,7 +206,7 @@ int main(int argc, char **argv) {
     //Setup Matchstiq-Z1 front end
     app.setProperty("rx","frequency_Mhz", argv[1]);
 
-    n = sprintf(rx_sample_rate_str,  "%f", rx_sample_rate);
+    sprintf(rx_sample_rate_str,  "%f", rx_sample_rate); /// @todo / FIXME - handle return value?
     app.setProperty("rx","sample_rate_Mhz", rx_sample_rate_str);
 
 
@@ -223,11 +222,10 @@ int main(int argc, char **argv) {
     printf("BB cutoff frequency: %s MHz\n", argv[5]);
     printf("BB gain            : %s dB\n",  argv[6]);
     std::string value;
-    app.getProperty("time_server","status",value);
-    uint32_t valid1pps=atol(value.c_str())&0x08000000;
-    printf("Valid 1 PPS        : %s \n", valid1pps ? "true" : "false");
+    app.getProperty("time_server","PPS_ok",value);
+    printf("Valid 1 PPS        : %s \n", value.c_str());
 
-    app.setProperty("time_server","timeNow","0");
+    app.setProperty("time_server","time_now","0");
     app.start();
 
     // workaround for broken property
@@ -266,7 +264,7 @@ int main(int argc, char **argv) {
     printf("DC Offset Peak         = %s\n", value.c_str());
 
     // copy file to local location from ram
-    int i = system("mv /var/volatile/output_file.bin odata/output_file.bin");
+    system("mv /var/volatile/output_file.bin odata/output_file.bin"); /// @todo / FIXME - handle return value?
 
     printf("Application complete\n");
 

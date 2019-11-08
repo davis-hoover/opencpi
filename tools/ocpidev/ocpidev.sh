@@ -30,7 +30,7 @@ Models=(rcc hdl ocl)
 Language_rcc=c++
 Languages_rcc=(c:c c++:cc)
 Language_hdl=vhdl
-Languages_hdl=(vhdl:vhd verilog:v)
+Languages_hdl=(vhdl:vhd)
 Language_ocl=cl
 
 CheckCDK='$(if $(realpath $(OCPI_CDK_DIR)),,\
@@ -118,7 +118,7 @@ function check_dirtype {
 # Determine the path to the current project's top level
 function get_project_top {
   # TODO get project, project.dir
-  project_top=`python3 -c "\
+  project_top=`python3.4 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.get_path_to_project_top());"`
   [ "$project_top" != None ] || bad failure to find project containing path \"`pwd`\"
@@ -127,7 +127,7 @@ import _opencpi.util as ocpiutil; print(ocpiutil.get_path_to_project_top());"`
 # Determine the package-id of the current project
 function get_project_package {
   # TODO get project, project.package_id
-  project_pkg=`python3 -c "\
+  project_pkg=`python3.4 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import Asset; print(Asset.Project(directory=\".\").package);"`
   [ "$project_pkg" != None ] || bad failure to find project package for path \"`pwd`\"
@@ -136,7 +136,7 @@ import Asset; print(Asset.Project(directory=\".\").package);"`
 # Create the link to a project in the installation registry (OCPI_PROJECT_REGISTRY_DIR)
 # based on the project's package name
 function py_try_return_bool {
-  python3 -c "\
+  python3.4 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\")
 import logging
 import _opencpi.util as ocpiutil
@@ -167,7 +167,7 @@ function register_project {
 
   # We want to export a project on register, but only if it is not
   # an exported project itself
-  is_exported=`python3 -c "\
+  is_exported=`python3.4 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.is_path_in_exported_project(\"$project\"));"`
   if [ "$is_exported" == "False" ]; then
@@ -527,7 +527,7 @@ $CheckCDK
 include \$(OCPI_CDK_DIR)/include/project.mk
 EOF
 
-package_id=`python3 -c "\
+package_id=`python3.4 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.get_project_package());"`
 
@@ -717,7 +717,7 @@ EOF
 
 namespace OA = OCPI::API;
 
-int main(int argc, char **argv) {
+int main(/*int argc, char **argv*/) {
   // Reference https://opencpi.github.io/OpenCPI_Application_Development.pdf for
   // an explanation of the ACI.
 
@@ -2324,7 +2324,6 @@ while [[ "${argv[0]}" != "" ]] ; do
     $OCPI_CDK_DIR/scripts/ocpidev_utilization.py $ocpiutilization_options
     exit $?
   elif [[ "${argv[0]}" == run ]] ; then
-    # This is portable while the below is not
     ocpidev_run_options=`sed -E 's/(^| )run( |$)/ /' <<< "${original_argv[@]}"`
     $OCPI_CDK_DIR/scripts/ocpidev_run.py $ocpidev_run_options
     exit $?
@@ -2502,6 +2501,12 @@ while [[ "${argv[0]}" != "" ]] ; do
   fi
   myshift
 done
+#todo move this up where the other ones are when its not just project creation
+if [ "$verb" == "create" -a "$noun" == "project" ]; then
+  ocpidev_create_options=`sed -E 's/(^| )create( |$)/ /' <<< "${original_argv[@]}"`
+  $OCPI_CDK_DIR/scripts/ocpicreate.py $ocpidev_create_options
+  exit $?
+fi
 if [ -n "$help_screen" ]; then
   help
 fi

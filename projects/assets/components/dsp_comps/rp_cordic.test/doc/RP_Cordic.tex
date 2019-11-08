@@ -89,13 +89,14 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Component Data Sheet}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 %----------------------------------------------------------------------------------------
 \date{Version \docVersion} % Force date to be blank and override date with version
 \title{\docTitle}
 \lhead{\small{\docTitle}}
 
 \def\comp{rp\_cordic}
+\def\rcc_comp{rp\_cordic\_for\_fskapp}
 \edef\ecomp{rp_cordic}
 \def\Comp{Rectangular to Polar CORDIC}
 \graphicspath{ {figures/} }
@@ -108,21 +109,42 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 	\rowcolor{blue}
 	                  &                                                    \\
 	\hline
-	Name              & \comp                                              \\
+	Name              & \comp                    \\
 	\hline
 	Worker Type       & Application                                        \\
 	\hline
 	Version           & v\docVersion \\
 	\hline
-	Release Date      & 4/2019 \\
+	Release Date      & 11/2019 \\
 	\hline
 	Component Library & ocpi.assets.dsp\_comps                              \\
 	\hline
-	Workers           & \comp.hdl                                          \\
+	Workers           & \comp.hdl, \rcc_comp.rcc                            \\
 	\hline
-	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL) \\
+	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL), E310(PL)\\
 	\hline
-\end{tabular}
+\end{tabular}\\ \bigskip
+
+\begin{center}
+	\textit{\textbf{Revision History}}
+	\begin{table}[H]
+	\label{table:revisions} % Add "[H]" to force placement of table
+		\begin{tabularx}{\textwidth}{|c|X|l|}
+		\hline
+		\rowcolor{blue}
+		\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+		\hline
+		v1.4 & & 10/2018 \\
+		\hline
+		v1.5 & & 4/2019 \\
+		\hline
+		v1.6 & Convert Worker to Version 2 HDL API & 5/2019 \\
+		\hline
+		v1.6 & Created rp\_cordic\_fsk\_app.rcc worker &  6/2019 \\
+		\hline
+		\end{tabularx}
+	\end{table}
+\end{center}
 
 \section*{Functionality}
 \begin{flushleft}
@@ -150,7 +172,38 @@ The second circuit simply uses a subtractor to implement a $d\phi$ function, whi
 	d\phi = {2 \pi f dt} = {2 \pi f T_s} = \frac{2 \pi f}{F_s} = \frac{2 \pi f \frac{2^{DATAWIDTH-1}}{\pi}}{F_s} = \frac{2f*2^{DATAWIDTH-1}}{F_s}
 \end{equation}
 \newpage
+\subsection*{\rcc_comp.rcc}
+This RCC worker is intended to be used in an all-RCC worker version of the FSK application
+as it is currently implemented. Where components are incorrectly named to reflect their implementation, rather than based on their functionality, i.e. rp\_cordic vs rect\_polar.
+Additionally, this worker implements a secondary function (i.e. FM discriminator), which does not respect the component (1 function) model.
+For these reasons, and those discussed below, it is highly recommended that the usage of this RCC worker be limited to the all-RCC FSK applications and not used for new applications.
 
+This RCC (C++) worker is a work-a-like to the HDL worker, similarly named rp\_cordic.hdl.
+However, it does NOT implement a CORDIC algorithm (i.e. stages of shifts \& adds), but rather utilizes floating point cmath functions to calculate its output.
+Due to HDL worker implementation decisions, which affect performance, the RCC worker was required to implement additional (restrictive) functionality to emulate the HDL worker's behavior.
+
+The calculation that it does first is the phase of all incoming iq samples. Then iterates over the phase values and FM discriminates based on the current and next phase value. 
+The resulting output is given to the output port.
+
+For the magnitude calculation, the HDL implements magnitude as a volatile property, however for RCC workers accessing the property is only viable at the completion of the run method. 
+To reduce unnecessary computations the last sample that would be used to calculate the magnitude sets the property value.
+ 
+The HDL worker will not output the final samples depending on the number of CORDIC stages and pipleline stages. 
+To match the HDL implementation, the rcc worker implements a stage delay using a deque as a FIFO (m\_trailing\_data).
+The FIFO contains the previous input samples that would still be present in the HDL implementation's pipline. 
+Calculations are made when data is present in the FIFO and enough data on the input port is present to push more data out.
+Then on the input data phase calculations are made.
+Finally the remaining input data that would be delayed is passed to the FIFO to be used in the next calculation.  
+
+Memory optimization was made to load the FIFO only with samples known to be used on the next run method call.  Considerations were made to unload existing elements from the FIFO. 
+
+Limitations:  
+
+1) This worker currently does not work with stage delay set to zero. 
+To do so the fm\_discrimination calculation cannot be lookahead but instead looks back at the previous phase value for its calculation.
+A variable will have to be maintained of the previous phase value when fm discriminating.
+
+2) This worker does not implement the CORDIC (shifts-add) algorithm, but equivalent floating point math with fixed-point adjustments (using float to integer truncation).
 \section*{Block Diagrams}
 \subsection*{Top level}
 \begin{center}
@@ -175,67 +228,103 @@ The second circuit simply uses a subtractor to implement a $d\phi$ function, whi
 \end{center}
 
 \subsection*{State Machine}
-\begin{flushleft}
-	Only one finite-state machine (FSM) is implemented by this worker. The FSM supports Zero-Length Messages.
-\end{flushleft}
-{\centering\captionsetup{type=figure}\includegraphics[scale=0.3]{rp_cordic_zlm_fsm}\par\captionof{figure}{Zero-Length Message FSM}\label{fig:rp_cordic_zlm_fsm}}
-\begin{flushleft}
-        Note: In future releases, this worker will be converted to the HDL version 2 API which will remove the need for this state machine.
-\end{flushleft}
-
+None
 
 \newpage
 
 \section*{Source Dependencies}
 \subsection*{\comp.hdl}
 \begin{itemize}
-	\item projects/assets/components/dsp\_comps/rp\_cordic/rp\_cordic.vhd
+	\item projects/assets/components/dsp\_comps/rp\_cordic.hdl/rp\_cordic.vhd
 	\item projects/assets/hdl/primitives/dsp\_prims/dsp\_prims\_pkg.vhd
 	      \subitem projects/assets/hdl/primitives/dsp\_prims/cordic/src/cordic\_rp.vhd
 	      \subitem projects/assets/hdl/primitives/dsp\_prims/cordic/src/cordic.vhd
 	      \subitem projects/assets/hdl/primitives/dsp\_prims/cordic/src/cordic\_stage.vhd
 	\item projects/assets/hdl/primitives/misc\_prims/misc\_prims\_pkg.vhd
 	      \subitem projects/assets/hdl/primitives/misc\_prims/round\_conv/src/round\_conv.vhd
+	\item projects/assets/hdl/primitives/util\_prims/util\_prims\_pkg.vhd
+	      \subitem projects/assets/hdl/primitives/util\_prims/pd/src/peakDetect.vhd
+\end{itemize}
+
+\subsection*{\rcc_comp.rcc}
+\begin{itemize}
+	\item projects/assets/components/dsp\_comps/\rcc_comp.rcc/\rcc_comp.rcc
 \end{itemize}
 
 \begin{landscape}
-	\section*{Component Spec Properties}
+\section*{Component Spec Properties}
 	\begin{scriptsize}
-		\begin{tabular}{|p{3cm}|p{1.5cm}|c|c|c|c|c|p{7cm}|}
+		\begin{longtable}{|p{3cm}|p{1.5cm}|c|c|c|c|c|p{7cm}|}
 			\hline
 			\rowcolor{blue}
 			Name               & Type   & SequenceLength & ArrayDimensions & Accessibility      & Valid Range & Default & Usage                                        \\
 			\hline
-			\verb+DATA_WIDTH+  & UChar  & -              & -               & Readable           & -           & -       & Worker internal non-sign-extended data width \\
+			\verb+DATA_WIDTH+  & UChar  & -              & -               & & -           & -       & Data width of complex input and real output \\
 			\hline
-			\verb+DATA_EXT+    & UChar  & -              & -               & Readable           & -           & -       & \# of extension bits                         \\
+			\verb+DATA_EXT+    & UChar  & -              & -               & & -           & -       & Number of growth bits implemented by CORDIC  \\
 			\hline
-			\verb+STAGES+      & UChar  & -              & -               & Readable           & -           & -       & Number of CORDIC stages implemented          \\
+			\verb+STAGES+      & UChar  & -              & -               & & -           & -       & Number of CORDIC stages to implement          \\
 			\hline
-			\verb+messageSize+ & UShort & -              & -               & Writable, Readable & 8192        & 8192    & Number of bytes in output message            \\
+			\verb+messageSize+ & UShort & -              & -               & Writable & 8192        & 8192    & Number of bytes in output message (Not implemented by Version 2) \\
 			\hline
-			\verb+enable+      & Bool   & -              & -               & Writable, Readable & Standard    & true    & Enable/bypass control                        \\
+			\verb+enable+      & Bool   & -              & -               & Writable & Standard    & true    & Enable(true) or bypass(false)                                      (Not implemented by Version 2) \\
 			\hline
-		\end{tabular}
+		\end{longtable}
 	\end{scriptsize}
 
 	\section*{Worker Properties}
 	\subsection*{\comp.hdl}
 	\begin{scriptsize}
-		\begin{tabular}{|p{3cm}|p{2cm}|c|c|c|c|c|c|p{6cm}|}
+		\begin{longtable}{|p{3cm}|p{2cm}|c|c|c|c|c|c|p{6cm}|}
 			\hline
 			\rowcolor{blue}
 			Type         & Name              & Type  & SequenceLength & ArrayDimensions & Accessibility & Valid Range & Default & Usage                                                    \\
 			\hline
 			SpecProperty & \verb+DATA_WIDTH+ & -     & -              & -               & Parameter     & 8-16        & 16      & Real input and complex output data width                 \\
 			\hline
-			SpecProperty & \verb+DATA_EXT+   & -     & -              & -               & Parameter     & 6           & 6       & CORDIC requirement: \# of extension bits                 \\
+			SpecProperty & \verb+DATA_EXT+   & -     & -              & -               & Parameter     & 6           & 6       & CORDIC requirement: Number of extension bits                 \\
 			\hline
 			SpecProperty & \verb+STAGES+     & -     & -              & -               & Parameter     & 8-16        & 16      & Number of CORDIC stages implemented                      \\
 			\hline
-			Property     & \verb+magnitude+  & Short & -              & -               & Volatile      & Standard    & -       & Read-only amplitude which may be useful for gain control \\
+			Property & \verb+PEAK_MONITOR+     & Bool     & -              & -               & Parameter     & Standard        & true      & Enable/Disable build-time inclusion of peak monitoring          \\
 			\hline
-		\end{tabular}
+			Property     & \verb+peak+  & Short & -              & -               & Volatile      & Standard    & -       & Peak value of FM Discriminator output \\
+			\hline
+			Property     & \verb+magnitude+  & Short & -              & -               & Volatile      & Standard    & -       & Magnitude of I/Q vector. May be useful for gain control \\
+			\hline
+
+		\end{longtable}
+	\end{scriptsize}
+
+	\subsection*{\rcc_comp.rcc}
+	\begin{scriptsize}
+		\begin{longtable}{|p{\dimexpr0.125\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.1\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.05\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.100\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.100\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.1\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.1\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.1\linewidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.2\linewidth-2\tabcolsep\relax}|}
+			\hline
+			\rowcolor{blue}
+			Type         & Name              & Type  & SequenceLength & ArrayDimensions & Accessibility & Valid Range & Default & Usage                                                    \\
+			\hline
+			SpecProperty & \verb+DATA_WIDTH+ & -     & -              & -               & Parameter     & 16        & 16      & Added here to be a FSK workalike, the implementation does not use this. \\
+			\hline
+			SpecProperty & \verb+DATA_EXT+   & -     & -              & -               & Parameter     & 6           & 6       & CORDIC requirement, the implementation does not use this. \\
+			\hline
+			SpecProperty & \verb+STAGES+     & -     & -              & -               & Parameter     & 8-16        & 16      & Used to truncate data to match HDL implementation \\
+			\hline
+			Property     & \verb+magnitude+  & Short & -              & -               & Volatile      & Standard    & -       & Magnitude of I/Q vector. May be useful for gain control \\
+			\hline			
+			Property & \verb+AdditionalDelay+     & UChar     & -              & -               & Parameter     & Standard        & 8      & Additional number of delays over CORDIC stages (STAGES) to match HDL implementation.          \\
+			\hline
+			Property     & \verb+StageDelay+  & UChar & -              & -               & Parameter      & Standard    & STAGES + AdditionalDelay       & Number of delays to match HDL implementation. \\
+			\hline
+
+		\end{longtable}
 	\end{scriptsize}
 
 	\section*{Component Ports}
@@ -260,25 +349,29 @@ The second circuit simply uses a subtractor to implement a $d\phi$ function, whi
 			\rowcolor{blue}
 			Type            & Name & DataWidth & Advanced                & Usage                  \\
 			\hline
-			StreamInterface & in   & 32        & ZeroLengthMessages=true & Signed complex samples \\
+			StreamInterface & in   & 32        & - & Signed complex samples \\
 			\hline
-			StreamInterface & out  & 16        & ZeroLengthMessages=true & Signed real samples    \\
+			StreamInterface & out  & 16        & InsertEOM=1 & Signed real samples    \\
 			\hline
 		\end{tabular}
 	\end{scriptsize}
 \end{landscape}
 
 \section*{Control Timing and Signals}
-The Rectangular to Polar CORDIC worker uses the clock from the Control Plane and standard Control Plane signals.
-
-\noindent There is a start-up delay for this worker. Once the input is ready and valid and the output is ready, there is a delay of \verb+STAGES++4 before the first sample is taken. After this initial delay, valid output data is given \verb+STAGES++4 clock cycles after input data is taken.\medskip
+The Rectangular to Polar CORDIC worker uses the clock from the Control Plane and standard Control Plane signals. This worker has a start-up transient delay of \verb+STAGES++8 valid samples. This means that once the input is ready and valid and the output is ready, it takes that many valid input samples before the first output sample is made available. The delays for this worker are itemized be as follows:
+\begin{itemize}
+	\item 2 : rp\_cordic.vhd
+	\item 5 : rp\_cordic.vhd/cordic\_rp.vhd
+	\item STAGES : rp\_cordic.vhd/cordic\_rp.vhd/cordic.vhd/cordic\_stage.vhd 
+	\item 1 : cordic\_rp.vhd/round\_conv.vhd
+\end{itemize}
 
 \begin{tabular}{|M{4.5cm}|M{1cm}|M{1cm}|M{1.5cm}|M{2cm}|M{1cm}|M{1cm}|M{2.5cm}|}
 	\hline
 	\rowcolor{blue}
 	Latency                      \\
 	\hline
-	\verb+STAGES++3 clock cycles \\
+	\verb+STAGES++8 clock cycles \\
 	\hline
 \end{tabular}
 

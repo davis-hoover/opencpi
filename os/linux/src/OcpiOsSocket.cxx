@@ -144,14 +144,14 @@ connect(const std::string & remoteHost, uint16_t remotePort, bool udp) throw (st
   }
   int fileno = ::socket (PF_INET, udp ? SOCK_DGRAM : SOCK_STREAM, udp ? IPPROTO_UDP : 0);
   if (fileno < 0)
-    throw Posix::getErrorMessage(errno);
+    throw Posix::getErrorMessage(errno, "socket");
   ocpiDebug("Socket connecting to \"%s\" (%s) port %u",
 	    remoteHost.c_str(), inet_ntoa(sin.sin_addr), remotePort);
   while (::connect(fileno, (struct sockaddr *) &sin, sizeof (sin)))
     if (errno != EINTR) {
       ocpiDebug("Connect failed to \"%s\" (%s) port %u with error \"%s\" (%d)",
 		remoteHost.c_str(), inet_ntoa(sin.sin_addr), remotePort, strerror(errno), errno);
-      throw Posix::getErrorMessage(errno);
+      throw Posix::getErrorMessage(errno, "connect");
     }
   o2fd(m_osOpaque) = fileno;
 }
@@ -164,7 +164,7 @@ recv(char *buffer, size_t amount, unsigned timeoutms, bool all) throw (std::stri
     tv.tv_usec = (timeoutms % 1000) * 1000;
     ocpiDebug("[Socket::recv] Setting socket timeout to %u ms", timeoutms);
     if (setsockopt(o2fd (m_osOpaque), SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) != 0)
-      throw "Error setting timeout option for sending: " + Posix::getErrorMessage(errno);
+      throw "Error setting timeout option for sending: " + Posix::getErrorMessage(errno, "setsockopt/recv");
     m_timeoutms = timeoutms;
   }
   size_t nread = 0;
@@ -179,7 +179,7 @@ recv(char *buffer, size_t amount, unsigned timeoutms, bool all) throw (std::stri
 	  break; // return what we read if we timed out trying to get it all...
 	return SIZE_MAX;
       } else
-	throw "Error receiving from network: " + Posix::getErrorMessage (errno);
+	throw "Error receiving from network: " + Posix::getErrorMessage (errno, "recv");
     } else {
       nread += n;
       if (n == 0 || !all)
@@ -202,7 +202,7 @@ recvfrom(char  *buf, size_t amount, int flags,
     tv.tv_usec = (timeoutms % 1000) * 1000;
     ocpiDebug("[Socket::recvfrom] Setting socket timeout to %u ms", timeoutms);
     if (setsockopt(o2fd (m_osOpaque), SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) != 0)
-      throw Posix::getErrorMessage (errno);
+      throw Posix::getErrorMessage (errno, "setsockopt/recvfrom");
     m_timeoutms = timeoutms;
   }
   struct sockaddr * si_other = reinterpret_cast< struct sockaddr *>(src_addr);
@@ -210,7 +210,7 @@ recvfrom(char  *buf, size_t amount, int flags,
   ret= ::recvfrom (o2fd (m_osOpaque), buf, amount, flags, si_other, (socklen_t*)addrlen);
   if (ret == -1) {
     if (errno != EAGAIN && errno != EINTR)
-      throw Posix::getErrorMessage(errno);
+      throw Posix::getErrorMessage(errno, "recvfrom");
     return 0;
   }
   return static_cast<size_t> (ret);
@@ -222,7 +222,7 @@ sendto (const char * data, size_t amount, int flags,  char * src_addr, size_t ad
   struct sockaddr * si_other = reinterpret_cast< struct sockaddr *>(src_addr);
   size_t ret = ::sendto (o2fd (m_osOpaque), data, amount, flags, si_other, (socklen_t)addrlen );
   if (ret == static_cast<size_t> (-1))
-    throw Posix::getErrorMessage(errno);
+    throw Posix::getErrorMessage(errno, "sendto");
   return static_cast<size_t>(ret);
 }
 
@@ -248,7 +248,7 @@ send(const char * data, size_t amount) throw (std::string) {
       if (errno == EINTR)
 	nsent = 0;
       else
-	throw "Error sending to network: " + Posix::getErrorMessage(errno);
+	throw "Error sending to network: " + Posix::getErrorMessage(errno, "send");
     }
   return amount;
 }
@@ -259,7 +259,7 @@ sendmsg (const void * iovect, unsigned int flags  ) throw (std::string) {
   const struct msghdr * iov = static_cast<const struct msghdr *>(iovect);
   ssize_t ret = ::sendmsg (o2fd (m_osOpaque), iov, flags);
   if (ret == -1)
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "sendmsg");
   return static_cast<size_t>(ret);
 }
 
@@ -269,7 +269,7 @@ getPortNo () throw (std::string) {
   socklen_t len = sizeof(sin);
   int ret = ::getsockname(o2fd (m_osOpaque), (struct sockaddr *) &sin, &len);
   if (ret != 0 || len != sizeof (sin))
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "getsockname");
   return ntohs(sin.sin_port);
 }
 
@@ -279,7 +279,7 @@ getPeerName (std::string & peerHost, uint16_t & peerPort) const throw (std::stri
   socklen_t len = sizeof (sin);
   int ret = ::getpeername(o2fd (m_osOpaque), (struct sockaddr *)&sin, &len);
   if (ret != 0 || len != sizeof(sin))
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "getpeername");
   Posix::netDbLock ();
   struct hostent *hent =
     ::gethostbyaddr((const char *) &sin.sin_addr.s_addr, 4, sin.sin_family);
@@ -299,26 +299,26 @@ linger(bool opt) throw (std::string) {
 
   if (::setsockopt(o2fd (m_osOpaque), SOL_SOCKET, SO_LINGER, (char *) &lopt,
 		   sizeof (struct linger)) != 0)
-    throw Posix::getErrorMessage (errno);
+    throw Posix::getErrorMessage (errno, "setsockopt/linger");
 #ifdef OCPI_OS_macos
   int x = 1;
   if (::setsockopt (o2fd (m_osOpaque), SOL_SOCKET, SO_NOSIGPIPE,
                     (void *) &x, sizeof (x)) != 0) {
-    throw Posix::getErrorMessage (errno);
-  }   
+    throw Posix::getErrorMessage (errno, "setsockopt/nosigpipe");
+  }
 #endif
 }
 
 void Socket::
 shutdown (bool sendingEnd) throw (std::string) {
   if (::shutdown(o2fd (m_osOpaque), sendingEnd ? SHUT_WR : SHUT_RD) != 0)
-    throw Posix::getErrorMessage(errno);
+    throw Posix::getErrorMessage(errno, "shutdown");
 }
 
 void Socket::
 close () throw (std::string) {
   if (::close(o2fd(m_osOpaque)))
-    throw Posix::getErrorMessage(errno);
+    throw Posix::getErrorMessage(errno, "socket close");
   o2fd(m_osOpaque) = -1;
 }
 

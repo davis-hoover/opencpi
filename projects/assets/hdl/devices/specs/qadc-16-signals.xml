@@ -1,0 +1,7 @@
+<Signals>
+  <Signal name='clk' direction='in'/>
+  <Signal name='data_i' direction='in' width='16'/>
+  <Signal name='data_q' direction='in' width='16'/>
+  <Signal name='valid' direction='in'/>
+  <Signal name='present' direction='out'/>
+</Signals>

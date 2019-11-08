@@ -72,7 +72,7 @@ public:
   // These members are for spec ports
   std::string m_name;  // spec:
   size_t m_ordinal;    // spec:
-  size_t m_count;      // spec: FIXME: can this change in impl???
+  size_t m_arrayCount; // spec: 0 means no array.  FIXME: can this change in impl???
   std::string m_countExpr;
   bool m_master;       // spec
   ezxml_t m_xml;       // spec or impl
@@ -82,9 +82,9 @@ public:
   std::string typeNameIn, typeNameOut; // impl: used during HDL generation
   const char *pattern; // impl: pattern if it overrides global pattern
   // These three are really for OCP ports, but its good to keep it generic where possible.
-  Clock *clock;        // impl:
-  Port *clockPort;     // impl: used temporarily until other port has clocks defined
-  bool myClock;        // impl
+  Clock *m_clock;      // impl:
+  size_t m_clockPort;  // impl: used temporarily until other port has clocks defined
+  bool m_myClock;      // impl
   ezxml_t m_specXml;   // impl
   Port(Worker &w, ezxml_t x, Port *sp, int ordinal, WIPType type, const char *defaultName,
        const char *&err);
@@ -93,11 +93,16 @@ public:
   virtual Port &clone(Worker &w, std::string &name, size_t count,
 		      OCPI::Util::Assembly::Role *role, const char *&err) const;
   virtual ~Port();
+  // count whether an array or not
+  size_t count() const { return m_arrayCount ? m_arrayCount : 1; }
+  bool isArray() const { return m_arrayCount || !m_countExpr.empty(); }
   Worker &worker() const { return *m_worker; }
+  const char *parseClock(ezxml_t);
   virtual const char *parse();    // second pass parsing for ports referring to each other
   virtual const char *resolveExpressions(OCPI::Util::IdentResolver &ir);
   virtual bool masterIn() const;  // Are master signals inputs at this port?
   Clock &addMyClock(bool output);
+  const char *addMyClock(const char *direction);
   virtual const char *checkClock();
   // This is not cname to deal with a multiple-inheritance issue.  The runtime classes use cname
   const char *pname() const { return m_name.c_str(); }

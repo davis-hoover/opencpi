@@ -26,6 +26,7 @@
 
 #include <inttypes.h>
 #include <climits>
+#include "ezxml.h"
 #include "OcpiUuid.h"
 #include "XferEndPoint.h"
 #include "OcpiRDTInterface.h"
@@ -74,6 +75,8 @@ namespace OCPI {
 	     const OCPI::Util::PValue *params = NULL);
     public:
       virtual ~Device();
+      bool getPPSIsOkay(useconds_t timeout, useconds_t sleepTime);
+      OCPI::OS::Time now(bool &isGps);
       virtual bool init(std::string &error);
       inline Access &properties() const { return m_pfWorker->m_properties; }
       inline Access *timeServer() const {

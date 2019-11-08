@@ -31,6 +31,10 @@
 #else
 #include <generated/autoconf.h>
 #endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
+#include <linux/fpga/fpga-mgr.h>
+#include <linux/of.h>
+#endif
 // TODO: which version actually made this change?
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 9, 0)
 #define ocpi_sk_for_each sk_for_each
@@ -236,7 +240,7 @@ ocpi_get_revision(struct pci_dev *dev) {
 
 static void
 log_debug_block(ocpi_block_t *block, char *msg) {
-  log_debug("%s: block %p: %10lx @ %016llx type(%u) c(%u) pid(%d) prev(%p) next(%p) refcnt(%u)\n",
+  log_debug("%s: block %px: %10lx @ %016llx type(%u) c(%u) pid(%d) prev(%px) next(%px) refcnt(%u)\n",
 	    msg, block, (unsigned long)block->size, block->start_phys, block->type, block->isCached,
 	    block->pid, block->list.prev, block->list.next, (unsigned)atomic_read(&block->refcnt));
 }
@@ -246,7 +250,7 @@ static void
 dump_memory_map(char * label) {
   ocpi_block_t *block;
 
-  log_debug( "dump memory map: %s (%p) prev(%p) next(%p)\n",
+  log_debug( "dump memory map: %s (%px) prev(%px) next(%px)\n",
 	     label, &block_list, block_list.prev, block_list.next);
 
   list_for_each_entry(block, &block_list, list)
@@ -288,7 +292,7 @@ static inline void
 free_kernel_block(ocpi_block_t *block) {
   if (block->size != block->kernel_size) {
     log_debug_block(block, "failed to free kernel block - not merged");
-    log_err("failed to free unmerged kernel block %p - it is leaked\n", block);
+    log_err("failed to free unmerged kernel block %px - it is leaked\n", block);
   } else
     __free_pages(pfn_to_page(block->start_phys >> PAGE_SHIFT), get_order(block->size));
 }
@@ -298,7 +302,7 @@ static inline void
 free_dma_block(ocpi_block_t *block) {
   if (block->size != block->kernel_size) {
     log_debug_block(block, "failed to free dma block - not merged");
-    log_err("failed to free unmerged dma block %p - it is leaked\n", block);
+    log_err("failed to free unmerged dma block %px - it is leaked\n", block);
   } else
     dmam_free_coherent(opencpi_devices[block->minor]->fsdev, block->size, block->virt_addr,
 		       block->bus_addr);
@@ -313,7 +317,7 @@ merge_free_memory(void) {
   list_for_each_entry_safe(block, next, &block_list, list)
     if (block->available) {
       // Merge all the next contiguous blocks into me
-      log_debug("Merge: considering %p/%p/%p a %u %llx=%llx %llx=%llx\n", block, next,
+      log_debug("Merge: considering %px/%px/%px a %u %llx=%llx %llx=%llx\n", block, next,
 		&block_list, next->available,  block->start_phys + block->size, next->start_phys,
 		block->kernel_alloc_id, next->kernel_alloc_id);
       while (&next->list != &block_list && next->available &&
@@ -527,7 +531,7 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
   // dma_set_coherent_mask sets a bit mask describing which bits of an address the device
   // supports, default is 32
   if (dma_set_coherent_mask(opencpi_devices[minor]->fsdev, DMA_BIT_MASK(32)))
-    log_debug("dma_set_coherent_mask failed for device %p\n", opencpi_devices[minor]->fsdev);
+    log_debug("dma_set_coherent_mask failed for device %px\n", opencpi_devices[minor]->fsdev);
   if ((virtual_addr = dmam_alloc_coherent(opencpi_devices[minor]->fsdev, request->actual,
 					  &dma_handle, GFP_KERNEL)) == NULL) {
     log_err("dmam_alloc_coherent failed\n");
@@ -541,8 +545,9 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
 		       request->bus_addr);
     return err;
   }
-  log_debug("requested (%lx) reserved %lx @ %016llx\n", (unsigned long)request->needed,
-	    (unsigned long)request->actual, (unsigned long long)request->address);
+  log_debug("requested (%lx) reserved %lx @ %016llx bus %016llx\n", (unsigned long)request->needed,
+	    (unsigned long)request->actual, (unsigned long long)request->address,
+	    (unsigned long long)request->bus_addr);
   err = 0;
   return err;
 }
@@ -558,7 +563,7 @@ request_memory(struct file *file, ocpi_request_t *request) {
   if (file != NULL)
     minor = GET_MINOR(file);
   request->actual = PAGE_ALIGN(request->needed);
-  log_debug("memory request file %p %lx -> %lx\n",
+  log_debug("memory request file %px %lx -> %lx\n",
 	    file, (unsigned long)request->needed, (unsigned long)request->actual);
   // This is most likely to be used, but possibly will be given back
   // We allocate it outside the spin lock
@@ -609,9 +614,9 @@ request_memory(struct file *file, ocpi_request_t *request) {
   if (spare)
     kfree(spare);
   if (err == 0)
-    log_debug("requested (%lx) reserved %lx @ %016llx\n",
+    log_debug("requested (%lx) reserved %lx @ %016llx bus %016llx\n",
 	      (unsigned long)request->needed, (unsigned long)request->actual,
-	      (unsigned long long)request->address);
+	      (unsigned long long)request->address, (unsigned long long)request->bus_addr);
   return err;
 }
 // ----------------------------------------------------------------------------------------------
@@ -625,7 +630,7 @@ static void
 opencpi_vma_open(struct vm_area_struct *vma) {
   ocpi_block_t *block = vma->vm_private_data;
 
-  log_debug("vma_open: vma %p size %lu @ offset %016llx\n", vma,
+  log_debug("vma_open: vma %px size %lu @ offset %016llx\n", vma,
 	    (unsigned long)(vma->vm_end - vma->vm_start),
 	    (ocpi_address_t)vma->vm_pgoff << PAGE_SHIFT);
   atomic_inc(&block->refcnt);
@@ -639,7 +644,7 @@ opencpi_vma_close(struct vm_area_struct *vma) {
   ocpi_address_t address = vma->vm_pgoff << PAGE_SHIFT;
   ocpi_block_t *block = vma->vm_private_data;
 
-  log_debug("vma close %p block %p count %d: %zx @ %016llx\n",
+  log_debug("vma close %px block %px count %d: %zx @ %016llx\n",
 	    vma, block, atomic_read(&block->refcnt), size, address);
 
   release_block(block);
@@ -665,7 +670,7 @@ opencpi_vma_nopage(struct vm_area_struct *vma, unsigned long virt_addr, int *typ
     unsigned long pfn = vma->vm_pgoff + ((virt_addr - vma->vm_start) >> PAGE_SHIFT);
     struct page *pageptr = pfn_to_page(pfn);
 
-    log_debug("vma_nopage vma %p addr %lx pfn %lx\n", vma, virt_addr, pfn);
+    log_debug("vma_nopage vma %px addr %lx pfn %lx\n", vma, virt_addr, pfn);
     log_debug_block(block, "vma_nopage:");
 
     get_page(pageptr);
@@ -688,13 +693,13 @@ static int opencpi_vma_fault
     unsigned long offset = vmf->pgoff << PAGE_SHIFT;
     struct page *pageptr = virt_to_page(offset);
 #if LINUX_VERSION_CODE > KERNEL_VERSION(4, 10, 0)
-    log_debug("vma_fault vma %p addr %lx pfn %lx\n",
+    log_debug("vma_fault vma %px addr %lx pfn %lx\n",
 	      vmf->vma, vmf->address,
 #elif LINUX_VERSION_CODE == KERNEL_VERSION(4, 10, 0)
-    log_debug("vma_fault vma %p addr %lx pfn %lx\n",
+    log_debug("vma_fault vma %px addr %lx pfn %lx\n",
 	      vma, vmf->address,
 #else
-    log_debug("vma_fault vma %p addr %p pfn %lx\n",
+    log_debug("vma_fault vma %px addr %px pfn %lx\n",
 	      vma, vmf->virtual_address,
 #endif
 	      vmf->pgoff);
@@ -724,7 +729,7 @@ static struct vm_operations_struct opencpi_vm_ops = {
 static int
 opencpi_io_open(struct inode *inode, struct file *file) {
   unsigned minor = iminor(inode);
-  log_debug("open file(%p) minor(%u) initial size(%lld)\n",
+  log_debug("open file(%px) minor(%u) initial size(%lld)\n",
 	    file, minor, inode->i_size);
   if (minor != 0) {
     ocpi_device_t *mydev = opencpi_devices[minor];
@@ -752,7 +757,7 @@ static int
 opencpi_io_release(struct inode *inode, struct file *file) {
   unsigned minor = iminor(inode);
 
-  log_debug("release file(%p) inode(%p) minor(%d)\n", file, inode, minor);
+  log_debug("release file(%px) inode(%px) minor(%d)\n", file, inode, minor);
 
   if (minor == 0) {
     ocpi_block_t *block, *temp;
@@ -773,6 +778,7 @@ opencpi_io_release(struct inode *inode, struct file *file) {
 #ifdef CONFIG_PCI
 static int get_pci(unsigned minor, ocpi_pci_t *pci);
 #endif
+
 // ioctl for getting memory status and requesting memory allocations
 // FIXME: do copy_to/from_user return the right error codes anyway?
 static
@@ -814,7 +820,6 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
   case OCPI_CMD_REQUEST:
     {
       ocpi_request_t request;
-      int err;
       if (copy_from_user(&request, (void __user *)arg, sizeof(request))) {
 	log_err("unable to retrieve memory request\n");
 	return -EFAULT;
@@ -839,6 +844,68 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
       // how to exclude the search? perhaps a module string param?
       return -EINVAL;
     }
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0) && defined(CONFIG_FPGA)
+  case OCPI_CMD_LOAD_FPGA: // use the fpga manager to load a whole (not partial) bitstream
+    {
+      ocpi_load_fpga_request_t request;
+      if (copy_from_user(&request, (void __user *)arg, offsetof(ocpi_load_fpga_request_t, device_path)) ||
+	  strncpy_from_user(request.device_path,
+			    (const char __user *)arg + offsetof(ocpi_load_fpga_request_t, device_path),
+			    sizeof(request.device_path)) >= sizeof(request.device_path)) {
+	log_err("unable to retrieve fpga load request\n");
+	return -EFAULT;
+      }
+      log_debug("fpga load request: addr: %px count: %lu device: %s\n",
+		request.data, (unsigned long)request.length, request.device_path);
+      err = -ENOENT;
+      { // find the fpga manager based on the open-firmware device path
+	struct device_node *node = of_find_node_by_path(request.device_path); // returns NULL on error
+	if (node) {
+	  struct fpga_manager *mgr = of_fpga_mgr_get(node); // returns IS_ERR on error
+	  log_debug("load fpga node: %px, path: %s, name: %s, full: %s, mgr: %px\n",
+		    node, request.device_path, node->name, node->full_name, mgr);
+	  if (!IS_ERR(mgr)) {
+	    const char *buf;
+	    err = -ENOMEM;
+	    if ((buf = vmalloc(request.length))) { // lock user mem and use sg someday?
+	      err = -EFAULT;
+	      log_debug("load fpga loading to: %px\n", buf);
+	      if (!copy_from_user((void *)buf, (void __user *)request.data, request.length)) {
+  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
+		err = fpga_mgs_buf_load(mgr, 0, buf, request.length);
+  #else
+		struct fpga_image_info *info;
+		err = -ENOMEM;
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
+		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {
+		  info->buf = buf;
+		  info->count = request.length;
+		  log_debug("loading fpga\n");
+		  err = -EBUSY;
+		  if (!fpga_mgr_lock(mgr)) {
+		    err = fpga_mgr_load(mgr, info);
+		    fpga_mgr_unlock(mgr);
+		  }
+		  fpga_image_info_free(info);
+		}
+    #else
+		if ((info = kzalloc(sizeof(struct fpga_image_info), GFP_KERNEL))) {
+		  err = fpga_mgr_buf_load(mgr, info, buf, request.length);
+		  kfree(info);
+		}
+    #endif
+  #endif
+	      }
+	      vfree(buf);
+	    }
+	    fpga_mgr_put(mgr);
+	  }
+	  of_node_put(node);
+	}
+      }
+      return err;
+    }
+#endif
   default:
     log_err("ioctl invalid command (%08x)\n", cmd);
     return -EINVAL;
@@ -859,7 +926,7 @@ static int
 opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
 #if 0
   unsigned minor;
-  log_debug("mmap: file %p, f_dentry %p inode %p vma %p\n",
+  log_debug("mmap: file %px, f_dentry %px inode %px vma %px\n",
 	    file, file->f_dentry, file->f_dentry->d_inode, vma);
   minor = iminor(file->f_dentry->d_inode);
   log_debug("mmap: minor: %u\n", minor);
@@ -874,7 +941,7 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
   ocpi_block_t *block = NULL;
   unsigned long pfn = vma->vm_pgoff;
 
-  log_debug("mmap minor %d file %p dev %p, %lx @ %016lx (%016llx to %016llx)\n",
+  log_debug("mmap minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx)\n",
 	    minor, file, mydev, (unsigned long)size, vma->vm_start,
 	    start_address, end_address);
   if (minor == 0) {
@@ -922,7 +989,7 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
       err = remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
   }
   if (err)
-    log_err("mmap failed: minor %d file %p dev %p, %lx @ %016lx (%016llx to %016llx)\n",
+    log_err("mmap failed: minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx)\n",
 	    minor, file, mydev, (unsigned long)size, vma->vm_start,
 	    start_address, end_address);
   else {
@@ -1199,7 +1266,7 @@ remove_pci(struct pci_dev *dev) {
    */
   ocpi_device_t *mydev = pci_get_drvdata(dev);
   if (mydev) {
-    log_debug("pci removing minor device %d at %p\n", mydev->minor, mydev);
+    log_debug("pci removing minor device %d at %px\n", mydev->minor, mydev);
     free_device(mydev);
   } else
     log_err("removing pci with no drvdata?\n");
@@ -1371,9 +1438,9 @@ net_release(struct socket *sock) {
     skb_queue_purge(&sk->sk_receive_queue);
     release_sock(sk);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
-    log_debug("socket %p count %d\n", sock, refcount_read(&sk->sk_refcnt));
+    log_debug("socket %px count %d\n", sock, refcount_read(&sk->sk_refcnt));
 #else
-    log_debug("socket %p count %d\n", sock, atomic_read(&sk->sk_refcnt));
+    log_debug("socket %px count %d\n", sock, atomic_read(&sk->sk_refcnt));
 #endif
     sock_put(sk); // decrement ref count from sock_init_data
   }
@@ -1387,7 +1454,7 @@ static int
 net_receive_cp(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt,
 	    struct net_device *orig_dev) {
 
-  log_debug("Got cp packet: %d %d %d %p %p %d %zd %p %ld\n",
+  log_debug("Got cp packet: %d %d %d %px %px %d %zd %px %ld\n",
 	    skb_headlen(skb), skb->len, dev->ifindex, skb->data, skb_mac_header(skb), skb->pkt_type,
 	    sizeof(struct ethhdr), skb->data - sizeof(struct ethhdr),
 	    ((ulong)skb_mac_header(skb)) & 3);
@@ -1448,7 +1515,7 @@ net_receive_cp(struct sk_buff *skb, struct net_device *dev, struct packet_type *
 static int
 net_receive_dp(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt,
 	    struct net_device *orig_dev) {
-  log_debug("Got dp packet: %d %d %d %p %p\n",
+  log_debug("Got dp packet: %d %d %d %px %px\n",
 	    skb_headlen(skb), skb->len, dev->ifindex, skb->data, skb_mac_header(skb));
   // Handle the packet if it meets all our assumptions
   if (// dev_net(dev) == &init_net &&                      // needed > 2.6.11?
@@ -1747,7 +1814,7 @@ opencpi_init(void) {
 	break;
       }
       mydev->fsdev = fsdev;
-      log_debug("creating device in sysfs: %p kname '%s'\n", fsdev, fsdev->kobj.name);
+      log_debug("creating device in sysfs: %px kname '%s'\n", fsdev, fsdev->kobj.name);
     }
 
 #ifdef CONFIG_PCI

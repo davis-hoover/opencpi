@@ -36,7 +36,7 @@ MIN_COVERAGE=80 #%
 rm -f .coverage
 # Run each test and collect coverage info
 if [ -z "$(type -p coverage3 2> /dev/null)" ]; then
-  pyrun_command="python3"
+  pyrun_command="python3.4"
 else
   pyrun_command="coverage3 run --append"
 fi
@@ -46,9 +46,9 @@ for i in *_test.py; do
 done
 # Run doctest from the CDK 
 find $OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/_opencpi/util ! -name "__init__.py" -name '*.py' |\
-  xargs python3 -m doctest -v 
+  xargs python3.4 -m doctest -v
 
-if [ "$pyrun_command" == "python3" ]; then
+if [ "$pyrun_command" == "python3.4" ]; then
   echo "Skipping coverage report because the coverage command does not exist"
 else
   # TODO: add a minimum coverage threshold
