@@ -13,10 +13,24 @@ stages:
   - test
   - cross-prereq
   - cross-build
+  - hdl-build
+  - hdl-test
   - deploy
 
+# Flow of stages to end stages (Directed Acyclic Graph)
+# The "needs" property defines these paths
+#
+# SW Platform
+#   CentOS6/7
+#     prereq > build > test
+#   Xilinx13_3/4
+#     prereq > build > cross-prereq > cross-build
+# Simulators
+#   xsim
+#     prereq > build > hdl-build > hdl-test
+
 #------------------------------------------------------------------------------
-# PREP
+# PREREQ
 #------------------------------------------------------------------------------
 
 prep:centos6:
@@ -70,7 +84,7 @@ prereq:centos7:
     - ./scripts/install-prerequisites.sh
 
 #------------------------------------------------------------------------------
-# BUILD
+# BUILD (prereq)
 #------------------------------------------------------------------------------
 
 build:centos6:
@@ -146,7 +160,7 @@ build:docs:
     - mv doc/pdfs/* public/
 
 #------------------------------------------------------------------------------
-# TEST
+# TEST (prereq > build)
 #------------------------------------------------------------------------------
 
 test:centos6:
@@ -190,7 +204,7 @@ test:centos7:
     - ./scripts/test-opencpi.sh
 
 #------------------------------------------------------------------------------
-# CROSS PREREQ
+# CROSS PREREQ (prereq > build)
 #------------------------------------------------------------------------------
 
 cross-prereq:centos6:xilinx13_3:
@@ -278,7 +292,7 @@ cross-prereq:centos7:xilinx13_4:
     - ./scripts/install-prerequisites.sh xilinx13_4
 
 #------------------------------------------------------------------------------
-# CROSS BUILD
+# CROSS BUILD (prereq > build > cross-prereq)
 #------------------------------------------------------------------------------
 
 cross-build:centos6:xilinx13_3:
@@ -362,6 +376,120 @@ cross-build:centos7:xilinx13_4:
     - ./scripts/build-opencpi.sh xilinx13_4
 
 #------------------------------------------------------------------------------
+# HDL BUILD (prereq > build)
+#------------------------------------------------------------------------------
+
+hdl-build:centos6:xsim:
+  stage: hdl-build
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xsim"
+    policy: push
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  dependencies: ["build:centos6"]
+  needs: ["build:centos6"]
+  script:
+    - source cdk/opencpi-setup.sh -e
+    - ocpidev build hdl -d projects/core --hdl --hdl-platform xsim
+    - ocpidev build test -d projects/core --hdl --hdl-platform xsim
+    # - ocpidev build hdl -d projects/assets --hdl --hdl-platform xsim
+    # - ocpidev build test -d projects/assets --hdl --hdl-platform xsim
+    # - ocpidev build hdl -d projects/assets_ts --hdl --hdl-platform xsim
+    # - ocpidev build test -d projects/assets_ts --hdl --hdl-platform xsim
+    # - ocpidev build hdl -d projects/inactive --hdl --hdl-platform xsim
+    # - ocpidev build test -d projects/inactive --hdl --hdl-platform xsim
+
+hdl-build:centos7:xsim:
+  stage: hdl-build
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xsim"
+    policy: push
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  dependencies: ["build:centos7"]
+  needs: ["build:centos7"]
+  script:
+    - source cdk/opencpi-setup.sh -e
+    - ocpidev build hdl -d projects/core/ --hdl --hdl-platform xsim
+    - ocpidev build test -d projects/core/ --hdl --hdl-platform xsim
+    # - ocpidev build hdl -d projects/assets/ --hdl --hdl-platform xsim
+    # - ocpidev build test -d projects/assets/ --hdl --hdl-platform xsim
+    # - ocpidev build hdl -d projects/assets_ts/ --hdl --hdl-platform xsim
+    # - ocpidev build test -d projects/assets_ts/ --hdl --hdl-platform xsim
+    # - ocpidev build hdl -d projects/inactive/ --hdl --hdl-platform xsim
+    # - ocpidev build test -d projects/inactive/ --hdl --hdl-platform xsim
+
+#------------------------------------------------------------------------------
+# HDL TEST (prereq > build > hdl-build)
+#------------------------------------------------------------------------------
+
+hdl-test:centos6:xsim:
+  stage: hdl-test
+  tags:
+    - shell
+    - centos6
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xsim"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["hdl-build:centos6:xsim"]
+  script:
+    - source cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/core/ --only-platform xsim --mode prep_run_verify
+    # - ocpidev run tests -d projects/assets/ --only-platform xsim --mode prep_run_verify
+    # - ocpidev run tests -d projects/assets_ts/ --only-platform xsim --mode prep_run_verify
+    # - ocpidev run tests -d projects/inactive/ --only-platform xsim --mode prep_run_verify
+
+hdl-test:centos7:xsim:
+  stage: hdl-test
+  tags:
+    - shell
+    - centos7
+    - opencpi
+  cache:
+    key: "$CI_PIPELINE_IID-xsim"
+    policy: pull
+    paths:
+      - build/
+      - exports/
+      - os/
+      - prerequisites/
+      - prerequisites-build/
+      - projects/
+  needs: ["hdl-build:centos7:xsim"]
+  script:
+    - source cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/core/ --only-platform xsim --mode prep_run_verify
+    # - ocpidev run tests -d projects/assets/ --only-platform xsim --mode prep_run_verify
+    # - ocpidev run tests -d projects/assets_ts/ --only-platform xsim --mode prep_run_verify
+    # - ocpidev run tests -d projects/inactive/ --only-platform xsim --mode prep_run_verify
+
+#------------------------------------------------------------------------------
 # DEPLOY
 #------------------------------------------------------------------------------
 
@@ -378,3 +506,4 @@ pages:
     - master
   script:
     - echo "Uploading OpenCPI docs to gitlab.io"
+
