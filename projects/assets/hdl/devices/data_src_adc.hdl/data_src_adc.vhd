@@ -16,6 +16,10 @@ architecture rtl of worker is
   signal adc_rst   : std_logic := '0';
   signal adc_idata : data_complex_adc_t;
 
+  signal adc_pending_initial_ready   : std_logic := '0';
+  signal adc_pending_initial_ready_r : std_logic := '0';
+
+  signal adc_overrun_generator_ivld      : std_logic := '0';
   signal adc_overrun_generator_odata     : data_complex_adc_t;
   signal adc_overrun_generator_ometadata : metadata_t;
   signal adc_overrun_generator_ovld      : std_logic := '0';
@@ -60,6 +64,28 @@ begin
 
   out_port_data_width_32 : if(OUT_PORT_DATA_WIDTH = 32) generate
 
+    -- this can't be simply dev_in.valid, otherwise sync message would be sent
+    -- before first sample message in the event ADC is streaming before the
+    -- output port first becomes ready to accept data (sync means
+    -- *discontinuity*, and exclaiming discontinuity when there is only "after"
+    -- data, not "before"-and-"after" data, would not be correct)
+    adc_overrun_generator_ivld <= dev_in.valid and
+                                  (not adc_pending_initial_ready);
+
+    adc_pending_initial_ready <= '1' when (adc_data_widener_irdy = '0') and
+        (adc_pending_initial_ready_r = '1') else '0';
+
+    adc_pending_initial_ready_reg : process(dev_in.clk)
+    begin
+      if(rising_edge(dev_in.clk)) then
+        if(adc_rst = '1') then
+          adc_pending_initial_ready_r <= '1';
+        else
+          adc_pending_initial_ready_r <= adc_pending_initial_ready;
+        end if;
+      end if;
+    end process;
+
     overrun_generator :
         misc_prims.misc_prims.adc_samp_drop_detector
       port map(
@@ -69,7 +95,7 @@ begin
         status    => adc_status,
         -- INPUT INTERFACE
         idata     => adc_idata,
-        ivld      => dev_in.valid,
+        ivld      => adc_overrun_generator_ivld,
         -- OUTPUT INTERFACE
         odata     => adc_overrun_generator_odata,
         ometadata => adc_overrun_generator_ometadata,

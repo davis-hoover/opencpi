@@ -15,7 +15,6 @@ entity wsi_message_sizer is
     eom                    : out Bool_t);
 end entity wsi_message_sizer;
 architecture rtl of wsi_message_sizer is
-  signal som_s            : std_logic := '0';
   signal eom_s            : std_logic := '0';
   signal give_counter_rst : std_logic := '0';
   signal give_counter_cnt : unsigned(SIZE_BIT_WIDTH-1 downto 0) := (others => '0');
@@ -29,7 +28,7 @@ begin
       BIT_WIDTH => SIZE_BIT_WIDTH)
     port map(
       clk => clk,
-      rst => rst,
+      rst => give_counter_rst,
       en  => give,
       cnt => give_counter_cnt);
 
