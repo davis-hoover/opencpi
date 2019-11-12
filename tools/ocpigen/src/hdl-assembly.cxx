@@ -312,8 +312,9 @@ parseHdlAssy() {
 	    break;
 	  case SDPPort:
 	    if (ip->m_port->m_master && i->m_worker->m_type == Worker::Configuration) {
-	      OU::format(sdpClock.m_signal, "%s_%s_out_i.Clk", i->cname(), ip->m_port->pname());
-	      OU::format(sdpClock.m_reset, "%s_%s_out_i.Reset", i->cname(), ip->m_port->pname());
+	      const char *index = ip->m_port->isArray() ? "(0)" : "";
+	      OU::format(sdpClock.m_signal, "%s_%s_out_i%s.Clk", i->cname(), ip->m_port->pname(), index);
+	      OU::format(sdpClock.m_reset, "%s_%s_out_i%s.Reset", i->cname(), ip->m_port->pname(), index);
 	      ocpiInfo("Adding the top level SDP clock, for the container: %s %s %s",
 		       sdpClock.cname(), sdpClock.m_signal.c_str(), sdpClock.m_reset.c_str());
 	    } else if (!ip->m_port->m_master)
