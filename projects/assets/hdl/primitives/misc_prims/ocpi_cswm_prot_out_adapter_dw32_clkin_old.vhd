@@ -47,7 +47,6 @@ architecture rtl of cswm_prot_out_adapter_dw32_clkin_old is
   signal state        : state_t := IDLE;
   signal state_r      : state_t := IDLE;
 
-  signal samples_som  : std_logic := '0';
   signal samples_eom  : std_logic := '0';
   signal give         : std_logic := '0';
   signal som          : std_logic := '0';
@@ -55,6 +54,7 @@ architecture rtl of cswm_prot_out_adapter_dw32_clkin_old is
 
   signal message_sizer_rst      : std_logic := '0';
   signal message_sizer_give     : std_logic := '0';
+  signal message_sizer_som      : std_logic := '0';
   signal message_sizer_eom      : std_logic := '0';
   signal force_end_of_samples   : std_logic := '0';
   signal force_end_of_samples_r : std_logic := '0';
@@ -186,13 +186,14 @@ begin
   end process imetadata_demux;
 
   -- TODO / FIXME - handle USER messages
-  ogen : process(state, idata_r, samples_som, samples_eom, imetadata_r2, imetadata_r)
+  ogen : process(state, idata_r, message_sizer_som, message_sizer_eom,
+                 force_end_of_samples, oready, imetadata_r2, imetadata_r)
   begin
     case state is
       when SAMPLES =>
         opcode    <= SAMPLES;
         odata   <= idata_r.q & idata_r.i;
-        som     <= samples_som;
+        som     <= message_sizer_som;
 
         -- handles forced EOM due to data_vld=1 error_samp_drop=1
         ovalid  <= not force_end_of_samples;
@@ -260,7 +261,7 @@ begin
       rst                    => message_sizer_rst,
       give                   => message_sizer_give,
       message_size_num_gives => to_unsigned(4092, 16),
-      som                    => samples_som,
+      som                    => message_sizer_som,
       eom                    => message_sizer_eom);
 
   ogive        <= give;

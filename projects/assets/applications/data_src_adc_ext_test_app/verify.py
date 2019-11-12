@@ -51,6 +51,11 @@ for msg in msgs:
                     num_expected_diffs += 1
             last_i_or_q = i_or_q
             first = False
+
+if(num_expected_diffs == 0):
+    print("ERROR: 1 or more messages with 2 or more samples is expected in",
+          "order to perform first backwards diff verification for ramp input")
+    exit(1)
 print("num_expected_diffs =", num_expected_diffs)
 print("num_unexpected_diffs = 0")
 
