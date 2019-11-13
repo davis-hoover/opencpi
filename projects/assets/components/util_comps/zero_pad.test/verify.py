@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -54,7 +54,7 @@ elif width == 8:
     fileType = 'uint8'
     numSamps = numSamps * 4
 else:
-    print("Invalid output width!")
+    print('Invalid output width!')
     sys.exit(1)
 
 #Read all of input data file as int8/int16/int32/int64 samples
@@ -62,12 +62,12 @@ fx = open(sys.argv[2], 'rb')
 dout = numpy.fromfile(fx, dtype=fileType, count=-1)
 #Ensure dout is not all zeros
 if all(dout == 0):
-    print color.RED + color.BOLD + 'FAILED, values are all zero' + color.END
+    print(color.RED + color.BOLD + 'FAILED, values are all zero' + color.END)
     sys.exit(100)
 #Ensure that dout is the expected amount of data
 if len(dout) != numSamps * (numZeros+1):
-    print color.RED + color.BOLD + 'FAILED, input file length is unexpected' + color.END
-    print color.RED + color.BOLD + 'Length dout = ', len(dout), 'while expected length is = ' + color.END, numSamps * (numZeros+1)
+    print(color.RED + color.BOLD + 'FAILED, input file length is unexpected' + color.END)
+    print(color.RED + color.BOLD + 'Length dout = ', len(dout), 'while expected length is = ' + color.END, numSamps * (numZeros+1))
     sys.exit(101)
 
 #numZeros 8/16/32/64-bit zeros are placed between input samples
@@ -76,14 +76,14 @@ myPattern = 0x0123456789ABCDEF
 ttype = numpy.iinfo(fileType)
 firstIdx=64/width-1
 idx=firstIdx
-for i in xrange(0,len(dout)):
+for i in range(0,len(dout)):
     #print color.RED + color.BOLD + 'dout[i] =' + hex(dout[i])
     #print color.RED + color.BOLD + 'i mod numZeros+1 =', i % (numZeros+1)
     if not(i % (numZeros+1)):
         #print color.RED + color.BOLD + 'myPattern >> idx*width&ttype.max =', hex(myPattern >> idx*width&ttype.max)
         if dout[i] != myPattern >> idx*width&ttype.max:
-            print color.RED + color.BOLD + '#1.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X')
-            print color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END
+            print(color.RED + color.BOLD + '#1.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X'))
+            print(color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END)
             sys.exit(102)
         if idx == 0:
             idx=firstIdx
@@ -91,6 +91,6 @@ for i in xrange(0,len(dout)):
             idx-=1
     else:
          if dout[i] != 0:
-            print color.RED + color.BOLD + '#2.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X')
-            print color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END
+            print(color.RED + color.BOLD + '#2.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X'))
+            print(color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END)
             sys.exit(102)

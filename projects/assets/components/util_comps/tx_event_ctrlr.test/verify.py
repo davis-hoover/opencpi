@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -69,7 +69,7 @@ try:
     raise ValueError('out port sent unexpected opcode: ' + get_opcode_str(opcode))
 
 except ValueError as err:
-  print color.RED + color.BOLD + 'FAILED, ' + err.message + color.END
+  print(color.RED + color.BOLD + 'FAILED, ' + err.message + color.END)
   exit_status = 1
 
 finally:

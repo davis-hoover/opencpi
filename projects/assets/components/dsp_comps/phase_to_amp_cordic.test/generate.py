@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -35,7 +35,7 @@ import struct
 if len(sys.argv) != 2:
     print("Invalid arguments:  usage is: generate.py <output-file>")
     sys.exit(1)
-print "    GENERATE (16b real binary data file):"
+print("    GENERATE (16b real binary data file):")
 
 CONSTANT_VALUE = int(os.environ.get("OCPI_TEST_CONSTANT_VALUE"))
 NUM_SAMPLES = int(os.environ.get("OCPI_TEST_NUM_SAMPLES"))
@@ -45,6 +45,6 @@ for x in range(0,NUM_SAMPLES):
     f.write(struct.pack('h', CONSTANT_VALUE))
 f.close()
 
-print '    Value of constant: ', CONSTANT_VALUE
-print '    Number of bytes: ', NUM_SAMPLES*2
-print '    Number of 16b words: ', NUM_SAMPLES
+print("    Value of constant: ", CONSTANT_VALUE)
+print("    Number of bytes: ", NUM_SAMPLES*2)
+print("    Number of 16b words: ", NUM_SAMPLES)

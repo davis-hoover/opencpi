@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -67,8 +67,8 @@ def AvgPeakError(x,y,n):
         sumDiffsY+=abs(y[k])
     x_err=sumDiffsX/n
     y_err=sumDiffsY/n
-    print "  AvgX Peak Error = %.3f" % (x_err)
-    print "  AvgY Peak Error = %.3f" % (y_err)
+    print("  AvgX Peak Error = %.3f" % (x_err))
+    print("  AvgY Peak Error = %.3f" % (y_err))
 
     if (x_err and y_err) <= 1:
         return 1
@@ -96,14 +96,14 @@ def CountErrors(diffs,n):
         else:
             error5bit+=1;
 
-    print "  error +-1= %d\t %% Err = %.3f" % (error1bit, (error1bit/n)*100)
-    print "  error +-2= %d\t %% Err = %.3f" % (error2bit, (error2bit/n)*100)
-    print "  error +-4 = %d\t %% Err = %.3f" % (error3bit, (error3bit/n)*100)
-    print "  error +-8 = %d\t %% Err = %.3f" % (error4bit, (error4bit/n)*100)
-    print "  error +-16 = %d\t %% Err = %.3f" % (error5bit, (error5bit/n)*100)
+    print("  error +-1= %d\t %% Err = %.3f" % (error1bit, (error1bit/n)*100))
+    print("  error +-2= %d\t %% Err = %.3f" % (error2bit, (error2bit/n)*100))
+    print("  error +-4 = %d\t %% Err = %.3f" % (error3bit, (error3bit/n)*100))
+    print("  error +-8 = %d\t %% Err = %.3f" % (error4bit, (error4bit/n)*100))
+    print("  error +-16 = %d\t %% Err = %.3f" % (error5bit, (error5bit/n)*100))
     totalError = (error1bit/n) + (error2bit/n) \
     + (error3bit/n) + (error4bit/n) + (error5bit/n)
-    print "==== Sanity check, total %% Err = %.3f" % (totalError*100)
+    print("==== Sanity check, total %% Err = %.3f" % (totalError*100))
 
 def getDATA(FILE):
 
@@ -118,8 +118,8 @@ def getDATA(FILE):
 
 def main():
 
-    print 'Number of arguments:', len(sys.argv), 'arguments.'
-    print 'Argument List:', str(sys.argv)
+    print("Number of arguments:", len(sys.argv), "arguments.")
+    print("Argument List:", str(sys.argv))
 
     if len(sys.argv) < 4:
         print("Usage expected: OCPI_TEST_NUM_SAMPLES=129023 OCPI_TEST_DATA_WIDTH=16 OCPI_TEST_STAGES=18 ./analyze_pr_cordic.py plot, output file, input file")
@@ -153,13 +153,13 @@ def main():
 
     x_peak_err=dispGetPeakErr(diffsX,NUM_OUTPUT_SAMPLES)
     y_peak_err=dispGetPeakErr(diffsY,NUM_OUTPUT_SAMPLES)
-    print "Peak Errors"
-    print "  X Peak Error = %d" % (x_peak_err)
-    print "  Y Peak Error = %d" % (y_peak_err)
+    print("Peak Errors")
+    print("  X Peak Error = %d" % (x_peak_err))
+    print("  Y Peak Error = %d" % (y_peak_err))
 
-    print "X Errors"
+    print("X Errors")
     CountErrors(diffsX,NUM_OUTPUT_SAMPLES)
-    print "Y Errors"
+    print("Y Errors")
     CountErrors(diffsY,NUM_OUTPUT_SAMPLES)
 
     # only pass if both of these test cases pass
@@ -207,12 +207,12 @@ def main():
         plt.title("Difference of Y -- Lower 16-bits")
         plt.grid()
 
-        plt.figure(8)
-        plt.plot(diffsX)
+        plt.figure(8) 
+        plt.plot(diffsX) 
         plt.title("Difference of X -- Upper 16-bits")
         plt.grid()
 
-        plt.figure(9)
+        plt.figure(9) 
         plt.plot(oLower16, color='r')
         plt.plot(y_expected, color='b')
         plt.title("Y: Red=Actual, Blue=Expected Data -- Lower 16-bits")
