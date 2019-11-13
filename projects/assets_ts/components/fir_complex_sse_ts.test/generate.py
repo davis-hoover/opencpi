@@ -57,7 +57,7 @@ if COEFF_WIDTH == 16:
 elif COEFF_WIDTH == 8:
     impulse_array=np.concatenate(([np.iinfo(np.int8).max],np.zeros(num_taps-1,dtype=np.int16)))
 else:
-    print('  FAILED: Unsupported coefficient width: ' + str(COEFF_WIDTH))
+    print("  FAILED: Unsupported coefficient width: " + str(COEFF_WIDTH))
     sys.exit(1)        
 
 num_impulse_arrays_required = int(min_samples_to_generate // num_taps + 1)

@@ -106,7 +106,7 @@ def impulse_cmplx_bin(filename): #COMPLEX - BINARY
     elif coeff_width == 8:
         data[0] = 0x007f007f
     else:
-        print('  FAILED: Unsupported coefficient width: ' + str(coeff_width))
+        print("  FAILED: Unsupported coefficient width: " + str(coeff_width))
         sys.exit(1)        
     fo = open(filename, 'wb')
     addmsg(fo, INTERVAL_OPCODE, array.array('I',(int('00000000',16), int('0000008C',16)))) #30.72 MHz

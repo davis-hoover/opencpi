@@ -80,7 +80,7 @@ def getDATA(FILE):
 
 
 if len(sys.argv) != 3:
-    print("Invalid arguments: usage is verify.py <output_file> <input_file>")
+    print('Invalid arguments: usage is verify.py <output_file> <input_file>')
     sys.exit(1)
 
 OFILE = sys.argv[1]
@@ -116,5 +116,5 @@ y_peak_err=dispGetPeakErr(diffsY,NUM_OUTPUT_SAMPLES)
 
 # Verify - Output is within the acceptable tolerances.
 if ((check_AvgPeakError != 1) or (check_AvgPeakError >= 1)) and (x_peak_err > 1) and (y_peak_err > 1):
-    print ('\tAvgPeakError = ', check_AvgPeakError, 'x_peak_err = ', x_peak_err, 'y_peak_err = ', y_peak_err, '')
+    print('\tAvgPeakError = ', check_AvgPeakError, 'x_peak_err = ', x_peak_err, 'y_peak_err = ', y_peak_err, '')
     sys.exit(1)
