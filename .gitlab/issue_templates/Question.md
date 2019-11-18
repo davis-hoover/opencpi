@@ -6,4 +6,3 @@ resolved by a good simple answer.)
 
 
 /label ~"type::question"
-/assign @nknowles88
