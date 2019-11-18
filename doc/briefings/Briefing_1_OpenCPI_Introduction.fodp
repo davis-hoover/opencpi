@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.presentation">
- <office:meta><meta:editing-cycles>14</meta:editing-cycles><meta:creation-date>2019-10-31T15:39:36.003476316</meta:creation-date><meta:editing-duration>PT2H18M3S</meta:editing-duration><meta:generator>LibreOffice/6.2.8.2$MacOSX_X86_64 LibreOffice_project/f82ddfca21ebc1e222a662a32b25c0c9d20169ee</meta:generator><dc:title>Briefing_Template</dc:title><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-11-12T11:05:42.526081505</dc:date><dc:creator>James Kulp</dc:creator><meta:document-statistic meta:object-count="943"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="Briefing_Template" xlink:href="Briefing_Template.otp" meta:date="2019-11-08T17:24:52.327236596"/></office:meta>
+ <office:meta><meta:editing-cycles>19</meta:editing-cycles><meta:creation-date>2019-10-31T15:39:36.003476316</meta:creation-date><meta:editing-duration>PT6H8M43S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><dc:title>Briefing_Template</dc:title><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-11-18T14:48:20.670255340</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:object-count="943"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="HiddenSlides" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="MMClips" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="Notes" meta:value-type="float">17</meta:user-defined><meta:user-defined meta:name="PresentationFormat" meta:value-type="string">Letter Paper (8.5x11 in)</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="Slides" meta:value-type="float">34</meta:user-defined><meta:user-defined meta:name="_NewReviewCycle" meta:value-type="string"/><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="Briefing_Template" xlink:href="Briefing_Template.otp" meta:date="2019-11-08T17:24:52.327236596"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="VisibleAreaTop" config:type="int">1197</config:config-item>
-   <config:config-item config:name="VisibleAreaLeft" config:type="int">-386</config:config-item>
+   <config:config-item config:name="VisibleAreaTop" config:type="int">-273</config:config-item>
+   <config:config-item config:name="VisibleAreaLeft" config:type="int">-2003</config:config-item>
    <config:config-item config:name="VisibleAreaWidth" config:type="int">29649</config:config-item>
    <config:config-item config:name="VisibleAreaHeight" config:type="int">19756</config:config-item>
    <config:config-item-map-indexed config:name="Views">
@@ -35,10 +35,10 @@
      <config:config-item config:name="IsClickChangeRotation" config:type="boolean">true</config:config-item>
      <config:config-item config:name="SlidesPerRow" config:type="short">4</config:config-item>
      <config:config-item config:name="EditMode" config:type="int">0</config:config-item>
-     <config:config-item config:name="VisibleAreaTop" config:type="int">1197</config:config-item>
-     <config:config-item config:name="VisibleAreaLeft" config:type="int">-386</config:config-item>
-     <config:config-item config:name="VisibleAreaWidth" config:type="int">26293</config:config-item>
-     <config:config-item config:name="VisibleAreaHeight" config:type="int">26988</config:config-item>
+     <config:config-item config:name="VisibleAreaTop" config:type="int">-273</config:config-item>
+     <config:config-item config:name="VisibleAreaLeft" config:type="int">-2003</config:config-item>
+     <config:config-item config:name="VisibleAreaWidth" config:type="int">29650</config:config-item>
+     <config:config-item config:name="VisibleAreaHeight" config:type="int">19757</config:config-item>
      <config:config-item config:name="GridCoarseWidth" config:type="int">2540</config:config-item>
      <config:config-item config:name="GridCoarseHeight" config:type="int">2540</config:config-item>
      <config:config-item config:name="GridFineWidth" config:type="int">254</config:config-item>
@@ -98,9 +98,9 @@
    <config:config-item config:name="ParagraphSummation" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrintQuality" config:type="int">0</config:config-item>
    <config:config-item config:name="PrinterIndependentLayout" config:type="string">low-resolution</config:config-item>
-   <config:config-item config:name="PrinterName" config:type="string">172.16.64.15</config:config-item>
+   <config:config-item config:name="PrinterName" config:type="string">Officejet Pro 8600</config:config-item>
    <config:config-item config:name="PrinterPaperFromSetup" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrinterSetup" config:type="base64Binary">5wD+/zE3Mi4xNi42NC4xNQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASFAgTGFzZXJKZXQgNTAwIGNvbG9yIE01NTEAAAAAAAAWAAQABAAAAAAAAAAIAFZUAAAkbQAAAAAAABIAQ09NUEFUX0RVUExFWF9NT0RFEwBEdXBsZXhNb2RlOjpVbmtub3du</config:config-item>
+   <config:config-item config:name="PrinterSetup" config:type="base64Binary">5wD+/09mZmljZWpldCBQcm8gODYwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASFAgT2ZmaWNlamV0IFBybyA4NjAwLUFpclByaW50AAAWAAQABAAAAAAAAAAIAFZUAAAkbQAAAAAAABIAQ09NUEFUX0RVUExFWF9NT0RFEwBEdXBsZXhNb2RlOjpVbmtub3du</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
    <config:config-item config:name="SlidesPerHandout" config:type="short">6</config:config-item>
@@ -109,7 +109,9 @@
  </office:settings>
  <office:scripts>
   <office:script script:language="ooo:Basic">
-   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ooo:library-embedded ooo:name="Standard"/>
+   </ooo:libraries>
   </office:script>
  </office:scripts>
  <office:font-face-decls>
@@ -117,8 +119,8 @@
   <style:font-face style:name="Calibri1" svg:font-family="Calibri"/>
   <style:font-face style:name="Tahoma1" svg:font-family="Tahoma"/>
   <style:font-face style:name="ＭＳ Ｐゴシック1" svg:font-family="&apos;ＭＳ Ｐゴシック&apos;"/>
-  <style:font-face style:name="Tahoma4" svg:font-family="Tahoma" style:font-family-generic="swiss"/>
   <style:font-face style:name="Arial" svg:font-family="Arial" style:font-pitch="variable"/>
+  <style:font-face style:name="Arial Unicode MS1" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-pitch="variable"/>
   <style:font-face style:name="Calibri" svg:font-family="Calibri" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Sans1" svg:font-family="&apos;Liberation Sans&apos;" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Serif1" svg:font-family="&apos;Liberation Serif&apos;" style:font-pitch="variable"/>
@@ -132,9 +134,10 @@
   <style:font-face style:name="Tahoma2" svg:font-family="Tahoma" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Sans2" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="swiss" style:font-pitch="variable"/>
   <style:font-face style:name="Tahoma3" svg:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable"/>
+  <style:font-face style:name="Arial Unicode MS" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
   <style:font-face style:name="Lucida Sans" svg:font-family="&apos;Lucida Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
   <style:font-face style:name="PingFang SC" svg:font-family="&apos;PingFang SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
-  <style:font-face style:name="Tahoma5" svg:font-family="Tahoma" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Tahoma4" svg:font-family="Tahoma" style:font-family-generic="system" style:font-pitch="variable"/>
   <style:font-face style:name="ＭＳ Ｐゴシック2" svg:font-family="&apos;ＭＳ Ｐゴシック&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
  </office:font-face-decls>
  <office:styles>
@@ -159,7 +162,7 @@
    <style:paragraph-properties style:text-autospace="ideograph-alpha" style:punctuation-wrap="simple" style:line-break="strict" style:font-independent-line-spacing="false">
     <style:tab-stops/>
    </style:paragraph-properties>
-   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="24pt" fo:language="en" fo:country="US" style:font-name-asian="Tahoma5" style:font-size-asian="24pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Tahoma5" style:font-size-complex="24pt" style:language-complex="hi" style:country-complex="IN"/>
+   <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="24pt" fo:language="en" fo:country="US" style:font-name-asian="Tahoma4" style:font-size-asian="24pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Tahoma4" style:font-size-complex="24pt" style:language-complex="hi" style:country-complex="IN"/>
   </style:default-style>
   <style:style style:name="standard" style:family="graphic">
    <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm" svg:stroke-color="#3465a4" draw:marker-start-width="0.2cm" draw:marker-start-center="false" draw:marker-end-width="0.2cm" draw:marker-end-center="false" draw:fill="solid" draw:fill-color="#729fcf" draw:textarea-horizontal-align="justify" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm" draw:shadow="hidden" draw:shadow-offset-x="0.2cm" draw:shadow-offset-y="0.2cm" draw:shadow-color="#808080">
@@ -11841,7 +11844,7 @@
      </draw:frame>
     </presentation:notes>
    </draw:page>
-   <draw:page draw:name="Introduction to OpenCPI 2" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
+   <draw:page draw:name="Introduction to OpenCPI 1" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr12" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
@@ -13134,7 +13137,7 @@
           <text:p text:style-name="P50"><text:span text:style-name="T7">For development time: </text:span><text:span text:style-name="T34">i.e. developing components and applications</text:span></text:p>
           <text:list>
            <text:list-item>
-            <text:p text:style-name="P50"><text:span text:style-name="T8">Tools and Scripts (command-line)</text:span></text:p>
+            <text:p text:style-name="P50"><text:span text:style-name="T8">Tools and Scripts (command line)</text:span></text:p>
            </text:list-item>
            <text:list-item>
             <text:p text:style-name="P50"><text:span text:style-name="T8">Specifications and Documentation</text:span></text:p>
@@ -13767,7 +13770,7 @@
        <draw:handle draw:handle-position="?f2 0" draw:handle-range-x-maximum="50000" draw:handle-range-x-minimum="0"/>
       </draw:enhanced-geometry>
      </draw:custom-shape>
-     <draw:custom-shape draw:name="Straight Arrow Connector 72" draw:style-name="gr52" draw:text-style-name="P8" draw:layer="layout" svg:width="0.563cm" svg:height="1.073cm" svg:x="3.572cm" svg:y="10.143cm">
+     <draw:custom-shape draw:name="Straight Arrow Connector 72" draw:style-name="gr52" draw:text-style-name="P8" draw:layer="layout" svg:width="0.563cm" svg:height="1.073cm" svg:x="3.572cm" svg:y="10.141cm">
       <text:p/>
       <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="true" svg:viewBox="0 0 21600 21600" draw:type="mso-spt32" draw:enhanced-path="M 0 0 L 21600 21600 N"/>
      </draw:custom-shape>
@@ -17185,7 +17188,7 @@
           <text:p text:style-name="P58"><text:span text:style-name="T7">Industry, products, tools are in silos, even when open-source</text:span></text:p>
          </text:list-item>
          <text:list-item>
-          <text:p text:style-name="P58"><text:span text:style-name="T7">Community and openness is necessary to cross all the boundaries.</text:span></text:p>
+          <text:p text:style-name="P58"><text:span text:style-name="T7">Community and openness is necessary to cross all the boundaries</text:span></text:p>
          </text:list-item>
         </text:list>
        </text:list-item>
@@ -17242,7 +17245,7 @@
         <text:p text:style-name="P50"><text:span text:style-name="T6">It evolved via a succession of IR&amp;D and DoD funded projects</text:span></text:p>
        </text:list-item>
        <text:list-item>
-        <text:p text:style-name="P50"><text:span text:style-name="T6">Core motivation was: </text:span><text:span text:style-name="T36">apply CBD to real embedded applications.</text:span></text:p>
+        <text:p text:style-name="P50"><text:span text:style-name="T6">Core motivation was: </text:span><text:span text:style-name="T36">apply CBD to real embedded applications</text:span></text:p>
        </text:list-item>
        <text:list-item>
         <text:p text:style-name="P50"><text:span text:style-name="T6">Various application areas were assessed and needs addressed</text:span></text:p>
@@ -17676,14 +17679,14 @@
      </draw:frame>
     </presentation:notes>
    </draw:page>
-   <draw:page draw:name="Where OpenCPI can be applied:" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
+   <draw:page draw:name="Where OpenCPI can be applied" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr12" draw:text-style-name="P12" draw:layer="layout" svg:width="24.235cm" svg:height="1.623cm" svg:x="1.341cm" svg:y="0cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
       <text:p text:style-name="P11"><text:span text:style-name="T50">Where OpenCPI can be applied:</text:span></text:p>
      </draw:text-box>
     </draw:frame>
-    <draw:custom-shape draw:name="AutoShape 3" draw:style-name="gr93" draw:text-style-name="P78" draw:layer="layout" svg:width="7.011cm" svg:height="1.492cm" draw:transform="skewX (0.0649262481741891) rotate (3.06078390922246) translate (16.865cm 10.582cm)">
+    <draw:custom-shape draw:name="AutoShape 3" draw:style-name="gr93" draw:text-style-name="P78" draw:layer="layout" svg:width="7.011cm" svg:height="1.492cm" draw:transform="skewX (-0.0649262481741891) rotate (3.06078390922246) translate (16.863cm 10.582cm)">
      <text:p/>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 ?f8 ?f12 ?f9" draw:type="ooxml-rightArrow" draw:modifiers="50000 92562" draw:enhanced-path="M 0 ?f8 L ?f5 ?f8 ?f5 0 ?f14 ?f7 ?f5 ?f13 ?f5 ?f9 0 ?f9 Z N">
       <draw:equation draw:name="f0" draw:formula="min(logwidth,logheight)"/>
@@ -17705,7 +17708,7 @@
       <draw:handle draw:handle-position="?f5 0" draw:handle-range-x-maximum="?f1" draw:handle-range-x-minimum="0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="AutoShape 4" draw:style-name="gr94" draw:text-style-name="P78" draw:layer="layout" svg:width="8.389cm" svg:height="1.519cm" draw:transform="skewX (0.0420624349730633) rotate (2.74575197923748) translate (16.483cm 9.607cm)">
+    <draw:custom-shape draw:name="AutoShape 4" draw:style-name="gr94" draw:text-style-name="P78" draw:layer="layout" svg:width="8.389cm" svg:height="1.52cm" draw:transform="skewX (-0.0413643032722656) rotate (2.74575197923748) translate (16.483cm 9.607cm)">
      <text:p/>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 ?f8 ?f12 ?f9" draw:type="ooxml-rightArrow" draw:modifiers="50000 92562" draw:enhanced-path="M 0 ?f8 L ?f5 ?f8 ?f5 0 ?f14 ?f7 ?f5 ?f13 ?f5 ?f9 0 ?f9 Z N">
       <draw:equation draw:name="f0" draw:formula="min(logwidth,logheight)"/>
@@ -17749,7 +17752,7 @@
       <draw:handle draw:handle-position="?f5 0" draw:handle-range-x-maximum="?f1" draw:handle-range-x-minimum="0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="AutoShape 6" draw:style-name="gr96" draw:text-style-name="P78" draw:layer="layout" svg:width="8.254cm" svg:height="1.481cm" draw:transform="rotate (-2.65272593010618) translate (15.939cm 11.945cm)">
+    <draw:custom-shape draw:name="AutoShape 6" draw:style-name="gr96" draw:text-style-name="P78" draw:layer="layout" svg:width="8.254cm" svg:height="1.481cm" draw:transform="rotate (-2.65272593010618) translate (15.937cm 11.945cm)">
      <text:p/>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 ?f8 ?f12 ?f9" draw:type="ooxml-rightArrow" draw:modifiers="48222 66960" draw:enhanced-path="M 0 ?f8 L ?f5 ?f8 ?f5 0 ?f14 ?f7 ?f5 ?f13 ?f5 ?f9 0 ?f9 Z N">
       <draw:equation draw:name="f0" draw:formula="min(logwidth,logheight)"/>
@@ -17771,7 +17774,7 @@
       <draw:handle draw:handle-position="?f5 0" draw:handle-range-x-maximum="?f1" draw:handle-range-x-minimum="0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="AutoShape 7" draw:style-name="gr97" draw:text-style-name="P78" draw:layer="layout" svg:width="6.984cm" svg:height="1.482cm" draw:transform="rotate (-2.15007110553182) translate (10.669cm 10.077cm)">
+    <draw:custom-shape draw:name="AutoShape 7" draw:style-name="gr97" draw:text-style-name="P78" draw:layer="layout" svg:width="6.984cm" svg:height="1.482cm" draw:transform="rotate (-2.15007110553182) translate (10.667cm 10.077cm)">
      <text:p/>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 ?f8 ?f12 ?f9" draw:type="ooxml-rightArrow" draw:modifiers="38898 82325" draw:enhanced-path="M 0 ?f8 L ?f5 ?f8 ?f5 0 ?f14 ?f7 ?f5 ?f13 ?f5 ?f9 0 ?f9 Z N">
       <draw:equation draw:name="f0" draw:formula="min(logwidth,logheight)"/>
@@ -17794,7 +17797,7 @@
      </draw:enhanced-geometry>
     </draw:custom-shape>
     <draw:custom-shape draw:name="Oval 8" draw:style-name="gr98" draw:text-style-name="P82" draw:layer="layout" svg:width="8.254cm" svg:height="3.746cm" svg:x="16.499cm" svg:y="3.458cm">
-     <text:p text:style-name="P81"><text:span text:style-name="T53">Wide Band</text:span></text:p>
+     <text:p text:style-name="P81"><text:span text:style-name="T53">Wideband</text:span></text:p>
      <text:p text:style-name="P81"><text:span text:style-name="T53">Comms</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f8 ?f6 ?f9" draw:type="ooxml-ellipse" draw:enhanced-path="M 0 ?f7 Z N" drawooo:enhanced-path="M 0 ?f7 G ?f0 ?f2 ?f12 ?f13 ?f0 ?f2 ?f14 ?f15 ?f0 ?f2 ?f16 ?f17 ?f0 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -17819,7 +17822,7 @@
       <draw:equation draw:name="f19" draw:formula="(5400000)/60000.0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="Oval 9" draw:style-name="gr99" draw:text-style-name="P88" draw:layer="layout" svg:width="6.561cm" svg:height="3.809cm" svg:x="15.228cm" svg:y="14.182cm">
+    <draw:custom-shape draw:name="Oval 9" draw:style-name="gr99" draw:text-style-name="P88" draw:layer="layout" svg:width="6.561cm" svg:height="3.809cm" svg:x="15.226cm" svg:y="14.182cm">
      <text:p text:style-name="P87"><text:span text:style-name="T53">Net-centric</text:span></text:p>
      <text:p text:style-name="P87"><text:span text:style-name="T53">ISR</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f8 ?f6 ?f9" draw:type="ooxml-ellipse" draw:enhanced-path="M 0 ?f7 Z N" drawooo:enhanced-path="M 0 ?f7 G ?f0 ?f2 ?f12 ?f13 ?f0 ?f2 ?f14 ?f15 ?f0 ?f2 ?f16 ?f17 ?f0 ?f2 ?f18 ?f19 Z N">
@@ -17845,7 +17848,7 @@
       <draw:equation draw:name="f19" draw:formula="(5400000)/60000.0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="Oval 10" draw:style-name="gr100" draw:text-style-name="P82" draw:layer="layout" svg:width="7.619cm" svg:height="3.387cm" svg:x="16.793cm" svg:y="7.373cm">
+    <draw:custom-shape draw:name="Oval 10" draw:style-name="gr100" draw:text-style-name="P82" draw:layer="layout" svg:width="7.619cm" svg:height="3.387cm" svg:x="16.791cm" svg:y="7.373cm">
      <text:p text:style-name="P81"><text:span text:style-name="T53">EW/CIED</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f8 ?f6 ?f9" draw:type="ooxml-ellipse" draw:enhanced-path="M 0 ?f7 Z N" drawooo:enhanced-path="M 0 ?f7 G ?f0 ?f2 ?f12 ?f13 ?f0 ?f2 ?f14 ?f15 ?f0 ?f2 ?f16 ?f17 ?f0 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -17870,7 +17873,7 @@
       <draw:equation draw:name="f19" draw:formula="(5400000)/60000.0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="Oval 11" draw:style-name="gr101" draw:text-style-name="P82" draw:layer="layout" svg:width="8.889cm" svg:height="3.216cm" svg:x="16.498cm" svg:y="10.876cm">
+    <draw:custom-shape draw:name="Oval 11" draw:style-name="gr101" draw:text-style-name="P82" draw:layer="layout" svg:width="8.889cm" svg:height="3.216cm" svg:x="16.496cm" svg:y="10.876cm">
      <text:p text:style-name="P81"><text:span text:style-name="T53">SIGINT</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f8 ?f6 ?f9" draw:type="ooxml-ellipse" draw:enhanced-path="M 0 ?f7 Z N" drawooo:enhanced-path="M 0 ?f7 G ?f0 ?f2 ?f12 ?f13 ?f0 ?f2 ?f14 ?f15 ?f0 ?f2 ?f16 ?f17 ?f0 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -17895,7 +17898,7 @@
       <draw:equation draw:name="f19" draw:formula="(5400000)/60000.0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="Oval 12" draw:style-name="gr102" draw:text-style-name="P80" draw:layer="layout" svg:width="6.561cm" svg:height="3.394cm" svg:x="8.237cm" svg:y="14.84cm">
+    <draw:custom-shape draw:name="Oval 12" draw:style-name="gr102" draw:text-style-name="P80" draw:layer="layout" svg:width="6.561cm" svg:height="3.394cm" svg:x="8.235cm" svg:y="14.84cm">
      <text:p text:style-name="P79"><text:span text:style-name="T53">Software</text:span></text:p>
      <text:p text:style-name="P79"><text:span text:style-name="T53">Radio</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f8 ?f6 ?f9" draw:type="ooxml-ellipse" draw:enhanced-path="M 0 ?f7 Z N" drawooo:enhanced-path="M 0 ?f7 G ?f0 ?f2 ?f12 ?f13 ?f0 ?f2 ?f14 ?f15 ?f0 ?f2 ?f16 ?f17 ?f0 ?f2 ?f18 ?f19 Z N">
@@ -17921,7 +17924,7 @@
       <draw:equation draw:name="f19" draw:formula="(5400000)/60000.0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="Oval 13" draw:style-name="gr103" draw:text-style-name="P84" draw:layer="layout" svg:width="6.561cm" svg:height="3.809cm" svg:x="3.586cm" svg:y="8.255cm">
+    <draw:custom-shape draw:name="Oval 13" draw:style-name="gr103" draw:text-style-name="P84" draw:layer="layout" svg:width="6.561cm" svg:height="3.809cm" svg:x="3.584cm" svg:y="8.255cm">
      <text:p text:style-name="P83"><text:span text:style-name="T54">OpenCPI</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f8 ?f6 ?f9" draw:type="ooxml-ellipse" draw:enhanced-path="M 0 ?f7 Z N" drawooo:enhanced-path="M 0 ?f7 G ?f0 ?f2 ?f12 ?f13 ?f0 ?f2 ?f14 ?f15 ?f0 ?f2 ?f16 ?f17 ?f0 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -17949,7 +17952,7 @@
     <draw:custom-shape draw:name="Text Box 14" draw:style-name="gr104" draw:text-style-name="P90" draw:layer="layout" svg:width="17.969cm" svg:height="5.252cm" svg:x="0.827cm" svg:y="1.905cm">
      <text:list text:style-name="L17">
       <text:list-item>
-       <text:p text:style-name="P89"><text:span text:style-name="T55">Application areas using embedded technologies to meet performance and SWAP requirements.</text:span></text:p>
+       <text:p text:style-name="P89"><text:span text:style-name="T55">Application areas using embedded technologies to meet performance and SWAP requirements</text:span></text:p>
       </text:list-item>
       <text:list-item>
        <text:p text:style-name="P89"><text:span text:style-name="T55">Characterized by rapid change and/or component-level re-use</text:span></text:p>
@@ -18585,7 +18588,7 @@
      </draw:frame>
     </presentation:notes>
    </draw:page>
-   <draw:page draw:name="Introduction to OpenCPI 3" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
+   <draw:page draw:name="Introduction to OpenCPI 2" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr12" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
@@ -18644,7 +18647,7 @@
       </text:list-item>
      </text:list>
      <text:p text:style-name="P92"><text:span text:style-name="T28"/></text:p>
-     <text:p text:style-name="P91"><text:span text:style-name="T42">Ports: </text:span><text:span text:style-name="T12">How does it communicate its input and output data</text:span></text:p>
+     <text:p text:style-name="P91"><text:span text:style-name="T42">Ports: </text:span><text:span text:style-name="T12">How does it communicate its input and output data?</text:span></text:p>
      <text:list text:continue-numbering="true" text:style-name="L18">
       <text:list-item>
        <text:list>
@@ -19282,7 +19285,7 @@
           <text:p text:style-name="P50"><text:span text:style-name="T7">Many messages are simply a fixed or variable length array of scalars</text:span></text:p>
          </text:list-item>
          <text:list-item>
-          <text:p text:style-name="P50"><text:span text:style-name="T7">Messages can be zero length (an event with no associated data).</text:span></text:p>
+          <text:p text:style-name="P50"><text:span text:style-name="T7">Messages can be zero length (an event with no associated data)</text:span></text:p>
          </text:list-item>
          <text:list-item>
           <text:p text:style-name="P50"><text:span text:style-name="T7">Messages are defined with data fields of various types</text:span></text:p>
@@ -19674,7 +19677,7 @@
       <text:p text:style-name="P57"><text:span text:style-name="T7"/></text:p>
       <text:list text:continue-numbering="true" text:style-name="L11">
        <text:list-item>
-        <text:p text:style-name="P50"><text:span text:style-name="T32">Properties are the &quot;knobs and meters&quot; of a component.</text:span></text:p>
+        <text:p text:style-name="P50"><text:span text:style-name="T32">Properties are the &quot;knobs and meters&quot; of a component</text:span></text:p>
         <text:list>
          <text:list-item>
           <text:p text:style-name="P50"><text:span text:style-name="T7">Some are for &quot;initial configuration&quot;</text:span></text:p>
@@ -20024,7 +20027,7 @@
           <text:p text:style-name="P50"><text:span text:style-name="T7">E.g. data compression, signal processing, etc.</text:span></text:p>
          </text:list-item>
          <text:list-item>
-          <text:p text:style-name="P50"><text:span text:style-name="T7">With properties and ports (with protocols).</text:span></text:p>
+          <text:p text:style-name="P50"><text:span text:style-name="T7">With properties and ports (with protocols)</text:span></text:p>
          </text:list-item>
          <text:list-item>
           <text:p text:style-name="P50"><text:span text:style-name="T7">Specified in a small XML document – a </text:span><text:span text:style-name="T38">component spec</text:span></text:p>
@@ -20089,11 +20092,11 @@
      </draw:frame>
     </presentation:notes>
    </draw:page>
-   <draw:page draw:name="Authoring Models:  How to write workers" draw:style-name="dp3" draw:master-page-name="Title_2b_Content_2b_Picture_5f_">
+   <draw:page draw:name="Authoring Models:  How to Write Workers" draw:style-name="dp3" draw:master-page-name="Title_2b_Content_2b_Picture_5f_">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr18" draw:text-style-name="P12" draw:layer="layout" svg:width="25.425cm" svg:height="1.367cm" svg:x="0.696cm" svg:y="0.236cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
-      <text:p text:style-name="P10"><text:span text:style-name="T62">Authoring Models: <text:s/>How to write workers</text:span></text:p>
+      <text:p text:style-name="P10"><text:span text:style-name="T62">Authoring Models: <text:s/>How to Write Workers</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:name="Text Placeholder 3" presentation:style-name="pr40" draw:text-style-name="P14" draw:layer="layout" svg:width="23.653cm" svg:height="16.959cm" svg:x="1.475cm" svg:y="1.79cm" presentation:class="outline" presentation:user-transformed="true">
@@ -20180,7 +20183,7 @@
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Rectangle 2" presentation:style-name="pr42" draw:text-style-name="P12" draw:layer="layout" svg:width="24.482cm" svg:height="1.367cm" svg:x="0.917cm" svg:y="0.329cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
-      <text:p text:style-name="P10"><text:span text:style-name="T62">Authoring Models: <text:s/>The Pattern for each one</text:span></text:p>
+      <text:p text:style-name="P10"><text:span text:style-name="T62">Authoring Models: <text:s/>The Pattern for Each One</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:custom-shape draw:name="Rectangle 3" draw:style-name="gr125" draw:text-style-name="P78" draw:layer="layout" svg:width="24.116cm" svg:height="12.497cm" svg:x="1.03cm" svg:y="4.409cm">
@@ -20213,7 +20216,7 @@
     </draw:custom-shape>
     <draw:custom-shape draw:name="Text Box 8" draw:style-name="gr128" draw:text-style-name="P98" draw:layer="layout" svg:width="6.662cm" svg:height="2.651cm" svg:x="14.393cm" svg:y="8.44cm">
      <text:p text:style-name="P97"><text:span text:style-name="T64"><text:s/></text:span><text:span text:style-name="T64">Output Ports</text:span><text:span text:style-name="T44">:</text:span></text:p>
-     <text:p text:style-name="P107"><text:span text:style-name="T44">Messages/data from this component. </text:span></text:p>
+     <text:p text:style-name="P107"><text:span text:style-name="T44">Messages/data from this component </text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
       <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -20245,7 +20248,7 @@
     </draw:custom-shape>
     <draw:custom-shape draw:name="Text Box 10" draw:style-name="gr130" draw:text-style-name="P98" draw:layer="layout" svg:width="6.971cm" svg:height="2.651cm" svg:x="1.235cm" svg:y="8.233cm">
      <text:p text:style-name="P97"><text:span text:style-name="T64">Input Ports</text:span><text:span text:style-name="T28">:</text:span></text:p>
-     <text:p text:style-name="P107"><text:span text:style-name="T44">Messages/data from other components.</text:span></text:p>
+     <text:p text:style-name="P107"><text:span text:style-name="T44">Messages/data from other components</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
       <draw:equation draw:name="f1" draw:formula="logheight/2"/>
@@ -20495,7 +20498,7 @@
    </draw:page>
    <draw:page draw:name="Implementing Components" draw:style-name="dp3" draw:master-page-name="Title_2b_Content_2b_Picture_5f_">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
-    <draw:custom-shape draw:name="TextBox 55" draw:style-name="gr145" draw:text-style-name="P112" draw:layer="layout" svg:width="4.343cm" svg:height="10.126cm" svg:x="13.119cm" svg:y="7.086cm">
+    <draw:custom-shape draw:name="TextBox 55" draw:style-name="gr145" draw:text-style-name="P112" draw:layer="layout" svg:width="4.343cm" svg:height="10.126cm" svg:x="13.117cm" svg:y="7.086cm">
      <text:p text:style-name="P33"><text:span text:style-name="T70">Source Code</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -20967,7 +20970,7 @@
       <draw:handle draw:handle-position="?f2 0" draw:handle-range-x-maximum="50000" draw:handle-range-x-minimum="0"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 25" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="1.018cm" svg:y="12.386cm">
+    <draw:custom-shape draw:name="TextBox 25" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="1.016cm" svg:y="12.386cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. encrypt</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -20976,7 +20979,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 26" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="5.414cm" svg:y="10.686cm">
+    <draw:custom-shape draw:name="TextBox 26" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="5.412cm" svg:y="10.686cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. &quot;HDL&quot;</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -20985,7 +20988,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 27" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="9.331cm" svg:y="10.561cm">
+    <draw:custom-shape draw:name="TextBox 27" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="9.329cm" svg:y="10.561cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. VHDL</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -20994,7 +20997,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 28" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="20.743cm" svg:y="8.176cm">
+    <draw:custom-shape draw:name="TextBox 28" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="20.741cm" svg:y="8.176cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. virtex6</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -21003,7 +21006,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 29" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="4.455cm" svg:height="0.927cm" svg:x="20.692cm" svg:y="9.113cm">
+    <draw:custom-shape draw:name="TextBox 29" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="4.455cm" svg:height="0.927cm" svg:x="20.69cm" svg:y="9.113cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. stratix4</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -21012,7 +21015,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 30" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="5.153cm" svg:height="0.927cm" svg:x="20.692cm" svg:y="10.386cm">
+    <draw:custom-shape draw:name="TextBox 30" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="5.153cm" svg:height="0.927cm" svg:x="20.69cm" svg:y="10.386cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. zynq FPGA</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -21048,7 +21051,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 34" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="5.358cm" svg:y="15.253cm">
+    <draw:custom-shape draw:name="TextBox 34" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="5.356cm" svg:y="15.253cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. &quot;RCC&quot;</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -21057,7 +21060,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 35" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="9.343cm" svg:y="13.758cm">
+    <draw:custom-shape draw:name="TextBox 35" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="9.341cm" svg:y="13.758cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. C</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -21066,7 +21069,7 @@
       <draw:equation draw:name="f3" draw:formula="logwidth"/>
      </draw:enhanced-geometry>
     </draw:custom-shape>
-    <draw:custom-shape draw:name="TextBox 36" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="9.39cm" svg:y="15.723cm">
+    <draw:custom-shape draw:name="TextBox 36" draw:style-name="gr148" draw:text-style-name="P36" draw:layer="layout" svg:width="3.867cm" svg:height="0.927cm" svg:x="9.388cm" svg:y="15.723cm">
      <text:p text:style-name="P35"><text:span text:style-name="T65">e.g. C++</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="true" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="0 0 ?f3 ?f2" draw:type="ooxml-rect" draw:enhanced-path="M 0 0 L ?f3 0 ?f3 ?f2 0 ?f2 Z N">
       <draw:equation draw:name="f0" draw:formula="logwidth/2"/>
@@ -21278,7 +21281,7 @@
      </draw:frame>
     </presentation:notes>
    </draw:page>
-   <draw:page draw:name="Introduction to OpenCPI" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
+   <draw:page draw:name="Introduction to OpenCPI 3" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr12" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.452cm" svg:x="1.693cm" svg:y="0.45cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
@@ -21322,7 +21325,7 @@
      <draw:text-box>
       <text:list text:style-name="L3">
        <text:list-item>
-        <text:p text:style-name="P13"><text:span text:style-name="T7">An interconnected set of </text:span><text:span text:style-name="T29">components, </text:span><text:span text:style-name="T39">called</text:span><text:span text:style-name="T7"> an </text:span><text:span text:style-name="T29">assembly</text:span><text:span text:style-name="T7">.</text:span></text:p>
+        <text:p text:style-name="P13"><text:span text:style-name="T7">An interconnected set of </text:span><text:span text:style-name="T29">components, </text:span><text:span text:style-name="T39">called</text:span><text:span text:style-name="T7"> an </text:span><text:span text:style-name="T29">assembly</text:span></text:p>
        </text:list-item>
       </text:list>
       <text:p text:style-name="P13"><text:span text:style-name="T7"/></text:p>
@@ -21361,7 +21364,7 @@
         <text:p text:style-name="P13"><text:span text:style-name="T7">Some ports are identified as </text:span><text:span text:style-name="T29">external ports </text:span><text:span text:style-name="T7">of the assembly</text:span></text:p>
         <text:list>
          <text:list-item>
-          <text:p text:style-name="P13"><text:span text:style-name="T8">Suggestive of, but not a true hierarchy.</text:span></text:p>
+          <text:p text:style-name="P13"><text:span text:style-name="T8">Suggestive of, but not a true hierarchy</text:span></text:p>
          </text:list-item>
          <text:list-item>
           <text:p text:style-name="P13"><text:span text:style-name="T8">Can be bound to files or other devices when the application is run</text:span></text:p>
@@ -21638,7 +21641,7 @@
    <draw:page draw:name="OpenCPI Terms for Defining Applications" draw:style-name="dp3" draw:master-page-name="Title_20_and_20_Content_5f_">
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:custom-shape draw:name="Rounded Rectangle 1" draw:style-name="gr164" draw:text-style-name="P122" draw:layer="layout" svg:width="23.776cm" svg:height="10.952cm" svg:x="1.199cm" svg:y="3.526cm">
-     <text:p text:style-name="P117"><text:span text:style-name="T80">How we define applications</text:span></text:p>
+     <text:p text:style-name="P117"><text:span text:style-name="T80">How We Define Applications</text:span></text:p>
      <draw:enhanced-geometry draw:mirror-horizontal="false" draw:mirror-vertical="false" svg:viewBox="0 0 0 0" draw:text-areas="?f5 ?f5 ?f6 ?f7" draw:type="ooxml-roundRect" draw:modifiers="4448" draw:enhanced-path="M 0 ?f2 L ?f3 0 L ?f11 ?f4 L ?f2 ?f10 Z N" drawooo:enhanced-path="M 0 ?f2 G ?f2 ?f2 ?f12 ?f13 L ?f3 0 G ?f2 ?f2 ?f14 ?f15 L ?f11 ?f4 G ?f2 ?f2 ?f16 ?f17 L ?f2 ?f10 G ?f2 ?f2 ?f18 ?f19 Z N">
       <draw:equation draw:name="f0" draw:formula="if(0-$0 ,0,if(50000-$0 ,$0 ,50000))"/>
       <draw:equation draw:name="f1" draw:formula="min(logwidth,logheight)"/>
@@ -23512,7 +23515,7 @@
     <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
     <draw:frame draw:name="Title 1" presentation:style-name="pr12" draw:text-style-name="P12" draw:layer="layout" svg:width="23.282cm" svg:height="1.281cm" svg:x="0.996cm" svg:y="0.295cm" presentation:class="title" presentation:user-transformed="true">
      <draw:text-box>
-      <text:p text:style-name="P11"><text:span text:style-name="T4">FPGA Developers: <text:s/>how can FPGAs work this way?</text:span></text:p>
+      <text:p text:style-name="P11"><text:span text:style-name="T4">FPGA Developers: <text:s/>How Can FPGAs Work This Way?</text:span></text:p>
      </draw:text-box>
     </draw:frame>
     <draw:frame draw:name="Text Placeholder 2" presentation:style-name="pr24" draw:text-style-name="P14" draw:layer="layout" svg:width="23.653cm" svg:height="15.186cm" svg:x="1.746cm" svg:y="1.764cm" presentation:class="outline" presentation:user-transformed="true">
@@ -23548,7 +23551,7 @@
         <text:p text:style-name="P13"><text:span text:style-name="T6">OpenCPI </text:span><text:span text:style-name="T98">artifacts</text:span><text:span text:style-name="T99"> </text:span><text:span text:style-name="T6">for FPGAs are:</text:span></text:p>
         <text:list>
          <text:list-item>
-          <text:p text:style-name="P13"><text:span text:style-name="T7">Preconstructed </text:span><text:span text:style-name="T100">sub</text:span><text:span text:style-name="T84">assemblies</text:span></text:p>
+          <text:p text:style-name="P13"><text:span text:style-name="T7">Pre-constructed </text:span><text:span text:style-name="T100">sub</text:span><text:span text:style-name="T84">assemblies</text:span></text:p>
          </text:list-item>
         </text:list>
        </text:list-item>
