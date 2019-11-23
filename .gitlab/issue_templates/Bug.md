@@ -35,4 +35,3 @@ console/log/code output here
 
 
 /label ~"type::bug"
-/assign @nknowles88

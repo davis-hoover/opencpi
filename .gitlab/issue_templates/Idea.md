@@ -12,4 +12,3 @@ enough to make a feature or enhancement request.)
 
 
 /label ~"type::idea"
-/assign @nknowles88
