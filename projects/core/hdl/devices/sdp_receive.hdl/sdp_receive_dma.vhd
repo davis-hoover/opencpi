@@ -158,6 +158,7 @@ architecture rtl of sdp_receive_dma is
   signal reading_r           : bool_t; -- a read is being issued waiting to be accepted
   signal read_accepted       : bool_t; -- last cycle of a read request
   signal read_complete       : bool_t; -- cycle when the last data for a read has arrived
+  signal read_complete_r     : bool_t; -- cycle after the last data for a read has arrived
   signal flag_needed         : bool_t; -- a flag cycle is needed
 --  signal flagging            : bool_t; -- a flag cycle is in progress
   signal flagging_r          : bool_t; -- a flag write is being issues waiting to be accepted
@@ -226,7 +227,7 @@ begin
                        length_not_empty;
   avail_enq         <= length_not_empty
                        when role = activeflowcontrol_e else
-                       read_complete;
+                       read_complete_r;
   faults            <= faults_r;
   --------------------------------------------------------------------------------
   -- Mastering the SDP to issue requests - either read requests or flag writes
@@ -236,7 +237,11 @@ begin
   read_starting <= to_bool(role = activemessage_e and length_not_empty and
                            not its(length_zlm_out) and lcl_buffers_empty_r /= 0 and
                            not its(reading_r) and not its(flagging_r));
-  read_accepted <= (length_not_empty and length_zlm_out) or (reading_r and sdp_in.sdp.ready);
+  -- If we are optimizing ZLM/EOFs, and not actually issueing a data read, we still need to
+  -- wait until any previous reads complete, hence we wait for all buffers to be empty.
+  read_accepted <= to_bool((its(length_not_empty) and length_zlm_out and
+                            lcl_buffers_empty_r = lcl_buffer_count) or
+                           its(reading_r and sdp_in.sdp.ready));
   -- Flags are different than reads - they can happen in one cycle, and don't need idles
   -- Reads take precedence over flags
   flag_needed   <= to_bool(flags_to_send_r /= 0 or read_complete);
@@ -247,8 +252,8 @@ begin
   --------------------------------------------------------------------------------
   -- The current xfer of the current read response is the last in the entire message
   read_complete     <= to_bool(role = activemessage_e and
-                               (its(length_not_empty and length_zlm_out) or
-                                (taking and 
+                               (its(length_not_empty and length_zlm_out and read_accepted) or
+                                (taking and
                                  sdp_am_addr = sdp_am_last_r(to_integer(sdp_am_buffer_idx)))));
   -- We are taking a xfer from the SDP
   taking            <= sdp_in.sdp.valid and can_take;
@@ -316,6 +321,7 @@ g2: for i in 0 to sdp_width-1 generate
         sdp_am_last_r       <= (others => (others => '0')); --for cleaner sim
         flagging_r          <= bfalse;
         reading_r           <= bfalse;
+        read_complete_r     <= bfalse;
         --status1_r           <= (others => '0');
         --status2_r           <= (others => '0');
         --status3_r           <= (others => '0');
@@ -327,6 +333,7 @@ g2: for i in 0 to sdp_width-1 generate
         rem_flag_addr_r     <= rem_flag_addr(rem_flag_addr_r'left+2 downto 2);
         rem_read_addr_r     <= rem_data_addr(rem_read_addr_r'left+2 downto 2);
       else
+        read_complete_r <= read_complete;
         if  bram_addr >= memory_depth then
           faults_r(6) <= btrue;
         end if;
