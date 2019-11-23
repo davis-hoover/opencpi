@@ -29,5 +29,4 @@ ANYTHING CONNECTED TO THE HOSTING HARDWARE.
 By submitting a request to add a runner you are acknowleding the above and are
 okay with it.
 
-/label ~"type::task"
-/assign @nknowles88
+/label ~"type::chore"

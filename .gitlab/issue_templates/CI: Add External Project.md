@@ -25,6 +25,5 @@ The easiest way to find this is to:
 token is not available to the general public.
 
 
-/label ~"type::task"
-/assign @nknowles88
+/label ~"type::chore"
 /confidential
