@@ -73,6 +73,7 @@ insertAdapter(Connection &c, InstancePort &from, InstancePort &to) {
   Clock
     &fromClock = *from.m_instance->m_clocks[from.m_port->m_clock->m_ordinal],
     &toClock = *to.m_instance->m_clocks[to.m_port->m_clock->m_ordinal];
+  ocpiInfo("Considering whether an adapter is required:");
   ocpiInfo("  From instance \"%s\" worker \"%s\" spec \"%s\" port \"%s\" clock \"%s\" width %zu",
 	   from.m_instance->cname(), from.m_instance->m_worker->cname(),
 	   from.m_instance->m_worker->m_specName, dpFrom.pname(), fromClock.cname(),
@@ -80,10 +81,9 @@ insertAdapter(Connection &c, InstancePort &from, InstancePort &to) {
   ocpiInfo("  To   instance \"%s\" worker \"%s\" spec \"%s\" port \"%s\" clock \"%s\" width %zu",
 	   to.m_instance->cname(), to.m_instance->m_worker->cname(),
 	   to.m_instance->m_worker->m_specName, dpTo.pname(), toClock.cname(),
-	   dpFrom.m_dataWidth);
+	   dpTo.m_dataWidth);
   if (dpFrom.m_dataWidth == dpTo.m_dataWidth && &fromClock == &toClock)
     return NULL;
-  ocpiInfo("WSI Adapter required between:");
   // 1. Create the adapter instance and its ports
   m_instances.resize(m_instances.size()+1);
   Instance &i = m_instances.back();
@@ -108,11 +108,13 @@ insertAdapter(Connection &c, InstancePort &from, InstancePort &to) {
     props.resize(1);
     OU::format(s, "%zu", dpFrom.m_dataWidth ? dpFrom.m_dataWidth : dpTo.m_dataWidth);
     props[0].setValue("width", s.c_str());
-    worker = dpTo.m_dataWidth ? "wsi_from_zero" : "wsi_to_zero"; // to_zero needed when both are zero
+    worker = dpTo.m_dataWidth ? "wsi_from_zero" : "wsi_to_zero"; // to_zero when both are zero
   }
   if (&fromClock != &toClock)
     worker += "_clock";
   worker += "_adapter";
+  ocpiInfo("  !A WSI Adapter is inserted between the above: instance: %s worker: %s",
+	   name.c_str(), worker.c_str());
   const char *err;
   if ((err = i.init(*this, name.c_str(), worker.c_str(), NULL, props)) ||
       (err = i.initHDL(*this)))
@@ -146,10 +148,11 @@ insertAdapter(Connection &c, InstancePort &from, InstancePort &to) {
   i.m_clocks[ncIn] = from.m_instance->m_clocks[ncFrom];
   i.m_clocks[ncOut] = to.m_instance->m_clocks[ncTo];
   i.m_clocks[i.m_worker->m_wciClock->m_ordinal] = m_assyWorker.m_wciClock;
-  if (c.m_clock)
-    assert(c.m_clock == i.m_clocks[ncIn]);
-  else
+  // The existing connection might have been clocks by either side, so we must reset
+  if (!c.m_clock || c.m_clock != i.m_clocks[ncIn]) {
+    c.m_clock = NULL; // in case we are switching sides
     c.setClock(*i.m_clocks[ncIn]);
+  }
   a2c.setClock(*i.m_clocks[ncOut]);
   return NULL;
 }
@@ -253,9 +256,10 @@ parseHdlAssy() {
   if ((err = addBuiltinProperties()))
     return err;
   if (strcasecmp(OX::ezxml_tag(m_xml), "HdlAssembly") &&
-      (err =
-       addProperty("<property name='sdp_width' type='uchar' parameter='true' default='1'/>",
-		   true)))
+      ((err = addProperty("<property name='sdp_width' type='uchar' parameter='true' "
+			 "default='1'/>", true)) ||
+       (err = addProperty("<property name='sdp_length' type='ushort' parameter='true' "
+			  "default='32'/>", true))))
     return err;
   ::Assembly *a = m_assembly = new ::Assembly(*this);
 
@@ -424,26 +428,26 @@ parseHdlAssy() {
   // Pass 1. Assign the wci clock to internal ports where we can, and set the clock of the connection
   // accordingly if we can.
   assert(m_wciClock);// testing this
-  if (m_wciClock)
-    for (auto ci = m_assembly->m_connections.begin(); ci != m_assembly->m_connections.end(); ++ci) {
-      Connection &c = **ci;
-      if (!c.m_clock) {
-	InstancePort *wciClocked1 = NULL, *wciClocked2 = NULL, *other = NULL;
-	for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ++ai) {
-	  InstancePort &ip = (**ai).m_instPort;
-	  if (ip.m_external)
-	    continue;
-	  size_t nc = ip.m_port->m_clock ? ip.m_port->m_clock->m_ordinal : 0; // ordinal within worker of the port
-	  if (ip.m_port->m_type == WCIPort || ip.m_port->m_clock == ip.m_port->worker().m_wciClock) {
-	    ip.m_instance->m_clocks[nc] = m_wciClock;
-	    (wciClocked1 ? wciClocked2 : wciClocked1) = &ip;
-	  } else if (ip.m_port->m_myClock && !ip.m_port->m_clock->m_output && !ip.m_instance->m_clocks[nc])
-	    other = &ip;
-	}
-	if (wciClocked1 && (wciClocked2 || c.m_external || other))
-	  ocpiCheck(c.setClock(*m_wciClock));
+  for (auto ci = m_assembly->m_connections.begin(); ci != m_assembly->m_connections.end(); ++ci) {
+    Connection &c = **ci;
+    if (!c.m_clock) {
+      InstancePort *wciClocked1 = NULL, *wciClocked2 = NULL, *other = NULL;
+      for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ++ai) {
+	InstancePort &ip = (**ai).m_instPort;
+	if (ip.m_external)
+	  continue;
+	size_t nc = ip.m_port->m_clock ? ip.m_port->m_clock->m_ordinal : 0; // ordinal within worker of the port
+	if (ip.m_port->m_type == WCIPort || ip.m_port->m_clock == ip.m_port->worker().m_wciClock) {
+	  ip.m_instance->m_clocks[nc] = m_wciClock;
+	  (wciClocked1 ? wciClocked2 : wciClocked1) = &ip;
+	} else if (ip.m_port->m_myClock && !ip.m_port->m_clock->m_output && !ip.m_instance->m_clocks[nc])
+	  other = &ip;
       }
+      if (wciClocked1 && (wciClocked2 || c.m_external || other))
+	ocpiCheck(c.setClock(*m_wciClock));
     }
+  }
+  m_assembly->propagateClocks();
   // Pass 2. set the clock for any connection with an external port to a internal port
   // with an owned clock.  This pass sets external port clocks for these ports.
   // It also sets the clock for internal connections with a driven clock

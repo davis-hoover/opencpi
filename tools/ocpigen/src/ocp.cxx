@@ -846,7 +846,7 @@ adjustConnection(Connection &c, bool /*isProducer*/, OcpAdapt *myAdapt, bool &/*
     if (m_myClock && other.m_myClock) {
       // Both have own clocks - one and only one better be an output clock
       assert((m_clock->m_output && !other.m_clock->m_output) ||
-	     (!m_clock->m_output && other.m_clock->m_output));
+	     (!m_clock->m_output && other.m_clock->m_output) || c.m_clock);
       assert(ocp.Clk.value && other.ocp.Clk.value);
     } else if (m_myClock) {
       // I am taking as clock from the temp clock signal associated with the other port

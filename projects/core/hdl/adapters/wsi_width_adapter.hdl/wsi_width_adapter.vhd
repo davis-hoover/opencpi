@@ -27,8 +27,8 @@ begin
   adapt_width : entity work.adapt_width
     generic map(width_in         => to_integer(width_in),
                 width_out        => to_integer(width_out))
-       port map(clk              => wci_clk,
-                reset            => wci_reset,
+       port map(clk              => in_in.clk,
+                reset            => in_in.reset,
                 in_som           => in_in.som,
                 in_valid         => in_in.valid,
                 in_eom           => in_in.eom,
