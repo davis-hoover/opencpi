@@ -45,12 +45,12 @@ ifilename= sys.argv[2]
 
 #Check to confirm number of taps is as expected
 if num_taps != 2*len(taps):
-    print('  FAILED: Actual number of taps does not match specified NUM_TAPS')
+    print("  FAILED: Actual number of taps does not match specified NUM_TAPS")
     sys.exit(1)
 
 #Check to make sure not all taps are zero
 if( sum(map(abs,taps)) == 0):
-    print('  FAILED: taps are all zero')
+    print("  FAILED: taps are all zero")
     sys.exit(1)
 
 # Parse non-samples messages from input file
@@ -110,5 +110,5 @@ tolerance=1
 if not (np.isclose(out_real,expected_output,atol=tolerance).all()):
     print(out_real)
     print(expected_output)
-    print ('  FAILED: Sample data does not match expected result')
+    print("  FAILED: Sample data does not match expected result")
     sys.exit(1)

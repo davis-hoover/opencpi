@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -117,8 +117,8 @@ def main():
         #Find max value in fft
         fft_max=max(yf_plot_log_scale)
         fft_max_freq=np.argmax(yf_plot_log_scale)
-        print "Max FFT value: " + str(fft_max)
-        print "Max FFT freq: " + str(xf[fft_max_freq])
+        print("Max FFT value: " + str(fft_max))
+        print("Max FFT freq: " + str(xf[fft_max_freq]))
         fft_max_plus=yf_plot_log_scale[fft_max_freq+how_many_bins_from_peak_to_check];
         #print "Max FFT freq+ bin: " + str(xf[fft_max_freq+how_many_bins_from_peak_to_check])
         #print "Max FFT freq+2 power: " + str(fft_max_plus)
@@ -143,22 +143,22 @@ def main():
         #plt.show()
 
         if  xf[fft_max_freq] > tone_center_freq + tolerance:
-            print "FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz"
+            print("FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz")
             sys.exit(1)
         if  xf[fft_max_freq] < tone_center_freq - tolerance:
-            print "FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz"
+            print("FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz")
             sys.exit(1)
         if  fft_max - fft_max_plus < expected_power_level_decrease_dB:
-            print "FAILED, Diff b/w max and max+2bins = ", fft_max - fft_max_plus, " dB. Should be > 10"
+            print("FAILED, Diff b/w max and max+2bins = ", fft_max - fft_max_plus, " dB. Should be > 10")
             sys.exit(1)
         if  fft_max - fft_max_minus < expected_power_level_decrease_dB:
-            print "FAILED, Diff b/w max and max-2bins = ", fft_max - fft_max_minus, " dB. Should be > 10"
+            print("FAILED, Diff b/w max and max-2bins = ", fft_max - fft_max_minus, " dB. Should be > 10")
             sys.exit(1)
-        print "PASSED"
+        print("PASSED")
 
     else:
-        print "Input is real data"
-        print "Currently no support for real data"
+        print("Input is real data")
+        print("Currently no support for real data")
         # data = np.fromfile(f, dtype=np.int16)
         # #Create time domain plot
         # fig = plt.figure(1)

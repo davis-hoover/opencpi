@@ -7,4 +7,3 @@ not concrete. Discussions are not about specific defects or capabilities)
 
 
 /label ~"type::discussion"
-/assign @nknowles88

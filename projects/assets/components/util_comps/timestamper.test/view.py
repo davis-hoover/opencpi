@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -48,14 +48,14 @@ if(enable=="true"): # => NORMAL MODE
     while a < len(odata):
         if(a % (MESSAGE_SIZE_WORDS+2) == 0):
             if(len(timestamp_list) and (timestamp_list[-1] > odata[a]+1.0*(odata[a+1])/0xFFFFFFFF)):
-                print "    Bad timestamp: " , timestamp_list[-1], " > ", odata[a]+1.0*(odata[a+1])/0xFFFFFFFF           
+                print("    Bad timestamp: " , timestamp_list[-1], " > ", odata[a]+1.0*(odata[a+1])/0xFFFFFFFF)           
             timestamp_list.append(odata[a]+1.0*(odata[a+1])/0xFFFFFFFF)
             if(len(timestamp_list)>1):
-                print "    Timestamp at index: ", str(a), " is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(odata[a]), " Fraction:", "{0:#x}".format(odata[a+1]),") Delta:","{:10.7f}".format(timestamp_list[-1]-timestamp_list[-2]) 
+                print("    Timestamp at index: ", str(a), " is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(odata[a]), " Fraction:", "{0:#x}".format(odata[a+1]),") Delta:","{:10.7f}".format(timestamp_list[-1]-timestamp_list[-2])) 
             else:
-                print "    Timestamp is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(odata[a]), " Fraction:", "{0:#x}".format(odata[a+1]),")"
+                print("    Timestamp is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(odata[a]), " Fraction:", "{0:#x}".format(odata[a+1]),")")
             a += 2
         else:
             a += 1
 else: # => BYPASS MODE
-    print "    View not supported for bypass mode"
+    print("    View not supported for bypass mode")

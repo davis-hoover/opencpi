@@ -22,4 +22,3 @@
 
 
 /label ~"type::problem"
-/assign @nknowles88

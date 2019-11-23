@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -38,7 +38,7 @@ import numpy as np
 if len(sys.argv) != 3:
     print("Invalid arguments:  usage is: generate.py <amplitude> <output-file>")
     sys.exit(1)
-print "    GENERATE (I/Q 16b binary data file):"
+print("    GENERATE (I/Q 16b binary data file):")
 
 # from OCS or OWD
 N=int(os.environ.get("OCPI_TEST_N"))
@@ -51,7 +51,7 @@ AMPLITUDE = int(sys.argv[1])
 # from -test.xml (properties that are declared to be test='true')
 Ft = int(os.environ.get("OCPI_TEST_TARGET_FREQ"))
 
-print '    UUT:(N=%d, M=%d, R=%d) Test Data:(%d)' % (N,M,R,Ft)
+print("    UUT:(N=%d, M=%d, R=%d) Test Data:(%d)" % (N,M,R,Ft))
 
 # Select test data to generate: DC or a Tone
 if (Ft == 0): # Generate DC data
@@ -59,7 +59,7 @@ if (Ft == 0): # Generate DC data
     Ts = 1.0 / Fs;             # sampling interval
     t = np.arange(0,1,Ts,dtype=np.float)
     T1 = 0.0
-    print "      Test data: DC with Amplitude=%d" % AMPLITUDE
+    print("      Test data: DC with Amplitude=%d" % AMPLITUDE)
     real = np.ones((int(Fs),), dtype=np.int16)
     imag = np.ones((int(Fs),), dtype=np.int16)
     gain = AMPLITUDE
@@ -69,7 +69,7 @@ else: # Generate a complex waveform with a tone
     Ts = 1.0 / Fs;             # sampling interval
     t = np.arange(0,1,Ts,dtype=np.float)
     T1 = 50.0                  # frequency of target signal
-    print "      Test data: Tone=%.1f Hz" % T1
+    print("      Test data: Tone=%.1f Hz" % T1)
     real = np.cos(2*np.pi*T1*t)
     imag = np.sin(2*np.pi*T1*t)
     # Set gain at something less than 32767 (full scale)
@@ -93,13 +93,13 @@ out_data['imag_idx'] = np.int16(imag * gain)
 # Save data to file
 f = open(sys.argv[2], 'wb')
 for i in range(0,int(num_cycles)):
-    for x in xrange(len(out_data)):
+    for x in range(len(out_data)):
         f.write(out_data[x])
 f.close()
 
 # Summary
-print '    Sample Frequency:', Fs
-print '    Target Frequency:', T1
-print '    Amplitude:', gain
-print '    # of Bytes:', len(out_data)*num_cycles*4
-print '    # of I/Q (16b) samples:', len(out_data)*num_cycles
+print('    Sample Frequency:', Fs)
+print('    Target Frequency:', T1)
+print('    Amplitude:', gain)
+print('    # of Bytes:', len(out_data)*num_cycles*4)
+print('    # of I/Q (16b) samples:', len(out_data)*num_cycles)
