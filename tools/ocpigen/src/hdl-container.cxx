@@ -191,14 +191,20 @@ addClient(std::string &assy, bool control, const char *client, const char *port)
       OU::formatAdd(prevPort, " index='%u'", m_currentChannel);
     std::string term;
     OU::format(term, "unoc_term%u_%u",  m_currentChannel, unc.m_currentNode);
+    if (m_type == SDPPort)
+      OU::formatAdd(assy,
+		    "  <instance worker='sdp_term' name='%s'>\n"
+		    "    <property name='sdp_width' value='%zu'/>\n"
+		    "  </instance>\n",
+		    term.c_str(), m_width);
+    else
+      OU::formatAdd(assy, "  <instance worker='unoc_term' name='%s'/>\n", term.c_str());
     OU::formatAdd(assy,
-		  "  <instance worker='%s_term' name='%s'/>\n"
 		  "  <connection>\n"
 		  "    <port instance='%s' %s/>\n"
 		  "    <port instance='%s' name='up'/>\n"
 		  "  </connection>\n",
-		  m_type == SDPPort ? "sdp" : "unoc", term.c_str(), prevInstance.c_str(),
-		  prevPort.c_str(), term.c_str());
+		  prevInstance.c_str(), prevPort.c_str(), term.c_str());
   }
 }
 
@@ -268,7 +274,8 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 	ocpiAssert(p.m_type == SDPPort || slave);
 #endif
 	uNocs.insert(std::make_pair(p.pname(),
-				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(), p.count())));
+				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(),
+					 m_config.sdpLength(), p.count())));
       }
     }
   }
@@ -724,9 +731,10 @@ emitUNocConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContCon
     OU::formatAdd(assy,
 		  "  <instance name='%s' worker='sdp_%s' interconnect='%s'>\n"
 		  "    <property name='sdp_width' value='%zu'/>\n"
+		  "    <property name='sdp_length' value='%zu'/>\n"
 		  "  </instance>\n",
 		  dma.c_str(), port->isDataProducer() ? "send" : "receive", iname,
-		  m_config.sdpWidth());
+		  m_config.sdpWidth(), m_config.sdpLength());
     // Instance a pipeline node upstream and connect it to the dma module
     // FIXME make this conditional
     std::string pipeline;

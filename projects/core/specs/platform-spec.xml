@@ -14,6 +14,8 @@
   <property name='platform' type='string' parameter='1' stringlength="31" default="unknown"/>
   <!-- Width of data plane in DWORDS -->
   <property name='sdp_width' type='uchar' parameter='1' default='1'/>
+  <!-- Length of maximum segment in DWORDS.  Default is legacy 64 bit wide AXI with 4 bit birst length-->
+  <property name='sdp_length' type='ushort' parameter='1' default='32'/>
   <!-- PCI Device ID for PCI devices
        This is essentially the "registry" of PCI device IDs
        New platforms can use "unknown" before they are registered -->

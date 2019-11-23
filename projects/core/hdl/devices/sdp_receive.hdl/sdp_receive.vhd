@@ -127,7 +127,6 @@ architecture rtl of worker is
   signal bramb_addr      : bram_addr_t;
   signal bramb_in        : dword_array_t(0 to sdp_width_c-1);
   signal bramb_write     : bool_array_t(0 to sdp_width_c-1);
-  signal bad_write       : bool_t;
   signal md_enq          : bool_t;
 
   ---- Global state
@@ -299,8 +298,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   last_give            <= to_bool(wsi_dws_left = 0);
   giving               <= to_bool(will_give and not its(md_out.eof));
   wsi_dws_left         <= md_out.ndws_left when its(wsi_starting_r) else wsi_dws_left_r;
-  buffer_ndws          <= props_in.buffer_size(bram_addr_t'left + addr_shift_c
-                                               downto addr_shift_c);
+  buffer_ndws          <= props_in.buffer_size(bram_addr_t'left + dword_shift downto dword_shift);
   faults                <= faults_r or dma_faults;
   --------------------------------------------------------------------------------
   -- Module output ports on the CTL/WSI side

@@ -32,7 +32,7 @@ architecture rtl of worker is
   constant count_width_c  : natural := width_for_max(max_buffers_c);
   constant nbytes_width_c : natural := width_for_max(sdp_width_c * 4); -- nbytes in frame
   constant max_remotes_c  : natural := to_integer(max_remotes);
-  constant max_seg_dws_c  : natural := 32;
+  constant max_seg_dws_c  : natural := to_integer(sdp_length);
 
   subtype remote_idx_t is unsigned(width_for_max(ocpi.util.max(1,max_remotes_c - 1)) - 1 downto 0);
 
@@ -452,7 +452,7 @@ g0: for i in 0 to sdp_width_c-1 generate
       end if;
     end procedure begin_flag;
     procedure begin_meta is
-      variable meta :std_logic_vector(55 downto 0)
+      variable meta : std_logic_vector(55 downto 0)
         := slv(slv(md_out.truncate),8) & slv(slv(md_out.eof),8) & md_out.opcode &
         std_logic_vector(resize(md_out.length, 32));
     begin
@@ -460,7 +460,11 @@ g0: for i in 0 to sdp_width_c-1 generate
         begin_flag(meta2slv(md_out));
       else
         sdp_remote_phase_r <= meta_e;
-        sdp_out_r          <= std_logic_vector(meta(sdp_out_r'range));
+        if meta'length < sdp_out_r'length then
+          sdp_out_r        <= slv0(sdp_out_r'length - meta'length) & meta;
+        else
+          sdp_out_r        <= meta(sdp_out_r'range);
+        end if;
         sdp_out_valid_r    <= btrue;
         begin_segment(to_unsigned(sdp_meta_ndws_c, meta_dw_count_t'length));
       end if;
@@ -550,8 +554,8 @@ g0: for i in 0 to sdp_width_c-1 generate
                   bramb_addr_r    <= bramb_addr + 1;
                   sdp_out_valid_r <= bfalse;
                 when meta_e => -- must be single word width
-                  sdp_out_r <= "00000001" & slv(slv(md_out.truncate), 8) &
-                               slv(slv(md_out.eof), 8) & md_out.opcode;
+                  sdp_out_r(dword_t'range) <= "00000001" & slv(slv(md_out.truncate), 8) &
+                                              slv(slv(md_out.eof), 8) & md_out.opcode;
                   sdp_out_valid_r <= btrue;
                 when others => null;
               end case;

@@ -107,7 +107,8 @@ architecture rtl of sdp_receive_dma is
     if sdp_width = 1 then
       return to_unsigned(0, sdp_xfr_dw_t'length);
     else
-      return addr(width_for_max(ocpi.util.max(1, sdp_width-1))-1 downto 0);
+--      return to_unsigned(to_integer(addr(ocpi.util.max(1,sdp_xfr_dw_t'left) - 1 downto 0)), sdp_xfr_dw_t'length);
+      return addr(ocpi.util.max(1,sdp_xfr_dw_t'length) - 1 downto 0);
     end if;
   end sdp_addr_dw_offset;
   signal sending_flag        : bool_t;
@@ -337,7 +338,8 @@ g2: for i in 0 to sdp_width-1 generate
           reading_r <= btrue;
           sdp_am_addr_r(to_integer(lcl_read_idx_r)) <= lcl_response_addr_r;
           sdp_am_last_r(to_integer(lcl_read_idx_r)) <=
-            resize(lcl_response_addr_r + length_out - 1, sdp_addr_t'length);
+            resize(lcl_response_addr_r + length_out - 1, sdp_addr_t'length) and
+            not unsigned(slvn(sdp_width-1, sdp_addr_t'length));
         end if;
         if its(read_accepted) then
           reading_r <= bfalse; -- yes, there will be a dead cycle between reads
@@ -378,9 +380,9 @@ g2: for i in 0 to sdp_width-1 generate
         end if;
         -- Maintain buffer empty count and queued consumption events (AFC only)
         case role is
-          when passive_e =>                            
+          when passive_e =>
             incdec(lcl_buffers_empty_r, buffer_consumed, length_not_empty);
-          when activeflowcontrol_e =>                            
+          when activeflowcontrol_e =>
             incdec(flags_to_send_r, buffer_consumed, flag_accepted);
             -- should the decrement happen on length_dequeue? rather then length_not_empty?
             incdec(lcl_buffers_empty_r, buffer_consumed, length_not_empty);
