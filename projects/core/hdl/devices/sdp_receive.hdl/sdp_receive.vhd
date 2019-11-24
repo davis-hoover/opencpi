@@ -370,7 +370,7 @@ g0: for i in 0 to sdp_width_c-1 generate
               wsi_buffer_index_r <= wsi_buffer_index_r + 1;
             end if;
           else
-            wsi_dws_left_r       <= wsi_dws_left - sdp_width_c;
+            wsi_dws_left_r       <= wsi_dws_left - ocpi.util.min(wsi_dws_left, sdp_width_c);
             wsi_starting_r       <= bfalse;
           end if;
         end if; -- will_give

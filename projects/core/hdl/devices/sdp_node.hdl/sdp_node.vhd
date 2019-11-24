@@ -48,7 +48,7 @@ begin
   client_out.sdp.eop <= up_in.sdp.eop;
   client_out_data <= up_in_data;
   client_out.sdp.valid <= up_in.sdp.valid and for_client;
-  -- Copy the incoming upstream info downstream, qualifying the valie signal
+  -- Copy the incoming upstream info downstream, qualifying the valid signal
   down_out.clk <= up_in.clk;
   down_out.reset <= up_in.reset;
   down_out.id <= up_in.id + 1;

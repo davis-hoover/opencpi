@@ -559,7 +559,8 @@ g0: for i in 0 to sdp_width_c-1 generate
                   sdp_out_valid_r <= btrue;
                 when others => null;
               end case;
-              sdp_segment_dws_left_r <= sdp_segment_dws_left_r - sdp_width_c;
+              sdp_segment_dws_left_r <= sdp_segment_dws_left_r -
+                                        ocpi.util.min(sdp_segment_dws_left_r, sdp_width_c);
             else
               -- end the segment
               case sdp_remote_phase_r is
