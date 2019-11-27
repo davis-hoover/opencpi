@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python2
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -46,13 +46,13 @@ flags = [0] * 256
   #flags[x] = 12660+x
 
 # Test 10
-for x in range(0,256):
-  print("{} odata/myoutput_{:03d}.out".format(12920+x, x))
+for x in xrange(0,256):
+  print "{} odata/myoutput_{:03d}.out".format(12920+x, x)
   flags[x] = 12920+x
 
 strn = ','.join([str(x) for x in flags])
 
-print("""    <Property Name="outSocket" Value='ports {
-     """)
-print(re.sub("(([0-9]+,){16})", "\\1\n      ", strn))
-print("}'/>")
+print """    <Property Name="outSocket" Value='ports {
+     """,
+print re.sub("(([0-9]+,){16})", "\\1\n      ", strn),
+print "}'/>"

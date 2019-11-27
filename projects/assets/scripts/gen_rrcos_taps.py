@@ -53,8 +53,8 @@ def main():
         print("Exit: alpha out of range (0,1)")
         return
     Ts = float(sys.argv[3])
-    Fs = float(sys.argv[4])
-    max_tap = int(sys.argv[5])
+    Fs = float(sys.argv[4]);
+    max_tap = int(sys.argv[5]);
 
     import filters
     time_idx, h_rrc = filters.rrcosfilter(length, alpha, Ts, Fs)

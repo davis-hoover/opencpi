@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python2
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -40,10 +40,10 @@ import struct
 import numpy as np
 import sys
 
-print("\n","*"*80)
-print("*** Python: AGC Real ***")
+print "\n","*"*80
+print "*** Python: AGC Real ***"
 
-print ("*** Generate input (binary data file) ***")
+print "*** Generate input (binary data file) ***"
 if len(sys.argv) < 2:
     print("Exit: Enter number of input samples (int:1 to ?)")
     sys.exit(1)
@@ -63,23 +63,23 @@ out_data = np.array(np.zeros(num_samples), dtype=np.int16)
 gain_pt_2 = 32767*0.2 / max(abs(real))
 gain_pt_3 = 32767*0.3 / max(abs(real))
 gain_pt_9 = 32767*0.9 / max(abs(real))
-for i in range(0,num_samples//4):
+for i in xrange(0,num_samples/4):
     out_data[i] = np.rint(real[i] * gain_pt_2)
-for i in range(num_samples//4,num_samples//2):
+for i in xrange(num_samples/4,num_samples/2):
     out_data[i] = np.rint(real[i] * gain_pt_9)
-for i in range(num_samples//2,num_samples*3//4):
+for i in xrange(num_samples/2,num_samples*3/4):
     out_data[i] = np.rint(real[i] * gain_pt_2)
-for i in range(num_samples*3//4,num_samples):
+for i in xrange(num_samples*3/4,num_samples):
     out_data[i] = np.rint(real[i] * gain_pt_3)
 
 #Convert array to list
 out_data_l = out_data.tolist()
 #Save data file
 f = open(filename, 'wb')
-for i in range(0,num_samples):
+for i in xrange(0,num_samples):
     f.write(struct.pack('h', out_data_l[i]))
 f.close()
 
-print("Output filename: ", filename)
-print("Number of samples: ", num_samples)
-print("*** End of file generation ***\n")
+print 'Output filename: ', filename
+print 'Number of samples: ', num_samples
+print '*** End of file generation ***\n'
