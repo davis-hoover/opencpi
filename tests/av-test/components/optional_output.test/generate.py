@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python2
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -37,7 +37,7 @@ num_samples = 6000
 
 filename = sys.argv[1]
 f = open(filename, 'wb')
-for i in range(num_samples-1):
+for i in xrange(num_samples-1):
     # randval = random.getrandbits(32)
     f.write(struct.pack('I',2))
 f.close()

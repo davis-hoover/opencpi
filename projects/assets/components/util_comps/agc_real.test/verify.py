@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python2
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -42,12 +42,12 @@ import opencpi.colors as color
 import numpy as np
 
 
-print("\n","*"*80)
-print("*** Python: AGC Real ***")
+print "\n","*"*80
+print "*** Python: AGC Real ***"
 
-print("*** Validate output against expected data ***")
+print "*** Validate output against expected data ***"
 if len(sys.argv) < 2:
-    print("Exit: Need to know how many input samples")
+    print ("Exit: Need to know how many input samples")
     sys.exit(1)
 elif len(sys.argv) < 3:
     print("Exit: Enter an output filename")
@@ -59,29 +59,29 @@ elif len(sys.argv) < 4:
 num_samples = int(sys.argv[1])
 
 # Read all of input data file as real int16
-print("Input file to validate: ", sys.argv[3])
+print 'Input file to validate: ', sys.argv[3]
 ifx = open(sys.argv[3], 'rb')
 din = np.fromfile(ifx, dtype=np.int16, count=-1)
 ifx.close()
 
 # Read all of output data file as real int16
-print("Output file to validate: ", sys.argv[2])
-ofx = open(sys.argv[2], "rb")
+print 'Output file to validate: ', sys.argv[2]
+ofx = open(sys.argv[2], 'rb')
 dout = np.fromfile(ofx, dtype=np.int16, count=-1)
 ofx.close()
 
 # Ensure dout is not all zeros
 if all(dout == 0):
-    print(color.RED + color.BOLD + "FAILED, values are all zero" + color.END)
+    print color.RED + color.BOLD + 'FAILED, values are all zero' + color.END
     sys.exit(1)
 # Ensure that dout is the expected amount of data
 if len(dout) != num_samples:
-    print(color.RED + color.BOLD + "FAILED, input file length is unexpected" + color.END)
-    print(color.RED + color.BOLD + "Length dout = ", len(dout), "while expected length is = " + color.END, num_samples)
+    print color.RED + color.BOLD + 'FAILED, input file length is unexpected' + color.END
+    print color.RED + color.BOLD + 'Length dout = ', len(dout), 'while expected length is = ' + color.END, num_samples
     sys.exit(1)
 
-print("Real Input Avg  = ", np.mean(din))
-print("Real Output Avg = ", np.mean(dout))
+print 'Real Input Avg  = ', np.mean(din)
+print 'Real Output Avg = ', np.mean(dout)
 
 # Perform the AGC function on the input data
 Navg   = 16
@@ -96,7 +96,7 @@ err     = np.array(np.zeros(num_samples), dtype=np.float32)   # loop error
 ydet    = np.array(np.zeros(num_samples), dtype=np.float32)   # output detected
 y       = np.array(np.zeros(num_samples+1), dtype=np.float32) # output
 
-for i in range(Navg-1,num_samples): # lagging by Navg samples
+for i in xrange(Navg-1,num_samples): # lagging by Navg samples
     # detecting output level
     det_buf = y[i+1-Navg:i+1] # buffering
     ydet[i] = sum(abs(det_buf))/Navg
@@ -113,27 +113,27 @@ for i in range(Navg-1,num_samples): # lagging by Navg samples
     y[i+1] = np.rint(gain[i] * din[i])
 
 # compare python AGC (y) to UUT output (dout)
-for i in range(Navg-1+384,num_samples/4):
+for i in xrange(Navg-1+384,num_samples/4):
     if abs(y[i+1] - dout[i+2]) > 2:
-        print(color.RED + color.BOLD + "FAILED Real" + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2])
-        print(color.RED + color.BOLD + "*** Error: End Validation ***\n" + color.END)
+        print color.RED + color.BOLD + 'FAILED Real' + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2]
+        print color.RED + color.BOLD + '*** Error: End Validation ***\n' + color.END
         sys.exit(1)
-for i in range(num_samples/4+896,num_samples/2):
+for i in xrange(num_samples/4+896,num_samples/2):
     if abs(y[i+1] - dout[i+2]) > 2:
-        print(color.RED + color.BOLD + "FAILED Real" + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2])
-        print(color.RED + color.BOLD + "*** Error: End Validation ***\n" + color.END)
+        print color.RED + color.BOLD + 'FAILED Real' + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2]
+        print color.RED + color.BOLD + '*** Error: End Validation ***\n' + color.END
         sys.exit(1)
-for i in range(num_samples/2+384,num_samples*3/4):
+for i in xrange(num_samples/2+384,num_samples*3/4):
     if abs(y[i+1] - dout[i+2]) > 2:
-        print(color.RED + color.BOLD + "FAILED Real" + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2])
-        print(color.RED + color.BOLD + "*** Error: End Validation ***\n" + color.END)
+        print color.RED + color.BOLD + 'FAILED Real' + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2]
+        print color.RED + color.BOLD + '*** Error: End Validation ***\n' + color.END
         sys.exit(1)
-for i in range(num_samples*3/4+256,num_samples-2):
+for i in xrange(num_samples*3/4+256,num_samples-2):
     if abs(y[i+1] - dout[i+2]) > 2:
-        print(color.RED + color.BOLD + "FAILED Real" + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2])
-        print(color.RED + color.BOLD + "*** Error: End Validation ***\n" + color.END)
+        print color.RED + color.BOLD + 'FAILED Real' + color.END, i, y[i+1], dout[i+2], y[i+1]-dout[i+2]
+        print color.RED + color.BOLD + '*** Error: End Validation ***\n' + color.END
         sys.exit(1)
 
-print("Data matched expected results.")
-print(color.GREEN + color.BOLD + "PASSED" + color.END)
-print("*** End validation ***\n")
+print 'Data matched expected results.'
+print color.GREEN + color.BOLD + 'PASSED' + color.END
+print '*** End validation ***\n'
