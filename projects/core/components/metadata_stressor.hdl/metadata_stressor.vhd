@@ -199,7 +199,7 @@ begin
                               output_state = split_zlm_e)) then
            EOF_flush <= '0';
          end if;
-        if (ocpi_version > 1 and in_in.eof and out_in.ready and
+        if (ocpi_version > 1 and in_in.eof and out_in.ready and in_valid = '0' and
             (props_in.mode = data_e or props_in.mode = bypass_e or
              (output_state = prop_nil and swm_detected = '0' and zlm_queued = '0') or
              (output_state = nil and zlm_queued = '0'))) then

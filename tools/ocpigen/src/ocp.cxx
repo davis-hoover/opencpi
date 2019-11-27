@@ -340,12 +340,18 @@ fixOCP() {
 #endif
 }
 
+// Note this might be called twice to rederive things, so we need to initialize all the signal stuff
+// and not assume 
 const char *OcpPort::
 deriveOCP() {
   OcpSignal *o = ocp.signals;
   OcpSignalDesc *osd = ocpSignals;
-  for (unsigned i = 0; i < N_OCP_SIGNALS; i++, o++, osd++)
+  for (unsigned i = 0; i < N_OCP_SIGNALS; i++, o++, osd++) {
+    o->value = NULL;
+    o->width = 0;
+    o->signal = NULL;
     o->master = osd->master;
+  }
   if (m_myClock)
     ocp.Clk.value = u8;
   return NULL;

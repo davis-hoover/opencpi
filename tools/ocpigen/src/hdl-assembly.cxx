@@ -73,7 +73,7 @@ insertAdapter(Connection &c, InstancePort &from, InstancePort &to) {
   Clock
     &fromClock = *from.m_instance->m_clocks[from.m_port->m_clock->m_ordinal],
     &toClock = *to.m_instance->m_clocks[to.m_port->m_clock->m_ordinal];
-  ocpiInfo("Considering whether an adapter is required:");
+  ocpiInfo("Considering whether an adapter is required for connection \"%s\":", c.cname());
   ocpiInfo("  From instance \"%s\" worker \"%s\" spec \"%s\" port \"%s\" clock \"%s\" width %zu",
 	   from.m_instance->cname(), from.m_instance->m_worker->cname(),
 	   from.m_instance->m_worker->m_specName, dpFrom.pname(), fromClock.cname(),
@@ -179,11 +179,12 @@ setClock(Clock &c) {
     InstancePort &ip = (**ai).m_instPort;
     if (!ip.m_external && ip.m_port->isOCP()) {
       size_t nc = ip.m_port->m_clock->m_ordinal; // the clock ordinal within the worker of the port
-      if (ip.m_instance->m_clocks[nc] && ip.m_instance->m_clocks[nc] != &c) {
+      if ((ip.m_instance->m_clocks[nc] && ip.m_instance->m_clocks[nc] != &c) ||
+	  (!ip.m_instance->m_clocks[nc] && ip.m_port->m_clock->m_output)) {
 	ocpiInfo("Cannot set clock \"%s\" on connection \"%s\" since internal port \"%s\" of "
 		 "instance \"%s\" already has clock \"%s\"",
 		 c.cname(), cname(), ip.m_port->pname(), ip.m_instance->cname(),
-		 ip.m_instance->m_clocks[nc]->cname());
+		 ip.m_instance->m_clocks[nc] ? ip.m_instance->m_clocks[nc]->cname() : "<output>");
 	return false;
       }
     }
@@ -194,13 +195,13 @@ setClock(Clock &c) {
       size_t nc = ip.m_port->m_clock->m_ordinal; // the clock ordinal within the worker of the port
       assert(ip.m_instance->m_clocks);
       assert(!ip.m_instance->m_clocks[nc] || ip.m_instance->m_clocks[nc] == &c);
+      ocpiInfo("Setting clock \"%s\" on connection \"%s\" at internal port \"%s\" of "
+	       "instance \"%s\"",
+	       c.cname(), cname(), ip.m_port->pname(), ip.m_instance->cname());
       ip.m_instance->m_clocks[nc] = &c;
       // unless the other port has its own clock signal, we need a global clock signal
       if (!otherIP(**ai).m_port->m_myClock)
 	ip.m_clockSignal = c.m_signal;
-      ocpiInfo("Setting clock \"%s\" on connection \"%s\" at internal port \"%s\" of "
-	       "instance \"%s\"",
-	       c.cname(), cname(), ip.m_port->pname(), ip.m_instance->cname());
       // If the clock was originally internal, it is now being propagated and becoming external.
       // So we externalize it
       if (c.m_internal && m_external) {
@@ -448,12 +449,10 @@ parseHdlAssy() {
     }
   }
   m_assembly->propagateClocks();
-  // Pass 2. set the clock for any connection with an external port to a internal port
-  // with an owned clock.  This pass sets external port clocks for these ports.
-  // It also sets the clock for internal connections with a driven clock
+  // Pass 2. set the clock for internal connections with a driven clock
   for (auto ci = m_assembly->m_connections.begin(); ci != m_assembly->m_connections.end(); ci++) {
     Connection &c = **ci;
-    if (!c.m_clock) {
+    if (!c.m_clock && !c.m_external) {
       InstancePort *clockOut = NULL, *other = NULL;
       for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++) {
 	InstancePort &ip = (**ai).m_instPort;
@@ -461,14 +460,6 @@ parseHdlAssy() {
 	  continue;
 	assert(ip.m_port->m_clock);
 	if (ip.m_port->m_myClock && !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
-	  if (c.m_external) { // look for external connection to owned clocks
-	    ocpiInfo("Promoting the port %s clock of instance %s port %s to be the assembly's clock "
-		     "for port %s", ip.m_port->m_clock->m_output ? "output" : "input",
-		     ip.m_instance->cname(), ip.m_port->pname(),
-		     c.m_external->m_instPort.m_port->pname());
-	    ocpiCheck(c.setClock(c.m_external->m_instPort.m_port->addMyClock(ip.m_port->m_clock->m_output)));
-	    break;
-	  }
 	  if (ip.m_port->m_clock->m_output) { // look for internal connections with a driven clock
 	    Clock &clk = addClock(ip.m_instance->m_name + "_" + ip.m_port->m_clock->cname(), true);
 	    clk.m_internal = true; // may be overridden later during propagation
@@ -486,6 +477,32 @@ parseHdlAssy() {
       if (!c.m_clock && !c.m_external && clockOut && other && other->m_port->m_myClock &&
 	  !other->m_port->m_clock->m_output)
 	ocpiCheck(c.setClock(*clockOut->m_instance->m_clocks[clockOut->m_port->m_clock->m_ordinal]));
+    }
+  }
+  // Now internal connections with driven clocks are done, and will be propagated to external ports
+  // for instances that have the same clock for internal and externally connected ports
+  m_assembly->propagateClocks();
+
+  // Pass 2a. set the clock for any connection with an external port to a internal port
+  // with an owned clock that is not determined yet.  This pass sets external port clocks for these ports.
+  for (auto ci = m_assembly->m_connections.begin(); ci != m_assembly->m_connections.end(); ci++) {
+    Connection &c = **ci;
+    if (!c.m_clock && c.m_external) {
+      for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++) {
+	InstancePort &ip = (**ai).m_instPort;
+	if (!ip.m_port->isOCP() || ip.m_external)
+	  continue;
+	if (ip.m_port->m_myClock && !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
+	    ocpiInfo("Promoting the %s clock of instance %s port %s to be the assembly's clock "
+		     "for external port %s", ip.m_port->m_clock->m_output ? "output" : "input",
+		     ip.m_instance->cname(), ip.m_port->pname(),
+		     c.m_external->m_instPort.m_port->pname());
+	    Clock &clk = c.m_external->m_instPort.m_port->addMyClock(ip.m_port->m_clock->m_output);
+	    ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal] = &clk;
+	    ocpiCheck(c.setClock(clk));
+	    break;
+	}
+      }
     }
   }
   // Now external ports have clocks if they are connected to internal ports with owned clocks, and
@@ -1031,15 +1048,23 @@ emitAssyHDL() {
   for (unsigned n = 0; n < m_assembly->m_instances.size(); n++, i++) {
     for (auto ci = i->m_worker->m_clocks.begin(); ci != i->m_worker->m_clocks.end(); ++ci) {
       Clock &c = **ci;
-      if (!c.m_port && c.m_output) {
+      if (!c.m_output)
+	continue;
+      InstancePort *ip = c.m_port ? &i->m_ports[c.m_port->m_ordinal] : NULL;
+      if (!ip || ip->m_clockSignal.length()) {
+	std::string signal;
+	if (ip && ip->m_clockSignal.length())
+	  signal = ip->m_clockSignal.c_str();
+	else
+	  OU::format(signal, "%s_%s", i->cname(), c.signal());
 	if (first)
-	  fprintf(f, "  %s Define signals for non-port output clocks from instances\n",
+	  fprintf(f, "  %s Define signals for output clocks from instances\n",
 		  myComment());
 	first = false;
 	if (m_language == VHDL)
-	  fprintf(f, "  signal %s_%s : std_logic;\n", i->cname(), c.signal());
+	  fprintf(f, "  signal %s : std_logic;\n", signal.c_str());
 	else
-	  fprintf(f, "  wire %s_%s;\n", i->cname(), c.signal());
+	  fprintf(f, "  wire %s;\n", signal.c_str());
       }
     }
   }

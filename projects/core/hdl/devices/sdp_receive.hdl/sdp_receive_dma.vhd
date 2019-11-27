@@ -291,7 +291,7 @@ g1: for i in 0 to sdp_width-1 generate
   sdp_out.sdp.valid          <= flagging_r or reading_r;
   sdp_out.dropCount          <= (others => '0');
 g2: for i in 0 to sdp_width-1 generate
-    sdp_out_data(i) <= slvn(1, dword_size) when i = 0 else (others => '0');
+    sdp_out_data(i) <= slvn(1, dword_size); -- when i = 0 else (others => '0');
   end generate g2;
 
   --------------------------------------------------------------------------------
