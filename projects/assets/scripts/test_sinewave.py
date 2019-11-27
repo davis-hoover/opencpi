@@ -106,14 +106,14 @@ def generate(argv):
     f.close()
 
     # Summary
-    print("Filename:", filename)
-    print("# of Bytes:", len(z)*NUM_CYCLES*4)
-    print("# of I/Q (16b) samples:", (len(z)*NUM_CYCLES))
-    print("Sample Frequency:", Fs)
-    print("Target Frequency:", Ft)
-    print("Amplitude:", AMPLITUDE)
-    print("Number of Cycles:", NUM_CYCLES)
-    print("*** END Generate ***")
+    print('Filename:', filename)
+    print('# of Bytes:', len(z)*NUM_CYCLES*4)
+    print('# of I/Q (16b) samples:', (len(z)*NUM_CYCLES))
+    print('Sample Frequency:', Fs)
+    print('Target Frequency:', Ft)
+    print('Amplitude:', AMPLITUDE)
+    print('Number of Cycles:', NUM_CYCLES)
+    print('*** END Generate ***')
     print("*"*80+"\n")
 
 def validate(argv):
@@ -151,23 +151,23 @@ def validate(argv):
     input_file.close()
 
     #Open output file and grab samples as complex int16
-    print("File to validate ", argv[3])
+    print('File to validate ', argv[3])
     output_file = open(argv[3], 'rb')
     output_file_samples = np.fromfile(output_file, dtype=dt_iq_pair, count=-1)
     output_file.close()
     #Ensure dout is not all zeros
     if all(output_file_samples == 0):
-        print(color.RED + color.BOLD + "FAILED, values are all zero" + color.END)
+        print(color.RED + color.BOLD + 'FAILED, values are all zero' + color.END)
         return
     else:
-        print("Pass: File is not all zeros")
+        print('Pass: File is not all zeros')
     #Ensure that dout is the expected amount of data
     if len(output_file_samples) != len(input_file_samples):
-        print(color.RED + color.BOLD + "FAILED, input file length is unexpected" + color.END)
-        print(color.RED + color.BOLD + "Length dout = ", len(output_file_samples), "while expected length is = " + color.END, len(input_file_samples))
+        print(color.RED + color.BOLD + 'FAILED, input file length is unexpected' + color.END)
+        print(color.RED + color.BOLD + 'Length dout = ', len(output_file_samples), 'while expected length is = ' + color.END, len(input_file_samples))
         return
     else:
-        print("Pass: Input and output file lengths match")
+        print('Pass: Input and output file lengths match')
         if(enable == 1):
             complex_data = np.array(np.zeros(num_samples), dtype=np.complex)
             for i in range(0,num_samples-1,2):
@@ -175,20 +175,20 @@ def validate(argv):
             FFT = abs(np.fft.fft(complex_data,num_samples))
             Max_FFT_freq=np.argmax(FFT)*sample_rate/num_samples
             if Max_FFT_freq != 2.0:
-                print("Fail: Max of FFT occurs at index: ",Max_FFT_freq , " Hz (Should be 0)")
+                print('Fail: Max of FFT occurs at index: ',Max_FFT_freq , ' Hz (Should be 0)')
                 return
             else:
-                print("Pass: Max of FFT occurs at index: ",Max_FFT_freq , " Hz")
+                print('Pass: Max of FFT occurs at index: ',Max_FFT_freq , ' Hz')
         else:
             if (input_file_samples != output_file_samples).all():
-                print("Fail: Input and output file do not match")
+                print('Fail: Input and output file do not match')
                 return
             else:
-                print("Pass: Input and output file match")
+                print('Pass: Input and output file match')
 
-    print("Data matched expected results.")
-    print(color.GREEN + color.BOLD + "PASSED" + color.END)
-    print("*** End validation ***\n")
+    print('Data matched expected results.')
+    print(color.GREEN + color.BOLD + 'PASSED' + color.END)
+    print('*** End validation ***\n')
 
 def main():
     print("\n","*"*80)

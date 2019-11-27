@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python2
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-""""
-Tim"
+"""
+Timestamper: Generate test data
 
-Gen"
-1. "
-2. "
+Generate args:
+1. Amplitude and length of generated ramp
+2. Number of ramps to generate
 3. Output file
 
 To test the Timestamper, a binary data file is generated containing real 
@@ -36,7 +36,7 @@ import os.path
 if len(sys.argv) != 4:
     print("Invalid arguments:  usage is: generate.py <block-size> <num-cycles> <output-file>")
     sys.exit(1)
-print("    GENERATE (Real 32b binary data file):")
+print "    GENERATE (Real 32b binary data file):"
 
 OFILENAME = sys.argv[3]
 
@@ -52,6 +52,6 @@ for i in range(0,int(NUM_CYCLES)):
 f.close()
 
 # Summary
-print("    Output filename: ", OFILENAME)
-print("    Test data:", NUM_CYCLES, "ramp(s) of size ", BLOCK_SIZE) 
-print("    Number of bytes: ", BLOCK_SIZE*NUM_CYCLES*4)
+print "    Output filename: ", OFILENAME
+print "    Test data:", NUM_CYCLES, "ramp(s) of size ", BLOCK_SIZE 
+print "    Number of bytes: ", BLOCK_SIZE*NUM_CYCLES*4

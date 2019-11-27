@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python2
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -55,10 +55,10 @@ enable = os.environ.get("OCPI_TEST_enable")
 
 # Test that odata is not all zeros
 if all(odata == 0):
-    print("    FAILED: Values are all zero")
+    print "    FAILED: Values are all zero"
     sys.exit(1)
 else:
-    print("    PASS: File is not all zeros")
+    print "    PASS: File is not all zeros"
 
 if(enable=="true"): # => NORMAL MODE
     #Test if timestamps are incrementing
@@ -79,22 +79,22 @@ if(enable=="true"): # => NORMAL MODE
     output_file_without_timestamps.close()
 
     if(timestamp_error):
-        print("    FAILED: one or more timestamps were not incrementing")
+        print "    FAILED: one or more timestamps were not incrementing"
         sys.exit(1)
     else:
-        print("    PASS: Timestamps are incrementing")
+        print "    PASS: Timestamps are incrementing"
 
         #Test that odata is the expected amount
         if len(odata) != len(idata)+len(timestamp_list)*2:
-            print("    FAILED: Output file length is unexpected")
-            print("Length =", len(odata), "while expected length is =", len(idata)+len(timestamp_list)*2)
+            print "    FAILED: Output file length is unexpected"
+            print 'Length =', len(odata), 'while expected length is =', len(idata)+len(timestamp_list)*2
             sys.exit(1)
         else:
-            print("    PASS: Output file length = input file length plus timestamps")
+            print "    PASS: Output file length = input file length plus timestamps"
 else: # => BYPASS MODE
     #Test that odata is the expected amount
     if (idata != odata).all():
-        print("    FAILED: Input and output file do not match")
+        print "    FAILED: Input and output file do not match"
         sys.exit(1)
     else:
-        print("    PASS: Input and output file match")
+        print "    PASS: Input and output file match"

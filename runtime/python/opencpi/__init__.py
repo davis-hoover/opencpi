@@ -18,7 +18,7 @@
 
 # This file will run when anything "under" opencpi is imported.
 
-# We always load the (single) aci swig module now (under python3).
+# We always load the (single) aci swig module now (under python2).
 # In the future if we have more subpackages we can use one of the variety of techniques
 # for lazy import of subpackages.
 
