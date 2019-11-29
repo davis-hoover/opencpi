@@ -120,7 +120,7 @@ architecture rtl of worker is
   -- Signals and definitions for talking to the SDP side
   --------------------------------------------------------------------------------
   -- to the SDP side
-  signal buffer_ndws     : bram_addr_t;
+  signal buffer_ndws     : unsigned(width_for_max(memory_depth_c * sdp_width_c)-1 downto 0);
   signal buffer_count    : buffer_count_t;
   signal md_not_full     : std_logic;
   -- from the SDP side
@@ -298,7 +298,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   last_give            <= to_bool(wsi_dws_left = 0);
   giving               <= to_bool(will_give and not its(md_out.eof));
   wsi_dws_left         <= md_out.ndws_left when its(wsi_starting_r) else wsi_dws_left_r;
-  buffer_ndws          <= props_in.buffer_size(bram_addr_t'left + dword_shift downto dword_shift);
+  buffer_ndws          <= props_in.buffer_size(buffer_ndws'left + dword_shift downto dword_shift);
   faults                <= faults_r or dma_faults;
   --------------------------------------------------------------------------------
   -- Module output ports on the CTL/WSI side

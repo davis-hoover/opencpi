@@ -52,7 +52,7 @@ entity sdp_receive_dma is
   port (   operating        : in bool_t;
            reset            : in bool_t;
            -- properties
-           buffer_ndws      : in  unsigned(width_for_max(memory_depth - 1)-1 downto 0);
+           buffer_ndws      : in  unsigned(width_for_max(memory_depth * sdp_width)-1 downto 0);
            lcl_buffer_count : in  unsigned(width_for_max(max_buffers)-1 downto 0);
            role             : in  role_t;
            rem_flag_addr    : in  ulonglong_t;
@@ -356,7 +356,7 @@ g2: for i in 0 to sdp_width-1 generate
             lcl_response_addr_r <= (others => '0');
           else
             lcl_read_idx_r      <= lcl_read_idx_r + 1;
-            lcl_response_addr_r <= lcl_response_addr_r + buffer_ndws;
+            lcl_response_addr_r <= lcl_response_addr_r + buffer_ndws(sdp_addr_t'range);
           end if;
           -- Remote side bookkeepping
           if rem_read_idx_r = rem_last_buffer_idx then
