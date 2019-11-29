@@ -108,7 +108,7 @@ architecture rtl of sdp_receive_dma is
       return to_unsigned(0, sdp_xfr_dw_t'length);
     else
 --      return to_unsigned(to_integer(addr(ocpi.util.max(1,sdp_xfr_dw_t'left) - 1 downto 0)), sdp_xfr_dw_t'length);
-      return addr(ocpi.util.max(1,sdp_xfr_dw_t'length) - 1 downto 0);
+      return resize(addr(ocpi.util.max(1,width_for_max(sdp_width-1)) - 1 downto 0), sdp_xfr_dw_t'length);
     end if;
   end sdp_addr_dw_offset;
   signal sending_flag        : bool_t;
@@ -264,7 +264,7 @@ begin
   bram_addr         <= sdp_addr(bram_addr'left + dw_addr_shift_c downto dw_addr_shift_c);
   bramb_addr        <= bram_addr;
 g1: for i in 0 to sdp_width-1 generate
-  bramb_write(i)    <= bfalse when i < first_dw or i > first_dw + dws_in_xfer
+  bramb_write(i)    <= bfalse when i < first_dw or i > first_dw + dws_in_xfer - 1
                        else sdp_in.sdp.valid;
   bramb_in(i)       <= sdp_in_data(i);
   end generate g1;
