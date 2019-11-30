@@ -178,7 +178,7 @@ begin
     end find_extent;
   begin
     assert (width_in rem width_out) = 0 report "width_in must be a multiple of width_out";
-    out_eof        <= in_eof and my_out_eom;
+    out_eof        <= in_eof and my_out_eom and not out_my_valid;
     -- Reorganize input data as an array of output words
     g0: for i in 0 to last_c generate
       word_data(i) <= in_data(width_out*i + width_out-1 downto width_out*i);
