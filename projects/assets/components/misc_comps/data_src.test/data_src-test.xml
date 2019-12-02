@@ -1,5 +1,5 @@
 <tests useHDLFileIo='true' Duration='60'> <!-- Duration set to 2x expected max necessary runtime -->
-  <output port='out' script='verify.py' view='view.sh 64'/> <!-- Argument to script is num bytes to view; backpressure failure see AV-4701 -->
+  <output port='out' script='verify.py' view='view.sh 64'/> <!-- Argument to script is num bytes to view -->
   <case>
     <property name='enable' values='false'/>
   </case>
