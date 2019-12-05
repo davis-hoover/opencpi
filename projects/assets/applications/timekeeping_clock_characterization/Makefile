@@ -22,12 +22,10 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 #TODO: this runs for every rule and shouldn't
 ifndef OcpiRunArgs
   $(info This application requires OcpiRunArgs but none were provided.)
-  $(info Usage is OcpiRunArgs=<platform>.)
+  $(info Usage is OcpiRunArgs=<ip-freq-ctr> <freq-std-tty> <platform>.)
   $(info Execution will be skipped.)
   OcpiAppNoRun=1
   run:
 endif
 
 include $(OCPI_CDK_DIR)/include/application.mk
-
-

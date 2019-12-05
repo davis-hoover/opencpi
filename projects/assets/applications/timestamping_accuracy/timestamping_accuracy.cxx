@@ -42,8 +42,9 @@
 #include "OcpiApi.hh"
 #include <iostream>
 #include <stdlib.h>
-#include <cmath>     //std::pow()
+#include <cmath>     // std::pow()
 #include <algorithm> // std::min_element, std::max_element
+#include <sstream>   // std::ostringstream
 
 const int NUM_TIME_TAGS_TO_COLLECT=100;
 const int EXTRA_TIME_BUFFER=5; //Seconds buffer for application timeout
@@ -114,27 +115,46 @@ void computeStatistics(uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLEC
      std_dev_corr * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
 }
 
-int main(/*int argc, char **argv*/) {
+int main(int argc, char **argv) {
 
-  OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), OA::PVEnd };
-  OA::Application app("timestamping_accuracy.xml", pvs);
-  app.initialize();
-  app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", NUM_TIME_TAGS_TO_COLLECT);
+  int ret = 0;
 
-  app.start();
-  app.wait(MAX_EXPECTED_RUN_TIME_USECS);
-  app.stop();
+  try {
 
-  app.finish();
+    if(argc != 2) {
+      std::ostringstream oss;
+      oss << "wrong number of arguments" << "\n";
+      oss << "Usage is: " << argv[0] << " <platform>\n";
+      throw oss.str();
+    }
 
-  uint32_t max_num_time_tags_to_collect;
-  app.getPropertyValue("signal_time_tagger", "MAX_NUM_TIME_TAGS_TO_COLLECT", max_num_time_tags_to_collect);
+    std::string platform = "=" + std::string(argv[1]);
+    OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), 
+			 OA::PVString("platform", platform.c_str()), OA::PVEnd };
 
-  uint32_t collected_time_tags_frac[max_num_time_tags_to_collect];
-  OA::Property collected_time_tags_frac_p(app, "signal_time_tagger", "collected_time_tags_frac");
-  collected_time_tags_frac_p.getULongSequenceValue(collected_time_tags_frac,max_num_time_tags_to_collect);
+    OA::Application app("timestamping_accuracy.xml", pvs);
+    app.initialize();
+    app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", NUM_TIME_TAGS_TO_COLLECT);
 
-  computeStatistics(collected_time_tags_frac);
+    app.start();
+    app.wait(MAX_EXPECTED_RUN_TIME_USECS);
+    app.stop();
 
-  return 0;
+    app.finish();
+
+    uint32_t max_num_time_tags_to_collect;
+    app.getPropertyValue("signal_time_tagger", "MAX_NUM_TIME_TAGS_TO_COLLECT", max_num_time_tags_to_collect);
+
+    uint32_t collected_time_tags_frac[max_num_time_tags_to_collect];
+    OA::Property collected_time_tags_frac_p(app, "signal_time_tagger", "collected_time_tags_frac");
+    collected_time_tags_frac_p.getULongSequenceValue(collected_time_tags_frac,max_num_time_tags_to_collect);
+
+    computeStatistics(collected_time_tags_frac);
+
+  } catch (std::string &e) {
+    std::cerr << "ERROR: " << e << "\n";
+    ret = 1;
+  }
+
+  return ret;
 }
