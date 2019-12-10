@@ -25,7 +25,6 @@ ifndef OcpiRunArgs
   $(info Usage is OcpiRunArgs=<platform>.)
   $(info Execution will be skipped.)
   OcpiAppNoRun=1
-  run:
 endif
 
 include $(OCPI_CDK_DIR)/include/application.mk

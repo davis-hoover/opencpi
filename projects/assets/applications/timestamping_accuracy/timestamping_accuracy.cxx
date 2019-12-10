@@ -25,14 +25,17 @@
  * The application consists of a device worker with a single input signal. The
  * worker collects the timestamp from its WTI at every rising edge of the input
  * signal and is done when the number of timestamps collected =
- * NUM_TIME_TAGS_TO_COLLECT
+ * num_time_tags_to_collect
  * 
  * The expected input signal is a 1 PPS signal from a high precision GPS receiver
  * (e.g FS740). Because the rising edge of this input signal is expected on each
  * second boundary of GPS time, the delta from the nearest second boundary can be
  * used to compute accuracy measurements. The average, minimum, maximum, and
- * standard deviation of the delta for the timestamps captured are reported. The
- * average can be used as a calibration constant for a timestamper worker.
+ * standard deviation of the delta for the timestamps captured are reported. 
+ *
+ * The application is run twice. The first time the average delta from the nearest
+ * second boundary is computed and fed into the application as a calibration
+ * constant to the signal_time_tagger worker.
  */
 
 #include <stdio.h>
@@ -46,73 +49,79 @@
 #include <algorithm> // std::min_element, std::max_element
 #include <sstream>   // std::ostringstream
 
-const int NUM_TIME_TAGS_TO_COLLECT=100;
-const int EXTRA_TIME_BUFFER=5; //Seconds buffer for application timeout
-//to prevent hanging application
-const int    MAX_EXPECTED_RUN_TIME_USECS=(NUM_TIME_TAGS_TO_COLLECT+EXTRA_TIME_BUFFER)*1e6;
+//Seconds buffer for application timeout
+const int MAX_NUM_TIME_TAGS_TO_COLLECT = 128;
+const int EXTRA_TIME_BUFFER = 5;
 const double NUM_MICROSECONDS_PER_FRAC_SEC = .000233;
 
 namespace OA = OCPI::API;
 using namespace std;
 
-void computeStatistics(uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLECT]){
-  int64_t delta_from_nearest_sec[NUM_TIME_TAGS_TO_COLLECT];
-  int64_t delta_corr[NUM_TIME_TAGS_TO_COLLECT];
-  int64_t avg_delta, avg_delta_corr = 0;
-  double  var, var_corr, std_dev, std_dev_corr = 0;
+int64_t computeStatistics(uint64_t* collected_time_tags, 
+		       uint32_t num_time_tags_to_collect,
+		       int64_t cal_value){
+  uint32_t frac_sec;
+  int64_t avg_delta;
+  int64_t delta_from_nearest_sec[num_time_tags_to_collect];
 
-  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++){
-    if(collected_time_tags_frac[a] <= std::pow(2.,32.)/2)
-      delta_from_nearest_sec[a] = collected_time_tags_frac[a];
+  //Compute avg from nearest second value
+  for (unsigned int a = 0; a < num_time_tags_to_collect; a++){
+    frac_sec = collected_time_tags[a];
+    if(frac_sec <= std::pow(2.,32.)/2)
+      delta_from_nearest_sec[a] = frac_sec;
     else
-      delta_from_nearest_sec[a] = -(std::pow(2.,32.) - collected_time_tags_frac[a]);
+      delta_from_nearest_sec[a] = -(std::pow(2.,32.) - frac_sec);
     avg_delta += (int64_t)(delta_from_nearest_sec[a] - avg_delta) / (a + 1);
   }
 
-  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
-    var += (int64_t)(delta_from_nearest_sec[a] - avg_delta) * 
-      (int64_t)(delta_from_nearest_sec[a] - avg_delta);
-  var /= NUM_TIME_TAGS_TO_COLLECT;
-  std_dev = sqrt(var);
-
-  cout << "Min Delta from nearest second              " << 
-    *std::min_element(delta_from_nearest_sec, delta_from_nearest_sec + NUM_TIME_TAGS_TO_COLLECT - 1) *
-    NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-  cout << "Max Delta from nearest second              " << 
-    *std::max_element(delta_from_nearest_sec, delta_from_nearest_sec + NUM_TIME_TAGS_TO_COLLECT - 1) *
-    NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
   cout << "Average Delta from nearest second          " << 
     avg_delta * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-  cout << "Standard Deviation from nearest second     " << 
-    std_dev * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
 
+  //Compute min, max, std_dev from nearest second value when cal value supplied
+  if(cal_value){
+    double  var, std_dev = 0;
 
-  //Report statistics with average subtracted
+    for (unsigned int a = 0; a < num_time_tags_to_collect; a++)
+      var += (int64_t)(delta_from_nearest_sec[a] - avg_delta) * 
+	(int64_t)(delta_from_nearest_sec[a] - avg_delta);
+    var /= num_time_tags_to_collect;
+    std_dev = sqrt(var);
 
-  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++){
-    if(delta_from_nearest_sec[a] >= avg_delta)
-      delta_corr[a] = delta_from_nearest_sec[a] - avg_delta;
-    else
-      delta_corr[a] = -(avg_delta - delta_from_nearest_sec[a]);
-    avg_delta_corr += 
-      (int64_t)(delta_corr[a] - avg_delta_corr) / (a + 1);
+    cout << "Min Delta from nearest second              " << 
+      *std::min_element(delta_from_nearest_sec, delta_from_nearest_sec + num_time_tags_to_collect - 1) *
+      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+    cout << "Max Delta from nearest second              " << 
+      *std::max_element(delta_from_nearest_sec, delta_from_nearest_sec + num_time_tags_to_collect - 1) *
+      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+    cout << "Standard Deviation from nearest second     " << 
+      std_dev * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
   }
+  return avg_delta;
+}
 
-   for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
-     var_corr += (int64_t)(delta_corr[a] - avg_delta_corr) * (int64_t)(delta_corr[a] - avg_delta_corr);
-   var_corr /= NUM_TIME_TAGS_TO_COLLECT;
-   std_dev_corr = sqrt(var_corr);
+void runApp(std::string platform, 
+		 uint32_t num_time_tags_to_collect,
+		 int64_t cal_value,
+		 uint64_t* collected_time_tags){
 
-   cout << "Min Delta with average subtracted          " << 
-     *std::min_element(delta_corr, delta_corr + NUM_TIME_TAGS_TO_COLLECT - 1) *
-     NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-   cout << "Max Delta with average subtracted          " << 
-     *std::max_element(delta_corr, delta_corr + NUM_TIME_TAGS_TO_COLLECT - 1) *
-     NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-   cout << "Average Delta with average subtracted      " << 
-     avg_delta_corr * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-   cout << "Standard Deviation with average subtracted " << 
-     std_dev_corr * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+    //to prevent hanging application
+    uint32_t max_expected_run_time_usecs = (num_time_tags_to_collect + EXTRA_TIME_BUFFER) * 1e6;
+    OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), 
+			 OA::PVString("platform", platform.c_str()), OA::PVEnd };
+    OA::Application app("timestamping_accuracy.xml", pvs);
+    app.initialize();
+    app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", num_time_tags_to_collect);
+    if(cal_value)
+      app.setPropertyValue("signal_time_tagger", "calibration_value", cal_value);
+
+    app.start();
+    app.wait(max_expected_run_time_usecs);
+    app.stop();
+
+    app.finish();
+
+    OA::Property collected_time_tags_p(app, "signal_time_tagger", "collected_time_tags");
+    collected_time_tags_p.getULongLongSequenceValue(collected_time_tags, MAX_NUM_TIME_TAGS_TO_COLLECT);
 }
 
 int main(int argc, char **argv) {
@@ -121,36 +130,25 @@ int main(int argc, char **argv) {
 
   try {
 
-    if(argc != 2) {
+    if(argc != 3) {
       std::ostringstream oss;
       oss << "wrong number of arguments" << "\n";
-      oss << "Usage is: " << argv[0] << " <platform>\n";
+      oss << "Usage is: " << argv[0] << " <platform> <num_time_tags_to_collect>\n";
       throw oss.str();
     }
 
     std::string platform = "=" + std::string(argv[1]);
-    OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), 
-			 OA::PVString("platform", platform.c_str()), OA::PVEnd };
+    uint32_t num_time_tags_to_collect = atoi(argv[2]);
+    uint64_t collected_time_tags[MAX_NUM_TIME_TAGS_TO_COLLECT];
 
-    OA::Application app("timestamping_accuracy.xml", pvs);
-    app.initialize();
-    app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", NUM_TIME_TAGS_TO_COLLECT);
+    cout << "Computing calibration value: " << endl;
+    runApp(platform, num_time_tags_to_collect, 0, collected_time_tags);
+    int64_t cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, 0);
 
-    app.start();
-    app.wait(MAX_EXPECTED_RUN_TIME_USECS);
-    app.stop();
-
-    app.finish();
-
-    uint32_t max_num_time_tags_to_collect;
-    app.getPropertyValue("signal_time_tagger", "MAX_NUM_TIME_TAGS_TO_COLLECT", max_num_time_tags_to_collect);
-
-    uint32_t collected_time_tags_frac[max_num_time_tags_to_collect];
-    OA::Property collected_time_tags_frac_p(app, "signal_time_tagger", "collected_time_tags_frac");
-    collected_time_tags_frac_p.getULongSequenceValue(collected_time_tags_frac,max_num_time_tags_to_collect);
-
-    computeStatistics(collected_time_tags_frac);
-
+    cout << "Timestamping Accuracy: " << endl;
+    runApp(platform, num_time_tags_to_collect, cal_value, collected_time_tags);
+    computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
+          
   } catch (std::string &e) {
     std::cerr << "ERROR: " << e << "\n";
     ret = 1;
