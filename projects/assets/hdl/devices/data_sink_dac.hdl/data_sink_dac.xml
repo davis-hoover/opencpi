@@ -20,6 +20,9 @@
 		   DataWidth="IN_PORT_DATA_WIDTH"
 		   ClockDirection="out"/>
 
+  <StreamInterface Name="on_off" 
+		   Clock="in"/>
+
   <DevSignal Name="dev" 
              Signals="qdac-16-signals.xml" 
              master="true"/> <!-- master must be lowercase -->

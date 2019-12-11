@@ -74,6 +74,8 @@ begin
     --On/Off port logic
     event_present <= start_samples or end_samples;
     
+    --Note that OWD includes Clock='in' for on_off port which means that the
+    --on_off port operates in the same clock domain as the in port (dac_clk)
     process(dac_clk)
     begin
       if rising_edge(dac_clk) then

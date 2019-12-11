@@ -16,4 +16,3 @@ enhancement?)
 
 
 /label ~"type::enhancement"
-/assign @nknowles88

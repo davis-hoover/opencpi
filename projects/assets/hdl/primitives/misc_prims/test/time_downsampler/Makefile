@@ -1,40 +1,31 @@
 .PHONY: all \
         cleantxt clean \
-        uut testbench \
-        FORCE
+        uut testbench
 
-all: xsim.dir/sim/
-
-FORCE:
+all: sim
 
 cleantxt:
 	rm -rf uut*.txt
 
 clean: cleantxt
-	rm -rf xsim.dir/ *.log *.pb *.jou *.str *.wdb .cache .Xil octave-workspace
+	rm -rf xsim.dir/ *.log *.pb *.jou *.str *.wdb .cache .Xil octave-workspace sim
 
-../xsim.dir/misc_prims/misc_prims.vdb: ../Makefile \
-  FORCE
+../xsim.dir/misc_prims/misc_prims.vdb: ../Makefile
 	$(MAKE) -C ../ xsim.dir/misc_prims/misc_prims.vdb
 
-../xsim.dir/misc_prims/time_downsampler.vdb: ../Makefile \
-  FORCE
+../xsim.dir/misc_prims/time_downsampler.vdb: ../Makefile
 	$(MAKE) -C ../ xsim.dir/misc_prims/time_downsampler.vdb
 
-../xsim.dir/misc_prims/counter.vdb: ../Makefile \
-  FORCE
+../xsim.dir/misc_prims/counter.vdb: ../Makefile
 	$(MAKE) -C ../ xsim.dir/misc_prims/counter.vdb
 
-../xsim.dir/misc_prims/lfsr.vdb: ../Makefile \
-  FORCE
+../xsim.dir/misc_prims/lfsr.vdb: ../Makefile
 	$(MAKE) -C ../ xsim.dir/misc_prims/lfsr.vdb
 
-../xsim.dir/misc_prims/maximal_lfsr_data_src.vdb: ../Makefile \
-  FORCE
+../xsim.dir/misc_prims/maximal_lfsr_data_src.vdb: ../Makefile
 	$(MAKE) -C ../ xsim.dir/misc_prims/maximal_lfsr_data_src.vdb
 
-../xsim.dir/misc_prims/latest_reg.vdb: ../Makefile \
-  FORCE
+../xsim.dir/misc_prims/latest_reg.vdb: ../Makefile
 	$(MAKE) -C ../ xsim.dir/misc_prims/latest_reg.vdb
 
 xsim.dir/work/data_src.vdb: data_src.vhd \
@@ -59,8 +50,9 @@ xsim.dir/work/testbench.vdb: testbench.vhd \
     xsim.dir/work/subtest.vdb
 	./myxvhdl.sh --lib misc_prims=../xsim.dir/misc_prims $<
 
-xsim.dir/sim/: xsim.dir/work/testbench.vdb
+sim: testbench
 	xelab -debug wave --lib unisim --lib misc_prims=../xsim.dir/misc_prims testbench -s sim
+	touch sim
 
 # for convenience
 uut:       xsim.dir/misc_prims/time_downsampler.vdb

@@ -19,4 +19,3 @@ console/log/code output here
 
 
 /label ~"type::problem"
-/assign @nknowles88
