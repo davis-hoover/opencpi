@@ -180,7 +180,7 @@ def do_zlm_test():
     do_test = (num_samples != -1) and \
               (os.environ.get("OCPI_TEST_ZLM_WHEN_NUM_SAMPLES_REACHED_p") ==
               "true")
-    ss = "num_samples != 1 and ZLM_WHEN_NUM_SAMPLES_REACHED_p = true"
+    ss = "num_samples != -1 and ZLM_WHEN_NUM_SAMPLES_REACHED_p = true"
     if do_test:
         zlm_found = False
         for msg in msgs:
