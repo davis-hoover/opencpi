@@ -54,6 +54,7 @@ VivadoZynqSources=\
   vivado_zynq/zynq_pkg.vhd \
   $(XilinxZynqPSFiles:%=$(XilinxZynq)/$(XilinxZynqCore)_%.v) \
   vivado_zynq/$(XilinxZynqCore)_processing_system7.v \
+  vivado_zynq/$(XilinxZynqCore)_processing_system7_spi0.v \
   vivado_zynq/zynq_ps.vhd
 
 IseZynqSources=$(XilinxZynq_isePSFiles:%=$(XilinxZynq_ise)/%.v) zynq_ps.vhd
@@ -95,17 +96,13 @@ else
   endif
 endif
 
-# In order to generate the processing_system7 top verilog file with Vivado,
-# we need to run a series of TCL commands located in vivado/tcl
 vivado_zynq/$(XilinxZynqCore)_processing_system7.v:
-	$(AT)rm -rf vivado_zynq/tmp; \
-	     mkdir vivado_zynq/tmp; \
-	     cd vivado_zynq/tmp; \
-	     $(call OcpiXilinxVivadoInit); \
-	     vivado -mode batch -source ../ps7.tcl -tclargs $(XilinxZynqPS7Version) > ../ps7.log; \
-	     cd ..; \
-	     cp tmp/managed_ip_project/managed_ip_project.srcs/sources_1/ip/processing_system7_0/hdl/verilog/$(XilinxZynqCore)_processing_system7.v .; \
-	     rm -rf tmp;
+	$(AT)$(call OcpiXilinxVivadoInit); \
+	./vivado_zynq/gen_xilinx_ip_processing_system_7.sh $(XilinxZynqPS7Version) processing_system7_0 0
+
+vivado_zynq/$(XilinxZynqCore)_processing_system7_spi0.v:
+	$(AT)$(call OcpiXilinxVivadoInit); \
+	./vivado_zynq/gen_xilinx_ip_processing_system_7.sh $(XilinxZynqPS7Version) processing_system7_0_spi0 1
 
 # Do not remove ps7 top level verilog on clean
 # This will save time

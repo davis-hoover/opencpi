@@ -137,6 +137,20 @@ begin
       s_axi_gp_out          => ps_s_axi_gp_out,
       s_axi_hp_in           => ps_axi_hp_in,
       s_axi_hp_out          => ps_axi_hp_out
+      spi0_sclk_i           => '0',
+      spi0_sclk_o           => open,
+      spi0_sclk_t           => open,
+      spi0_mosi_i           => '0',
+      spi0_mosi_o           => open,
+      spi0_mosi_t           => open,
+      spi0_miso_i           => '0',
+      spi0_miso_o           => open,
+      spi0_miso_t           => open,
+      spi0_ss_i             => '0',
+      spi0_ss_o             => open,
+      spi0_ss1_o            => open,
+      spi0_ss2_o            => open,
+      spi0_ss_t             => open
       );
   -- Adapt the axi master from the PS to be a CP Master
   cp : axi2cp

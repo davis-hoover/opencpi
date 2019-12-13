@@ -801,6 +801,9 @@ component processing_system7 is
   end component;
 
 component zynq_ps is
+  generic(
+    PCW_SPI0_PERIPHERAL_ENABLE : boolean := false
+    );
   port(
     ps_in        : in    pl2ps_t;
     ps_out       : out   ps2pl_t;
@@ -809,7 +812,21 @@ component zynq_ps is
     s_axi_gp_in  : in    s_axi_gp_in_array_t(0 to C_S_AXI_GP_COUNT-1);
     s_axi_gp_out : out   s_axi_gp_out_array_t(0 to C_S_AXI_GP_COUNT-1);
     s_axi_hp_in  : in    s_axi_hp_in_array_t(0 to C_S_AXI_HP_COUNT-1);
-    s_axi_hp_out : out   s_axi_hp_out_array_t(0 to C_S_AXI_HP_COUNT-1)
+    s_axi_hp_out : out   s_axi_hp_out_array_t(0 to C_S_AXI_HP_COUNT-1);
+    spi0_sclk_i  : in    std_logic;
+    spi0_sclk_o  : out   std_logic;
+    spi0_sclk_t  : out   std_logic;
+    spi0_mosi_i  : in    std_logic;
+    spi0_mosi_o  : out   std_logic;
+    spi0_mosi_t  : out   std_logic;
+    spi0_miso_i  : in    std_logic;
+    spi0_miso_o  : out   std_logic;
+    spi0_miso_t  : out   std_logic;
+    spi0_ss_i    : in    std_logic;
+    spi0_ss_o    : out   std_logic;
+    spi0_ss1_o   : out   std_logic;
+    spi0_ss2_o   : out   std_logic;
+    spi0_ss_t    : out   std_logic
     );
 end component zynq_ps;
 
