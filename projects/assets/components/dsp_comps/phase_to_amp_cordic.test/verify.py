@@ -71,13 +71,13 @@ ifilename.close()
 
 # Test #1 - Check that output data is not all zeros
 if all(odata == 0):
-    print("\tValues are all zero")
+    print ("\tValues are all zero")
     sys.exit(1)
 
 # Test #2 - Check that output data is the expected amount
 if len(odata) != int(NUM_SAMPLES-STAGES-2):
-    print("\tOutput file length is unexpected")
-    print("\tLength ofilename = ", len(odata), "while expected length is = ", int(NUM_SAMPLES-STAGES-2))
+    print ("\tOutput file length is unexpected")
+    print ("\tLength ofilename = ", len(odata), "while expected length is = ", int(NUM_SAMPLES-STAGES-2))
     sys.exit(1)
 
 # Test #3 - Check that output data values
@@ -116,12 +116,12 @@ if (enable == "true"): # => NORMAL MODE
     # Check that the difference between the calculated and expected frequencies is greater
     # than the max possible difference (max_delta).
     if (calc_delta > max_delta):
-        print("\tExpected:Max:Delta ", expected_freq, measured_freq, calc_delta, max_delta)
+        print ("\tExpected:Max:Delta ", expected_freq, measured_freq, calc_delta, max_delta)
         sys.exit(1)
-    print("\tResults (Normal Mode): Max freq is within the expected range")
+    print ("\tResults (Normal Mode): Max freq is within the expected range")
 
 else: # => BYPASS MODE
     if (idata[0:NUM_SAMPLES-STAGES-2] != odata['real_idx']).all():
-        print("\tInput and output data files do not match")
+        print ("\tInput and output data files do not match")
         sys.exit(1)
-    print("\tResults (Bypass Mode): Input and output data files match")
+    print ("\tResults (Bypass Mode): Input and output data files match")

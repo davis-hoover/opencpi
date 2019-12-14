@@ -28,4 +28,4 @@ if type(x) is np.ndarray:
     plt.title('RX App\nFailures vs. RF Tune Freq')
     plt.show()
 else:
-    print("Not enough data to plot")
+    print "Not enough data to plot"

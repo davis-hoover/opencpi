@@ -23,7 +23,7 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
        inode64 \
        "fix for 32 bit binaries running on 64-bit-inode file systems" \
-       https://www.mjr19.org.uk/personal/sw \
+       https://www.mjr19.org.uk/sw \
        inode64.c \
        . \
        0

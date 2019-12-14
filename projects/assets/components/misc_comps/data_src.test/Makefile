@@ -17,3 +17,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 include $(OCPI_CDK_DIR)/include/test.mk
+clean::
+	rm -rf __pycache__

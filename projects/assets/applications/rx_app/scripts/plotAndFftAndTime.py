@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python2
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -53,18 +53,18 @@ def main():
     dataType=sys.argv[2].lower()
     numSamples=int(sys.argv[3])
     if numSamples>len(data):
-        print("Error: Number of samples requested is less than file length")
+        print "Error: Number of samples requested is less than file length"
         return
     sampleRate=int(sys.argv[4])
     messageSize=int(sys.argv[5])
     message_size_in_words=messageSize/4
-    print("file is : "+f.name)
-    print("data is : "+dataType)
-    print("num samples is: "+str(numSamples))
-    print("sample rate is: "+str(sampleRate))
+    print "file is : "+f.name
+    print "data is : "+dataType
+    print "num samples is: "+str(numSamples)
+    print "sample rate is: "+str(sampleRate)
 
     if dataType=="complex":
-        print("Input is complex data")
+        print "Input is complex data"
         #Pull out I and Q and make lists for each
         iqList=np.array([],dtype=complex);
         timestampList=list();
@@ -75,7 +75,7 @@ def main():
             if(message_size_in_words>0):
                 if(a%(message_size_in_words*2+4)==0):
                     timestampList.append(((data[a+1].astype(np.uint16)<<16)+data[a].astype(np.uint16))+(1.0*((data[a+3].astype(np.uint16)<<16)+data[a+2].astype(np.uint16))/0xFFFFFFFF))
-                    print("Timestamp at index:","{0:09}".format(a),":","{:10.7f}".format(timestampList[-1]),"Seconds:","{0:#x}".format(((data[a+1].astype(np.uint16)<<16)+data[a].astype(np.uint16)).astype(np.uint32)),"Fraction:","{0:#x}".format(((data[a+3].astype(np.uint16)<<16)+data[a+2].astype(np.uint16)).astype(np.uint32)),("Delta:{:10.7f}".format(timestampList[-1]-timestampList[-2]),"Expected:,{:10.7f}".format(1.0/sampleRate*message_size_in_words)) if (len(timestampList)>1) else " ")
+                    print "Timestamp at index:","{0:09}".format(a),":","{:10.7f}".format(timestampList[-1]),"Seconds:","{0:#x}".format(((data[a+1].astype(np.uint16)<<16)+data[a].astype(np.uint16)).astype(np.uint32)),"Fraction:","{0:#x}".format(((data[a+3].astype(np.uint16)<<16)+data[a+2].astype(np.uint16)).astype(np.uint32)),("Delta:{:10.7f}".format(timestampList[-1]-timestampList[-2]),"Expected:,{:10.7f}".format(1.0/sampleRate*message_size_in_words)) if (len(timestampList)>1) else " "
                     a+=4
                 else:
                     iqList=np.append(iqList,complex(data[a],data[a+1]))
@@ -130,7 +130,7 @@ def main():
 
         print("End!")
     else:
-        print("Non-complex data not supported")
+        print "Non-complex data not supported"
 
 if __name__ == '__main__':
     main()

@@ -23,7 +23,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-architecture rtl of data_src_worker is
+architecture rtl of worker is
   constant WIDTH      : integer := to_integer(DATA_BIT_WIDTH_p);
   -- mandatory output port logic
   signal data_ready_for_out_port : std_logic := '0';
