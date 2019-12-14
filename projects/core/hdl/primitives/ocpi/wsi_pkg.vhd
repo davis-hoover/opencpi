@@ -141,6 +141,8 @@ package wsi is
       input_eof        : in  Bool_t;   -- an EOF is pending from (the first) input port
       buffer_size      : in  UShort_t;
       latency          : out UShort_t;
+      messages         : out ULong_t;  -- the message count - if debug
+      bytes            : out ULong_t;  -- the byte count - if debug
     --====== Signals to and from the worker=====
       -- only used if abortable
       abort            : in  Bool_t; -- message is aborted

@@ -1,0 +1,22 @@
+<build>
+  <configuration id='0'>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='1'>
+    <parameter name='src_clk_hz' value='50000000.0'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='2'>
+    <parameter name='src_clk_hz' value='25000000.0'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='3'>
+    <parameter name='dst_clk_hz' value='50000000.0'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+  <configuration id='4'>
+    <parameter name='dst_clk_hz' value='25000000.0'/>
+    <parameter name='num_input_samples' value='15'/>
+  </configuration>
+
+</build>

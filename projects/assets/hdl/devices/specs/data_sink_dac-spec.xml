@@ -1,0 +1,28 @@
+<ComponentSpec>
+  <Property Name="DAC_WIDTH_BITS"
+            Type="UChar"
+            Parameter="True"
+            Default="12"
+            Description="Number of bits in each of the I and Q values delivered to the DAC device"/>
+  <Property Name="DAC_OUTPUT_IS_LSB_OF_IN_PORT" 
+            Type="Bool" 
+            Parameter="True"
+	    Default="false"
+            Description="Indicates whether DAC data is extracted from the most
+                         significant or least significant DAC_WIDTH_BITS of the in port."/>
+  <Property Name="underrun_sticky_error"
+            Type="Bool"
+            Volatile="true"
+            Description="Sticky bit indication of samples underrun."/>
+  <Property Name="clr_underrun_sticky_error" 
+            Type="Bool"
+            Writable="true"
+            Description="Writing true clears underrun_sticky_error."/>
+
+  <Port Name="in" 
+        Protocol="ComplexShortWithMetadata-prot"/>
+  <Port Name="on_off" 
+        Protocol="tx_event-prot"
+        Optional="1"
+        Producer="true"/>
+</ComponentSpec>

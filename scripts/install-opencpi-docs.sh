@@ -30,18 +30,36 @@
   exit 1
 }
 set -e
+
 # We do some bootstrapping here (that is also done in the scripts we call), in order to know
 # whether the platform we are building
 
 # Ensure exports (or cdk) exists and has scripts
 source ./scripts/init-opencpi.sh
+
 # Ensure CDK and TOOL variables
 OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh; source $OCPI_BOOTSTRAP
+
 [ "${OCPI_TOOL_PLATFORM}" == "centos7" ] || (echo "This script only works on CentOS 7, sorry!"; exit 1)
 sanity=--setopt=skip_missing_names_on_install=False
-echo Installing all the standard packages required to build OpenCPI documentation using "sudo yum install"...
-sudo yum install -y $sanity epel-release texlive-latex ghostscript libreoffice-headless unoconv
-sudo yum install -y $sanity rubber texlive-latex-bin texlive-texconfig-bin texlive-metafont-bin texlive-cm texlive-pdftex-def texlive-ifluatex texlive-zapfding texlive-helvetic texlive-times texlive-symbol texlive-titlesec texlive-multirow texlive-dvips texlive-fancyhdr texlive-collection-fontsrecommended texlive-microtype texlive-rotating texlive-placeins texlive-appendix
+
+# Docker doesn't have sudo installed by default and we run as root inside
+# a container anyway
+SUDO=
+if [ "$(whoami)" != root ]; then
+  SUDO=$(command -v sudo)
+  [ $? -ne 0 ] && echo "\
+Error: Could not find 'sudo' and you are not root. Installing packages requires
+root permissions." && exit 1
+fi
+
+echo Installing all the standard packages required to build OpenCPI
+echo documentation using "$SUDO yum install"...
+$SUDO yum install -y $sanity epel-release
+$SUDO yum install -y $sanity ghostscript git libreoffice-headless make rubber \
+  texlive texlive-appendix texlive-latex texlive-multirow texlive-placeins \
+  texlive-titlesec unoconv
+
 echo Building/creating OpenCPI documentation in the doc/pdfs directory.
 make doc
 echo PDFs and the index.html have been created in the doc/pdfs directory.

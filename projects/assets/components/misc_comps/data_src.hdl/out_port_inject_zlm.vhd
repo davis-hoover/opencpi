@@ -66,7 +66,7 @@ begin
       q_r => open);
 
   -- same as zlm_req, but obeys backpressure
-  force_zlm <= pending_zlm and out_in_ready;
+  force_zlm <= (zlm_req or pending_zlm) and out_in_ready;
 
   zlm_req_sent <= force_zlm;
   som_o        <= som_i or force_zlm;

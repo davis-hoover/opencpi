@@ -31,12 +31,18 @@
 --  immediately when the FIFO becomes FULL or EMPTY, but their deassertion
 --  is delayed due to synchronization latency.
 --
+--  When the FIFO is in the empty/full state consistenly, this latency
+--  can impact throughput. To minimize the impact of this latency, the depth of
+--  the FIFO should be at least 2*latency (2 to cover both the latency of
+--  clearing the FULL and the EMPTY flags) or 10. 16 is the recommended value
+--  because this implementation only supports depths which are powers of 2. 
+--
 -- Generics:
 --  WIDTH : width of data mult-bit data signal. >= 1 (default 1)
 --  DEPTH : number of data words to store. Must be power of 2. >= 2 (default 2)
 --
 -- Latency:
---  dst_OUT : 1 src_CLK + 4 dst_CLk
+--  dst_OUT : 1 src_CLK + 3 dst_CLk
 --
 -- Background:
 --  - VHDL replacement for core/hdl/primitives/bsv/imports/SyncFIFO.v
@@ -160,7 +166,7 @@ architecture rtl of fifo is
 begin
 
   assert (DEPTH = 2**INDXWIDTH)
-    report "ERROR sync_fifo_ic.vhd: INDXWIDTH and DEPTH do not match. DEPTH must equal 2 ** INDXWIDTH"
+    report "ERROR fifo.vhd: INDXWIDTH and DEPTH do not match. DEPTH must equal 2 ** INDXWIDTH"
     severity failure;
 
   -- Resets

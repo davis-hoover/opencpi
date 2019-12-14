@@ -22,14 +22,50 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <lzma.h>
+#include <unistd.h>
 #include "XferManager.h"
 #include "HdlDevice.h"
+#include "HdlDriver.h"
+#include "HdlContainer.h"
+/// @todo / FIXME - figure out problems w/ gpsd functionality commented out here
+//#include <libgpsmm.h>
 
 #define USE_LZMA 1
 namespace OCPI {
   namespace HDL {
     namespace OE = OCPI::Util::EzXml;
     namespace OU = OCPI::Util;
+    namespace OO = OCPI::OS;
+
+    enum TimeService_PPS_out_source {
+      TIME_SERVICE_PPS_OUT_SOURCE_TIMESERVER_BASED,
+      TIME_SERVICE_PPS_OUT_SOURCE_COPY_OF_INPUT_PPS,
+      TIME_SERVICE_PPS_OUT_SOURCE_LOCAL_REFCLK_DIV2,
+      TIME_SERVICE_PPS_OUT_SOURCE_DISABLED,
+      TIME_SERVICE_PPS_OUT_SOURCE_PAD_ = 0X7FFFFFFF
+    } __attribute__((__packed__));
+    // The properties of the Hardware Time Server
+    // (see projects/core/hdl/devices/time_server.hdl/time_server.xml)
+    struct __attribute__ ((__packed__)) TimeService {
+      uint64_t time_now; /* 0x00 */
+      uint64_t delta; /* 0x08 */
+      uint8_t PPS_ok; /* 0x10 */
+      uint8_t enable_time_now_updates_from_PPS; /* 0x11 */
+      uint8_t valid_requires_write_to_time_now; /* 0x12 */
+      uint8_t clr_status_sticky_bits; /* 0x13 */
+      uint8_t force_time_now_to_free_running; /* 0x14 */
+      char pad0_[3];
+      enum TimeService_PPS_out_source PPS_out_source; /* 0x18 */
+      uint8_t force_time_now_valid; /* 0x1C */
+      uint8_t force_time_now_invalid; /* 0x1D */
+      uint8_t PPS_lost_sticky_error; /* 0x1E */
+      uint8_t time_now_updated_by_PPS_sticky; /* 0x1F */
+      uint8_t time_now_set_sticky; /* 0x20 */
+      uint8_t PPS_lost_last_second_error; /* 0x21 */
+      uint8_t PPS_count; /* 0x22 */
+      char pad1_[1];
+      uint32_t ticks_per_second; /* 0x24 */
+    };
 
     // The derived class will set up accessors after this constructor is done
     // So we can't perform accesses until that time, which is the "init" call.
@@ -55,6 +91,64 @@ namespace OCPI {
 
     static sigjmp_buf jmpbuf;
     static void catchBusError(int) { siglongjmp(jmpbuf, 1); }
+    /// @todo / FIXME - document justification for default timeout value
+    bool Device::
+    getPPSIsOkay(useconds_t timeout=2100e3, useconds_t sleepTime=100e3) {
+      bool ret = false;
+      useconds_t elapsed = 0;
+      Access *ts = timeServer();
+      ocpiInfo("HDL Device '%s': waiting up to %i usec for time_server.hdl PPS_ok...",
+               m_name.c_str(), (int)timeout);
+      while (elapsed < timeout) {
+        usleep(sleepTime);
+        elapsed += sleepTime;
+        if (ts) {
+          ret = ts->get8RegisterOffset(offsetof(TimeService, PPS_ok));
+          if (ret) {
+            ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is true", m_name.c_str());
+            break;
+          }
+        }
+      }
+      return ret;
+    }
+    OS::Time Device::
+    now(bool &isGps) {
+      OS::Time ret;
+      OS::Time current_time;
+      Access *ts = timeServer();
+      isGps = true;
+      if (!ts)
+        isGps = false;
+      if (isGps)
+        isGps = Driver::getSingleton().configure_gpsd_if_enabled(); // PPS pin init'd for PPS_ok
+      if (isGps) {
+        auto os = offsetof(TimeService, enable_time_now_updates_from_PPS);
+        ts->set8RegisterOffset(os, 1);
+        isGps = getPPSIsOkay();
+        if (!isGps)
+          ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is false, forcing GPS time to be "
+                   "ignored", m_name.c_str());
+      }
+      if (isGps) {
+        current_time = Driver::getSingleton().now(isGps);
+      }
+      if (isGps) {
+        // if system.xml has gpsd tag, WTI time valid=1 means time came from
+        // successful gps fix
+        auto os = offsetof(TimeService, valid_requires_write_to_time_now);
+        ts->set8RegisterOffset(os, 1);
+        os = offsetof(TimeService, time_now);
+        // write integer portion only (most significant 32 bits) from
+        // libgpsd-provided time from HDL::Driver to HTS
+        ts->set64RegisterOffset(os, current_time.bits());
+        // read current Q32.32 time from HTS now that HTS is fully sync'd to GPS
+        ret = ts->get64RegisterOffset(os);
+      }
+      if (!isGps)
+        ret = OS::Time::now();
+      return ret;
+    }
     // Called from derived constructor after accessors have been set up.
     // Also called after bitstream loading.
     bool Device::

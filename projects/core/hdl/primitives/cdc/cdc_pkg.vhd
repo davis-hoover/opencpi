@@ -51,7 +51,7 @@ package cdc is
     generic (
       N         : natural   := 2;         -- Range 2 - 10
       IREG      : std_logic := '0';       -- 0=no, 1=yes input register
-      RST_LEVEL : std_logic := '1');      -- 0=low, 1=high
+      RST_LEVEL : std_logic := '0');      -- 0=low, 1=high
     port (
       src_clk  : in  std_logic;           -- optional; required when IREG='1'
       src_rst  : in  std_logic;           -- optional; required when IREG='1'
@@ -66,7 +66,7 @@ package cdc is
     generic (
       N         : natural   := 2;         -- Range 2 - 10
       IREG      : std_logic := '0';       -- 0=no, 1=yes input register
-      RST_LEVEL : std_logic := '1';       -- 0=low, 1=high
+      RST_LEVEL : std_logic := '0';       -- 0=low, 1=high
       WIDTH     : positive  := 1);
     port (
       src_clk   : in  std_logic;
@@ -85,6 +85,7 @@ package cdc is
       src_clk : in  std_logic;
       src_rst : in  std_logic;
       src_in  : in  std_logic;
+      src_rdy : out std_logic;
       dst_clk : in  std_logic;
       dst_rst : in  std_logic;           -- optional; if not required, tie '0'
       dst_out : out unsigned(WIDTH-1 downto 0));
@@ -102,4 +103,19 @@ package cdc is
       dst_rst : in  std_logic;
       dst_out : out std_logic);
   end component pulse;
+
+  component fast_pulse_to_slow_sticky is
+    port(
+      -- fast clock domain
+      fast_clk    : in  std_logic;
+      fast_rst    : in  std_logic;
+      fast_pulse  : in  std_logic; -- pulse to be detected w/ sticky bit out
+      -- slow clock domain
+      slow_clk    : in  std_logic;
+      slow_rst    : in  std_logic;
+      slow_clr    : in  std_logic;  -- clears sticky bit
+      slow_sticky : out std_logic); -- sticky bit set when fast_pulse is high,
+                                    -- sync'd to slow clock domain
+  end component fast_pulse_to_slow_sticky;
+
 end package cdc;
