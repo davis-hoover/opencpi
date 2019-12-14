@@ -65,8 +65,14 @@ MyCores=$(ImportCores) $(Cores)
 ifdef PrimitiveLibraries
 Libs:=$(PrimitiveLibraries)
 endif
-
+# If not cleaning and no platforms, don't bother
+ifeq ($(HdlPlatform)$(HdlPlatforms)$(filter-out clean%,$(MAKECMDGOALS)),)
+all:
+	$(AT)echo No HDL platforms specified.  Skipping building of hdl primitives.
+else
 all: $(Libs) $(MyCores)
+endif
+
 hdl: all
 # enable cores to use libs
 $(Cores): $(Libs)

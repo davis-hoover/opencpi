@@ -160,7 +160,7 @@ begin
   nbytes             <= be2bytes(in_in.byte_enable) when its(in_in.valid) else (others => '0');
   md_in.length       <= (resize(buffer_offset_r, meta_length_width_c) sll addr_shift_c) + nbytes;
   md_in.eof          <= in_in.eof;
-  md_in.truncate     <= in_in.valid and buffer_maxed_r;
+  md_in.truncate     <= in_in.eom and buffer_maxed_r; -- signal truncation at end of message
   md_in.opcode       <= in_in.opcode;
   md_enq             <= to_bool(its(can_take) and ((in_in.ready and its(in_in.eom)) or
                                                    (in_in.eof and not its(eof_sent_r))));
@@ -180,7 +180,7 @@ begin
         dst_rst           => ctl_in.reset,
         unsigned(dst_out) => props_out.faults(2 downto 0));
 
-  truncatedData <= taking and in_in.valid and buffer_maxed_r;
+  truncatedData <= taking and in_in.eom and buffer_maxed_r; -- signal truncation at EOM
   -- cross from sdp clock domain to ctl clock domain
   -- increment for each cycle where the input is high
   trunc_data : component cdc.cdc.count_up
