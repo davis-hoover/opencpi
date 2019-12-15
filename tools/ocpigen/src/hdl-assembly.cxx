@@ -1084,9 +1084,9 @@ emitAssyHDL() {
 		  myComment());
 	first = false;
 	if (m_language == VHDL)
-	  fprintf(f, "  signal %s_%s : std_logic;\n", i->cname(), c.signal());
+	  fprintf(f, "  signal %s_%s : std_logic;\n", i->cname(), signal.c_str());
 	else
-	  fprintf(f, "  wire %s_%s;\n", i->cname(), c.signal());
+	  fprintf(f, "  wire %s_%s;\n", i->cname(), signal.c_str());
       }
     }
   }
