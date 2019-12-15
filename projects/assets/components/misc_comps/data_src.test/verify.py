@@ -26,10 +26,12 @@ import math
 # this exists for optimization purposes, gen_bit_reversal_table.py originally
 # generated this file
 import bit_reverse_table
-
 # this exists for optimization purposes, gen_lfsr_tables.py originally
 # generated this file
 import lfsr_tables
+
+import opencpi.unit_test_utils as utu
+import opencpi.iqstream_utils as iqm
 
 DATA_BIT_WIDTH_p = int(os.environ.get("OCPI_TEST_DATA_BIT_WIDTH_p"))
 num_samples      = int(os.environ.get("OCPI_TEST_num_samples"))
@@ -49,10 +51,8 @@ if (LFSR_bit_reverse != 'true') and (LFSR_bit_reverse != 'false'):
           LFSR_bit_reverse, " received, expected true or false")
     sys.exit(100)
 
-OFILENAME = open(sys.argv[1], 'rb')
-dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,0), 'imag_idx':(np.int16,2)}))
-odata = np.fromfile(OFILENAME, dtype=dt_iq_pair, count=-1)
-OFILENAME.close()
+msgs = iqm.parse_msgs_from_msgs_in_file(sys.argv[1])
+odata = iqm.parse_samples_data_from_msgs_in_file(sys.argv[1])
 
 def comma_sep_bool_string_to_bit_list(bool_array_string,
                                       array_length):
@@ -71,39 +71,37 @@ def comma_sep_bool_string_to_bit_list(bool_array_string,
             bit_list.append(0)
     return list(bit_list)
 
-def test_odata_file_length_zero_when_enable_prop_false():
+def test_out_file_contains_zero_msgs_when_enable_prop_false():
     if enable == "false":
-        if len(odata) == 0:
-            print("    PASS: output file length = 0 32-bit words for 'enable'",
+        if len(msgs) == 0:
+            print("    PASS: num output file messages = 0 for 'enable'",
                   "property = false")
         else:
-            print("    FAIL: output file length =", len(odata), "32-bit"
-                  "words, while expected length is 0 32-bit words for",
-                  "'enable' property = false")
+            print("    FAIL: num output file messages =", len(msgs), "while",
+                  "expected num messages is 0 when enable' property = false")
             sys.exit(1)
 
-def test_odata_file_length_matches_expected_num_samples():
+def test_out_file_contains_expected_num_samples():
     if enable == "true":
         if num_samples == -1:
-            if len(odata) >= 1:
-                print("    PASS: output file length >= 1 samples for 'num_samples'" \
-                      " property value = -1")
+            if len(msgs) >= 1:
+                print("    PASS: num output file messages >= 1 for",
+                      "'num_samples' property value = -1")
             else:
-                print("    FAIL: output file length =", len(odata), \
-                      " samples, while expected length is >=1 for 'num_samples'" \
-                      " property value = -1")
+                print("    FAIL: num output file messages =", len(msgs),
+                      "samples, while expected num  messages is >=1 for",
+                      "'num_samples' property value = -1")
                 sys.exit(1)
         else:
             if len(odata) == num_samples:
-                print("    PASS: output file length = input file length")
+                print("    PASS: num output file samples = expected num samples")
             else:
-                print("    FAIL: output file length =", len(odata), \
-                      "samples, while expected length =", num_samples, \
-                      "samples for 'num_samples' property value =", \
-                      num_samples)
+                print("    PASS: num output file samples =", len(odata),
+                      " while expected num =", num_samples,
+                      "for 'num_samples' property value =", num_samples)
                 sys.exit(1)
 
-def test_odata_file_binary_contents_are_as_expected():
+def test_out_file_samples_are_as_expected():
     if num_samples == 0:
         print("    skipping file binary contents check since num samples saved " \
               " out was 0")
@@ -116,7 +114,8 @@ def test_odata_file_binary_contents_are_as_expected():
         elif mode == "walking":
             # e.g. b'100 -> b'010 -> b'001 -> b'100 ->etc  (see
             # component data sheet)
-            tmp = np.arange(DATA_BIT_WIDTH_p-1,DATA_BIT_WIDTH_p-len(odata)-1,-1)
+            nsamps = len(odata)
+            tmp = np.arange(DATA_BIT_WIDTH_p-1,DATA_BIT_WIDTH_p-nsamps-1,-1)
             data = 2**np.remainder(tmp, DATA_BIT_WIDTH_p)
         elif mode == "LFSR":
             if LFSR_bit_reverse == 'true':
@@ -177,11 +176,30 @@ def test_odata_file_binary_contents_are_as_expected():
             sys.exit(1)
     print("    PASS: output file content matches expected content")
 
+def do_zlm_test():
+    do_test = (num_samples != -1) and \
+              (os.environ.get("OCPI_TEST_ZLM_WHEN_NUM_SAMPLES_REACHED_p") ==
+              "true")
+    ss = "num_samples != -1 and ZLM_WHEN_NUM_SAMPLES_REACHED_p = true"
+    if do_test:
+        zlm_found = False
+        for msg in msgs:
+            if(msg[utu.MESSAGE_LENGTH] == 0):
+                zlm_found = True
+                print("    PASS: as expected, output file contains ZLM when",
+                      ss)
+                break
+        if not zlm_found:
+            print("    FAIL: unexpected - output file does not contain ZLM",
+                  "when", ss)
+            sys.exit(1)
+
 def main():
-    test_odata_file_length_zero_when_enable_prop_false()
-    test_odata_file_length_matches_expected_num_samples()
+    test_out_file_contains_zero_msgs_when_enable_prop_false()
+    test_out_file_contains_expected_num_samples()
     if len(odata) > 0:
-        test_odata_file_binary_contents_are_as_expected()
+        test_out_file_samples_are_as_expected()
+    do_zlm_test()
 
 if __name__ == "__main__":
     main()

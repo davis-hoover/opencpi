@@ -152,9 +152,13 @@ done
         done
       done
       rm ${tex}
-      sed -i -e "s|${tex}\$|*|g" ${DEV_FILES}
-      ln -sf /opt/opencpi/doc/${proj}/$(basename ${tex} tex)pdf $(dirname ${tex})/$(basename ${tex} tex)pdf
-      echo "If this documentation symlink is broken, install opencpi-doc RPM or visit https://opencpi.github.io/" > $(dirname ${tex})/README
+      base=$(basename ${tex})
+      name=${base%.tex}
+      dir=$(dirname $tex)
+      sed -i -e "s|\(.*$proj/$dir/$name\).tex\$|\1.pdf\\
+\1.README|" ${DEV_FILES}
+      ln -sf /opt/opencpi/doc/$proj/$name.pdf $dir/$name.pdf
+      echo "If this documentation symlink is broken, install opencpi-doc RPM or visit https://opencpi.github.io/" > $dir/$name.README
     done
     popd
   done

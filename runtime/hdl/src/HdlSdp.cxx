@@ -71,7 +71,7 @@ namespace OCPI {
 	    // shouldn't happen because we have it open for writing too
 	    error = "EOF on SDP channel, simulation server stopped";
 	  else if (nread > 0) {
-	    nRequested -= nread;
+	    nRequested -= (size_t)nread;
 	    buf += nread;
 	    ocpiDebug("SIM got %zu from fd %d", nread, fd);
 	  } else if (errno != EINTR)

@@ -196,7 +196,7 @@ Clock(Worker &w) : m_worker(w), m_port(NULL), m_ordinal(0), m_output(false), m_i
 void Clock::
 rename(const char *name, Port *port) {
   m_name = name;
-  OU::format(m_signal, "%s_Clk", name);
+  OU::format(m_signal, "%s_wClk", name);
   if ((m_port = port)) {
     m_port->m_myClock = true;
     m_port->deriveOCP();
