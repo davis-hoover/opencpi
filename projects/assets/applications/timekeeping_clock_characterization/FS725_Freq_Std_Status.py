@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3.4
 
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
@@ -21,10 +21,18 @@
 """
 This script checks the status of the FS725 Frequency Standard
 """
-# https://pypi.org/project/pyserial/
-# pip install pyserial
-import serial
 import sys
+
+try:
+    import serial
+except ImportError:
+    # To be replaced in 2.0 with proper Python dependencies
+    # Recommended way to use pip within a program (but not best practice)
+    # https://pip.pypa.io/en/latest/user_guide/#using-pip-from-your-program
+    import subprocess
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', 'pyserial'])
+    import os
+    os.execv(__file__, sys.argv)
 
 if len(sys.argv) != 2:
     print("Invalid arguments: usage is: FS725_Freq_Std_Status.py <serial-port>")
@@ -34,7 +42,7 @@ with serial.Serial(sys.argv[1], 9600, timeout=1) as ser:
     # Check ID string from FS725
     # The FS725 uses the rubidium oscillator SRS model PRS10
     ser.write(b'ID? \r') #expected output: PRS10_3.24_SN_47043
-    if ser.readline().split('_')[0] != "PRS10" :
+    if ser.readline().decode().split('_')[0] != "PRS10" :
         sys.exit(2)
 
     # Check external PPS 
@@ -42,5 +50,5 @@ with serial.Serial(sys.argv[1], 9600, timeout=1) as ser:
     # The 5th status byte related to Frequency Lock to External 1pps
     # A value of 4 indicates a valid PPS input. Any other value indicates an error
     ser.write(b'ST? \r') #expected output: 0,0,0,0,4,0
-    if ser.readline().split(',')[4] != "4":
+    if ser.readline().decode().split(',')[4] != "4":
         sys.exit(3)

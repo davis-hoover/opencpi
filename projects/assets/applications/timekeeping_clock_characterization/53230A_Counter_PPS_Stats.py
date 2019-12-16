@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3.4
 
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
@@ -27,18 +27,28 @@ The measurement setup was intended to measure 1 PPS of amplitude 3.3 - 5 V
 """
 import sys
 
-# https://pypi.org/project/python-vxi11/
-# pip install python-vxi11
-import vxi11
+try:
+    import vxi11
+except ImportError:
+    # To be replaced in 2.0 with proper Python dependencies
+    # Recommended way to use pip within a program (but not best practice)
+    # https://pip.pypa.io/en/latest/user_guide/#using-pip-from-your-program
+    import subprocess
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--user', 'python-vxi11'])
+    import os
+    os.execv(__file__, sys.argv)
 
+# There are issues the Instrument class cleaning up properly 
+# https://github.com/python-ivi/python-usbtmc/issues/44
+def clean_exit(instrument_obj, err):
+    freq_cnt.close()
+    sys.exit(err)
+    
 if len(sys.argv) != 3:
     print("Invalid arguments: usage is: 53230A_Counter_PPS_Stats.py <ip-address-of-53230-counter> <measurement-type>")
     sys.exit(1)
 
-freq_cnt =  vxi11.Instrument(sys.argv[1])
 measurement_type = sys.argv[2].lower()
-NUM_MEASUREMENTS = [100]
-
 if (measurement_type != "frequency" and measurement_type != "period" and 
     measurement_type != "single_period" and measurement_type != "time_interval_2-1" and
     measurement_type != "ref_check"):
@@ -46,6 +56,9 @@ if (measurement_type != "frequency" and measurement_type != "period" and
     print("ref_check, frequency, period, single_period, time_interval_2-1")
     sys.exit(2)
 
+freq_cnt = vxi11.Instrument(sys.argv[1])
+NUM_MEASUREMENTS = [100]
+    
 # Put the device in a known state
 freq_cnt.write("*RST")
 freq_cnt.write("*CLS")
@@ -60,12 +73,9 @@ if measurement_type == "ref_check":
     if ref_freq != expected_ref_freq:
         print("Incorrect input reference frequency: " + ref_freq)
         print("Expected " + expected_ref_freq)
-        sys.exit(3)
+        clean_exit(freq_cnt, 3)
     freq_cnt.write("ROSCillator:EXTernal:CHECk ONCE")          #Check ref validity
-    sys.exit()
-
-# Disable timeout (otherwise we might lose measurements)
-freq_cnt.write("SYSTem:TIMeout INFinity")
+    clean_exit(freq_cnt, 0)
 
 #Measurement specific parameters
 #Setup measurement
@@ -106,7 +116,7 @@ elif measurement_type == "time_interval_2-1":
 else:
     print("Invalid measurement type. Valid measurements types are:")
     print("frequency, period, single_period, time_interval_1-1, time_interval_2-1")
-    sys.exit(3)
+    clean_exit(freq_cnt, 4)
 
 #Make measurement
 MEASUREMENT_BUFFER_SEC = 10
@@ -117,13 +127,14 @@ else:
     units=" s"
 
 for a in NUM_MEASUREMENTS:
-    #print("If measuring PPS, measurement will take approximately " + str(a) + " Seconds")
     print(measurement_name)
-
+    
+    # Set timeouts
     if measurement_type == "single_period":
         freq_cnt.timeout = a * 2 + MEASUREMENT_BUFFER_SEC #single period measurement take 2 s each
     else:
         freq_cnt.timeout = a + MEASUREMENT_BUFFER_SEC
+    freq_cnt.write("SYSTem:TIMeout " + str(freq_cnt.timeout))
 
     freq_cnt.write("SAMP:COUN " + str(a))
     freq_cnt.write("CALC:AVER:STAT ON")
@@ -142,4 +153,4 @@ for a in NUM_MEASUREMENTS:
         print("Short Term Stability:")
         print("Allan Deviation    : " + str(freq_cnt.ask("CALC:AVER:ADEV?")))
 
-sys.exit()
+clean_exit(freq_cnt, 0)

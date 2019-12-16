@@ -109,7 +109,7 @@ python3_ver=python34
 PKGS_E+=(${python3_ver} ${python3_ver}-jinja2)
 #    for various testing scripts
 #    AV-5478: If the minor version changes here, fix script below
-PKGS_E+=(${python3_ver}-numpy)
+PKGS_E+=(${python3_ver}-numpy ${python3_ver}-pip)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
