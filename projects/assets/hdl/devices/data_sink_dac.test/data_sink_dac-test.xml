@@ -1,0 +1,4 @@
+<Tests UseHdlFileIo='true' Spec='data_sink_dac'>
+  <Input  port='in'  Script='generate.py' MessageSize='16368'/>
+  <Output port='out' Script='verify.py' DisableBackpressure='true'/>
+</Tests>

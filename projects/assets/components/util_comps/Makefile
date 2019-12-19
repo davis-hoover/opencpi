@@ -25,6 +25,7 @@ Tests = \
 	file_write_demux.test \
 	socket_write.test \
 	timestamper.test \
+	timestamper_scdcd.test \
 	tx_event_ctrlr.test \
 	zero_padding.test \
 	zero_pad.test \

@@ -1,0 +1,19 @@
+# Example usage:
+
+pushd /opt/Xilinx/Vivado/2017.1/
+. ./settings64.sh
+popd
+
+make -j 8 && run.sh
+
+# Success Criteria
+run.sh returns exit status of 0.
+
+# to plot output:
+./view.m
+
+# to view simulation
+./run.sh -gui 
+
+# To clean build artifacts, run:
+make clean

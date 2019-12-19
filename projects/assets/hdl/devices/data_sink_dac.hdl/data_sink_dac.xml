@@ -1,0 +1,30 @@
+<HdlDevice Language="vhdl" Spec="data_sink_dac-spec" Version="2">
+
+  <Property Name="IN_PORT_DATA_WIDTH"
+            Parameter="true"
+            Default="32"/>
+  <Property Name="unused_opcode_detected_sticky"
+	    Type="Bool"
+	    Volatile="true"/>
+  <Property Name="clr_unused_opcode_detected_sticky"
+	    Type="Bool"
+	    Writable="true"/>
+
+  <!-- This parameter is currently only used in simulation -->
+  <Property Name='dac_clk_freq_hz' 
+            Type='float' 
+            Default='1e6' 
+            Parameter='true'/>
+
+  <StreamInterface Name="in" 
+		   DataWidth="IN_PORT_DATA_WIDTH"
+		   ClockDirection="out"/>
+
+  <StreamInterface Name="on_off" 
+		   Clock="in"/>
+
+  <DevSignal Name="dev" 
+             Signals="qdac-16-signals.xml" 
+             master="true"/> <!-- master must be lowercase -->
+
+</HdlDevice>

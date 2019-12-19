@@ -1,0 +1,40 @@
+<ComponentSpec>
+
+  <Property name='bypass'
+            type='bool'
+            writable='true'
+            default='false'
+            description='Forces in port messages to be sent directly to out
+            port, bypassing the timestamping functionality.'/>
+  <Property name='time_correction'
+            type='longlong'
+            writable='true'
+            default='0'
+            description='Q32.32 time correction value which is subtracted from
+            the applied time (note Qm.n implies existence of a sign bit).'/>
+  <Property name='correction_overflow_sticky'
+            type='bool'
+            volatile='true'
+            description='Sticky bit overflow indication of correction
+            calculation.'/>
+  <Property name='clr_correction_overflow_sticky'
+            type='bool'
+            writable='true'
+            default='false'
+            description='Writing a value of true clears
+            correction_overflow_sticky.'/>
+  <Property name='force_error_on_invalid_time_at_start'
+            type='bool'
+            initial='true'
+            default='false'
+            description='Forces worker into the unusable state if the time
+            invalid signal is low during the worker initialized state.'/>
+  <Property name='min_num_samples_per_timestamp'
+            type='ulong'
+            writable='true'
+            default='1024'/>
+
+  <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>
+  <Port name='out' producer='true' protocol='ComplexShortWithMetadata-prot'/>
+
+</ComponentSpec>

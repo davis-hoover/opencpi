@@ -22,7 +22,7 @@ library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all;
 entity bits is
   generic (N         : natural   := 2;         -- Range 2 - 10
            IREG      : std_logic := '0';       -- 0=no, 1=yes input register
-           RST_LEVEL : std_logic := '1';       -- 0=low, 1=high
+           RST_LEVEL : std_logic := '0';       -- 0=low, 1=high
            WIDTH     : positive  := 1);
   port    (src_clk : in  std_logic;
            src_rst : in  std_logic;

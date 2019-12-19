@@ -1,0 +1,16 @@
+<ComponentSpec>
+
+
+ <Property Name="src_clk_hz" Type="float"
+                             Parameter="true"
+                             Default="100000000.0"
+                             Description="Source clock frequency"/>
+
+  <Property Name="dst_clk_hz" Type="float"
+                              Parameter="true"
+                              Default="100000000.0"
+                              Description="Destination clock frequency"/>
+
+  <Port Name="out" Producer="true"/>
+
+</ComponentSpec>

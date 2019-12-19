@@ -53,6 +53,12 @@
   -->
   <Operation name="sync"/>
 
+  <!-- 
+    * Used to signify a end of transmission (e.g. burst) without EOF to properly turn off transmitter and
+    * suppress underrun detection.
+  -->
+  <Operation name="end_of_samples"/>
+
   <!--
     * User-defined metadata operation. This operation can be used to append information to the data stream. 
     * (e.g. burst framing, front end parameter change indicators) This is an advanced option and may not be

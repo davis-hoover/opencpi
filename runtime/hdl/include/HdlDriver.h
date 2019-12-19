@@ -22,12 +22,15 @@
 #define HdlDriver_H
 
 #include <string>
+#include "ezxml.h"
 #include "HdlSimDriver.h"
 #include "HdlLSimDriver.h"
 #include "HdlBusDriver.h"
 #include "HdlEtherDriver.h"
 #include "HdlPciDriver.h"
 #include "ContainerManager.h"
+
+struct GPSDParams;
 
 namespace OCPI {
   namespace HDL {
@@ -49,7 +52,17 @@ namespace OCPI {
     {
       const OCPI::Util::PValue *m_params; // a temporary during discovery
       bool setup(Device &dev, ezxml_t &config, std::string &err);
+      struct GPSDParams* m_gpsdp;
+    protected:
+      bool m_doGpsd;
+      std::vector<const char*> m_gpsd_xml;
+      void loop_gpsctl(ezxml_t xml);
+      void configure(ezxml_t xml);
     public:
+      Driver();
+      static bool m_gpsdTimeout;
+      bool configure_gpsd_if_enabled();
+      OCPI::OS::Time now(bool &isGps);
       void print(const char *name, Access &access);
       // This driver method is called when container-discovery happens, to see if there
       // are any container devices supported by this driver

@@ -929,7 +929,7 @@ public:
 	eaddr = &m_admin[offset];
       else if (offset >= offsetof(OccpSpace, config))
 	if ((offset - offsetof(OccpSpace, config)) >=
-	    OCCP_WORKER_CONFIG_SIZE + 2*sizeof(uint64_t))
+	    OCCP_WORKER_CONFIG_SIZE + 5*sizeof(uint64_t)) // bootstrapping, 5 props from time_server that must be accessible
 	  throwit("Read/write offset out of range1 when emulating: 0x%" PRIx64, offset);
 	else {
 	  offset -= offsetof(OccpSpace, config);
@@ -1070,6 +1070,7 @@ public:
     DT::EndPoint &ep =
       DT::getManager().allocateProxyEndPoint(m_endpointSpecific.c_str(), true,
 					     OCPI_UTRUNCATE(size_t, m_endpointSize));
+    ep.addRef();
     ep.finalize();
     // This is the hook that allows us to receive data/metadata/flags pushed to this
     // endpoint from elsewhere - from multiple other endpoints.
@@ -1239,7 +1240,7 @@ open(const char *name, const OA::PValue *params, std::string &err) {
     if (OS::FileSystem::exists("simtest", &isDir) && isDir)
       dir = "simtest";
   }
-  uint32_t simTicks = 100000000, sleepUsecs = 200000;
+  uint32_t simTicks = 200000000, sleepUsecs = 200000;
   uint8_t spinCount = 20;
   OU::findULong(params, "simTicks", simTicks);
 
