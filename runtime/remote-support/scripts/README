@@ -1,3 +1,47 @@
+These scripts are used to manage a remote OpenCPI container server.
+
+Basic Usage:
+1) "ocpiremote.py load" on the host to send a server package to a remote device.
+2) "ocpiremote.py start" to start ocpiserve on the remote.
+3) "ocpirun -C ..." to check if the remote container is available.
+
+Overview:
+
+    +-------------------+                                        +----------------------------+
+    |       HOST        |                                        |         REMOTE DEVICE      |
+    |-------------------|                                        |----------------------------|
+ 0) |OCPI_CDK_DIR:      |                                     >) |~/<empty>                   |
+    |  ocpiserver.sh    |                                        |                            |
+    |  ocpiserve        |                                        |                            |
+    |  ...              |            +-------------+             |                            |
+    |                   |            | package.tar |             |                            |
+ 1) |ocpiremote.py load |  ------>   |-------------|  -------->) |~/sandbox/                  |
+    |                   |            |ocpiserver.sh|             |    ocpiserver.sh           |
+    |                   |            |ocpiserve    |             |    ocpiserve               |
+    |                   |            |...          |             |    ...                     |
+    |                   |            +-------------+             |                            |
+    |                   |                                        |                            |
+    |                   |                                        |                            |
+ 2) |ocpiremote.py start|  ----------------------------------->) |     ocpiserver.sh start    |
+    |                   |                                        |             |              |
+    |                   |                                        |             |              |
+    |                   |                                        |             v              |
+    |                   |                                        |     +----------------+     |
+    |                   |                                        |     |   ocpiserve    |     |
+    |                   |                                        |     +----------------+     |
+    |                   |                                        |     |Remote Container|     |
+    |                   |                                        |     |----------------|     |
+    |                   |                                        |     |                |     |
+ 3) |ocpirun -C -S ...  |  ----------------------------------------->  |                |     |
+    |                   |                                        |     |                |     |
+    | Container Found!  |  <-----------------------------------------  |                |     |
+    |                   |                                        |     |                |     |
+    |                   |                                        |     +----------------+     |
+    |                   |                                        |                            |
+    +-------------------+                                        +----------------------------+
+
+Background:
+
 These scripts support remote management of an OpenCPI container server.
 The fundamental executable is ocpiserve, which serves up containers for use by clients running applications.
 
@@ -17,19 +61,14 @@ without installing anything.
 
 The two scripts are:
 
-ocpiremote - the client for controlling the server
-  (there is a ocpiremote C++ main program too - it is a placeholder, but it may not be necessary if
-   the bash script is ok, but the argument parsing should be our standard options).
+ocpiremote.py - the client for controlling the server
 
-ocpi_server.sh - the server script for ocpiremote - not a persistent server
+ocpiserver.sh - the server script for ocpiremote.py - not a persistent server
   (maybe a better name:  the "control/admin server script" ocpi_server_admin
 
-ocpiremote has the typical:
-  <program> <options> <verbs>
+ocpiremote.py has the typical:
+  <program> <options> <cmd> <cmd-options>
 
-syntax like ocpihdl ocpidev etc.
-
-But it can take multiple verbs and executes them in sequence.
 
 TODOs:
 
@@ -37,6 +76,7 @@ Eventually like all tools, have a standardized way to set options in environment
 Ensure private key password-less usage.
 Protection for multiple clients colliding
 Any manipulation of the server for multi-cast discovery
+
 
 
 

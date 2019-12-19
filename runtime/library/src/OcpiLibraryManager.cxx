@@ -362,7 +362,7 @@ namespace OCPI {
     }
 
     // Given metadata in string form, parse it up, shortly after construction
-    // The ownership of metadat is passed in here.
+    // The ownership of metadata is passed in here.
     const char *Artifact::
     setFileMetadata(const char *a_name, char *metadata, std::time_t a_mtime, uint64_t a_length,
 		    size_t metaLength) {

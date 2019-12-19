@@ -31,6 +31,7 @@ Libraries=ocpi fixed_float util cdc bsv
 SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_pkg \
 	misc_prims_body \
+	debounce/src/debounce \
 	ocpi_pkg \
 	cdc_pkg \
 	lfsr/src/lfsr \
