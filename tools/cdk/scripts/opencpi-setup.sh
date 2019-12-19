@@ -275,4 +275,8 @@ ocpi_comp=$OCPI_CDK_DIR/scripts/ocpidev_bash_complete
   echo "Below are all OCPI_* environment variables now set:" >&2
   env | grep OCPI | sort >&2
 }
+
+# Clear bash hash in case there are any paths stored in it
+hash -r
+
 return 0
