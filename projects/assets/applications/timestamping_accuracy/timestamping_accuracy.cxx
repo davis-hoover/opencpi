@@ -38,16 +38,12 @@
  * constant to the signal_time_tagger worker.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include "OcpiApi.hh"
-#include <iostream>
-#include <stdlib.h>
+#include <iostream>  // cout,cerr
 #include <cmath>     // std::pow()
 #include <algorithm> // std::min_element, std::max_element
 #include <sstream>   // std::ostringstream
+#include "ezxml.h"
 
 //Seconds buffer for application timeout
 const int MAX_NUM_TIME_TAGS_TO_COLLECT = 128;
@@ -127,28 +123,52 @@ void runApp(std::string platform,
 int main(int argc, char **argv) {
 
   int ret = 0;
+  const char *platform;
 
   try {
 
-    if(argc != 3) {
+    if(argc != 2) {
       std::ostringstream oss;
       oss << "wrong number of arguments" << "\n";
-      oss << "Usage is: " << argv[0] << " <platform> <num_time_tags_to_collect>\n";
+      oss << "Usage is: " << argv[0] << " <num_time_tags_to_collect>\n";
       throw oss.str();
     }
 
-    std::string platform = "=" + std::string(argv[1]);
-    uint32_t num_time_tags_to_collect = atoi(argv[2]);
-    uint64_t collected_time_tags[MAX_NUM_TIME_TAGS_TO_COLLECT];
+    uint32_t num_time_tags_to_collect = atoi(argv[1]);
 
-    cout << "Computing calibration value: " << endl;
-    runApp(platform, num_time_tags_to_collect, 0, collected_time_tags);
-    int64_t cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, 0);
+    //Extract test setup config from system.xml
+    //First check if OCPI_SYSTEM_CONFIG sets location of system.xml
+    const char *system_xml_filename = getenv("OCPI_SYSTEM_CONFIG");
+    if(!system_xml_filename)
+      //If not, check default location of /opt/opencpi/system.xml
+      system_xml_filename = "/opt/opencpi/system.xml";
+    FILE *system_xml_file = fopen(system_xml_filename, "r"); 
+    if(system_xml_file){
+      fclose(system_xml_file);
+      ezxml_t system_xml = ezxml_parse_file(system_xml_filename);
+      ezxml_t timetest_xml = ezxml_get(system_xml,
+				     "container", 0,
+				     "timetest", -1);
+      platform = ezxml_cattr(timetest_xml, "platform");
+    } else
+      system_xml_filename = NULL;
 
-    cout << "Timestamping Accuracy: " << endl;
-    runApp(platform, num_time_tags_to_collect, cal_value, collected_time_tags);
-    computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
-          
+    if(!system_xml_filename || !platform){
+      cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
+    } else {
+
+      std::string platform_string = "=" + std::string(platform);
+      uint64_t collected_time_tags[MAX_NUM_TIME_TAGS_TO_COLLECT];
+
+      cout << "Computing calibration value: " << endl;
+      runApp(platform_string, num_time_tags_to_collect, 0, collected_time_tags);
+      int64_t cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, 0);
+
+      cout << "Timestamping Accuracy: " << endl;
+      runApp(platform_string, num_time_tags_to_collect, cal_value, collected_time_tags);
+      computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
+
+    }          
   } catch (std::string &e) {
     std::cerr << "ERROR: " << e << "\n";
     ret = 1;

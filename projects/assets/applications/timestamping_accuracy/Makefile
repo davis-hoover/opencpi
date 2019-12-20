@@ -19,13 +19,11 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
 
-#TODO: this runs for every rule and shouldn't
-ifndef OcpiRunArgs
-  $(info This application requires OcpiRunArgs but none were provided.)
-  $(info Usage is OcpiRunArgs=<platform>.)
-  $(info Execution will be skipped.)
-  OcpiAppNoRun=1
-endif
+# Default value for num_time_tags_to_collect
+OcpiRunArgs=10
+
+IncludeDirs+=\
+	../../../../runtime/util/ezxml/include/
 
 include $(OCPI_CDK_DIR)/include/application.mk
 

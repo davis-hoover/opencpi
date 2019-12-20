@@ -1,0 +1,19 @@
+<!-- Example system.xml file for running timing accuracy tests. -->
+<opencpi>
+  <container>
+    <rcc load='1'/>
+    <ocl load='0'/>
+    <remote load='1'/>
+    <hdl load='1'/>
+    <timetest platform='e3xx'>
+      <freqstd type='srs725' serialport='/dev/ttyUSB1'/>
+      <gpsfreqref type='srs740'/>
+      <freqcounter type='53230a' ipaddr='192.168.1.2'/>
+    </timetest>
+  </container>
+  <transfer smbsize='100M'>
+    <pio load='1'/>
+    <dma load='1'/>
+    <socket load='1'/>
+  </transfer>
+</opencpi>
