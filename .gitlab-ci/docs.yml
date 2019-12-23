@@ -1,0 +1,27 @@
+build:docs:
+  stage: build
+  tags:
+    - docker
+  image: centos:7
+  artifacts:
+    paths:
+      - public/
+  script:
+    - yum -y distro-sync
+    - ./scripts/install-opencpi-docs.sh
+    - mkdir -p public
+    - mv doc/pdfs/* public/
+
+pages:
+  stage: deploy
+  tags:
+    - docker
+  image: centos:7
+  artifacts:
+    paths:
+      - public/
+  dependencies: ["build:docs"]
+  only:
+    - master
+  script:
+    - echo "Uploading OpenCPI docs to gitlab.io"

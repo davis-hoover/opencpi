@@ -1,0 +1,225 @@
+#################
+# Jobs - Prereq #
+#################
+.install-packages:
+  stage: prereq
+  script:
+    - yum -y distro-sync
+    - ./scripts/install-packages.sh
+
+.install-prereqs:
+  extends:
+    - .standard-artifacts
+  stage: prereq
+  script:
+    - ./scripts/install-prerequisites.sh $PLATFORM
+
+
+#################
+# Jobs - Build #
+#################
+.build-opencpi:
+  extends:
+    - .standard-artifacts
+  stage: build
+  script:
+    - ./scripts/build-opencpi.sh $PLATFORM
+
+.build-rcc:
+  extends: 
+    - .build-opencpi
+  stage: build-rcc
+
+.build-hdl-core:
+  extends:
+    - .standard-artifacts
+  stage: build-hdl-core
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl -d projects/core --hdl --hdl-platform $PLATFORM
+
+.build-hdl-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-hdl-assets
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl -d projects/assets --hdl --hdl-platform $PLATFORM
+
+.build-hdl-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-hdl-rest
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl -d projects/assets_ts --hdl --hdl-platform $PLATFORM
+
+.build-hdl-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-hdl-rest
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl -d projects/inactive --hdl --hdl-platform $PLATFORM
+
+
+#####################
+# Jobs - Build-Test #
+#####################
+.build-test-core:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/core --hdl --hdl-platform $PLATFORM
+
+.build-test-assets-base:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/base_comps --hdl --hdl-platform $PLATFORM
+
+.build-test-assets-comms:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/comms_comps --hdl --hdl-platform $PLATFORM
+
+.build-test-assets-dsp:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/dsp_comps --hdl --hdl-platform $PLATFORM
+
+.build-test-assets-misc:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/misc_comps --hdl --hdl-platform $PLATFORM
+
+.build-test-assets-util:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/util_comps --hdl --hdl-platform $PLATFORM
+
+.build-test-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets_ts --hdl --hdl-platform $PLATFORM
+
+.build-test-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-test
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/inactive --hdl --hdl-platform $PLATFORM
+
+
+###############
+# Jobs - Test #
+###############
+.test-opencpi:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - ./scripts/test-opencpi.sh
+
+.test-core:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify
+
+.test-assets:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e 
+    - ocpidev run tests -d projects/assets --only-platform $PLATFORM --mode prep_run_verify
+
+
+.test-assets_ts:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify
+
+.test-inactive:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify
+
+
+#############
+# Platforms #
+#############
+.docker:
+  tags:
+    - docker
+  image: $IMAGE
+
+.centos7:
+  tags:
+    - opencpi
+    - centos7
+    - shell
+  variables:
+    PLATFORM: 'centos7'
+    IMAGE: 'centos:7'
+
+.centos6:
+  tags:
+    - opencpi
+    - centos6
+    - shell
+  variables:
+    PLATFORM: 'centos6'
+    IMAGE: 'centos:6'
+
+.xilinx13_3:
+  variables:
+    PLATFORM: 'xilinx13_3'
+
+.xilinx13_4:
+  variables:
+    PLATFORM: 'xilinx13_4'
+
+.xsim:
+  variables:
+    PLATFORM: 'xsim'
+
+
+########
+# Misc #
+########
+.standard-artifacts:
+  artifacts:
+    when: on_success
+    expire_in: '5h'
+    paths: 
+      - artifacts-$CI_JOB_ID.tar
