@@ -19,11 +19,8 @@
 # This is the util_comps library
 
 Tests = \
-	advanced_pattern.test \
 	agc_real.test \
 	fifo.test \
-	file_write_demux.test \
-	socket_write.test \
 	timestamper.test \
 	timestamper_scdcd.test \
 	tx_event_ctrlr.test \
