@@ -1,0 +1,9 @@
+\section*{Test and Verification}
+Two test cases are implemented to validate the CIC Decimator component:
+
+\begin{enumerate}
+	\item Impulse response - Input file consists of max Q0.15 values for I and Q followed by zeros
+	\item Step response - Input file consists of max Q0.15 values
+\end{enumerate}\medskip
+
+For both test cases, verification of the output file is performed using the input file and a python model of the CIC Decimator. The python model can be found in the \textit{opencpi.dsp\_utils} module included with the framework. This unit test also implements \textit{view}, which calls a script for plotting the input and output data files.
