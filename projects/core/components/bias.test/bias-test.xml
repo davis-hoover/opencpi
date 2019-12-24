@@ -1,5 +1,16 @@
 <tests ExcludeWorkers='bias_ver.hdl' timeout='1000'>
-  <property name='biasValue' value='0'/>
-  <input port='in' stressorMode='full' file='test.input'/>
   <output port='out' file='test.input'/>
+  <property name='biasValue' value='0'/>
+  <case>
+    <input port='in' stressorMode='full' file='test.input' messagesize='20'/>
+  </case>
+  <case>
+    <input port='in' stressorMode='full' file='test.input' messagesize='2048'/>
+  </case>
+  <case>
+    <input port='in' stressorMode='full' file='test.input' messagesize='4096'/>
+  </case>
+  <case>
+    <input port='in' stressorMode='full' file='test.input' messagesize='16368'/>
+  </case>
 </tests>

@@ -99,18 +99,6 @@ ifneq ($(MAKECMDGOALS),clean)
   endif
   endif
 endif
-$(call OcpiDbgVar,HdlExactPart)
-$(call OcpiDbgVar,HdlPlatform)
-HdlExactPart:=$(HdlPart_$(HdlPlatform))
-$(call OcpiDbgVar,HdlExactPart)
-$(call OcpiDbgVar,HdlTargets)
-$(eval $(HdlSearchComponentLibraries))
-$(call OcpiDbgVar,XmlIncludeDirsInternal)
-$(infox HP1:$(HdlPlatforms))
-$(call OcpiDbgVar,HdlPlatforms)
-SubCores_$(call HdlGetFamily,$(Worker)):=$(Cores)
-OnlyPlatforms:=$(Worker)
-OnlyTargets:=$(call HdlGetFamily,$(Worker))
 # We might be building for multiple platforms (e.g. sim and this one)
 # But from here, if we are building this platform, we must force it
 # When the mode is platform and config, the underlying scripts depend
@@ -119,6 +107,18 @@ ifeq ($(filter $(Worker),$(HdlPlatforms))$(filter clean,$(MAKECMDGOALS)),)
   HdlSkip := 1
   $(info Skipping this platform ($(Worker)).  It is not in HdlPlatforms ($(HdlPlatforms)))
 else
+  $(call OcpiDbgVar,HdlExactPart)
+  $(call OcpiDbgVar,HdlPlatform)
+  HdlExactPart:=$(HdlPart_$(HdlPlatform))
+  $(call OcpiDbgVar,HdlExactPart)
+  $(call OcpiDbgVar,HdlTargets)
+  $(eval $(HdlSearchComponentLibraries))
+  $(call OcpiDbgVar,XmlIncludeDirsInternal)
+  $(infox HP1:$(HdlPlatforms))
+  $(call OcpiDbgVar,HdlPlatforms)
+  SubCores_$(call HdlGetFamily,$(Worker)):=$(Cores)
+  OnlyPlatforms:=$(Worker)
+  OnlyTargets:=$(call HdlGetFamily,$(Worker))
   override HdlPlatform:=$(Worker)
   include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
   ifneq ($(filter clean,$(MAKECMDGOALS)),)

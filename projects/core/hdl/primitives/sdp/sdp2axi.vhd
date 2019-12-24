@@ -255,8 +255,8 @@ begin
   axi_out.B.READY              <= '1';              -- we are always ready for responses
 
   -- Read address channel
-  axi_out.AR.ID                <= std_logic_vector(sdp_in.sdp.header.node(2 downto 0)) &
-                                  std_logic_vector(sdp_in.sdp.header.xid);
+  axi_out.AR.ID                <= std_logic_vector(sdp_p.header.node(2 downto 0)) &
+                                  std_logic_vector(sdp_p.header.xid);
   axi_out.AR.ADDR              <= std_logic_vector(axi_addr) & "000";
   axi_out.AR.LEN               <= std_logic_vector(axi_len);
   axi_out.AR.SIZE              <= "011"; -- we are always 64 bits wide

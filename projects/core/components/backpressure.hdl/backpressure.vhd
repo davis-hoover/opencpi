@@ -31,11 +31,11 @@ architecture rtl of worker is
 
 begin
 
-  process (ctl_in.clk)
+  process (in_in.clk)
     variable take_v : std_logic;
   begin
-    if rising_edge(ctl_in.clk) then
-      if (ctl_in.reset = '1') then
+    if rising_edge(in_in.clk) then
+      if (in_in.reset = '1') then
         take_en <= '0';
         lfsr <= x"0001";
       else
