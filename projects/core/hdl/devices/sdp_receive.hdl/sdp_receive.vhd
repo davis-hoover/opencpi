@@ -171,7 +171,7 @@ g0: for i in 0 to sdp_width_c-1 generate
                 ADDR_WIDTH => addr_width_c,
                 DATA_WIDTH => dword_size,
                 MEMSIZE    => memory_depth_c)
-    port map   (CLKA       => ctl_in.clk,
+    port map   (CLKA       => sdp_in.clk,
                 ENA        => '1',
                 WEA        => '0',
                 ADDRA      => std_logic_vector(brama_addr),
@@ -184,22 +184,19 @@ g0: for i in 0 to sdp_width_c-1 generate
                 DIB        => bramb_in(i),
                 DOB        => open);
   end generate g0;
-  -- Metadata fifo enqueued from doorbell then used on WSI, all in the same clock domain
-  -- (until ctl clock is different from wsi clock.)
-  -- CTL -> WSI
-  metafifo : component bsv.bsv.SizedFIFO
-   generic map(p1width      => msginfo_width_c,
-               p2depth      => roundup_2_power_of_2(max_buffers_c), -- must be power of 2
-               p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
-   port map   (CLK          => ctl_in.clk, -- maybe syncfifo later
-               RST          => ctl_reset_n,
-               D_IN         => md_in_slv,
-               ENQ          => std_logic(md_enq),
-               FULL_N       => md_not_full,
-               D_OUT        => md_out_slv,
-               DEQ          => md_deq,
-               EMPTY_N      => md_not_empty,
-               CLR          => '0');
+  -- Metadata fifo enqueued from doorbell in active-flow-control mode then used on WSI
+  metafifo : component cdc.cdc.fifo
+   generic map(width       => msginfo_width_c,
+               depth       => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2
+   port map   (src_CLK     => ctl_in.clk, -- maybe syncfifo later
+               src_RST     => ctl_in.reset,
+               src_IN      => md_in_slv,
+               src_ENQ     => std_logic(md_enq),
+               src_FULL_N  => md_not_full,
+               dst_clk     => sdp_in.clk,
+               dst_OUT     => md_out_slv,
+               dst_DEQ     => md_deq,
+               dst_EMPTY_N => md_not_empty);
   md_in_slv   <= msginfo2slv(md_in);
   md_out      <= slv2msginfo(md_out_slv);
   md_enq      <= props_in.remote_doorbell_any_written;
@@ -209,19 +206,18 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- Length fifo enqueued from doorbell for active message/pull mode, dequeued on the SDP side
   -- Telling the SDP (when actively PULLING data) to read this much data
   -- CTL -> SDP
-  lengthfifo : component bsv.bsv.SyncFIFO
-   generic map(dataWidth    => length_in_slv'length,
-               depth        => roundup_2_power_of_2(max_buffers_c), -- must be power of 2
-               indxWidth    => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
-   port map   (sCLK         => ctl_in.clk, -- maybe syncfifo later
-               sRST         => ctl_reset_n,
-               dCLK         => sdp_in.clk,
-               sENQ         => std_logic(length_enq),
-               sD_IN        => length_in_slv,
-               sFULL_N      => length_not_full,
-               dDEQ         => length_deq,
-               dD_OUT       => length_out_slv,
-               dEMPTY_N     => length_not_empty);
+  lengthfifo : component cdc.cdc.fifo
+   generic map(width        => length_in_slv'length,
+               depth        => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2)
+   port map   (src_CLK      => ctl_in.clk, -- maybe syncfifo later
+               src_RST      => ctl_in.reset,
+               dst_CLK      => sdp_in.clk,
+               src_ENQ      => std_logic(length_enq),
+               src_IN       => length_in_slv,
+               src_FULL_N   => length_not_full,
+               dst_DEQ      => length_deq,
+               dst_OUT      => length_out_slv,
+               dst_EMPTY_N  => length_not_empty);
   -- The length we put into the fifo is converted to NDWs and residue in last dw
   md_in.eof       <= md_in_raw.eof;
   -- md_in.truncate <= md_in_raw.truncate;
@@ -261,28 +257,29 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- I.e. when the SDP side is done PULLING data, it indicates the buffer is full,
   -- and then the WSI processing can send the message, according to the metadata Fifo.
   -- SDP -> WSI
-  availfifo : component bsv.bsv.SyncFIFO
-   generic map(dataWidth    => 1,
-               depth        => roundup_2_power_of_2(max_buffers_c),
-               indxWidth    => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
-   port map   (sCLK         => sdp_in.clk,
-               sRST         => sdp_reset_n,
-               dCLK         => ctl_in.clk,
-               sENQ         => avail_enq,
-               sD_IN        => "1",
-               sFULL_N      => avail_not_full,
-               dDEQ         => avail_deq,
-               dD_OUT       => avail_out_slv,
-               dEMPTY_N     => avail_not_empty);
+  availfifo : component bsv.bsv.SizedFIFO
+   generic map(p1Width      => 1,
+               p2depth      => roundup_2_power_of_2(max_buffers_c),
+               p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
+   port map   (CLK          => sdp_in.clk,
+               RST          => sdp_reset_n,
+               ENQ          => avail_enq,
+               D_IN         => "1",
+               FULL_N       => avail_not_full,
+               DEQ          => avail_deq,
+               D_OUT        => avail_out_slv,
+               EMPTY_N      => avail_not_empty,
+               CLR          => '0');
   -- A sync pulse to carry buffer consumption events
   -- The WSI side is telling the SDP side that it can reuse a buffer
   -- and also tell the other side that they can write into the next buffer.
-  cpulse: component bsv.bsv.SyncPulse
-    port map  (sCLK         => ctl_in.clk,
-               sRST         => ctl_reset_n,
-               dCLK         => sdp_in.clk,
-               sEN          => md_deq,
-               dPulse       => buffer_consumed);
+  -- cpulse: component bsv.bsv.SyncPulse
+  --   port map  (sCLK         => ctl_in.clk,
+  --              sRST         => ctl_reset_n,
+  --              dCLK         => sdp_in.clk,
+  --              sEN          => md_deq,
+  --              dPulse       => buffer_consumed);
+  buffer_consumed <= md_deq;
   --------------------------------------------------------------------------------
   -- Combinatorial signals on the WSI side
   --------------------------------------------------------------------------------
@@ -309,8 +306,9 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- Module output ports on the CTL/WSI side
   --------------------------------------------------------------------------------
   ctl_out.finished    <= to_bool(faults /= 0 );
-  props_out.faults     <= faults;
+  props_out.faults    <= faults;
   props_out.sdp_id    <= resize(sdp_in.id, props_out.sdp_id'length);
+--  out_out.clk         <= sdp_in.clk;
   out_out.give        <= giving;
   out_out.som         <= wsi_starting_r and not md_out.eof;
   out_out.eom         <= last_give and not md_out.eof;
@@ -328,9 +326,9 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- The process of reading messages from the metadata FIFO and BRAM and sending
   -- then to the WSI port named "out"
   --------------------------------------------------------------------------------
-  bram2wsi : process(ctl_in.clk)
+  bram2wsi : process(sdp_in.clk)
   begin
-    if rising_edge(ctl_in.clk) then
+    if rising_edge(sdp_in.clk) then
       if ctl_in.reset = '1' then
         brama_addr_r       <= (others => '0');
         wsi_buffer_index_r <= (others => '0');

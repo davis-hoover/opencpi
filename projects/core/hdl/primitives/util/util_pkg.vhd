@@ -320,4 +320,10 @@ component zlm_detector is
     eozlm       : out std_logic); -- same as EOM but only for end of ZLMs
 end component;
 
+component in2out is
+  port(
+    in_port  : in std_logic;
+    out_port : out std_logic);
+end component;
+
 end package util;

@@ -990,7 +990,7 @@ finalize() {
   if (isDataProducer()) {
     // name         type,   debug  param  initl  volatl impl   builtin value enums
     AP(blocked,     ULong,  true,  false, false, true,  true,  true);    // cycles when output was blocked
-    AP(max_latency, UShort, false, true,  false, false, true,  false,  256); // maximum input-to-output latency 
+    AP(max_latency, UShort, false, true,  false, false, true,  false,  256); // maximum input-to-output latency
     AP(latency,     UShort, false, false, false, true,  true,  true);   // measured latency
     AP(messages,    ULong,  true,  false, false, true,  true,  true);   // messages crossing this port
     AP(bytes,       ULong,  true,  false, false, true,  true,  true);   // bytes crossing this port

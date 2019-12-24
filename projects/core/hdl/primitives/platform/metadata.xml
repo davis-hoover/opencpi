@@ -1,4 +1,4 @@
 <HdlWorker language='vhdl' library='platform'>
   <ComponentSpec nocontrol='true' package='ocpi.core'/>
-  <metadata name='metadata' myclock='true'/>
+  <metadata/>
 </HdlWorker>

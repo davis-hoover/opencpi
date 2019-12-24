@@ -153,10 +153,10 @@ begin
   -- This process detects zero length messages and ends of message
   -- and sets signals used to exert backpressure on the previous worker
   -- or clamp output to the next worker accordingly.
-  buffer_inputs : process (ctl_in.clk)
+  buffer_inputs : process (in_in.clk)
   begin
-    if rising_edge(ctl_in.clk) then
-      if (ctl_in.reset = '1') then
+    if rising_edge(in_in.clk) then
+      if (in_in.reset = '1') then
         in_som <= '0';
         in_valid <= '0';
         in_eom <= '0';
@@ -242,10 +242,10 @@ begin
   swm_detected <= swm_seen and not giving_swm_valid;
 
   -- This FSM controls what kind of message is passed to the unit under test.
-  output_select_proc : process (ctl_in.clk)
+  output_select_proc : process (in_in.clk)
   begin
-   if rising_edge(ctl_in.clk) then
-     if (ctl_in.reset = '1') then
+   if rising_edge(in_in.clk) then
+     if (in_in.reset = '1') then
        output_state <= nil;
        state <= init_s;
        nil_state_store <= init_s;
@@ -539,12 +539,12 @@ begin
   end process output_select_proc;
 
   -- controls the duty cycle or randomness of taking dating and giving data
-  stutter : process (ctl_in.clk)
+  stutter : process (in_in.clk)
     variable give_v : std_logic;
     variable take_v : std_logic;
   begin
-    if rising_edge(ctl_in.clk) then
-      if (ctl_in.reset = '1') then
+    if rising_edge(in_in.clk) then
+      if (in_in.reset = '1') then
         give_en <= '1';
         take_en <= '1';
         lfsr <= props_in.seed;

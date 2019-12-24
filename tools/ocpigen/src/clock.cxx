@@ -21,6 +21,7 @@ parseClocks() {
     Clock *c;
     if ((err = addClock(name, direction, c)))
       return err;
+    c->m_exported = true;  // If you mention it here at the top level, exporting is implied
     c->m_signal = signal ? signal : "";
     return NULL;
   }
@@ -81,6 +82,7 @@ addWciClockReset() {
     Clock *clock;
     ocpiCheck(!addClock("wci", "in", clock));
     clock->m_reset = "wci_Reset_n";
+    clock->m_exported = true;
     m_wciClock = clock;
   }
   return *m_wciClock;
@@ -166,7 +168,7 @@ parseClock(ezxml_t xml) {
 	return OU::esprintf("For port \"%s\", specifying a clock direction (\"%s\") when referring "
 			    "to another port's clock (\"%s\") is invalid",
 			    pname(), direction, clock);
-      if (!port->isOCP())
+      if (!port->isOCP() && port->m_type != SDPPort)
 	return OU::esprintf("For port \"%s\", specifying another port's clock (\"%s\") is invalid "
 			    "because that port is not a type that has a clock",
 			    pname(), clock);
@@ -190,13 +192,14 @@ parseClock(ezxml_t xml) {
 }
 
 Clock::
-Clock(Worker &w) : m_worker(w), m_port(NULL), m_ordinal(0), m_output(false), m_internal(false) {
+Clock(Worker &w) : m_worker(w), m_port(NULL), m_ordinal(0), m_output(false), m_internal(false), m_exported(false) {
 }
 
 void Clock::
 rename(const char *name, Port *port) {
-  m_name = name;
-  OU::format(m_signal, "%s_Clk", name);
+  if (name)
+    m_name = name;
+  OU::format(m_signal, "%s_wClk", cname());
   if ((m_port = port)) {
     m_port->m_myClock = true;
     m_port->deriveOCP();

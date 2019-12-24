@@ -47,7 +47,6 @@ architecture rtl of adapt_width is
   constant bytes_in  : natural := width_in/8;
   constant bytes_out : natural := width_out/8;
 begin
-  out_eof <= in_eof;
   -----------------------------------------------------------------------------------------
   -- This first generate is for expanding the width.  Below is for contraction.
   -----------------------------------------------------------------------------------------
@@ -71,6 +70,7 @@ begin
     signal eom_r        : bool_t; -- is the buffered data at EOM? (must be last)
   begin
     assert (width_out rem width_in) = 0 report "width_out must be a multiple of width_in";
+    out_eof        <= in_eof;
     could_take     <= out_ready or not full_r when not its(last_in_now) else out_ready and not full_r;
     take_now       <= could_take and in_ready;
     -- is the current input word the last in an output word?
@@ -155,6 +155,7 @@ begin
     signal data_r       : buf_t;   -- Buffer of inword
     signal opcode_r     : std_logic_vector(in_opcode'range);
     signal last_be_r    : std_logic_vector(bytes_out-1 downto 0); -- BE for last outword
+    signal my_out_eom   : bool_t;
     -- Compute the byte offset of the last outword in the inword.
     procedure find_extent(in_be : std_logic_vector(bytes_in-1 downto 0);
                           in_valid : bool_t;
@@ -177,6 +178,7 @@ begin
     end find_extent;
   begin
     assert (width_in rem width_out) = 0 report "width_in must be a multiple of width_out";
+    out_eof        <= in_eof and my_out_eom;
     -- Reorganize input data as an array of output words
     g0: for i in 0 to last_c generate
       word_data(i) <= in_data(width_out*i + width_out-1 downto width_out*i);
@@ -191,9 +193,10 @@ begin
     in_take         <= take_now;
     give_now        <= to_bool(out_ready and (its(have_data_r) or in_ready));
     out_give        <= give_now;
-    out_eom         <= eom_r when its(on_last_word) else
+    my_out_eom      <= eom_r when its(on_last_word) else
                        in_eom when not its(have_data_r) and last_word_in = 0 else
                        bfalse;
+    out_eom         <= my_out_eom;
     out_som         <= som_r when its(have_data_r) and index_r = 0 else
                        in_som when not have_data_r else
                        bfalse;
@@ -250,6 +253,7 @@ begin
     end process;
   end generate big2small;
   same_size: if width_in = width_out generate
+    out_eof         <= in_eof;
     in_take         <= to_bool(its(in_ready) and out_ready);
     out_give        <= to_bool(its(in_ready) and out_ready);
     out_data        <= in_data;

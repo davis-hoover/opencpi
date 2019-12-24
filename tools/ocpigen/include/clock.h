@@ -28,7 +28,8 @@ struct Clock {
   Port  *m_port;     // If not NULL, the port of the worker that this clock is owned by.
   size_t m_ordinal;  // within the worker
   bool   m_output;   // This clock is an output of its worker on its owned port or globally
-  bool   m_internal; // This clock is internal to an assembly and not externalized.
+  bool   m_internal; // This clock is internal to an assembly and used for a single connection out->in connection
+  bool   m_exported; // This clock is exported from the worker without being associated with a port
   Clock(Worker &w);
   const char *parse(ezxml_t x);
   void rename(const char *name, Port *port);
