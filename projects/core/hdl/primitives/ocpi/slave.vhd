@@ -137,7 +137,7 @@ architecture rtl of slave is
   -- signals derived from OCP fed into the fifo (other than raw OCP signals)
   signal ocp_last       : std_logic;
   signal ocp_data       : std_logic_vector(max(1,data_width) - 1 downto 0);
-  signal ocp_busy_r     : bool_t; -- busy output to OCP
+  -- signal ocp_busy_r     : bool_t; -- busy output to OCP
   -- input signals to the fifo;
   signal fifo_in        : std_logic_vector(fifo_width - 1 downto 0);
   signal fifo_enq, fifo_deq : bool_t;

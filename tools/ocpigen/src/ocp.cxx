@@ -340,12 +340,18 @@ fixOCP() {
 #endif
 }
 
+// Note this might be called twice to rederive things, so we need to initialize all the signal stuff
+// and not assume 
 const char *OcpPort::
 deriveOCP() {
   OcpSignal *o = ocp.signals;
   OcpSignalDesc *osd = ocpSignals;
-  for (unsigned i = 0; i < N_OCP_SIGNALS; i++, o++, osd++)
+  for (unsigned i = 0; i < N_OCP_SIGNALS; i++, o++, osd++) {
+    o->value = NULL;
+    o->width = 0;
+    o->signal = NULL;
     o->master = osd->master;
+  }
   if (m_myClock)
     ocp.Clk.value = u8;
   return NULL;
@@ -846,7 +852,7 @@ adjustConnection(Connection &c, bool /*isProducer*/, OcpAdapt *myAdapt, bool &/*
     if (m_myClock && other.m_myClock) {
       // Both have own clocks - one and only one better be an output clock
       assert((m_clock->m_output && !other.m_clock->m_output) ||
-	     (!m_clock->m_output && other.m_clock->m_output));
+	     (!m_clock->m_output && other.m_clock->m_output) || c.m_clock);
       assert(ocp.Clk.value && other.ocp.Clk.value);
     } else if (m_myClock) {
       // I am taking as clock from the temp clock signal associated with the other port

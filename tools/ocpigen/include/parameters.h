@@ -100,6 +100,7 @@ class ParamConfig : public OCPI::Util::IdentResolver {
   bool equal(ParamConfig &other);
   // The callback when evaluating expressions for data types (e.g. array length).
   const char *getValue(const char *sym, OCPI::Util::ExprValue &val) const;
+  const char *getParamValue(const char *sym, const OCPI::Util::Value *&v) const;
   const Worker &worker() const { return m_worker; }
 };
 

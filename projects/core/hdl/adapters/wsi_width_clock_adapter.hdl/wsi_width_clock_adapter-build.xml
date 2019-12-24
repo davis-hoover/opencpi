@@ -103,4 +103,8 @@
     <parameter name='width_in' value='64'/>
     <parameter name='width_out' value='64'/>
   </configuration>
+  <configuration id='26'>
+    <parameter name='width_in' value='128'/>
+    <parameter name='width_out' value='128'/>
+  </configuration>
 </build>

@@ -377,6 +377,24 @@ parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
 }
 
 const char *ParamConfig::
+getParamValue(const char *sym, const OU::Value *&v) const {
+  OU::Property *prop;
+  size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
+  const char *err;
+  if ((err = m_worker.findParamProperty(sym, prop, nParam)))
+    return err;
+  const Param &param = params[nParam];
+  if (param.m_param) {
+    if (param.m_uValues.size() > 1)
+      return OU::esprintf("parameter property %s used in expression, but has multiple values",
+			  prop->cname());
+    v = &param.m_value;
+  } else if (!(v = prop->m_default))
+    return OU::esprintf("The parameter \"%s\" has no default or specified value", sym);
+  return NULL;
+}
+
+const char *ParamConfig::
 getValue(const char *sym, OU::ExprValue &val) const {
   OU::Property *prop;
   size_t nParam; // FIXME not needed since properties have m_paramOrdinal?
@@ -392,7 +410,8 @@ getValue(const char *sym, OU::ExprValue &val) const {
     v = &param.m_value;
   } else if (!(v = prop->m_default))
     return OU::esprintf("The parameter \"%s\" has no default or specified value", sym);
-  return extractExprValue(*prop, *v, val);
+  return (err = getParamValue(sym, v)) ? err :
+    extractExprValue(*prop, *v, val);
 }
 
 const char *Worker::

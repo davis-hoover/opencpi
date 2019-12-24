@@ -32,7 +32,6 @@
   <Signal Output="TXD" width="12"/>
 
   <!-- Time Client Interface -->
-  <!--<TimeInterface Name="time" SecondsWidth="32" FractionWidth="32" MyClock="TX_CLK_IN"/>-->
   <Property Name="SECONDS_WIDTH_p"  Type="uchar" Parameter="true" Readable="true" Default="32"/>
   <Property Name="FRACTION_WIDTH_p" Type="uchar" Parameter="true" Readable="true" Default="32"/>
   <TimeInterface Name="time" SecondsWidth="SECONDS_WIDTH_p" FractionWidth="FRACTION_WIDTH_p"/>
