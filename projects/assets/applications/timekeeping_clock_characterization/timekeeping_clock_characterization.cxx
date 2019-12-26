@@ -27,7 +27,6 @@
 const int MAX_EXPECTED_RUN_TIME_USECS=1e6;
 
 namespace OA = OCPI::API;
-using namespace std;
 
 int main(/*int argc, char **argv*/) {
 
@@ -58,7 +57,7 @@ int main(/*int argc, char **argv*/) {
       system_xml_filename = NULL;
 
     if(!system_xml_filename || !platform || !freq_std_tty || !freq_counter_ip){
-      cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
+      std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
     } else {
       //Check as much as you can about the test setup
 

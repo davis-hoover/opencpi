@@ -51,7 +51,6 @@ const int EXTRA_TIME_BUFFER = 5;
 const double NUM_MICROSECONDS_PER_FRAC_SEC = .000233;
 
 namespace OA = OCPI::API;
-using namespace std;
 
 int64_t computeStatistics(uint64_t* collected_time_tags, 
 		       uint32_t num_time_tags_to_collect,
@@ -70,8 +69,8 @@ int64_t computeStatistics(uint64_t* collected_time_tags,
     avg_delta += (int64_t)(delta_from_nearest_sec[a] - avg_delta) / (a + 1);
   }
 
-  cout << "Average Delta from nearest second          " << 
-    avg_delta * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+  std::cout << "Average Delta from nearest second          " << 
+    avg_delta * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
 
   //Compute min, max, std_dev from nearest second value when cal value supplied
   if(cal_value){
@@ -83,14 +82,14 @@ int64_t computeStatistics(uint64_t* collected_time_tags,
     var /= num_time_tags_to_collect;
     std_dev = sqrt(var);
 
-    cout << "Min Delta from nearest second              " << 
+    std::cout << "Min Delta from nearest second              " << 
       *std::min_element(delta_from_nearest_sec, delta_from_nearest_sec + num_time_tags_to_collect - 1) *
-      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-    cout << "Max Delta from nearest second              " << 
+      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
+    std::cout << "Max Delta from nearest second              " << 
       *std::max_element(delta_from_nearest_sec, delta_from_nearest_sec + num_time_tags_to_collect - 1) *
-      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-    cout << "Standard Deviation from nearest second     " << 
-      std_dev * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
+    std::cout << "Standard Deviation from nearest second     " << 
+      std_dev * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
   }
   return avg_delta;
 }
@@ -154,17 +153,17 @@ int main(int argc, char **argv) {
       system_xml_filename = NULL;
 
     if(!system_xml_filename || !platform){
-      cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
+      std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
     } else {
 
       std::string platform_string = "=" + std::string(platform);
       uint64_t collected_time_tags[MAX_NUM_TIME_TAGS_TO_COLLECT];
 
-      cout << "Computing calibration value: " << endl;
+      std::cout << "Computing calibration value: " << std::endl;
       runApp(platform_string, num_time_tags_to_collect, 0, collected_time_tags);
       int64_t cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, 0);
 
-      cout << "Timestamping Accuracy: " << endl;
+      std::cout << "Timestamping Accuracy: " << std::endl;
       runApp(platform_string, num_time_tags_to_collect, cal_value, collected_time_tags);
       computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
 
