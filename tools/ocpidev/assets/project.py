@@ -955,7 +955,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         else:
             return name
 
-    def _get_template_dict(name, **kwargs):
+    def _get_template_dict(name, directory, **kwargs):
         """
         used by the create function/verb to generate the dictionary of viabales to send to the
         jinja2 template.
@@ -1003,7 +1003,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                         "depend" : depend,
                         "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
                                                                                     package_prefix,
-                                                                                    package_name)
+                                                                                    package_name, directory)
                         }
         return template_dict
 
@@ -1019,7 +1019,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             raise ocpiutil.OCPIException("Cannot create this project" + proj_dir + "because this " +
                                          "folder already exists.")
         os.mkdir(name)
-        template_dict = Project._get_template_dict(name, **kwargs)
+        template_dict = Project._get_template_dict(name, proj_dir, **kwargs)
 
         #generate all the project files using templates
         ocpiutil.write_file_from_string( proj_dir + "/Project.exports", ocpitemplate.PROJ_EXPORTS)

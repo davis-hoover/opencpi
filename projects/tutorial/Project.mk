@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This Makefile fragment for the "training" project created at /training
-PackageName=training
+PackageName=tutorial
 PackagePrefix=ocpi
 
 ProjectDependencies=ocpi.assets

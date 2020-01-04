@@ -117,8 +117,8 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\\
 include $(OCPI_CDK_DIR)/include/project.mk
 \n\n""")
 
-PROJ_GUI_PROJECT = ("""
-<?xml version="1.0" encoding="UTF-8"?>
+PROJ_GUI_PROJECT = (
+"""<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
   <name>{{determined_package_id}}</name>
   <comment></comment>
@@ -126,4 +126,4 @@ PROJ_GUI_PROJECT = ("""
   <buildSpec></buildSpec>
   <natures></natures>
 </projectDescription>
-\n\n""")
+\n""")
