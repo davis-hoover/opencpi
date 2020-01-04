@@ -127,15 +127,15 @@ begin
     begin
       return byte + read_byte(f, "short2") * 256;
     end read_short;
-    procedure write_dw(dw : dword_t) is
-    begin
-      sim2sw_valid_r <= btrue;
-      sim2sw_data_r <= dw;
---      for i in 0 to 3 loop
---        -- report "Writing byte";
---        write(sim2sw_file, to_character(char_t(dw(i*8+7 downto i*8))));
---      end loop;
-    end write_dw;
+--     procedure write_dw(dw : dword_t) is
+--     begin
+--       sim2sw_valid_r <= btrue;
+--       sim2sw_data_r <= dw;
+-- --      for i in 0 to 3 loop
+-- --        -- report "Writing byte";
+-- --        write(sim2sw_file, to_character(char_t(dw(i*8+7 downto i*8))));
+-- --      end loop;
+--     end write_dw;
     impure function header_dws(dw : dword_t) return dword_array_t is
       variable dws : dword_array_t(0 to sdp_header_ndws-1);
     begin

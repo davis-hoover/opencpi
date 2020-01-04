@@ -24,23 +24,27 @@
 SdpPort::
 SdpPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
   : Port(w, x, sp, ordinal, SDPPort, "sdp", err) {
+  // This clock is a bit phony.  This is not an OCP port, and the clock is embedded in the SDP signal bundle.
+  // Since it is not OCP, it will not be explicitly wired in any case.
+  if (!err && !m_master && !(m_clock = w.findClock("sdp")) && !(err = w.addClock("sdp", "in", m_clock))) {
+    m_clock->m_port = this;
+    m_myClock = true;
+  }
 }
 
 // Our special copy constructor
 SdpPort::
-SdpPort(const SdpPort &other, Worker &w , std::string &arg_name, size_t count,
+SdpPort(const SdpPort &other, Worker &w , std::string &a_name, size_t a_count,
 		const char *&err)
-  : Port(other, w, arg_name, count, err) {
-  if (err)
-    return;
+  : Port(other, w, a_name, a_count, err) {
 }
 
 // Virtual constructor: the concrete instantiated classes must have a clone method,
 // which calls the corresponding specialized copy constructor
 Port &SdpPort::
-clone(Worker &w, std::string &arg_name, size_t count, OCPI::Util::Assembly::Role */*role*/,
+clone(Worker &w, std::string &arg_name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
       const char *&err) const {
-  return *new SdpPort(*this, w, arg_name, count, err);
+  return *new SdpPort(*this, w, arg_name, a_count, err);
 }
 
 void SdpPort::

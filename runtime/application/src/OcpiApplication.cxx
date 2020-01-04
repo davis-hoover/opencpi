@@ -359,7 +359,7 @@ namespace OCPI {
           // then check for prewired compatibility
           if (m_assembly.badConnection(*c.impl, otherImpl, *ap, nn)) {
             ocpiInfo("%s due to connectivity conflict", reject.c_str());
-            ocpiInfo("Other is instance \"%s\" for spec \"%s\" implementation \"%s%s%s\" "
+            ocpiInfo("  Other is instance \"%s\" for spec \"%s\" implementation \"%s%s%s\" "
                      "from artifact \"%s\".",
                      m_assembly.instance(other->m_instance).name().c_str(),
                      m_assembly.instance(other->m_instance).specName().c_str(),

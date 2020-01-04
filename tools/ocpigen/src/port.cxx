@@ -290,8 +290,8 @@ emitPortDescription(FILE *f, Language lang) const {
     fprintf(f, "  %s   Clock: uses the clock from interface named \"%s\"\n", comment,
 	    m_worker->m_ports[m_clockPort]->pname());
   else if (m_myClock)
-    fprintf(f, "  %s   Clock: this interface has its own clock, named \"%s\"\n", comment,
-	    m_clock->signal());
+    fprintf(f, "  %s   Clock: this interface has its own %s clock, named \"%s\"\n", comment,
+	    m_clock->m_output ? "output" : "input", m_clock->signal());
   else if (m_clock)
     fprintf(f, "  %s   Clock: this interface uses the worker's clock named \"%s\"\n", comment,
 	    m_clock->signal());

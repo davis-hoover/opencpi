@@ -37,10 +37,4 @@ PrimitiveCores=temac_v6\
                pcie_4243_trn_v6_gtx_x4_250 \
                pcie_4243_hip_s4gx_gen2_x4_128
 
-ifeq ($(HdlPlatform)$(HdlPlatforms),)
-all:
-	$(AT)echo No HDL platforms specified.  Skip building of ocpi.assets hdl primitives.
-else
-  # Build primitives if HdlPlatform(s) are not empty
-  include $(OCPI_CDK_DIR)/include/hdl/hdl-primitives.mk
-endif
+include $(OCPI_CDK_DIR)/include/hdl/hdl-primitives.mk

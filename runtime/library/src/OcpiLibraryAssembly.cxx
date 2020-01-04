@@ -88,7 +88,7 @@ namespace OCPI {
       eq = strchr(assign, '='); // points past instance or external port
       OU::Assembly::ConnectionsIter ci = m_connections.end();
       if (neqs == 1) { // find an external port with this name
-	pname.assign(assign, eq - assign);
+	pname.assign(assign, OCPI_SIZE_T_DIFF(eq, assign));
 	const OU::Assembly::Port *ap = NULL;
 	for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
 	  const OU::Assembly::Connection &c = *ci;
@@ -108,7 +108,7 @@ namespace OCPI {
 	if ((err = findInstanceForParam(pName, iassign, instn))) // iassign points to port name
 	  return err;
 	eq = strchr(iassign, '=');
-	pname.assign(iassign, eq - iassign);
+	pname.assign(iassign, OCPI_SIZE_T_DIFF(eq, iassign));
 	// There might be an external connection on this port that has to be removed...
 	if (removeExternal)
 	  for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
@@ -159,19 +159,19 @@ namespace OCPI {
 	// name=value pairs
 	const char *p = strchr(value, '?');
 	if (p) {
-	  std::string s(value, p - value);
+	  std::string s(value, OCPI_SIZE_T_DIFF(p, value));
 	  ezxml_set_attr_d(fpx, "value", s.c_str());
 	  do {
 	    const char *tp = strchr(++p, '=');
 	    if (!tp)
 	      return OU::esprintf("Invalid file option: %s", assign);
-	    s.assign(p, tp - p);
+	    s.assign(p, OCPI_SIZE_T_DIFF(tp, p));
 	    ezxml_t x = ezxml_add_child(inst, "property", 0);
 	    ezxml_set_attr_d(x, "name", s.c_str());
 	    p = strchr(++tp, ';');
 	    if (!p) p = strchr(tp, '&');
 	    if (!p) p = tp + strlen(tp);
-	    s.assign(tp, p - tp);
+	    s.assign(tp, OCPI_SIZE_T_DIFF(p, tp));
 	    ezxml_set_attr_d(x, "value", s.c_str());
 	  } while (*p++);
 	} else
@@ -667,24 +667,23 @@ namespace OCPI {
       const OU::Port
 	&p = impl.m_metadataImpl.metaPort(port),
 	&other = *otherImpl.m_metadataImpl.findMetaPort(ap.m_connectedPort->m_name);
-      if (impl.m_internals & (1 << port)) {
-	if (!(otherImpl.m_internals & (1 << other.m_ordinal)) ||
+      if (impl.m_internals & (1u << port)) {
+	if (!(otherImpl.m_internals & (1u << other.m_ordinal)) ||
 	    otherImpl.m_connections[other.m_ordinal].impl != &impl ||
 	    otherImpl.m_connections[other.m_ordinal].port != &p) {
-	  ocpiInfo("This port is preconnected and the other port is not preconnected to us: "
-		   "we're incompatible");
-	  ocpiInfo("other %p %u %s  m_internals %x, other internals %x", &other,
-		   other.m_ordinal, other.m_name.c_str(), impl.m_internals,
+	  ocpiInfo("This port %p \"%s\" of worker \"%s\" is preconnected and the other port is not "
+		   "preconnected to us: we're incompatible", &p, p.cname(), p.metaWorker().cname());
+	  ocpiInfo("  Other port %p %u \"%s\" of worker \"%s\"  m_internals %x, other internals %x", &other,
+		   other.m_ordinal, other.cname(), other.metaWorker().cname(), impl.m_internals,
 		   otherImpl.m_internals);
-	  ocpiInfo("me %p port ordinal %u port %s", &p, p.m_ordinal, p.m_name.c_str());
 	  return true;
 	}
-      } else if (otherImpl.m_internals & (1 << other.m_ordinal)) {
-	ocpiInfo("Port %s of %s is external; the other port is connected: we're incompatible",
-		 p.m_name.c_str(), impl.m_metadataImpl.cname());
-	ocpiInfo("other %p %u %s  m_internals %x, other internals %x", &other, other.m_ordinal,
-		 other.m_name.c_str(), impl.m_internals, otherImpl.m_internals);
-	ocpiInfo("me %p port ordinal %u port %s", &p, p.m_ordinal, p.m_name.c_str());
+      } else if (otherImpl.m_internals & (1u << other.m_ordinal)) {
+	ocpiInfo("Port \"%s\" of \"%s\" is external; the other port is connected: we're incompatible",
+		 p.cname(), impl.m_metadataImpl.cname());
+	ocpiInfo("  other %p %u \"%s\"  m_internals %x, other internals %x", &other, other.m_ordinal,
+		 other.cname(), impl.m_internals, otherImpl.m_internals);
+	ocpiInfo("  me %p port ordinal %u port \"%s\"", &p, p.m_ordinal, p.cname());
 	return true;
       }
       return false;

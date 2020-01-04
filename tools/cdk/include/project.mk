@@ -226,6 +226,10 @@ run: all test
 	$(call MaybeMake,components,run)
 	$(call MaybeMake,applications,run)
 
+runonly:
+	$(call MaybeMake,components,run)
+	$(call MaybeMake,applications,run)
+
 cleancomponents:
 	$(call MaybeMake,components,clean)
 

@@ -81,7 +81,7 @@ mymain(const char **argv) {
 #endif
   std::string cmd = argv[0]; // ensured valid by caller
   if (cmd == "test")
-    printf("test\n");
+    printf("testing\n");
   else if (cmd == "clocks") {
     volatile FTM *ftm = (volatile FTM *)map(FTM_ADDR, sizeof(FTM));
     if (!ftm)
@@ -207,6 +207,36 @@ mymain(const char **argv) {
 #endif
       sleep(10);
     }
+  } else if (cmd == "devcfg") {
+    const uint32_t DEVCFG_ADDR = 0xF8007000;
+    struct DEVCFG {
+      uint32_t
+        ctrl,
+	lock,
+	cfg,
+	int_sts,
+	int_mask,
+	status,
+	dma_src_addr,
+	dma_dst_addr,
+	dma_src_len,
+	dma_dest_len,
+	rom_shadow,
+	multiboot_addr,
+	sw_id,
+	unlock,
+	mctrl,
+	xadcif_cfg,
+	xadcif_int_sts,
+	xadcif_int_mask,
+	xadcif_msts,
+	xadcif_cmdfifo,
+	xadcif_rdfifo,
+	xadcif_mctl;
+    };
+    volatile DEVCFG *devcfg = (volatile DEVCFG *)map(DEVCFG_ADDR, sizeof(DEVCFG));
+    printf("ctrl 0x%x lock 0x%x cfg 0x%x int_sts 0x%x int_mask 0x%x status 0x%x\n",
+	   devcfg->ctrl, devcfg->lock, devcfg->cfg, devcfg->int_sts, devcfg->int_mask, devcfg->status);
   }
   return 0;
 }
