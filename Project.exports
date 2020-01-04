@@ -115,6 +115,8 @@
 +tools/cdk/scripts/setup-prerequisite.sh scripts/
 +tools/cdk/scripts/setup-prereq-dirs.sh scripts/
 +tools/cdk/scripts/getPlatform.sh scripts/
++tools/cdk/scripts/ocpiav.sh <target>/bin/ocpigui
++tools/cdk/scripts/ocpiav.sh <target>/bin/ocpiav
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/
