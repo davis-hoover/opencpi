@@ -123,7 +123,7 @@ namespace OCPI {
 		ssize_t n;
 		while ((n = read(rfd, buf, sizeof(buf))) > 0) {
 		  while (n) {
-		    unsigned nn = (unsigned)wskt.send(buf, n);
+		    unsigned nn = (unsigned)wskt.send(buf, (size_t)n);
 		    // no errors - it throws
 		    n -= nn;
 		  }

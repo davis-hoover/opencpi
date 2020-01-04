@@ -79,6 +79,7 @@ struct OcpSignalDesc {
 };
 
 extern OcpSignalDesc ocpSignals[N_OCP_SIGNALS+1];
+// No constructor - it is initialized and reinitialized in deriveOCP
 struct OcpSignal {
   uint8_t *value;
   size_t width;

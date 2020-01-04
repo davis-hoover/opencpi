@@ -25,7 +25,6 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 architecture rtl of worker is
 begin
---  out_out.give   <= to_bool(its(in_in.ready) and out_in.ready);
   out_out.give   <= in_in.ready and out_in.ready;
   in_out.take    <= in_in.ready and out_in.ready;
   out_out.opcode <= in_in.opcode;

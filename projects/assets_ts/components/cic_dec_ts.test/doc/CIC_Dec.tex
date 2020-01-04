@@ -173,27 +173,19 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \input{../../\ecomp.hdl/utilization.inc}
 \end{landscape}
 \newpage
-\section*{Test and Verification}
-Two test cases are implemented to validate the CIC Decimator component:
+\input{CIC_Test}
 
-\begin{enumerate}
-	\item Unity gain response to DC: The CIC Decimator gain is calculated using the following equation:
-	      \begin{equation} \label{eq:cic_gain}
-	      	CIC\ Gain = \frac{(R*M)^N}{2^{CEIL(N*log_2(R*M))}}
-	      \end{equation}
-	\item Tone waveform: A waveform containing tones at 50 Hz, 100 Hz and Fs/R sampled at 1024000 is processed by the worker. The tones at 50 Hz and 100 Hz are within the bandwidth of the filter, while the Fs/R tone is at the first null. The power levels of the input tones and output tones are measured and compared.
-\end{enumerate}\medskip
-
+\medskip
 In both of the test cases, the samples data is interleaved with all of the operations of the Complex\_Short\_With\_Metadata protocol in the following sequence:
+
 \begin{enumerate}
 	\item Interval
-	\item Sync (this opcode is expected after an Interval operation)
 	\item Time
 	\item Samples
-	\item Flush	
+	\item Time	
 	\item Samples
+	\item Flush
 	\item Sync
-	\item Samples
 \end{enumerate}
 
 \input{CIC_References}
