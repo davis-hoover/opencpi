@@ -21,11 +21,11 @@
 # in the typical way that such scripts are called from the user's .profile.
 # It not meant to be *executed* as a shell script, only sourced.
 # It is sourced by its name in the top level of the desired CDK installation
-# (possibly /opt/opencpi/cdk).  If may be sourced using a relative pathname.
+# (possibly /opt/opencpi/cdk).  It may be sourced using a relative pathname.
 
-# Thus its location implies where OpenCPI is installed.
+# Thus its location (where it is sourced from) implies where OpenCPI is installed.
 # This means that it should only be run (sourced) in its "exported" location, not in its
-# location inside the source tree.
+# location inside the source tree.  Most common usage from source tree is: source cdk/opencpi-setup.sh -s
 # The CDK is where this is sourced from (its dirname) and so OCPI_CDK_DIR is set accordingly.
 
 # There are several different scenarios where this script will run:
@@ -190,7 +190,7 @@ done
   done
 }
 # Make the file name of this script absolute if it isn't already
-# But leave it user friendly (don't to readlink etc.)
+# But leave it user friendly (don't do readlink etc.)
 [[ "$ocpi_me" = /* ]] || ocpi_me=`pwd`/$ocpi_me
 ocpi_dir=`dirname $ocpi_me`
 [ -d $ocpi_dir -a -x $ocpi_dir ] || {
@@ -271,6 +271,17 @@ ocpi_comp=$OCPI_CDK_DIR/scripts/ocpidev_bash_complete
 	PYTHONPATH now set to $PYTHONPATH
 	Now determining where prerequisite software is installed.
 	EOF
+ocpi_user_env=$OCPI_CDK_DIR/../user-env.sh
+[ -r "$ocpi_user_env" ] && {
+  if grep -q '^ *export' $ocpi_user_env; then
+    [ "$ocpi_verbose" = 1 ] &&
+	echo "Sourcing $ocpi_user_env for user settings of OpenCPI environment variables." >&2
+    source $ocpi_user_env
+  elif [ -r $ocpi_user_env ]; then
+    [ "$ocpi_verbose" = 1 ] &&
+	echo The user environment setting script \"$ocpi_user_env\" contains no export commands so it is ignored. >&2
+  fi
+}
 [ "$ocpi_verbose" = 1 ] && {
   echo "Below are all OCPI_* environment variables now set:" >&2
   env | grep OCPI | sort >&2

@@ -25,16 +25,16 @@ _XILINX_MK=1
 # "error" in error messages.  This is used when the caller wants an empty return rather than
 # an error
 
-OcpiXilinxDir=$(strip $(foreach t,$(or $(OCPI_XILINX_DIR),/opt/Xilinx),$(infox TT is $t)\
+OcpiXilinxDir=$(strip $(foreach t,$(or $(OCPI_XILINX_DIR),$(wildcard /opt/Xilinx),/tools/Xilinx),$(infox TT is $t)\
 		 $(if $(shell test -d $t && echo 1),$t,\
-		    $(call $(or $1,error), Directory "$t" for OCPI_XILINX_DIR not found))))
+		    $(call $(or $1,error), Directory $(if $(OCPI_XILINX_DIR),"$t" from OCPI_XILINX_DIR,/opt/Xilinx or /tools/Xilinx) not found))))
 
 OcpiXilinxLicenseFile=$(strip $(foreach t,$(or $(OCPI_XILINX_LICENSE_FILE),\
                                                $(call OcpiXilinxDir,$1)/Xilinx-License.lic),\
 			 $(if $(or $(findstring @,$t),$(findstring :,$t),$(shell test -f $t && echo 1)),$t,\
 			    $(if $(OCPI_XILINX_LICENSE_FILE),\
                               $(call $(or $1,error), File "$t", for OCPI_XILINX_LICENSE_FILE, not found),\
-			      $(warning, No license file specified in OCPI_XILINX_LICENSE_DIR and default one in $t is nonexistent.  Webpack installations may still work.)))))
+			      $(warning, No license file specified in OCPI_XILINX_LICENSE_FILE and default one in $t is nonexistent.  Webpack installations may still work.)))))
 
 OcpiXilinxIseDir=$(strip\
 $(foreach t,$(OcpiXilinxDir),\

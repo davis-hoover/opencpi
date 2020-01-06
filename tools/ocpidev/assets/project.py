@@ -358,6 +358,101 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             print()
     # pylint:enable=unused-argument
 
+    def _collect_components_dict(self):
+        """
+        return a dictionary with all the components in the project
+        """
+        top_comp_dict = {}
+        for comp in self.get_valid_components():
+            comp_name = ocpiutil.rchop(os.path.basename(comp), "spec.xml")[:-1]
+            top_comp_dict[comp_name] = comp
+        lib_dict = {}
+        if top_comp_dict:
+            lib_dict[self.directory + "/specs"] = { "components" : top_comp_dict,
+                                                    "package_id" : self.package_id }
+        for lib in self.lib_list:
+            comp_dict = {}
+            for comp in lib.get_valid_components():
+                comp_name = ocpiutil.rchop(os.path.basename(comp), "spec.xml")[:-1]
+                comp_dict[comp_name] = comp
+            if comp_dict:
+                comps_dict = {"components":comp_dict,
+                              "package_id": lib.package_id}
+                lib_dict[lib.directory + "/specs"] = comps_dict
+        return lib_dict
+
+    # pylint:disable=unused-argument
+    def show_components(self, details, verbose, **kwargs):
+        """
+        Show all the components in all the projects in the registry
+        """
+        lib_dict = self._collect_components_dict()
+        if details == "simple":
+            for dir, comps_dict in lib_dict.items():
+                for comp in comps_dict["components"]:
+                    print(comp + " ", end="")
+            print()
+        elif details == "table":
+            rows = [["Library Package ID", "Component Spec Directory", "Component"]]
+            for dir, comps_dict in lib_dict.items():
+                for comp in sorted(comps_dict["components"]):
+                    rows.append([comps_dict["package_id"], dir[len(self.directory)+1:], comp])
+            ocpiutil.print_table(rows, underline="-")
+        elif details == "json":
+            json.dump(lib_dict, sys.stdout)
+            print()
+    # pylint:enable=unused-argument
+
+    def _collect_workers_dict(self):
+        """
+        return a dictionary with all the workers in the projects
+        """
+        lib_dict = {}
+        for lib in self.lib_list:
+            wkr_dict = {}
+            # pylint:disable=unused-variable
+            tests, wkrs = lib.get_valid_tests_workers()
+            # pylint:enable=unused-variable
+            for wkr in wkrs:
+                wkr_dict[os.path.basename(wkr)] = wkr
+            if wkr_dict:
+                wkrs_dict = {"workers":wkr_dict,
+                             "directory":lib.directory,
+                             "package_id": lib.package_id}
+                lib_package = lib.package_id
+                # in case two or more libraries have the same package id we update the key to
+                # end with a number
+                i = 1
+                while lib_package in lib_dict:
+                    lib_package += ":" + str(i)
+                    i += 1
+                lib_dict[lib_package] = wkrs_dict
+        return lib_dict
+
+    # pylint:disable=unused-argument
+
+    def show_workers(self, details, verbose, **kwargs):
+        """
+        Show all the workers in the projects
+        """
+        lib_dict = self._collect_workers_dict()
+        if details == "simple":
+            for id,lib in lib_dict.items():
+                print(self.directory)
+                for wkr in lib["workers"]:
+                    print(wkr + " ", end="")
+            print()
+        elif details == "table":
+            rows = [["Library Package ID", "Library Directory", "Worker"]]
+            for id,lib in lib_dict.items():
+                for wkr in sorted(lib["workers"]):
+                    rows.append([lib["package_id"], lib["directory"][len(self.directory)+1:], wkr])
+            ocpiutil.print_table(rows, underline="-")
+        elif details == "json":
+            json.dump(lib_dict, sys.stdout)
+            print()
+    # pylint:enable=unused-argument
+
     # pylint:disable=unused-argument
     def _show_non_verbose(self, details, **kwargs):
         """
@@ -1016,7 +1111,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         """
         proj_dir = directory + "/" + name
         if os.path.isdir(proj_dir):
-            raise ocpiutil.OCPIException("Cannot create this project" + proj_dir + "because this " +
+            raise ocpiutil.OCPIException("Cannot create this project: " + proj_dir + ", because the " +
                                          "folder already exists.")
         os.chdir(directory)
         os.mkdir(name)

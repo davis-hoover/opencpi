@@ -1162,7 +1162,12 @@ function do_worker {
   fi
   [ -n "$emulates" ] && emuattr=" emulate='$emulates'"
   [ -n "$slave" ] && slaveattr=" slave='$slave'"
-  [ -n "$version" ] && versionattr=" version='$version'"
+  if [ -n "$version" ]; then
+     versionattr=" version='$version'"
+  else
+     echo Without the worker version specified, it is set to 2 in this new worker.
+     versionattr=" version='2'"
+  fi
   if [ "$OCPI_CREATE_BUILD_FILES" = 1 ]; then
     [ -n "${xmlincludes[*]}" ] && xmlincattr=" XmlIncludeDirs='${xmlincludes[@]}'"
     [ -n "${complibs[*]}" ] && complibattr=" ComponentLibraries='${complibs[@]}'"
@@ -1300,7 +1305,7 @@ EOF
     fi
     bad "Failed to build worker skeleton"
   }
-  echo "Successfully built skeleton"
+  echo "Successfully created worker \"$1\" in library \"$(basename $libdir)\" and generated+built its skeleton."
 }
 
 # A special version of creating a spec - just adjust the default locations
@@ -2331,6 +2336,24 @@ while [[ "${argv[0]}" != "" ]] ; do
     help
   elif [[ "${argv[0]}" == -* ]] ; then
     case "${argv[0]}" in
+      # allow getopt_long style --<opt>=value
+      (--*=*)
+	 flag=${argv[0]%%=*}
+         val=${argv[0]##*=}
+	 unset argv[0]
+	 argv=($flag $val ${argv[@]})
+	 ;;
+      # allow getopt_long style -<letter>value
+      # We are not allowing multiple letter options following a dash, which we could
+      (-[dlhNFKDSPLVEWIAYyRrgqOCTZGQUMB]?*)
+	 flag=${argv[0]:0:2}
+	 val=${argv[0]:2}
+	 unset argv[0]
+	 argv=($flag $val ${argv[@]})
+	 echo FIXING: flag=$flag val=$val new=:${argv[@]}: >&2
+	 ;;
+    esac
+    case "${argv[0]}" in
       (-v) verbose=1;;
       (-k) keep=1;;
       (-f) force=1;;
@@ -2341,7 +2364,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (-p) project=1;;
       (-t) createtest=1;;
       (-n) nocontrol=1;;
-      (-l)
+      (-l | --library)
         # if a library is mentioned, it must exist.
 	takeval library # default is <components>
         liboptset=1    # the library variable can be set elsewhere (ie card option)
@@ -2388,7 +2411,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (-g) takeval hdlpart ;;
       (-q) takeval timefreq ;;
       (-u) nosdp=1 ;;
-      (-ll) takeval loglevel; export OCPI_LOG_LEVEL=$loglevel;;
+      (--log-level) takeval loglevel; export OCPI_LOG_LEVEL=$loglevel;;
 
       (-O) takeval other; others=(${others[@]} $other) ;;
       (-C) takeval core; cores=(${cores[@]} $core) ;;
@@ -2409,7 +2432,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       # for apps
       (-X) xmlapp=1;;
       (-x) xmldirapp=1;;
-      (-help|--help)  help_screen=true;;
+      (-help|--help)  help_screen=true;; # SPECIAL CASE SHORT OPTION OK since -h takes no value above
       # for building
       (--clean-all) hardClean=1;;
       (--build-rcc|--rcc) buildRcc=1;;

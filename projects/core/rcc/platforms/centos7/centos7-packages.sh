@@ -100,6 +100,8 @@ PKGS_S+=(swig python-devel)
 PKGS_S+=(nfs-utils)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+#    for the AV GUI installation
+PKGS_S+=(oxygen-icon-theme jre)
 
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required

@@ -78,6 +78,8 @@ projects = [dir for dir in os.listdir(projects_dir)
             if not os.path.isfile(os.path.join(projects_dir, dir))]
 while "bsps" in projects:
     projects.remove("bsps")
+while "osps" in projects:
+    projects.remove("osps")
 new_user_dir = None
 new_reg_dir = None
 force = False
