@@ -17,19 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if ! PORT=`command -v port`; then
-  # Try this in case the macports tree is not in the path
-  PORT=/opt/local/bin/port
-  [ ! -x $PORT ] && {
-    echo 'ERROR: This software platform, $OCPI_TOOL_PLATFORM, requires that the "macports" package be installed.'
-    echo '       It is usually directly installable from: https://www.macports.org/install.php'
-    echo '       The "port" command was not in the PATH or in the standard location, '$PORT
-    exit 1
-  }
-fi
-PKGS="python34 coreutils gsed py34-numpy swig swig-python py27-numpy scons"
-echo Using $PORT to install packages required by OpenCPI for $OCPI_TOOL_PLATFORM: $PKGS
-sudo $PORT install $PKGS
-# FIXME: somehow automate the required path additions?
-# They are /opt/local/bin and /opt/local/libexec/gnubin
-# At the end of the path.
+[ "$(uname -s)" = Darwin ] && which -s sw_vers &&
+    vers=`sw_vers -productVersion |
+          sed 's/^\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/' | tr . _` &&
+    [ macos$vers = $(basename $(dirname $0)) ]
