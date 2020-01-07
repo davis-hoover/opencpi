@@ -21,9 +21,34 @@ if [ -z "$OCPI_CDK_DIR" ]; then
   echo "You probably need to do \"source <wherever-the-cdk-is>/opencpi-setup.sh -s\"."
   exit 1
 fi
-if [ ! -x $OCPI_CDK_DIR/../av/eclipse/eclipse ]; then
-    echo The OpenCPI AV GUI does not appear to be installed.
-    exit 1
+if [ -z "$1" -o "$1" = "-h" -o "$1" = "--help" ]; then
+  cat <<-EOF
+	Usage is: ocpiav -h|--help|desktop|remove|run
+	Commands are:
+	      -h|--help   Show this message
+	      desktop     Add a shortcut to access this tool from the Applications->Programming menu bar
+	                  This adds a file in your home directory in the ~/.local/share/applications directory
+	      remove      Remote the short cut, remving the file under your ghome directory.
+	      run         Run the AV GUI tool
+	EOF
+  exit 1
 fi
-
-exec $OCPI_CDK_DIR/../av/eclipse/eclipse
+file=~/.local/share/applications/ocpiav.desktop
+case $1 in
+  desktop)
+    echo "Adding the ocpiav tool to be accessed from the Applications->Programming menu."
+    echo "This creates a new file under your home directory at: $file"
+    mkdir -p ~/.local/share/applications
+    sed "s-OCPI_CDK_DIR-$OCPI_CDK_DIR-" $OCPI_CDK_DIR/scripts/ocpiav.desktop > $file
+    ;;
+  remove)
+    rm $file
+    ;;
+  run)
+    if [ ! -x $OCPI_CDK_DIR/../av/eclipse/eclipse ]; then
+	echo The OpenCPI AV GUI does not appear to be installed.
+	exit 1
+    fi
+    exec $OCPI_CDK_DIR/../av/eclipse/eclipse
+    ;;
+esac

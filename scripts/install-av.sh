@@ -33,7 +33,7 @@ FILE=eclipse-cpp-neon-3-linux-gtk-x86_64.tar.gz
 DOWNLOAD=https://www.eclipse.org/downloads/packages/release/neon/3
 AVFILE=av.proj.ide.plugin_1.5.jar
 AVURL=https://opencpi.github.io/ide
-set -vx
+set -e
 echo Ensuring that the prerequisite packages are available and installed on this system...
 sudo yum install $YUMS ||
     (echo Failed to obtain the required packages from CentOS repository using: yum install $YUMS && exit 1)
@@ -110,6 +110,11 @@ If the "Force Quit or Wait" window comes up, click "Wait" to allow it to start
 7. After a few minutes (patience...) those same projects will appear in the OpenCPI Projects window.
 8. Select File->Exit to exit the program.
 EOF
+. ../cdk/opencpi-setup.sh -r
 ./eclipse/eclipse
-echo The AV installation is complete and can be used via the ocpiav tool.
-
+cat <<-'EOF'
+	The AV installation is complete and can be used via the ocpiav tool, using "ocpiav run".
+	To access this tool from the Applications->Programming menu bar you must put a file under your home directory.
+	To do that, use the "ocpiav desktop" command.
+	The ocpiav command must be run in a normal user environment (after opencpi-setup.sh is run).
+EOF
