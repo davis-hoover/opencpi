@@ -64,8 +64,9 @@ function getvars {
 }
 if getvars; then
     echo The $model platform \"$platform\" is already defined in this installation, in $dir.
+    project_dir=$(echo $dir | sed -e "s=/.../platforms/$platform==" -e 's=/lib$==')
     if [ -n "$project" ]; then
-	echo The supplied project package-id for this platform, \"$2\", will be ignored.
+	echo The supplied project package-id for this platform, \"$project\", will be ignored.
     fi
 else
     echo The platform \"$platform\" is not defined in this installation yet.
@@ -88,7 +89,7 @@ else
 	fi
 	echo "Downloading (git cloning) from $url..."
 	if git clone --no-checkout $url $project_dir && test -d $project_dir; then
-	    echo "Download/clone successful into projects/osps/$project."
+	    echo "Download/clone successful into $project_dir."
 	else
 	    echo "Download/clone of project \"$project\" for platforn \"$platform\" failed."
 	    rm -r -f $project_dir
@@ -169,9 +170,12 @@ if [ $model = RCC ]; then
 else
     ocpidev -d projects/core build --hdl --hdl-platform=$platform
     ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
+    ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
     if [ -n "$project" ]; then
 	ocpidev -d $project_dir build --hdl --hdl-platform=$platform
     fi
-    ocpidev -d projects/assets build hdl assembly testbias
+    ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
+    echo "HDL platform \"$platform\" complete, with one HDL assembly (testbias) built for testing."
 fi
+echo "Platform installation (download and build) for platform \"$platform\" succeeded."
 exit 0

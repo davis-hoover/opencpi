@@ -34,6 +34,7 @@
 # OCPI_XILINX_LICENSE_FILE specifies the location of the license file for Xilinx tools
 # If not specified, the file Xilinx-License.lic is used in the $OCPI_XILINX_DIR directory.
 # Note that no license file is required if using recent WebPack versions of xilinx tools.
+# license file can be: <port>@<server.ip.addr>
 # export OCPI_XILINX_LICENSE_FILE=
 
 # OCPI_XILINX_VERSION specifies the version of Xilinx tools to be used.
@@ -59,6 +60,7 @@
 
 # OCPI_XILINX_VIVADO_LICENSE_FILE specifies the location of the Vivado license file
 # If not specified, the file $OCPI_XILINX_VIVADO_DIR/Vivado/Xilinx-License.lic is used
+# license file can be: <port>@<server.ip.addr>
 # export OCPI_XILINX_VIVADO_DIR=xxx
 
 ####################################################################################################
@@ -101,12 +103,28 @@
 # None of them are normally set unless the installation of Xilinx tools is complex, e.g. using a variety of
 # versions where the desired one is not the latest one etc.
 
+
+
+####################################################################################################
+####################################################################################################
+# MODELSIM tool-related variables.
+# Normally the defaults are used since they represent the defaults used by the Xilinx tool installers.
+# None of them are normally set unless the installation of Xilinx tools is complex, e.g. using a variety of
+# versions where the desired one is not the latest one etc.
+
+# OCPI_MODELSIM_DIR specifies the top level directory where modelsim installed.
+# export OCPI_MODELSIM_DIR=xxx
+
+# OCPI_MODELSIM_LICENSE_FILE specified the modelsim license file to be used
+# license file can be: <port>@<server.ip.addr>
+# export OCPI_MODELSIM_LICENSE_FILE=ssdf
+
 return 0
+
+
 OCPI_ALTERA_DIR
 OCPI_ALTERA_VERSION
 OCPI_ALTERA_LICENSE_FILE
-OCPI_MODELSIM_DIR
-OCPI_MODELSIM_LICENSE_FILE
 
 # Project registry-related when you want separate sets of projects not globally registered
 # I.e. not the installation
@@ -119,7 +137,6 @@ OCPI_LIBRARY_PATH --- runtime - execution outside of projects outside the dev en
 OCPI_LOG_LEVEL
 
 
-license file can be: <port>@<server.ip.addr>
 /opt/Xilinx/Xilinx-License.lic
 • /opt/Xilinx/Vivado/Xilinx-License.lic
 OCPI_REMOTE_TEST_SYSTEMS
