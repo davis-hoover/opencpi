@@ -21,44 +21,65 @@
 #include "OcpiApi.hh"
 #include <iostream> //std::cerr
 #include <sstream> // std::ostringstream
-#include "ezxml.h"
 
+//TODO: These are internal headers which should not be included directly
+//      Anything from them exposed to the ACI should be in Ocpi*Api.h files
+#include "OcpiDriverManager.h"
+#include "OcpiUtilEzxml.h"
+
+const char *APP_NAME = "timekeeping_clock_characterization";
 //to prevent hanging application
 const int MAX_EXPECTED_RUN_TIME_USECS=1e6;
 
 namespace OA = OCPI::API;
+namespace OX = OCPI::Util::EzXml;
 
-int main(/*int argc, char **argv*/) {
+int main(int argc, char **argv) {
 
   int ret = 0;
   std::ostringstream oss;
   const char *platform, *freq_std_tty, *freq_counter_ip;
 
   try {
-    //Extract test setup config from system.xml
-    //First check if OCPI_SYSTEM_CONFIG sets location of system.xml
-    const char *system_xml_filename = getenv("OCPI_SYSTEM_CONFIG");
-    if(!system_xml_filename)
-      //If not, check default location of /opt/opencpi/system.xml
-      system_xml_filename = "/opt/opencpi/system.xml";
-    FILE *system_xml_file = fopen(system_xml_filename, "r"); 
-    if(system_xml_file){
-      fclose(system_xml_file);
-      ezxml_t system_xml = ezxml_parse_file(system_xml_filename);
-      ezxml_t timetest_xml = ezxml_get(system_xml,
-				     "container", 0,
-				     "timetest", -1);
-      platform = ezxml_cattr(timetest_xml, "platform");
-      ezxml_t freqstd_xml = ezxml_child(timetest_xml, "freqstd");
-      freq_std_tty = ezxml_cattr(freqstd_xml, "serialport");
-      ezxml_t freqcounter_xml = ezxml_child(timetest_xml, "freqcounter");
-      freq_counter_ip = ezxml_cattr(freqcounter_xml, "ipaddr");
-    } else
-      system_xml_filename = NULL;
 
-    if(!system_xml_filename || !platform || !freq_std_tty || !freq_counter_ip){
-      std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
+    if(argc == 1) {
+      std::cout << "INFO: No arguments supplied. Using defaults." << std::endl;
+      std::cout << "INFO: platform: e3xx" << std::endl;
+      platform = "e3xx";
+    } else if(argc != 2) {
+      oss << "wrong number of arguments" << "\n";
+      oss << "Usage is: " << argv[0] << " <platform>\n";
+      throw oss.str();
     } else {
+      platform = argv[1];
+    }
+
+    //Run nothing application
+    std::string platform_string = "=" + std::string(platform);
+    OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), 
+			 OA::PVString("platform", platform_string.c_str()), 
+			 OA::PVBool("dumpPlatforms", true), OA::PVEnd };
+    OA::Application app("../nothing.xml", pvs);
+
+    //Check if system is setup to run test
+      ezxml_t system_xml = OCPI::Driver::ManagerManager::getManagerManager().getXML();
+    ezxml_t applications_xml = ezxml_child(system_xml, "applications");
+    ezxml_t application_xml = OX::findChildWithAttr(applications_xml, "application", "name", APP_NAME); 
+    ezxml_t platform_xml, freqstd_xml, freqcounter_xml;
+    if(application_xml){
+      ezxml_t platforms_xml = ezxml_child(application_xml, "platforms");
+      platform_xml = OX::findChildWithAttr(platforms_xml, "platform", "name", platform);
+      if(platform_xml){
+	freqstd_xml = ezxml_child(application_xml, "freqstd");
+	freq_std_tty = ezxml_cattr(freqstd_xml, "serialport");
+	freqcounter_xml = ezxml_child(application_xml, "freqcounter");
+	freq_counter_ip = ezxml_cattr(freqcounter_xml, "ipaddr");
+      }
+    }
+
+    if(!application_xml || !platform_xml || !freq_std_tty || !freq_counter_ip)
+      std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
+    else {
       //Check as much as you can about the test setup
 
       //10 MHz reference
@@ -74,12 +95,6 @@ int main(/*int argc, char **argv*/) {
 	throw oss.str();
       }
       
-      //Run nothing application
-      std::string platform_string = "=" + std::string(platform);
-      OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), 
-			   OA::PVString("platform", platform_string.c_str()), 
-			   OA::PVBool("dumpPlatforms", true), OA::PVEnd };
-      OA::Application app("../nothing.xml", pvs);
       app.initialize();
       app.start();
       app.wait(MAX_EXPECTED_RUN_TIME_USECS);

@@ -5,15 +5,26 @@
     <ocl load='0'/>
     <remote load='1'/>
     <hdl load='1'/>
-    <timetest platform='e3xx'>
-      <freqstd type='srs725' serialport='/dev/ttyUSB1'/>
-      <gpsfreqref type='srs740'/>
-      <freqcounter type='53230a' ipaddr='192.168.1.2'/>
-    </timetest>
   </container>
   <transfer smbsize='100M'>
     <pio load='1'/>
     <dma load='1'/>
     <socket load='1'/>
   </transfer>
+  <applications>
+    <application name='timestamping_accuracy'>
+      <platforms>
+	<!-- For future use, multiple platforms on switch -->
+	<platform name='e3xx' position='0'/>
+      </platforms>
+    </application>
+    <application name='timekeeping_clock_characterization'>
+      <platforms>
+	<!-- For future use, multiple platforms on switch -->
+	<platform name='e3xx' position='0'/>
+      </platforms>
+      <freqstd type='srs725' serialport='/dev/ttyUSB1'/>
+      <freqcounter type='53230a' ipaddr='192.168.1.2'/>
+    </application>
+  </applications>
 </opencpi>

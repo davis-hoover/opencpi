@@ -204,7 +204,8 @@ namespace OCPI {
 	      OS::LoadableModule::load(file_attr, true, err);
 	    }
 	    continue;
-	  }
+	  } else if (!strcasecmp(ezxml_name(x), "applications"))
+	    continue;
 	  Manager *m;
 	  for (m = firstChild(); m; m = m->nextChild())
 	    if (!strcasecmp(m->name().c_str(), ezxml_name(x)))

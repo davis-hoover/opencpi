@@ -43,14 +43,20 @@
 #include <cmath>     // std::pow()
 #include <algorithm> // std::min_element, std::max_element
 #include <sstream>   // std::ostringstream
-#include "ezxml.h"
 
+//TODO: These are internal headers which should not be included directly
+//      Anything from them exposed to the ACI should be in Ocpi*Api.h files
+#include "OcpiDriverManager.h"
+#include "OcpiUtilEzxml.h"
+
+const char *APP_NAME = "timestamping_accuracy";
 //Seconds buffer for application timeout
 const int MAX_NUM_TIME_TAGS_TO_COLLECT = 128;
 const int EXTRA_TIME_BUFFER = 5;
 const double NUM_MICROSECONDS_PER_FRAC_SEC = .000233;
 
 namespace OA = OCPI::API;
+namespace OX = OCPI::Util::EzXml;
 
 int64_t computeStatistics(uint64_t* collected_time_tags, 
 		       uint32_t num_time_tags_to_collect,
@@ -94,80 +100,83 @@ int64_t computeStatistics(uint64_t* collected_time_tags,
   return avg_delta;
 }
 
-void runApp(std::string platform, 
-		 uint32_t num_time_tags_to_collect,
-		 int64_t cal_value,
-		 uint64_t* collected_time_tags){
+int64_t runApp(const char *platform,
+	       uint32_t num_time_tags_to_collect,
+	       int64_t cal_value,
+	       uint64_t* collected_time_tags){
 
     //to prevent hanging application
     uint32_t max_expected_run_time_usecs = (num_time_tags_to_collect + EXTRA_TIME_BUFFER) * 1e6;
+    std::string platform_string = "=" + std::string(platform);
     OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), 
-			 OA::PVString("platform", platform.c_str()), OA::PVEnd };
+			 OA::PVString("platform", platform_string.c_str()), OA::PVEnd };
     OA::Application app("timestamping_accuracy.xml", pvs);
-    app.initialize();
-    app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", num_time_tags_to_collect);
-    if(cal_value)
-      app.setPropertyValue("signal_time_tagger", "calibration_value", cal_value);
+    
+    //Check if system is setup to run test
+    ezxml_t system_xml = OCPI::Driver::ManagerManager::getManagerManager().getXML();
+    ezxml_t applications_xml = ezxml_child(system_xml, "applications");
+    ezxml_t application_xml = OX::findChildWithAttr(applications_xml, "application", "name", APP_NAME); 
+    ezxml_t platform_xml;
+    if(application_xml){
+      ezxml_t platforms_xml = ezxml_child(application_xml, "platforms");
+      platform_xml = OX::findChildWithAttr(platforms_xml, "platform", "name", platform);
+    }
 
-    app.start();
-    app.wait(max_expected_run_time_usecs);
-    app.stop();
+    if(!application_xml || !platform_xml)
+      std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
+    else {
+      app.initialize();
+      app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", num_time_tags_to_collect);
+      if(cal_value)
+	app.setPropertyValue("signal_time_tagger", "calibration_value", cal_value);
 
-    app.finish();
+      app.start();
+      app.wait(max_expected_run_time_usecs);
+      app.stop();
 
-    OA::Property collected_time_tags_p(app, "signal_time_tagger", "collected_time_tags");
-    collected_time_tags_p.getULongLongSequenceValue(collected_time_tags, MAX_NUM_TIME_TAGS_TO_COLLECT);
+      app.finish();
+
+      OA::Property collected_time_tags_p(app, "signal_time_tagger", "collected_time_tags");
+      collected_time_tags_p.getULongLongSequenceValue(collected_time_tags, MAX_NUM_TIME_TAGS_TO_COLLECT);
+      cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
+    }
+    return cal_value;
 }
 
 int main(int argc, char **argv) {
 
   int ret = 0;
   const char *platform;
+  uint32_t num_time_tags_to_collect;
 
   try {
 
-    if(argc != 2) {
+    if(argc == 1) {
+      std::cout << "INFO: No arguments supplied. Using defaults." << std::endl;
+      std::cout << "INFO: num_time_tags_to_collect: 10" << std::endl;
+      std::cout << "INFO: platform: e3xx" << std::endl;
+      num_time_tags_to_collect = 10;
+      platform = "e3xx";
+    } else if(argc != 3) {
       std::ostringstream oss;
       oss << "wrong number of arguments" << "\n";
-      oss << "Usage is: " << argv[0] << " <num_time_tags_to_collect>\n";
+      oss << "Usage is: " << argv[0] << " <num_time_tags_to_collect> <platform>\n";
       throw oss.str();
+    } else {
+      num_time_tags_to_collect = atoi(argv[1]);
+      platform = argv[2];
     }
 
-    uint32_t num_time_tags_to_collect = atoi(argv[1]);
+    uint64_t collected_time_tags[MAX_NUM_TIME_TAGS_TO_COLLECT];
 
-    //Extract test setup config from system.xml
-    //First check if OCPI_SYSTEM_CONFIG sets location of system.xml
-    const char *system_xml_filename = getenv("OCPI_SYSTEM_CONFIG");
-    if(!system_xml_filename)
-      //If not, check default location of /opt/opencpi/system.xml
-      system_xml_filename = "/opt/opencpi/system.xml";
-    FILE *system_xml_file = fopen(system_xml_filename, "r"); 
-    if(system_xml_file){
-      fclose(system_xml_file);
-      ezxml_t system_xml = ezxml_parse_file(system_xml_filename);
-      ezxml_t timetest_xml = ezxml_get(system_xml,
-				     "container", 0,
-				     "timetest", -1);
-      platform = ezxml_cattr(timetest_xml, "platform");
-    } else
-      system_xml_filename = NULL;
+    std::cout << "Computing calibration value: " << std::endl;
+    int64_t cal_value = runApp(platform, num_time_tags_to_collect, 0, collected_time_tags);     
 
-    if(!system_xml_filename || !platform){
-      std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
-    } else {
-
-      std::string platform_string = "=" + std::string(platform);
-      uint64_t collected_time_tags[MAX_NUM_TIME_TAGS_TO_COLLECT];
-
-      std::cout << "Computing calibration value: " << std::endl;
-      runApp(platform_string, num_time_tags_to_collect, 0, collected_time_tags);
-      int64_t cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, 0);
-
+    if(cal_value){
       std::cout << "Timestamping Accuracy: " << std::endl;
-      runApp(platform_string, num_time_tags_to_collect, cal_value, collected_time_tags);
-      computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
+      runApp(platform, num_time_tags_to_collect, cal_value, collected_time_tags);
+    }
 
-    }          
   } catch (std::string &e) {
     std::cerr << "ERROR: " << e << "\n";
     ret = 1;

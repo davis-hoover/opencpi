@@ -19,11 +19,16 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
 
-# Default value for num_time_tags_to_collect
-OcpiRunArgs=10
-
+#TODO: These are internal headers which should not be included directly
+#      Anything from them exposed to the ACI should be in Ocpi*Api.h files
 IncludeDirs+=\
-	../../../../runtime/util/ezxml/include/
+	../../../../runtime/util/driver/include/ \
+	../../../../runtime/util/ezxml/include/ \
+	../../../../runtime/util/misc/include/ \
+	../../../../runtime/util/parentChild/include/ \
+	../../../../runtime/util/property/include/ \
+	../../../../runtime/util/vfs/include/ \
+	../../../../os/interfaces/include/
 
 include $(OCPI_CDK_DIR)/include/application.mk
 

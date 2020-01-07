@@ -41,7 +41,7 @@ except ImportError:
 # There are issues the Instrument class cleaning up properly 
 # https://github.com/python-ivi/python-usbtmc/issues/44
 def clean_exit(instrument_obj, err):
-    freq_cnt.close()
+    instrument_obj.close()
     sys.exit(err)
     
 if len(sys.argv) != 3:
@@ -60,6 +60,7 @@ freq_cnt = vxi11.Instrument(sys.argv[1])
 NUM_MEASUREMENTS = [100]
     
 # Put the device in a known state
+freq_cnt.timeout = 10
 freq_cnt.write("*RST")
 freq_cnt.write("*CLS")
 
