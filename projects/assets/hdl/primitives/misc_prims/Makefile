@@ -33,6 +33,7 @@ SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_body \
 	debounce/src/debounce \
 	ocpi_pkg \
+	wsi_helpers_pkg \
 	cdc_pkg \
 	lfsr/src/lfsr \
 	round_conv/src/round_conv \
@@ -56,6 +57,7 @@ SourceFiles=$(patsubst %,%.vhd,\
 	ocpi_cswm_prot_out_adapter_dw32_clkin_old \
 	ocpi_cswm_prot_out_adapter_dw32_clkout \
 	ocpi_cswm_prot_out_adapter_dw32_clkout_old \
+	wsi_helpers/iqstream_prot_out_adapter \
 	level_to_pulse_converter \
 	cdc_fifo_info \
 	set_clr \
