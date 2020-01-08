@@ -109,9 +109,10 @@ def main():
 
     args = parse_cl_vars()
     name = args["name"]
+    cur_dir = args["cur_dir"]
     args.pop("name", None)
     try:
-        CLASS_DICT[args["noun"]].create(name, ".", **args)
+        CLASS_DICT[args["noun"]].create(name, cur_dir, **args)
     except ocpiutil.OCPIException as ex:
         ocpiutil.logging.error(ex)
         ocpiutil.logging.error("Unable to run due to previous errors")

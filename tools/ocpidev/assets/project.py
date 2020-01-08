@@ -1018,6 +1018,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         if os.path.isdir(proj_dir):
             raise ocpiutil.OCPIException("Cannot create this project" + proj_dir + "because this " +
                                          "folder already exists.")
+        os.chdir(directory)
         os.mkdir(name)
         template_dict = Project._get_template_dict(name, **kwargs)
 
