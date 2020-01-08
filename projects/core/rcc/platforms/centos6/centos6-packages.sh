@@ -98,9 +98,11 @@ PKGS_S+=(rpm-build)
 #    for creating swig
 PKGS_S+=(swig python-devel)
 #    for general configuration/installation flexibility
-PKGS_S+=(nfs-utils)
+PKGS_S+=(nfs-utils nfs-utils-lib)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+#    for serial console terminal emulation
+PKGS_S+=(screen)
 
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
