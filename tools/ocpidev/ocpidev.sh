@@ -718,8 +718,8 @@ EOF
 namespace OA = OCPI::API;
 
 int main(/*int argc, char **argv*/) {
-  // Reference https://opencpi.github.io/OpenCPI_Application_Development.pdf for
-  // an explanation of the ACI.
+  // For an explanation of the ACI, see:
+  // https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development.pdf
 
   try {
     OA::Application app("$app.xml");

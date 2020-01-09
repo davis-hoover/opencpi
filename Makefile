@@ -227,7 +227,7 @@ timestamp:=_$(shell printf %05d $(shell expr `date -u +"%s"` / 360 - 4273900))
 git_branch :=$(notdir $(shell git name-rev --name-only HEAD | \
                               perl -pe 's/~[^\d]*$$//' | perl -pe 's/^.*?--//'))
 git_version:=$(shell echo $(git_branch) | perl -ne '/^v[\.\d]+$$/ && print')
-git_hash   :=$(shell h=`(git tag --points-at HEAD | grep github | head -n1) 2>/dev/null`;\
+git_hash   :=$(shell h=`(git tag --points-at HEAD | grep gitlab | head -n1) 2>/dev/null`;\
                      [ -z "$$h" ] && h=`git rev-list --max-count=1 HEAD`; echo $$h)
 # git_tag is used in *.spec files for RPM release tag.
 # Any non alphanumeric (or .) strings converted to single _
