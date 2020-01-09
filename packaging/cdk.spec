@@ -164,7 +164,7 @@ done
       sed -i -e "s|\(.*$proj/$dir/$name\).tex\$|\1.pdf\\
 \1.README|" ${DEV_FILES}
       ln -sf /opt/opencpi/doc/$proj/$name.pdf $dir/$name.pdf
-      echo "If this documentation symlink is broken, install opencpi-doc RPM or visit https://opencpi.github.io/" > $dir/$name.README
+      echo "If this documentation symlink is broken, install opencpi-doc RPM or visit https://opencpi.gitlab.io/" > $dir/$name.README
     done
     popd
   done
