@@ -105,6 +105,9 @@ int64_t runApp(const char *platform,
 	       int64_t cal_value,
 	       uint64_t* collected_time_tags){
 
+  try {
+
+    const char *freq_std_tty, *gps_freq_ref_ip;
     //to prevent hanging application
     uint32_t max_expected_run_time_usecs = (num_time_tags_to_collect + EXTRA_TIME_BUFFER) * 1e6;
     std::string platform_string = "=" + std::string(platform);
@@ -116,15 +119,37 @@ int64_t runApp(const char *platform,
     ezxml_t system_xml = OCPI::Driver::ManagerManager::getManagerManager().getXML();
     ezxml_t applications_xml = ezxml_child(system_xml, "applications");
     ezxml_t application_xml = OX::findChildWithAttr(applications_xml, "application", "name", APP_NAME); 
-    ezxml_t platform_xml;
+    ezxml_t platform_xml, freqstd_xml, gpsfreqref_xml;
     if(application_xml){
       ezxml_t platforms_xml = ezxml_child(application_xml, "platforms");
       platform_xml = OX::findChildWithAttr(platforms_xml, "platform", "name", platform);
+      if(platform_xml){
+	freqstd_xml = ezxml_child(application_xml, "freqstd");
+	freq_std_tty = ezxml_cattr(freqstd_xml, "serialport");
+	gpsfreqref_xml = ezxml_child(application_xml, "gpsfreqref");
+	gps_freq_ref_ip = ezxml_cattr(gpsfreqref_xml, "ipaddr");
+      }
     }
-
-    if(!application_xml || !platform_xml)
+    
+    if(!application_xml || !platform_xml || !freq_std_tty || !gps_freq_ref_ip)
       std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
     else {
+      //Check as much as you can about the test setup
+      std::ostringstream oss;
+
+      //Check if Rb Standard has 1 PPS sync
+      std::string cmd = "./FS725_Freq_Std_Status.py " + std::string(freq_std_tty);
+      if(system(cmd.c_str()) != 0){
+	oss << "no valid PPS into frequency standard" << "\n";
+	throw oss.str();
+      }
+      //Check GPS Receiver status
+      cmd = "./FS740_GPS_Freq_Ref_Status.py " + std::string(gps_freq_ref_ip);
+      if(system(cmd.c_str()) != 0){
+	oss << "Unexpected GPS receiver status register" << "\n";
+	throw oss.str();
+      }
+
       app.initialize();
       app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", num_time_tags_to_collect);
       if(cal_value)
@@ -140,7 +165,12 @@ int64_t runApp(const char *platform,
       collected_time_tags_p.getULongLongSequenceValue(collected_time_tags, MAX_NUM_TIME_TAGS_TO_COLLECT);
       cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
     }
-    return cal_value;
+
+  } catch (std::string &e) {
+    std::cerr << "ERROR: " << e << "\n";
+  }
+  return cal_value;
+
 }
 
 int main(int argc, char **argv) {
