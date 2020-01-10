@@ -49,6 +49,10 @@ case $1 in
 	echo The OpenCPI AV GUI does not appear to be installed.
 	exit 1
     fi
-    exec $OCPI_CDK_DIR/../av/eclipse/eclipse
+    exec $OCPI_CDK_DIR/../av/eclipse/eclipse> $OCPI_CDK_DIR/../av/av.log 2>&1 
+    ;;
+  *)
+    echo Illegal argument: $1
+    exit 1
     ;;
 esac
