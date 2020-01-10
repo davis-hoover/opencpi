@@ -31,3 +31,6 @@ source ./scripts/init-opencpi.sh
 # Ensure CDK and TOOL variables
 OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh; source $OCPI_BOOTSTRAP
 make deploy Platforms=$1:$2
+# add the one missing piece, which is the test bitstream.
+cp -L projects/assets/hdl/assemblies/testbias/container-testbias_${1}_base/target-*/*.bitz \
+   cdk/$1/sdcard-$2/opencpi/$2/artifacts

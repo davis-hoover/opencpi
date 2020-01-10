@@ -172,7 +172,7 @@ else
     ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
     ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
     if [ -n "$project" ]; then
-	ocpidev -d $project_dir build --hdl --hdl-platform=$platform
+	ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
 	echo "HDL platform \"$platform\" built for OSP in $project_dir, including assemblies."
     fi
     ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
