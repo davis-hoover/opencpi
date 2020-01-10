@@ -8,20 +8,19 @@ tutorial describes.
 
 OpenCPI provides the following tutorials:
 
-Tutorial 0: Setting up an OpenCPI Workspace. This tutorial is a
-pre-cursor to a set of tutorials numbered 1 through 9. It illustrates
-how to create local copies of OpenCPI projects required for running
-the tutorials, how to set up a blank Eclipse workspace and how to
-import the OpenCPI projects into the workspace for use in subsequent
-tutorials.
-
-Tutorial 1: Understanding the OpenCPI Application Development Workflow.
+Tutorial 1: Introduction to OpenCPI Application Development.
 This tutorial demonstrates the OpenCPI application development
 workflow and processes using the OpenCPI FSK reference application.
 
 Tutorial 1a: Using the OpenCPI Application Control Interface (ACI).
 This tutorial demonstrates how to create and compile an ACI application,
 how to use the control plane and how to access the data plane.
+
+Tutorial 1b: Introduction to Component-based Development. This tutorial
+demonstrates the process of component-based development with OpenCPI.
+It shows how to create the OpenCPI assets required by an example
+OpenCPI application and how to build and run the application on
+HDL (FPGA) and RCC (software) platforms.
 
 Tutorial 2: Creating Worker Assemblies. This tutorial demonstrates
 how to create, build, test and run RCC and HDL worker assemblies.
@@ -67,11 +66,13 @@ information, view worker lifecycles, change and view worker properties
 and debug workers.
 
 Tutorial 9: Debugging an HDL Worker on a Hardware Platform.
-This tutorial demonstrates how to debug OpenCPI applications with
-OpenCPI debugging utilities.
+This tutorial demonstrates how to debug OpenCPI applications
+on hardware platforms with OpenCPI debugging utilities.
+
+Tutorial 9a: Using OpenCPI Debugging Tools. This tutorial provides
+information on OpenCPI debugging tools and how to use them.
 
 These tutorials are meant to be run in sequence.
 
-This directory also provides the tutorial-project directory, which
+This directory also provides the tutorial directory, which
 contains source material for examples used in the tutorials.
-be used in the tutorial

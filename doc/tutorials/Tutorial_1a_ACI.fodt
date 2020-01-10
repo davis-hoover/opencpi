@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>17</meta:editing-cycles><meta:creation-date>2019-10-11T15:14:50.055764302</meta:creation-date><meta:editing-duration>PT59M59S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2019-10-17T15:10:39.394485073</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="0" meta:image-count="0" meta:object-count="0" meta:page-count="10" meta:paragraph-count="186" meta:word-count="1043" meta:character-count="7402" meta:non-whitespace-character-count="6224"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../../../Library/Application%20Support/LibreOffice/4/user/template/OCPI_ODT.ott" meta:date="2019-10-11T15:14:49.840522117"/></office:meta>
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>24</meta:editing-cycles><meta:creation-date>2019-11-19T09:58:13.981275069</meta:creation-date><meta:editing-duration>PT52M53S</meta:editing-duration><meta:generator>LibreOffice/6.2.5.2$MacOSX_X86_64 LibreOffice_project/1ec314fa52f458adc18c4f025c545a4e8b22c159</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2020-01-09T10:08:32.110766954</dc:date><dc:creator>Lisa Zahn</dc:creator><meta:document-statistic meta:table-count="4" meta:image-count="0" meta:object-count="0" meta:page-count="20" meta:paragraph-count="180" meta:word-count="1688" meta:character-count="12415" meta:non-whitespace-character-count="10492"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../odt/shared/OCPI_ODT.ott" meta:date="2019-12-26T11:07:12.756958334"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">5</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">200392</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">32066</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">16526</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">37742</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">15023</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">6354</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">3464</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">15875</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">203241</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">5</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">32064</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">16529</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">200392</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">37740</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">215413</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
-     <config:config-item config:name="ZoomFactor" config:type="short">100</config:config-item>
+     <config:config-item config:name="ZoomFactor" config:type="short">110</config:config-item>
      <config:config-item config:name="IsSelectedFrame" config:type="boolean">false</config:config-item>
      <config:config-item config:name="AnchoredTextOverflowLegacy" config:type="boolean">true</config:config-item>
     </config:config-item-map-entry>
@@ -111,7 +111,7 @@
    <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">36706654</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">36300833</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
    <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
@@ -134,17 +134,22 @@
  </office:settings>
  <office:scripts>
   <office:script script:language="ooo:Basic">
-   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+   <ooo:libraries xmlns:ooo="http://openoffice.org/2004/office" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ooo:library-embedded ooo:name="Standard"/>
+   </ooo:libraries>
   </office:script>
  </office:scripts>
  <office:font-face-decls>
   <style:font-face style:name="OpenSymbol" svg:font-family="OpenSymbol" style:font-charset="x-symbol"/>
+  <style:font-face style:name="Arial2" svg:font-family="Arial" style:font-family-generic="swiss"/>
   <style:font-face style:name="Lucida Sans1" svg:font-family="&apos;Lucida Sans&apos;" style:font-family-generic="swiss"/>
+  <style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="variable"/>
   <style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-adornments="Bold" style:font-family-generic="modern" style:font-pitch="variable"/>
   <style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Calibri" svg:font-family="Calibri" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Cambria" svg:font-family="Cambria" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Tahoma" svg:font-family="Tahoma" style:font-family-generic="roman" style:font-pitch="variable"/>
+  <style:font-face style:name="Arial3" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
   <style:font-face style:name="Arial1" svg:font-family="Arial" style:font-adornments="Regular" style:font-family-generic="swiss" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="swiss" style:font-pitch="variable"/>
   <style:font-face style:name="Lucida Sans" svg:font-family="&apos;Lucida Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
@@ -348,7 +353,9 @@
     <style:tab-stops/>
    </style:paragraph-properties>
   </style:style>
-  <style:style style:name="Subtitle" style:family="paragraph" style:parent-style-name="Heading" style:class="chapter"/>
+  <style:style style:name="Subtitle" style:family="paragraph" style:parent-style-name="Heading" style:class="chapter" style:master-page-name="">
+   <style:paragraph-properties fo:orphans="0" fo:widows="0" style:page-number="auto" fo:keep-with-next="auto"/>
+  </style:style>
   <style:style style:name="Quotations" style:family="paragraph" style:parent-style-name="Standard" style:class="html"/>
   <style:style style:name="Contents_20_Heading" style:display-name="Contents Heading" style:family="paragraph" style:parent-style-name="Heading" style:class="index" style:master-page-name="">
    <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" style:page-number="auto" fo:break-before="page"/>
@@ -357,6 +364,7 @@
   <style:style style:name="Horizontal_20_Line" style:display-name="Horizontal Line" style:family="paragraph" style:parent-style-name="Standard" style:class="html"/>
   <style:style style:name="Sender" style:family="paragraph" style:parent-style-name="Standard" style:class="extra"/>
   <style:style style:name="Table_20_Contents" style:display-name="Table Contents" style:family="paragraph" style:parent-style-name="Standard" style:class="extra">
+   <style:paragraph-properties fo:margin-top="0.0098in" fo:margin-bottom="0.0098in" loext:contextual-spacing="false"/>
    <style:text-properties fo:font-size="11pt"/>
   </style:style>
   <style:style style:name="Numbering_20_2" style:display-name="Numbering 2" style:family="paragraph" style:parent-style-name="List" style:class="list"/>
@@ -386,6 +394,13 @@
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:text-align="start" style:justify-single-word="false" fo:text-indent="0in" style:auto-text-indent="false"/>
    <style:text-properties officeooo:rsid="01a8d50f"/>
   </style:style>
+  <style:style style:name="List_20_1" style:display-name="List 1" style:family="paragraph" style:parent-style-name="List" style:class="list"/>
+  <style:style style:name="List_20_1_20_Start" style:display-name="List 1 Start" style:family="paragraph" style:parent-style-name="List" style:class="list"/>
+  <style:style style:name="List_20_2_20_Start" style:display-name="List 2 Start" style:family="paragraph" style:parent-style-name="List" style:class="list"/>
+  <style:style style:name="ReleaseSubtitle" style:family="paragraph" style:parent-style-name="Body" style:master-page-name="">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" style:page-number="auto"/>
+   <style:text-properties fo:font-size="14pt" fo:font-style="italic"/>
+  </style:style>
   <style:style style:name="Default_20_Paragraph_20_Font" style:display-name="Default Paragraph Font" style:family="text">
    <style:text-properties style:font-name="Arial1" fo:font-family="Arial" style:font-style-name="Regular" style:font-family-generic="swiss" style:font-pitch="variable" fo:font-size="12pt"/>
   </style:style>
@@ -407,7 +422,7 @@
   <style:style style:name="Title_20_Char" style:display-name="Title Char" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
    <style:text-properties fo:color="#17365d" style:font-name="Cambria" fo:font-family="Cambria" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="26pt" fo:letter-spacing="0.0035in" style:letter-kerning="true" style:font-size-asian="26pt"/>
   </style:style>
-  <style:style style:name="Internet_20_link" style:display-name="Internet link" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
+  <style:style style:name="Internet_20_link" style:display-name="Internet link" style:family="text">
    <style:text-properties fo:color="#0000ff" fo:language="zxx" fo:country="none" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" style:language-asian="zxx" style:country-asian="none" style:language-complex="zxx" style:country-complex="none"/>
   </style:style>
   <style:style style:name="FollowedHyperlink" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
@@ -454,6 +469,9 @@
   </style:style>
   <style:style style:name="FirstEmphasis" style:family="text">
    <style:text-properties style:font-name="Arial" fo:font-family="Arial" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="12pt" fo:font-style="italic" fo:font-weight="bold" officeooo:rsid="01a8d50f" style:font-size-asian="12pt" style:font-size-complex="12pt"/>
+  </style:style>
+  <style:style style:name="Table_20_Code" style:display-name="Table Code" style:family="text" style:parent-style-name="Code">
+   <style:text-properties fo:font-size="11pt"/>
   </style:style>
   <style:style style:name="Graphics" style:family="graphic">
    <style:graphic-properties text:anchor-type="paragraph" svg:x="0in" svg:y="0in" style:wrap="dynamic" style:number-wrapped-paragraphs="no-limit" style:wrap-contour="false" style:vertical-pos="top" style:vertical-rel="paragraph" style:horizontal-pos="center" style:horizontal-rel="paragraph"/>
@@ -2644,143 +2662,647 @@
   </style:default-page-layout>
  </office:styles>
  <office:automatic-styles>
-  <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Body">
-   <style:text-properties officeooo:rsid="02236d2f" officeooo:paragraph-rsid="02236d2f"/>
+  <style:style style:name="Table1" style:family="table">
+   <style:table-properties style:width="5.5799in" fo:margin-top="0in" fo:margin-bottom="0in" table:align="center" style:writing-mode="lr-tb"/>
   </style:style>
-  <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Body">
-   <style:text-properties officeooo:paragraph-rsid="02236d2f"/>
+  <style:style style:name="Table1.A" style:family="table-column">
+   <style:table-column-properties style:column-width="0.7035in"/>
   </style:style>
-  <style:style style:name="P3" style:family="paragraph" style:parent-style-name="Body">
-   <style:text-properties officeooo:paragraph-rsid="0223778a"/>
+  <style:style style:name="Table1.B" style:family="table-column">
+   <style:table-column-properties style:column-width="4.059in"/>
   </style:style>
-  <style:style style:name="P4" style:family="paragraph" style:parent-style-name="Code">
-   <style:text-properties fo:font-style="italic" fo:font-weight="bold" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+  <style:style style:name="Table1.C" style:family="table-column">
+   <style:table-column-properties style:column-width="0.8174in"/>
   </style:style>
-  <style:style style:name="P5" style:family="paragraph" style:parent-style-name="Code">
-   <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
+  <style:style style:name="Table1.1" style:family="table-row">
+   <style:table-row-properties fo:keep-together="auto"/>
+  </style:style>
+  <style:style style:name="Table1.A1" style:family="table-cell">
+   <style:table-cell-properties fo:padding-left="0.0833in" fo:padding-right="0.0799in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #000001"/>
+  </style:style>
+  <style:style style:name="Table1.2" style:family="table-row">
+   <style:table-row-properties style:min-row-height="0.0701in" fo:keep-together="auto"/>
+  </style:style>
+  <style:style style:name="Table1.A5" style:family="table-cell">
+   <style:table-cell-properties fo:padding-left="0.0833in" fo:padding-right="0.0799in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #000001" fo:border-right="0.5pt solid #000001" fo:border-top="none" fo:border-bottom="0.5pt solid #000001"/>
+  </style:style>
+  <style:style style:name="Table3" style:family="table">
+   <style:table-properties style:width="6.4771in" fo:margin-top="0in" fo:margin-bottom="0in" table:align="left" style:writing-mode="lr-tb"/>
+  </style:style>
+  <style:style style:name="Table3.A" style:family="table-column">
+   <style:table-column-properties style:column-width="1.625in"/>
+  </style:style>
+  <style:style style:name="Table3.B" style:family="table-column">
+   <style:table-column-properties style:column-width="0.9319in"/>
+  </style:style>
+  <style:style style:name="Table3.C" style:family="table-column">
+   <style:table-column-properties style:column-width="3.9201in"/>
+  </style:style>
+  <style:style style:name="Table3.1" style:family="table-row">
+   <style:table-row-properties fo:keep-together="auto"/>
+  </style:style>
+  <style:style style:name="Table3.A1" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:background-color="#cccccc" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a">
+    <style:background-image/>
+   </style:table-cell-properties>
+  </style:style>
+  <style:style style:name="Table3.A2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table3.B2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table3.C2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table3.A3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table3.B3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table3.C3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2" style:family="table">
+   <style:table-properties style:width="6.4771in" fo:margin-top="0in" fo:margin-bottom="0in" table:align="left" style:writing-mode="lr-tb"/>
+  </style:style>
+  <style:style style:name="Table2.A" style:family="table-column">
+   <style:table-column-properties style:column-width="1.625in"/>
+  </style:style>
+  <style:style style:name="Table2.B" style:family="table-column">
+   <style:table-column-properties style:column-width="0.9319in"/>
+  </style:style>
+  <style:style style:name="Table2.C" style:family="table-column">
+   <style:table-column-properties style:column-width="3.9201in"/>
+  </style:style>
+  <style:style style:name="Table2.1" style:family="table-row">
+   <style:table-row-properties fo:keep-together="auto"/>
+  </style:style>
+  <style:style style:name="Table2.A1" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:background-color="#cccccc" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a">
+    <style:background-image/>
+   </style:table-cell-properties>
+  </style:style>
+  <style:style style:name="Table2.A2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.B2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.C2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.A3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.B3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.C3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.A4" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.B4" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.C4" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.A5" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.B5" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.C5" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.A6" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.B6" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.C6" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.A7" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.B7" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table2.C7" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4" style:family="table">
+   <style:table-properties style:width="6.4771in" fo:margin-top="0in" fo:margin-bottom="0in" table:align="left" style:writing-mode="lr-tb"/>
+  </style:style>
+  <style:style style:name="Table4.A" style:family="table-column">
+   <style:table-column-properties style:column-width="1.625in"/>
+  </style:style>
+  <style:style style:name="Table4.B" style:family="table-column">
+   <style:table-column-properties style:column-width="0.9319in"/>
+  </style:style>
+  <style:style style:name="Table4.C" style:family="table-column">
+   <style:table-column-properties style:column-width="3.9201in"/>
+  </style:style>
+  <style:style style:name="Table4.1" style:family="table-row">
+   <style:table-row-properties fo:keep-together="auto"/>
+  </style:style>
+  <style:style style:name="Table4.A1" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:background-color="#cccccc" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a">
+    <style:background-image/>
+   </style:table-cell-properties>
+  </style:style>
+  <style:style style:name="Table4.A2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.B2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.C2" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.A3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.B3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.C3" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.A4" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.B4" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="Table4.C4" style:family="table-cell">
+   <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0.0785in" fo:padding-right="0.075in" fo:padding-top="0in" fo:padding-bottom="0in" fo:border="0.5pt solid #00000a"/>
+  </style:style>
+  <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="14pt" officeooo:paragraph-rsid="0222534a" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
+  </style:style>
+  <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">
+   <style:text-properties fo:font-size="14pt" officeooo:paragraph-rsid="0222534a" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
+  </style:style>
+  <style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard">
+   <style:text-properties fo:color="#ff0000" fo:font-size="22pt" fo:font-weight="bold" officeooo:paragraph-rsid="0222534a" style:font-size-asian="22pt" style:font-weight-asian="bold"/>
+  </style:style>
+  <style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard">
+   <style:text-properties fo:color="#ff0000" fo:font-weight="bold" officeooo:paragraph-rsid="0222534a" style:font-weight-asian="bold"/>
+  </style:style>
+  <style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="8pt" fo:font-weight="bold" officeooo:paragraph-rsid="0222534a" style:font-size-asian="8pt" style:font-weight-asian="bold"/>
   </style:style>
   <style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard">
-   <style:text-properties officeooo:rsid="0221afe8" officeooo:paragraph-rsid="0221afe8"/>
+   <style:text-properties officeooo:rsid="0221afe8" officeooo:paragraph-rsid="0222534a"/>
   </style:style>
   <style:style style:name="P7" style:family="paragraph" style:parent-style-name="Standard">
-   <style:text-properties officeooo:rsid="02240df4" officeooo:paragraph-rsid="02240df4"/>
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
   </style:style>
   <style:style style:name="P8" style:family="paragraph" style:parent-style-name="Standard">
-   <style:text-properties officeooo:rsid="0225093e" officeooo:paragraph-rsid="0225093e"/>
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false" fo:text-align="center" style:justify-single-word="false" fo:break-before="page"/>
+   <style:text-properties fo:font-style="italic" officeooo:paragraph-rsid="0222534a" style:font-style-asian="italic" style:font-size-complex="14pt" style:font-style-complex="italic"/>
   </style:style>
   <style:style style:name="P9" style:family="paragraph" style:parent-style-name="Standard">
-   <style:text-properties officeooo:rsid="02276b0f" officeooo:paragraph-rsid="02276b0f"/>
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:paragraph-rsid="0222534a" style:font-size-asian="7pt" style:font-size-complex="7pt"/>
   </style:style>
   <style:style style:name="P10" style:family="paragraph" style:parent-style-name="Standard">
-   <style:text-properties officeooo:rsid="0228b7bf" officeooo:paragraph-rsid="0228b7bf"/>
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="036c49e6" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
   <style:style style:name="P11" style:family="paragraph" style:parent-style-name="Standard">
-   <style:text-properties officeooo:rsid="022a9c9d" officeooo:paragraph-rsid="022a9c9d"/>
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="036e2136" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P12" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="02236d2f" officeooo:paragraph-rsid="02236d2f"/>
+  <style:style style:name="P12" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="03f03fbb" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P13" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="0223778a" officeooo:paragraph-rsid="0223778a"/>
+  <style:style style:name="P13" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="03fca32b" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P14" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="022a9c9d" officeooo:paragraph-rsid="022a9c9d"/>
+  <style:style style:name="P14" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="0403bd41" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P15" style:family="paragraph" style:parent-style-name="Heading_20_3">
-   <style:text-properties officeooo:rsid="02240df4" officeooo:paragraph-rsid="02240df4"/>
+  <style:style style:name="P15" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="04dd7a53" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P16" style:family="paragraph" style:parent-style-name="Heading_20_3">
-   <style:text-properties officeooo:rsid="022a9c9d" officeooo:paragraph-rsid="022a9c9d"/>
+  <style:style style:name="P16" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="05478dc2" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P17" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:rsid="0221afe8"/>
+  <style:style style:name="P17" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="057223ab" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P18" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:rsid="0221afe8" officeooo:paragraph-rsid="0221afe8"/>
+  <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="059c6fc1" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
-  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="">
-   <style:paragraph-properties style:page-number="auto"/>
+  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="7pt" officeooo:rsid="05b53a1c" officeooo:paragraph-rsid="0222534a" style:font-size-asian="6.09999990463257pt" style:font-size-complex="7pt"/>
   </style:style>
   <style:style style:name="P20" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false" fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="28pt" fo:font-style="italic" fo:font-weight="bold" officeooo:paragraph-rsid="022823d3" style:font-size-asian="28pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-size-complex="14pt" style:font-style-complex="italic"/>
+  </style:style>
+  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0.0417in" fo:margin-bottom="0.0417in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:paragraph-rsid="0222534a" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0.0417in" fo:margin-bottom="0.0417in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="0222cf1f" officeooo:paragraph-rsid="0222534a" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0.0417in" fo:margin-bottom="0.0417in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="0221d6f0" officeooo:paragraph-rsid="0222534a" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0.0417in" fo:margin-bottom="0.0417in" loext:contextual-spacing="false" fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P25" style:family="paragraph" style:parent-style-name="Standard" style:master-page-name="">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" style:page-number="auto" fo:break-before="page"/>
+   <style:text-properties fo:font-size="28pt" fo:font-weight="bold" officeooo:paragraph-rsid="0222534a" style:font-size-asian="28pt" style:font-weight-asian="bold" style:font-size-complex="28pt"/>
+  </style:style>
+  <style:style style:name="P26" style:family="paragraph" style:parent-style-name="Standard" style:master-page-name="">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" style:page-number="auto" fo:break-before="page"/>
+   <style:text-properties fo:font-size="28pt" fo:font-weight="bold" officeooo:paragraph-rsid="022823d3" style:font-size-asian="28pt" style:font-weight-asian="bold" style:font-size-complex="28pt"/>
+  </style:style>
+  <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:rsid="0222534a" officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P30" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="02236d2f" officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P31" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P32" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:paragraph-rsid="02260504"/>
+  </style:style>
+  <style:style style:name="P33" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="02260504" officeooo:paragraph-rsid="02260504"/>
+  </style:style>
+  <style:style style:name="P34" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="022658a8" officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P35" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:rsid="0221afe8" officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P36" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P37" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:rsid="0223841d" officeooo:paragraph-rsid="02260504"/>
+  </style:style>
+  <style:style style:name="P38" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="02260504"/>
+  </style:style>
+  <style:style style:name="P39" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:rsid="023e1d07" officeooo:paragraph-rsid="02260504"/>
+  </style:style>
+  <style:style style:name="P40" style:family="paragraph" style:parent-style-name="Contents_20_1">
+   <style:paragraph-properties>
+    <style:tab-stops>
+     <style:tab-stop style:position="0.3in"/>
+     <style:tab-stop style:position="6.5in" style:type="right" style:leader-style="dotted" style:leader-text="."/>
+    </style:tab-stops>
+   </style:paragraph-properties>
+  </style:style>
+  <style:style style:name="P41" style:family="paragraph" style:parent-style-name="Contents_20_2">
+   <style:paragraph-properties>
+    <style:tab-stops>
+     <style:tab-stop style:position="0.3in"/>
+     <style:tab-stop style:position="0.7in"/>
+     <style:tab-stop style:position="6.5in" style:type="right" style:leader-style="dotted" style:leader-text="."/>
+    </style:tab-stops>
+   </style:paragraph-properties>
+  </style:style>
+  <style:style style:name="P42" style:family="paragraph" style:parent-style-name="Code">
+   <style:text-properties fo:font-style="italic" officeooo:paragraph-rsid="0222534a" style:font-style-asian="italic" style:font-style-complex="italic"/>
+  </style:style>
+  <style:style style:name="P43" style:family="paragraph" style:parent-style-name="Code">
+   <style:text-properties fo:font-style="italic" fo:font-weight="bold" officeooo:paragraph-rsid="0222534a" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="P44" style:family="paragraph" style:parent-style-name="Code">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P45" style:family="paragraph" style:parent-style-name="Contents_20_Heading">
+   <style:paragraph-properties fo:break-before="page"/>
+  </style:style>
+  <style:style style:name="P46" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:text-properties fo:font-size="11pt" officeooo:paragraph-rsid="0222534a" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="P47" style:family="paragraph" style:parent-style-name="Table_20_Caption_20__28_before_29_">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P48" style:family="paragraph" style:parent-style-name="Standard">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" loext:contextual-spacing="false" fo:line-height="100%" fo:text-align="start" style:justify-single-word="false" fo:hyphenation-ladder-count="no-limit" fo:text-indent="0in" style:auto-text-indent="false" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
    <style:text-properties fo:hyphenate="false" fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
   </style:style>
-  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:rsid="0221afe8"/>
+  <style:style style:name="P49" style:family="paragraph" style:parent-style-name="ReleaseSubtitle">
+   <style:text-properties officeooo:paragraph-rsid="022823d3"/>
   </style:style>
-  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="List_20_Bullet">
-   <style:text-properties officeooo:rsid="0221afe8" officeooo:paragraph-rsid="0221afe8"/>
+  <style:style style:name="P50" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="0229e821" officeooo:paragraph-rsid="0229e821" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
   </style:style>
-  <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Heading_20_3">
-   <style:text-properties officeooo:rsid="02240df4" officeooo:paragraph-rsid="02240df4"/>
+  <style:style style:name="P51" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:paragraph-rsid="0222534a" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
   </style:style>
-  <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Heading_20_3">
-   <style:text-properties officeooo:rsid="022a9c9d" officeooo:paragraph-rsid="022a9c9d"/>
+  <style:style style:name="P52" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:paragraph-rsid="0229e821" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
   </style:style>
-  <style:style style:name="P25" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="02236d2f" officeooo:paragraph-rsid="02236d2f"/>
+  <style:style style:name="P53" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="02e650c0" officeooo:paragraph-rsid="0229e821" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
   </style:style>
-  <style:style style:name="P26" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="0223778a" officeooo:paragraph-rsid="0223778a"/>
+  <style:style style:name="P54" style:family="paragraph" style:parent-style-name="Table_20_Caption_20__28_before_29_">
+   <style:text-properties officeooo:paragraph-rsid="0229e821"/>
   </style:style>
-  <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="022a9c9d" officeooo:paragraph-rsid="022a9c9d"/>
+  <style:style style:name="P55" style:family="paragraph" style:parent-style-name="Table_20_Caption_20__28_before_29_">
+   <style:text-properties officeooo:rsid="022658a8" officeooo:paragraph-rsid="0229e821"/>
   </style:style>
-  <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="Standard">
-   <style:paragraph-properties style:page-number="auto"/>
+  <style:style style:name="P56" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:rsid="0222534a" officeooo:paragraph-rsid="0222534a"/>
   </style:style>
-  <style:style style:name="P29" style:family="paragraph">
+  <style:style style:name="P57" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P58" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P59" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:rsid="02458c69" officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P60" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P61" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="022658a8" officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P62" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="02803250" officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P63" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="02954a7e" officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P64" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="028547db" officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P65" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P66" style:family="paragraph" style:parent-style-name="Body">
+   <style:text-properties officeooo:rsid="02260504" officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P67" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P68" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:rsid="0221afe8" officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P69" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:rsid="028547db" officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P70" style:family="paragraph" style:parent-style-name="List_20_Bullet">
+   <style:text-properties officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P71" style:family="paragraph" style:parent-style-name="Code">
+   <style:text-properties officeooo:paragraph-rsid="0222534a"/>
+  </style:style>
+  <style:style style:name="P72" style:family="paragraph" style:parent-style-name="Standard" style:master-page-name="Standard">
+   <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" style:page-number="auto" fo:break-before="page"/>
+   <style:text-properties fo:font-size="28pt" fo:font-weight="bold" officeooo:paragraph-rsid="022823d3" style:font-size-asian="28pt" style:font-weight-asian="bold" style:font-size-complex="28pt"/>
+  </style:style>
+  <style:style style:name="P73" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0.0417in" fo:margin-bottom="0.0417in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="02d75c92" officeooo:paragraph-rsid="0229e821" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="P74" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0.0417in" fo:margin-bottom="0.0417in" loext:contextual-spacing="false"/>
+   <style:text-properties fo:font-size="11pt" officeooo:paragraph-rsid="0229e821" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="P75" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-top="0.0417in" fo:margin-bottom="0.0417in" loext:contextual-spacing="false" fo:text-align="center" style:justify-single-word="false"/>
+   <style:text-properties officeooo:paragraph-rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="P76" style:family="paragraph">
    <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0in" fo:margin-bottom="0in" fo:line-height="100%" fo:text-align="start" fo:text-indent="0in" style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging" style:line-break="strict" style:writing-mode="lr-tb">
     <style:tab-stops/>
    </style:paragraph-properties>
    <style:text-properties fo:hyphenate="false"/>
   </style:style>
   <style:style style:name="T1" style:family="text">
-   <style:text-properties officeooo:rsid="0230195e"/>
+   <style:text-properties officeooo:rsid="022823d3"/>
   </style:style>
   <style:style style:name="T2" style:family="text">
-   <style:text-properties officeooo:rsid="022d00cd"/>
+   <style:text-properties officeooo:rsid="022823d3"/>
   </style:style>
   <style:style style:name="T3" style:family="text">
-   <style:text-properties officeooo:rsid="0221afe8"/>
+   <style:text-properties officeooo:rsid="0222534a"/>
   </style:style>
   <style:style style:name="T4" style:family="text">
-   <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
-  </style:style>
-  <style:style style:name="T5" style:family="text">
-   <style:text-properties fo:font-style="italic" fo:font-weight="bold" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-style-complex="italic" style:font-weight-complex="bold"/>
-  </style:style>
-  <style:style style:name="T6" style:family="text">
-   <style:text-properties officeooo:rsid="02236d2f"/>
-  </style:style>
-  <style:style style:name="T7" style:family="text">
-   <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
-  </style:style>
-  <style:style style:name="T8" style:family="text">
-   <style:text-properties officeooo:rsid="02240df4"/>
-  </style:style>
-  <style:style style:name="T9" style:family="text">
-   <style:text-properties officeooo:rsid="0225093e"/>
-  </style:style>
-  <style:style style:name="T10" style:family="text">
-   <style:text-properties officeooo:rsid="0226a652"/>
-  </style:style>
-  <style:style style:name="T11" style:family="text">
-   <style:text-properties officeooo:rsid="022afbee"/>
-  </style:style>
-  <style:style style:name="T12" style:family="text">
    <style:text-properties officeooo:rsid="022c1641"/>
   </style:style>
+  <style:style style:name="T5" style:family="text">
+   <style:text-properties officeooo:rsid="022afbee"/>
+  </style:style>
+  <style:style style:name="T6" style:family="text">
+   <style:text-properties officeooo:rsid="02228436"/>
+  </style:style>
+  <style:style style:name="T7" style:family="text">
+   <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
+  </style:style>
+  <style:style style:name="T8" style:family="text">
+   <style:text-properties fo:font-style="italic" officeooo:rsid="02273614" style:font-style-asian="italic" style:font-style-complex="italic"/>
+  </style:style>
+  <style:style style:name="T9" style:family="text">
+   <style:text-properties fo:font-style="italic" fo:font-weight="bold" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T10" style:family="text">
+   <style:text-properties fo:font-style="italic" fo:font-weight="bold" officeooo:rsid="02d75c92" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-style-complex="italic" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T11" style:family="text">
+   <style:text-properties officeooo:rsid="03ed2d7b"/>
+  </style:style>
+  <style:style style:name="T12" style:family="text">
+   <style:text-properties fo:font-size="11pt" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
   <style:style style:name="T13" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="05bbcb43" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
   </style:style>
   <style:style style:name="T14" style:family="text">
-   <style:text-properties officeooo:rsid="0230195e"/>
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="0223841d" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
   </style:style>
   <style:style style:name="T15" style:family="text">
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="0222cf1f" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="T16" style:family="text">
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="0229e821" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="T17" style:family="text">
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="02d75c92" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="T18" style:family="text">
+   <style:text-properties fo:font-size="11pt" officeooo:rsid="02e650c0" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+  </style:style>
+  <style:style style:name="T19" style:family="text">
+   <style:text-properties officeooo:rsid="029d03ca"/>
+  </style:style>
+  <style:style style:name="T20" style:family="text">
+   <style:text-properties officeooo:rsid="0230f70f"/>
+  </style:style>
+  <style:style style:name="T21" style:family="text">
+   <style:text-properties officeooo:rsid="022d00cd"/>
+  </style:style>
+  <style:style style:name="T22" style:family="text">
+   <style:text-properties officeooo:rsid="0221afe8"/>
+  </style:style>
+  <style:style style:name="T23" style:family="text">
+   <style:text-properties officeooo:rsid="024482cd"/>
+  </style:style>
+  <style:style style:name="T24" style:family="text">
+   <style:text-properties officeooo:rsid="002017f8"/>
+  </style:style>
+  <style:style style:name="T25" style:family="text">
+   <style:text-properties officeooo:rsid="023a5a27"/>
+  </style:style>
+  <style:style style:name="T26" style:family="text">
+   <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T27" style:family="text">
+   <style:text-properties fo:font-weight="bold" officeooo:rsid="0221afe8" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T28" style:family="text">
+   <style:text-properties officeooo:rsid="02236d2f"/>
+  </style:style>
+  <style:style style:name="T29" style:family="text">
+   <style:text-properties officeooo:rsid="0226a652"/>
+  </style:style>
+  <style:style style:name="T30" style:family="text">
+   <style:text-properties officeooo:rsid="02240df4"/>
+  </style:style>
+  <style:style style:name="T31" style:family="text">
+   <style:text-properties officeooo:rsid="0225093e"/>
+  </style:style>
+  <style:style style:name="T32" style:family="text">
+   <style:text-properties officeooo:rsid="022658a8"/>
+  </style:style>
+  <style:style style:name="T33" style:family="text">
+   <style:text-properties officeooo:rsid="0222cf1f"/>
+  </style:style>
+  <style:style style:name="T34" style:family="text">
+   <style:text-properties officeooo:rsid="023e1d07"/>
+  </style:style>
+  <style:style style:name="T35" style:family="text">
+   <style:text-properties officeooo:rsid="02273614"/>
+  </style:style>
+  <style:style style:name="T36" style:family="text">
+   <style:text-properties fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
+  </style:style>
+  <style:style style:name="T37" style:family="text">
+   <style:text-properties fo:font-style="normal" officeooo:rsid="02273614" style:font-style-asian="normal" style:font-style-complex="normal"/>
+  </style:style>
+  <style:style style:name="T38" style:family="text">
+   <style:text-properties fo:font-style="normal" fo:font-weight="normal" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-style-complex="normal" style:font-weight-complex="normal"/>
+  </style:style>
+  <style:style style:name="T39" style:family="text">
+   <style:text-properties style:font-name="Courier New1"/>
+  </style:style>
+  <style:style style:name="T40" style:family="text">
+   <style:text-properties style:font-name="Courier New1" fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T41" style:family="text">
+   <style:text-properties style:font-name="Courier New1" fo:font-weight="bold" officeooo:rsid="02273614" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T42" style:family="text">
+   <style:text-properties style:font-name="Courier New1" officeooo:rsid="02273614"/>
+  </style:style>
+  <style:style style:name="T43" style:family="text">
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
+  <style:style style:name="T44" style:family="text">
+   <style:text-properties officeooo:rsid="0213bccf"/>
+  </style:style>
+  <style:style style:name="T45" style:family="text">
+   <style:text-properties officeooo:rsid="023b813b"/>
+  </style:style>
+  <style:style style:name="T46" style:family="text">
+   <style:text-properties officeooo:rsid="022b2250"/>
+  </style:style>
+  <style:style style:name="T47" style:family="text">
+   <style:text-properties officeooo:rsid="0229e821"/>
+  </style:style>
+  <style:style style:name="T48" style:family="text">
+   <style:text-properties officeooo:rsid="02d75c92"/>
+  </style:style>
+  <style:style style:name="T49" style:family="text">
+   <style:text-properties style:font-name="Arial2" officeooo:rsid="02d75c92"/>
+  </style:style>
+  <style:style style:name="T50" style:family="text">
+   <style:text-properties officeooo:rsid="0285d8e9"/>
+  </style:style>
+  <style:style style:name="T51" style:family="text">
+   <style:text-properties officeooo:rsid="028547db"/>
+  </style:style>
+  <style:style style:name="T52" style:family="text">
+   <style:text-properties style:font-name="Arial3" fo:font-weight="normal" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
+  </style:style>
+  <style:style style:name="T53" style:family="text">
+   <style:text-properties style:font-name="Arial3" fo:font-weight="normal" officeooo:rsid="0285d8e9" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
+  </style:style>
+  <style:style style:name="T54" style:family="text">
+   <style:text-properties officeooo:rsid="02857540"/>
+  </style:style>
+  <style:style style:name="T55" style:family="text">
+   <style:text-properties style:font-name="Courier New1" fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T56" style:family="text">
+   <style:text-properties style:font-name="Courier New1" fo:font-weight="bold" officeooo:rsid="0221afe8" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T57" style:family="text">
+   <style:text-properties fo:color="#c9211e" fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
+  </style:style>
+  <style:style style:name="T58" style:family="text">
+   <style:text-properties fo:color="#c9211e" fo:font-style="normal" style:font-style-asian="normal" style:font-style-complex="normal"/>
+  </style:style>
+  <style:style style:name="T59" style:family="text">
+   <style:text-properties fo:color="#c9211e" fo:font-style="normal" fo:font-weight="bold" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-style-complex="normal" style:font-weight-complex="bold"/>
+  </style:style>
+  <style:style style:name="T60" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+  </style:style>
+  <style:style style:name="Sect1" style:family="section">
+   <style:section-properties style:editable="false">
+    <style:columns fo:column-count="1" fo:column-gap="0in"/>
+   </style:section-properties>
   </style:style>
   <style:page-layout style:name="pm1">
    <style:page-layout-properties fo:page-width="8.5in" fo:page-height="11in" style:num-format="1" style:print-orientation="portrait" fo:margin-top="1in" fo:margin-bottom="0.5in" fo:margin-left="1in" fo:margin-right="1in" style:writing-mode="lr-tb" style:layout-grid-color="#c0c0c0" style:layout-grid-lines="38" style:layout-grid-base-height="0.1665in" style:layout-grid-ruby-height="0.0835in" style:layout-grid-mode="none" style:layout-grid-ruby-below="false" style:layout-grid-print="false" style:layout-grid-display="false" style:layout-grid-base-width="0.1457in" style:layout-grid-snap-to="true" style:footnote-max-height="0in">
@@ -2791,17 +3313,23 @@
     <style:header-footer-properties fo:min-height="0.5in" fo:margin-left="0in" fo:margin-right="0in" fo:margin-top="0.4602in" style:dynamic-spacing="true"/>
    </style:footer-style>
   </style:page-layout>
+  <number:number-style style:name="N0">
+   <number:number number:min-integer-digits="1"/>
+  </number:number-style>
  </office:automatic-styles>
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:footer>
-    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial: Using the ACI<text:tab/></text:span><text:tab/>Page <text:page-number text:select-page="current">10</text:page-number><text:s/>of <text:page-count>10</text:page-count></text:p>
+    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 1a: Using the Application Control Interface</text:span><text:tab/>Page <text:page-number text:select-page="current">20</text:page-number><text:s/>of <text:page-count>20</text:page-count></text:p>
    </style:footer>
   </style:master-page>
  </office:master-styles>
  <office:body>
   <office:text text:use-soft-page-breaks="true">
    <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
+   <text:variable-decls>
+    <text:variable-decl office:value-type="float" text:name="AVGUI"/>
+   </text:variable-decls>
    <text:sequence-decls>
     <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -2810,228 +3338,619 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:h text:style-name="P28" text:outline-level="1"><text:span text:style-name="T1">Tutorial: Using the </text:span>OpenCPI Application Control Interface (ACI)<office:annotation>
+   <text:p text:style-name="P72">OpenCPI<text:span text:style-name="T45"><text:variable-set text:name="AVGUI" text:display="none" text:formula="ooow:1" office:value-type="float" office:value="1" style:data-style-name="N0"/></text:span><text:line-break/><text:span text:style-name="T46">Tutorial 1a: Using the Application Control Interface</text:span></text:p>
+   <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
+    <text:section-source xlink:href="../odt/shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release 1.6.0rc2</text:p>
+   </text:section>
+   <text:p text:style-name="P20"/>
+   <text:p text:style-name="P1"/>
+   <text:p text:style-name="P2"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P3"/>
+   <text:p text:style-name="P4"/>
+   <text:p text:style-name="P4"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P7"/>
+   <text:p text:style-name="P8">Revision History</text:p>
+   <table:table table:name="Table1" table:style-name="Table1">
+    <table:table-column table:style-name="Table1.A"/>
+    <table:table-column table:style-name="Table1.B"/>
+    <table:table-column table:style-name="Table1.C"/>
+    <table:table-row table:style-name="Table1.1">
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P5">Revision</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P5">Description of Change</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P5">Date</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9">1.01</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9">Creation <text:span text:style-name="T6">from Course 7 developed by BIA</text:span></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9">201<text:span text:style-name="T6">9</text:span>-1<text:span text:style-name="T6">0</text:span>-<text:span text:style-name="T6">01</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9">1.1</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9">1.2</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+      <text:p text:style-name="P9"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P10">1.3</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P10"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P10"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P11">1.4</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P11"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P11"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P12">1.5</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P12"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P12"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P13">1.6</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P13"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P13"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P14">1.7</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P14"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P14"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P15">1.8</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P15"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P15"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P16">1.9</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P16"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P16"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P17">1.9.1</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P17"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P17"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P18">2.0</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P18"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P17"/>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table1.2">
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P19">2.1</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P19"/>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table1.A5" office:value-type="string">
+      <text:p text:style-name="P19"/>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:table-of-content text:style-name="Sect1" text:name="Table of Contents1">
+    <text:table-of-content-source text:outline-level="2" text:use-index-marks="false">
+     <text:index-title-template text:style-name="Contents_20_Heading">Table of Contents</text:index-title-template>
+     <text:table-of-content-entry-template text:outline-level="1" text:style-name="Contents_20_1">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-tab-stop style:type="left" style:position="0.3in" style:leader-char=" "/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="2" text:style-name="Contents_20_2">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-tab-stop style:type="left" style:position="0.3in" style:leader-char=" "/>
+      <text:index-entry-chapter/>
+      <text:index-entry-tab-stop style:type="left" style:position="0.7in" style:leader-char=" "/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="3" text:style-name="Contents_20_3">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-tab-stop style:type="left" style:position="0.6in" style:leader-char=" "/>
+      <text:index-entry-chapter/>
+      <text:index-entry-tab-stop style:type="left" style:position="1in" style:leader-char=" "/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="4" text:style-name="Contents_20_4">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="5" text:style-name="Contents_20_5">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="6" text:style-name="Contents_20_6">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="7" text:style-name="Contents_20_7">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="8" text:style-name="Contents_20_8">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="9" text:style-name="Contents_20_9">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+     <text:table-of-content-entry-template text:outline-level="10" text:style-name="Contents_20_10">
+      <text:index-entry-link-start text:style-name="Index_20_Link"/>
+      <text:index-entry-chapter/>
+      <text:index-entry-text/>
+      <text:index-entry-tab-stop style:type="right" style:leader-char="."/>
+      <text:index-entry-page-number/>
+      <text:index-entry-link-end/>
+     </text:table-of-content-entry-template>
+    </text:table-of-content-source>
+    <text:index-body>
+     <text:index-title text:style-name="Sect1" text:name="Table of Contents1_Head">
+      <text:p text:style-name="P45">Table of Contents</text:p>
+     </text:index-title>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc11266_3495623107" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">1 <text:tab/>Documentation Dependences and Optional References<text:tab/>4</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42860_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">2 <text:tab/>About This Tutorial<text:tab/>5</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42862_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">3 <text:tab/>Prerequisites to Running This Tutorial<text:tab/>6</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42864_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">4 <text:tab/>About the ACI<text:tab/>7</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42866_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">5 <text:tab/>Creating a New Application<text:tab/>8</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42868_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">6 <text:tab/>Compiling ACI Applications<text:tab/>9</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42870_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">7 <text:tab/>Using the Control Plane<text:tab/>10</text:a></text:p>
+     <text:p text:style-name="P41"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42872_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link"><text:tab/>7.1 <text:tab/>Getting Properties: Option 1<text:tab/>11</text:a></text:p>
+     <text:p text:style-name="P41"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42874_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link"><text:tab/>7.2 <text:tab/>Getting Properties, Option 2<text:tab/>12</text:a></text:p>
+     <text:p text:style-name="P41"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42876_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link"><text:tab/>7.3 <text:tab/>Getting Properties, Option 3<text:tab/>13</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42878_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">8 <text:tab/>Setting Properties<text:tab/>14</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42880_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">9 <text:tab/>Accessing the Data Plane<text:tab/>15</text:a></text:p>
+     <text:p text:style-name="P41"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42882_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link"><text:tab/>9.1 <text:tab/>Example of Sending Data to an Application<text:tab/>16</text:a></text:p>
+     <text:p text:style-name="P41"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42884_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link"><text:tab/>9.2 <text:tab/>Example of Getting Data from an Application<text:tab/>17</text:a></text:p>
+     <text:p text:style-name="P40"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc42886_28991016" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">10 <text:tab/>About the SWIG Python Interface (Beta)<text:tab/>18</text:a></text:p>
+    </text:index-body>
+   </text:table-of-content>
+   <text:h text:style-name="P28" text:outline-level="1"><text:bookmark-start text:name="_Toc245388431"/><text:bookmark-start text:name="__RefHeading___Toc11266_3495623107"/><text:bookmark-start text:name="_Toc224890089"/><text:bookmark-start text:name="_Toc141837257"/><text:bookmark-start text:name="_Toc141318608"/><text:bookmark-start text:name="_Toc1413186081"/><text:bookmark-start text:name="_Toc1418372571"/><text:bookmark-start text:name="_Toc2248900891"/><text:bookmark-start text:name="_Toc2453884311"/>D<text:bookmark-end text:name="_Toc245388431"/><text:bookmark-end text:name="_Toc224890089"/><text:bookmark-end text:name="_Toc141837257"/><text:bookmark-end text:name="_Toc141318608"/><text:bookmark-end text:name="_Toc1413186081"/><text:bookmark-end text:name="_Toc1418372571"/><text:bookmark-end text:name="_Toc2248900891"/><text:bookmark-end text:name="_Toc2453884311"/>ocumentation Dependences and Optional References<text:bookmark-end text:name="__RefHeading___Toc11266_3495623107"/></text:h>
+   <text:p text:style-name="P31">This <text:span text:style-name="T3">document depends on information provided in the documents listed in the following table. The documents listed in this table are required reading.</text:span></text:p>
+   <text:p text:style-name="P47">Table <text:sequence text:ref-name="refTable0" text:name="Table" text:formula="ooow:1 " style:num-format="1">1</text:sequence><text:s/>- <text:span text:style-name="T32">Tutorial Documentation Dependencies</text:span></text:p>
+   <table:table table:name="Table3" table:style-name="Table3">
+    <table:table-column table:style-name="Table3.A"/>
+    <table:table-column table:style-name="Table3.B"/>
+    <table:table-column table:style-name="Table3.C"/>
+    <table:table-row table:style-name="Table3.1">
+     <table:table-cell table:style-name="Table3.A1" office:value-type="string">
+      <text:p text:style-name="P51">Title</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table3.A1" office:value-type="string">
+      <text:p text:style-name="P51">Published By</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table3.A1" office:value-type="string">
+      <text:p text:style-name="P50">Public URL</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table3.1">
+     <table:table-cell table:style-name="Table3.A2" office:value-type="string">
+      <text:p text:style-name="P22">Briefing 1: Introduction to OpenCPI</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table3.B2" office:value-type="string">
+      <text:p text:style-name="P24"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table3.C2" office:value-type="string">
+      <text:p text:style-name="P24"><text:span text:style-name="T12">Public URL: </text:span><text:span text:style-name="T13">https://opencpi.git</text:span><text:span text:style-name="T16">lab</text:span><text:span text:style-name="T13">.io/releases/1.</text:span><text:span text:style-name="T16">6</text:span><text:span text:style-name="T13">.0.rc/doc/OpenCPI_</text:span><text:span text:style-name="T14">xxxxx</text:span><text:span text:style-name="T13">.pdf</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table3.1">
+     <table:table-cell table:style-name="Table3.A3" office:value-type="string">
+      <text:p text:style-name="P22">Briefing 2: Introduction to OpenCPI <text:span text:style-name="T32">for</text:span> Application Developers</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table3.B3" office:value-type="string">
+      <text:p text:style-name="P24"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table3.C3" office:value-type="string">
+      <text:p text:style-name="P24"><text:span text:style-name="T12">Public URL: </text:span><text:span text:style-name="T13">https://opencpi.git</text:span><text:span text:style-name="T16">lab</text:span><text:span text:style-name="T13">.io/releases/1.</text:span><text:span text:style-name="T16">6</text:span><text:span text:style-name="T13">.0.rc/doc/OpenCPI_</text:span><text:span text:style-name="T14">xxxxx</text:span><text:span text:style-name="T13">.pdf</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:p text:style-name="P61">The documents listed in the following table provide detailed information about subjects discussed in this tutorial. <text:s/>The documents listed here are not required reading for this tutorial but will likely be of interest for more in-depth learning.</text:p>
+   <text:p text:style-name="P54">Table <text:sequence text:ref-name="refTable1" text:name="Table" style:num-format="1">1</text:sequence><text:s/>- <text:span text:style-name="T32">OpenCPI Reference Documentation</text:span></text:p>
+   <table:table table:name="Table2" table:style-name="Table2">
+    <table:table-column table:style-name="Table2.A"/>
+    <table:table-column table:style-name="Table2.B"/>
+    <table:table-column table:style-name="Table2.C"/>
+    <table:table-row table:style-name="Table2.1">
+     <table:table-cell table:style-name="Table2.A1" office:value-type="string">
+      <text:p text:style-name="P52">Title</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.A1" office:value-type="string">
+      <text:p text:style-name="P52">Published By</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.A1" office:value-type="string">
+      <text:p text:style-name="P53">Public URL</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table2.1">
+     <table:table-cell table:style-name="Table2.A2" office:value-type="string">
+      <text:p text:style-name="P74">OpenCPI <text:span text:style-name="T11">Overview</text:span></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.B2" office:value-type="string">
+      <text:p text:style-name="P75"><text:bookmark-start text:name="__DdeLink__23639_548880921"/><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a><text:bookmark-end text:name="__DdeLink__23639_548880921"/></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.C2" office:value-type="string">
+      <text:p text:style-name="P75"><text:bookmark text:name="__DdeLink__23641_548880921"/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T13">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf</text:span></text:a></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table2.1">
+     <table:table-cell table:style-name="Table2.A3" office:value-type="string">
+      <text:p text:style-name="P73">OpenCPI User Guide</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.B3" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.C3" office:value-type="string">
+      <text:p text:style-name="P75"><text:span text:style-name="T13">https://opencpi.git</text:span><text:span text:style-name="T17">lab</text:span><text:span text:style-name="T13">.io/releases/</text:span><text:span text:style-name="T18">v</text:span><text:span text:style-name="T13">1.</text:span><text:span text:style-name="T17">6</text:span><text:span text:style-name="T13">.0-rc.</text:span><text:span text:style-name="T18">0</text:span><text:span text:style-name="T13">/doc</text:span><text:span text:style-name="T18">s</text:span><text:span text:style-name="T13">/OpenCPI_</text:span><text:span text:style-name="T17">User</text:span><text:span text:style-name="T13">.pdf</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table2.1">
+     <table:table-cell table:style-name="Table2.A4" office:value-type="string">
+      <text:p text:style-name="P74">OpenCPI <text:span text:style-name="T33">Application Development Guide</text:span></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.B4" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.C4" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T13">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table2.1">
+     <table:table-cell table:style-name="Table2.A5" office:value-type="string">
+      <text:p text:style-name="P74">OpenCPI <text:span text:style-name="T19">Component Development Guide</text:span></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.B5" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.C5" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T13">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table2.1">
+     <table:table-cell table:style-name="Table2.A6" office:value-type="string">
+      <text:p text:style-name="P73">OpenCPI HDL Development Guide</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.B6" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.C6" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T13">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table2.1">
+     <table:table-cell table:style-name="Table2.A7" office:value-type="string">
+      <text:p text:style-name="P73">OpenCPI RCC Development Guide</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.B7" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table2.C7" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T13">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:p text:style-name="P54"/>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42860_28991016"/><text:span text:style-name="T47">Overview</text:span><office:annotation>
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-10-11T16:03:11.751291226</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P29"><text:span text:style-name="T15">This information was taken from BIA Course 7. It is a start at a tutorial. It needs to address the comments on the course that exist in CNF Confluence.</text:span></text:p>
-    </office:annotation></text:h>
-   <text:p text:style-name="P6">This tutorial <text:span text:style-name="T2">provides information and examples of</text:span> how to use OpenCPI’s application control interface (ACI). It describes how to:</text:p>
-   <text:list xml:id="list1840966030" text:style-name="WWNum32">
+     <text:p text:style-name="P76"><text:span text:style-name="T60">This information was taken from BIA Course 7. It is a start at a tutorial. It needs to address the comments on the course that exist in CNF Confluence.</text:span></text:p>
+    </office:annotation><text:bookmark-end text:name="__RefHeading___Toc42860_28991016"/></text:h>
+   <text:p text:style-name="P6">This tutorial <text:span text:style-name="T21">provides information and examples of</text:span> how to use OpenCPI’s application control interface (ACI). It describes how to:</text:p>
+   <text:list xml:id="list3572440422" text:style-name="WWNum32">
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T3">C</text:span>reat<text:span text:style-name="T3">e</text:span> a <text:span text:style-name="T3">n</text:span>ew <text:span text:style-name="T3">ACI a</text:span>pplication</text:p>
+     <text:p text:style-name="P36"><text:span text:style-name="T22">C</text:span>reat<text:span text:style-name="T22">e</text:span> a <text:span text:style-name="T22">n</text:span>ew <text:span text:style-name="T22">ACI a</text:span>pplication</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">Compile an ACI application</text:p>
+     <text:p text:style-name="P35">Compile an ACI application</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T3">Use the c</text:span>ontrol <text:span text:style-name="T2">p</text:span>lane</text:p>
+     <text:p text:style-name="P36"><text:span text:style-name="T22">Use the c</text:span>ontrol <text:span text:style-name="T21">p</text:span>lane</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Access the <text:span text:style-name="T2">d</text:span>ata <text:span text:style-name="T2">p</text:span>lane</text:p>
+     <text:p text:style-name="P36">Access the <text:span text:style-name="T21">d</text:span>ata <text:span text:style-name="T21">p</text:span>lane</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P17">Use the Simplified Wrapper and Interface Generator (SWIG) Python interface</text:p>
-    </text:list-item>
-   </text:list>
-   <text:p text:style-name="P6">For details and usage information about the OpenCPI ACI, see the <text:span text:style-name="T4">OpenCPI Application Development Guide</text:span>.</text:p>
-   <text:h text:style-name="P12" text:outline-level="2">About the ACI</text:h>
-   <text:p text:style-name="P2"/>
-   <text:p text:style-name="P6">The ACI is an API for executing XML-based OpenCPI applications within a C++ or Python context. <text:span text:style-name="T6">It’s useful </text:span>when <text:span text:style-name="T6">the </text:span><text:span text:style-name="T7">ocpirun</text:span> <text:span text:style-name="T6">program</text:span> cannot supply the necessary programmatic and/or dynamic creation or control of an XML-based application; <text:span text:style-name="T6">for example, when:</text:span></text:p>
-   <text:list xml:id="list151040434460272" text:continue-numbering="true" text:style-name="WWNum32">
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">The contents of the application XML (OAS) need to be constructed programmatically</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">The main program needs to directly connect to the ports of the running application</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">An XML-based application needs to be run repeatedly in the same process</text:p>
-    </text:list-item>
-    <text:list-item>
-     <text:p text:style-name="List_20_Bullet">Some attributes or properties of the XML application need to be dynamically configured or read throughout execution of the application</text:p>
+     <text:p text:style-name="P35">Use the Simplified Wrapper and Interface Generator (SWIG) Python interface</text:p>
     </text:list-item>
    </text:list>
-   <text:p text:style-name="P6"><text:span text:style-name="T6">The ACI is u</text:span>seful for standalone applications or test fixtures.</text:p>
-   <text:h text:style-name="P12" text:outline-level="2">Creating a New Application</text:h>
-   <text:p text:style-name="P2">ACI applications are placed under the applications/ subdirectory of an OpenCPI project. </text:p>
-   <text:p text:style-name="P2">New ACI applications can be created with the ocpidev tool as follows:</text:p>
-   <text:p text:style-name="Code">$ ocpidev create application ${appname}</text:p>
-   <text:p text:style-name="P2"><text:span text:style-name="T6">For example, i</text:span>f ${appname} <text:span text:style-name="T6">is</text:span> demo-aci-app, the following directory and files should be created as follows:</text:p>
-   <text:p text:style-name="P2"><text:s text:c="3"/>applications/</text:p>
-   <text:p text:style-name="P2"><text:s text:c="3"/>|-- demo-aci-app/</text:p>
-   <text:p text:style-name="P2"><text:s text:c="3"/>| <text:s text:c="2"/>|-- demo-aci-app.cc</text:p>
-   <text:p text:style-name="P2"><text:s text:c="3"/>| <text:s text:c="2"/>|-- demo-aci-app.xml</text:p>
-   <text:p text:style-name="P2"><text:s text:c="3"/>| <text:s text:c="2"/>`-- Makefile</text:p>
-   <text:p text:style-name="P2"><text:s text:c="3"/>`-- Makefile</text:p>
-   <text:p text:style-name="P1">Here is a simple example:</text:p>
-   <text:p text:style-name="Code">#include &quot;OcpiApi.hh&quot;</text:p>
-   <text:p text:style-name="Code">namespace OA = OCPI::API;</text:p>
-   <text:p text:style-name="Code">...</text:p>
-   <text:p text:style-name="Code">int main()</text:p>
-   <text:p text:style-name="Code">{</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>try {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.initialize();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.start();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.wait();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.finish();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>catch (std::string &amp;e) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>}</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:h text:style-name="P13" text:outline-level="2">Compiling ACI Applications</text:h>
-   <text:p text:style-name="P3">Compiling an ACI application is similar to building other OpenCPI assets. The <text:span text:style-name="T7">--rcc-platform</text:span> option can be used to build for various software platforms.</text:p>
-   <text:p text:style-name="P3">From the lower level directory:</text:p>
-   <text:p text:style-name="Code">$ ocpidev build --rcc-platform centos7 --rcc-platform xilinx13_3</text:p>
-   <text:p text:style-name="P3">From top-level of directory:</text:p>
-   <text:p text:style-name="Code">$ ocpidev build application demo-aci-app --rcc-platform xilinx13_3</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Using the Control Plane</text:h>
-   <text:p text:style-name="Standard">Control plane operations in OpenCPI consist of getting and setting properties of components. In the ACI, there are a few different options for getting and setting properties depending on performance, accuracy, and simplicity requirements.</text:p>
-   <text:h text:style-name="P15" text:outline-level="3">Getting Properties: Option 1</text:h>
-   <text:p text:style-name="P7">Here is a code snippet that illustrates this option <text:span text:style-name="T10">(identified in italics):</text:span></text:p>
-   <text:p text:style-name="Code">...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.initialize(); </text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>std::string value;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/><text:span text:style-name="T4">app.getProperty(&quot;bias&quot;, &quot;biasValue&quot;, value);</text:span></text:p>
-   <text:p text:style-name="P5"><text:s text:c="4"/>std::cout &lt;&lt; value &lt;&lt; &quot;\n&quot;;</text:p>
-   <text:p text:style-name="Code">... </text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.start();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>while (true) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="6"/>...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>}</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>catch (std::string &amp;e) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>}</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:p text:style-name="Standard"><text:span text:style-name="T8">This option is the si</text:span>mplest interface; <text:span text:style-name="T8">however, because</text:span> <text:span text:style-name="T8">it’s </text:span>all string-based, <text:span text:style-name="T8">it’s the </text:span>slowest <text:span text:style-name="T8">option </text:span>for real-time processing.</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Getting Properties, Option 2</text:h>
-   <text:p text:style-name="P8">Here is a code snippet that illustrates this option:</text:p>
-   <text:p text:style-name="Code">...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.initialize(); </text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/><text:span text:style-name="T4">unsigned int ivalue = app.getPropertyValue(&quot;bias&quot;, &quot;biasValue&quot;);</text:span></text:p>
-   <text:p text:style-name="P5"><text:s text:c="4"/>std::cout &lt;&lt; ivalue &lt;&lt; &quot;\n&quot;;</text:p>
-   <text:p text:style-name="Code">... </text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.start();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>while (true) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="6"/>...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>}</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>catch (std::string &amp;e) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>}</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:p text:style-name="Standard"><text:soft-page-break/>T<text:span text:style-name="T9">his option is t</text:span>emplate-based and simple, but <text:span text:style-name="T9">it </text:span>can have C++ &quot;promoting&quot; issues if you don&apos;t explicitly state the type using getPropertyValue&lt;type&gt;(). <text:span text:style-name="T9">It g</text:span>ives proper native types, which is sometimes more convenient.</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3">Getting Properties, Option 3</text:h>
-   <text:p text:style-name="P8">Here is a code snippet that illustrates this option:</text:p>
-   <text:p text:style-name="Code">...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.initialize(); </text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/><text:span text:style-name="T5">OA::Property biasValue(app, &quot;bias.biasValue&quot;);</text:span></text:p>
-   <text:p text:style-name="P4"><text:s text:c="4"/>std::cout &lt;&lt; biasValue.getULongValue();</text:p>
-   <text:p text:style-name="Code">... </text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.start();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>while (true) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="6"/>...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>}</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>catch (std::string &amp;e) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>}</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:p text:style-name="Standard"><text:span text:style-name="T9">This option presents the f</text:span>astest, lowest level, &quot;I know exactly what to expect,&quot; with possible optimizations to direct memory-mapped access.</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Setting Properties</text:h>
-   <text:p text:style-name="P9">Here is a code snippet that gives an example of how to set properties. The setProperty methods used are italicized:</text:p>
-   <text:p text:style-name="Code">...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>OA::Application app(&quot;myapp.xml&quot;);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.initialize();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/><text:span text:style-name="T4">app.setProperty(&quot;bias&quot;, &quot;biasValue&quot;, &quot;15&quot;);</text:span></text:p>
-   <text:p text:style-name="P5"/>
-   <text:p text:style-name="P5"><text:s text:c="4"/>app.setPropertyValue&lt;unsigned int&gt;(&quot;bias&quot;, &quot;biasValue&quot;, 16);</text:p>
-   <text:p text:style-name="P5"/>
-   <text:p text:style-name="P5"><text:s text:c="4"/>OA::Property biasValue(app, &quot;bias.biasValue&quot;);</text:p>
-   <text:p text:style-name="P5"><text:s text:c="4"/>biasValue.setULongValue(17);</text:p>
-   <text:p text:style-name="Code">... </text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.start();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>while (true) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="6"/>...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>}</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>catch (std::string &amp;e) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>}</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:p text:style-name="Standard"/>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2">Accessing the Data Plane</text:h>
-   <text:p text:style-name="P9">Data can be written into or read from the external ports of an OpenCPI application using the ACI&apos;s ExternalPort and ExternalBuffer classes. These classes are useful for interfacing with other applications external to OpenCPI that use a different protocol or transport layer and leaves the data formatting and opcode up to the user for increase flexibility.</text:p>
-   <text:p text:style-name="P10">Here is a code snippet that illustrates these classes:</text:p>
-   <text:p text:style-name="Code">#include &quot;OcpiApi.hh&quot;</text:p>
-   <text:p text:style-name="Code">namespace OA = OCPI::API;</text:p>
-   <text:p text:style-name="Code">...</text:p>
-   <text:p text:style-name="Code">int main()</text:p>
-   <text:p text:style-name="Code">{</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>try {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.initialize();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/><text:span text:style-name="T4">OA::ExternalPort &amp;toApp = app.getPort(&quot;in&quot;);</text:span></text:p>
-   <text:p text:style-name="P5"><text:s text:c="4"/>OA::ExternalPort &amp;fromApp = app.getPort(&quot;out&quot;);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>app.start();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>while (true) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="6"/>...</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>}</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>catch (std::string &amp;e) {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>}</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:h text:style-name="P16" text:outline-level="3">Example of Sending Data to an Application</text:h>
-   <text:p text:style-name="P11">Here is a code snippet that illustrates how to send data <text:span text:style-name="T4">to</text:span> an application:</text:p>
-   <text:p text:style-name="Code">size_t sendBytesToApp(uint8_t *sendPtr, size_t sendSize, ExternalPort &amp;port)</text:p>
-   <text:p text:style-name="Code">{</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>uint8_t *dataPtr = NULL;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>size_t dataSizeBytes = 0;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>OA::ExternalBuffer *dataBuffer = NULL;</text:p>
-   <text:p text:style-name="Code"/>
-   <text:p text:style-name="Code"><text:s text:c="2"/>// Get a buffer to fill</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>do {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>dataBuffer = port.getBuffer(dataPtr, dataSizeBytes);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>} while(!dataBuffer);</text:p>
-   <text:p text:style-name="Code"/>
-   <text:p text:style-name="Code"><text:s text:c="2"/>// Fill the buffer</text:p>
-   <text:p text:style-name="Code"><text:soft-page-break/><text:s text:c="2"/>const size_t transferSizeBytes = std::min(sendSize, dataSizeBytes);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>memcpy(dataPtr, sendPtr, transferSizeBytes);</text:p>
-   <text:p text:style-name="Code"/>
-   <text:p text:style-name="Code"><text:s text:c="2"/>// Actually push N bytes on the port with opcode 0</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>dataBuffer-&gt;put(transferSizeBytes, 0);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>return transferSizeBytes; // Tell caller</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:h text:style-name="P16" text:outline-level="3">Example of Getting Data from an Application</text:h>
-   <text:p text:style-name="P11">Here is a code snippet that illustrates how to get data <text:span text:style-name="T4">from</text:span> an application:</text:p>
-   <text:p text:style-name="Code">size_t getBytesFromApp(uint8_t *recvPtr, size_t recvSize, ExternalPort &amp;port)</text:p>
-   <text:p text:style-name="Code">{</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>uint8_t *dataPtr = NULL;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>size_t dataSizeBytes = 0;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>uint8_t opCode;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>bool endOfData;</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>OA::ExternalBuffer *dataBuffer = NULL;</text:p>
-   <text:p text:style-name="Code"/>
-   <text:p text:style-name="Code"><text:s text:c="2"/>// Get a buffer of data</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>do {</text:p>
-   <text:p text:style-name="Code"><text:s text:c="4"/>dataBuffer = port.getBuffer(dataPtr, dataSizeBytes, opCode, endOfData);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>} while(!dataBuffer);</text:p>
-   <text:p text:style-name="Code"/>
-   <text:p text:style-name="Code"><text:s text:c="2"/>// Fill the out buffer with the data</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>const size_t transferSizeBytes = std::min(recvSize, dataSizeBytes);</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>memcpy(recvPtr, dataPtr, transferSizeBytes);</text:p>
-   <text:p text:style-name="Code"/>
-   <text:p text:style-name="Code"><text:s text:c="2"/>// Release the buffer</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>dataBuffer-&gt;release();</text:p>
-   <text:p text:style-name="Code"><text:s text:c="2"/>return transferSizeBytes; // Tell caller</text:p>
-   <text:p text:style-name="Code">}</text:p>
-   <text:h text:style-name="P14" text:outline-level="2">About the SWIG Python Interface (Beta)</text:h>
-   <text:p text:style-name="P11">OpenCPI provides Simplified Wrapper and Interface Generator (SWIG) bindings for the ACI, which allows users to access the ACI from within a Python interpreter. Once installed, the ACI can be imported into a Python script. For example:</text:p>
-   <text:p text:style-name="Code">$ python</text:p>
-   <text:p text:style-name="Code">&gt;&gt;&gt; import OcpiApi as OA # 1.3</text:p>
-   <text:p text:style-name="Code">&gt;&gt;&gt; import opencpi.aci as OA # 1.4</text:p>
-   <text:p text:style-name="P11">It is mostly a 1-<text:span text:style-name="T12">to-</text:span>1 translation from C++ ACI functions to <text:span text:style-name="T12">P</text:span>ython, <text:span text:style-name="T11">and t</text:span>here are some exceptions due to differences in language features.</text:p>
+   <text:h text:style-name="P59" text:outline-level="2">What’s Provided for This Tutorial</text:h>
+   <text:p text:style-name="P62"><text:bookmark-start text:name="__DdeLink__15647_310614188"/>The<text:bookmark-end text:name="__DdeLink__15647_310614188"/><text:span text:style-name="T47">re are no items currently provided for this tutorial.</text:span></text:p>
+   <text:p text:style-name="P63"><text:span text:style-name="T48">Note that a</text:span>ll <text:span text:style-name="T48">of the </text:span>OpenCPI built-in projects <text:span text:style-name="T48">described in the </text:span><text:span text:style-name="T10">OpenCPI User Guide</text:span><text:span text:style-name="T48"> </text:span>are built for <text:span text:style-name="T48">the CentOS 7 and Xilinx Vivado</text:span><text:span text:style-name="T49">®</text:span><text:span text:style-name="T48"> XSim</text:span> platforms <text:span text:style-name="T48">as part of the OpenCPI installation process. You do not need to build or import these projects in order to use them in this tutorial.</text:span></text:p>
+   <text:h text:style-name="P60" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc36438_28991016"/>Prerequisites <text:span text:style-name="T23">to Running This Tutorial</text:span><text:bookmark-end text:name="__RefHeading___Toc36438_28991016"/></text:h>
+   <text:p text:style-name="P65">This tutorial is <text:span text:style-name="T50">designed</text:span> to be run on a machine that has:</text:p>
+   <text:list xml:id="list100833249227210" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list-item>
+     <text:p text:style-name="P70">The default OpenCPI source code installation (the latest OpenCPI source installed and built on CentOS 7)</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P70">The default third-party FPGA simulator <text:span text:style-name="T40">xsim</text:span> <text:span text:style-name="T48">installation </text:span>(<text:span text:style-name="T51">the simulator installed</text:span> with the free, <text:span text:style-name="T51">unlicensed variant</text:span> of the Xilinx Vivado Design Suite HLx Edition tool set<text:span text:style-name="T51">)</text:span></text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P70">The ANGRYVIPER (AV) <text:bookmark-start text:name="__DdeLink__10245_3429347919"/>Eclipse-based GUI development tool<text:bookmark-end text:name="__DdeLink__10245_3429347919"/> <text:span text:style-name="T51">(</text:span>optionally install<text:span text:style-name="T51">ed with OpenCPI </text:span>as a GUI alternative <text:span text:style-name="T51">to the OpenCPI command-line tools)</text:span></text:p>
+    </text:list-item>
+   </text:list>
+   <text:p text:style-name="P64">The <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Installation.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">OpenCPI Installation Guide</text:span></text:a> describes how to install these items. <text:s/>This tutorial assumes that you have, at a minimum, this OpenCPI environment set up on your development host.</text:p>
+   <text:p text:style-name="P64">To be able to use the OpenCPI tools, you need to run the OpenCPI environment setup script <text:span text:style-name="T40">opencpi-setup.sh</text:span><text:span text:style-name="T52"> </text:span><text:span text:style-name="T53">on your development host.</text:span> <text:s/>If you have not already done so, follow the procedure in the <text:span text:style-name="T9">OpenCPI User Guide</text:span><text:span text:style-name="T38"> to run this script.</text:span></text:p>
+   <text:p text:style-name="P64">Finally, we recommend reading the following briefings before getting started with the tutorial:</text:p>
+   <text:list xml:id="list100833113591342" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list-item>
+     <text:p text:style-name="P70"><office:annotation office:name="__Annotation__23636_19753347">
+       <dc:creator>Lisa Zahn</dc:creator>
+       <dc:date>2019-12-27T15:25:43.741183105</dc:date>
+       <loext:sender-initials>LZ</loext:sender-initials>
+       <text:p text:style-name="P76"><text:span text:style-name="T60">TODO: Add hyperlinks to these documents when Jim and Nathan have the structure and PDFs set up.</text:span></text:p>
+      </office:annotation>Briefing 1, “Introduction to OpenCPI”.<office:annotation-end office:name="__Annotation__23636_19753347"/> <text:span text:style-name="T54">This briefing introduces OpenCPI positioning, priorities and background as well as component and application terminology.</text:span></text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P69">Briefing 2, “Introduction to Application Development with OpenCPI”. <text:s/><text:span text:style-name="T54">This briefing discusses OpenCPI elements and concepts from an application development perspective and introduces OpenCPI tools and building blocks for application development.</text:span></text:p>
+    </text:list-item>
+   </text:list>
+   <text:p text:style-name="P66">You may also want to read the chapter on the OpenCPI Application Control Interface in the <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">OpenCPI Application Development Guide</text:span></text:a><text:span text:style-name="T36"> </text:span><text:span text:style-name="T37">for detailed usage information.</text:span></text:p>
+   <text:h text:style-name="P60" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc10982_3429347919"/><text:span text:style-name="T32">Documentation </text:span><text:bookmark-start text:name="_Toc2453884312"/><text:bookmark-start text:name="_Toc2248900892"/><text:bookmark-start text:name="_Toc1418372572"/><text:bookmark-start text:name="_Toc1413186082"/>References<text:bookmark-end text:name="__RefHeading___Toc10982_3429347919"/><text:bookmark-end text:name="_Toc2453884312"/><text:bookmark-end text:name="_Toc2248900892"/><text:bookmark-end text:name="_Toc1418372572"/><text:bookmark-end text:name="_Toc1413186082"/></text:h>
+   <text:p text:style-name="P61">The documents listed in the following table provide detailed information about subjects discussed in this tutorial. <text:s/>The documents listed here are not required reading for this tutorial but will likely be of interest for more in-depth learning.</text:p>
+   <text:p text:style-name="P54">Table <text:sequence text:ref-name="refTable4" text:name="Table" style:num-format="1">1</text:sequence><text:s/>- <text:span text:style-name="T32">OpenCPI Reference Documentation</text:span></text:p>
+   <table:table table:name="Table4" table:style-name="Table4">
+    <table:table-column table:style-name="Table4.A"/>
+    <table:table-column table:style-name="Table4.B"/>
+    <table:table-column table:style-name="Table4.C"/>
+    <table:table-row table:style-name="Table4.1">
+     <table:table-cell table:style-name="Table4.A1" office:value-type="string">
+      <text:p text:style-name="P52">Title</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.A1" office:value-type="string">
+      <text:p text:style-name="P52">Published By</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.A1" office:value-type="string">
+      <text:p text:style-name="P53">Public URL</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table4.1">
+     <table:table-cell table:style-name="Table4.A2" office:value-type="string">
+      <text:p text:style-name="P74">OpenCPI <text:span text:style-name="T11">Overview</text:span></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B2" office:value-type="string">
+      <text:p text:style-name="P75"><text:bookmark-start text:name="__DdeLink__23639_5488809211"/><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a><text:bookmark-end text:name="__DdeLink__23639_5488809211"/></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.C2" office:value-type="string">
+      <text:p text:style-name="P75"><text:bookmark text:name="__DdeLink__23641_5488809211"/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T13">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf</text:span></text:a></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table4.1">
+     <table:table-cell table:style-name="Table4.A3" office:value-type="string">
+      <text:p text:style-name="P73">OpenCPI User Guide</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B3" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.C3" office:value-type="string">
+      <text:p text:style-name="P75"><text:span text:style-name="T13">https://opencpi.git</text:span><text:span text:style-name="T17">lab</text:span><text:span text:style-name="T13">.io/releases/</text:span><text:span text:style-name="T18">v</text:span><text:span text:style-name="T13">1.</text:span><text:span text:style-name="T17">6</text:span><text:span text:style-name="T13">.0-rc.</text:span><text:span text:style-name="T18">0</text:span><text:span text:style-name="T13">/doc</text:span><text:span text:style-name="T18">s</text:span><text:span text:style-name="T13">/OpenCPI_</text:span><text:span text:style-name="T17">User</text:span><text:span text:style-name="T13">.pdf</text:span></text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row table:style-name="Table4.1">
+     <table:table-cell table:style-name="Table4.A4" office:value-type="string">
+      <text:p text:style-name="P74">OpenCPI <text:span text:style-name="T33">Application Development Guide</text:span></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.B4" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T12">OpenCPI</text:span></text:a></text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table4.C4" office:value-type="string">
+      <text:p text:style-name="P75"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T13">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+     </table:table-cell>
+    </table:table-row>
+   </table:table>
+   <text:p text:style-name="P55"/>
+   <text:p text:style-name="P65"/>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42864_28991016"/>About the ACI<text:bookmark-end text:name="__RefHeading___Toc42864_28991016"/></text:h>
+   <text:p text:style-name="P31"><text:span text:style-name="T22">The ACI is an API for executing XML-based OpenCPI applications within a C++ or Python context. It’s useful when the </text:span><text:span text:style-name="T56">ocpirun</text:span><text:span text:style-name="T22"> program cannot supply the necessary programmatic and/or dynamic creation or control of an XML-based application; for example, when:</text:span></text:p>
+   <text:list xml:id="list100832497250146" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list-item>
+     <text:p text:style-name="P36">The contents of the application XML (OAS) need to be constructed programmatically</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P36">The main program needs to directly connect to the ports of the running application</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P36">An XML-based application needs to be run repeatedly in the same process</text:p>
+    </text:list-item>
+    <text:list-item>
+     <text:p text:style-name="P36">Some attributes or properties of the XML application need to be dynamically configured or read throughout execution of the application</text:p>
+    </text:list-item>
+   </text:list>
+   <text:p text:style-name="P31"><text:span text:style-name="T28">The ACI is u</text:span>seful for standalone applications or test fixtures<office:annotation>
+     <dc:creator>Lisa Zahn</dc:creator>
+     <dc:date>2019-11-10T09:52:04.875057662</dc:date>
+     <loext:sender-initials>LZ</loext:sender-initials>
+     <text:p text:style-name="P76"><text:span text:style-name="T60">What is a “test fixture”?</text:span></text:p>
+    </office:annotation>.</text:p>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42866_28991016"/>Creating a New Application<text:bookmark-end text:name="__RefHeading___Toc42866_28991016"/></text:h>
+   <text:p text:style-name="P31">ACI applications are placed under the applications/ subdirectory of an OpenCPI project. </text:p>
+   <text:p text:style-name="P31">New ACI applications can be created with the <text:span text:style-name="T40">ocpidev</text:span> tool as follows:</text:p>
+   <text:p text:style-name="P44">$ ocpidev create application ${appname}</text:p>
+   <text:p text:style-name="P31"><text:span text:style-name="T28">For example, i</text:span>f <text:span text:style-name="T40">${appname}</text:span> <text:span text:style-name="T28">is</text:span> <text:span text:style-name="T40">demo-aci-app</text:span>, the following directory and files should be created as follows:</text:p>
+   <text:p text:style-name="Code"><text:s text:c="3"/>applications/</text:p>
+   <text:p text:style-name="Code"><text:s text:c="3"/>|-- demo-aci-app/<text:line-break/> <text:s text:c="2"/>| <text:s text:c="2"/>|-- demo-aci-app.cc<text:line-break/> <text:s text:c="2"/>| <text:s text:c="2"/>|-- demo-aci-app.xml<text:line-break/> <text:s text:c="2"/>| <text:s text:c="2"/>`-- Makefile<text:line-break/> <text:s text:c="2"/>`-- Makefile</text:p>
+   <text:p text:style-name="P30">Here is a simple example:</text:p>
+   <text:p text:style-name="P44">#include &quot;OcpiApi.hh&quot;</text:p>
+   <text:p text:style-name="P44">namespace OA = OCPI::API;</text:p>
+   <text:p text:style-name="P44">...</text:p>
+   <text:p text:style-name="P44">int main()</text:p>
+   <text:p text:style-name="P44">{</text:p>
+   <text:p text:style-name="P44"><text:s text:c="2"/>try {</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>app.initialize();</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>app.start();</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>app.wait();</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>app.finish();</text:p>
+   <text:p text:style-name="P44"><text:s text:c="2"/>catch (std::string &amp;e) {</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;</text:p>
+   <text:p text:style-name="P44"><text:s text:c="2"/>}</text:p>
+   <text:p text:style-name="P44">}</text:p>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42868_28991016"/>Compiling ACI Applications<text:bookmark-end text:name="__RefHeading___Toc42868_28991016"/></text:h>
+   <text:p text:style-name="P31">Compiling an ACI application is similar to building other OpenCPI assets. <text:s/><text:span text:style-name="T20">You can use t</text:span>he <text:span text:style-name="T40">--rcc-platform</text:span> option <text:span text:style-name="T35">to </text:span><text:span text:style-name="T41">ocpidev</text:span><text:span text:style-name="T35"> </text:span>to build for various software platforms.</text:p>
+   <text:p text:style-name="P31">From the lower level directory:</text:p>
+   <text:p text:style-name="P44">$ ocpidev build --rcc-platform centos7 --rcc-platform xilinx13_3</text:p>
+   <text:p text:style-name="P31">From <text:span text:style-name="T20">the </text:span>top-level of directory:</text:p>
+   <text:p text:style-name="P44">$ ocpidev build application demo-aci-app --rcc-platform xilinx13_3</text:p>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42870_28991016"/>Using the Control Plane<text:bookmark-end text:name="__RefHeading___Toc42870_28991016"/></text:h>
+   <text:p text:style-name="P31">Control plane operations in OpenCPI consist of getting and setting properties of components. <text:s/>In the ACI, there are a few different options for getting and setting properties depending on performance, accuracy, and simplicity requirements.</text:p>
+   <text:h text:style-name="P29" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc42872_28991016"/>Getting Properties: Option 1<text:bookmark-end text:name="__RefHeading___Toc42872_28991016"/></text:h>
+   <text:p text:style-name="P31">Here is a code snippet that illustrates this option <text:span text:style-name="T29">(highlighted in red):</text:span></text:p>
+   <text:p text:style-name="P44">...</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);<text:line-break/> <text:s text:c="3"/>app.initialize();<text:line-break/> <text:s text:c="3"/>std::string value;<text:line-break/> <text:s text:c="3"/><text:span text:style-name="T58">app.getProperty(&quot;bias&quot;, &quot;biasValue&quot;, value);<text:line-break/> <text:s text:c="3"/>std::cout &lt;&lt; value &lt;&lt; &quot;\n&quot;;</text:span><text:span text:style-name="T7"><text:line-break/></text:span>... <text:line-break/> <text:s text:c="3"/>app.start();<text:line-break/> <text:s text:c="3"/>while (true) {<text:line-break/> <text:s text:c="5"/>…<text:line-break/> <text:s text:c="3"/>}<text:line-break/> <text:s/>catch (std::string &amp;e) {<text:line-break/> <text:s text:c="3"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;<text:line-break/> <text:s/>}<text:line-break/>}</text:p>
+   <text:p text:style-name="P31"><text:span text:style-name="T30">This option is the si</text:span>mplest interface; <text:span text:style-name="T30">however, because</text:span> <text:span text:style-name="T30">it’s </text:span>all string-based, <text:span text:style-name="T30">it’s the </text:span>slowest <text:span text:style-name="T30">option </text:span>for real-time processing.</text:p>
+   <text:h text:style-name="P29" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc42874_28991016"/>Getting Properties, Option 2<text:bookmark-end text:name="__RefHeading___Toc42874_28991016"/></text:h>
+   <text:p text:style-name="P31">Here is a code snippet that illustrates this option <text:span text:style-name="T47">(highlighted in red)</text:span>:</text:p>
+   <text:p text:style-name="P44">...</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);<text:line-break/> <text:s text:c="3"/>app.initialize(); <text:line-break/> <text:s text:c="3"/><text:span text:style-name="T58">unsigned int ivalue = app.getPropertyValue(&quot;bias&quot;, &quot;biasValue&quot;);<text:line-break/></text:span><text:span text:style-name="T7"> <text:s text:c="3"/>std::cout &lt;&lt; ivalue &lt;&lt; &quot;\n&quot;;<text:line-break/></text:span>... <text:line-break/> <text:s text:c="3"/>app.start();<text:line-break/> <text:s text:c="3"/>while (true) {<text:line-break/> <text:s text:c="5"/>…<text:line-break/> <text:s text:c="3"/>}<text:line-break/> <text:s/>catch (std::string &amp;e) {<text:line-break/> <text:s text:c="3"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;<text:line-break/> <text:s/>}<text:line-break/>}</text:p>
+   <text:p text:style-name="P31">T<text:span text:style-name="T31">his option is t</text:span>emplate-based and simple, but <text:span text:style-name="T31">it </text:span>can have C++ &quot;promoting&quot; issues if you don&apos;t explicitly state the type using <text:span text:style-name="T40">getPropertyValue&lt;type&gt;()</text:span>. <text:span text:style-name="T31">It g</text:span>ives proper native types, which is sometimes more convenient.</text:p>
+   <text:h text:style-name="P29" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc42876_28991016"/>Getting Properties, Option 3<text:bookmark-end text:name="__RefHeading___Toc42876_28991016"/></text:h>
+   <text:p text:style-name="P31">Here is a code snippet that illustrates this option <text:span text:style-name="T47">(highlighted in red)</text:span>:</text:p>
+   <text:p text:style-name="P44">...</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>OA::Application app(&quot;demo-aci-app.xml&quot;);<text:line-break/> <text:s text:c="3"/>app.initialize(); <text:line-break/> <text:s text:c="3"/><text:span text:style-name="T59">OA::Property biasValue(app, &quot;bias.biasValue&quot;);<text:line-break/> <text:s text:c="3"/>std::cout &lt;&lt; biasValue.getULongValue();<text:line-break/></text:span>... <text:line-break/> <text:s text:c="3"/>app.start();<text:line-break/> <text:s text:c="3"/>while (true) {<text:line-break/> <text:s text:c="5"/>…<text:line-break/> <text:s text:c="3"/>}<text:line-break/> <text:s/>catch (std::string &amp;e) {<text:line-break/> <text:s text:c="3"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;<text:line-break/> <text:s/>}<text:line-break/>}</text:p>
+   <text:p text:style-name="P31"><text:span text:style-name="T31">This option presents the f</text:span>astest, lowest level, &quot;I know exactly what to expect,&quot; with possible optimizations to direct memory-mapped access.</text:p>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42878_28991016"/>Setting Properties<text:bookmark-end text:name="__RefHeading___Toc42878_28991016"/></text:h>
+   <text:p text:style-name="P31">Here is a code snippet that gives an example of how to set properties. The <text:span text:style-name="T40">setProperty</text:span> methods used are <text:span text:style-name="T47">highlighted in red</text:span>:</text:p>
+   <text:p text:style-name="P44">...</text:p>
+   <text:p text:style-name="P44"><text:s text:c="4"/>OA::Application app(&quot;myapp.xml&quot;);<text:line-break/> <text:s text:c="3"/>app.initialize();<text:line-break/> <text:s text:c="3"/><text:span text:style-name="T58">app.setProperty(&quot;bias&quot;, &quot;biasValue&quot;, &quot;15&quot;);<text:line-break/><text:line-break/></text:span><text:span text:style-name="T7"> <text:s text:c="3"/></text:span><text:span text:style-name="T58">app.setPropertyValue&lt;unsigned int&gt;(&quot;bias&quot;, &quot;biasValue&quot;, 16);<text:line-break/><text:line-break/></text:span><text:span text:style-name="T7"> <text:s text:c="3"/></text:span><text:span text:style-name="T58">OA::Property biasValue(app, &quot;bias.biasValue&quot;);<text:line-break/></text:span><text:span text:style-name="T7"> <text:s text:c="3"/></text:span><text:span text:style-name="T58">biasValue.setULongValue(17);<text:line-break/></text:span>... <text:line-break/> <text:s text:c="3"/>app.start();<text:line-break/> <text:s text:c="3"/>while (true) {<text:line-break/> <text:s text:c="5"/>…<text:line-break/> <text:s text:c="3"/>}<text:line-break/> <text:s/>catch (std::string &amp;e) {<text:line-break/> <text:s text:c="3"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;<text:line-break/> <text:s/>}<text:line-break/>}</text:p>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42880_28991016"/>Accessing the Data Plane<text:bookmark-end text:name="__RefHeading___Toc42880_28991016"/></text:h>
+   <text:p text:style-name="P31">Data can be written into or read from the external ports of an OpenCPI application using the ACI&apos;s ExternalPort and ExternalBuffer classes. These classes are useful for interfacing with other applications external to OpenCPI that use a different protocol or transport layer and leaves the data formatting and opcode up to the user for increase flexibility.</text:p>
+   <text:p text:style-name="P31">Here is a code snippet that illustrates these classes <text:span text:style-name="T47">(highlighted in red)</text:span>:</text:p>
+   <text:p text:style-name="P44">#include &quot;OcpiApi.hh&quot;<text:line-break/>namespace OA = OCPI::API;<text:line-break/>…<text:line-break/>int main()<text:line-break/>{<text:line-break/> <text:s/>try {<text:line-break/> <text:s text:c="3"/>OA::Application app(&quot;demo-aci-app.xml&quot;);<text:line-break/> <text:s text:c="3"/>app.initialize();<text:line-break/> <text:s text:c="3"/><text:span text:style-name="T58">OA::ExternalPort &amp;toApp = app.getPort(&quot;in&quot;);<text:line-break/></text:span><text:span text:style-name="T7"> <text:s text:c="3"/></text:span><text:span text:style-name="T57">OA::ExternalPort &amp;fromApp = app.getPort(&quot;out&quot;);<text:line-break/></text:span> <text:s text:c="3"/>app.start();<text:line-break/> <text:s text:c="3"/>while (true) {<text:line-break/> <text:s text:c="5"/>…<text:line-break/> <text:s text:c="3"/>}<text:line-break/> <text:s/>catch (std::string &amp;e) {<text:line-break/> <text:s text:c="3"/>std::cerr &lt;&lt; &quot;Error: &quot; &lt;&lt; e &lt;&lt; std::endl;<text:line-break/> <text:s/>}<text:line-break/>}</text:p>
+   <text:h text:style-name="P29" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc42882_28991016"/>Example of Sending Data to an Application<text:bookmark-end text:name="__RefHeading___Toc42882_28991016"/></text:h>
+   <text:p text:style-name="P31">Here is a code snippet that illustrates how to send data <text:span text:style-name="T7">to</text:span> an application:</text:p>
+   <text:p text:style-name="P44">size_t sendBytesToApp(uint8_t *sendPtr, size_t sendSize, ExternalPort &amp;port)<text:line-break/>{<text:line-break/> <text:s/>uint8_t *dataPtr = NULL;<text:line-break/> <text:s/>size_t dataSizeBytes = 0;<text:line-break/> <text:s/>OA::ExternalBuffer *dataBuffer = NULL;<text:line-break/><text:line-break/> <text:s/>// Get a buffer to fill<text:line-break/> <text:s/>do {<text:line-break/> <text:s text:c="3"/>dataBuffer = port.getBuffer(dataPtr, dataSizeBytes);<text:line-break/> <text:s/>} while(!dataBuffer);<text:line-break/><text:line-break/> <text:s/>// Fill the buffer<text:line-break/> <text:s/>const size_t transferSizeBytes = std::min(sendSize,<text:line-break/> <text:s text:c="14"/>dataSizeBytes);<text:line-break/> <text:s/>memcpy(dataPtr, sendPtr, transferSizeBytes);<text:line-break/><text:line-break/> <text:s/>// Actually push N bytes on the port with opcode 0<text:line-break/> <text:s/>dataBuffer-&gt;put(transferSizeBytes, 0);<text:line-break/> <text:s/>return transferSizeBytes; // Tell caller<text:line-break/>}</text:p>
+   <text:h text:style-name="P29" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc42884_28991016"/>Example of Getting Data from an Application<text:bookmark-end text:name="__RefHeading___Toc42884_28991016"/></text:h>
+   <text:p text:style-name="P31">Here is a code snippet that illustrates how to get data <text:span text:style-name="T7">from</text:span> an application:</text:p>
+   <text:p text:style-name="P44">size_t getBytesFromApp(uint8_t *recvPtr, size_t recvSize,<text:line-break/> <text:s text:c="22"/>ExternalPort &amp;port)<text:line-break/>{<text:line-break/> <text:s/>uint8_t *dataPtr = NULL;<text:line-break/> <text:s/>size_t dataSizeBytes = 0;<text:line-break/> <text:s/>uint8_t opCode;<text:line-break/> <text:s/>bool endOfData;<text:line-break/> <text:s/>OA::ExternalBuffer *dataBuffer = NULL;<text:line-break/><text:line-break/> <text:s/>// Get a buffer of data<text:line-break/> <text:s/>do {<text:line-break/> <text:s text:c="3"/>dataBuffer = port.getBuffer(dataPtr, dataSizeBytes, opCode,<text:line-break/> <text:s text:c="16"/>endOfData);<text:line-break/> <text:s/>} while(!dataBuffer);<text:line-break/><text:line-break/> <text:s/>// Fill the out buffer with the data<text:line-break/> <text:s/>const size_t transferSizeBytes = std::min(recvSize,<text:line-break/> <text:s text:c="14"/>dataSizeBytes);<text:line-break/> <text:s/>memcpy(recvPtr, dataPtr, transferSizeBytes);<text:line-break/><text:line-break/> <text:s/>// Release the buffer<text:line-break/> <text:s/>dataBuffer→release();<text:line-break/> <text:s/>return transferSizeBytes; // Tell caller<text:line-break/>}</text:p>
+   <text:h text:style-name="P27" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc42886_28991016"/>About the SWIG Python Interface (Beta)<text:bookmark-end text:name="__RefHeading___Toc42886_28991016"/></text:h>
+   <text:p text:style-name="P31">OpenCPI provides Simplified Wrapper and Interface Generator (SWIG) bindings for the ACI, which allows users to access the ACI from within a Python interpreter. Once installed, the ACI can be imported into a Python script. For example:</text:p>
+   <text:p text:style-name="P44">$ python<text:line-break/>&gt;&gt;&gt; import OcpiApi as OA # 1.3<text:line-break/>&gt;&gt;&gt; import opencpi.aci as OA # 1.4</text:p>
+   <text:p text:style-name="P31">It is mostly a 1-<text:span text:style-name="T4">to-</text:span>1 translation from C++ ACI functions to <text:span text:style-name="T4">P</text:span>ython, <text:span text:style-name="T5">and t</text:span>here are some exceptions due to differences in language features.</text:p>
   </office:text>
  </office:body>
 </office:document>
