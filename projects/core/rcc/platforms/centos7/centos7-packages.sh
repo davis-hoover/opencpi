@@ -96,10 +96,14 @@ PKGS_S+=(kernel-devel)
 PKGS_S+=(rpm-build)
 #    for creating swig
 PKGS_S+=(swig python-devel)
-#    for general configuration/installation flexibility
+#    for general configuration/installation flexibility - note nfs-utils-lib exists on early centos7.1
 PKGS_S+=(nfs-utils)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+#    for the AV GUI installation
+PKGS_S+=(oxygen-icon-theme jre)
+#    for serial console terminal emulation
+PKGS_S+=(screen)
 
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required

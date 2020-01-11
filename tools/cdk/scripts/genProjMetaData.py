@@ -318,7 +318,8 @@ def main():
             if (retVal[0]):
                 addWorkers(retVal[1], subdirList, dirName)
 
-        print("Updating project metadata...")
+        # This message talks about something that is meaningless and undocumented to users
+        #print("Updating project metadata...")
         indent(root)
         tree = ET.ElementTree(root)
         tree.write(mydir+"/project.xml")

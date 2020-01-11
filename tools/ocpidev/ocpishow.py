@@ -170,8 +170,8 @@ def check_scope_options(scope, noun):
     valid_scope_dict = {
         "registry":["global"],
         "projects":["global"],
-        "workers":["global"],
-        "components":["global"],
+        "workers":["global","local"],
+        "components":["global","local"],
         "component":["local"],
         "worker":["local"],
         "tests":["local"],
