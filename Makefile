@@ -183,11 +183,9 @@ cleaneverything distclean: clean cleandriver cleanpackaging
 # Documentation (AV-4402)
 .PHONY: doc
 .SILENT: doc
-# This hack determines how many jobs you are allowing by pulling bytes out of the make
-# jobserver https://stackoverflow.com/a/48865939/836748
 doc:
 	$(AT)rm -rf doc/{pdfs,html}
-	$(AT)+[[ "${MAKEFLAGS}" =~ --jobserver[^=]+=([0-9]+),([0-9]+) ]] && ( J=""; while read -t0 -u $${BASH_REMATCH[1]}; do read -N1 -u $${BASH_REMATCH[1]}; J="$${J}$${REPLY}"; done; JOBS="$$(expr 1 + $${#J})" doc/generator/genDocumentation.sh; echo -n $$J >&$${BASH_REMATCH[2]} ) || doc/generator/genDocumentation.sh
+	$(AT)bash doc/generator/genDocumentation.sh
 
 
 ##########################################################################################

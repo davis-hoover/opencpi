@@ -56,11 +56,9 @@ fi
 echo Installing all the standard packages required to build OpenCPI
 echo documentation using "$SUDO yum install"...
 $SUDO yum install -y $sanity epel-release
-$SUDO yum install -y $sanity ghostscript git libreoffice-headless make rubber \
-  texlive texlive-appendix texlive-latex texlive-multirow texlive-placeins \
-  texlive-titlesec texlive-xstring unoconv
+$SUDO yum install -y $sanity ghostscript git libreoffice-headless make \
+  python34 python34-jinja2 rubber texlive texlive-appendix texlive-latex \
+  texlive-multirow texlive-placeins texlive-titlesec texlive-xstring
 
-echo Building/creating OpenCPI documentation in the doc/pdfs directory.
-make doc
-echo PDFs and the index.html have been created in the doc/pdfs directory.
-echo To see them all, open the file doc/pdfs/index.html in a browser.
+echo Packages required to build OpenCPI documentation have been installed.
+echo To build OpenCPI documentation, run '`make doc`'.
