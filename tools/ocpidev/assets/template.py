@@ -141,4 +141,4 @@ PROJ_GUI_PROJECT = ("""<?xml version="1.0" encoding="UTF-8"?>
   <buildSpec></buildSpec>
   <natures></natures>
 </projectDescription>
-\n\n""")
+\n""")
