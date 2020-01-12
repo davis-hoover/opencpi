@@ -2668,9 +2668,6 @@
   <style:style style:name="T3" style:family="text">
    <style:text-properties officeooo:rsid="0229ef23"/>
   </style:style>
-  <style:style style:name="T4" style:family="text">
-   <style:text-properties officeooo:rsid="022cb22a"/>
-  </style:style>
   <style:page-layout style:name="pm1">
    <style:page-layout-properties fo:page-width="8.5in" fo:page-height="11in" style:num-format="1" style:print-orientation="portrait" fo:margin-top="1in" fo:margin-bottom="0.5in" fo:margin-left="1in" fo:margin-right="1in" style:writing-mode="lr-tb" style:layout-grid-color="#c0c0c0" style:layout-grid-lines="38" style:layout-grid-base-height="0.1665in" style:layout-grid-ruby-height="0.0835in" style:layout-grid-mode="none" style:layout-grid-ruby-below="false" style:layout-grid-print="false" style:layout-grid-display="false" style:layout-grid-base-width="0.1457in" style:layout-grid-snap-to="true" style:footnote-max-height="0in">
     <style:footnote-sep style:width="0.0071in" style:distance-before-sep="0.0398in" style:distance-after-sep="0.0398in" style:line-style="solid" style:adjustment="left" style:rel-width="0%" style:color="#000000"/>
@@ -2698,7 +2695,7 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
     <text:sequence-decl text:display-outline-level="0" text:name="Diagram"/>
    </text:sequence-decls>
-   <text:p text:style-name="ReleaseSubtitle">OpenCPI Release 1.6.0-rc.<text:span text:style-name="T4">1</text:span></text:p>
+   <text:p text:style-name="ReleaseSubtitle">OpenCPI Release v1.6.0-rc.1</text:p>
   </office:text>
  </office:body>
 </office:document>
