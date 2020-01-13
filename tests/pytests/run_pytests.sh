@@ -19,7 +19,7 @@
 
 # remove any leftover results from last run
 make clean
-[ -z "$HDL_PLATFORM" ] && {
+[ -z "${HDL_PLATFORM+x}" ] && {
   sims=(`ocpirun -C --only-platforms | grep '.*-.*sim' | sed s/^.*-//`)
   if [ -n "$sims" ]; then
      echo Available simulators are: ${sims[*]}, using $sims.

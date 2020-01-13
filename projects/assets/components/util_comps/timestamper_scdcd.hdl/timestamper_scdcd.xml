@@ -20,16 +20,16 @@
 
   <StreamInterface name='in'
                    datawidth='IN_PORT_DATA_WIDTH'
-                   myclock='true'/>
+                   clockDirection='in'/>
   <StreamInterface name='out'
                    datawidth='OUT_PORT_DATA_WIDTH'
                    workereof='true'
-                   myclock='true'/>
+                   clockDirection='in'/>
 
   <TimeInterface name='time'
                  secondswidth='32'
                  fractionwidth='32'
-                 myoutputclock='true'
+                 clockDirection='out'
                  allowunavailable='true'/>
 
 </HdlWorker>

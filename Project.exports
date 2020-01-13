@@ -115,6 +115,9 @@
 +tools/cdk/scripts/setup-prerequisite.sh scripts/
 +tools/cdk/scripts/setup-prereq-dirs.sh scripts/
 +tools/cdk/scripts/getPlatform.sh scripts/
++tools/cdk/scripts/ocpigui.sh <target>/bin/ocpigui
++tools/cdk/scripts/ocpiav.sh <target>/bin/ocpiav
++tools/cdk/scripts/ocpiav.desktop scripts/
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/
@@ -184,6 +187,7 @@
 # Utilities for unit test scripts
 +tools/cdk/python/opencpi/unit_test_utils.py <target>/lib/opencpi/
 +tools/cdk/python/opencpi/complexshortwithmetadata_utils.py <target>/lib/opencpi/
++tools/cdk/python/opencpi/iqstream_utils.py <target>/lib/opencpi/
 +tools/cdk/python/opencpi/dsp_utils.py <target>/lib/opencpi/
 ################################################################################
 # RCC related exclusions and additions

@@ -1,0 +1,10 @@
+<!-- This is the test xml for testing component "peak_detector" -->
+<Tests UseHDLFileIo='true'>
+  <!-- Here are typical examples of generating for an input port and verifying results
+       at an output port-->
+  <Input Port='in' Script='generate.py 32768'/>
+  <Output Port='out' Script='verify.py 32768' View='view.sh'/>
+  -->
+  <!-- Set properties here.
+       Use Test='true' to create a test-exclusive property. -->
+</Tests>

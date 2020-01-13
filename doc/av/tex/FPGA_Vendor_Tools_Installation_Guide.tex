@@ -20,7 +20,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{FPGA Vendor Tools Installation Guide}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 %----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
 \input{\snippetpath/includes}
@@ -32,6 +32,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \usepackage{multirow}
 \begin{document}
 \maketitle
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 \thispagestyle{fancy}
 \newpage
 
@@ -52,6 +55,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 			v1.5 & Updated for Release 1.5 & 4/2019 \\
 			\hline
+			v1.6 & Updated for Release 1.6 and deprecated & 1/2020 \\
+			\hline
 			\end{tabularx}
 		\end{table}
 	\end{center}
@@ -64,9 +69,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 \section{References}
 
-	This document assumes a basic understanding of the Linux command line (or ``shell'') environment. A working knowledge of OpenCPI is required for understanding what vendor tools are necessary to perform various operations. However, no OpenCPI knowledge is required to perform the toolset installation and configuration herein. The reference(s) in Table \ref{table:references} can be used as an overview of OpenCPI and may prove useful.
+	This document assumes a basic understanding of the Linux command line (or ``shell'') environment. A working knowledge of OpenCPI is required for understanding what vendor tools are necessary to perform various operations. However, no OpenCPI knowledge is required to perform the toolset installation and configuration herein. The reference(s) in Table \ref{table:references} can be used as an overview of OpenCPI and may prove useful.  In particular, the sections in the \textit{OpenCPI Installation Guide} referring to FPGA tools installations supercede this document.  \textbf{This document is deprecated but not removed since there is some content not yet integrated into that other document.}
 \def\refcapbottom{}
-\input{References_Table}
+\input{References_Table_noRPM}
 
 \begin{flushleft}
 \begin{landscape}

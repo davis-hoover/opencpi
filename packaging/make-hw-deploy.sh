@@ -65,10 +65,10 @@ done
 [ -d cdk/deploy/$rcc_platform ] && cp -R -L cdk/deploy/$rcc_platform/* $sd
 # 4. mv the top level sw files on the hw deployment into root
 [ -d cdk/deploy/$platform/$rcc_platform ] && cp -R -L cdk/deploy/$platform/$rcc_platform/* $sd
-# 5. mv the top level hw files into root, moving system.xml into opencpi subdir
+# 5. move any SW-specific system.xml into $sd/opencpi
+[ -f cdk/runtime/$rcc_platform/system.xml ] && cp -R -L -H cdk/runtime/$rcc_platform/system.xml $sd/opencpi || ::
+# 6. mv the top level hw files into root, moving system.xml into opencpi subdir
 for f in cdk/deploy/$platform/*; do
   is_platform $f && continue;
   cp -R -L -H $f $sd
 done
-# 6. move any HW-specific system.xml into $sd/opencpi
-[ -x cdk/runtime/$platform/system.xml ] && cp -R -L -H cdk/runtime/$platform/system.xml $sd/opencpi || :
