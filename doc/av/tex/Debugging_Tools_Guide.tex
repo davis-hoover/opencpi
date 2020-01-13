@@ -20,7 +20,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Debugging Tools Guide}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 %----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
 \input{\snippetpath/includes}
@@ -31,6 +31,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 %----------------------------------------------------------------------------------------
 \begin{document}
 \maketitle
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 \thispagestyle{fancy}
 \newpage
 
@@ -55,6 +58,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		    \hline
 		    v1.5 & Updated for OpenCPI Release 1.5 and expanded SignalTap section & 4/2019 \\
 		    \hline
+		    v1.6 & Updated for OpenCPI Release 1.6 for new references & 1/2020 \\
+		    \hline
 			\end{tabularx}
 		\end{table}
 	\end{center}
@@ -74,7 +79,7 @@ Xilinx's ChipScope Pro\footnote{Full title: ``ChipScope Pro Software and Cores (
 % So the URL for 14_7 has version 14.3 of the doc, but 14_5 has 14.5...
 \url{http://www.xilinx.com/support/documentation/sw_manuals/xilinx14_5/chipscope_pro_sw_cores_ug029.pdf} \\
 }
-\input{References_Table}
+\input{References_Table_noRPM}
 \newpage
 \section{Debugging RCC Workers}
 RCC workers are built as dynamically loadable shared object files, with the .so suffix.  When an application uses a worker, it will be loaded on demand, even when the executable is statically linked itself.  To debug a worker, it is necessary to first start the debugger on the executable, which is either the ocpirun utility program or an ACI application.  In either case the first step is to run the executable under the debugger, establishing a generic breakpoint to enter the debugger at a point after workers are loaded, but before they are actually run.  Then breakpoints can be placed in the worker code itself. gdb is now provided as a prerequisite for all embedded platforms.  This means that the procedure that is provided below will work on any RCC platform.
