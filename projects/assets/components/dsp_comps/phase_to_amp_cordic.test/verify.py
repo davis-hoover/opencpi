@@ -39,7 +39,7 @@ import os.path
 import opencpi.colors as color
 import numpy as np
 
-np.set_printoptions(threshold=np.nan)
+np.set_printoptions(threshold=sys.maxsize)
 
 if len(sys.argv) != 3:
     print("Invalid arguments:  usage is: verify.py <output-file> <input-file>")
