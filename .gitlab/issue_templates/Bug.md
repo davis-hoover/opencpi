@@ -7,10 +7,10 @@
 
 
 ### Context
-(How has this bug affected you? What were you trying to accomplish?)
+(What were you trying to accomplish? Can you reliably reproduce this issue?)
 
 
-### What is the expected correct behavior
+### Expected correct behavior
 (What you should see instead)
 
 
@@ -23,11 +23,11 @@ console/log/code output here
 
 
 ### Environment info
-* OpenCPI Version used:
-* Type of install (RPM or source):
-* Environment vars (`env | grep -i ocpi`):
-* Operating System and version (`uname -a`):
-* Link to your project on GitLab:
+- OpenCPI Version used:
+- Type of install (Source or RPM):
+- Environment vars (`env | grep -i ocpi | sort`):
+- Operating System and version (ex. CentOS 7):
+- Link to your project on GitLab (optional):
 
 
 ### Possible fixes
