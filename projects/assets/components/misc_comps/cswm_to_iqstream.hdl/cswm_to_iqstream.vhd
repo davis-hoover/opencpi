@@ -28,8 +28,6 @@ begin
     in_in.opcode = ComplexShortWithMetadata_sync_op_e           else
     misc_prims.ocpi.END_OF_SAMPLES when
     in_in.opcode = ComplexShortWithMetadata_end_of_samples_op_e else
-    misc_prims.ocpi.USER            when
-    in_in.opcode = ComplexShortWithMetadata_user_op_e           else
     misc_prims.ocpi.SAMPLES;
 
   in_adapter : misc_prims.ocpi.cswm_prot_in_adapter_dw32_clkin
