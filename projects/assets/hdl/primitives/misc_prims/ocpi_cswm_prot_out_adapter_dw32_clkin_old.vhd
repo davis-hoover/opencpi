@@ -30,7 +30,7 @@ architecture rtl of cswm_prot_out_adapter_dw32_clkin_old is
 
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := 16;
   type state_t is (SAMPLES, TIME_63_32, TIME_31_0, INTERVAL_63_32,
-                   INTERVAL_31_0, FLUSH, SYNC, IDLE); -- TODO / FIXME add USER
+                   INTERVAL_31_0, FLUSH, SYNC, IDLE);
 
   signal idata_r : data_complex_t;
 
@@ -185,7 +185,6 @@ begin
     end if;
   end process imetadata_demux;
 
-  -- TODO / FIXME - handle USER messages
   ogen : process(state, idata_r, message_sizer_som, message_sizer_eom,
                  force_end_of_samples, oready, imetadata_r2, imetadata_r)
   begin
