@@ -1,38 +1,35 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library misc_prims; use misc_prims.ocpi.all;
-library misc_prims; use misc_prims.misc_prims.all;
-library ocpi; use ocpi.types.all;
+library ocpi; library misc_prims;
 
--- for use w/ port clockdirection='input'
-entity cswm_prot_out_adapter_dw32_clkin_old is
+entity cswm_marshaller_old is
   generic(
     OUT_PORT_MBYTEEN_WIDTH : positive);
   port(
     -- INPUT
-    idata        : in  data_complex_t;
-    imetadata    : in  metadata_t;
+    idata        : in  misc_prims.misc_prims.data_complex_t;
+    imetadata    : in  misc_prims.misc_prims.metadata_t;
     ivld         : in  std_logic;
     irdy         : out std_logic;
     -- OUTPUT
     oclk         : in  std_logic;
     orst         : in  std_logic;
     odata        : out std_logic_vector(31 downto 0);
-    ovalid       : out Bool_t;
+    ovalid       : out ocpi.types.Bool_t;
     obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
-    ogive        : out Bool_t;
-    osom         : out Bool_t;
-    oeom         : out Bool_t;
-    oopcode      : out complex_short_with_metadata_opcode_t;
-    oeof         : out Bool_t;
-    oready       : in  Bool_t);
+    ogive        : out ocpi.types.Bool_t;
+    osom         : out ocpi.types.Bool_t;
+    oeom         : out ocpi.types.Bool_t;
+    oopcode      : out cswm_opcode_t;
+    oeof         : out ocpi.types.Bool_t;
+    oready       : in  ocpi.types.Bool_t);
 end entity;
-architecture rtl of cswm_prot_out_adapter_dw32_clkin_old is
+architecture rtl of cswm_demarshaller_old is
 
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := 16;
   type state_t is (SAMPLES, TIME_63_32, TIME_31_0, INTERVAL_63_32,
                    INTERVAL_31_0, FLUSH, SYNC, IDLE);
 
-  signal idata_r : data_complex_t;
+  signal idata_r : misc_prims.misc_prims.data_complex_t;
 
   signal ivld_r  : std_logic := '0';
   signal ivld_r2 : std_logic := '0';
@@ -41,8 +38,8 @@ architecture rtl of cswm_prot_out_adapter_dw32_clkin_old is
 
   signal metadata_zeros : std_logic_vector(METADATA_BIT_WIDTH-1 downto 0) :=
                           (others => '0');
-  signal imetadata_r  : metadata_t;
-  signal imetadata_r2 : metadata_t;
+  signal imetadata_r  : misc_prims.misc_prims.metadata_t;
+  signal imetadata_r2 : misc_prims.misc_prims.metadata_t;
 
   signal state        : state_t := IDLE;
   signal state_r      : state_t := IDLE;
@@ -59,7 +56,7 @@ architecture rtl of cswm_prot_out_adapter_dw32_clkin_old is
   signal force_end_of_samples   : std_logic := '0';
   signal force_end_of_samples_r : std_logic := '0';
 
-  signal opcode : complex_short_with_metadata_opcode_t := SAMPLES;
+  signal opcode : cswm_opcode_t := SAMPLES;
   signal pending_samples_eom : std_logic := '0';
 
 begin
