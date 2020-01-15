@@ -1,0 +1,1 @@
+These "old" primitives perform more optimally that the non-"old" version in terms of I/Q throughput, but the "old" have known defects for some metadata opcodes. The optimal features need to be implemented in the non-"old" versions (which have no known defects), and then these "old" versions need to be deleted.
