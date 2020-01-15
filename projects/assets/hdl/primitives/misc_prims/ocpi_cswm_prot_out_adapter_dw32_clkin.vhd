@@ -1,5 +1,3 @@
--- TODO / FIXME - this implementation will be affect by protocol changes (which are expected - see #124)
--- TODO / FIXME - USER opcode is not supported!
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library misc_prims; use misc_prims.ocpi.all;
 library misc_prims; use misc_prims.misc_prims.all;
@@ -32,7 +30,7 @@ architecture rtl of cswm_prot_out_adapter_dw32_clkin is
 
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := 16;
   type state_t is (SAMPLES, SAMPLES_EOM_ONLY, TIME_63_32, TIME_31_0, INTERVAL_63_32,
-                   INTERVAL_31_0, FLUSH, SYNC, EOF, IDLE); -- TODO / FIXME add USER
+                   INTERVAL_31_0, FLUSH, SYNC, EOF, IDLE);
 
   signal idata_r : data_complex_t := data_complex_zero;
 
@@ -225,7 +223,6 @@ begin
     end if;
   end process mux;
 
-  -- TODO / FIXME - handle USER messages
   ogen : process(state, idata_r, samples_som, samples_eom, imetadata_r, oready)
   begin
     case state is

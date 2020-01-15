@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}OpenCPI {{title}}{% endblock %}
+
+{% block content %}
+{% if is_latest %}
+<h1>OpenCPI {{title}} Documentation (the latest release)</h1>
+{% else %}
+<h1>OpenCPI {{title}} Documentation</h1>
+{% endif %}
+<a href="{{ releases_all_url }}">All OpenCPI Releases</a>
+<div>{{ sections["main"] }}</div>
+<div>{{ sections["core"] }}</div>
+<div>{{ sections["assets"] }}</div>
+<div>{{ sections["assets_ts"] }}</div>
+{% endblock %}

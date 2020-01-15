@@ -1,0 +1,52 @@
+{% macro get_link(name, data) -%}
+{% if name in data %}
+    {{ data[name].anchor_tag() }}
+{% endif %}
+{%- endmacro %}
+
+{% macro pop_link(name, data) -%}
+{% if name in data %}
+    {{ data[name].anchor_tag() }}
+    {% set _ = data.pop(name) %}
+{% endif %}
+{%- endmacro %}
+
+<h2>{{ section_title }}</h2>
+<p>
+    It is highly recommended to read all of the Getting Started Guides in the order listed before reading
+    the Developer or Additional Guides.
+</p>
+<div>{{ pop_link("release_notes", links) }}</div>
+
+<h3>Getting Started Guides</h3>
+<div>{{ pop_link("overview", links) }}</div>
+{% if "opencpi_installation" in links and "rpm_installation_guide" in links %}
+<div>{{ pop_link("opencpi_installation", links) }} or
+     {{ pop_link("rpm_installation_guide", links) }}</div>
+{% elif "opencpi_installation" in links %}
+<div>{{ pop_link("opencpi_installation", links) }}</div>
+{% else %}
+<div>{{ pop_link("rpm_installation_guide", links) }}</div>
+{% endif %}
+<div>{{ pop_link("opencpi_user", links) }}</div>
+<div>{{ pop_link("getting_started", links) }}</div>
+
+{% if assets_links %}
+<h4>System Specific Guides</h4>
+<div>{{ get_link("alst4_getting_started_guide", assets_links) }}</div>
+<div>{{ get_link("matchstiq_z1_getting_started_guide", assets_links) }}</div>
+<div>{{ get_link("ml605_getting_started_guide", assets_links) }}</div>
+<div>{{ get_link("zedboard_getting_started_guide", assets_links) }}</div>
+{% endif %}
+
+<h3>Developer Guides</h3>
+<div>{{ pop_link("opencpi_application_development", links) }}</div>
+<div>{{ pop_link("opencpi_component_development", links) }}</div>
+<div>{{ pop_link("opencpi_rcc_development", links) }}</div>
+<div>{{ pop_link("opencpi_hdl_development", links) }}</div>
+<div>{{ pop_link("opencpi_platform_development", links) }}</div>
+
+<h3>Additional Guides</h3>
+{% for name in links|sort %}
+    <div>{{ links[name].anchor_tag() }}</div>
+{% endfor %}

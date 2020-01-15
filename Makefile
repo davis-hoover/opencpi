@@ -25,7 +25,7 @@ ifneq ($(filter-out cleandriver,$(filter show help clean% distclean%,$(MAKECMDGO
         $(if $(filter $(realpath $(OCPI_CDK_DIR)),$p/cdk $p/exports),\
            $(warning Missing exports link when performing: $(MAKECMDGOALS).)\
 	   $(warning Setting OCPI_CDK_DIR temporarily to $(CURDIR)/bootstrap.))))\
-    $(eval export OCPI_CDK_DIR:=$(CURDIR)/bootstrap))
+       $(eval export OCPI_CDK_DIR:=$(CURDIR)/bootstrap))
 else
   ifndef OCPI_CDK_DIR
     export OCPI_CDK_DIR:=$(CURDIR)/cdk
@@ -42,11 +42,12 @@ else
   endif
 endif
 include $(OCPI_CDK_DIR)/include/util.mk
-
 ##########################################################################################
 # Process all platform info specified (and default RccPlatforms if not set at all).
 # FIXME someday: we need to treat models more uniformly so we can more easily add them
-$(eval $(OcpiEnsureToolPlatform))
+ifeq ($(filter show help clean% distclean%,$(MAKECMDGOALS)),)
+  $(eval $(OcpiEnsureToolPlatform))
+endif
 override Platforms:=$(call Unique,$(strip $(Platforms) $(Platform)))
 export Platforms # why?
 # Read in the database of actual RCC and HDL, setting RccPlatforms if it has not been set.
@@ -57,9 +58,10 @@ ifdef Platforms
     RccPlatforms:=
   endif
 endif
-include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
-include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
-
+ifeq ($(filter show help clean% distclean%,$(MAKECMDGOALS)),)
+  include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
+  include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
+endif
 # Now check all platforms for validity, even the hdl:rcc pairs
 $(foreach p,$(subst :, ,$(Platform)),$(if $(filter $p,$(RccAllPlatforms) $(HdlAllPlatforms)),,\
   $(error Platform $p is specified but non-existent, RCC or HDL.  HDL platforms may not be built yet)))
@@ -183,11 +185,9 @@ cleaneverything distclean: clean cleandriver cleanpackaging
 # Documentation (AV-4402)
 .PHONY: doc
 .SILENT: doc
-# This hack determines how many jobs you are allowing by pulling bytes out of the make
-# jobserver https://stackoverflow.com/a/48865939/836748
 doc:
 	$(AT)rm -rf doc/{pdfs,html}
-	$(AT)+[[ "${MAKEFLAGS}" =~ --jobserver[^=]+=([0-9]+),([0-9]+) ]] && ( J=""; while read -t0 -u $${BASH_REMATCH[1]}; do read -N1 -u $${BASH_REMATCH[1]}; J="$${J}$${REPLY}"; done; JOBS="$$(expr 1 + $${#J})" doc/generator/genDocumentation.sh; echo -n $$J >&$${BASH_REMATCH[2]} ) || doc/generator/genDocumentation.sh
+	$(AT)bash doc/generator/genDocumentation.sh
 
 
 ##########################################################################################
@@ -227,7 +227,7 @@ timestamp:=_$(shell printf %05d $(shell expr `date -u +"%s"` / 360 - 4273900))
 git_branch :=$(notdir $(shell git name-rev --name-only HEAD | \
                               perl -pe 's/~[^\d]*$$//' | perl -pe 's/^.*?--//'))
 git_version:=$(shell echo $(git_branch) | perl -ne '/^v[\.\d]+$$/ && print')
-git_hash   :=$(shell h=`(git tag --points-at HEAD | grep github | head -n1) 2>/dev/null`;\
+git_hash   :=$(shell h=`(git tag --points-at HEAD | grep gitlab | head -n1) 2>/dev/null`;\
                      [ -z "$$h" ] && h=`git rev-list --max-count=1 HEAD`; echo $$h)
 # git_tag is used in *.spec files for RPM release tag.
 # Any non alphanumeric (or .) strings converted to single _
@@ -331,7 +331,6 @@ showhw:
 	$(AT)echo $(DoHw)
 showhwdir:
 	$(AT)echo $(foreach h,$(DoHw),$(HdlPlatformDir_$h))
-
 ##########################################################################################
 # Goals that are about prerequisites
 # Here in the Makefile to enable install-prerequisites.sh for multiple platforms
@@ -352,7 +351,7 @@ Projects=core assets inactive assets_ts
 ProjectGoals=cleanhdl cleanrcc cleanocl rcc ocl hdl applications run runtest hdlprimitives \
              hdlportable components cleancomponents test
 # These are not done in parallel since we do not know the dependencies
-DoProjects=set -e; . cdk/opencpi-setup.sh -r; $(foreach p,$(Projects),\
+DoProjects=set -e; . $(OCPI_CDK_DIR)/opencpi-setup.sh -r; $(foreach p,$(Projects),\
                      echo Performing $1 on project $p && \
                      $(MAKE) -C projects/$p $(if $(filter build,$1),,$1) &&) :
 .PHONY: $(ProjectGoals) testprojects

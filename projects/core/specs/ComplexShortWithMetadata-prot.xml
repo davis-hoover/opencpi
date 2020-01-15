@@ -58,14 +58,4 @@
     * suppress underrun detection.
   -->
   <Operation name="end_of_samples"/>
-
-  <!--
-    * User-defined metadata operation. This operation can be used to append information to the data stream. 
-    * (e.g. burst framing, front end parameter change indicators) This is an advanced option and may not be
-    * used by all applications but this message should be passed on by all workers in the data stream.
-  -->
-  <Operation name="user">
-    <Argument name="uuid" type="ulonglong"/>
-    <Argument name="metadata" type="long" sequencelength="2048"/>
-  </Operation>
 </Protocol>

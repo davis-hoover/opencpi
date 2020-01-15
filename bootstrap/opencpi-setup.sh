@@ -1,0 +1,1 @@
+scripts/opencpi-setup.sh

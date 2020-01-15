@@ -77,10 +77,12 @@ function setVarsFromMake {
     return 1
   }
   local vars
+  # Note that we strip out any assignments where the variable name is not a valid bash variable, i.e.
+  # we silently remove assignments that have hyphens in variable names, rather than have an error
   vars=$(set -o pipefail;\
          eval make -n -r -s -f $1 $2 ${quiet:+2>/dev/null} | \
-	 grep '^[a-zA-Z_][a-zA-Z_]*=')
-  [ $? != 0 ] && return 1
+	 tr ';' '\n' | sed -e '/^ *$/d' -e 's/^ *//' -e 's/ *$//' | grep '^[a-zA-Z_][a-zA-Z0-9_]*=')
+   [ $? != 0 ] && return 1
   eval $vars
 }
 

@@ -39,8 +39,6 @@ begin
                 when in_in.opcode = ComplexShortWithMetadata_flush_op_e else
                 misc_prims.ocpi.SYNC
                 when in_in.opcode = ComplexShortWithMetadata_sync_op_e else
-                misc_prims.ocpi.USER
-                when in_in.opcode = ComplexShortWithMetadata_user_op_e else
                 misc_prims.ocpi.SAMPLES;
 
   in_adapter : misc_prims.ocpi.cswm_prot_in_adapter_dw32_clkout

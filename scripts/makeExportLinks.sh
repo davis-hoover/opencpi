@@ -395,6 +395,31 @@ done
 for a in $deployments; do
   do_addition $a --
 done
+# Create or replace the user editable environment setup file.
+# Since this might enable tools, we do it early, even when we are not creating links for a target
+# Note that this is analogous to the runtime system config file system.xml
+userenv=user-env.sh
+defaultuserenv=tools/cdk/scripts/default-user-env.sh
+if [ -r $userenv ] && grep -q '^ *export' $userenv; then
+  [ -n "$verbose" ] &&
+      echo Preserving user environment script \"$userenv\" since it has user-specified exports in it.
+  version=$(sed -n 'g/^ *# *VERSION */s///p' $userenv)
+  defaultversion=$(sed -n 'g/^ *# *VERSION */s///p' $defaultuserenv)
+  if [ "$version" != "$defaultversion" ]; then
+      echo The user-edited environment setup file \"$userenv\", is out of date.
+      echo It should be re-edited based on a copy of the updated default version in \"$defaultuserenv\".
+  fi
+elif [ -r $userenv ]; then
+  if cmp -s $userenv $defaultuserenv; then
+    [ -n "$verbose" ] && echo Preserving user environment script \"$userenv\" since it is the default one.
+  else
+    [ -n "$verbose" ] && echo "Replacing user environment script \"$userenv\" with current default, since it has no exports and is different from the (presumably newer) default one."
+    cp $defaultuserenv $userenv
+  fi
+else
+  cp $defaultuserenv $userenv
+fi
+
 # After this are only exports done when targets exist
 [ -n "$hdl_platform" ] && exit 0
 [ "$target" = - ] && exit 0

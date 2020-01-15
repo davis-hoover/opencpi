@@ -1,0 +1,7 @@
+FROM centos:7
+
+RUN yum -y distro-sync
+RUN yum -y install epel-release
+RUN yum -y --setopt=skip_missing_names_on_install=False install ghostscript git libreoffice-headless make python34 python34-jinja2 rubber texlive texlive-appendix texlive-latex texlive-multirow texlive-placeins texlive-titlesec texlive-xstring unoconv
+
+CMD ["bash"]
