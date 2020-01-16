@@ -33,7 +33,7 @@ architecture rtl of signal_time_tagger_worker is
   signal time_is_operating        : std_logic;
   signal signal_to_time_tag_redge : std_logic;
   signal time_64bit               : ulonglong_t;
-  signal time_64bit_corrected     : longlong_t;
+  signal time_64bit_corrected     : ulonglong_t;
 begin
 
   ctl2time_rst : component cdc.cdc.reset
@@ -58,7 +58,7 @@ begin
               falling_pulse => open);
 
   time_64bit           <= time_in.seconds & time_in.fraction;
-  time_64bit_corrected <= signed(time_64bit) - props_in.calibration_value;
+  time_64bit_corrected <= ulonglong_t(signed(time_64bit) - props_in.calibration_value);
   
   process(time_in.clk)
   begin
@@ -69,7 +69,7 @@ begin
       elsif its(time_is_operating) then
         if its(signal_to_time_tag_redge) and time_tag_cnt < props_in.num_time_tags_to_collect then
           time_tag_cnt <= time_tag_cnt + 1;
-          props_out.collected_time_tags(to_integer(time_tag_cnt)) <= unsigned(time_64bit_corrected);
+          props_out.collected_time_tags(to_integer(time_tag_cnt)) <= time_64bit_corrected;
         end if;
       end if;
     end if;
