@@ -1,5 +1,6 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi; library util; library misc_prims;
+library ocpi; library util;
+library misc_prims; use misc_prims.prot.all;
 
 entity cswm_demarshaller is
   generic(
@@ -7,8 +8,8 @@ entity cswm_demarshaller is
                                       -- MUST USE 32 FOR NOW
   port(
     clk       : in  std_logic;
+    rst       : in  std_logic;
     -- INPUT
-    irst      : in  std_logic;
     idata     : in  std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
     ivalid    : in  ocpi.types.Bool_t;
     iready    : in  ocpi.types.Bool_t;
@@ -46,7 +47,7 @@ begin
     eozlm_gen : util.util.zlm_detector
       port map(
         clk         => clk,
-        reset       => irst,
+        reset       => rst,
         som         => isom,
         valid       => ivalid,
         eom         => ieom,
@@ -55,7 +56,7 @@ begin
         eozlm_pulse => open,
         eozlm       => eozlm);
 
-    iinfo <= '1' when ((iready = btrue) and ((ivalid = btrue) or (eozlm = '1')))
+    iinfo <= '1' when ((iready = '1') and ((ivalid = '1') or (eozlm = '1')))
              else '0';
 
     take  <= iinfo and ordy;
@@ -65,7 +66,7 @@ begin
     data_reg : process(clk)
     begin
       if(rising_edge(clk)) then
-        if(irst = '1') then
+        if(rst = '1') then
           data_r <= (others => '0');
         elsif(take = '1') then
           data_r <= idata;
@@ -76,7 +77,7 @@ begin
     take_final_regs : process(clk)
     begin
       if(rising_edge(clk)) then
-        if(irst = '1') then
+        if(rst = '1') then
           take_time_final        <= '0';
           take_samp_period_final <= '0';
         elsif(take = '1') then
@@ -99,7 +100,7 @@ begin
     arg_31_0 <= idata;
     arg_63_0 <= idata & data_r;
 
-    metadata.eof             <= '1' when (ieof = btrue) and (ixfer = '1')
+    metadata.eof             <= '1' when (ieof = '1') and (ixfer = '1')
                                 else '0';
     metadata.flush           <= '1' when (iopcode = FLUSH) and (ixfer = '1')
                                 else '0';
@@ -119,7 +120,7 @@ begin
     pipeline : process(clk)
     begin
       if(rising_edge(clk)) then
-        if(irst = '1') then
+        if(rst = '1') then
           odata.i  <= (others => '0');
           odata.q  <= (others => '0');
           ometadata.flush           <= '0';

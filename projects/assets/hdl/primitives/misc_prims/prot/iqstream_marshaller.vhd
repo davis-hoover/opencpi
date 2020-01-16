@@ -41,7 +41,7 @@ begin
 
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
 
-    message_sizer : misc_prims.ocpi.wsi_message_sizer
+    message_sizer : misc_prims.prot.wsi_message_sizer
       generic map(
         SIZE_BIT_WIDTH => SAMPLES_MESSAGE_SIZE_BIT_WIDTH)
       port map(

@@ -1,18 +1,19 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi; library misc_prims;
+library ocpi;
+library misc_prims; use misc_prims.prot.all;
 
 entity cswm_marshaller_old is
   generic(
     OUT_PORT_MBYTEEN_WIDTH : positive);
   port(
+    clk          : in  std_logic;
+    rst          : in  std_logic;
     -- INPUT
     idata        : in  misc_prims.misc_prims.data_complex_t;
     imetadata    : in  misc_prims.misc_prims.metadata_t;
     ivld         : in  std_logic;
     irdy         : out std_logic;
     -- OUTPUT
-    oclk         : in  std_logic;
-    orst         : in  std_logic;
     odata        : out std_logic_vector(31 downto 0);
     ovalid       : out ocpi.types.Bool_t;
     obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
@@ -23,7 +24,7 @@ entity cswm_marshaller_old is
     oeof         : out ocpi.types.Bool_t;
     oready       : in  ocpi.types.Bool_t);
 end entity;
-architecture rtl of cswm_demarshaller_old is
+architecture rtl of cswm_marshaller_old is
 
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := 16;
   type state_t is (SAMPLES, TIME_63_32, TIME_31_0, INTERVAL_63_32,
@@ -36,8 +37,9 @@ architecture rtl of cswm_demarshaller_old is
 
   signal irdy_s : std_logic := '0';
 
-  signal metadata_zeros : std_logic_vector(METADATA_BIT_WIDTH-1 downto 0) :=
-                          (others => '0');
+  signal metadata_zeros : std_logic_vector(
+         misc_prims.misc_prims.METADATA_BIT_WIDTH-1 downto 0) :=
+         (others => '0');
   signal imetadata_r  : misc_prims.misc_prims.metadata_t;
   signal imetadata_r2 : misc_prims.misc_prims.metadata_t;
 
@@ -61,13 +63,13 @@ architecture rtl of cswm_demarshaller_old is
 
 begin
 
-  pipeline : process(oclk)
+  pipeline : process(clk)
   begin
-    if(rising_edge(oclk)) then
-      if(orst = '1') then
+    if(rising_edge(clk)) then
+      if(rst = '1') then
         idata_r.i   <= (others => '0');
         idata_r.q   <= (others => '0');
-        imetadata_r <= from_slv(metadata_zeros);
+        imetadata_r <= misc_prims.misc_prims.from_slv(metadata_zeros);
         ivld_r      <= '0';
         irdy        <= '0';
       else
@@ -79,21 +81,21 @@ begin
     end if;
   end process pipeline;
 
-  metadata_reg : process(oclk)
+  metadata_reg : process(clk)
   begin
-    if(rising_edge(oclk)) then
-      if(orst = '1') then
-        imetadata_r2 <= from_slv(metadata_zeros);
+    if(rising_edge(clk)) then
+      if(rst = '1') then
+        imetadata_r2 <= misc_prims.misc_prims.from_slv(metadata_zeros);
       elsif(ivld_r = '1') then
         imetadata_r2 <= imetadata_r;
       end if;
     end if;
   end process metadata_reg;
 
-  regs : process(oclk)
+  regs : process(clk)
   begin
-    if(rising_edge(oclk)) then
-      if(orst = '1') then
+    if(rising_edge(clk)) then
+      if(rst = '1') then
         ivld_r2                <= '0';
         state_r                <= IDLE;
         force_end_of_samples_r <= '0';
@@ -105,10 +107,10 @@ begin
     end if;
   end process regs;
 
-  pending_samples_eom_gen : process(oclk)
+  pending_samples_eom_gen : process(clk)
   begin
-    if(rising_edge(oclk)) then
-      if(orst = '1') then
+    if(rising_edge(clk)) then
+      if(rst = '1') then
         pending_samples_eom <= '0';
       elsif((give = '1') and (opcode = SAMPLES)) then
         if(eom = '1') then
@@ -246,14 +248,14 @@ begin
 
   oopcode <= opcode;
 
-  message_sizer_rst <= orst or force_end_of_samples;
+  message_sizer_rst <= rst or force_end_of_samples;
   message_sizer_give <= '1' when ((give = '1') and (opcode = SAMPLES)) else '0';
 
-  message_sizer : wsi_message_sizer
+  message_sizer : misc_prims.prot.wsi_message_sizer
     generic map(
       SIZE_BIT_WIDTH => SAMPLES_MESSAGE_SIZE_BIT_WIDTH)
     port map(
-      clk                    => oclk,
+      clk                    => clk,
       rst                    => message_sizer_rst,
       give                   => message_sizer_give,
       message_size_num_gives => to_unsigned(4092, 16),

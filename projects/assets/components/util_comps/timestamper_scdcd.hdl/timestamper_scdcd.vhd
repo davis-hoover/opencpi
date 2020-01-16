@@ -3,7 +3,7 @@ library ocpi; use ocpi.types.all; use ocpi.wci.all; -- remove this to avoid all
                                                     -- ocpi name collisions
 library misc_prims;
 use misc_prims.misc_prims.all;
-use misc_prims.ocpi.all;
+use misc_prims.prot.all;
 use misc_prims.cdc.all;
 library cdc; use cdc.cdc.all;
 architecture rtl of worker is
@@ -32,11 +32,11 @@ architecture rtl of worker is
       props_in.min_num_samples_per_timestamp'range) := (others => '0');
   signal iclk_is_operating                          : std_logic := '0';
 
-  signal iclk_opcode : complex_short_with_metadata_opcode_t := SAMPLES;
+  signal iclk_opcode : cswm_opcode_t := SAMPLES;
 
-  signal iclk_in_adapter_odata           : data_complex_t := data_complex_zero;
-  signal iclk_in_adapter_ometadata       : metadata_t := metadata_zero;
-  signal iclk_in_adapter_ovld            : std_logic := '0';
+  signal iclk_in_demarshaller_odata      : data_complex_t := data_complex_zero;
+  signal iclk_in_demarshaller_ometadata  : metadata_t := metadata_zero;
+  signal iclk_in_demarshaller_ovld       : std_logic := '0';
 
   signal iclk_time_downsampler_imetadata : metadata_t := metadata_zero;
   signal iclk_time_downsampler_irdy      : std_logic := '0';
@@ -65,7 +65,7 @@ architecture rtl of worker is
   signal oclk_out_adapter_ivld      : std_logic := '0';
 
   signal oclk_data   : std_logic_vector(out_out.data'range) := (others => '0');
-  signal oclk_opcode : complex_short_with_metadata_opcode_t := SAMPLES;
+  signal oclk_opcode : cswm_opcode_t := SAMPLES;
 begin
 
   ------------------------------------------------------------------------------
@@ -141,22 +141,22 @@ begin
   ------------------------------------------------------------------------------
 
   iclk_time_downsampler_imetadata.eof <=
-      iclk_in_adapter_ometadata.eof;
+      iclk_in_demarshaller_ometadata.eof;
   iclk_time_downsampler_imetadata.flush <=
-      iclk_in_adapter_ometadata.flush;
+      iclk_in_demarshaller_ometadata.flush;
   iclk_time_downsampler_imetadata.error_samp_drop <=
-      iclk_in_adapter_ometadata.error_samp_drop;
+      iclk_in_demarshaller_ometadata.error_samp_drop;
   iclk_time_downsampler_imetadata.data_vld <=
-      iclk_in_adapter_ometadata.data_vld;
+      iclk_in_demarshaller_ometadata.data_vld;
   iclk_time_downsampler_imetadata.time     <= time_in.seconds &
                                               time_in.fraction;
   iclk_time_downsampler_imetadata.time_vld <= '1' when (time_in.valid = btrue)
                                               and (props_in.bypass = bfalse)
                                               else '0';
   iclk_time_downsampler_imetadata.samp_period <=
-      iclk_in_adapter_ometadata.samp_period;
+      iclk_in_demarshaller_ometadata.samp_period;
   iclk_time_downsampler_imetadata.samp_period_vld <=
-      iclk_in_adapter_ometadata.samp_period_vld;
+      iclk_in_demarshaller_ometadata.samp_period_vld;
 
   time_out.clk <= in_in.clk;
 
@@ -176,28 +176,26 @@ begin
       SYNC      when in_in.opcode = ComplexShortWithMetadata_sync_op_e     else
       SAMPLES;
 
-  in_adapter_32 : if IN_PORT_DATA_WIDTH = 32 generate
-
-    in_adapter : misc_prims.ocpi.cswm_prot_in_adapter_dw32_clkin
-      port map(
-        -- INPUT
-        iclk      => in_in.clk,
-        irst      => in_in.reset,
-        idata     => in_in.data,
-        ivalid    => in_in.valid,
-        iready    => in_in.ready,
-        isom      => in_in.som,
-        ieom      => in_in.eom,
-        iopcode   => iclk_opcode,
-        ieof      => in_in.eof,
-        itake     => in_out.take,
-        -- OUTPUT
-        odata     => iclk_in_adapter_odata,
-        ometadata => iclk_in_adapter_ometadata,
-        ovld      => iclk_in_adapter_ovld,
-        ordy      => iclk_time_downsampler_irdy);
-
-  end generate in_adapter_32;
+  in_demarshaller : misc_prims.prot.cswm_demarshaller
+    generic map(
+      WSI_DATA_WIDTH => to_integer(IN_PORT_DATA_WIDTH))
+    port map(
+      clk       => in_in.clk,
+      rst       => in_in.reset,
+      -- INPUT
+      idata     => in_in.data,
+      ivalid    => in_in.valid,
+      iready    => in_in.ready,
+      isom      => in_in.som,
+      ieom      => in_in.eom,
+      iopcode   => iclk_opcode,
+      ieof      => in_in.eof,
+      itake     => in_out.take,
+      -- OUTPUT
+      odata     => iclk_in_demarshaller_odata,
+      ometadata => iclk_in_demarshaller_ometadata,
+      ovld      => iclk_in_demarshaller_ovld,
+      ordy      => iclk_time_downsampler_irdy);
 
   iclk_time_downsampler_ctrl.bypass                    <= iclk_bypass;
   iclk_time_downsampler_ctrl.min_num_data_per_time     <=
@@ -212,9 +210,9 @@ begin
       rst       => in_in.reset,
       ctrl      => iclk_time_downsampler_ctrl,
       -- INPUT
-      idata     => iclk_in_adapter_odata,
+      idata     => iclk_in_demarshaller_odata,
       imetadata => iclk_time_downsampler_imetadata,
-      ivld      => iclk_in_adapter_ovld,
+      ivld      => iclk_in_demarshaller_ovld,
       irdy      => iclk_time_downsampler_irdy,
       -- OUTPUT
       odata     => iclk_time_downsampler_odata,
@@ -267,31 +265,28 @@ begin
   oclk_data_cdc_odeq <= oclk_out_adapter_irdy and oclk_data_cdc_oempty_n;
   oclk_out_adapter_ivld <= oclk_data_cdc_oempty_n and oclk_out_adapter_irdy;
 
-  out_adapter_32 : if IN_PORT_DATA_WIDTH = 32 generate
-
-    out_adapter : misc_prims.ocpi.cswm_prot_out_adapter_dw32_clkin
-      generic map(
-        OUT_PORT_MBYTEEN_WIDTH => out_out.byte_enable'length)
-      port map(
-        -- INPUT
-        idata        => oclk_data_cdc_oinfo.data,
-        imetadata    => oclk_data_cdc_oinfo.metadata,
-        ivld         => oclk_out_adapter_ivld,
-        irdy         => oclk_out_adapter_irdy,
-        -- OUTPUT
-        oclk         => out_in.clk,
-        orst         => out_in.reset,
-        odata        => oclk_data,
-        ovalid       => out_out.valid,
-        obyte_enable => out_out.byte_enable,
-        ogive        => out_out.give,
-        osom         => out_out.som,
-        oeom         => out_out.eom,
-        oopcode      => oclk_opcode,
-        oeof         => out_out.eof,
-        oready       => out_in.ready);
-
-  end generate out_adapter_32;
+  out_marshaller : misc_prims.prot.cswm_marshaller
+    generic map(
+      WSI_DATA_WIDTH         => to_integer(OUT_PORT_DATA_WIDTH),
+      OUT_PORT_MBYTEEN_WIDTH => out_out.byte_enable'length)
+    port map(
+      clk          => out_in.clk,
+      rst          => out_in.reset,
+      -- INPUT
+      idata        => oclk_data_cdc_oinfo.data,
+      imetadata    => oclk_data_cdc_oinfo.metadata,
+      ivld         => oclk_out_adapter_ivld,
+      irdy         => oclk_out_adapter_irdy,
+      -- OUTPUT
+      odata        => oclk_data,
+      ovalid       => out_out.valid,
+      obyte_enable => out_out.byte_enable,
+      ogive        => out_out.give,
+      osom         => out_out.som,
+      oeom         => out_out.eom,
+      oopcode      => oclk_opcode,
+      oeof         => out_out.eof,
+      oready       => out_in.ready);
 
   -- this only needed to avoid build bug for xsim:
   -- ERROR: [XSIM 43-3316] Signal SIGSEGV received.

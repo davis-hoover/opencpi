@@ -1,5 +1,6 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi; library misc_prims;
+library ocpi;
+library misc_prims; use misc_prims.prot.all;
 
 -- for use w/ port clockdirection='input'
 entity cswm_marshaller is
@@ -8,14 +9,14 @@ entity cswm_marshaller is
                                              -- MUST USE 32 FOR NOW
     OUT_PORT_MBYTEEN_WIDTH : positive);
   port(
+    clk          : in  std_logic;
+    rst          : in  std_logic;
     -- INPUT
     idata        : in  misc_prims.misc_prims.data_complex_t;
     imetadata    : in  misc_prims.misc_prims.metadata_t;
     ivld         : in  std_logic;
     irdy         : out std_logic;
     -- OUTPUT
-    oclk         : in  std_logic;
-    orst         : in  std_logic;
     odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
     ovalid       : out ocpi.types.Bool_t;
     obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
@@ -41,8 +42,9 @@ architecture rtl of cswm_marshaller is
   signal mux_start         : std_logic := '0';
   signal mux_end           : std_logic := '0';
 
-  signal metadata_zeros : std_logic_vector(METADATA_BIT_WIDTH-1 downto 0) :=
-                          (others => '0');
+  signal metadata_zeros : std_logic_vector(
+         misc_prims.misc_prims.METADATA_BIT_WIDTH-1 downto 0) :=
+         (others => '0');
   signal imetadata_r  : misc_prims.misc_prims.metadata_t :=
                        misc_prims.misc_prims.metadata_zero;
 
@@ -72,10 +74,10 @@ begin
 
     in_xfer <= irdy_s and ivld;
 
-    in_xfer_reg : process(oclk)
+    in_xfer_reg : process(clk)
     begin
-      if(rising_edge(oclk)) then
-        if(orst = '1') then
+      if(rising_edge(clk)) then
+        if(rst = '1') then
           in_xfer_r <= '0';
         else
           in_xfer_r <= in_xfer;
@@ -83,13 +85,13 @@ begin
       end if;
     end process in_xfer_reg;
 
-    in_in_pipeline : process(oclk)
+    in_in_pipeline : process(clk)
     begin
-      if(rising_edge(oclk)) then
-        if(orst = '1') then
+      if(rising_edge(clk)) then
+        if(rst = '1') then
           idata_r.i   <= (others => '0');
           idata_r.q   <= (others => '0');
-          imetadata_r <= from_slv(metadata_zeros);
+          imetadata_r <= misc_prims.misc_prims.from_slv(metadata_zeros);
         elsif(in_xfer = '1') then
           idata_r     <= idata;
           imetadata_r <= imetadata;
@@ -97,10 +99,10 @@ begin
       end if;
     end process in_in_pipeline;
 
-    in_out_pipeline : process(oclk)
+    in_out_pipeline : process(clk)
     begin
-      if(rising_edge(oclk)) then
-        if(orst = '1') then
+      if(rising_edge(clk)) then
+        if(rst = '1') then
           irdy_s <= '0';
         else
           if((state = IDLE) and (mux_end = '1')) then
@@ -114,10 +116,10 @@ begin
 
     irdy <= irdy_s;
 
-    regs : process(oclk)
+    regs : process(clk)
     begin
-      if(rising_edge(oclk)) then
-        if(orst = '1') then
+      if(rising_edge(clk)) then
+        if(rst = '1') then
           state_r                <= IDLE;
           force_end_of_samples_r <= '0';
         elsif(oready = '1') then
@@ -132,9 +134,9 @@ begin
     pending_samples_eom_gen_clr <= '1' when (give = '1') and (eom = '1') and
                                    (opcode = SAMPLES) else '0';
 
-    pending_samples_eom_gen : set_clr
-      port map(clk => oclk,
-               rst => orst,
+    pending_samples_eom_gen : misc_prims.misc_prims.set_clr
+      port map(clk => clk,
+               rst => rst,
                set => pending_samples_eom_gen_set,
                clr => pending_samples_eom_gen_clr,
                q   => open,
@@ -308,14 +310,14 @@ begin
 
     oopcode <= opcode;
 
-    message_sizer_rst <= orst or force_end_of_samples;
+    message_sizer_rst <= rst or force_end_of_samples;
     message_sizer_give <= '1' when ((give = '1') and (opcode = SAMPLES)) else '0';
 
     message_sizer : wsi_message_sizer
       generic map(
         SIZE_BIT_WIDTH => SAMPLES_MESSAGE_SIZE_BIT_WIDTH)
       port map(
-        clk                    => oclk,
+        clk                    => clk,
         rst                    => message_sizer_rst,
         give                   => message_sizer_give,
         message_size_num_gives => to_unsigned(4092, 16),

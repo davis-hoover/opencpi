@@ -48,14 +48,14 @@ component cswm_marshaller is
                                              -- MUST USE 32 FOR NOW
     OUT_PORT_MBYTEEN_WIDTH : positive);
   port(
+    clk          : in  std_logic;
+    rst          : in  std_logic;
     -- INPUT
-    idata        : in  data_complex_t;
-    imetadata    : in  metadata_t;
+    idata        : in  misc_prims.misc_prims.data_complex_t;
+    imetadata    : in  misc_prims.misc_prims.metadata_t;
     ivld         : in  std_logic;
     irdy         : out std_logic;
     -- OUTPUT
-    oclk         : in  std_logic;
-    orst         : in  std_logic;
     odata        : out std_logic_vector(31 downto 0);
     ovalid       : out ocpi.types.Bool_t;
     obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
@@ -73,8 +73,8 @@ component cswm_demarshaller is
                                       -- MUST USE 32 FOR NOW
   port(
     clk       : in  std_logic;
+    rst       : in  std_logic;
     -- INPUT
-    irst      : in  std_logic;
     idata     : in  std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
     ivalid    : in  ocpi.types.Bool_t;
     iready    : in  ocpi.types.Bool_t;
@@ -95,14 +95,14 @@ component cswm_marshaller_old is
   generic(
     OUT_PORT_MBYTEEN_WIDTH : positive);
   port(
+    clk          : in  std_logic;
+    rst          : in  std_logic;
     -- INPUT
-    idata        : in  data_complex_t;
-    imetadata    : in  metadata_t;
+    idata        : in  misc_prims.misc_prims.data_complex_t;
+    imetadata    : in  misc_prims.misc_prims.metadata_t;
     ivld         : in  std_logic;
     irdy         : out std_logic;
     -- OUTPUT
-    oclk         : in  std_logic;
-    orst         : in  std_logic;
     odata        : out std_logic_vector(31 downto 0);
     ovalid       : out ocpi.types.Bool_t;
     obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
