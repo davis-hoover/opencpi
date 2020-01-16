@@ -46,6 +46,7 @@
 
 //TODO: These are internal headers which should not be included directly
 //      Anything from them exposed to the ACI should be in Ocpi*Api.h files
+//      https://gitlab.com/opencpi/opencpi/issues/887
 #include "OcpiDriverManager.h"
 #include "OcpiUtilEzxml.h"
 

@@ -21,6 +21,7 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 
 #TODO: These are internal headers which should not be included directly
 #      Anything from them exposed to the ACI should be in Ocpi*Api.h files
+#      https://gitlab.com/opencpi/opencpi/issues/887
 IncludeDirs+=\
 	../../../../runtime/util/driver/include/ \
 	../../../../runtime/util/ezxml/include/ \
