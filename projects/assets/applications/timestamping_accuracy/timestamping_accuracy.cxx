@@ -50,7 +50,7 @@
 #include "OcpiDriverManager.h"
 #include "OcpiUtilEzxml.h"
 
-const char *APP_NAME = "timestamping_accuracy";
+const char *APP_NAME = "ocpi.assets.timestamping_accuracy";
 //Seconds buffer for application timeout
 const int MAX_NUM_TIME_TAGS_TO_COLLECT = 128;
 const int EXTRA_TIME_BUFFER = 5;
