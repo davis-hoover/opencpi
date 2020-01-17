@@ -47,13 +47,13 @@ SourceFiles=$(patsubst %,%.vhd,\
 	adc_maximal_lfsr_data_src \
 	time_downsampler \
 	time_corrector \
-	prot/wsi_message_sizer \
-	prot/iqstream_marshaller \
 	data_narrower \
 	dac_underrun_detector \
 	prot/cswm_demarshaller \
 	prot/cswm_marshaller \
+	prot/iqstream_marshaller \
 	prot/old/cswm_marshaller_old \
+	prot/wsi_message_sizer \
 	level_to_pulse_converter \
 	cdc_fifo_info \
 	set_clr \

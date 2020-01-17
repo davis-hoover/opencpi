@@ -2,7 +2,7 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; library misc_prims;
 
-entity iqstream_prot_out_adapter is
+entity iqstream_marshaller is
   generic(
     WSI_DATA_WIDTH    : positive := 16; -- 16 is default of codegen, but
                                         -- MUST USE 32 FOR NOW
@@ -25,7 +25,7 @@ entity iqstream_prot_out_adapter is
     oeof         : out ocpi.types.Bool_t;
     oready       : in  ocpi.types.Bool_t);
 end entity;
-architecture rtl of iqstream_prot_out_adapter is
+architecture rtl of iqstream_marshaller is
   constant SAMPLES_SEQUENCE_LENGTH        : positive := 2048;
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive :=
       ocpi.util.width_for_max(SAMPLES_SEQUENCE_LENGTH);
