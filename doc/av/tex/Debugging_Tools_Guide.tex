@@ -205,8 +205,8 @@ cd target-zynq
 source /opt/Xilinx/Vivado/2017.1/settings64.sh ; vivado complex_mixer_rv.xpr &
 \end{lstlisting}
 			\textit{Note}: because OpenCPI operates in Vivado's Non-Project Mode, you will need to rerun synthesis
-			in Project Mode using the GUI. Refer to the \textit{Vivado\_Usage} doc for more information. You may want to
-			set the \code{flatten\_hierarchy} option to \code{none} via the GUI as well.
+			in Project Mode using the Vivado GUI. Refer to the \textit{Vivado\_Usage} doc for more information. You may want to
+			set the \code{flatten\_hierarchy} option to \code{none} via the Vivado GUI as well.
 		\item In the Flow Navigator's Synthesis section, select ``Set Up Debug''. Choose the debug settings and nets of your choice. You can drag nets in from the Netlist hierarchy, or the Schematic view:
 			\begin{figure}[H]
 				\centerline{\includegraphics[scale=0.6]			{figures/xilinx_vivado_2017_set_up_debug}}
@@ -217,7 +217,7 @@ source /opt/Xilinx/Vivado/2017.1/settings64.sh ; vivado complex_mixer_rv.xpr &
 				\centerline{\includegraphics[scale=0.6]			{figures/xilinx_vivado_2017_debug_cores_listed}}
 					\caption{Xilinx Vivado 2017.1 Debug Cores Listed}
 			\end{figure}
-		\item Rerun synthesis. Note that you may once again want to set the \code{flatten\_hierarchy} option set to ``none'' via the GUI. Observe the debug cores in the worker's netlist:
+		\item Rerun synthesis. Note that you may once again want to set the \code{flatten\_hierarchy} option set to ``none'' via the Vivado GUI. Observe the debug cores in the worker's netlist:
 			\begin{figure}[H]
 				\centerline{\includegraphics[scale=0.4]			{figures/xilinx_vivado_2017_debug_cores_schematic}}
 					\caption{Xilinx Vivado 2017.1 Debug Cores Schematic}

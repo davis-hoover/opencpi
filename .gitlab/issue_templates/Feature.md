@@ -1,5 +1,6 @@
 ### New feature description
-(Describe why this new feature is needed and what it will add.)
+(Describe why this new feature is needed and what it will add. Be as detailed
+as possible.)
 
 
 ### Intended users
@@ -12,7 +13,7 @@ feature?)
 
 
 ### Define success
-(What does success look like and how can we measure it?)
+(What does the result look like so we know when it has been achieved?)
 
 
 ### Links/references

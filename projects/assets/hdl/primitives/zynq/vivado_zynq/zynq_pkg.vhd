@@ -814,6 +814,10 @@ component processing_system7_v5_5_processing_system7 is
   end component;
 
 component zynq_ps is
+  generic(
+     package_name    : STRING        := "clg484";
+     dq_width        : integer       := 32
+  );
   port(
     ps_in        : in    pl2ps_t;
     ps_out       : out   ps2pl_t;

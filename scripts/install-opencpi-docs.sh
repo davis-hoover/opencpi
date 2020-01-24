@@ -58,7 +58,13 @@ echo documentation using "$SUDO yum install"...
 $SUDO yum install -y $sanity epel-release
 $SUDO yum install -y $sanity ghostscript git libreoffice-headless make \
   python34 python34-jinja2 rubber texlive texlive-appendix texlive-latex \
-  texlive-multirow texlive-placeins texlive-titlesec texlive-xstring
+  texlive-multirow texlive-placeins texlive-titlesec texlive-xstring \
+  https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
 
 echo Packages required to build OpenCPI documentation have been installed.
-echo To build OpenCPI documentation, run '`make doc`'.
+if [ "$1" = "--no-build" ]; then
+  echo To build OpenCPI documentation, run '`make doc`'.
+else
+  echo 'Building documentation using `make doc`'
+  make doc
+fi
