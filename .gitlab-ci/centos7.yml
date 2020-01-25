@@ -13,18 +13,15 @@ build:centos7:
   extends: 
     - .build-opencpi
     - .centos7
-  dependencies:
-    - prereq:centos7
   needs:
-    - prereq:centos7
+    - job: prereq:centos7
+      artifacts: true
 
 test:centos7:
   extends: 
     - .test-opencpi
     - .centos7
-  dependencies: 
-    - prereq:centos7
-    - build:centos7
   needs:
-    - prereq:centos7
+    - job: prereq:centos7
+      artifacts: true
     - build:centos7
