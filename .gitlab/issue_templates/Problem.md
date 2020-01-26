@@ -1,6 +1,6 @@
 ### Summary
 (Describe what the problem is. A problem is similar to a bug, but not as well
-defined.)
+defined, and is usually external to OpenCPI.)
 
 
 ### Context
