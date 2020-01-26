@@ -56,7 +56,7 @@ fi
 echo Installing all the standard packages required to build OpenCPI
 echo documentation using "$SUDO yum install"...
 $SUDO yum install -y $sanity epel-release
-$SUDO yum install -y $sanity ghostscript git libreoffice-headless make \
+$SUDO yum install -y $sanity ghostscript git libreoffice-writer make \
   python34 python34-jinja2 rubber texlive texlive-appendix texlive-latex \
   texlive-multirow texlive-placeins texlive-titlesec texlive-xstring \
   https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
