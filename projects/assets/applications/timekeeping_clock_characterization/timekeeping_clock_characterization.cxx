@@ -35,55 +35,32 @@ const int MAX_EXPECTED_RUN_TIME_USECS=1e6;
 namespace OA = OCPI::API;
 namespace OX = OCPI::Util::EzXml;
 
-int main(int argc, char **argv) {
+int main(/*int argc, char **argv*/) {
 
   int ret = 0;
   std::ostringstream oss;
-  const char *platform, *freq_std_tty, *freq_counter_ip, *gps_freq_ref_ip;
+  const char *container, *freq_std_tty, *freq_counter_ip, *gps_freq_ref_ip;
 
   try {
 
-    if(argc == 1) {
-      std::cout << "INFO: No arguments supplied. Using defaults." << std::endl;
-      std::cout << "INFO: platform: e3xx" << std::endl;
-      platform = "e3xx";
-    } else if(argc != 2) {
-      oss << "wrong number of arguments" << "\n";
-      oss << "Usage is: " << argv[0] << " <platform>\n";
-      throw oss.str();
-    } else {
-      platform = argv[1];
-    }
-
-    //Run nothing application
-    std::string platform_string = "=" + std::string(platform);
-    OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), 
-			 OA::PVString("platform", platform_string.c_str()), 
-			 OA::PVBool("dumpPlatforms", true), OA::PVEnd };
-    OA::Application app("../nothing.xml", pvs);
-
     //Check if system is setup to run test
+    OCPI::Driver::ManagerManager::getManagerManager().configure();
     ezxml_t system_xml = OCPI::Driver::ManagerManager::getManagerManager().getXML();
     ezxml_t applications_xml = ezxml_child(system_xml, "applications");
     ezxml_t application_xml = OX::findChildWithAttr(applications_xml, "application", "name", APP_NAME); 
-    ezxml_t platform_xml, freqstd_xml, freqcounter_xml, gpsfreqref_xml;
+    ezxml_t freqstd_xml, freqcounter_xml, gpsfreqref_xml;
     if(application_xml){
-      ezxml_t platforms_xml = ezxml_child(application_xml, "platforms");
-      platform_xml = OX::findChildWithAttr(platforms_xml, "platform", "name", platform);
-      if(platform_xml){
-	freqstd_xml = ezxml_child(application_xml, "freqstd");
-	freq_std_tty = ezxml_cattr(freqstd_xml, "serialport");
-	freqcounter_xml = ezxml_child(application_xml, "freqcounter");
-	freq_counter_ip = ezxml_cattr(freqcounter_xml, "ipaddr");
-	gpsfreqref_xml = ezxml_child(application_xml, "gpsfreqref");
-	gps_freq_ref_ip = ezxml_cattr(gpsfreqref_xml, "ipaddr");
-      }
+      freqstd_xml = ezxml_child(application_xml, "freqstd");
+      freq_std_tty = ezxml_cattr(freqstd_xml, "serialport");
+      freqcounter_xml = ezxml_child(application_xml, "freqcounter");
+      freq_counter_ip = ezxml_cattr(freqcounter_xml, "ipaddr");
+      gpsfreqref_xml = ezxml_child(application_xml, "gpsfreqref");
+      gps_freq_ref_ip = ezxml_cattr(gpsfreqref_xml, "ipaddr");
     }
 
-    if(!application_xml || !platform_xml || !freq_std_tty || !freq_counter_ip || !gps_freq_ref_ip)
+    if(!application_xml || !freq_std_tty || !freq_counter_ip || !gps_freq_ref_ip)
       std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
     else {
-      //Check as much as you can about the test setup
 
       //10 MHz reference
       std::string cmd = "./53230A_Counter_PPS_Stats.py " + std::string(freq_counter_ip) + " ref_check";
@@ -103,32 +80,43 @@ int main(int argc, char **argv) {
 	oss << "Unexpected GPS receiver status register" << "\n";
 	throw oss.str();
       }
+
+      //Run nothing application for containers listed in system.xml
+      ezxml_t containers_xml = ezxml_child(application_xml, "containers");
+      for (ezxml_t x = OX::ezxml_firstChild(containers_xml); x; x = OX::ezxml_nextChild(x)) {	
+	container = ezxml_cattr(x, "name");
+	std::string container_string = "=" + std::string(container);
+	OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), 
+			     OA::PVString("container", container_string.c_str()), 
+			     OA::PVBool("dumpPlatforms", true), OA::PVEnd };
+	OA::Application app("../nothing.xml", pvs);
       
-      app.initialize();
-      app.start();
-      app.wait(MAX_EXPECTED_RUN_TIME_USECS);
-      app.stop();
-      app.finish();
+	app.initialize();
+	app.start();
+	app.wait(MAX_EXPECTED_RUN_TIME_USECS);
+	app.stop();
+	app.finish();
 
-      //Frequency Error and Allan Variance Measurements
-      cmd = "./53230A_Counter_PPS_Stats.py " + std::string(freq_counter_ip) + " frequency";
-      if(system(cmd.c_str()) != 0){
-	oss << "frequency measurement failure" << "\n";
-	throw oss.str();
-      }
+	//Frequency Error and Allan Variance Measurements
+	cmd = "./53230A_Counter_PPS_Stats.py " + std::string(freq_counter_ip) + " frequency";
+	if(system(cmd.c_str()) != 0){
+	  oss << "frequency measurement failure" << "\n";
+	  throw oss.str();
+	}
 
-      //Jitter Measurements
-      cmd = "./53230A_Counter_PPS_Stats.py " + std::string(freq_counter_ip) + " single_period";
-      if(system(cmd.c_str()) != 0){
-	oss << "jitter measurement failure" << "\n";
-	throw oss.str();
-      }
+	//Jitter Measurements
+	cmd = "./53230A_Counter_PPS_Stats.py " + std::string(freq_counter_ip) + " single_period";
+	if(system(cmd.c_str()) != 0){
+	  oss << "jitter measurement failure" << "\n";
+	  throw oss.str();
+	}
 
-      //Phase Accuracy Measurements
-      cmd = "./53230A_Counter_PPS_Stats.py " + std::string(freq_counter_ip) + " time_interval_2-1";
-      if(system(cmd.c_str()) != 0){
-	oss << "phase accuracy measurement failure" << "\n";
-	throw oss.str();
+	//Phase Accuracy Measurements
+	cmd = "./53230A_Counter_PPS_Stats.py " + std::string(freq_counter_ip) + " time_interval_2-1";
+	if(system(cmd.c_str()) != 0){
+	  oss << "phase accuracy measurement failure" << "\n";
+	  throw oss.str();
+	}
       }
     }
   } catch (std::string &e) {

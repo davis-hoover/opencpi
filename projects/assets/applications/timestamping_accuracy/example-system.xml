@@ -13,18 +13,18 @@
   </transfer>
   <applications>
     <application name='ocpi.assets.timestamping_accuracy'>
-      <platforms>
-	<!-- For future use, multiple platforms on switch -->
-	<platform name='e3xx' position='0'/>
-      </platforms>
+      <!-- List of containers to run on -->
+      <containers>
+	<container name='192.168.1.1:12345/PL:0'/>
+      </containers>
       <freqstd type='srs725' serialport='/dev/ttyUSB1'/>
       <gpsfreqref type='srs740' ipaddr='192.168.1.3'/>
     </application>
     <application name='ocpi.assets.timekeeping_clock_characterization'>
-      <platforms>
-	<!-- For future use, multiple platforms on switch -->
-	<platform name='e3xx' position='0'/>
-      </platforms>
+      <!-- List of containers to run on -->
+      <containers>
+	<container name='192.168.1.1:12345/PL:0'/>
+      </containers>
       <freqstd type='srs725' serialport='/dev/ttyUSB1'/>
       <freqcounter type='53230a' ipaddr='192.168.1.2'/>
       <gpsfreqref type='srs740' ipaddr='192.168.1.3'/>
