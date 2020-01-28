@@ -82,9 +82,9 @@ DataPort(Worker &w, ezxml_t x, int ordinal, const char *&err)
 
 // Our special clone copy constructor
 DataPort::
-DataPort(const DataPort &other, Worker &w , std::string &a_name, size_t count,
+DataPort(const DataPort &other, Worker &w , std::string &a_name, size_t a_count,
 	 OCPI::Util::Assembly::Role *role, const char *&err)
-  : OcpPort(other, w, a_name, count, err),
+  : OcpPort(other, w, a_name, a_count, err),
     OU::Port(other, w, pname(), err) {
   if (err)
     return;

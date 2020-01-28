@@ -708,7 +708,7 @@ emitSignals(FILE *f, Language lang, bool useRecords, bool inPackage, bool inWork
   if (m_type != Container)
     for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       Clock &c = **ci;
-      if (!c.m_port && !c.m_internal) {
+      if (c.m_exported) {
 	if (last.empty())
 	  fprintf(f,
 		  "    %s Clock(s) not associated with one specific port:\n", comment);
@@ -1181,7 +1181,7 @@ emitDefsHDL(bool wrap) {
     // Now we emit the declarations (input, output, width) for each module port
     for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       Clock &c = **ci;
-      if (!c.m_port && !c.m_internal) {
+      if (c.m_exported) {
 	fprintf(f, "  %s      %s;\n", c.m_output ? "output" : "input", c.signal());
 	if (c.m_reset.size())
 	  fprintf(f, "  input      %s;\n", c.reset());
@@ -1616,7 +1616,7 @@ emitVhdlRecordWrapper(FILE *f) {
       if (m_type != Container)
 	for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
 	  Clock *c = *ci;
-	  if (!c->m_port && !c->m_internal) {
+	  if (c->m_exported) {
 	    if (last.empty())
 	      fprintf(f,
 		      "  -- Clock(s) not associated with one specific port:\n");

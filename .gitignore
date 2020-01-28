@@ -1,10 +1,8 @@
-# Lines starting with '#' are considered comments.
-# Ignore (generated) html files,
-#*.html
-# except foo.html which is maintained by hand.
-#!foo.html
+# Google 'gitignore' for info on how to use this file
+
 .tags*
 TAGS
+
 # Ignore objects and archives.
 *.obj
 *.lo
@@ -26,7 +24,8 @@ gen/
 **/driver/modules.order
 /prerequisites
 /prerequisites-build
-# temporary, until we rename targets
+
+# Temporary, until we rename targets
 *.old
 *.bak
 *.hold
@@ -52,5 +51,10 @@ projects/*/project.xml
 projects/*/specs/package-id
 doc/tex/build
 vendor/
-# Output PDFs
-pdfs
+
+# GitLab Pages staging area
+.public/
+
+# JetBrains
+.idea/
+**/.idea/

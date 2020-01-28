@@ -17,6 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 =<platform_dir>/97-matchstiq_z1.rules <target>/udev-rules/
-=<platform_dir>/sd_card/system.xml <target>/
+@<platform_dir>/sd_card/system.xml opencpi/
 @<platform_dir>/sd_card/iveia-atlas-i-z7e.dtb /
 @<platform_dir>/sd_card/u-boot.bin /

@@ -1,56 +1,84 @@
-## [1.6.0-rc.0](https://gitlab.com/opencpi/opencpi/compare/v1.5.0...v1.6.0-rc.0) (2019.11.08)
+# [v1.6.0-rc.1](https://gitlab.com/opencpi/opencpi/compare/v1.6.0-rc.0...v1.6.0-rc.1) (2020-01-11)
+
+### New Features
+- **app,comp**: Builtin Tutorial project. (!92)(db38114a)
+- **comp**: Add Phase to amplitude CORDIC RCC work-a-like. (!83)(42c010ea)
+- **devops**: add xsim to the ci pipeline. (!50)(ed8bbff4)
+- **devops**: Add GitLab Pages static site generator for documentation. (!84)(5748523d)
+- **devops**: Add Dockerfile for docker image used to create pdfs and GitLab Pages. (!84)(5748523d)
+- **devops**: Use custom docker image in CI pipeline to create pdfs and GitLab Pages. (!84)(5748523d)
+- **hdl base**: Add debounce.vhd primitive. (!83)(42c010ea)
+- **hdl base**: Add GPI and GPO device workers. (!83)(42c010ea)
+- **osp**: Support MacOS Catalina (10.15). (!92)(db38114a)
+- **tools**: Add script, `scripts/install-platform.sh`, to install platforms and projects for that platform. (!92)(db38114a)
+
+### Enhancements
+- **comp**: Replace matchstiq_z1_gp_out worker with matchstiq_z1_gp_card "virtual card". (!83)(42c010ea)
+- **runtime**: data and control clocks split throughout the unit test infrastructure. (!82)(f83770a5)
+- **tools**: Simplify installation of AV GUI and reduce user setup after installation. (!92)(db38114a)
+
+### Bug Fixes
+- **app**: Fixes fmcomss_2_3_tx artifact build issue for xilinx13_4. (!64)(f9f2791e)
+- **app**: Removed extra newline from template.py, added license to model core project. (!88)(86448f87)
+- **app,comp**: data_src.hdl: out port ZLM generation failed in some cases. (!73)(a5335922)
+- **comp**: Set data_sink_dac on_off port to correct clock domain. (!60)(8fc9e6fe)
+- **hdl base**: patches a bug in the fixed_float library seen when using older tools. (!67)(4e77a644)
+- **osp**: Fix exporting the zed_ise specific system.xml. (!72)(eaefb073)
+- **tools**: updated inode64.c url. (!65)(e54c92ea)
+- **tools**: Fix make-hw-deploy.sh to put system.xml in correct place. (!71)(b37f8244)
+
+### Documentation
+- **app,comp,runtime**: Add Briefing slides that provide background information about OpenCPI concepts and processes. (!92)(db38114a)
+- **app,comp,runtime**: Add Tutorial documents that allow completion of tutorials using an HDL simulator as well as an E310. (!92)(db38114a)
+- **app,comp,runtime**: Major update to developer guides. (!92)(db38114a)
+- **comp**: Add HDL worker documentation for data_sink_dac.hdl. (!61)(501dab62)
+- **devops**: replace github references with gitlab. (!46)(8079eafb)
+- **devops**: Refactor CHANGELOG.md. (!75)(5efbc78b)
+- **osp**: Update ZedBoard GSG to use new sharing scheme. (!92)(db38114a)
+- **osp**: Update Matchstiq GSG to refer to installation guide. (!92)(db38114a)
+- **runtime,tools**: New User document geared towards OpenCPI users. (!92)(db38114a)
+- **tools**: `scripts/install-opencpi-docs.sh` no longer builds the docs, one must additionally use `make doc`. (!84)(5748523d)
+- **tools**: Major update to installation guide. (!92)(db38114a)
+
+# [v1.6.0-rc.0](https://gitlab.com/opencpi/opencpi/compare/v1.5.0...v1.6.0-rc.0) (2019.11.08)
 
 ### Feature Preview
 - **app**: Timestamping accuracy and characterization. (!27)(499967c3)
-- **worker**: Update ADC worker to work with split clocks. (!18)(634ad0cf)
-- **worker**: Update ADC worker to no longer timestamp. (!18)(634ad0cf)
-- **worker**: Update ADC worker to supply sample clock as an output.
-    (!18)(634ad0cf)
-- **worker**: Add HDL worker for timestamping `ComplextShortWithMetadata`
-    protocol data. Supports control, data, input and output clock domains.
-    (!29)(408dfb16)
-- **worker**: Update DAC worker to work with split clocks. (!30)(bed4736b)
-- **worker**: Update DAC worker to no longer timestamp. (!30)(bed4736b)
-- **worker**: Update DAC worker to support end of data/burst and EOF distinct
-    from underrun. (!30)(bed4736b)
+- **comp**: Update ADC worker to work with split clocks. (!18)(634ad0cf)
+- **comp**: Update ADC worker to no longer timestamp. (!18)(634ad0cf)
+- **comp**: Update ADC worker to supply sample clock as an output. (!18)(634ad0cf)
+- **comp**: Add HDL worker for timestamping `ComplextShortWithMetadata` protocol data. Supports control, data, input and output clock domains. (!29)(408dfb16)
+- **comp**: Update DAC worker to work with split clocks. (!30)(bed4736b)
+- **comp**: Update DAC worker to no longer timestamp. (!30)(bed4736b)
+- **comp**: Update DAC worker to support end of data/burst and EOF distinct from underrun. (!30)(bed4736b)
 
-### Features
-- **ci**: Init CI/CD starting with CentOS 7 software platform. (!5)(696bcc02)
-- **ci**: Utilize docker to test system package installation. (!21)(28805cf9)
-- **ci**: Add CentOS 6 software platform. (!25)(e8b67dc6)
-- **ci**: Add Xilinx 13.3 and 13.4 software platforms. (!41)(146e2693)
-- **prereq**: Add gpsd for all software platforms. (!4)(22842b54)
+### New Features
+- **devops**: Init CI/CD starting with CentOS 7 software platform. (!5)(696bcc02)
+- **devops**: Utilize docker to test system package installation. (!21)(28805cf9)
+- **devops**: Add CentOS 6 software platform. (!25)(e8b67dc6)
+- **devops**: Add Xilinx 13.3 and 13.4 software platforms. (!41)(146e2693)
 - **tests**: Add CDC library primitives tests. (!38)(35b698a8)
-- **tools**: Support remote HW testing, simplfying hardware in the loop
-    testing. (!36, !34)(579e96fc)
+- **tools**: Add gpsd for all software platforms. (!4)(22842b54)
+- **tools**: Support remote HW testing, simplfying hardware in the loop testing. (!36, !34)(579e96fc)
 
 ### Enhancements
-- **framework**: Support Zynq FPGA loading on linux kernels from 2013 to 2019,
-    including non-Xilinx kernels. (!14)(c0c402dc)
-- **framework**: Standardize on python3.4. (!33)(e2e1eddb)
-- **framework**: Time service initializes time-of-day from gpsd. Falls back to
-    system time-of-day if gpsd not available. (!40)(9a2a670f)
-- **platform**: Xilinx/zynq script updates to better support lots of xilinx
-    software versions, including 2019.1. (!6)(fcf33e2a)
-- **prereq**: Remove gdb prereq for Xilinx13. (!44)(aea49736)
-- **worker**: HDL time service worker provides "time is good" signal.
-    (!9)(3aebfece)
-- **worker**: HDL time service worker uses booleans instead of bit fields for
-    control and status registers. (!9)(3aebfece)
-- **worker**: `time_server.hdl` syncs with framework time service when
-    initializing. (!40)(9a2a670f)
-- **tests**: Relax skew constraint for `TestOcpiOsTimer` to reduce false
-    failures when executing in a VM. (!17) (3696eb69)
+- **comp**: HDL time service worker provides "time is good" signal. (!9)(3aebfece)
+- **comp**: HDL time service worker uses booleans instead of bit fields for control and status registers. (!9)(3aebfece)
+- **comp**: `time_server.hdl` syncs with framework time service when initializing. (!40)(9a2a670f)
+- **runtime**: Support Zynq FPGA loading on linux kernels from 2013 to 2019, including non-Xilinx kernels. (!14)(c0c402dc)
+- **runtime**: Standardize on python3.4. (!33)(e2e1eddb)
+- **runtime**: Time service initializes time-of-day from gpsd. Falls back to system time-of-day if gpsd not available. (!40)(9a2a670f)
+- **tests**: Relax skew constraint for `TestOcpiOsTimer` to reduce false failures when executing in a VM. (!17) (3696eb69)
+- **tools**: Xilinx/zynq script updates to better support lots of xilinx software versions, including 2019.1. (!6)(fcf33e2a)
+- **tools**: Remove gdb prereq for Xilinx13. (!44)(aea49736)
 
 ### Bug Fixes
-- **build**: Fix make error if `/opt/Xilinx` does not exist. (!11)(155c809c)
-- **build**: Error cross building `opencpi.ko` for Xilinx13 on CentOS6. (!35)(19d8f474)
-- **prereq**: Prevent rare git issue when cloning repos that contain CRLF.
-    (!11)(155c809c)
-- **prereq**: Use tarball for _rsync_ instead of git repo. (!32)(ab3864a5)
-- **prereq**: Update _inode64_ url to a working location. (!34)(b2ca33ac)
-- **tests**: Do not page help output. Tests desinged to fail were stalling the
-    pipeline. (!11)(155c809c)
+- **tests**: Do not page help output. Tests desinged to fail were stalling the pipeline. (!11)(155c809c)
+- **tools**: Fix make error if `/opt/Xilinx` does not exist. (!11)(155c809c)
+- **tools**: Prevent rare git issue when cloning repos that contain CRLF. (!11)(155c809c)
+- **tools**: Use tarball for _rsync_ instead of git repo. (!32)(ab3864a5)
+- **tools**: Update _inode64_ url to a working location. (!34)(b2ca33ac)
+- **tools**: Error cross building `opencpi.ko` for Xilinx13 on CentOS6. (!35)(19d8f474)
 
 ### Documentation
-- **Worker**: Update ADC device worker to reflect enhancements. (!42)(c53385d3)
+- **comp**: Update ADC device worker to reflect enhancements. (!42)(c53385d3)

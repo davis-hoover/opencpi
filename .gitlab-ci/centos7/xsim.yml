@@ -1,0 +1,207 @@
+####################
+# Jobs - Build-hdl #
+####################
+build-hdl-core:centos7:xsim:
+  extends: 
+    - .build-hdl-core
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+
+build-hdl-assets:centos7:xsim:
+  extends: 
+    - .build-hdl-assets
+    - .centos7
+    - .xsim
+  needs:
+    - job: prereq:centos7 
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+
+build-hdl-assets_ts:centos7:xsim:
+  extends: 
+    - .build-hdl-assets_ts
+    - .centos7
+    - .xsim
+  needs:
+    - job: prereq:centos7
+      artifacts: true 
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+
+build-hdl-inactive:centos7:xsim:
+  extends: 
+    - .build-hdl-inactive
+    - .centos7
+    - .xsim
+  needs:
+    - job: prereq:centos7
+      artifacts: true 
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+
+
+#####################
+# Jobs - Build-Test #
+#####################
+build-test-core:centos7:xsim:
+  extends:
+    - .build-test-core
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+
+build-test-assets-base:centos7:xsim:
+  extends:
+    - .build-test-assets-base
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+
+build-test-assets-comms:centos7:xsim:
+  extends:
+    - .build-test-assets-comms
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+
+build-test-assets-dsp:centos7:xsim:
+  extends:
+    - .build-test-assets-dsp
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+
+build-test-assets-misc:centos7:xsim:
+  extends:
+    - .build-test-assets-misc
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+
+build-test-assets-util:centos7:xsim:
+  extends:
+    - .build-test-assets-util
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+
+build-test-assets_ts:centos7:xsim:
+  extends:
+    - .build-test-assets_ts
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+    - build-hdl-assets_ts:centos7:xsim
+
+build-test-inactive:centos7:xsim:
+  extends:
+    - .build-test-inactive
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim
+    - build-hdl-assets:centos7:xsim
+    - build-hdl-inactive:centos7:xsim
+
+
+###############
+# Jobs - Test #
+###############
+test-core:centos7:xsim:
+  extends: 
+    - .test-core
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7  
+    - build-hdl-core:centos7:xsim
+    - build-test-core:centos7:xsim
+
+test-assets:centos7:xsim:
+  extends: 
+    - .test-assets
+    - .centos7
+    - .xsim
+  needs:
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim  
+    - build-hdl-assets:centos7:xsim
+    - build-test-assets-base:centos7:xsim
+    - build-test-assets-comms:centos7:xsim
+    - build-test-assets-dsp:centos7:xsim
+    - build-test-assets-misc:centos7:xsim
+    - build-test-assets-util:centos7:xsim
+
+test-assets_ts:centos7:xsim:
+  extends: 
+    - .test-assets_ts
+    - .centos7
+    - .xsim
+  needs:
+    - job: prereq:centos7
+      artifacts: true 
+    - build:centos7
+    - build-hdl-core:centos7:xsim  
+    - build-hdl-assets_ts:centos7:xsim
+    - build-test-assets_ts:centos7:xsim
+
+test-inactive:centos7:xsim:
+  extends: 
+    - .test-inactive
+    - .centos7
+    - .xsim
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-hdl-core:centos7:xsim  
+    - build-hdl-inactive:centos7:xsim
+    - build-test-inactive:centos7:xsim

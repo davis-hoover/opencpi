@@ -39,6 +39,7 @@ import os.path
 import opencpi.colors as color
 import numpy as np
 
+np.set_printoptions(threshold=sys.maxsize)
 
 if len(sys.argv) != 3:
     print("Invalid arguments:  usage is: verify.py <output-file> <input-file>")
@@ -116,7 +117,7 @@ if (enable == "true"): # => NORMAL MODE
     # Check that the difference between the calculated and expected frequencies is greater
     # than the max possible difference (max_delta).
     if (calc_delta > max_delta):
-        print ("\tExpected:Max:Delta ", expected_freq, measured_freq, calc_delta, max_delta)
+        print ("\tExpected freq: ", expected_freq," Measured freq: ", measured_freq, " calc delta ", calc_delta, " max delta ", max_delta)
         sys.exit(1)
     print ("\tResults (Normal Mode): Max freq is within the expected range")
 

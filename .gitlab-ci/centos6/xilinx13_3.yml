@@ -1,0 +1,16 @@
+prereq:centos6:xilinx13_3:
+  extends: 
+    - .install-prereqs
+    - .centos6
+    - .xilinx13_3
+
+build-rcc:centos6:xilinx13_3:
+  extends: 
+    - .build-rcc
+    - .centos6
+    - .xilinx13_3
+  needs:
+    - job: prereq:centos6
+      artifacts: true
+    - build:centos6
+    - prereq:centos6:xilinx13_3
