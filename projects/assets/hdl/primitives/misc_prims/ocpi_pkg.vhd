@@ -27,7 +27,7 @@ library misc_prims; use misc_prims.misc_prims.all;
 package ocpi is
 
 type complex_short_with_metadata_opcode_t is (
-  SAMPLES, TIME_TIME, INTERVAL, FLUSH, SYNC, END_OF_SAMPLES, USER);
+  SAMPLES, TIME_TIME, INTERVAL, FLUSH, SYNC, END_OF_SAMPLES);
 
 component wsi_message_sizer is
   generic(
