@@ -111,7 +111,7 @@ PKGS_S+=(screen)
 python3_ver=python34
 PKGS_E+=(${python3_ver} ${python3_ver}-jinja2)
 #    for various testing scripts
-PKGS_E+=(${python3_ver}-numpy)
+PKGS_E+=(${python3_ver}-numpy ${python3_ver}-pip)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd)
 #    for bash completion - a noarch package  (AV-2398)

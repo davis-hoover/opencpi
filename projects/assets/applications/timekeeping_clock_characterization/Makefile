@@ -32,5 +32,3 @@ IncludeDirs+=\
 	../../../../os/interfaces/include/
 
 include $(OCPI_CDK_DIR)/include/application.mk
-
-
