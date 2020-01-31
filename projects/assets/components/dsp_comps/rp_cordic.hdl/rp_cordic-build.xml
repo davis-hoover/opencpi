@@ -4,4 +4,9 @@
     <parameter name='DATA_EXT' value='6'/>
     <parameter name='STAGES' value='16'/>
   </configuration>
+  <configuration id='1'>
+    <parameter name='DATA_WIDTH' value='16'/>
+    <parameter name='DATA_EXT' value='6'/>
+    <parameter name='STAGES' value='5'/>
+  </configuration>
 </build>
