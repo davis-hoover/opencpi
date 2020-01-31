@@ -26,6 +26,8 @@ if len(sys.argv) != 4:
     print("Invalid arguments:  usage is: verify.py <message-size-words> <output-file> <input-file>")
     sys.exit(1)
 
+FIFO_DEPTH_p = int(os.environ.get("OCPI_TEST_FIFO_DEPTH_p"))
+
 #Open input file and grab samples as int32
 IFILENAME = open(sys.argv[3], 'rb')
 idata = np.fromfile(IFILENAME, dtype=np.uint32, count=-1)
@@ -55,7 +57,7 @@ if(oneshot=="false"): # => NORMAL MODE
         print "    PASS: Input and output file match"
 else: # => ONESHOT MODE
     #Test that odata file length is the expected amount
-    if len(odata) != min(len(idata),8192):
+    if len(odata) != min(len(idata),FIFO_DEPTH_p):
         print "    FAILED: Output file length is unexpected"
         print 'Length =', len(odata), 'while expected length is =', len(idata)
         sys.exit(1)
@@ -63,7 +65,7 @@ else: # => ONESHOT MODE
         print "    PASS: Output file length = min(input file length,8192)"
     #Test that odata file is same as idata file (up to 8192 samples)
     fail=0
-    for idx in range(0,min(len(idata),8192)):
+    for idx in range(0,min(len(idata),FIFO_DEPTH_p)):
         if odata[idx] != idata[idx]:
             print "    FAILED: Input and output file do not match"
             fail=1
