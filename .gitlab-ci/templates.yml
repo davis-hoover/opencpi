@@ -220,6 +220,6 @@
 .standard-artifacts:
   artifacts:
     when: on_success
-    expire_in: '5h'
+    expire_in: '24h'
     paths: 
       - artifacts-$CI_JOB_ID.tar
