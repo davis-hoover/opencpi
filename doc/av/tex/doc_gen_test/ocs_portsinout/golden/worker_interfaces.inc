@@ -3,8 +3,5 @@
 % editing this file is NOT recommended
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Component Properties}
-
-
-This component has no properties.
-
+\section*{Worker Interfaces}
+\input{owd_datawidth32_ocsportsinout.hdl_interfaces.inc}

@@ -54,7 +54,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1}} % To do notes
 \newcommand{\code}[1]{\texttt{#1}} % For inline code snippet or command line
 %----------------------------------------------------------------------------------------
-% Various pacakges
+% Various packages
 %----------------------------------------------------------------------------------------
 \usepackage{hyperref} % for linking urls and lists
 \usepackage{graphicx} % for including pictures by file
@@ -78,7 +78,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Block Diagram / FSM Drawings
 %----------------------------------------------------------------------------------------
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows,fit,positioning}
+\usetikzlibrary{shapes,arrows,decorations.markings,backgrounds,fit,positioning}
 \usetikzlibrary{automata} % used for the fsm
 %----------------------------------------------------------------------------------------
 % Colors Used
@@ -94,20 +94,14 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Component Data Sheet}
-\def\docVersion{1.4}
+\def\docVersion{\color{red}develop}
 %----------------------------------------------------------------------------------------
 \date{Version \docVersion} % Force date to be blank and override date with version
 \title{\docTitle}
 \lhead{\small{\docTitle}}
 
-\def\comp{temp}
-% do not delete this line, it is used by the auto gen script to insert latex code
 \def\comp{data\_src}
-%GEN_COMPLC_NAME
-\def\Comp{TEMP}
-% do not delete this line, it is used by the auto gen script to insert latex code
-\def\Comp{Data\ Src }
-%GEN_COMPUC_NAME
+\def\Comp{Data Src}
 \graphicspath{ {figures/} }
 
 \begin{document}

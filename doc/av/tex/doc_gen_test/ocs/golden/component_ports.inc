@@ -4,7 +4,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{Component Ports}
-
-
-This component has no ports.
+The component has no ports.
 

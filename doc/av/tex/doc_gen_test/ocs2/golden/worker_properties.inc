@@ -3,5 +3,5 @@
 % editing this file is NOT recommended
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
+\section*{Worker Properties}
+\input{owd.rcc_properties.inc}

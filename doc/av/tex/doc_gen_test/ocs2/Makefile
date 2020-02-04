@@ -22,19 +22,8 @@ all: ocs2.pdf
 clean:
 	rm -rf *.tex *.inc *.pdf *.aux *.log *.out
 
-ocs2.tex: ocs2.xml
-	../../docGen.py $<
+ocs2.tex: ocs2.xml owd.xml
+	../../docGen.py ocs2.xml -owd owd.xml
 
-developer_doc.inc: ocs2.tex
-component_spec_properties.inc: ocs2.tex
-component_ports.inc: ocs2.tex
-
-worker_properties.inc: owd.xml ocs2.tex
-	rm -rf worker_properties.inc
-	rm -rf worker_interfaces.inc
-	../../docGen.py $<
-
-worker_interfaces.inc: worker_properties.inc
-
-ocs2.pdf: ocs2.tex developer_doc.inc component_spec_properties.inc component_ports.inc worker_properties.inc worker_interfaces.inc
+ocs2.pdf: ocs2.tex
 	rubber -d $<
