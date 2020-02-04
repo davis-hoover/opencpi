@@ -24,6 +24,25 @@
   \hline
 \end{longtable}
 
+\begin{center}
+\textit{\textbf{Revision History}}
+  \begin{table}[H]
+  \label{table:revisions} % Add "[H]" to force placement of table
+    \begin{longtable}{|p{\dimexpr0.15\textwidth-2\tabcolsep\relax}
+                      |p{\dimexpr0.75\textwidth-2\tabcolsep\relax}
+                      |p{\dimexpr0.1\textwidth-2\tabcolsep\relax}|}
+    \hline
+    \rowcolor{blue}
+    \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+      \hline
+      v1.6 & Released initial technology preview & \\
+      \hline
+      v1.7 & Updated port/property/interface tables for accuracy & \\
+      \hline
+    \end{longtable}
+  \end{table}
+\end{center}
+
 \section*{Functionality}
 The \comp \ component provides the property and port definitions necessary for the data\_src\_adc.hdl worker which performs all the generic functionality required to ingest Analog-to-Digital Converter (ADC) data onto an FPGA.
 

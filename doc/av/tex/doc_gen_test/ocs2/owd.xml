@@ -8,4 +8,10 @@
        to "inherit" volatile from OCS -->
   <SpecProperty name='prop_volatile' writable='true' readsync='true'/>
 
+  <Property name='owd_prop_bool_volatile' type='bool' volatile='true'/>
+  <Property name='owd_prop_bool_array_writable' type='bool' arraylength='5' default='1,0,1,0,1' writable='true'/>
+  <Property name='owd_prop_parameter_5' type='uchar' parameter='true' default='5'/>
+  <Property name='owd_prop_bool_array_writable_array_length_parameter' type='bool' arraylength='owd_prop_parameter_5' default='1,0,1,0,1' writable='true'/>
+  <Property name='owd_prop_bool_array_writable_array_length_parameter_default_hex' type='bool' arraylength='owd_prop_parameter_5' default='0x5a' writable='true'/>
+
 </RccWorker>

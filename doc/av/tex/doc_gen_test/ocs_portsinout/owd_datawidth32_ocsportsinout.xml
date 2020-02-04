@@ -1,4 +1,12 @@
-<HdlWorker datawidth='123455'>
+<HdlWorker datawidth='123455' version='2'>
   <StreamInterface name='in'/>
   <StreamInterface name='out'/>
+  <StreamInterface name='in1' clockdirection='in'/>
+  <StreamInterface name='out1' clock='in1'/>
+  <StreamInterface name='in2' clockdirection='out'/>
+  <StreamInterface name='out2' clock='in1'/>
+  <StreamInterface name='in3' clock='out3'/>
+  <StreamInterface name='out3' clockdirection='in' workereof='true'/>
+  <StreamInterface name='in4' clock='out4'/>
+  <StreamInterface name='out4' clockdirection='out' inserteom='true'/>
 </HdlWorker>

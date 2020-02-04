@@ -43,6 +43,8 @@
 		\hline
 		v1.5 & Convert Worker to Version 2 HDL API & 4/2019\\
 		\hline
+    v1.7 & Updated port/property/interface tables for accuracy & \\
+    \hline
 		\end{tabularx}
 	\end{table}
 \end{center}

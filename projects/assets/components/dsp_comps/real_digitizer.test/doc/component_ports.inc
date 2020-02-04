@@ -20,6 +20,7 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
+
 \section*{Component Ports}
 \begin{scriptsize}
 \begin{longtable}{|p{\dimexpr0.3\linewidth-2\tabcolsep\relax}
@@ -28,12 +29,15 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
                   |p{\dimexpr0.3\linewidth-2\tabcolsep\relax}|}
 \hline
 \rowcolor{blue}
-Name & Producer & Protocol & Optional 
+Name & Producer & Protocol & Optional
 \\
 \hline
-in & false & rstream\_protocol.xml& False\\
+in & False & rstream\_protocol.xml & False\\
+
 \hline
-out & true & rstream\_protocol.xml& False\\
+out & True & rstream\_protocol.xml & False\\
+
 \hline
 \end{longtable}
 \end{scriptsize}
+
