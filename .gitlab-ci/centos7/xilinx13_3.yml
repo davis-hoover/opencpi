@@ -9,11 +9,8 @@ build-rcc:centos7:xilinx13_3:
     - .build-rcc
     - .centos7
     - .xilinx13_3
-  dependencies:
-    - prereq:centos7
-    - build:centos7
-    - prereq:centos7:xilinx13_3
   needs:
-    - prereq:centos7
+    - job: prereq:centos7
+      artifacts: true
     - build:centos7
     - prereq:centos7:xilinx13_3

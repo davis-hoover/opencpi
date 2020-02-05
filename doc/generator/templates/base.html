@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8"/>
     <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet"/>
     <style>
-        a {text-decoration-line: none;}
-        body {font-family: 'Roboto', sans-serif; }
+        a {text-decoration-line:none;}
+        body {
+          font-family: 'Roboto', sans-serif;
+          max-width: 1200px;
+          padding: 0 8px;
+        }
+        .main-section {padding-bottom:16px;}
+        .flexbox-container {display:flex;}
+        @media screen and (max-width: 900px) {
+          .flexbox-container {flex-direction:column;}
+        }
+        .flexbox-item {margin-right:3em;}
     </style>
 </head>
 <body>{% block content %}{% endblock %}</body>

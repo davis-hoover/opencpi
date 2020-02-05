@@ -31,6 +31,10 @@ library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisio
 library zynq; use zynq.zynq_pkg.all;
 library axi; use axi.axi_pkg.all;
 entity zynq_ps is
+  generic (
+        package_name    : STRING        := "clg484";
+        dq_width        : integer       := 32
+  );
   port(
     ps_in        : in    pl2ps_t;
     ps_out       : out   ps2pl_t;
@@ -62,11 +66,11 @@ begin
       C_USE_DEFAULT_ACP_USER_VAL => 0,
       C_S_AXI_ACP_ARUSER_VAL => 31,
       C_S_AXI_ACP_AWUSER_VAL => 31,
-      C_DQ_WIDTH => 32,
-      C_DQS_WIDTH => 4,
-      C_DM_WIDTH => 4,
+      C_DQ_WIDTH => dq_width,
+      C_DQS_WIDTH => dq_width/8,
+      C_DM_WIDTH => dq_width/8,
       C_MIO_PRIMITIVE => 54,
-      C_PACKAGE_NAME => "clg484",
+      C_PACKAGE_NAME => package_name,
       C_PS7_SI_REV => "PRODUCTION",
       C_M_AXI_GP0_ID_WIDTH => 12,
       C_M_AXI_GP0_ENABLE_STATIC_REMAP => 0,

@@ -32,6 +32,8 @@ architecture rtl of signal_time_tagger_worker is
   signal ctl2time_reset           : std_logic;
   signal time_is_operating        : std_logic;
   signal signal_to_time_tag_redge : std_logic;
+  signal time_64bit               : ulonglong_t;
+  signal time_64bit_corrected     : ulonglong_t;
 begin
 
   ctl2time_rst : component cdc.cdc.reset
@@ -55,18 +57,19 @@ begin
               rising_pulse  => signal_to_time_tag_redge,
               falling_pulse => open);
 
+  time_64bit           <= time_in.seconds & time_in.fraction;
+  time_64bit_corrected <= ulonglong_t(signed(time_64bit) - props_in.calibration_value);
+  
   process(time_in.clk)
   begin
     if rising_edge(time_in.clk) then
       if its(ctl2time_reset) then
         time_tag_cnt <= (others => '0');
-        props_out.collected_time_tags_sec <= (others => (others => '0'));
-        props_out.collected_time_tags_frac <= (others => (others => '0'));
+        props_out.collected_time_tags <= (others => (others => '0'));
       elsif its(time_is_operating) then
         if its(signal_to_time_tag_redge) and time_tag_cnt < props_in.num_time_tags_to_collect then
           time_tag_cnt <= time_tag_cnt + 1;
-          props_out.collected_time_tags_sec(to_integer(time_tag_cnt)) <= time_in.seconds;
-          props_out.collected_time_tags_frac(to_integer(time_tag_cnt)) <= time_in.fraction;
+          props_out.collected_time_tags(to_integer(time_tag_cnt)) <= time_64bit_corrected;
         end if;
       end if;
     end if;

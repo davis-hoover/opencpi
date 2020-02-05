@@ -13,18 +13,15 @@ build:centos6:
   extends: 
     - .build-opencpi
     - .centos6
-  dependencies:
-    - prereq:centos6
   needs:
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
 
 test:centos6:
   extends: 
     - .test-opencpi
     - .centos6
-  dependencies: 
-    - prereq:centos6
-    - build:centos6
   needs:
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6

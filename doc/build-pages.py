@@ -61,13 +61,25 @@ def main():
     if "v1.3.0" in git_tags:
         git_tags.remove("v1.3.0")
 
+    # Get list of branches
+    git_branches = [x.replace("*", "").strip() for x in subprocess.check_output(
+        ["git", "branch", "--no-color"]
+    ).decode().strip("\n").split("\n")]
+
+    # Resolve HEAD because it doesn't work with all git commands
+    for i in range(len(args.releases)):
+        if args.releases[i] == "HEAD":
+            args.releases[i] = subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+            ).decode().strip('\n')
+
     if args.all:
         releases = sorted(git_tags)
         latest_release = releases[-1]
         releases.append("develop")
     else:
         for release in args.releases:
-            if release not in git_tags and release != "develop":
+            if release not in git_tags and release not in git_branches:
                 logging.critical("Release '{}' is not a valid git tag. Exiting...".format(release))
                 exit(1)
         releases = args.releases
@@ -96,6 +108,7 @@ def build(tag: str):
     dst_dir = Path(args.outputdir, tag, "docs").absolute()
     if dst_dir.exists():
         if dst_dir.parent.name in args.clean:
+            logging.info("Removing {}".format(dst_dir))
             shutil.rmtree(dst_dir.as_posix())
         else:
             logging.info("  Not building PDFs... '{}' exists".format(dst_dir.as_posix()))
@@ -124,7 +137,7 @@ def build(tag: str):
         copy_pdfs(tmprepo, dst_dir)
 
         # No RPM support for 1.6.0
-        if tag.startswith("v1.6.0") or tag == "develop":
+        if tag.startswith("v1.6.0"):
             rpm_guide = find_file(dst_dir, "RPM_Installation_Guide.pdf")
             if rpm_guide is not None:
                 os.remove(rpm_guide.as_posix())
@@ -216,9 +229,37 @@ def gen_release_index(tag: str, is_latest=False):
         return
     logging.info("Generating {}/index.html".format(release_dir))
 
-    old_main_section = jinja_env.get_template("old-main-documentation.html")
-    main_section = jinja_env.get_template("main-documentation.html")
-    project_section = jinja_env.get_template("project-section.html")
+    def _fix_file_name(file_name: str):
+        """Cleans up file names until they can be renamed"""
+        fname = file_name.lower()
+        if fname == "opencpi installation":
+            return file_name + " Guide"
+        elif fname == "opencpi user":
+            return file_name + " Guide"
+        elif fname == "opencpi application development":
+            return file_name + " Guide"
+        elif fname == "opencpi component development":
+            return file_name + " Guide"
+        elif fname == "opencpi rcc development":
+            return file_name + " Guide"
+        elif fname == "opencpi hdl development":
+            return file_name + " Guide"
+        elif fname == "opencpi platform development":
+            return file_name + " Guide"
+        elif fname == "ide user guide":
+            return "AV GUI User Guide"
+        elif fname.startswith("briefing"):
+            chunks = fname.split()
+            chunks[1] = "{:02d}".format(int(chunks[1]))
+            return " ".join(chunks)
+        elif fname.startswith("tutorial"):
+            chunks = fname.split()
+            if chunks[1].endswith("hw"):
+                chunks[1] = "{:02d}hw".format(int(chunks[1][:-2]))
+            else:
+                chunks[1] = "{:02d}".format(int(chunks[1]))
+            return " ".join(chunks)
+        return file_name
 
     # Generate dictionary of pdf links organized based on filesystem layout
     # Links are built relative to release_dir
@@ -234,36 +275,47 @@ def gen_release_index(tag: str, is_latest=False):
             section_title = section_name.replace("_", " ").title()
             if section_title == "Assets Ts":
                 section_title = "Assets TS"
-            section_title += " Project Documentation"
+            if section_title not in ["Tutorials", "Briefings"]:
+                section_title += " Project Documentation"
 
         file_links = {}
         for f in files:
             if f.endswith(".pdf"):
                 url = "{}/{}".format(base_url, f)
                 name = f[:-4]  # remove '.pdf'
-                file_links[name.lower()] = UrlLink(name=name.replace("_", " "), url=url)
+                if name.startswith("Briefing") or name.startswith("Tutorial"):
+                    file_links[_fix_file_name(name.replace("_", " ")).lower()] = UrlLink(
+                        name=name.replace("_", " "), url=url)
+                else:
+                    file_links[name.lower()] = UrlLink(name=_fix_file_name(name.replace("_", " ")), url=url)
         section_data[section_name] = SectionData(name=section_name, title=section_title, files=file_links)
 
     # Render each section
+    old_main_section = jinja_env.get_template("old-main-documentation.html")
+    main_section = jinja_env.get_template("main-documentation.html")
+    project_section = jinja_env.get_template("project-section.html")
     rendered_sections = {}
     for data in section_data.values():
-        if data.name == "main":
-            if tag in ["OpenCPI-1.0", "OpenCPI-2015.Q1.rc0"]:
-                rendered_sections[data.name] = old_main_section.render(section_title=data.title, links=data.files)
-            else:
-                # Main section needs some files from assets
-                assets_links = section_data.get("assets")
-                if assets_links is not None:
-                    assets_links = assets_links.files
-                rendered_sections[data.name] = main_section.render(section_title=data.title, links=data.files,
-                                                                   assets_links=assets_links)
-        else:
+        if data.name != "main":
             rendered_sections[data.name] = project_section.render(section_title=data.title, links=data.files)
+
+    # Render main last as it needs data from other sections
+    data = section_data["main"]
+    if tag in ["OpenCPI-1.0", "OpenCPI-2015.Q1.rc0"]:
+        rendered_sections[data.name] = old_main_section.render(section_title=data.title, links=data.files)
+    else:
+        # Main section needs some files from assets, briefings, and tutorials
+        assets = section_data.get("assets")
+        tutorials = section_data.get("tutorials")
+        briefings = section_data.get("briefings")
+        rendered_sections[data.name] = main_section.render(section_title=data.title, links=data.files,
+                                                           assets=assets, tutorials=tutorials,
+                                                           briefings=briefings)
 
     # Stitch it all together
     template = jinja_env.get_template("release.index.html")
     index = template.render(title=tag, sections=rendered_sections, is_latest=is_latest,
-                            releases_all_url="https://opencpi.gitlab.io/releases/all/")
+                            releases_all_url="../../releases/all/")
     with open(Path(release_dir, "index.html").as_posix(), "w") as fd:
         fd.write(index)
 
@@ -323,16 +375,17 @@ if __name__ == "__main__":
                                                 "serving files for a particular site.\n"
                                                 "OUTPUTDIR must be based off WEBROOT.\n"
                                                 "Default: {}".format(default_webroot))
-    parser.add_argument("--all", action="store_true", help="Build docs for all releases")
+    parser.add_argument("--all", action="store_true", help="Build docs for all releases + develop")
     parser.add_argument("--clean-all", action="store_true", help="Remove OUTPUTDIR before generating pdfs")
     # parser.add_argument("--parallel", action="store_true", help="builds docs for each release in parallel")
-    parser.add_argument("releases", nargs="*", help="Releases to build (must be a valid git tag or 'develop')")
+    parser.add_argument("releases", nargs="*", help="Release(s) to build. Must be a valid git tag, branch, or 'HEAD'")
     parser.epilog = ("Examples:\n"
                      "  {prog} --all                  Build all releases + develop\n"
                      "  {prog} --all --clean-all      Clean and build all + develop\n"
                      "  {prog} --all --clean develop  Same as --all, but only clean develop\n"
                      "  {prog} --clean develop        Clean and build develop\n"
-                     "  {prog} develop                Build develop").format(prog=parser.prog)
+                     "  {prog} develop                Build develop\n"
+                     "  {prog} HEAD                   Build checked out branch").format(prog=parser.prog)
     args = parser.parse_args()
 
     # Setup logging

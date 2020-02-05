@@ -200,15 +200,17 @@ tex_kernel() {
 ###
 generate_pdfs() {
     shopt -s nullglob
-
-    [ -z "$1" ] && echo "${BOLD}Building PDFs from '${REPO_PATH}' with results in '${OUTPUT_PATH}'${RESET}"
+    local search_path="$1"
 
     # TODO: remove core/assets and have it just walk projects/ skipping osps and inactive
-    if [ -z "$1" ]; then
+    if [ -z "$search_path" ]; then
+        echo "${BOLD}Building PDFs from '${REPO_PATH}' with results in '${OUTPUT_PATH}'${RESET}"
         dirs_to_search=()
+        dirs_to_search+=("${REPO_PATH}/doc/briefings")
         dirs_to_search+=("${REPO_PATH}/doc/av/tex")
-        dirs_to_search+=("${REPO_PATH}/doc/tex")
         dirs_to_search+=("${REPO_PATH}/doc/odt")
+        dirs_to_search+=("${REPO_PATH}/doc/tex")
+        dirs_to_search+=("${REPO_PATH}/doc/tutorials")
         dirs_to_search+=($(find ${REPO_PATH}/projects/assets -type d \( -name doc -o -name docs \)))
         dirs_to_search+=($(find ${REPO_PATH}/projects/assets_ts -type d \( -name doc -o -name docs \)))
         dirs_to_search+=($(find ${REPO_PATH}/projects/core -type d -name doc))
@@ -218,7 +220,7 @@ generate_pdfs() {
         done
     else # given directories to search
         dirs_to_search=()
-        tmp_array=($1)
+        tmp_array=($search_path)
         for dir in ${tmp_array[@]}; do
             if [ -e "$dir" ]; then
              # Code elsewhere requires absolute paths, like REPO_PATH is above
@@ -228,32 +230,30 @@ generate_pdfs() {
             fi
         done
     fi
+
     for d in ${dirs_to_search[*]}; do
         # This should be an error post-AV-5448
-        [ ! -d $d ] && echo "${RED}Directory $d does not exist! Skipping!${RESET}" && continue
+        [ ! -d "$d" ] && echo "${RED}Directory $d does not exist! Skipping!${RESET}" && continue
         echo "${BOLD}Directory: $d${RESET}"
-        cd $d
+        pushd "$d" || return 1
         prefix=.
         osp_name="$(get_osp_name $d)"
-        # If we are building for a specific directory there will be no prefix
-        [ -z "$1" ] &&
-        # otherwise, assets / core / osp_XXX, or left empty
         if expr match $d '.*assets_ts' > /dev/null; then
             prefix=assets_ts
         elif expr match $d '.*assets' > /dev/null; then
             prefix=assets
         elif expr match $d '.*core' > /dev/null; then
             prefix=core
+        elif expr match $d '.*tutorials' > /dev/null; then
+            prefix=tutorials
+        elif expr match $d '.*briefings' > /dev/null; then
+            prefix=briefings
         elif [ -n "${osp_name}" ]; then
             prefix=osp_${osp_name}
         fi
 
         log_dir=${OUTPUT_PATH}/${prefix}/logs
         mkdir -p "${log_dir}"
-
-        # Once upon a time, we allowed custom scripts to build PDFs.
-        # If that code is ever needed again, see Jenkins Job 1 before 6a64d20.
-        # AV-3987, AV-4085
 
         for ext in *docx *pptx *odt *odp; do
             # Get the name of the file without the file extension
@@ -269,6 +269,7 @@ generate_pdfs() {
               echo "Error creating $ofile.pdf ($d)" >> ${OUTPUT_PATH}/errors.log
             fi
         done
+
         # There are a few places where it is doc/XXX/*.tex so captures both, removing XXX
         export -f tex_kernel warn_existing_pdf
         export OUTPUT_PATH
@@ -279,6 +280,7 @@ generate_pdfs() {
         else
           echo "${texfs// /$'\n'}" | parallel -j ${JOBS} tex_kernel $d $prefix $log_dir
         fi
+        popd || return 1
     done
     rm -rf ${UNO_TMP}
 }
