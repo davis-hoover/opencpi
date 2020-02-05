@@ -14,10 +14,46 @@
 Name & Producer & Protocol & Optional
 \\
 \hline
-in & false & iqstream\_protocol.xml & false\\
+in & False & (none) & False\\
 
 \hline
-out & true & rstream\_protocol.xml & false\\
+out & True & (none) & False\\
+
+\hline
+in1 & False & (none) & False\\
+
+\hline
+out1 & True & (none) & False\\
+
+\hline
+in2 & False & (none) & False\\
+
+\hline
+out2 & True & (none) & False\\
+
+\hline
+in3 & False & (none) & False\\
+
+\hline
+out3 & True & (none) & False\\
+
+\hline
+in4 & False & (none) & False\\
+
+\hline
+out4 & True & (none) & False\\
+
+\hline
+optional\_false & False & (none) & False\\
+
+\hline
+optional\_true & False & (none) & True\\
+
+\hline
+optional\_0 & False & (none) & False\\
+
+\hline
+optional\_1 & False & (none) & True\\
 
 \hline
 \end{longtable}

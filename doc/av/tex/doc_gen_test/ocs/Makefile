@@ -25,11 +25,5 @@ clean:
 ocs.tex: ocs.xml
 	../../docGen.py $<
 
-developer_doc.inc: ocs.tex
-component_spec_properties.inc: ocs.tex
-component_ports.inc: ocs.tex
-worker_properties.inc: ocs.tex
-worker_interfaces.inc: ocs.tex
-
-ocs.pdf: ocs.tex developer_doc.inc component_spec_properties.inc component_ports.inc worker_properties.inc worker_interfaces.inc
+ocs.pdf: ocs.tex
 	rubber -d $<

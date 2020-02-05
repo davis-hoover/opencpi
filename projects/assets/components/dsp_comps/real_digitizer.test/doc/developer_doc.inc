@@ -14,7 +14,7 @@
   \hline
   Name              & \comp \\
   \hline
-  Latest Version    &  \docVersion (release date 4/2019) \\
+  Latest Version    &  \docVersion (release date TBD) \\
   \hline
 	Worker Type       & Application                              \\
   \hline

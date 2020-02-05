@@ -27,18 +27,23 @@ make
 
 check_golden() {
   echo -n "Testing $1... "
-  diff $2.inc golden/$2
+  diff $2 golden/$2
   [ "$?" != "0" ] && echo "FAILED: $2" && exit 1
   echo "PASSED"
 }
 
-check_golden "Component Spec Properties" component_spec_properties
+check_golden "Component Spec Properties" component_spec_properties.inc
 
-check_golden "Component Ports" component_ports
+check_golden "Component Ports" component_ports.inc
 
-check_golden "Worker Properties" worker_properties
+check_golden "Worker Properties" worker_properties.inc
 
-check_golden "Worker Interfaces" worker_interfaces
+check_golden "Worker Interfaces" worker_interfaces.inc
+
+for arg in "$@"; do
+  [ "$arg" == "$1" ] && continue
+  check_golden $arg $arg
+done
 
 echo "OUTPUT FILE: $1.pdf"
 # Not sure how rubber would pass but still have a PDF out but why not?

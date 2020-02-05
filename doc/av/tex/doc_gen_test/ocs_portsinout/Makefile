@@ -22,19 +22,8 @@ all: ocs_portsinout.pdf
 clean:
 	rm -rf *.tex *.inc *.pdf *.aux *.log *.out
 
-ocs_portsinout.tex: ocs_portsinout.xml
-	../../docGen.py $<
+ocs_portsinout.tex: ocs_portsinout.xml owd_datawidth32_ocsportsinout.xml
+	../../docGen.py ocs_portsinout.xml -owd owd_datawidth32_ocsportsinout.xml
 
-developer_doc.inc: ocs_portsinout.tex
-component_spec_properties.inc: ocs_portsinout.tex
-component_ports.inc: ocs_portsinout.tex
-
-worker_properties.inc: owd_datawidth32_ocsportsinout.xml ocs_portsinout.tex
-	rm -rf worker_properties.inc
-	rm -rf worker_interfaces.inc
-	../../docGen.py $<
-
-worker_interfaces.inc: worker_properties.inc
-
-ocs_portsinout.pdf: ocs_portsinout.tex developer_doc.inc component_spec_properties.inc component_ports.inc worker_properties.inc worker_interfaces.inc
+ocs_portsinout.pdf: ocs_portsinout.tex
 	rubber -d $<
