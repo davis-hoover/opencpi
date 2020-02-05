@@ -1,0 +1,378 @@
+\iffalse
+This file is protected by Copyright. Please refer to the COPYRIGHT file
+distributed with this source distribution.
+
+This file is part of OpenCPI <http://www.opencpi.org>
+
+OpenCPI is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program. If not, see <http://www.gnu.org/licenses/>.
+\fi
+%----------------------------------------------------------------------------------------
+% Update the docTitle and docVersion per document
+%----------------------------------------------------------------------------------------
+\def\docTitle{Adding Support for HDL Compilation Tools}
+\def\docVersion{1.5}
+%----------------------------------------------------------------------------------------
+\def\snippetpath{../tex/snippets}
+\input{\snippetpath/includes}
+\input{LaTeX_Header}
+\setlength{\parindent}{0pt} % Don't indent all paragraphs
+\newcommand{\forceindent}{\leavevmode{\parindent=1em\indent}}
+\date{Version \docVersion} % Force date to be blank and override date with version
+\title{\docTitle}
+\lhead{\small{\docTitle}}
+\usepackage{enumitem}
+%----------------------------------------------------------------------------------------
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+\newpage
+
+        \begin{center}
+        \textit{\textbf{Revision History}}
+                \begin{table}[H]
+                \label{table:revisions} % Add "[H]" to force placement of table
+                        \begin{tabularx}{\textwidth}{|c|X|l|}
+                        \hline
+                        \rowcolor{blue}
+                        \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+                        \hline
+                        v1.2 & Initial creation for OpenCPI 1.2 & 5/2017 \\
+                        \hline
+                        v1.4 & Update for release 1.4 & 9/2018 \\
+                        \hline
+                        v1.5 & Update for release 1.5 & 4/2019 \\
+                        \hline
+                        \end{tabularx}
+                \end{table}
+        \end{center}
+\newpage
+
+\tableofcontents
+% Make section numbers (Roman)-(Arabic).(Arabic) instead of default (Arabic).(Arabic).(Arabic)
+\renewcommand\thesection{\Roman{section}}
+\renewcommand\thesubsection{\thesection-\arabic{subsection}}
+
+\newpage
+\section{Introduction, Overview and Definitions}
+\subsection{Definitions}
+\begin{itemize}
+\item \textbf{core}: refers to the build artifact of any primitive core, worker, platform, config, assembly, or container. For synthesis tools this is generally a netlist. For simulators this is often source files or compiled source.
+\item \textbf{library-compile artifact}: the result of building a primitive library. For some tools, this refers to compiled-source files. Sometimes tools do not have a ``true'' library-compile artifact and therefore make copies/links to the original source files.
+\item \textbf{implementation stage}: stages of HDL compilation which occur \textit{after} synthesis. This includes optimizations, placement, routing, bitstream generation, etc....
+\end{itemize}
+
+\subsection{Introduction}
+This document is intended to ease the process of integrating a new HDL compilation tool into OpenCPI. Some of the best resources for this process are the existing tool Makefiles in the CDK (\textit{e.g.} \code{xst.mk}, \code{vivado.mk}, \code{quartus.mk}, \code{quartus\_pro.mk}). The support for each tool is implemented differently based on the each tool's unique process or limitations. The integration process for synthesis tools often differs from that of simulation tools. This document is more tailored towards synthesis tools, but can be useful for both.\newline
+
+The first step for integration is to understand the tool's build process. Here are some important questions to ask before you begin:
+\begin{enumerate}
+\item What types of artifacts does the tool generate for the following:
+	\begin{itemize}
+	\item \textbf{Source Libraries}
+	\subitem - \textit{e.g.} What is the result of compiling a VHDL library that may not have a single top-module
+	\subitem - This might be compiled libraries or no artifact at all.
+	\item \textbf{Cores}
+	\subitem - This might be compiled libraries for simulators or netlists for synthesis tools.
+	\end{itemize}
+\item How does the tool include/import VHDL and Verilog files and associate the files with libraries
+	\begin{itemize}
+	\item Command line options?
+	\item Settings files?
+	\item Separate commands/executables used to import files?
+	\end{itemize}
+\item How does the tool include/import cores/netlists into a design
+	\begin{itemize}
+	\item Command line options?
+	\item Settings file?
+	\item Separate commands/executables used to import files?
+	\item Does the tool require that cores be mapped to HDL instances?
+	\end{itemize}
+    \item What target parts will be supported by this new tool
+	\begin{itemize}
+	\item Are they already supported by another tool? If so, do you intend to continue supporting these targets under both tools?
+	\end{itemize}
+    \item What platforms will be supported by this new tool
+	\begin{itemize}
+	\item Are they already supported by another tool? If so, do you intend to continue supporting these platforms under both tools?
+	\end{itemize}
+	\item What options should be exposed to the user and forwarded to the tool
+	\begin{itemize}
+	\item This is lower priority, but should be kept in mind throughout the design process.
+	\end{itemize}
+	\item What implementation stages does the tool define
+	\begin{itemize}
+	\item Can they be split up into separate tasks, each with its own build-artifact (and therefore its own make rule)?
+	\end{itemize}
+	\item Can tool execution be operated entirely via bash commands
+	\begin{itemize}
+	\item This is not necessary, but may ease the process if true. Vivado for example required helper Tcl files to be used instead of simple calls to executables. This complicated the process.
+	\end{itemize}
+\end{enumerate}
+
+\subsection{Steps for Adding Support for a New Tool}
+\begin{enumerate}
+\item \textbf{Define pre-build mappings} (associate a target-part with the new tool) \ref{prebuild}
+\item \textbf{Set flags and variables} to define the tool's capabilities, requirements and limitations \ref{flags}
+\item \textbf{Determine how you will collect options} and pass them to the tool \ref{options}
+\item \textbf{Define \code{HdlToolCompile}} to collect source/core dependencies for an asset and perform compilation/synthesis \ref{hdltoolcompile}
+\item \textbf{Define \code{HdlToolDoPlatform\_<tool>}} to list and define the make rules associated with each implementation stage \ref{impl}
+\end{enumerate}
+\subsection{Summary of OpenCPI's HDL-Compilation Flow}
+OpenCPI's  HDL compilation flow is roughly explained here. This is nowhere near a full explanation of the build process, but gives an introduction for the purpose of assisting tool integration.\newline
+
+\begin{figure}[H]
+	\centerline{\includegraphics[scale=0.4]{figures/hdl_tool_make_flow}}
+	\caption{OpenCPI's HDL-Compilation Flow}
+	\label{fig:flowdiag}
+\end{figure}
+
+\textbf{Compilation Steps (Top in Figure~\ref{fig:flowdiag})}
+\begin{enumerate}
+\item When a make command is run with a set of \code{HdlTargets} or \code{HdlPlatforms}, \code{hdl-pre.mk} iterates through these targets and determines the \textbf{toolset} for each target (via the mappings in \textit{1(a)} \code{hdl-targets.mk} explained in section \ref{prebuild}). It then generates the make-rules for each tool and includes \code{<tool>.mk}.
+\end{enumerate}
+\textbf{Synthesis-Only Steps (Left in Figure~\ref{fig:flowdiag})}
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item (a): \code{hdl-make.mk} defines \code{HdlCompile}. This function is used  in the core/library makefiles (\code{hdl-core2.mk} and \code{hdl-lib2.mk}), which are ultimately included by every asset-type's makefile (\code{hdl-worker.mk, hdl-platform.mk, hdl-config.mk, hdl-assembly.mk, hdl-container.mk}). This function records the core/library/source dependencies, calls the tool-specific \code{HdlToolCompile} to actually perform synthesis, and runs any post synthesis (error checking and \code{HdlToolPost}) operations.
+\item (a): When \code{HdlToolCompile} is called, that brings us into \code{<tool>.mk}. Here, our tool-specific options, flags, file-suffixes, and core/library/source dependencies are collected, and synthesis is initiated.
+\item (a): This information is finally handed off to the tool itself for synthesis (or the simulator equivalent stage).
+\end{enumerate}
+\textbf{Implementation-Only Steps (Right in Figure~\ref{fig:flowdiag})}
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item (b): In \code{hdl-container.mk}, make-rules are created for the XML metadata and compressed bitz. In order to create the tool-specific implementation-stage make-rules, \code{HdlToolDoPlatform\_<tool>} is called, which brings us into \code{<tool>.mk}.
+\item (b): \code{<tool>.mk}'s \code{HdlToolDoPlatform\_<tool>} specifies the make-rules for each implementation stage of the tool. The make-rules are handed options specific to the implementation stage being considered. Each stage may depend on a previous stage and/or a constraints file.
+\item (b): The make-rules pass the options and dependencies to the tool, and the implementation stage is run.
+\end{enumerate}
+
+\subsection{Variables and Utility Functions}
+\begin{itemize}
+\item \code{Top}: the name of the top-module to be used during compilation. If no true top module exists (\textit{e.g. for primitive libraries}), this is often set to `onewire' which refers to `onewire.v' (a dummy top-module in the CDK created for this purpose).
+\item \code{Core}: the name of the core being built which will ultimately be used for the binary/netlist/compile-result file for workers...containers
+\item \code{HdlMode}: the type of asset currently being built
+	\subitem \textit{e.g} core, library, worker, platform, config, assembly, container
+\item \code{TargetDir}: the \code{target-*} directory for the current asset being built
+	\subitem \textit{e.g.} \code{target-zynq} or \code{target-6-isim}
+\item \code{FindRelative} (\code{util.mk}): returns the relative path from \$1 to \$2
+	\subitem often used with \code{arg2} set to \code{\$(TargetDir)} to find the path relative to the dir where artifacts will be placed
+\item \code{HdlLibraryRefDir} (\code{hdl-search.mk}): given a primitive library path and \code{HdlTarget}, this function returns the path to that library's artifact file/directory
+\item \code{HdlCoreRef} (\code{hdl-search.mk}): given a core location and \code{HdlTarget}, returns the path to that core's artifact file or directory
+\item \code{HdlRmRv}: given a string, strips off `\_rv'. This is needed for core artifacts sometimes because while the core may be named \code{<core>\_rv}, there may still be files to create/access named \code{<core>}
+	\subitem \code{\_rv} tags a module or file as 'record VHDL'. VHDL modules which might be instantiated in Verilog must not use records, so it is often necessary to wrap a \code{\_rv} module in one that uses individual signals instead of records. The wrapper module omits the \code{\_rv}.
+\item \code{HdlCoreRefMaybeTargetSpecificFile} (\code{hdl-search.mk}): determines whether a core is a fully specified path to a core or not. If not, it uses \code{HdlCoreRef} and \code{HdlToolCoreRef} to determine the desired path to the core
+\item \code{HdlToolPost}: actions taken after \code{HdlToolCompile} has completed. Can be defined in \code{<tool>.mk} if necessary
+\item \code{HdlGrepExclude\_<tool>}: strings to be ignored by the grep in \code{hdl-make.mk}'s \code{HdlCompile}, which greps the tool's logfile for strings that imply an error/failure
+	\subitem Format: \code{HdlGrepExclude\_vivado:=-e `<string/regex>' -e `<string/regex>' ...}
+\item \code{HdlExists} (\code{hdl-make.mk}): functions similarly to `wildcard', but does not cache information as wildcard does
+	\subitem - useful when checking for files that may have been created during this make run
+\item \code{HdlRecord<Cores/Libraries/Sources>} (\code{hdl-make.mk}): records the dependencies of a core/library in a file .cores/.libraries/.sources
+	\subitem * expanded on in section \ref{depends}
+\item \code{HdlCollect<Cores/Libraries>} (\code{hdl-make.mk}): collects the cores/libraries recorded by \code{HdlRecord<Cores/Libraries>} for each core/library this asset depends on
+	\subitem * expanded on in section \ref{depends}
+\item \code{HdlExtractSourcesForLib} (\code{hdl-make.mk}): extracts the source files associated with a given library
+	\subitem * expanded on in section \ref{depends}
+\item \code{HdlPlatformDir\_<platform>}: the directory for a platform which contains the platform's constraints file
+\end{itemize}
+
+Look through \code{util.mk} for other useful makefile functions.
+
+\section{Details: Steps for Adding a New Tool}
+\subsection{Step 1: Define Pre-build Mappings}
+\label{prebuild}
+In \path{/opt/opencpi/cdk/include/hdl/}, there are a few files that are important to understand prior to adding support for a new tool. When a ``make'' command is executed, \code{hdl-pre.mk} determines the following:
+\begin{enumerate}
+\item which \textbf{HdlTargets} will be iterated through and
+\item which \textbf{HdlToolSets} correspond to each of these \textbf{HdlTargets}.
+\end{enumerate}
+This is done by referencing the mappings defined in \code{hdl-targets.mk}. These mappings include the following:
+\begin{enumerate}
+\item Hardware \textbf{families} are associated with \textbf{vendors}
+\subitem isim, virtex6, zynq  $\rightarrow$ xilinx
+\item Target \textbf{parts} are associated with hardware \textbf{families}
+\subitem xc7z020 $\rightarrow$ zynq
+\item Target \textbf{families} are assigned \textbf{HdlToolSet}s
+\subitem zynq $\rightarrow$ vivado
+\subitem stratix4 $\rightarrow$ quartus
+\end{enumerate}
+The result of this last mapping (\textbf{HdlToolSet}) determines which Makefile contains the relevant tool-specific functions. For example, \code{HdlToolSet\_zynq=vivado} implies that the tool-specific build functions for \code{zynq} will be defined in \code{vivado.mk}.\newline
+
+In order to test a tool, you must have at least one target family associated with it. So, at least one of the \code{HdlToolSet\_<family>} variables must map to the tool being tested.\newline
+
+\textbf{Once you have a target part and family associated with the new tool, create \code{<tool>.mk}. This is where the bulk of the new-tool support will be added.}\newline
+
+\textit{Note: }Each platform has its own \code{<platform>.mk} file which specifies its exact target part (\textit{e.g.}: \code{HdlPart\_zed=xc7z020-1-clg484}). This mapping is not used until the final/implementation stages of the build process.
+
+\subsection{Step 2: Set Tool-Specific Flags/Variables}
+\label{flags}
+This sections lists some flags/variables that may need to be set for each supported tool. Some of these end in \code{\_<tool>}. Most of the ones that are listed here without \code{\_<tool>} exist both with and without that suffix. It is safest to set both versions (\textit{e.g.} \code{HdlBin} and \code{HdlBin\_<tool>}). Moving forward it is best-practice to create new variables with the \code{\_<tool>} suffix version \textit{only} whenever possible.
+\begin{itemize}
+\item \code{HdlBin}: specifies the suffix for the binary file result of building a core
+\item \code{HdlConstraintsSuffix\_<tool>}: specifies the suffix for constraints files for this tool. Usually only used during implementation
+\item \code{HdlToolLibraryFile}: specifies the suffix for the file result of building a library. Arg1: target, Arg2: libname
+\item \code{HdlToolRealCore}: set to `yes' if this tool can build a real core (\textit{i.e.} a singular binary file that can be used in upper builds). If unset, each asset compiles to a library containing the implementation to be used later
+\item \code{HdlToolCoreRef}: given the tool-agnostic path to reference a core, this can return a tool-specific path for referencing that core. Often just set to \code{\$1} (\textit{e.g.} the tool-agnostic way to reference the core)
+\item \code{HdlToolNeedBB}: set to `yes' if this requires a black-box library to access a core
+  \subitem - \code{xst.mk} is an example
+\item \code{HdlRecurseLibraries\_<tool>}: set to `yes' if this tool has no true library-compile artifact, and therefore upper builds will need to recurse through library dependencies to collect library source files
+  \subitem - \code{vivado.mk} is an example
+\item \code{HdlToolNeedsSourceList\_<tool>}: set to `yes' if this tool does not have a true library-compile artifact and therefore requires a listing of the source files for each primitive library dependency for reference when that library is included elsewhere
+  \subitem - \code{vivado.mk} is an example
+\item \code{HdlToolRequiresEntityStubs\_<tool>}: set to `yes' if this tool requires that entity declarations be present in stub files (\textit{e.g.} a component declaration is insufficient when including a core/netlist)
+  \subitem - \code{quartus\_pro.mk} is an example
+\item \code{HdlToolRequiresFullCoreHierarchy\_<tool>}: set to `yes' if this tool requires that \textit{all} cores in a design hierachy must be included at each level, even subcores that have already been synthesized/compiled into a containing core/netlist
+  \subitem - \code{quartus\_pro.mk} is an example
+\item \code{HdlToolRequiresInstanceMap\_<tool>}: set to `yes' if this tool requires that cores be explicitly mapped to HDL instances, and therefore OpenCPI must record the full instance hierarchy associated with each core
+  \subitem - \code{quartus\_pro.mk} is an example
+\item \code{HdlFullPart\_<tool>}: function that should be defined for a tool if a full device part must be rearranged or modified before being passed to tool executables
+\end{itemize}
+
+\subsection{Step 3: Compilation Options}
+\label{options}
+Each tool has a set of available options. It may be important to expose such options to the user. Some tool-support Makefiles do this, and others do not. This section logically comes before compilation, but in reality it can be skipped for now and revisited after all other steps are complete.\newline
+
+Some options are set by the framework automatically and therefore should not be set by the user. Other options might interfere with OpenCPI's incremental build-process. Therefore, for each tool there is a subset of options that a user should be able to set. This is why variables such as \code{XstGoodOptions}, \code{XstBadOptions}, and \code{XstDefaultOptions} are set. Equivalent variables can be created for individual tools and used similarly. \newline
+
+\code{*GoodOptions} lists the options that are acceptable for a user to specify. \code{*BadOptions} lists the options that cannot be specified by the user. \code{*DefaultOptions} lists the options that OpenCPI sets by default. Since the container build is the final synthesis, there may be extra options associated with that stage (\textit{e.g.} \code{XstDefaultContainerExtraOptions}). Users can specify additional options (\textit{e.g.} via \code{XstExtraOptions} or \code{XstExtraContainerOptions} for XST). \newline
+
+For XST and Vivado, the extra options are pruned and then checked (\code{*CheckOptions}) against the bad options before being compiled into \code{XstOptions}/\code{VivadoOptions} and ultimately handed off to the tool. \newline
+
+For Vivado, there are good/bad/default options associated with each individual stage of compilation. \code{Vivado*Options\_synth} is used for all synthesis runs. After container synthesis, the implementation stages begin and other options are used (\textit{e.g.} \code{VivadoGoodOptions\_route}).\newline
+
+Each tool's makefile handles options differently. Vivado mimics XST's method, but adds separate options for each stage. Some other tools (XSIM) do not implement strict option checking.
+
+\subsection{Step 4: Define HdlToolCompile}
+\label{hdltoolcompile}
+\textbf{HdlToolCompile} is the tool-specific function called from \textbf{HdlCompile} in \code{hdl-make.mk}. It is a function that must be defined independently in each tool's Makefile. This function performs compilation for every type of OpenCPI asset (primitive core/library, worker, platform, config, assembly, and container)\footnote{The asset-type can be determined via \code{HdlMode}. Sometimes slightly different operations are required for libraries and containers. For example, in Vivado we do not run full synthesis for libraries (only RTL Elaboration).}. For simulators, \textbf{HdlToolCompile} may run RTL Elaboration and create compiled simulation libraries. For synthesis/implementation tools, \textbf{HdlToolCompile} will run synthesis and generate a netlist file (\textit{e.g.} qxp/edif/ngc/qdb). Here, the tool must be handed any information it needs to compile an asset. This includes source files, artifacts from libraries (which may actually be collections of source files) or cores, Verilog include-directories, and any compile-options for the tool.\newline
+
+Collecting an asset's dependencies and performing tool-specific handling of such dependencies comprises a large portion of the work for integrating a new tool. In the case of Vivado, \code{HdlToolCompile} calls \code{VivadoIncludeDependencies}. This function utilizes the generic dependency functions from Section~\ref{depends} and hands these dependencies to tool-specific functions. These tool-specific functions (\textit{e.g.} \code{VivadoIncludeCores}, \code{VivadoIncludeSources}) generate the Vivado TCL commands that are ultimately handed to the \code{vivado} executable. Each tool may process source, core and library dependencies very differently, but ideally they should make use of the generic functions elaborated in Section~\ref{depends}.
+
+\subsubsection{Library/Core Dependencies}
+\label{depends}
+Each asset will depend on a set of source files, cores and libraries.  \code{HdlToolCompile} must process this set of source/core/library dependencies and hand the results to the tool.  This section explains some functions for recording and collecting these dependencies.
+\\\textbf{Files created to store dependency lists}\\
+\begin{itemize}
+\item \textbf{.cores}: list of cores an asset depends on
+\item \textbf{.libs}: list of libraries an asset depends on
+\item \textbf{.sources}: list of source files an asset depends on
+\end{itemize}
+\textbf{Functions for recording and collecting dependencies}\\
+\code{hdl-make.mk} contains functions for recording and extracting the cores, libraries and sources that an asset depends on. These functions can be used in a \code{<tool>.mk} file to keep track of dependencies:
+\begin{itemize}
+\item Automatically called in \code{hdl-make.mk}'s \code{HdlCompile} function prior to \code{HdlToolCompile}:
+\begin{itemize}
+\item \code{HdlRecordCores}: Records a list of cores that the asset currently being built depends on. This list is stored in a \code{*.cores} file.
+\item \code{HdlRecordLibraries}: Called in \code{HdlSourceListCompile} if \code{HdlToolNeedsSourceList\_<tool>} is set. Records a list of libraries that the asset currently being built depends on. This list is stored in a \code{*.libs} file.
+\item \code{HdlRecordSources}: Called in \code{HdlSourceListCompile} if \code{HdlToolNeedsSourceList\_<tool>} is set. Records a list of source files that the asset currently being built depends on. This list is stored in a \code{*.sources} file.
+\end{itemize}
+
+\item Functions that can be manually called from within \code{HdlToolCompile}:
+\begin{itemize}
+\item \code{HdlCollectCores}: An asset may depend on a list of cores (\code{SubCores\_<HdlTarget>}). For certain toolsets, it may be useful to recurse and collect the subcores included by each of this asset's subcores. This can be done by locating and reading the \code{.cores} list for each subcore.
+	\subitem - This function iterates through an asset's list of cores (\code{SubCores\_<HdlTarget>}) and collects each
+	\subitem one's core dependencies. This function may be particularly useful for tools that do not have true
+	\subitem `cores' (\textit{e.g.} simulators).
+\item \code{HdlCollectLibraries}: Collect the list of primitive libraries that an asset depends on. These are extracted from \code{*.libs} files of each library listed in \code{HdlLibrariesInternal}. If \code{HdlRecurseLibraries\_<tool>} is set, the libraries will be collected in a recursive manner.
+\item \code{HdlExtractSourcesForLib}: This function collects the source dependencies for a given library. It can be used in conjunction with \code{HdlCollectLibraries} to collect all source file dependencies for each library an asset depends on. This is particularly useful for tools (\textit{e.g. Vivado}) that have no true \code{library-compile artifact}.
+\end{itemize}
+\end{itemize}
+
+\textbf{When to use these functions}\\
+Each of these functions for storing/extracting dependencies is not always necessary. Cores, Libraries and Sources only need to be recorded and collected in certain circumstances.
+\begin{itemize}
+\item \textbf{Cores}: Here, ``core'' refers to \code{HdlToolCompile}'s build artifact for any primitive core, worker, platform, config, assembly, or container. The cores directly depended on by an asset are accessible via \code{SubCores\_<HdlTarget>}. The functions for recording and collecting cores are generally used by tools that ``do not implement proper hierarchies'', so that they can, ``include indirectly required cores later'' (from the comments in \code{hdl-make.mk}). This is generally done for simulators because they do not generate ``true cores'' (\textit{e.g.} netlists). Regardless of whether or not this is necessary for a tool, it can be useful to observe the list of all cores that an asset depends on. Therefore this information is recorded whenever core dependencies exist, but is not required for some tools.
+
+\item \textbf{Libraries}: Prior to Vivado, no tools explicitly handled recursive library dependencies. These tools either got lucky or implicitly captured such dependencies via true library-compile artifacts. Vivado (and Quartus) do not have any ``library-compile artifact''. In Vivado, artifacts are either netlists or design-checkpoints (which are essentially zip files containing netlists or post-netlist artifacts). A primitive library may not have only a single top module, and therefore cannot be compiled into a single netlist. Therefore, the artifacts we reference for primitive libraries are just references back to the source files. Only some the tool Makefiles (\textit{e.g.} \code{vivado.mk} and \code{quartus\_pro.mk}) explicitly handle recursive library dependencies. Moving forward, any tools without source-library compilation should use \code{HdlRecordLibraries}, \code{HdlCollectLibraries} and \code{HdlRecurseLibraries\_<tool>} in conjunction with \code{HdlRecordSources}, \code{HdlCollectSources}, and \code{HdlExtractSourcesForLib}.
+
+\item \textbf{Sources}: Similar to libraries, sources need only be recorded and collected from libraries if the tool does not have a true library-compile artifact. Paths to source files can be extracted for a specified library using \code{HdlExtractSourcesForLib}. If sources are in fact recorded (via \code{HdlRecordSources}) for later use, \code{HdlToolPost} must be defined in \code{<tool>.mk} to create links to these source files for later reference (see \code{vivado.mk} and \code{quartus.mk} for example definitions of \code{HdlToolPost}).
+
+	* \textit{Note}: The .sources file and its corresponding functions might only be useful for collecting and recording the source files associated with \textit{primitive libraries} (as is done with Vivado). This holds true unless a tool requires the ability to collect source files (without compilation) for \textit{every} asset type and run compilation only \textit{once} at a later stage (\textit{e.g.} at the container level). This is called \textit{Delayed Compilation}, and is a flow not yet supported/required by any OpenCPI Tool-Support Packages.\setlength{\leftskip}{1cm}
+\end{itemize}
+\subsubsection{Example for handling dependencies: Vivado}
+Here, the above mentioned functions are called for the Vivado tool. This \code{VivadoIncludeDependencies} function is called for each synthesis run by \code{HdlToolCompile} in \code{vivado.mk}. The \code{HdlCollectLibraries} function iterates through the \code{HdlLibrariesInternal} list, and recursively searches each corresponding .libs file. This results in a list of every library that the current asset depends on. Next, the \code{HdlExtractSourcesForLib} function is called for each library and returns a list of paths to each library's source files. The results are handed to Vivado's tool-specific function for including source files. Afterwards, the cores, sources, and Verilog include-directories that are directly depended on by this asset are included by Vivado's tool-specific functions.\newline
+
+\code{VivadoIncludeDependencies=\textbackslash}\newline
+\setlength{\parindent}{1cm}
+\indent  \code{\$(foreach l,\$(call HdlCollectLibraries,\$(HdlTarget)),\textbackslash}\newline
+\indent\indent    \code{\$(call VivadoIncludeSources,\textbackslash}\newline
+\indent\indent\indent      \code{\$(foreach s,\$(call HdlExtractSourcesForLib,\$(HdlTarget),\$l,\$(TargetDir)),\textbackslash}\newline
+\indent\indent\indent      \code{\$(notdir \$(call HdlRmRv,\$l))))\textbackslash}\newline
+\indent  \code{\$(call VivadoIncludeCores,\$(SubCores\_\$(HdlTarget)),\$(CoreOrLibName))\textbackslash}\newline
+\indent  \code{\$(call VivadoIncludeSources,\$(foreach s,\$(HdlSources),\textbackslash}\newline
+\indent\indent  \code{\$(call FindRelative,\$(TargetDir),\$s)),\$(CoreOrLibName))\textbackslash}\newline
+\indent  \code{\$(call VivadoIncludeIncludedirs,\textbackslash}\newline
+\indent\indent  \code{\$(call Unique,\$(patsubst \%/,\%,\$(dir \$(HdlSources)) \$(VerilogIncludeDirs))),\textbackslash}\newline
+\indent\indent  \code{\$(CoreOrLibName))}\newline
+
+\setlength{\parindent}{0cm}
+\textbf{Tool-specific functions for including cores and sources}\\
+\code{VivadoIncludeCores}, \code{VivadoIncludeSources} and \code{VivadoIncludeIncludeDirs} are tool-specific functions for including cores, sources and Verilog include-directories for an asset. For any tool that uses the \code{*IncludeDependencies} paradigm presented above, similar functions should be implemented.\newline
+
+These functions essentially take a list of cores, sources, or directories, and generate some commands, files, etc. that the tool understands and will use to absorb this information at compilation/synthesis time. For instance, \code{vivado.mk}'s \code{VivadoIncludeCores} iterates through a provided list of \code{SubCores}, and writes Tcl commands to \code{*-imports.tcl} that will read the netlist files (EDIF, DCP, NGC). It then generates Tcl commands to add any source files necessary to support those subcores (\textit{i.e.} \code{generics.vhd}, stub-files like \code{*-defs.vhd}, etc.). Back in \code{HdlToolCompile}, this \code{*-imports.tcl} file is passed as a \code{tclarg} argument to the \code{vivado} executable, and the contained Tcl commands are run before synthesis\footnote{Note that the \code{vivado} executable was not sufficient on its own for performing complex imports of netlists and sourcefiles in an incremental manner. So, we call the \code{vivado} executable and direct it to source the \code{vivado-synth.tcl} script to assist. This helper Tcl script accepts the \code{*-imports.tcl} file as an argument, executes its commands, performs other auxiliary functions, and proceeds with synthesis.}\newline
+
+Every tool will implement their equivalent include functions differently, but the general loop structure may be very similar. Therefore, it is often helpful to start with existing implementations of functions like \code{*IncludeCores} and replace the tool-specific contents. Note that while \code{vivado.mk} generates Tcl commands, other tool-support Makefiles might generate configuration files, project files, or even just strings of command-line options\footnote{Problems have been observed with generating long command-line strings because the bash/terminal limit for command length may be reached.} to be used during synthesis in \code{HdlToolCompile}.
+
+\pagebreak
+\subsection{Step 5: Define \code{HdlToolDoPlatform\_<tool>}: Implementation Stages}
+\label{impl}
+Each tool has its own implementation stages and naming schemes. Vivado has stages such as optimization, placing, routing, etc.... Simulation tools may have only a single stage since they do not truly run implementation. The following are Vivado examples of implementation-stage make targets. Each one corresponds to the filename result of a single implementation stage:\newline
+
+\verb+BitName=*.bit+\newline
+\verb+SynthName=*.edf+\newline
+\verb+OptName=*-opt.dcp+\newline
+\verb+PlaceName=*-place.dcp+\newline
+\verb+PhysOptName=*-phys_opt.dcp+\newline
+\verb+RouteName=*-route.dcp+\newline
+\verb+TimingName=*-timing.rpx+\newline
+\verb+BitFile_vivado=*.bit+\newline
+
+\textit{Note:} \code{BitFile\_vivado} is used in hdl-container.mk for referencing the final bit file, appending XML, and creating the compressed bit file. \newline
+
+
+These \code{<Stage>Name} assignments are generally used to define make-rules in an \code{HdlToolDoPlatform\_<tool-set>} define-block.\newline
+
+Below is an example implementation stage defined for the Vivado tool. The code block defines the make-rule for Vivado's optimization stage, and uses the \code{OptName} function to determine the resulting filename:\newline
+\setlength{\leftskip}{1cm}
+\newline\code{define HdlToolDoPlatform\_vivado}\newline ...\newline
+\setlength{\parindent}{1cm}
+\code{\$(call OptName,\$1,\$3): \$(call SynthName,\$1,\$3) \$(call VivadoConstraints,\$5)}\newline
+\indent        \code{\$(AT)echo -n For \$2 on \$5 using config \$4: creating placed DCP file using `"opt\_design"'}.\newline
+\indent        \code{\$(AT)\$(call DoVivado,vivado-impl.tcl,\$1,-tclargs \textbackslash}\newline
+\indent\indent         \code{stage=opt \textbackslash}\newline
+\indent\indent         \code{target\_file=\$(notdir \$(call OptName,\$1,\$3)) \textbackslash}\newline
+\indent\indent         \code{part=\$(call VivadoChoosePart,\$(HdlPart\_\$5)) \textbackslash}\newline
+\indent\indent         \code{edif\_file=\$(call SynthName,\$1,\$3) \textbackslash}\newline
+\indent\indent         \code{constraints=\$(call VivadoConstraints,\$5) \textbackslash}\newline
+\indent\indent         \code{impl\_opts=`\$(call VivadoOptions,opt)'
+\textbackslash}\newline
+\indent\indent         \code{power\_opt=`\$(if \$(VivadoPowerOpt),true,false)' \textbackslash}\newline
+\indent\indent         \code{,opt)}\newline
+...\newline
+\code{endef}\newline\newline
+\setlength{\parindent}{0cm}
+Here, the make-rule for the post-opt artifact is defined. It ultimately calls the \code{vivado} executable. The Opt stage depends on the Synth stage (run by \code{HdlToolCompile}) along with an XDC constraints file. The make-rule passes some information to Vivado (the current stage, target-file, target-part, synthesis netlist to start with, XDC constraints file, etc....). The constraints file is accessed via \code{\$(call VivadoConstraints,\$5)}. Argument \$5 to \code{HdlToolDoPlatform\_<tool>} is the platform being built for. \code{VivadoConstraints} makes use of this as well as \code{HdlPlatformDir\_<platform>} to find the constraints file which should be located in the HDL Platform's directory.\newline
+
+\setlength{\leftskip}{0pt}
+
+This \code{HdlToolDoPlatform\_<tool>} block of code is called from \code{hdl-container.mk}, and should define \textit{all} of the make-rules for the final stages of compilation. For simulation tools, this may involve generating the simulation executable. For synthesis/implementation tools, this may include optimizing, mapping, placing, routing, and/or timing-analysis, and must include bitstream generation. \newline
+
+One of the early implementation stages (possibly the first stage after synthesis), will be the stage where the platform-specific constraints (UCF, XDC, QSF) file is handed to the tool. Constraint formats are generally tool-specific. There is a tool-agnostic function \code{HdlConstraints} that will return constraints file(s) that are specified by the user via Platform Configuration or Container XML, but this function will not necessarily return the \textit{default} constraints file which lives in the HDL Platform directory and is named \code{<platform>.<constraint-suffix>}. So, new tool-support Makefiles should mimic existing tools and implement a function to check \code{HdlConstraints}, and fall back on the HDL Platform's default constraints file. Here is an example for Vivado:
+\begin{lstlisting}[showspaces=false]
+HdlConstraintsSuffix_vivado=.xdc
+VivadoConstraints_default=$(HdlPlatformDir_$1)/$1$(HdlConstraintsSuffix_vivado)
+VivadoConstraints=$(or $(HdlConstraints),$(VivadoConstraints_default))
+\end{lstlisting}
+This \code{VivadoConstraints} function is used in the optimization stage of implementation as show in the \code{HdlToolDoPlatform\_vivado} code block above.\newline\bigskip
+
+\textbf{REMEMBER: Existing tool support Makefiles like \code{vivado.mk}, \code{xst.mk}, \code{quartus.mk}, \code{quartus\_pro.mk}, \code{modelsim.mk}, \code{xsim.mk} and \code{isim.mk} are great resources when developing a new tool-support package.}
+
+\end{document}
