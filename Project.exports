@@ -290,5 +290,5 @@
 # XML files required when building containers that are not real workers
 +projects/core/hdl/primitives/platform/*.xml include/hdl/
 +runtime/remote-support/scripts/* scripts/
-+runtime/remote-support/scripts/ocpiremote.sh <target>/bin/ocpiremote
++runtime/remote-support/scripts/ocpiremote.py <target>/bin/ocpiremote
 

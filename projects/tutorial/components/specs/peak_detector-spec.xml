@@ -6,6 +6,6 @@
   <!-- Add property and port elements here -->
     <Port Name="in" Protocol="iqstream_protocol"></Port>
     <Port Name="out" Protocol="iqstream_protocol" Producer="true"></Port>
-    <Property Name="max_peak" Type="short" Volatile="true"></Property>
-    <Property Name="min_peak" Type="short" Volatile="true"></Property>
+    <Property Name="max_peak" Type="short" Volatile="true" Description="Maximum peak value"></Property>
+    <Property Name="min_peak" Type="short" Volatile="true" Description="Minium peak value"></Property>
 </ComponentSpec>

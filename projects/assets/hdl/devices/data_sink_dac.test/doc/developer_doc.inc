@@ -26,6 +26,25 @@
   \hline
 \end{longtable}
 
+\begin{center}
+\textit{\textbf{Revision History}}
+  \begin{table}[H]
+  \label{table:revisions} % Add "[H]" to force placement of table
+    \begin{longtable}{|p{\dimexpr0.15\textwidth-2\tabcolsep\relax}
+                      |p{\dimexpr0.75\textwidth-2\tabcolsep\relax}
+                      |p{\dimexpr0.1\textwidth-2\tabcolsep\relax}|}
+    \hline
+    \rowcolor{blue}
+    \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+      \hline
+      v1.6 & Released initial technology preview & \\
+      \hline
+      v1.7 & Updated port/property/interface tables for accuracy & \\
+      \hline
+    \end{longtable}
+  \end{table}
+\end{center}
+
 \section*{Functionality}
 \begin{flushleft}
 The \comp{} worker provides functionality common to all DAC device types, including

@@ -25,116 +25,192 @@
  * The application consists of a device worker with a single input signal. The
  * worker collects the timestamp from its WTI at every rising edge of the input
  * signal and is done when the number of timestamps collected =
- * NUM_TIME_TAGS_TO_COLLECT
+ * num_time_tags_to_collect
  * 
  * The expected input signal is a 1 PPS signal from a high precision GPS receiver
  * (e.g FS740). Because the rising edge of this input signal is expected on each
  * second boundary of GPS time, the delta from the nearest second boundary can be
  * used to compute accuracy measurements. The average, minimum, maximum, and
- * standard deviation of the delta for the timestamps captured are reported. The
- * average can be used as a calibration constant for a timestamper worker.
+ * standard deviation of the delta for the timestamps captured are reported. 
+ *
+ * The application is run twice. The first time the average delta from the nearest
+ * second boundary is computed and fed into the application as a calibration
+ * constant to the signal_time_tagger worker.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include "OcpiApi.hh"
-#include <iostream>
-#include <stdlib.h>
-#include <cmath>     //std::pow()
+#include <iostream>  // cout,cerr
+#include <cmath>     // std::pow()
 #include <algorithm> // std::min_element, std::max_element
+#include <sstream>   // std::ostringstream
 
-const int NUM_TIME_TAGS_TO_COLLECT=100;
-const int EXTRA_TIME_BUFFER=5; //Seconds buffer for application timeout
-//to prevent hanging application
-const int    MAX_EXPECTED_RUN_TIME_USECS=(NUM_TIME_TAGS_TO_COLLECT+EXTRA_TIME_BUFFER)*1e6;
+//TODO: These are internal headers which should not be included directly
+//      Anything from them exposed to the ACI should be in Ocpi*Api.h files
+//      https://gitlab.com/opencpi/opencpi/issues/887
+#include "OcpiDriverManager.h"
+#include "OcpiUtilEzxml.h"
+
+const char *APP_NAME = "ocpi.assets.timestamping_accuracy";
+//Seconds buffer for application timeout
+const int MAX_NUM_TIME_TAGS_TO_COLLECT = 128;
+const int EXTRA_TIME_BUFFER = 5;
 const double NUM_MICROSECONDS_PER_FRAC_SEC = .000233;
 
 namespace OA = OCPI::API;
-using namespace std;
+namespace OX = OCPI::Util::EzXml;
 
-void computeStatistics(uint32_t collected_time_tags_frac[NUM_TIME_TAGS_TO_COLLECT]){
-  int64_t delta_from_nearest_sec[NUM_TIME_TAGS_TO_COLLECT];
-  int64_t delta_corr[NUM_TIME_TAGS_TO_COLLECT];
-  int64_t avg_delta, avg_delta_corr = 0;
-  double  var, var_corr, std_dev, std_dev_corr = 0;
+int64_t computeStatistics(uint64_t* collected_time_tags, 
+		       uint32_t num_time_tags_to_collect,
+		       int64_t cal_value){
+  uint32_t frac_sec;
+  int64_t avg_delta;
+  int64_t delta_from_nearest_sec[num_time_tags_to_collect];
 
-  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++){
-    if(collected_time_tags_frac[a] <= std::pow(2.,32.)/2)
-      delta_from_nearest_sec[a] = collected_time_tags_frac[a];
+  //Compute avg from nearest second value
+  for (unsigned int a = 0; a < num_time_tags_to_collect; a++){
+    frac_sec = collected_time_tags[a];
+    if(frac_sec <= std::pow(2.,32.)/2)
+      delta_from_nearest_sec[a] = frac_sec;
     else
-      delta_from_nearest_sec[a] = -(std::pow(2.,32.) - collected_time_tags_frac[a]);
+      delta_from_nearest_sec[a] = -(std::pow(2.,32.) - frac_sec);
     avg_delta += (int64_t)(delta_from_nearest_sec[a] - avg_delta) / (a + 1);
   }
 
-  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
-    var += (int64_t)(delta_from_nearest_sec[a] - avg_delta) * 
-      (int64_t)(delta_from_nearest_sec[a] - avg_delta);
-  var /= NUM_TIME_TAGS_TO_COLLECT;
-  std_dev = sqrt(var);
+  std::cout << "Average Delta from nearest second          " << 
+    avg_delta * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
 
-  cout << "Min Delta from nearest second              " << 
-    *std::min_element(delta_from_nearest_sec, delta_from_nearest_sec + NUM_TIME_TAGS_TO_COLLECT - 1) *
-    NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-  cout << "Max Delta from nearest second              " << 
-    *std::max_element(delta_from_nearest_sec, delta_from_nearest_sec + NUM_TIME_TAGS_TO_COLLECT - 1) *
-    NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-  cout << "Average Delta from nearest second          " << 
-    avg_delta * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-  cout << "Standard Deviation from nearest second     " << 
-    std_dev * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+  //Compute min, max, std_dev from nearest second value when cal value supplied
+  if(cal_value){
+    double  var, std_dev = 0;
 
+    for (unsigned int a = 0; a < num_time_tags_to_collect; a++)
+      var += (int64_t)(delta_from_nearest_sec[a] - avg_delta) * 
+	(int64_t)(delta_from_nearest_sec[a] - avg_delta);
+    var /= num_time_tags_to_collect;
+    std_dev = sqrt(var);
 
-  //Report statistics with average subtracted
-
-  for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++){
-    if(delta_from_nearest_sec[a] >= avg_delta)
-      delta_corr[a] = delta_from_nearest_sec[a] - avg_delta;
-    else
-      delta_corr[a] = -(avg_delta - delta_from_nearest_sec[a]);
-    avg_delta_corr += 
-      (int64_t)(delta_corr[a] - avg_delta_corr) / (a + 1);
+    std::cout << "Min Delta from nearest second              " << 
+      *std::min_element(delta_from_nearest_sec, delta_from_nearest_sec + num_time_tags_to_collect - 1) *
+      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
+    std::cout << "Max Delta from nearest second              " << 
+      *std::max_element(delta_from_nearest_sec, delta_from_nearest_sec + num_time_tags_to_collect - 1) *
+      NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
+    std::cout << "Standard Deviation from nearest second     " << 
+      std_dev * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << std::endl;
   }
-
-   for (int a = 0; a < NUM_TIME_TAGS_TO_COLLECT; a++)
-     var_corr += (int64_t)(delta_corr[a] - avg_delta_corr) * (int64_t)(delta_corr[a] - avg_delta_corr);
-   var_corr /= NUM_TIME_TAGS_TO_COLLECT;
-   std_dev_corr = sqrt(var_corr);
-
-   cout << "Min Delta with average subtracted          " << 
-     *std::min_element(delta_corr, delta_corr + NUM_TIME_TAGS_TO_COLLECT - 1) *
-     NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-   cout << "Max Delta with average subtracted          " << 
-     *std::max_element(delta_corr, delta_corr + NUM_TIME_TAGS_TO_COLLECT - 1) *
-     NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-   cout << "Average Delta with average subtracted      " << 
-     avg_delta_corr * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
-   cout << "Standard Deviation with average subtracted " << 
-     std_dev_corr * NUM_MICROSECONDS_PER_FRAC_SEC << " us" << endl;
+  return avg_delta;
 }
 
-int main(/*int argc, char **argv*/) {
+int64_t runApp(const char *container,
+	       uint32_t num_time_tags_to_collect,
+	       int64_t cal_value,
+	       uint64_t* collected_time_tags){
 
-  OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), OA::PVEnd };
-  OA::Application app("timestamping_accuracy.xml", pvs);
-  app.initialize();
-  app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", NUM_TIME_TAGS_TO_COLLECT);
+  try {
 
-  app.start();
-  app.wait(MAX_EXPECTED_RUN_TIME_USECS);
-  app.stop();
+    //to prevent hanging application
+    uint32_t max_expected_run_time_usecs = (num_time_tags_to_collect + EXTRA_TIME_BUFFER) * 1e6;
+    std::string container_string = "=" + std::string(container);
+    OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), 
+    			 OA::PVString("container", container_string.c_str()), OA::PVEnd };
+    OA::Application app("timestamping_accuracy.xml", pvs);
+    
+    app.initialize();
+    app.setPropertyValue("signal_time_tagger", "num_time_tags_to_collect", num_time_tags_to_collect);
+    if(cal_value)
+      app.setPropertyValue("signal_time_tagger", "calibration_value", cal_value);
+    
+    app.start();
+    app.wait(max_expected_run_time_usecs);
+    app.stop();
 
-  app.finish();
+    app.finish();
 
-  uint32_t max_num_time_tags_to_collect;
-  app.getPropertyValue("signal_time_tagger", "MAX_NUM_TIME_TAGS_TO_COLLECT", max_num_time_tags_to_collect);
+    OA::Property collected_time_tags_p(app, "signal_time_tagger", "collected_time_tags");
+    collected_time_tags_p.getULongLongSequenceValue(collected_time_tags, MAX_NUM_TIME_TAGS_TO_COLLECT);
+    cal_value = computeStatistics(collected_time_tags, num_time_tags_to_collect, cal_value);
+    
+  } catch (std::string &e) {
+    std::cerr << "ERROR: " << e << "\n";
+  }
+  return cal_value;
 
-  uint32_t collected_time_tags_frac[max_num_time_tags_to_collect];
-  OA::Property collected_time_tags_frac_p(app, "signal_time_tagger", "collected_time_tags_frac");
-  collected_time_tags_frac_p.getULongSequenceValue(collected_time_tags_frac,max_num_time_tags_to_collect);
+}
 
-  computeStatistics(collected_time_tags_frac);
+int main(int argc, char **argv) {
 
-  return 0;
+  int ret = 0;
+  const char *container;
+  uint32_t num_time_tags_to_collect;
+
+  try {
+
+    if(argc == 1) {
+      std::cout << "INFO: No arguments supplied. Using defaults." << std::endl;
+      std::cout << "INFO: num_time_tags_to_collect: 10" << std::endl;
+      num_time_tags_to_collect = 10;
+    } else if(argc != 2) {
+      std::ostringstream oss;
+      oss << "wrong number of arguments" << "\n";
+      oss << "Usage is: " << argv[0] << " <num_time_tags_to_collect>\n";
+      throw oss.str();
+    } else {
+      num_time_tags_to_collect = atoi(argv[1]);
+    }
+
+    //Check if system is setup to run test
+    OCPI::Driver::ManagerManager::getManagerManager().configure();
+    ezxml_t system_xml = OCPI::Driver::ManagerManager::getManagerManager().getXML();
+    ezxml_t applications_xml = ezxml_child(system_xml, "applications");
+    ezxml_t application_xml = OX::findChildWithAttr(applications_xml, "application", "name", APP_NAME); 
+    ezxml_t freqstd_xml, gpsfreqref_xml;
+    const char *freq_std_tty, *gps_freq_ref_ip;
+    if(application_xml){
+	freqstd_xml = ezxml_child(application_xml, "freqstd");
+	freq_std_tty = ezxml_cattr(freqstd_xml, "serialport");
+	gpsfreqref_xml = ezxml_child(application_xml, "gpsfreqref");
+	gps_freq_ref_ip = ezxml_cattr(gpsfreqref_xml, "ipaddr");
+    }
+    
+    if(!application_xml || !freq_std_tty || !gps_freq_ref_ip)
+      std::cerr << "WARNING: system.xml not setup correctly. Exiting but not failing.\n";
+    else {
+      std::ostringstream oss;
+      
+      //Check if Rb Standard has 1 PPS sync
+      std::string cmd = "./FS725_Freq_Std_Status.py " + std::string(freq_std_tty);
+      if(system(cmd.c_str()) != 0){
+	oss << "no valid PPS into frequency standard" << "\n";
+	throw oss.str();
+      }
+      //Check GPS Receiver status
+      cmd = "./FS740_GPS_Freq_Ref_Status.py " + std::string(gps_freq_ref_ip);
+      if(system(cmd.c_str()) != 0){
+	oss << "Unexpected GPS receiver status register" << "\n";
+	throw oss.str();
+      }
+      
+      //Run application for containers listed in system.xml
+      uint64_t collected_time_tags[MAX_NUM_TIME_TAGS_TO_COLLECT];
+      ezxml_t containers_xml = ezxml_child(application_xml, "containers");
+      for (ezxml_t x = OX::ezxml_firstChild(containers_xml); x; x = OX::ezxml_nextChild(x)) {	
+	container = ezxml_cattr(x, "name");
+	
+	std::cout << "Computing calibration value: " << std::endl;
+	int64_t cal_value = runApp(container, num_time_tags_to_collect, 0, collected_time_tags);     
+
+	if(cal_value){
+	  std::cout << "Timestamping Accuracy: " << std::endl;
+	  runApp(container, num_time_tags_to_collect, cal_value, collected_time_tags);
+	}
+	
+      }
+    }
+
+  } catch (std::string &e) {
+    std::cerr << "ERROR: " << e << "\n";
+    ret = 1;
+  }
+
+  return ret;
 }

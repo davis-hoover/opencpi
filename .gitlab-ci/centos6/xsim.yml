@@ -6,11 +6,9 @@ build-hdl-core:centos6:xsim:
     - .build-hdl-core
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
 
 build-hdl-assets:centos6:xsim:
@@ -18,12 +16,9 @@ build-hdl-assets:centos6:xsim:
     - .build-hdl-assets
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
   needs:
-    - prereq:centos6 
+    - job: prereq:centos6 
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
 
@@ -32,13 +27,9 @@ build-hdl-assets_ts:centos6:xsim:
     - .build-hdl-assets_ts
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
   needs:
-    - prereq:centos6 
+    - job: prereq:centos6
+      artifacts: true 
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -48,13 +39,9 @@ build-hdl-inactive:centos6:xsim:
     - .build-hdl-inactive
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
   needs:
-    - prereq:centos6 
+    - job: prereq:centos6
+      artifacts: true 
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -68,12 +55,9 @@ build-test-core:centos6:xsim:
     - .build-test-core
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6 
-    - build:centos6
-    - build-hdl-core:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
 
@@ -82,13 +66,9 @@ build-test-assets-base:centos6:xsim:
     - .build-test-assets-base
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -98,13 +78,9 @@ build-test-assets-comms:centos6:xsim:
     - .build-test-assets-comms
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -114,13 +90,9 @@ build-test-assets-dsp:centos6:xsim:
     - .build-test-assets-dsp
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -130,13 +102,9 @@ build-test-assets-misc:centos6:xsim:
     - .build-test-assets-misc
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -146,13 +114,9 @@ build-test-assets-util:centos6:xsim:
     - .build-test-assets-util
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -162,14 +126,9 @@ build-test-assets_ts:centos6:xsim:
     - .build-test-assets_ts
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
-    - build-hdl-assets_ts:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -180,14 +139,9 @@ build-test-inactive:centos6:xsim:
     - .build-test-inactive
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim
-    - build-hdl-assets:centos6:xsim
-    - build-hdl-inactive:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim
     - build-hdl-assets:centos6:xsim
@@ -202,13 +156,9 @@ test-core:centos6:xsim:
     - .test-core
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6  
-    - build-hdl-core:centos6:xsim
-    - build-test-core:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6  
     - build-hdl-core:centos6:xsim
     - build-test-core:centos6:xsim
@@ -218,8 +168,9 @@ test-assets:centos6:xsim:
     - .test-assets
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
+  needs:
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim  
     - build-hdl-assets:centos6:xsim
@@ -234,14 +185,9 @@ test-assets_ts:centos6:xsim:
     - .test-assets_ts
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim  
-    - build-hdl-assets_ts:centos6:xsim
-    - build-test-assets_ts:centos6:xsim
   needs:
-    - prereq:centos6 
+    - job: prereq:centos6
+      artifacts: true 
     - build:centos6
     - build-hdl-core:centos6:xsim  
     - build-hdl-assets_ts:centos6:xsim
@@ -252,14 +198,9 @@ test-inactive:centos6:xsim:
     - .test-inactive
     - .centos6
     - .xsim
-  dependencies:
-    - prereq:centos6
-    - build:centos6
-    - build-hdl-core:centos6:xsim  
-    - build-hdl-inactive:centos6:xsim
-    - build-test-inactive:centos6:xsim
   needs: 
-    - prereq:centos6
+    - job: prereq:centos6
+      artifacts: true
     - build:centos6
     - build-hdl-core:centos6:xsim  
     - build-hdl-inactive:centos6:xsim

@@ -18,10 +18,20 @@
     <parameter name='PEAK_MONITOR_p'  value='true'/>
     <parameter name='ocpi_debug' value='false'/>
     <parameter name='ocpi_endian' value='little'/>
+  </configuration>  
+  <configuration id='2'>
+    <parameter name='VIVADO_ILA_p' value='false'/>
+    <parameter name='CHIPSCOPE_p' value='false'/>
+    <parameter name='NCO_DATA_WIDTH_p' value='12'/>
+    <parameter name='INPUT_DATA_WIDTH_p' value='12'/>
+    <parameter name='CORDIC_STAGES_p'  value='12'/>
+    <parameter name='PEAK_MONITOR_p'  value='true'/>
+    <parameter name='ocpi_debug' value='false'/>
+    <parameter name='ocpi_endian' value='little'/>
   </configuration>
 
 <!-- Debug Configurations -->
-  <configuration id='2'>
+  <configuration id='3'>
     <parameter name='VIVADO_ILA_p' value='true'/>
     <parameter name='CHIPSCOPE_p' value='false'/>
     <parameter name='NCO_DATA_WIDTH_p' value='12'/>
@@ -31,5 +41,4 @@
     <parameter name='ocpi_debug' value='false'/>
     <parameter name='ocpi_endian' value='little'/>
   </configuration>
-
 </build>

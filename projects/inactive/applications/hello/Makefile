@@ -20,13 +20,10 @@ OcpiApp=hello
 
 override OcpiRunBefore+= $(VG)
 override OcpiRunAfter+= > /dev/null
-
-include $(OCPI_CDK_DIR)/include/application.mk
-
-# Set package to local for the hello.rcc worker
-Package=local
 export OCPI_LIBRARY_PATH=lib
 
 # These make the worker library for this application
-Implementations = hello.rcc
-include $(OCPI_CDK_DIR)/include/lib.mk
+Package=local
+include $(OCPI_CDK_DIR)/include/library.mk
+# The last include line determines the dir type
+include $(OCPI_CDK_DIR)/include/application.mk

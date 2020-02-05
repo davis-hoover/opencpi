@@ -2314,11 +2314,27 @@ function takeval {
 set -e
 [ "$#" == 0 -o "$1" == -help -o "$1" == --help -o \( "$1" == -h -a -z "$2" \) ] && help_screen=true
 
+# Copy the argv removing a verb in $1
+function run_original_argv {
+    local args=()
+    local old=("${original_argv[@]}")
+    for a in "${original_argv[@]}"; do
+	[ "$a" != "$2" ] && args+=("$a")
+    done
+    $1 "${args[@]}"
+}
+
 # Collect all flag arguments and do preliminary error checking that does not depend
 # on other potential flags.
-argv=($*)
+function dump {
+    # eval echo -n "ARRAY\(\${#$1[@]}\):" $1
+    eval for i in "\"\${$1[@]}\"" \; do  echo -n +\"\$i\"\; done
+    echo
+}
+argv=("$@")
+# dump argv
 # Keep an untouched argv to be passed to other executables
-original_argv=($*)
+original_argv=("$@")
 while [[ "${argv[0]}" != "" ]] ; do
   if [[ "${argv[0]}" == show ]] ; then
     ocpishow_options=`sed -E 's/(^| )show( |$)/ /' <<< "${original_argv[@]}"`
@@ -2329,19 +2345,26 @@ while [[ "${argv[0]}" != "" ]] ; do
     $OCPI_CDK_DIR/scripts/ocpidev_utilization.py $ocpiutilization_options
     exit $?
   elif [[ "${argv[0]}" == run ]] ; then
+    # echo ORIG:${original_argv[@]}
+    # echo LEFT:${argv[@]}
     ocpidev_run_options=`sed -E 's/(^| )run( |$)/ /' <<< "${original_argv[@]}"`
-    $OCPI_CDK_DIR/scripts/ocpidev_run.py $ocpidev_run_options
+    # echo $OCPI_CDK_DIR/scripts/ocpidev_run.py $ocpidev_run_options
+    run_original_argv $OCPI_CDK_DIR/scripts/ocpidev_run.py run
+    # $OCPI_CDK_DIR/scripts/ocpidev_run.py $ocpidev_run_options
     exit $?
   elif [[ -n "$verb" && -n "$help_screen" ]]; then
     help
-  elif [[ "${argv[0]}" == -* ]] ; then
+  elif [[ "${argv[0]}" == -* && "$posonly" == "" ]] ; then
     case "${argv[0]}" in
       # allow getopt_long style --<opt>=value
+      (--)
+	 posonly=1;;
       (--*=*)
 	 flag=${argv[0]%%=*}
-         val=${argv[0]##*=}
+         val="${argv[0]#*=}"
+	 echo FLAG:$flag VAL:$val ARG:${argv[0]}
 	 unset argv[0]
-	 argv=($flag $val ${argv[@]})
+	 argv=($flag "$val" "${argv[@]}")
 	 ;;
       # allow getopt_long style -<letter>value
       # We are not allowing multiple letter options following a dash, which we could
@@ -2449,6 +2472,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--create-build-files) OCPI_CREATE_BUILD_FILES=1;;
       (--version) ocpirun --version; exit 0;;
       (--worker-version) takeval version;;
+      (--run_arg) takeval run_arg;;
       (*)
         error_msg="unknown option: ${argv[0]}"
         if [ -n "$verb" ]; then

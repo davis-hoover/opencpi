@@ -17,4 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-../ocs_test.sh ocs_portsinout
+../ocs_test.sh \
+  ocs_portsinout \
+  owd_datawidth32_ocsportsinout.hdl_interfaces.inc \
+  owd_datawidth32_ocsportsinout.hdl_properties.inc

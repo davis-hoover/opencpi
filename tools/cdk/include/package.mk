@@ -44,7 +44,9 @@ define OcpiCreatePackageId
 #      So, there should be some sort of flag that can be set in library.mk or
 #      hdl-platforms.mk for example that flags it as "a dir that can have lib/".
 #      This hardcoded list here is not very scalable.
-LibIsInCwd=$$(filter lib library %-platform %-platforms %-primitives,$$(call OcpiGetDirType,$$(or $1,./)))
+#  Note "application" is in the list here to allow applications to have private libraries in the same dir
+#  as long as the last include line is "application"
+LibIsInCwd=$$(filter application lib library %-platform %-platforms %-primitives,$$(call OcpiGetDirType,$$(or $1,./)))
 LibIsInParent=$$(filter lib library %-platform %-platforms %-primitives,$$(call OcpiGetDirType,$$(or $1,.)/../))
 
 # Determine the directory containing the 'lib' directory to place package-id

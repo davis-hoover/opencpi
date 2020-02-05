@@ -1,11 +1,10 @@
 %# Only want to have a section title if is_OCS or it has something meaningful
-%% if (is_OCS and not is_HDL) or (not is_OCS and latex_rows)
+%% if is_OCS
 \section\VAR{sec_star}{\VAR{title_text}}
-%% endif
-%% if latex_rows
-%% if not is_OCS
+%% else
 \subsection\VAR{sec_star}{\VAR{comp_name}}
 %% endif
+%% if latex_rows
 \begin{scriptsize}
 \begin{longtable}{|p{\dimexpr0.2\linewidth-2\tabcolsep\relax}
                   |p{\dimexpr0.05\linewidth-2\tabcolsep\relax}
@@ -26,9 +25,9 @@ Name                 & Type   & SequenceLength & ArrayDimensions & Accessibility
 \end{longtable}
 \end{scriptsize}
 %% else
-%# We have no rows
 %% if is_OCS
-%# If there are no rows and is_OCS, tell them there are none...
-This component has no properties.
+The component has no properties.
+%% else
+The worker has no properties.
 %% endif
 %% endif

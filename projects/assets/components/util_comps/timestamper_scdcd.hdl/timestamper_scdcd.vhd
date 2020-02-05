@@ -174,7 +174,6 @@ begin
       INTERVAL  when in_in.opcode = ComplexShortWithMetadata_interval_op_e else
       FLUSH     when in_in.opcode = ComplexShortWithMetadata_flush_op_e    else
       SYNC      when in_in.opcode = ComplexShortWithMetadata_sync_op_e     else
-      USER      when in_in.opcode = ComplexShortWithMetadata_user_op_e     else
       SAMPLES;
 
   in_adapter_32 : if IN_PORT_DATA_WIDTH = 32 generate
@@ -304,7 +303,6 @@ begin
       ComplexShortWithMetadata_interval_op_e when oclk_opcode = INTERVAL  else
       ComplexShortWithMetadata_flush_op_e    when oclk_opcode = FLUSH     else
       ComplexShortWithMetadata_sync_op_e     when oclk_opcode = SYNC      else
-      ComplexShortWithMetadata_user_op_e     when oclk_opcode = USER      else
       ComplexShortWithMetadata_samples_op_e;
 
 end rtl;
