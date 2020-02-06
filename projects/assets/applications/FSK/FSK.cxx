@@ -313,7 +313,7 @@ std::string get_frontend(const std::string& hdl_pf) {
 }
 
 void run(FSKApp& app) {
-  // Reference https://opencpi.github.io/OpenCPI_Application_Development.pdf for
+  // Reference opencpi.gitlab.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf for
   // an explanation of the ACI.
 
   bool adc_overrun_flag = false;

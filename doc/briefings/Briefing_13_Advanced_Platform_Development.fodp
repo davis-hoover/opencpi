@@ -37181,7 +37181,7 @@
        <text:list-item>
         <text:list>
          <text:list-item>
-          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.github.io/OpenCPI_Platform_Development.pdf" xlink:type="simple">https://opencpi.github.io/OpenCPI_Platform_Development.pdf</text:a></text:span></text:p>
+          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.github.io/OpenCPI_Platform_Development_Guide.pdf" xlink:type="simple">https://opencpi.github.io/OpenCPI_Platform_Development_Guide.pdf</text:a></text:span></text:p>
          </text:list-item>
         </text:list>
        </text:list-item>
