@@ -88,7 +88,7 @@ architecture rtl of zed_worker is
 begin
   timebase_out.clk   <= clk;
   timebase_out.reset <= reset;
-  timebase_out.ppsIn <= '0';
+  timebase_out.pps   <= '0';
 
   g0: if its(ocpi_debug) generate
     -- If we don't assign the outputs, the "debug overhead" will disappear

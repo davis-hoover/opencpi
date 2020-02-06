@@ -88,11 +88,13 @@ RccRealPlatform=$(strip $(infox RRP:$(RccPlatform))\
 # of the <platform>) to find one that maps a platform to the target in $1.  Return <platform>
 # This relies on the 1:1 mapping of rcc platforms and targets
 RccGetPlatform=$(strip $(infox RGP:$1:$2:)\
-  $(or $(filter $1,$(RccAllPlatforms)),\
-       $(foreach v,$(filter RccTarget_%,$(.VARIABLES)),$(infox VV:$v:$($v))\
-         $(foreach p,$(v:RccTarget_%=%),\
-           $(and $(filter $p,$(RccAllPlatforms)),$(filter $1,$(value $v)),\
-	         $(infox RGPr:$1:$v:$p:$(value $v))$p))),\
+  $(or $(filter $1,$(RccAllPlatforms)),$(strip\
+       $(eval plats:=$(strip\
+         $(foreach v,$(filter RccTarget_%,$(.VARIABLES)),$(infox VV:$v:$($v):$(v:RccTarget_%=%))\
+           $(foreach p,$(v:RccTarget_%=%),$(infox PP:$p)\
+             $(and $(filter $p,$(RccAllPlatforms)),$(filter $1,$(value $v)),$p)))))\
+       $(if $(filter 0 1,$(words $(plats))),,$(error Multiple platforms match target $1: $(plats))) \
+       $(and $(filter 1,$(words $(plats))),$(infox RGPr:$1:$v:$(plats):$(value $v))$(plats))),\
        $($(or $2,error) Cannot find an RCC platform for the target: $1)))
 # The model-specific determination of the "tail end" of the target directory,
 # after the prefix (target), and build configuration.

@@ -36,7 +36,7 @@ OcpiStaticProgramFlags=-rdynamic
 OcpiPlatformPrerequisites=$(MatchTool) busybox:epiq_matchstiq
 OcpiKernelDir=$(or $(AV_MATCH_VENDOR_REPO),vendor)/zynq_kernel
 OcpiPlatformOs=linux
-OcpiPlatformOsVersion=zynq
+OcpiPlatformOsVersion=zynq_e
 OcpiPlatformArch=arm_cs
 # CLOCK_MONOTONIC_RAW is not available
 OcpiGetTimeClockId=CLOCK_MONOTONIC

@@ -245,7 +245,7 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
     } else
     // ========= end backwards compatibility
       targets = options.target();
-    for (const char **tp = targets; *tp; ++tp)
+    for (const char **tp = targets; tp && *tp; ++tp)
       doTarget(*tp, options.specs() || options.list_specs());
     return false;
   } else if (options.list()) { // no xml here
@@ -288,7 +288,7 @@ static int mymain(const char **ap) {
   signal(SIGPIPE, SIG_IGN);
   if (options.log_level())
     OCPI::OS::logSetLevel(options.log_level());
-  if (!*ap && !options.list() && !options.artifacts())
+  if (!*ap && !options.list() && !options.artifacts() && !options.list_artifacts() && !options.list_specs())
     return options.usage();
   if (options.verbose())
     params.addBool("verbose", true);

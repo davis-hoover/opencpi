@@ -78,8 +78,8 @@ public: // Should these be protected with friends reading?
   // Constructors
   // Default constructor: no timeout, all ports must be ready
   RunCondition();
-  // This allows a zero-terminated list of masks to be provided in the argument list.
-  // No timeout is enabled.  A very common case.  If given one arg == 0, then never runs
+  // This allows a RCC_NO_PORTS-terminated list of masks to be provided in the argument list.
+  // No timeout is enabled.  A very common case.  If given one arg == RCC_NO_PORTS, then never runs
   RunCondition(OcpiPortMask first, ...);
   // This allows the specification of a mask array (which can be nullptr) and a timeout.
   RunCondition(OcpiPortMask*, uint32_t usecs = 0, bool timeout = false);

@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <climits>
 #include <set>
 #include <limits>
 #include "OcpiUtilExceptionApi.h"
@@ -90,7 +91,7 @@ namespace OCPI {
     parse(const char *defaultName, const char **extraTopAttrs, const char **extraInstAttrs,
           const PValue *params) {
       // This is where common initialization is done except m_xml and m_copy
-      m_doneInstance = -1;
+      m_doneInstance = UINT_MAX;
       m_cMapPolicy = RoundRobin;
       m_processors = 0;
       ezxml_t ax = m_xml;
@@ -144,7 +145,7 @@ namespace OCPI {
       if (done) {
         if ((err = getInstance(done, n)))
           return err;
-        m_doneInstance = (int)n;
+        m_doneInstance = n;
       }
       // Note the mapped properties are AFTER the instances so that a value
       // set on an instance is overriden by one on a mapped property.

@@ -30,6 +30,7 @@
  * All values are hex.
  * If holeOffset is zero there is no hole
  */
+#include <cerrno>
 #include <inttypes.h>
 #include <unistd.h>
 #include <sys/mman.h> // FIXME: use OS services?

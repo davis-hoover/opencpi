@@ -201,7 +201,7 @@ namespace OCPI {
       static unsigned s_count;
       std::string m_name;
       std::string m_package;
-      int m_doneInstance; // -1 for none
+      unsigned m_doneInstance; // UINT_MAX for none
       std::list<Connection> m_connections;
       typedef std::list<Connection>::iterator ConnectionsIter;
       CMapPolicy m_cMapPolicy;

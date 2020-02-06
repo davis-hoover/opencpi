@@ -44,7 +44,7 @@ HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 $(eval $(HdlPreprocessTargets))
 $(infox HP2:$(HdlPlatform) HPs:$(HdlPlatforms) HT:$(HdlTarget) HTs:$(HdlTargets):$(CURDIR))
-include $(OCPI_CDK_DIR)/include/rcc/rcc-targets.mk
+include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
 ifeq ($(OCPI_HAVE_OPENCL),1)
   include $(OCPI_CDK_DIR)/include/ocl/ocl-make.mk
 endif
@@ -164,7 +164,6 @@ MyMake=$(MAKE) --no-print-directory
 
 HdlLibrariesCommand=$(call OcpiAdjustLibraries,$(HdlLibraries))
 RccLibrariesCommand=$(call OcpiAdjustLibraries,$(RccLibraries))
-TestTargets:=$(call Unique,$(HdlPlatforms) $(HdlTargets) $(RccTargets))
 # set the directory flag to make, and use the desired Makefile
 GoWorker=-C $1 -f $(or $(realpath $1/Makefile),$(OCPI_CDK_DIR)/include/worker.mk)
 BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker,$2)::)\

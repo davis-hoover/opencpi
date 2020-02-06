@@ -89,7 +89,8 @@ begin
     port    map(clk => clk, reset => reset, name => sim2sw_name,
                 valid => sim2sw_valid_r, flush => sim2sw_flush_r, close => sim2sw_close_r,
                 data => sim2sw_data_r);
-  sdp_out.clk        <= clk;
+  in2out_i: util.util.in2out port map(in_port => clk, out_port => sdp_out.clk);
+--  sdp_out.clk        <= clk;
   sdp_out.reset      <= reset;
   sdp_out.id         <= (others => '0');  -- set in case directly wired to control plane
   sdp_out.sdp.header <= dws2header(sw2sdp_header_r);
