@@ -95,6 +95,7 @@ namespace OCPI {
 	void collectCandidate(OCPI::Library::Candidate &c, unsigned n);
 	void finalizePortParam(OU::Assembly::Instance &ui, const OCPI::Util::PValue *params,
 			       const char *param);
+	OCPI::Library::Assembly::Instance *m_libInstance;
 	Instance();
 	~Instance();
       };
@@ -103,7 +104,7 @@ namespace OCPI {
 	CMap m_usedImpls;         // which fixed implementations in the artifact are in use
 	Booking() : m_artifact(NULL), m_usedImpls(0) {}
       };
-      Instance *m_instances;
+      std::vector<Instance> m_instances;
       // The instance objects for the launcher
       OCPI::Container::Launcher::Members m_launchMembers;
       OCPI::Container::Launcher::Connections m_launchConnections;
@@ -208,6 +209,7 @@ namespace OCPI {
       void deployInstance(unsigned instNum, unsigned score, size_t scale,
 			  unsigned *containers, const OCPI::Library::Implementation **impls,
 			  CMap feasible);
+      OCPI::Library::Assembly::Instance &libInstance(size_t n) const { return *m_instances[n].m_libInstance; }
       void doInstance(unsigned instNum, unsigned score);
       void checkExternalParams(const char *pName, const OCPI::Util::PValue *params);
       void prepareInstanceProperties(unsigned nInstance,

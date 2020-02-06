@@ -51,8 +51,9 @@ namespace OCPI {
 	  struct stat s;
 	  if (!lstat(a_libName.c_str(), &s) && (s.st_mode & S_IFMT) == S_IFLNK) {
 	    std::string dirName = OS::FileSystem::directoryName(a_libName);
-	    if (OS::FileSystem::relativeName(dirName) == "exports" &&
-		OS::FileSystem::exists(dirName + "/project-package-id"))
+	    if ((OS::FileSystem::relativeName(dirName) == "exports" &&
+		 OS::FileSystem::exists(dirName + "/project-package-id")) ||
+		OS::FileSystem::exists(dirName + "/Project.mk"))
 	      return true;
 	  }
 	}

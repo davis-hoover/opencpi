@@ -273,6 +273,7 @@ namespace OCPI {
       }
       if (isReadable) {
 	static bool once = false;
+	assert(cname() && cname()[0]);
 	if (!once)
 	  ewprintf("for property \"%s\", the \"readable\" attribute is deprecated: all properties "
 		   "are considered readable; workers can use the \"readback\" attribute in the OWD when "
@@ -331,6 +332,7 @@ namespace OCPI {
       if ((err = includeImpl ?
 	   OE::checkAttrs(prop, "Name", PROPERTY_ATTRIBUTES, IMPL_ATTRIBUTES, NULL) :
 	   OE::checkAttrs(prop, "Name", PROPERTY_ATTRIBUTES, NULL)) ||
+	  (err = OE::getRequiredString(prop, m_name, "name", "property")) ||
 	  (includeImpl && (err = parseImplAlso(prop))) ||
 	  (err = parseAccess(prop, !includeImpl, false)))
 	return err;
