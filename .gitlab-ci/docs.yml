@@ -1,0 +1,39 @@
+build:pages:
+  stage: build
+  tags:
+    - docker
+  image: $CI_REGISTRY_IMAGE/build-pages:latest
+  cache:
+    key: pages
+    paths:
+      - .public/
+  artifacts:
+    paths:
+      - .public/
+  # Overwrite default before and after script
+  before_script:
+  after_script:
+  script:
+    - git checkout develop  # this is necessary so build-docs.py can checkout develop
+    - git checkout $CI_COMMIT_SHORT_SHA  # go back to commit under test
+    - python3.4 doc/build-pages.py --clean develop  # force building of develop
+
+pages:
+  stage: deploy
+  tags:
+    - docker
+  image: centos:latest
+  artifacts:
+    paths:
+      - public/
+  dependencies: ["build:pages"]
+  only:
+    - develop
+    - master
+  # Overwrite default before and after script
+  before_script:
+  after_script:
+  script:
+    - rm -rf public
+    - mkdir -p public
+    - mv .public/releases/develop/* public/  # only deploy develop version of docs

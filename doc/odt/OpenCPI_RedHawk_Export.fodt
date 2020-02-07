@@ -6,19 +6,19 @@
   <config:config-item-set config:name="ooo:view-settings">
    <config:config-item config:name="ViewAreaTop" config:type="long">0</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">32198</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">26938</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">30157</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">27894</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">false</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">14014</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">12993</config:config-item>
      <config:config-item config:name="ViewTop" config:type="long">3244</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
      <config:config-item config:name="VisibleTop" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">32196</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">26936</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">30155</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">27892</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">1</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -70,7 +70,7 @@
    <config:config-item config:name="InvertBorderSpacing" config:type="boolean">true</config:config-item>
    <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">80353484</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">80384976</config:config-item>
    <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
    <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
@@ -98,7 +98,7 @@
    <config:config-item config:name="UnbreakableNumberings" config:type="boolean">true</config:config-item>
    <config:config-item config:name="AllowPaddingWithoutBorders" config:type="boolean">false</config:config-item>
    <config:config-item config:name="StylesNoDefault" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="LinkUpdateMode" config:type="short">1</config:config-item>
+   <config:config-item config:name="LinkUpdateMode" config:type="short">2</config:config-item>
    <config:config-item config:name="AlignTabStopPosition" config:type="boolean">true</config:config-item>
    <config:config-item config:name="DoNotJustifyLinesWithManualBreak" config:type="boolean">false</config:config-item>
    <config:config-item config:name="SubtractFlysAnchoredAtFlys" config:type="boolean">true</config:config-item>
@@ -3519,14 +3519,14 @@
    <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" style:page-number="auto"/>
    <style:text-properties fo:font-size="28pt" fo:font-weight="bold" officeooo:paragraph-rsid="0214f63d" style:font-size-asian="28pt" style:font-weight-asian="bold" style:font-size-complex="28pt"/>
   </style:style>
-  <style:style style:name="P74" style:family="paragraph" style:parent-style-name="Heading_20_2">
-   <style:text-properties officeooo:rsid="04a4f1e7" officeooo:paragraph-rsid="04a4f1e7"/>
-  </style:style>
-  <style:style style:name="P75" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P74" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:paragraph-rsid="0214f63d"/>
   </style:style>
-  <style:style style:name="P76" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P75" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:paragraph-rsid="036ddc90"/>
+  </style:style>
+  <style:style style:name="P76" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:rsid="04a4f1e7" officeooo:paragraph-rsid="04a4f1e7"/>
   </style:style>
   <style:style style:name="P77" style:family="paragraph" style:parent-style-name="List_20_Bullet">
    <style:text-properties officeooo:rsid="049cc370" officeooo:paragraph-rsid="049cc370"/>
@@ -4220,7 +4220,7 @@
      <text:p text:style-name="P66"><text:a xlink:type="simple" xlink:href="#__RefHeading___Toc91722_2939887359" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">6 <text:tab/>Building the ocpirh_export tool in an OpenCPI Source Installation<text:tab/>13</text:a></text:p>
     </text:index-body>
    </text:table-of-content>
-   <text:h text:style-name="P69" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__5328_1790153948"/><text:bookmark-start text:name="_Toc245388431"/><text:bookmark-start text:name="_Toc224890089"/><text:bookmark-start text:name="_Toc141837257"/><text:bookmark-start text:name="_Toc141318608"/>References<text:bookmark-end text:name="__RefHeading__5328_1790153948"/><text:bookmark-end text:name="_Toc245388431"/><text:bookmark-end text:name="_Toc224890089"/><text:bookmark-end text:name="_Toc141837257"/><text:bookmark-end text:name="_Toc141318608"/></text:h>
+   <text:h text:style-name="P69" text:outline-level="1"><text:bookmark-start text:name="_Toc141318608"/><text:bookmark-start text:name="_Toc141837257"/><text:bookmark-start text:name="_Toc224890089"/><text:bookmark-start text:name="_Toc245388431"/><text:bookmark-start text:name="__RefHeading__5328_1790153948"/>References<text:bookmark-end text:name="_Toc141318608"/><text:bookmark-end text:name="_Toc141837257"/><text:bookmark-end text:name="_Toc224890089"/><text:bookmark-end text:name="_Toc245388431"/><text:bookmark-end text:name="__RefHeading__5328_1790153948"/></text:h>
    <text:p text:style-name="Body">This document depends on <text:span text:style-name="T25">the OpenCPI Application Development Guide. <text:s/>For information on component development, which is </text:span><text:span text:style-name="T20">not</text:span><text:span text:style-name="T25"> a prerequisite of this document, see the OpenCPI Component Development Guide (CDG)</text:span>.</text:p>
    <text:p text:style-name="Table_20_Caption_20__28_before_29_">Table <text:sequence text:ref-name="refTable0" text:name="Table" text:formula="ooow:1 " style:num-format="1">1</text:sequence> - Table of Reference Documents</text:p>
    <table:table table:name="Table2" table:style-name="Table2">
@@ -4246,7 +4246,7 @@
       <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T11">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C2" office:value-type="string">
-      <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.1/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">https://opencpi.gitlab.io/releases/v1.6.0-rc.1/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">https://opencpi.gitlab.io/releases/v1.6.0/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4257,7 +4257,7 @@
       <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T11">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C3" office:value-type="string">
-      <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.1/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">https://opencpi.gitlab.io/releases/v1.6.0-rc.1/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">https://opencpi.gitlab.io/releases/v1.6.0/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4268,16 +4268,16 @@
       <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T11">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C4" office:value-type="string">
-      <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.1/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">https://opencpi.gitlab.io/releases/v1.6.0-rc.1/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P13"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">https://opencpi.gitlab.io/releases/v1.6.0/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
    <text:p text:style-name="P14"><text:a xlink:type="simple" xlink:href="https://github.com/opencpi/opencpi/raw/master/doc/pdf/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"/></text:p>
-   <text:h text:style-name="P70" text:outline-level="1"><text:bookmark-start text:name="_Toc245388432"/><text:bookmark-start text:name="__RefHeading___Toc69312_1755303479"/><text:bookmark-start text:name="_Toc224890090"/>Overview<text:bookmark-end text:name="_Toc245388432"/><text:bookmark-end text:name="__RefHeading___Toc69312_1755303479"/><text:bookmark-end text:name="_Toc224890090"/><text:bookmark text:name="_Toc224273818"/></text:h>
+   <text:h text:style-name="P70" text:outline-level="1"><text:bookmark-start text:name="_Toc224890090"/><text:bookmark-start text:name="__RefHeading___Toc69312_1755303479"/><text:bookmark-start text:name="_Toc245388432"/>Overview<text:bookmark-end text:name="_Toc224890090"/><text:bookmark-end text:name="__RefHeading___Toc69312_1755303479"/><text:bookmark-end text:name="_Toc245388432"/><text:bookmark text:name="_Toc224273818"/></text:h>
    <text:p text:style-name="P20">The purpose of this document is to <text:span text:style-name="T29">describe a tool, </text:span><text:span text:style-name="Code">ocpirh_export</text:span><text:span text:style-name="T29">, that exports OpenCPI components and applications for execution as components in a REDHAWK (RH) environment. <text:s/>This tool is part of OpenCPI. <text:s/>The user of this tool must be familiar with application development in OpenCPI, as it is based on, and analogous to preparing OpenCPI applications for execution in the OpenCPI runtime environment.</text:span></text:p>
    <text:p text:style-name="P23">REDHAWK is a software-defined radio (SDR) framework, available at <text:a xlink:type="simple" xlink:href="http://redhawksdr.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">redhawksdr.org</text:a>. <text:s/>It is a software component-based framework based on Eclipse, CORBA and the Software Communication Architecture <text:span text:style-name="T30">(SCA) </text:span>as defined at <text:a xlink:type="simple" xlink:href="http://www.public.navy.mil/JTNC/SCA" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T30">http://www.public.navy.mil/JTNC/SCA</text:span></text:a><text:span text:style-name="T30">, with some modifications and enhancements.</text:span></text:p>
    <text:p text:style-name="P24">The capability described in this document is a specific bridge between the two environments that facilitates exactly one of many possible interaction and integration use cases between the OpenCPI and REDHAWK frameworks. <text:s/>Namely:</text:p>
-   <text:list xml:id="list751106667" text:style-name="WWNum32">
+   <text:list xml:id="list406962704" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T30">A</text:span>n OpenCPI component or application developer needs to provide a package to a <text:span text:style-name="T31">RH</text:span> developer such that the <text:span text:style-name="T31">RH</text:span> developer can install the OpenCPI component or application as a component in the <text:span text:style-name="T31">RH</text:span> environment.</text:p>
     </text:list-item>
@@ -4296,19 +4296,19 @@
    <text:p text:style-name="P28">As mentioned above, components or application may be exported <text:span text:style-name="T35">from OpenCPI to RH</text:span>. <text:s/>Exporting <text:span text:style-name="T51">a</text:span> <text:span text:style-name="T19">component</text:span> means exporting an application consisting of that single component, with its properties taking default values, and <text:span text:style-name="T35">all </text:span>its ports made external. <text:s/><text:span text:style-name="T34">Thus exporting a component is just a shortcut for exporting a simple application based on that component, with all its ports declared as external using the </text:span><text:span text:style-name="Code">externals</text:span><text:span text:style-name="T34"> attribute in the single </text:span><text:span text:style-name="Code">instance</text:span><text:span text:style-name="T34"> element of the OAS.</text:span></text:p>
    <text:h text:style-name="P68" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc91716_2939887359"/>Defining the External Ports of the Application<text:bookmark-end text:name="__RefHeading___Toc91716_2939887359"/></text:h>
    <text:p text:style-name="P29">External ports are designated in the OAS XML file using one of these methods:</text:p>
-   <text:list xml:id="list232144971311805" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list124825333399382" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">the <text:span text:style-name="Code">externals</text:span> (plural) boolean attribute of an instance <text:span text:style-name="T36">specifies</text:span> that all its unconnected ports should be considered external to the application, using the instance&apos;s port names, <text:span text:style-name="T34">e.g.:</text:span></text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Code"><text:tab/><text:span text:style-name="T34">&lt;application&gt;<text:line-break/><text:tab/><text:tab/>&lt;instance component=&apos;ocpi.bias&apos; externals=&apos;true&apos;/&gt;<text:line-break/><text:tab/>&lt;/application&gt;</text:span></text:p>
-   <text:list xml:id="list232144544396891" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list124823600976918" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">the <text:span text:style-name="Code">external</text:span> (singular) string attribute of an instance can designate that a single port of the instance be external, using the instance&apos;s port name.</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Code"><text:tab/><text:span text:style-name="T34">&lt;application&gt;<text:line-break/><text:tab/><text:tab/>&lt;instance component=&apos;c1&apos; external=&apos;input&apos; connect=&apos;c2&apos;/&gt;<text:line-break/><text:tab/><text:tab/>&lt;instance component=&apos;c2&apos; external=&apos;output&apos;/&gt;<text:line-break/><text:tab/>&lt;/application&gt;</text:span></text:p>
-   <text:list xml:id="list232144106697503" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list124825145355252" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:span text:style-name="T34">a</text:span> <text:span text:style-name="Code">connection</text:span> element in the application can designate that a port of an instance should be considered external, using a specified name that may be different than the instance&apos;s port name., <text:span text:style-name="T34">e.g.</text:span></text:p>
     </text:list-item>

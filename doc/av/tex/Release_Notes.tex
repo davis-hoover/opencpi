@@ -20,7 +20,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Release Notes}
-\def\docVersion{1.5.0}
+\def\docVersion{1.6.0}
 %----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
 \input{\snippetpath/includes}
@@ -55,6 +55,9 @@ The Release Notes from previous releases are included here as reference for stil
 %----------------------------------------------------------------------------------------
 \begin{document}
 \maketitle
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 \thispagestyle{empty}
 \newpage
 \pagenumbering{roman}
@@ -80,6 +83,8 @@ The Release Notes from previous releases are included here as reference for stil
 			v1.4.0 & Updates for 1.4.0 release and moved previous to appendices & 10/2018 \\
 			\hline
 			v1.5.0 & Updates for 1.5.0 release & 4/2019 \\
+			\hline
+			v1.6.0 & Updates for 1.6.0 release & 1/2020 \\
 			\hline
 			\end{tabularx}
 		\end{table}
@@ -112,6 +117,96 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 \fi
 
 % \origsection{Release 1.5.0}
+\section{Enhancements}
+\subsection{Support for Workers with Separate Control and Data Clocks} % AV-3840
+\label{sec:16_clocks}
+Each worker data port can now declare whether the clock domain of the port's signals is:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item The same as the control port and clock (as before, which is still the default)
+\item Based on an output clock driven by worker code, indicated using the \code{clockDirection='out'} attribute
+\item Based on an input clock accepted into the port, indicated using the \code{clockDirection='in'} attribute
+\item The same as some other port of the worker, indicated using the \code{clock='\textit{other-port-name}'} attribute
+\end{itemize}
+One important use case for this is for all data communication and data processing to happen in a clock domain
+different from the control clock domain.
+When worker ports are connected that are in different clock domains, a clock-domain-crossing adapter is inserted which is conservative with respect to the relative clock rates and phasing.
+
+For more information, consult \path{OpenCPI_HDL_Development.pdf}.
+
+\subsection{Issues Database for OpenCPI is now Publicly Accessible}
+\label{sec:16_issues}
+Prior to this release, the issues/bug database used by the active OpenCPI developers and maintainers was private and not visible.  Now the OpenCPI developers and maintainers use the GitLab issues database that is associated with the new public GitLab repository at \url{gitlab.com/opencpi/-/issues}.
+
+\subsection{Source Installation Simplified}
+\label{sec:16_install}
+When installing from source,  various steps of installation, including the AV GUI installation and cross-building for embedded software and FPGA platforms, requires fewer steps and less complexity. Installation of an FPGA simulator has also been simplified since the Vivado WebPack package no longer requires any licensing at all.  See \githubio{OpenCPI\_Installation.pdf}.
+
+\subsection{Time Service Interfaces were Upgraded for better Timestamping Support}
+\label{sec:16_time}
+For platform developers, the properties of the \code{time\_server} worker instantiated in all platform configurations have been updated and clarified.  The VHDL signals associated with the timebase and timeservice platform port types have new signals.  The time service now supports the indication as to whether the time values come from valid GPS-based time.  Platforms with GPS receivers connected to CPU serial ports (e.g. Ettus e310) enable time values provided on worker time interfaces to be GPS-based time values.  This is a technology preview until the next release when most supported platforms will use this capability to provide GPS-based timestamping to workers.
+
+\subsection{New Features for Simplifying ADC/DAC Devices Workers and Enabling Timestamping}
+\label{sec:16_adcdac}
+For platform developers, special workers have been developed to allow the data ports of ADC and DAC device workers to remain in the sample clock domain and not be involved in timestamp injection.  These are a technology preview
+until the next release when they will be used for supported platforms.  See the specs and workers for \code{data\_src\_adc} and \code{data\_sink\_dac} in \code{projects/assets/hdl/device/}.  Similarly there is now a new timestamping worker that receives inputs in the sample clock domain.  See \code{timestamper\_sdcd} in \code{projects/assets/components/util\_comps}.
+
+\section{Changes and Notes}
+\subsection{Repository of OpenCPI moved to GitLab.com}
+\label{sec:16_repo}
+The git repository site where OpenCPI is hosted and actively maintained is now \code{gitlab.com}.  The documentation for releases is found at \url{opencpi.gitlab.io}.
+
+\subsection{Project with Content for Tutorials is in the Core Repository}
+\label{sec:16_tutorial}
+The project used for tutorials which was previously in a separate training repository is now in the core OpenCPI repository under \code{projects/tutorial}.
+
+\subsection{MacOS Catalina (10.15) is now Supported for Software Only (no FPGA) Development.}
+\label{sec:16_macos}
+Software only development (no FPGA tools or simulators) is supported on MacOS Catalina.  It relies on the \code{macports} package manager already being installed on the system, from \url{macports.org}.
+
+\subsection{The gpsd package is now a prerequisite for all OpenCPI systems.}
+\label{sec:16_gpsd}
+OpenCPI now has a core dependency on this package (\url{gpsd.gitlab.io/gpsd}) and it will be built for all development hosts and embedded systems and used in a way that will not conflict with systems that already have \code{gpsd} installed.
+
+\subsection{Optional Environment Settings for a Source Installation are in a New File.}
+\label{sec:16_gpsd}
+All environment settings for OpenCPI (which are all optional), should be set in the \code{user-env.sh} file at the top
+level of the installation.  This file is automatically read when the OpenCPI environment is established.
+
+\section{Major Known Deficiencies}
+\label{sec:15_bugs}
+
+\subsection{RPM Installation is not Supported in Release 1.6.0}
+\label{bug:norpm}
+In the initial 1.6.0 release of 1.6, RPM installation is not supported.  Only source installation is supported, as described in \githubio{OpenCPI\_Installation.pdf}.  RPM installations will be supported by the next minor release.
+
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 1.6:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1392}
+\item \bugref{2400}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+The following previously-documented deficiencies have been fixed in this release:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{2241}
+\item \bugref{3193}
+\item \bugref{4307}
+\end{itemize}
+
+% === End of 1.5
+
+\beginoldnotes
+
+\origsection{Release 1.5.0}
 \section{Enhancements}
 \subsection{New Digital Radio Controller Front-End Control Paradigm} (Technology Preview) % AV-3840
 \label{sec:15_drc}
@@ -263,9 +358,6 @@ The following previously-documented deficiencies have been fixed in this release
 \end{itemize}
 
 % === End of 1.5
-
-\beginoldnotes
-
 \origsection{Release 1.4.0}
 \section{Enhancements}
 
@@ -875,7 +967,7 @@ This is a list of major known deficiencies at the release of 1.1 that were not p
 \label{bug:1392}
 PCI-based platforms, \textit{e.g.} ML605 and ALST4, are limited to a 32KB buffer. By default, that buffer is split into two, resulting in two 16KB buffers. The maximum message length, in bytes, is then 16KB-16\footnote{16 bytes required for metadata}. RCC Workers will see any data beyond the limit as zero-filled.
 
-\subsection{MAC Address on ZedBoard}
+\subsection{MAC Address on ZedBoard when Using the xilinx13\_3 Software Platform (use xilinx13\_4 to avoid the issue)}
 % AV-2400, AV-2403
 \label{bug:2400}
 The currently used Linux release (``\texttt{xilinx13\_3}'') cannot properly set the MAC address on the ZedBoard. This should only affect users who have \textit{more than one ZedBoard} on a single network. Consult the \textit{ZedBoard Getting Started Guide} for a workaround.
