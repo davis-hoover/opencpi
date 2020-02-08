@@ -37181,7 +37181,7 @@
        <text:list-item>
         <text:list>
          <text:list-item>
-          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.github.io/OpenCPI_Platform_Development_Guide.pdf" xlink:type="simple">https://opencpi.github.io/OpenCPI_Platform_Development_Guide.pdf</text:a></text:span></text:p>
+          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Platform_Development_Guide.pdf" xlink:type="simple">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Platform_Development_Guide.pdf</text:a></text:span></text:p>
          </text:list-item>
         </text:list>
        </text:list-item>
@@ -37189,7 +37189,7 @@
         <text:p text:style-name="P114"><text:span text:style-name="T96">Matchstiq BSP Case Study</text:span></text:p>
         <text:list>
          <text:list-item>
-          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.github.io/assets/Matchstiq_BSP_Case_Study.pdf" xlink:type="simple">https://opencpi.github.io/assets/Matchstiq_BSP_Case_Study.pdf</text:a></text:span></text:p>
+          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/Matchstiq_BSP_Case_Study.pdf" xlink:type="simple">https://opencpi.gitlab.io/releases/develop/docs/assets/Matchstiq_BSP_Case_Study.pdf</text:a></text:span></text:p>
          </text:list-item>
         </text:list>
        </text:list-item>
@@ -37197,7 +37197,7 @@
         <text:p text:style-name="P114"><text:span text:style-name="T96">Matchstiq Platform Worker Datasheet</text:span></text:p>
         <text:list>
          <text:list-item>
-          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.github.io/assets/Matchstiq_Z1_Platform_Worker.pdf" xlink:type="simple">https://opencpi.github.io/assets/Matchstiq_Z1_Platform_Worker.pdf</text:a></text:span></text:p>
+          <text:p text:style-name="P114"><text:span text:style-name="T96"><text:a xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/Matchstiq_Z1_Platform_Worker.pdf" xlink:type="simple">https://opencpi.gitlab.io/releases/develop/docs/assets/Matchstiq_Z1_Platform_Worker.pdf</text:a></text:span></text:p>
          </text:list-item>
         </text:list>
        </text:list-item>
