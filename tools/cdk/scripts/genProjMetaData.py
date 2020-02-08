@@ -60,7 +60,6 @@ def addSpecs(curRoot, curDir):
 
 def getWorkerPlatforms(dirName, name):
     buildFile = dirName + "/" + name.split('.', 1)[0] + "-build.xml"
-    #print buildFile
 
 def checkBuiltApp (appName, appDir):
     fileList = os.listdir(appDir)
@@ -163,7 +162,6 @@ def addPlatforms (root, plats, dirName):
 
 def addAssemblies (root, assys, dirName):
     for a in assys:
-        #print "assemblies dir is: " + str(built)
         app = ET.SubElement(root, "assembly")
         app.set('name', a)
 
@@ -187,7 +185,7 @@ def isStale (myDir, force):
     '''find_output = ""
     if (force == False):
         if os.path.isfile(myDir + "/project.xml"):
-            print ("running find command: " + 'find ' + myDir + " -name" + " \"*.xml\"" +
+            print("running find command: " + 'find ' + myDir + " -name" + " \"*.xml\"" +
                    ' -newer '+ myDir + "/project.xml")
             find_output = subprocess.Popen(['find', myDir, "-name", "\"*.xml\"",
                                            '-newer', myDir + "/project.xml"],
@@ -195,9 +193,9 @@ def isStale (myDir, force):
             print(find_output)
             if find_output != b'':
                 retVal = False
-                print ("is stale")
+                print("is stale")
         else:
-            print ("metadata file does not exist yet")'''
+            print("metadata file does not exist yet")'''
 
     return retVal
 
