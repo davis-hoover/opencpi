@@ -42,7 +42,7 @@ bypass = os.environ.get("OCPI_TEST_bypass") == "true"
 
 if(bypass):
     bytes_per_sample = 4
-    total_num_in_samps = max_bytes_in / bytes_per_sample
+    total_num_in_samps = max_bytes_in // bytes_per_sample
     total_num_out_samps = get_total_num_samps(msgs)
     tmp1 = "for bypass mode, total number of input samples ("
     tmp1 += str(total_num_in_samps)

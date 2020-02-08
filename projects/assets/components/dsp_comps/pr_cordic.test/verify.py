@@ -89,7 +89,7 @@ DATA_WIDTH = int(os.environ.get("OCPI_TEST_DATA_WIDTH"))
 
 NUM_PRIM_DELAYS = int(os.environ.get("OCPI_TEST_STAGES")) + 2
 NUM_WORKER_DELAYS = NUM_PRIM_DELAYS
-NUM_OUTPUT_SAMPLES = int((os.stat(IFILE).st_size)/4) - NUM_WORKER_DELAYS
+NUM_OUTPUT_SAMPLES = os.stat(IFILE).st_size // 4 - NUM_WORKER_DELAYS
 
 iUpper16, iLower16 = getDATA(IFILE)
 oUpper16, oLower16 = getDATA(OFILE)
@@ -98,8 +98,8 @@ x_expected = [None]*NUM_OUTPUT_SAMPLES
 y_expected = [None]*NUM_OUTPUT_SAMPLES
 
 for k in range(0,NUM_OUTPUT_SAMPLES):
-    x_expected[k] = round(iUpper16[k] * np.cos ((np.pi*iLower16[k])/(2**(DATA_WIDTH-1))))
-    y_expected[k] = round(iUpper16[k] * np.sin ((np.pi*iLower16[k])/(2**(DATA_WIDTH-1))))
+    x_expected[k] = round(iUpper16[k] * np.cos((np.pi*iLower16[k])/(2**(DATA_WIDTH-1))))
+    y_expected[k] = round(iUpper16[k] * np.sin((np.pi*iLower16[k])/(2**(DATA_WIDTH-1))))
 
 # Buffers for holding the difference
 diffsY=[None]*NUM_OUTPUT_SAMPLES

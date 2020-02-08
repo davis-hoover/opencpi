@@ -30,7 +30,11 @@ import numpy as np
 
 with open(sys.argv[1], 'wb') as f:
     testCase = int(os.environ.get("OCPI_TEST_testCase"))
-    counterWidth = int(np.ceil(np.log2(float(os.environ.get("OCPI_TEST_CLK_RATE_HZ"))*float(os.environ.get("OCPI_TEST_DEBOUNCE_TIME_PSEC"))/1.0E12)))
+    counterWidth = int(np.ceil(np.log2(
+                       float(os.environ.get("OCPI_TEST_CLK_RATE_HZ")) 
+                       * float(os.environ.get("OCPI_TEST_DEBOUNCE_TIME_PSEC"))
+                       / 1.0E12
+                   )))
     counterClockCycles = pow(2, counterWidth)+2
     if (testCase == 1 or testCase == 3):
         # Toggle pins on and off.

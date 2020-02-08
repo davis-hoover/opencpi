@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -52,13 +52,13 @@ def main():
     dataType = sys.argv[2].lower()
     numSamples = int(sys.argv[3])
     sampleRate = float(sys.argv[4])
-    print "file is : " + f.name
-    print "data is : " + dataType
-    print "num samples is: " + str(numSamples)
-    print "sample rate is: " + str(sampleRate)
+    print("file is : " + f.name)
+    print("data is : " + dataType)
+    print("num samples is: " + str(numSamples))
+    print("sample rate is: " + str(sampleRate))
 
     if dataType == "complex":
-        print "Input is complex data"
+        print("Input is complex data")
         #I/Q pair in a 32-bit vector (31:0) is I(0) I(1) Q(0) Q(1) in bytes 0123 little-Endian
         #Thus I is indexed at byte 0 and Q is indexed at byte 2
         dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,0), 'imag_idx':(np.int16,2)}))
@@ -119,7 +119,7 @@ def main():
 
         print("End!")
     else:
-        print "Input is real data"
+        print("Input is real data")
         data = np.fromfile(f, dtype=np.int16)
         #Create time domain plot
         fig = plt.figure(1)
@@ -149,7 +149,7 @@ def main():
         fft_fig = plt.figure(2)
         ax2 = fft_fig.add_subplot(1, 1, 1)
         epsilon = pow(10, -10) #Error factor to avoid divide by zero in log10
-        ax2.plot(xf[xf.size/2:xf.size],20*np.log10(yf_plot[yf.size/2:yf.size]+epsilon))
+        ax2.plot(xf[xf.size//2:xf.size],20*np.log10(yf_plot[yf.size//2:yf.size]+epsilon))
 
         #Beautify plot
         ax2.set_title(str(numSamples) + '-Point Real FFT\n' + os.path.basename(f.name))

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -131,7 +131,7 @@ for i in range(Navg-1,num_samples): # lagging by Navg samples
     y.imag[i+1] = np.rint(gain.imag[i] * i_complex_data.imag[i])
 
 # compare python AGC (y) to UUT output (o_complex_data)
-for i in range(Navg-1+384,int(num_samples/4)):
+for i in range(Navg - 1 + 384, num_samples // 4):
     if abs(y.real[i+1] - o_complex_data.real[i+2]) > 2:
         print ("Real", i, y.real[i+1], o_complex_data.real[i+2], y.real[i+1]-o_complex_data.real[i+2])
         sys.exit(1)
@@ -140,7 +140,7 @@ for i in range(Navg-1+384,int(num_samples/4)):
         print ("Imag", i, y.imag[i+1], o_complex_data.imag[i+2], y.imag[i+1]-o_complex_data.imag[i+2])
         sys.exit(1)
     '''
-for i in range(int(num_samples/4+896),int(num_samples/2)):
+for i in range(num_samples // 4 + 896, num_samples // 2):
     if abs(y.real[i+1] - o_complex_data.real[i+2]) > 2:
         print ("Real", i, y.real[i+1], o_complex_data.real[i+2], y.real[i+1]-o_complex_data.real[i+2])
         sys.exit(1)
@@ -149,7 +149,7 @@ for i in range(int(num_samples/4+896),int(num_samples/2)):
         print ("Imag" + color.END, i, y.imag[i+1], o_complex_data.imag[i+2], y.imag[i+1]-o_complex_data.imag[i+2])
         sys.exit(1)
     '''
-for i in range(int(num_samples/2+384),int(num_samples*3/4)):
+for i in range(num_samples // 2 + 384, num_samples * 3 // 4):
     if abs(y.real[i+1] - o_complex_data.real[i+2]) > 2:
         print ("Real", i, y.real[i+1], o_complex_data.real[i+2], y.real[i+1]-o_complex_data.real[i+2])
         sys.exit(1)
@@ -158,7 +158,7 @@ for i in range(int(num_samples/2+384),int(num_samples*3/4)):
        print ("Imag", i, y.imag[i+1], o_complex_data.imag[i+2], y.imag[i+1]-o_complex_data.imag[i+2])
        sys.exit(1)
     '''
-for i in range(int(num_samples*3/4+256),num_samples-2):
+for i in range(num_samples * 3 // 4 + 256, num_samples - 2):
     if abs(y.real[i+1] - o_complex_data.real[i+2]) > 2:
         print ("Real", i, y.real[i+1], o_complex_data.real[i+2], y.real[i+1]-o_complex_data.real[i+2])
         sys.exit(1)

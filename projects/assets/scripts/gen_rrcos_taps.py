@@ -58,8 +58,6 @@ def main():
 
     import filters
     time_idx, h_rrc = filters.rrcosfilter(length, alpha, Ts, Fs)
-    #print time_idx
-    #print h_rrc
 
     #set taps scale to integers
     scale = max(abs(h_rrc))
@@ -68,10 +66,8 @@ def main():
     print(taps)
     print((sum(taps)))
     print(((sum(taps))/max_tap))#variables were previously cast to float 
-    #print taps[0:int(np.ceil(length/2.0))]
 
     fo = open(sys.argv[6], 'w')
-    #print "\tName of the output file:", fo.name
     for i in taps[0:int(np.ceil(length/2.0))]:
         stringy = ''.join(str(i)+'\n')
         fo.write(stringy)

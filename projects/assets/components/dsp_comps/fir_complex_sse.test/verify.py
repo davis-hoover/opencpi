@@ -67,7 +67,7 @@ if( sum(map(abs,taps)) == 0):
     sys.exit(1)
 
 #Convert output binary file to text file
-filter_group_delay = int(num_taps/2)+4
+filter_group_delay = num_taps // 2 + 4
 bin2int.bin2int_complex(output_file, output_file.rstrip('out')+'tmp', 2*num_taps, filter_group_delay)
 
 #Compare symmetric taps file to output

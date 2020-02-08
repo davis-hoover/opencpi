@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -19,12 +19,12 @@
 
 
 import numpy as np
+import sys
 try:
     import matplotlib.pyplot as plt
 except (ImportError, RuntimeError):
     print("******* Error: python matplotlib is unavailable or not installed")
     sys.exit(1)
-import sys
 import os.path
 import itertools
 
@@ -33,7 +33,7 @@ def getmsg(m):
     opcode = m[1]
     data   = None
     if length > 0:
-        data = m[2:length/4+2]
+        data = m[2:length//4+2]
     return (opcode, length, data)
 
 def main():
@@ -61,14 +61,14 @@ def main():
     if len(sys.argv) > 5:
         if sys.argv[5].lower() == "true":
             messagesInFile = "true"
-    print "file is : " + f.name
-    print "data is : " + dataType
-    print "num samples is: " + str(numSamples)
-    print "sample rate is: " + str(sampleRate)
-    print "messages in file is: " + messagesInFile
+    print("file is : " + f.name)
+    print("data is : " + dataType)
+    print("num samples is: " + str(numSamples))
+    print("sample rate is: " + str(sampleRate))
+    print("messages in file is: " + messagesInFile)
 
     if dataType == "complex":
-        print "Input is complex data"
+        print("Input is complex data")
         #I/Q pair in a 32-bit vector (31:0) is Q(0) Q(1) I(0) I(1) in bytes 0123 little-Endian
         #Thus Q is indexed at byte 0 and I is indexed at byte 2
         dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,2), 'imag_idx':(np.int16,0)}))
@@ -90,7 +90,7 @@ def main():
                 else:
                     index = index + len(msg[msg_count][2]) + 2
                 msg_count += 1
-            for i in xrange(0,len(msg)):
+            for i in range(0,len(msg)):
                 if(msg[i][0]==0):
                     samples.extend(msg[i][2])
                 else:
@@ -100,8 +100,8 @@ def main():
         #Pull out I and Q and make lists for each
         iList = data['real_idx']
         qList = data['imag_idx']
-        iqList = list();
-        iqList_mag = list();
+        iqList = list()
+        iqList_mag = list()
         for a,data in enumerate(iList):
             iqList.append(complex(int(iList[int(a)]),int(qList[int(a)])))
 
@@ -153,7 +153,7 @@ def main():
         print("End!")
 
     else:
-        print "Input is real data"
+        print("Input is real data")
 
         #Optionally parse non-samples messages out of the data before plotting
         if messagesInFile == "false":
@@ -172,7 +172,7 @@ def main():
                 else:
                     index = index + len(msg[msg_count][2]) + 2
                 msg_count += 1
-            for i in xrange(0,len(msg)):
+            for i in range(0,len(msg)):
                 if(msg[i][0]==0):
                     samples.extend(msg[i][2])
                 else:
@@ -207,7 +207,7 @@ def main():
         fft_fig = plt.figure(2)
         ax2 = fft_fig.add_subplot(1, 1, 1)
         epsilon = pow(10, -10) #Error factor to avoid divide by zero in log10
-        ax2.plot(xf[xf.size/2:xf.size],20*np.log10(yf_plot[yf.size/2:yf.size]+epsilon))
+        ax2.plot(xf[xf.size//2:xf.size],20*np.log10(yf_plot[yf.size//2:yf.size]+epsilon))
 
         #Beautify plot
         ax2.set_title(str(numSamples) + '-Point Real FFT\n' + os.path.basename(f.name))

@@ -39,7 +39,7 @@ max_bytes_in = int(os.environ.get("OCPI_TEST_ocpi_max_bytes_in"))
 # Generate enough samples to generate number_of_samples_messages max_bytes_in sized input messages
 number_of_samples_messages = 10
 bytes_per_sample = 4
-num_samples_to_generate = number_of_samples_messages*max_bytes_in/bytes_per_sample
+num_samples_to_generate = number_of_samples_messages * max_bytes_in // bytes_per_sample
 
 # Create ramp from 0 to num-samples-1
 ramp = np.arange(num_samples_to_generate)

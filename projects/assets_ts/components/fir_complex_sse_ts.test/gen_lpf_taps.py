@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -64,11 +64,8 @@ def set_taps_lpf():
 
     #set taps scale to integers
     taps = (np.int16)(result * max_tap / scale)
-    #print (float)(sum(taps))/(float)(max_tap)
-    #print taps[0:int(np.ceil(length/2.0))]
 
     fo = open(sys.argv[1], 'w')
-    #print "\tName of the output file:", fo.name
     for i in taps[0:int(np.ceil(length/2.0))]:
         stringy = ''.join(str(i)+'\n')
         fo.write(stringy)

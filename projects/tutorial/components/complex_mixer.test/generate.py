@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -75,7 +75,7 @@ f.close()
 
 # Summary
 print ('\t# of Bytes:', NUM_SAMPLES*4)
-print ('\t# of I/Q (16b) samples:', NUM_SAMPLES/2)
+print ('\t# of I/Q (16b) samples:', NUM_SAMPLES//2)
 print ('\tSample Frequency:', Fs)
 print ('\tTarget Frequency:', Ft)
 print ('\tAmplitude:', AMPLITUDE)
