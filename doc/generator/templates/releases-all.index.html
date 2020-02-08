@@ -10,7 +10,7 @@
 
 <h2>Releases</h2>
 <ul>
-    {% for release in releases|sort(reverse=True, attribute='name') %}
+    {% for release in releases|reverse %}
     <li>{{ release.anchor_tag() }}</li>
     {% endfor %}
 </ul>
