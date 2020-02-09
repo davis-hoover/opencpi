@@ -9,7 +9,7 @@
 
 [mailing_list]: <http://lists.opencpi.org>
 
-[src_install]: <https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Installation.pdf>
+[src_install]: <https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Installation_Guide.pdf>
 
 [releases]:   <https://gitlab.com/opencpi/opencpi/-/releases>
 

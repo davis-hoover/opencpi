@@ -56,7 +56,7 @@ RccIncludeDirsActual=$(RccIncludeDirsInternal)\
 BF=$(strip\
   $(if $1,,$(error internal: BF w/o arg))\
   $(foreach p,$(or $(call RccGetPlatform,$1),$(error internal: no platform for BF: $1)),\
-    $(foreach s,$(or $(OcpiDynamicLibrarySuffix_$p),$(error internal: no suffix for: $p)),\
+    $(foreach s,$(or $(OcpiDynamicLibrarySuffix_$p),$(error internal: no suffix for: $p/$1)),\
       $(infox BFr:$1->$p->$s)$s)))
 RccLinkOptions=$(OcpiRccLDFlags_$(RccPlatform))
 # This is for backward compatibility

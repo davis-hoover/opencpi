@@ -4261,7 +4261,7 @@
       <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C2" office:value-type="string">
-      <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T16">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T16">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development_Guide.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4272,7 +4272,7 @@
       <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C3" office:value-type="string">
-      <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T16">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_User_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T16">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_User_Guide.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -4283,11 +4283,11 @@
       <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T9">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C4" office:value-type="string">
-      <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T16">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P11"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T16">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development_Guide.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:p text:style-name="P12"><text:a xlink:type="simple" xlink:href="https://github.com/opencpi/opencpi/raw/master/doc/pdf/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"/></text:p>
+   <text:p text:style-name="P12"><text:a xlink:type="simple" xlink:href="https://github.com/opencpi/opencpi/raw/master/doc/pdf/OpenCPI_RCC_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"/></text:p>
    <text:h text:style-name="P68" text:outline-level="1"><text:bookmark-start text:name="_Toc245388432"/><text:bookmark-start text:name="__RefHeading___Toc69312_1755303479"/><text:bookmark-start text:name="_Toc224890090"/>Overview<text:bookmark-end text:name="_Toc245388432"/><text:bookmark-end text:name="__RefHeading___Toc69312_1755303479"/><text:bookmark-end text:name="_Toc224890090"/><text:bookmark text:name="_Toc224273818"/></text:h>
    <text:p text:style-name="P18">The purpose of this document is to <text:span text:style-name="T27">describe a tool, </text:span><text:span text:style-name="Code">ocpirh_export</text:span><text:span text:style-name="T27">, that exports OpenCPI components and applications for execution as components in a REDHAWK (RH) environment. <text:s/>This tool is part of OpenCPI. <text:s/>The user of this tool must be familiar with application development in OpenCPI, as it is based on, and analogous to preparing OpenCPI applications for execution in the OpenCPI runtime environment.</text:span></text:p>
    <text:p text:style-name="P21">REDHAWK is a software-defined radio (SDR) framework, available at <text:a xlink:type="simple" xlink:href="http://redhawksdr.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">redhawksdr.org</text:a>. <text:s/>It is a software component-based framework based on Eclipse, CORBA and the Software Communication Architecture <text:span text:style-name="T28">(SCA) </text:span>as defined at <text:a xlink:type="simple" xlink:href="http://www.public.navy.mil/JTNC/SCA" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T28">http://www.public.navy.mil/JTNC/SCA</text:span></text:a><text:span text:style-name="T28">, with some modifications and enhancements.</text:span></text:p>
