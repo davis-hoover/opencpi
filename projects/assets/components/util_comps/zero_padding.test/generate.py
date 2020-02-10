@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -49,7 +49,7 @@ if width == 64:
     fileType = 'uint64'
     packType = 'L'
     loop_step = 1
-    num_samples = num_samples / 2
+    num_samples = num_samples // 2
 elif width == 32:
     fileType = 'uint32'
     packType = 'I'
@@ -72,7 +72,7 @@ else:
 out_data = numpy.array(numpy.zeros(num_samples), dtype=fileType)
 ttype = numpy.iinfo(fileType)
 #Create a sample of all ones followed by a sample of all zeros
-for i in xrange(0,num_samples,loop_step):
+for i in range(0,num_samples,loop_step):
     if width == 64:
         out_data[i]   = 0x0123456789ABCDEF
     if width == 32:
@@ -96,6 +96,6 @@ for i in xrange(0,num_samples,loop_step):
 out_data_l = out_data.tolist()
 #Save data file
 f = open(filename, 'wb')
-for i in xrange(0,num_samples):
+for i in range(0,num_samples):
     f.write(struct.pack(packType, out_data_l[i]))
 f.close()

@@ -50,7 +50,7 @@ OFILENAME.close()
 
 m_p = int(os.environ.get("OCPI_TEST_M_p"))
 bits_per_symbol = int(numpy.log2(m_p))
-number_of_symbols_in_input_file = len(idata)*8/bits_per_symbol
+number_of_symbols_in_input_file = len(idata) * 8 // bits_per_symbol
 
 #Ensure dout is not all zeros
 if all(odata == 0):

@@ -135,7 +135,7 @@ ofile.close()
 enable = os.environ.get("OCPI_TEST_enable")
 
 #Throw away the first half of the output file to remove the start-up transients
-dout_normal = dout[int(num_samples/2):num_samples]
+dout_normal = dout[num_samples//2:num_samples]
 
 # Test #1 - Check that output data is not all zeros
 if all(dout_normal == 0):
@@ -143,9 +143,9 @@ if all(dout_normal == 0):
     sys.exit(1)
 
 # Test #2 - Check that output data is the expected amount
-if len(dout_normal) != num_samples/2:
+if len(dout_normal) != num_samples//2:
     print ("\tOutput file length is unexpected")
-    print ("\tLength dout = ", len(dout_normal)/2, "while expected length is = ", num_samples)
+    print ("\tLength dout = ", len(dout_normal)//2, "while expected length is = ", num_samples)
     sys.exit(1)
 
 # Test #3 - Check that output data values
@@ -158,10 +158,10 @@ if(enable=="true"): # => NORMAL MODE
     Fs = 100.
 
     complex_idata = np.array(np.zeros(num_samples), dtype=np.complex)
-    complex_odata = np.array(np.zeros(int(num_samples/2)), dtype=np.complex)
+    complex_odata = np.array(np.zeros(num_samples//2), dtype=np.complex)
     for i in range(0,num_samples):
         complex_idata[i] = complex(din['real_idx'][i], din['imag_idx'][i])
-    for i in range(0,int(num_samples/2)):
+    for i in range(0,num_samples//2):
         complex_odata[i] = complex(dout_normal['real_idx'][i], dout_normal['imag_idx'][i])
 
     in_calc = DFTCalculator(SampledData(complex_idata, Fs))

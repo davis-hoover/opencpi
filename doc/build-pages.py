@@ -41,6 +41,51 @@ class UrlLink(object):
         return '<a href="{url}">{name}</a>'.format(url=self.url, name=self.name)
 
 
+def sort_tags(tags):
+    old_versions = []
+    new_versions = []
+    for tag in tags:  # type: str
+        if tag.startswith("OpenCPI"):
+            old_versions.append(tag)
+        else:
+            new_versions.append(tag)
+
+    def _swap(a, b) -> bool:
+        if b[0] == a[0]:
+            if b[1] == a[1]:
+                if "rc" in a[2]:
+                    return False
+                if "rc" in b[2]:
+                    return True
+                if b[2] < a[2]:
+                    return True
+            elif b[1] < a[1]:
+                return True
+        elif b[0] < a[0]:
+            return True
+        return False
+
+    for i in range(1, len(old_versions)):
+        old = old_versions[i].split(".")
+        for j in range(i + 1, len(old_versions)):
+            new = old_versions[j].split(".")
+            if _swap(old, new):
+                old_versions[i] = ".".join(new)
+                old_versions[j] = ".".join(old)
+                break
+
+    for i in range(len(new_versions)):
+        old = new_versions[i].split(".")
+        for j in range(i + 1, len(new_versions)):
+            new = new_versions[j].split(".")
+            if _swap(old, new):
+                new_versions[i] = ".".join(new)
+                new_versions[j] = ".".join(old)
+                break
+
+    return old_versions + new_versions
+
+
 def main():
     logging.debug("CURDIR        : {}".format(CURDIR))
     logging.debug("OCPI_ROOT     : {}".format(OCPI_ROOT))
@@ -55,7 +100,7 @@ def main():
     os.makedirs(args.outputdir.as_posix(), exist_ok=True)
 
     # Get list of release tags
-    git_tags = subprocess.check_output(["git", "tag", "-l"]).decode().strip("\n").split("\n")
+    git_tags = sort_tags(subprocess.check_output(["git", "tag", "-l"]).decode().strip("\n").split("\n"))
 
     # v1.3.0 has no docs
     if "v1.3.0" in git_tags:
@@ -74,7 +119,7 @@ def main():
             ).decode().strip('\n')
 
     if args.all:
-        releases = sorted(git_tags)
+        releases = git_tags
         latest_release = releases[-1]
         releases.append("develop")
     else:
@@ -202,20 +247,24 @@ def gen_releases_index(latest_release: str):
 def gen_releases_all_index(latest_release: str):
     logging.info("Generating {}/all/index.html".format(args.outputdir))
 
-    # Every directory under OUTPUTDIR is a released version.
-    # Make links for each directory, skipping develop
+    # Every directory under OUTPUTDIR is a released version. Gather releases and sort them.
     releases = []
     for item in Path(args.outputdir).iterdir():
         if item.is_dir() and item.name not in ["all", "develop"]:
-            url = "../{}".format(item.name)
-            name = item.name
-            if item.name == latest_release:
-                name = name + " (the latest release)"
-            releases.append(UrlLink(name=name, url=url))
+            releases.append(item.name)
+    releases = sort_tags(releases)
+
+    # Make links for each release
+    releases_links = []
+    for release in releases:
+        url = "../{}".format(release)
+        if release == latest_release:
+            release = release + " (latest release)"
+        releases_links.append(UrlLink(name=release, url=url))
 
     # Render index.html and save it
     template = jinja_env.get_template("releases-all.index.html")
-    index = template.render(develop_url="../develop", releases=releases)
+    index = template.render(develop_url="../develop", releases=releases_links)
     outdir = Path(args.outputdir, "all")
     os.makedirs(outdir.as_posix(), exist_ok=True)
     with open(Path(outdir, "index.html").as_posix(), "w") as fd:
