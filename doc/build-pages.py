@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import pprint
+import re
 import shutil
 import subprocess
 import tempfile
@@ -41,51 +42,6 @@ class UrlLink(object):
         return '<a href="{url}">{name}</a>'.format(url=self.url, name=self.name)
 
 
-def sort_tags(tags):
-    old_versions = []
-    new_versions = []
-    for tag in tags:  # type: str
-        if tag.startswith("OpenCPI"):
-            old_versions.append(tag)
-        else:
-            new_versions.append(tag)
-
-    def _swap(a, b) -> bool:
-        if b[0] == a[0]:
-            if b[1] == a[1]:
-                if "rc" in a[2]:
-                    return False
-                if "rc" in b[2]:
-                    return True
-                if b[2] < a[2]:
-                    return True
-            elif b[1] < a[1]:
-                return True
-        elif b[0] < a[0]:
-            return True
-        return False
-
-    for i in range(1, len(old_versions)):
-        old = old_versions[i].split(".")
-        for j in range(i + 1, len(old_versions)):
-            new = old_versions[j].split(".")
-            if _swap(old, new):
-                old_versions[i] = ".".join(new)
-                old_versions[j] = ".".join(old)
-                break
-
-    for i in range(len(new_versions)):
-        old = new_versions[i].split(".")
-        for j in range(i + 1, len(new_versions)):
-            new = new_versions[j].split(".")
-            if _swap(old, new):
-                new_versions[i] = ".".join(new)
-                new_versions[j] = ".".join(old)
-                break
-
-    return old_versions + new_versions
-
-
 def main():
     logging.debug("CURDIR        : {}".format(CURDIR))
     logging.debug("OCPI_ROOT     : {}".format(OCPI_ROOT))
@@ -99,36 +55,37 @@ def main():
         shutil.rmtree(args.outputdir.as_posix())
     os.makedirs(args.outputdir.as_posix(), exist_ok=True)
 
-    # Get list of release tags
-    git_tags = sort_tags(subprocess.check_output(["git", "tag", "-l"]).decode().strip("\n").split("\n"))
-
-    # v1.3.0 has no docs
-    if "v1.3.0" in git_tags:
-        git_tags.remove("v1.3.0")
-
-    # Get list of branches
-    git_branches = [x.replace("*", "").strip() for x in subprocess.check_output(
-        ["git", "branch", "--no-color"]
-    ).decode().strip("\n").split("\n")]
+    # Get list of tags and checked out branches
+    git_tags = get_tags()
+    logging.debug("Tags: {}".format(git_tags))
+    git_branches = get_branches()
+    logging.debug("Branches: {}".format(git_branches))
 
     # Resolve HEAD because it doesn't work with all git commands
-    for i in range(len(args.releases)):
-        if args.releases[i] == "HEAD":
-            args.releases[i] = subprocess.check_output(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"]
-            ).decode().strip('\n')
+    head = get_name_rev("HEAD")
+    if "HEAD" in args.releases:
+        args.releases[args.releases.index("HEAD")] = head
+    if "HEAD" in args.clean:
+        args.clean[args.clean.index("HEAD")] = head
 
     if args.all:
-        releases = git_tags
+        releases = git_tags.copy()
         latest_release = releases[-1]
         releases.append("develop")
     else:
         for release in args.releases:
             if release not in git_tags and release not in git_branches:
-                logging.critical("Release '{}' is not a valid git tag. Exiting...".format(release))
+                logging.critical(
+                    "'{}' is not a valid git tag or checked out branch. Exiting...".format(release)
+                )
                 exit(1)
-        releases = args.releases
-        latest_release = releases[-1]
+        releases = args.releases  # type: list
+        try:
+            releases.remove("develop")
+            latest_release = releases[-1] if len(releases) else "develop"
+            releases.append("develop")
+        except ValueError:
+            latest_release = releases[-1]
 
     # This doesn't work because libreoffice is unable to have multiple instances
     # of it's pdf conversion tool (unoconv or soffice) running concurrently or
@@ -139,16 +96,18 @@ def main():
     #     with concurrent.futures.ThreadPoolExecutor() as executor:
     #         executor.map(run, releases)
     # else:
+    logging.debug("Releases: {}".format(releases))
+    logging.debug("Latest release: {}".format(latest_release))
     for release in releases:
-        build(release)
         is_latest = True if latest_release == release else False
+        build(release, is_latest=is_latest)
         gen_release_index(release, is_latest=is_latest)
 
     gen_releases_index(latest_release)  # Create OUTPUTDIR/index.html
-    gen_releases_all_index(latest_release)  # Create OUTPUTDIR/all/index.html
+    gen_releases_all_index(latest_release, git_tags)  # Create OUTPUTDIR/all/index.html
 
 
-def build(tag: str):
+def build(tag: str, is_latest=True):
     logging.info("Processing release: {}".format(tag))
     dst_dir = Path(args.outputdir, tag, "docs").absolute()
     if dst_dir.exists():
@@ -180,6 +139,13 @@ def build(tag: str):
         # Copy pdfs to dst_dir
         logging.info("Copying docs for release: {}".format(tag))
         copy_pdfs(tmprepo, dst_dir)
+
+        # Create symlink so urls like https://example.com/releases/latest/doc/some.pdf will work
+        if is_latest:
+            latest_link = Path(args.outputdir, "latest")
+            if latest_link.exists():
+                os.remove(latest_link.as_posix())
+            os.symlink(tag, latest_link.as_posix())
 
         # No RPM support for 1.6.0
         if tag.startswith("v1.6.0"):
@@ -244,13 +210,13 @@ def gen_releases_index(latest_release: str):
         fd.write(index)
 
 
-def gen_releases_all_index(latest_release: str):
+def gen_releases_all_index(latest_release: str, git_tags):
     logging.info("Generating {}/all/index.html".format(args.outputdir))
 
     # Every directory under OUTPUTDIR is a released version. Gather releases and sort them.
     releases = []
     for item in Path(args.outputdir).iterdir():
-        if item.is_dir() and item.name not in ["all", "develop"]:
+        if item.is_dir() and item.name in git_tags:
             releases.append(item.name)
     releases = sort_tags(releases)
 
@@ -369,6 +335,8 @@ def gen_release_index(tag: str, is_latest=False):
         fd.write(index)
 
 
+# Util functions ##############################################################
+
 def find_file(search_dir, filename: str, case_sensitive=True) -> Path:
     if not isinstance(search_dir, Path):
         search_dir = Path(str(search_dir))
@@ -397,6 +365,90 @@ def find_files(search_dir, extension=None, recursive=True) -> list:
         if not recursive:
             break
     return pdfs
+
+
+def get_tags():
+    # Get list of release tags
+    git_tags = sort_tags(subprocess.check_output(["git", "tag", "-l"]).decode().strip("\n").split("\n"))
+
+    # v1.3.0 has no docs
+    if "v1.3.0" in git_tags:
+        git_tags.remove("v1.3.0")
+
+    return git_tags
+
+
+def get_branches():
+    # Get list of branches
+    git_branches = [x.replace("*", "").strip() for x in subprocess.check_output(
+        ["git", "branch", "--no-color"]
+    ).decode().strip("\n").split("\n")]
+
+    # Resolve detached branches to their symbolic name. This is needed because
+    # of how gitlab runner checks out branch under test
+    pat = re.compile(r"detached from ([a-z0-9]+)")
+    for i, branch in enumerate(git_branches):
+        match = pat.search(branch)
+        if match is not None:
+            sha = match.group(1)
+            git_branches[i] = get_name_rev(sha)
+
+    # Ensure no duplicates
+    return list(set(git_branches))
+
+
+def get_name_rev(rev: str):
+    name = subprocess.check_output(
+        ["git", "name-rev", "--name-only", "--no-undefined", rev]
+    ).decode().strip("\n")
+    if len(name):
+        return name
+    raise RuntimeError("Could not resolve {} to a branch name".format(rev))
+
+
+def sort_tags(tags):
+    old_versions = []
+    new_versions = []
+    for tag in tags:  # type: str
+        if tag.startswith("OpenCPI"):
+            old_versions.append(tag)
+        else:
+            new_versions.append(tag)
+
+    def _swap(a, b) -> bool:
+        if b[0] == a[0]:
+            if b[1] == a[1]:
+                if "rc" in a[2]:
+                    return False
+                if "rc" in b[2]:
+                    return True
+                if b[2] < a[2]:
+                    return True
+            elif b[1] < a[1]:
+                return True
+        elif b[0] < a[0]:
+            return True
+        return False
+
+    for i in range(1, len(old_versions)):
+        old = old_versions[i].split(".")
+        for j in range(i + 1, len(old_versions)):
+            new = old_versions[j].split(".")
+            if _swap(old, new):
+                old_versions[i] = ".".join(new)
+                old_versions[j] = ".".join(old)
+                break
+
+    for i in range(len(new_versions)):
+        old = new_versions[i].split(".")
+        for j in range(i + 1, len(new_versions)):
+            new = new_versions[j].split(".")
+            if _swap(old, new):
+                new_versions[i] = ".".join(new)
+                new_versions[j] = ".".join(old)
+                break
+
+    return old_versions + new_versions
 
 
 if __name__ == "__main__":
@@ -454,6 +506,9 @@ if __name__ == "__main__":
         else:
             logging.critical("A release to build must be specified or use '--all' to build all releases")
             exit(1)
+    elif len(args.clean) and len(args.releases):
+        # add items being cleaned to items being built
+        args.releases = list(set(args.releases + args.clean))
 
     # Setup webroot and outputdir
     if args.webroot is None:
