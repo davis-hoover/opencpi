@@ -3304,7 +3304,7 @@
    <text:p text:style-name="P80">OpenCPI<text:span text:style-name="T53"><text:variable-set text:name="AVGUI" text:display="none" text:formula="ooow:2" office:value-type="float" office:value="2" style:data-style-name="N0"/></text:span><text:line-break/><text:span text:style-name="T54">Tutorial 7: Using HDL Primitive Libraries</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="../odt/shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release 1.6.0rc2</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release develop</text:p>
    </text:section>
    <text:p text:style-name="Standard"/>
    <text:p text:style-name="P7"/>
