@@ -14,9 +14,7 @@ build:pages:
   before_script:
   after_script:
   script:
-    - git checkout develop  # this is necessary so build-docs.py can checkout develop
-    - git checkout $CI_COMMIT_SHORT_SHA  # go back to commit under test
-    - python3.4 doc/build-pages.py --clean develop  # force building of develop
+    - make doc
 
 pages:
   stage: deploy
