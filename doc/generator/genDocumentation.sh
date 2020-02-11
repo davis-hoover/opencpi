@@ -260,7 +260,7 @@ generate_pdfs() {
             ofile=${ext%.*}
             echo "${BOLD}office: $d/$ext ${prefix+(output prefix=${prefix})}${RESET}"
             warn_existing_pdf "${OUTPUT_PATH}/${prefix}" ${ofile} $d && continue
-            soffice --convert-to pdf $ext >> ${log_dir}/${ofile}.log 2>&1
+            unoconv $ext >> ${log_dir}/${ofile}.log 2>&1
             # If the pdf was created then copy it out
             if [ -f $ofile.pdf ]; then
                 mv ${ofile}.pdf ${OUTPUT_PATH}/${prefix}/
@@ -479,7 +479,7 @@ enable_color
 echo -n "${RED}"
 [ -z "$(command -v rubber)" ] && printf "\nThe 'rubber' command was not found - will not be able to convert LaTeX => PDF!\n\n"
 [ -z "$(command -v gs)" ] && printf "\nThe 'gs' command was not found - will not be able to optimize PDF!\n\n"
-[ -z "$(command -v soffice)" ] && printf "\nThe 'soffice' command was not found - will not be able to convert Open/LibreOffice => PDF!\n\n"
+[ -z "$(command -v unoconv)" ] && printf "\nThe 'unoconv' command was not found - will not be able to convert Open/LibreOffice => PDF!\n\n"
 echo -n "${RESET}"
 
 mkdir -p ${OUTPUT_PATH} > /dev/null 2>&1
