@@ -231,6 +231,11 @@ generate_pdfs() {
         done
     fi
 
+    # There is a bug with unoconv where it doesn't work the first time it is
+    # ran so we kick start it here
+    # https://github.com/dagwieers/unoconv/issues/241
+    unoconv /dev/null > /dev/null 2>&1 || :
+
     for d in ${dirs_to_search[*]}; do
         # This should be an error post-AV-5448
         [ ! -d "$d" ] && echo "${RED}Directory $d does not exist! Skipping!${RESET}" && continue
@@ -260,7 +265,7 @@ generate_pdfs() {
             ofile=${ext%.*}
             echo "${BOLD}office: $d/$ext ${prefix+(output prefix=${prefix})}${RESET}"
             warn_existing_pdf "${OUTPUT_PATH}/${prefix}" ${ofile} $d && continue
-            unoconv $ext >> ${log_dir}/${ofile}.log 2>&1
+            unoconv -vvv $ext >> ${log_dir}/${ofile}.log 2>&1
             # If the pdf was created then copy it out
             if [ -f $ofile.pdf ]; then
                 mv ${ofile}.pdf ${OUTPUT_PATH}/${prefix}/
