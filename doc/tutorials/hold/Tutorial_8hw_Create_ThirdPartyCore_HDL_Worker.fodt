@@ -3425,7 +3425,7 @@
    <text:p text:style-name="P93">OpenCPI<text:span text:style-name="T86"><text:variable-set text:name="AVGUI" text:display="none" text:formula="ooow:1" office:value-type="float" office:value="1" style:data-style-name="N0"/></text:span><text:line-break/><text:span text:style-name="T87">Tutorial 8hw: Using Third-Party HDL Primitive Cores</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="../odt/shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release 1.6.0rc2</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release develop</text:p>
    </text:section>
    <text:p text:style-name="Standard"/>
    <text:p text:style-name="P4"/>
