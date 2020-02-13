@@ -23,7 +23,7 @@
 
 [ospgroup]: <https://gitlab.com/opencpi/osp>
 
-[srcinstall]: <https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Installation.pdf>
+[srcinstall]: <https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Installation_Guide.pdf>
 
 [rpminstall]: <https://opencpi.gitlab.io/releases/develop/docs/RPM_Installation_Guide.pdf>
 

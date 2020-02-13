@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -69,14 +69,14 @@ DATA_SELECT = os.environ.get('OCPI_TEST_data_select')
 
 # Test #1 - Check that output data is not all zeros
 if all(odata == 0):
-    print ('\tValues are all zero')
+    print('\tValues are all zero')
     sys.exit(1)
 
 # Test #2 - Check that output data is the expected amount
 # INCLUDES TRANSIENT and not FLUSHING of pipeline (USE THIS FOR v1.2)
 if len(odata) != len(idata):
-    print ('Output file length is unexpected')
-    print ('Length = ', len(odata), 'while expected length is = ', len(idata))
+    print('Output file length is unexpected')
+    print('Length = ', len(odata), 'while expected length is = ', len(idata))
     sys.exit(1)
 
 # Test #3 - Check output data values
@@ -84,20 +84,20 @@ if(ENABLE == 'true'): # => NORMAL MODE
     complex_data = np.array(np.zeros(NUM_SAMPLES), dtype=np.complex)
     for i in range(0,NUM_SAMPLES):
         complex_data[i] = complex(odata['real_idx'][i], odata['imag_idx'][i])
-    FFT = 1.0/NUM_SAMPLES * abs(np.fft.fft(complex_data,NUM_SAMPLES))
-    Max_FFT_freq=np.argmax(FFT)*SAMPLE_RATE/NUM_SAMPLES
+    FFT = 1.0 / NUM_SAMPLES * abs(np.fft.fft(complex_data,NUM_SAMPLES))
+    Max_FFT_freq = np.argmax(FFT) * SAMPLE_RATE / NUM_SAMPLES
     if Max_FFT_freq != 0.0:
-        print ('Fail: Max of FFT occurs at index: ',Max_FFT_freq, 'Hz (Should be 0)')
+        print('Fail: Max of FFT occurs at index: ',Max_FFT_freq, 'Hz (Should be 0)')
         sys.exit(1)
-    print ('\tResults (Normal Mode): FFT occurs at expect index', Max_FFT_freq, 'Hz')
+    print('\tResults (Normal Mode): FFT occurs at expect index', Max_FFT_freq, 'Hz')
 
 else: # => BYPASS MODE
     if (DATA_SELECT == 'false'):
         # INCLUDES TRANSIENT and not FLUSHING of pipeline (USE THIS FOR v1.2)
         if (idata != odata).all():
-            print ('Fail - Bypass Mode: Input and output file do not match')
+            print('Fail - Bypass Mode: Input and output file do not match')
             sys.exit(1)
-        print ("\tResults (Bypass Mode): Input and output file match")
+        print("\tResults (Bypass Mode): Input and output file match")
 """
 TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
 - NEED TO BLOCK WHEN VERIFYING RCC OUTPUT or NOT RUN CONFIGURATION AGAINST RCC.
@@ -106,7 +106,7 @@ TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
         system_freq = SAMPLE_RATE
         phase_acc_width = 16 # Configuration of the Xilinx CORE Generator: DDS module
         nco_freq = ((system_freq * PHS_INC) / (2**phase_acc_width))
-        #print '      NCO freq (calc) = ', nco_freq
+        #print('      NCO freq (calc) = ', nco_freq)
         # Construct complex array of vectors for performing FFT
         # (PUT FFT INTO ITS OWN FUNCTION)
         data=np.zeros((len(odata)), dtype=complex)
@@ -118,12 +118,12 @@ TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
         # Locate max Tone
         idx = np.argmax(np.abs(w))
         freq = freqs[idx]
-        #print 'Measured freq \t= ', freq
+        #print('Measured freq \t= ', freq)
         ofreq_hz = freq * system_freq
-        #print '      NCO freq (measured) = ', ofreq_hz
+        #print('      NCO freq (measured) = ', ofreq_hz)
         if (nco_freq != ofreq_hz):
-            print 'Fail: Bypass Mode: NCO does not match expected freq: %.2f vs %.2f' % (nco_freq, ofreq_hz)
+            print('Fail: Bypass Mode: NCO does not match expected freq: %.2f vs %.2f' % (nco_freq, ofreq_hz))
             sys.exit(1)
         else:
-            print '      PASS - Bypass Mode: NCO output matches expected freq'
+            print('      PASS - Bypass Mode: NCO output matches expected freq')
 """

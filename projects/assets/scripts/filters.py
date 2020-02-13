@@ -62,12 +62,12 @@ def rcosfilter(N, alpha, Ts, Fs):
     """
 
     T_delta = 1/float(Fs)
-    time_idx = ((np.arange(N)-N/2))*T_delta
+    time_idx = ((np.arange(N)-N//2))*T_delta
     sample_num = np.arange(N)
     h_rc = np.zeros(N, dtype=float)
 
     for x in sample_num:
-        t = (x-N/2)*T_delta
+        t = (x-N//2)*T_delta
         if t == 0.0:
             h_rc[x] = 1.0
         elif alpha != 0 and t == Ts/(2*alpha):
@@ -112,18 +112,18 @@ def rrcosfilter(N, alpha, Ts, Fs):
     T_delta = 1/float(Fs)
     #check for even number of taps
     if (N % 2 == 0):
-        time_idx = ((np.arange(N)-N/2 + 0.5))*T_delta
+        time_idx = ((np.arange(N)-N//2 + 0.5))*T_delta
     else: #odd
-        time_idx = ((np.arange(N)-N/2))*T_delta
+        time_idx = ((np.arange(N)-N//2))*T_delta
     sample_num = np.arange(N)
     h_rrc = np.zeros(N, dtype=float)
 
     for x in sample_num:
         #check for even number of taps
         if (N % 2 == 0):
-            t = (x-N/2+0.5)*T_delta
+            t = (x-N//2+0.5)*T_delta
         else: #odd
-            t = (x-N/2)*T_delta
+            t = (x-N//2)*T_delta
         if t == 0.0:
             h_rrc[x] = 1.0 - alpha + (4*alpha/np.pi)
         elif alpha != 0 and t == Ts/(4*alpha):
@@ -169,7 +169,7 @@ def gaussianfilter(N, alpha, Ts, Fs):
     """
 
     T_delta = 1/float(Fs)
-    time_idx = ((np.arange(N)-N/2))*T_delta
+    time_idx = ((np.arange(N)-N//2))*T_delta
     h_gaussian = (np.sqrt(np.pi)/alpha)*np.exp(-((np.pi*time_index/alpha)*(np.pi*time_index/alpha)))
 
     return time_idx, h_gaussian

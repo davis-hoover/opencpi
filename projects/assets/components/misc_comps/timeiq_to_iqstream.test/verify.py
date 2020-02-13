@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -38,12 +38,12 @@ OFILENAME.close()
 
 #Ensure that output data is the expected amount of data
 if len(odata) != len(goldendata):
-    print "    FAILED: Output file length is unexpected"
-    print "    Length = ", len(odata), "while expected length is = ", len(goldendata)
+    print("    FAILED: Output file length is unexpected")
+    print("    Length = ", len(odata), "while expected length is = ", len(goldendata))
     sys.exit(1)
 
 if (goldendata != odata).all():
-    print "    FAILED: Golden and output file do not match"
+    print("    FAILED: Golden and output file do not match")
     sys.exit(1)
 else:
-    print "    PASS: Golden and output file match"
+    print("    PASS: Golden and output file match")
