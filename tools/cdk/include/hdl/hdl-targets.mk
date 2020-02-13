@@ -141,10 +141,13 @@ HdlChoosePart=$(strip \
 HdlAllPlatforms:=
 HdlBuiltPlatforms:=
 
+# exports/lib/platforms is going away
 override OCPI_HDL_PLATFORM_PATH:=$(subst $(Space),:,$(call Unique,\
   $(subst :, ,$(OCPI_HDL_PLATFORM_PATH)) \
   $(foreach p,$(OcpiGetExtendedProjectPath),\
-    $(or $(call OcpiExists,$p/exports/lib/platforms),$(call OcpiExists,$p/hdl/platforms)))))
+    $(or $(call OcpiExists,$p/exports/hdl/platforms),$(strip\
+         $(call OcpiExists,$p/exports/lib/platforms)),$(strip\
+         $(call OcpiExists,$p/hdl/platforms))))))
 export OCPI_HDL_PLATFORM_PATH
 $(call OcpiDbgVar,OCPI_HDL_PLATFORM_PATH)
 ################################################################################

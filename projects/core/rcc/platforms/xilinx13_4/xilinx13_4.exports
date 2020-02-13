@@ -24,16 +24,13 @@
 # Both the default setup files for users and the underlying ones, for the SD card
 @platforms/zynq/zynq_*setup.sh opencpi/
 @platforms/zynq/default_my*setup.sh opencpi/
-# no system.xml, let the hardware platform specify that
-# any value in having the zynq-generic one lying around anyway?
-# =platforms/zynq/zynq_system.xml <target>/zynq/
 # Put the platform's READMEs onto the runtime
 =<platform_dir>/README* <target>/
 # Put the generic READMEs onto the development package under zynq
 +platforms/zynq/README* <target>/zynq/
 # For the development package add this script for formatting SD cards
 +platforms/zynq/formatOpenCPIZynqSD.sh <target>/zynq/
-# Use the default zynq system.xml
+# Use the default zynq system.xml unless overridden by hardware
 =platforms/zynq/zynq_system.xml <target>/system.xml
 +<platform_dir>/README <target>/
 # Deployment files

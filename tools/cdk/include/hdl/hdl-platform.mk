@@ -199,9 +199,23 @@ ifndef HdlSkip
     $(foreach c,$(Configurations),$(eval $(call doConfig,$c)))
     all: configs
   endif # have configurations
-  # If the platform has special files to export to the CDK, do it
-  # this is only done if we are building, so we don't export until we have actually built something
-  ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk) $(wildcard $(Worker).exports))
+  # If the platform has special files to export to the CDK, do it.
+  # This is only done if we are building, so we don't export until we have actually built something.
+  # The two different variables:
+  # - ExportsFile is the name of the file full of exports here
+  # - ExportFiles is the list of files to export for development time
+  # If the ExportFiles variable is not set, take the + lines from the exports file, which is the new way.
+  ExportsFile:=$(wildcard $(Worker).exports)
+  ifndef ExportFiles
+    ifdef ExportsFile
+      ExportFiles:=$(shell sed -n 's/^ *+ *\([^ ]*.*$$\)/\1/p' $(ExportsFile) | \
+                           sed -n 's=<platform-dir>/==p')
+      $(infox ExportFiles HERE:$(ExportFiles))
+    endif
+  endif
+  ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk $(Worker).exports))
+  $(info ExportFiles for this platform: $(ExportFiles))
+
   ifdef ExportFiles
     ExportLinks:=$(ExportFiles:%=lib/%)
     exports: $(ExportLinks)

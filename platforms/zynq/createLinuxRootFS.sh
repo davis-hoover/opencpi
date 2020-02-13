@@ -27,8 +27,7 @@ fi
 
 if test "$1" = "" -o "$1" = "--help" -o "$1" = "-help" -o "$2" = ""; then
   cat <<EOF
-The purpose of this script is to put an appropriately patched root file system
-into the OpenCPI Zynq Linux "release" based on a specific Xilinx binary release.
+The purpose of this script is to patch the root file system from a Xilinx binary release
 It assumes:
 - a (partially complete) OpenCPI Zynq release has been created using:
       createLinuxKernelHeaders.sh <rel-name> <repo-tag> <work-dir>
@@ -47,14 +46,15 @@ fi
 
 case $2 in (/*) gdir=$2 ;; (*) gdir=`pwd`/$2;; esac
 rel=$1
-rdir=$gdir/xilinx-zynq-binary-release-for-$rel
+rdir=$gdir
 if test ! -d $rdir; then
   echo The release directory for the $1 release \($rdir\) does not exist.
   echo Run getXilinxLinuxBinaryRelease.sh to download it for release $rel
   exit 1
 fi
 # Protect against sym links for the git subdir for case sensitivity
-cd opencpi-zynq-linux-release-$rel
+#cd opencpi-zynq-linux-release-$rel
+cd gen
 echo Patching the root file system from the Xilinx binary release to the OpenCPI release
 FROM=`pwd`
 SOURCE=$rdir/uramdisk.image.gz
@@ -66,7 +66,25 @@ set -e
 rm -r -f $T
 mkdir $T
 cd $T
-dd if=$SOURCE bs=64 skip=1 | gunzip > in.root.image
+if [ -r $SOURCE ]; then
+  echo "Found $SOURCE (compressed ramdisk image) in Xilinx binary release."
+  dd if=$SOURCE bs=64 skip=1 | gunzip > in.root.image
+elif [ -r $rdir/image.ub ]; then
+  echo "Found $SOURCE (FIT image combining kernel/devicetree/ramdisk) in Xilinx binary release."
+  SOURCE=$rdir/image.ub
+  x=(`$FROM/fit_info -f $SOURCE -n /images/ramdisk@1 -p data`)
+  if [ "${#x[@]}" != 6 ]; then
+      echo "Failed to extract the root FS from $SOURCE (using fit_info tool from u-boot)."
+      exit 1
+  fi
+  (set -o pipefail; dd if=$SOURCE bs=1 skip=${x[5]} count=${x[3]} | gunzip) > in.root.image
+  if [ $? != 0 ]; then
+      echo Failed to extract and decompress root FS from $SOURCE.
+      exit 1
+  fi
+else
+  echo Cannot find expected files in Xilinx linux binary release directory.
+fi
 mkdir root
 cd root
 fakeroot cpio -i --quiet -d -H newc -F ../in.root.image --no-absolute-filenames
@@ -84,7 +102,7 @@ EOF
 # Put the C++ runtime library on the system
 cp $FROM/lib/libstdc++.so* lib
 # Record in the rootfs, which release we are actually running.
-ocpi_kernel_release=$(< $FROM/kernel-headers/ocpi-release)
+ocpi_kernel_release=$(< $FROM/ocpi-release)
 echo xilinx$rel linux-x$rel-arm $ocpi_kernel_release > etc/opencpi-release
 # This is for backward compatibility
 echo $ocpi_kernel_release > etc/ocpi-release
@@ -104,19 +122,3 @@ $FROM/mkimage \
 rm ../out.root.image.gz ../in.root.image
 cd $FROM
 echo "A new patched root file system has been created, and placed in $(basename $FROM)"
-echo "Copying some ancillary files from the binary release into the opencpi zynq release"
-# This is where we unfortunately need per-platform knowledge for now, otherwise we need a
-# whole copy of the binary release in our release dir.  We do for all platforms we know.
-for i in $rdir/*; do
- if [ -d $i ]; then
-     case $(basename $i) in
-	 (zed)
-	     mkdir -p zed
-	     cp $rdir/zed/boot.bin zed
-	     ;;
-     esac
- fi
-done
-echo "============================================================================================"
-echo "That directory is now complete: ready for creating a bootable SD card."
-echo "============================================================================================"

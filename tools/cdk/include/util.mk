@@ -543,14 +543,16 @@ OcpiGetExtendedProjectPath=$(strip\
 #
 # Note: the path 'platforms' without a leading 'rcc/' is searched as well for legacy
 #       compatibilty before rcc platforms were supported outside of the CDK
+#       exports/lib/rcc/platforms is deprecated
 OcpiGetRccPlatformPaths=$(strip \
                           $(foreach p,$(OCPI_PROJECT_DIR),\
                             $(call OcpiExists,$p/rcc/platforms))\
                           $(foreach p,$(OcpiGetExtendedProjectPath),\
                             $(if $(filter-out $(realpath $(OCPI_PROJECT_DIR)),\
                                               $(realpath $(call OcpiAbsPathToContainingProject,$p))),\
-                              $(or $(call OcpiExists,$p/exports/lib/rcc/platforms),\
-                                   $(call OcpiExists,$p/rcc/platforms)))))
+                              $(or $(call OcpiExists,$p/exports/rcc/platforms),$(strip \
+                                   $(call OcpiExists,$p/exports/lib/rcc/platforms),$(strip \
+                                   $(call OcpiExists,$p/rcc/platforms)))))))
 
 # Search for a given platform ($1) in the list of 'rcc/platform' directories found
 # by OcpiGetRccPlatformPaths.

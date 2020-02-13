@@ -165,13 +165,13 @@ MyIncs?= \
          -I$(realpath $(MyDir)/../../interfaces/include)
 MyLib:=$(realpath $(OCPI_CDK_DIR)/$(OCPI_TARGET_DIR)/lib)
 $(infox x:$(MyTargetDir) $(MyDir))
-ifneq ($(MAKECMDGOALS),topclean)
-  ifdef OCPI_TARGET_PLATFORM
-    ifeq ($(strip $(MyLib)),)
-      $(error OpenCPI libraries must be built before the driver is built)
-    endif
-  endif
-endif
+# ifneq ($(MAKECMDGOALS),topclean)
+#   ifdef OCPI_TARGET_PLATFORM
+#     ifeq ($(strip $(MyLib)),)
+#       $(error OpenCPI libraries must be built before the driver is built)
+#     endif
+#   endif
+# endif
 # This is what works with RHEL5
 export EXTRA_CFLAGS := $(MyIncs) -Wformat=2
 # This is what works with Centos6
