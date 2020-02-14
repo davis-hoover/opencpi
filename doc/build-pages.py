@@ -100,14 +100,20 @@ def main():
     logging.debug("Latest release: {}".format(latest_release))
     for release in releases:
         is_latest = True if latest_release == release else False
-        build(release, is_latest=is_latest)
+        build(release)
         gen_release_index(release, is_latest=is_latest)
+
+    # Create symlink so urls like https://example.com/releases/latest/doc/some.pdf will work
+    latest_link = Path(args.outputdir, "latest")
+    if latest_link.exists():
+        os.remove(latest_link.as_posix())
+    os.symlink(latest_release, latest_link.as_posix())
 
     gen_releases_index(latest_release)  # Create OUTPUTDIR/index.html
     gen_releases_all_index(latest_release, git_tags)  # Create OUTPUTDIR/all/index.html
 
 
-def build(tag: str, is_latest=True):
+def build(tag: str):
     logging.info("Processing release: {}".format(tag))
     dst_dir = Path(args.outputdir, tag, "docs").absolute()
     if dst_dir.exists():
@@ -139,13 +145,6 @@ def build(tag: str, is_latest=True):
         # Copy pdfs to dst_dir
         logging.info("Copying docs for release: {}".format(tag))
         copy_pdfs(tmprepo, dst_dir)
-
-        # Create symlink so urls like https://example.com/releases/latest/doc/some.pdf will work
-        if is_latest:
-            latest_link = Path(args.outputdir, "latest")
-            if latest_link.exists():
-                os.remove(latest_link.as_posix())
-            os.symlink(tag, latest_link.as_posix())
 
         # No RPM support for 1.6.0
         if tag.startswith("v1.6.0"):
