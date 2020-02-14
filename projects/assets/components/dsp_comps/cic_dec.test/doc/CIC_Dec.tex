@@ -22,7 +22,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Component Data Sheet}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 %----------------------------------------------------------------------------------------
 \date{Version \docVersion} % Force date to be blank and override date with version
 \title{\docTitle}
@@ -51,14 +51,15 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 	\hline
 	Component Library & ocpi.assets.dsp\_comps                              \\
 	\hline
-	Workers           & \comp.hdl                                          \\
+	Workers           & \comp.hdl, \comp.rcc                                          \\
 	\hline
-	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL) \\
+	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL), CentOS7 \\
 	\hline
 \end{tabular}
 \input{\importpath snippets/CIC_Dec_Functionality}
 \section*{Worker Implementation Details}
 \input{\importpath snippets/CIC_HDL_Implementation}
+\input{\importpath snippets/CIC_RCC_Implementation}
 \input{\importpath snippets/CIC_Theory}
 
 % TODO / FIXME - add version history table, with initial release version
@@ -143,6 +144,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		\end{tabular}
 	\end{scriptsize}
 
+	\input{\importpath snippets/cic_dec.rcc_properties}
+
 	\section*{Component Ports}
 	\begin{scriptsize}
 		\begin{tabular}{|p{2cm}|p{1.5cm}|p{4cm}|p{1.5cm}|p{1.5cm}|p{10.75cm}|}
@@ -152,7 +155,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 			in   & False    & iqstream\_protocol & False     & -        & Complex signed samples (Q0.15 I, Q0.15 Q). \\
 			\hline
-			out  & False    & iqstream\_protocol & False     & -        & Complex signed samples (Q0.15 I, Q0.15 Q). \\
+			out  & True    & iqstream\_protocol & False     & -        & Complex signed samples (Q0.15 I, Q0.15 Q). \\
 			\hline
 		\end{tabular}
 	\end{scriptsize}
@@ -171,6 +174,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 		\end{tabular}
 	\end{scriptsize}
+
+	\input{\importpath snippets/cic_dec.rcc_interfaces}
+
 \end{landscape}
 
 \section*{Control Timing and Signals}
@@ -194,7 +200,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 \begin{landscape}
 \section*{Worker Configuration Parameters}
-\subsubsection*{\comp.hdl}
+\subsubsection*{\comp.hdl and \comp.rcc}
 \input{../../\ecomp.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsection*{\comp.hdl}
@@ -205,3 +211,4 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \input{\importpath snippets/CIC_References}
 
 \end{document}
+
