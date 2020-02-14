@@ -44,6 +44,7 @@ tryDir() {
   local platforms_dir=$1
   if [ -n "$2" ]; then # looking for a specific platform (not the current one)
     local d=$platforms_dir/$2
+    [ -d $d/lib -a -f $d/lib/$2.mk ] && returnPlatform $d/lib
     [ -d $d -a -f $d/$2.mk ] && returnPlatform $d
   else # not looking for a particular platform, but looking for the one we're running on
     for i in $platforms_dir/*; do
@@ -83,7 +84,7 @@ for j in $projects; do
   # First, assume it is an exported project and check lib/rcc...
   # Next, assume this is a source project that is exported and check exports/lib/rcc,
   # Finally, just search the source rcc/platforms...
-  for  d in $j/lib/rcc/platforms $j/exports/lib/rcc/platforms $j/rcc/platforms; do
+  for  d in $j/exports/rcc/platforms $j/rcc/platforms; do
     [ -d $d ] && tryDir $d $1
   done
 done # done with the project

@@ -551,14 +551,13 @@ OcpiGetRccPlatformPaths=$(strip \
                             $(if $(filter-out $(realpath $(OCPI_PROJECT_DIR)),\
                                               $(realpath $(call OcpiAbsPathToContainingProject,$p))),\
                               $(or $(call OcpiExists,$p/exports/rcc/platforms),$(strip \
-                                   $(call OcpiExists,$p/exports/lib/rcc/platforms),$(strip \
-                                   $(call OcpiExists,$p/rcc/platforms)))))))
+                                   $(call OcpiExists,$p/rcc/platforms))))))
 
 # Search for a given platform ($1) in the list of 'rcc/platform' directories found
 # by OcpiGetRccPlatformPaths.
 OcpiGetRccPlatformDir=$(strip $(firstword \
 		        $(foreach p,$(OcpiGetRccPlatformPaths),\
-                          $(call OcpiExists,$p/$1))))
+                          $(or $(call OcpiExists,$p/$1/lib),$(call OcpiExists,$p/$1)))))
 
 ##################################################################################
 # Functions for collecting Project Dependencies and imports for use with project

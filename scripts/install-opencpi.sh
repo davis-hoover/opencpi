@@ -59,5 +59,5 @@ else
   export HdlPlatforms=
   export HdlPlatform=
   export HDL_PLATFORM=
-  eval $* ./scripts/test-opencpi.sh $platform
+  eval $* ./scripts/test-opencpi.sh
 fi
