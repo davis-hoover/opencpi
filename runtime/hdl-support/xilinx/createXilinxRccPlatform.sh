@@ -59,14 +59,17 @@ fi
 xilinx_releases=$OCPI_XILINX_ZYNQ_RELEASE_DIR
 [ -z $OCPI_XILINX_ZYNQ_RELEASE_DIR ] && xilinx_releases=$OcpiXilinxDir/ZynqReleases || :
 if [ -d $xilinx_releases ]; then
-  xzs=$(shopt -s nullglob; echo $xilinx_releases/${release}-*)
-  [ -z "$xzs" ] && echo No Xilinx Zynq Release $release found at $xilinx_releases && err=1
-  echo "Xilinx Zynq binary release(s) found in $xilinx_releases/${release}-*"
+    if [ -d "$xilinx_releases/$release" ]; then
+	echo "Xilinx Zynq binary release(s) found in $xilinx_releases/${release}"
+    else
+	echo Error:  No Xilinx Zynq Release $release found at $xilinx_releases && err=1
+	err=1
+    fi
 else
   echo No Xilinx Zynq releases found at $xilinx_releases
   err=1
 fi
-[ -n "$err" ] && exit 1
+[ -n "$err" ] && echo Errors found.  &&exit 1
 projdir=projects/$project
 [ -d $projdir ] || (echo Project does not exists: $project && exit 1)
 yq=${release#20}
@@ -88,7 +91,17 @@ cat > $dir/$platform.mk <<-EOF
 	OcpiPlatformArch:=$arch
 	EOF
 cat > $dir/$platform.exports <<-EOF
+	# kernel - just the headers package, and only for development
+	+<platform-dir>/gen/kernel-artifacts/kernel-headers.tgz <target>/
+
+	# sdk - just the libs extracted from the rootfs, needed at runtime for ocpiremote
+	=<platform-dir>/gen/sdk-artifacts/lib <target>/sdk/
+
+	# Use the default zynq file unless overridden by hardware
 	=platforms/zynq/zynq_system.xml <target>/system.xml
-	=<platform_dir>/lib/lib <target>/lib
+	# Use the default zynq file unless overridden by hardware
+	# Provide these libraries on the SD card when we do not patch the root fs
+	@<platform_dir>/gen/sdk-artifacts/lib opencpi/sdk/
 	EOF
+make -C $dir exports
 make -C $projdir exports

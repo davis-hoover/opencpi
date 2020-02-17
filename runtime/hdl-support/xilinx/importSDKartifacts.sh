@@ -70,3 +70,9 @@ getlib "libstdc++.so*"
 getlib "libgcc_s.so*"
 getlib "ld-*.so*"
 
+# While we are here, dump out the details of the compiler
+mkdir -p gen
+${cross}gcc -Q --help=target > $dest/gcc-target-options
+echo 'void x() { }' > $dest/t.c
+${cross}gcc -c -dD -E $dest/t.c > $dest/gcc-predefined-macros
+${cross}gcc -dumpspecs > $dest/gcc-specs

@@ -36,5 +36,5 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
   --enable-fat=yes --enable-cxx=yes --with-pic
 #=gmp \
 #  CFLAGS='-g -fPIC' CXXFLAGS='-g -fPIC' # why doesn't --with-pic do this?
-make -j && make install
+make -j4 && make install
 rm -f $OcpiInstallExecDir/lib/*.la

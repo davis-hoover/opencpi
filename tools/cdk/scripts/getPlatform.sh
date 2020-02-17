@@ -25,15 +25,15 @@
 
 # Given the directory of the platform we want to return
 returnPlatform() {
-  local d=$1 p=$(basename $1)
-  local vars=($(egrep '^ *OcpiPlatform(Os|Arch|OsVersion) *:*= *' $d/$p.mk |
+  local d=$1
+  local vars=($(egrep '^ *OcpiPlatform(Os|Arch|OsVersion) *:*= *' $d/$2.mk |
               sed 's/OcpiPlatform\([^ :=]*\) *:*= *\([^a-zA-Z0-9_]*\)/\1 \2/'|sort))
   [ ${#vars[@]} = 6 ] || {
-    echo "Error:  Platform file $d/$p.mk is invalid and cannot be used.${vars[*]}" >&2
+    echo "Error:  Platform file $d/$2.mk is invalid and cannot be used.${vars[*]}" >&2
     echo "Error:  OcpiPlatform(Os|OsVersion|Arch) variables are not valid." >&2
     exit 1
   }
-  echo ${vars[3]} ${vars[5]} ${vars[1]} ${vars[3]}-${vars[5]}-${vars[1]} $p $d
+  echo ${vars[3]} ${vars[5]} ${vars[1]} ${vars[3]}-${vars[5]}-${vars[1]} $2 $d
   exit 0
 }
 isCurPlatform() {
@@ -44,12 +44,13 @@ tryDir() {
   local platforms_dir=$1
   if [ -n "$2" ]; then # looking for a specific platform (not the current one)
     local d=$platforms_dir/$2
-    [ -d $d/lib -a -f $d/lib/$2.mk ] && returnPlatform $d/lib
-    [ -d $d -a -f $d/$2.mk ] && returnPlatform $d
+    [ -d $d/lib -a -f $d/lib/$2.mk ] && returnPlatform $d/lib $2
+    [ -d $d -a -f $d/$2.mk ] && returnPlatform $d $2
   else # not looking for a particular platform, but looking for the one we're running on
     for i in $platforms_dir/*; do
-      test -d $i -a -f $i/$(basename $i).mk &&
-        isCurPlatform $i/$(basename $i) && returnPlatform $i
+      local p=$(basename $i)
+      test -d $i -a -f $i/$p.mk &&
+        isCurPlatform $i/$p && returnPlatform $i $p
     done
   fi
   return 0 # if it returns, it didn't find anything

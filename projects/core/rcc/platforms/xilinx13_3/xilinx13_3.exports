@@ -39,4 +39,4 @@
 # Deployment files
 @<platform_dir>/release/uramdisk.image.gz /
 @<platform_dir>/release/uImage /
-+<platform_dir>/release/lib/ <target>/lib/sdk/lib
++<platform_dir>/release/lib/ <target>/sdk/lib

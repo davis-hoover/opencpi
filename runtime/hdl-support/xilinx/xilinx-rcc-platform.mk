@@ -68,8 +68,9 @@
 # OCPI_XILINX_ZYNQ_RELEASE_DIR iis where the Xilinx binary release tarballs are downloaded.
 
 AT=@
-all:
+all: exports
 .DELETE_ON_ERROR:
+.PHONY: kernel-artifacts sdk-artifacts release-artifacts exports
 $(if $(wildcard $(OCPI_CDK_DIR)),,$(error OCPI_CDK_DIR not set or non-existent.  This file requires it.))
 
 include $(notdir $(CURDIR)).mk
@@ -83,12 +84,44 @@ kernel_config:=$(and $(wildcard kernel.config),$(CURDIR)/kernel.config)
 binary_release:=/home/jek/mac/Xilinx/ZynqReleases/2019.1-zed-release-dir/2019.1-zed-release
 # kernel file from gen/patch_ub_image
 kernel_image:=../uImage
+exports_file:=$(xilinx_sw_platform).exports
 
-# use default exports.
-#ifeq ($(wildcard $(xilinx_sw_platform).exports),)
+all: exports
 
-all: gen
+gen:
+	$(AT)mkdir gen
+# Retrieve/patch/build artifacts we need from the kernel+u-boot source repo, which is at OCPI_
+# Note top level kernel-headers.tgz link until we get all the exports in the lib subdir
 
+gen/kernel-artifacts.done: | $(local_repo) gen
+	$(AT)rm -f gen/kernel-artifacts.done
+	$(AT)echo Retrieving/patching/building needed artifacts from the Xilinx kernel and u-boot source repos.
+	$(AT)bash $(OCPI_CDK_DIR)/scripts/xilinx/createXilinxLinuxKernelHeaders.sh $(xilinx_sw_arch) \
+		$(linux_repo_tag) $(uboot_repo_tag) $(local_repo) gen/kernel-artifacts "$(kernel_config)"
+	$(AT)echo The kernel-headers has been created.
+	$(AT)touch $@
+
+kernel-artifacts: gen/kernel-artifacts.done
+
+# Retrieve and/or build artifacts we need from the EDK/SDK, essentially c++ runtime libraries.
+gen/sdk-artifacts.done: | gen
+	$(AT)rm -f $@
+	$(AT)$(OCPI_CDK_DIR)/scripts/xilinx/importSDKartifacts.sh $(OcpiCrossCompile) gen/sdk-artifacts
+	$(AT)echo Libraries and compiler details from the SDK have been captured for SD cards, valgrind etc.
+	$(AT)touch $@
+
+sdk-artifacts: gen/sdk-artifacts.done
+
+# Retrieve the artifacts we need from the Xilinx Zynq binary release
+gen/release-artifacts.done:
+	$(AT)rm -f $@
+	$(AT)$(OCPI_CDK_DIR)/scripts/xilinx/importXilinxRelease.sh \
+	     $(xilinx_version_tag) $(xilinx_releases) gen/release-artifacts $(local_repo)
+	$(AT)touch $@
+
+release-artifacts: gen/release-artifacts.done
+
+# Do the one-time work to create SD card artifacts for booting this platform
 get-kernel-repos:
 	echo Retrieving/downloading the Xilinx source trees for the linux kernel and u-boot into $(local_repo)
 	$(OCPI_CDK_DIR)/scripts/xilinx/getXilinxLinuxSources.sh $(local_repo)
@@ -98,43 +131,7 @@ get-kernel-repos:
 	echo To redo this listing (e.g. with grep), use this command:
 	echo $(OCPI_CDK_DIR)/scripts/xilinx/showXilinxLinuxTags.sh $(local_repo)
 
-# Retrieve/patch/build artifacts we need from the kernel+u-boot source repo, which is at OCPI_
-# Note top level kernel-headers.tgz link until we get all the exports in the lib subdir
-kernel-artifacts: | $(local_repo)
-	$(AT)echo Retrieving/patching/building needed artifacts from the Xilinx kernel and u-boot source repos.
-	$(AT)bash $(OCPI_CDK_DIR)/scripts/xilinx/createXilinxLinuxKernelHeaders.sh $(xilinx_sw_arch) \
-		$(linux_repo_tag) $(uboot_repo_tag) $(local_repo) gen/kernel-artifacts "$(kernel_config)"
-	$(AT)mkdir -p lib && rm -f lib/kernel-headers.tgz && ln -s ../gen/kernel-artifacts/kernel-headers.tgz lib
-	$(AT)rm -f kernel-headers.tgz && ln -s lib/kernel-headers.tgz .
-	$(AT)echo The kernel-headers has been created.
-	$(AT)echo It is now ready for building the OpenCPI linux kernel driver for this platform
-
-# Retrieve and/or build artifacts we need from the EDK/SDK, essentially c++ runtime libraries.
-sdk-artifacts:
-	$(AT)$(OCPI_CDK_DIR)/scripts/xilinx/importSDKartifacts.sh $(OcpiCrossCompile) gen/sdk-artifacts
-	$(AT)mkdir -p lib && rm -f lib/lib && ln -s ../gen/sdk-artifacts/lib lib/lib
-	$(AT)echo Libraries from the SDK have been captured for SD cards, valgrind etc.
-
-# Retrieve the artifacts we need from the Xilinx Zynq binary release
-release-artifacts:
-	$(AT)$(OCPI_CDK_DIR)/scripts/xilinx/importXilinxRelease.sh $(xilinx_version_tag) $(xilinx_releases) gen/release-artifacts $(local_repo)
-
-# Do the one-time work to create SD card artifacts for booting this platform
-.PHONY: deploy cleandeploy
-cleandeploy:
-	rm -r -f deploy
-
-# Put the appropriate release files in the "deploy" directory based on a Xilinx binary release
-deploy: # $(kernel_headers) $(binary_release)
-	$(OCPI_CDK_DIR)/scripts/xilinx/patchXilinxInitRamFS.sh $(xilinx_version_tag) $(xilinx_releases) deploy
-
-
-# Unpack the root file system from the binary release
-root:
-	rm -r -f root
-	mkdir -p root
-
-ifneq (,)
+ifneq (,) # note test.its is a human concoction for patching the later root fs's...
 	mkdir -p boot
 	cp $(binary_release)/* boot
 	echo Here is original boot dir:
@@ -157,22 +154,18 @@ ifneq (,)
 
 endif
 
-#	$(OCPI_CDK_DIR)/scripts/xilinx/createLinuxRootFS.sh $(xilinx_sw_platform) $(binary_release)
+# Prepare the lib subdir with pointers to what is exported per the .exports file
+exports: kernel-artifacts sdk-artifacts release-artifacts
+	$(AT)if [ -e $(exports_file) ] ; then \
+	       $$OCPI_CDK_DIR/scripts/export-platform.sh lib; \
+	     else \
+	       echo Exports file \"$(exports_file)\" is not present.  No exporting done.; \
+	     fi
 
 $(local_repo):
 	mkdir $@
 	$(OCPI_CDK_DIR)/scripts/xilinx/getXilinxLinuxSources.sh $(local_repo)
 
-# Dump out things about the compiler
-dump:
-	$(AT)mkdir -p gen
-	$(AT)$(OcpiCrossCompile)gcc -Q --help=target > gen/gcc-target-options
-	$(AT)echo 'void x() { }' > gen/t.c
-	$(AT)$(OcpiCrossCompile)gcc -c -dD -E gen/t.c > gen/gcc-predefined-macros
-	$(AT)$(OcpiCrossCompile)gcc -dumpspecs > gen/gcc-specs
-	$(AT)echo 'The gen/ subdir now has gcc-target-options, gcc-predefined-macros and gcc-specs'
-
-all: $(kernel_headers)
 
 # Clean the repo if it is local
 # Do not clean the kernel headers, they are expected to be added to the repo with git add

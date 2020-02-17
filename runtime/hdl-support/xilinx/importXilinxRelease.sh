@@ -55,36 +55,35 @@ function do_platform {
     sub+=/boot
     cp -Rp $1 $sub
 }
-for d in $releases/*.tar.xz; do
+for d in $releases/$version/*.tar.xz; do
   f=$(basename $d)
-  if [[ $f = ${version}* ]]; then
-      found=1
-      tar -C $tmp -x -f $d # note that some files are actually gzip, not xz
-      if [ $(basename $d) = ${version}-release.tar.xz ]; then
-	  echo Old style release with embedded platforms: $d
-	  for i in $tmp/*; do
-	      if [ -d $i ]; then
-		  plat=$(basename $i)
-		  if [ $plat = zc70x ]; then
-		      for p in $i/*; do
-			  if [ -d $p ]; then
-			      plat=$(basename $p)
-			      do_platform $p
-			      copy_files $tmp $sub
-			      copy_files $i $sub
-			  fi
-		      done
-		  else
-		      do_platform $i
-		      copy_files $tmp $sub
-		  fi
+  [[ $f != ${version}* ]] && echo File in $d without release prexif ignored: $d && continue
+  found=1
+  tar -C $tmp -x -f $d # note that some files are actually gzip, not xz
+  if [ $(basename $d) = ${version}-release.tar.xz ]; then
+      echo Old style release with embedded platforms: $d
+      for i in $tmp/*; do
+	  if [ -d $i ]; then
+	      plat=$(basename $i)
+	      if [ $plat = zc70x ]; then
+		  for p in $i/*; do
+		      if [ -d $p ]; then
+			  plat=$(basename $p)
+			  do_platform $p
+			  copy_files $tmp $sub
+			  copy_files $i $sub
+		      fi
+		  done
+	      else
+		  do_platform $i
+		  copy_files $tmp $sub
 	      fi
-	  done
-      else
-	  plat=$(echo $f | sed -e 's/[^-]*-\([^-]*\)-.*$/\1/')
-	  echo New per-platform release: $f for platform $plat.
-	  do_platform $tmp/*${plat}*
-      fi
+	  fi
+      done
+  else
+      plat=$(echo $f | sed -e 's/[^-]*-\([^-]*\)-.*$/\1/')
+      echo New per-platform release: $f for platform $plat.
+      do_platform $tmp/*${plat}*
   fi
 done
 [ -z "$found" ] && echo Could not find any Xilinx $version release tarballs in $releases. && exit 1

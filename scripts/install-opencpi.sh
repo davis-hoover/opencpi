@@ -37,19 +37,23 @@ if test -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform"; then
   # This should check if a successful prereq install has been done
   # It should also just to "host" prerequisites, not "runtime" or "project" prerequisites
   ./scripts/install-prerequisites.sh $OCPI_TOOL_PLATFORM
+  ./build/build-opencpi.sh "" -
 fi
 # Allow this to build for platforms defined in the inactive project or in osps
 [ -z "$OCPI_PROJECT_PATH" ] && export OCPI_PROJECT_PATH=`pwd`/projects/inactive
-for i in projects/osps/*; do
+for i in $(shopt -s nullglob; echo projects/osps/*); do
   [ -d $i/rcc/platforms ] && OCPI_PROJECT_PATH=$OCPI_PROJECT_PATH:`pwd`/$i
 done
+# We assume that install-packages.sh does NOT depend on "building" the platform
 ./build/install-packages.sh $platform
-./build/install-prerequisites.sh $platform
-# To build the framework (really just projects), the host platform must be built
-if test -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform"; then
-  # build the framework for the tool host, but not projects, 
-  ./build/build-opencpi.sh "" -
+source $OCPI_CDK_DIR/scripts/ocpitarget.sh $platform
+[ -z "$OCPI_TARGET_PLATFORM_DIR" ] && echo Cannot find platform $platform && exit 1
+# If the platform itself needs to be "built", do it now.
+if [ -f $OCPI_TARGET_PLATFORM_DIR/Makefile ]; then
+  echo Building/preparing the software platform \"$platform\" which will enable building other assets for it.
+  make -C $OCPI_TARGET_PLATFORM_DIR/Makefile
 fi
+./build/install-prerequisites.sh $platform
 # Any arguments after the first are variable assignments for make, like HdlPlatforms...
 eval $* ./build/build-opencpi.sh $platform
 if test -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform"; then

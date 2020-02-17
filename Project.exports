@@ -118,6 +118,7 @@
 +tools/cdk/scripts/ocpigui.sh <target>/bin/ocpigui
 +tools/cdk/scripts/ocpiav.sh <target>/bin/ocpiav
 +tools/cdk/scripts/ocpiav.desktop scripts/
++tools/cdk/scripts/export-platform.sh scripts/
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/

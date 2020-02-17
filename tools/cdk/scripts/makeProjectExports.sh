@@ -407,6 +407,7 @@ done
 [ -n "$verbose" -a -n "$rcc_platforms" ] && echo Processing rcc platforms
 for p in ${rcc_platforms[*]}; do
   d=rcc/platforms/$p
+  [ -d $d/lib ] && d=$d/lib
   [ -f $d/$p.mk -o -f $d/$p-target.mk ] || bad RCC platform $p not exported due to missing files in $d
   make_filtered_link $d exports/rcc/platforms/$p rcc-platform
 done
