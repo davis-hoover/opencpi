@@ -11,41 +11,46 @@
 {% endif %}
 {%- endmacro %}
 
+{% macro pop_link_must_exist(name, data) -%}
+{{ data[name].anchor_tag() }}
+{% set _ = data.pop(name) %}
+{%- endmacro %}
+
 <h2>{{ section_title }}</h2>
 <p>
     It is highly recommended to read all of the Getting Started Guides in the order listed before reading
     the Developer or Additional Guides. If OpenCPI has already been installed, then you may skip the installation guide.
 </p>
-<div>{{ pop_link("release_notes", links) }}</div>
+<div>{{ pop_link("release notes", links) }}</div>
 
 <div class="flexbox-container">
     <div class="flexbox-item">
         <h3>Getting Started Guides</h3>
-        {% if "opencpi_installation" in links and "rpm_installation_guide" in links %}
-        <div>{{ pop_link("opencpi_installation", links) }} or
-            {{ pop_link("rpm_installation_guide", links) }}
+        {% if "opencpi installation" in links and "rpm installation" in links %}
+        <div>{{ pop_link_must_exist("opencpi installation", links) }} or
+            {{ pop_link_must_exist("rpm installation", links) }}
         </div>
-        {% elif "opencpi_installation" in links %}
-        <div>{{ pop_link("opencpi_installation", links) }}</div>
-        {% else %}
-        <div>{{ pop_link("rpm_installation_guide", links) }}</div>
+        {% elif "opencpi installation" in links %}
+        <div>{{ pop_link_must_exist("opencpi installation", links) }}</div>
+        {% elif "rpm installation" in links %}
+        <div>{{ pop_link_must_exist("rpm installation", links) }}</div>
         {% endif %}
-        <div>{{ pop_link("opencpi_user", links) }}</div>
-        <div>{{ pop_link("getting_started", links) }}</div>
+        <div>{{ pop_link("opencpi user", links) }}</div>
+        <div>{{ pop_link("getting started", links) }}</div>
 
         <h3>Developer Guides</h3>
-        <div>{{ pop_link("opencpi_application_development", links) }}</div>
-        <div>{{ pop_link("opencpi_component_development", links) }}</div>
-        <div>{{ pop_link("opencpi_rcc_development", links) }}</div>
-        <div>{{ pop_link("opencpi_hdl_development", links) }}</div>
-        <div>{{ pop_link("opencpi_platform_development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi application development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi component development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi rcc development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi hdl development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi platform development", links) }}</div>
 
         {% if assets %}
         <h3>System Specific Guides</h3>
-        <div>{{ get_link("alst4_getting_started_guide", assets.files) }}</div>
-        <div>{{ get_link("matchstiq_z1_getting_started_guide", assets.files) }}</div>
-        <div>{{ get_link("ml605_getting_started_guide", assets.files) }}</div>
-        <div>{{ get_link("zedboard_getting_started_guide", assets.files) }}</div>
+        <div>{{ get_link("alst4 getting started", assets.files) }}</div>
+        <div>{{ get_link("matchstiq z1 getting started", assets.files) }}</div>
+        <div>{{ get_link("ml605 getting started", assets.files) }}</div>
+        <div>{{ get_link("zedboard getting started", assets.files) }}</div>
         {% endif %}
 
         <h3>Additional Guides</h3>

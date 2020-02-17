@@ -100,14 +100,20 @@ def main():
     logging.debug("Latest release: {}".format(latest_release))
     for release in releases:
         is_latest = True if latest_release == release else False
-        build(release, is_latest=is_latest)
+        build(release)
         gen_release_index(release, is_latest=is_latest)
+
+    # Create symlink so urls like https://example.com/releases/latest/doc/some.pdf will work
+    latest_link = Path(args.outputdir, "latest")
+    if latest_link.exists():
+        os.remove(latest_link.as_posix())
+    os.symlink(latest_release, latest_link.as_posix())
 
     gen_releases_index(latest_release)  # Create OUTPUTDIR/index.html
     gen_releases_all_index(latest_release, git_tags)  # Create OUTPUTDIR/all/index.html
 
 
-def build(tag: str, is_latest=True):
+def build(tag: str):
     logging.info("Processing release: {}".format(tag))
     dst_dir = Path(args.outputdir, tag, "docs").absolute()
     if dst_dir.exists():
@@ -139,13 +145,6 @@ def build(tag: str, is_latest=True):
         # Copy pdfs to dst_dir
         logging.info("Copying docs for release: {}".format(tag))
         copy_pdfs(tmprepo, dst_dir)
-
-        # Create symlink so urls like https://example.com/releases/latest/doc/some.pdf will work
-        if is_latest:
-            latest_link = Path(args.outputdir, "latest")
-            if latest_link.exists():
-                os.remove(latest_link.as_posix())
-            os.symlink(tag, latest_link.as_posix())
 
         # No RPM support for 1.6.0
         if tag.startswith("v1.6.0"):
@@ -247,21 +246,14 @@ def gen_release_index(tag: str, is_latest=False):
     def _fix_file_name(file_name: str):
         """Cleans up file names until they can be renamed"""
         fname = file_name.lower()
-        if fname == "opencpi installation":
+        if fname in [
+            "opencpi installation", "opencpi user", "opencpi application development", "opencpi component development",
+            "opencpi rcc development", "opencpi hdl development", "opencpi platform development"
+        ]:
             return file_name + " Guide"
-        elif fname == "opencpi user":
+        elif fname.endswith("getting started"):
             return file_name + " Guide"
-        elif fname == "opencpi application development":
-            return file_name + " Guide"
-        elif fname == "opencpi component development":
-            return file_name + " Guide"
-        elif fname == "opencpi rcc development":
-            return file_name + " Guide"
-        elif fname == "opencpi hdl development":
-            return file_name + " Guide"
-        elif fname == "opencpi platform development":
-            return file_name + " Guide"
-        elif fname == "ide user guide":
+        elif fname == "ide user":
             return "AV GUI User Guide"
         elif fname.startswith("briefing"):
             chunks = fname.split()
@@ -298,11 +290,13 @@ def gen_release_index(tag: str, is_latest=False):
             if f.endswith(".pdf"):
                 url = "{}/{}".format(base_url, f)
                 name = f[:-4]  # remove '.pdf'
+                name = name.replace("_", " ")
                 if name.startswith("Briefing") or name.startswith("Tutorial"):
-                    file_links[_fix_file_name(name.replace("_", " ")).lower()] = UrlLink(
-                        name=name.replace("_", " "), url=url)
+                    file_links[_fix_file_name(name).lower()] = UrlLink(name=name, url=url)
                 else:
-                    file_links[name.lower()] = UrlLink(name=_fix_file_name(name.replace("_", " ")), url=url)
+                    if name.lower().endswith("guide"):
+                        name = name[:-6]
+                    file_links[name.lower()] = UrlLink(name=_fix_file_name(name), url=url)
         section_data[section_name] = SectionData(name=section_name, title=section_title, files=file_links)
 
     # Render each section
@@ -321,11 +315,10 @@ def gen_release_index(tag: str, is_latest=False):
     else:
         # Main section needs some files from assets, briefings, and tutorials
         assets = section_data.get("assets")
-        tutorials = section_data.get("tutorials")
         briefings = section_data.get("briefings")
+        tutorials = section_data.get("tutorials")
         rendered_sections[data.name] = main_section.render(section_title=data.title, links=data.files,
-                                                           assets=assets, tutorials=tutorials,
-                                                           briefings=briefings)
+                                                           assets=assets, briefings=briefings, tutorials=tutorials)
 
     # Stitch it all together
     template = jinja_env.get_template("release.index.html")
