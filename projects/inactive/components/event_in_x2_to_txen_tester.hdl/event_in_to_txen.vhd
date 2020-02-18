@@ -20,7 +20,7 @@
 -- turn tx on as soon as we get txon from event port (zero-latency)
 -- turn tx off only after we get txoff from event port (zero-latency)
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library protocol; use protocol.protocol.all;
+library protocol;
 entity event_in_to_txen is
   port (ctl_in_clk             : in  std_logic;
         ctl_in_reset           : in  std_logic;
@@ -59,7 +59,7 @@ architecture rtl of event_in_to_txen is
   signal txen_r               : std_logic := '0';
 begin
 
-  zlm_detector : util.util.zlm_detector
+  zlm_detector : protocol.protocol.zlm_detector
     port map (clk         => ctl_in_clk,
               reset       => ctl_in_reset,
               som         => event_in_in_som,
