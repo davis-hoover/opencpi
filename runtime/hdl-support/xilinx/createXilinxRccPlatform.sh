@@ -103,5 +103,7 @@ cat > $dir/$platform.exports <<-EOF
 	# Provide these libraries on the SD card when we do not patch the root fs
 	@<platform_dir>/gen/sdk-artifacts/lib opencpi/sdk/
 	EOF
+make -C $projdir exports # pre local exports (no lib/)
 make -C $dir exports
-make -C $projdir exports
+make -C $projdir exports # post local exports
+

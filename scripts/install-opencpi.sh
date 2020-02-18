@@ -33,11 +33,12 @@ OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh; source $OCPI_BOOTSTRAP
 platform=$1
 [ -n "$1" ] && shift
 if test -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform"; then
-  ./scripts/install-packages.sh $OCPI_TOOL_PLATFORM
+  echo Assuming development host platform $OCPI_TOOL_PLATFORM is arleady installed.
+#  ./scripts/install-packages.sh $OCPI_TOOL_PLATFORM
   # This should check if a successful prereq install has been done
   # It should also just to "host" prerequisites, not "runtime" or "project" prerequisites
-  ./scripts/install-prerequisites.sh $OCPI_TOOL_PLATFORM
-  ./build/build-opencpi.sh "" -
+#  ./scripts/install-prerequisites.sh $OCPI_TOOL_PLATFORM
+#  ./build/build-opencpi.sh "" -
 fi
 # Allow this to build for platforms defined in the inactive project or in osps
 [ -z "$OCPI_PROJECT_PATH" ] && export OCPI_PROJECT_PATH=`pwd`/projects/inactive
