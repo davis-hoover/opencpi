@@ -20,7 +20,7 @@
 -- turn tx on as soon as we get txon from event port (zero-latency)
 -- turn tx off only after we get txoff from event port (zero-latency)
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library util; use util.util.all;
+library protocol; use protocol.protocol.all;
 entity event_in_to_txen is
   port (ctl_in_clk             : in  std_logic;
         ctl_in_reset           : in  std_logic;

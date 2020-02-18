@@ -14,32 +14,16 @@ entity file_writer is
     backpressure_select_vld : in  std_logic;
     -- INPUT
     idata                   : in  data_complex_dac_t;
+    idata_vld               : in  std_logic;
     imetadata               : in  metadata_dac_t;
-    ivld                    : in  std_logic;
+    imetadata_vld           : in  std_logic;
     irdy                    : out std_logic);
 end entity file_writer;
 architecture rtl of file_writer is
-  signal latest_backpressure_select_gen_val : std_logic := '0';
-  signal latest_backpressure_select         : std_logic := '0';
-  signal lfsr_reg                           : std_logic_vector(11 downto 0) :=
-                                              (others => '0');
+  signal lfsr_reg : std_logic_vector(11 downto 0) :=
+                    (others => '0');
+  signal irdy_s   : std_logic := '0';
 begin
-
-  latest_backpressure_select_gen_val <=
-      '1' when (backpressure_select = NO_BP) else
-      '0' when (backpressure_select = LFSR_BP) else
-      '0';
-
-  latest_backpressure_select_gen : misc_prims.misc_prims.latest_reg
-    generic map(
-      BIT_WIDTH => 1)
-    port map(
-      clk      => clk,
-      rst      => rst,
-      din      => latest_backpressure_select_gen_val,
-      din_vld  => backpressure_select_vld,
-      dout     => latest_backpressure_select,
-      dout_vld => open);
 
   lfsr : misc_prims.misc_prims.lfsr
     generic map(
@@ -51,9 +35,10 @@ begin
       en  => '1',
       reg => lfsr_reg);
 
-  irdy <= '1'         when (latest_backpressure_select = '1') else
-          lfsr_reg(0) when (latest_backpressure_select = '0') else
-          '0';
+  irdy_s <= '1'         when (backpressure_select = NO_BP)   else
+            lfsr_reg(0) when (backpressure_select = LFSR_BP) else
+            '0';
+  irdy <= irdy_s;
 
   file_write : process(clk)
     file     data_file     : text open write_mode is FILENAME;
@@ -67,12 +52,12 @@ begin
       --  writeline(data_file, data_file_row);
       --  on_first_line <= '0';
       --end if;
-      if((rst = '0') and (ivld = '1')) then
-        if(imetadata.underrun_error = '1') then
+      if(rst = '0') then
+        if((imetadata_vld = '1') and (imetadata.underrun_error = '1')) then
           write(data_file_row, string'("ERROR_SAMP_NOT_AVAIL"));
           writeline(data_file, data_file_row);
         end if;
-        if(imetadata.data_vld = '1') then
+        if((irdy_s = '1') and (idata_vld = '1')) then
           write(data_file_row, to_integer(unsigned(idata.i)));
           write(data_file_row, ',');
           write(data_file_row, to_integer(unsigned(idata.q)));

@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
+library protocol;
 library misc_prims; use misc_prims.misc_prims.all;
 
 entity subtest is
@@ -14,12 +15,16 @@ end entity subtest;
 architecture rtl of subtest is
   signal clk                : std_logic := '0';
   signal rst                : std_logic := '0';
-  signal data_src_odata     : data_complex_t;
+  signal data_src_oprotocol     :
+      protocol.complex_short_with_metadata.protocol_t := 
+      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
   signal data_src_ometadata : metadata_dac_t;
-  signal data_src_ovld      : std_logic := '0';
+  signal data_src_ometadata_vld : std_logic := '0';
   signal uut_irdy           : std_logic := '0';
   signal uut_odata          : data_complex_dac_t;
+  signal uut_odata_vld      : std_logic := '0';
   signal uut_ometadata      : metadata_dac_t;
+  signal uut_ometadata_vld  : std_logic := '0';
   signal file_writer_irdy   : std_logic := '0';
   signal end_of_test        : std_logic := '0';
 begin
@@ -54,9 +59,9 @@ begin
       stop_on_period_cnt => '1',
       stopped            => end_of_test,
       -- OUTPUT
-      odata              => data_src_odata,
+      oprotocol          => data_src_oprotocol,
       ometadata          => data_src_ometadata,
-      ovld               => data_src_ovld,
+      ometadata_vld      => data_src_ometadata_vld,
       ordy               => uut_irdy);
 
   uut : misc_prims.misc_prims.data_narrower
@@ -64,17 +69,19 @@ begin
       BITS_PACKED_INTO_LSBS    => BITS_PACKED_INTO_LSBS)
     port map(
       -- CTRL
-      clk       => clk,
-      rst       => rst,
+      clk           => clk,
+      rst           => rst,
       -- INPUT
-      idata     => data_src_odata,
-      imetadata => data_src_ometadata,
-      ivld      => data_src_ovld,
-      irdy      => uut_irdy,
+      iprotocol     => data_src_oprotocol,
+      imetadata     => data_src_ometadata,
+      imetadata_vld => data_src_ometadata_vld,
+      irdy          => uut_irdy,
       -- OUTPUT
-      odata     => uut_odata,
-      ometadata => uut_ometadata,
-      ordy      => file_writer_irdy);
+      odata         => uut_odata,
+      odata_vld     => uut_odata_vld,
+      ometadata     => uut_ometadata,
+      ometadata_vld => uut_ometadata_vld,
+      ordy          => file_writer_irdy);
 
   file_writer : entity work.file_writer
     generic map(
@@ -87,9 +94,9 @@ begin
       backpressure_select_vld => backpressure_select_vld,
       -- INPUT
       idata                   => uut_odata,
+      idata_vld               => uut_odata_vld,
       imetadata               => uut_ometadata,
-      ivld                    => '1',--emulates DAC which accepts data
-                                     --regardless of valid
+      imetadata_vld           => uut_ometadata_vld,
       irdy                    => file_writer_irdy);
 
 end rtl;

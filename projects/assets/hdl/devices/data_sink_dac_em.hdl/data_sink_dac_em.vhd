@@ -1,5 +1,6 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi, platform; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
+library util;
 architecture rtl of worker is
   signal   dac_clk    : std_logic;
   signal   first, eof : bool_t;
@@ -9,8 +10,14 @@ begin
     generic map(frequency => from_float(dac_clk_freq_hz))
     port map   (clk => dac_clk, reset => open);
 
-  dev_out.clk <= dac_clk;
-  out_out.clk <= dac_clk;
+  dev_clk_gen : util.util.in2out
+    port map(
+      in_port  => dac_clk,
+      out_port => dev_out.clk);
+  out_clk_gen : util.util.in2out
+    port map(
+      in_port  => dac_clk,
+      out_port => out_out.clk);
 
   out_out.valid <= out_in.ready and dev_in.valid;
   

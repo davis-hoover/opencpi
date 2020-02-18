@@ -1,9 +1,26 @@
+-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+-- distributed with this source distribution.
+--
+-- This file is part of OpenCPI <http://www.opencpi.org>
+--
+-- OpenCPI is free software: you can redistribute it and/or modify it under the
+-- terms of the GNU Lesser General Public License as published by the Free
+-- Software Foundation, either version 3 of the License, or (at your option) any
+-- later version.
+--
+-- OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+-- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+-- A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU Lesser General Public License
+-- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi;
-library misc_prims; use misc_prims.prot.all;
+library util;
+library protocol; use protocol.complex_short_with_metadata.all;
 
--- for use w/ port clockdirection='input'
-entity cswm_marshaller is
+entity complex_short_with_metadata_marshaller is
   generic(
     WSI_DATA_WIDTH         : positive := 16; -- 16 is default of codegen, but
                                              -- MUST USE 32 FOR NOW
@@ -12,9 +29,7 @@ entity cswm_marshaller is
     clk          : in  std_logic;
     rst          : in  std_logic;
     -- INPUT
-    idata        : in  misc_prims.misc_prims.data_complex_t;
-    imetadata    : in  misc_prims.misc_prims.metadata_t;
-    ivld         : in  std_logic;
+    iprotocol    : in  protocol.complex_short_with_metadata.protocol_t;
     irdy         : out std_logic;
     -- OUTPUT
     odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
@@ -23,30 +38,25 @@ entity cswm_marshaller is
     ogive        : out ocpi.types.Bool_t;
     osom         : out ocpi.types.Bool_t;
     oeom         : out ocpi.types.Bool_t;
-    oopcode      : out cswm_opcode_t;
+    oopcode      : out protocol.complex_short_with_metadata.opcode_t;
     oeof         : out ocpi.types.Bool_t;
     oready       : in  ocpi.types.Bool_t);
 end entity;
-architecture rtl of cswm_marshaller is
+architecture rtl of complex_short_with_metadata_marshaller is
 
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := 16;
   type state_t is (SAMPLES, SAMPLES_EOM_ONLY, TIME_63_32, TIME_31_0, INTERVAL_63_32,
                    INTERVAL_31_0, FLUSH, SYNC, EOF, IDLE);
 
-  signal idata_r : misc_prims.misc_prims.data_complex_t :=
-                   misc_prims.misc_prims.data_complex_zero;
+  signal ivld        : std_logic := '0';
+  signal iprotocol_r : protocol.complex_short_with_metadata.protocol_t :=
+                       protocol.complex_short_with_metadata.PROTOCOL_ZERO;
 
   signal in_xfer           : std_logic := '0';
   signal in_xfer_r         : std_logic := '0';
   signal irdy_s            : std_logic := '0';
   signal mux_start         : std_logic := '0';
   signal mux_end           : std_logic := '0';
-
-  signal metadata_zeros : std_logic_vector(
-         misc_prims.misc_prims.METADATA_BIT_WIDTH-1 downto 0) :=
-         (others => '0');
-  signal imetadata_r  : misc_prims.misc_prims.metadata_t :=
-                       misc_prims.misc_prims.metadata_zero;
 
   signal state        : state_t := IDLE;
   signal state_r      : state_t := IDLE;
@@ -63,7 +73,8 @@ architecture rtl of cswm_marshaller is
   signal force_end_of_samples   : std_logic := '0';
   signal force_end_of_samples_r : std_logic := '0';
 
-  signal opcode : cswm_opcode_t := SAMPLES;
+  signal opcode : protocol.complex_short_with_metadata.opcode_t :=
+                  protocol.complex_short_with_metadata.SAMPLES;
   signal pending_samples_eom_gen_set : std_logic := '0';
   signal pending_samples_eom_gen_clr : std_logic := '0';
   signal pending_samples_eom_r       : std_logic := '0';
@@ -72,6 +83,13 @@ begin
 
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
 
+    ivld <= iprotocol.samples_vld or
+            iprotocol.time_vld or
+            iprotocol.interval_vld or
+            iprotocol.flush or
+            iprotocol.sync or
+            iprotocol.end_of_samples or
+            iprotocol.eof;
     in_xfer <= irdy_s and ivld;
 
     in_xfer_reg : process(clk)
@@ -89,12 +107,9 @@ begin
     begin
       if(rising_edge(clk)) then
         if(rst = '1') then
-          idata_r.i   <= (others => '0');
-          idata_r.q   <= (others => '0');
-          imetadata_r <= misc_prims.misc_prims.from_slv(metadata_zeros);
+          iprotocol_r <= protocol.complex_short_with_metadata.PROTOCOL_ZERO;
         elsif(in_xfer = '1') then
-          idata_r     <= idata;
-          imetadata_r <= imetadata;
+          iprotocol_r <= iprotocol;
         end if;
       end if;
     end process in_in_pipeline;
@@ -106,7 +121,8 @@ begin
           irdy_s <= '0';
         else
           if((state = IDLE) and (mux_end = '1')) then
-            irdy_s <= (not ivld) and oready;
+            --irdy_s <= (not ivld) and oready;
+            irdy_s <= oready;
           else
             irdy_s <= '0';
           end if;
@@ -130,11 +146,11 @@ begin
     end process regs;
 
     pending_samples_eom_gen_set <= '1' when (give = '1') and (som = '1') and
-                                   (opcode = SAMPLES) else '0';
+        (opcode = protocol.complex_short_with_metadata.SAMPLES) else '0';
     pending_samples_eom_gen_clr <= '1' when (give = '1') and (eom = '1') and
-                                   (opcode = SAMPLES) else '0';
+        (opcode = protocol.complex_short_with_metadata.SAMPLES) else '0';
 
-    pending_samples_eom_gen : misc_prims.misc_prims.set_clr
+    pending_samples_eom_gen : util.util.set_clr
       port map(clk => clk,
                rst => rst,
                set => pending_samples_eom_gen_set,
@@ -148,10 +164,10 @@ begin
 
     -- sets the priority of multiplexing of output messages
     -- EOF, SYNC, TIME, INTERVAL, FLUSH, SAMPLES
-    mux : process(oready, imetadata_r, mux_start, state_r, pending_samples_eom_r)
+    mux : process(oready, iprotocol_r, mux_start, state_r, pending_samples_eom_r)
     begin
       if(oready = '1') then
-        if((imetadata_r.eof = '1') and (
+        if((iprotocol_r.eof = '1') and (
             (mux_start = '1') or
             (state_r = SAMPLES_EOM_ONLY))) then
           if(pending_samples_eom_r = '1') then
@@ -160,7 +176,7 @@ begin
             state <= EOF;
           end if;
           force_end_of_samples <= pending_samples_eom_r;
-        elsif((imetadata_r.error_samp_drop = '1') and (
+        elsif((iprotocol_r.sync = '1') and (
             (mux_start = '1') or
             (state_r = SAMPLES_EOM_ONLY) or
             (state_r = EOF))) then
@@ -170,7 +186,7 @@ begin
             state <= SYNC;
           end if;
           force_end_of_samples <= pending_samples_eom_r;
-        elsif((imetadata_r.time_vld = '1') and (
+        elsif((iprotocol_r.time_vld = '1') and (
             (mux_start = '1') or
             (state_r = SAMPLES_EOM_ONLY) or
             (state_r = EOF) or
@@ -184,7 +200,7 @@ begin
         elsif(state_r = TIME_31_0) then
           state                <= TIME_63_32;
           force_end_of_samples <= '0';
-        elsif((imetadata_r.samp_period_vld = '1') and (
+        elsif((iprotocol_r.interval_vld = '1') and (
             (mux_start = '1') or
             (state_r = SAMPLES_EOM_ONLY) or
             (state_r = EOF) or
@@ -199,7 +215,7 @@ begin
         elsif(state_r = INTERVAL_31_0) then
           state                <= INTERVAL_63_32;
           force_end_of_samples <= '0';
-        elsif((imetadata_r.flush = '1') and (
+        elsif((iprotocol_r.flush = '1') and (
             (mux_start = '1') or
             (state_r = SAMPLES_EOM_ONLY) or
             (state_r = EOF) or
@@ -212,7 +228,7 @@ begin
             state <= FLUSH;
           end if;
           force_end_of_samples <= pending_samples_eom_r;
-        elsif((imetadata_r.data_vld = '1') and (
+        elsif((iprotocol_r.samples_vld = '1') and (
             (mux_start = '1') or
             (state_r = SAMPLES_EOM_ONLY) or
             (state_r = EOF) or
@@ -229,77 +245,82 @@ begin
       end if;
     end process mux;
 
-    ogen : process(state, idata_r, samples_som, samples_eom, imetadata_r, oready)
+    ogen : process(state, iprotocol_r, samples_som, samples_eom, oready)
     begin
       case state is
         when SAMPLES =>
-          opcode  <= SAMPLES;
-          odata   <= idata_r.q & idata_r.i;
+          opcode  <= protocol.complex_short_with_metadata.SAMPLES;
+          odata   <= iprotocol_r.samples.iq.q & iprotocol_r.samples.iq.i;
           som     <= samples_som;
           ovalid  <= '1';
           eom     <= message_sizer_eom;
           oeof    <= '0';
           give    <= oready;
         when SAMPLES_EOM_ONLY =>
-          opcode  <= SAMPLES;
+          opcode  <= protocol.complex_short_with_metadata.SAMPLES;
+          odata   <= (others => '0');
           som     <= '0';
           ovalid  <= '0';
           eom     <= '1';
           oeof    <= '0';
           give    <= oready;
         when TIME_63_32 =>
-          opcode    <= TIME_TIME;
-          odata <= std_logic_vector(imetadata_r.time(63 downto 32));
+          opcode <= protocol.complex_short_with_metadata.TIME_TIME;
+          odata  <= iprotocol_r.time.sec;
           som    <= '0';
           ovalid <= '1';
           eom    <= '1';
           oeof   <= '0';
           give   <= oready;
         when TIME_31_0 =>
-          opcode    <= TIME_TIME;
-          odata <= std_logic_vector(imetadata_r.time(31 downto 0));
+          opcode <= protocol.complex_short_with_metadata.TIME_TIME;
+          odata  <= iprotocol_r.time.fract_sec;
           som    <= '1';
           ovalid <= '1';
           eom    <= '0';
           oeof   <= '0';
           give   <= oready;
         when INTERVAL_63_32 =>
-          opcode    <= INTERVAL;
-          odata <= std_logic_vector(imetadata_r.samp_period(63 downto 32));
+          opcode <= protocol.complex_short_with_metadata.INTERVAL;
+          odata  <= iprotocol_r.interval.delta_time(63 downto 32);
           som    <= '0';
           ovalid <= '1';
           eom    <= '1';
           oeof   <= '0';
           give   <= oready;
         when INTERVAL_31_0 =>
-          opcode    <= INTERVAL;
-          odata <= std_logic_vector(imetadata_r.samp_period(31 downto 0));
+          opcode <= protocol.complex_short_with_metadata.INTERVAL;
+          odata  <= iprotocol_r.interval.delta_time(31 downto 0);
           som    <= '1';
           ovalid <= '1';
           eom    <= '0';
           oeof   <= '0';
           give   <= oready;
         when SYNC =>
-          opcode    <= SYNC;
+          opcode <= protocol.complex_short_with_metadata.SYNC;
+          odata   <= (others => '0');
           som    <= '1';
           ovalid <= '0';
           eom    <= '1';
           oeof   <= '0';
           give   <= oready;
         when FLUSH =>
-          opcode <= FLUSH;
+          opcode <= protocol.complex_short_with_metadata.FLUSH;
+          odata   <= (others => '0');
           som    <= '1';
           ovalid <= '0';
           eom    <= '1';
           oeof   <= '0';
           give   <= oready;
         when EOF =>
+          odata   <= (others => '0');
           som    <= '0';
           ovalid <= '0';
           eom    <= '0';
           oeof   <= '1';
           give   <= oready;
         when others =>
+          odata   <= (others => '0');
           som    <= '0';
           ovalid <= '0';
           eom    <= '0';
@@ -313,7 +334,8 @@ begin
     message_sizer_rst <= rst or force_end_of_samples;
     message_sizer_give <= '1' when ((give = '1') and (opcode = SAMPLES)) else '0';
 
-    message_sizer : wsi_message_sizer
+    -- TODO / FIXME - include mechanism for assessment of port buffer size
+    message_sizer : protocol.protocol.message_sizer
       generic map(
         SIZE_BIT_WIDTH => SAMPLES_MESSAGE_SIZE_BIT_WIDTH)
       port map(

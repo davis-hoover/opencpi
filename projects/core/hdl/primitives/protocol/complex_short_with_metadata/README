@@ -1,0 +1,3 @@
+This package provides marshalling functionality for ports using the OpenCPI ComplexShortWithMetadata protocol.
+
+The "old" primitive(s) perform(s) more optimally that the non-"old" version(s) in terms of I/Q throughput, but "old" have known defects for some metadata opcodes. TODO / FIXME - the optimal features need to be implemented in any non-"old" versions (which have no known defects), and then all "old" versions should be deleted.

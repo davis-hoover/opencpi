@@ -1,35 +1,37 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
+library protocol;
 library misc_prims;
 architecture rtl of worker is
-  signal opcode : misc_prims.prot.cswm_opcode_t:= misc_prims.prot.SAMPLES;
-  signal in_adapter_odata     : misc_prims.misc_prims.data_complex_t :=
-                                misc_prims.misc_prims.data_complex_zero;
-  signal in_adapter_ometadata : misc_prims.misc_prims.metadata_t :=
-                                misc_prims.misc_prims.metadata_zero;
-  signal in_adapter_ovld      : std_logic := '0';
+  signal in_opcode :
+      protocol.complex_short_with_metadata.opcode_t :=
+      protocol.complex_short_with_metadata.SAMPLES;
+  signal in_demarshaller_oprotocol :
+      protocol.complex_short_with_metadata.protocol_t :=
+      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+  signal oprotocol : protocol.iqstream.protocol_t :=
+                     protocol.iqstream.PROTOCOL_ZERO;
   signal out_marshaller_irdy  : std_logic := '0';
   signal out_marshaller_odata : std_logic_vector(out_out.data'range) :=
                                 (others => '0');
-  signal data_vld             : std_logic := '0';
 begin
 
-  opcode <=
-    misc_prims.prot.SAMPLES         when
+  in_opcode <=
+    protocol.complex_short_with_metadata.SAMPLES        when
     in_in.opcode = ComplexShortWithMetadata_samples_op_e        else
-    misc_prims.prot.TIME_TIME       when
+    protocol.complex_short_with_metadata.TIME_TIME      when
     in_in.opcode = ComplexShortWithMetadata_time_op_e           else
-    misc_prims.prot.INTERVAL        when
+    protocol.complex_short_with_metadata.INTERVAL       when
     in_in.opcode = ComplexShortWithMetadata_interval_op_e       else
-    misc_prims.prot.FLUSH           when
+    protocol.complex_short_with_metadata.FLUSH          when
     in_in.opcode = ComplexShortWithMetadata_flush_op_e          else
-    misc_prims.prot.SYNC            when
+    protocol.complex_short_with_metadata.SYNC           when
     in_in.opcode = ComplexShortWithMetadata_sync_op_e           else
-    misc_prims.prot.END_OF_SAMPLES when
+    protocol.complex_short_with_metadata.END_OF_SAMPLES when
     in_in.opcode = ComplexShortWithMetadata_end_of_samples_op_e else
-    misc_prims.prot.SAMPLES;
+    protocol.complex_short_with_metadata.SAMPLES;
 
-  in_demarshaller : misc_prims.prot.cswm_demarshaller
+  in_demarshaller : protocol.complex_short_with_metadata.complex_short_with_metadata_demarshaller
     generic map(
       WSI_DATA_WIDTH => in_in.data'length)
     port map(
@@ -41,18 +43,18 @@ begin
       iready       => in_in.ready,
       isom         => in_in.som,
       ieom         => in_in.eom,
-      iopcode      => opcode,
+      iopcode      => in_opcode,
       ieof         => in_in.eof,
       itake        => in_out.take,
       -- OUTPUT
-      odata        => in_adapter_odata,
-      ometadata    => in_adapter_ometadata,
-      ovld         => in_adapter_ovld,
+      oprotocol    => in_demarshaller_oprotocol,
       ordy         => out_marshaller_irdy);
 
-  data_vld <= in_adapter_ovld and in_adapter_ometadata.data_vld;
+  oprotocol.iq.data.i <= in_demarshaller_oprotocol.samples.iq.i;
+  oprotocol.iq.data.q <= in_demarshaller_oprotocol.samples.iq.q;
+  oprotocol.iq_vld    <= in_demarshaller_oprotocol.samples_vld;
 
-  out_marshaller : misc_prims.prot.iqstream_marshaller
+  out_marshaller : protocol.iqstream.iqstream_marshaller
     generic map(
       WSI_DATA_WIDTH    => out_out.data'length,
       WSI_MBYTEEN_WIDTH => out_out.byte_enable'length)
@@ -61,8 +63,7 @@ begin
       clk          => in_in.clk,
       rst          => in_in.reset,
       -- INPUT
-      idata        => in_adapter_odata,
-      ivld         => data_vld,
+      iprotocol    => oprotocol,
       irdy         => out_marshaller_irdy,
       -- OUTPUT
       odata        => out_marshaller_odata,

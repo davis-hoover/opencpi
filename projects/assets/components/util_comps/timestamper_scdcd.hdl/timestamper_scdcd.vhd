@@ -3,17 +3,14 @@ library ocpi; use ocpi.types.all; use ocpi.wci.all; -- remove this to avoid all
                                                     -- ocpi name collisions
 library misc_prims;
 use misc_prims.misc_prims.all;
-use misc_prims.prot.all;
 use misc_prims.cdc.all;
 library cdc; use cdc.cdc.all;
+library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
   constant CTRL_IN_CDC_BIT_WIDTH : positive := 
       1 + props_in.time_correction'length +
       props_in.min_num_samples_per_timestamp'length + 1;
-
-  constant DATA_CDC_BIT_WIDTH : positive := 
-      2*DATA_BIT_WIDTH+METADATA_BIT_WIDTH;
 
   signal cclk_is_operating_pulse     : std_logic := '0';
   signal cclk_ctrl_in_cdc_src_enq    : std_logic := '0';
@@ -32,40 +29,32 @@ architecture rtl of worker is
       props_in.min_num_samples_per_timestamp'range) := (others => '0');
   signal iclk_is_operating                          : std_logic := '0';
 
-  signal iclk_opcode : cswm_opcode_t := SAMPLES;
+  signal iclk_opcode : protocol.complex_short_with_metadata.opcode_t := SAMPLES;
 
-  signal iclk_in_demarshaller_odata      : data_complex_t := data_complex_zero;
-  signal iclk_in_demarshaller_ometadata  : metadata_t := metadata_zero;
-  signal iclk_in_demarshaller_ovld       : std_logic := '0';
+  signal iclk_in_demarshaller_oprotocol : protocol_t := PROTOCOL_ZERO;
 
-  signal iclk_time_downsampler_imetadata : metadata_t := metadata_zero;
   signal iclk_time_downsampler_irdy      : std_logic := '0';
-  signal iclk_time_downsampler_odata     : data_complex_t := data_complex_zero;
-  signal iclk_time_downsampler_ometadata : metadata_t := metadata_zero;
-  signal iclk_time_downsampler_ovld      : std_logic := '0';
+  signal iclk_time_downsampler_oprotocol : protocol_t := PROTOCOL_ZERO;
 
   signal iclk_time_corrector_irdy        : std_logic := '0';
-  signal iclk_time_corrector_odata       : data_complex_t := data_complex_zero;
-  signal iclk_time_corrector_ometadata   : metadata_t := metadata_zero;
-  signal iclk_time_corrector_ovld        : std_logic := '0';
+  signal iclk_time_corrector_oprotocol   : protocol_t := PROTOCOL_ZERO;
+  signal iclk_time_downsampler_iprotocol : protocol_t := PROTOCOL_ZERO;
 
   signal iclk_time_downsampler_ctrl : time_downsampler_ctrl_t;
 
   signal iclk_time_corrector_ctrl   : time_corrector_ctrl_t;
   signal iclk_time_corrector_status : time_corrector_status_t;
 
-  signal iclk_data_cdc_iinfo    : info_t := info_zero;
-  signal iclk_data_cdc_ienq     : std_logic := '0';
-  signal iclk_data_cdc_ifull_n  : std_logic := '0';
-  signal oclk_data_cdc_odeq     : std_logic := '0';
-  signal oclk_data_cdc_oinfo    : info_t := info_zero;
-  signal oclk_data_cdc_oempty_n : std_logic := '0';
+  signal iclk_data_cdc_ienq      : std_logic := '0';
+  signal iclk_data_cdc_ifull_n   : std_logic := '0';
+  signal oclk_data_cdc_odeq      : std_logic := '0';
+  signal oclk_data_cdc_oprotocol : protocol_t := PROTOCOL_ZERO;
+  signal oclk_data_cdc_oempty_n  : std_logic := '0';
 
-  signal oclk_out_adapter_irdy      : std_logic := '0';
-  signal oclk_out_adapter_ivld      : std_logic := '0';
+  signal oclk_out_adapter_irdy   : std_logic := '0';
 
   signal oclk_data   : std_logic_vector(out_out.data'range) := (others => '0');
-  signal oclk_opcode : cswm_opcode_t := SAMPLES;
+  signal oclk_opcode : protocol.complex_short_with_metadata.opcode_t := SAMPLES;
 begin
 
   ------------------------------------------------------------------------------
@@ -140,24 +129,29 @@ begin
   -- WTI
   ------------------------------------------------------------------------------
 
-  iclk_time_downsampler_imetadata.eof <=
-      iclk_in_demarshaller_ometadata.eof;
-  iclk_time_downsampler_imetadata.flush <=
-      iclk_in_demarshaller_ometadata.flush;
-  iclk_time_downsampler_imetadata.error_samp_drop <=
-      iclk_in_demarshaller_ometadata.error_samp_drop;
-  iclk_time_downsampler_imetadata.data_vld <=
-      iclk_in_demarshaller_ometadata.data_vld;
-  iclk_time_downsampler_imetadata.time     <= time_in.seconds &
-                                              time_in.fraction;
-  iclk_time_downsampler_imetadata.time_vld <= '1' when (time_in.valid = btrue)
+  iclk_time_downsampler_iprotocol.samples <= 
+      iclk_in_demarshaller_oprotocol.samples;
+  iclk_time_downsampler_iprotocol.samples_vld <=
+      iclk_in_demarshaller_oprotocol.samples_vld;
+  iclk_time_downsampler_iprotocol.time.sec <=
+      std_logic_vector(time_in.seconds);
+  iclk_time_downsampler_iprotocol.time.fract_sec <=
+      std_logic_vector(time_in.fraction);
+  iclk_time_downsampler_iprotocol.time_vld <= '1' when (time_in.valid = btrue)
                                               and (props_in.bypass = bfalse)
                                               else '0';
-  iclk_time_downsampler_imetadata.samp_period <=
-      iclk_in_demarshaller_ometadata.samp_period;
-  iclk_time_downsampler_imetadata.samp_period_vld <=
-      iclk_in_demarshaller_ometadata.samp_period_vld;
-
+  iclk_time_downsampler_iprotocol.interval <=
+      iclk_in_demarshaller_oprotocol.interval;
+  iclk_time_downsampler_iprotocol.interval_vld <=
+      iclk_in_demarshaller_oprotocol.interval_vld;
+  iclk_time_downsampler_iprotocol.flush <=
+      iclk_in_demarshaller_oprotocol.flush;
+  iclk_time_downsampler_iprotocol.sync <=
+      iclk_in_demarshaller_oprotocol.sync;
+  iclk_time_downsampler_iprotocol.end_of_samples <=
+      iclk_in_demarshaller_oprotocol.end_of_samples;
+  iclk_time_downsampler_iprotocol.eof <=
+      iclk_in_demarshaller_oprotocol.eof;
   time_out.clk <= in_in.clk;
 
   ctl_out.error <= btrue when (ctl_in.control_op = START_e) and
@@ -176,7 +170,7 @@ begin
       SYNC      when in_in.opcode = ComplexShortWithMetadata_sync_op_e     else
       SAMPLES;
 
-  in_demarshaller : misc_prims.prot.cswm_demarshaller
+  in_demarshaller : complex_short_with_metadata_demarshaller
     generic map(
       WSI_DATA_WIDTH => to_integer(IN_PORT_DATA_WIDTH))
     port map(
@@ -192,16 +186,12 @@ begin
       ieof      => in_in.eof,
       itake     => in_out.take,
       -- OUTPUT
-      odata     => iclk_in_demarshaller_odata,
-      ometadata => iclk_in_demarshaller_ometadata,
-      ovld      => iclk_in_demarshaller_ovld,
+      oprotocol => iclk_in_demarshaller_oprotocol,
       ordy      => iclk_time_downsampler_irdy);
 
-  iclk_time_downsampler_ctrl.bypass                    <= iclk_bypass;
-  iclk_time_downsampler_ctrl.min_num_data_per_time     <=
+  iclk_time_downsampler_ctrl.bypass                <= iclk_bypass;
+  iclk_time_downsampler_ctrl.min_num_data_per_time <=
       unsigned(iclk_min_num_samples_per_timestamp);
-  iclk_time_downsampler_ctrl.min_num_data_per_time_vld <=
-      iclk_is_operating;
 
   time_downsampler : misc_prims.misc_prims.time_downsampler
     port map(
@@ -210,19 +200,14 @@ begin
       rst       => in_in.reset,
       ctrl      => iclk_time_downsampler_ctrl,
       -- INPUT
-      idata     => iclk_in_demarshaller_odata,
-      imetadata => iclk_time_downsampler_imetadata,
-      ivld      => iclk_in_demarshaller_ovld,
+      iprotocol => iclk_time_downsampler_iprotocol,
       irdy      => iclk_time_downsampler_irdy,
       -- OUTPUT
-      odata     => iclk_time_downsampler_odata,
-      ometadata => iclk_time_downsampler_ometadata,
-      ovld      => iclk_time_downsampler_ovld,
+      oprotocol => iclk_time_downsampler_oprotocol,
       ordy      => iclk_time_corrector_irdy);
 
-  iclk_time_corrector_ctrl.bypass              <= iclk_bypass;
-  iclk_time_corrector_ctrl.time_correction     <= signed(iclk_time_correction);
-  iclk_time_corrector_ctrl.time_correction_vld <= iclk_is_operating;
+  iclk_time_corrector_ctrl.bypass          <= iclk_bypass;
+  iclk_time_corrector_ctrl.time_correction <= signed(iclk_time_correction);
 
   time_corrector : misc_prims.misc_prims.time_corrector
     port map(
@@ -232,40 +217,41 @@ begin
       ctrl      => iclk_time_corrector_ctrl,
       status    => iclk_time_corrector_status,
       -- INPUT
-      idata     => iclk_time_downsampler_odata,
-      imetadata => iclk_time_downsampler_ometadata,
-      ivld      => iclk_time_downsampler_ovld,
+      iprotocol => iclk_time_downsampler_oprotocol,
       irdy      => iclk_time_corrector_irdy,
       -- OUTPUT
-      odata     => iclk_time_corrector_odata,
-      ometadata => iclk_time_corrector_ometadata,
-      ovld      => iclk_time_corrector_ovld,
+      oprotocol => iclk_time_corrector_oprotocol,
       ordy      => iclk_data_cdc_ifull_n);
 
-  iclk_data_cdc_iinfo.data     <= iclk_time_corrector_odata;
-  iclk_data_cdc_iinfo.metadata <= iclk_time_corrector_ometadata;
-  iclk_data_cdc_ienq <= iclk_time_corrector_ovld and iclk_data_cdc_ifull_n;
+  iclk_data_cdc_ienq <= (
+    iclk_time_corrector_oprotocol.samples_vld    or
+    iclk_time_corrector_oprotocol.time_vld       or
+    iclk_time_corrector_oprotocol.interval_vld   or
+    iclk_time_corrector_oprotocol.flush          or
+    iclk_time_corrector_oprotocol.sync           or
+    iclk_time_corrector_oprotocol.end_of_samples or
+    iclk_time_corrector_oprotocol.eof
+    ) and iclk_data_cdc_ifull_n;
 
-  data_cdc : misc_prims.cdc.fifo_info
+  data_cdc : misc_prims.cdc.fifo_complex_short_with_metadata
     generic map(
       DEPTH    => to_integer(unsigned(DATA_CDC_DEPTH)))
     port map(
       -- INPUT
-      iclk     => in_in.clk,
-      irst     => in_in.reset,
-      ienq     => iclk_data_cdc_ienq,
-      iinfo    => iclk_data_cdc_iinfo,
-      ifull_n  => iclk_data_cdc_ifull_n,
+      iclk      => in_in.clk,
+      irst      => in_in.reset,
+      ienq      => iclk_data_cdc_ienq,
+      iprotocol => iclk_time_corrector_oprotocol,
+      ifull_n   => iclk_data_cdc_ifull_n,
       -- OUTPUT
-      oclk     => out_in.clk,
-      odeq     => oclk_data_cdc_odeq,
-      oinfo    => oclk_data_cdc_oinfo,
-      oempty_n => oclk_data_cdc_oempty_n);
+      oclk      => out_in.clk,
+      odeq      => oclk_data_cdc_odeq,
+      oprotocol => oclk_data_cdc_oprotocol,
+      oempty_n  => oclk_data_cdc_oempty_n);
 
   oclk_data_cdc_odeq <= oclk_out_adapter_irdy and oclk_data_cdc_oempty_n;
-  oclk_out_adapter_ivld <= oclk_data_cdc_oempty_n and oclk_out_adapter_irdy;
 
-  out_marshaller : misc_prims.prot.cswm_marshaller
+  out_marshaller : complex_short_with_metadata_marshaller
     generic map(
       WSI_DATA_WIDTH         => to_integer(OUT_PORT_DATA_WIDTH),
       OUT_PORT_MBYTEEN_WIDTH => out_out.byte_enable'length)
@@ -273,9 +259,7 @@ begin
       clk          => out_in.clk,
       rst          => out_in.reset,
       -- INPUT
-      idata        => oclk_data_cdc_oinfo.data,
-      imetadata    => oclk_data_cdc_oinfo.metadata,
-      ivld         => oclk_out_adapter_ivld,
+      iprotocol    => oclk_data_cdc_oprotocol,
       irdy         => oclk_out_adapter_irdy,
       -- OUTPUT
       odata        => oclk_data,

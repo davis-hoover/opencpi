@@ -1,8 +1,25 @@
+-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+-- distributed with this source distribution.
+--
+-- This file is part of OpenCPI <http://www.opencpi.org>
+--
+-- OpenCPI is free software: you can redistribute it and/or modify it under the
+-- terms of the GNU Lesser General Public License as published by the Free
+-- Software Foundation, either version 3 of the License, or (at your option) any
+-- later version.
+--
+-- OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+-- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+-- A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU Lesser General Public License
+-- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi; library util;
-library misc_prims; use misc_prims.prot.all;
+library ocpi;
+library protocol; use protocol.complex_short_with_metadata.all;
 
-entity cswm_demarshaller is
+entity complex_short_with_metadata_demarshaller is
   generic(
     WSI_DATA_WIDTH : positive := 16); -- 16 is default of codegen, but
                                       -- MUST USE 32 FOR NOW
@@ -15,16 +32,14 @@ entity cswm_demarshaller is
     iready    : in  ocpi.types.Bool_t;
     isom      : in  ocpi.types.Bool_t;
     ieom      : in  ocpi.types.Bool_t;
-    iopcode   : in  cswm_opcode_t;
+    iopcode   : in  protocol.complex_short_with_metadata.opcode_t;
     ieof      : in  ocpi.types.Bool_t;
     itake     : out ocpi.types.Bool_t;
     -- OUTPUT
-    odata     : out misc_prims.misc_prims.data_complex_t;
-    ometadata : out misc_prims.misc_prims.metadata_t;
-    ovld      : out std_logic;
+    oprotocol : out protocol.complex_short_with_metadata.protocol_t;
     ordy      : in  std_logic);
 end entity;
-architecture rtl of cswm_demarshaller is
+architecture rtl of complex_short_with_metadata_demarshaller is
 
   signal eozlm   : std_logic := '0';
   signal iinfo   : std_logic := '0';
@@ -34,7 +49,8 @@ architecture rtl of cswm_demarshaller is
   signal data_r  : std_logic_vector(31 downto 0) :=
                    (others => '0');
 
-  signal metadata               : misc_prims.misc_prims.metadata_t;
+  signal protocol_s : protocol.complex_short_with_metadata.protocol_t :=
+                      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
   signal take_time_final        : std_logic := '0';
   signal take_samp_period_final : std_logic := '0';
 
@@ -44,7 +60,7 @@ begin
 
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
 
-    eozlm_gen : util.util.zlm_detector
+    eozlm_gen : protocol.protocol.zlm_detector
       port map(
         clk         => clk,
         reset       => rst,
@@ -81,12 +97,12 @@ begin
           take_time_final        <= '0';
           take_samp_period_final <= '0';
         elsif(take = '1') then
-          if(iopcode = TIME_TIME) then
+          if(iopcode = protocol.complex_short_with_metadata.TIME_TIME) then
             take_time_final <= (not take_time_final);
           else
             take_time_final <= '0';
           end if;
-          if(iopcode = INTERVAL) then
+          if(iopcode = protocol.complex_short_with_metadata.INTERVAL) then
             take_samp_period_final <= (not take_samp_period_final);
           else
             take_samp_period_final <= '0';
@@ -100,52 +116,39 @@ begin
     arg_31_0 <= idata;
     arg_63_0 <= idata & data_r;
 
-    metadata.eof             <= '1' when (ieof = '1') and (ixfer = '1')
-                                else '0';
-    metadata.flush           <= '1' when (iopcode = FLUSH) and (ixfer = '1')
-                                else '0';
-    metadata.error_samp_drop <= '1' when (iopcode = SYNC) and (ixfer = '1')
-                                else '0';
-    metadata.data_vld        <= '1' when (iopcode = SAMPLES) and (ixfer = '1')
-                                else '0';
-    metadata.time            <= unsigned(arg_63_0);
-    metadata.time_vld        <= '1' when (take_time_final = '1') and (ixfer = '1')
-                                else '0';
-    metadata.samp_period     <= unsigned(arg_63_0);
-    metadata.samp_period_vld <= '1' when (take_samp_period_final = '1') and
-                                (ixfer = '1') else '0';
+    -- this is the heart of the demarshalling functionality
+    protocol_s.samples.iq.i        <= arg_31_0(15 downto 0);
+    protocol_s.samples.iq.q        <= arg_31_0(31 downto 16);
+    protocol_s.samples_vld         <= '1' when (iopcode =
+        protocol.complex_short_with_metadata.SAMPLES) and (ixfer = '1') else '0';
+    protocol_s.time.fract_sec      <= arg_63_0(31 downto 0);
+    protocol_s.time.sec            <= arg_63_0(63 downto 32);
+    protocol_s.time_vld            <= '1' when (take_time_final = '1') and (ixfer = '1')
+                                      else '0';
+    protocol_s.interval.delta_time <= arg_63_0;
+    protocol_s.interval_vld        <= '1' when (take_samp_period_final = '1') and
+                                      (ixfer = '1') else '0';
+    protocol_s.flush               <= '1' when (iopcode =
+        protocol.complex_short_with_metadata.FLUSH) and (ixfer = '1') else '0';
+    protocol_s.sync                <= '1' when (iopcode =
+        protocol.complex_short_with_metadata.SYNC) and (ixfer = '1') else '0';
+    protocol_s.end_of_samples      <= '1' when (iopcode =
+        protocol.complex_short_with_metadata.END_OF_SAMPLES) and (ixfer = '1') else '0';
+    protocol_s.eof                 <= ieof;
 
     -- necessary to prevent combinatorial loop, depending an what's connected to
-    -- ovld,ordy
+    -- ordy
     pipeline : process(clk)
     begin
       if(rising_edge(clk)) then
         if(rst = '1') then
-          odata.i  <= (others => '0');
-          odata.q  <= (others => '0');
-          ometadata.flush           <= '0';
-          ometadata.error_samp_drop <= '0';
-          ometadata.data_vld        <= '0';
-          ometadata.time            <= (others => '0');
-          ometadata.time_vld        <= '0';
-          ometadata.samp_period     <= (others => '0');
-          ometadata.samp_period_vld <= '0';
-          ovld <= '0';
+          oprotocol <= PROTOCOL_ZERO;
           --itake_s <= '0';
         else
           --itake_s <= take;
           if(ordy = '1') then
           --else
-            odata.i   <= arg_31_0(15 downto 0);
-            odata.q   <= arg_31_0(31 downto 16);
-            ometadata <= metadata;
-    
-            -- this is an optimization (don't declare valid unless we have to)
-            ovld <= metadata.flush or
-                    metadata.error_samp_drop or
-                    metadata.data_vld or
-                    metadata.time_vld or
-                    metadata.samp_period_vld;
+            oprotocol <= protocol_s;
            end if;
         end if;
       end if;

@@ -18,11 +18,65 @@ clean: clean_run
 # prims
 ################################################################################
 
-xsim.dir/misc_prims/: xsim.dir/misc_prims/misc_prims.vdb
+xsim.dir/fixed_float/fixed_float_types.vdb: \
+    ../../../../../core/hdl/primitives/fixed_float/fixed_float_types_pkg.vhd
+	./myxvhdl.sh -work fixed_float $<
 
-xsim.dir/misc_prims/misc_prims.vdb: ../misc_prims_pkg.vhd ../misc_prims_body.vhd
+xsim.dir/fixed_float/fixed_pkg.vdb: \
+    ../../../../../core/hdl/primitives/fixed_float/fixed_pkg.vhd \
+    ../../../../../core/hdl/primitives/fixed_float/fixed_body.vhd
+	./myxvhdl.sh -work fixed_float ../../../../../core/hdl/primitives/fixed_float/fixed_pkg.vhd ../../../../../core/hdl/primitives/fixed_float/fixed_body.vhd
+
+xsim.dir/fixed_float/float_pkg.vdb: \
+    ../../../../../core/hdl/primitives/fixed_float/float_pkg.vhd \
+    ../../../../../core/hdl/primitives/fixed_float/float_body.vhd \
+    xsim.dir/fixed_float/fixed_float_types.vdb \
+    xsim.dir/fixed_float/fixed_pkg.vdb
+	./myxvhdl.sh -work fixed_float ../../../../../core/hdl/primitives/fixed_float/float_pkg.vhd ../../../../../core/hdl/primitives/fixed_float/float_body.vhd
+
+xsim.dir/ocpi/types.vdb: \
+    xsim.dir/fixed_float/float_pkg.vdb \
+    ../../../../../core/hdl/primitives/ocpi/types_pkg.vhd \
+    ../../../../../core/hdl/primitives/ocpi/types_body.vhd
+	./myxvhdl.sh -work ocpi ../../../../../core/hdl/primitives/ocpi/types_pkg.vhd ../../../../../core/hdl/primitives/ocpi/types_body.vhd
+
+xsim.dir/ocpi/util.vdb: ../../../../../core/hdl/primitives/ocpi/util_pkg.vhd \
+    ../../../../../core/hdl/primitives/ocpi/util_body.vhd \
+    xsim.dir/ocpi/types.vdb
+	./myxvhdl.sh -work ocpi ../../../../../core/hdl/primitives/ocpi/util_pkg.vhd ../../../../../core/hdl/primitives/ocpi/util_body.vhd
+
+xsim.dir/ocpi/ocp.vdb: ../../../../../core/hdl/primitives/ocpi/ocp_pkg.vhd
+	./myxvhdl.sh -work ocpi $<
+
+xsim.dir/ocpi/wci.vdb: ../../../../../core/hdl/primitives/ocpi/wci_pkg.vhd \
+    ../../../../../core/hdl/primitives/ocpi/wci_body.vhd \
+    xsim.dir/ocpi/types.vdb \
+    xsim.dir/ocpi/util.vdb \
+    xsim.dir/ocpi/ocp.vdb
+	./myxvhdl.sh -work ocpi ../../../../../core/hdl/primitives/ocpi/wci_pkg.vhd ../../../../../core/hdl/primitives/ocpi/wci_body.vhd
+
+xsim.dir/util/types.vdb: ../../../../../core/hdl/primitives/util/types_pkg.vhd
+	./myxvhdl.sh -work util $<
+
+xsim.dir/util/util.vdb: ../../../../../core/hdl/primitives/util/util_pkg.vhd \
+    xsim.dir/ocpi/types.vdb \
+    xsim.dir/util/types.vdb \
+    xsim.dir/ocpi/util.vdb \
+    xsim.dir/ocpi/wci.vdb
+	./myxvhdl.sh -work util $<
+
+xsim.dir/util/counter.vdb : ../../../../../core/hdl/primitives/util/counter.vhd \
+    xsim.dir/util/util.vdb
+	./myxvhdl.sh -work util $<
+
+xsim.dir/protocol/complex_short_with_metadata.vdb: ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/pkg.vhd \
+    ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/body.vhd \
+    xsim.dir/ocpi/types.vdb
+	./myxvhdl.sh -work protocol ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/pkg.vhd ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/body.vhd
+
+xsim.dir/misc_prims/misc_prims.vdb: ../misc_prims_pkg.vhd \
+    xsim.dir/protocol/complex_short_with_metadata.vdb
 	./myxvhdl.sh -work misc_prims $<
-	./myxvhdl.sh -work misc_prims ../misc_prims_body.vhd
 
 xsim.dir/cdc/cdc.vdb: ../../../../../core/hdl/primitives/cdc/cdc_pkg.vhd
 	./myxvhdl.sh -work cdc $<
@@ -51,37 +105,29 @@ xsim.dir/misc_prims/dac_underrun_detector.vdb: ../dac_underrun_detector.vhd \
     xsim.dir/misc_prims/misc_prims.vdb
 	./myxvhdl.sh -work misc_prims $<
 
-xsim.dir/misc_prims/counter.vdb: ../counter.vhd
-	./myxvhdl.sh -work misc_prims $<
-
 xsim.dir/misc_prims/lfsr.vdb: ../lfsr/src/lfsr.vhd
 	./myxvhdl.sh -work misc_prims $<
 
 xsim.dir/misc_prims/adc_maximal_lfsr_data_src.vdb: ../adc_maximal_lfsr_data_src.vhd \
     xsim.dir/misc_prims/misc_prims.vdb \
-    xsim.dir/misc_prims/counter.vdb \
+    xsim.dir/util/util.vdb \
+    xsim.dir/util/counter.vdb \
     xsim.dir/misc_prims/lfsr.vdb
 	./myxvhdl.sh -work misc_prims $<
 
 xsim.dir/misc_prims/maximal_lfsr_data_src.vdb: ../maximal_lfsr_data_src.vhd \
     xsim.dir/misc_prims/misc_prims.vdb \
-    xsim.dir/misc_prims/counter.vdb \
+    xsim.dir/util/counter.vdb \
     xsim.dir/misc_prims/lfsr.vdb
 	./myxvhdl.sh -work misc_prims $<
 
-xsim.dir/misc_prims/latest_reg.vdb: ../latest_reg.vhd
-	./myxvhdl.sh -work misc_prims $<
-
-xsim.dir/misc_prims/latest_reg_signed.vdb: ../latest_reg_signed.vhd
-	./myxvhdl.sh -work misc_prims $<
-
 xsim.dir/misc_prims/time_corrector.vdb: ../time_corrector.vhd \
-    xsim.dir/misc_prims/misc_prims.vdb \
-    xsim.dir/misc_prims/latest_reg_signed.vdb
+    xsim.dir/misc_prims/misc_prims.vdb
 	./myxvhdl.sh -work misc_prims $<
 
 xsim.dir/misc_prims/time_downsampler.vdb: ../time_downsampler.vhd \
-    xsim.dir/misc_prims/misc_prims.vdb
+    xsim.dir/misc_prims/misc_prims.vdb \
+    xsim.dir/util/counter.vdb
 	./myxvhdl.sh -work misc_prims $<
 
 prims: prims_cdc prims_misc_prims
@@ -94,11 +140,8 @@ prims_cdc:
 prims_misc_prims:
 	$(MAKE) xsim.dir/misc_prims/misc_prims.vdb
 	$(MAKE) xsim.dir/misc_prims/adc_samp_drop_detector.vdb
-	$(MAKE) xsim.dir/misc_prims/counter.vdb
 	$(MAKE) xsim.dir/misc_prims/lfsr.vdb
 	$(MAKE) xsim.dir/misc_prims/adc_maximal_lfsr_data_src.vdb
-	$(MAKE) xsim.dir/misc_prims/latest_reg.vdb
-	$(MAKE) xsim.dir/misc_prims/latest_reg_signed.vdb
 	$(MAKE) xsim.dir/misc_prims/dac_underrun_detector.vdb
 	$(MAKE) xsim.dir/misc_prims/time_corrector.vdb
 	$(MAKE) xsim.dir/misc_prims/time_downsampler.vdb

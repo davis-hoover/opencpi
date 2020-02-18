@@ -1,12 +1,25 @@
-library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library misc_prims; library ocpi;
+-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+-- distributed with this source distribution.
+--
+-- This file is part of OpenCPI <http://www.opencpi.org>
+--
+-- OpenCPI is free software: you can redistribute it and/or modify it under the
+-- terms of the GNU Lesser General Public License as published by the Free
+-- Software Foundation, either version 3 of the License, or (at your option) any
+-- later version.
+--
+-- OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+-- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+-- A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU Lesser General Public License
+-- along with this program. If not, see <http://www.gnu.org/licenses/>.
+library ieee; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
+package protocol is
 
-package prot is
-
-type cswm_opcode_t is (
-  SAMPLES, TIME_TIME, INTERVAL, FLUSH, SYNC, END_OF_SAMPLES);
-
-component wsi_message_sizer is
+-- TODO / FIXME - include mechanism for assessment of port buffer size
+component message_sizer is
   generic(
     SIZE_BIT_WIDTH : positive);
   port(
@@ -18,100 +31,17 @@ component wsi_message_sizer is
     eom                    : out std_logic);
 end component;
 
-component iqstream_marshaller is
-  generic(
-    WSI_DATA_WIDTH    : positive := 16; -- 16 is default of codegen, but
-                                        -- MUST USE 32 FOR NOW
-    WSI_MBYTEEN_WIDTH : positive);
+component zlm_detector is
   port(
-    -- CTRL
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    -- INPUT
-    idata        : in  misc_prims.misc_prims.data_complex_t;
-    ivld         : in  std_logic;
-    irdy         : out std_logic;
-    -- OUTPUT (WSI)
-    odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
-    ovalid       : out ocpi.types.Bool_t;
-    obyte_enable : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
-    ogive        : out ocpi.types.Bool_t;
-    osom         : out ocpi.types.Bool_t;
-    oeom         : out ocpi.types.Bool_t;
-    oeof         : out ocpi.types.Bool_t;
-    oready       : in  ocpi.types.Bool_t);
+    clk         : in  std_logic;  -- control plane clock
+    reset       : in  std_logic;  -- control plane reset (active-high)
+    som         : in  std_logic;  -- input port SOM
+    valid       : in  std_logic;  -- input port valid
+    eom         : in  std_logic;  -- input port EOM
+    ready       : in  std_logic;  -- input port ready
+    take        : in  std_logic;  -- input port take
+    eozlm_pulse : out std_logic;  -- pulse-per-end-of-ZLM
+    eozlm       : out std_logic); -- same as EOM but only for end of ZLMs
 end component;
 
-component cswm_marshaller is
-  generic(
-    WSI_DATA_WIDTH         : positive := 16; -- 16 is default of codegen, but
-                                             -- MUST USE 32 FOR NOW
-    OUT_PORT_MBYTEEN_WIDTH : positive);
-  port(
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    -- INPUT
-    idata        : in  misc_prims.misc_prims.data_complex_t;
-    imetadata    : in  misc_prims.misc_prims.metadata_t;
-    ivld         : in  std_logic;
-    irdy         : out std_logic;
-    -- OUTPUT
-    odata        : out std_logic_vector(31 downto 0);
-    ovalid       : out ocpi.types.Bool_t;
-    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
-    ogive        : out ocpi.types.Bool_t;
-    osom         : out ocpi.types.Bool_t;
-    oeom         : out ocpi.types.Bool_t;
-    oopcode      : out cswm_opcode_t;
-    oeof         : out ocpi.types.Bool_t;
-    oready       : in  ocpi.types.Bool_t);
-end component;
-
-component cswm_demarshaller is
-  generic(
-    WSI_DATA_WIDTH : positive := 16); -- 16 is default of codegen, but
-                                      -- MUST USE 32 FOR NOW
-  port(
-    clk       : in  std_logic;
-    rst       : in  std_logic;
-    -- INPUT
-    idata     : in  std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
-    ivalid    : in  ocpi.types.Bool_t;
-    iready    : in  ocpi.types.Bool_t;
-    isom      : in  ocpi.types.Bool_t;
-    ieom      : in  ocpi.types.Bool_t;
-    iopcode   : in  cswm_opcode_t;
-    ieof      : in  ocpi.types.Bool_t;
-    itake     : out ocpi.types.Bool_t;
-    -- OUTPUT
-    odata     : out misc_prims.misc_prims.data_complex_t;
-    ometadata : out misc_prims.misc_prims.metadata_t;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
-end component;
-
--- TODO / FIXME - consolidate w/ cswm_demarshaller
-component cswm_marshaller_old is
-  generic(
-    OUT_PORT_MBYTEEN_WIDTH : positive);
-  port(
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    -- INPUT
-    idata        : in  misc_prims.misc_prims.data_complex_t;
-    imetadata    : in  misc_prims.misc_prims.metadata_t;
-    ivld         : in  std_logic;
-    irdy         : out std_logic;
-    -- OUTPUT
-    odata        : out std_logic_vector(31 downto 0);
-    ovalid       : out ocpi.types.Bool_t;
-    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
-    ogive        : out ocpi.types.Bool_t;
-    osom         : out ocpi.types.Bool_t;
-    oeom         : out ocpi.types.Bool_t;
-    oopcode      : out cswm_opcode_t;
-    oeof         : out ocpi.types.Bool_t;
-    oready       : in  ocpi.types.Bool_t);
-end component;
-
-end package prot;
+end package protocol;

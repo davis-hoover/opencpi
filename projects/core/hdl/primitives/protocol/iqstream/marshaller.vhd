@@ -1,6 +1,7 @@
 -- TODO / FIXME - support WSI_DATA_WIDTH of 16
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi; library misc_prims;
+library ocpi;
+library protocol;
 
 entity iqstream_marshaller is
   generic(
@@ -12,8 +13,7 @@ entity iqstream_marshaller is
     clk          : in  std_logic;
     rst          : in  std_logic;
     -- INPUT
-    idata        : in  misc_prims.misc_prims.data_complex_t;
-    ivld         : in  std_logic;
+    iprotocol    : in  protocol.iqstream.protocol_t;
     irdy         : out std_logic;
     -- OUTPUT
     odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
@@ -26,22 +26,22 @@ entity iqstream_marshaller is
     oready       : in  ocpi.types.Bool_t);
 end entity;
 architecture rtl of iqstream_marshaller is
-  constant SAMPLES_SEQUENCE_LENGTH        : positive := 2048;
   constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive :=
-      ocpi.util.width_for_max(SAMPLES_SEQUENCE_LENGTH);
+      ocpi.util.width_for_max(protocol.iqstream.OP_IQ_ARG_DATA_SEQUENCE_LENGTH);
   constant MESSAGE_SIZE_NUM_GIVES         : unsigned := to_unsigned(
-                                            SAMPLES_SEQUENCE_LENGTH,
-                                            SAMPLES_MESSAGE_SIZE_BIT_WIDTH);
+      protocol.iqstream.OP_IQ_ARG_DATA_SEQUENCE_LENGTH,
+      SAMPLES_MESSAGE_SIZE_BIT_WIDTH);
   signal give              : std_logic := '0';
   signal message_sizer_som : std_logic := '0';
   signal message_sizer_eom : std_logic := '0';
 begin
 
-  give <= oready and ivld;
+  give <= oready and iprotocol.iq_vld;
 
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
 
-    message_sizer : misc_prims.prot.wsi_message_sizer
+    -- TODO / FIXME - include mechanism for assessment of port buffer size
+    message_sizer : protocol.protocol.message_sizer
       generic map(
         SIZE_BIT_WIDTH => SAMPLES_MESSAGE_SIZE_BIT_WIDTH)
       port map(
@@ -53,7 +53,7 @@ begin
         eom                    => message_sizer_eom);
 
     irdy  <= oready;
-    odata <= idata.q & idata.i;
+    odata <= iprotocol.iq.data.q & iprotocol.iq.data.i;
 
   end generate wsi_data_width_32;
 
@@ -61,7 +61,7 @@ begin
   osom         <= message_sizer_som;
   oeom         <= message_sizer_eom;
   obyte_enable <= (others => '1');
-  ovalid       <= ivld;
+  ovalid       <= iprotocol.iq_vld;
   oeof         <= '0';
 
 end rtl;

@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
 library misc_prims; use misc_prims.misc_prims.all;
+library protocol;
 
 entity subtest is
   generic(
@@ -11,17 +12,16 @@ entity subtest is
     backpressure_select_vld : in  std_logic);
 end entity subtest;
 architecture rtl of subtest is
-  signal clk                : std_logic := '0';
-  signal rst                : std_logic := '0';
-  signal data_src_odata     : data_complex_adc_t;
-  signal data_src_ometadata : metadata_t;
-  signal data_src_ovld      : std_logic := '0';
-  signal uut_irdy           : std_logic := '0';
-  signal uut_odata          : data_complex_t;
-  signal uut_ometadata      : metadata_t;
-  signal uut_ovld           : std_logic := '0';
-  signal file_writer_irdy   : std_logic := '0';
-  signal end_of_test        : std_logic := '0';
+  signal clk                 : std_logic := '0';
+  signal rst                 : std_logic := '0';
+  signal data_src_odata      : data_complex_adc_t;
+  signal data_src_osamp_drop : std_logic := '0';
+  signal data_src_ovld       : std_logic := '0';
+  signal uut_irdy            : std_logic := '0';
+  signal file_writer_irdy    : std_logic := '0';
+  signal end_of_test         : std_logic := '0';
+  signal uut_oprotocol : protocol.complex_short_with_metadata.protocol_t :=
+                         protocol.complex_short_with_metadata.PROTOCOL_ZERO;
 begin
 
   clk_gen : process
@@ -45,8 +45,6 @@ begin
   end process rst_gen;
 
   data_src : entity work.data_src
-    generic map(
-      DATA_BIT_WIDTH => DATA_ADC_BIT_WIDTH)
     port map(
       -- CTRL
       clk                => clk,
@@ -55,7 +53,7 @@ begin
       stopped            => end_of_test,
       -- OUTPUT
       odata              => data_src_odata,
-      ometadata          => data_src_ometadata,
+      osamp_drop         => data_src_osamp_drop,
       ovld               => data_src_ovld,
       ordy               => uut_irdy);
 
@@ -64,18 +62,16 @@ begin
       BITS_PACKED_INTO_MSBS    => BITS_PACKED_INTO_MSBS)
     port map(
       -- CTRL
-      clk       => clk,
-      rst       => rst,
+      clk        => clk,
+      rst        => rst,
       -- INPUT
-      idata     => data_src_odata,
-      imetadata => data_src_ometadata,
-      ivld      => data_src_ovld,
-      irdy      => uut_irdy,
+      idata      => data_src_odata,
+      isamp_drop => data_src_osamp_drop,
+      ivld       => data_src_ovld,
+      irdy       => uut_irdy,
       -- OUTPUT
-      odata     => uut_odata,
-      ometadata => uut_ometadata,
-      ovld      => uut_ovld,
-      ordy      => file_writer_irdy);
+      oprotocol  => uut_oprotocol,
+      ordy       => file_writer_irdy);
 
   file_writer : entity work.file_writer
     generic map(
@@ -87,9 +83,7 @@ begin
       backpressure_select     => backpressure_select,
       backpressure_select_vld => backpressure_select_vld,
       -- INPUT
-      idata                   => uut_odata,
-      imetadata               => uut_ometadata,
-      ivld                    => uut_ovld,
+      iprotocol               => uut_oprotocol,
       irdy                    => file_writer_irdy);
 
 end rtl;
