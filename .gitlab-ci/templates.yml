@@ -370,7 +370,7 @@
   artifacts: 
     paths: []
   script:
-    - ./scripts/test-opencpi.sh
+    - HDL_PLATFORM= HdlPlatforms= HdlPlatform= ./scripts/test-opencpi.sh
 
 .test-core:
   stage: test
