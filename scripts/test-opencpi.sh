@@ -150,8 +150,8 @@ for t in $TESTS; do
       echo ======================= Running ocpidev tests
       (framework_test ocpidev && HDL_TEST_PLATFORM=$hplats ./run-dropin-tests.sh)
       echo ======================= Running ocpidev_test tests
-      (unset HdlPlatforms; unset HdlPlatforms; \
-       framework_test ocpidev_test && rm -r -f test_project && \
+      ( # unset HdlPlatforms; unset HdlPlatforms;
+       framework_test ocpidev_test && rm -r -f test_project &&
          HDL_PLATFORM=$hplats ./test-ocpidev.sh);;
     load-drivers)
       echo ======================= Loading all the OpenCPI plugins/drivers.
