@@ -2316,11 +2316,12 @@ set -e
 
 # Copy the argv removing a verb in $1
 function run_original_argv {
-    local args=()
-    local old=("${original_argv[@]}")
-    for a in "${original_argv[@]}"; do
-	[ "$a" != "$2" ] && args+=("$a")
-    done
+    local args=("${original_argv[@]}")
+
+    if [ "${original_argv[0]}" == "$2" ]; then
+      args=("${original_argv[@]:1}")
+    fi
+
     $1 "${args[@]}"
 }
 
