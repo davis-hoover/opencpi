@@ -31,6 +31,8 @@
 lib=$1
 set -e
 shopt -s extglob
+base=$(basename `pwd`)
+[ $base = lib ] && cd ..
 platform=$(basename `pwd`)
 exports=$platform.exports
 echo Performing local exports into the $lib/ subdirectory for platform $platform, using $exports
@@ -38,7 +40,7 @@ echo Performing local exports into the $lib/ subdirectory for platform $platform
 
 rm -r -f $lib
 sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local export deploy; do
-  echo "tag: '$tag' local: '$local' export: '$export' deploy: '$deploy'"
+  # echo "tag: '$tag' local: '$local' export: '$export' deploy: '$deploy'"
   # For runtime or devel, the RHS (export) is relative to the CDK top, which usually means
   # the platform's subdir - i.e. a leading <target> or <platform>
   [ -z "$local" ] && continue;                     # blank lines

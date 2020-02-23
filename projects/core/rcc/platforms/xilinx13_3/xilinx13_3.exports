@@ -18,25 +18,26 @@
 
 # Add generic zynq files to this zynq platform.
 # These files will be used for both the runtime package as well as the initial/default contents
-# of the hardware platform's SD card.  The hardware platform's script for its SD card can
+# of the hardware platform's SD card.  The hardware platform's exports for deployment can
 # remove files as well as add files.
 
-# Both the default setup files for users and the underlying ones, for the SD card
-@platforms/zynq/zynq_*setup.sh opencpi/
-@platforms/zynq/default_my*setup.sh opencpi/
-# no system.xml, let the hardware platform specify that
-# any value in having the zynq-generic one lying around anyway?
-# =platforms/zynq/zynq_system.xml <target>/zynq/
-# Put the platform's READMEs onto the runtime
-=<platform_dir>/README* <target>/
+### Development files
 # Put the generic READMEs onto the development package under zynq
 +platforms/zynq/README* <target>/zynq/
 # For the development package add this script for formatting SD cards
 +platforms/zynq/formatOpenCPIZynqSD.sh <target>/zynq/
-# Use the default zynq system.xml
++<platform-dir>/release/kernel-headers.tar <target>/release/
++<platform-dir>/install*.sh <target>/
+### Runtime files
+# Put the platform's READMEs onto the runtime
+=<platform-dir>/README* <target>/
+# Use the default zynq system.xml unless overridden by hardware
 =platforms/zynq/zynq_system.xml <target>/system.xml
-+<platform_dir>/README <target>/
-# Deployment files
-@<platform_dir>/release/uramdisk.image.gz /
-@<platform_dir>/release/uImage /
-+<platform_dir>/release/lib/ <target>/sdk/lib
+=<platform-dir>/release/lib <target>/sdk/
+
+### Deployment files
+# Both the default setup files for users and the underlying ones, for the SD card
+@platforms/zynq/zynq_*setup.sh opencpi/
+@platforms/zynq/default_my*setup.sh opencpi/
+@<platform-dir>/release/uramdisk.image.gz /
+@<platform-dir>/release/uImage /

@@ -33,7 +33,7 @@ OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh; source $OCPI_BOOTSTRAP
 platform=$1
 [ -n "$1" ] && shift
 if test -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform"; then
-  echo Assuming development host platform $OCPI_TOOL_PLATFORM is arleady installed.
+  echo Assuming development host platform $OCPI_TOOL_PLATFORM is already installed.
 #  ./scripts/install-packages.sh $OCPI_TOOL_PLATFORM
   # This should check if a successful prereq install has been done
   # It should also just to "host" prerequisites, not "runtime" or "project" prerequisites
@@ -45,16 +45,23 @@ fi
 for i in $(shopt -s nullglob; echo projects/osps/*); do
   [ -d $i/rcc/platforms ] && OCPI_PROJECT_PATH=$OCPI_PROJECT_PATH:`pwd`/$i
 done
-# We assume that install-packages.sh does NOT depend on "building" the platform
-./build/install-packages.sh $platform
+# Finding the platform should not depend on whether it is exported or not
 source $OCPI_CDK_DIR/scripts/ocpitarget.sh $platform
 [ -z "$OCPI_TARGET_PLATFORM_DIR" ] && echo Cannot find platform $platform && exit 1
+# Make sure we are running in a mode without any platform exports since this installation phase
+# should *not* depend on platform exports.  This essentially unexports the platform
+OCPI_TARGET_PLATFORM_DIR=${OCPI_TARGET_PLATFORM_DIR%/lib}
+rm -r -f $OCPI_TARGET_PLATFORM_DIR/lib
+# We assume that install-packages.sh and install-prerequisites.sh do NOT depend on the platform's exports
+./build/install-packages.sh $platform
+./build/install-prerequisites.sh $platform
 # If the platform itself needs to be "built", do it now.
 if [ -f $OCPI_TARGET_PLATFORM_DIR/Makefile ]; then
   echo Building/preparing the software platform \"$platform\" which will enable building other assets for it.
   make -C $OCPI_TARGET_PLATFORM_DIR/Makefile
+elif [ -f $OCPI_TARGET_PLATFORM_DIR/$platform.exports ]; then
+  (cd $OCPI_TARGET_PLATFORM_DIR; $OCPI_CDK_DIR/scripts/export-platform.sh lib)
 fi
-./build/install-prerequisites.sh $platform
 # Any arguments after the first are variable assignments for make, like HdlPlatforms...
 eval $* ./build/build-opencpi.sh $platform
 if test -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform"; then

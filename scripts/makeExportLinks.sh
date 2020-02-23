@@ -201,7 +201,7 @@ function do_addition {
     rawsrc=${exp#<platform>/}
     rawsrc=${rawsrc#<target>/}
     [[ "$exp" == */ ]] && rawsrc+=$(basename ${both[0]}) # if RHS was just a dir with trailing slash...
-    [ "$2" = "--" ] && rawsrc=deploy/$rawsrc
+    [ "$2" = "--" ] && rawsrc=deploy/${rawsrc#/}
     rawsrc=$platform_dir/$rawsrc
   fi
   rawsrc=${rawsrc//<target>/$target2}
