@@ -59,8 +59,12 @@ begin
   -- out port
   ------------------------------------------------------------------------------
 
-  adc_idata.i <= dev_in.data_i(to_integer(unsigned(ADC_WIDTH_BITS))-1 downto 0);
-  adc_idata.q <= dev_in.data_q(to_integer(unsigned(ADC_WIDTH_BITS))-1 downto 0);
+  adc_idata.i <= dev_in.data_i(dev_in.data_i'left downto
+                               dev_in.data_i'left-
+                               to_integer(unsigned(ADC_WIDTH_BITS))+1);
+  adc_idata.q <= dev_in.data_q(dev_in.data_q'left downto
+                               dev_in.data_q'left-
+                               to_integer(unsigned(ADC_WIDTH_BITS))+1);
 
   out_port_data_width_32 : if(OUT_PORT_DATA_WIDTH = 32) generate
 
