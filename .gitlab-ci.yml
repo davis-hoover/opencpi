@@ -23,16 +23,17 @@ stages:
 
 # Global before and after scripts to run after each job. Overwrite in a specific
 # job to prevent these from occurring.
-before_script:
-  - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
-  - sleep 5
-  - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
-  - cat timestamp.txt
-  - ls -lh
-after_script:
-  - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
-  - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-  - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+default:
+  before_script:
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - sleep 5
+    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - cat timestamp.txt
+    - ls -lh
+  after_script:
+    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
+    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
 
 # Includes yaml files in the '.gitlab-ci' directory.
 # Folder structure for the directory is as follows:
@@ -41,17 +42,17 @@ after_script:
 #   - .yml files for target platform (e.g., xilinx13_4.yml, xsim.yml, zed.yml)
 include:
   # .gitlab-ci
-  - /.gitlab-ci/templates.yml
-  - /.gitlab-ci/docs.yml
-  - /.gitlab-ci/centos6.yml
-  - /.gitlab-ci/centos7.yml
+   - /.gitlab-ci/templates.yml
+   - /.gitlab-ci/docs.yml
+   - /.gitlab-ci/centos6.yml
+   - /.gitlab-ci/centos7.yml
 
   # centos6
-  - /.gitlab-ci/centos6/xilinx13_3.yml
-  - /.gitlab-ci/centos6/xilinx13_4.yml
-  - /.gitlab-ci/centos6/xsim.yml
+   - /.gitlab-ci/centos6/xilinx13_3.yml
+   - /.gitlab-ci/centos6/xilinx13_4.yml
+   - /.gitlab-ci/centos6/xsim.yml
   
   # centos7
-  - /.gitlab-ci/centos7/xilinx13_3.yml
-  - /.gitlab-ci/centos7/xilinx13_4.yml
-  - /.gitlab-ci/centos7/xsim.yml
+   - /.gitlab-ci/centos7/xilinx13_3.yml
+   - /.gitlab-ci/centos7/xilinx13_4.yml
+   - /.gitlab-ci/centos7/xsim.yml

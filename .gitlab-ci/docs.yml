@@ -3,35 +3,32 @@ build:pages:
   tags:
     - docker
   image: $CI_REGISTRY_IMAGE/build-pages:latest
-  cache:
-    key: pages
-    paths:
-      - .public/
   artifacts:
     paths:
       - .public/
   # Overwrite default before and after script
-  before_script:
-  after_script:
+  before_script: []
+  after_script: []
+  dependencies:
   script:
     - make doc
+    - mkdir -p .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
+    - mv doc/pdfs/* .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
 
-pages:
+# Trigger downstream pipeline in opencpi.gitlab.io project
+trigger:opencpi.gitlab.io:
   stage: deploy
-  tags:
-    - docker
-  image: centos:latest
-  artifacts:
-    paths:
-      - public/
-  dependencies: ["build:pages"]
   only:
     - develop
     - master
-  # Overwrite default before and after script
-  before_script:
-  after_script:
-  script:
-    - rm -rf public
-    - mkdir -p public
-    - mv .public/releases/develop/* public/  # only deploy develop version of docs
+    - tags
+  trigger:
+    project: opencpi/opencpi.gitlab.io
+    branch: develop
+    strategy: depend
+  variables:
+    JOB_NAME: 'build:pages'
+    REF_NAME: $CI_COMMIT_REF_NAME
+    PIPELINE_ID: $CI_PIPELINE_ID
+    PROJECT_ID: $CI_PROJECT_ID
+    PROJECT_PATH: $CI_PROJECT_PATH
