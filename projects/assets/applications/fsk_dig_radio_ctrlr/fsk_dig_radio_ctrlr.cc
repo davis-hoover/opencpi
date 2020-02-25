@@ -781,7 +781,7 @@ void dig_radio_ctrlr_request_config_lock(bool& do_exit_failure) {
     //  |  <--|   |<|  |<-|<----|<----data stream ID|<--+
     //  |     +---+ +--+  |     |                   |
     //  +-----------------+     +-------------------+
-    req << "data_stream_type RX,";
+    req << "direction RX,";
     req << "data_stream_ID "      << app_main_args.rx_data_stream_ID << ",";
     req << "routing_ID RX0,"; // application uses RX0 routing ID (see OAS)
 
@@ -821,7 +821,7 @@ void dig_radio_ctrlr_request_config_lock(bool& do_exit_failure) {
     //  |  -->|   |>|  |->|---->|---->data stream ID|->-+
     //  |     +---+ +--+  |     |                   |
     //  +-----------------+     +-------------------+
-    req << "data_stream_type TX,";
+    req << "direction TX,";
     req << "data_stream_ID "      << app_main_args.tx_data_stream_ID << ",";
     req << "routing_ID TX0,"; // application uses TX0 routing ID (see OAS)
 
