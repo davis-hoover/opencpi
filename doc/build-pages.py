@@ -310,7 +310,7 @@ def gen_release_index(tag: str, is_latest=False):
 
     # Render main last as it needs data from other sections
     data = section_data["main"]
-    if tag in ["OpenCPI-1.0", "OpenCPI-2015.Q1.rc0"]:
+    if tag in ["v1.0.0"]:
         rendered_sections[data.name] = old_main_section.render(section_title=data.title, links=data.files)
     else:
         # Main section needs some files from assets, briefings, and tutorials
@@ -361,14 +361,36 @@ def find_files(search_dir, extension=None, recursive=True) -> list:
 
 
 def get_tags():
-    # Get list of release tags
-    git_tags = sort_tags(subprocess.check_output(["git", "tag", "-l"]).decode().strip("\n").split("\n"))
+    # Get list of release tags and their creation date
+    all_tags = dict()
+    for tag in subprocess.check_output(["git", "tag", "-l", "v*"]).decode().strip("\n").split("\n"):
+        time = subprocess.check_output(["git", "log", "-1", "--format=%at", tag]).decode().strip("\n")
+        all_tags[tag] = time
 
-    # v1.3.0 has no docs
-    if "v1.3.0" in git_tags:
-        git_tags.remove("v1.3.0")
+    # Filter out known bad tags and tags that have a hyphen
+    git_tags = dict()
+    semver_versions = set()  # collect only vX.Y.Z tags
+    for tag in all_tags:  # type: str
+        if tag == "v1.3.0":  # v1.3.0 has no docs
+            continue
+        ndx = tag.find("-")
+        if ndx != -1:
+            semver_versions.add(tag[:ndx])
+        else:
+            semver_versions.add(tag)
+            git_tags[tag] = all_tags[tag]
 
-    return git_tags
+    # Handle most recent release for a version is not a new version
+    for version in semver_versions:
+        if version in git_tags:
+            continue
+        # Find most recent release that starts with version
+        for release in sorted(all_tags, key=all_tags.__getitem__, reverse=True):
+            if release.startswith(version):
+                git_tags[release] = all_tags[release]
+                break
+
+    return sorted(git_tags, key=git_tags.__getitem__)
 
 
 def get_branches():
@@ -400,48 +422,11 @@ def get_name_rev(rev: str):
 
 
 def sort_tags(tags):
-    old_versions = []
-    new_versions = []
-    for tag in tags:  # type: str
-        if tag.startswith("OpenCPI"):
-            old_versions.append(tag)
-        else:
-            new_versions.append(tag)
-
-    def _swap(a, b) -> bool:
-        if b[0] == a[0]:
-            if b[1] == a[1]:
-                if "rc" in a[2]:
-                    return False
-                if "rc" in b[2]:
-                    return True
-                if b[2] < a[2]:
-                    return True
-            elif b[1] < a[1]:
-                return True
-        elif b[0] < a[0]:
-            return True
-        return False
-
-    for i in range(1, len(old_versions)):
-        old = old_versions[i].split(".")
-        for j in range(i + 1, len(old_versions)):
-            new = old_versions[j].split(".")
-            if _swap(old, new):
-                old_versions[i] = ".".join(new)
-                old_versions[j] = ".".join(old)
-                break
-
-    for i in range(len(new_versions)):
-        old = new_versions[i].split(".")
-        for j in range(i + 1, len(new_versions)):
-            new = new_versions[j].split(".")
-            if _swap(old, new):
-                new_versions[i] = ".".join(new)
-                new_versions[j] = ".".join(old)
-                break
-
-    return old_versions + new_versions
+    git_tags = dict()
+    for tag in tags:
+        time = subprocess.check_output(["git", "log", "-1", "--format=%at", tag]).decode().strip("\n")
+        git_tags[tag] = time
+    return sorted(git_tags, key=git_tags.__getitem__)
 
 
 if __name__ == "__main__":
