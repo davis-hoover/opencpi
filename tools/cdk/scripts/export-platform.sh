@@ -29,6 +29,7 @@
 
 # We process the .exports file to get the "union" of all the exports for devel, runtime, deploy
 lib=$1
+shift # the remaining files are simple development exports
 set -e
 shopt -s extglob
 base=$(basename `pwd`)
@@ -79,7 +80,7 @@ sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local ex
 done
 # Export the default files that should not be mentioned in the exports file
 # This list is the union of common files to export from all types of platforms
-for i in .mk .exports -check.sh -packages.sh; do
-    [ -e $platform$i ] && ln -s ../$platform$i $lib || :
+for i in $platform.mk $platform-check.sh $platform-packages.sh $*; do
+    [ -e $i ] && ln -s ../$i $lib || :
 done
 echo Exports for the \"$platform\" created in \"$lib\".

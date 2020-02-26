@@ -181,7 +181,7 @@ ifndef HdlSkip
         ifeq ($$(wildcard $$(HdlConstraints)),)
           $$(error The constraints file, $$(HdlConstraints), from configuration $1, not found)
         endif
-        ExportFiles:=$$(ExportFiles) $$(HdlConstraints)
+        ExportFiles:=$$(call Unique,$$(ExportFiles) $$(HdlConstraints))
       endif
       $(call HdlConfOutDir,$1): exports
 	$(AT)mkdir -p $$@
@@ -201,23 +201,8 @@ ifndef HdlSkip
   # Make necessary files visible for using from outside the platform
   # This is only done if we are building, so we don't export until we have actually built something.
   all: exports
-  ifdef ExportFiles
-    # Old way - set the variables to export in the Makefile, redundant with exports file
-    ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk $(Worker).exports))
-    $(info ExportFiles declared for this platform:  $(ExportFiles))
-    ExportLinks:=$(ExportFiles:%=lib/%)
-    exports: $(ExportLinks)
-
-    # order-only prereq should be something like $$(@:lib/%=%) but that doesn't work...
-    $(ExportLinks): | $(ExportFiles)
-	$(AT)mkdir -p lib
-	$(AT)ln -s ../$(@:lib/%=%) lib
-
-  else
-    # New way - use exports file like other places
-    exports:
-	$(AT)$(OCPI_CDK_DIR)/scripts/export-platform.sh lib
-  endif
+  exports:
+	$(AT)$(OCPI_CDK_DIR)/scripts/export-platform.sh lib $(ExportFiles)
 endif # skip after hdl-pre.mk
 
 # There is no test target here, but there might be in the devices subdir
