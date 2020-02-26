@@ -199,6 +199,9 @@ tex_kernel() {
 #       should not be used.
 ###
 generate_pdfs() {
+    pushd ${REPO_PATH}/projects/assets/components/util_comps/timestamper_scdcd.test/doc/
+    ${REPO_PATH}/doc/av/tex/docGen.py ${REPO_PATH}/projects/assets/components/util_comps/specs/timestamper_scdcd-spec.xml -owd ${REPO_PATH}/projects/assets/components/util_comps/timestamper_scdcd.hdl/timestamper_scdcd.xml --no-prompt
+    popd
     shopt -s nullglob
     local search_path="$1"
 
