@@ -91,17 +91,23 @@ cat > $dir/$platform.mk <<-EOF
 	OcpiPlatformArch:=$arch
 	EOF
 cat > $dir/$platform.exports <<-EOF
-	# kernel - just the headers package, and only for development
+	# kernel exports for driver building - just the headers package, and only for development
 	+<platform-dir>/gen/kernel-artifacts/kernel-headers.tgz <target>/
 
-	# sdk - just the libs extracted from the rootfs, needed at runtime for ocpiremote
+	# Release files for hdl platforms for this rcc platform
+	# This assumes that all the files from release artifacts are hdl platform-specific
+	# earlier releases had platform-agnostic boot files, but they are normalized when imported
+	# so in all cases boot files appear hdl-platfform-specific
+	# These (development) files will be used during deployment to create SD card (boot) files
+	# This implies you need a development package to make the SD cards
+	+<platform-dir>/gen/release-artifacts/* <target>/hdl/
+
+	# sdk - just the libs, needed at runtime for ocpiremote, and for deployment
 	=<platform-dir>/gen/sdk-artifacts/lib <target>/sdk/
+
 
 	# Use the default zynq file unless overridden by hardware
 	=platforms/zynq/zynq_system.xml <target>/system.xml
-	# Use the default zynq file unless overridden by hardware
-	# Provide these libraries on the SD card when we do not patch the root fs
-	@<platform_dir>/gen/sdk-artifacts/lib opencpi/sdk/
 	EOF
 make -C $projdir exports # pre local exports (no lib/)
 make -C $dir exports

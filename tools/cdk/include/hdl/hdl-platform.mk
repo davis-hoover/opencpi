@@ -143,7 +143,6 @@ ifndef HdlSkip
   ifdef HdlSkip
     $(error unexpected target/platform skip)
   endif
-  exports:
   .PHONY: exports
   ifneq ($(MAKECMDGOALS),clean)
   ifndef ShellHdlPlatformVars
@@ -199,24 +198,13 @@ ifndef HdlSkip
     $(foreach c,$(Configurations),$(eval $(call doConfig,$c)))
     all: configs
   endif # have configurations
-  # If the platform has special files to export to the CDK, do it.
+  # Make necessary files visible for using from outside the platform
   # This is only done if we are building, so we don't export until we have actually built something.
-  # The two different variables:
-  # - ExportsFile is the name of the file full of exports here
-  # - ExportFiles is the list of files to export for development time
-  # If the ExportFiles variable is not set, take the + lines from the exports file, which is the new way.
-  ExportsFile:=$(wildcard $(Worker).exports)
-  ifndef ExportFiles
-    ifdef ExportsFile
-      ExportFiles:=$(shell sed -n 's/^ *+ *\([^ ]*.*$$\)/\1/p' $(ExportsFile) | \
-                           sed -n 's=<platform-dir>/==p')
-      $(infox ExportFiles HERE:$(ExportFiles))
-    endif
-  endif
-  ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk $(Worker).exports))
-  $(info ExportFiles for this platform: $(ExportFiles))
-
+  all: exports
   ifdef ExportFiles
+    # Old way - set the variables to export in the Makefile, redundant with exports file
+    ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk $(Worker).exports))
+    $(info ExportFiles declared for this platform:  $(ExportFiles))
     ExportLinks:=$(ExportFiles:%=lib/%)
     exports: $(ExportLinks)
 
@@ -225,7 +213,10 @@ ifndef HdlSkip
 	$(AT)mkdir -p lib
 	$(AT)ln -s ../$(@:lib/%=%) lib
 
-    all: $(ExportLinks)
+  else
+    # New way - use exports file like other places
+    exports:
+	$(AT)$(OCPI_CDK_DIR)/scripts/export-platform.sh lib
   endif
 endif # skip after hdl-pre.mk
 

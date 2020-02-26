@@ -92,10 +92,10 @@ case $arch in
       kargs="UIMAGE_LOADADDR=0x8000 uImage"
       ;;
     (aarch64)
-      uarch=arm
       karch=arm64
-      uconfig=xilinx_zynqmp_zcu104_revC_defconfig
+      uarch=arm
       kconfig=xilinx_zynqmp_defconfig
+      uconfig=xilinx_zynqmp_ep_defconfig
       kargs=Image.gz
       ;;
     (*)
@@ -215,7 +215,7 @@ mkdir kernel-headers
   done
 )
 # Remove all other architectures
-find kernel-headers/arch -mindepth 1 -maxdepth 1 -type d ! -name $karch ! -name x86 -exec rm -r {} \;
+find kernel-headers/arch -mindepth 1 -maxdepth 1 -type d ! -path "*/arch/arm*" ! -name x86 -exec rm -r {} \;
 rm -r -f kernel-headers/arch/$karch/boot
 rm kernel-headers/scripts/{basic,mod}/.gitignore
 # Record the kernel release AND the repo tag used, both inside the kernel headers and at the top-level

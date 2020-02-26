@@ -554,10 +554,14 @@ OcpiGetRccPlatformPaths=$(strip \
                                    $(call OcpiExists,$p/rcc/platforms))))))
 
 # Search for a given platform ($1) in the list of 'rcc/platform' directories found
-# by OcpiGetRccPlatformPaths.
+# by OcpiGetRccPlatformPaths.  The search priority is:
+# 1. if the project is exported, just use rcc/platforms/$1
+# 2. if not exported, look for a platform export in rcc/platforms/$1/lib
+# 3. assume a raw source tree with no project or platform exports, and use rcc/platforms/$1
 OcpiGetRccPlatformDir=$(strip $(firstword \
 		        $(foreach p,$(OcpiGetRccPlatformPaths),\
-                          $(or $(call OcpiExists,$p/$1/lib),$(call OcpiExists,$p/$1)))))
+                          $(if $(findstring /exports/rcc/,$p/$1),$(call OcpiExists,$p/$1),\
+                               $(or $(call OcpiExists,$p/$1/lib),$(call OcpiExists,$p/$1))))))
 
 ##################################################################################
 # Functions for collecting Project Dependencies and imports for use with project

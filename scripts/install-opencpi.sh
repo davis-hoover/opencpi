@@ -58,13 +58,17 @@ rm -r -f $OCPI_TARGET_PLATFORM_DIR/lib
 # If the platform itself needs to be "built", do it now.
 if [ -f $OCPI_TARGET_PLATFORM_DIR/Makefile ]; then
   echo Building/preparing the software platform \"$platform\" which will enable building other assets for it.
-  make -C $OCPI_TARGET_PLATFORM_DIR/Makefile
+  make -C $OCPI_TARGET_PLATFORM_DIR
 elif [ -f $OCPI_TARGET_PLATFORM_DIR/$platform.exports ]; then
+  echo Exporting files from the software platform \"$platform\" which will enable building other assets for it.
   (cd $OCPI_TARGET_PLATFORM_DIR; $OCPI_CDK_DIR/scripts/export-platform.sh lib)
 fi
-# Any arguments after the first are variable assignments for make, like HdlPlatforms...
+echo Exporting the platform \"$platform\" from its project.
+project=$(cd $OCPI_TARGET_PLATFORM_DIR/../../..; pwd)
+project=${project%/exports}
+make -C $project exports
 eval $* ./build/build-opencpi.sh $platform
-if test -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform"; then
+if [ -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform" ]; then
   echo When building/installing for cross-compiled platform $platform, we are skipping tests.
 else
   # This script suppresses any HDL testing

@@ -56,6 +56,7 @@ sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local ex
 	       continue;;
        esac;;
       (@) # deployment
+        [[ "$export" == \<[a-z]*[-_]platform[-_]dir\> ]] && continue # skip cross-platform exports here
         [ -z "$export" ] && echo Cannot do deployment export with no RHS.  There is no default. && exit 1
 	[[ "$export" == /* ]] && export=${export#/} # root is permissable, and stripped here
 	export=deploy/$export  # deployment exports are put in their own subdir: deploy, under the local dir
@@ -63,13 +64,21 @@ sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local ex
   esac
   local=${local//<platform>/$platform}
   local=${local//<target>/$platform}
-  mkdir -p lib
-  [[ "$export" == */ ]] && mkdir -p $lib/${export%/}
+  if [[ "$export" == */ ]]; then
+     mkdir -p $lib/${export%/}
+  elif [[ "$export" == */* ]]; then
+     mkdir -p $lib/$(dirname $export)
+  else
+     mkdir -p $lib
+  fi
   # add ../ for each level that is in the export that is in subdirs
-  [[ "$export" == */* ]] && tmp=${export%%+([^/])} && local=$(echo $tmp|sed 's/[^/][^/]*\//..\//g')$local
-  ln -s ../$local $lib/$export
+  [[ "$export" == */* ]] && tmp=${export%%+([^/])} && prefix=$(echo $tmp|sed 's/[^/][^/]*\//..\//g')
+  for i in $(set -vx; shopt -s nullglob; echo $local); do
+      ln -s ../$prefix$i $lib${export:+/}$export
+  done
 done
 # Export the default files that should not be mentioned in the exports file
+# This list is the union of common files to export from all types of platforms
 for i in .mk .exports -check.sh -packages.sh; do
     [ -e $platform$i ] && ln -s ../$platform$i $lib || :
 done
