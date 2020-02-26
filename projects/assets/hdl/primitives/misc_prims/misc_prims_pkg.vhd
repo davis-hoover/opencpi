@@ -116,10 +116,10 @@ function from_slv(slv    : in std_logic_vector) return metadata_t;
 function to_slv(info     : in info_t)         return std_logic_vector;
 function from_slv(slv    : in std_logic_vector) return info_t;
 
-function calc_cdc_bit_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
-function calc_cdc_fifo_depth (src_dst_ratio : in real) return natural;
-function calc_cdc_pulse_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
-function calc_cdc_count_up_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
+function calc_cdc_bit_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
+function calc_cdc_fifo_depth (constant src_dst_ratio : in real) return natural;
+function calc_cdc_pulse_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
+function calc_cdc_count_up_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
 
 type adc_samp_drop_detector_status_t is record
   error_samp_drop : std_logic;

@@ -22,7 +22,7 @@ library misc_prims; use misc_prims.misc_prims.all;
 
 -- TODO: Replace four_bit_lfsr with a generic lfsr and add a mode
 -- for fast source to slow destination that intentionally doesn't hold input data
--- long enough show that it fails when the primitive is not properly used.
+-- long enough to show that it fails when the primitive is not properly used.
 architecture rtl of worker is
 
   constant c_src_clk_hz : real := from_float(src_clk_hz);
@@ -108,10 +108,9 @@ architecture rtl of worker is
 
     s_not_synced_dst_to_scr_rst <= not s_synced_dst_to_scr_rst;
 
-    -- For fast source to slow destination, this ensures that
-    -- the minimum input signal width is 2x the period of the destination
-    -- clock and they are seperated by 2x src_clk cycles to
-    -- ensure proper crossing of the CDC boundary.
+    -- For fast source to slow destination and equal source and destination clock frequencies.
+    -- This ensures that the minimum input signal width is 2x the period of the destination
+    -- clock and they are seperated by 2x src_clk cycles to ensure proper crossing of the CDC boundary.
     gen_advance_counter : if (c_src_clk_hz >= c_dst_clk_hz) generate
       advance_counter : misc_prims.misc_prims.advance_counter
        generic map (hold_width => c_hold_width)

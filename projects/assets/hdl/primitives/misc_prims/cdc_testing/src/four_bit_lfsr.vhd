@@ -20,7 +20,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
--- Implementation of standard lsfr with polynomial x^4 +x^3 + 1
+-- Implementation of Fibonacci lfsr with polynomial x^4 +x^3 + 1
 -- Shifts from lsb to msb
 entity four_bit_lfsr is
     generic (

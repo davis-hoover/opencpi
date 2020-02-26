@@ -1,10 +1,9 @@
 -- Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2017.1 (lin64) Build 1846317 Fri Apr 14 18:54:47 MDT 2017
--- Date        : Fri Oct 25 23:23:55 2019
--- Host        : running 64-bit CentOS Linux release 7.7.1908 (Core)
+-- Date        : Fri Dec 20 12:05:12 2019
 -- Command     : write_vhdl -force -mode funcsim
--- Design      : mmcm_100_to_50_and_25
+-- Design      : mmcm_100_to_100_50_and_25
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
 -- Device      : xc7z020clg484-1
@@ -13,30 +12,31 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity mmcm_100_to_50_and_25_mmcm_100_to_50_and_25_clk_wiz is
+entity mmcm_100_to_100_50_and_25_mmcm_100_to_100_50_and_25_clk_wiz is
   port (
     clk_out1 : out STD_LOGIC;
     clk_out2 : out STD_LOGIC;
+    clk_out3 : out STD_LOGIC;
     reset : in STD_LOGIC;
     locked : out STD_LOGIC;
     clk_in1 : in STD_LOGIC
   );
   attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of mmcm_100_to_50_and_25_mmcm_100_to_50_and_25_clk_wiz : entity is "mmcm_100_to_50_and_25_clk_wiz";
-end mmcm_100_to_50_and_25_mmcm_100_to_50_and_25_clk_wiz;
+  attribute ORIG_REF_NAME of mmcm_100_to_100_50_and_25_mmcm_100_to_100_50_and_25_clk_wiz : entity is "mmcm_100_to_100_50_and_25_clk_wiz";
+end mmcm_100_to_100_50_and_25_mmcm_100_to_100_50_and_25_clk_wiz;
 
-architecture STRUCTURE of mmcm_100_to_50_and_25_mmcm_100_to_50_and_25_clk_wiz is
-  signal clk_in1_mmcm_100_to_50_and_25 : STD_LOGIC;
-  signal clk_out1_mmcm_100_to_50_and_25 : STD_LOGIC;
-  signal clk_out2_mmcm_100_to_50_and_25 : STD_LOGIC;
-  signal clkfbout_buf_mmcm_100_to_50_and_25 : STD_LOGIC;
-  signal clkfbout_mmcm_100_to_50_and_25 : STD_LOGIC;
+architecture STRUCTURE of mmcm_100_to_100_50_and_25_mmcm_100_to_100_50_and_25_clk_wiz is
+  signal clk_in1_mmcm_100_to_100_50_and_25 : STD_LOGIC;
+  signal clk_out1_mmcm_100_to_100_50_and_25 : STD_LOGIC;
+  signal clk_out2_mmcm_100_to_100_50_and_25 : STD_LOGIC;
+  signal clk_out3_mmcm_100_to_100_50_and_25 : STD_LOGIC;
+  signal clkfbout_buf_mmcm_100_to_100_50_and_25 : STD_LOGIC;
+  signal clkfbout_mmcm_100_to_100_50_and_25 : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKFBOUTB_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKFBSTOPPED_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKOUT0B_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKOUT1B_UNCONNECTED : STD_LOGIC;
-  signal NLW_mmcm_adv_inst_CLKOUT2_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKOUT2B_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKOUT3_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKOUT3B_UNCONNECTED : STD_LOGIC;
@@ -57,12 +57,13 @@ architecture STRUCTURE of mmcm_100_to_50_and_25_mmcm_100_to_50_and_25_clk_wiz is
   attribute IFD_DELAY_VALUE of clkin1_ibufg : label is "AUTO";
   attribute BOX_TYPE of clkout1_buf : label is "PRIMITIVE";
   attribute BOX_TYPE of clkout2_buf : label is "PRIMITIVE";
+  attribute BOX_TYPE of clkout3_buf : label is "PRIMITIVE";
   attribute BOX_TYPE of mmcm_adv_inst : label is "PRIMITIVE";
 begin
 clkf_buf: unisim.vcomponents.BUFG
      port map (
-      I => clkfbout_mmcm_100_to_50_and_25,
-      O => clkfbout_buf_mmcm_100_to_50_and_25
+      I => clkfbout_mmcm_100_to_100_50_and_25,
+      O => clkfbout_buf_mmcm_100_to_100_50_and_25
     );
 clkin1_ibufg: unisim.vcomponents.IBUF
     generic map(
@@ -70,17 +71,22 @@ clkin1_ibufg: unisim.vcomponents.IBUF
     )
         port map (
       I => clk_in1,
-      O => clk_in1_mmcm_100_to_50_and_25
+      O => clk_in1_mmcm_100_to_100_50_and_25
     );
 clkout1_buf: unisim.vcomponents.BUFG
      port map (
-      I => clk_out1_mmcm_100_to_50_and_25,
+      I => clk_out1_mmcm_100_to_100_50_and_25,
       O => clk_out1
     );
 clkout2_buf: unisim.vcomponents.BUFG
      port map (
-      I => clk_out2_mmcm_100_to_50_and_25,
+      I => clk_out2_mmcm_100_to_100_50_and_25,
       O => clk_out2
+    );
+clkout3_buf: unisim.vcomponents.BUFG
+     port map (
+      I => clk_out3_mmcm_100_to_100_50_and_25,
+      O => clk_out3
     );
 mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
     generic map(
@@ -90,15 +96,15 @@ mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
       CLKFBOUT_USE_FINE_PS => false,
       CLKIN1_PERIOD => 10.000000,
       CLKIN2_PERIOD => 0.000000,
-      CLKOUT0_DIVIDE_F => 20.000000,
+      CLKOUT0_DIVIDE_F => 10.000000,
       CLKOUT0_DUTY_CYCLE => 0.500000,
       CLKOUT0_PHASE => 0.000000,
       CLKOUT0_USE_FINE_PS => false,
-      CLKOUT1_DIVIDE => 40,
+      CLKOUT1_DIVIDE => 20,
       CLKOUT1_DUTY_CYCLE => 0.500000,
       CLKOUT1_PHASE => 0.000000,
       CLKOUT1_USE_FINE_PS => false,
-      CLKOUT2_DIVIDE => 1,
+      CLKOUT2_DIVIDE => 40,
       CLKOUT2_DUTY_CYCLE => 0.500000,
       CLKOUT2_PHASE => 0.000000,
       CLKOUT2_USE_FINE_PS => false,
@@ -134,19 +140,19 @@ mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
       STARTUP_WAIT => false
     )
         port map (
-      CLKFBIN => clkfbout_buf_mmcm_100_to_50_and_25,
-      CLKFBOUT => clkfbout_mmcm_100_to_50_and_25,
+      CLKFBIN => clkfbout_buf_mmcm_100_to_100_50_and_25,
+      CLKFBOUT => clkfbout_mmcm_100_to_100_50_and_25,
       CLKFBOUTB => NLW_mmcm_adv_inst_CLKFBOUTB_UNCONNECTED,
       CLKFBSTOPPED => NLW_mmcm_adv_inst_CLKFBSTOPPED_UNCONNECTED,
-      CLKIN1 => clk_in1_mmcm_100_to_50_and_25,
+      CLKIN1 => clk_in1_mmcm_100_to_100_50_and_25,
       CLKIN2 => '0',
       CLKINSEL => '1',
       CLKINSTOPPED => NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED,
-      CLKOUT0 => clk_out1_mmcm_100_to_50_and_25,
+      CLKOUT0 => clk_out1_mmcm_100_to_100_50_and_25,
       CLKOUT0B => NLW_mmcm_adv_inst_CLKOUT0B_UNCONNECTED,
-      CLKOUT1 => clk_out2_mmcm_100_to_50_and_25,
+      CLKOUT1 => clk_out2_mmcm_100_to_100_50_and_25,
       CLKOUT1B => NLW_mmcm_adv_inst_CLKOUT1B_UNCONNECTED,
-      CLKOUT2 => NLW_mmcm_adv_inst_CLKOUT2_UNCONNECTED,
+      CLKOUT2 => clk_out3_mmcm_100_to_100_50_and_25,
       CLKOUT2B => NLW_mmcm_adv_inst_CLKOUT2B_UNCONNECTED,
       CLKOUT3 => NLW_mmcm_adv_inst_CLKOUT3_UNCONNECTED,
       CLKOUT3B => NLW_mmcm_adv_inst_CLKOUT3B_UNCONNECTED,
@@ -173,26 +179,28 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity mmcm_100_to_50_and_25 is
+entity mmcm_100_to_100_50_and_25 is
   port (
     clk_out1 : out STD_LOGIC;
     clk_out2 : out STD_LOGIC;
+    clk_out3 : out STD_LOGIC;
     reset : in STD_LOGIC;
     locked : out STD_LOGIC;
     clk_in1 : in STD_LOGIC
   );
   attribute NotValidForBitStream : boolean;
-  attribute NotValidForBitStream of mmcm_100_to_50_and_25 : entity is true;
-end mmcm_100_to_50_and_25;
+  attribute NotValidForBitStream of mmcm_100_to_100_50_and_25 : entity is true;
+end mmcm_100_to_100_50_and_25;
 
-architecture STRUCTURE of mmcm_100_to_50_and_25 is
+architecture STRUCTURE of mmcm_100_to_100_50_and_25 is
 begin
-inst: entity work.mmcm_100_to_50_and_25_mmcm_100_to_50_and_25_clk_wiz
+inst: entity work.mmcm_100_to_100_50_and_25_mmcm_100_to_100_50_and_25_clk_wiz
      port map (
-      clk_in1 => clk_in1,
-      clk_out1 => clk_out1,
-      clk_out2 => clk_out2,
-      locked => locked,
-      reset => reset
+       clk_in1 => clk_in1,
+       clk_out1 => clk_out1,
+       clk_out2 => clk_out2,
+       clk_out3 => clk_out3,
+       locked => locked,
+       reset => reset
     );
 end STRUCTURE;

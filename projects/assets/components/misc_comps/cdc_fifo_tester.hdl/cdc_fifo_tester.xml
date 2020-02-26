@@ -1,12 +1,5 @@
-<HdlWorker language='vhdl' spec='cdc_fifo_tester-spec' DataWidth="32" Version='2' libraries='cdc'>
+<HdlWorker language="vhdl" spec="cdc_fifo_tester-spec" DataWidth="32" Version="2" libraries="cdc">
 
-  <Property Name="num_input_samples" Type="uchar"
-                                     Parameter="true"
-                                     Default="15"
-                                     Description="Number of input samples sent."/>
-
-  <StreamInterface Name="out"
-                  NumberOfOpcodes="256" DataValueWidth="8"
-                  ZeroLengthMessages="true" insertEOM="true" workerEOF='1' clockDirection='out'/>
+  <StreamInterface Name="out" insertEOM="true" workerEOF="true" clockDirection="out"/>
 
 </HdlWorker>

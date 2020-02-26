@@ -16,7 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- TODO Once there is a generic MMCM/PLL, modifiy this to use it instead and move this module to cdc_testing in misc prims 
+-- TODO Once there is a generic MMCM/PLL, modifiy this to use it instead and move this module to cdc_testing in misc prims
 library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; use ieee.math_real.all; use ieee.std_logic_misc.all;
 library ocpi; use ocpi.types.all,  ocpi.util.all;
 library cdc;
@@ -25,8 +25,8 @@ entity gen_clk is
     generic (src_clk_hz : real := 100000000.0;
              dst_clk_hz : real := 100000000.0);
     port (
-	ctl_clk      : in std_logic;
-	ctl_rst      : in std_logic;
+      	ctl_clk      : in std_logic;
+      	ctl_rst      : in std_logic;
         src_clk      : out std_logic;
         src_rst      : out std_logic;
         dst_clk      : out std_logic;
@@ -35,11 +35,12 @@ end entity gen_clk;
 
 architecture rtl of gen_clk is
 
-  component mmcm_100_to_50_and_25
+  component mmcm_100_to_100_50_and_25_top
     port(
-      clk_in1           : in     std_logic;
-      clk_out1          : out    std_logic; -- 50 MHz output
-      clk_out2          : out    std_logic; -- 25 MHz output
+      clk_in_100_MHz    : in     std_logic;
+      clk_out_100_MHz   : out    std_logic;
+      clk_out_50_MHz    : out    std_logic;
+      clk_out_25_MHz    : out    std_logic;
       reset             : in     std_logic;
       locked            : out    std_logic);
   end component;
@@ -48,8 +49,8 @@ architecture rtl of gen_clk is
   signal s_src_rst          : std_logic;
   signal s_dst_clk          : std_logic := '0';
   signal s_dst_rst          : std_logic;
-  signal s_locked : std_logic;
-  signal s_not_locked : std_logic;
+  signal s_locked           : std_logic;
+  signal s_not_locked       : std_logic;
 
 begin
 
@@ -82,57 +83,57 @@ begin
           dst_rst   => s_dst_rst);
 
 
-    gen_1_to_2_clk : if (src_clk_hz = 50000000.0) generate
+   gen_1_to_2_clk : if (src_clk_hz = 50000000.0) generate
 
-       s_dst_clk <= ctl_clk;
-       inst_mmcm_100_to_50_and_25 : component mmcm_100_to_50_and_25
-	 port map (
-	  clk_in1 => ctl_clk,
-	  clk_out1 => s_src_clk,
-	  clk_out2 => open,
-	  reset => ctl_rst,
-	  locked => s_locked);
+     inst_mmcm_100_to_100_50_and_25 : component mmcm_100_to_100_50_and_25_top
+    	 port map (
+    	  clk_in_100_MHz => ctl_clk,
+    	  clk_out_100_MHz => s_dst_clk,
+        clk_out_50_MHz => s_src_clk,
+    	  clk_out_25_MHz => open,
+    	  reset => ctl_rst,
+    	  locked => s_locked);
 
-    end generate gen_1_to_2_clk;
+   end generate gen_1_to_2_clk;
 
-    gen_1_to_4_clk : if (src_clk_hz = 25000000.0) generate
+   gen_1_to_4_clk : if (src_clk_hz = 25000000.0) generate
 
-       s_dst_clk <= ctl_clk;
-       inst_mmcm_100_to_50_and_25 : component mmcm_100_to_50_and_25
-	 port map (
-	  clk_in1 => ctl_clk,
-	  clk_out1 => open,
-	  clk_out2 => s_src_clk,
-	  reset => ctl_rst,
-	  locked => s_locked);
+     inst_mmcm_100_to_100_50_and_25 : component mmcm_100_to_100_50_and_25_top
+    	 port map (
+    	  clk_in_100_MHz => ctl_clk,
+    	  clk_out_100_MHz => s_dst_clk,
+        clk_out_50_MHz => open,
+    	  clk_out_25_MHz => s_src_clk,
+    	  reset => ctl_rst,
+    	  locked => s_locked);
 
     end generate gen_1_to_4_clk;
 
     gen_2_to_1_clk : if (dst_clk_hz = 50000000.0) generate
 
-   	s_src_clk <= ctl_clk;
-	inst_mmcm_100_to_50_and_25 : component mmcm_100_to_50_and_25
-	 port map (
-	  clk_in1 => ctl_clk,
-	  clk_out1 => s_dst_clk,
-	  clk_out2 => open,
-	  reset => ctl_rst,
-	  locked => s_locked);
+      inst_mmcm_100_to_100_50_and_25 : component mmcm_100_to_100_50_and_25_top
+       	port map (
+         	clk_in_100_MHz => ctl_clk,
+         	clk_out_100_MHz => s_src_clk,
+          clk_out_50_MHz => s_dst_clk,
+         	clk_out_25_MHz => open,
+         	reset => ctl_rst,
+         	locked => s_locked);
 
-    end generate gen_2_to_1_clk;
+     end generate gen_2_to_1_clk;
 
-    gen_4_to_1_clk : if (dst_clk_hz = 25000000.0) generate
+     gen_4_to_1_clk : if (dst_clk_hz = 25000000.0) generate
 
-      s_src_clk <= ctl_clk;
-       inst_mmcm_100_to_50_and_25 : component mmcm_100_to_50_and_25
-	 port map (
-	  clk_in1 => ctl_clk,
-	  clk_out1 => open,
-	  clk_out2 => s_dst_clk,
-	  reset => ctl_rst,
-	  locked => s_locked);
+       inst_mmcm_100_to_100_50_and_25 : component mmcm_100_to_100_50_and_25_top
+         port map (
+           clk_in_100_MHz => ctl_clk,
+           clk_out_100_MHz => s_src_clk,
+           clk_out_50_MHz => open,
+           clk_out_25_MHz => s_dst_clk,
+           reset => ctl_rst,
+           locked => s_locked);
 
-    end generate gen_4_to_1_clk;
+      end generate gen_4_to_1_clk;
 
   end generate gen_diff_clk_freq;
 

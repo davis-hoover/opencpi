@@ -46,7 +46,7 @@ architecture rtl of worker is
   signal s_pulse_fifo_dout : std_logic_vector(0 downto 0) := (others => '0');
 
   begin
-	
+
    gen_clk : entity work.gen_clk
       generic map (src_clk_hz => c_src_clk_hz,
                    dst_clk_hz => c_dst_clk_hz)
@@ -70,8 +70,6 @@ architecture rtl of worker is
               synced_src_to_dst_rst => s_synced_src_to_dst_rst);
 
     out_out.clk <= s_dst_clk;
-
-
 
     s_pulse_src_in <= '1' when (s_data_gen_en = '1') else '0';
 
