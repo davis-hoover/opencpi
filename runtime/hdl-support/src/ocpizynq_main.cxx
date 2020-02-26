@@ -22,7 +22,8 @@
   "Usage syntax is: ocpizynq [options] <command>\n" \
   "  Commands are:\n" \
   "    clocks  - print how the clocks are configured\n" \
-  "    axi_hp   - print how the axi_hp interfaces are configured\n"
+  "    axi_hp   - print how the axi_hp interfaces are configured\n" \
+  "    spi      - print how the spi interfaces are configured\n"
 
 //          name      abbrev  type    value description
 #define OCPI_OPTIONS \
@@ -71,6 +72,14 @@ static uint8_t *map(off_t addr, size_t arg_size) {
     return NULL;
   }
   return ((uint8_t*)ptr) + (addr - base);
+}
+
+void print_spi_idx_msg(unsigned idx, const char* msg, ...) {
+  va_list arg;
+  va_start(arg, msg);
+  printf("SPI%u: ", idx);
+  vfprintf(stdout, msg, arg);
+  va_end(arg);
 }
 
 int
@@ -237,6 +246,25 @@ mymain(const char **argv) {
     volatile DEVCFG *devcfg = (volatile DEVCFG *)map(DEVCFG_ADDR, sizeof(DEVCFG));
     printf("ctrl 0x%x lock 0x%x cfg 0x%x int_sts 0x%x int_mask 0x%x status 0x%x\n",
 	   devcfg->ctrl, devcfg->lock, devcfg->cfg, devcfg->int_sts, devcfg->int_mask, devcfg->status);
+  } else if (cmd == "spi") {
+    struct SPI_ARRAY {
+      SPI spi[NSPIS];
+    };
+    volatile SPI_ARRAY *spi_array= (volatile SPI_ARRAY *)map(SPI_ADDR, sizeof(SPI_ARRAY));
+    volatile SPI *spi = spi_array->spi;
+    for (unsigned n = 0; n < NSPIS; n++, spi++) {
+      print_spi_idx_msg(n, "SPI Configuration: 0x%x\n", spi->cr_offset);
+      print_spi_idx_msg(n, "SPI Interrupt Status: 0x%x\n", spi->sr_offset);
+      print_spi_idx_msg(n, "Interrupt Enable: 0x%x\n", spi->ier_offset);
+      print_spi_idx_msg(n, "Interrupt disable: 0x%x\n", spi->idr_offset);
+      print_spi_idx_msg(n, "Interrupt mask: 0x%x\n", spi->imr_offset);
+      print_spi_idx_msg(n, "SPI Controller Enable: 0x%x\n", spi->er_offset);
+      print_spi_idx_msg(n, "Delay Control: 0x%x\n", spi->dr_offset);
+      print_spi_idx_msg(n, "Slave Idle Count: 0x%x\n", spi->sicr_offset);
+      print_spi_idx_msg(n, "TX_FIFO Threshold: 0x%x\n", spi->txwr_offset);
+      print_spi_idx_msg(n, "RX_FIFO Threshold: 0x%x\n", spi->rx_thresh_reg0);
+      print_spi_idx_msg(n, "Module ID: 0x%x\n", spi->mod_id_reg0);
+    }
   }
   return 0;
 }
