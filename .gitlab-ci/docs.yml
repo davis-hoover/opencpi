@@ -3,32 +3,26 @@ build:pages:
   tags:
     - docker
   image: $CI_REGISTRY_IMAGE/build-pages:latest
-  artifacts:
-    paths:
-      - .public/
-  # Overwrite default before and after script
-  before_script: []
-  after_script: []
   dependencies:
+  before_script: []
   script:
     - make doc
     - mkdir -p .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
     - mv doc/pdfs/* .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
-
+  after_script: []
+  artifacts:
+    paths:
+      - .public/
 
 trigger-downstream:
   stage: deploy
   tags:
     - docker
   image: $CI_REGISTRY_IMAGE/build-pages:latest
-  artifacts:
-    paths:
-      - .public/
-  before_script: []
-  after_script: []
   only:
     - develop
     - tags
+  before_script: []
   script:
     - >
       curl --request POST 
@@ -36,4 +30,24 @@ trigger-downstream:
       --form ref=develop
       --form "variables[JOB_ID]=$CI_JOB_ID"
       https://gitlab.com/api/v4/projects/16024285/trigger/pipeline
+  after_script: []
+  artifacts:
+    paths:
+      - .public/
 
+# This just redirects gitlab.com/opencpi to opencpi.gitlab.io/releases/develop
+pages:
+  stage: deploy
+  tags:
+   - docker
+  image: centos:latest
+  only:
+   - develop
+  dependencies:
+  before_script: []
+  script:
+    - mv .gitlab/public/ .
+  after_script: []
+  artifacts:
+    paths:
+      - public/
