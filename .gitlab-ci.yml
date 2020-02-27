@@ -42,17 +42,17 @@ default:
 #   - .yml files for target platform (e.g., xilinx13_4.yml, xsim.yml, zed.yml)
 include:
   # .gitlab-ci
-   - /.gitlab-ci/templates.yml
-   - /.gitlab-ci/docs.yml
-   - /.gitlab-ci/centos6.yml
-   - /.gitlab-ci/centos7.yml
+  - /.gitlab-ci/templates.yml
+  - /.gitlab-ci/docs.yml
+  - /.gitlab-ci/centos6.yml
+  - /.gitlab-ci/centos7.yml
 
   # centos6
-   - /.gitlab-ci/centos6/xilinx13_3.yml
-   - /.gitlab-ci/centos6/xilinx13_4.yml
-   - /.gitlab-ci/centos6/xsim.yml
+  - /.gitlab-ci/centos6/xilinx13_3.yml
+  - /.gitlab-ci/centos6/xilinx13_4.yml
+  - /.gitlab-ci/centos6/xsim.yml
   
-  # centos7
-   - /.gitlab-ci/centos7/xilinx13_3.yml
-   - /.gitlab-ci/centos7/xilinx13_4.yml
-   - /.gitlab-ci/centos7/xsim.yml
+  # # centos7
+  - /.gitlab-ci/centos7/xilinx13_3.yml
+  - /.gitlab-ci/centos7/xilinx13_4.yml
+  - /.gitlab-ci/centos7/xsim.yml
