@@ -39,7 +39,38 @@ exports=$platform.exports
 echo Performing local exports into the $lib/ subdirectory for platform $platform, using $exports
 [ -e $exports ] || (echo Exports file \"$exports\" is missing. && exit 1)
 
-rm -r -f $lib
+# FIXME: Share this functionality with makeExportLinks.sh or makeProjectExports.sh
+function make_link {
+  # echo make_link $1 $2
+  # Figure out what the relative prefix should be
+  local L
+  from=$2
+  if [ -L $2 ]; then
+    L=$(readlink $2)
+  elif [ -d $2 ]; then
+    from=$2/$(basename $1)
+    if [ -L $from ]; then
+	L=$(readlink $from)
+    elif [ -e $from ]; then
+      echo "File '$from' already exists and is not a symbolic link (when doing $2 -> $1)"
+      exit 1
+    fi
+  elif [ -e $2 ]; then
+    echo File $2 already exists, as a regular file, when trying to link to $1
+    exit 1
+  fi
+  if [ "$L" = "$1" ]; then
+      echo Symbolic link already correct from $from to $1.
+      return 0
+  elif [ -n "$L" ]; then
+      echo Symbolic link is wrong from $from to $1 \(was $L\), replacing it.
+      rm $2
+  fi
+  [[ $from == */* ]] && mkdir -p $(dirname $from)
+  # echo ln -s $1 $from
+  ln -s $1 $from
+}
+
 sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local export deploy; do
   # echo "tag: '$tag' local: '$local' export: '$export' deploy: '$deploy'"
   # For runtime or devel, the RHS (export) is relative to the CDK top, which usually means
@@ -74,13 +105,13 @@ sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local ex
   fi
   # add ../ for each level that is in the export that is in subdirs
   [[ "$export" == */* ]] && tmp=${export%%+([^/])} && prefix=$(echo $tmp|sed 's/[^/][^/]*\//..\//g')
-  for i in $(set -vx; shopt -s nullglob; echo $local); do
-      ln -s ../$prefix$i $lib${export:+/}$export
+  for i in $(shopt -s nullglob; echo $local); do
+      make_link ../$prefix$i $lib${export:+/}$export
   done
 done
 # Export the default files that should not be mentioned in the exports file
 # This list is the union of common files to export from all types of platforms
 for i in $platform.mk $platform-check.sh $platform-packages.sh $*; do
-    [ -e $i ] && ln -s ../$i $lib || :
+    [ -e $i ] && make_link ../$i $lib || :
 done
 echo Exports for the \"$platform\" created in \"$lib\".
