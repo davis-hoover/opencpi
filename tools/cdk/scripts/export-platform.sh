@@ -45,10 +45,11 @@ function make_link {
   # Figure out what the relative prefix should be
   local L
   from=$2
+  [[ $2 == */ ]] && mkdir -p $2
   if [ -L $2 ]; then
     L=$(readlink $2)
   elif [ -d $2 ]; then
-    from=$2/$(basename $1)
+    from=${2%/}/$(basename $1)
     if [ -L $from ]; then
 	L=$(readlink $from)
     elif [ -e $from ]; then
@@ -64,7 +65,7 @@ function make_link {
       return 0
   elif [ -n "$L" ]; then
       echo Exports link is wrong from $from to $1 \(was $L\), replacing it.
-      rm $2
+      rm $from
   fi
   [[ $from == */* ]] && mkdir -p $(dirname $from)
   # echo ln -s $1 $from
@@ -83,9 +84,6 @@ function make_link {
        case $export in
 	   (\<target\>*|\<platform\>*)             # leading <platform> or <target>
 	       export=${export#*/};;               # strip leading <platform> or <target>
-	   (?*)
-	       echo export \"$export\" is to some non-platform place - UNEXPECTED and ignored
-	       continue;;
        esac;;
       (@) # deployment
         [[ "$export" == \<[a-z]*[-_]platform[-_]dir\> ]] && continue # skip cross-platform exports here
@@ -104,6 +102,7 @@ function make_link {
      mkdir -p $lib
   fi
   # add ../ for each level that is in the export that is in subdirs
+  prefix=
   [[ "$export" == */* ]] && tmp=${export%%+([^/])} && prefix=$(echo $tmp|sed 's/[^/][^/]*\//..\//g')
   for i in $(shopt -s nullglob; echo $local); do
       make_link ../$prefix$i $lib${export:+/}$export
