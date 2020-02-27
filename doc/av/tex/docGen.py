@@ -488,9 +488,9 @@ def emit_datasheet_tex_file(comp_name, copyright, prompt):
     UC_NAME = (" ".join(re.split('[-_]', comp_name))).title()
     LC_NAME = latexify(comp_name)
 
-    if not prompt:
-        return
-    if not prompt_to_overwrite(datasheet_filename):
+    if not prompt and os.path.isfile(datasheet_filename):
+            return
+    if not prompt_to_overwrite(datasheet_filename, warn_existing=True):
         return
     print_info("emitting {0} (compile using rubber -d {0})".format(datasheet_filename))
     j_template = LATEX_JINJA_ENV.get_template("Component_Template.tex")
@@ -610,7 +610,7 @@ def emit_latex_inc_files(component, worker_dict, copyright, prompt):
 def emit_developer_doc_inc_file(copyright, prompt):
     """ Creates "main" developer doc that they probably DON'T want to edit """
     DEVELOPER_DOC_INC_FILENAME = 'developer_doc.inc'
-    if not prompt:
+    if not prompt and os.path.isfile(DEVELOPER_DOC_INC_FILENAME):
         return
     if not prompt_to_overwrite(DEVELOPER_DOC_INC_FILENAME, warn_existing=True):
         return
