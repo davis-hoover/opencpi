@@ -92,7 +92,7 @@ cat > $dir/$platform.mk <<-EOF
 	EOF
 cat > $dir/$platform.exports <<-EOF
 	# kernel exports for driver building - just the headers package, and only for development
-	+<platform-dir>/gen/kernel-artifacts/kernel-headers.tgz <target>/
+	+<platform-dir>/gen/kernel-artifacts/kernel-headers.tgz
 
 	# Release files for hdl platforms for this rcc platform
 	# This assumes that all the files from release artifacts are hdl platform-specific
@@ -100,14 +100,14 @@ cat > $dir/$platform.exports <<-EOF
 	# so in all cases boot files appear hdl-platfform-specific
 	# These (development) files will be used during deployment to create SD card (boot) files
 	# This implies you need a development package to make the SD cards
-	+<platform-dir>/gen/release-artifacts/* <target>/hdl/
+	+<platform-dir>/gen/release-artifacts/* hdl/
 
 	# sdk - just the libs, needed at runtime for ocpiremote, and for deployment
-	=<platform-dir>/gen/sdk-artifacts/lib <target>/sdk/
+	=<platform-dir>/gen/sdk-artifacts/lib sdk/
 
 
 	# Use the default zynq file unless overridden by hardware
-	=platforms/zynq/zynq_system.xml <target>/system.xml
+	=platforms/zynq/zynq_system.xml system.xml
 	EOF
 make -C $projdir exports # pre local exports (no lib/)
 make -C $dir exports

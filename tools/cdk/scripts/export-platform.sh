@@ -36,8 +36,8 @@ base=$(basename `pwd`)
 [ $base = lib ] && cd ..
 platform=$(basename `pwd`)
 exports=$platform.exports
-echo Performing local exports into the $lib/ subdirectory for platform $platform, using $exports
-[ -e $exports ] || (echo Exports file \"$exports\" is missing. && exit 1)
+echo Performing local exports into the $lib/ subdirectory for platform $platform.
+[ -e $exports ] && echo Exports file \"$exports\" will be processed || :
 
 # FIXME: Share this functionality with makeExportLinks.sh or makeProjectExports.sh
 function make_link {
@@ -60,10 +60,10 @@ function make_link {
     exit 1
   fi
   if [ "$L" = "$1" ]; then
-      echo Symbolic link already correct from $from to $1.
+      echo Exports link already correct from $from to $1.
       return 0
   elif [ -n "$L" ]; then
-      echo Symbolic link is wrong from $from to $1 \(was $L\), replacing it.
+      echo Exports link is wrong from $from to $1 \(was $L\), replacing it.
       rm $2
   fi
   [[ $from == */* ]] && mkdir -p $(dirname $from)
@@ -71,7 +71,7 @@ function make_link {
   ln -s $1 $from
 }
 
-sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local export deploy; do
+[ -e $exports ] && sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local export deploy; do
   # echo "tag: '$tag' local: '$local' export: '$export' deploy: '$deploy'"
   # For runtime or devel, the RHS (export) is relative to the CDK top, which usually means
   # the platform's subdir - i.e. a leading <target> or <platform>
@@ -89,7 +89,7 @@ sed -n 's/^ *\([+=@]\) *\([^#]*\).*$/\1 \2/p' $exports | while read tag local ex
        esac;;
       (@) # deployment
         [[ "$export" == \<[a-z]*[-_]platform[-_]dir\> ]] && continue # skip cross-platform exports here
-        [ -z "$export" ] && echo Cannot do deployment export with no RHS.  There is no default. && exit 1
+        [ -z "$export" ] && export=/ || :
 	[[ "$export" == /* ]] && export=${export#/} # root is permissable, and stripped here
 	export=deploy/$export  # deployment exports are put in their own subdir: deploy, under the local dir
         ;;

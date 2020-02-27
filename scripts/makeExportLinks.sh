@@ -193,7 +193,13 @@ function do_addition {
       *\<target\>*|*\<platform\>*|*\<platform[-_]dir\>*) return;;
   esac
   exp=${both[1]}
-  [ -z "$exp" ] && bad unexpected empty second field
+  if [ -z "$exp" ]; then
+      if [ "$2" = "--" ]; then
+	  exp=/
+      else
+	  exp="<platform>/"
+      fi
+  fi
   rawsrc=${both[0]}
   if [[ $rawsrc == \<platform[-_]dir\>/* ]]; then
     # This is an export from a platform's own directory, which is already pre-staged for us in the
