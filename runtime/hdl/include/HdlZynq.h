@@ -164,6 +164,27 @@ namespace OCPI {
 	  pad8[(0x530-0x448-4)/4],
 	  pss_idcode;
       };
+      const uint32_t SPI_ADDR = 0xe0006000;
+      struct SPI {
+        uint32_t
+          cr_offset,
+          sr_offset,
+          ier_offset,
+          idr_offset,
+          imr_offset,
+          er_offset,
+          dr_offset,
+          txd_offset,
+          rxd_offset,
+          sicr_offset,
+          txwr_offset,
+          rx_thresh_reg0,
+          pad0[(0xfc - 0x2c - 4)/4],
+          mod_id_reg0,
+          pad1[(0x1000 - 0xfc - 4)/4]; // pad between 7 series spi0 last register and 0xE0007000 spi1
+      }; // ref ug585-Zynq-7000-TRM.pdf
+#define NSPIS 2
+
 #ifdef __cplusplus
     }
   }

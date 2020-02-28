@@ -263,15 +263,23 @@ generate_pdfs() {
         for ext in *docx *pptx *odt *odp; do
             # Get the name of the file without the file extension
             ofile=${ext%.*}
-            echo "${BOLD}office: $d/$ext ${prefix+(output prefix=${prefix})}${RESET}"
-            warn_existing_pdf "${OUTPUT_PATH}/${prefix}" ${ofile} $d && continue
-            unoconv -vvv $ext >> ${log_dir}/${ofile}.log 2>&1
-            # If the pdf was created then copy it out
-            if [ -f $ofile.pdf ]; then
-                mv ${ofile}.pdf ${OUTPUT_PATH}/${prefix}/
+            echo "${BOLD}office: ${d}/${ext} ${prefix+(output prefix=${prefix})}${RESET}"
+            warn_existing_pdf "${OUTPUT_PATH}/${prefix}" "${ofile}" "${d}" && continue
+            rv=0
+            if [ "${prefix}" = tutorials ]; then
+              bash "${GEN_CG_PDFS_SH}" "${ext}" "${PWD}" >> "${log_dir}/${ofile}.log" 2>&1
+              rv=$?
             else
-              echo "${RED}Error creating $ofile.pdf${RESET}"
-              echo "Error creating $ofile.pdf ($d)" >> ${OUTPUT_PATH}/errors.log
+              unoconv -vvv "${ext}" >> "${log_dir}/${ofile}.log" 2>&1
+              rv=$?
+            fi
+
+            # If the pdf was created then copy it out
+            if [ ${rv} -eq 0 ]; then
+              mv ./*.pdf "${OUTPUT_PATH}/${prefix}"
+            else
+              echo "${RED}Error creating ${ofile}.pdf${RESET}"
+              echo "Error creating ${ofile}.pdf (${d})" >> "${OUTPUT_PATH}/errors.log"
             fi
         done
 
@@ -279,15 +287,16 @@ generate_pdfs() {
         export -f tex_kernel warn_existing_pdf
         export OUTPUT_PATH
         texfs=$(echo *tex */*tex)
-        [ -z "${texfs}" ] && continue
-        if [ -z "$(command -v parallel)" -o -n "${JENKINS_HOME}" ]; then
-          echo "${texfs// /$'\n'}" | xargs -I+ bash -c "tex_kernel $d $prefix $log_dir +"
-        else
-          echo "${texfs// /$'\n'}" | parallel -j ${JOBS} tex_kernel $d $prefix $log_dir
+        if [ -n "${texfs}" ]; then
+          if [ -z "$(command -v parallel)" -o -n "${JENKINS_HOME}" ]; then
+            echo "${texfs// /$'\n'}" | xargs -I+ bash -c "tex_kernel $d $prefix $log_dir +"
+          else
+            echo "${texfs// /$'\n'}" | parallel -j ${JOBS} tex_kernel $d $prefix $log_dir
+          fi
         fi
+
         popd || return 1
     done
-    rm -rf ${UNO_TMP}
 }
 
 ###
@@ -474,11 +483,18 @@ while [[ $# -gt 0 ]]; do
 done
 # Do not try to access parameters to the script past this
 
+GEN_CG_PDFS_SH="${REPO_PATH}/doc/tutorials/gen-cg-pdfs.sh"
+
 enable_color
 # Failures
 [ ! -r ${REPO_PATH} ] && show_help "\"${REPO_PATH}\" not readable by $USER. Consider using a different repo path."
 [ ! -d "${REPO_PATH}/doc/av" ] && show_help "\"${REPO_PATH}\" doesn't seem to be correct. Could not find doc/av/."
 [ -d "${OUTPUT_PATH}" ] && show_help "\"${OUTPUT_PATH}\" already exists"
+if [ ! -f "$GEN_CG_PDFS_SH" ]; then
+  echo "Could not find $GEN_GEN_CG_PDFS_SH"
+  echo "This script is required to properly convert the tutorials to pdfs"
+  exit 1
+fi
 
 # Warnings
 echo -n "${RED}"
