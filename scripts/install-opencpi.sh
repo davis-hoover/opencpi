@@ -71,9 +71,5 @@ eval $* ./build/build-opencpi.sh $platform
 if [ -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform" ]; then
   echo When building/installing for cross-compiled platform $platform, we are skipping tests.
 else
-  # This script suppresses any HDL testing
-  export HdlPlatforms=
-  export HdlPlatform=
-  export HDL_PLATFORM=
-  eval $* ./scripts/test-opencpi.sh
+  eval $* ./scripts/test-opencpi.sh --no-hdl
 fi
