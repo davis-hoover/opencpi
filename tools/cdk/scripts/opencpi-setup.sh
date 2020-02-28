@@ -241,15 +241,11 @@ else
   [ -n "$ocpi_optimized" ] && OCPI_TOOL_DIR+=o
   # This is (temporarily) redundant with ocpibootstrap.sh
   [ -z "$OCPI_PREREQUISITES_DIR" ] && {
-#    if [ -n "$OCPI_CDK_DIR" -a -d "$OCPI_CDK_DIR/../prerequisites" ]; then
-      export OCPI_PREREQUISITES_DIR=$OCPI_CDK_DIR/../prerequisites
-      [ -d $OCPI_PREREQUISITES_DIR ] && export OCPI_PREREQUISITES_DIR=$(cd $OCPI_PREREQUISITES_DIR; pwd)
-#    else
-#      export OCPI_PREREQUISITES_DIR=/opt/opencpi/prerequisites
-#    fi
-    if [ ! -d $OCPI_PREREQUISITES_DIR ]; then
-      echo "$ocpi_name: warning: $OCPI_PREREQUISITES_DIR does not exist.  The installation/build of OpenCPI is incomplete."
-#      return 1
+    export OCPI_PREREQUISITES_DIR=$OCPI_CDK_DIR/../prerequisites
+    if [ -d $OCPI_PREREQUISITES_DIR ]; then
+      export OCPI_PREREQUISITES_DIR=$(cd $OCPI_PREREQUISITES_DIR; pwd)
+    else
+      echo "$ocpi_name: warning: $OCPI_PREREQUISITES_DIR does not exist.  The installation/build of OpenCPI is incomplete." >&2
     fi
   }
   [ "$ocpi_verbose" = 1 ] &&

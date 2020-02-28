@@ -198,7 +198,8 @@ echo Preparing the kernel-headers tree based on the built kernel.
 rm -r -f kernel-headers-$tag kernel-headers
 mkdir kernel-headers
 # copy that avoids errors when caseinsensitive file systems are used (MacOS...)
-#cp -R ../git/linux-xlnx/{Makefile,Module.symvers,include,scripts,arch} kernel-headers
+# otherwise it would be:
+#    cp -R ../git/linux-xlnx/{Makefile,Module.symvers,include,scripts,arch} kernel-headers
 (cd $gdir/linux-xlnx;
   for f in Makefile Module.symvers include scripts arch/$karch .config; do
     find $f -type d -exec mkdir -p $RELDIR/kernel-headers/{} \;
@@ -241,4 +242,4 @@ echo Removing unused large headers
 rm -rf kernel-headers/include/linux/{mfd,platform_data}
 echo Creating the compressed archive for kernel headers
 tar -c -z -f kernel-headers.tgz kernel-headers
-#rm -r -f kernel-headers
+rm -r -f kernel-headers

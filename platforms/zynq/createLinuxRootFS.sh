@@ -53,7 +53,6 @@ if test ! -d $rdir; then
   exit 1
 fi
 # Protect against sym links for the git subdir for case sensitivity
-#cd opencpi-zynq-linux-release-$rel
 cd gen
 echo Patching the root file system from the Xilinx binary release to the OpenCPI release
 FROM=`pwd`

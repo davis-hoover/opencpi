@@ -127,23 +127,3 @@ for d in $dir/*; do
      fakeroot cpio -i --quiet -d -H newc -F $tmp/rootfs.cpio --no-absolute-filenames -f "var/*")
     rm $tmp/rootfs.cpio
 done
-
-exit 0
-
-	echo Here is original boot dir:
-	ls -l boot
-	mkdir -p gen/patch_ub_image
-	mv boot/image.ub gen/patch_ub_image
-	set -evx; cd gen/patch_ub_image; \
-	PATH=$$PATH:$(local_repo)/u-boot-xlnx/tools:$(local_repo)/linux-xlnx/scripts/dtc; \
-	echo Dumping metadata for image.ub; \
-	dumpimage -l image.ub; \
-	dumpimage -T flat_dt -i image.ub -p 0 old-kernel; \
-	dumpimage -T flat_dt -i image.ub -p 1 old-dtb; \
-	dumpimage -T flat_dt -i image.ub -p 2 uramdisk.image.gz; \
-	dumpimage -i $(kernel_image) -p 0 new-kernel; \
-	cmp ../../boot/system.dtb old-dtb; \
-	cp ../../test.its test.its; \
-	mkimage -f test.its new_image.ub; \
-	dumpimage -l new_image.ub; \
-	cp new_image.ub ../../boot/image.ub
