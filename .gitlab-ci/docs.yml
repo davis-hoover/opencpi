@@ -22,6 +22,7 @@ trigger-downstream:
   only:
     - develop
     - tags
+  dependencies:
   before_script: []
   script:
     - >
