@@ -186,19 +186,35 @@ function make_filtered_link {
   make_relative_link $1 $2
 }
 
-# process an addition ($1), and $2 is non-blank for runtime
+# process an addition ($1), and $2 is non-blank for runtime (-- for deploy)
 function do_addition {
   declare -a both=($(echo $1 | tr : ' '))
   [ "$target" = - ] && case $1 in
-      *\<target\>*|*\<platform\>*|*\<platform_dir\>*) return;;
+      *\<target\>*|*\<platform\>*|*\<platform[-_]dir\>*) return;;
   esac
-  rawsrc=${both[0]//<target>/$target2}
-  rawsrc=${rawsrc//<platform>/$platform}
-  rawsrc=${rawsrc/#<platform_dir>/$platform_dir}
-  [ -n "$rcc_platform_dir" ] && rawsrc=${rawsrc/#<rcc_platform_dir>/$rcc_platform_dir}
-  [ -n "$rcc_platform" ] && rawsrc=${rawsrc//<rcc_platform>/$rcc_platform}
   exp=${both[1]}
-  [ -z "$exp" ] && bad unexpected empty second field
+  if [ -z "$exp" ]; then
+      if [ "$2" = "--" ]; then
+	  exp=/
+      else
+	  exp="<platform>/"
+      fi
+  fi
+  rawsrc=${both[0]}
+  if [[ $rawsrc == \<platform[-_]dir\>/* ]]; then
+    # This is an export from a platform's own directory, which is already pre-staged for us in the
+    # platform's own exports dir
+    rawsrc=${exp#<platform>/}
+    rawsrc=${rawsrc#<target>/}
+    [[ "$exp" == */ ]] && rawsrc+=$(basename ${both[0]}) # if RHS was just a dir with trailing slash...
+    [ "$2" = "--" ] && rawsrc=deploy/${rawsrc#/}
+    rawsrc=$platform_dir/$rawsrc
+  fi
+  rawsrc=${rawsrc//<target>/$target2}
+  rawsrc=${rawsrc//<platform>/$platform}
+  rawsrc=${rawsrc/#<platform[-_]dir>/$platform_dir}
+  [ -n "$rcc_platform_dir" ] && rawsrc=${rawsrc/#<rcc[-_]platform[-_]dir>/$rcc_platform_dir}
+  [ -n "$rcc_platform" ] && rawsrc=${rawsrc//<rcc[-_]platform>/$rcc_platform}
   if [ "$2" = "--" ]; then
       # If deployment(@) replace make sure there is deploy/<target>
       if [[ "${exp}" =~ ^deploy/ ]]; then
@@ -213,7 +229,7 @@ function do_addition {
   exp=${exp//<platform>/$platform}
   exp=${exp//<target>/$target2}
   if [ -n "$rcc_platform" ]; then
-     exp=${exp//<rcc_platform>/$rcc_platform}
+     exp=${exp//<rcc[-_]platform>/$rcc_platform}
   fi
   set +f
   targets=$(match_pattern "$rawsrc")

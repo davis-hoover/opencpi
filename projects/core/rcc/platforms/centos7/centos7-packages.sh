@@ -120,6 +120,8 @@ PKGS_E+=(fakeroot)
 PKGS_E+=(ocl-icd)
 #    Needed to build gpsd
 PKGS_E+=(python2-scons)
+#    Needed to build certain linux kernels or u-boot, at least Xilinx 2015.4
+PKGS_E+=(dtc)
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {

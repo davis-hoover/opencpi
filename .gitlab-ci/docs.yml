@@ -26,7 +26,7 @@ trigger-downstream:
   before_script: []
   script:
     - >
-      curl --request POST 
+      curl --request POST
       --form token=$CI_JOB_TOKEN
       --form ref=develop
       --form "variables[JOB_ID]=$CI_JOB_ID"

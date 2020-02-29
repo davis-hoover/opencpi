@@ -20,7 +20,7 @@
 set -e
 if test "$1" = "" -o "$1" = "--help" -o "$1" = "-help"; then
   cat <<EOF
-This script establishes a local clone of the Xilinx Linux kernel source tree, as well as a
+This script establishes a local clone of the Xilinx Linux kernel source trees, as well as a
 clone of the Xilinx u-boot source tree.  It will not checkout the git trees for a tag/branch.
 Tags can be listed with the ./showXilinxLinuxTags.sh script.
 Thus the user has the option of specifying the desired tags to the follow-on script:
