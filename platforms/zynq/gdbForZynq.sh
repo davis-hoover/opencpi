@@ -39,12 +39,14 @@ shift
 plat=$1
 [ $plat = - ] && plat=$OCPI_TARGET_PLATFORM
 shift
+hdl=$1
+shift
 # assume the current target is a zynq target
 source $OCPI_CDK_DIR/scripts/util.sh
 source $OCPI_CDK_DIR/scripts/ocpitarget.sh $plat
 exec ${OCPI_TARGET_CROSS_COMPILE}gdb \
   $main \
-  -ex "set sysroot $OCPI_CDK_DIR/platforms/$plat/release/uramdisk/root" \
+  -ex "set sysroot $OCPI_TARGET_PLATFORM_DIR/release/$hdl/root" \
   -ex "set solib-search-path $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib:$(getProjectRegistryDir)/ocpi.core/exports/lib/components/rcc/$OCPI_TARGET_DIR" \
   -ex "target remote ${addr}:1234" \
   $*

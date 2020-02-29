@@ -54,7 +54,7 @@
 #   options, functionality, and usage of this file and the vivado tool with
 #   OpenCPI
 
-include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
+include $(OCPI_CDK_DIR)/include/xilinx/xilinx.mk
 
 
 ################################################################################

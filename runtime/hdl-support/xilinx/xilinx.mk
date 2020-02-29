@@ -97,26 +97,29 @@ OcpiXilinxIseInit=\
   . $(OcpiXilinxIseDir)/settings64.sh $(and $1,> $1); \
   export LM_LICENSE_FILE=$(OcpiXilinxLicenseFile)
 
-# Looks for the Vivado SDK dir
-OcpiXilinxSdkDir=$(strip\
-$(foreach t,$(OcpiXilinxDir)/SDK,\
+# Looks for the Vivado SDK dir or Vitis (2019.2+)
+OcpiXilinxSdkTry=$(strip\
   $(foreach i,\
       $(foreach v,\
         $(if $(filter-out undefined,$(origin OCPI_XILINX_VIVADO_SDK_VERSION)),\
           $(foreach e,$(OCPI_XILINX_VIVADO_SDK_VERSION),\
-            $(if $(shell test -d $t/$e && echo 1),$e,\
-              $(call $(or $1,error), Directory "$t/$e", for OCPI_XILINX_VIVADO_SDK_VERSION, not found))),\
+            $(if $(shell test -d $1/$e && echo 1),$e,\
+              $(call $(or $2,error), Directory "$1/$e", for OCPI_XILINX_VIVADO_SDK_VERSION, not found))),\
           $(or $(shell for i in \
-                        `shopt -s nullglob && echo $t/*  | tr ' ' '\n' | sort -n -r`; \
+                        `shopt -s nullglob && echo $1/*  | tr ' ' '\n' | sort -n -r`; \
                        do \
                          [ -d $$i -a -r $$i/settings*.sh ] && echo `basename $$i` && break; \
                        done),\
-            $(call $(or $1,error), No valid version directory under $t/* for Xilinx Vivado SDK))),\
-        $(infox VV:$v)$(call OcpiXilinxDir,$1)/SDK/$v),\
+            $(call $(or $2,error), No valid version directory under $1/* for Xilinx Vivado SDK))),\
+        $(infox VV:$v)$1/$v),\
     $(infox II:$i.)\
     $(if $(shell test -d $i && echo 1),$i,\
-      $(call $(or $1,error), Directory "$i", in $$OCPI_XILINX_DIR/SDK, not found)))))
+      $(call $(or $2,error), Directory "$i", in $$OCPI_XILINX_DIR/SDK, not found))))
 
+OcpiXilinxSdkDir=$(strip\
+  $(foreach d,$(call OcpiXilinxDir,$1),\
+    $(or $(call OcpiXilinxSdkTry,$d/SDK,ignore),$(call OcpiXilinxSdkTry,$d/Vitis,ignore),\
+       $($1 Could not find a Xilinx SDK in $d/SDK or $d/Vitis$(and $(OCPI_XILINX_VIVADO_SDK_VERSION), for $(OCPI_XILINX_VIVADO_SDK_VERSION))))))
 
 # Return the directory where Vivado lives, which as a default is usually /opt/Xilinx/Vivado
 OcpiXilinxTryVivadoDir=$(strip $(foreach t,$(or $(OCPI_XILINX_VIVADO_DIR),$(foreach x,$(call OcpiXilinxDir,$1),$x/Vivado)),$(infox TT is $t)\
@@ -169,6 +172,7 @@ XilinxCheck=ignore
 all:
 
 $(info OcpiXilinxIseDir=$(call OcpiXilinxIseDir,$(XilinxCheck));\
+       OcpiXilinxDir=$(call OcpiXilinxDir,$(XilinxCheck)); \
        OcpiXilinxEdkOrSdkDir=$(call OcpiXilinxEdkOrSdkDir,$(XilinxCheck));\
        OcpiXilinxIseEdkDir=$(call OcpiXilinxIseEdkDir,$(XilinxCheck));\
        OcpiXilinxLabToolsDir=$(call OcpiXilinxLabToolsDir,$(XilinxCheck));\

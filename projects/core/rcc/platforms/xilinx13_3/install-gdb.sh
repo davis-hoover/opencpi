@@ -32,7 +32,7 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        binutils-gdb \
        1
 
-../configure --target=$OcpiCrossHost --host=$OcpiCrossHost CFLAGS="-static $OcpiCFlags"
+../configure --target=$OcpiCrossHost --host=$OcpiCrossHost CFLAGS="-static $OcpiCFlags -Wno-error=implicit-fallthrough"
 make MAKEINFO=true -j
 
 # Make a directory for binaries produced from this script
