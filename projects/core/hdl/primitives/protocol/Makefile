@@ -23,12 +23,12 @@ SourceFiles= \
   protocol_pkg.vhd \
   message_sizer.vhd \
   zlm_detector.vhd \
-  complex_short_with_metadata/pkg.vhd \
-  complex_short_with_metadata/body.vhd \
-  complex_short_with_metadata/demarshaller.vhd \
-  complex_short_with_metadata/marshaller.vhd \
-  complex_short_with_metadata/marshaller_old.vhd \
-  iqstream/pkg.vhd \
-  iqstream/body.vhd \
-  iqstream/marshaller.vhd
+  complex_short_with_metadata_pkg.vhd \
+  complex_short_with_metadata_body.vhd \
+  complex_short_with_metadata_demarshaller.vhd \
+  complex_short_with_metadata_marshaller.vhd \
+  complex_short_with_metadata_marshaller_old.vhd \
+  iqstream_pkg.vhd \
+  iqstream_body.vhd \
+  iqstream_marshaller.vhd
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
