@@ -3,7 +3,7 @@ build:pages:
   tags:
     - docker
   image: $CI_REGISTRY_IMAGE/build-pages:latest
-  dependencies:
+  dependencies: []
   before_script: []
   script:
     - make doc
@@ -22,7 +22,7 @@ trigger-downstream:
   only:
     - develop
     - tags
-  dependencies:
+  dependencies: []
   before_script: []
   script:
     - >
@@ -44,7 +44,7 @@ pages:
   image: centos:latest
   only:
    - develop
-  dependencies:
+  dependencies: []
   before_script: []
   script:
     - mv .gitlab/public/ .
