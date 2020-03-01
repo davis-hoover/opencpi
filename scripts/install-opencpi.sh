@@ -59,13 +59,15 @@ rm -r -f $OCPI_TARGET_PLATFORM_DIR/lib
 if [ -f $OCPI_TARGET_PLATFORM_DIR/Makefile ]; then
   echo Building/preparing the software platform \"$platform\" which will enable building other assets for it.
   make -C $OCPI_TARGET_PLATFORM_DIR
-elif [ -f $OCPI_TARGET_PLATFORM_DIR/$platform.exports ]; then
+elif [ -f $OCPI_TARGET_PLATFORM_DIR/$OCPI_TARGET_PLATFORM.exports ]; then
   echo Exporting files from the software platform \"$platform\" which will enable building other assets for it.
   (cd $OCPI_TARGET_PLATFORM_DIR; $OCPI_CDK_DIR/scripts/export-platform.sh lib)
 fi
-echo Exporting the platform \"$platform\" from its project.
+echo Exporting the platform \"$OCPI_TARGET_PLATFORM\" from its project.
 project=$(cd $OCPI_TARGET_PLATFORM_DIR/../../..; pwd)
 project=${project%/exports}
+# Allow bootstrap exports
+make exports
 make -C $project exports
 eval $* ./build/build-opencpi.sh $platform
 if [ -n "$platform" -a "$OCPI_TOOL_PLATFORM" != "$platform" ]; then

@@ -178,7 +178,7 @@ begin
     end find_extent;
   begin
     assert (width_in rem width_out) = 0 report "width_in must be a multiple of width_out";
-    // we cannot propagate an EOF until the EOM has shipped
+    -- we cannot propagate an EOF until the EOM has shipped
     out_eof        <= in_eof and eom_r and not have_data_r and not give_now and out_ready;
     -- Reorganize input data as an array of output words
     g0: for i in 0 to last_c generate
