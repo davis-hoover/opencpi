@@ -1,0 +1,11 @@
+<!-- This is the spec file (OCS) for: peak_detector
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <!-- Add property and port elements here -->
+    <Port Name="in" Protocol="iqstream_protocol"></Port>
+    <Port Name="out" Protocol="iqstream_protocol" Producer="true"></Port>
+    <Property Name="max_peak" Type="short" Volatile="true" Description="Maximum peak value"></Property>
+    <Property Name="min_peak" Type="short" Volatile="true" Description="Minium peak value"></Property>
+</ComponentSpec>

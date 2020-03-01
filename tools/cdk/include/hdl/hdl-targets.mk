@@ -142,10 +142,13 @@ HdlChoosePart=$(strip \
 HdlAllPlatforms:=
 HdlBuiltPlatforms:=
 
+# exports/lib/platforms is going away
 override OCPI_HDL_PLATFORM_PATH:=$(subst $(Space),:,$(call Unique,\
   $(subst :, ,$(OCPI_HDL_PLATFORM_PATH)) \
   $(foreach p,$(OcpiGetExtendedProjectPath),\
-    $(or $(call OcpiExists,$p/exports/lib/platforms),$(call OcpiExists,$p/hdl/platforms)))))
+    $(or $(call OcpiExists,$p/exports/hdl/platforms),$(strip\
+         $(call OcpiExists,$p/exports/lib/platforms)),$(strip\
+         $(call OcpiExists,$p/hdl/platforms))))))
 export OCPI_HDL_PLATFORM_PATH
 $(call OcpiDbgVar,OCPI_HDL_PLATFORM_PATH)
 ################################################################################
@@ -291,7 +294,7 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
        HdlAllTargets="$(HdlAllTargets)";\
        HdlTargets="$(foreach t,$(HdlTopTargets),$(or $(HdlTargets_$t),$t))";\
        $(foreach p,$(HdlAllPlatforms),HdlPart_$p=$(HdlPart_$p); HdlPlatformDir_$p=$(HdlPlatformDir_$p);)\
-       $(foreach p,$(HdlAllPlatforms),HdlAllRccPlatforms_$p=$(HdlAllRccPlatforms_$p); )\
+       $(foreach p,$(HdlAllPlatforms),HdlAllRccPlatforms_$p="$(HdlAllRccPlatforms_$p)"; )\
        $(foreach f,$(HdlAllTargets),\
          $(if $(HdlTargets_$f),HdlTargets_$f="$(HdlTargets_$f)";)\
          $(if $(HdlToolSet_$f),HdlToolSet_$f="$(HdlToolSet_$f)";)\
@@ -304,7 +307,7 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
          HdlToolName_$t="$(or $(HdlToolName_$t),$t)";)\
        $(foreach p,$(HdlAllPlatforms),\
          HdlFamily_$(HdlPart_$p)=$(call HdlGetFamily,$(HdlPart_$p));)\
-	   $(foreach p,$(HdlAllPlatforms),\
-	     HdlPlatformDir_$(p)="$(realpath $(HdlPlatformDir_$(p)))";))
+       $(foreach p,$(HdlAllPlatforms),\
+         HdlPlatformDir_$(p)="$(realpath $(HdlPlatformDir_$(p)))";))
 endif
 endif

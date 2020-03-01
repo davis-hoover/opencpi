@@ -141,8 +141,9 @@ for op in $*; do
              $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/ocpihdl $platform/bin/ocpizynq $platform/system.xml"
       [ -n "$vg" ] && files+=" ../prerequisites/valgrind/$platform"
       [ -x $platform/bin/gdb ] && files+=" $platform/bin/gdb"
-      [ -x $platform/lib/sdk ] && files+=" $platform/lib/sdk"
-      tar -c -z -H -f $tmpdir/tar.tgz $files
+      [ -x runtime/$platform/sdk ] && files+=" $platform/sdk"
+      echo tar -c -z --dereference -f $tmpdir/tar.tgz $files
+      tar -c -z --dereference -f $tmpdir/tar.tgz $files
       do_ssh "test -e $rdir && echo Directory exists && exit 1;
       	      date -u `date -u +%Y.%m.%d-%H:%M:%S`;
 	      mkdir $rdir && echo $platform > $rdir/swplatform && echo $port > $rdir/port &&

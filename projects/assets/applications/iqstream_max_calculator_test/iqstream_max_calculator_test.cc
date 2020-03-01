@@ -27,7 +27,7 @@
 #include <sstream> // std::ostringstream
 #include "OcpiApi.hh"
 
-const int EXIT__TEST_COULD_NOT_COMPLETE=100;
+//const int EXIT__TEST_COULD_NOT_COMPLETE=100;
 
 namespace OA = OCPI::API;
 
@@ -271,15 +271,16 @@ int main(int, char **) {
   unsigned n = 0;
   // When run in a build environment that is suppressing HDL platforms, respect that.
   const char *env = getenv("HdlPlatforms");
-  if (!env || env[0])
-    for (OA::Container *c; (c = OA::ContainerManager::get(n)); n++) {
-      if (c->model() == "hdl") {
-        hdl = true;
-        std::cout << "INIT: found HDL container " << c->name() << ", will run HDL tests" << std::endl;
-      }
-    }
 
   try {
+    if (!env || env[0])
+      for (OA::Container *c; (c = OA::ContainerManager::get(n)); n++) {
+	if (c->model() == "hdl") {
+	  hdl = true;
+	  std::cout << "INIT: found HDL container " << c->name() << ", will run HDL tests" << std::endl;
+	}
+      }
+
     std::cout << "TEST: file_read->RCC worker->file_write\n";
     run_app("iqstream_max_calculator_test_rcc.xml", "max_I_0_Q_0.bin");
     run_app("iqstream_max_calculator_test_rcc.xml", "max_I_0_Q_1024.bin");

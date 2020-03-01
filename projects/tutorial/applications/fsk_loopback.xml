@@ -1,0 +1,91 @@
+<!-- The fsk_loopback application xml file -->
+<Application Done="file_write">
+    <Instance Component="ocpi.core.file_read" Name="file_read">
+        <Property Name="filename" Value="FSK/idata/Os.jpeg"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.comms_comps.mfsk_mapper" Name="mfsk_mapper">
+        <Property Name="symbols" Value="-32768,32767"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.util_comps.zero_pad" Name="zero_pad">
+        <Property Name="num_zeros" Value="38"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="tx_fir">
+        <Property Name="taps" ValueFile="FSK/idata/tx_rrcos_taps.dat"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Name="phase_to_amp_cordic">
+        <Property Name="magnitude" Value="20000"></Property>
+        <Property Name="STAGES" Value="16"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.cic_int" Name="cic_int">
+        <Property Name="R" Value="16"></Property>
+        <Property Name="ACC_WIDTH" Value="28"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.complex_mixer" Name="complex_mixer">
+        <Property Name="enable" Value="False"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.cic_dec" Name="cic_dec">
+        <Property Name="R" Value="16"></Property>
+        <Property Name="ACC_WIDTH" Value="28"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.rp_cordic" Name="rp_cordic">
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="rx_fir">
+        <Property Name="taps" ValueFile="FSK/idata/rx_rrcos_taps.dat"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.baudTracking" Name="baudTracking">
+        <Property Name="SPB" Value="39"></Property>
+        <Property Name="BaudAvrCount" Value="10"></Property>
+    </Instance>
+    <Instance Component="ocpi.assets.dsp_comps.real_digitizer" Name="real_digitizer"></Instance>
+    <Instance Component="ocpi.core.file_write" Name="file_write">
+        <Property Name="filename" Value="out.out"></Property>
+    </Instance>
+    <Connection>
+        <Port Instance="file_read" Name="out"></Port>
+        <Port Instance="mfsk_mapper" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="mfsk_mapper" Name="out"></Port>
+        <Port Instance="zero_pad" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="zero_pad" Name="out"></Port>
+        <Port Instance="tx_fir" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="tx_fir" Name="out"></Port>
+        <Port Instance="phase_to_amp_cordic" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="phase_to_amp_cordic" Name="out"></Port>
+        <Port Instance="cic_int" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="cic_int" Name="out"></Port>
+        <Port Instance="complex_mixer" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="complex_mixer" Name="out"></Port>
+        <Port Instance="cic_dec" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="cic_dec" Name="out"></Port>
+        <Port Instance="rp_cordic" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="rp_cordic" Name="out"></Port>
+        <Port Instance="rx_fir" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="rx_fir" Name="out"></Port>
+        <Port Instance="baudTracking" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="baudTracking" Name="out"></Port>
+        <Port Instance="real_digitizer" Name="in"></Port>
+    </Connection>
+    <Connection>
+        <Port Instance="real_digitizer" Name="out"></Port>
+        <Port Instance="file_write" Name="in"></Port>
+    </Connection>
+</Application>

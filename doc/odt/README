@@ -1,20 +1,28 @@
 This directory contains OpenOffice/LibreOffice Writer documents for OpenCPI.
 Some documents have been converted to LaTex and they are in ../tex and this file does not apply to those.
 
+=== Filenames
+
+Follow the file name convention from other files here, using OpenCPI_ as a prefix, and suppressing any
+final "_Guide".
+Use the .fodt format for all files, and not the .odt format.
+
 === Templates
 
-These documents all use the template here named shared/OCPI_ODT.ott, which must be imported
-into LibreOffice before editing any of these odt documents.
+These documents all use the template here named "shared/OCPI_ODT.ott".
+Unfortunately the LibreOffice Writer GUI does not let you specify a relative pathname for a template
+directly.  So new documents are best copied from older documents that already have the right template
+association.  You can see the current template in an .fodt file by using:
 
-To be sure your template is current, with no documents open, do:
-1. Go to file->templates->manage templates, set upper right pull-down to "my templates"
-2. Click-right on the OCPI_ODT template and delete it (this sometimes crashes LO, but does delete the template)
-3. In manage templates, click "import" and select the "my templates" category, and select shared/OCPI_ODT.ott
+sed -n 's|.*<meta:template[^>]* xlink:href="\([^"]*\)".*|\1|p' <filename>.fodt
 
-If the template is edited modified (inside LO), it should be re-exported into the shared directory.
-Exporting a template will not overwrite the template file -- the destination file must be deleted first.
+If it does not print:
 
-When the template is changed (i.e. by importing it), the next time you load a document it will ask if you want to
+shared/OCPI_ODT.ott
+
+it is wrong.
+
+When the template is changed (i.e. by editing it), the next time you load a document it will ask if you want to
 update with the changed template or "keep old styles".  Do *NOT* say "keep old styles" since this
 permanently disassociates the document from the template.  To re-associate the document with the template
 you must create a new empty file from the template and copy-paste the whole disassociated

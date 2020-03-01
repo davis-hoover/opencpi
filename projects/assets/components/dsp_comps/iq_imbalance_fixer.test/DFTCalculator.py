@@ -108,7 +108,6 @@ class DFTCalculator():
             Frequency value in Hz.
         """
         fs = self.sampled_data.fs
-        #return int(round(float(f)/float(fs)*float(len(self.result.amplitudes))))
         return int(round(float(f)/float(fs)*float(len(self.result.amplitudes))))
 
     def get_freq_for_idx_in_result(self, idx):
@@ -172,7 +171,7 @@ class DFTCalculator():
             msg += ", supported values are None and dB_relative_to_unity"
             raise Exception(msg)
         nn = self.result.get_num_dft_points()
-        result_pos_freqs = self.result.amplitudes[0:int(nn/2)-1]
+        result_pos_freqs = self.result.amplitudes[0:nn//2-1]
         tmp = 20*np.log10(abs(result_pos_freqs) + eps)
         ret = tmp[np.argmax(tmp)]
         return ret
@@ -189,7 +188,7 @@ class DFTCalculator():
             msg += ", supported values are None and dB_relative_to_unity"
             raise Exception(msg)
         nn = self.result.get_num_dft_points()
-        result_neg_freqs = self.result.amplitudes[int(nn/2):nn-1]
+        result_neg_freqs = self.result.amplitudes[nn//2:nn-1]
         tmp = 20*np.log10(abs(result_neg_freqs) + eps)
         ret = tmp[np.argmax(tmp)]
         return ret

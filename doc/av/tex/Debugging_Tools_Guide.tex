@@ -20,7 +20,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Debugging Tools Guide}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 %----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
 \input{\snippetpath/includes}
@@ -31,6 +31,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 %----------------------------------------------------------------------------------------
 \begin{document}
 \maketitle
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 \thispagestyle{fancy}
 \newpage
 
@@ -55,6 +58,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		    \hline
 		    v1.5 & Updated for OpenCPI Release 1.5 and expanded SignalTap section & 4/2019 \\
 		    \hline
+		    v1.6 & Updated for OpenCPI Release 1.6 for new references & 1/2020 \\
+		    \hline
 			\end{tabularx}
 		\end{table}
 	\end{center}
@@ -74,7 +79,7 @@ Xilinx's ChipScope Pro\footnote{Full title: ``ChipScope Pro Software and Cores (
 % So the URL for 14_7 has version 14.3 of the doc, but 14_5 has 14.5...
 \url{http://www.xilinx.com/support/documentation/sw_manuals/xilinx14_5/chipscope_pro_sw_cores_ug029.pdf} \\
 }
-\input{References_Table}
+\input{References_Table_noRPM}
 \newpage
 \section{Debugging RCC Workers}
 RCC workers are built as dynamically loadable shared object files, with the .so suffix.  When an application uses a worker, it will be loaded on demand, even when the executable is statically linked itself.  To debug a worker, it is necessary to first start the debugger on the executable, which is either the ocpirun utility program or an ACI application.  In either case the first step is to run the executable under the debugger, establishing a generic breakpoint to enter the debugger at a point after workers are loaded, but before they are actually run.  Then breakpoints can be placed in the worker code itself. gdb is now provided as a prerequisite for all embedded platforms.  This means that the procedure that is provided below will work on any RCC platform.
@@ -200,8 +205,8 @@ cd target-zynq
 source /opt/Xilinx/Vivado/2017.1/settings64.sh ; vivado complex_mixer_rv.xpr &
 \end{lstlisting}
 			\textit{Note}: because OpenCPI operates in Vivado's Non-Project Mode, you will need to rerun synthesis
-			in Project Mode using the GUI. Refer to the \textit{Vivado\_Usage} doc for more information. You may want to
-			set the \code{flatten\_hierarchy} option to \code{none} via the GUI as well.
+			in Project Mode using the Vivado GUI. Refer to the \textit{Vivado\_Usage} doc for more information. You may want to
+			set the \code{flatten\_hierarchy} option to \code{none} via the Vivado GUI as well.
 		\item In the Flow Navigator's Synthesis section, select ``Set Up Debug''. Choose the debug settings and nets of your choice. You can drag nets in from the Netlist hierarchy, or the Schematic view:
 			\begin{figure}[H]
 				\centerline{\includegraphics[scale=0.6]			{figures/xilinx_vivado_2017_set_up_debug}}
@@ -212,7 +217,7 @@ source /opt/Xilinx/Vivado/2017.1/settings64.sh ; vivado complex_mixer_rv.xpr &
 				\centerline{\includegraphics[scale=0.6]			{figures/xilinx_vivado_2017_debug_cores_listed}}
 					\caption{Xilinx Vivado 2017.1 Debug Cores Listed}
 			\end{figure}
-		\item Rerun synthesis. Note that you may once again want to set the \code{flatten\_hierarchy} option set to ``none'' via the GUI. Observe the debug cores in the worker's netlist:
+		\item Rerun synthesis. Note that you may once again want to set the \code{flatten\_hierarchy} option set to ``none'' via the Vivado GUI. Observe the debug cores in the worker's netlist:
 			\begin{figure}[H]
 				\centerline{\includegraphics[scale=0.4]			{figures/xilinx_vivado_2017_debug_cores_schematic}}
 					\caption{Xilinx Vivado 2017.1 Debug Cores Schematic}

@@ -1404,37 +1404,39 @@ namespace {
           excludedPlatforms.insert(m_excludePlatforms.begin(), m_excludePlatforms.end());
         }
 
+	std::string hdr;
         // Now that all platforms exclusions have been collected, generate list
-        fprintf(out, "    <subcase id='%u'", s);
+	OU::format(hdr, "    <subcase id='%u'", s);
         if (excludedPlatforms.size() && !onlyPlatforms.size() && !m_onlyPlatforms.size()) {
-          fprintf(out, " exclude='");
+          OU::formatAdd(hdr, " exclude='");
           for (auto si = excludedPlatforms.begin(); si != excludedPlatforms.end(); ++si) {
-            fprintf(out, "%s%s", si == excludedPlatforms.begin() ? "" : " ", si->c_str());
+            OU::formatAdd(hdr, "%s%s", si == excludedPlatforms.begin() ? "" : " ", si->c_str());
           }
-    	  fprintf(out, "'");
+    	  OU::formatAdd(hdr, "'");
         }
         // Now we know which platforms should be included
         if (m_onlyPlatforms.size()) {
-          fprintf(out, " only='");
+          OU::formatAdd(hdr, " only='");
           for (auto si = m_onlyPlatforms.begin(); si != m_onlyPlatforms.end(); ++si) {
-            fprintf(out, "%s%s", si == m_onlyPlatforms.begin() ? "" : " ", si->c_str());
+            OU::formatAdd(hdr, "%s%s", si == m_onlyPlatforms.begin() ? "" : " ", si->c_str());
           }
-          fprintf(out, "'");
+          OU::formatAdd(hdr, "'");
         } else if (onlyPlatforms.size()) {
-          fprintf(out, " only='");
+          OU::formatAdd(hdr, " only='");
           for (auto si = onlyPlatforms.begin(); si != onlyPlatforms.end(); ++si) {
             const char *p = si->c_str();
             if (m_excludePlatforms.size()  && m_excludePlatforms.find(p) != m_excludePlatforms.end())
               continue;
-            fprintf(out, "%s%s", si == onlyPlatforms.begin() ? "" : " ", p);
+            OU::formatAdd(hdr, "%s%s", si == onlyPlatforms.begin() ? "" : " ", p);
           }
-          fprintf(out, "'");
+          OU::formatAdd(hdr, "'");
         }
         if (m_timeout)
-          fprintf(out, " timeout='%zu'", m_timeout);
+          OU::formatAdd(hdr, " timeout='%zu'", m_timeout);
         if (m_duration)
-          fprintf(out, " duration='%zu'", m_duration);
-        fprintf(out, ">\n");
+          OU::formatAdd(hdr, " duration='%zu'", m_duration);
+        OU::formatAdd(hdr, ">\n");
+	bool noConfigs = true;
         // For each worker configuration, decide whether it can support the subcase.
         // Note worker configs only have *parameters*, while subcases can have runtime properties
         for (WorkerConfigsIter wci = configs.begin(); wci != configs.end(); ++wci) {
@@ -1504,12 +1506,16 @@ namespace {
                 OU::formatAdd(ports, "%s%s", first ? "" : " ", m_ports[n].m_port->pname());
                 first = false;
               }
+	    if (noConfigs)
+	      fprintf(out, "%s", hdr.c_str());
+	    noConfigs = false;
             fprintf(out, "      <worker name='%s' model='%s' outputs='%s'/>\n",
                     name.c_str(), wci->second->m_modelString, ports.c_str());
           }
         skip_worker_config:;
         }
-        fprintf(out, "    </subcase>\n");
+	if (!noConfigs)
+	  fprintf(out, "    </subcase>\n");
       }
       // Output the workers and configurations that are ok to run on this case.
       fprintf(out, "  </case>\n");

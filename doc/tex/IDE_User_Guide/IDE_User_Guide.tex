@@ -57,7 +57,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \pagenumbering{roman}
 \pagestyle{fancy}
 \fancyhf{}
-\lfoot{ANGRYVIPER IDE User Guide}
+\lfoot{OpenCPI AV User Guide}
 \rfoot{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 \definecolor{blue}{rgb}{.5, .75,1}
@@ -99,11 +99,14 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % ---
 \begin{document}
 % Set up the maketitle command
-\title {ANGRYVIPER IDE User Guide}
+\title {OpenCPI ANGRYVIPER IDE User Guide}
 \author{}
-\date{May 2019} % You can remove \today{} and type a date manually
+\date{January 2020} % You can remove \today{} and type a date manually
 \begin{titlepage}
 \maketitle{} % Generates title
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 \end{titlepage}
 
 \section{Revision History}
@@ -115,7 +118,8 @@ Revision & Description of Change & Date\\
 & Initial, from earlier doc sources & 02-2018\\ \hline
 1.0 & Revision for v1.4& 09-2018\\  \hline
 2.0 & Updates for v1.5 & 05-2019 \\\hline
-2.1 & Converted to \LaTeX, added build instructions & 05-2019\\
+2.1 & Converted to \LaTeX, added build instructions & 05-2019\\ \hline
+2.2 & Removed RPM dependencies for v1.6 & 01-2020\\
 \hline
 \end{tabular}
 
@@ -132,7 +136,7 @@ Revision & Description of Change & Date\\
 Some familiarity with the Eclipse Integrated Development Environment (IDE) or similar environment is assumed. If this is not the case, Appendix A gives basic information to get you started.
 
 \subsection{Assumptions}
-The document begins with the assumption that \href{https://github.com/opencpi/opencpi}{OpenCPI} and \href{https://github.com/opencpi/angryviper_gui}{ANGRYVIPER IDE} are installed on a development machine and the Eclipse workspace has been previously set up.
+The document begins with the assumption that \href{https://gitlab.com/opencpi/opencpi}{OpenCPI} and its ANGRYVIPER IDE are installed on a development machine and the Eclipse workspace has been previously set up.
 \subsection{Reference Documents}
 \def\myreferences{
 \hline
@@ -140,20 +144,21 @@ OpenCPI Website &
 \href{https://www.opencpi.org}{www.opencpi.org} \\
 \hline
 OpenCPI Component Development Guide &
-\githubio{OpenCPI\_Component\_Development.pdf} \\
+\githubio{OpenCPI\_Component\_Development\_Guide.pdf} \\
 \hline
 OpenCPI Application Development Guide &
-\githubio{OpenCPI\_Application\_Development.pdf} \\
+\githubio{OpenCPI\_Application\_Development\_Guide.pdf} \\
 }
-\input{References_Table}
+\input{References_Table_noRPM}
 \section{Introduction}
-The ANGRYVIPER (AV) {IDE} consists of the Eclipse IDE for C/C++ developers and a custom plugin for OpenCPI development. OpenCPI users local to the project may install OpenCPI and the IDE from the yum repository (the IDE is a separate AV IDE RPM). Open source users must obtain the IDE plugin from GitHub and drop it into an existing Eclipse installation. Both methods are described in the \githubio[RPM Installation Guide]{RPM\_Installation\_Guide.pdf} Section 6, addresses the RPM Installation and Appendix B addresses the plugin install. Note, if the RPM method is used, the IDE is installed in \textbf{opt/opencpi/gui} and the command \textbf{ocpigui} is provided to start the IDE.
-\subsection{New Features in the 1.5 Release}
-In the 1.5 release, the ANGRYVIPER team focused on getting the OpenCPI XML editors current with OpenCPI Framework standards. Every available component editor (excluding the Application and Assembly Editors) is updated. In addition, new editors are provided for the Properties File, Signals File, and Slot Signals File. These editors are not integrated with the OpenCPI Projects view but they will open if the respective XML file is selected via the Eclipse Project Explorer.
+The OpenCPI ANGRYVIPER (AV) {IDE} consists of the Eclipse IDE for C/C++ developers and a custom plugin for OpenCPI development. Eclipse and this plugin is installed into the \textbf{av/eclipse} subdirectory of the OpenCPI installation as described in the OpenCPI Installation Guide.  The default workspace is in the \textbf{av/workspace} subdirectory.  Users that want to add this plugin to an \textit{existing} eclipse installation must obtain the IDE plugin from GitLab and drop it into the existing Eclipse installation.  This should work in theory, but the tested configuration uses a private installation of eclipse installed for OpenCPI.
+\subsection{New Features in the 1.6 Release}
+No new features were added for release 1.6. However, the installation was simplified, and now includes the initial configuration of a default workspace, the initial import (not copy) of the built-in OpenCPI projects, and the exposure of the console window.
+In the 1.5 release, every available component editor (excluding the Application and Assembly Editors) were updated. In addition, new editors were provided for the Properties File, Signals File, and Slot Signals File. These editors are not integrated with the OpenCPI Projects view but they will open if the respective XML file is selected via the Eclipse Project Explorer.
 
 \newpage
 \section{Overview}
-The face of the ANGRYVIPER {AV} IDE is now the \textbf{ANGRYVIPER (AV) Perspective}. This section provides an overview of the perspective layout and how to set it up in a new IDE installation.
+The face of AV is the \textbf{ANGRYVIPER (AV) Perspective}. This section provides an overview of the perspective layout and how to set it up in a new IDE installation.
 \subsection{AV Perspective Views}
 The figure below illustrates the new AV Perspective. It consists of detailed views and the Eclipse Editor panel.
 
@@ -173,16 +178,15 @@ Below are brief summaries of each of the perspective views, full descriptions ar
 \item [] \hyperlink{Eclipse Console View} {\textbf{Eclipse Console View}} – Shows the various ocpidev command executions based on user requests as well as the result of the requests.
 \end{itemize}
 \subsubsection{Open the AV Perspective}
- In a new Eclipse installation, the current default behavior is that Eclipse will open in the selected workspace and will display the C/C++ Perspective shown below.\\
+ After AV is installed as described in the OpenCPI Installation Guide, the current perspective is set to the AV perspective and it will be in the Perspectives Toolbar.  That tool bar is shown in the C++ perspective below. \\
 
-\textbf{\emph{Note: The AV Perspective must be added to the Eclipse perspectives toolbar for regular use.}}
 \begin{figure}[h!]
 \centering
 \caption{IDE showing C/C++ Perspective}\label{fig:IDE_CandC++Perspective}
 	\includegraphics[width=1.0\textwidth]{CandC++.png}
 \end{figure}
 \subsubsection{Adding the Perspective to the Toolbar}
-To open the Perspective and add it to the Perspectives Toolbar:
+If for some reason the AV perspective has been removed, you can add it to the Perspectives Toolbar:
 \begin{itemize}
 \item Click the Open Perspective Icon
 \item Select it from the Perspective List
@@ -290,7 +294,7 @@ If the execution configuration is rerun, the corresponding status bar and consol
      \label{fig:Operations panel}
 \end{figure}
 \subsubsection{Unit Test panel}
-The Unit Tests Panel (shown in the below figure) supports most of the features for the unit testing of workers which is described in the OpenCPI \githubio[Component Development Guide]{OpenCPI\_Component\_Development.pdf}.
+The Unit Tests Panel (shown in the below figure) supports most of the features for the unit testing of workers which is described in the OpenCPI \githubio[Component Development Guide]{OpenCPI\_Component\_Development\_Guide.pdf}.
 Reference the Component Development Guide for a complete description of the unit test of workers and details of the five phases of unit testing. The five phases of unit testing are:
 \begin{enumerate}
 \item Generate
@@ -430,6 +434,8 @@ Execution consoles provide \textbf{build and run} commands and their output.The 
 \subsection{OpenCPI Asset Wizard}
 The \textbf{Asset Wizard} provides a tool to create a number of OpenCPI Assets. It provides a simple form for required and optional parameters to create the asset (accomplished by ocpidev create). Upon completion, the asset and follow-on OpenCPI framework folders and files will be created. \\
 
+\textbf{\emph{Caution! AV currently does not allow projects to be created outside the current eclipse workspace directory. To create an OpenCPI project in any directory, not necessarily used with eclipse, use the ocpidev tool (ocpidev create project). Then use File-$>$Import-$>$General-$>$Existing Projects into Workspace with the ``copy projects into workspace'' option UNCHECKED.}}.\\
+
 The new asset is displayed in the project views. If an XML Editor is provided in the IDE, then the respective Editor is opened to further populate the XML specification. The figure below shows all of the available assets in the drop-down list that the wizard supports.
 \begin{figure}[h!]
 	\centering
@@ -440,7 +446,7 @@ This OpenCPI \textbf{Asset Creation Wizard} may be selected from the context men
 
 It is also found under the New selection (or New Other) Eclipse Project Explorer View context menu or under the File Tab in the top Eclipse menu bar.\\
 
-\textbf{\emph{Caution! There are some dependencies to create assets. An OpenCPI project must be open in the workspace before any other assets can be created. Also, a components library must be established before components and workers can be created}}.
+\textbf{\emph{Caution! There are some dependencies to create assets. An OpenCPI project must be open before any other assets can be created. Also, a components library must be established before components and workers can be created}}.
 
 \subsection{OpenCPI Asset XML Editors}
 The IDE supports the creation of the following OpenCPI Assets and provides graphical editors to populate their XML files:
@@ -493,9 +499,7 @@ To remove an element:
 \end{itemize}
 The source file may also be edited and those changes will appear in the design view.\\
 
-See the \githubio[Component Development Guide]{OpenCPI\_Component\_Development.pdf} for more information about the XML files these editors support. \\
-
-\textbf{\emph{Note: In Release 1.5 these editors were updated to current OpenCPI standards}}.\\
+See the \githubio[Component Development Guide]{OpenCPI\_Component\_Development\_Guide.pdf} for more information about the XML files these editors support. \\
 
 \subsubsection{Graphical Drag-and-Drop Editors}
 The Application and Assembly Editors provide a \textbf{diagram interface} to generate the respective XML files.
@@ -518,8 +522,6 @@ The following list provides OpenCPI asset XML to examine in its respective Edito
 \item	\textbf{Unit Test Editor-} core-components-metadata\_stressor.test
 \end{enumerate}
 
-\subsubsection{Additional Notes About the Perspective}
-The ANGRYVIPER Team hopes to continue to add capabilities to the \emph{OpenCPI Projects View} to further support OpenCPI operations. The goal for Version 1.4 was to give complementary features. This section provides a brief discussion to make the user aware of a number of issues that may occur when using the IDE.
 \subsection{The Execution Configuration}
 The \textbf{Execution Configuration} provides a means to associate and manage resources tied to the execution. These are:
 \begin{itemize}
@@ -550,14 +552,7 @@ The OpenCPI Projects View does not track changes to the Workspace or the files s
 \textbf{\emph{Note: Do not delete a project using Project Explorer or Shell Command. Use the ocpidev command to delete a project. This will ensure project registration information remains up to date.}}
 \section{OpenCPI Development Workflow Using the IDE}
 \subsection{Introduction}
-The IDE supports a number of OpenCPI workflow concepts; beginning with setting up the OpenCPI core and assets projects and getting them built to support new project development. This section demonstrates a number of the fundamentals discussed in Sections 4 and 5 of the \githubio[Getting Started Guide]{Getting\_Started.pdf}. This includes creating the DemoProject and then a number of assets that go in the project as described in the document. Additionally, the IDE provides an effective way to look at existing assets OpenCPI XML specifications.
-\subsection{OpenCPI the Core and Assets Projects}
-A number of existing projects are provided in OpenCPI Release for use in development. If they are to be used, they need to be set up in the development environment, registered, and imported into the IDE and built for the desired platforms to further support new development. Procedures to set these projects up:
-\begin{enumerate}
-\item	Select an area in the file system to put these projects and create the folder if necessary
-\item	Execute the project copy script ocpi-copy-projects to load these projects in desired folder and register them in that location (this script is interactive or arguments may be supplied)
-\item	Import the desired projects into Eclipse
-\end{enumerate}
+When AV is installed according to the OpenCPI Installation Guide, the OpenCPI built-in projects (e.g. \textbf{core} and \textbf{assets}) are already imported into (known by) the default workspace, and those projects are built for the development host.  This section demonstrates how this can be re-done at a later time and so it can be ignored for initial use of AV.  The IDE provides an effective way to look at existing assets OpenCPI XML specifications.
 \begin{figure}[h!]
 	\centering
 	\caption{Procedures to use existing Projects}\label{fig:Procedures to use existing Projects}
@@ -570,7 +565,7 @@ This demonstration describes the procedure to import the core and assets project
 \item	Right Click -Import-General-Existing projects into workspace - (This opens the import wizard)
 \item	Click Browse for the select root directory input
 \item	Navigate to and select the folder holding these projects
-\item	Select the checkboxes on the desired projects to import as shown in the preceding figure
+\item	Select the checkboxes on the desired projects to import as shown in the figure
 \item	Click Finish and the projects will be brought into the Eclipse workspace - (they will appear in the Eclipse Project Explore View)
 \item	Click Refresh in the OpenCPI Projects View to update that view with the imported projects
 \end{enumerate}
@@ -581,7 +576,7 @@ This demonstration describes the procedure to import the core and assets project
  \end{figure}
 \subsection{Build the Projects for the desired RCC and HDL Platforms}
 There are a number of ways to build existing projects in the IDE because builds can be kicked off concurrently. If time is not an issue, put the core and assets projects in the Operations panel (core first followed by assets), Select the platforms to which to build to and launch the build (press build). Core will be built followed by assets.
-Concurrent building saves time-key things to know:
+Concurrent building saves time, but these are the things to know:
 \begin{itemize}
 \item	HDL libraries in the core project must be built before starting a build on the assets project primitives
 \item	Project primitives must be built first
@@ -663,7 +658,7 @@ In the new project example above, no inputs were provided for package-prefix and
 	\includegraphics[width=.75\textwidth]{TerminalWindowView.png}
  \end{figure}
 \subsection{Project Registration}
-By registering a project, a user is publishing his/her project so that it can be referenced/searched by any user or project using that same project registry. The default project registry is found at : \textbf{ /opt/opencpi/project-registry}. The registration features are provided to support bringing in an external OpenCPI project or a project location needs to change.
+By registering a project, a user is publishing his/her project so that it can be referenced/searched by any user or project using that same project registry. The default project registry is in the OpenCPI installation directory, in the \textbf{ project-registry}. The registration features are provided to support bringing in an external OpenCPI project or a project location needs to change.
 Examples:
 \begin{itemize}
 \item	To rename a project: unregister it, and change its name with Project Explorer, refresh OpenCPI Projects, re-register it.
@@ -854,7 +849,7 @@ The following series of figures show the advanced connection in the 3 editor vie
 	\includegraphics[width=.85\textwidth]{AdvancedConnectionViews.png}
  \end{figure}
 
-See the \githubio[Application Development Guide]{OpenCPI\_Application\_Development.pdf} for detailed information about the Application and Assembly XML files.
+See the \githubio[Application Development Guide]{OpenCPI\_Application\_Development\_Guide.pdf} for detailed information about the Application and Assembly XML files.
 Note that the Application and Assembly Editors provide a basic capability to create the respective XML files.
 \subsection{Assembly Editor}
 The HDL Assembly Editor operates similarly to the Application Editor. The difference is that assemblies are built with application workers while applications are built with components. The drag-and-drop feature works with OpenCPI Worker Description (OWD) XML files just as the application Editor operates with OCS XML files. \textbf{\emph{Note: The Eclipse Project Explorer must be used for the current drag and drop feature; it is currently not supported in the OpenCPI Projects View.}}\\
@@ -882,7 +877,7 @@ Creating a Unit Test using the Asset Wizard is demonstrated in this section.
  \end{figure}
 When the action completes, the Unit Test Editor opens in the Editor panel as shown below. \\
 
-Unit testing requires an in-depth knowledge on how to implement them so this will not be addressed here. Refer to the \githubio[Component Development Guide]{OpenCPI\_Component\_Development.pdf} to learn about them.
+Unit testing requires an in-depth knowledge on how to implement them so this will not be addressed here. Refer to the \githubio[Component Development Guide]{OpenCPI\_Component\_Development\_Guide.pdf} to learn about them.
 The Editor supports most aspects of developing unit test XML.\\
 
 \begin{figure}[h!]
@@ -905,14 +900,14 @@ The figure below demonstrates this behavior. An input element can either have a 
 \begin{appendices}
 \appendix
 \section{Eclipse Basics}
-A central abstraction for Eclipse is \textbf{the workspace}. This is a directory Eclipse uses to maintain state and projects. When Eclipse opens, it prompts the user to Select a workspace with the following dialog preset for a default directory name in the user’s home directory. If the workspace directory does not exist yet, it will be created. This directory path name can be changed. The Browse Button allows navigation to another location to either create the workspace or select an existing workspace directory.
+A central abstraction for Eclipse is \textbf{the workspace}. This is a directory Eclipse uses to maintain state and projects. When Eclipse opens, it prompts the user to Select a workspace with the following dialog preset for a default directory name in the user’s home directory. If the workspace directory does not exist yet, it will be created. This directory path name can be changed. The Browse Button allows navigation to another location to either create the workspace or select an existing workspace directory.  AV is configured to start up in its default workspace until you switch to a different workspace using the File-$>$Switch Workspace menu command, which puts you in the same place/dialog as the Eclipse startup as shown here.
  \begin{figure}[h!]
 	\centering
 	\caption{Eclipse Launcher}{}
 	\includegraphics[width=.70\textwidth]{EclipseLauncher.png}
  \end{figure}
 
-Since this is a new workspace, when Eclipse completes start-up, it presents the Welcome screen as shown in the figure below. If you are new to Eclipse or an IDE of this type, this is a good screen to explore. Overview gives basic concepts and definitions such as Toolbars, Perspectives, and Views.
+When Eclipse is in a new workspace, when Eclipse completes start-up, it presents the Welcome screen as shown in the figure below. If you are new to Eclipse or an IDE of this type, this is a good screen to explore. Overview gives basic concepts and definitions such as Toolbars, Perspectives, and Views.
 \begin{figure}[h!]
 	\centering
 	\caption{Eclipse Welcome Screen}{}
@@ -1016,7 +1011,7 @@ org.eclipse.sapphire.modeling.xml.feature.group"}
 \item Clone OpenCPI IDE repository
 \cmd{cd \$DIR}
 \cmd{git clone}
-\url{https://github.com/opencpi/angryviper_gui.git}
+\url{https://gitlab.com/opencpi/angryviper_gui.git}
 \cmd{} $<$\code{git checkout} appropriate branch$>$
 \item Build OpenCPI Plugin
 \cmd{cd angryviper\_gui/av.proj.ide.tycho}

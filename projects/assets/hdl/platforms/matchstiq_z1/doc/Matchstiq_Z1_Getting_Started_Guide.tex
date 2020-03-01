@@ -21,7 +21,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{OpenCPI\\ \bigskip Matchstiq-Z1 Getting Started Guide}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 \def\rccplatform{xilinx13\_3}
 \def\radioName{Matchstiq-Z1}
 \def\mountPoint{/mnt/}
@@ -50,6 +50,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \usepackage{textcomp}
 \begin{document}
 \maketitle
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 %\thispagestyle{fancy}
 
 \newpage
@@ -73,6 +76,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
             \hline
             v1.5 & Update  for OpenCPI Release 1.5 & 4/2019 \\
             \hline
+            v1.6 & Refer to installation doc when possible & 1/2020 \\
+			\hline
 			\end{tabularx}
 		\end{table}
 	\end{center}
@@ -84,97 +89,24 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \newpage
 
 \section{References}
-
-	This document assumes a basic understanding of the Linux command line (or ``shell'') environment.  The reference(s) in Table 1 can be used as an overview of OpenCPI and may prove useful.
-\def\refskipocpiov{}
+The reference(s) in Table 1 can be used as an overview of OpenCPI and may prove useful.  The installation guide is required since many of the steps mentioned here are defined there, especially in the section:  Enabling OpenCPI Development for Embedded Systems.  This document provides details for this system that can be applied to procedures defined there.  It is best to use both documents at the same time.  This document assumes a basic understanding of the Linux command line (or ``shell'') environment.  
 \def\refcapbottom{}
-\input{References_Table}
+\input{References_Table_noRPM}
 
-\newpage
 \section{Overview}
-This document provides steps for configuring a factory provided Epiq Solutions Matchstiq-Z1 SDR with the OpenCPI run-time environment for executing applications, configuring a development system to build OpenCPI bitstreams targeting the \textit{matchstiq\_z1} platform, and examples of executing applications on the OpenCPI configured Matchstiq-Z1. \textbf{Note: Only the Z1 version of the Epiq Solutions Matchstiq product line is supported by OpenCPI.}
+This document provides steps for configuring a factory provided Epiq Solutions Matchstiq-Z1 SDR with the OpenCPI run-time environment for executing applications. \textbf{Note: Only the Z1 version of the Epiq Solutions Matchstiq product line is supported by OpenCPI.}
 
 \section{Prerequisites}
 \begin{flushleft}
-This guide assumes that, at a minimum, the following RPMs are installed:  \\
-\begin{table}[H]
-	\label{table:rpms}
-		\begin{tabularx}{\textwidth}{|c|X|}
-		\hline
-		\rowcolor{blue}
-		\textbf{RPM Name} & \textbf{Description} \\
-		\hline
-		\hline
-		All prerequisite RPMs & These packages have OpenCPI-specific patches and are provided as RPMs. This packaging ensures they will not conflict with other installed copies by using a nonstandard installation location of \path{/opt/opencpi/prerequisites}. \\
-		\hline
-		\small{\code{angryviper-ide-*.x86 64.rpm}} &
-		The ANGRYVIPER IDE (Eclipse with plugins). See RPM Installation Guide.pdf, Appendix D for an alternative method to set up the IDE using an existing Eclipse installation. \\
-		\hline
-		\small{\code{opencpi-*.x86\_64.rpm}} &
-		Base installation RPM includes the runtime portion of the Component
-Development Kit (CDK) and the source for the ocpi.core and ocpi.assets Projects containing framework essential components, workers,
-platforms, etc. \\
-		\hline
-		\small{\code{opencpi-devel-*.x86\_64.rpm}} &
-		Additional header files and scripts for developing new assets as HDL
-and/or RCC. \\
-		\hline
-		\small{\code{opencpi-sw-platform-xilinx13\_3-*.noarch.rpm}} &
-		Additional files necessary to build the framework targeting specific
-RCC/software platforms, independent of the final deployed hardware. \\
-		\hline
-		\small{\code{opencpi-hw-platform-matchstiq\_z1-xilinx13\_3-*.noarch.rpm}} &
-		Additional files necessary to build the framework targeting specific hard-ware platform ``X'' when running RCC platform ``Y'' (``Y'' can be ``no sw''). This RPM also includes hardware-specific SD Card images when applicable. \\
-		\hline
-	\end{tabularx}
-\end{table}
-
-\subsection{Installation of provided OpenCPI projects: \textit{core} and \textit{assets}}
-This guide  assumes the user has executed \textit{ocpi-copy-projects}, accepting the default settings, to copy and register the \textit{core} and \textit{assets} projects from the /opt/opencpi/projects for building bitstreams for the Matchstiq-Z1. Reference the Getting Started Guide for details on \textit{ocpi-copy-projects}.  While registering of the projects is performed during the execution of ocpi-copy-projects, changes to the registry can be made via \code{ocpidev un/register project} or the ANGRYVIPER GUI.\medskip
-
-\begin{verbatim}
-$ ocpi-copy-projects
-...
-
-$ ls ~/ocpi_projects
-assets core
-$ ocpidev show registry
-Project registry is located at: /opt/opencpi/cdk/../project-registry
-----------------------------------------------------------------------------------------
-| Project Package-ID  | Path to Project                                 | Valid/Exists |
-| ------------------  | ---------------                                 | ------------ |
-| ocpi.core           | /home/user/ocpi_projects/core                   | True         |
-| ocpi.assets         | /home/user/ocpi_projects/assets                 | True         |
-----------------------------------------------------------------------------------------
-\end{verbatim}
+  It is assumed that the tasks defined in the ``Enabling OpenCPI Development for Embedded Systems'' section of the \githubio[\textit{OpenCPI Installation Guide}]{OpenCPI\_Installation\_Guide.pdf} have been successfully performed.
+  As mentioned there, support for the Matchstiq Z1 system is based on the \textit{ocpi.assets} built-in project, using the \textit{matchstiq\_z1} OpenCPI HDL (FPGA) platform and the \textit{xilinx13\_3 }OpenCPI RCC (software) platform.  The software platforms are supported by the \textit{ocpi.core} built-in project.
 
 \subsection{Vendor Software Setup}
-The platform that is expected to be used is the Epiq Solutions Matchstiq-Z1 (\textit{e.g.} matchstiq\_z1). This OpenCPI-enabled platform provides the capability of deploying hardware and software workers while using Xilinx's 13.3 distribution of Linux.\\ \bigskip
+  Also indicated in the installation guide, the tools used for software cross compilation are from the Xilinx Vivado 2013.4 SDK, and the tools used for the FPGA are any recent version of the Xilinx Vivado Webpack tools.  The Linux Kernel is based on the Xilinx Linux kernel tagged \textit{xilinx-v14.7}.  The installation of these tools is described in the installation guide.
 
-The synthesizers and cross-compilers required to build HDL and RCC Workers for this platform are installed by following the instructions found in the \textit{OpenCPI FPGA Vendor Tools Installation Guide}. This document assumes that the user has installed the appropriate versions of Vivado and the Xilinx SDK.\\ \bigskip
-
-\subsection{Building OpenCPI projects: \textit{core} and \textit{assets} }
+\subsection{Building Required Projects}
 \label{sec:Building OpenCPI projects}
-The \textit{core} and \textit{assets} projects must be built \textit{in a specific order} for this platform. This section outlines how to build the relevant projects and provides the commands to do so.\medskip
-
-For this document, the projects should be built as follows:\\
-
-\begin{enumerate}
-	\item Build \code{core} for the \code{xilinx13\_3} RCC Platform and the \code{matchstiq\_z1} HDL Platform (approx 30 min)
-	\item Build \code{assets} for the \code{xilinx13\_3} RCC Platform and the \code{matchstiq\_z1} HDL Platform, but omit assemblies (approx 45 min)
-	\item Build the \code{testbias} assembly from the \code{assets} project. This will be used later in this guide. (approx 10 min)
-\end{enumerate}
-\begin{lstlisting}[showspaces=false]
-$ cd /home/<user>/ocpi_projects/
-$ ocpidev build -d core     --rcc-platform xilinx13_3 --hdl-platform matchstiq_z1
-$ ocpidev build -d assets   --rcc-platform xilinx13_3 --hdl-platform matchstiq_z1 --no-assemblies
-$ ocpidev build -d assets hdl assembly testbias       --hdl-platform matchstiq_z1
-\end{lstlisting}
-Note: replace ``\code{<user>}'' with your username in the commands above.\\\medskip
-
-Each of these build commands can also be performed via the ANGRYVIPER IDE as follows:
-\OcpidevBuild
-See the ANGRYVIPER Team's Getting Started Guide for additional information concerning the use of \code{ocpidev} and the ANGRYVIPER IDE to build OpenCPI assets.
+The standard built-in OpenCPI projects, as well as the OSP for this system, are built using the above instructions in the installation guide.  This results in a single executable FPGA test application ready to run:  \textit{bias}, based on the \textit{testbias} HDL assembly, both in the \textit{assets} built-in project.
 
 \subsection{Hardware Setup}
 \begin{itemize}
@@ -190,7 +122,7 @@ A micro-USB connector on the back of the Matchstiq-Z1 provides access to the ser
 	\label{fig:back}
 \end{figure}
 
-\item \textbf{Micro-USB to Ethernet adapter}. To allow network access when plugged into the front panel micro-USB port.  The OpenCPI BSP for the Matchstiq-Z1 is configured for DHCP. An Ethernet connection is required for developing OpenCPI in Network mode.
+\item \textbf{Micro-USB to Ethernet adapter}. To allow network access when plugged into the front panel micro-USB port.  The OpenCPI software platform for the Matchstiq-Z1 is configured for DHCP. An Ethernet connection is required for developing OpenCPI in Network mode.
 
 On the front panel of the Matchstiq-Z1, there are three labeled SMB (50 Ohm) connectors: ``RX'' (receive), ``TX'' (transmit), and ``GPS''.  From the factory, the Matchstiq-Z1 is provided with two SMB to SMA adapters.  Due to the RF performance to the transceiver device, any RF COAX cables should be rated up to at least 3GHz. \\ \medskip
 \begin{figure}[ht]
@@ -208,138 +140,28 @@ On the front panel of the Matchstiq-Z1, there are three labeled SMB (50 Ohm) con
 \newpage
 \section{SD Card Setup}
 \label{sec:SD_Card_Setup}
-The Matchstiq-Z1 SDR is equipped with two SD card slots: one internal and one accessible via the front panel. It is expected that the SDRs are shipped from Epiq Solutions with an SD card installed in the internal slot that is loaded with their embedded environment. A feature of this SDR is that when an SD card is installed in the front panel SD slot, the SDR will automatically choose to operate from this SD card rather than the internal SD card. Therefore, a user can easily switch the SDR between operating in the Epiq Solutions or OpenCPI environment.
+The Matchstiq-Z1 SDR is equipped with two SD card slots: one internal and one accessible via the front panel. It is expected that the SDRs are shipped from Epiq Solutions with an SD card installed in the internal slot that is loaded with their embedded environment. A feature of this SDR is that when an SD card is installed in the front panel SD slot, the SDR will automatically choose to operate from this SD card rather than the internal SD card. Therefore, a user can easily switch the SDR between operating in the Epiq Solutions or OpenCPI environment.\\
 
-The Matchstiq-Z1's factory SD card has a non-default formatting and content, which \textit{must} be maintained for proper operation. This guide assumes that the internal (factory) SD card is being use for OpenCPI and will be reinstalled in the front panel SD card slot. If the user desires the use of a new SD card, the user must ensure that it is initially imaged from the factory provided SD card, as there is a unique partition containing required content from the OEM.
+The Matchstiq-Z1's factory SD card has a non-default formatting and content, which \textit{must} be maintained for proper operation. This guide assumes that the internal (factory) SD card is being use for OpenCPI and will be reinstalled in the front panel SD card slot. If the user desires the use of a new SD card, the user must ensure that it is initially imaged from the factory provided SD card, as there is a unique partition containing required content from the OEM.\\
 
-\subsection{Make a backup image of factory SD card (assumes Linux host)}
-This section provides the steps for creating an SD card backup image.  Access the internal SD card slot by removing the screws from the front and back plates, then slide the board assembly out of the enclosure. Flip the SD card slot open and lift the card out. Insert the SD card into a USB reader and install into a host machine.
-\begin{enumerate}
-	\item Determine the device file name for the SD card by
-	executing dmesg command below. It will likely be something
-	like \texttt{/dev/sdb} or \texttt{/dev/mmcblk0}.\\ \\
-	\texttt{\$ dmesg | tail -n 15}
-	\item Run the following \textit{dd} command to make a backup
-	image, where DEVICENAME was determined above. This step
-	should take $\sim15$ minutes depending on the card size.\\ \\
-	\texttt{\$ dd if=DEVICENAME of=backup.image}
-\end{enumerate}
+The installation guide provides the procedure for creating a new SD card for OpenCPI and customizing some of files for your particular configuration.  The usual way is to make a raw copy of the manufacturer supplied card to a new card, preserving formatting and content, and then removing most original files and copying files from OpenCPI.\\
 
-\subsection{Format the SD card for OpenCPI}
-The Matchstiq-Z1 SDR requires an SD card with a
-specific partition and content. The recommend method for formatting a new SD card is to begin by imaging the new card using the backup image of the factory SD card, removing factory default files and directory and copying OpenCPI content to SD card.
-\begin{enumerate}
-	\item Format an SD card for OpenCPI, (restore to its original factory default captured in the previous section), run the command \\ \\
-	\texttt{\$ dd of=DEVICENAME if=backup.image}
-	\item To prepare for OpenCPI provided content to be placed onto the SD card, remove all factory files and directories from the ATLAS partition.
-\end{enumerate}
+To prepare for OpenCPI provided content to be placed onto the SD card, remove all factory files and directories from the ATLAS partition.  The Matchstiq\_z1 boots from the ``ATLAS'' partition of the SD Card so that is where the OpenCPI contents should be copied.\\
 
-\subsection{Copy embedded OS files to SD card, ``ATLAS'' partition}
-\label{sec:Copy embedded OS to SD card}
-\begin{flushleft}
+Any files/directories copied to the ``ATLAS'' partition will appear at /mnt/card on the Matchstiq-Z1.\\
 
-WARNING: The user must ensure that the contents of the SD, match the version of the OpenCPI release that the artifacts were built against.\\ \medskip
-
-Copy the following files/directories into the ``ATLAS'' partition:
-\begin{verbatim}
-$ cp /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/iveia-atlas-i-z7e.dtb /run/media/<user>/ATLAS/
-
-$ cp /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/u-boot.bin /run/media/<user>/ATLAS/
-
-$ cp /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/uImage /run/media/<user>/ATLAS/
-
-$ cp /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/uramdisk.image.gz /run/media/<user>/ATLAS/
-\end{verbatim}
-
-Any files/directories copied to the ``ATLAS'' partition will appear at /mnt/card on the Matchstiq-Z1.\\ \medskip
-
-The need to copy the \textit{/opt/opencpi/cdk/matchstiq\_z1/opencpi} onto the SD card is dependent on the desired operating mode (Standalone vs Network) and is discussed in the following sections.
-\end{flushleft}
-
-\subsection{Copy files to SD card for desired Mode(s)}
-As previously discussed, Standalone and Network modes offer trade-offs for configuring the run-time environment of the platform. The following sections provide instructions for copying specific files/directories to the SD card in support of these modes. For maximum flexibility and completion of this getting started guide, it is recommended that the SD card be configured to support both modes, as covered in the next sub-section. However, instructions for configuring the SD card for each mode separately, have also been provided.
-
-\subsubsection{Standalone and Network Modes}
-The SD can be setup to support both modes, as there is no conflict between the files/directories for either mode. To setup the SD to support both modes:\\
-
-\noindent After performing the steps from \ref{sec:Copy embedded OS to SD card}, copy the entire \textit{opencpi} directory to the SD card.
-
-\begin{verbatim}
-$ cp -rL /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/opencpi /run/media/<user>/ATLAS/
-
-$ cp /home/<user>/ocpi_projects/assets/hdl/assemblies/testbias/container-testbias_matchstiq_z1_base/\
-target-zynq/testbias_matchstiq_z1_base.bit.gz /run/media/<user>/ATLAS/opencpi/xilinx13_3/artifacts/
-\end{verbatim}
-
-\subsubsection{Standalone Mode}
-After performing the steps from \ref{sec:Copy embedded OS to SD card}, copy the entire \textit{opencpi} directory to the SD card, then copy the relevant bitstreams, artifacts into the \textit{artifacts} directory and application XMLs into the \textit{applications} directory. For this getting started guide, only one bitstream is required to be copied onto the SD cards, where as the required artifacts and application XML where copied to the SD along with the entire \textit{opencpi} directory.
-
-\begin{verbatim}
-$ cp -rL /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/opencpi /run/media/<user>/ATLAS/
-
-$ cp /home/<user>/ocpi_projects/assets/hdl/assemblies/testbias/container-testbias_matchstiq_z1_base/\
-target-zynq/testbias_matchstiq_z1_base.bit.gz /run/media/<user>/ATLAS/opencpi/xilinx13_3/artifacts/
-\end{verbatim}
-
-\subsubsection{Network Mode}
-After performing the steps from \ref{sec:Copy embedded OS to SD card}, create a directory on the partition named ``opencpi'' and copy the following files into the this directory:
-
-\begin{verbatim}
-$ mkdir /run/media/<user>/ATLAS/opencpi
-
-$ cp /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/opencpi/system.xml \
-/run/media/<user>/ATLAS/opencpi/
-
-$ cp /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/opencpi/default_mynetsetup.sh \
-/run/media/<user>/ATLAS/opencpi/
-
-$ cp /opt/opencpi/cdk/matchstiq_z1/sdcard-xilinx13_3/opencpi/zynq_net_setup.sh \
-/run/media/<user>/ATLAS/opencpi/
-\end{verbatim}
-
-\subsection{SD Card Source}
-The final SD Card artifacts are distributed in \path{/opt/opencpi/cdk/matchstiq_z1/} via RPM as noted previously. The end user is not required nor expected to generate the files.
-
-\subsection{No changes required for ``SDHOME'' partition}
 All the files in this partition can be ignored. If space for files is required for your application, they can be deleted.
-
-
-\pagebreak
-
-\input{Script_Setup}
-\input{Setup_System_Time}
-\input{rsync_Setup_Snippet}
-\end{flushleft}
 
 \pagebreak
 \section{Hardware Setup}
 
 \subsection{Establish a Serial Connection}
-By default, the USB to Serial adapter connects as read-only, which requires sudo privileges for establishing a serial connection. OpenCPI recognizes that sudo may not be available and has provided an alternative for configuring the device thereby allowing all users access to the device. Specifically, this is accomplished by adding \texttt{udev} rules to instruct the device connection to have read and write permissions for all users.
-\begin{itemize}
-\item If OpenCPI was installed via RPMs, the \texttt{udev} rules are automatically setup for the user.
-\item If OpenCPI was installed from source, then the user must manually add the \texttt{udev} rules by copying the file from the host machine's installation directory to the host machine's \path{/etc/udev/rules.d/}. The following command can be used as a guide:
-\begin{verbatim}
-$ cd /etc/udev/rules.d/
-$ sudo ln -s /<install-path>/opencpi/cdk/matchstiq_z1/host-udev-rules/97-matchstiq_z1.rules \
-97-matchstiq_z1.rules
-\end{verbatim}
-\item Whether installed via RPMs or source (and manually creating the symbolic link), the USB to Serial adapter will be connected as \texttt{/dev/matchstiq\_z1\_0} with read and write permissions for all users.
-\end{itemize}
-
-\noindent Once the Matchstiq-Z1 is powered on, use the following command to connect to the serial port:
-\begin{verbatim}
-$ screen /dev/matchstiq_z1_0 115200
-\end{verbatim}
-
+The installation guide provides the procedure establishing a serial console.  On these systems the console serial port operates at 115200 baud.  The cable used is a micro-USB to USB-A cable to connect its  console micro-USB port to the development host.  Remember the micro-USB socket on the Matchstiq Z1 is \textbf{delicate!}.
 \subsection{Update U-boot Variables}
 \begin{enumerate}
 \item Remove power from the Matchstiq-Z1 unit.
 \item Insert the SD card into the front panel SD card slot.
 \item Connect a terminal to the rear micro-USB connector of the Matchstiq-Z1 with a baud rate of 115200.
-\begin{itemize}
-\item per the previous section, ``\texttt{screen /dev/matchstiq\_z1\_0 115200}'' can be used to connect to the serial port.
-\end{itemize}
 \item Apply power to the Matchstiq-Z1 with the terminal still connected and stop the boot process by hitting any key to enter the U-Boot terminal.
 \item Run the following commands to setup the environment variables:
 \begin{itemize}
@@ -392,25 +214,10 @@ Environment size: 1283/131068 bytes
 \end{verbatim}
 
 \pagebreak
-\section{Development Host Setup - Network Mode ONLY}
-% Bring in NFS setup snippet (has subsections)
-\input{NFS_Setup_Snippet}
-%
-
-\pagebreak
-\section{Configuring the run-time environment on the platform}
-
-\subsection{Network Mode}
-\begin{enumerate}
-\item Ensure the USB to Ethernet adapter is plugged into the micro-USB port of the front panel and connected to a network configured for DHCP.
-\item Ensure a micro-USB to USB cable is connected between the Matchstiq-Z1's serial port and development host.
-\item Apply power to the Matchstiq-Z1
-\item Use a serial terminal application to establish a serial connection, for example:
-\begin{verbatim}
-$ screen /dev/matchstiq_z1_0 115200
-\end{verbatim} \medskip
-
-\item After a successful boot to PetaLinux, login to the system, using  ``\textbf{root}`` for user name and password.
+\section{Configuring the runtime environment on the system}
+The installation guide provides the procedure for setting up and verifying the runtime environment.
+This system is initially set with  ``\textbf{root}'' for user name and password.
+After a successful boot to PetaLinux, login to the system, using  ``\textbf{root}`` for user name and password.
 
 \begin{figure}[H]
 	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_login}}
@@ -418,213 +225,8 @@ $ screen /dev/matchstiq_z1_0 115200
 	\label{fig:boot1}
 \end{figure}
 
-\item Setup the OpenCPI environment on remote system
-
-\begin{flushleft}
-Each time the SDR is booted, the OpenCPI environment must be setup. By sourcing the \texttt{mynetsetup.sh} script, the remote system's environment is configured for OpenCPI and NFS directories are mounted for Network mode.\footnote{This script calls the \texttt{zynq\_net\_setup.sh} script, which should not be modifiable by the user.}. The user must provide the network address of the development system to the script as its only argument:
-\begin{verbatim}
-$ source /mnt/card/opencpi/mynetsetup.sh XX.XX.XX.XX
-\end{verbatim} \medskip
-
-where XX.XX.XX.XX is the IP address of the NFS host (i.e. that development host, \textit{e.g.} 192.168.1.10). A successful run is shown in Figure~\ref{fig:netsetup}.
-\end{flushleft}
-
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_net_setup}}
-	\caption{Successful Network Mode Setup}
-	\label{fig:netsetup}
-\end{figure} \medskip
-
-\input{NTP_Alarm_Clock}
-
-\end{enumerate}
-
-\pagebreak
-\subsection{Standalone Mode}
-All artifacts (.so, .bit.gz) for any applications or tests that need to be located on the SD card must be on the ATLAS partition in the \texttt{opencpi/xilinx13\_3/artifacts} folder.  All of the helper utilities such as \texttt{ocpirun} and \texttt{ocpihdl} are already located on the SD card and do not need to be copied over to the SDR platform.
-
-\begin{enumerate}
-\item Ensure the USB to Ethernet adapter (as needed) is plugged into the micro-USB port of the front panel and connected to a network configured for DHCP. \item Ensure a micro-USB to USB cable is connected between the Matchstiq-Z1's serial port and development host.
-\item Apply power to the Matchstiq-Z1
-\item Use a serial terminal application to establish a serial connection, for example:
-
-\begin{verbatim}
-$ screen /dev/matchstiq_z1_0 115200
-\end{verbatim} \medskip
-
-\item After a successful boot to PetaLinux, login to the system, using  ``\textbf{root}`` for user name and password.
-
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_login}}
-	\caption{Successful Boot}
-	\label{fig:boot2}
-\end{figure}
-
-\item \textcolor{red}{WARNING:}
-Applications (including XML-only ones) fail if there is not an IP address assigned to the platform, even when in ``standalone mode.'' When the Ethernet port is not connected to a network configured with DHCP, a temporary IP address must be set:
-\begin{verbatim}
-$ ifconfig eth0 192.168.244.244
-\end{verbatim} \medskip
-
-\item Setup the OpenCPI environment on remote system
-
-Each time the SDR is booted, the OpenCPI environment must be setup. By sourcing the \texttt{mysetup.sh} script, the remote system's environment is configured for OpenCPI.\footnote{This script calls the \texttt{zynq\_setup.sh} script, which should not be modifiable by the user.}. There are no arguments required for this script.
-\begin{verbatim}
-$ source /mnt/card/opencpi/mysetup.sh
-\end{verbatim} \medskip
-
-\noindent A successful setup of the platform will look as follows:
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_setup}}
-	\caption{Successful Standalone Mode Setup}
-	\label{fig:standalonesetup}
-\end{figure} \medskip
-
-\input{NTP_Alarm_Clock}
-
-\end{enumerate}
-
-\pagebreak
-\section{Build an Application}
-\begin{flushleft}
-The setup of the platform can be verified by running an application that uses both RCC and HDL workers. A simple application that requires two RCC and one HDL worker is located in \texttt{assets/applications/bias.xml}, but only the RCC artifacts are provided with the installation of RPMs, and are availble on the SD card (Standard Mode) or mounted CDK directory (Network Mode). The remaining task is to build an assembly, or bitstream for loading the FPGA, which contains the HDL worker.
-\end{flushleft}
-
 \section{Run an Application}
-\subsection{Network Mode}
-The default setup script sets the \texttt{OCPI\_LIBRARY\_PATH} variable to include the RCC workers that are required to execute the application, but it must be updated to include to the assembly bitstream that was built.  After running the \texttt{mynetsetup.sh} script, navigate to  \texttt{/mnt/ocpi\_assets/applications}, then update the \texttt{OCPI\_LIBRARY\_PATH} variable:
-\begin{verbatim}
-$ cd /mnt/net/cdk/applications
-$ export OCPI_LIBRARY_PATH=$OCPI_LIBRARY_PATH:/mnt/ocpi_assets/artifacts
-\end{verbatim}
-Run the application using the following command:
-\begin{verbatim}
-$ ocpirun -v -t 1 -d -m bias=hdl bias.xml
-\end{verbatim}
-The output should be similar to Figure~\ref{fig:netBias}:
-\begin{verbatim}
-% ocpirun -v -t 1 -d -m bias=hdl bias.xml
-Available containers are:  0: PL:0 [model: hdl os:  platform:
-matchstiq_z1], 1: rcc0 [model: rcc os: linux platform: xilinx13_3]
-Actual deployment is:
-  Instance  0 file_read (spec ocpi.core.file_read) on rcc container 1: rcc0, using file_read in
-  /mnt/ocpi_core/artifacts/ocpi.core.file_read.rcc.0.xilinx13_3.so
-  dated Tue Apr  9 11:34:43 2019
-  Instance  1 bias (spec ocpi.core.bias) on hdl container 0: PL:0, using bias_vhdl/a/bias_vhdl in
-  /mnt/ocpi_assets/applications/rx_app/../../artifacts/
-  ocpi.assets.testbias_matchstiq_z1_base.hdl.0.matchstiq_z1.gz
-  dated Mon Apr  8 14:31:34 2019
-  Instance  2 file_write (spec ocpi.core.file_write) on rcc container 1: rcc0, using file_write in
-  /mnt/ocpi_core/artifacts/ocpi.core.file_write.rcc.0.xilinx13_3.so
-  dated Tue Apr  9 11:34:48 2019
-Application XML parsed and deployments (containers and artifacts) chosen
-Application established: containers, workers, connections all created
-Communication with the application established
-Dump of all initial property values:
-Property  0: file_read.fileName = "test.input" (cached)
-Property  1: file_read.messagesInFile = "false" (cached)
-Property  2: file_read.opcode = "0" (cached)
-Property  3: file_read.messageSize = "16"
-Property  4: file_read.granularity = "4" (cached)
-Property  5: file_read.repeat = "false"
-Property  6: file_read.bytesRead = "0"
-Property  7: file_read.messagesWritten = "0"
-Property  8: file_read.suppressEOF = "false"
-Property  9: file_read.badMessage = "false"
-Property 10: file_read.ocpi_debug = "false" (parameter)
-Property 11: file_read.ocpi_endian = "little" (parameter)
-Property 16: bias.biasValue = "16909060" (cached)
-Property 17: bias.ocpi_debug = "false" (parameter)
-Property 18: bias.ocpi_endian = "little" (parameter)
-Property 20: bias.test64 = "0"
-Property 29: file_write.fileName = "test.output" (cached)
-Property 30: file_write.messagesInFile = "false" (cached)
-Property 31: file_write.bytesWritten = "0"
-Property 32: file_write.messagesWritten = "0"
-Property 33: file_write.stopOnEOF = "true" (cached)
-Property 34: file_write.ocpi_debug = "false" (parameter)
-Property 35: file_write.ocpi_endian = "little" (parameter)
-Application started/running
-Waiting up to 1 seconds for application to finish
-Application is now considered finished after waiting 1 seconds
-Dump of all final property values:
-Property  3: file_read.messageSize = "16"
-Property  6: file_read.bytesRead = "1776"
-Property  7: file_read.messagesWritten = "111"
-Property  9: file_read.badMessage = "false"
-Property 31: file_write.bytesWritten = "1760"
-Property 32: file_write.messagesWritten = "110"
-\end{verbatim}
-
-%\begin{figure}[H]
-%	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_net_bias}}
-%	\caption{Successful Network Mode Execution}
-%	\label{fig:netBias}
-%\end{figure}
-
-\pagebreak
-Run the following command to view the input. It should look like Figure~\ref{fig:inBias1}: \\
-\begin{verbatim}
-$ hexdump test.input | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_bias_input}}
-	\caption{Expected Input}
-	\label{fig:inBias1}
-\end{figure}
-
-Run the following command to view the output. It should look like Figure~\ref{fig:outBias1}: \\
-\begin{verbatim}
-$ hexdump test.output | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_bias_output}}
-	\caption{Expected Output}
-	\label{fig:outBias1}
-\end{figure}
-
-\newpage
-\subsection{Standalone Mode}
-\begin{flushleft}
-The default setup script sets the \texttt{OCPI\_LIBRARY\_PATH} variable to include the all of the artifacts that are required to execute the application. Specifically, all three of the artifacts that are located on the SD card are mounted at \texttt{/mnt/card/opencpi/xilinx13\_3/artifacts}.  After running \texttt{mysetup.sh}, navigate to \texttt{/mnt/card/opencpi/applications} and ensure the \texttt{OCPI\_LIBRARY\_PATH} variable is configure as shown below:
-\begin{verbatim}
-$ cd /mnt/card/opencpi/applications
-$ export OCPI_LIBRARY_PATH=$OCPI_LIBRARY_PATH:/mnt/card/opencpi/xilinx13_3/artifacts
-\end{verbatim}
-
-Run the application using the following command:
-\begin{verbatim}
-$ ocpirun -v -t 1 -d -m bias=hdl bias.xml
-\end{verbatim}
-The output should be similar to Figure~\ref{fig:standBias}:
-\end{flushleft}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_stand_bias}}
-	\caption{Successful Standalone Mode Execution}
- \label{fig:standBias}
-\end{figure}
-
-\pagebreak
-Run the following command to view the input. It should look like Figure~\ref{fig:inBias2}: \\
-\begin{verbatim}
-$ hexdump test.input | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_bias_input}}
-	\caption{Expected Input}
-	\label{fig:inBias2}
-\end{figure}
-
-Run the following command to view the output. It should look like Figure~\ref{fig:outBias2}: \\
-\begin{verbatim}
-$ hexdump test.output | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{Matchstiq_Z1_bias_output}}
-	\caption{Expected Output}
-	\label{fig:outBias2}
-\end{figure}
-
+See the installation guide for running a small test application.
 \pagebreak
 \begin{appendices}
 

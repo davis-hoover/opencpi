@@ -248,10 +248,11 @@ getHdlPlatforms(const StringSet *&platforms) {
   StringArray places;
   if ((err = getCdkDir(cdk)) ||
       (err = addPlaces("OCPI_HDL_PLATFORM_PATH", "", true, places)) ||
-      (err = addPlaces("OCPI_PROJECT_PATH", "/lib/platforms", false, places)))
+      (err = addPlaces("OCPI_PROJECT_PATH", "/hdl/platforms", false, places)))
     return err;
   places.push_back(cdk + "/lib/platforms"); // this must exist
   for (unsigned n = 0; n < places.size(); n++) {
+    ocpiDebug("Looking for HDL platforms in: %s", places[n].c_str());
     const char *slash = strrchr(places[n].c_str(), '/');
     assert(slash);
     if (!strcmp(++slash, "platforms")) {

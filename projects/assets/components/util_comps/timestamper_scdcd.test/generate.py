@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -34,7 +34,7 @@ if len(sys.argv) != 2:
 # Generate enough samples to generate number_of_samples_messages max_bytes_in sized input messages
 number_of_samples_messages = 1
 bytes_per_sample = 4
-num_samples_to_generate = 2048/4#number_of_samples_messages*max_bytes_in/bytes_per_sample
+num_samples_to_generate = 2048 // 4 # number_of_samples_messages * max_bytes_in // bytes_per_sample
 
 # Create ramp from 0 to num-samples-1
 ramp = np.arange(num_samples_to_generate)

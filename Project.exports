@@ -115,6 +115,10 @@
 +tools/cdk/scripts/setup-prerequisite.sh scripts/
 +tools/cdk/scripts/setup-prereq-dirs.sh scripts/
 +tools/cdk/scripts/getPlatform.sh scripts/
++tools/cdk/scripts/ocpigui.sh <target>/bin/ocpigui
++tools/cdk/scripts/ocpiav.sh <target>/bin/ocpiav
++tools/cdk/scripts/ocpiav.desktop scripts/
++tools/cdk/scripts/export-platform.sh scripts/
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/
@@ -246,14 +250,18 @@
 =runtime/hdl-support/xilinx/findJtagByESN_xilinx scripts/
 =runtime/hdl-support/xilinx/getESNfromUSB_xilinx scripts/
 =runtime/hdl-support/scripts/loadBitStream scripts/
-=runtime/hdl-support/xilinx/xilinx.mk include/hdl/
-=runtime/hdl-support/xilinx/xilinx-rcc-platform.mk include/xilinx/
-=runtime/hdl-support/xilinx/xilinx-rcc-platform-definition.mk include/xilinx/
-=platforms/zynq/createLinuxKernelHeaders.sh scripts/xilinx/
-=platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
-=platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
-=runtime/hdl-support/xilinx/normalizeXilinxReleases.sh scripts/xilinx/
-=runtime/hdl-support/xilinx/vivado* include/hdl/
++runtime/hdl-support/xilinx/xilinx.mk include/xilinx/
+# for backward compatibility
++runtime/hdl-support/xilinx/xilinx.mk include/hdl/
++runtime/hdl-support/xilinx/xilinx-rcc-platform.mk include/xilinx/
++runtime/hdl-support/xilinx/xilinx-rcc-platform-definition.mk include/xilinx/
++platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
++platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
++runtime/hdl-support/xilinx/createXilinxLinuxKernelHeaders.sh scripts/xilinx/
++runtime/hdl-support/xilinx/importXilinxRelease.sh scripts/xilinx/
++runtime/hdl-support/xilinx/importSDKartifacts.sh scripts/xilinx/
++runtime/hdl-support/xilinx/createXilinxRccPlatform.sh scripts/xilinx/
++runtime/hdl-support/xilinx/vivado* include/hdl/
 =runtime/hdl-support/scripts/loadFlash <target>/bin/
 =runtime/hdl-support/scripts/probeJtag <target>/bin/
 +runtime/hdl-support/scripts/ocpiview <target>/bin/
@@ -287,5 +295,5 @@
 # XML files required when building containers that are not real workers
 +projects/core/hdl/primitives/platform/*.xml include/hdl/
 +runtime/remote-support/scripts/* scripts/
-+runtime/remote-support/scripts/ocpiremote.sh <target>/bin/ocpiremote
++runtime/remote-support/scripts/ocpiremote.py <target>/bin/ocpiremote
 

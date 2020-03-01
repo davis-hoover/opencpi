@@ -7,6 +7,6 @@
 
   <StreamInterface Name="out"
                   NumberOfOpcodes="256" DataValueWidth="8"
-                  ZeroLengthMessages="true" insertEOM="true" workerEOF='1' myoutputclock='1'/>
+                  ZeroLengthMessages="true" insertEOM="true" workerEOF='1' clockDirection='out'/>
 
 </HdlWorker>

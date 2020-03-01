@@ -1,0 +1,11 @@
+<!-- This is the spec file (OCS) for: complex_mixer
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <!-- Add property and port elements here -->
+    <Property Name="enable" Type="bool" Writable="true" Default="true" Description="Enable(true) or Bypass(false) mixer"></Property>
+    <Property Name="phs_inc" Type="short" Writable="true" Default="8192" Description="Phase increment of NCO"></Property>
+    <Port Name="in" Protocol="iqstream_protocol"></Port>
+    <Port Name="out" Protocol="iqstream_protocol" Producer="true"></Port>
+</ComponentSpec>

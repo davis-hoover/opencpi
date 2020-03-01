@@ -96,10 +96,14 @@ PKGS_S+=(kernel-devel)
 PKGS_S+=(rpm-build)
 #    for creating swig
 PKGS_S+=(swig python-devel)
-#    for general configuration/installation flexibility
+#    for general configuration/installation flexibility - note nfs-utils-lib exists on early centos7.1
 PKGS_S+=(nfs-utils)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+#    for the AV GUI installation and tutorials
+PKGS_S+=(oxygen-icon-theme jre tree)
+#    for serial console terminal emulation
+PKGS_S+=(screen)
 
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
@@ -109,13 +113,15 @@ python3_ver=python34
 PKGS_E+=(${python3_ver} ${python3_ver}-jinja2)
 #    for various testing scripts
 #    AV-5478: If the minor version changes here, fix script below
-PKGS_E+=(${python3_ver}-numpy)
+PKGS_E+=(${python3_ver}-numpy ${python3_ver}-pip)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd)
 #    Needed to build gpsd
 PKGS_E+=(python2-scons)
+#    Needed to build certain linux kernels or u-boot, at least Xilinx 2015.4
+PKGS_E+=(dtc)
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {

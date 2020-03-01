@@ -27,6 +27,8 @@
 # in this library belong in Library.mk
 
 Tests = \
+	gpi.test \
+	gpo.test \
 	lime_dac_ts.test \
 	data_sink_dac.test
 
@@ -47,6 +49,10 @@ Workers = \
 	data_src_adc_em.hdl \
 	cstest.hdl \
 	flash.hdl \
+	gpi.hdl \
+	gpi_em.hdl \
+	gpo.hdl \
+	gpo_em.hdl \
 	gps_uart.hdl \
 	lime_adc.hdl \
 	lime_dac_ts_em.hdl \
@@ -66,7 +72,7 @@ Workers = \
 	stm_mc24c02.hdl \
 	tmp100.hdl \
 	tmp100_proxy.rcc \
-        data_sink_dac.hdl \
+	data_sink_dac.hdl \
 	data_sink_dac_em.hdl \
 	signal_time_tagger.hdl
 

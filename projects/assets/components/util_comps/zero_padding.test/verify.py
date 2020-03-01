@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -64,12 +64,12 @@ fx = open(sys.argv[2], 'rb')
 dout = numpy.fromfile(fx, dtype=fileType, count=-1)
 #Ensure dout is not all zeros
 if all(dout == 0):
-    print color.RED + color.BOLD + 'FAILED, values are all zero' + color.END
+    print(color.RED + color.BOLD + 'FAILED, values are all zero' + color.END)
     sys.exit(100)
 #Ensure that dout is the expected amount of data
 if len(dout) != numSamps * (numZeros+1) * isize:
-    print color.RED + color.BOLD + 'FAILED, input file length is unexpected' + color.END
-    print color.RED + color.BOLD + 'Length dout = ', len(dout), 'while expected length is = ' + color.END, numSamps * (numZeros+1) * isize
+    print(color.RED + color.BOLD + 'FAILED, input file length is unexpected' + color.END)
+    print(color.RED + color.BOLD + 'Length dout = ', len(dout), 'while expected length is = ' + color.END, numSamps * (numZeros+1) * isize)
     sys.exit(101)
 
 #Ones in the input file are unpacked as signed +1 values
@@ -81,25 +81,25 @@ count = 63
 ttype = numpy.iinfo(fileType)
 array_of_zeros = numpy.zeros(numZeros)
 array_of_dout = numpy.ones(numZeros)
-for i in xrange(0,len(dout)-numZeros,numZeros+1):
+for i in range(0,len(dout)-numZeros,numZeros+1):
     if (myPattern >> count) & 0x1:
         if dout[i] != ttype.max:
-            print color.RED + color.BOLD + '#1.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X')
-            print color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END
+            print(color.RED + color.BOLD + '#1.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X'))
+            print(color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END)
             sys.exit(102)
     else:
         if dout[i] != ttype.min:
-            print color.RED + color.BOLD + '#2.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X')
-            print color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END
+            print(color.RED + color.BOLD + '#2.FAILED at sample:', i, 'with value:' + color.END, format(dout[i], '#X'))
+            print(color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END)
             sys.exit(103)
 
     # Construct array of dout for bulk comparison
-    for j in xrange(1,numZeros+1):
+    for j in range(1,numZeros+1):
         array_of_dout[j-1] = dout[j]
 
     if not(numpy.array_equal(array_of_dout,array_of_zeros)):
-        print color.RED + color.BOLD + '#3.FAILED at sample:', i+numZeros, 'with value:' + color.END, format(dout[i+numZeros], '#X')
-        print color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END
+        print(color.RED + color.BOLD + '#3.FAILED at sample:', i+numZeros, 'with value:' + color.END, format(dout[i+numZeros], '#X'))
+        print(color.RED + color.BOLD + '*** Error:End validation ***\n' + color.END)
         sys.exit(104)
 
     if count == 0:

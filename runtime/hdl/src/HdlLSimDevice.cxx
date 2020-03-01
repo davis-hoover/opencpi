@@ -1125,8 +1125,8 @@ getSims(std::vector<std::string> &sims) {
   std::vector<std::string> pdirs;
   sims.clear();
   std::string first;
-  if (OU::searchPath(path.c_str(), "lib/platforms/*", first, "exports", &pdirs)) {
-    ocpiInfo("No HDL platforms found (no lib/platforms/*) in path %s",
+  if (OU::searchPath(path.c_str(), "hdl/platforms/*", first, "exports", &pdirs)) {
+    ocpiInfo("No HDL platforms found (no hdl/platforms/*) in path %s",
 	     path.c_str());
     return NULL;
   }
@@ -1261,7 +1261,7 @@ createDevice(const std::string &name, const std::string &platform, uint8_t spinC
   actualPlatform.assign(platform.c_str(),
 			!strcmp("_pf", platform.c_str() + len - 3) ? len - 3 : len);
   std::string relScript;
-  OU::format(relScript, "lib/platforms/%s/runSimExec.%s", actualPlatform.c_str(),
+  OU::format(relScript, "hdl/platforms/%s/runSimExec.%s", actualPlatform.c_str(),
 	     actualPlatform.c_str());
   if (OU::searchPath(path.c_str(), relScript.c_str(), script, "exports")) {
     OU::format(error, "No simulation platform found named %s (no %s)",

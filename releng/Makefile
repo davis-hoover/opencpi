@@ -46,9 +46,9 @@ GIT_BRANCH:=$(notdir $(shell git name-rev --name-only HEAD | perl -pe 's/([~^]\d
 GIT_VERSION:=$(shell echo $(GIT_BRANCH) | perl -ne '/^v[\.\d]+(?:gh)?$$/ && print')
 # Fix broken highlights on some editors: '
 RPM_RELEASE?=snapshot
-# If there is a tag saying it was exported to github, e.g. "1.3.0_github_1414ef3" use that instead
+# If there is a tag saying it was exported to gitlab, e.g. "1.3.0_gitlab_1414ef3" use that instead
 # Note: This command fails on CentOS6 but no worries
-COMMIT_HASH=$(shell git tag --points-at HEAD 2>/dev/null | grep github | head -n1)
+COMMIT_HASH=$(shell git tag --points-at HEAD 2>/dev/null | grep gitlab | head -n1)
 ifeq "$(COMMIT_HASH)" ''
   COMMIT_HASH=$(shell git rev-list --max-count=1 HEAD)
 endif

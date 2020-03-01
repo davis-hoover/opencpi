@@ -1,0 +1,13 @@
+# How to build:
+#   cd /path/to/opencpi
+#   podman build -t TAG -f packaging/docker/Dockerfile.build-pages scripts/
+
+FROM centos:7
+
+COPY install-opencpi-docs.sh .
+
+RUN yum -y distro-sync \
+ && ./install-opencpi-docs.sh --no-build \
+ && rm -f ./install-opencpi-docs.sh \
+
+CMD ["bash"]

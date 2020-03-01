@@ -105,10 +105,10 @@ if len(in_real) != len(out_real):
 print("    Comparing expected output and actual output")
 # Compare repeated symmetric taps array to output
 taps.extend(reversed(taps)); #extend the taps to be symmetric
-expected_output = np.tile(taps,int(len(out_real)/len(taps)))
+expected_output = np.tile(taps, len(out_real) // len(taps))
 tolerance=1
 if not (np.isclose(out_real,expected_output,atol=tolerance).all()):
     print(out_real)
     print(expected_output)
-    print ('  FAILED: Sample data does not match expected result')
+    print('  FAILED: Sample data does not match expected result')
     sys.exit(1)

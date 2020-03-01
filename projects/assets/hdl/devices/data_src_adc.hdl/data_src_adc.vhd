@@ -104,7 +104,7 @@ begin
 
     data_widener : misc_prims.misc_prims.data_widener
       generic map(
-        BITS_PACKED_INTO_MSBS    => BITS_PACKED_INTO_MSBS)
+        BITS_PACKED_INTO_MSBS => BITS_PACKED_INTO_MSBS)
       port map(
         -- CTRL INTERFACE
         clk       => dev_in.clk,
@@ -163,7 +163,6 @@ begin
       ComplexShortWithMetadata_interval_op_e when adc_opcode = INTERVAL  else
       ComplexShortWithMetadata_flush_op_e    when adc_opcode = FLUSH     else
       ComplexShortWithMetadata_sync_op_e     when adc_opcode = SYNC      else
-      ComplexShortWithMetadata_user_op_e     when adc_opcode = USER      else
       ComplexShortWithMetadata_samples_op_e;
 
 end rtl;

@@ -85,6 +85,8 @@ namespace OCPI {
       static Driver *findDriver(const char *managerName, const char *drvrName);
       // Load a specific driver
       static Driver *loadDriver(const char *managerName, const char *drvrName, std::string &err);
+      // Get system configuration information
+      ezxml_t getXML() const { return m_xml; }
     };
     // The base class for all (singleton) driver managers which are children of
     // ManagerManager. This is NOT directly inherited by derived managers. They

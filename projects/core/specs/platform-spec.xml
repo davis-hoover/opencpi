@@ -27,7 +27,7 @@
   <!-- **********MUST BE FIRST non-parameter for bootstrapping purposes -->
   <property name="UUID" arraylength='16'/>
   <!-- padding for backwards compatibility -->
-  <property name="oldtime" type='ulonglong' volatile='true'/>
+  <property name="oldtime" type='ulonglong'/>
   <!-- This could be better if we had the option for array or sequence properties to
        be individually raw or support addressible reads -->
   <property name="romAddr" type='ushort' writable='true'/>

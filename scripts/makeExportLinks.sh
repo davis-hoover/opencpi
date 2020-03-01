@@ -131,7 +131,7 @@ function make_relative_link {
   local up
 #  [[ $1 =~ ^/ ]] || up=$(echo $2 | sed 's-[^/]*$--' | sed 's-[^/]*/-../-g')
 #  link=${up}$1
-  link=$(python -c "import os.path; print os.path.relpath('$(dirname $1)','$(dirname $2)')")/
+  link=$(python -c "import os.path; print(os.path.relpath('$(dirname $1)','$(dirname $2)'))")/
   link+=$(basename $1)
   # echo make_relative_link $1 $2 up:$up link:$link > /dev/tty
   if [ -L $2 ]; then
@@ -186,19 +186,35 @@ function make_filtered_link {
   make_relative_link $1 $2
 }
 
-# process an addition ($1), and $2 is non-blank for runtime
+# process an addition ($1), and $2 is non-blank for runtime (-- for deploy)
 function do_addition {
   declare -a both=($(echo $1 | tr : ' '))
   [ "$target" = - ] && case $1 in
-      *\<target\>*|*\<platform\>*|*\<platform_dir\>*) return;;
+      *\<target\>*|*\<platform\>*|*\<platform[-_]dir\>*) return;;
   esac
-  rawsrc=${both[0]//<target>/$target2}
-  rawsrc=${rawsrc//<platform>/$platform}
-  rawsrc=${rawsrc/#<platform_dir>/$platform_dir}
-  [ -n "$rcc_platform_dir" ] && rawsrc=${rawsrc/#<rcc_platform_dir>/$rcc_platform_dir}
-  [ -n "$rcc_platform" ] && rawsrc=${rawsrc//<rcc_platform>/$rcc_platform}
   exp=${both[1]}
-  [ -z "$exp" ] && bad unexpected empty second field
+  if [ -z "$exp" ]; then
+      if [ "$2" = "--" ]; then
+	  exp=/
+      else
+	  exp="<platform>/"
+      fi
+  fi
+  rawsrc=${both[0]}
+  if [[ $rawsrc == \<platform[-_]dir\>/* ]]; then
+    # This is an export from a platform's own directory, which is already pre-staged for us in the
+    # platform's own exports dir
+    rawsrc=${exp#<platform>/}
+    rawsrc=${rawsrc#<target>/}
+    [[ "$exp" == */ ]] && rawsrc+=$(basename ${both[0]}) # if RHS was just a dir with trailing slash...
+    [ "$2" = "--" ] && rawsrc=deploy/${rawsrc#/}
+    rawsrc=$platform_dir/$rawsrc
+  fi
+  rawsrc=${rawsrc//<target>/$target2}
+  rawsrc=${rawsrc//<platform>/$platform}
+  rawsrc=${rawsrc/#<platform[-_]dir>/$platform_dir}
+  [ -n "$rcc_platform_dir" ] && rawsrc=${rawsrc/#<rcc[-_]platform[-_]dir>/$rcc_platform_dir}
+  [ -n "$rcc_platform" ] && rawsrc=${rawsrc//<rcc[-_]platform>/$rcc_platform}
   if [ "$2" = "--" ]; then
       # If deployment(@) replace make sure there is deploy/<target>
       if [[ "${exp}" =~ ^deploy/ ]]; then
@@ -213,7 +229,7 @@ function do_addition {
   exp=${exp//<platform>/$platform}
   exp=${exp//<target>/$target2}
   if [ -n "$rcc_platform" ]; then
-     exp=${exp//<rcc_platform>/$rcc_platform}
+     exp=${exp//<rcc[-_]platform>/$rcc_platform}
   fi
   set +f
   targets=$(match_pattern "$rawsrc")
@@ -395,6 +411,31 @@ done
 for a in $deployments; do
   do_addition $a --
 done
+# Create or replace the user editable environment setup file.
+# Since this might enable tools, we do it early, even when we are not creating links for a target
+# Note that this is analogous to the runtime system config file system.xml
+userenv=user-env.sh
+defaultuserenv=tools/cdk/scripts/default-user-env.sh
+if [ -r $userenv ] && grep -q '^ *export' $userenv; then
+  [ -n "$verbose" ] &&
+      echo Preserving user environment script \"$userenv\" since it has user-specified exports in it.
+  version=$(sed -n 'g/^ *# *VERSION */s///p' $userenv)
+  defaultversion=$(sed -n 'g/^ *# *VERSION */s///p' $defaultuserenv)
+  if [ "$version" != "$defaultversion" ]; then
+      echo The user-edited environment setup file \"$userenv\", is out of date.
+      echo It should be re-edited based on a copy of the updated default version in \"$defaultuserenv\".
+  fi
+elif [ -r $userenv ]; then
+  if cmp -s $userenv $defaultuserenv; then
+    [ -n "$verbose" ] && echo Preserving user environment script \"$userenv\" since it is the default one.
+  else
+    [ -n "$verbose" ] && echo "Replacing user environment script \"$userenv\" with current default, since it has no exports and is different from the (presumably newer) default one."
+    cp $defaultuserenv $userenv
+  fi
+else
+  cp $defaultuserenv $userenv
+fi
+
 # After this are only exports done when targets exist
 [ -n "$hdl_platform" ] && exit 0
 [ "$target" = - ] && exit 0
@@ -403,7 +444,7 @@ set +f
 # FIXME: make sure if/whether this is really required and why
 check=$rcc_platform_dir/${rcc_platform}-check.sh
 [ -z "$hdl_platform" -a -r "$check" ] && {
-  to=$(python -c "import os.path; print os.path.relpath('"$check"', '.')")
+  to=$(python -c "import os.path; print(os.path.relpath('"$check"', '.'))")
   make_relative_link $to exports/runtime/$target/$(basename $check)
   cat <<-EOF > exports/runtime/$target/${rcc_platform}-init.sh
 	# This is the minimal setup required for runtime

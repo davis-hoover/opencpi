@@ -1,0 +1,16 @@
+prereq:centos7:xilinx13_4:
+  extends: 
+    - .install-prereqs
+    - .centos7
+    - .xilinx13_4
+
+build-rcc:centos7:xilinx13_4:
+  extends: 
+    - .build-rcc
+    - .centos7
+    - .xilinx13_4
+  needs:
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - prereq:centos7:xilinx13_4

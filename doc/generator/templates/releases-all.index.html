@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}OpenCPI Documentation{% endblock %}
+
+{% block content %}
+<h1>OpenCPI Documentation</h1>
+
+<p>Below is a list of OpenCPI releases with links to documentation for that release.</p>
+<p>Development version of the documentation can be found <a href="{{develop_url}}">here</a>.</p>
+
+<h2>Releases</h2>
+<ul>
+    {% for release in releases|reverse %}
+    <li>{{ release.anchor_tag() }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

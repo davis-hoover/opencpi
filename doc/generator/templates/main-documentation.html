@@ -1,0 +1,79 @@
+{% macro get_link(name, data) -%}
+{% if name in data %}
+{{ data[name].anchor_tag() }}
+{% endif %}
+{%- endmacro %}
+
+{% macro pop_link(name, data) -%}
+{% if name in data %}
+{{ data[name].anchor_tag() }}
+{% set _ = data.pop(name) %}
+{% endif %}
+{%- endmacro %}
+
+{% macro pop_link_must_exist(name, data) -%}
+{{ data[name].anchor_tag() }}
+{% set _ = data.pop(name) %}
+{%- endmacro %}
+
+<h2>{{ section_title }}</h2>
+<p>
+    It is highly recommended to read all of the Getting Started Guides in the order listed before reading
+    the Developer or Additional Guides. If OpenCPI has already been installed, then you may skip the installation guide.
+</p>
+<div>{{ pop_link("release notes", links) }}</div>
+
+<div class="flexbox-container">
+    <div class="flexbox-item">
+        <h3>Getting Started Guides</h3>
+        {% if "opencpi installation" in links and "rpm installation" in links %}
+        <div>{{ pop_link_must_exist("opencpi installation", links) }} or
+            {{ pop_link_must_exist("rpm installation", links) }}
+        </div>
+        {% elif "opencpi installation" in links %}
+        <div>{{ pop_link_must_exist("opencpi installation", links) }}</div>
+        {% elif "rpm installation" in links %}
+        <div>{{ pop_link_must_exist("rpm installation", links) }}</div>
+        {% endif %}
+        <div>{{ pop_link("opencpi user", links) }}</div>
+        <div>{{ pop_link("getting started", links) }}</div>
+
+        <h3>Developer Guides</h3>
+        <div>{{ pop_link_must_exist("opencpi application development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi component development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi rcc development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi hdl development", links) }}</div>
+        <div>{{ pop_link_must_exist("opencpi platform development", links) }}</div>
+
+        {% if assets %}
+        <h3>System Specific Guides</h3>
+        <div>{{ get_link("alst4 getting started", assets.files) }}</div>
+        <div>{{ get_link("matchstiq z1 getting started", assets.files) }}</div>
+        <div>{{ get_link("ml605 getting started", assets.files) }}</div>
+        <div>{{ get_link("zedboard getting started", assets.files) }}</div>
+        {% endif %}
+
+        <h3>Additional Guides</h3>
+        {% for name in links|sort %}
+        <div>{{ links[name].anchor_tag() }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="flexbox-item">
+        {% if briefings %}
+        <h3>{{ briefings.title }}</h3>
+        {% for name in briefings.files|sort %}
+        <div>{{ briefings.files[name].anchor_tag() }}</div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="flexbox-item">
+        {% if tutorials %}
+        <h3>{{ tutorials.title }}</h3>
+        {% for name in tutorials.files|sort %}
+        <div>{{ tutorials.files[name].anchor_tag() }}</div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>

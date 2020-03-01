@@ -51,11 +51,11 @@ def addsamples(f, data, num_cycles,samples_per_message):
     for i in xrange(num_cycles):
         a = 0
         while a < len(data):
-            if len(data) - a < samples_per_message/4:
+            if len(data) - a < samples_per_message // 4:
                 addmsg(f, SAMPLES_OPCODE, data[a:len(data)])
             else:
-                addmsg(f, SAMPLES_OPCODE, data[a:a+samples_per_message/4])
-            a+=samples_per_message/4
+                addmsg(f, SAMPLES_OPCODE, data[a:a+samples_per_message//4])
+            a += samples_per_message // 4
 
 
 if len(sys.argv) != 6:
@@ -97,7 +97,7 @@ out_data['imag_idx'] = np.int16(imag * gain)
 
 # Save data to file
 message_size=2048
-samples_per_message=message_size/4
+samples_per_message=message_size//4
 interval=(1/Fs)*pow(2,64)
 interval_msb=long(interval)>>32
 interval_lsb=long(interval)&0xFFFFFFFF

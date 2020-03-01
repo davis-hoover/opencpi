@@ -20,7 +20,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Vivado Usage Notes}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 %----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
 \input{\snippetpath/includes}
@@ -32,6 +32,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 %----------------------------------------------------------------------------------------
 \begin{document}
 \maketitle
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 \thispagestyle{fancy}
 \newpage
 \begin{center}
@@ -47,6 +50,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
       v1.4 & Update for Release 1.4 & 9/2018 \\
       \hline
       v1.5 & Update for Release 1.5 & 4/2019 \\
+      \hline
+      v1.6 & Update for Release 1.6 & 1/2020 \\
       \hline
     \end{tabularx}
   \end{table}
@@ -67,7 +72,7 @@ The reference(s) in Table \ref{table:references} can be used as an overview of O
 \def\myreferences{
 \hline
 HDL Development Guide &
-\githubio{OpenCPI\_HDL\_Development.pdf} \\
+\githubio{OpenCPI\_HDL\_Development\_Guide.pdf} \\
 }
 \input{References_Table}
 
@@ -147,7 +152,7 @@ To use Vivado's IP within OpenCPI, you can follow these steps:
 \subitem  \textit{Note}: Reference section \ref{prebuiltcore} for more information on using Vivado pre-built cores with OpenCPI
 \subitem - Generate a simulation netlist for use with XSIM:
 \subsubitem \code{> write\_vhdl <ip\_name>\_sim.vhd}
-\subsubitem \textit{Note}: For more information on simulating Vivado IP with ANGRYIPER, reference \ref{sim_ip}.
+\subsubitem \textit{Note}: For more information on simulating Vivado IP with OpenCPI, reference \ref{sim_ip}.
 %\item Note that we recommend placing pre-built cores in %OpenCPI Primitive Cores. Doing so involves creating a %\code{<ip\_name>\_pkg.vhd} file which would contain a VHDL %package with the core's component declaration. This package %file replaces the stub file.
 \item Reference the Instantiation Template (*.vho) file when instantiating the module in your design.
 \end{itemize}

@@ -98,9 +98,11 @@ PKGS_S+=(rpm-build)
 #    for creating swig
 PKGS_S+=(swig python-devel)
 #    for general configuration/installation flexibility
-PKGS_S+=(nfs-utils)
+PKGS_S+=(nfs-utils nfs-utils-lib)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
+#    for serial console terminal emulation
+PKGS_S+=(screen)
 
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
@@ -109,7 +111,7 @@ PKGS_S+=(glibc-devel.i686)
 python3_ver=python34
 PKGS_E+=(${python3_ver} ${python3_ver}-jinja2)
 #    for various testing scripts
-PKGS_E+=(${python3_ver}-numpy)
+PKGS_E+=(${python3_ver}-numpy ${python3_ver}-pip)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd)
 #    for bash completion - a noarch package  (AV-2398)

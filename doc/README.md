@@ -1,8 +1,4 @@
-Overview
----
+Source documents for OpenCPI Framework from which PDFs are generated.
 
- - The [html directory](html/) contains *some* documents ready for viewing. Generated PDFs can be found at http://opencpi.github.io/
- - The odt//tex//docx directories contains source documents in ODT//LaTeX//docx format.
- - Documents created by the ANGRYVIPER team are under /av/.
- - The "old" directory contains documents that are no longer current, but are available for historical reasons.
- - The Recommended.md file contains a recommeded reading order.
+Generated PDFs for the latest version can be found at https://opencpi.gitlab.io/releases/  
+Generated PDFs for the all versions can be found at https://opencpi.gitlab.io/releases/all/

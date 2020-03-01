@@ -1,0 +1,6 @@
+<HdlWorker language='vhdl' spec='complex_mixer-spec' Version="2">
+    <Property Name="data_select" Type="bool" Default="false" Writable="true" 
+     Description="In Bypass Mode: selects data to output: 0=input data, 1=output of NCO"></Property>
+    <StreamInterface Name="in" DataWidth="32"></StreamInterface>
+    <StreamInterface Name="out" DataWidth="32" InsertEOM="1"></StreamInterface>
+</HdlWorker>

@@ -21,11 +21,11 @@
 # in the typical way that such scripts are called from the user's .profile.
 # It not meant to be *executed* as a shell script, only sourced.
 # It is sourced by its name in the top level of the desired CDK installation
-# (possibly /opt/opencpi/cdk).  If may be sourced using a relative pathname.
+# (possibly /opt/opencpi/cdk).  It may be sourced using a relative pathname.
 
-# Thus its location implies where OpenCPI is installed.
+# Thus its location (where it is sourced from) implies where OpenCPI is installed.
 # This means that it should only be run (sourced) in its "exported" location, not in its
-# location inside the source tree.
+# location inside the source tree.  Most common usage from source tree is: source cdk/opencpi-setup.sh -s
 # The CDK is where this is sourced from (its dirname) and so OCPI_CDK_DIR is set accordingly.
 
 # There are several different scenarios where this script will run:
@@ -190,7 +190,7 @@ done
   done
 }
 # Make the file name of this script absolute if it isn't already
-# But leave it user friendly (don't to readlink etc.)
+# But leave it user friendly (don't do readlink etc.)
 [[ "$ocpi_me" = /* ]] || ocpi_me=`pwd`/$ocpi_me
 ocpi_dir=`dirname $ocpi_me`
 [ -d $ocpi_dir -a -x $ocpi_dir ] || {
@@ -241,14 +241,11 @@ else
   [ -n "$ocpi_optimized" ] && OCPI_TOOL_DIR+=o
   # This is (temporarily) redundant with ocpibootstrap.sh
   [ -z "$OCPI_PREREQUISITES_DIR" ] && {
-    if [ -n "$OCPI_CDK_DIR" -a -d "$OCPI_CDK_DIR/../prerequisites" ]; then
-      export OCPI_PREREQUISITES_DIR=$(cd $OCPI_CDK_DIR/../prerequisites; pwd)
+    export OCPI_PREREQUISITES_DIR=$OCPI_CDK_DIR/../prerequisites
+    if [ -d $OCPI_PREREQUISITES_DIR ]; then
+      export OCPI_PREREQUISITES_DIR=$(cd $OCPI_PREREQUISITES_DIR; pwd)
     else
-      export OCPI_PREREQUISITES_DIR=/opt/opencpi/prerequisites
-    fi
-    if [ ! -d $OCPI_PREREQUISITES_DIR ]; then
-      echo "$ocpi_name:  $OCPI_PREREQUISITES_DIR does not exist.  The installation/build of OpenCPI is incomplete."
-      return 1
+      echo "$ocpi_name: warning: $OCPI_PREREQUISITES_DIR does not exist.  The installation/build of OpenCPI is incomplete." >&2
     fi
   }
   [ "$ocpi_verbose" = 1 ] &&
@@ -271,8 +268,23 @@ ocpi_comp=$OCPI_CDK_DIR/scripts/ocpidev_bash_complete
 	PYTHONPATH now set to $PYTHONPATH
 	Now determining where prerequisite software is installed.
 	EOF
+ocpi_user_env=$OCPI_CDK_DIR/../user-env.sh
+[ -r "$ocpi_user_env" ] && {
+  if grep -q '^ *export' $ocpi_user_env; then
+    [ "$ocpi_verbose" = 1 ] &&
+	echo "Sourcing $ocpi_user_env for user settings of OpenCPI environment variables." >&2
+    source $ocpi_user_env
+  elif [ -r $ocpi_user_env ]; then
+    [ "$ocpi_verbose" = 1 ] &&
+	echo The user environment setting script \"$ocpi_user_env\" contains no export commands so it is ignored. >&2
+  fi
+}
 [ "$ocpi_verbose" = 1 ] && {
   echo "Below are all OCPI_* environment variables now set:" >&2
   env | grep OCPI | sort >&2
 }
+
+# Clear bash hash in case there are any paths stored in it
+hash -r
+
 return 0

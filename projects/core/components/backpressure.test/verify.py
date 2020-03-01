@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3.4
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -57,7 +57,7 @@ import numpy as np
 if len(sys.argv) != 3:
     print("Invalid arguments:  usage is: verify.py <output-file> <input-file>")
     sys.exit(1)
-print "    VALIDATE (I/Q 16b binary data file):"
+print("    VALIDATE (I/Q 16b binary data file):")
 
 enable_select = os.environ.get("OCPI_TEST_enable_select")
 
@@ -79,26 +79,26 @@ ifilename.close()
 
 #Test #1 - Check that output data is not all zeros
 if all(odata == 0):
-    print '    ' + color.RED + color.BOLD + 'FAIL, values are all zero' + color.END
+    print('    ' + color.RED + color.BOLD + 'FAIL, values are all zero' + color.END)
     sys.exit(1)
 else:
-    print '    PASS: File is not all zeros'
+    print('    PASS: File is not all zeros')
 
 #Test #2 - Check that output data is the expected amount
 if len(odata) != len(idata):
-    print '    ' + color.RED + color.BOLD + 'FAIL, input file length is unexpected' + color.END
-    print '    ' + color.RED + color.BOLD + 'Length dout = ', len(odata), 'while expected length is = ' + color.END, len(idata)
+    print('    ' + color.RED + color.BOLD + 'FAIL, input file length is unexpected' + color.END)
+    print('    ' + color.RED + color.BOLD + 'Length dout = ', len(odata), 'while expected length is = ' + color.END, len(idata))
     sys.exit(1)
 else:
-    print '    PASS: Input and output file lengths match'
+    print('    PASS: Input and output file lengths match')
 
 #Test #3 - Check that output data matches the input data
 if np.array_equal(idata, odata):
-    print '    PASS: Input and output data files match'
+    print('    PASS: Input and output data files match')
 else:
-    print '    FAIL: Input and output data files not match'
+    print('    FAIL: Input and output data files not match')
     sys.exit(1)
 
 
-print '    Data matched expected results.'
-print '    ' + color.GREEN + color.BOLD + 'PASSED' + color.END
+print('    Data matched expected results.')
+print('    ' + color.GREEN + color.BOLD + 'PASSED' + color.END)

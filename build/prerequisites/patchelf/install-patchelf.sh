@@ -24,7 +24,7 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
        patchelf \
        "ELF file patching utility" \
-       http://nixos.org/releases/patchelf/$dir \
+       https://nixos.org/releases/patchelf/$dir \
        $dir.tar.gz \
        $dir \
        0

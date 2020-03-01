@@ -872,7 +872,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	      log_debug("load fpga loading to: %px\n", buf);
 	      if (!copy_from_user((void *)buf, (void __user *)request.data, request.length)) {
   #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
-		err = fpga_mgs_buf_load(mgr, 0, buf, request.length);
+		err = fpga_mgr_buf_load(mgr, 0, buf, request.length);
   #else
 		struct fpga_image_info *info;
 		err = -ENOMEM;

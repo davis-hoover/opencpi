@@ -21,7 +21,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{OpenCPI\\ \bigskip ZedBoard Getting Started Guide}
-\def\docVersion{1.5}
+\def\docVersion{1.6}
 \def\rccplatform{xilinx13\_3}
 \def\radioName{Zedboard}
 \def\mountPoint{/mnt/}
@@ -49,6 +49,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 }
 \begin{document}
 \maketitle
+\begin{center}
+OpenCPI Release: \ocpiversion
+\end{center}
 %\thispagestyle{fancy}
 
 \newpage
@@ -74,6 +77,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 				\hline
 				v1.5 & Deprecated Zipper & 4/2019 \\
 				\hline
+                                v1.6 & Refer to installation doc when possible & 1/2020 \\
+			        \hline
 			\end{tabularx}
 		\end{table}
 	\end{center}
@@ -85,104 +90,31 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \newpage
 
 \section{References}
-	This document assumes a basic understanding of the Linux command line (or ``shell'') environment.  The reference(s) in Table 1 can be used as an overview of OpenCPI and may prove useful.
-\def\refskipocpiov{}
+The reference(s) in Table 1 can be used as an overview of OpenCPI and may prove useful.  The installation guide is required since many of the steps mentioned here are defined there, especially in the section:  Enabling OpenCPI Development for Embedded Systems.  This document provides details for this system that can be applied to procedures defined there.  It is best to use both documents at the same time.  This document assumes a basic understanding of the Linux command line (or ``shell'') environment.  
 \def\refcapbottom{}
-\input{References_Table}
-
-\newpage
+\input{References_Table_noRPM}
 \section{Overview}
-This document provides: steps for configuring a factory provided Digilent Zedboard with the OpenCPI run-time environment for executing applications, configuring a development system to build OpenCPI bitstreams targeting the \textit{zed} platform, and examples of executing applications on the OpenCPI configured Zedboard.
+This document provides: steps for configuring a factory provided Digilent Zedboard with the OpenCPI run-time environment for executing applications.
 
 \section{Prerequisites}
-\subsection{RCC Platforms}
-The RCC platforms xilinx13\_3 and xilinx13\_4 are both supported. When targeting xilinx13\_4, replace 13\_3 in directory names and other places where 13\_3 is used or applicable. Boards such as the E310 and ZedBoard use the same xilinx13\_4 RCC platform. If it is already installed and built it can apply to the ZedBoard. 
 \begin{flushleft}
-\subsection{RPM}
-This guide assumes that, at a minimum, the following RPMs are installed:  \\
-\begin{table}[H]
-	\label{table:rpms}
-		\begin{tabularx}{\textwidth}{|C|X|}
-		\hline
-		\rowcolor{blue}
-		 \textbf{RPM Name} & \textbf{Description} \\
-		\hline
-		All prerequisite RPMs & These packages have OpenCPI-specific patches and are provided as RPMs. This packaging ensures they will not conflict with other installed copies by using a nonstandard installation location of \path{/opt/opencpi/prerequisites}. \\
-		\hline
-		\small{\code{angryviper-ide-*.x86 64.rpm}} &
-		The ANGRYVIPER IDE (Eclipse with plugins). See RPM Installation Guide.pdf, Appendix D for an alternative method to set up the IDE using an existing Eclipse installation. \\
-		\hline
-		\small{\code{opencpi-*.x86\_64.rpm}} &
-		Base installation RPM includes the runtime portion of the Component
-Development Kit (CDK) and the source for the ocpi.core and ocpi.assets Projects containing framework essential components, workers,
-platforms, etc. \\
-		\hline
-		\small{\code{opencpi-devel-*.x86\_64.rpm}} &
-		Additional header files and scripts for developing new assets as HDL
-and/or RCC. \\
-		\hline
-		\small{\code{opencpi-sw-platform-xilinx13\_3-*.noarch.rpm}}
-		\centerline{or}
-		\small{\code{opencpi-sw-platform-xilinx13\_4-*.noarch.rpm}} &
-		Additional files necessary to build the framework targeting specific
-RCC/software platforms, independent of the final deployed hardware. \\
-		\hline
-		\small{\code{opencpi-hw-platform-zed-xilinx13\_3-*.noarch.rpm}} \centerline{or} \small{\code{opencpi-hw-platform-zed-xilinx13\_4-*.noarch.rpm}} &
-		Additional files necessary to build the framework targeting specific hardware platform ``X'' when running RCC platform ``Y'' (``Y'' can be ``no sw''). This RPM also includes hardware-specific SD Card images when applicable. \\
-		\hline
-	\end{tabularx}
-\end{table}
+It is assumed that the tasks defined in the ``Enabling OpenCPI Development for Embedded Systems'' section of the \githubio[\textit{OpenCPI Installation Guide}]{OpenCPI\_Installation\_Guide.pdf} have been successfully performed.
+As mentioned there, support for the ZedBoard system is based on the \textit{ocpi.assets} built-in project, using the \textit{zed} OpenCPI HDL (FPGA) platform and the \textit{xilinx13\_4} or \textit{xilinx13\_3 }OpenCPI RCC (software) platform.  The software platforms are supported by the \textit{ocpi.core} built-in project.
 
-\subsection{Installation of provided OpenCPI projects: \textit{core} and \textit{assets}}
-This guide  assumes the user has executed \textit{ocpi-copy-projects}, accepting the default settings, to copy and register the \textit{core} and \textit{assets} projects from the /opt/opencpi/projects for building bitstreams for the Zedboard. Reference the Getting Started Guide for details on \textit{ocpi-copy-projects}.  While registering of the projects is performed during the execution of ocpi-copy-projects, changes to the registry can be made via \code{ocpidev un/register project} or the ANGRYVIPER GUI.\medskip
-
-\begin{verbatim}
-$ ocpi-copy-projects
-...
-$ ls ~/ocpi_projects
-assets core
-$ ocpidev show registry
-Project registry is located at: /opt/opencpi/cdk/../project-registry
-----------------------------------------------------------------------------------------
-| Project Package-ID  | Path to Project                                 | Valid/Exists |
-| ------------------  | ---------------                                 | ------------ |
-| ocpi.core           | /home/user/ocpi_projects/core                   | True         |
-| ocpi.assets         | /home/user/ocpi_projects/assets                 | True         |
-----------------------------------------------------------------------------------------
-\end{verbatim}
+\subsection{RCC Platforms}
+The RCC platforms \textit{xilinx13\_3} and \textit{xilinx13\_4} are both supported. When targeting \textit{xilinx13\_4}, replace 13\_3 in directory names and other places where 13\_3 is used or applicable. Systems such as the E310 and ZedBoard use the same \textit{xilinx13\_4} RCC platform. If it is already installed and built it can apply to the ZedBoard. 
 
 \subsection{Vendor Software Setup}
-The platform that is expected to be used is the Digilent Zedboard (\textit{e.g.} zed). This OpenCPI-enabled platform provides the capability of deploying hardware and software workers while using Xilinx's 13.3 distribution of Linux.\\ \bigskip
+Also indicated in the installation guide, the tools used for software cross compilation are from the Xilinx Vivado 2013.4 SDK, and the tools used for the FPGA are any recent version of the Xilinx Vivado Webpack tools.  The Linux Kernel is based on the Xilinx Linux kernel tagged \textit{xilinx-v2013.4} (for \textit{xilinx13\_4}) or \textit{xilinx-v14.7} (for \textit{xilinx13\_3}.  The installation of these tools is described in the installation guide.
 
-The synthesizers and cross-compilers required to build HDL and RCC Workers for this platform are installed by following the instructions found in the \textit{OpenCPI FPGA Vendor Tools Installation Guide}. This document assumes that the user has installed the appropriate versions of Vivado and the Xilinx SDK.\\ \bigskip
-
-\subsection{Building OpenCPI projects: \textit{core} and \textit{assets} }
+\subsection{Building Required Projects}
 \label{sec:Building OpenCPI projects}
-The \textit{core} and \textit{assets} projects must be built \textit{in a specific order} for this platform. This section outlines how to build the relevant projects and provides the commands to do so.\medskip
-
-For this document, the projects should be built as follows:\\
-
-\begin{enumerate}
-	\item Build \code{core} for the \code{xilinx13\_3} RCC Platform and the \code{zed} HDL Platform (approx 30 min)
-	\item Build \code{assets} for the \code{xilinx13\_3} RCC Platform and the \code{zed} HDL Platform, but omit assemblies (approx 45 min)
-	\item Build the \code{testbias} assembly from the \code{assets} project. This will be used later in this guide. (approx 10 min)
-\end{enumerate}
-\begin{lstlisting}[showspaces=false]
-$ cd /home/<user>/ocpi_projects/
-$ ocpidev build -d core     --rcc-platform xilinx13_3 --hdl-platform zed
-$ ocpidev build -d assets   --rcc-platform xilinx13_3 --hdl-platform zed --no-assemblies
-$ ocpidev build -d assets hdl assembly testbias       --hdl-platform zed
-\end{lstlisting}
-Note: replace ``\code{<user>}'' with your username in the commands above.\\\medskip
-
-Each of these build commands can also be performed via the ANGRYVIPER IDE as follows:
-\OcpidevBuild
-See the ANGRYVIPER Team's Getting Started Guide for additional information concerning the use of \code{ocpidev} and the ANGRYVIPER IDE to build OpenCPI assets.
+The standard built-in OpenCPI projects are built using the instructions in the installation guide.  This results in a single executable FPGA test application ready to run:  \textit{bias}, based on the \textit{testbias} HDL assembly, both in the \textit{assets} built-in project.
 
 \subsection{Hardware Setup}
 \begin{itemize}
-\item \textbf{Digilent Zedboard}\\ \medskip
-It is expected that this evaluation board includes a power supply, micro-USB to USB cable, micro-USB to female-USB adapter and standard SD card (4GB). \\ \medskip
+\item \textbf{Digilent Zedboard Product Package}\\ \medskip
+It is expected that this system includes a power supply, micro-USB to USB cable, micro-USB to female-USB adapter and standard SD card (4GB). \\ \medskip
 OpenCPI has been tested on revisions C and D of the Zedboard.\\ \medskip
 The micro-USB serial port located on the top-side of the ZedBoard labeled UART, can be used to access the serial connection with the processor.\medskip
 
@@ -208,7 +140,7 @@ An Ethernet port is available on the Zedboard and is required when the Network m
 	\label{fig:zed_ether}
 \end{figure}
 
-\item \textbf{OpenCPI Zedboard BSP supported daughter cards (OPTIONAL)}\\
+\item \textbf{OpenCPI Zedboard supported daughter cards (OPTIONAL)}\\
 The ZedBoard has a FMC LPC slot that is used to connect plug-in modules or daughter cards. Currently, OpenCPI supports two FMC daughter cards, which may be installed on the Zedboard:
 \begin{itemize}
 	\item Analog Devices FMCOMMS2
@@ -221,88 +153,10 @@ The ZedBoard has a FMC LPC slot that is used to connect plug-in modules or daugh
 \end{itemize}
 \end{flushleft}
 
-\pagebreak
 \section{SD Card Setup}
 \label{sec:SD_Card_Setup}
-\subsection{Make a backup image of factory SD card (assumes Linux host)}
-This section provides the steps for creating an SD card backup image. It is optional, because the factory provided SD card does not have special formatting or content that must be preserved, unlike other systems (Epiq Solutions Matchstiq-Z1) that have been enabled for OpenCPI. The subsequent subsections assume the SD card is empty.
-
-\begin{itemize}
-\item Determine the device file name for the SD card by executing dmesg command below. It will likely be something like \texttt{/dev/sdb} or \texttt{/dev/mmcblk0}.\\
-\texttt{\$ dmesg | tail -n 15} \\
-\item Run the following dd command to make a backup image, where DEVICENAME was determined above. This step should take $\sim15$ minutes depending on the card size.\\ \medskip
-\texttt{\$ dd if=DEVICENAME of=backup.image}
-\end{itemize}
-\noindent To restore the card back to the original contents, run the command ``\texttt{dd of=DEVICENAME if=backup.image}''
-
-\subsection{Format the SD card}
-\begin{itemize}
-\item If the user requires the SD card to be formatted, use a single FAT32 partition.
-\end{itemize}
-
-\subsection{Copy embedded OS and boot files to SD card}
-\label{sec:Copy embedded OS and boot files to SD card}
-WARNING: The user must ensure that the contents of the SD, match the version of the OpenCPI release that the artifacts were built against.\\
-
-\noindent When using the factory SD card (with the proper formatting), all files can be ignored or deleted. Any files/directories copied to the SD card will appear at \texttt{/mnt/card} on the Zed.\\
-
-\noindent Copy the following files/directories onto the SD card:
-\begin{verbatim}
-$ cp /opt/opencpi/cdk/zed/sdcard-xilinx13_3/boot.bin /run/media/<user>/<partition>/
-
-$ cp /opt/opencpi/cdk/zed/sdcard-xilinx13_3/devicetree.dtb /run/media/<user>/<partition>/
-
-$ cp /opt/opencpi/cdk/zed/sdcard-xilinx13_3/uImage /run/media/<user>/<partition>/
-
-$ cp /opt/opencpi/cdk/zed/sdcard-xilinx13_3/uramdisk.image.gz /run/media/<user>/<partition>/
-\end{verbatim}\medskip
-
-\subsection{Copy files to SD card for desired Mode(s)}
-As previously discussed, Standalone and Network modes offer trade-offs for configuring the run-time environment of the platform. The following sections provide instructions for copying specific files/directories to the SD card in support of these modes. For maximum flexibility and completion of this getting started guide, it is recommended that the SD card be configured to support both modes, as covered in the next sub-section. However, instructions for configuring the SD card for each mode separately, have also been provided.
-
-\subsubsection{Standalone and Network Modes}
-The SD can be setup to support both modes, as there is no conflict between the files/directories for either mode. To setup the SD to support both modes:\\
-
-\noindent After performing the steps from \ref{sec:Copy embedded OS and boot files to SD card}, copy the entire \textit{opencpi} directory to the SD card.
-
-\begin{verbatim}
-$ cp -rL /opt/opencpi/cdk/zed/sdcard-xilinx13_3/opencpi /run/media/<user>/<partition>/
-
-$ cp /home/<user>/ocpi_projects/assets/hdl/assemblies/testbias/container-testbias_zed_base/\
-target-zynq/testbias_zed_base.bit.gz /run/media/<user>/<partition>/opencpi/xilinx13_3/artifacts/
-\end{verbatim}
-
-\subsubsection{Standalone Mode}
-After performing the steps from \ref{sec:Copy embedded OS and boot files to SD card}, copy the entire \textit{opencpi} directory to the SD card, then copy the relevant bitstreams, artifacts into the \textit{artifacts} directory and application XMLs into the \textit{applications} directory. For this getting started guide, only one bitstream is required to be copied onto the SD cards, where as the required artifacts and application XML where copied to the SD along with the entire \textit{opencpi} directory.
-
-\begin{verbatim}
-$ cp -rL /opt/opencpi/cdk/zed/sdcard-xilinx13_3/opencpi /run/media/<user>/<partition>/
-
-$ cp /home/<user>/ocpi_projects/assets/hdl/assemblies/testbias/container-testbias_zed_base/\
-target-zynq/testbias_zed_base.bit.gz /run/media/<user>/<partition>/opencpi/xilinx13_3/artifacts/
-\end{verbatim}
-
-\subsubsection{Network Mode}
-After performing the steps from \ref{sec:Copy embedded OS and boot files to SD card}, create a directory on the partition named \code{opencpi} and copy the following files into the this directory:
-
-\begin{verbatim}
-$ mkdir /run/media/<user>/<partition>/opencpi
-
-$ cp /opt/opencpi/cdk/zed/sdcard-xilinx13_3/opencpi/default_mynetsetup.sh \
-/run/media/<user>/<partition>/opencpi/
-
-$ cp /opt/opencpi/cdk/zed/sdcard-xilinx13_3/opencpi/zynq_net_setup.sh \
-/run/media/<user>/<partition>/opencpi/
-\end{verbatim}
-
-\subsection{SD Card Source}
-The final SD Card artifacts are distributed in \path{/opt/opencpi/cdk/zed/} via RPM as noted previously. The end user is not required nor expected to generate the files.
-
-\pagebreak
-\input{Script_Setup}
-\input{Setup_System_Time}
-\input{rsync_Setup_Snippet}
-\end{flushleft}
+The installation guide provides the procedure for creating a new SD card for OpenCPI and customizing some of files for your particular configuration.  The usual way is to make a raw copy of the manufacturer supplied card to a new card, preserving formatting and content, and then removing most original files and copying files from OpenCPI.\\ \medskip
+If you need to format the SD card for this system, it should be a single FAT32 partition.
 
 \subsection{Multiple ZedBoards on the same network}
 \label{sec:Multiple ZedBoards on the same network}
@@ -318,22 +172,7 @@ If it is required that multiple ZedBoards are to be on the same network, the fol
 \section{Hardware Setup}
 
 \subsection{Establish a Serial Connection}
-By default, the USB to Serial adapter connects as read-only, which requires sudo privileges for establishing a serial connection. OpenCPI recognizes that sudo may not be available and has provided an alternative for configuring the device thereby allowing all users access to the device. Specifically, this is accomplished by adding \texttt{udev} rules to instruct the device connection to have read and write permissions for all users.
-\begin{itemize}
-\item If OpenCPI was installed via RPMs, the \texttt{udev} rules are automatically setup for the user.
-\item If OpenCPI was installed from source, then the user must manually add the \texttt{udev} rules by copying the file from the host machine's installation directory to the host machine's \path{/etc/udev/rules.d/}. The following command can be used as a guide:
-\begin{verbatim}
-$ cd /etc/udev/rules.d/
-$ sudo ln -s /<install-path>/opencpi/cdk/zed/host-udev-rules/98-zedboard.rules 98-zedboard.rules
-\end{verbatim}
-\item Whether installed via RPMs or source (and manually creating the symbolic link), the USB to Serial adapter will be connected as \texttt{/dev/zed0} with read and write permissions for all users.
-\end{itemize}
-
-\noindent Once the Zedboard is powered on and micro-USB cable is connected UART to the development host, use the following command to connect to the serial port:
-\begin{verbatim}
-$ screen /dev/zed0 115200
-\end{verbatim}
-\medskip
+The installation guide provides the procedure establishing a serial console.  On ZedBoard systems the console serial port operates at 115200 baud.  The cable used is a micro-USB to USB-A cable to connect its console micro-USB port to the development host.
 
 \subsection{Booting the ZedBoard from the SD card}
 \begin{enumerate}
@@ -350,38 +189,19 @@ $ screen /dev/zed0 115200
 \end{enumerate}
 \item Insert the SD card into the SD card slot.
 \item Connect a terminal to the micro-USB connector labelled 'UART' on the ZedBoard. The baud rate should be 115200 baud.
-\begin{itemize}
-\item per the previous section, ``\texttt{screen /dev/zed0 115200}'' can be used to connect to the serial port.
-\end{itemize}
+\item Start the terminal emulator on the development host (usually the \textit{screen} command) at 115200 baud.
 \item Apply power to the ZedBoard with the terminal still connected.
 \end{enumerate}
 
-\pagebreak
-\section{Development Host Setup - Network Mode ONLY}
-% Bring in NFS setup snippet (has subsections)
-\input{NFS_Setup_Snippet}
-%
-
-\pagebreak
 \section{Configuring the run-time environment on the platform}
-
-\subsection{Network Mode}
-\begin{enumerate}
-\item Ensure the Ethernet cable is plugged in and connected to a network configured for DHCP.
-\item Ensure a micro-USB to USB cable is connected between the Zed's serial port and development host.
-\item Apply power to the Zedboard
-\item Use a serial terminal application to establish a serial connection, for example:
-
-\begin{verbatim}
-$ screen /dev/zed0 115200
-\end{verbatim}
-
-\item Typically, upon the initial power-on of the platform, the boot sequence will stop at the uboot configuration prompt. When this occurs, simply enter \textit{boot} to allow the boot sequence to continue:
+The installation guide provides the procedure for setting up and verifying the runtime environment.
+This system is initially set with  ``\textbf{root}'' for user name and password.
+Typically, upon the initial power-on of the platform, the boot sequence will stop at the uboot configuration prompt. When this occurs, simply enter \textit{boot} to allow the boot sequence to continue:
 \begin{verbatim}
 $ zynq-uboot> boot
-\end{verbatim} \medskip
-
-\item After a successful boot to PetaLinux, login to the system, using  ``\textbf{root}`` for user name and password.
+\end{verbatim}
+\begin{flushleft}
+After a successful boot to PetaLinux, login to the system, using  ``\textbf{root}`` for user name and password.
 
 \begin{figure}[H]
 	\centerline{\includegraphics[scale=0.5]{zed_boot}}
@@ -389,185 +209,23 @@ $ zynq-uboot> boot
 	\label{fig:boot1}
 \end{figure}
 
-\item
-\begin{enumerate}
-	\item When a \textbf{single} Zedboard is on the network, execute the following command to enable its Ethernet interface:
+When a \textbf{single} Zedboard is on the network, execute the following command to enable its Ethernet interface:
 \begin{verbatim}
 $ ifconfig eth0 up
-\end{verbatim} \medskip
-	\item When \textbf{multiple} Zedboards are on the network, the mynsetsetup.sh script \textbf{MUST} be modified according to \ref{sec:Multiple ZedBoards on the same network} prior to proceeding to the next step, in order to prevent network collisions due to multiple Zedboards having the same MAC address.
-\end{enumerate}
-
-\item Setup the OpenCPI environment on remote system
-
-\begin{flushleft}
-Each time the SDR is booted, the OpenCPI environment must be setup. By sourcing the \texttt{mynetsetup.sh} script, the remote system's environment is configured for OpenCPI and NFS directories are mounted for Network mode.\footnote{This script calls the \texttt{zynq\_net\_setup.sh} script, which should not be modifiable by the user.}. The user must provide the network address of the development system to the script as its only argument:
-\begin{verbatim}
-$ source /mnt/card/opencpi/mynetsetup.sh XX.XX.XX.XX
-\end{verbatim} \medskip
-
-where XX.XX.XX.XX is the IP address of the NFS host (i.e. that development host, \textit{e.g.} 192.168.1.10). A successful run is shown in Figure~\ref{fig:netsetup}. \medskip
-
-\end{flushleft}
-
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_net_setup}}
-	\caption{Successful Network Mode Setup}
-	\label{fig:netsetup}
-\end{figure} \medskip
-
-\input{NTP_Alarm_Clock}
-
-\end{enumerate}
-
-\pagebreak
-\subsection{Standalone Mode}
-All artifacts (.so, .bit.gz) for any applications or tests that need to be located on the SD card must be in the \texttt{opencpi/xilinx13\_3/artifacts} folder.  All of the helper utilities such as \texttt{ocpirun} and \texttt{ocpihdl} are already located on the SD card and do not need to be copied over to the ZedBoard platform.
-
-\begin{enumerate}
-\item (Not required for OpenCPI in this mode) Plug in an Ethernet cable to a network configured for DHCP.
-\item Ensure a micro-USB to USB cable is connected between the Zedboard's serial port and development host.
-\item Apply power to the Zedboard
-\item Use a serial terminal application to establish a serial connection, for example:
-
-\begin{verbatim}
-$ screen /dev/zed0 115200
-\end{verbatim} \medskip
-
-\item After a successful boot to PetaLinux, login to the system, using  ``\textbf{root}`` for user name and password.
-
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_boot}}
-	\caption{Successful Boot}
-	\label{fig:boot2}
-\end{figure}
-
-\item \textcolor{red}{WARNING:}
-Applications (including XML-only ones) fail if there is not an IP address assigned to the platform, even when in ``standalone mode.'' When the Ethernet port is not connected to a network configured with DHCP, a temporary IP address must be set:
-\begin{verbatim}
-$ ifconfig eth0 192.168.244.244
-\end{verbatim} \medskip
-
-\item Setup the OpenCPI environment on remote system
-
-Each time the SDR is booted, the OpenCPI environment must be setup. By sourcing the \texttt{mysetup.sh} script, the remote system's environment is configured for OpenCPI.\footnote{This script calls the \texttt{zynq\_setup.sh} script, which should not be modifiable by the user.}. There are no arguments required for this script.
-\begin{verbatim}
-$ source /mnt/card/opencpi/mysetup.sh
-\end{verbatim} \medskip
-
-\noindent A successful setup of the platform will look as follows:
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_setup}}
-	\caption{Successful Standalone Mode Setup}
-	\label{fig:standalonesetup}
-\end{figure} \medskip
-
-\input{NTP_Alarm_Clock}
-
-\end{enumerate}
-
-\pagebreak
-\section{Build an Application}
-\begin{flushleft}
-The setup of the platform can be verified by running an application that uses both RCC and HDL workers. A simple application that requires two RCC and one HDL worker is located in \texttt{assets/applications/bias.xml}, but only the RCC artifacts are provided with the installation of RPMs, and are availble on the SD card (Standard Mode) or mounted CDK directory (Network Mode). The remaining task is to build an assembly, or bitstream for loading the FPGA, which contains the HDL worker.
+\end{verbatim}
+When \textbf{multiple} Zedboards are on the network, the \texttt{mynetsetup.sh} script \textbf{MUST} be modified according to \ref{sec:Multiple ZedBoards on the same network} prior to proceeding to the next step, in order to prevent network collisions due to multiple Zedboards having the same MAC address.
 \end{flushleft}
 
 \section{Run an Application}
-\subsection{Network Mode}
-The default setup script sets the \texttt{OCPI\_LIBRARY\_PATH} variable to include the RCC workers that are required to execute the application, but it must be updated to include to the assembly bitstream that was built.  After running the \texttt{mynetsetup.sh} script, navigate to  \texttt{/mnt/ocpi\_assets/applications}, then update the \texttt{OCPI\_LIBRARY\_PATH} variable:
-\begin{verbatim}
-$ cd /mnt/ocpi_assets/applications
-$ export OCPI_LIBRARY_PATH=$OCPI_LIBRARY_PATH:/mnt/ocpi_assets/artifacts
-\end{verbatim}
-Run the application using the following command:
-\begin{verbatim}
-$ ocpirun -v -t 1 -d -m bias=hdl bias.xml
-\end{verbatim}
-The output should be similar to Figure~\ref{fig:netBias}:
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.45]{zed_net_bias}}
-	\caption{Successful Network Mode Execution}
-	\label{fig:netBias}
-\end{figure}
-
-\pagebreak
-Run the following command to view the input. It should look like Figure~\ref{fig:inBias1}: \\
-\begin{verbatim}
-$ hexdump test.input | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_bias_input}}
-	\caption{Expected Input}
-	\label{fig:inBias1}
-\end{figure}
-
-Run the following command to view the output. It should look like Figure~\ref{fig:outBias1}: \\
-\begin{verbatim}
-$ hexdump test.output | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_bias_output}}
-	\caption{Expected Output}
-	\label{fig:outBias1}
-\end{figure}
-
-\newpage
-\subsection{Standalone Mode}
-\begin{flushleft}
-The default setup script sets the \texttt{OCPI\_LIBRARY\_PATH} variable to include the all of the artifacts that are required to execute the application. Specifically, all three of the artifacts that are located on the SD card are mounted at \texttt{/mnt/card/opencpi/xilinx13\_3/artifacts}.  After running \texttt{mysetup.sh}, navigate to \texttt{/mnt/card/opencpi/applications} and ensure the \texttt{OCPI\_LIBRARY\_PATH} variable is configure as shown below:
-\begin{verbatim}
-$ cd /mnt/card/opencpi/applications
-$ export OCPI_LIBRARY_PATH=$OCPI_LIBRARY_PATH:/mnt/card/opencpi/xilinx13_3/artifacts
-\end{verbatim}
-
-Run the application using the following command:
-\begin{verbatim}
-$ ocpirun -v -t 1 -d -m bias=hdl bias.xml
-\end{verbatim}
-The output should be similar to Figure~\ref{fig:standBias}:
-\end{flushleft}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_bias}}
-	\caption{Successful Standalone Mode Execution}
- \label{fig:standBias}
-\end{figure}
-
-\pagebreak
-Run the following command to view the input. It should look like Figure~\ref{fig:inBias2}: \\
-\begin{verbatim}
-$ hexdump test.input | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_bias_input}}
-	\caption{Expected Input}
-	\label{fig:inBias2}
-\end{figure}
-
-Run the following command to view the output. It should look like Figure~\ref{fig:outBias2}: \\
-\begin{verbatim}
-$ hexdump test.output | less
-\end{verbatim}
-\begin{figure}[H]
-	\centerline{\includegraphics[scale=0.5]{zed_bias_output}}
-	\caption{Expected Output}
-	\label{fig:outBias2}
-\end{figure}
-
+See the installation guide for running a small test application.
 \pagebreak
 \begin{appendices}
 
 \section{Using ISE instead of Vivado with the ZedBoard}
 \begin{flushleft}
 If the user requires the use of the Xilinx ISE tools, rather than the Vivado (recommended), a different OpenCPI platform must be targeted for building bitstreams for the Zedboard. Specifically, the \textit{zed\_ise} (\textit{zynq\_ise} is the target) OpenCPI platform is built using ISE tools, where as the \textit{zed} (\textit{zynq} is the target) OpenCPI platform  is built using Vivado tools.\medskip
-
-Its critical to note that the entire \textit{core} and \textit{assets} projects must be built using ISE tools and that the \textit{zed\_ise} platform is located in the \textit{assets} project.\medskip
-
-After ensuring the proper environment variables are set in support of the ISE tools, use the following command to build from the top-level of a project:
-
-\begin{verbatim}
-$ ocpidev build --hdl-platform zed_ise
-\end{verbatim}
 \end{flushleft}
+
 % Bring in kernel message snippet
 \section{Driver Notes}
 \input{Driver_Snippet}

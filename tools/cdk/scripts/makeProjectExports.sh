@@ -398,17 +398,18 @@ fi
 for p in ${hdl_platforms[*]}; do
   d=hdl/platforms/$p
   [ -f $d/Makefile -a -f $d/$p.mk ] || bad HDL platform $p not exported due to missing files in $d
-  [ -d $d/lib ] && make_filtered_link $d/lib exports/lib/platforms/$p platform
+  [ -d $d/lib ] && make_filtered_link $d/lib exports/hdl/platforms/$p platform
   # this $p.mk link is for bootstrapping before the platform is built to show it exists
-  make_filtered_link $d/$p.mk exports/lib/platforms/mk/$p.mk platform
+  make_filtered_link $d/$p.mk exports/hdl/platforms/mk/$p.mk platform
 done
 ###################################################################################
 # Export rcc platforms
 [ -n "$verbose" -a -n "$rcc_platforms" ] && echo Processing rcc platforms
 for p in ${rcc_platforms[*]}; do
   d=rcc/platforms/$p
+  [ -d $d/lib ] && d=$d/lib
   [ -f $d/$p.mk -o -f $d/$p-target.mk ] || bad RCC platform $p not exported due to missing files in $d
-  make_filtered_link $d exports/lib/rcc/platforms/$p rcc-platform
+  make_filtered_link $d exports/rcc/platforms/$p rcc-platform
 done
 
 ###################################################################################
