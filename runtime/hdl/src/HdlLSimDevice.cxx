@@ -837,9 +837,9 @@ public:
     } else
       m_file = m_app = slash;
     char date[100];
-    time_t now = time(NULL);
+    time_t l_now = time(NULL);
     struct tm nowtm;
-    localtime_r(&now, &nowtm);
+    localtime_r(&l_now, &nowtm);
     strftime(date, sizeof(date), ".%Y%m%d%H%M%S", &nowtm);
     OU::format(m_dir, "%.*s/%s.%s%s", (int)(strchr(m_simDir.c_str(), '/') - m_simDir.c_str()),
 	       m_simDir.c_str(), m_app.c_str(), m_platform.c_str(), date);
@@ -1225,9 +1225,9 @@ search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std:
 
 OH::Device *Driver::
 open(const char *name, const OA::PValue *params, std::string &err) {
-  const char *cp;
-  for (cp = name; *cp && !isdigit(*cp); cp++)
-    ;
+  const char *cp = name + strlen(name);
+  while (cp > name && isdigit(cp[-1]))
+    cp--;
   std::string platform;
   platform.assign(name, OCPI_SIZE_T_DIFF(cp, name));
   bool verbose = false;

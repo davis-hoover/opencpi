@@ -469,7 +469,7 @@ OCPI_DATA_TYPES
 	    m_properties.get32Register(memory_bytes, SDP::Properties);
 	  myDataOffset =
 	    m_properties.get8Register(sdp_id, SDP::Properties) *
-	    (1 << m_properties.get8Register(window_log2, SDP::Properties));
+	    (1u << m_properties.get8Register(window_log2, SDP::Properties));
 	  ocpiDebug("SDP ID: %u:0x%zx", m_properties.get8Register(sdp_id, SDP::Properties), myDataOffset);
 	  myDesc.metaDataPitch      = 0;
 	  myDesc.metaDataBaseAddr   = 0; //m_properties.physOffset(offsetof(SDP::Properties,

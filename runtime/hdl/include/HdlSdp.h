@@ -121,7 +121,7 @@ namespace OCPI {
 	// Unfortunate effect of non-portable bitfields
 #define SDP_FIELD(type, field)						             \
 	void set_##field(type field) {					             \
-	  assert(!(field & (UINT64_MAX << field##_width)));		             \
+	  assert(!((uint64_t)field & (UINT64_MAX << field##_width)));	\
 	  m_bits &= ~(~(UINT64_MAX << field##_width) << field##_shift);              \
 	  m_bits |= (uint64_t)field << field##_shift;			\
         }								             \
