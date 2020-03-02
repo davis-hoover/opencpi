@@ -33,11 +33,12 @@ trigger-downstream:
   script:
     - cat build-pages.vars
     - source build-pages.vars
+      # JOB_ID comes from opencpi/build:pages
     - >
       curl --request POST
       --form token=$CI_JOB_TOKEN
       --form ref=develop
-      --form "variables[JOB_ID]=$JOB_ID"  # JOB_ID of build:pages
+      --form "variables[JOB_ID]=$JOB_ID"
       --form "variables[REF_NAME]=$REF_NAME"
       https://gitlab.com/api/v4/projects/16024285/trigger/pipeline
   after_script: []
