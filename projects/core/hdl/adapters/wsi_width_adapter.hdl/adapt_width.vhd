@@ -228,7 +228,9 @@ begin
             last_r    <= last_word_in; -- remember the last word in the input
             last_be_r <= last_be_in;
             som_r     <= in_som and in_ready;
-            eom_r     <= in_eom and in_ready;
+            if its(in_ready) then
+              eom_r   <= in_eom;
+            end if;
             opcode_r  <= in_opcode;
             -- If we are actually buffering any data (not passing through), set the indicator
             if take_now and (have_data_r or
