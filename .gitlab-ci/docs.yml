@@ -7,12 +7,17 @@ build:pages:
   before_script: []
   script:
     - make doc
-    - mkdir -p .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
-    - mv doc/pdfs/* .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
+    - REF_NAME=${CI_COMMIT_REF_NAME//\//-}  # Convert '/' to '-'
+    - mkdir -p .public/releases/$REF_NAME/docs/
+    - mv doc/pdfs/* .public/releases/$REF_NAME/docs/
+      # These are used in trigger-downstream
+    - echo "JOB_ID=$CI_JOB_ID"   > build-pages.vars
+    - echo "REF_NAME=$REF_NAME" >> build-pages.vars
   after_script: []
   artifacts:
     paths:
       - .public/
+      - build-pages.vars
 
 trigger-downstream:
   stage: deploy
@@ -22,21 +27,22 @@ trigger-downstream:
   only:
     - develop
     - tags
-  dependencies: []
+  dependencies:
+    - build:pages
   before_script: []
   script:
+    - cat build-pages.vars
+    - source build-pages.vars
     - >
       curl --request POST
       --form token=$CI_JOB_TOKEN
       --form ref=develop
-      --form "variables[JOB_ID]=$CI_JOB_ID"
+      --form "variables[JOB_ID]=$JOB_ID"  # JOB_ID of build:pages
+      --form "variables[REF_NAME]=$REF_NAME"
       https://gitlab.com/api/v4/projects/16024285/trigger/pipeline
   after_script: []
-  artifacts:
-    paths:
-      - .public/
 
-# This just redirects gitlab.com/opencpi to opencpi.gitlab.io/releases/develop
+# This just redirects opencpi.gitlab.io/opencpi to opencpi.gitlab.io/releases/latest
 pages:
   stage: deploy
   tags:
