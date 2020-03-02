@@ -27,10 +27,10 @@ if ! PORT=`command -v port`; then
     exit 1
   }
 fi
-PKGS="python34 coreutils gsed py34-numpy swig swig-python py27-numpy scons"
+PKGS="python34 coreutils gsed swig swig-python py27-numpy scons autoconf automake libtool"
 echo Using $PORT to install packages required by OpenCPI for $OCPI_TOOL_PLATFORM: $PKGS
 sudo $PORT install $PKGS
-PATH=$PATH:/opt/local/bin
+PATH=$PATH:/opt/local/bin:/opt/local/libexec/gnubin
 # We need python2
 if ! command -v python2 > /dev/null ; then
     # prefer macports
