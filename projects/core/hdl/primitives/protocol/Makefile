@@ -22,7 +22,6 @@ HdlLibraries=fixed_float ocpi util
 SourceFiles= \
   protocol_pkg.vhd \
   message_sizer.vhd \
-  zlm_detector.vhd \
   complex_short_with_metadata_pkg.vhd \
   complex_short_with_metadata_body.vhd \
   complex_short_with_metadata_demarshaller.vhd \

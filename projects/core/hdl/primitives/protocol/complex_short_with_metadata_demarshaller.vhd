@@ -60,7 +60,7 @@ begin
 
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
 
-    eozlm_gen : protocol.protocol.zlm_detector
+    eozlm_gen : ocpi.util.zlm_detector
       port map(
         clk         => clk,
         reset       => rst,

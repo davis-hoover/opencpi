@@ -69,10 +69,10 @@ xsim.dir/util/counter.vdb : ../../../../../core/hdl/primitives/util/counter.vhd 
     xsim.dir/util/util.vdb
 	./myxvhdl.sh -work util $<
 
-xsim.dir/protocol/complex_short_with_metadata.vdb: ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/pkg.vhd \
-    ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/body.vhd \
+xsim.dir/protocol/complex_short_with_metadata.vdb: ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata_pkg.vhd \
+    ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata_body.vhd \
     xsim.dir/ocpi/types.vdb
-	./myxvhdl.sh -work protocol ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/pkg.vhd ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata/body.vhd
+	./myxvhdl.sh -work protocol ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata_pkg.vhd ../../../../../core/hdl/primitives/protocol/complex_short_with_metadata_body.vhd
 
 xsim.dir/misc_prims/misc_prims.vdb: ../misc_prims_pkg.vhd \
     xsim.dir/protocol/complex_short_with_metadata.vdb

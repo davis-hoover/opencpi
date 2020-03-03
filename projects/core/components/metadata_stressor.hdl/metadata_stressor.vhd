@@ -58,7 +58,6 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all; use ieee.math_real.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library protocol;
 architecture rtl of worker is
 
   constant DATA_WIDTH_c         : integer := to_integer(unsigned(DATA_WIDTH_p));
@@ -138,7 +137,7 @@ architecture rtl of worker is
 begin
 
   -- Primitive detects zlms, split or not
-    zlm_detect : protocol.protocol.zlm_detector
+    zlm_detect : ocpi.util.zlm_detector
       port map (
        CLK   => ctl_in.clk,
        RESET => ctl_in.reset,
