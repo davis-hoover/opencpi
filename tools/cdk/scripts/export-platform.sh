@@ -110,7 +110,7 @@ function make_link {
 done
 # Export the default files that should not be mentioned in the exports file
 # This list is the union of common files to export from all types of platforms
-for i in $platform.mk $platform-check.sh $platform-packages.sh $*; do
+for i in $platform.exports $platform.mk $platform-check.sh $platform-packages.sh $*; do
     [ -e $i ] && make_link ../$i $lib || :
 done
 echo Exports for the \"$platform\" created in \"$lib\".

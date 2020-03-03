@@ -70,7 +70,7 @@ done
 # 6. copy hw-specific files from the rcc platform
 [ -d cdk/$rcc_platform/hdl/$platform/boot ] && cp -R -L -H cdk/$rcc_platform/hdl/$platform/boot/* $sd || :
 # 7. mv the top level hw files into root
-for f in $(set -vx; shopt -s nullglob; echo cdk/deploy/$platform/*); do
+for f in $(shopt -s nullglob; echo cdk/deploy/$platform/*); do
   is_platform $f && continue;
   cp -R -L -H $f $sd
 done
