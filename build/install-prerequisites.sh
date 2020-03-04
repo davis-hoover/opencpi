@@ -25,6 +25,9 @@ set -e
 [ "$1" = -f ] && force=1 && shift
 # Ensure exports
 source ./scripts/init-opencpi.sh
+echo exp
+ls -l exports
+env
 # Ensure CDK and TOOL variables
 source ./cdk/opencpi-setup.sh -e
 # Ensure TARGET variables
