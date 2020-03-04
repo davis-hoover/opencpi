@@ -25,5 +25,4 @@
 =<platform-dir>/98-zedboard.rules udev-rules/98-zedboard.rules
 
 # Assume that all the boot files are in the software platforms for now
-# So there are no deployment exports
-
+@<rcc-platform-dir>/hdl/zed/boot/*

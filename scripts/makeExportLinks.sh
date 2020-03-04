@@ -193,7 +193,8 @@ function do_addition {
       *\<target\>*|*\<platform\>*|*\<platform[-_]dir\>*) return;;
   esac
   exp=${both[1]}
-  if [ -z "$exp" ]; then
+  [ -z "$exp" ] && echo UNEXPECTED EMPTY SECOND FIELD && exit 1
+  if [ "$exp" = - ]; then
       if [ "$2" = "--" ]; then
 	  exp=/
       else
