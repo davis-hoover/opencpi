@@ -65,7 +65,29 @@ Timestaping is done by sending ComplexShortWithMetadata-prot time opcode message
 
 \section*{Source Dependencies}
 %\subsection*{\comp.rcc}
-%\subsection*{\comp.hdl}
+\subsection*{\comp.hdl}
+\begin{itemize}
+  \item projects/assets/components/util\_comps/timestamper\_scdcd.hdl/timestamper\_scdcd.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/misc\_prims\_pkg.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/misc\_prims\_body.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/level\_to\_pulse\_converter.vhd
+  \item projects/core/hdl/primitives/cdc/cdc\_pkg.vhd
+  \item projects/core/hdl/primitives/cdc/fifo.vhd
+  \item projects/core/hdl/primitives/cdc/fast\_pulse\_to\_slow\_sticky.vhd
+  \item projects/core/hdl/primitives/cdc/single\_bit.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/ocpi\_cswm\_prot\_in\_adapter\_dw32\_clkin.vhd
+  \item projects/core/hdl/primitives/util/util\_pkg.vhd
+  \item projects/core/hdl/primitives/util/util\_body.vhd
+  \item projects/core/hdl/primitives/util/zlm\_detector.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/time\_downsampler.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/counter.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/latest\_reg\_signed.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/cdc\_pkg.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/cdc\_fifo\_info.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/ocpi\_cswm\_prot\_out\_adapter\_dw32\_clkin.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/set\_clr.vhd
+  \item projects/assets/hdl/primitives/misc\_prims/ocpi\_wsi\_message\_sizer.vhd
+\end{itemize}
 
 \begin{landscape}
   \input{component_spec_properties.inc} % it is recommended to NOT remove this line
