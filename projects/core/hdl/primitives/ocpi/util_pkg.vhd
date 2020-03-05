@@ -60,6 +60,19 @@ component message_bounds
        give_out     : out bool_t);
 end component message_bounds;
 
+component zlm_detector is
+  port(
+    clk         : in  std_logic;  -- control plane clock
+    reset       : in  std_logic;  -- control plane reset (active-high)
+    som         : in  std_logic;  -- input port SOM
+    valid       : in  std_logic;  -- input port valid
+    eom         : in  std_logic;  -- input port EOM
+    ready       : in  std_logic;  -- input port ready
+    take        : in  std_logic;  -- input port take
+    eozlm_pulse : out std_logic;  -- pulse-per-end-of-ZLM
+    eozlm       : out std_logic); -- same as EOM but only for end of ZLMs
+end component;
+
 component clock_limiter
   generic(width : natural);
   port(clk      : in std_logic;

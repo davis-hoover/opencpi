@@ -22,6 +22,7 @@
 
 library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
 library misc_prims; use misc_prims.misc_prims.all;
+library protocol;
 
 entity time_corrector is
   -- the DATA PIPE LATENCY CYCLES is currently 0
@@ -32,93 +33,56 @@ entity time_corrector is
     ctrl      : in  time_corrector_ctrl_t;
     status    : out time_corrector_status_t;
     -- INPUT
-    idata     : in  data_complex_t;
-    imetadata : in  metadata_t;
-    ivld      : in  std_logic;
+    iprotocol : in  protocol.complex_short_with_metadata.protocol_t;
     irdy      : out std_logic;
     -- OUTPUT
-    odata     : out data_complex_t;
-    ometadata : out metadata_t;
-    ovld      : out std_logic;
+    oprotocol : out protocol.complex_short_with_metadata.protocol_t;
     ordy      : in  std_logic);
 end time_corrector;
 architecture rtl of time_corrector is
-  signal tmp                                 : signed(METADATA_TIME_BIT_WIDTH+1
-                                               downto 0) := (others => '0');
-  signal tmp_lower_than_min                  : std_logic := '0';
-  signal tmp_larger_than_max                 : std_logic := '0';
-  signal time_time                           : unsigned(METADATA_TIME_BIT_WIDTH-1
-                                               downto 0) := (others => '0');
-  signal overflow                            : std_logic := '0';
---  signal overflow_sticky                     : std_logic := '0';
-  signal time_correction_latest_reg_dout     : signed(METADATA_TIME_BIT_WIDTH-1
-                                               downto 0) := (others => '0');
-  signal time_correction_latest_reg_dout_vld : std_logic := '0';
-
-  signal imetadata_slv : std_logic_vector(METADATA_BIT_WIDTH-1 downto 0) :=
-                         (others => '0');
-  signal metadata      : std_logic_vector(METADATA_BIT_WIDTH-1 downto 0) :=
-                         (others => '0');
+  signal itime_slv           : std_logic_vector(
+      protocol.complex_short_with_metadata.OP_TIME_BIT_WIDTH-1 downto 0) :=
+      (others => '0');
+  signal tmp                 : signed(
+      protocol.complex_short_with_metadata.OP_TIME_BIT_WIDTH+1 downto 0) :=
+      (others => '0');
+  signal tmp_lower_than_min  : std_logic := '0';
+  signal tmp_larger_than_max : std_logic := '0';
+  signal time_time           : unsigned(
+      protocol.complex_short_with_metadata.OP_TIME_BIT_WIDTH-1 downto 0) :=
+      (others => '0');
+  signal overflow            : std_logic := '0';
+  signal protocol_s : protocol.complex_short_with_metadata.protocol_t :=
+                      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
 begin
-
-  time_correction_latest_reg : misc_prims.misc_prims.latest_reg_signed
-    generic map(
-      BIT_WIDTH => time_correction_latest_reg_dout'length)
-    port map(
-      clk      => clk,
-      rst      => rst,
-      din      => ctrl.time_correction,
-      din_vld  => ctrl.time_correction_vld,
-      dout     => time_correction_latest_reg_dout,
-      dout_vld => time_correction_latest_reg_dout_vld);
-
-  tmp <= resize(signed(imetadata.time), tmp'length) -
+  itime_slv <= iprotocol.time.sec & iprotocol.time.fract_sec;
+  tmp <= resize(signed(itime_slv), tmp'length) -
          resize(signed(ctrl.time_correction), tmp'length);
 
   tmp_lower_than_min  <= tmp(tmp'left); -- sign bit
   tmp_larger_than_max <= tmp(tmp'left-1); -- largest amplitude bit
-  overflow <= tmp_lower_than_min or tmp_larger_than_max;
-  status.overflow        <= overflow;
---  status.overflow_sticky <= overflow_sticky;
-  time_time <= unsigned(tmp(tmp'left-2 downto 0));
+  overflow            <= (tmp_lower_than_min or tmp_larger_than_max) and
+                         iprotocol.time_vld;
+  status.overflow     <= overflow;
+  time_time           <= unsigned(tmp(tmp'left-2 downto 0));
 
---  overflow_sticky_gen : process(clk)
---  begin
---    if(rising_edge(clk)) then
---      if(rst = '1') then
---        overflow_sticky <= '0';
---      else
---        overflow_sticky <= overflow and overflow_sticky and (not ctrl.clr_overflow_sticky);
---      end if;
---    end if;
---  end process overflow_sticky_gen;
+  protocol_s.samples        <= iprotocol.samples;
+  protocol_s.samples_vld    <= iprotocol.samples_vld;
+  protocol_s.time.sec       <= iprotocol.time.sec when (ctrl.bypass = '1')
+      else std_logic_vector(time_time(time_time'left downto time_time'left -
+      protocol.complex_short_with_metadata.OP_TIME_ARG_SEC_BIT_WIDTH+1));
+  protocol_s.time.fract_sec <= iprotocol.time.fract_sec when (ctrl.bypass = '1')
+      else std_logic_vector(time_time(
+      protocol.complex_short_with_metadata.OP_TIME_ARG_FRACT_SEC_BIT_WIDTH-1
+      downto 0));
+  protocol_s.time_vld       <= iprotocol.time_vld and (not overflow);
+  protocol_s.interval       <= iprotocol.interval;
+  protocol_s.interval_vld   <= iprotocol.interval_vld;
+  protocol_s.flush          <= iprotocol.flush;
+  protocol_s.sync           <= iprotocol.sync;
+  protocol_s.end_of_samples <= iprotocol.end_of_samples;
+  protocol_s.eof            <= iprotocol.eof;
 
-  -- start the DATA PIPE LATENCY CYCLES is currently 0
-  odata.i <= idata.i;
-  odata.q <= idata.q;
-
-  imetadata_slv <= to_slv(imetadata);
-
-  metadata_gen : process(time_time, imetadata, overflow,
-                         time_correction_latest_reg_dout_vld,
-                         imetadata_slv)
-  begin
-    for idx in metadata'range loop
-      if((idx <= METADATA_IDX_TIME_L) and (idx >= METADATA_IDX_TIME_R)) then
-        metadata(idx) <= time_time(idx-METADATA_IDX_TIME_R);
-      elsif(idx = METADATA_IDX_TIME_VLD) then
-        metadata(idx) <= imetadata.time_vld and (not overflow) and
-                         time_correction_latest_reg_dout_vld;
-      else
-        metadata(idx) <= imetadata_slv(idx);
-      end if;
-    end loop;
-  end process metadata_gen;
-
-  ometadata <= imetadata when (ctrl.bypass = '1') else from_slv(metadata);
-
-  ovld <= ivld;
-  irdy <= ordy;
-  -- end the DATA PIPE LATENCY CYCLES is currently 0
-
+  oprotocol <= protocol_s;
+  irdy      <= ordy;
 end rtl;

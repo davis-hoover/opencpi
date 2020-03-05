@@ -1,12 +1,14 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library misc_prims; use misc_prims.misc_prims.all; use misc_prims.ocpi.all;
+library misc_prims; use misc_prims.misc_prims.all;
 library cdc;
+library util;
+library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
   constant BITS_PACKED_INTO_MSBS : boolean := not
       to_boolean(ADC_INPUT_IS_LSB_OF_OUT_PORT);
 
-  signal adc_opcode : complex_short_with_metadata_opcode_t := SAMPLES;
+  signal adc_opcode : opcode_t := SAMPLES;
   signal adc_data   : std_logic_vector(
                       to_integer(unsigned(OUT_PORT_DATA_WIDTH))-1 downto 0) :=
                       (others => '0');
@@ -19,17 +21,15 @@ architecture rtl of worker is
   signal adc_pending_initial_ready   : std_logic := '0';
   signal adc_pending_initial_ready_r : std_logic := '0';
 
-  signal adc_overrun_generator_ivld      : std_logic := '0';
-  signal adc_overrun_generator_odata     : data_complex_adc_t;
-  signal adc_overrun_generator_ometadata : metadata_t;
-  signal adc_overrun_generator_ovld      : std_logic := '0';
+  signal adc_overrun_generator_ivld       : std_logic := '0';
+  signal adc_overrun_generator_odata      : data_complex_adc_t;
+  signal adc_overrun_generator_osamp_drop : std_logic := '0';
+  signal adc_overrun_generator_ovld       : std_logic := '0';
 
   signal adc_data_widener_irdy      : std_logic := '0';
-  signal adc_data_widener_odata     : data_complex_t;
-  signal adc_data_widener_ometadata : metadata_t;
-  signal adc_data_widener_ovld      : std_logic := '0';
+  signal adc_data_widener_oprotocol : protocol_t := PROTOCOL_ZERO;
 
-  signal adc_out_adapter_irdy  : std_logic := '0';
+  signal adc_out_marshaller_irdy : std_logic := '0';
 
 begin
   ------------------------------------------------------------------------------
@@ -89,50 +89,45 @@ begin
     overrun_generator :
         misc_prims.misc_prims.adc_samp_drop_detector
       port map(
-        -- CTRL INTERFACE
-        clk       => dev_in.clk,
-        rst       => adc_rst,
-        status    => adc_status,
-        -- INPUT INTERFACE
-        idata     => adc_idata,
-        ivld      => adc_overrun_generator_ivld,
-        -- OUTPUT INTERFACE
-        odata     => adc_overrun_generator_odata,
-        ometadata => adc_overrun_generator_ometadata,
-        ovld      => adc_overrun_generator_ovld,
-        ordy      => adc_data_widener_irdy);
+        -- CTRL
+        clk        => dev_in.clk,
+        rst        => adc_rst,
+        status     => adc_status,
+        -- INPUT
+        idata      => adc_idata,
+        ivld       => adc_overrun_generator_ivld,
+        -- OUTPUT
+        odata      => adc_overrun_generator_odata,
+        osamp_drop => adc_overrun_generator_osamp_drop,
+        ovld       => adc_overrun_generator_ovld,
+        ordy       => adc_data_widener_irdy);
 
     data_widener : misc_prims.misc_prims.data_widener
       generic map(
         BITS_PACKED_INTO_MSBS => BITS_PACKED_INTO_MSBS)
       port map(
         -- CTRL INTERFACE
-        clk       => dev_in.clk,
-        rst       => adc_rst,
+        clk        => dev_in.clk,
+        rst        => adc_rst,
         -- INPUT INTERFACE
-        idata     => adc_overrun_generator_odata,
-        imetadata => adc_overrun_generator_ometadata,
-        ivld      => adc_overrun_generator_ovld,
-        irdy      => adc_data_widener_irdy,
+        idata      => adc_overrun_generator_odata,
+        isamp_drop => adc_overrun_generator_osamp_drop,
+        ivld       => adc_overrun_generator_ovld,
+        irdy       => adc_data_widener_irdy,
         -- OUTPUT INTERFACE
-        odata     => adc_data_widener_odata,
-        ometadata => adc_data_widener_ometadata,
-        ovld      => adc_data_widener_ovld,
-        ordy      => adc_out_adapter_irdy);
+        oprotocol  => adc_data_widener_oprotocol,
+        ordy       => adc_out_marshaller_irdy);
 
-    out_adapter : misc_prims.ocpi.cswm_prot_out_adapter_dw32_clkout_old
+    out_marshaller : complex_short_with_metadata_marshaller_old
       generic map(
         OUT_PORT_MBYTEEN_WIDTH => out_out.byte_enable'length)
       port map(
+        clk          => dev_in.clk,
+        rst          => adc_rst,
         -- INPUT
-        iclk         => dev_in.clk,
-        irst         => adc_rst,
-        idata        => adc_data_widener_odata,
-        imetadata    => adc_data_widener_ometadata,
-        ivld         => adc_data_widener_ovld,
-        irdy         => adc_out_adapter_irdy,
+        iprotocol    => adc_data_widener_oprotocol,
+        irdy         => adc_out_marshaller_irdy,
         -- OUTPUT
-        oclk         => out_out.clk,
         odata        => adc_data,
         ovalid       => out_out.valid,
         obyte_enable => out_out.byte_enable,
@@ -142,6 +137,11 @@ begin
         oopcode      => adc_opcode,
         oeof         => out_out.eof,
         oready       => out_in.ready);
+
+    out_clk_gen : util.util.in2out
+      port map(
+        in_port  => dev_in.clk,
+        out_port => out_out.clk);
 
   end generate;
 

@@ -2,8 +2,6 @@ library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.
 library misc_prims; use misc_prims.misc_prims.all;
 
 entity data_src is
-  generic(
-    DATA_BIT_WIDTH : positive); -- width of each of I/Q
   port(
     -- CTRL
     clk                : in  std_logic;
@@ -18,8 +16,6 @@ architecture rtl of data_src is
 begin
 
   adc_emulator : misc_prims.misc_prims.adc_maximal_lfsr_data_src
-    generic map(
-      DATA_BIT_WIDTH => DATA_ADC_BIT_WIDTH)
     port map(
       -- CTRL
       clk                => clk,
