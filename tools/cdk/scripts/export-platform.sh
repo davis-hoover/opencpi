@@ -113,4 +113,4 @@ done
 for i in $platform.exports $platform.mk $platform-check.sh $platform-packages.sh $*; do
     [ -e $i ] && make_link ../$i $lib || :
 done
-echo Exports for the \"$platform\" created in \"$lib\".
+echo Exports for the \"$platform\" platform created in its local directory: \"$lib\".
