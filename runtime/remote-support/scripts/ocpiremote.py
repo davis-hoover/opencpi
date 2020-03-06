@@ -61,7 +61,7 @@ def main():
     option_user = make_option(
         '-u', '--user', 
         'user name for login on remote device',
-        default='root',)
+        default='root')
     option_password = make_option(
         '-p', '--password', 
         'user password for login on remote device',
@@ -76,11 +76,11 @@ def main():
         default='sandbox')
     option_sw_platform = make_option(
         '-s', '--sw_platform', 
-        'software platform for server environment', 
+        'software platform for server environment; default: xilinx13_4', 
         default='xilinx13_4')
     option_hw_platform = make_option(
         '-w', '--hw_platform', 
-        'hardware platform for server environment', 
+        'hardware platform for server environment; default: zed', 
         default='zed')
     option_valgrind = make_option(
         '-v', '--valgrind', 
@@ -90,6 +90,10 @@ def main():
         '-l', '--log_level', 
         'specify log level',
         default=0)
+    option_clean_known_host = make_option(
+        '-c', '--clean_known_host', 
+        'remove remote device\'s entry in .ssh/known_hosts',
+        action='store_true')
 
     common_options = [option_user, option_password, 
                       option_ip, option_remote_dir, option_ssh_opts]
@@ -123,6 +127,14 @@ def main():
         'log', log, 
         'watch server log in realtime', 
         common_options))
+    commands.append(make_subcommand(
+        'reboot', reboot, 
+        'reboot the remote device', 
+        common_options + [option_clean_known_host]))
+    commands.append(make_subcommand(
+        'boot', boot, 
+        'load boot files onto the remote device and reboot', 
+        common_options + [option_hw_platform, option_sw_platform]))
    
     parser = make_parser(commands)
     args = parser.parse_args()
@@ -189,7 +201,7 @@ def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0):
     if ocpiserver:
         cmd = 'cd "{}" && ./ocpiserver.sh "{}"'.format(args.remote_dir, cmd)
     if ssh:
-        cmd = 'ssh -o StrictHostKeyChecking=no {} {}@{} sh -c "{}"'.format(
+        cmd = 'ssh -o StrictHostKeyChecking=no {} {}@{} sh -c \'{}\''.format(
             args.ssh_opts, args.user, args.ip_addr, cmd)
 
     command = Command(cmd, rc)
@@ -314,7 +326,7 @@ def load(args):
     rules = glob.glob(os.path.join(cdk, args.sw_platform, 'lib', '*.rules'))
     bin_files = ['ocpidriver', 'ocpiserve', 'ocpihdl', 'ocpizynq']
     bin_files = [os.path.join(cdk, args.sw_platform, 'bin', bin_file) for bin_file in bin_files]
-    sdk = glob.glob(os.path.join(cdk, args.sw_platform, 'lib', 'sdk', 'lib', '*'))
+    sdk = glob.glob(os.path.join(cdk, args.sw_platform, 'sdk', 'lib', '*'))
 
     # List of files to add to tar
     tar_files = (drivers 
@@ -330,11 +342,13 @@ def load(args):
                 for tar_file in tar_files]
 
     # Check for hw system.xml. If it doesn't exist, get sw system.xml
-    system_xml = os.path.join(cdk, 'deploy',args.hw_platform, 'system.xml')
-    if not os.path.isfile(system_xml):
-        system_xml = os.path.join(cdk, args.sw_platform, 'system.xml')
-    arcnames.append(os.path.join(args.remote_dir, *system_xml[len(cdk):].split('/')))
+    hw_system_xml = os.path.join(cdk, 'deploy', args.hw_platform, 'opencpi', 'system.xml')
+    sw_system_xml = os.path.join(cdk, args.sw_platform, 'system.xml')
+    system_xml = hw_system_xml if os.path.isfile(hw_system_xml) else sw_system_xml
+    
     tar_files.append(system_xml)
+    system_xml_arc = os.path.join(args.remote_dir, *system_xml[len(cdk):].split('/'))
+    arcnames.append(system_xml_arc)
 
     if args.valgrind:
         tar_files.append(
@@ -348,7 +362,7 @@ def load(args):
             'mkdir {}'.format(args.remote_dir), 
             args))
         commands.append(make_command(
-            'date -s "{}"'.format(datetime.datetime.now().strftime("%Y%m%d%H%M.%S")), 
+            'date -s "{}"'.format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")), 
             args))
         commands.append(make_command(
             'echo {} > {}/swplatform'.format(args.sw_platform, args.remote_dir), 
@@ -360,7 +374,7 @@ def load(args):
             'ln -s scripts/ocpiserver.sh {}'.format(args.remote_dir), 
             args))
         commands.append( make_command(
-            'ln -s {}/system.xml {}'.format(args.sw_platform, args.remote_dir), 
+            'ln -s ../{} {}'.format(system_xml_arc, args.remote_dir), 
             args))
 
         if execute_commands(commands, args) == 0:
@@ -380,6 +394,34 @@ def load(args):
             print('Server package sent successfully.')
     
 
+def reboot(args):
+    command = make_command('/sbin/reboot', args)
+    rc = execute_command(command, args)
+
+    if rc == 0:
+        print("Rebooted remote device")
+
+        if args.clean_known_host:
+            print("Removing entry from '~/.ssh/known_hosts'")
+            home = os.environ.get('HOME')
+            with open('{}/.ssh/known_hosts'.format(home), 'r') as f:
+                lines = f.readlines()
+            with open('{}/.ssh/known_hosts'.format(home), 'w') as f:
+                for line in lines:
+                    if not line.strip("\n").startswith(args.ip_addr):
+                        f.write(line)
+                    
+    
+    return rc
+
+
+def boot(args):
+    # command = make_command('/sbin/reboot', args)
+    # rc = execute_command(command, args)                
+    
+    return rc
+
+
 def unload(args):
     """ Unload ocpiserver package from remote device.
 
@@ -388,7 +430,6 @@ def unload(args):
     Args:
         args: parsed user arguments
     """
-
     if status(args) == 0:
         if stop(args) != 0:
             return 1
