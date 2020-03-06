@@ -192,6 +192,9 @@ function do_addition {
   [ "$target" = - ] && case $1 in
       *\<target\>*|*\<platform\>*|*\<platform[-_]dir\>*) return;;
   esac
+  if [[  "$2" == "--"  && "${both[2]}" != "" && "$1" == \<rcc[-_]platform[-_]dir\>* ]]; then
+      return # ignore cross-platform here
+  fi
   exp=${both[1]}
   [ -z "$exp" ] && echo UNEXPECTED EMPTY SECOND FIELD && exit 1
   if [ "$exp" = - ]; then # process defaults for exported location
@@ -200,6 +203,8 @@ function do_addition {
       else
 	  exp=/                                      # normal is top of exports or top of sdcard
       fi
+  elif [ -n "${both[2]}" ]; then
+    exp="<platform>/"$exp
   fi
   rawsrc=${both[0]}
   if [[ $rawsrc == \<platform[-_]dir\>/* ]]; then

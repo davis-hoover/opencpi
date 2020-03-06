@@ -40,6 +40,7 @@ rdir=sandbox
 platform=xilinx13_4
 os=linux
 log=
+hdl=
 function help {
   cat <<-EOF
 	Options are:
@@ -55,6 +56,7 @@ function help {
 	  -P <platform>     - Specify the software platform for the server environment
 	  -n <server>       - Specify NTP server, or - for none
           -V                - Use valgrind (for load, load it, for start, use it)
+	  -H <hdl-platform> - Specify HDL platform
 
 	Commands are:
 	  test              - test basic connectivity
@@ -83,6 +85,7 @@ while [[ "$1" = -* ]]; do
 	-h|--help) help;;
 	-o) shift; options="$1";;
 	-P) shift; platform="$1";;
+	-H) shift; hdl="$1";;
         -V) vg=-V;;
 	*) echo Unknown option: $1 && exit 1;;
     esac
@@ -91,9 +94,9 @@ done
 [ -z "$1" ] && help
 [ -z "$OCPI_CDK_DIR" ] && echo OCPI_CDK_DIR not set. && exit 1
 [ -z "$host" ] && echo No host or ip-address specified in OCPI_SERVER_ADDRESSES or using the -a option. && exit 1
+tmpdir=$(mktemp -d)
+chmod 700 $tmpdir
 [ -n "$passwd" ] && {
-  tmpdir=$(mktemp -d)
-  chmod 700 $tmpdir
   touch $tmpdir/password
   chmod 777 $tmpdir/password
   echo echo $passwd > $tmpdir/password
@@ -162,5 +165,15 @@ for op in $*; do
 	do_ssh "test ! -d $rdir || (cd $rdir && ./ocpiserver.sh stop_if)";;
     status)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh status";;
+    bootload)
+	[ -z "$hdl" ] && echo "The bootload command requires both an RCC (-P) and HDL (-H) platform." && exit 1
+        (cd $OCPI_CDK_DIR/$hdl/sdcard-$platform &&
+	 tar -c -z --exclude opencpi --dereference -f $tmpdir/boot.tgz *)
+	echo These are the boot files being copied:
+	do_ssh "mkdir -p tmp; cd tmp; gunzip | tar -x -f -" < $tmpdir/boot.tgz
+	echo do_ssh 'cd /media/card;
+		for i in *; do $i != opencpi && rm -r -f $i; done;
+		gunzip | tar -x -f -" < $tmpdir/boot.tgz
+	;;
   esac
 done
