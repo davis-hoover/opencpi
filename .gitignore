@@ -52,9 +52,15 @@ projects/*/specs/package-id
 doc/tex/build
 vendor/
 
+# Generated PDFs
+doc/pdfs/
+
 # GitLab Pages staging area
 .public/
 
 # JetBrains
 .idea/
 **/.idea/
+
+# User specific env files
+user-env.sh

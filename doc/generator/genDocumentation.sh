@@ -200,15 +200,17 @@ tex_kernel() {
 ###
 generate_pdfs() {
     shopt -s nullglob
-
-    [ -z "$1" ] && echo "${BOLD}Building PDFs from '${REPO_PATH}' with results in '${OUTPUT_PATH}'${RESET}"
+    local search_path="$1"
 
     # TODO: remove core/assets and have it just walk projects/ skipping osps and inactive
-    if [ -z "$1" ]; then
+    if [ -z "$search_path" ]; then
+        echo "${BOLD}Building PDFs from '${REPO_PATH}' with results in '${OUTPUT_PATH}'${RESET}"
         dirs_to_search=()
+        dirs_to_search+=("${REPO_PATH}/doc/briefings")
         dirs_to_search+=("${REPO_PATH}/doc/av/tex")
-        dirs_to_search+=("${REPO_PATH}/doc/tex")
         dirs_to_search+=("${REPO_PATH}/doc/odt")
+        dirs_to_search+=("${REPO_PATH}/doc/tex")
+        dirs_to_search+=("${REPO_PATH}/doc/tutorials")
         dirs_to_search+=($(find ${REPO_PATH}/projects/assets -type d \( -name doc -o -name docs \)))
         dirs_to_search+=($(find ${REPO_PATH}/projects/assets_ts -type d \( -name doc -o -name docs \)))
         dirs_to_search+=($(find ${REPO_PATH}/projects/core -type d -name doc))
@@ -218,7 +220,7 @@ generate_pdfs() {
         done
     else # given directories to search
         dirs_to_search=()
-        tmp_array=($1)
+        tmp_array=($search_path)
         for dir in ${tmp_array[@]}; do
             if [ -e "$dir" ]; then
              # Code elsewhere requires absolute paths, like REPO_PATH is above
@@ -228,22 +230,29 @@ generate_pdfs() {
             fi
         done
     fi
+
+    # There is a bug with unoconv where it doesn't work the first time it is
+    # ran so we kick start it here
+    # https://github.com/dagwieers/unoconv/issues/241
+    unoconv /dev/null > /dev/null 2>&1 || :
+
     for d in ${dirs_to_search[*]}; do
         # This should be an error post-AV-5448
-        [ ! -d $d ] && echo "${RED}Directory $d does not exist! Skipping!${RESET}" && continue
+        [ ! -d "$d" ] && echo "${RED}Directory $d does not exist! Skipping!${RESET}" && continue
         echo "${BOLD}Directory: $d${RESET}"
-        cd $d
+        pushd "$d" || return 1
         prefix=.
         osp_name="$(get_osp_name $d)"
-        # If we are building for a specific directory there will be no prefix
-        [ -z "$1" ] &&
-        # otherwise, assets / core / osp_XXX, or left empty
         if expr match $d '.*assets_ts' > /dev/null; then
             prefix=assets_ts
         elif expr match $d '.*assets' > /dev/null; then
             prefix=assets
         elif expr match $d '.*core' > /dev/null; then
             prefix=core
+        elif expr match $d '.*tutorials' > /dev/null; then
+            prefix=tutorials
+        elif expr match $d '.*briefings' > /dev/null; then
+            prefix=briefings
         elif [ -n "${osp_name}" ]; then
             prefix=osp_${osp_name}
         fi
@@ -251,36 +260,43 @@ generate_pdfs() {
         log_dir=${OUTPUT_PATH}/${prefix}/logs
         mkdir -p "${log_dir}"
 
-        # Once upon a time, we allowed custom scripts to build PDFs.
-        # If that code is ever needed again, see Jenkins Job 1 before 6a64d20.
-        # AV-3987, AV-4085
-
         for ext in *docx *pptx *odt *odp; do
             # Get the name of the file without the file extension
             ofile=${ext%.*}
-            echo "${BOLD}office: $d/$ext ${prefix+(output prefix=${prefix})}${RESET}"
-            warn_existing_pdf "${OUTPUT_PATH}/${prefix}" ${ofile} $d && continue
-            soffice --convert-to pdf $ext >> ${log_dir}/${ofile}.log 2>&1
-            # If the pdf was created then copy it out
-            if [ -f $ofile.pdf ]; then
-                mv ${ofile}.pdf ${OUTPUT_PATH}/${prefix}/
+            echo "${BOLD}office: ${d}/${ext} ${prefix+(output prefix=${prefix})}${RESET}"
+            warn_existing_pdf "${OUTPUT_PATH}/${prefix}" "${ofile}" "${d}" && continue
+            rv=0
+            if [ "${prefix}" = tutorials ]; then
+              bash "${GEN_CG_PDFS_SH}" "${ext}" "${PWD}" >> "${log_dir}/${ofile}.log" 2>&1
+              rv=$?
             else
-              echo "${RED}Error creating $ofile.pdf${RESET}"
-              echo "Error creating $ofile.pdf ($d)" >> ${OUTPUT_PATH}/errors.log
+              unoconv -vvv "${ext}" >> "${log_dir}/${ofile}.log" 2>&1
+              rv=$?
+            fi
+
+            # If the pdf was created then copy it out
+            if [ ${rv} -eq 0 ]; then
+              mv ./*.pdf "${OUTPUT_PATH}/${prefix}"
+            else
+              echo "${RED}Error creating ${ofile}.pdf${RESET}"
+              echo "Error creating ${ofile}.pdf (${d})" >> "${OUTPUT_PATH}/errors.log"
             fi
         done
+
         # There are a few places where it is doc/XXX/*.tex so captures both, removing XXX
         export -f tex_kernel warn_existing_pdf
         export OUTPUT_PATH
         texfs=$(echo *tex */*tex)
-        [ -z "${texfs}" ] && continue
-        if [ -z "$(command -v parallel)" -o -n "${JENKINS_HOME}" ]; then
-          echo "${texfs// /$'\n'}" | xargs -I+ bash -c "tex_kernel $d $prefix $log_dir +"
-        else
-          echo "${texfs// /$'\n'}" | parallel -j ${JOBS} tex_kernel $d $prefix $log_dir
+        if [ -n "${texfs}" ]; then
+          if [ -z "$(command -v parallel)" -o -n "${JENKINS_HOME}" ]; then
+            echo "${texfs// /$'\n'}" | xargs -I+ bash -c "tex_kernel $d $prefix $log_dir +"
+          else
+            echo "${texfs// /$'\n'}" | parallel -j ${JOBS} tex_kernel $d $prefix $log_dir
+          fi
         fi
+
+        popd || return 1
     done
-    rm -rf ${UNO_TMP}
 }
 
 ###
@@ -467,17 +483,24 @@ while [[ $# -gt 0 ]]; do
 done
 # Do not try to access parameters to the script past this
 
+GEN_CG_PDFS_SH="${REPO_PATH}/doc/tutorials/gen-cg-pdfs.sh"
+
 enable_color
 # Failures
 [ ! -r ${REPO_PATH} ] && show_help "\"${REPO_PATH}\" not readable by $USER. Consider using a different repo path."
 [ ! -d "${REPO_PATH}/doc/av" ] && show_help "\"${REPO_PATH}\" doesn't seem to be correct. Could not find doc/av/."
 [ -d "${OUTPUT_PATH}" ] && show_help "\"${OUTPUT_PATH}\" already exists"
+if [ ! -f "$GEN_CG_PDFS_SH" ]; then
+  echo "Could not find $GEN_GEN_CG_PDFS_SH"
+  echo "This script is required to properly convert the tutorials to pdfs"
+  exit 1
+fi
 
 # Warnings
 echo -n "${RED}"
 [ -z "$(command -v rubber)" ] && printf "\nThe 'rubber' command was not found - will not be able to convert LaTeX => PDF!\n\n"
 [ -z "$(command -v gs)" ] && printf "\nThe 'gs' command was not found - will not be able to optimize PDF!\n\n"
-[ -z "$(command -v soffice)" ] && printf "\nThe 'soffice' command was not found - will not be able to convert Open/LibreOffice => PDF!\n\n"
+[ -z "$(command -v unoconv)" ] && printf "\nThe 'unoconv' command was not found - will not be able to convert Open/LibreOffice => PDF!\n\n"
 echo -n "${RESET}"
 
 mkdir -p ${OUTPUT_PATH} > /dev/null 2>&1

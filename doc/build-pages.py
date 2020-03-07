@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import pprint
+import re
 import shutil
 import subprocess
 import tempfile
@@ -54,24 +55,37 @@ def main():
         shutil.rmtree(args.outputdir.as_posix())
     os.makedirs(args.outputdir.as_posix(), exist_ok=True)
 
-    # Get list of release tags
-    git_tags = subprocess.check_output(["git", "tag", "-l"]).decode().strip("\n").split("\n")
+    # Get list of tags and checked out branches
+    git_tags = get_tags()
+    logging.debug("Tags: {}".format(git_tags))
+    git_branches = get_branches()
+    logging.debug("Branches: {}".format(git_branches))
 
-    # v1.3.0 has no docs
-    if "v1.3.0" in git_tags:
-        git_tags.remove("v1.3.0")
+    # Resolve HEAD because it doesn't work with all git commands
+    head = get_name_rev("HEAD")
+    if "HEAD" in args.releases:
+        args.releases[args.releases.index("HEAD")] = head
+    if "HEAD" in args.clean:
+        args.clean[args.clean.index("HEAD")] = head
 
     if args.all:
-        releases = sorted(git_tags)
+        releases = git_tags.copy()
         latest_release = releases[-1]
         releases.append("develop")
     else:
         for release in args.releases:
-            if release not in git_tags and release != "develop":
-                logging.critical("Release '{}' is not a valid git tag. Exiting...".format(release))
+            if release not in git_tags and release not in git_branches:
+                logging.critical(
+                    "'{}' is not a valid git tag or checked out branch. Exiting...".format(release)
+                )
                 exit(1)
-        releases = args.releases
-        latest_release = releases[-1]
+        releases = args.releases  # type: list
+        try:
+            releases.remove("develop")
+            latest_release = releases[-1] if len(releases) else "develop"
+            releases.append("develop")
+        except ValueError:
+            latest_release = releases[-1]
 
     # This doesn't work because libreoffice is unable to have multiple instances
     # of it's pdf conversion tool (unoconv or soffice) running concurrently or
@@ -82,13 +96,21 @@ def main():
     #     with concurrent.futures.ThreadPoolExecutor() as executor:
     #         executor.map(run, releases)
     # else:
+    logging.debug("Releases: {}".format(releases))
+    logging.debug("Latest release: {}".format(latest_release))
     for release in releases:
-        build(release)
         is_latest = True if latest_release == release else False
+        build(release)
         gen_release_index(release, is_latest=is_latest)
 
+    # Create symlink so urls like https://example.com/releases/latest/doc/some.pdf will work
+    latest_link = Path(args.outputdir, "latest")
+    if latest_link.exists():
+        os.remove(latest_link.as_posix())
+    os.symlink(latest_release, latest_link.as_posix())
+
     gen_releases_index(latest_release)  # Create OUTPUTDIR/index.html
-    gen_releases_all_index(latest_release)  # Create OUTPUTDIR/all/index.html
+    gen_releases_all_index(latest_release, git_tags)  # Create OUTPUTDIR/all/index.html
 
 
 def build(tag: str):
@@ -96,6 +118,7 @@ def build(tag: str):
     dst_dir = Path(args.outputdir, tag, "docs").absolute()
     if dst_dir.exists():
         if dst_dir.parent.name in args.clean:
+            logging.info("Removing {}".format(dst_dir))
             shutil.rmtree(dst_dir.as_posix())
         else:
             logging.info("  Not building PDFs... '{}' exists".format(dst_dir.as_posix()))
@@ -124,7 +147,7 @@ def build(tag: str):
         copy_pdfs(tmprepo, dst_dir)
 
         # No RPM support for 1.6.0
-        if tag.startswith("v1.6.0") or tag == "develop":
+        if tag.startswith("v1.6.0"):
             rpm_guide = find_file(dst_dir, "RPM_Installation_Guide.pdf")
             if rpm_guide is not None:
                 os.remove(rpm_guide.as_posix())
@@ -186,23 +209,27 @@ def gen_releases_index(latest_release: str):
         fd.write(index)
 
 
-def gen_releases_all_index(latest_release: str):
+def gen_releases_all_index(latest_release: str, git_tags):
     logging.info("Generating {}/all/index.html".format(args.outputdir))
 
-    # Every directory under OUTPUTDIR is a released version.
-    # Make links for each directory, skipping develop
+    # Every directory under OUTPUTDIR is a released version. Gather releases and sort them.
     releases = []
     for item in Path(args.outputdir).iterdir():
-        if item.is_dir() and item.name not in ["all", "develop"]:
-            url = "../{}".format(item.name)
-            name = item.name
-            if item.name == latest_release:
-                name = name + " (the latest release)"
-            releases.append(UrlLink(name=name, url=url))
+        if item.is_dir() and item.name in git_tags:
+            releases.append(item.name)
+    releases = sort_tags(releases)
+
+    # Make links for each release
+    releases_links = []
+    for release in releases:
+        url = "../{}".format(release)
+        if release == latest_release:
+            release = release + " (latest release)"
+        releases_links.append(UrlLink(name=release, url=url))
 
     # Render index.html and save it
     template = jinja_env.get_template("releases-all.index.html")
-    index = template.render(develop_url="../develop", releases=releases)
+    index = template.render(develop_url="../develop", releases=releases_links)
     outdir = Path(args.outputdir, "all")
     os.makedirs(outdir.as_posix(), exist_ok=True)
     with open(Path(outdir, "index.html").as_posix(), "w") as fd:
@@ -216,9 +243,30 @@ def gen_release_index(tag: str, is_latest=False):
         return
     logging.info("Generating {}/index.html".format(release_dir))
 
-    old_main_section = jinja_env.get_template("old-main-documentation.html")
-    main_section = jinja_env.get_template("main-documentation.html")
-    project_section = jinja_env.get_template("project-section.html")
+    def _fix_file_name(file_name: str):
+        """Cleans up file names until they can be renamed"""
+        fname = file_name.lower()
+        if fname in [
+            "opencpi installation", "opencpi user", "opencpi application development", "opencpi component development",
+            "opencpi rcc development", "opencpi hdl development", "opencpi platform development"
+        ]:
+            return file_name + " Guide"
+        elif fname.endswith("getting started"):
+            return file_name + " Guide"
+        elif fname == "ide user":
+            return "AV GUI User Guide"
+        elif fname.startswith("briefing"):
+            chunks = fname.split()
+            chunks[1] = "{:02d}".format(int(chunks[1]))
+            return " ".join(chunks)
+        elif fname.startswith("tutorial"):
+            chunks = fname.split()
+            if chunks[1].endswith("hw"):
+                chunks[1] = "{:02d}hw".format(int(chunks[1][:-2]))
+            else:
+                chunks[1] = "{:02d}".format(int(chunks[1]))
+            return " ".join(chunks)
+        return file_name
 
     # Generate dictionary of pdf links organized based on filesystem layout
     # Links are built relative to release_dir
@@ -234,39 +282,53 @@ def gen_release_index(tag: str, is_latest=False):
             section_title = section_name.replace("_", " ").title()
             if section_title == "Assets Ts":
                 section_title = "Assets TS"
-            section_title += " Project Documentation"
+            if section_title not in ["Tutorials", "Briefings"]:
+                section_title += " Project Documentation"
 
         file_links = {}
         for f in files:
             if f.endswith(".pdf"):
                 url = "{}/{}".format(base_url, f)
                 name = f[:-4]  # remove '.pdf'
-                file_links[name.lower()] = UrlLink(name=name.replace("_", " "), url=url)
+                name = name.replace("_", " ")
+                if name.startswith("Briefing") or name.startswith("Tutorial"):
+                    file_links[_fix_file_name(name).lower()] = UrlLink(name=name, url=url)
+                else:
+                    if name.lower().endswith("guide"):
+                        name = name[:-6]
+                    file_links[name.lower()] = UrlLink(name=_fix_file_name(name), url=url)
         section_data[section_name] = SectionData(name=section_name, title=section_title, files=file_links)
 
     # Render each section
+    old_main_section = jinja_env.get_template("old-main-documentation.html")
+    main_section = jinja_env.get_template("main-documentation.html")
+    project_section = jinja_env.get_template("project-section.html")
     rendered_sections = {}
     for data in section_data.values():
-        if data.name == "main":
-            if tag in ["OpenCPI-1.0", "OpenCPI-2015.Q1.rc0"]:
-                rendered_sections[data.name] = old_main_section.render(section_title=data.title, links=data.files)
-            else:
-                # Main section needs some files from assets
-                assets_links = section_data.get("assets")
-                if assets_links is not None:
-                    assets_links = assets_links.files
-                rendered_sections[data.name] = main_section.render(section_title=data.title, links=data.files,
-                                                                   assets_links=assets_links)
-        else:
+        if data.name != "main":
             rendered_sections[data.name] = project_section.render(section_title=data.title, links=data.files)
+
+    # Render main last as it needs data from other sections
+    data = section_data["main"]
+    if tag in ["v1.0.0"]:
+        rendered_sections[data.name] = old_main_section.render(section_title=data.title, links=data.files)
+    else:
+        # Main section needs some files from assets, briefings, and tutorials
+        assets = section_data.get("assets")
+        briefings = section_data.get("briefings")
+        tutorials = section_data.get("tutorials")
+        rendered_sections[data.name] = main_section.render(section_title=data.title, links=data.files,
+                                                           assets=assets, briefings=briefings, tutorials=tutorials)
 
     # Stitch it all together
     template = jinja_env.get_template("release.index.html")
     index = template.render(title=tag, sections=rendered_sections, is_latest=is_latest,
-                            releases_all_url="https://opencpi.gitlab.io/releases/all/")
+                            releases_all_url="../../releases/all/")
     with open(Path(release_dir, "index.html").as_posix(), "w") as fd:
         fd.write(index)
 
+
+# Util functions ##############################################################
 
 def find_file(search_dir, filename: str, case_sensitive=True) -> Path:
     if not isinstance(search_dir, Path):
@@ -298,6 +360,75 @@ def find_files(search_dir, extension=None, recursive=True) -> list:
     return pdfs
 
 
+def get_tags():
+    # Get list of release tags and their creation date
+    all_tags = dict()
+    for tag in subprocess.check_output(["git", "tag", "-l", "v*"]).decode().strip("\n").split("\n"):
+        time = subprocess.check_output(["git", "log", "-1", "--format=%at", tag]).decode().strip("\n")
+        all_tags[tag] = time
+
+    # Filter out known bad tags and tags that have a hyphen
+    git_tags = dict()
+    semver_versions = set()  # collect only vX.Y.Z tags
+    for tag in all_tags:  # type: str
+        if tag == "v1.3.0":  # v1.3.0 has no docs
+            continue
+        ndx = tag.find("-")
+        if ndx != -1:
+            semver_versions.add(tag[:ndx])
+        else:
+            semver_versions.add(tag)
+            git_tags[tag] = all_tags[tag]
+
+    # Handle most recent release for a version is not a new version
+    for version in semver_versions:
+        if version in git_tags:
+            continue
+        # Find most recent release that starts with version
+        for release in sorted(all_tags, key=all_tags.__getitem__, reverse=True):
+            if release.startswith(version):
+                git_tags[release] = all_tags[release]
+                break
+
+    return sorted(git_tags, key=git_tags.__getitem__)
+
+
+def get_branches():
+    # Get list of branches
+    git_branches = [x.replace("*", "").strip() for x in subprocess.check_output(
+        ["git", "branch", "--no-color"]
+    ).decode().strip("\n").split("\n")]
+
+    # Resolve detached branches to their symbolic name. This is needed because
+    # of how gitlab runner checks out branch under test
+    pat = re.compile(r"detached from ([a-z0-9]+)")
+    for i, branch in enumerate(git_branches):
+        match = pat.search(branch)
+        if match is not None:
+            sha = match.group(1)
+            git_branches[i] = get_name_rev(sha)
+
+    # Ensure no duplicates
+    return list(set(git_branches))
+
+
+def get_name_rev(rev: str):
+    name = subprocess.check_output(
+        ["git", "name-rev", "--name-only", "--no-undefined", rev]
+    ).decode().strip("\n")
+    if len(name):
+        return name
+    raise RuntimeError("Could not resolve {} to a branch name".format(rev))
+
+
+def sort_tags(tags):
+    git_tags = dict()
+    for tag in tags:
+        time = subprocess.check_output(["git", "log", "-1", "--format=%at", tag]).decode().strip("\n")
+        git_tags[tag] = time
+    return sorted(git_tags, key=git_tags.__getitem__)
+
+
 if __name__ == "__main__":
     def _find_root(x: Path):
         while not x.name.startswith("opencpi") and len(x.parts) != 1:
@@ -323,16 +454,17 @@ if __name__ == "__main__":
                                                 "serving files for a particular site.\n"
                                                 "OUTPUTDIR must be based off WEBROOT.\n"
                                                 "Default: {}".format(default_webroot))
-    parser.add_argument("--all", action="store_true", help="Build docs for all releases")
+    parser.add_argument("--all", action="store_true", help="Build docs for all releases + develop")
     parser.add_argument("--clean-all", action="store_true", help="Remove OUTPUTDIR before generating pdfs")
     # parser.add_argument("--parallel", action="store_true", help="builds docs for each release in parallel")
-    parser.add_argument("releases", nargs="*", help="Releases to build (must be a valid git tag or 'develop')")
+    parser.add_argument("releases", nargs="*", help="Release(s) to build. Must be a valid git tag, branch, or 'HEAD'")
     parser.epilog = ("Examples:\n"
                      "  {prog} --all                  Build all releases + develop\n"
                      "  {prog} --all --clean-all      Clean and build all + develop\n"
                      "  {prog} --all --clean develop  Same as --all, but only clean develop\n"
                      "  {prog} --clean develop        Clean and build develop\n"
-                     "  {prog} develop                Build develop").format(prog=parser.prog)
+                     "  {prog} develop                Build develop\n"
+                     "  {prog} HEAD                   Build checked out branch").format(prog=parser.prog)
     args = parser.parse_args()
 
     # Setup logging
@@ -352,6 +484,9 @@ if __name__ == "__main__":
         else:
             logging.critical("A release to build must be specified or use '--all' to build all releases")
             exit(1)
+    elif len(args.clean) and len(args.releases):
+        # add items being cleaned to items being built
+        args.releases = list(set(args.releases + args.clean))
 
     # Setup webroot and outputdir
     if args.webroot is None:

@@ -19,6 +19,8 @@
 Definition of Application and ApplicationCollection classes
 """
 
+import os.path
+import fnmatch
 import logging
 import _opencpi.util as ocpiutil
 from .factory import AssetFactory
@@ -28,7 +30,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
     """
     This class represents an OpenCPI ACI Application.
     """
-    valid_settings = []
+    valid_settings = ["run_before", "run_after", "run_arg"]
     def __init__(self, directory, name=None, **kwargs):
         """
         Initializes Application member data  and calls the super class __init__.  Throws an
@@ -36,15 +38,25 @@ class Application(RunnableAsset, RCCBuildableAsset):
         valid kwargs handled at this level are:
             None
         """
-        self.check_dirtype("application", directory)
+        if name:
+            if fnmatch.fnmatch(name, '*.xml'): # explicit .xml implies non-dir app
+                self.check_dirtype("applications", directory)
+            elif os.path.basename(directory) == "applications" and \
+                 os.path.exists(directory + "/" + name + ".xml"):
+                name = name + ".xml"
+        else:
+            self.check_dirtype("application", directory)
         super().__init__(directory, name, **kwargs)
+        self.run_before = kwargs.get("run_before", None)
+        self.run_after = kwargs.get("run_after", None)
+        self.run_arg = kwargs.get("run_arg", None)
 
     def run(self):
         """
         Runs the Application with the settings specified in the object
         """
         return ocpiutil.execute_cmd(self.get_settings(),
-                                    self.directory, ["run"])
+                                    self.directory, ["run", "Applications="+self.name] if self.name else ["run"])
     def build(self):
         """
         This is a placeholder function will be the function that builds this Asset
@@ -62,7 +74,10 @@ class Application(RunnableAsset, RCCBuildableAsset):
             ocpiutil.throw_not_valid_dirtype_e(["applications", "project"])
         if not name: ocpiutil.throw_not_blank_e("application", "name", True)
         #assume the only valid place for a application in a project is in the applications directory
-        return ocpiutil.get_path_to_project_top() + "/applications/" + name
+        top = ocpiutil.get_path_to_project_top() + "/applications/";
+        if fnmatch.fnmatch(name, '*.xml') or os.path.exists(top + name + ".xml"):
+            return top
+        return top + name
 
 class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
     """

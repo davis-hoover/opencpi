@@ -27,12 +27,12 @@ dnl ============================================================================
 dnl 0. Set constants for the software, and autoconf (not auto-discovered values)
 dnl ================================================================================
 dnl If changing version number here, also get minor/patchlevel below:
-AC_INIT([opencpi],[1.6.0],[discuss@lists.opencpi.org])
+AC_INIT([opencpi],[1.6.1],[discuss@lists.opencpi.org])
 dnl This version is what comes with centos6, which is as far back as we want to go.
 AC_PREREQ([2.63])
 AC_DEFINE([VERSION_MAJOR],1,[Major version])
 AC_DEFINE([VERSION_MINOR],6,[Minor version])
-AC_DEFINE([VERSION_PATCHLEVEL],0,[Patchlevel version])
+AC_DEFINE([VERSION_PATCHLEVEL],1,[Patchlevel version])
 dnl Note that this is renamed by AX_PREFIX_CONFIG below
 AC_CONFIG_HEADERS([config.h])
 dnl Define the fixed prefix for the macros and the file name

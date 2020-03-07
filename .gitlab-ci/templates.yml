@@ -15,9 +15,9 @@
     - ./scripts/install-prerequisites.sh $PLATFORM
 
 
-#################
+################
 # Jobs - Build #
-#################
+################
 .build-opencpi:
   extends:
     - .standard-artifacts
@@ -30,37 +30,268 @@
     - .build-opencpi
   stage: build-rcc
 
-.build-hdl-core:
-  extends:
-    - .standard-artifacts
-  stage: build-hdl-core
-  script:
-    - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build hdl -d projects/core --hdl --hdl-platform $PLATFORM
 
-.build-hdl-assets:
+################################
+# Jobs - Build-Primitives-Core #
+################################
+.build-primitives-core:
   extends:
     - .standard-artifacts
-  stage: build-hdl-assets
+  stage: build-primitives-core
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build hdl -d projects/assets --hdl --hdl-platform $PLATFORM
+    - ocpidev build primitives -d projects/core --hdl-platform $PLATFORM
 
-.build-hdl-assets_ts:
-  extends:
-    - .standard-artifacts
-  stage: build-hdl-rest
-  script:
-    - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build hdl -d projects/assets_ts --hdl --hdl-platform $PLATFORM
 
-.build-hdl-inactive:
+##################################
+# Jobs - Build-Primitives-Assets #
+##################################
+.build-primitives-assets:
   extends:
     - .standard-artifacts
-  stage: build-hdl-rest
+  stage: build-primitives-assets
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build hdl -d projects/inactive --hdl --hdl-platform $PLATFORM
+    - ocpidev build primitives -d projects/assets --hdl-platform $PLATFORM
+
+
+####################################
+# Jobs - Build-Primitives-Inactive #
+####################################
+.build-primitives-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-primitives-inactive
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build primitives -d projects/inactive --hdl-platform $PLATFORM
+
+
+###########################
+# Jobs - Build-Components #
+###########################
+.build-components-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/components --hdl-platform $PLATFORM
+
+.build-components-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components --hdl-platform $PLATFORM
+
+.build-components-assets-base:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/base_comps --hdl-platform $PLATFORM
+
+.build-components-assets-comms:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/comms_comps --hdl-platform $PLATFORM
+
+.build-components-assets-dsp:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/dsp_comps --hdl-platform $PLATFORM
+
+.build-components-assets-misc:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/misc_comps --hdl-platform $PLATFORM
+
+.build-components-assets-util:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/util_comps --hdl-platform $PLATFORM
+
+.build-components-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets_ts/components --hdl-platform $PLATFORM
+
+.build-components-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/components --hdl-platform $PLATFORM
+
+
+########################
+# Jobs - Build-Devices #
+########################
+.build-devices-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/hdl/devices --hdl-platform $PLATFORM
+
+.build-devices-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/devices --hdl-platform $PLATFORM
+
+.build-devices-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets_ts/hdl/devices --hdl-platform $PLATFORM
+
+.build-devices-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/hdl/devices --hdl-platform $PLATFORM
+
+
+#########################
+# Jobs - Build-Adapters #
+#########################
+.build-adapters-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/hdl/adapters --hdl-platform $PLATFORM
+
+.build-adapters-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/adapters --hdl-platform $PLATFORM
+
+
+######################
+# Jobs - Build-Cards #
+######################
+.build-cards-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/hdl/cards --hdl-platform $PLATFORM
+
+.build-cards-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/cards --hdl-platform $PLATFORM
+
+.build-cards-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/hdl/cards --hdl-platform $PLATFORM
+
+
+##########################
+# Jobs - Build-Platforms #
+##########################
+.build-platforms:
+  after_script:
+    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
+    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - for f in artifacts-build-workers-*.tar; do tar --concatenate -f artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar $f; done;
+    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+
+.build-platforms-core:
+  extends:
+    - .standard-artifacts
+    - .build-platforms
+  stage: build-platforms
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl platforms -d projects/core --hdl-platform $PLATFORM
+
+.build-platforms-assets:
+  extends:
+    - .standard-artifacts
+    - .build-platforms
+  stage: build-platforms
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl platforms -d projects/assets --hdl-platform $PLATFORM
+
+.build-platforms-inactive:
+  extends:
+    - .standard-artifacts
+    - .build-platforms
+  stage: build-platforms
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl platforms -d projects/inactive --hdl-platform $PLATFORM
+
+
+###########################
+# Jobs - Build-Assemblies #
+###########################
+.build-assemblies-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-assemblies
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/assemblies --hdl-platform $PLATFORM
+
+.build-assemblies-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-assemblies
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets_ts/hdl/assemblies --hdl-platform $PLATFORM
+
+.build-assemblies-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-assemblies
+  script: 
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/hdl/assemblies --hdl-platform $PLATFORM
 
 
 #####################
@@ -72,7 +303,7 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/core --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/core --hdl-platform $PLATFORM
 
 .build-test-assets-base:
   extends:
@@ -80,7 +311,7 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/base_comps --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/assets/components/base_comps --hdl-platform $PLATFORM
 
 .build-test-assets-comms:
   extends:
@@ -149,14 +380,45 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify
 
-.test-assets:
+.test-assets-base:
   stage: test
   artifacts: 
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e 
-    - ocpidev run tests -d projects/assets --only-platform $PLATFORM --mode prep_run_verify
+    - ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify
 
+.test-assets-comms:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e 
+    - ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify
+
+.test-assets-dsp:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e 
+    - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify
+
+.test-assets-misc:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e 
+    - ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify
+
+.test-assets-util:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e 
+    - ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify
 
 .test-assets_ts:
   stage: test
@@ -212,6 +474,7 @@
 .xsim:
   variables:
     PLATFORM: 'xsim'
+    PLATFORM_DIR: 'assets'
 
 
 ########
@@ -222,4 +485,4 @@
     when: on_success
     expire_in: '24h'
     paths: 
-      - artifacts-$CI_JOB_ID.tar
+      - artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
