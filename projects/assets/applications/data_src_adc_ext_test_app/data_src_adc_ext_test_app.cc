@@ -8,7 +8,7 @@
 namespace OA = OCPI::API;
 
 int main(/*int argc, char **argv*/) {
-  // Reference https://opencpi.github.io/OpenCPI_Application_Development.pdf for
+  // Reference opencpi.github.io/releases/latest/docs/OpenCPI_Application_Development_Guide.pdf for
   // an explanation of the ACI.
 
   std::string cmd("rm -rf case00.00.in case00.00.out");

@@ -79,7 +79,7 @@ def parse_cl_vars():
     parser.add_argument("noun", type=str, nargs='?', help="This is the noun to run.  The only " +
                         "valid options are " + ",".join(NOUNS_NO_LIBS) + ".", choices=NOUNS_NO_LIBS)
     parser.add_argument("name", default=None, type=str, action="store", nargs='?',
-                        help="This is the name of the test or application to run.")
+                        help="The name of the test or application to run.  Positional run options can follow the name after --.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Be verbose with output.")
     parser.add_argument("--keep-simulations", dest="keep_sims", action="store_true",
                         help="Keep HDL simulation files regardless of verification results.  " +
@@ -130,6 +130,8 @@ def parse_cl_vars():
     parser.add_argument("--run-arg", dest="run_arg", action="append",
                         help="Argument(s) to insert immediately after the ACI executable or " +
                         "ocpirun.  Not valid for Test.")
+    parser.add_argument("run_arg", nargs="*", 
+                        help=argparse.SUPPRESS)
     parser.add_argument("--mode", dest="mode", default="all", choices=MODES,
                         help="Specify which phase(s) of the unit test to execute.  Not valid " +
                         "for Application.")

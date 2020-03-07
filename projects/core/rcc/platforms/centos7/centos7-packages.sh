@@ -100,8 +100,8 @@ PKGS_S+=(swig python-devel)
 PKGS_S+=(nfs-utils)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(glibc-devel.i686)
-#    for the AV GUI installation
-PKGS_S+=(oxygen-icon-theme jre)
+#    for the AV GUI installation and tutorials
+PKGS_S+=(oxygen-icon-theme jre tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
 

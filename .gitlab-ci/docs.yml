@@ -3,37 +3,59 @@ build:pages:
   tags:
     - docker
   image: $CI_REGISTRY_IMAGE/build-pages:latest
-  cache:
-    key: pages
-    paths:
-      - .public/
+  dependencies: []
+  before_script: []
+  script:
+    - make doc
+    - REF_NAME=${CI_COMMIT_REF_NAME//\//-}  # Convert '/' to '-'
+    - mkdir -p .public/releases/$REF_NAME/docs/
+    - mv doc/pdfs/* .public/releases/$REF_NAME/docs/
+      # These are used in trigger-downstream
+    - echo "JOB_ID=$CI_JOB_ID"   > build-pages.vars
+    - echo "REF_NAME=$REF_NAME" >> build-pages.vars
+  after_script: []
   artifacts:
     paths:
       - .public/
-  # Overwrite default before and after script
-  before_script:
-  after_script:
-  script:
-    - git checkout develop  # this is necessary so build-docs.py can checkout develop
-    - git checkout $CI_COMMIT_SHORT_SHA  # go back to commit under test
-    - python3.4 doc/build-pages.py --clean develop  # force building of develop
+      - build-pages.vars
 
-pages:
+trigger-downstream:
   stage: deploy
   tags:
     - docker
+  image: $CI_REGISTRY_IMAGE/build-pages:latest
+  only:
+    - develop
+    - tags
+  dependencies:
+    - build:pages
+  before_script: []
+  script:
+    - cat build-pages.vars
+    - source build-pages.vars
+      # JOB_ID comes from opencpi/build:pages
+    - >
+      curl --request POST 
+      --form token=$CI_JOB_TOKEN
+      --form ref=develop
+      --form "variables[JOB_ID]=$JOB_ID"
+      --form "variables[REF_NAME]=$REF_NAME"
+      https://gitlab.com/api/v4/projects/16024285/trigger/pipeline
+  after_script: []
+
+# This just redirects opencpi.gitlab.io/opencpi to opencpi.gitlab.io/releases/latest
+pages:
+  stage: deploy
+  tags:
+   - docker
   image: centos:latest
+  only:
+   - develop
+  dependencies: []
+  before_script: []
+  script:
+    - mv .gitlab/public/ .
+  after_script: []
   artifacts:
     paths:
       - public/
-  dependencies: ["build:pages"]
-  only:
-    - develop
-    - master
-  # Overwrite default before and after script
-  before_script:
-  after_script:
-  script:
-    - rm -rf public
-    - mkdir -p public
-    - mv .public/releases/develop/* public/  # only deploy develop version of docs
