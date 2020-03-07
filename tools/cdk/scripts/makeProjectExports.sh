@@ -507,7 +507,7 @@ set +f
 # Or change the python to do this and not use "make".
 
 # export the specs for each of the libraries
-python3 -c "import sys, os;
+python3.4 -c "import sys, os;
 sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
 import _opencpi.util; _opencpi.util.export_libraries()"
 
