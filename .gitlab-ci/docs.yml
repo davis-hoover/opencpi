@@ -2,7 +2,7 @@ build:pages:
   stage: build
   tags:
     - docker
-  image: $CI_REGISTRY_IMAGE/build-pages:latest
+  image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
   dependencies: []
   before_script: []
   script:
@@ -23,7 +23,7 @@ trigger-downstream:
   stage: deploy
   tags:
     - docker
-  image: $CI_REGISTRY_IMAGE/build-pages:latest
+  image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
   only:
     - develop
     - tags

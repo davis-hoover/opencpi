@@ -24,6 +24,7 @@ stages:
 # Global before and after scripts to run after each job. Overwrite in a specific
 # job to prevent these from occurring.
 default:
+  timeout: 16h
   before_script:
     - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
     - sleep 5
