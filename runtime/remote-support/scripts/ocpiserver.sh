@@ -183,6 +183,6 @@ status)
     echo No ocpiserve appears to be running \(pid $pid\). Process does not exist. >&2
     exit 1
   fi
-  echo Server is running with port: $(<port) and pid: $pid >&2
+  echo Server is running with port: $(<port) and pid: $pid
   ;;
 esac

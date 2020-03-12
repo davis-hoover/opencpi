@@ -30,7 +30,7 @@ import _opencpi.util as ocpiutil
 
 Option = collections.namedtuple('Option', 'short long help default required action')
 Subcommand = collections.namedtuple('Subcommand', 'name func help options')
-Command = collections.namedtuple('Command', 'cmd rc')
+Command = collections.namedtuple('Command', 'cmd rc stderr')
 
 
 def main():
@@ -68,8 +68,14 @@ def main():
         default='root')
     option_ssh_opts = make_option(
         '-o', '--ssh_opts', 
-        'ssh options for connecting to remote device',
-        default='')
+        'ssh options for connecting to remote device; \
+            default: -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null',
+        default='-q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null')
+    option_scp_opts = make_option(
+        '-c', '--scp_opts', 
+        'scp options for copying files to remote device; \
+            default: -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null',
+        default='-q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null')
     option_remote_dir = make_option(
         '-d', '--remote_dir', 
         'directory on remote device to create/use as the server sandbox',
@@ -90,13 +96,9 @@ def main():
         '-l', '--log_level', 
         'specify log level',
         default=0)
-    option_clean_known_host = make_option(
-        '-c', '--clean_known_host', 
-        'remove remote device\'s entry in .ssh/known_hosts',
-        action='store_true')
 
-    common_options = [option_user, option_password, 
-                      option_ip, option_remote_dir, option_ssh_opts]
+    common_options = [option_user, option_password, option_ip, 
+                      option_remote_dir, option_ssh_opts, option_scp_opts]
 
     commands = []
     commands.append(make_subcommand(
@@ -108,8 +110,16 @@ def main():
         'delete a server sandbox directory', 
         common_options))
     commands.append(make_subcommand(
+        'reload', reload_, 
+        'delete a server sandbox directory and then reload it', 
+        common_options + [option_port, option_valgrind, option_hw_platform, option_sw_platform]))
+    commands.append(make_subcommand(
         'start', start, 
         'start server on remote device',
+        common_options + [option_log_level, option_valgrind]))
+    commands.append(make_subcommand(
+        'restart', restart, 
+        'stop and then start server on remote device',
         common_options + [option_log_level, option_valgrind]))
     commands.append(make_subcommand(
         'status', status, 
@@ -130,17 +140,16 @@ def main():
     commands.append(make_subcommand(
         'reboot', reboot, 
         'reboot the remote device', 
-        common_options + [option_clean_known_host]))
+        common_options))
     commands.append(make_subcommand(
-        'boot', boot, 
-        'load boot files onto the remote device and reboot', 
+        'deploy', deploy, 
+        'Deploy Opencpi boot files onto the remote device and reboot', 
         common_options + [option_hw_platform, option_sw_platform]))
    
     parser = make_parser(commands)
     args = parser.parse_args()
 
-    # If a subcommand was passed, call it.
-    # Else print help message
+    # If a subcommand was passed, call it. Else print help message
     if 'func' in args:
         args.func(args)
     else:
@@ -183,7 +192,7 @@ def make_subcommand(name, func, help, options):
     return command
 
 
-def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0):
+def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0, stderr=True):
     """ Returns a string containing a command formatted to be executed on 
         remote device.
 
@@ -201,10 +210,10 @@ def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0):
     if ocpiserver:
         cmd = 'cd "{}" && ./ocpiserver.sh "{}"'.format(args.remote_dir, cmd)
     if ssh:
-        cmd = 'ssh -o StrictHostKeyChecking=no {} {}@{} sh -c \'{}\''.format(
+        cmd = 'ssh {} {}@{} sh -c \'{}\''.format(
             args.ssh_opts, args.user, args.ip_addr, cmd)
 
-    command = Command(cmd, rc)
+    command = Command(cmd, rc, stderr)
 
     return command
 
@@ -299,7 +308,7 @@ def execute_command(command, args):
             raise ocpiutil.OCPIException(
                 'SSH/SCP call failed in a way we cannot handle; quitting. {}'.format(e))
 
-        if stderr:
+        if stderr and command.stderr:
             print(stderr)
 
         return process.returncode
@@ -357,6 +366,7 @@ def load(args):
             os.path.join(args.remote_dir, 'prerequisites', 'valgrind', args.sw_platform))
 
     with tempfile.TemporaryDirectory() as tempdir:
+        # Prepare sandbox
         commands = []
         commands.append(make_command(
             'mkdir {}'.format(args.remote_dir), 
@@ -377,48 +387,57 @@ def load(args):
             'ln -s ../{} {}'.format(system_xml_arc, args.remote_dir), 
             args))
 
-        if execute_commands(commands, args) == 0:
-            print('Server package created successfully.')
+        print('Preparing remote sandbox...')
+        rc = execute_commands(commands, args)
 
+        # Create server package
+        print('Creating server package...')
         tar_commands = []
         tar_path = make_tar(tar_files, arcnames, tempdir)
         tar_commands.append(make_command(
-            'scp {} {}@{}:./{}'.format(tar_path, args.user, args.ip_addr, args.remote_dir), 
+            'scp {} {} {}@{}:./{}'.format(
+                args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir), 
             args, 
             ssh=False))
         tar_commands.append(make_command(
             'tar -xf {}/tar.tgz'.format(args.remote_dir), 
             args))
 
-        if execute_commands(tar_commands, args) == 0:
+        print('Sending server package...')
+        rc = execute_commands(tar_commands, args)
+
+        if rc == 0:
             print('Server package sent successfully.')
+
+    return rc
     
 
 def reboot(args):
+    if status(args, stderr=False) == 0:
+        if stop(args) != 0:
+            return 1
+
     command = make_command('/sbin/reboot', args)
     rc = execute_command(command, args)
 
-    if rc == 0:
-        print("Rebooted remote device")
-
-        if args.clean_known_host:
-            print("Removing entry from '~/.ssh/known_hosts'")
-            home = os.environ.get('HOME')
-            with open('{}/.ssh/known_hosts'.format(home), 'r') as f:
-                lines = f.readlines()
-            with open('{}/.ssh/known_hosts'.format(home), 'w') as f:
-                for line in lines:
-                    if not line.strip("\n").startswith(args.ip_addr):
-                        f.write(line)
-                    
-    
+    if rc in command.rc:
+        print("Rebooting remote device...")
+               
     return rc
 
 
-def boot(args):
-    # command = make_command('/sbin/reboot', args)
-    # rc = execute_command(command, args)                
-    
+def deploy(args):
+    local_dir = 'cdk/{}/sdcard-{}'.format(args.hw_platform, args.sw_platform)
+    print('Deploying Opencpi boot files to remote device from {}...'.format(local_dir))
+
+    cmd = 'scp {} -r {}/. {}@{}:/mnt/card'.format(
+        args.scp_opts, local_dir, args.user, args.ip_addr)
+    command = make_command(cmd, args, ssh=False)
+    rc = execute_command(command, args)
+
+    if rc in command.rc:
+        rc = reboot(args)
+
     return rc
 
 
@@ -430,7 +449,7 @@ def unload(args):
     Args:
         args: parsed user arguments
     """
-    if status(args) == 0:
+    if status(args, stderr=False) == 0:
         if stop(args) != 0:
             return 1
 
@@ -440,6 +459,15 @@ def unload(args):
 
     if rc in command.rc:
         print("Server unloaded successfully.")
+
+    return rc
+
+
+def reload_(args):
+    rc = unload(args)
+
+    if rc == 0:
+        rc = load(args)
 
     return rc
 
@@ -474,14 +502,23 @@ def stop(args):
 
     return rc
 
+
+def restart(args):
+    rc = stop(args)
+
+    if rc == 0:
+        rc = start(args)
+
+    return rc
+
     
-def status(args):
+def status(args, stderr=True):
     """ Get the status of the ocpiserver running on remote device.
 
     Args:
         args: parsed user arguments
     """
-    command = make_command('status', args, ocpiserver=True)
+    command = make_command('status', args, ocpiserver=True, stderr=stderr)
     rc = execute_command(command, args)
 
     return rc
