@@ -7,14 +7,15 @@ function retval = get_any_error_samp_drop(filename)
 
   retval = false;
   tmp = textread(filename, '%s');
-  for ii=0:length(tmp)
-    if(strmcmp(tmp{ii}, "ERROR_SAMP_DROP"))
+  for ii=2:length(tmp)
+    row = strsplit(tmp{ii}, ",", "collapsedelimiters", false);
+    if(strcmp(row(8), "sync"))
       retval = true;
     end
   end
 endfunction
 
-function retval = length_is_expected_maximal_lfsr_period_12_bits(xx)
+function retval = length_is_expected_maximal_lfsr_period_12_bits(xx, filename)
   % https://en.wikipedia.org/wiki/Linear-feedback_shift_register#Some_polynomials_for_maximal_LFSRs
   maximal_lfsr_period_12_bits = 4095;
 
@@ -22,20 +23,20 @@ function retval = length_is_expected_maximal_lfsr_period_12_bits(xx)
     printf("INFO: All %i values passed through UUT\n", maximal_lfsr_period_12_bits)
     retval = true;
   else
-    printf("ERROR: %i values passed through UUT instead of the expected %i values\n",
-           length(xx), maximal_lfsr_period_12_bits)
+    printf("ERROR: for %s, %i values passed through UUT instead of the expected %i values\n",
+           filename, length(xx), maximal_lfsr_period_12_bits)
     retval = false;
   end
 endfunction
 
-function retval = successfully_verified_lfsr_passthrough(data_i, data_q)
+function retval = successfully_verified_lfsr_passthrough(data_i, data_q, filename)
 
   retval = true;
 
-  if((!length_is_expected_maximal_lfsr_period_12_bits(data_i)) ||
-     (!length_is_expected_maximal_lfsr_period_12_bits(data_q)) ||
-     (!length_is_expected_maximal_lfsr_period_12_bits(unique(data_i))) ||
-     (!length_is_expected_maximal_lfsr_period_12_bits(unique(data_q))))
+  if((!length_is_expected_maximal_lfsr_period_12_bits(data_i, filename)) ||
+     (!length_is_expected_maximal_lfsr_period_12_bits(data_q, filename)) ||
+     (!length_is_expected_maximal_lfsr_period_12_bits(unique(data_i), filename)) ||
+     (!length_is_expected_maximal_lfsr_period_12_bits(unique(data_q), filename)))
     retval = false;
   end
 
@@ -58,17 +59,14 @@ function retval = successfully_verified_output_not_all_zero(data_i, data_q)
   end
 endfunction
 
-function retval = successfully_verified_expected_error_samp_drop(data_cell)
+function retval = successfully_verified_expected_error_samp_drop(filename)
   
-  retval = false;
-
-  for ii=1:length(data_cell)
-    if(strcmp(data_cell{ii}, "ERROR_SAMP_DROP"))
-      retval = true;
-      disp("INFO: as expected, ERROR_SAMP_DROP detected")
-      break;
-    end
+  retval = get_any_error_samp_drop(filename);
+  if(retval)
+    disp("INFO: as expected, sync detected")
   end
+
+
 endfunction
 
 function retval = is_msb_packed(data)
@@ -121,24 +119,27 @@ function retval = verify_subtest_expecting_no_error_samp_drop(filename,
   retval = 0;
 
   %[data_i, data_q] = textread(filename, '%d,%d');
-  tmp = csvread(filename);
-  data_i = tmp(:,1);
-  data_q = tmp(:,2);
+  empty_value = 32768; % one higher than is possible
+  tmp = dlmread(filename, ",", "emptyvalue", empty_value);
+  data_i = tmp(2:end,2);
+  data_i = data_i(data_i != empty_value);
+  data_q = tmp(2:end,3);
+  data_q = data_q(data_q != empty_value);
 
-  if((!successfully_verified_lfsr_passthrough(data_i, data_q)) && (!retval))
+  if((!retval) && (!successfully_verified_lfsr_passthrough(data_i, data_q, filename)))
     retval = 1;
   end
 
-  if((!successfully_verified_output_not_all_zero(data_i, data_q)) && (!retval))
+  if((!retval) && (!successfully_verified_output_not_all_zero(data_i, data_q, filename)))
     retval = 1;
   end
 
   if(expecting_msb_pack)
-    if((!successfully_verified_msb_pack(data_i, data_q)) && (!retval))
+    if((!retval) && (!successfully_verified_msb_pack(data_i, data_q, filename)))
       retval = 1;
     end
   else
-    if((!successfully_verified_lsb_pack(data_i, data_q)) && (!retval))
+    if((!retval) && (!successfully_verified_lsb_pack(data_i, data_q, filename)))
       retval = 1;
     end
   end
@@ -154,8 +155,8 @@ function retval = verify_subtest_1()
 
   retval = 0;
 
-  fn = 'uut_subtest_1_data.txt';
-  if(!successfully_verified_expected_error_samp_drop(textread(fn, '%s')))
+  filename = 'uut_subtest_1_data.txt';
+  if(!successfully_verified_expected_error_samp_drop(filename))
     retval = 1;
   end
 endfunction
@@ -170,8 +171,8 @@ function retval = verify_subtest_3()
 
   retval = 0;
 
-  fn = 'uut_subtest_3_data.txt';
-  if(!successfully_verified_expected_error_samp_drop(textread(fn, '%s')))
+  filename = 'uut_subtest_3_data.txt';
+  if(!successfully_verified_expected_error_samp_drop(filename))
     retval = 1;
   end
 endfunction

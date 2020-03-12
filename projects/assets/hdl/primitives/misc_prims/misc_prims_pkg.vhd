@@ -21,16 +21,13 @@ use ieee.std_logic_1164.all;
 USE IEEE.NUMERIC_STD.ALL;
 USE IEEE.MATH_REAL.ALL;
 USE IEEE.MATH_COMPLEX.ALL;
+library protocol;
 
 package misc_prims is
 
 constant TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH : positive := 32;
 constant DATA_ADC_BIT_WIDTH                  : positive := 12;
 constant DATA_DAC_BIT_WIDTH                  : positive := 12;
-constant DATA_BIT_WIDTH                      : positive := 16;
-constant METADATA_TIME_BIT_WIDTH             : positive := 64;
-constant METADATA_SAMP_PERIOD_BIT_WIDTH      : positive := 64;
-
 type file_writer_backpressure_select_t is (NO_BP, LFSR_BP);
 
 type data_complex_adc_t is record
@@ -43,78 +40,13 @@ type data_complex_dac_t is record
   q : std_logic_vector(DATA_DAC_BIT_WIDTH-1 downto 0);
 end record data_complex_dac_t;
 
-type data_complex_t is record
-  i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
-  q : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
-end record data_complex_t;
-
-constant data_complex_zero : data_complex_t := ((others => '0'), (others => '0'));
-
-type metadata_t is record
-  eof               : std_logic; -- End of File (from OpenCPI WSI)
-  flush             : std_logic; -- one or more samples have been dropped
-  error_samp_drop   : std_logic; -- one or more samples have been dropped
-  data_vld          : std_logic; -- allows for option of sending valid metadata
-                                 -- in parallel with invalid data to output
-
-  -- if error_samp_drop and data_vld are both 1, samp drop is assumed to have
-  -- happened before the current valid data
-
-  -- if data_vld=1 and time_vld=1 time of corresponding to current data value
-  -- if data_vld=0 and time_vld=1 time of next valid data value
-  time              : unsigned(METADATA_TIME_BIT_WIDTH-1 downto 0);
-
-  time_vld          : std_logic;
-  samp_period       : unsigned(METADATA_SAMP_PERIOD_BIT_WIDTH-1 downto 0);
-  samp_period_vld   : std_logic;
-end record metadata_t;
-
+-- provides info in additional to ComplexShortWithMetadata protocol
 type metadata_dac_t is record
   underrun_error : std_logic; -- samples were not available for one or
                               -- more dac clock cycles
   ctrl_tx_on_off : std_logic; -- high when transmitter should be powered on
                               -- low when transmitter should be powered off
-  data_vld       : std_logic; -- parallel with data to output
-                              -- if error and data_vld are both 1, error is
-                              -- assumed to have happened before the current valid data
 end record metadata_dac_t;
-
-constant metadata_zero : metadata_t := ('0', '0', '0', '0', (others => '0'),
-                                        '0', (others => '0'), '0');
-
-type info_t is record
-  data     : data_complex_t;
-  metadata : metadata_t;
-end record info_t;
-
-constant info_zero : info_t := (data_complex_zero, metadata_zero);
-
-constant METADATA_IDX_SAMP_PERIOD_VLD : natural := 0;
-constant METADATA_IDX_SAMP_PERIOD_R   : natural := 1;
-constant METADATA_IDX_SAMP_PERIOD_L   : natural :=
-                                        METADATA_IDX_SAMP_PERIOD_R+
-                                        METADATA_SAMP_PERIOD_BIT_WIDTH-1;
-constant METADATA_IDX_TIME_VLD        : natural :=
-                                        METADATA_IDX_SAMP_PERIOD_L+1;
-constant METADATA_IDX_TIME_R          : natural := METADATA_IDX_TIME_VLD+1;
-constant METADATA_IDX_TIME_L          : natural := METADATA_IDX_TIME_R+
-                                                   METADATA_TIME_BIT_WIDTH-1;
-constant METADATA_IDX_DATA_VLD        : natural := METADATA_IDX_TIME_L+1;
-constant METADATA_IDX_ERROR_SAMP_DROP : natural := METADATA_IDX_DATA_VLD+1;
-constant METADATA_IDX_FLUSH           : natural := METADATA_IDX_ERROR_SAMP_DROP
-                                                   +1;
-constant METADATA_IDX_EOF             : natural := METADATA_IDX_FLUSH
-                                                   +1;
-constant METADATA_BIT_WIDTH : positive := METADATA_IDX_EOF+1;
-
-constant INFO_BIT_WIDTH : positive := (2*DATA_BIT_WIDTH)+METADATA_BIT_WIDTH;
-
-function to_slv(data     : in data_complex_t) return std_logic_vector;
-function from_slv(slv    : in std_logic_vector) return data_complex_t;
-function to_slv(metadata : in metadata_t)     return std_logic_vector;
-function from_slv(slv    : in std_logic_vector) return metadata_t;
-function to_slv(info     : in info_t)         return std_logic_vector;
-function from_slv(slv    : in std_logic_vector) return info_t;
 
 function calc_cdc_bit_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
 function calc_cdc_fifo_depth (src_dst_ratio : in real) return natural;
@@ -130,16 +62,15 @@ type dac_underrun_detector_status_t is record
 end record dac_underrun_detector_status_t;
 
 type time_downsampler_ctrl_t is record
-  bypass                    : std_logic;
-  min_num_data_per_time     : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1
-                              downto 0);
-  min_num_data_per_time_vld : std_logic;
+  bypass                : std_logic;
+  min_num_data_per_time : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1
+                          downto 0);
 end record time_downsampler_ctrl_t;
 
 type time_corrector_ctrl_t is record
   bypass              : std_logic;
-  time_correction     : signed(METADATA_TIME_BIT_WIDTH-1 downto 0);
-  time_correction_vld : std_logic;
+  time_correction     : signed(
+      protocol.complex_short_with_metadata.OP_TIME_BIT_WIDTH-1 downto 0);
 end record time_corrector_ctrl_t;
 
 type time_corrector_status_t is record
@@ -213,55 +144,7 @@ component debounce
     RESULT : out std_logic);
 end component;
 
-component counter is
-  generic(
-    BIT_WIDTH : positive);
-  port(
-    clk : in  std_logic;
-    rst : in  std_logic;
-    en  : in  std_logic;
-    cnt : out unsigned(BIT_WIDTH-1 downto 0));
-end component;
-
-component latest_reg is
-  generic(
-    BIT_WIDTH : positive);
-  port(
-    clk      : in  std_logic;
-    rst      : in  std_logic;
-    din      : in  std_logic;
-    din_vld  : in  std_logic;
-    dout     : out std_logic;
-    dout_vld : out std_logic);
-end component;
-
-component latest_reg_slv is
-  generic(
-    BIT_WIDTH : positive);
-  port(
-    clk      : in  std_logic;
-    rst      : in  std_logic;
-    din      : in  std_logic_vector(BIT_WIDTH-1 downto 0);
-    din_vld  : in  std_logic;
-    dout     : out std_logic_vector(BIT_WIDTH-1 downto 0);
-    dout_vld : out std_logic);
-end component;
-
-component latest_reg_signed is
-  generic(
-    BIT_WIDTH : positive);
-  port(
-    clk      : in  std_logic;
-    rst      : in  std_logic;
-    din      : in  signed(BIT_WIDTH-1 downto 0);
-    din_vld  : in  std_logic;
-    dout     : out signed(BIT_WIDTH-1 downto 0);
-    dout_vld : out std_logic);
-end component;
-
 component adc_maximal_lfsr_data_src is
-  generic(
-    DATA_BIT_WIDTH : positive); -- width of each of I/Q
   port(
     -- CTRL
     clk                : in  std_logic;
@@ -282,7 +165,8 @@ component maximal_lfsr_data_src is
     stop_on_period_cnt : in  std_logic;
     stopped            : out std_logic;
     -- OUTPUT
-    odata              : out data_complex_t;
+    odata              : out
+        protocol.complex_short_with_metadata.op_samples_arg_iq_t;
     ovld               : out std_logic;
     ordy               : in  std_logic);
 end component;
@@ -298,7 +182,7 @@ component adc_samp_drop_detector is
     ivld      : in  std_logic;
     -- OUTPUT
     odata     : out data_complex_adc_t;
-    ometadata : out metadata_t;
+    osamp_drop: out std_logic;
     ovld      : out std_logic;
     ordy      : in  std_logic);
 end component;
@@ -308,68 +192,60 @@ component data_widener is
     BITS_PACKED_INTO_MSBS : boolean := true);
   port(
     -- CTRL
-    clk       : in  std_logic;
-    rst       : in  std_logic;
+    clk        : in  std_logic;
+    rst        : in  std_logic;
     -- INPUT
-    idata     : in  data_complex_adc_t;
-    imetadata : in  metadata_t;
-    ivld      : in  std_logic;
-    irdy      : out std_logic;
+    idata      : in  data_complex_adc_t;
+    isamp_drop : in  std_logic;
+    ivld       : in  std_logic;
+    irdy       : out std_logic;
     -- OUTPUT
-    odata     : out data_complex_t;
-    ometadata : out metadata_t;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
+    oprotocol  : out protocol.complex_short_with_metadata.protocol_t;
+    ordy       : in  std_logic);
 end component;
-
-component set_clr
-  port(
-    clk : in  std_logic;
-    rst : in  std_logic;
-    set : in  std_logic;
-    clr : in  std_logic;
-    q   : out std_logic;
-    q_r : out std_logic);
-end component set_clr;
 
 component data_narrower is
   generic(
-    BITS_PACKED_INTO_LSBS    : boolean := false);
+    BITS_PACKED_INTO_LSBS : boolean := false);
   port(
     -- CTRL
-    clk       : in  std_logic;
-    rst       : in  std_logic;
+    clk           : in  std_logic;
+    rst           : in  std_logic;
     -- INPUT
-    idata     : in  data_complex_t;
-    imetadata : in  metadata_dac_t;
-    ivld      : in  std_logic;
-    irdy      : out std_logic;
+    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
+    imetadata     : in  metadata_dac_t;
+    imetadata_vld : in  std_logic;
+    irdy          : out std_logic;
     -- OUTPUT
-    odata     : out data_complex_dac_t;
-    ometadata : out metadata_dac_t;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
+    odata         : out data_complex_dac_t;
+    odata_vld     : out std_logic;
+    ometadata     : out metadata_dac_t;
+    ometadata_vld : out std_logic;
+    ordy          : in  std_logic);
 end component;
 
 component dac_underrun_detector is
   port(
     -- CTRL
-    clk       : in  std_logic;
-    rst       : in  std_logic;
-    status    : out dac_underrun_detector_status_t;
+    clk           : in  std_logic;
+    rst           : in  std_logic;
+    status        : out dac_underrun_detector_status_t;
     -- INPUT
-    idata     : in  data_complex_t;
-    imetadata : in  metadata_dac_t;
-    ivld      : in  std_logic;
-    irdy      : out std_logic;
+    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
+    imetadata     : in  metadata_dac_t;
+    imetadata_vld : in  std_logic;
+    irdy          : out std_logic;
     -- OUTPUT
-    odata     : out data_complex_t;
-    ometadata : out metadata_dac_t;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
+    -- if ometadata.underrun_error and protocol.samples_vld are both 1, error is
+    -- assumed to have happened before the current valid sample
+    oprotocol     : out protocol.complex_short_with_metadata.protocol_t;
+    ometadata     : out metadata_dac_t;
+    ometadata_vld : out std_logic;
+    ordy          : in  std_logic);
 end component;
 
 component time_corrector is
+  -- the DATA PIPE LATENCY CYCLES is currently 0
   port(
     -- CTRL
     clk       : in  std_logic;
@@ -377,14 +253,10 @@ component time_corrector is
     ctrl      : in  time_corrector_ctrl_t;
     status    : out time_corrector_status_t;
     -- INPUT
-    idata     : in  data_complex_t;
-    imetadata : in  metadata_t;
-    ivld      : in  std_logic;
+    iprotocol : in  protocol.complex_short_with_metadata.protocol_t;
     irdy      : out std_logic;
     -- OUTPUT
-    odata     : out data_complex_t;
-    ometadata : out metadata_t;
-    ovld      : out std_logic;
+    oprotocol : out protocol.complex_short_with_metadata.protocol_t;
     ordy      : in  std_logic);
 end component;
 
@@ -397,14 +269,10 @@ component time_downsampler is
     rst       : in  std_logic;
     ctrl      : in  time_downsampler_ctrl_t;
     -- INPUT
-    idata     : in  data_complex_t;
-    imetadata : in  metadata_t;
-    ivld      : in  std_logic;
+    iprotocol : in  protocol.complex_short_with_metadata.protocol_t;
     irdy      : out std_logic;
     -- OUTPUT
-    odata     : out data_complex_t;
-    ometadata : out metadata_t;
-    ovld      : out std_logic;
+    oprotocol : out protocol.complex_short_with_metadata.protocol_t;
     ordy      : in  std_logic);
 end component;
 
@@ -460,6 +328,5 @@ generic (hold_width : natural := 1);
     en        : in std_logic;
     advance   : out std_logic);
 end component;
-
 
 end package misc_prims;

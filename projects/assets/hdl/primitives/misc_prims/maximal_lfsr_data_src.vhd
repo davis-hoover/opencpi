@@ -1,4 +1,7 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
+library ocpi;
+library util;
+library protocol;
 library misc_prims; use misc_prims.misc_prims.all;
 
 -- I is maximal LFSR output, Q is bit-reversed I
@@ -10,14 +13,15 @@ entity maximal_lfsr_data_src is
     stop_on_period_cnt : in  std_logic;
     stopped            : out std_logic;
     -- OUTPUT
-    odata              : out data_complex_t;
+    odata              : out
+        protocol.complex_short_with_metadata.op_samples_arg_iq_t;
     ovld               : out std_logic;
     ordy               : in  std_logic);
 end maximal_lfsr_data_src;
 architecture rtl of maximal_lfsr_data_src is
-  constant CNT_BIT_WIDTH : integer := integer(ceil(real(DATA_BIT_WIDTH)))+1;
   -- https://en.wikipedia.org/wiki/Linear-feedback_shift_register#Some_polynomials_for_maximal_LFSRs
   constant MAXIMAL_LFSR_16_BIT_PERIOD : positive := 65535;
+  constant CNT_BIT_WIDTH : integer := ocpi.util.width_for_max(MAXIMAL_LFSR_16_BIT_PERIOD);
 
   signal rst_r   : std_logic := '0';
   signal vld_rst : std_logic := '0';
@@ -43,7 +47,7 @@ begin
   counter_en <= ordy and not (stopped_s);
   stopped <= stopped_s;
 
-  counter : misc_prims.misc_prims.counter
+  counter : util.util.counter
     generic map(
       BIT_WIDTH => CNT_BIT_WIDTH)
     port map(
@@ -66,7 +70,9 @@ begin
 
   odata.i <= data_i;
 
-  data_q_src : for idx in 0 to DATA_BIT_WIDTH-1 generate
+  data_q_src : for idx in 0 to
+      protocol.complex_short_with_metadata.OP_SAMPLES_ARG_IQ_I_BIT_WIDTH-1
+      generate
     odata.q(odata.q'length-1-idx) <= data_i(idx);
   end generate;
 

@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
+library protocol;
 library misc_prims; use misc_prims.misc_prims.all;
 
 entity subtest is
@@ -11,17 +12,21 @@ entity subtest is
     backpressure_select_vld : in  std_logic);
 end entity subtest;
 architecture rtl of subtest is
-  signal clk              : std_logic := '0';
-  signal rst              : std_logic := '0';
-  signal data_src_odata   : data_complex_t;
-  signal data_src_ovld    : std_logic := '0';
-  signal uut_irdy         : std_logic := '0';
-  signal uut_imetadata    : metadata_dac_t;
-  signal uut_odata        : data_complex_t;
-  signal uut_ometadata    : metadata_dac_t;
-  signal uut_ovld         : std_logic := '0';
-  signal file_writer_irdy : std_logic := '0';
-  signal end_of_test      : std_logic := '0';
+  signal clk                    : std_logic := '0';
+  signal rst                    : std_logic := '0';
+  signal data_src_oprotocol     :
+      protocol.complex_short_with_metadata.protocol_t := 
+      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+  signal data_src_ometadata     : metadata_dac_t;
+  signal data_src_ometadata_vld : std_logic := '0';
+  signal uut_irdy               : std_logic := '0';
+  signal uut_oprotocol          :
+      protocol.complex_short_with_metadata.protocol_t := 
+      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+  signal uut_ometadata          : metadata_dac_t;
+  signal uut_ometadata_vld      : std_logic := '0';
+  signal file_writer_irdy       : std_logic := '0';
+  signal end_of_test            : std_logic := '0';
 begin
 
   clk_gen : process
@@ -54,30 +59,27 @@ begin
       stop_on_period_cnt => '1',
       stopped            => end_of_test,
       -- OUTPUT
-      odata              => data_src_odata,
-      ovld               => data_src_ovld,
+      oprotocol          => data_src_oprotocol,
+      ometadata          => data_src_ometadata,
+      ometadata_vld      => data_src_ometadata_vld,
       ordy               => uut_irdy);
-
-  uut_imetadata.underrun_error <= '0';
-  uut_imetadata.data_vld <= '0';
-  uut_imetadata.ctrl_tx_on_off <= not end_of_test;
     
   uut : misc_prims.misc_prims.dac_underrun_detector
     port map(
       -- CTRL
-      clk       => clk,
-      rst       => rst,
-      status    => open,
+      clk           => clk,
+      rst           => rst,
+      status        => open,
       -- INPUT
-      idata     => data_src_odata,
-      imetadata => uut_imetadata,
-      ivld      => data_src_ovld,
-      irdy      => uut_irdy,
+      iprotocol     => data_src_oprotocol,
+      imetadata     => data_src_ometadata,
+      imetadata_vld => data_src_ometadata_vld,
+      irdy          => uut_irdy,
       -- OUTPUT
-      odata     => uut_odata,
-      ometadata => uut_ometadata,
-      ovld      => uut_ovld,
-      ordy      => file_writer_irdy);
+      oprotocol     => uut_oprotocol,
+      ometadata     => uut_ometadata,
+      ometadata_vld => uut_ometadata_vld,
+      ordy          => file_writer_irdy);
 
   file_writer : entity work.file_writer
     generic map(
@@ -89,9 +91,9 @@ begin
       backpressure_select     => backpressure_select,
       backpressure_select_vld => backpressure_select_vld,
       -- INPUT
-      idata                   => uut_odata,
+      iprotocol               => uut_oprotocol,
       imetadata               => uut_ometadata,
-      ivld                    => uut_ovld,
+      imetadata_vld           => uut_ometadata_vld,
       irdy                    => file_writer_irdy);
 
 end rtl;

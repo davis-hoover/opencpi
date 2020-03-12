@@ -96,6 +96,11 @@ def main():
         '-l', '--log_level', 
         'specify log level',
         default=0)
+    option_no_compress = make_option(
+        '-z', '--no_compress',
+        'Disable tar gzip compression',
+        default=False,
+        action='store_true')
 
     common_options = [option_user, option_password, option_ip, 
                       option_remote_dir, option_ssh_opts, option_scp_opts]
@@ -103,8 +108,10 @@ def main():
     commands = []
     commands.append(make_subcommand(
         'load', load, 
-        'create and send the server package to the remote sandbox directory', 
-        common_options + [option_port, option_valgrind, option_hw_platform, option_sw_platform]))
+        'Create and send the server package to the remote sandbox directory', 
+        common_options 
+        + [option_port, option_valgrind, option_hw_platform, 
+           option_sw_platform, option_no_compress]))
     commands.append(make_subcommand(
         'unload', unload, 
         'delete a server sandbox directory', 
@@ -242,7 +249,7 @@ def make_parser(commands):
     return parser
 
 
-def make_tar(tar_files, arcnames, tempdir):
+def make_tar(tar_files, arcnames, tempdir, no_compress):
     """ Creates a tar file and returns the path.
 
     Args:
@@ -251,7 +258,13 @@ def make_tar(tar_files, arcnames, tempdir):
         tempdir: staging directory for the tar
     """
     tar_path = os.path.join(tempdir, 'tar.tgz')
-    with tarfile.open(tar_path, 'w:gz', 
+
+    mode = "w:gz"
+    
+    if no_compress :
+        mode = "w"  
+
+    with tarfile.open(tar_path, mode, 
                       format=tarfile.PAX_FORMAT, dereference=True) as tar:
         for tar_file,arcname in zip(tar_files,arcnames):
             tar.add(tar_file, arcname=arcname)
@@ -393,7 +406,7 @@ def load(args):
         # Create server package
         print('Creating server package...')
         tar_commands = []
-        tar_path = make_tar(tar_files, arcnames, tempdir)
+        tar_path = make_tar(tar_files, arcnames, tempdir, args.no_compress)
         tar_commands.append(make_command(
             'scp {} {} {}@{}:./{}'.format(
                 args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir), 
@@ -478,12 +491,11 @@ def start(args):
     Args:
         args: parsed user arguments
     """
-    command = ''
+    command = 'start'
     if args.valgrind:
         command += ' -V '
     if int(args.log_level) > 0:
         command += ' -l {} '.format(args.log_level)
-    command += 'start'
     command = make_command(command, args, ocpiserver=True)
     
     rc = execute_command(command, args)

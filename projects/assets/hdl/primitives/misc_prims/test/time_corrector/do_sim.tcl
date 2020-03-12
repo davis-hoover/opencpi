@@ -38,5 +38,11 @@ add_wave_divider SUBTEST_5_UUT
 add_wave {{/testbench/subtest_5/uut}}
 add_wave_divider SUBTEST_5_FILE_WRITER
 add_wave {{/testbench/subtest_5/file_writer}}
+add_wave_divider SUBTEST_6_DATA_SRC
+add_wave {{/testbench/subtest_6/data_src}}
+add_wave_divider SUBTEST_6_UUT
+add_wave {{/testbench/subtest_6/uut}}
+add_wave_divider SUBTEST_6_FILE_WRITER
+add_wave {{/testbench/subtest_6/file_writer}}
 
 run 1 us
