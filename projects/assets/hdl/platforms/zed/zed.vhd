@@ -28,15 +28,15 @@ library zynq; use zynq.zynq_pkg.all;
 library axi; use axi.axi_pkg.all;
 library unisim; use unisim.vcomponents.all;
 library bsv;
-library sdp; use sdp.sdp.all, sdp.sdp_axi.all;
+library sdp; use sdp.sdp.all;
 architecture rtl of zed_worker is
   constant whichGP : natural := to_integer(unsigned(from_bool(useGP1)));
-  signal ps_m_axi_gp_in  : m_axi_gp_in_array_t(0 to C_M_AXI_GP_COUNT-1);  -- s2m
-  signal ps_m_axi_gp_out : m_axi_gp_out_array_t(0 to C_M_AXI_GP_COUNT-1); -- m2s
-  signal ps_s_axi_gp_in  : s_axi_gp_in_array_t(0 to C_S_AXI_GP_COUNT-1);  -- m2s
-  signal ps_s_axi_gp_out : s_axi_gp_out_array_t(0 to C_S_AXI_GP_COUNT-1); -- s2m
-  signal ps_axi_hp_in  : s_axi_hp_in_array_t(0 to C_S_AXI_HP_COUNT-1);    -- m2s
-  signal ps_axi_hp_out : s_axi_hp_out_array_t(0 to C_S_AXI_HP_COUNT-1);   -- s2m
+  signal ps_m_axi_gp_in   : axi.zynq7_mgp.axi_s2m_array_t(0 to C_M_AXI_GP_COUNT-1); -- s2m
+  signal ps_m_axi_gp_out  : axi.zynq7_mgp.axi_m2s_array_t(0 to C_M_AXI_GP_COUNT-1); -- m2s
+  signal ps_s_axi_gp_in   : axi.zynq7_sgp.axi_m2s_array_t(0 to C_S_AXI_GP_COUNT-1); -- m2s
+  signal ps_s_axi_gp_out  : axi.zynq7_sgp.axi_s2m_array_t(0 to C_S_AXI_GP_COUNT-1); -- s2m
+  signal ps_axi_hp_in     : axi.zynq7_shp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1); -- m2s
+  signal ps_axi_hp_out    : axi.zynq7_shp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1); -- s2m
   signal fclk             : std_logic_vector(3 downto 0);
   signal clk              : std_logic;
   signal raw_rst_n        : std_logic; -- FCLKRESET_Ns need synchronization
@@ -139,7 +139,7 @@ begin
       s_axi_hp_out          => ps_axi_hp_out
       );
   -- Adapt the axi master from the PS to be a CP Master
-  cp : axi2cp
+  cp : axi.zynq7_mgp.axi2cp_zynq7_mgp
     port map(
       clk     => clk,
       reset   => reset,
@@ -155,7 +155,7 @@ begin
   props_out.debug_state1 <= dbg_state1_r;
   props_out.debug_state2 <= dbg_state2_r;
   g : for i in 0 to 3 generate
-    dp : sdp2axi
+    dp : axi.zynq7_shp.sdp2axi_zynq7_shp
       generic map(ocpi_debug => true,
                   sdp_width  => to_integer(sdp_width),
                   axi_width  => ps_axi_hp_in(0).W.DATA'length/dword_size)
@@ -193,13 +193,13 @@ begin
   metadata_out.romAddr      <= props_in.romAddr;
   metadata_out.romEn        <= props_in.romData_read;
   led(0) <= count(count'left);
-  led(1) <= ps_m_axi_gp_out(whichGP).ARVALID;
+  led(1) <= ps_m_axi_gp_out(whichGP).AR.VALID;
   led(2) <= '0';
   led(3) <= cp_in.take;
   led(4) <= cp_in.valid;
-  led(5) <= ps_m_axi_gp_in(whichGP).ARREADY;
-  led(6) <= ps_m_axi_gp_in(whichGP).RVALID;
-  led(7) <= ps_m_axi_gp_out(whichGP).RREADY;
+  led(5) <= ps_m_axi_gp_in(whichGP).AR.READY;
+  led(6) <= ps_m_axi_gp_in(whichGP).R.VALID;
+  led(7) <= ps_m_axi_gp_out(whichGP).R.READY;
   work : process(clk)
   begin
     if rising_edge(clk) then
@@ -328,21 +328,21 @@ begin
               ps_axi_hp_in(0).AW.ADDR); -- 32
           axi_wacount <= axi_wacount + 1;
         end if;
-        if its(ps_m_axi_gp_out(whichGP).WVALID) and ps_m_axi_gp_in(whichGP).WREADY and axi_cdcount /= ntrace-1 and sdp_seen_r then
+        if its(ps_m_axi_gp_out(whichGP).W.VALID) and ps_m_axi_gp_in(whichGP).W.READY and axi_cdcount /= ntrace-1 and sdp_seen_r then
           axi_cdata(to_integer(axi_cdcount)) <=
             to_ulonglong(
               std_logic_vector(count(15 downto 0)) & -- 16
               std_logic_vector(dbg_state1(0)(15 downto 5)) &
-              fyv(ps_m_axi_gp_out(whichGP).WLAST) & -- 1
-              ps_m_axi_gp_out(whichGP).WSTRB & -- 8
-              ps_m_axi_gp_out(whichGP).WDATA);
+              fyv(ps_m_axi_gp_out(whichGP).W.LAST) & -- 1
+              ps_m_axi_gp_out(whichGP).W.STRB & -- 8
+              ps_m_axi_gp_out(whichGP).W.DATA);
 --   ps_axi_hp_in(0).W.DATA(63 downto 56) & -- 8
 --              ps_axi_hp_in(0).W.DATA(39 downto 32) & -- 8
 --              ps_axi_hp_in(0).W.DATA(31 downto 24) & -- 8
 --              ps_axi_hp_in(0).W.DATA(7 downto 0)); -- 8
           axi_cdcount <= axi_cdcount + 1;
         end if;
-        if its(ps_m_axi_gp_out(whichGP).AWVALID and ps_m_axi_gp_in(whichGP).AWREADY) and axi_cacount /= ntrace-1 and sdp_seen_r then
+        if its(ps_m_axi_gp_out(whichGP).AW.VALID and ps_m_axi_gp_in(whichGP).AW.READY) and axi_cacount /= ntrace-1 and sdp_seen_r then
           axi_caddr(to_integer(axi_cacount)) <=
             to_ulonglong(
 --              std_logic_vector(dbg_state(27 downto 4)) & -- 24
@@ -350,12 +350,12 @@ begin
 --                                          ps_axi_hp_in(0).AWLEN & -- 4
               std_logic_vector(count(15 downto 0)) & -- 16
               "000000000000" &
-              ps_m_axi_gp_out(whichGP).AWLEN & -- 4
-              ps_m_axi_gp_out(whichGP).AWADDR); -- 32
+              ps_m_axi_gp_out(whichGP).AW.LEN & -- 4
+              ps_m_axi_gp_out(whichGP).AW.ADDR); -- 32
           axi_cacount <= axi_cacount + 1;
         end if;
         count <= count + 1;
---        if ps_m_axi_gp_out(whichGP).ARVALID = '1' and ps_m_axi_gp_out(whichGP).ARLEN = "0001" then
+--        if ps_m_axi_gp_out(whichGP).AR.VALID = '1' and ps_m_axi_gp_out(whichGP).AR.LEN = "0001" then
 --          seen_burst <= '1';
 --        end if;
       end if;

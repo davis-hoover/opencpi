@@ -821,12 +821,12 @@ component zynq_ps is
   port(
     ps_in        : in    pl2ps_t;
     ps_out       : out   ps2pl_t;
-    m_axi_gp_in  : in    m_axi_gp_in_array_t(0 to C_M_AXI_GP_COUNT-1);
-    m_axi_gp_out : out   m_axi_gp_out_array_t(0 to C_M_AXI_GP_COUNT-1);
-    s_axi_gp_in  : in    s_axi_gp_in_array_t(0 to C_S_AXI_GP_COUNT-1);
-    s_axi_gp_out : out   s_axi_gp_out_array_t(0 to C_S_AXI_GP_COUNT-1);
-    s_axi_hp_in  : in    s_axi_hp_in_array_t(0 to C_S_AXI_HP_COUNT-1);
-    s_axi_hp_out : out   s_axi_hp_out_array_t(0 to C_S_AXI_HP_COUNT-1)
+    m_axi_gp_in  : in    axi.zynq7_mgp.axi_s2m_array_t(0 to C_M_AXI_GP_COUNT-1);
+    m_axi_gp_out : out   axi.zynq7_mgp.axi_m2s_array_t(0 to C_M_AXI_GP_COUNT-1);
+    s_axi_gp_in  : in    axi.zynq7_sgp.axi_m2s_array_t(0 to C_S_AXI_GP_COUNT-1);
+    s_axi_gp_out : out   axi.zynq7_sgp.axi_s2m_array_t(0 to C_S_AXI_GP_COUNT-1);
+    s_axi_hp_in  : in    axi.zynq7_shp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1);
+    s_axi_hp_out : out   axi.zynq7_shp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1)
     );
 end component zynq_ps;
 

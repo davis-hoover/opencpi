@@ -54,7 +54,7 @@ HdlTopTargets:=xilinx altera modelsim # icarus # verilator
 ###############################################################################
 # Xilinx targets
 ###############################################################################
-HdlTargets_xilinx:=isim virtex5 virtex6 spartan3adsp spartan6 zynq_ise zynq xsim x4sim
+HdlTargets_xilinx:=isim virtex5 virtex6 spartan3adsp spartan6 zynq_ise zynq zynq_ultra xsim x4sim
 
 HdlTargets_virtex5:=xc5vtx240t xc5vlx50t xc5vsx95t xc5vlx330t xc5vlx110t
 HdlTargets_virtex6:=xc6vlx240t
@@ -71,6 +71,10 @@ HdlTargets_zynq_ise:=$(foreach tgt,$(HdlTargets_zynq),$(tgt)_ise_alias)
 # The line below is not needed because for ISE we just hand the tools the word "zynq" when
 # compiling any zynq parts unless given an HdlExactPart
 #HdlDefaultTarget_zynq_ise:=xc7z020_ise_alias
+# Zynq UltraScale+ parts
+HdlTargets_zynq_ultra:=xczu28dr xczu9eg zczu7ev
+# Zynq UltraScale+ chips require full part to be specified
+HdlDefaultTarget_zynq_ultra:=xczu7ev-2ffvc1156e
 
 ###############################################################################
 # Altera targets
@@ -114,6 +118,7 @@ HdlToolSet_virtex6:=xst
 HdlToolSet_spartan6:=xst
 HdlToolSet_zynq_ise:=xst
 HdlToolSet_zynq:=vivado
+HdlToolSet_zynq_ultra:=vivado
 HdlToolSet_verilator:=verilator
 HdlToolSet_icarus:=icarus
 HdlToolSet_stratix4:=quartus
