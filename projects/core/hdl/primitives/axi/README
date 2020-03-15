@@ -1,0 +1,50 @@
+This directory is for AXI-related modules.  If its about AXI, it should be here.  If it
+converts between AXI and something else, it should be here, and it should depend on that other
+thing.
+This library depends on the SDP library and the platform library since adapters between
+SDP and AXI and CP and AXI also live here, since they are about AXI.
+AXI interfaces come in two flavors, AXI3 and AXI4, which have slighly different signals.
+AXI interfaces have different widths for various fields (address, data, transaction IDs etc.).
+AXI is flexible with respect to where clock and reset are driven from.  We parameterize
+AXU interfaces as to who (among master and slave) drivers reset and clock, separately.
+Thus fundamentally AXI interfaces are parameterized.
+
+We use record structures for AXI interfaces, so that an interface has a master-to-slave interface
+record and a slave-to-master structure.
+
+We use some simple C-preprocessor templating to parameterize the defined structures for the AXI
+interfaces, since the older versions of VHDL we use do not have generics for packages.  In return
+for using this type of parameterization, get cleaner portable AXI logic in the modules.
+
+Thus for each version of an AXI interface we generate a VHDL package specific to that interface.
+
+The "source code" for defining an AXI interface flavor is to define several interface parameters,
+in C-Processor syntax, in a file whose name is axi_interface_<if_name>.h
+
+The result of this is that there is a VHDL package in this library called <if_name>, and that
+the actual modules in this library that use AXI interfaces have variants called
+<module_name>_<ifname>.vhd
+
+From the point of view of a platform that wants to instantiate AXI modules with interface
+<if_name>, they do:
+
+library axi;
+
+my_axp_cp: component axi.<if_name>.axi2cp_<if_name> ...
+
+For all AXI modules here, we build them for all the interface variants defined here.
+These VHDL files are actually specialized and built per interface by doing:
+1. Prepend a line: "use work.<axi-if-name>.all;" to the file when building for <axi-if-name>
+2. Replace "_INTERFACE" in the file with <axi-if-name>, usually for the entity name
+
+
+
+
+axi2cp is already dealing with 2 word bursts over a 32 bit datapath
+it could simply deal with a 64 bit data path.
+notes:
+zynq should depend on AXI
+zynq should include ultrascale
+tcl file in upperdirectory, and use the gen directory
+Is there a benefit for a 64 bit axi GP? would axi2cp be any smaller/simpler?
+
