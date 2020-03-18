@@ -1,0 +1,4 @@
+<Tests usehdlfileio='true'>
+  <Input port='in' script='generate.py' messagesinfile='true'/>
+  <Output port='out' script='verify.py' messagesinfile='true'/> <!-- messagesinfile UNDOCUMENTED / SUBJECT TO CHANGE - see #323 -->
+</Tests>

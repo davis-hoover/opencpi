@@ -30,7 +30,6 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library util; use util.util.all;
               
 architecture rtl of zero_pad_worker is
   signal message_wcnt_r    : unsigned(15 downto 0);
@@ -54,7 +53,7 @@ begin
   data_eom <= to_bool(message_wcnt_r=unsigned(props_in.num_zeros)); --Send eom on last zero
 
   -- Use zlm detector primitive to detect zlms and multicycle zlms
-  zlm_detector : util.util.zlm_detector
+  zlm_detector : ocpi.util.zlm_detector
   port map (
     clk => ctl_in.clk,
     reset => ctl_in.reset,
