@@ -119,7 +119,8 @@ def main():
     commands.append(make_subcommand(
         'reload', reload_, 
         'delete a server sandbox directory and then reload it', 
-        common_options + [option_port, option_valgrind, option_hw_platform, option_sw_platform]))
+        common_options + [option_port, option_valgrind, option_hw_platform, 
+                          option_sw_platform, option_no_compress]))
     commands.append(make_subcommand(
         'start', start, 
         'start server on remote device',
@@ -426,6 +427,11 @@ def load(args):
     
 
 def reboot(args):
+    """ Reboot the remote device.
+
+    Args:
+        args: parsed user arguments
+    """
     if status(args, stderr=False) == 0:
         if stop(args) != 0:
             return 1
@@ -440,7 +446,13 @@ def reboot(args):
 
 
 def deploy(args):
-    local_dir = 'cdk/{}/sdcard-{}'.format(args.hw_platform, args.sw_platform)
+    """ Copy boot files to the remote device and call reboot().
+
+    Args:
+        args: parsed user arguments
+    """
+    cdk = os.environ['OCPI_CDK_DIR']
+    local_dir = '{}/{}/sdcard-{}'.format(cdk, args.hw_platform, args.sw_platform)
     print('Deploying Opencpi boot files to remote device from {}...'.format(local_dir))
 
     cmd = 'scp {} -r {}/. {}@{}:/mnt/card'.format(
@@ -477,6 +489,12 @@ def unload(args):
 
 
 def reload_(args):
+    """ Reload the remote server package on the remote device by calling unload() 
+        followed by load().
+
+    Args:
+        args: parsed user arguments
+    """
     rc = unload(args)
 
     if rc == 0:
@@ -516,6 +534,11 @@ def stop(args):
 
 
 def restart(args):
+    """ Restart the server on the remote device by calling stop() followed by start().
+
+    Args:
+        args: parsed user arguments
+    """
     rc = stop(args)
 
     if rc == 0:
