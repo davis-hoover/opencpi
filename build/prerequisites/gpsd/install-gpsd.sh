@@ -72,7 +72,7 @@ sysroot=
 scons prefix=$OcpiInstallExecDir target=$OcpiCrossHost sysroot=$sysroot \
       libgpsmm=True ncurses=False qt=False python=False usb=False \
       bluez=False ntp=False manbuild=False shared=False nostrip=True \
-      debug=True
+      debug=True dbus_export=False
 scons install
 # Because OpenCPI prerequisites must be statically compiled into a single
 # archive, and the scons build produces both libgps.a and libgpsd.a, a single
