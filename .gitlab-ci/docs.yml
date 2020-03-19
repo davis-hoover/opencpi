@@ -47,10 +47,10 @@ trigger-downstream:
 pages:
   stage: deploy
   tags:
-   - docker
+    - docker
   image: centos:latest
   only:
-   - develop
+    - develop
   dependencies: []
   before_script: []
   script:
