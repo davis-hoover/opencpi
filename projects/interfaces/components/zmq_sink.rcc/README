@@ -1,0 +1,3 @@
+Because this worker depends on the libzmq and cppzmq prerequisites, the build
+instructions in this project's top-level README must be completed before
+building this worker.

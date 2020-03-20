@@ -1,0 +1,15 @@
+UNDOCUMENTED / SUBJECT TO CHANGE - the prerequisites directory includes
+functionality that is undocumented and not officially supported.
+
+# Building Prerequisites
+
+1. Clone the git source.
+
+2. Run the following command to effectively register this project in the source tree.
+```
+cd <opencpi>/project-registry
+ln -fs ../projects/interfaces ocpi.interfaces
+```
+
+3. Build OpenCPI from source (see "Source-based Installation" in ```<opencpi>/README.md```).
+

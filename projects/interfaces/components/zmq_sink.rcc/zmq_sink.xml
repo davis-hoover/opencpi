@@ -1,0 +1,10 @@
+<RccWorker language='c++' spec='zmq_sink-spec' controloperations='start'>
+
+  <Property name='type' type='enum' enums='push,pub' initial='true'/>
+  <Property name='address' type='string'
+                           stringLength='128'
+                           initial='true'
+                           description="Value is sent to ZMQ bind method's
+                                        endpoint parameter."/>
+
+</RccWorker>
