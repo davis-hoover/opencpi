@@ -203,7 +203,7 @@ function do_addition {
       else
 	  exp=/                                      # normal is top of exports or top of sdcard
       fi
-  elif [ -n "${both[2]}" ]; then
+  elif [ -n "${both[2]}" -a "$2" != -- ]; then # If platform specific, and not deployment, prepend platform name
     exp="<platform>/"$exp
   fi
   rawsrc=${both[0]}

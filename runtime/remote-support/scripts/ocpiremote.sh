@@ -173,7 +173,7 @@ for op in $*; do
 	do_ssh "mkdir -p tmp; cd tmp; gunzip | tar -x -f -" < $tmpdir/boot.tgz
 	echo do_ssh 'cd /media/card;
 		for i in *; do $i != opencpi && rm -r -f $i; done;
-		gunzip | tar -x -f -" < $tmpdir/boot.tgz
+		gunzip | tar -x -f -' < $tmpdir/boot.tgz
 	;;
   esac
 done
