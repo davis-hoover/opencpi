@@ -6,25 +6,22 @@ entity adc_samp_drop_detector is
   -- the DATA PIPE LATENCY CYCLES is currently 0
   port(
     -- CTRL
-    clk       : in  std_logic;
-    rst       : in  std_logic;
-    status    : out adc_samp_drop_detector_status_t;
+    clk        : in  std_logic;
+    rst        : in  std_logic;
+    status     : out adc_samp_drop_detector_status_t;
     -- INPUT
-    idata     : in  data_complex_adc_t;
-    ivld      : in  std_logic;
+    idata      : in  data_complex_adc_t;
+    ivld       : in  std_logic;
     -- OUTPUT
-    odata     : out data_complex_adc_t;
-    ometadata : out metadata_t;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
+    odata      : out data_complex_adc_t;
+    osamp_drop : out std_logic;
+    ovld       : out std_logic;
+    ordy       : in  std_logic);
 end entity adc_samp_drop_detector;
 architecture rtl of adc_samp_drop_detector is
   signal samp_drop                      : std_logic := '0';
   signal pending_xfer_error_samp_drop_r : std_logic := '0';
   signal xfer_error_samp_drop           : std_logic := '0';
-
-  signal metadata      : std_logic_vector(METADATA_BIT_WIDTH-1 downto 0) :=
-                         (others => '0');
 begin
 
   status.error_samp_drop <= samp_drop;
@@ -47,23 +44,8 @@ begin
   xfer_error_samp_drop <= ordy and pending_xfer_error_samp_drop_r;
 
   -- start the DATA PIPE LATENCY CYCLES is currently 0
-  odata.i <= idata.i;
-  odata.q <= idata.q;
-
-  metadata_gen : process(xfer_error_samp_drop, ordy, ivld)
-  begin
-    for idx in metadata'range loop
-      if(idx = METADATA_IDX_ERROR_SAMP_DROP) then
-        metadata(idx) <= xfer_error_samp_drop;
-      elsif(idx = METADATA_IDX_DATA_VLD) then
-        metadata(idx) <= ordy and ivld;
-      else
-        metadata(idx) <= '0';
-      end if;
-    end loop;
-  end process metadata_gen;
-
-  ometadata <= from_slv(metadata);
+  odata      <= idata;
+  osamp_drop <= xfer_error_samp_drop;
 
   ovld <= ordy and (ivld or xfer_error_samp_drop);
   -- end the DATA PIPE LATENCY CYCLES is currently 0

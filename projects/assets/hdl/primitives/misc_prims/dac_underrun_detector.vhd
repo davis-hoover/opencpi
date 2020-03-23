@@ -1,23 +1,24 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library protocol;
 library misc_prims; use misc_prims.misc_prims.all;
 
 -- generates underrun indicator when data starvation occurs
 entity dac_underrun_detector is
   port(
     -- CTRL
-    clk       : in  std_logic;
-    rst       : in  std_logic;
-    status    : out dac_underrun_detector_status_t;
+    clk           : in  std_logic;
+    rst           : in  std_logic;
+    status        : out dac_underrun_detector_status_t;
     -- INPUT
-    idata     : in  data_complex_t;
-    imetadata : in  metadata_dac_t;
-    ivld      : in  std_logic;
-    irdy      : out std_logic;
+    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
+    imetadata     : in  metadata_dac_t;
+    imetadata_vld : in  std_logic;
+    irdy          : out std_logic;
     -- OUTPUT
-    odata     : out data_complex_t;
-    ometadata : out metadata_dac_t;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
+    oprotocol     : out protocol.complex_short_with_metadata.protocol_t;
+    ometadata     : out metadata_dac_t;
+    ometadata_vld : out std_logic;
+    ordy          : in  std_logic);
 end entity dac_underrun_detector;
 architecture rtl of dac_underrun_detector is
   signal underrun                      : std_logic := '0';
@@ -28,7 +29,7 @@ begin
   status.underrun_error <= underrun;
 
   --underrun only generated when ctrl_tx_on_off = '1'
-  underrun <= ordy and (not ivld) and imetadata.ctrl_tx_on_off;
+  underrun <= ordy and (not iprotocol.samples_vld) and imetadata.ctrl_tx_on_off;
 
   pending_underrun_error_reg : process(clk)
   begin
@@ -43,12 +44,11 @@ begin
 
   xfer_underrun_error <= ordy and pending_xfer_underrun_error_r;
 
-  odata.i                        <= idata.i;
-  odata.q                        <= idata.q;
-  ometadata.underrun_error       <= xfer_underrun_error;
-  ometadata.ctrl_tx_on_off       <= imetadata.ctrl_tx_on_off;
-  ometadata.data_vld             <= ordy and ivld;
-  ovld                           <= ordy and (ivld or xfer_underrun_error);
-  irdy                           <= ordy;
+  oprotocol                <= iprotocol;
+  ometadata.underrun_error <= xfer_underrun_error;
+  ometadata.ctrl_tx_on_off <= imetadata.ctrl_tx_on_off;
+  ometadata_vld            <= ordy and ((imetadata_vld and
+                              imetadata.ctrl_tx_on_off) or xfer_underrun_error);
+  irdy                     <= ordy;
 
 end rtl;

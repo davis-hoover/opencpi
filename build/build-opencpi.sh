@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -22,34 +22,70 @@
 
 # Ensure CDK and TOOL variables
 source ./cdk/opencpi-setup.sh -e
+
 # Ensure TARGET variables
-source $OCPI_CDK_DIR/scripts/ocpitarget.sh "$1"
+source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1"
+
 set -e
 echo ================================================================================
-echo We are running in `pwd` where the git clone of opencpi has been placed.
+echo "We are running in $(pwd) where the git clone of opencpi has been placed."
 echo ================================================================================
-echo Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_PLATFORM
+
+# If the platform itself needs to be "built", do it now.
+if [ -f "$OCPI_TARGET_PLATFORM_DIR/Makefile" ]; then
+  echo "Building/preparing the software platform '$OCPI_TARGET_PLATFORM' which will enable building other assets for it."
+  make -C "$OCPI_TARGET_PLATFORM_DIR"
+elif [ -f "$OCPI_TARGET_PLATFORM_DIR/${OCPI_TARGET_PLATFORM}.exports" ]; then
+  echo "Exporting files from the software platform '$OCPI_TARGET_PLATFORM' which will enable building other assets for it."
+  (cd "$OCPI_TARGET_PLATFORM_DIR"; "$OCPI_CDK_DIR/scripts/export-platform.sh" lib)
+fi
+
+# Export ocpi python libraries needed in later steps
+if ! make exports &> /tmp/tmp.$$; then
+  echo 'Error running "make exports":'
+  cat /tmp/tmp.$$
+  rm -f /tmp/tmp.$$
+  exit 1
+fi
+rm -f /tmp/tmp.$$
+
+# Export platform from its project
+echo "Exporting the platform '$OCPI_TARGET_PLATFORM' from its project."
+project=$(cd "$OCPI_TARGET_PLATFORM_DIR/../../.."; pwd)
+project=${project%/exports}
+make -C "$project" exports
+
+# Build the framework
+echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_PLATFORM"
 make
 [ -n "$2" ] && exit 0
+
+# Build kernel module
 echo ================================================================================
 if [ -n "$OcpiCrossCompile" -a -z "$OcpiKernelDir" ]; then
-  echo This cross-compiled platform does not indicate where kernel headers are found.
-  echo I.e. the OcpiKernelDir variable is not set in the software platform definition.
-  echo Thus building the OpenCPI kernel device driver for $OCPI_TARGET_PLATFORM is skipped.
+  echo "This cross-compiled platform does not indicate where kernel headers are found."
+  echo "I.e. the OcpiKernelDir variable is not set in the software platform definition."
+  echo "Thus building the OpenCPI kernel device driver for $OCPI_TARGET_PLATFORM is skipped."
 else
-  echo Next, we will build the OpenCPI kernel device driver for $OCPI_TARGET_PLATFORM
+  echo "Next, we will build the OpenCPI kernel device driver for $OCPI_TARGET_PLATFORM"
   make driver
 fi
+
+# Build built-in RCC components
 echo ================================================================================
-echo Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_PLATFORM
+echo "Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_PLATFORM"
 make -C projects/core rcc
 make -C projects/assets rcc
 make -C projects/inactive rcc
+
+# Build built-in OCL components
 echo ================================================================================
-echo Now we will build the built-in OCL '(GPU)' components for the available OCL platforms
+echo "Now we will build the built-in OCL '(GPU)' components for the available OCL platforms"
 make -C projects/core ocl
 make -C projects/assets ocl
 make -C projects/inactive ocl
+
+# Build built-in HDL components
 [ -n "$HdlPlatforms" -o -n "$HdlPlatform" ] && {
   echo ================================================================================
   echo "Since HdlPlatform(s) are specified, we will build the built-in HDL components for: $HdlPlatform $HdlPlatforms"
@@ -57,12 +93,16 @@ make -C projects/inactive ocl
   make -C projects/assets hdl
   make -C projects/inactive hdl
 }
+
+# Build tests
 echo ================================================================================
-echo Now we will build the tests and examples for $OCPI_TARGET_PLATFORM
+echo "Now we will build the tests and examples for $OCPI_TARGET_PLATFORM"
 make -C projects/core test
 make -C projects/assets applications
 make -C projects/inactive applications
-# ensure any framework exports that depend on built projects happen
-make exports Platforms=$OCPI_TARGET_PLATFORM
+
+# Ensure any framework exports that depend on built projects happen
+make exports Platforms="$OCPI_TARGET_PLATFORM"
+
 echo ================================================================================
-echo OpenCPI has been built for $OCPI_TARGET_PLATFORM, with software components, examples and kernel driver
+echo "OpenCPI has been built for $OCPI_TARGET_PLATFORM, with software components, examples and kernel driver"
