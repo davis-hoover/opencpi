@@ -431,9 +431,9 @@ build-test-inactive:centos6:zed:
     - build-platforms-inactive:centos6:zed
 
 
-#####################
+###############
 # Jobs - Test #
-#####################
+###############
 test-core:centos6:zed:
   extends:
     - .test-core
@@ -449,6 +449,7 @@ test-core:centos6:zed:
     - build-primitives-assets:centos6:zed
     - build-platforms-assets:centos6:zed
     - build-test-core:centos6:zed
+  resource_group: zed
 
 test-assets-base:centos6:zed:
   extends:
@@ -465,6 +466,7 @@ test-assets-base:centos6:zed:
     - build-primitives-assets:centos6:zed
     - build-platforms-assets:centos6:zed
     - build-test-assets-base:centos6:zed
+  resource_group: zed
 
 test-assets-comms:centos6:zed:
   extends:
@@ -481,6 +483,7 @@ test-assets-comms:centos6:zed:
     - build-primitives-assets:centos6:zed
     - build-platforms-assets:centos6:zed
     - build-test-assets-comms:centos6:zed
+  resource_group: zed
 
 test-assets-dsp:centos6:zed:
   extends:
@@ -497,6 +500,7 @@ test-assets-dsp:centos6:zed:
     - build-primitives-assets:centos6:zed
     - build-platforms-assets:centos6:zed
     - build-test-assets-dsp:centos6:zed
+  resource_group: zed
 
 test-assets-misc:centos6:zed:
   extends:
@@ -513,6 +517,7 @@ test-assets-misc:centos6:zed:
     - build-primitives-assets:centos6:zed
     - build-platforms-assets:centos6:zed
     - build-test-assets-misc:centos6:zed
+  resource_group: zed
 
 test-assets-util:centos6:zed:
   extends:
@@ -529,6 +534,7 @@ test-assets-util:centos6:zed:
     - build-primitives-assets:centos6:zed
     - build-platforms-assets:centos6:zed
     - build-test-assets-util:centos6:zed
+  resource_group: zed
 
 test-assets_ts:centos6:zed:
   extends:
@@ -547,6 +553,7 @@ test-assets_ts:centos6:zed:
     - build-components-assets_ts:centos6:zed
     - build-devices-assets_ts:centos6:zed
     - build-test-assets_ts:centos6:zed
+  resource_group: zed
 
 test-inactive:centos6:zed:
   extends:
@@ -562,3 +569,4 @@ test-inactive:centos6:zed:
     - build-primitives-assets:centos6:zed
     - build-platforms-inactive:centos6:zed
     - build-test-inactive:centos6:zed
+  resource_group: zed
