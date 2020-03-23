@@ -581,15 +581,13 @@
 
 .ocpiremote:
   before_script:
-    - export HOME=$CI_PROJECT_DIR
     - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
-    - rm -f artifacts*.tar
     - sleep 5
     - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
     - cat timestamp.txt
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
-    - make deploy Platforms=$HW_PLATFORM:$SW_PLATFORM
+    - ./scripts/deploy-opencpi.sh $HW_PLATFORM $SW_PLATFORM
     - echo "IP- $IP"
     - echo "PORT- $PORT"
     - echo "HW- $HW_PLATFORM"
@@ -599,6 +597,7 @@
   after_script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpiremote unload -i $IP
-    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_ID.txt
-    - tar -T artifacts-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_ID.tar
-    - ls -lh artifacts-$CI_JOB_ID.tar
+    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
+    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
