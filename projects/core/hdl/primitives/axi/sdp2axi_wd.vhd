@@ -21,10 +21,10 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library platform; use platform.platform_pkg.all;
 library ocpi; use ocpi.types.all, ocpi.util.all;
-library axi; use axi.axi_pkg.all;
 library sdp; use sdp.sdp.all;
+library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
 
-entity sdp2axi_wd_INTERFACE is
+entity sdp2axi_wd_AXI_INTERFACE is
   generic(ocpi_debug      : boolean;
           axi_width       : natural;
           sdp_width       : natural);
@@ -40,8 +40,8 @@ entity sdp2axi_wd_INTERFACE is
           taking_data     : out bool_t;           -- indicate data is being used.
           writing_done    : out bool_t;           -- indicate all data taken.
           debug           : out ulonglong_t);
-end entity sdp2axi_wd_INTERFACE;
-architecture rtl of sdp2axi_wd_INTERFACE is
+end entity sdp2axi_wd_AXI_INTERFACE;
+architecture rtl of sdp2axi_wd_AXI_INTERFACE is
   -- These ensure no truncation during arithmetic...
   constant axi_width_u : unsigned(width_for_max(axi_width)-1 downto 0) :=
     to_unsigned(axi_width, width_for_max(axi_width));
@@ -293,7 +293,9 @@ begin
   -- Interface outputs to the S_AXI_HP write data channel interface
   -----------------------------------------------------------------
   -- Write data channel
+#if !AXI4
   axi_out.ID                 <= (others => '0');  -- spec says same id means in-order
+#endif
   g3: for i in 0 to axi_width-1 generate -- for all but the last ones
     axi_out.DATA(i*32+31 downto i*32) <= axi_data(i); -- swap(axi_data(i));
 --      axi_data_r(i) when i < last_sxf_offset_in_axf else

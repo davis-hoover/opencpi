@@ -34,8 +34,9 @@ library platform; use platform.platform_pkg.all;
 library ocpi; use ocpi.types.all, ocpi.util.all;
 library axi; use axi.axi_pkg.all;
 library sdp; use sdp.sdp.all;
+library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
 
-entity sdp2axi_rd_INTERFACE is
+entity sdp2axi_rd_AXI_INTERFACE is
   generic(ocpi_debug   : boolean;
           axi_width    : natural;
           sdp_width    : natural);
@@ -48,8 +49,8 @@ entity sdp2axi_rd_INTERFACE is
           axi_in       : in  r_s2m_t;   -- read data channel in to here
           axi_out      : out r_m2s_t;   -- read data channel out from here
           debug        : out ulonglong_t);
-end entity sdp2axi_rd_INTERFACE;
-architecture rtl of sdp2axi_rd_INTERFACE is
+end entity sdp2axi_rd_AXI_INTERFACE;
+architecture rtl of sdp2axi_rd_AXI_INTERFACE is
  signal axi_dw_idx      : unsigned(width_for_max(axi_width-1)-1 downto 0);
  signal axi_dw_idx_r    : unsigned(width_for_max(axi_width-1)-1 downto 0);
  signal last_sxf_in_axf : bool_t;

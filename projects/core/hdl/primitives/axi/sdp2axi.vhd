@@ -49,12 +49,12 @@ library platform; use platform.platform_pkg.all;
 library ocpi; use ocpi.types.all, ocpi.util.all;
 library axi; use axi.axi_pkg.all;
 library sdp; use sdp.sdp.all;
+library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
 
-entity sdp2axi_INTERFACE is
+entity sdp2axi_AXI_INTERFACE is
   generic(
     ocpi_debug   : boolean;
-    sdp_width    : natural;
-    axi_width    : natural);
+    sdp_width    : natural);
   port(
     clk          : in  std_logic;
     reset        : in  bool_t;
@@ -69,8 +69,8 @@ entity sdp2axi_INTERFACE is
     dbg_state1   : out ulonglong_t;
     dbg_state2   : out ulonglong_t
     );
-end entity sdp2axi_INTERFACE;
-architecture rtl of sdp2axi_INTERFACE is
+end entity sdp2axi_AXI_INTERFACE;
+architecture rtl of sdp2axi_AXI_INTERFACE is
   --------------------------------------------------------------------------------
   -- Terminology:
   -- xf     the beat of a data path - a "transfer"
@@ -82,9 +82,9 @@ architecture rtl of sdp2axi_INTERFACE is
   -- sw:    sdp word (payload of sdp transfer sdp_width*32)
   -- aw:    axi word (currently 64b)
   --------------------------------------------------------------------------------
-  constant dw_bytes_c          : natural := 32/8;
-  constant aw_bytes_c          : natural := axi_width * dw_bytes_c;
-  constant axi_max_burst_c     : natural := 16;
+  constant axi_width           : natural := axi_out.w.data'length/dword_size;
+  constant aw_bytes_c          : natural := axi_width * dword_bytes;
+  constant axi_max_burst_c     : natural := 2**axi_out.aw.len'length;
   subtype pkt_naxf_t           is unsigned(width_for_max(max_pkt_dws/axi_width)-1 downto 0);
   -- SDP request decoding and internal outputs
   signal pkt_dw_addr_0         : whole_addr_t;
@@ -239,6 +239,13 @@ begin
 #if CLOCK_FROM_MASTER
   axi_out.A.CLK                <= clk;
 #endif
+#if RESET_FROM_MASTER
+  axi_out.A.RESETN             <= not reset;
+#endif
+#if AXI4
+  axi_out.AW.REGION            <= (others => '0');
+  axi_out.AW.QOS               <= (others => '0');
+#endif  
   -- Write address channel
   axi_out.AW.ID                <= (others => '0');  -- spec says same id means in-order
   axi_out.AW.ADDR              <= std_logic_vector(axi_addr) & "000";
@@ -278,23 +285,23 @@ begin
   ----------------------------------------------
   -- debug output - very poor man's ILA
   ----------------------------------------------
-  dbg_state <= to_ulonglong(
-    std_logic_vector(axi_addr_r) & "000" &
-    slv(pkt_writing_p) & --31
-    slv(taking_data) & --30
-    slv(sdp_in.sdp.eop) & --29
-    slv(addressing_done) & --28
-    slv(axi_accepting_addr) & --27
-    slv(accepting_last) & --26
-    slv(sdp_in.sdp.valid) & --25
-    "00000000000" & -- 24 - 14
-    slv(to_unsigned(address_state_t'pos(addr_state_r),2)) & -- 13-12
-    std_logic_vector(pkt_naxf_left) -- 11 to 0
+  dbg_state <= to_ulonglong(0
+    -- std_logic_vector(axi_addr_r(31 downto 0)) & "000" &
+    -- slv(pkt_writing_p) & --31
+    -- slv(taking_data) & --30
+    -- slv(sdp_in.sdp.eop) & --29
+    -- slv(addressing_done) & --28
+    -- slv(axi_accepting_addr) & --27
+    -- slv(accepting_last) & --26
+    -- slv(sdp_in.sdp.valid) & --25
+    -- "00000000000" & -- 24 - 14
+    -- slv(to_unsigned(address_state_t'pos(addr_state_r),2)) & -- 13-12
+    -- std_logic_vector(pkt_naxf_left(11 to 0)) -- 11 to 0
     );
     
   ----------------------------------------------
   -- Instantiate the write data channel module
-  wd : entity work.sdp2axi_wd_INTERFACE
+  wd : entity work.sdp2axi_wd_AXI_INTERFACE
     generic map (ocpi_debug      => ocpi_debug,
                  axi_width       => axi_width,
                  sdp_width       => sdp_width)
@@ -313,7 +320,7 @@ begin
 
   ----------------------------------------------
   -- Instantiate the read data channel module
-  rd : entity work.sdp2axi_rd_INTERFACE
+  rd : entity work.sdp2axi_rd_AXI_INTERFACE
     generic map (ocpi_debug   => ocpi_debug,
                  axi_width    => axi_width,
                  sdp_width    => sdp_width)

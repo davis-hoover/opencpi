@@ -21,8 +21,9 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library platform; use platform.all;
 library ocpi; use ocpi.types.all;
-library work; use work.axi_pkg.all;
-entity axi2cp_INTERFACE is
+library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
+
+entity axi2cp_AXI_INTERFACE is
   port(
     clk     : in std_logic;
     reset   : in bool_t;
@@ -31,8 +32,8 @@ entity axi2cp_INTERFACE is
     cp_in   : in  platform_pkg.occp_out_t;
     cp_out  : out platform_pkg.occp_in_t
     );
-end entity axi2cp_INTERFACE;
-architecture rtl of axi2cp_INTERFACE is
+end entity axi2cp_AXI_INTERFACE;
+architecture rtl of axi2cp_AXI_INTERFACE is
   signal read_done        : std_logic; -- true in the last cycle of the read
   signal write_done       : std_logic; -- true in the last cycle of the write
   signal address          : std_logic_vector(cp_out.address'range);
@@ -80,7 +81,7 @@ begin
         case address_state is
           when a_idle_e =>
             if axi_in.AW.VALID = '1' and axi_in.W.VALID = '1' then
-              if axi_in.AW.LEN = "0001" then
+              if axi_in.AW.LEN = "0001" then --- BROKEN FOR SCALABLE AXI4 etc.
                 address_state <= a_first_e;
                 addr2_r       <= '0';
               else
@@ -88,7 +89,7 @@ begin
                 address_state <= a_last_e;
               end if;
             elsif axi_in.AR.VALID = '1' then
-              if axi_in.AR.LEN = "0001" then
+              if axi_in.AR.LEN = "0001" then --- BROKEN FOR SCALABLE AXI4 etc.
                 addr2_r       <= '0';
                 address_state <= a_first_e;
                 read_state    <= r_first_wanted_e;
@@ -181,7 +182,14 @@ begin
   -- AXI GP signals we drive from the PL into the PS, ordered per AXI Chapter 2
   -- Global signals
 #if !CLOCK_FROM_MASTER
-  axi_out.A.CLK    <= clk;        -- we drive the control clock as the AXI GP CLK
+  axi_out.A.CLK    <= clk;       -- we drive the AXI clock as the SDP CLK
+#endif
+#if !RESET_FROM_MASTER
+  axi_out.A.RESETn <= not reset; -- we drive the reset as the SDP reset
+#endif
+#if AXI4
+  axi_out.B.USER <= (others => '0');
+  axi_out.R.USER <= (others => '0');
 #endif
   -- Write Address Channel: we accept addresses when we don't need them anymore
   --                        note we need the AWID for the all responses

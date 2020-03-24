@@ -46,6 +46,13 @@ $(OcpiIncludeProject)
 # can be mapped to a part here and therefore a family as well.
 # E.g. in zed.mk, HdlPart_zed=xc7z020-1-clg484, which maps to xc7z020, which
 # maps to the 'zynq' family with a default target of xc7z020 for building pre-platform cores.
+# In OpenCPI parts are always three hypen-separated fields roughly meaning:
+# <die>-<speed_grade>-<package>
+# Since vendors name parts in a variety of ways, and change their minds about
+# part ordering formats, and use different formats between data sheets and tools,
+# there is a tool-specific function, HdlFullPart_<tool> to translate between
+# our canonical form, and the format that the tools like, which is *not*
+# necessarily the "part ordering number" in data sheets etc.
 ###############################################################################
 
 # Vendors
@@ -72,9 +79,14 @@ HdlTargets_zynq_ise:=$(foreach tgt,$(HdlTargets_zynq),$(tgt)_ise_alias)
 # compiling any zynq parts unless given an HdlExactPart
 #HdlDefaultTarget_zynq_ise:=xc7z020_ise_alias
 # Zynq UltraScale+ parts
-HdlTargets_zynq_ultra:=xczu28dr xczu9eg zczu7ev
+# The last two letters mean: (ds891)
+# ev: quad core, mali gpu, H.264
+# eg: quad core, mali gpu
+# cg: dual core
+HdlTargets_zynq_ultra:=xczu28dr xczu9eg xczu7ev
 # Zynq UltraScale+ chips require full part to be specified
-HdlDefaultTarget_zynq_ultra:=xczu7ev-2ffvc1156e
+# The default is based on the zcu104 dev board, which is the cheapest, and supported by webpack.
+HdlDefaultTarget_zynq_ultra:=xczu7ev-2-ffvc1156e
 
 ###############################################################################
 # Altera targets
@@ -130,16 +142,16 @@ HdlToolSet_arria10soc_std:=quartus
 # tool needs to rearrange the different part elements
 # If the tool does not define this function, return part as-is
 # Arg1 is the full/exact part number
-HdlFullPart=$(or $(call HdlFullPart_$(HdlToolSet),$1),$1)
+#HdlFullPart=$(or $(call HdlFullPart_$(HdlToolSet),$1),$1)
 # In the platform and post-platform stages, get the part from the <platform>.mk
 # In other stages, use the HdlExactPart if set, or the Default part if set,
 # or the first part for this target
-# Arg1 can be optionally set instead of determining the part here.
+# Note that the return part is still in the opencpi canonical form
 HdlChoosePart=$(strip \
   $(if $(findstring $(HdlMode),platform config container),\
-    $(call HdlFullPart,$(HdlPart_$(HdlPlatform))),\
+    $(HdlPart_$(HdlPlatform)),\
     $(or \
-      $(and $(HdlExactPart),$(call HdlFullPart,$(HdlExactPart))),\
+      $(HdlExactPart),\
       $(HdlDefaultTarget_$(HdlTarget)),\
       $(firstword $(HdlTargets_$(HdlTarget))))))
 

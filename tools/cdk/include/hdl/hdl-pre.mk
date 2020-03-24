@@ -230,10 +230,9 @@ ifneq ($(HdlMode),worker)
 # we look for any relevant
 $(call OcpiDbgVar,SourceFiles,Before searching: )
 ifdef SourceFiles
-AuthoredSourceFiles:= $(SourceFiles)
+AuthoredSourceFiles:=$(SourceFiles)
 else
-Temp:=$(wildcard *.[vV]) $(wildcard *.vhd) $(wildcard *.vhdl)
-AuthoredSourceFiles:= $(filter %_pkg.vhd,$(Temp)) $(filter-out %_pkg.vhd,$(Temp))
+AuthoredSourceFiles:=$(call OcpiPullPkgFiles,$(wildcard *.[vV]) $(wildcard *.vhd) $(wildcard *.vhdl))
 endif
 $(call OcpiDbgVar,AuthoredSourceFiles,After searching: )
 endif

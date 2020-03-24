@@ -46,8 +46,7 @@
 #define SDP_NAME CPP_CAT(sdp2axi_,NAME)
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi; use ocpi.types.all;
-library sdp, platform;
+library sdp, platform, ocpi; use ocpi.types.all;
 package NAME is
   subtype axi_id_t is std_logic_vector(ID_WIDTH-1 downto 0);
   ------------------------------------------------------------
@@ -99,7 +98,9 @@ package NAME is
 
   -- The write data channel, a.k.a. the W channel
   type w_m2s_t is record
+#if !AXI4
     ID     : axi_id_t;
+#endif
     DATA   : std_logic_vector(DATA_WIDTH-1 downto 0);
     STRB   : std_logic_vector((DATA_WIDTH/8)-1 downto 0);
     LAST   : std_logic;
@@ -154,7 +155,6 @@ package NAME is
     READY : std_logic;
   end record r_m2s_t;
   type r_s2m_t is record
-    READY : std_logic;
     ID     : axi_id_t;
     DATA   : std_logic_vector(DATA_WIDTH-1 downto 0);
     RESP   : std_logic_vector(1 downto 0);
@@ -207,8 +207,7 @@ package NAME is
   component SDP_NAME is
     generic(
       ocpi_debug : boolean;
-      sdp_width  : natural;
-      axi_width  : natural);
+      sdp_width  : natural);
     port(
       clk          : in  std_logic;
       reset        : in  bool_t;

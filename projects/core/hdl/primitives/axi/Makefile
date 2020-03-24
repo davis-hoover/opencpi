@@ -47,8 +47,7 @@ define doInterfaceModule
 $(infox DIM:$1:$2)
 gen/$1_$2.vhd: gen/$2_pkg.vhd $1.vhd | gen
 	$$(AT)tr "'" "~" < $1.vhd | cpp -P --include axi_interface_$2.h \
-	          --include <(echo 'library work; use work.$2.all;') \
-                  - | sed -e "s/_INTERFACE/_$2/" -e "s/~/'/g" > $$@
+                  - | sed -e "s/AXI_INTERFACE/$2/" -e "s/~/'/g" > $$@
 SourceFiles+=gen/$1_$2.vhd
 endef
 
