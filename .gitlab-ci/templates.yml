@@ -486,6 +486,42 @@
       fi
 
 
+######################
+# Jobs - Test Remote #
+######################
+.test-remote-core:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify
+
+.test-remote-assets:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e 
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets --only-platform $PLATFORM --mode prep_run_verify
+
+.test-remote-assets_ts:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify
+
+.test-remote-inactive:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify
+
+
 #############
 # Platforms #
 #############
@@ -568,6 +604,15 @@
     PORT: '1000'
     MODEL: 'hdl'
 
+.matchstiq_z1-xilinx13_3:
+  variables:
+    PLATFORM: 'matchstiq_z1'
+    HW_PLATFORM: 'matchstiq_z1'
+    SW_PLATFORM: 'xilinx13_3'
+    IP: '10.0.0.53'
+    PORT: '1000'
+    MODEL: 'hdl'
+  
 
 ########
 # Misc #
