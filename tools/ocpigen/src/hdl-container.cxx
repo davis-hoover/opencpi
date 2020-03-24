@@ -975,8 +975,22 @@ mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
 	    OU::format(ename, "%s%s", di.slot->m_prefix.c_str(),
 		       ssi == di.slot->m_signals.end()  ?
 		       slotSig->cname() : ssi->second.c_str());
-	} else
+	} else {
 	  ename = boardName;
+	  if (*boardName) {
+	    // So a non-slot signal has a boardName (i.e. mapped).
+	    // Thus we must make the mapped name an external signal of the container
+	    Signal *ns = new Signal(**i);
+	    ns->m_name = boardName;
+	    if (isSingle)
+	      ns->m_width = 0;
+	    m_signals.push_back(ns);
+	    m_sigmap[ns->m_name.c_str()] = ns;
+	    if (!isSingle)
+	      break;
+	  }
+	}
+
 	//	if (ename.length())
 	OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
 		      dname.c_str(), ename.c_str());

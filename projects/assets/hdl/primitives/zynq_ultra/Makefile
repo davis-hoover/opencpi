@@ -55,5 +55,4 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),) # if not cleaning
   $(info The Zynq Ultra PS wrapper module name is: $(WrapperModule))
 endif # if not cleaning
 
-$(info SOURCE:$(SourceFiles))
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
