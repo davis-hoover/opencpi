@@ -17,18 +17,18 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi; use ocpi.types.all;
-library util, protocol, misc_prims;
+library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
+library util, protocol;
 architecture rtl of worker is
   signal in_opcode :
-      protocol.complex_short_with_metadata.opcode_t :=
-      protocol.complex_short_with_metadata.SAMPLES;
+      protocol.iqstream.opcode_t :=
+      protocol.iqstream.IQ;
   signal in_demarshaller_oprotocol :
-      protocol.complex_short_with_metadata.protocol_t :=
-      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+      protocol.iqstream.protocol_t :=
+      protocol.iqstream.PROTOCOL_ZERO;
   signal in_demarshaller_oeof : std_logic := '0';
-  signal oprotocol : protocol.iqstream.protocol_t :=
-                     protocol.iqstream.PROTOCOL_ZERO;
+  signal oprotocol : protocol.complex_short_with_metadata.protocol_t :=
+                     protocol.complex_short_with_metadata.PROTOCOL_ZERO;
   signal out_marshaller_irdy  : std_logic := '0';
   signal out_marshaller_odata : std_logic_vector(out_out.data'range) :=
                                 (others => '0');
@@ -36,27 +36,12 @@ architecture rtl of worker is
   signal out_rst_detected : std_logic := '0';
 begin
 
-  in_opcode <=
-    protocol.complex_short_with_metadata.SAMPLES        when
-    in_in.opcode = ComplexShortWithMetadata_samples_op_e        else
-    protocol.complex_short_with_metadata.TIME_TIME      when
-    in_in.opcode = ComplexShortWithMetadata_time_op_e           else
-    protocol.complex_short_with_metadata.INTERVAL       when
-    in_in.opcode = ComplexShortWithMetadata_interval_op_e       else
-    protocol.complex_short_with_metadata.FLUSH          when
-    in_in.opcode = ComplexShortWithMetadata_flush_op_e          else
-    protocol.complex_short_with_metadata.SYNC           when
-    in_in.opcode = ComplexShortWithMetadata_sync_op_e           else
-    protocol.complex_short_with_metadata.END_OF_SAMPLES when
-    in_in.opcode = ComplexShortWithMetadata_end_of_samples_op_e else
-    protocol.complex_short_with_metadata.SAMPLES;
-
-  in_demarshaller : protocol.complex_short_with_metadata.complex_short_with_metadata_demarshaller
+  in_demarshaller : protocol.iqstream.iqstream_demarshaller
     generic map(
       WSI_DATA_WIDTH => in_in.data'length)
     port map(
-      clk          => in_in.clk,
-      rst          => in_in.reset,
+      clk          => out_in.clk,
+      rst          => out_in.reset,
       -- INPUT
       idata        => in_in.data,
       ivalid       => in_in.valid,
@@ -71,18 +56,18 @@ begin
       oeof         => in_demarshaller_oeof,
       ordy         => out_marshaller_irdy);
 
-  oprotocol.iq.data.i <= in_demarshaller_oprotocol.samples.iq.i;
-  oprotocol.iq.data.q <= in_demarshaller_oprotocol.samples.iq.q;
-  oprotocol.iq_vld    <= in_demarshaller_oprotocol.samples_vld;
+  oprotocol.samples.iq.i <= in_demarshaller_oprotocol.iq.data.i;
+  oprotocol.samples.iq.q <= in_demarshaller_oprotocol.iq.data.q;
+  oprotocol.samples_vld  <= in_demarshaller_oprotocol.iq_vld;
 
-  out_marshaller : protocol.iqstream.iqstream_marshaller
+  out_marshaller : protocol.complex_short_with_metadata.complex_short_with_metadata_marshaller
     generic map(
       WSI_DATA_WIDTH    => out_out.data'length,
       WSI_MBYTEEN_WIDTH => out_out.byte_enable'length)
     port map(
       -- CTRL
-      clk          => in_in.clk,
-      rst          => in_in.reset,
+      clk          => out_in.clk,
+      rst          => out_in.reset,
       -- INPUT
       iprotocol    => oprotocol,
       ieof         => in_demarshaller_oeof,
@@ -105,14 +90,14 @@ begin
   -- and out ports have successfully come into reset
   in_rst_detector : util.util.reset_detector
     port map(
-      clk                     => in_in.clk,
+      clk                     => out_in.clk,
       rst                     => in_in.reset,
       clr                     => '0',
       rst_detected            => in_rst_detected,
       rst_then_unrst_detected => open);
   out_rst_detector : util.util.reset_detector
     port map(
-      clk                     => in_in.clk,
+      clk                     => out_in.clk,
       rst                     => out_in.reset,
       clr                     => '0',
       rst_detected            => out_rst_detected,
@@ -120,3 +105,4 @@ begin
   ctl_out.done <= in_rst_detected and out_rst_detected;
 
 end rtl;
+

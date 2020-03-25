@@ -1,4 +1,8 @@
-<HdlWorker language='vhdl' spec='cswm_to_iqstream-spec' version='2'>
+<HdlWorker language='vhdl'
+           spec='iqstream_to_cswm-spec'
+           controloperations='initialize'
+           version='2'>
+  <ControlInterface timeout='131072'/>
   <Property name='IN_PORT_DATA_WIDTH'
             type='uchar'
             default='32'
@@ -9,9 +13,9 @@
             parameter='true'/>
   <StreamInterface name='in'
                    datawidth='IN_PORT_DATA_WIDTH'
-                   clockdirection='in'/>
+                   clock='out'/>
   <StreamInterface name='out'
                    datawidth='OUT_PORT_DATA_WIDTH'
-                   clock='in'
+                   clockdirection='in'
                    workereof='true'/>
 </HdlWorker>

@@ -14,6 +14,7 @@ entity iqstream_marshaller is
     rst          : in  std_logic;
     -- INPUT
     iprotocol    : in  protocol.iqstream.protocol_t;
+    ieof         : in  ocpi.types.Bool_t;
     irdy         : out std_logic;
     -- OUTPUT
     odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
@@ -62,6 +63,6 @@ begin
   oeom         <= message_sizer_eom;
   obyte_enable <= (others => '1');
   ovalid       <= iprotocol.iq_vld;
-  oeof         <= '0';
+  oeof         <= ieof;
 
 end rtl;

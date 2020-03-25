@@ -76,6 +76,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all; use ieee.math_real.all; use ieee.std_logic_misc.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
+library util;
 
 architecture rtl of worker is
   -----------------------------------------------------------------------------
@@ -129,7 +130,7 @@ begin
 
     -- edge detect the input signal
     edge_detect_gen : if its(EDGE_MODE) generate
-      ed : misc_prims.misc_prims.edge_detector
+      ed : util.util.edge_detector
         port map (
           clk           => ctl_in.clk,
           reset         => ctl_in.reset,
