@@ -1,0 +1,69 @@
+<!-- This file defines the zcu102 HDL platform -->
+<HdlPlatform Language="VHDL" Spec='platform-spec'>
+  <specproperty name='platform' value='zcu104'/>
+  <specproperty name="nSlots" value='1'/>
+  <specproperty name="nLEDs" parameter='1' value='4'/>
+  <!-- 4 dip switches and 4 push button switches -->
+  <specproperty name="nSwitches" parameter='1' value='8'/>
+  <specproperty name="slotNames" value='fmc_lpc'/>
+  <!-- All platform workers must provide these two ports -->
+  <metadata master="true"/>
+  <timebase master="true"/>
+  <!-- This platform worker provides a control plane -->
+  <cpmaster master='true'/>
+  <!-- Set your time server frequency -->
+  <device worker='time_server'>
+    <property name='frequency' value='100e6'/>
+  </device>
+  <sdp name='zynq_ultra' master='true' count='4'/>
+  <Property name='useGP1' type='bool' parameter='1' default='false'/>
+  <Property name='axi_error' type='bool' arraylength='4' volatile='true'/>
+  <Property name='sdpDropCount' type='uchar' volatile='true'/>
+  <!-- The ZCU104 FMC LPC slot.
+       Unconnected LPC signals are:
+       Hard-connected LPC signals are:
+       - PG_C2M is connected to PS_POR_B - the Zynq powerup reset where high is power good.
+       - TCK, TDI, TDO, TMS JTAG for normal jtag chain when an FMC is present
+  -->
+  <slot name='FMC_LPC' type='fmc_lpc'>
+    <!-- We only mention signals that don't have the canonical signal name -->
+    <signal slot='PRSNT_M2C_L' platform='PRSNT_M2C_B'/>
+    <signal slot='LA00_P_CC'         platform='LA00_CC_P'/>
+    <signal slot='LA00_N_CC'         platform='LA00_CC_N'/>
+
+    <signal slot='LA01_P_CC'         platform='LA01_CC_P'/>
+    <signal slot='LA01_N_CC'         platform='LA01_CC_N'/>
+
+    <signal slot='LA17_P_CC'         platform='LA17_CC_P'/>
+    <signal slot='LA17_N_CC'         platform='LA17_CC_N'/>
+
+    <signal slot='LA18_P_CC'         platform='LA18_CC_P'/>
+    <signal slot='LA18_N_CC'         platform='LA18_CC_N'/>
+
+    <signal slot='SCL'               platform='IIC_SCL'/>
+    <signal slot='SDA'               platform='IIC_SDA'/>
+    <!-- These are not really disconnected, but OpenCPI does not yet generate the right stub driver -->
+    <signal slot='DP0_C2M_P' platform=''/>
+    <signal slot='DP0_C2M_N' platform=''/>
+  </slot>
+  <signal  output='leds' width='4'/>
+  <signal name='leds(0)' platform="GPIO_LED_0_LS"/>
+  <signal name='leds(1)' platform="GPIO_LED_1_LS"/>
+  <signal name='leds(2)' platform="GPIO_LED_2_LS"/>
+  <signal name='leds(3)' platform="GPIO_LED_3_LS"/>
+  <signal input='switches' width='8'/>
+  <signal name='switches(0)' platform="GPIO_DIP_SW0"/>
+  <signal name='switches(1)' platform="GPIO_DIP_SW1"/>
+  <signal name='switches(2)' platform="GPIO_DIP_SW2"/>
+  <signal name='switches(3)' platform="GPIO_DIP_SW3"/>
+  <signal name='switches(4)' platform="GPIO_PB_SW0"/>
+  <signal name='switches(5)' platform="GPIO_PB_SW1"/>
+  <signal name='switches(6)' platform="GPIO_PB_SW2"/>
+  <signal name='switches(7)' platform="GPIO_PB_SW3"/>
+
+  <signal  input='fmc_prsnt'/>
+  <!-- debug stuff -->
+  <Property name="debug_state" type="Ulonglong" arraylength='4' volatile='true' debug='false'/>
+  <Property name="debug_state1" type="Ulonglong" arraylength='4' volatile='true' debug='false'/>
+  <Property name="debug_state2" type="Ulonglong" arraylength='4' volatile='true' debug='false'/>
+</HdlPlatform>
