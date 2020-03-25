@@ -104,7 +104,7 @@ class Cic_decWorker : public Cic_decWorkerBase {
             memset(integQ, 0, sizeof(integQ));
             // Integrator
 
-            int integPower = 1 << ACC_WIDTH;  // Calculate power of 2,ACC_width and return proper value;
+            long integPower = 1L << ACC_WIDTH;  // Calculate power of 2,ACC_width and return proper value;
             for (size_t i = 0; i < iData->size(); ++i)
             {
                 integI[0] = iData->at(i);
