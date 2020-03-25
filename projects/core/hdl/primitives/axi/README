@@ -3,10 +3,11 @@ converts between AXI and something else, it should be here, and it should depend
 thing.
 This library depends on the SDP library and the platform library since adapters between
 SDP and AXI and CP and AXI also live here, since they are about AXI.
+
 AXI interfaces come in two flavors, AXI3 and AXI4, which have slighly different signals.
 AXI interfaces have different widths for various fields (address, data, transaction IDs etc.).
 AXI is flexible with respect to where clock and reset are driven from.  We parameterize
-AXU interfaces as to who (among master and slave) drivers reset and clock, separately.
+AXI interfaces as to who (among master and slave) drivers reset and clock, separately.
 Thus fundamentally AXI interfaces are parameterized.
 
 We use record structures for AXI interfaces, so that an interface has a master-to-slave interface
@@ -21,33 +22,34 @@ Thus for each version of an AXI interface we generate a VHDL package specific to
 The "source code" for defining an AXI interface flavor is to define several interface parameters,
 in C-Processor syntax, in a file whose name is axi_interface_<if_name>.h
 
-The result of this is that there is a VHDL package in this library called <if_name>, and that
+The result of this is that there is a VHDL package in this library called <if-name>, and
 the actual modules in this library that use AXI interfaces have variants called
-<module_name>_<ifname>.vhd
+<module-name>_<if-name>.vhd, which has its component declaration in the <if-name> package.
 
 From the point of view of a platform that wants to instantiate AXI modules with interface
-<if_name>, they do:
+<if-name>, they do:
 
 library axi;
 
 my_axp_cp: component axi.<if_name>.axi2cp_<if_name> ...
 
-For all AXI modules here, we build them for all the interface variants defined here.
-(Someday we could prune this for build speed).
+SO in this diretory we basically have:
+1. AXI interfaces defined (all the variants)
+2. AXI-related modules that are built for each interface variant.
+   (Someday we could prune this for build speed).
 
-These VHDL module files (e.g. axi2cp) files are actually specialized by preprocessing then and putting
-the specialized code in the gen/ subdir.  To preprocess them we:
-1. Prepend a line: "use work.<axi-if-name>.all;" to the file when building for <axi-if-name>
-2. Replace "_INTERFACE" in the file with <axi-if-name>, usually for the entity name
+The VHDL module files (e.g. axi2cp) files are actually specialized by preprocessing then and putting
+the specialized code in the gen/ subdir.  To preprocess them we simply: replace "AXI_INTERFACE" in
+the file with <axi-if-name>
 
+Some notes:
 
-
-
-axi2cp is already dealing with 2 word bursts over a 32 bit datapath
-it could simply deal with a 64 bit data path.
-notes:
-zynq should depend on AXI
-zynq should include ultrascale
-tcl file in upperdirectory, and use the gen directory
+axi2cp is already dealing with 2 word bursts over a 32 bit datapath so
+it could simply deal with a 64 bit data path.  For 128 bits it would be a bit harder.
 Is there a benefit for a 64 bit axi GP? would axi2cp be any smaller/simpler?
+It would mean that the (currently supported) 64 bit load/store would indeed be slightly faster.
 
+In this parameterization we have not achieved "drop-in AXI interface variants at the point of use".
+This means that the little 4 line files that define AXI interfaces have to be added here for
+new platforms that need new interfaces.  But this is fairly infrequent so the MRs for it should not
+be burdensome.

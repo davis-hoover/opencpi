@@ -6,18 +6,15 @@ FOR ISE/SST:
 ================================================================================
 It is in 14.7/ISE_DS/EDK/hw/XilinxProcessorIPLib/pcores/processing_system7_v4_03_a
 The actual verilog wrapper around the PS7 primitive is in hdl/verilog/processing_system7.v
-with the doc in doc/ds871_processing_system7.pdf.
-The instantiation parameters of processing_system7 is based on
+subdir, with the doc in doc/ds871_processing_system7.pdf.
+The instantiation parameters of processing_system7 was based on
 running the XPS tool, and *looking at* but not using the generated wrapper file:
   system_processing_system7_0_wrapper.v
-The xps project was mostly for the purpose of generating PS register settings,
-which is not relevant here, but is used for per-platform bootstrapping when the
-board vendor's setup is not sufficient.
 
 FOR VIVADO:
 ================================================================================
 It is in data/ip/xilinx/processing_system7_v5_5
-A tcl script here (vivado-gen-ps7.tcl) is used to extract the verilog wrapper,
+A tcl script here (vivado-gen-ps.tcl) is used to extract the verilog wrapper,
 which results in the file:  processing_system7_v5_5_processing_system7.v
 
 COMMON TO ISE AND VIVADO
@@ -29,7 +26,7 @@ This VHDL module needs to instantiate Xilinx's Verilog wrapper, and pass down
 any parameters that OpenCPI needs, to make this zynq_ps module sharable across various
 platforms that use different chips etc.
 
-Xilinx Vivado has declared that VHDL can only instance Verilog via a VHDL component
+Vivado has declared that VHDL can only instance Verilog via a VHDL component
 declaration (which there is evidence is not actually true, but...), so our VHDL module
 must declare the underlying Verilog module as a VHDL component, and then
 instance it.
@@ -48,7 +45,7 @@ The ISE Xilinx Verilog wrapper is directly used from the ISE installation as is.
 The Vivado Xilinx Verilog wrapper is generated (slowly...) using a tcl script,
 but it is basically just extracted from a ttcl file without any real modifications.
 
-This in neither case are we generating anything that is parameterized based on
+Thus in neither case are we generating anything that is parameterized based on
 how we are using the chip.  We are simply providing parameters to the Xilinx Verilog wrapper.
 
 Building this library has to decide whether to use the ISE/isim method or the Vivado/xsim method.

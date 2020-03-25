@@ -1,3 +1,8 @@
+This zcu104 platform is the cheapest Xilinx ultrascale development platform that is supported with WebPack tools.
+It is supported as the "default zynq ultrascale", much like the zed board is the default zynq-7000.
+
+TODO: get the fmcomms platform configs and test apps working.
+
 A page that has most resources:
 https://www.xilinx.com/support/documentation-navigation/design-hubs/dh0036-zynq-ultrascale-plus-mpsoc-hub.html
 Constraints file:
