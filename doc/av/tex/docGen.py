@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -34,7 +34,7 @@ try:
     import jinja2
     from jinja2 import Template
 except ImportError:
-    print("ERROR : Could not import jinja2; try 'sudo yum install python34-jinja2'",
+    print("ERROR : Could not import jinja2; try 'sudo yum install python3-jinja2'",
           file=sys.stderr)
     sys.exit(1)
 

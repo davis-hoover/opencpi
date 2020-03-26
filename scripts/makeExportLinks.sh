@@ -526,7 +526,7 @@ shopt -u nullglob
 # If we are not building on the target platform do not pre-compile python AV-4850
 if [ "$OCPI_TOOL_DIR" = "$target" ]; then
   # Force precompilation of python files right here, but only if we are doing a target
-  py=python3.4
+  py=python3
   command -v $py &> /dev/null || py=/opt/local/bin/$py
   dirs=
   for d in `find exports -name "*.py"|sed 's=/[^/]*$=='|sort -u`; do
