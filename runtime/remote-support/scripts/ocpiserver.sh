@@ -46,7 +46,7 @@ export OCPI_TOOL_PLATFORM=$(cat swplatform)
 export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
 PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
-export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/system.xml
+export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/system.xml
 export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/sdk/lib
 EOF
 . ./setup.sh
@@ -164,4 +164,21 @@ status)
   fi
   echo Server is running with port: $(cat port) and pid: $pid >&2
   ;;
+mount)
+  for i in /mnt/card /media/card /run/media/mmc*; do
+      echo Trying $i...
+      if [ -r $i/u-boot.elf ]; then
+	  echo Found $i...
+	  rm -f /mnt/opencpi-boot
+	  ln -s $i /mnt/opencpi-boot
+          exit 0
+      fi
+  done
+  echo Nothing found.  Trying to mount /dev/mmcblk0p1 on /mnt/card
+  if [ -b /dev/mmcblk0p1 ]; then
+      mkdir -o /mnt/card
+      mount /dev/mmcblk0p1 /mnt/card
+      rm -f /mnt/opencpi-boot
+      ln -s /mnt/card /mnt/opencpi-boot
+  fi
 esac

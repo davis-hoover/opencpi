@@ -20,7 +20,7 @@
 -- The clock and reset are injected to be supplied to both sides
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library platform; use platform.all;
-library ocpi; use ocpi.types.all;
+library ocpi; use ocpi.types.all, ocpi.util.all;
 library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
 
 entity axi2cp_AXI_INTERFACE is
@@ -81,7 +81,7 @@ begin
         case address_state is
           when a_idle_e =>
             if axi_in.AW.VALID = '1' and axi_in.W.VALID = '1' then
-              if axi_in.AW.LEN = "0001" then --- BROKEN FOR SCALABLE AXI4 etc.
+              if axi_in.AW.LEN = slvn(1, axi_in.AW.LEN'length) then
                 address_state <= a_first_e;
                 addr2_r       <= '0';
               else
@@ -89,7 +89,7 @@ begin
                 address_state <= a_last_e;
               end if;
             elsif axi_in.AR.VALID = '1' then
-              if axi_in.AR.LEN = "0001" then --- BROKEN FOR SCALABLE AXI4 etc.
+              if axi_in.AR.LEN = slvn(1, axi_in.AR.LEN'length) then --- BROKEN FOR SCALABLE AXI4 etc.
                 addr2_r       <= '0';
                 address_state <= a_first_e;
                 read_state    <= r_first_wanted_e;

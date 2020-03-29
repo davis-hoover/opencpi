@@ -174,7 +174,13 @@ URULESFILE=99-$(MODNAME).rules
 MRULESFILE=mdev-$(MODNAME).rules
 TMP_FILES=Module.markers Module.symvers .opencpi* opencpi.mod.* opencpi.o .tmp* modules.order
 
-$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
+# This dependency is causing more problems than I think it is worth since it is doing things
+# that are unnecessary and problematic in most casesn.
+#$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
+EXPORTS=EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KCPPFLAGS="$(KCPPFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" $(and $(ARCH),ARCH=$(ARCH))
+$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P))
+	$(if $(CROSS_COMPILE),$(AT)echo Building kernel tools that run on the development host &&\
+	    $(MAKE) -C $(KERNELDIR) V=2 scripts)
 	$(AT)echo Building kernel module $(MODFILE)
 	$(and $(KERNELDIR),$(MAKE) -C $(KERNELDIR) M=$(PWD) V=2 modules)
 	$(AT)mkdir -p $(MyTargetDir)

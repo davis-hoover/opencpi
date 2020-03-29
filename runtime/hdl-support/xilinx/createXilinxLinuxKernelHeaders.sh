@@ -47,7 +47,7 @@ The result of this script is a directory with artifacts that are needed to:
 - Build the OpenCPI linux kernel driver (thus completing the framework build for zynq)
 - Create a bootable SD card (necessary files, not sufficient)
 
-Usage is: createLinuxKernelHeaders.sh <arch> <linux-tag> <uboot-tag> <repo-dir> <out-dir> <config>
+Usage is: createLinuxKernelHeaders.sh <arch> <linux-tag> <uboot-tag> <repo-dir> <out-dir> <config> <local>
 
 The release name can be the same as the tag, but it is usually the associated
 Xilinx tool release associated with the tag unless it is between releases etc.
@@ -71,6 +71,7 @@ uboot_tag=$2
 case $3 in (/*) gdir=$3 ;; (*) gdir=`pwd`/$3;; esac
 case $4 in (/*) RELDIR=$4;; (*) RELDIR=`pwd`/$4;; esac
 config=$5
+localversion=-$6
 if test ! -d $gdir/linux-xlnx; then
   echo The source directory $3/linux-xlnx does not exist. Run getXilinxLinuxSources.sh\?
   exit 1
@@ -192,9 +193,21 @@ else
 fi
 echo ============================================================================================
 echo Building the Xilinx linux kernel for zynq to create the kernel-headers tree.
-# To build a kernel that we would use, we would do:
+################################################################################
+# We need to make sure the kernel version string matches the deployed kernel.
+# How this happens has evolved over various kernel and xilinx versions
+# There are two parts:
+# 1. There is the part that comes from the linux kernel build's idea of the "state of the scm tree".
+# Presumably the Xilinx build in production is a clean tree, so we emulate that by forcing
+# the SCM part of the version string to be empty by:
+cat /dev/null > .scmversion # cannot use touch in case it was there already
+# 2. There is the "local version" part of the release string.
+# this is passed in as an argument
+# First, suppress any SCM/git-based kernel version strings since we must match the
+
+# deployed kernel.
 yes "" | PATH="$PATH:`pwd`/../u-boot-xlnx/tools" \
-   make Q= V=2 ARCH=$karch CROSS_COMPILE=$CROSS_COMPILE ${MAKE_PARALLEL} \
+   make Q= V=2 ARCH=$karch CROSS_COMPILE=$CROSS_COMPILE ${MAKE_PARALLEL} LOCALVERSION=$localversion \
         $kargs dtbs modules # why modules?
 ocpi_kernel_release=$(< include/config/kernel.release)-$(echo $linux_tag | sed 's/^xilinx-//')
 echo ============================================================================================
@@ -237,8 +250,8 @@ echo Removing *.cmd
 find kernel-headers -name '*.cmd' -o -name '*.o' -delete
 echo Removing x86_64 binaries
 find kernel-headers/scripts | xargs file | grep "ELF 64-bit" | cut -f1 -d: | xargs -tr -n1 rm
-echo Removing auto.conf
-rm kernel-headers/include/config/auto.conf
+#echo Removing auto.conf
+#rm kernel-headers/include/config/auto.conf
 echo Restoring source to removed binaries
 (cd $gdir/linux-xlnx;
   for f in $(find scripts/ -name '*.c' -o -name 'zconf.tab'); do

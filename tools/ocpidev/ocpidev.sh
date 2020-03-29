@@ -2363,7 +2363,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--*=*)
 	 flag=${argv[0]%%=*}
          val="${argv[0]#*=}"
-	 echo FLAG:$flag VAL:$val ARG:${argv[0]}
+	 # echo FLAG:$flag VAL:$val ARG:${argv[0]}
 	 unset argv[0]
 	 argv=($flag "$val" "${argv[@]}")
 	 ;;
@@ -2374,7 +2374,7 @@ while [[ "${argv[0]}" != "" ]] ; do
 	 val=${argv[0]:2}
 	 unset argv[0]
 	 argv=($flag $val ${argv[@]})
-	 echo FIXING: flag=$flag val=$val new=:${argv[@]}: >&2
+	 # echo FIXING: flag=$flag val=$val new=:${argv[@]}: >&2
 	 ;;
     esac
     case "${argv[0]}" in

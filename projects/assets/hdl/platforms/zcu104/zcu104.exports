@@ -19,7 +19,7 @@
 # Development files for building for this platform
 +<platform_dir>/zcu104.xdc
 +<platform_dir>/zcu104_bit.xdc
-=<platform_dir>/sd_card/system.xml
+=<platform_dir>/system.xml
 
 # Udev rules for runtime on dev host
 # They are always placed in the udev-rules subdir in the runtime packages
@@ -27,5 +27,5 @@
 
 # Assume that all the boot files are in the software platforms for now
 @<rcc-platform-dir>/hdl/zed/boot/*
-
+@<platform-dir>/system.xml opencpi/
 
