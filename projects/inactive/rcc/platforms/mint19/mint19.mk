@@ -23,5 +23,5 @@
 # See that file for a description of valid variables and their defaults.
 
 OcpiPlatformOs=linux
-OcpiPlatformOsVersion=m18
+OcpiPlatformOsVersion=m19
 OcpiPlatformArch=x86_64
