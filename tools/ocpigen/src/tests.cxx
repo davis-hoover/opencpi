@@ -1215,7 +1215,7 @@ namespace {
       std::string file(dir + "/" + name);
       std::string verify;
       OU::format(verify,
-                 "#!/bin/sh --noprofile\n"
+                 "#!/bin/bash --noprofile\n"
                  "# Verification and/or viewing script for case: %s\n"
                  "# Args are: <worker> <subcase> <verify> <view>\n"
                  "# Act like a normal process if get this signal\n"
@@ -2280,11 +2280,11 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
                       return true;
                     }
                     fprintf(m_run,
-                            "#!/bin/sh --noprofile\n"
+                            "#!/bin/bash --noprofile\n" // no arg (at least to dash) to suppress reading .profile etc.
                             "# Note that this file runs on remote/embedded systems and thus\n"
                             "# may not have access to the full development host environment\n"
                             "failed=0\n"
-                            "source $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
+                            ". $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
                             m_spec.c_str(), m_platform.c_str(), ezxml_cattr(wx, "outputs"));
                   }
                   const char

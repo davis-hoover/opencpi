@@ -23,6 +23,7 @@ Configurations=\
   base $(basename $(notdir $(subst /alst4,/alst4x,$(wildcard ../alst4/alst4_zipper*.xml))))
 # FIXME: we need a better way to "clone" a platform
 # Unfortunately, the xml file must exist prior to dependencies, so we just do them all immediately
+include $(OCPI_CDK_DIR)/include/util.mk
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
     test -e alst4x.xml || sed "s/'alst4'/'alst4x'/" ../alst4/alst4.xml > alst4x.xml; \
