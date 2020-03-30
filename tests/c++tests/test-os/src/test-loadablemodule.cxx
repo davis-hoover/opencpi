@@ -31,14 +31,7 @@ namespace {
   class TestOcpiOsLoadableModule : public ::testing::Test {
     protected:
       std::string sym_to_load, library_to_load;
-      //
-      // Originally, override specifier was commented-out.
-      // Qt5 has a Q_DECL_OVERRIDE macro that resolves to
-      // the override keyword for compilers that support it, 
-      // and nothing for those that don't.  Making OpenCPI
-      // dependent on Qt5 is a "bad idea".
-      //
-      void SetUp() override {
+      void SetUp() /* override */ {
 	//
 	// Choosing "libm" as the shared library for testing was
 	// unfortunate for the Linux case where "libm.so" points
