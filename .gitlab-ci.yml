@@ -54,9 +54,11 @@ include:
   - /.gitlab-ci/centos6/zed.yml
   - /.gitlab-ci/centos6/xilinx13_3.yml
   - /.gitlab-ci/centos6/xilinx13_4.yml
+  - /.gitlab-ci/centos6/matchstiq_z1.yml
   
   # centos7
   - /.gitlab-ci/centos7/xsim.yml
   - /.gitlab-ci/centos7/zed.yml
   - /.gitlab-ci/centos7/xilinx13_3.yml
   - /.gitlab-ci/centos7/xilinx13_4.yml
+  - /.gitlab-ci/centos7/matchstiq_z1.yml
