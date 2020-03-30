@@ -684,6 +684,7 @@ namespace OCPI {
       bool IfScanner::findIpAddr(const char *interface, std::string &ipAddr, std::string &error) {
 	IfScanner ifs(error);
 	Interface eif;
+	ipAddr.clear();
 	if (error.empty())
 	  while (ifs.getNext(eif, error))
 	    if (eif.connected && eif.up && !eif.loopback && eif.addr.isEther() &&
@@ -695,6 +696,12 @@ namespace OCPI {
 		       ipAddr.c_str(), eif.name.c_str(), eif.addr.pretty());
 	      break;
 	    }
+	if (error.empty() && ipAddr.empty()) {
+	  if (interface)
+	    OS::setError(error, "No address found for socket interface: %s", interface);
+	  else
+	    OS::setError(error, "No socket interface found with a usable address");
+	}
 	return !error.empty();
       }
       IfScanner::IfScanner(std::string &err)
