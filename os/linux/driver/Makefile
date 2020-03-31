@@ -127,10 +127,11 @@ else
   OcpiKernelRelease:=$(shell uname -r)
   # This is not the actual package version, but suffices for our purposes:
   # if the "build" symlink is broken, the kernel headers package has not
-  # been installed.  N.B.: "realpath" does not care whether the symlink is
-  # broken -- only that it is present.  Thus, "realpath" and "basename"
-  # should always succeed.
-  OcpiKernelHeadersVersion:=$(shell basename $(shell realpath /lib/modules/$(OcpiKernelRelease)/build))
+  # been installed.  N.B.: the gmake built-in "$(realpath <str>)" function
+  # returns NULL if the symlink is broken, so we cannot use it here.  Also,
+  # there is no external "realpath" command for "centos6" so we have to use
+  # "readlink -f" for reasons of portability.
+  OcpiKernelHeadersVersion:=$(shell basename $(shell readlink -f /lib/modules/$(OcpiKernelRelease)/build))
   $(info --- The running kernel is release: $(OcpiKernelRelease))
   $(info --- The current kernel-headers package is version: $(OcpiKernelHeadersVersion))
   ifdef KERNELDIR
@@ -139,7 +140,7 @@ else
       $(error The requested kernel header location ($(KERNELDIR)) is not found)
     endif
   else
-    KERNELDIR=$(shell realpath /lib/modules/$(OcpiKernelRelease)/build)
+    KERNELDIR=$(shell readlink -f /lib/modules/$(OcpiKernelRelease)/build)
     ifeq ($(wildcard $(KERNELDIR)),)
       $(info XXX: $(shell ls -l /lib/modules ))
       $(error Cannot find a kernel headers directory at $(KERNELDIR))
