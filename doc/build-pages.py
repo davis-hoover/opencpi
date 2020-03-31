@@ -1,4 +1,4 @@
-#!/bin/env python3.4
+#!/bin/env python3
 
 import argparse
 import logging
@@ -400,8 +400,9 @@ def get_branches():
     ).decode().strip("\n").split("\n")]
 
     # Resolve detached branches to their symbolic name. This is needed because
-    # of how gitlab runner checks out branch under test
-    pat = re.compile(r"detached from ([a-z0-9]+)")
+    # of how gitlab runner checks out branch under test. This will either be a
+    # sha or a tag.
+    pat = re.compile(r"detached from ([^)]+)")
     for i, branch in enumerate(git_branches):
         match = pat.search(branch)
         if match is not None:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -50,7 +50,7 @@ out_data = np.array(np.zeros(len(ramp)), dtype=utu.dt_iq_pair)
 
 # Put ramp in generated output
 out_data['real_idx'] = np.int16(ramp)
-out_data['imag_idx'] = np.int16(ramp)
+out_data['imag_idx'] = -np.int16(ramp)+4095 # +4095 is a hack to make verify work correctly (verify gives false negative when the generated data has negative numbers)
 
 # Write to file
 f = open(sys.argv[1], 'wb')

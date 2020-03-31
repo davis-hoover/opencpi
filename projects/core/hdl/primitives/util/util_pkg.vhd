@@ -307,23 +307,30 @@ component clock_forward
     CLK_OUT_N : out std_logic);
 end component clock_forward;
 
-component zlm_detector is
-  port(
-    clk         : in  std_logic;  -- control plane clock
-    reset       : in  std_logic;  -- control plane reset (active-high)
-    som         : in  std_logic;  -- input port SOM
-    valid       : in  std_logic;  -- input port valid
-    eom         : in  std_logic;  -- input port EOM
-    ready       : in  std_logic;  -- input port ready
-    take        : in  std_logic;  -- input port take
-    eozlm_pulse : out std_logic;  -- pulse-per-end-of-ZLM
-    eozlm       : out std_logic); -- same as EOM but only for end of ZLMs
-end component;
-
 component in2out is
   port(
     in_port  : in std_logic;
     out_port : out std_logic);
 end component;
+
+component counter is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk      : in  std_logic;
+    rst      : in  std_logic;
+    en       : in  std_logic;
+    cnt      : out unsigned(BIT_WIDTH-1 downto 0));
+end component;
+
+component set_clr
+  port(
+    clk : in  std_logic;
+    rst : in  std_logic;
+    set : in  std_logic;
+    clr : in  std_logic;
+    q   : out std_logic;
+    q_r : out std_logic);
+end component set_clr;
 
 end package util;

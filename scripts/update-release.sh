@@ -9,8 +9,8 @@ function usage {
   cat <<USAGE
 Usage: $(basename "$0") <release-tag>
 
-release-tag:  An OpenCPI semver compatible release tag.
-              Ex. v1.6.0, v1.7.0-beta.1, v1.7.0-rc.1
+release-tag    An OpenCPI semver compatible release tag.
+               Ex. v1.6.0, v1.7.0-beta.1, v1.7.0-rc.1
 USAGE
   exit 1
 }
@@ -24,7 +24,7 @@ function parse_release {
   # Validate proper format. Format after the hyphen is not enforced, but
   # might be in the future.
   if [[ ! "${release%%-*}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Invalid release tag $1"
+    echo "Invalid release tag '$1'"
     return 1
   fi
 
@@ -34,7 +34,7 @@ function parse_release {
 
 # Parse args
 RELEASE=
-if [ -z "$1" ]; then
+if [[ -z "$1" || "$1" = -* ]]; then
   usage
 elif [ "$1" == develop ]; then
   RELEASE=$1
@@ -47,8 +47,9 @@ fi
  echo "Updating odt docs for release $RELEASE"
  sed -i "s|\(OpenCPI Release \)[^<]*|\1$RELEASE|" shared/release.fodt
  for f in *.fodt; do
-     sed -i 's|\( xlink:href="https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^"]*"\)|\1'"$RELEASE"'\2|g' "$f"
-     sed -i 's|\(>https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^<]*<\)|\1'"$RELEASE"'\2|g' "$f"
+   sed -i "s|\(OpenCPI Release \)[^<]*|\1$RELEASE|" "$f"
+   sed -i 's|\( xlink:href="https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^"]*"\)|\1'"$RELEASE"'\2|g' "$f"
+   sed -i 's|\(>https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^<]*<\)|\1'"$RELEASE"'\2|g' "$f"
  done
 )
 

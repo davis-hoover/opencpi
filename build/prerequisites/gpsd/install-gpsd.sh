@@ -40,7 +40,7 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
 # per-platform, to the build directory for the platform
 here=$(basename $PWD)
 echo Making a copy of gpsd for platform $platform because gpsd does not yet support separate build directories.
-(cd ..; for i in *; do [ $i != $here ] && cp -R -p $i $here; done)
+(cd ..; for i in *; do [[ $i != ocpi-build-* ]] && cp -R -p $i $here; done)
 
 pwd
 echo $OcpiThisPrerequisiteDir

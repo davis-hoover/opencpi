@@ -40,7 +40,7 @@
   stage: build-primitives-core
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build primitives -d projects/core --hdl-platform $PLATFORM
+    - ocpidev build -d projects/core/hdl/primitives --hdl-platform $PLATFORM
 
 
 ##################################
@@ -52,7 +52,7 @@
   stage: build-primitives-assets
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build primitives -d projects/assets --hdl-platform $PLATFORM
+    - ocpidev build -d projects/assets/hdl/primitives --hdl-platform $PLATFORM
 
 
 ####################################
@@ -64,7 +64,7 @@
   stage: build-primitives-inactive
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build primitives -d projects/inactive --hdl-platform $PLATFORM
+    - ocpidev build -d projects/inactive/hdl/primitives --hdl-platform $PLATFORM
 
 
 ###########################
@@ -237,6 +237,7 @@
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - for f in artifacts-build-workers-*.tar; do tar --concatenate -f artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar $f; done;
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
 
 .build-platforms-core:
   extends:
@@ -303,7 +304,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/core --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 .build-test-assets-base:
   extends:
@@ -311,7 +313,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/base_comps --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 .build-test-assets-comms:
   extends:
@@ -319,7 +322,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/comms_comps --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/assets/components/comms_comps --$MODEL --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 .build-test-assets-dsp:
   extends:
@@ -327,7 +331,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/dsp_comps --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 .build-test-assets-misc:
   extends:
@@ -335,7 +340,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/misc_comps --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/assets/components/misc_comps --$MODEL --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 .build-test-assets-util:
   extends:
@@ -343,7 +349,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/util_comps --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/assets/components/util_comps --$MODEL --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 .build-test-assets_ts:
   extends:
@@ -351,7 +358,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets_ts --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/assets_ts --$MODEL --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 .build-test-inactive:
   extends:
@@ -359,7 +367,8 @@
   stage: build-test
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/inactive --hdl --hdl-platform $PLATFORM
+    - ocpidev build test -d projects/inactive --$MODEL --$MODEL-platform $PLATFORM
+    - find -type f -name case*.*.in -delete
 
 
 ###############
@@ -370,7 +379,7 @@
   artifacts: 
     paths: []
   script:
-    - ./scripts/test-opencpi.sh
+    - ./scripts/test-opencpi.sh --no-hdl
 
 .test-core:
   stage: test
@@ -378,7 +387,12 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/core --only-platform $PLATFORM;
+      else 
+        ocpidev run tests -d projects/core --only-platform $PLATFORM;
+      fi
 
 .test-assets-base:
   stage: test
@@ -386,7 +400,12 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e 
-    - ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM; 
+      else 
+        ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM;
+      fi
 
 .test-assets-comms:
   stage: test
@@ -394,7 +413,12 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e 
-    - ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM;
+      else 
+        ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM;
+      fi
 
 .test-assets-dsp:
   stage: test
@@ -402,7 +426,12 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e 
-    - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM;
+      else 
+        ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM;
+      fi
 
 .test-assets-misc:
   stage: test
@@ -410,7 +439,12 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e 
-    - ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM; 
+      else 
+        ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM;
+      fi
 
 .test-assets-util:
   stage: test
@@ -418,7 +452,12 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e 
-    - ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM;
+      else 
+        ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM; 
+      fi
 
 .test-assets_ts:
   stage: test
@@ -426,7 +465,12 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM; 
+      else 
+        ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM;
+      fi
 
 .test-inactive:
   stage: test
@@ -434,7 +478,48 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify
+    - >
+      if [[ -n $IP ]]; then 
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/inactive --only-platform $PLATFORM;
+      else 
+        ocpidev run tests -d projects/inactive --only-platform $PLATFORM; 
+      fi
+
+
+######################
+# Jobs - Test Remote #
+######################
+.test-remote-core:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify
+
+.test-remote-assets:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e 
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets --only-platform $PLATFORM --mode prep_run_verify
+
+.test-remote-assets_ts:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify
+
+.test-remote-inactive:
+  stage: test
+  artifacts: 
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify
 
 
 #############
@@ -463,19 +548,71 @@
     PLATFORM: 'centos6'
     IMAGE: 'centos:6'
 
+.vivado:
+  before_script:
+    - export HOME=$CI_PROJECT_DIR
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - sleep 5
+    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - cat timestamp.txt
+    - ls -lh
+
+.xsim:
+  extends:
+    - .vivado
+  variables:
+    PLATFORM: 'xsim'
+    MODEL: 'hdl'
+
 .xilinx13_3:
   variables:
     PLATFORM: 'xilinx13_3'
+    HW_PLATFORM: 'zed'
+    SW_PLATFORM: 'xilinx13_3'
+    IP: '10.0.0.103'
+    PORT: '1000'
+    MODEL: 'rcc'
 
 .xilinx13_4:
   variables:
     PLATFORM: 'xilinx13_4'
+    HW_PLATFORM: 'zed'
+    SW_PLATFORM: 'xilinx13_4'
+    IP: '10.0.0.103'
+    PORT: '1000'
+    MODEL: 'rcc'
 
-.xsim:
+.zed-xilinx13_3:
+  extends:
+    - .vivado
   variables:
-    PLATFORM: 'xsim'
-    PLATFORM_DIR: 'assets'
+    PLATFORM: 'zed'
+    HW_PLATFORM: 'zed'
+    SW_PLATFORM: 'xilinx13_3'
+    IP: '10.0.0.103'
+    PORT: '1000'
+    MODEL: 'hdl'
 
+.zed-xilinx13_4:
+  extends:
+    - .vivado
+  variables:
+    PLATFORM: 'zed'
+    HW_PLATFORM: 'zed'
+    SW_PLATFORM: 'xilinx13_4'
+    IP: '10.0.0.103'
+    PORT: '1000'
+    MODEL: 'hdl'
+
+.matchstiq_z1-xilinx13_3:
+  variables:
+    PLATFORM: 'matchstiq_z1'
+    HW_PLATFORM: 'matchstiq_z1'
+    SW_PLATFORM: 'xilinx13_3'
+    IP: '10.0.0.53'
+    PORT: '1000'
+    MODEL: 'hdl'
+  
 
 ########
 # Misc #
@@ -486,3 +623,27 @@
     expire_in: '24h'
     paths: 
       - artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+
+.ocpiremote:
+  before_script:
+    - export HOME=$CI_PROJECT_DIR
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - rm -f artifacts*.tar
+    - sleep 5
+    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - cat timestamp.txt
+    - ls -lh
+    - source ./cdk/opencpi-setup.sh -e
+    - make deploy Platforms=$HW_PLATFORM:$SW_PLATFORM
+    - echo "IP- $IP"
+    - echo "PORT- $PORT"
+    - echo "HW- $HW_PLATFORM"
+    - echo "SW- $SW_PLATFORM"
+    - ocpiremote load -i $IP -r $PORT -w $HW_PLATFORM -s $SW_PLATFORM
+    - ocpiremote start -i $IP
+  after_script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpiremote unload -i $IP
+    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_ID.txt
+    - tar -T artifacts-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_ID.tar
+    - ls -lh artifacts-$CI_JOB_ID.tar

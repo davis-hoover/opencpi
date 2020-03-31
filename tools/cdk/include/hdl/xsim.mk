@@ -26,7 +26,7 @@ HdlToolName_xsim=Vivado
 # you should not need the corresponding toolchain installed
 ifndef __ONLY_TOOL_VARS__
 
-include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
+include $(OCPI_CDK_DIR)/include/xilinx/xilinx.mk
 
 ################################################################################
 # $(call HdlToolLibraryFile,target,libname)
