@@ -36,6 +36,7 @@ Configurations=\
 
 ExportFiles=zed_ise.ucf zed_ise.ut testbias_zed_ise_base.bitz 98-zedboard.rules sd_card
 
+include $(OCPI_CDK_DIR)/include/util.mk
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
     test -e zed_ise.xml || sed "s/'zed'/'zed_ise'/" ../zed/zed.xml > zed_ise.xml; \

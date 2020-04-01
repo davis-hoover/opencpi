@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -34,7 +34,7 @@ try:
     import jinja2
     from jinja2 import Template
 except ImportError:
-    print("ERROR : Could not import jinja2; try 'sudo yum install python34-jinja2'",
+    print("ERROR : Could not import jinja2; try 'sudo yum install python3-jinja2'",
           file=sys.stderr)
     sys.exit(1)
 
@@ -481,14 +481,16 @@ def prompt_to_overwrite(filename, warn_existing=False):
     return res == "y"
 
 
-def emit_datasheet_tex_file(comp_name, copyright):
+def emit_datasheet_tex_file(comp_name, copyright, prompt):
     """ Main routine that creates the LaTeX files after parsing the XML.
     """
     datasheet_filename = normalize_file_name(comp_name + ".tex")
     UC_NAME = (" ".join(re.split('[-_]', comp_name))).title()
     LC_NAME = latexify(comp_name)
 
-    if not prompt_to_overwrite(datasheet_filename):
+    if not prompt and os.path.isfile(datasheet_filename):
+            return
+    if not prompt_to_overwrite(datasheet_filename, warn_existing=True):
         return
     print_info("emitting {0} (compile using rubber -d {0})".format(datasheet_filename))
     j_template = LATEX_JINJA_ENV.get_template("Component_Template.tex")
@@ -499,11 +501,12 @@ def emit_datasheet_tex_file(comp_name, copyright):
 
 
 def emit_property_table_inc_file(thing_with_props, filename, title_text, name,
-                                 is_OCS, first_worker, copyright):
+                                 is_OCS, first_worker, copyright, prompt):
     j_template = LATEX_JINJA_ENV.get_template("Properties.tex")
     latex_rows = []
-    if not prompt_to_overwrite(filename):
-        return
+    if prompt:
+        if not prompt_to_overwrite(filename):
+            return
     for key in thing_with_props.properties:
         latex_rows.append(thing_with_props.properties[key].as_latex_table_row())
     with open(filename, 'w') as outfile:
@@ -519,12 +522,13 @@ def emit_property_table_inc_file(thing_with_props, filename, title_text, name,
 
 
 def emit_ports_table_inc_file(thing_with_ports, filename, title_text, name,
-                              is_OCS, is_HDL, first_worker, copyright):
+                              is_OCS, is_HDL, first_worker, copyright, prompt):
     """ Main routine for port tables to a file """
     j_template = LATEX_JINJA_ENV.get_template("Ports.tex")
     latex_rows = []
-    if not prompt_to_overwrite(filename):
-        return
+    if prompt:
+        if not prompt_to_overwrite(filename):
+            return
     if is_HDL:
         for key in thing_with_ports.stream_interfaces:
             latex_rows.append(
@@ -545,23 +549,23 @@ def emit_ports_table_inc_file(thing_with_ports, filename, title_text, name,
                                ), file=outfile)
 
 
-def emit_latex_inc_files(component, worker_dict, copyright):
+def emit_latex_inc_files(component, worker_dict, copyright, prompt):
     """ Creates the various .inc snippet files based on parsed data """
-    emit_developer_doc_inc_file(copyright=copyright)
+    emit_developer_doc_inc_file(copyright=copyright, prompt=prompt)
     emit_property_table_inc_file(component,
                                  filename="component_spec_properties.inc",
                                  title_text="Component Properties",
                                  name=component.name,
                                  is_OCS=True,
                                  first_worker=False,
-                                 copyright=copyright)
+                                 copyright=copyright, prompt=prompt)
     emit_ports_table_inc_file(component,
                               filename="component_ports.inc",
                               title_text="Component Ports",
                               name=component.name,
                               is_OCS=True, is_HDL=False,
                               first_worker=False,
-                              copyright=copyright)
+                              copyright=copyright, prompt=prompt)
     with open('worker_properties.inc', 'w') as fprop:
         emit_latex_header(fprop, user_edits=False, copyright=copyright)
         with open('worker_interfaces.inc', 'w') as finterface:
@@ -580,7 +584,7 @@ def emit_latex_inc_files(component, worker_dict, copyright):
                                              name=latexify(name),
                                              is_OCS=False,
                                              first_worker=first_worker,
-                                             copyright=copyright)
+                                             copyright=copyright, prompt=prompt)
                 first_worker = False
             first_worker = True
             if len(worker_dict) > 0:
@@ -597,15 +601,17 @@ def emit_latex_inc_files(component, worker_dict, copyright):
                                           name=latexify(name),
                                           is_OCS=False, is_HDL=is_HDL,
                                           first_worker=first_worker,
-                                          copyright=copyright)
+                                          copyright=copyright, prompt=prompt)
                 first_worker = False
         fprop.close()
         finterface.close()
 
 
-def emit_developer_doc_inc_file(copyright):
+def emit_developer_doc_inc_file(copyright, prompt):
     """ Creates "main" developer doc that they probably DON'T want to edit """
     DEVELOPER_DOC_INC_FILENAME = 'developer_doc.inc'
+    if not prompt and os.path.isfile(DEVELOPER_DOC_INC_FILENAME):
+        return
     if not prompt_to_overwrite(DEVELOPER_DOC_INC_FILENAME, warn_existing=True):
         return
     print_info("emitting " + DEVELOPER_DOC_INC_FILENAME +
@@ -682,14 +688,18 @@ def main():
                         help='path to OWD file (can specify multiple)')
     parser.add_argument('-c', '--copyright', default=False, action='store_true',
                         help='insert copyright into LaTex files')
+    parser.add_argument('-n', '--no-prompt', default=False, action='store_true',
+                        help='will not prompt for overwrite of existing auto-generated files (no overwrite will occur)')
     args = parser.parse_args()
 
     throw_if_any_files_have_xi_include([args.ocs])
     if args.owd is not None:
         throw_if_any_files_have_xi_include(args.owd)
     [component, worker_dict] = parse_files(args.ocs, args.owd)
-    emit_datasheet_tex_file(component.name, args.copyright)
-    emit_latex_inc_files(component, worker_dict, args.copyright)
+    emit_datasheet_tex_file(component.name, args.copyright,
+                            prompt=not args.no_prompt)
+    emit_latex_inc_files(component, worker_dict, args.copyright,
+                         prompt=not args.no_prompt)
 
 
 if __name__ == '__main__':

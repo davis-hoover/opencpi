@@ -126,6 +126,9 @@ else
   OcpiKernelRelease:=$(shell uname -r)
   # this command should be platform-specific (e.g. different for debian etc.)
   OcpiKernelHeadersVersion:=$(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)
+  ifeq ($(OcpiKernelHeadersVersion),)
+    OcpiKernelHeadersVersion:=$(OcpiKernelRelease)
+  endif
   $(info --- The running kernel is release: $(OcpiKernelRelease))
   $(info --- The current kernel-headers package is version: $(OcpiKernelHeadersVersion))
   ifdef KERNELDIR
@@ -141,8 +144,12 @@ else
       ifneq ($(wildcard $(KERNELDIR)),)
         $(info --- Using the kernel headers version at: $(KERNELDIR))
       else
-        $(info XXX: $(shell ls -l /lib/modules ))
-        $(error Cannot find a kernel headers directory.  Tried $(try1) and $(KERNELDIR))
+        KERNELDIR=/usr/src/linux-headers-$(OcpiKernelHeadersVersion)
+        ifneq ($(wildcard $(KERNELDIR)),)
+          $(info --- Using the kernel headers version at: $(KERNELDIR))
+        else
+          $(error Cannot find a kernel headers directory.  Tried $(try1) and $(KERNELDIR))
+        endif
       endif
     else
       $(info --- Using the kernel release at: $(KERNELDIR))
@@ -165,13 +172,6 @@ MyIncs?= \
          -I$(realpath $(MyDir)/../../interfaces/include)
 MyLib:=$(realpath $(OCPI_CDK_DIR)/$(OCPI_TARGET_DIR)/lib)
 $(infox x:$(MyTargetDir) $(MyDir))
-ifneq ($(MAKECMDGOALS),topclean)
-  ifdef OCPI_TARGET_PLATFORM
-    ifeq ($(strip $(MyLib)),)
-      $(error OpenCPI libraries must be built before the driver is built)
-    endif
-  endif
-endif
 # This is what works with RHEL5
 export EXTRA_CFLAGS := $(MyIncs) -Wformat=2
 # This is what works with Centos6

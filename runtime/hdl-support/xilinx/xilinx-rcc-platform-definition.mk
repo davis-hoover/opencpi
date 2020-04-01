@@ -28,6 +28,7 @@ xilinx_sw_platform:=$(basename $(notdir $(lastword $(filter-out $(lastword $(MAK
 xilinx_sw_fields:=$(subst _, ,$(subst xilinx,,$(xilinx_sw_platform)))
 xilinx_sw_version:=$(word 1,$(xilinx_sw_fields))_$(word 2,$(xilinx_sw_fields))
 xilinx_sw_arch:=$(word 3,$(xilinx_sw_fields))
+
 xilinx_version_tag:=20$(subst _,.,$(xilinx_sw_version))
 $(info Platform is: $(xilinx_sw_platform).  Version is: $(xilinx_sw_version).  Architecture is: $(xilinx_sw_arch))
 ifndef xilinx_sw_tool_dir
@@ -35,12 +36,23 @@ ifndef xilinx_sw_tool_dir
     OCPI_XILINX_VIVADO_SDK_VERSION:=$(xilinx_version_tag)
   endif
   include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
-  xilinx_sw_tool_dir:=$(call OcpiXilinxSdkDir,$(if $(filter deploy clean%,$(MAKECMDGOALS)),warning,error))/gnu/$(xilinx_sw_arch)/lin/gcc-arm-linux-gnueabi/bin
+  xilinx_sdk_dir:=$(call OcpiXilinxSdkDir,$(if $(filter deploy clean%,$(MAKECMDGOALS)),warning,error))/gnu
+  xilinx_lin:=$(strip\
+    $(or $(wildcard $(xilinx_sdk_dir)/$(xilinx_sw_arch)),\
+	 $(and $(filter aarch32,$(xilinx_sw_arch)),$(wildcard $(xilinx_sdk_dir)/arm)),\
+         $(error Could not find an architecture directory for "$(xilinx_sw_arch)" in $(xilinx_sdk_dir))))/lin
+  ifeq ($(xilinx_sw_arch),aarch64)
+    xilinx_sw_tool_dir:=$(xilinx_lin)/aarch64-linux/bin
+    xilinx_sw_tool_prefix:=aarch64-linux-gnu-
+  else ifeq ($(xilinx_sw_arch),aarch32)
+    xilinx_sw_tool_dir:=$(xilinx_lin)/gcc-arm-linux-gnueabi/bin
+    xilinx_sw_tool_prefix:=arm-linux-gnueabihf-
+  else ifeq ($(xilinx_sw_arch),arm)
+    xilinx_sw_tool_dir:=$(xilinx_lin)/bin
+    xilinx_sw_tool_prefix:=arm-xilinx-linux-gnueabi-
+  endif
 else
   include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
-endif
-ifndef xilinx_sw_tool_prefix
-  xilinx_sw_tool_prefix:=arm-linux-gnueabihf-
 endif
 ifeq ($(filter deploy clean%,$(MAKECMDGOALS))$(wildcard $(xilinx_sw_tool_dir)),)
   $(error When setting up to build for zynq for $(xilinx_sw_platform), cannot find $(xilinx_sw_tool_dir). Perhaps the SDK was not installed\
@@ -50,6 +62,6 @@ endif
 # For now these next three are in fact rewritten in each definition file...
 OcpiPlatformOs:=linux
 OcpiPlatformOsVersion:=x$(xilinx_version)
-OcpiPlatformArch:=$(xilinx_arch)
+OcpiPlatformArch:=$(xilinx_sw_arch)
 OcpiKernelDir:=kernel-headers
 OcpiCrossCompile:=$(xilinx_sw_tool_dir)/$(xilinx_sw_tool_prefix)

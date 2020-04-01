@@ -23,7 +23,7 @@
 # If they are in this project, they must be compiled first, and this requires that the
 # PrimitiveLibraries variable be set in the hdl/primitives/Makefile such that the
 # libraries are in dependency order.
-Libraries=fixed_float ocpi util misc_prims
+Libraries=fixed_float ocpi util protocol misc_prims
 
 # Set this variable to the list of source files in dependency order
 # If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
@@ -34,8 +34,7 @@ SourceFiles=$(patsubst %,%.vhd,\
 	pd/src/peakDetect \
 	zp/src/zero_padding_gen \
 	mult/src/complex_mult \
-	divide_by_constant/src/divide_by_constant \
-	set_clr/src/set_clr)
+	divide_by_constant/src/divide_by_constant)
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:
 # 1. Any entity (VHDL) or module (verilog) must have a VHDL component declaration in util_prims_pkg.vhd

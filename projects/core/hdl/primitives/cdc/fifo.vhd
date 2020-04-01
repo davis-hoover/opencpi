@@ -139,7 +139,7 @@ architecture rtl of fifo is
     variable incrGray  : std_logic_vector(INDXWIDTH downto 0);
   begin
     flips(0) := not parity;
-    for i in 1 to INDXWIDTH loop
+    for i in 1 to INDXWIDTH-1 loop
       tempshift := std_logic_vector(signed(grayin) sll (2 + INDXWIDTH - i));
       flips(i)  := parity and grayin(i-1) and (not or_reduce(tempshift));
     end loop;

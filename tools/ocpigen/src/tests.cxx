@@ -1215,7 +1215,7 @@ namespace {
       std::string file(dir + "/" + name);
       std::string verify;
       OU::format(verify,
-                 "#!/bin/sh --noprofile\n"
+                 "#!/bin/bash --noprofile\n"
                  "# Verification and/or viewing script for case: %s\n"
                  "# Args are: <worker> <subcase> <verify> <view>\n"
                  "# Act like a normal process if get this signal\n"
@@ -1404,37 +1404,39 @@ namespace {
           excludedPlatforms.insert(m_excludePlatforms.begin(), m_excludePlatforms.end());
         }
 
+	std::string hdr;
         // Now that all platforms exclusions have been collected, generate list
-        fprintf(out, "    <subcase id='%u'", s);
+	OU::format(hdr, "    <subcase id='%u'", s);
         if (excludedPlatforms.size() && !onlyPlatforms.size() && !m_onlyPlatforms.size()) {
-          fprintf(out, " exclude='");
+          OU::formatAdd(hdr, " exclude='");
           for (auto si = excludedPlatforms.begin(); si != excludedPlatforms.end(); ++si) {
-            fprintf(out, "%s%s", si == excludedPlatforms.begin() ? "" : " ", si->c_str());
+            OU::formatAdd(hdr, "%s%s", si == excludedPlatforms.begin() ? "" : " ", si->c_str());
           }
-    	  fprintf(out, "'");
+    	  OU::formatAdd(hdr, "'");
         }
         // Now we know which platforms should be included
         if (m_onlyPlatforms.size()) {
-          fprintf(out, " only='");
+          OU::formatAdd(hdr, " only='");
           for (auto si = m_onlyPlatforms.begin(); si != m_onlyPlatforms.end(); ++si) {
-            fprintf(out, "%s%s", si == m_onlyPlatforms.begin() ? "" : " ", si->c_str());
+            OU::formatAdd(hdr, "%s%s", si == m_onlyPlatforms.begin() ? "" : " ", si->c_str());
           }
-          fprintf(out, "'");
+          OU::formatAdd(hdr, "'");
         } else if (onlyPlatforms.size()) {
-          fprintf(out, " only='");
+          OU::formatAdd(hdr, " only='");
           for (auto si = onlyPlatforms.begin(); si != onlyPlatforms.end(); ++si) {
             const char *p = si->c_str();
             if (m_excludePlatforms.size()  && m_excludePlatforms.find(p) != m_excludePlatforms.end())
               continue;
-            fprintf(out, "%s%s", si == onlyPlatforms.begin() ? "" : " ", p);
+            OU::formatAdd(hdr, "%s%s", si == onlyPlatforms.begin() ? "" : " ", p);
           }
-          fprintf(out, "'");
+          OU::formatAdd(hdr, "'");
         }
         if (m_timeout)
-          fprintf(out, " timeout='%zu'", m_timeout);
+          OU::formatAdd(hdr, " timeout='%zu'", m_timeout);
         if (m_duration)
-          fprintf(out, " duration='%zu'", m_duration);
-        fprintf(out, ">\n");
+          OU::formatAdd(hdr, " duration='%zu'", m_duration);
+        OU::formatAdd(hdr, ">\n");
+	bool noConfigs = true;
         // For each worker configuration, decide whether it can support the subcase.
         // Note worker configs only have *parameters*, while subcases can have runtime properties
         for (WorkerConfigsIter wci = configs.begin(); wci != configs.end(); ++wci) {
@@ -1504,12 +1506,16 @@ namespace {
                 OU::formatAdd(ports, "%s%s", first ? "" : " ", m_ports[n].m_port->pname());
                 first = false;
               }
+	    if (noConfigs)
+	      fprintf(out, "%s", hdr.c_str());
+	    noConfigs = false;
             fprintf(out, "      <worker name='%s' model='%s' outputs='%s'/>\n",
                     name.c_str(), wci->second->m_modelString, ports.c_str());
           }
         skip_worker_config:;
         }
-        fprintf(out, "    </subcase>\n");
+	if (!noConfigs)
+	  fprintf(out, "    </subcase>\n");
       }
       // Output the workers and configurations that are ok to run on this case.
       fprintf(out, "  </case>\n");
@@ -2252,14 +2258,16 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
           i.m_artifact.dynamic() == m_dynamic) {
         unsigned sn = 0;
         for (ezxml_t cx = ezxml_cchild(m_xml, "case"); cx; cx = ezxml_cnext(cx)) {
-          unsigned n = 0;
           const char *name = ezxml_cattr(cx, "name");
-          for (ezxml_t sx = ezxml_cchild(cx, "subcase"); sx; sx = ezxml_cnext(sx), n++, sn++)
-            if (included(m_platform.c_str(), sx))
+          for (ezxml_t sx = ezxml_cchild(cx, "subcase"); sx; sx = ezxml_cnext(sx), sn++)
+            if (included(m_platform.c_str(), sx)) {
+	      const char *id = ezxml_cattr(sx, "id");
+	      size_t n;
+	      ocpiCheck(id && !OE::getUNum(id, &n));
               for (ezxml_t wx = ezxml_cchild(sx, "worker"); wx; wx = ezxml_cnext(wx))
                 if (!strcmp(i.m_metadataImpl.cname(), ezxml_cattr(wx, "name")) &&
                     i.m_metadataImpl.model() == ezxml_cattr(wx, "model")) {
-                  ocpiInfo("Accepted for case %s subcase %u from file: %s", name, n,
+                  ocpiInfo("Accepted for case %s subcase %zu from file: %s", name, n,
                            i.m_artifact.name().c_str());
                   if (m_first) {
                     m_first = false;
@@ -2274,11 +2282,11 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
                       return true;
                     }
                     fprintf(m_run,
-                            "#!/bin/sh --noprofile\n"
+                            "#!/bin/bash --noprofile\n" // no arg (at least to dash) to suppress reading .profile etc.
                             "# Note that this file runs on remote/embedded systems and thus\n"
                             "# may not have access to the full development host environment\n"
                             "failed=0\n"
-                            "source $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
+                            ". $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
                             m_spec.c_str(), m_platform.c_str(), ezxml_cattr(wx, "outputs"));
                   }
                   const char
@@ -2287,12 +2295,13 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
                     *w = ezxml_cattr(wx, "name"),
                     *o = ezxml_cattr(wx, "outputs");
                   std::string doit;
-                  OU::format(doit, "docase %s %s %s %02u %s %s %s\n", m_model.c_str(), w, name, n,
+                  OU::format(doit, "docase %s %s %s %02zu %s %s %s\n", m_model.c_str(), w, name, n,
                              to ? to : "0", du ? du : "0", o);
                   std::string key;
                   OU::format(key, "%08u %s", sn, w);
                   m_runs.insert(RunsPair(key, doit));
                 }
+	    }
         }
         accepted = true;
       }

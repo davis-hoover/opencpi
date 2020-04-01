@@ -381,12 +381,12 @@ OcpiConvertListToPythonList=$(strip \
 # Run the python code in $1
 # Usage: $(call OcpiCallPythonFunc,this_is_a_python_function_with_output())
 OcpiCallPythonFunc=\
-  $(shell python3.4 -c '$1')
+  $(shell python3 -c '$1')
 
 # Import the ocpiutil module and run the python code in $1
 # Usage: $(call OcpiCallPythonUtil,ocpiutil.utility_function(arg1, arg2))
 OcpiCallPythonUtil=$(infox OPYTHON:$1)\
-  $(shell python3.4 -c 'import sys;\
+  $(shell python3 -c 'import sys;\
 sys.path.append("$(OCPI_CDK_DIR)/$(OCPI_TOOL_PLATFORM)/lib/");\
 import _opencpi.util as ocpiutil;\
 $1')
@@ -543,20 +543,25 @@ OcpiGetExtendedProjectPath=$(strip\
 #
 # Note: the path 'platforms' without a leading 'rcc/' is searched as well for legacy
 #       compatibilty before rcc platforms were supported outside of the CDK
+#       exports/lib/rcc/platforms is deprecated
 OcpiGetRccPlatformPaths=$(strip \
                           $(foreach p,$(OCPI_PROJECT_DIR),\
                             $(call OcpiExists,$p/rcc/platforms))\
                           $(foreach p,$(OcpiGetExtendedProjectPath),\
                             $(if $(filter-out $(realpath $(OCPI_PROJECT_DIR)),\
                                               $(realpath $(call OcpiAbsPathToContainingProject,$p))),\
-                              $(or $(call OcpiExists,$p/exports/lib/rcc/platforms),\
-                                   $(call OcpiExists,$p/rcc/platforms)))))
+                              $(or $(call OcpiExists,$p/exports/rcc/platforms),$(strip \
+                                   $(call OcpiExists,$p/rcc/platforms))))))
 
 # Search for a given platform ($1) in the list of 'rcc/platform' directories found
-# by OcpiGetRccPlatformPaths.
+# by OcpiGetRccPlatformPaths.  The search priority is:
+# 1. if the project is exported, just use rcc/platforms/$1
+# 2. if not exported, look for a platform export in rcc/platforms/$1/lib
+# 3. assume a raw source tree with no project or platform exports, and use rcc/platforms/$1
 OcpiGetRccPlatformDir=$(strip $(firstword \
 		        $(foreach p,$(OcpiGetRccPlatformPaths),\
-                          $(call OcpiExists,$p/$1))))
+                          $(if $(findstring /exports/rcc/,$p/$1),$(call OcpiExists,$p/$1),\
+                               $(or $(call OcpiExists,$p/$1/lib),$(call OcpiExists,$p/$1))))))
 
 ##################################################################################
 # Functions for collecting Project Dependencies and imports for use with project
