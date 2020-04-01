@@ -1,4 +1,3 @@
-#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,12 +16,12 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-set -e
-# Run all test scripts in dropin-tests/
-cd dropin-tests/
-for t in ./*.sh; do
-  echo ==========Running ocpidev dropin test: $t==============
-  if ! ./$t; then
-    echo ERROR:  TEST FAILED && exit 1
-  fi
-done
+##########################################################################################
+# This file defines the mint18 software platform.
+# It sets platform variables as necessary to override the defaults in the file:
+#   include/platform-defaults.mk file.
+# See that file for a description of valid variables and their defaults.
+
+OcpiPlatformOs=linux
+OcpiPlatformOsVersion=m19
+OcpiPlatformArch=x86_64
