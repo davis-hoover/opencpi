@@ -35,7 +35,7 @@ default:
     - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
-  timeout: 16h
+  timeout: 24h
 
 # Includes yaml files in the '.gitlab-ci' directory.
 # Folder structure for the directory is as follows:
@@ -51,6 +51,7 @@ include:
 
   # centos6
   - /.gitlab-ci/centos6/xsim.yml
+  # - /.gitlab-ci/centos6/isim.yml
   - /.gitlab-ci/centos6/zed.yml
   - /.gitlab-ci/centos6/xilinx13_3.yml
   - /.gitlab-ci/centos6/xilinx13_4.yml
@@ -58,6 +59,7 @@ include:
   
   # centos7
   - /.gitlab-ci/centos7/xsim.yml
+  # - /.gitlab-ci/centos7/isim.yml
   - /.gitlab-ci/centos7/zed.yml
   - /.gitlab-ci/centos7/xilinx13_3.yml
   - /.gitlab-ci/centos7/xilinx13_4.yml
