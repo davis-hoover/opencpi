@@ -1,0 +1,16 @@
+trigger-downstream:e3xx:
+  stage: prereq
+  extends:
+    - .centos7
+    - .docker
+  before_script: []
+  script:
+    - >
+      curl --request POST
+      --form token=$CI_JOB_TOKEN
+      --form ref=develop
+      --form "variables[REF_NAME]=$CI_COMMIT_REF_NAME"
+      https://gitlab.com/api/v4/projects/12747905/trigger/pipeline
+  after_script: []
+  artifacts:
+    paths: []

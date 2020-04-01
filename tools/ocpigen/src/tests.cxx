@@ -2258,14 +2258,16 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
           i.m_artifact.dynamic() == m_dynamic) {
         unsigned sn = 0;
         for (ezxml_t cx = ezxml_cchild(m_xml, "case"); cx; cx = ezxml_cnext(cx)) {
-          unsigned n = 0;
           const char *name = ezxml_cattr(cx, "name");
-          for (ezxml_t sx = ezxml_cchild(cx, "subcase"); sx; sx = ezxml_cnext(sx), n++, sn++)
-            if (included(m_platform.c_str(), sx))
+          for (ezxml_t sx = ezxml_cchild(cx, "subcase"); sx; sx = ezxml_cnext(sx), sn++)
+            if (included(m_platform.c_str(), sx)) {
+	      const char *id = ezxml_cattr(sx, "id");
+	      size_t n;
+	      ocpiCheck(id && !OE::getUNum(id, &n));
               for (ezxml_t wx = ezxml_cchild(sx, "worker"); wx; wx = ezxml_cnext(wx))
                 if (!strcmp(i.m_metadataImpl.cname(), ezxml_cattr(wx, "name")) &&
                     i.m_metadataImpl.model() == ezxml_cattr(wx, "model")) {
-                  ocpiInfo("Accepted for case %s subcase %u from file: %s", name, n,
+                  ocpiInfo("Accepted for case %s subcase %zu from file: %s", name, n,
                            i.m_artifact.name().c_str());
                   if (m_first) {
                     m_first = false;
@@ -2280,11 +2282,11 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
                       return true;
                     }
                     fprintf(m_run,
-                            "#!/bin/bash --noprofile\n"
+                            "#!/bin/bash --noprofile\n" // no arg (at least to dash) to suppress reading .profile etc.
                             "# Note that this file runs on remote/embedded systems and thus\n"
                             "# may not have access to the full development host environment\n"
                             "failed=0\n"
-                            "source $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
+                            ". $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
                             m_spec.c_str(), m_platform.c_str(), ezxml_cattr(wx, "outputs"));
                   }
                   const char
@@ -2293,12 +2295,13 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
                     *w = ezxml_cattr(wx, "name"),
                     *o = ezxml_cattr(wx, "outputs");
                   std::string doit;
-                  OU::format(doit, "docase %s %s %s %02u %s %s %s\n", m_model.c_str(), w, name, n,
+                  OU::format(doit, "docase %s %s %s %02zu %s %s %s\n", m_model.c_str(), w, name, n,
                              to ? to : "0", du ? du : "0", o);
                   std::string key;
                   OU::format(key, "%08u %s", sn, w);
                   m_runs.insert(RunsPair(key, doit));
                 }
+	    }
         }
         accepted = true;
       }

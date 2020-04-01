@@ -16,13 +16,10 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-## Development files for building for this platform
-+<platform-dir>/zed.xdc
-+<platform-dir>/zed_bit.xdc
+REPO_PATH=../../../../../../
 
-# Udev rules for runtime on dev host
-# They are always placed in the udev-rules subdir in the runtime packages
-=<platform-dir>/98-zedboard.rules udev-rules/98-zedboard.rules
-
-# Assume that all the boot files are in the software platforms for now
-@<rcc-platform-dir>/hdl/zed/boot/*
+${REPO_PATH}/doc/av/tex/docGen.py \
+    ${REPO_PATH}/projects/assets/components/dsp_comps/specs/real_digitizer-spec.xml \
+    -owd \
+    ${REPO_PATH}/projects/assets/components/dsp_comps/real_digitizer.rcc/real_digitizer.xml \
+    --no-prompt

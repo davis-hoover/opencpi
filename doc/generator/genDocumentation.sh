@@ -161,6 +161,7 @@ tex_kernel() {
   expr match $tex '.*/' >/dev/null && cd "$(dirname $tex)"
   ofile=$(basename -s .tex $tex)
   warn_existing_pdf "${OUTPUT_PATH}/${prefix}" ${ofile} $d && return
+  [ -f Makefile ] && make
   rubber -d $ofile.tex || FAIL=1
   # If the pdf was created then copy it out
   if [ ! -f $ofile.pdf -o -n "${FAIL}" ]; then
