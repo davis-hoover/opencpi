@@ -39,8 +39,8 @@ namespace {
         library_to_load = "libm.";
         sym_to_load = "atan";
 #else
-        library_to_load = sym_to_load = "FAIL";
-        std::cerr << "[ WARNING! ] This platform is not fully testable and some tests may fail.\n";
+	library_to_load = sym_to_load = "FAIL";
+	std::cerr << "[ WARNING! ] This platform is not fully testable and some tests may fail.\n";
 #endif
         library_to_load += LoadableModule::suffix();
       }
