@@ -26,8 +26,8 @@
 # Otherwise, this is likely a runtime-only evironment, and the registry should
 # be determined based solely on the environment and defaults.
 function getProjectRegistryDir {
-  if [ -n "$OCPI_CDK_DIR" -a -n "$(command -v python3.4 2> /dev/null)" -a -r $OCPI_CDK_DIR/scripts/ocpiutil.py ]; then
-    python3.4 -c "\
+  if [ -n "$OCPI_CDK_DIR" -a -n "$(command -v python3 2> /dev/null)" -a -r $OCPI_CDK_DIR/scripts/ocpiutil.py ]; then
+    python3 -c "\
 import sys; sys.path.insert(0,\"$OCPI_CDK_DIR/scripts/\");
 import ocpiassets; print(ocpiassets.Registry.get_registry_dir());"
   elif [ -n "$OCPI_PROJECT_REGISTRY_DIR" ]; then
@@ -197,7 +197,7 @@ function ocpiGetToolOS {
 # do readlink -e, but more portably
 # There are 100 ways to do this....
 function ocpiReadLinkE {
-  [ -f $1 -o -d $1 ] && python3.4 -c 'import os; print(os.path.realpath("'$1'"))'
+  [ -f $1 -o -d $1 ] && python3 -c 'import os; print(os.path.realpath("'$1'"))'
 }
 
 function ocpiDirType {
@@ -211,7 +211,7 @@ function ocpiDirType {
 
 OcpiEcho=/bin/echo
 
-if [ "$1" == __test__ ] ; then
+if [ "$1" = __test__ ] ; then
   if eval findInProjectPath $2 $3 result ; then
     echo good result is $result
   else

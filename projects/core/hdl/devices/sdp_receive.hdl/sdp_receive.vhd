@@ -37,7 +37,7 @@ architecture rtl of worker is
     ndws_left : metalength_dws_t; -- left AFTER FIRST WSI XFER
     zlm       : bool_t;           -- this is a zlm
     eof       : bool_t;           -- this is an EOF
-    last_be   : std_logic_vector(dword_bytes * sdp_width_c-1 downto 0);    
+    last_be   : std_logic_vector(dword_bytes * sdp_width_c-1 downto 0);
     opcode    : std_logic_vector(meta_opcode_width_c-1 downto 0);
   end record msginfo_t;
   constant msginfo_width_c : natural :=
@@ -231,7 +231,7 @@ g0: for i in 0 to sdp_width_c-1 generate
     when md_in_byte_bits = 0 and md_in_dws_bits >= sdp_width else
     md_in_dws_bits - (sdp_width - 1)
     when md_in_byte_bits /= 0 and md_in_dws_bits >= sdp_width - 1 else
-    (others => '0');   
+    (others => '0');
   md_in.last_be <=
     (others => '1') when md_in_raw.length(addr_shift_c-1 downto 0) = 0 else
     slv(not (unsigned(slv1(sdp_width_c*dword_bytes)) sll

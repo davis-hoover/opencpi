@@ -271,7 +271,7 @@ g1: for i in 0 to sdp_width-1 generate
   --------------------------------------------------------------------------------
   -- Module output ports on the SDP side
   --------------------------------------------------------------------------------
-  -- For data arriving on sdp_in: 
+  -- For data arriving on sdp_in:
   sdp_out.sdp.ready          <= taking;
   -- For flag writes and data reads leaving on sdp_out:
   sdp_out.sdp.header.op      <= read_e when its(reading_r) else write_e;

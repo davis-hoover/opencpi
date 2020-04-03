@@ -382,12 +382,12 @@ OcpiConvertListToPythonList=$(strip \
 # Run the python code in $1
 # Usage: $(call OcpiCallPythonFunc,this_is_a_python_function_with_output())
 OcpiCallPythonFunc=\
-  $(shell python3.4 -c '$1')
+  $(shell python3 -c '$1')
 
 # Import the ocpiutil module and run the python code in $1
 # Usage: $(call OcpiCallPythonUtil,ocpiutil.utility_function(arg1, arg2))
 OcpiCallPythonUtil=$(infox OPYTHON:$1)\
-  $(shell python3.4 -c 'import sys;\
+  $(shell python3 -c 'import sys;\
 sys.path.append("$(OCPI_CDK_DIR)/$(OCPI_TOOL_PLATFORM)/lib/");\
 import _opencpi.util as ocpiutil;\
 $1')
