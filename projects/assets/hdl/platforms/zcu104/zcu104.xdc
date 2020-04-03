@@ -1519,3 +1519,7 @@ set_property PACKAGE_PIN R10      [get_ports "HDMI_RX_CLK_C_P"] ;# Bank 227 - MG
 #Other net   PACKAGE_PIN AD22     - VCCINT_VCU                Bank 999 - VCCINT_VCU
 #Other net   PACKAGE_PIN AD23     - VCCINT_VCU                Bank 999 - VCCINT_VCU
 #Other net   PACKAGE_PIN AD24     - VCCINT_VCU                Bank 999 - VCCINT_VCU
+
+# OpenCPI additions to the above, which is unmodified from the original
+create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i/worker/ps/U0/PS8_i/PLCLK[0]}]
+set_property DONT_TOUCH true [get_cells "ftop/pfconfig_i/zcu104_i/worker/ps/U0/PS8_i"]

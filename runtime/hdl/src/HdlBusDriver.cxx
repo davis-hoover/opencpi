@@ -69,11 +69,15 @@
 	     m_driver(driver), m_vaddr(NULL) {
 	   m_isAlive = false;
 	   m_endpointSize = sizeof(OccpSpace);
-	   if (OF::exists(fpgaMgrState)) // && OF::exists(fpgaMgrFirmware))
+	   if (OF::exists(fpgaMgrState)) { // && OF::exists(fpgaMgrFirmware))
 	     m_fpgaManager = true;
-	   else if (OF::exists(xdevCfgState) && !::access(xdevCfgDevice, F_OK)) // need access() for char device
+	     ocpiInfo("HDL Device %s will use the FPGA Manager linux kernel support (no %s)",
+		      a_name.c_str(), fpgaMgrState);
+	   } else if (OF::exists(xdevCfgState) && !::access(xdevCfgDevice, F_OK)) {
+	     // need access() for char device
 	     m_fpgaManager = false;
-	   else {
+	     ocpiInfo("HDL Device %s will use the /dev/xdevcfg linux kernel support", a_name.c_str());
+	   } else {
 	     err = "FPGA support not present for Zynq PL, required files are missing";
 	     return;
 	   }
@@ -96,6 +100,15 @@
 	   // Any delayed setup-before-usage that can be deferred beyond discovery
 	  const char *p = ezxml_cattr(config, "platform");
 	  m_platform = p ? p : "zed"; // FIXME: is there any other automatic way for this?
+	  // since we can't get at the real IDCODE yet
+	  if (m_platform == "zcu102")
+	    m_part = "xczu9eg";
+	  else if (m_platform == "zcu111")
+	    m_part = "xczu28dr";
+	  else if (m_platform == "zcu104")
+	    m_part = "xczu7ev";
+	  else
+	    m_part = "xczu9eg";
 	  return OCPI::HDL::Device::configure(config, err);
 	}
 	bool
@@ -134,6 +147,16 @@
 	    return true;
 	  *reg = 0;  // set gp0/1 to 32bit mode
 	  if (m_driver.unmap((uint8_t *)reg, sizeof(*reg), err))
+	    return true;
+	  volatile OM::ALL_AFIFMS *axi_hp;
+	  if (!(axi_hp =
+		(volatile OM::ALL_AFIFMS *)m_driver.map(sizeof(OM::ALL_AFIFMS), OM::S_AXI_HPX_FPD_ADDR, err)))
+	    return true;
+	  for (unsigned n = 0; n <  OM::NUM_S_AXI_HPNCS; n++) {
+	    axi_hp->afifm[OM::NUM_S_AXI_HPCS + n].rdctrl = 0xB1; // set 64 bits wide
+	    axi_hp->afifm[OM::NUM_S_AXI_HPCS + n].wrctrl = 0xB1;
+	  }
+	  if (m_driver.unmap((uint8_t *)axi_hp, sizeof(OM::ALL_AFIFMS), err))
 	    return true;
 #else
 	  volatile SLCR *slcr = (volatile SLCR *)m_driver.map(sizeof(SLCR), SLCR_ADDR, err);

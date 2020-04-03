@@ -275,7 +275,7 @@ namespace OCPI {
 	    struct sockaddr_ll sa;
 	    sa.sll_family = PF_PACKET;      // supposedly not used for bind
 	    sa.sll_protocol = htons(m_type);
-	    sa.sll_ifindex = i.index;
+	    sa.sll_ifindex = (int)i.index;
 	    sa.sll_hatype = ARPHRD_ETHER;   // supposedly not used for bind
 	    sa.sll_pkttype = PACKET_HOST;   // supposedly not used for bind
 	    sa.sll_halen = sizeof(Address); // supposedly not used for bind
@@ -497,15 +497,15 @@ namespace OCPI {
 	  if (haveDriver()) {
 	    ocpiDebug("driver packet fam %u role %u index %d",
 		      sa.ocpi.ocpi_family, sa.ocpi.ocpi_role, sa.ocpi.ocpi_ifindex);
-	    payLoadLength = (unsigned)rlen;
+	    payLoadLength = (size_t)rlen;
 	    ifindex = sa.ocpi.ocpi_ifindex;
 	  } else {
-	    payLoadLength = (unsigned)(rlen - (sizeof(Header) - sizeof(uint16_t)));
+	    payLoadLength = (size_t)((size_t)rlen - (sizeof(Header) - sizeof(uint16_t)));
 #ifdef OCPI_OS_linux
 	    ocpiDebug("fam %u prot %u index %d hatype %u ptype %u len %u off %zu",
 		      sa.ll.sll_family, sa.ll.sll_protocol, sa.ll.sll_ifindex, sa.ll.sll_hatype,
 		      sa.ll.sll_pkttype, sa.ll.sll_halen, offsetof(struct sockaddr_ll, sll_addr[0]));
-	    ifindex = sa.ll.sll_ifindex;
+	    ifindex = (unsigned)sa.ll.sll_ifindex;
 #else
 	    ocpiDebug("fam %u index %u type %u len %u off %zu",
 		      sa.dl.sdl_family, sa.dl.sdl_index, sa.dl.sdl_type, sa.dl.sdl_len,
@@ -520,7 +520,7 @@ namespace OCPI {
 	  // iterate through all the control headers
 	  for (struct cmsghdr *cmsg_tmp = CMSG_FIRSTHDR(&mh); cmsg_tmp != NULL; cmsg_tmp = CMSG_NXTHDR(&mh, cmsg_tmp))
 	    if ((cmsg_tmp->cmsg_level == IPPROTO_IP) && (cmsg_tmp->cmsg_type == IP_PKTINFO)) {
-	      ifindex = ((struct in_pktinfo *)CMSG_DATA(cmsg_tmp))->ipi_ifindex;
+	      ifindex = (unsigned)((struct in_pktinfo *)CMSG_DATA(cmsg_tmp))->ipi_ifindex;
 	      break;
 	    }
 	}
@@ -597,7 +597,7 @@ namespace OCPI {
 	    sa.ll.sll_family = PF_PACKET;
 	    memcpy(sa.ll.sll_addr, addr.addr(), Address::s_size);
 	    sa.ll.sll_halen = Address::s_size;
-	    sa.ll.sll_ifindex = m_ifIndex;
+	    sa.ll.sll_ifindex = (int)m_ifIndex;
 	    msg.msg_namelen = (socklen_t)sizeof(sa.ll);
 #endif
 	    Header header;
@@ -647,7 +647,11 @@ namespace OCPI {
 	    cmsg->cmsg_type = IP_PKTINFO;
 	    cmsg->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
 	    struct in_pktinfo *pip = (struct in_pktinfo *)CMSG_DATA(cmsg);
+#ifdef OCPI_OS_macos
 	    pip->ipi_ifindex = ifc->index;
+#else
+	    pip->ipi_ifindex = (int)ifc->index;
+#endif
 	  } else {
 	    sa.in.sin_port = htons(addr.addrPort());
 	    sa.in.sin_addr.s_addr = addr.addrInAddr();
@@ -657,7 +661,11 @@ namespace OCPI {
 	for (IOVec *i = iov; i < &iov[iovlen]; i++)
 	  len += i->iov_len;
         msg.msg_iov = (iovec*)iov;
+#ifdef OCPI_OS_macos
+	msg.msg_iovlen = (int)iovlen;
+#else
 	msg.msg_iovlen = iovlen;
+#endif
 	ssize_t rlen = sendmsg(m_fd, &msg, 0);
 	ocpiDebug("Send packet length %zd, to %s/%s via %u(%s), port %u returned %zd errno %u (%s) fd %u",
 		  len, inet_ntoa(sa.in.sin_addr), addr.pretty(), ifc ? ifc->index : 0,

@@ -111,6 +111,9 @@ function do_ssh {
     set +e
     eval $OCPI_CDK_DIR/scripts/setsid.py ssh $sshopts $user@$host sh -c "'\"$1\"'"
 }
+function stop_if {
+    do_ssh "test ! -d $rdir || (cd $rdir && ./ocpiserver.sh stop_if)"
+}
 function unload {
     do_ssh "if [ -d $rdir ]; then rm -r -f $rdir; fi"
 }
@@ -134,7 +137,7 @@ for op in $*; do
       grep -v "^$host " ~/.ssh/known_hosts > $tmpdir/known_hosts
       cp $tmpdir/known_hosts $kn;;
     load|reload)
-      [ $op = reload ] && unload
+      [ $op = reload ] && stop_if && unload
       pdir=$OCPI_CDK_DIR/$platform
       echo "Loading server package into a specific location ($rdir).  Relative path is in root home dir."
       [ -d $pdir ] || (echo No deployable software at $pdir && exit 1)
@@ -173,7 +176,7 @@ for op in $*; do
     stop)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh stop";;
     stop_if)
-	do_ssh "test ! -d $rdir || (cd $rdir && ./ocpiserver.sh stop_if)";;
+	stop_if;;
     status)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh status";;
     mount)
