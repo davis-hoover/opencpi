@@ -71,7 +71,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
               (cd tmp && \
                            $(call OcpiXilinxVivadoInit) && \
                            vivado -mode batch -source ../../vivado-gen-ps.tcl \
-                                  -tclargs $(XilinxCoreName) xc7z020-clg484-1
+                                  -tclargs $(XilinxCoreName) xc7z020-clg484-1 \
                           ) > vivado-gen-ps7.log && \
                            rm -r -f tmp,MyError),\
            $(shell rm -f gen/wrapper-module)$(error $(MyError)))
