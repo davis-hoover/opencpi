@@ -1,3 +1,16 @@
+# [v1.6.2](https://gitlab.com/opencpi/opencpi/compare/v1.6.1...v1.6.2) (2020-04-05)
+
+One framework related fix, rest are CI/CD related.
+
+### Enhancements
+- **devops**: add kicking off of e3xx project pipeline from main opencpi pipeline. (!171)(3dd44849)
+
+### Bug Fixes
+- **devops**: Don't use $CI_REGISTRY_IMAGE as it is incorrect for forked projects. (!155)(fe8ac9f8)
+- **devops**: Explicitly set default job timeout as forked projects do not inherit the value. (!155)(fe8ac9f8)
+- **doc,tools**: Regex pattern used to parse `git branch` output was improved to correctly handle `(detached from XXX)`. (!157)(6126f943)
+- **hdl base**: apply fix to sdp_receive_dma. (!166)(3024057a)
+
 # [v1.6.1](https://gitlab.com/opencpi/opencpi/compare/v1.6.0...v1.6.1) (2020-03-02)
 
 This is mainly a documentation + CI/CD improvement release. However, there was
