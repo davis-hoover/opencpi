@@ -57,7 +57,6 @@ See \url{http://www.sunburst-design.com/papers/CummingsSNUG2008Boston_CDC.pdf} -
 The number of register stages used in the synchronizers is configurable. An optional input register may be used to register the input signal in source clock domain prior to being synchronized.
 When possible, it is recommended (default) to register the input signal in the source clock domain before sending it across the clock domain crossing (CDC) into synchronizers. 
 \section*{Worker Implementation Details}
-
 The \comp \ worker uses a LFSR to generate data and the bit shifted out from LFSR is then used as the input to the \verb+single_bit+ primitive. Once the input signal has crossed into the destination clock domain it is stored in a FIFO until the worker's output port is ready for the data. The FIFO is used because the data is sent only once and also used to mitigate synchronizing the backpressure from the output port to the LFSR. \\ \\
 The \texttt{src\_clk\_hz} and \texttt{dst\_clk\_hz} parameter properties are used to define the source and destination domain clock frequencies. \\ \\
 A clock generator is used to generate the clocks for the source and destination clock domains when the source and destination clock domains are different. \\ \\

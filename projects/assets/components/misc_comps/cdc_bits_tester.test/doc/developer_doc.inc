@@ -48,7 +48,6 @@ An example use case of the \verb+bits+ primitive is using it for status bits for
 The worker generates data and sends the data through the bits synchronizer. The output of the synchronizer is sent to worker's output port.
 
 \section*{Worker Implementation Details}
-
 The \comp \ worker instantiates the \verb+bits+ primitive with the input and output being 4 bits wide. The worker uses 4 LFSRs with each one having the same polynomial
 but different seeds. The bit shifted out from each LFSR is then used as the input to the \verb+bits+ primitive. Once the input signal has crossed into the destination clock domain it is stored in a FIFO until the worker's output port is ready for the data. The FIFO is used because the data is sent only once and also used to mitigate synchronizing the backpressure from the output port to the LFSRs. \\ \\
 The \texttt{src\_clk\_hz} and \texttt{dst\_clk\_hz} parameter properties are used to define the source and destination domain clock frequencies. \\ \\

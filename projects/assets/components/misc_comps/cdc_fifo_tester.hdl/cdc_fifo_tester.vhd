@@ -96,6 +96,4 @@ architecture rtl of worker is
       out_out.valid <= s_fifo_deq when (s_dst_counter < num_input_samples) else '0';
       out_out.eof <= '1' when (s_dst_counter = num_input_samples) else '0';
 
-
-
 end rtl;

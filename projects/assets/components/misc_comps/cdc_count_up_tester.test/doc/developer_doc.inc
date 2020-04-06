@@ -16,31 +16,62 @@
   \hline
   Latest Version    &  \docVersion (release date TBD) \\
   \hline
-  Worker Type       &  \\
+  Worker Type       &  Application Worker \\
   \hline
-  Component Library &  \\
+  Component Library &  ocpi.assets.misc\_comps \\
   \hline
-  Workers           &  \\
+  Workers           &  \comp.hdl \\
   \hline
-  Tested Platforms  &  \\
+  Tested Platforms  & xsim, isim, ZedBoard(PL) \\
   \hline
 \end{longtable}
 
+\begin{center}
+	\textit{\textbf{Revision History}}
+		\begin{table}[H]
+		\label{table:revisions} % Add "[H]" to force placement of table
+			\begin{tabularx}{\textwidth}{|c|X|l|}
+			\hline
+			\rowcolor{blue}
+			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+		    \hline
+		    v\docVersion & Initial Release & TBD \\
+			\end{tabularx}
+		\end{table}
+	\end{center}
+
 \section*{Functionality}
-\begin{flushleft}
-\end{flushleft}
-
+The \comp \ worker serves as a testbench for the \verb+count_up+ cdc primitive. The \verb+count_up+ primitive takes in a pulse from the source domain, synchronizes it to the destination domain,
+and uses that synchronized pulse to increment a counter. The count of pulses is sent to the worker's output port.
 \section*{Worker Implementation Details}
-\begin{flushleft}
-\end{flushleft}
+The \comp \ worker uses the \texttt{src\_rdy} output from the \verb+count_up+ primitive to enable a pulse generator circuit and the pulse from the pulse generator is used as an input to the \verb+count_up+ primitive. The count of pulses that are output by the \verb+count_up+ primitive are stored in a FIFO until the worker's output port is ready for the data. The FIFO is used because the data is sent only once and also used to mitigate synchronizing the backpressure from the output port to the LFSR. \\ \\
+The \texttt{src\_clk\_hz} and \texttt{dst\_clk\_hz} parameter properties are used to define the source and destination domain clock frequencies. \\ \\
+A clock generator is used to generate the clocks for the source and destination clock domains when the source and destination clock domains are different. \\ \\
+\textbf{Fast clock domain to slow clock domain}: \\
+When the source clock frequency is faster than destination clock frequency, the destination domain reset signal is sent through a reset synchronizer to synchronize it to the source domain. The source domain uses the sychronized reset and \texttt{src\_rdy} output from the the \verb+count_up+ primitive to enable the pulse generator circuit. The FIFO is enabled when the destination clock domain has come out of reset. \\ \\
+\textbf{Slow clock domain to fast clock domain}: \\
+When the source clock frequency is slower than the destination clock frequency, the pulse generator circuit is enabled when the source domain has come out of reset and \texttt{src\_rdy} output from the the \verb+count_up+ primitive is high. The source domain reset signal is sent through a reset synchronizer to synchronize it to the destination domain and is used to enable the FIFO. \\ \\
+\textbf{Same clock domain}: \\
+When the source clock frequency is equal to the destination clock frequency, the destination domain reset signal is sent through a reset synchronizer to synchronize it to the source domain. The source domain uses the the sychronized reset and \texttt{src\_rdy} output from the the \verb+count_up+ primitive to enable the pulse generator circuit. The source domain reset signal is sent through a reset synchronizer to synchronize it to the destination domain and is used to enable the FIFO. 
 
-\section*{Theory}
-\begin{flushleft}
-\end{flushleft}
+
 
 \section*{Block Diagrams}
 \subsection*{Top level}
 \begin{center}
+\begin{tikzpicture}[% List of styles applied to all, to override specify on a case-by-case
+					every node/.style={
+						align=center,  		% use this so that the "\\" for line break works
+						minimum size=1.5cm	% creates space above and below text in rectangle
+						},
+					every edge/.style={draw,thick}
+					]
+\node[rectangle,ultra thick,draw=black,fill=blue, minimum width=5 cm](R2){Parameter Properties:\\ \verb+src_clk_hz+ \\ \verb+dst_clk_hz+ \\ \verb+num_input_samples+ \\ \\ \comp \\ \\ };
+\node[rectangle,draw=white,fill=white](R3)[right= of R2]{``out'' \\ Data};
+\path[->]
+(R2)edge []     node [] {} (R3)
+;
+\end{tikzpicture}
 \end{center}\pagebreak
 
 %\subsection*{State Machine}
@@ -48,8 +79,12 @@
 %\end{flushleft}
 
 \section*{Source Dependencies}
-%\subsection*{\comp.rcc}
-%\subsection*{\comp.hdl}
+\subsection*{\comp.hdl}
+\begin{itemize}
+		\item assets/components/misc\_comps/\comp.hdl/\comp.vhd
+	        \item core/hdl/primitives/cdc/count\_up.vhd
+		\item core/hdl/primitives/cdc/cdc\_pkg.vhd
+	\end{itemize}
 
 \begin{landscape}
   \input{component_spec_properties.inc} % it is recommended to NOT remove this line
@@ -61,15 +96,13 @@
   \input{worker_interfaces.inc} % it is recommended to NOT remove this line
 \end{landscape}
 
-\section*{Control Timing and Signals}
-%\subsection*{\comp.hdl}
-\begin{flushleft}
-\end{flushleft}
+\section*{Data Timing and Signals}
+The {\comp} worker uses the clock from the Control Plane as input to the clock generator. The output of the clock generator is used to drive the output port clock.
+
 
 \section*{Performance and Resource Utilization}
-%\subsubsection*{\comp.rcc}
 %\subsubsection*{\comp.hdl}
 
 \section*{Test and Verification}
-\begin{flushleft}
-\end{flushleft}
+There are files used to validate the data the \comp \ worker sends. The files used in the verification were created from the output of the unit test when running the unit test in simulation and contain the expected output data when there is no metastability. Since there might or might not be a perfect match of the output data to the expected output data when running the tests in hardware due to 
+metastability or phase offset, the output data is correlated with the expected output data. If there is at least a 0.7 positive Pearson product-moment correlation coefficient, then test case is considered passing. This correlation is only used when running the unit test on hardware. If the test are run in simulation, the output data is compared with expected output data. If the they match exactly, then test case is considered passing.
