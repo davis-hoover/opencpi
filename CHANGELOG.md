@@ -1,3 +1,46 @@
+# [v1.6.1](https://gitlab.com/opencpi/opencpi/compare/v1.6.0...v1.6.1) (2020-03-02)
+
+This is mainly a documentation + CI/CD improvement release. However, there was
+a handful of framework releated bug fixes.
+
+### Enhancements
+- **devops**: Speed up CI pipeline by 100%. (!131)(1ba546af)
+- **devops**: Trigger pipeline for downstream project opencpi.gitlab.io. (!141)(5a2e7683)
+- **devops**: Add support for passing upstream artifacts to downstream projects. (!144)(47da89d0)
+- **devops,tools**: Add a "latest" release url. (!125)(ab5ecf67)
+- **doc**: rename reference document file names to be friendlier and reflect their content better. (!122)(b9b730ad)
+- **tools**: Build and add tutorials to opencpi.gitlab.io. (!117)(674496a1)
+- **tools**: Build and add briefings to opencpi.gitlab.io. (!117)(674496a1)
+- **tools**: Pages: only build latest release of each version. (!136)(38889eec)
+- **tools**: Add CLI and GUI version of tutorials to doc site. **Note**: not all tutorials support this new format and will be made available when converted. (!138)(91922c85)
+
+### Bug Fixes
+- **app**: change instances of `data_stream_type` to `direction`. (!142)(6e3e9cb8)
+- **tests**: Change `np.nan` to `sys.maxsize` as not all systems support `np.nan`. (!100)(27099092)
+- **tools**: install package for Tahoma font. (!102)(8d5ca9a9)
+- **tools**: Replace `libreoffice-headless` dependency with `libreoffice-writer` so docs can be built on fresh install of CentOS 7 minimal. (!112)(f5638c53)
+- **tools**: ocpidev run now works for xml-only applications created with -X. (!116)(3c3d3fc9)
+- **tools**: ocpidev now allows spaces in argument values, equal sign values after --options. (!116)(3c3d3fc9)
+- **tools**: Fix OpenCPI version tag sorting for opencpi.gitlab.io. (!124)(bc9cfc14)
+- **tools**: Use unoconv to convert libreoffice docs to pdfs. (!126)(7361545e)
+
+### Miscellaneous
+- **devops**: Redirect https://opencpi.gitlab.io/opencpi to https://opencpi.gitlab.io/releases/latest/. (!145)(0a5ce1aa)
+- **doc**: Change relevant references from GitHub to GitLab. (!100)(27099092)
+- **tools**: Install `tree` package since tutorials use it. (!100)(27099092)
+
+# [v1.6.0](https://gitlab.com/opencpi/opencpi/compare/v1.6.0-rc.1...v1.6.0) (2020-02-06)
+
+### Enhancements
+- **devops**: Remove use of caching to pass artifacts between stages. Enables use of cloud and local resources. (!87)(72604cb1)
+
+### Bug Fixes
+- **tests**: Change `#!/usr/bin/env python3` to `#!/usr/bin/env python3.4`. (!85)(5bf52ee2)
+
+### Documentation
+- Updated [Release Notes](https://opencpi.gitlab.io/releases/v1.6.0/doc/Release_Notes.pdf). (!121)(e494630f)
+- Version bump documents to `v1.6.0`. (!121)(8e5967c3)
+
 # [v1.6.0-rc.1](https://gitlab.com/opencpi/opencpi/compare/v1.6.0-rc.0...v1.6.0-rc.1) (2020-01-11)
 
 ### New Features

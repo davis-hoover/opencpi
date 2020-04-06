@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -41,21 +41,24 @@ OFILENAME.close()
 MESSAGE_SIZE_WORDS = int(sys.argv[1])
 enable = os.environ.get("OCPI_TEST_enable")
 
-if(enable=="true"): # => NORMAL MODE
-    #Test if timestamps are incrementing
-    timestamp_list = list();
+if enable == "true": # => NORMAL MODE
+    # Test if timestamps are incrementing
+    timestamp_list = list()
     a = 0
     while a < len(odata):
-        if(a % (MESSAGE_SIZE_WORDS+2) == 0):
-            if(len(timestamp_list) and (timestamp_list[-1] > odata[a]+1.0*(odata[a+1])/0xFFFFFFFF)):
-                print "    Bad timestamp: " , timestamp_list[-1], " > ", odata[a]+1.0*(odata[a+1])/0xFFFFFFFF           
-            timestamp_list.append(odata[a]+1.0*(odata[a+1])/0xFFFFFFFF)
-            if(len(timestamp_list)>1):
-                print "    Timestamp at index: ", str(a), " is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(odata[a]), " Fraction:", "{0:#x}".format(odata[a+1]),") Delta:","{:10.7f}".format(timestamp_list[-1]-timestamp_list[-2]) 
+        if a % (MESSAGE_SIZE_WORDS+2) == 0:
+            val = odata[a] + (odata[a+1] / 0xFFFFFFFF)
+            if len(timestamp_list) and timestamp_list[-1] > val:
+                print("    Bad timestamp: " , timestamp_list[-1], " > ", val)           
+            timestamp_list.append(val)
+            if len(timestamp_list) > 1:
+                print("    Timestamp at index: {} is: {:10.7f} ( Seconds: {0:#x} Fraction: {0:#x} ) Delta: {:10.7f}".format(
+                      str(a), timestamp_list[-1], odata[a], odata[a+1], timestamp_list[-1] - timestamp_list[-2]))
             else:
-                print "    Timestamp is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(odata[a]), " Fraction:", "{0:#x}".format(odata[a+1]),")"
+                print("    Timestamp is: {:10.7f} ( Seconds: {0:#x} Fraction: {0:#x} )".format(
+                      timestamp_list[-1], odata[a], odata[a+1]))
             a += 2
         else:
             a += 1
 else: # => BYPASS MODE
-    print "    View not supported for bypass mode"
+    print("    View not supported for bypass mode")

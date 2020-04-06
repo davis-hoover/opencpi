@@ -9,7 +9,5 @@ COPY install-opencpi-docs.sh .
 RUN yum -y distro-sync \
  && ./install-opencpi-docs.sh --no-build \
  && rm -f ./install-opencpi-docs.sh \
- # Needed for older versions of opencpi
- && yum -y --setopt=skip_missing_names_on_install=False install unoconv
 
 CMD ["bash"]

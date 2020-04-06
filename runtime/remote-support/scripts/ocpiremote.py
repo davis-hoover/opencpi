@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -44,52 +44,57 @@ def main():
     ip = None
     port = None
     
-    if ocpi_server_addresses:
+    if ocpi_server_addresses and ':' in ocpi_server_addresses:
         ip = ocpi_server_addresses.split(':')[0]
         port = ocpi_server_addresses.split(':')[1]
 
     option_ip = make_option(
         '-i', '--ip_addr', 
-        'Login password',
+        'remote server IP address; first address in OCPI_SERVER_ADDRESSES',
         default=ip,
         required=True)
     option_port = make_option(
         '-r', '--port', 
-        'Remote\'s server port. First port in OCPI_SERVER_ADDRESSES',
+        'remote server port; first port in OCPI_SERVER_ADDRESSES',
         default=port,
         required=True)
     option_user = make_option(
         '-u', '--user', 
-        'Login user',
+        'user name for login on remote device',
         default='root',)
     option_password = make_option(
         '-p', '--password', 
-        'Login password',
+        'user password for login on remote device',
         default='root')
     option_ssh_opts = make_option(
         '-o', '--ssh_opts', 
-        'SSH options',
+        'ssh options for connecting to remote device',
         default='')
     option_remote_dir = make_option(
         '-d', '--remote_dir', 
-        'Directory on remote to create/use as the server sandbox',
+        'directory on remote device to create/use as the server sandbox',
         default='sandbox')
     option_sw_platform = make_option(
         '-s', '--sw_platform', 
-        'Forms part of path under OCPI_CDK_DIR to create server package', 
+        'software platform for server environment', 
         default='xilinx13_4')
     option_hw_platform = make_option(
         '-w', '--hw_platform', 
-        'Forms part of path under OCPI_CDK_DIR to create server package', 
+        'hardware platform for server environment', 
         default='zed')
     option_valgrind = make_option(
         '-v', '--valgrind', 
-        'Load/Use Valgrind',
+        'load/use Valgrind',
         action='store_true')
     option_log_level = make_option(
         '-l', '--log_level', 
-        'Specify a log level to use with \'start\'',
+        'specify log level',
         default=0)
+    option_no_compress = make_option(
+        '-z', '--no_compress',
+        'Disable tar gzip compression',
+        default=False,
+        action='store_true')
 
     common_options = [option_user, option_password, 
                       option_ip, option_remote_dir, option_ssh_opts]
@@ -98,35 +103,41 @@ def main():
     commands.append(make_subcommand(
         'load', load, 
         'Create and send the server package to the remote sandbox directory', 
-        common_options + [option_port, option_valgrind, option_hw_platform, option_sw_platform]))
+        common_options + [option_port, option_valgrind, option_hw_platform, option_sw_platform, option_no_compress]))
     commands.append(make_subcommand(
         'unload', unload, 
-        'Delete a server sandbox directory', 
+        'delete a server sandbox directory', 
         common_options))
     commands.append(make_subcommand(
         'start', start, 
-        'Calls \'./ocpiserver.sh start\'  on the remote',
+        'start server on remote device',
         common_options + [option_log_level, option_valgrind]))
     commands.append(make_subcommand(
         'status', status, 
-        'Calls \'./ocpiserver.sh status\' on the remote',
+        'get status of server on remote device',
         common_options))
     commands.append(make_subcommand(
         'stop', stop, 
-        'Calls \'./ocpiserver.sh stop\'   on the remote',
+        'stop server on remote device',
         common_options))
     commands.append(make_subcommand(
         'test', test, 
-        'Test basic connectivity', 
+        'test basic connectivity', 
         common_options))
     commands.append(make_subcommand(
         'log', log, 
-        'Watch server log in realtime', 
+        'watch server log in realtime', 
         common_options))
    
     parser = make_parser(commands)
     args = parser.parse_args()
-    args.func(args)
+
+    # If a subcommand was passed, call it.
+    # Else print help message
+    if 'func' in args:
+        args.func(args)
+    else:
+        parser.print_help()
 
 
 def make_option(short, long, help, default=None, required=False, action='store'):
@@ -183,7 +194,8 @@ def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0):
     if ocpiserver:
         cmd = 'cd "{}" && ./ocpiserver.sh "{}"'.format(args.remote_dir, cmd)
     if ssh:
-        cmd = 'ssh {} {}@{} sh -c "{}"'.format(args.ssh_opts, args.user, args.ip_addr, cmd)
+        cmd = 'ssh -o StrictHostKeyChecking=no {} {}@{} sh -c "{}"'.format(
+            args.ssh_opts, args.user, args.ip_addr, cmd)
 
     command = Command(cmd, rc)
 
@@ -205,16 +217,16 @@ def make_parser(commands):
 
         for option in command.options:
             if option.default is not None:
-                subparser.add_argument(
-                    option.short, option.long, default=option.default, action=option.action)
+                subparser.add_argument(option.short, option.long, default=option.default, 
+                                       action=option.action, help=option.help)
             else:
-                subparser.add_argument(
-                    option.short, option.long, required=option.required, action=option.action)
+                subparser.add_argument(option.short, option.long, required=option.required, 
+                                       action=option.action, help=option.help)
 
     return parser
 
 
-def make_tar(tar_files, arcnames, tempdir):
+def make_tar(tar_files, arcnames, tempdir, no_compress):
     """ Creates a tar file and returns the path.
 
     Args:
@@ -223,7 +235,13 @@ def make_tar(tar_files, arcnames, tempdir):
         tempdir: staging directory for the tar
     """
     tar_path = os.path.join(tempdir, 'tar.tgz')
-    with tarfile.open(tar_path, 'w:gz', 
+
+    mode = "w:gz"
+    
+    if no_compress :
+        mode = "w"  
+
+    with tarfile.open(tar_path, mode, 
                       format=tarfile.PAX_FORMAT, dereference=True) as tar:
         for tar_file,arcname in zip(tar_files,arcnames):
             tar.add(tar_file, arcname=arcname)
@@ -294,10 +312,6 @@ def load(args):
     """
     cdk = os.environ['OCPI_CDK_DIR']
 
-    system_xml = os.path.join(cdk,'deploy',args.hw_platform,'system.xml')
-    if not os.path.isfile(system_xml):
-        system_xml = os.path.join(cdk,args.sw_platform,'system.xml')
-
     driver_list = os.path.join(cdk,args.sw_platform,'lib','driver-list')
     with open(driver_list) as driver_file:
         drivers = ['libocpi_{}_s.so'.format(driver) for line in driver_file
@@ -312,6 +326,7 @@ def load(args):
     bin_files = ['ocpidriver', 'ocpiserve', 'ocpihdl', 'ocpizynq']
     bin_files = [os.path.join(cdk, args.sw_platform, 'bin', bin_file) for bin_file in bin_files]
     sdk = glob.glob(os.path.join(cdk, args.sw_platform, 'lib', 'sdk', 'lib', '*'))
+    no_compress = args.no_compress
 
     # List of files to add to tar
     tar_files = (drivers 
@@ -319,12 +334,19 @@ def load(args):
              + rules 
              + bin_files
              + sdk
-             + [localtime, ocpiserver, os_driver, system_xml])
+             + [localtime, ocpiserver, os_driver])
 
     # Where to extract files to on remote device
     arcnames = [os.path.join(args.remote_dir, *tar_file[len(cdk):].split('/')) 
                 if tar_file.startswith(cdk) else tar_file 
                 for tar_file in tar_files]
+
+    # Check for hw system.xml. If it doesn't exist, get sw system.xml
+    system_xml = os.path.join(cdk, 'deploy',args.hw_platform, 'system.xml')
+    if not os.path.isfile(system_xml):
+        system_xml = os.path.join(cdk, args.sw_platform, 'system.xml')
+    arcnames.append(os.path.join(args.remote_dir, *system_xml[len(cdk):].split('/')))
+    tar_files.append(system_xml)
 
     if args.valgrind:
         tar_files.append(
@@ -357,7 +379,7 @@ def load(args):
             print('Server package created successfully.')
 
         tar_commands = []
-        tar_path = make_tar(tar_files, arcnames, tempdir)
+        tar_path = make_tar(tar_files, arcnames, tempdir,no_compress)
         tar_commands.append(make_command(
             'scp {} {}@{}:./{}'.format(tar_path, args.user, args.ip_addr, args.remote_dir), 
             args, 
@@ -399,12 +421,11 @@ def start(args):
     Args:
         args: parsed user arguments
     """
-    command = ''
+    command = 'start'
     if args.valgrind:
         command += ' -V '
     if int(args.log_level) > 0:
         command += ' -l {} '.format(args.log_level)
-    command += 'start'
     command = make_command(command, args, ocpiserver=True)
     
     rc = execute_command(command, args)

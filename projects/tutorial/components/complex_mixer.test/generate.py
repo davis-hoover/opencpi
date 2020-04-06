@@ -75,7 +75,7 @@ f.close()
 
 # Summary
 print ('\t# of Bytes:', NUM_SAMPLES*4)
-print ('\t# of I/Q (16b) samples:', NUM_SAMPLES/2)
+print ('\t# of I/Q (16b) samples:', NUM_SAMPLES//2)
 print ('\tSample Frequency:', Fs)
 print ('\tTarget Frequency:', Ft)
 print ('\tAmplitude:', AMPLITUDE)

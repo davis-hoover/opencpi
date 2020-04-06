@@ -58,7 +58,7 @@ ifdef Platforms
     RccPlatforms:=
   endif
 endif
-ifeq ($(filter show help clean% distclean%,$(MAKECMDGOALS)),)
+ifeq ($(filter-out cleandriver,$(filter show help clean% distclean%,$(MAKECMDGOALS))),)
   include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
   include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
 endif

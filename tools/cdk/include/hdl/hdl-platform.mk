@@ -143,7 +143,6 @@ ifndef HdlSkip
   ifdef HdlSkip
     $(error unexpected target/platform skip)
   endif
-  exports:
   .PHONY: exports
   ifneq ($(MAKECMDGOALS),clean)
   ifndef ShellHdlPlatformVars
@@ -182,7 +181,7 @@ ifndef HdlSkip
         ifeq ($$(wildcard $$(HdlConstraints)),)
           $$(error The constraints file, $$(HdlConstraints), from configuration $1, not found)
         endif
-        ExportFiles:=$$(ExportFiles) $$(HdlConstraints)
+        ExportFiles:=$$(call Unique,$$(ExportFiles) $$(HdlConstraints))
       endif
       $(call HdlConfOutDir,$1): exports
 	$(AT)mkdir -p $$@
@@ -199,20 +198,11 @@ ifndef HdlSkip
     $(foreach c,$(Configurations),$(eval $(call doConfig,$c)))
     all: configs
   endif # have configurations
-  # If the platform has special files to export to the CDK, do it
-  # this is only done if we are building, so we don't export until we have actually built something
-  ExportFiles:=$(call Unique,$(ExportFiles) $(wildcard $(Worker).mk) $(wildcard $(Worker).exports))
-  ifdef ExportFiles
-    ExportLinks:=$(ExportFiles:%=lib/%)
-    exports: $(ExportLinks)
-
-    # order-only prereq should be something like $$(@:lib/%=%) but that doesn't work...
-    $(ExportLinks): | $(ExportFiles)
-	$(AT)mkdir -p lib
-	$(AT)ln -s ../$(@:lib/%=%) lib
-
-    all: $(ExportLinks)
-  endif
+  # Make necessary files visible for using from outside the platform
+  # This is only done if we are building, so we don't export until we have actually built something.
+  all: exports
+  exports:
+	$(AT)$(OCPI_CDK_DIR)/scripts/export-platform.sh lib $(ExportFiles)
 endif # skip after hdl-pre.mk
 
 # There is no test target here, but there might be in the devices subdir

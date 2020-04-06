@@ -5,10 +5,6 @@ and processes.
 
 OpenCPI briefings Include:
 
-Briefing 0: Tutorial Hardware Setup. This briefing describes how to set up the
-SDR hardware platforms on which you may run the OpenCPI tutorials 6hw through 9hw.
-It is a pre-requisite for these tutorials.
- 
 Briefing 1: Introduction to OpenCPI. This briefing gives a high-level description
 of OpenCPI technology, its goals, history, concepts and processes and associated
 terminology. It is intended to provide first-level introductory information
@@ -17,9 +13,6 @@ to those who are new to OpenCPI.
 Briefing 2: Introduction to OpenCPI Development. This briefing describes the
 OpenCPI technology from the development point of view, including information
 about concepts of operation and comparisons with other similar technologies.
-
-Briefing 3: OpenCPI Concepts. This briefing describes OpenCPI development
-building blocks and the types of development efforts that OpenCPI supports.
 
 Briefing 4: Component and Worker Development Overview. This briefing describes
 component and worker authoring models using an example to illustrate the models.

@@ -65,7 +65,7 @@ sanity=--setopt=skip_missing_names_on_install=False
 $SUDO yum install -y $sanity epel-release
 $SUDO yum install -y $sanity ghostscript git libreoffice-writer make \
   python34 python34-jinja2 rubber texlive texlive-appendix texlive-latex \
-  texlive-multirow texlive-placeins texlive-titlesec texlive-xstring \
+  texlive-multirow texlive-placeins texlive-titlesec texlive-xstring unoconv \
   https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
 echo 'Packages required to build OpenCPI documentation have been installed.'
 

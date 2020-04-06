@@ -6,4 +6,4 @@ OpenCPI for CentOS7. Look at the readme files for:
 3. Setup - things to do after building in order to use the platform to run apps.
 
 [This information is incomplete at this time, but the OpenCPI Installation Manual,
-in doc/OpenCPI_Installation.pdf, includes all the pertinent information]
+in doc/OpenCPI_Installation_Guide.pdf, includes all the pertinent information]

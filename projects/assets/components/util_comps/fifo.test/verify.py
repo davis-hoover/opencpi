@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -44,32 +44,32 @@ oneshot = os.environ.get("OCPI_TEST_oneshot")
 if(oneshot=="false"): # => NORMAL MODE
     #Test that odata file length is the expected amount
     if len(odata) != len(idata):
-        print "    FAILED: Output file length is unexpected"
-        print 'Length =', len(odata), 'while expected length is =', len(idata)
+        print("    FAILED: Output file length is unexpected")
+        print('Length =', len(odata), 'while expected length is =', len(idata))
         sys.exit(1)
     else:
-        print "    PASS: Output file length = input file length"
+        print("    PASS: Output file length = input file length")
     #Test that odata file is same as idata file
     if (idata != odata).all():
-        print "    FAILED: Input and output file do not match"
+        print("    FAILED: Input and output file do not match")
         sys.exit(1)
     else:
-        print "    PASS: Input and output file match"
+        print("    PASS: Input and output file match")
 else: # => ONESHOT MODE
     #Test that odata file length is the expected amount
     if len(odata) != min(len(idata),FIFO_DEPTH_p):
-        print "    FAILED: Output file length is unexpected"
-        print 'Length =', len(odata), 'while expected length is =', len(idata)
+        print("    FAILED: Output file length is unexpected")
+        print("Length =", len(odata), "while expected length is =", len(idata))
         sys.exit(1)
     else:
-        print "    PASS: Output file length = min(input file length,8192)"
+        print("    PASS: Output file length = min(input file length,{})".format(FIFO_DEPTH_p))
     #Test that odata file is same as idata file (up to 8192 samples)
     fail=0
     for idx in range(0,min(len(idata),FIFO_DEPTH_p)):
         if odata[idx] != idata[idx]:
-            print "    FAILED: Input and output file do not match"
+            print("    FAILED: Input and output file do not match")
             fail=1
             break
     if fail == 0:
-        print "    PASS: Input and output file match (up to 8192 samples)"
+        print("    PASS: Input and output file match (up to {} samples)".format(FIFO_DEPTH_p))
 

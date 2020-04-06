@@ -25,12 +25,30 @@ unit test scripts
 import sys
 import numpy as np
 import struct
+import argparse
 
 # !!!!! CAUTION !!!!! - this type is specific to the following protocol-specific
 # use case:
 # (port w/ iqstream-prot) -> file_write component, or
 # file_read component     -> (port w/ iqstream-prot)
 dt_iq_pair = np.dtype((np.uint32, {'real_idx':(np.int16,0), 'imag_idx':(np.int16,2)}))
+
+class ArgumentParser(argparse.ArgumentParser):
+    def add_port_argument(self, port_name, direction):
+        """
+        port_name - string matching port name
+        direction - string port direction (either 'input' or 'output')
+        """
+        arg = port_name + '_file'
+        help_str = 'filename for ' + direction + ' file associated with UUT ' + \
+            port_name  + ' port'
+        self.add_argument(arg, help=help_str)
+
+def print_cmd_and_args():
+    print('    executed:', end='')
+    for idx in range(len(sys.argv)):
+        print(' ', sys.argv[idx], end='')
+    print('')
 
 def is_power2(num):
     """
@@ -78,7 +96,7 @@ def get_msg(msgs_in_file_array):
     opcode = msgs_in_file_array[MESSAGE_OPCODE]
     data   = None
     if length > 0:
-        data = msgs_in_file_array[MESSAGE_DATA:int(length/4+2)]
+        data = msgs_in_file_array[MESSAGE_DATA:length//4+2]
     return (length,opcode,data)
 
 def add_msg(f, opcode, data):

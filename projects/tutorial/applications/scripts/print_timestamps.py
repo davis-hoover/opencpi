@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -51,28 +51,30 @@ def validate(argv):
 
     #Ensure dout is not all zeros
     if all(input_file_samples == 0):
-        print color.RED + color.BOLD + 'FAILED, values are all zero' + color.END
+        print(color.RED + color.BOLD + 'FAILED, values are all zero' + color.END)
         return
     else:
-        print 'Pass: File is not all zeros'
+        print('Pass: File is not all zeros')
 
     #Print out timestamps
     timestamp_list = list();
     a = 0
     while a < len(input_file_samples):
-        timestamp_list.append(input_file_samples[a]+1.0*(input_file_samples[a+1])/0xFFFFFFFF)
-        if(len(timestamp_list)>1):
-            print "Timestamp is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(input_file_samples[a]), " Fraction:", "{0:#x}".format(input_file_samples[a+1]),") Delta:","{:10.7f}".format(timestamp_list[-1]-timestamp_list[-2]) 
-        else:
-            print "Timestamp is:", "{:10.7f}".format(timestamp_list[-1]), " ( Seconds:", "{0:#x}".format(input_file_samples[a]), " Fraction:", "{0:#x}".format(input_file_samples[a+1]),")"
+        val = input_file_samples[a] + input_file_samples[a+1] / 0xFFFFFFFF
+        timestamp_list.append(val)
+        s = "Timestamp is: {:10.7f} ( Seconds: {0:#x} Fraction: {0:#x} )".format(
+            timestamp_list[-1], input_file_samples[a], input_file_samples[a+1])
+        if len(timestamp_list) > 1:
+            s += " Delta: {:10.7f}".format(timestamp_list[-1] - time_stamplist[-2])
+        print(s)
         a += 2
 
-    print '*** End ***'
-    print "*"*80
+    print('*** End ***')
+    print("*"*80)
 
 def main():
-    print "\n","*"*80
-    print "*** Python: Prints Timestamps ***"
+    print("\n","*"*80)
+    print("*** Python: Prints Timestamps ***")
     validate(sys.argv)
 
 if __name__ == '__main__':

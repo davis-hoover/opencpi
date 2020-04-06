@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -44,12 +44,12 @@ import os.path
 if len(sys.argv) != 6:
     print("Invalid arguments:  usage is: generate.py <sample-freq> <target-freq> <amplitude> <num-samples> <output-file>")
     sys.exit(1)
-print "    GENERATE (I/Q 16b binary data file):"
+print("    GENERATE (I/Q 16b binary data file):")
 
 ofilename = sys.argv[5]
 # Create cosine & sine waveforms
 Fs = float(sys.argv[1])     # sample frequency
-Ts = 1.0/float(Fs);     # sampling interval
+Ts = 1.0/float(Fs)     # sampling interval
 Ft = float(sys.argv[2])     # target frequency
 AMPLITUDE = int(sys.argv[3])
 NUM_SAMPLES = int(sys.argv[4]) # number of complex samples
@@ -68,13 +68,13 @@ z['imag_idx'] = np.int16(imag * gain_q)
 
 # Save data to file
 f = open(ofilename, 'wb')
-for i in xrange(NUM_SAMPLES):
+for i in range(NUM_SAMPLES):
     f.write(z[i])
 f.close()
 
 # Summary
-print '      # of Bytes:', NUM_SAMPLES*4
-print '      # of I/Q (16b) samples:', NUM_SAMPLES/2
-print '      Sample Frequency:', Fs
-print '      Target Frequency:', Ft
-print '      Amplitude:', AMPLITUDE
+print('      # of Bytes:', NUM_SAMPLES*4)
+print('      # of I/Q (16b) samples:', NUM_SAMPLES//2)
+print('      Sample Frequency:', Fs)
+print('      Target Frequency:', Ft)
+print('      Amplitude:', AMPLITUDE)

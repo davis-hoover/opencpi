@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -29,7 +29,7 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 txen = os.environ.get('OCPI_TEST_txen')
-expected_opcode_str = "txOn" if (txen == "true") else "txOff";
+expected_opcode_str = "txOn" if (txen == "true") else "txOff"
 
 f = open(sys.argv[1], 'rb')
 
@@ -69,7 +69,7 @@ try:
     raise ValueError('out port sent unexpected opcode: ' + get_opcode_str(opcode))
 
 except ValueError as err:
-  print color.RED + color.BOLD + 'FAILED, ' + err.message + color.END
+  print(color.RED + color.BOLD + 'FAILED, ' + err.message + color.END)
   exit_status = 1
 
 finally:

@@ -35,7 +35,8 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
   --disable-scripts --disable-doc \
   --with-pic=liblzma \
   CFLAGS="-g -fPIC" CXXFLAGS="-g -fPIC" # why doesn't with-pic to this?
-make -j
+# Leaving -j unconstrained goes very badly on some systems, including MacOS
+make -j4
 make install
 # lzma creates an empty directory even when we have disabled the executables
 rm -r -f $OcpiInstallExecDir/bin

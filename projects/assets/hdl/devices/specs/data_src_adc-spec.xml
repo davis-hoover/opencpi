@@ -9,7 +9,7 @@
   <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT'
             type='bool'
             parameter='true'
-            default='true'
+            default='false'
             description='Indicates whether ADC data is justified to most
             significant or least significant ADC_WIDTH_BITS of the out port.
             When value is false, sign extension occurs.'/>

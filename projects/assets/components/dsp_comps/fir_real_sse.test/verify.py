@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -67,7 +67,7 @@ if( sum(list(map(abs,taps))) == 0):
     sys.exit(1)
 
 #Convert output binary file to text file
-filter_group_delay = int(num_taps/2)+4
+filter_group_delay = num_taps // 2 + 4
 bin2int.bin2int_real(output_file, output_file.rstrip('out')+'tmp', num_taps, filter_group_delay)
 
 #Compare symmetric taps file to output
