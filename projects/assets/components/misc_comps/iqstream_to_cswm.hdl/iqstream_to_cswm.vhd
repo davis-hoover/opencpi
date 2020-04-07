@@ -18,7 +18,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library util, protocol;
+library util, protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
   signal in_opcode :
       protocol.iqstream.opcode_t :=
@@ -29,6 +29,8 @@ architecture rtl of worker is
   signal in_demarshaller_oeof : std_logic := '0';
   signal oprotocol : protocol.complex_short_with_metadata.protocol_t :=
                      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+  signal out_opcode : protocol.complex_short_with_metadata.opcode_t :=
+                      protocol.complex_short_with_metadata.SAMPLES;
   signal out_marshaller_irdy  : std_logic := '0';
   signal out_marshaller_odata : std_logic_vector(out_out.data'range) :=
                                 (others => '0');
@@ -79,12 +81,28 @@ begin
       ogive        => out_out.give,
       osom         => out_out.som,
       oeom         => out_out.eom,
+      oopcode      => out_opcode,
       oeof         => out_out.eof,
       oready       => out_in.ready);
 
   -- this only needed to avoid build bug for xsim:
   -- ERROR: [XSIM 43-3316] Signal SIGSEGV received.
   out_out.data <= out_marshaller_odata;
+
+  out_out.opcode <=
+    ComplexShortWithMetadata_samples_op_e        when
+    out_opcode = protocol.complex_short_with_metadata.SAMPLES else
+    ComplexShortWithMetadata_time_op_e           when
+    out_opcode = protocol.complex_short_with_metadata.TIME_TIME else
+    ComplexShortWithMetadata_interval_op_e       when
+    out_opcode = protocol.complex_short_with_metadata.INTERVAL else
+    ComplexShortWithMetadata_flush_op_e          when
+    out_opcode = protocol.complex_short_with_metadata.FLUSH else
+    ComplexShortWithMetadata_sync_op_e           when
+    out_opcode = protocol.complex_short_with_metadata.SYNC else
+    ComplexShortWithMetadata_end_of_samples_op_e when
+    out_opcode = protocol.complex_short_with_metadata.END_OF_SAMPLES else
+    ComplexShortWithMetadata_samples_op_e;
 
   -- this worker is not initialized until out_in.clk is ticking and both the in
   -- and out ports have successfully come into reset
