@@ -56,11 +56,11 @@ echo Executing remote configuration command: $*
 
 action=$1; shift
 
-while getopts u:l:w:a:p:s:d:o:P:Vh o 
+while getopts u:l:w:a:p:s:d:o:P:Vh o
 do 
   case "$o" in 
     u) user=$OPTARG ;;
-    l) logopt=$OPTARG ;;
+    l) logopt="-l $OPTARG" ;;
     w) passwd=$OPTARG ;;
     a) host=$OPTARG ;;
     p) port=$OPTARG ;;
@@ -72,7 +72,6 @@ do
     V) vg=-V ;;
   esac 
 done
-
 case $action in
 start)
   if [ -f ocpiserve.pid ] && kill -s CONT $(cat ocpiserve.pid); then

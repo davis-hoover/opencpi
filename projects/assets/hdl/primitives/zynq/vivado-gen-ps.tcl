@@ -25,22 +25,22 @@
 # And a file named wrapper-module is placed there with the name of the wrapper module
 # which includes the version.
 
+
 set ip_name [lindex $argv 0]
 set ip_part [lindex $argv 1]
 set ip_module ${ip_name}_0
-set ip_dir managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module
-puts "$ip_name+$ip_module+$ip_dir"
-create_project managed_ip_project managed_ip_project -part $ip_part -ip -force
+# puts [llength [get_parts -regexp {xcz.*}]]
+# puts [get_parts -regexp {xc7z.*}]
+create_project managed_ip_project managed_ip_project -ip -force -part $ip_part
+# Get latest version
 create_ip -name $ip_name -vendor xilinx.com -library ip -module_name $ip_module
-generate_target all [get_files $ip_dir/$ip_module.xci]
-# Extract version
 set ip [get_ips $ip_module]
-# Get this IP core's version (e.g 3.2)
-set major_version [get_property VERSION [get_ipdefs xilinx.com:ip:$ip_name*]]
-set ip_version [regsub {\.} $major_version "_"]
-# Core revision is the minor-version
-set minor_version [get_property CORE_REVISION $ip]
-put "MAJOR: $major_version MINOR: $minor_version"
+set ip_minor [get_property CORE_REVISION $ip]
+set ip_major [regsub {\.} [regsub {.*:} [get_property IPDEF $ip] ""] "_"]
+puts "ip_name:$ip_name ip_part:$ip_part ip_module:$ip_module ip_major:$ip_major ip_minor:$ip_minor"
+set ip_version $ip_major
+set ip_dir managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module
+generate_target all [get_files $ip_dir/$ip_module.xci]
 set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
 # This is pretty lame, but it is what is different between the PS7 IP and the PS8 ip...
 # Look in two places (in verilog subdir or not), and look in two ways (with minor or not)
@@ -49,7 +49,7 @@ if {[file exists $ip_dir/hdl/verilog/${ip_wrapper}.v]} {
 } elseif {[file exists $ip_dir/hdl/${ip_wrapper}.v]} {
   file copy $ip_dir/hdl/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
 } else {
-  set ip_version ${ip_version}_${minor_version}
+  set ip_version ${ip_version}_${ip_minor}
   set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
   if {[file exists $ip_dir/hdl/verilog/${ip_wrapper}.v]} {
     file copy $ip_dir/hdl/verilog/${ip_wrapper}.v ..
@@ -58,4 +58,3 @@ if {[file exists $ip_dir/hdl/verilog/${ip_wrapper}.v]} {
     file copy $ip_dir/hdl/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
   }
 }
-exec echo $ip_wrapper > ../wrapper-module

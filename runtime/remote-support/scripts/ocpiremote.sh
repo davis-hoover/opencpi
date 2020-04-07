@@ -170,7 +170,7 @@ for op in $*; do
     unload|remove)
 	unload;;
     start)
-	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh $vg $log start";;
+	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh start $vg $log";;
     log)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh log";;
     stop)

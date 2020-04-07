@@ -56,7 +56,7 @@ VivadoIpDir=$(call OcpiXilinxVivadoDir,infox)/data/ip/xilinx
 VivadoZynqCore=$(VivadoWrapperModule:%_processing_system7=%)
 VivadoZynqSources=$(foreach f,atc aw_atc b_atc trace_buffer w_atc,\
                     $(VivadoIpDir)/$(VivadoZynqCore)/hdl/verilog/$(VivadoZynqCore)_$f.v) \
-                  gen/$(WrapperModule).v
+                  $(VivadoWrapperFile)
 # The TCL script that gets the wrapper verilog code also determines the version and module name.
 # Since this determines the file name of the wrapper code, we do it here on the first pass of make
 # so the "SourceFiles" to build includes the module whose name is determined by the tcl.
@@ -64,7 +64,8 @@ VivadoZynqSources=$(foreach f,atc aw_atc b_atc trace_buffer w_atc,\
 # version of Vivado installed. If either of those changes a clean build here is required.
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
   ifndef UseISE                            # if non-ISE targets
-    ifeq ($(wildcard gen/wrapper-module),) # if wrapper-module not determined yet
+    VivadoWrapperFile=$(wildcard gen/$(XilinxCoreName)*.v)
+    ifeq ($(VivadoWrapperFile),) # if wrapper-module not determined yet
       $(info Generating the verilog wrapper for the Zynq 7000 PS (PS7 primitive).)
       $(if $(call DoShell,\
               mkdir -p gen && cd gen && rm -r -f tmp && mkdir tmp && \
@@ -74,10 +75,11 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
                                   -tclargs $(XilinxCoreName) xc7z020-clg484-1 \
                           ) > vivado-gen-ps7.log && \
                            rm -r -f tmp,MyError),\
-           $(shell rm -f gen/wrapper-module)$(error $(MyError)))
+           $(error $(MyError)))
+      VivadoWrapperFile:=$(shell echo gen/$(XilinxCoreName)*.v)
     endif # if need to get the wrapper
-    VivadoWrapperModule=$(shell cat gen/wrapper-module)
   endif # if non-ISE targets
+  VivadoWrapperModule:=$(basename $(notdir $(VivadoWrapperFile)))
   WrapperModule=$(if $(UseISE),$(ISEWrapperModule),$(VivadoWrapperModule))
   $(info The Zynq 7000 PS wrapper module name is: $(WrapperModule))
 endif # if not cleaning

@@ -398,6 +398,8 @@
 		request.length = OCPI_UTRUNCATE(ocpi_size_t, optr - obase);
 		int fd = creat("bits", 0666); write(fd, obase, request.length); close(fd);
 		strncpy(request.device_path, fpgaMgrDevice, sizeof(request.device_path));
+		ocpiInfo("Loading using FPGA manager, %u bytes uncompressed from %s",
+			 request.length, inputFile.c_str());
 		if (ioctl(xfd, OCPI_CMD_LOAD_FPGA, &request))
 		  return OU::eformat(error, "Error loading fpga: %s(%u)", strerror(errno), errno);
 	      }

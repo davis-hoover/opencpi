@@ -229,7 +229,7 @@ ifneq ($(HdlMode),worker)
 # In all non-worker cases, if SourceFiles is not specified in the Makefile,
 # we look for any relevant
 $(call OcpiDbgVar,SourceFiles,Before searching: )
-ifdef SourceFiles
+ifneq ($(origin SourceFiles),undefined)
 AuthoredSourceFiles:=$(SourceFiles)
 else
 AuthoredSourceFiles:=$(call OcpiPullPkgFiles,$(wildcard *.[vV]) $(wildcard *.vhd) $(wildcard *.vhdl))

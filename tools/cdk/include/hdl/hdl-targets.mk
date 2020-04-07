@@ -83,10 +83,11 @@ HdlTargets_zynq_ise:=$(foreach tgt,$(HdlTargets_zynq),$(tgt)_ise_alias)
 # ev: quad core, mali gpu, H.264
 # eg: quad core, mali gpu
 # cg: dual core
-HdlTargets_zynq_ultra:=xczu28dr xczu9eg xczu7ev
+HdlTargets_zynq_ultra:=xczu28dr xczu9eg xczu7ev xczu3cg
 # Zynq UltraScale+ chips require full part to be specified
 # The default is based on the zcu104 dev board, which is the cheapest, and supported by webpack.
-HdlDefaultTarget_zynq_ultra:=xczu7ev-2-ffvc1156e
+HdlDefaultTarget_zynq_ultra:=xczu3cg-2-sbva484e
+# This is zcu104, but it is not available for older versions of Vivado: xczu7ev-2-ffvc1156e
 
 ###############################################################################
 # Altera targets
