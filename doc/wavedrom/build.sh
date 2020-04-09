@@ -15,20 +15,14 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-HdlLibraries=fixed_float ocpi util
-
-# These need to be in order for most tools that aren't smart about figuring it out.
-SourceFiles= \
-  protocol_pkg.vhd \
-  message_sizer.vhd \
-  complex_short_with_metadata_pkg.vhd \
-  complex_short_with_metadata_body.vhd \
-  complex_short_with_metadata_demarshaller.vhd \
-  complex_short_with_metadata_marshaller.vhd \
-  complex_short_with_metadata_marshaller_old.vhd \
-  iqstream_pkg.vhd \
-  iqstream_body.vhd \
-  iqstream_demarshaller.vhd \
-  iqstream_marshaller.vhd
-include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+comps=(`find . -name \*.json | sed "s/\.json//g" | sed "s/\.\///g"`)
+echo "Building for:"
+for comp in "${comps[@]}"; do
+  echo $comp
+done
+for comp in "${comps[@]}"; do
+  npx wavedrom-cli -i $comp.json -s $comp.svg &
+done
+for comp in "${comps[@]}"; do
+  while [ ! -f $comp.svg ]; do true; done;
+done
