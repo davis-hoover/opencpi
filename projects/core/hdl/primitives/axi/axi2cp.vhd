@@ -81,7 +81,8 @@ begin
         case address_state is
           when a_idle_e =>
             if axi_in.AW.VALID = '1' and axi_in.W.VALID = '1' then
-              if axi_in.AW.LEN = slvn(1, axi_in.AW.LEN'length) then
+              -- if we have a 32 bit wide data path and a burst of length 2 DWs, wait for next DW.
+              if axi_in.W.DATA'length = 32 and axi_in.AW.LEN = slvn(1, axi_in.AW.LEN'length) then
                 address_state <= a_first_e;
                 addr2_r       <= '0';
               else
@@ -89,7 +90,8 @@ begin
                 address_state <= a_last_e;
               end if;
             elsif axi_in.AR.VALID = '1' then
-              if axi_in.AR.LEN = slvn(1, axi_in.AR.LEN'length) then --- BROKEN FOR SCALABLE AXI4 etc.
+              -- if we have a 32 bit wide data path and a burst of length 2 DWs, two cp reads
+              if axi_out.R.DATA'length = 32  and axi_in.AR.LEN = slvn(1, axi_in.AR.LEN'length) then
                 addr2_r       <= '0';
                 address_state <= a_first_e;
                 read_state    <= r_first_wanted_e;
@@ -205,7 +207,7 @@ begin
   axi_out.AR.READY <= read_done;
   -- Read Data Channel
   axi_out.R.ID     <= axi_in.AR.ID;
-  axi_out.R.DATA   <= cp_in.data;
+  axi_out.R.DATA(cp_in.data'range)   <= cp_in.data; -- not right for > 32 bits
   axi_out.R.RESP   <= Resp_OKAY;
   axi_out.R.LAST   <= read_done;
   axi_out.R.VALID  <= RVALID;
@@ -225,9 +227,9 @@ begin
                        axi_in.AR.ADDR(cp_out.address'left + 2 downto 2);
   cp_out.address(cp_out.address'left downto 1) <= address(address'left downto 1);
   cp_out.address(0) <= addr2_r;
-  cp_out.byte_en    <= axi_in.W.STRB when read_state = r_idle_e else
+  cp_out.byte_en    <= axi_in.W.STRB(cp_out.byte_en'range) when read_state = r_idle_e else
                        read_byte_en(axi_in.AR.ADDR(1 downto 0),
                                     axi_in.AR.SIZE);
-  cp_out.data       <= axi_in.W.DATA;
+  cp_out.data       <= axi_in.W.DATA(cp_out.data'range); -- not right for > 32 bits
   cp_out.take       <= RVALID and axi_in.R.READY;
 end rtl;
