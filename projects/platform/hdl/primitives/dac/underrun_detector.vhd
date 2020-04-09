@@ -1,26 +1,25 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library protocol;
-library misc_prims; use misc_prims.misc_prims.all;
+library protocol, dac; use dac.dac.all;
 
 -- generates underrun indicator when data starvation occurs
-entity dac_underrun_detector is
+entity underrun_detector is
   port(
     -- CTRL
     clk           : in  std_logic;
     rst           : in  std_logic;
-    status        : out dac_underrun_detector_status_t;
+    status        : out underrun_detector_status_t;
     -- INPUT
     iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
-    imetadata     : in  metadata_dac_t;
+    imetadata     : in  metadata_t;
     imetadata_vld : in  std_logic;
     irdy          : out std_logic;
     -- OUTPUT
     oprotocol     : out protocol.complex_short_with_metadata.protocol_t;
-    ometadata     : out metadata_dac_t;
+    ometadata     : out metadata_t;
     ometadata_vld : out std_logic;
     ordy          : in  std_logic);
-end entity dac_underrun_detector;
-architecture rtl of dac_underrun_detector is
+end entity underrun_detector;
+architecture rtl of underrun_detector is
   signal underrun                      : std_logic := '0';
   signal pending_xfer_underrun_error_r : std_logic := '0';
   signal xfer_underrun_error           : std_logic := '0';

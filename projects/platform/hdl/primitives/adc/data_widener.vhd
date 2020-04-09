@@ -1,6 +1,5 @@
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library misc_prims; use misc_prims.misc_prims.all;
-library protocol;
+library protocol, adc;
 
 -- widens data bus (useful when downstream processing bit growth is anticipated)
 entity data_widener is
@@ -11,7 +10,7 @@ entity data_widener is
     -- INPUT
     clk        : in  std_logic;
     rst        : in  std_logic;
-    idata      : in  data_complex_adc_t;
+    idata      : in  adc.adc.data_complex_t;
     isamp_drop : in  std_logic;
     ivld       : in  std_logic;
     irdy       : out std_logic;

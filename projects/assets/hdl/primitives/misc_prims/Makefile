@@ -37,13 +37,8 @@ SourceFiles=$(patsubst %,%.vhd,\
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
 	edge_detector/src/edge_detector \
-	adc_samp_drop_detector \
-	data_widener \
-	adc_maximal_lfsr_data_src \
 	time_downsampler \
 	time_corrector \
-	data_narrower \
-	dac_underrun_detector \
 	level_to_pulse_converter \
 	cdc_fifo_complex_short_with_metadata \
 	cdc_testing/src/gen_reset_sync \

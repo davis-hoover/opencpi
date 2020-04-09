@@ -169,6 +169,7 @@ if [ $model = RCC ]; then
     ./scripts/install-opencpi.sh $platform || exit 1
 else
     ocpidev -d projects/core build --hdl --hdl-platform=$platform
+    ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
     ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
     ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
     if [ -n "$project" ]; then
