@@ -80,7 +80,7 @@ if (messagesSentFinal != messagesToSendInitial):
     print ('    The final value of messagesSent = ', messagesSentFinal, 'while expected value is',  messagesToSendInitial)
     sys.exit(1)
 else:
-    print ('    The final value of messageSent is correct')
+    print ('    The final value of messagesSent is correct')
 
 # Generate the expected data that was sent to compare to the output data and also grab the number
 # of data sent for each message
