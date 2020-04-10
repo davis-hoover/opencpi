@@ -192,39 +192,37 @@ function do_addition {
   [ "$target" = - ] && case $1 in
       *\<target\>*|*\<platform\>*|*\<platform[-_]dir\>*) return;;
   esac
+  if [[  "$2" == "--"  && "${both[2]}" != "" && "$1" == \<rcc[-_]platform[-_]dir\>* ]]; then
+      return # ignore cross-platform here
+  fi
   exp=${both[1]}
-  if [ -z "$exp" ]; then
-      if [ "$2" = "--" ]; then
-	  exp=/
-      else
+  [ -z "$exp" ] && echo UNEXPECTED EMPTY SECOND FIELD && exit 1
+  if [ "$exp" = - ]; then # process defaults for exported location
+      if [  "$2" != "--"  -a -n "${both[2]}" ]; then # platform-specific defaults to platform subdir
 	  exp="<platform>/"
+      else
+	  exp=/                                      # normal is top of exports or top of sdcard
       fi
+  elif [ -n "${both[2]}" -a "$2" != -- ]; then # If platform specific, and not deployment, prepend platform name
+    exp="<platform>/"$exp
   fi
   rawsrc=${both[0]}
   if [[ $rawsrc == \<platform[-_]dir\>/* ]]; then
     # This is an export from a platform's own directory, which is already pre-staged for us in the
     # platform's own exports dir
-    rawsrc=${exp#<platform>/}
-    rawsrc=${rawsrc#<target>/}
+    rawsrc=${exp#<platform>}
     [[ "$exp" == */ ]] && rawsrc+=$(basename ${both[0]}) # if RHS was just a dir with trailing slash...
-    [ "$2" = "--" ] && rawsrc=deploy/${rawsrc#/}
-    rawsrc=$platform_dir/$rawsrc
+    if [ "$2" == "--" ]; then
+      rawsrc=deploy/${rawsrc#/} # deployment comes FROM prestaged deployment
+    fi
+    rawsrc=$platform_dir/$rawsrc    # otherwise just use the platform's dir
   fi
   rawsrc=${rawsrc//<target>/$target2}
   rawsrc=${rawsrc//<platform>/$platform}
-  rawsrc=${rawsrc/#<platform[-_]dir>/$platform_dir}
   [ -n "$rcc_platform_dir" ] && rawsrc=${rawsrc/#<rcc[-_]platform[-_]dir>/$rcc_platform_dir}
   [ -n "$rcc_platform" ] && rawsrc=${rawsrc//<rcc[-_]platform>/$rcc_platform}
-  if [ "$2" = "--" ]; then
-      # If deployment(@) replace make sure there is deploy/<target>
-      if [[ "${exp}" =~ ^deploy/ ]]; then
-	  exp=${exp/%deploy\/<target>\//deploy\/<platform>\/}
-      else
-	  exp=deploy/$platform/$exp
-      fi
-  else
-      # If not deployment(@) replace with just target else replace with deploy/target
-      exp=${exp//<target>/$target2}
+  if [ "$2" = -- ]; then
+      exp=deploy/$platform/${exp#/}
   fi
   exp=${exp//<platform>/$platform}
   exp=${exp//<target>/$target2}
@@ -243,7 +241,7 @@ function do_addition {
         # dir=$target/
         srctmp=${src=#$platform_dir/=}
       fi
-      if [[ $exp = - ]]; then
+      if [[ -z "$exp" ]]; then
         : # [[ $srctmp == */* ]] && dir+=$(dirname $srctmp)/
       elif [[ $exp =~ /$ ]]; then
         dir+=$exp
@@ -253,7 +251,7 @@ function do_addition {
       # figure out the basename of the export
       local base=$(basename $src)
       local suff=$(echo $base | sed -n '/\./s/.*\(\.[^.]*\)$/\1/p')
-      [[ $exp != - && ! $exp =~ /$ ]] && base=$(basename $exp)
+      [[ "$exp" && ! $exp =~ /$ ]] && base=$(basename $exp)
       base=${base//<suffix>/$suff}
       # echo For $1 $2
       # echo dir=$dir base=$base
@@ -526,7 +524,7 @@ shopt -u nullglob
 # If we are not building on the target platform do not pre-compile python AV-4850
 if [ "$OCPI_TOOL_DIR" = "$target" ]; then
   # Force precompilation of python files right here, but only if we are doing a target
-  py=python3.4
+  py=python3
   command -v $py &> /dev/null || py=/opt/local/bin/$py
   dirs=
   for d in `find exports -name "*.py"|sed 's=/[^/]*$=='|sort -u`; do

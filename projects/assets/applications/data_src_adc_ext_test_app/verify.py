@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -30,6 +30,9 @@ import opencpi.unit_test_utils as utu
 import opencpi.complexshortwithmetadata_utils as iqm
 
 num_expected_diffs = 0
+# left shift because dev signal port is MSB-justified and
+# ADC_INPUT_IS_LSB_OF_OUT_PORT=false
+expected_diff = (np.left_shift(1, 4))
 
 msgs = iqm.parse_msgs_from_msgs_in_file('case00.00.out')
 for msg in msgs:
@@ -42,9 +45,9 @@ for msg in msgs:
             print(i_or_q)
             if((not first) and (i_or_q != 0)):
                 diff = i_or_q - last_i_or_q
-                if(diff != 1):
+                if(diff != expected_diff):
                     msg1 = "ERROR: sample-to-sample diff was"
-                    msg2 = "instead of 1 (I or Q value was"
+                    msg2 = "instead of" + expected_diff + "(I or Q value was"
                     print(msg1, diff, msg2, i_or_q, ")")
                     exit(1)
                 else:

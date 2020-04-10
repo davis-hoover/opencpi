@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -47,9 +47,10 @@ ramp = np.arange(num_samples_to_generate)
 # Initialize empty array, sized to store interleaved I/Q 16bit samples
 out_data = np.array(np.zeros(len(ramp)), dtype=utu.dt_iq_pair)
 
-# Put ramp in generated output
-out_data['real_idx'] = np.int16(ramp)
-out_data['imag_idx'] = np.int16(ramp)
+# Put ramp in generated output, left shift because dev signal port is
+# MSB-justified
+out_data['real_idx'] = np.left_shift(np.int16(ramp), 4)
+out_data['imag_idx'] = np.left_shift(np.int16(ramp), 4)
 
 # Write to file
 with open(sys.argv[1], 'wb') as f:

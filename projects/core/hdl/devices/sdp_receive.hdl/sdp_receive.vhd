@@ -37,7 +37,7 @@ architecture rtl of worker is
     ndws_left : metalength_dws_t; -- left AFTER FIRST WSI XFER
     zlm       : bool_t;           -- this is a zlm
     eof       : bool_t;           -- this is an EOF
-    last_be   : std_logic_vector(dword_bytes * sdp_width_c-1 downto 0);    
+    last_be   : std_logic_vector(dword_bytes * sdp_width_c-1 downto 0);
     opcode    : std_logic_vector(meta_opcode_width_c-1 downto 0);
   end record msginfo_t;
   constant msginfo_width_c : natural :=
@@ -120,7 +120,7 @@ architecture rtl of worker is
   -- Signals and definitions for talking to the SDP side
   --------------------------------------------------------------------------------
   -- to the SDP side
-  signal buffer_ndws     : bram_addr_t;
+  signal buffer_ndws     : unsigned(width_for_max(memory_depth_c * sdp_width_c)-1 downto 0);
   signal buffer_count    : buffer_count_t;
   signal md_not_full     : std_logic;
   -- from the SDP side
@@ -232,7 +232,7 @@ g0: for i in 0 to sdp_width_c-1 generate
     when md_in_byte_bits = 0 and md_in_dws_bits >= sdp_width else
     md_in_dws_bits - (sdp_width - 1)
     when md_in_byte_bits /= 0 and md_in_dws_bits >= sdp_width - 1 else
-    (others => '0');   
+    (others => '0');
   md_in.last_be <=
     (others => '1') when md_in_raw.length(addr_shift_c-1 downto 0) = 0 else
     slv(not (unsigned(slv1(sdp_width_c*dword_bytes)) sll
@@ -299,7 +299,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   last_give            <= to_bool(wsi_dws_left = 0);
   giving               <= to_bool(will_give and not its(md_out.eof));
   wsi_dws_left         <= md_out.ndws_left when its(wsi_starting_r) else wsi_dws_left_r;
-  buffer_ndws          <= props_in.buffer_size(bram_addr_t'left + addr_shift_c
+  buffer_ndws          <= props_in.buffer_size(buffer_ndws'left + addr_shift_c
                                                downto addr_shift_c);
   faults                <= faults_r or dma_faults;
   --------------------------------------------------------------------------------

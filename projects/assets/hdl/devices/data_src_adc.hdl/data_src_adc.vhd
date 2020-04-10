@@ -15,8 +15,10 @@ architecture rtl of worker is
 
   signal adc_status : adc_samp_drop_detector_status_t;
 
-  signal adc_rst   : std_logic := '0';
-  signal adc_idata : data_complex_adc_t;
+  signal adc_rst                        : std_logic := '0';
+  signal adc_rst_falling_edge           : std_logic := '0';
+  signal adc_rst_falling_edge_sticky_r  : std_logic := '0';
+  signal adc_idata                      : data_complex_adc_t;
 
   signal adc_pending_initial_ready   : std_logic := '0';
   signal adc_pending_initial_ready_r : std_logic := '0';
@@ -28,12 +30,13 @@ architecture rtl of worker is
 
   signal adc_data_widener_irdy      : std_logic := '0';
   signal adc_data_widener_oprotocol : protocol_t := PROTOCOL_ZERO;
+  signal adc_data_widener_oeof      : std_logic := '0';
 
   signal adc_out_marshaller_irdy : std_logic := '0';
 
 begin
   ------------------------------------------------------------------------------
-  -- CTRL <- DATA CDC
+  -- CTRL
   ------------------------------------------------------------------------------
 
   -- ADCs usally won't provide a reset along w/ their clock
@@ -41,7 +44,7 @@ begin
     port map(
       src_rst => ctl_in.reset,
       dst_clk => dev_in.clk,
-      dst_rst => adc_rst);
+      dst_rst => adc_rst); -- TODO/FIXME replace with out_in.rst once CDC issues addressed
 
   ctrl_out_cdc : cdc.cdc.fast_pulse_to_slow_sticky
     port map(
@@ -55,12 +58,26 @@ begin
       slow_clr    => props_in.clr_overrun_sticky_error,
       slow_sticky => props_out.overrun_sticky_error);
 
+  -- this worker is not initialized until dev_in.clk is ticking and the out port
+  -- has successfully come into reset
+  adc_rst_detector_reg : util.util.reset_detector
+    port map(
+      clk                     => dev_in.clk,
+      rst                     => out_in.reset,
+      clr                     => '0',
+      rst_detected            => ctl_out.done,
+      rst_then_unrst_detected => open);
+
   ------------------------------------------------------------------------------
   -- out port
   ------------------------------------------------------------------------------
 
-  adc_idata.i <= dev_in.data_i(to_integer(unsigned(ADC_WIDTH_BITS))-1 downto 0);
-  adc_idata.q <= dev_in.data_q(to_integer(unsigned(ADC_WIDTH_BITS))-1 downto 0);
+  adc_idata.i <= dev_in.data_i(dev_in.data_i'left downto
+                               dev_in.data_i'left-
+                               to_integer(unsigned(ADC_WIDTH_BITS))+1);
+  adc_idata.q <= dev_in.data_q(dev_in.data_q'left downto
+                               dev_in.data_q'left-
+                               to_integer(unsigned(ADC_WIDTH_BITS))+1);
 
   out_port_data_width_32 : if(OUT_PORT_DATA_WIDTH = 32) generate
 
@@ -126,6 +143,7 @@ begin
         rst          => adc_rst,
         -- INPUT
         iprotocol    => adc_data_widener_oprotocol,
+        ieof         => adc_data_widener_oeof,
         irdy         => adc_out_marshaller_irdy,
         -- OUTPUT
         odata        => adc_data,
