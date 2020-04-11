@@ -952,6 +952,8 @@ mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
       const char *boardName;
       bool isSingle;
       if ((boardName = di.device.m_dev2bd.findSignal(**s, n, isSingle))) {
+	ocpiInfo("For device %s devinst %s signal %s boardname '%s'",
+		 di.device.deviceType().cname(), di.cname(), (*s)->cname(), boardName);
 	std::string devSig = (*s)->cname();
 	if ((*s)->m_width && isSingle)
 	  OU::formatAdd(devSig, "(%u)", n);
@@ -977,29 +979,34 @@ mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
 		       slotSig->cname() : ssi->second.c_str());
 	} else {
 	  ename = boardName;
-	  if (*boardName) {
+	  if (*boardName && m_sigmap.find(boardName) == m_sigmap.end()) {
 	    // So a non-slot signal has a boardName (i.e. mapped).
 	    // Thus we must make the mapped name an external signal of the container
+	    // if it is not already a board signal (e.g. an input mapped to two platform/device signals)
+	    ocpiInfo("Adding a board signal '%s' for device signal '%s'", boardName, (*i)->cname());
 	    Signal *ns = new Signal(**i);
 	    ns->m_name = boardName;
 	    if (isSingle)
 	      ns->m_width = 0;
 	    m_signals.push_back(ns);
-	    m_sigmap[ns->m_name.c_str()] = ns;
-	    if (!isSingle)
-	      break;
+	    m_sigmap[boardName] = ns;
 	  }
 	}
 
-	//	if (ename.length())
 	OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
 		      dname.c_str(), ename.c_str());
+	if (!isSingle)
+	  break;
       } else {
-	Signal *ns = new Signal(**i);
+	std::string ename = (*i)->m_name;
 	if (di.device.deviceType().m_type != Worker::Platform)
-	  OU::format(ns->m_name, "%s_%s", di.device.cname(), ns->cname());
-	m_signals.push_back(ns);
-	m_sigmap[ns->m_name.c_str()] = ns;
+	  OU::format(ename, "%s_%s", di.device.cname(), (*i)->cname());
+	if (m_sigmap.find(ename.c_str()) == m_sigmap.end()) {
+	  Signal *ns = new Signal(**i);
+	  ns->m_name = ename;
+	  m_signals.push_back(ns);
+	  m_sigmap[ns->cname()] = ns;
+	}
 	break;
       }
     }
