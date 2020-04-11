@@ -383,7 +383,7 @@ protected:
 	    dup2(fd, 2) < 0)
 	  _exit(10 + errno);
 	assert(fd > 2);
-	if (execl("/bin/sh", "/bin/sh", "--noprofile", "-c", cmd.c_str(), NULL))
+	if (execl("/bin/bash", "/bin/bash", "--noprofile", "-c", cmd.c_str(), NULL))
 	  _exit(10 + errno);
       }
       break; // not used.

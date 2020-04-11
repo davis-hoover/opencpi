@@ -1,4 +1,3 @@
-#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -16,23 +15,14 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-# dmaTestBasic - a script for dma "sanity" that runs in less than a minute
-
-echo "admin probe: "
-XX=($*)
-LAST=${XX[$#-1]}
-sudo ocpihdl settime -d $LAST
-sudo ocpihdl admin -d $LAST 
-
-#./testDMA "p f m" "3" "0 4112 8176" "100" $*
-#./testDMA "p f m" "3" "0 4096 8192" "100" $*
-#./testDMA "p " "3" "0 16 4096 8192" "1000" $*
-#./testDMA "p m" "3" "0 16 1024 4096 8192" "100" $*
-#./testDMA "p m f" "3" "0 16 1024 2048" "200" $*
-#./testDMA "p m f" "3" "0 4096 8176" "1000" $*
-testDMA "m f" "3" "0 4096 8192" "500" $*
-
-# TODO: Understand system "hiccup" or full stall with 4096 or 8192 and 100+ iterations
-# observed only with m+m
-# seems to happen much less when size is not exactly big 2^n (try +/- 16B)
+comps=(`find . -name \*.json | sed "s/\.json//g" | sed "s/\.\///g"`)
+echo "Building for:"
+for comp in "${comps[@]}"; do
+  echo $comp
+done
+for comp in "${comps[@]}"; do
+  npx wavedrom-cli -i $comp.json -s $comp.svg &
+done
+for comp in "${comps[@]}"; do
+  while [ ! -f $comp.svg ]; do true; done;
+done

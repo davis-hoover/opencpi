@@ -66,3 +66,17 @@ def parse_msgs_from_msgs_in_file(file_to_be_parsed):
         msg_array.append(msg[i])
     return msg_array
 
+def add_samples(f, data, num_cycles,samples_per_message):
+    """
+    Write samples message data and metadata to a file in messagesInFile=true format
+    with a specified message size. Data can be added num_cycles number of times
+    """
+    for i in range(num_cycles):
+        a = 0
+        while a < len(data):
+            if len(data) - a < samples_per_message:
+                utu.add_msg(f, SAMPLES_OPCODE, data[a:len(data)])
+            else:
+                utu.add_msg(f, SAMPLES_OPCODE, data[a:a+samples_per_message])
+            a+=samples_per_message
+

@@ -12,18 +12,23 @@ entity fifo_complex_short_with_metadata is
     irst     : in  std_logic;
     ienq     : in  std_logic;
     iprotocol: in  protocol.complex_short_with_metadata.protocol_t;
+    ieof     : in  std_logic;
     ifull_n  : out std_logic;
     -- OUTPUT
     oclk     : in  std_logic;
     odeq     : in  std_logic;
     oprotocol: out protocol.complex_short_with_metadata.protocol_t;
+    oeof     : out std_logic;
     oempty_n : out std_logic);
 end entity;
 architecture rtl of fifo_complex_short_with_metadata is
   signal src_in           : std_logic_vector(
-      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH-1 downto 0) :=
+      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH downto 0) :=
       (others => '0');
   signal dst_out          : std_logic_vector(
+      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH downto 0) :=
+      (others => '0');
+  signal dst_out_protocol : std_logic_vector(
       protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH-1 downto 0) :=
       (others => '0');
   signal fifo_dst_empty_n : std_logic := '0';
@@ -31,11 +36,11 @@ architecture rtl of fifo_complex_short_with_metadata is
                             protocol.complex_short_with_metadata.PROTOCOL_ZERO;
 begin
 
-  src_in <= protocol.complex_short_with_metadata.to_slv(iprotocol);
+  src_in <= protocol.complex_short_with_metadata.to_slv(iprotocol) & ieof;
 
   fifo : cdc.cdc.fifo
     generic map(
-      WIDTH       => protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH,
+      WIDTH       => protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH+1,
       DEPTH       => DEPTH)
     port map(
       src_CLK     => iclk,
@@ -50,7 +55,9 @@ begin
 
   oempty_n <= fifo_dst_empty_n;
 
-  protocol_s <= protocol.complex_short_with_metadata.from_slv(dst_out);
+  dst_out_protocol <= dst_out(
+      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH downto 1);
+  protocol_s <= protocol.complex_short_with_metadata.from_slv(dst_out_protocol);
 
   oprotocol.samples        <= protocol_s.samples;
   oprotocol.samples_vld    <= protocol_s.samples_vld and fifo_dst_empty_n;
@@ -61,6 +68,6 @@ begin
   oprotocol.flush          <= protocol_s.flush;
   oprotocol.sync           <= protocol_s.sync;
   oprotocol.end_of_samples <= protocol_s.end_of_samples;
-  oprotocol.eof            <= protocol_s.eof;
+  oeof                     <= dst_out(0);
 
 end rtl;

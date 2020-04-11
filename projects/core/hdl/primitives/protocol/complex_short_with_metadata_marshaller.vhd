@@ -22,19 +22,20 @@ library protocol; use protocol.complex_short_with_metadata.all;
 
 entity complex_short_with_metadata_marshaller is
   generic(
-    WSI_DATA_WIDTH         : positive := 16; -- 16 is default of codegen, but
-                                             -- MUST USE 32 FOR NOW
-    OUT_PORT_MBYTEEN_WIDTH : positive);
+    WSI_DATA_WIDTH    : positive := 16; -- 16 is default of codegen, but
+                                        -- MUST USE 32 FOR NOW
+    WSI_MBYTEEN_WIDTH : positive);
   port(
     clk          : in  std_logic;
     rst          : in  std_logic;
     -- INPUT
     iprotocol    : in  protocol.complex_short_with_metadata.protocol_t;
+    ieof         : in  ocpi.types.Bool_t;
     irdy         : out std_logic;
     -- OUTPUT
     odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
     ovalid       : out ocpi.types.Bool_t;
-    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
+    obyte_enable : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
     ogive        : out ocpi.types.Bool_t;
     osom         : out ocpi.types.Bool_t;
     oeom         : out ocpi.types.Bool_t;
@@ -51,6 +52,7 @@ architecture rtl of complex_short_with_metadata_marshaller is
   signal ivld        : std_logic := '0';
   signal iprotocol_r : protocol.complex_short_with_metadata.protocol_t :=
                        protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+  signal ieof_r      : std_logic := '0';
 
   signal in_xfer           : std_logic := '0';
   signal in_xfer_r         : std_logic := '0';
@@ -89,7 +91,7 @@ begin
             iprotocol.flush or
             iprotocol.sync or
             iprotocol.end_of_samples or
-            iprotocol.eof;
+            ieof;
     in_xfer <= irdy_s and ivld;
 
     in_xfer_reg : process(clk)
@@ -108,8 +110,10 @@ begin
       if(rising_edge(clk)) then
         if(rst = '1') then
           iprotocol_r <= protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+          ieof_r      <= '0';
         elsif(in_xfer = '1') then
           iprotocol_r <= iprotocol;
+          ieof_r      <= ieof;
         end if;
       end if;
     end process in_in_pipeline;
@@ -167,7 +171,7 @@ begin
     mux : process(oready, iprotocol_r, mux_start, state_r, pending_samples_eom_r)
     begin
       if(oready = '1') then
-        if((iprotocol_r.eof = '1') and (
+        if((ieof_r = '1') and (
             (mux_start = '1') or
             (state_r = SAMPLES_EOM_ONLY))) then
           if(pending_samples_eom_r = '1') then
