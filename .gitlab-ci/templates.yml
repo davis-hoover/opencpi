@@ -620,7 +620,7 @@
 .standard-artifacts:
   artifacts:
     when: on_success
-    expire_in: '24h'
+    expire_in: '3d'
     paths: 
       - artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
 
