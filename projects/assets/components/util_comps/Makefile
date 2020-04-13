@@ -21,7 +21,6 @@
 Tests = \
 	agc_real.test \
 	fifo.test \
-	test_tx_event.test \
 	timestamper.test \
 	timestamper_scdcd.test \
 	tx_event_ctrlr.test \
