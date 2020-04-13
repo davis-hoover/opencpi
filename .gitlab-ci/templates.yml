@@ -31,51 +31,18 @@
   stage: build-rcc
 
 
-################################
-# Jobs - Build-Primitives-Core #
-################################
-.build-primitives-core:
+###########################
+# Jobs - Build-Primitives #
+###########################
+.build-primitives:
   extends:
     - .standard-artifacts
-  stage: build-primitives-core
+  stage: build-primitives
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/primitives --hdl-platform $PLATFORM
-
-
-####################################
-# Jobs - Build-Primitives-Platform #
-####################################
-.build-primitives-platform:
-  extends:
-    - .standard-artifacts
-  stage: build-primitives-platform
-  script:
-    - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/platform/hdl/primitives --hdl-platform $PLATFORM
-
-
-##################################
-# Jobs - Build-Primitives-Assets #
-##################################
-.build-primitives-assets:
-  extends:
-    - .standard-artifacts
-  stage: build-primitives-assets
-  script:
-    - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/primitives --hdl-platform $PLATFORM
-
-
-####################################
-# Jobs - Build-Primitives-Inactive #
-####################################
-.build-primitives-inactive:
-  extends:
-    - .standard-artifacts
-  stage: build-primitives-inactive
-  script:
-    - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/hdl/primitives --hdl-platform $PLATFORM
 
 

@@ -1,62 +1,15 @@
 ################################
 # Jobs - Build-Primitives-Core #
 ################################
-build-primitives-core:centos6:matchstiq_z1:
+build-primitives:centos6:matchstiq_z1:
   extends:
-    - .build-primitives-core
+    - .build-primitives
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-
-
-####################################
-# Jobs - Build-Primitives-Platform #
-####################################
-build-primitives-platform:centos6:matchstiq_z1:
-  extends:
-    - .build-primitives-platform
-    - .centos6
-    - .matchstiq_z1-xilinx13_3
-  needs:
-    - job: prereq:centos6
-      artifacts: true
-    - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-
-
-##################################
-# Jobs - Build-Primitives-Assets #
-##################################
-build-primitives-assets:centos6:matchstiq_z1:
-  extends:
-    - .build-primitives-assets
-    - .centos6
-    - .matchstiq_z1-xilinx13_3
-  needs:
-    - job: prereq:centos6
-      artifacts: true
-    - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-
-
-####################################
-# Jobs - Build-Primitives-Inactive #
-####################################
-build-primitives-inactive:centos6:matchstiq_z1:
-  extends:
-    - .build-primitives-inactive
-    - .centos6
-    - .matchstiq_z1-xilinx13_3
-  needs:
-    - job: prereq:centos6
-      artifacts: true
-    - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
 
 
 ###########################
@@ -71,7 +24,7 @@ build-components-core:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-components-assets:centos6:matchstiq_z1:
   extends: 
@@ -82,9 +35,7 @@ build-components-assets:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-components-assets_ts:centos6:matchstiq_z1:
   extends: 
@@ -95,9 +46,7 @@ build-components-assets_ts:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true 
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-components-inactive:centos6:matchstiq_z1:
   extends: 
@@ -108,10 +57,7 @@ build-components-inactive:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true 
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
-    - build-primitives-inactive:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 
 #########################
@@ -126,7 +72,7 @@ build-adapters-core:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-adapters-assets:centos6:matchstiq_z1:
   extends: 
@@ -137,9 +83,7 @@ build-adapters-assets:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 
 ########################
@@ -154,7 +98,7 @@ build-devices-core:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-devices-platform:centos6:matchstiq_z1:
   extends: 
@@ -165,8 +109,7 @@ build-devices-platform:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-devices-assets:centos6:matchstiq_z1:
   extends: 
@@ -177,9 +120,7 @@ build-devices-assets:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-devices-assets_ts:centos6:matchstiq_z1:
   extends: 
@@ -190,9 +131,7 @@ build-devices-assets_ts:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true 
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-devices-inactive:centos6:matchstiq_z1:
   extends: 
@@ -203,9 +142,7 @@ build-devices-inactive:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true 
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 
 ######################
@@ -220,7 +157,7 @@ build-cards-core:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-cards-platform:centos6:matchstiq_z1:
   extends: 
@@ -231,8 +168,7 @@ build-cards-platform:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-cards-assets:centos6:matchstiq_z1:
   extends: 
@@ -243,9 +179,7 @@ build-cards-assets:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 build-cards-inactive:centos6:matchstiq_z1:
   extends: 
@@ -256,9 +190,7 @@ build-cards-inactive:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
 
 
 ##########################
@@ -273,7 +205,7 @@ build-platforms-core:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-devices-core:centos6:matchstiq_z1
     - build-cards-core:centos6:matchstiq_z1
     - build-adapters-core:centos6:matchstiq_z1
@@ -290,8 +222,7 @@ build-platforms-platform:centos6:matchstiq_z1:
     - build:centos6
     - build-devices-platform:centos6:matchstiq_z1
     - build-cards-platform:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-devices-core:centos6:matchstiq_z1
 
 build-platforms-assets:centos6:matchstiq_z1:
@@ -305,13 +236,11 @@ build-platforms-assets:centos6:matchstiq_z1:
     - build:centos6
     - build-devices-platform:centos6:matchstiq_z1
     - build-cards-platform:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-devices-assets:centos6:matchstiq_z1
     - build-cards-assets:centos6:matchstiq_z1
     - build-adapters-assets:centos6:matchstiq_z1
     - build-components-assets:centos6:matchstiq_z1
-    - build-primitives-core:centos6:matchstiq_z1
     - build-devices-core:centos6:matchstiq_z1
 
 build-platforms-inactive:centos6:matchstiq_z1:
@@ -323,13 +252,10 @@ build-platforms-inactive:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-inactive:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-devices-inactive:centos6:matchstiq_z1
     - build-cards-inactive:centos6:matchstiq_z1
     - build-components-inactive:centos6:matchstiq_z1
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
 
 
 #####################
@@ -344,9 +270,8 @@ build-assemblies-platform:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
 
 build-assemblies-assets:centos6:matchstiq_z1:
@@ -358,11 +283,9 @@ build-assemblies-assets:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
 build-assemblies-assets_ts:centos6:matchstiq_z1:
@@ -374,11 +297,9 @@ build-assemblies-assets_ts:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
     - build-components-assets_ts:centos6:matchstiq_z1
     - build-devices-assets_ts:centos6:matchstiq_z1
@@ -392,13 +313,10 @@ build-assemblies-inactive:centos6:matchstiq_z1:
     - job: prereq:centos6 
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
-    - build-primitives-inactive:centos6:matchstiq_z1
     - build-platforms-inactive:centos6:matchstiq_z1
 
 
@@ -414,9 +332,8 @@ build-test-core:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
 build-test-assets-base:centos6:matchstiq_z1:
@@ -428,11 +345,9 @@ build-test-assets-base:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
 build-test-assets-comms:centos6:matchstiq_z1:
@@ -444,11 +359,9 @@ build-test-assets-comms:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
 build-test-assets-dsp:centos6:matchstiq_z1:
@@ -460,11 +373,9 @@ build-test-assets-dsp:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
 build-test-assets-misc:centos6:matchstiq_z1:
@@ -476,11 +387,9 @@ build-test-assets-misc:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
 build-test-assets-util:centos6:matchstiq_z1:
@@ -492,11 +401,9 @@ build-test-assets-util:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
 build-test-assets_ts:centos6:matchstiq_z1:
@@ -508,11 +415,9 @@ build-test-assets_ts:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
     - build-platforms-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
     - build-components-assets_ts:centos6:matchstiq_z1
     - build-devices-assets_ts:centos6:matchstiq_z1
@@ -526,7 +431,5 @@ build-test-inactive:centos6:matchstiq_z1:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
-    - build-primitives-core:centos6:matchstiq_z1
-    - build-primitives-platform:centos6:matchstiq_z1
-    - build-primitives-assets:centos6:matchstiq_z1
+    - build-primitives:centos6:matchstiq_z1
     - build-platforms-inactive:centos6:matchstiq_z1
