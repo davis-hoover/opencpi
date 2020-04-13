@@ -18,7 +18,7 @@
   \hline
   Worker Type       &  Device\\
   \hline
-  Component Library &  ocpi.assets.devices\\
+  Component Library &  ocpi.platform.devices\\
   \hline
   Workers           &  data\_sink\_dac.hdl\\
   \hline
@@ -39,11 +39,11 @@
       \hline
       v1.6 & Released initial technology preview & \\
       \hline
-      v1.7 & Updated port/property/interface tables for accuracy & \\
+      v1.7 & Updated port/property/interface tables for accuracy. Package ID changed from ocpi.assets to ocpi.platform. & \\
       \hline
     \end{longtable}
   \end{table}
-\end{center}
+end{center}
 
 \section*{Functionality}
 \begin{flushleft}

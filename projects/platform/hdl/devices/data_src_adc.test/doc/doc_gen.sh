@@ -19,7 +19,7 @@
 REPO_PATH=../../../../../../
 
 ${REPO_PATH}/doc/av/tex/docGen.py \
-    ${REPO_PATH}/projects/assets/hdl/devices/specs/data_src_adc-spec.xml \
+    ${REPO_PATH}/projects/platform/hdl/devices/specs/data_src_adc-spec.xml \
     -owd \
-    ${REPO_PATH}/projects/assets/hdl/devices/data_src_adc.hdl/data_src_adc.xml \
+    ${REPO_PATH}/projects/platform/hdl/devices/data_src_adc.hdl/data_src_adc.xml \
     --no-prompt

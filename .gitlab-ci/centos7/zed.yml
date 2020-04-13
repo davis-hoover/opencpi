@@ -12,6 +12,21 @@ build-primitives-core:centos7:zed:
     - build:centos7
 
 
+####################################
+# Jobs - Build-Primitives-Platform #
+####################################
+build-primitives-platform:centos7:zed:
+  extends:
+    - .build-primitives-platform
+    - .centos7
+    - .zed-xilinx13_4
+  needs:
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-primitives-core:centos7:zed
+
+
 ##################################
 # Jobs - Build-Primitives-Assets #
 ##################################
@@ -40,6 +55,7 @@ build-primitives-inactive:centos7:zed:
       artifacts: true
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 
@@ -67,6 +83,7 @@ build-components-assets:centos7:zed:
       artifacts: true
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 build-components-assets_ts:centos7:zed:
@@ -79,6 +96,7 @@ build-components-assets_ts:centos7:zed:
       artifacts: true 
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 build-components-inactive:centos7:zed:
@@ -91,6 +109,7 @@ build-components-inactive:centos7:zed:
       artifacts: true 
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-primitives-inactive:centos7:zed
 
@@ -119,6 +138,7 @@ build-adapters-assets:centos7:zed:
       artifacts: true
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 
@@ -136,6 +156,18 @@ build-devices-core:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
 
+build-devices-platform:centos7:zed:
+  extends: 
+    - .build-devices-platform
+    - .centos7
+    - .zed-xilinx13_4
+  needs:
+    - job: prereq:centos7 
+      artifacts: true
+    - build:centos7
+    - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+
 build-devices-assets:centos7:zed:
   extends: 
     - .build-devices-assets
@@ -146,6 +178,7 @@ build-devices-assets:centos7:zed:
       artifacts: true
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 build-devices-assets_ts:centos7:zed:
@@ -158,6 +191,7 @@ build-devices-assets_ts:centos7:zed:
       artifacts: true 
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 build-devices-inactive:centos7:zed:
@@ -170,6 +204,7 @@ build-devices-inactive:centos7:zed:
       artifacts: true 
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 
@@ -187,6 +222,18 @@ build-cards-core:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
 
+build-cards-platform:centos7:zed:
+  extends: 
+    - .build-cards-platform
+    - .centos7
+    - .zed-xilinx13_4
+  needs:
+    - job: prereq:centos7 
+      artifacts: true
+    - build:centos7
+    - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+
 build-cards-assets:centos7:zed:
   extends: 
     - .build-cards-assets
@@ -197,6 +244,7 @@ build-cards-assets:centos7:zed:
       artifacts: true
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 build-cards-inactive:centos7:zed:
@@ -209,6 +257,7 @@ build-cards-inactive:centos7:zed:
       artifacts: true
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
 
 
@@ -230,6 +279,21 @@ build-platforms-core:centos7:zed:
     - build-adapters-core:centos7:zed
     - build-components-core:centos7:zed
 
+build-platforms-platform:centos7:zed:
+  extends: 
+    - .build-platforms-assets
+    - .centos7
+    - .zed-xilinx13_4
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-devices-platform:centos7:zed
+    - build-cards-platform:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-primitives-core:centos7:zed
+    - build-devices-core:centos7:zed
+
 build-platforms-assets:centos7:zed:
   extends: 
     - .build-platforms-assets
@@ -239,6 +303,9 @@ build-platforms-assets:centos7:zed:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
+    - build-devices-platform:centos7:zed
+    - build-cards-platform:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-devices-assets:centos7:zed
     - build-cards-assets:centos7:zed
@@ -262,11 +329,26 @@ build-platforms-inactive:centos7:zed:
     - build-components-inactive:centos7:zed
     - build-primitives-core:centos7:zed
     - build-primitives-assets:centos7:zed
+    - build-primitives-platform:centos7:zed
 
 
 #####################
 # Jobs - Assemblies #
 #####################
+build-assemblies-platform:centos7:zed:
+  extends: 
+    - .build-assemblies-platform
+    - .centos7
+    - .zed-xilinx13_4
+  needs:
+    - job: prereq:centos7 
+      artifacts: true
+    - build:centos7
+    - build-primitives-core:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
+
 build-assemblies-assets:centos7:zed:
   extends: 
     - .build-assemblies-assets
@@ -278,6 +360,8 @@ build-assemblies-assets:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
 
@@ -292,6 +376,8 @@ build-assemblies-assets_ts:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-components-assets_ts:centos7:zed
@@ -308,6 +394,8 @@ build-assemblies-inactive:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-primitives-inactive:centos7:zed
@@ -342,6 +430,8 @@ build-test-assets-base:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
 
@@ -356,6 +446,8 @@ build-test-assets-comms:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
 
@@ -370,6 +462,8 @@ build-test-assets-dsp:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
 
@@ -384,6 +478,8 @@ build-test-assets-misc:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
 
@@ -398,6 +494,8 @@ build-test-assets-util:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
 
@@ -412,6 +510,8 @@ build-test-assets_ts:centos7:zed:
     - build:centos7
     - build-primitives-core:centos7:zed
     - build-platforms-core:centos7:zed
+    - build-primitives-platform:centos7:zed
+    - build-platforms-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-components-assets_ts:centos7:zed
@@ -427,5 +527,6 @@ build-test-inactive:centos7:zed:
       artifacts: true
     - build:centos7
     - build-primitives-core:centos7:zed
+    - build-primitives-platform:centos7:zed
     - build-primitives-assets:centos7:zed
     - build-platforms-inactive:centos7:zed
