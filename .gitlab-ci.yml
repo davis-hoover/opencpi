@@ -12,6 +12,7 @@ stages:
   - build
   - build-rcc
   - build-primitives-core
+  - build-primitives-platform
   - build-primitives-assets
   - build-primitives-inactive
   - build-workers
