@@ -113,8 +113,12 @@ class Worker
   void write(size_t /*offset*/, size_t /*nBytes*/, const void */*p_data*/ ) {}
   void setPropertyBytes(const OA::PropertyInfo &/*info*/, size_t /*offset*/,
 			const uint8_t */*data*/, size_t /*nBytes*/, unsigned /*idx*/) const {};
-  void setProperty8(const OA::PropertyInfo &/*info*/, size_t /*offset*/, uint8_t /*data*/,
-		    unsigned /*idx*/) const {}
+  void setProperty8(const OA::PropertyInfo &info, size_t offset, uint8_t data,
+		    unsigned idx) const {
+    char unparsed[2+8/4+1];
+    snprintf(unparsed, sizeof(unparsed), "%" PRIu8, data);
+    setProperty(info, unparsed, info, offset + idx, 0);
+  }
   void setProperty16(const OA::PropertyInfo &/*info*/, size_t /*offset*/, uint16_t /*data*/,
 		     unsigned /*idx*/) const {}
   void setProperty32(const OA::PropertyInfo &/*info*/, size_t /*offset*/, uint32_t /*data*/,

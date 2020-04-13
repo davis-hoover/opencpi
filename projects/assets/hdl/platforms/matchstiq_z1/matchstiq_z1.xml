@@ -37,7 +37,7 @@
   <device worker="lime_dac"> <!-- Uses RX_CLK_OUT from Lime -->
     <property name="USE_CLK_IN_p" value="1"/>
     <property name="USE_CTL_CLK_p" value="0"/>
-    <signal name="TX_CLK_IN" platform="lime_adc_rx_clk_out"/>
+    <signal name="TX_CLK_IN" platform="lime_adc_RX_CLK_OUT"/>
   </device>
   <device worker="lime_spi"/>
   <device worker="lime_rx"> <!-- RXEN not connected to FPGA -->
