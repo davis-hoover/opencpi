@@ -12,11 +12,13 @@ component fifo_complex_short_with_metadata is
     irst      : in  std_logic;
     ienq      : in  std_logic;
     iprotocol : in  protocol.complex_short_with_metadata.protocol_t;
+    ieof      : in  std_logic;
     ifull_n   : out std_logic;
     -- OUTPUT
     oclk      : in  std_logic;
     odeq      : in  std_logic;
     oprotocol : out protocol.complex_short_with_metadata.protocol_t;
+    oeof      : out std_logic;
     oempty_n  : out std_logic);
 end component;
 
