@@ -26,6 +26,7 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # you must define container XML files, and mention them in a "Containers" variable here, e.g.:
 # Containers=take_input_from_local_ADC
 
-Libraries+=misc_prims util_prims dsp_prims comms_prims # this is BAD
+Libraries+=adc
+ComponentLibraries+=devices
 OnlyPlatforms=isim modelsim xsim
 include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk

@@ -21,10 +21,8 @@
 # 2) Similarly, Emulators must occur after the devices they emulate.
 Workers = \
 	data_src_adc.hdl \
-	data_src_adc_ad9361_sub.hdl \
 	data_src_adc_em.hdl \
 	data_sink_dac.hdl \
-	data_sink_dac_ad9361_sub.hdl \
 	data_sink_dac_em.hdl
 
 include $(OCPI_CDK_DIR)/include/library.mk

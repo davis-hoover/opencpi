@@ -1,7 +1,5 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library misc_prims; use misc_prims.misc_prims.all;
-library cdc;
-library util;
+library cdc, util, adc;
 library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
@@ -13,16 +11,16 @@ architecture rtl of worker is
                       to_integer(unsigned(OUT_PORT_DATA_WIDTH))-1 downto 0) :=
                       (others => '0');
 
-  signal adc_status : adc_samp_drop_detector_status_t;
+  signal adc_status : adc.adc.samp_drop_detector_status_t;
 
   signal adc_rst   : std_logic := '0';
-  signal adc_idata : data_complex_adc_t;
+  signal adc_idata : adc.adc.data_complex_t;
 
   signal adc_pending_initial_ready   : std_logic := '0';
   signal adc_pending_initial_ready_r : std_logic := '0';
 
   signal adc_overrun_generator_ivld       : std_logic := '0';
-  signal adc_overrun_generator_odata      : data_complex_adc_t;
+  signal adc_overrun_generator_odata      : adc.adc.data_complex_t;
   signal adc_overrun_generator_osamp_drop : std_logic := '0';
   signal adc_overrun_generator_ovld       : std_logic := '0';
 
@@ -91,7 +89,7 @@ begin
     end process;
 
     overrun_generator :
-        misc_prims.misc_prims.adc_samp_drop_detector
+        adc.adc.samp_drop_detector
       port map(
         -- CTRL
         clk        => dev_in.clk,
@@ -106,7 +104,7 @@ begin
         ovld       => adc_overrun_generator_ovld,
         ordy       => adc_data_widener_irdy);
 
-    data_widener : misc_prims.misc_prims.data_widener
+    data_widener : adc.adc.data_widener
       generic map(
         BITS_PACKED_INTO_MSBS => BITS_PACKED_INTO_MSBS)
       port map(

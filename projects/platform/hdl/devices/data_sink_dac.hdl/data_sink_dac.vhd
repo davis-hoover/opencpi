@@ -1,28 +1,44 @@
+-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+-- distributed with this source distribution.
+--
+-- This file is part of OpenCPI <http://www.opencpi.org>
+--
+-- OpenCPI is free software: you can redistribute it and/or modify it under the
+-- terms of the GNU Lesser General Public License as published by the Free
+-- Software Foundation, either version 3 of the License, or (at your option) any
+-- later version.
+--
+-- OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+-- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+-- A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU Lesser General Public License
+-- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi, cdc; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library util;
+library util, dac;
 library protocol; use protocol.complex_short_with_metadata.all;
-library misc_prims; use misc_prims.misc_prims.all;
 architecture rtl of worker is
 
   signal dac_rst                                : std_logic;
   signal opcode_samples, opcode_eos             : std_logic := '0';
 
-  signal dac_metadata_status                    : dac_underrun_detector_status_t;
+  signal dac_metadata_status                    : dac.dac.underrun_detector_status_t;
   signal dac_opcode                             : opcode_t := SAMPLES;
   signal dac_in_demarshaller_oprotocol          : protocol_t := PROTOCOL_ZERO;
 
-  signal dac_underrun_detector_imetadata        : metadata_dac_t;
+  signal dac_underrun_detector_imetadata        : dac.dac.metadata_t;
   signal dac_underrun_detector_irdy             : std_logic := '0';
   signal dac_underrun_detector_oprotocol        :
       protocol.complex_short_with_metadata.protocol_t;
-  signal dac_underrun_detector_ometadata        : metadata_dac_t;
+  signal dac_underrun_detector_ometadata        : dac.dac.metadata_t;
   signal dac_underrun_detector_ometadata_vld    : std_logic := '0';
 
   signal dac_data_narrower_irdy                 : std_logic := '0';
   signal dac_data_narrower_ordy                 : std_logic := '0';
-  signal dac_data_narrower_odata                : data_complex_dac_t;
-  signal dac_data_narrower_ometadata            : metadata_dac_t;
+  signal dac_data_narrower_odata                : dac.dac.data_complex_t;
+  signal dac_data_narrower_ometadata            : dac.dac.metadata_t;
   signal dac_data_narrower_ometadata_vld        : std_logic := '0';
 
   signal dac_clk_unused_opcode_detected         : std_logic;
@@ -124,7 +140,7 @@ begin
     
     ctl_out.finished <= dac_in_demarshaller_oprotocol.eof;
     
-    dac_underrun_detector : misc_prims.misc_prims.dac_underrun_detector
+    dac_underrun_detector : dac.dac.underrun_detector
       port map(
         -- CTRL
         clk           => dev_in.clk,
@@ -141,7 +157,7 @@ begin
         ometadata_vld => dac_underrun_detector_ometadata_vld,
         ordy          => dac_data_narrower_irdy);
 
-    data_narrower : misc_prims.misc_prims.data_narrower
+    data_narrower : dac.dac.data_narrower
       generic map(
         BITS_PACKED_INTO_LSBS => to_boolean(DAC_OUTPUT_IS_LSB_OF_IN_PORT))
       port map(
