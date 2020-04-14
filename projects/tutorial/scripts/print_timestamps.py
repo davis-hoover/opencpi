@@ -62,10 +62,10 @@ def validate(argv):
     while a < len(input_file_samples):
         val = input_file_samples[a] + input_file_samples[a+1] / 0xFFFFFFFF
         timestamp_list.append(val)
-        s = "Timestamp is: {:10.7f} ( Seconds: {0:#x} Fraction: {0:#x} )".format(
+        s = "Timestamp is: {:10.7f} ( Seconds: {:#x} Fraction: {:#x} )".format(
             timestamp_list[-1], input_file_samples[a], input_file_samples[a+1])
         if len(timestamp_list) > 1:
-            s += " Delta: {:10.7f}".format(timestamp_list[-1] - time_stamplist[-2])
+            s += " Delta: {:10.7f}".format(timestamp_list[-1] - timestamp_list[-2])
         print(s)
         a += 2
 

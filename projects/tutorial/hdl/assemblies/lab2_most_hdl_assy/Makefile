@@ -26,6 +26,7 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # you must define container XML files, and mention them in a "Containers" variable here, e.g.:
 # Containers=take_input_from_local_ADC
 
+# Exclude this for now since the complex mixer is not happy with modelsim FIXME
 ExcludePlatforms=modelsim
 
 # The following is only required for backwards compatibility with ISE/XST:
