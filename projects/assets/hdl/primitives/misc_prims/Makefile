@@ -33,7 +33,6 @@ SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_body \
 	debounce/src/debounce \
 	cdc_pkg \
-	lfsr/src/lfsr \
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
 	edge_detector/src/edge_detector \
