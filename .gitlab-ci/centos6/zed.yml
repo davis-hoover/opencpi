@@ -334,6 +334,7 @@ build-test-core:centos6:zed:
     - build:centos6
     - build-primitives:centos6:zed
     - build-platforms-core:centos6:zed
+    - build-platforms-platform:centos6:zed
     - build-platforms-assets:centos6:zed
 
 build-test-assets-base:centos6:zed:
@@ -432,4 +433,5 @@ build-test-inactive:centos6:zed:
       artifacts: true
     - build:centos6
     - build-primitives:centos6:zed
+    - build-platforms-platform:centos6:zed
     - build-platforms-inactive:centos6:zed
