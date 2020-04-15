@@ -162,7 +162,7 @@ OcpiXilinxVivadoInit=\
   . $(OcpiXilinxVivadoDir)/.settings64-Vivado.sh $(and $1,> $1); \
   $(if $(OcpiXilinxVivadoLicenseFile),,\
     echo Warning: No Vivado license file specified or found, which is ok with recent WebPack versions/parts.;) \
-  export LM_LICENSE_FILE=$(OcpiXilinxVivadoLicenseFile)
+  export XILINX_LOCAL_USER_DATA=no; export LM_LICENSE_FILE=$(OcpiXilinxVivadoLicenseFile)
 
 
 # emit shell assignments - allowing errors etc.
