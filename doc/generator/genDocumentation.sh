@@ -244,11 +244,11 @@ generate_pdfs() {
         pushd "$d" || return 1
         prefix=.
         osp_name="$(get_osp_name $d)"
-        if expr match $d '.*assets_ts' > /dev/null; then
+        if expr match $d '.*projects/assets_ts' > /dev/null; then
             prefix=assets_ts
-        elif expr match $d '.*assets' > /dev/null; then
+        elif expr match $d '.*projects/assets' > /dev/null; then
             prefix=assets
-        elif expr match $d '.*core' > /dev/null; then
+        elif expr match $d '.*projects/core' > /dev/null; then
             prefix=core
         elif expr match $d '.*tutorials' > /dev/null; then
             prefix=tutorials
