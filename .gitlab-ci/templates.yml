@@ -444,6 +444,13 @@
     PLATFORM: 'xsim'
     MODEL: 'hdl'
 
+.isim:
+  extends:
+    - .vivado
+  variables:
+    PLATFORM: 'isim'
+    MODEL: 'hdl'
+
 .xilinx13_3:
   variables:
     PLATFORM: 'xilinx13_3'
