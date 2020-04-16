@@ -453,6 +453,15 @@ def deploy(args):
     """
     cdk = os.environ['OCPI_CDK_DIR']
     local_dir = '{}/{}/sdcard-{}'.format(cdk, args.hw_platform, args.sw_platform)
+
+    if not os.path.isdir(local_dir):
+        print("Error: {} does not exist".format(local_dir))
+        print("Try running 'scripts/install-platform.sh {} && scripts/install-platform.sh {}'".format(
+                    args.hw_platform, args.sw_platform)
+            )
+
+        return 1
+
     print('Deploying Opencpi boot files to remote device from {}...'.format(local_dir))
 
     cmd = 'scp {} -r {}/. {}@{}:/mnt/card'.format(
