@@ -60,7 +60,7 @@ PKGS_D+=(time)
 #    for various project testing scripts - to allow users to use python2 - (we migrate to 3)
 #    -- (AV-1261, AV-1299): still python 2 or just for users?
 #    -- note that we also need python3 but some packages are from epel - below in $#4
-PKGS_D+=(python-matplotlib scipy numpy)
+PKGS_D+=(python-matplotlib scipy numpy python3-tkinter)
 #    enable other packages in the epel repo, some required for devel (e.g. python34)
 PKGS_D+=(epel-release)
 #    for various 32-bit software tools we end up supporting (e.g. modelsim) in devel (AV-567)
