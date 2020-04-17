@@ -171,6 +171,8 @@ else
     ocpidev -d projects/core build --hdl --hdl-platform=$platform
     ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
     ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
+    # Make sure that tutorials can run after installation, note will do rcc too.
+    [ "$platform" != xsim ] || ocpidev -d projects/tutorial build --hdl-platform=$platform
     if [ -n "$project" ]; then
 	ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
 	echo "HDL platform \"$platform\" built for OSP in $project_dir, including assemblies."
