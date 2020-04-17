@@ -1,0 +1,2 @@
+dig_radio_ctrlr-spec.xml symlink is a temporary workaround for
+missing/erroneous framework import/exports of OCSs across projects.

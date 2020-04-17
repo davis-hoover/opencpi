@@ -24,6 +24,7 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 #  $(OCPI_HDL_IMPORTS_DIR)/coregen/temac_v6 \
 #  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_trn_v6_gtx_x4_250 \
 #  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_hip_s4gx_gen2_x4_128
+# TODO - FIXME - zynq is a workaround for broken/missing framework mechanism for import/export of HDL primitive libraries across projects
 PrimitiveLibraries=comms_prims \
                    misc_prims \
                    util_prims \
@@ -31,6 +32,7 @@ PrimitiveLibraries=comms_prims \
                    virtex6 \
                    stratix4 \
                    xilinx \
+                   zynq \
                    i2c
 PrimitiveCores=temac_v6\
                pcie_4243_trn_v6_gtx_x4_250 \
