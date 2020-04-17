@@ -19,7 +19,7 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable is not set correctly.))
 Containers= \
 	cnt_0rx_1tx_thruasm_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_0rx_1tx_thruasm_fmcomms_2_3_lpc_LVDS_zed \
+	cnt_nopfcfg_0rx_1tx_fmcomms_2_3_lpc_thruasm_zed \
 	cnt_0rx_1tx_thruasm_matchstiq_z1 \
 	cnt_0rx_1tx_thruasm_zipper_hpc_ml605 \
 	cnt_0rx_1tx_thruasm_zipper_hsmc_a_alst4 \

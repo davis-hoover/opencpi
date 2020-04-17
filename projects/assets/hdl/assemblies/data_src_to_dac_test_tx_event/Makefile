@@ -45,7 +45,7 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # Containers=take_input_from_local_ADC
 Containers= \
 	cnt_0rx_1tx_txsrc_eventasmout_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_0rx_1tx_txsrc_eventasmout_fmcomms_2_3_lpc_LVDS_zed \
+	cnt_nopfcfg_0rx_1tx_fmcomms_2_3_lpc_txsrc_eventasmout_zed \
 	cnt_0rx_1tx_txsrc_eventasmout_matchstiq_z1
 DefaultContainers=
 
