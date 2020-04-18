@@ -16,12 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- THIS FILE WAS ORIGINALLY GENERATED ON Thu Dec  6 14:15:22 2018 EST
--- BASED ON THE FILE: zcu102.xml
--- YOU *ARE* EXPECTED TO EDIT IT
--- This file initially contains the architecture skeleton for worker: zcu102
-
-library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
+library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library platform; use platform.platform_pkg.all;
 library zynq_ultra; use zynq_ultra.zynq_ultra_pkg.all;

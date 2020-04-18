@@ -81,7 +81,6 @@ local_repo:=$(or $(OCPI_XILINX_GIT_REPOSITORY),$(call OcpiXilinxDir)/git)
 xilinx_releases:=$(or $(OCPI_XILINX_ZYNQ_RELEASE_DIR),$(call OcpiXilinxDir,warning)/ZynqReleases)
 kernel_headers:=$(OcpiKernelDir).tgz
 kernel_config:=$(and $(wildcard kernel.config),$(CURDIR)/kernel.config)
-binary_release:=/home/jek/mac/Xilinx/ZynqReleases/2019.1-zed-release-dir/2019.1-zed-release
 # kernel file from gen/patch_ub_image
 kernel_image:=../uImage
 exports_file:=$(xilinx_sw_platform).exports

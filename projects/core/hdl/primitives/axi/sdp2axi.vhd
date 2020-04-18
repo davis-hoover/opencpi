@@ -16,29 +16,31 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- This module adapts between the SDP and an AXI4 slave interface
+----------------------------------------------------------------------------------------------------
+-- This module adapts between the SDP and an AXI slave interface
 -- The initial target AXI configuration is a 64 bit version of the AXI_HP ports on zynq,
----- This is a hardware interface on Zynq
+---- This AXI is a hardware interface on Zynq
 -- Another target is the AXI PCIE bridge, 
----- This is a VHDL bridge to the underlying PCIE AXI4-lite TLP interface (mostly HW)
+---- This AXI is a VHDL bridge to the underlying PCIE AXI4-lite TLP interface (mostly HW)
 ---- The tax (performace and gates) for using this IP core is unknown
 ---- Can be wide and can have long bursts
----- But this "AXU-master-only" mode does not work well for peer-to-peer,
+---- But this "AXI-master-only" mode does not work well for peer-to-peer,
 ---- So a different module that is both master and slave is necessary for good peer to peer.
--- For now we do not parameterize the AXI interface - it is what the zynq 64 hardware is.
+-- This module is parameterized (CPP-style) by the AXI interface parameters (see README).
 -- This adapter is between the connected SDP acting as sdp "slave" and this adapter
--- We are acting as SDP master and an axi master.  (An SDP slave can still issue requests).
+---- Note that the SDP "slave" can still issue read/write requests, which it does in this case.
+-- This module is acting as SDP master and an axi master.
 -- For the purposes of the OpenCPI data plane, this adapter will only support the
 -- "active-message" mode since it does not have a slave to receive data written
 -- by the "other side" (yet, if ever).  This keeps this adapter smaller.
--- In order to fully implement the passive mode on zynq, or the active flow control mode,
--- we would have to also enable the M_AXI_GP1 interface and use it to allow
+-- In order to fully implement the passive mode, or the active flow control mode,
+-- we would have to also enable am AXI master interface (like the zynq the M_AXI_GP1) and use it to allow
 -- software to write into the BRAMs.  There would be a small latency benefit
 -- for PS->PL data transfers, but everything else would suffer (throughput, gates, etc.)
 
--- The clock and reset are injected to be supplied to both sides
+-- The clock and reset are driven to the AXI interface based on the AXI interface parameters
 
--- OPTIMIZING FOR FMAX:  when going to 100MHZ on zynq, we introduce a pipeline
+-- OPTIMIZING FOR FMAX:  when going to 100MHZ on zynq, we introduced a pipeline
 -- to compute all the values derived from incoming SDP headers.
 -- The variables with the _p suffix are those that were promoted from combinatorial
 -- values on a (slower) functional version to be registered for pipeline purposes.
@@ -245,12 +247,15 @@ begin
 #if AXI4
   axi_out.AW.REGION            <= (others => '0');
   axi_out.AW.QOS               <= (others => '0');
+  axi_out.AR.QOS               <= (others => '0');
 #endif  
   -- Write address channel
   axi_out.AW.ID                <= (others => '0');  -- spec says same id means in-order
-  axi_out.AW.ADDR              <= std_logic_vector(axi_addr) & "000";
+  axi_out.AW.ADDR              <= std_logic_vector(axi_addr) &
+                                  slv0(width_for_max(axi_out.W.DATA'length/8-1));
   axi_out.AW.LEN               <= std_logic_vector(axi_len);
-  axi_out.AW.SIZE              <= "011";        -- we are always 64 bits wide
+  axi_out.AW.SIZE              <= std_logic_vector(to_unsigned(width_for_max(axi_out.W.DATA'length/8)-1,
+                                                               axi_out.AW.SIZE'length));
   axi_out.AW.BURST             <= "01";         -- we are always doing incrementing bursts
   axi_out.AW.LOCK              <= "00";         -- normal access, no locking or exclusion
   axi_out.AW.CACHE             <= (others => '0');
@@ -266,9 +271,11 @@ begin
   -- Read address channel
   axi_out.AR.ID                <= std_logic_vector(sdp_p.header.node(2 downto 0)) &
                                   std_logic_vector(sdp_p.header.xid);
-  axi_out.AR.ADDR              <= std_logic_vector(axi_addr) & "000";
+  axi_out.AR.ADDR              <= std_logic_vector(axi_addr) &
+                                  slv0(width_for_max(axi_in.R.DATA'length/8-1));
   axi_out.AR.LEN               <= std_logic_vector(axi_len);
-  axi_out.AR.SIZE              <= "011"; -- we are always 64 bits wide
+  axi_out.AR.SIZE              <= std_logic_vector(to_unsigned(width_for_max(axi_out.W.DATA'length/8)-1,
+                                                               axi_out.AR.SIZE'length));
   axi_out.AR.BURST             <= "01";  -- we are always doing incrementing bursts
   axi_out.AR.LOCK              <= "00";  -- normal access, no locking or exclusion
   axi_out.AR.CACHE             <= (others => '0');

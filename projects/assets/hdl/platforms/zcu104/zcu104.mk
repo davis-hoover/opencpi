@@ -19,7 +19,7 @@
 # SET THIS VARIABLE to the part (die-speed-package, e.g. xc7z020-1-clg484) for the platform!
 # The EV in this part is for quad core + mali gpu + H.264
 HdlPart_zcu104=xczu7ev-2-ffvc1156e
-HdlRccPlatform_zcu104=xilinx19_2
+HdlRccPlatform_zcu104=xilinx19_2_aarch64
 # Set this variable to the names of any other component libraries with devices defined in this
 # platform. Do not use slashes.  If there is an hdl/devices library in this project, it will be
 # searched automatically, as will "devices" in any projects this project depends on.

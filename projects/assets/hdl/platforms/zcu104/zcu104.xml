@@ -1,4 +1,4 @@
-<!-- This file defines the zcu102 HDL platform -->
+<!-- This file defines the zcu104 HDL platform -->
 <HdlPlatform Language="VHDL" Spec='platform-spec'>
   <specproperty name='platform' value='zcu104'/>
   <specproperty name="nSlots" value='1'/>

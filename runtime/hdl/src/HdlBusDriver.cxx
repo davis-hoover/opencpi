@@ -46,6 +46,7 @@
        namespace OU = OCPI::Util;
        namespace OF = OCPI::OS::FileSystem;
        namespace OM = OCPI::HDL::ZynqMP;
+       namespace OH = OCPI::HDL;
 
        const char
          fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
@@ -226,6 +227,11 @@
 		    err.empty() ? (done ? "true" : "false") : "error: ", err.empty() ? "" : err.c_str());
 	  return done;
         }
+	bool
+	isLoadedUUID(const std::string &uuid) {
+	  static std::string dummy;
+	  return isProgrammed(dummy) && OH::Device::isLoadedUUID(uuid);
+	}
 	bool getMetadata(std::vector<char> &xml, std::string &err) {
 	  if (isProgrammed(err))
 	    return OCPI::HDL::Device::getMetadata(xml, err);

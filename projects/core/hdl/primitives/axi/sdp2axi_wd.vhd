@@ -47,6 +47,7 @@ architecture rtl of sdp2axi_wd_AXI_INTERFACE is
     to_unsigned(axi_width, width_for_max(axi_width));
   constant sdp_width_u : unsigned(width_for_max(sdp_width)-1 downto 0) :=
     to_unsigned(sdp_width, width_for_max(sdp_width));
+  subtype dw_idx_in_sxf_t is unsigned(width_for_max(sdp_width-1)-1 downto 0);
   subtype ndw_in_sxf_t is unsigned(width_for_max(sdp_width)-1 downto 0);
   type write_state_t is (sop_next_e, -- valid is start of packet
                          capture_e,  -- capturing an sxf to build an axf
@@ -61,7 +62,7 @@ architecture rtl of sdp2axi_wd_AXI_INTERFACE is
   signal ndws_this_axf            : ndws_in_axf_t;
   signal pkt_first_axf_dw_offset  : dw_idx_in_axf_t;
   signal pkt_first_axf_dw_offset_0 : dw_idx_in_axf_t;
-  signal pkt_first_sxf_dw_offset  : dw_idx_in_axf_t;
+  signal pkt_first_sxf_dw_offset  : dw_idx_in_sxf_t;
   signal pkt_first_axf_sxf_offset : dw_idx_in_axf_t;
   signal pkt_last_axf_dw_offset_0 : dw_idx_in_axf_t;
   signal pkt_first_axf_ndws_0     : ndws_in_axf_t;
@@ -146,9 +147,9 @@ begin
   pkt_first_sxf_ndws       <= resize(ocpi.util.min(sdp_width_u - pkt_first_sxf_dw_offset,
                                                    pkt_ndws_p),
                                      pkt_first_sxf_ndws'length);
-  pkt_last_axf_dw_offset_0 <= resize(((pkt_ndws_0 + pkt_first_axf_dw_offset_0 - 1) and
-                                      to_unsigned(axi_width-1, pkt_last_axf_dw_offset_0'length)),
-                                      pkt_last_axf_dw_offset_0'length);
+  pkt_last_axf_dw_offset_0 <= resize(pkt_ndws_0 + pkt_first_axf_dw_offset_0 - 1,
+                                     pkt_last_axf_dw_offset_0'length) and
+                              to_unsigned(axi_width-1, pkt_last_axf_dw_offset_0'length);
   pkt_is_first_axf         <= pkt_starting or pkt_is_first_axf_r;
   pkt_ndws_left            <= pkt_ndws_p when its(pkt_is_first_axf) else pkt_ndws_left_r;
   axf_ndws                 <= pkt_first_axf_ndws_p when its(pkt_is_first_axf) else
@@ -256,7 +257,7 @@ begin
 --            axi_data_r(to_integer(axi_data_idx_r) to
 --                     to_integer(axi_data_idx_r + (sdp_width - 1))) <= sdp_in_data;
             axi_data_r <= sdp_data_p;
-            axi_data_idx_r <= axi_data_idx_r + sdp_width_u;
+            axi_data_idx_r <= resize(axi_data_idx_r + sdp_width_u, axi_data_idx_r'length);
             if not capturing_next_sxf then
               write_state_r <= offer_e;
             end if;

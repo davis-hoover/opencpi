@@ -1,4 +1,4 @@
-<!-- The default system XML for the Zed board.
+<!-- The default system XML for the zcu104 board.
      There is no large block of DMA memory reserved currently, so we
      must limit the DMA allocation size to what the driver will allow.
      FIXME:  the driver actually knows this, and could communicate it somehow.

@@ -670,7 +670,7 @@ addConfig(ParamConfig &info, bool fromXml) {
   // Check that the configuration we have is not already in the existing file
   ocpiDebug("Possibly adding parameter config. n=%zu", m_paramConfigs.size());
   for (unsigned n = 0; n < m_paramConfigs.size(); n++)
-    if (m_paramConfigs[n]->equal(info)) {
+    if (m_paramConfigs[n] && m_paramConfigs[n]->equal(info)) {
       // Mark the old config as used so it will be written to the Makefile
       m_paramConfigs[n]->used = true;
       ocpiInfo("Parameter config %zu is skipped since it is identical to config %u",
@@ -784,11 +784,12 @@ writeParamFiles(FILE *mkFile, FILE *xmlFile) {
   m_build.writeMakeVars(mkFile);
   fprintf(mkFile, "ParamConfigurations:=");
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
-    if (m_paramConfigs[n]->used)
+    if (m_paramConfigs[n] && m_paramConfigs[n]->used)
       fprintf(mkFile, "%s%zu", n ? " " : "", n);
   fprintf(mkFile, "\nWorkerName_%s:=%s\n", m_fileName.c_str(), m_implName);
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
-    m_paramConfigs[n]->write(xmlFile, mkFile);
+    if (m_paramConfigs[n])
+      m_paramConfigs[n]->write(xmlFile, mkFile);
   if (xmlFile)
     fprintf(xmlFile, "</build>\n");
   ocpiDebug("xmlFile closing %p mkFile closing %p", xmlFile, mkFile);
@@ -887,7 +888,8 @@ emitMakefile(FILE *xmlFile) {
       (err = openOutput(m_fileName.c_str(), m_outDir, "", "", ".mk", NULL, mkFile)))
     return err;
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
-    m_paramConfigs[n]->used = true;
+    if (m_paramConfigs[n])
+      m_paramConfigs[n]->used = true;
   return writeParamFiles(mkFile, xmlFile);
 }
 // Based on worker xml, read the <worker>-build.xml, and emit the generics file
