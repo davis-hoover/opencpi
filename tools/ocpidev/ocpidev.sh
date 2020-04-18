@@ -2363,7 +2363,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--*=*)
 	 flag=${argv[0]%%=*}
          val="${argv[0]#*=}"
-	 # echo FLAG:$flag VAL:$val ARG:${argv[0]}
+	 #echo FLAG:$flag VAL:$val ARG:${argv[0]}
 	 unset argv[0]
 	 argv=($flag "$val" "${argv[@]}")
 	 ;;
