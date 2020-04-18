@@ -21,17 +21,6 @@ Libraries=axi zynq sdp
 ParamValues_useGP1=0/1
 Configurations=\
   base \
-	cfg_0rx_1tx_fmcomms_2_3_lpc_lvds \
-	cfg_0rx_2tx_fmcomms_2_3_lpc_lvds \
-	cfg_1rx_0tx_fmcomms_2_3_lpc_lvds \
-	cfg_1rx_1tx_fmcomms_2_3_lpc_lvds \
-	cfg_1rx_2tx_fmcomms_2_3_lpc_lvds \
-	cfg_2rx_0tx_fmcomms_2_3_lpc_lvds \
-	cfg_2rx_1tx_fmcomms_2_3_lpc_lvds \
-	cfg_2rx_2tx_fmcomms_2_3_lpc_lvds \
-	gp1 \
-	zed_zipper_fmc_rx_tx \
-	zed_zipper_fmc_rx \
-	zed_zipper_fmc_tx
+	gp1
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
