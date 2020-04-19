@@ -1,4 +1,4 @@
-<HdlContainer constraints='nopfcfg_nrx_ntx_fmcomms_2_3_lpc_zed_cst.xdc'
+<HdlContainer constraints='cst_nopfcfg_nrx_ntx_fmcomms_2_3_lpc_zed.xdc'
               only='zed,zed_ise'>
   <Device name='ad9361_spi' card='fmcomms_2_3_lpc'>
     <Property name='CP_CLK_FREQ_HZ_p' value='100e6'/>
