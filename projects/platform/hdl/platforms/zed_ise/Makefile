@@ -30,9 +30,6 @@ Configurations=\
 	cfg_2rx_1tx_fmcomms_2_3_lpc_lvds \
 	cfg_2rx_2tx_fmcomms_2_3_lpc_lvds \
 	gp1 \
-	zed_zipper_fmc_rx_tx \
-	zed_zipper_fmc_rx \
-	zed_zipper_fmc_tx
 
 ExportFiles=zed_ise.ucf zed_ise.ut testbias_zed_ise_base.bitz 98-zedboard.rules sd_card
 
