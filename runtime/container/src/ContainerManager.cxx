@@ -186,9 +186,9 @@ namespace OCPI {
 	  printf("%s\n", i->c_str());
       } else {
 	printf("Available containers:\n"
-	       " #  Model Platform       OS     OS-Version  Arch     Name\n");
+	       " #  Model Platform            OS     OS-Version  Arch     Name\n");
 	for (unsigned n = 0; (c = ContainerManager::get(n)); n++)
-	  printf("%2u  %-5s %-14s %-6s %-11s %-8s %s\n",
+	  printf("%2u  %-5s %-19s %-6s %-11s %-8s %s\n",
 		 n,  c->model().c_str(), c->platform().c_str(), c->os().c_str(),
 		 c->osVersion().c_str(), c->arch().c_str(), c->name().c_str());
       }

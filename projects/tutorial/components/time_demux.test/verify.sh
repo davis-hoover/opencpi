@@ -19,11 +19,11 @@
 
 set -e
 
-if expr match $1 .*Time_Out >/dev/null; then
+if [[ $1 == *.Time_Out.* ]]; then
   echo Checking time:
   cmp $1 ${2}_gold_time
 else
-  if expr match $1 .*Data_Out >/dev/null; then
+  if [[ $1 == *.Data_Out.* ]]; then
     echo Checking data:
     cmp $1 ${2}_gold_data
   else
