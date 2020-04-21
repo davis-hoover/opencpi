@@ -288,6 +288,8 @@
   stage: build-assemblies
   script: 
     - source ./cdk/opencpi-setup.sh -e
+    - make -C projects/platform/ exports
+    - make -C projects/assets/ imports
     - ocpidev build -d projects/assets/hdl/assemblies --hdl-platform $PLATFORM
 
 .build-assemblies-assets_ts:
@@ -296,6 +298,8 @@
   stage: build-assemblies
   script: 
     - source ./cdk/opencpi-setup.sh -e
+    - make -C projects/platform/ exports
+    - make -C projects/assets_ts/ imports
     - ocpidev build -d projects/assets_ts/hdl/assemblies --hdl-platform $PLATFORM
 
 .build-assemblies-inactive:
@@ -304,6 +308,8 @@
   stage: build-assemblies
   script: 
     - source ./cdk/opencpi-setup.sh -e
+    - make -C projects/platform/ exports
+    - make -C projects/inactive/ imports
     - ocpidev build -d projects/inactive/hdl/assemblies --hdl-platform $PLATFORM
 
 
