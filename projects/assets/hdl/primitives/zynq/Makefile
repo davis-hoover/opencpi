@@ -34,9 +34,6 @@ MyTargets:=$(sort $(HdlTargets))
 ifneq ($(and $(filter $(ISEZynqTargets),$(MyTargets)),$(filter $(VivadoZynqTargets),xsim,$(MyTargets))),)
   $(error The zynq primitive library cannot be built for zynq_ise/isim and zynq/xsim at the same time (yet))
 endif
-ifneq ($(and $(filter $(ISEZynqTargets),$(MyTargets)),$(filter $(VivadoZynqTargets),xsim,$(MyTargets))),)
-  $(error The zynq primitive library cannot be built for zynq_ise/isim and zynq/xsim at the same time (yet))
-endif
 UseISE:=$(filter $(ISEZynqTargets),$(HdlTargets))
 
 XilinxCoreName=processing_system7
