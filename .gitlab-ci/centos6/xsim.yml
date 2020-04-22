@@ -414,7 +414,6 @@ test-assets_ts:centos6:xsim:
     - build-platforms-platform:centos6:xsim
     - build-components-assets_ts:centos6:xsim
 
-<<<<<<< HEAD
 build-test-inactive:centos6:xsim:
   extends:
     - .build-test-inactive
