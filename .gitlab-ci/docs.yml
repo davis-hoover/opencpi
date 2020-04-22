@@ -1,4 +1,6 @@
 build:pages:
+  rules:
+    - when: on_success
   stage: build
   tags:
     - docker
@@ -24,9 +26,9 @@ trigger-downstream:
   tags:
     - docker
   image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
-  only:
-    - develop
-    - tags
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
+    - if: "$CI_COMMIT_TAG"  
   dependencies:
     - build:pages
   before_script: []
@@ -49,8 +51,8 @@ pages:
   tags:
     - docker
   image: centos:latest
-  only:
-    - develop
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'develop'" 
   dependencies: []
   before_script: []
   script:
