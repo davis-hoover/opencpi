@@ -417,8 +417,8 @@ defaultuserenv=tools/cdk/scripts/default-user-env.sh
 if [ -r $userenv ] && grep -q '^ *export' $userenv; then
   [ -n "$verbose" ] &&
       echo Preserving user environment script \"$userenv\" since it has user-specified exports in it.
-  version=$(sed -n 'g/^ *# *VERSION */s///p' $userenv)
-  defaultversion=$(sed -n 'g/^ *# *VERSION */s///p' $defaultuserenv)
+  version=$(sed -n '/^ *# *VERSION */s///p' $userenv)
+  defaultversion=$(sed -n '/^ *# *VERSION */s///p' $defaultuserenv)
   if [ "$version" != "$defaultversion" ]; then
       echo The user-edited environment setup file \"$userenv\", is out of date.
       echo It should be re-edited based on a copy of the updated default version in \"$defaultuserenv\".
