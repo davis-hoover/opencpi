@@ -17,9 +17,11 @@ entity time_downsampler is
     ctrl      : in  time_downsampler_ctrl_t;
     -- INPUT
     iprotocol : in  protocol.complex_short_with_metadata.protocol_t;
+    ieof      : in  std_logic;
     irdy      : out std_logic;
     -- OUTPUT
     oprotocol : out protocol.complex_short_with_metadata.protocol_t;
+    oeof      : out std_logic;
     ordy      : in  std_logic);
 end entity time_downsampler;
 architecture rtl of time_downsampler is
@@ -48,7 +50,7 @@ begin
         protocol_r.flush          <= iprotocol.flush;
         protocol_r.sync           <= iprotocol.sync;
         protocol_r.end_of_samples <= iprotocol.end_of_samples;
-        protocol_r.eof            <= iprotocol.eof;
+        oeof                      <= ieof;
       end if;
     end if;
   end process pipeline;

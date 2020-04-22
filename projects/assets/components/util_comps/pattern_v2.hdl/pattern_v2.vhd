@@ -253,7 +253,7 @@ begin
   if rising_edge(ctl_in.clk) then
     if ctl_in.reset = '1' then
       s_data_bramW_addr  <= (others => '0');
-    -- Increment s_data_bramW_addr only when ready to read in data to BRAM
+    -- Increment s_data_bramW_addr only when ready to write to data BRAM
     elsif ((to_integer(props_in.raw.address)/4 >= 2*numMessagesMax) and props_in.raw.is_write = '1') then
       if (s_data_bramW_addr = numDataWords-1) then
         s_data_bramW_addr <= (others => '0');
@@ -271,20 +271,20 @@ begin
   if rising_edge(ctl_in.clk) then
     if ctl_in.reset = '1' then
       s_messages_bramW_ctr <= (others => '0');
-    -- Increment s_messages_bramW_ctr only when ready to read in messages
+    -- Increment s_messages_bramW_ctr only when ready to write to messages BRAM
     elsif ((to_integer(props_in.raw.address)/4 < 2*numMessagesMax) and props_in.raw.is_write = '1') then
           s_messages_bramW_ctr <= s_messages_bramW_ctr + 1;
     end if;
   end if;
 end process messages_bramW_counter;
 
--- Running counter to keep track of messages BRAM reading side address
+-- Running counter to keep track of messages BRAM writing side address
 messages_bramW_addr_counter : process (ctl_in.clk)
 begin
   if rising_edge(ctl_in.clk) then
     if ctl_in.reset = '1' then
       s_messages_bramW_addr  <= (others => '0');
-    -- Increment s_messages_bramW_addr only when ready to read in messages
+    -- Increment s_messages_bramW_addr only when ready to write to messages BRAM
     elsif ((to_integer(props_in.raw.address)/4 < 2*numMessagesMax) and props_in.raw.is_write = '1') then
     -- Reset s_messages_bramW_addr to 0 when on the second messages field
         if (s_messages_bramW_addr = numMessagesMax-1 and s_messages_bramW_ctr = 1) then
@@ -334,6 +334,7 @@ begin
       s_finished <= '0';
       s_messagesSent <= (others => '0');
       s_out_eof <= '0';
+      s_messages_bramR_addr <= (others => '0');
     -- Grab the value of messagesToSend once it gets it's initial value
     elsif (ctl_in.control_op = START_e) then
       s_messagesToSend <= props_in.messagesToSend;

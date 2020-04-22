@@ -344,4 +344,23 @@ component lfsr
     REG      : out std_logic_vector(POLYNOMIAL'length-1 downto 0));
 end component;
 
+component reset_detector is
+  port(
+    clk                     : in  std_logic;
+    rst                     : in  std_logic;
+    clr                     : in  std_logic;  -- clears all rst_*
+    rst_detected            : out std_logic;  -- synchronous reset detected
+    rst_then_unrst_detected : out std_logic); -- synchronous reset, followed by
+                                              -- a synchronous unreset, detected
+end component;
+
+component edge_detector is
+  port(
+    clk               : in  std_logic;  -- input clock
+    reset             : in  std_logic;  -- reset (active-high)
+    din               : in  std_logic;  -- input
+    rising_pulse      : out std_logic;  -- rising edge pulse
+    falling_pulse     : out std_logic); -- falling edge pulse
+end component;
+
 end package util;

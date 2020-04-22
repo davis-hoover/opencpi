@@ -1,0 +1,6 @@
+<!-- The iq_app_min_hdl HDL assembly xml file -->
+<HdlAssembly>
+  <Instance worker="agc_complex" name="agc_complex" external="in" connect="peak_detector"/>
+  <Instance worker="timestamper" name="timestamper" external="out"/>
+  <Instance worker="peak_detector" name="peak_detector" connect="timestamper"/>
+</HdlAssembly>

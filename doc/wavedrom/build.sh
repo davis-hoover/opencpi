@@ -15,14 +15,14 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-$(if $(realpath $(OCPI_CDK_DIR)),,\
-  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
-# This is the HDL assembly Makefile for the "lab8_most_rcc_assy" assembly
-# The file "lab8_most_rcc_assy.xml" defines the assembly.
-# The default container for all assemblies is one that connects all external ports to
-# the devices interconnect to communicate with software workers or other FPGAs. 
-# If you want to connect external ports of the assembly to local devices on the platform,
-# you must define container XML files, and mention them in a "Containers" variable here, e.g.:
-# Containers=take_input_from_local_ADC
-include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk
+comps=(`find . -name \*.json | sed "s/\.json//g" | sed "s/\.\///g"`)
+echo "Building for:"
+for comp in "${comps[@]}"; do
+  echo $comp
+done
+for comp in "${comps[@]}"; do
+  npx wavedrom-cli -i $comp.json -s $comp.svg &
+done
+for comp in "${comps[@]}"; do
+  while [ ! -f $comp.svg ]; do true; done;
+done

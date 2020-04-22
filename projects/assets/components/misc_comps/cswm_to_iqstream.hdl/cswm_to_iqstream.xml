@@ -12,5 +12,6 @@
                    clockdirection='in'/>
   <StreamInterface name='out'
                    datawidth='OUT_PORT_DATA_WIDTH'
-                   clock='in'/>
+                   clock='in'
+                   workereof='true'/>
 </HdlWorker>

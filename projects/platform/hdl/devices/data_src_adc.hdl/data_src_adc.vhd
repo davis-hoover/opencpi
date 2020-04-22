@@ -26,12 +26,13 @@ architecture rtl of worker is
 
   signal adc_data_widener_irdy      : std_logic := '0';
   signal adc_data_widener_oprotocol : protocol_t := PROTOCOL_ZERO;
+  signal adc_data_widener_oeof      : std_logic := '0';
 
   signal adc_out_marshaller_irdy : std_logic := '0';
 
 begin
   ------------------------------------------------------------------------------
-  -- CTRL <- DATA CDC
+  -- CTRL
   ------------------------------------------------------------------------------
 
   -- ADCs usally won't provide a reset along w/ their clock
@@ -39,7 +40,7 @@ begin
     port map(
       src_rst => ctl_in.reset,
       dst_clk => dev_in.clk,
-      dst_rst => adc_rst);
+      dst_rst => adc_rst); -- TODO/FIXME replace with out_in.rst once CDC issues addressed
 
   ctrl_out_cdc : cdc.cdc.fast_pulse_to_slow_sticky
     port map(
@@ -52,6 +53,16 @@ begin
       slow_rst    => ctl_in.reset,
       slow_clr    => props_in.clr_overrun_sticky_error,
       slow_sticky => props_out.overrun_sticky_error);
+
+  -- this worker is not initialized until dev_in.clk is ticking and the out port
+  -- has successfully come into reset
+  adc_rst_detector_reg : util.util.reset_detector
+    port map(
+      clk                     => dev_in.clk,
+      rst                     => out_in.reset,
+      clr                     => '0',
+      rst_detected            => ctl_out.done,
+      rst_then_unrst_detected => open);
 
   ------------------------------------------------------------------------------
   -- out port
@@ -128,6 +139,7 @@ begin
         rst          => adc_rst,
         -- INPUT
         iprotocol    => adc_data_widener_oprotocol,
+        ieof         => adc_data_widener_oeof,
         irdy         => adc_out_marshaller_irdy,
         -- OUTPUT
         odata        => adc_data,

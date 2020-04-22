@@ -35,11 +35,9 @@ SourceFiles=$(patsubst %,%.vhd,\
 	cdc_pkg \
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
-	edge_detector/src/edge_detector \
 	time_downsampler \
 	time_corrector \
 	level_to_pulse_converter \
-	cdc_fifo_complex_short_with_metadata \
 	cdc_testing/src/gen_reset_sync \
 	cdc_testing/src/four_bit_lfsr \
 	cdc_testing/src/one_shot_fifo \

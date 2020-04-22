@@ -16,7 +16,6 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library ieee; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library misc_prims;
 library ocpi;
 
 package iqstream is
@@ -45,6 +44,7 @@ constant OP_IQ_ZERO : op_iq_t := (
     data => OP_IQ_ARG_DATA_ZERO);
 
 -- protocol containing all operations
+constant PROTOCOL_BIT_WIDTH : positive := OP_IQ_BIT_WIDTH+1;
 type protocol_t is record
   iq     : op_iq_t;
   iq_vld : std_logic;
@@ -64,6 +64,7 @@ component iqstream_marshaller is
     rst          : in  std_logic;
     -- INPUT
     iprotocol    : in  protocol_t;
+    ieof         : in  ocpi.types.Bool_t;
     irdy         : out std_logic;
     -- OUTPUT (WSI)
     odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
@@ -74,6 +75,28 @@ component iqstream_marshaller is
     oeom         : out ocpi.types.Bool_t;
     oeof         : out ocpi.types.Bool_t;
     oready       : in  ocpi.types.Bool_t);
+end component;
+
+component iqstream_demarshaller is
+  generic(
+    WSI_DATA_WIDTH : positive := 16); -- 16 is default of codegen, but
+                                      -- MUST USE 32 FOR NOW
+  port(
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    -- INPUT
+    idata     : in  std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
+    ivalid    : in  ocpi.types.Bool_t;
+    iready    : in  ocpi.types.Bool_t;
+    isom      : in  ocpi.types.Bool_t;
+    ieom      : in  ocpi.types.Bool_t;
+    iopcode   : in  opcode_t;
+    ieof      : in  ocpi.types.Bool_t;
+    itake     : out ocpi.types.Bool_t;
+    -- OUTPUT
+    oprotocol : out protocol_t;
+    oeof      : out ocpi.types.Bool_t;
+    ordy      : in  std_logic);
 end component;
 
 end package iqstream;

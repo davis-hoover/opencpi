@@ -26,9 +26,9 @@ build-rcc:centos6:xilinx13_4:
 #####################
 # Jobs - Build-Test #
 #####################
-build-test-core:centos6:xilinx13_4:
+test-core:centos6:xilinx13_4:
   extends:
-    - .build-test-core
+    - .test-core
     - .centos6
     - .xilinx13_4
   needs: 
@@ -38,9 +38,9 @@ build-test-core:centos6:xilinx13_4:
     - prereq:centos6:xilinx13_4
     - build-rcc:centos6:xilinx13_4
 
-build-test-assets-base:centos6:xilinx13_4:
+test-assets-base:centos6:xilinx13_4:
   extends:
-    - .build-test-assets-base
+    - .test-assets-base
     - .centos6
     - .xilinx13_4
   needs: 
@@ -50,9 +50,9 @@ build-test-assets-base:centos6:xilinx13_4:
     - prereq:centos6:xilinx13_4
     - build-rcc:centos6:xilinx13_4
 
-build-test-assets-comms:centos6:xilinx13_4:
+test-assets-comms:centos6:xilinx13_4:
   extends:
-    - .build-test-assets-comms
+    - .test-assets-comms
     - .centos6
     - .xilinx13_4
   needs: 
@@ -62,9 +62,9 @@ build-test-assets-comms:centos6:xilinx13_4:
     - prereq:centos6:xilinx13_4
     - build-rcc:centos6:xilinx13_4
 
-build-test-assets-dsp:centos6:xilinx13_4:
+test-assets-dsp:centos6:xilinx13_4:
   extends:
-    - .build-test-assets-dsp
+    - .test-assets-dsp
     - .centos6
     - .xilinx13_4
   needs: 
@@ -74,9 +74,9 @@ build-test-assets-dsp:centos6:xilinx13_4:
     - prereq:centos6:xilinx13_4
     - build-rcc:centos6:xilinx13_4
 
-build-test-assets-misc:centos6:xilinx13_4:
+test-assets-misc:centos6:xilinx13_4:
   extends:
-    - .build-test-assets-misc
+    - .test-assets-misc
     - .centos6
     - .xilinx13_4
   needs: 
@@ -86,9 +86,9 @@ build-test-assets-misc:centos6:xilinx13_4:
     - prereq:centos6:xilinx13_4
     - build-rcc:centos6:xilinx13_4
 
-build-test-assets-util:centos6:xilinx13_4:
+test-assets-util:centos6:xilinx13_4:
   extends:
-    - .build-test-assets-util
+    - .test-assets-util
     - .centos6
     - .xilinx13_4
   needs: 
@@ -98,9 +98,9 @@ build-test-assets-util:centos6:xilinx13_4:
     - prereq:centos6:xilinx13_4
     - build-rcc:centos6:xilinx13_4
 
-build-test-assets_ts:centos6:xilinx13_4:
+test-assets_ts:centos6:xilinx13_4:
   extends:
-    - .build-test-assets_ts
+    - .test-assets_ts
     - .centos6
     - .xilinx13_4
   needs: 
@@ -110,9 +110,9 @@ build-test-assets_ts:centos6:xilinx13_4:
     - prereq:centos6:xilinx13_4
     - build-rcc:centos6:xilinx13_4
 
-build-test-inactive:centos6:xilinx13_4:
+test-inactive:centos6:xilinx13_4:
   extends:
-    - .build-test-inactive
+    - .test-inactive
     - .centos6
     - .xilinx13_4
   needs:

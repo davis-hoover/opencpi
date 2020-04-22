@@ -323,9 +323,9 @@ build-assemblies-inactive:centos6:zed:
 #####################
 # Jobs - Build-Test #
 #####################
-build-test-core:centos6:zed:
+test-core:centos6:zed:
   extends:
-    - .build-test-core
+    - .test-core
     - .centos6
     - .zed-xilinx13_4
   needs: 
@@ -337,9 +337,9 @@ build-test-core:centos6:zed:
     - build-platforms-platform:centos6:zed
     - build-platforms-assets:centos6:zed
 
-build-test-assets-base:centos6:zed:
+test-assets-base:centos6:zed:
   extends:
-    - .build-test-assets-base
+    - .test-assets-base
     - .centos6
     - .zed-xilinx13_4
   needs: 
@@ -351,9 +351,9 @@ build-test-assets-base:centos6:zed:
     - build-platforms-platform:centos6:zed
     - build-platforms-assets:centos6:zed
 
-build-test-assets-comms:centos6:zed:
+test-assets-comms:centos6:zed:
   extends:
-    - .build-test-assets-comms
+    - .test-assets-comms
     - .centos6
     - .zed-xilinx13_4
   needs: 
@@ -365,9 +365,9 @@ build-test-assets-comms:centos6:zed:
     - build-platforms-platform:centos6:zed
     - build-platforms-assets:centos6:zed
 
-build-test-assets-dsp:centos6:zed:
+test-assets-dsp:centos6:zed:
   extends:
-    - .build-test-assets-dsp
+    - .test-assets-dsp
     - .centos6
     - .zed-xilinx13_4
   needs: 
@@ -379,9 +379,9 @@ build-test-assets-dsp:centos6:zed:
     - build-platforms-platform:centos6:zed
     - build-platforms-assets:centos6:zed
 
-build-test-assets-misc:centos6:zed:
+test-assets-misc:centos6:zed:
   extends:
-    - .build-test-assets-misc
+    - .test-assets-misc
     - .centos6
     - .zed-xilinx13_4
   needs: 
@@ -393,9 +393,9 @@ build-test-assets-misc:centos6:zed:
     - build-platforms-platform:centos6:zed
     - build-platforms-assets:centos6:zed
 
-build-test-assets-util:centos6:zed:
+test-assets-util:centos6:zed:
   extends:
-    - .build-test-assets-util
+    - .test-assets-util
     - .centos6
     - .zed-xilinx13_4
   needs: 
@@ -407,9 +407,9 @@ build-test-assets-util:centos6:zed:
     - build-platforms-platform:centos6:zed
     - build-platforms-assets:centos6:zed
 
-build-test-assets_ts:centos6:zed:
+test-assets_ts:centos6:zed:
   extends:
-    - .build-test-assets_ts
+    - .test-assets_ts
     - .centos6
     - .zed-xilinx13_4
   needs: 
@@ -423,9 +423,9 @@ build-test-assets_ts:centos6:zed:
     - build-components-assets_ts:centos6:zed
     - build-devices-assets_ts:centos6:zed
 
-build-test-inactive:centos6:zed:
+test-inactive:centos6:zed:
   extends:
-    - .build-test-inactive
+    - .test-inactive
     - .centos6
     - .zed-xilinx13_4
   needs: 

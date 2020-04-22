@@ -34,9 +34,11 @@ entity time_corrector is
     status    : out time_corrector_status_t;
     -- INPUT
     iprotocol : in  protocol.complex_short_with_metadata.protocol_t;
+    ieof      : in  std_logic;
     irdy      : out std_logic;
     -- OUTPUT
     oprotocol : out protocol.complex_short_with_metadata.protocol_t;
+    oeof      : out std_logic;
     ordy      : in  std_logic);
 end time_corrector;
 architecture rtl of time_corrector is
@@ -81,8 +83,8 @@ begin
   protocol_s.flush          <= iprotocol.flush;
   protocol_s.sync           <= iprotocol.sync;
   protocol_s.end_of_samples <= iprotocol.end_of_samples;
-  protocol_s.eof            <= iprotocol.eof;
 
   oprotocol <= protocol_s;
+  oeof      <= ieof;
   irdy      <= ordy;
 end rtl;

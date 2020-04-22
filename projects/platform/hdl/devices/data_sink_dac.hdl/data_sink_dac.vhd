@@ -27,6 +27,7 @@ architecture rtl of worker is
   signal dac_metadata_status                    : dac.dac.underrun_detector_status_t;
   signal dac_opcode                             : opcode_t := SAMPLES;
   signal dac_in_demarshaller_oprotocol          : protocol_t := PROTOCOL_ZERO;
+  signal dac_in_demarshaller_oeof               : std_logic := '0';
 
   signal dac_underrun_detector_imetadata        : dac.dac.metadata_t;
   signal dac_underrun_detector_irdy             : std_logic := '0';
@@ -90,6 +91,7 @@ begin
         itake     => in_out.take,
         -- OUTPUT
         oprotocol => dac_in_demarshaller_oprotocol,
+        oeof      => dac_in_demarshaller_oeof,
         ordy      => dac_underrun_detector_irdy);
 
     dac_clk_unused_opcode_detected <=
@@ -100,7 +102,7 @@ begin
     start_samples <= dac_in_demarshaller_oprotocol.samples_vld and
                      not tx_on_off_r;
     end_samples   <= dac_in_demarshaller_oprotocol.end_of_samples or
-                     dac_in_demarshaller_oprotocol.eof;
+                     dac_in_demarshaller_oeof;
     tx_on_off_s   <= start_samples or (tx_on_off_r and not end_samples);
 
     process(dev_in.clk)
@@ -138,7 +140,7 @@ begin
 
     on_off_out.give <= on_off_in.ready and (event_present or event_pending);
     
-    ctl_out.finished <= dac_in_demarshaller_oprotocol.eof;
+    ctl_out.finished <= dac_in_demarshaller_oeof;
     
     dac_underrun_detector : dac.dac.underrun_detector
       port map(
