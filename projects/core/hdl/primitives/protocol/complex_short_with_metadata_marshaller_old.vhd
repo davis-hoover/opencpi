@@ -55,10 +55,6 @@ architecture rtl of complex_short_with_metadata_marshaller_old is
                         protocol.complex_short_with_metadata.PROTOCOL_ZERO;
   signal ieof_r       : std_logic := '0';
   signal ieof_r2      : std_logic := '0';
-  -- needed to avoid bug in opt stage for Vivado zynq 7 series build:
-  -- ERROR: [DRC MDRV-1] Multiple Driver Nets:
-  signal iprotocol_r2_samples_vld : std_logic := '0';
-  signal iprotocol_r2_sync        : std_logic := '0';
 
   signal ivld    : std_logic := '0';
   signal ivld_r  : std_logic := '0';
@@ -106,10 +102,6 @@ begin
         irdy         <= '0';
         ieof_r       <= '0';
         ieof_r2      <= '0';
-        -- needed to avoid bug in opt stage for Vivado zynq 7 series build:
-        -- ERROR: [DRC MDRV-1] Multiple Driver Nets:
-        iprotocol_r2_samples_vld  <= '0';
-        iprotocol_r2_sync         <= '0';
       else
         iprotocol_r  <= iprotocol;
         iprotocol_r2 <= iprotocol_r;
@@ -117,24 +109,9 @@ begin
         irdy         <= irdy_s;
         ieof_r       <= ieof;
         ieof_r2      <= ieof_r;
-        -- needed to avoid bug in opt stage for Vivado zynq 7 series build:
-        -- ERROR: [DRC MDRV-1] Multiple Driver Nets:
-        iprotocol_r2_samples_vld <= iprotocol_r.samples_vld;
-        iprotocol_r2_sync        <= iprotocol_r.sync;
       end if;
     end if;
   end process pipeline;
-
-  iprotocol_r2_gen : process(clk)
-  begin
-    if(rising_edge(clk)) then
-      if(rst = '1') then
-        iprotocol_r2 <= protocol.complex_short_with_metadata.PROTOCOL_ZERO;
-      elsif(ivld_r = '1') then
-        iprotocol_r2 <= iprotocol_r;
-      end if;
-    end if;
-  end process iprotocol_r2_gen;
 
   regs : process(clk)
   begin
@@ -172,16 +149,16 @@ begin
   begin
     if(oready = '1') then
       if(state_r = TIME_31_0) and (ivld_r2 = '1') then
-        irdy_s <= (not iprotocol_r2_sync) and
-                  (not iprotocol_r2_samples_vld) and
+        irdy_s <= (not iprotocol_r2.sync) and
+                  (not iprotocol_r2.samples_vld) and
                   (not iprotocol_r2.interval_vld) and
                   (not iprotocol_r2.flush) and
                   (not ieof_r2);
         state <= TIME_63_32;
         force_end_of_samples <= '0';
       elsif(state_r = INTERVAL_31_0) and (ivld_r2 = '1') then
-        irdy_s <= (not iprotocol_r2_sync) and
-                  (not iprotocol_r2_samples_vld) and
+        irdy_s <= (not iprotocol_r2.sync) and
+                  (not iprotocol_r2.samples_vld) and
                   (not iprotocol_r2.time_vld) and
                   (not iprotocol_r2.flush) and
                   (not ieof_r2);
