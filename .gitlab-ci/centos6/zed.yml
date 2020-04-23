@@ -213,7 +213,7 @@ build-platforms-core:centos6:zed:
 
 build-platforms-platform:centos6:zed:
   extends: 
-    - .build-platforms-assets
+    - .build-platforms-platform
     - .centos6
     - .zed-xilinx13_4
   needs: 

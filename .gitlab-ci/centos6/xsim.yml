@@ -213,7 +213,7 @@ build-platforms-core:centos6:xsim:
 
 build-platforms-platform:centos6:xsim:
   extends: 
-    - .build-platforms-assets
+    - .build-platforms-platform
     - .centos6
     - .xsim
   needs: 

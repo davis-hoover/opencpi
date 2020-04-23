@@ -213,7 +213,7 @@ build-platforms-core:centos6:matchstiq_z1:
 
 build-platforms-platform:centos6:matchstiq_z1:
   extends: 
-    - .build-platforms-assets
+    - .build-platforms-platform
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
