@@ -315,9 +315,9 @@ build-assemblies-inactive:centos6:xsim:
     - build-primitives:centos6:xsim
 
 
-#####################
-# Jobs - Build-Test #
-#####################
+###############
+# Jobs - Test #
+###############
 test-core:centos6:xsim:
   extends:
     - .test-core

@@ -1,6 +1,6 @@
-################################
-# Jobs - Build-Primitives-Core #
-################################
+###########################
+# Jobs - Build-Primitives #
+###########################
 build-primitives:centos7:xsim:
   extends:
     - .build-primitives
@@ -315,9 +315,9 @@ build-assemblies-inactive:centos7:xsim:
     - build-primitives:centos7:xsim
 
 
-#####################
-# Jobs - Build-Test #
-#####################
+###############
+# Jobs - Test #
+###############
 test-core:centos7:xsim:
   extends:
     - .test-core

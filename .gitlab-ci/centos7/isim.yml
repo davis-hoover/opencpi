@@ -100,6 +100,17 @@ build-devices-core:centos7:isim:
     - build:centos7
     - build-primitives:centos7:isim
 
+build-devices-platform:centos7:isim:
+  extends: 
+    - .build-devices-platform
+    - .centos7
+    - .isim
+  needs:
+    - job: prereq:centos7 
+      artifacts: true
+    - build:centos7
+    - build-primitives:centos7:isim
+
 build-devices-assets:centos7:isim:
   extends: 
     - .build-devices-assets
@@ -144,6 +155,17 @@ build-cards-core:centos7:isim:
     - .isim
   needs: 
     - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-primitives:centos7:isim
+
+build-cards-platform:centos7:isim:
+  extends: 
+    - .build-cards-platform
+    - .centos7
+    - .isim
+  needs:
+    - job: prereq:centos7 
       artifacts: true
     - build:centos7
     - build-primitives:centos7:isim
@@ -423,3 +445,4 @@ test-inactive:centos7:isim:
     - build-primitives:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-platforms-inactive:centos7:isim
+
