@@ -19,8 +19,62 @@
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
-# "xilinx" covers xsim, zynq, etc.
-OnlyTargets=xilinx
+# TODO Remove the logic for generating the ip in this Makefile after the clocking
+# library has been merged into develop
+
+VivadoZynqTargets=zynq xsim
+ISEZynqTargets=zynq_ise isim
+OnlyTargets=$(VivadoZynqTargets) $(ISEZynqTargets)
+
+
+# We need to include this file before hdl-library.mk to preprocess the platforms and targets (at least)
+include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
+$(eval $(HdlPreprocessTargets))
+MyTargets:=$(sort $(HdlTargets))
+ifneq ($(and $(filter $(ISEZynqTargets),$(MyTargets)),$(filter $(VivadoZynqTargets),xsim,$(MyTargets))),)
+	$(error The zynq primitive library cannot be built for zynq_ise/isim and zynq/xsim at the same time (yet))
+endif
+UseISE:=$(filter $(ISEZynqTargets),$(HdlTargets))
+
+XilinxCoreName=clk_wiz
+XilinxClockPrimitive=MMCM
+XilinxCoreModuleName=mmcm_100_to_100_50_and_25
+
+# The TCL script that gets generates the clk_wiz
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
+  ifndef UseISE                            # if non-ISE targets
+    ifeq ($(wildcard vivado_clk_wiz/timestamp-clk_wiz),) # if it hasn't been generated
+      $(info Generating Zynq 7000 clk_wiz.)
+      $(if $(call DoShell,\
+	            mkdir -p vivado_clk_wiz/tmp && cd vivado_clk_wiz && rm -r -f tmp && mkdir tmp && \
+	            (cd tmp && \
+	                         $(call OcpiXilinxVivadoInit) && \
+													 vivado -mode batch -source ../vivado-gen-clk_wiz.tcl \
+													 				-tclargs $(XilinxCoreName) $(XilinxClockPrimitive) \
+																	$(XilinxCoreModuleName) xc7z020-clg484-1 \
+													) > clk_wiz.log && \
+													 patch < mmcm_100_to_100_50_and_25.patch && patch < mmcm_100_to_100_50_and_25_sim_netlist.patch && \
+													 date > timestamp-clk_wiz && \
+	                         rm -r -f tmp,MyError),\
+	         $(error $(MyError)))
+    endif
+  else
+    ifeq ($(wildcard ise_clk_wiz/timestamp-clk_wiz),)
+      $(info Generating Zynq 7000 clk_wiz.)
+      $(if $(call DoShell,\
+		  		 mkdir -p ise_clk_wiz/tmp && cd ise_clk_wiz && rm -r -f tmp && mkdir tmp && \
+		  	   (cd tmp && \
+			     							$(call OcpiXilinxIseInit) && \
+												coregen -b ../ise-gen-clk_wiz-coregen-commands \
+											 ) > clk_wiz.log && cp tmp/managed_ip_project/mmcm_100_to_100_50_and_25.vhd . && \
+												cp tmp/managed_ip_project/mmcm_100_to_100_50_and_25.vhd  . && \
+												patch < mmcm_100_to_100_50_and_25.patch && \
+												date > timestamp-clk_wiz && \
+												rm -r -f tmp,MyError),\
+		 $(error $(MyError)))
+    endif
+  endif
+endif # if not cleaning
 
 # For vivado we use vivado stubs with netlists
 # For xsim we use simulation netlists
@@ -28,11 +82,18 @@ SourceFiles=\
   gen_clk.vhd \
 	mmcm_100_to_100_50_and_25_top.vhd \
 	$(if $(filter vivado,$(HdlToolSet)),\
-			./xilinx_ip/mmcm_100_to_100_50_and_25.v,\
-	$(if $(filter xsim,$(HdlToolSet)),\
-			./xilinx_ip/mmcm_100_to_100_50_and_25_sim_netlist.vhd,\
+      ./vivado_clk_wiz/mmcm_100_to_100_50_and_25.v,\
+  $(if $(filter xsim,$(HdlToolSet)),\
+      ./vivado_clk_wiz/mmcm_100_to_100_50_and_25_sim_netlist.vhd,\
 	$(if $(filter isim xst,$(HdlToolSet)),\
-			./xilinx_ip/mmcm_100_to_100_50_and_25_ise.vhd)))
+	  	./ise_clk_wiz/mmcm_100_to_100_50_and_25.vhd)))
 
 
 include $(OCPI_CDK_DIR)/include/worker.mk
+
+
+clean::
+	$(AT)rm -rf vivado_clk_wiz/tmp; \
+			 rm -f vivado_clk_wiz/clk_wiz.log; \
+			 rm -rf ise_clk_wiz/tmp; \
+		 	 rm -f ise_clk_wiz/clk_wiz.log;
