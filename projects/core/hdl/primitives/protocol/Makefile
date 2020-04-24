@@ -29,5 +29,6 @@ SourceFiles= \
   complex_short_with_metadata_marshaller_old.vhd \
   iqstream_pkg.vhd \
   iqstream_body.vhd \
+  iqstream_demarshaller.vhd \
   iqstream_marshaller.vhd
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

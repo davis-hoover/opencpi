@@ -1,9 +1,25 @@
+-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+-- distributed with this source distribution.
+--
+-- This file is part of OpenCPI <http://www.opencpi.org>
+--
+-- OpenCPI is free software: you can redistribute it and/or modify it under the
+-- terms of the GNU Lesser General Public License as published by the Free
+-- Software Foundation, either version 3 of the License, or (at your option) any
+-- later version.
+--
+-- OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+-- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+-- A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU Lesser General Public License
+-- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; use ocpi.wci.all; -- remove this to avoid all
                                                     -- ocpi name collisions
 library misc_prims;
 use misc_prims.misc_prims.all;
-use misc_prims.cdc.all;
 library cdc; use cdc.cdc.all;
 library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
@@ -32,12 +48,15 @@ architecture rtl of worker is
   signal iclk_opcode : protocol.complex_short_with_metadata.opcode_t := SAMPLES;
 
   signal iclk_in_demarshaller_oprotocol : protocol_t := PROTOCOL_ZERO;
+  signal iclk_in_demarshaller_oeof      : std_logic := '0';
 
   signal iclk_time_downsampler_irdy      : std_logic := '0';
   signal iclk_time_downsampler_oprotocol : protocol_t := PROTOCOL_ZERO;
+  signal iclk_time_downsampler_oeof      : std_logic := '0';
 
   signal iclk_time_corrector_irdy        : std_logic := '0';
   signal iclk_time_corrector_oprotocol   : protocol_t := PROTOCOL_ZERO;
+  signal iclk_time_corrector_oeof        : std_logic := '0';
   signal iclk_time_downsampler_iprotocol : protocol_t := PROTOCOL_ZERO;
 
   signal iclk_time_downsampler_ctrl : time_downsampler_ctrl_t;
@@ -49,6 +68,7 @@ architecture rtl of worker is
   signal iclk_data_cdc_ifull_n   : std_logic := '0';
   signal oclk_data_cdc_odeq      : std_logic := '0';
   signal oclk_data_cdc_oprotocol : protocol_t := PROTOCOL_ZERO;
+  signal oclk_data_cdc_oeof      : std_logic := '0';
   signal oclk_data_cdc_oempty_n  : std_logic := '0';
 
   signal oclk_out_adapter_irdy   : std_logic := '0';
@@ -150,8 +170,6 @@ begin
       iclk_in_demarshaller_oprotocol.sync;
   iclk_time_downsampler_iprotocol.end_of_samples <=
       iclk_in_demarshaller_oprotocol.end_of_samples;
-  iclk_time_downsampler_iprotocol.eof <=
-      iclk_in_demarshaller_oprotocol.eof;
   time_out.clk <= in_in.clk;
 
   ctl_out.error <= btrue when (ctl_in.control_op = START_e) and
@@ -187,6 +205,7 @@ begin
       itake     => in_out.take,
       -- OUTPUT
       oprotocol => iclk_in_demarshaller_oprotocol,
+      oeof      => iclk_in_demarshaller_oeof,
       ordy      => iclk_time_downsampler_irdy);
 
   iclk_time_downsampler_ctrl.bypass                <= iclk_bypass;
@@ -201,9 +220,11 @@ begin
       ctrl      => iclk_time_downsampler_ctrl,
       -- INPUT
       iprotocol => iclk_time_downsampler_iprotocol,
+      ieof      => iclk_in_demarshaller_oeof,
       irdy      => iclk_time_downsampler_irdy,
       -- OUTPUT
       oprotocol => iclk_time_downsampler_oprotocol,
+      oeof      => iclk_time_downsampler_oeof,
       ordy      => iclk_time_corrector_irdy);
 
   iclk_time_corrector_ctrl.bypass          <= iclk_bypass;
@@ -218,9 +239,11 @@ begin
       status    => iclk_time_corrector_status,
       -- INPUT
       iprotocol => iclk_time_downsampler_oprotocol,
+      ieof      => iclk_time_downsampler_oeof,
       irdy      => iclk_time_corrector_irdy,
       -- OUTPUT
       oprotocol => iclk_time_corrector_oprotocol,
+      oeof      => iclk_time_corrector_oeof,
       ordy      => iclk_data_cdc_ifull_n);
 
   iclk_data_cdc_ienq <= (
@@ -230,10 +253,10 @@ begin
     iclk_time_corrector_oprotocol.flush          or
     iclk_time_corrector_oprotocol.sync           or
     iclk_time_corrector_oprotocol.end_of_samples or
-    iclk_time_corrector_oprotocol.eof
+    iclk_time_corrector_oeof
     ) and iclk_data_cdc_ifull_n;
 
-  data_cdc : misc_prims.cdc.fifo_complex_short_with_metadata
+  data_cdc : entity work.fifo_complex_short_with_metadata
     generic map(
       DEPTH    => to_integer(unsigned(DATA_CDC_DEPTH)))
     port map(
@@ -242,24 +265,27 @@ begin
       irst      => in_in.reset,
       ienq      => iclk_data_cdc_ienq,
       iprotocol => iclk_time_corrector_oprotocol,
+      ieof      => iclk_time_corrector_oeof,
       ifull_n   => iclk_data_cdc_ifull_n,
       -- OUTPUT
       oclk      => out_in.clk,
       odeq      => oclk_data_cdc_odeq,
       oprotocol => oclk_data_cdc_oprotocol,
+      oeof      => oclk_data_cdc_oeof,
       oempty_n  => oclk_data_cdc_oempty_n);
 
   oclk_data_cdc_odeq <= oclk_out_adapter_irdy and oclk_data_cdc_oempty_n;
 
   out_marshaller : complex_short_with_metadata_marshaller
     generic map(
-      WSI_DATA_WIDTH         => to_integer(OUT_PORT_DATA_WIDTH),
-      OUT_PORT_MBYTEEN_WIDTH => out_out.byte_enable'length)
+      WSI_DATA_WIDTH    => to_integer(OUT_PORT_DATA_WIDTH),
+      WSI_MBYTEEN_WIDTH => out_out.byte_enable'length)
     port map(
       clk          => out_in.clk,
       rst          => out_in.reset,
       -- INPUT
       iprotocol    => oclk_data_cdc_oprotocol,
+      ieof         => oclk_data_cdc_oeof,
       irdy         => oclk_out_adapter_irdy,
       -- OUTPUT
       odata        => oclk_data,

@@ -21,23 +21,32 @@ if [ -z "$OCPI_CDK_DIR" ]; then
   echo "You probably need to do \"source <wherever-the-cdk-is>/opencpi-setup.sh -s\"."
   exit 1
 fi
-if [ -z "$1" -o "$1" = "-h" -o "$1" = "--help" ]; then
-  cat <<-EOF
-	Usage is: ocpiav -h|--help|desktop|remove|run
-	Commands are:
-	      -h|--help   Show this message
-	      desktop     Add a shortcut to access this tool from the Applications->Programming menu bar
-	                  This adds a file in your home directory in the ~/.local/share/applications directory
-	      remove      Remote the short cut, remving the file under your ghome directory.
-	      run         Run the AV GUI tool
-	EOF
-  exit 1
-fi
+
+usage () {
+    cat <<-EOF
+  Usage: ocpiav -h|--help|desktop|remove|run
+
+    -h|--help   Show this message.
+
+    desktop     Adds desktop environment "Applications" menu shortcut
+                for running the AV GUI tool (creates "ocpiav.desktop"
+                file in "~/.local/share/applications").
+
+    remove      Removes the desktop environment menu shortcut
+                (deletes "~/.local/share/applications/ocpiav.desktop").
+
+    run         Runs the AV GUI tool.
+EOF
+    exit 1
+}
+
+[ -z "$1" -o "$1" = "-h" -o "$1" = "--help" ] && usage
+
 file=~/.local/share/applications/ocpiav.desktop
 case $1 in
   desktop)
-    echo "Adding the ocpiav tool to be accessed from the Applications->Programming menu."
-    echo "This creates a new file under your home directory at: $file"
+    echo "Adding desktop environment menu item under \"Applications\" for running ocpiav tool."
+    echo "This creates \"$file\"."
     mkdir -p ~/.local/share/applications
     sed "s-OCPI_CDK_DIR-$OCPI_CDK_DIR-" $OCPI_CDK_DIR/scripts/ocpiav.desktop > $file
     ;;
@@ -52,7 +61,6 @@ case $1 in
     exec $OCPI_CDK_DIR/../av/eclipse/eclipse> $OCPI_CDK_DIR/../av/av.log 2>&1 
     ;;
   *)
-    echo Illegal argument: $1
-    exit 1
+    echo "Illegal argument: $1" && usage
     ;;
 esac

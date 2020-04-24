@@ -317,9 +317,9 @@ build-assemblies-inactive:centos6:matchstiq_z1:
 #####################
 # Jobs - Build-Test #
 #####################
-build-test-core:centos6:matchstiq_z1:
+test-core:centos6:matchstiq_z1:
   extends:
-    - .build-test-core
+    - .test-core
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
@@ -331,9 +331,9 @@ build-test-core:centos6:matchstiq_z1:
     - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
-build-test-assets-base:centos6:matchstiq_z1:
+test-assets-base:centos6:matchstiq_z1:
   extends:
-    - .build-test-assets-base
+    - .test-assets-base
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
@@ -345,9 +345,9 @@ build-test-assets-base:centos6:matchstiq_z1:
     - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
-build-test-assets-comms:centos6:matchstiq_z1:
+test-assets-comms:centos6:matchstiq_z1:
   extends:
-    - .build-test-assets-comms
+    - .test-assets-comms
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
@@ -359,9 +359,9 @@ build-test-assets-comms:centos6:matchstiq_z1:
     - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
-build-test-assets-dsp:centos6:matchstiq_z1:
+test-assets-dsp:centos6:matchstiq_z1:
   extends:
-    - .build-test-assets-dsp
+    - .test-assets-dsp
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
@@ -373,9 +373,9 @@ build-test-assets-dsp:centos6:matchstiq_z1:
     - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
-build-test-assets-misc:centos6:matchstiq_z1:
+test-assets-misc:centos6:matchstiq_z1:
   extends:
-    - .build-test-assets-misc
+    - .test-assets-misc
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
@@ -387,9 +387,9 @@ build-test-assets-misc:centos6:matchstiq_z1:
     - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
-build-test-assets-util:centos6:matchstiq_z1:
+test-assets-util:centos6:matchstiq_z1:
   extends:
-    - .build-test-assets-util
+    - .test-assets-util
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
@@ -401,9 +401,9 @@ build-test-assets-util:centos6:matchstiq_z1:
     - build-primitives-assets:centos6:matchstiq_z1
     - build-platforms-assets:centos6:matchstiq_z1
 
-build-test-assets_ts:centos6:matchstiq_z1:
+test-assets_ts:centos6:matchstiq_z1:
   extends:
-    - .build-test-assets_ts
+    - .test-assets_ts
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 
@@ -417,9 +417,9 @@ build-test-assets_ts:centos6:matchstiq_z1:
     - build-components-assets_ts:centos6:matchstiq_z1
     - build-devices-assets_ts:centos6:matchstiq_z1
 
-build-test-inactive:centos6:matchstiq_z1:
+test-inactive:centos6:matchstiq_z1:
   extends:
-    - .build-test-inactive
+    - .test-inactive
     - .centos6
     - .matchstiq_z1-xilinx13_3
   needs: 

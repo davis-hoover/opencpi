@@ -42,9 +42,9 @@ end to_slv;
 function from_slv(slv : in std_logic_vector) return protocol_t is
   variable ret : protocol_t;
 begin
-  ret.iq.data.i := slv(ret.iq.data.i'range);
-  ret.iq.data.q := slv(ret.iq.data.q'range);
-  ret.iq_vld    := slv(ret.iq.data.q'right+1);
+  ret.iq.data.i := slv(32 downto 17);
+  ret.iq.data.q := slv(16 downto 1);
+  ret.iq_vld    := slv(0);
   return ret;
 end from_slv;
 

@@ -32,11 +32,9 @@ SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_pkg \
 	misc_prims_body \
 	debounce/src/debounce \
-	cdc_pkg \
 	lfsr/src/lfsr \
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
-	edge_detector/src/edge_detector \
 	adc_samp_drop_detector \
 	data_widener \
 	adc_maximal_lfsr_data_src \
@@ -45,7 +43,6 @@ SourceFiles=$(patsubst %,%.vhd,\
 	data_narrower \
 	dac_underrun_detector \
 	level_to_pulse_converter \
-	cdc_fifo_complex_short_with_metadata \
 	cdc_testing/src/gen_reset_sync \
 	cdc_testing/src/four_bit_lfsr \
 	cdc_testing/src/one_shot_fifo \
