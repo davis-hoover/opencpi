@@ -61,7 +61,7 @@ def validation(argv):
     # Due to an inconsistency in the unit test framework, the final values of
     #   these properties are captured correctly in the environment variables
     #   for RCC workers, but not HDL.
-    with open(logname, 'rb') as log:
+    with open(logname, 'r') as log:
         for line in log:
             max_obj = re.search("Property \d+: peak_detector.max_peak = \"(-?\d+)\".*", line)
             if max_obj: #max_obj[1]:

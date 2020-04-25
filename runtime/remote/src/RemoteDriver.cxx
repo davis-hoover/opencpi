@@ -414,7 +414,8 @@ useServers(const OU::PValue *params, bool verbose, std::string &error) {
     for (OU::TokenIter li(saddr); li.token(); li.next())
       if (probeServer(li.token(), verbose, NULL, NULL, false, error))
 	return true;
-  if ((saddr = getenv("OCPI_SERVER_ADDRESS_FILE"))) {
+  saddr = getenv("OCPI_SERVER_ADDRESSES_FILE"); // This is documented and consistent
+  if (saddr || (saddr = getenv("OCPI_SERVER_ADDRESS_FILE"))) {
     std::string addrs;
     const char *err = OU::file2String(addrs, saddr, ' ');
     if (err)
