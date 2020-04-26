@@ -435,6 +435,11 @@
   variables:
     PLATFORM: 'xsim'
     MODEL: 'hdl'
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*xsim(\s[^\s\]]*)*\]/i
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci[^\]]*\]/i
+      when: never
+    - when: on_success
 
 .isim:
   extends:
@@ -443,6 +448,12 @@
   variables:
     PLATFORM: 'isim'
     MODEL: 'hdl'
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*isim(\s[^\s\]]*)*\]/i
 
 .xilinx13_3:
   extends:
@@ -491,6 +502,12 @@
     IP: '10.0.0.103'
     PORT: '1000'
     MODEL: 'hdl'
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*zed(\s[^\s\]]*)*\]/i
 
 .matchstiq_z1-xilinx13_3:
   extends:
@@ -503,10 +520,20 @@
     IP: '10.0.0.53'
     PORT: '1000'
     MODEL: 'hdl'
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*matchstiq(\s[^\s\]]*)*\]/i
 
 .e3xx:
-  extends:
-    - .rules-special
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*e3xx(\s[^\s\]]*)*\]/i
   
 
 ########
@@ -522,13 +549,6 @@
 .rules-default:
   rules:
     - when: on_success
-
-.rules-special:
-  rules:
-    - if: "$CI_MERGE_REQUEST_ID" 
-    - if: "$CI_COMMIT_TAG" 
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"  
 
 .vivado:
   before_script:
