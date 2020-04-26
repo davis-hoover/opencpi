@@ -26,7 +26,7 @@
     - ./scripts/build-opencpi.sh $PLATFORM
 
 .build-rcc:
-  extends: 
+  extends:
     - .build-opencpi
   stage: build-rcc
 
@@ -74,7 +74,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/components --hdl-platform $PLATFORM
 
@@ -82,7 +82,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components --hdl-platform $PLATFORM
 
@@ -90,7 +90,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/base_comps --hdl-platform $PLATFORM
 
@@ -98,7 +98,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/comms_comps --hdl-platform $PLATFORM
 
@@ -106,7 +106,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/dsp_comps --hdl-platform $PLATFORM
 
@@ -114,7 +114,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/misc_comps --hdl-platform $PLATFORM
 
@@ -122,7 +122,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/util_comps --hdl-platform $PLATFORM
 
@@ -130,7 +130,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets_ts/components --hdl-platform $PLATFORM
 
@@ -138,7 +138,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/components --hdl-platform $PLATFORM
 
@@ -150,7 +150,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/devices --hdl-platform $PLATFORM
 
@@ -158,7 +158,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/devices --hdl-platform $PLATFORM
 
@@ -166,7 +166,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets_ts/hdl/devices --hdl-platform $PLATFORM
 
@@ -174,7 +174,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/hdl/devices --hdl-platform $PLATFORM
 
@@ -186,7 +186,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/adapters --hdl-platform $PLATFORM
 
@@ -194,7 +194,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/adapters --hdl-platform $PLATFORM
 
@@ -206,7 +206,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/cards --hdl-platform $PLATFORM
 
@@ -214,7 +214,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/cards --hdl-platform $PLATFORM
 
@@ -222,7 +222,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/hdl/cards --hdl-platform $PLATFORM
 
@@ -244,7 +244,7 @@
     - .standard-artifacts
     - .build-platforms
   stage: build-platforms
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/core --hdl-platform $PLATFORM
 
@@ -253,7 +253,7 @@
     - .standard-artifacts
     - .build-platforms
   stage: build-platforms
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/assets --hdl-platform $PLATFORM
 
@@ -262,7 +262,7 @@
     - .standard-artifacts
     - .build-platforms
   stage: build-platforms
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/inactive --hdl-platform $PLATFORM
 
@@ -274,7 +274,7 @@
   extends:
     - .standard-artifacts
   stage: build-assemblies
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/assemblies --hdl-platform $PLATFORM
 
@@ -282,7 +282,7 @@
   extends:
     - .standard-artifacts
   stage: build-assemblies
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets_ts/hdl/assemblies --hdl-platform $PLATFORM
 
@@ -290,7 +290,7 @@
   extends:
     - .standard-artifacts
   stage: build-assemblies
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/hdl/assemblies --hdl-platform $PLATFORM
 
@@ -300,104 +300,104 @@
 ###############
 .test-opencpi:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - ./scripts/test-opencpi.sh --no-hdl
 
 .test-core:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
 .test-assets-base:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
 .test-assets-comms:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/comms_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
 .test-assets-dsp:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
 .test-assets-misc:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
 .test-assets-util:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/util_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
 .test-assets_ts:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
 .test-inactive:
   stage: test
-  artifacts: 
+  artifacts:
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/inactive --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then 
+      if [[ -z $IP ]]; then
         ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
       fi
 
@@ -449,10 +449,10 @@
     PLATFORM: 'isim'
     MODEL: 'hdl'
   rules:
-    - if: "$CI_MERGE_REQUEST_ID" 
-    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
     - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*isim(\s[^\s\]]*)*\]/i
 
 .xilinx13_3:
@@ -503,10 +503,10 @@
     PORT: '1000'
     MODEL: 'hdl'
   rules:
-    - if: "$CI_MERGE_REQUEST_ID" 
-    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
     - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*zed(\s[^\s\]]*)*\]/i
 
 .matchstiq_z1-xilinx13_3:
@@ -521,20 +521,20 @@
     PORT: '1000'
     MODEL: 'hdl'
   rules:
-    - if: "$CI_MERGE_REQUEST_ID" 
-    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
     - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*matchstiq(\s[^\s\]]*)*\]/i
 
 .e3xx:
   rules:
-    - if: "$CI_MERGE_REQUEST_ID" 
-    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
     - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*e3xx(\s[^\s\]]*)*\]/i
-  
+
 
 ########
 # Misc #
@@ -543,12 +543,19 @@
   artifacts:
     when: on_success
     expire_in: '3d'
-    paths: 
+    paths:
       - artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
 
 .rules-default:
   rules:
     - when: on_success
+
+.rules-special:
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_TAG"
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
 
 .vivado:
   before_script:
