@@ -98,7 +98,7 @@ function docase {
                  -s '?ocpi.core.backpressure=model!=\"rcc\"||platform==\"$platform\"' \
                  -s '?ocpi.core.metadata_stressor=model!=\"rcc\"||platform==\"$platform\"' \
                  -s '?ocpi.core.file_write=model!=\"rcc\"||platform==host_platform'"
-    cmd=('OCPI_LIBRARY_PATH=../../../lib/rcc:../../../lib/ocl:../../gen/assemblies:$OCPI_CDK_DIR/$OCPI_TOOL_DIR/artifacts' \
+    cmd=('OCPI_LIBRARY_PATH=../../../lib/rcc:../../../lib/ocl:../../gen/assemblies:$OCPI_CDK_DIR/$OCPI_TOOL_DIR/artifacts:$OCPI_CDK_DIR/$platform/artifacts' \
              '$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/'ocpirun -d -v -H -m$component=$1 -w$component=$2 \
                  $lockrcc -P$component=$platform \
                  --sim-dir=$3.$4.$2.$1.simulation $timearg \

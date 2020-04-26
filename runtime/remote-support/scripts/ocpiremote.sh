@@ -31,10 +31,6 @@
 
 user=root
 passwd=root
-[[ -z $OCPI_SERVER_ADDRESSES || $OCPI_SERVER_ADDRESSES != *:* ]] &&
-    echo Bad OCPI_SERVER_ADDRESSES value: $OCPI_SERVER_ADDRESSES && exit 1
-host=${OCPI_SERVER_ADDRESSES%%:*}
-port=${OCPI_SERVER_ADDRESSES##*:}
 sshopts='-t -o "GSSAPIAuthentication no" -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -o "ConnectTimeout=30"'
 rdir=sandbox
 platform=xilinx13_4
@@ -73,6 +69,7 @@ EOF
 
 
 trap 'test -n "$tmpdir" -a -d "$tmpdir" && rm -r -f "$tmpdir"' EXIT
+[ -z "$1" ] && help
 while [[ "$1" = -* ]]; do
     case $1 in
 	-u) shift; user=$1;;
@@ -91,6 +88,13 @@ while [[ "$1" = -* ]]; do
     esac
     shift
 done
+if [ -z "$host" ] ; then
+  [[ $OCPI_SERVER_ADDRESSES || $OCPI_SERVER_ADDRESSES != *:* ]] &&
+    echo Bad OCPI_SERVER_ADDRESSES value: $OCPI_SERVER_ADDRESSES && exit 1
+  host=${OCPI_SERVER_ADDRESSES%%:*}
+  port=${OCPI_SERVER_ADDRESSES##*:}
+fi
+[ -z "$port" ] && port=1234
 [ -z "$1" ] && help
 [ -z "$OCPI_CDK_DIR" ] && echo OCPI_CDK_DIR not set. && exit 1
 [ -z "$host" ] && echo No host or ip-address specified in OCPI_SERVER_ADDRESSES or using the -a option. && exit 1
@@ -106,6 +110,9 @@ function do_ssh {
     eval export $ASK
     set +e
     eval $OCPI_CDK_DIR/scripts/setsid.py ssh $sshopts $user@$host sh -c "'\"$1\"'"
+}
+function stop_if {
+    do_ssh "test ! -d $rdir || (cd $rdir && ./ocpiserver.sh stop_if)"
 }
 function unload {
     do_ssh "if [ -d $rdir ]; then rm -r -f $rdir; fi"
@@ -130,7 +137,7 @@ for op in $*; do
       grep -v "^$host " ~/.ssh/known_hosts > $tmpdir/known_hosts
       cp $tmpdir/known_hosts $kn;;
     load|reload)
-      [ $op = reload ] && unload
+      [ $op = reload ] && stop_if && unload
       pdir=$OCPI_CDK_DIR/$platform
       echo "Loading server package into a specific location ($rdir).  Relative path is in root home dir."
       [ -d $pdir ] || (echo No deployable software at $pdir && exit 1)
@@ -141,39 +148,48 @@ for op in $*; do
       # This list is not yet an official package like "development/runtime/deploy" etc., but it will be
       files="/etc/localtime scripts/ocpi_${os}_driver scripts/ocpiserver.sh \
       	     $platform/lib/*.ko $platform/lib/*.rules ${driverlibs[*]} \
-             $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/ocpihdl $platform/bin/ocpizynq $platform/system.xml"
+             $platform/bin/ocpidriver $platform/bin/ocpiserve $platform/bin/ocpihdl $platform/bin/ocpizynq"
+      if [ -e $hdl/system.xml ]; then
+	  files+=" $hdl/system.xml"
+      else
+	  files+=" $platform/system.xml"
+      fi
       [ -n "$vg" ] && files+=" ../prerequisites/valgrind/$platform"
       [ -x $platform/bin/gdb ] && files+=" $platform/bin/gdb"
       [ -x runtime/$platform/sdk ] && files+=" $platform/sdk"
       echo tar -c -z --dereference -f $tmpdir/tar.tgz $files
       tar -c -z --dereference -f $tmpdir/tar.tgz $files
-      do_ssh "test -e $rdir && echo Directory exists && exit 1;
+      do_ssh "set -vx; test -e $rdir && echo Directory exists && exit 1;
       	      date -u `date -u +%Y.%m.%d-%H:%M:%S`;
-	      mkdir $rdir && echo $platform > $rdir/swplatform && echo $port > $rdir/port &&
-	      ln -s scripts/ocpiserver.sh $rdir && ln -s $platform/system.xml $rdir
-	      tar -x -z -C $rdir -f - && pwd && TZ=\`pwd\`/$rdir/etc/localtime date" < $tmpdir/tar.tgz
+	      mkdir $rdir && cd $rdir && echo $platform > swplatform && echo $port > port &&
+	      ln -s scripts/ocpiserver.sh . &&
+	      tar -x -z -f - && pwd && TZ=\`pwd\`/etc/localtime date &&
+	      if [ -e $hdl/system.xml ]; then sx=$hdl/system.xml; else sx=$platform/system.xml; fi &&
+              ln -s \\\$sx ." < $tmpdir/tar.tgz
 	;;
     unload|remove)
 	unload;;
     start)
-	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh $vg $log start";;
+	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh start $vg $log";;
     log)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh log";;
     stop)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh stop";;
     stop_if)
-	do_ssh "test ! -d $rdir || (cd $rdir && ./ocpiserver.sh stop_if)";;
+	stop_if;;
     status)
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh status";;
+    mount)
+	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh mount";;
     bootload)
 	[ -z "$hdl" ] && echo "The bootload command requires both an RCC (-P) and HDL (-H) platform." && exit 1
-        (cd $OCPI_CDK_DIR/$hdl/sdcard-$platform &&
-	 tar -c -z --exclude opencpi --dereference -f $tmpdir/boot.tgz *)
+        (cd $OCPI_CDK_DIR/$hdl/sdcard-$platform && pwd && ls -l &&
+	 tar -c -z --exclude opencpi --dereference -f $tmpdir/boot.tgz *) # we avoid dot files
 	echo These are the boot files being copied:
-	do_ssh "mkdir -p tmp; cd tmp; gunzip | tar -x -f -" < $tmpdir/boot.tgz
+	do_ssh "cd /var/volatile && rm -r -f opencpi-tmp && mkdir opencpi-tmp; cd opencpi-tmp; gunzip | tar -x -f -" < $tmpdir/boot.tgz
 	echo do_ssh 'cd /media/card;
-		for i in *; do $i != opencpi && rm -r -f $i; done;
-		gunzip | tar -x -f -' < $tmpdir/boot.tgz
+		     for i in *; do $i != opencpi && rm -r -f $i; done;
+		     gunzip | tar -v -x -f -' < $tmpdir/boot.tgz
 	;;
   esac
 done

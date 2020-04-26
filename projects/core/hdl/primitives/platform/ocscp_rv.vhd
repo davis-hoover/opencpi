@@ -205,7 +205,7 @@ begin
                           (is_admin_r or response_r /= none_e) and
                           (not its(reading_r) or cp_in.take));
   cp_out.valid <= to_bool(reading_r and (is_admin_r or response_r /= none_e));
-  cp_out.tag   <= cp_in.data(cp_out.tag'left downto 0);
+  cp_out.tag   <= workers_out_r.data(cp_out.tag'left downto 0);
 
   gen0: for i in 0 to nWkrs - 1 generate
     present(i)   <= workers_in(i).present;

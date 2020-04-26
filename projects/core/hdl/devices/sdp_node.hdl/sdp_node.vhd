@@ -24,7 +24,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-architecture rtl of sdp_node_rv is
+architecture rtl of sdp_node_worker is
   -- Combinatorial state for splitting downstream messages to "client" or "down"
   signal for_client       : bool_t; -- the message coming from up_in is for the client
   -- State for joining upstream messsages from "client" or "down".
@@ -48,7 +48,7 @@ begin
   client_out.sdp.eop <= up_in.sdp.eop;
   client_out_data <= up_in_data;
   client_out.sdp.valid <= up_in.sdp.valid and for_client;
-  -- Copy the incoming upstream info downstream, qualifying the valie signal
+  -- Copy the incoming upstream info downstream, qualifying the valid signal
   down_out.clk <= up_in.clk;
   down_out.reset <= up_in.reset;
   down_out.id <= up_in.id + 1;

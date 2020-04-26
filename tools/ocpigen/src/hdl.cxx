@@ -418,6 +418,9 @@ parseSignals(ezxml_t xml, const std::string &parent, Signals &signals, SigMap &s
   }
   // process ad hoc signals
   for (ezxml_t xs = ezxml_cchild(xml, "Signal"); !err && xs; xs = ezxml_cnext(xs)) {
+    // Avoid mapping-only elements
+    if (ezxml_cattr(xs, "name") && ezxml_cattr(xs, "platform") && !ezxml_cattr(xs, "direction"))
+      continue;
     Signal *s = new Signal;
     if (!(err = s->parse(xs, w)))  {
       if (sigmap.find(s->m_name.c_str()) == sigmap.end()) {

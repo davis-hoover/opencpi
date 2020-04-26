@@ -27,6 +27,8 @@ OutLibFile=\
 #  $(call WkrTargetDir,$1,$2)/$(call HdlToolLibraryFile,$1,$(LibName))
 define DoLibTarget
 $(call OcpiDbg,OutLibFile:$(call OutLibFile,$1,$2))
+$$(foreach f,$$(call OcpiCPPSources,$$(SourceFiles)),\
+  $$(eval $$(call OcpiCPPSource,$$f,$1,$2,$(call OutLibFile,$1,$2))))
 OutLibFiles+=$(call OutLibFile,$1,$2)
 $(call OutLibFile,$1,$2): override TargetDir:=$(call WkrTargetDir,$1,$2)
 $(call OutLibFile,$1,$2): override HdlTarget:=$1
@@ -34,7 +36,7 @@ $(call OutLibFile,$1,$2): override ParamConfig:=$2
 $(call OutLibFile,$1,$2): override WorkLib:=$(WorkLib)$(and $(filter-out 0,$2),_c$2)
 $(call OutLibFile,$1,$2): $(call HdlTargetSrcFiles,$1,$2)
 $(call OutLibFile,$1,$2): \
-  HdlSources=$$(call Unique,$$(filter-out %.vh,$$(call HdlTargetSrcFiles,$1,$2) $$(call HdlShadowFiles,$1,$2)))
+  HdlSources=$$(call OcpiPullPkgFiles,$$(filter-out %.vh,$$(call HdlTargetSrcFiles,$1,$2) $$(call HdlShadowFiles,$1,$2)))
 $(call OutLibFile,$1,$2): \
 $$$$(foreach l,$$$$(HdlLibrariesInternal),$$$$(call HdlLibraryRefDir,$$$$l,$$$$(HdlTarget),,DLT))
 

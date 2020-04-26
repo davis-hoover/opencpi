@@ -94,7 +94,7 @@ namespace OCPI {
       inline uint64_t endpointSize() { return m_endpointSize; }
       inline bool isAlive() { return m_isAlive; }
       inline bool isFailed() { return m_isFailed; }
-      bool isLoadedUUID(const std::string &uuid);
+      virtual bool isLoadedUUID(const std::string &uuid); // Allow device to do extra checking
       void getUUID();
       RomWord getRomWord(uint16_t n);
       virtual bool getMetadata(std::vector<char> &xml, std::string &err);

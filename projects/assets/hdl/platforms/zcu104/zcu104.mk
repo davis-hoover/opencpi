@@ -16,9 +16,14 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-puts "Generating wrapper verilog file for processing_system7 version: [lindex $argv 0]"
-create_project managed_ip_project managed_ip_project -part xc7z020-clg484-1 -ip -force
+# SET THIS VARIABLE to the part (die-speed-package, e.g. xc7z020-1-clg484) for the platform!
+# The EV in this part is for quad core + mali gpu + H.264
+HdlPart_zcu104=xczu7ev-2-ffvc1156e
+HdlRccPlatform_zcu104=xilinx19_2_aarch64
+# Set this variable to the names of any other component libraries with devices defined in this
+# platform. Do not use slashes.  If there is an hdl/devices library in this project, it will be
+# searched automatically, as will "devices" in any projects this project depends on.
+# An example might be something like "our_special_devices", which would exist in this or
+# other projects.
+# ComponentLibraries_zcu102=
 
-create_ip -name processing_system7 -vendor xilinx.com -library ip -version [lindex $argv 0] -module_name processing_system7_0
-
-generate_target all [get_files  managed_ip_project/managed_ip_project.srcs/sources_1/ip/processing_system7_0/processing_system7_0.xci]

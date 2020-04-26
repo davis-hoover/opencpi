@@ -66,7 +66,7 @@ ifdef PrimitiveLibraries
 Libs:=$(PrimitiveLibraries)
 endif
 # If not cleaning and no platforms, don't bother
-ifeq ($(HdlPlatform)$(HdlPlatforms)$(filter-out clean%,$(MAKECMDGOALS)),)
+ifeq ($(HdlPlatform)$(HdlPlatforms)$(HdlTarget)$(HdlTargets)$(filter-out clean%,$(MAKECMDGOALS)),)
 all:
 	$(AT)echo No HDL platforms specified.  Skipping building of hdl primitives.
 else
