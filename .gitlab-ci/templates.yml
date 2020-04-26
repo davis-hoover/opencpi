@@ -439,7 +439,7 @@
 .isim:
   extends:
     - .vivado
-    - .rules-default
+    - .rules-special
   variables:
     PLATFORM: 'isim'
     MODEL: 'hdl'
@@ -471,7 +471,7 @@
 .zed-xilinx13_3:
   extends:
     - .vivado
-    - .rules-default
+    - .rules-special
   variables:
     PLATFORM: 'zed'
     HW_PLATFORM: 'zed'
@@ -483,7 +483,7 @@
 .zed-xilinx13_4:
   extends:
     - .vivado
-    - .rules-default
+    - .rules-special
   variables:
     PLATFORM: 'zed'
     HW_PLATFORM: 'zed'
@@ -495,7 +495,7 @@
 .matchstiq_z1-xilinx13_3:
   extends:
     - .vivado
-    - .rules-default
+    - .rules-special
   variables:
     PLATFORM: 'matchstiq_z1'
     HW_PLATFORM: 'matchstiq_z1'
