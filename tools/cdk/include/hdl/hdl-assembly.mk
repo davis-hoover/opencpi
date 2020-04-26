@@ -21,6 +21,8 @@
 HdlMode:=assembly
 Model:=hdl
 include $(OCPI_CDK_DIR)/include/util.mk
+$(if $(call DoShell,! echo $(CwdName) | grep -s '[A-Z]',Var1),\
+  $(error "This HDL assembly, $(CwdName), has upper case letters in its name, which is not supported due to limitations of some tools."))
 $(OcpiIncludeProject)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 

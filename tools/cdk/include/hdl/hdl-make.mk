@@ -570,15 +570,17 @@ HdlShadowFiles=\
 # Return nothing if no parameters
 # FIXME: this has worker stuff in it - should it be elsewhere?
 # $(call HdlTargetSrcFiles,target-dir,paramconfig)
-HdlTargetSrcFiles=$(and $(filter-out library core,$(HdlMode)),\
-  $(call HdlVHDLTargetDefs,$1,$2)\
-  $(if $(HdlToolRequiresEntityStubs_$(HdlToolSet)),$(call HdlVHDLTargetEnts,$1,$2))\
-  $(call HdlVerilogTargetDefs,$1,$2)\
-  $(call WkrTargetDir,$1,$2)/generics$(HdlVHDLIncSuffix)\
-  $(call WkrTargetDir,$1,$2)/generics$(HdlVerilogIncSuffix)\
-  $(call HdlVHDLTargetImpl,$1,$2)\
-  $(TargetSourceFiles_$2) \
-  $(ImplFile))
+HdlTargetSrcFiles=\
+  $(if $(filter-out library core,$(HdlMode)),\
+    $(call HdlVHDLTargetDefs,$1,$2)\
+    $(if $(HdlToolRequiresEntityStubs_$(HdlToolSet)),$(call HdlVHDLTargetEnts,$1,$2))\
+    $(call HdlVerilogTargetDefs,$1,$2)\
+    $(call WkrTargetDir,$1,$2)/generics$(HdlVHDLIncSuffix)\
+    $(call WkrTargetDir,$1,$2)/generics$(HdlVerilogIncSuffix)\
+    $(call HdlVHDLTargetImpl,$1,$2)\
+    $(TargetSourceFiles_$2) \
+    $(ImplFile),\
+    $(TargetSourceFiles_$2)) # only use TargetSourceFiles for primitives
 
 $(OutDir)target-%/generics.vhd: $$(ImplXmlFile) | $(OutDir)target-%
 	$(AT)echo Generating the VHDL constants file for config $(ParamConfig): $@
@@ -680,6 +682,8 @@ define HdlPreprocessTargets
     override HdlTargets:=$$(HdlAllFamilies)
   endif
 endef
+
+OcpiPullPkgFiles=$(call Unique,$(filter %_pkg.vhd,$1) $(filter-out %_pkg.vhd,$1))
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-search.mk
 endif
