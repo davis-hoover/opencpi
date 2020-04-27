@@ -431,7 +431,6 @@
 .xsim:
   extends:
     - .vivado
-    - .rules-default
   variables:
     PLATFORM: 'xsim'
     MODEL: 'hdl'
@@ -444,7 +443,6 @@
 .isim:
   extends:
     - .vivado
-    - .rules-special
   variables:
     PLATFORM: 'isim'
     MODEL: 'hdl'
@@ -482,7 +480,6 @@
 .zed-xilinx13_3:
   extends:
     - .vivado
-    - .rules-special
   variables:
     PLATFORM: 'zed'
     HW_PLATFORM: 'zed'
@@ -494,7 +491,6 @@
 .zed-xilinx13_4:
   extends:
     - .vivado
-    - .rules-special
   variables:
     PLATFORM: 'zed'
     HW_PLATFORM: 'zed'
@@ -512,7 +508,6 @@
 .matchstiq_z1-xilinx13_3:
   extends:
     - .vivado
-    - .rules-special
   variables:
     PLATFORM: 'matchstiq_z1'
     HW_PLATFORM: 'matchstiq_z1'
@@ -549,13 +544,6 @@
 .rules-default:
   rules:
     - when: on_success
-
-.rules-special:
-  rules:
-    - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_TAG"
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"
 
 .vivado:
   before_script:
