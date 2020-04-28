@@ -17,6 +17,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This primitive library contains VHDL primitive modules for zynq platforms.
+
+###############################################################################
+# NOTE: This Makefile runs tcl commands to generate Xilinx IP cores. This must
+# be done on-the-fly, at runtime, because licensed cores cannot be generated
+# and committed to SCM without violating the license agreement.
+###############################################################################
+
 #include $(OCPI_CDK_DIR)/include/util.mk
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
