@@ -81,7 +81,6 @@ local_repo:=$(or $(OCPI_XILINX_GIT_REPOSITORY),$(call OcpiXilinxDir)/git)
 xilinx_releases:=$(or $(OCPI_XILINX_ZYNQ_RELEASE_DIR),$(call OcpiXilinxDir,warning)/ZynqReleases)
 kernel_headers:=$(OcpiKernelDir).tgz
 kernel_config:=$(and $(wildcard kernel.config),$(CURDIR)/kernel.config)
-binary_release:=/home/jek/mac/Xilinx/ZynqReleases/2019.1-zed-release-dir/2019.1-zed-release
 # kernel file from gen/patch_ub_image
 kernel_image:=../uImage
 exports_file:=$(xilinx_sw_platform).exports
@@ -94,10 +93,11 @@ gen:
 # Note top level kernel-headers.tgz link until we get all the exports in the lib subdir
 
 gen/kernel-artifacts.done: | $(local_repo) gen
-	$(AT)rm -f gen/kernel-artifacts.done
+	$(AT)rm -f -r gen/kernel-artifacts.done lib/kernel-headers
 	$(AT)echo Retrieving/patching/building needed artifacts from the Xilinx kernel and u-boot source repos.
 	$(AT)bash $(OCPI_CDK_DIR)/scripts/xilinx/createXilinxLinuxKernelHeaders.sh $(xilinx_sw_arch) \
-		$(linux_repo_tag) $(uboot_repo_tag) $(local_repo) gen/kernel-artifacts "$(kernel_config)"
+		$(linux_repo_tag) $(uboot_repo_tag) $(local_repo) gen/kernel-artifacts "$(kernel_config)" \
+                $(repo_tag)
 	$(AT)echo The kernel-headers has been created.
 	$(AT)touch $@
 

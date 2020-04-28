@@ -50,9 +50,7 @@
 #include "OcpiOsPosixError.h"
 
 void
-OCPI::OS::sleep (unsigned long msecs)
-  throw (std::string)
-{
+OCPI::OS::sleep(unsigned long msecs) {
   if (msecs) {
     struct timeval timeout;
     timeout.tv_sec = msecs / 1000;
@@ -61,25 +59,19 @@ OCPI::OS::sleep (unsigned long msecs)
     int res = ::select (0, 0, 0, 0, &timeout);
 
     if (res < 0 && errno != EINTR) {
-      throw OCPI::OS::Posix::getErrorMessage (errno);
+      throw OCPI::OS::Posix::getErrorMessage(errno);
     }
-  }
-  else {
-    sched_yield ();
-  }
+  } else
+    sched_yield();
 }
 
 unsigned long
-OCPI::OS::getProcessId ()
-  throw ()
-{
+OCPI::OS::getProcessId() throw() {
   return static_cast<unsigned long> (getpid());
 }
 
 unsigned long
-OCPI::OS::getThreadId ()
-  throw ()
-{
+OCPI::OS::getThreadId() throw() {
 #ifdef __APPLE__
   return (unsigned long) pthread_self();
 #else
@@ -88,31 +80,23 @@ OCPI::OS::getThreadId ()
 }
 
 std::string
-OCPI::OS::getHostname ()
-  throw (std::string)
-{
-  return Posix::getHostname ();
+OCPI::OS::getHostname() {
+  return Posix::getHostname();
 }
 
 std::string
-OCPI::OS::getFQDN ()
-  throw (std::string)
-{
-  return Posix::getFQDN ();
+OCPI::OS::getFQDN() {
+  return Posix::getFQDN();
 }
 
 std::string
-OCPI::OS::getIPAddress ()
-  throw (std::string)
-{
-  return Posix::getIPAddress ();
+OCPI::OS::getIPAddress() {
+  return Posix::getIPAddress();
 }
 
 bool
-OCPI::OS::isLocalhost (const std::string & name)
-  throw (std::string)
-{
-  return Posix::isLocalhost (name);
+OCPI::OS::isLocalhost(const std::string & name) {
+  return Posix::isLocalhost(name);
 }
 
 namespace {
@@ -121,21 +105,17 @@ namespace {
    * Posix wants a signal handler that takes an integer parameter.
    */
 
-  void (*g_userHandler) (void) = 0;
+  void (*g_userHandler)(void) = 0;
 
   void
-  PosixCtrlCHandler (int)
-    throw ()
-  {
+  PosixCtrlCHandler(int) throw() {
     g_userHandler ();
   }
 
 }
 
 void
-OCPI::OS::setCtrlCHandler (void (*handler) (void))
-  throw ()
-{
+OCPI::OS::setCtrlCHandler(void (*handler) (void)) throw() {
   if (!g_userHandler) {
     g_userHandler = handler;
     struct sigaction act;
@@ -149,8 +129,7 @@ OCPI::OS::setCtrlCHandler (void (*handler) (void))
     g_userHandler = handler;
   }
 }
-void OCPI::OS::setError(std::string &error, const char *fmt, ...)
-  throw() {
+void OCPI::OS::setError(std::string &error, const char *fmt, ...) throw() {
   int incoming_errno = errno;
   char *err0, *err1;
   va_list ap;

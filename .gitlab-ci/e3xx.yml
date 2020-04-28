@@ -3,6 +3,7 @@ trigger-downstream:e3xx:
   extends:
     - .centos7
     - .docker
+    - .e3xx
   before_script: []
   script:
     - >

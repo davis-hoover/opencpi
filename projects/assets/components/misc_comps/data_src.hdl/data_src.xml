@@ -2,6 +2,7 @@
 
   <Property Name="ODATA_WIDTH_p" Type="ushort" Default="32" Parameter="true"/>
 
-  <StreamInterface Name="out" DataWidth="ODATA_WIDTH_p"/>
+  <property Name='debug' type='long' volatile='1'/>
+  <StreamInterface Name="out" DataWidth="ODATA_WIDTH_p" inserteom='1'/>
 
 </HdlWorker>

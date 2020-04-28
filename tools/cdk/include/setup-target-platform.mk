@@ -28,7 +28,11 @@ ifndef OcpiPlatform
   ifdef OCPI_TARGET_PLATFORM
     OcpiPlatform:=$(OCPI_TARGET_PLATFORM)
   else
-    $(error Internal error: this file included without OcpiPlatform or OCPI_TARGET_PLATFORM set)
+    ifdef ShellExternalVars # bootstrap when environment is truly minimal - no opencpi-setup.sh required.
+      OcpiPlatform:=$(OCPI_TOOL_PLATFORM)
+    else
+      $(error Internal error: this file included without OcpiPlatform or OCPI_TARGET_PLATFORM set)
+    endif
   endif
 endif
 # This may be already included
@@ -60,4 +64,16 @@ $(foreach v,\
   OS OS_VERSION ARCH DIR PLATFORM PLATFORM_DIR KERNEL_DIR CROSS_COMPILE PREREQUISITES \
   DYNAMIC_FLAGS DYNAMIC_SUFFIX EXTRA_LIBS,\
   $(info OCPI_TARGET_$v="$(OCPI_TARGET_$v)"; export OCPI_TARGET_$v;))
+endif
+# Emit minimal variable assignments for making OpenCPI apps, for makefiles outside of projects
+# Emit semicolons for post processing by ocpisetup.mk
+ifdef ShellExternalVars
+$(info OCPI_INC_DIR=$(OCPI_CDK_DIR)/include/aci;)
+$(info OCPI_LIB_DIR=$(OCPI_CDK_DIR)/$(OCPI_TARGET_DIR)/lib;)
+# This assumes the external program is linked against our static libs
+$(info OCPI_EXPORT_DYNAMIC=$(OcpiStaticProgramFlags);)
+# This should be shared with RccInternalLibraries in rcc-workers.mk FIXME
+$(info OCPI_API_LIBS=application remote_support container library transport xfer util msg_driver_interface foreign os;)
+$(info OCPI_SYSTEM_LIBS=$(OcpiExtraLibs);)
+$(info OCPI_PREREQUISITES_LIBS=$(OCPI_PREREQUISITES_LIBS);)
 endif

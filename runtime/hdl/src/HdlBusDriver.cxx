@@ -45,11 +45,17 @@
      namespace Zynq {
        namespace OU = OCPI::Util;
        namespace OF = OCPI::OS::FileSystem;
+       namespace OM = OCPI::HDL::ZynqMP;
+       namespace OH = OCPI::HDL;
 
        const char
          fpgaMgrState[]  = "/sys/class/fpga_manager/fpga0/state",
-	 fpgaMgrFlags[]  = "/sys/class/fpga_manager/fpga0/flags",
+       // fpgaMgrFlags[]  = "/sys/class/fpga_manager/fpga0/flags",
+#if defined(OCPI_ARCH_aarch64)
+       	 fpgaMgrDevice[] = "/pcap", // from /sys/firmware/devicetree/base/...
+#else
        	 fpgaMgrDevice[] = "/amba/devcfg@f8007000", // from /sys/firmware/devicetree/base/...
+#endif
 	 xdevCfgState[]  = "/sys/class/xdevcfg/xdevcfg/device/prog_done",
 	 xdevCfgDevice[] = "/dev/xdevcfg";
        class Device
@@ -64,11 +70,15 @@
 	     m_driver(driver), m_vaddr(NULL) {
 	   m_isAlive = false;
 	   m_endpointSize = sizeof(OccpSpace);
-	   if (OF::exists(fpgaMgrState)) // && OF::exists(fpgaMgrFirmware))
+	   if (OF::exists(fpgaMgrState)) { // && OF::exists(fpgaMgrFirmware))
 	     m_fpgaManager = true;
-	   else if (OF::exists(xdevCfgState) && !::access(xdevCfgDevice, F_OK)) // need access() for char device
+	     ocpiInfo("HDL Device %s will use the FPGA Manager linux kernel support (no %s)",
+		      a_name.c_str(), fpgaMgrState);
+	   } else if (OF::exists(xdevCfgState) && !::access(xdevCfgDevice, F_OK)) {
+	     // need access() for char device
 	     m_fpgaManager = false;
-	   else {
+	     ocpiInfo("HDL Device %s will use the /dev/xdevcfg linux kernel support", a_name.c_str());
+	   } else {
 	     err = "FPGA support not present for Zynq PL, required files are missing";
 	     return;
 	   }
@@ -88,48 +98,109 @@
 
 	 bool
 	 configure(ezxml_t config, std::string &err) {
-	   if (!m_isAlive) {
-	     volatile SLCR *slcr =
-	       (volatile SLCR *)m_driver.map(sizeof(SLCR), SLCR_ADDR, err);
-	     if (!slcr)
-	       return true;
-	     // We're not loaded, but fake as much stuff as possible.
-	     const char *p = ezxml_cattr(config, "platform");
-	     m_platform = p ? p : "zed"; // FIXME: is there any other automatic way for this?
-	     switch ((slcr->pss_idcode >> 12) & 0x1f) {
-	     case 0x02: m_part = "xc7z010"; break;
-	     case 0x07: m_part = "xc7z020"; break;
-	     case 0x0c: m_part = "xc7z030"; break;
-	     case 0x11: m_part = "xc7z045"; break;
-	     default:
-	       m_part = "xc7zXXX";
-	     }
-	     ocpiDebug("Zynq SLCR PSS_IDCODE: 0x%x", slcr->pss_idcode);
-	     return m_driver.unmap((uint8_t *)slcr, sizeof(SLCR), err);
-	   }
+	   // Any delayed setup-before-usage that can be deferred beyond discovery
+	  const char *p = ezxml_cattr(config, "platform");
+	  m_platform = p ? p : "zed"; // FIXME: is there any other automatic way for this?
+	  // since we can't get at the real IDCODE yet
+	  if (m_platform == "zcu102")
+	    m_part = "xczu9eg";
+	  else if (m_platform == "zcu111")
+	    m_part = "xczu28dr";
+	  else if (m_platform == "zcu104")
+	    m_part = "xczu7ev";
+	  else
+	    m_part = "xczu9eg";
 	  return OCPI::HDL::Device::configure(config, err);
 	}
 	bool
 	init(std::string &err) {
 	  ocpiDebug("Setting up the Zynq PL");
+#if defined(OCPI_ARCH_aarch64) // not a great ultrascale test, but works for now
+#if 0 // bus error due to the CSU being "secured"  Maybe we could do it in our kernel driver...
+	  volatile OM::CSU *csu;
+	  if (!(csu = (volatile OM::CSU*)m_driver.map(sizeof(*csu), OM::CSU_ADDR, err)))
+	    return true;
+	  uint32_t val = csu->IDCODE;;
+	  ocpiDebug("Zynq Ultrascale IDCODE is 0x%x", val);
+	  switch (val & ( UINT32_MAX >> 4)) {
+	  case 0x4711093: m_part = "ZU3"; break;
+	  case 0x4710093: m_part = "ZU4"; break;
+	  case 0x4721093: m_part = "ZU5"; break;
+	  case 0x4720093: m_part = "ZU6"; break;
+	  case 0x4739093: m_part = "ZU7"; break;
+	  case 0x4730093: m_part = "ZU9"; break;
+	  case 0x4738093: m_part = "ZU11"; break;
+	  case 0x4740093: m_part = "ZU15"; break;
+	  case 0x4750093: m_part = "ZU17"; break;
+	  case 0x4759093: m_part = "ZU19"; break;
+	  case 0x4758093: m_part = "ZU21"; break;
+	  case 0x47E1093: m_part = "ZU25"; break;
+	  case 0x47E5093: m_part = "ZU27"; break;
+	  case 0x47E4093: m_part = "ZU28"; break;
+	  case 0x47E0093: m_part = "ZU29"; break;
+	  default:
+	    m_part = "ZUXXX";
+	  }
+	  m_driver.unmap((uint8_t *)csu, sizeof(*csu), err);
+#endif
+	  volatile uint32_t *reg;
+	  if (!(reg = (volatile uint32_t *)m_driver.map(sizeof(uint32_t), OM::FPD_SLCR_AFI_FS_ADDR, err)))
+	    return true;
+	  *reg = 0;  // set gp0/1 to 32bit mode
+	  if (m_driver.unmap((uint8_t *)reg, sizeof(*reg), err))
+	    return true;
+	  volatile OM::ALL_AFIFMS *axi_hp;
+	  if (!(axi_hp =
+		(volatile OM::ALL_AFIFMS *)m_driver.map(sizeof(OM::ALL_AFIFMS), OM::S_AXI_HPX_FPD_ADDR, err)))
+	    return true;
+	  for (unsigned n = 0; n <  OM::NUM_S_AXI_HPNCS; n++) {
+	    axi_hp->afifm[OM::NUM_S_AXI_HPCS + n].rdctrl = 0xB1; // set 64 bits wide
+	    axi_hp->afifm[OM::NUM_S_AXI_HPCS + n].wrctrl = 0xB1;
+	  }
+	  if (m_driver.unmap((uint8_t *)axi_hp, sizeof(OM::ALL_AFIFMS), err))
+	    return true;
+#else
+	  volatile SLCR *slcr = (volatile SLCR *)m_driver.map(sizeof(SLCR), SLCR_ADDR, err);
+	  if (!slcr)
+	    return true;
+	  // We're not loaded, but fake as much stuff as possible.
+	  switch ((slcr->pss_idcode >> 12) & 0x1f) {
+	  case 0x02: m_part = "xc7z010"; break;
+	  case 0x07: m_part = "xc7z020"; break;
+	  case 0x0c: m_part = "xc7z030"; break;
+	  case 0x11: m_part = "xc7z045"; break;
+	  default:
+	    m_part = "xc7zXXX";
+	  }
+	  ocpiDebug("Zynq SLCR PSS_IDCODE: 0x%x", slcr->pss_idcode);
+	  if (m_driver.unmap((uint8_t *)slcr, sizeof(SLCR), err))
+	    return true;
+#endif
+	  uint32_t cpAddr;
+#if defined(OCPI_ARCH_aarch64)
+	  // Pernaps we could use the ftm.gpi register if we needed to do the gp0/gp1 thing.
+	  // Note:  for parts that have the VCU (H.264/5), this is actually wrong.
+	  cpAddr = OM::M_HP0_PADDR;
+#else
 	  volatile FTM *ftm = (volatile FTM *)m_driver.map(sizeof(FTM), FTM_ADDR, err);
 	  if (!ftm)
 	    return true;
 	  ocpiDebug("Debug register 3 from Zynq FTM is 0x%x", ftm->f2pdbg3);
 	  // Find out whether the OpenCPI control plane is available at GP0 or GP1, GP0 first
 	  bool useGP1 = (ftm->f2pdbg3 & 0x80) != 0;
-	  uint32_t gpAddr = useGP1 ? GP1_PADDR : GP0_PADDR;
-	  if (m_driver.unmap((uint8_t *)ftm, sizeof(FTM), err) ||
-	      (m_vaddr && m_driver.unmap((uint8_t *)m_vaddr, sizeof(OccpSpace), err)) ||
-	      !(m_vaddr = m_driver.map(sizeof(OccpSpace), gpAddr, err)))
+	  ocpiCheck(!m_driver.unmap((uint8_t *)ftm, sizeof(FTM), err));
+	  cpAddr = useGP1 ? GP1_PADDR : GP0_PADDR;
+#endif
+	  if ((m_vaddr && m_driver.unmap((uint8_t *)m_vaddr, sizeof(OccpSpace), err)) ||
+	      !(m_vaddr = m_driver.map(sizeof(OccpSpace), cpAddr, err)))
 	    return true;
-	  ocpiDebug("Mapping for GP%c at %p", useGP1 ? '1' : '0', m_vaddr);
+	  ocpiDebug("Mapping for control plane %p", m_vaddr);
 	  cAccess().setAccess(m_vaddr, NULL, OCPI_UTRUNCATE(RegisterOffset, 0));
 	  if (OCPI::HDL::Device::init(err))
 	    return true;
 	  OU::format(m_endpointSpecific,
 		     "ocpi-dma-pio:0x%" PRIx32 ".0x%" PRIx32 ".0x%" PRIx32,
-		     gpAddr, 0, 0);
+		     cpAddr, 0, 0);
 	  dAccess().setAccess(NULL, NULL, 0); // the data space will never be accessed by CPU
 	  m_isAlive = true;
 	  return false;
@@ -156,6 +227,11 @@
 		    err.empty() ? (done ? "true" : "false") : "error: ", err.empty() ? "" : err.c_str());
 	  return done;
         }
+	bool
+	isLoadedUUID(const std::string &uuid) {
+	  static std::string dummy;
+	  return isProgrammed(dummy) && OH::Device::isLoadedUUID(uuid);
+	}
 	bool getMetadata(std::vector<char> &xml, std::string &err) {
 	  if (isProgrammed(err))
 	    return OCPI::HDL::Device::getMetadata(xml, err);
@@ -175,8 +251,19 @@
 	}
 
 	// Scan the buffer and identify the start of the sync pattern
+	// On zynq7000, you need 32 FFs in the preamble, but on zynqmp, you need 64
 	static uint8_t *findsync(uint8_t *buf, size_t len) {
 	  static uint8_t startup[] = {
+#if defined(OCPI_ARCH_aarch64)
+	    0xff, 0xff, 0xff, 0xff,
+	    0xff, 0xff, 0xff, 0xff, 
+	    0xff, 0xff, 0xff, 0xff,
+	    0xff, 0xff, 0xff, 0xff, 
+	    0xff, 0xff, 0xff, 0xff,
+	    0xff, 0xff, 0xff, 0xff, 
+	    0xff, 0xff, 0xff, 0xff,
+	    0xff, 0xff, 0xff, 0xff, 
+#endif
 	    0xff, 0xff, 0xff, 0xff,
 	    0xff, 0xff, 0xff, 0xff, 
 	    0xff, 0xff, 0xff, 0xff,
@@ -315,7 +402,10 @@
 		ocpi_load_fpga_request_t request;
 		request.data = obase;
 		request.length = OCPI_UTRUNCATE(ocpi_size_t, optr - obase);
+		int fd = creat("bits", 0666); write(fd, obase, request.length); close(fd);
 		strncpy(request.device_path, fpgaMgrDevice, sizeof(request.device_path));
+		ocpiInfo("Loading using FPGA manager, %u bytes uncompressed from %s",
+			 request.length, inputFile.c_str());
 		if (ioctl(xfd, OCPI_CMD_LOAD_FPGA, &request))
 		  return OU::eformat(error, "Error loading fpga: %s(%u)", strerror(errno), errno);
 	      }
@@ -355,8 +445,19 @@
 	}
 	bool
 	unload(std::string &error) {
+	  ocpiDebug("Trying to unload Zynq bitstream from %s", m_name.c_str());
 	  int xfd;
-	  if ((xfd = ::open("/dev/xdevcfg", O_WRONLY)) < 0)
+	  if (m_fpgaManager) {
+	    if ((xfd = ::open(OCPI_DRIVER_MEM, O_RDWR)) < 0)
+	      return OU::eformat(error, "Can't open %s for bitstream unloading: %s(%d)", OCPI_DRIVER_MEM,
+				 strerror(errno), errno);
+	    ocpi_load_fpga_request_t request;
+	    request.data = (uint8_t*)"bad";
+	    request.length = 4;
+	    strncpy(request.device_path, fpgaMgrDevice, sizeof(request.device_path));
+	    ioctl(xfd, OCPI_CMD_LOAD_FPGA, &request);
+	    // could check for wrong state here...
+	  } else if ((xfd = ::open("/dev/xdevcfg", O_WRONLY)) < 0)
 	    return OU::eformat(error, "Can't open /dev/xdevcfg for bitstream unloading: %s(%d)",
 			       strerror(errno), errno);
 	  close(xfd);
@@ -410,7 +511,7 @@
 	  error = "Can't open /dev/mem, forgot to load the driver? sudo?";
 	else if ((vaddr = mmap64(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, m_memFd,
 				 off64)) == MAP_FAILED)
-	  error = "can't mmap /dev/mem for control space";
+	  OU::format(error, "can't mmap /dev/mem: %s(%d)", strerror(errno), errno);
 	else {
 	  ocpiDebug("Zynq map returns %p", vaddr);
 	  return (uint8_t*)vaddr;

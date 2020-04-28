@@ -39,9 +39,10 @@
      </Property>
   </Case>
   <Case>
-     <Property name='max_count_value' value='1M'/>
+     <Property name='max_count_value' value='128K'/>
      <Property name='assert_eof'>
-       <Set delay='90' value='true'/>
+       <!-- this needs to be long enough for simulators to count to 1m -->
+       <Set delay='120' value='true'/>
      </Property>
   </Case>
 </Tests>

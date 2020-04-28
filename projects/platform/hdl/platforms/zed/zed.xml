@@ -1,5 +1,5 @@
 <!-- ZedBoard Platform Worker -->
-<HdlPlatform Language="VHDL" spec='platform-spec'>
+<HdlPlatform Language="VHDL" spec='platform-spec' version='2'>
   <specproperty name='platform' value='zed'/>
   <specproperty name="nSlots" value='1'/>
   <specproperty name="slotNames" value='fmc_lpc'/>

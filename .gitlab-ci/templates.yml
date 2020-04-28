@@ -427,12 +427,10 @@
 #############
 # Platforms #
 #############
-.docker:
-  tags:
-    - docker
-  image: $IMAGE
 
 .centos7:
+  extends:
+    - .rules-default
   tags:
     - opencpi
     - centos7
@@ -442,6 +440,8 @@
     IMAGE: 'centos:7'
 
 .centos6:
+  extends:
+    - .rules-default
   tags:
     - opencpi
     - centos6
@@ -450,30 +450,37 @@
     PLATFORM: 'centos6'
     IMAGE: 'centos:6'
 
-.vivado:
-  before_script:
-    - export HOME=$CI_PROJECT_DIR
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
-    - sleep 5
-    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
-    - cat timestamp.txt
-    - ls -lh
-
 .xsim:
   extends:
     - .vivado
+    - .rules-default
   variables:
     PLATFORM: 'xsim'
     MODEL: 'hdl'
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*xsim(\s[^\s\]]*)*\]/i
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci[^\]]*\]/i
+      when: never
+    - when: on_success
 
 .isim:
   extends:
     - .vivado
+    - .rules-special
   variables:
     PLATFORM: 'isim'
     MODEL: 'hdl'
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*isim(\s[^\s\]]*)*\]/i
 
 .xilinx13_3:
+  extends:
+    - .vivado
+    - .rules-default
   variables:
     PLATFORM: 'xilinx13_3'
     HW_PLATFORM: 'zed'
@@ -483,6 +490,9 @@
     MODEL: 'rcc'
 
 .xilinx13_4:
+  extends:
+    - .vivado
+    - .rules-default
   variables:
     PLATFORM: 'xilinx13_4'
     HW_PLATFORM: 'zed'
@@ -494,6 +504,7 @@
 .zed-xilinx13_3:
   extends:
     - .vivado
+    - .rules-special
   variables:
     PLATFORM: 'zed'
     HW_PLATFORM: 'zed'
@@ -505,6 +516,7 @@
 .zed-xilinx13_4:
   extends:
     - .vivado
+    - .rules-special
   variables:
     PLATFORM: 'zed'
     HW_PLATFORM: 'zed'
@@ -512,10 +524,17 @@
     IP: '10.0.0.103'
     PORT: '1000'
     MODEL: 'hdl'
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*zed(\s[^\s\]]*)*\]/i
 
 .matchstiq_z1-xilinx13_3:
   extends:
     - .vivado
+    - .rules-special
   variables:
     PLATFORM: 'matchstiq_z1'
     HW_PLATFORM: 'matchstiq_z1'
@@ -523,6 +542,20 @@
     IP: '10.0.0.53'
     PORT: '1000'
     MODEL: 'hdl'
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*matchstiq(\s[^\s\]]*)*\]/i
+
+.e3xx:
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID" 
+    - if: "$CI_COMMIT_TAG" 
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"  
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*e3xx(\s[^\s\]]*)*\]/i
   
 
 ########
@@ -534,6 +567,24 @@
     expire_in: '3d'
     paths: 
       - artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+
+.rules-default:
+  rules:
+    - when: on_success
+
+.vivado:
+  before_script:
+    - export HOME=$CI_PROJECT_DIR
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - sleep 5
+    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - cat timestamp.txt
+    - ls -lh
+
+.docker:
+  tags:
+    - docker
+  image: $IMAGE
 
 .ocpiremote:
   before_script:
