@@ -16,46 +16,46 @@ build-primitives:centos6:isim:
 # Jobs - Build-Components #
 ###########################
 build-components-core:centos6:isim:
-  extends: 
+  extends:
     - .build-components-core
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
 build-components-assets:centos6:isim:
-  extends: 
+  extends:
     - .build-components-assets
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
 build-components-assets_ts:centos6:isim:
-  extends: 
+  extends:
     - .build-components-assets_ts
     - .centos6
     - .isim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
 build-components-inactive:centos6:isim:
-  extends: 
+  extends:
     - .build-components-inactive
     - .centos6
     - .isim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
@@ -64,23 +64,23 @@ build-components-inactive:centos6:isim:
 # Jobs - Build-Adapters #
 #########################
 build-adapters-core:centos6:isim:
-  extends: 
+  extends:
     - .build-adapters-core
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
 build-adapters-assets:centos6:isim:
-  extends: 
+  extends:
     - .build-adapters-assets
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
@@ -90,11 +90,11 @@ build-adapters-assets:centos6:isim:
 # Jobs - Build-Devices #
 ########################
 build-devices-core:centos6:isim:
-  extends: 
+  extends:
     - .build-devices-core
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -112,35 +112,35 @@ build-devices-platform:centos6:isim:
     - build-primitives:centos6:isim
 
 build-devices-assets:centos6:isim:
-  extends: 
+  extends:
     - .build-devices-assets
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
 build-devices-assets_ts:centos6:isim:
-  extends: 
+  extends:
     - .build-devices-assets_ts
     - .centos6
     - .isim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
 build-devices-inactive:centos6:isim:
-  extends: 
+  extends:
     - .build-devices-inactive
     - .centos6
     - .isim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
@@ -149,11 +149,11 @@ build-devices-inactive:centos6:isim:
 # Jobs - Build-Cards #
 ######################
 build-cards-core:centos6:isim:
-  extends: 
+  extends:
     - .build-cards-core
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -171,23 +171,23 @@ build-cards-platform:centos6:isim:
     - build-primitives:centos6:isim
 
 build-cards-assets:centos6:isim:
-  extends: 
+  extends:
     - .build-cards-assets
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
 
 build-cards-inactive:centos6:isim:
-  extends: 
+  extends:
     - .build-cards-inactive
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
@@ -197,11 +197,11 @@ build-cards-inactive:centos6:isim:
 # Jobs - Build-Platforms #
 ##########################
 build-platforms-core:centos6:isim:
-  extends: 
+  extends:
     - .build-platforms-core
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -226,11 +226,11 @@ build-platforms-platform:centos6:isim:
     - build-devices-core:centos6:isim
 
 build-platforms-assets:centos6:isim:
-  extends: 
+  extends:
     - .build-platforms-assets
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -244,11 +244,11 @@ build-platforms-assets:centos6:isim:
     - build-devices-core:centos6:isim
 
 build-platforms-inactive:centos6:isim:
-  extends: 
+  extends:
     - .build-platforms-inactive
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -275,12 +275,12 @@ build-assemblies-platform:centos6:isim:
     - build-platforms-platform:centos6:isim
 
 build-assemblies-assets:centos6:isim:
-  extends: 
+  extends:
     - .build-assemblies-assets
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
@@ -289,12 +289,12 @@ build-assemblies-assets:centos6:isim:
     - build-platforms-assets:centos6:isim
 
 build-assemblies-assets_ts:centos6:isim:
-  extends: 
+  extends:
     - .build-assemblies-assets_ts
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:isim
@@ -303,12 +303,12 @@ build-assemblies-assets_ts:centos6:isim:
     - build-components-assets_ts:centos6:isim
 
 build-assemblies-inactive:centos6:isim:
-  extends: 
+  extends:
     - .build-assemblies-inactive
     - .centos6
     - .isim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-platforms-inactive:centos6:isim
@@ -323,7 +323,7 @@ test-core:centos6:isim:
     - .test-core
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -340,7 +340,7 @@ test-assets-base:centos6:isim:
     - .test-assets-base
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -354,7 +354,7 @@ test-assets-comms:centos6:isim:
     - .test-assets-comms
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -368,7 +368,7 @@ test-assets-dsp:centos6:isim:
     - .test-assets-dsp
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -382,7 +382,7 @@ test-assets-misc:centos6:isim:
     - .test-assets-misc
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -394,8 +394,8 @@ test-assets-misc:centos6:isim:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
     - >
-      for f in $(find projects/assets/components/misc_comps/ -maxdepth 1 -type d -name "*.test" -not -name "cdc_*"); do 
-        ocpidev run test "$(basename "$f" .test)" -d projects/assets/components/misc_comps --only-platform isim; 
+      for f in $(find projects/assets/components/misc_comps/ -maxdepth 1 -type d -name "*.test" -not -name "cdc_*"); do
+        ocpidev run test "$(basename "$f" .test)" -d projects/assets/components/misc_comps --only-platform isim;
       done
 
 test-assets-util:centos6:isim:
@@ -403,7 +403,7 @@ test-assets-util:centos6:isim:
     - .test-assets-util
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -417,7 +417,7 @@ test-assets_ts:centos6:isim:
     - .test-assets_ts
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -429,8 +429,8 @@ test-assets_ts:centos6:isim:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
     - >
-      for f in $(find opencpi/projects/assets_ts/components -maxdepth 1 -type d -name "*.test" -not -name "complex_mixer_ts.test"); do 
-        ocpidev run test "$(basename "$f" .test)" -d projects/assets_ts/components --only-platform isim; 
+      for f in $(find opencpi/projects/assets_ts/components -maxdepth 1 -type d -name "*.test" -not -name "complex_mixer_ts.test"); do
+        ocpidev run test "$(basename "$f" .test)" -d projects/assets_ts/components --only-platform isim;
       done
 
 test-inactive:centos6:isim:
@@ -438,7 +438,7 @@ test-inactive:centos6:isim:
     - .test-inactive
     - .centos6
     - .isim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
