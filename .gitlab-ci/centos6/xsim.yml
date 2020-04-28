@@ -47,48 +47,48 @@ build-primitives-inactive:centos6:xsim:
 # Jobs - Build-Components #
 ###########################
 build-components-core:centos6:xsim:
-  extends: 
+  extends:
     - .build-components-core
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
 
 build-components-assets:centos6:xsim:
-  extends: 
+  extends:
     - .build-components-assets
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
     - build-primitives-assets:centos6:xsim
 
 build-components-assets_ts:centos6:xsim:
-  extends: 
+  extends:
     - .build-components-assets_ts
     - .centos6
     - .xsim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
     - build-primitives-assets:centos6:xsim
 
 build-components-inactive:centos6:xsim:
-  extends: 
+  extends:
     - .build-components-inactive
     - .centos6
     - .xsim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
     - build-primitives-assets:centos6:xsim
@@ -99,23 +99,23 @@ build-components-inactive:centos6:xsim:
 # Jobs - Build-Adapters #
 #########################
 build-adapters-core:centos6:xsim:
-  extends: 
+  extends:
     - .build-adapters-core
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
 
 build-adapters-assets:centos6:xsim:
-  extends: 
+  extends:
     - .build-adapters-assets
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
@@ -126,48 +126,48 @@ build-adapters-assets:centos6:xsim:
 # Jobs - Build-Devices #
 ########################
 build-devices-core:centos6:xsim:
-  extends: 
+  extends:
     - .build-devices-core
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
 
 build-devices-assets:centos6:xsim:
-  extends: 
+  extends:
     - .build-devices-assets
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
     - build-primitives-assets:centos6:xsim
 
 build-devices-assets_ts:centos6:xsim:
-  extends: 
+  extends:
     - .build-devices-assets_ts
     - .centos6
     - .xsim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
     - build-primitives-assets:centos6:xsim
 
 build-devices-inactive:centos6:xsim:
-  extends: 
+  extends:
     - .build-devices-inactive
     - .centos6
     - .xsim
   needs:
     - job: prereq:centos6
-      artifacts: true 
+      artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
     - build-primitives-assets:centos6:xsim
@@ -177,35 +177,35 @@ build-devices-inactive:centos6:xsim:
 # Jobs - Build-Cards #
 ######################
 build-cards-core:centos6:xsim:
-  extends: 
+  extends:
     - .build-cards-core
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
 
 build-cards-assets:centos6:xsim:
-  extends: 
+  extends:
     - .build-cards-assets
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
     - build-primitives-assets:centos6:xsim
 
 build-cards-inactive:centos6:xsim:
-  extends: 
+  extends:
     - .build-cards-inactive
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
@@ -216,11 +216,11 @@ build-cards-inactive:centos6:xsim:
 # Jobs - Build-Platforms #
 ##########################
 build-platforms-core:centos6:xsim:
-  extends: 
+  extends:
     - .build-platforms-core
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -231,11 +231,11 @@ build-platforms-core:centos6:xsim:
     - build-components-core:centos6:xsim
 
 build-platforms-assets:centos6:xsim:
-  extends: 
+  extends:
     - .build-platforms-assets
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -248,11 +248,11 @@ build-platforms-assets:centos6:xsim:
     - build-devices-core:centos6:xsim
 
 build-platforms-inactive:centos6:xsim:
-  extends: 
+  extends:
     - .build-platforms-inactive
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -268,12 +268,12 @@ build-platforms-inactive:centos6:xsim:
 # Jobs - Assemblies #
 #####################
 build-assemblies-assets:centos6:xsim:
-  extends: 
+  extends:
     - .build-assemblies-assets
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
@@ -282,12 +282,12 @@ build-assemblies-assets:centos6:xsim:
     - build-platforms-assets:centos6:xsim
 
 build-assemblies-assets_ts:centos6:xsim:
-  extends: 
+  extends:
     - .build-assemblies-assets_ts
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives-core:centos6:xsim
@@ -296,12 +296,12 @@ build-assemblies-assets_ts:centos6:xsim:
     - build-components-assets_ts:centos6:xsim
 
 build-assemblies-inactive:centos6:xsim:
-  extends: 
+  extends:
     - .build-assemblies-inactive
     - .centos6
     - .xsim
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-platforms-inactive:centos6:xsim
@@ -317,7 +317,7 @@ test-core:centos6:xsim:
     - .test-core
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -329,7 +329,7 @@ test-assets-base:centos6:xsim:
     - .test-assets-base
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -343,7 +343,7 @@ test-assets-comms:centos6:xsim:
     - .test-assets-comms
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -357,7 +357,7 @@ test-assets-dsp:centos6:xsim:
     - .test-assets-dsp
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -371,7 +371,7 @@ test-assets-misc:centos6:xsim:
     - .test-assets-misc
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -385,7 +385,7 @@ test-assets-util:centos6:xsim:
     - .test-assets-util
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -399,7 +399,7 @@ test-assets_ts:centos6:xsim:
     - .test-assets_ts
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -413,7 +413,7 @@ test-inactive:centos6:xsim:
     - .test-inactive
     - .centos6
     - .xsim
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
