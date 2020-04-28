@@ -210,7 +210,6 @@ build-platforms-platform:centos6:matchstiq_z1:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:matchstiq_z1
-    - build-cards-platform:centos6:matchstiq_z1
     - build-primitives:centos6:matchstiq_z1
     - build-devices-core:centos6:matchstiq_z1
 
@@ -224,7 +223,6 @@ build-platforms-assets:centos6:matchstiq_z1:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:matchstiq_z1
-    - build-cards-platform:centos6:matchstiq_z1
     - build-primitives:centos6:matchstiq_z1
     - build-devices-assets:centos6:matchstiq_z1
     - build-cards-assets:centos6:matchstiq_z1

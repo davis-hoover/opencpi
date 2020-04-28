@@ -210,7 +210,6 @@ build-platforms-platform:centos6:zed:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:zed
-    - build-cards-platform:centos6:zed
     - build-primitives:centos6:zed
     - build-devices-core:centos6:zed
 
@@ -224,7 +223,6 @@ build-platforms-assets:centos6:zed:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:zed
-    - build-cards-platform:centos6:zed
     - build-primitives:centos6:zed
     - build-devices-assets:centos6:zed
     - build-cards-assets:centos6:zed
