@@ -1,16 +1,16 @@
 prep:centos7:
-  extends: 
+  extends:
     - .install-packages
     - .centos7
     - .docker
 
 prereq:centos7:
-  extends: 
+  extends:
     - .install-prereqs
     - .centos7
 
 build:centos7:
-  extends: 
+  extends:
     - .build-opencpi
     - .centos7
   needs:
@@ -18,7 +18,7 @@ build:centos7:
       artifacts: true
 
 test:centos7:
-  extends: 
+  extends:
     - .test-opencpi
     - .centos7
   needs:

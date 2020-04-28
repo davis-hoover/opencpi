@@ -2,7 +2,7 @@
 # Jobs - Prereq #
 #################
 prereq:centos6:xilinx13_4:
-  extends: 
+  extends:
     - .install-prereqs
     - .centos6
     - .xilinx13_4
@@ -12,7 +12,7 @@ prereq:centos6:xilinx13_4:
 # Jobs - Build #
 ################
 build-rcc:centos6:xilinx13_4:
-  extends: 
+  extends:
     - .build-rcc
     - .centos6
     - .xilinx13_4
@@ -31,7 +31,7 @@ test-core:centos6:xilinx13_4:
     - .test-core
     - .centos6
     - .xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -43,7 +43,7 @@ test-assets-base:centos6:xilinx13_4:
     - .test-assets-base
     - .centos6
     - .xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -55,7 +55,7 @@ test-assets-comms:centos6:xilinx13_4:
     - .test-assets-comms
     - .centos6
     - .xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -67,7 +67,7 @@ test-assets-dsp:centos6:xilinx13_4:
     - .test-assets-dsp
     - .centos6
     - .xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -79,7 +79,7 @@ test-assets-misc:centos6:xilinx13_4:
     - .test-assets-misc
     - .centos6
     - .xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -91,7 +91,7 @@ test-assets-util:centos6:xilinx13_4:
     - .test-assets-util
     - .centos6
     - .xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -103,7 +103,7 @@ test-assets_ts:centos6:xilinx13_4:
     - .test-assets_ts
     - .centos6
     - .xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
