@@ -27,8 +27,8 @@ Run from this directory as follows:
 To view the code coverage report:
     $ coverage3 report
 To view the line-by-line code coverage report:
-    $ coverage3 annotate ../../tools/cdk/scripts/ocpiutil.py
-    $ vim ../../tools/cdk/scripts/ocpiutil.py,cover
+    $ coverage3 annotate ../../tools/scripts/ocpiutil.py
+    $ vim ../../tools/scripts/ocpiutil.py,cover
 """
 import unittest
 import os

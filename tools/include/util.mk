@@ -332,10 +332,10 @@ ToolsDir=$(eval $(OcpiEnsureToolPlatform))$(OCPI_CDK_DIR)/$(OCPI_TOOL_DIR)/bin
 # that must be propagated to ocpigen.
 OcpiGenEnv=\
     OCPI_PROJECT_DIR="$(OCPI_PROJECT_DIR)" \
+    OCPI_PROJECT_REL_DIR="$(OCPI_PROJECT_REL_DIR)" \
     OCPI_PREREQUISITES_DIR="$(OCPI_PREREQUISITES_DIR)" \
-    OCPI_PROJECT_DEPENDENCIES="$(OcpiGetProjectDependencies)" \
-    OCPI_HDL_PLATFORM_PATH="$(subst $(Space),:,$(strip \
-                              $(call OcpiRelativePathsInsideProjectOrImports,.,$(subst :, ,$(OCPI_HDL_PLATFORM_PATH)))))" \
+    OCPI_PROJECT_DEPENDENCIES="$(OCPI_PROJECT_DEPENDENCIES)" \
+    OCPI_COMPONENT_LIBRARIES="$(call Unique,$(ComponentLibraries) $(ComponentLibrariesInternal))" \
     OCPI_ALL_PLATFORMS="$(strip $(HdlAllPlatforms:%=%.hdl) $(RccAllPlatforms:%=%.rcc) $(OclAllPlatforms:%=%.ocl))"\
     OCPI_ALL_HDL_TARGETS="$(OCPI_ALL_HDL_TARGETS)" \
     OCPI_ALL_RCC_TARGETS="$(OCPI_ALL_RCC_TARGETS)" \
@@ -461,39 +461,69 @@ endef
 # This normalizes between exported libraries and source libraries
 OcpiComponentLibraryExists=$(or $(call OcpiExists,$1/lib),$(call OcpiExists,$1))
 
+# Return per-library export directories in this project that exist, ignore libs with slashes
+# THIS MUST BE IN SYNC WITH THE C++ VERSION in platforms.cxx
+# arg1: the project's directory
+# arg2: the set of cmponent libraries (non-slash)
+# arg3: whether it is local
+# arg4: whether to include top-level specs directory
+# Second arg means it is a local project rather than a project-path (ProjectDependencies) project
+# $(call OcpiSearchComponentLibrariesInProject,<project-dir>,<local-project?>)
+OcpiSearchComponentLibrariesInProject=$(strip\
+  $(and $4,$(call OcpiExists,$(if $3,$1,$(or $(call OcpiExists,$1/exports),$1))/specs))\
+  $(if $3,\
+    $(foreach l,$2,\
+      $(foreach d,$(if $(filter devices cards adapters,$l),hdl/$l,components$(if $(filter components,$l),,/$l)),\
+        $(call OcpiExists,$1/$d/lib))),\
+    $(foreach p,$(or $(call OcpiExists,$1/exports/lib),$1/lib),\
+      $(foreach l,$2,\
+	$(call OcpiExists,$p/$l)))))
+
 # Search for a component library by name, independent of target
 # This is not used for component libraries specified by location (with slashes)
-# $(call OcpiSearchComponentPath,lib)
-OcpiSearchComponentPath=\
-  $(eval OcpiTempPlaces:=$(strip\
-       $(subst :, ,$(OCPI_COMPONENT_LIBRARY_PATH)) \
-       $(foreach d,$(OcpiGetProjectPath),$d/lib)))\
-  $(eval OcpiTempDirs:= $(strip \
-    $(foreach p,$(OcpiTempPlaces),\
-       $(foreach d,$p/$1,$(call OcpiComponentLibraryExists,$d)))))\
-  $(or $(OcpiTempDirs)$(infox HTD:$(OcpiTempDirs)),\
-    $(if $(filter clean,$(MAKECMDGOALS)),,$(error $(call OcpiComponentSearchError,$1,$(OcpiTempPlaces)))))
+# OCPI_COMPONENT_LIBRARY_PATH is used BEFORE other libraries in the project
+# The second arg is a boolean as to whether to include specs or not
+# for when we are being called for XML searching
+# $(call OcpiSearchComponentPath,lib,x)
+# OcpiSearchComponentPath=\
+#   $(eval OcpiTempPlaces:=$(strip\
+#        $(subst :, ,$(OCPI_COMPONENT_LIBRARY_PATH)) \
+#        $(foreach d,$(OcpiProjectDir) $(OcpiGetProjectPath),$($d/lib)))\
+#   $(eval OcpiTempDirs:= $(strip \
+#     $(foreach p,$(OcpiTempPlaces),\
+#        $(foreach d,$p/$1,$(call OcpiComponentLibraryExists,$d)))))\
+#   $(or $(OcpiTempDirs)$(infox HTD:$(OcpiTempDirs)),\
+#     $(if $(filter clean,$(MAKECMDGOALS)),,$(error $(call OcpiComponentSearchError,$1,$(OcpiTempPlaces)))))
 
-
-
-# Collect component libraries independent of targets.
-# Normalize the list at the spec level
-# No arguments
-OcpiComponentLibraries=$(strip\
-    $(foreach c,$(call Unique,$(ComponentLibraries) $(ComponentLibrariesInternal)),$(infox HCL:$c)\
-      $(if $(findstring /,$c),\
-         $(or $(call OcpiComponentLibraryExists,$c),\
-              $(error Component library $c (from ComponentLibraries, in $(CURDIR)) not found.)),\
-         $(call OcpiSearchComponentPath,$c))))
+# Collect component libraries independent of targets, across projects
+# Explicit directories (with slashes) come first, then
+# then project by project (starting with the current project), and within that, library by library
+# First argument is whether to include project-level specs directories for xml searching or not
+OcpiComponentLibraries=$(infox OCL1:$(OCPI_PROJECT_REL_DIR))$(strip\
+  $(eval OcpiTempLibs:=$(call Unique,$(ComponentLibraries) $(ComponentLibrariesInternal)))\
+  $(foreach l,$(OcpiTempLibs),\
+    $(and $(findstring /,$l),\
+      $(or $(call OcpiExists,$l/lib),$(call OcpiExists,$l),\
+        $(error Component library at "$l" does not exist or is not built.))))\
+  $(eval OcpiTempLibs:=$(foreach l,$(OcpiTempLibs),$(if $(findstring /,$l),,$l)))\
+  $(eval OcpiTempFound:=$(call OcpiSearchComponentLibrariesInProject,$(OCPI_PROJECT_DIR),$(OcpiTempLibs),true,$1))\
+  $(foreach p,$(OcpiProjectDir) $(OcpiGetProjectPath),\
+    $(eval OcpiTempFound+=$(call OcpiSearchComponentLibrariesInProject,$p,$(OcpiTempLibs),,$1)))\
+  $(foreach l,$(OcpiTempLibs),$(if $(filter %/$l,$(patsubst %/lib,%,$(OcpiTempFound))),,\
+    $(error Component Library "$l" was not found in this or any of these projects: $(OcpiGetProjectPath)))) \
+  $(and $(filter 1,$(OCPI_SEARCH_VERBOSE)),\
+    $(if $1,\
+       $(info For XML searching of ComponentLibraries, found directories are:),\
+       $(info For searching for ComponentLibraries, found directories are:))\
+    $(foreach d,$(OcpiTempFound),$(info * $d)))\
+  $(OcpiTempFound))
 
 # Return the list of XML search directories for component libraries
 # it searches the hdl subdir
 # since hdl workers need to be referenced by rcc workers.
-OcpiXmlComponentLibraries=$(infox HXC)\
-  $(eval OcpiTempDirs:= $(strip \
-    $(foreach c,$(OcpiComponentLibraries),$c/hdl $c/$(Model) $c))) \
-  $(infox OcpiXmlComponentLibraries returned: $(OcpiTempDirs))\
-  $(OcpiTempDirs)
+OcpiXmlComponentLibraries=$(info HXC NOT NEEDED)\
+  $(foreach c,$(call OcpiComponentLibraries,true),\
+     $(or $(filter $c,%/specs),$(call OcpiExists,$c/hdl $c/$(Model)) $c))
 
 # Return a colon separated default OCPI_LIBRARY_PATH. It contains:
 # 1. arg1 if present
@@ -515,15 +545,12 @@ OcpiSetDefaultLibraryPath=$(eval export OCPI_LIBRARY_PATH=$(call OcpiGetDefaultL
 # If CDK is not in the resulting list of projects, add it at the end.
 # Warning is suppressed during RPM builds
 OcpiGetProjectPath=$(strip \
-                     $(foreach p,$(subst :, ,$(OCPI_PROJECT_PATH)) $(OcpiGetProjectDependencies)\
-                       $(if $(filter $(realpath $(OCPI_CDK_DIR)),$(realpath $(OcpiGetProjectDependencies))),\
-                         ,$(OCPI_CDK_DIR)),\
+                     $(foreach p,$(subst :, ,$(OCPI_PROJECT_PATH)) $(OcpiGetProjectDependencies),\
                        $(or $(call OcpiExists,$p/exports),$(call OcpiExists,$p),$(RPM_BUILD_ROOT),\
                          $(info Warning: The path $p in Project Path does not exist.))))
 
 # There are certain cases where we will want all projects that are 'registered'
-# (not just the ones
-# explicitly or implicitly depended on by the current project).
+# (not just the ones explicitly or implicitly depended on by the current project).
 # For example, available platforms can be determined based on all known projects.
 # Warning is suppressed during RPM builds
 # This may be called from outside of a project
@@ -570,17 +597,20 @@ OcpiGetRccPlatformDir=$(strip $(firstword \
 ##################################################################################
 # Project Dependencies are defined by those explicitly listed in a Project.mk as well as the 'required'
 # projects such as core/cdk
-OcpiProjectDependenciesInternal=$(strip $(call Unique,$(ProjectDependencies) ocpi.core))
+OcpiProjectDependenciesInternal=$(call Unique,$(ProjectDependencies)\
+                                   $(if $(filter ocpi.core,$(OCPI_PROJECT_PACKAGE)),,ocpi.core))
 # If a project dependency is a path, use it as is. Otherwise, check for it in imports.
 OcpiGetProjectDependencies=$(strip \
-  $(foreach d,$(OcpiProjectDependenciesInternal),\
+  $(foreach d,$(OCPI_PROJECT_DEPENDENCIES),\
     $(if $(findstring /,$d),\
       $d,\
-      $(call OcpiGetProjectInImports,.,$d)) ))
+      $(OCPI_PROJECT_REL_DIR)/imports/$d)))
+
+#      $(call OcpiGetProjectInImports,.,$d)) ))
 # These are the leftover imports that are not listed in the ProjectDependencies
 OcpiGetImportsNotInDependencies=$(strip \
   $(foreach i,$(OcpiGetProjectImports),\
-    $(if $(filter $(notdir $i),$(OcpiProjectDependenciesInternal)),\
+    $(if $(filter $(notdir $i),$(OCPI_PROJECT_DEPENDENCIES)),\
       ,\
       $i) ))
 
@@ -783,17 +813,23 @@ OcpiPrependEnvPath=\
 #TODO all the cooments within this define should probably be moved out for perfromance reasons
 #     because this function is used by $(call ...)
 define OcpiSetProject
+  ifneq ($(OCPI_PROJECT_REL_DIR),${1:./%=%})
+    $(call OcpiSetProjectX,$1)
+  endif
+endef
+define OcpiSetProjectX
   # This might already be set
   $$(call OcpiDbg,Setting project to $1)
   OcpiTempProjDir:=$$(call OcpiAbsDir,$1)
-  $$(infox OTPD:$1:$$(OcpiTempProjDir))
   ifdef OCPI_PROJECT_DIR
     ifneq ($$(OcpiTempProjDir),$$(OCPI_PROJECT_DIR))
       $$(error OCPI_PROJECT_DIR in environment is $$(OCPI_PROJECT_DIR), but found Project.mk in $1)
     endif
   endif
   override OCPI_PROJECT_DIR=$$(OcpiTempProjDir)
+  override OCPI_PROJECT_REL_DIR=$(1:./%=%)
   export OCPI_PROJECT_DIR
+  export OCPI_PROJECT_REL_DIR
 
   # Save the Package, PackagePrefix, and PackageName variables
   # so that they can be used as is later on (if set at the command
@@ -827,33 +863,33 @@ define OcpiSetProject
       override ProjectPackage:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)
     endif
   endif
+  export OCPI_PROJECT_PACKAGE=$$(ProjectPackage)
+  override OCPI_PROJECT_DEPENDENCIES=$$(OcpiProjectDependenciesInternal)
+  export OCPI_PROJECT_DEPENDENCIES
   # Restore the Package* variables in case they were set at the command line
   # for a library or in a library 'Makefile'
   Package:=$$(PackageSaved)
   PackagePrefix:=$$(PackagePrefixSaved)
   PackageName:=$$(PackageNameSaved)
-
   # A project is always added to the below-project/non-project search paths
   # I.e. where the project path looks for other projects, and their exports,
   # the current project is searched internally, not in exports
   # when looking for (non-slash) primitives, look in this project, not exports
   $$(call OcpiPrependEnvPath,OCPI_HDL_PRIMITIVE_PATH,$$(OcpiTempProjDir)/hdl/primitives/lib)
-  # when looking for platforms, look in this project
-  $$(call OcpiPrependEnvPath,OCPI_HDL_PLATFORM_PATH,$$(OcpiTempProjDir)/hdl/platforms)
   # when looking for XML specs and protocols, look in this project
   $$(call OcpiPrependEnvPath,OCPI_XML_INCLUDE_PATH,$$(OcpiTempProjDir)/specs)
   # when looking for component libraries, look in this project, without depending on
   # exports, and also include the hdl/devices library
   # 1. specifically add each library in the project to "componentlibraries"
   # 2. add each place in the project where libraries live to the component library search path.
-  $$(foreach l,$$(wildcard $$(OcpiTempProjDir)/hdl/devices) \
-    $$(if $$(filter libraries,$$(call OcpiGetDirType,$$(OcpiTempProjDir)/components)),\
-      $$(foreach m,$$(wildcard $$(OcpiTempProjDir)/components/*/Makefile),$$(infox MMM:$$m)\
-         $$(foreach d,$$(m:%/Makefile=%),$$(infox DDD:$$d)\
-            $$(and $$(filter library,$$(call OcpiGetDirType,$$d)),$$d))),\
-      $$(OcpiTempProjDir)/components),\
-    $$(eval override ComponentLibrariesInternal:=$$(call Unique,$(ComponentLibrariesInternal) $$(notdir $$l))) \
-    $$(call OcpiPrependEnvPath,OCPI_COMPONENT_LIBRARY_PATH,$$(patsubst %/,%,$$(dir $$l))))
+  # $$(foreach l,$$(wildcard $$(OcpiTempProjDir)/hdl/devices) \
+  #   $$(if $$(filter libraries,$$(call OcpiGetDirType,$$(OcpiTempProjDir)/components)),\
+  #     $$(foreach m,$$(wildcard $$(OcpiTempProjDir)/components/*/Makefile),$$(infox MMM:$$m)\
+  #        $$(foreach d,$$(m:%/Makefile=%),$$(infox DDD:$$d)\
+  #           $$(and $$(filter library,$$(call OcpiGetDirType,$$d)),$$d))),\
+  #     $$(OcpiTempProjDir)/components),\
+  #   $$(eval override ComponentLibrariesInternal:=$$(call Unique,$(ComponentLibrariesInternal) $$(notdir $$l))) \
+  #   $$(call OcpiPrependEnvPath,OCPI_COMPONENT_LIBRARY_PATH,$$(patsubst %/,%,$$(dir $$l))))
 endef
 ifdef NEVER
   # when executing applications, look in this project
@@ -906,16 +942,17 @@ OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
   $(if $(wildcard $1/Project.mk),\
     $(if $(wildcard $1/Makefile)$(wildcard $1/Makefile.am),\
       $(if $(filter project,$(call OcpiGetDirType,$1)),\
-       $(infox found project in $1)$(eval $(call OcpiSetProject,$1)),\
-       $(error no proper Makefile found in the directory where Project.mk was found ($1))),\
+        $(infox found project in $1)$(eval $(call OcpiSetProject,$1))$(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)),\
+        $(error no proper Makefile found in the directory where Project.mk was found ($1))),\
       $(error no Makefile found in the directory where Project.mk was found ($1))),\
     $(if $(foreach r,$(realpath $1/..),$(filter-out /,$r)),\
       $(call OcpiIncludeProjectX,$1/..,$2,$3),\
       $(call $2,$2: no Project.mk was found here ($3) or in any parent directory)))
 
 # One arg is what to do if not found: error, warning, nothing
-# FIXME: can we avoid this when cleaning?
-OcpiIncludeProject=$(call OcpiIncludeProjectX,$(or $(OCPI_PROJECT_DIR),.),$1,$(call OcpiAbsDir,.))
+OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS))\
+  $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
+    $(call OcpiIncludeProjectX,$(or $(OCPI_PROJECT_REL_DIR),.),$1,$(call OcpiAbsDir,.)))
 
 # OcpiIncludeParentAsset_<asset-type> defines how to include an asset's parent.
 # This is done on a per-asset-type basis (e.g. platform, platforms, library ...).
@@ -930,11 +967,12 @@ OcpiIncludeProject=$(call OcpiIncludeProjectX,$(or $(OCPI_PROJECT_DIR),.),$1,$(c
 # So, for library, first check if this is a platform's devices library.
 # If so, include the parent (../) with type Platform so it can
 # find Platform.mk if it exists. Otherwise, the parent is just the project
-# TODO: should hdl/devices library should have an hdl prefix?
 OcpiIncludeParentAsset_library=\
+  $(if $(filter devices cards,$(notdir $(realpath $1))),\
+    $(eval ComponentLibraries+=devices))\
   $(if $(filter %-platform,$(call OcpiGetDirType,$1/../)),\
     $(call OcpiIncludeAssetAndParentX,$1/../,$2,$3),\
-    $(call OcpiIncludeProject,$3))
+    $(call OcpiIncludeProject,$3,lib))
 
 # For a platform directory, we include the platforms directory in ../
 # We provide it with type Platforms so it can find the Platforms.mk
@@ -987,7 +1025,7 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3)$(strip \
     $(foreach c,$(call Capitalize,$s),\
       $(if $(filter-out undefined,$(origin OcpiIncludeParentAsset_$s)),\
         $(call OcpiIncludeParentAsset_$s,$1,$2,$3),\
-        $(call OcpiIncludeProject,$3))\
+        $(call OcpiIncludeProject,$3,asset))\
       $(eval $(call OcpiSetAsset,$1,$c))\
       $(eval ParentPackage:=)\
       $(eval unexport ParentPackage)\
@@ -1001,9 +1039,11 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3)$(strip \
 #   Arg1 = reference directory (optional) - defaults to '.' in subcalls
 #   Arg2 = authoring model prefix for package-ID (optional) - <parent>.<auth>.<package-name>
 #   Arg3 = error/warning/info mode (optional)
-OcpiIncludeAssetAndParent=$(strip \
-  $(eval include $(OCPI_CDK_DIR)/include/package.mk)\
-  $(call OcpiIncludeAssetAndParentX,$(or $1,.),$2,$3))
+OcpiIncludeAssetAndParent=\
+  $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
+    $(eval include $(OCPI_CDK_DIR)/include/package.mk)\
+    $(call OcpiIncludeAssetAndParentX,$(or $1,.),$2,$3))
+
 
 ###############################################################################
 
@@ -1067,16 +1107,10 @@ $(eval override XmlIncludeDirsInternal:=\
     . $(GeneratedDir) \
     $(XmlIncludeDirs) \
     $(XmlIncludeDirsInternal) \
-    $(Models:%=../lib/%)\
+    $(comment this is unreliable: Models:%=../lib/%) ../lib\
     ../specs \
-    $(OcpiXmlComponentLibraries) \
-    $(foreach d,$(subst :, ,$(OCPI_XML_INCLUDE_PATH)),$(wildcard $d)) \
-    $(foreach d,$(OcpiGetProjectPath),$(wildcard $d/specs)) \
-    $(OCPI_CDK_DIR)/lib/components/hdl\
-    $(OCPI_CDK_DIR)/lib/components/$(Model)\
-    $(OCPI_CDK_DIR)/lib/components \
-    $(OCPI_CDK_DIR)/specs \
-   ))
+    $(comment we are out of the component library so look in projects, including ours) \
+    $(comment we let c++ add the OcpiXmlComponentLibraries)))
 endef
 
 # Used wherever test goals are processed.  runtests is for compatibility
@@ -1299,5 +1333,7 @@ define OcpiCPPSource
 endef
 # Return CPP sources from list in $1
 OcpiCPPSources=$(strip $(foreach f,$1,$(and $(filter .cpp_%,$(suffix $f)),$f)))
+
+OcpiSpecLinks=mkdir -p $2;$(foreach f,$(wildcard $1/specs/*.xml),$(call MakeSymLink,$f,$2);)
 
 endif # ifndef __UTIL_MK__

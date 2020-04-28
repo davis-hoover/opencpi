@@ -101,7 +101,7 @@ override XmlIncludeDirsInternal:=\
 override ComponentLibraries:=$(call Unique,\
    $(HdlAssembly) \
    $(ComponentLibrariesInternal) \
-   $(HdlPlatformDir_$(Platform)) \
+   $(HdlPlatformDir_$(Platform):%/lib=%) \
    $(foreach p,$(HdlPlatformDir_$(Platform)),\
      $(foreach d,$(if $(filter lib,$(notdir $p)),$(dir $p),$p/),\
        $(wildcard $ddevices) \

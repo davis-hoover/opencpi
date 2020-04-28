@@ -1,5 +1,5 @@
 Scripts (not C++ main programs) fall into several categories, but are generally placed in
-tools/cdk/scripts (soon to become tools/scripts).
+tools/scripts
 
 Scripts that are exposed to users must follow these rules:
 ==========================================================

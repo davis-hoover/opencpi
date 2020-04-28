@@ -23,12 +23,10 @@ override OcpiRunAfter+= < copy.cxx > test.output &&
 override OcpiRunAfter+= ls -l copy.cxx test.output && \
                cmp copy.cxx test.output
 
-# Set package to local for the copy worker
-Package=local
 export OCPI_LIBRARY_PATH=lib
 
 # These make the worker library for this application
 include $(OCPI_CDK_DIR)/include/application.mk
 include $(OCPI_CDK_DIR)/include/library.mk
 clean::
-	rm -f test.output
+	$(AT)rm -f test.output

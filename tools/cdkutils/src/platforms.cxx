@@ -20,6 +20,7 @@
 
 // Utility functions relating to available platforms.
 
+#include <string.h>
 #include <fnmatch.h>
 #include "ocpi-config.h"
 #include "OcpiOsFileIterator.h"
@@ -37,6 +38,7 @@ namespace {
 typedef std::vector<std::string> StringArray;
 StringArray hdlPrimitivePath;
 StringArray componentPath;
+StringArray projectPath; // includes current project, OCPI_PROJECT_PATH, dependencies
 StringSet oclPlatforms; bool oclPlatformsDone;
 StringSet rccPlatforms; bool rccPlatformsDone;
 StringSet hdlPlatforms; bool hdlPlatformsDone;
@@ -46,14 +48,17 @@ StringSet rccTargets;
 StringSet hdlTargets;
 StringSet allTargets; bool allTargetsDone;
 
-const char *
-addPlaces(const char *envname, const char *suffix, bool check, StringArray &list) {
+// Add directories that must exist, based on an environment variable that contains
+// one or more things that may require prefixes or suffixes
+static const char *
+addPlaces(const char *envname, const char *prefix, const char *suffix, bool check, StringArray &list) {
   const char *env = getenv(envname);
   ocpiInfo("Path %s is: %s", envname, env ? env : "<not set>");
   for (OU::TokenIter ti(env, ": "); ti.token(); ti.next()) {
     bool isDir;
-    if (OF::exists(ti.token(), &isDir) && isDir)
-      list.push_back(std::string(ti.token()) + suffix);
+    std::string whole = (prefix ? prefix : "") + std::string(ti.token()) + (suffix ? suffix : "");
+    if (OF::exists(whole, &isDir) && isDir)
+      list.push_back(whole);
     else if (check)
       return OU::esprintf("in %s, \"%s\" is not a directory", env, ti.token());
   }
@@ -180,8 +185,8 @@ getComponentLibrary(const char *lib, std::string &path) {
   }
   if (componentPath.empty()) {
     if ((err = getCdkDir(path)) ||
-	(err = addPlaces("OCPI_COMPONENT_LIBRARY_PATH", "/lib", true, componentPath)) ||
-	(err = addPlaces("OCPI_PROJECT_PATH", "/lib", true, componentPath)))
+	(err = addPlaces("OCPI_COMPONENT_LIBRARY_PATH", NULL, "/lib", true, componentPath)) ||
+	(err = addPlaces("OCPI_PROJECT_PATH", NULL, "/lib", true, componentPath)))
       return err;
     componentPath.push_back(path + "/lib");
   }
@@ -196,6 +201,76 @@ getComponentLibrary(const char *lib, std::string &path) {
   return OU::esprintf("Could not find component library \"%s\"; looked in:  %s",
 		      lib, path.c_str());
 }
+static void
+addLibs(const char *libs, OrderedStringSet &dirs, OrderedStringSet &nonSlashes) {
+  for (OU::TokenIter ti(libs); ti.token(); ti.next())
+    if (strchr(ti.token(), '/')) {
+      std::string withLib(ti.token());
+      withLib += "/lib";
+      dirs.push_back(OF::exists(withLib) ? withLib : ti.token());
+    } else
+      nonSlashes.push_back(ti.token());
+}
+// This implementation mirrors the one in util./mk for OcpiXmlComponentLibraries
+// I.e. implements the same search rules
+const char *
+getComponentLibraries(const char *libs, const char *model, OrderedStringSet &places) {
+  // First pass just take the slash-containing ones
+  OrderedStringSet dirs, nonSlashes;
+  addLibs(libs, dirs, nonSlashes);
+  addLibs(getenv("OCPI_COMPONENT_LIBRARIES"), dirs, nonSlashes);
+  const char *err;
+  if (projectPath.empty()) {
+    std::string imports(getenv("OCPI_PROJECT_REL_DIR"));
+    imports += "/imports/";
+    if ((err = addPlaces("OCPI_PROJECT_REL_DIR", NULL, NULL, true, projectPath)) ||
+	(err = addPlaces("OCPI_PROJECT_PATH", NULL, NULL, true, projectPath)) ||
+	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", imports.c_str(), NULL, true, projectPath)))
+      return err;
+  }
+  for (auto pit = projectPath.begin(); pit != projectPath.end(); ++pit) {
+    ocpiInfo("For component library search, considering project dir: %s", pit->c_str());
+    std::string pDir(*pit);
+    if (pit != projectPath.begin() && OF::exists(pDir + "/exports"))
+      pDir += "/exports";
+    std::string dir(pDir + "/specs");
+    if (OF::exists(dir))
+      dirs.push_back(dir);
+    if (pit == projectPath.begin())
+      for (auto it = nonSlashes.begin(); it != nonSlashes.end(); ++it) {
+	if (*it == "devices" || *it == "cards" || *it == "adapters")
+	  dir = pDir + "/hdl/" + *it;
+	else if (*it == "components")
+	  dir = pDir + "/components";
+	else
+	  dir = pDir + "/components/" + *it;
+	dir += "/lib";
+	ocpiInfo("Trying DIR: %s", dir.c_str());
+	if (OF::exists(dir))
+	  dirs.push_back(dir);
+      }
+    else {
+      pDir += "/lib/";
+      for (auto it = nonSlashes.begin(); it != nonSlashes.end(); ++it) {
+	dir = pDir + *it;
+	if (OF::exists(dir))
+	  dirs.push_back(dir);
+      }
+    }
+  }
+  for (auto it = dirs.begin(); it != dirs.end(); ++it) {
+    ocpiInfo("Final dir: %s", it->c_str());
+    const char *slash = strrchr(it->c_str(), '/');
+    assert(slash);
+    if (strcmp(slash + 1, "specs")) {
+      places.push_back(*it + "/hdl");
+      if (model)
+	places.push_back(*it + "/" + model);
+    }
+    places.push_back(*it);
+  }
+  return NULL;
+}
 
 const char *
 getHdlPrimitive(const char *prim, const char *type, OrderedStringSet &prims) {
@@ -208,11 +283,13 @@ getHdlPrimitive(const char *prim, const char *type, OrderedStringSet &prims) {
   }
   std::string cdk;
   if (hdlPrimitivePath.empty()) {
+    std::string imports(getenv("OCPI_PROJECT_REL_DIR"));
+    imports += "/imports/";
     if ((err = getCdkDir(cdk)) ||
-	(err = addPlaces("OCPI_HDL_PRIMITIVE_PATH", "", true, hdlPrimitivePath)) ||
-	(err = addPlaces("OCPI_PROJECT_DIR", "/exports/lib/hdl", false, hdlPrimitivePath)) ||
-	(err = addPlaces("OCPI_PROJECT_PATH", "/lib/hdl", false, hdlPrimitivePath)) ||
-	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", "/exports/lib/hdl", false, hdlPrimitivePath)))
+	(err = addPlaces("OCPI_HDL_PRIMITIVE_PATH", NULL, NULL, true, hdlPrimitivePath)) ||
+	(err = addPlaces("OCPI_PROJECT_REL_DIR", NULL, "/hdl/primitives/lib", false, hdlPrimitivePath)) ||
+	(err = addPlaces("OCPI_PROJECT_PATH", NULL, "/lib/hdl", false, hdlPrimitivePath)) ||
+	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", imports.c_str(), "/exports/lib/hdl", false, hdlPrimitivePath)))
       return err;
   }
   std::string path;
@@ -240,15 +317,22 @@ getHdlPrimitive(const char *prim, const char *type, OrderedStringSet &prims) {
 
 const char *
 getHdlPlatforms(const StringSet *&platforms) {
-  const char *err;
   platforms = &hdlPlatforms;
   if (hdlPlatformsDone)
     return NULL;
+#if 1
+  const char *env = getenv("OCPI_ALL_HDL_PLATFORMS");
+  if (!env)
+    return "The environment variable OCPI_ALL_HDL_PLATFORMS is expected to be set internally";
+  for (OU::TokenIter ti(env); ti.token(); ti.next())
+    addPlatform(ti.token(), hdlPlatforms);
+#else
+  const char *err;
   std::string cdk;
   StringArray places;
   if ((err = getCdkDir(cdk)) ||
-      (err = addPlaces("OCPI_HDL_PLATFORM_PATH", "", true, places)) ||
-      (err = addPlaces("OCPI_PROJECT_PATH", "/hdl/platforms", false, places)))
+      (err = addPlaces("OCPI_HDL_PLATFORM_PATH", NULL, NULL, true, places)) ||
+      (err = addPlaces("OCPI_PROJECT_PATH", NULL, "/hdl/platforms", false, places)))
     return err;
   places.push_back(cdk + "/lib/platforms"); // this must exist
   for (unsigned n = 0; n < places.size(); n++) {
@@ -276,6 +360,7 @@ getHdlPlatforms(const StringSet *&platforms) {
     } else if ((err = doHdlPlatform(places[n])))
       return err;
   }
+#endif
   hdlPlatformsDone = true;
   return NULL;
 }

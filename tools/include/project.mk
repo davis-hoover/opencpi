@@ -24,12 +24,12 @@ ifeq ($(wildcard Project.mk),)
   $(error A project directory must contain a "Project.mk" file.)
 endif
 $(OcpiIncludeProject)
-
-# As a default, build for everything supported in the CDK
 # FIXME: can we test for licensing?
 # FIXME: Error message makes no sense if give hdltargets but not platforms
+doimports=$(shell $(OcpiExportVars) $(MAKE) imports NoExports=1)
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
-  ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter projectpackage,$(MAKECMDGOALS)),)
+  ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter imports projectpackage,$(MAKECMDGOALS)),)
+    $(infox $(doimports))
     include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
     ifeq ($(findstring export,$(MAKECMDGOALS))$(findstring import,$(MAKECMDGOALS)),)
       $(info No HDL platforms specified.  No HDL assets will be targeted.)
@@ -40,7 +40,6 @@ endif
 
 # imports need to be created before exports etc.
 ifeq ($(filter imports projectpackage,$(MAKECMDGOALS)),)
-  doimports=$(shell $(OcpiExportVars) $(MAKE) imports NoExports=1)
   ifeq ($(wildcard imports),)
     $(info Setting up imports)
     $(infox $(doimports))
@@ -51,7 +50,7 @@ ifeq ($(filter imports projectpackage,$(MAKECMDGOALS)),)
 endif
 
 ifeq ($(NoExports)$(wildcard exports)$(filter projectpackage,$(MAKECMDGOALS)),)
-  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/makeProjectExports.sh - $(ProjectPackage) xxx)
+  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/makeProjectExports.sh - $(OCPI_PROJECT_PACKAGE) xxx)
   ifeq ($(filter clean%,$(MAKECMDGOALS)),)
     $(info Setting up exports)
     $(infox $(doexports))
@@ -146,7 +145,7 @@ imports:
 	fi
 
 exports:
-	$(OCPI_CDK_DIR)/scripts/makeProjectExports.sh "$(OCPI_TARGET_DIR)" $(ProjectPackage)
+	$(OCPI_CDK_DIR)/scripts/makeProjectExports.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
 
 components: hdlprimitives
 	$(MAKE) imports

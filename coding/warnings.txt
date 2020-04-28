@@ -9,4 +9,38 @@ because the GCC gods decided that too many people make these mistakes.
 The warnings that the result of pointer subtraction is not size_t are dealt with by using the
 OCPI_SIZE_T_DIFF macro to make it clear that you are subtracting pointers expecting a non-negative
 result.
+Code that lives under the runtime/foreign directory is not "fixed" to suppress warnings since this
+is imported code that we must occasionally update from source and thus maintain "diffability".
+I.e. we expect warnings in foreign code to be inconsequential.
+I.e. we think it is worth leaving it alone to enable easier updates.
+
+New warnings appear when compilers are updated on different platforms, thus there is essentially
+never a point where code is warning free forever.
+
+Warnings should be addressed in code when that code is already being touched for other good reasons, and
+generally if you are updating a source file for functional reasons, it is a reasonable time to
+fix any warnings in that file.  If a set of files in a single directory is being updated
+(i.e. a few of the files in a directory), it can be a good time to cleanup the source files in that
+directory.
+
+A few specific "tools" for warnings:
+
+If you are subtracting pointers and expect a positive result, use the OCPI_SIZE_T_DIFF macro.
+
+If you are truncating an integer use the OCPI_STRUNCATE and OCPI_UTRUNCATE macros.
+
+If you are fighting with the signed/unsigned mess with C-based POSIX system calls,
+where int should have been unsigned, direct simple C-style casting is ok, and even things like
+casting ssize_t to size_t after testing for negatives is "ok", meaning it is not worth
+the clutter of fancier casting.
+
+Otherwise (when not dealing with old standard interfaces), the correct C++ casting should be used,
+and code should not be written using dynamic_cast since it is inappropriate for embedded systems and
+usually indicates design problems.  There's lots of guidance about this (Myers, Google).
+
+
+
+
+
+
 

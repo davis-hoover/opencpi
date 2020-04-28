@@ -266,10 +266,10 @@ $(call OcpiDbgVar,HdlTargets)
 #          $(and $(filter $(notdir $o),$(notdir $c)),
 #            $(error The component libraries "$(c)" and "$(o)" have the same base name, which is not allowed)))))
 
-define HdlSearchComponentLibraries
-
-  override XmlIncludeDirsInternal := $(call Unique,$(XmlIncludeDirsInternal) $(call HdlXmlComponentLibraries))
-endef
+# define HdlSearchComponentLibraries
+#   $(info HdlSearchComponentLibraries NOT NEEDED?)
+#  override XmlIncludeDirsInternal := $(call Unique,$(XmlIncludeDirsInternal) $(call HdlXmlComponentLibraries))
+#endef
 HdlRmRv=$(if $(filter %_rv,$1),$(patsubst %_rv,%,$1),$1)
 
 # Grep a file and collect all non-comment lines into a space-separated list
@@ -620,6 +620,7 @@ define HdlPrepareAssembly
                     Platform=$(Platform) \
                     PlatformDir=$(PlatformDir) \
                     Assembly=$(Assembly) \
+	            ComponentLibrariesInternal="$$(call Unique,$$(ComponentLibraries) $$(ComponentLibrariesInternal))" \
                     XmlIncludeDirsInternal="$$(XmlIncludeDirsInternal)" \
                     AssyWorkersFile=$$(AssyWorkersFile) \
                     Worker=$$(Worker) Worker_xml=$$(Worker_xml) \

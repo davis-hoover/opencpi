@@ -505,6 +505,10 @@ set +f
 # other make machinery.  If necessary before the python rewrite, we could have a
 # shared implementation some other way that avoided all the recursion.
 # Or change the python to do this and not use "make".
+for i in components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
+    [ -d $i -a "$(ocpiDirType $i)" = library ] && make -C $i speclinks
+done
+exit 0
 
 # export the specs for each of the libraries
 python3 -c "import sys, os;
