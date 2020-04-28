@@ -159,17 +159,6 @@ build-cards-core:centos6:isim:
     - build:centos6
     - build-primitives:centos6:isim
 
-build-cards-platform:centos6:isim:
-  extends: 
-    - .build-cards-platform
-    - .centos6
-    - .isim
-  needs:
-    - job: prereq:centos6 
-      artifacts: true
-    - build:centos6
-    - build-primitives:centos6:isim
-
 build-cards-assets:centos6:isim:
   extends:
     - .build-cards-assets
@@ -221,7 +210,6 @@ build-platforms-platform:centos6:isim:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:isim
-    - build-cards-platform:centos6:isim
     - build-primitives:centos6:isim
     - build-devices-core:centos6:isim
 
@@ -235,7 +223,6 @@ build-platforms-assets:centos6:isim:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:isim
-    - build-cards-platform:centos6:isim
     - build-primitives:centos6:isim
     - build-devices-assets:centos6:isim
     - build-cards-assets:centos6:isim

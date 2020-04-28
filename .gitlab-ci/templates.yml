@@ -197,14 +197,6 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/cards --hdl-platform $PLATFORM
 
-.build-cards-platform:
-  extends:
-    - .standard-artifacts
-  stage: build-workers
-  script: 
-    - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build -d projects/platform/hdl/cards --hdl-platform $PLATFORM
-
 .build-cards-assets:
   extends:
     - .standard-artifacts

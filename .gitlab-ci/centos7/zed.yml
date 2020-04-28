@@ -159,17 +159,6 @@ build-cards-core:centos7:zed:
     - build:centos7
     - build-primitives:centos7:zed
 
-build-cards-platform:centos7:zed:
-  extends: 
-    - .build-cards-platform
-    - .centos7
-    - .zed-xilinx13_4
-  needs:
-    - job: prereq:centos7 
-      artifacts: true
-    - build:centos7
-    - build-primitives:centos7:zed
-
 build-cards-assets:centos7:zed:
   extends:
     - .build-cards-assets
@@ -221,7 +210,6 @@ build-platforms-platform:centos7:zed:
       artifacts: true
     - build:centos7
     - build-devices-platform:centos7:zed
-    - build-cards-platform:centos7:zed
     - build-primitives:centos7:zed
     - build-devices-core:centos7:zed
 
@@ -235,7 +223,6 @@ build-platforms-assets:centos7:zed:
       artifacts: true
     - build:centos7
     - build-devices-platform:centos7:zed
-    - build-cards-platform:centos7:zed
     - build-primitives:centos7:zed
     - build-devices-assets:centos7:zed
     - build-cards-assets:centos7:zed

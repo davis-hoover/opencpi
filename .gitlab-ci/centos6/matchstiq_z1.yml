@@ -159,17 +159,6 @@ build-cards-core:centos6:matchstiq_z1:
     - build:centos6
     - build-primitives:centos6:matchstiq_z1
 
-build-cards-platform:centos6:matchstiq_z1:
-  extends: 
-    - .build-cards-platform
-    - .centos6
-    - .matchstiq_z1-xilinx13_3
-  needs:
-    - job: prereq:centos6 
-      artifacts: true
-    - build:centos6
-    - build-primitives:centos6:matchstiq_z1
-
 build-cards-assets:centos6:matchstiq_z1:
   extends:
     - .build-cards-assets

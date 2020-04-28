@@ -159,17 +159,6 @@ build-cards-core:centos6:xsim:
     - build:centos6
     - build-primitives:centos6:xsim
 
-build-cards-platform:centos6:xsim:
-  extends: 
-    - .build-cards-platform
-    - .centos6
-    - .xsim
-  needs:
-    - job: prereq:centos6 
-      artifacts: true
-    - build:centos6
-    - build-primitives:centos6:xsim
-
 build-cards-assets:centos6:xsim:
   extends:
     - .build-cards-assets

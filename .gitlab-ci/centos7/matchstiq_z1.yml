@@ -159,17 +159,6 @@ build-cards-core:centos7:matchstiq_z1:
     - build:centos7
     - build-primitives:centos7:matchstiq_z1
 
-build-cards-platform:centos7:matchstiq_z1:
-  extends: 
-    - .build-cards-platform
-    - .centos7
-    - .matchstiq_z1-xilinx13_3
-  needs:
-    - job: prereq:centos7 
-      artifacts: true
-    - build:centos7
-    - build-primitives:centos7:matchstiq_z1
-
 build-cards-assets:centos7:matchstiq_z1:
   extends:
     - .build-cards-assets
@@ -221,7 +210,6 @@ build-platforms-platform:centos7:matchstiq_z1:
       artifacts: true
     - build:centos7
     - build-devices-platform:centos7:matchstiq_z1
-    - build-cards-platform:centos7:matchstiq_z1
     - build-primitives:centos7:matchstiq_z1
     - build-devices-core:centos7:matchstiq_z1
 
@@ -235,7 +223,6 @@ build-platforms-assets:centos7:matchstiq_z1:
       artifacts: true
     - build:centos7
     - build-devices-platform:centos7:matchstiq_z1
-    - build-cards-platform:centos7:matchstiq_z1
     - build-primitives:centos7:matchstiq_z1
     - build-devices-assets:centos7:matchstiq_z1
     - build-cards-assets:centos7:matchstiq_z1
