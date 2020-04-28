@@ -210,7 +210,6 @@ build-platforms-platform:centos6:xsim:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:xsim
-    - build-cards-platform:centos6:xsim
     - build-primitives:centos6:xsim
     - build-devices-core:centos6:xsim
 
@@ -224,7 +223,6 @@ build-platforms-assets:centos6:xsim:
       artifacts: true
     - build:centos6
     - build-devices-platform:centos6:xsim
-    - build-cards-platform:centos6:xsim
     - build-primitives:centos6:xsim
     - build-devices-assets:centos6:xsim
     - build-cards-assets:centos6:xsim
