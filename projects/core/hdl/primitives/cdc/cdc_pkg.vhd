@@ -24,6 +24,7 @@ package cdc is
 
   component reset
     generic (
+      SRC_RST_VALUE : std_logic :='1'; 
       RST_DELAY : integer := 2);
     port (
       src_rst : in  std_logic;
