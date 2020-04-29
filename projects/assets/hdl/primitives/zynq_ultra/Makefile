@@ -46,7 +46,8 @@ OcpiCPPDefines=PS8_WRAPPER_MODULE=$(WrapperModule)
 # The TCL script that gets the wrapper verilog code also determines the version and module name.
 # Since this determines the file name of the wrapper code, we do it here on the first pass of make
 # so the "SourceFiles" to build includes the module whose name is determined by the tcl.
-# It actually depends on the tcl script (which is in ../zynq) and of course the particular
+# It actually depends on the tcl script (which is in ../../../../platform/hdl/primitives/zynq) and
+# of course the particular
 # version of Vivado installed. If either of those changes a clean build here is required.
 XilinxCoreName=zynq_ultra_ps_e
 ifeq ($(filter clean%,$(MAKECMDGOALS))$(SkipVersion),) # if not cleaning
@@ -57,7 +58,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS))$(SkipVersion),) # if not cleaning
              mkdir -p gen && cd gen && rm -r -f tmp && mkdir tmp && \
              (cd tmp && \
                $(call OcpiXilinxVivadoInit) && \
-               vivado -mode batch -source ../../../zynq/vivado-gen-ps.tcl \
+               vivado -mode batch -source ../../../../../../platform/hdl/primitives/zynq/vivado-gen-ps.tcl \
                       -tclargs $(XilinxCoreName) xczu3cg-sbva484-1-e \
              ) > vivado-gen-ps8.log && \
              rm -r -f tmp,MyError),\
