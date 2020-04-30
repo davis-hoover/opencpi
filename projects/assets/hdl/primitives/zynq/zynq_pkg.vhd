@@ -1,0 +1,1 @@
+../../../../platform/hdl/primitives/zynq/zynq_pkg.vhd

@@ -1,2 +1,2 @@
-zynq is copied form platform project and is a temporary workaround for
+zynq is symlinked from platform project and is a temporary workaround for
 missing/erroneous framework import/exports of primitives across projects.
