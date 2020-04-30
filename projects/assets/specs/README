@@ -1,6 +1,0 @@
-dig_radio_ctrlr-spec.xml symlink is a temporary workaround for
-missing/erroneous framework import/exports of OCSs across projects.
-
-platform-spec.xml symlink is a temporary workaround for
-allowing platforms in this project to be built (eventually all platforms from
-this project will be moved to the platform project)
