@@ -124,8 +124,8 @@ emitVhdlShell(FILE *f, Port *p) {
   // These are not used, but assigned in any case
   // FIXME when ocp can accomodate having no outputs at all?
   fprintf(f,
-	  "  %s.SThreadBusy(0) <= wci_reset;\n"
-	  "  %s.SReset_n <= not wci_reset;\n", out.c_str(), out.c_str());
+	  "  %s.SThreadBusy(0) <= '0';\n"
+	  "  %s.SReset_n <= '1';\n", out.c_str(), out.c_str());
 #else
   // Leave this here when we actually have support for "request", and time not available
   if (m_allowUnavailable)

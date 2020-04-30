@@ -54,7 +54,8 @@ include:
   - /.gitlab-ci/centos6/xilinx13_3.yml
   - /.gitlab-ci/centos6/xilinx13_4.yml
   - /.gitlab-ci/centos6/matchstiq_z1.yml
-
+  - /.gitlab-ci/centos6/modelsim.yml
+  
   # centos7
   - /.gitlab-ci/centos7/xsim.yml
   - /.gitlab-ci/centos7/isim.yml
@@ -62,6 +63,7 @@ include:
   - /.gitlab-ci/centos7/xilinx13_3.yml
   - /.gitlab-ci/centos7/xilinx13_4.yml
   - /.gitlab-ci/centos7/matchstiq_z1.yml
+  - /.gitlab-ci/centos7/modelsim.yml
 
   # downstream projects
   - /.gitlab-ci/e3xx.yml

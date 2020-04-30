@@ -454,6 +454,25 @@
       when: never
     - when: on_success
 
+.modelsim:
+  variables:
+    PLATFORM: 'modelsim'
+    MODEL: 'hdl'
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_TAG"
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*modelsim(\s[^\s\]]*)*\]/i
+  before_script:
+    - export OCPI_MODELSIM_DIR=/opt/Mentor/modelsim_dlx
+    - export OCPI_MODELSIM_LICENSE_FILE=2103@sembach.opencpi.net
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - sleep 5
+    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - cat timestamp.txt
+    - ls -lh
+
 .isim:
   extends:
     - .vivado
