@@ -282,10 +282,6 @@
     - source ./cdk/opencpi-setup.sh -e
     - make -C projects/platform/ exports
     - make -C projects/assets/ imports
-    - ls -alR projects/platform/hdl/platforms/zed/
-    - ls -alR projects/platform/imports/ocpi.platform/
-    - ls -alR projects/platform/imports/ocpi.platform/exports/
-    - ls -alR projects/platform/imports/ocpi.platform/exports/hdl/platforms/zed
     - ocpidev build -d projects/assets/hdl/assemblies --hdl-platform $PLATFORM
 
 .build-assemblies-assets_ts:
