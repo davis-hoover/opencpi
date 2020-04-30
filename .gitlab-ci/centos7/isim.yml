@@ -14,8 +14,7 @@
 build-primitives:centos7:isim:
   extends:
     - .build-primitives
-    - .centos7
-    - .isim
+    - .isim-centos7
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -106,8 +105,7 @@ build-devices-core:centos7:isim:
 build-devices-platform:centos7:isim:
   extends: 
     - .build-devices-platform
-    - .centos7
-    - .isim
+    - .isim-centos7
   needs:
     - job: prereq:centos7 
       artifacts: true
@@ -199,8 +197,7 @@ build-platforms-core:centos7:isim:
 build-platforms-platform:centos7:isim:
   extends: 
     - .build-platforms-platform
-    - .centos7
-    - .isim
+    - .isim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
@@ -245,8 +242,7 @@ build-platforms-inactive:centos7:isim:
 build-assemblies-platform:centos7:isim:
   extends: 
     - .build-assemblies-platform
-    - .centos7
-    - .isim
+    - .isim-centos7
   needs:
     - job: prereq:centos7 
       artifacts: true
