@@ -6,300 +6,292 @@
     - centos7
     - modelsim
     - shell
-     
 
-################################ 
-# Jobs - Build-Primitives-Core #
-################################
-build-primitives-core:centos7:modelsim:
+
+###########################
+# Jobs - Build-Primitives #
+###########################
+build-primitives:centos7:modelsim:
   extends:
-    - .build-primitives-core
+    - .build-primitives
     - .modelsim-centos7
   needs:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-
-
-##################################
-# Jobs - Build-Primitives-Assets #
-##################################
-build-primitives-assets:centos7:modelsim:
-  extends:
-    - .build-primitives-assets
-    - .modelsim-centos7
-  needs:
-    - job: prereq:centos7
-      artifacts: true
-    - build:centos7
-    - build-primitives-core:centos7:modelsim
-
-
-####################################
-# Jobs - Build-Primitives-Inactive #
-####################################
-build-primitives-inactive:centos7:modelsim:
-  extends:
-    - .build-primitives-inactive
-    - .modelsim-centos7
-  needs:
-    - job: prereq:centos7
-      artifacts: true
-    - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
 
 
 ###########################
 # Jobs - Build-Components #
 ###########################
 build-components-core:centos7:modelsim:
-  extends: 
+  extends:
     - .build-components-core
     - .modelsim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 build-components-assets:centos7:modelsim:
-  extends: 
+  extends:
     - .build-components-assets
     - .modelsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 build-components-assets_ts:centos7:modelsim:
-  extends: 
+  extends:
     - .build-components-assets_ts
     - .modelsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true 
+      artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 build-components-inactive:centos7:modelsim:
-  extends: 
+  extends:
     - .build-components-inactive
     - .modelsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true 
+      artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
-    - build-primitives-inactive:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 
 #########################
 # Jobs - Build-Adapters #
 #########################
 build-adapters-core:centos7:modelsim:
-  extends: 
+  extends:
     - .build-adapters-core
     - .modelsim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 build-adapters-assets:centos7:modelsim:
-  extends: 
+  extends:
     - .build-adapters-assets
     - .modelsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 
 ########################
 # Jobs - Build-Devices #
 ########################
 build-devices-core:centos7:modelsim:
-  extends: 
+  extends:
     - .build-devices-core
     - .modelsim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
-build-devices-assets:centos7:modelsim:
+build-devices-platform:centos7:modelsim:
   extends: 
-    - .build-devices-assets
+    - .build-devices-platform
     - .modelsim-centos7
   needs:
     - job: prereq:centos7 
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
+
+build-devices-assets:centos7:modelsim:
+  extends:
+    - .build-devices-assets
+    - .modelsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-primitives:centos7:modelsim
 
 build-devices-assets_ts:centos7:modelsim:
-  extends: 
+  extends:
     - .build-devices-assets_ts
     - .modelsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true 
+      artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 build-devices-inactive:centos7:modelsim:
-  extends: 
+  extends:
     - .build-devices-inactive
     - .modelsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true 
+      artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 
 ######################
 # Jobs - Build-Cards #
 ######################
 build-cards-core:centos7:modelsim:
-  extends: 
+  extends:
     - .build-cards-core
     - .modelsim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 build-cards-assets:centos7:modelsim:
-  extends: 
+  extends:
     - .build-cards-assets
     - .modelsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 build-cards-inactive:centos7:modelsim:
-  extends: 
+  extends:
     - .build-cards-inactive
     - .modelsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 
 ##########################
 # Jobs - Build-Platforms #
 ##########################
 build-platforms-core:centos7:modelsim:
-  extends: 
+  extends:
     - .build-platforms-core
     - .modelsim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-devices-core:centos7:modelsim
     - build-cards-core:centos7:modelsim
     - build-adapters-core:centos7:modelsim
     - build-components-core:centos7:modelsim
 
-build-platforms-assets:centos7:modelsim:
+build-platforms-platform:centos7:modelsim:
   extends: 
+    - .build-platforms-platform
+    - .modelsim-centos7
+  needs: 
+    - job: prereq:centos7
+      artifacts: true
+    - build:centos7
+    - build-devices-platform:centos7:modelsim
+    - build-primitives:centos7:modelsim
+    - build-devices-core:centos7:modelsim
+
+build-platforms-assets:centos7:modelsim:
+  extends:
     - .build-platforms-assets
     - .modelsim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-assets:centos7:modelsim
+    - build-devices-platform:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-devices-assets:centos7:modelsim
     - build-cards-assets:centos7:modelsim
     - build-adapters-assets:centos7:modelsim
     - build-components-assets:centos7:modelsim
-    - build-primitives-core:centos7:modelsim
     - build-devices-core:centos7:modelsim
 
 build-platforms-inactive:centos7:modelsim:
-  extends: 
+  extends:
     - .build-platforms-inactive
     - .modelsim-centos7
   needs: 
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-inactive:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-devices-inactive:centos7:modelsim
     - build-cards-inactive:centos7:modelsim
     - build-components-inactive:centos7:modelsim
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
 
 
 #####################
 # Jobs - Assemblies #
 #####################
-build-assemblies-assets:centos7:modelsim:
+build-assemblies-platform:centos7:modelsim:
   extends: 
+    - .build-assemblies-platform
+    - .modelsim-centos7
+  needs:
+    - job: prereq:centos7 
+      artifacts: true
+    - build:centos7
+    - build-primitives:centos7:modelsim
+    - build-platforms-core:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
+
+build-assemblies-assets:centos7:modelsim:
+  extends:
     - .build-assemblies-assets
     - .modelsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-platforms-assets:centos7:modelsim
 
 build-assemblies-assets_ts:centos7:modelsim:
-  extends: 
+  extends:
     - .build-assemblies-assets_ts
     - .modelsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-components-assets_ts:centos7:modelsim
 
 build-assemblies-inactive:centos7:modelsim:
-  extends: 
+  extends:
     - .build-assemblies-inactive
     - .modelsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
     - build-platforms-inactive:centos7:modelsim
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
 
 
-#####################
-# Jobs - Build-Test #
-#####################
+###############
+# Jobs - Test #
+###############
 test-core:centos7:modelsim:
   extends:
     - .test-core
@@ -308,7 +300,7 @@ test-core:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
 
 test-assets-base:centos7:modelsim:
@@ -319,9 +311,9 @@ test-assets-base:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-platforms-assets:centos7:modelsim
 
 test-assets-comms:centos7:modelsim:
@@ -332,9 +324,9 @@ test-assets-comms:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-platforms-assets:centos7:modelsim
 
 test-assets-dsp:centos7:modelsim:
@@ -345,9 +337,9 @@ test-assets-dsp:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-platforms-assets:centos7:modelsim
 
 test-assets-misc:centos7:modelsim:
@@ -358,9 +350,9 @@ test-assets-misc:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-platforms-assets:centos7:modelsim
 
 test-assets-util:centos7:modelsim:
@@ -371,9 +363,9 @@ test-assets-util:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-platforms-assets:centos7:modelsim
 
 test-assets_ts:centos7:modelsim:
@@ -384,9 +376,9 @@ test-assets_ts:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
+    - build-primitives:centos7:modelsim
     - build-platforms-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-components-assets_ts:centos7:modelsim
 
 test-inactive:centos7:modelsim:
@@ -397,6 +389,6 @@ test-inactive:centos7:modelsim:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
-    - build-primitives-core:centos7:modelsim
-    - build-primitives-assets:centos7:modelsim
+    - build-primitives:centos7:modelsim
+    - build-platforms-platform:centos7:modelsim
     - build-platforms-inactive:centos7:modelsim

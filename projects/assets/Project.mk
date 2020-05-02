@@ -26,7 +26,7 @@
 PackageName=assets
 PackagePrefix=ocpi
 
-ProjectDependencies=
+ProjectDependencies=platform
 
 # These assignments support building from any directory.
 ComponentLibraries+=misc_comps util_comps dsp_comps comms_comps base_comps devices cards
