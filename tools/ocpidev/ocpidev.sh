@@ -1401,9 +1401,9 @@ EOF
        Use Test='true' to create a test-exclusive property. -->
 </Tests>
 EOF
-    #   create generate.py: #!/usr/bin/env python2
+    #   create generate.py: #!/usr/bin/env python3
     cat <<EOF > $testdir/generate.py
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 Use this file to generate your input data.
@@ -1411,9 +1411,9 @@ Args: <list-of-user-defined-args> <input-file>
 """
 EOF
     chmod +x $testdir/generate.py
-    #   create verify.py: #!/usr/bin/env python2
+    #   create verify.py: #!/usr/bin/env python3
     cat <<EOF > $testdir/verify.py
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 Use this script to validate your output data against your input data.

@@ -46,10 +46,3 @@ PKGS+=" swig python-dev"
 PKGS+=" python-numpy python3 python3-numpy scons python3-jinja2"
 [ "$1" = list ] && echo $PKGS && exit 0
 sudo apt install $PKGS -y
-if ! command -v python3.4; then
-    if ! p3=$(command -v python3); then
-	echo Cannot find python3 for this system. && exit 1
-    fi
-    sudo ln -s python3 $(dirname $p3)/python3.4
-    echo Patched python3.4 to point to python3!!!
-fi
