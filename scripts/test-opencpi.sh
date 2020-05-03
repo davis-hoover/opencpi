@@ -138,9 +138,9 @@ for t in $tests; do
       echo ======================= Running python swig test
       OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts \
 		       PYTHONPATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib \
-		       python <<-EOF
+		       python3 <<-EOF
 	import opencpi.aci as OA
-	app=OA.Application("$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
+	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
 	EOF
       ;;
     core)
