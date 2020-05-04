@@ -1506,7 +1506,7 @@ namespace OCPI {
       for (unsigned n = 0; getProperty(n, value, AccessList({}),
                                        PropertyOptionList({m_hex ? HEX : NONE, UNREADABLE_OK}), &attrs); ++n)
         if ((printParameters || attrs.isVolatile || attrs.isWritable) &&
-            (m_hidden || !attrs.isHidden) && (printCached || !attrs.isCached)) {
+            (m_hidden || !attrs.isHidden) && (printCached || !attrs.isCached || attrs.isWritable)) {
           fprintf(stderr, "Property %2u: %s = \"%s\"", n, attrs.name.c_str(), value.c_str());
           std::string out;
           addAttr(out, attrs.isParameter, "parameter");

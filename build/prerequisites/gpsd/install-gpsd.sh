@@ -31,7 +31,7 @@ source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
        "$1" \
        $me \
        "GPS (Global Positioning System) daemon" \
-       https://git.savannah.gnu.org/git/gpsd.git \
+       https://gitlab.com/gpsd/gpsd.git \
        $version \
        $me \
        1

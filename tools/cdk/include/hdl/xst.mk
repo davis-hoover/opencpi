@@ -236,6 +236,7 @@ XstPruneOption=\
         $(call XstPruneOption,$(wordlist 3,$(words $(1)),$(1))))
 
 XstOptions=\
+$(and $(VerilogDefines),-define {$(foreach d,$(VerilogDefines),-define $d)}) \
 $(call XstCheckOptions,$(XstMyExtraOptions))\
 $(call XstPruneOption,$(XstDefaultOptions)) $(XstMyExtraOptions) $(XstInternalOptions)
 

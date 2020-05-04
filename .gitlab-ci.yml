@@ -11,9 +11,7 @@ stages:
   - prereq
   - build
   - build-rcc
-  - build-primitives-core
-  - build-primitives-assets
-  - build-primitives-inactive
+  - build-primitives
   - build-workers
   - build-platforms
   - build-assemblies
@@ -51,19 +49,22 @@ include:
 
   # centos6
   - /.gitlab-ci/centos6/xsim.yml
-  # - /.gitlab-ci/centos6/isim.yml
+  - /.gitlab-ci/centos6/isim.yml
   - /.gitlab-ci/centos6/zed.yml
   - /.gitlab-ci/centos6/xilinx13_3.yml
   - /.gitlab-ci/centos6/xilinx13_4.yml
   - /.gitlab-ci/centos6/matchstiq_z1.yml
+  - /.gitlab-ci/centos6/modelsim.yml
   
   # centos7
   - /.gitlab-ci/centos7/xsim.yml
-  # - /.gitlab-ci/centos7/isim.yml
+  - /.gitlab-ci/centos7/isim.yml
   - /.gitlab-ci/centos7/zed.yml
   - /.gitlab-ci/centos7/xilinx13_3.yml
   - /.gitlab-ci/centos7/xilinx13_4.yml
   - /.gitlab-ci/centos7/matchstiq_z1.yml
+  - /.gitlab-ci/centos7/modelsim.yml
 
   # downstream projects
   - /.gitlab-ci/e3xx.yml
+

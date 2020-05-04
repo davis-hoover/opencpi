@@ -78,7 +78,7 @@ endif
 # First global test goals
 .PHONY: $(OcpiTestGoals)
 # Next, generic goals
-.PHONY: run clean generate build
+.PHONY: run clean generate build inputs
 # Next local test-only goals
 .PHONY: prepare runonly verify runnoprepare view
 # Map global goals to local goals
@@ -93,11 +93,12 @@ runtest: run
 # This is the input file describing this test suite
 TESTXML:=$(CwdName)-test.xml
 
-$(CASEXML): $(TESTXML)
+$(CASEXML): $(TESTXML) inputs
 	$(AT)echo ========= Generating test assemblies, inputs and applications for $(CwdName):
 	$(AT)$(call OcpiGen, -v -T $<)
 
 -include gen/*.deps
+inputs:
 generate: $(CASEXML)
 
 $(TESTXML):

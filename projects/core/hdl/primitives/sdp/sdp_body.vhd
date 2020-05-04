@@ -107,7 +107,7 @@ begin
   if sdp_width = 1 then
     return 0;
   else
-    return to_integer(header.addr(width_for_max(to_integer(sdp_width))-1 downto 0));
+    return to_integer(header.addr(width_for_max(to_integer(sdp_width-1))-1 downto 0));
   end if;
 end start_dw;
 

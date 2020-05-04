@@ -68,7 +68,9 @@ python_PYTHON=
 # both can be trivially used using PYTHONPATH
 pythondir=$(libdir)
 # It doesn't appear that autoconf macros actually gives us the proper runtime prefix
-PYTHON_INCLUDES=$(or @OcpiPythonInclude@,$(shell echo `@PYTHON@ -c "import sys;print(sys.prefix)"`/include/python@PYTHON_VERSION@*))
+PYTHON_INCLUDES=$(shell python@PYTHON_VERSION@-config --includes)
+# And we need to define a similar variable for the python library
+PYTHON_LIBS=$(shell python@PYTHON_VERSION@-config --libs | sed 's/.*\(-lpython[^ ]*\).*/\1/')
 # Avoid automake limitations by defining a variable used later
 ocpi_extra_libs=$(patsubst %,-l%,@OcpiExtraLibs@)
 
@@ -181,9 +183,9 @@ function do_library {
   fi
   if [ "$1" = swig ]; then
     printf "${7}_LTLIBRARIES += \$(ocpi_build_dir)/_$2.la\n"
-    printf "${amname}_CPPFLAGS+=-I\$(PYTHON_INCLUDES)\\n"
+    printf "${amname}_CPPFLAGS+=\$(PYTHON_INCLUDES)\\n"
     printf "\$(ocpi_build_dir)/$3: $swig\\n"
-    printf "\\t\$(AT)@OcpiSWIG@ -classic -c++ -python -outdir \$(@D) -o \$@ "
+    printf "\\t\$(AT)@OcpiSWIG@ -c++ -python -classic -outdir \$(@D) -o \$@ "
     printf "\$(${amname}_CPPFLAGS) \$<\\n"
     printf "python_PYTHON+=$(dirname $swig)/$2.py\\n"
   else
@@ -330,7 +332,8 @@ while read path opts; do
 	# Even on a mac, the swig suffix is always .so...
 	ldflags="-module -export-dynamic -shrext .so \
                  @libtool_dynamic_library_flags@ @ocpi_swig_flags@"
-	ldflags+=" -lpython@PYTHON_VERSION@ $ocpi_prereq_ldflags"
+	ldflags+=" \$(PYTHON_LIBS)"
+	ldflags+=" $ocpi_prereq_ldflags"
 	ldadd="libocpi_${lname} $ldadd"
 	echo "if !ocpi_is_cross"
 #	echo "if ocpi_is_dynamic"

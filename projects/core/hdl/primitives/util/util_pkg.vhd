@@ -333,6 +333,17 @@ component set_clr
     q_r : out std_logic);
 end component set_clr;
 
+component lfsr
+  generic (
+    POLYNOMIAL : std_logic_vector;
+    SEED       : std_logic_vector); -- must never be all zeros
+  port (
+    CLK      : in std_logic; -- rising edge clock
+    RST      : in std_logic; -- synchronous, active high
+    EN       : in std_logic; -- synchronous, active high
+    REG      : out std_logic_vector(POLYNOMIAL'length-1 downto 0));
+end component;
+
 component reset_detector is
   port(
     clk                     : in  std_logic;

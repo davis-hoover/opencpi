@@ -80,7 +80,7 @@ NOTE: When copy/paste of the above 'export' from the Makefile source file, the r
 ./target-xilinx13_3/matchstiq_z1_example_design
 ----------------------------------------------------------------------------
 4) Verification of output data: (development system)
-python ./scripts/plotAndFft.py odata/testbench_rx.out complex 300000 1 &
+python3 ./scripts/plotAndFft.py odata/testbench_rx.out complex 300000 1 &
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 endef

@@ -101,12 +101,19 @@ PKGS_D+=(flex)
 PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
-#    for building kernel drivers (separate from driver RPM)
-PKGS_S+=(linux-source)
+#    for building kernel drivers (separate from pre-packaged driver)
+#    N.B.: "linux-headers-`uname -r`" is probably the only required
+#    package, and normally gets installed with kernel upgrades, i.e.,
+#    it should already be present.
+KVER=`uname -r | cut -f1 -d'-'`
+PKGS_S+=(linux-source-$KVER)
 #    for "make rpm":
 PKGS_S+=(rpm)
 #    for creating swig
-PKGS_S+=(swig python-dev)
+#    Do not install swig at this time: have to make sure
+#    the TimSC third-party repository is enabled first.
+#PKGS_S+=(swig python-dev)
+PKGS_S+=(python-dev)
 #    for general configuration/installation flexibility
 PKGS_S+=(nfs-common nfs-kernel-server)
 #    for the inode64 prerequisite build (from source)
@@ -118,20 +125,24 @@ PKGS_S+=(screen)
 
 ##########################################################################################
 # E. installations that have to happen after we run "apt-get install" once, and also
-#    install the required "devel" packages.  At this point, we somehow rely on any
-#    extra repos that are needed being enabled.  With respect to Python 3, it would
-#    seem the minimum required version is 3.4.  For *ubuntu 16.04 LTS, "python3" maps
-#    to "python3.5" by default as of March 2020.
+#    install the required "devel" packages.  At this point, we rely on any extra
+#    repos that are needed being enabled.  With respect to Python 3, it would seem
+#    the minimum required version is 3.4.  For *ubuntu 16.04 LTS, "python3" maps to
+#    "python3.5" by default as of March 2020.
 #
+#    for creating swig
+PKGS_E+=(swig)
 #    for ocpidev
-PKGS_E+=(python3 python3-jinja2)
+#    swig is supposed to support python3, so adding python3-dev here
+PKGS_E+=(python3 python3-dev python3-jinja2)
 #    for various testing scripts
 #    AV-5478: If the minor version changes here, fix script below
-PKGS_E+=(python3-numpy)
+PKGS_E+=(python3-numpy python3-scipy python3-matplotlib)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd-libopencl1)
 #    Needed to build gpsd
-#    Potential problem here: *ubuntu 16.04 LTS version is a major release older than CentOS 7 version
+#    Potential problem here: *ubuntu 16.04 LTS SCons version is a major
+#    release older than CentOS 7 version.  No separate python3 version.
 PKGS_E+=(scons)
 
 #
@@ -186,11 +197,19 @@ permissions."
 fi
 
 # Install required packages, packages needed for development, and packages
-# needed for building from source.
+# needed for building from source.  Specify "--no-act" for debugging.
 $SUDO apt-get --yes install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
 [ $? -ne 0 ] && bad "Installing required packages failed"
 
-# Now those that depend on "extras" repos.  Again, specify "--no-act" for debugging.
+# Enable TimSC Personal Package Archive (PPA)
+if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
+then
+  $SUDO add-apt-repository ppa:timsc/swig-3.0.12
+  $SUDO apt-get update
+fi
+
+# Now install those packages that depend on "extras" repos.
+# Again, specify "--no-act" for debugging.
 $SUDO apt-get --yes install $(ypkgs PKGS_E)
 [ $? -ne 0 ] && bad "Installing extra packages failed"
 

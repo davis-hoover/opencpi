@@ -871,6 +871,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	      err = -EFAULT;
 	      log_debug("load fpga loading to: %px\n", buf);
 	      if (!copy_from_user((void *)buf, (void __user *)request.data, request.length)) {
+	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
   #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
 		err = fpga_mgr_buf_load(mgr, 0, buf, request.length);
   #else
@@ -880,10 +881,12 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {
 		  info->buf = buf;
 		  info->count = request.length;
-		  log_debug("loading fpga\n");
+		  log_debug("locking fpga\n");
 		  err = -EBUSY;
 		  if (!fpga_mgr_lock(mgr)) {
+		    log_debug("loading fpga\n");
 		    err = fpga_mgr_load(mgr, info);
+		    log_debug("unlocking fpga %d\n", err);
 		    fpga_mgr_unlock(mgr);
 		  }
 		  fpga_image_info_free(info);
@@ -1824,6 +1827,13 @@ opencpi_init(void) {
       break;
     }
     opencpi_pci_registered = 1;
+#endif
+#ifdef CONFIG_ARCH_ZYNQMP
+    if (make_block(0xA8000000, 0xA8000000, sizeof(OccpSpace), ocpi_mmio, false,
+        0, NULL, 0) == NULL) {
+      break;
+    }
+    log_debug("Control Plane physical addr space for ZynqMP HP0 slave reserved\n");
 #endif
 #ifdef CONFIG_ARCH_ZYNQ
     // Register the memory range of the control plane GP0 or GP1 on the PL

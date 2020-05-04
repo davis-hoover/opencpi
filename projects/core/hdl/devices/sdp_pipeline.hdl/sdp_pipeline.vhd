@@ -35,7 +35,7 @@
 
 library IEEE, ocpi, sdp, util;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all, sdp.sdp.all;
-architecture rtl of sdp_pipeline_rv is
+architecture rtl of sdp_pipeline_worker is
   constant sdp_width_c : positive := to_integer(sdp_width);
   constant width_c : positive := sdp_width_c * dword_size + sdp_header_ndws*32 + 1;
   subtype data_t is std_logic_vector(width_c-1 downto 0);
