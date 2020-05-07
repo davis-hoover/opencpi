@@ -324,6 +324,7 @@ test-core:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
 
 test-assets-base:centos7:zed:
@@ -340,6 +341,7 @@ test-assets-base:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
 
 test-assets-comms:centos7:zed:
@@ -356,6 +358,7 @@ test-assets-comms:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
 
 test-assets-dsp:centos7:zed:
@@ -372,6 +375,7 @@ test-assets-dsp:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
 
 test-assets-misc:centos7:zed:
@@ -388,6 +392,7 @@ test-assets-misc:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
 
 test-assets-util:centos7:zed:
@@ -404,6 +409,7 @@ test-assets-util:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
 
 test-assets_ts:centos7:zed:
@@ -422,6 +428,7 @@ test-assets_ts:centos7:zed:
     - build-platforms-assets:centos7:zed
     - build-components-assets_ts:centos7:zed
     - build-devices-assets_ts:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
 
 test-inactive:centos7:zed:
@@ -437,4 +444,5 @@ test-inactive:centos7:zed:
     - build-primitives:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-inactive:centos7:zed
+    - build-rcc:centos7:xilinx13_4
   resource_group: zed
