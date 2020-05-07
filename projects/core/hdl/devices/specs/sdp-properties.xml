@@ -1,5 +1,6 @@
 <properties>
   <property name='memory_bytes' parameter='1'              readback='1' default='64k'/>
+  <property name='sdp_length'   parameter='1' type='ushort' readback='1' default='32'/>
   <property name='sdp_width'    parameter='1' type='uchar' readback='1' default='1'/>
   <property name='interconnect' parameter='1' type='uchar' readback='1' default='0'/>
   <property name='window_log2'  parameter='1' type='uchar' readback='1' default='26'/>

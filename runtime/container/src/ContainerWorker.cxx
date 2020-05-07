@@ -830,6 +830,8 @@ namespace OCPI {
     run Worker::							\
     get##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
 			size_t offset, unsigned idx) const {;		\
+      if (info.m_isParameter)                                           \
+    	return m.m_default->m_##pretty;                                 \
       bool dirty;							\
       Cache *cache = getCache(info, offset, m, &dirty);			\
       run val;								\

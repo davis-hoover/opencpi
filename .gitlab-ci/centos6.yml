@@ -1,16 +1,16 @@
 prep:centos6:
-  extends: 
+  extends:
     - .install-packages
     - .centos6
     - .docker
 
 prereq:centos6:
-  extends: 
+  extends:
     - .install-prereqs
     - .centos6
 
 build:centos6:
-  extends: 
+  extends:
     - .build-opencpi
     - .centos6
   needs:
@@ -18,7 +18,7 @@ build:centos6:
       artifacts: true
 
 test:centos6:
-  extends: 
+  extends:
     - .test-opencpi
     - .centos6
   needs:

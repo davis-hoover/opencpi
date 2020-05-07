@@ -51,7 +51,7 @@ entity slave is
   port (
     -- Exterior OCP input/master signals
     --- this is the same as wci_clock unless metadata says it isn't
-    Clk              : in  std_logic;
+    wsi_clk          : in  std_logic;
     --- only used if burst are precise
     MBurstLength     : in  std_logic_vector(burst_width - 1 downto 0);
     --- only used if bytesize < data width or zlm
@@ -70,10 +70,8 @@ entity slave is
     -- Exterior OCP output/slave signals
     SReset_n         : out std_logic;
     SThreadBusy      : out std_logic_vector(0 downto 0);
-    -- Signals connected from the worker's WCI to this module;
-    wci_clk          : in  std_logic;
-    wci_reset        : in  Bool_t;
-    wci_is_operating : in  Bool_t;
+    wsi_reset        : in  Bool_t;
+    wsi_is_operating : in  Bool_t;
     -- Non-worker internal signals
     first_take       : out Bool_t; -- the first datum after is_operating taken, a pulse
     -- Interior signals used by worker logic
@@ -154,18 +152,18 @@ architecture rtl of slave is
   signal trailing_eom : bool_t; -- a trailing eom is enqueued *behind* the current non-eom output
   signal teom_deq     : bool_t; -- dequeue and discard a trailing eom now
   signal eom_i        : bool_t; -- internal eom: original or added from trailing  or v1 zlm0 for EOF
-  signal ready_i      : bool_t; -- internal ready, prequalified by wci_is_operating
+  signal ready_i      : bool_t; -- internal ready, prequalified by wsi_is_operating
   -- FIFO internal state - our customized 3 deep FIFO
   signal fifo_in_r, fifo_middle_in_r, fifo_middle_out_r, fifo_out_r : std_logic_vector(fifo_width-1 downto 0);
 begin
   -- Combi resets:
-  --   We get wci reset and wsi peer reset (from master)
+  --   We get wsi reset and wsi peer reset (from master)
   --   We produce wsi peer reset (from slave)
-  -- Worker sees reset if wci is doing it or we're not started yet or peer is reset
-  reset_i  <= wci_reset or not MReset_n; -- FIXME WHEN own_clock
-  reset    <= reset_i; -- in wci clock domain for now
-  -- Peer sees reset if wci is doing it or we're not started
-  SReset_n <= not wci_reset; -- FIXME WHEN OWN CLOCK
+  -- Worker sees reset if wsi is doing it or we're not started yet or peer is reset
+  reset_i  <= wsi_reset or not MReset_n;
+  reset    <= reset_i;
+  -- Peer sees reset if wsi is doing it or we're not started
+  SReset_n <= not wsi_reset;
   ----------------------------------
   -- fifo inputs - keep decoding minimumal on input side since that is perhaps a synthesis/routing
   -- boundary.  We still enqueue trailing eoms to avoid conditional enqueue
@@ -219,7 +217,7 @@ begin
                            (fifo_count_r = 1 and ((fifo_eom and its(fifo_valid or at_end_r)) or zlm_eof))));
   zlm_eof      <= to_bool(fifo_eof and its(at_end_r) and hdl_version < 2);
   -- final filtering of "ready" for the user based on eof and isoperating
-  ready_i      <= wci_is_operating and fifo_ready and (not fifo_eof or to_bool(hdl_version < 2));
+  ready_i      <= wsi_is_operating and fifo_ready and (not fifo_eof or to_bool(hdl_version < 2));
   ----------------------------------
   -- Signals to worker
   ready        <= ready_i and not v1_eof_r; -- suppress ready after v1 eof
@@ -238,9 +236,9 @@ begin
   -- True once
   first_take <= take and ready_i and not seen_any_r;
   -- keep track of message state as it comes out the back of the fifo
-  reg: process(Clk) is
+  reg: process(wsi_clk) is
   begin
-    if rising_edge(clk) then
+    if rising_edge(wsi_clk) then
       if its(reset_i) then
         seen_any_r     <= bfalse;
         at_end_r       <= btrue;
@@ -275,9 +273,9 @@ begin
   -- We need a fifo that will tell us when there are two slots left.  It would be nice to find
   -- one and not use this one.
   fifo_out  <= fifo_out_r;
-  fifo: process(Clk) is
+  fifo: process(wsi_clk) is
   begin
-    if rising_edge(clk) then
+    if rising_edge(wsi_clk) then
       if its(reset_i) then
         fifo_count_r <= (others => '0');
       else

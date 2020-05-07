@@ -18,8 +18,8 @@
 
 ##########################################################################################
 # This file defines the CentOS6 software platform.
-# It sets platform variables as necessary to override the defaults in the file:
-#   include/platform-defaults.mk file.
+# It sets platform variables as necessary to override the defaults in
+#   "tools/cdk/include/platform-defaults.mk".
 # See that file for a description of valid variables and their defaults.
 
 OcpiPlatformOs=linux
@@ -30,3 +30,18 @@ OcpiPlatformArch=x86_64
 OcpiGetTimeClockId=CLOCK_MONOTONIC
 OcpiRequiredCFlags:=$(patsubst -grecord-gcc-switches,-frecord-gcc-switches,$(OcpiRequiredCFlags))
 OcpiRequiredCXXFlags:=$(patsubst -grecord-gcc-switches,-frecord-gcc-switches,$(OcpiRequiredCXXFlags))
+# Could not find a way to make swig-1.X do what is required
+# for python3, so using swig3 from Springdale Computational.
+OcpiSWIG:=/usr/local/swig/3.0.12/bin/swig
+#
+# Must set the following variable for the "opencpi.ko" module
+# build if we are running in a container, because there is no
+# "/lib/modules/`uname -r`/build" symlink in that environment.
+#
+# TODO: figure out a way to set the variable conditionally if
+# there is an easy way to determine whether we are running in
+# a container.
+#
+# For debugging: $(info OcpiKernelDir is $(OcpiKernelDir))
+#
+OcpiKernelDir:=/usr/src/kernels/$(shell uname -r)

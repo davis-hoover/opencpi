@@ -72,7 +72,7 @@ begin
 
  -- edge detect the input signal
  edge_detect_gen : for i in 0 to c_num_inputs-1 generate
-    edge_detector : misc_prims.misc_prims.edge_detector
+    edge_detector : util.util.edge_detector
       port map (
         clk    => ctl_in.clk,
         reset  => ctl_in.reset,

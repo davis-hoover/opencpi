@@ -9,33 +9,39 @@
 <ComponentSpec package='ocpi.core'>
   <!-- ======================================================
        === 1. Platform parameters======== -->
-  <!-- Name of this platform: default is here until we can remove "parameter", but that requires
-       all platforms to put parameter=1 in their <specproperty> -->
-  <property name='platform' type='string' parameter='1' stringlength="31" default="unknown"/>
-  <!-- Width of data plane in DWORDS -->
-  <property name='sdp_width' type='uchar' parameter='1' default='1'/>
-  <!-- PCI Device ID for PCI devices
-       This is essentially the "registry" of PCI device IDs
-       New platforms can use "unknown" before they are registered -->
+  <property name='platform' type='string' parameter='1' stringlength="31" default="unknown"
+	    description='name of the platform, lower case, value attribute set in OWD'/>
+  <property name='sdp_width' type='uchar' parameter='1' default='1'
+	    description='width of data plane in DWORDS, can vary in different platform configurations'/>
+  <property name='sdp_length' type='ushort' parameter='1' default='32'
+	    description='length of maximum segment in DWORDS, may be a hardware limitation of interconnect'/>
   <property name='pci_device_id' parameter='1' default='unknown'
-	    type='enum' enums='unknown,ml605,alst4,alst4x'/>
+	    type='enum' enums='unknown,ml605,alst4,alst4x'>
+    <description>
+      PCI Device ID for PCI devices, as registered at http://pci-ids.ucw.cz/read/PC/1df7
+      New platforms shoud use "unknown" before they are registered.
+    </description>
+  </property>
   <!-- ======================================================
        === 2. Required first non-parameters - fixed/known in bootstrapping code -->
   <!-- UUID of this platform: MUST BE FIRST for bootstrapping purposes ========= -->
   <!-- **********MUST BE FIRST non-parameter for bootstrapping purposes -->
-  <property name="UUID" arraylength='16'/>
-  <!-- padding for backwards compatibility -->
-  <property name="oldtime" type='ulonglong'/>
+  <property name="UUID" arraylength='16'
+	    description='unique ID of the bitstream, including platform, device, build time'/>
+  <property name="oldtime" type='ulonglong'
+	    description='padding for backwards compatibility'/>
   <!-- This could be better if we had the option for array or sequence properties to
        be individually raw or support addressible reads -->
-  <property name="romAddr" type='ushort' writable='true'/>
-  <property name="romData" volatile='true'/>
+  <property name="romAddr" type='ushort' writable='true'
+	    description='ROM address for reading compressed metadata, one DWORD at a time'/>
+  <property name="romData" volatile='true'
+	    description='ROM data readback after romAddr is written'/>
   <!-- ======================================================
        === 3. properties that could (and usually should) be parameters, but may not be -->
   <!-- Number of switches -->
-  <property name="nSwitches"/>
+  <property name="nSwitches" description='number of switches readable/valid in the "switches" property'/>
   <!-- Number of LEDs -->
-  <property name="nLEDs"/>
+  <property name="nLEDs" description='number of LEDs/lamps writable/valid in the "LEDs" property'/>
   <!-- The memory regions that may be used by various other elements, which indicates
        aliasing etc.
        The values describing each region are:
@@ -50,13 +56,20 @@
        === 4. required non-parameter properties -->
   <!-- DNA (unique chip serial number) of this platform.-->
   <property name="dna" type="ULongLong"/>
-  <!-- current value of any switches in the platform -->
-  <property name="switches" volatile='true'/>
-  <!-- setting of leds in the platform, with readback -->
-  <property name="LEDS" writable='true'/>
-  <property name="nSlots" type="ULong" parameter="true" default="0"/>
-  <!-- A sequence of strings, where each index contains a description of the given index's slot. For an indication of whether a card is plugged into a given index's slot, see the same index in the slotCardIsPresent property. Example index contents are "FMC_LPC", "FMC_HPC", "HSMC", "HMSC_A", "HSMC_B". It is recommended that the index contents correspond to the PCB silk screen description near the intended slot. -->
-  <property name="slotNames" type="string" stringlength="32" parameter="true" default=""/> <!-- TODO / FIXME make this a sequencelength of nslots -->
-  <!-- An array of booleans, where each index contains a indication whether a card is physically present in the given index's slot. For a description of a given index's slot, see the same index in the slotName property. Note that only a max of 64 slots are currently supported. -->
-  <property name="slotCardIsPresent" type="bool" volatile="true" arraylength="64"/> <!-- TODO / FIXME change to sequence once sequence problems fixed -->
+  <property name="switches" volatile='true' description='readable switches on the platform, LSB is zero'/>
+  <property name="LEDS" writable='true' description='settable LEDs/lamps on the platform, LSB is zero'/>
+  <property name="nSlots" type="ULong" parameter="true" default="0" description='number of slots' />
+  <!-- A sequence of strings, where each index contains a description of the given index's slot.
+       For an indication of whether a card is plugged into a given index's slot, see the same index
+       in the slotCardIsPresent property. Example index contents are
+       "FMC_LPC", "FMC_HPC", "HSMC", "HMSC_A", "HSMC_B".
+       It is recommended that the index contents correspond to the PCB silk screen description near
+       the intended slot.
+       TODO / FIXME make this a sequencelength of nslots  -->
+  <property name="slotNames" type="string" stringlength="32" parameter="true" default=""/> 
+  <!-- An array of booleans, where each index contains a indication whether a card is physically
+       present in the given index's slot. For a description of a given index's slot, see the same
+       index in the slotName property. Note that only a max of 64 slots are currently supported.
+       TODO / FIXME change to sequence once sequence problems fixed -->
+  <property name="slotCardIsPresent" type="bool" volatile="true" arraylength="64"/>
 </ComponentSpec>

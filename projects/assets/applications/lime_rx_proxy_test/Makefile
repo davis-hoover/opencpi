@@ -73,9 +73,9 @@ NOTE: When copy/paste of the above 'export' from the Makefile source file, the r
 ----------------------------------------------------------------------------
 4) Verification of output data: (development system)
 (Matchstiq-Z1): 
-python ./scripts/plotAndFft.py odata/lime_rx_proxy_test_app.out complex 300000 0.1 &
+python3 ./scripts/plotAndFft.py odata/lime_rx_proxy_test_app.out complex 300000 0.1 &
 (Zedboard): 
-python ./scripts/plotAndFft.py odata/lime_rx_proxy_test_app.out complex 1500000 0.5 &
+python3 ./scripts/plotAndFft.py odata/lime_rx_proxy_test_app.out complex 1500000 0.5 &
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 endef

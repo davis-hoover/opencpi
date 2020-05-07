@@ -178,7 +178,8 @@ begin
     end find_extent;
   begin
     assert (width_in rem width_out) = 0 report "width_in must be a multiple of width_out";
-    out_eof        <= in_eof and my_out_eom;
+    -- we cannot propagate an EOF until the EOM has shipped
+    out_eof        <= in_eof and eom_r and not have_data_r and not give_now and out_ready;
     -- Reorganize input data as an array of output words
     g0: for i in 0 to last_c generate
       word_data(i) <= in_data(width_out*i + width_out-1 downto width_out*i);
@@ -227,7 +228,9 @@ begin
             last_r    <= last_word_in; -- remember the last word in the input
             last_be_r <= last_be_in;
             som_r     <= in_som and in_ready;
-            eom_r     <= in_eom and in_ready;
+            if its(in_ready) then
+              eom_r   <= in_eom;
+            end if;
             opcode_r  <= in_opcode;
             -- If we are actually buffering any data (not passing through), set the indicator
             if take_now and (have_data_r or

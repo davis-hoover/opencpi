@@ -519,7 +519,8 @@ finalizeProperties() {
 #endif
   // Ensure all parameters are in all paramConfigs, since some may have been added.
   for (unsigned n = 0; n < m_paramConfigs.size(); n++)
-    m_paramConfigs[n]->doDefaults();
+    if (m_paramConfigs[n])
+      m_paramConfigs[n]->doDefaults();
   return NULL;
 }
 

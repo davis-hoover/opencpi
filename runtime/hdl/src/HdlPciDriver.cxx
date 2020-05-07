@@ -106,8 +106,8 @@ namespace OCPI {
     static inline uint64_t ticks2ns(uint64_t ticks) {
       return (ticks * 1000000000ull + (1ull << 31)) / (1ull << 32);
     }
-    static inline int64_t dticks2ns(int64_t ticks) {
-      return (ticks * 1000000000ll + (1ll << 31))/ (1ll << 32);
+    static inline uint64_t dticks2ns(uint64_t ticks) {
+      return (ticks * 1000000000ull + (1ull << 31))/ (1ull << 32);
     }
     static inline uint64_t ns2ticks(unsigned long sec, unsigned long nsec) {
       return ((uint64_t)sec << 32ull) + ((nsec + 500000000ull) * (1ull<<32)) /1000000000ull;
@@ -121,7 +121,7 @@ namespace OCPI {
       }
       struct timespec tv;
       fasttime_gettime(&tv);
-      return ns2ticks(tv.tv_sec, tv.tv_nsec);
+      return ns2ticks((unsigned long)tv.tv_sec, (unsigned long)tv.tv_nsec);
 #else
 #ifdef __APPLE__
       struct timeval tv;
@@ -148,7 +148,7 @@ namespace OCPI {
 	    ts->set64RegisterOffset(sizeof(uint64_t), ts->get64RegisterOffset(0));
 	    // occp->admin.timeDelta = occp->admin.time;
 	    // Read the (incorrect endian) delta register
-	    delta[n] = (int32_t)swap32(ts->get64RegisterOffset(sizeof(uint64_t)));
+	    delta[n] = (uint32_t)swap32(ts->get64RegisterOffset(sizeof(uint64_t)));
 	  }
 	  qsort(delta, 100, sizeof(uint32_t), compu32);
   
@@ -175,7 +175,7 @@ namespace OCPI {
 	  ts->set64RegisterOffset(sizeof(uint64_t), nw1as);
 	  uint64_t nw1b = ts->get64RegisterOffset(0);
 	  uint64_t nw1bs = swap32(nw1b);
-	  int64_t dt = ts->get64RegisterOffset(sizeof(uint64_t));
+	  uint64_t dt = ts->get64RegisterOffset(sizeof(uint64_t));
 	  ocpiDebug("Now delta is: %" PRIi64 "ns "
 		    "(dt 0x%" PRIx64 " dtsw 0x%" PRIx64 " nw1 0x%" PRIx64 " nw1a 0x%" PRIx64 " nw1as 0x%" PRIx64
 		    " nw1b 0x%" PRIx64 " nw1bs 0x%" PRIx64 " nw2 0x%" PRIx64 " nw2s 0x%" PRIx64 " t 0x%lx)",
@@ -264,7 +264,7 @@ namespace OCPI {
 	  closedir(pcid);
 	} else if (!m_useDriver)
 #ifndef OCPI_OS_macos
-	  OU::format(error, "can't open the %s directory for PCI search", dir);
+	  ocpiLog(8, "can't open the %s directory for PCI search", dir);
 #else
 	;
 #endif
