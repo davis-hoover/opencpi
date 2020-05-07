@@ -1,0 +1,12 @@
+# zcu104 has FT4232HL chip which is actually 4 UARTS:
+# Channel A: JTAG Chain
+# Channel B: UART0: the console
+# Channel C: UART1
+# Channel D: UART2: PL
+
+# THese lines came from: https://www.florian-wolters.de/blog/2016/11/02/udev-rules-for-quad-serial-adapter-ft-4232h/
+SUBSYSTEMS=="usb", ENV{.LOCAL_ifNum}="$attr{bInterfaceNumber}"
+SUBSYSTEMS=="usb", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", ATTRS{serial}=="FTZ0BJFH", ENV{.LOCAL_ifNum}=="00",  SYMLINK+="QuadSerialA", GROUP="dialout", MODE="0660"
+SUBSYSTEMS=="usb", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", ATTRS{serial}=="FTZ0BJFH", ENV{.LOCAL_ifNum}=="01",  SYMLINK+="QuadSerialB", GROUP="dialout", MODE="0660"
+SUBSYSTEMS=="usb", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", ATTRS{serial}=="FTZ0BJFH", ENV{.LOCAL_ifNum}=="02",  SYMLINK+="QuadSerialC", GROUP="dialout", MODE="0660"
+SUBSYSTEMS=="usb", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", ATTRS{serial}=="FTZ0BJFH", ENV{.LOCAL_ifNum}=="03",  SYMLINK+="QuadSerialD", GROUP="dialout", MODE="0660"

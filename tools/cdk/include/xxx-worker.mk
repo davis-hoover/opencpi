@@ -98,21 +98,18 @@ endif
 endif
 endif
 skeleton: $(WorkerSourceFiles)
-# $(call CPPGenFile,<file>,<target>,<config>)
-CPPGenFile=$(call WkrTargetDir,$2,$3)/$(basename $(notdir $1))$(patsubst .cpp_%,.%,$(suffix $1))
 # $(call WkrCPPSource,<file>,<target>,<config>)
-define WkrCPPSource
-  TargetSourceFiles_$3+=$$(call CPPGenFile,$1,$2,$3)
-  $$(call WkrBinary,$2,$3): $$(call CPPGenFile,$1,$2,$3)
-  $$(call CPPGenFile,$1,$2,$3): $1 | $(call WkrTargetDir,$2,$3)
-	$(AT)gcc -MMD -MP -MF $$@.deps -E -P -std=c99 -xc \
-               $$(foreach n,$$(WorkerParamNames), '-DOCPI_PARAM_$$n()=$$(Param_$3_$$n)') $$< | \
-               tr '$$$$@`' "\n '" | sed '/^ *$$$$/d' > $$@
-endef
+WkrCPPSource=$(call OcpiCPPSource,$1,$2,$3,$(call WkrBinary,$2,$3))
+# define WkrCPPSource
+#   TargetSourceFiles_$3+=$$(call OcpiCPPGenFile,$1,$2,$3)
+#   $$(call WkrBinary,$2,$3): $$(call OcpiCPPGenFile,$1,$2,$3)
+#   $$(call OcpiCPPGenFile,$1,$2,$3): $1 | $(call WkrTargetDir,$2,$3)
+# 	$(AT)gcc -MMD -MP -MF $$@.deps -E -P -std=c99 -xc \
+#                $$(foreach n,$$(WorkerParamNames), '-DOCPI_PARAM_$$n()=$$(Param_$3_$$n)') $$< | \
+#                tr '$$$$@`' "\n '" | sed '/^ *$$$$/d' > $$@
+# endef
 MaybeCPPSources=$(call Unique,$(SourceFiles) $(WorkerSourceFiles))
-$(call OcpiDbgVar,MaybeCPPSources)
-CPPSources=$(strip $(foreach f,$(MaybeCPPSources),$(and $(filter .cpp_%,$(suffix $f)),$f)))
-$(call OcpiDbgVar,CPPSources)
+CPPSources=$(call OcpiCPPSources,$(MaybeCPPSources))
 AuthoredSourceFiles=$(filter-out $(CPPSources),$(MaybeCPPSources))
 $(call OcpiDbgVar,AuthoredSourceFiles)
 
@@ -182,7 +179,7 @@ define WkrDoTargetConfig
   # The target directory
   $$(call WkrTargetDir,$1,$2): | $$(OutDir) $$(GeneratedDir)
 	$(AT)mkdir $$@
-  $$(foreach f,$$(CPPSources),$$(eval $$(call WkrCPPSource,$$f,$1,$2)))
+  $$(foreach f,$$(CPPSources),$$(eval $$(call OcpiCPPSource,$$f,$1,$2,$$(call WkrBinary,$1,$2))))
   # If object files are separate from the final binary,
   # Make them individually, and then link them together
   ifdef ToolSeparateObjects

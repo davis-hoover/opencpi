@@ -1,4 +1,4 @@
-#!/bin/sh --noprofile
+#!/bin/bash --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -95,8 +95,10 @@ function docase {
     [ "$OCPI_ENABLE_REMOTE_DISCOVERY" = 1 -o -n "$OCPI_SERVER_ADDRESS" -o \
       -n "$OCPI_SERVER_ADDRESSES" -o -n "$OCPI_SERVER_ADDRESSES_FILE" ] &&
         lockrcc="-s '?ocpi.core.file_read=model!=\"rcc\"||platform==host_platform' \
+                 -s '?ocpi.core.backpressure=model!=\"rcc\"||platform==\"$platform\"' \
+                 -s '?ocpi.core.metadata_stressor=model!=\"rcc\"||platform==\"$platform\"' \
                  -s '?ocpi.core.file_write=model!=\"rcc\"||platform==host_platform'"
-    cmd=('OCPI_LIBRARY_PATH=../../../lib/rcc:../../../lib/ocl:../../gen/assemblies:$OCPI_CDK_DIR/$OCPI_TOOL_DIR/artifacts' \
+    cmd=('OCPI_LIBRARY_PATH=../../../lib/rcc:../../../lib/ocl:../../gen/assemblies:$OCPI_CDK_DIR/$OCPI_TOOL_DIR/artifacts:$OCPI_CDK_DIR/$platform/artifacts' \
              '$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/'ocpirun -d -v -H -m$component=$1 -w$component=$2 \
                  $lockrcc -P$component=$platform \
                  --sim-dir=$3.$4.$2.$1.simulation $timearg \

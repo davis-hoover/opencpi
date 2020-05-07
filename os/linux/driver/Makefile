@@ -121,11 +121,17 @@ else
 
   # Find the kernel headers - they can be found:
   #  1. Specified KERNELDIR (always chosen if given)
-  #  2. /usr/src/kernels/(uname -r)
-  #  3. /usr/src/kernels/(specific RPM-specified location based on the kernel-headers package)
+  #  2. For any sane Linux distro, look at /lib/modules/(uname -r)/build.  If the symlink
+  #     is not broken, the kernel headers package is installed and present.  This method
+  #     should be the default and valid for the case where KERNELDIR is not specified.
   OcpiKernelRelease:=$(shell uname -r)
-  # this command should be platform-specific (e.g. different for debian etc.)
-  OcpiKernelHeadersVersion:=$(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)
+  # This is not the actual package version, but suffices for our purposes:
+  # if the "build" symlink is broken, the kernel headers package has not
+  # been installed.  N.B.: the gmake built-in "$(realpath <str>)" function
+  # returns NULL if the symlink is broken, so we cannot use it here.  Also,
+  # there is no external "realpath" command for "centos6" so we have to use
+  # "readlink -f" for reasons of portability.
+  OcpiKernelHeadersVersion:=$(shell basename $(shell readlink -f /lib/modules/$(OcpiKernelRelease)/build))
   $(info --- The running kernel is release: $(OcpiKernelRelease))
   $(info --- The current kernel-headers package is version: $(OcpiKernelHeadersVersion))
   ifdef KERNELDIR
@@ -134,18 +140,12 @@ else
       $(error The requested kernel header location ($(KERNELDIR)) is not found)
     endif
   else
-    KERNELDIR=/usr/src/kernels/$(OcpiKernelRelease)
+    KERNELDIR=$(shell readlink -f /lib/modules/$(OcpiKernelRelease)/build)
     ifeq ($(wildcard $(KERNELDIR)),)
-      try1:=$(KERNELDIR)
-      KERNELDIR=/usr/src/kernels/$(OcpiKernelHeadersVersion)
-      ifneq ($(wildcard $(KERNELDIR)),)
-        $(info --- Using the kernel headers version at: $(KERNELDIR))
-      else
-        $(info XXX: $(shell ls -l /lib/modules ))
-        $(error Cannot find a kernel headers directory.  Tried $(try1) and $(KERNELDIR))
-      endif
+      $(info XXX: $(shell ls -l /lib/modules ))
+      $(error Cannot find a kernel headers directory at $(KERNELDIR))
     else
-      $(info --- Using the kernel release at: $(KERNELDIR))
+      $(info --- Using the kernel headers at: $(KERNELDIR))
     endif
   endif
   $(info No OCPI_TARGET_KERNEL_DIR specified, so using: KERNELDIR=$(KERNELDIR))
@@ -174,7 +174,13 @@ URULESFILE=99-$(MODNAME).rules
 MRULESFILE=mdev-$(MODNAME).rules
 TMP_FILES=Module.markers Module.symvers .opencpi* opencpi.mod.* opencpi.o .tmp* modules.order
 
-$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
+# This dependency is causing more problems than I think it is worth since it is doing things
+# that are unnecessary and problematic in most casesn.
+#$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
+EXPORTS=EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KCPPFLAGS="$(KCPPFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" $(and $(ARCH),ARCH=$(ARCH))
+$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P))
+	$(if $(CROSS_COMPILE),$(AT)echo Building kernel tools that run on the development host &&\
+	    $(MAKE) -C $(KERNELDIR) V=2 scripts)
 	$(AT)echo Building kernel module $(MODFILE)
 	$(and $(KERNELDIR),$(MAKE) -C $(KERNELDIR) M=$(PWD) V=2 modules)
 	$(AT)mkdir -p $(MyTargetDir)

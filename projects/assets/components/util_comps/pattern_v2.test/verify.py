@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -80,7 +80,7 @@ if (messagesSentFinal != messagesToSendInitial):
     print ('    The final value of messagesSent = ', messagesSentFinal, 'while expected value is',  messagesToSendInitial)
     sys.exit(1)
 else:
-    print ('    The final value of messageSent is correct')
+    print ('    The final value of messagesSent is correct')
 
 # Generate the expected data that was sent to compare to the output data and also grab the number
 # of data sent for each message

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -53,7 +53,7 @@ import numpy as np
 
 def generate(argv):
     """
-    Ex: python test_sinewave.py -g {odata_filename} {TARGET_FREQ} {SAMPLE_FREQ} {AMPLITUDE} {NUM_CYCLES}
+    Ex: python3 test_sinewave.py -g {odata_filename} {TARGET_FREQ} {SAMPLE_FREQ} {AMPLITUDE} {NUM_CYCLES}
     Generate test data:
     Tone at TARGET_FREQ, sampled at SAMPLE_FREQ
     """
@@ -118,7 +118,7 @@ def generate(argv):
 
 def validate(argv):
     """
-    Ex: python test_sinewave.py -v {idata_filename} {odata_filename} {number_of_samples} {sample_rate} {enable}
+    Ex: python3 test_sinewave.py -v {idata_filename} {odata_filename} {number_of_samples} {sample_rate} {enable}
     Validate:
     TEST #1: Verify I & Q values are not all zeros
     TEST #2: Output File Size

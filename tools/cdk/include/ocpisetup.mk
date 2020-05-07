@@ -16,15 +16,14 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This make file fragment establishes environment variables for user Makefiles,
-# all based on OCPI_CDK_DIR, which might be set already, but may not be.
-# If not set, it is assumed that this file is being included from its proper location
-# in a CDK and the CDK location is inferred from that.
-# This means that a user makefile could simply include this file however it wants and
-# OCPI_CDK_DIR and friends will all be set properly.
-# The goal here to have *no* environment setup requirement for a user app on the
-# development system with default settings.
-ifndef OCPI_TARGET_PLATFORM
-  export OCPI_TARGET_PLATFORM=$(OCPI_TOOL_PLATFORM)
-endif
-include $(OCPI_CDK_DIR)/include/setup-target-platform.mk
+# This make file fragment establishes gnumake variables for user Makefiles outside of projects,
+# all based on OCPI_CDK_DIR, which must be set already and the environment set up.
+# This means that a user makefile simply includes this file in their Makefile.
+# FIXME: there should be a 
+# Note you need two blank lines below
+define OCPI_NL
+
+
+endef
+$(eval $(subst ;,$(OCPI_NL),\
+  $(shell source $(OCPI_CDK_DIR)/opencpi-setup.sh -r; make -n -r -s -f $(OCPI_CDK_DIR)/include/setup-target-platform.mk ShellExternalVars=1)))

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -42,7 +42,7 @@ import numpy as np
 
 
 """
-Ex: python verify.py {sample-freq} {number_of_samples} {ofilename} {ifilename}
+Ex: python3 verify.py {sample-freq} {number_of_samples} {ofilename} {ifilename}
 Validate:
 TEST #1: Verify I & Q values are not all zeros
 TEST #2: Output file matches expected size

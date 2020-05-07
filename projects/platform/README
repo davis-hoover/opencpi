@@ -1,0 +1,23 @@
+Criteria for content to exist in this OpenCPI project:
+* specs/
+   - component specs must facilitate generic device worker or platform support
+* hdl/primitives/
+   - must directly support assets within hdl/devices, hdl/cards, or
+     hdl/platforms, or be useful and used by devices in OSPs
+* hdl/devices/
+   - generic device workers belong here
+   - RF ADC/DAC command/control: device proxies must implement the latest
+     generation dig_radio_ctrlr component
+   - ADC/DAC data flow: de-interleaving/interleaving subdevice workers must
+     support the latest generation ADC/DAC data flow paradigm workers
+     data_src_adc.hdl/data_sink_dac.hdl
+* hdl/cards/
+    - reusable card specs belong here
+    - card-specific device workers for reusable cards belong here
+* hdl/platforms/
+   - current reference platforms (relatively cheap and supported with high
+     priority with as many software and hardware options as possible - e.g. zed,
+     ultrascale/ZCU104, etc.)
+   - note that non-reference platforms ("full-fledged OSPs") belong in their
+     own, separate, OpenCPI project
+

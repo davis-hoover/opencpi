@@ -1,0 +1,46 @@
+<Application Name="IQapp" done="file_write_data">
+  <Instance component="ocpi.core.file_read"
+	    name="file_read" Connect="peak_detector_file_out">
+    <Property Name="fileName" value="IQapp_input_file.bin"/>
+    <Property Name="messageSize" Value="2048"/>
+  </Instance>
+  <Instance component="ocpi.tutorial.peak_detector"
+	    name="peak_detector_file_out" Connect="complex_mixer"/>
+  <Instance component="ocpi.tutorial.complex_mixer"
+	    name="complex_mixer" Connect="peak_detector_agc_in"/>
+  <Instance component="ocpi.tutorial.peak_detector"
+	    name="peak_detector_agc_in" Connect="agc_complex"/>
+  <Instance component="ocpi.tutorial.agc_complex"
+	    name="agc_complex" Connect="peak_detector_agc_out">
+    <Property Name="mu" Value="0x144E"/>
+    <Property Name="ref" Value="0x1B26"/>
+  </Instance>
+  <Instance component="ocpi.tutorial.peak_detector"
+	    name="peak_detector_agc_out" Connect="timestamper"/>
+  <Instance component="ocpi.assets.util_comps.timestamper"
+	    name="timestamper"/>
+  <Connection>
+    <Port instance="timestamper" name="out"/>
+    <Port instance="time_demux" name="Mux_In"/>
+  </Connection>
+  <Instance component="ocpi.tutorial.time_demux"
+	    name="time_demux"/>
+  <Connection>
+    <Port instance="time_demux" name="Time_Out"/>
+    <Port instance="file_write_time" name="in"/>
+  </Connection>
+  <Connection>
+    <Port instance="time_demux" name="Data_Out"/>
+    <Port instance="file_write_data" name="in"/>
+  </Connection>
+  <Instance component="ocpi.core.file_write"
+	    name="file_write_time">
+    <Property Name="fileName"
+              value="IQapp_time_output_file.bin"/>
+  </Instance>
+  <Instance component="ocpi.core.file_write"
+	    name="file_write_data">
+    <Property Name="fileName"
+              value="IQapp_data_output_file.bin"/>
+  </Instance>   
+</Application>

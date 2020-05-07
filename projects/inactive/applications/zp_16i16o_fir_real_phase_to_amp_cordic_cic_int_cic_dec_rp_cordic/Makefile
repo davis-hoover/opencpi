@@ -27,7 +27,7 @@ all: gen_input
 
 # build unit test input data
 gen_input:
-	python scripts/gen_rrcos_taps.py 128 0.95 `echo "1/64000" | bc -l` 3200000 16384 idata/tx_rrcos_taps.dat
+	python3 scripts/gen_rrcos_taps.py 128 0.95 `echo "1/64000" | bc -l` 3200000 16384 idata/tx_rrcos_taps.dat
 
 clean::
 	rm -rf odata/* scripts/*.pyc
@@ -63,8 +63,8 @@ HDL: 'ocpirun -v -d app_zp_16i16o_fir_real_phase_to_amp_cordic_cic_int_cic_dec_r
 HDL: 'ocpirun -v -d app_zp_16i16o_fir_real_phase_to_amp_cordic_cic_int_cic_dec_rp_cordic_baudtrack_digitizer_filerw.xml'
 ----------------------------------------------------------------------------
 Development Computer - verify output data
-'python ./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_phase_to_amp_cordic_cic_int_cic_dec_rp_cordic_filerw.bin real 8192 1 &'
-'python ./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_phase_to_amp_cordic_cic_int_cic_dec_rp_cordic_baudtrack_digitizer_filerw.bin real 1024 1 &'
+'python3 ./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_phase_to_amp_cordic_cic_int_cic_dec_rp_cordic_filerw.bin real 8192 1 &'
+'python3 ./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_phase_to_amp_cordic_cic_int_cic_dec_rp_cordic_baudtrack_digitizer_filerw.bin real 1024 1 &'
 ----------------------------------------------------------------------------
 endef
 export showhelp

@@ -39,7 +39,7 @@ entity master is
            );
   port (
     -- Exterior OCP input/slave signals
-    Clk              : in  std_logic; -- MIGHT BE THE SAME AS wci_clk
+    wsi_clk          : in  std_logic; -- MIGHT BE THE SAME AS wci_clk
     SReset_n         : in  std_logic;
     SThreadBusy      : in  std_logic_vector(0 downto 0);
     -- Exterior OCP output/master signals
@@ -53,10 +53,8 @@ entity master is
     MReqInfo         : out std_logic_vector(opcode_width-1 downto 0);
     MReqLast         : out std_logic;
     MReset_n         : out std_logic;
-    -- Signals connected from the worker's WCI to this interface;
-    wci_clk          : in  std_logic;
-    wci_reset        : in  Bool_t;
-    wci_is_operating : in  Bool_t;
+    wsi_reset        : in  Bool_t;
+    wsi_is_operating : in  Bool_t;
     -- Non-worker internal signals
     first_take       : in  Bool_t;   -- the first datum after is_operating taken, a pulse
     input_eof        : in  Bool_t;   -- an EOF is pending from (the first) input port
@@ -112,8 +110,7 @@ begin
   byte_limit <= to_unsigned(max_bytes, byte_limit'length) when fixed_buffer_size
                 else resize(ocpi.util.min(to_ushort(max_bytes), buffer_size), byte_limit'length);
   data_limit <= resize((byte_limit srl bs_shift) - 1, data_limit'length);
-  -- FIXME WHEN OWN CLOCK
-  reset_i <= wci_reset or not SReset_n;
+  reset_i <= wsi_reset or not SReset_n;
   reset   <= reset_i;
   ready   <= ready_r;
   latency <= resize(latency_r,latency'length);
@@ -125,7 +122,6 @@ begin
      messages <= (others => '0');
      bytes    <= (others => '0');
   end generate gen_ndebug;
-  -- FIXME WHEN OWN CLOCK
   -- internal conveniences
   -- Version 2 allows valid only, and allows valid as well as give to lead ready, like AXI
   my_give    <= give when hdl_version < 2 else ready_r and (give or valid);
@@ -148,7 +144,7 @@ begin
                         ((my_give and not its(early_som) and not its(eof_zlm)) or
                          state_r = NEED_EOM_e or state_r = NEED_EOF_e));
   -- Outputs to OCP
-  MReset_n   <= not wci_reset;
+  MReset_n   <= not wsi_reset;
   MCmd       <= ocpi.ocp.MCmd_WRITE when ready_r and ocp_give else ocpi.ocp.MCmd_IDLE;
   MDataLast  <= ocp_eom;
   MReqLast   <= ocp_eom;
@@ -171,7 +167,7 @@ begin
   end generate gen2;
   MDataInfo(MDataInfo'left) <= to_bool(abort or state_r = NEED_EOF_e or
                                        (hdl_version > 1 and state_r = BEFORE_SOM_E and eof));
-  process(Clk) is
+  process(wsi_clk) is
     -- procedure to deal with the worker giving data
     procedure do_data is
     begin
@@ -208,9 +204,9 @@ begin
       end if;
     end procedure;
   begin
-    if rising_edge(Clk) then
+    if rising_edge(wsi_clk) then
       if its(reset_i) then
-        if (its(wci_reset) or state_r /= FINISHED_e) then
+        if (its(wsi_reset) or state_r /= FINISHED_e) then
           state_r      <= BEFORE_SOM_e;
         end if;
         ready_r      <= bfalse;
@@ -225,7 +221,7 @@ begin
         data_count_r <= (others => '0');
         input_eof_r  <= bfalse;
       else
-        ready_r <= (wci_is_operating or eof_now) and not SThreadBusy(0); -- for next cycle.  OCP pipelining
+        ready_r <= (wsi_is_operating or eof_now) and not SThreadBusy(0); -- for next cycle.  OCP pipelining
         if ready_r and its(first_take) and not its(my_give) then -- start latency measurement
           first_data_r <= btrue;
         end if;
@@ -316,9 +312,9 @@ begin
   l1: if precise generate
     signal my_burst_length : std_logic_vector(MBurstLength'range);
   begin
-    burst: process(Clk) is
+    burst: process(wsi_clk) is
     begin
-      if rising_edge(clk) and my_give and ready_r and som_i then
+      if rising_edge(wsi_clk) and my_give and ready_r and som_i then
         my_burst_length <= burst_length;
       end if;
     end process;

@@ -35,7 +35,7 @@ tap_gen:
 	$(eval SAMPLE_FREQ=1000000)
 	$(eval INPUT_DATA_AMPLITUDE=1024)
 	$(eval NUM_CYCLES=16)
-	python ./scripts/test_sinewave.py -g idata/input_file.bin $(TARGET_FREQ) $(SAMPLE_FREQ) $(INPUT_DATA_AMPLITUDE) $(NUM_CYCLES)
+	python3 ./scripts/test_sinewave.py -g idata/input_file.bin $(TARGET_FREQ) $(SAMPLE_FREQ) $(INPUT_DATA_AMPLITUDE) $(NUM_CYCLES)
 
 clean::
 	rm -rf idata/* odata/*
@@ -84,7 +84,7 @@ Zedboard/Zipper:
 ocpirun -v -d -t 1 app_empty_rxtx_zed_zipper_card
 ----------------------------------------------------------------------------
 4) Verification of output data: (development system)
-python ./scripts/plotAndFft.py odata/out_app_empty_rxtx_zed_zipper_card.bin complex 131072 1000000 &
+python3 ./scripts/plotAndFft.py odata/out_app_empty_rxtx_zed_zipper_card.bin complex 131072 1000000 &
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 endef

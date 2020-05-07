@@ -37,6 +37,7 @@ entity complex_short_with_metadata_demarshaller is
     itake     : out ocpi.types.Bool_t;
     -- OUTPUT
     oprotocol : out protocol.complex_short_with_metadata.protocol_t;
+    oeof      : out ocpi.types.Bool_t;
     ordy      : in  std_logic);
 end entity;
 architecture rtl of complex_short_with_metadata_demarshaller is
@@ -134,7 +135,6 @@ begin
         protocol.complex_short_with_metadata.SYNC) and (ixfer = '1') else '0';
     protocol_s.end_of_samples      <= '1' when (iopcode =
         protocol.complex_short_with_metadata.END_OF_SAMPLES) and (ixfer = '1') else '0';
-    protocol_s.eof                 <= ieof;
 
     -- necessary to prevent combinatorial loop, depending an what's connected to
     -- ordy
@@ -149,6 +149,7 @@ begin
           if(ordy = '1') then
           --else
             oprotocol <= protocol_s;
+            oeof      <= ieof;
            end if;
         end if;
       end if;

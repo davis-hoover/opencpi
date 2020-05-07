@@ -21,18 +21,24 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library platform; use platform.platform_pkg.all;
 library ocpi; use ocpi.types.all, ocpi.util.all;
-library work; use work.axi_pkg.all;
-entity axinull is
+library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
+
+entity axinull_AXI_INTERFACE is
   port(
     clk       : in  std_logic;
     reset     : in  bool_t;
-    axi_in    : in  s_axi_hp_out_t;
-    axi_out   : out s_axi_hp_in_t
+    axi_in    : in  axi_s2m_t;
+    axi_out   : out axi_m2s_t
     );
-end entity axinull;
-architecture rtl of axinull is
+end entity axinull_AXI_INTERFACE;
+architecture rtl of axinull_AXI_INTERFACE is
 begin
-  axi_out.ACLK    <= clk;
+#if CLOCK_FROM_MASTER
+  axi_out.A.CLK <= clk;
+#endif
+#if RESET_FROM_MASTER
+  axi_out.A.RESETn <= '0';
+#endif
   axi_out.AW.VALID <= '0';
   axi_out.W.VALID  <= '0';
   axi_out.B.READY  <= '0';              -- we are always ready for responses

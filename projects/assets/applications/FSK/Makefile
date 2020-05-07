@@ -35,7 +35,7 @@ idata/tx_rrcos_taps.dat:
 	$(eval baudRate=64000)
 	$(eval spb=39)
 	$(eval maxTap=4096)
-	python scripts/gen_rrcos_taps.py $(numTaps) $(alpha) `echo "1/$(baudRate)" | bc -l` `echo "$(baudRate)*$(spb)" | bc -l` $(maxTap) idata/tx_rrcos_taps.dat
+	python3 scripts/gen_rrcos_taps.py $(numTaps) $(alpha) `echo "1/$(baudRate)" | bc -l` `echo "$(baudRate)*$(spb)" | bc -l` $(maxTap) idata/tx_rrcos_taps.dat
 
 idata/rx_rrcos_taps.dat:
 	$(eval numTaps=128)
@@ -43,7 +43,7 @@ idata/rx_rrcos_taps.dat:
 	$(eval baudRate=64000)
 	$(eval spb=39)
 	$(eval maxTap=4096)
-	python scripts/gen_rrcos_taps.py $(numTaps) $(alpha) `echo "1/$(baudRate)" | bc -l` `echo "$(baudRate)*$(spb)" | bc -l` $(maxTap) idata/rx_rrcos_taps.dat
+	python3 scripts/gen_rrcos_taps.py $(numTaps) $(alpha) `echo "1/$(baudRate)" | bc -l` `echo "$(baudRate)*$(spb)" | bc -l` $(maxTap) idata/rx_rrcos_taps.dat
 
 clean::
 	rm -rf idata/*.dat idata/*.bin odata/* scripts/*.pyc html/ latex/

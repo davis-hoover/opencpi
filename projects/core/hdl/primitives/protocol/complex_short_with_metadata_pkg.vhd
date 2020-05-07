@@ -74,16 +74,21 @@ function to_slv(interval : in op_interval_t)    return std_logic_vector;
 function from_slv(slv    : in std_logic_vector) return op_interval_t;
 
 -- operation flush
+constant OP_FLUSH_BIT_WIDTH : positive := 1;
 
 -- operation sync
+constant OP_SYNC_BIT_WIDTH : positive := 1;
 
 -- operation end_of_samples
+constant OP_END_OF_SAMPLES_BIT_WIDTH : positive := 1;
 
 -- protocol containing all operations
 constant PROTOCOL_BIT_WIDTH : positive := OP_SAMPLES_BIT_WIDTH+1 +
                                           OP_TIME_BIT_WIDTH+1 +
                                           OP_INTERVAL_BIT_WIDTH+1 +
-                                          1 + 1 + 1 + 1;
+                                          OP_FLUSH_BIT_WIDTH +
+                                          OP_SYNC_BIT_WIDTH +
+                                          OP_END_OF_SAMPLES_BIT_WIDTH;
 type protocol_t is record
   samples           : op_samples_t;
   samples_vld       : std_logic;
@@ -94,7 +99,6 @@ type protocol_t is record
   flush             : std_logic;
   sync              : std_logic;
   end_of_samples    : std_logic;
-  eof               : std_logic;
 end record;
 function to_slv(protocol : in protocol_t)       return std_logic_vector;
 function from_slv(slv    : in std_logic_vector) return protocol_t;
@@ -107,8 +111,7 @@ constant PROTOCOL_ZERO : protocol_t := (
   interval_vld   => '0',
   flush          => '0',
   sync           => '0',
-  end_of_samples => '0',
-  eof            => '0');
+  end_of_samples => '0');
 
 --------------------------------------------------------------------------------
 -- marshalling
@@ -116,19 +119,20 @@ constant PROTOCOL_ZERO : protocol_t := (
 
 component complex_short_with_metadata_marshaller is
   generic(
-    WSI_DATA_WIDTH         : positive := 16; -- 16 is default of codegen, but
-                                             -- MUST USE 32 FOR NOW
-    OUT_PORT_MBYTEEN_WIDTH : positive);
+    WSI_DATA_WIDTH    : positive := 16; -- 16 is default of codegen, but
+                                        -- MUST USE 32 FOR NOW
+    WSI_MBYTEEN_WIDTH : positive);
   port(
     clk          : in  std_logic;
     rst          : in  std_logic;
     -- INPUT
     iprotocol    : in  protocol_t;
+    ieof         : in  ocpi.types.Bool_t;
     irdy         : out std_logic;
     -- OUTPUT
     odata        : out std_logic_vector(31 downto 0);
     ovalid       : out ocpi.types.Bool_t;
-    obyte_enable : out std_logic_vector(OUT_PORT_MBYTEEN_WIDTH-1 downto 0);
+    obyte_enable : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
     ogive        : out ocpi.types.Bool_t;
     osom         : out ocpi.types.Bool_t;
     oeom         : out ocpi.types.Bool_t;
@@ -155,6 +159,7 @@ component complex_short_with_metadata_demarshaller is
     itake       : out ocpi.types.Bool_t;
     -- OUTPUT
     oprotocol   : out protocol_t;
+    oeof        : out ocpi.types.Bool_t;
     ordy        : in  std_logic);
 end component;
 
@@ -167,6 +172,7 @@ component complex_short_with_metadata_marshaller_old is
     rst          : in  std_logic;
     -- INPUT
     iprotocol    : in  protocol_t;
+    ieof         : in  ocpi.types.Bool_t;
     irdy         : out std_logic;
     -- OUTPUT
     odata        : out std_logic_vector(31 downto 0);

@@ -133,7 +133,8 @@ endif
 # this is to ensure support for the -n flag
 ECHO=/bin/echo
 #default assumes all generated files go before all authored files
-CompiledSourceFiles=$(TargetSourceFiles_$(ParamConfig)) $(GeneratedSourceFiles) $(AuthoredSourceFiles)
+CompiledSourceFiles=$(TargetSourceFiles_$(ParamConfig)) $(GeneratedSourceFiles) \
+                    $(filter-out $(call OcpiCPPSources,$(AuthoredSourceFiles)),$(AuthoredSourceFiles))
 # Just for history (thanks Andrew): this only works with tcsh, not traditional csh.  And csh isn't posix anywah
 # function to add a ../ to pathnames, avoiding changing absolute ones
 AdjustRelative2=$(foreach i,$(1),$(if $(filter /%,$(i)),$(i),../../$(patsubst ./%,%,$(filter-out .,$(i)))))
@@ -381,12 +382,12 @@ OcpiConvertListToPythonList=$(strip \
 # Run the python code in $1
 # Usage: $(call OcpiCallPythonFunc,this_is_a_python_function_with_output())
 OcpiCallPythonFunc=\
-  $(shell python3.4 -c '$1')
+  $(shell python3 -c '$1')
 
 # Import the ocpiutil module and run the python code in $1
 # Usage: $(call OcpiCallPythonUtil,ocpiutil.utility_function(arg1, arg2))
 OcpiCallPythonUtil=$(infox OPYTHON:$1)\
-  $(shell python3.4 -c 'import sys;\
+  $(shell python3 -c 'import sys;\
 sys.path.append("$(OCPI_CDK_DIR)/$(OCPI_TOOL_PLATFORM)/lib/");\
 import _opencpi.util as ocpiutil;\
 $1')
@@ -1274,5 +1275,29 @@ define OcpiSetPlatformVariables
       $$(eval $$v_$1:=$$($$v)))
   endif
 endef
+
+################################################################################
+# Definitions for preprocessing source files that are not C or C++ files
+# with the suffix cpp_<foo> where <foo> is the ultimate suffix.
+# These functions were previously specific to workers, but are collected here
+# so that they may also be used in primitive libraries etc.
+# Since the result can be specific to parameters, they must go in the target directory
+# rather than the "gen" directory.
+# FIXME:  Workers use redundant functions in xxx-worker.mk
+
+# $(call OcpiCPPGenFile,<file>,<target>,<config>)
+OcpiCPPGenFile=$(call WkrTargetDir,$2,$3)/$(basename $(notdir $1))$(patsubst .cpp_%,.%,$(suffix $1))
+# $(call OcpiCPPSource,<file>,<target>,<config>,<goal-binary>)
+define OcpiCPPSource
+  TargetSourceFiles_$3+=$$(call OcpiCPPGenFile,$1,$2,$3)
+  $4: $$(call OcpiCPPGenFile,$1,$2,$3)
+  $$(call OcpiCPPGenFile,$1,$2,$3): $1 | $(call WkrTargetDir,$2,$3)
+	$(AT)gcc -MMD -MP -MT $$@ -MF $$@.deps -E -P -std=c99 -xc \
+	       $$(foreach d,$$(OcpiCPPDefines), '-D$$d') \
+               $$(foreach n,$$(WorkerParamNames), '-DOCPI_PARAM_$$n()=$$(Param_$3_$$n)') $$< | \
+               tr '$$$$@`' "\n '" | sed '/^ *$$$$/d' > $$@
+endef
+# Return CPP sources from list in $1
+OcpiCPPSources=$(strip $(foreach f,$1,$(and $(filter .cpp_%,$(suffix $f)),$f)))
 
 endif # ifndef __UTIL_MK__

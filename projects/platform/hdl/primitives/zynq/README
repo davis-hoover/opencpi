@@ -1,0 +1,64 @@
+This zynq_ps core (which is actually currently an HDL primitive library) is our wrapper
+around the processing_system7 (Zynq PS) IP as found in two different places, depending
+on whether we are using ISE/XST or Vivado.
+
+FOR ISE/SST:
+================================================================================
+It is in 14.7/ISE_DS/EDK/hw/XilinxProcessorIPLib/pcores/processing_system7_v4_03_a
+The actual verilog wrapper around the PS7 primitive is in hdl/verilog/processing_system7.v
+subdir, with the doc in doc/ds871_processing_system7.pdf.
+The instantiation parameters of processing_system7 was based on
+running the XPS tool, and *looking at* but not using the generated wrapper file:
+  system_processing_system7_0_wrapper.v
+
+FOR VIVADO:
+================================================================================
+It is in data/ip/xilinx/processing_system7_v5_5
+A tcl script here (vivado-gen-ps.tcl) is used to extract the verilog wrapper,
+which results in the file:  processing_system7_v5_5_processing_system7.v
+
+COMMON TO ISE AND VIVADO
+================================================================================
+We have a VHDL module whose interfaces are record-based, and its AXI interfaces
+(for control and data flow) are based on the OpenCPI parameterized AXI interfaces
+as defined in the axi library in the core project.
+This VHDL module needs to instantiate Xilinx's Verilog wrapper, and pass down
+any parameters that OpenCPI needs, to make this zynq_ps module sharable across various
+platforms that use different chips etc.
+
+Vivado has declared that VHDL can only instance Verilog via a VHDL component
+declaration (which there is evidence is not actually true, but...), so our VHDL module
+must declare the underlying Verilog module as a VHDL component, and then
+instance it.
+
+In order to have one zynq_ps module used by both ISE and Vivado, we have a lightly
+preprocessed file, zynq_ps.cpp_vhd, that uses a XILINX_ISE macro to know which tool
+is being used, and thus which underlying IP core is being used.
+
+So an HDL platform worker in OpenCPI that uses a zynq7000 chip, instances zynq_ps,
+which only has generics and ports useful to OpenCPI.  zynq_ps in turn instances
+the the Xilinx Verilog wrapper (generated differently using ISE vs Vivado),
+which in turn instances the actual PS7 Xilinx primitive that represents the
+PL -to- PS interface on zynq7000 chips.
+
+The ISE Xilinx Verilog wrapper is directly used from the ISE installation as is.
+The Vivado Xilinx Verilog wrapper is generated (slowly...) using a tcl script,
+but it is basically just extracted from a ttcl file without any real modifications.
+
+Thus in neither case are we generating anything that is parameterized based on
+how we are using the chip.  We are simply providing parameters to the Xilinx Verilog wrapper.
+
+Building this library has to decide whether to use the ISE/isim method or the Vivado/xsim method.
+So it does not allow building for both types at a time, i.e. building for isim and xsim at the same time,
+or zynq and zynq_ise at the same time.  This could be fixed with some more work.
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+This (test) platform is a "quad-word-wide" platform that runs the SDP subsystem under simulation 128 bits wide.
+This exercises lots of SDP-related modules in this wide mode, and also forces various width adapters to be used.
+E.g. the control plane adapter must go from 128 bits to 32 bits, and most app workers are 32 bits wide.
+It is not just a "platform confguration" of the xsim platform so that it is easy to build and test all
+assemblies by just building and testing for x4sim.
+
+

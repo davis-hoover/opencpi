@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -46,7 +46,7 @@ def getmsg(m):
     return (opcode, length, data)
 
 """
-Ex: python verify.py {sample-freq} {ofilename} {ifilename}
+Ex: python3 verify.py {sample-freq} {ofilename} {ifilename}
 Validate:
 TEST #1: Verify I & Q values are not all zeros
 TEST #2: Output file matches expected size

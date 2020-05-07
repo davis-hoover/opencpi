@@ -51,8 +51,7 @@ namespace OCPI {
      * \throw std::string Operating system error.
      */
 
-    void sleep (unsigned long msecs)
-      throw (std::string);
+    void sleep(unsigned long msecs);
 
     /**
      * Returns an identifier for the current process.
@@ -64,8 +63,7 @@ namespace OCPI {
      *           process exits and new processes are started.
      */
 
-    unsigned long getProcessId ()
-      throw ();
+    unsigned long getProcessId() throw();
 
     /**
      * Returns an identifier for the current thread.
@@ -76,8 +74,7 @@ namespace OCPI {
      *           reused when a thread exits and new threads are started.
      */
 
-    unsigned long getThreadId ()
-      throw ();
+    unsigned long getThreadId() throw();
 
     /**
      * Returns the unqualified host name.
@@ -87,8 +84,7 @@ namespace OCPI {
      * \throw std::string Operating system error.
      */
 
-    std::string getHostname ()
-      throw (std::string);
+    std::string getHostname();
 
     /**
      * Returns the fully qualified host name.
@@ -98,8 +94,7 @@ namespace OCPI {
      * \throw std::string Operating system error.
      */
 
-    std::string getFQDN ()
-      throw (std::string);
+    std::string getFQDN();
 
     /**
      * Returns the local host's IP address.
@@ -108,8 +103,7 @@ namespace OCPI {
      * \throw std::string Operating system error.
      */
 
-    std::string getIPAddress ()
-      throw (std::string);
+    std::string getIPAddress();
 
     /**
      * Determines if a name is an alias for the local host.
@@ -123,8 +117,7 @@ namespace OCPI {
      * \throw std::string Operating system error.
      */
 
-    bool isLocalhost (const std::string & name)
-      throw (std::string);
+    bool isLocalhost(const std::string & name);
 
     /**
      * Arranges for a function to be called when the current
@@ -143,11 +136,9 @@ namespace OCPI {
      * abort().
      */
 
-    void setCtrlCHandler (void (*handler) (void))
-      throw ();
+    void setCtrlCHandler(void (*handler) (void)) throw();
 
-    void setError(std::string &error, const char *fmt, ...)
-      throw();
+    void setError(std::string &error, const char *fmt, ...) throw();
 
     void getExecFile(std::string &name);
 

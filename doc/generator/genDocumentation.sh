@@ -161,6 +161,7 @@ tex_kernel() {
   expr match $tex '.*/' >/dev/null && cd "$(dirname $tex)"
   ofile=$(basename -s .tex $tex)
   warn_existing_pdf "${OUTPUT_PATH}/${prefix}" ${ofile} $d && return
+  [ -f Makefile ] && make
   rubber -d $ofile.tex || FAIL=1
   # If the pdf was created then copy it out
   if [ ! -f $ofile.pdf -o -n "${FAIL}" ]; then
@@ -243,11 +244,11 @@ generate_pdfs() {
         pushd "$d" || return 1
         prefix=.
         osp_name="$(get_osp_name $d)"
-        if expr match $d '.*assets_ts' > /dev/null; then
+        if expr match $d '.*projects/assets_ts' > /dev/null; then
             prefix=assets_ts
-        elif expr match $d '.*assets' > /dev/null; then
+        elif expr match $d '.*projects/assets' > /dev/null; then
             prefix=assets
-        elif expr match $d '.*core' > /dev/null; then
+        elif expr match $d '.*projects/core' > /dev/null; then
             prefix=core
         elif expr match $d '.*tutorials' > /dev/null; then
             prefix=tutorials

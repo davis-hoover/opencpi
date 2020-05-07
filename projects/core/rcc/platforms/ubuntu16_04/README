@@ -1,0 +1,23 @@
+This directory contains information and scripts for installing and building
+OpenCPI for *ubuntu 16.04. This is a work in progress, and is based on the
+CentOS7 scripts.  N.B.: "/bin/sh" points to "/bin/dash" by default, not
+"/bin/bash", and the principle of least astonishment is likely going to
+be repeatedly violated as the porting work continues.
+
+What must be accomplished falls into one of the three categories below:
+
+1. Install - things you must do *before* building OpenCPI infrastructure, components and apps.
+2. Build - how to actually build all of OpenCPI.
+3. Setup - things to do after building in order to use the platform to run apps.
+
+The OpenCPI Installation Manual (in doc/OpenCPI_Installation_Guide.pdf) will
+eventually contain all the pertinent information.
+
+Miscellaneous notes:
+
+(1) Installing the "lsb" metapackage takes care of installing much of the
+    required development functionality, and some of the 32-bit support
+    framework.  In particular "lsb" gets you all of the "lsb-*" packages,
+    "fakeroot", compilers, and the base 32-bit runtime libraries.
+
+(2) The "curl" package is not part of the base installation.  WTF?

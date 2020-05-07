@@ -50,11 +50,12 @@ struct UNocChannel {
 struct UNoc {
   const char *m_name;
   WIPType m_type;
-  size_t  m_width;
+  size_t  m_width, m_length;
   unsigned m_currentChannel;
   std::vector<UNocChannel> m_channels;
-  UNoc(const char *name, WIPType type, size_t width, size_t size)
-    : m_name(name), m_type(type), m_width(width), m_currentChannel(0), m_channels(size) {}
+  UNoc(const char *name, WIPType type, size_t width, size_t length, size_t channels)
+    : m_name(name), m_type(type), m_width(width), m_length(length), m_currentChannel(0),
+      m_channels(channels) {}
   void addClient(std::string &assy, bool control, const char *client, const char *port);
   void terminate(std::string &assy);
 };

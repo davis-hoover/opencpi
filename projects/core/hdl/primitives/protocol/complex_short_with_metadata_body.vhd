@@ -35,8 +35,8 @@ end from_slv;
 
 function to_slv(time : in op_time_t) return std_logic_vector is
 begin
-  return time.sec &
-         time.fract_sec;
+  return time.fract_sec &
+         time.sec;
 end to_slv;
 
 function from_slv(slv : in std_logic_vector) return op_time_t is
@@ -68,25 +68,23 @@ begin
          protocol.interval_vld &
          protocol.flush &
          protocol.sync &
-         protocol.end_of_samples &
-         protocol.eof;
+         protocol.end_of_samples;
 end to_slv;
 
 function from_slv(slv : in std_logic_vector) return protocol_t is
   variable ret : protocol_t;
 begin
-  ret.samples.iq.i        := slv(166 downto 151);
-  ret.samples.iq.q        := slv(150 downto 135);
-  ret.samples_vld         := slv(134);
-  ret.time.sec            := slv(133 downto 102);
-  ret.time.fract_sec      := slv(101 downto 70);
-  ret.time_vld            := slv(69);
-  ret.interval.delta_time := slv(68 downto 5);
-  ret.interval_vld        := slv(4);
-  ret.flush               := slv(3);
-  ret.sync                := slv(2);
-  ret.end_of_samples      := slv(1);
-  ret.eof                 := slv(0);
+  ret.samples.iq.i        := slv(165 downto 150);
+  ret.samples.iq.q        := slv(149 downto 134);
+  ret.samples_vld         := slv(133);
+  ret.time.fract_sec      := slv(132 downto 101);
+  ret.time.sec            := slv(100 downto 69);
+  ret.time_vld            := slv(68);
+  ret.interval.delta_time := slv(67 downto 4);
+  ret.interval_vld        := slv(3);
+  ret.flush               := slv(2);
+  ret.sync                := slv(1);
+  ret.end_of_samples      := slv(0);
   return ret;
 end from_slv;
 

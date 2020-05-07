@@ -82,7 +82,7 @@ ifeq ($(TestImplementations),)
   ifeq ($(origin Tests),undefined)
     TestImplementations:=$(filter-out $(ExcludeTests),$(patsubst %/,%,$(dir $(wildcard *.test/Makefile))))
   else
-    TestImplementations:=$(Tests)
+    TestImplementations:=$(filter-out $(ExcludeTests),$(Tests))
   endif
 endif
 override LibDir=$(OutDir)lib

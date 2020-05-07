@@ -373,17 +373,14 @@ getPlatforms(const char *attr, OrderedStringSet &platforms, Model m, bool onlyVa
     return err;
   for (OU::TokenIter ti(attr); ti.token(); ti.next()) {
     bool found;
-    if (onlyValidPlatforms) {
-      for (StringSetIter si = universe->begin(); si != universe->end(); ++si)
-        if (fnmatch(ti.token(), (*si).c_str(), FNM_CASEFOLD) == 0) {
-          found = true;
-          platforms.push_back(*si);
-	}
-      if (!found)
-	return OU::esprintf("the string \"%s\" does not indicate or match any platforms",
+    for (StringSetIter si = universe->begin(); si != universe->end(); ++si)
+      if (fnmatch(ti.token(), (*si).c_str(), FNM_CASEFOLD) == 0) {
+	found = true;
+	platforms.push_back(*si);
+      }
+    if (!found && onlyValidPlatforms)
+      return OU::esprintf("the string \"%s\" does not indicate or match any known platforms",
 			    ti.token());
-    } else
-      platforms.push_back(ti.token());
   }
   return NULL;
 }
