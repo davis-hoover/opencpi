@@ -315,6 +315,7 @@ test-core:centos7:zed:
     - .test-core
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -329,6 +330,7 @@ test-assets-base:centos7:zed:
     - .test-assets-base
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -343,6 +345,7 @@ test-assets-comms:centos7:zed:
     - .test-assets-comms
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -357,6 +360,7 @@ test-assets-dsp:centos7:zed:
     - .test-assets-dsp
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -371,6 +375,7 @@ test-assets-misc:centos7:zed:
     - .test-assets-misc
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -385,6 +390,7 @@ test-assets-util:centos7:zed:
     - .test-assets-util
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -399,6 +405,7 @@ test-assets_ts:centos7:zed:
     - .test-assets_ts
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
@@ -415,6 +422,7 @@ test-inactive:centos7:zed:
     - .test-inactive
     - .centos7
     - .zed-xilinx13_4
+    - .ocpiremote
   needs:
     - job: prereq:centos7
       artifacts: true
