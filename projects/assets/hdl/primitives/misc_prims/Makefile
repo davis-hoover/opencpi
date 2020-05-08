@@ -32,16 +32,11 @@ SourceFiles=$(patsubst %,%.vhd,\
 	misc_prims_pkg \
 	misc_prims_body \
 	debounce/src/debounce \
-	lfsr/src/lfsr \
+	cdc_pkg \
 	round_conv/src/round_conv \
 	event_in_to_txen/src/event_in_to_txen \
-	adc_samp_drop_detector \
-	data_widener \
-	adc_maximal_lfsr_data_src \
 	time_downsampler \
 	time_corrector \
-	data_narrower \
-	dac_underrun_detector \
 	level_to_pulse_converter \
 	cdc_testing/src/gen_reset_sync \
 	cdc_testing/src/four_bit_lfsr \

@@ -26,8 +26,8 @@ ofile=$1
 oft=$1.tmp
 echo 'Analyzing the software components'
 rm -rf $ofile
-python $analyzer >> $oft;
-cat $OCPI_BASE_DIR/tools/include/Metrics_Header.txt >> $ofile;
+python3 $analyzer >> $oft;
+cat $OCPI_BASE_DIR/tools/cdk/include/Metrics_Header.txt >> $ofile;
 cat $oft | sed -n '/LOC    Avg.NLOC AvgCCN Avg.ttoken  function_cnt    file/,$ p' >> $ofile;
 rm -rf $oft;
 echo "  " >> $ofile;

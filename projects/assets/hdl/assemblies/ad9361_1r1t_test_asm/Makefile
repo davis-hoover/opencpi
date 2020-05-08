@@ -18,7 +18,7 @@
 
 Containers= \
 	cnt_1rx_1tx_thruasm_txsrc_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_1rx_1tx_thruasm_txsrc_fmcomms_2_3_lpc_LVDS_zed
+	cnt_nopfcfg_1rx_1tx_fmcomms_2_3_lpc_thruasm_txsrc_zed
 # ML605/FMCOMMS3-FMC_HPC combo is currently known to have TX data fidelity issues
 #	cnt_1rx_1tx_thruasm_txsrc_fmcomms_2_3_hpc_LVDS_ml605 \
 

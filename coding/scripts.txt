@@ -65,6 +65,6 @@ of BASH features.
 Python:
 =======
 
-The availability of python 2.x can be assumed in development environments, but not (yet) in
+The availability of python 3.x can be assumed in development environments, but not in
 embedded environments.
 

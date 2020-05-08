@@ -106,7 +106,7 @@ function relative_link {
   local from=$2
   [ -d $2 ] || from=$(dirname $2)
  # [ -d $1 ] && echo Bad relative symlink to a directory: $1 && exit 1
-  local to=$(python -c "import os.path; print os.path.relpath('$(dirname $1)', '$from')")
+  local to=$(python3 -c "import os.path; print os.path.relpath('$(dirname $1)', '$from')")
   [ -d $2 -a -L $2/$(basename $1) ] && rm $2/$(basename $1)
   ln -s -f $to/$(basename $1) $2
 }

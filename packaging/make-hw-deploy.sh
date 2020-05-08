@@ -25,7 +25,7 @@ cross=0
 shift
 rcc_platform=$1 && shift
 set -e
-# If there is no rcc platform set hdl_rcc_platform to no_sw
+# if there is no rcc platform set hdl_rcc_platform to no_sw
 [ "$rcc_platform" = "-" ] && rcc_platform=
 cross=1
 platforms=$platform
@@ -50,7 +50,7 @@ mkdir -p $sd/opencpi
 for f in cdk/runtime/*; do
   is_platform $f && [ $(basename $f) != $rcc_platform ] && continue; # Skip all platforms except our RCC
   (cd cdk/runtime;
-   for x in $(find $(basename $f)); do
+   for x in $(find -L $(basename $f)); do
        case $x in *env*|*include*) continue;; esac # not sure how to explain this
        if [ -d $x ]; then
 	  mkdir $sd/opencpi/$x
@@ -63,13 +63,13 @@ for f in cdk/runtime/*; do
 done
 # 3. move the sw deploy files into root
 [ -d cdk/deploy/$rcc_platform ] && cp -R -L cdk/deploy/$rcc_platform/* $sd
-# 4. mv the top level sw files on the hw deployment into root
+# 4. move the top level sw files on the hw deployment into root
 [ -d cdk/deploy/$platform/$rcc_platform ] && cp -R -L cdk/deploy/$platform/$rcc_platform/* $sd
 # 5. move any SW-specific system.xml into $sd/opencpi
 [ -f cdk/runtime/$rcc_platform/system.xml ] && cp -R -L -H cdk/runtime/$rcc_platform/system.xml $sd/opencpi || :
-# 6. copy hw-specific files from the rcc platform
+# 6. move hw-specific files from the rcc platform
 [ -d cdk/$rcc_platform/hdl/$platform/boot ] && cp -R -L -H cdk/$rcc_platform/hdl/$platform/boot/* $sd || :
-# 7. mv the top level hw files into root
+# 7. move the top level hw files into root
 for f in $(shopt -s nullglob; echo cdk/deploy/$platform/*); do
   is_platform $f && continue;
   cp -R -L -H $f $sd
