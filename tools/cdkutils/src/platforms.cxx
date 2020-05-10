@@ -21,6 +21,7 @@
 // Utility functions relating to available platforms.
 
 #include <string.h>
+#include <cstdlib>
 #include <fnmatch.h>
 #include "ocpi-config.h"
 #include "OcpiOsFileIterator.h"
@@ -211,6 +212,30 @@ addLibs(const char *libs, OrderedStringSet &dirs, OrderedStringSet &nonSlashes) 
     } else
       nonSlashes.push_back(ti.token());
 }
+static const char
+  PROJECT_ROOT[] = "Project.mk",
+  PROJECT_REL_DIR_ENV[] = "OCPI_PROJECT_REL_DIR";
+static const char *
+getProjectRelDir(std::string &dir) {
+  const char *env = getenv(PROJECT_REL_DIR_ENV);
+  if (env)
+    dir = env;
+  else {
+    OF::FileId dot, dotdot;
+    std::string up;
+    for (up = "./"; !OF::exists(up + PROJECT_ROOT); up += "../")
+      if (!OF::exists(up + ".", NULL, NULL, NULL, &dot) ||
+	  !OF::exists(up + "..", NULL, NULL, NULL, &dotdot) ||
+	  dot == dotdot)
+	return OU::esprintf("Could not find containing project directory (i.e. count not find \"%s\""
+			    " in any parent directory", PROJECT_ROOT);
+    env = up == "./" ? up.c_str() : up.c_str() + 2;
+    ocpiCheck(setenv(PROJECT_REL_DIR_ENV, env, 1) == 0);
+    dir = env;
+  }
+  return NULL;
+}
+
 // This implementation mirrors the one in util./mk for OcpiXmlComponentLibraries
 // I.e. implements the same search rules
 const char *
@@ -221,9 +246,11 @@ getComponentLibraries(const char *libs, const char *model, OrderedStringSet &pla
   addLibs(getenv("OCPI_COMPONENT_LIBRARIES"), dirs, nonSlashes);
   const char *err;
   if (projectPath.empty()) {
-    std::string imports(getenv("OCPI_PROJECT_REL_DIR"));
+    std::string imports;
+    if ((err = getProjectRelDir(imports)))
+      return err;
     imports += "/imports/";
-    if ((err = addPlaces("OCPI_PROJECT_REL_DIR", NULL, NULL, true, projectPath)) ||
+    if ((err = addPlaces(PROJECT_REL_DIR_ENV, NULL, NULL, true, projectPath)) ||
 	(err = addPlaces("OCPI_PROJECT_PATH", NULL, NULL, true, projectPath)) ||
 	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", imports.c_str(), NULL, true, projectPath)))
       return err;
@@ -283,11 +310,13 @@ getHdlPrimitive(const char *prim, const char *type, OrderedStringSet &prims) {
   }
   std::string cdk;
   if (hdlPrimitivePath.empty()) {
-    std::string imports(getenv("OCPI_PROJECT_REL_DIR"));
+    std::string imports;
+    if ((err = getProjectRelDir(imports)))
+      return err;
     imports += "/imports/";
     if ((err = getCdkDir(cdk)) ||
 	(err = addPlaces("OCPI_HDL_PRIMITIVE_PATH", NULL, NULL, true, hdlPrimitivePath)) ||
-	(err = addPlaces("OCPI_PROJECT_REL_DIR", NULL, "/hdl/primitives/lib", false, hdlPrimitivePath)) ||
+	(err = addPlaces(PROJECT_REL_DIR_ENV, NULL, "/hdl/primitives/lib", false, hdlPrimitivePath)) ||
 	(err = addPlaces("OCPI_PROJECT_PATH", NULL, "/lib/hdl", false, hdlPrimitivePath)) ||
 	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", imports.c_str(), "/exports/lib/hdl", false, hdlPrimitivePath)))
       return err;

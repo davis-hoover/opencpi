@@ -26,7 +26,7 @@
 PackageName=assets
 PackagePrefix=ocpi
 
-ProjectDependencies=platform
+ProjectDependencies=ocpi.platform
 
 # These assignments support building from any directory.
 #example remote system: note there can be multiple remote systems, colon-separated.

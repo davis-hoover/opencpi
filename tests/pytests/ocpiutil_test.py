@@ -160,7 +160,7 @@ class TestPathFunctions(unittest.TestCase):
         # Register the exported project
         ocpidev_command += OCPIDEV_CMD + " register project mypj8_exported; "
 
-        logging.debug("OCPIDEV CMD: '" + ocpidev_command.replace('; ', ';\n') + "';")
+        logging.debug("OCPIDEV CMD: '" + ocpidev_command.replace('; ', ';\n'))
         process = subprocess.Popen(ocpidev_command, shell=True, executable='/bin/bash')
         results = process.communicate()
         if results[1] or process.returncode != 0:
