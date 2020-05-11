@@ -178,7 +178,7 @@ for t in $tests; do
     driver)
       if [ ! -e $OCPI_CDK_DIR/scripts/ocpi_${OCPI_TOOL_OS}_driver ]; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  not supported.
-      elif [ -e /.dockerenv ] ; then
+      elif [ -e /.dockerenv ] || [ -e /run/.containerenv ] ; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  running in a docker container.
       else
         echo ======================= Loading the OpenCPI Linux Kernel driver. &&
