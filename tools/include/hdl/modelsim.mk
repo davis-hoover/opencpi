@@ -100,10 +100,14 @@ HdlToolCompile=\
    export LM_LICENSE_FILE=$(OCPI_MODELSIM_LICENSE_FILE); \
    rm -r -f $(WorkLib); \
    $(if $(filter work,$(LibName)),,$(call ModelsimExec,vlib) $(WorkLib) &&) \
-   $(and $(filter %.v,$(ModelsimFiles)),\
-    $(call ModelsimExec,vlog) $(ModelSimVlogIncs) $(VlogLibs) $(ModelsimArgs) $(filter %.v, $(ModelsimFiles)) ;) \
-   $(and $(filter %.vhd,$(ModelsimFiles)),\
-    $(call ModelsimExec,vcom) -preserve $(if $(HdlNoSimElaboration),,$(ignore -bindAtCompile)) -error 1253 $(ModelsimArgs) $(filter %.vhd,$(ModelsimFiles)))
+   (\
+    $(and $(filter %.v,$(ModelsimFiles)),\
+          $(call ModelsimExec,vlog) $(ModelSimVlogIncs) $(VlogLibs) $(ModelsimArgs)\
+                                    $(filter %.v, $(ModelsimFiles)) &&)\
+    $(and $(filter %.vhd,$(ModelsimFiles)),\
+          $(call ModelsimExec,vcom) -preserve $(if $(HdlNoSimElaboration),,$(or -bindAtCompile))\
+          -error 1253 $(ModelsimArgs) $(filter %.vhd,$(ModelsimFiles)) &&)\
+    :) 2>&1 | grep -v 'ERROR: .* LD_PRELOAD cannot be preloaded'
 
 # Since there is not a singular output, make's builtin deletion will not work
 HdlToolPost=\
