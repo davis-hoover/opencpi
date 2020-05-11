@@ -506,8 +506,6 @@
     PLATFORM: 'xilinx13_3'
     HW_PLATFORM: 'zed'
     SW_PLATFORM: 'xilinx13_3'
-    IP: '10.0.0.103'
-    PORT: '1000'
     MODEL: 'rcc'
 
 .xilinx13_4:
@@ -518,8 +516,6 @@
     PLATFORM: 'xilinx13_4'
     HW_PLATFORM: 'zed'
     SW_PLATFORM: 'xilinx13_4'
-    IP: '10.0.0.103'
-    PORT: '1000'
     MODEL: 'rcc'
 
 .zed-xilinx13_3:
