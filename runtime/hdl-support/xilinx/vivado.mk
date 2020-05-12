@@ -716,7 +716,7 @@ $(call BitName,$1,$3,$6): $(call RouteName,$1,$3) $(call TimingName,$1,$3) $(wil
 		target_file=$(notdir $(call BitName,$1,$3,$6)) \
 		checkpoint=$(notdir $(call RouteName,$1,$3)) \
 		part=$(HdlVivadoPart) \
-		constraints='$(wildcard $(HdlPlatformDir_$5)/*_bit.xdc)' \
+		constraints='$(call AdjustRelative,$(wildcard $(HdlPlatformDir_$5)/*_bit.xdc))' \
                 impl_opts='$(call VivadoOptions,bit)' \
 		,bit)
 
