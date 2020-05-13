@@ -249,12 +249,12 @@ build-platforms-inactive:centos7:zed:
 # Jobs - Assemblies #
 #####################
 build-assemblies-platform:centos7:zed:
-  extends: 
+  extends:
     - .build-assemblies-platform
     - .centos7
     - .zed-xilinx13_4
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
     - build-primitives:centos7:zed
@@ -316,9 +316,8 @@ test-core:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-core:centos7:zed
@@ -326,6 +325,7 @@ test-core:centos7:zed:
     - build-platforms-assets:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
 
 test-assets-base:centos7:zed:
@@ -334,9 +334,8 @@ test-assets-base:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-core:centos7:zed
@@ -344,6 +343,7 @@ test-assets-base:centos7:zed:
     - build-platforms-assets:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
 
 test-assets-comms:centos7:zed:
@@ -352,9 +352,8 @@ test-assets-comms:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-core:centos7:zed
@@ -362,6 +361,7 @@ test-assets-comms:centos7:zed:
     - build-platforms-assets:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
 
 test-assets-dsp:centos7:zed:
@@ -370,9 +370,8 @@ test-assets-dsp:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-core:centos7:zed
@@ -380,6 +379,7 @@ test-assets-dsp:centos7:zed:
     - build-platforms-assets:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
 
 test-assets-misc:centos7:zed:
@@ -388,9 +388,8 @@ test-assets-misc:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-core:centos7:zed
@@ -398,6 +397,7 @@ test-assets-misc:centos7:zed:
     - build-platforms-assets:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
 
 test-assets-util:centos7:zed:
@@ -406,9 +406,8 @@ test-assets-util:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-core:centos7:zed
@@ -416,6 +415,7 @@ test-assets-util:centos7:zed:
     - build-platforms-assets:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
 
 test-assets_ts:centos7:zed:
@@ -424,9 +424,8 @@ test-assets_ts:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-core:centos7:zed
@@ -436,6 +435,7 @@ test-assets_ts:centos7:zed:
     - build-devices-assets_ts:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
 
 test-inactive:centos7:zed:
@@ -444,13 +444,13 @@ test-inactive:centos7:zed:
     - .centos7
     - .zed-xilinx13_4
     - .ocpiremote
-  needs:
-    - job: prereq:centos7
-      artifacts: true
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-inactive:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+    - build-assemblies-assets:centos7:zed
   resource_group: zed
