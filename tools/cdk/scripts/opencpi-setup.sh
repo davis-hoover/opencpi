@@ -65,6 +65,7 @@
 # You can give an optional "-v" argument to get it to be verbose.
 ocpi_name=opencpi-setup.sh
 ocpi_me=$BASH_SOURCE
+ocpi_cdk_dir=cdk
 # The egrep of the beginning of variables to clean out, e.g. derived rather than user specified
 ocpi_cleaned_vars="OCPI_(PREREQUISITES_DIR|TARGET_|TOOL_|CDK_|ROOT_)"
 [ -z "$BASH_VERSION" -o -z "$ocpi_me" ] && {
@@ -113,6 +114,18 @@ EOF
 
 # Guard against somebody sourcing us with nullglob set (otherwise "unset ocpi_options[0]" could be blank below)
 if shopt -q nullglob; then echo 'Note: Turning off nullglob; was active!'; shopt -u nullglob; fi
+
+# Get file location w/o following symlinks since 'realpath -s' not in cos6
+ocpi_file_location=$(cd $(dirname $ocpi_me); pwd)/$(basename $ocpi_me)
+# Get the parent directory of the file being called and make sure it's cdk
+ocpi_file_parent_dir=$(basename $(dirname $ocpi_file_location))
+if [ "$ocpi_file_parent_dir" != "$ocpi_cdk_dir" ]; then
+  cat <<-EOF >&2
+	Error: Setup script should only be run (sourced) in cdk folder 
+  ex: source cdk/opencpi-setup.sh -s
+	EOF
+  return 1
+fi
 
 ocpi_dynamic= ocpi_optimized= ocpi_reset= ocpi_verbose= ocpi_clean= ocpi_list= ocpi_ensure=
 ocpi_options=($*)
