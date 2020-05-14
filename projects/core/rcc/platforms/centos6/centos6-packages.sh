@@ -46,8 +46,6 @@ PKGS_R+=(util-linux coreutils ed findutils initscripts)
 PKGS_R+=(libusb-devel)
 #    for bitstream manipulation at least
 PKGS_R+=(unzip)
-#    CentOS7 has "python" in this group of packages.
-#    CentOS6 has it below in the development group.
 
 ##########################################################################################
 # D. yum-installed and rpm-required for devel (when users are doing their development).
@@ -59,10 +57,10 @@ PKGS_D+=(which wget)
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
 PKGS_D+=(time)
-#    for various project testing scripts - to allow users to use python2 - (we migrate to 3)
-#    -- (AV-1261, AV-1299): still python 2 or just for users?
-#    -- note that we also need python3 but that is from epel - below in $#4
-PKGS_D+=(python python-matplotlib scipy numpy python-pip)
+#    although no longer needed for testing scripts, the next two
+#    packages are required for SCons installation and the "gpsd"
+#    build (both require python2)
+PKGS_D+=(python python-pip)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_D+=(fakeroot)
 #    enable other packages in the epel repo, some required for devel (e.g. python34)
@@ -99,8 +97,6 @@ PKGS_S+=(patch)
 PKGS_S+=(kernel-devel)
 #    for "make rpm":
 PKGS_S+=(rpm-build)
-#    for creating swig
-PKGS_S+=(swig python-devel)
 #    for general configuration/installation flexibility
 PKGS_S+=(nfs-utils nfs-utils-lib)
 #    for the inode64 prerequisite build (from source)
@@ -122,7 +118,6 @@ PKGS_S+=(blas-devel lapack-devel atlas-devel)
 # CentOS 6 repo (which is pretty much everything, unfortunately).
 python3_ver=python34
 #    for ocpidev
-#    swig is supposed to support python3, so adding ${python3_ver}-devel here
 PKGS_E+=(${python3_ver} ${python3_ver}-devel ${python3_ver}-jinja2)
 #    for various testing scripts
 PKGS_E+=(${python3_ver}-numpy ${python3_ver}-numpy-f2py ${python3_ver}-pip)
@@ -136,8 +131,7 @@ PKGS_E+=(bash-completion=/etc/profile.d/bash_completion.sh)
 #    after installing python3-pip (see PKGS_E).  "pip3" will select the latest
 #    version of a given package unless otherwise specified: this is important
 #    because many current python3 packages require python3 >= 3.5 and we are
-#    stuck with 3.4 on CentOS 6.  For now, assume the justification for a package
-#    in this category is the same as for its python2 counterpart as given above.
+#    stuck with 3.4 on CentOS 6.  These packages are needed for testing scripts.
 PKGS_P+=('kiwisolver==1.0.1' 'scipy==1.2.2' 'matplotlib==2.2.5')
 
 # SEE BELOW: "scons" installation is a mess on this platform.  The first
@@ -145,8 +139,8 @@ PKGS_P+=('kiwisolver==1.0.1' 'scipy==1.2.2' 'matplotlib==2.2.5')
 # python2 >= 2.7 and python3 >= 3.5, so we cannot get there from here
 # without upgrading the entire python ecosystem, and that will NOT be
 # happening.  The "python2" version of "pip" botches the installation
-# of "scons==2.5.1", which is required because of bugs in the earlier
-# versions.
+# of "scons==2.5.1" (required because of bugs in the earlier versions)
+# unless invoked with "--egg".
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {
