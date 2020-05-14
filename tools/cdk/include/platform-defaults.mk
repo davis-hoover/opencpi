@@ -89,8 +89,8 @@ OcpiAllPlatformVars:=\
   OcpiPlatformPrerequisites OcpiPluginFlags \
   OcpiRccCXXFlags  OcpiRccLDFlags \
   OcpiRequiredCFlags OcpiRequiredCPPFlags OcpiRequiredCXXFlags OcpiRpathOrigin \
-  OcpiStaticLibraryFlags OcpiStaticLibrarySuffix OcpiStaticProgramFlags OcpiStaticSwigFlags \
-  OcpiStrictCFlags OcpiStrictCXXFlags OcpiSTRIP OcpiSWIG \
+  OcpiStaticLibraryFlags OcpiStaticLibrarySuffix OcpiStaticProgramFlags \
+  OcpiStaticSwigFlags OcpiStrictCFlags OcpiStrictCXXFlags OcpiSTRIP OcpiSWIG \
   OcpiUnknownWarningsError
 
 # The list of variables containing optional warnings needed early (for autoreconf).
