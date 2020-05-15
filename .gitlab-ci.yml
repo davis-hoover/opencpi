@@ -8,6 +8,7 @@
 
 # Define the stages of the pipeline.
 stages:
+  - .pre
   - prereq
   - build
   - build-rcc
@@ -19,21 +20,6 @@ stages:
   - test
   - deploy
 
-# Global before and after scripts to run after each job. Overwrite in a specific
-# job to prevent these from occurring.
-default:
-  before_script:
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
-    - sleep 5
-    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
-    - cat timestamp.txt
-    - ls -lh
-  after_script:
-    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
-    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
-  timeout: 24h
 
 # Includes yaml files in the '.gitlab-ci' directory.
 # Folder structure for the directory is as follows:
@@ -67,4 +53,52 @@ include:
 
   # downstream projects
   - /.gitlab-ci/e3xx.yml
+
+
+# Global before and after scripts to run after each job. Overwrite in a specific
+# job to prevent these from occurring.
+default:
+  before_script:
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - sleep 5
+    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - cat timestamp.txt
+    - ls -lh
+  after_script:
+    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
+    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
+  timeout: 24h
+
+
+# Job that runs in .pre stage to verify if a commit is made to a branch with an existing MR.
+# If an MR exist for the branch, do not run a pipeline for the commit.
+# This is to prevent both an MR pipeline and a commit pipeline from being kicked off.
+cancel-pipeline:
+  stage: .pre
+  extends:
+    - .centos7
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+      when: never
+    - when: on_success
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  script:
+    - MR="[]"
+    - >
+      MR=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests?source_branch=${CI_COMMIT_REF_NAME}&state=opened") || true
+    - >
+      if [ "$MR" != "[]" ]; then
+        echo "A merge request exists for this branch; canceling pipeline."
+        curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
+      else
+        echo "No merge request found for this branch; proceeding with pipeline."
+      fi;
+  after_script: []
+  artifacts:
+    paths: []
+
 

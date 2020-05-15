@@ -240,7 +240,7 @@
     - .standard-artifacts
     - .build-platforms
   stage: build-platforms
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/platform --hdl-platform $PLATFORM
 
