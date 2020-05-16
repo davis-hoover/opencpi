@@ -28,10 +28,5 @@ PackagePrefix=ocpi
 
 ProjectDependencies=ocpi.assets
 
-# These assignments support building from any directory.
-ComponentLibraries+=components misc_comps util_comps dsp_comps comms_comps base_comps devices cards
-# Note: the 'components' library is listed above to ensure the local library is checked before the
-# libraries outside of the project. This distinction is important because specs/workers in this 
-# project have the same names as specs/workers in the assets project. 
 #example remote system: note there can be multiple remote systems, colon-separated.
 #export OCPI_REMOTE_TEST_SYSTEMS:=10.0.1.16=root=root=/mnt/net/workspace/git/ocpi.assets

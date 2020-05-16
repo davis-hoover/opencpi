@@ -266,10 +266,10 @@ $(call OcpiDbgVar,HdlTargets)
 #          $(and $(filter $(notdir $o),$(notdir $c)),
 #            $(error The component libraries "$(c)" and "$(o)" have the same base name, which is not allowed)))))
 
-define HdlSearchComponentLibraries
-
-  override XmlIncludeDirsInternal := $(call Unique,$(XmlIncludeDirsInternal) $(call HdlXmlComponentLibraries))
-endef
+# define HdlSearchComponentLibraries
+#   $(info HdlSearchComponentLibraries NOT NEEDED?)
+#  override XmlIncludeDirsInternal := $(call Unique,$(XmlIncludeDirsInternal) $(call HdlXmlComponentLibraries))
+#endef
 HdlRmRv=$(if $(filter %_rv,$1),$(patsubst %_rv,%,$1),$1)
 
 # Grep a file and collect all non-comment lines into a space-separated list
@@ -476,7 +476,7 @@ HdlRecordLibraries=\
   (\
    echo '\#' This generated file records libraries necessary to build this $(LibName) $(HdlMode); \
    $(foreach l,$(HdlLibrariesInternal),\
-     echo $(if $(filter /%,$l),$(notdir $l),$(call OcpiPathToAssetOutsideProject,.,$l));) \
+     echo $(if $(findstring /,$l),$(notdir $l),$(call OcpiPathToAssetOutsideProject,.,$l));) \
   ) > $(patsubst %/,%,$(call HdlRmRv,$1)).libs;)\
 
 # Extract the list of libraries required by an asset/library $2 for target $1
@@ -620,6 +620,7 @@ define HdlPrepareAssembly
                     Platform=$(Platform) \
                     PlatformDir=$(PlatformDir) \
                     Assembly=$(Assembly) \
+	            ComponentLibrariesInternal="$$(call Unique,$$(ComponentLibraries) $$(ComponentLibrariesInternal))" \
                     XmlIncludeDirsInternal="$$(XmlIncludeDirsInternal)" \
                     AssyWorkersFile=$$(AssyWorkersFile) \
                     Worker=$$(Worker) Worker_xml=$$(Worker_xml) \

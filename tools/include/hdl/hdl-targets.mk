@@ -160,15 +160,6 @@ HdlChoosePart=$(strip \
 HdlAllPlatforms:=
 HdlBuiltPlatforms:=
 
-# exports/lib/platforms is going away
-override OCPI_HDL_PLATFORM_PATH:=$(subst $(Space),:,$(call Unique,\
-  $(subst :, ,$(OCPI_HDL_PLATFORM_PATH)) \
-  $(foreach p,$(OcpiGetExtendedProjectPath),\
-    $(or $(call OcpiExists,$p/exports/hdl/platforms),$(strip\
-         $(call OcpiExists,$p/exports/lib/platforms)),$(strip\
-         $(call OcpiExists,$p/hdl/platforms))))))
-export OCPI_HDL_PLATFORM_PATH
-$(call OcpiDbgVar,OCPI_HDL_PLATFORM_PATH)
 ################################################################################
 # These functions are here because this file is leaf and used when callers
 # only want to know the facts about targets, without pulling in any other
@@ -210,8 +201,7 @@ HdlAddPlatform=\
         platforms for assistance))))
 
 # Call this with a directory that is a platform's directory, either source (with "lib" subdir
-
-# if built) or exported. For the individual platform directories we need to deal with
+# if built) or project-exported. For the individual platform directories we need to deal with
 # the prebuilt, postbuilt, and exported scenarios.  Hence the complexity.
 # Both the *.xml and *.mk are generally needed, but the *.mk is more critical here,
 # so we key on that.
@@ -221,7 +211,7 @@ HdlAddPlatform=\
 HdlDoPlatform=\
   $(foreach p,$(notdir $1),\
     $(foreach d,$(if $(wildcard $1/lib/$p.mk),$1/lib,$1),\
-      $(if $(filter clean%,$(MAKECMDGOALS))$(call OcpiExists,$d/hdl/$p.mk)$(call OcpiExists,$d/$p.mk),,$(error no $p.mk file found for platform under: $1))\
+      $(if $(filter clean%,$(MAKECMDGOALS))$(call OcpiExists,$d/$p.mk),,$(error no $p.mk file found for platform under: $1))\
       $(if $(wildcard $d/$p.mk),,$(error no $p.mk file found under $1. $p not built?))\
       $(call HdlAddPlatform,$d,$p,$d)))
 
@@ -234,7 +224,7 @@ HdlDoPlatformsDir=\
     \
     $(foreach d,$(wildcard $1/*),\
       $(foreach p,$(notdir $d),\
-        $(if $(wildcard $d/$p.mk)$(wildcard $d/lib/hdl/$p.mk)$(wildcard $d/hdl/$p.mk),\
+        $(if $(wildcard $d/$p.mk)$(wildcard $d/lib/$p.mk),\
           $(call HdlDoPlatform,$d)))))
 
 ################################################################################
@@ -285,11 +275,16 @@ HdlAllTargets:=$(call Unique,$(HdlAllFamilies) $(HdlTopTargets))
 export OCPI_ALL_HDL_TARGETS:=$(HdlAllTargets)
 
 $(call OcpiDbgVar,HdlAllPlatforms)
-$(call OcpiDbgVar,OCPI_HDL_PLATFORM_PATH)
+# This is dirs where platforms might be found
+OcpiHdlPlatformPaths=$(call Unique,\
+  $(foreach p,$(OCPI_PROJECT_REL_DIR),\
+    $(call OcpiExists,$p/hdl/platforms))\
+  $(foreach p,$(OcpiGetExtendedProjectPath),\
+    $(or $(call OcpiExists,$p/exports/hdl/platforms),$(strip\
+         $(call OcpiExists,$p/hdl/platforms)))))
+$(call OcpiDbgVar,OcpiHdlPlatformPaths)
 # The warning below would apply, e.g. if a new project has been registered.
-$(foreach d,$(subst :, ,$(OCPI_HDL_PLATFORM_PATH)),\
-  $(if $(wildcard $d),,$(if $(filter clean%,$(MAKECMDGOALS)),,\
-    $(warning "$d" does not exist, so no hardware platform(s) can be imported from it)))\
+$(foreach d,$(OcpiHdlPlatformPaths),\
   $(if $(filter platforms,$(notdir $d)),\
     $(call HdlDoPlatformsDir,$d),\
     $(call HdlDoPlatform,$d)))

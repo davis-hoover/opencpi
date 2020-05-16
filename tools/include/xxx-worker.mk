@@ -54,8 +54,9 @@ generate: skeleton
 # This ensures that the workers file will be correct even if the worker is never built for a particular
 # target.
 skeleton:  $(ImplHeaderFiles) $(SkelFiles)
+	$(AT):
 	$(AT)$(and $(filter $(call OcpiGetDirType,$(DirContainingLib)),library),\
-	    make -C $(DirContainingLib) workersfile speclinks)
+	      make -r --no-print-directory -C $(DirContainingLib) workersfile speclinks)
 
 all: skeleton
 

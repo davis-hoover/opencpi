@@ -17,7 +17,7 @@ places - a list of framework source directories and their attributes, one per li
 
 Also, key files used when building the framework for various platforms:
 
-../tools/cdk/include/platform-defaults.mk
+../tools/include/platform-defaults.mk
        - the file that defines the default values for software platform definitions.
 (any-project)/rcc/platforms/<platform>/<platform>.mk
        - the file that defines a particular software platform

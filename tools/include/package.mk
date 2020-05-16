@@ -64,7 +64,7 @@ $$(foreach p,$$(shell [ -f $$(DirContainingLib)/Makefile ] && grep "^\s*Package\
 ###############################################################################
 # If ParentPackage is unset, assume the parent is the project
 ifeq ($$(ParentPackage),)
-  export ParentPackage:=$$(ProjectPackage)
+  export ParentPackage:=$$(OCPI_PROJECT_PACKAGE)
 endif
 
 # If the PackagePrefix is not set, set it to ParentPackage

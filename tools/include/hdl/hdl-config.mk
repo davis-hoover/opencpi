@@ -53,9 +53,9 @@ override XmlIncludeDirsInternal+=$(HdlPlatformDir_$(Platform)) $(HdlPlatformDir_
 # In both cases we start with the platform directory itself acting as a component library, where
 # the platform is built.
 ifdef ComponentLibrariesInternal
-  ComponentLibraries=$(HdlPlatformDir_$(Platform)) $(ComponentLibrariesInternal)
+  ComponentLibraries=$(HdlPlatformDir_$(Platform):%/lib=%) $(ComponentLibrariesInternal)
 else
-  ComponentLibraries=$(HdlPlatformDir_$(Platform)) \
+  ComponentLibraries=$(HdlPlatformDir_$(Platform):%/lib=%) \
    $(wildcard $(HdlPlatformDir_$(Platform))/devices) \
    $(and $(ComponentLibraries_$(Platform)),\
      $(join $(HdlPlatformDir_$(Platform)),$(ComponentLibraries_$(Platform))))\

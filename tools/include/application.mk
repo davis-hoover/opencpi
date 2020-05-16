@@ -22,6 +22,7 @@
 
 include $(OCPI_CDK_DIR)/include/util.mk
 
+ifeq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
 $(OcpiIncludeProject)
 # If library path is unset, provide a default
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
@@ -78,3 +79,4 @@ endif
 
 clean::
 	$(AT)rm -r -f *~ timeData.raw
+endif # avoid speclinks and workersfile
