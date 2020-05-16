@@ -20,8 +20,9 @@
 include $(OCPI_CDK_DIR)/include/util.mk
 # Plain workers do not have their own package-id file
 # They inherit the containing library's package-id
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(call OcpiIncludeAssetAndParent,..)
-
+endif
 ifndef Model
   $(error This directory named $(CwdName) does not end in any of: $(Models))
 endif
@@ -59,7 +60,7 @@ else
 $(foreach w,$(Workers),\
      $(if $(wildcard $(Worker_$w_xml)),,\
 	 $(and \
-            $(info Creating a default OWD in $(Worker_$w_xml) since it doesn't exist.)\
+            $(info Creating a default OWD in $(Worker_$w_xml) since it does not exist.)\
             $(shell echo "$(call OcpiDefaultOWD,$w,$(Model))" > $(Worker_$w_xml)),\
           )))
 endif

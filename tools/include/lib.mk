@@ -29,8 +29,9 @@ $(if $(wildcard $(OCPI_CDK_DIR)),,$(error OCPI_CDK_DIR environment variable not 
 include $(OCPI_CDK_DIR)/include/util.mk
 # Include library settings for this library, which are available here and for workers
 # Thus library settings can depend on project settings
+ifeq ($(filter speclinks workersfile clean%,$(MAKECMDGOALS)),)
 $(OcpiIncludeAssetAndParent)
-
+endif
 ifneq ($(origin Workers),undefined)
   ifneq ($(origin Implementations),undefined)
     $(error You cannot set both Workers and Implementations variables.)
@@ -39,7 +40,25 @@ ifneq ($(origin Workers),undefined)
   endif
 endif
 unexport Workers
-
+ifeq ($(origin Implementations),undefined)
+Implementations=$(filter-out $(ExcludeWorkers),$(foreach m,$(Models),$(wildcard *.$m)))
+endif
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+$(shell mkdir -p lib; \
+        workers_content="$(filter-out %.test, $(Implementations))"; \
+        if [[ ! -e $(LibDir)/workers || "$$workers_content" != "$$(cat lib/workers)" ]]; then \
+          echo $$workers_content > lib/workers; \
+        fi)
+endif
+ifneq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
+# We define this empty make rule so that workers can generate the "workers" file
+# by calling "make workersfile -C ../". Doing so will trigger the code block above
+# which is executed for all make rules except clean%
+workersfile:
+	$(AT): # nothing - just suppress message
+speclinks:
+	$(AT)mkdir -p $(OutDir)lib;$(foreach f,$(wildcard specs/*.xml),$(call MakeSymLink,$f,lib);)
+else
 HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 $(eval $(HdlPreprocessTargets))
@@ -51,21 +70,6 @@ endif
 ifndef LibName
 LibName=$(CwdName)
 endif
-ifeq ($(origin Implementations),undefined)
-Implementations=$(filter-out $(ExcludeWorkers),$(foreach m,$(Models),$(wildcard *.$m)))
-endif
-ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-$(shell mkdir -p lib; \
-        workers_content="$(filter-out %.test, $(Implementations))"; \
-        if [[ ! -e $(LibDir)/workers || "$$workers_content" != "$$(cat lib/workers)" ]]; then \
-          echo $$workers_content > lib/workers; \
-        fi)
-endif
-# We define this empty make rule so that workers can generate the "workers" file
-# by calling "make workersfile -C ../". Doing so will trigger the code block above
-# which is executed for all make rules except clean%
-workersfile:
-	$(AT): # nothing - just suppress message
 # we need to factor the model-specifics our of here...
 XmImplementations=$(filter %.xm,$(Implementations))
 RccImplementations=$(filter %.rcc,$(Implementations))
@@ -176,6 +180,7 @@ BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker
 	       LibDir=$(call AdjustRelative,$(LibDir)/$(1)) \
 	       GenDir=$(call AdjustRelative,$(GenDir)/$(1)) \
 	       $(PassOutDir) \
+	       $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
 	       ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
 	       $(call Capitalize,$1)LibrariesInternal="$(call OcpiAdjustLibraries,$($(call Capitalize,$1)Libraries))" \
 	       $(call Capitalize,$1)IncludeDirsInternal="$(call AdjustRelative,$($(call Capitalize,$1)IncludeDirs))" \
@@ -214,8 +219,7 @@ workers: $(build_targets)
 $(OutDir)lib:
 	$(AT)mkdir $@
 speclinks: | $(OutDir)lib
-	$(AT): # do nothing to avoid warning
-	$(AT)$(foreach f,$(wildcard specs/*.xml),$(call MakeSymLink,$(f),$(OutDir)lib);)
+	$(AT)$(call OcpiSpecLinks,.,$(OutDir)lib)
 
 $(Models:%=$(OutDir)lib/%): | $(OutDir)lib
 	$(AT)mkdir $@
@@ -431,3 +435,4 @@ cleanall:
 	$(AT)find . -depth -name gen -exec rm -r -f "{}" ";"
 	$(AT)find . -depth -name "target-*" -exec rm -r -f "{}" ";"
 	$(AT)rm -r -f lib
+endif # else of workersfile

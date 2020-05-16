@@ -1276,6 +1276,8 @@ ${specelems[$w]}
 ${supportselem[@]}
 </$elem>
 EOF
+    # The following check cannot be done since we are not looking at the right place for the file.
+    if false; then
     specfile=${specs[$w]}
     case "$specfile" in
       (*.xml) ;;
@@ -1290,6 +1292,7 @@ EOF
         fi
     esac
     [ -n "$verbose" -a "${specs[$w]}" != none -a ! -e "$specfile" ] && echo Warning:  spec file \"$specfile\" does not exist
+    fi
   done
   [ -z "$verbose" ] || echo Running \"make skeleton\" to make initial skeleton for worker $1
   # FIXME: how do we get the project's or library's xmlincludepath etc.

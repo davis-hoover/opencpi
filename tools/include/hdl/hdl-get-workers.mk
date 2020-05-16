@@ -16,4 +16,17 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#Libraries+=misc_prims util_prims dsp_prims comms_prims
+# This is a top level makefile used when an HDL assembly is being built.
+# It is executed by a local sub-make in the same directory to create a workers file in the
+# gen subdirectory.  It generates the output that is used by the parent
+# Makefile to establish dependencies of assemblies on their constituent workers.
+include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
+all: $(AssyWorkersFile)
+-include $(AssyWorkersFile).deps
+$(AssyWorkersFile): $(Worker_xml) | $(GeneratedDir)
+	$(call OcpiGen, -D $(GeneratedDir)\
+                        $(and $(Platform),-P $(Platform)) $(and $(Assembly),-S $(Assembly))\
+			$(and $(PlatformDir),-F $(PlatformDir)) \
+                        -W $(Worker) $<)
+
+

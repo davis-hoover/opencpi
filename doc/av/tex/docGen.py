@@ -38,7 +38,7 @@ except ImportError:
           file=sys.stderr)
     sys.exit(1)
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../../../tools/cdk/python/')
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../../../tools/python/')
 import _opencpi.util  as ocpi
 # Set OCPI_LOG_LEVEL to a desired number to see warnings or debug statements
 

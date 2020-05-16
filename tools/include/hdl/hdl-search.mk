@@ -98,18 +98,18 @@ __HDL_SEARCH_MK__=x
 # These locations are useful for locating HDL cores/workers
 HdlTargetComponentLibraries=$(infox HTCL:$1:$(OcpiComponentLibraries):$(ComponentLibraries):$2)\
   $(or $(strip $(foreach f,$(call HdlGetFamily,$1),\
-                  $(foreach d,$(OcpiComponentLibraries),$(infox HTCL1:$d:$f)\
+                  $(foreach d,$(call OcpiComponentLibraries),$(infox HTCL1:$d:$f)\
                      $(call HdlExists,$d/hdl/$f)))),\
       $(error No component libraries were found for target $1.  Perhaps not built yet?))
 
 # Return the list of XML search directories for component libraries
 # This also includes any top level specs directories in the project path,
 # since the search order must be project oriented.
-HdlXmlComponentLibraries=$(infox HXC)\
-  $(eval HdlTempDirs:= $(strip \
-    $(foreach c,$(OcpiComponentLibraries),$c $c/hdl)) $(OCPI_CDK_DIR)/specs) \
-  $(infox HdlXmlComponentLibraries returned: $(HdlTempDirs))\
-  $(HdlTempDirs)
+# HdlXmlComponentLibraries=$(infox HXC)\
+#   $(eval HdlTempDirs:= $(strip \
+#     $(foreach c,$(OcpiComponentLibraries),$c $c/hdl))) \
+#   $(infox HdlXmlComponentLibraries returned: $(HdlTempDirs))\
+#   $(HdlTempDirs)
 
 ################################################################################
 # Primitive Library searching (actually primitive library and/or core searching)

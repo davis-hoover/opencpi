@@ -95,7 +95,7 @@ namespace OCPI {
 	  // Take out of reset
 	  // myRegisters->control = OCCP_CONTROL_ENABLE | logTimeout ;
 	  set32Register(control,  OccpWorkerRegisters, OCCP_WORKER_CONTROL_ENABLE | logTimeout);
-	  ocpiInfo("HDL Controp Op Asserted/Deasserted reset on worker %s.%s", m_implName, m_instName);
+	  ocpiInfo("HDL Control Op Asserted/Deasserted reset on worker %s.%s", m_implName, m_instName);
 	}
 #if 0 // do this by changing the accessor
 	if (getenv("OCPI_OCFRP_DUMMY")) {

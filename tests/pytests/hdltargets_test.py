@@ -31,8 +31,8 @@ Run from this directory as follows:
 To view the code coverage report:
     $ coverage3 report
 To view the line-by-line code coverage report:
-    $ coverage3 annotate ../../tools/cdk/scripts/hdltargets.py
-    $ vim ../../tools/cdk/scripts/hdltargets.py,cover
+    $ coverage3 annotate ../../tools/scripts/hdltargets.py
+    $ vim ../../tools/scripts/hdltargets.py,cover
 """
 import unittest
 import os
