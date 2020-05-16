@@ -79,6 +79,7 @@ cancel-pipeline:
   stage: .pre
   extends:
     - .centos7
+    - .docker
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: never
@@ -88,14 +89,18 @@ cancel-pipeline:
   before_script: []
   script:
     - MR="[]"
-    - >
-      MR=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests?source_branch=${CI_COMMIT_REF_NAME}&state=opened") || true
+    - MR=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests?source_branch=${CI_COMMIT_REF_NAME}&state=opened") || true
+    - DEV=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/commits/develop")
+    - DEV_SHA=$(echo "$DEV" | sed -e 's/.*"sha":"\([^"]*\).*/\1/g')
     - >
       if [ "$MR" != "[]" ]; then
         echo "A merge request exists for this branch; canceling pipeline."
         curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
+      elif [ "$DEV_SHA" == "$CI_COMMIT_SHA" ]; then
+        echo "Last commit is identical to last commit in develop; canceling pipeline."
+        curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
       else
-        echo "No merge request found for this branch; proceeding with pipeline."
+        echo "Pipeline is ok to proceed."
       fi;
   after_script: []
   artifacts:
