@@ -29,7 +29,6 @@ stages:
 include:
   # .gitlab-ci
   - /.gitlab-ci/templates.yml
-  - /.gitlab-ci/docs.yml
   - /.gitlab-ci/centos6.yml
   - /.gitlab-ci/centos7.yml
 
@@ -52,6 +51,7 @@ include:
   - /.gitlab-ci/centos7/modelsim.yml
 
   # downstream projects
+  - /.gitlab-ci/docs.yml
   - /.gitlab-ci/e3xx.yml
 
 
@@ -81,7 +81,7 @@ cancel-pipeline:
     - .centos7
     - .docker
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == 'develop'"
       when: never
     - when: on_success
   variables:
