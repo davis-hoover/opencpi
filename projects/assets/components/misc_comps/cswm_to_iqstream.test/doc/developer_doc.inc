@@ -14,7 +14,7 @@
   \hline
   Name              & \comp \\
   \hline
-  Latest Version    &  \docVersion (release date TBD) \\
+  Latest Version    &  \docVersion, May 28, 2020 \\
   \hline
   Worker Type       & Application \\
   \hline
@@ -22,7 +22,7 @@
   \hline
   Workers           & \comp.hdl \\
   \hline
-  Tested Platforms  & xsim \\
+  Tested Platforms  & xsim, CentOS 7 \\
   \hline
 \end{longtable}
 
@@ -37,7 +37,7 @@
     \rowcolor{blue}
     \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
       \hline
-      v1.7 & Initial release & \\
+      v1.7 & Initial release & 5/28/2020 \\
       \hline
     \end{longtable}
   \end{table}
@@ -102,3 +102,5 @@ This component receives \verb+ComplexShortWithMetadata+ protocol messages from t
 \section*{Test and Verification}
 The Unit Under Test (UUT) is tested by a) generating a file containing protocol-formatted messages which are sent to the UUT via the \verb+file_read+ component, b) using the \verb+file_write+ component to save the file containing the UUT's output as protocol-formatted message, and c) verifying the contents of the output file. The generated file contains one or more \verb+ComplexShortWithMetadata+ \verb+samples+ messages following followed by a message for each of the non-\verb+samples+ opcodes. The sequence of \verb+samples+ messages include samples whose I and Q signals are positive and negative ramp functions, respectively. The output file is verified by confirming that a) the same number of samples exists in the input and output files, and b) the output file contains the same ramp functions as the input.
 
+\section*{Block Diagram}
+\input{bd.inc}
