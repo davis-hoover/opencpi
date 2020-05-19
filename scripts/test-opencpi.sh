@@ -110,6 +110,7 @@ if [ -n "$no_hdl" ]; then
   export HdlPlatform=
   export HdlPlatforms=
   export HDL_PLATFORM=
+  export OCPI_ENABLE_HDL_DISCOVERY=0
 fi
 
 bin=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/bin

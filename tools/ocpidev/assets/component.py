@@ -77,11 +77,11 @@ class ShowableComponent(ShowableAsset):
             ocpigen_cmd.append("-I")
             ocpigen_cmd.append(inc_dir)
 
-        ocpigen_cmd.append(xml_file)
+        ocpigen_cmd.append(os.path.basename(xml_file))
         ocpiutil.logging.debug("running ocpigen cmd: " + str(ocpigen_cmd))
         old_log_level = os.environ.get("OCPI_LOG_LEVEL", "0")
         os.environ["OCPI_LOG_LEVEL"] = "0"
-        comp_xml = subprocess.Popen(ocpigen_cmd, stdout=subprocess.PIPE).communicate()[0]
+        comp_xml = subprocess.Popen(ocpigen_cmd, stdout=subprocess.PIPE,cwd=self.directory).communicate()[0]
         os.environ["OCPI_LOG_LEVEL"] = old_log_level
 
         #put xml output file into an ElementTree object

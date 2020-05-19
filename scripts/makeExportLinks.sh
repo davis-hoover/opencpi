@@ -413,7 +413,7 @@ done
 # Since this might enable tools, we do it early, even when we are not creating links for a target
 # Note that this is analogous to the runtime system config file system.xml
 userenv=user-env.sh
-defaultuserenv=tools/cdk/scripts/default-user-env.sh
+defaultuserenv=tools/scripts/default-user-env.sh
 if [ -r $userenv ] && grep -q '^ *export' $userenv; then
   [ -n "$verbose" ] &&
       echo Preserving user environment script \"$userenv\" since it has user-specified exports in it.

@@ -71,27 +71,22 @@ else
   make driver
 fi
 
+Projects="core platform assets inactive"
 # Build built-in RCC components
 echo ================================================================================
 echo "Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_PLATFORM"
-make -C projects/core rcc
-make -C projects/assets rcc
-make -C projects/inactive rcc
+for p in $Projects; do make -C projects/$p rcc; done
 
 # Build built-in OCL components
 echo ================================================================================
 echo "Now we will build the built-in OCL '(GPU)' components for the available OCL platforms"
-make -C projects/core ocl
-make -C projects/assets ocl
-make -C projects/inactive ocl
+for p in $Projects; do make -C projects/$p ocl; done
 
 # Build built-in HDL components
 [ -n "$HdlPlatforms" -o -n "$HdlPlatform" ] && {
   echo ================================================================================
   echo "Since HdlPlatform(s) are specified, we will build the built-in HDL components for: $HdlPlatform $HdlPlatforms"
-  make -C projects/core hdl
-  make -C projects/assets hdl
-  make -C projects/inactive hdl
+  for p in $Projects; do make -C projects/$p hdl; done
 }
 
 # Build tests

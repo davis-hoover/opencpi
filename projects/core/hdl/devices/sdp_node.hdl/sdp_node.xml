@@ -1,4 +1,4 @@
-<HdlDevice language='vhdl' Libraries='sdp platform axi'>
+<HdlDevice language='vhdl' Libraries='sdp platform'>
   <ComponentSpec name='sdp_node' nocontrol='true'/>
   <property name='sdp_width' parameter='true' type='uchar' default='1'/>
   <sdp name="up"/>

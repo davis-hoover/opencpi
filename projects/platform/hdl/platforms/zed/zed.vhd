@@ -48,7 +48,7 @@ begin
   -- Drive timekeepping interface - depends on which clock, and whether there is a PPS input
   timebase_out.clk     <= clk;
   timebase_out.reset   <= reset;
-  timebase_out.ppsIn   <= '0';
+  timebase_out.pps     <= '0';
   -- Use a global clock buffer for this clock used for both control and data
   clkbuf   : BUFG   port map(I => fclk(0),
                              O => clk);

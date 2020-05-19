@@ -30,15 +30,6 @@ include $(OCPI_CDK_DIR)/include/util.mk
 $(OcpiIncludeAssetAndParent)
 
 HdlLibraries+=platform
-# Force the platform path to point to this directory.
-# This means we can build this platform without it being
-# defined globally anywhere, whether in OCPI_HDL_PLATFORM_PATH
-# or in the core hdl/platforms dir.
-# Note "export" must appear BEFORE override because once
-# "override" is used, "export" doesn't apply.
-export OCPI_HDL_PLATFORM_PATH
-override OCPI_HDL_PLATFORM_PATH := $(call OcpiAbsDir,.)$(and $(OCPI_HDL_PLATFORM_PATH),:$(OCPI_HDL_PLATFORM_PATH))
-$(call OcpiDbgVar,OCPI_HDL_PLATFORM_PATH)
 # If no platforms were specified, we obviously want to build this platform.
 # And not default to some global "default" one.
 ifeq ($(origin HdlPlatform),undefined)
@@ -86,7 +77,6 @@ ifneq ($(MAKECMDGOALS),clean)
     $(and $(shell \
        RET=; \
        echo ======= Entering the \"devices\" library for the \"$(Worker)\" platform. 1>&2; \
-       export OCPI_HDL_PLATFORM_PATH=$(CURDIR):$$OCPI_HDL_PLATFORM_PATH; \
        $(MAKE) -C devices --no-print-directory \
          ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
          XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))" \
@@ -106,6 +96,8 @@ endif
 ifeq ($(filter $(Worker),$(HdlPlatforms))$(filter clean,$(MAKECMDGOALS)),)
   HdlSkip := 1
   $(info Skipping this platform ($(Worker)).  It is not in HdlPlatforms ($(HdlPlatforms)))
+else ifneq ($(filter clean%,$(MAKECMDGOALS)),)
+  HdlSkip:=1
 else
   $(call OcpiDbgVar,HdlExactPart)
   $(call OcpiDbgVar,HdlPlatform)
@@ -121,9 +113,6 @@ else
   OnlyTargets:=$(call HdlGetFamily,$(Worker))
   override HdlPlatform:=$(Worker)
   include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
-  ifneq ($(filter clean,$(MAKECMDGOALS)),)
-    HdlSkip:=1
-  endif
 endif
 # the target preprocessing may tell us there is nothing to do
 # some platforms may have been used for the devices subdir (tests, sims, .etc.)

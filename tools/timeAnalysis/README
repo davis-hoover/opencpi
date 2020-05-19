@@ -15,7 +15,7 @@ The --smart argument performs additional formatting on the data to make it more 
 
 3) Open the Workbook
 
-The workbook can be found at  $(OCPI_BASE_DIR)/tools/cdk/excel/timeDataAnalyzer.xlsm
+The workbook can be found at  $(OCPI_BASE_DIR)/tools/excel/timeDataAnalyzer.xlsm
 
 Open the workbook in Microsoft Excel 2010 ro later.  In Excel select TimeData sheet then select the Data tab from the selection ribbon. Now select "Refresh" from the Data toolbar.  A file selection dialog will appear, use this dialog to select the .csv file that you created in step #2.  This will update the data in the TimeData sheet to reflect your time data.
 
