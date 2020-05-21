@@ -40,6 +40,7 @@ include:
   - /.gitlab-ci/centos6/xilinx13_4.yml
   - /.gitlab-ci/centos6/matchstiq_z1.yml
   - /.gitlab-ci/centos6/modelsim.yml
+  - /.gitlab-ci/centos6/zed_ise.yml
 
   # centos7
   - /.gitlab-ci/centos7/xsim.yml
@@ -49,6 +50,7 @@ include:
   - /.gitlab-ci/centos7/xilinx13_4.yml
   - /.gitlab-ci/centos7/matchstiq_z1.yml
   - /.gitlab-ci/centos7/modelsim.yml
+  - /.gitlab-ci/centos7/zed_ise.yml
 
   # downstream projects
   - /.gitlab-ci/docs.yml

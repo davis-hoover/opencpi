@@ -106,7 +106,7 @@ build-devices-platform:centos6:zed:
     - .centos6
     - .zed-xilinx13_4
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:zed
@@ -205,7 +205,7 @@ build-platforms-platform:centos6:zed:
     - .build-platforms-platform
     - .centos6
     - .zed-xilinx13_4
-  needs: 
+  needs:
     - job: prereq:centos6
       artifacts: true
     - build:centos6
@@ -254,7 +254,7 @@ build-assemblies-platform:centos6:zed:
     - .centos6
     - .zed-xilinx13_4
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:zed
