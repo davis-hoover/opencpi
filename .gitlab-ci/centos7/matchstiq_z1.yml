@@ -106,7 +106,7 @@ build-devices-platform:centos7:matchstiq_z1:
     - .centos7
     - .matchstiq_z1-xilinx13_3
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
     - build-primitives:centos7:matchstiq_z1
@@ -205,7 +205,7 @@ build-platforms-platform:centos7:matchstiq_z1:
     - .build-platforms-platform
     - .centos7
     - .matchstiq_z1-xilinx13_3
-  needs: 
+  needs:
     - job: prereq:centos7
       artifacts: true
     - build:centos7
@@ -254,7 +254,7 @@ build-assemblies-platform:centos7:matchstiq_z1:
     - .centos7
     - .matchstiq_z1-xilinx13_3
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
     - build-primitives:centos7:matchstiq_z1

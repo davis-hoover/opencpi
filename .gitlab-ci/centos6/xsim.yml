@@ -107,7 +107,7 @@ build-devices-platform:centos6:xsim:
     - .build-devices-platform
     - .xsim-centos6
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:xsim
@@ -244,7 +244,7 @@ build-assemblies-platform:centos6:xsim:
     - .build-assemblies-platform
     - .xsim-centos6
   needs:
-    - job: prereq:centos6 
+    - job: prereq:centos6
       artifacts: true
     - build:centos6
     - build-primitives:centos6:xsim
