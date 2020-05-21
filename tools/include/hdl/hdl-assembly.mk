@@ -95,13 +95,18 @@ ifneq ($(MAKECMDGOALS),clean)
       HdlTarget_$$(ContName):=$$(call HdlGetFamily,$$(HdlPart_$2))
       HdlConfig_$$(ContName):=$3
       ifeq ($4,-)
+        # If the container does not mention a constraints file, get it from the pf config
         HdlConstraints_$$(ContName):=$$(strip\
           $$(foreach c,$$(call getConfigConstraints,$1,$2,$3),\
              $$(HdlPlatformDir_$2)/$$c))
       else
+        # If the container mentions a constraints file, it, may be local to the 
+        # container file (in the assembly dir), or under the platform directory
         HdlConstraints_$$(ContName):=$$(strip \
-          $$(foreach c,$4,\
-             $$(call AdjustRelative,$$c,$$(HdlPlatformDir_$2))))
+          $$(foreach c,$(call HdlGetConstraintsFile,$4),\
+	     $$(or $$(wildcard $$c),$$(strip\
+                   $$(and $$(filter-out /%,$c),$$(wildcard $$(HdlPlatformDir_$2)/$$c))),\
+                   $$(error Constraints file $$c not found for container $$(ContName)))))
       endif
       HdlContXml_$$(ContName):=$$(call HdlContOutDir,$$(ContName))/gen/$$(ContName).xml
       $$(shell mkdir -p $$(call HdlContOutDir,$$(ContName))/gen; \
@@ -213,7 +218,7 @@ else
 	  $(AT)mkdir -p $(call HdlContOutDir,$1)
 	  $(AT)$(MAKE) -C $(call HdlContOutDir,$1) -f $(OCPI_CDK_DIR)/include/hdl/hdl-container.mk \
                HdlAssembly=../../$(CwdName)  HdlConfig=$(HdlConfig_$1) \
-               HdlConstraints=$(HdlConstraints_$1) \
+               HdlConstraints=$(call AdjustRelative,$(HdlConstraints_$1)) \
                HdlPlatforms=$(HdlPlatform_$1) HdlPlatform=$(HdlPlatform_$1) \
 	       ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
 	       HdlLibrariesInternal="$(call OcpiAdjustLibraries,$(HdlMyLibraries))" \
