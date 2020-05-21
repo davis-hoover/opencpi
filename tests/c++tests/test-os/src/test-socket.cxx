@@ -43,7 +43,7 @@ namespace
     {
       uint16_t* portNoPtr = reinterpret_cast<uint16_t*> ( opaque );
       OCPI::OS::Socket cs;
-      cs.connect(OCPI::OS::getHostname(), *portNoPtr);
+      cs.connect( "localhost", *portNoPtr);
       cs.close();
     }
     catch ( const std::string& s )
@@ -63,7 +63,7 @@ namespace
   {
     uint16_t* portNoPtr = reinterpret_cast<uint16_t*> ( opaque );
     OCPI::OS::Socket cs;
-    cs.connect ( OCPI::OS::getHostname ( ), *portNoPtr );
+    cs.connect ( "localhost", *portNoPtr );
     cs.send ( "Hello World!", 13 );
     cs.close ( );
   }
@@ -73,7 +73,7 @@ namespace
     uint16_t* portNoPtr = reinterpret_cast<uint16_t*> ( opaque );
 
     OCPI::OS::Socket cs;
-    cs.connect ( OCPI::OS::getHostname ( ), *portNoPtr );
+    cs.connect ( "localhost", *portNoPtr );
     char buffer [ 1024] ;
     char* ptr = buffer;
     size_t count, total = 0;
@@ -128,7 +128,7 @@ namespace
 
   void test07Thread ( void* opaque )
   {
-    std::string myAddress = OCPI::OS::getIPAddress ( );
+    std::string myAddress = "127.0.0.1";
 
     const char* ap = myAddress.c_str ( );
 
