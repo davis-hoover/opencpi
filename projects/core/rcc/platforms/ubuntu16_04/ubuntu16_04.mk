@@ -26,14 +26,19 @@ OcpiPlatformOs=linux
 OcpiPlatformOsVersion=u16_04
 OcpiPlatformArch=x86_64
 #
-# Must set the following variable for the "opencpi.ko" module
-# build if we are running in a container, because there is no
-# "/lib/modules/`uname -r`/build" symlink in that environment.
+# "OcpiKernelDir" must be set if it is appropriate to build
+# the "opencpi.ko" driver module for this platform.
 #
-# TODO: figure out a way to set the variable conditionally if
-# there is an easy way to determine whether we are running in
-# a container.
+# There are less expensive ways to find a kernel headers directory if
+# the stars align properly, but the method below is guaranteed to find
+# one on "ubuntu16_04" if one exists.
 #
-# For debugging: $(info OcpiKernelDir is $(OcpiKernelDir))
-#
-OcpiKernelDir:=/usr/src/linux-headers-$(shell uname -r)
+OcpiKernelDir:=\
+$(strip $(foreach krel,$(shell uname -r),\
+ $(foreach ktype,$(shell echo $(krel) | cut -f3 -d'-'),\
+  $(foreach hver,$(or $(shell dpkg -l | grep 'linux-headers' | cut -f3 -d' ' | sort -t'-' -n -k 3,4 -k 4,5 | egrep '$(ktype)$$' | tail -1),NOPE),\
+   $(if $(filter NOPE,$(hver)),\
+    $(info Warning: no kernel headers for "$(ktype)" kernel installed),\
+    $(if $(filter linux-headers-$(krel),$(hver)),,$(info Warning: probable running kernel vs. installed kernel mismatch detected: the OpenCPI kernel driver will be built for kernel version $(subst linux-headers-,,$(hver)).  The detected mismatch usually means the kernel has been updated recently, but the system has not been rebooted since the update.  Please reboot your system if you have not already done so.))\
+    $(foreach kdir,/usr/src/$(hver),\
+     $(or $(wildcard $(kdir)),$(info Warning: no kernel headers directory found))))))))
