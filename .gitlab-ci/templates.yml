@@ -270,7 +270,7 @@
   extends:
     - .standard-artifacts
   stage: build-assemblies
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/platform/hdl/assemblies --hdl-platform $PLATFORM
 
@@ -323,11 +323,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/core--only-platform $PLATFORM --mode prep_run_verify;
-      fi
 
 .test-assets-base:
   stage: test
@@ -337,11 +336,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
 
 .test-assets-comms:
   stage: test
@@ -351,11 +349,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/comms_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
 
 .test-assets-dsp:
   stage: test
@@ -365,11 +362,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
 
 .test-assets-misc:
   stage: test
@@ -379,11 +375,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
 
 .test-assets-util:
   stage: test
@@ -393,11 +388,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/util_comps --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
-        ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/util_comps--only-platform $PLATFORM --mode prep_run_verify;
-      fi
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
+        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
 
 .test-assets_ts:
   stage: test
@@ -407,11 +401,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
-      fi
 
 .test-inactive:
   stage: test
@@ -421,11 +414,10 @@
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/inactive --$MODEL-platform $PLATFORM
     - >
-      if [[ -z $IP ]]; then
+      if [[ -z $IP ]]
+      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
+      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
-      else
-        OCPI_SERVER_ADDRESSES=$IP:$PORT ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
-      fi
 
 
 #############
@@ -523,6 +515,7 @@
     HW_PLATFORM: 'zed'
     SW_PLATFORM: 'xilinx13_3'
     IP: '10.0.0.103'
+    OCPI_SERVER_ADDRESSES: '10.0.0.103:1000'
     PORT: '1000'
     MODEL: 'hdl'
 
@@ -535,6 +528,7 @@
     SW_PLATFORM: 'xilinx13_4'
     IP: '10.0.0.103'
     PORT: '1000'
+    OCPI_SERVER_ADDRESSES: '10.0.0.103:1000'
     MODEL: 'hdl'
   rules:
     - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*all(\s[^\s\]]*)*\]/i
