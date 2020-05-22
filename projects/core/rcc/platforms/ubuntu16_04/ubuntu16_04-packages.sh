@@ -94,11 +94,8 @@ PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
 #    for building kernel drivers (separate from pre-packaged driver)
-#    N.B.: "linux-headers-`uname -r`" is probably the only required
-#    package, and normally gets installed with kernel upgrades, i.e.,
-#    it should already be present.
-#KVER=`uname -r | cut -f1 -d'-'`
-#PKGS_S+=(linux-source-$KVER)
+KVER=`uname -r`
+PKGS_S+=(linux-headers-$KVER)
 #    for "make rpm":
 #      does not necessarily make sense for debian-based
 #      distros, but will include for completeness

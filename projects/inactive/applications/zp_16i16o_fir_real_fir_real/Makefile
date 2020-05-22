@@ -23,8 +23,8 @@ $(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable 
 
 # build unit test input data
 all:
-	python3 scripts/gen_rrcos_taps.py 128 0.95 `echo "1/64000" | bc -l` 3200000 4096 idata/tx_rrcos_taps.dat
-	python3 scripts/gen_rrcos_taps.py 128 0.95 `echo "1/64000" | bc -l` 3200000 4096 idata/rx_rrcos_taps.dat
+	./scripts/gen_rrcos_taps.py 128 0.95 `echo "1/64000" | bc -l` 3200000 4096 idata/tx_rrcos_taps.dat
+	./scripts/gen_rrcos_taps.py 128 0.95 `echo "1/64000" | bc -l` 3200000 4096 idata/rx_rrcos_taps.dat
 
 clean::
 	rm -rf odata/* scripts/*.pyc
@@ -61,9 +61,9 @@ HDL: 'ocpirun -v -d app_zp_16i16o_fir_real_fir_real_baudtrack_filerw.xml'
 HDL: 'ocpirun -v -d app_zp_16i16o_fir_real_fir_real_baudtrack_digitizer_filerw.xml'
 ----------------------------------------------------------------------------
 Development Computer - verify output data
-'python3 ./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_fir_real_filerw.bin real 8192 1 &'
-'python3 ./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_fir_real_baudtrack_filerw.bin real 8192 1 &'
-'python3 ./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_fir_real_baudtrack_digitizer_filerw.bin real 4096 1 &'
+'./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_fir_real_filerw.bin real 8192 1 &'
+'./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_fir_real_baudtrack_filerw.bin real 8192 1 &'
+'./scripts/plotAndFft.py odata/out_app_zp_16i16o_fir_real_fir_real_baudtrack_digitizer_filerw.bin real 4096 1 &'
 ----------------------------------------------------------------------------
 endef
 export showhelp
