@@ -57,7 +57,7 @@ PKGS_D+=(which wget)
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
 PKGS_D+=(time)
-#    enable other packages in the epel repo, some required for devel (e.g. python34)
+#    enable the epel repo, which contains some packages required for devel (e.g. python36)
 PKGS_D+=(epel-release)
 #    for various 32-bit software tools we end up supporting (e.g. modelsim) in devel (AV-567)
 #    -- for rpm-required, we need a file-in-this-package too
