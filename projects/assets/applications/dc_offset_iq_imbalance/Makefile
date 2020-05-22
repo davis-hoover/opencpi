@@ -70,7 +70,7 @@ Zedboard/Zipper:
 ocpirun -v -d -t 1 app_zipper_dc_offset_iq_imbalance_filew.xml
 ----------------------------------------------------------------------------
 4) Verification of output data: (development system)
-python3 ./scripts/plotAndFft.py odata/output_file.bin complex 65536 1000000 &
+./scripts/plotAndFft.py odata/output_file.bin complex 65536 1000000 &
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 endef

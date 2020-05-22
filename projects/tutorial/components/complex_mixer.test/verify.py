@@ -40,7 +40,7 @@ import sys
 import os.path
 
 """
-Ex: python3 verify.py {sample-freq} {number_of_samples} {ofilename} {ifilename}
+Ex: ./verify.py {sample-freq} {number_of_samples} {ofilename} {ifilename}
 Validate:
 TEST #1: Verify I & Q values are not all zeros
 TEST #2: Output file matches expected size
