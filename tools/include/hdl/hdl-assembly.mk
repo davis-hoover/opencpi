@@ -103,7 +103,7 @@ ifneq ($(MAKECMDGOALS),clean)
         # If the container mentions a constraints file, it, may be local to the 
         # container file (in the assembly dir), or under the platform directory
         HdlConstraints_$$(ContName):=$$(strip \
-          $$(foreach c,$(call HdlGetConstraintsFile,$4),\
+          $$(foreach c,$$(call HdlGetConstraintsFile,$4,$2),\
 	     $$(or $$(wildcard $$c),$$(strip\
                    $$(and $$(filter-out /%,$c),$$(wildcard $$(HdlPlatformDir_$2)/$$c))),\
                    $$(error Constraints file $$c not found for container $$(ContName)))))
