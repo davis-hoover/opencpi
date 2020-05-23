@@ -83,12 +83,19 @@ case "$ocpi_me" in
     */*);;
     *)
       cat <<-EOF >&2
-	Error: This OpenCPI $ocpi_name file can only be sourced as a pathname with slashes.
-	       If it is in your current directory, use: "source ./$ocpi_me <options>".
+	Error: You are attempting to source $ocpi_me and should instead
+	       source <installation-directory-of-opencpi>/cdk/$ocpi_name
 	EOF
       return 1
     ;;
 esac
+[ "$ocpi_name" != "$(basename $ocpi_me)" ] && {
+  cat <<-EOF >&2
+	Error: You are attempting to source $ocpi_me and should instead
+	       source <installation-directory-of-opencpi>/cdk/$ocpi_name
+	EOF
+  return 1
+}
 [ "$1" = --help -o "$1" = -h -o -z "$1" ] && {
   cat <<-EOF >&2
 	This script modifies the OpenCPI environment variables and the PATH/PYTHONPATH variables.
@@ -108,26 +115,15 @@ esac
 	When in the root directory of the OpenCPI source tree, the typical usage is:
 	   source cdk/opencpi-setup.sh -s
 	Note that neither --dynamic nor --optimized affect what is built.  Just what is used.
-EOF
+	EOF
   return 1
 }
 
 # Guard against somebody sourcing us with nullglob set (otherwise "unset ocpi_options[0]" could be blank below)
 if shopt -q nullglob; then echo 'Note: Turning off nullglob; was active!'; shopt -u nullglob; fi
 
-# Get file location w/o following symlinks since 'realpath -s' not in cos6
-ocpi_file_location=$(cd $(dirname $ocpi_me); pwd)/$(basename $ocpi_me)
-# Get the parent directory of the file being called and make sure it's cdk
-ocpi_file_parent_dir=$(basename $(dirname $ocpi_file_location))
-if [ "$ocpi_file_parent_dir" != "$ocpi_cdk_dir" ]; then
-  cat <<-EOF >&2
-	Error: Setup script should only be run (sourced) in cdk folder 
-  ex: source cdk/opencpi-setup.sh -s
-	EOF
-  return 1
-fi
-
-ocpi_dynamic= ocpi_optimized= ocpi_reset= ocpi_verbose= ocpi_clean= ocpi_list= ocpi_ensure=
+# Parse opts
+ocpi_dynamic= ocpi_optimized= ocpi_reset= ocpi_verbose= ocpi_clean= ocpi_list= ocpi_ensure= ocpi_bootstrap=
 ocpi_options=($*)
 while [ -n "$ocpi_options" ] ; do
   case $ocpi_options in
@@ -138,6 +134,7 @@ while [ -n "$ocpi_options" ] ; do
     -c|--clean) ocpi_clean=1;;
     -l|--list) ocpi_list=1;;
     -e|--ensure) ocpi_ensure=1;;
+    -b|--bootstrap) ocpi_bootstrap=1;;  # Undocumented option for internal use only
     -|-s|--set);; # perhaps the single required variable
     *)
       echo Unknown option \"$ocpi_options\" when sourcing the $ocpi_name file. Try --help. >&2
@@ -146,6 +143,24 @@ while [ -n "$ocpi_options" ] ; do
   unset ocpi_options[0]
   ocpi_options=(${ocpi_options[*]})
 done
+
+# Make sure this script is being sourced in the correct location, except when
+# bootstrapping
+if [ -z "$ocpi_bootstrap" ]; then
+  # Get file location w/o following symlinks since 'realpath -s' not in cos6
+  ocpi_file_location=$(cd $(dirname $ocpi_me); pwd)/$(basename $ocpi_me)
+  # Get the parent directory of the file being called and make sure it's cdk
+  ocpi_file_parent_dir=$(basename $(dirname $ocpi_file_location))
+  if [ "$ocpi_file_parent_dir" != "$ocpi_cdk_dir" ]; then
+    cat <<-EOF >&2
+	Error: You are attempting to source the wrong $ocpi_name file
+	       and should instead source <installation-directory-of-opencpi>/cdk/$ocpi_name
+	EOF
+    return 1
+  fi
+fi
+unset ocpi_bootstrap
+
 [ -n "$ocpi_clean" ] && {
   [ -n "$OCPI_CDK_DIR" ] && {
     ocpi_cleaned=$(echo "$PATH" | sed "s=$OCPI_CDK_DIR/[^:/]*/bin[^:]*:==g")
