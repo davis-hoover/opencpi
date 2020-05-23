@@ -1,1 +1,1 @@
-scripts/opencpi-setup.sh
+scripts/opencpi-setup-internal.sh
