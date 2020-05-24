@@ -38,7 +38,7 @@
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all; use IEEE.math_real.all;
-library ocpi, util, bsv; use ocpi.all, ocpi.types.all, util.util.all, bsv.bsv.SyncFIFO;
+library ocpi, util, ocpi_core_bsv; use ocpi.all, ocpi.types.all, util.util.all, ocpi_core_bsv.all;
 library platform; use platform.platform_pkg.all;
 entity time_service is
   generic (
@@ -318,7 +318,7 @@ begin
   -- Control to Time clk domain: Select the 'mode' of ppsOut
   -----------------------------------------------------------------------------
   s_ppsOutMode_sD_IN <= s_rplTimeControl(1 downto 0);
-  syncReg_ppsOutMode : SyncRegister
+  syncReg_ppsOutMode : bsv_pkg.SyncRegister
     generic map (
       width => 2,
       init  => 0)
@@ -345,7 +345,7 @@ begin
   -- Control to Time clk domain: Control monitoring of External PPS sync pulse
   -----------------------------------------------------------------------------
   s_ppsDisablePPS_sD_IN_slv0 <= (0 downto 0 => timeControl(2));
-  syncReg_ppsDisablePPS : SyncRegister
+  syncReg_ppsDisablePPS : bsv_pkg.SyncRegister
     generic map (
       width => 1,
       init  => 0)
@@ -390,7 +390,7 @@ begin
   s_refPerPPS_sEN <= '1' when (s_refPerPPS_sRDY = '1' and
                                s_ppsExtSync_d2 = '1'  and
                                s_ppsExtSyncD = '0') else '0';
-  syncReg_refPerPPS : SyncRegister
+  syncReg_refPerPPS : bsv_pkg.SyncRegister
     generic map (
       width => 28,
       init  => 0)
@@ -407,7 +407,7 @@ begin
   -- Control to Time clk domain: Disable update of 'fracInc' value
   -----------------------------------------------------------------------------  
   s_disableServo_sD_IN_slv0 <= (0 downto 0 => s_rplTimeControl(4));
-  syncReg_disableServo : SyncRegister
+  syncReg_disableServo : bsv_pkg.SyncRegister
     generic map (
       width => 1,
       init  => 0)
@@ -469,7 +469,7 @@ begin
   -- Time to Control clk domain: For Status register and setting ppsLostSticky bit
   -----------------------------------------------------------------------------  
   s_ppsLostCC_sD_IN_slv0 <= (0 downto 0 => s_ppsLost);  
-  syncReg_ppsLostCC : SyncRegister    
+  syncReg_ppsLostCC : bsv_pkg.SyncRegister    
     generic map (
       width => 1,
       init  => 0)
@@ -487,7 +487,7 @@ begin
   -- Time to Control clk domain: For Status register and setting ppsInSticky bit
   -----------------------------------------------------------------------------
   s_ppsOKCC_sD_IN_slv0 <= (0 downto 0 => s_ppsOK);    
-  syncReg_ppsOKCC : SyncRegister    
+  syncReg_ppsOKCC : bsv_pkg.SyncRegister    
     generic map (
       width => 1,
       init  => 0)
@@ -505,7 +505,7 @@ begin
   -- Time to Control clk domain: Count # of ppsIn, via their leading edge.
   -----------------------------------------------------------------------------
   s_rollingPPSIn_sD_IN <= s_ppsEdgeCount;
-  syncReg_rollingPPSIn : SyncRegister    
+  syncReg_rollingPPSIn : bsv_pkg.SyncRegister    
     generic map (
       width => 8,
       init  => 0)
@@ -524,7 +524,7 @@ begin
   s_setRefF_sD_IN <= (not s_gpsDisabled) & s_timeIn;
   s_setRefF_sENQ <= timeNow_written;
   s_setRefF_dDEQ <= s_setRefF_dEMPTY_N;
-  syncFifo_setRefF : SyncFIFO
+  syncFifo_setRefF : bsv_pkg.SyncFIFO
     generic map (
       dataWidth => 65,
       depth  => 2,

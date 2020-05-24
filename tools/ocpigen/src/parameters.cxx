@@ -1096,11 +1096,28 @@ parse(ezxml_t x, const char *buildFile) {
 #endif
     m_sourceFiles.push_back(ti.token());
   }
-  for (OU::TokenIter ti(ezxml_cattr(x, "libraries")); ti.token(); ti.next())
-    if (m != HdlModel)
-      return "Invalid \"libraries\" attribute:  worker model is not HDL";
-    else if ((err = getHdlPrimitive(ti.token(), "library", m_libraries)))
-      return err;
+  // Do not bother parsing this stuff if the worker is not the top level worker
+  // i.e. for emulatees or slaves...
+  if (!m_worker.m_parent) {
+    for (OU::TokenIter ti(ezxml_cattr(x, "libraries")); ti.token(); ti.next())
+      if (m != HdlModel)
+	return "Invalid \"libraries\" attribute:  worker model is not HDL";
+      else if ((err = getHdlPrimitive(ti.token(), "library", m_checkedLibraries)))
+	return err;
+      else
+	m_libraries.push_back(ti.token());
+    if (m == HdlModel) {
+      for (OU::TokenIter ti(getenv("OCPI_HDL_LIBRARIES")); ti.token(); ti.next())
+	if ((err = getHdlPrimitive(ti.token(), "library", m_checkedLibraries)))
+	  return err;
+	else
+	  m_libraries.push_back(ti.token());
+      // These are not explicit, but must be available for generated code
+      for (OU::TokenIter ti("fixed_float ocpi ocpi.core.bsv cdc"); ti.token(); ti.next())
+	if ((err = getHdlPrimitive(ti.token(), "library", m_checkedLibraries)))
+	  return err;
+    }
+  }
   for (OU::TokenIter ti(ezxml_cattr(x, "cores")); ti.token(); ti.next())
     if (m != HdlModel)
       return "Invalid \"cores\" attribute:  worker model is not HDL";
@@ -1115,10 +1132,6 @@ parse(ezxml_t x, const char *buildFile) {
       return OU::esprintf("The include directory: \"%s\" is not a directory", ti.token());
   }
   for (OU::TokenIter ti(ezxml_cattr(x, "componentlibraries")); ti.token(); ti.next())
-#if 0 // note: componentlibraries can be used for other xml files like specs etc.
-    if (!m_worker.m_isSlave && !m_worker.m_emulate)
-      return OU::esprintf("componentlibraries only valid on workers with slaves or emulators");
-#endif
     if ((err = getComponentLibrary(ti.token(), m_componentLibraries)))
       return err;
   std::string prereqs;
@@ -1150,7 +1163,7 @@ parse(ezxml_t x, const char *buildFile) {
 static void writeVar(FILE *f, const char *var, OrderedStringSet &vals) {
   if (vals.empty())
     return;
-  fprintf(f,"$(call OcpiCheckVars,%s)\n%s:=", var, var);
+  fprintf(f,"%s:=", var);
   for (auto i = vals.begin(); i != vals.end(); ++i)
     fprintf(f, "%s%s", i == vals.begin() ? "" : " ", (*i).c_str());
   fprintf(f, "\n");

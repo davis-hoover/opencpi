@@ -51,9 +51,8 @@
 --
 ---------------------------------------------------------------------------------
 
-library IEEE, ocpi;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library IEEE;
+use IEEE.std_logic_1164.all,ieee.math_real.all, IEEE.numeric_std.all;
 
 entity fifo is
   generic (
@@ -73,7 +72,7 @@ end entity fifo;
 
 architecture rtl of fifo is
 
-  constant INDXWIDTH : natural := ocpi.util.width_for_max(DEPTH-1);          --minimum 1
+  constant INDXWIDTH : natural := natural(ceil(log2(real(DEPTH))));
   function msb12set return std_logic_vector is
     variable v : std_logic_vector(INDXWIDTH downto 0) := (others => '0');
   begin

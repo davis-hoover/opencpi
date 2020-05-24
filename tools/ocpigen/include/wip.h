@@ -536,6 +536,7 @@ class Worker : public OU::Worker {
     emitXmlInstances(FILE *f),
     emitXmlConnections(FILE *f);
   void
+    emitVhdlLibraries(FILE *f),
     emitCppTypesNamespace(FILE *f, std::string &nsName, const std::string &slaveName=""),
     emitDeviceConnectionSignals(FILE *f, const char *iname, bool container),
     setParent(Worker *p), // when it can't happen at construction
@@ -598,7 +599,7 @@ extern const char
   *checkSuffix(const char *str, const char *suff, const char *last),
   *createTests(const char *file, const char *package, const char *outDir, bool verbose),
   *createCases(const char **args, const char *package, const char *outDir, bool verbose),
-  *addLibrary(const char *lib),
+//  *addLibrary(const char *lib),
   *extractExprValue(const OU::Property &p, const OU::Value &v, OU::ExprValue &val),
   *tryInclude(ezxml_t x, const std::string &parent, const char *element, ezxml_t *parsed,
 	      std::string &child, bool optional),
@@ -610,8 +611,8 @@ extern const char
   *rccValue(OU::Value &v, std::string &value),
   *g_platform, *g_device, *load, *g_os, *g_os_version, *g_arch, **libraries, **mappedLibraries,
   *assembly, *attribute, *platformDir,
-  *addLibMap(const char *),
-  *findLibMap(const char *file), // returns mapped lib name from dir name of file or NULL
+//  *addLibMap(const char *),
+//  *findLibMap(const char *file), // returns mapped lib name from dir name of file or NULL
   *propertyTypes[],
   *getNames(ezxml_t xml, const char *file, const char *tag, std::string &name, std::string &fileName),
   *tryOneChildInclude(ezxml_t top, const std::string &parent, const char *element,

@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 <HdlDevice language='vhdl' Libraries='sdp platform'>
+=======
+<HdlDevice language='vhdl' Libraries='sdp platform util'>
+>>>>>>> Stashed changes
   <ComponentSpec nocontrol='true'/>
   <property name='sdp_width' parameter='true' type='uchar' default='1'/>
   <sdp name="up"/>

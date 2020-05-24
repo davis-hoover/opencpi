@@ -61,7 +61,7 @@ addPlaces(const char *envname, const char *prefix, const char *suffix, bool chec
     if (OF::exists(whole, &isDir) && isDir)
       list.push_back(whole);
     else if (check)
-      return OU::esprintf("in %s, \"%s\" is not a directory", env, ti.token());
+      return OU::esprintf("in %s, \"%s\" is not a directory", envname, whole.c_str());
   }
   return NULL;
 }
@@ -300,48 +300,71 @@ getComponentLibraries(const char *libs, const char *model, OrderedStringSet &pla
 }
 
 const char *
-getHdlPrimitive(const char *prim, const char *type, OrderedStringSet &prims) {
-  const char *err;
-  if (strchr(prim, '/')) {
-    if (!OS::FileSystem::exists(prim))
-      return OU::esprintf("The %s location: \"%s\" does not exist", type, prim);
-    prims.push_back(prim);
-    return NULL;
-  }
-  std::string cdk;
-  if (hdlPrimitivePath.empty()) {
+getHdlPrimitive(const char *primitive, const char */*type*/, OrderedStringSet &prims) {
+  const char
+    *dot = strrchr(primitive, '.'),
+    *packageId = getenv("OCPI_PROJECT_PACKAGE"),
+    *projectDir = getenv("OCPI_PROJECT_REL_DIR");
+  std::string prim, dir;
+  if (dot) {
+    const char *lib = dot + 1;
+    std::string project(primitive, OCPI_SIZE_T_DIFF(dot, primitive));
+    if (project == packageId)
+      OU::format(dir, "%s/hdl/primitives/lib/%s", projectDir, lib);
+    else
+      OU::format(dir, "%s/imports/%s/exports/lib/hdl/%s", projectDir, project.c_str(), lib);
+    if (OF::exists(dir)) {
+      prim = dir + ":";
+      for (const char *cp = primitive; *cp; ++cp)
+	prim += *cp == '.' ? '_' : *cp;
+    } else if (project == packageId) {
+      OU::format(dir, "%s/hdl/primitives/%s", projectDir, lib);
+      return OU::esprintf("it looks like the %s library in this project %s", primitive,
+			  OF::exists(dir) ? "has not been built" : "does not exist");
+    } else
+      return OU::esprintf("it looks like the %s library was not build+exported from the %p project",
+			  lib, project.c_str());
+  } else {
+    StringArray places;
+    const char *err;
+    OU::format(dir, "%s/hdl/primitives/lib", projectDir);
+    places.push_back(dir);
     std::string imports;
     if ((err = getProjectRelDir(imports)))
       return err;
     imports += "/imports/";
-    if ((err = getCdkDir(cdk)) ||
-	(err = addPlaces("OCPI_HDL_PRIMITIVE_PATH", NULL, NULL, true, hdlPrimitivePath)) ||
-	(err = addPlaces(PROJECT_REL_DIR_ENV, NULL, "/hdl/primitives/lib", false, hdlPrimitivePath)) ||
-	(err = addPlaces("OCPI_PROJECT_PATH", NULL, "/lib/hdl", false, hdlPrimitivePath)) ||
-	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", imports.c_str(), "/exports/lib/hdl", false, hdlPrimitivePath)))
+    if ((err = addPlaces("OCPI_PROJECT_PATH", NULL, "/exports/lib/hdl", true, places)) ||
+	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", imports.c_str(), "/exports/lib/hdl", true, places)))
       return err;
-  }
-  std::string path;
-  for (unsigned n = 0; n < hdlPrimitivePath.size(); n++) {
-    OU::format(path, "%s/%s", hdlPrimitivePath[n].c_str(), prim);
-    ocpiDebug("Looking for primitive \"%s\" at \"%s\"", prim, path.c_str());
-    if (OS::FileSystem::exists(path)) {
-      prims.push_back(path);
-      return NULL;
+    for (auto it = places.begin(); prim.empty() && it != places.end(); ++it) {
+      std::string file;
+      OU::format(file, "%s/%s/%s.libs", it->c_str(), primitive, primitive);
+      if (OF::exists(file)) {
+	std::string libs;
+	if ((err = OU::file2String(libs, file.c_str())))
+	  return err;
+	for (OU::TokenIter ti(libs, "\n"); ti.token(); ti.next()) {
+	  const char *cp = ti.token();
+	  while (isspace(*cp)) cp++;
+	  if (*cp != '#') {
+	    OU::format(prim, "%s/%s:", it->c_str(), primitive);
+	    if (it == places.begin() && *cp == 'q') { // if local and qualified
+	      for (cp = packageId; *cp; ++cp)
+		prim += *cp == '.' ? '_' : *cp;
+	      prim += '_';
+	    }
+	    prim += primitive;
+	    break;
+	  }
+	}
+      }
     }
+    if (prim.empty())
+      return OU::esprintf("primitive library \"%s\" not found in this project or other projects it depends on",
+			  primitive);
   }
-  path.clear();
-  for (unsigned n = 0; n < hdlPrimitivePath.size(); n++)
-    OU::formatAdd(path, "%s\"%s\"", n ? ", " : "", hdlPrimitivePath[n].c_str());
-#if 0 // we can't make this an error due to the fact that we might be looking too early.
-  return OU::esprintf("Could not find primitive %s \"%s\"; looked in:  %s",
-		      type, prim, path.c_str());
-#else
-  fprintf(stderr,"WARNING: Could not find HDL primitive %s \"%s\"; looked in:  %s\n",
-	  type, prim, path.c_str());
   prims.push_back(prim);
   return NULL;
-#endif
 }
 
 const char *

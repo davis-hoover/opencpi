@@ -871,14 +871,18 @@ create(const char *file, const std::string &parentFile, const char *package, con
   } else {
     w->m_outDir = outDir;
     if (w->m_library) {
+      Worker *top = w; // surprising that we do not have this.
+      while (top->m_parent)
+	top = top->m_parent;
       std::string lib(w->m_library);
       w->addParamConfigSuffix(lib);
-      addLibMap(lib.c_str());
+      top->m_build.m_checkedLibraries.push_back(":" + lib); // no path here
     }
   }
   return w;
 }
 
+#if 0
 // TODO: Move to vector
 static unsigned nLibraries;
 const char **libraries;
@@ -942,7 +946,7 @@ findLibMap(const char *file) {
   }
   return NULL;
 }
-
+#endif
 Control::
 Control()
   : sizeOfConfigSpace(0), controlOps(0), offset(0), ordinal(0), firstRaw(NULL),
@@ -1055,8 +1059,10 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     }
     if ((m_library = ezxml_cattr(xml, "library")))
       ocpiDebug("m_library set from xml attr: %s", m_library);
+#if 0
     else if (xfile && (m_library = findLibMap(xfile)))
       ocpiDebug("m_library set from map from file %s: %s", xfile, m_library);
+#endif
     else if (m_parent && (m_library = m_implName))
       ocpiDebug("m_library set from worker name: %s parent: %s", m_implName, parent->m_implName);
     else

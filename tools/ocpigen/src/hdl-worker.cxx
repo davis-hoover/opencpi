@@ -875,8 +875,18 @@ emitVhdlPropMember(FILE *f, OU::Property &pr, unsigned maxPropName, bool in2work
     emitVhdlPropMemberData(f, pr, maxPropName);
 }
 
-void
+void Worker::
 emitVhdlLibraries(FILE *f) {
+#if 1
+  //assert(mappedLibraries == NULL && libraries == NULL);
+  // New way:
+  bool first = true;
+  for (auto it = m_build.m_checkedLibraries.begin();
+       it != m_build.m_checkedLibraries.end(); ++it, first = false)
+    fprintf(f, "%s %s", first ? "library" : ",", strrchr(it->c_str(),':')+1);
+  if (!first)
+    fprintf(f, ";\n");
+#else
   if ((libraries && libraries[0])
 #if 1
       || (mappedLibraries && mappedLibraries[0])
@@ -898,6 +908,7 @@ emitVhdlLibraries(FILE *f) {
     }
     fprintf(f, ";\n");
   }
+#endif
 }
 
 const char *Worker::

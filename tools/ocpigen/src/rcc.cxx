@@ -1289,7 +1289,6 @@ emitSkelRCC() {
   return 0;
 }
 
-
 const char *Worker::
 addSlave(const std::string worker_name, const std::string slave_name) {
   const char *err = NULL;
@@ -1300,7 +1299,7 @@ addSlave(const std::string worker_name, const std::string slave_name) {
   OU::format(sw, "../%s/%.*s.xml", worker_name.c_str(), (int)(dot - worker_name.c_str()), worker_name.c_str());
   if (!OF::exists(sw)) // make it findable in any generated/built library
     OU::format(sw, "%s/%.*s.xml", dot + 1, (int)(dot - worker_name.c_str()), worker_name.c_str());
-  Worker *wkr = Worker::create(sw.c_str(), m_file, NULL, m_outDir, NULL, NULL, 0, err);
+  Worker *wkr = Worker::create(sw.c_str(), m_file, NULL, m_outDir, this, NULL, 0, err);
   if (!wkr) {
     return OU::esprintf("for slave worker %s: %s", worker_name.c_str(), err);
   }
@@ -1532,7 +1531,7 @@ create(ezxml_t xml, const char *xfile, const char *&err) {
 
 RccAssembly::
 RccAssembly(ezxml_t xml, const char *xfile, const char *&err)
-  : Worker(xml, xfile, "", Worker::Assembly, this, NULL, err) {
+  : Worker(xml, xfile, "", Worker::Assembly, NULL, NULL, err) {
   if (!(err = OE::checkAttrs(xml, IMPL_ATTRS, RCC_TOP_ATTRS, (void*)0)) &&
       !(err = OE::checkElements(xml, IMPL_ELEMS, RCC_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
     err = parseRcc();

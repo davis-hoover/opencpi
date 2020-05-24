@@ -19,7 +19,7 @@
 -- package for letting VHDL access the verilogs in this library
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
-library util; use util.types.all;
+use work.types.all;
 package util is
 component ROM
   generic (WIDTH    : natural;

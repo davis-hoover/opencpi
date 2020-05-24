@@ -1063,7 +1063,7 @@ emitAssyHDL() {
   } else {
     fprintf(f,
 	    "library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;\n"
-	    "library ocpi, util;\n");
+	    "library ocpi;\n");
     emitVhdlLibraries(f);
     fprintf(f,
 	    "architecture rtl of %s_rv is\n",
