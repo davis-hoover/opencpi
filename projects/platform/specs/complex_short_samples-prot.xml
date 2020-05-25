@@ -11,5 +11,5 @@
     </Argument>
   </Operation>
 
-  <xi:include href="metadata.xml"/>
+  <xi:include href="timed_samples_metadata.xml"/>
 </Protocol>
