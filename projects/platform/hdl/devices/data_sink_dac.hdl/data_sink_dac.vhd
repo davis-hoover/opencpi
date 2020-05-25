@@ -180,8 +180,16 @@ begin
     dac_data_narrower_ordy <= not dac_rst;
     dev_out.valid <= dac_data_narrower_ometadata_vld;
   
-    dev_out.data_i <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.i),16));
-    dev_out.data_q <= std_logic_vector(resize(unsigned(dac_data_narrower_odata.q),16));
+    dev_out.data_i(dev_out.data_i'left downto
+        dev_out.data_i'left-dac.dac.DATA_BIT_WIDTH+1) <=
+        dac_data_narrower_odata.i;
+    dev_out.data_i(dev_out.data_i'left-dac.dac.DATA_BIT_WIDTH downto 0) <=
+        (others => '0');
+    dev_out.data_q(dev_out.data_q'left downto
+        dev_out.data_q'left-dac.dac.DATA_BIT_WIDTH+1) <=
+        dac_data_narrower_odata.q;
+    dev_out.data_q(dev_out.data_q'left-dac.dac.DATA_BIT_WIDTH downto 0) <=
+        (others => '0');
     
   end generate;
       
