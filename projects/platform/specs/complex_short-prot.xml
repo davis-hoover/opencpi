@@ -1,0 +1,15 @@
+<Protocol>
+  <!-- Message data / samples.
+
+       Sequence length is set to allow for a maximum message length of 16,384
+       bytes. All protocols for all data types must have the same maximum
+       message length in bytes. -->
+  <Operation name="sample">
+    <Argument name="data" type="struct" sequencelength="4096">
+      <Member name="real" type="short"/>
+      <Member name="imaginary" type="short"/>
+    </Argument>
+  </Operation>
+
+  <xi:include href="metadata.xml"/>
+</Protocol>
