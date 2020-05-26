@@ -137,7 +137,7 @@
   extends:
     - .standard-artifacts
   stage: build-workers
-  script: 
+  script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/platform/hdl/devices --hdl-platform $PLATFORM
 
@@ -558,6 +558,20 @@
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
     - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*matchstiq_z1(\s[^\s\]]*)*\]/i
+
+.zed_ise-xilinx13_4:
+  extends:
+    - .vivado
+  variables:
+    PLATFORM: 'zed_ise'
+    HW_PLATFORM: 'zed_ise'
+    SW_PLATFORM: 'xilinx13_4'
+    IP: '10.0.0.1003'
+    PORT: '1000'
+    MODEL: 'hdl'
+    XILINXD_LICENSE_FILE: '2101@sembach.opencpi.net'
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*zed_ise(\s[^\s\]]*)*\]/i
 
 .e3xx:
   rules:

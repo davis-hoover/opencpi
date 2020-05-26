@@ -34,7 +34,7 @@ tap_gen:
 	$(eval SAMPLE_FREQ=2062500)
 	$(eval INPUT_DATA_AMPLITUDE=1024)
 	$(eval NUM_CYCLES=16)
-	python3 ./scripts/test_sinewave.py -g idata/input_file.bin $(TARGET_FREQ) $(SAMPLE_FREQ) $(INPUT_DATA_AMPLITUDE) $(NUM_CYCLES)
+	./scripts/test_sinewave.py -g idata/input_file.bin $(TARGET_FREQ) $(SAMPLE_FREQ) $(INPUT_DATA_AMPLITUDE) $(NUM_CYCLES)
 
 clean::
 	rm -rf idata/* odata/*
@@ -91,7 +91,7 @@ Zedboard/Zipper:
 ocpirun -v -d -t 1 app_cic_int_dc_offset_iq_imbalance_mixer_cic_dec_zed_zipper.xml
 ----------------------------------------------------------------------------
 4) Verification of output data: (development system)
-python3 ./scripts/plotAndFft.py odata/out_app_cic_int_dc_offset_iq_imbalance_mixer_cic_dec_txrx.bin complex 131072 2062500 &
+./scripts/plotAndFft.py odata/out_app_cic_int_dc_offset_iq_imbalance_mixer_cic_dec_txrx.bin complex 131072 2062500 &
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 endef

@@ -119,38 +119,20 @@ else
     $(error This is a cross-compiled platform, but OCPI_TARGET_KERNEL_DIR is not set, which is not supported.)
   endif
 
-  # Find the kernel headers - they can be found:
-  #  1. Specified KERNELDIR (always chosen if given)
-  #  2. For any sane Linux distro, look at /lib/modules/(uname -r)/build.  If the symlink
-  #     is not broken, the kernel headers package is installed and present.  This method
-  #     should be the default and valid for the case where KERNELDIR is not specified.
-  OcpiKernelRelease:=$(shell uname -r)
-  # This is not the actual package version, but suffices for our purposes:
-  # if the "build" symlink is broken, the kernel headers package has not
-  # been installed.  N.B.: the gmake built-in "$(realpath <str>)" function
-  # returns NULL if the symlink is broken, so we cannot use it here.  Also,
-  # there is no external "realpath" command for "centos6" so we have to use
-  # "readlink -f" for reasons of portability.
-  OcpiKernelHeadersVersion:=$(shell basename $(shell readlink -f /lib/modules/$(OcpiKernelRelease)/build))
-  $(info --- The running kernel is release: $(OcpiKernelRelease))
-  $(info --- The current kernel-headers package is version: $(OcpiKernelHeadersVersion))
+  # KERNELDIR must be set by the time we get here
   ifdef KERNELDIR
+    # KERNELDIR is set and non-empty
     $(info --- The requested kernel header location (via KERNELDIR) is: $(KERNELDIR))
     ifeq ($(wildcard $(KERNELDIR)),)
       $(error The requested kernel header location ($(KERNELDIR)) is not found)
     endif
   else
-    KERNELDIR=$(shell readlink -f /lib/modules/$(OcpiKernelRelease)/build)
-    ifeq ($(wildcard $(KERNELDIR)),)
-      $(info XXX: $(shell ls -l /lib/modules ))
-      $(error Cannot find a kernel headers directory at $(KERNELDIR))
-    else
-      $(info --- Using the kernel headers at: $(KERNELDIR))
-    endif
+    $(error KERNELDIR is not set)
   endif
-  $(info No OCPI_TARGET_KERNEL_DIR specified, so using: KERNELDIR=$(KERNELDIR))
+  $(info OCPI_TARGET_KERNEL_DIR not specified: using KERNELDIR=$(KERNELDIR))
 endif
 endif # end of if not cleaning
+
 ocpi_release:=$(shell cat $(OCPI_TARGET_KERNEL_DIR)/ocpi-release 2>/dev/null)
 # The current directory is passed to sub-makes as argument
 PWD := $(shell pwd)

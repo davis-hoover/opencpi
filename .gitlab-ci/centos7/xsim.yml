@@ -107,7 +107,7 @@ build-devices-platform:centos7:xsim:
     - .build-devices-platform
     - .xsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
     - build-primitives:centos7:xsim
@@ -244,7 +244,7 @@ build-assemblies-platform:centos7:xsim:
     - .build-assemblies-platform
     - .xsim-centos7
   needs:
-    - job: prereq:centos7 
+    - job: prereq:centos7
       artifacts: true
     - build:centos7
     - build-primitives:centos7:xsim

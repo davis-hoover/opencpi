@@ -111,7 +111,7 @@
 # This is runtime although this one script deals with initialization issues
 # for development time tool.  An acceptable "runtime bloat" to keep this gnarly bootstrapping
 # stuff in one place.
-=tools/scripts/opencpi-setup.sh
+=tools/scripts/opencpi-setup-internal.sh opencpi-setup.sh
 +tools/scripts/setup-prerequisite.sh scripts/
 +tools/scripts/setup-prereq-dirs.sh scripts/
 +tools/scripts/getPlatform.sh scripts/
