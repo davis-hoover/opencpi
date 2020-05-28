@@ -77,6 +77,8 @@ PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
+#    Needed to install xilinx19_2_aarch32 platform
+PKGS_D+=(openssl-devel)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
