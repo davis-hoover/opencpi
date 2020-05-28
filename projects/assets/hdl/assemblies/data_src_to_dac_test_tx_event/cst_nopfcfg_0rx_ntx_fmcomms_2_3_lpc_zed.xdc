@@ -1,0 +1,1 @@
+../../../../platform/hdl/platforms/zed/legacy/cst_nopfcfg_0rx_ntx_fmcomms_2_3_lpc_zed.xdc

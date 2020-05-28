@@ -75,7 +75,7 @@ NOTE: When copy/paste of the above 'export' from the Makefile source file, the r
 ./target-xilinx13_3/testbench
 ----------------------------------------------------------------------------
 4) Verification of output data: (development system)
-python ./scripts/plotAndFft.py odata/testbench_rx.out complex 3000 1000000 &
+./scripts/plotAndFft.py odata/testbench_rx.out complex 3000 1000000 &
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 endef

@@ -26,40 +26,12 @@ library protocol;
 package misc_prims is
 
 constant TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH : positive := 32;
-constant DATA_ADC_BIT_WIDTH                  : positive := 12;
-constant DATA_DAC_BIT_WIDTH                  : positive := 12;
 type file_writer_backpressure_select_t is (NO_BP, LFSR_BP);
-
-type data_complex_adc_t is record
-  i : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
-  q : std_logic_vector(DATA_ADC_BIT_WIDTH-1 downto 0);
-end record data_complex_adc_t;
-
-type data_complex_dac_t is record
-  i : std_logic_vector(DATA_DAC_BIT_WIDTH-1 downto 0);
-  q : std_logic_vector(DATA_DAC_BIT_WIDTH-1 downto 0);
-end record data_complex_dac_t;
-
--- provides info in additional to ComplexShortWithMetadata protocol
-type metadata_dac_t is record
-  underrun_error : std_logic; -- samples were not available for one or
-                              -- more dac clock cycles
-  ctrl_tx_on_off : std_logic; -- high when transmitter should be powered on
-                              -- low when transmitter should be powered off
-end record metadata_dac_t;
 
 function calc_cdc_bit_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
 function calc_cdc_fifo_depth (constant src_dst_ratio : in real) return natural;
 function calc_cdc_pulse_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
 function calc_cdc_count_up_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
-
-type adc_samp_drop_detector_status_t is record
-  error_samp_drop : std_logic;
-end record adc_samp_drop_detector_status_t;
-
-type dac_underrun_detector_status_t is record
-  underrun_error : std_logic;
-end record dac_underrun_detector_status_t;
 
 type time_downsampler_ctrl_t is record
   bypass                : std_logic;
@@ -144,19 +116,6 @@ component debounce
     RESULT : out std_logic);
 end component;
 
-component adc_maximal_lfsr_data_src is
-  port(
-    -- CTRL
-    clk                : in  std_logic;
-    rst                : in  std_logic;
-    stop_on_period_cnt : in  std_logic;
-    stopped            : out std_logic;
-    -- OUTPUT
-    odata              : out data_complex_adc_t;
-    ovld               : out std_logic;
-    ordy               : in  std_logic);
-end component;
-
 component maximal_lfsr_data_src is
   port(
     -- CTRL
@@ -169,79 +128,6 @@ component maximal_lfsr_data_src is
         protocol.complex_short_with_metadata.op_samples_arg_iq_t;
     ovld               : out std_logic;
     ordy               : in  std_logic);
-end component;
-
-component adc_samp_drop_detector is
-  port(
-    -- CTRL
-    clk       : in  std_logic;
-    rst       : in  std_logic;
-    status    : out adc_samp_drop_detector_status_t;
-    -- INPUT
-    idata     : in  data_complex_adc_t;
-    ivld      : in  std_logic;
-    -- OUTPUT
-    odata     : out data_complex_adc_t;
-    osamp_drop: out std_logic;
-    ovld      : out std_logic;
-    ordy      : in  std_logic);
-end component;
-
-component data_widener is
-  generic(
-    BITS_PACKED_INTO_MSBS : boolean := true);
-  port(
-    -- CTRL
-    clk        : in  std_logic;
-    rst        : in  std_logic;
-    -- INPUT
-    idata      : in  data_complex_adc_t;
-    isamp_drop : in  std_logic;
-    ivld       : in  std_logic;
-    irdy       : out std_logic;
-    -- OUTPUT
-    oprotocol  : out protocol.complex_short_with_metadata.protocol_t;
-    ordy       : in  std_logic);
-end component;
-
-component data_narrower is
-  generic(
-    BITS_PACKED_INTO_LSBS : boolean := false);
-  port(
-    -- CTRL
-    clk           : in  std_logic;
-    rst           : in  std_logic;
-    -- INPUT
-    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
-    imetadata     : in  metadata_dac_t;
-    imetadata_vld : in  std_logic;
-    irdy          : out std_logic;
-    -- OUTPUT
-    odata         : out data_complex_dac_t;
-    odata_vld     : out std_logic;
-    ometadata     : out metadata_dac_t;
-    ometadata_vld : out std_logic;
-    ordy          : in  std_logic);
-end component;
-
-component dac_underrun_detector is
-  port(
-    -- CTRL
-    clk           : in  std_logic;
-    rst           : in  std_logic;
-    status        : out dac_underrun_detector_status_t;
-    -- INPUT
-    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
-    imetadata     : in  metadata_dac_t;
-    imetadata_vld : in  std_logic;
-    irdy          : out std_logic;
-    -- OUTPUT
-    -- if ometadata.underrun_error and protocol.samples_vld are both 1, error is
-    -- assumed to have happened before the current valid sample
-    oprotocol     : out protocol.complex_short_with_metadata.protocol_t;
-    ometadata     : out metadata_dac_t;
-    ometadata_vld : out std_logic;
-    ordy          : in  std_logic);
 end component;
 
 component time_corrector is

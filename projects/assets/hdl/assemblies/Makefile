@@ -25,5 +25,5 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 
 # Otherwise all assemblies will be built
 # Alternatively, you can set ExcludeAssemblies to list the ones you want to exclude
-
+ComponentLibraries=util_comps base_comps misc_comps dsp_comps comms_comps devices
 include $(OCPI_CDK_DIR)/include/hdl/hdl-assemblies.mk

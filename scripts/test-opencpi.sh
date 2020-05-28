@@ -110,6 +110,7 @@ if [ -n "$no_hdl" ]; then
   export HdlPlatform=
   export HdlPlatforms=
   export HDL_PLATFORM=
+  export OCPI_ENABLE_HDL_DISCOVERY=0
 fi
 
 bin=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/bin
@@ -138,9 +139,9 @@ for t in $tests; do
       echo ======================= Running python swig test
       OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts \
 		       PYTHONPATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib \
-		       python <<-EOF
+		       python3 <<-EOF
 	import opencpi.aci as OA
-	app=OA.Application("$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
+	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
 	EOF
       ;;
     core)
@@ -178,7 +179,7 @@ for t in $tests; do
     driver)
       if [ ! -e $OCPI_CDK_DIR/scripts/ocpi_${OCPI_TOOL_OS}_driver ]; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  not supported.
-      elif [ -e /.dockerenv ] ; then
+      elif [ -e /.dockerenv ] || [ -e /run/.containerenv ] ; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  running in a docker container.
       else
         echo ======================= Loading the OpenCPI Linux Kernel driver. &&

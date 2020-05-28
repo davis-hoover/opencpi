@@ -8,18 +8,54 @@
 
 # Define the stages of the pipeline.
 stages:
+  - .pre
   - prereq
   - build
   - build-rcc
-  - build-primitives-core
-  - build-primitives-assets
-  - build-primitives-inactive
+  - build-primitives
   - build-workers
   - build-platforms
   - build-assemblies
   - build-test
   - test
   - deploy
+
+
+# Includes yaml files in the '.gitlab-ci' directory.
+# Folder structure for the directory is as follows:
+# - .yml file for host platform (e.g., centos7.yml)
+# - Host Platform (e.g., centos7)
+#   - .yml files for target platform (e.g., xilinx13_4.yml, xsim.yml, zed.yml)
+include:
+  # .gitlab-ci
+  - /.gitlab-ci/templates.yml
+  - /.gitlab-ci/centos6.yml
+  - /.gitlab-ci/centos7.yml
+
+  # centos6
+  - /.gitlab-ci/centos6/xsim.yml
+  - /.gitlab-ci/centos6/isim.yml
+  - /.gitlab-ci/centos6/zed.yml
+  - /.gitlab-ci/centos6/xilinx13_3.yml
+  - /.gitlab-ci/centos6/xilinx13_4.yml
+  - /.gitlab-ci/centos6/matchstiq_z1.yml
+  - /.gitlab-ci/centos6/modelsim.yml
+  - /.gitlab-ci/centos6/zed_ise.yml
+
+  # centos7
+  - /.gitlab-ci/centos7/xsim.yml
+  - /.gitlab-ci/centos7/isim.yml
+  - /.gitlab-ci/centos7/zed.yml
+  - /.gitlab-ci/centos7/xilinx13_3.yml
+  - /.gitlab-ci/centos7/xilinx13_4.yml
+  - /.gitlab-ci/centos7/matchstiq_z1.yml
+  - /.gitlab-ci/centos7/modelsim.yml
+  - /.gitlab-ci/centos7/zed_ise.yml
+
+  # downstream projects
+  - /.gitlab-ci/docs.yml
+  - /.gitlab-ci/e3xx.yml
+
 
 # Global before and after scripts to run after each job. Overwrite in a specific
 # job to prevent these from occurring.
@@ -37,33 +73,39 @@ default:
     - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
   timeout: 24h
 
-# Includes yaml files in the '.gitlab-ci' directory.
-# Folder structure for the directory is as follows:
-# - .yml file for host platform (e.g., centos7.yml)
-# - Host Platform (e.g., centos7)
-#   - .yml files for target platform (e.g., xilinx13_4.yml, xsim.yml, zed.yml)
-include:
-  # .gitlab-ci
-  - /.gitlab-ci/templates.yml
-  - /.gitlab-ci/docs.yml
-  - /.gitlab-ci/centos6.yml
-  - /.gitlab-ci/centos7.yml
 
-  # centos6
-  - /.gitlab-ci/centos6/xsim.yml
-  - /.gitlab-ci/centos6/isim.yml
-  - /.gitlab-ci/centos6/zed.yml
-  - /.gitlab-ci/centos6/xilinx13_3.yml
-  - /.gitlab-ci/centos6/xilinx13_4.yml
-  - /.gitlab-ci/centos6/matchstiq_z1.yml
-  
-  # centos7
-  - /.gitlab-ci/centos7/xsim.yml
-  - /.gitlab-ci/centos7/isim.yml
-  - /.gitlab-ci/centos7/zed.yml
-  - /.gitlab-ci/centos7/xilinx13_3.yml
-  - /.gitlab-ci/centos7/xilinx13_4.yml
-  - /.gitlab-ci/centos7/matchstiq_z1.yml
+# Job that runs in .pre stage to verify if a commit is made to a branch with an existing MR.
+# If an MR exist for the branch, do not run a pipeline for the commit.
+# This is to prevent both an MR pipeline and a commit pipeline from being kicked off.
+cancel-pipeline:
+  stage: .pre
+  extends:
+    - .centos7
+    - .docker
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == 'develop'"
+      when: never
+    - when: on_success
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  script:
+    - MR="[]"
+    - MR=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests?source_branch=${CI_COMMIT_REF_NAME}&state=opened") || true
+    - DEV=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/commits/develop")
+    - DEV_SHA=$(echo "$DEV" | sed -e 's/.*"sha":"\([^"]*\).*/\1/g')
+    - >
+      if [ "$MR" != "[]" ]; then
+        echo "A merge request exists for this branch; canceling pipeline."
+        curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
+      elif [ "$DEV_SHA" == "$CI_COMMIT_SHA" ]; then
+        echo "Last commit is identical to last commit in develop; canceling pipeline."
+        curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
+      else
+        echo "Pipeline is ok to proceed."
+      fi;
+  after_script: []
+  artifacts:
+    paths: []
 
-  # downstream projects
-  - /.gitlab-ci/e3xx.yml
+

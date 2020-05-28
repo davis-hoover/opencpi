@@ -519,7 +519,8 @@ finalizeProperties() {
 #endif
   // Ensure all parameters are in all paramConfigs, since some may have been added.
   for (unsigned n = 0; n < m_paramConfigs.size(); n++)
-    m_paramConfigs[n]->doDefaults();
+    if (m_paramConfigs[n])
+      m_paramConfigs[n]->doDefaults();
   return NULL;
 }
 
@@ -1088,6 +1089,13 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
   }
   // This is a convenient way to specify XML include dirs in component libraries
   // This will be parsed again for build/Makefile purposes.
+  // THIS MUST BE IN SYNC WITH THE gnumake VERSION in util.mk! Ugh.
+  OrderedStringSet dirs;
+  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, dirs)))
+    return;
+  for (auto it = dirs.begin(); it != dirs.end(); ++it)
+    addInclude(*it);
+#if 0
   for (OU::TokenIter ti(ezxml_cattr(xml, "componentlibraries")); ti.token(); ti.next()) {
     std::string inc;
     if ((err = getComponentLibrary(ti.token(), inc)))
@@ -1097,6 +1105,7 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     addInclude(inc + "/" + m_modelString);
     addInclude(inc);
   }
+#endif
   err = m_build.parse(xml);
 }
 

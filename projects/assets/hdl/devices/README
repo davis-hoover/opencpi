@@ -1,0 +1,3 @@
+See platform project's hdl/devices directory for device workers which implement
+latest-generation capabilities. Devices within this directory are expected to
+slowly migrate to the platform project.

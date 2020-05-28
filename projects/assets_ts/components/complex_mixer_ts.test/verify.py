@@ -46,7 +46,7 @@ def getmsg(m):
     return (opcode, length, data)
 
 """
-Ex: python verify.py {sample-freq} {ofilename} {ifilename}
+Ex: ./verify.py {sample-freq} {ofilename} {ifilename}
 Validate:
 TEST #1: Verify I & Q values are not all zeros
 TEST #2: Output file matches expected size

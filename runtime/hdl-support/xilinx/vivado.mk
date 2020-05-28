@@ -107,8 +107,14 @@ HdlToolNeedsSourceList_vivado=yes
 empty:=
 space:=$(empty) $(empty)
 
-VivadoRearrangePart=$(firstword $1)$(word 3,$1) $(word 2,$1)
-HdlFullPart_vivado=$(if $1,$(subst $(space),-,$(call VivadoRearrangePart,$(subst -, ,$1))))
+# If there is no speed or package, return the single part designator.
+# Otherwise change <die>-<speed>-<package> to <die>-<package>-<speed>[-<temp>]
+# Where <temp> is included as i or e at the end of <package>
+VivadoRearrangePart=$(strip\
+  $(if $(filter 1,$(words $1)),$1,\
+   $(foreach package,$(patsubst %e,%,$(patsubst %i,%,$(word 3,$1))),\
+     $(word 1,$1) $(package) $(word 2,$1) $(filter i e,$(patsubst %e,e,$(patsubst %i,i,$(word 3,$1)))))))
+HdlFullPart_vivado=$(and $1,$(subst $(space),-,$(call VivadoRearrangePart,$(subst -, ,$1))))
 
 ifeq ($(HdlMode),library)
 CoreOrLibName=$(LibName)
@@ -169,7 +175,7 @@ VivadoBadOptions_synth=\
 $(VivadoBadOptions_all)
 
 VivadoDefaultOptions_synth=\
--part $(HdlChoosePart) \
+-part $(HdlVivadoPart) \
 $(VivadoDefaultOptions_synth_$(HdlMode))
 
 
@@ -450,6 +456,7 @@ VivadoPruneOption=\
 
 # Check our extra options, prune our options and concatenate our defaults, extras, and internals
 VivadoOptions=$(strip \
+$(and $(VerilogDefines),$(foreach d,$(VerilogDefines),-verilog_define $d)}) \
 $(call VivadoCheckOptions,$(call VivadoMyExtraOptions,$1),$1)\
 $(call VivadoPruneOption,$(VivadoDefaultOptions_$1),$1) $(call VivadoMyExtraOptions,$1) $(VivadoInternalOptions_$1))
 
@@ -533,7 +540,7 @@ HdlToolCompile=\
     artifact='$(notdir $@)' \
     hdl_mode='$(HdlMode)' \
     top_mod='$(Top)' \
-    synth_part='$(HdlChoosePart)' \
+    synth_part='$(HdlVivadoPart)' \
     synth_opts='$(call VivadoOptions,synth)' \
     edif_opts='$(VivadoEdifOptions)';)
 
@@ -649,6 +656,8 @@ HdlConstraintsSuffix_vivado=.xdc
 VivadoConstraints_default=$(HdlPlatformDir_$1)/$1$(HdlConstraintsSuffix_vivado)
 VivadoConstraints=$(or $(HdlConstraints),$(VivadoConstraints_default))
 
+HdlVivadoPart=$(foreach p,$(HdlChoosePart),$(infox HVP:$p)$(call HdlFullPart_vivado,$p))
+
 # For synth rule: load dcp files of platform and app workers.
 define HdlToolDoPlatform_vivado
 
@@ -657,7 +666,7 @@ $(call OptName,$1,$3): $(call SynthName,$1,$3) $(call VivadoConstraints,$5)
 	$(AT)$(call DoVivado,vivado-impl.tcl,$1,-tclargs \
 		stage=opt \
 		target_file=$(notdir $(call OptName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
 		edif_file=$(notdir $(call SynthName,$1,$3)) \
 		constraints='$(foreach u,$(call VivadoConstraints,$5),$(call AdjustRelative,$u))' \
 		impl_opts='$(call VivadoOptions,opt)' \
@@ -670,7 +679,7 @@ $(call PlaceName,$1,$3): $(call OptName,$1,$3)
 		stage=place \
 		target_file=$(notdir $(call PlaceName,$1,$3)) \
 		checkpoint=$(notdir $(call OptName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
 		impl_opts='$(call VivadoOptions,place)' \
 		post_place_opt=$(if $(VivadoPostPlaceOpt),true,false) \
 		phys_opt_opts='$(call VivadoOptions,post_place_phys_opt)' \
@@ -683,7 +692,7 @@ $(call RouteName,$1,$3): $(call PlaceName,$1,$3)
 		stage=route \
 		target_file=$(notdir $(call RouteName,$1,$3)) \
 		checkpoint=$(notdir $(call PlaceName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
 		impl_opts='$(call VivadoOptions,route)' \
 		post_route_opt=$(if $(VivadoPostRouteOpt),true,false) \
 		phys_opt_opts='$(call VivadoOptions,post_route_phys_opt)' \
@@ -696,7 +705,7 @@ $(call TimingName,$1,$3): $(call RouteName,$1,$3)
 		stage=timing \
 		target_file=$(notdir $(call TimingName,$1,$3)) \
 		checkpoint=$(notdir $(call RouteName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
                 impl_opts='$(call VivadoOptions,timing)' \
 		,timing)
 
@@ -706,8 +715,8 @@ $(call BitName,$1,$3,$6): $(call RouteName,$1,$3) $(call TimingName,$1,$3) $(wil
 		stage=bit \
 		target_file=$(notdir $(call BitName,$1,$3,$6)) \
 		checkpoint=$(notdir $(call RouteName,$1,$3)) \
-		part=$(HdlChoosePart) \
-		constraints='$(wildcard $(HdlPlatformDir_$5)/*_bit.xdc)' \
+		part=$(HdlVivadoPart) \
+		constraints='$(call AdjustRelative,$(wildcard $(HdlPlatformDir_$5)/*_bit.xdc))' \
                 impl_opts='$(call VivadoOptions,bit)' \
 		,bit)
 

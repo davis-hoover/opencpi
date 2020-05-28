@@ -53,15 +53,15 @@ package wsi is
              opcode_width     : natural; -- bits in reqinfo
              own_clock        : boolean; -- does the port have a clock different thanthe wci?
              hdl_version      : natural; -- hdl interface version
-             early_request    : boolean  -- are datavalid and datalast used? 
+             early_request    : boolean  -- are datavalid and datalast used?
              );
     port (
       -- Exterior OCP input/master signals
       --- this is the same as wci_clock unless metadata says it isn't
-      Clk              : in  std_logic;
+      wsi_clk          : in  std_logic;
       --- only used if burst are precise
       MBurstLength     : in  std_logic_vector(burst_width - 1 downto 0);
-      --- only used if bytesize < data width or zlm 
+      --- only used if bytesize < data width or zlm
       MByteEn          : in  std_logic_vector(n_bytes - 1 downto 0);
       MCmd             : in  ocpi.ocp.MCmd_t;
       MData            : in  std_logic_vector(mdata_width-1 downto 0);
@@ -76,10 +76,8 @@ package wsi is
       -- Exterior OCP output/slave signals
       SReset_n         : out std_logic;
       SThreadBusy      : out std_logic_vector(0 downto 0);
-      -- Signals connected from the worker's WCI to this module;
-      wci_clk          : in  std_logic;
-      wci_reset        : in  Bool_t;
-      wci_is_operating : in  Bool_t;
+      wsi_reset        : in  Bool_t;
+      wsi_is_operating : in  Bool_t;
       -- Non-worker internal signals
       first_take       : out Bool_t; -- the first datum after is_operating taken, a pulse
       -- Interior signals used by worker logic
@@ -108,7 +106,7 @@ package wsi is
              opcode_width     : natural; -- bits in reqinfo
              own_clock        : boolean; -- does the port have a clock different thanthe wci?
              hdl_version      : natural; -- hdl interface version
-             early_request    : boolean; -- are datavalid and datalast used? 
+             early_request    : boolean; -- are datavalid and datalast used?
              insert_eom       : boolean; -- create output messages
              max_bytes        : natural; -- max possible supported message size in bytes
              max_latency      : natural := 256; -- max supported latency value
@@ -118,7 +116,7 @@ package wsi is
              );
     port (
       -- Exterior OCP input/slave signals
-      Clk              : in  std_logic; -- MIGHT BE THE SAME AS wci_clk
+      wsi_clk          : in  std_logic; -- MIGHT BE THE SAME AS wci_clk
       SReset_n         : in  std_logic;
       SThreadBusy      : in  std_logic_vector(0 downto 0);
       -- Exterior OCP output/master signals
@@ -132,10 +130,8 @@ package wsi is
       MReqInfo         : out std_logic_vector(opcode_width-1 downto 0);
       MReqLast         : out std_logic;
       MReset_n         : out std_logic;
-      -- Signals connected from the worker's WCI to this interface;
-      wci_clk          : in  std_logic;
-      wci_reset        : in  Bool_t;
-      wci_is_operating : in  Bool_t;
+      wsi_reset        : in  Bool_t;
+      wsi_is_operating : in  Bool_t;
       -- Non-worker internal signals
       first_take       : in  Bool_t; -- the first datum after is_operating taken, a pulse
       input_eof        : in  Bool_t;   -- an EOF is pending from (the first) input port
@@ -170,7 +166,7 @@ package wsi is
              byte_width         : natural; -- byte_width
              opcode_width       : natural; -- bits in reqinfo
              own_clock          : boolean; -- does the port have a clock different thanthe wci?
-             early_request      : boolean;  -- are datavalid and datalast used? 
+             early_request      : boolean;  -- are datavalid and datalast used?
              part_size_width    : natural := 16; -- width of part size path
              part_offset_width  : natural := 16 -- width of part offset path
              );
@@ -180,7 +176,7 @@ package wsi is
       Clk              : in  std_logic;
       --- only used if burst are precise
       MBurstLength     : in  std_logic_vector(burst_width - 1 downto 0);
-      --- only used if bytesize < data width or zlm 
+      --- only used if bytesize < data width or zlm
       MByteEn          : in  std_logic_vector(n_bytes - 1 downto 0);
       MCmd             : in  ocpi.ocp.MCmd_t;
       MData            : in  std_logic_vector(mdata_width-1 downto 0);
@@ -231,7 +227,7 @@ package wsi is
              byte_width         : natural; -- byte_width
              opcode_width       : natural; -- bits in reqinfo
              own_clock          : boolean; -- does the port have a clock different thanthe wci?
-             early_request      : boolean;  -- are datavalid and datalast used? 
+             early_request      : boolean;  -- are datavalid and datalast used?
              part_size_width    : natural := 16; -- width of part size path
              part_offset_width  : natural := 16 -- width of part offset path
              );
@@ -276,7 +272,7 @@ package wsi is
       part_give        : in Bool_t
       );
   end component part_master;
-  
+
   component delayline is
     generic (
       g_latency     : integer);

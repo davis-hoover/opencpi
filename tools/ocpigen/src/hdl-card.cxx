@@ -99,8 +99,10 @@ get(const char *file, const char *parentFile, Worker *parent, const char *&err) 
   if (c)
     return c;
   std::string type;
-  if ((err = OE::getRequiredString(xml, type, "type")))
+  if ((err = OE::getRequiredString(xml, type, "type"))) {
+    err = OU::esprintf("%s is not a valid card (has no slot type)", file);
     return NULL;
+  }
   SlotType *st = SlotType::get(type.c_str(), parentFile, err);
   if (!st)
     return NULL;

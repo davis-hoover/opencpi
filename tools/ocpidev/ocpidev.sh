@@ -1276,6 +1276,8 @@ ${specelems[$w]}
 ${supportselem[@]}
 </$elem>
 EOF
+    # The following check cannot be done since we are not looking at the right place for the file.
+    if false; then
     specfile=${specs[$w]}
     case "$specfile" in
       (*.xml) ;;
@@ -1290,6 +1292,7 @@ EOF
         fi
     esac
     [ -n "$verbose" -a "${specs[$w]}" != none -a ! -e "$specfile" ] && echo Warning:  spec file \"$specfile\" does not exist
+    fi
   done
   [ -z "$verbose" ] || echo Running \"make skeleton\" to make initial skeleton for worker $1
   # FIXME: how do we get the project's or library's xmlincludepath etc.
@@ -1401,9 +1404,9 @@ EOF
        Use Test='true' to create a test-exclusive property. -->
 </Tests>
 EOF
-    #   create generate.py: #!/usr/bin/env python2
+    #   create generate.py: #!/usr/bin/env python3
     cat <<EOF > $testdir/generate.py
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 Use this file to generate your input data.
@@ -1411,9 +1414,9 @@ Args: <list-of-user-defined-args> <input-file>
 """
 EOF
     chmod +x $testdir/generate.py
-    #   create verify.py: #!/usr/bin/env python2
+    #   create verify.py: #!/usr/bin/env python3
     cat <<EOF > $testdir/verify.py
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 Use this script to validate your output data against your input data.
@@ -2374,7 +2377,7 @@ while [[ "${argv[0]}" != "" ]] ; do
 	 val=${argv[0]:2}
 	 unset argv[0]
 	 argv=($flag $val ${argv[@]})
-	 echo FIXING: flag=$flag val=$val new=:${argv[@]}: >&2
+	 # echo FIXING: flag=$flag val=$val new=:${argv[@]}: >&2
 	 ;;
     esac
     case "${argv[0]}" in

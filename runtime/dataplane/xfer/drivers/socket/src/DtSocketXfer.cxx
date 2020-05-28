@@ -83,6 +83,7 @@ public:
 	  std::string error;
 	  if (OE::IfScanner::findIpAddr(getenv("OCPI_SOCKET_INTERFACE"), myAddr, error))
 	    throw OU::Error("Cannot obtain a local IP address:  %s", error.c_str());
+	  ocpiInfo("Socket endpoint address determined to be: %s", myAddr.c_str());
 	}
 	m_ipAddress = myAddr;
       }

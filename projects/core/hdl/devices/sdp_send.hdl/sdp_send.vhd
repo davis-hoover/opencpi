@@ -32,7 +32,7 @@ architecture rtl of worker is
   constant count_width_c  : natural := width_for_max(max_buffers_c);
   constant nbytes_width_c : natural := width_for_max(sdp_width_c * 4); -- nbytes in frame
   constant max_remotes_c  : natural := to_integer(max_remotes);
-  constant max_seg_dws_c  : natural := 32;
+  constant max_seg_dws_c  : natural := to_integer(sdp_length);
 
   subtype remote_idx_t is unsigned(width_for_max(ocpi.util.max(1,max_remotes_c - 1)) - 1 downto 0);
 
@@ -92,7 +92,7 @@ architecture rtl of worker is
   signal eof_sent_r        : bool_t; -- input eof indication conveyed/enqueued
 
   -- SDP back side --
-  signal sdp_reset              : std_logic;
+  signal sdp_reset              : std_logic; -- reset from EITHER sdp_in.reset or ctl_in.reset
   signal ctl2sdp_reset          : std_logic;
   signal bramb_addr             : bram_addr_t;
   signal bramb_addr_r           : bram_addr_t;
@@ -172,7 +172,7 @@ begin
         width => 3)
       port map(
         src_clk           => sdp_in.clk,
-        src_rst           => sdp_in.reset,
+        src_rst           => sdp_reset,
         src_in(0)         => truncation_fault_r,
         src_in(1)         => doorbell_fault_r,
         src_in(2)         => buffer_size_fault_r,
@@ -186,7 +186,7 @@ begin
   trunc_data : component cdc.cdc.count_up
     generic map(width => props_out.truncatedData'length)
     port map   (src_clk           => sdp_in.clk,
-                src_rst           => sdp_in.reset,
+                src_rst           => sdp_reset,
                 src_in            => truncatedData, -- a count-up pulse
                 dst_clk           => ctl_in.clk,
                 dst_rst           => ctl_in.reset,
@@ -194,14 +194,6 @@ begin
   -- This crosses clock domain (sdp->ctl), but it is an end-of-run debug thing so
   -- proper CDC is unnecessary
   props_out.truncatedMessage <= truncatedMessage_r;
-  -- trunc_mesg : component cdc.cdc.bits
-  --   generic map(width => props_out.truncatedMessage'length)
-  --   port map   (src_clk           => sdp_in.clk,
-  --               src_rst           => sdp_in.reset,
-  --               src_in            => std_logic_vector(truncatedMessage_r),
-  --               dst_clk           => ctl_in.clk,
-  --               dst_rst           => ctl_in.reset,
-  --               unsigned(dst_out) => props_out.truncatedMessage);
 
   -- Instance the message data BRAM
   -- Since the BRAM is single cycle, there is no handshake.
@@ -244,7 +236,7 @@ begin
   -- control clock domain to sdp clock domain
   flagfifo : component cdc.cdc.fifo
    generic map(width       => remote_idx_t'length,
-               depth       => 2) -- must be power of 2
+               depth       => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2
    port map   (src_CLK     => ctl_in.clk, -- maybe syncfifo later
                src_RST     => ctl_in.reset,
                dst_CLK     => sdp_in.clk,
@@ -255,14 +247,6 @@ begin
                dst_OUT     => flag_out_slv,
                dst_EMPTY_N => flag_not_empty);
 
-  -- A sync pulse to carry buffer consumption events
-  -- The sdp telling WSI that a local buffer has become empty
---  cpulse: component bsv.bsv.SyncPulse
---    port map  (sCLK         => sdp_in.clk,
---               sRST         => sdp_reset_n,
---               dCLK         => ctl_in.clk,
---               sEN          => md_deq,
---               dPulse       => buffer_consumed);
   buffer_consumed <= md_deq;
   -- source side
   flag_enq       <= props_in.remote_doorbell_any_written;
@@ -278,7 +262,7 @@ begin
                 src_in            => ctl_in.is_operating,
                 src_en            => '1',
                 dst_clk           => sdp_in.clk,
-                dst_rst           => sdp_in.reset,
+                dst_rst           => sdp_reset,
                 dst_out           => sdp_is_operating);
   ctl2sdp_rst : component cdc.cdc.reset
     port map   (src_rst           => ctl_in.reset,
@@ -360,7 +344,7 @@ begin
 
   --------------------------------------------------------------------------------
   -- BRAM to SDP signals and process, in the clock domain from the SDP.
-  sdp_reset_n         <= not sdp_in.reset;
+  sdp_reset_n         <= not sdp_reset;
   sdp_last_remote     <= resize(props_in.remote_count -1, remote_idx_t'length);
   md_out              <= slv2meta(md_out_slv);
   md_out_ndws         <= resize((md_out.length + dword_bytes - 1) srl 2, md_out_ndws'length);
@@ -452,7 +436,7 @@ g0: for i in 0 to sdp_width_c-1 generate
       end if;
     end procedure begin_flag;
     procedure begin_meta is
-      variable meta :std_logic_vector(55 downto 0)
+      variable meta : std_logic_vector(55 downto 0)
         := slv(slv(md_out.truncate),8) & slv(slv(md_out.eof),8) & md_out.opcode &
         std_logic_vector(resize(md_out.length, 32));
     begin
@@ -460,7 +444,11 @@ g0: for i in 0 to sdp_width_c-1 generate
         begin_flag(meta2slv(md_out));
       else
         sdp_remote_phase_r <= meta_e;
-        sdp_out_r          <= std_logic_vector(meta(sdp_out_r'range));
+        if meta'length < sdp_out_r'length then
+          sdp_out_r        <= slv0(sdp_out_r'length - meta'length) & meta;
+        else
+          sdp_out_r        <= meta(sdp_out_r'range);
+        end if;
         sdp_out_valid_r    <= btrue;
         begin_segment(to_unsigned(sdp_meta_ndws_c, meta_dw_count_t'length));
       end if;
@@ -550,12 +538,13 @@ g0: for i in 0 to sdp_width_c-1 generate
                   bramb_addr_r    <= bramb_addr + 1;
                   sdp_out_valid_r <= bfalse;
                 when meta_e => -- must be single word width
-                  sdp_out_r <= "00000001" & slv(slv(md_out.truncate), 8) &
-                               slv(slv(md_out.eof), 8) & md_out.opcode;
+                  sdp_out_r(dword_t'range) <= "00000001" & slv(slv(md_out.truncate), 8) &
+                                              slv(slv(md_out.eof), 8) & md_out.opcode;
                   sdp_out_valid_r <= btrue;
                 when others => null;
               end case;
-              sdp_segment_dws_left_r <= sdp_segment_dws_left_r - sdp_width_c;
+              sdp_segment_dws_left_r <= sdp_segment_dws_left_r -
+                                        ocpi.util.min(sdp_segment_dws_left_r, sdp_width_c);
             else
               -- end the segment
               case sdp_remote_phase_r is

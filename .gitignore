@@ -41,8 +41,6 @@ lib/
 run/
 !/projects/*/rcc/platforms/xilinx*/opencpi-*-release*/**/lib
 !/projects/*/rcc/platforms/xilinx*/opencpi-*-release*/**/*.so
-tools/cdk/export/*
-tools/cdk/include/ctests/*
 my-env.sh
 myzed.sh
 exports

@@ -131,7 +131,7 @@ function make_relative_link {
   local up
 #  [[ $1 =~ ^/ ]] || up=$(echo $2 | sed 's-[^/]*$--' | sed 's-[^/]*/-../-g')
 #  link=${up}$1
-  link=$(python -c "import os.path; print(os.path.relpath('$(dirname $1)','$(dirname $2)'))")/
+  link=$(python -c "import os.path; print(os.path.relpath('$(dirname $1)', '$(dirname $2)'))")/
   link+=$(basename $1)
   # echo make_relative_link $1 $2 up:$up link:$link > /dev/tty
   if [ -L $2 ]; then
@@ -413,7 +413,7 @@ done
 # Since this might enable tools, we do it early, even when we are not creating links for a target
 # Note that this is analogous to the runtime system config file system.xml
 userenv=user-env.sh
-defaultuserenv=tools/cdk/scripts/default-user-env.sh
+defaultuserenv=tools/scripts/default-user-env.sh
 if [ -r $userenv ] && grep -q '^ *export' $userenv; then
   [ -n "$verbose" ] &&
       echo Preserving user environment script \"$userenv\" since it has user-specified exports in it.
@@ -437,12 +437,13 @@ fi
 # After this are only exports done when targets exist
 [ -n "$hdl_platform" ] && exit 0
 [ "$target" = - ] && exit 0
+
 set +f
 # Put the check file into the runtime platform dir
 # FIXME: make sure if/whether this is really required and why
 check=$rcc_platform_dir/${rcc_platform}-check.sh
 [ -z "$hdl_platform" -a -r "$check" ] && {
-  to=$(python -c "import os.path; print(os.path.relpath('"$check"', '.'))")
+  to=$(python3 -c "import os.path; print(os.path.relpath('"$check"', '.'))")
   make_relative_link $to exports/runtime/$target/$(basename $check)
   cat <<-EOF > exports/runtime/$target/${rcc_platform}-init.sh
 	# This is the minimal setup required for runtime

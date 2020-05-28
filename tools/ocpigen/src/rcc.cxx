@@ -22,11 +22,14 @@
 #include <algorithm>
 #include <vector>
 
+#include "OcpiOsFileSystem.h"
+
 #include "assembly.h"
 #include "data.h"
 #include "rcc.h"
 
 namespace OU = OCPI::Util;
+namespace OF = OCPI::OS::FileSystem;
 
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
@@ -1292,9 +1295,11 @@ addSlave(const std::string worker_name, const std::string slave_name) {
   const char *err = NULL;
   std::string sw;
   const char *dot = strrchr(worker_name.c_str(), '.');
-  OU::format(sw, "../%s/%.*s.xml", worker_name.c_str(), (int)(dot - worker_name.c_str()),
-             worker_name.c_str());
-
+  // Here we try a shortcut to find the slave worker's XML even when it has not been built
+  // or the library has not been "generated".
+  OU::format(sw, "../%s/%.*s.xml", worker_name.c_str(), (int)(dot - worker_name.c_str()), worker_name.c_str());
+  if (!OF::exists(sw)) // make it findable in any generated/built library
+    OU::format(sw, "%s/%.*s.xml", dot + 1, (int)(dot - worker_name.c_str()), worker_name.c_str());
   Worker *wkr = Worker::create(sw.c_str(), m_file, NULL, m_outDir, NULL, NULL, 0, err);
   if (!wkr) {
     return OU::esprintf("for slave worker %s: %s", worker_name.c_str(), err);

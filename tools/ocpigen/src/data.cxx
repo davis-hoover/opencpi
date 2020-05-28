@@ -21,6 +21,7 @@
 // Support for data ports
 
 #include <cassert>
+#include <climits>
 #include "assembly.h"
 #include "data.h"
 
@@ -383,18 +384,18 @@ emitRecordDataTypes(FILE *f) {
     if (operations()) {
       // See if this protocol has already been defined
       size_t maxOpcodes = 0;
-      unsigned first = 0;
+      unsigned first = UINT_MAX;
       for (unsigned nn = 0; nn < worker().m_ports.size(); nn++)
 	if (worker().m_ports[nn]->isData()) {
 	  DataPort *dp = static_cast<DataPort*>(worker().m_ports[nn]);
 	  if (dp->operations() &&
 	      !strcasecmp(dp->OU::Protocol::cname(), OU::Protocol::cname())) {
 	    maxOpcodes = std::max(dp->m_nOpcodes, maxOpcodes);
-	    if (!first)
+	    if (first == UINT_MAX)
 	      first = nn;
 	  }
 	}
-      if (first >= ::Port::m_ordinal) {
+      if (first == ::Port::m_ordinal) {
 	fprintf(f,
 		"  -- This enumeration is for the opcodes for protocol %s (%s)\n"
 		"  type %s_OpCode_t is (\n",

@@ -45,10 +45,15 @@ std::vector<const char *> compat_includes() {
 }
 void
 addInclude(const std::string &inc) {
+  for (auto it = includes.begin(); it != includes.end(); ++it)
+    if (inc == *it) // use ordered set?
+      return;
+  ocpiInfo("Adding to XML path: %s", inc.c_str());
   includes.push_back(inc);
 }
 void
 addInclude(const char *inc) {
+  ocpiInfo("Adding to XML path: %s", inc);
   includes.push_back(inc);
 }
 
@@ -243,8 +248,8 @@ openOutput(const char *name, const char *outDir, const char *prefix, const char 
       char dummy;
       ssize_t length = readlink(otherFile.c_str(), &dummy, 1);
       if (length != -1) {
-	char *buf = (char*)malloc(length + 1);
-	if (readlink(otherFile.c_str(), buf, length) != length) {
+	char *buf = (char*)malloc((size_t)length + 1u);
+	if (readlink(otherFile.c_str(), buf, (size_t)length) != length) {
 	  free(buf);
 	  err = "Unexpected system error reading symlink";
 	  break;
@@ -303,7 +308,7 @@ expandEnv(const char *s, std::string &out) {
       const char *name = in;
       while (*++in && (isalnum(*in) || *in == '_'))
 	;
-      std::string ename(name, in - name);
+      std::string ename(name, OCPI_SIZE_T_DIFF(in,name));
       if (paren && *in++ != ')')
 	return OU::esprintf("invalid environment reference in: %s", in);
       const char *env = getenv(ename.c_str());

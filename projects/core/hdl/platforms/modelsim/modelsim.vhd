@@ -66,6 +66,7 @@ begin
              sdp_out_data => sdp_sim_out_data);
 
   sdp_node_i : component sdp.sdp.sdp_node_rv
+    generic map(sdp_width  => sdp_width)
     port map( wci_Clk => ctl_clk,
               wci_Reset_n => ctl_reset_n,
               up_in => sdp_sim_out,
@@ -82,6 +83,7 @@ begin
               down_out_data => sdp_out_data);
 
   sdp2cp_clk_i : component sdp.sdp.sdp2cp_clk_rv
+    generic map(sdp_width  => sdp_width)
     port map( wci_Clk => ctl_clk,
               wci_Reset_n => ctl_reset_n,
               cp_in => cp_in,

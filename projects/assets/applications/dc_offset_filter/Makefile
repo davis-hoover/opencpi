@@ -80,7 +80,7 @@ Zedboard/Zipper:
 ./target-xilinx13_3/dc_offset_filter 1000 .512 -1 6 .75 51 1
 ----------------------------------------------------------------------------
 4) Verification of output data: (development system)
-python ./scripts/plotAndFft.py odata/output_file.bin complex 65536 1000000 &
+./scripts/plotAndFft.py odata/output_file.bin complex 65536 1000000 &
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 endef
