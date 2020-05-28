@@ -315,7 +315,7 @@ For these platforms, follow the instructions contained in the Rx application's M
 
 \par\medskip
 \noindent The output file can then be plotted with the python script with the following syntax and the output can be seen below:\par\medskip
-\noindent\texttt{python3 ./scripts/plotAndFftAndTime.py odata/rx\_app\_raw.out complex 18000 256000 8192}\par
+\noindent\texttt{./scripts/plotAndFftAndTime.py odata/rx\_app\_raw.out complex 18000 256000 8192}\par
 	\begin{figure}[h]
 	 	\centering
 		\includegraphics[scale=.2]{rx_app_iq_plot}
@@ -328,7 +328,7 @@ For these platforms, follow the instructions contained in the Rx application's M
 		\label{fig:rx_app_fft_plot}
 	\end{figure}
 \noindent Alternatively, the shortened file can be plotted which will ignore optionally unwanted startup data:\par\medskip
-\noindent\texttt{python3 ./scripts/plotAndFftAndTime.py odata/rx\_app\_shortened.out complex 18000 256000 8192}\par\medskip
+\noindent\texttt{./scripts/plotAndFftAndTime.py odata/rx\_app\_shortened.out complex 18000 256000 8192}\par\medskip
 \noindent The default sample rate for the GNUradio block diagram is 512 kS/s. It is recommended that when using RX app with this input signal that a sample rate close to 512 kS/s be used. Higher sample rates are still valid, but may produce plots that look drastically different than those shown here.\par\medskip
 \newpage
 \noindent Timestamps are embedded, optionally, in the output file, and in addition to plotting, the script parses out and prints the timestamps. An example output gathered using the syntax above:\par\medskip
@@ -383,7 +383,7 @@ IF_TUNE_FREQ_MHZ=0.1
 Verify that the signal generator tone exists at 700,000 Hz in the plotted baseband signal FFT (calculated as signal generator frequency - RF tune frequency - IF tune frequency = 2400.8 MHz - 2400 MHz - 0.1 MHz = 700,000Hz).
 \begin{lstlisting}
 SAMP_RATE_HZ=2500000
-python3 ./scripts/plotAndFftAndTime.py odata/rx_app_shortened.out complex 65536 $SAMP_RATE_HZ 8192 &
+./scripts/plotAndFftAndTime.py odata/rx_app_shortened.out complex 65536 $SAMP_RATE_HZ 8192 &
 \end{lstlisting}
         \begin{figure}[H]
         \begin{minipage}{.5\textwidth}
@@ -425,7 +425,7 @@ IF_TUNE_FREQ_MHZ=0
 Verify that the signal generator tone exists at 800,000 Hz in the plotted baseband signal FFT (calculated as signal generator frequency - RF tune frequency - IF tune frequency = 2400.8 MHz - 2400 MHz - 0 MHz = 800,000Hz).
 \begin{lstlisting}
 SAMP_RATE_HZ=2500000
-python3 ./scripts/plotAndFftAndTime.py odata/rx_app_shortened.out complex 65536 $SAMP_RATE_HZ 8192 &
+./scripts/plotAndFftAndTime.py odata/rx_app_shortened.out complex 65536 $SAMP_RATE_HZ 8192 &
 \end{lstlisting}
         \begin{figure}[H]
         \begin{minipage}{.5\textwidth}

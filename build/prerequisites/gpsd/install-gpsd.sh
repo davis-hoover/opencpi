@@ -69,11 +69,23 @@ echo OcpiCrossHost=$OcpiCrossHost
 sysroot=
 [ -n "$OcpiCrossHost" ] && sysroot=$(echo $OcpiCrossCompile | sed "s|/bin[^/]*/$OcpiCrossHost-||")/$OcpiCrossHost/libc
 
-scons prefix=$OcpiInstallExecDir target=$OcpiCrossHost sysroot=$sysroot \
+#
+# Figure out how a potentially python3-compatible version of SCons
+# is invoked on $OCPI_TOOL_PLATFORM.  As of 12 May 2020, there are
+# two known possibilities.  If and/or when it becomes necessary to
+# check for others, the preferred order is from "least likely" to
+# "most likely", i.e., the sensible default of "scons" should be
+# the last possibility checked.
+#
+SCons=`command -v scons-3 || command -v scons`
+
+#echo "DEBUG: SCons is \"$SCons\""
+
+$SCons prefix=$OcpiInstallExecDir target=$OcpiCrossHost sysroot=$sysroot \
       libgpsmm=True ncurses=False qt=False python=False usb=False \
       bluez=False ntp=False manbuild=False shared=False nostrip=True \
-      debug=True
-scons install
+      debug=True dbus_export=False
+$SCons install
 # Because OpenCPI prerequisites must be statically compiled into a single
 # archive, and the scons build produces both libgps.a and libgpsd.a, a single
 # archive is manually constructed. The arguments to pass to ar were determined

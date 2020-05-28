@@ -21,7 +21,7 @@ build:pages:
       - .public/
       - build-pages.vars
 
-trigger-downstream:
+trigger-downstream:docs:
   stage: deploy
   tags:
     - docker

@@ -2,10 +2,10 @@
 [*] GTKWave Analyzer v3.3.30 (w)1999-2012 BSI
 [*] Tue Oct  2 19:38:34 2012
 [*]
-[dumpfile] "/work/ocpi/tools/cdk/examples/fsk_modem_xml/timeData.vcd"
+[dumpfile] "/work/ocpi/tools/examples/fsk_modem_xml/timeData.vcd"
 [dumpfile_mtime] "Tue Oct  2 18:58:40 2012"
 [dumpfile_size] 119091
-[savefile] "/work/ocpi/tools/cdk/examples/fsk_modem_xml/gtkwave.cfg/BufferTransferTiming.gtkw"
+[savefile] "/work/ocpi/tools/examples/fsk_modem_xml/gtkwave.cfg/BufferTransferTiming.gtkw"
 [timestart] 431810000
 [size] 1742 927
 [pos] 36 -1

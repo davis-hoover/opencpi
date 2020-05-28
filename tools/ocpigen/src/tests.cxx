@@ -1735,6 +1735,14 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
                                    "excludePlatforms", "finishPort", NULL)) ||
              (err = OE::checkElements(xml, "property", "case", "input", "output", NULL)))
     return err;
+  // This is a convenient way to specify XML include dirs in component libraries
+  // This will be parsed again for build/Makefile purposes.
+  // THIS MUST BE IN SYNC WITH THE gnumake VERSION in util.mk! Ugh.
+  OrderedStringSet dirs;
+  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), NULL, dirs)))
+    return err;
+  for (auto it = dirs.begin(); it != dirs.end(); ++it)
+    addInclude(*it);
   // ================= 1. Get the spec
   if ((err = getSpec(xml, testFile, package, xspec, specFile, specName)) ||
       (err = OE::getNumber(xml, "duration", &duration)) ||

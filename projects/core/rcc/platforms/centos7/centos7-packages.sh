@@ -46,8 +46,6 @@ PKGS_R+=(util-linux coreutils ed findutils initscripts)
 PKGS_R+=(libusb-devel)
 #    for bitstream manipulation at least
 PKGS_R+=(unzip)
-#    for python and swig testing
-PKGS_R+=(python)
 
 ##########################################################################################
 # D. yum-installed and rpm-required for devel (when users are doing their development).
@@ -59,11 +57,7 @@ PKGS_D+=(which wget)
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
 PKGS_D+=(time)
-#    for various project testing scripts - to allow users to use python2 - (we migrate to 3)
-#    -- (AV-1261, AV-1299): still python 2 or just for users?
-#    -- note that we also need python3 but some packages are from epel - below in $#4
-PKGS_D+=(python-matplotlib scipy numpy python3-tkinter)
-#    enable other packages in the epel repo, some required for devel (e.g. python34)
+#    enable the epel repo, which contains some packages required for devel (e.g. python36)
 PKGS_D+=(epel-release)
 #    for various 32-bit software tools we end up supporting (e.g. modelsim) in devel (AV-567)
 #    -- for rpm-required, we need a file-in-this-package too
@@ -96,10 +90,6 @@ PKGS_S+=(patch)
 PKGS_S+=(kernel-devel)
 #    for "make rpm":
 PKGS_S+=(rpm-build)
-#    for creating swig
-#    cannot install swig3 if swig is already installed, so defer.
-#PKGS_S+=(swig3 python-devel)
-PKGS_S+=(python-devel)
 #    for general configuration/installation flexibility - note nfs-utils-lib exists on early centos7.1
 PKGS_S+=(nfs-utils)
 #    for the inode64 prerequisite build (from source)
@@ -117,20 +107,20 @@ PKGS_S+=(screen)
 # "python3-scipy", and "python3-scons".
 python3_ver=python36
 #    for ocpidev
-#    swig is supposed to support python3, so adding python3-devel here
 PKGS_E+=(python3 python3-devel ${python3_ver}-jinja2)
 #    for various testing scripts
 #    AV-5478: If the minor version changes here, fix script below
-PKGS_E+=(${python3_ver}-numpy ${python3_ver}-scipy python3-pip)
+PKGS_E+=(${python3_ver}-numpy ${python3_ver}-scipy python3-tkinter python3-pip)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd)
 #    Needed to build gpsd
-#    Adding python3-scons for eventual upgrade from python2 to python3
-PKGS_E+=(python2-scons ${python3_ver}-scons)
+PKGS_E+=(${python3_ver}-scons)
 #    Needed to build certain linux kernels or u-boot, at least Xilinx 2015.4
 PKGS_E+=(dtc)
+#    Need to build plutosdr osp 
+PKGS_E+=(perl-ExtUtils-MakeMaker)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available
@@ -201,7 +191,7 @@ $SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=sk
 $SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
 [ $? -ne 0 ] && bad "Installing EPEL packages failed"
 
-# Handle the deferred installation of SWIG
+# SWIG is a special case on CentOS 7
 install_swig3
 
 # And finally, install the remaining python3 packages

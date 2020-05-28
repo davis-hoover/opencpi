@@ -50,8 +50,6 @@ PKGS_R+=(util-linux coreutils ed findutils initscripts curl)
 PKGS_R+=(libusb-dev)
 #    for bitstream manipulation at least
 PKGS_R+=(unzip)
-#    for python and swig testing: python means python2 by default on most distros
-PKGS_R+=(python)
 
 ##########################################################################################
 # D. devel (when users are doing their development).
@@ -65,14 +63,9 @@ PKGS_D+=(debianutils wget)
 PKGS_D+=(libc6-dev binutils)
 #    for various building scripts for timing commands
 PKGS_D+=(time)
-#    for various project testing scripts - to allow users to use python2 - (we migrate to 3)
-#    -- (AV-1261, AV-1299): still python 2 or just for users?
-#    -- note that we also need python3: some distros have that in their "extra" repos
-PKGS_D+=(python-matplotlib python-scipy python-numpy)
-#    placeholder for enabling non-standard repos (epel-release is RHEL-specific)
-#PKGS_D+=(epel-release)
 #    for various 32-bit software tools we end up supporting (e.g. modelsim) in devel (AV-567)
 #    -- for rpm-required, we need a file-in-this-package too
+#    -- leaving the next several lines as a reminder of why we need the packages
 #PKGS_D+=(glibc.i686=/lib/ld-linux.so.2
 #         redhat-lsb-core.i686=/lib/ld-lsb.so.3
 #         ncurses-libs.i686=/usr/lib/libncurses.so.5
@@ -86,7 +79,6 @@ PKGS_D+=(libpng12-0)
 PKGS_D+=(hardlink)
 # docker container missing this	libXdmcp.i686=/lib/libXdmcp.so.6) # AV-3645
 #    for bash completion - a noarch package  (AV-2398)
-#PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 PKGS_D+=(bash-completion)
 #    Needed to build gdb
 PKGS_D+=(bison)
@@ -102,18 +94,12 @@ PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
 #    for building kernel drivers (separate from pre-packaged driver)
-#    N.B.: "linux-headers-`uname -r`" is probably the only required
-#    package, and normally gets installed with kernel upgrades, i.e.,
-#    it should already be present.
-KVER=`uname -r | cut -f1 -d'-'`
-PKGS_S+=(linux-source-$KVER)
+KVER=`uname -r`
+PKGS_S+=(linux-headers-$KVER)
 #    for "make rpm":
+#      does not necessarily make sense for debian-based
+#      distros, but will include for completeness
 PKGS_S+=(rpm)
-#    for creating swig
-#    Do not install swig at this time: have to make sure
-#    the TimSC third-party repository is enabled first.
-#PKGS_S+=(swig python-dev)
-PKGS_S+=(python-dev)
 #    for general configuration/installation flexibility
 PKGS_S+=(nfs-common nfs-kernel-server)
 #    for the inode64 prerequisite build (from source)
@@ -131,19 +117,18 @@ PKGS_S+=(screen)
 #    "python3.5" by default as of March 2020.
 #
 #    for creating swig
+#    -- see note about installing/enabling TimSC PPA below
 PKGS_E+=(swig)
 #    for ocpidev
-#    swig is supposed to support python3, so adding python3-dev here
 PKGS_E+=(python3 python3-dev python3-jinja2)
 #    for various testing scripts
-#    AV-5478: If the minor version changes here, fix script below
 PKGS_E+=(python3-numpy python3-scipy python3-matplotlib)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd-libopencl1)
 #    Needed to build gpsd
-#    Potential problem here: *ubuntu 16.04 LTS SCons version is a major
-#    release older than CentOS 7 version.  No separate python3 version.
 PKGS_E+=(scons)
+#    Needed to build plutosdr osp
+PKGS_D+=(libssl-dev device-tree-compiler)
 
 #
 # Comments around/within the next two functions are for my own
@@ -196,17 +181,17 @@ Could not find 'sudo' and you are not root. Installing packages requires root
 permissions."
 fi
 
+# Enable TimSC Personal Package Archive (PPA): needed for "swig"
+if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
+then
+  $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
+  $SUDO apt-get update
+fi
+
 # Install required packages, packages needed for development, and packages
 # needed for building from source.  Specify "--no-act" for debugging.
 $SUDO apt-get --yes install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
 [ $? -ne 0 ] && bad "Installing required packages failed"
-
-# Enable TimSC Personal Package Archive (PPA)
-if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
-then
-  $SUDO add-apt-repository ppa:timsc/swig-3.0.12
-  $SUDO apt-get update
-fi
 
 # Now install those packages that depend on "extras" repos.
 # Again, specify "--no-act" for debugging.

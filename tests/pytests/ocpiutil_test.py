@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -27,8 +29,8 @@ Run from this directory as follows:
 To view the code coverage report:
     $ coverage3 report
 To view the line-by-line code coverage report:
-    $ coverage3 annotate ../../tools/cdk/scripts/ocpiutil.py
-    $ vim ../../tools/cdk/scripts/ocpiutil.py,cover
+    $ coverage3 annotate ../../tools/scripts/ocpiutil.py
+    $ vim ../../tools/scripts/ocpiutil.py,cover
 """
 import unittest
 import os
@@ -160,7 +162,7 @@ class TestPathFunctions(unittest.TestCase):
         # Register the exported project
         ocpidev_command += OCPIDEV_CMD + " register project mypj8_exported; "
 
-        logging.debug("OCPIDEV CMD: '" + ocpidev_command.replace('; ', ';\n') + "';")
+        logging.debug("OCPIDEV CMD: '" + ocpidev_command.replace('; ', ';\n'))
         process = subprocess.Popen(ocpidev_command, shell=True, executable='/bin/bash')
         results = process.communicate()
         if results[1] or process.returncode != 0:
