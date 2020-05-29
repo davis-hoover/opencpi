@@ -92,7 +92,7 @@ HdlDefaultTarget_zynq_ultra:=xczu3cg-2-sbva484e
 ###############################################################################
 # Altera targets
 ###############################################################################
-HdlTargets_altera:=arria10soc arria10soc_std stratix4 stratix5 # altera-sim
+HdlTargets_altera:=arria10soc arria10soc_std stratix4 stratix5 cyclone5 # altera-sim
 
 # The "k", when present indicates the transceiver count (k = 36)
 # But in many places it is left off..
@@ -112,7 +112,8 @@ HdlDefaultTarget_arria10soc:=10AS066N3F40E2SG
 HdlTargets_arria10soc_std:=10AS066N3F40E2SG_std_alias
 HdlDefaultTarget_arria10soc_std:=10AS066N3F40E2SG_std_alias
 
-
+HdlTargets_cyclone5:=5CSXFC6D6F31C8ES
+HdlDefaultTarget_cyclone5:=AUTO
 
 
 ###############################################################################
@@ -138,7 +139,8 @@ HdlToolSet_stratix4:=quartus
 HdlToolSet_stratix5:=quartus
 HdlToolSet_arria10soc:=quartus_pro
 HdlToolSet_arria10soc_std:=quartus
-
+HdlToolSet_cyclone5:=quartus
+	
 # Call the tool-specific function to get the full part incase the
 # tool needs to rearrange the different part elements
 # If the tool does not define this function, return part as-is

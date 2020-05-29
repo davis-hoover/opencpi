@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -16,13 +17,31 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ImportCoreDirs=\
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/temac_v6 \
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_trn_v6_gtx_x4_250 \
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_hip_s4gx_gen2_x4_128
-# These are order-sensitive
-PrimitiveLibraries=bsv fixed_float ocpi util cdc platform sdp axi sync protocol clocking
-# All cores here are imported
-PrimitiveCores=
+"""
+Use this script to validate your output data against your input data.
+Args: <list-of-user-defined-args> <output-file> <input-files>
+"""
 
-include $(OCPI_CDK_DIR)/include/hdl/hdl-primitives.mk
+import sys
+import os.path
+import numpy as np
+
+dt = np.dtype('<u4')
+with open(sys.argv[2], 'rb') as f:
+    idata = np.fromfile(f, dtype=dt)
+
+with open(sys.argv[1], 'rb') as f:
+    odata = np.fromfile(f, dtype=dt)
+
+if len(odata) != len(idata):
+    print("    Output file length is unexpected")
+    print("    Length = ", len(odata), "while expected length is = ", len(idata))
+    sys.exit(1)
+else:
+    print("    Input and output file lengths match")
+
+if np.array_equal(idata, odata):
+    print("    Input and output data match")
+else:
+    print("    Input and output data don't match")
+    sys.exit(1)

@@ -16,13 +16,19 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ImportCoreDirs=\
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/temac_v6 \
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_trn_v6_gtx_x4_250 \
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_hip_s4gx_gen2_x4_128
-# These are order-sensitive
-PrimitiveLibraries=bsv fixed_float ocpi util cdc platform sdp axi sync protocol clocking
-# All cores here are imported
-PrimitiveCores=
+set ip_name [lindex $argv 0]
+set clock_prim [string toupper [lindex $argv 1]]
+set ip_module [lindex $argv 2]
+set ip_part [lindex $argv 3]
 
-include $(OCPI_CDK_DIR)/include/hdl/hdl-primitives.mk
+create_project managed_ip_project managed_ip_project -ip -force -part $ip_part
+# Get latest version
+create_ip -name $ip_name -vendor xilinx.com -library ip -module_name $ip_module
+set ip_dir managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module
+set_property -dict [list CONFIG.PRIMITIVE $clock_prim] [get_ips $ip_module]
+generate_target all [get_files $ip_dir/$ip_module.xci]
+create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
+launch_runs ${ip_module}_synth_1
+wait_on_run ${ip_module}_synth_1
+file copy -force $ip_dir/${ip_module}_clk_wiz.v ../${ip_module}.v
+file copy -force $ip_dir/${ip_module}_sim_netlist.vhdl ../${ip_module}_sim.vhd
