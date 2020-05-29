@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -15,14 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+import sys
+import os.path
+import struct
 
-#ImportCoreDirs=\
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/temac_v6 \
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_trn_v6_gtx_x4_250 \
-#  $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_hip_s4gx_gen2_x4_128
-# These are order-sensitive
-PrimitiveLibraries=bsv fixed_float ocpi util cdc platform sdp axi sync protocol clocking
-# All cores here are imported
-PrimitiveCores=
-
-include $(OCPI_CDK_DIR)/include/hdl/hdl-primitives.mk
+with open(sys.argv[1], 'wb') as f:
+    for x in range(0, 256):
+        f.write(struct.pack("<I", x))

@@ -1,0 +1,119 @@
+--- mmcme2_sim.vhd	2020-05-15 11:06:50.000000000 -0400
++++ mmcme2_sim_modified.vhd	2020-05-15 11:33:00.990249202 -0400
+@@ -15,6 +15,13 @@
+ library UNISIM;
+ use UNISIM.VCOMPONENTS.ALL;
+ entity mmcme2_mmcme2_clk_wiz is
++  generic (
++    DIVCLK_DIVIDE        : integer :=  1; -- D
++    CLKFBOUT_MULT_F      : real :=  5.0;  -- M
++    CLKOUT0_DIVIDE_F     : real :=  1.0;  -- O
++    CLKOUT0_PHASE        : real :=  0.0;
++    CLKOUT0_DUTY_CYCLE   : real :=  0.5;
++    CLKIN1_PERIOD        : real :=  0.0);
+   port (
+     clk_out1 : out STD_LOGIC;
+     reset : in STD_LOGIC;
+@@ -26,7 +33,6 @@
+ end mmcme2_mmcme2_clk_wiz;
+ 
+ architecture STRUCTURE of mmcme2_mmcme2_clk_wiz is
+-  signal clk_in1_mmcme2 : STD_LOGIC;
+   signal clk_out1_mmcme2 : STD_LOGIC;
+   signal clkfbout_buf_mmcme2 : STD_LOGIC;
+   signal clkfbout_mmcme2 : STD_LOGIC;
+@@ -48,13 +54,6 @@
+   signal NLW_mmcm_adv_inst_DO_UNCONNECTED : STD_LOGIC_VECTOR ( 15 downto 0 );
+   attribute BOX_TYPE : string;
+   attribute BOX_TYPE of clkf_buf : label is "PRIMITIVE";
+-  attribute BOX_TYPE of clkin1_ibufg : label is "PRIMITIVE";
+-  attribute CAPACITANCE : string;
+-  attribute CAPACITANCE of clkin1_ibufg : label is "DONT_CARE";
+-  attribute IBUF_DELAY_VALUE : string;
+-  attribute IBUF_DELAY_VALUE of clkin1_ibufg : label is "0";
+-  attribute IFD_DELAY_VALUE : string;
+-  attribute IFD_DELAY_VALUE of clkin1_ibufg : label is "AUTO";
+   attribute BOX_TYPE of clkout1_buf : label is "PRIMITIVE";
+   attribute BOX_TYPE of mmcm_adv_inst : label is "PRIMITIVE";
+ begin
+@@ -63,14 +62,6 @@
+       I => clkfbout_mmcme2,
+       O => clkfbout_buf_mmcme2
+     );
+-clkin1_ibufg: unisim.vcomponents.IBUF
+-    generic map(
+-      IOSTANDARD => "DEFAULT"
+-    )
+-        port map (
+-      I => clk_in1,
+-      O => clk_in1_mmcme2
+-    );
+ clkout1_buf: unisim.vcomponents.BUFG
+      port map (
+       I => clk_out1_mmcme2,
+@@ -79,14 +70,14 @@
+ mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
+     generic map(
+       BANDWIDTH => "OPTIMIZED",
+-      CLKFBOUT_MULT_F => 10.000000,
++      CLKFBOUT_MULT_F => CLKFBOUT_MULT_F,
+       CLKFBOUT_PHASE => 0.000000,
+       CLKFBOUT_USE_FINE_PS => false,
+-      CLKIN1_PERIOD => 10.000000,
++      CLKIN1_PERIOD => CLKIN1_PERIOD,
+       CLKIN2_PERIOD => 0.000000,
+-      CLKOUT0_DIVIDE_F => 10.000000,
+-      CLKOUT0_DUTY_CYCLE => 0.500000,
+-      CLKOUT0_PHASE => 0.000000,
++      CLKOUT0_DIVIDE_F => CLKOUT0_DIVIDE_F,
++      CLKOUT0_DUTY_CYCLE => CLKOUT0_DUTY_CYCLE,
++      CLKOUT0_PHASE => CLKOUT0_PHASE,
+       CLKOUT0_USE_FINE_PS => false,
+       CLKOUT1_DIVIDE => 1,
+       CLKOUT1_DUTY_CYCLE => 0.500000,
+@@ -114,7 +105,7 @@
+       CLKOUT6_PHASE => 0.000000,
+       CLKOUT6_USE_FINE_PS => false,
+       COMPENSATION => "ZHOLD",
+-      DIVCLK_DIVIDE => 1,
++      DIVCLK_DIVIDE => DIVCLK_DIVIDE,
+       IS_CLKINSEL_INVERTED => '0',
+       IS_PSEN_INVERTED => '0',
+       IS_PSINCDEC_INVERTED => '0',
+@@ -132,7 +123,7 @@
+       CLKFBOUT => clkfbout_mmcme2,
+       CLKFBOUTB => NLW_mmcm_adv_inst_CLKFBOUTB_UNCONNECTED,
+       CLKFBSTOPPED => NLW_mmcm_adv_inst_CLKFBSTOPPED_UNCONNECTED,
+-      CLKIN1 => clk_in1_mmcme2,
++      CLKIN1 => clk_in1,
+       CLKIN2 => '0',
+       CLKINSEL => '1',
+       CLKINSTOPPED => NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED,
+@@ -168,6 +159,13 @@
+ library UNISIM;
+ use UNISIM.VCOMPONENTS.ALL;
+ entity mmcme2 is
++  generic (
++    DIVCLK_DIVIDE        : integer :=  1; -- D
++    CLKFBOUT_MULT_F      : real :=  5.0;  -- M
++    CLKOUT0_DIVIDE_F     : real :=  1.0;  -- O
++    CLKOUT0_PHASE        : real :=  0.0;
++    CLKOUT0_DUTY_CYCLE   : real :=  0.5;
++    CLKIN1_PERIOD        : real :=  0.0);
+   port (
+     clk_out1 : out STD_LOGIC;
+     reset : in STD_LOGIC;
+@@ -181,6 +179,13 @@
+ architecture STRUCTURE of mmcme2 is
+ begin
+ inst: entity work.mmcme2_mmcme2_clk_wiz
++    generic map(
++      DIVCLK_DIVIDE        =>  DIVCLK_DIVIDE,
++      CLKFBOUT_MULT_F      =>  CLKFBOUT_MULT_F,
++      CLKOUT0_DIVIDE_F     =>  CLKOUT0_DIVIDE_F,
++      CLKOUT0_PHASE        =>  CLKOUT0_PHASE,
++      CLKOUT0_DUTY_CYCLE   =>  CLKOUT0_DUTY_CYCLE,
++      CLKIN1_PERIOD        =>  CLKIN1_PERIOD)
+      port map (
+       clk_in1 => clk_in1,
+       clk_out1 => clk_out1,

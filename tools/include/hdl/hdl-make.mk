@@ -556,13 +556,24 @@ HdlPassTargets=$(and $(HdlTargets),HdlTargets="$(HdlTargets)") \
                $(and $(HdlPlatforms),HdlPlatforms="$(HdlPlatforms)") \
                $(and $(HdlPlatform),HdlPlatforms="$(HdlPlatform)")
 
-# Do target-specific file shadowing
+# Do target and vendor-specific file shadowing
+# Note family/target files shadow vendor ones which shadow top-level ones
+# Family and vendor directories may have ancillary/support files.
+# These ancillary files must be uniquely named if they exist for both target and vendor directories
+# Thus target ancillary files shadow vendor ancillary files.
+# A SourceFiles_<target-or-vendor) variable may be defined to specify ordering of the ancillary
+# files, but if there is no such variable, a simple wildcard is used in the shadow directory.
 HdlShadowFiles=\
-  $(foreach f,$(filter-out $(filter-out %.vhd,$(call CoreBlackBoxFiles,$1,$2)),\
-              $(CompiledSourceFiles)),\
-     $(or $(wildcard $(HdlTarget)/$f),\
-	  $(wildcard $(call HdlGetTop,$(HdlTarget))/$f),\
-          $f))
+ $(foreach t,$(call HdlGetTop,$(HdlTarget)),\
+   $(- first, include the files that are not shadowed)\
+   $(foreach f,$(filter-out $(filter-out %.vhd,$(call CoreBlackBoxFiles,$1,$2)),\
+               $(CompiledSourceFiles)),\
+     $(if $(or $(wildcard $(HdlTarget)/$f),$(wildcard $t/$f)),,$f))\
+   $(- second, include all target files)\
+   $(or $(SourceFiles_$(HdlTarget)),$(wildcard $(HdlTarget)/*.v $(HdlTarget)/*.vhd))\
+   $(- third, include all vendor files that are not shadowed by target files)\
+   $(foreach f,$(or $(SourceFiles_$t),$(wildcard $t/*.v $t/*.vhd)),\
+     $(if $(wildcard $(HdlTarget)/$(notdir $f)),,$f)))
 
 # This is the list of files that will be generated in the TARGET
 # directory.
