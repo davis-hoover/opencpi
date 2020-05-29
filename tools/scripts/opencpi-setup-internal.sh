@@ -98,7 +98,7 @@ esac
 }
 [ "$1" = --help -o "$1" = -h -o -z "$1" ] && {
   cat <<-EOF >&2
-	This script modifies the OpenCPI environment variables and the PATH/PYTHONPATH variables.
+	This script modifies the OpenCPI environment variables and the PATH/PYTHONPATH/MANPATH variables.
 	Options to this $ocpi_name file when *sourced* are:
 	 --help or -h:      print this message
 	 --reset or -r:     reset any previous OpenCPI environment before setting up a new one
@@ -174,6 +174,12 @@ unset ocpi_bootstrap
       [ -n "$ocpi_verbose" ] && echo Removing OpenCPI lib directory from PYTHONPATH.
       PYTHONPATH="$ocpi_cleaned"
     }
+    # Note we might be the only thing in this path, with no colon
+    ocpi_cleaned=$(echo "$MANPATH" | sed "s=$OCPI_CDK_DIR/doc/man[^:]*:*==g")
+    [ "$ocpi_cleaned" != "$MANPATH" ] && {
+      [ -n "$ocpi_verbose" ] && echo Removing OpenCPI doc/man directory from MANPATH.
+      MANPATH="$ocpi_cleaned"
+    }
   }
   [ -n "$ocpi_verbose" ] && echo Unsetting all OpenCPI environment variables.
   for ocpi_v in $(env | egrep "^$ocpi_cleaned_vars" | sort | cut -f1 -d=)
@@ -187,6 +193,7 @@ unset ocpi_bootstrap
   env | grep OCPI >&2
   env | grep '^PATH='
   env | grep '^PYTHONPATH='
+  env | grep '^MANPATH='
   return 0
 }
 
@@ -287,6 +294,9 @@ export PATH="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin:$ocpi_cleaned"
 ocpi_cleaned=$(echo "$PYTHONPATH" | sed "s=$OCPI_CDK_DIR/[^:/]*/lib[^:]*:*==g")
 [ -n "$ocpi_verbose" -a "$PYTHONPATH" != "$ocpi_cleaned" ] && echo Removing OpenCPI lib directory from PYTHONPATH >&2
 export PYTHONPATH="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib${ocpi_cleaned:+:}$ocpi_cleaned"
+ocpi_cleaned=$(echo "$MANPATH" | sed "s=$OCPI_CDK_DIR/doc/man[^:]*:*==g")
+[ -n "$ocpi_verbose" -a "$MANPATH" != "$ocpi_cleaned" ] && echo Removing OpenCPI doc/man directory from MANPATH >&2
+export MANPATH="$OCPI_CDK_DIR/doc/man${ocpi_cleaned:+:}$ocpi_cleaned"
 ocpi_comp=$OCPI_CDK_DIR/scripts/ocpidev_bash_complete
 [ -f $ocpi_comp ] && source $ocpi_comp
 [ "$ocpi_verbose" = 1 ] && cat <<-EOF >&2
@@ -294,6 +304,7 @@ ocpi_comp=$OCPI_CDK_DIR/scripts/ocpidev_bash_complete
 	The OpenCPI target directory set for this environment is "$OCPI_TOOL_DIR".
 	PATH now set to $PATH
 	PYTHONPATH now set to $PYTHONPATH
+	MANPATH now set to $MANPATH
 	Now determining where prerequisite software is installed.
 	EOF
 ocpi_user_env=$OCPI_CDK_DIR/../user-env.sh
