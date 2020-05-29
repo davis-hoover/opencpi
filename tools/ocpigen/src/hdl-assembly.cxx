@@ -570,6 +570,7 @@ parseHdlAssy() {
       }
     }
   }
+#if 0 // TODO / FIXME - do we need to restore the error check but with it being ok if it is optional and not connected?
   // Check for unconnected ports without clocks
   for (n = 0, i = &a->m_instances[0]; n < a->m_instances.size(); n++, i++)
     if (i->m_worker && !i->m_worker->m_assembly) {
@@ -584,6 +585,7 @@ parseHdlAssy() {
 	  }
 	}
     }
+#endif
   // Look at connections for inserting adapters between ports
   for (ConnectionsIter ci = a->m_connections.begin(); ci != a->m_connections.end(); ci++) {
     Connection &c = **ci;
