@@ -1,4 +1,4 @@
-#!/bin/bash --noprofile
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -16,21 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+import sys
+import os.path
+import struct
 
-[ -r /etc/lsb-release ] && exec 3</etc/lsb-release || exit 1
-d_id=''
-d_rel=''
-
-IFS='='
-while read var val <&3
-do
-	case $var in
-	"DISTRIB_ID")
-		d_id=$val
-		;;
-	"DISTRIB_RELEASE")
-		d_rel=$val
-		;;
-	esac
-done
-[ $d_id = "Ubuntu" -a $d_rel = "16.04" ]
+with open(sys.argv[1], 'wb') as f:
+    for x in range(0, 256):
+        f.write(struct.pack("<I", x))

@@ -1,0 +1,71 @@
+--- plle2.v	2020-05-15 11:07:06.000000000 -0400
++++ plle2_modified.v	2020-05-15 11:24:52.506289147 -0400
+@@ -63,9 +63,8 @@
+ //----------------------------------------------------------------------------
+ // __primary_________100.000____________0.010
+ 
+-`timescale 1ps/1ps
+ 
+-module plle2_clk_wiz 
++module plle2
+ 
+  (// Clock in ports
+   // Clock out ports
+@@ -75,15 +74,6 @@
+   output        locked,
+   input         clk_in1
+  );
+-  // Input buffering
+-  //------------------------------------
+-wire clk_in1_plle2;
+-wire clk_in2_plle2;
+-  IBUF clkin1_ibufg
+-   (.O (clk_in1_plle2),
+-    .I (clk_in1));
+-
+-
+   // Clocking PRIMITIVE
+   //------------------------------------
+ 
+@@ -91,6 +81,12 @@
+   //    * Unused inputs are tied off
+   //    * Unused outputs are labeled unused
+ 
++  parameter DIVCLK_DIVIDE       =  1;  // D
++  parameter CLKFBOUT_MULT       =  5;  // M
++  parameter CLKOUT0_DIVIDE      =  1;  // O
++  parameter CLKOUT0_PHASE       =  0.0;
++  parameter CLKOUT0_DUTY_CYCLE  =  0.5;
++  parameter CLKIN1_PERIOD       =  0.0;
+   wire        clk_out1_plle2;
+   wire        clk_out2_plle2;
+   wire        clk_out3_plle2;
+@@ -120,13 +116,13 @@
+   #(.BANDWIDTH            ("OPTIMIZED"),
+     .COMPENSATION         ("ZHOLD"),
+     .STARTUP_WAIT         ("FALSE"),
+-    .DIVCLK_DIVIDE        (1),
+-    .CLKFBOUT_MULT        (9),
++    .DIVCLK_DIVIDE        (DIVCLK_DIVIDE),
++    .CLKFBOUT_MULT        (CLKFBOUT_MULT),
+     .CLKFBOUT_PHASE       (0.000),
+-    .CLKOUT0_DIVIDE       (9),
+-    .CLKOUT0_PHASE        (0.000),
+-    .CLKOUT0_DUTY_CYCLE   (0.500),
+-    .CLKIN1_PERIOD        (10.000))
++    .CLKOUT0_DIVIDE       (CLKOUT0_DIVIDE),
++    .CLKOUT0_PHASE        (CLKOUT0_PHASE),
++    .CLKOUT0_DUTY_CYCLE   (CLKOUT0_DUTY_CYCLE),
++    .CLKIN1_PERIOD        (CLKIN1_PERIOD))
+   plle2_adv_inst
+     // Output clocks
+    (
+@@ -139,7 +135,7 @@
+     .CLKOUT5             (clkout5_unused),
+      // Input clock control
+     .CLKFBIN             (clkfbout_buf_plle2),
+-    .CLKIN1              (clk_in1_plle2),
++    .CLKIN1              (clk_in1),
+     .CLKIN2              (1'b0),
+      // Tied to always select the primary input clock
+     .CLKINSEL            (1'b1),

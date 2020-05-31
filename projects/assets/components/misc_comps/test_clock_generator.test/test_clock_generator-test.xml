@@ -1,0 +1,5 @@
+<!-- This is the test xml for testing component "test_clock_generator" -->
+<Tests UseHDLFileIo='true'>
+  <Input Port='in' Script='generate.py' StressorMode='full'/>
+  <Output Port='out' Script='verify.py'/>
+</Tests>

@@ -1,4 +1,3 @@
-#!/bin/bash --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,20 +16,23 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-[ -r /etc/lsb-release ] && exec 3</etc/lsb-release || exit 1
-d_id=''
-d_rel=''
+OnlyTargets=zynq xsim isim zynq_ise modelsim
 
-IFS='='
-while read var val <&3
-do
-	case $var in
-	"DISTRIB_ID")
-		d_id=$val
-		;;
-	"DISTRIB_RELEASE")
-		d_rel=$val
-		;;
-	esac
-done
-[ $d_id = "Ubuntu" -a $d_rel = "16.04" ]
+# Param_CLK_IN_FREQUENCY_MHz=100.0
+# Param_CLK_OUT_FREQUENCY_MHz=100.0
+# Param_Clock_Primitive=mmcme2
+# Param_Clock_Primitive=plle2
+# Param_M=$(shell [ ! -f M.txt ] && ./calc_pll_factors.py $(Param_CLK_IN_FREQUENCY_MHz) $(Param_CLK_OUT_FREQUENCY_MHz) $(HdlTarget) $(Param_Clock_Primitive); cat M.txt)
+# Param_N=$(shell cat N.txt)
+# Param_O=$(shell cat O.txt)
+
+include $(OCPI_CDK_DIR)/include/worker.mk
+
+# .SILENT: display_info
+# .PHONY: display_info
+#
+# clean::
+# 	rm -rf info.txt M.txt N.txt O.txt
+#
+# display_info:
+# 	cat info.txt
