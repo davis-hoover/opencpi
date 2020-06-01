@@ -1,0 +1,71 @@
+--- plle2.vhd	2020-05-15 11:02:39.000000000 -0400
++++ plle2_modified.vhd	2020-05-15 11:49:52.276910146 -0400
+@@ -72,6 +72,13 @@
+ use unisim.vcomponents.all;
+ 
+ entity plle2 is
++generic (
++  DIVCLK_DIVIDE        : integer :=  1;  -- D
++  CLKFBOUT_MULT        : integer :=  5;  -- M
++  CLKOUT0_DIVIDE       : integer :=  1;  -- O
++  CLKOUT0_PHASE        : real :=  0.0;
++  CLKOUT0_DUTY_CYCLE   : real :=  0.5;
++  CLKIN1_PERIOD        : real :=  0.0);
+ port
+  (-- Clock in ports
+   CLK_IN1           : in     std_logic;
+@@ -86,8 +93,6 @@
+ architecture xilinx of plle2 is
+   attribute CORE_GENERATION_INFO : string;
+   attribute CORE_GENERATION_INFO of xilinx : architecture is "plle2,clk_wiz_v3_6,{component_name=plle2,use_phase_alignment=true,use_min_o_jitter=false,use_max_i_jitter=false,use_dyn_phase_shift=false,use_inclk_switchover=false,use_dyn_reconfig=false,feedback_source=FDBK_AUTO,primtype_sel=MMCM_ADV,num_out_clk=1,clkin1_period=10.0,clkin2_period=10.0,use_power_down=false,use_reset=true,use_locked=true,use_inclk_stopped=false,use_status=false,use_freeze=false,use_clk_valid=false,feedback_type=SINGLE,clock_mgr_type=MANUAL,manual_override=false}";
+-  -- Input clock buffering / unused connectors
+-  signal clkin1      : std_logic;
+   -- Output clock buffering / unused connectors
+   signal clkfbout         : std_logic;
+   signal clkfbout_buf     : std_logic;
+@@ -112,16 +117,6 @@
+   signal clkfbstopped_unused : std_logic;
+   signal clkinstopped_unused : std_logic;
+ begin
+-
+-
+-  -- Input buffering
+-  --------------------------------------
+-  clkin1_buf : IBUFG
+-  port map
+-   (O => clkin1,
+-    I => CLK_IN1);
+-
+-
+   -- Clocking primitive
+   --------------------------------------
+   -- Instantiation of the MMCM primitive
+@@ -131,13 +126,13 @@
+   generic map
+    (BANDWIDTH            => "OPTIMIZED",
+     COMPENSATION         => "ZHOLD",
+-    DIVCLK_DIVIDE        => 1,
+-    CLKFBOUT_MULT        => 8,
++    DIVCLK_DIVIDE        => DIVCLK_DIVIDE,
++    CLKFBOUT_MULT        => CLKFBOUT_MULT,
+     CLKFBOUT_PHASE       => 0.000,
+-    CLKOUT0_DIVIDE       => 8,
+-    CLKOUT0_PHASE        => 0.000,
+-    CLKOUT0_DUTY_CYCLE   => 0.500,
+-    CLKIN1_PERIOD        => 10.0,
++    CLKOUT0_DIVIDE       => CLKOUT0_DIVIDE,
++    CLKOUT0_PHASE        => CLKOUT0_PHASE,
++    CLKOUT0_DUTY_CYCLE   => CLKOUT0_DUTY_CYCLE,
++    CLKIN1_PERIOD        => CLKIN1_PERIOD,
+     REF_JITTER1          => 0.010)
+   port map
+     -- Output clocks
+@@ -150,7 +145,7 @@
+     CLKOUT5             => clkout5_unused,
+     -- Input clock control
+     CLKFBIN             => clkfbout_buf,
+-    CLKIN1              => clkin1,
++    CLKIN1              => CLK_IN1,
+     CLKIN2              => '0',
+     -- Tied to always select the primary input clock
+     CLKINSEL            => '1',

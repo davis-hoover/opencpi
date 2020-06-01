@@ -84,6 +84,8 @@ PKGS_D+=(hardlink)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
+#    Needed by Xilinx ISE Coregen
+PKGS_D+=(libSM)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
