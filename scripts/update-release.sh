@@ -45,9 +45,9 @@ fi
 # Fix the common release subtitle and any URLs in fodt files
 (cd doc/odt
  echo "Updating odt docs for release $RELEASE"
- sed -i "s|\(OpenCPI Release \)[^<]*|\1$RELEASE|" shared/release.fodt
+ sed -i "s|\(OpenCPI Release:  \)[^<]*|\1$RELEASE|" shared/release.fodt
  for f in *.fodt; do
-   sed -i "s|\(OpenCPI Release \)[^<]*|\1$RELEASE|" "$f"
+   sed -i "s|\(OpenCPI Release:  \)[^<]*|\1$RELEASE|" "$f"
    sed -i 's|\( xlink:href="https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^"]*"\)|\1'"$RELEASE"'\2|g' "$f"
    sed -i 's|\(>https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^<]*<\)|\1'"$RELEASE"'\2|g' "$f"
  done
