@@ -1,4 +1,4 @@
-# This file is protected by Copyright. Please refer to the COPYRIGHT file
+#This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
 # This file is part of OpenCPI <http://www.opencpi.org>
@@ -16,11 +16,15 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-+<platform-dir>/matchstiq_z1.xdc
 # Development time to make visible to all others
++<platform-dir>/matchstiq_z1.xdc
 +<platform-dir>/matchstiq_z1_bit.xdc
-+<platform-dir>/sd_card
-=<platform_dir>/97-matchstiq_z1.rules udev-rules/
 =<platform_dir>/sd_card/system.xml
-@<platform_dir>/sd_card/iveia-atlas-i-z7e.dtb
-@<platform_dir>/sd_card/u-boot.bin
+
+# Udev rules for runtime on dev host
+=<platform_dir>/97-matchstiq_z1.rules udev-rules/
+
+# Deployment files
+@<platform-dir>/sd_card/iveia-atlas-i-z7e.dtb
+@<platform-dir>/sd_card/u-boot.bin
+@<platform-dir>/sd_card/system.xml opencpi/
