@@ -61,6 +61,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 			v1.5 & Deprecated Zipper; Moved to Appendix & 3/2019 \\
 			\hline
+			v1.7 & Resource Utilization Table removed & 5/2020 \\
+			\hline
 			\end{tabularx}
 		\end{table}
 	\end{center}
@@ -423,13 +425,13 @@ Using the ACI's default prompted setting of $f_s=4,000,000$ Hz for the FMCOMMS2/
 \begin{landscape}
 \subsection{Performance and Resource Utilization}
 \subsubsection{filerw}
-\input{../../../hdl/assemblies/fsk_filerw/utilization.inc}
+%\input{../../../hdl/assemblies/fsk_filerw/utilization.inc}
 \subsubsection{tx}
-\input{../../../hdl/assemblies/mfsk2_zp16_fir_real_phase_to_amp_cordic_cic_int/utilization.inc}
+%\input{../../../hdl/assemblies/mfsk2_zp16_fir_real_phase_to_amp_cordic_cic_int/utilization.inc}
 \subsubsection{rx}
-\input{../../../hdl/assemblies/dc_offset_iq_imbalance_mixer_cic_dec_rp_cordic_fir_real/utilization.inc}
+%\input{../../../hdl/assemblies/dc_offset_iq_imbalance_mixer_cic_dec_rp_cordic_fir_real/utilization.inc}
 \subsubsection{txrx/bbloopback}
-\input{../../../hdl/assemblies/fsk_modem/utilization.inc}
+%\input{../../../hdl/assemblies/fsk_modem/utilization.inc}
 \end{landscape}
 \subsection{Executable}
 The software portion of the application consists of a C++ program written using the OpenCPI C++ API as well as RCC proxy workers for command and control functionality. The program references the appropriate application XML file for the requested hardware and mode. The app XML files contain all of the property settings for the components in each application, except for the configuration of the endpoint proxy(ies). These endpoint proxy-related settings are passed via command-line prompted values to the appropriate endpoint proxy workers.\\
