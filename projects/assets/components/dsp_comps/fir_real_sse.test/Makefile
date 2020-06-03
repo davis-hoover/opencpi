@@ -15,5 +15,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-ExcludePlatforms=isim modelsim
+
+# TODO remove plutosdr - issue #1165 - ExludePlatform support at unit test build time
+ExcludePlatforms=isim modelsim plutosdr
+
 include $(OCPI_CDK_DIR)/include/test.mk
