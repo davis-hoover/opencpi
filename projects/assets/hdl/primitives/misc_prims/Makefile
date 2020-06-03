@@ -23,7 +23,7 @@
 # If they are in this project, they must be compiled first, and this requires that the
 # PrimitiveLibraries variable be set in the hdl/primitives/Makefile such that the
 # libraries are in dependency order.
-Libraries=ocpi fixed_float util cdc bsv protocol
+Libraries=ocpi fixed_float util cdc bsv protocol clocking
 
 # Set this variable to the list of source files in dependency order
 # If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
@@ -41,7 +41,8 @@ SourceFiles=$(patsubst %,%.vhd,\
 	cdc_testing/src/gen_reset_sync \
 	cdc_testing/src/four_bit_lfsr \
 	cdc_testing/src/one_shot_fifo \
-	cdc_testing/src/advance_counter)
+	cdc_testing/src/advance_counter \
+	cdc_testing/src/cdc_clk_gen)
 
 # Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:
 # 1. Any entity (VHDL) or module (verilog) must have a VHDL component declaration in misc_prims_pkg.vhd

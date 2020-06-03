@@ -20,9 +20,8 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all; use ieee.ma
 library ocpi; use ocpi.types.all,  ocpi.util.all; -- remove this to avoid all ocpi name collisions
 library misc_prims; use misc_prims.misc_prims.all;
 
--- TODO: Replace four_bit_lfsr with a generic lfsr and add a mode
--- for fast source to slow destination that intentionally doesn't hold input data
--- long enough to show that it fails when the primitive is not properly used.
+-- TODO: Add a mode for fast source to slow destination that intentionally doesn't hold input data
+-- long enough show that it fails when the primitive is not properly used.
 architecture rtl of worker is
 
   constant c_src_clk_hz : real := from_float(src_clk_hz);
@@ -32,7 +31,7 @@ architecture rtl of worker is
   constant c_fifo_depth : natural := 2**width_for_max(c_num_output_samples -1);
   constant c_hold_width : natural := natural(ceil((c_src_dst_ratio)*2.0));
   constant c_width : natural := 4;
-  constant c_bits_data_gen_seed : std_logic_vector(15 downto 0) := x"8421";
+  constant c_bits_data_gen_seed : std_logic_vector(15 downto 0) := x"1248";
 
   signal s_src_clk : std_logic;
   signal s_src_rst : std_logic := '0';
@@ -53,21 +52,20 @@ architecture rtl of worker is
   signal s_bits_src_in : std_logic_vector(c_width-1 downto 0) := (others => '0');
   signal s_bits_dst_out : std_logic_vector(c_width-1 downto 0) := (others => '0');
   signal s_bits_data_gen_out : std_logic_vector(15 downto 0) := (others => '0');
-
   begin
 
-   gen_clk : entity work.gen_clk
-       generic map (src_clk_hz => c_src_clk_hz,
-                    dst_clk_hz => c_dst_clk_hz)
-       port map (
-               ctl_clk => ctl_in.clk,
-               ctl_rst => ctl_in.reset,
-               src_clk => s_src_clk,
-               src_rst => s_src_rst,
-               dst_clk => s_dst_clk,
-               dst_rst => s_dst_rst);
+    gen_clk : misc_prims.misc_prims.cdc_clk_gen
+      generic map (src_clk_hz => c_src_clk_hz,
+                   dst_clk_hz => c_dst_clk_hz)
+      port map (
+              ctl_clk => ctl_in.clk,
+              ctl_rst => ctl_in.reset,
+              src_clk => s_src_clk,
+              src_rst => s_src_rst,
+              dst_clk => s_dst_clk,
+              dst_rst => s_dst_rst);
 
-   gen_reset_sync : misc_prims.misc_prims.gen_reset_sync
+    gen_reset_sync : misc_prims.misc_prims.gen_reset_sync
       generic map (src_clk_hz => c_src_clk_hz,
                    dst_clk_hz => c_dst_clk_hz)
       port map (
@@ -81,14 +79,16 @@ architecture rtl of worker is
     out_out.clk <= s_dst_clk;
 
     input_gen : for i in 0 to c_width-1 generate
-      gen_src_data : misc_prims.misc_prims.four_bit_lfsr
-        generic map (SEED => c_bits_data_gen_seed((i*4)+3 downto i*4))
+      gen_src_data : util.util.lfsr
+        generic map(
+          POLYNOMIAL => "1100",
+          SEED => c_bits_data_gen_seed((i*4)+3 downto i*4))
         port map (clk => s_src_clk,
                   rst => s_src_rst,
                   en => s_data_gen_en,
-                  dout => s_bits_data_gen_out((i*4)+4-1 downto i*4));
-
-      s_bits_src_in(i) <= s_bits_data_gen_out((i*c_width));
+                  reg => s_bits_data_gen_out((i*4)+4-1 downto i*4));
+      -- output is reversed from what is expected so reverse the bits to what's expected
+      s_bits_src_in(i) <= s_bits_data_gen_out((i*4)+4-1);
 
     end generate input_gen;
 

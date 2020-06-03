@@ -20,7 +20,6 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all; use ieee.ma
 library ocpi; use ocpi.types.all,  ocpi.util.all; -- remove this to avoid all ocpi name collisions
 library misc_prims; use misc_prims.misc_prims.all;
 
--- TODO: Replace four_bit_lfsr with a generic lfsr
 architecture rtl of worker is
 
   constant c_src_clk_hz : real := from_float(src_clk_hz);
@@ -40,28 +39,38 @@ architecture rtl of worker is
   signal s_fifo_deq : std_logic := '0';
   signal s_dst_counter : unsigned(width_for_max(to_integer(num_input_samples) -1) downto 0) := (others => '0');
   signal s_fifo_data_gen_out : std_logic_vector(c_width-1 downto 0) := (others => '0');
+  signal s_fifo_data_gen_out_rev : std_logic_vector(c_width-1 downto 0) := (others => '0');
   signal s_fifo_dst_out : std_logic_vector(c_width-1 downto 0) := (others => '0');
 
   begin
 
-   gen_clk : entity work.gen_clk
-       generic map (src_clk_hz => c_src_clk_hz,
-                    dst_clk_hz => c_dst_clk_hz)
-       port map (
-               ctl_clk => ctl_in.clk,
-               ctl_rst => ctl_in.reset,
-               src_clk => s_src_clk,
-               src_rst => s_src_rst,
-               dst_clk => s_dst_clk,
-               dst_rst => s_dst_rst);
+    gen_clk : misc_prims.misc_prims.cdc_clk_gen
+      generic map (src_clk_hz => c_src_clk_hz,
+                   dst_clk_hz => c_dst_clk_hz)
+      port map (
+              ctl_clk => ctl_in.clk,
+              ctl_rst => ctl_in.reset,
+              src_clk => s_src_clk,
+              src_rst => s_src_rst,
+              dst_clk => s_dst_clk,
+              dst_rst => s_dst_rst);
 
     out_out.clk <= s_dst_clk;
 
-    gen_src_data : misc_prims.misc_prims.four_bit_lfsr
-      port map (clk  => s_src_clk,
-                rst  => s_src_rst,
-                en   => s_fifo_enq,
-                dout => s_fifo_data_gen_out);
+    gen_src_data : util.util.lfsr
+      generic map(
+        POLYNOMIAL => "1100",
+        SEED       => "0001")
+      port map(
+        clk => s_src_clk,
+        rst => s_src_rst,
+        en  => s_fifo_enq,
+        reg => s_fifo_data_gen_out);
+
+    -- output is reversed from what is expected so reverse the bits to what's expected
+    data_rev : for idx in 0 to c_width-1 generate
+      s_fifo_data_gen_out_rev(3-idx) <= s_fifo_data_gen_out(idx);
+    end generate;
 
     s_fifo_enq <= s_fifo_not_full;
     cdc_fifo : cdc.cdc.fifo
@@ -72,7 +81,7 @@ architecture rtl of worker is
           src_CLK     => s_src_clk,
           src_RST     => s_src_rst,
           src_ENQ     => s_fifo_enq,
-          src_in      => s_fifo_data_gen_out,
+          src_in      => s_fifo_data_gen_out_rev,
           src_FULL_N  => s_fifo_not_full,
           dst_CLK     => s_dst_clk,
           dst_DEQ     => s_fifo_deq,

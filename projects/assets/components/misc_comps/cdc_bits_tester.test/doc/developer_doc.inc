@@ -101,7 +101,7 @@ When the source clock frequency is equal to the destination clock frequency, the
 \end{landscape}
 
 \section*{Data Timing and Signals}
-The {\comp} worker uses the clock from the Control Plane as input to the clock generator. The output of the clock generator is used to drive the output port clock.
+The \comp \ worker uses the clock from the Control Plane as input to the clock generator. The output of the clock generator is used to drive the output port clock.
 
 \section*{Performance and Resource Utilization}
 %\subsubsection*{\comp.hdl}
