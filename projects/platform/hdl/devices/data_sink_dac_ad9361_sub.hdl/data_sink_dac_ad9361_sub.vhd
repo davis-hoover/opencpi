@@ -16,11 +16,6 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- THIS FILE WAS ORIGINALLY GENERATED ON Wed Apr 12 12:20:38 2017 EDT
--- BASED ON THE FILE: ad9361_dac_sub.xml
--- YOU *ARE* EXPECTED TO EDIT IT
--- This file initially contains the architecture skeleton for worker: ad9361_dac_sub
-
 -- ***** NOTE: the TX_FRAME_P and TX data bus lines have setup/hold requirements
 -- as specified in the ADI UG-570 document. This worker does not include any
 -- ODELAY lines. Note also that the AD9361 registers affect setup/hold
@@ -32,7 +27,8 @@ library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisio
 use ocpi.util.all;
 library bsv; use bsv.bsv.all;
 library unisim; use unisim.vcomponents.all;
-architecture rtl of ad9361_dac_sub_worker is
+library protocol, cdc;
+architecture rtl of worker is
   constant dac_width  : positive := 12; -- must not be > 15 due to WSI width, must be multiple of 2 due to LVDS generate loop
 
   -- we could expose these constants as bool parameters with default values
@@ -71,6 +67,7 @@ architecture rtl of ad9361_dac_sub_worker is
   end function data_width;
 
   constant data_width_from_pins : positive := data_width(dac_width);
+  constant NUM_CHANS            : positive := 2;
 
   -- no clock domain / static signals
   signal ch0_worker_present : std_logic := '0';
@@ -104,7 +101,6 @@ architecture rtl of ad9361_dac_sub_worker is
   signal dacd2_tx_frame_ddr_first_r : std_logic := '0';
   signal dacd2_tx_frame_ddr_second_r : std_logic := '1';
   -- AD9361 TX clock domain signals
-  signal dac_clk           : std_logic := '0';
   signal dac_data_ddr_first_r   : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
   signal dac_data_ddr_second_r  : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
   signal dac_start_frame_r : std_logic := '0';
@@ -112,6 +108,37 @@ architecture rtl of ad9361_dac_sub_worker is
   signal dacm2_tx_data_r     : std_logic_vector(dac_width-1 downto 0);
   -- signals interface (DAC clock domain)
   signal TX_FRAME_P_s : std_logic := '0';
+
+  signal wci_use_two_r_two_t_timing : std_logic := '0';
+  signal wsi_clk        : std_logic := '0';
+  signal wsi_data_i     : dac.dac.array_data_t(0 to NUM_CHANS-1) :=
+                          (others=> (others => '0'));
+  signal wsi_data_q     : dac.dac.array_data_t(0 to NUM_CHANS-1) :=
+                          (others=> (others => '0'));
+  signal wsi_data_valid : std_logic_vector(0 to NUM_CHANS-1) :=
+                          (others => '0');
+  signal dac_data_i     : dac.dac.array_data_t(0 to NUM_CHANS-1) :=
+                          (others=> (others => '0'));
+  signal dac_data_q     : dac.dac.array_data_t(0 to NUM_CHANS-1) :=
+                          (others=> (others => '0'));
+  signal dac_data_vld   : std_logic_vector(0 to NUM_CHANS-1) :=
+                          (others => '0');
+  signal dac_take       : std_logic_vector(0 to NUM_CHANS-1) :=
+                          (others => '0');
+
+  signal wsi_in0_opcode : protocol.tx_event.opcode_t
+                        := protocol.tx_event.TXOFF;
+  signal wsi_in1_opcode : protocol.tx_event.opcode_t
+                        := protocol.tx_event.TXOFF;
+  signal wsi_in0_demarshaller_oprotocol : protocol.tx_event.protocol_t
+                                        := protocol.tx_event.PROTOCOL_ZERO;
+  signal wsi_in1_demarshaller_oprotocol : protocol.tx_event.protocol_t
+                                        := protocol.tx_event.PROTOCOL_ZERO;
+
+  signal wsi_in0_connected : std_logic := '0';
+  signal wsi_in1_connected : std_logic := '0';
+  signal wsi_is_operating  : std_logic := '0';
+  signal wci_is_operating  : std_logic := '0';
 
   attribute equivalent_register_removal : string;
   attribute equivalent_register_removal of dacd2_processing_ch0 : signal is "no";
@@ -163,28 +190,79 @@ begin
     single_port_fdd_ddr : if(SINGLE_PORT_p = btrue) and
                             (HALF_DUPLEX_p = bfalse) and
                             (DATA_RATE_CONFIG_p = DDR_e) generate
+
+      wsi_data_i(0)     <= dev_data_ch0_in_in.data_i(
+          dev_data_ch0_in_in.data_i'left downto 
+          dev_data_ch0_in_in.data_i'left-dac_width+1);
+      wsi_data_i(1)     <= dev_data_ch1_in_in.data_i(
+          dev_data_ch0_in_in.data_i'left downto 
+          dev_data_ch0_in_in.data_i'left-dac_width+1);
+      wsi_data_q(0)     <= dev_data_ch0_in_in.data_q(
+          dev_data_ch0_in_in.data_i'left downto 
+          dev_data_ch0_in_in.data_i'left-dac_width+1);
+      wsi_data_q(1)     <= dev_data_ch1_in_in.data_q(
+          dev_data_ch0_in_in.data_i'left downto 
+          dev_data_ch0_in_in.data_i'left-dac_width+1);
+      wsi_data_valid(0) <= dev_data_ch0_in_in.valid;
+      wsi_data_valid(1) <= dev_data_ch1_in_in.valid;
+
+      wsi_clk_gen : entity work.one_wsi_clock_per_dac_sample_generator
+        generic map(
+          NUM_CHANS => NUM_CHANS)
+        port map(
+          -- to/from supported worker
+          wci_use_two_r_two_t_timing => wci_use_two_r_two_t_timing,
+          wsi_clk                    => wsi_clk,
+          wsi_data_in_i              => wsi_data_i,
+          wsi_data_in_q              => wsi_data_q,
+          wsi_data_in_valid          => wsi_data_valid,
+          -- clock handling
+          dac_clk                    => dev_data_clk_in.DATA_CLK_P,
+          dacd2_clk                  => open,
+          dacd4_clk                  => open,
+          -- to/from data_interleaver
+          dac_data_i                 => dac_data_i,
+          dac_data_q                 => dac_data_q,
+          dac_data_vld               => dac_data_vld,
+          dac_take                   => dac_take);
+
+      --dac_data_test_gen : process(dev_data_clk_in.DATA_CLK_P)
+      --begin
+      --  if rising_edge(dev_data_clk_in.DATA_CLK_P) then
+      --    if(dac_data_vld(0) = '1') then
+      --      dac_data_i(0) <= std_logic_vector(unsigned(dac_data_i(0))+1);
+      --      dac_data_q(0) <= std_logic_vector(unsigned(dac_data_q(0))+1);
+      --    end if;
+      --    if(dac_data_vld(1) = '1') then
+      --      dac_data_i(1) <= std_logic_vector(unsigned(dac_data_i(1))+1);
+      --      dac_data_q(1) <= std_logic_vector(unsigned(dac_data_q(1))+1);
+      --    end if;
+      --  end if;
+      --end process;
+
       single_port_fdd_ddr_i : entity work.ad9361_dac_sub_cmos_single_port_fdd_ddr
-      generic map(
-        data_bus_bits_are_reversed => data_bus_bits_are_reversed = btrue)
-      port map(
-        wci_clk                      => wci_clk,
-        wci_reset                    => wci_reset,
-        wci_config_is_two_r          => dev_cfg_data_in.config_is_two_r,
-        wci_config_is_two_t          => dev_cfg_data_tx_in.config_is_two_t,
-        wci_force_two_r_two_t_timing => dev_cfg_data_tx_in.force_two_r_two_t_timing,
-        dac_clk                      => dev_data_clk_in.DATA_CLK_P,
-        dac_data_i_ch0               => dev_data_ch0_in_in.dac_data_I,
-        dac_data_i_ch1               => dev_data_ch1_in_in.dac_data_I,
-        dac_data_q_ch0               => dev_data_ch0_in_in.dac_data_Q,
-        dac_data_q_ch1               => dev_data_ch1_in_in.dac_data_Q,
-        dac_dev_data_ch0_in_in_ready => dev_data_ch0_in_in.dac_ready,
-        dac_dev_data_ch1_in_in_ready => dev_data_ch1_in_in.dac_ready,
-        dac_tx_frame                 => TX_FRAME_P_s,
-        dac_dev_data_ch0_in_out_clk  => dev_data_ch0_in_out.dac_clk,
-        dac_dev_data_ch1_in_out_clk  => dev_data_ch1_in_out.dac_clk,
-        dac_dev_data_ch0_in_out_take => dev_data_ch0_in_out.dac_take,
-        dac_dev_data_ch1_in_out_take => dev_data_ch1_in_out.dac_take,
-        dacm2_dev_data               => dev_data_to_pins_out.data);
+        generic map(
+          data_bus_bits_are_reversed => data_bus_bits_are_reversed = btrue)
+        port map(
+          wci_clk                      => wci_clk,
+          wci_reset                    => wci_reset,
+          wci_config_is_two_r          => dev_cfg_data_in.config_is_two_r,
+          wci_config_is_two_t          => dev_cfg_data_tx_in.config_is_two_t,
+          wci_force_two_r_two_t_timing => dev_cfg_data_tx_in.force_two_r_two_t_timing,
+          dac_clk                      => dev_data_clk_in.DATA_CLK_P,
+          dac_data_i_ch0               => dac_data_i(0),
+          dac_data_i_ch1               => dac_data_i(1),
+          dac_data_q_ch0               => dac_data_q(0),
+          dac_data_q_ch1               => dac_data_q(1),
+          dac_dev_data_ch0_in_in_ready => dac_data_vld(0),
+          dac_dev_data_ch1_in_in_ready => dac_data_vld(1),
+          dac_tx_frame                 => TX_FRAME_P_s,
+          dac_dev_data_ch0_in_out_take => dac_take(0),
+          dac_dev_data_ch1_in_out_take => dac_take(1),
+          dacm2_dev_data               => dev_data_to_pins_out.data);
+
+      dev_data_ch0_in_out.clk <= wsi_clk;
+      dev_data_ch1_in_out.clk <= wsi_clk;
 
     end generate single_port_fdd_ddr;
 
@@ -197,21 +275,43 @@ begin
                       (HALF_DUPLEX_p       = bfalse) and
                       (DATA_RATE_CONFIG_p  = DDR_e) generate
   begin
+    wsi_data_i(0)     <= dev_data_ch0_in_in.data_i(
+        dev_data_ch0_in_in.data_i'left downto 
+        dev_data_ch0_in_in.data_i'left-dac_width+1);
+    wsi_data_i(1)     <= dev_data_ch1_in_in.data_i(
+        dev_data_ch0_in_in.data_i'left downto 
+        dev_data_ch0_in_in.data_i'left-dac_width+1);
+    wsi_data_q(0)     <= dev_data_ch0_in_in.data_q(
+        dev_data_ch0_in_in.data_i'left downto 
+        dev_data_ch0_in_in.data_i'left-dac_width+1);
+    wsi_data_q(1)     <= dev_data_ch1_in_in.data_q(
+        dev_data_ch0_in_in.data_i'left downto 
+        dev_data_ch0_in_in.data_i'left-dac_width+1);
+    wsi_data_valid(0) <= dev_data_ch0_in_in.valid;
+    wsi_data_valid(1) <= dev_data_ch1_in_in.valid;
 
-    dac_clk <= dev_data_clk_in.DATA_CLK_P;
+    wsi_clk_gen : entity work.one_wsi_clock_per_dac_sample_generator
+      generic map(
+        NUM_CHANS => NUM_CHANS)
+      port map(
+        -- to/from supported worker
+        wci_use_two_r_two_t_timing => wci_use_two_r_two_t_timing,
+        wsi_clk                    => wsi_clk,
+        wsi_data_in_i              => wsi_data_i,
+        wsi_data_in_q              => wsi_data_q,
+        wsi_data_in_valid          => wsi_data_valid,
+        -- clock handling
+        dac_clk                    => dev_data_clk_in.DATA_CLK_P,
+        dacd2_clk                  => dacd2_clk,
+        dacd4_clk                  => open,
+        -- to/from data_interleaver
+        dac_data_i                 => dac_data_i,
+        dac_data_q                 => dac_data_q,
+        dac_data_vld               => dac_data_vld,
+        dac_take                   => dac_take);
 
-    BUFR_inst : BUFR
-    generic map (
-       BUFR_DIVIDE => "2")   -- "BYPASS", "1", "2", "3", "4", "5", "6", "7", "8"
-    port map (
-       O => dacd2_clk,   -- 1-bit output: Clock output port
-       CE => '1',        -- 1-bit input: Active high, clock enable (Divided modes only)
-       CLR => '0',       -- 1-bit input: Active high, asynchronous clear (Divided mode only)
-       I => dac_clk      -- 1-bit input: Clock buffer input driven by an IBUFG, MMCM or local interconnect
-    );
-
-    dev_data_ch0_in_out.dac_clk <= dacd2_clk;
-    dev_data_ch1_in_out.dac_clk <= dacd2_clk;
+    dev_data_ch0_in_out.clk <= wsi_clk;
+    dev_data_ch1_in_out.clk <= wsi_clk;
 
     -- From ADI's UG-570:
     -- "For a system with a 2R1T or a 1R2T configuration, the clock
@@ -239,17 +339,17 @@ begin
         sD_IN  => wsi_use_two_r_two_t_timing,
         dD_OUT => dacd2_use_two_r_two_t_timing_rr); -- delayed by one WSI clock, two DACD2 clocks
 
-    -- take is delayed version of ready to ensure that there is always at least
+    -- take is delayed version of vld to ensure that there is always at least
     -- 1 sample in the CDC FIFO (prevents possibility of CDC FIFO underrun upon
     -- startup)
     take_regs : process(dacd2_clk)
     begin
       if rising_edge(dacd2_clk) then
         -- chose dacd2_processing_ch0 idx 0 but we could have done any idx
-        dev_data_ch0_in_out.dac_take <= dev_data_ch0_in_in.dac_ready and
-                                     dacd2_processing_ch0(0);
-        dev_data_ch1_in_out.dac_take <= dev_data_ch1_in_in.dac_ready and
-                                     (not dacd2_processing_ch0(0));
+        dac_take(0) <= dac_data_vld(0) and
+                       dacd2_processing_ch0(0);
+        dac_take(1)<= dac_data_vld(1) and
+                      (not dacd2_processing_ch0(0));
       end if;
     end process;
 
@@ -268,9 +368,9 @@ begin
       dacd2_ch0_regs : process(dacd2_clk)
       begin
         if rising_edge(dacd2_clk) then
-          if (dev_data_ch0_in_in.dac_ready = '1') and (dacd2_processing_ch0(idx) = '1') then
-            dacd2_ch0_i_r(idx) <= dev_data_ch0_in_in.dac_data_I(idx);
-            dacd2_ch0_q_r(idx) <= dev_data_ch0_in_in.dac_data_Q(idx);
+          if (dac_data_vld(0) = '1') and (dacd2_processing_ch0(idx) = '1') then
+            dacd2_ch0_i_r(idx) <= dev_data_ch0_in_in.data_i(idx);
+            dacd2_ch0_q_r(idx) <= dev_data_ch0_in_in.data_q(idx);
           end if;
         end if;
       end process;
@@ -278,9 +378,9 @@ begin
       dacd2_ch1_regs : process(dacd2_clk)
       begin
         if rising_edge(dacd2_clk) then
-          if (dev_data_ch1_in_in.dac_ready = '1') and (dacd2_processing_ch0(idx) = '0') then
-            dacd2_ch1_i_r(idx) <= dev_data_ch1_in_in.dac_data_I(idx);
-            dacd2_ch1_q_r(idx) <= dev_data_ch1_in_in.dac_data_Q(idx);
+          if (dac_data_vld(1) = '1') and (dacd2_processing_ch0(idx) = '0') then
+            dacd2_ch1_i_r(idx) <= dev_data_ch1_in_in.data_i(idx);
+            dacd2_ch1_q_r(idx) <= dev_data_ch1_in_in.data_q(idx);
           end if;
         end if;
       end process;
@@ -292,13 +392,13 @@ begin
       dacd2_q_r(idx) <= dacd2_ch0_q_r(idx) when
                         (dacd2_processing_ch0_r(idx) = '1') else
                         dacd2_ch1_q_r(idx);
-    end generate;
+    end generate reg_duplication_loop;
 
     -- 12-bit word-> 6-bit word serialization registers (high 6 bits one
-    -- dac_clk, low 6 bits next dac_clk)
-    word_serial_regs : process(dac_clk)
+    -- DATA_CLK_P, low 6 bits next DATA_CLK_P)
+    word_serial_regs : process(dev_data_clk_in.DATA_CLK_P)
     begin
-      if rising_edge(dac_clk) then
+      if rising_edge(dev_data_clk_in.DATA_CLK_P) then
         if dacd2_clk = '1' then
           dac_data_ddr_first_r  <= dacd2_i_r(dac_width-1 downto dac_width/2);
           dac_data_ddr_second_r <= dacd2_q_r(dac_width-1 downto dac_width/2);
@@ -352,7 +452,7 @@ begin
         SRTYPE       => "ASYNC")
       port map(
         Q  => dacm2_tx_data_r(idx),
-        C  => dac_clk,
+        C  => dev_data_clk_in.DATA_CLK_P,
         CE => '1',
         D1  => dac_data_ddr_first_r(idx),
         D2  => dac_data_ddr_second_r(idx),
@@ -373,23 +473,78 @@ begin
       end generate;
     end generate;
 
-  end generate;
+  end generate data_mode_lvds;
 
   -- delegate to the data_sub.
   dev_data_to_pins_out.tx_frame <= TX_FRAME_P_s;
 
-  event_in_x2_to_txen : entity work.event_in_x2_to_txen
-    port map (clk                  => wci_clk,
-              reset                => wci_reset,
-              txon_pulse_0         => dev_tx_event_ch0_in.txon_pulse,
-              txoff_pulse_0        => dev_tx_event_ch0_in.txoff_pulse,
-              event_in_connected_0 => dev_tx_event_ch0_in.event_in_connected,
-              is_operating_0       => dev_tx_event_ch0_in.is_operating,
-              txon_pulse_1         => dev_tx_event_ch1_in.txon_pulse,
-              txoff_pulse_1        => dev_tx_event_ch1_in.txoff_pulse,
-              event_in_connected_1 => dev_tx_event_ch1_in.event_in_connected,
-              is_operating_1       => dev_tx_event_ch1_in.is_operating,
-              txen                 => wsi_txen);
+  wsi_in0_opcode <=
+      protocol.tx_event.TXOFF when on_off0_in.opcode = tx_event_txOff_op_e else
+      protocol.tx_event.TXON when on_off0_in.opcode = tx_event_txOn_op_e  else
+      protocol.tx_event.TXOFF;
+  on_off0_demarshaller : protocol.tx_event.tx_event_demarshaller
+    port map(
+      clk       => on_off0_in.clk,
+      rst       => on_off0_in.reset,
+      -- INPUT
+      iready    => on_off0_in.ready,
+      iopcode   => wsi_in0_opcode,
+      ieof      => on_off0_in.eof,
+      itake     => on_off0_out.take,
+      -- OUTPUT
+      oprotocol => wsi_in0_demarshaller_oprotocol,
+      ordy      => '1');
+  --on_off0_out.clk <= wsi_clk;
 
-  dev_txen_out.txen         <= wsi_txen;
+  wsi_in1_opcode <= 
+      protocol.tx_event.TXOFF when on_off0_in.opcode = tx_event_txOff_op_e else
+      protocol.tx_event.TXON  when on_off0_in.opcode = tx_event_txOn_op_e  else
+      protocol.tx_event.TXOFF;
+  on_off1_demarshaller : protocol.tx_event.tx_event_demarshaller
+    port map(
+      clk       => on_off1_in.clk,
+      rst       => on_off1_in.reset,
+      -- INPUT
+      iready    => on_off1_in.ready,
+      iopcode   => wsi_in1_opcode,
+      ieof      => on_off1_in.eof,
+      itake     => on_off1_out.take,
+      -- OUTPUT
+      oprotocol => wsi_in1_demarshaller_oprotocol,
+      ordy      => '1');
+  --on_off1_out.clk <= wsi_clk;
+
+  is_operating_cdc : cdc.cdc.single_bit
+    generic map(
+      N    => 2,
+      IREG => '1')
+    port map(
+      src_clk  => wci_Clk,
+      src_rst  => wci_reset,
+      src_en   => '1',
+      src_in   => wci_is_operating,
+      dst_clk  => wsi_clk,
+      dst_rst  => '0',
+      dst_out  => wsi_is_operating);
+
+  wsi_in0_connected <= not on_off0_in.reset; -- TODO / FIXME - UNDOCUMENTED AND SUBJECTED TO CHANGE
+  wsi_in1_connected <= not on_off1_in.reset; -- TODO / FIXME - UNDOCUMENTED AND SUBJECTED TO CHANGE
+  wci_is_operating <= not wci_reset; -- mimicking behavior in shell
+
+  event_in_x2_to_txen : dac.dac.event_in_x2_to_txen
+    port map(
+      clk                  => wsi_clk,
+      reset                => on_off0_in.reset,
+      txon_pulse_0         => wsi_in0_demarshaller_oprotocol.txOn,
+      txoff_pulse_0        => wsi_in0_demarshaller_oprotocol.txOff,
+      event_in_connected_0 => wsi_in0_connected,
+      is_operating_0       => wsi_is_operating,
+      txon_pulse_1         => wsi_in1_demarshaller_oprotocol.txOn,
+      txoff_pulse_1        => wsi_in1_demarshaller_oprotocol.txOff,
+      event_in_connected_1 => wsi_in1_connected,
+      is_operating_1       => wsi_is_operating,
+      txen                 => wsi_txen);
+
+  dev_txen_out.txen <= wsi_txen;
+
 end rtl;

@@ -23,20 +23,21 @@
 -- txon will override
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 entity event_in_x2_to_txen is
-  port (ctl_in_clk             : in  std_logic;
-        ctl_in_reset           : in  std_logic;
-        -- TX channel 0 (channel indices are treated identically)
-        txon_pulse_0           : in  std_logic;
-        txoff_pulse_0          : in  std_logic;
-        event_in_connected_0   : in  std_logic;
-        is_operating_0         : in  std_logic;
-        -- TX channel 1 (channel indices are treated identically)
-        txon_pulse_1           : in  std_logic;
-        txoff_pulse_1          : in  std_logic;
-        event_in_connected_1   : in  std_logic;
-        is_operating_1         : in  std_logic;
-        -- tx enable output
-        txen                   : out std_logic);
+  port(
+    clk                    : in  std_logic;
+    reset                  : in  std_logic;
+    -- TX channel 0 (channel indices are treated identically)
+    txon_pulse_0           : in  std_logic;
+    txoff_pulse_0          : in  std_logic;
+    event_in_connected_0   : in  std_logic;
+    is_operating_0         : in  std_logic;
+    -- TX channel 1 (channel indices are treated identically)
+    txon_pulse_1           : in  std_logic;
+    txoff_pulse_1          : in  std_logic;
+    event_in_connected_1   : in  std_logic;
+    is_operating_1         : in  std_logic;
+    -- tx enable output
+    txen                   : out std_logic);
 end entity event_in_x2_to_txen;
 architecture rtl of event_in_x2_to_txen is
   signal pending_off_ch0_r    : std_logic := '0';
@@ -57,10 +58,10 @@ begin
   -- only necessary because we have two pin ctrl channels and the desired
   -- functionality is to *wait* for both txoff pulses before turning transmitter
   -- off
-  pending_off_ch0_reg : process(ctl_in_clk)
+  pending_off_ch0_reg : process(clk)
   begin
-    if rising_edge(ctl_in_clk) then
-      if ctl_in_reset = '1' then
+    if rising_edge(clk) then
+      if reset = '1' then
         pending_off_ch0_r <= '0';
       else
         -- if one channel gets txoff and other gets txon simultaneously, txon
@@ -79,10 +80,10 @@ begin
   -- only necessary because we have two pin ctrl channels and the desired
   -- functionality is to *wait* for both txoff pulses before turning transmitter
   -- off
-  pending_off_ch1_reg : process(ctl_in_clk)
+  pending_off_ch1_reg : process(clk)
   begin
-    if rising_edge(ctl_in_clk) then
-      if ctl_in_reset = '1' then
+    if rising_edge(clk) then
+      if reset = '1' then
         pending_off_ch1_r <= '0';
       else
         -- if one channel gets txoff and other gets txon simultaneously, txon
@@ -118,10 +119,10 @@ begin
   en_clear <= noperating or off_s;
   txen_s <= en_set and (not en_clear);
 
-  tx_en_reg : process(ctl_in_clk)
+  tx_en_reg : process(clk)
   begin
-    if rising_edge(ctl_in_clk) then
-      if ctl_in_reset = '1' then
+    if rising_edge(clk) then
+      if reset = '1' then
         txen_r <= '0';
       else
         txen_r <= txen_s;
