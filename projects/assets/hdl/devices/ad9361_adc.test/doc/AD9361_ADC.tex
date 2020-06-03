@@ -260,7 +260,7 @@ The \comp{}.hdl device worker contains two clock domains: the clock from the Con
 
 \section*{Worker Configuration Parameters}
 \subsubsection*{\comp.hdl}
-\input{../../\ecomp.hdl/configurations.inc}
+%\input{../../\ecomp.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsubsection*{\comp.hdl}
 The FPGA resource utilization and Fmax are included for this worker. Fmax refers to the maximum allowable clock rate for any registered signal paths within a given clock domain for an FPGA design. Fmax in the table below is specific only to this worker and represents the maximum possible Fmax for any OpenCPI bitstream built with this worker included. Note that the Fmax value for a given clock domain for the final bitstream is often worse than the Fmax specific to this worker, even if this worker is the only one included in the bitstream. Note also that the DATA\_CLK\_P devsignal's rate will only ever go as high as 245.76 MHz\cite{adi_ug570}. \\ \\
