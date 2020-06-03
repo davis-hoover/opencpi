@@ -49,8 +49,9 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
 													 				-tclargs $(XilinxCoreName) $$prim \
 																	$${prim}e2 xc7z020-clg484-1 \
 													) > clk_wiz.log && \
-													 patch < $${prim}e2.patch && patch < $${prim}e2_sim.patch && \
-													 mv $${prim}e2.v ../zynq/$${prim}e2.v && mv $${prim}e2_sim.vhd ../xsim/$${prim}e2.vhd; done && \
+													 patch -F 5 < $${prim}e2.patch && patch < $${prim}e2_sim.patch && \
+													 mv $${prim}e2.v ../zynq/$${prim}e2.v && mv $${prim}e2_sim.vhd ../xsim/$${prim}e2.vhd && \
+													 rm -r -f $${prim}e2.v.orig; done && \
 													 date > timestamp-clk_wiz && \
 	                         rm -r -f tmp,MyError),\
 	         $(error $(MyError)))
