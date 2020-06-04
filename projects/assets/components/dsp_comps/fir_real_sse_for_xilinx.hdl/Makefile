@@ -20,7 +20,7 @@
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
-VivadoZynqTargets=zynq xsim 
+VivadoZynqTargets=zynq xsim
 ISEZynqTargets=zynq_ise isim
 OnlyTargets=$(VivadoZynqTargets)
 
@@ -32,12 +32,12 @@ IsXSim=$(filter xsim,$(HdlTargets))
 ifneq ($(and $(filter $(ISEZynqTargets),$(MyTargets)),$(filter $(VivadoZynqTargets),xsim,$(MyTargets))),)
   $(error The zynq primitive library cannot be built for zynq_ise/isim and zynq/xsim at the same time (yet))
 endif
-UseISE:=$(filter $(ISEZynqTargets),$(HdlTargets))
+UseVivado:=$(filter $(VivadoZynqTargets),$(HdlTargets))
 
 XilinxCoreName=fir_compiler
 
-ifeq ($(filter clean%,$(MAKECMDGOALS)),) # if not cleaning 
-  ifndef UseISE				 # if non-ISE targets 
+ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),) # if not cleaning 
+  ifdef UseVivado			 # if Vivado targets 
     VivadoWrapperFile=$(wildcard gen/vivado_ip/$(XilinxCoreName)*.vhd)
     ifeq ($(VivadoWrapperFile),) # if wrapper file not generated yet 
       $(info running TCL script)
@@ -53,7 +53,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),) # if not cleaning
                         ./$(XilinxCoreName)_0_reload_order.txt ../fir_real_sse_for_xilinx_reload_order_rom.vhd ,MyError),\
 	$(error $(MyError)))
     endif # if need to get the wrapper 
-  endif # if non-ISE targets 
+  endif # if Vivado targets 
 endif # if not cleaning 
 
 SimSourceFiles=./gen/vivado_ip/fir_compiler_0_sim.vhd 

@@ -106,11 +106,11 @@
 \begin{landscape}
 \section*{Worker Configuration Parameters}
 \subsubsection*{\comp.hdl}
-\input{../../data_src.hdl/configurations.inc}
+%\input{../../data_src.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 %\subsubsection*{\comp.rcc}
 \subsubsection*{\comp.hdl}
-\input{../../data_src.hdl/utilization.inc}
+%\input{../../data_src.hdl/utilization.inc}
 \end{landscape}
 
 \section*{Test and Verification}

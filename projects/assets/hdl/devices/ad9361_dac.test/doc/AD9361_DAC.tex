@@ -163,6 +163,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		    \hline
 		    v1.5 & Version bump only & 4/2019 \\
 		    \hline
+		    v1.7 & Table of Worker Configurations removed & 5/2020 \\
+			\hline
 			\end{longtable}
 		\end{table}
 	\end{center}
@@ -369,7 +371,7 @@ Backpressure is transferred from the \devsignal{}'s dac\_clk clock to the input 
 
 \section*{Worker Configuration Parameters}
 \subsubsection*{\comp.hdl}
-\input{../../\ecomp.hdl/configurations.inc}
+%\input{../../\ecomp.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsubsection*{\comp.hdl}
 Fmax refers to the maximum allowable clock rate for any registered signal paths within a given clock domain for an FPGA design. Fmax in the table below is specific only to this worker and represents the maximum possible Fmax for any OpenCPI bitstream built with this worker included. Note that the Fmax value for a given clock domain for the final bitstream is often worse than the Fmax specific to this worker, even if this worker is the only one included in the bitstream. \\ \\
