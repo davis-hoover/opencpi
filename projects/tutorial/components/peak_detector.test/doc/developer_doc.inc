@@ -41,7 +41,7 @@
 		\hline
 		v1.5 & Convert Worker to Version 2 HDL API & 4/2019\\
 		\hline
-    v1.7 & Updated port/property/interface tables for accuracy & \\
+    v1.7 & Updated port/property/interface tables for accuracy. Resource Utilization Table removed & \\
     \hline
 		\end{tabularx}
 	\end{table}
@@ -113,7 +113,7 @@ The {\Comp} worker uses the clock from the Control Plane and standard Control Pl
 
 \section*{Performance and Resource Utilization}
 \subsubsection*{\comp.hdl}
-\input{../../peak_detector.hdl/utilization.inc}
+%\input{../../peak_detector.hdl/utilization.inc}
 
 
 \section*{Test and Verification}
