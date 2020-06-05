@@ -1,0 +1,37 @@
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+OnlyTargets=zynq zynq_ise isim xsim # cause of BUFR primitive
+
+SourceFiles+=ad936x_tx_data_cmos_single_port_fdd_ddr.vhd \
+	ad9361_dac_sub_cmos_single_port_fdd_ddr.vhd \
+	clock_manager_xilinx_7_series.vhd \
+	one_wsi_clock_per_dac_sample_generator.vhd
+
+# During the build process, swap HdlTarget with 'actual' target part of the target platform
+# We do this to build for a part with the correct number of resources, such as hardware
+# multipliers, rather than the default smallest part in the family
+# zynq => xc7z020 (ZedBoard, Matchstiq-Z1, Picoflexor-T6A)
+HdlExactPart=\
+	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
+	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484))
+
+HdlLibraries+=cdc
+HdlLibraries+=dac
+HdlLibraries+=protocol
+include $(OCPI_CDK_DIR)/include/worker.mk

@@ -379,8 +379,8 @@ begin
   dev_data_to_pins_out.tx_frame <= TX_FRAME_P_s;
 
   event_in_x2_to_txen : entity work.event_in_x2_to_txen
-    port map (ctl_in_clk           => wci_clk,
-              ctl_in_reset         => wci_reset,
+    port map (clk                  => wci_clk,
+              reset                => wci_reset,
               txon_pulse_0         => dev_tx_event_ch0_in.txon_pulse,
               txoff_pulse_0        => dev_tx_event_ch0_in.txoff_pulse,
               event_in_connected_0 => dev_tx_event_ch0_in.event_in_connected,

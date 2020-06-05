@@ -30,5 +30,8 @@ SourceFiles= \
   iqstream_pkg.vhd \
   iqstream_body.vhd \
   iqstream_demarshaller.vhd \
-  iqstream_marshaller.vhd
+  iqstream_marshaller.vhd \
+  tx_event_pkg.vhd \
+  tx_event_body.vhd \
+  tx_event_demarshaller.vhd
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

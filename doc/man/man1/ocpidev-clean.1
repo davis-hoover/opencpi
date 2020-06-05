@@ -1,0 +1,253 @@
+.\"     Title: ocpidev-clean
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 05/22/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-CLEAN" "1" "05/22/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-clean \- cleans OpenCPI assets
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fBclean\fR [\fI<noun>\fR [\fI<name>\fR ]]
+.SH "DESCRIPTION"
+.sp
+The \fBclean\fR verb cleans the OpenCPI assets specified by the noun used in the command\&. If no nouns are provided, \fBocpidev\fR cleans the current directory\&. When the plural version of the nouns are used, no name is specified and all assets of that type are cleaned\&.
+.sp
+Asset types to be specified in the \fI<noun>\fR argument are:
+.PP
+\fBproject\fR
+.RS 4
+Clean all assets in a project\&.
+.RE
+.PP
+\fBapplication\fR(\fBs\fR)
+.RS 4
+Clean all (\fBapplications\fR) or a specific ACI application\&. This includes any custom building specified by a customized application
+\fBMakefile\fR\&.
+.RE
+.PP
+\fBtest\fR
+.RS 4
+Clean but do not run the component unit test with the specified
+\fI<name>\fR
+in the specified library\&.
+.RE
+.PP
+\fBlibrary\fR
+.RS 4
+Clean a component library\&.
+.RE
+.PP
+\fBworker\fR
+.RS 4
+Clean a specific worker in a specific library (using
+\fB\-l\fR
+\fI<library>\fR)\&.
+.RE
+.PP
+\fBhdl\fR
+.RS 4
+A prefix to indicate an HDL asset in the
+\fBhdl\fR
+subdirectory of a project\&. Possible HDL assets are:
+.PP
+\fBassembly\fR|\fBies\fR
+.RS 4
+Clean all or a specified HDL assembly\&.
+.RE
+.PP
+\fBdevice\fR
+.RS 4
+Clean an HDL device worker in a specified library\&.
+.RE
+.PP
+\fBplatform\fR(\fBs\fR)
+.RS 4
+Clean all or a specified HDL platform\&.
+.RE
+.PP
+\fBprimitive\fR(\fBs\fR)
+.RS 4
+Clean all or a specified HDL primitive of a specified type\&. Possible HDL primitive types are:
+.PP
+\fBlibrary\fR
+.RS 4
+Clean a primitive that results in a library of modules\&.
+.RE
+.PP
+\fBcore\fR
+.RS 4
+Clean a primitive that results in a synthesized core/netlist\&.
+.RE
+.RE
+.RE
+.SH "OPTIONS"
+.sp
+The options to the \fBclean\fR verb are primarily used to limit what is cleaned (focus the build process on specific assets of interest), or specify the platforms and targets for which to clean the assets\&.
+.SS "Options When Cleaning Projects"
+.PP
+\fB\-\-no\-assemblies\fR
+.RS 4
+Don\(cqt clean the assemblies in the project\&. This option takes no following argument and can only be specified once on the command line\&.
+.RE
+.PP
+\fB\-\-hdl\-assembly\fR \fI<hdl\-assembly>\fR
+.RS 4
+Limit the assemblies being cleaned to assemblies specified by the option\&. May also be used in the
+\fBhdl/assemblies\fR
+directory\&. This option can be specified more than once on the command line\&.
+.RE
+.SS "Options When Building Projects or Libraries"
+.PP
+\fB\-\-rcc\fR
+.RS 4
+Limit the assets being cleaned to RCC workers\&. This option takes no following argument and can only be specified once on the command line\&.
+.RE
+.PP
+\fB\-\-hdl\fR
+.RS 4
+Limit the assets being cleaned to HDL primitives, workers, platforms or assemblies\&. This option takes no following argument and can only be specified once on the command line\&.
+.RE
+.PP
+*\-\-worker \fI<worker>\fR
+.RS 4
+Limits the assets being cleaned to workers with the name specified in
+\fI<worker>\fR\&. This argument can be specified more than once on the command line\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Clean the current asset or directory and those underneath it\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev clean
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Clean the
+\fBassets\fR
+project\&. Omit the name
+\fBassets\fR
+if inside the
+\fBassets\fR
+project\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev clean project assets
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside the
+\fBassets\fR
+project, clean the
+\fBfir_real_sse\&.hdl\fR
+worker in the
+\fBdsp_comps\fR
+library located at
+\fBcomponents/dsp_comps\fR
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev \-l dsp_comps clean worker fir_real_sse\&.hdl
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Inside the
+\fBassets\fR
+project, clean the
+\fBdsp_comps\fR
+library located at
+\fBcomponents/dsp_comps\fR\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev clean library dsp_comps
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev\-build(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-show(1) ocpidev\-[un]register(1) ocpidev\-[un]set(1) ocpidev\-run(1) ocpidev\-refresh(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

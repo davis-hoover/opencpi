@@ -83,4 +83,22 @@ component data_narrower is
     ordy          : in  std_logic);
 end component;
 
+component event_in_x2_to_txen is
+  port(
+    clk                    : in  std_logic;
+    reset                  : in  std_logic;
+    -- TX channel 0 (channel indices are treated identically)
+    txon_pulse_0           : in  std_logic;
+    txoff_pulse_0          : in  std_logic;
+    event_in_connected_0   : in  std_logic;
+    is_operating_0         : in  std_logic;
+    -- TX channel 1 (channel indices are treated identically)
+    txon_pulse_1           : in  std_logic;
+    txoff_pulse_1          : in  std_logic;
+    event_in_connected_1   : in  std_logic;
+    is_operating_1         : in  std_logic;
+    -- tx enable output
+    txen                   : out std_logic);
+end component;
+
 end package dac;

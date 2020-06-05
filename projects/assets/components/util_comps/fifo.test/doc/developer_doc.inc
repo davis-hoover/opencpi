@@ -14,7 +14,7 @@
   \hline
   Name              & \comp \\
   \hline
-  Latest Version    &  v1.5 (release date 4/2019) \\
+  Latest Version    & \docVersion \\
   \hline
   Worker Type       & Application                                                  \\
   \hline
@@ -101,10 +101,10 @@
 \section*{Worker Configuration Parameters}
 %\subsubsection*{\comp.rcc}
 \subsubsection*{\comp.hdl}
-\input{../../fifo.hdl/configurations.inc}
+%\input{../../fifo.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsubsection*{\comp.hdl}
-\input{../../fifo.hdl/utilization.inc}
+%\input{../../fifo.hdl/utilization.inc}
 \end{landscape}
 
 \section*{Test and Verification}
