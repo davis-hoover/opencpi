@@ -71,7 +71,7 @@ else
   make driver
 fi
 
-Projects="core platform assets inactive"
+Projects="core platform assets assets_ts inactive"
 # Build built-in RCC components
 echo ================================================================================
 echo "Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_PLATFORM"

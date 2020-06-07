@@ -112,4 +112,4 @@ install:
                 $(MAKE) -j1 OcpiThisPlatform=$(OcpiThisPlatform) install
 
 clean:
-	$(AT) make clean
+	$(AT) make distclean

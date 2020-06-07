@@ -21,6 +21,22 @@ int main(/*int argc, char **argv*/) {
   }
 
   try {
+    // When run in a build environment that is suppressing HDL platforms, respect that.
+    const char *env = getenv("HdlPlatforms");
+    bool hdl = false;
+    if (!env || env[0]) {
+      OA::Container *c;
+      for (unsigned n = 0; (c = OA::ContainerManager::get(n)); ++n) {
+	if (c->model() == "hdl") {
+	  hdl = true;
+	  std::cout << "INIT: found HDL container " << c->name() << ", will run HDL tests" << std::endl;
+	}
+      }
+    }
+    if (!hdl) {
+      std::cerr << "WARNING: this test could not be run because no HDL containers were found\n";
+      return 0;
+    }
     OA::Application app("case00.00.xml");
     app.initialize(); // all resources have been allocated
     app.start();      // execution is started
