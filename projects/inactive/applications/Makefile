@@ -48,3 +48,6 @@ Applications=\
 
 # Otherwise all applications will be built and run
 include $(OCPI_CDK_DIR)/include/applications.mk
+
+clean::
+	$(AT)rm -f test.output
