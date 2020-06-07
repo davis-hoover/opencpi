@@ -118,7 +118,9 @@ PKGS_E+=(ocl-icd)
 #    Needed to build gpsd
 PKGS_E+=(${python3_ver}-scons)
 #    Needed to build certain linux kernels or u-boot, at least Xilinx 2015.4
-PKGS_E+=(dtc)
+PKGS_E+=(dtc openssl-devel)
+#    Need to build plutosdr osp 
+PKGS_E+=(perl-ExtUtils-MakeMaker)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available

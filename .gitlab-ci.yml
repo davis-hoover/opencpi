@@ -83,7 +83,7 @@ cancel-pipeline:
     - .centos7
     - .docker
   rules:
-    - if: "$CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == 'develop'"
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == "develop" || $CI_PIPELINE_SOURCE == "web"'
       when: never
     - when: on_success
   variables:

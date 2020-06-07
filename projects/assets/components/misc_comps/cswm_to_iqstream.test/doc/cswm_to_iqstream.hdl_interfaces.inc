@@ -23,7 +23,7 @@ Type & Name & Producer & Protocol & Optional & DataWidth & Clock & ClockDirectio
 StreamInterface & in & False & ComplexShortWithMetadata-prot & False & IN\_PORT\_DATA\_WIDTH & - & in & False & False\\
 
 \hline
-StreamInterface & out & True & iqstream\_protocol & False & OUT\_PORT\_DATA\_WIDTH & in & - & False & False\\
+StreamInterface & out & True & iqstream\_protocol & False & OUT\_PORT\_DATA\_WIDTH & in & - & True & False\\
 
 \hline
 \end{longtable}

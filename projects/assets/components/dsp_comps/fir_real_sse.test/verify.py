@@ -44,6 +44,11 @@ num_taps=2*int(os.environ.get("OCPI_TEST_NUM_TAPS_p"))
 taps=list(map(int, os.environ.get("OCPI_TEST_taps").split(","))) #tap values are comma-separated
 output_file=sys.argv[1]
 
+#Xilinx IP core implementation does not output data until data is valid. Verification data captured  
+#   will not have expected initial delay compared to other implementations. Determine if test is _for_xilinx worker 
+#   if so, shift comparison data to account for pipeline delay differences. 
+is_for_xilinx = True if output_file.split('.')[2]  == 'fir_real_sse_for_xilinx' else False
+
 #The following section tests the framework and is not generally needed for enduser testing
 #start framework test
 goldTapsFilename="../../gen/properties/{0}.{1}.{2}".format(os.environ['OCPI_TESTCASE'], os.environ['OCPI_TESTSUBCASE'], "taps")
@@ -73,6 +78,12 @@ bin2int.bin2int_real(output_file, output_file.rstrip('out')+'tmp', num_taps, fil
 #Compare symmetric taps file to output
 taps.extend(reversed(taps)); #extend the taps to be symmetric
 data2cmp = [line.strip() for line in open(output_file.rstrip('out')+'tmp')]
+
+# _for_xilinx worker doesn't have initial delay - modify output to fit inside window 
+if is_for_xilinx:
+  data2cmp = data2cmp[63:len(data2cmp)]
+  data2cmp.extend(reversed(data2cmp[:63]))
+
 for x in range(len(taps)):
     if abs(abs(int(taps[x])) - abs(int(data2cmp[x]))) > 1:
         print ('data2cmp[' + str(x) + '] = ' + str(data2cmp[x]) + ' while expected = ' + str(taps[x]))

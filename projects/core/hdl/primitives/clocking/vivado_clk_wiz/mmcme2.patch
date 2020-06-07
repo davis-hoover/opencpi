@@ -1,0 +1,73 @@
+--- mmcme2.v	2020-05-15 11:06:20.000000000 -0400
++++ mmcme2_modified.v	2020-05-15 11:19:02.173114648 -0400
+@@ -63,9 +63,8 @@
+ //----------------------------------------------------------------------------
+ // __primary_________100.000____________0.010
+ 
+-`timescale 1ps/1ps
+ 
+-module mmcme2_clk_wiz 
++module mmcme2
+ 
+  (// Clock in ports
+   // Clock out ports
+@@ -75,15 +74,6 @@
+   output        locked,
+   input         clk_in1
+  );
+-  // Input buffering
+-  //------------------------------------
+-wire clk_in1_mmcme2;
+-wire clk_in2_mmcme2;
+-  IBUF clkin1_ibufg
+-   (.O (clk_in1_mmcme2),
+-    .I (clk_in1));
+-
+-
+   // Clocking PRIMITIVE
+   //------------------------------------
+ 
+@@ -91,6 +81,12 @@
+   //    * Unused inputs are tied off
+   //    * Unused outputs are labeled unused
+ 
++  parameter DIVCLK_DIVIDE       =  1;   // D
++  parameter CLKFBOUT_MULT_F     =  5.0; // M
++  parameter CLKOUT0_DIVIDE_F    =  1.0; // O
++  parameter CLKOUT0_PHASE       =  0.0;
++  parameter CLKOUT0_DUTY_CYCLE  =  0.5;
++  parameter CLKIN1_PERIOD       =  0.0;
+   wire        clk_out1_mmcme2;
+   wire        clk_out2_mmcme2;
+   wire        clk_out3_mmcme2;
+@@ -125,15 +121,15 @@
+     .CLKOUT4_CASCADE      ("FALSE"),
+     .COMPENSATION         ("ZHOLD"),
+     .STARTUP_WAIT         ("FALSE"),
+-    .DIVCLK_DIVIDE        (1),
+-    .CLKFBOUT_MULT_F      (10.000),
++    .DIVCLK_DIVIDE        (DIVCLK_DIVIDE),
++    .CLKFBOUT_MULT_F      (CLKFBOUT_MULT_F),
+     .CLKFBOUT_PHASE       (0.000),
+     .CLKFBOUT_USE_FINE_PS ("FALSE"),
+-    .CLKOUT0_DIVIDE_F     (10.000),
+-    .CLKOUT0_PHASE        (0.000),
+-    .CLKOUT0_DUTY_CYCLE   (0.500),
++    .CLKOUT0_DIVIDE_F     (CLKOUT0_DIVIDE_F),
++    .CLKOUT0_PHASE        (CLKOUT0_PHASE),
++    .CLKOUT0_DUTY_CYCLE   (CLKOUT0_DUTY_CYCLE),
+     .CLKOUT0_USE_FINE_PS  ("FALSE"),
+-    .CLKIN1_PERIOD        (10.000))
++    .CLKIN1_PERIOD        (CLKIN1_PERIOD))
+   mmcm_adv_inst
+     // Output clocks
+    (
+@@ -152,7 +148,7 @@
+     .CLKOUT6             (clkout6_unused),
+      // Input clock control
+     .CLKFBIN             (clkfbout_buf_mmcme2),
+-    .CLKIN1              (clk_in1_mmcme2),
++    .CLKIN1              (clk_in1),
+     .CLKIN2              (1'b0),
+      // Tied to always select the primary input clock
+     .CLKINSEL            (1'b1),

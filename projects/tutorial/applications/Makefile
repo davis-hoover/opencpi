@@ -22,4 +22,5 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # variable to the specific list of which ones you want to build and run, e.g.:
 # Applications=app1 app3
 # Otherwise all applications will be built and run
+HdlApplications=IQapp fsk_loopback
 include $(OCPI_CDK_DIR)/include/applications.mk

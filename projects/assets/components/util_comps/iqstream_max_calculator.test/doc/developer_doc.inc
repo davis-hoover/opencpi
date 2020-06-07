@@ -134,11 +134,11 @@ Data is passed from the input port to the output port with the minimum possible 
 \begin{landscape}
 \section*{Worker Configuration Parameters}
 \subsubsection*{\comp.hdl}
-\input{../../iqstream_max_calculator.hdl/configurations.inc}
+%\input{../../iqstream_max_calculator.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsubsection*{\comp.rcc}
 \subsubsection*{\comp.hdl}
-\input{../../iqstream_max_calculator.hdl/utilization.inc}
+%\input{../../iqstream_max_calculator.hdl/utilization.inc}
 \end{landscape}
 
 

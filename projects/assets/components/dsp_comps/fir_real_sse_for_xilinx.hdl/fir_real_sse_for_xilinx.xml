@@ -1,0 +1,13 @@
+<HdlWorker Language="vhdl" Spec="fir_real_sse-spec.xml" Version="2" >
+ 
+  <SpecProperty Name="taps" Raw="true"/>
+  <Property Name="DATA_WIDTH_p" Type="ulong" Parameter="true" Default="16"/>
+  <Property Name="COEFF_WIDTH_p" Type="ulong" Parameter="true" Default="16"/>
+  <Property Name="PEAK_MONITOR" Type="bool" Parameter="true" Default="true" Description="Enable/Disable build-time inclusion of Peak Monitoring"/>
+
+  <Property Name="COEFF_PADDING_p" Type="uchar" Parameter="true" Default="2"/>
+
+  <StreamInterface Name="in"/>
+  <StreamInterface Name="out" insertEOM='1'/>
+</HdlWorker>
+
