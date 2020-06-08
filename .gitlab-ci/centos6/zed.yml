@@ -1,11 +1,19 @@
+.zed-centos6:
+  extends:
+    - .zed
+  tags:
+    - opencpi
+    - centos6
+    - zed
+    - shell
+
 ################################
 # Jobs - Build-Primitives-Core #
 ################################
 build-primitives:centos6:zed:
   extends:
     - .build-primitives
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -18,8 +26,7 @@ build-primitives:centos6:zed:
 build-components-core:centos6:zed:
   extends:
     - .build-components-core
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -29,8 +36,7 @@ build-components-core:centos6:zed:
 build-components-assets:centos6:zed:
   extends:
     - .build-components-assets
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -40,8 +46,7 @@ build-components-assets:centos6:zed:
 build-components-assets_ts:centos6:zed:
   extends:
     - .build-components-assets_ts
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -51,8 +56,7 @@ build-components-assets_ts:centos6:zed:
 build-components-inactive:centos6:zed:
   extends:
     - .build-components-inactive
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -66,8 +70,7 @@ build-components-inactive:centos6:zed:
 build-adapters-core:centos6:zed:
   extends:
     - .build-adapters-core
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -77,8 +80,7 @@ build-adapters-core:centos6:zed:
 build-adapters-assets:centos6:zed:
   extends:
     - .build-adapters-assets
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -92,8 +94,7 @@ build-adapters-assets:centos6:zed:
 build-devices-core:centos6:zed:
   extends:
     - .build-devices-core
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -103,8 +104,7 @@ build-devices-core:centos6:zed:
 build-devices-platform:centos6:zed:
   extends: 
     - .build-devices-platform
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -114,8 +114,7 @@ build-devices-platform:centos6:zed:
 build-devices-assets:centos6:zed:
   extends:
     - .build-devices-assets
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -125,8 +124,7 @@ build-devices-assets:centos6:zed:
 build-devices-assets_ts:centos6:zed:
   extends:
     - .build-devices-assets_ts
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -136,8 +134,7 @@ build-devices-assets_ts:centos6:zed:
 build-devices-inactive:centos6:zed:
   extends:
     - .build-devices-inactive
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -151,8 +148,7 @@ build-devices-inactive:centos6:zed:
 build-cards-core:centos6:zed:
   extends:
     - .build-cards-core
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -162,8 +158,7 @@ build-cards-core:centos6:zed:
 build-cards-assets:centos6:zed:
   extends:
     - .build-cards-assets
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -173,8 +168,7 @@ build-cards-assets:centos6:zed:
 build-cards-inactive:centos6:zed:
   extends:
     - .build-cards-inactive
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -188,8 +182,7 @@ build-cards-inactive:centos6:zed:
 build-platforms-core:centos6:zed:
   extends:
     - .build-platforms-core
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -203,8 +196,7 @@ build-platforms-core:centos6:zed:
 build-platforms-platform:centos6:zed:
   extends: 
     - .build-platforms-platform
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -216,8 +208,7 @@ build-platforms-platform:centos6:zed:
 build-platforms-assets:centos6:zed:
   extends:
     - .build-platforms-assets
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -233,8 +224,7 @@ build-platforms-assets:centos6:zed:
 build-platforms-inactive:centos6:zed:
   extends:
     - .build-platforms-inactive
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -251,8 +241,7 @@ build-platforms-inactive:centos6:zed:
 build-assemblies-platform:centos6:zed:
   extends:
     - .build-assemblies-platform
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -264,8 +253,7 @@ build-assemblies-platform:centos6:zed:
 build-assemblies-assets:centos6:zed:
   extends:
     - .build-assemblies-assets
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -278,8 +266,7 @@ build-assemblies-assets:centos6:zed:
 build-assemblies-assets_ts:centos6:zed:
   extends:
     - .build-assemblies-assets_ts
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -294,8 +281,7 @@ build-assemblies-assets_ts:centos6:zed:
 build-assemblies-inactive:centos6:zed:
   extends:
     - .build-assemblies-inactive
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
   needs:
     - job: prereq:centos6
       artifacts: true
@@ -313,8 +299,7 @@ build-assemblies-inactive:centos6:zed:
 test-core:centos6:zed:
   extends:
     - .test-core
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
@@ -331,8 +316,7 @@ test-core:centos6:zed:
 test-assets-base:centos6:zed:
   extends:
     - .test-assets-base
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
@@ -349,8 +333,7 @@ test-assets-base:centos6:zed:
 test-assets-comms:centos6:zed:
   extends:
     - .test-assets-comms
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
@@ -367,8 +350,7 @@ test-assets-comms:centos6:zed:
 test-assets-dsp:centos6:zed:
   extends:
     - .test-assets-dsp
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
@@ -385,8 +367,7 @@ test-assets-dsp:centos6:zed:
 test-assets-misc:centos6:zed:
   extends:
     - .test-assets-misc
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
@@ -403,8 +384,7 @@ test-assets-misc:centos6:zed:
 test-assets-util:centos6:zed:
   extends:
     - .test-assets-util
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
@@ -421,8 +401,7 @@ test-assets-util:centos6:zed:
 test-assets_ts:centos6:zed:
   extends:
     - .test-assets_ts
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
@@ -441,8 +420,7 @@ test-assets_ts:centos6:zed:
 test-inactive:centos6:zed:
   extends:
     - .test-inactive
-    - .centos6
-    - .zed-xilinx13_4
+    - .zed-centos6
     - .ocpiremote
   dependencies:
     - prereq:centos6
