@@ -20,12 +20,12 @@
 # 1) Subdevices that support other devices must occur AFTER the devices they support.
 # 2) Similarly, Emulators must occur after the devices they emulate.
 Workers = \
-	data_sink_dac.hdl \
-	data_sink_dac_ad9361_sub.hdl \
-	data_sink_dac_em.hdl \
-	data_src_adc.hdl \
-	data_src_adc_ad9361_sub.hdl \
-	data_src_adc_em.hdl \
+	data_sink_qdac.hdl \
+	data_sink_qdac_ad9361_sub.hdl \
+	data_sink_qdac_em.hdl \
+	data_src_qadc.hdl \
+	data_src_qadc_ad9361_sub.hdl \
+	data_src_qadc_em.hdl \
 	platform_ad9361_config.hdl \
 	platform_ad9361_config_proxy.rcc \
 	platform_ad9361_data_sub.hdl \

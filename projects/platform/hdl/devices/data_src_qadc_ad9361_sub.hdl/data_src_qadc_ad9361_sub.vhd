@@ -17,9 +17,9 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 -- THIS FILE WAS ORIGINALLY GENERATED ON Thu Nov  7 14:51:57 2019 EST
--- BASED ON THE FILE: data_src_adc_ad9361_sub.xml
+-- BASED ON THE FILE: data_src_qadc_ad9361_sub.xml
 -- YOU *ARE* EXPECTED TO EDIT IT
--- This file initially contains the architecture skeleton for worker: data_src_adc_ad9361_sub
+-- This file initially contains the architecture skeleton for worker: data_src_qadc_ad9361_sub
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
@@ -537,7 +537,7 @@ begin
   dev_data_ch0_out_out.clk    <= adc_clk;
   dev_data_ch0_out_out.valid  <= adc_r1_give_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_give_rrrr;
   -- i and q signal buses driven where each signal bus is MSB-justified
-  -- (data_src_adc.hdl takes care of justification standardization)
+  -- (data_src_qadc.hdl takes care of justification standardization)
   dev_data_ch0_out_out.data_i(dev_data_ch0_out_out.data_i'left downto
                               dev_data_ch0_out_out.data_i'left-adc_width+1) <=
                                  adc_r1_i_rrrrrr    when (adc_channels_are_swapped = bfalse) else adc_r2_i_rrrr;

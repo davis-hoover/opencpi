@@ -19,7 +19,7 @@
 REPO_PATH=../../../../../../
 
 ${REPO_PATH}/doc/av/tex/docGen.py \
-    ${REPO_PATH}/projects/platform/hdl/devices/specs/data_sink_dac-spec.xml \
+    ${REPO_PATH}/projects/platform/hdl/devices/specs/data_sink_qdac-spec.xml \
     -owd \
-    ${REPO_PATH}/projects/platform/hdl/devices/data_sink_dac.hdl/data_sink_dac.xml \
+    ${REPO_PATH}/projects/platform/hdl/devices/data_sink_qdac.hdl/data_sink_qdac.xml \
     --no-prompt

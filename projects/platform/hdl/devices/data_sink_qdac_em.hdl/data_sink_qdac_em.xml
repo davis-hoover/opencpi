@@ -1,4 +1,4 @@
-<HdlDevice Language="vhdl" Emulate="data_sink_dac.hdl" Version="2">
+<HdlDevice Language="vhdl" Emulate="data_sink_qdac.hdl" Version="2">
   <ComponentSpec>
     <Port Name="out" Producer="true" Protocol="ComplexShortWithMetadata-prot"/>
   </ComponentSpec>
@@ -9,7 +9,7 @@
 		   InsertEOM="true" 
 		   WorkerEOF="true"/>
 
-  <Supports Worker="data_sink_dac">
+  <Supports Worker="data_sink_qdac">
     <Connect port="dev" to="dev"/>
   </Supports>
 </HdlDevice>

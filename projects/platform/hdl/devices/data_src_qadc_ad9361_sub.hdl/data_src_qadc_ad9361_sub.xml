@@ -46,10 +46,10 @@
   <DevSignal name='dev' signals='qadc-16-signals.xml'/>
 
   <!-- Sub-Device Port Connections (Supports) -->
-  <supports worker='data_src_adc'>
+  <supports worker='data_src_qadc'>
     <connect port="dev" to="dev_data_ch0_out"/>
   </supports>
-  <supports worker='data_src_adc'>
+  <supports worker='data_src_qadc'>
     <connect port="dev" to="dev_data_ch1_out"/>
   </supports>
 

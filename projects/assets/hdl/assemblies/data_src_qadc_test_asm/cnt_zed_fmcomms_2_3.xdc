@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # this is the zed XDC file that should be generated when instantiating the:
-# data_src_adc_ad9361_sub worker
+# data_src_qadc_ad9361_sub worker
 # on the fmcomms_2_3_lpc_scdcd card
 
 # Extracted from the zedboard_master_XDC_RevC_D_v3.xdc
@@ -40,7 +40,7 @@ create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zed_i/wo
 #set AD9361_LVDS_t_CP_ns 4.069
 #create_clock -period $AD9361_LVDS_t_CP_ns -name FMC_LA00_CC_P [get_ports {FMC_LA00_CC_P}]
 
-# max supported AD9361 DATA_CLK period of data_src_adc_ad9361_sub.hdl on
+# max supported AD9361 DATA_CLK period of data_src_qadc_ad9361_sub.hdl on
 # Zedboard/FMCOMMS2/3 for which slack will be 0
 create_clock -period 5.712 -name FMC_LA00_CC_P [get_ports {FMC_LA00_CC_P}]
 
@@ -235,7 +235,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports -of_objects [get_iobanks 35]];
 set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 13]];
 
 # ----------------------------------------------------------------------------
-# INPUT / OUTPUT DELAY constraints - data_src_adc_ad9361_sub.hdl
+# INPUT / OUTPUT DELAY constraints - data_src_qadc_ad9361_sub.hdl
 # ----------------------------------------------------------------------------
 
 # FMCOMMS3 RX_D/RX_FRAME_P
@@ -399,9 +399,9 @@ set_output_delay -clock [get_clocks {FMC_LA08_P}] -max -add_delay $AD9361_TXNRX_
 set_clock_groups -asynchronous -group [get_clocks {FMC_LA00_CC_P}] -group [get_clocks {clk_fpga_0}]
 
 # ----------------------------------------------------------------------------
-# CLOCK DOMAIN CROSSING / FALSE PATH constraints - data_src_adc_ad9361_sub.hdl
+# CLOCK DOMAIN CROSSING / FALSE PATH constraints - data_src_qadc_ad9361_sub.hdl
 # ----------------------------------------------------------------------------
 
 # because RX_FRAME_P is sampled on the DATA_CLK_P falling edge (we use DDR primitive as a sample-in-the-middle), the rising edge latched output is unconnected and therefore should not be used in timing analysis
-set_false_path -from [get_ports FMC_LA01_CC_P] -rise_to [get_pins ftop/FMC_data_src_adc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D
+set_false_path -from [get_ports FMC_LA01_CC_P] -rise_to [get_pins ftop/FMC_data_src_qadc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D
 ]

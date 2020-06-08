@@ -11,7 +11,7 @@
     <Property name='oneshot' value='true'/>
   </Instance>
   <Instance component='ocpi.core.file_write'>
-    <Property name='fileName' value='data_src_adc_zed_fmcomms_2_3_test_app.out'/>
+    <Property name='fileName' value='data_src_qadc_zed_fmcomms_2_3_test_app.out'/>
   </Instance>
 
   <!-- must be instanced here as workaround for AV-3799 -->
@@ -37,7 +37,7 @@
 
        UNDOCUMENTED AND SUSCEPTIBLE TO CHANGES - This initialization order is forced by
        putting this instance at the end of the app XML -->
-  <Instance component='ocpi.platform.devices.data_src_adc'
+  <Instance component='ocpi.platform.devices.data_src_qadc'
             model='hdl'
             connect='cswm_to_iqstream'
             selection='ADC_INPUT_IS_LSB_OF_OUT_PORT == true && OUT_PORT_DATA_WIDTH == 32 && ADC_WIDTH_BITS == 12'>

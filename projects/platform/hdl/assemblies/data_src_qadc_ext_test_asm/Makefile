@@ -1,7 +1,7 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
-# This is the HDL assembly Makefile for the "data_src_adc_ext_test_asm" assembly
-# The file "data_src_adc_ext_test_asm.xml" defines the assembly.
+# This is the HDL assembly Makefile for the "data_src_qadc_ext_test_asm" assembly
+# The file "data_src_qadc_ext_test_asm.xml" defines the assembly.
 # The default container for all assemblies is one that connects all external ports to
 # the devices interconnect to communicate with software workers or other FPGAs.
 #

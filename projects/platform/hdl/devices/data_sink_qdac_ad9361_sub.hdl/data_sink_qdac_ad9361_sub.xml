@@ -46,21 +46,21 @@
   <devsignal name='dev_data_to_pins' signals='ad9361-data-dac-signals.xml'    master='true'/>
   <devsignal name='dev_txen'     signals='txen-out-signals.xml'           master='true'/>
 
-  <!-- to supported data_sink_dac.hdl -->
+  <!-- to supported data_sink_qdac.hdl -->
   <devsignal name='dev_data_ch0_in' signals='qdac-16-signals.xml'/>
   <devsignal name='dev_data_ch1_in' optional='true' signals='qdac-16-signals.xml'/>
 
   <!-- Sub-Device Port Connections (Supports) -->
 
-  <supports worker='data_sink_dac'>
+  <supports worker='data_sink_qdac'>
     <connect port="dev" to="dev_data_ch0_in"/>
   </supports>
-  <supports worker='data_sink_dac'>
+  <supports worker='data_sink_qdac'>
     <connect port="dev" to="dev_data_ch1_in"/>
   </supports>
 
   <!-- it was originally desired to use clockdirection='in' so that these ports
-       would inherit the clock from the data_sink_dac.hdl's on_off ports, but
+       would inherit the clock from the data_sink_qdac.hdl's on_off ports, but
        optional ports are not (yet?) fully supported w/ clockdirection='out' in
        ocpigen (issue for investigation of adding this support is in
        https://gitlab.com/opencpi/opencpi/-/issues/1135)
