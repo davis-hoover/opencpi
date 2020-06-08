@@ -29,7 +29,7 @@ entity four_bit_lfsr is
         clk     : in std_logic;
         rst     : in std_logic;
         en      : in std_logic;
-        dout    : out std_logic_vector);
+        dout    : out std_logic_vector(3 downto 0));
 
 end entity four_bit_lfsr;
 
