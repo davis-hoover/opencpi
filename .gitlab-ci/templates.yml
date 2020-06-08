@@ -462,11 +462,12 @@
     PLATFORM: 'xsim'
     MODEL: 'hdl'
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*all(\s[^\s\]]*)*\]/i
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*xsim(\s[^\s\]]*)*\]/i
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci[^\]]*\]/i
-      when: never
-    - when: on_success
+    - if: '$CI_HDL_PLATFORM =~ /(^| )xsim|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )xsim|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +xsim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
 
 .modelsim:
   variables:
@@ -475,12 +476,12 @@
     OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
     OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*all(\s[^\s\]]*)*\]/i
+    - if: '$CI_HDL_PLATFORM =~ /(^| )modelsim|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )modelsim|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +modelsim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
     - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*modelsim(\s[^\s\]]*)*\]/i
 
 .isim:
   extends:
@@ -489,12 +490,12 @@
     PLATFORM: 'isim'
     MODEL: 'hdl'
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*all(\s[^\s\]]*)*\]/i
+    - if: '$CI_HDL_PLATFORM =~ /(^| )isim|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )isim|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +isim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
     - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*isim(\s[^\s\]]*)*\]/i
 
 .xilinx13_3:
   extends:
@@ -516,19 +517,7 @@
     SW_PLATFORM: 'xilinx13_4'
     MODEL: 'rcc'
 
-.zed-xilinx13_3:
-  extends:
-    - .vivado
-  variables:
-    PLATFORM: 'zed'
-    HW_PLATFORM: 'zed'
-    SW_PLATFORM: 'xilinx13_3'
-    IP: '10.0.0.103'
-    OCPI_SERVER_ADDRESSES: '10.0.0.103:1000'
-    PORT: '1000'
-    MODEL: 'hdl'
-
-.zed-xilinx13_4:
+.zed:
   extends:
     - .vivado
   variables:
@@ -540,12 +529,12 @@
     OCPI_SERVER_ADDRESSES: '10.0.0.103:1000'
     MODEL: 'hdl'
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*all(\s[^\s\]]*)*\]/i
+    - if: '$CI_HDL_PLATFORM =~ /(^| )zed|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )zed|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zed|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
     - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*zed(\s[^\s\]]*)*\]/i
 
 .matchstiq_z1-xilinx13_3:
   extends:
@@ -558,12 +547,12 @@
     PORT: '1000'
     MODEL: 'hdl'
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*all(\s[^\s\]]*)*\]/i
+    - if: '$CI_HDL_PLATFORM =~ /(^| )matchstiq_z1|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )matchstiq_z1|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +matchstiq_z1|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
     - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*matchstiq_z1(\s[^\s\]]*)*\]/i
 
 .zed_ise-xilinx13_4:
   extends:
@@ -577,16 +566,18 @@
     MODEL: 'hdl'
     XILINXD_LICENSE_FILE: '2101@sembach.opencpi.net'
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*zed_ise(\s[^\s\]]*)*\]/i
+    - if: '$CI_HDL_PLATFORM =~ /(^| )zed_ise|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )zed_ise|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zed_ise|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
 
 .e3xx:
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*all(\s[^\s\]]*)*\]/i
+    - if: '$CI_HDL_PLATFORM =~ /(^| )e31x|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )e31x|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +e31x|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
     - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_TAG"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
-    - if: $CI_COMMIT_MESSAGE =~ /\[\s*ci\s.*e31x(\s[^\s\]]*)*\]/i
 
 
 ########
@@ -636,7 +627,7 @@
   after_script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpiremote unload -i $IP
-    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
-    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
+    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_ID.txt
+    - tar -T artifacts-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_ID.tar
+    - ls -lh artifacts-$CI_JOB_ID.tar
+    
