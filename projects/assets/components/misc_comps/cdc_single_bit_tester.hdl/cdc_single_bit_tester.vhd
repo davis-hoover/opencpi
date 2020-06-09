@@ -53,7 +53,7 @@ architecture rtl of worker is
 
   begin
 
-  gen_clk : misc_prims.misc_prims.cdc_clk_gen
+  gen_clk : entity work.cdc_clk_gen
     generic map (src_clk_hz => c_src_clk_hz,
                  dst_clk_hz => c_dst_clk_hz)
     port map (

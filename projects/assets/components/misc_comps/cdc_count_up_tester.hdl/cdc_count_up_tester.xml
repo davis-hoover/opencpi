@@ -1,4 +1,4 @@
-<HdlWorker language="vhdl" spec="cdc_count_up_tester-spec" DataWidth="32" Version="2" libraries="cdc">
+<HdlWorker language="vhdl" spec="cdc_count_up_tester-spec" DataWidth="32" Version="2" libraries="cdc clocking">
 
   <StreamInterface Name="out" insertEOM="true" workerEOF="true" clockDirection="out"/>
 

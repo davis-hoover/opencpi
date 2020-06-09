@@ -219,16 +219,4 @@ generic (hold_width : natural := 1);
     advance   : out std_logic);
 end component;
 
-component cdc_clk_gen is
-    generic (src_clk_hz : real := 100000000.0;
-             dst_clk_hz : real := 100000000.0);
-    port (
-      	ctl_clk    : in std_logic;
-      	ctl_rst    : in std_logic;
-        src_clk    : out std_logic;
-        src_rst    : out std_logic;
-        dst_clk    : out std_logic;
-        dst_rst    : out std_logic);
-end component;
-
 end package misc_prims;

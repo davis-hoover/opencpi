@@ -54,7 +54,7 @@ architecture rtl of worker is
   signal s_bits_data_gen_out : std_logic_vector(15 downto 0) := (others => '0');
   begin
 
-    gen_clk : misc_prims.misc_prims.cdc_clk_gen
+    gen_clk : entity work.cdc_clk_gen
       generic map (src_clk_hz => c_src_clk_hz,
                    dst_clk_hz => c_dst_clk_hz)
       port map (
