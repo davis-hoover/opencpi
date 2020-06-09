@@ -83,12 +83,12 @@
   <devsignal name='dev_data_clk'        signals='ad9361-data-clk-signals.xml'      master='true'/>
 
   <!-- Sub-Device Port Connections (Supports) -->
-  <supports worker='data_src_adc_ad9361_sub'>
+  <supports worker='data_src_qadc_ad9361_sub'>
     <connect port="dev_cfg_data"    to="dev_cfg_data" index='0'/>
     <connect port="dev_cfg_data_rx" to="dev_cfg_data_rx"/>
   </supports>
 
-  <supports worker='data_sink_dac_ad9361_sub'>
+  <supports worker='data_sink_qdac_ad9361_sub'>
     <connect port="dev_cfg_data"    to="dev_cfg_data" index='1'/>
     <connect port="dev_cfg_data_tx" to="dev_cfg_data_tx"/>
   </supports>
