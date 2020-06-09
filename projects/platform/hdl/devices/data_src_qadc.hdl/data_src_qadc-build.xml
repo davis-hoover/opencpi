@@ -1,0 +1,8 @@
+<Build>
+  <Configuration id='0'>
+    <Parameter name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='false'/>
+  </Configuration>
+  <Configuration id='1'>
+    <Parameter name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
+  </Configuration>
+</Build>
