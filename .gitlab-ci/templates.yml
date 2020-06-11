@@ -621,8 +621,8 @@
     - echo "PORT- $PORT"
     - echo "HW- $HW_PLATFORM"
     - echo "SW- $SW_PLATFORM"
-    - ocpiremote deploy -i $IP -s $SW_PLATFORM -w $HW_PLATFORM
     - ocpiremote load -i $IP -r $PORT -w $HW_PLATFORM -s $SW_PLATFORM
+    - ocpiremote deploy -i $IP -s $SW_PLATFORM -w $HW_PLATFORM
     - ocpiremote start -i $IP
   after_script:
     - source ./cdk/opencpi-setup.sh -e
