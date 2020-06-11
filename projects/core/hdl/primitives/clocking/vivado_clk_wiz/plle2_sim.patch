@@ -1,0 +1,118 @@
+--- plle2_sim.vhd	2020-05-15 11:07:35.000000000 -0400
++++ plle2_sim_modified.vhd	2020-05-15 11:40:06.965210685 -0400
+@@ -15,6 +15,13 @@
+ library UNISIM;
+ use UNISIM.VCOMPONENTS.ALL;
+ entity plle2_plle2_clk_wiz is
++  generic (
++    DIVCLK_DIVIDE        : integer :=  1;  -- D
++    CLKFBOUT_MULT        : integer :=  5;  -- M
++    CLKOUT0_DIVIDE       : integer :=  1;  -- O
++    CLKOUT0_PHASE        : real :=  0.0;
++    CLKOUT0_DUTY_CYCLE   : real :=  0.5;
++    CLKIN1_PERIOD        : real :=  0.0);
+   port (
+     clk_out1 : out STD_LOGIC;
+     reset : in STD_LOGIC;
+@@ -26,7 +33,6 @@
+ end plle2_plle2_clk_wiz;
+ 
+ architecture STRUCTURE of plle2_plle2_clk_wiz is
+-  signal clk_in1_plle2 : STD_LOGIC;
+   signal clk_out1_plle2 : STD_LOGIC;
+   signal clkfbout_buf_plle2 : STD_LOGIC;
+   signal clkfbout_plle2 : STD_LOGIC;
+@@ -39,13 +45,6 @@
+   signal NLW_plle2_adv_inst_DO_UNCONNECTED : STD_LOGIC_VECTOR ( 15 downto 0 );
+   attribute BOX_TYPE : string;
+   attribute BOX_TYPE of clkf_buf : label is "PRIMITIVE";
+-  attribute BOX_TYPE of clkin1_ibufg : label is "PRIMITIVE";
+-  attribute CAPACITANCE : string;
+-  attribute CAPACITANCE of clkin1_ibufg : label is "DONT_CARE";
+-  attribute IBUF_DELAY_VALUE : string;
+-  attribute IBUF_DELAY_VALUE of clkin1_ibufg : label is "0";
+-  attribute IFD_DELAY_VALUE : string;
+-  attribute IFD_DELAY_VALUE of clkin1_ibufg : label is "AUTO";
+   attribute BOX_TYPE of clkout1_buf : label is "PRIMITIVE";
+   attribute BOX_TYPE of plle2_adv_inst : label is "PRIMITIVE";
+ begin
+@@ -54,14 +53,6 @@
+       I => clkfbout_plle2,
+       O => clkfbout_buf_plle2
+     );
+-clkin1_ibufg: unisim.vcomponents.IBUF
+-    generic map(
+-      IOSTANDARD => "DEFAULT"
+-    )
+-        port map (
+-      I => clk_in1,
+-      O => clk_in1_plle2
+-    );
+ clkout1_buf: unisim.vcomponents.BUFG
+      port map (
+       I => clk_out1_plle2,
+@@ -70,13 +61,13 @@
+ plle2_adv_inst: unisim.vcomponents.PLLE2_ADV
+     generic map(
+       BANDWIDTH => "OPTIMIZED",
+-      CLKFBOUT_MULT => 9,
++      CLKFBOUT_MULT => CLKFBOUT_MULT,
+       CLKFBOUT_PHASE => 0.000000,
+-      CLKIN1_PERIOD => 10.000000,
++      CLKIN1_PERIOD => CLKIN1_PERIOD,
+       CLKIN2_PERIOD => 0.000000,
+-      CLKOUT0_DIVIDE => 9,
+-      CLKOUT0_DUTY_CYCLE => 0.500000,
+-      CLKOUT0_PHASE => 0.000000,
++      CLKOUT0_DIVIDE => CLKOUT0_DIVIDE,
++      CLKOUT0_DUTY_CYCLE => CLKOUT0_DUTY_CYCLE,
++      CLKOUT0_PHASE => CLKOUT0_PHASE,
+       CLKOUT1_DIVIDE => 1,
+       CLKOUT1_DUTY_CYCLE => 0.500000,
+       CLKOUT1_PHASE => 0.000000,
+@@ -93,7 +84,7 @@
+       CLKOUT5_DUTY_CYCLE => 0.500000,
+       CLKOUT5_PHASE => 0.000000,
+       COMPENSATION => "ZHOLD",
+-      DIVCLK_DIVIDE => 1,
++      DIVCLK_DIVIDE => DIVCLK_DIVIDE,
+       IS_CLKINSEL_INVERTED => '0',
+       IS_PWRDWN_INVERTED => '0',
+       IS_RST_INVERTED => '0',
+@@ -104,7 +95,7 @@
+         port map (
+       CLKFBIN => clkfbout_buf_plle2,
+       CLKFBOUT => clkfbout_plle2,
+-      CLKIN1 => clk_in1_plle2,
++      CLKIN1 => clk_in1,
+       CLKIN2 => '0',
+       CLKINSEL => '1',
+       CLKOUT0 => clk_out1_plle2,
+@@ -130,6 +121,13 @@
+ library UNISIM;
+ use UNISIM.VCOMPONENTS.ALL;
+ entity plle2 is
++  generic (
++    DIVCLK_DIVIDE        : integer :=  1;  -- D
++    CLKFBOUT_MULT        : integer :=  5;  -- M
++    CLKOUT0_DIVIDE       : integer :=  1;  -- O
++    CLKOUT0_PHASE        : real :=  0.0;
++    CLKOUT0_DUTY_CYCLE   : real :=  0.5;
++    CLKIN1_PERIOD        : real :=  0.0);
+   port (
+     clk_out1 : out STD_LOGIC;
+     reset : in STD_LOGIC;
+@@ -143,6 +141,13 @@
+ architecture STRUCTURE of plle2 is
+ begin
+ inst: entity work.plle2_plle2_clk_wiz
++    generic map(
++      DIVCLK_DIVIDE        =>  DIVCLK_DIVIDE,
++      CLKFBOUT_MULT        =>  CLKFBOUT_MULT,
++      CLKOUT0_DIVIDE       =>  CLKOUT0_DIVIDE,
++      CLKOUT0_PHASE        =>  CLKOUT0_PHASE,
++      CLKOUT0_DUTY_CYCLE   =>  CLKOUT0_DUTY_CYCLE,
++      CLKIN1_PERIOD        =>  CLKIN1_PERIOD)
+      port map (
+       clk_in1 => clk_in1,
+       clk_out1 => clk_out1,

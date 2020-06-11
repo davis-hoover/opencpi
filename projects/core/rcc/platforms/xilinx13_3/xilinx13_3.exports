@@ -28,6 +28,10 @@
 +platforms/zynq/formatOpenCPIZynqSD.sh zynq/
 +<platform-dir>/release/kernel-headers.tar release/
 +<platform-dir>/install*.sh
+# Expose the HDL-platform-specific boot files to support building SD cards
++<platform-dir>/release/zed hdl/zed/boot
++<platform-dir>/prerequisites
+
 ### Runtime files
 # Put the platform's READMEs onto the runtime
 =<platform-dir>/README*

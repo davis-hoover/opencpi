@@ -27,9 +27,13 @@ if ! PORT=`command -v port`; then
     exit 1
   }
 fi
-PKGS="python34 coreutils gsed py34-numpy swig swig-python py27-numpy scons"
+PKGS="python38 swig3 swig3-python scons coreutils gsed py38-numpy libtool autoconf automake py38-jinja2"
 echo Using $PORT to install packages required by OpenCPI for $OCPI_TOOL_PLATFORM: $PKGS
+set -evx
 sudo $PORT install $PKGS
+sudo port select --set python3 python38
+sudo port select --set python python27
+sudo port select --set python2 python27
 # FIXME: somehow automate the required path additions?
 # They are /opt/local/bin and /opt/local/libexec/gnubin
 # At the end of the path.

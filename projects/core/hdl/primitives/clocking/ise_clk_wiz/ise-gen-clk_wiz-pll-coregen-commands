@@ -1,0 +1,14 @@
+NEWPROJECT managed_ip_project
+SET designentry = VHDL
+SET device = xc7z020
+SET devicefamily = zynq
+SET flowvendor = Other
+SET package = clg484
+SET simulationfiles = Behavioral
+SET speedgrade = -1
+SET vhdlsim = true
+SELECT Clocking_Wizard xilinx.com:ip:clk_wiz:3.6
+CSET component_name=plle2
+CSET primitive=PLLE2
+CSET primtype_sel=MMCM_ADV
+GENERATE

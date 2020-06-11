@@ -30,7 +30,8 @@ Tests = \
 	gpi.test \
 	gpo.test \
 	lime_dac_ts.test \
-	data_sink_dac.test
+
+#	data_sink_qdac.test
 
 # Build Ordering Rules:
 # 1) Subdevices that support other devices must occur AFTER the devices they support.
