@@ -96,11 +96,6 @@ def main():
         '-l', '--log_level',
         'specify log level',
         default=0)
-    option_no_compress = make_option(
-        '-z', '--no_compress',
-        'Disable tar gzip compression',
-        default=False,
-        action='store_true')
 
     common_options = [option_user, option_password, option_ip,
                       option_remote_dir, option_ssh_opts, option_scp_opts]
@@ -111,7 +106,7 @@ def main():
         'Create and send the server package to the remote sandbox directory',
         common_options
         + [option_port, option_valgrind, option_hw_platform,
-           option_sw_platform, option_no_compress]))
+           option_sw_platform]))
     commands.append(make_subcommand(
         'unload', unload,
         'delete a server sandbox directory',
@@ -120,7 +115,7 @@ def main():
         'reload', reload_,
         'delete a server sandbox directory and then reload it',
         common_options + [option_port, option_valgrind, option_hw_platform,
-                          option_sw_platform, option_no_compress]))
+                          option_sw_platform]))
     commands.append(make_subcommand(
         'start', start,
         'start server on remote device',
@@ -152,7 +147,7 @@ def main():
     commands.append(make_subcommand(
         'deploy', deploy,
         'Deploy Opencpi boot files onto the remote device and reboot',
-        common_options + [option_hw_platform, option_sw_platform, option_no_compress]))
+        common_options + [option_hw_platform, option_sw_platform]))
 
     parser = make_parser(commands)
     args = parser.parse_args()
@@ -250,7 +245,7 @@ def make_parser(commands):
     return parser
 
 
-def make_tar(tar_files, arcnames, tempdir, no_compress):
+def make_tar(tar_files, arcnames, tempdir):
     """ Creates a tar file and returns the path.
 
     Args:
@@ -258,12 +253,8 @@ def make_tar(tar_files, arcnames, tempdir, no_compress):
         arcnames: list of file paths to achive tar_files to
         tempdir: staging directory for the tar
     """
+    mode = "w:gz"
     tar_path = os.path.join(tempdir, 'tar.tgz')
-
-    if no_compress:
-        mode = "w"
-    else:
-        mode = "w:gz"
 
     with tarfile.open(tar_path, mode,
                       format=tarfile.PAX_FORMAT, dereference=True) as tar:
@@ -407,14 +398,14 @@ def load(args):
         # Create server package
         print('Creating server package...')
         tar_commands = []
-        tar_path = make_tar(tar_files, arcnames, tempdir, args.no_compress)
+        tar_path = make_tar(tar_files, arcnames, tempdir)
         tar_commands.append(make_command(
             'scp {} {} {}@{}:./{}'.format(
                 args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
             args,
             ssh=False))
         tar_commands.append(make_command(
-            'tar -xf {}/tar.tgz'.format(args.remote_dir),
+            'gunzip -c {}/tar.tgz | tar xf -'.format(args.remote_dir),
             args))
 
         print('Sending server package...')
@@ -466,7 +457,7 @@ def deploy(args):
 
     with tempfile.TemporaryDirectory() as tempdir:
         tar_commands = []
-        tar_path = make_tar(tar_files, tar_files, tempdir, args.no_compress)
+        tar_path = make_tar(tar_files, tar_files, tempdir)
 
         tar_commands.append(make_command(
             'scp {} {} {}@{}:./{}'.format(
