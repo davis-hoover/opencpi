@@ -22,6 +22,20 @@
 #    (mount point on development host, etc.), and supply the IP address as arg
 # 2. The core setup HAS been run and you are just setting up a shell or ssh session
 
+set_tool_platform() {
+
+  if test -f /etc/opencpi-release; then #checks to see if xilinx13_4 platform is being ran
+    read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
+    OCPI_DIR=/mnt/card/opencpi
+  elif [[ $(uname -r) == *"2019.2"* ]]; then #checks to see if xilinx19_2_aarch32 platform is being ran
+    OCPI_TOOL_PLATFORM=xilinx19_2_aarch32
+    OCPI_DIR=/run/media/mmcblk0p1/opencpi
+  else
+    echo Error: OCPI_TOOL_PLATFORM not set properly
+    exit
+  fi
+}
+
 trap "trap - ERR; break" ERR; for i in 1; do
 if test "$OCPI_CDK_DIR" = ""; then
   # Uncomment this section and change the MAC address for an environment with multiple
@@ -30,11 +44,11 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 hw ether 00:0a:35:00:01:23
   # ifconfig eth0 up
   # udhcpc
-
+set_tool_platform
   # CUSTOMIZE THIS LINE FOR YOUR ENVIRONMENT
   # First argument is backup time server for the time protocol used by the ntp command
   # Second argument is timezone spec - see "man timezone" for the format.
-  source /mnt/card/opencpi/zynq_setup.sh time.nist.gov EST5EDT,M3.2.0,M11.1.0
+  source $OCPI_DIR/zynq_setup.sh time.nist.gov EST5EDT,M3.2.0,M11.1.0
   # add any commands to be run only the first time this script is run
 
   break # this script will be rerun recursively by setup.sh
@@ -43,7 +57,7 @@ alias ll='ls -lt --color=auto'
 # Tell the ocpihdl utility to always assume the FPGA device is the zynq PL.
 export OCPI_DEFAULT_HDL_DEVICE=pl:0
 # The system config file sets the default SMB size
-export OCPI_SYSTEM_CONFIG=/mnt/card/opencpi/system.xml
+export OCPI_SYSTEM_CONFIG=$OCPI_DIR/system.xml
 # Get ready to run some test xml-based applications
 cd $OCPI_CDK_DIR/applications
 # Shorten the default shell prompt

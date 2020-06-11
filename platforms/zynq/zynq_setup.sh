@@ -24,21 +24,13 @@
 # If ntpd fails because it could not find ntp.conf fall back on time server
 # passed in as the first parameter
 set_time() {
-  if test "$1" != -; then
-    echo Attempting to set time from the time server
-    if test -f /etc/opencpi-release; then
-      read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    else
-      echo No /etc/opencpi-release - assuming ZedBoard hardware
-      OCPI_TOOL_PLATFORM=zed
-    fi
 
     # Calling ntpd without any options will run it as a dameon
     OPTS=""
-    BUSYBOX_PATH="/mnt/card/opencpi/$OCPI_TOOL_PLATFORM/bin"
+    BUSYBOX_PATH="$OCPI_DIR/$OCPI_TOOL_PLATFORM/bin"
     TIMEOUT=20
-    MSG="Succeeded in setting the time from /mnt/card/opencpi/ntp.conf"
-    if [ ! -e /mnt/card/opencpi/ntp.conf ]; then
+    MSG="Succeeded in setting the time from $OCPI_DIR/ntp.conf"
+    if [ ! -e $OCPI_DIR/ntp.conf ]; then
       OPTS="-p $1"
       MSG="Succeeded in setting the time from $1"
     fi
@@ -49,15 +41,15 @@ set_time() {
       echo ====YOU HAVE NO NETWORK CONNECTION and NO HARDWARE CLOCK====
       echo Set the time using the '"date YYYY.MM.DD-HH:MM[:SS]"' command.
     fi
-  fi
 }
+
 if test $# != 2; then
   echo You must supply 2 arguments to this script.
   echo Usage is: zynq_setup.sh '<ntp-server> <timezone>'
   echo A good example timezone is: EST5EDT,M3.2.0,M11.1.0
   echo If the ntp-server is '"-"', no ntpclient will be started.
 else
-  export OCPI_CDK_DIR=/mnt/card/opencpi
+  export OCPI_CDK_DIR=$OCPI_DIR
   # In case dhcp failed on eth0, try it on eth1
   set_time $1
   # Make sure the hostname is in the host table
@@ -65,16 +57,11 @@ else
   if ! grep -q $myhostname /etc/hosts; then echo 127.0.0.1 $myhostname >> /etc/hosts; fi
   # Run the generic script to setup the OpenCPI environment
   # Note the ocpidriver load command is innocuous if run redundantly
-  OCPI_CDK_DIR=/mnt/card/opencpi
+  OCPI_CDK_DIR=$OCPI_DIR
   cat <<EOF > $HOME/.profile
     echo Executing $HOME/.profile.
     export OCPI_CDK_DIR=$OCPI_CDK_DIR
-    if test -f /etc/opencpi-release; then
-      read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    else
-      echo No /etc/opencpi-release - assuming xilinx13_3 software platform
-      OCPI_TOOL_PLATFORM=xilinx13_3
-    fi
+    
     export OCPI_TOOL_PLATFORM
     export OCPI_TOOL_OS=linux
     # There is no multimode support when running standalone
@@ -82,7 +69,7 @@ else
     export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/artifacts
     export PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/bin:\$PATH
     # This is only for explicitly-linked driver libraries.  Fixed someday.
-    export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/lib:\$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/sdk/lib:\$LD_LIBRARY_PATH
     ocpidriver load
     export TZ=$2
     echo OpenCPI ready for zynq.

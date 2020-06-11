@@ -19,26 +19,22 @@
 # If there is a "mynetsetup.sh" script in this directory it will run it after the
 # other setup items, and arrange for it to be run in any login scripts later
 # e.g. ssh logins
-
 # Set time using ntpd
 # If ntpd fails because it could not find ntp.conf fall back on time server
 # passed in as the first parameter
+
+#checks a couple locations to determine which version of xilinx is being ran
+
 set_time() {
   if test "$1" != -; then
     echo Attempting to set time from the time server
-    if test -f /etc/opencpi-release; then
-      read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    else
-      echo No /etc/opencpi-release - assuming ZedBoard hardware
-      OCPI_TOOL_PLATFORM=zed
-    fi
 
     # Calling ntpd without any options will run it as a dameon
     OPTS=""
-    BUSYBOX_PATH="/mnt/card/opencpi/$OCPI_TOOL_PLATFORM/bin"
+    BUSYBOX_PATH="$OCPI_DIR/$OCPI_TOOL_PLATFORM/bin"
     TIMEOUT=20
-    MSG="Succeeded in setting the time from /mnt/card/opencpi/ntp.conf"
-    if [ ! -e /mnt/card/opencpi/ntp.conf ]; then
+    MSG="Succeeded in setting the time from $OCPI_DIR/ntp.conf"
+    if [ ! -e $OCPI_DIR/$OCPI_TOOL_PLATFORM/ntp.conf ]; then
       OPTS="-p $1"
       MSG="Succeeded in setting the time from $1"
     fi
@@ -66,6 +62,7 @@ else
      echo No IP address was detected! No network or no DHCP.
      break;
   fi
+  
   set_time $4
   # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
   # This may change for 64 bit zynqs
@@ -91,12 +88,6 @@ else
   if test -e /mnt/net/$3; then
     echo Executing $PROFILE_FILE
     export OCPI_CDK_DIR=$OCPI_CDK_DIR
-    if test -f /etc/opencpi-release; then
-      read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    else
-      echo No /etc/opencpi-release - assuming xilinx13_3 software platform
-      OCPI_TOOL_PLATFORM=xilinx13_3
-    fi
     export OCPI_TOOL_PLATFORM
     export OCPI_TOOL_OS=linux
     export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
@@ -106,8 +97,8 @@ else
     export OCPI_LIBRARY_PATH+=:$OCPI_CDK_DIR/\$OCPI_TOOL_PLATFORM/artifacts
     # Priorities for finding system.xml:
     # 1. If is it on the local system it is considered customized for this system - use it.
-    if test -r /mnt/card/opencpi/system.xml; then
-      OCPI_SYSTEM_CONFIG=/mnt/card/opencpi/system.xml
+    if test -r $OCPI_DIR/system.xml; then
+      OCPI_SYSTEM_CONFIG=$OCPI_DIR/system.xml
     # 2. If is it at the top level of the mounted CDK, it is considered customized for all the
     #    systems that use this CDK installation (not shipped/installed by the CDK)
     elif test -r $OCPI_CDK_DIR/system.xml; then
@@ -126,14 +117,14 @@ else
     export OCPI_SYSTEM_CONFIG
     export PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/bin:\$PATH
     # This is only for ACI executables in special cases...
-    export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/lib:\$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/sdk/lib:\$LD_LIBRARY_PATH
     ocpidriver load
     export TZ=$5
     echo OpenCPI ready for zynq.
-    if test -r /mnt/card/opencpi/mynetsetup.sh; then
-       source /mnt/card/opencpi/mynetsetup.sh
+    if test -r $OCPI_DIR/mynetsetup.sh; then
+       source $OCPI_DIR/mynetsetup.sh
     else
-       echo Error: enable to find /mnt/card/opencpi/mynetsetup.sh
+       echo Error: enable to find $OCPI_DIR/mynetsetup.sh
     fi
   else
     echo NFS mounts not yet set up. Please mount the OpenCPI CDK into /mnt/net/.
