@@ -181,12 +181,22 @@ Could not find 'sudo' and you are not root. Installing packages requires root
 permissions."
 fi
 
+# Must ensure i386 architecture support is enabled so "apt-get"
+# will have access to the i386 package repositories.  It is not
+# an error to run "dpkg --add-architecture i386" more than once.
+$SUDO dpkg --add-architecture i386
+
 # Enable TimSC Personal Package Archive (PPA): needed for "swig"
 if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
 then
   $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
-  $SUDO apt-get update
 fi
+
+# Make sure "apt-get" knows about the latest available packages
+# in all configured repositories.  Although running this is in
+# accordance with best practices anyway, it is mandatory if we
+# added the i386 architecture or the TimSC PPA above. 
+$SUDO apt-get update
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source.  Specify "--no-act" for debugging.
