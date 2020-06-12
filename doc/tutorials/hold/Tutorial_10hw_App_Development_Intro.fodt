@@ -6416,7 +6416,7 @@
       <text:p text:style-name="P29"><text:bookmark-start text:name="__DdeLink__23639_548880921"/><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">OpenCPI</text:span></text:a><text:bookmark-end text:name="__DdeLink__23639_548880921"/></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C2" office:value-type="string">
-      <text:p text:style-name="P29"><text:bookmark text:name="__DdeLink__23641_548880921"/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P29"><text:bookmark text:name="__DdeLink__23641_548880921"/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/develop/docs/Overview.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -6438,7 +6438,7 @@
       <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C4" office:value-type="string">
-      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -6449,7 +6449,7 @@
       <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C5" office:value-type="string">
-      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -6460,7 +6460,7 @@
       <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C6" office:value-type="string">
-      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -6471,7 +6471,7 @@
       <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T18">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C7" office:value-type="string">
-      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P29"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T19">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>

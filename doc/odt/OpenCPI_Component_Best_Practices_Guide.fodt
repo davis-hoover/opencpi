@@ -3535,7 +3535,7 @@
    <text:p text:style-name="P137">[Preliminary Draft]</text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
    </text:section>
    <text:p text:style-name="P87"><text:bookmark-end text:name="__DdeLink__15612_1276242887"/>Revision History</text:p>
    <table:table table:name="Table2" table:style-name="Table2">
