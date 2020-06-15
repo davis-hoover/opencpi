@@ -45,6 +45,8 @@ function is_platform {
 sd=`pwd`/cdk/$platform/sdcard-$rcc_platform
 rm -r -f $sd
 mkdir -p $sd/opencpi
+# Add a proper first "release" argument when we have that file in the source tree
+echo opencpi-v1.7.0 $rcc_platform $platform  > $sd/opencpi/release
 # 2. copy runtime files into opencpi, preserving links that are within the same directory and skipping
 #    some things.  This is somewhat redundant with how the runtime packaging prepare-list works...
 for f in cdk/runtime/*; do
