@@ -23,7 +23,7 @@
 
 set_tool_platform() {
 
-  if test -f /etc/opencpi-release; then #checks to see if xilinx13_4 platform is being ran
+  if test -f /etc/opencpi-release; then  # checks to see if xilinx13_4 platform is being ran
     read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
     OCPI_DIR=/mnt/card/opencpi
   elif [[ $(uname -r) == *"2019.2"* ]]; then #checks to see if xilinx19_2_aarch32 platform is being ran
