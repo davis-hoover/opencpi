@@ -30,7 +30,7 @@ set_tool_platform() {
     OCPI_TOOL_PLATFORM=xilinx19_2_aarch32
     OCPI_DIR=/run/media/mmcblk0p1/opencpi
   else
-     echo Error: OCPI_TOOL_PLATFORM not set properly
+    echo Error: OCPI_TOOL_PLATFORM not set properly
     exit
   fi
 }
