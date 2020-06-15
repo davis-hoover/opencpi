@@ -54,7 +54,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   # Third argument is opencpi dir relative to mount point
   # Fourth argument is backup time server for the time protocol used by the ntp command
   # Fifth arg is timezone spec - see "man timezone" for the format.
-  mkdir -p /mnt/net # requirement to mount opencpi from host during the zynq_net_setup.sh script
+  mkdir -p /mnt/net  # requirement to mount opencpi from host during the zynq_net_setup.sh script
   source $OCPI_DIR/zynq_net_setup.sh $1 /opt/opencpi cdk time.nist.gov EST5EDT,M3.2.0,M11.1.0
   mkdir -p /mnt/ocpi_core
   mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
