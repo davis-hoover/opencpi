@@ -145,7 +145,7 @@ endef
 # $(call HdlSearchPrimitivePath,lib,non-existent-ok,from)
 HdlSearchPrimitivePath=$(infox HSPP:$1:$2:$3)\
   $(eval HdlTempPlaces:=$(strip\
-       $(subst :, ,$(OCPI_HDL_PRIMITIVE_PATH)) \
+       $(OCPI_PROJECT_REL_DIR)/hdl/primitives/lib \
        $(foreach d,$(OcpiGetProjectPath),$d/lib/hdl)))\
   $(eval HdlTempDirs:=$(firstword $(strip\
     $(foreach p,$(HdlTempPlaces),$(infos HTPS:$(HdlTempPlaces):$1)\
