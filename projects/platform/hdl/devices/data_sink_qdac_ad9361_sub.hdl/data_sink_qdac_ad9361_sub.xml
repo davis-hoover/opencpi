@@ -59,12 +59,6 @@
     <connect port="dev" to="dev_data_ch1_in"/>
   </supports>
 
-  <!-- it was originally desired to use clockdirection='in' so that these ports
-       would inherit the clock from the data_sink_qdac.hdl's on_off ports, but
-       optional ports are not (yet?) fully supported w/ clockdirection='out' in
-       ocpigen (issue for investigation of adding this support is in
-       https://gitlab.com/opencpi/opencpi/-/issues/1135)
-  -->
   <StreamInterface name='on_off0' clockdirection='in'/>
   <StreamInterface name='on_off1' clockdirection='in'/>
 
