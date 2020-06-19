@@ -1,0 +1,73 @@
+<Protocol>
+  <!-- Time of the first sample in the next sample message, with subsequent
+       sample messages being continuous to this message.
+
+       In a receive path, time is the receive time of samples. In a transmit
+       path, time is the time the samples are to be transmitted.
+
+       Time format is GPS time.
+
+       Components which discard or insert samples must update time messages so
+       that any forwarded on time messages correctly related to the next sample
+       message output by the component.
+
+       Time is stored as an unsigned fixed point value, where the ``seconds``
+       argument is the value before the decimal point and the ``fraction``
+       argument is the value after the decimal point. -->
+  <Operation name="time">
+    <Argument name="seconds" type="ulonglong"/>
+    <Argument name="fraction" type="ulonglong"/>
+  </Operation>
+ 
+  <!-- Time between sample points (i.e. the reciprocal of the sample rate).
+       In the same format as the time operation to allow direction addition of
+       sample interval values to time values.
+ 
+       Components which discard samples, insert samples or change the sample
+       rate in any way, must update sample interval messages so the sample
+       interval values sent from a component is a true reflection of the sample
+       interval used in sample messages output by the component.
+ 
+       Sample interval is stored as an unsigned fixed point value, where the
+       ``seconds`` argument is the value before the decimal point and the
+       ``fraction`` argument is the value after the decimal point. -->
+  <Operation name="sample_interval">
+    <Argument name="seconds" type="ulonglong"/>
+    <Argument name="fraction" type="ulonglong"/>
+  </Operation>
+ 
+  <!-- Instructs workers to flush all internal buffers of the worker that relate
+       to the input port this message is received on, so all input data received
+       before this message is processed and output without the need for
+       additional input data.
+ 
+       Internal buffers are often flushed by feeding in zeros.
+ 
+       Once all data has been flushed (or if there is no internal buffer to
+       clear) the flush message must be forwarded on; this includes cases where
+       a flush message would be output during the flush itself. -->
+  <Operation name="flush"/>
+ 
+  <!-- Indicates that the next sample message is discontinuous from the previous
+       sample message. -->
+  <Operation name="discontinuity"/>
+ 
+  <!-- Additional information relating to the sample messages.
+        
+       The ``id`` argument stores an ID value for the type of metadata message.
+       Each ID value is unique to a type of metadata.
+ 
+       The ``value`` argument is the metadata value associated with the ID. This
+       has an array length of 3, so combined the ID and value arguments have a
+       data length which is the same as the time and sample interval messages;
+       to allow workers which do not process these fields to use the same logic
+       for all message types.
+ 
+       Workers must make the best possible effort to maintain the alignment of
+       metadata messages within sample values of sample messages.-->
+  <Operation name="metadata">
+    <Argument name="id" type="ulong"/>
+    <Argument name="value" type="ulong" arraylength="3"/>
+  </Operation>
+ 
+</Protocol>
