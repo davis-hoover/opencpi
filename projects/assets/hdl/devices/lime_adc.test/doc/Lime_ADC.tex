@@ -315,14 +315,14 @@ The Lime ADC device worker uses the clock from the Control Plane and Control Pla
 \begin{landscape}
 \section*{Worker Configuration Parameters}
 \subsubsection*{\comp.hdl}
-\input{../../\ecomp.hdl/configurations.inc}
+%\input{../../\ecomp.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsubsection*{\comp.hdl}
 The table entries for configuration ``0'' are a result of building the worker for the following (Matchstiq-Z1-related) parameter set. Note that that are two global clocks (GCLKs), one for the control plane clock, and one for the Lime ADC-sourced clock (Fmax is assumed to be worst case for all available clocks).\\
 
 The Virtex-6 implementation is specific to the Zipper card's pin locations, which exhibit suboptimal timing due to the Lime ADC's clock pin location on the FPGA. Table entries for configuration1 ``1'' are a result of building the worker for the (Zipper-related) parameter set.\\
 
-\input{../../\ecomp.hdl/utilization.inc}
+%\input{../../\ecomp.hdl/utilization.inc}
 \end{landscape}
 \section*{Test and Verification}
 \begin{flushleft}
