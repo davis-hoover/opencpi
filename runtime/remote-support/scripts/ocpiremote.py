@@ -447,7 +447,7 @@ def deploy(args):
 
     if not os.path.isdir(local_dir):
         print("Error: {} does not exist".format(local_dir))
-        print("Try running 'scripts/install-platform.sh {} && scripts/install-platform.sh {}'".format(
+        print("Try running 'scripts/deploy-opencpi.sh {} {}'".format(
                     args.hw_platform, args.sw_platform)
             )
 
@@ -459,13 +459,14 @@ def deploy(args):
         tar_commands = []
         tar_path = make_tar(tar_files, tar_files, tempdir)
 
+        tar_commands.append('if [ ! -d {} ]; then mkdir {}; fi'.format(args.remote_dir))
         tar_commands.append(make_command(
             'scp {} {} {}@{}:./{}'.format(
                 args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
             args,
             ssh=False))
         tar_commands.append(make_command(
-            'tar -xf {}/tar.tgz'.format(args.remote_dir),
+            'gunzip -c {}/tar.tgz | tar xf -'.format(args.remote_dir),
             args))
 
         print('Deploying Opencpi boot files to remote device from {} ...'.format(local_dir))
@@ -474,14 +475,6 @@ def deploy(args):
     if rc == 0:
         print('Opencpi boot files deployed successfully.')
         rc = reboot(args)
-
-    # cmd = 'scp {} -r {}/. {}@{}:/mnt/card'.format(
-    #     args.scp_opts, local_dir, args.user, args.ip_addr)
-    # command = make_command(cmd, args, ssh=False)
-    # rc = execute_command(command, args)
-
-    # if rc in command.rc:
-    #     rc = reboot(args)
 
     return rc
 
