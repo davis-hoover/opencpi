@@ -19,6 +19,7 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library bsv; use bsv.bsv.all;
+library unisim;
 architecture rtl of platform_ad9361_config_worker is
   constant adc_sub_c  : natural := 0;
   constant dac_sub_c  : natural := 1;
@@ -173,7 +174,23 @@ begin
   -- during AD9361 initialization
   ENABLE_s <= dac_enable;
 
-  TXNRX_s <= dac_txnrx;
+  -- ODDR was added to TX data lines in order to minimize skew between
+  -- high-speed TX data and its clock (the clock used ODDR as its forwarding
+  -- mechanism, as per Xilinx documentation recommendation), and since TXNRX is
+  -- on the same clock domain, a similar design methodology is employed
+  txen_oddr : unisim.vcomponents.ODDR
+    generic map(
+      DDR_CLK_EDGE => "SAME_EDGE",
+      INIT         => '0',
+      SRTYPE       => "ASYNC")
+    port map(
+      Q  => TXNRX_s,
+      C  => dac_clk,
+      CE => '1',
+      D1  => dac_txnrx,
+      D2  => dac_txnrx,
+      R  => '0',
+      S  => '0');
 
   signals : entity work.signals
     port map(
