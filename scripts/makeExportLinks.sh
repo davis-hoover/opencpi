@@ -80,6 +80,38 @@ export OCPI_CDK_DIR=`pwd`/bootstrap
 # The only things we currently need from ocpitarget.sh is OcpiPlatformOs and OcpiPlatformPrerequisites
 [ $rcc_platform != - -a -z "$hdl_platform" ] && source $OCPI_CDK_DIR/scripts/ocpitarget.sh $rcc_platform
 
+# Return relative path from canonical absolute dir path $1 to canonical
+# absolute dir path $2 ($1 and/or $2 may end with one or no "/").
+# Does only need POSIX shell builtins (no external command)
+relPath () {
+    local common path up
+    common=${1%/} path=${2%/}/
+    while test "${path#"$common"/}" = "$path"; do
+        common=${common%/*} up=../$up
+    done
+    path=$up${path#"$common"/}; path=${path%/}; printf %s "${path:-.}"
+}
+
+# From:
+# https://stackoverflow.com/questions/2564634
+# Return relative path from dir $1 to dir $2 (Does not impose any
+# restrictions on $1 and $2 but requires GNU Core Utility "readlink"
+# HINT: busybox's "readlink" does not support option '-m', only '-f'
+#       which requires that all but the last path component must exist)
+if ! readlinkm=$(command -v greadlink || command -v readlink); then
+    echo No readlink command found >&2
+    exit 1
+fi
+if ! $readlinkm --version > /dev/null 2>&1; then
+    echo No GNU-style readlink command available;
+    exit 1
+fi
+relpath () {
+    #echo relpath: from \"$1\" to \"$2\" is $rc >&2
+    local rc=$(relPath "$($readlinkm -m "$2")" "$($readlinkm -m "$1")")
+    echo $rc
+}
+
 # match_pattern: Find the files that match the pattern:
 #  - use default bash glob, and also
 #  - avoids looking at ./exports/
@@ -131,8 +163,8 @@ function make_relative_link {
   local up
 #  [[ $1 =~ ^/ ]] || up=$(echo $2 | sed 's-[^/]*$--' | sed 's-[^/]*/-../-g')
 #  link=${up}$1
-  link=$(python -c "import os.path; print(os.path.relpath('$(dirname $1)', '$(dirname $2)'))")/
-  link+=$(basename $1)
+  link=$(relpath "$(dirname $1)" "$(dirname $2)")
+  link+=/$(basename $1)
   # echo make_relative_link $1 $2 up:$up link:$link > /dev/tty
   if [ -L $2 ]; then
     L=$(ls -l $2|sed 's/^.*-> *//')
@@ -443,7 +475,7 @@ set +f
 # FIXME: make sure if/whether this is really required and why
 check=$rcc_platform_dir/${rcc_platform}-check.sh
 [ -z "$hdl_platform" -a -r "$check" ] && {
-  to=$(python3 -c "import os.path; print(os.path.relpath('"$check"', '.'))")
+  to=$(relpath "$check" .)
   make_relative_link $to exports/runtime/$target/$(basename $check)
   cat <<-EOF > exports/runtime/$target/${rcc_platform}-init.sh
 	# This is the minimal setup required for runtime
