@@ -1,3 +1,39 @@
+# [v1.7.0-rc.1](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-beta.1...v1.7.0-rc.1) (2020-06-19)
+
+Changes/additions since OpenCPI Release v1.7.0-beta.1
+
+### Enhancements
+- **comp**: add new complex_short_samples protocol. (!250)(d4a95651)
+- **devops,tests**: add specifying hdl platforms to run in pipeline using gitlab web UI. (!255)(f01d9a71)
+- **doc**: clarify that `RCCPort::send()` does not advance a worker's output port buffer, and `RCC_OK` should be returned. (!285)(8468d7cc)
+- **doc**: clarify that git clone of Xilinx repos are automatic. (!285)(8468d7cc)
+- **doc**: clarify that minBufferCount in RCC workers refers to how many buffers exist and not how many need to be full of data. (!285)(8468d7cc)
+- **runtime**: update ocpiremote tar command. (!263)(7a0f0f14)
+
+### Bug Fixes
+- **comp**: fix cdc tester workers cosim issue. (!176)(6945a2af)
+- **doc**: fix opencpi.gitlab.io urls in various "develop" version docs. (!257)(b1ebfed1)
+- **hdl base**: bypass build for fir_real_sse_for_xilinx.hdl on rcc-platform builds. (!260)(d80c30a0)
+- **hdl base**: fix issue with generating clock generator primitive when using Vivado 2019.2. (!261)(ded238b4)
+- **hdl base**: fix verify script. (!273)(22d72ca5)
+- **hdl base**: only build zynq ultra primitives for xsim or zync_ultra. (!282)(25842f25)
+- **hdl base,tools**: clocking of split clock output ports propagating clocks from input ports was fixed. (!277)(869c4408)
+- **osp**: update xilinx13_3 exports for sd card generation. (!241)(1b2c2fb0)
+- **runtime**: fix EOF on output when the output port is not in the run condition. (!284)(752fea83)
+- **runtime,tests**: fix macos10_14/Mojave installations, mostly due to python2->python3 transition. (!262)(1ab35078)
+- **tools**: add missing CentOS 6 dependencies for ISE. (!282)(25842f25)
+- **tools**: ensure i386 repo is enabled for Ubuntu 16.04, some vendor tools require 32-bit libraries still. (!271)(1aabe590)
+- **tools**: fix HDL primitive search algorithm in `tools/include/hdl/hdl-search.mk`. (!266)(bdd9c797)
+- **tools**: fix altera  build issue for part numbers. (!281)(bbbc0a18)
+- **tools**: fix macos catalina install. (!281)(bbbc0a18)
+- **tools**: install-platform script enhancements. (!268)(1ca453a1)
+- **tools**: remove clocking library from hdl-pre.mk. (!270)(c75b93ca)
+
+### Miscellaneous
+- **doc**: remove utilization.inc and configurations.inc from repo. (!251)(86b45477)
+- **osp,tests**: exclude plutosdr from fifo, fir_real_sse, fir_complex_sse unit tests. (!249)(981440b5)
+- **tools**: add openssl-devel to centos7 packages. (!254)(7e7e6d82)
+
 # [v1.7.0-beta.1](https://gitlab.com/opencpi/opencpi/compare/v1.6.2...v1.7.0-beta.1) (2020-05-31)
 
 ### Summary
