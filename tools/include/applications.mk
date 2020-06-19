@@ -33,6 +33,19 @@ FILTER=$(strip \
             $(foreach a,$(Applications),\
               $(and $(filter-out $(ExcludeApplications),$(basename $a)),$a))))
 
+ifneq ($(filter run,$(MAKECMDGOALS)),)
+  ifdef HdlApplications
+    $(info Testing whether there are any HDL containers available for HDL applications: $(HdlApplications))
+    OcpiLiveHdlContainers:=$(shell ocpirun -C --only-platforms| grep '^hdl')
+    ifdef OcpiLiveHdlContainers
+      $(info Found HDL containers ($(OcpiLiveHdlContainers)) so these HDL applications will be run: $(HdlApplications))
+      Applications+=$(HdlApplications)
+    else
+      $(info No HDL containers found, will not run these HDL applications:  $(HdlApplications))
+      Applications:=$(foreach a,$(Applications),$(and $(filter-out $(basename $(HdlApplications)),$(basename $a)),$a))
+    endif
+  endif
+endif
 DOALL=$(AT)\
   set -e;\
   for i in $(filter-out %.xml,$(FILTER)); do\

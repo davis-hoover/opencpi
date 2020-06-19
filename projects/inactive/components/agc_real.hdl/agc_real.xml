@@ -1,4 +1,4 @@
-<HdlWorker language='vhdl' spec='agc_real-spec.xml'>
+<HdlWorker language='vhdl' spec='agc_real-spec.xml' componentlibraries='util_comps'>
     <Property name="DATA_WIDTH_p" type="UShort" parameter="true" readable="true" default="16"></Property>
     <Property name="AVG_WINDOW_p" type="UShort" parameter="true" readable="true" default="16"></Property>
     <Property name="hold" type="Bool" readable="true" writable="true" default="false"></Property>

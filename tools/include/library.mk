@@ -30,7 +30,8 @@ $(filter-out test cleantest,$(OcpiTestGoals)):
 	$(AT)set -e; for i in $(filter-out $(OldTests),$(TestImplementations)); do \
 	  echo ==============================================================================;\
 	  echo ==== Performing goal \"$@\" for unit tests in $$i;\
-	  $(MAKE) --no-print-directory -C $$i $@ ; \
+	  $(MAKE) $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
+                  --no-print-directory -C $$i $@ ; \
 	done
 
 # The ordering here assumes HDL cannot depend on RCC.

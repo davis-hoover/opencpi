@@ -58,10 +58,11 @@ addPlaces(const char *envname, const char *prefix, const char *suffix, bool chec
   for (OU::TokenIter ti(env, ": "); ti.token(); ti.next()) {
     bool isDir;
     std::string whole = (prefix ? prefix : "") + std::string(ti.token()) + (suffix ? suffix : "");
+    ocpiLog(10, "Adding: %s", whole.c_str());
     if (OF::exists(whole, &isDir) && isDir)
       list.push_back(whole);
     else if (check)
-      return OU::esprintf("in %s, \"%s\" is not a directory", env, ti.token());
+      return OU::esprintf("in %s, \"%s\" is not a directory", env, whole.c_str());
   }
   return NULL;
 }
@@ -171,6 +172,8 @@ getComponentLibrary(const char *lib, OrderedStringSet &libs) {
   libs.push_back(path);
   return NULL;
 }
+static const char *
+getProjectRelDir(std::string &dir);
 const char *
 getComponentLibrary(const char *lib, std::string &path) {
   const char *err;
@@ -185,14 +188,19 @@ getComponentLibrary(const char *lib, std::string &path) {
     return NULL;
   }
   if (componentPath.empty()) {
-    if ((err = getCdkDir(path)) ||
-	(err = addPlaces("OCPI_COMPONENT_LIBRARY_PATH", NULL, "/lib", true, componentPath)) ||
-	(err = addPlaces("OCPI_PROJECT_PATH", NULL, "/lib", true, componentPath)))
+    std::string imports;
+    if ((err = getProjectRelDir(imports)))
       return err;
-    componentPath.push_back(path + "/lib");
+    imports += "/imports/";
+    if ((err = addPlaces("OCPI_COMPONENT_LIBRARY_PATH", NULL, "/lib", true, componentPath)) ||
+	(err = addPlaces("OCPI_PROJECT_PATH", NULL, "/exports/lib", false, componentPath)) ||
+	(err = addPlaces("OCPI_PROJECT_DEPENDENCIES", imports.c_str(), "/exports/lib", false, componentPath)))
+      return err;
+    componentPath.push_back(imports + "ocpi.core/lib");
   }
   for (unsigned n = 0; n < componentPath.size(); n++) {
     OU::format(path, "%s/%s", componentPath[n].c_str(), lib);
+    ocpiLog(10, "Trying for complib: %s", path.c_str());
     if (OS::FileSystem::exists(path, &isDir) && isDir)
       return NULL;
   }
