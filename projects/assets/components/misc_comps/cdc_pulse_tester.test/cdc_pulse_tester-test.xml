@@ -1,29 +1,72 @@
 
-<Tests UseHDLFileIo='true'>
-  <case>
+<Tests UseHDLFileIo="true">
+
+  <Property Name="simulation" Type="bool" Test="true" Description="Used by verify script to choose how to verify output.
+    True - Indicates that test case is being run for simualation.
+    False - Indicates the test case is being run on hardware."/>
+
+  <!-- Simulation -->
+  <case OnlyPlatForms="*sim">
     <Output Port="out" Script="verify.py ../../pulse_golden1.bin"/>
-    <Property Name='src_clk_hz' Value='100000000.0'/>
-    <Property Name='dst_clk_hz' Value='100000000.0'/>
+    <Property Name="src_clk_hz" Value="100000000.0"/>
+    <Property Name="dst_clk_hz" Value="100000000.0"/>
+    <Property Name="simulation" Value="true"/>
   </case>
-  <case>
+  <case OnlyPlatForms="*sim">
     <Output Port="out" Script="verify.py ../../pulse_golden2.bin"/>
-    <Property Name='src_clk_hz' Value='50000000.0'/>
-    <Property Name='dst_clk_hz' Value='100000000.0'/>
+    <Property Name="src_clk_hz" Value="50000000.0"/>
+    <Property Name="dst_clk_hz" Value="100000000.0"/>
+    <Property Name="simulation" Value="true"/>
   </case>
-  <case>
+  <case OnlyPlatForms="*sim">
     <Output Port="out" Script="verify.py ../../pulse_golden3.bin"/>
-    <Property Name='src_clk_hz' Value='25000000.0'/>
-    <Property Name='dst_clk_hz' Value='100000000.0'/>
+    <Property Name="src_clk_hz" Value="25000000.0"/>
+    <Property Name="dst_clk_hz" Value="100000000.0"/>
+    <Property Name="simulation" Value="true"/>
   </case>
-  <case>
+  <case OnlyPlatForms="*sim">
     <Output Port="out" Script="verify.py ../../pulse_golden4.bin"/>
-    <Property Name='src_clk_hz' Value='100000000.0'/>
-    <Property Name='dst_clk_hz' Value='50000000.0'/>
+    <Property Name="src_clk_hz" Value="100000000.0"/>
+    <Property Name="dst_clk_hz" Value="50000000.0"/>
+    <Property Name="simulation" Value="true"/>
   </case>
-  <case>
+  <case OnlyPlatForms="*sim">
     <Output Port="out" Script="verify.py ../../pulse_golden5.bin"/>
-    <Property Name='src_clk_hz' Value='100000000.0'/>
-    <Property Name='dst_clk_hz' Value='25000000.0'/>
+    <Property Name="src_clk_hz" Value="100000000.0"/>
+    <Property Name="dst_clk_hz" Value="25000000.0"/>
+    <Property Name="simulation" Value="true"/>
+  </case>
+
+  <!-- Hardware -->
+  <case ExcludePlatforms="*sim">
+    <Output Port="out" Script="verify.py ../../pulse_golden1.bin"/>
+    <Property Name="src_clk_hz" Value="100000000.0"/>
+    <Property Name="dst_clk_hz" Value="100000000.0"/>
+    <Property Name="simulation" Value="false"/>
+  </case>
+  <case ExcludePlatforms="*sim">
+    <Output Port="out" Script="verify.py ../../pulse_golden2.bin"/>
+    <Property Name="src_clk_hz" Value="50000000.0"/>
+    <Property Name="dst_clk_hz" Value="100000000.0"/>
+    <Property Name="simulation" Value="false"/>
+  </case>
+  <case ExcludePlatforms="*sim">
+    <Output Port="out" Script="verify.py ../../pulse_golden3.bin"/>
+    <Property Name="src_clk_hz" Value="25000000.0"/>
+    <Property Name="dst_clk_hz" Value="100000000.0"/>
+    <Property Name="simulation" Value="false"/>
+  </case>
+  <case ExcludePlatforms="*sim">
+    <Output Port="out" Script="verify.py ../../pulse_golden4.bin"/>
+    <Property Name="src_clk_hz" Value="100000000.0"/>
+    <Property Name="dst_clk_hz" Value="50000000.0"/>
+    <Property Name="simulation" Value="false"/>
+  </case>
+  <case ExcludePlatforms="*sim">
+    <Output Port="out" Script="verify.py ../../pulse_golden5.bin"/>
+    <Property Name="src_clk_hz" Value="100000000.0"/>
+    <Property Name="dst_clk_hz" Value="25000000.0"/>
+    <Property Name="simulation" Value="false"/>
   </case>
 
 </Tests>

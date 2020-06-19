@@ -15,6 +15,5 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-ExcludePlatforms=modelsim # This depends on xilinx clock gen for now but FIXME since modelsim can do xilinx prims
+Libraries=clocking
 include $(OCPI_CDK_DIR)/include/test.mk
