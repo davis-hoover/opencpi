@@ -113,6 +113,7 @@ addMyClock(bool output) {
   m_clock = &m_worker->addClock(pname(), output);
   m_clock->m_port = this;
   m_myClock = true;
+  deriveOCP(); // this might have changed the port's clock signals
   return *m_clock;
 }
 
