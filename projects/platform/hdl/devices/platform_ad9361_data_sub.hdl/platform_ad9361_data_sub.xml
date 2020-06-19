@@ -154,12 +154,12 @@
     <connect port="dev_txen_data_sub" to="dev_txen_config"/>
     <connect port="dev_data_clk" to="dev_data_clk" index='2'/>
   </supports>
-  <supports worker='data_src_adc_ad9361_sub'>
+  <supports worker='data_src_qadc_ad9361_sub'>
     <connect port="dev_data_clk" to="dev_data_clk" index='0'/>
     <connect port="dev_data_from_pins" to="dev_data_adc"/>
     <!--connect port="dev_rxen" to="dev_rxen_adc"/--> <!-- TODO / FIXME - support this -->
   </supports>
-  <supports worker='data_sink_dac_ad9361_sub'>
+  <supports worker='data_sink_qdac_ad9361_sub'>
     <connect port="dev_data_clk" to="dev_data_clk" index='1'/>
     <connect port="dev_data_to_pins" to="dev_data_dac"/>
     <connect port="dev_txen" to="dev_txen_dac"/>

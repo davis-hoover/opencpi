@@ -1,16 +1,16 @@
 <card type="fmc_lpc">
-  <device worker='data_src_adc'/>
-  <device worker='data_src_adc'/>
+  <device worker='data_src_qadc'/>
+  <device worker='data_src_qadc'/>
                                                   <!--ad9361 ad9361     
                                                         pin  name -->
-  <device worker='data_src_adc_ad9361_sub'>
+  <device worker='data_src_qadc_ad9361_sub'>
     <Property name='LVDS_P' value='true'/>
   </device>
 
-  <!-- TODO / FIXME - use new data_sink_dac and data_sink_dac_ad9361_sub -->
-  <device worker='data_sink_dac'/>
-  <device worker='data_sink_dac'/>                            <!--ad9361 ad9361 --> 
-  <device worker='data_sink_dac_ad9361_sub'>                        <!--pin    name   -->
+  <!-- TODO / FIXME - use new data_sink_qdac and data_sink_qdac_ad9361_sub -->
+  <device worker='data_sink_qdac'/>
+  <device worker='data_sink_qdac'/>                            <!--ad9361 ad9361 --> 
+  <device worker='data_sink_qdac_ad9361_sub'>                        <!--pin    name   -->
     <Property name='LVDS_P' value='false'/>
   </device>
 
