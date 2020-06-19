@@ -15,23 +15,9 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-HdlLibraries=fixed_float ocpi util
-
-# These need to be in order for most tools that aren't smart about figuring it out.
-SourceFiles= \
-  protocol_pkg.vhd \
-  message_sizer.vhd \
-  complex_short_with_metadata_pkg.vhd \
-  complex_short_with_metadata_body.vhd \
-  complex_short_with_metadata_demarshaller.vhd \
-  complex_short_with_metadata_marshaller.vhd \
-  complex_short_with_metadata_marshaller_old.vhd \
-  iqstream_pkg.vhd \
-  iqstream_body.vhd \
-  iqstream_demarshaller.vhd \
-  iqstream_marshaller.vhd \
-  tx_event_pkg.vhd \
-  tx_event_body.vhd \
-  tx_event_demarshaller.vhd
-include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+$(if $(realpath $(OCPI_CDK_DIR)),,\
+  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
+Containers=cnt_zed_fmcomms_2_3_scdcd
+DefaultContainers=
+ComponentLibraries=util_comps base_comps misc_comps dsp_comps comms_comps devices
+include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk

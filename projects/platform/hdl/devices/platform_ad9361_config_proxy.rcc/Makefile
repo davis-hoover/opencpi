@@ -16,22 +16,16 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-HdlLibraries=fixed_float ocpi util
+#RccStaticPrereqLibs=ad9361
 
-# These need to be in order for most tools that aren't smart about figuring it out.
-SourceFiles= \
-  protocol_pkg.vhd \
-  message_sizer.vhd \
-  complex_short_with_metadata_pkg.vhd \
-  complex_short_with_metadata_body.vhd \
-  complex_short_with_metadata_demarshaller.vhd \
-  complex_short_with_metadata_marshaller.vhd \
-  complex_short_with_metadata_marshaller_old.vhd \
-  iqstream_pkg.vhd \
-  iqstream_body.vhd \
-  iqstream_demarshaller.vhd \
-  iqstream_marshaller.vhd \
-  tx_event_pkg.vhd \
-  tx_event_body.vhd \
-  tx_event_demarshaller.vhd
-include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+# Our "platform" functions that the ADI library calls
+#SourceFiles=ad9361_platform.cc
+
+RccIncludeDirs+=./supporting/include/OCPIProjects/
+RccIncludeDirs+=./supporting/src/OCPIProjects/
+
+include $(OCPI_CDK_DIR)/include/worker.mk
+
+# if someone happened to run doxygen, this will clean it up
+clean::
+	rm -rf supporting/html/ supporting/latex/

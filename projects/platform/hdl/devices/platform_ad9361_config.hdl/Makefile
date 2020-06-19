@@ -16,22 +16,18 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-HdlLibraries=fixed_float ocpi util
+# During the build process, swap HdlTarget with 'actual' target part of the target platform
+# We do this to build for a part with the correct number of resources, such as hardware
+# multipliers, rather than the default smallest part in the family
+# zynq => xc7z020 (ZedBoard, Matchstiq-Z1, Picoflexor-T6A)
+# virtex6 => xc6vlx240t (ml605 development board)
+# alst4 => ep4sgx230k (Stratix4 development board)
+HdlExactPart=\
+	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
+	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484), \
+	$(and $(filter virtex6,$(HdlTarget)),xc6vlx240t-1-ff1156), \
+	$(and $(filter stratix4,$(HdlTarget)),ep4sgx230k-c2-f40))
 
-# These need to be in order for most tools that aren't smart about figuring it out.
-SourceFiles= \
-  protocol_pkg.vhd \
-  message_sizer.vhd \
-  complex_short_with_metadata_pkg.vhd \
-  complex_short_with_metadata_body.vhd \
-  complex_short_with_metadata_demarshaller.vhd \
-  complex_short_with_metadata_marshaller.vhd \
-  complex_short_with_metadata_marshaller_old.vhd \
-  iqstream_pkg.vhd \
-  iqstream_body.vhd \
-  iqstream_demarshaller.vhd \
-  iqstream_marshaller.vhd \
-  tx_event_pkg.vhd \
-  tx_event_body.vhd \
-  tx_event_demarshaller.vhd
-include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+SourceFiles=signals.vhd
+
+include $(OCPI_CDK_DIR)/include/worker.mk
