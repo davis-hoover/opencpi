@@ -84,7 +84,7 @@ else
 	echo either been done manually or previously by this script.
     else
 	if [ -z "$url" ]; then
-	    url=git@gitlab.com:opencpi/osp/$project.git
+	    url=https://gitlab.com/opencpi/osp/$project.git
 	    echo No URL was supplied as the third argument, so it will be located at the OpenCPI repo site: $url
 	fi
 	echo "Downloading (git cloning) from $url..."
@@ -174,7 +174,9 @@ else
     ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
     # Make sure that tutorials can run after installation, note will do rcc too.
     [ "$platform" != xsim ] || ocpidev -d projects/tutorial build --hdl-platform=$platform
-    if [ -n "$project" ]; then
+    # If project dir is not one of the core projects build platoform  
+    if [[ "$platform_dir" != *"/projects/core/"* && "$platform_dir" != *"/projects/platform/"* && \
+            "$platform_dir" != *"/projects/assets/"* ]]; then 
 	ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
 	echo "HDL platform \"$platform\" built for OSP in $project_dir, including assemblies."
     fi
