@@ -154,7 +154,7 @@ getRccPlatforms(const StringSet *&platforms) {
   return NULL;
 }
 
-static void
+static const char *
 addLibs(const char *libs, OrderedStringSet &dirs, OrderedStringSet &nonSlashes) {
   for (OU::TokenIter ti(libs); ti.token(); ti.next())
     if (strchr(ti.token(), '/')) {
@@ -162,13 +162,14 @@ addLibs(const char *libs, OrderedStringSet &dirs, OrderedStringSet &nonSlashes) 
       withLib += "/lib";
       if (!OF::exists(withLib)) {
 	if (OF::exists(ti.token()))
-	  withLib = ti:token();
+	  withLib = ti.token();
         else
-	  return esprintf("Component library at \"%s\" does not exist or is not built.", ti.token());
+	  return OU::esprintf("Component library at \"%s\" does not exist or is not built.", ti.token());
       }
       dirs.push_back(withLib);
     } else
       nonSlashes.push_back(ti.token());
+  return NULL;
 }
 static const char
   PROJECT_ROOT[] = "Project.mk",
@@ -200,9 +201,10 @@ const char *
 getComponentLibraries(const char *libs, const char *model, OrderedStringSet &places) {
   // First pass just take the slash-containing ones
   OrderedStringSet dirs, nonSlashes;
-  addLibs(libs, dirs, nonSlashes);
-  addLibs(getenv("OCPI_COMPONENT_LIBRARIES"), dirs, nonSlashes);
   const char *err;
+  if ((err = addLibs(libs, dirs, nonSlashes)) ||
+      (err = addLibs(getenv("OCPI_COMPONENT_LIBRARIES"), dirs, nonSlashes)))
+    return err;
   if (projectPath.empty()) {
     std::string imports;
     if ((err = getProjectRelDir(imports)))

@@ -79,7 +79,7 @@ else
   # This assignment is redundant with what is in hdl-pre.mk, but it is needed here earlier than that
   # and we don't yet have something like: include $(Model)-pre.mk
   override $(CapModel)ExplicitLibraries:=$(call Unique,$($(CapModel)Libraries) $(Libraries) $($(CapModel)ExplicitLibraries))
-  $(info override $(CapModel)ExplicitLibraries:=$(call Unique,$($(CapModel)Libraries) $(Libraries) $($(CapModel)ExplicitLibraries)))
+  $(infox override $(CapModel)ExplicitLibraries:=$(call Unique,$($(CapModel)Libraries) $(Libraries) $($(CapModel)ExplicitLibraries)))
   $(call OcpiDbgVar,$(CapModel)ExplicitLibraries)
   $(if $(filter clean%,$(MAKECMDGOALS)),,$(eval $(OcpiProcessBuildFiles)))
   include $(OCPI_CDK_DIR)/include/$(Model)/$(Model)-worker.mk

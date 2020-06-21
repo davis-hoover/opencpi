@@ -39,7 +39,6 @@ QualifiedLibName:=$(and $(filter qualified,$(NameSpace)),$(subst .,$(OcpiLibDot)
 ifndef WorkLib
 WorkLib:=$(QualifiedLibName)
 endif
-$(info HLL:$(WorkLib))
 ifdef HdlToolNeedBB
 stublibrary: install
 else

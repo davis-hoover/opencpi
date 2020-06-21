@@ -1127,6 +1127,13 @@ parse(ezxml_t x, const char *buildFile) {
       m_libraries.push_back(ti.token());
     for (OU::TokenIter ti(builtinLibs); ti.token(); ti.next())
       m_libraries.push_back(ti.token());
+    for (auto it = m_libraries.begin(); it != m_libraries.end(); ++it) {
+      const char *slash = strrchr(it->c_str(), '/');
+      std::string lib(*it + ":");
+      for (const char *cp = slash ? slash + 1 : it->c_str(); *cp; ++cp)
+	lib += *cp == '.' ? '_' : *cp;
+      m_checkedLibraries.push_back(lib);
+    }
   }
   for (OU::TokenIter ti(ezxml_cattr(x, "cores")); ti.token(); ti.next())
     if (m != HdlModel)
