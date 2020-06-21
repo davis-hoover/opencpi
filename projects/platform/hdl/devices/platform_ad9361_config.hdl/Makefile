@@ -31,4 +31,6 @@ HdlExactPart=\
 SourceFiles=signals.vhd
 Libraries=util
 
+ExcludeTargets=modelsim
+
 include $(OCPI_CDK_DIR)/include/worker.mk

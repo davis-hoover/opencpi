@@ -65,9 +65,9 @@ begin
   oprotocol.time_vld       <= protocol_s.time_vld and fifo_dst_empty_n;
   oprotocol.interval       <= protocol_s.interval;
   oprotocol.interval_vld   <= protocol_s.interval_vld and fifo_dst_empty_n;
-  oprotocol.flush          <= protocol_s.flush;
-  oprotocol.sync           <= protocol_s.sync;
-  oprotocol.end_of_samples <= protocol_s.end_of_samples;
+  oprotocol.flush          <= protocol_s.flush and fifo_dst_empty_n;
+  oprotocol.sync           <= protocol_s.sync and fifo_dst_empty_n;
+  oprotocol.end_of_samples <= protocol_s.end_of_samples and fifo_dst_empty_n;
   oeof                     <= dst_out(0);
 
 end rtl;

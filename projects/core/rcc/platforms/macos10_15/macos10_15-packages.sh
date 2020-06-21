@@ -27,22 +27,13 @@ if ! PORT=`command -v port`; then
     exit 1
   }
 fi
-PKGS="python34 coreutils gsed py34-numpy swig swig-python py27-numpy scons"
+PKGS="python38 swig3 swig3-python scons coreutils gsed py38-numpy libtool autoconf automake py38-jinja2"
 echo Using $PORT to install packages required by OpenCPI for $OCPI_TOOL_PLATFORM: $PKGS
+set -evx
 sudo $PORT install $PKGS
-PATH=$PATH:/opt/local/bin
-# We need python2
-if ! command -v python2 > /dev/null ; then
-    # prefer macports
-    if [ -x /opt/local/bin/python2.7 ]; then
-	sudo ln -s python2.7 /opt/local/bin/python2
-    elif p27=`command -v python2.7`; then
-	sudo ln -s python2.7 $(dirname $p27)/python2
-    else
-	echo No python 2 or python2.7 found, and it is required. >&2
-	exit 1
-    fi
-fi
+sudo port select --set python3 python38
+sudo port select --set python python27
+sudo port select --set python2 python27
 # FIXME: somehow automate the required path additions?
 # They are /opt/local/bin and /opt/local/libexec/gnubin
 # At the end of the path.

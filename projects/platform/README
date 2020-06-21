@@ -10,7 +10,7 @@ Criteria for content to exist in this OpenCPI project:
      generation dig_radio_ctrlr component
    - ADC/DAC data flow: de-interleaving/interleaving subdevice workers must
      support the latest generation ADC/DAC data flow paradigm workers
-     data_src_adc.hdl/data_sink_dac.hdl
+     data_src_qadc.hdl/data_sink_qdac.hdl
 * hdl/cards/
     - reusable card specs belong here
     - card-specific device workers for reusable cards belong here

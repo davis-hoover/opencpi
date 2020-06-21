@@ -8198,7 +8198,7 @@
    <text:p text:style-name="P693"><text:span text:style-name="T381">OpenCPI<text:line-break/></text:span><text:span text:style-name="T382">Platform Development<text:line-break/>Guide</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="shared/release.fodt"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
    </text:section>
    <text:p text:style-name="P227"/>
    <text:p text:style-name="P603">Revision History</text:p>

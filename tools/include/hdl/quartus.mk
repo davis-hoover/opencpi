@@ -96,6 +96,8 @@ QuartusMakePart=$(call QuartusMakePart1,$(subst -, ,$(subst _std_alias,,$1)))
 # Defining HdlFullPart below allos HdlChoosePart to use Quartus' custom functions
 # for performing string opertations on Parts/Devices
 HdlFullPart_quartus=$(call ToUpper,$(call QuartusMakePart,$1))
+HdlQuartusPart=$(foreach p,$(subst _std_alias,,$(HdlChoosePart)),$(infox HQP:$p)$(call HdlFullPart_quartus,$p))
+
 
 # Make the file that lists the files in order when we are building a library
 QuartusMakeExport= \
@@ -116,7 +118,7 @@ QuartusMakeDevices=$(infox QMD:$1)\
   $(and $(call QuartusMakeFamily,$1),\
     echo set_global_assignment -name FAMILY '\"'$(call QuartusMakeFamily,$1)'\"'; )\
   $(if $(filter-out NONE,$(HdlChoosePart)),\
-    echo set_global_assignment -name DEVICE $(subst _std_alias,,$(HdlChoosePart)); )
+    echo set_global_assignment -name DEVICE $(HdlQuartusPart); )
 
 # The constraint file(s) to use, first/only arg is platform
 HdlConstraintsSuffix_quartus=.qsf

@@ -98,9 +98,17 @@ relPath () {
 # restrictions on $1 and $2 but requires GNU Core Utility "readlink"
 # HINT: busybox's "readlink" does not support option '-m', only '-f'
 #       which requires that all but the last path component must exist)
+if ! readlinkm=$(command -v greadlink || command -v readlink); then
+    echo No readlink command found >&2
+    exit 1
+fi
+if ! $readlinkm --version > /dev/null 2>&1; then
+    echo No GNU-style readlink command available;
+    exit 1
+fi
 relpath () {
-    local rc=$(relPath "$(readlink -m "$2")" "$(readlink -m "$1")")
-    echo relpath: from \"$1\" to \"$2\" is $rc >&2
+    #echo relpath: from \"$1\" to \"$2\" is $rc >&2
+    local rc=$(relPath "$($readlinkm -m "$2")" "$($readlinkm -m "$1")")
     echo $rc
 }
 
@@ -468,7 +476,11 @@ set +f
 check=$rcc_platform_dir/${rcc_platform}-check.sh
 [ -z "$hdl_platform" -a -r "$check" ] && {
   to=$(relpath "$check" .)
+<<<<<<< HEAD
   make_relative_link $to/ exports/runtime/$target/$(basename $check)
+=======
+  make_relative_link $to exports/runtime/$target/$(basename $check)
+>>>>>>> origin/develop
   cat <<-EOF > exports/runtime/$target/${rcc_platform}-init.sh
 	# This is the minimal setup required for runtime
 	export OCPI_TOOL_PLATFORM=$rcc_platform
