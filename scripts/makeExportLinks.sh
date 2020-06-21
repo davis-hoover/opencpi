@@ -476,11 +476,7 @@ set +f
 check=$rcc_platform_dir/${rcc_platform}-check.sh
 [ -z "$hdl_platform" -a -r "$check" ] && {
   to=$(relpath "$check" .)
-<<<<<<< HEAD
-  make_relative_link $to/ exports/runtime/$target/$(basename $check)
-=======
   make_relative_link $to exports/runtime/$target/$(basename $check)
->>>>>>> origin/develop
   cat <<-EOF > exports/runtime/$target/${rcc_platform}-init.sh
 	# This is the minimal setup required for runtime
 	export OCPI_TOOL_PLATFORM=$rcc_platform
