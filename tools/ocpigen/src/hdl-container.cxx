@@ -45,7 +45,7 @@ emitTimeClient(std::string &assy, const char *instance, const char *portName, Po
 }
 
 HdlContainer *HdlContainer::
-create(ezxml_t xml, const char *xfile, const char *&err) {
+create(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err) {
   std::string myConfig, myPlatform, myAssy, myConstraints;
   OrderedStringSet platforms;
   // "only" is for backward compatibility
@@ -93,11 +93,11 @@ create(ezxml_t xml, const char *xfile, const char *&err) {
     if (parseFile(configName.c_str(), xfile, "HdlConfig", &x, configFile))
       return NULL;
   }
-  if (!(config = HdlConfig::create(x, myPlatform.c_str(), configFile.c_str(), NULL, err)) ||
+  if (!(config = HdlConfig::create(x, myPlatform.c_str(), configFile.c_str(), parentFile, NULL, err)) ||
       (err = parseFile(myAssy.c_str(), xfile, "HdlAssembly", &x, assyFile)) ||
-      !(appAssembly = HdlAssembly::create(x, assyFile.c_str(), NULL, err)))
+      !(appAssembly = HdlAssembly::create(x, assyFile.c_str(), parentFile, NULL, err)))
     return NULL;
-  HdlContainer *p = new HdlContainer(*config, *appAssembly, xml, xfile, err);
+  HdlContainer *p = new HdlContainer(*config, *appAssembly, xml, xfile, parentFile, err);
   if (err) {
     delete p;
     return NULL;
@@ -220,8 +220,8 @@ terminate(std::string &assy) {
 
 HdlContainer::
 HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const char *xfile,
-	     const char *&err)
-  : Worker(xml, xfile, "", Worker::Container, NULL, NULL, err),
+	     const std::string &parentFile, const char *&err)
+  : Worker(xml, xfile, parentFile, Worker::Container, NULL, NULL, err),
     HdlHasDevInstances(config.m_platform, config.m_plugged, *this),
     m_appAssembly(appAssembly), m_config(config) {
   appAssembly.setParent(this);

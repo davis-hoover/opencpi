@@ -18,7 +18,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library bsv; use bsv.bsv.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 architecture rtl of platform_ad9361_config_worker is
   constant adc_sub_c  : natural := 0;
   constant dac_sub_c  : natural := 1;
@@ -158,7 +158,7 @@ begin
   wci_reset_n <= not ctl_in.reset;
 
   -- TODO / FIXME - for now rxen functionality is not supported, so we are assuming wci_enable is static while dac_txnrx is toggling (this is true after the AD9361 is initialized, but it is not universally true..), this seperate-synchronizers-for-ENABLE-and-TXNRX-solution is a NON-IDEAL synchronization solution for independent control signals
-  sync_enable : bsv.bsv.SyncBit
+  sync_enable : bsv_pkg.SyncBit
     generic map(
       init   => 0)
     port map(

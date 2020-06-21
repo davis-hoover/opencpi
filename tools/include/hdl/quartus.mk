@@ -130,7 +130,7 @@ QuartusConstraints=$(or $(HdlConstraints),$(QuartusConstraints_default))
 QuartusEchoFiles=$(strip \
     hdl_files $1 $2; )
 QuartusEchoFilesNoVlgLibs=$(strip \
-    hdl_files_no_vlg_libs $1 $2; )
+    hdl_files $1 $2; )
 # Make the settings file
 # Note that the local source files use notdir names and search paths while the
 # remote libraries use pathnames so that you can have files with the same names.
@@ -175,17 +175,17 @@ QuartusMakeQsf=\
   \
   $(and $(HdlLibrariesInternal),echo '\#' Assignments for adding libraries to search path;) \
   $(foreach l,$(HdlLibrariesInternal),\
-    $(foreach hlr,$(call HdlLibraryRefDir,$l,$(HdlTarget),,qts),\
+    $(foreach hlr,$(call HdlLibraryRefDir,$l,$(HdlTarget),,qts),$(info HLR:$(hlr))\
       $(if $(realpath $(hlr)),,$(error No altera library for $l at $(abspath $(hlr))))\
       echo set_global_assignment -name SEARCH_PATH '\"'$(call FindRelative,$(TargetDir),$(hlr))'\"'; \
       $(foreach f,$(wildcard $(hlr)/*_pkg.vhd),\
-        echo set_global_assignment -name VHDL_FILE -library $(notdir $l) '\"'$f'\"';\
+        echo set_global_assignment -name VHDL_FILE -library $(word 2,$(subst :, ,$l)) '\"'$f'\"';\
         $(foreach b,$(subst _pkg.vhd,_body.vhd,$f),\
           $(and $(wildcard $b),\
-          echo set_global_assignment -name VHDL_FILE -library $(notdir $l) '\"'$b'\"';))))) \
+          echo set_global_assignment -name VHDL_FILE -library $(word 2,$(subst :, ,$l)) '\"'$b'\"';))))) \
   \
   echo '\#' Assignment for local source files using search paths above; \
-  $(call QuartusEchoFilesNoVlgLibs,$(LibName),\
+  $(call QuartusEchoFilesNoVlgLibs,$(WorkLib),\
     $(foreach s,$(QuartusSources), \
       $(call FindRelative,$(TargetDir),$s) ))\
   \

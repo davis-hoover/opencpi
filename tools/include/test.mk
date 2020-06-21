@@ -108,11 +108,14 @@ $(TESTXML):
 build: generate
 	$(AT)[ ! -d gen/assemblies ] || \
 		$(MAKE) -C gen/assemblies \
-			ComponentLibrariesInternal="../../.. $(call OcpiAdjustLibraries,$(ComponentLibraries))" \
+	                $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../../$(OCPI_PROJECT_REL_DIR)) \
+			$(info CLIII:$(ComponentLibraries))\
+			ComponentLibrariesInternal="../../.. $(call OcpiAdjustLibraries2,$(ComponentLibraries))" \
 			LibrariesInternal="$(call OcpiAdjustLibraries,$(Libraries))" \
-			HdlLibrariesInternal="$(call OcpiAdjustLibraries,$(HdlLibraries))" \
 			IncludeDirsInternal="$(call AdjustRelative,$(IncludeDirs))" \
 			XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirs))";
+
+#			HdlLibrariesInternal="$(call OcpiAdjustLibraries,$(HdlLibraries))" \
 
 # Prepare to run by looking for available containers and generating run scripts for the
 # current platform environment - this is context/platform sensitiive

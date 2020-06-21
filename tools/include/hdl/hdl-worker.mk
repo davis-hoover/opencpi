@@ -280,20 +280,8 @@ include $(OCPI_CDK_DIR)/include/hdl/hdl-core2.mk
 endif # HdlSkip
 $(call OcpiDbg,After skipping)
 generated: skeleton  $(GeneratedSourceFiles)
-################################################################################
-# If not an assembly or container, we have to contribute to the exports for the
-# component library we are a part of.
-#ifneq ($(HdlMode),assembly)
-# Expose the implementation xml file for apps that instantiate this worker core
+
 ifdef LibDir
-$(call OcpiDbg,Before all: "$(LibDir)/$(ImplXmlFile)")
-
-genlinks: $(LibDir)/$(notdir $(ImplXmlFile))
-
-$(LibDir)/$(notdir $(ImplXmlFile)): | $(LibDir)
-	$(AT)echo Creating link from $(LibDir) -\> $(ImplXmlFile) to expose the $(CwdName) implementation xml.
-	$(AT)$(call MakeSymLink,$(ImplXmlFile),$(LibDir))
-
 # Export the stub/defs files by providing links to the defs files that are
 # in the target directories.  This allows assemblies to compile with these source files
 # to instantiate cores.
@@ -396,7 +384,7 @@ $(foreach t,$(HdlTargets),\
                             $(if $(HdlToolRealCore_$(HdlToolSet_$t)),$l,$r)$(suffix $n)),$(strip\
 			    $c),$r,$(if $(filter $c,0),,_c$c)))\
 
-all: links
+# all: links
 
 endif
 #endif # if not an assembly

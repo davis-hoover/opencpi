@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-<HdlDevice language="vhdl" version='2' Libraries='sdp platform cdc' SourceFiles='sdp_receive_dma.vhd'>
-=======
 <HdlDevice language="vhdl" version='2' Libraries='platform sdp util' SourceFiles='sdp_receive_dma.vhd'>
->>>>>>> Stashed changes
   <componentspec/>
   <xi:include href='sdp-properties.xml'/>
   <sdp name='sdp'/>

@@ -1520,8 +1520,8 @@ parseRcc(const char *a_package) {
 }
 
 RccAssembly *RccAssembly::
-create(ezxml_t xml, const char *xfile, const char *&err) {
-  RccAssembly *ha = new RccAssembly(xml, xfile, err);
+create(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err) {
+  RccAssembly *ha = new RccAssembly(xml, xfile, parentFile, err);
   if (err) {
     delete ha;
     ha = NULL;
@@ -1530,8 +1530,8 @@ create(ezxml_t xml, const char *xfile, const char *&err) {
 }
 
 RccAssembly::
-RccAssembly(ezxml_t xml, const char *xfile, const char *&err)
-  : Worker(xml, xfile, "", Worker::Assembly, NULL, NULL, err) {
+RccAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err)
+  : Worker(xml, xfile, parentFile, Worker::Assembly, NULL, NULL, err) {
   if (!(err = OE::checkAttrs(xml, IMPL_ATTRS, RCC_TOP_ATTRS, (void*)0)) &&
       !(err = OE::checkElements(xml, IMPL_ELEMS, RCC_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
     err = parseRcc();

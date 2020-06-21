@@ -1161,7 +1161,7 @@ emitAssyHDL() {
       fprintf(f, "%s assign the external clock output from the internal port that is driving it\n",
 	      myComment());
       if (m_language == VHDL)
-	fprintf(f, "  assign_%s_i : util.util.in2out port map (in_port => %s, out_port => %s_out.Clk);\n",
+	fprintf(f, "  assign_%s_i : ocpi.util.in2out port map (in_port => %s, out_port => %s_out.Clk);\n",
 		c.signal(), c.signal(), c.m_port->pname());
       else
 	fprintf(f, "  assign %s_Clk = %s;\n", c.m_port->pname(), c.signal());
@@ -1449,8 +1449,8 @@ emitAssyImplHDL(FILE *f, bool wrap) {
 }
 
 HdlAssembly *HdlAssembly::
-create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err) {
-  HdlAssembly *ha = new HdlAssembly(xml, xfile, parent, err);
+create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err) {
+  HdlAssembly *ha = new HdlAssembly(xml, xfile, parentFile, parent, err);
   if (err) {
     delete ha;
     ha = NULL;
@@ -1459,8 +1459,8 @@ create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err) {
 }
 
 HdlAssembly::
-HdlAssembly(ezxml_t xml, const char *xfile, Worker *parent, const char *&err)
-  : Worker(xml, xfile, "", Worker::Assembly, parent, NULL, err) {
+HdlAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err)
+  : Worker(xml, xfile, parentFile, Worker::Assembly, parent, NULL, err) {
   if (!(err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS, (void*)0)) &&
       !(err = OE::checkElements(xml, IMPL_ELEMS, HDL_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
     err = parseHdl();

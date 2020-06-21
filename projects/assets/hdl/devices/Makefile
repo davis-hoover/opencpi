@@ -31,8 +31,6 @@ Tests = \
 	gpo.test \
 	lime_dac_ts.test \
 
-#	data_sink_dac.test
-
 # Build Ordering Rules:
 # 1) Subdevices that support other devices must occur AFTER the devices they support.
 # 2) Similarly, Emulators must occur after the devices they emulate.

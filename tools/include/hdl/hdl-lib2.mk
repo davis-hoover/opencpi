@@ -22,13 +22,15 @@
 
 # Refine the target list as appropriate for the tool
 $(call OcpiDbgVar,LibName)
+$(call OcpiDbgVar,WorkLib)
 OutLibFile=\
-  $(call WkrTargetDir,$1,$2)/$(call HdlToolLibraryFile,$1,$(LibName)$(if $(filter 0,$2),,_c$2))
+  $(call WkrTargetDir,$1,$2)/$(call HdlToolLibraryFile,$1,$(WorkLib)$(if $(filter 0,$2),,_c$2))
 #  $(call WkrTargetDir,$1,$2)/$(call HdlToolLibraryFile,$1,$(LibName))
 define DoLibTarget
 $(call OcpiDbg,OutLibFile:$(call OutLibFile,$1,$2))
 $$(foreach f,$$(call OcpiCPPSources,$$(SourceFiles)),\
   $$(eval $$(call OcpiCPPSource,$$f,$1,$2,$(call OutLibFile,$1,$2))))
+$$(call OcpiDbg,OutLibFile:$$(call OutLibFile,$1,$2))$$(infox d1)
 OutLibFiles+=$(call OutLibFile,$1,$2)
 $(call OutLibFile,$1,$2): override TargetDir:=$(call WkrTargetDir,$1,$2)
 $(call OutLibFile,$1,$2): override HdlTarget:=$1
@@ -39,12 +41,10 @@ $(call OutLibFile,$1,$2): \
   HdlSources=$$(call OcpiPullPkgFiles,$$(filter-out %.vh,$$(call HdlTargetSrcFiles,$1,$2) $$(call HdlShadowFiles,$1,$2)))
 $(call OutLibFile,$1,$2): \
 $$$$(foreach l,$$$$(HdlLibrariesInternal),$$$$(call HdlLibraryRefDir,$$$$l,$$$$(HdlTarget),,DLT))
-
 $(call OutLibFile,$1,$2): $$$$(HdlPreCore) $$$$(HdlSources) | $$$$(TargetDir)
 	$(AT)echo Building the $(LibName) $(HdlMode) for $$(HdlTarget) \($$@\) $$(ParamConfig):$$(ParamMsg)
 	$(AT)$$(HdlCompile)
 	$(AT)$$(HdlPost)
-
 endef
 
 $(foreach f,$(HdlActualTargets),\

@@ -134,44 +134,44 @@ HdlTargetComponentLibraries=$(infox HTCL:$1:$(OcpiComponentLibraries):$(Componen
 
 define HdlPrimitiveSearchError
 The primitive core/library "$1" was not found in any of these locations: $(call OcpiCheckLinks,$2)
-OCPI_HDL_PRIMITIVE_PATH is: $(OCPI_HDL_PRIMITIVE_PATH)
 Internal Project Path is: $(OcpiGetProjectPath)
 OCPI_CDK_DIR is: $(OCPI_CDK_DIR)
-HdlLibraries is: $(HdlLibraries) $(Libraries)
+HdlLibraries is: $(HdlLibraries) $(Libraries) $(PrimitiveLibraries)
 
 endef
-# Search for a primitive library/core by name, independent of target
-# This is not used for primitive libraries/cores specified by location (with slashes)
-# $(call HdlSearchPrimitivePath,lib,non-existent-ok,from)
-HdlSearchPrimitivePath=$(infox HSPP:$1:$2:$3)\
-  $(eval HdlTempPlaces:=$(strip\
-       $(subst :, ,$(OCPI_HDL_PRIMITIVE_PATH)) \
-       $(foreach d,$(OcpiGetProjectPath),$d/lib/hdl)))\
-  $(eval HdlTempDirs:=$(firstword $(strip\
-    $(foreach p,$(HdlTempPlaces),$(infos HTPS:$(HdlTempPlaces):$1)\
-       $(foreach d,$p/$1,$(infox HTPSD:$d:$(call HdlExists,$d))$(call HdlExists,$d))))))\
-  $(or $(HdlTempDirs)$(infox HTD:$(HdlTempDirs)),\
-    $(if $(filter clean,$(MAKECMDGOALS))$2,,$(error $(call HdlPrimitiveSearchError,$1,$(HdlTempPlaces)))))
-
-# Collect component libraries independent of targets.
-# Normalize the list at the spec level
-# No arguments
-HdlPrimitiveLibraries=$(infox HPL:$(HdlMyLibraries))$(strip\
-    $(foreach p,$(HdlMyLibraries),\
-      $(if $(findstring /,$p),\
-         $(or $(call HdlExists,$p),\
-              $(error Primitive library $p (from HdlLibraries) not found.)),\
-         $(call HdlSearchPrimitivePath,$p,,HPL))))
-
-ifneq (,)
-# Return list of target directories in all possible primitive libraries
-HdlTargetPrimitiveLibraries=$(infox HTPL:$1)\
-  $(or $(strip $(foreach f,$(call HdlGetFamily,$1),$(infox F:$f)\
-                  $(foreach d,$(HdlPrimitiveLibraries),$(infox D:$d)\
-                     $(or $(call HdlExists,$d/$f),$(call HdlExists,$d/target-$f/$(notdir $d)))))),\
-      $(if $(HdlPrimitiveLibraries),\
-       $(error No primitive libraries were found for target $1.  Perhaps not built yet?)))
-endif
+# Search for a primitive library/core by name (maybe qualified), independent of target
+# $(call HdlSearchPrimitivePath,lib,non-existent-ok,from-tag)
+# What is returned is the path to the library (local or remote/exported) followed by
+# the VHDL library name which may be fully qualified for usage by VHDL.
+# This format: <path-to-lib>:libname means that AdjustRelative still works.
+HdlSearchPrimitivePath=$(infox HSPP:$1:$2:$3)$(strip\
+  $(if $(findstring .,$1),\
+    $(- what we are looking for is qualified by project)\
+    $(foreach l,$(lastword $(subst ., ,$1)),\
+      $(foreach p,$(1:%.$l=%),\
+        $(foreach d,$(if $(filter $(OCPI_PROJECT_PACKAGE),$p),\
+                      $(OCPI_PROJECT_REL_DIR)/hdl/primitives/lib/$l,\
+                      $(OCPI_PROJECT_REL_DIR)/imports/$p/exports/lib/hdl/$l),\
+          $(or $(and $(call OcpiExists,$d),$d:$(subst .,_,$1)$(infox DDD:$d)),\
+            $(info Error:  When looking for HDL library $1 at $d:)\
+            $(if $(filter $(OCPI_PROJECT_PACKAGE),$p),\
+              $(if $(call OcpiExists,$(OCPI_PROJECT_REL_DIR)/hdl/primitives/$l),\
+                 $(error it looks like the $l library in this project has not been built),\
+                 $(error it looks like the $l library in this project does not exist)),\
+              $(error it looks like the $l library was not built and exported from the $p project)))))),\
+    $(- now we are doing a global search, and we need to ignore qualified libraries unless local)\
+    $(eval HdlTempPlaces:=$(strip\
+                            $(OCPI_PROJECT_REL_DIR)/hdl/primitives/lib \
+                            $(foreach p,$(OcpiGetProjectDependencies),$p/exports/lib/hdl)))\
+    $(infox HTLTEMP:$(HdlTempPlaces))\
+    $(or $(firstword\
+           $(foreach p,$(HdlTempPlaces),$(infox HTPS:$p:$1)\
+             $(foreach f,$(call OcpiExists,$p/$1/$1.libs),\
+               $(foreach q,$(firstword $(call HdlGrepExcludeComments,$f)),$(infox QQQ:$q)\
+                 $(if $(findstring $(OCPI_PROJECT_REL_DIR)/hdl/primitives,$p),\
+                   $p/$1:$(if $(filter qualified,$q),$(subst .,_,$(OCPI_PROJECT_PACKAGE))_$1,$1),\
+                   $p/$1:$1))))),\
+      $(error $(call HdlPrimitiveSearchError,$1,$(HdlTempPlaces))))))
 
 ################################################################################
 # $(call HdlLibraryRefDir,location-dir,target)
@@ -265,19 +265,21 @@ HdlCoreRefMaybeTargetSpecificFile=$(infox HCRMTSF:$1:$2)$(strip \
 # We rely on the underlying tool for the actual filename, if it is not just
 # the directory
 
-HdlLRF=$(infox HdlLRF:$1:$2:$3)$(strip \
-  $(foreach r,\
-    $(if $(call HdlExists,$1/target-$2),\
-       $1/target-$2/$(call HdlToolLibraryBuildFile,$(notdir $1)),\
-       $(if $(findstring /hdl/$2/,$1),$1,\
-         $1/$2/$(call HdlToolInstallFile,$(notdir $1),$t))),\
-       $(infox LRF Result:$r)$r))
+HdlLRF=$(infox HdlLRF=$1=$2=$3)$(strip \
+  $(foreach p,$(word 1,$(subst :, ,$1)),\
+    $(foreach l,$(word 2,$(subst :, ,$1)),\
+      $(foreach r,\
+        $(if $(call HdlExists,$p/target-$2),\
+           $p/target-$2/$(call HdlToolLibraryBuildFile,$l),\
+           $(if $(findstring /hdl/$2/,$p),$p,$p/$2)),\
+           $(infox LRF Result:$r)$r))))
 
 # Look everywhere (including component libraries in some modes), return an error if not found
 HdlLibraryRefDir=$(infox HLRD:$1:$2:$4:$(HdlMode))$(strip \
   $(or $(strip\
      $(if $(findstring /,$1),\
         $(call HdlLRF,$1,$2,slash),\
+        $(warning UNEXPECTED UNSLASH LIBRARY)\
         $(firstword \
           $(and $(filter assembly config container,$(HdlMode)),\
                 $(foreach l,$(call HdlTargetComponentLibraries,$2,HLR),\

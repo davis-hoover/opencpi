@@ -274,7 +274,7 @@ namespace {
     bool missing;
     if (!err && (matchSpec ? w->m_specName == matchName :
                  w->m_emulate && w->m_emulate->m_implName == matchName) &&
-        !(err = w->parseBuildFile(true, &missing, &testFile))) {
+        !(err = w->parseBuildFile(true, &missing, testFile))) {
       if (verbose)
         fprintf(stderr,
                 "Found worker for %s:  %s\n", matchSpec ? "this spec" : "emulating this worker",

@@ -70,7 +70,7 @@ pythondir=$(libdir)
 # It doesn't appear that autoconf macros actually gives us the proper runtime prefix
 PYTHON_INCLUDES=$(shell python@PYTHON_VERSION@-config --includes)
 # And we need to define a similar variable for the python library
-PYTHON_LIBS=$(shell python@PYTHON_VERSION@-config --libs | sed 's/.*\(-lpython[^ ]*\).*/\1/')
+PYTHON_LIBS=$(shell echo -L`python3 -c "import sys;print(sys.prefix)"`/lib python@PYTHON_VERSION@-config --libs | sed 's/.*\(-lpython[^ ]*\).*/\1/')
 # Avoid automake limitations by defining a variable used later
 ocpi_extra_libs=$(patsubst %,-l%,@OcpiExtraLibs@)
 

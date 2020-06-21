@@ -309,6 +309,10 @@ main(int argc, const char **argv) {
             break;
           return 0;
         }
+	// The parent file being empty is for code generation, and thus library dependency parsing
+	// This suppresses that for these two modes that are not doing code generation
+	if (options.parameters() || options.build())
+	  parent = "Makefile";
         Worker *w = Worker::create(*ap, parent, package, outDir, NULL, NULL,
                                    doGenerics >= 0 ? (unsigned)doGenerics : 0, err);
 

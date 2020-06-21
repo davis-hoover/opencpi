@@ -830,17 +830,17 @@ create(const char *file, const std::string &parentFile, const char *package, con
   }
   Worker *w;
   if (!strcasecmp("HdlPlatform", name))
-    w = HdlPlatform::create(xml, xfile, parent, err);
+    w = HdlPlatform::create(xml, xfile, parentFile, parent, err);
   else if (!strcasecmp("HdlConfig", name))
-    w = HdlConfig::create(xml, NULL, xfile, parent, err);
+    w = HdlConfig::create(xml, NULL, xfile, parentFile, parent, err);
   else if (!strcasecmp("HdlContainer", name))
-    w = HdlContainer::create(xml, xfile, err);
+    w = HdlContainer::create(xml, xfile, parentFile, err);
   else if (!strcasecmp("HdlAssembly", name))
-    w = HdlAssembly::create(xml, xfile, parent, err);
+    w = HdlAssembly::create(xml, xfile, parentFile, parent, err);
   else if (!strcasecmp("HdlDevice", name)) {
-    w = HdlDevice::create(xml, xfile, NULL, parent, instancePVs, err);
+    w = HdlDevice::create(xml, xfile, parentFile, parent, instancePVs, err);
   } else if (!strcasecmp("RccAssembly", name))
-    w = RccAssembly::create(xml, xfile, err);
+    w = RccAssembly::create(xml, xfile, parentFile, err);
   else if ((w = new Worker(xml, xfile, parentFile, Worker::Application, parent, instancePVs,
                            err)) && !err) {
     if (!strcasecmp("RccImplementation", name) || !strcasecmp("RccWorker", name))
@@ -861,7 +861,7 @@ create(const char *file, const std::string &parentFile, const char *package, con
       err = OU::esprintf("Unrecognized top level tag: \"%s\" in file \"%s\"", name, xfile);
   }
   if (err ||
-      (err = w->setParamConfig(instancePVs, paramConfig, &parentFile)) ||
+      (err = w->setParamConfig(instancePVs, paramConfig, parentFile)) ||
       // Resolving expressions finalizes data ports, which may add built-in properties for ports
       (err = w->resolveExpressions(*w)) ||
       (err = w->finalizeProperties()) ||
@@ -1101,17 +1101,6 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     return;
   for (auto it = dirs.begin(); it != dirs.end(); ++it)
     addInclude(*it);
-#if 0
-  for (OU::TokenIter ti(ezxml_cattr(xml, "componentlibraries")); ti.token(); ti.next()) {
-    std::string inc;
-    if ((err = getComponentLibrary(ti.token(), inc)))
-      return;
-    if (m_model != HdlModel)
-      addInclude(inc + "/hdl"); // for proxies accessing hdl
-    addInclude(inc + "/" + m_modelString);
-    addInclude(inc);
-  }
-#endif
   err = m_build.parse(xml);
 }
 
@@ -1271,6 +1260,7 @@ deriveOCP() {
   const char *err;
   for (unsigned i = 0; i < m_ports.size(); i++) {
     Port *p = m_ports[i];
+    // FIXME? why can't we derive OCP here on a cloned port>?
     if (p->isOCP() && !p->isCloned() && (err = p->deriveOCP()))
       return err;
   }

@@ -23,17 +23,23 @@
 
 # Tell all the general purpose and toolset make scripts we are building libraries
 HdlMode:=library
+Model:=hdl
 include $(OCPI_CDK_DIR)/include/util.mk
-$(OcpiIncludeProject)
+$(call OcpiIncludeAssetAndParent)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
 .PHONY: stublibrary
 ifndef HdlSkip
-ifndef LibName
+ifdef LibName
+  $(error Unexpected LibName vairable set to $(LibName))
+else
 LibName:=$(CwdName)
 endif
+OcpiLibDot:=_
+QualifiedLibName:=$(and $(filter qualified,$(NameSpace)),$(subst .,$(OcpiLibDot),$(OCPI_PROJECT_PACKAGE).))$(CwdName)
 ifndef WorkLib
-WorkLib:=$(LibName)
+WorkLib:=$(QualifiedLibName)
 endif
+$(info HLL:$(WorkLib))
 ifdef HdlToolNeedBB
 stublibrary: install
 else
@@ -83,6 +89,7 @@ install: $(OutLibFiles) $(HdlLibsList) $(HdlSourcesList) | $(HdlInstallLibDir)
 	  $(call ReplaceIfDifferent,$(strip \
              $(OutDir)target-$$f/$(WorkLib)),$(strip \
              $(HdlInstallLibDir)/$$f)); \
+	  $(call ReplaceIfDifferent,$(GeneratedDir)/$(LibName).libs,$(HdlInstallLibDir));\
 	done
 
 endif

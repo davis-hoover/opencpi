@@ -30,9 +30,9 @@ namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
 
 HdlPlatform *HdlPlatform::
-create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err) {
+create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err) {
   err = NULL;
-  HdlPlatform *p = new HdlPlatform(xml, xfile, parent, err);
+  HdlPlatform *p = new HdlPlatform(xml, xfile, parentFile, parent, err);
   if (err) {
     delete p;
     return NULL;
@@ -41,8 +41,8 @@ create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err) {
 }
 
 HdlPlatform::
-HdlPlatform(ezxml_t xml, const char *xfile, Worker *parent, const char *&err)
-  : HdlDevice(xml, xfile, "", parent, Worker::Platform, NULL, err), Board(m_sigmap, m_signals),
+HdlPlatform(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err)
+  : HdlDevice(xml, xfile, parentFile, parent, Worker::Platform, NULL, err), Board(m_sigmap, m_signals),
     ::Device(*this, *this, cname(), xml, true, 0, NULL, err),
     m_control(false) {
   m_isDevice = true;
