@@ -681,7 +681,15 @@ opencpi_vma_nopage(struct vm_area_struct *vma, unsigned long virt_addr, int *typ
   return NOPAGE_SIGBUS; /* send a SIGBUS */
 }
 #else
+/*
+*  This got changed to "vm_fault_t opencpi_vma_fault"
+*  in kernel version 5.0-rcX.  See "linux/mm_types.h".
+*/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
+static vm_fault_t opencpi_vma_fault
+#else
 static int opencpi_vma_fault
+#endif
 #if LINUX_VERSION_CODE > KERNEL_VERSION(4, 10, 0)
   (struct vm_fault *vmf) {
   ocpi_block_t *block = vmf->vma->vm_private_data;
