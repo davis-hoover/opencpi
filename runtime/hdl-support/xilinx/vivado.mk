@@ -469,7 +469,7 @@ VivadoPrimitiveCores=$(foreach c,$(Cores),$(if $(findstring /,$c),,$c))
 # Call the tool specific function for including this asset's sources
 # Call the tool specific function for including 'include directories' (ie for verilog includes)
 VivadoIncludeDependencies=\
-  $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),$(infox IncLib:$l)\
+  $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),$(info IncLib:$l)\
     $(call VivadoIncludeSources,\
       $(call HdlExtractSourcesForLib,$(HdlTarget),$l,$(TargetDir)),\
       $(word 2,$(subst :, ,$l))))\
@@ -490,7 +490,7 @@ VivadoIncludeCores=\
   $(foreach c,$1,\
     echo read_edif_or_dcp $(call FindRelative,$(TargetDir),$(call HdlCoreRefMaybeTargetSpecificFile,$c,$(HdlTarget))) >> $(CoreOrLibName)-imports.tcl;\
     $(if $(filter $c,$(Cores)),\
-        echo add_files_set_lib $c '\"'$(call HdlExtractSourcesForLib,$(HdlTarget),$c,$(TargetDir))'\"' >> $(CoreOrLibName)-imports.tcl;,\
+        echo add_files_set_lib $c '\"'$(call HdlExtractSourcesForLib,$(HdlTarget),$c:$(notdir $c),$(TargetDir))'\"' >> $(CoreOrLibName)-imports.tcl;,\
       $(foreach w,$(subst _rv,,$(basename $(notdir $c))),\
         $(foreach d,$(dir $c),\
           $(foreach l,$(if $(filter vhdl,$(HdlLanguage)),vhd,v),\
