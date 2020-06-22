@@ -67,7 +67,9 @@ ifeq (@,$(AT))
 	projectpackage projectdeps projectincludes
 endif
 
-MaybeMake=if [ -d $1 ]; then $(MAKE) -C $1 $2; fi
+OcpiToProject=$(subst $(Space),/,$(patsubst %,..,$(subst /, ,$1)))
+MaybeMake=\
+  if [ -d $1 ] ; then $(MAKE) --no-print-directory -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2; fi
 
 # Three parameters - $1 is before platform, $2 is after platform, $3 is call to $(MAKE)
 MaybeMakePlatforms=\
@@ -222,7 +224,11 @@ applications: rcc hdl
 	$(call MaybeMake,applications)
 
 run: all test
+	$(AT)echo ==============================================================================
+	$(AT)echo ==== Running all unit tests in this project.
 	$(call MaybeMake,components,run)
+	$(AT)echo ==============================================================================
+	$(AT)echo ==== Running all applications in this project.
 	$(call MaybeMake,applications,run)
 
 runonly:

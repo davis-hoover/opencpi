@@ -42,8 +42,8 @@ constant c_dst_src_ratio : natural := natural(ceil(dst_clk_hz/src_clk_hz));
 begin
 
  gen_sync_rst_dst_to_src : if (src_clk_hz >= dst_clk_hz) generate
-   -- faster or same clock frequency source needs to wait until slow or same
-   -- clock frequency destination has come out of reset
+   -- faster or same source clock frequency needs to wait until slow or same
+   -- destination clock frequency has come out of reset
    gen_fast_to_slow : if (src_clk_hz > dst_clk_hz) generate
      reset_sync_dst_to_src : cdc.cdc.reset
        generic map (RST_DELAY => c_src_dst_ratio)
@@ -65,8 +65,8 @@ begin
  end generate gen_sync_rst_dst_to_src;
 
  gen_sync_rst_src_to_dst : if (src_clk_hz <= dst_clk_hz) generate
- -- faster or same clock frequency destination needs to wait until slow or same
- -- clock frequency source has come out of reset
+ -- faster or same destination clock frequency needs to wait until slow or same
+ -- source clock frequency has come out of reset
    gen_slow_to_fast : if (src_clk_hz < dst_clk_hz) generate
      reset_sync_src_to_dst : cdc.cdc.reset
        generic map (RST_DELAY => c_dst_src_ratio)

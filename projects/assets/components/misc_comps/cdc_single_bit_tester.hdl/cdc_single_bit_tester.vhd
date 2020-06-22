@@ -20,8 +20,7 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all; use ieee.ma
 library ocpi; use ocpi.types.all,  ocpi.util.all; -- remove this to avoid all ocpi name collisions
 library misc_prims; use misc_prims.misc_prims.all;
 
--- TODO: Replace four_bit_lfsr with a generic lfsr and add a mode
--- for fast source to slow destination that intentionally doesn't hold input data
+-- TODO: Add a mode for fast source to slow destination that intentionally doesn't hold input data
 -- long enough show that it fails when the primitive is not properly used.
 architecture rtl of worker is
 
@@ -54,16 +53,16 @@ architecture rtl of worker is
 
   begin
 
-  gen_clk : entity work.gen_clk
-       generic map (src_clk_hz => c_src_clk_hz,
-                    dst_clk_hz => c_dst_clk_hz)
-       port map (
-               ctl_clk => ctl_in.clk,
-               ctl_rst => ctl_in.reset,
-               src_clk => s_src_clk,
-               src_rst => s_src_rst,
-               dst_clk => s_dst_clk,
-               dst_rst => s_dst_rst);
+  gen_clk : entity work.cdc_clk_gen
+    generic map (src_clk_hz => c_src_clk_hz,
+                 dst_clk_hz => c_dst_clk_hz)
+    port map (
+           ctl_clk => ctl_in.clk,
+           ctl_rst => ctl_in.reset,
+           src_clk => s_src_clk,
+           src_rst => s_src_rst,
+           dst_clk => s_dst_clk,
+           dst_rst => s_dst_rst);
 
   gen_reset_sync : misc_prims.misc_prims.gen_reset_sync
       generic map (src_clk_hz => c_src_clk_hz,
@@ -78,13 +77,18 @@ architecture rtl of worker is
 
     out_out.clk <= s_dst_clk;
 
-    gen_src_data : misc_prims.misc_prims.four_bit_lfsr
-      port map (clk  => s_src_clk,
-                rst  => s_src_rst,
-                en   => s_data_gen_en,
-                dout => s_bit_data_gen_out);
+    gen_src_data : util.util.lfsr
+      generic map(
+        POLYNOMIAL => "1100",
+        SEED       => "0001")
+      port map(
+        clk => s_src_clk,
+        rst => s_src_rst,
+        en  => s_data_gen_en,
+        reg => s_bit_data_gen_out);
 
-    s_bit_src_in <= s_bit_data_gen_out(0);
+    -- output is reversed from what is expected so use 4th bit
+    s_bit_src_in <= s_bit_data_gen_out(3);
 
     cdc_bit : cdc.cdc.single_bit
       generic map (
@@ -101,10 +105,9 @@ architecture rtl of worker is
 
     s_not_synced_dst_to_scr_rst <= not s_synced_dst_to_scr_rst;
 
-    -- For fast source to slow destination, this ensures that
-    -- the minimum input signal width is 2x the period of the destination
-    -- clock and they are seperated by 2x src_clk cycles to
-    -- ensure proper crossing of the CDC boundary.
+    -- For fast source to slow destination and equal source and destination clock frequencies.
+    -- This ensures that the minimum input signal width is 2x the period of the destination
+    -- clock and they are seperated by 2x src_clk cycles to ensure proper crossing of the CDC boundary.
     gen_advance_counter : if (c_src_clk_hz >= c_dst_clk_hz) generate
       advance_counter : misc_prims.misc_prims.advance_counter
         generic map (hold_width => c_hold_width)

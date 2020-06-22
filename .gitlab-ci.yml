@@ -61,29 +61,31 @@ include:
 # job to prevent these from occurring.
 default:
   before_script:
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
-    - sleep 5
-    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f"; fi; done
+    - sleep 2
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
     - cat timestamp.txt
+    - sleep 2
     - ls -lh
   after_script:
     - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
     - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
+    - for f in artifacts*.tar; do if [ "$f" != "artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar" ]; then rm -rf "$f"; fi; done
   timeout: 24h
 
 
 # Job that runs in .pre stage to verify if a commit is made to a branch with an existing MR.
 # If an MR exist for the branch, do not run a pipeline for the commit.
 # This is to prevent both an MR pipeline and a commit pipeline from being kicked off.
+# Also, if a branch's sha equals develop's sha, do not run a pipeline for the commit.
 cancel-pipeline:
   stage: .pre
   extends:
     - .centos7
     - .docker
   rules:
-    - if: "$CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == 'develop'"
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_BRANCH == "develop" || $CI_PIPELINE_SOURCE == "web"'
       when: never
     - when: on_success
   variables:
@@ -95,17 +97,10 @@ cancel-pipeline:
     - DEV=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/commits/develop")
     - DEV_SHA=$(echo "$DEV" | sed -e 's/.*"sha":"\([^"]*\).*/\1/g')
     - >
-      if [ "$MR" != "[]" ]; then
-        echo "A merge request exists for this branch; canceling pipeline."
+      if [[ "$MR" != "[]" || "$DEV_SHA" == "$CI_COMMIT_SHA" ]]; then
         curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
-      elif [ "$DEV_SHA" == "$CI_COMMIT_SHA" ]; then
-        echo "Last commit is identical to last commit in develop; canceling pipeline."
-        curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
-      else
-        echo "Pipeline is ok to proceed."
       fi;
   after_script: []
   artifacts:
     paths: []
-
 

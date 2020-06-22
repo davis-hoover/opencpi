@@ -29,6 +29,13 @@ include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk # for OcpiXilinxVivadoInit
 include $(OCPI_CDK_DIR)/include/util.mk       # for DoShell below
 
 OnlyTargets=zynq_ultra xsim
+
+# We need to include this file before hdl-library.mk to preprocess the platforms and targets (at least)
+include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
+$(eval $(HdlPreprocessTargets))  # HdlTargets (and more) will be defined after this
+
+ifneq ($(filter $(OnlyTargets),$(HdlTargets)),)  # OnlyTargets guard
+
 # FIXME: make a utility function for this version checking
 FirstVersion=2017.1
 SkipVersion=
@@ -70,3 +77,5 @@ ifeq ($(filter clean%,$(MAKECMDGOALS))$(SkipVersion),) # if not cleaning
 endif # if not cleaning
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+
+endif  # end OnlyTargets guard
