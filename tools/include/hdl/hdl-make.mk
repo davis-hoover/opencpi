@@ -560,7 +560,7 @@ HdlCollectCoreLibraries=$(infox PPPCx=$1=$2=$(notdir $1)=)\
 # in which case we create <asset>.<tool>.sources
 # If this is a true core, we record the black box stub files
 HdlRecordSources=\
-  $(info Record:$1:$(HdlSources):$(HdlTarget))\
+  $(infox Record:$1:$(HdlSources):$(HdlTarget))\
   $(and $(call HdlExists,$(dir $1)),\
   (\
    echo '\#' This generated file records sources necessary to build this $(LibName) $(HdlMode); \
@@ -573,7 +573,7 @@ HdlRecordSources=\
 # asset $2 in question. If we are working with an absolute path,
 # just return the result of HdlLibraryRefDir. Otherwise, we are
 # working with a relative path. Return the path relative to $3.
-HdlRelativeOrAbsolutePathToLib=$(info HRAPL:$1:$2:$3)$(strip \
+HdlRelativeOrAbsolutePathToLib=$(infox HRAPL:$1:$2:$3)$(strip \
   $(if $(filter /%,$2),\
     $(patsubst %/,%,$(call HdlLibraryRefDir,$2,$1,,X4)),\
     $(call FindRelative,$3,$(strip \
@@ -588,7 +588,7 @@ HdlRelativeOrAbsolutePathToLib=$(info HRAPL:$1:$2:$3)$(strip \
 #
 # Return the paths (relative or absolute) to each file listed in .sources
 # relative to $3.
-HdlExtractSourcesForLib=$(info Extract:$2:$1)\
+HdlExtractSourcesForLib=$(infox Extract:$2:$1)\
   $(foreach p,$(word 1,$(subst :, ,$2)),\
     $(foreach f,\
       $(call HdlRelativeOrAbsolutePathToLib,$1,$2,.),$(infox ZF:$f)\

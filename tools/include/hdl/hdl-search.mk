@@ -137,7 +137,7 @@ The primitive core/library "$1" was not found in any of these locations: $(call 
 Internal Project Path is: $(OcpiGetProjectPath)
 OCPI_CDK_DIR is: $(OCPI_CDK_DIR)
 HdlLibraries is: $(HdlLibraries) $(Libraries) $(PrimitiveLibraries)
-
+Remember that a project-qualified library (a.b.c) must be referenced with its qualified name
 endef
 # Search for a primitive library/core by name (maybe qualified), independent of target
 # $(call HdlSearchPrimitivePath,lib,non-existent-ok,from-tag)
@@ -167,11 +167,16 @@ HdlSearchPrimitivePath=$(infox HSPP:$1:$2:$3)$(strip\
     $(or $(firstword\
            $(foreach p,$(HdlTempPlaces),$(infox HTPS:$p:$1)\
              $(foreach f,$(call OcpiExists,$p/$1/$1.libs),\
-               $(foreach q,$(firstword $(call HdlGrepExcludeComments,$f)),$(infox QQQ:$q)\
-                 $(if $(findstring $(OCPI_PROJECT_REL_DIR)/hdl/primitives,$p),\
-                   $p/$1:$(if $(filter qualified,$q),$(subst .,_,$(OCPI_PROJECT_PACKAGE))_$1,$1),\
+               $(foreach q,$(firstword $(call HdlGrepExcludeComments,$f)),$(infox QQQ:$q:$f)\
+                 $(if $(filter qualified,$q),\
+                   $(and $(findstring $(OCPI_PROJECT_REL_DIR)/hdl/primitives,$p),\
+                     $p/$1:$(subst .,_,$(OCPI_PROJECT_PACKAGE))_$1),\
                    $p/$1:$1))))),\
       $(error $(call HdlPrimitiveSearchError,$1,$(HdlTempPlaces))))))
+
+#                 $p/$1:$(if $(filter qualified,$q),$(subst .,_,$(OCPI_PROJECT_PACKAGE))_$1,$1))))),\
+#                 $(if $(findstring $(OCPI_PROJECT_REL_DIR)/hdl/primitives,$p),\
+#                   $p/$1:$(if $(filter qualified,$q),$(subst .,_,$(OCPI_PROJECT_PACKAGE))_$1,$1),\
 
 ################################################################################
 # $(call HdlLibraryRefDir,location-dir,target)
