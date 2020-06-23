@@ -81,12 +81,18 @@ XsimCoreLibraryChoices=$(strip \
   $(foreach c,$(call HdlRmRv,$1),$(call HdlCoreRef,$c,xsim)))
 
 XsimLibs=\
-    $(foreach l,$(call HdlCollectLibraries,xsim),\
-      -lib $(word 2,$(subst :, ,$l))=$(strip \
-            $(call FindRelative,$(TargetDir),$(call HdlLibraryRefDir,$l,xsim,,xsim)))) \
-    $(foreach c,$(call HdlCollectCorePaths),$(info CCC:$c)\
-      -lib $(call HdlRmRv,$(notdir $(c)))=$(info fc:$c)$(call FindRelative,$(TargetDir),$(strip \
-          $(firstword $(foreach l,$(call XsimCoreLibraryChoices,$c),$(call HdlExists,$l))))))
+    $(eval XsimTempLibs:=$(call HdlCollectLibraries,isim))\
+    $(foreach l,$(XsimTempLibs),$(infox LLL:$l)\
+      -lib $(word 2,$(subst :, ,$l))=$(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,xsim)))\
+    $(foreach c,$(call HdlCollectCorePaths),$(infox CCC:$c)\
+      $(- for each core, specify any libraries it needs)\
+      $(eval XsimCoreLibs:=$(call HdlCollectCoreLibraries,$c,$(XsimTempLibs)))\
+      $(foreach l,$(XsimCoreLibs),$(infox LLL1:$l)\
+        -lib $(lastword $(subst :, ,$l))=$(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,xsim)))\
+       -lib $(notdir $c)=$(call AdjustRelative,$(call HdlCoreRef,$c,xsim))\
+      $(eval XsimTempLibs+=$(XsimCoreLibs)))
+
+#        -lib $(call HdlRmRv,$(lastword $(subst :, ,$l)))=$(info fc:$l)$(call FindRelative,$(TargetDir),$(strip \
 
 XsimVerilogIncs=\
   $(foreach d,$(VerilogDefines),-d $d) \
@@ -119,7 +125,7 @@ HdlToolCompile=\
   $(and $(filter %.v,$(XsimFiles))$(findstring $(HdlMode),platform),\
     && xvlog $(XsimVerilogIncs) $(XsimArgs) $(XsimLibs) $(filter %.v,$(XsimFiles)) \
       $(and $(findstring $(HdlMode),platform),\
-        $(OcpiXilinxVivadoDir)/data/verilog/src/glbl.v) -prj $(LibName).prj && echo V2 > /dev/tty) \
+        $(OcpiXilinxVivadoDir)/data/verilog/src/glbl.v) -prj $(LibName).prj) \
   $(if $(filter worker platform config assembly,$(HdlMode)),\
     $(if $(HdlNoSimElaboration),, \
       && xelab $(WorkLib).$(WorkLib)$(and $(filter assembly config,$(HdlMode)),_rv) work.glbl -v 2 \

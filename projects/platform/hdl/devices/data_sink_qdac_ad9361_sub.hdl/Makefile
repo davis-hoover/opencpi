@@ -34,7 +34,4 @@ HdlExactPart=\
 	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
 	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484))
 
-HdlLibraries+=cdc
-HdlLibraries+=dac
-HdlLibraries+=protocol
 include $(OCPI_CDK_DIR)/include/worker.mk

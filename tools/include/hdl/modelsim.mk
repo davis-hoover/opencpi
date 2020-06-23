@@ -99,7 +99,7 @@ HdlToolCompile=\
       $(- for each core, specify any libraries it needs)\
       $(eval ModelsimCoreLibs:=$(call HdlCollectCoreLibraries,$c,$(ModelsimLibs)))\
       $(foreach l,$(ModelsimCoreLibs),$(infox LLL1:$l)\
-        echo $(lastword $(subst :, ,$(notdir $l)))=$(strip\
+        echo $(lastword $(subst :, ,$l))=$(strip\
           $(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,modelsim)));)\
       $(eval ModesimLibs+=$(ModelsimCoreLibs))$(strip \
       echo ';core $c' && echo $(call HdlRmRv,$(notdir $(c)))=$(call FindRelative,$(TargetDir),$(strip \
