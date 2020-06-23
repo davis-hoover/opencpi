@@ -459,7 +459,9 @@ def deploy(args):
         tar_commands = []
         tar_path = make_tar(tar_files, tar_files, tempdir)
 
-        tar_commands.append('if [ ! -d {} ]; then mkdir {}; fi'.format(args.remote_dir))
+        tar_commands.append(make_command(
+            'if [ ! -d {} ]; then mkdir {}; fi'.format(args.remote_dir),
+            args))
         tar_commands.append(make_command(
             'scp {} {} {}@{}:./{}'.format(
                 args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
