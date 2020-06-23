@@ -15,28 +15,36 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
+#
 # This script should be customized to do what you want.
 # It is used in two contexts:
 # 1. The core setup has not been run, so run it with your specific parameters
 #    (mount point on development host, etc.), and supply the IP address as arg
 # 2. The core setup HAS been run and you are just setting up a shell or ssh session
 
+# add any additional platform checks into this function
 set_tool_platform() {
-
-  if test -f /etc/opencpi-release; then #checks to see if xilinx13_4 platform is being ran
+  if test -f /etc/opencpi-release; then  # checks to see if xilinx13_4 platform is being ran
     read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    OCPI_DIR=/mnt/card/opencpi
-  elif [[ $(uname -r) == *"2019.2"* ]]; then #checks to see if xilinx19_2_aarch32 platform is being ran
-    OCPI_TOOL_PLATFORM=xilinx19_2_aarch32
-    OCPI_DIR=/run/media/mmcblk0p1/opencpi
+    if [ "$OCPI_TOOL_PLATFORM" == "xilinx13_4" ]; then
+      OCPI_DIR=/mnt/card/opencpi
+    elif [ "$OCPI_TOOL_PLATFORM" == "xilinx19_2_aarch32" ]; then  # checks to see if xilinx19_2_aarch32 platform is being ran
+      OCPI_DIR=/run/media/mmcblk0p1/opencpi
+    else
+      echo Error: OCPI_TOOL_PLATFORM not set properly or supported
+      break
+    fi
   else
-    echo Error: OCPI_TOOL_PLATFORM not set properly
-    exit
+    echo Error: OCPI_TOOL_PLATFORM not set properly, /etc/opencpi-release not found
+    break  
   fi
 }
 
 trap "trap - ERR; break" ERR; for i in 1; do
+for m in /mnt/card /run/media/mmcblk0p1; do
+  [ -d $m/opencpi ] && OCPI_DIR=$m/opencpi && break
+done
+
 if test "$OCPI_CDK_DIR" = ""; then
   # Uncomment this section and change the MAC address for an environment with multiple
   # ZedBoards on one network (only needed on xilinx13_3)
@@ -44,7 +52,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 hw ether 00:0a:35:00:01:23
   # ifconfig eth0 up
   # udhcpc
-set_tool_platform
+  set_tool_platform
   # CUSTOMIZE THIS LINE FOR YOUR ENVIRONMENT
   # First argument is backup time server for the time protocol used by the ntp command
   # Second argument is timezone spec - see "man timezone" for the format.

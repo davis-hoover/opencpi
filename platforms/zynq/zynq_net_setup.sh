@@ -15,16 +15,14 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
+#
 # If there is a "mynetsetup.sh" script in this directory it will run it after the
 # other setup items, and arrange for it to be run in any login scripts later
 # e.g. ssh logins
+#
 # Set time using ntpd
 # If ntpd fails because it could not find ntp.conf fall back on time server
 # passed in as the first parameter
-
-#checks a couple locations to determine which version of xilinx is being ran
-
 set_time() {
   if test "$1" != -; then
     echo Attempting to set time from the time server
@@ -116,7 +114,6 @@ else
     fi
     export OCPI_SYSTEM_CONFIG
     export PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/bin:\$PATH
-    # This is only for ACI executables in special cases...
     export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/sdk/lib:\$LD_LIBRARY_PATH
     ocpidriver load
     export TZ=$5

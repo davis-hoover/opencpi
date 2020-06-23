@@ -21,21 +21,29 @@
 #    (mount point on development host, etc.), and supply the IP address as arg
 # 2. The core setup HAS been run and you are just setting up a shell or ssh session
 
+# add any additional platform checks into this function
 set_tool_platform() {
-
-  if test -f /etc/opencpi-release; then  # checks to see if xilinx13_4 platform is being ran
+  if test -f /etc/opencpi-release; then #checks to see if xilinx13_4 platform is being ran
     read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    OCPI_DIR=/mnt/card/opencpi
-  elif [[ "$(uname -r)" == *"2019.2"* ]]; then  # checks to see if xilinx19_2_aarch32 platform is being ran
-    OCPI_TOOL_PLATFORM=xilinx19_2_aarch32
-    OCPI_DIR=/run/media/mmcblk0p1/opencpi
+    if [ "$OCPI_TOOL_PLATFORM" == "xilinx13_4" ]; then
+      OCPI_DIR=/mnt/card/opencpi
+    elif [ "$OCPI_TOOL_PLATFORM" == "xilinx19_2_aarch32" ]; then #checks to see if xilinx19_2_aarch32 platform is being ran
+      OCPI_DIR=/run/media/mmcblk0p1/opencpi
+    else
+      echo Error: OCPI_TOOL_PLATFORM not set properly or supported
+      break
+    fi
   else
     echo Error: OCPI_TOOL_PLATFORM not set properly
-    exit
+    break  
   fi
 }
 
 trap "trap - ERR; break" ERR; for i in 1; do
+for m in /mnt/card /run/media/mmcblk0p1; do
+  [ -d $m/opencpi ] && OCPI_DIR=$m/opencpi && break
+done
+
 if test "$OCPI_CDK_DIR" = ""; then
   if test "$1" = ""; then
      echo It appears that the environment is not set up yet.
@@ -56,12 +64,12 @@ if test "$OCPI_CDK_DIR" = ""; then
   # Fifth arg is timezone spec - see "man timezone" for the format.
   mkdir -p /mnt/net  # requirement to mount opencpi from host during the zynq_net_setup.sh script
   source $OCPI_DIR/zynq_net_setup.sh $1 /opt/opencpi cdk time.nist.gov EST5EDT,M3.2.0,M11.1.0
-  mkdir -p /mnt/ocpi_core
-  mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
-  mkdir -p /mnt/ocpi_assets
-  mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets /mnt/ocpi_assets
-  mkdir -p /mnt/ocpi_assets_ts
-  mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets_ts /mnt/ocpi_assets_ts
+  # mkdir -p /mnt/ocpi_core
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
+  # mkdir -p /mnt/ocpi_assets
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets /mnt/ocpi_assets
+  # mkdir -p /mnt/ocpi_assets_ts
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets_ts /mnt/ocpi_assets_ts
   # Below this line other projects can be included
   # Here is a template of including a BSP project
   # mkdir -p /mnt/bsp_<bsp_name>
@@ -75,7 +83,7 @@ alias ll='ls -lt --color=auto'
 # Tell the ocpihdl utility to always assume the FPGA device is the zynq PL.
 export OCPI_DEFAULT_HDL_DEVICE=pl:0
 # Only override this file if it is customized beyond what is the default for the platform
-export OCPI_SYSTEM_CONFIG=$OCPI_DIR/system.xml
+#export OCPI_SYSTEM_CONFIG=$OCPI_DIR/system.xml
 # Get ready to run some test xml-based applications
 PS1='% '
 # add any commands to be run every time this script is run
