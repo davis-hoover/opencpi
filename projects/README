@@ -1,16 +1,40 @@
-This directory contains various OpenCPI "Projects". These descriptions of some are from a high-level view.
+This directory contains various OpenCPI projects. These descriptions of some are from a high-level view.
 
-core - This contains the minimum Project needed to experience OpenCPI, e.g. bias.test. It contains:
+core - This contains the minimum project needed to experience OpenCPI, e.g. bias.test. It contains:
   * Components and Workers such as file_read and file_write as well as Framework internals
   * RCC (GPP) Platforms such as centos7 and xilinx13_3 (used by most Zynq-7000-based systems)
   * HDL Simulation Platforms such as modelsim and xsim
 
-assets - This is the main library Project provided by the OpenCPI maintainers, containing:
+platform - This contains reference platforms and support for generic devices and
+cards. Criteria for content to exist in this OpenCPI project:
+  * specs/
+     - component specs must facilitate generic device worker or platform support
+  * hdl/primitives/
+     - must directly support assets within hdl/devices, hdl/cards, or
+       hdl/platforms, or be useful and used by devices in OSPs
+  * hdl/devices/
+     - generic device workers belong here
+     - RF ADC/DAC command/control: device proxies must implement the latest
+       generation dig_radio_ctrlr component
+     - ADC/DAC data flow: de-interleaving/interleaving subdevice workers must
+       support the latest generation ADC/DAC data flow paradigm workers
+       data_src_qadc.hdl/data_sink_qdac.hdl
+  * hdl/cards/
+      - reusable card specs belong here
+      - card-specific device workers for reusable cards belong here
+  * hdl/platforms/
+     - current reference platforms (relatively cheap and supported with high
+       priority with as many software and hardware options as possible - e.g. zed,
+       ultrascale/ZCU104, etc.)
+     - note that non-reference platforms ("full-fledged OSPs") belong in their
+       own, separate, OpenCPI project
+
+assets - This is the main library project provided by the OpenCPI maintainers, containing:
   * Example Applications, e.g. FSK modulation
   * Components and Workers partitioned into various libraries by type, e.g. dsp_comps
   * HDL Platforms such as Epiq's Matchstiq Z1 and Altera's Stratix 4 Development Board (ALST4)
 
-inactive - This Project is the "catch-all" for anything not in the above Projects. This would include Platforms
+inactive - This project is the "catch-all" for anything not in the above projects. This would include Platforms
 that are not officially supported (e.g. fedora25 or ML555), Components that have not been fully vetted or are
-being retired, etc. Inclusion within this Project is neither an indication that something should be avoided nor
+being retired, etc. Inclusion within this project is neither an indication that something should be avoided nor
 that it is being promoted; it is simply not actively being maintained currently by the core OpenCPI team.
