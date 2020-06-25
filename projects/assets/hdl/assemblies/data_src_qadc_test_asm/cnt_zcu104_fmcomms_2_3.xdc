@@ -81,13 +81,13 @@ set_property PACKAGE_PIN H18 [get_ports {FMC_LPC_LA01_CC_P}];  # "FMC-LA01_CC_P"
 set_property PACKAGE_PIN K20 [get_ports {FMC_LPC_LA02_N}];  # "FMC-LA02_N"
 set_property PACKAGE_PIN L20 [get_ports {FMC_LPC_LA02_P}];  # "FMC-LA02_P"
 set_property PACKAGE_PIN K18 [get_ports {FMC_LPC_LA03_N}];  # "FMC-LA03_N"
-set_property PACKAGE_PIN E18 [get_ports {FMC_LPC_LA03_P}];  # "FMC-LA03_P"
+set_property PACKAGE_PIN K19 [get_ports {FMC_LPC_LA03_P}];  # "FMC-LA03_P"
 set_property PACKAGE_PIN L16 [get_ports {FMC_LPC_LA04_N}];  # "FMC-LA04_N"
 set_property PACKAGE_PIN L17 [get_ports {FMC_LPC_LA04_P}];  # "FMC-LA04_P"
 set_property PACKAGE_PIN J17 [get_ports {FMC_LPC_LA05_N}];  # "FMC-LA05_N"
 set_property PACKAGE_PIN K17 [get_ports {FMC_LPC_LA05_P}];  # "FMC-LA05_P"
 set_property PACKAGE_PIN G19 [get_ports {FMC_LPC_LA06_N}];  # "FMC-LA06_N"
-set_property PACKAGE_PIN L15 [get_ports {FMC_LPC_LA06_P}];  # "FMC-LA06_P"
+set_property PACKAGE_PIN H19 [get_ports {FMC_LPC_LA06_P}];  # "FMC-LA06_P"
 set_property PACKAGE_PIN J15 [get_ports {FMC_LPC_LA07_N}];  # "FMC-LA07_N"
 set_property PACKAGE_PIN J16 [get_ports {FMC_LPC_LA07_P}];  # "FMC-LA07_P"
 set_property PACKAGE_PIN E17 [get_ports {FMC_LPC_LA08_N}];  # "FMC-LA08_N"
@@ -188,38 +188,38 @@ set_property IOSTANDARD LVCMOS18 [get_ports {FMC_LPC_LA16_P}]; # FMCOMMS2/3 AD93
 # IOSTANDARD constraints - ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA00_CC_P}]; # FMCOMMS3 DATA_CLK_P
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA00_CC_P}]; # FMCOMMS3 DATA_CLK_P
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA00_CC_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA01_CC_P}]; # FMCOMMS3 RX_FRAME_P
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA01_CC_P}]; # FMCOMMS3 RX_FRAME_P
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA01_CC_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA02_P}]; # FMCOMMS3 RX_D0
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA02_P}]; # FMCOMMS3 RX_D0
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA02_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA03_P}]; # FMCOMMS3 RX_D1
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA03_P}]; # FMCOMMS3 RX_D1
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA03_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA04_P}]; # FMCOMMS3 RX_D2
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA04_P}]; # FMCOMMS3 RX_D2
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA04_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA05_P}]; # FMCOMMS3 RX_D3
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA05_P}]; # FMCOMMS3 RX_D3
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA05_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA06_P}]; # FMCOMMS3 RX_D4
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA06_P}]; # FMCOMMS3 RX_D4
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA06_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA07_P}]; # FMCOMMS3 RX_D5
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA07_P}]; # FMCOMMS3 RX_D5
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA07_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA08_P}]; # FMCOMMS3 TX_FB_CLK_P
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA08_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA09_P}]; # FMCOMMS3 TX_FRAME_P
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA09_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA11_P}]; # FMCOMMS3 TX_D0
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA11_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA12_P}]; # FMCOMMS3 TX_D1
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA12_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA13_P}]; # FMCOMMS3 TX_D2
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA13_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA10_P}]; # FMCOMMS3 TX_D3
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA10_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA14_P}]; # FMCOMMS3 TX_D4
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA14_P}]
-set_property IOSTANDARD LVDS_18 [get_ports {FMC_LPC_LA15_P}]; # FMCOMMS3 TX_D5
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA15_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA08_P}]; # FMCOMMS3 TX_FB_CLK_P
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA08_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA09_P}]; # FMCOMMS3 TX_FRAME_P
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA09_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA11_P}]; # FMCOMMS3 TX_D0
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA11_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA12_P}]; # FMCOMMS3 TX_D1
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA12_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA13_P}]; # FMCOMMS3 TX_D2
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA13_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA10_P}]; # FMCOMMS3 TX_D3
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA10_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA14_P}]; # FMCOMMS3 TX_D4
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA14_P}]
+set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA15_P}]; # FMCOMMS3 TX_D5
+#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA15_P}]
 
 # Set the bank voltage for IO Bank 35 to 2.5V by default.
 # set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 35]];
@@ -398,5 +398,29 @@ set_clock_groups -asynchronous -group [get_clocks {FMC_LPC_LA00_CC_P}] -group [g
 # ----------------------------------------------------------------------------
 
 # because RX_FRAME_P is sampled on the DATA_CLK_P falling edge (we use DDR primitive as a sample-in-the-middle), the rising edge latched output is unconnected and therefore should not be used in timing analysis
-set_false_path -from [get_ports FMC_LPC_LA01_CC_P] -rise_to [get_pins ftop/FMC_data_src_adc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D
-]
+set_false_path -from [get_ports FMC_LPC_LA01_CC_P] -rise_to [get_pins ftop/FMC_data_src_adc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D]
+
+set_property PACKAGE_PIN D5       [get_ports "GPIO_LED_0_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11N_AD9N_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_LED_0_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11N_AD9N_88
+set_property PACKAGE_PIN D6       [get_ports "GPIO_LED_1_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11P_AD9P_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_LED_1_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11P_AD9P_88
+set_property PACKAGE_PIN A5       [get_ports "GPIO_LED_2_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L10N_AD10N_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_LED_2_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L10N_AD10N_88
+set_property PACKAGE_PIN B5       [get_ports "GPIO_LED_3_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L10P_AD10P_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_LED_3_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L10P_AD10P_88
+set_property PACKAGE_PIN F4       [get_ports "GPIO_DIP_SW3"] ;# Bank  88 VCCO - VCC3V3   - IO_L9N_AD11N_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_DIP_SW3"] ;# Bank  88 VCCO - VCC3V3   - IO_L9N_AD11N_88
+set_property PACKAGE_PIN F5       [get_ports "GPIO_DIP_SW2"] ;# Bank  88 VCCO - VCC3V3   - IO_L9P_AD11P_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_DIP_SW2"] ;# Bank  88 VCCO - VCC3V3   - IO_L9P_AD11P_88
+set_property PACKAGE_PIN D4       [get_ports "GPIO_DIP_SW1"] ;# Bank  88 VCCO - VCC3V3   - IO_L8N_HDGC_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_DIP_SW1"] ;# Bank  88 VCCO - VCC3V3   - IO_L8N_HDGC_88
+set_property PACKAGE_PIN E4       [get_ports "GPIO_DIP_SW0"] ;# Bank  88 VCCO - VCC3V3   - IO_L8P_HDGC_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_DIP_SW0"] ;# Bank  88 VCCO - VCC3V3   - IO_L8P_HDGC_88
+set_property PACKAGE_PIN B4       [get_ports "GPIO_PB_SW0"] ;# Bank  88 VCCO - VCC3V3   - IO_L7N_HDGC_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_PB_SW0"] ;# Bank  88 VCCO - VCC3V3   - IO_L7N_HDGC_88
+set_property PACKAGE_PIN C4       [get_ports "GPIO_PB_SW1"] ;# Bank  88 VCCO - VCC3V3   - IO_L7P_HDGC_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_PB_SW1"] ;# Bank  88 VCCO - VCC3V3   - IO_L7P_HDGC_88
+set_property PACKAGE_PIN B3       [get_ports "GPIO_PB_SW2"] ;# Bank  88 VCCO - VCC3V3   - IO_L6N_HDGC_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_PB_SW2"] ;# Bank  88 VCCO - VCC3V3   - IO_L6N_HDGC_88
+set_property PACKAGE_PIN C3       [get_ports "GPIO_PB_SW3"] ;# Bank  88 VCCO - VCC3V3   - IO_L6P_HDGC_88
+set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_PB_SW3"] ;# Bank  88 VCCO - VCC3V3   - IO_L6P_HDGC_88
