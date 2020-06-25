@@ -1,4 +1,4 @@
-# [v1.7.0-rc.1](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-beta.1...v1.7.0-rc.1) (2020-06-19)
+# [v1.7.0-rc.1](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-beta.1...v1.7.0-rc.1) (2020-06-25)
 
 Changes/additions since OpenCPI Release v1.7.0-beta.1
 
