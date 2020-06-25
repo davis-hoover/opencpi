@@ -302,11 +302,6 @@ test-core:centos6:isim:
     - build:centos6
     - build-primitives:centos6:isim
     - build-platforms-core:centos6:isim
-  script:
-    - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
-    - ocpidev run test backpressure -d projects/core --only-platform isim
-    - ocpidev run test metadata_stressor -d projects/core --only-platform isim
 
 test-assets-base:centos6:isim:
   extends:
@@ -359,13 +354,6 @@ test-assets-misc:centos6:isim:
     - build-platforms-core:centos6:isim
     - build-platforms-platform:centos6:isim
     - build-platforms-assets:centos6:isim
-  script:
-    - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
-    - >
-      for f in $(find projects/assets/components/misc_comps/ -maxdepth 1 -type d -name "*.test" -not -name "cdc_*"); do
-        ocpidev run test "$(basename "$f" .test)" -d projects/assets/components/misc_comps --only-platform isim;
-      done
 
 test-assets-util:centos6:isim:
   extends:
@@ -392,14 +380,7 @@ test-assets_ts:centos6:isim:
     - build-platforms-core:centos6:isim
     - build-platforms-platform:centos6:isim
     - build-components-assets_ts:centos6:isim
-  script:
-    - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
-    - >
-      for f in $(find opencpi/projects/assets_ts/components -maxdepth 1 -type d -name "*.test" -not -name "complex_mixer_ts.test"); do
-        ocpidev run test "$(basename "$f" .test)" -d projects/assets_ts/components --only-platform isim;
-      done
-
+ 
 test-inactive:centos6:isim:
   extends:
     - .test-inactive
