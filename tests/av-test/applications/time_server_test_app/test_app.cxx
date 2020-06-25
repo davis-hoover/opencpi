@@ -58,10 +58,10 @@
 #include <stdlib.h>
 
 const int MAX_EXPECTED_SIM_TIME_USECS = 120000000; //to prevent simulator hanging
-const unsigned long TIME_NOW_VALUE_FOR_VERIFY = 0x0123456700000000;
 
 //PPS valid expected to occur > 0.999% of frac rollover (2^32=4294967296)
 const double LOWER_FRAC_SEC_THRESHOLD = 4294967296 * .999;
+const unsigned long TIME_NOW_VALUE_FOR_VERIFY = 0x0123456700000000;
 
 const int NUM_TEST_CASES = 5;
 //The current set of test cases are for the following combinations of 
@@ -84,6 +84,8 @@ namespace OA = OCPI::API;
 using namespace std;
 int programRet = 0; 
 
+#define PRINT_ERROR(err) cerr << "ERROR: " << err << "\n";
+
 unsigned int verifyTestCase(bool enable_time_now_updates_from_PPS, 
 			    bool valid_requires_write_to_time_now, 
 			    bool time_server_tester_mode, 
@@ -93,36 +95,39 @@ unsigned int verifyTestCase(bool enable_time_now_updates_from_PPS,
   //cout << "Seconds[0]: " << seconds[0] << " Fraction[0]: " << fraction[0] << endl;
   //cout << "Seconds[1]: " << seconds[1] << " Fraction[1]: " << fraction[1] << endl;
   if (time_server_tester_mode){
-    //seconds value should have rolled over
-    if(seconds[0] - seconds[1] != 1)
+    if(seconds[0] - seconds[1] != 1) {
+      PRINT_ERROR("seconds value did not roll over")
       retVal = 5;
-    if((fraction[1] >> 31) - (fraction[0] >> 31) != 1)
+    }
+    if((fraction[1] >> 31) - (fraction[0] >> 31) != 1) {
+      PRINT_ERROR("fraction difference between subsequent HTS time reads was not 1")
       retVal = 6;
+    }
   } else {
     if (valid_requires_write_to_time_now)
       {
-	// Current second value should be TIME_NOW_VALUE_FOR_VERIFY when GPS enabled
-	// and last second (which was captured before valid) should be 0
-	if (seconds[0] != TIME_NOW_VALUE_FOR_VERIFY >> 32)
+	if (seconds[0] != TIME_NOW_VALUE_FOR_VERIFY >> 32) {
+	  PRINT_ERROR("current second value was not " << TIME_NOW_VALUE_FOR_VERIFY << "when GPS enabled")
 	  retVal = 1;
-	if (seconds[1] != 0)
+	}
+	if (seconds[1] != 0) {
+	  PRINT_ERROR("last second (which was captured before valid) was not 0")
 	  retVal = 2;
+	}
       }
     else
-      {
-	//Second value should be zero when valid_requires_write_to_time_now = false
-	if (seconds[0] != 0)
-	  retVal = 3;
+      if (seconds[0] != 0) {
+	PRINT_ERROR("second value was not zero when valid_requires_write_to_time_now = false")
+	retVal = 3;
       }
 
     if (retVal)
       return retVal;
 
     if (enable_time_now_updates_from_PPS)
-      {
-	//Fraction value should be > lower threshold when enable_time_now_updates_from_PPS = true
-	if (fraction[0] < LOWER_FRAC_SEC_THRESHOLD)
-	  retVal = 4;
+      if (fraction[0] < LOWER_FRAC_SEC_THRESHOLD) {
+	PRINT_ERROR("fraction value was not > lower threshold when enable_time_now_updates_from_PPS = true")
+	retVal = 4;
       }
     //Currently, no way to deterministically verify fractional second count when
     //enable_time_now_updates_from_PPS = false
