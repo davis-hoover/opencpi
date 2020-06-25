@@ -2,7 +2,7 @@
               only='zcu104'
               constraints='cnt_zcu104_fmcomms_2_3.xdc'>
   <Device name='platform_ad9361_spi' card='fmcomms_2_3_lpc_scdcd'>
-    <!-- MUST provide to this worker the zed's control plane clock freq value -->
+    <!-- MUST provide to this worker the zcu104's control plane clock freq value -->
     <Property name='CP_CLK_FREQ_HZ_p' value='100e6'/>
   </Device>
   <Device name='platform_ad9361_data_sub' card='fmcomms_2_3_lpc_scdcd'>
