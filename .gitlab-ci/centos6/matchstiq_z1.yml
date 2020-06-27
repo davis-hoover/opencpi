@@ -101,7 +101,7 @@ build-devices-core:centos6:matchstiq_z1:
     - build-primitives:centos6:matchstiq_z1
 
 build-devices-platform:centos6:matchstiq_z1:
-  extends: 
+  extends:
     - .build-devices-platform
     - .centos6
     - .matchstiq_z1-xilinx13_3
@@ -201,7 +201,7 @@ build-platforms-core:centos6:matchstiq_z1:
     - build-components-core:centos6:matchstiq_z1
 
 build-platforms-platform:centos6:matchstiq_z1:
-  extends: 
+  extends:
     - .build-platforms-platform
     - .centos6
     - .matchstiq_z1-xilinx13_3
@@ -249,7 +249,7 @@ build-platforms-inactive:centos6:matchstiq_z1:
 # Jobs - Assemblies #
 #####################
 build-assemblies-platform:centos6:matchstiq_z1:
-  extends: 
+  extends:
     - .build-assemblies-platform
     - .centos6
     - .matchstiq_z1-xilinx13_3
