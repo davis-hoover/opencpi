@@ -220,6 +220,7 @@ architecture rtl of time_service is
   signal s_jamFrac_EN                          : std_logic;
   signal s_jamFrac_Val                         : std_logic_vector(49 downto 0);
   signal s_fracSeconds                         : std_logic_vector(49 downto 0);
+  signal s1_fracSeconds                        : std_logic_vector(49 downto 0);
   --
   signal s_ppsEdgeCount                        : std_logic_vector(7 downto 0);
   signal s_ppsLost                             : std_logic;
@@ -427,7 +428,7 @@ begin
   --
   -- TODO: Replace with appropriate CDC (bus-based) module
   -----------------------------------------------------------------------------
-  s_nowInCC_sD_IN <= s_refSecCount & s_fracSeconds(47 downto 16);
+  s_nowInCC_sD_IN <= s_refSecCount & s1_fracSeconds(47 downto 16);
   s_nowInCC_sRDY  <= '1';
   -- Purely sampling the time clock to cross the clock domain
   reg_nowInCC1 : process(timeCLK)
@@ -458,7 +459,7 @@ begin
         s1_gpsSecWrite <= '0';
       else
         if (s_nowInCC_sRDY = '1') then
-          s_nowTC <= s_refSecCount & s_fracSeconds(47 downto 16);
+          s_nowTC <= s_refSecCount & s1_fracSeconds(47 downto 16);
           s1_gpsSecWrite <= s_gpsSecWrite;
         end if;
       end if;
@@ -770,10 +771,12 @@ begin
         s_delSecond   <= "01" & x"0000_0000_0000";
         s_fracInc     <= c_fracInc;
         s_fracSeconds <= (others => '0');
+        s1_fracSeconds <= (others => '0');
         s_jamFrac_EN  <= '0';
         s_jamFrac_Val <= (others => '0');
       else
         
+        s1_fracSeconds <= s_fracSeconds;        
         s_delSec <= s_fracSeconds(49 downto 48);
 
         -- "Phase Detector"

@@ -34,3 +34,6 @@ endif
 APP=test_app
 
 include $(OCPI_CDK_DIR)/include/application.mk
+
+clean::
+	rm -rf simulations
