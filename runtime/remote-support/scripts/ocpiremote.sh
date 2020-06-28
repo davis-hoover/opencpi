@@ -37,6 +37,7 @@ platform=xilinx13_4
 os=linux
 log=
 hdl=
+mount=/media/card
 function help {
   cat <<-EOF
 	Options are:
@@ -53,6 +54,7 @@ function help {
 	  -n <server>       - Specify NTP server, or - for none
           -V                - Use valgrind (for load, load it, for start, use it)
 	  -H <hdl-platform> - Specify HDL platform
+	  -M mount          - Specify SD card mount point
 
 	Commands are:
 	  test              - test basic connectivity
@@ -68,7 +70,7 @@ EOF
 }
 
 
-trap 'test -n "$tmpdir" -a -d "$tmpdir" && rm -r -f "$tmpdir"' EXIT
+trap 'test -n "$tmpdir" -a -d "$tmpdir" && echo rm -r -f "$tmpdir"' EXIT
 [ -z "$1" ] && help
 while [[ "$1" = -* ]]; do
     case $1 in
@@ -83,13 +85,14 @@ while [[ "$1" = -* ]]; do
 	-o) shift; options="$1";;
 	-P) shift; platform="$1";;
 	-H) shift; hdl="$1";;
+	-M) shift; mount="$1";;
         -V) vg=-V;;
 	*) echo Unknown option: $1 && exit 1;;
     esac
     shift
 done
 if [ -z "$host" ] ; then
-  [[ $OCPI_SERVER_ADDRESSES || $OCPI_SERVER_ADDRESSES != *:* ]] &&
+  [[ -z "$OCPI_SERVER_ADDRESSES" || $OCPI_SERVER_ADDRESSES != *:* ]] &&
     echo Bad OCPI_SERVER_ADDRESSES value: $OCPI_SERVER_ADDRESSES && exit 1
   host=${OCPI_SERVER_ADDRESSES%%:*}
   port=${OCPI_SERVER_ADDRESSES##*:}
@@ -183,11 +186,12 @@ for op in $*; do
 	do_ssh "$checkdir; cd $rdir && ./ocpiserver.sh mount";;
     bootload)
 	[ -z "$hdl" ] && echo "The bootload command requires both an RCC (-P) and HDL (-H) platform." && exit 1
-        (cd $OCPI_CDK_DIR/$hdl/sdcard-$platform && pwd && ls -l &&
+        (set -vx; cd $OCPI_CDK_DIR/$hdl/sdcard-$platform && pwd && ls -l &&
 	 tar -c -z --exclude opencpi --dereference -f $tmpdir/boot.tgz *) # we avoid dot files
+        set -vx
 	echo These are the boot files being copied:
 	do_ssh "cd /var/volatile && rm -r -f opencpi-tmp && mkdir opencpi-tmp; cd opencpi-tmp; gunzip | tar -x -f -" < $tmpdir/boot.tgz
-	echo do_ssh 'cd /media/card;
+	echo do_ssh 'cd '$mount';
 		     for i in *; do $i != opencpi && rm -r -f $i; done;
 		     gunzip | tar -v -x -f -' < $tmpdir/boot.tgz
 	;;

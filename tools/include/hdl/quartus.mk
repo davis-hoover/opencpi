@@ -236,16 +236,16 @@ HdlToolFiles=\
 # force them into the correct library when they are "discovered" via SEARCH_PATH.
 ifeq ($(HdlMode),library)
 HdlToolPost=\
-  if ! test -d $(LibName); then \
-    mkdir $(LibName); \
+  if ! test -d $(WorkLib); then \
+    mkdir $(WorkLib); \
   else \
-    rm -f $(LibName)/*; \
+    rm -f $(WorkLib)/*; \
   fi;\
   for s in $(HdlToolFiles); do \
     if [[ $$s == *.vhd ]]; then \
-      echo -- synthesis library $(LibName) | cat - $$s > $(LibName)/`basename $$s`; \
+      echo -- synthesis library $(LibName) | cat - $$s > $(WorkLib)/`basename $$s`; \
     else \
-      ln -s ../$$s $(LibName); \
+      ln -s ../$$s $(WorkLib); \
     fi; \
   done;
 endif

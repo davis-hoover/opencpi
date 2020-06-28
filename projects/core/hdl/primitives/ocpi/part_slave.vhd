@@ -34,6 +34,7 @@
 -- We assume MDataValid/MDataLast.
 library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.all, ocpi.types.all, ocpi.util.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 
 entity part_slave is
   generic (precise            : boolean; -- are we precise-only?
@@ -97,7 +98,6 @@ entity part_slave is
     );
 end entity;
 
-library ocpi_core_bsv; use ocpi_core_bsv.all;
 architecture rtl of part_slave is
   signal reset_i : Bool_t; -- internal version of output to worker
   signal reset_n   : Bool_t; -- internal assert-low reset (to avoid silly isim warning).
