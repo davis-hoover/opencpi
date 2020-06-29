@@ -36,7 +36,8 @@ set_time() {
       MSG="Succeeded in setting the time from $1"
     fi
     # AV-5422 Timeout ntpd command after $TIMEOUT in seconds
-    if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS; then
+    # checks to see if busybox is present without displaying a prompt on error
+    if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS > /dev/null 2>&1; then
       echo $MSG
 	elif rdate -p time.nist.gov; then
 	  rdate -s time.nist.gov
