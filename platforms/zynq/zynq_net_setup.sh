@@ -26,19 +26,21 @@
 set_time() {
   if test "$1" != -; then
     echo Attempting to set time from the time server
-
     # Calling ntpd without any options will run it as a dameon
     OPTS=""
     BUSYBOX_PATH="$OCPI_DIR/$OCPI_TOOL_PLATFORM/bin"
     TIMEOUT=20
     MSG="Succeeded in setting the time from $OCPI_DIR/ntp.conf"
-    if [ ! -e $OCPI_DIR/$OCPI_TOOL_PLATFORM/ntp.conf ]; then
+    if [ ! -e $OCPI_DIR/ntp.conf ]; then
       OPTS="-p $1"
       MSG="Succeeded in setting the time from $1"
     fi
     # AV-5422 Timeout ntpd command after $TIMEOUT in seconds
     if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS; then
       echo $MSG
+	elif rdate -p time.nist.gov; then
+	  rdate -s time.nist.gov
+	  echo $MSG
     else
       echo ====YOU HAVE NO NETWORK CONNECTION and NO HARDWARE CLOCK====
       echo Set the time using the '"date YYYY.MM.DD-HH:MM[:SS]"' command.

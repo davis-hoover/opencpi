@@ -38,6 +38,9 @@ set_time() {
     # AV-5422 Timeout ntpd command after $TIMEOUT in seconds
     if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS; then
       echo $MSG
+	elif rdate -p time.nist.gov; then
+	  rdate -s time.nist.gov
+	  echo $MSG
     else
       echo ====YOU HAVE NO NETWORK CONNECTION and NO HARDWARE CLOCK====
       echo Set the time using the '"date YYYY.MM.DD-HH:MM[:SS]"' command.
