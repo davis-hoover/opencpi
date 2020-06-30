@@ -44,6 +44,10 @@
         <div>{{ pop_link_must_exist("opencpi rcc development", links) }}</div>
         <div>{{ pop_link_must_exist("opencpi hdl development", links) }}</div>
         <div>{{ pop_link_must_exist("opencpi platform development", links) }}</div>
+        {% if "opencpi component best practices" in links %}
+        <p></p> <!-- for spacing -->
+        <div>{{ pop_link("opencpi component best practices", links) }}</div>
+        {% endif %}
 
         {% if assets %}
         <h3>System Specific Guides</h3>

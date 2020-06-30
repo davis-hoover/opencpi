@@ -81,11 +81,9 @@ PKGS_D+=(libpng)
 #    to cleanup multiple copies of Linux kernel, etc. (AV-4802)
 PKGS_D+=(hardlink)
 #    Needed to build gdb
-PKGS_D+=(bison)
-#    Needed to build gdb
-PKGS_D+=(flex)
-#    Needed by Xilinx ISE Coregen
-PKGS_D+=(libSM)
+PKGS_D+=(bison flex)
+#    Needed by Xilinx ISE
+PKGS_D+=(libSM libXi libXrandr libXrender)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment

@@ -36,7 +36,7 @@ OCPI_BOOTSTRAP="$(pwd)/cdk/scripts/ocpibootstrap.sh"; source "$OCPI_BOOTSTRAP"
 
 # This will set OCPI_TARGET_* vars
 echo -n "Finding target platform ... "
-source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1"
+source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1" -
 if [ -z "$OCPI_TARGET_PLATFORM_DIR" ]; then
   echo "Cannot find platform '$1'"
   exit 1
