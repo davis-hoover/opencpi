@@ -110,7 +110,7 @@ PKGS_S+=(nfs-common nfs-kernel-server)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(libc6-dev-i386)
 #    for the AV GUI installation and tutorials
-PKGS_S+=(oxygen5-icon-theme default-jre tree)
+PKGS_S+=(oxygen5-icon-theme openjdk-8-jre openjdk-8-jre-headless tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
 

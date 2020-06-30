@@ -1,3 +1,4 @@
+This contains reference platforms and support for generic devices and
 Criteria for content to exist in this OpenCPI project:
 * specs/
    - component specs must facilitate generic device worker or platform support

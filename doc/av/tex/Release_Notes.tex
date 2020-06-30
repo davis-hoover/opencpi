@@ -20,7 +20,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
 \def\docTitle{Release Notes}
-\def\docVersion{1.6.0}
+\def\docVersion{1.7.0}
 %----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
 \input{\snippetpath/includes}
@@ -86,6 +86,8 @@ OpenCPI Release: \ocpiversion
 			\hline
 			v1.6.0 & Updates for 1.6.0 release & 1/2020 \\
 			\hline
+			v1.7.0 & Updates for 1.7.0 release & 6/2020 \\
+			\hline
 			\end{tabularx}
 		\end{table}
 	\end{center}
@@ -105,7 +107,7 @@ This document contains corrections, changes, and enhancements made to OpenCPI si
 \item Section~II (``Changes and Notes'') is ``\textit{What do I need to be aware of as a \textbf{previous} user of the Framework?}''
 \item Section~III (``Major Known Deficiencies'') is for \textit{all} users to answer ``\textit{What bugs should I be aware of?}''
 \end{itemize}
-The \href{sec:appendices}{appendices} contain the Release Notes from previously released versions of the Framework, roughly following the same format, e.g. \ref{sec:13_enhancements}, being Section~I of the v1.3~Appendix, is the ``Enhancements'' that were added to Release 1.3. \textit{\textbf{It is highly recommended that a new user reviews the appendices as well; not only the main document concerning the latest release.}}
+The \href{sec:appendices}{appendices} contain the Release Notes from previously released versions of the Framework, roughly following the same format, e.g. \ref{sec:13_enhancements}, being Section~I of the v1.3~Appendix, is the ``Enhancements'' that were added to Release 1.3.
 
 \iffalse
 % \origsection{Release XXX}
@@ -114,9 +116,121 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 \section{Major Known Deficiencies}
 \label{sec:XX_bugs}
 \subsection{Previously Documented Deficiencies}
+% === End of XXX
 \fi
 
-% \origsection{Release 1.5.0}
+% \origsection{Release 1.7.0}
+\section{Enhancements}
+\subsection{ADC/DAC Clocking Architecture}
+\label{sec:17_adc_dac}
+A new clocking and timestamping model has been implemented for ADC and DAC devices that is expected to be rolled out across all HDL platforms and devices for 2.0.  It simplifies some device workers, minimizes clock-domain crossing and time-jitter for sample data, as well as supports the \code{ComplexShortWithMetadata} protocol more directly. All new device support for ADC/DAC/transceiver devices should use this model.  It is described in the \githubio{OpenCPI\_{}Platform\_{}Development\_{}Guide.pdf}, section 5.5.9.  For 1.7 it is implemented on the e31x and zed+fmcomms platforms.
+
+\subsection{Built-in \code{platform} Project}
+\label{sec:17_platform_project}
+The new built-in \code{platform} project contains reference platforms and support for generic devices and cards. The \code{zed} and \code{zed\_{}ise} platforms have been moved to this project, with future reference platforms expected to follow. Most device support in the built-in \code{assets} project is expected to migrate to the \code{platform} project for 2.0. Any OSP project which relies on such generic support or reference platforms should include \code{ocpi.platform} as a project dependency. See the README file in this new built-in project for more details.
+
+\subsection{CIC Decimator RCC work-a-like}
+\label{sec17_cic_dec}
+An RCC work-a-like of the \code{CIC\_{}Dec.hdl} worker has been added to the built-in project ``assets".
+
+\subsection{Clock Generator Primitive}
+\label{sec:17_clocking}
+A new clocking library has been added to \path{core/hdl/primitives}. This is a preliminary view of how OpenCPI will handle vendor clock generator support.
+
+\subsection{Man Pages}
+\label{sec:17_man_pages}
+Man pages are available for the ocpidev command and its subcommands. When the OpenCPI environment is setup using \code{opencpi-setup.sh}, the man pages can be viewed using the man command, e.g. "man ocpidev".
+
+\subsection{\code{ocpiremote}}
+\label{sec:17_ocpiremote}
+\code{ocpiremote.py} was added to remove, or reduce, the need for setting up NFS for the purposes of remote application execution and development. When the OpenCPI environment is setup using \code{opencpi-setup.sh}, running \code{ocpiremote --help} will list available subcommands. Additional help for each subcommand is available via \code{ocpiremote <subcommand> --help}.
+
+\subsection{PlutoSDR HDL Platform Support}
+\label{sec:17_plutosdr}
+Support for plutosdr platform based on adi\_{}plutosdr0\_{}31 RCC platform has been added. The plutosdr platform is the cheapest starter platform for OpenCPI, featuring a Zynq 7010 FPGA and AD9363 transceiver chip on the same board.\\
+
+\textit{\textbf{Note:}} Xilinx SDK 2018.3 is required to build the framework, RCC artifacts, and ACI executables for the plutosdr platform.
+
+\subsection{Protocol complex\_{}short\_{}samples}
+\label{sec:17_css}
+A new protocol, \code{complex\_{}short\_{}samples}, has been added which is intended to be used for streaming complex data and metadata commonly associated with SDR applications. For expansion of future capabilities, this protocol includes an operation for user-defined metadata. This protocol is expected to replace \code{ComplexShortWithMetadata} in future releases.
+
+\subsection{Ubuntu 16.04 Support}
+\label{sec:17_ubuntu_16.04}
+Users now have the option of using Ubuntu 16.04 as their host development platform. The level of support for Ubuntu 16.04 is the same as CentOS 7.
+
+\subsection{zcu104 HDL Platform Support}
+\label{sec:17_zcu104}
+Support for the zcu104 platform based on xilinx19.2 aarch64 RCC platform has been added. The zcu104 platform is like the zed platform: the cheapest "reference" platform for the zynq-ultrascale processor line, that
+also can support the ad9361.\\
+
+\textit{\textbf{Note:}} Vivado 2019.2 is required to build artifacts for the zcu104 platform. Vivado 2019.2 is not supported on CentOS 6.
+
+
+\section{Changes and Notes}
+\subsection{\code{ComplexShortWithMetadata} Changes}
+\label{sec:17_cswm}
+Removed \code{user} opcode and further clarified the descriptions of the \code{sync} and \code{end\_{}of\_{}samples} opcodes. This protocol is finalized, meaning little to no future changes.
+
+\subsection{MacOS 10.14 and 10.15}
+\label{sec:17_mojave}
+Both MacOS 10.14 (Mojave) and MacOS 10.15 (Catalina) have been requalified as RCC-only platforms, which can still be used as a client for remote containers. Support for these RCC-only platforms relies on MacPorts already being installed on the user's system.
+
+\subsection{Optional HDL Ports with \code{clockdirection=in}}
+\label{sec:17_hdl_clockdirection}
+Optional HDL worker ports that have the ``clockdirection" attribute set to ``in" are now supported.
+
+\subsection{Python Scripts}
+\label{sec:17_python_scripts}
+Removed all Python 2 related packages and dependencies for OpenCPI. On CentOS 6, there are still python 2 related packages being installed as the \code{gpsd} prerequisite requires python 2 for SCons.\\
+
+The shebangs in all OpenCPI python scripts have been changed from \code{\#{}!/usr/bin/env python3.4} to\\ \code{\#{}!/usr/bin/env python3} allowing for greater portability across operating systems that provide different python 3.x versions.\\
+
+All OpenCPI python scripts have had their execute bit set so they can be executed directly without having to explicitly invoke a python interpreter.\\
+
+\textit{\textbf{Note:}} OpenCPI requires at least python 3.4 and does not use any newer features added in later versions of python 3. This minimal version requirement is based on what is available for CentOS 6. OpenCPI installation on CentOS 7 installs and uses python 3.6 and related packages.
+
+\subsection{SCons 3}
+\label{sec:17_scons3}
+Related to python 3 changes, SCons dependency was updated from SCons 2 to SCons 3 on CentOS 7. Due to how SCons is packaged for CentOS 7, one cannot have both \code{scons} and \code{scons3} RPMs installed due to conflicts with the RPMs. SCons is used for building the \code{gpsd} prerequisite.
+
+\subsection{SD Card Export Model}
+\label{sec:17_sd_card}
+The process of generating SD cards for embedded systems was revamped and simplified.  In particular the syntax for the platform exports files was changed/enhanced.  Developers of platforms should read the appropriate section in the \githubio{OpenCPI\_{}Platform\_{}Development\_{}Guide.pdf}.  The change reduces the requirements to change the embedded system's root file system from the manufacturers default.
+
+\section{Major Known Deficiencies}
+\label{sec:17_bugs}
+
+\subsection{HDL Platform zed\_{}ise Build Error}
+\label{bug:1113}
+Known issue with building HDL platform \code{zed\_{}ise}. See \href{https://gitlab.com/opencpi/opencpi/-/issues/1113}{\#{}1113} for status of this issue.
+
+\subsection{Remote Development using Network Mode Scripts}
+\label{bug:1117}
+Known issue related to using network mode scripts for remote development (ex. \code{mynetsetup.sh}). Status can be tracked here: \href{https://gitlab.com/opencpi/opencpi/-/issues/1117}{\#{}1117},  \href{https://gitlab.com/opencpi/opencpi/-/issues/1204}{\#{}1204}
+
+\subsection{RPM Support}
+\label{bug:17_rpms}
+RPMs are not supported in OpenCPI 1.7.0. Support will be added in OpenCPI 1.7.1.
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 1.7:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1392}
+\item \bugref{2400}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+% === End of 1.7
+
+\beginoldnotes
+
+\origsection{Release 1.6.0}
 \section{Enhancements}
 \subsection{Support for Workers with Separate Control and Data Clocks} % AV-3840
 \label{sec:16_clocks}
@@ -169,12 +283,12 @@ Software only development (no FPGA tools or simulators) is supported on MacOS Ca
 OpenCPI now has a core dependency on this package (\url{gpsd.gitlab.io/gpsd}) and it will be built for all development hosts and embedded systems and used in a way that will not conflict with systems that already have \code{gpsd} installed.
 
 \subsection{Optional Environment Settings for a Source Installation are in a New File.}
-\label{sec:16_gpsd}
+\label{sec:16_userenv}
 All environment settings for OpenCPI (which are all optional), should be set in the \code{user-env.sh} file at the top
 level of the installation.  This file is automatically read when the OpenCPI environment is established.
 
 \section{Major Known Deficiencies}
-\label{sec:15_bugs}
+\label{sec:16_bugs}
 
 \subsection{RPM Installation is not Supported in Release 1.6.0}
 \label{bug:norpm}
@@ -202,9 +316,7 @@ The following previously-documented deficiencies have been fixed in this release
 \item \bugref{4307}
 \end{itemize}
 
-% === End of 1.5
-
-\beginoldnotes
+% === End of 1.6
 
 \origsection{Release 1.5.0}
 \section{Enhancements}

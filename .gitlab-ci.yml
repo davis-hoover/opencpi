@@ -1,8 +1,9 @@
 # vim: ts=2:sw=2:et
 #
 # GitLab's yaml reference:
-#   https://docs.gitlab.com/ee/ci/yaml/README.html
-#
+#   https://docs.gitlab.com/ee/ci/yaml/
+# Predefined environment variable reference:
+#   https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
 
 # Job's with tag:opencpi run on our servers, not the cloud
 
@@ -57,8 +58,9 @@ include:
   - /.gitlab-ci/e3xx.yml
 
 
-# Global before and after scripts to run after each job. Overwrite in a specific
-# job to prevent these from occurring.
+# Global before and after scripts to run before and after each job. Overwrite
+# in a specific job using 'before_script: []' or 'after_script: []' to prevent
+# these from occurring.
 default:
   before_script:
     - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f"; fi; done
@@ -68,6 +70,11 @@ default:
     - sleep 2
     - ls -lh
   after_script:
+    - |-
+      if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
+        "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
+        exit 1
+      fi
     - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
     - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
@@ -96,10 +103,10 @@ cancel-pipeline:
     - MR=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests?source_branch=${CI_COMMIT_REF_NAME}&state=opened") || true
     - DEV=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/commits/develop")
     - DEV_SHA=$(echo "$DEV" | sed -e 's/.*"sha":"\([^"]*\).*/\1/g')
-    - >
+    - |-
       if [[ "$MR" != "[]" || "$DEV_SHA" == "$CI_COMMIT_SHA" ]]; then
         curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
-      fi;
+      fi
   after_script: []
   artifacts:
     paths: []
