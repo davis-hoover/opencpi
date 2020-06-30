@@ -183,7 +183,7 @@ else
     ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
-    ./scripts/makeExportLinks.sh -v - - $platform $platform_dir
+    $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform $platform_dir
 fi
 echo "Platform installation (download and build) for platform \"$platform\" succeeded."
 exit 0

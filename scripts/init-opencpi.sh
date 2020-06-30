@@ -28,11 +28,11 @@
 # although if CDK is available we let it go with a warning
 if test ! -d exports; then
   # We're being run in an uninitialized environment.
-  if test ! -x ./scripts/makeExportLinks.sh; then
-    echo Error: it appears that this script is not being run at the top level of OpenCPI.
+  if test ! -x ./scripts/export-framework.sh; then
+    echo Error: it appears that this script is not being run at the top level of the OpenCPI source tree.
     exit 1
   fi
   # Ensure a skeletal exported CDK
-  ./scripts/makeExportLinks.sh -b -
+  ./scripts/export-framework.sh -
 fi
 mkdir -p prerequisites
