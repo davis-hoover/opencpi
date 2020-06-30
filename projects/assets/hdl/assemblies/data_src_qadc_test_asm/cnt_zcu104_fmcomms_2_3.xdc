@@ -31,13 +31,10 @@ create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i
 # ----------------------------------------------------------------------------
 
 # FMCOMMS2/3 AD9361 DATA_CLK_P
-
-
 # create_clock command defaults to 50% duty cycle when -waveform is not specified
 
-# from AD9361 datasheet
-#set AD9361_LVDS_t_CP_ns 4.069
-#create_clock -period $AD9361_LVDS_t_CP_ns -name FMC_LA00_CC_P [get_ports {FMC_LA00_CC_P}]
+# set AD9361_LVDS_t_CP_ns 4.069
+# create_clock -period $AD9361_LVDS_t_CP_ns -name FMC_LA00_CC_P [get_ports {FMC_LA00_CC_P}]
 
 # max supported AD9361 DATA_CLK period of data_src_adc_ad9361_sub.hdl on
 # Zedboard/FMCOMMS2/3 for which slack will be 0
@@ -45,29 +42,6 @@ create_clock -period 5.712 -name FMC_LPC_LA00_CC_P [get_ports {FMC_LPC_LA00_CC_P
 
 # FMCOMMS2/3 AD9361 FB_CLK_P (forwarded version of DATA_CLK_P)
 create_generated_clock -name FMC_LPC_LA08_P -source [get_pins {ftop/FMC_ad9361_data_sub_i/worker/mode7.dac_clock_forward/C}] -divide_by 1 -invert [get_ports {FMC_LPC_LA08_P}]
-
-# ----------------------------------------------------------------------------
-# User LEDs - Bank 33
-# ---------------------------------------------------------------------------- 
-#set_property PACKAGE_PIN T22 [get_ports {led[0]}];  # "LD0"
-#set_property PACKAGE_PIN T21 [get_ports {led[1]}];  # "LD1"
-#set_property PACKAGE_PIN U22 [get_ports {led[2]}];  # "LD2"
-#set_property PACKAGE_PIN U21 [get_ports {led[3]}];  # "LD3"
-#set_property PACKAGE_PIN V22 [get_ports {led[4]}];  # "LD4"
-#set_property PACKAGE_PIN W22 [get_ports {led[5]}];  # "LD5"
-#set_property PACKAGE_PIN U19 [get_ports {led[6]}];  # "LD6"
-#set_property PACKAGE_PIN U14 [get_ports {led[7]}];  # "LD7"
-
-# ----------------------------------------------------------------------------
-# FMC Expansion Connector - Bank 13
-# ---------------------------------------------------------------------------- 
-#set_property PACKAGE_PIN R7 [get_ports {FMC_SCL}];  # "FMC-SCL"
-#set_property PACKAGE_PIN U7 [get_ports {FMC_SDA}];  # "FMC-SDA"
-
-# ----------------------------------------------------------------------------
-# FMC Expansion Connector - Bank 33
-# ---------------------------------------------------------------------------- 
-#set_property PACKAGE_PIN AB14 [get_ports {fmc_prsnt}];  # "FMC-PRSNT"
 
 # ----------------------------------------------------------------------------
 # FMC Expansion Connector 
@@ -108,10 +82,6 @@ set_property PACKAGE_PIN C16 [get_ports {FMC_LPC_LA15_N}];  # "FMC-LA15_N"
 set_property PACKAGE_PIN D16 [get_ports {FMC_LPC_LA15_P}];  # "FMC-LA15_P"
 set_property PACKAGE_PIN C17 [get_ports {FMC_LPC_LA16_N}];  # "FMC-LA16_N"
 set_property PACKAGE_PIN D17 [get_ports {FMC_LPC_LA16_P}];  # "FMC-LA16_P"
-
-# ----------------------------------------------------------------------------
-# FMC Expansion Connector 
-# ---------------------------------------------------------------------------- 
 set_property PACKAGE_PIN F10 [get_ports {FMC_LPC_CLK1_M2C_N}];  # "FMC-CLK1_N"
 set_property PACKAGE_PIN G10 [get_ports {FMC_LPC_CLK1_M2C_P}];  # "FMC-CLK1_P"
 set_property PACKAGE_PIN E10 [get_ports {FMC_LPC_LA17_CC_N}];  # "FMC-LA17_CC_N"
@@ -205,21 +175,13 @@ set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA06_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA07_P}]; # FMCOMMS3 RX_D5
 set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA07_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA08_P}]; # FMCOMMS3 TX_FB_CLK_P
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA08_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA09_P}]; # FMCOMMS3 TX_FRAME_P
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA09_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA11_P}]; # FMCOMMS3 TX_D0
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA11_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA12_P}]; # FMCOMMS3 TX_D1
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA12_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA13_P}]; # FMCOMMS3 TX_D2
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA13_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA10_P}]; # FMCOMMS3 TX_D3
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA10_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA14_P}]; # FMCOMMS3 TX_D4
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA14_P}]
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA15_P}]; # FMCOMMS3 TX_D5
-#set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA15_P}]
 
 # Set the bank voltage for IO Bank 35 to 2.5V by default.
 # set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 35]];
@@ -400,6 +362,9 @@ set_clock_groups -asynchronous -group [get_clocks {FMC_LPC_LA00_CC_P}] -group [g
 # because RX_FRAME_P is sampled on the DATA_CLK_P falling edge (we use DDR primitive as a sample-in-the-middle), the rising edge latched output is unconnected and therefore should not be used in timing analysis
 set_false_path -from [get_ports FMC_LPC_LA01_CC_P] -rise_to [get_pins ftop/FMC_data_src_adc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D]
 
+# ----------------------------------------------------------------------------
+# ZCU104 GPIO 
+# ----------------------------------------------------------------------------
 set_property PACKAGE_PIN D5       [get_ports "GPIO_LED_0_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11N_AD9N_88
 set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_LED_0_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11N_AD9N_88
 set_property PACKAGE_PIN D6       [get_ports "GPIO_LED_1_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11P_AD9P_88
