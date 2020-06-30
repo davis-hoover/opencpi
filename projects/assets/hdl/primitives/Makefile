@@ -34,7 +34,8 @@ PrimitiveLibraries=comms_prims \
                    xilinx \
                    zynq \
                    zynq_ultra \
-                   i2c
+                   i2c \
+									 cyclone5
 PrimitiveCores=temac_v6\
                pcie_4243_trn_v6_gtx_x4_250 \
                pcie_4243_hip_s4gx_gen2_x4_128

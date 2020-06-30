@@ -20,7 +20,7 @@
 -- This module adapts between the SDP and an AXI slave interface
 -- The initial target AXI configuration is a 64 bit version of the AXI_HP ports on zynq,
 ---- This AXI is a hardware interface on Zynq
--- Another target is the AXI PCIE bridge, 
+-- Another target is the AXI PCIE bridge,
 ---- This AXI is a VHDL bridge to the underlying PCIE AXI4-lite TLP interface (mostly HW)
 ---- The tax (performace and gates) for using this IP core is unknown
 ---- Can be wide and can have long bursts
@@ -123,6 +123,39 @@ architecture rtl of sdp2axi_AXI_INTERFACE is
   signal pkt_writing_p         : bool_t;
   signal pkt_naxf_p            : pkt_naxf_t;
   signal pkt_dw_addr_p         : whole_addr_t;
+
+  component sdp2axi_wd_AXI_INTERFACE is
+    generic(ocpi_debug      : boolean;
+            axi_width       : natural;
+            sdp_width       : natural);
+    port(   clk             : in  std_logic;
+            reset           : in  bool_t;
+            addressing_done : in  bool_t;           -- addressing is done in/before this cycle
+            pipeline        : in  bool_t;           -- our pipeline state is full
+            sdp             : in  sdp_t;
+            sdp_in_data     : in  dword_array_t(0 to sdp_width-1);
+            sdp_p           : in  sdp_t;
+            axi_in          : in  w_s2m_t;          -- write data channel in to here
+            axi_out         : out w_m2s_t;          -- write data channel out from here
+            taking_data     : out bool_t;           -- indicate data is being used.
+            writing_done    : out bool_t;           -- indicate all data taken.
+            debug           : out ulonglong_t);
+  end component; -- sdp2axi_wd_AXI_INTERFACE;
+
+  component sdp2axi_rd_AXI_INTERFACE is
+    generic(ocpi_debug   : boolean;
+            axi_width    : natural;
+            sdp_width    : natural);
+    port(   clk          : in  std_logic;
+            reset        : in  bool_t;
+            sdp_take     : in  bool_t;
+            sdp_in       : in  s2m_t;
+            sdp_out      : out m2s_t;
+            sdp_out_data : out dword_array_t(0 to sdp_width-1);
+            axi_in       : in  r_s2m_t;   -- read data channel in to here
+            axi_out      : out r_m2s_t;   -- read data channel out from here
+            debug        : out ulonglong_t);
+  end component; -- sdp2axi_rd_AXI_INTERFACE;
 begin
   pkt_dw_addr_0         <= sdp_in.sdp.header.extaddr & sdp_in.sdp.header.addr;
   pkt_ndws_0            <= count_in_dws(sdp_in.sdp.header);
@@ -248,7 +281,7 @@ begin
   axi_out.AW.REGION            <= (others => '0');
   axi_out.AW.QOS               <= (others => '0');
   axi_out.AR.QOS               <= (others => '0');
-#endif  
+#endif
   -- Write address channel
   axi_out.AW.ID                <= (others => '0');  -- spec says same id means in-order
   axi_out.AW.ADDR              <= std_logic_vector(axi_addr) &
@@ -269,8 +302,11 @@ begin
   axi_out.B.READY              <= '1';              -- we are always ready for responses
 
   -- Read address channel
-  axi_out.AR.ID                <= std_logic_vector(sdp_p.header.node(2 downto 0)) &
-                                  std_logic_vector(sdp_p.header.xid);
+  -- TODO add assert to check if ID is smaller than 6 bits.
+  axi_out.AR.ID <= ocpi.util.slv(std_logic_vector(sdp_p.header.node), axi_out.AR.ID'length - sdp_p.header.xid'length) &
+                               std_logic_vector(sdp_p.header.xid);
+  -- axi_out.AR.ID <= std_logic_vector(sdp_p.header.node(2 downto 0)) &
+  --                                 std_logic_vector(sdp_p.header.xid);
   axi_out.AR.ADDR              <= std_logic_vector(axi_addr) &
                                   slv0(width_for_max(axi_in.R.DATA'length/8-1));
   axi_out.AR.LEN               <= std_logic_vector(axi_len);
@@ -305,10 +341,10 @@ begin
     -- slv(to_unsigned(address_state_t'pos(addr_state_r),2)) & -- 13-12
     -- std_logic_vector(pkt_naxf_left(11 to 0)) -- 11 to 0
     );
-    
+
   ----------------------------------------------
   -- Instantiate the write data channel module
-  wd : entity work.sdp2axi_wd_AXI_INTERFACE
+  wd : sdp2axi_wd_AXI_INTERFACE
     generic map (ocpi_debug      => ocpi_debug,
                  axi_width       => axi_width,
                  sdp_width       => sdp_width)
@@ -327,7 +363,7 @@ begin
 
   ----------------------------------------------
   -- Instantiate the read data channel module
-  rd : entity work.sdp2axi_rd_AXI_INTERFACE
+  rd : sdp2axi_rd_AXI_INTERFACE
     generic map (ocpi_debug   => ocpi_debug,
                  axi_width    => axi_width,
                  sdp_width    => sdp_width)

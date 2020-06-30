@@ -1,0 +1,136 @@
+<!-- This file defines the cyclone5_sockit HDL platform -->
+<HdlPlatform Language="VHDL" Spec="platform-spec" version='2'>
+  <SpecProperty Name='platform' Value='cyclone5_sockit'/>
+  <!-- These next two lines must be present in all platforms -->
+  <MetaData Master="true"/>
+  <TimeBase Master="true"/>
+  <!-- This platform worker provides a control plane -->
+  <CPMaster master="true"/>
+  <SDP Name='cyclone5_sockit' Master='true' count='1'/>
+  <!-- Set your time server frequency -->
+  <Device Worker='time_server'>
+    <Property Name='frequency' Value='50e6'/>
+  </Device>
+
+  <!-- <Signal  input='fpga_button_pio' width='4'/>
+  <Signal  input='fpga_dipsw_pio' width='4'/>
+  <Signal output='fpga_led_pio'  width='4'/> -->
+  <signal input="fpga_clk_50"/>
+  <!-- <signal input="fpga_reset_n"/> -->
+  <property name="axi_error" type="bool" arraylength='4' volatile='true'/>
+  <property name="sdpDropCount" type='uchar' volatile='true'/>
+  <signal inout='hps_io_emac1_inst_MDIO' width='1' pin='true'/> <!--E21-->
+  <signal inout='hps_io_qspi_inst_IO0' width='1' pin='true'/> <!--C20-->
+  <signal inout='hps_io_qspi_inst_IO1' width='1' pin='true'/> <!--H18-->
+  <signal inout='hps_io_qspi_inst_IO2' width='1' pin='true'/> <!--A19-->
+  <signal inout='hps_io_qspi_inst_IO3' width='1' pin='true'/> <!--E19-->
+  <signal inout='hps_io_sdio_inst_CMD' width='1' pin='true'/> <!--F18-->
+  <signal inout='hps_io_sdio_inst_D0'  width='1' pin='true'/> <!--G18-->
+  <signal inout='hps_io_sdio_inst_D1'  width='1' pin='true'/> <!--C17-->
+  <signal inout='hps_io_sdio_inst_D2'  width='1' pin='true'/> <!--D17-->
+  <signal inout='hps_io_sdio_inst_D3'  width='1' pin='true'/> <!--B16-->
+  <signal inout='hps_io_usb1_inst_D0'  width='1' pin='true'/> <!--E16-->
+  <signal inout='hps_io_usb1_inst_D1'  width='1' pin='true'/> <!--G16-->
+  <signal inout='hps_io_usb1_inst_D2'  width='1' pin='true'/> <!--D16-->
+  <signal inout='hps_io_usb1_inst_D3'  width='1' pin='true'/> <!--D14-->
+  <signal inout='hps_io_usb1_inst_D4'  width='1' pin='true'/> <!--A15-->
+  <signal inout='hps_io_usb1_inst_D5'  width='1' pin='true'/> <!--C14-->
+  <signal inout='hps_io_usb1_inst_D6'  width='1' pin='true'/> <!--D15-->
+  <signal inout='hps_io_usb1_inst_D7'  width='1' pin='true'/> <!--M17-->
+  <signal inout='hps_io_gpio_inst_GPIO09'  width='1' pin='true'/>  <!--B15-->
+  <signal inout='hps_io_gpio_inst_GPIO35'  width='1' pin='true'/> <!--C19-->
+  <signal inout='hps_io_gpio_inst_GPIO41'  width='1' pin='true'/> <!--C18-->
+  <signal inout='hps_io_gpio_inst_GPIO42'  width='1' pin='true'/> <!--G17-->
+  <signal inout='hps_io_gpio_inst_GPIO43'  width='1' pin='true'/> <!--E18-->
+  <signal inout='hps_io_gpio_inst_GPIO44'  width='1' pin='true'/> <!--E17-->
+  <signal input='oct_rzqin' width='1'/>
+  <!-- <signal output='hps_memory_mem_ck' width='1'/>
+  <signal output='hps_memory_mem_ck_n' width='1'/>
+  <signal output='hps_memory_mem_a' width='17'/>
+  <signal output='hps_memory_mem_act_n' width='1'/>
+  <signal output='hps_memory_mem_ba' width='2'/>
+  <signal output='hps_memory_mem_bg'  width='1'/>
+  <signal output='hps_memory_mem_cke' width='1'/>
+  <signal output='hps_memory_mem_cs_n' width='1'/>
+  <signal output='hps_memory_mem_odt' width='1'/>
+  <signal output='hps_memory_mem_reset_n' width='1'/>
+  <signal output='hps_memory_mem_par' width='1'/>
+  <signal input='hps_memory_mem_alert_n' width='1'/> -->
+
+ <!-- <signal inout='hps_memory_mem_dqs' width='4' pin='true'/>
+ <signal inout='hps_memory_mem_dqs_n' width='4' pin='true'/>
+ <signal inout='hps_memory_mem_dq' width='32' pin='true'/>
+ <signal inout='hps_memory_mem_dbi_n' width='4' pin='true'/>
+
+ <signal input='hps_memory_oct_rzqin'/>
+ <signal input='emif_ref_clk'/>
+
+ <signal output='hps_emac0_TX_CLK'/>
+ <signal output='hps_emac0_TXD0'/>
+ <signal output='hps_emac0_TXD1'/>
+ <signal output='hps_emac0_TXD2'/>
+ <signal output='hps_emac0_TXD3'/>
+ <signal input='hps_emac0_RX_CTL'/>
+ <signal output='hps_emac0_TX_CTL'/>
+ <signal input='hps_emac0_RX_CLK'/>
+ <signal input='hps_emac0_RXD0'/>
+ <signal input='hps_emac0_RXD1'/>
+ <signal input='hps_emac0_RXD2'/>
+ <signal input='hps_emac0_RXD3'/>
+ <signal inout='hps_emac0_MDIO' pin='true'/>
+
+ <signal output='hps_emac0_MDC'/>
+
+
+ <signal inout='hps_sdio_CMD' pin='true'/>
+ <signal inout='hps_sdio_D1' pin='true'/>
+ <signal inout='hps_sdio_D2' pin='true'/>
+ <signal inout='hps_sdio_D3' pin='true'/>
+ <signal inout='hps_sdio_D4' pin='true'/>
+ <signal inout='hps_sdio_D5' pin='true'/>
+ <signal inout='hps_sdio_D6' pin='true'/>
+ <signal inout='hps_sdio_D7' pin='true'/>
+
+ <signal output='hps_sdio_CLK'/>
+
+ <signal inout='hps_usb0_D0' pin='true'/>
+ <signal inout='hps_usb0_D1' pin='true'/>
+ <signal inout='hps_usb0_D2' pin='true'/>
+ <signal inout='hps_usb0_D3' pin='true'/>
+ <signal inout='hps_usb0_D4' pin='true'/>
+ <signal inout='hps_usb0_D5' pin='true'/>
+ <signal inout='hps_usb0_D6' pin='true'/>
+ <signal inout='hps_usb0_D7' pin='true'/>
+ <signal input='hps_usb0_CLK'/>
+ <signal output='hps_usb0_STP'/>
+ <signal input='hps_usb0_DIR'/>
+ <signal input='hps_usb0_NXT'/>
+
+ <signal output='hps_spim1_CLK'/>
+ <signal output='hps_spim1_MOSI'/>
+ <signal input='hps_spim1_MISO'/>
+ <signal output='hps_spim1_SS0_N'/>
+ <signal output='hps_spim1_SS1_N'/>
+
+ <signal output='hps_trace_CLK'/>
+ <signal output='hps_trace_D0'/>
+ <signal output='hps_trace_D1'/>
+ <signal output='hps_trace_D2'/>
+ <signal output='hps_trace_D3'/>
+
+ <signal input='hps_uart1_RX'/>
+ <signal output='hps_uart1_TX'/>
+
+ <signal inout='hps_i2c1_SDA' pin='true'/>
+ <signal inout='hps_i2c1_SCL' pin='true'/>
+
+ <signal inout='hps_gpio_GPIO05' pin='true'/>
+ <signal inout='hps_gpio_GPIO14' pin='true'/>
+ <signal inout='hps_gpio_GPIO16' pin='true'/>
+ <signal inout='hps_gpio_GPIO17' pin='true'/>    -->
+
+  <!-- Put any additional platform-specific properties here using <Property> -->
+  <!-- Put any built-in (always present) devices here using <device> -->
+  <!-- Put any card slots here using <slot> -->
+  <!-- Put ad hoc signals here using <signal> -->
+</HdlPlatform>
