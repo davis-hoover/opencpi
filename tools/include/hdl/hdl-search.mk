@@ -137,6 +137,7 @@ The primitive core/library "$1" was not found in any of these locations: $(call 
 Internal Project Path is: $(OcpiGetProjectPath)
 OCPI_CDK_DIR is: $(OCPI_CDK_DIR)
 HdlLibraries is: $(HdlLibraries) $(Libraries) $(PrimitiveLibraries)
+PWD is: $(CURDIR)
 Remember that a project-qualified library (a.b.c) must be referenced with its qualified name
 endef
 # Search for a primitive library/core by name (maybe qualified), independent of target
@@ -216,22 +217,24 @@ HdlBinExists=\
   $(call HdlChooseHdlBinThatExists,$1,$(HdlBin) $(HdlBinAlternatives_$(HdlToolSet)))
 
 HdlCRF=$(strip \
+ $(foreach p,$(word 1,$(subst :, ,$1)),\
   $(foreach r,\
-    $(or $(and $(HdlBin),$(call HdlSuffixContainsHdlBin,$1),$(call HdlExists,$1)),$(strip \
+    $(or $(and $(HdlBin),$(call HdlSuffixContainsHdlBin,$p),$(call HdlExists,$p)),$(strip \
          $(infox ff:$(filter $2 target-%,$(subst /, ,$1)):$1$(call HdlSuffixContainsHdlBin,$1):$(call HdlBinExists,$1))\
-         $(and $(or $(HdlBin),$(filter $2 target-%,$(subst /, ,$1))),$(call HdlBinExists,$1))),$(strip \
+         $(and $(or $(HdlBin),$(filter $2 target-%,$(subst /, ,$p))),$(call HdlBinExists,$p))),$(strip \
          $(infox ff1:$(filter $2 target-%,$(subst /, ,$1)):$1$(call HdlSuffixContainsHdlBin,$1))\
-         $(call HdlBinExists,$1/target-$2/$3)),$(strip \
-         $(call HdlBinExists,$1/$3)),$(strip \
-         $(call HdlBinExists,$1/$2/$3)),\
-	 $1/$2),\
-     $(infox HCRF:$1,$2,$3->$r,bin:$(call HdlSuffixContainsHdlBin,$1),t:$(HdlTarget))$r))
+         $(call HdlBinExists,$p/target-$2/$3)),$(strip \
+         $(call HdlBinExists,$p/$3)),$(strip \
+         $(call HdlBinExists,$p/$2/$3)),\
+	 $p/$2),\
+     $(infox HCRF:$1,$2,$3->$r,bin:$(call HdlSuffixContainsHdlBin,$1),t:$(HdlTarget))$r)))
 
 # Check for given target or family target
 HdlCoreRef1=$(strip \
-   $(foreach c,$(notdir $1),\
-     $(infox checking $c)$(or $(call HdlExists,$(call HdlCRF,$1,$2,$c)),\
-	  $(and $2,$(call HdlExists,$(call HdlCRF,$1,$(call HdlGetFamily,$2),$c$(infox HdlCoreRef1 returning '$c'for '$1' and '$2')))))))
+  $(foreach c,$(notdir $1),\
+    $(infox checking $c)\
+    $(or $(call HdlExists,$(call HdlCRF,$1,$2,$c)),$(strip\
+         $(and $2,$(call HdlExists,$(call HdlCRF,$1,$(call HdlGetFamily,$2),$c$(infox HdlCoreRef1 returning '$c'for '$1' and '$2'))))))))
 
 # Look everywhere (including component libraries in some modes), return an error if not found
 HdlCoreRef=$(infox HCR:$1:$2:$(HdlMode))$(strip \
@@ -256,7 +259,7 @@ HdlCoreRef=$(infox HCR:$1:$2:$(HdlMode))$(strip \
 #   is a path to a core that should be left as is. If so, return it.
 # If arg 1 is NOT a path that should be left alone, determine the
 #   tool-specific path to the core.
-HdlCoreRefMaybeTargetSpecificFile=$(infox HCRMTSF:$1:$2)$(strip \
+HdlCoreRefMaybeTargetSpecificFile=$(infox HCRMTSF=$1=$2)$(strip \
   $(foreach c,$1,\
     $(if $(and $(findstring /,$c),$(findstring .,$(basename $c)),$(call HdlExists,$c)),\
       $c,\

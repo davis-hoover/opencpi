@@ -109,7 +109,7 @@ else
   $(call OcpiDbgVar,XmlIncludeDirsInternal)
   $(infox HP1:$(HdlPlatforms))
   $(call OcpiDbgVar,HdlPlatforms)
-  SubCores_$(call HdlGetFamily,$(Worker)):=$(Cores)
+  SubCores_$(call HdlGetFamily,$(Worker)):=$(call HdlFindCores,$(Cores))
   OnlyPlatforms:=$(Worker)
   OnlyTargets:=$(call HdlGetFamily,$(Worker))
   override HdlPlatform:=$(Worker)

@@ -24,7 +24,7 @@ endif
 $(call OcpiDbg,Entering hdl-worker.mk)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
 ifneq ($(filter worker,$(HdlMode)),)
-$(foreach t,$(HdlTargets),$(eval SubCores_$t:=$(Cores)))
+$(foreach t,$(HdlTargets),$(eval SubCores_$t:=$(call HdlFindCores,$(Cores))))
 endif
 ifneq ($(filter skeleton generated,$(MAKECMDGOALS)),)
   HdlSkip:=

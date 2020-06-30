@@ -85,6 +85,14 @@ HdlInstanceCfg=$(word 2,$(subst :, ,$1))
 HdlInstanceName=$(word 3,$(subst :, ,$1))
 HdlInstanceWkrCfg=$(call HdlInstanceWkr,$1)$(and $(HdlToolRealCore),$(filter %.vhd,$(ImplFile)),_rv)$(foreach c,$(call HdlInstanceCfg,$1),$(if $(filter 0,$c),,_c$c))
 
+# Do the basic primitive core search, returning target-independent paths
+HdlFindCores=\
+  $(foreach c,$1,\
+    $(if $(findstring /,$c),\
+      $(or $(and $(call HdlExists,$c),$$c:$(notdir $c)),\
+            $(error Primitive core $c (from Cores) not found.)),\
+      $(call HdlSearchPrimitivePath,$c,,HPLx)))
+
 define HdlSetWorkers
   HdlInstances:=$$(and $$(AssyWorkersFile),$$(strip $$(foreach i,$$(shell grep -h -v '\\\#' $$(AssyWorkersFile)),\
 	               $$(if $$(filter $$(call HdlInstanceWkr,$$i),$$(HdlPlatformWorkers)),,$$i))))
@@ -92,11 +100,7 @@ define HdlSetWorkers
   $$(infox HdlSetWorkers:Cores:'$$(Cores)':'$$(HdlWorkers)':'$$(HdlInstances)':'$$(HdlTarget)')
   SubCores_$$(HdlTarget):=$$(call Unique,\
     $$(- Cores) \
-    $$(foreach c,$$(Cores),\
-       $$(if $$(findstring /,$$c),\
-         $$(or $$(and $$(call HdlExists,$$c),$$c:$$(notdir $$c)),\
-              $$(error Primitive core $$c (from Cores) not found.)),\
-         $$(call HdlSearchPrimitivePath,$$c,,HPLx)))\
+    $$(call HdlFindCores,$(Cores))\
     $$(foreach w,$$(HdlWorkers),\
       $$(or $(strip\
         $$(foreach f,$$(strip\
@@ -408,9 +412,9 @@ HdlGetSubCoresFromFile=$(infox GetSubCoresFrom:$(call HdlRmRv,$(basename $1)).co
 #                                 second checking for OpenCPI defined mappings (HdlInstancesForCore - e.g. .wks file)
 #       if there are > 1 instances mapped to by a single core, each instance string must have its prefix and suffix applied before
 #         being assigned to "subcoreinst" and inserted in the constructed/returned element (format <core-name>:<core-path:<instance>)
-HdlCollectCores=$(infox Collect:$(SubCores_$(HdlTarget)):$(HdlTarget))$(strip \
-  $(foreach subcore,$(SubCores_$(HdlTarget)),\
-    $(foreach corename,$(firstword $(subst :, ,$(subcore))),\
+HdlCollectCores=$(infox CollectCore:$(SubCores_$(HdlTarget)):$(HdlTarget))$(strip \
+  $(foreach subcore,$(SubCores_$(HdlTarget)),$(infox subcore=$(subcore))\
+    $(foreach corename,$(firstword $(subst :, ,$(subcore))),$(infox corename=$(corename))\
       $(foreach corepath,$(call HdlCoreRefMaybeTargetSpecificFile,$(corename),$(HdlTarget)),$(infox CorePath:$(corepath))\
         $(if $(or $(filter $1,noinstances),$(if $(HdlToolRequiresInstanceMap_$(HdlToolSet)),,noinstances)),\
           $(corename):$(corepath) $(if $(HdlToolRequiresFullCoreHierarchy_$(HdlToolSet)),$(call HdlGetSubCoresFromFile,$(corepath),,$1)),\
@@ -744,5 +748,34 @@ endef
 
 OcpiPullPkgFiles=$(call Unique,$(filter %_pkg.vhd,$1) $(filter-out %_pkg.vhd,$1))
 
+define HdlInstallLibsAndSources
+  HdlLibsList=install_libs
+
+  $$(HdlLibsList):
+	$(AT)set -vx;for f in $$(HdlActualTargets); do \
+          if test -f $(GeneratedDir)/$(call RmRv,$(LibName)).libs; then \
+	    $$(call ReplaceIfDifferent,$$(strip \
+	        $(GeneratedDir)/$(call RmRv,$(LibName)).libs),$(strip \
+	        $(HdlInstallLibDir)/$$f))\
+          fi;\
+	done
+
+  ifdef HdlToolNeedsSourceList_$(HdlToolSet)
+    HdlSourcesList=install_sources
+
+    $$(HdlSourcesList):
+	$(AT)for f in $$(HdlActualTargets); do \
+          if test -f $(OutDir)target-$$f/$(call RmRv,$(LibName)).sources; then \
+            $$(call ReplaceIfDifferent,$(strip \
+	        $(OutDir)target-$$$$f/$(call RmRv,$(LibName)).sources),$(strip \
+	        $(OutDir)target-$$$$f/$(WorkLib)));\
+          fi;\
+	done
+  endif
+
+  install: $$(HdlLibsList) $$(HdlSourcesList)
+
+endef
+
 include $(OCPI_CDK_DIR)/include/hdl/hdl-search.mk
-endif
+endif # __HDL_MAKE_MK__
