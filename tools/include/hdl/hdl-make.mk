@@ -752,7 +752,7 @@ define HdlInstallLibsAndSources
   HdlLibsList=install_libs
 
   $$(HdlLibsList):
-	$(AT)set -vx;for f in $$(HdlActualTargets); do \
+	$(AT)for f in $$(HdlActualTargets); do \
           if test -f $(GeneratedDir)/$(call RmRv,$(LibName)).libs; then \
 	    $$(call ReplaceIfDifferent,$$(strip \
 	        $(GeneratedDir)/$(call RmRv,$(LibName)).libs),$(strip \
