@@ -22,6 +22,6 @@ SimFiles=\
  $(OCPI_XILINX_TOOLS_DIR)/ISE/verilog/src/glbl.v
 # We need the data plane protocols
 XmlIncludeDirs+=../../../components/specs
-Libraries=xilinx
+Libraries=xilinx util
 OnlyTargets= xilinx #isim virtex5
 include $(OCPI_CDK_DIR)/include/worker.mk
