@@ -19,4 +19,5 @@ launch-children:
   stage: launch-children
   trigger:
     include:
-      - local: .gitlab-ci/centos7-zed.yml
+      - artifact: .gitlab-ci/centos7-zed.yml
+        job: create-children
