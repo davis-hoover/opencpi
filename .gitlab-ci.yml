@@ -11,6 +11,9 @@ create-children:
   script:
     - .gitlab-ci/yaml_generator.py centos7 zed
     - cat .gitlab-ci/centos7-zed.yml
+  artifacts:
+    paths: 
+      - .gitlab-ci/centos7-zed.yml
 
 launch-children:
   stage: launch-children
