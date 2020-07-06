@@ -35,8 +35,8 @@ yml['default'] = {
     'after_script': [
         'if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"; exit 1; fi',
         'rm -f "${CI_PROJECT_DIR}/.success"',
-        'find -not -type d -newerct "$(< timestamp.txt)" > artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.txt',
-        'tar -T artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.txt -cf artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.tar',
+        'find -not -type d -newerct "$(< timestamp.txt)" > "artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.txt"',
+        'tar -T "artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.txt" -cf "artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.tar"',
         'for f in artifacts*.tar; do if [ "$f" != "artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.tar" ]; then rm -rf "$f"; fi; done',
     ],
     'artifacts': {
