@@ -7,7 +7,7 @@ create-children:
   tags:
     - centos7
     - opencpi
-    - shell
+    - docker
   script:
     - .gitlab-ci/yaml_generator.py centos7 zed
     - cat .gitlab-ci/centos7-zed.yml
