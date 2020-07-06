@@ -43,10 +43,9 @@ yml['default'] = {
 }
 
 yml['install-prereqs'] = {
-    'stage': 'prereq',
-    'script': [
-        'yum -y distro-sync',
-        './scripts/install-packages.sh',
+        'stage': 'prereq',
+        'script': [
+        './scripts/install-prerequisites.sh'
         'touch {}/.success"'.format(CI_PROJECT_DIR)
     ]
 }
