@@ -43,7 +43,7 @@ yml['default'] = {
         'when': 'on_success',
         'expire_in': '3d',
         'paths': [
-            'artifacts-"${CI_JOB_STAGE}-${CI_JOB_ID}.tar"'
+            'artifacts-${CI_JOB_STAGE}-${CI_JOB_ID}.tar'
         ]
     }
 }
