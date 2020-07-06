@@ -5,9 +5,9 @@ stages:
 create-children:
   stage: create-children
   tags:
-    - docker
-  variables:
-    IMAGE: 'centos:7'
+    - opencpi
+    - centos7
+    - shell
   script:
     - .gitlab-ci/yaml_generator.py centos7 zed
     - cat .gitlab-ci/centos7-zed.yml
