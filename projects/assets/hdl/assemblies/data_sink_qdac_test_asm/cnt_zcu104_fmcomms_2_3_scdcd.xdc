@@ -21,7 +21,7 @@
 # Clock constraints                                                        #
 ############################################################################
 # 10 ns period = 100000 KHz
-create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i/worker/ps/ps/PS7_i/FCLKCLK[0]}]
+create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i/worker/ps/U0/pl_clk0}]
 
 # ----------------------------------------------------------------------------
 # Clock constraints - platform_ad9361_data_sub.hdl
@@ -38,16 +38,16 @@ create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i
 create_clock -period 5.712 -name FMC_LPC_LA00_CC_P [get_ports {FMC_LPC_LA00_CC_P}]
 
 # FMCOMMS2/3 AD9361 FB_CLK_P (forwarded version of DATA_CLK_P)
-create_generated_clock -name FMC_LPC_LA08_P -source [get_pins {ftop/FMC_platform_ad9361_data_sub_i/worker/mode7.dac_clock_forward/C}] -divide_by 1 -invert [get_ports {FMC_LPC_LA08_P}]
+create_generated_clock -name FMC_LPC_LA08_P -source [get_pins {ftop/FMC_LPC_platform_ad9361_data_sub_i/worker/mode7.dac_clock_forward/C}] -divide_by 1 -invert [get_ports {FMC_LPC_LA08_P}]
 
 # almost exactly the design methodology outlined in "Figure 3-70: Generated Clock in the Fanout Of
 # Master Clock" in
 # https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
-create_generated_clock -name FMC_LPC_LA08_P_DIV4 -divide_by 2 -source [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O}] [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}]
+create_generated_clock -name FMC_LPC_LA08_P_DIV4 -divide_by 2 -source [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O}] [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}]
 
 # following methodology in "Figure 3-77: Muxed Clocks" / "Case in which only the paths A or B or C exist" in https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
-create_generated_clock -name clkdiv2_mux -divide_by 1 -source [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O}] [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
-create_generated_clock -name clkdiv4_mux -divide_by 1 -add master_clock FMC_LPC_LA08_P_DIV4 -source [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}] [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
+create_generated_clock -name clkdiv2_mux -divide_by 1 -source [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O}] [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
+create_generated_clock -name clkdiv4_mux -divide_by 1 -add master_clock FMC_LPC_LA08_P_DIV4 -source [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}] [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
 set_clock_groups -physically_exclusive -group clkdiv2_mux -group clkdiv4_mux
 
 # ----------------------------------------------------------------------------
@@ -461,12 +461,12 @@ set_clock_groups -asynchronous -group [get_clocks {FMC_LPC_LA00_CC_P}] -group [g
 # ----------------------------------------------------------------------------
 
 # because RX_FRAME_P is sampled on the DATA_CLK_P falling edge (we use DDR primitive as a sample-in-the-middle), the rising edge latched output is unconnected and therefore should not be used in timing analysis
-set_false_path -from [get_ports FMC_LPC_LA01_CC_P] -rise_to [get_pins ftop/FMC_data_src_qadc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D]
+set_false_path -from [get_ports FMC_LPC_LA01_CC_P] -rise_to [get_pins ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D]
 
 # ----------------------------------------------------------------------------
 # CLOCK DOMAIN CROSSING / FALSE PATH constraints - data_sink_qdac_ad9361_sub.hdl
 # ----------------------------------------------------------------------------
-set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks -of_objects [get_pins ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.BUFR_inst/O]]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks -of_objects [ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O]]
 set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks FMC_LPC_LA08_P_DIV4]
 
 # ----------------------------------------------------------------------------
