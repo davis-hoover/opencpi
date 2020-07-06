@@ -6,7 +6,6 @@ import sys
 
 hw_platform = sys.argv[2]
 host_platform = sys.argv[1]
-CI_PROJECT_DIR = os.environ.get('CI_PROJECT_DIR')
 
 yml = {}
 
@@ -34,8 +33,8 @@ yml['default'] = {
         'sleep 2',
     ],
     'after_script': [
-        'if [ ! -f {}/.success ]; then {}/.gitlab-ci/upload-failed-job.sh exit 1 fi'.format(CI_PROJECT_DIR, CI_PROJECT_DIR),
-        'rm -f {}/.success'.format(CI_PROJECT_DIR),
+        'if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"; exit 1; fi',
+        'rm -f "${CI_PROJECT_DIR}/.success"',
         'find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt',
         'tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar',
         'for f in artifacts*.tar; do if [ "$f" != "artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar" ]; then rm -rf "$f"; fi; done',
@@ -46,7 +45,7 @@ yml['install-prereqs'] = {
         'stage': 'prereq',
         'script': [
         './scripts/install-prerequisites.sh',
-        'touch {}/.success"'.format(CI_PROJECT_DIR)
+        'touch "${CI_PROJECT_DIR}/.success"'
     ]
 }
 
@@ -54,7 +53,7 @@ yml['build-opencpi'] = {
     'stage': 'build',
     'script': [
         './scripts/install-prerequisites.sh',
-        'touch {}/.success"'.format(CI_PROJECT_DIR)
+        'touch "${CI_PROJECT_DIR}/.success"'
     ]
 }
 

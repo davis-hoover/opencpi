@@ -18,6 +18,7 @@ create-children:
 launch-children:
   stage: launch-children
   trigger:
+    strategy: depend
     include:
       - artifact: .gitlab-ci/centos7-zed.yml
         job: create-children
