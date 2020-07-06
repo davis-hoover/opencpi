@@ -69,7 +69,7 @@ source_cmd = 'source cdk/opencpi-setup.sh -r'
 build_hdl = 'ocpidev build -d {} --hdl-platform {}'
 build_plat = 'ocpidev build hdl platforms -d {} --hdl-platform {}'
 os.chdir(os.path.join(cwd,'..'))
-projects_dir = os.path.abspath('projects')
+projects_dir = 'projects'
 projects = [os.path.join(projects_dir,d) 
             for d in os.listdir(projects_dir) 
             if os.path.isdir(os.path.join(projects_dir, d))
