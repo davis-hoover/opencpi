@@ -589,6 +589,13 @@
     - if: '$CI_HDL_PLATFORM =~ /(^| )e31x|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
     - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +e31x|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
 
+.plutosdr:
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )plutosdr|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )plutosdr|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +plutosdr|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
+
+
 
 ########
 # Misc #
