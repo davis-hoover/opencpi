@@ -135,7 +135,7 @@ stage(stage_name) {
     cached_checkout this, scm
     // sh """git clean -ffdx -e ".jenkins-*/" || :""" // Cleanup (see JENKINS-31924 for formula)
     previous_changesets = find_last_success()
-    def import_config = load("releng/jenkins/runtime/groovy/lib/import_config.groovy")
+    def import_config = load("releng/jenkins/runtime/groovy/shared/import_config.groovy")
     branch_config = import_config()
     // Build Platform*RPMs by walking the branch configuration
     def BSPURLs = [] as Set // If multiple platforms share a repo, only build it once
