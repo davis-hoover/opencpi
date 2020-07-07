@@ -36,12 +36,11 @@ set_time() {
       MSG="Succeeded in setting the time from $1"
     fi
     # AV-5422 Timeout ntpd command after $TIMEOUT in seconds
-    # checks to see if busybox is present without displaying a prompt on error
     if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS > /dev/null 2>&1; then
       echo $MSG
 	elif rdate -p time.nist.gov; then
 	  rdate -s time.nist.gov
-	  echo $MSG
+	  echo time set from time.nist.gov server
     else
       echo ====YOU HAVE NO NETWORK CONNECTION and NO HARDWARE CLOCK====
       echo Set the time using the '"date YYYY.MM.DD-HH:MM[:SS]"' command.
@@ -63,7 +62,7 @@ else
      echo No IP address was detected! No network or no DHCP.
      break;
   fi
-  
+ 
   set_time $4
   # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
   # This may change for 64 bit zynqs

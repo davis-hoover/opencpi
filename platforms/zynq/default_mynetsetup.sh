@@ -22,27 +22,23 @@
 # 2. The core setup HAS been run and you are just setting up a shell or ssh session
 
 # add any additional platform checks into this function
+# For Dev Testing: export OCPI_TOOL_PLATFORM and OCPI_DIR for testing platforms 
+# in the future without touching the set_tool_platform function or script in general
 set_tool_platform() {
-  if test -f /etc/opencpi-release; then #checks to see if xilinx13_4 platform is being ran
-    read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    if [ "$OCPI_TOOL_PLATFORM" == "xilinx13_4" ]; then
-      OCPI_DIR=/mnt/card/opencpi
-    elif [ "$OCPI_TOOL_PLATFORM" == "xilinx19_2_aarch32" ]; then #checks to see if xilinx19_2_aarch32 platform is being ran
-      OCPI_DIR=/run/media/mmcblk0p1/opencpi
+  if test "$OCPI_TOOL_PLATFORM" == ""; then
+    for m in /mnt/card /run/media/mmcblk0p1; do
+      [ -d $m/opencpi ] && OCPI_DIR=$m/opencpi
+    done
+    if test -f release; then  # checks to see if xilinx13_4 platform is being ran
+      read OCPI_RELEASE OCPI_TOOL_PLATFORM HDL_PLATFORM < release
     else
-      echo Error: OCPI_TOOL_PLATFORM not set properly or supported
-      break
+      echo Error: OCPI_TOOL_PLATFORM not set properly, ~/opencpi/release not found
+      break  
     fi
-  else
-    echo Error: OCPI_TOOL_PLATFORM not set properly
-    break  
   fi
 }
 
 trap "trap - ERR; break" ERR; for i in 1; do
-for m in /mnt/card /run/media/mmcblk0p1; do
-  [ -d $m/opencpi ] && OCPI_DIR=$m/opencpi && break
-done
 
 if test "$OCPI_CDK_DIR" = ""; then
   if test "$1" = ""; then
@@ -57,6 +53,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 up
   # udhcpc
   set_tool_platform
+  OCPI_ENABLE_HDL_SIMULATOR_DISCOVERY=0
   # CUSTOMIZE THIS LINE FOR YOUR ENVIRONMENT
   # Second arg is shared file system mount point on development system
   # Third argument is opencpi dir relative to mount point
