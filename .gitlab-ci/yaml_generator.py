@@ -66,6 +66,7 @@ yml['build-opencpi'] = {
 
 cwd = os.path.dirname(sys.argv[0])
 source_cmd = 'source cdk/opencpi-setup.sh -r'
+touch_cmd = 'touch "${CI_PROJECT_DIR}/.success"'
 build_hdl = 'ocpidev build -d {} --hdl-platform {}'
 build_plat = 'ocpidev build hdl platforms -d {} --hdl-platform {}'
 os.chdir(os.path.join(cwd,'..'))
@@ -113,7 +114,8 @@ for project in projects:
             'stage': stage,
             'script': [
                 source_cmd,
-                script
+                script,
+                touch_cmd
             ]
         }
 
