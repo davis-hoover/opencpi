@@ -56,6 +56,7 @@ include:
   # downstream projects
   - /.gitlab-ci/docs.yml
   - /.gitlab-ci/e3xx.yml
+  - /.gitlab-ci/plutosdr.yml
 
 
 # Global before and after scripts to run before and after each job. Overwrite
