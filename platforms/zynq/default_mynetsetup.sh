@@ -24,23 +24,11 @@
 # add any additional platform checks into this function
 # For Dev Testing: export OCPI_TOOL_PLATFORM and OCPI_DIR for testing platforms 
 # in the future without touching the set_tool_platform function or script in general
-set_tool_platform() {
-  if test "$OCPI_TOOL_PLATFORM" == ""; then
-    for m in /mnt/card /run/media/mmcblk0p1; do
-      [ -d $m/opencpi ] && OCPI_DIR=$m/opencpi
-    done
-    if test -f release; then  # checks to see if xilinx13_4 platform is being ran
-      read OCPI_RELEASE OCPI_TOOL_PLATFORM HDL_PLATFORM < release
-    else
-      echo Error: OCPI_TOOL_PLATFORM not set properly, ~/opencpi/release not found
-      break  
-    fi
-  fi
-}
 
 trap "trap - ERR; break" ERR; for i in 1; do
 
 if test "$OCPI_CDK_DIR" = ""; then
+  source ./zynq_setup_common.sh setup.sh time.nist.gov
   if test "$1" = ""; then
      echo It appears that the environment is not set up yet.
      echo You must supply the IP address of the OpenCPI server machine as an argument to this script.
@@ -52,25 +40,15 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 hw ether 00:0a:35:00:01:23
   # ifconfig eth0 up
   # udhcpc
-  set_tool_platform
   OCPI_ENABLE_HDL_SIMULATOR_DISCOVERY=0
   # CUSTOMIZE THIS LINE FOR YOUR ENVIRONMENT
   # Second arg is shared file system mount point on development system
   # Third argument is opencpi dir relative to mount point
   # Fourth argument is backup time server for the time protocol used by the ntp command
   # Fifth arg is timezone spec - see "man timezone" for the format.
-  mkdir -p /mnt/net  # requirement to mount opencpi from host during the zynq_net_setup.sh script
-  source $OCPI_DIR/zynq_net_setup.sh $1 /opt/opencpi cdk time.nist.gov EST5EDT,M3.2.0,M11.1.0
-  # mkdir -p /mnt/ocpi_core
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
-  # mkdir -p /mnt/ocpi_assets
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets /mnt/ocpi_assets
-  # mkdir -p /mnt/ocpi_assets_ts
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets_ts /mnt/ocpi_assets_ts
-  # Below this line other projects can be included
-  # Here is a template of including a BSP project
-  # mkdir -p /mnt/bsp_<bsp_name>
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/bsp_<bsp_name> /mnt/bsp_<bsp_name>
+  
+  source ./zynq_net_setup.sh $1 /opt/opencpi cdk time.nist.gov EST5EDT,M3.2.0,M11.1.0
+  
   # add any commands to be run only the first time this script is run
 
   break # this script will be rerun recursively by setup.sh

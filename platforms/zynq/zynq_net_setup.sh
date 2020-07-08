@@ -23,30 +23,6 @@
 # Set time using ntpd
 # If ntpd fails because it could not find ntp.conf fall back on time server
 # passed in as the first parameter
-set_time() {
-  if test "$1" != -; then
-    echo Attempting to set time from the time server
-    # Calling ntpd without any options will run it as a dameon
-    OPTS=""
-    BUSYBOX_PATH="$OCPI_DIR/$OCPI_TOOL_PLATFORM/bin"
-    TIMEOUT=20
-    MSG="Succeeded in setting the time from $OCPI_DIR/ntp.conf"
-    if [ ! -e $OCPI_DIR/ntp.conf ]; then
-      OPTS="-p $1"
-      MSG="Succeeded in setting the time from $1"
-    fi
-    # AV-5422 Timeout ntpd command after $TIMEOUT in seconds
-    if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS > /dev/null 2>&1; then
-      echo $MSG
-	elif rdate -p time.nist.gov; then
-	  rdate -s time.nist.gov
-	  echo time set from time.nist.gov server
-    else
-      echo ====YOU HAVE NO NETWORK CONNECTION and NO HARDWARE CLOCK====
-      echo Set the time using the '"date YYYY.MM.DD-HH:MM[:SS]"' command.
-    fi
-  fi
-}
 
 if test -z  "$5"; then
   echo You must supply at least 5 arguments to this script.
@@ -62,13 +38,26 @@ else
      echo No IP address was detected! No network or no DHCP.
      break;
   fi
- 
-  set_time $4
+  
+  mkdir -p /mnt/net
+  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net
+  # mkdir -p /mnt/ocpi_core
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
+  # mkdir -p /mnt/ocpi_assets
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets /mnt/ocpi_assets
+  # mkdir -p /mnt/ocpi_assets_ts
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets_ts /mnt/ocpi_assets_ts
+  # Below this line other projects can be included
+  # Here is a template of including a BSP project
+  # mkdir -p /mnt/bsp_<bsp_name>
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/bsp_<bsp_name> /mnt/bsp_<bsp_name>
+  
   # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
   # This may change for 64 bit zynqs
   echo 0 > /sys/module/nfs/parameters/enable_ino64
   # Mount the opencpi development system as an NFS server, onto /mnt/net
-  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net
+  
+  
   # Make sure the hostname is in the host table
   myipaddr=`ifconfig | grep -v 127.0.0.1 | sed -n '/inet addr:/s/^.*inet addr: *\([^ ]*\).*$/\1/p'`
   myhostname=`hostname`
