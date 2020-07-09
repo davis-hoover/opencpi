@@ -265,7 +265,7 @@ test_packaging: exports
 # This should be moved into the packaging subdir...
 .PHONY: tar
 tar: exports
-	$(AT)set -e; file=$(package_name).tar temp=$(mktemp -t tarcmdXXXX); \
+	$(AT)set -e; file=$(package_name).tar temp=$(shell mktemp -t tarcmdXXXX); \
 	     echo Determining tar export file contents for the $(Package) package: $$file.gz; \
 	     (echo "tar -h -f $$file -c \\";\
 	      $(Prepare) |\

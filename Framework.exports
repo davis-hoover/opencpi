@@ -301,4 +301,6 @@
 ################################################################################
 # Man pages (initially premade)
 +doc/man doc/
+# PDFs and HTML (aka gitlab.io)
++.public/releases/* doc/pdfs/
 
