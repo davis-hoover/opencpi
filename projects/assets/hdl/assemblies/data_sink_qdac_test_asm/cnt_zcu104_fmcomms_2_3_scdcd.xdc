@@ -21,7 +21,7 @@
 # Clock constraints                                                        #
 ############################################################################
 # 10 ns period = 100000 KHz
-create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i/worker/ps/U0/pl_clk0}]
+create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i/worker/ps/U0/PS8_i/PLCLK[0]}]
 
 # ----------------------------------------------------------------------------
 # Clock constraints - platform_ad9361_data_sub.hdl
@@ -164,23 +164,22 @@ set_property IOSTANDARD LVCMOS18 [get_ports {FMC_LPC_LA16_P}]; # FMCOMMS2/3 AD93
 # ----------------------------------------------------------------------------
 # IOSTANDARD constraints - platform_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
-
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA00_CC_P}]; # FMCOMMS3 DATA_CLK_P
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA00_CC_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA00_CC_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA01_CC_P}]; # FMCOMMS3 RX_FRAME_P
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA01_CC_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA01_CC_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA02_P}]; # FMCOMMS3 RX_D0
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA02_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA02_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA03_P}]; # FMCOMMS3 RX_D1
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA03_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA03_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA04_P}]; # FMCOMMS3 RX_D2
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA04_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA04_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA05_P}]; # FMCOMMS3 RX_D3
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA05_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA05_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA06_P}]; # FMCOMMS3 RX_D4
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA06_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA06_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA07_P}]; # FMCOMMS3 RX_D5
-set_property DIFF_TERM 1 [get_ports {FMC_LPC_LA07_P}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA07_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA08_P}]; # FMCOMMS3 TX_FB_CLK_P
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA09_P}]; # FMCOMMS3 TX_FRAME_P
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA11_P}]; # FMCOMMS3 TX_D0
@@ -240,72 +239,72 @@ set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA15_P}]; # FMCOMMS3 TX_D5
 # |                     | no-OS init_param member | value | delay(ns)          |
 # | parameter property  |                         |       |                    |
 # ------------------------------------------------------------------------------
-# | DATA_CLK_Delay      | rx_data_clock_delay     | 3     | 0.9                |
+# | DATA_CLK_Delay      | rx_data_clock_delay     | 4     | 1.2                |
 # | Rx_Data_Delay       | rx_data_delay           | 0     | 0.0                |
 # ------------------------------------------------------------------------------
 #
 # ----- calculations
-# skew_bre = -t_DDRx_min + (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.65
-# skew_are =  t_DDRx_max - (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.35
-# skew_bfe = -t_DDRx_min + (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.65
-# skew_afe =  t_DDRx_max - (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.35
-# Rise Max = (period/2) + skew_afe = (5.712/2) + 0.35 = 3.206
-# Rise Min = (period/2) - skew_bfe = (5.712/2) - 0.65 = 2.206
-# Fall Max = (period/2) + skew_are = (5.712/2) + 0.35 = 3.206
-# Fall Min = (period/2) - skew_bre = (5.712/2) - 0.65 = 2.206
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA02_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA02_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA02_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA02_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA02_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA02_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA02_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA02_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA03_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA03_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA03_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA03_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA03_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA03_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA03_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA03_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA04_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA04_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA04_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA04_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA04_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA04_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA04_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA04_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA05_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA05_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA05_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA05_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA05_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA05_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA05_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA05_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA06_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA06_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA06_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA06_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA06_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA06_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA06_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA06_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA07_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA07_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 2.206 [get_ports {FMC_LPC_LA07_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 3.206 [get_ports {FMC_LPC_LA07_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA07_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA07_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA07_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA07_N}]
+# skew_bre = -t_DDRx_min + (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.95
+# skew_are =  t_DDRx_max - (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.05
+# skew_bfe = -t_DDRx_min + (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.95
+# skew_afe =  t_DDRx_max - (DATA_CLK_Delay-Rx_Data_Delay)*0.3 = 0.05
+# Rise Max = (period/2) + skew_afe = (5.712/2) + 0.05 = 2.906
+# Rise Min = (period/2) - skew_bfe = (5.712/2) - 0.95 = 1.906
+# Fall Max = (period/2) + skew_are = (5.712/2) + 2.05 = 2.906
+# Fall Min = (period/2) - skew_bre = (5.712/2) - 0.95 = 1.906
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA02_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA02_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA02_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA02_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA02_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA02_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA02_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA02_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA03_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA03_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA03_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA03_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA03_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA03_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA03_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA03_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA04_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA04_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA04_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA04_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA04_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA04_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA04_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA04_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA05_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA05_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA05_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA05_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA05_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA05_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA05_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA05_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA06_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA06_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA06_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA06_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA06_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA06_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA06_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA06_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA07_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA07_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -min -add_delay 1.906 [get_ports {FMC_LPC_LA07_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -max -add_delay 2.906 [get_ports {FMC_LPC_LA07_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA07_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA07_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA07_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA07_N}]
 # RX_FRAME_P is sampled on the DATA_CLK_P falling edge (we use DDR primitive as a sample-in-the-middle)
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA01_CC_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA01_CC_P}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 2.206 [get_ports {FMC_LPC_LA01_CC_N}]
-set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 3.206 [get_ports {FMC_LPC_LA01_CC_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA01_CC_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA01_CC_P}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA01_CC_N}]
+set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA01_CC_N}]
 
 
 # ----------------------------------------------------------------------------
@@ -342,72 +341,72 @@ set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_de
 # |                     | no-OS init_param member | value | delay(ns)          |
 # | parameter property  |                         |       |                    |
 # ------------------------------------------------------------------------------
-# | FB_CLK_Delay        | tx_fb_clock_delay       | 1     | 0.3                |
+# | FB_CLK_Delay        | tx_fb_clock_delay       | 7     | 2.1                |
 # | TX_Data_Delay       | tx_data_delay           | 0     | 0.0                |
 # ------------------------------------------------------------------------------
 #
 # ----- calculations
-# tsu_r = t_STx_min + (FB_CLK_Delay-TX_Data_Delay)*0.3 =  1.3 (AD9361 datasheet only specifies falling edge requirement, but rising is implied since DDR is used)
-# thd_r = t_HTx_min - (FB_CLK_Delay-TX_Data_Delay)*0.3 = -0.3 (AD9361 datasheet only specifies falling edge requirement, but rising is implied since DDR is used)
-# tsu_f = t_STx_min + (FB_CLK_Delay-TX_Data_Delay)*0.3 =  1.3
-# thd_f = t_HTx_min - (FB_CLK_Delay-TX_Data_Delay)*0.3 = -0.3
+# tsu_r = t_STx_min + (FB_CLK_Delay-TX_Data_Delay)*0.3 =  3.1 (AD9361 datasheet only specifies falling edge requirement, but rising is implied since DDR is used)
+# thd_r = t_HTx_min - (FB_CLK_Delay-TX_Data_Delay)*0.3 = -2.1 (AD9361 datasheet only specifies falling edge requirement, but rising is implied since DDR is used)
+# tsu_f = t_STx_min + (FB_CLK_Delay-TX_Data_Delay)*0.3 =  3.1
+# thd_f = t_HTx_min - (FB_CLK_Delay-TX_Data_Delay)*0.3 = -2.1
 # trce_dly_max is unknown, so value of 0 is used for calculation
 # trce_dly_min is unknown, so value of 0 is used for calculation
-# Rise Max = trce_dly_max + tsu_r = 0 + 1.3    = 1.3
-# Rise Min = trce_dly_min - thd_r = 0 - (-0.3) = 0.3
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA10_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA10_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA10_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA10_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA10_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA10_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA10_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA10_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA11_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA11_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA11_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA11_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA11_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA11_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA11_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA11_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA12_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA12_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA12_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA12_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA12_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA12_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA12_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA12_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA13_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA13_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA13_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA13_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA13_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA13_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA13_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA13_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA14_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA14_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA14_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA14_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA14_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA14_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA14_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA14_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA15_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA15_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA15_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA15_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA15_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA15_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 0.3 [get_ports {FMC_LPC_LA15_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 1.3 [get_ports {FMC_LPC_LA15_N}]
+# Rise Max = trce_dly_max + tsu_r = 0 + 3.1    = 3.1
+# Rise Min = trce_dly_min - thd_r = 0 - (-2.1) = 2.1
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_N}]
 # TX_FRAME_P
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA09_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA09_P}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 0.3 [get_ports {FMC_LPC_LA09_N}]
-set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 1.3 [get_ports {FMC_LPC_LA09_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA09_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA09_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA09_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA09_N}]
 
 # ----------------------------------------------------------------------------
 # INPUT / OUTPUT DELAY constraints - platform_ad9361_data_sub.hdl
@@ -463,11 +462,21 @@ set_clock_groups -asynchronous -group [get_clocks {FMC_LPC_LA00_CC_P}] -group [g
 # because RX_FRAME_P is sampled on the DATA_CLK_P falling edge (we use DDR primitive as a sample-in-the-middle), the rising edge latched output is unconnected and therefore should not be used in timing analysis
 set_false_path -from [get_ports FMC_LPC_LA01_CC_P] -rise_to [get_pins ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D]
 
+
 # ----------------------------------------------------------------------------
 # CLOCK DOMAIN CROSSING / FALSE PATH constraints - data_sink_qdac_ad9361_sub.hdl
 # ----------------------------------------------------------------------------
 set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks -of_objects [ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O]]
 set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks FMC_LPC_LA08_P_DIV4]
+set_clock_groups -asynchronous -group [get_clocks FMC_LPC_LA00_CC_P] -group [get_clocks FMC_LPC_LA08_P]
+set_clock_groups -asynchronous -group [get_clocks clkdiv2_mux] -group [get_clocks clk_fpga_0]
+set_clock_groups -asynchronous -group clk_fpga_0 -group dacd2_clk
+set_false_path -from [get_clocks dacd2_clk] -to [get_clocks FMC_LPC_LA00_CC_P]
+set_false_path -from [get_clocks FMC_LPC_LA00_CC_P] -to [get_clocks dacd2_clk]
+set_false_path -from [get_clocks dacd2_clk] -to [get_clocks FMC_LPC_LA08_P]
+set_false_path -from [get_clocks FMC_LPC_LA08_P] -to [get_clocks dacd2_clk] 
+set_false_path -from [get_clocks clk_fpga_0] -to [get_clocks FMC_LPC_LA08_P]
+
 
 # ----------------------------------------------------------------------------
 # ZCU104 GPIO
