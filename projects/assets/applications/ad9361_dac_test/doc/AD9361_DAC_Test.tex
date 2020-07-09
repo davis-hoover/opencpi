@@ -18,27 +18,25 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ AD9361 DAC Test App Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{AD9361 DAC Test App Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{AD9361 DAC Test App Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
-\usepackage{listings}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
+\newpage
+
+% No revision history
+
+\tableofcontents
+\newpage
 
 \section{Description}
 This application is intended to perform a hardware-in-the-loop test of the ad9361\_dac.hdl worker. The AD9361 has a Built In Self Test (BIST) mode cable of validating in-situ the digital RX/TX data paths without the need for additional external equipment. One of the BIST configurations enables a Linear Feedback Shift Register (LFSR) within the AD9361 and sends the LFSR output to AD9361's ADC data pins. The LFSR generates a Pseudo Random Bit Sequence (PRBS). By using the LFSR algorithm to verify data fidelity after the RX data is registered inside the FPGA, the AD9361-to-FPGA digital RX data path is verified. An additional BIST configuration exists which performs a digital TX-to-RX loopback on the AD9361. By first validating the RX data path with the PRBS BIST, then running a loopback BIST while sending generating LFSR data to the AD9361 TX path while using the LFSR algorithm to verify data fidently after the RX data is registered inside the FPGA, the entire FPGA-to-AD9361-to-FPGA digital RX/TX data path is verfied. For more information on the BIST modes see \cite{adi_bist_doc} and \cite{adi_ug570}. \\ \\

@@ -5293,7 +5293,7 @@
      <text:p text:style-name="List_20_Bullet">The default third-party FPGA simulator <text:span text:style-name="Code"><text:span text:style-name="T326">xsim</text:span></text:span> installation (the Xilinx Vivado XSim simulator installed with the free, unlicensed variant, WebPack, <text:s/>of the Xilinx Vivado Design Suite HLx Edition tool s<text:span text:style-name="T309">et)</text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="List_20_Bullet">(optional) The ANGRYVIPER (AV) Eclipse-based GUI development tool <text:span text:style-name="T234">(</text:span>optionally install<text:span text:style-name="T234">ed with OpenCPI </text:span>as a GUI alternative <text:span text:style-name="T234">to the OpenCPI command-line tools)</text:span></text:p>
+     <text:p text:style-name="List_20_Bullet">(optional) The AV Eclipse-based GUI development tool <text:span text:style-name="T234">(</text:span>optionally install<text:span text:style-name="T234">ed with OpenCPI </text:span>as a GUI alternative <text:span text:style-name="T234">to the OpenCPI command-line tools)</text:span></text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="P77">The <text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.0-rc.1/docs/OpenCPI_Installation_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T10">OpenCPI Installation Guide</text:span></text:a> describes how to install these items. <text:s/>This tutorial assumes that you have, at a minimum, this OpenCPI environment set up on your development host.</text:p>

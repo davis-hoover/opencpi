@@ -41,7 +41,7 @@ Group:          Applications/Engineering
 License:        LGPLv3+
 Source0:        %{RPM_PLATFORM}
 Vendor:         OpenCPI
-Packager:       ANGRYVIPER Team <discuss@lists.opencpi.org>
+Packager:       OpenCPI <discuss@lists.opencpi.org>
 
 %description
 Contains the content needed to deploy opencpi to %{RPM_PLATFORM}

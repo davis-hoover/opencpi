@@ -34,8 +34,8 @@ Summary:   The OpenCPI Linux Kernel Driver
 Group:     System Environment/Kernel
 
 License:   LGPLv3+
-Vendor:    ANGRYVIPER Team
-Packager:  ANGRYVIPER Team <discuss@lists.opencpi.org>
+Vendor:    OpenCPI
+Packager:  OpenCPI <discuss@lists.opencpi.org>
 
 # BuildRoot is deprecated, but maybe this was for OLD rpmbuild in centos6?
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot

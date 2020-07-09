@@ -18,23 +18,15 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ Rx App Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{Rx App Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{Rx App Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
-
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
 % note that postbreak breaks copy/paste
 \lstset{
   language=bash,
@@ -47,12 +39,13 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
   upquote=true,
   %postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}, % https://tex.stackexchange.com/a/116572
   aboveskip=\baselineskip,
-  belowskip=\baselineskip}
+  belowskip=\baselineskip
+}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
-
+\thispagestyle{empty}
 \newpage
 
 	\begin{center}

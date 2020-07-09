@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
+\iffalse
 %----------------------------------------------------------------------------------------
 % Update the docTitle and docVersion per document
 %----------------------------------------------------------------------------------------
@@ -38,28 +39,35 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \graphicspath{ {figures/} }
 
 \begin{document}
+\fi
 
-\section*{Summary - \Comp}
-\begin{tabular}{|c|M{13.5cm}|}
-	\hline
-	\rowcolor{blue}
-	                  &                        							\\
-	\hline
-	Name              & \comp                  							\\
-	\hline
-	Worker Type       & Application            							\\
-	\hline
-	Version           & \docVersion                  							\\
-	\hline
-	Release Date      & 4/2019           						\\
-	\hline
-	Component Library & ocpi.assets.misc\_comps					\\
-	\hline
-	Workers           & \comp.hdl              							\\
-	\hline
-	Tested Platforms  & isim, xsim, modelsim, zed, matchstiq\_z1, e3xx, alst4, ml605	\\
-	\hline
-\end{tabular}
+%----------------------------------------------------------------------------------------
+% Required document specific properties
+%----------------------------------------------------------------------------------------
+\def\comp{timeiq\_{}to\_{}iqstream}
+\def\ecomp{timeiq_to_iqstream}
+\def\Comp{TimeIQ to IQstream}
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{4/2019}
+\def\componentlibrary{ocpi.assets.misc\_{}comps}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{alst4, e3xx, isim, matchstiq\_{}z1, ml605, modelsim, xsim, zed}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 \begin{flushleft}

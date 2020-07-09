@@ -18,27 +18,20 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ fmcomms\_2\_3\_tx.rcc Test App Guide}
-\def\docVersion{1.4}
-%----------------------------------------------------------------------------------------
+\def\docTitle{fmcomms\_{}2\_{}3\_{}tx.rcc Test App Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{fmcomms\_2\_3\_tx.rcc Test App Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
-\usepackage{listings}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
+\newpage
 
 \begin{center}
   \textit{\textbf{Revision History}}
@@ -55,6 +48,10 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
   v1.5 & Version bump only. & 4/2019 \\
   \hline
 \end{longtable}
+\newpage
+
+\tableofcontents
+\newpage
 
 \section{Description}
 This application is intended to perform a hardware-in-the-loop test of the fmcomms\_2\_3\_tx.rcc worker. It tests to ensure that the default values and the expected possible min/max values are applied successfully for the various RF frontend parameters. It also tests that fmcomms\_2\_3\_tx.rcc property writes do not override the fmcomms\_2\_3\_rx.rcc worker property writes when both exist in the OAS. Note that TX data fidelity is not verified within this test.
