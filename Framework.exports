@@ -1,0 +1,304 @@
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# distributed with this source distribution.
+#
+# This file is part of OpenCPI <http://www.opencpi.org>
+#
+# OpenCPI is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+################################################################################
+#
+# THIS IS NOT A PROJECT EXPORTS FILE EVEN THOUGH IT IS SIMILAR
+# There are implicit links based on "places", with rules described below.
+# + lines means additions to cdk development package
+# = lines means additions to cdk runtime and development packages
+# - lines means remove links implied by other rules
+#
+# The "places" rules are about framework headers, libraries, and programs.
+# In general, programs go in bin, libraries and swigs go in lib, API headers go into include/aci
+#
+# For runtime, only driver/plugin libraries go in lib, (and later, dynamic libraries)
+# For runtime, tool programs are not exported.
+# For programs, they can specify a subdirectory of bin.  If that subdirectory is "internal",
+# they are not exported at all.
+#
+# There are other "final" actions that happen during this export:
+# - compile python programs and scripts
+
+# exclusions, sometimes only applying to categories
+#-runtime/util main
+#-runtime/dataplane main
+#-runtime/ctests
+#+|runtime/ctests/target-<target>/test_[^.]* bin/<target>/ctests/
+# In dynamic mode when this library is not statically linked
+#+|runtime/ctests/target-<target>/libocpi_ctests.(so|dylib) bin/<target>/ctests/
+-tests library
+-runtime/dataplane/xfer/tests library
+# This is a broad, platform independent default...
+=tools/default-system.xml
+# More or less obsolete env scripts, left in for compatibility, put in runtime just to match
+# up with 1.3.1
+=env/altera.sh env/
+=env/clean-env.sh env/
+=env/finish.sh env/
+=env/start.sh env/
+=env/xilinx.sh env/
+# This is what is run from /etc/profile.d/opencpi.sh from RPMs.
+# We need to rationalize this with opencpi-setup.sh
+=env/rpm_cdk.sh env/
+=packaging/dist/env.d/* env.d/
++tools/python/_opencpi/__init__.py <target>/lib/_opencpi/
++tools/python/_opencpi/util/__init__.py <target>/lib/_opencpi/util/
++tools/python/_opencpi/util/__init__.py <target>/lib/_opencpi/util/
++tools/python/_opencpi/util/file.py <target>/lib/_opencpi//util/
++tools/python/_opencpi/util/project.py <target>/lib/_opencpi/util/
++tools/python/_opencpi/util/report.py <target>/lib/_opencpi/util/
++tools/ocpidev/hdltools/__init__.py <target>/lib/_opencpi/hdltools/
++tools/ocpidev/hdltools/quartus.py <target>/lib/_opencpi/hdltools/
++tools/ocpidev/hdltools/vivado.py <target>/lib/_opencpi/hdltools/
++tools/ocpidev/hdltools/_xilinx.py <target>/lib/_opencpi/hdltools/
++tools/ocpidev/hdltools/xst.py <target>/lib/_opencpi/hdltools/
++tools/ocpidev/hdlreportableitem.py <target>/lib/_opencpi/
++tools/ocpidev/hdltargets.py <target>/lib/_opencpi/
++tools/ocpidev/assets/abstract.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/application.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/assembly.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/factory.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/__init__.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/library.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/platform.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/project.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/registry.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/test.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/worker.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/template.py <target>/lib/_opencpi/assets/
++tools/ocpidev/assets/component.py <target>/lib/_opencpi/assets/
++tools/ocpidev/ocpidev.sh <target>/bin/ocpidev
++tools/ocpidev/ocpidev_run.py scripts/
++tools/ocpidev/ocpishow.py scripts/
++tools/ocpidev/ocpidev_utilization.py scripts/
++tools/ocpidev/ocpicreate.py scripts/
+# generic make scripts
++tools/include/show.mk include/
++tools/include/lib.mk include/
++tools/include/library.mk include/
++tools/include/util.mk include/
++tools/include/package.mk include/
++tools/include/worker.mk include/
++tools/include/xxx-worker.mk include/
++tools/include/ocpisetup.mk include/
++tools/include/test.mk include/
++tools/include/ocpisetup.mk
++tools/include/libraries.mk include/
++tools/include/project.mk include/
++tools/include/applications.mk include/
++tools/include/application.mk include/
++tools/include/aci.mk include/
++tools/include/setup-target-platform.mk include/
++tools/include/platform-defaults.mk include/
+# CDK scripts we need
++scripts/clean-env.sh scripts/
+# This is runtime although this one script deals with initialization issues
+# for development time tool.  An acceptable "runtime bloat" to keep this gnarly bootstrapping
+# stuff in one place.
+=tools/scripts/opencpi-setup-internal.sh opencpi-setup.sh
++tools/scripts/setup-prerequisite.sh scripts/
++tools/scripts/setup-prereq-dirs.sh scripts/
++tools/scripts/getPlatform.sh scripts/
++tools/scripts/ocpigui.sh <target>/bin/ocpigui
++tools/scripts/ocpiav.sh <target>/bin/ocpiav
++tools/scripts/ocpiav.desktop scripts/
++tools/scripts/export-platform.sh scripts/
++tools/scripts/export-utils.sh scripts/
++tools/scripts/export-platform-to-framework.sh scripts/
+# Put this script where the executables are exported to run there - needed?
+=runtime/ctests/src/run_tests.sh <target>/bin/ctests/
+#+runtime/ctests/src/run_tests.sh scripts/
+# this is built like runtime, but needs to be exported for development
+# so it is "place" in the internal dir to avoid runtime, and exported explicitly for devel
+# we are removing it from the distribution entirely before deciding about the RH stuff
+#+build/autotools/target-<target>/staging/bin/internal/ocpisca <target>/bin/
+# Allow installations to run this, but not documented yet
+# It will run only runtime env tests if that's where it is
+# Perhaps migrate this to bin with a new name at some point
+
+=scripts/test-opencpi.sh <target>/bin/ocpitest
++tools/scripts/makeStaticWorker.sh scripts/
+=tools/scripts/ocpidriver scripts/
+=tools/scripts/ocpisetup.sh scripts/
+=tools/scripts/ocpibootstrap.sh scripts/
+=tools/scripts/ocpisudo scripts/
++tools/scripts/ocpitarget.sh scripts/
++tools/scripts/ocpidev scripts/
++tools/scripts/ocpishow.py scripts/
++tools/scripts/ocpidev_utilization.py scripts/
++tools/scripts/ocpidev_run.py scripts/
++tools/scripts/ocpiassets.py scripts/
++tools/scripts/ocpiutil.py scripts/
++tools/scripts/hdltargets.py scripts/
++tools/scripts/hdlreportableitem.py scripts/
++tools/scripts/hdltools/__init__.py scripts/hdltools/
++tools/scripts/hdltools/quartus.py scripts/hdltools/
++tools/scripts/hdltools/vivado.py scripts/hdltools/
++tools/scripts/hdltools/_xilinx.py scripts/hdltools/
++tools/scripts/hdltools/xst.py scripts/hdltools/
++tools/scripts/upgradeApp_v1_3.py scripts/
++tools/ocpidev/ocpidev_bash_complete.sh scripts/ocpidev_bash_complete
+=tools/scripts/util.sh scripts/
++tools/scripts/testrunprep.sh scripts/
++tools/scripts/testrunremote.sh scripts/
++tools/scripts/testrun.sh scripts/
++tools/scripts/testutil.sh scripts/
++tools/scripts/setsid.py scripts/
++tools/scripts/freeze_project.sh scripts/
++tools/scripts/thaw_project.sh scripts/
++tools/scripts/export-project.sh scripts/
++tools/scripts/export-file.sh scripts/
++tools/scripts/deploy-platform.sh scripts/
+# user level scripts made available in the bin directory
++tools/scripts/ocpidev <target>/bin/
++tools/scripts/ocpi-copy-projects.py <target>/bin/ocpi-copy-projects
+=tools/scripts/ocpidriver <target>/bin/
++tools/scripts/genProjMetaData.py scripts/
+#+tools/scripts/genProjMetaData.pyc scripts/
+#+tools/scripts/genProjMetaData.pyo scripts/
++tools/specs/* specs/
++hdl/devices/specs/lime-iq-properties.xml specs/
++hdl/devices/specs/dac-properties.xml specs/
+# linux driver
+=os/linux/driver/99-opencpi.rules <target>/lib/
+=os/linux/driver/mdev-opencpi.rules <target>/lib/
+=os/linux/driver/target-<target>/opencpi*.ko <target>/lib/
+=os/linux/driver/ocpi_linux_driver scripts/
+################################################################################
+# Python related exclusions and additions
+# It is runtime for systems that have python, but non-python platforms can exclude it
+# SWIG:
+=runtime/python/opencpi/__init__.py <target>/lib/opencpi/
+# Colors for verification scripts:
++tools/python/opencpi/colors.py <target>/lib/opencpi/
+# Utilities for unit test scripts
++tools/python/opencpi/unit_test_utils.py <target>/lib/opencpi/
++tools/python/opencpi/complexshortwithmetadata_utils.py <target>/lib/opencpi/
++tools/python/opencpi/iqstream_utils.py <target>/lib/opencpi/
++tools/python/opencpi/dsp_utils.py <target>/lib/opencpi/
+################################################################################
+# RCC related exclusions and additions
+# We don't want everything so we are selective here.  was: +tools/include/rcc include/rcc
+# After more cleanup we may be able to default to everything
++runtime/rcc/include/RCC_Worker.h include/rcc/
++runtime/container/include/OcpiContainerRunConditionApi.h include/rcc/
++os/interfaces/include/OcpiConfigApi.h include/rcc/
++tools/include/rcc/rcc-targets.mk include/rcc/
++tools/include/rcc/rcc-make.mk include/rcc/
++tools/include/rcc/rcc-worker.mk include/rcc/
++tools/include/rcc/default.mk include/rcc/
+# OCL additions
++tools/include/ocl/ocl-make.mk include/ocl/
++tools/include/ocl/ocl-worker.mk include/ocl/
++runtime/ocl/include/OCL_Worker.h include/ocl/
+# We export everything in tools/include/hdl, although we could be more careful...
++tools/include/hdl/* include/hdl/
+# These three are links for bootstrapping purposes only
+-tools/include/hdl/altera.mk
+-tools/include/hdl/xilinx.mk
+-tools/include/hdl/vivado.mk
+# These should be in a common-to-zynq-platforms dir in "platforms"...
+# +tools/include/rcc/linux-c6-x86_64=linux-zynq-arm.mk include/rcc/
+# +tools/include/rcc/linux-c7-x86_64=linux-zynq-arm.mk include/rcc/
+# These are to allow them carefully for RCC workers that access other workers in the app
+# They are currently redundant with the top level include, but they are here so we can
+# Ultimately control visibility for workers
+# Expose API headers to the ACI - this is mostly automated *Api.h
++runtime/application/include/OcpiApi.h include/aci/OcpiApi.hh
+# These are horrible, but until we get multiple slaves, we need them
++runtime/application/include/OcpiApi.h include/rcc/OcpiApi.hh
++runtime/application/include/OcpiApi.h include/rcc/OcpiApi.h
++os/interfaces/include/OcpiOsDebugApi.h include/rcc/OcpiOsDebugApi.hh
++runtime/application/include/OcpiApplicationApi.h include/rcc/
++runtime/container/include/OcpiContainerApi.h include/rcc/
++runtime/util/ior/include/OcpiCorbaApi.h include/rcc/
++runtime/util/property/include/OcpiPValueApi.h include/rcc/
++runtime/util/property/include/OcpiUtilDataTypesApi.h include/rcc/
++runtime/util/property/include/OcpiUtilPropertyApi.h include/rcc/
++runtime/util/misc/include/OcpiUtilExceptionApi.h include/rcc/
++runtime/library/include/OcpiLibraryApi.h include/rcc/
+# End of undocumented temporary stuff until multi-slaves
+################################################################################
+# HDL related exclusions and additions
+# test executables to suppress
+-runtime/hdl-support/target-/testRpl
+# -runtime/hdl-support/target-/ocpinft
+# test scripts to suppress that we want to keep in the repo
+-runtime/hdl-support/scripts/testDMA
+-runtime/hdl-support/scripts/donft
+-runtime/hdl-support/scripts/dmaTestBasic
+# base vendor-specific scripts not in a platform and not in hdl-support
+=runtime/hdl-support/altera/altera.mk include/hdl/
+=runtime/hdl-support/altera/loadFlash_altera scripts/
+=runtime/hdl-support/altera/probeJtag_altera scripts/
+=runtime/hdl-support/xilinx/loadFlash_xilinx scripts/
+=runtime/hdl-support/xilinx/probeJtag_xilinx scripts/
+=runtime/hdl-support/xilinx/findJtagByESN_xilinx scripts/
+=runtime/hdl-support/xilinx/getESNfromUSB_xilinx scripts/
+=runtime/hdl-support/scripts/loadBitStream scripts/
++runtime/hdl-support/xilinx/xilinx.mk include/xilinx/
+# for backward compatibility
++runtime/hdl-support/xilinx/xilinx.mk include/hdl/
++runtime/hdl-support/xilinx/xilinx-rcc-platform.mk include/xilinx/
++runtime/hdl-support/xilinx/xilinx-rcc-platform-definition.mk include/xilinx/
++platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
++platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
++runtime/hdl-support/xilinx/createXilinxLinuxKernelHeaders.sh scripts/xilinx/
++runtime/hdl-support/xilinx/importXilinxRelease.sh scripts/xilinx/
++runtime/hdl-support/xilinx/importSDKartifacts.sh scripts/xilinx/
++runtime/hdl-support/xilinx/createXilinxRccPlatform.sh scripts/xilinx/
++runtime/hdl-support/xilinx/vivado* include/hdl/
+=runtime/hdl-support/scripts/loadFlash <target>/bin/
+=runtime/hdl-support/scripts/probeJtag <target>/bin/
++runtime/hdl-support/scripts/ocpiview <target>/bin/
+# Enable all local bitstreams to be seen in one place for convenience of OCPI_LIBRARY_PATH
++hdl/assemblies/*/container-*/target-*/*.bitz lib/hdl/assemblies/
+# for backward compatibility of system.xml files
++runtime/dataplane/xfer/drivers/socket/target-<target>/libocpi_socket.* <target>/lib/libocpi_sockets<suffix>
++runtime/dataplane/xfer/drivers/socket/target-<target>/libocpi_socket_s.* <target>/lib/libocpi_sockets_s<suffix>
+################################################################################
+# SCA/RH related additions.
+#+tools/ocpirh/ocpirh_export.sh <target>/bin/ocpirh_export
+#+tools/ocpirh/target-<target>/ocpirh_proxy <target>/bin/
+################################################################################
+# GNU Radio related additions.
++tools/ocpigr/target-<target>/ocpigr <target>/bin/
+################################################################################
+# Kernel module and main license files
+#+LICENSE.txt <target>/lib/
+=LICENSE.txt
+=COPYRIGHT
+################################################################################
+# automake related exclusions and additions
+#+tools/include/autoconfig_import.mk include/
+# Until wildcards are supported, the cross-compiled platforms:
+#+tools/include/autoconfig_import-zed.mk include/
+#+tools/include/autoconfig_import-pico_t6a.mk include/
+=projects/assets/applications/*.xml applications/
+=projects/assets/applications/test.input applications/
+=projects/assets/applications/run.sh applications/
+################################################################################
+# XML files required when building containers that are not real workers
++projects/core/hdl/primitives/platform/*.xml include/hdl/
++runtime/remote-support/scripts/* scripts/
++runtime/remote-support/scripts/ocpiremote.py <target>/bin/ocpiremote
+################################################################################
+# Man pages (initially premade)
++doc/man doc/
+

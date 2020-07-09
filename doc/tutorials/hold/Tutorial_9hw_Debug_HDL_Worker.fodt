@@ -3681,7 +3681,7 @@
       <text:p text:style-name="P55"><text:bookmark-start text:name="__DdeLink__23639_548880921"/><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T47">OpenCPI</text:span></text:a><text:bookmark-end text:name="__DdeLink__23639_548880921"/></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C2" office:value-type="string">
-      <text:p text:style-name="P55"><text:bookmark text:name="__DdeLink__23641_548880921"/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/Overview.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P55"><text:bookmark text:name="__DdeLink__23641_548880921"/><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/Overview.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/develop/docs/Overview.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -3703,7 +3703,7 @@
       <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T47">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C4" office:value-type="string">
-      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -3714,7 +3714,7 @@
       <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T47">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C5" office:value-type="string">
-      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -3725,7 +3725,7 @@
       <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T47">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C6" office:value-type="string">
-      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table4.1">
@@ -3736,13 +3736,13 @@
       <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T47">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table4.C7" office:value-type="string">
-      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/v1.6.0-rc.0/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P55"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T48">https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
    <text:p text:style-name="P20"><text:bookmark-end text:name="__DdeLink__78971_4114161630"/><text:span text:style-name="Default_20_Paragraph_20_Font"/></text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc98672_3495623107"/>Step 1: Build HDL Worker <text:span text:style-name="T10">(Xilinx XSIM)</text:span><text:bookmark-end text:name="__RefHeading___Toc98672_3495623107"/></text:h>
-   <text:p text:style-name="Body"><text:span text:style-name="T3">To build the HDL worker using the ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="Body"><text:span text:style-name="T3">To build the HDL worker using the AV GUI</text:span>:</text:p>
    <text:list xml:id="list131141808804521" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57">&quot;Refresh&quot; the Project Explorer panel.</text:p>
@@ -3769,7 +3769,7 @@
    <text:p text:style-name="P13">To build the HDL worker using the <text:span text:style-name="T35">ocpidev</text:span> command:</text:p>
    <text:p text:style-name="P13">TBD</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc98674_3495623107"/>Step 2: Build Unit Test (Xilinx XSIM)<text:bookmark-end text:name="__RefHeading___Toc98674_3495623107"/></text:h>
-   <text:p text:style-name="P34">To build the unit test using the ANGRYVIPER GUI:</text:p>
+   <text:p text:style-name="P34">To build the unit test using the AV GUI:</text:p>
    <text:list xml:id="list131142390516364" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57">Remove the <text:span text:style-name="T12">w</text:span>orker from the Project Operations panel.</text:p>
@@ -3797,7 +3797,7 @@
    <text:p text:style-name="P13">TBD</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc98676_3495623107"/>Step 3a: Run Unit Test <text:bookmark-end text:name="__RefHeading___Toc98676_3495623107"/></text:h>
    <text:p text:style-name="P24">First, run the <text:span text:style-name="T4">u</text:span>nit <text:span text:style-name="T4">t</text:span>est <text:span text:style-name="T4">s</text:span>uite for the target simulation platform. </text:p>
-   <text:p text:style-name="P24"><text:span text:style-name="T3">Using the ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="P24"><text:span text:style-name="T3">Using the AV GUI</text:span>:</text:p>
    <text:list xml:id="list131142392577979" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57">Add the <text:span text:style-name="T14">u</text:span>nit <text:span text:style-name="T14">t</text:span>est to the Project Operations panel.</text:p>
@@ -3826,7 +3826,7 @@
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc98678_3495623107"/>Step 3a: Run Unit Test and Change Count<text:bookmark-end text:name="__RefHeading___Toc98678_3495623107"/></text:h>
    <text:p text:style-name="P24"><text:span text:style-name="T15">First, e</text:span>dit counter.test/counter-test.xml to test the value &quot;9&quot; for the &quot;max&quot; property.</text:p>
    <text:p text:style-name="P24"><text:span text:style-name="T15">Next, r</text:span>egenerate the application XML. </text:p>
-   <text:p text:style-name="P24"><text:span text:style-name="T3">Using</text:span> the <text:span text:style-name="T3">ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="P24"><text:span text:style-name="T3">Using</text:span> the <text:span text:style-name="T3">AV GUI</text:span>:</text:p>
    <text:list xml:id="list131143404509707" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57"><text:span text:style-name="T15">A</text:span>dd the <text:span text:style-name="T16">u</text:span>nit <text:span text:style-name="T16">t</text:span>est to the Project Operations panel.</text:p>
@@ -3849,7 +3849,7 @@
    <text:p text:style-name="Body"><text:span text:style-name="T3">Finally, r</text:span>eview gen/applications/*.xml(s) to ensure the max value has been updated.</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc98680_3495623107"/>Step 3a: Run Unit Test and Change Count (con’t.)<text:bookmark-end text:name="__RefHeading___Toc98680_3495623107"/></text:h>
    <text:p text:style-name="P25"><text:span text:style-name="T3">R</text:span>erun the Unit Test with the new maximum value.</text:p>
-   <text:p text:style-name="P34">Using the ANGRYVIPER GUI:</text:p>
+   <text:p text:style-name="P34">Using the AV GUI:</text:p>
    <text:list xml:id="list131143178320742" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57">Check &quot;keep simulations&quot; so that we can see the waveform output later <text:span text:style-name="T15">on.</text:span></text:p>
@@ -6055,11 +6055,11 @@
    <text:p text:style-name="Body">Edit the counter-test.xml to set ocpi_debug to false and true</text:p>
    <text:p text:style-name="P16">&lt;Property Name=&apos;ocpi_debug&apos; Values=&apos;false,true&apos;&gt;&lt;/Property&gt;</text:p>
    <text:p text:style-name="Body">&quot;<text:span text:style-name="T3">C</text:span>lean&quot; <text:span text:style-name="T20">counter.hdl and counter.test.</text:span></text:p>
-   <text:p text:style-name="Body">Using the ANGRYVIPER GUI: [TBD]</text:p>
+   <text:p text:style-name="Body">Using the AV GUI: [TBD]</text:p>
    <text:p text:style-name="Body">Using the ocpidev command: TBD]</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc98688_3495623107"/>Steps 5 and 6: Build the Worker and Assembly for the Hardware<text:bookmark-end text:name="__RefHeading___Toc98688_3495623107"/></text:h>
    <text:p text:style-name="P26">First, build the HDL Worker for Zynq targets. </text:p>
-   <text:p text:style-name="P26"><text:span text:style-name="T3">Using</text:span> the <text:span text:style-name="T3">ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="P26"><text:span text:style-name="T3">Using</text:span> the <text:span text:style-name="T3">AV GUI</text:span>:</text:p>
    <text:list xml:id="list131143532163027" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57">Add the App Worker to the Project Operations panel.</text:p>
@@ -6080,7 +6080,7 @@
    <text:p text:style-name="Standard">Using the <text:span text:style-name="T35">ocpidev</text:span> command:</text:p>
    <text:p text:style-name="P13">TBD</text:p>
    <text:p text:style-name="Body">N<text:span text:style-name="T21">ext,</text:span> build the <text:span text:style-name="T21">u</text:span>nit <text:span text:style-name="T21">t</text:span>est <text:span text:style-name="T21">s</text:span>uite for the target hardware platform. </text:p>
-   <text:p text:style-name="Body"><text:span text:style-name="T3">Using the ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="Body"><text:span text:style-name="T3">Using the AV GUI</text:span>:</text:p>
    <text:list xml:id="list131142555646589" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57">Remove the <text:span text:style-name="T3">a</text:span>pp <text:span text:style-name="T3">w</text:span>orker from the Project Operations panel.</text:p>
@@ -6140,7 +6140,7 @@
    </text:list>
    <text:p text:style-name="P15">&quot;source /mnt/card/opencpi/mynetsetup.sh &lt;Host <text:span text:style-name="T29">IP</text:span> address&gt;&quot;</text:p>
    <text:h text:style-name="P66" text:outline-level="3">Run Unit Test</text:h>
-   <text:p text:style-name="Body"><text:span text:style-name="T53">T</text:span>o run the unit test on the remote platform <text:span text:style-name="T53">using the ANGRYVIPER GUI:</text:span></text:p>
+   <text:p text:style-name="Body"><text:span text:style-name="T53">T</text:span>o run the unit test on the remote platform <text:span text:style-name="T53">using the AV GUI:</text:span></text:p>
    <text:list xml:id="list131142341567638" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P57">Add counter.test to the Project Operations <text:span text:style-name="T30">p</text:span>anel.</text:p>

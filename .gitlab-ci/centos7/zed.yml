@@ -102,7 +102,7 @@ build-devices-core:centos7:zed:
     - build-primitives:centos7:zed
 
 build-devices-platform:centos7:zed:
-  extends: 
+  extends:
     - .build-devices-platform
     - .zed-centos7
   needs:
@@ -194,7 +194,7 @@ build-platforms-core:centos7:zed:
     - build-components-core:centos7:zed
 
 build-platforms-platform:centos7:zed:
-  extends: 
+  extends:
     - .build-platforms-platform
     - .zed-centos7
   needs:

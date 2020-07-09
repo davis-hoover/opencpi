@@ -30,7 +30,12 @@ set -e
 source ./scripts/init-opencpi.sh
 # Ensure CDK and TOOL variables
 OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh; source $OCPI_BOOTSTRAP
-make deploy Platforms=$1:$2
-# add the one missing piece, which is the test bitstream.
-cp -L projects/assets/hdl/assemblies/testbias/container-testbias_${1}_base/target-*/*.bitz \
-   cdk/$1/sdcard-$2/opencpi/$2/artifacts
+
+[ "$1" = -v ] && verbose=-v && shift
+# Get the platform info from the "make" world so that it is in the environment
+# for the internal script below
+source $OCPI_CDK_DIR/scripts/util.sh
+setVarsFromMake $OCPI_CDK_DIR/include/hdl/hdl-targets.mk ShellHdlTargetsVars=1
+setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
+export OCPI_ALL_RCC_PLATFORMS="$RccAllPlatforms" OCPI_ALL_HDL_PLATFORMS="$HdlAllPlatforms"
+$OCPI_CDK_DIR/scripts/deploy-platform.sh $verbose $2 $1

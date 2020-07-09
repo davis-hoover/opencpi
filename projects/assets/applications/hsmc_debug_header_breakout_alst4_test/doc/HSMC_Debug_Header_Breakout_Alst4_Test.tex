@@ -18,27 +18,20 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ HSMC Debug Header Breakout Stratix IV (alst4) Test App Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{HSMC Debug Header Breakout Stratix IV (alst4) Test App Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{HSMC Debug Header Breakout Stratix IV (alst4) Test App Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
-\usepackage{listings}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
+\newpage
 
 \begin{center}
   \textit{\textbf{Revision History}}
@@ -55,6 +48,10 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
     \hline
   \end{longtable}
 \end{center}
+\newpage
+
+\tableofcontents
+\newpage
 
 \section{Description}
 Intended to test HSMC slots on the alst4 platform.

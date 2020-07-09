@@ -18,43 +18,20 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ \bigskip Matchstiq-Z1 Getting Started Guide}
-\def\docVersion{1.6}
-\def\rccplatform{xilinx13\_3}
-\def\radioName{Matchstiq-Z1}
-\def\mountPoint{/mnt/}
-\def\copyLoc{ATLAS}
-%----------------------------------------------------------------------------------------
+\def\docTitle{Matchstiq-Z1 Getting Started Guide}
 \def\snippetpath{../../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\input{ocpidev_ide}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{Matchstiq-Z1 Getting Started Guide}
 %----------------------------------------------------------------------------------------
-\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\lstset{ % https://tex.stackexchange.com/a/116572
-  basicstyle=\ttfamily,
-  columns=fullflexible,
-  % frame=single,
-  breaklines=true,
-  showstringspaces=true,
-  showspaces=true,
-  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
-}
-\usepackage{textcomp}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 \maketitle
-\begin{center}
-OpenCPI Release: \ocpiversion
-\end{center}
-%\thispagestyle{fancy}
-
+\thispagestyle{empty}
 \newpage
 
 	\begin{center}
@@ -91,7 +68,7 @@ OpenCPI Release: \ocpiversion
 \section{References}
 The reference(s) in Table 1 can be used as an overview of OpenCPI and may prove useful.  The installation guide is required since many of the steps mentioned here are defined there, especially in the section:  Enabling OpenCPI Development for Embedded Systems.  This document provides details for this system that can be applied to procedures defined there.  It is best to use both documents at the same time.  This document assumes a basic understanding of the Linux command line (or ``shell'') environment.  
 \def\refcapbottom{}
-\input{References_Table_noRPM}
+\input{\snippetpath/References_Table_noRPM}
 
 \section{Overview}
 This document provides steps for configuring a factory provided Epiq Solutions Matchstiq-Z1 SDR with the OpenCPI run-time environment for executing applications. \textbf{Note: Only the Z1 version of the Epiq Solutions Matchstiq product line is supported by OpenCPI.}
@@ -242,7 +219,7 @@ It is recommended that you use the default toolset (Xilinx Vivado) to build Matc
 \end{enumerate}
 % Bring in the kernel message snippet
 \section{Driver Notes}
-\input{Driver_Snippet}
+\input{\snippetpath/Driver_Snippet}
 %
 \end{appendices}
 \end{document}

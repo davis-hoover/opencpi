@@ -6,6 +6,7 @@
   script:
     - yum -y distro-sync
     - ./scripts/install-packages.sh
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .install-prereqs:
   extends:
@@ -13,6 +14,7 @@
   stage: prereq
   script:
     - ./scripts/install-prerequisites.sh $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 ################
@@ -24,6 +26,7 @@
   stage: build
   script:
     - ./scripts/build-opencpi.sh $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-rcc:
   extends:
@@ -44,6 +47,7 @@
     - ocpidev build -d projects/platform/hdl/primitives --hdl-platform $PLATFORM
     - ocpidev build -d projects/assets/hdl/primitives --hdl-platform $PLATFORM
     - ocpidev build -d projects/inactive/hdl/primitives --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 ###########################
@@ -56,6 +60,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-assets:
   extends:
@@ -64,6 +69,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-assets-base:
   extends:
@@ -72,6 +78,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/base_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-assets-comms:
   extends:
@@ -80,6 +87,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/comms_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-assets-dsp:
   extends:
@@ -88,6 +96,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/dsp_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-assets-misc:
   extends:
@@ -96,6 +105,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/misc_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-assets-util:
   extends:
@@ -104,6 +114,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/components/util_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-assets_ts:
   extends:
@@ -112,6 +123,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets_ts/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-components-inactive:
   extends:
@@ -120,6 +132,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 ########################
@@ -132,6 +145,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-devices-platform:
   extends:
@@ -140,6 +154,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/platform/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-devices-assets:
   extends:
@@ -148,6 +163,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-devices-assets_ts:
   extends:
@@ -156,6 +172,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets_ts/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-devices-inactive:
   extends:
@@ -164,6 +181,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 #########################
@@ -176,6 +194,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/adapters --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-adapters-assets:
   extends:
@@ -184,6 +203,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/adapters --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 ######################
@@ -196,6 +216,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/core/hdl/cards --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-cards-assets:
   extends:
@@ -204,6 +225,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/assets/hdl/cards --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-cards-inactive:
   extends:
@@ -212,6 +234,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/inactive/hdl/cards --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 ##########################
@@ -219,12 +242,18 @@
 ##########################
 .build-platforms:
   after_script:
+    - |-
+      if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
+        "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
+        exit 1
+      fi
+    - rm -f "${CI_PROJECT_DIR}/.success"
     - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
     - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - for f in artifacts-build-workers-*.tar; do tar --concatenate -f artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar $f; done;
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f";  fi ; done
+    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f"; fi; done
 
 .build-platforms-core:
   extends:
@@ -234,6 +263,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/core --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-platforms-platform:
   extends:
@@ -243,6 +273,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/platform --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-platforms-assets:
   extends:
@@ -252,6 +283,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/assets --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-platforms-inactive:
   extends:
@@ -261,6 +293,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build hdl platforms -d projects/inactive --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 ###########################
@@ -273,6 +306,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build -d projects/platform/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-assemblies-assets:
   extends:
@@ -283,6 +317,7 @@
     - make -C projects/platform/ exports
     - make -C projects/assets/ imports
     - ocpidev build -d projects/assets/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-assemblies-assets_ts:
   extends:
@@ -293,6 +328,7 @@
     - make -C projects/platform/ exports
     - make -C projects/assets_ts/ imports
     - ocpidev build -d projects/assets_ts/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .build-assemblies-inactive:
   extends:
@@ -303,6 +339,7 @@
     - make -C projects/platform/ exports
     - make -C projects/inactive/ imports
     - ocpidev build -d projects/inactive/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
 
 
 ###############
@@ -314,6 +351,7 @@
     paths: []
   script:
     - ./scripts/test-opencpi.sh --no-hdl
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-core:
   stage: test
@@ -329,6 +367,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify;
       fi
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-base:
   stage: test
@@ -343,6 +382,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-comms:
   stage: test
@@ -357,6 +397,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-dsp:
   stage: test
@@ -371,6 +412,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-misc:
   stage: test
@@ -385,6 +427,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-util:
   stage: test
@@ -399,6 +442,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
       fi
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets_ts:
   stage: test
@@ -413,6 +457,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
       fi
+    - touch "${CI_PROJECT_DIR}/.success"
 
 .test-inactive:
   stage: test
@@ -427,7 +472,7 @@
       || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
         ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
       fi
-
+    - touch "${CI_PROJECT_DIR}/.success"
 
 #############
 # Platforms #
@@ -464,7 +509,7 @@
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )xsim|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )xsim|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
-    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +xsim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +xsim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
     - if: "$CI_MERGE_REQUEST_ID"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
@@ -478,7 +523,7 @@
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )modelsim|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )modelsim|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
-    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +modelsim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +modelsim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
     - if: "$CI_MERGE_REQUEST_ID"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
@@ -492,10 +537,7 @@
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )isim|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )isim|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
-    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +isim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
-    - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +isim|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
 
 .xilinx13_3:
   extends:
@@ -531,7 +573,7 @@
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )zed|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )zed|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
-    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zed|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zed|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
     - if: "$CI_MERGE_REQUEST_ID"
     - if: "$CI_COMMIT_BRANCH == 'master'"
     - if: "$CI_COMMIT_BRANCH == 'develop'"
@@ -549,10 +591,7 @@
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )matchstiq_z1|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )matchstiq_z1|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
-    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +matchstiq_z1|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
-    - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +matchstiq_z1|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
 
 .zed_ise-xilinx13_4:
   extends:
@@ -568,16 +607,20 @@
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )zed_ise|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )zed_ise|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
-    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zed_ise|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zed_ise|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
 
 .e3xx:
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )e31x|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )e31x|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
-    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +e31x|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
-    - if: "$CI_MERGE_REQUEST_ID"
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-    - if: "$CI_COMMIT_BRANCH == 'develop'"
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +e31x|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
+
+.plutosdr:
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )plutosdr|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )plutosdr|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +plutosdr|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
+
 
 
 ########
@@ -597,9 +640,9 @@
 .vivado:
   before_script:
     - export HOME=$CI_PROJECT_DIR
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f"; fi; done
     - sleep 5
-    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
     - cat timestamp.txt
     - ls -lh
 
@@ -612,7 +655,7 @@
   before_script:
     - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
     - sleep 5
-    - echo $(date "+%Y-%m-%d %H:%M:%S") > timestamp.txt
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
     - cat timestamp.txt
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
@@ -627,6 +670,12 @@
   after_script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpiremote unload -i $IP
+    - |-
+      if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
+        "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
+        exit 1
+      fi
+    - rm -f "${CI_PROJECT_DIR}/.success"
     - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_ID.txt
     - tar -T artifacts-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_ID.tar
     - ls -lh artifacts-$CI_JOB_ID.tar

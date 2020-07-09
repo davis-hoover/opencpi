@@ -28,10 +28,10 @@ package misc_prims is
 constant TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH : positive := 32;
 type file_writer_backpressure_select_t is (NO_BP, LFSR_BP);
 
-function calc_cdc_bit_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
-function calc_cdc_fifo_depth (src_dst_ratio : in real) return natural;
-function calc_cdc_pulse_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
-function calc_cdc_count_up_dst_fifo_depth (src_dst_ratio : in real; num_input_samples : in natural) return natural;
+function calc_cdc_bit_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
+function calc_cdc_fifo_depth (constant src_dst_ratio : in real) return natural;
+function calc_cdc_pulse_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
+function calc_cdc_count_up_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
 
 type time_downsampler_ctrl_t is record
   bypass                : std_logic;
@@ -192,7 +192,7 @@ generic (SEED : std_logic_vector := "1000");
     clk     : in std_logic;
     rst     : in std_logic;
     en      : in std_logic;
-    dout    : out std_logic_vector);
+    dout    : out std_logic_vector(3 downto 0));
 end component;
 
 component one_shot_fifo
@@ -202,12 +202,12 @@ generic (data_width : natural := 1;
   port(
     clk      : in std_logic;
     rst      : in std_logic;
-    din      : in std_logic_vector;
+    din      : in std_logic_vector(data_width-1 downto 0);
     en       : in std_logic;
     rdy      : in std_logic;
     data_vld : out std_logic;
     done     : out std_logic;
-    dout     : out std_logic_vector);
+    dout     : out std_logic_vector(data_width-1 downto 0));
 end component;
 
 component advance_counter
