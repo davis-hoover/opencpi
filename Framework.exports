@@ -119,6 +119,8 @@
 +tools/scripts/ocpiav.sh <target>/bin/ocpiav
 +tools/scripts/ocpiav.desktop scripts/
 +tools/scripts/export-platform.sh scripts/
++tools/scripts/export-utils.sh scripts/
++tools/scripts/export-platform-to-framework.sh scripts/
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/
@@ -160,9 +162,9 @@
 +tools/scripts/setsid.py scripts/
 +tools/scripts/freeze_project.sh scripts/
 +tools/scripts/thaw_project.sh scripts/
-+tools/scripts/makeProjectExports.sh scripts/
-#+scripts/makeExportLinks.sh scripts/
-+tools/scripts/maybeExport.sh scripts/
++tools/scripts/export-project.sh scripts/
++tools/scripts/export-file.sh scripts/
++tools/scripts/deploy-platform.sh scripts/
 # user level scripts made available in the bin directory
 +tools/scripts/ocpidev <target>/bin/
 +tools/scripts/ocpi-copy-projects.py <target>/bin/ocpi-copy-projects

@@ -199,7 +199,7 @@ function checkfiles {
     done
 }
 if test "$*" = ""; then
-  echo "Usage is: makeProjectExports.sh [-v] <target>"
+  echo "Usage is: export-project.sh [-v] <target>"
   echo "This script takes one arguments:"
   echo "  <target> in the form of <os>-<version>-<machine>[/mm], e.g. linux-c6-x86_64"
   echo "    It is commonly used with the value of the OCPI_TARGET_DIR environment variable."

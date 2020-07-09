@@ -1,0 +1,183 @@
+In OpenCPI, the term "exports" is used in several places to indicate which files are necessary to expose,
+in order for something to be *used*.  I.e. every OpenCPI asset consists of a number of source files,
+and if/when built, results in lots of generated output files.  The "exports" of the asset is the subset
+of all these files that are needed to "use" the asset.  This concept of "usage" is a post-build usage --
+a user of an asset doesn't built it, but expects it to be built in order to be used.
+
+This is basically a typical "information hiding" or "need to know" principle: the owner/implementer of something
+decides which files to export (expose to users) and which to not expose.  Not exposing files means they can
+change without affecting how users use the asset.
+
+OpenCPI has builtin rules about what gets exported for each type of asset.  Thus there is no a burden on
+developers to make such decisions.
+
+Exporting is implemented largely using symbolic links in "exports trees".  I.e. there is a directory
+structure populated with symbolic links to exported files.  So an exports tree serves two purposes:
+- it identifies the subset of files needed for usage
+- it structures the files in a tree structure as they should be used
+
+An exports tree can be converted into a usable standalone directory structure by simply copying it
+with the "follow links" option.  This converts the exports-tree-full-of-symbolic-links to a directory structure
+consisting of the exported files ready to be used.  If everything is set up correctly, this deep-copy
+of an exports tree can be used to use the asset, without the presence of the original source tree or built files
+for the asset being used.  The export tree can be seen as a "view" into the built source tree which only contains
+files needed for usage, and structured for users of assets, not developers of assets.
+
+Exports trees are populated incrementally, as assets are built, and built for various targets and platforms.
+Thus if the assets are built for one platform, the exports tree for the asset will have the files necessary
+for using the asset with that platform.  If later, more targets are built, then the exports tree is
+further populated with files for that target.  Exports trees enable use for multiple platforms simultaneously.
+
+
+Exporting happens at three levels:
+1. within a project (where one asset uses another in the same project)
+2. between projects (where assets in one project use assets in another project)
+3. at the level of the OpenCPI framework as a whole
+
+1. exports within a project to enable one asset in a project to use another asset in the project
+----------------------------------------------------------------------------------------------------
+
+The lowest level of exporting happens mostly in "lib" directories.  I.e.  a "lib" directory is a directory
+containing links and files necessary to use assets, from other assets in the same project.
+Wherever you see a "lib" directory in an OpenCPI project, it represents the export tree for one or more assets.
+
+These intra project export trees are all called "lib", and currently exist in three place in a project:
+
+For any component library, a lib subdirectory is the export tree for everything in that library.  This might be
+any of:
+
+components/lib - when there is only the one component library called "components"
+components/<complib1>/lib - when there are component libraries inside the "components" directory
+hdl/{cards,slots,devices,adapters}/lib - these are device-oriented component libraries, lib is the exports
+hdl/platforms/<platform>/devices/lib - the exports tree of a platform-specific devices library
+
+For an HDL or RCC platform:
+
+{rcc,hdl}/platforms/<platform>/lib -  the exports tree of the HDL platform itself (not really a library)
+Platforms explicitly declare their exports in a <platform>.exports file.
+
+For HDL primitives
+
+hdl/primitives/lib - all the primitive libraries and cores under hdl/primitives are exported here
+
+Finally, there is a project directory called "artifacts", which exposes built OpenCPI artifact files
+as a group to be used by unit tests and applications in the project.
+
+
+2. project exports:  how a project lets other projects use its assets
+----------------------------------------------------------------------------------------------------
+
+When a project identifies another project in its "ProjectDependencies" list, it is saying that it uses
+that other project's assets, and in fact it is using a project-level exports tree from that project.
+This means that the project is only seeing the files exported by that other project, not any arbitrary
+file in that other project.
+
+So for a project's assets to be used from outside the project, it must create an exports tree for the
+project as a whole.  This is done automatically when a project is built.  As mentioned earlier,
+the exports tree for a project is populated incrementally, and supports simultaneous use of the assets
+built for different platforms.
+
+The exports tree for a project is the top-level directory called "exports".
+
+This exports tree usually has symbolic links in it that point into the exports trees inside the project.
+Thus it is exporting outside the project some subset of what is exported inside the project.
+
+While exports within a project are automatic (except for platform assets which have an explicit exports file),
+exports from a project are all explicit.  Nothing inside the project is exported outside the project
+except what is specified in the Project.exports file for the project.  However, it is commoon for projects
+to have one line in this file containing "all", which indicates that all assets in the project can be
+used from outside the project, and that the exports tree for the project should be generated to enable that.
+
+3. framework exports
+----------------------------------------------------------------------------------------------------
+
+The OpenCPI source tree has a variety of files as well as a set of builtin projects.
+
+There is a top-level Framework.exports (was Project.exports) file that specifies exports for the framework
+as a whole, and the exports tree generated from this file is the basis for binary packaged distributions
+for OpenCPI.  This exports tree indicates everything that may be distributed in any non-source
+binary distributions of OpenCPI.  As with other exports trees, it contains all the platforms that
+have been built and can be used simultaneously for multiple platforms.
+
+This exports tree is populated based on the following distinct phases, each of which rely on
+previous ones.
+
+1. early in the first build process on a fresh source tree, a static/permanent read-only exports tree
+is used.  This is the "bootstrap" directory in the root of the source tree.
+
+2. in a fresh source tree the exports tree is initially populated  with files that do not depend on building,
+e.g. the scripts that actually perform building, but nothing that is compiled
+
+3. when the framework sources are built for a development host, all the tools and runtime software that are built
+are populated in the exports tree for that development host.  The same tree may be built for multiple development
+hosts and used by them (presumably with shared network mounts).
+
+4. when the framework sources are cross-built for an embedded RCC platform, all the tools and runtime software
+are populated in the framework exports tree.  While the RCC platform lives in a project, and is exported from
+that project, it is used to cross-build the framework itself (which is not a project).
+Thus what is exported at the framework level is a combination of files resulting from building the framework,
+and files exported from the platform itself.
+
+5. when an HDL platform in a project is built, it has its own exports within the project, and also is usually
+exported from that project.  The platform's exports may also be used to populate the framework exports tree with
+some files needed to create SD cards (bootable media) that combines files from two platforms
+(RCC and HDL) that may be from different projects.
+
+So in the framework exports tree a platform may appear in several places for different purposes:
+
+<platform>/        - exports for a platform for use during development
+runtime/<platform> - exports for a platform used when executing on that platform, with this tree on a server
+deploy/<platform>  - exports staged here to enable creation of SD cards later.
+
+How exports relate to binary distributions:
+====================================================================================================
+
+Installing binary distributions can largely be thought of as recreating an exports tree (but without links).
+
+For dev and cross-built software platforms, this is exactly what happens.
+
+A source distribution is built and cross-built, resulting in the frameworks exports tree combining
+build outputs.  Binary distributions are usually made one platform at a time, and when installed
+are essentially reconstructing the same contents that were in the exports tree.
+
+Beyond the exports tree reconstruction, the following additional top-level entities are in the installation:
+
+- project-repository directory - containing pointers to the builtin-projects
+- projects/* - the built-in projects in source form
+- userenv.sh - for customizing the installation's user environment
+- system.xml - for customizing the OpenCPI system configuration for the dev host itself
+- cdk - the exports tree(s)
+
+Binary distributions are not made for HDL platforms (yet).  Mostly this is due to users having
+different versions of tools to satisfy various policies and constraints in their organization,
+thus prebuilt projects would never satisfy all users.
+
+Export scripts to implement exports
+===================================
+
+export-framework.sh    - for source trees to implement framework export trees
+                         calls export-platform-to-framework.sh
+			 ***only used in a source environment***
+
+export-project.sh - to implement project export trees
+                      - exposes intra-project platform export trees as project exports
+
+export-platform.sh    - when a platform is built in its directory in its project, this script performs
+                        platform-level exports, usually creating an exports tree under the "lib" directory
+		        of the platform.
+
+export-platform-to-framework.sh - populate exports in the framework exports tree for a platform
+                                  *** can be used in a binary installation environment for HDL platforms ***
+export-utils.sh     - utility functions shared between export-framework.sh and export-platform-to-framework.sh
+export-file.sh      - export a file from a project when it is created
+Framework.exports   - framework file for framework exports
+Project.exports     - project file for project exports in each project
+
+
+
+
+
+
+
+
+
