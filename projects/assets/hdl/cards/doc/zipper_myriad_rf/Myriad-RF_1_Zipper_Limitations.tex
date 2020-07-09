@@ -16,27 +16,27 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
+
+%----------------------------------------------------------------------------------------
+% Required document specific properties
+%----------------------------------------------------------------------------------------
+\def\docTitle{Zipper/Myriad-RF 1 Daughtercards}
 \def\snippetpath{../../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{fancyhdr}
-\usepackage{colortbl}
-%\usepackage[margin=.75in]{geometry}
-\usepackage[justification=centering]{caption}
-\pagestyle{fancy}
-\lhead{Zipper/Myriad-RF 1 Daughtercards}
-\rhead{ANGRYVIPER Team}
-\definecolor{drkgreen}{rgb}{0,.6,0}
-\renewcommand{\headrulewidth}{0pt}
-%\newcommand{\code}[1]{\texttt{#1}} % For inline code snippet or command line
-\definecolor{blue}{rgb}{.7,.8,.9}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
+
 \begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
+
 \section*{Deprecation Notice:}
 Beginning with OpenCPI Version 1.5, support for Lime Microsystems' Zipper card is now deprecated. This document will not be updated any further.
 \section*{Limitations: Myriad-RF 1 and Zipper Daughtercard}
-The following is a list of the known limitations with ANGRYVIPER and the Myriad-RF 1 and Zipper Daughtercard:\par
+The following is a list of the known limitations with OpenCPI and the Myriad-RF 1 and Zipper Daughtercard:\par
 	\begin{itemize}
 	\item[1)] The Zipper Carrier card is no longer being produced by the manufacturer. The card is Open Source so you are able to fabricate one yourself.
 	\item[2)] Sample Rate Limit on ML605, Stratix IV and ZedBoard Rev D
@@ -45,7 +45,7 @@ The following is a list of the known limitations with ANGRYVIPER and the Myriad-
 	\end{itemize}
 This document will describe the limitations and any workarounds.
 \subsection*{Sample Rate Limitations}
-During testing of the ANGRYVIPER reference applications, data fidelity issues have been observed in the following scenarios:
+During testing of the OpenCPI reference applications, data fidelity issues have been observed in the following scenarios:
 %\begin{flushleft}
 %\begin{center}
 \begin{table}[H]
@@ -71,17 +71,15 @@ During testing of the ANGRYVIPER reference applications, data fidelity issues ha
 %\end{center}
 %\begin{enumerate}
 %\item ZedBoard Rev D
-%\end{enumerate} certain sample rates on Rev D of the ZedBoard platform, the ALST4 and ML605. Specifically, the FSK application did not run correctly above 36 MS/s. Other ANGRYVIPER platforms (Matchstiq Z1, ML605, ALST4, ZedBoard Rev C) do not show this limitation.\par\medskip
-\noindent As of the 1.2 release of ANGRYVIPER, it is suspected that these upper sampling rate data fidelity problems are caused by phase incoherence due to the non-source-synchronous ADC/DAC clock source on the Zipper that are not being accounted for. This will be investigated during future release(s).
-%As of the 1.1 release of ANGRYVIPER, there are no card specific constraints in the UCFs for these platforms. It is suspected that properly constraining the interface between the ML605/Stratix IV/ZedBoard and the daughtercard would increase the sample rate limit.
+\noindent As of the 1.2 release of OpenCPI, it is suspected that these upper sampling rate data fidelity problems are caused by phase incoherence due to the non-source-synchronous ADC/DAC clock source on the Zipper that are not being accounted for. This will be investigated during future release(s).
 \subsection*{Clock Initialization Error with SI5351 Proxy RCC Component}
-When using ANGRYVIPER and the Myriad-RF 1 and Zipper Daughtercard, the SI5351 proxy component experiences the following intermittent errors:\par\medskip
+When using OpenCPI and the Myriad-RF 1 and Zipper Daughtercard, the SI5351 proxy component experiences the following intermittent errors:\par\medskip
 \noindent \code{Exception thrown: Code 0x17, level 0, error: 'Worker 'clock\_gen' produced error during the 'stop' control operation: SI5351 has not completed system initialization'}\par\medskip
 \noindent \code{Exception thrown: Code 0x17, level 0, error: 'Worker 'clock\_gen' produced error during the 'initialize' control operation: SI5351 has not completed system initialization'}\par\medskip
 \noindent Per an application note of the SI5351\cite{an_619}, this error means that the IC is in 'System Initialization Mode'. It isn't recommended to read or write registers during this period, so the proxy correctly throws an exception. This mode is only supposed to be encountered during power up, but the error occurs intermittently  during use of this platform.\par\medskip
 \noindent There is no known workaround for this error. The error does not typically occur multiple times in a row, so re-running the application after an occurrence typically completes successfully.
 \subsection*{Only VADJ supported on ZedBoard is 2.5 V}
-The ZedBoard platform  and the Myriad-RF 1 and Zipper Daughtercard support three different Vadj voltages for the FMC LPC connector. During testing of the ANGRYVIPER reference applications, the only working configuration was 2.5 V. 3.3 V was not tested and 1.8 V showed data fidelity issues.  It is recommended that 2.5 V be used.
+The ZedBoard platform  and the Myriad-RF 1 and Zipper Daughtercard support three different Vadj voltages for the FMC LPC connector. During testing of the OpenCPI reference applications, the only working configuration was 2.5 V. 3.3 V was not tested and 1.8 V showed data fidelity issues.  It is recommended that 2.5 V be used.
 \pagebreak
   \begin{thebibliography}{1}
 

@@ -26,8 +26,8 @@ Summary:   OpenCPI Documentation
 Group:     Documentation
 
 License:        LGPLv3+
-Vendor:         ANGRYVIPER Team
-Packager:       ANGRYVIPER Team <discuss@lists.opencpi.org>
+Vendor:         OpenCPI
+Packager:       OpenCPI <discuss@lists.opencpi.org>
 
 %description
 PDFs and HTML index file installed into %{_pkgdocdir}
