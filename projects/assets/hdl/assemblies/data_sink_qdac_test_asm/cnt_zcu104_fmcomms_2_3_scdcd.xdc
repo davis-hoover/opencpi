@@ -38,7 +38,7 @@ create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i
 create_clock -period 5.712 -name FMC_LPC_LA00_CC_P [get_ports {FMC_LPC_LA00_CC_P}]
 
 # FMCOMMS2/3 AD9361 FB_CLK_P (forwarded version of DATA_CLK_P)
-create_generated_clock -name FMC_LPC_LA08_P -source [get_pins {ftop/FMC_LPC_platform_ad9361_data_sub_i/worker/mode7.dac_clock_forward/C}] -divide_by 1 -invert [get_ports {FMC_LPC_LA08_P}]
+create_generated_clock -name FMC_LPC_LA08_P -source [get_pins {ftop/FMC_LPC_platform_ad9361_data_sub_i/worker/mode7.data_clk_buf_i/O}] -divide_by 1 -invert [get_ports {FMC_LPC_LA08_P}]
 
 # almost exactly the design methodology outlined in "Figure 3-70: Generated Clock in the Fanout Of
 # Master Clock" in
