@@ -3,28 +3,14 @@
 % this file is intended to be edited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Summary - \Comp}
-% Make table whose width is equal to which will be used for text
-% wrapping, split into 2 equal columns
-\begin{longtable}{|p{\dimexpr0.5\textwidth-2\tabcolsep\relax}
-                  |p{\dimexpr0.5\textwidth-2\tabcolsep\relax}|}
-  \hline
-  \rowcolor{blue}
-  & \\
-  \hline
-  Name              & \comp \\
-  \hline
-  Latest Version    & \docVersion \\
-  \hline
-  Worker Type       & Application                                                  \\
-  \hline
-  Component Library & ocpi.assets.util\_comps                                        \\
-  \hline
-  Workers           & \comp.hdl                                                    \\
-  \hline
-  Tested Platforms  & isim \\
-  \hline
-\end{longtable}
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{}
+\def\componentlibrary{ocpi.assets.util\_{}comps}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{isim}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 \begin{flushleft}

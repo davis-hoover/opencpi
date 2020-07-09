@@ -20,15 +20,17 @@
 # TODO / FIXME: Handle xinclude properly
 
 from argparse import ArgumentParser
-import os
+import collections
 import itertools
+import os
 import re
 import shutil
 import sys
 import textwrap
-from xml.etree import ElementTree as etree
+
 from enum import Enum
-import collections
+from pathlib import Path
+from xml.etree import ElementTree as etree
 
 try:
     import jinja2
@@ -143,12 +145,12 @@ def latexify(string):
     'this is a test'
     >>> latexify("this is a test & so was this") == r"this is a test \& so was this"
     True
-    >>> latexify("this_is_a_test") == r"this\_is\_a\_test"
+    >>> latexify("this_is_a_test") == r"this\_{}is\_{}a\_{}test"
     True
     >>> latexify("Please don't % comment ^^this^^ out") == r"Please don't \% comment \^{}\^{}this\^{}\^{} out"
     True
     """
-    string = string.replace('_', r'\_')
+    string = string.replace('_', r'\_{}')
     string = string.replace('&', r'\&')
     string = string.replace('%', r'\%')
     string = string.replace('^', r'\^{}')
@@ -492,11 +494,28 @@ def emit_datasheet_tex_file(comp_name, copyright, prompt):
             return
     if not prompt_to_overwrite(datasheet_filename, warn_existing=True):
         return
+
+    # Find relative path to snippet directory
+    path = Path(".")
+    cwd = path.resolve()
+    at_root = False
+    while not at_root:
+        for item in cwd.parent.iterdir():
+            if not item.is_dir():
+                continue
+            if item.name == ".gitlab-ci":
+                at_root = True
+                break
+        cwd = cwd.parent
+        path /= ".."
+    path = path / "doc" / "av" / "tex" / "snippets"
+
     print_info("emitting {0} (compile using rubber -d {0})".format(datasheet_filename))
     j_template = LATEX_JINJA_ENV.get_template("Component_Template.tex")
     with open(datasheet_filename, 'w') as datasheet_file:
         emit_latex_header(datasheet_file, user_edits=False, copyright=copyright)
-        print(j_template.render(LC_NAME=LC_NAME, UC_NAME=UC_NAME), file=datasheet_file)
+        print(j_template.render(LC_NAME=LC_NAME, UC_NAME=UC_NAME,
+              SNIPPET_PATH=path.as_posix()), file=datasheet_file)
     return
 
 
