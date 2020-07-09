@@ -40,7 +40,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 hw ether 00:0a:35:00:01:23
   # ifconfig eth0 up
   # udhcpc
-  OCPI_ENABLE_HDL_SIMULATOR_DISCOVERY=0
+  
   # CUSTOMIZE THIS LINE FOR YOUR ENVIRONMENT
   # Second arg is shared file system mount point on development system
   # Third argument is opencpi dir relative to mount point
@@ -57,6 +57,8 @@ fi
 alias ll='ls -lt --color=auto'
 # Tell the ocpihdl utility to always assume the FPGA device is the zynq PL.
 export OCPI_DEFAULT_HDL_DEVICE=pl:0
+#prevent looking for simulation tools such as xsim
+export OCPI_ENABLE_HDL_SIMULATOR_DISCOVERY=0
 # Only override this file if it is customized beyond what is the default for the platform
 #export OCPI_SYSTEM_CONFIG=$OCPI_DIR/system.xml
 # Get ready to run some test xml-based applications
