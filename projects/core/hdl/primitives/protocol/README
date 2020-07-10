@@ -1,0 +1,15 @@
+This library provides VHDL packages which aid in handling of OpenCPI port
+protocols and their messages. Examples include ZLM detection, message sizing,
+and separation of data streaming and metadata. Each protocol within this
+OpenCPI project is expected to have a separate VHDL package.
+
+The complex_short_with_metadata package provides marshalling functionality for
+ports using the OpenCPI ComplexShortWithMetadata protocol. The "old"
+primitive(s) perform(s) more optimally that the non-"old" version(s) in terms
+of I/Q throughput, but "old" have known defects for some metadata opcodes.
+TODO / FIXME - the optimal features need to be implemented in any non-"old"
+versions (which have no known defects), and then all "old" versions should be
+deleted.
+
+The iqstream package provides marshalling functionality for ports using the
+OpenCPI iqstream protocol.

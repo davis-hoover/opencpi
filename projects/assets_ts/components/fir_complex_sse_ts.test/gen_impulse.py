@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -54,7 +54,7 @@ def addmsg(f, opcode, data):
         f.write(data)
 
 # def impulse_real_ascii(filename): #REAL - ASCII
-#     print "\n*** Python: Generate an ASCII impulse file, real ***"
+#     print("\n*** Python: Generate an ASCII impulse file, real ***")
 #     fo = open(filename, 'w')
 #     scnt=int(os.environ.get("OCPI_TEST_NUM_TAPS_p"))
 #     max_tap=pow(2,int(os.environ.get("OCPI_TEST_COEFF_WIDTH_p"))-1)-1
@@ -64,7 +64,7 @@ def addmsg(f, opcode, data):
 #     fo.close()
 
 # def impulse_real_bin(filename): #REAL - BINARY
-#     print "\n*** Python: Generate a binary impulse file, real ***"
+#     print("\n*** Python: Generate a binary impulse file, real ***")
 #     #binary, 16b values packed into 32bit word, little-endian
 #     scnt=int(os.environ.get("OCPI_TEST_NUM_TAPS_p"))
 #     max_tap=pow(2,int(os.environ.get("OCPI_TEST_COEFF_WIDTH_p"))-1)-1
@@ -85,7 +85,7 @@ def addmsg(f, opcode, data):
 #     fo.close()
 
 # def impulse_cmplx_ascii(filename): #COMPLEX - ASCII
-#     print "\n*** Python: Generate an ASCII impulse file, complex ***"
+#     print("\n*** Python: Generate an ASCII impulse file, complex ***")
 #     fo = open(filename, 'w')
 #     scnt=2*int(os.environ.get("OCPI_TEST_NUM_TAPS_p"))
 #     max_tap=pow(2,int(os.environ.get("OCPI_TEST_COEFF_WIDTH_p"))-1)-1

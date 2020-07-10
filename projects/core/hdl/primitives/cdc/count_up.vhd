@@ -23,7 +23,7 @@ entity count_up is
   port    (src_clk : in  std_logic;
            src_rst : in  std_logic;
            src_in  : in  std_logic;
-	   src_rdy : out std_logic;
+	         src_rdy : out std_logic;
            dst_clk : in  std_logic;
            dst_rst : in  std_logic;           -- optional; if not required, tie '0'
            dst_out : out unsigned(WIDTH-1 downto 0));
@@ -48,7 +48,7 @@ begin
     port map   (src_clk => src_clk,
                 src_rst => src_rst,
                 src_in  => src_in,
-		src_rdy => src_rdy,
+		            src_rdy => src_rdy,
                 dst_clk => dst_clk,
                 dst_rst => dst_rst,
                 dst_out => increment);

@@ -16,55 +16,41 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
-% AV-5479: Assume this is in projects/assets_ts of source checkout
-\def\importpath{../../../../assets/components/dsp_comps/cic_dec.test/doc}
-\makeatletter
-\def\input@path{{\importpath/snippets/}}
-\makeatother
-\input{CIC_Dec_Header}
-%----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
-%----------------------------------------------------------------------------------------
-\def\docTitle{Component Data Sheet}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
 
-\def\comp{cic\_dec\_ts}
+%----------------------------------------------------------------------------------------
+% Required document specific properties
+%----------------------------------------------------------------------------------------
+\def\comp{cic\_{}dec\_{}ts}
 \edef\ecomp{cic_dec_ts}
 \def\Comp{CIC Decimator (TimeStamped)}
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\def\importpath{../../../../assets/components/dsp_comps/cic_dec.test/doc}
 \graphicspath{ {\importpath/figures/} }
+%----------------------------------------------------------------------------------------
 
 \begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
 
-\section*{Summary - \Comp}
-\begin{tabular}{|c|M{13.5cm}|}
-	\hline
-	\rowcolor{blue}
-	                  &                                                    \\
-	\hline
-	Name              & \comp                                              \\
-	\hline
-	Worker Type       & Application                                        \\
-	\hline
-	Version           & v\docVersion \\
-	\hline
-	Release Date      & 4/2019 \\
-	\hline
-	Component Library & ocpi.assets\_ts.components \\
-	\hline
-	Workers           & \comp.hdl                                          \\
-	\hline
-	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL) \\
-	\hline
-\end{tabular}
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{4/2019}
+\def\componentlibrary{ocpi.assets\_{}ts.components}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{alst4, isim, Matchstiq-Z1(PL), ml605, modelsim, xsim, ZedBoard(PL)}
+\input{\snippetpath/component_summary_table}
 
-\input{CIC_Dec_Functionality}
+\input{\importpath/snippets/CIC_Dec_Functionality}
 \section*{Worker Implementation Details}
-\input{CIC_HDL_Implementation}
-\input{CIC_Theory}
+\input{\importpath/snippets/CIC_HDL_Implementation}
+\input{\importpath/snippets/CIC_Theory}
 
 \section*{Block Diagrams}
 \subsection*{Top level}
@@ -167,35 +153,27 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \begin{landscape}
 \section*{Worker Configuration Parameters}
 \subsubsection*{\comp.hdl}
-\input{../../\ecomp.hdl/configurations.inc}
+%\input{../../\ecomp.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsection*{\comp.hdl}
-\input{../../\ecomp.hdl/utilization.inc}
+%\input{../../\ecomp.hdl/utilization.inc}
 \end{landscape}
 \newpage
-\section*{Test and Verification}
-Two test cases are implemented to validate the CIC Decimator component:
+\input{\importpath/snippets/CIC_Test}
 
-\begin{enumerate}
-	\item Unity gain response to DC: The CIC Decimator gain is calculated using the following equation:
-	      \begin{equation} \label{eq:cic_gain}
-	      	CIC\ Gain = \frac{(R*M)^N}{2^{CEIL(N*log_2(R*M))}}
-	      \end{equation}
-	\item Tone waveform: A waveform containing tones at 50 Hz, 100 Hz and Fs/R sampled at 1024000 is processed by the worker. The tones at 50 Hz and 100 Hz are within the bandwidth of the filter, while the Fs/R tone is at the first null. The power levels of the input tones and output tones are measured and compared.
-\end{enumerate}\medskip
-
+\medskip
 In both of the test cases, the samples data is interleaved with all of the operations of the Complex\_Short\_With\_Metadata protocol in the following sequence:
+
 \begin{enumerate}
 	\item Interval
-	\item Sync (this opcode is expected after an Interval operation)
 	\item Time
 	\item Samples
-	\item Flush	
+	\item Time	
 	\item Samples
+	\item Flush
 	\item Sync
-	\item Samples
 \end{enumerate}
 
-\input{CIC_References}
+\input{\importpath/snippets/CIC_References}
 
 \end{document}

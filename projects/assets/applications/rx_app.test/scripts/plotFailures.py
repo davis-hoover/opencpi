@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -28,4 +29,4 @@ if type(x) is np.ndarray:
     plt.title('RX App\nFailures vs. RF Tune Freq')
     plt.show()
 else:
-    print "Not enough data to plot"
+    print("Not enough data to plot")

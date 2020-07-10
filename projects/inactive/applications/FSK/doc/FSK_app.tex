@@ -18,32 +18,27 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ FSK App Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{FSK App Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{FSK App Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
 \newpage
-	\begin{center}
+
+\begin{center}
 	\textit{\textbf{Revision History}}
-		\begin{table}[H]
+	\begin{table}[H]
 		\label{table:revisions} % Add "[H]" to force placement of table
-			\begin{tabularx}{\textwidth}{|c|X|l|}
+		\begin{tabularx}{\textwidth}{|c|X|l|}
 			\hline
 			\rowcolor{blue}
 			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
@@ -60,13 +55,16 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 			v1.5 & Deprecated Zipper; Moved to Appendix & 3/2019 \\
 			\hline
-			\end{tabularx}
-		\end{table}
-	\end{center}
-
+			v1.7 & Resource Utilization Table removed & 5/2020 \\
+			\hline
+		\end{tabularx}
+	\end{table}
+\end{center}
 \newpage
+
 \tableofcontents
-\pagebreak
+\newpage
+
 \section{Document Scope}
 This document describes the OpenCPI FSK demo application. It includes a description of the application, instructions to setup the hardware, build of bitstreams, and execution of the application itself on various platforms.
 
@@ -385,13 +383,13 @@ Using the default settings for the Ettus E310 platform, the resulting frequency 
 \begin{landscape}
 \subsection{Performance and Resource Utilization}
 \subsubsection{filerw}
-\input{../../../hdl/assemblies/fsk_filerw/utilization.inc}
+%\input{../../../hdl/assemblies/fsk_filerw/utilization.inc}
 \subsubsection{tx}
-\input{../../../hdl/assemblies/mfsk2_zp16_fir_real_phase_to_amp_cordic_cic_int/utilization.inc}
+%\input{../../../hdl/assemblies/mfsk2_zp16_fir_real_phase_to_amp_cordic_cic_int/utilization.inc}
 \subsubsection{rx}
-\input{../../../hdl/assemblies/dc_offset_iq_imbalance_mixer_cic_dec_rp_cordic_fir_real/utilization.inc}
+%\input{../../../hdl/assemblies/dc_offset_iq_imbalance_mixer_cic_dec_rp_cordic_fir_real/utilization.inc}
 \subsubsection{txrx/bbloopback}
-\input{../../../hdl/assemblies/fsk_modem/utilization.inc}
+%\input{../../../hdl/assemblies/fsk_modem/utilization.inc}
 \end{landscape}
 \subsection{Executable}
 The software portion of the application consists of a C++ program written using the OpenCPI C++ API as well as RCC proxy workers for command and control functionality. The program references the appropriate application XML file for the requested hardware and mode. The app XML files contain all of the property settings for the components in each application, except for the configuration of the endpoint proxy(ies). These endpoint proxy-related settings are passed via command-line prompted values to the appropriate endpoint proxy workers.\\

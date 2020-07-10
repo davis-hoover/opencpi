@@ -17,47 +17,25 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
-\def\importpath{}
-\input{\importpath snippets/FIR_Complex_SSE_Header}
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{Component Data Sheet}
-\def\docVersion{1.6}
-%----------------------------------------------------------------------------------------
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
-
-\def\comp{fir\_complex\_sse}
+\def\comp{fir\_{}complex\_{}sse}
 \edef\ecomp{fir_complex_sse}
 \def\Comp{FIR Complex SSE}
-\graphicspath{ {figures/} }
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
-
-\section*{Summary - \Comp}
-
-\begin{tabular}{|c|M{13.5cm}|}
-	\hline
-	\rowcolor{blue}
-	                  &                                                              \\
-	\hline
-	Name              & \comp                                                        \\
-	\hline
-	Worker Type       & Application                                                  \\
-	\hline
-	Version           & v\docVersion \\
-	\hline
-	Release Date      & 11/2019 \\
-	\hline
-	Component Library & ocpi.assets.dsp\_comps                                        \\
-	\hline
-	Workers           & \comp.hdl                                                    \\
-	\hline
-	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL) \\
-	\hline
-\end{tabular}
+\maketitle
+\thispagestyle{empty}
+\newpage
 
 \begin{center}
 	\textit{\textbf{Revision History}}
@@ -76,7 +54,17 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		    \hline
 			\end{tabularx}
 		\end{table}
-	\end{center}	
+\end{center}	
+\newpage
+
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{11/2019}
+\def\componentlibrary{ocpi.assets.dsp\_{}comps}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{alst4, isim, Matchstiq-Z1(PL), ml605, modelsim, xsim, ZedBoard(PL)}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 \begin{flushleft}
@@ -136,7 +124,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \subsection*{\comp.hdl}
 \begin{itemize}
 	\item projects/assets/components/dsp\_comps/fir\_complex\_sse.hdl/fir\_complex\_sse.vhd
-          \input{\importpath snippets/FIR_Complex_SSE_Primitive_Dependencies}
+          \input{snippets/FIR_Complex_SSE_Primitive_Dependencies}
 \end{itemize}
 
 \begin{landscape}
@@ -206,7 +194,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 	\end{scriptsize}
 \end{landscape}
 
-\input{\importpath snippets/FIR_Complex_SSE_Control_Config_Utilization}
+\input{snippets/FIR_Complex_SSE_Control_Config_Utilization}
 \section*{Test and Verification}
 
 

@@ -16,29 +16,14 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- THIS FILE WAS ORIGINALLY GENERATED ON Fri May  5 16:02:04 2017 EDT
--- BASED ON THE FILE: data_src.xml
--- YOU *ARE* EXPECTED TO EDIT IT
--- This file initially contains the architecture skeleton for worker: data_src
-
-library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
+library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 architecture rtl of worker is
   constant WIDTH      : integer := to_integer(DATA_BIT_WIDTH_p);
-  -- mandatory output port logic
-  signal data_ready_for_out_port : std_logic := '0';
-  signal out_meta_is_reserved    : std_logic := '0';
-  signal out_som                 : std_logic := '0';
-  signal out_eom                 : std_logic := '0';
-  signal out_valid               : std_logic := '0';
-
-  signal som_data   : std_logic := '0';
-  signal eom_data   : std_logic := '0';
-  signal valid_data : std_logic := '0';
 
   signal enable        : std_logic := '0';
   signal data_count    : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
-  signal data_count_32 : std_logic_vector(31 downto 0)      := (others => '0');
+  signal data_count_32 : long_t := (others => '0');
   signal data_walking      : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
   signal data_lfsr         : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
   signal data_lfsr_ordered : std_logic_vector(WIDTH-1 downto 0) := (others => '0');
@@ -50,32 +35,18 @@ architecture rtl of worker is
   signal out_Q  : std_logic_vector(15 downto 0) := (others => '0');
   signal out_I  : std_logic_vector(15 downto 0) := (others => '0');
 
-  signal message_size_samples : ulong_t := (others => '0');
-  signal msg_samp_ctr         : ulong_t := (0 => '1', others => '0');
-
-  signal num_samples_valid : std_logic := '0';
-
-  signal zlm_req                 : std_logic := '0'; -- ZLM request
-  signal zlm_req_once            : std_logic := '0';
-  signal zlm_req_once_r          : std_logic := '0';
-  signal zlm_req_once_sent       : std_logic := '0';
-  signal zlm_req_once_clr_sticky : std_logic := '0';
+  signal num_samples_valid : bool_t := bfalse;
+  signal eof_req           : bool_t := bfalse; -- eof is indicated now
+  signal eof_r             : bool_t := bfalse; -- we are in the sticky EOF state
 begin
+  props_out.debug <= data_count_32;
   ------------------------------------------------------------------------------
   -- out port
   ------------------------------------------------------------------------------
 
-  -- mandatory output port logic, (note that
-  -- data_ready_for_out_port MUST be clock-aligned with out_out.data)
-  out_out.give <= ctl_in.is_operating and out_in.ready and
-                  (not out_meta_is_reserved) and data_ready_for_out_port;
-  out_meta_is_reserved <= (not out_som) and (not out_valid) and (not out_eom);
-  out_out.som   <= out_som;
-  out_out.eom   <= out_eom;
-  out_out.valid <= out_valid;
-
-  data_ready_for_out_port <= enable or zlm_req_once_sent;
-
+  out_out.valid       <= enable; -- implies give, only accepted if out_in.ready
+  out_out.byte_enable <= (others => '1');
+  out_out.eof         <= eof_r;
   odata_width_32 : if ODATA_WIDTH_p = 32 generate
 
     -- iqstream w/ DataWidth=32 formats Q in most significant bits, I in least
@@ -84,54 +55,6 @@ begin
     out_out.data <= out_Q & out_I;
 
   end generate odata_width_32;
-
-  out_port_inject_zlm_i : entity work.out_port_inject_zlm
-    port map (
-      clk          => ctl_in.clk,
-      reset        => ctl_in.reset,
-      zlm_req      => zlm_req_once,
-      som_i        => som_data,
-      eom_i        => eom_data,
-      valid_i      => valid_data,
-      out_in_ready => out_in.ready, -- enforces backpressure
-      zlm_req_sent => zlm_req_once_sent,
-      som_o        => out_som,    -- does obey backpressure (for injected ZLMs)
-      eom_o        => out_eom,    -- does obey backpressure (for injected ZLMs)
-      valid_o      => out_valid); -- does obey backpressure (for injected ZLMs)
-
-  out_out.byte_enable <= (others => '1');
-
-  zlm_req_once_regs : process(ctl_in.clk)
-  begin
-    if rising_edge(ctl_in.clk) then
-      if ctl_in.reset = '1' then
-        zlm_req_once_r <= '0';
-        zlm_req_once_clr_sticky <= '0';
-      else
-        zlm_req_once_r <= zlm_req_once;
-        zlm_req_once_clr_sticky <= zlm_req_once_sent or zlm_req_once_clr_sticky;
-      end if;
-    end if;
-  end process;
-
-  -- will send only one ZLM
-  zlm_req_once <= (zlm_req or zlm_req_once_r) and (not zlm_req_once_clr_sticky);
-
-  som_data   <= to_bool(msg_samp_ctr = 1);
-  eom_data   <= to_bool(msg_samp_ctr = message_size_samples) or
-                (num_samples_valid and
-                to_bool(msg_samp_ctr = unsigned(props_in.num_samples)));
-  valid_data <= ctl_in.is_operating and out_in.ready and
-                data_ready_for_out_port;
-
-  num_samples_valid_gen : util_prims.util_prims.set_clr
-    port map(
-      clk => ctl_in.clk,
-      rst => ctl_in.reset,
-      set => props_in.num_samples_written,
-      clr => '0',
-      q   => num_samples_valid,
-      q_r => open);
 
   -- from the component data sheet: "Data_Src selects one DATA_BIT_WIDTH_p
   -- bits-wide data bus from multiple data generation sources, packs the
@@ -145,10 +68,9 @@ begin
   end generate;
   data_Q(15-WIDTH downto 0) <= (others => '0');
 
-  enable <= ctl_in.is_operating and out_in.ready and props_in.enable and
-            (num_samples_valid and
-             (to_bool(props_in.num_samples = -1) or
-              to_bool(long_t(data_count_32) < props_in.num_samples)));
+  enable <= out_in.ready and props_in.enable and num_samples_valid and
+            (to_bool(props_in.num_samples = -1) or
+             to_bool(data_count_32 < props_in.num_samples));
 
   lfsr : misc_prims.misc_prims.lfsr
     generic map (
@@ -172,36 +94,32 @@ begin
         data_count <= (others => '0');
         data_walking(data_walking'left) <= '1';
         data_walking(data_walking'left-1 downto 0) <= (others => '0');
-      elsif ctl_in.is_operating = '1' then
-        if enable = '1' then
-          data_count_32 <= std_logic_vector(signed(data_count_32) + 1);
-          data_count <= std_logic_vector(unsigned(data_count) + 1);
-          data_walking <= data_walking(0) &
-                          data_walking(data_walking'length-1 downto 1);
-        end if;
+      elsif ctl_in.is_operating and enable = '1' then
+        data_count_32 <= data_count_32 + 1;
+        data_count <= std_logic_vector(unsigned(data_count) + 1);
+        data_walking <= data_walking(0) &
+                        data_walking(data_walking'length-1 downto 1);
       end if;
     end if;
   end process data_regs;
 
-  -- message size in samples = message size in bytes divided by (4 bytes in a
-  -- 32-bit output bus)
-  message_size_samples <=
-    props_in.messageSize_bytes srl 2 when props_in.messageSize_bytes /= 0 else
-    resize(props_in.ocpi_buffer_size_out srl 2, message_size_samples'length);
-  msg_counter : process(ctl_in.clk)
+  -- watch for num_samples being set and running out of samples to assert EOF
+  do_samples : process(ctl_in.clk)
   begin
     if rising_edge(ctl_in.clk) then
       if ctl_in.reset = '1' then
-        msg_samp_ctr <= (0 => '1', others => '0');
-      elsif enable = '1' then
-        if eom_data = '1' then
-          msg_samp_ctr <= (0 => '1', others => '0');
-        else
-          msg_samp_ctr <= msg_samp_ctr + 1;
-        end if;
+        eof_r             <= bfalse;
+        num_samples_valid <= bfalse;
+      -- assert EOF when number of samples sent (if num_samples is not -1)
+      elsif (its(ZLM_WHEN_NUM_SAMPLES_REACHED_p or EOF_WHEN_NUM_SAMPLES_REACHED_p) and
+             num_samples_valid and props_in.num_samples /= -1 and
+             data_count_32 >= props_in.num_samples) then
+        eof_r <= btrue;
+      elsif its(props_in.num_samples_written) then
+        num_samples_valid <= btrue;
       end if;
     end if;
-  end process msg_counter;
+  end process do_samples;
 
   ------------------------------------------------------------------------------
   -- mask_I, mask_Q properties
@@ -209,16 +127,6 @@ begin
 
   out_Q <= data_Q and std_logic_vector(props_in.mask_Q);
   out_I <= data_I and std_logic_vector(props_in.mask_I);
-
-  ------------------------------------------------------------------------------
-  -- ZLM_WHEN_NUM_SAMPLES_REACHED_p parameter property
-  ------------------------------------------------------------------------------
-
-  -- does not obey backpressure, will send multiple ZLMs if used directly
-  zlm_req <= num_samples_valid and
-             to_bool(props_in.num_samples /= -1) and
-             to_bool(long_t(data_count_32) >= (props_in.num_samples))
-             when (ZLM_WHEN_NUM_SAMPLES_REACHED_p = btrue) else '0';
 
   ------------------------------------------------------------------------------
   -- mode property

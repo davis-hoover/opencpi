@@ -108,9 +108,9 @@ else
 	perl $directory/configure_sig_gen.pl $sig_gen_ip "OUTP OFF"
 	if test -n "${USE_EPIQ_APP}"; then
 	    sshpass -p "$sdr_pass" scp $sdr_user@$sdr_ip:$output_dir$output_file $directory
-	    python $directory/verifyRxAppFft.py $directory/$output_file complex 65536 2500000
+	    ./$directory/verifyRxAppFft.py $directory/$output_file complex 65536 2500000
 	else
-	    python $directory/verifyRxAppFft.py $directory/../../rx_app/odata/rx_app_shortened.out complex 65536 2500000
+	    ./$directory/verifyRxAppFft.py $directory/../../rx_app/odata/rx_app_shortened.out complex 65536 2500000
 	fi
 	result=$?
 	if [ $result -ne 0 ] ; then
@@ -138,6 +138,6 @@ else
     echo "Total Failures: $total_failures"
     echo "Total Tests: $total_tests"
     if test -n "${PLOT}"; then
-	python $directory/plotFailures.py $log_file &
+	./$directory/plotFailures.py $log_file &
     fi
 fi

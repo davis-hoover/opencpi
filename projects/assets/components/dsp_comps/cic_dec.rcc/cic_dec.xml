@@ -1,0 +1,18 @@
+<RccWorker language='c++' spec='cic_dec-spec' Version="2" controlOperations="initialize,release">
+
+    <SpecProperty Name="N" Default="3" Parameter="true"></SpecProperty>
+
+    <SpecProperty Name="M" Default="1" Parameter="true"></SpecProperty>
+
+    <SpecProperty Name="R" Default="4" Parameter="true"></SpecProperty>
+    
+    <SpecProperty Name="ACC_WIDTH" Parameter="true"  Default="22"></SpecProperty>
+      <!-- 
+       ACC_WIDTH is calculated internally by the worker as ACC_WIDTH = CEIL(N*log2(R*M))+DIN_WIDTH
+       -->
+
+    <SpecProperty Name="DIN_WIDTH" Parameter="true"  Default="16"></SpecProperty>
+
+    <SpecProperty Name="DOUT_WIDTH" Parameter="true"  Default="16"></SpecProperty>
+    
+</RccWorker>

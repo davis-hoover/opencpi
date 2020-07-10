@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -42,11 +42,11 @@ def getmsg(m):
     opcode = m[1]
     data   = None
     if length > 0:
-        data = m[2:int(length/4+2)]
+        data = m[2:length//4+2]
     return (opcode, length, data)
 
 """
-Ex: python verify.py {sample-freq} {ofilename} {ifilename}
+Ex: ./verify.py {sample-freq} {ofilename} {ifilename}
 Validate:
 TEST #1: Verify I & Q values are not all zeros
 TEST #2: Output file matches expected size
@@ -133,8 +133,8 @@ if(enable == 'true'): # => NORMAL MODE
     complex_data = np.zeros(dout_samples_length, dtype=np.complex)
     complex_data.real = dout_samples_array['real_idx']
     complex_data.imag = dout_samples_array['imag_idx']
-    FFT = 1.0/dout_samples_length * abs(np.fft.fft(complex_data,dout_samples_length))
-    Max_FFT_freq=np.argmax(FFT)*sample_rate/dout_samples_length
+    FFT = 1.0 / dout_samples_length * abs(np.fft.fft(complex_data,dout_samples_length))
+    Max_FFT_freq = np.argmax(FFT) * sample_rate / dout_samples_length
     if Max_FFT_freq != 0.0:
         print ('Fail: Max of FFT occurs at index: ',Max_FFT_freq, 'Hz (Should be 0)')
         sys.exit(1)

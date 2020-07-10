@@ -191,14 +191,20 @@ addClient(std::string &assy, bool control, const char *client, const char *port)
       OU::formatAdd(prevPort, " index='%u'", m_currentChannel);
     std::string term;
     OU::format(term, "unoc_term%u_%u",  m_currentChannel, unc.m_currentNode);
+    if (m_type == SDPPort)
+      OU::formatAdd(assy,
+		    "  <instance worker='sdp_term' name='%s'>\n"
+		    "    <property name='sdp_width' value='%zu'/>\n"
+		    "  </instance>\n",
+		    term.c_str(), m_width);
+    else
+      OU::formatAdd(assy, "  <instance worker='unoc_term' name='%s'/>\n", term.c_str());
     OU::formatAdd(assy,
-		  "  <instance worker='%s_term' name='%s'/>\n"
 		  "  <connection>\n"
 		  "    <port instance='%s' %s/>\n"
 		  "    <port instance='%s' name='up'/>\n"
 		  "  </connection>\n",
-		  m_type == SDPPort ? "sdp" : "unoc", term.c_str(), prevInstance.c_str(),
-		  prevPort.c_str(), term.c_str());
+		  prevInstance.c_str(), prevPort.c_str(), term.c_str());
   }
 }
 
@@ -268,7 +274,8 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
 	ocpiAssert(p.m_type == SDPPort || slave);
 #endif
 	uNocs.insert(std::make_pair(p.pname(),
-				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(), p.count())));
+				    UNoc(p.pname(), p.m_type, m_config.sdpWidth(),
+					 m_config.sdpLength(), p.count())));
       }
     }
   }
@@ -724,9 +731,10 @@ emitUNocConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContCon
     OU::formatAdd(assy,
 		  "  <instance name='%s' worker='sdp_%s' interconnect='%s'>\n"
 		  "    <property name='sdp_width' value='%zu'/>\n"
+		  "    <property name='sdp_length' value='%zu'/>\n"
 		  "  </instance>\n",
 		  dma.c_str(), port->isDataProducer() ? "send" : "receive", iname,
-		  m_config.sdpWidth());
+		  m_config.sdpWidth(), m_config.sdpLength());
     // Instance a pipeline node upstream and connect it to the dma module
     // FIXME make this conditional
     std::string pipeline;
@@ -944,6 +952,8 @@ mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
       const char *boardName;
       bool isSingle;
       if ((boardName = di.device.m_dev2bd.findSignal(**s, n, isSingle))) {
+	ocpiInfo("For device %s devinst %s signal %s boardname '%s'",
+		 di.device.deviceType().cname(), di.cname(), (*s)->cname(), boardName);
 	std::string devSig = (*s)->cname();
 	if ((*s)->m_width && isSingle)
 	  OU::formatAdd(devSig, "(%u)", n);
@@ -967,17 +977,36 @@ mapDevSignals(std::string &assy, const DevInstance &di, bool inContainer) {
 	    OU::format(ename, "%s%s", di.slot->m_prefix.c_str(),
 		       ssi == di.slot->m_signals.end()  ?
 		       slotSig->cname() : ssi->second.c_str());
-	} else
+	} else {
 	  ename = boardName;
-	//	if (ename.length())
+	  if (*boardName && m_sigmap.find(boardName) == m_sigmap.end()) {
+	    // So a non-slot signal has a boardName (i.e. mapped).
+	    // Thus we must make the mapped name an external signal of the container
+	    // if it is not already a board signal (e.g. an input mapped to two platform/device signals)
+	    ocpiInfo("Adding a board signal '%s' for device signal '%s'", boardName, (*i)->cname());
+	    Signal *ns = new Signal(**i);
+	    ns->m_name = boardName;
+	    if (isSingle)
+	      ns->m_width = 0;
+	    m_signals.push_back(ns);
+	    m_sigmap[boardName] = ns;
+	  }
+	}
+
 	OU::formatAdd(assy, "    <signal name='%s' external='%s'/>\n",
 		      dname.c_str(), ename.c_str());
+	if (!isSingle)
+	  break;
       } else {
-	Signal *ns = new Signal(**i);
+	std::string ename = (*i)->m_name;
 	if (di.device.deviceType().m_type != Worker::Platform)
-	  OU::format(ns->m_name, "%s_%s", di.device.cname(), ns->cname());
-	m_signals.push_back(ns);
-	m_sigmap[ns->m_name.c_str()] = ns;
+	  OU::format(ename, "%s_%s", di.device.cname(), (*i)->cname());
+	if (m_sigmap.find(ename.c_str()) == m_sigmap.end()) {
+	  Signal *ns = new Signal(**i);
+	  ns->m_name = ename;
+	  m_signals.push_back(ns);
+	  m_sigmap[ns->cname()] = ns;
+	}
 	break;
       }
     }

@@ -7,6 +7,16 @@
   <Property name='prop_parameter' parameter='true'/>
   <Property name='prop_volatile' volatile='true'/>
 
+  <Property name='prop_bool_readable' type='bool' readable='true'/>
+  <Property name='prop_bool_readback' type='bool' readback='true'/>
+  <Property name='prop_bool_writable' type='bool' writable='true'/>
+  <Property name='prop_bool_initial' type='bool' initial='true'/>
+  <Property name='prop_bool_parameter' type='bool' parameter='true'/>
+  <Property name='prop_bool_volatile' type='bool' volatile='true'/>
+
+  <Property name='prop_bool_readable_initial_false' type='bool' readable='true' initial='true' default='false'/>
+  <Property name='prop_bool_readable_initial_true' type='bool' readable='true' initial='true' default='true'/>
+
   <Property name='prop_valueexpression' parameter='true' value='prop_parameter+1'/>
 
 </ComponentSpec>

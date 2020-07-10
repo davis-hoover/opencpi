@@ -155,7 +155,7 @@ deriveOCP() {
 }
 
 void WsiPort::
-emitVhdlShell(FILE *f, ::Port *wci) {
+emitVhdlShell(FILE *f, ::Port */*wci*/) {
   bool slave = masterIn();
   std::string mNameTemp;
   if (!slave)
@@ -227,7 +227,7 @@ emitVhdlShell(FILE *f, ::Port *wci) {
 		"  %s_opcode_temp <= std_logic_vector(to_unsigned(%s_opcode_pos, %s_opcode_temp'length));\n",
 		cname(), cname(), cname());
       }
-    } else 
+    } else
       fprintf(f, "  %s_opcode%s <= %s_opcode%s;\n",
 	      cname(), slave ? "" : "_temp", cname(), slave ? "_temp" : "");
   }
@@ -288,18 +288,7 @@ emitVhdlShell(FILE *f, ::Port *wci) {
 	  "                hdl_version      => to_integer(ocpi_version),\n"
 	  "                early_request    => %s)\n",
 	  BOOL(m_earlyRequest));
-  std::string clockName(m_clock->signal());
-  if (m_clock->m_port) {
-    if (m_clock->m_output) {
-      if (m_clock->m_port->isDataProducer())
-	clockName = m_clock->m_port->typeNameOut + "_temp.";
-      else
-	clockName = m_clock->m_port->pname(), clockName += "_";
-    } else
-      clockName = m_clock->m_port->typeNameIn + ".";
-    clockName += "Clk";
-  }
-  fprintf(f, "    port map   (Clk              => %s,\n", clockName.c_str());
+  fprintf(f, "    port map   (wsi_clk          => %s,\n", m_clock->internalName());
   fprintf(f, "                MBurstLength     => %s.MBurstLength,\n", mName);
   fprintf(f, "                MByteEn          => %s%s,\n",
 	  ocp.MByteEn.value ? mName : mOption1,
@@ -324,12 +313,13 @@ emitVhdlShell(FILE *f, ::Port *wci) {
   fprintf(f, "                MReset_n         => %s.MReset_n,\n", mName);
   fprintf(f, "                SReset_n         => %s.SReset_n,\n", sName);
   fprintf(f, "                SThreadBusy      => %s.SThreadBusy,\n", sName);
-  fprintf(f, "                wci_clk          => %s%s,\n",
-	  wci ? wci->typeNameIn.c_str() :
-	  (m_clock->m_port ? m_clock->m_port->typeNameIn.c_str() : m_clock->signal()),
-	  wci || m_clock->m_port ? ".Clk" : "");
-  fprintf(f, "                wci_reset        => %s,\n", "wci_reset");
-  fprintf(f, "                wci_is_operating => %s,\n",	"wci_is_operating");
+  fprintf(f,
+	  "                wsi_reset        => %s%s,\n"
+	  "                wsi_is_operating => %s%s,\n",
+	  m_clock == ::Port::m_worker->m_wciClock ? "wci_reset" : "wsi_reset_",
+	  m_clock == ::Port::m_worker->m_wciClock ? "" : m_clock->cname(),
+	  m_clock == ::Port::m_worker->m_wciClock ? "wci_is_operating" : "wsi_is_operating_",
+	  m_clock == ::Port::m_worker->m_wciClock ? "" : m_clock->cname());
   if (slave)
     fprintf(f,
 	    "                first_take       => %s_first_take, -- output the input port\n"
@@ -522,7 +512,7 @@ emitVHDLShellPortMap(FILE *f, std::string &last) {
       fprintf(f,
 	      ",\n    %s_in.som => %s_som,\n"
 	      "    %s_in.eom => %s_eom,\n"
-	      "    %s_in.valid => %s_valid", 
+	      "    %s_in.valid => %s_valid",
 	      cname(), cname(), cname(), cname(), cname(), cname());
     fprintf(f, ",\n    %s_in.eof => %s_eof", cname(), cname());
     if (m_isPartitioned)
@@ -572,7 +562,7 @@ adjustConnection(::Port &consPort, const char *masterName, Language lang,
 		 OcpAdapt *prodAdapt, OcpAdapt *consAdapt, size_t &unused) {
   WsiPort &cons = *static_cast<WsiPort *>(&consPort);
   OcpAdapt *oa;
-  
+
   // Bursting compatibility and adaptation
   if (m_impreciseBurst && !cons.m_impreciseBurst)
     return "consumer needs precise, and producer may produce imprecise";

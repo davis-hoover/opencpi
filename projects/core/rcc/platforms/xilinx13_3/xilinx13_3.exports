@@ -18,24 +18,30 @@
 
 # Add generic zynq files to this zynq platform.
 # These files will be used for both the runtime package as well as the initial/default contents
-# of the hardware platform's SD card.  The hardware platform's script for its SD card can
+# of the hardware platform's SD card.  The hardware platform's exports for deployment can
 # remove files as well as add files.
 
+### Development files
+# Put the generic READMEs onto the development package under zynq
++platforms/zynq/README* zynq/
+# For the development package add this script for formatting SD cards
++platforms/zynq/formatOpenCPIZynqSD.sh zynq/
++<platform-dir>/release/kernel-headers.tar release/
++<platform-dir>/install*.sh
+# Expose the HDL-platform-specific boot files to support building SD cards
++<platform-dir>/release/zed hdl/zed/boot
++<platform-dir>/prerequisites
+
+### Runtime files
+# Put the platform's READMEs onto the runtime
+=<platform-dir>/README*
+# Use the default zynq system.xml unless overridden by hardware
+=platforms/zynq/zynq_system.xml system.xml
+=<platform-dir>/release/lib sdk/
+
+### Deployment files
 # Both the default setup files for users and the underlying ones, for the SD card
 @platforms/zynq/zynq_*setup.sh opencpi/
 @platforms/zynq/default_my*setup.sh opencpi/
-# no system.xml, let the hardware platform specify that
-# any value in having the zynq-generic one lying around anyway?
-# =platforms/zynq/zynq_system.xml <target>/zynq/
-# Put the platform's READMEs onto the runtime
-=<platform_dir>/README* <target>/
-# Put the generic READMEs onto the development package under zynq
-+platforms/zynq/README* <target>/zynq/
-# For the development package add this script for formatting SD cards
-+platforms/zynq/formatOpenCPIZynqSD.sh <target>/zynq/
-# Use the default zynq system.xml
-=platforms/zynq/zynq_system.xml <target>/system.xml
-+<platform_dir>/README <target>/
-# Deployment files
-@<platform_dir>/release/uramdisk.image.gz /
-@<platform_dir>/release/uImage /
+@<platform-dir>/release/uramdisk.image.gz
+@<platform-dir>/release/uImage

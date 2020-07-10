@@ -38,7 +38,7 @@ else
   ifeq ($(wildcard exports),)
     include $(CURDIR)/bootstrap/include/util.mk
     $(info Exports have never been set up here.  Doing it now for platform-independent items.)
-    $(and $(call DoShell,./scripts/makeExportLinks.sh -b -,Error),$(error $(Error)))
+    $(and $(call DoShell,./scripts/export-framework.sh -,Error),$(error $(Error)))
   endif
 endif
 include $(OCPI_CDK_DIR)/include/util.mk
@@ -58,7 +58,7 @@ ifdef Platforms
     RccPlatforms:=
   endif
 endif
-ifeq ($(filter show help clean% distclean%,$(MAKECMDGOALS)),)
+ifeq ($(filter-out cleandriver,$(filter show help clean% distclean%,$(MAKECMDGOALS))),)
   include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
   include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
 endif
@@ -99,14 +99,18 @@ GetRccHdlPlatform=$(strip\
         $(if $(filter $s,$(RccAllPlatforms)),,$(error Unknown RCC platform: $s)),\
         $(if $(filter $f,$(HdlAllPlatforms) $(RccAllPlatforms)),,\
            $(error Platform $f is neither an RCC platform or a (built) HDL platform)))\
-      $(foreach r,$(or $(filter $f,$(RccAllPlatforms)),$(filter-out -,$s),$(HdlRccPlatform_$f),-),\
+      $(foreach r,$(or $(filter $f,$(RccAllPlatforms)),$(filter-out -,$s),-),\
         $(foreach h,$(or $(filter $f,$(HdlAllPlatforms)),-),$r:$h)))))
+
+#$(HdlRccPlatform_$f),-),\
 
 ##########################################################################################
 # Goals that are not about projects
 
-# The exports script makeExportLinks.sh needs to know what we already know about the platforms.
-# Feed the required info into makeExportLinks on a silver platter.
+# The exports script export-framework.sh needs to know what we already know about the platforms.
+# Feed the required info into export-framework on a silver platter.
+# If there is an hdl:rcc pair, we just run the export scripts for each one
+# I.e. its only "deploy" that actually does a combination of rcc and hdl
 DoExports=\
   $(foreach p,$(or $(Platforms),$(RccPlatforms) $(HdlPlatforms)),\
     $(foreach x,$(call GetRccHdlPlatform,$p),\
@@ -116,9 +120,9 @@ DoExports=\
           $(if $(and $(filter-out -,$h),$(filter -,$r)),\
             $(warning The HDL platform "$h" has no RCC platform.  It will be ignored.))\
 	  $(and $(filter-out -,$r),\
-            ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) &&) \
+            ./scripts/export-framework.sh rcc $r $(RccPlatformDir_$r) &&) \
           $(and $(filter-out -,$h),\
-            ./scripts/makeExportLinks.sh $r $(RccPlatformDir_$r) $h $(HdlPlatformDir_$h) &&))))) :
+            ./scripts/export-framework.sh hdl $h "$(HdlPlatformDir_$h)" &&))))) :
 
 .PHONY: exports      framework      driver      testframework cleanpackaging \
         cleanexports cleanframework cleanprojects cleandriver clean distclean cleaneverything
@@ -347,11 +351,11 @@ cleanprerequisites:
 # Goals that are about projects
 # A convenience to run various goals on all the projects that are here
 # Unfortunately, we need to know the order here.
-Projects=core assets inactive assets_ts
+Projects=core platform assets inactive assets_ts
 ProjectGoals=cleanhdl cleanrcc cleanocl rcc ocl hdl applications run runtest hdlprimitives \
              hdlportable components cleancomponents test
 # These are not done in parallel since we do not know the dependencies
-DoProjects=set -e; . $(OCPI_CDK_DIR)/opencpi-setup.sh -r; $(foreach p,$(Projects),\
+DoProjects=set -e; . $(OCPI_CDK_DIR)/opencpi-setup.sh -r -b; $(foreach p,$(Projects),\
                      echo Performing $1 on project $p && \
                      $(MAKE) -C projects/$p $(if $(filter build,$1),,$1) &&) :
 .PHONY: $(ProjectGoals) testprojects

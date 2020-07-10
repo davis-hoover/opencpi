@@ -1,4 +1,4 @@
-#!/bin/sh --noprofile
+#!/bin/bash --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -44,7 +44,7 @@ if findInProjectPath loadFlash_$1 lib/platforms/$1 pfscript ; then
   echo Loading from file: $2
   # do not require execute permission on the file
   # echo exec sh $pfscript $verbose $2 $3
-  exec sh $pfscript $verbose $2 $3
+  exec bash $pfscript $verbose $2 $3
 fi
 echo 'The "'$1'" platform does not appear to be supported for flash loading.  Misspelled?'
 echo "Looked for \"loadFlash_$1\" internal script in OCPI_PROJECT_PATH and OCPI_CDK_DIR."

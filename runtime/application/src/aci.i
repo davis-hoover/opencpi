@@ -20,6 +20,11 @@
 
 // This module will be a submodule under the opencpi package
 %module "aci"
+// The following is needed so python3 will interpret
+// strings as bytes objects instead of unicode objects.
+%begin %{
+#define SWIG_PYTHON_STRICT_BYTE_CHAR
+%}
 %include <exception.i>
 %include <std_string.i>
 %include <cstring.i>
@@ -30,8 +35,8 @@
 %apply std::string& OUTPUT {std::string& value};
 
 // ExternalBuffer *getBuffer(uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData)
-// Typemaps to adapt the c++ return by reference calls into return values. Allows for data to be read FROM
-// an external port
+// Typemaps to adapt the c++ return by reference calls into return values.
+// Allows for data to be read FROM an external port.
 %typemap(in, numinputs=0) (uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData) (uint8_t *tdata, size_t tlength, uint8_t topCode, bool tendOfData) {
     tdata = NULL;
     tlength = 0;
@@ -60,8 +65,8 @@
 %rename(writeBuffer) getBuffer(uint8_t *&data, size_t &length);
 
 // ExternalBuffer *getBuffer(uint8_t *&data, size_t &length)
-// Typemaps to adapt the c++ return by reference calls into return values. Allows for data to be written TO
-// an external port
+// Typemaps to adapt the c++ return by reference calls into return values.
+// Allows for data to be written TO an external port.
 %typemap(in) (uint8_t *&data, size_t &length) (uint8_t *tdata, size_t tlength) {
     if (!PyList_Check($input)) {
         PyErr_SetString(PyExc_ValueError, "Expecting a python list");

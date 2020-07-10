@@ -41,8 +41,6 @@ lib/
 run/
 !/projects/*/rcc/platforms/xilinx*/opencpi-*-release*/**/lib
 !/projects/*/rcc/platforms/xilinx*/opencpi-*-release*/**/*.so
-tools/cdk/export/*
-tools/cdk/include/ctests/*
 my-env.sh
 myzed.sh
 exports
@@ -52,8 +50,10 @@ projects/*/specs/package-id
 doc/tex/build
 vendor/
 
-# Generated PDFs
+# Generated files
 doc/pdfs/
+**/doc/*.inc
+!**/doc/developer_doc.inc
 
 # GitLab Pages staging area
 .public/

@@ -1,18 +1,28 @@
 #!/usr/bin/octave
 
+function retval = get_time(filename)
+
+  empty_value = -1;
+  tmp = dlmread(filename, ",", "emptyvalue", empty_value);
+  time_sec = tmp(2:end,5);
+  time_fract_sec = tmp(2:end,4);
+  time = bitshift(time_sec, 32) + time_fract_sec;
+
+  retval = time(time_sec != empty_value);
+
+endfunction
+
 function retval = verify_min_num_data_per_time(filename,
     expected_min_num_data_per_time)
 
   retval = 0;
 
-  empty_value = -1;
-  tmp = dlmread(filename, ",", "emptyvalue", empty_value);
-  time = tmp(:,5);
-  time = time(time != empty_value);
+  time = get_time(filename);
   ss = sort(unique(diff(time)));
   emin = expected_min_num_data_per_time;
   if(min(ss) < emin)
-    printf("ERROR: expected num data per time to be >= %i\n", emin)
+    time
+    printf("ERROR: for file %s, min num data per time was %i instead of the expected value of %i\n", filename, min(ss), emin)
     retval = true;
   else
     printf("INFO: as expected, num data_per time exceeded minimum of %i\n", emin)

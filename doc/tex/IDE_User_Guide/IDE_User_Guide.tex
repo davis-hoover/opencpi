@@ -1,4 +1,3 @@
-%TODO: Use LaTeX_Header
 \iffalse
 This file is protected by Copyright. Please refer to the COPYRIGHT file
 distributed with this source distribution.
@@ -17,111 +16,51 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
-\documentclass[10pt, a4paper, oneside]{article}
 
-% Packages
-% ---
-\usepackage{ifthen}
-\usepackage{enumitem}
-\usepackage{float}
-% not on approved list \usepackage{wrapfig}
-\usepackage{helvet}
-\renewcommand{\familydefault}{\sfdefault}
-\usepackage{fancyhdr}
-\usepackage{colortbl}
-\usepackage{scrextend}
-\usepackage{hyperref}
-\usepackage{titlesec}
-% not on approved list \usepackage[export]{adjustbox}
-\titleformat{\section}{\bfseries\Large}{\thesection.}{0.5em}{}
-\titleformat{\subsubsection}{}{\thesubsubsection}{1em}{\itshape}
-\setlength{\parindent}{0pt}
-\setcounter{secnumdepth}{0} % No numbers, but import into TOC anyway
-\usepackage{textcomp} % for upquote
-\usepackage{listings}
-% \usepackage{wrapfig}
-% \usepackage[export]{adjustbox}
-% Set default for listings
-\lstset{
-  basicstyle=\ttfamily,
-  columns=flexible,
-  breaklines=true,
-  breakatwhitespace=true,
-  upquote=true, % Don't put weird single quotes
-  % WIP: https://tex.stackexchange.com/q/385271/87531
-  %  breakindent=1em,
-  % literate=-{\nobreak-\nobreak}3 [--]{\nobreak--\nobreak}4, % <--- 10K penalty to break around - (e.g. python-matplotlib) https://tex.stackexchange.com/a/200498 https://tex.stackexchange.com/a/119371
-}
-\usepackage[margin=.75in]{geometry}
-\usepackage{microtype}
-\pagenumbering{roman}
-\pagestyle{fancy}
-\fancyhf{}
-\lfoot{OpenCPI AV User Guide}
-\rfoot{\thepage}
-\renewcommand{\headrulewidth}{0pt}
-\definecolor{blue}{rgb}{.5, .75,1}
-
-% This block is to make sure there is 3cm min at the bottom of a page before a new section or subsection is allowed to start. Otherwise, next page.
-% Modified from http://tex.stackexchange.com/a/152278
-\usepackage{etoolbox}
-\newskip\mfilskip
-\mfilskip=0pt plus 3cm\relax
-\newcommand{\mfilbreak}{\vspace{\mfilskip}\penalty -200%
-\ifdim\lastskip<\mfilskip\vspace{-\lastskip}\else\vspace{-\mfilskip}\fi}
-\pretocmd{\section}{\mfilbreak}{}{}
-\usepackage{graphicx} % Add pictures to your document
-% end [sub]section pushes
-\usepackage{tabularx}
-% These define tabularx columns "C" and "R" to match "X" but center/right aligned
-\newcolumntype{C}{>{\centering\arraybackslash}X}
-\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
-
-% \parindent=20pt
-% \hangindent=0.7cm
-
-% \tableofcontents
-% \vspace{1pc}
-% \hrule
-\usepackage{amsmath} % Advanced math typesetting
-\usepackage[utf8]{inputenc} % Unicode support (Umlauts etc.)
-\usepackage[english]{babel} % Change hyphenation rules
-\usepackage[toc,page]{appendix}
-
-%\usepackage[backend=bibtex,style=verbose-trad2]{biblatex} % Use biblatex package
-%\bibliography{quick} % The name of the .bib file (name without .bib)
-
-%TODO: Why doesn't this use LaTeX_Header?
+%----------------------------------------------------------------------------------------
+% Required document specific properties
+%----------------------------------------------------------------------------------------
+\def\docTitle{AV GUI User Guide}
 \def\snippetpath{../../av/tex/snippets}
-\input{\snippetpath/includes}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\usepackage[english]{babel}  % Change hyphenation rules
+\date{Version: 2.2}  % Override "date" to be revision
+%----------------------------------------------------------------------------------------
 
-% Main document
-% ---
 \begin{document}
-% Set up the maketitle command
-\title {OpenCPI ANGRYVIPER IDE User Guide}
-\author{}
-\date{January 2020} % You can remove \today{} and type a date manually
-\begin{titlepage}
-\maketitle{} % Generates title
+\maketitle
+% Doc has revision not inline with opencpi release
 \begin{center}
-OpenCPI Release: \ocpiversion
+OpenCPI Release:\ \ \ocpiversion
 \end{center}
-\end{titlepage}
+\thispagestyle{empty}
+\newpage
 
-\section{Revision History}
-\renewcommand{\arraystretch}{2}
-\begin{tabular}{|c|p{11cm}|c|}
-\hline
-Revision & Description of Change & Date\\
-\hline
-& Initial, from earlier doc sources & 02-2018\\ \hline
-1.0 & Revision for v1.4& 09-2018\\  \hline
-2.0 & Updates for v1.5 & 05-2019 \\\hline
-2.1 & Converted to \LaTeX, added build instructions & 05-2019\\ \hline
-2.2 & Removed RPM dependencies for v1.6 & 01-2020\\
-\hline
-\end{tabular}
+\begin{center}
+  \textit{\textbf{Revision History}}
+  \begin{table}[H]
+    \begin{tabularx}{\textwidth}{|c|X|l|}
+      \hline
+      \rowcolor{blue}
+      \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+      \hline
+       & Initial, from earlier doc sources & 02-2018 \\
+      \hline
+      1.0 & Revision for v1.4& 09-2018 \\
+      \hline
+      2.0 & Updates for v1.5 & 05-2019 \\
+      \hline
+      2.1 & Converted to \LaTeX, added build instructions & 05-2019 \\
+      \hline
+      2.2 & Removed RPM dependencies for v1.6 & 01-2020 \\
+      \hline
+    \end{tabularx}
+  \end{table}
+\end{center}
+\newpage
 
 \setcounter{tocdepth}{2}
 \tableofcontents
@@ -136,7 +75,7 @@ Revision & Description of Change & Date\\
 Some familiarity with the Eclipse Integrated Development Environment (IDE) or similar environment is assumed. If this is not the case, Appendix A gives basic information to get you started.
 
 \subsection{Assumptions}
-The document begins with the assumption that \href{https://gitlab.com/opencpi/opencpi}{OpenCPI} and its ANGRYVIPER IDE are installed on a development machine and the Eclipse workspace has been previously set up.
+The document begins with the assumption that \href{https://gitlab.com/opencpi/opencpi}{OpenCPI} and its IDE are installed on a development machine and the Eclipse workspace has been previously set up.
 \subsection{Reference Documents}
 \def\myreferences{
 \hline
@@ -149,22 +88,22 @@ OpenCPI Component Development Guide &
 OpenCPI Application Development Guide &
 \githubio{OpenCPI\_Application\_Development\_Guide.pdf} \\
 }
-\input{References_Table_noRPM}
+\input{\snippetpath/References_Table_noRPM}
 \section{Introduction}
-The OpenCPI ANGRYVIPER (AV) {IDE} consists of the Eclipse IDE for C/C++ developers and a custom plugin for OpenCPI development. Eclipse and this plugin is installed into the \textbf{av/eclipse} subdirectory of the OpenCPI installation as described in the OpenCPI Installation Guide.  The default workspace is in the \textbf{av/workspace} subdirectory.  Users that want to add this plugin to an \textit{existing} eclipse installation must obtain the IDE plugin from GitLab and drop it into the existing Eclipse installation.  This should work in theory, but the tested configuration uses a private installation of eclipse installed for OpenCPI.
+The OpenCPI {IDE} consists of the Eclipse IDE for C/C++ developers and a custom plugin for OpenCPI development. Eclipse and this plugin is installed into the \textbf{av/eclipse} subdirectory of the OpenCPI installation as described in the OpenCPI Installation Guide.  The default workspace is in the \textbf{av/workspace} subdirectory.  Users that want to add this plugin to an \textit{existing} eclipse installation must obtain the IDE plugin from GitLab and drop it into the existing Eclipse installation.  This should work in theory, but the tested configuration uses a private installation of eclipse installed for OpenCPI.
 \subsection{New Features in the 1.6 Release}
 No new features were added for release 1.6. However, the installation was simplified, and now includes the initial configuration of a default workspace, the initial import (not copy) of the built-in OpenCPI projects, and the exposure of the console window.
 In the 1.5 release, every available component editor (excluding the Application and Assembly Editors) were updated. In addition, new editors were provided for the Properties File, Signals File, and Slot Signals File. These editors are not integrated with the OpenCPI Projects view but they will open if the respective XML file is selected via the Eclipse Project Explorer.
 
 \newpage
 \section{Overview}
-The face of AV is the \textbf{ANGRYVIPER (AV) Perspective}. This section provides an overview of the perspective layout and how to set it up in a new IDE installation.
+The face of AV is the \textbf{AV Perspective}. This section provides an overview of the perspective layout and how to set it up in a new IDE installation.
 \subsection{AV Perspective Views}
 The figure below illustrates the new AV Perspective. It consists of detailed views and the Eclipse Editor panel.
 
 \begin{figure}[h!]
 	\centering
-	\caption{ANGRYVIPER Perspective Views}\label{fig:AVPerspectiveViews}
+	\caption{AV Perspective Views}\label{fig:AVPerspectiveViews}
 	\includegraphics[width=.95\linewidth]{AVPerspectiveViews.png}
 \end{figure}
 
@@ -949,7 +888,7 @@ Search for Terminal in the Marketplace to see a number of available terminal pac
 \section{Build The IDE}
 \newcommand{\cmd}[1]{\subitem \textbf{cmd:} \code{#1}}
 \subsection{Introduction}
-The OpenCPI/ANGRYVIPER IDE Plugin can be built from source with the following instructions. These commands assume they are performed by the ``root'' user, while normally discouraged, is usually performed within a Docker container running a Fedora OS.
+The OpenCPI IDE Plugin can be built from source with the following instructions. These commands assume they are performed by the ``root'' user, while normally discouraged, is usually performed within a Docker container running a Fedora OS.
 \subsection{Instructions}
 Follow the steps below, in the directory of your choice ``\path{$DIR}''. %$
 \begin{enumerate}
@@ -1011,17 +950,17 @@ org.eclipse.sapphire.modeling.xml.feature.group"}
 \item Clone OpenCPI IDE repository
 \cmd{cd \$DIR}
 \cmd{git clone}
-\url{https://gitlab.com/opencpi/angryviper_gui.git}
+\url{https://gitlab.com/opencpi/av-gui.git}
 \cmd{} $<$\code{git checkout} appropriate branch$>$
 \item Build OpenCPI Plugin
-\cmd{cd angryviper\_gui/av.proj.ide.tycho}
+\cmd{cd av-gui/av.proj.ide.tycho}
 \cmd{xmvn -o clean verify}
 \item Combine Prerequisites + OpenCPI Plugin + Eclipse
 \cmd{mdkir -p \$DIR/eclipse/dropins/angryviper/plugins}
 \cmd{mv \$DIR/eclipse/av\_prereqs/plugins/* \$DIR/eclipse/dropins/angryviper/plugins/}
 \cmd{rm -rf \$DIR/eclipse/av\_prereqs}
 \cmd{mv \\
-\$DIR/angryviper\_gui/av.proj.ide.tycho/releng/av.proj.ide.update/target/repository/plugins/*.jar \\
+\$DIR/av-gui/av.proj.ide.tycho/releng/av.proj.ide.update/target/repository/plugins/*.jar \\
 \$DIR/eclipse/dropins/angryviper/plugins/}
 \item Start Eclipse With IDE Plugin
 \cmd{\$DIR/eclipse/eclipse \&}

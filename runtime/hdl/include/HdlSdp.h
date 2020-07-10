@@ -121,7 +121,7 @@ namespace OCPI {
 	// Unfortunate effect of non-portable bitfields
 #define SDP_FIELD(type, field)						             \
 	void set_##field(type field) {					             \
-	  assert(!(field & (UINT64_MAX << field##_width)));		             \
+	  assert(!((uint64_t)field & (UINT64_MAX << field##_width)));	\
 	  m_bits &= ~(~(UINT64_MAX << field##_width) << field##_shift);              \
 	  m_bits |= (uint64_t)field << field##_shift;			\
         }								             \
@@ -208,6 +208,7 @@ namespace OCPI {
       struct Properties {
 	// Constant values available from the hardware
 	const uint32_t memory_bytes;
+	const uint16_t sdp_length;
 	const uint8_t sdp_width, interconnect, window_log2, max_buffers, max_remotes;
 	const uint8_t sdp_id; // not a parameter of the worker, but fed from the SDP itself
 	// Configured by software

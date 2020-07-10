@@ -121,7 +121,7 @@ Running AV to make some final installation settings.  Log output is in av/av.log
 If the "Force Quit or Wait" window comes up, click "Wait" to allow it to start
 1. Close the Welcome Tab, clicking the X in the Welcome window's tab.
 2. Select: Window->Perspective->Open Perspective->Other...
-3. Choose the "ANGRYVIPER Perspective" then click OK.
+3. Choose the "AV Perspective" then click OK.
 4. Select: File->Import, open the General category and select Existing Projects into Workspace, Click OK.
 5. Use Select root directory, and the Browse next to it to select the project-registry directory
    OpenCPI built-in projects should appear in the lower level Project Explorer window

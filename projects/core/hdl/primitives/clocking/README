@@ -1,0 +1,17 @@
+PRELIMINARY
+This library contains vendor specific clocking ip and vendor agnostic clocking based on phased-locked loops.
+
+The clock_generator.vhd wraps the vendor specific ip and the vendor agnostic version of clock_generator.vhd 
+implements something similar to the vendor IP.
+
+Not all of the generics of clock_generator.vhd are used by the various implementations. 
+
+Description of the generics of clock_generator.vhd:
+CLK_PRIMITIVE - Used when a vendor has multiple clock primitives or versions for a part
+CLK_IN_FREQUENCY_MHz  - Input clock frequency in MHz
+CLK_OUT_FREQUENCY_MHz - Output clock frequency in MHz
+M - The multiply factor for a phase-locked loop
+N - The divide factor for a phase-locked loop. Xilinx calls it D and Intel calls it N
+O - For phase-locked loops with muitlple outputs, this is the output divide factor. Xilinx calls it O and Intel calls it C
+CLK_OUT_DUTY_CYCLE - Duty cycle of output clock
+ 

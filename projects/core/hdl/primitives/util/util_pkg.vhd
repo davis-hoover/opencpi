@@ -307,23 +307,60 @@ component clock_forward
     CLK_OUT_N : out std_logic);
 end component clock_forward;
 
-component zlm_detector is
-  port(
-    clk         : in  std_logic;  -- control plane clock
-    reset       : in  std_logic;  -- control plane reset (active-high)
-    som         : in  std_logic;  -- input port SOM
-    valid       : in  std_logic;  -- input port valid
-    eom         : in  std_logic;  -- input port EOM
-    ready       : in  std_logic;  -- input port ready
-    take        : in  std_logic;  -- input port take
-    eozlm_pulse : out std_logic;  -- pulse-per-end-of-ZLM
-    eozlm       : out std_logic); -- same as EOM but only for end of ZLMs
-end component;
-
 component in2out is
   port(
     in_port  : in std_logic;
     out_port : out std_logic);
+end component;
+
+component counter is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk      : in  std_logic;
+    rst      : in  std_logic;
+    en       : in  std_logic;
+    cnt      : out unsigned(BIT_WIDTH-1 downto 0));
+end component;
+
+component set_clr
+  port(
+    clk : in  std_logic;
+    rst : in  std_logic;
+    set : in  std_logic;
+    clr : in  std_logic;
+    q   : out std_logic;
+    q_r : out std_logic);
+end component set_clr;
+
+component lfsr
+  generic (
+    POLYNOMIAL : std_logic_vector;
+    SEED       : std_logic_vector); -- must never be all zeros
+  port (
+    CLK      : in std_logic; -- rising edge clock
+    RST      : in std_logic; -- synchronous, active high
+    EN       : in std_logic; -- synchronous, active high
+    REG      : out std_logic_vector(POLYNOMIAL'length-1 downto 0));
+end component;
+
+component reset_detector is
+  port(
+    clk                     : in  std_logic;
+    rst                     : in  std_logic;
+    clr                     : in  std_logic;  -- clears all rst_*
+    rst_detected            : out std_logic;  -- synchronous reset detected
+    rst_then_unrst_detected : out std_logic); -- synchronous reset, followed by
+                                              -- a synchronous unreset, detected
+end component;
+
+component edge_detector is
+  port(
+    clk               : in  std_logic;  -- input clock
+    reset             : in  std_logic;  -- reset (active-high)
+    din               : in  std_logic;  -- input
+    rising_pulse      : out std_logic;  -- rising edge pulse
+    falling_pulse     : out std_logic); -- falling edge pulse
 end component;
 
 end package util;

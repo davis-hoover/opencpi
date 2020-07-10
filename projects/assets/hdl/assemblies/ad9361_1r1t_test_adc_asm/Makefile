@@ -19,7 +19,7 @@
 Containers= \
 	cnt_1rx_0tx_thruasm_fmcomms_2_3_hpc_LVDS_ml605 \
 	cnt_1rx_0tx_thruasm_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_1rx_0tx_thruasm_fmcomms_2_3_lpc_LVDS_zed
+	cnt_nopfcfg_1rx_0tx_fmcomms_2_3_lpc_thruasm_zed
 
 #VivadoExtraOptions_synth=" -<myoption1> -<myoption2> "
 #VivadoExtraOptions_impl_opt=" -<myoption1> -<myoption2> "

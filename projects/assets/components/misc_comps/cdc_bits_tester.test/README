@@ -1,9 +1,0 @@
-The golden files used in the verification were created from the output of the unit test when running the unit test in simulation. 
-Since there might or might not be a perfect match of the output data to the golden data when running the tests in hardware due to 
-metastability or phase offset, the output data is correlated with the golden data and if the correlation is at least 70% then the 
-test is allowed to pass. This correlation is not to say that the cdc primitives work 70% of the time but it used to account for the 
-output, when running in hardware, not being a perfect match to the golden data from simulation.
-
-Currently there is a bug (issue #139) with unit test case generation when using the OnlyPlatorms and ExcludePlatforms xml tags together, 
-so once the bug is fixed, there will be hooks to just compare the output data to the golden if running the test in simulation 
-and if running in hardware take the correlation.

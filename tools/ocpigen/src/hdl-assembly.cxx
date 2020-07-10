@@ -512,7 +512,8 @@ parseHdlAssy() {
 	InstancePort &ip = (**ai).m_instPort;
 	if (!ip.m_port->isOCP() || ip.m_external)
 	  continue;
-	if (ip.m_port->m_myClock && !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
+	if ((ip.m_port->m_myClock || ip.m_port->m_clockPort != SIZE_MAX) &&
+	    !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
 	    ocpiInfo("Promoting the %s clock of instance %s port %s to be the assembly's clock "
 		     "for external port %s", ip.m_port->m_clock->m_output ? "output" : "input",
 		     ip.m_instance->cname(), ip.m_port->pname(),
@@ -570,6 +571,7 @@ parseHdlAssy() {
       }
     }
   }
+#if 0 // TODO / FIXME - do we need to restore the error check but with it being ok if it is optional and not connected?
   // Check for unconnected ports without clocks
   for (n = 0, i = &a->m_instances[0]; n < a->m_instances.size(); n++, i++)
     if (i->m_worker && !i->m_worker->m_assembly) {
@@ -584,6 +586,7 @@ parseHdlAssy() {
 	  }
 	}
     }
+#endif
   // Look at connections for inserting adapters between ports
   for (ConnectionsIter ci = a->m_connections.begin(); ci != a->m_connections.end(); ci++) {
     Connection &c = **ci;

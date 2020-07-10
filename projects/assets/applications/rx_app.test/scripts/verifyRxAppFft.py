@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -25,12 +25,12 @@
 #The expected power level decrease is set by expected_power_level_decrease_dB
 
 import numpy as np
+import sys
 try:
     import matplotlib.pyplot as plt
 except (ImportError, RuntimeError):
     print("******* Error: python matplotlib is unavailable or not installed")
     sys.exit(1)
-import sys
 import os.path
 import itertools
 
@@ -64,13 +64,8 @@ def main():
     dataType = sys.argv[2].lower()
     numSamples = int(sys.argv[3])
     sampleRate = float(sys.argv[4])
-    #print "file is : " + f.name
-    #print "data is : " + dataType
-    #print "num samples is: " + str(numSamples)
-    #print "sample rate is: " + str(sampleRate)
 
     if dataType == "complex":
-        #print "Input is complex data"
         #I/Q pair in a 32-bit vector (31:0) is Q(0) Q(1) I(0) I(1) in bytes 0123 little-Endian
         #Thus Q is indexed at byte 0 and I is indexed at byte 2
         dt_iq_pair = np.dtype((np.uint32, {'imag_idx':(np.int16,2), 'real_idx':(np.int16,0)}))
@@ -78,8 +73,8 @@ def main():
         #Pull out I and Q and make lists for each
         iList = data['real_idx']
         qList = data['imag_idx']
-        iqList = list();
-        iqList_mag = list();
+        iqList = list()
+        iqList_mag = list()
         for a,data in enumerate(iList):
             iqList.append(complex(int(iList[int(a)]),int(qList[int(a)])))
 
@@ -117,14 +112,10 @@ def main():
         #Find max value in fft
         fft_max=max(yf_plot_log_scale)
         fft_max_freq=np.argmax(yf_plot_log_scale)
-        print "Max FFT value: " + str(fft_max)
-        print "Max FFT freq: " + str(xf[fft_max_freq])
-        fft_max_plus=yf_plot_log_scale[fft_max_freq+how_many_bins_from_peak_to_check];
-        #print "Max FFT freq+ bin: " + str(xf[fft_max_freq+how_many_bins_from_peak_to_check])
-        #print "Max FFT freq+2 power: " + str(fft_max_plus)
-        fft_max_minus=yf_plot_log_scale[fft_max_freq-how_many_bins_from_peak_to_check];
-        #print "Max FFT freq-2 bin: " + str(xf[fft_max_freq-how_many_bins_from_peak_to_check])
-        #print "Max FFT freq-2 power: " + str(fft_max_minus)
+        print("Max FFT value: " + str(fft_max))
+        print("Max FFT freq: " + str(xf[fft_max_freq]))
+        fft_max_plus=yf_plot_log_scale[fft_max_freq+how_many_bins_from_peak_to_check]
+        fft_max_minus=yf_plot_log_scale[fft_max_freq-how_many_bins_from_peak_to_check]
         
         #Create FFT plot
         #fft_fig = plt.figure(1)
@@ -143,22 +134,22 @@ def main():
         #plt.show()
 
         if  xf[fft_max_freq] > tone_center_freq + tolerance:
-            print "FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz"
+            print("FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz")
             sys.exit(1)
         if  xf[fft_max_freq] < tone_center_freq - tolerance:
-            print "FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz"
+            print("FAILED, Output tone freq is = ", xf[fft_max_freq], " Hz. Should be ", tone_center_freq, "+/-", tolerance, "Hz")
             sys.exit(1)
         if  fft_max - fft_max_plus < expected_power_level_decrease_dB:
-            print "FAILED, Diff b/w max and max+2bins = ", fft_max - fft_max_plus, " dB. Should be > 10"
+            print("FAILED, Diff b/w max and max+2bins = ", fft_max - fft_max_plus, " dB. Should be > 10")
             sys.exit(1)
         if  fft_max - fft_max_minus < expected_power_level_decrease_dB:
-            print "FAILED, Diff b/w max and max-2bins = ", fft_max - fft_max_minus, " dB. Should be > 10"
+            print("FAILED, Diff b/w max and max-2bins = ", fft_max - fft_max_minus, " dB. Should be > 10")
             sys.exit(1)
-        print "PASSED"
+        print("PASSED")
 
     else:
-        print "Input is real data"
-        print "Currently no support for real data"
+        print("Input is real data")
+        print("Currently no support for real data")
         # data = np.fromfile(f, dtype=np.int16)
         # #Create time domain plot
         # fig = plt.figure(1)

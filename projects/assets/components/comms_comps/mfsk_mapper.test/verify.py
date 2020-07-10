@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -50,7 +50,7 @@ OFILENAME.close()
 
 m_p = int(os.environ.get("OCPI_TEST_M_p"))
 bits_per_symbol = int(numpy.log2(m_p))
-number_of_symbols_in_input_file = len(idata)*8/bits_per_symbol
+number_of_symbols_in_input_file = len(idata) * 8 // bits_per_symbol
 
 #Ensure dout is not all zeros
 if all(odata == 0):

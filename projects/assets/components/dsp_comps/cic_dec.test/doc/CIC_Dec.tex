@@ -16,50 +16,42 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
-\def\importpath{}
-\input{\importpath snippets/CIC_Dec_Header}
-%----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
-%----------------------------------------------------------------------------------------
-\def\docTitle{Component Data Sheet}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
 
-\def\comp{cic\_dec}
+%----------------------------------------------------------------------------------------
+% Required document specific properties
+%----------------------------------------------------------------------------------------
+\def\comp{cic\_{}dec}
 \edef\ecomp{cic_dec}
 \def\Comp{CIC Decimator}
-\graphicspath{ {figures/} }
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
 
-\section*{Summary - \Comp}
-\begin{tabular}{|c|M{13.5cm}|}
-	\hline
-	\rowcolor{blue}
-	                  &                                                    \\
-	\hline
-	Name              & \comp                                              \\
-	\hline
-	Worker Type       & Application                                        \\
-	\hline
-	Version           & v\docVersion \\
-	\hline
-	Release Date      & 4/2019 \\
-	\hline
-	Component Library & ocpi.assets.dsp\_comps                              \\
-	\hline
-	Workers           & \comp.hdl                                          \\
-	\hline
-	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL) \\
-	\hline
-\end{tabular}
-\input{\importpath snippets/CIC_Dec_Functionality}
+% These are needed by component summary table
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{4/2019}
+\def\componentlibrary{ocpi.assets.dsp\_{}comps}
+\def\workers{\comp{}.hdl, \comp{}.rcc}
+\def\testedplatforms{alst4, CentOS7, isim, Matchstiq-Z1(PL), ml605, modelsim, xsim, ZedBoard(PL)}
+\input{\snippetpath/component_summary_table}
+
+\input{snippets/CIC_Dec_Functionality}
 \section*{Worker Implementation Details}
-\input{\importpath snippets/CIC_HDL_Implementation}
-\input{\importpath snippets/CIC_Theory}
+\input{snippets/CIC_HDL_Implementation}
+\input{snippets/CIC_RCC_Implementation}
+\input{snippets/CIC_Theory}
 
 % TODO / FIXME - add version history table, with initial release version
 % TODO / FIXME - version history table, gather changes for v1.0
@@ -143,6 +135,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		\end{tabular}
 	\end{scriptsize}
 
+	\input{snippets/cic_dec.rcc_properties}
+
 	\section*{Component Ports}
 	\begin{scriptsize}
 		\begin{tabular}{|p{2cm}|p{1.5cm}|p{4cm}|p{1.5cm}|p{1.5cm}|p{10.75cm}|}
@@ -152,7 +146,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 			in   & False    & iqstream\_protocol & False     & -        & Complex signed samples (Q0.15 I, Q0.15 Q). \\
 			\hline
-			out  & False    & iqstream\_protocol & False     & -        & Complex signed samples (Q0.15 I, Q0.15 Q). \\
+			out  & True    & iqstream\_protocol & False     & -        & Complex signed samples (Q0.15 I, Q0.15 Q). \\
 			\hline
 		\end{tabular}
 	\end{scriptsize}
@@ -171,6 +165,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 		\end{tabular}
 	\end{scriptsize}
+
+	\input{snippets/cic_dec.rcc_interfaces}
+
 \end{landscape}
 
 \section*{Control Timing and Signals}
@@ -194,93 +191,15 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 \begin{landscape}
 \section*{Worker Configuration Parameters}
-\subsubsection*{\comp.hdl}
-\input{../../\ecomp.hdl/configurations.inc}
+\subsubsection*{\comp.hdl and \comp.rcc}
+%\input{../../\ecomp.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 \subsection*{\comp.hdl}
-\input{../../\ecomp.hdl/utilization.inc}
+%\input{../../\ecomp.hdl/utilization.inc}
 \end{landscape}
 \newpage
-\section*{Test and Verification}
-Two test cases are implemented to validate the CIC Decimator component:
-
-\begin{enumerate}
-	\item Unity gain response to DC: The CIC Decimator gain is calculated using the following equation:
-	      \begin{equation} \label{eq:cic_gain}
-	      	CIC\ Gain = \frac{(R*M)^N}{2^{CEIL(N*log_2(R*M))}}
-	      \end{equation}
-	\item Tone waveform: A waveform containing tones at 50 Hz, 100 Hz and Fs/R sampled at 1024000 is processed by the worker. The tones at 50 Hz and 100 Hz are within the bandwidth of the filter, while the Fs/R tone is at the first null. The power levels of the input tones and output tones are measured and compared.
-\end{enumerate}\medskip
-
-For the plots below, a CIC decimator with the following parameter set was used: \verb+N+=3, \verb+M+=1, \verb+R+=2048, and \verb+ACC_WIDTH+=49.\bigskip
-
-\newpage
-	For Case \#1, the plots below show the input with the I-leg zoomed in the show the amplitude is 32767, and output data with the I-leg zoomed to show an amplitude of 32767, which can be calculated using \ref{eq:cic_gain}, shown below, and the Q-leg showing the worker delay before reaching it steady-state value.
-		  \begin{equation} \label{eq:cic_gain_applied}
-	      	Output Amplitude = 32767*\frac{(2048*1)^3}{2^{CEIL(3*log_2(2038*1))}} = 32767*1=32767
-	      \end{equation}
-
-	\begin{figure}[ht]
-		\centering
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{input_time_DC}
-			\captionof{figure}{Time Domain: DC with amp=32767}
-			\label{fig:input_time_DC}
-		\end{minipage}%
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{input_freq_DC}
-			\captionof{figure}{Frequency Domain: 0 Hz}
-			\label{fig:input_freq_DC}
-		\end{minipage}
-	\end{figure}
-
-
-	\begin{figure}[ht]
-		\centering
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{output_time_DC}
-			\captionof{figure}{Time Domain: DC with amp=32767}
-			\label{fig:output_time_DC}
-		\end{minipage}%
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{output_freq_DC}
-			\captionof{figure}{Frequency Domain: 0 Hz}
-			\label{fig:output_freq_DC}
-		\end{minipage}
-	\end{figure}
-
-\newpage
-	For Case \#2, the plots below show the input and output data (I-leg zoomed). The input plots show a complex waveform with frequency=50 Hz, 100 Hz, Fs\//R Hz, where Fs=1024000 Hz and R=2048. The output FFT plot shows the Fs\//R Hz has been filtered by the CIC decimator, but 50 Hz, 100 Hz were retained because they are within the bandwidth of the filter.
-
-	\begin{figure}[ht]
-		\centering
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{input_time_R2048}
-			\captionof{figure}{Time Domain}
-			\label{fig:input_time_R2048}
-		\end{minipage}%
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{input_freq_R2048}
-			\captionof{figure}{Frequency Domain: 50 Hz, 100 Hz, 1024000/2048 Hz}
-			\label{fig:input_freq_R2048}
-		\end{minipage}
-	\end{figure}
-
-	\begin{figure}[ht]
-		\centering
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{output_time_R2048}
-			\captionof{figure}{Time Domain}
-			\label{fig:output_time_R2048}
-		\end{minipage}%
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]{output_freq_R2048}
-			\captionof{figure}{Frequency Domain: 50 Hz, 100 Hz}
-			\label{fig:output_freq_R2048}
-		\end{minipage}
-	\end{figure}
-
-
-\input{\importpath snippets/CIC_References}
+\input{snippets/CIC_Test}
+\input{snippets/CIC_References}
 
 \end{document}
+

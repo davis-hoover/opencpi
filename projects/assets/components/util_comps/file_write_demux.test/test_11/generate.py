@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -39,9 +39,9 @@ except OSError as e:
     raise e
 
 with open("idata/infile.bin", "wb") as ofile:
-  for loop in xrange(0,2000):
-    for opcode in xrange(0,256):
+  for loop in range(0,2000):
+    for opcode in range(0,256):
       addmsg(ofile, opcode, [opcode, opcode, opcode, opcode])
   # ZLM on all
-  for opcode in xrange(0,256):
+  for opcode in range(0,256):
     addmsg(ofile, opcode, [])

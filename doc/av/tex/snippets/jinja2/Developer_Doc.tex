@@ -1,26 +1,27 @@
-
-\section*{Summary - \Comp}
-% Make table whose width is equal to which will be used for text
-% wrapping, split into 2 equal columns
-\begin{longtable}{|p{\dimexpr0.5\textwidth-2\tabcolsep\relax}
-                  |p{\dimexpr0.5\textwidth-2\tabcolsep\relax}|}
+\begin{center}
+  \textit{\textbf{Revision History}}
+\end{center}
+\begin{longtable}{|p{\dimexpr0.15\textwidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.65\textwidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.2\textwidth-2\tabcolsep\relax}|}
   \hline
   \rowcolor{blue}
-  & \\
+  \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
   \hline
-  Name              & \comp \\
-  \hline
-  Latest Version    &  \docVersion (release date TBD) \\
-  \hline
-  Worker Type       &  \\
-  \hline
-  Component Library &  \\
-  \hline
-  Workers           &  \\
-  \hline
-  Tested Platforms  &  \\
+   & Initial release. & \\
   \hline
 \end{longtable}
+\newpage
+
+% These are needed by component summary table
+\def\componentlibrary{}
+\def\name{\comp}
+\def\releasedate{}
+\def\testedplatforms{}
+\def\version{\ocpiversion}
+\def\workers{}
+\def\workertype{}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 \begin{flushleft}

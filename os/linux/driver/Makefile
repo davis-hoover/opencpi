@@ -119,38 +119,20 @@ else
     $(error This is a cross-compiled platform, but OCPI_TARGET_KERNEL_DIR is not set, which is not supported.)
   endif
 
-  # Find the kernel headers - they can be found:
-  #  1. Specified KERNELDIR (always chosen if given)
-  #  2. /usr/src/kernels/(uname -r)
-  #  3. /usr/src/kernels/(specific RPM-specified location based on the kernel-headers package)
-  OcpiKernelRelease:=$(shell uname -r)
-  # this command should be platform-specific (e.g. different for debian etc.)
-  OcpiKernelHeadersVersion:=$(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)
-  $(info --- The running kernel is release: $(OcpiKernelRelease))
-  $(info --- The current kernel-headers package is version: $(OcpiKernelHeadersVersion))
+  # KERNELDIR must be set by the time we get here
   ifdef KERNELDIR
+    # KERNELDIR is set and non-empty
     $(info --- The requested kernel header location (via KERNELDIR) is: $(KERNELDIR))
     ifeq ($(wildcard $(KERNELDIR)),)
       $(error The requested kernel header location ($(KERNELDIR)) is not found)
     endif
   else
-    KERNELDIR=/usr/src/kernels/$(OcpiKernelRelease)
-    ifeq ($(wildcard $(KERNELDIR)),)
-      try1:=$(KERNELDIR)
-      KERNELDIR=/usr/src/kernels/$(OcpiKernelHeadersVersion)
-      ifneq ($(wildcard $(KERNELDIR)),)
-        $(info --- Using the kernel headers version at: $(KERNELDIR))
-      else
-        $(info XXX: $(shell ls -l /lib/modules ))
-        $(error Cannot find a kernel headers directory.  Tried $(try1) and $(KERNELDIR))
-      endif
-    else
-      $(info --- Using the kernel release at: $(KERNELDIR))
-    endif
+    $(error KERNELDIR is not set)
   endif
-  $(info No OCPI_TARGET_KERNEL_DIR specified, so using: KERNELDIR=$(KERNELDIR))
+  $(info OCPI_TARGET_KERNEL_DIR not specified: using KERNELDIR=$(KERNELDIR))
 endif
 endif # end of if not cleaning
+
 ocpi_release:=$(shell cat $(OCPI_TARGET_KERNEL_DIR)/ocpi-release 2>/dev/null)
 # The current directory is passed to sub-makes as argument
 PWD := $(shell pwd)
@@ -165,13 +147,6 @@ MyIncs?= \
          -I$(realpath $(MyDir)/../../interfaces/include)
 MyLib:=$(realpath $(OCPI_CDK_DIR)/$(OCPI_TARGET_DIR)/lib)
 $(infox x:$(MyTargetDir) $(MyDir))
-ifneq ($(MAKECMDGOALS),topclean)
-  ifdef OCPI_TARGET_PLATFORM
-    ifeq ($(strip $(MyLib)),)
-      $(error OpenCPI libraries must be built before the driver is built)
-    endif
-  endif
-endif
 # This is what works with RHEL5
 export EXTRA_CFLAGS := $(MyIncs) -Wformat=2
 # This is what works with Centos6
@@ -181,7 +156,13 @@ URULESFILE=99-$(MODNAME).rules
 MRULESFILE=mdev-$(MODNAME).rules
 TMP_FILES=Module.markers Module.symvers .opencpi* opencpi.mod.* opencpi.o .tmp* modules.order
 
-$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
+# This dependency is causing more problems than I think it is worth since it is doing things
+# that are unnecessary and problematic in most casesn.
+#$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
+EXPORTS=EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KCPPFLAGS="$(KCPPFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" $(and $(ARCH),ARCH=$(ARCH))
+$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P))
+	$(if $(CROSS_COMPILE),$(AT)echo Building kernel tools that run on the development host &&\
+	    $(MAKE) -C $(KERNELDIR) V=2 scripts)
 	$(AT)echo Building kernel module $(MODFILE)
 	$(and $(KERNELDIR),$(MAKE) -C $(KERNELDIR) M=$(PWD) V=2 modules)
 	$(AT)mkdir -p $(MyTargetDir)

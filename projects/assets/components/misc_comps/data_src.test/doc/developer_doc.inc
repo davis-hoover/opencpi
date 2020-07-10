@@ -3,28 +3,14 @@
 % this file is intended to be edited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Summary - \Comp}
-% Make table whose width is equal to which will be used for text
-% wrapping, split into 2 equal columns
-\begin{longtable}{|p{\dimexpr0.5\textwidth-2\tabcolsep\relax}
-                  |p{\dimexpr0.5\textwidth-2\tabcolsep\relax}|}
-  \hline
-  \rowcolor{blue}
-  & \\
-  \hline
-  Name              & \comp \\
-  \hline
-  Latest Version    &  v1.5 (release date 4/2019) \\
-  \hline
-  Worker Type       & Application                                                                    \\
-  \hline
-  Component Library & ocpi.assets.misc\_comps \\
-  \hline
-  Workers           & \comp.hdl \\
-  \hline
-  Tested Platforms  & zed, matchstiq\_z1, e3xx, alst4, ml605, xsim \\
-  \hline
-\end{longtable}
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{}
+\def\componentlibrary{ocpi.assets.misc\_{}comps}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{alst4, e3xx, matchstiq\_{}z1, ml605, xsim, zed}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 \begin{flushleft}
@@ -106,11 +92,11 @@
 \begin{landscape}
 \section*{Worker Configuration Parameters}
 \subsubsection*{\comp.hdl}
-\input{../../data_src.hdl/configurations.inc}
+%\input{../../data_src.hdl/configurations.inc}
 \section*{Performance and Resource Utilization}
 %\subsubsection*{\comp.rcc}
 \subsubsection*{\comp.hdl}
-\input{../../data_src.hdl/utilization.inc}
+%\input{../../data_src.hdl/utilization.inc}
 \end{landscape}
 
 \section*{Test and Verification}

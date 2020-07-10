@@ -1,0 +1,346 @@
+.\"     Title: ocpidev-build
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 05/22/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-BUILD" "1" "05/22/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-build \- compiles OpenCPI assets
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fBbuild\fR [\fI<noun>\fR [\fI<name>\fR ]]
+.SH "DESCRIPTION"
+.sp
+The \fBbuild\fR verb compiles the OpenCPI assets specified by the noun used in the command\&. If no nouns are provided, \fBocpidev\fR compiles the current directory\&. When the plural version of the nouns are used, no name is specified and all assets of that type are built\&.
+.sp
+Asset types to be specified in the \fI<noun>\fR argument are:
+.PP
+\fBproject\fR
+.RS 4
+Build all assets in a project\&.
+.RE
+.PP
+\fBapplication\fR(\fBs\fR)
+.RS 4
+Build all (\fBapplications\fR) or a specific ACI application\&. This includes any custom bilding specified by a customized application
+\fBMakefile\fR\&.
+.RE
+.PP
+\fBtest\fR
+.RS 4
+Build but do not run the component unit test with the specified
+\fI<name>\fR
+in the specified library\&.
+.RE
+.PP
+\fBlibrary\fR
+.RS 4
+Build a component library\&.
+.RE
+.PP
+\fBworker\fR
+.RS 4
+Build a specific worker in a specific library (using the
+\fB\-l\fR
+\fI<library>\fR
+option)\&.
+.RE
+.PP
+\fBhdl\fR
+.RS 4
+A prefix to indicate an HDL asset in the
+\fBhdl\fR
+subdirectory of a project\&. Possible HDL assets are:
+.PP
+\fBassembly\fR|\fBies\fR
+.RS 4
+Build all or a specified HDL assembly\&.
+.RE
+.PP
+\fBdevice\fR
+.RS 4
+Build an HDL device worker in a specified library\&.
+.RE
+.PP
+\fBplatform\fR(\fBs\fR)
+.RS 4
+Build all or a specified HDL platform\&.
+.RE
+.PP
+\fBprimitive\fR(\fBs\fR)
+.RS 4
+Build all or a specified HDL primitive of a specified type\&. Possible HDL primitive types are:
+.PP
+\fBlibrary\fR
+.RS 4
+Build a primitive that results in a library of modules\&.
+.RE
+.PP
+\fBcore\fR
+.RS 4
+Build a primitive that results in a synthesized core/netlist\&.
+.RE
+.RE
+.RE
+.SH "OPTIONS"
+.sp
+The options to the build verb are primarily used to limit what is built (focus the build process on specific assets of interest), or specify the platforms and targets to build the assets for\&.
+.SS "Options When Building Projects"
+.PP
+\fB\-\-no\-assemblies\fR
+.RS 4
+Don\(cqt build the assemblies in the project\&. Building HDL assemblies (and their containers) can be slow\&. This option takes no following argument and can only be specified once on the command line\&.
+.RE
+.PP
+\fB\-\-hdl\-assembly\fR \fI<hdl\-assembly>\fR
+.RS 4
+Limit the assemblies being built to the specified assembly\&. This option can also be used in the
+\fBhdl/assemblies\fR
+directory\&. This option can be specified more than once on the command line\&.
+.RE
+.SS "Options When Building Projects or Libraries"
+.PP
+\fB\-\-rcc\fR
+.RS 4
+Limit the assets being built to RCC workers\&. This option takes no following argument and can only be specified once on the command line\&.
+.RE
+.PP
+\fB\-\-hdl\fR
+.RS 4
+Limit the assets being built to HDL primitives, workers, platforms or assemblies\&. This option takes no following argument and can only be specified once on the command line\&.
+.RE
+.PP
+\fB\-\-worker\fR \fI<worker>\fR
+.RS 4
+Limits the assets being built to the specified worker\&. This option can be specified more than once on the command line\&.
+.RE
+.SS "Options When Building Projects, Libraries, Tests, RCC Workers or ACI Applications"
+.PP
+\fB\-\-rcc\-platform\fR \fI<platform>\fR
+.RS 4
+Build RCC/ACI assets for the specified RCC platform\&. If this option is not used (and
+\fB\-\-hdl\-rcc\-platform\fR
+\fI<platform>\fR
+is also not used), the current development software platform is used as the single RCC platform used for building\&. This option can be specified more than once on the command line\&.
+.RE
+.PP
+\fB\-\-hdl\-rcc\-platform\fR \fI<platform>\fR
+.RS 4
+Build RCC/ACI assets for the RCC platforms associated with the specified HDL platform\&. If this option is not used (and \-\-rcc\-platform
+\fI<platform>\fR
+is also not used), the current development software platform is used as the single RCC platform used for building\&. This option can be specified more than once on the command line\&.
+.RE
+.SS "Options When Building Projects, Libraries, Tests with HDL Workers or other HDL Assets"
+.PP
+\fB\-\-hdl\-target\fR \fI<target>\fR
+.RS 4
+Build HDL assets for the specified HDL target\&. If only HDL targets are specified (and no HDL platforms), containers will not be built for assemblies or unit tests\&. This option can be specified more than one on the command line\&.
+.RE
+.PP
+\fB\-\-hdl\-platform\fR \fI<hdl\-platform>\fR
+.RS 4
+Build HDL assets for the specified HDL platform\&. This option can be specified more than once on the command line\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Build the current asset or directory and those underneath it for the
+\fBzed\fR
+HDL platform and the
+\fBxilinx13_3\fR
+RCC platform\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build \-\-hdl\-platform zed \-\-rcc\-platform xilinx13_3
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Build the
+\fBassets\fR
+project for the
+\fBzed\fR
+HDL platform and
+*`xilinx13_3* RCC platform\&. Omit the name
+\fBassets\fR
+if inside the
+\fBassets\fR
+project\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build project assets \-\-hdl\-platform zed
+                             \-\-rcc\-platform xilinx13_3
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside the
+\fBassets\fR
+project, build the
+\fBcomplex_mixer\&.hdl\fR
+worker in the
+\fBdsp_comps\fR
+library for the
+\fBzed\fR
+HDL platform and
+\fBxilinx13_3\fR
+RCC platform\&. You can omit the
+\fB\-l dsp_comps\fR
+option if operating in a project with only a single top\-level
+\fBcomponents\fR
+library\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev \-l dsp_comps build worker complex_mixer\&.hdl
+                         \-\-hdl\-platform zed
+                         \-\-rcc\-platform xilinx13_3
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Inside the
+\fBassets\fR
+project, build the
+\fBdsp_comps\fR
+library located at
+\fBcomponents/dsp_comps\fR
+for the
+\fBzed\fR
+HDL platform and
+\fBxilinx13_3 RCC\fR
+platform\&. (Note that the library noun differs from the
+\fB\-l\fR
+option in that the noun is used when building the library itself, and the option is used when building an asset inside the library\&.)
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build library dsp_comps \-\-hdl\-platform zed
+                                \-\-rcc\-platform xilinx13_3
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Inside the
+\fBassets\fR
+project, build the
+\fBdsp_comps\fR
+library, but limit the build to the
+\fBcomplex_mixer\&.hdl\fR
+and
+\fBcic_dec\&.hdl\fR
+workers\&. Note that the
+\fB\-\-worker\fR
+option differs from the
+\fBworker\fR
+noun in that the noun is used to build a single worker, while the
+\fB\-\-worker\fR
+option is used when building a library to limit the build to an individual worker (or a list of workers if
+\fB\-\-worker\fR
+is specified multiple times)\&. If building a library without the
+\fB\-\-worker\fR
+option, all workers will be built\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build library dsp_comps \-\-worker complex_mixer\&.hdl
+                                \-\-worker cic_dec\&.hdl
+                                \-\-hdl\-platform zed
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: <www\&.opencpi\&.org>
+.SH "SEE ALSO"
+.sp
+ocpidev\-clean(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-refresh(1) ocpidev\-run(1) ocpidev\-show(1) ocpidev\-[un]register(1) ocpidev\-[un]set(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

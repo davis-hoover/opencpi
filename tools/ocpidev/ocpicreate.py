@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -109,9 +109,10 @@ def main():
 
     args = parse_cl_vars()
     name = args["name"]
+    cur_dir = args["cur_dir"]
     args.pop("name", None)
     try:
-        CLASS_DICT[args["noun"]].create(name, ".", **args)
+        CLASS_DICT[args["noun"]].create(name, cur_dir, **args)
     except ocpiutil.OCPIException as ex:
         ocpiutil.logging.error(ex)
         ocpiutil.logging.error("Unable to run due to previous errors")

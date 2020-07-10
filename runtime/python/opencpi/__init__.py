@@ -18,16 +18,18 @@
 
 # This file will run when anything "under" opencpi is imported.
 
-# We always load the (single) aci swig module now (under python2).
+# We always load the (single) aci swig module now.
 # In the future if we have more subpackages we can use one of the variety of techniques
 # for lazy import of subpackages.
 
+# The former version of this script was a no-op for
+# "sys.version_info >= (3, 0)" for whatever reason.
+
 # This file is only functional when exported, and with swig libraries collocated.
 import sys
-if sys.version_info < (3, 0):
-    old=sys.getdlopenflags()
-    if sys.platform != 'darwin':
-       import ctypes
-       sys.setdlopenflags(old|ctypes.RTLD_GLOBAL)
-    import aci  # Should probably be opencpi.aci
-    sys.setdlopenflags(old)
+old=sys.getdlopenflags()
+if sys.platform != 'darwin':
+   import ctypes
+   sys.setdlopenflags(old|ctypes.RTLD_GLOBAL)
+import opencpi.aci
+sys.setdlopenflags(old)

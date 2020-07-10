@@ -1,4 +1,3 @@
-\documentclass{article}
 \iffalse
 This file is protected by Copyright. Please refer to the COPYRIGHT file
 distributed with this source distribution.
@@ -17,110 +16,25 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
-\author{} % Force author to be blank
+
 %----------------------------------------------------------------------------------------
-% Paper size, orientation and margins
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\usepackage{geometry}
-\geometry{
-	letterpaper,			% paper type
-	portrait,				% text direction
-	left=.75in,				% left margin
-	top=.75in,				% top margin
-	right=.75in,			% right margin
-	bottom=.75in			% bottom margin
- }
+\def\comp{file\_{}read}
+\def\Comp{File\ Read}
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../doc/av/tex/snippets/}
 %----------------------------------------------------------------------------------------
-% Header/Footer
+% Global latex header (this must be after document specific properties)
 %----------------------------------------------------------------------------------------
-\usepackage{fancyhdr} \pagestyle{fancy} % required for fancy headers
-\renewcommand{\headrulewidth}{0.5pt}
-\renewcommand{\footrulewidth}{0.5pt}
-\rhead{\small{ANGRYVIPER Team}}
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
 %----------------------------------------------------------------------------------------
-% Appendix packages
-%----------------------------------------------------------------------------------------
-\usepackage[toc,page]{appendix}
-%----------------------------------------------------------------------------------------
-% Defined Commands & Renamed Commands
-%----------------------------------------------------------------------------------------
-\renewcommand{\contentsname}{Table of Contents}
-\renewcommand{\listfigurename}{List of Figures}
-\renewcommand{\listtablename}{List of Tables}
-\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1}} % To do notes
-\newcommand{\code}[1]{\texttt{#1}} % For inline code snippet or command line
-%----------------------------------------------------------------------------------------
-% Various pacakges
-%----------------------------------------------------------------------------------------
-\usepackage{hyperref} % for linking urls and lists
-\usepackage{graphicx} % for including pictures by file
-\usepackage{listings} % for coding language styles
-\usepackage{rotating} % for sideways table
-\usepackage{pifont}   % for sideways table
-\usepackage{pdflscape} % for landscape view
-%----------------------------------------------------------------------------------------
-% Table packages
-%----------------------------------------------------------------------------------------
-\usepackage{tabularx} % c=center,l=left,r=right,X=fill
-\usepackage{float}
-\floatstyle{plaintop}
-\usepackage[tableposition=top]{caption}
-\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
-\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-%----------------------------------------------------------------------------------------
-% Block Diagram / FSM Drawings
-%----------------------------------------------------------------------------------------
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows,fit,positioning}
-\usetikzlibrary{automata} % used for the fsm
-%----------------------------------------------------------------------------------------
-% Colors Used
-%----------------------------------------------------------------------------------------
-\usepackage{colortbl}
-\definecolor{blue}{rgb}{.7,.8,.9}
-\definecolor{ceruleanblue}{rgb}{0.16, 0.32, 0.75}
-\definecolor{drkgreen}{rgb}{0,0.6,0}
-\definecolor{deepmagenta}{rgb}{0.8, 0.0, 0.8}
-\definecolor{cyan}{rgb}{0.0,0.6,0.6}
-\definecolor{maroon}{rgb}{0.5,0,0}
-%----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
-%----------------------------------------------------------------------------------------
-\def\docTitle{Component Data Sheet}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
-\graphicspath{ {figures/} }
-\usepackage{longtable}
-\def\comp{file\_read}
-\def\Comp{File\ Read }
-\graphicspath{ {figures/} }
 
 \begin{document}
-
-\section*{Summary - \Comp}
-\begin{tabular}{|c|M{13.5cm}|}
-	\hline
-	\rowcolor{blue}
-	                  &                                                                                \\
-	\hline
-	Name              & \comp                                                                          \\
-	\hline
-	Worker Type       & Application                                                                    \\
-	\hline
-	Version           &  v\docVersion \\
-	\hline
-	Release Date      &  4/2019 \\
-	\hline
-	Component Library &   ocpi.core\\
-	\hline
-	Workers           &  file\_read.rcc file\_read.hdl\\
-	\hline
-	Tested Platforms  &  isim, xsim, modelsim, xilinx13\_3, xilinx13\_4, centos6, centos7\\
-	\hline
-\end{tabular}
+\maketitle
+\thispagestyle{empty}
+\newpage
 
 \begin{center}
   \textit{\textbf{Revision History}}
@@ -132,11 +46,21 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
   \rowcolor{blue}
   \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
   \hline
-  v1.4 & Initial release. & 9/2019 \\
+  v1.4 & Initial release. & 09/2018 \\
   \hline
-  v1.5 & Changed all readable properties to readback and changed default value of MessageSize from 4096 to 0. Also updated the end of file descriptions with smart wrapper updates.  & 4/2019 \\
+  v1.5 & Changed all readable properties to readback and changed default value of MessageSize from 4096 to 0. Also updated the end of file descriptions with smart wrapper updates.  & 04/2019 \\
   \hline
 \end{longtable}
+\newpage
+
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{04/2019}
+\def\componentlibrary{ocpi.core}
+\def\workers{\comp{}.hdl, \comp{}.rcc}
+\def\testedplatforms{centos6, centos7, isim, modelsim, xilinx13\_{}3, xilinx13\_{}4, xsim}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 \begin{flushleft}
@@ -166,7 +90,13 @@ will be sent with the indicated opcode, and the length of the message will be ze
 \subsection*{No Protocol}
 The port on the component has no protocol specified.  This means that the data file must be formatted to match the protocol of the input port of the connected worker.  For message mode this means only using opcodes and payloads in the file that correspond to the protocol of the connected component.  In data streaming mode the file structure needs to correspond to the opcode that is set by the \textit{opcode} property.
 \subsection*{Message Size/Buffers}
-The protocol of the connected component needs to be taken into account when selecting the message size (bytes) to prevent buffer overflow problems.  The component has no information about what component it is connected to (by design). The application designer needs to set a valid value.  For example iqstream protocol uses a sequence of 2048 16-bit I/Q pairs which means anything over 8192 (2048 * 4 bytes per pair) is invalid.
+The system normally determines buffer sizes based on protocol.  Since File\_Read's output port has no protocol, the protocol used is that of the port that this output port is connected to.  If the connected port also has no protocol, then the system's default of 2KB is chosen.  This chosen buffer size can always be overriden in the OAS or with ACI PValues for \textit{any} connection in the application.\\ \medskip
+
+The \textbf{messageSize} property for this component has a default value of zero, which means the system's (or application's) chosen buffer size is used.  If set to non-zero, it overrides the system/application value, which risks trying to write messages larger than the system is prepared for, resulting in an error.\\ \medskip
+
+If the \textbf{messagesInFile} property is true (i.e. the component is operating in messaging mode), the buffer size must be large enough to accommodate the largest message found in the input file.  It is always better to set the buffer size on connections in the OAS (or using PValues in the ACI) than to use the \textbf{messageSize} property since the former method is universal for specifying buffer sizes for all connections in the application.\\ \medskip
+
+For example the iqstream protocol uses a sequence of 2048 16-bit I/Q pairs which means any message over 8192 (2048 * 4 bytes per pair) is invalid.
 \subsection*{End of File Handling}
 When the File\_Read component reaches the end of its input file, it will do one of three
 things:

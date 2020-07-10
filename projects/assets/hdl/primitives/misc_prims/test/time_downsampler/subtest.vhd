@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
+library protocol;
 library misc_prims; use misc_prims.misc_prims.all;
 
 entity subtest is
@@ -13,14 +14,14 @@ end entity subtest;
 architecture rtl of subtest is
   signal clk                : std_logic := '0';
   signal rst                : std_logic := '0';
-  signal data_src_odata     : data_complex_t;
-  signal data_src_ometadata : metadata_t;
-  signal data_src_ovld      : std_logic := '0';
+  signal data_src_oprotocol :
+      protocol.complex_short_with_metadata.protocol_t := 
+      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
   signal uut_irdy           : std_logic := '0';
   signal uut_ctrl           : time_downsampler_ctrl_t;
-  signal uut_odata          : data_complex_t;
-  signal uut_ometadata      : metadata_t;
-  signal uut_ovld           : std_logic := '0';
+  signal uut_oprotocol      :
+      protocol.complex_short_with_metadata.protocol_t := 
+      protocol.complex_short_with_metadata.PROTOCOL_ZERO;
   signal file_writer_irdy   : std_logic := '0';
 begin
 
@@ -42,21 +43,16 @@ begin
   end process rst_gen;
 
   data_src : entity work.data_src
-    generic map(
-      DATA_BIT_WIDTH => DATA_BIT_WIDTH)
     port map(
       -- CTRL
       clk       => clk,
       rst       => rst,
       -- OUTPUT
-      odata     => data_src_odata,
-      ometadata => data_src_ometadata,
-      ovld      => data_src_ovld,
+      oprotocol => data_src_oprotocol,
       ordy      => uut_irdy);
 
-  uut_ctrl.bypass                    <= BYPASS;
-  uut_ctrl.min_num_data_per_time     <= MIN_NUM_DATA_PER_TIME;
-  uut_ctrl.min_num_data_per_time_vld <= '1';
+  uut_ctrl.bypass                <= BYPASS;
+  uut_ctrl.min_num_data_per_time <= MIN_NUM_DATA_PER_TIME;
 
   uut : misc_prims.misc_prims.time_downsampler
     port map(
@@ -65,14 +61,10 @@ begin
       rst       => rst,
       ctrl      => uut_ctrl,
       -- INPUT
-      idata     => data_src_odata,
-      imetadata => data_src_ometadata,
-      ivld      => data_src_ovld,
+      iprotocol => data_src_oprotocol,
       irdy      => uut_irdy,
       -- OUTPUT
-      odata     => uut_odata,
-      ometadata => uut_ometadata,
-      ovld      => uut_ovld,
+      oprotocol => uut_oprotocol,
       ordy      => file_writer_irdy);
 
   file_writer : entity work.file_writer
@@ -85,9 +77,7 @@ begin
       backpressure_select     => BACKPRESSURE_SELECT,
       backpressure_select_vld => '1',
       -- INPUT
-      idata                   => uut_odata,
-      imetadata               => uut_ometadata,
-      ivld                    => uut_ovld,
+      iprotocol               => uut_oprotocol,
       irdy                    => file_writer_irdy);
 
 end rtl;

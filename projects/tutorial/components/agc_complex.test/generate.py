@@ -63,16 +63,16 @@ gain_pt_2 = 32767*0.2 / max(abs(real))
 gain_pt_3 = 32767*0.3 / max(abs(real))
 gain_pt_9 = 32767*0.9 / max(abs(real))
 
-for i in range(0,int(num_samples/4)):
+for i in range(0, num_samples // 4):
     out_data['real_idx'][i] = np.rint(real[i] * gain_pt_2)
     out_data['imag_idx'][i] = np.rint(imag[i] * gain_pt_2)
-for i in range(int(num_samples/4),int(num_samples/2)):
+for i in range(num_samples // 4, num_samples // 2):
     out_data['real_idx'][i] = np.rint(real[i] * gain_pt_9)
     out_data['imag_idx'][i] = np.rint(imag[i] * gain_pt_9)
-for i in range(int(num_samples/2),int(num_samples*3/4)):
+for i in range(num_samples // 2, num_samples * 3 // 4):
     out_data['real_idx'][i] = np.rint(real[i] * gain_pt_2)
     out_data['imag_idx'][i] = np.rint(imag[i] * gain_pt_2)
-for i in range(int(num_samples*3/4),int(num_samples)):
+for i in range(num_samples * 3 // 4, num_samples):
     out_data['real_idx'][i] = np.rint(real[i] * gain_pt_3)
     out_data['imag_idx'][i] = np.rint(imag[i] * gain_pt_3)
 

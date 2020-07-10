@@ -41,6 +41,7 @@ namespace OCPI {
       m_minBufferCount = 1;
       m_defaultBufferCount = SIZE_MAX;
       m_bufferSize = SIZE_MAX;
+      m_workerEOF = false;
       m_xml = NULL;
       m_worker = NULL;
       m_bufferSizePort = SIZE_MAX;

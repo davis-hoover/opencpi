@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -58,7 +58,6 @@ set -e
 # Pass arguments to the settings script to override current args
 . $OcpiXilinxVivadoDir/.settings64-Vivado.sh $OcpiXilinxVivadoDir
 export LM_LICENSE_FILE=$OcpiXilinxVivadoLicenseFile
-set -vx
 appname=${1##*.}
 package=${1%.*}
 assyname=${appname%%_xsim*}

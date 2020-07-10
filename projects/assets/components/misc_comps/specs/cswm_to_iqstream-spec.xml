@@ -1,0 +1,4 @@
+<ComponentSpec>
+  <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>
+  <Port name='out' producer='true' protocol='iqstream_protocol'/>
+</ComponentSpec>

@@ -1,0 +1,263 @@
+.\"     Title: ocpidev-show
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 05/28/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-SHOW" "1" "05/28/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-show \- displays information about OpenCPI assets\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR \fBshow\fR [\fI<options>\fR] \fI<noun>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBshow\fR verb is slightly different from other verbs since the command currently is not associated with a project, but with the operating environment by default\&. There are two scoping options to associate with the command\&. By default, the \fB\-\-global\-scope\fR option is set and it will look in all registered projects (and the current project if applicable)\&. The registry used is the one in the OpenCPI installation unless overridden using the \fBOCPI_PROJECT_REGISTRY_DIR\fR environment variable\&. Use the \fB\-\-local\-scope\fR option to run the command in just the current project\&.
+.sp
+Asset types to be specified in the \fI<noun>\fR argument are:
+.PP
+\fBcomponent\fR
+.RS 4
+Display information on the specified component\&.
+.RE
+.PP
+\fBcomponents\fR
+.RS 4
+Display all components in registered projects\&.
+.RE
+.PP
+\fBlibraries\fR
+.RS 4
+Display information on all the libraries in the current scope\&.
+.RE
+.PP
+\fBplatforms\fR
+.RS 4
+Display all platforms that assets can be built for\&.
+.RE
+.PP
+\fBproject\fR
+.RS 4
+Display information about a project\&.
+.RE
+.PP
+\fBprojects\fR
+.RS 4
+Display all registered projects\&.
+.RE
+.PP
+\fBregistry\fR
+.RS 4
+Display information on the registry\&.
+.RE
+.PP
+\fBtargets\fR
+.RS 4
+Display all targets that assets can be built for\&.
+.RE
+.PP
+\fBtests\fR
+.RS 4
+Display information on the unit tests in the current scope\&.
+.RE
+.PP
+\fBworker\fR
+.RS 4
+Display information on the specified worker\&.
+.RE
+.PP
+\fBworkers\fR
+.RS 4
+Display all workers in registered projects\&.
+.RE
+.sp
+Use the keywords \fBrcc\fR and \fBhdl\fR to scope what is displayed for the \fBplatforms\fR and \fBtargets\fR nouns\&. For example, the command:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show rcc platforms
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+only shows the available RCC platforms\&.
+.SH "OPTIONS"
+.sp
+In the option descriptions below, a plus sign (+) indicates that the option can be specified more than once on the command line\&.
+.PP
+\fB\-P\fR \fI<hdl\-platform\-directory>\fR
+.RS 4
+Specify the HDL platform subdirectory in which to operate\&. This option can only be specified once on the command line\&.
+.RE
+.PP
+\fB\-\-simple\fR
+.RS 4
+Format the output as simply as possible\&.
+.RE
+.PP
+\fB\-\-json\fR
+.RS 4
+Format the output in JSON format for integration with other software\&.
+.RE
+.PP
+\fB\-\-global\-scope\fR
+.RS 4
+Show assets from all registered projects and the current project if applicable\&. This is the default scope used if
+\fB\-local\-scope\fR
+is not used\&.
+.RE
+.PP
+\fB\-\-hdl\-library=\fR\fI<hdl\-library>\fR
+.RS 4
+Specify the HDL library in which this operation will be performed\&.
+.RE
+.PP
+\fB\-\-library=\fR\fI<library>\fR, \fB\-l\fR \fI<library>\fR
+.RS 4
+Specify the component library in which this operation will be performed\&.
+.RE
+.PP
+\fB\-\-local\-scope\fR
+.RS 4
+Only show assets in the local project\&.
+.RE
+.PP
+\fB\-\-table\fR
+.RS 4
+Display the output in an easy\-to\-read table\&. This is the default display format used if
+\fB\-\-simple\fR
+or
+\fB\-\-json\fR
+are not used\&.
+.RE
+.PP
+\fB\-\-very\-verbose\fR
+.RS 4
+Be very verbose with output\&.
+.RE
+.PP
+\fB\-\-very\-very\-verbose\fR
+.RS 4
+Be very, very verbose with output\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+List all RCC and HDL platforms that assets can be built for:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show platforms
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+List all HDL platforms that HDL assets can be built for:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show hdl platforms
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+List all components in any registered projects (omits components at the top level of project due to a defect):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show components
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Display a table of the registered projects and their locations:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show \-\-table registry
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-build(1) ocpidev\-clean(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-refresh(1) ocpidev\-register(1) ocpidev\-run(1) ocpidev\-set(1) ocpidev\-unregister(1) ocpidev\-unset(1) ocpidev\-utilization(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

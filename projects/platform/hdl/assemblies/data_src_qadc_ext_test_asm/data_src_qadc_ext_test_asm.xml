@@ -1,0 +1,19 @@
+<HdlAssembly language='vhdl'>
+  <Instance Worker='data_src_qadc' Name='uut_data_src_qadc' ParamConfig='0'/>
+  <Instance Worker='data_src_qadc_em' Name='uut_data_src_qadc_em' ParamConfig='0'/>
+  <Connection>
+    <port instance='uut_data_src_qadc' name='dev'/>
+    <port instance='uut_data_src_qadc_em' name='dev'/>
+  </Connection>
+  <Instance Name='data_src_qadc_ms_in' Worker='metadata_stressor'/>
+  <Connection>
+    <port instance='data_src_qadc_ms_in' name='out'/>
+    <port instance='uut_data_src_qadc_em' name='in'/>
+  </Connection>
+  <Connection Name='in_ms_data_src_qadc' External='consumer'>
+    <port Instance='data_src_qadc_ms_in' Name='in'/>
+  </Connection>
+  <Connection External='producer'>
+    <port Instance='uut_data_src_qadc' Name='out'/>
+  </Connection>
+</HdlAssembly>

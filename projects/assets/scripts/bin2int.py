@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -29,7 +29,7 @@ import os.path
 import itertools
 
 def bin2int_real(ifile, ofile, num_taps, filter_group_delay):
-    print ("Input file: " + ifile + "\n" + "Output file: " + ofile)
+    print("Input file: " + ifile + "\n" + "Output file: " + ofile)
     fr = open(ifile, 'rb')
     fw = open(ofile, 'w')
 
@@ -48,7 +48,7 @@ def bin2int_real(ifile, ofile, num_taps, filter_group_delay):
     fw.close()
 
 def bin2int_complex(ifile, ofile, num_taps, filter_group_delay):
-    print ("Input file: " + ifile + "\n" + "Output file: " + ofile)
+    print("Input file: " + ifile + "\n" + "Output file: " + ofile)
     fr = open(ifile, 'rb')
     fw = open(ofile, 'w')
 
