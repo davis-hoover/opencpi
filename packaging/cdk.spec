@@ -16,13 +16,17 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# Disable Fascist build policy.  This is here solely to
+# handle "lib*myhost.so" being installed but not packaged.
+%define _unpackaged_files_terminate_build 0
+
 ##########################################################################################
 # The RPM spec for the runtime and devel packages
 # The runtime is the primary/main package, and devel is a subpackage which depends on runtime
 Name:        %{RPM_NAME}
 Version:     %{RPM_VERSION}
 Release:     %{RPM_RELEASE}%{?dist}
-Summary:     A framework to simplify and enable code portability of real-time systems
+Summary:     An open source software framework for developing and executing component-based applications on heterogeneous embedded systems
 Group:       Applications/Engineering
 License:     LGPLv3+
 %global      prefix0 /opt/opencpi
@@ -32,6 +36,7 @@ Prefix:      %{prefix0}
 Prefix:      %{prefix1}
 Vendor:      OpenCPI
 Packager:    OpenCPI <discuss@lists.opencpi.org>
+URL:         https://opencpi.org
 %include %{RPM_OPENCPI}/packaging/target-%{RPM_PLATFORM}/runtime-requires
 # Then the "requires" that are only needed by the rpm installation itself rather than
 # OpenCPI.
@@ -78,10 +83,10 @@ for the %{RPM_PLATFORM} target platform, along with core components.
 %endif
 
 %prep
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %build
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 # suppress post processing that bytecompiles python for two reasons:
 # 1. We're doing it in general for all distributions so its already done
@@ -176,7 +181,7 @@ done
 ##########################################################################################
 # files for runtime
 %files -f runtime-files
-%defattr(-,opencpi,opencpi,-)
+%defattr(-,opencpi,opencpi,775)
 %dir %{prefix0}
 
 ##########################################################################################
@@ -206,7 +211,7 @@ installed. It also provides useful development utilities.
 ##########################################################################################
 # files for devel
 %files devel -f devel-files
-%defattr(-,opencpi,opencpi,-)
+%defattr(-,opencpi,opencpi,775)
 
 ##########################################################################################
 # The debug subpackage - only added for dev platforms

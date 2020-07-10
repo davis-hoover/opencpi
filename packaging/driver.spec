@@ -36,6 +36,7 @@ Group:     System Environment/Kernel
 License:   LGPLv3+
 Vendor:    OpenCPI
 Packager:  OpenCPI <discuss@lists.opencpi.org>
+URL:       https://opencpi.org
 
 # BuildRoot is deprecated, but maybe this was for OLD rpmbuild in centos6?
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
