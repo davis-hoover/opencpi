@@ -75,9 +75,15 @@ set -o pipefail
     done
   fi
 done | sort -u |
-  # Add the necessary permissions here on the exceptional files (for security)
-  # These are nicer in the spec file, but this suppresses the warnings.  A tradeoff.
-  # These files will only be present for dev platforms
+  # Exclude the libraries only used for RPM packaging.
+  grep -v '.*lib.*myhostname\.so' |
+  # Add the necessary permissions here on the exceptional files (for security).
+  # These are nicer in the spec file, but this suppresses the warnings: a tradeoff.
+  # These files will only be present for dev platforms.
+  #
+  # The following '-e <expression>' used to be part of the "sed"
+  # command below, and effectively zeroized the project registry:
+  #   -e '\=%{prefix0}/project-registry/=d'
   sed \
     -e 's=%{prefix0}/cdk/udev-rules/.*\.rules$=%attr(644,root,root) &=' \
     -e 's=%{prefix0}/cdk/env/rpm_cdk.sh$=%attr(755,root,root) &=' \
@@ -85,7 +91,6 @@ done | sort -u |
     -e 's=%{prefix0}/cdk/env.d/.*\.sh\.example$=%attr(644,root,root) &=' \
     -e 's=%{prefix0}/cdk/opencpi-setup.sh$= %attr(644,root,root) &=' \
     -e 's=%{prefix0}/project-registry$= %attr(775,opencpi,opencpi) %config(noreplace) &=' \
-    -e '\=%{prefix0}/project-registry/=d' \
   > $builddir/$package-files
 mkdir -p ${buildroot}${prefix}/project-registry
-rm -f ${buildroot}${prefix}/project-registry/*
+# rm -f ${buildroot}${prefix}/project-registry/*

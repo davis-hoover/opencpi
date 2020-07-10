@@ -42,6 +42,7 @@ License:        LGPLv3+
 Source0:        %{RPM_PLATFORM}
 Vendor:         OpenCPI
 Packager:       OpenCPI <discuss@lists.opencpi.org>
+URL:            https://opencpi.org
 
 %description
 Contains the content needed to deploy opencpi to %{RPM_PLATFORM}

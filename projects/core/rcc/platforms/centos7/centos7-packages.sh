@@ -77,6 +77,10 @@ PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
+#    Needed by Xilinx ISE 14.7
+PKGS_D+=(libSM libXi libXrandr)
+#    for the new "xilinx19_2_aarch*" platforms
+PKGS_D+=(openssl-devel)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment

@@ -160,11 +160,11 @@ check=$platform_dir/${platform}-check.sh
   to=$(python3 -c "import os.path; print(os.path.relpath('"$check"', '.'))")
   make_relative_link $to exports/runtime/$platform/$(basename $check)
   # FIXME: make sure this is actually used and needed or maybe it should be used and isn't?
-  cat <<-EOF > exports/runtime/$platform/${rcc_platform}-init.sh
+  cat <<-EOF > exports/runtime/$platform/${platform}-init.sh
 	# This is the minimal setup required for runtime
-	export OCPI_TOOL_PLATFORM=$rcc_platform
+	export OCPI_TOOL_PLATFORM=$platform
 	export OCPI_TOOL_OS=$OcpiPlatformOs
-	export OCPI_TOOL_DIR=$rcc_platform
+	export OCPI_TOOL_DIR=$platform
 	EOF
 }
 # Put the minimal set of artifacts to support the built-in runtime tests or
