@@ -17,7 +17,6 @@ stages:
   - build-workers
   - build-platforms
   - build-assemblies
-  - build-test
   - test
   - deploy
 
