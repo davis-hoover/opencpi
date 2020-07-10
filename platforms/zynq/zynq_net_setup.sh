@@ -19,10 +19,6 @@
 # If there is a "mynetsetup.sh" script in this directory it will run it after the
 # other setup items, and arrange for it to be run in any login scripts later
 # e.g. ssh logins
-#
-# Set time using ntpd
-# If ntpd fails because it could not find ntp.conf fall back on time server
-# passed in as the first parameter
 
 if test -z  "$5"; then
   echo You must supply at least 5 arguments to this script.

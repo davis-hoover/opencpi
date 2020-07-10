@@ -12,6 +12,10 @@ set_tool_platform() {
   fi
 }
 
+# Set time using ntpd
+# If ntpd fails because it could not find ntp.conf fall back on time server
+# passed in as the first parameter
+
 set_time() {
   if test "$1" != -; then
     echo Attempting to set time from the time server
