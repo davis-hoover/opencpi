@@ -92,6 +92,9 @@ __HDL_SEARCH_MK__=x
 #  be useful in very simple cases where there is no library - just a worker's directory by
 #  itself.
 
+# Return the list of exported HDL subdirectories of component libraries that have anything built for HDL
+HdlComponentLibraries=$(foreach d,$(OcpiComponentLibraries),$(call HdlExists,$d/hdl))
+
 # Return list of target directories in all possible component libraries
 # For example, return a list of all component-library "target" directories.
 #              Of the form: <library>/lib/hdl/<target>
@@ -237,7 +240,7 @@ HdlCoreRef1=$(strip \
          $(and $2,$(call HdlExists,$(call HdlCRF,$1,$(call HdlGetFamily,$2),$c$(infox HdlCoreRef1 returning '$c'for '$1' and '$2'))))))))
 
 # Look everywhere (including component libraries in some modes), return an error if not found
-HdlCoreRef=$(infox HCR:$1:$2:$(HdlMode))$(strip \
+HdlCoreRef=$(infox HCR:$1:$2:$3:$(HdlMode))$(strip \
   $(or $(strip\
      $(if $(findstring /,$1),\
         $(call HdlCoreRef1,$1,$2),\
@@ -263,7 +266,7 @@ HdlCoreRefMaybeTargetSpecificFile=$(infox HCRMTSF=$1=$2)$(strip \
   $(foreach c,$1,\
     $(if $(and $(findstring /,$c),$(findstring .,$(basename $c)),$(call HdlExists,$c)),\
       $c,\
-      $(call HdlCoreRef,$(call HdlToolCoreRef,$c),$2))))
+      $(call HdlCoreRef,$(call HdlToolCoreRef,$c),$2,HCRMTSF))))
 
 ################################################################################
 # $(call HdlLibraryRefFile,location-dir,target)

@@ -20,65 +20,76 @@
 -- iostandards
 library IEEE;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library util; use util.types.all;
+use work.platform_pkg.all;
 library unisim; use unisim.vcomponents.all;
-entity BUFFER_OUT_1 is
-  generic (IOSTANDARD   :     iostandard_t := UNSPECIFIED;
+entity BUFFER_OUT_N is
+  generic (width        :   natural;
+           IOSTANDARD   :   iostandard_t := UNSPECIFIED;
            DIFFERENTIAL :   boolean); -- only used if IOSTANDARD is UNSPECIFIED
-  port (   I          : in  std_logic;
-           O          : out std_logic;
-           OBAR       : out std_logic := 'X'); -- only use if relevant to IOSTANDARD
-end entity BUFFER_OUT_1;
-architecture rtl of BUFFER_OUT_1 is
+  port (   I          : in  std_logic_vector(width-1 downto 0);
+           O          : out std_logic_vector(width-1 downto 0);
+           OBAR       : out std_logic_vector(width-1 downto 0) := (others => 'X')); -- only use if relevant to IOSTANDARD
+end entity BUFFER_OUT_N;
+architecture rtl of BUFFER_OUT_N is
 begin
 
   -- technology: unspecified, supply voltage: unspecified
   UNSPECIFIED_gen : if IOSTANDARD = UNSPECIFIED generate
     single_ended_prim : if DIFFERENTIAL = false generate
-      buf : OBUF
-        port map(
-          O  => O,
-          I  => I);
+      gen_loop : for idx in width-1 downto 0 generate
+        buf : OBUF
+          port map(
+            O  => O(idx),
+            I  => I(idx));
+      end generate;
     end generate;
 
     differential_prim : if DIFFERENTIAL = true generate
-      buf : OBUFDS
-        port map(
-          O  => O,
-          OB => OBAR,
-          I  => I);
+      gen_loop : for idx in width-1 downto 0 generate
+        buf : OBUFDS
+          port map(
+            O  => O(idx),
+            OB => OBAR(idx),
+            I  => I(idx));
+      end generate;
     end generate;
   end generate;
 
   -- technology: CMOS, supply voltage: 1.8V
   CMOS18_gen : if IOSTANDARD = CMOS18 generate
-    buf : OBUF
-      generic map(
-        IOSTANDARD => "LVCMOS18")
-      port map(
-        O  => O,
-        I  => I);
+    gen_loop : for idx in width-1 downto 0 generate
+      buf : OBUF
+        generic map(
+          IOSTANDARD => "LVCMOS18")
+        port map(
+          O  => O(idx),
+          I  => I(idx));
+    end generate;
   end generate;
 
   -- technology: CMOS, supply voltage: 2.5V
   CMOS25_gen : if IOSTANDARD = CMOS25 generate
-    buf : OBUF
-      generic map(
-        IOSTANDARD => "LVCMOS25")
-      port map(
-        O  => O,
-        I  => I);
+    gen_loop : for idx in width-1 downto 0 generate
+      buf : OBUF
+        generic map(
+          IOSTANDARD => "LVCMOS25")
+        port map(
+          O  => O(idx),
+          I  => I(idx));
+    end generate;
   end generate;
 
   -- technology: LVDS (TIA/EIA-644 specification), supply voltage: 2.5V
   LVDS25_gen : if IOSTANDARD = LVDS25 generate
-    buf : OBUFDS
-      generic map(
-        IOSTANDARD => "LVDS_25")
-      port map(
-        O  => O,
-        OB => OBAR,
-        I  => I);
+    gen_loop : for idx in width-1 downto 0 generate
+      buf : OBUFDS
+        generic map(
+          IOSTANDARD => "LVDS_25")
+        port map(
+          O  => O(idx),
+          OB => OBAR(idx),
+          I  => I(idx));
+    end generate;
   end generate;
 
 end rtl;

@@ -254,7 +254,7 @@ TreeHash=`(if test -f $(1); then \
              find -L . -type f | sort | xargs cat; \
            fi) \
            | $(MD5)`
-ReplaceIfDifferent=\
+ReplaceIfDifferent=$(infox REPLACE:$1:$2:$3)\
   TAIL=`basename $(1)`; \
   while test 1; do \
     if test -f $(1); then OLD=$(2)/$$TAIL; else OLD=$(2); fi;\

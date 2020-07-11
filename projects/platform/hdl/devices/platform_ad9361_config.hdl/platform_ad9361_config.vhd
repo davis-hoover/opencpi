@@ -19,6 +19,7 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library ocpi_core_bsv; use ocpi_core_bsv.all;
+library platform; use platform.all;
 library unisim;
 architecture rtl of platform_ad9361_config_worker is
   constant adc_sub_c  : natural := 0;

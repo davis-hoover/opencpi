@@ -29,7 +29,7 @@ HdlExactPart=\
 	$(and $(filter stratix4,$(HdlTarget)),ep4sgx230k-c2-f40))
 
 SourceFiles=signals.vhd
-Libraries=util
+Libraries=platform
 
 ExcludeTargets=modelsim
 

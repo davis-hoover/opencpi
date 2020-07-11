@@ -109,7 +109,6 @@ build: generate
 	$(AT)[ ! -d gen/assemblies ] || \
 		$(MAKE) -C gen/assemblies \
 	                $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../../$(OCPI_PROJECT_REL_DIR)) \
-			$(info CLIII:$(ComponentLibraries))\
 			ComponentLibrariesInternal="../../.. $(call OcpiAdjustLibraries2,$(ComponentLibraries))" \
 			LibrariesInternal="$(call OcpiAdjustLibraries,$(Libraries))" \
 			IncludeDirsInternal="$(call AdjustRelative,$(IncludeDirs))" \
@@ -158,6 +157,7 @@ ifneq ($(origin HdlPlatforms),undefined)
     # If we had OnlyPlatforms, and we are building for none of them, we are building for nothing
     ifndef OnlyPlatforms
       override HdlPlatforms:=
+      override HdlPlatform:=
       MAKEOVERRIDES:=$(filter-out HdlPlatforms=% HdlPlatform=%,$(MAKEOVERRIDES))
     endif
   else ifdef ExcludePlatforms

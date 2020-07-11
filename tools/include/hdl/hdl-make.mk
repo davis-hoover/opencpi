@@ -93,22 +93,28 @@ HdlFindCores=\
             $(error Primitive core $c (from Cores) not found.)),\
       $(call HdlSearchPrimitivePath,$c,,HPLx)))
 
+HdlBuiltinWorkers=ocscp ocscp_rv metadata metadata_rv time_client time_client_rv unoc_node unoc_node_rv
 define HdlSetWorkers
   HdlInstances:=$$(and $$(AssyWorkersFile),$$(strip $$(foreach i,$$(shell grep -h -v '\\\#' $$(AssyWorkersFile)),\
 	               $$(if $$(filter $$(call HdlInstanceWkr,$$i),$$(HdlPlatformWorkers)),,$$i))))
   HdlWorkers:=$$(call Unique,$$(foreach i,$$(HdlInstances),$$(call HdlInstanceWkrCfg,$$i)))
   $$(infox HdlSetWorkers:Cores:'$$(Cores)':'$$(HdlWorkers)':'$$(HdlInstances)':'$$(HdlTarget)')
   SubCores_$$(HdlTarget):=$$(call Unique,\
-    $$(- Cores) \
+    $(- Process explicit Cores) \
     $$(call HdlFindCores,$(Cores))\
-    $$(foreach w,$$(HdlWorkers),\
-      $$(or $(strip\
-        $$(foreach f,$$(strip\
-          $$(firstword \
-            $$(foreach d,$$(call HdlTargetComponentLibraries,$$(HdlTarget),HSW),\
-               $$(call HdlExists,$$d/$$w$$(HdlBin))))),\
-          $$(call FindRelative,.,$$f)),\
-	),$$(if $$(filter-out ocscp ocscp_rv metadata metadata_rv time_client time_client_rv unoc_node unoc_node_rv,$$w),$$(warning Warning: Worker $$w was not found in any of the component libraries built for $$(HdlTarget))))))
+    $(- Find worker cores)\
+    $$(foreach f,$$(call HdlGetFamily,$$(HdlTarget)),\
+       $$(foreach w,$$(HdlWorkers),\
+          $$(or $$(strip\
+             $$(firstword \
+                $$(foreach l,$$(OcpiComponentLibraries),$$(infox CORELIB:$$l:$$l/hdl/$$f/$$w$$(HdlBin))\
+                   $$(or $$(call HdlExists,$$l/hdl/$$f/$$w$$(HdlBin)),\
+                         $$(if $$(call HdlExists,$$l/hdl/$$w.xml),\
+                             $$(foreach lib,$$(l:%/lib=%),\
+                                $$(error HDL worker "$$w" found in component library "$$(lib)" $$(strip\
+                                   ($$(realpath $$(lib)))), but not built for $$f))))))),\
+             $$(if $$(filter-out $$(HdlBuiltinWorkers),$$w),\
+                $$(warning Warning: Worker $$w was not found in any of the component libraries))))))
    $$(infox Cores SubCores_$$(HdlTarget) is $$(origin SubCores_$$(HdlTarget)) $$(flavor SubCores_$$(HdlTarget)):$$(SubCores_$$(HdlTarget)))
 
 endef
@@ -564,8 +570,8 @@ HdlCollectCoreLibraries=$(infox PPPCx=$1=$2=$(notdir $1)=)\
 # in which case we create <asset>.<tool>.sources
 # If this is a true core, we record the black box stub files
 HdlRecordSources=\
-  $(infox Record:$1:$(HdlSources):$(HdlTarget))\
-  $(and $(call HdlExists,$(dir $1)),\
+  $(infox Record:$1:$(HdlSources):$(HdlTarget):$(call HdlExists,$(dir $1)))\
+  $(and $(call HdlExists,$(dir $1)),$(infox WRITING)\
   (\
    echo '\#' This generated file records sources necessary to build this $(LibName) $(HdlMode); \
    $(foreach s,$(if $(filter $(HdlMode),core),$(wildcard $(CoreBlackBoxFiles)),$(call OcpiUniqueNotDir,$(HdlSources))),echo $(notdir $s);) \
@@ -596,7 +602,7 @@ HdlExtractSourcesForLib=$(infox Extract:$2:$1)\
   $(foreach p,$(word 1,$(subst :, ,$2)),\
     $(foreach f,\
       $(call HdlRelativeOrAbsolutePathToLib,$1,$2,.),$(infox ZF:$f)\
-        $(foreach z,$(call HdlGrepExcludeComments,$f/$(notdir $p).sources),$(infox found:$z)\
+        $(foreach z,$(call HdlGrepExcludeComments,$f/$(notdir $p).sources),$(infox foundsource:$z)\
           $(call HdlRelativeOrAbsolutePathToLib,$1,$2,$3)/$z)))
 
 #########################################################################################################

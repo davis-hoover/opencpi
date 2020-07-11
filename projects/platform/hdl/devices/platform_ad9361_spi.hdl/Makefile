@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-Libraries=util
+Libraries=platform
 SourceFiles=signals.vhd
 
 # During the build process, swap HdlTarget with 'actual' target part of the target platform

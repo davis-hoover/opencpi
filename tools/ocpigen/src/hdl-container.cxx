@@ -1117,7 +1117,7 @@ emitTieoffSignals(FILE *f) {
 	assert(s.m_differential == false);
 	fprintf(f,
 		"  -- Inout signal \"%s\" is not connected to any instance.\n"
-		"  %s_ts: util.util.TSINOUT_",
+		"  %s_ts: platform.platform_pkg.TSINOUT_",
 		s.cname(), s.cname());
 	if (s.m_width)
 	  fprintf(f,
@@ -1147,7 +1147,7 @@ emitTieoffSignals(FILE *f) {
       // Signal has a connection and is INOUT - generate the top level tristate
       fprintf(f,
 	      "  -- Inout signal \"%s\" needs a tristate buffer.\n"
-		"  %s_ts: util.util.TSINOUT_",
+		"  %s_ts: platform.platform_pkg.TSINOUT_",
 	      s.cname(), s.cname());
       if (s.m_width)
 	fprintf(f, "N\n    generic map(width => %zu)\n", s.m_width);
