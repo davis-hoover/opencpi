@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -31,6 +31,7 @@ dt = np.dtype('<u4')
 
 # Open input file and grab samples as uint32
 
+simulation = os.environ.get("OCPI_TEST_simulation")
 
 with open(sys.argv[1], 'rb') as f:
     goldendata = np.fromfile(f, dtype=dt)
@@ -46,8 +47,18 @@ if len(odata) != len(goldendata):
 else:
     print("    Golden and output file lengths match")
 
-if np.array_equal(goldendata, odata):
-    print("    Golden and output file match")
-else:
-    print("    Golden and output file do not match")
-    sys.exit(1)
+if (simulation == "true"):
+    if np.array_equal(goldendata, odata):
+        print ("    Output data and golden data match")
+    else:
+        print ("    Output data and golden data don't match")
+        sys.exit(1)
+
+elif (simulation == "false"):
+    correlation = np.corrcoef(odata,goldendata)[1,0]
+    if (correlation >= 0.7):
+        print("    Output data and golden data Pearson product-moment correlation coefficient is greater than or equal to 0.7")
+    else:
+        print("    Output data and golden data Pearson product-moment correlation coefficient is less than 0.7")
+        print("    Correlation: " + str(correlation))
+        sys.exit(1)

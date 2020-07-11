@@ -18,11 +18,19 @@
 
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
-# This is the application Makefile for the "timestamping_accuracy_app" application
-# If there is a timestamping_accuracy_app.cc (or timestamping_accuracy_app.cxx) file, it will be assumed to be a C++ main program to build and run
-# If there is a timestamping_accuracy_app.xml file, it will be assumed to be an XML app that can be run with ocpirun.
-# The RunArgs variable can be set to a standard set of arguments to use when executing either.
 
-APP=timestamping_accuracy
+#TODO: These are internal headers which should not be included directly
+#      Anything from them exposed to the ACI should be in Ocpi*Api.h files
+#      https://gitlab.com/opencpi/opencpi/issues/887
+IncludeDirs+=\
+	../../../../runtime/util/driver/include/ \
+	../../../../runtime/util/ezxml/include/ \
+	../../../../runtime/util/misc/include/ \
+	../../../../runtime/util/parentChild/include/ \
+	../../../../runtime/util/property/include/ \
+	../../../../runtime/util/vfs/include/ \
+	../../../../os/interfaces/include/
 
 include $(OCPI_CDK_DIR)/include/application.mk
+
+

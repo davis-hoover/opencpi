@@ -383,7 +383,7 @@ protected:
 	    dup2(fd, 2) < 0)
 	  _exit(10 + errno);
 	assert(fd > 2);
-	if (execl("/bin/sh", "/bin/sh", "--noprofile", "-c", cmd.c_str(), NULL))
+	if (execl("/bin/bash", "/bin/bash", "--noprofile", "-c", cmd.c_str(), NULL))
 	  _exit(10 + errno);
       }
       break; // not used.
@@ -837,9 +837,9 @@ public:
     } else
       m_file = m_app = slash;
     char date[100];
-    time_t now = time(NULL);
+    time_t l_now = time(NULL);
     struct tm nowtm;
-    localtime_r(&now, &nowtm);
+    localtime_r(&l_now, &nowtm);
     strftime(date, sizeof(date), ".%Y%m%d%H%M%S", &nowtm);
     OU::format(m_dir, "%.*s/%s.%s%s", (int)(strchr(m_simDir.c_str(), '/') - m_simDir.c_str()),
 	       m_simDir.c_str(), m_app.c_str(), m_platform.c_str(), date);
@@ -1125,8 +1125,8 @@ getSims(std::vector<std::string> &sims) {
   std::vector<std::string> pdirs;
   sims.clear();
   std::string first;
-  if (OU::searchPath(path.c_str(), "lib/platforms/*", first, "exports", &pdirs)) {
-    ocpiInfo("No HDL platforms found (no lib/platforms/*) in path %s",
+  if (OU::searchPath(path.c_str(), "hdl/platforms/*", first, "exports", &pdirs)) {
+    ocpiInfo("No HDL platforms found (no hdl/platforms/*) in path %s",
 	     path.c_str());
     return NULL;
   }
@@ -1225,9 +1225,9 @@ search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std:
 
 OH::Device *Driver::
 open(const char *name, const OA::PValue *params, std::string &err) {
-  const char *cp;
-  for (cp = name; *cp && !isdigit(*cp); cp++)
-    ;
+  const char *cp = name + strlen(name);
+  while (cp > name && isdigit(cp[-1]))
+    cp--;
   std::string platform;
   platform.assign(name, OCPI_SIZE_T_DIFF(cp, name));
   bool verbose = false;
@@ -1261,7 +1261,7 @@ createDevice(const std::string &name, const std::string &platform, uint8_t spinC
   actualPlatform.assign(platform.c_str(),
 			!strcmp("_pf", platform.c_str() + len - 3) ? len - 3 : len);
   std::string relScript;
-  OU::format(relScript, "lib/platforms/%s/runSimExec.%s", actualPlatform.c_str(),
+  OU::format(relScript, "hdl/platforms/%s/runSimExec.%s", actualPlatform.c_str(),
 	     actualPlatform.c_str());
   if (OU::searchPath(path.c_str(), relScript.c_str(), script, "exports")) {
     OU::format(error, "No simulation platform found named %s (no %s)",

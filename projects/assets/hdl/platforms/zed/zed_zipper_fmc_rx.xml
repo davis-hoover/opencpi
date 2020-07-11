@@ -1,3 +1,0 @@
-<HdlConfig>
-  <device name='lime_adc' card='lime_zipper_fmc_lpc'/> <!-- connection must be defined in a container -->
-</HdlConfig>

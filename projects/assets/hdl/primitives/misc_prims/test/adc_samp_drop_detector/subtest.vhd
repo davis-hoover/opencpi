@@ -16,7 +16,7 @@ architecture rtl of subtest is
   signal data_src_odata   : data_complex_adc_t;
   signal data_src_ovld    : std_logic := '0';
   signal uut_odata        : data_complex_adc_t;
-  signal uut_ometadata    : metadata_t;
+  signal uut_osamp_drop   : std_logic := '0';
   signal uut_ovld         : std_logic := '0';
   signal file_writer_irdy : std_logic := '0';
   signal end_of_test      : std_logic := '0';
@@ -43,8 +43,6 @@ begin
   end process rst_gen;
 
   data_src : entity work.data_src
-    generic map(
-      DATA_BIT_WIDTH => DATA_ADC_BIT_WIDTH)
     port map(
       -- CTRL
       clk                => clk,
@@ -58,17 +56,17 @@ begin
   uut : misc_prims.misc_prims.adc_samp_drop_detector
     port map(
       -- CTRL
-      clk       => clk,
-      rst       => rst,
-      status    => open,
+      clk        => clk,
+      rst        => rst,
+      status     => open,
       -- INPUT
-      idata     => data_src_odata,
-      ivld      => data_src_ovld,
+      idata      => data_src_odata,
+      ivld       => data_src_ovld,
       -- OUTPUT
-      odata     => uut_odata,
-      ometadata => uut_ometadata,
-      ovld      => uut_ovld,
-      ordy      => file_writer_irdy);
+      odata      => uut_odata,
+      osamp_drop => uut_osamp_drop,
+      ovld       => uut_ovld,
+      ordy       => file_writer_irdy);
 
   file_writer : entity work.file_writer
     generic map(
@@ -82,7 +80,7 @@ begin
       backpressure_select_vld => backpressure_select_vld,
       -- INPUT
       idata                   => uut_odata,
-      imetadata               => uut_ometadata,
+      isamp_drop              => uut_osamp_drop,
       ivld                    => uut_ovld,
       irdy                    => file_writer_irdy);
 

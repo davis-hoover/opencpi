@@ -76,6 +76,7 @@ run(RCCWorker *self, RCCBoolean timedOut, RCCBoolean *newRunCondition) {
  RCCPort *port = &self->ports[FILE_WRITE_IN];
  File_writeProperties *props = self->properties;
  MyState *s = self->memory;
+ ssize_t rv;
 
  // printf("In file_write.c got %zu/%u data = %x\n", port->input.length, port->input.u.operation,
  //	*(uint32_t *)port->current.data);
@@ -88,13 +89,13 @@ run(RCCWorker *self, RCCBoolean timedOut, RCCBoolean *newRunCondition) {
      uint32_t length;
      uint32_t opcode;
    } m = { port->input.length, port->input.u.operation };
-   if (write(s->fd, &m, sizeof(m)) != (ssize_t)sizeof(m))
-     return self->container.setError("error writing header to file: %s", strerror(errno));
+   if ((rv = write(s->fd, &m, sizeof(m)) != (ssize_t)sizeof(m)))
+     return self->container.setError("error writing header to file: %s (%zd)", strerror(errno), rv);
  }
  if (port->input.length &&
-     write(s->fd, port->current.data, port->input.length) != (ssize_t)port->input.length)
-   return self->container.setError("error writing data to file: length %zu(%zx): %s",
-				   port->input.length, port->input.length, strerror(errno));
+     (rv = write(s->fd, port->current.data, port->input.length)) != (ssize_t)port->input.length)
+   return self->container.setError("error writing data to file: length %zu(%zx): %s (%zd)",
+				   port->input.length, port->input.length, strerror(errno), rv);
  props->bytesWritten += port->input.length;
  props->messagesWritten++; // this includes non-EOF ZLMs even though no data was written.
  return RCC_ADVANCE;

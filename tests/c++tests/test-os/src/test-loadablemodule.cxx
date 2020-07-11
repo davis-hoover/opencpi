@@ -32,14 +32,17 @@ namespace {
     protected:
       std::string sym_to_load, library_to_load;
       void SetUp() /* override */ {
-#if  defined(OCPI_OS_linux) || defined(OCPI_OS_macos)
+#if  defined(OCPI_OS_linux) // works on centos6/7, mint19
+        library_to_load = "librt.";
+        sym_to_load = "clock_gettime";
+#elif   defined(OCPI_OS_macos)
         library_to_load = "libm.";
-        library_to_load += LoadableModule::suffix();
         sym_to_load = "atan";
 #else
-        library_to_load = sym_to_load = "FAIL";
-        std::cerr << "[ WARNING! ] This platform is not fully testable and some tests may fail.\n";
+	library_to_load = sym_to_load = "FAIL";
+	std::cerr << "[ WARNING! ] This platform is not fully testable and some tests may fail.\n";
 #endif
+        library_to_load += LoadableModule::suffix();
       }
   };
 

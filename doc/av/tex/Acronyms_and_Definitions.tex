@@ -16,22 +16,21 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
+
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
 \def\docTitle{Acronyms and Definitions}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
-\usepackage{enumitem}
 %----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 \maketitle
+\thispagestyle{empty}
 \newpage
 \begin{center}
   \textit{\textbf{Revision History}}
@@ -61,11 +60,14 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
   This document uses \textit{italic type} to indicate a keyword that is defined elsewhere, and possibly later, within.
 \end{center}
 \newpage
+
+\tableofcontents
+\newpage
+
 \section{Acronyms}
 \begin{description}
 \item[ACI] \textit{Application} Control Interface
 \item[ARM] Advanced RISC Machine
-\item[AV] ANGRYVIPER Team: sometimes used as prefix on ticket numbers within code
 \item[AXI] \textit{Advanced eXtensible Interface}
 % \item[CBD] \textit{Component}-Based Development
 \item[BSP] \textit{Board Support Package}

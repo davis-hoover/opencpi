@@ -58,7 +58,8 @@ architecture rtl of sdp2cp_clk_rv is
   signal s2c_dwords_r      : dword_array_t(1 downto 0);
   signal in_second_dw_r    : bool_t;
   signal in_read_r         : bool_t;
-  signal addr_r            : occp_address_t;
+  signal addr_r            : occp_address_t; -- the requested address
+  signal addr_lsb_r        : std_logic;      -- the lsb of the address to the 32 bit cp
   signal be_r              : occp_byte_en_t;
   signal tag_r             : occp_tag_t;
   signal in_64_r           : bool_t;
@@ -105,7 +106,7 @@ begin
 --  cp_out.address <= addr_r;
 --  cp_out.byte_en <= be_r;
   cp_out_data    <= slv(tag_r, dword_size) when its(in_read_r) else
-                    s2c_dwords_r(hi_dw) when a_state_r = a_last_e and in_64_r else
+                    s2c_dwords_r(1) when a_state_r = a_last_e and in_64_r and sdp_width > 1 else
                     s2c_dwords_r(0);
   -- take read data from the CP if it will be accepted by the SDP. We don't pipeline
   cp_out_take    <= to_bool(cp_in_valid and
@@ -121,7 +122,7 @@ begin
   sdp_out.sdp.header.lead     <= (others => '0');
   sdp_out.sdp.header.trail    <= (others => '0');
   sdp_out.sdp.header.node     <= (others => '0'); -- CP is always node zero
-  sdp_out.sdp.header.addr     <= (others => '0');
+  sdp_out.sdp.header.addr     <= unsigned(addr_r);
   sdp_out.sdp.header.extaddr  <= (others => '0');
   sdp_out.sdp.valid           <= to_bool(
 -- no zero-latency reads...             (r_state_r = r_idle_e and its(cp_in.valid) and
@@ -133,11 +134,11 @@ begin
                         -- r_state_r = r_last_wanted_e or r_state_r = r_last_valid_e;
   sdp_out.sdp.ready  <= to_bool(sdp_in.sdp.valid and
                                 (a_state_r = a_idle_e or
-                                 (a_state_r = a_first_e and cp_in_take) or
+                                 (a_state_r = a_first_e and sdp_width = 1 and cp_in_take) or
                                  a_state_r = a_last_wanted_e));
   sdp_out.dropCount  <= (others => '0');
 g0: for i in 0 to to_integer(sdp_width)-1 generate
-  sdp_out_data(i) <= cp_in_data when tag_startdw(cp_in_tag) = i else (others => '0');
+  sdp_out_data(i) <= cp_in_data when tag_startdw(cp_in_tag) = i else c2s_dword_r; --(others => '0');
   end generate g0;
 
   -- Our state machines, separate for address and read-data
@@ -151,12 +152,14 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
         r_state_r      <= r_idle_e;
         c2s_dword_r    <= (others => '0');
         addr_r         <= (others => '0');
+        addr_lsb_r     <= '0';
       else
         case a_state_r is
           when a_idle_e =>
             -- Capture the request immediately to free up the SDP
             if its(sdp_in.sdp.valid) then
               addr_r          <= occp_address_t(hdr.addr(addr_r'left downto 0));
+              addr_lsb_r      <= hdr.addr(0);
               be_r            <= header2be(hdr, to_unsigned(0,1));
               in_read_r       <= to_bool(hdr.op = read_e);
               in_64_r         <= to_bool(count_in_dws(hdr) = 2);
@@ -174,7 +177,7 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
             end if;
           when a_first_e => -- First of two is being read or written
             if its(cp_in_take) then
-              addr_r(0) <= '1';
+              addr_lsb_r <= '1';
               a_state_r <= a_last_e;
               tag_r <= make_tag(tag_xid(tag_r), bfalse,
                                 tag_startdw(tag_r) + (1 - bit2unsigned(sdp_width(0))));
@@ -257,7 +260,7 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
   begin
     ctl_reset <= not wci_reset_n;
     ------ CDC SDP -> CP
-    fifo2cp_in     <= addr_r & cp_out_data & be_r & in_read_r;
+    fifo2cp_in     <= addr_r(addr_r'left downto 1) & addr_lsb_r & cp_out_data & be_r & in_read_r;
     fifo2cp_enq    <= fifo2cp_not_full and cp_out_valid;
     cp_in_take     <= fifo2cp_enq; -- we are taking from cp_out
     cp_out.address <= fifo2cp_out(address_lsb_c + cp_out.address'length-1 downto address_lsb_c);

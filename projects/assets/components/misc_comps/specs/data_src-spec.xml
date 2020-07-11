@@ -19,27 +19,26 @@
                                Parameter="true"
                                Default="0"
                                Description="Out-of-reset value of the Linear Feedback Shift Register (only affects output data in LFSR mode). This value should never be all zeros, which would cause the register to always have a value of all zeros regardless of polynomial value."/>
-  <Property Name="ZLM_WHEN_NUM_SAMPLES_REACHED_p" Type="bool"
+  <!-- this is for backward compatibility -->
+  <Property Name="ZLM_WHEN_NUM_SAMPLES_REACHED_p" Type="bool" Parameter='true' Default='false'/>
+  <Property Name="EOF_WHEN_NUM_SAMPLES_REACHED_p" Type="bool"
                                    Parameter="true"
                                    Default="false"
-                                   Description="When value is true and num_samples property value is not -1, worker will generate Zero-Length-Message after num_samples amount of samples have been sent out the output port. Note this functionality is independent of the value of the enable property."/>
+                                   Description="When value is true and num_samples property value is not -1, worker will generate EOF after num_samples amount of samples have been sent out the output port. Note this functionality is independent of the value of the enable property."/>
 
   <!-- Initial Properties -->
   <Property Name="messageSize_bytes" Type="ulong"
-                                     Readable="true"
                                      Initial="true"
                                      Default="0"
                                      Description="Message size in bytes. When the value of (num_samples * num bytes per sample) is less than this property's value, the value of (num_samples * num bytes per sample) is used as the message size."/>
 
   <!-- Runtime Properties -->
   <Property Name="num_samples" Type="long" 
-                               Readable="true"
                                Writable="true"
                                Default="-1"
                                Description="Maximum number of samples which will be sent out of the output port once out of reset. Note that samples are only sent when the enable property has a value of true. When the value of this property is -1, samples will be sent indefinitely (obeying backpressure from the connected worker, of course)."/>
   <Property Name="fixed_value" Type="bool"
                                Arraylength="DATA_BIT_WIDTH_p"
-                               Readable="true"
                                Writable="true"
                                Default="0x5a5a"
                                Description="The value of this property will be used for I (and the bit-reversed version of this value will be used for Q) to send to the output port when the mode property's value is 'fixed'.
@@ -47,27 +46,22 @@
                                             array index 1 corresponds to the 14th (next-to-most significant) I bit and the 15-DATA_BIT_WIDTH_p Q bit of the out port, etc..."/>
   <Property Name="mode" Type="enum"
                         Enums="count,walking,LFSR,fixed"
-                        Readable="true"
                         Writable="true"
                         Default="count"
                         Description="Counter, walking ones, Linear Feedback Shift Register, or fixed value."/>
   <Property Name="enable" Type="bool"
-                          Readable="true"
                           Writable="true"
                           Default="true"
                           Description="When the worker is not in reset, this property must have a value of true for the data to be sent to the output. Note that this property has no effect on the ZLM operation (see ZLM_WHEN_NUM_SAMPLES_REACHED_p parameter property)."/>
   <Property Name="LFSR_bit_reverse" Type="bool"
-                                    Readable="true"
                                     Writable="true"
                                     Default="true"
                                     Description="Used to determine the LFSR shift direction. When true, the DATA_BIT_WIDTH_p-bits wide LFSR will be reversed for both I and Q."/>
   <Property Name="mask_I" Type="ushort"
-                          Readable="true"
                           Writable="true"
                           Default="0xffff"
                           Description="I data will be bitwise anded with this mask before being sent to out port."/>
   <Property Name="mask_Q" Type="ushort"
-                          Readable="true"
                           Writable="true"
                           Default="0xffff"
                           Description="Q data will be bitwise anded with this mask before being sent to out port."/>

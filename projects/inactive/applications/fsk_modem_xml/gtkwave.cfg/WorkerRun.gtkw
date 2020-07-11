@@ -3,10 +3,10 @@
 [*] Tue Oct  2 18:45:18 2012
 [*]
 [hier_max_level] 3
-[dumpfile] "/work/ocpi/tools/cdk/examples/fsk_modem_xml/timeData.vcd"
+[dumpfile] "/work/ocpi/tools/examples/fsk_modem_xml/timeData.vcd"
 [dumpfile_mtime] "Mon Oct  1 17:08:24 2012"
 [dumpfile_size] 119094
-[savefile] "/work/ocpi/tools/cdk/examples/fsk_modem_xml/gtkwave.cfg/WorkerRun.gtkw"
+[savefile] "/work/ocpi/tools/examples/fsk_modem_xml/gtkwave.cfg/WorkerRun.gtkw"
 [timestart] 104100000
 [size] 1593 953
 [pos] -1 -1

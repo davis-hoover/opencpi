@@ -1,0 +1,3 @@
+yum install nodejs
+yum install nvm
+make

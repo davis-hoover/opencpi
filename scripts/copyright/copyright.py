@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 """Inserts copyright into files, replacing old ones found (AV-2759, AV-2912)"""
 # For copyright information concerning THIS script; see build_copyright below.
 

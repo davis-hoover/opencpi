@@ -18,27 +18,21 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ TX Event Test App Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{TX Event Test App Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{TX Event Test App Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
-\usepackage{listings}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
+\newpage
+
 	\begin{center}
 	\textit{\textbf{Revision History}}
 		\begin{table}[H]
@@ -57,6 +51,10 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\end{longtable}
 		\end{table}
 	\end{center}
+\newpage
+
+\tableofcontents
+\newpage
 
 \section{Description}
 This application directory containts several OAS files which allow for the testing of the \verb+tx_event+ protocol using the \verb+qdac+ component's \verb+event_in+ port in multiple scenarios include both \verb+event_in+ port connected and unconnected. The application transmits a single tone at a frequency set via the \verb+tx+ component's \verb+frequency_MHz+ property in each OAS. OAS files exist for each supported hardware setup for two different behaviors: 1) transmitted tone is toggled (on/off) at a rate of once per second (\verb+event_in+ port is connected), and 2) transmitted tone is constant over duration of application (\verb+event_in+ port is unconnected). The application duration is set via ocpirun ... -t $<$duration\_sec$>$ ...).

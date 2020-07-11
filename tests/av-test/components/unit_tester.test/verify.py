@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#!/usr/bin/env python
 import sys
 import os.path
 import numpy as np
@@ -38,7 +37,7 @@ idata = np.fromfile(ifilename, dtype=np.uint32, count=-1)
 ifilename.close()
 
 if np.array_equal(idata, odata):
-    print '    PASS: Input and output data files match'
+    print('    PASS: Input and output data files match')
 else:
-    print '    FAIL: Input and output data files not match'
+    print('    FAIL: Input and output data files not match')
     sys.exit(1)

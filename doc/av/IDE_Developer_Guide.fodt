@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:creation-date>2019-06-17T10:47:07.983816461</meta:creation-date><dc:date>2019-06-27T15:04:16.470392304</dc:date><meta:editing-duration>PT1H55M38S</meta:editing-duration><meta:editing-cycles>18</meta:editing-cycles><meta:generator>LibreOffice/5.3.6.1$Linux_X86_64 LibreOffice_project/30$Build-1</meta:generator><meta:document-statistic meta:table-count="0" meta:image-count="2" meta:object-count="0" meta:page-count="7" meta:paragraph-count="84" meta:word-count="1820" meta:character-count="11659" meta:non-whitespace-character-count="9779"/></office:meta>
+ <office:meta><meta:creation-date>2019-06-17T10:47:07.983816461</meta:creation-date><dc:date>2019-06-27T15:04:16.470392304</dc:date><meta:editing-duration>PT1H55M38S</meta:editing-duration><meta:editing-cycles>18</meta:editing-cycles><meta:generator>LibreOffice/5.3.6.1$Linux_X86_64 LibreOffice_project/30$Build-1</meta:generator><meta:document-statistic meta:table-count="0" meta:image-count="2" meta:object-count="0" meta:page-count="7" meta:paragraph-count="84" meta:word-count="1819" meta:character-count="11626" meta:non-whitespace-character-count="9747"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">0</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">164093</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">48606</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">24079</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">47249</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">19713</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">15508</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">2501</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">30194</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">177419</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">48604</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">24077</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">164093</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">47248</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">183804</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">1</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
-     <config:config-item config:name="ZoomFactor" config:type="short">100</config:config-item>
+     <config:config-item config:name="ZoomFactor" config:type="short">140</config:config-item>
      <config:config-item config:name="IsSelectedFrame" config:type="boolean">false</config:config-item>
      <config:config-item config:name="AnchoredTextOverflowLegacy" config:type="boolean">false</config:config-item>
     </config:config-item-map-entry>
@@ -70,7 +70,7 @@
    <config:config-item config:name="InvertBorderSpacing" config:type="boolean">false</config:config-item>
    <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
    <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">5426129</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">5494209</config:config-item>
    <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
    <config:config-item config:name="ApplyUserData" config:type="boolean">false</config:config-item>
@@ -346,6 +346,12 @@
   <style:style style:name="P33" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="004313af" officeooo:paragraph-rsid="004e3442"/>
   </style:style>
+  <style:style style:name="P34" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:rsid="004313af" officeooo:paragraph-rsid="004313af"/>
+  </style:style>
+  <style:style style:name="P35" style:family="paragraph" style:parent-style-name="Heading_20_2">
+   <style:text-properties officeooo:rsid="004313af" officeooo:paragraph-rsid="004e3442"/>
+  </style:style>
   <style:style style:name="T1" style:family="text">
    <style:text-properties officeooo:rsid="0013b6d1"/>
   </style:style>
@@ -520,6 +526,9 @@
   <style:style style:name="T58" style:family="text">
    <style:text-properties officeooo:rsid="004ffcb6"/>
   </style:style>
+  <style:style style:name="T59" style:family="text">
+   <style:text-properties officeooo:rsid="0053d5c1"/>
+  </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
    <style:graphic-properties style:run-through="foreground" style:wrap="none" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
   </style:style>
@@ -556,7 +565,7 @@
    <text:p text:style-name="Standard"/>
    <text:p text:style-name="Standard"/>
    <text:p text:style-name="Standard"/>
-   <text:p text:style-name="P1">ANGRYVIPER IDE Developer Guide</text:p>
+   <text:p text:style-name="P1"><text:span text:style-name="T59">AV</text:span> IDE Developer Guide</text:p>
    <text:p text:style-name="P1"/>
    <text:p text:style-name="P2"/>
    <text:p text:style-name="P2"/>
@@ -599,7 +608,7 @@
    <text:p text:style-name="P2"/>
    <text:p text:style-name="P2"/>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:soft-page-break/><text:span text:style-name="T1">1. </text:span>How to Construct the AV-IDE Development Environment</text:h>
-   <text:p text:style-name="P3">The <text:span text:style-name="T1">ANGRYVIPER</text:span> IDE <text:span text:style-name="T1">(AV-IDE) </text:span>is an eclipse plugin development project written in Java. This section describes how to assemble and Eclipse Plugin Development environment and obtain required packages to continue IDE development.</text:p>
+   <text:p text:style-name="P3">The <text:span text:style-name="T59">AV</text:span> IDE is an eclipse plugin development project written in Java. This section describes how to assemble and Eclipse Plugin Development environment and obtain required packages to continue IDE development.</text:p>
    <text:p text:style-name="P3"/>
    <text:p text:style-name="P3">Obtain an Eclipse IDE for Java Developers</text:p>
    <text:p text:style-name="Standard"><text:bookmark text:name="LPNoLP323531"/><text:a xlink:type="simple" xlink:href="https://www.eclipse.org/downloads/packages/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T2">https://www.eclipse.org/downloads/packages/</text:span></text:a></text:p>
@@ -622,7 +631,7 @@
    <text:p text:style-name="P6">Obtain the plugin code base from git. <text:s/>The repo is called avide.</text:p>
    <text:p text:style-name="P6">Import the plugin project into Eclipse. The entire repo will import as a project, <text:span text:style-name="T27">however</text:span> <text:span text:style-name="T27">t</text:span>he <text:span text:style-name="T56">individual </text:span>plugin project is located in: <text:span text:style-name="T10">avide/av.proj.ide.tycho/bundles/av.proj.ide.plugin</text:span>.</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2">2. Overview of <text:span text:style-name="T9">the IDE</text:span></text:h>
-   <text:p text:style-name="P6">The IDE primary consists of a number of OpenCPI asset editors and the ANGRYVIPER <text:span text:style-name="T18">Perspective</text:span> implementation. <text:s/>The editor <text:span text:style-name="T18">implementations are located in their own packages. <text:s/>The perspective views are implemented in the </text:span><text:span text:style-name="T15">swt</text:span><text:span text:style-name="T18"> package, the build/run environment is in the </text:span><text:span text:style-name="T15">avps</text:span><text:span text:style-name="T18"> package. The data model and data services are located in the </text:span><text:span text:style-name="T15">internal</text:span><text:span text:style-name="T18"> package.</text:span></text:p>
+   <text:p text:style-name="P6">The IDE primary consists of a number of OpenCPI asset editors and the <text:span text:style-name="T59">AV</text:span> <text:span text:style-name="T18">Perspective</text:span> implementation. <text:s/>The editor <text:span text:style-name="T18">implementations are located in their own packages. <text:s/>The perspective views are implemented in the </text:span><text:span text:style-name="T15">swt</text:span><text:span text:style-name="T18"> package, the build/run environment is in the </text:span><text:span text:style-name="T15">avps</text:span><text:span text:style-name="T18"> package. The data model and data services are located in the </text:span><text:span text:style-name="T15">internal</text:span><text:span text:style-name="T18"> package.</text:span></text:p>
    <text:p text:style-name="P7">The <text:span text:style-name="T10">develop</text:span> branch is currently a snapshot of the 1.5 development cycle. <text:s/><text:span text:style-name="T19">Current work to improve the Data model and services in located in the </text:span><text:span text:style-name="T11">AV-5507_ocpidev</text:span><text:span text:style-name="T21"> branch. This was close to being finished </text:span><text:span text:style-name="T25">when the project shut down. T</text:span><text:span text:style-name="T21">he remaining development was to get the wizard working and update the model accordingly and to implement the refresh.</text:span></text:p>
    <text:p text:style-name="P10"><text:soft-page-break/></text:p>
    <text:p text:style-name="P8"><text:span text:style-name="T21">M</text:span><text:span text:style-name="T20">ost of the classes are pretty cohesive. This cannot be said for the service classes as they evolved in response to a number is forces stemming to the initial construction of the build functionality (avps package) to the </text:span><text:span text:style-name="T22">functionality needed for the OpenCPI Project View. The 1.6 development was to clean this up as we moved to </text:span><text:span text:style-name="T12">ocpidev </text:span><text:span text:style-name="T22">to obtain asset information. The whole approach to display the data model was </text:span><text:span text:style-name="T23">to </text:span><text:span text:style-name="T22">chang</text:span><text:span text:style-name="T23">e</text:span><text:span text:style-name="T22"> to provide a cleaner, </text:span><text:span text:style-name="T24">more responsive</text:span><text:span text:style-name="T22"> and more intelligent design.</text:span></text:p>

@@ -200,7 +200,7 @@ if [ -n "$files" ]; then
     done
 fi
 # Create the script that runs the proxy in the OpenCPI installation
-(echo '#!/bin/sh --noprofile';
+(echo '#!/bin/bash --noprofile';
  echo 'OCPI_BOOTSTRAP=$OCPI_CDK_DIR/scripts/ocpibootstrap.sh && source $OCPI_BOOTSTRAP';
  echo 'OCPI_RH_APP='$app' exec $OCPI_CDK_DIR/bin/$OCPI_TOOL_DIR/ocpirh_proxy $*') > $tmpdir/$app
 chmod 755 $tmpdir/$app

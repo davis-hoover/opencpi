@@ -1,22 +1,32 @@
 #!/bin/bash --noprofile
 
-# Usage is:  update-release.sh <release-tag>
-# Release tag before any hyphen is assume to be numeric maj.min.patch
-
 set -e
 
 function usage {
   cat <<USAGE
-Usage: $(basename "$0") <release-tag>
+Usage: $(basename "$0") [--autotools-only] <release-tag>
 
-release-tag    An OpenCPI semver compatible release tag.
+Updates OpenCPI version that is defined in various places. This script is only
+used when creating releases.
+
+Required arguments:
+  release-tag  An OpenCPI semver compatible release tag.
                Ex. v1.6.0, v1.7.0-beta.1, v1.7.0-rc.1
+
+Optional arguments:
+  --autotools-only  Only update version defined in configure.ac. This is done
+                    after a new minor release has been made.
 USAGE
   exit 1
 }
 
 function parse_release {
   local release="$1"
+
+  if [ "$release" = develop ]; then
+    RELEASE=develop
+    return 0
+  fi
 
   # Clean up release tag
   [[ "$release" != v* ]]  && release="v$release"
@@ -32,32 +42,28 @@ function parse_release {
   return 0
 }
 
-# Parse args
-RELEASE=
-if [[ -z "$1" || "$1" = -* ]]; then
+
+##### Main #####
+
+if [ -z "$1" ]; then
   usage
-elif [ "$1" == develop ]; then
-  RELEASE=$1
-elif ! parse_release "$1" ; then
   exit 1
 fi
 
-# Fix the common release subtitle and any URLs in fodt files
-(cd doc/odt
- echo "Updating odt docs for release $RELEASE"
- sed -i "s|\(OpenCPI Release \)[^<]*|\1$RELEASE|" shared/release.fodt
- for f in *.fodt; do
-   sed -i "s|\(OpenCPI Release \)[^<]*|\1$RELEASE|" "$f"
-   sed -i 's|\( xlink:href="https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^"]*"\)|\1'"$RELEASE"'\2|g' "$f"
-   sed -i 's|\(>https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^<]*<\)|\1'"$RELEASE"'\2|g' "$f"
- done
-)
+# Parse args
+RELEASE=         # set by parse_release
+AUTOTOOLS_ONLY=
+while [ -n "$1" ]; do
+  case "$1" in
+    --help|-h)         usage ;;
+    --autotools-only)  AUTOTOOLS_ONLY=1 ;;
+    *)                 parse_release "$1" || exit 1 ;;
+  esac
+  shift
+done
 
-# Fix the common release subtitle for (some) tex docs
-(cd doc/av/tex/snippets
- echo "Updating tex docs for release $RELEASE"
- sed -i "s/\(ocpiversion{\)[^}]*/\1$RELEASE/" includes.tex
-)
+# RELEASE should be defined by now...
+[ -n "$RELEASE" ] || usage
 
 # Fix the builtin software release tag for compatibility checking
 if [ "$RELEASE" != develop ]; then
@@ -78,3 +84,20 @@ if [ "$RELEASE" != develop ]; then
 else
   echo "Not updating autotools, 'develop' specified as release"
 fi
+
+# Are we only doing autotools?
+[ -z "$AUTOTOOLS_ONLY" ] || exit 0
+
+# Fix the common release subtitle and any URLs in fodt files
+echo "Updating odt docs for release $RELEASE"
+for f in $(find doc/ -type f -name '*.fodt'); do
+  sed -i "s|\(OpenCPI Release:\)[^<]*|\1  $RELEASE|" "$f"
+  sed -i 's|\( xlink:href="https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^"]*"\)|\1'"$RELEASE"'\2|g' "$f"
+  sed -i 's|\(>https://opencpi.gitlab.io/releases/\)[^/]*\(/docs/[^<]*<\)|\1'"$RELEASE"'\2|g' "$f"
+done
+
+# Fix the common release subtitle for (some) tex docs
+echo "Updating tex docs for release $RELEASE"
+sed -i "s/\(ocpiversion{\)[^}]*/\1$RELEASE/" doc/av/tex/snippets/LaTeX_Header.tex
+
+exit 0

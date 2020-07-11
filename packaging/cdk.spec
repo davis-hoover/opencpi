@@ -31,7 +31,7 @@ Prefix:      %{prefix0}
 %global      prefix1 /etc
 Prefix:      %{prefix1}
 Vendor:      OpenCPI
-Packager:    ANGRYVIPER Team <discuss@lists.opencpi.org>
+Packager:    OpenCPI <discuss@lists.opencpi.org>
 %include %{RPM_OPENCPI}/packaging/target-%{RPM_PLATFORM}/runtime-requires
 # Then the "requires" that are only needed by the rpm installation itself rather than
 # OpenCPI.

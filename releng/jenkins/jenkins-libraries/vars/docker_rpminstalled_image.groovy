@@ -30,7 +30,7 @@
     The name returned will still need to use docker.image() to use it.
 
   Notes:
-   * Image naming: angryviper/<BRANCHNAME>x:<ID>-C<OS>
+   * Image naming: av/<BRANCHNAME>x:<ID>-C<OS>
     * The "x" at the end is in case the branch ends with "-"
    * Calls return an IMAGE not a CONTAINER.
    * These functions use the metadata file (.jenkins_metadata.json)
@@ -62,7 +62,7 @@ def call(caller_in, path_in) {
   // Check that the branch is sane (caller.env.BRANCH_NAME could be null in some cases)
   if (caller.env.BRANCH_NAME && (rpm_config.branch_name && rpm_config.branch_name != caller.env.BRANCH_NAME))
     error "Build process from branch '${caller.env.BRANCH_NAME}' attempted to use RPMs from '${rpm_config.branch_name}'"
-  def image_name = "angryviper/${rpm_config.branch_name.toLowerCase()}x:${rpm_config.original_build}-C${rpm_config.os}"
+  def image_name = "av/${rpm_config.branch_name.toLowerCase()}x:${rpm_config.original_build}-C${rpm_config.os}"
   // This lock is poorly named across branches, but acceptable
   lock("docker_rpminstalled_image_${rpm_config.os}_${rpm_config.original_build}") {
     // JENKINS-45152
@@ -100,7 +100,7 @@ def call(caller_in, path_in) {
 
 String findimage(branch, os, build) {
     print "docker_rpminstalled_image: Asked for #${build} from '${branch.toLowerCase()}' on CentOS${os}."
-    def installed_image = sh (script: "docker images -q --filter 'reference=angryviper/${branch.toLowerCase()}:${build}-C${os}'", returnStdout: true).trim()
+    def installed_image = sh (script: "docker images -q --filter 'reference=av/${branch.toLowerCase()}:${build}-C${os}'", returnStdout: true).trim()
     if (installed_image) {
       print "docker_rpminstalled_image: Found ${installed_image}."
       return installed_image

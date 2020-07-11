@@ -1,7 +1,7 @@
 Primitives are low level modules used in the various types of workers.
 They are either simple source libraries of VHDL or verilog, OR cores
 built from other authoring processes - like Xilinx coregen or Altera
-megawizrds.  So the individual Makefiles include hdl-lib.mk if the
+megawizard.  So the individual Makefiles include hdl-lib.mk if the
 primitive is just a primitive library of simple source files, or it
 includes hdl-core.mk if the primitive is a core.
 

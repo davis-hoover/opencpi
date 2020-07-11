@@ -1,0 +1,4 @@
+\subsection*{\comp.rcc}
+\begin{flushleft}
+	The RCC implementation for the \verb+cic_dec+ worker in C++ is to function as a work-alike of the \verb+cic_dec.hdl+ worker. This RCC worker is based on the python model used to verify the output of the HDL worker. The worker has three separate stages and is not complete until there is no data left to be output. The first stage of the worker reads in all the input data, buffer by buffer. The second stage the worker processes the data all, once of the data is read. The third stage outputs the data, buffer by buffer. Both the first and third stage run multiple times until there is no data left to be read in or out.  The decimation is based on the total amount of data being read, so the worker has to figure out how large the incoming data set is.
+\end{flushleft}

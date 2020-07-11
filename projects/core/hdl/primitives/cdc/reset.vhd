@@ -22,12 +22,14 @@
 -- Description:
 --  Level Synchronizer (Input and Output are Level signals)
 --  Open-loop solution (i.e. without Feedback Acknowledgement)
--- 
+--
 --  Reset assertion is asynchronous, while deassertion is synchronized to the clock.
 --  The width of the reset signal is at least (RSTDELAY * dest_clk) period.
 --
 -- Generics:
---  RSTDELAY : Depth of shift register. Valid range 2 to 10 (default = 2)
+--  SRC_RST_VALUE : Value of source reset used to asynchronously assert
+--  s_reset_hold. Default is 1.
+--  RSTDELAY : Depth of shift register.
 --
 -- Background:
 --  - "Reset Synchronizer" in
@@ -44,6 +46,7 @@ use ieee.numeric_std.all;
 
 entity reset is
   generic (
+    SRC_RST_VALUE : std_logic :='1';
     RST_DELAY : integer := 2);             --Width of reset shift reg
   port (
     src_rst : in  std_logic;
@@ -53,20 +56,18 @@ end entity reset;
 
 architecture rtl of reset is
 
-  signal s_reset_hold : std_logic_vector(RST_DELAY-1 downto 0) := (others => '0');  
+  signal s_reset_hold : std_logic_vector(RST_DELAY-1 downto 0) := (others => '0');
 
 begin
 
-  assert (RST_DELAY >= 2 and RST_DELAY <= 10) report "Out of valid range (2-10) RST_DELAY = " & integer'image(RST_DELAY) severity failure;
-  
-  dst_rst <= s_reset_hold(s_reset_hold'length-1);  
+  dst_rst <= s_reset_hold(s_reset_hold'length-1);
 
   sync : process (dst_clk, src_rst)
   begin
-    if src_rst = '1' then              --async assert of output
+    if src_rst = SRC_RST_VALUE then    --async assert of output
       s_reset_hold <= (others => '1');
     elsif rising_edge(dst_clk) then    --sync deassert of output
-      s_reset_hold <= s_reset_hold(s_reset_hold'length-2 downto 0) & '0';      
+      s_reset_hold <= s_reset_hold(s_reset_hold'length-2 downto 0) & '0';
     end if;
   end process;
 

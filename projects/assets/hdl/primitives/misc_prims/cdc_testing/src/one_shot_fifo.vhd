@@ -27,12 +27,12 @@ entity one_shot_fifo is
     port (
         clk      : in std_logic;
         rst      : in std_logic;
-        din      : in std_logic_vector;
+        din      : in std_logic_vector(data_width-1 downto 0);
         en       : in std_logic;
         rdy      : in std_logic;
         data_vld : out std_logic;
         done     : out std_logic;
-        dout     : out std_logic_vector);
+        dout     : out std_logic_vector(data_width-1 downto 0));
 
 end entity one_shot_fifo;
 

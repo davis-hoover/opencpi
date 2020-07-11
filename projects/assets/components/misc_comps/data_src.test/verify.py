@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -176,30 +176,11 @@ def test_out_file_samples_are_as_expected():
             sys.exit(1)
     print("    PASS: output file content matches expected content")
 
-def do_zlm_test():
-    do_test = (num_samples != -1) and \
-              (os.environ.get("OCPI_TEST_ZLM_WHEN_NUM_SAMPLES_REACHED_p") ==
-              "true")
-    ss = "num_samples != -1 and ZLM_WHEN_NUM_SAMPLES_REACHED_p = true"
-    if do_test:
-        zlm_found = False
-        for msg in msgs:
-            if(msg[utu.MESSAGE_LENGTH] == 0):
-                zlm_found = True
-                print("    PASS: as expected, output file contains ZLM when",
-                      ss)
-                break
-        if not zlm_found:
-            print("    FAIL: unexpected - output file does not contain ZLM",
-                  "when", ss)
-            sys.exit(1)
-
 def main():
     test_out_file_contains_zero_msgs_when_enable_prop_false()
     test_out_file_contains_expected_num_samples()
     if len(odata) > 0:
         test_out_file_samples_are_as_expected()
-    do_zlm_test()
 
 if __name__ == "__main__":
     main()

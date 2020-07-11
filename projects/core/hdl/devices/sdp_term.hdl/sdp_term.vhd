@@ -19,7 +19,7 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library sdp; use sdp.sdp.all;
-architecture rtl of sdp_term_rv is
+architecture rtl of sdp_term_worker is
   signal count_r : uchar_t;
 begin
   up_out_data         <= (others => (others => '0'));

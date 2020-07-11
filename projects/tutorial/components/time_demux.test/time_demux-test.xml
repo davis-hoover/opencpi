@@ -5,5 +5,5 @@
   <output port='Time_Out' script='verify.sh' view='view_time.sh'/>
   <property test='true' name='START' value='0'/>
   <property test='true' name='SAMPLES' value='256'/>
-  <property test='true' name='IFILE' type="String" value='mytestvmlinuz'/>
+  <property test='true' name='IFILE' type="String" value='gen/mytestdata'/>
 </tests>

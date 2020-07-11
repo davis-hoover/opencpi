@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -42,7 +42,7 @@ import numpy as np
 
 
 """
-Ex: python verify.py {sample-freq} {number_of_samples} {ofilename} {ifilename}
+Ex: ./verify.py {sample-freq} {number_of_samples} {ofilename} {ifilename}
 Validate:
 TEST #1: Verify I & Q values are not all zeros
 TEST #2: Output file matches expected size
@@ -71,37 +71,37 @@ data_select = os.environ.get('OCPI_TEST_data_select')
 
 # Test that odata is not all zeros
 if all(odata == 0):
-    print color.RED + color.BOLD + 'FAILED, values are all zero' + color.END
+    print(color.RED + color.BOLD + 'FAILED, values are all zero' + color.END)
     sys.exit(1)
 else:
-    print '      PASS - File is not all zeros'
+    print('      PASS - File is not all zeros')
 
 # Test that odata is the expected amount
 if len(odata) != len(idata):
-    print color.RED + color.BOLD + 'FAILED, output file length is unexpected' + color.END
-    print color.RED + color.BOLD + 'Length ofilename = ', len(odata), 'while expected length is = ' + color.END, len(idata)
+    print(color.RED + color.BOLD + 'FAILED, output file length is unexpected' + color.END)
+    print(color.RED + color.BOLD + 'Length ofilename = ', len(odata), 'while expected length is = ' + color.END, len(idata))
     sys.exit(1)
 else:
-    print '      PASS - Input and output file lengths match'
+    print('      PASS - Input and output file lengths match')
 
 if(enable == 'true'): # => NORMAL MODE
     complex_data = np.array(np.zeros(num_samples), dtype=np.complex)
-    for i in xrange(0,num_samples):
+    for i in range(0,num_samples):
         complex_data[i] = complex(odata['real_idx'][i], odata['imag_idx'][i])
     FFT = 1.0/num_samples * abs(np.fft.fft(complex_data,num_samples))
     Max_FFT_freq=np.argmax(FFT)*sample_rate/num_samples
     if Max_FFT_freq != 0.0:
-        print 'Fail: Max of FFT occurs at index: ',Max_FFT_freq, 'Hz (Should be 0)'
+        print('Fail: Max of FFT occurs at index: ',Max_FFT_freq, 'Hz (Should be 0)')
         sys.exit(1)
     else:
-        print '      PASS - Max of FFT occurs at index: ',Max_FFT_freq, 'Hz'
+        print('      PASS - Max of FFT occurs at index: ',Max_FFT_freq, 'Hz')
 else: # => BYPASS MODE
     if (data_select == 'false'):
         if (idata != odata).all():
-            print 'Fail - Bypass Mode: Input and output file do not match'
+            print('Fail - Bypass Mode: Input and output file do not match')
             sys.exit(1)
         else:
-            print '      PASS - Bypass Mode: Input and output file match'
+            print('      PASS - Bypass Mode: Input and output file match')
 """
 
 TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
@@ -112,7 +112,6 @@ TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
         system_freq = sample_rate
         phase_acc_width = 16 # Configuration of the Xilinx CORE Generator: DDS module
         nco_freq = ((system_freq * phs_inc) / (2**phase_acc_width))
-        #print '      NCO freq (calc) = ', nco_freq
         # Construct complex array of vectors for performing FFT
         # (PUT FFT INTO ITS OWN FUNCTION)
         data=np.zeros((len(odata)), dtype=complex)
@@ -124,12 +123,10 @@ TODO: TEST IS ONLY VALID FOR HDL OUTPUT!
         # Locate max Tone
         idx = np.argmax(np.abs(w))
         freq = freqs[idx]
-        #print 'Measured freq \t= ', freq
         ofreq_hz = freq * system_freq
-        #print '      NCO freq (measured) = ', ofreq_hz
         if (nco_freq != ofreq_hz):
-            print 'Fail: Bypass Mode: NCO does not match expected freq: %.2f vs %.2f' % (nco_freq, ofreq_hz)
+            print('Fail: Bypass Mode: NCO does not match expected freq: %.2f vs %.2f' % (nco_freq, ofreq_hz))
             sys.exit(1)
         else:
-            print '      PASS - Bypass Mode: NCO output matches expected freq'
+            print('      PASS - Bypass Mode: NCO output matches expected freq')
 """

@@ -2,5 +2,18 @@
 
   <Port name='in' producer='false'/>
   <Port name='out' producer='true'/>
+  <Port name='in1' producer='false'/>
+  <Port name='out1' producer='true'/>
+  <Port name='in2' producer='false'/>
+  <Port name='out2' producer='true'/>
+  <Port name='in3' producer='false'/>
+  <Port name='out3' producer='true'/>
+  <Port name='in4' producer='false'/>
+  <Port name='out4' producer='true'/>
+
+  <Port name='optional_false' optional='false'/>
+  <Port name='optional_true' optional='true'/>
+  <Port name='optional_0' optional='0'/>
+  <Port name='optional_1' optional='1'/>
 
 </ComponentSpec>

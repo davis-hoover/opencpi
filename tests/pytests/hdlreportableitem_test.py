@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -25,8 +27,8 @@ Run from this directory as follows:
 To view the code coverage report:
     $ coverage3 report
 To view the line-by-line code coverage report:
-    $ coverage3 annotate ../../tools/cdk/scripts/hdlreportableitem.py
-    $ vim ../../tools/cdk/scripts/hdlreportableitem.py,cover
+    $ coverage3 annotate ../../tools/scripts/hdlreportableitem.py
+    $ vim ../../tools/scripts/hdlreportableitem.py,cover
 """
 
 import unittest

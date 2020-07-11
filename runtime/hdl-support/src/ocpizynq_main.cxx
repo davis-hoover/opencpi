@@ -22,7 +22,8 @@
   "Usage syntax is: ocpizynq [options] <command>\n" \
   "  Commands are:\n" \
   "    clocks  - print how the clocks are configured\n" \
-  "    axi_hp   - print how the axi_hp interfaces are configured\n"
+  "    axi_hp   - print how the axi_hp interfaces are configured\n" \
+  "    spi      - print how the spi interfaces are configured\n"
 
 //          name      abbrev  type    value description
 #define OCPI_OPTIONS \
@@ -38,6 +39,7 @@
 #include "HdlZynq.h"
 
 namespace OU = OCPI::Util;
+namespace OM = OCPI::HDL::ZynqMP;
 using namespace OCPI::HDL::Zynq;
 
 struct PLL {
@@ -55,17 +57,19 @@ struct PLL {
   double freq(double psclk) { return psclk * fdiv; }
 };
 
-static uint8_t *map(off_t addr, size_t arg_size) {
+static uint8_t *
+map(size_t addr, size_t arg_size) {
   static int fd = -1;
   if (fd < 0 &&
       (fd = open("/dev/mem", O_RDWR|O_SYNC)) < 0) {
     perror("opening /dev/mem") ;
     return NULL ;
   }
-  int pagesize = getpagesize();
-  off_t base = addr & ~(pagesize - 1);
-  size_t size = OU::roundUp(addr + arg_size - base, pagesize);
-  void *ptr = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, base);
+  size_t
+    pagesize = (size_t)getpagesize(),
+    base = addr & ~(pagesize - 1),
+    size = OU::roundUp(addr + arg_size - base, pagesize);
+  void *ptr = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, (off_t)base);
   if (ptr == MAP_FAILED) {
     perror("mapping /dev/mem");
     return NULL;
@@ -73,16 +77,99 @@ static uint8_t *map(off_t addr, size_t arg_size) {
   return ((uint8_t*)ptr) + (addr - base);
 }
 
+void
+print_spi_idx_msg(unsigned idx, const char* msg, ...) {
+  va_list arg;
+  va_start(arg, msg);
+  printf("SPI%u: ", idx);
+  vfprintf(stdout, msg, arg);
+  va_end(arg);
+}
+
+
+static void
+doPLL(const char *name, uint32_t control) {
+  const char *clks[] = { "PS", "PS", "PS", "PS", "VIDEO", "ALT", "AUX", "GT" };
+  printf("For PLL %s control 0x%x pre clk is %s_REF_CLK and post clk is %s_REF_CLK\n",
+	 name, control, clks[(control >> 20) & 7], clks[(control >> 24) & 7]);
+  printf("    div2 %u feedback %u bypass %u reset %u\n",
+	 (control >> 16) & 1, (control >> 8) & 0x7f, (control >> 3) & 1, control & 1);
+}
+static void
+doFclk(unsigned n, uint32_t control) {
+  const char *plls[] = { "IOPLL", "Unexpected==1", "RPLL", "DPLL_CLK_TO_LPD" };
+  printf("For FCLK%u enable %u div1 %u div0 %u src %s\n", n,
+	 (control >> 24) & 1, (control >> 16) & 0x3f, (control >> 8) & 0x3f,
+	 plls[control & 3]);
+}
 int
 mymain(const char **argv) {
 #if !defined(OCPI_ARCH_arm) && !defined(OCPI_ARCH_arm_cs) && !defined(OCPI_ARCH_aarch32) && !defined(OCPI_ARCH_aarch64)
-  fprintf(stderr, "This program is only functional on Zynq/Arm platforms\n");
-  return 1;
+  options.bad("This program is only functional on Zynq/Arm platforms");
 #endif
   std::string cmd = argv[0]; // ensured valid by caller
   if (cmd == "test")
     printf("testing\n");
   else if (cmd == "clocks") {
+#if defined(OCPI_ARCH_aarch64)
+    // Clocking sources (10):
+    // 4 Periperal input clocks: PCIe/USB, DIsplayPort, SATA, SGMII
+    // 1 Internal AUX_REF_CLK from PL
+    // 5 Input pins: are PS_REF_CLK, and MIO 28/51/27/50
+    // Muxed down to 5 inputs outside the PLLs, to each of the 5 System PLLs, so the 5 clocks to all PLLs are:
+    // 1 of the peripheral cocks (SIOU.CRX_CTRL/REFCLK_SEL)
+    // 1 Internal AUX_REF_CLK
+    // 1 PS_REF_CLK
+    // 1 Choose between MIO28 and MIO 51 (PSS_ALT_CLK)
+    // 1 Choose between MIO27 and MIO 50 (VIDEO_PSS_CLK_SEL)
+    // Each system PLL can choose among 5 a bypass clock and a through-the-pll clk and then select which is output
+    // Called: RPLL, IOPL, APLL, DPLL, VPLL
+    auto siou = (volatile OM::SIOU *)map(OM::SIOU_ADDR, sizeof(OM::SIOU));
+    if (!siou)
+      options.bad("cannot map SIOU");
+    printf("Dumping SIOU:\n");
+    printf("SIOU: reg_ctrl 0x%x IR_STATUS 0x%x IR_MASK 0x%x IR_ENABLE 0x%x IR_DISABLE 0x%x\n",
+	   siou->reg_ctrl, siou->IR_STATUS, siou->IR_MASK, siou->IR_ENABLE, siou->IR_DISABLE);
+    printf("SIOU: sata_misc_ctrl 0x%x crx_ctrl 0x%x dp_stc_clkctrl 0x%x\n",
+	   siou->sata_misc_ctrl, siou->crx_ctrl, siou->dp_stc_clkctrl);
+    const char *gtr_sources[] = { "PCIe/USB", "DisplayPort", "SATA", "SGMII" };
+    printf("SIOU: GTR_REF_CLK source is %s\n", gtr_sources[siou->crx_ctrl & 3]);
+    printf("SIOU: check %zx\n", offsetof(OM::SIOU, dp_stc_clkctrl));
+    auto iou_slcr = (volatile OM::IOU_SLCR *)map(OM::IOU_SLCR_ADDR, sizeof(OM::IOU_SLCR));
+    uint32_t vpcs = iou_slcr->VIDEO_PSS_CLK_SEL;
+    printf("IOU_SLCR: VIDEO_PSS_CLK_SEL 0x%x MIO[27] 0x%x MIO[28] 0x%x MIO[50] 0x%x MIO[15] 0x%x\n",
+	   vpcs, iou_slcr->MIO_PIN[27], iou_slcr->MIO_PIN[28], iou_slcr->MIO_PIN[50], iou_slcr->MIO_PIN[51]);
+	   printf("IOU_SLCR: VIDEO_CLK source is: %s\n", vpcs & 1 ? "MIO[50]" : "MIO[27]");
+    printf("IOU_SLCR: PSS_ALT_CLK source is: %s\n", vpcs & 2 ? "MIO[51]" : "MIO[28]");
+    printf("IOU_SLCR: check %zx\n", offsetof(OM::IOU_SLCR, itr));
+    auto crf_apb = (volatile OM::CRF_APB *)map(OM::CRF_APB_ADDR, sizeof(OM::CRF_APB));
+    printf("CRF_APB: check %zx\n", offsetof(OM::CRF_APB, RST_DDR_SS));
+    doPLL("APLL", crf_apb->APLL_CTRL);
+    doPLL("DPLL", crf_apb->DPLL_CTRL);
+    doPLL("VPLL", crf_apb->VPLL_CTRL);
+    auto crl_apb = (volatile OM::CRL_APB *)map(OM::CRL_APB_ADDR, sizeof(OM::CRL_APB));
+    doPLL("IOPLL", crl_apb->IOPLL_CTRL);
+    doPLL("RPLL", crl_apb->RPLL_CTRL);
+    printf("CRL_APB: check %zx\n", offsetof(OM::CRL_APB, BANK3_STATUS));
+    uint32_t acpu_ctrl = crf_apb->ACPU_CTRL;
+    const char *aclks[] = { "APLL", "Unexpected==1", "DPLL", "VPLL" };
+    printf("ACPU Clock: half %u full %u divisor %u source is %s\n",
+	   (acpu_ctrl >> 25) & 1, (acpu_ctrl >> 24) & 1, (acpu_ctrl >> 8) & 0x3f,
+	   aclks[acpu_ctrl & 3]);
+    for (unsigned n = 0; n < 4; n++)
+      doFclk(0, crl_apb->PL_REF_CTRL[n]);
+    auto cci_intc = (volatile OM::APM *)map(OM::APM_INTC_OCM_ADDR, sizeof(OM::APM));
+    printf("CCI_INTC_APM: check %zx\n", offsetof(OM::APM, FECR));
+    uint32_t 
+      l0 = *(volatile uint32_t *)cci_intc->GCCR_L,
+      h0 = *(volatile uint32_t *)cci_intc->GCCR_H;
+    sleep(1);
+    uint32_t 
+      l1 = *(volatile uint32_t *)cci_intc->GCCR_L,
+      h1 = *(volatile uint32_t *)cci_intc->GCCR_H;
+    printf("TIME 0x%08x%08x 0x%08x%08x\n", h0, l0, h1, l0);
+    options.bad("clocks command not implemented on zynq ultrascale");
+#endif
     volatile FTM *ftm = (volatile FTM *)map(FTM_ADDR, sizeof(FTM));
     if (!ftm)
       return 1;
@@ -93,20 +180,20 @@ mymain(const char **argv) {
 	   "itcyccount 0x%x lock_status 0x%x lock_access 0x%x\n",
 	   ftm->glbctrl, ftm->status, ftm->control, ftm->cycountpre, ftm->synccount,
 	   ftm->itcyccount, ftm->lock_status, ftm->lock_access);
-    ftm->lock_access = 0xc5acce55;
-    ftm->glbctrl = 1;
-    ftm->control = 4;
-    ftm->lock_access = 0;
+    ftm->lock_access = 0xc5acce55; // unlock the FTM
+    ftm->glbctrl = 1;              // enable the FTM
+    ftm->control = 4;              // enable cycle count packets, no trace packets
+    ftm->lock_access = 0;          // relock
 #ifdef OCPI_OS_macos
     uint32_t t0 = 0;
 #else
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     ts.tv_sec++;
-    uint32_t t0 = ftm->itcyccount;
+    uint32_t t0 = ftm->itcyccount;  // capture t0
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL);
 #endif
-    uint32_t t1 = ftm->itcyccount;
+    uint32_t t1 = ftm->itcyccount;  // capture t1
     double freq = (t1 - t0)/2.;
     freq *= slcr->clk_621_true & 1 ? 6 : 4;
     uint32_t ctrl = slcr->arm_clk_ctrl;
@@ -168,6 +255,19 @@ mymain(const char **argv) {
 	     ((((options.psclk() * fpll.fdiv) / divisor0 ) / divisor1) + 5000) / 1000000.);
     }
   } else if (cmd == "axi_hp") {
+#if defined(OCPI_ARCH_aarch64)
+    volatile OM::ALL_AFIFMS *axi_hp =
+      (volatile OM::ALL_AFIFMS *)map(OM::S_AXI_HPX_FPD_ADDR, sizeof(OM::ALL_AFIFMS));
+    volatile OM::AFIFM *afifm = axi_hp->afifm;
+    for (unsigned n = 0; n < OM::NUM_S_AXI_HPXS; n++, afifm++) {
+      printf("%.10s: rdctrl: 0x%x rdissue: 0x%x rdqos: 0x%x rddebug: 0x%x\n",
+	     OM::afifmNames[n], afifm->rdctrl, afifm->rdissue, afifm->rdqos, afifm->rddebug);
+      printf("        : wrctrl: 0x%x wrissue: 0x%x wrqos: 0x%x\n",
+	     afifm->wrctrl, afifm->wrissue, afifm->wrqos);
+      printf("        :  i_sts: 0x%x i_en: 0x%x i_dis: 0x%x i_mask: 0x%x control: 0x%x safety_chk 0x%x\n",
+	     afifm->i_sts, afifm->i_en, afifm->i_dis, afifm->i_mask, afifm->control, afifm->safety_chk);
+    }
+#else
     struct AFI {
       uint32_t
         rdchan_ctrl,
@@ -205,8 +305,9 @@ mymain(const char **argv) {
       printf("AXI_HP %u: rdctrl: 0x%x rdissue: 0x%x rdqos: 0x%x rdfifo: 0x%x rddebug: 0x%x\n",
 	     n, afi->rdchan_ctrl, afi->rdchan_issuingcap, afi->rdqos, afi->rddatafifo_level, 0);
 #endif
-      sleep(10);
+      sleep(1);
     }
+#endif
   } else if (cmd == "devcfg") {
     const uint32_t DEVCFG_ADDR = 0xF8007000;
     struct DEVCFG {
@@ -237,6 +338,25 @@ mymain(const char **argv) {
     volatile DEVCFG *devcfg = (volatile DEVCFG *)map(DEVCFG_ADDR, sizeof(DEVCFG));
     printf("ctrl 0x%x lock 0x%x cfg 0x%x int_sts 0x%x int_mask 0x%x status 0x%x\n",
 	   devcfg->ctrl, devcfg->lock, devcfg->cfg, devcfg->int_sts, devcfg->int_mask, devcfg->status);
+  } else if (cmd == "spi") {
+    struct SPI_ARRAY {
+      SPI spi[NSPIS];
+    };
+    volatile SPI_ARRAY *spi_array= (volatile SPI_ARRAY *)map(SPI_ADDR, sizeof(SPI_ARRAY));
+    volatile SPI *spi = spi_array->spi;
+    for (unsigned n = 0; n < NSPIS; n++, spi++) {
+      print_spi_idx_msg(n, "SPI Configuration: 0x%x\n", spi->cr_offset);
+      print_spi_idx_msg(n, "SPI Interrupt Status: 0x%x\n", spi->sr_offset);
+      print_spi_idx_msg(n, "Interrupt Enable: 0x%x\n", spi->ier_offset);
+      print_spi_idx_msg(n, "Interrupt disable: 0x%x\n", spi->idr_offset);
+      print_spi_idx_msg(n, "Interrupt mask: 0x%x\n", spi->imr_offset);
+      print_spi_idx_msg(n, "SPI Controller Enable: 0x%x\n", spi->er_offset);
+      print_spi_idx_msg(n, "Delay Control: 0x%x\n", spi->dr_offset);
+      print_spi_idx_msg(n, "Slave Idle Count: 0x%x\n", spi->sicr_offset);
+      print_spi_idx_msg(n, "TX_FIFO Threshold: 0x%x\n", spi->txwr_offset);
+      print_spi_idx_msg(n, "RX_FIFO Threshold: 0x%x\n", spi->rx_thresh_reg0);
+      print_spi_idx_msg(n, "Module ID: 0x%x\n", spi->mod_id_reg0);
+    }
   }
   return 0;
 }

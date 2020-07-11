@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-#$OCPI_PROJECT_DIR/scripts/plotAndFft.py $2 complex $((2400*$OCPI_TEST_R)) 16384&
-#$OCPI_PROJECT_DIR/scripts/plotAndFft.py $2 complex $((9600*$OCPI_TEST_R)) 16384&
-$OCPI_PROJECT_DIR/scripts/plotAndFft.py $2 complex $((9600*$OCPI_TEST_R)) 100000&
 
-#$OCPI_PROJECT_DIR/scripts/plotAndFft.py $1 complex $((9600/4)) $((16384/$OCPI_TEST_R)) &
-#$OCPI_PROJECT_DIR/scripts/plotAndFft.py $1 complex $((9600*2/4)) $((16384/$OCPI_TEST_R)) &
-$OCPI_PROJECT_DIR/scripts/plotAndFft.py $1 complex $((9600*2/4)) $((100000/$OCPI_TEST_R)) &
+
+
+isize=$(du -sb $2 | awk '{ print $1 }')
+osize=$(du -sb $1 | awk '{ print $1 }')
+
+$OCPI_PROJECT_DIR/scripts/plotAndFft.py $2 complex $(($isize/4)) 1 &
+$OCPI_PROJECT_DIR/scripts/plotAndFft.py $1 complex $(($osize/4)) 1 &
+

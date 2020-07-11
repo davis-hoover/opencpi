@@ -71,20 +71,17 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.util.all; use ocpi.types.all; use ocpi.wci.all;
+library util; use util.util.all;
 
 architecture rtl of worker is
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Signals for pattern logic
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-constant c_msg_ptr_width    : natural := width_for_max(to_integer(numMessagesMax*2) - 1); --Multiply numMessagesMax by 2 because there are 2 message fields
-constant c_data_ptr_width   : natural := width_for_max(to_integer(numDataWords) - 1);
 signal s_byte_enable        : std_logic_vector(3 downto 0) := (others => '0');
 signal s_opcode             : std_logic_vector(7 downto 0) := (others => '0');
 signal s_bytes_left         : ulong_t := (others => '0'); -- Keep track of how many bytes that are left to send for current message
 signal s_messagesToSend     : ulong_t := (others => '0');
-signal s_msg_ptr            : unsigned(c_msg_ptr_width-1 downto 0) := (others => '0'); -- Pointer for messages buffer
-signal s_data_ptr           : unsigned(c_data_ptr_width-1 downto 0) := (others => '0'); -- Pointer for data buffer
 signal s_dataSent           : ulong_t := (others => '0');
 signal s_messagesSent       : ulong_t := (others => '0');
 signal s_finished           : std_logic := '0';   -- Used to to stop sending messages
@@ -97,6 +94,39 @@ signal s_eom_r               : std_logic := '0'; -- Used to drive s_out_eom
 signal s_ready_r             : std_logic := '0'; -- Used to determine if ready to send message data
 signal s_valid_r             : std_logic := '0'; -- Used for combinatorial logic for out_valid
 signal s_give                : std_logic := '0'; -- Used for combinatorial logic for out_valid
+signal s_data_vld            : std_logic := '0';
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Data BRAM constants and signals
+-- Writing to the BRAM B side and then reading from the BRAM A side
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+constant c_data_memory_depth  : natural := to_integer(numDataWords);
+constant c_data_addr_width    : natural := width_for_max(c_data_memory_depth - 1);
+constant c_data_bram_dsize    : natural := 32; -- Size in bytes of the data for data bram
+signal s_data_bramW_in        : std_logic_vector(c_data_bram_dsize-1 downto 0) := (others => '0');
+signal s_data_bramW_write     : std_logic := '0';
+signal s_data_bramR_out       : std_logic_vector(c_data_bram_dsize-1 downto 0) := (others => '0');
+signal s_data_addr            : unsigned(c_data_addr_width-1 downto 0) := (others => '0');
+signal s_data_bramR_addr      : unsigned(c_data_addr_width-1 downto 0) := (others => '0');
+signal s_data_bramW_addr      : unsigned(c_data_addr_width-1 downto 0) := (others => '0');
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Messages BRAM constants and signals
+-- Writing to the BRAM B side and then reading from the BRAM A side
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+constant c_messages_memory_depth  : natural := to_integer(numMessagesMax);
+constant c_messages_addr_width    : natural := width_for_max(c_messages_memory_depth - 1);
+constant c_messages_bram_dsize_c  : natural := 40; -- Size in bytes of the data for messages bram
+constant c_counter_size           : natural := width_for_max(1); -- Size in bytes for messages_bramR_ctr
+signal s_messages_bramW_in        : std_logic_vector(c_messages_bram_dsize_c-1 downto 0) := (others => '0');
+signal s_messages_bramR_out       : std_logic_vector(c_messages_bram_dsize_c-1 downto 0) := (others => '0');
+signal s_messages_bramW_write     : std_logic := '0';
+signal s_messages_bramR_addr      : unsigned(c_messages_addr_width-1 downto 0) := (others => '0');
+signal s_messages_bramW_addr      : unsigned(c_messages_addr_width-1 downto 0) := (others => '0');
+signal s_messages_bramW_ctr       : unsigned(c_counter_size-1 downto 0) := (others => '0'); -- Used for the messages_bramW_addr_counter process
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Counter to control Data and Messages BRAM write signals
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+constant c_bramW_ctr_size           : natural := width_for_max(to_integer(numMessagesMax + numDataWords));
+signal s_bramW_ctr                  : unsigned(c_bramW_ctr_size-1 downto 0) := (others => '0');
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Mandatory output port logic
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -156,16 +186,138 @@ s_out_valid <= out_in.ready and s_data_ready_for_out_port and s_valid_r;
 
 s_data_ready_for_out_port <= s_ready_r;
 
-out_out.data <= std_logic_vector(props_in.data(to_integer(s_data_ptr)));
+out_out.data <= s_data_bramR_out;
 out_out.byte_enable <= s_byte_enable;
 out_out.opcode <= s_opcode;
 
 ctl_out.finished <= s_finished;
 
+-- Data is ready to send
+s_data_vld <= out_in.ready and s_out_valid and not (s_finished);
+
+props_out.raw.done  <= '1';
+props_out.raw.error <= '0';
+
+
+s_data_bramW_in <= std_logic_vector(props_in.raw.data);
+
+-- Write to data BRAM when data
+s_data_bramW_write <= '1' when (to_integer(props_in.raw.address)/4 >= 2*numMessagesMax and props_in.raw.is_write ='1') else '0';
+
+-- Write to messages BRAM when
+s_messages_bramW_write <= '1' when (to_integer(props_in.raw.address)/4 < 2*numMessagesMax and props_in.raw.is_write ='1') else '0';
+
+s_data_bramR_addr <= (others => '0') when (s_data_vld = '1' and props_in.dataRepeat = '1' and s_eom_r = '1') else
+                   s_data_addr + 1    when(s_data_vld = '1' and s_data_addr < numDataWords-1)   else
+                   s_data_addr;
+
+dataBram : component util.util.BRAM2
+generic map(PIPELINED  => 0,
+            ADDR_WIDTH => c_data_addr_width,
+            DATA_WIDTH => c_data_bram_dsize,
+            MEMSIZE    => c_data_memory_depth)
+  port map   (CLKA       => ctl_in.clk,
+              ENA        => '1',
+              WEA        => '0',
+              ADDRA      => std_logic_vector(s_data_bramR_addr),
+              DIA        => x"00000000",
+              DOA        => s_data_bramR_out,
+              CLKB       => ctl_in.clk,
+              ENB        => '1',
+              WEB        => s_data_bramW_write,
+              ADDRB      => std_logic_vector(s_data_bramW_addr),
+              DIB        => s_data_bramW_in,
+              DOB        => open);
+
+  messagesBram : component util.util.BRAM2
+  generic map(PIPELINED  => 0,
+              ADDR_WIDTH => c_messages_addr_width,
+              DATA_WIDTH => c_messages_bram_dsize_c,
+              MEMSIZE    => c_messages_memory_depth)
+    port map   (CLKA       => ctl_in.clk,
+                ENA        => '1',
+                WEA        => '0',
+                ADDRA      => std_logic_vector(s_messages_bramR_addr),
+                DIA        => x"0000000000",
+                DOA        => s_messages_bramR_out,
+                CLKB       => ctl_in.clk,
+                ENB        => '1',
+                WEB        => s_messages_bramW_write,
+                ADDRB      => std_logic_vector(s_messages_bramW_addr),
+                DIB        => s_messages_bramW_in,
+                DOB        => open);
+
+-- Running counter to keep track of data BRAM write side address
+data_bramW_addr_counter : process (ctl_in.clk)
+begin
+  if rising_edge(ctl_in.clk) then
+    if ctl_in.reset = '1' then
+      s_data_bramW_addr  <= (others => '0');
+    -- Increment s_data_bramW_addr only when ready to write to data BRAM
+    elsif ((to_integer(props_in.raw.address)/4 >= 2*numMessagesMax) and props_in.raw.is_write = '1') then
+      if (s_data_bramW_addr = numDataWords-1) then
+        s_data_bramW_addr <= (others => '0');
+      else
+        s_data_bramW_addr <= s_data_bramW_addr + 1;
+      end if;
+    end if;
+  end if;
+end process data_bramW_addr_counter;
+
+
+-- Counter used to decode messages and to advance s_messages_bramW_addr
+messages_bramW_counter : process (ctl_in.clk)
+begin
+  if rising_edge(ctl_in.clk) then
+    if ctl_in.reset = '1' then
+      s_messages_bramW_ctr <= (others => '0');
+    -- Increment s_messages_bramW_ctr only when ready to write to messages BRAM
+    elsif ((to_integer(props_in.raw.address)/4 < 2*numMessagesMax) and props_in.raw.is_write = '1') then
+          s_messages_bramW_ctr <= s_messages_bramW_ctr + 1;
+    end if;
+  end if;
+end process messages_bramW_counter;
+
+-- Running counter to keep track of messages BRAM writing side address
+messages_bramW_addr_counter : process (ctl_in.clk)
+begin
+  if rising_edge(ctl_in.clk) then
+    if ctl_in.reset = '1' then
+      s_messages_bramW_addr  <= (others => '0');
+    -- Increment s_messages_bramW_addr only when ready to write to messages BRAM
+    elsif ((to_integer(props_in.raw.address)/4 < 2*numMessagesMax) and props_in.raw.is_write = '1') then
+    -- Reset s_messages_bramW_addr to 0 when on the second messages field
+        if (s_messages_bramW_addr = numMessagesMax-1 and s_messages_bramW_ctr = 1) then
+          s_messages_bramW_addr <= (others => '0');
+        elsif (s_messages_bramW_ctr = 1) then
+          s_messages_bramW_addr <= s_messages_bramW_addr + 1;
+        end if;
+    end if;
+  end if;
+end process messages_bramW_addr_counter;
+
+-- Encode messages fields
+messages_encoder : process (ctl_in.clk)
+begin
+  if rising_edge(ctl_in.clk) then
+    if ctl_in.reset = '1' then
+      s_messages_bramW_in  <= (others => '0');
+    elsif ((to_integer(props_in.raw.address)/4 < 2*numMessagesMax)) then
+      if (s_messages_bramW_ctr = 0) then
+        -- message bytes
+        s_messages_bramW_in(39 downto 8) <= props_in.raw.data;
+      elsif (s_messages_bramW_ctr = 1) then
+        -- message opcode
+        s_messages_bramW_in(7 downto 0) <= std_logic_vector(resize(unsigned(props_in.raw.data), s_opcode'length));
+      end if;
+    end if;
+  end if;
+end process messages_encoder;
 
 -- This process handles the logic for the byte enable, opcode, som, eom, valid, and give for the
--- current message. It handles decrementing the messagesToSend counter, incrementing the messages
--- buffer pointer, and s_messagesSent counter. It also handles when the worker should stop sending messages
+-- current message. It handles decrementing the messagesToSend counter, incrementing the
+-- messages_bramR_addr and the messages s_messagesSent counter. It also handles when
+-- the worker should stop sending messages
 message_logic : process(ctl_in.clk)
 begin
   if rising_edge(ctl_in.clk) then
@@ -180,9 +332,9 @@ begin
       s_valid_r <= '0';
       s_messagesToSend <= (others => '0');
       s_finished <= '0';
-      s_msg_ptr <= (others => '0');
       s_messagesSent <= (others => '0');
       s_out_eof <= '0';
+      s_messages_bramR_addr <= (others => '0');
     -- Grab the value of messagesToSend once it gets it's initial value
     elsif (ctl_in.control_op = START_e) then
       s_messagesToSend <= props_in.messagesToSend;
@@ -208,9 +360,12 @@ begin
         elsif (s_bytes_left = 0 and s_som_next_r = '0') then
             s_eom_r<= '0';
             s_som_next_r <= '1';
-            s_bytes_left <= props_in.messages(to_integer(s_msg_ptr));
-            s_opcode <= std_logic_vector(resize(props_in.messages(to_integer(s_msg_ptr+1)), s_opcode'length));
-            s_byte_enable <= read_bytes(props_in.messages(to_integer(s_msg_ptr)));
+            s_bytes_left <= to_ulong(s_messages_bramR_out(39 downto 8));
+            s_opcode <= s_messages_bramR_out(7 downto 0);
+            s_byte_enable <= read_bytes(to_ulong(s_messages_bramR_out(39 downto 8)));
+            if (s_messages_bramR_addr <  numMessagesMax-1) then
+               s_messages_bramR_addr <= s_messages_bramR_addr + 1;
+            end if;
         -- Handle sending a message that is a ZLM
         elsif (s_bytes_left = 0 and s_som_next_r = '1') then
             s_som_next_r <= '0';
@@ -218,7 +373,6 @@ begin
             s_eom_r <= '1';
             s_ready_r <= '1';
             s_valid_r <= '0';
-            s_msg_ptr <= s_msg_ptr + 2;
             s_messagesToSend <= s_messagesToSend - 1;
             s_messagesSent <=  s_messagesSent + 1;
         -- Keep track of how many bytes are left for the current message and set byte enable
@@ -235,7 +389,6 @@ begin
             s_ready_r <= '1';
             s_valid_r <= '1';
             s_eom_r <= '1';
-            s_msg_ptr <= s_msg_ptr + 2;
             s_messagesToSend <= s_messagesToSend - 1;
             s_byte_enable <= read_bytes(s_bytes_left);
             s_messagesSent <=  s_messagesSent + 1;
@@ -248,19 +401,19 @@ begin
   end if;
 end process;
 
--- The process handles incrementing the data buffer pointer and s_dataSent counter
+-- The process handles incrementing the data address and s_dataSent counter
 data_logic : process(ctl_in.clk)
 begin
     if rising_edge(ctl_in.clk) then
       if ctl_in.reset = '1' then
-         s_data_ptr <= (others => '0');
+         s_data_addr <= (others => '0');
          s_dataSent <= (others => '0');
-      elsif (s_finished = '0' and out_in.ready = '1' and s_out_valid = '1') then
+      elsif (s_data_vld = '1') then
         s_dataSent <= s_dataSent + 1;
         if (props_in.dataRepeat = '1' and s_eom_r = '1') then
-            s_data_ptr <= (others => '0');
-        elsif (s_data_ptr < numDataWords-1) then
-            s_data_ptr <= s_data_ptr + 1;
+            s_data_addr <= (others => '0');
+        elsif (s_data_addr < numDataWords-1) then
+            s_data_addr <= s_data_addr + 1;
         end if;
       end if;
     end if;

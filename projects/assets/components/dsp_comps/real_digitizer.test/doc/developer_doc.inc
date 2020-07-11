@@ -3,29 +3,6 @@
 % this file is intended to be edited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Summary - \Comp}
-% Make table whose width is equal to which will be used for text
-% wrapping, split into 2 equal columns
-\begin{longtable}{|p{\dimexpr0.5\textwidth-2\tabcolsep\relax}
-                  |p{\dimexpr0.5\textwidth-2\tabcolsep\relax}|}
-  \hline
-  \rowcolor{blue}
-  & \\
-  \hline
-  Name              & \comp \\
-  \hline
-  Latest Version    &  \docVersion (release date 4/2019) \\
-  \hline
-	Worker Type       & Application                              \\
-  \hline
-	Component Library & ocpi.assets.dsp\_comps                    \\
-  \hline
-	Workers           & \comp.rcc                                \\
-  \hline
-	Tested Platforms  & centos7, xilinx13\_3, xilinx13\_4 \\
-  \hline
-\end{longtable}
-
 \begin{center}
   \textit{\textbf{Revision History}}
 \end{center}
@@ -48,6 +25,16 @@
   v1.5 & Added \verb+enable_printing+ and \verb+sync_criteria_met+ properties to \comp{}.rcc. Also added functional diagram and xilinx13\_4 as a tested platform. & 4/2019 \\
   \hline
 \end{longtable}
+\newpage
+
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{4/2019}
+\def\componentlibrary{ocpi.assets.dsp\_{}comps}
+\def\workers{\comp{}.rcc}
+\def\testedplatforms{CentOS7, xilinx13\_{}3, xilinx13\_{}4}
+\input{\snippetpath/component_summary_table}
 
 %\section*{Functionality}
 %\begin{flushleft}

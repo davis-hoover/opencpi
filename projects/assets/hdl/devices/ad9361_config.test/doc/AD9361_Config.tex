@@ -1,5 +1,3 @@
-%TODO: Use LaTeX_Header
-\documentclass{article}
 \iffalse
 This file is protected by Copyright. Please refer to the COPYRIGHT file
 distributed with this source distribution.
@@ -19,126 +17,44 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
-\author{} % Force author to be blank
 %----------------------------------------------------------------------------------------
-% Paper size, orientation and margins
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\usepackage{geometry}
-\geometry{
-  letterpaper,      % paper type
-  portrait,       % text direction
-  left=.75in,       % left margin
-  top=.75in,        % top margin
-  right=.75in,      % right margin
-  bottom=.75in      % bottom margin
- }
-%----------------------------------------------------------------------------------------
-% Header/Footer
-%----------------------------------------------------------------------------------------
-\usepackage{fancyhdr} \pagestyle{fancy} % required for fancy headers
-\renewcommand{\headrulewidth}{0.5pt}
-\renewcommand{\footrulewidth}{0.5pt}
-\newcommand{\terminaloutput}[1]{\texttt{#1}}
-\rhead{\small{ANGRYVIPER Team}}
-%----------------------------------------------------------------------------------------
-% Appendix packages
-%----------------------------------------------------------------------------------------
-\usepackage[toc,page]{appendix}
-%----------------------------------------------------------------------------------------
-% Defined Commands & Renamed Commands
-%----------------------------------------------------------------------------------------
-\renewcommand{\contentsname}{Table of Contents}
-\renewcommand{\listfigurename}{List of Figures}
-\renewcommand{\listtablename}{List of Tables}
-%----------------------------------------------------------------------------------------
-% Various pacakges
-%----------------------------------------------------------------------------------------
-\usepackage{hyperref} % for linking urls and lists
-\usepackage{graphicx} % for including pictures by file
-\usepackage{listings} % for coding language styles
-\usepackage{rotating} % for sideways table
-\usepackage{pifont}   % for sideways table
-\usepackage{pdflscape} % for landscape view
-\usepackage{longtable}
-%----------------------------------------------------------------------------------------
-% Table packages
-%----------------------------------------------------------------------------------------
-\usepackage{longtable} % for long possibly multi-page tables
-\usepackage{tabularx} % c=center,l=left,r=right,X=fill
-\usepackage{float}
-\floatstyle{plaintop}
-\usepackage[tableposition=top]{caption}
-\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
-\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-%----------------------------------------------------------------------------------------
-% Block Diagram / FSM Drawings
-%----------------------------------------------------------------------------------------
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows,fit,positioning}
-\usetikzlibrary{automata} % used for the fsm
-\usetikzlibrary{calc} % For duplicating clients
-\usepgfmodule{oo} % To define a client box
-%----------------------------------------------------------------------------------------
-% Colors Used
-%----------------------------------------------------------------------------------------
-\usepackage{colortbl}
-\definecolor{blue}{rgb}{.7,.8,.9}
-\definecolor{ceruleanblue}{rgb}{0.16, 0.32, 0.75}
-\definecolor{drkgreen}{rgb}{0,0.6,0}
-\definecolor{deepmagenta}{rgb}{0.8, 0.0, 0.8}
-\definecolor{cyan}{rgb}{0.0,0.6,0.6}
-\definecolor{maroon}{rgb}{0.5,0,0}
-\usepackage{multirow}
-%----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
-%----------------------------------------------------------------------------------------
-\def\docTitle{Component Data Sheet}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
-
-\def\snippetpath{../../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-
-\def\comp{ad9361\_config}
+\def\comp{ad9361\_{}config}
 \edef\ecomp{ad9361_config}
 \def\Comp{AD9361 Config}
-\graphicspath{ {figures/} }
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
-
-\section*{Summary - \Comp}
-\begin{tabular}{|c|M{13.5cm}|}
-  \hline
-  \rowcolor{blue}
-                    &                  \\
-  \hline
-  Name              & \comp            \\
-  \hline
-  Worker Type       & Device           \\
-  \hline
-  Version           & v\docVersion   \\
-  \hline
-  Release Date      & 9/2018         \\
-  \hline
-  Component Library & ocpi.assets.devices     \\
-  \hline
-  Workers           & \comp.hdl        \\
-  \hline
-	Tested Platforms  &
-\begin{itemize}
-  \item Agilent Zedboard/Analog Devices FMCOMMS2 (Vivado only)
-  \item Agilent Zedboard/Analog Devices FMCOMMS3 (Vivado only)
-  \item x86/Xilinx ML605/Analog Devices FMCOMMS2
-  \item x86/Xilinx ML605/Analog Devices FMCOMMS3
-  \item Ettus E310 (Vivado only)
-\end{itemize} \\
-  \hline
-\end{tabular}
+\maketitle
+\thispagestyle{empty}
+\newpage
 
 \tableofcontents
+\newpage
+
+\def\name{\comp}
+\def\workertype{Device}
+\def\version{\ocpiversion}
+\def\releasedate{9/2018}
+\def\componentlibrary{ocpi.assets.devices}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{{
+  \begin{itemize}
+    \item Agilent Zedboard/Analog Devices FMCOMMS2 (Vivado only)
+    \item Agilent Zedboard/Analog Devices FMCOMMS3 (Vivado only)
+    \item x86/Xilinx ML605/Analog Devices FMCOMMS2
+    \item x86/Xilinx ML605/Analog Devices FMCOMMS3
+    \item Ettus E310 (Vivado only)
+  \end{itemize}
+}}
+\input{\snippetpath/component_summary_table}
 
 \section{Functionality}
   The \Comp{} is a subdevice worker which provides an entry point to the major functionality of the AD9361 IC\cite{ad9361}. This includes both SPI bus functionality for intercommunication with the AD9361 register map as well as additional command/control between the software and the FPGA. Note that, while the register address decoding is performed within this worker, the SPI state machine itself is implemented in one or more separate, platform-specific or card-specific subdevice workers\footnote{For an example, see \cite{spi_comp_datasheet}}. This worker's register map provides an API for integrating with Analog Devices's No-OS software\cite{no_os}. This integration is implemented in \cite{config_proxy_comp_datasheet}.
@@ -319,7 +235,7 @@ The \Comp{} subdevice worker operates in the control plane clock domain. Note th
 \section{Performance and Resource Utilization}
 \section{Worker Configuration Parameters}
 \subsection{\comp.hdl}
-\input{../../\ecomp.hdl/configurations.inc}
+%\input{../../\ecomp.hdl/configurations.inc}
 \subsection{\comp.hdl}
 Fmax refers to the maximum allowable clock rate for any registered signal paths within a given clock domain for an FPGA design. Fmax in the table below is specific only to this worker and represents the maximum possible Fmax for any OpenCPI bitstream built with this worker included. Note that the Fmax value for a given clock domain for the final bitstream is often worse than the Fmax specific to this worker, even if this worker is the only one included in the bitstream. \\ \\
 

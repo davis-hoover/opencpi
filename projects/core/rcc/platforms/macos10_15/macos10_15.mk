@@ -46,9 +46,7 @@ OcpiAsNeeded=
 OcpiUnknownWarningsError=-Werror=unknown-warning-option
 OcpiStaticProgramFlags=-Xlinker -export_dynamic -Wl,-no_pie
 #export OCPI_OPENCL_LIB=/System/Library/Frameworks/OpenCL.framework/Versions/A/OpenCL
-OcpiSWIG=$(wildcard /opt/local/bin/swig)
+OcpiSWIG=$(wildcard /opt/local/bin/swig3)
 OcpiPlatformOs=macos
 OcpiPlatformOsVersion=10_15
 OcpiPlatformArch=x86_64
-# This is where the officially installed python headers go.
-OcpiPythonInclude=/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7

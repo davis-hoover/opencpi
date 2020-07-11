@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -43,11 +43,11 @@ if  len(sys.argv) == 5:
     messageSizeIncrement=int(sys.argv[3])
     fileName = sys.argv[4]
 else: #sensible defaults if no arguments are given
-    print "Using default input parameters:"
-    print "Starting Message Size: 2"
-    print "Ending message size: 8192"
-    print "Message size increment: 315"
-    print "Output file: test.input.width_adapter"
+    print("Using default input parameters:")
+    print("Starting Message Size: 2")
+    print("Ending message size: 8192")
+    print("Message size increment: 315")
+    print("Output file: test.input.width_adapter")
     startingMessageSize=2
     endingMessageSize=8192
     messageSizeIncrement=315
@@ -55,7 +55,7 @@ else: #sensible defaults if no arguments are given
 fileType = 'uint8'
 packType = 'B'
 metadataHeaderSizeInBytes=8
-numCases=(endingMessageSize-startingMessageSize)/messageSizeIncrement+1
+numCases= (endingMessageSize - startingMessageSize) // messageSizeIncrement + 1
 if numCases <= 0 or (endingMessageSize-startingMessageSize)%messageSizeIncrement != 0 :
     print("Error: (endingMessageSize-startingMessageSize)/messageSizeIncrement must be a postive integer")
     sys.exit(1)
@@ -84,6 +84,6 @@ while messageSizeIndex <= endingMessageSize:
 outDataList = outData.tolist()
 #Save data file
 f = open(fileName, 'wb')
-for i in xrange(0,numBytesInOutputFile):
+for i in range(0,numBytesInOutputFile):
     f.write(struct.pack(packType, outDataList[i]))
 f.close()

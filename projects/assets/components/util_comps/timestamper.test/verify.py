@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -55,46 +55,47 @@ enable = os.environ.get("OCPI_TEST_enable")
 
 # Test that odata is not all zeros
 if all(odata == 0):
-    print "    FAILED: Values are all zero"
+    print("    FAILED: Values are all zero")
     sys.exit(1)
 else:
-    print "    PASS: File is not all zeros"
+    print("    PASS: File is not all zeros")
 
-if(enable=="true"): # => NORMAL MODE
-    #Test if timestamps are incrementing
+if enable == "true": # => NORMAL MODE
+    # Test if timestamps are incrementing
     ofilename_without_timestamps = sys.argv[2] + ".no_timestamps"
     output_file_without_timestamps =  open(ofilename_without_timestamps, 'wb')
     timestamp_list = list();
     timestamp_error = 0
     a = 0
     while a < len(odata):
-        if(a % (MESSAGE_SIZE_WORDS+2) == 0):
-            if(len(timestamp_list) and (timestamp_list[-1] > odata[a]+1.0*(odata[a+1])/0xFFFFFFFF)):
+        if a % (MESSAGE_SIZE_WORDS+2) == 0:
+            val = odata[a] + odata[a+1] / 0xFFFFFFFF
+            if len(timestamp_list) and (timestamp_list[-1] > val):
                 timestamp_error = 1
-            timestamp_list.append(odata[a]+1.0*(odata[a+1])/0xFFFFFFFF)
+            timestamp_list.append(val)
             a += 2
         else:
             output_file_without_timestamps.write(struct.pack('i', odata[a]))
             a += 1
     output_file_without_timestamps.close()
 
-    if(timestamp_error):
-        print "    FAILED: one or more timestamps were not incrementing"
+    if timestamp_error:
+        print("    FAILED: one or more timestamps were not incrementing")
         sys.exit(1)
     else:
-        print "    PASS: Timestamps are incrementing"
+        print("    PASS: Timestamps are incrementing")
 
         #Test that odata is the expected amount
         if len(odata) != len(idata)+len(timestamp_list)*2:
-            print "    FAILED: Output file length is unexpected"
-            print 'Length =', len(odata), 'while expected length is =', len(idata)+len(timestamp_list)*2
+            print("    FAILED: Output file length is unexpected")
+            print('Length =', len(odata), 'while expected length is =', len(idata)+len(timestamp_list)*2)
             sys.exit(1)
         else:
-            print "    PASS: Output file length = input file length plus timestamps"
+            print("    PASS: Output file length = input file length plus timestamps")
 else: # => BYPASS MODE
     #Test that odata is the expected amount
     if (idata != odata).all():
-        print "    FAILED: Input and output file do not match"
+        print("    FAILED: Input and output file do not match")
         sys.exit(1)
     else:
-        print "    PASS: Input and output file match"
+        print("    PASS: Input and output file match")

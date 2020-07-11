@@ -176,11 +176,21 @@ namespace OCPI {
             if (magic_slice != curr) {
               //FIXME better error message
               ocpiBad("HDL Device '%s' responds, but not with the OCCP signature: "
-                      "magic: 0x%" PRIx8 " (sb 0x%" PRIx8 ")", m_name.c_str(), magic_slice, curr);
-              err = "Magic numbers in admin space do not match";
+                      "magic: 0x%" PRIx8 " (sb 0x%" PRIx8 ")", m_name.c_str(), curr, magic_slice);
+              err = "Magic numbers in admin space do not match when accessing bytes";
               return true;
             }
           }
+	  const uint32_t
+	    low = m_cAccess.get32RegisterOffset(offsetof(OccpAdminRegisters, magic)),
+	    high = m_cAccess.get32RegisterOffset(offsetof(OccpAdminRegisters, magic)+4);
+	  if ((OCCP_MAGIC & 0xffffffff) != low || (OCCP_MAGIC >> 32) != high) {
+              ocpiBad("HDL Device '%s' responds, but not with the OCCP signature: "
+                      "magic: high 0x%" PRIx32 " low 0x%" PRIx32 " (sb 0x%" PRIx64 ")", m_name.c_str(),
+		      high, low, OCCP_MAGIC);
+              err = "Magic numbers in admin space do not match when accessing 32 bit words";
+              return true;
+	  }
           // We verified the magic number on the board is the correct magic number reading
           // 8 bits at a time.  Now we read it as a 64 bit number to confirm that 64 bit
           // accesses work on this hardware.
@@ -204,7 +214,7 @@ namespace OCPI {
       if (magic != OCCP_MAGIC) {
         ocpiBad("HDL Device '%s' responds, but the OCCP signature: "
                 "magic: 0x%" PRIx64 " (sb 0x%" PRIx64 ")", m_name.c_str(), magic, OCCP_MAGIC);
-        err = "Magic numbers in admin space do not match";
+        err = "Magic numbers in admin space do not match when accessing 64 bit words";
         return true;
       }
       if (!m_pfWorker) {
@@ -326,6 +336,10 @@ namespace OCPI {
     // Return true on error
     bool Device::
     configure(ezxml_t config, std::string &error) {
+      if (!m_isAlive) {
+	ocpiDebug("Avoiding configuration of device that is not alive: %s", name().c_str());
+	return false;
+      }
       uint64_t magic = m_cAccess.get64Register(magic, OccpAdminRegisters);
       // Shuffle endianness here
       if (magic != OCCP_MAGIC) {
