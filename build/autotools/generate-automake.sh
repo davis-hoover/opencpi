@@ -262,6 +262,11 @@ while read path opts; do
   done
   echo '################################################################################'
   echo '# For location: '$path
+
+  # This guard is needed for the entire generated section to disable
+  # cross-compilation
+  [ -n "$tools" ] && echo 'if !ocpi_is_cross'
+
   includes=" $(find -H $path $exclude -type d -a -name include) $xincludes" 
   includes="$(for i in $includes; do echo @srcdir@/$i; done)"
   sources=$(find -H $path $exclude -not -name "*_main.c*" -a -not -name "*_[sS]tubs.c*" -a \
@@ -387,6 +392,7 @@ while read path opts; do
   }
   [ -n "$sources" -a "$dest" != "noinst" -a -z "$driver" ] &&
       ocpi_libs_ordered="libocpi_$lname $ocpi_libs_ordered"
+  [ -n "$tools" ] && echo 'endif'  # end cross-compilation guard
 done
 echo ocpi_drivers=$drivers
 echo ocpi_swigs=$swigs

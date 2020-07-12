@@ -3,29 +3,6 @@
 % this file is intended to be edited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Summary - \Comp}
-% Make table whose width is equal to which will be used for text
-% wrapping, split into 2 equal columns
-\begin{longtable}{|p{\dimexpr0.5\textwidth-2\tabcolsep\relax}
-                  |p{\dimexpr0.5\textwidth-2\tabcolsep\relax}|}
-  \hline
-  \rowcolor{blue}
-  & \\
-  \hline
-  Name              & \comp \\
-  \hline
-  Latest Version    &  \docVersion \\
-  \hline
-  Worker Type       & Application \\
-  \hline
-  Component Library & ocpi.assets.misc\_comps \\
-  \hline
-  Workers           & \comp.hdl \\
-  \hline
-  Tested Platforms  & xsim, CentOS 7 \\
-  \hline
-\end{longtable}
-
 \begin{center}
 \textit{\textbf{Revision History}}
   \begin{table}[H]
@@ -36,14 +13,23 @@
     \hline
     \rowcolor{blue}
     \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
-      \hline
-      v1.7 & Initial release & 5/28/2020 \\
-      \hline
+    \hline
+    v1.7 & Initial release & 05/2020 \\
+    \hline
     \end{longtable}
   \end{table}
 \end{center}
+\newpage
 
-
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{05/2020}
+\def\componentlibrary{ocpi.assets.misc\_{}comps}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{CentOS7, xsim}
+\input{\snippetpath/component_summary_table}
+\section*{Summary - \Comp}
 
 \section*{Functionality}
 \begin{flushleft}

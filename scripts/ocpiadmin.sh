@@ -16,38 +16,66 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+# Originally, this script was also known as "install-platform.sh".  A decision
+# was made to integrate the functionality of "deploy-opencpi.sh".  Accordingly,
+# both of the original scripts have gone away because it made no sense to have
+# one integrated script with three names.  Like the originals, this script must
+# be runnable regardless of whether the OpenCPI environment has been properly
+# initialized.
 
-# Just check if it looks like we are in the source tree.
-[ -d runtime -a -d build -a -d scripts -a -d tools ] || {
-  echo "Error:  this script ($0) is not being run from the top level of the OpenCPI source tree."
-  exit 1
-}
 set -e
-if [ $# = 0 ]; then
-    cat <<-EOF
-	This script installs a platform by downloading it (if needed) and building it.
-	Usage is:  ./scripts/install-platform.sh <platform> <project-package-id> <url> <checkout>
-EOF
+
+if [ x$OCPI_CDK_DIR = x ]
+then
+  #
+  # OpenCPI environment not initialized: not a fatal error
+  # unless we are not in the top-level OpenCPI directory.
+  #
+  [ -d runtime -a -d build -a -d scripts -a -d tools ] || {
+    echo "$0: ERROR: either OCPI_CDK_DIR must be set OR this script must be run from the top level of the OpenCPI source tree." >&2
     exit 1
+  }
+  # Ensure exports (or cdk) exists and has scripts.
+  source ./scripts/init-opencpi.sh
+
+  # Ensure CDK and TOOL variables are set.
+  OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh ; source $OCPI_BOOTSTRAP
+else
+  cd $OCPI_CDK_DIR/..
 fi
 
-# We do some bootstrapping here (that is also done in the scripts we call), in order to know
-# whether the platform we are building
+# install platform syntax:
+#   ocpiadmin install platform <platform> <project-package-id> <url> <checkout>
+# deploy platform syntax:
+#   ocpiadmin deploy platform <rcc_platform> <hdl_platform>
+#   (<hdl_platform> is optional)
 
-# Ensure exports (or cdk) exists and has scripts
-source ./scripts/init-opencpi.sh
-# Ensure CDK and TOOL variables
-OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh; source $OCPI_BOOTSTRAP
+if [ $# -lt 3 ] || [ $1 != "install" -a $1 != "deploy" ] || [ $2 != "platform" ]
+then
+  cat <<-EOF
+    To install a platform (by downloading it, if necessary, and building it):
+      $0 install platform <platform> <project-package-id> <url> <checkout>
+    To deploy a platform:
+      $0 deploy platform <rcc_platform> [<hdl_platform>]
+EOF
+  exit 1
+fi
 
-platform=$1
-project=$2
-url=$3
-checkout=$4
+#
+# Figure out what we are doing early.
+#
+action=$1 ; shift 2
 source $OCPI_CDK_DIR/scripts/util.sh
 
 function getvars {
   setVarsFromMake $OCPI_CDK_DIR/include/hdl/hdl-targets.mk ShellHdlTargetsVars=1
   setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
+  if [ $action = "deploy" ]
+  then
+    export OCPI_ALL_RCC_PLATFORMS="$RccAllPlatforms" OCPI_ALL_HDL_PLATFORMS="$HdlAllPlatforms"
+    return 0
+  fi
   platforms="$RccAllPlatforms $HdlAllPlatforms"
   if isPresent $platform $platforms; then
     if isPresent $platform $RccAllPlatforms; then
@@ -62,6 +90,24 @@ function getvars {
   fi
   return 1
 }
+
+#
+# The "deploy" case is trivial: "deploy-platform.sh"
+# does the heavy lifting.  Note undocumented "verbose"
+# option: set to "-v" for debugging.
+#
+if [ $action = "deploy" ]
+then
+  getvars
+  $OCPI_CDK_DIR/scripts/deploy-platform.sh $verbose $1 $2
+  exit $?
+fi
+
+platform=$1
+project=$2
+url=$3
+checkout=$4
+
 if getvars; then
     echo The $model platform \"$platform\" is already defined in this installation, in $platform_dir.
     project_dir=$(echo $platform_dir | sed -e "s=/.../platforms/$platform==" -e 's=/lib$==')
@@ -183,7 +229,7 @@ else
     ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
-    ./scripts/makeExportLinks.sh -v - - $platform $platform_dir
+    $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform $platform_dir
 fi
 echo "Platform installation (download and build) for platform \"$platform\" succeeded."
 exit 0

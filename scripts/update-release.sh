@@ -98,6 +98,6 @@ done
 
 # Fix the common release subtitle for (some) tex docs
 echo "Updating tex docs for release $RELEASE"
-sed -i "s/\(ocpiversion{\)[^}]*/\1$RELEASE/" doc/av/tex/snippets/includes.tex
+sed -i "s/\(ocpiversion{\)[^}]*/\1$RELEASE/" doc/av/tex/snippets/LaTeX_Header.tex
 
 exit 0

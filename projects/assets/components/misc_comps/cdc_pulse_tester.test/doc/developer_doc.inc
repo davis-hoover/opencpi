@@ -3,29 +3,6 @@
 % this file is intended to be edited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Summary - \Comp}
-% Make table whose width is equal to which will be used for text
-% wrapping, split into 2 equal columns
-\begin{longtable}{|p{\dimexpr0.5\textwidth-2\tabcolsep\relax}
-                  |p{\dimexpr0.5\textwidth-2\tabcolsep\relax}|}
-  \hline
-  \rowcolor{blue}
-  & \\
-  \hline
-  Name              & \comp \\
-  \hline
-  Latest Version    &  \docVersion (release date TBD) \\
-  \hline
-  Worker Type       &  Application Worker \\
-  \hline
-  Component Library &  ocpi.assets.misc\_comps \\
-  \hline
-  Workers           &  \comp.hdl \\
-  \hline
-  Tested Platforms  &  xsim, isim, ZedBoard(PL) \\
-  \hline
-\end{longtable}
-
 \begin{center}
 	\textit{\textbf{Revision History}}
 		\begin{table}[H]
@@ -35,13 +12,25 @@
 			\rowcolor{blue}
 			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
 		    \hline
-		    v\docVersion & Initial Release & TBD \\
+		    v1.6 & Initial Release & 02/2020 \\
+		    \hline
 			\end{tabularx}
 		\end{table}
-	\end{center}
+\end{center}
+\newpage
+
+\def\name{\comp}
+\def\workertype{Application Worker}
+\def\version{\ocpiversion}
+\def\releasedate{02/2020}
+\def\componentlibrary{ocpi.assets.misc\_{}comps}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{isim, xsim, ZedBoard(PL)}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 The \comp \ worker serves as a testbench for the \verb+pulse+ cdc primitive. The \verb+pulse+ primitive takes in a pulse from the source domain and synchronizes it to the destination domain. The synchronized pulse is sent to the worker's output port.
+
 \section*{Worker Implementation Details}
 The \comp \ worker uses the \texttt{src\_rdy} output from the \verb+pulse+ primitive to enable a pulse generator circuit and the pulse from the pulse generator is used as an input to the \verb+pulse+ primitive. The synchronized pulse output from the \verb+pulse+ primitive is stored in a FIFO until the worker's output port is ready for the data. The FIFO is used because the data is sent only once and also used to mitigate synchronizing the backpressure from the output port to the LFSR. \\ \\
 The \texttt{src\_clk\_hz} and \texttt{dst\_clk\_hz} parameter properties are used to define the source and destination domain clock frequencies. \\ \\

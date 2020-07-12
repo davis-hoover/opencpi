@@ -37,7 +37,7 @@ done
 if [ $PWD == / ]; then
   exit 0 # we're not in a project
 fi
-# FIXME: These lines are copied from makeExportLinks.sh
+# FIXME: These lines are copied from export-utils.sh
 # When that file is moved to a better place, perhaps this function can be incorporated there.
 additions=$(test -f Project.exports && grep '^[ 	]*+' Project.exports | sed 's/^[ 	]*+[ 	]*\([^ 	#]*\)[ 	]*\([^ 	#]*\).*$/\1:\2/') || true
 set -f

@@ -109,8 +109,8 @@
 # CDK scripts we need
 +scripts/clean-env.sh scripts/
 # This is runtime although this one script deals with initialization issues
-# for development time tool.  An acceptable "runtime bloat" to keep this gnarly bootstrapping
-# stuff in one place.
+# for development time too: an acceptable "runtime bloat" to keep this gnarly
+# bootstrapping stuff in one place.
 =tools/scripts/opencpi-setup-internal.sh opencpi-setup.sh
 +tools/scripts/setup-prerequisite.sh scripts/
 +tools/scripts/setup-prereq-dirs.sh scripts/
@@ -119,6 +119,8 @@
 +tools/scripts/ocpiav.sh <target>/bin/ocpiav
 +tools/scripts/ocpiav.desktop scripts/
 +tools/scripts/export-platform.sh scripts/
++tools/scripts/export-utils.sh scripts/
++tools/scripts/export-platform-to-framework.sh scripts/
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/
@@ -126,10 +128,10 @@
 # so it is "place" in the internal dir to avoid runtime, and exported explicitly for devel
 # we are removing it from the distribution entirely before deciding about the RH stuff
 #+build/autotools/target-<target>/staging/bin/internal/ocpisca <target>/bin/
++scripts/ocpiadmin.sh <target>/bin/ocpiadmin
 # Allow installations to run this, but not documented yet
 # It will run only runtime env tests if that's where it is
 # Perhaps migrate this to bin with a new name at some point
-
 =scripts/test-opencpi.sh <target>/bin/ocpitest
 +tools/scripts/makeStaticWorker.sh scripts/
 =tools/scripts/ocpidriver scripts/
@@ -160,9 +162,9 @@
 +tools/scripts/setsid.py scripts/
 +tools/scripts/freeze_project.sh scripts/
 +tools/scripts/thaw_project.sh scripts/
-+tools/scripts/makeProjectExports.sh scripts/
-#+scripts/makeExportLinks.sh scripts/
-+tools/scripts/maybeExport.sh scripts/
++tools/scripts/export-project.sh scripts/
++tools/scripts/export-file.sh scripts/
++tools/scripts/deploy-platform.sh scripts/
 # user level scripts made available in the bin directory
 +tools/scripts/ocpidev <target>/bin/
 +tools/scripts/ocpi-copy-projects.py <target>/bin/ocpi-copy-projects
@@ -299,4 +301,6 @@
 ################################################################################
 # Man pages (initially premade)
 +doc/man doc/
+# PDFs and HTML (aka gitlab.io)
++.public/releases/* doc/pdfs/
 

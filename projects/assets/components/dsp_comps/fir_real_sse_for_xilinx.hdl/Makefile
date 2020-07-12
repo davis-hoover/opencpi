@@ -20,7 +20,7 @@
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
-VivadoZynqTargets=zynq xsim
+VivadoZynqTargets=zynq zynq_ultra xsim
 ISEZynqTargets=zynq_ise isim
 OnlyTargets=$(VivadoZynqTargets)
 
