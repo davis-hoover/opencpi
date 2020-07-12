@@ -469,7 +469,7 @@ VivadoPrimitiveCores=$(foreach c,$(Cores),$(if $(findstring /,$c),,$c))
 # Call the tool specific function for including this asset's sources
 # Call the tool specific function for including 'include directories' (ie for verilog includes)
 VivadoIncludeDependencies=\
-  $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),$(info IncLib:$l)\
+  $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),$(infox IncLib:$l)\
     $(call VivadoIncludeSources,\
       $(call HdlExtractSourcesForLib,$(HdlTarget),$l,$(TargetDir)),\
       $(word 2,$(subst :, ,$l))))\
@@ -524,15 +524,19 @@ ifeq ($(HdlLibraryElaboration),1)
 else ifndef HdlNoElaboration
   override HdlNoElaboration=1
 endif
+
+# This old stuff is redundant error checking that is already done.
+  # $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),\
+  #    $(if $(wildcard $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X5)),,\
+  #         $(error Error: Specified library: "$l", in the "HdlLibraries" variable, was not found for $(call HdlGetFamily,$(HdlTarget)).))) \
+  # $(foreach l,$(SubCores_$(HdlTarget)),$(info AC:$l)\
+  #   $(if $(findstring $l),,$(error UNEXPECTED SUBCORE WITHOUT SLASH: $l))\
+  #   $(if $(foreach x,$(call FindRelative,.,$(if $(findstring /,$l),$l,$(call HdlCoreRef,$l,$(HdlTarget)))),$(call HdlExists,$x)),,\
+  # 	$(info Error: Specified primitive core for "$l", in the "Cores" variable, was not found.) \
+  #       $(error Error:   after looking in $(call HdlExists,$(call FindRelative,.,$(call HdlCoreRef,$c,$(HdlTarget))))))) \
+  # $(infox ALLCORE1) \
+
 HdlToolCompile=\
-  $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),\
-     $(if $(wildcard $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X5)),,\
-          $(error Error: Specified library: "$l", in the "HdlLibraries" variable, was not found for $(call HdlGetFamily,$(HdlTarget)).))) \
-  $(foreach l,$(SubCores_$(HdlTarget)),$(infox AC:$l)\
-    $(if $(foreach x,$(call FindRelative,.,$(if $(findstring /,$l),$l,$(call HdlCoreRef,$l,$(HdlTarget)))),$(call HdlExists,$x)),,\
-	$(info Error: Specified core library for "$l", in the "Cores" variable, was not found.) \
-        $(error Error:   after looking in $(call HdlExists,$(call FindRelative,.,$(call HdlCoreRef,$c,$(HdlTarget))))))) \
-  $(infox ALLCORE1) \
   echo '  'Creating $@ with top == $(Top)\; details in $(TargetDir)/vivado-$(Core).out.;\
   if test -f vivado.jou ; then mv -f vivado.jou vivado.jou.bak ; fi;\
   echo Doing Vivado compile ;\

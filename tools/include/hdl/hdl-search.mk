@@ -149,7 +149,7 @@ endef
 # the VHDL library name which may be fully qualified for usage by VHDL.
 # This format: <path-to-lib>:libname means that AdjustRelative still works.
 HdlSearchPrimitivePath=$(infox HSPP:$1:$2:$3)$(strip\
-  $(if $(findstring .,$1),\
+  $(if $(if $(findstring /,$1),,$(findstring .,$1)),\
     $(- what we are looking for is qualified by project)\
     $(foreach l,$(lastword $(subst ., ,$1)),\
       $(foreach p,$(1:%.$l=%),\
@@ -184,7 +184,7 @@ HdlSearchPrimitivePath=$(infox HSPP:$1:$2:$3)$(strip\
 
 ################################################################################
 # $(call HdlLibraryRefDir,location-dir,target)
-# $(call HdlCoreRefDir,location-dir,target)
+# $(call HdlCoreRef,location-dir,target)
 # These functions take a user-specified (friendly, target-independent) library
 # or core location and a target name.  They return the actual directory of that
 # library/core that the tool wants to see for that target.
@@ -244,6 +244,7 @@ HdlCoreRef=$(infox HCR:$1:$2:$3:$(HdlMode))$(strip \
   $(or $(strip\
      $(if $(findstring /,$1),\
         $(call HdlCoreRef1,$1,$2),\
+        $(warning UNEXPECTED UNSLASH CORE)\
         $(firstword \
           $(and $(filter assembly config container,$(HdlMode)),\
                 $(foreach l,$(call HdlTargetComponentLibraries,$2,HCR),\

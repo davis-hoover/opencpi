@@ -86,10 +86,10 @@ HdlInstanceName=$(word 3,$(subst :, ,$1))
 HdlInstanceWkrCfg=$(call HdlInstanceWkr,$1)$(and $(HdlToolRealCore),$(filter %.vhd,$(ImplFile)),_rv)$(foreach c,$(call HdlInstanceCfg,$1),$(if $(filter 0,$c),,_c$c))
 
 # Do the basic primitive core search, returning target-independent paths
-HdlFindCores=\
+HdlFindCores=$(infox HFC:$1)\
   $(foreach c,$1,\
     $(if $(findstring /,$c),\
-      $(or $(and $(call HdlExists,$c),$$c:$(notdir $c)),\
+      $(or $(and $(call HdlExists,$c),$c:$(notdir $c)),\
             $(error Primitive core $c (from Cores) not found.)),\
       $(call HdlSearchPrimitivePath,$c,,HPLx)))
 
