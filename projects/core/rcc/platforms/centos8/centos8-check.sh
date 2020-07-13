@@ -1,3 +1,4 @@
+#!/bin/sh --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -15,6 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-Libraries=clocking
-OnlyPlatforms=zed zed_ise isim xsim modelsim e31x matchstiq_z1
-include $(OCPI_CDK_DIR)/include/test.mk
+
+f=/etc/centos-release
+[ -r $f ] && read c l r v x < $f && [[ $c == CentOS && $v == 8.* ]]

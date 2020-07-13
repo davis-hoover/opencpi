@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ##########################################################################################
-# Install or list required and available packages for Centos7
+# Install or list required and available packages for Centos8
 #
-# The packages are really in five categories (and in 5 variables PKGS_{R,D,S,E,P})
+# The packages are really in five categories (and in 4 variables PKGS_{R,D,S,E})
 # R. Simply required packages that can be yum-installed and rpm-required for runtime
 #    -- note the driver package has separate requirements for driver rebuilding etc.
 # D. Simply required packages that can be yum-installed and rpm-required for devel
@@ -29,8 +29,6 @@
 # E. Packages from other repos that are enabled as category #2 (e.g. use epel)
 #    -- assumed needed for devel
 #    -- thus they are installed after category #2 is installed
-# P. Python3 packages that must be installed with pip3 because they
-#    are not available as RPMs.
 
 # 32 bit cross-architecture packages that, when rpm-required,
 #    -- can only be rpm-required by mentioning some individual file in the package
@@ -42,7 +40,8 @@
 PKGS_R+=(util-linux coreutils ed findutils initscripts)
 #    for JTAG loading of FPGA bitstreams
 #    AV-3053 libusb.so is required to communicate with Xilinx programming dongle
-#    For some reason, that is only in the libusb-devel package in both C6 and C7
+#    For some reason, that is only in the libusb-devel package in CentOS X.
+#    N.B.: libusb and libusbx can coexist just fine.
 PKGS_R+=(libusb-devel)
 #    for bitstream manipulation at least
 PKGS_R+=(unzip)
@@ -67,6 +66,8 @@ PKGS_D+=(glibc.i686=/lib/ld-linux.so.2
          libXft.i686=/usr/lib/libXft.so.2
          libXext.i686=/usr/lib/libXext.so.6)
 #    for Quartus Pro 17 (AV-4318), we need specifically the 1.2 version of libpng
+#    Revisit this if/when we upgrade the Intel tools: current version is 1.6, and
+#    CentOS 8 provides both 1.2 and 1.5 for old binaries.
 PKGS_D+=(libpng12)
 #    to cleanup multiple copies of Linux kernel, etc. (AV-4802)
 PKGS_D+=(hardlink)
@@ -74,13 +75,7 @@ PKGS_D+=(hardlink)
 #    for bash completion - a noarch package  (AV-2398)
 PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 #    Needed to build gdb
-PKGS_D+=(bison)
-#    Needed to build gdb
-PKGS_D+=(flex)
-#    Needed by Xilinx ISE 14.7
-PKGS_D+=(libSM libXi libXrandr)
-#    for the new "xilinx19_2_aarch*" platforms
-PKGS_D+=(openssl-devel)
+PKGS_D+=(bison flex)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
@@ -91,7 +86,7 @@ PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
 #    for building kernel drivers (separate from driver RPM)
-PKGS_S+=(kernel-devel)
+PKGS_S+=(kernel-devel elfutils-libelf-devel)
 #    for "make rpm":
 PKGS_S+=(rpm-build)
 #    for general configuration/installation flexibility - note nfs-utils-lib exists on early centos7.1
@@ -106,35 +101,25 @@ PKGS_S+=(screen)
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
 #    for devel.  For RPM installations we somehow rely on the user pre-installing epel.
-# NOTE: only use ${python3_ver} package name prefix for add-on packages not provided in
-# CentOS 7 repo.  Known packages in this category are "python3-jinja2", "python3-numpy",
-# "python3-scipy", and "python3-scons".
-python3_ver=python36
+#    N.B.: for CentOS 8, none of the PKGS_E packages currently come from the EPEL repo.
+#
+#    for creating swig
+PKGS_E+=(swig)
 #    for ocpidev
-PKGS_E+=(python3 python3-devel ${python3_ver}-jinja2)
+PKGS_E+=(python3 python3-devel python3-jinja2)
 #    for various testing scripts
 #    AV-5478: If the minor version changes here, fix script below
-PKGS_E+=(${python3_ver}-numpy ${python3_ver}-scipy python3-tkinter python3-pip)
+PKGS_E+=(python3-numpy python3-scipy python3-tkinter python3-matplotlib)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
 PKGS_E+=(ocl-icd)
 #    Needed to build gpsd
-PKGS_E+=(${python3_ver}-scons)
-#    Needed to build certain linux kernels or u-boot, at least Xilinx 2015.4
+PKGS_E+=(python3-scons)
+#    Needed to build certain linux kernels or u-boot.
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
-
-##########################################################################################
-# P. python3 packages that must be installed using pip3, which we have available
-#    after installing python3-pip (see PKGS_E).  "pip3" will select the latest
-#    version of a given package unless otherwise specified: this is important
-#    because many current python3 packages require python3 >= 3.5.  This will
-#    not be an issue for CentOS 7 as long as we have python36 installed.  For
-#    now, assume the justification for a package in this category is the same
-#    as for its python2 counterpart as given above.
-PKGS_P+=(matplotlib)
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {
@@ -150,31 +135,11 @@ function bad {
   exit 1
 }
 
-function install_swig3 {
-  #
-  # Need SWIG 3.0.12 for this platform, and the "swig3" package
-  # conflicts with the "swig" package that is probably already
-  # installed.  Figure out whether we have the correct version,
-  # and go from there.
-  #
-  local need_swig3=1
-
-  [ -d /usr/share/swig/3.0.12 ] && need_swig3=0
-
-  if [ $need_swig3 -eq 1 ]
-  then
-    $SUDO yum -y erase swig
-    $SUDO yum -y install swig3
-  fi
-}
-
 # Different package listing options:
 #     list: RPMs with names replaced by <file> where <pkg>=<file> was specified
 #     yumlist: RPMs with names replaced by <pkg> where <pkg>=<file> was specified
-#     piplist: packages handled by pip3
 [ "$1" = list ] && rpkgs PKGS_R && rpkgs PKGS_D && rpkgs PKGS_S && rpkgs PKGS_E && exit 0
 [ "$1" = yumlist ] && ypkgs PKGS_R && ypkgs PKGS_D && ypkgs PKGS_S && ypkgs PKGS_E && exit 0
-[ "$1" = piplist ] && echo ${PKGS_P[*]} && exit 0
 
 # Docker doesn't have sudo installed by default and we run as root inside
 # a container anyway
@@ -188,17 +153,11 @@ fi
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source
-$SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
+$SUDO dnf -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
 [ $? -ne 0 ] && bad "Installing required packages failed"
 
 # Now those that depend on epel
-$SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
+$SUDO dnf -y install $(ypkgs PKGS_E)
 [ $? -ne 0 ] && bad "Installing EPEL packages failed"
-
-# SWIG is a special case on CentOS 7
-install_swig3
-
-# And finally, install the remaining python3 packages
-$SUDO pip3 install ${PKGS_P[*]}
 
 exit 0

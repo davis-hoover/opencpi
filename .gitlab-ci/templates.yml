@@ -314,8 +314,6 @@
   stage: build-assemblies
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - make -C projects/platform/ exports
-    - make -C projects/assets/ imports
     - ocpidev build -d projects/assets/hdl/assemblies --hdl-platform $PLATFORM
     - touch "${CI_PROJECT_DIR}/.success"
 
@@ -325,8 +323,6 @@
   stage: build-assemblies
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - make -C projects/platform/ exports
-    - make -C projects/assets_ts/ imports
     - ocpidev build -d projects/assets_ts/hdl/assemblies --hdl-platform $PLATFORM
     - touch "${CI_PROJECT_DIR}/.success"
 
@@ -336,8 +332,6 @@
   stage: build-assemblies
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - make -C projects/platform/ exports
-    - make -C projects/inactive/ imports
     - ocpidev build -d projects/inactive/hdl/assemblies --hdl-platform $PLATFORM
     - touch "${CI_PROJECT_DIR}/.success"
 
@@ -608,6 +602,19 @@
     - if: '$CI_HDL_PLATFORM =~ /(^| )zed_ise|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_HDL_PLATFORM =~ /(^| )zed_ise|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
     - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zed_ise|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web" && $CI_PIPELINE_SOURCE != "scheduled"'
+
+.zcu104:
+  variables:
+    PLATFORM: 'zcu104'
+    HW_PLATFORM: 'zcu104'
+    MODEL: 'hdl'
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )zcu104|all( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )zcu104|all( |$)/i && $CI_COMMIT_MESSAGE !~  /\[ *ci.*\]/i'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +zcu104|all( \S*)*\]/i && $CI_PIPELINE_SOURCE != "web"'
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
 
 .e3xx:
   rules:

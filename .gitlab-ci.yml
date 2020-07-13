@@ -40,6 +40,7 @@ include:
   - /.gitlab-ci/centos7/matchstiq_z1.yml
   - /.gitlab-ci/centos7/modelsim.yml
   - /.gitlab-ci/centos7/zed_ise.yml
+  - /.gitlab-ci/centos7/zcu104.yml
 
   # downstream projects
   - /.gitlab-ci/docs.yml

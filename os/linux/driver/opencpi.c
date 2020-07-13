@@ -652,7 +652,7 @@ opencpi_vma_close(struct vm_area_struct *vma) {
 
 // Map an individual page - in our case only for kernel allocation (not mmio, not reserved)
 #if defined(RHEL_MAJOR)
-#if RHEL_MAJOR==6 || RHEL_MAJOR==7
+#if RHEL_MAJOR>=6
 #define OCPI_RH6
 #else
 #define OCPI_RH5
@@ -684,8 +684,11 @@ opencpi_vma_nopage(struct vm_area_struct *vma, unsigned long virt_addr, int *typ
 /*
 *  This got changed to "vm_fault_t opencpi_vma_fault"
 *  in kernel version 5.0-rcX.  See "linux/mm_types.h".
+*
+*  Looks like RedHat/CentOS made the switch as of
+*  major release 8 with kernel version 4.18.0.
 */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 18, 0)
 static vm_fault_t opencpi_vma_fault
 #else
 static int opencpi_vma_fault
