@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-HdlLibraries=bsv fixed_float ocpi util
+HdlLibraries=bsv fixed_float ocpi util cdc
 # We can't successfully elaborate this since it references the metadata stuff
 HdlNoElaboration=yes
 # FIXME FIXME: The low level primitives (FIFO etc.) are COPIED here due to an XST bug

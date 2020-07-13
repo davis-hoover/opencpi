@@ -25,7 +25,7 @@
 --
 -- For each worker that requires "time", a Time Client is used to synchronize
 -- from the HTS clock domain to the target's clock domain.
--- 
+--
 -- Ideally, the HTS is clocked off the fastest and most stable (MHz +/- PPM) clock
 -- available to the system, such that, the most accurate "time keeping" may be
 -- achieved and sustained during the absence of the GPS PPS signal.
@@ -38,7 +38,7 @@
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all; use IEEE.math_real.all;
-library ocpi, util, ocpi_core_bsv; use ocpi.all, ocpi.types.all, util.util.all, ocpi_core_bsv.all;
+library ocpi, util, cdc; use ocpi.all, ocpi.types.all, util.util.all;
 library platform; use platform.platform_pkg.all;
 entity time_service is
   generic (
@@ -78,7 +78,7 @@ architecture rtl of time_service is
   -- Zynq-based 100        90           100.1           99.9            2621541
   --
   -----------------------------------------------------------------------------
-  -- Defines 90% threshold of a "seconds" counter at the timeCLK rate and is 
+  -- Defines 90% threshold of a "seconds" counter at the timeCLK rate and is
   -- used to create the s_ppsDrive, which is a possible source for ppsOut.
   --
   -- ML605:
@@ -210,7 +210,7 @@ architecture rtl of time_service is
   signal s_ppsDrive                            : std_logic;
   --
   signal x_281474976710656_minus_delSecond_50b : std_logic_vector(49 downto 0);
-  signal s_base2exp48_minus_delSecond_50b        : std_logic_vector(49 downto 0);  
+  signal s_base2exp48_minus_delSecond_50b        : std_logic_vector(49 downto 0);
   signal x_281474976710656_minus_delSecond_22b : std_logic_vector(21 downto 0);
   signal s_fracBeta                            : std_logic_vector(49 downto 0);
   signal s_delSec                              : std_logic_vector(1 downto 0);
@@ -244,7 +244,7 @@ begin
   -- Outputs assignments
   -----------------------------------------------------------------------------
 
-  -- Control Clock Domain  
+  -- Control Clock Domain
   s_statusOut <= (s_ppsLostSticky & s_gpsInSticky & s_ppsInSticky & s_timeSetSticky &
                   s_ppsOKCC_dD_OUT & s_ppsLostCC_dD_OUT & "00" &
                   x"0000" & s_rollingPPSIn_dD_OUT);
@@ -291,11 +291,11 @@ begin
       end if;
     end if;
   end process;
-  
+
   ------------------------------------------------------------------------------
   -- TODO:
   -- Identify optimization/placement VHDL attributes to assign to register signals
-  -- 
+  --
   -- Async to Time Clock domain:
   -- Since there is no access to the clock that is generates (synchronized) the PPS,
   -- double registering the External PPS sync pulse input.
@@ -319,18 +319,18 @@ begin
   -- Control to Time clk domain: Select the 'mode' of ppsOut
   -----------------------------------------------------------------------------
   s_ppsOutMode_sD_IN <= s_rplTimeControl(1 downto 0);
-  syncReg_ppsOutMode : bsv_pkg.SyncRegister
+  syncReg_ppsOutMode : cdc.cdc.bits_feedback
     generic map (
-      width => 2,
-      init  => 0)
+      width => 2)
     port map (
-      sCLK   => CLK,
-      dCLK   => timeCLK,
-      sRST   => RST,
-      sD_IN  => s_ppsOutMode_sD_IN,
-      sEN    => s_ppsOutMode_sRDY,
-      dD_OUT => s_ppsOutMode_dD_OUT,
-      sRDY   => s_ppsOutMode_sRDY);
+      src_CLK => CLK,
+      dst_CLK => timeCLK,
+      src_RST => RST,
+      dst_rst => timeRST,
+      src_IN  => s_ppsOutMode_sD_IN,
+      src_EN  => s_ppsOutMode_sRDY,
+      dst_OUT => s_ppsOutMode_dD_OUT,
+      src_RDY => s_ppsOutMode_sRDY);
 
   mux_ppsOut : process(s_ppsOutMode_dD_OUT, s_ppsDrive, s_ppsExtSync_d2, s_xo2)
   begin
@@ -346,18 +346,18 @@ begin
   -- Control to Time clk domain: Control monitoring of External PPS sync pulse
   -----------------------------------------------------------------------------
   s_ppsDisablePPS_sD_IN_slv0 <= (0 downto 0 => timeControl(2));
-  syncReg_ppsDisablePPS : bsv_pkg.SyncRegister
+  syncReg_ppsDisablePPS : cdc.cdc.bits_feedback
     generic map (
-      width => 1,
-      init  => 0)
+      width => 1)
     port map (
-      sCLK   => CLK,
-      dCLK   => timeCLK,
-      sRST   => RST,
-      sD_IN  => s_ppsDisablePPS_sD_IN_slv0,
-      sEN    => s_ppsDisablePPS_sRDY,
-      dD_OUT => s_ppsDisablePPS_dD_OUT_slv0,
-      sRDY   => s_ppsDisablePPS_sRDY);
+      src_CLK => CLK,
+      dst_CLK => timeCLK,
+      src_RST => RST,
+      dst_rst => timeRST,
+      src_IN  => s_ppsDisablePPS_sD_IN_slv0,
+      src_EN  => s_ppsDisablePPS_sRDY,
+      dst_OUT => s_ppsDisablePPS_dD_OUT_slv0,
+      src_RDY => s_ppsDisablePPS_sRDY);
   s_ppsDisablePPS_dD_OUT <= s_ppsDisablePPS_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
@@ -391,35 +391,35 @@ begin
   s_refPerPPS_sEN <= '1' when (s_refPerPPS_sRDY = '1' and
                                s_ppsExtSync_d2 = '1'  and
                                s_ppsExtSyncD = '0') else '0';
-  syncReg_refPerPPS : bsv_pkg.SyncRegister
+  syncReg_refPerPPS : cdc.cdc.bits_feedback
     generic map (
-      width => 28,
-      init  => 0)
+      width => 28)
     port map (
-      sCLK   => timeCLK,
-      dCLK   => CLK,
-      sRST   => timeRST,
-      sD_IN  => s_refPerPPS_sD_IN,
-      sEN    => s_refPerPPS_sEN,
-      dD_OUT => s_refPerPPS_dD_OUT,
-      sRDY   => s_refPerPPS_sRDY);
+      src_CLK => timeCLK,
+      dst_CLK => CLK,
+      src_RST => timeRST,
+      dst_rst => RST,
+      src_IN  => s_refPerPPS_sD_IN,
+      src_EN  => s_refPerPPS_sEN,
+      dst_OUT => s_refPerPPS_dD_OUT,
+      src_RDY => s_refPerPPS_sRDY);
 
   -----------------------------------------------------------------------------
   -- Control to Time clk domain: Disable update of 'fracInc' value
-  -----------------------------------------------------------------------------  
+  -----------------------------------------------------------------------------
   s_disableServo_sD_IN_slv0 <= (0 downto 0 => s_rplTimeControl(4));
-  syncReg_disableServo : bsv_pkg.SyncRegister
+  syncReg_disableServo : cdc.cdc.bits_feedback
     generic map (
-      width => 1,
-      init  => 0)
+      width => 1)
     port map (
-      sCLK   => CLK,
-      dCLK   => timeCLK,
-      sRST   => RST,
-      sD_IN  => s_disableServo_sD_IN_slv0,
-      sEN    => s_disableServo_sRDY,
-      dD_OUT => s_disableServo_dD_OUT_slv0,
-      sRDY   => s_disableServo_sRDY);
+      src_CLK => CLK,
+      dst_CLK => timeCLK,
+      src_RST => RST,
+      dst_rst => timeRST,
+      src_IN  => s_disableServo_sD_IN_slv0,
+      src_EN  => s_disableServo_sRDY,
+      dst_OUT => s_disableServo_dD_OUT_slv0,
+      src_RDY => s_disableServo_sRDY);
   s_disableServo_dD_OUT <= s_disableServo_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
@@ -465,59 +465,59 @@ begin
       end if;
     end if;
   end process;
-  
+
   -----------------------------------------------------------------------------
   -- Time to Control clk domain: For Status register and setting ppsLostSticky bit
-  -----------------------------------------------------------------------------  
-  s_ppsLostCC_sD_IN_slv0 <= (0 downto 0 => s_ppsLost);  
-  syncReg_ppsLostCC : bsv_pkg.SyncRegister    
+  -----------------------------------------------------------------------------
+  s_ppsLostCC_sD_IN_slv0 <= (0 downto 0 => s_ppsLost);
+  syncReg_ppsLostCC : cdc.cdc.bits_feedback
     generic map (
-      width => 1,
-      init  => 0)
+      width => 1)
     port map (
-      sCLK   => timeCLK,
-      dCLK   => CLK,
-      sRST   => timeRST,
-      sD_IN  => s_ppsLostCC_sD_IN_slv0,
-      sEN    => s_ppsLostCC_sRDY,
-      dD_OUT => s_ppsLostCC_dD_OUT_slv0,
-      sRDY   => s_ppsLostCC_sRDY);
+      src_CLK => timeCLK,
+      dst_CLK => CLK,
+      src_RST => timeRST,
+      dst_rst => RST,
+      src_IN  => s_ppsLostCC_sD_IN_slv0,
+      src_EN  => s_ppsLostCC_sRDY,
+      dst_OUT => s_ppsLostCC_dD_OUT_slv0,
+      src_RDY => s_ppsLostCC_sRDY);
   s_ppsLostCC_dD_OUT <= s_ppsLostCC_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
   -- Time to Control clk domain: For Status register and setting ppsInSticky bit
   -----------------------------------------------------------------------------
-  s_ppsOKCC_sD_IN_slv0 <= (0 downto 0 => s_ppsOK);    
-  syncReg_ppsOKCC : bsv_pkg.SyncRegister    
+  s_ppsOKCC_sD_IN_slv0 <= (0 downto 0 => s_ppsOK);
+  syncReg_ppsOKCC : cdc.cdc.bits_feedback
     generic map (
-      width => 1,
-      init  => 0)
+      width => 1)
     port map (
-      sCLK   => timeCLK,
-      dCLK   => CLK,
-      sRST   => timeRST,
-      sD_IN  => s_ppsOKCC_sD_IN_slv0,
-      sEN    => s_ppsOKCC_sRDY,
-      dD_OUT => s_ppsOKCC_dD_OUT_slv0,
-      sRDY   => s_ppsOKCC_sRDY);
+      src_CLK => timeCLK,
+      dst_CLK => CLK,
+      src_RST => timeRST,
+      dst_rst => RST,
+      src_IN  => s_ppsOKCC_sD_IN_slv0,
+      src_EN  => s_ppsOKCC_sRDY,
+      dst_OUT => s_ppsOKCC_dD_OUT_slv0,
+      src_RDY => s_ppsOKCC_sRDY);
   s_ppsOKCC_dD_OUT <= s_ppsOKCC_dD_OUT_slv0(0);
 
   -----------------------------------------------------------------------------
   -- Time to Control clk domain: Count # of ppsIn, via their leading edge.
   -----------------------------------------------------------------------------
   s_rollingPPSIn_sD_IN <= s_ppsEdgeCount;
-  syncReg_rollingPPSIn : bsv_pkg.SyncRegister    
+  syncReg_rollingPPSIn : cdc.cdc.bits_feedback
     generic map (
-      width => 8,
-      init  => 0)
+      width => 8)
     port map (
-      sCLK   => timeCLK,
-      dCLK   => CLK,
-      sRST   => timeRST,
-      sD_IN  => s_rollingPPSIn_sD_IN,
-      sEN    => s_rollingPPSIn_sRDY,
-      dD_OUT => s_rollingPPSIn_dD_OUT,
-      sRDY   => s_rollingPPSIn_sRDY);
+      src_CLK => timeCLK,
+      dst_CLK => CLK,
+      src_RST => timeRST,
+      dst_rst => RST,
+      src_IN  => s_rollingPPSIn_sD_IN,
+      src_EN  => s_rollingPPSIn_sRDY,
+      dst_OUT => s_rollingPPSIn_dD_OUT,
+      src_RDY => s_rollingPPSIn_sRDY);
 
   -----------------------------------------------------------------------------
   -- Control to Time clk domain: Clock 's_timeIn' into the Time clk domain
@@ -525,21 +525,20 @@ begin
   s_setRefF_sD_IN <= (not s_gpsDisabled) & s_timeIn;
   s_setRefF_sENQ <= timeNow_written;
   s_setRefF_dDEQ <= s_setRefF_dEMPTY_N;
-  syncFifo_setRefF : bsv_pkg.SyncFIFO
+  syncFifo_setRefF : cdc.cdc.fifo
     generic map (
-      dataWidth => 65,
-      depth  => 2,
-      indxWidth => 1)
+      Width => 65,
+      depth  => 2)
     port map (
-      sCLK   => CLK,
-      dCLK   => timeCLK,
-      sRST   => RST_N,
-      sD_IN  => s_setRefF_sD_IN,
-      sENQ   => s_setRefF_sENQ,
-      dDEQ   => s_setRefF_dDEQ,
-      dD_OUT => s_setRefF_dD_OUT,
-      sFULL_N => open,
-      dEMPTY_N => s_setRefF_dEMPTY_N);
+      src_CLK     => CLK,
+      dst_CLK     => timeCLK,
+      src_RST     => RST,
+      src_IN      => s_setRefF_sD_IN,
+      src_ENQ     => s_setRefF_sENQ,
+      dst_DEQ     => s_setRefF_dDEQ,
+      dst_OUT     => s_setRefF_dD_OUT,
+      src_FULL_N  => open,
+      dst_EMPTY_N => s_setRefF_dEMPTY_N);
 
   -----------------------------------------------------------------------------
   -- Control clock domain: Update registers per host or other events
@@ -641,14 +640,14 @@ begin
       end if;
     end if;
   end process;
-  
+
   -----------------------------------------------------------------------------
   -- Seconds:
   -- refSecCount : # of Seconds output by the time service
   -- refPerCount : # of cycles from start of PPS pulse (External or Internal/free-running)
   -- ppsDrive    : Active while count is < 0.9 of a second (90% HI, 10% LO)
   -- gpsSecWrite : used for time_service.valid; delay timeNow_written and not
-  --               gpsDisabled to align with time_service.now update 
+  --               gpsDisabled to align with time_service.now update
   -----------------------------------------------------------------------------
   reg_Second : process(timeCLK)
   begin
@@ -717,10 +716,10 @@ begin
       end if;
     end if;
   end process;
-    
+
   -----------------------------------------------------------------------------
   -- Fractional Seconds with Phase-Locked Loop
-  -- 
+  --
   -- "Filter" of the PLL
   --
   -- With each PPS, proportionally correct the fractonal increment by the
@@ -775,8 +774,7 @@ begin
         s_jamFrac_EN  <= '0';
         s_jamFrac_Val <= (others => '0');
       else
-        
-        s1_fracSeconds <= s_fracSeconds;        
+        s1_fracSeconds <= s_fracSeconds;
         s_delSec <= s_fracSeconds(49 downto 48);
 
         -- "Phase Detector"
@@ -810,7 +808,7 @@ begin
 
         -- If PPS is not valid, (due to loss or PPS tracking is disabled)
         -- allow host to "Jam" a new fraction value into the circuit.
-        -- 
+        --
         -- NOTE:
         -- An application (ACI) may be required to force the HTS to stop tracking
         -- External PPS, to cause s_ppsOK=0, and then set the s_jamFrac_Val.
@@ -860,9 +858,7 @@ begin
         else
           s_ppsOK <= '0';
         end if;
-        
       end if;
     end if;
   end process;
-  
 end rtl;
