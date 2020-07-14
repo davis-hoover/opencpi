@@ -41,6 +41,24 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 up
   # udhcpc
   
+  # add or remove mount points based on your needs
+  mkdir -p /mnt/net
+  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net
+  # mkdir -p /mnt/ocpi_core
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
+  # mkdir -p /mnt/ocpi_assets
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets /mnt/ocpi_assets
+  # mkdir -p /mnt/ocpi_assets_ts
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets_ts /mnt/ocpi_assets_ts
+  # Below this line other projects can be included
+  # Here is a template of including a BSP project
+  # mkdir -p /mnt/bsp_<bsp_name>
+  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/bsp_<bsp_name> /mnt/bsp_<bsp_name>
+  
+  # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
+  # This may change for 64 bit zynqs
+  echo 0 > /sys/module/nfs/parameters/enable_ino64
+  # Mount the opencpi development system as an NFS server, onto /mnt/net
   # CUSTOMIZE THIS LINE FOR YOUR ENVIRONMENT
   # Second arg is shared file system mount point on development system
   # Third argument is opencpi dir relative to mount point

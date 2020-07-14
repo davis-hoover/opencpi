@@ -19,6 +19,10 @@
 # If there is a "mynetsetup.sh" script in this directory it will run it after the
 # other setup items, and arrange for it to be run in any login scripts later
 # e.g. ssh logins
+#
+# Set time using ntpd
+# If ntpd fails because it could not find ntp.conf fall back on time server
+# passed in as the first parameter
 
 if test -z  "$5"; then
   echo You must supply at least 5 arguments to this script.
@@ -34,25 +38,6 @@ else
      echo No IP address was detected! No network or no DHCP.
      break;
   fi
-  
-  mkdir -p /mnt/net
-  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net
-  # mkdir -p /mnt/ocpi_core
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
-  # mkdir -p /mnt/ocpi_assets
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets /mnt/ocpi_assets
-  # mkdir -p /mnt/ocpi_assets_ts
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/assets_ts /mnt/ocpi_assets_ts
-  # Below this line other projects can be included
-  # Here is a template of including a BSP project
-  # mkdir -p /mnt/bsp_<bsp_name>
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/bsp_<bsp_name> /mnt/bsp_<bsp_name>
-  
-  # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
-  # This may change for 64 bit zynqs
-  echo 0 > /sys/module/nfs/parameters/enable_ino64
-  # Mount the opencpi development system as an NFS server, onto /mnt/net
-  
   
   # Make sure the hostname is in the host table
   myipaddr=`ifconfig | grep -v 127.0.0.1 | sed -n '/inet addr:/s/^.*inet addr: *\([^ ]*\).*$/\1/p'`
@@ -78,8 +63,7 @@ else
     export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
     # As a default, access all built artifacts in the core project as well as
     # the bare-bones set of prebuilt runtime artifacts for this SW platform
-    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts
-    export OCPI_LIBRARY_PATH+=:$OCPI_CDK_DIR/\$OCPI_TOOL_PLATFORM/artifacts
+    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/artifacts:$OCPI_CDK_DIR/../projects/assets/artifacts
     # Priorities for finding system.xml:
     # 1. If is it on the local system it is considered customized for this system - use it.
     if test -r $OCPI_DIR/system.xml; then
