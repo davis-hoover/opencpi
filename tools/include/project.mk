@@ -26,7 +26,7 @@ endif
 $(OcpiIncludeProject)
 # FIXME: can we test for licensing?
 # FIXME: Error message makes no sense if give hdltargets but not platforms
-doimports=$(shell (set -vx; ls -l specs; $(OcpiExportVars) $(MAKE) imports NoExports=1) > /dev/tty)
+doimports=$(shell $(OcpiExportVars) $(MAKE) imports NoExports=1)
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
   ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter imports projectpackage,$(MAKECMDGOALS)),)
     $(infox $(doimports))
