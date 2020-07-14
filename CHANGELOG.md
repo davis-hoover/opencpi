@@ -1,3 +1,17 @@
+# [v1.7.0](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-rc.1...v1.7.0) (2020-07-09)
+
+Changes/additions since OpenCPI Release v1.7.0-rc.1
+
+[Consolidated changelog](https://gitlab.com/opencpi/opencpi/-/releases/v1.7.0)  
+Full [diff](https://gitlab.com/opencpi/opencpi/compare/v1.6.2...v1.7.0) between v1.6.2 and v1.7.0
+
+### Enhancements
+- **doc**: tex documents are more consistent in terms of layout. (!286)(98c0cafb)
+- **tools**: revamp export script modularity to support RPM installs. (!299)(f66e7180)
+
+### Bug Fixes
+- **hdl base**: fix fractional and integer second misalignment in time_server.hdl. (!296)(9b9dc17a)
+
 # [v1.7.0-rc.1](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-beta.1...v1.7.0-rc.1) (2020-06-25)
 
 Changes/additions since OpenCPI Release v1.7.0-beta.1
