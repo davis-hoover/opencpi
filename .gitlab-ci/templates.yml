@@ -336,9 +336,9 @@
     - touch "${CI_PROJECT_DIR}/.success"
 
 
-###############
-# Jobs - Test #
-###############
+#####################
+# Jobs - Build-Test #
+#####################
 .build-test-opencpi:
   stage: build-assemblies
   artifacts:
@@ -354,13 +354,6 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
-    # Run tests if no IP (means not running on hardware), or commit message contains deirective to run tests
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-base:
@@ -370,12 +363,6 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-comms:
@@ -385,12 +372,6 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/comms_comps --$MODEL-platform $PLATFORM
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-dsp:
@@ -400,12 +381,6 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL-platform $PLATFORM
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-misc:
@@ -415,12 +390,6 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-util:
@@ -430,12 +399,6 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/util_comps --$MODEL-platform $PLATFORM
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets_ts:
@@ -445,12 +408,6 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-inactive:
@@ -460,13 +417,92 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/inactive --$MODEL-platform $PLATFORM
-    - >
-      if [[ -z $IP ]]
-      || [[ "$HW_PLATFORM" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s($HW_PLATFORM)\s+test.*\].*/\1/g") ]]
-      || [[ "all" == $(echo $CI_COMMIT_MESSAGE | sed -E "s/.*\[\s*ci.*\s(all)\s+test.*\].*/\1/g") ]]; then
-        ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
-      fi
     - touch "${CI_PROJECT_DIR}/.success"
+
+
+###############
+# Jobs - Test #
+###############
+.test-opencpi:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - ./scripts/test-opencpi.sh --no-hdl
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-core:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-base:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-comms:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-dsp:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-misc:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-util:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets_ts:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-inactive:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
 
 #############
 # Platforms #
