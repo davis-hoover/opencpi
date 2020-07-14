@@ -26,7 +26,7 @@ endif
 $(OcpiIncludeProject)
 # FIXME: can we test for licensing?
 # FIXME: Error message makes no sense if give hdltargets but not platforms
-doimports=$(shell $(OcpiExportVars) $(MAKE) imports NoExports=1)
+doimports=$(shell (set -vx; ls -l specs; $(OcpiExportVars) $(MAKE) imports NoExports=1) > /dev/tty)
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
   ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter imports projectpackage,$(MAKECMDGOALS)),)
     $(infox $(doimports))
@@ -90,10 +90,10 @@ ifneq ($(wildcard specs),)
     # This can be accomplished by having imports depend on it.
     imports: specs/package-id
     # If Project.mk changes, recreate specs/package-id file unless the package-id file contents
-    # exactly match ProjectPackage.
+    # exactly match OCPI_PROJECT_PACKAGE.
     specs/package-id: Project.mk
-	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(ProjectPackage)" ]; then \
-	       echo "$(ProjectPackage)" > specs/package-id; \
+	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
+	      echo HIHI; echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
 	     fi
   endif
 endif
@@ -128,7 +128,7 @@ imports:
 	  if [ -n "$(OCPI_PROJECT_REGISTRY_DIR)" ]; then \
 	    if [ "$(realpath $(OCPI_PROJECT_REGISTRY_DIR))" != "$(realpath imports)" ]; then \
 	      echo "Warning: OCPI_PROJECT_REGISTRY_DIR is globally set to \"$(OCPI_PROJECT_REGISTRY_DIR)\"," >&2 ; \
-	      echo "         but the '$(ProjectPackage)' project located at '$$(pwd)' is using" >&2 ; \
+	      echo "         but the '$(OCPI_PROJECT_PACKAGE)' project located at '$$(pwd)' is using" >&2 ; \
 	      echo "         'imports -> $(realpath imports)'" >&2 ; \
 	      echo "         The project's 'imports' link will take precedence when within the project." >&2 ; \
 	    fi; \
@@ -269,7 +269,7 @@ cleaneverything: clean
 
 ifdef ShellProjectVars
 projectpackage:
-	$(info ProjectPackage="$(ProjectPackage)";)
+	$(info ProjectPackage="$(OCPI_PROJECT_PACKAGE)";)
 projectdeps:
 	$(info ProjectDependencies="$(ProjectDependencies)";)
 projectincludes:
