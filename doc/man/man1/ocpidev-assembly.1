@@ -1,0 +1,435 @@
+.\"     Title: ocpidev-assembly
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/14/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-ASSEMBLY" "1" "07/14/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-assembly \- manage an OpenCPI HDL assembly\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl assembly\fR \fI<name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBhdl assembly\fR noun represents an OpenCPI HDL assembly, which is a group of pre\-connected HDL workers built as an \fIartifact\fR \- a binary executable compiled from the workers \- intended for use as an FPGA\-based subset of an OpenCPI application\&.
+.sp
+An HDL assembly is described by an OpenCPI HDL Assembly Description (OHAD), which is an XML file that specifies the HDL workers that make up the HDL assembly and the connections between them\&. The OHAD defines the worker instances, any properties and parameter settings, connections between workers and external ports for any data flowing into or out of the assembly\&. For information about the OHAD\(cqs XML structure, see the section "The HDL Assembly XML File" in the \fIOpenCPI HDL Development Guide\fR
+.sp
+In a project, an HDL assembly resides in its own directory \fI<name>\fR under an \fBassemblies/\fR subdirectory in the project\(cqs \fBhdl/\fR directory\&. An HDL assembly directory contains the assembly\(cqs OHAD XML file (named \fI<name>\fR\fB\&.xml\fR) and its "make" file (named \fBMakefile\fR)\&. The \fBocpidev create\fR operation produces initial versions of these files that can then be edited as necessary\&.
+.sp
+When an HDL assembly is built, the result \- the executable artifact file (with the suffix \fB\&.bitz\fR or \fB\&.gz\fR) \- is placed in an \fBartifacts\fR directory at the top level of the project\&. The \fBocpidev build\fR operation also creates additional directories and files in the HDL assembly\(cqs directory, including a container artifact built for the target platform in a directory \fBcontainer\-\fR\fI<platform>\fR\&. The \fBocpidev clean\fR operation removes the files created by the \fBocpidev build\fR operation\&.
+.sp
+For information on how to develop an HDL assembly, see the chapter "HDL Assemblies for Creating Bitstreams/Executables" in the \fIOpenCPI HDL Development Guide\fR\&.
+.sp
+Verbs that can operate on an HDL assembly are:
+.PP
+\fBbuild\fR
+.RS 4
+Build the HDL assembly, creating directories and files as required\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Remove all the generated and compiled files for all assets in the HDL assembly\&.
+.RE
+.PP
+\fBcreate\fR
+.RS 4
+Create the named HDL assembly, creating files and directories as required\&.
+.RE
+.PP
+\fBdelete\fR
+.RS 4
+Remove all directories and files associated with the named HDL assembly\&.
+.RE
+.PP
+\fButilization\fR
+.RS 4
+Display information about FPGA resource use by the HDL assembly\&.
+.RE
+.sp
+Note that an asset\(cqs name is implied by the directory you\(cqre in when you issue the \fBocpidev\fR command\&. For HDL assemblies, this means that you can perform operations (verbs) on the HDL assembly without having to specify its name when you issue the \fBocpidev\fR command from inside the HDL assembly\(cqs directory\&.
+.sp
+The \fBocpidev\fR tool can also operate on a plural \fBhdl assemblies\fR noun\&. The syntax is:
+.sp
+\fBocpidev\fR [\fI<options>\fR] [\fBbuild|clean|utilization\fR] \fBhdl assemblies\fR
+.sp
+The verbs that can be performed on the \fBhdl assemblies\fR noun are:
+.PP
+\fBbuild\fR
+.RS 4
+Build all of the HDL assemblies in the project or the
+\fB/hdl\fR
+subdirectory of the project, creating directories and files as required\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Remove all the generated and compiled files in all HDL assemblies in the project or the
+\fB/hdl\fR
+subdirectory of the project\&.
+.RE
+.PP
+\fButilization\fR
+.RS 4
+Display FPGA resource usage information for all built HDL assemblies in the project\&. The general\-pupose options and the
+\fButilization\fR
+options can be specified\&.
+.RE
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.sp
+Keywords for platforms supported by OpenCPI that can be specified in the \fI<platform>\fR argument to an option can be found in the tables of supported platforms in the \fIOpenCPI User Guide\fR\&.
+.sp
+Keywords for architectures supported by OpenCPI that can be specified in the \fI<target>\fR argument to an option include \fBisim\fR, \fBmodelsim\fR, \fBxsim\fR, \fBstratix4\fR, \fBstratix5\fR, \fBvirtex5\fR, \fBvirtex6\fR, \fBzynq\fR, \fBzynq_is\fR, \fBspartan3adsp\fR\&.
+.SS "Options That Apply to All Operations (Verbs) on HDL Assemblies"
+.PP
+\fB\-d <directory>\fR
+.RS 4
+Specify the directory in which the command should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&.
+.RE
+.PP
+\fB\-v, \-\-verbose\fR
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Options When Creating HDL Assemblies"
+.PP
+\fB\-\-exclude\-platform=\fR\fI<platform>\fR, \fB\-Q\fR \fI<platform>\fR+
+.RS 4
+Do not build the HDL assembly for the specified HDL platform\&.
+.RE
+.PP
+\fB\-\-only\-platform=\fR\fI<platform>\fR, \fB\-G\fR \fI<platform>\fR+
+.RS 4
+Only build the HDL assembly for the specified HDL platform\&.
+.RE
+.PP
+\fB\-T\fR \fI<target>\fR+
+.RS 4
+Only build the HDL assembly for the specified HDL architecture\&.
+.RE
+.PP
+\fB\-Z\fR \fI<target>\fR+
+.RS 4
+Do not build the HDL assembly for the specified HDL architecture\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Keep files and directories created after an HDL assembly creation fails\&. Normally, all such files and directories are removed on any failure\&.
+.RE
+.SS "Options When Deleting HDL Assemblies"
+.PP
+\fB\-f\fR
+.RS 4
+Force deletion: do not ask for confirmation when deleting an HDL assembly\&. Normally, you are asked to confirm a deletion\&.
+.RE
+.SS "Options When Building HDL Assemblies"
+.PP
+\fB\-\-hdl\-target=\fR\fI<target>\fR+
+.RS 4
+Build the HDL assembly/ies for the specified HDL architecture\&. If only HDL targets are specified (and no HDL platforms), containers are not built\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<hdl\-platform>\fR+
+.RS 4
+Build the HDL assembly/ies for the specified HDL platform\&.
+.RE
+.SS "Options When Using Utilization on HDL Assemblies"
+.PP
+\fB\-\-format=\fR{\fBtable\fR|\fBlatex\fR}
+.RS 4
+Specify the format in which to output the FPGA resource usage information\&. Specifying
+\fBtable\fR
+sends the information to stdout in tabular format\&. Specifying
+\fBlatex\fR
+bypasses
+\fBstdout\fR
+and writes all output to
+\fButilization\&.inc\fR
+files in the directories for the assets on which it operates\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<platform>\fR+
+.RS 4
+Display information about FPGA resource use by the built HDL assemblies on the specified HDL platform\&.
+.RE
+.PP
+\fB\-\-hdl\-library=\fR\fI<library>\fR
+.RS 4
+Display information about FPGA resource use by the built HDL assemblies in the specified HDL primitive library\&.
+.RE
+.PP
+\fB\-\-library=\fR\fI<library>\fR, \fB\-l\fR \fI<library>\fR
+.RS 4
+Display information about FPGA resource use by the built HDL assemblies in the specified component library\&.
+.RE
+.PP
+\fB\-P\fR \fI<hdl\-platform>\fR
+.RS 4
+Display information about FPGA resource use by the built HDL assemblies on the specified HDL platform\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Inside the project (at the top level), create the HDL assembly
+\fBmyassy\fR\&. The directory
+\fBmyassy\fR
+is created in the
+\fBhdl/assemblies\fR
+directory (which is also created if it doesn\(cqt exist):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl assembly myassy
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Inside the project (at the top level), create the HDL assembly
+\fBmyassy\fR, specifying that it can only be built for the
+\fBzed\fR
+HDL platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl assembly myassy \-\-only\-platform=zed
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside the project (at the top level), create the HDL assembly
+\fBmyassy\fR, specifying that it can only be built for the
+\fBzynq\fR
+HDL chip architecture:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl assembly myassy \-T zynq
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Inside the project (from the top level or the
+\fBhdl/assemblies\fR
+directory), delete the HDL assembly
+\fBmyassy\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev delete hdl assembly myassy
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Inside the
+\fBmyassy\fR
+HDL assembly\(cqs directory, build the
+\fBmyassy\fR
+assembly for the
+\fBxsim\fR
+HDL platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build \-\-hdl\-platform=xsim
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 6.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  6." 4.2
+.\}
+Inside the project (from the top level or the
+\fBhdl/assemblies\fR
+directory), build all existing HDL assemblies:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build hdl assemblies
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 7.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  7." 4.2
+.\}
+Inside the
+\fBmyassy\fR
+HDL assembly\(cqs directory, built the
+\fBmyassy\fR
+assembly for the
+\fBzynq\fR
+HDL chip architecture:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build \-\-hdl\-target=zynq
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 8.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  8." 4.2
+.\}
+Inside the project (from the top level of the
+\fB/hdl/assemblies\fR
+directory) display information about FPGA resource use by the
+\fBmyassy\fR
+assembly:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization hdl assembly myassy
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 9.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  9." 4.2
+.\}
+Inside the project (from the top level of the
+\fB/hdl/assemblies\fR
+directory) display information about FPGA resource use by the assemblies in the project:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization hdl assemblies
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-application(1) ocpidev\-build(1) ocpidev\-create(1) ocpidev\-clean(1) ocpidev\-delete(1) ocpidev\-library(1) ocpidev\-project(1) ocpidev\-worker(1) ocpidev\-utilization(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.
