@@ -1,0 +1,17 @@
+README FILE FOR NOUN MAN PAGES STATUS 7/15/20
+---------------------------------------------
+application - reviewed once, updates since
+assembly - ready for review
+card - under construction, text is from protocol, not reviewable yet
+component - reviewed once, updates since
+device - under construction, text is from worker, not reviewable yet
+library - reviewed once, udpates since
+platform - ready for review, has embedded questions
+primitive - ready for review
+project - reviewed once, updates since
+protocol - ready for review
+registry - ready for review
+slot - under construction, text is from protocol, not reviewable yet
+subdevice - under construction, text is from worker, not reviewable yet
+test - ready for review
+worker - reviewed once, updates since
