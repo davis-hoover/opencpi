@@ -123,6 +123,8 @@ PKGS_E+=(${python3_ver}-numpy ${python3_ver}-numpy-f2py ${python3_ver}-pip)
 PKGS_E+=(ocl-icd)
 #    for bash completion - a noarch package  (AV-2398)
 PKGS_E+=(bash-completion=/etc/profile.d/bash_completion.sh)
+#    Needed to run ocpigr
+PKGS_E+=(yaml-cpp-devel)
 #    for python3 scipy build/install using "pip3"
 PKGS_E+=(openblas-serial openblas-threads)
 #    for scons install
