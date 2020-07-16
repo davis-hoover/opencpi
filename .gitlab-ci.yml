@@ -62,7 +62,7 @@ default:
   after_script:
     - |-
       if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
-        "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py upload . -t 'failed-job'"
+        "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py" upload . -t 'failed-job'
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
