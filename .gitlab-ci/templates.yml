@@ -4,6 +4,7 @@
 .install-packages:
   stage: prereq
   script:
+    - exit 1
     - yum -y distro-sync
     - ./scripts/install-packages.sh
     - touch "${CI_PROJECT_DIR}/.success"
@@ -13,6 +14,7 @@
     - .standard-artifacts
   stage: prereq
   script:
+    - exit 1
     - ./scripts/install-prerequisites.sh $PLATFORM
     - touch "${CI_PROJECT_DIR}/.success"
 
@@ -244,7 +246,7 @@
   after_script:
     - |-
       if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
-        "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
+        "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py upload . -t 'failed-job'"
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
@@ -727,7 +729,7 @@
     - ocpiremote unload -i $IP
     - |-
       if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
-        "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
+        "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py upload . -t 'failed-job'"
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
