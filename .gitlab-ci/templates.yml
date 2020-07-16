@@ -678,7 +678,6 @@
 
 .vivado:
   before_script:
-    - export HOME=$CI_PROJECT_DIR
     - .gitlab-ci/artifacts.py download
     - sleep 5
     - date "+%Y-%m-%d %H:%M:%S" > timestamp
