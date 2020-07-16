@@ -24,16 +24,15 @@ import tarfile
 import sys
 
 def main():
-    parser = make_parser()
-    args = parser.parse_args()
-
-
     PROJECT_DIR = os.getenv('CI_PROJECT_DIR')
 
     if not PROJECT_DIR:
-        sys.exit('Error: Script is intended to run from within CI pipeline.\n\tSet CI environment variables for testing.')
+        sys.exit('Error: Script is intended to run from within CI pipeline. Set CI environment variables for testing.')
     elif os.getcwd() != PROJECT_DIR:
         sys.exit('Error: Script in intended to run in CI_PROJECT_DIR.')
+
+    parser = make_parser()
+    args = parser.parse_args()
 
     if 'func' in args:
         args.func(args)
@@ -90,7 +89,8 @@ def upload(args):
                 tar.add(f, arcname=arcname)
 
     cmd = ['aws', 's3', 'cp', '{}.tar'.format(JOB_NAME), 
-        's3://opencpi-ci-artifacts/{}'.format(s3_object)]
+        's3://opencpi-ci-artifacts/{}'.format(s3_object),
+        '--no-progress']
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
     print(process.stdout.read())
 
@@ -104,13 +104,14 @@ def download(args):
     os.chdir('..')
     PIPELINE_ID = os.getenv('CI_PIPELINE_ID')
     s3_object = '/'.join([PIPELINE_ID, args.artifact])
-    temp = os.path.join('.', 'temp', '.')
+    temp = os.path.join('.', 'temp', '')
 
     if s3_object == PIPELINE_ID + '/':
         args.recursive = True
 
     cmd = ['aws', 's3', 'cp', 
-        's3://opencpi-ci-artifacts/{}'.format(s3_object), temp]
+        's3://opencpi-ci-artifacts/{}'.format(s3_object), temp,
+        '--no-progress']
 
     if args.recursive:
         cmd.append('--recursive')
@@ -138,7 +139,7 @@ def download(args):
             os.remove(filepath)
         dirs.insert(0, dirpath)
 
-    for directory in dirs:
+    for directory in set(dirs):
         os.rmdir(directory)
 
 

@@ -3,8 +3,8 @@
 #################
 .install-packages:
   stage: prereq
+  before_scripts: []
   script:
-    - exit 1
     - yum -y distro-sync
     - ./scripts/install-packages.sh
     - touch "${CI_PROJECT_DIR}/.success"
@@ -13,8 +13,8 @@
   extends:
     - .standard-artifacts
   stage: prereq
+  before_script: []
   script:
-    - exit 1
     - ./scripts/install-prerequisites.sh $PLATFORM
     - touch "${CI_PROJECT_DIR}/.success"
 
@@ -242,25 +242,9 @@
 ##########################
 # Jobs - Build-Platforms #
 ##########################
-.build-platforms:
-  after_script:
-    - |-
-      if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
-        "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py" upload . -t 'failed-job'
-        exit 1
-      fi
-    - rm -f "${CI_PROJECT_DIR}/.success"
-    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
-    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts-build-workers-*.tar; do tar --concatenate -f artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar $f; done;
-    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f"; fi; done
-
 .build-platforms-core:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -270,7 +254,6 @@
 .build-platforms-platform:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -280,7 +263,6 @@
 .build-platforms-assets:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -290,7 +272,6 @@
 .build-platforms-inactive:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -683,11 +664,8 @@
 # Misc #
 ########
 .standard-artifacts:
-  artifacts:
-    when: on_success
-    expire_in: '3d'
-    paths:
-      - artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+  artifacts: 
+    paths: []
 
 .rules-default:
   rules:
@@ -696,10 +674,10 @@
 .vivado:
   before_script:
     - export HOME=$CI_PROJECT_DIR
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f"; fi; done
+    - ./gitlab-ci/artifacts.py download
     - sleep 5
-    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
-    - cat timestamp.txt
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp
+    - cat timestamp
     - ls -lh
 
 .docker:
@@ -709,10 +687,10 @@
 
 .ocpiremote:
   before_script:
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f";  fi ; done
+    - ./gitlab-ci/artifacts.py download
     - sleep 5
-    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
-    - cat timestamp.txt
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp
+    - cat timestamp
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
     - ./scripts/deploy-opencpi.sh $HW_PLATFORM $SW_PLATFORM
@@ -733,6 +711,4 @@
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
-    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_ID.txt
-    - tar -T artifacts-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_ID.tar
-    - ls -lh artifacts-$CI_JOB_ID.tar
+    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s $(< timestamp)
