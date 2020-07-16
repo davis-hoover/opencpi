@@ -55,8 +55,8 @@ default:
   before_script:
     - .gitlab-ci/artifacts.py download
     - sleep 2
-    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
-    - cat timestamp.txt
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp
+    - cat timestamp
     - sleep 2
     - ls -lh
   after_script:
