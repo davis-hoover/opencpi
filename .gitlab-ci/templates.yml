@@ -3,7 +3,7 @@
 #################
 .install-packages:
   stage: prereq
-  before_scripts: []
+  before_script: []
   script:
     - yum -y distro-sync
     - ./scripts/install-packages.sh
