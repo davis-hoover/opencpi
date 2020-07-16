@@ -3,10 +3,9 @@
 #################
 prereq:centos7:xilinx13_3:
   extends:
-    - .install-prereqs
     - .centos7
     - .xilinx13_3
-
+    - .install-prereqs
 
 ################
 # Jobs - Build #

@@ -53,7 +53,7 @@ include:
 # these from occurring.
 default:
   before_script:
-    - ./gitlab-ci/artifacts.py download
+    - .gitlab-ci/artifacts.py download
     - sleep 2
     - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
     - cat timestamp.txt
