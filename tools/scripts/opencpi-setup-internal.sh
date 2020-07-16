@@ -293,7 +293,7 @@ ocpi_cleaned=$(echo "$PATH" | sed "s=$OCPI_CDK_DIR/[^:/]*/bin[^:]*:==g")
 export PATH="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin:$ocpi_cleaned"
 ocpi_cleaned=$(echo "$PYTHONPATH" | sed "s=$OCPI_CDK_DIR/[^:/]*/lib[^:]*:*==g")
 [ -n "$ocpi_verbose" -a "$PYTHONPATH" != "$ocpi_cleaned" ] && echo Removing OpenCPI lib directory from PYTHONPATH >&2
-export PYTHONPATH="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib${ocpi_cleaned:+:}$ocpi_cleaned"
+export PYTHONPATH="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/lib${ocpi_cleaned:+:}$ocpi_cleaned:"
 ocpi_cleaned=$(echo "$MANPATH" | sed "s=$OCPI_CDK_DIR/doc/man[^:]*:*==g")
 [ -n "$ocpi_verbose" -a "$MANPATH" != "$ocpi_cleaned" ] && echo Removing OpenCPI doc/man directory from MANPATH >&2
 export MANPATH="$OCPI_CDK_DIR/doc/man${ocpi_cleaned:+:}$ocpi_cleaned:"
