@@ -82,6 +82,8 @@ PKGS_D+=(libSM libXi libXrandr)
 #    for the new "xilinx19_2_aarch*" platforms
 PKGS_D+=(openssl-devel)
 
+
+
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
 # While some manual installations require git manually installed before this,
@@ -125,6 +127,8 @@ PKGS_E+=(${python3_ver}-scons)
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
+#    Needed to run ocpigr
+PKGS_E+=(yaml-cpp-devel)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available
