@@ -711,4 +711,4 @@
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
-    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s $(< timestamp)
+    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s "$(< timestamp)"
