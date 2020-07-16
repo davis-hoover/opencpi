@@ -22,7 +22,7 @@
 -- This file initially contains the architecture skeleton for worker: time_gen
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi, util; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
+library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 architecture rtl of time_gen_worker is
   signal out_count : ushort_t;
 begin

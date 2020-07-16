@@ -20,7 +20,7 @@
 -- BASED ON THE FILE: i2c_em.xml
 -- YOU *ARE* EXPECTED TO EDIT IT
 -- This file initially contains the architecture skeleton for worker: i2c_em
-library ieee, ocpi, util;
+library ieee, ocpi, platform; use platform.all;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all;
 architecture rtl of i2c_em_worker is
 
@@ -41,7 +41,7 @@ architecture rtl of i2c_em_worker is
 begin
   scl <= 'H';
   
-  i2c_sda_ts: util.util.TSINOUT_1
+  i2c_sda_ts: platform_pkg.TSINOUT_1
     port map(
       I => sda_o,
       IO => sda,
@@ -49,7 +49,7 @@ begin
       OE => sda_oe
       );
 
-  i2c_scl_ts: util.util.TSINOUT_1
+  i2c_scl_ts: platform_pkg.TSINOUT_1
     port map(
       I => scl_o,
       IO => scl,

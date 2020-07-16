@@ -32,9 +32,8 @@
 -- All potential input ports are present here,
 -- and widths of unneeded fields are 1
 -- We assume MDataValid/MDataLast.
-library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi; use ocpi.all; use ocpi.types.all; use ocpi.wsi.all; use ocpi.util.all;
-
+library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library ocpi; use ocpi.all, ocpi.types.all, ocpi.util.all;
 entity slave is
   generic (precise          : boolean; -- are we precise-only?
            mdata_width      : natural; -- width of ocp mdata path
@@ -90,9 +89,6 @@ entity slave is
     );
 end entity;
 
-library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi; use ocpi.all; use ocpi.types.all; use ocpi.wsi.all; use ocpi.util.all;
-library bsv; use bsv.bsv.all;
 architecture rtl of slave is
   signal reset_i         : Bool_t; -- internal version of output to worker
   -- FIXME: a opcode field is per message, could be optimized

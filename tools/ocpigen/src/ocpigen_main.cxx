@@ -208,7 +208,8 @@ main(int argc, const char **argv) {
 	setDep(*++ap);
 	break;
       case 'B':
-	err = addLibrary(ap[0][2] ? &ap[0][2] : *++ap);
+        assert("Unexpected -B flag"==NULL);
+	//	err = addLibrary(ap[0][2] ? &ap[0][2] : *++ap);
 	break;
       case 'I':
 	if (ap[0][2])
@@ -223,8 +224,9 @@ main(int argc, const char **argv) {
 	assembly = *++ap;
 	break;
       case 'L':
-	if ((err = addLibMap(ap[0][2] ? &ap[0][2] : *++ap)))
-	  err = OU::esprintf("Error processing -L (library map) option: %s", err);
+        assert("Unexpected -L flag"==NULL);
+	//	if ((err = addLibMap(ap[0][2] ? &ap[0][2] : *++ap)))
+	//	  err = OU::esprintf("Error processing -L (library map) option: %s", err);
 	break;
       case 'e':
 	g_device = *++ap;
@@ -307,6 +309,10 @@ main(int argc, const char **argv) {
             break;
           return 0;
         }
+	// The parent file being empty is for code generation, and thus library dependency parsing
+	// This suppresses that for these two modes that are not doing code generation
+	if (options.parameters() || options.build())
+	  parent = "Makefile";
         Worker *w = Worker::create(*ap, parent, package, outDir, NULL, NULL,
                                    doGenerics >= 0 ? (unsigned)doGenerics : 0, err);
 

@@ -1,4 +1,4 @@
-<HdlDevice Language="vhdl" Libraries="platform" SourceFiles="time_service.vhd">
+<HdlDevice Language="vhdl" Libraries="platform util" SourceFiles="time_service.vhd">
   <ComponentSpec/>
   <!-- These five properties must be first due to limitations of OCPI::HDL::LSim::Device::sdpRequest() -->
   <Property Name="time_now" Type="ulonglong" Writable="true" Volatile="true"

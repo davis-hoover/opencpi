@@ -110,6 +110,9 @@ OcpPort(const OcpPort &other, Worker &w , std::string &name, size_t a_count, con
   m_byteWidth = other.m_byteWidth;
   m_continuous = other.m_continuous;
   ocp = other.ocp;
+  // It is unclear why we cannot simply rederive OCP here, but...
+  if (!m_myClock)
+    ocp.Clk.value = NULL;
 }
 
 void OcpPort::

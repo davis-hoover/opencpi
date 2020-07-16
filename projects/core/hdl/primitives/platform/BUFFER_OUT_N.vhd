@@ -20,7 +20,7 @@
 -- single ended and differential iostandards
 library IEEE;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library util; use util.types.all;
+use work.platform_pkg.all;
 entity BUFFER_OUT_N is
   generic (width        :   natural;
            IOSTANDARD   :   iostandard_t := UNSPECIFIED;

@@ -80,28 +80,33 @@ HdlOtherLanguage:=verilog
 endif
 $(call OcpiDbgVar,HdlSourceSuffix)
 
-# Add any inbound (internally via command line) libraries to what is specified in the makefile
-# This list is NOT target dependent
-HdlMyLibraries:=$(strip $(HdlLibraries) $(Libraries) $(HdlLibrariesInternal))
-$(infox HLU:$(HdlMyLibraries):$(HdlLibrariesInternal):$(HdlMode):$(HdlLibraries):$(Libraries))
-
-################################################################################
-# Add the default libraries
-# FIXME: when tools don't really elaborate or search, capture the needed libraries for later
-# FIXME: but that still means a flat library space...
-# Note this is evaluted in a context when HdlTarget is set, but can also just supply it as $1
-override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlLibraries):$(MAKECMDGOALS))\
+# This is redundant with what is in worker.mk, when that file is included, but sometimes it isn't
+override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlExplicitLibraries))
+####################################################################################################
+# Construct (deferred) the list of all HDL primitive libraries needed for this asset.
+# This includes searching for explicitly requested libraries (what the source code needs),
+# and built-in/default libraries that are always needed. Note this is evaluated deferred in a
+# context when HdlTarget is set, but can also just supply it as $1.  The returned list is of the
+# form <path>:<lib>, where if the library is in the global namespace <lib> is the same as basename
+# <path>, but when the library is in the qualified namespace it is qualified
+override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlExplicitLibraries):$(MAKECMDGOALS):$(CURDIR))\
 $(if $(findstring clean,$(MAKECMDGOALS)),,\
 $(foreach l,$(call Unique,\
-               $(HdlPrimitiveLibraries) \
-               $(if $(HdlNoLibraries),,\
-	          $(foreach f,$(call HdlGetFamily,$(or $(HdlTarget),$1)),\
-		    $(foreach v,$(call HdlGetTop,$f),$(infox VVV:$v)\
-	              $(if $(filter library,$(HdlMode)),,\
-			$(foreach p,$(foreach x,$(filter-out $(LibName),fixed_float ocpi util bsv cdc protocol),$(infox XXX:$x)$(call HdlSearchPrimitivePath,$x,,HLI)),$(infox PPP:$p)\
-			  $(if $(wildcard $(call HdlLibraryRefDir,$p,$f,,HLI)),$p,\
-			    $(error Primitive library "$p" non-existent or not built for $f [$(call HdlLibraryRefDir,$p,$f,x,HLI2)])))))))),\
-    $(infox HLI:returning $l)$l))
+              $(- first process explicitly supplied libraries)\
+              $(foreach p,$(HdlExplicitLibraries),\
+                $(if $(findstring /,$p),\
+                  $(info Warning:  HDL primitive libraries specified with pathnames is deprecated:$p)\
+                  $(or $(and $(call HdlExists,$p),$p:$(notdir $p)),\
+                       $(error Primitive library $p (from HdlLibraries or Libraries) not found.)),\
+                  $(call HdlSearchPrimitivePath,$p,,HPLHLI)))\
+              $(- second, unless suppressed, add the libraries that are automatically included all the time)\
+              $(if $(HdlNoLibraries),,\
+	        $(if $(filter library core,$(HdlMode)),,\
+                  $(foreach f,$(call HdlGetFamily,$(or $(HdlTarget),$1)),\
+                    $(foreach v,$(call HdlGetTop,$f),$(infox VVV:$v)\
+	              $(foreach x,$(filter-out $(LibName),fixed_float ocpi ocpi.core.bsv cdc),\
+                        $(call HdlSearchPrimitivePath,$x,,HLI))))))),\
+  $(infox HLI:returning $l)$l))
 
 # For use by some tools
 define HdlSimNoLibraries
@@ -269,7 +274,7 @@ ifneq ($(MAKECMDGOALS),clean)
   ifdef HdlPreExcludeTargets
     $(info Not building $(HdlMode) for these filtered (only/excluded) HDL targets: $(HdlPreExcludeTargets))
   else
-    $(info No HDL targets to build for.  Perhaps you want to set OCPI_HDL_PLATFORM for a default?)
+    $(infox No HDL targets to build for.  Perhaps you want to set OCPI_HDL_PLATFORM for a default?)
   endif
 endif
 HdlSkip:=1
