@@ -23,6 +23,7 @@
 # virtex6 => xc6vlx240t (ml605 development board)
 # alst4 => ep4sgx230k (Stratix4 development board)
 ExcludeTargets=altera modelsim
+Libraries=platform
 HdlExactPart=\
 	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
 	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484), \

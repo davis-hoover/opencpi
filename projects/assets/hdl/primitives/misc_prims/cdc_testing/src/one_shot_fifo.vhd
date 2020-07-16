@@ -18,7 +18,7 @@
 
 library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; use ieee.math_real.all; use ieee.std_logic_misc.all;
 library ocpi; use ocpi.types.all,  ocpi.util.all;
-library bsv;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 
 entity one_shot_fifo is
     generic (data_width : natural := 1;
@@ -54,7 +54,7 @@ begin
   s_deq <= s_not_empty and rdy when (s_counter < num_output_samples) else '0';
   s_not_rst <= not rst;
 
-  SizedFIFO : bsv.bsv.SizedFIFO
+  SizedFIFO : bsv_pkg.SizedFIFO
   generic map(p1Width      => data_width,
               p2depth      => fifo_depth,
               p3cntr_width => width_for_max(fifo_depth-1))

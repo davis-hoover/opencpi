@@ -78,10 +78,12 @@ extern const char *endians[];
 #define HDL_ASSEMBLY_ATTRS "platform", "config", "configuration"
 #define HDL_ASSEMBLY_ELEMS "connection"
 class HdlAssembly : public Worker {
-public:  
+public:
   static HdlAssembly *
-    create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err);
-  HdlAssembly(ezxml_t xml, const char *xfile, Worker *parent, const char *&err);
+    create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent,
+	   const char *&err);
+  HdlAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent,
+	      const char *&err);
   virtual ~HdlAssembly();
 };
 

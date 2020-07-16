@@ -52,6 +52,7 @@ ifndef HdlInstallDir
 endif
 MyMake=$(MAKE) $(and $(HdlTargets),HdlTargets="$(HdlTargets)") --no-print-directory -C $1 \
   OCPI_CDK_DIR=$(call AdjustRelative,$(OCPI_CDK_DIR)) \
+  OCPI_PROJECT_REL_DIR=$(call AdjustRelative,$(OCPI_PROJECT_REL_DIR)) \
   HdlInstallDir=$(call AdjustRelative,$(HdlInstallDir)) \
 
 ifdef ImportCoreDirs
@@ -66,7 +67,9 @@ ifdef PrimitiveLibraries
 Libs:=$(PrimitiveLibraries)
 endif
 # If not cleaning and no platforms, don't bother
-ifeq ($(HdlPlatform)$(HdlPlatforms)$(HdlTarget)$(HdlTargets)$(filter-out clean%,$(MAKECMDGOALS)),)
+# Note we disable this check here since building with no platforms actually has beneficial side-effects
+# for error checking workers etc.
+ifeq (xxx$(HdlPlatform)$(HdlPlatforms)$(HdlTarget)$(HdlTargets)$(filter-out clean%,$(MAKECMDGOALS)),)
 all:
 	$(AT)echo No HDL platforms specified.  Skipping building of hdl primitives.
 else

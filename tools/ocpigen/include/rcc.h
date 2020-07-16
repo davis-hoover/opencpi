@@ -41,8 +41,8 @@ public:
 class RccAssembly : public Worker {
 public:
   static RccAssembly *
-  create(ezxml_t xml, const char *xfile, const char *&err);
-  RccAssembly(ezxml_t xml, const char *xfile, const char *&err);
+    create(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err);
+  RccAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err);
   virtual ~RccAssembly();
 };
 

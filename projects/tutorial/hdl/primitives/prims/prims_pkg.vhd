@@ -17,7 +17,7 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 -- This package enables VHDL code to instantiate all entities and modules in this library
-library ieee; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
+library ieee; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 package prims is
 
   component agc

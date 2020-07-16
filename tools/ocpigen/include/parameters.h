@@ -113,6 +113,7 @@ struct Build {
   OrderedStringSet    m_onlyPlatforms, m_excludePlatforms;
   OrderedStringSet    m_onlyTargets, m_excludeTargets;
   OrderedStringSet    m_sourceFiles;    // absolute or relative to the worker dir ORDERED
+  OrderedStringSet    m_checkedLibraries; // primitive libraries, with path and hdl-library name colon separated
   OrderedStringSet    m_libraries;      // primitive libraries, slashes imply no search
   OrderedStringSet    m_xmlIncludeDirs; // include paths for XML files
   OrderedStringSet    m_includeDirs;    // include paths for source files

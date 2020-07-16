@@ -79,9 +79,8 @@ IsimCoreLibraryChoices=$(strip \
   $(foreach c,$(call HdlRmRv,$1),$(call HdlCoreRef,$c,isim)))
 
 IsimLibs=\
-    $(foreach l,\
-      $(HdlLibrariesInternal),\
-      -lib $(notdir $l)=$(strip \
+    $(foreach l,$(call HdlCollectLibraries,isim),\
+      -lib $(word 2,$(subst :, ,$l))=$(strip \
             $(call FindRelative,$(TargetDir),$(call HdlLibraryRefDir,$l,isim,,isim)))) \
     $(foreach c,$(call HdlCollectCorePaths),$(infox CCC:$c)\
       -lib $(call HdlRmRv,$(notdir $(c)))=$(infox fc:$c)$(call FindRelative,$(TargetDir),$(strip \

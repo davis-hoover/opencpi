@@ -20,7 +20,6 @@
 library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all, std.textio.all;
 library ocpi; use ocpi.all, ocpi.types.all;
 library platform; use platform.platform_pkg.all, platform.metadata_defs.all;
-library bsv;
 library util;
 entity metadata_rv is
   generic(romwords : natural := 2048);
