@@ -8,12 +8,17 @@
     - yum -y distro-sync
     - ./scripts/install-packages.sh
     - touch "${CI_PROJECT_DIR}/.success"
+  after_script: []
 
 .install-prereqs:
   extends:
     - .standard-artifacts
   stage: prereq
-  before_script: []
+  before_script:
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp
+    - cat timestamp
+    - sleep 2
+    - ls -lh
   script:
     - ./scripts/install-prerequisites.sh $PLATFORM
     - touch "${CI_PROJECT_DIR}/.success"
