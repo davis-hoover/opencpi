@@ -561,6 +561,7 @@
     - if: '$CI_HDL_PLATFORM =~ /(^| )(isim|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
 
 .xilinx13_3:
+  extends:
     - .rules-default
   variables:
     PLATFORM: 'xilinx13_3'
