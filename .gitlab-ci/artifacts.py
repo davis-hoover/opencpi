@@ -22,6 +22,7 @@ from argparse import ArgumentParser
 import os
 import tarfile
 import sys
+from shutil import rmtree
 
 def main():
     PROJECT_DIR = os.getenv('CI_PROJECT_DIR')
@@ -136,11 +137,9 @@ def download(args):
             if out:
                 print(out)
 
-            os.remove(filepath)
         dirs.insert(0, dirpath)
 
-    for directory in set(dirs):
-        os.rmdir(directory)
+    rmtree(temp)
 
 
 def tag(args, s3_object):
