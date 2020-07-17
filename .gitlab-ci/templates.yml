@@ -504,7 +504,6 @@
     - centos7
     - shell
   variables:
-    HOST_PLATFORM: 'centos7'
     PLATFORM: 'centos7'
     IMAGE: 'centos:7'
 

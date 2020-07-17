@@ -103,6 +103,7 @@ def upload(args, env):
     cmd = ['aws', 's3', 'cp', 'tar', 
         's3://opencpi-ci-artifacts/{}'.format(s3_object),
         '--no-progress']
+    print(' '.join(cmd))
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
     print(process.stdout.read())
 
