@@ -26,6 +26,7 @@ ExcludeTargets=altera modelsim
 HdlExactPart=\
 	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
 	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484), \
+        $(and $(filter zynq_ultra,$(HdlTarget)),xczu7ev-2-ffvc1156e), \
 	$(and $(filter virtex6,$(HdlTarget)),xc6vlx240t-1-ff1156), \
 	$(and $(filter stratix4,$(HdlTarget)),ep4sgx230k-c2-f40))
 Libraries=platform
