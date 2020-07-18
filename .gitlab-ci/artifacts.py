@@ -10,6 +10,12 @@ from argparse import ArgumentParser
 
 
 def main():
+    """Gets user arguments, CI environment variables, and calls appropriate function.
+
+    Calls make_parser() to get parser and parses user args.
+    Calls get_env() to get CI environment variables. 
+    Calls function specified by user argument, passing user args and CI env vars.
+    """
     parser = make_parser()
     args = parser.parse_args()
     env = get_env(args)
@@ -21,6 +27,16 @@ def main():
 
 
 def get_env(args):
+    """ Creates an Env NamedTuple.
+
+    Creates an Env NamedTuple with members set to CI environment variables.
+
+    Args:
+        args: User command line arguments
+
+    Returns:
+        Env NamedTuple 
+    """
     Env = namedtuple('Env', 'project_dir, pipeline, stage, job')
 
     try:
@@ -47,39 +63,61 @@ def get_env(args):
 
 
 def make_parser():
+    """ Creates an argparse ArgumentParser.
+
+    Returns:
+        argparse ArgumentParser
+    """
     # Create parser
     parser = ArgumentParser()
     subparsers = parser.add_subparsers()
 
-    # Download subparser
-    subparser = subparsers.add_parser(name='download', 
+    # Create download subparser
+    subparser = subparsers.add_parser(
+        name='download', 
         help='download artifacts from aws. ' \
              'Default: all pipeline artifacts not in current stage and not failed')
-    subparser.add_argument('-e', '--exclude', 
+    subparser.add_argument(
+        '-e', '--exclude', 
         help='artifacts to exclude from download. Can take any number of arguments', 
         nargs='+', metavar='')
-    subparser.add_argument('-i', '--include', 
+    subparser.add_argument(
+        '-i', '--include', 
         help='artifacts to include in download. Can take any number of arguments', 
         nargs='+', metavar='')
     subparser.set_defaults(func=download)
 
-
-    # Upload subparser
-    subparser = subparsers.add_parser(name='upload', 
+    # Create upload subparser
+    subparser = subparsers.add_parser(
+        name='upload', 
         help='upload artifacts to aws')
     subparser.add_argument('artifact', 
         help='directory or file to upload to aws. Default: cwd',
         nargs='?', default='.')
-    subparser.add_argument('-s', '--timestamp', 
-        help='upload artifacts in directory updated/created since timestamp', metavar='')
-    subparser.add_argument('-t', '--tag', 
-        help='tag to give the artifact', metavar='')
+    subparser.add_argument(
+        '-s', '--timestamp', 
+        help='upload artifacts in directory updated/created since timestamp', 
+        metavar='')
+    subparser.add_argument(
+        '-t', '--tag', 
+        help='tag to give the artifact', 
+        metavar='')
     subparser.set_defaults(func=upload)
+
 
     return parser
 
 
 def upload(args, env):
+    """ Uploads artifacts to aws.
+
+    Tars artifacts and constructs and executes command to upload artifacts to aws.
+    Calls tag() if a tag is passed as user argument.
+
+    Args:
+        args: User command line arguments
+        env:  CI envinronment variables
+    """
     # Set s3 object
     # Will appear on aws as:
     # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID/CI_JOB_STAGE[-failed]/CI_JOB_NAME'
@@ -116,6 +154,15 @@ def upload(args, env):
 
 
 def download(args, env):
+    """ Downloads artifacts from aws.
+
+    Constructs and executes command to download tar artifacts from aws into temp folder
+    and extracts the files from the tar artifacts.
+
+    Args:
+        args: User command line arguments
+        env:  CI envinronment variables
+    """
     # temp dir to download artifact into
     temp_dir = os.path.join('.', 'temp', '')
 
@@ -123,6 +170,7 @@ def download(args, env):
     cmd = ['aws', 's3', 'cp', 
         's3://opencpi-ci-artifacts/{}'.format(env.pipeline), temp_dir,
         '--no-progress', '--recursive']
+
     if args.exclude:
         for exclude in args.exclude:
             cmd += ['--exclude', exclude]
@@ -131,9 +179,11 @@ def download(args, env):
         cmd += ['--exclude', '*']
         for include in args.include:
             cmd += ['--include', include]
+
     # Do not download artifacts from same stage
     # Necessary in case a job is restarted
     cmd += ['--exclude', '/'.join([env.stage, '*'])]
+
     # Do not download failed jobs
     cmd += ['--exclude', '/'.join(['*-failed', '*'])]
     print(' '.join(cmd))
@@ -158,6 +208,15 @@ def download(args, env):
 
 
 def tag(args, s3_object):
+    """ Tags artifacts on aws.
+
+    Constructs and executes command to tag artifacts on aws.
+    Constructs and executes command to get artifact expiration date based on applied tag.
+
+    Args:
+        args:       User command line arguments
+        s3_object:  The aws s3 object to tag
+    """
     # Create command to tag artifact
     cmd = ['aws', 's3api', 'put-object-tagging', '--bucket', 
         "opencpi-ci-artifacts", '--key', s3_object, 

@@ -672,7 +672,7 @@
 
 .ocpiremote:
   before_script:
-    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}*" "*${HOST_PLATFORM}.tar"
+    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar" "*centos7.tar"
     - sleep 5
     - date "+%Y-%m-%d %H:%M:%S" > timestamp
     - cat timestamp
