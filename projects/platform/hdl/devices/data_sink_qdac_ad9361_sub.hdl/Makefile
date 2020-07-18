@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-OnlyTargets=zynq zynq_ise isim xsim # cause of BUFR primitive
+OnlyTargets=zynq zynq_ise zynq_ultra isim xsim # cause of BUFR primitive
 
 SourceFiles+= \
 	clock_selector_with_async_select.vhd \
