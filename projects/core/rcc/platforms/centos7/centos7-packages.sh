@@ -127,7 +127,7 @@ PKGS_E+=(${python3_ver}-scons)
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
-#    Needed to run ocpigr
+#    Needed to build/run ocpigr
 PKGS_E+=(yaml-cpp-devel)
 
 ##########################################################################################
