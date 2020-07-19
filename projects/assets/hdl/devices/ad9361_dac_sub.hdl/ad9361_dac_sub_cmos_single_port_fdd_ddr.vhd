@@ -17,7 +17,7 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library bsv; use bsv.bsv.all; -- SyncBit
+library ocpi_core_bsv; use ocpi_core_bsv.all; -- SyncBit
 entity ad9361_dac_sub_cmos_single_port_fdd_ddr is
   generic(data_bus_bits_are_reversed : in boolean);
   port (-- wci (control plane) clock domain
@@ -71,7 +71,7 @@ begin
   -- domain), note that we don't care if WSI clock is much faster and bits are
   -- dropped - wsi_use_two_r_two_t_timing is a configuration bit which is
   -- expected to change very rarely in relation to either clock
-  second_chan_enable_sync : bsv.bsv.SyncBit
+  second_chan_enable_sync : bsv_pkg.SyncBit
     generic map(
       init   => 0)
     port map(

@@ -162,7 +162,7 @@ ifneq ($(MAKECMDGOALS),clean)
 
         $(call HdlContBitZ,$1): | $(call HdlContBitZName,$1)
 	    $(AT)ln -s $(notdir $(call HdlContBitZName,$1)) $$@
-	    $(AT)$(OCPI_CDK_DIR)/scripts/maybeExport.sh - $$@
+	    $(AT)$(OCPI_CDK_DIR)/scripts/export-file.sh - $$@
 
         all: $(call HdlContBitZName,$1) $(call HdlContBitZ,$1)
 

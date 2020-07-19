@@ -50,7 +50,7 @@ ifeq ($(filter imports projectpackage,$(MAKECMDGOALS)),)
 endif
 
 ifeq ($(NoExports)$(wildcard exports)$(filter projectpackage,$(MAKECMDGOALS)),)
-  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/makeProjectExports.sh - $(OCPI_PROJECT_PACKAGE) xxx)
+  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh - $(OCPI_PROJECT_PACKAGE) xxx)
   ifeq ($(filter clean%,$(MAKECMDGOALS)),)
     $(info Setting up exports)
     $(infox $(doexports))
@@ -147,7 +147,7 @@ imports:
 	fi
 
 exports:
-	$(OCPI_CDK_DIR)/scripts/makeProjectExports.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
+	$(OCPI_CDK_DIR)/scripts/export-project.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
 
 components: hdlprimitives
 	$(MAKE) imports
@@ -245,7 +245,7 @@ cleanapplications:
 # needs to be accessible via imports for projects other than core
 # (e.g. for cleaning rcc)
 clean: cleancomponents cleanapplications cleanrcc cleanhdl cleanexports cleanimports
-	rm -r -f artifacts
+	rm -r -f artifacts project.xml
 
 # Iterate through symlinks in imports. If the link points to the project registry dir,
 # it is the CDK, or is a broken link, it can be cleaned/removed. If the imports directory

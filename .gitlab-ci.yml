@@ -30,18 +30,7 @@ stages:
 include:
   # .gitlab-ci
   - /.gitlab-ci/templates.yml
-  - /.gitlab-ci/centos6.yml
   - /.gitlab-ci/centos7.yml
-
-  # centos6
-  - /.gitlab-ci/centos6/xsim.yml
-  - /.gitlab-ci/centos6/isim.yml
-  - /.gitlab-ci/centos6/zed.yml
-  - /.gitlab-ci/centos6/xilinx13_3.yml
-  - /.gitlab-ci/centos6/xilinx13_4.yml
-  - /.gitlab-ci/centos6/matchstiq_z1.yml
-  - /.gitlab-ci/centos6/modelsim.yml
-  - /.gitlab-ci/centos6/zed_ise.yml
 
   # centos7
   - /.gitlab-ci/centos7/xsim.yml
@@ -52,10 +41,12 @@ include:
   - /.gitlab-ci/centos7/matchstiq_z1.yml
   - /.gitlab-ci/centos7/modelsim.yml
   - /.gitlab-ci/centos7/zed_ise.yml
+  - /.gitlab-ci/centos7/zcu104.yml
 
   # downstream projects
   - /.gitlab-ci/docs.yml
   - /.gitlab-ci/e3xx.yml
+  - /.gitlab-ci/plutosdr.yml
 
 
 # Global before and after scripts to run before and after each job. Overwrite
@@ -75,6 +66,7 @@ default:
         "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
         exit 1
       fi
+    - rm -f "${CI_PROJECT_DIR}/.success"
     - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
     - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
     - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar

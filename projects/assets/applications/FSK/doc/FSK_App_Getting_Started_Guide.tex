@@ -18,34 +18,19 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ FSK App Getting Started Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{FSK App Getting Started Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{FSK App Getting Started Guide}
 %----------------------------------------------------------------------------------------
-\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\lstset{ % https://tex.stackexchange.com/a/116572
-  basicstyle=\ttfamily,
-  columns=fullflexible,
-  % frame=single,
-  breaklines=true,
-  showstringspaces=true,
-  showspaces=true,
-  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
-}
-\usepackage{textcomp}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
 \newpage
 
 	\begin{center}
@@ -85,7 +70,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \hline
 FSK App\footnote{Provides details of the ``FSK App'' reference application} & \path{FSK_app.pdf} \\
 }
-\input{References_Table}
+\input{\snippetpath/References_Table}
 
 \newpage
 \begin{flushleft}

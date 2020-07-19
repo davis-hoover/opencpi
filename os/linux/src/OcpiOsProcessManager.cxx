@@ -100,7 +100,7 @@ namespace {
     bool started;
     bool detached;
     bool terminated;
-    int argc;
+    unsigned argc;
     char ** argv;
     pid_t pid;
     int exitCode;
@@ -141,7 +141,7 @@ namespace {
   {
     ocpiAssert (terminated);
 
-    for (int ai=0; ai<argc; ai++) {
+    for (unsigned int ai=0; ai<argc; ai++) {
       delete argv[ai];
     }
 
@@ -531,7 +531,7 @@ OCPI::OS::ProcessManager::pid ()
 
   ocpiAssert (pdp);
 
-  return pdp->pid;
+  return (unsigned long)(pdp->pid);
 }
 
 bool
@@ -558,8 +558,8 @@ OCPI::OS::ProcessManager::wait (unsigned long timeout)
 #else
     clock_gettime (CLOCK_REALTIME, &deadline);
 #endif
-    deadline.tv_sec += timeout / 1000;
-    if ((deadline.tv_nsec += (timeout%1000)*1000000) > 1000000000) {
+    deadline.tv_sec += (long)timeout / 1000;
+    if ((deadline.tv_nsec += ((long)timeout%1000)*1000000) > 1000000000) {
       deadline.tv_sec++;
       deadline.tv_nsec -= 1000000000;
     }

@@ -1,4 +1,4 @@
-<HdlWorker Language="vhdl" version='2' OnlyTargets='isim modelsim xsim'>
+<HdlWorker Language="vhdl" version='2' OnlyTargets='isim modelsim xsim' libraries='util'>
   <xi:include href="file_read_spec.xml"/>
   
   <!-- Current working directory string -->

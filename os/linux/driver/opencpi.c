@@ -652,7 +652,7 @@ opencpi_vma_close(struct vm_area_struct *vma) {
 
 // Map an individual page - in our case only for kernel allocation (not mmio, not reserved)
 #if defined(RHEL_MAJOR)
-#if RHEL_MAJOR==6 || RHEL_MAJOR==7
+#if RHEL_MAJOR>=6
 #define OCPI_RH6
 #else
 #define OCPI_RH5
@@ -684,8 +684,11 @@ opencpi_vma_nopage(struct vm_area_struct *vma, unsigned long virt_addr, int *typ
 /*
 *  This got changed to "vm_fault_t opencpi_vma_fault"
 *  in kernel version 5.0-rcX.  See "linux/mm_types.h".
+*
+*  Looks like RedHat/CentOS made the switch as of
+*  major release 8 with kernel version 4.18.0.
 */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 18, 0)
 static vm_fault_t opencpi_vma_fault
 #else
 static int opencpi_vma_fault
@@ -879,11 +882,12 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	      err = -EFAULT;
 	      log_debug("load fpga loading to: %px\n", buf);
 	      if (!copy_from_user((void *)buf, (void __user *)request.data, request.length)) {
+  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
 	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
-  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
 		err = fpga_mgr_buf_load(mgr, 0, buf, request.length);
   #else
 		struct fpga_image_info *info;
+	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
 		err = -ENOMEM;
     #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {

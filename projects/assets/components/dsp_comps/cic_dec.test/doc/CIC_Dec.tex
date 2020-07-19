@@ -16,51 +16,42 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
-\def\importpath{}
-\input{\importpath snippets/CIC_Dec_Header}
-%----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
-%----------------------------------------------------------------------------------------
-\def\docTitle{Component Data Sheet}
-\def\docVersion{1.6}
-%----------------------------------------------------------------------------------------
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
 
-\def\comp{cic\_dec}
+%----------------------------------------------------------------------------------------
+% Required document specific properties
+%----------------------------------------------------------------------------------------
+\def\comp{cic\_{}dec}
 \edef\ecomp{cic_dec}
 \def\Comp{CIC Decimator}
-\graphicspath{ {figures/} }
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
 
-\section*{Summary - \Comp}
-\begin{tabular}{|c|M{13.5cm}|}
-	\hline
-	\rowcolor{blue}
-	                  &                                                    \\
-	\hline
-	Name              & \comp                                              \\
-	\hline
-	Worker Type       & Application                                        \\
-	\hline
-	Version           & v\docVersion \\
-	\hline
-	Release Date      & 4/2019 \\
-	\hline
-	Component Library & ocpi.assets.dsp\_comps                              \\
-	\hline
-	Workers           & \comp.hdl, \comp.rcc                                          \\
-	\hline
-	Tested Platforms  & xsim, isim, modelsim, alst4, ml605, ZedBoard(PL), Matchstiq-Z1(PL), CentOS7 \\
-	\hline
-\end{tabular}
-\input{\importpath snippets/CIC_Dec_Functionality}
+% These are needed by component summary table
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{4/2019}
+\def\componentlibrary{ocpi.assets.dsp\_{}comps}
+\def\workers{\comp{}.hdl, \comp{}.rcc}
+\def\testedplatforms{alst4, CentOS7, isim, Matchstiq-Z1(PL), ml605, modelsim, xsim, ZedBoard(PL)}
+\input{\snippetpath/component_summary_table}
+
+\input{snippets/CIC_Dec_Functionality}
 \section*{Worker Implementation Details}
-\input{\importpath snippets/CIC_HDL_Implementation}
-\input{\importpath snippets/CIC_RCC_Implementation}
-\input{\importpath snippets/CIC_Theory}
+\input{snippets/CIC_HDL_Implementation}
+\input{snippets/CIC_RCC_Implementation}
+\input{snippets/CIC_Theory}
 
 % TODO / FIXME - add version history table, with initial release version
 % TODO / FIXME - version history table, gather changes for v1.0
@@ -144,7 +135,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		\end{tabular}
 	\end{scriptsize}
 
-	\input{\importpath snippets/cic_dec.rcc_properties}
+	\input{snippets/cic_dec.rcc_properties}
 
 	\section*{Component Ports}
 	\begin{scriptsize}
@@ -175,7 +166,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		\end{tabular}
 	\end{scriptsize}
 
-	\input{\importpath snippets/cic_dec.rcc_interfaces}
+	\input{snippets/cic_dec.rcc_interfaces}
 
 \end{landscape}
 
@@ -207,8 +198,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 %\input{../../\ecomp.hdl/utilization.inc}
 \end{landscape}
 \newpage
-\input{\importpath snippets/CIC_Test}
-\input{\importpath snippets/CIC_References}
+\input{snippets/CIC_Test}
+\input{snippets/CIC_References}
 
 \end{document}
 

@@ -134,8 +134,10 @@ namespace OCPI {
       }
       OE::getNameWithDefault(ax, m_name, defaultName ? defaultName : "unnamed%u", s_count);
       OE::getOptionalString(ax, m_package, "package");
-      if (m_package.empty())
-        m_package = "local";
+      if (m_package.empty()) {
+	const char *env = getenv("OCPI_PROJECT_PACKAGE");
+        m_package = env ? env : "local";
+      }
       for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix))
         if ((err = addInstance(ix, extraInstAttrs, params)))
           return err;

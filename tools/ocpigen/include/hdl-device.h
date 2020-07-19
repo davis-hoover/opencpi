@@ -59,9 +59,9 @@ public:
   Supports           m_supports;      // what subdevices are supported?
   static HdlDevice *
     get(const char *name, ezxml_t xml, const char *parentFile, Worker *parent, const char *&err);
-  static HdlDevice *create(ezxml_t xml, const char *file, const char *parentFile, Worker *parent,
+  static HdlDevice *create(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
 			   OU::Assembly::Properties *instancePVs, const char *&err);
-  HdlDevice(ezxml_t xml, const char *file, const char *parentFile, Worker *parent,
+  HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
 	    Worker::WType type, OU::Assembly::Properties *instancePVs, const char *&err);
   virtual ~HdlDevice() {}
   const char *cname() const;

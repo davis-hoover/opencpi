@@ -20,7 +20,7 @@
 -- BASED ON THE FILE: lime_spi_em.xml
 -- YOU *ARE* EXPECTED TO EDIT IT
 -- This file initially contains the architecture skeleton for worker: lime_spi_em
-library ieee, ocpi, bsv;
+library ieee, ocpi;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all;
 architecture rtl of lime_spi_em_worker is
   signal spi_clk_async_r : std_logic; -- cross clock domain
