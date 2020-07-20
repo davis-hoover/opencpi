@@ -394,8 +394,8 @@ emitSubdeviceConnections(std::string &assy,  DevInstances *baseInstances) {
 }
 
 HdlConfig *HdlConfig::
-create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent,
-       const char *&err) {
+create(ezxml_t xml, const char *knownPlatform, const char *xfile, const std::string &parentFile,
+       Worker *parent, const char *&err) {
   err = NULL;
   std::string myPlatform;
   OE::getOptionalString(xml, myPlatform, "platform");
@@ -439,9 +439,9 @@ create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent
   HdlPlatform *pf;
 
   if ((err = parseFile(myPlatform.c_str(), xfile, "HdlPlatform", &pxml, pfile)) ||
-      !(pf = HdlPlatform::create(pxml, pfile.c_str(), NULL, err)))
+      !(pf = HdlPlatform::create(pxml, pfile.c_str(), parentFile, NULL, err)))
     return NULL;
-  HdlConfig *p = new HdlConfig(*pf, xml, xfile, parent, err);
+  HdlConfig *p = new HdlConfig(*pf, xml, xfile, parentFile, parent, err);
   if (err) {
     delete p;
     p = NULL;
@@ -450,8 +450,9 @@ create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent
 }
 
 HdlConfig::
-HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, Worker *parent, const char *&err)
-  : Worker(xml, xfile, "", Worker::Configuration, parent, NULL, err),
+HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &parentFile,
+	  Worker *parent, const char *&err)
+  : Worker(xml, xfile, parentFile, Worker::Configuration, parent, NULL, err),
     HdlHasDevInstances(pf, m_plugged, *this),
     m_platform(pf), m_sdpWidth(1), m_sdpLength(32) { // 32 is for backward compatibility (zynq w/64 bit AXI)
   if (err ||

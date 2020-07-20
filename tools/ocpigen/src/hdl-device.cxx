@@ -28,7 +28,7 @@
 //DeviceTypes DeviceType::s_types;
 
 HdlDevice *HdlDevice::
-create(ezxml_t xml, const char *xfile, const char *parentFile, Worker *parent,
+create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent,
        OU::Assembly::Properties *instancePVs, const char *&err) {
   HdlDevice *hd = new HdlDevice(xml, xfile, parentFile, parent, Worker::Device, instancePVs, err);
   if (err ||
@@ -36,16 +36,16 @@ create(ezxml_t xml, const char *xfile, const char *parentFile, Worker *parent,
       (err = OE::checkAttrs(xml, PARSED_ATTRS, IMPL_ATTRS, HDL_TOP_ATTRS, HDL_IMPL_ATTRS,
 			    "interconnect", "control", (void*)0)) ||
       (err = OE::checkElements(xml, IMPL_ELEMS, HDL_IMPL_ELEMS, (void*)0)) ||
-      (err = hd->setParamConfig(instancePVs, 0))) {
+      (err = hd->setParamConfig(instancePVs, 0, parentFile))) {
     delete hd;
     hd = NULL;
   }
   return hd;
 }
 HdlDevice::
-HdlDevice(ezxml_t xml, const char *file, const char *parentFile, Worker *parent,
+HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
 	  Worker::WType type, OU::Assembly::Properties *instancePVs, const char *&err)
-  : Worker(xml, file, parentFile ? parentFile : "", type, parent, instancePVs, err) {
+  : Worker(xml, file, parentFile, type, parent, instancePVs, err) {
   m_isDevice = true;
   if (err ||
       (err = OE::getBoolean(xml, "interconnect", &m_interconnect)) ||
@@ -375,7 +375,7 @@ parse(ezxml_t xml, Board &b, SlotType *stype) {
     return OU::esprintf("Duplicate device name \"%s\" for platform/card", m_name.c_str());
   // Do the stuff in Worker::create - can we share more?
   if (m_deviceType.m_type != Worker::Platform &&
-      ((err = m_deviceType.setParamConfig(&m_deviceType.m_instancePVs, 0, &m_deviceType.m_parentFile)) ||
+      ((err = m_deviceType.setParamConfig(&m_deviceType.m_instancePVs, 0, m_deviceType.m_parentFile)) ||
        (err = m_deviceType.resolveExpressions(m_deviceType)) ||
        (err = m_deviceType.finalizeProperties()) ||
        (err = m_deviceType.finalizeHDL())))

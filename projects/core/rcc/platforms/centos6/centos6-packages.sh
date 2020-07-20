@@ -57,10 +57,9 @@ PKGS_D+=(which wget)
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
 PKGS_D+=(time)
-#    although no longer needed for testing scripts, the next two
-#    packages are required for SCons installation and the "gpsd"
-#    build (both require python2)
-PKGS_D+=(python python-pip)
+#    although python2 is no longer needed for the testing scripts,
+#    it is required for SCons installation and the "gpsd" build.
+PKGS_D+=(python)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_D+=(fakeroot)
 #    enable other packages in the epel repo, some required for devel (e.g. python34)
@@ -82,6 +81,10 @@ PKGS_D+=(libpng)
 PKGS_D+=(hardlink)
 #    Needed to build gdb
 PKGS_D+=(bison flex)
+#    for python3 matplotlib build/install using "pip3"
+PKGS_D+=(freetype-devel libpng-devel)
+#    for python3 scipy build/install using "pip3"
+PKGS_D+=(atlas atlas-devel blas blas-devel lapack lapack-devel)
 #    Needed by Xilinx ISE
 PKGS_D+=(libSM libXi libXrandr libXrender)
 
@@ -105,11 +108,6 @@ PKGS_S+=(glibc-devel.i686)
 #PKGS_S+=(oxygen-icon-theme jre tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
-#    for python3 matplotlib build/install using "pip3"
-PKGS_S+=(freetype-devel libpng-devel)
-#    for python3 scipy build/install using "pip3"
-PKGS_S+=(blas openblas-serial openblas-threads lapack atlas)
-PKGS_S+=(blas-devel lapack-devel atlas-devel)
 
 ##########################################################################################
 # E. installations that have to happen after we run yum-install once, and also rpm-required
@@ -125,6 +123,12 @@ PKGS_E+=(${python3_ver}-numpy ${python3_ver}-numpy-f2py ${python3_ver}-pip)
 PKGS_E+=(ocl-icd)
 #    for bash completion - a noarch package  (AV-2398)
 PKGS_E+=(bash-completion=/etc/profile.d/bash_completion.sh)
+#    Needed to build/run ocpigr
+PKGS_E+=(yaml-cpp-devel)
+#    for python3 scipy build/install using "pip3"
+PKGS_E+=(openblas-serial openblas-threads)
+#    for scons install
+PKGS_E+=(python-pip)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available

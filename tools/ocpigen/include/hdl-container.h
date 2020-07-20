@@ -94,11 +94,11 @@ class HdlContainer : public Worker, public HdlHasDevInstances {
   emitConnection(std::string &assy, UNocs &uNocs, size_t &index, const ContConnect &c);
 public:  
   static HdlContainer *
-  create(ezxml_t xml, const char *xfile, const char *&err);
+    create(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err);
   static const char *parsePlatform(ezxml_t xml, std::string &config, std::string &constraints,
 				   OrderedStringSet &platforms, bool onlyValidPlatforms = true);
   HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const char *xfile,
-	       const char *&err);
+	       const std::string &parentFile, const char *&err);
   virtual ~HdlContainer();
   const char
     *emitAttribute(const char *attr),

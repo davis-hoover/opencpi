@@ -28,7 +28,6 @@
 # 3. processor architecture (aarch32 or aarch64 for now)
 # 4. kernel repo linux tag (defaults)
 # 5. kernel repo u-boot tag (defaults)
-# 6. tool-prefix?
 
 set -e
 [ -z "$1" -o "$1" = --help ] && {
@@ -82,10 +81,18 @@ mkdir -p $dir
 cat > $dir/Makefile <<-EOF
 	include \$(OCPI_CDK_DIR)/include/xilinx/xilinx-rcc-platform.mk
 	EOF
+CXXFL=
+CFL=
+[ $arch = aarch64 ] && {
+  CXXFL="OcpiCXXFlags+=-fno-builtin-memset -fno-builtin-memcpy"
+  CFL="OcpiCFlags+=-fno-builtin-memset -fno-builtin-memcpy"
+}
 cat > $dir/$platform.mk <<-EOF
 	${tag:+OcpiXilinxLinuxRepoTag:=}$tag
 	${utag:+OcpiXilinxUbootRepoTag:=}$utag
 	include \$(OCPI_CDK_DIR)/include/xilinx/xilinx-rcc-platform-definition.mk
+	$CXXFL
+	$CFL
 	OcpiPlatformOs:=linux
 	OcpiPlatformOsVersion:=$version
 	OcpiPlatformArch:=$arch

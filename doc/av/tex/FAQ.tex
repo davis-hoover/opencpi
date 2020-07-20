@@ -16,27 +16,21 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
+
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
 \def\docTitle{Frequently Asked Questions}
-\def\docVersion{1.6}
-%----------------------------------------------------------------------------------------
 \def\snippetpath{snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\setlength{\parindent}{0pt} % Don't indent all paragraphs
-\newcommand{\forceindent}{\leavevmode{\parindent=1em\indent}}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
-\usepackage{enumitem}
 %----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 \maketitle
-\begin{center}
-OpenCPI Release: \ocpiversion
-\end{center}
+\thispagestyle{empty}
 \newpage
 
         \begin{center}
@@ -62,6 +56,10 @@ OpenCPI Release: \ocpiversion
                 \end{table}
         \end{center}
 \newpage
+
+\tableofcontents
+\newpage
+
 % How to add a new question / answer:
 % \item[Question]~\\
 % Answer
@@ -70,7 +68,7 @@ OpenCPI Release: \ocpiversion
 %% \begin{description}[style=nextline]
 %% \item[Is the RPM suite a standalone install?]~\\
 %% \label{faq:whatis}%
-%% Yes, the RPMs distributed by the ANGRYVIPER team incorporates and extends the Free / Open Source Project ``OpenCPI.'' Any OpenCPI installation documents that still exist are for reference and legacy users. All other OpenCPI documentation still applies and should be referenced. Do \textbf{not} attempt to install OpenCPI from source at the same time as the RPM distribution.
+%% Yes, the RPMs distributed by OpenCPI Maintainers incorporates and extends the Free / Open Source Project ``OpenCPI.'' Any OpenCPI installation documents that still exist are for reference and legacy users. All other OpenCPI documentation still applies and should be referenced. Do \textbf{not} attempt to install OpenCPI from source at the same time as the RPM distribution.
 %% \end{description}
 
 \begin{description}[style=nextline]

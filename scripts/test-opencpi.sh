@@ -137,7 +137,8 @@ for t in $tests; do
     # After this we are depending on the core project being built for the targeted platform
     swig)
       echo ======================= Running python swig test
-      OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts \
+      # OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts
+      OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
 		       PYTHONPATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib \
 		       python3 <<-EOF
 	import opencpi.aci as OA

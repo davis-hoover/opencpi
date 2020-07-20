@@ -17,5 +17,4 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This is the Makefile for worker fifo.hdl
-Libraries=bsv
 include $(OCPI_CDK_DIR)/include/worker.mk

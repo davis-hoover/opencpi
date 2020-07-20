@@ -89,9 +89,10 @@ class HdlConfig : public Worker, public HdlHasDevInstances {
   uint16_t     m_sdpLength;
 public:
   static HdlConfig *
-  create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent,
-	 const char *&err);
-  HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, Worker *parent, const char *&err);
+    create(ezxml_t xml, const char *knownPlatform, const char *xfile, const std::string &parentFile,
+	   Worker *parent, const char *&err);
+  HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &parentFile,
+	    Worker *parent, const char *&err);
   virtual ~HdlConfig();
 
   size_t sdpWidth() { return m_sdpWidth; }

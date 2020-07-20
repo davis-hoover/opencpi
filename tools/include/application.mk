@@ -26,7 +26,7 @@ ifeq ($(filter speclinks workersfile,$(MAKECMDGOALS)),)
 $(OcpiIncludeProject)
 # If library path is unset, provide a default
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
- $(eval $(OcpiEnsureToolPlatform))
+  $(eval $(OcpiEnsureToolPlatform))
   ifndef OCPI_LIBRARY_PATH
     $(call OcpiSetDefaultLibraryPath)
   endif

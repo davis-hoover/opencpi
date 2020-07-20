@@ -161,7 +161,7 @@ node('master') {
   )
   archiveArtifacts allowEmptyArchive: false, artifacts: 'releng/jenkins_runtime.tar'
   dir ('releng') { sh "tar xf jenkins_runtime.tar" } // Some of the imported code REQUIRES this to live in "releng"
-  def import_config = load("releng/jenkins/runtime/groovy/lib/import_config.groovy")
+  def import_config = load("releng/jenkins/runtime/groovy/shared/import_config.groovy")
   branch_config = import_config()
 
   previous_changesets = find_last_success()
