@@ -53,7 +53,7 @@ include:
 # these from occurring.
 default:
   before_script:
-    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar" "*centos7.tar"
+    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar.gz" "*centos7.tar.gz"
     - sleep 2
     - date "+%Y-%m-%d %H:%M:%S" > timestamp
     - cat timestamp

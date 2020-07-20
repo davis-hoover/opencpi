@@ -154,7 +154,10 @@ def main():
 
     # If a subcommand was passed, call it. Else print help message
     if 'func' in args:
-        args.func(args)
+        rc = args.func(args)
+
+        if rc != 0:
+            sys.exit(rc)
     else:
         parser.print_help()
 
@@ -310,9 +313,10 @@ def execute_command(command, args):
                     stderr = process.stderr.read().strip()
 
         except Exception as e:
+            print('help')
             raise ocpiutil.OCPIException(
                 'SSH/SCP call failed in a way we cannot handle; quitting. {}'.format(e))
-
+        
         if stderr and command.stderr:
             print(stderr)
 
@@ -447,7 +451,7 @@ def deploy(args):
 
     if not os.path.isdir(local_dir):
         print("Error: {} does not exist".format(local_dir))
-        print("Try running 'scripts/deploy-opencpi.sh {} {}'".format(
+        print("Try running 'ocpiadmin deploy platform {} {}'".format(
                     args.hw_platform, args.sw_platform)
             )
 

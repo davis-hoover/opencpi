@@ -40,17 +40,17 @@ def get_env(args):
     Env = namedtuple('Env', 'project_dir, pipeline, stage, job')
 
     try:
-        job_stage = os.getenv('CI_JOB_STAGE')
+        job_stage = os.environ['CI_JOB_STAGE']
 
         # Append failed status to job stage if tagged as failed-job
         # Makes it easier to exclude when downloading artifacts
         if 'tag' in args and args.tag == 'failed-job':
             job_stage += '-failed'
 
-        env = Env(os.getenv('CI_PROJECT_DIR'),
-                  os.getenv('CI_PIPELINE_ID'),
+        env = Env(os.environ['CI_PROJECT_DIR'],
+                  os.environ['CI_PIPELINE_ID'],
                   job_stage,
-                  os.getenv('CI_JOB_NAME'))
+                  os.environ['CI_JOB_NAME'])
     except:
         sys.exit('Error: Script is intended to run from within CI pipeline. ' \
                  'Set CI environment variables for testing.')
@@ -121,7 +121,7 @@ def upload(args, env):
     # Set s3 object
     # Will appear on aws as:
     # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID/CI_JOB_STAGE[-failed]/CI_JOB_NAME'
-    s3_object = '/'.join([env.pipeline, env.stage, env.job]) + '.tar'
+    s3_object = '/'.join([env.pipeline, env.stage, env.job]) + '.tar.gz'
 
     # If timestamp passed, find all files created/updated since the timestamp
     if args.timestamp:
@@ -141,9 +141,10 @@ def upload(args, env):
     cmd = ['aws', 's3', 'cp', 'tar', 
         's3://opencpi-ci-artifacts/{}'.format(s3_object),
         '--no-progress']
-    print(' '.join(cmd))
+    print('Executing: "{}"'.format(' '.join(cmd)))
+    print('Uploading to: s3://opencpi-ci-artifacts/{}'.format(s3_object))
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    print(process.stdout.read())
+    print(process.stdout.read().strip())
 
     # If tag passed, tag uploaded artifact
     if args.tag:
@@ -186,22 +187,19 @@ def download(args, env):
 
     # Do not download failed jobs
     cmd += ['--exclude', '/'.join(['*-failed', '*'])]
-    print(' '.join(cmd))
+    print('Executing: "{}"'.format(' '.join(cmd)))
 
     # Execute command to download artifacts
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    print(process.stdout.read())
+    print(process.stdout.read().strip())
 
     # Walk temp_dir and extract tar files
     for dirpath, dirnames, filenames in os.walk(temp_dir):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
-            cmd = ['tar', '-xf', filepath]
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-            out = process.stdout.read()
-
-            if out:
-                print(out)
+            print('Extracting: {}'.format(filepath))
+            with tarfile.open(filepath) as tar:
+                tar.extractall()
 
     # Delete temp_dir and its contents
     rmtree(temp_dir)

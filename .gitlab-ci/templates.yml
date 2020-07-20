@@ -672,24 +672,24 @@
 
 .ocpiremote:
   before_script:
-    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar" "*centos7.tar"
+    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar.gz" "*centos7.tar.gz"
     - sleep 5
     - date "+%Y-%m-%d %H:%M:%S" > timestamp
     - cat timestamp
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
-    - ./scripts/deploy-opencpi.sh $HW_PLATFORM $SW_PLATFORM
-    - echo "IP- $IP"
-    - echo "PORT- $PORT"
-    - echo "HW- $HW_PLATFORM"
-    - echo "SW- $SW_PLATFORM"
-    - ocpiremote deploy -i $IP -s $SW_PLATFORM -w $HW_PLATFORM
+    - ocpiadmin deploy platform "$HW_PLATFORM" "$SW_PLATFORM"
+    - echo "IP- ${IP}"
+    - echo "PORT- ${PORT}"
+    - echo "HW- ${HW_PLATFORM}"
+    - echo "SW- ${SW_PLATFORM}"
+    - ocpiremote deploy -i "$IP" -s "$SW_PLATFORM" -w "$HW_PLATFORM"
     - sleep 5
-    - ocpiremote load -i $IP -r $PORT -w $HW_PLATFORM -s $SW_PLATFORM
-    - ocpiremote start -i $IP
+    - ocpiremote load -i "$IP" -r "$PORT" -w "$HW_PLATFORM" -s "$SW_PLATFORM"
+    - ocpiremote start -i "$IP"
   after_script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpiremote unload -i $IP
+    - ocpiremote unload -i "$IP"
     - |-
       if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
         "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py" upload . -t 'failed-job'
