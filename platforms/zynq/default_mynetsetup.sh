@@ -43,7 +43,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   
   # add or remove mount points based on your needs
   mkdir -p /mnt/net
-  mount -t nfs -o udp,nolock,soft,intr $1:/opt/opencpi /mnt/net
+  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net
   # mkdir -p /mnt/ocpi_core
   # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
   # mkdir -p /mnt/ocpi_assets
