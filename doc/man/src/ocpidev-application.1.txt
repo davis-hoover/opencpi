@@ -1,0 +1,287 @@
+OCPIDEV-APPLICATION(1)
+=====================
+
+
+NAME
+----
+ocpidev-application - manage an OpenCPI application.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`application`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *application* noun represents an OpenCPI application, which is a
+connected and configured assembly of components. An application is
+described by an OpenCPI Application Specification (OAS), which can
+be a standalone XML text file or an XML document embedded in and
+manipulated by a C++ or Python program via the OpenCPI Application
+Control Interface (ACI). The 'OpenCPI Application Development Guide'
+provides details on the structure, syntax and development process
+for OpenCPI applications.
+
+In a project, an application resides in the *`applications/`* directory
+and is either an XML application or an ACI application.
+XML applications reside either directly in the *`applications/`* directory
+or in their own directory underneath the *`applications/`* directory.
+ACI applications always reside in their own directory within the
+*`applications/`* directory.
+
+Verbs that can operate on an application are:
+
+*`build`*::
+    Build the application, including any custom building
+    specified by a customized Makefile. The build operation
+    applies only to an ACI application: it builds the C++
+    files into an executable.
+
+*`clean`*::
+    Remove all the generated and compiled files for the
+    application, including any cleaning specfied by
+    a customized application Makefile.
+
+*`create`*::
+    Create the named application in the *`applications/`* directory of
+    the project according to the specified options. If the *`applications/`*
+    directory does not exist, it is created.
+
+*`delete`*::
+    Remove all directories and files associated with the named application.
+
+*`run`*::
+    Run the application. For an XML application, the
+    OpenCPI tool *`ocpirun`* is invoked to execute it.
+    For an ACI application, the executable is run.
+    
+Note that an asset's name is implied by the directory you're in when
+you issue the *`ocpidev`* command. For applications, this means that you can
+perform operations (verbs) on the application without having to specify its
+name when you issue the *`ocpidev`* command from inside the *`applications/`*
+directory or the application's own directory.
+
+The *`ocpidev`* tool can also operate on a plural *`applications`* noun.
+The syntax is:
+
+*`ocpidev`* ['<options>'] [*`build`*|*`clean`*|*`run`*] *`applications`*
+
+The verbs that can be performed on the *`applications`* noun are:
+
+*`build`*::
+    Build all ACI applications in a project. The general-purpose
+    options and all options for building applications can be used.
+
+*`clean`*::
+    Clean all ACI applications in a project. The general-purpose
+    options can be used.
+
+*`run`*::
+    Run all the applications in the *`applications/`* directory
+    of a project. The general-purpose options and all options
+    for running applications can be used.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options That Apply to All Operations (Verbs) on Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-d`* '<directory>'::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+
+*`-v`*, *`--verbose`*::
+    Describe what is happening in command execution in more detail.
+
+Options When Creating Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+   Do not build the application for the specified platform.
+
+*`--only-platform=`*'<platform>', *-G* '<platform>'+::
+   Only build the application for the specified platform.
+
+*`-T`* '<target>'+::
+   Only build the application for the specified architecture.
+
+*`-X`*::
+    Create a simple XML OAS file named '<name>'*.xml*
+    in the *`applications/`* directory of the project.
+    The default (no *`-X`* or *`-x`* option specified) is to
+    create an ACI application in a file named '<name>'*`.cc`*
+    that contains the main program in the '<name>' directory
+    underneath the *`applications/`* directory.
+
+*-Z* '<target>'+::
+   Do not build the application for the specified architecture.
+
+*-k*::
+    Keep files and directories created after an application creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+
+*-x*::
+    Create a simple XML OAS file named '<name>'*`.xml`* in
+    the '<name>' directory under *`applications/`*.
+
+Options When Deleting Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-f*::
+    Force deletion: do not ask for confirmation when deleting
+    an application. Normally, you are asked to confirm a deletion.
+
+Options When Building ACI Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-rcc-platform=`*'<platform>'+::
+    Build ACI assets for the RCC platforms associated with the
+    specified HDL platform. If this option is not used
+    (and *`--rcc-platform`* '<platform>' is also not used),
+    the current development software platform is used as
+    the single RCC platform used for building.
+
+*`--rcc-platform=`*'<platform>'+::
+    Build ACI assets for the specified RCC platform. If this
+    option is not used (and *`--hdl-rcc-platform`* '<platform>'
+    is also not used), the current development software platform
+    is used as the single RCC platform used for building.
+
+Options When Running ACI Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+*`--after=`*'<args>'+::
+    Specify the argument(s) to insert at the end of the execution command line.
+
+*`--before=`*'<args>'+:: 
+    Specify the argument(s) to insert before the ACI executable or
+    the *`ocpirun`* command; for example, environment settings
+    or prefix commands.
+
+*`--rcc-platform=`*'<platform>'+:: 
+    Specify the RCC platform to use to build the ACI application.
+	
+*`--run-arg=`*'<args>'+::
+    Specify the argument(s) to insert immediately after the ACI executable or
+    the *`ocpirun`* command.
+
+You can also add *`run-arg`* arguments after the application '<name>';
+for example, to specify options to *`ocpirun`* for XML applications.
+Preface these arguments with the double hyphen (*`--`*) notation
+to indicate that they are not options to the *`ocpidev`* command
+itself. For example, if you want to run an application with a
+number of *`run-arg`* arguments, you can use any of the following
+syntaxes:
+
+   ocpidev run application myapp -- -v -d -Pxsim
+   
+   ocpidev run application myapp --run-arg=-v --run-arg=-d --run-arg=-Pxsim
+   
+   ocpidev run application myapp --run-arg=”-v -d -Pxsim”
+
+For an XML application, these command lines perform the command:
+
+   ocpirun -v -d -Pxsim myapp
+
+For more information on how to use the *`before`*, *`after`* and
+*`run-arg`* options, see the section "Applications in Projects"
+in the 'OpenCPI Application Development Guide'.
+
+EXAMPLES
+--------
+. From the project's *`applications/`* directory, create
+an ACI application with the name *`MyApp`*. The ACI application
+*`MyApp.cc`* will be created in the *`applications/MyApp`*
+subdirectory of the project.
++
+-------------------------------
+ocpidev create application MyApp
+--------------------------------
++
+. From the project's top-level directory, create an XML
+application named *`MyApp`*. The XML application
+(empty OAS file) *`MyApp.xml`* will be created in
+the *`applications/`* subdirectory of the project.
++
+-------------------------------------
+ocpidev -X create application MyApp
+-------------------------------------
++
+. From the project's top-level directory, delete the
+XML application named *`MyApp`*:
++
+-------------------------------
+ocpidev delete application MyApp
+-------------------------------
++
+. Build the application *`MyApp`* from inside its own directory.
+Since no target platform is specified, the application is built
+to run on the development system platform; for example, CentOS 7.
++
+--------------
+ocpidev build
+--------------
++
+. From inside an ACI application's directory, build the
+ACI application for the Avnet Zedboard *`xilinx13_4`* embedded
+RCC platform:
++
+--------------------------------------
+ocpidev --rcc-platform xilinx13_4 build
+--------------------------------------
++
+. From the *`applications/`* directory, run the application
+named *`MyApp`* that exists in that directory:
++
+----------------
+ocpidev run MyApp
+----------------
++
+. From the *`applications/`* directory, run all the applications
+that exist in that directory:
++
+----------
+ocpidev run
+----------
++
+. Run all applications in the *`applications/`* directory of a project:
++
+------------------------
+ocpidev run applications
+------------------------
++
+. Clean all applications in a project:
++
+-------------------------
+ocpidev clean applications
+-------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-component.1.html[ocpidev-component(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
