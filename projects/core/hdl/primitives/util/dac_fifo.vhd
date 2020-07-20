@@ -20,8 +20,8 @@
 -- Underrun is reported (and cleared) in the WSI clock domain
 -- We completely ignore message boundaries here.
 -- FIXME: enable SRL FIFOs
-library IEEE, ocpi, bsv, util;
-use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all, ocpi.util.all;
+library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
+library ocpi, ocpi_core_bsv; use ocpi.types.all, ocpi.util.all, ocpi_core_bsv.all;
 entity dac_fifo is
   generic (width : positive := 32;
            depth : positive := 16);
@@ -62,7 +62,7 @@ begin
   fifo_s_reset_n <= not reset;
   dac_reset <= dac_rst;
   fifo_s_enq     <= wsi_ready and operating and wsi_valid and fifo_s_not_full;
-  fifo : bsv.bsv.SyncFIFO
+  fifo : bsv_pkg.SyncFIFO
     generic map (dataWidth => width,
                  depth     => depth,
                  indxWidth => width_for_max(depth-1))
@@ -93,7 +93,7 @@ begin
     end if;
   end process;
 
-  status : util.util.sync_status
+  status : work.util.sync_status
     port map   (clk         => clk,
                 reset       => reset,
                 operating   => operating,

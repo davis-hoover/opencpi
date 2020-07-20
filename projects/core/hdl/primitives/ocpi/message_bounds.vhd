@@ -42,7 +42,7 @@ entity message_bounds is
        give_out     : out bool_t);
 end entity message_bounds;
 
-library bsv; use bsv.bsv.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 architecture rtl of message_bounds is
   signal in_count_r  : unsigned(width-1 downto 0);
   signal out_count_r : unsigned(width-1 downto 0);
@@ -83,7 +83,7 @@ begin
   take_in <= my_take;
   my_reset_n <= not RST; -- for old vhdl
   
-  myfifo : FIFO2
+  myfifo : bsv_pkg.FIFO2
     generic map(width           => width)
     port    map(clk             => clk,
                 rst             => my_reset_n,

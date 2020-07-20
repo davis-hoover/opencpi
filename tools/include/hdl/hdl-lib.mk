@@ -23,16 +23,21 @@
 
 # Tell all the general purpose and toolset make scripts we are building libraries
 HdlMode:=library
+Model:=hdl
 include $(OCPI_CDK_DIR)/include/util.mk
-$(OcpiIncludeProject)
+$(call OcpiIncludeAssetAndParent)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
 .PHONY: stublibrary
 ifndef HdlSkip
-ifndef LibName
+ifdef LibName
+  $(error Unexpected LibName vairable set to $(LibName))
+else
 LibName:=$(CwdName)
 endif
+OcpiLibDot:=_
+QualifiedLibName:=$(and $(filter qualified,$(NameSpace)),$(subst .,$(OcpiLibDot),$(OCPI_PROJECT_PACKAGE).))$(CwdName)
 ifndef WorkLib
-WorkLib:=$(LibName)
+WorkLib:=$(QualifiedLibName)
 endif
 ifdef HdlToolNeedBB
 stublibrary: install
@@ -48,29 +53,6 @@ ifeq ($(HdlInstallDir)$(HdlInstallLibDir),)
   HdlInstallDir=../lib
   $(call OcpiIncludeAssetAndParent,..,hdl)
 endif
-ifdef HdlToolNeedsSourceList_$(HdlToolSet)
-HdlLibsList=install_libs
-
-$(HdlLibsList):
-	$(AT)for f in $(HdlActualTargets); do \
-          if test -f $(OutDir)target-$$f/$(call RmRv,$(LibName)).libs; then \
-	    $(call ReplaceIfDifferent,$(strip \
-	        $(OutDir)target-$$f/$(call RmRv,$(LibName)).libs),$(strip \
-	        $(OutDir)target-$$f/$(WorkLib)));\
-          fi;\
-	done
-
-HdlSourcesList=install_sources
-
-$(HdlSourcesList):
-	$(AT)for f in $(HdlActualTargets); do \
-          if test -f $(OutDir)target-$$f/$(call RmRv,$(LibName)).sources; then \
-            $(call ReplaceIfDifferent,$(strip \
-	        $(OutDir)target-$$f/$(call RmRv,$(LibName)).sources),$(strip \
-	        $(OutDir)target-$$f/$(WorkLib)));\
-          fi;\
-	done
-endif
 
 # This can be overriden
 HdlInstallLibDir=$(HdlInstallDir)/$(LibName)
@@ -78,11 +60,16 @@ $(HdlInstallLibDir):
 	$(AT)echo Creating directory $@ for library $(LibName)
 	$(AT)mkdir -p $@
 
-install: $(OutLibFiles) $(HdlLibsList) $(HdlSourcesList) | $(HdlInstallLibDir)
+install: $(OutLibFiles) | $(HdlInstallLibDir)
 	$(AT)for f in $(HdlActualTargets); do \
 	  $(call ReplaceIfDifferent,$(strip \
              $(OutDir)target-$$f/$(WorkLib)),$(strip \
              $(HdlInstallLibDir)/$$f)); \
+	  [ -f $(OutDir)target-$$f/$(LibName).sources ] && (\
+            $(call ReplaceIfDifferent,$(strip \
+              $(OutDir)target-$$f/$(LibName).sources),$(strip \
+              $(HdlInstallLibDir)/$$f))); \
+	  $(call ReplaceIfDifferent,$(GeneratedDir)/$(LibName).libs,$(HdlInstallLibDir));\
 	done
 
 endif
@@ -94,6 +81,8 @@ endif
 ifndef OcpiDynamicMakefile
 $(OutLibFiles): Makefile
 endif
+
+$(eval $(HdlInstallLibsAndSources))
 
 build: $(OutLibFiles)
 install: build

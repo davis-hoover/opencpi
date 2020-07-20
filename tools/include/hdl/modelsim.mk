@@ -67,6 +67,7 @@ HdlToolNeedBB=
 # Modify a stated core reference to be appropriate for the tool set
 HdlToolCoreRef=$(call HdlRmRv,$1)
 HdlToolCoreRef_modelsim=$(call HdlRmRv,$1)
+HdlRecurseLibraries_modelsim=yes
 
 ModelsimFiles=\
   $(foreach f,$(HdlSources),\
@@ -88,13 +89,21 @@ ModelsimArgs=-pedanticerrors -work $(WorkLib) -modelsimini modelsim.ini
 HdlToolCompile=\
   (echo '; This file is generated for building this '$(LibName)' library.';\
    echo '[library]' ; \
-   $(foreach l,$(HdlLibrariesInternal),$(infox LLL:$l)\
-      echo $(lastword $(subst -, ,$(notdir $l)))=$(strip \
+   $(eval ModelsimLibs:=$(call HdlCollectLibraries,modelsim))\
+   $(foreach l,$(ModelsimLibs),$(infox LLL:$l)\
+      echo $(lastword $(subst :, ,$l))=$(strip \
         $(call FindRelative,$(TargetDir),$(strip \
            $(call HdlLibraryRefDir,$l,$(HdlTarget),,modelsim))));) \
-   $(foreach c,$(call HdlCollectCorePaths),\
-      echo $(call HdlRmRv,$(notdir $(c)))=$(call FindRelative,$(TargetDir),$(strip \
-          $(call HdlCoreRef,$(call HdlRmRv,$c),modelsim)));) \
+   echo '; above is primitive libraries, below is cores';\
+   $(foreach c,$(call HdlCollectCorePaths),$(infox CCC:$c)\
+      $(- for each core, specify any libraries it needs)\
+      $(eval ModelsimCoreLibs:=$(call HdlCollectCoreLibraries,$c,$(ModelsimLibs)))\
+      $(foreach l,$(ModelsimCoreLibs),$(infox LLL1:$l)\
+        echo $(lastword $(subst :, ,$l))=$(strip\
+          $(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,modelsim)));)\
+      $(eval ModesimLibs+=$(ModelsimCoreLibs))$(strip \
+      echo ';core $c' && echo $(call HdlRmRv,$(notdir $(c)))=$(call FindRelative,$(TargetDir),$(strip \
+          $(call HdlCoreRef,$(call HdlRmRv,$c),modelsim)));)) \
    echo others=$(OCPI_MODELSIM_DIR)/modelsim.ini \
    ) > modelsim.ini ; \
    export LM_LICENSE_FILE=$(OCPI_MODELSIM_LICENSE_FILE); \
@@ -107,7 +116,8 @@ HdlToolCompile=\
     $(and $(filter %.vhd,$(ModelsimFiles)),\
           $(call ModelsimExec,vcom) -preserve $(if $(HdlNoSimElaboration),,$(ignore -bindAtCompile))\
           -error 1253 $(ModelsimArgs) $(filter %.vhd,$(ModelsimFiles)) &&)\
-    :) 2>&1 | grep -v 'ERROR: .* LD_PRELOAD cannot be preloaded')
+    :) 2>&1 | grep -v 'ERROR: .* LD_PRELOAD cannot be preloaded') || \
+    (rm -r -f $(WorkLib) && exit 1)
 
 # Since there is not a singular output, make's builtin deletion will not work
 HdlToolPost=\

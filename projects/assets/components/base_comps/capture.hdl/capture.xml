@@ -1,4 +1,4 @@
-<HdlWorker Language="verilog"  Pattern="%w%M%0_">
+<HdlWorker Language="verilog"  Pattern="%w%M%0_" libraries='util'>
   <xi:include href="capture_spec.xml"/>
   <ControlInterface Sub32BitConfigProperties="true" ControlOperations="initialize"/>
   <!-- additional implementation-specific properties -->

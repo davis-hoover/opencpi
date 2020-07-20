@@ -26,4 +26,5 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # you must define container XML files, and mention them in a "Containers" variable here, e.g.:
 # Containers=take_input_from_local_ADC
 
+OnlyPlatforms=xsim zed zcu104 # This is bad, and we should remove the xilinx-only complex mixer from this assy
 include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk

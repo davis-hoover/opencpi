@@ -58,7 +58,12 @@ skeleton:  $(ImplHeaderFiles) $(SkelFiles)
 	$(AT)$(and $(filter $(call OcpiGetDirType,$(DirContainingLib)),library),\
 	      make -r --no-print-directory -C $(DirContainingLib) workersfile speclinks)
 
-all: skeleton
+ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),)
+  $(info This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified)
+  all: liblinks
+else
+  all: skeleton links
+endif
 
 $(SkelFiles): $(GeneratedDir)/%$(SkelSuffix) : $$(Worker_%_xml) | $(GeneratedDir)
 	$(AT)$(OcpiRemoveSkeletons)
@@ -69,6 +74,7 @@ $(SkelFiles): $(GeneratedDir)/%$(SkelSuffix) : $$(Worker_%_xml) | $(GeneratedDir
               $(and $(PlatformDir),-F $(PlatformDir)) \
               $(and $(Package),-p $(Package)) -s $<)
 endif
+
 
 clean:: cleanfirst
 	$(AT)rm -r -f $(GeneratedDir) \
@@ -176,6 +182,7 @@ endef
 # Function to do stuff per target per param config:
 #   $(call WkrDoTargetConfig,target,config))
 define WkrDoTargetConfig
+  $$(infox WkrDoTargetConfig:$1:$2:$$(call WkrTargetDir,$1,$2))
   -include $$(call WkrTargetDir,$1,$2)/*.deps
   # The target directory
   $$(call WkrTargetDir,$1,$2): | $$(OutDir) $$(GeneratedDir)
@@ -183,6 +190,7 @@ define WkrDoTargetConfig
   $$(foreach f,$$(CPPSources),$$(eval $$(call OcpiCPPSource,$$f,$1,$2,$$(call WkrBinary,$1,$2))))
   # If object files are separate from the final binary,
   # Make them individually, and then link them together
+  $$(infox WkrDoTargetConfig1:$1:$2:$$(call WkrTargetDir,$1,$2):$(ToolSeparateObjects))
   ifdef ToolSeparateObjects
     $$(call OcpiDbgVar,CompiledSourceFiles)
     $$(foreach s,$$(CompiledSourceFiles),$$(eval $$(call WkrMakeObject,$$s,$1,$2)))
@@ -203,6 +211,7 @@ define WkrDoTargetConfig
   endif
 
   # If not an application, make the worker object files depend on the impl headers
+  $$(infox WkrDoTargetConfig2:$1:$2:$$(call WkrTargetDir,$1,$2):$$(Workers))
   $$(foreach w,$$(Workers),$$(call WkrWorkerDep,$$w,$1,$2))
 
 endef
@@ -218,9 +227,11 @@ endef
 # Do all the targets
 # Call WkrDoTarget for all targets
 #   So, we are now calling this function for all Parameter Configurations and targets
-ifneq ($(MAKECMDGOALS),skeleton)
+$(infox WW0:$(MAKECMDGOALS))
+ifneq ($(or $(filter-out clean% skeleton,$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,x)),)
 $(call OcpiDbgVar,HdlTargets)
 $(call OcpiDbgVar,HdlTarget)
+$(infox WW1:$($(CapModel)Targets))
 $(foreach t,$($(CapModel)Targets),$(eval $(call WkrDoTarget,$t)))
 endif
 ################################################################################
@@ -234,19 +245,24 @@ endif
 # and we are currently building a worker (rcc, ocl, hdl),
 # set libdir to ../lib/$(Model)
 ShouldSetLibDir=$(strip \
-  $(if $(and $(filter $(call OcpiGetDirType,../),library),\
+  $(if $(and $(or $(filter-out clean%,$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,x)),\
+             $(filter library,$(call OcpiGetDirType,../)),\
              $(or $(filter $(Model),rcc ocl),\
                   $(and $(filter $(Model),hdl),\
 	                $(filter $(HdlMode),worker)))),\
     true))
 ifneq ($(ShouldSetLibDir),)
+$(infox WW2:$($(CapModel)Targets))
   ifndef DirContainingLib
     DirContainingLib=../
   endif
+$(infox WW3:$($(CapModel)Targets))
   ifndef LibDir
+$(infox WW4:$($(CapModel)Targets))
     LibDir=../lib/$(Model)
   endif
 endif
+$(infox WW5:$($(CapModel)Targets))
 ifdef LibDir
 # The default for things in the target dir to export into the component library's
 # export directory for this target
@@ -306,15 +322,43 @@ else
 	$(AT)$(call MakeSymLink,$(GeneratedDir)/$(Worker)-build.xml,$(LibDir))
 endif
 
+ifdef LibDir
+$(call OcpiDbg,Before all: "$(LibDir)/$(ImplXmlFile)")
+
+$(and $(filter /%,$(ImplXmlFiles)),$(error unexpected non-local impl files: $(ImplXmlFiles)))
+
+define doImplLink
+LibLinks+=$(LibDir)/$(notdir $1)
+
+$(LibDir)/$(notdir $1): $1 | $(LibDir)
+	$(AT)echo Creating link from $(LibDir) -\> $$< to expose the $(CwdName) implementation xml.
+	$(AT)$$(call MakeSymLink,$$<,$(LibDir))
+endef
+
+$(foreach x,$(ImplXmlFiles),$(eval $(call doImplLink,$x)))
+
+endif
+
+
+
+
+# For now, restrict to HDL
+ifeq ($(Model),hdl)
+BinLibLinks+=$(LibDir)/$(Worker).libs
+$(LibDir)/$(Worker).libs: $(GeneratedDir)/$(Worker).libs | $(LibDir)
+	$(AT)$(call MakeSymLink,$(GeneratedDir)/$(Worker).libs,$(LibDir))
+endif
+
 $(call OcpiDbgVar,LibLinks,Before all:)
 $(call OcpiDbgVar,BinLibLinks,Before all:)
-.PHONY: links binlinks genlinks $(Model)links
-genlinks: $$(LibLinks)
+.PHONY: links binlinks genlinks $(Model)links liblinks
+# These are the lightest weight export links which do not involve code generation
+liblinks: $$(LibLinks)
+genlinks: liblinks
 # <model>-worker.mk may define its own rules for more links
 $(Model)links:
 binlinks: $$(BinLibLinks) $(Model)links
 links: binlinks genlinks
-all: links
 $(LibDir) $(LibDirs):
 	$(AT)mkdir -p $@
 

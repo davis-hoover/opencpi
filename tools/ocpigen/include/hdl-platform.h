@@ -36,9 +36,11 @@ class HdlPlatform : public HdlDevice, public Board, public Device {
   Slots       m_slots;   // slots of the platform
   bool        m_control; // should the platform be used for control?
 			 // FIXME should inherit device type and be a device
-public:  
-  static HdlPlatform *create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err);
-  HdlPlatform(ezxml_t xml, const char *xfile, Worker *parent, const char *&err);
+public:
+  static HdlPlatform *create(ezxml_t xml, const char *xfile, const std::string &parentFile,
+			     Worker *parent, const char *&err);
+  HdlPlatform(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent,
+	      const char *&err);
   virtual ~HdlPlatform();
   const char *cname() const { return HdlDevice::m_name.c_str(); }
   const Slots &slots() const { return m_slots; }
