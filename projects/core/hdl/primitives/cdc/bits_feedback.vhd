@@ -141,7 +141,7 @@ begin
   end process;
 
   -- Synchronize enable pulse generation with feedback
-  en_puls_w_fdbk : entity work.pulse_handshake
+  en_puls_w_fdbk : work.cdc.pulse_handshake
     port map(
       src_clk   => src_clk,
       src_rst   => src_rst,
