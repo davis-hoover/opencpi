@@ -342,6 +342,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-base:
@@ -351,6 +352,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-comms:
@@ -360,6 +362,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/comms_comps --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-dsp:
@@ -369,6 +372,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-misc:
@@ -378,6 +382,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets-util:
@@ -387,6 +392,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets/components/util_comps --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-assets_ts:
@@ -396,6 +402,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 .build-test-inactive:
@@ -405,6 +412,7 @@
   script:
     - source ./cdk/opencpi-setup.sh -e
     - ocpidev build test -d projects/inactive --$MODEL-platform $PLATFORM
+    - if [ -n "$SW_PLATFORM" ] && [ -n "$HW_PLATFORM" ]; then ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"; fi
     - touch "${CI_PROJECT_DIR}/.success"
 
 
@@ -677,11 +685,7 @@
     - touch timestamp
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
-    - ocpiadmin deploy platform "$HW_PLATFORM" "$SW_PLATFORM"
-    - echo "IP- ${IP}"
-    - echo "PORT- ${PORT}"
-    - echo "HW- ${HW_PLATFORM}"
-    - echo "SW- ${SW_PLATFORM}"
+    - export OCPI_SERVER_ADDRESSES="${IP}:${PORT}"
     - ocpiremote deploy -i "$IP" -s "$SW_PLATFORM" -w "$HW_PLATFORM"
     - sleep 5
     - ocpiremote load -i "$IP" -r "$PORT" -w "$HW_PLATFORM" -s "$SW_PLATFORM"
@@ -695,4 +699,4 @@
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
-    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s "$(< timestamp)"
+    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s timestamp
