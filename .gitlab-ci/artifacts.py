@@ -144,11 +144,11 @@ def upload(args, env):
         timestamp = os.lstat(args.timestamp).st_ctime
 
         for dirpath, dirnames, filenames in os.walk('.'):
-            for filename in filenames:
-                filepath = os.path.join(dirpath, filename)
+            paths = [os.path.join(dirpath, name) for name in dirnames + filenames]
 
-                if os.lstat(filepath).st_ctime > timestamp:
-                    files.append(filepath)              
+            for path in paths:
+                if os.lstat(path).st_ctime > timestamp:
+                    files.append(path)              
     else:
         files.append(args.artifact)
 
