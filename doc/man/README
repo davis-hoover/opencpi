@@ -1,5 +1,12 @@
-README FILE FOR NOUN MAN PAGES STATUS 7/15/20
----------------------------------------------
+OPENCPI MAN PAGES - STATUS 7/21/20
+----------------------------------
+
+ocpidev Man Pages
+-----------------
+ocpidev - reviewed once, updates since
+
+ocpidev Nouns
+-------------
 application - reviewed once, updates since
 assembly - ready for review
 card - under construction, text is from protocol, not reviewable yet
@@ -15,3 +22,39 @@ slot - under construction, text is from protocol, not reviewable yet
 subdevice - under construction, text is from worker, not reviewable yet
 test - ready for review
 worker - reviewed once, updates since
+
+ocpidev Verbs
+--------------
+ocpidev-build - ready for review
+ocpidev-clean - ready for review
+ocpidev-create - ready for review
+ocpidev-delete - ready for review
+ocpidev-refresh - ready for review
+ocpidev-register - ready for review
+ocpidev-run - ready for review
+ocpidev-set - ready for review
+ocpidev-show - ready for review
+ocpidev-unregister - ready for review
+ocpidev-unset - ready for review
+ocpidev-utilization - ready for review
+-----------------------------
+
+Man pages to be created:
+
+ocpiadmin
+ocpiav
+ocpidriver
+ocpigen
+ocpigr
+ocpihdl
+ocpiocl
+ocpiocltest
+ocpiremote
+ocpirun
+ocpiserve
+ocpitest
+ocpiview
+ocpixml
+ocpizynq
+
+
