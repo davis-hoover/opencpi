@@ -22,9 +22,9 @@ library cyclone5; use cyclone5.cyclone5_pkg.all;
 library axi;
 
 entity cyclone5_hps is
-  port    (hps_in        : in  pl2hps_t;
-           hps_out       : out hps2pl_t;
-           hps_inout     : inout hps_io_t;
+  port    (hps_in        : in  hps_in_t;
+           hps_out       : out hps_out_t;
+           hps_inout     : inout hps_inout_t;
            m_h2f_axi_in  : in  axi.cyclone5_m.axi_s2m_array_t(0 to C_M_AXI_COUNT-1);
            m_h2f_axi_out : out axi.cyclone5_m.axi_m2s_array_t(0 to C_M_AXI_COUNT-1);
            s_f2h_axi_in  : in  axi.cyclone5_s.axi_m2s_array_t(0 to C_S_AXI_COUNT-1);
@@ -375,6 +375,186 @@ architecture rtl of cyclone5_hps is
       pulse_out : out std_logic
       );
   end component;
+
+  component soc_system_mm_interconnect_3 is
+		port (
+			clk_0_clk_clk                                                           : in  std_logic                      := 'X';             -- clk
+			f2sdram_only_master_clk_reset_reset_bridge_in_reset_reset               : in  std_logic                      := 'X';             -- reset
+			f2sdram_only_master_master_translator_reset_reset_bridge_in_reset_reset : in  std_logic                      := 'X';             -- reset
+			hps_0_f2h_sdram0_data_translator_reset_reset_bridge_in_reset_reset      : in  std_logic                      := 'X';             -- reset
+			f2sdram_only_master_master_address                                      : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- address
+			f2sdram_only_master_master_waitrequest                                  : out std_logic;                                         -- waitrequest
+			f2sdram_only_master_master_byteenable                                   : in  std_logic_vector(3 downto 0)   := (others => 'X'); -- byteenable
+			f2sdram_only_master_master_read                                         : in  std_logic                      := 'X';             -- read
+			f2sdram_only_master_master_readdata                                     : out std_logic_vector(31 downto 0);                     -- readdata
+			f2sdram_only_master_master_readdatavalid                                : out std_logic;                                         -- readdatavalid
+			f2sdram_only_master_master_write                                        : in  std_logic                      := 'X';             -- write
+			f2sdram_only_master_master_writedata                                    : in  std_logic_vector(31 downto 0)  := (others => 'X'); -- writedata
+			hps_0_f2h_sdram0_data_address                                           : out std_logic_vector(26 downto 0);                     -- address
+			hps_0_f2h_sdram0_data_write                                             : out std_logic;                                         -- write
+			hps_0_f2h_sdram0_data_read                                              : out std_logic;                                         -- read
+			hps_0_f2h_sdram0_data_readdata                                          : in  std_logic_vector(255 downto 0) := (others => 'X'); -- readdata
+			hps_0_f2h_sdram0_data_writedata                                         : out std_logic_vector(255 downto 0);                    -- writedata
+			hps_0_f2h_sdram0_data_burstcount                                        : out std_logic_vector(7 downto 0);                      -- burstcount
+			hps_0_f2h_sdram0_data_byteenable                                        : out std_logic_vector(31 downto 0);                     -- byteenable
+			hps_0_f2h_sdram0_data_readdatavalid                                     : in  std_logic                      := 'X';             -- readdatavalid
+			hps_0_f2h_sdram0_data_waitrequest                                       : in  std_logic                      := 'X'              -- waitrequest
+		);
+	end component soc_system_mm_interconnect_3;
+
+  component soc_system_rst_controller is
+		generic (
+			NUM_RESET_INPUTS          : integer := 6;
+			OUTPUT_RESET_SYNC_EDGES   : string  := "deassert";
+			SYNC_DEPTH                : integer := 2;
+			RESET_REQUEST_PRESENT     : integer := 0;
+			RESET_REQ_WAIT_TIME       : integer := 1;
+			MIN_RST_ASSERTION_TIME    : integer := 3;
+			RESET_REQ_EARLY_DSRT_TIME : integer := 1;
+			USE_RESET_REQUEST_IN0     : integer := 0;
+			USE_RESET_REQUEST_IN1     : integer := 0;
+			USE_RESET_REQUEST_IN2     : integer := 0;
+			USE_RESET_REQUEST_IN3     : integer := 0;
+			USE_RESET_REQUEST_IN4     : integer := 0;
+			USE_RESET_REQUEST_IN5     : integer := 0;
+			USE_RESET_REQUEST_IN6     : integer := 0;
+			USE_RESET_REQUEST_IN7     : integer := 0;
+			USE_RESET_REQUEST_IN8     : integer := 0;
+			USE_RESET_REQUEST_IN9     : integer := 0;
+			USE_RESET_REQUEST_IN10    : integer := 0;
+			USE_RESET_REQUEST_IN11    : integer := 0;
+			USE_RESET_REQUEST_IN12    : integer := 0;
+			USE_RESET_REQUEST_IN13    : integer := 0;
+			USE_RESET_REQUEST_IN14    : integer := 0;
+			USE_RESET_REQUEST_IN15    : integer := 0;
+			ADAPT_RESET_REQUEST       : integer := 0
+		);
+		port (
+			reset_in0      : in  std_logic := 'X'; -- reset_in0.reset
+			clk            : in  std_logic := 'X'; --       clk.clk
+			reset_out      : out std_logic;        -- reset_out.reset
+			reset_req      : out std_logic;        --          .reset_req
+			reset_in1      : in  std_logic := 'X';
+			reset_in10     : in  std_logic := 'X';
+			reset_in11     : in  std_logic := 'X';
+			reset_in12     : in  std_logic := 'X';
+			reset_in13     : in  std_logic := 'X';
+			reset_in14     : in  std_logic := 'X';
+			reset_in15     : in  std_logic := 'X';
+			reset_in2      : in  std_logic := 'X';
+			reset_in3      : in  std_logic := 'X';
+			reset_in4      : in  std_logic := 'X';
+			reset_in5      : in  std_logic := 'X';
+			reset_in6      : in  std_logic := 'X';
+			reset_in7      : in  std_logic := 'X';
+			reset_in8      : in  std_logic := 'X';
+			reset_in9      : in  std_logic := 'X';
+			reset_req_in0  : in  std_logic := 'X';
+			reset_req_in1  : in  std_logic := 'X';
+			reset_req_in10 : in  std_logic := 'X';
+			reset_req_in11 : in  std_logic := 'X';
+			reset_req_in12 : in  std_logic := 'X';
+			reset_req_in13 : in  std_logic := 'X';
+			reset_req_in14 : in  std_logic := 'X';
+			reset_req_in15 : in  std_logic := 'X';
+			reset_req_in2  : in  std_logic := 'X';
+			reset_req_in3  : in  std_logic := 'X';
+			reset_req_in4  : in  std_logic := 'X';
+			reset_req_in5  : in  std_logic := 'X';
+			reset_req_in6  : in  std_logic := 'X';
+			reset_req_in7  : in  std_logic := 'X';
+			reset_req_in8  : in  std_logic := 'X';
+			reset_req_in9  : in  std_logic := 'X'
+		);
+	end component soc_system_rst_controller;
+
+  component soc_system_rst_controller_001 is
+		generic (
+			NUM_RESET_INPUTS          : integer := 6;
+			OUTPUT_RESET_SYNC_EDGES   : string  := "deassert";
+			SYNC_DEPTH                : integer := 2;
+			RESET_REQUEST_PRESENT     : integer := 0;
+			RESET_REQ_WAIT_TIME       : integer := 1;
+			MIN_RST_ASSERTION_TIME    : integer := 3;
+			RESET_REQ_EARLY_DSRT_TIME : integer := 1;
+			USE_RESET_REQUEST_IN0     : integer := 0;
+			USE_RESET_REQUEST_IN1     : integer := 0;
+			USE_RESET_REQUEST_IN2     : integer := 0;
+			USE_RESET_REQUEST_IN3     : integer := 0;
+			USE_RESET_REQUEST_IN4     : integer := 0;
+			USE_RESET_REQUEST_IN5     : integer := 0;
+			USE_RESET_REQUEST_IN6     : integer := 0;
+			USE_RESET_REQUEST_IN7     : integer := 0;
+			USE_RESET_REQUEST_IN8     : integer := 0;
+			USE_RESET_REQUEST_IN9     : integer := 0;
+			USE_RESET_REQUEST_IN10    : integer := 0;
+			USE_RESET_REQUEST_IN11    : integer := 0;
+			USE_RESET_REQUEST_IN12    : integer := 0;
+			USE_RESET_REQUEST_IN13    : integer := 0;
+			USE_RESET_REQUEST_IN14    : integer := 0;
+			USE_RESET_REQUEST_IN15    : integer := 0;
+			ADAPT_RESET_REQUEST       : integer := 0
+		);
+		port (
+			reset_in0      : in  std_logic := 'X'; -- reset_in0.reset
+			clk            : in  std_logic := 'X'; --       clk.clk
+			reset_out      : out std_logic;        -- reset_out.reset
+			reset_in1      : in  std_logic := 'X';
+			reset_in10     : in  std_logic := 'X';
+			reset_in11     : in  std_logic := 'X';
+			reset_in12     : in  std_logic := 'X';
+			reset_in13     : in  std_logic := 'X';
+			reset_in14     : in  std_logic := 'X';
+			reset_in15     : in  std_logic := 'X';
+			reset_in2      : in  std_logic := 'X';
+			reset_in3      : in  std_logic := 'X';
+			reset_in4      : in  std_logic := 'X';
+			reset_in5      : in  std_logic := 'X';
+			reset_in6      : in  std_logic := 'X';
+			reset_in7      : in  std_logic := 'X';
+			reset_in8      : in  std_logic := 'X';
+			reset_in9      : in  std_logic := 'X';
+			reset_req      : out std_logic;
+			reset_req_in0  : in  std_logic := 'X';
+			reset_req_in1  : in  std_logic := 'X';
+			reset_req_in10 : in  std_logic := 'X';
+			reset_req_in11 : in  std_logic := 'X';
+			reset_req_in12 : in  std_logic := 'X';
+			reset_req_in13 : in  std_logic := 'X';
+			reset_req_in14 : in  std_logic := 'X';
+			reset_req_in15 : in  std_logic := 'X';
+			reset_req_in2  : in  std_logic := 'X';
+			reset_req_in3  : in  std_logic := 'X';
+			reset_req_in4  : in  std_logic := 'X';
+			reset_req_in5  : in  std_logic := 'X';
+			reset_req_in6  : in  std_logic := 'X';
+			reset_req_in7  : in  std_logic := 'X';
+			reset_req_in8  : in  std_logic := 'X';
+			reset_req_in9  : in  std_logic := 'X'
+		);
+  end component soc_system_rst_controller_001;
+
+  component soc_system_f2sdram_only_master is
+		generic (
+			USE_PLI     : integer := 0;
+			PLI_PORT    : integer := 50000;
+			FIFO_DEPTHS : integer := 2
+		);
+		port (
+			clk_clk              : in  std_logic                     := 'X';             -- clk
+			clk_reset_reset      : in  std_logic                     := 'X';             -- reset
+			master_address       : out std_logic_vector(31 downto 0);                    -- address
+			master_readdata      : in  std_logic_vector(31 downto 0) := (others => 'X'); -- readdata
+			master_read          : out std_logic;                                        -- read
+			master_write         : out std_logic;                                        -- write
+			master_writedata     : out std_logic_vector(31 downto 0);                    -- writedata
+			master_waitrequest   : in  std_logic                     := 'X';             -- waitrequest
+			master_readdatavalid : in  std_logic                     := 'X';             -- readdatavalid
+			master_byteenable    : out std_logic_vector(3 downto 0);                     -- byteenable
+			master_reset_reset   : out std_logic                                         -- reset
+		);
+	end component soc_system_f2sdram_only_master;
+
   -- constant      ID_WIDTH          : natural := 6;
   signal        hps_fpga_reset_n  : std_logic;
   signal        hps_reset_req     : std_logic_vector(2 downto 0);
@@ -390,6 +570,26 @@ architecture rtl of cyclone5_hps is
   -- signal        s_f2h_BID         : std_logic_vector(7 downto 0);
   -- signal        s_f2h_RID         : std_logic_vector(7 downto 0);
   signal        stm_hw_events     : std_logic_vector(27 downto 0);
+  signal f2sdram_only_master_master_readdata                           : std_logic_vector(31 downto 0);  -- mm_interconnect_3:f2sdram_only_master_master_readdata -> f2sdram_only_master:master_readdata
+	signal f2sdram_only_master_master_waitrequest                        : std_logic;                      -- mm_interconnect_3:f2sdram_only_master_master_waitrequest -> f2sdram_only_master:master_waitrequest
+	signal f2sdram_only_master_master_address                            : std_logic_vector(31 downto 0);  -- f2sdram_only_master:master_address -> mm_interconnect_3:f2sdram_only_master_master_address
+	signal f2sdram_only_master_master_read                               : std_logic;                      -- f2sdram_only_master:master_read -> mm_interconnect_3:f2sdram_only_master_master_read
+	signal f2sdram_only_master_master_byteenable                         : std_logic_vector(3 downto 0);   -- f2sdram_only_master:master_byteenable -> mm_interconnect_3:f2sdram_only_master_master_byteenable
+	signal f2sdram_only_master_master_readdatavalid                      : std_logic;                      -- mm_interconnect_3:f2sdram_only_master_master_readdatavalid -> f2sdram_only_master:master_readdatavalid
+	signal f2sdram_only_master_master_write                              : std_logic;                      -- f2sdram_only_master:master_write -> mm_interconnect_3:f2sdram_only_master_master_write
+	signal f2sdram_only_master_master_writedata                          : std_logic_vector(31 downto 0);  -- f2sdram_only_master:master_writedata -> mm_interconnect_3:f2sdram_only_master_master_writedata
+  signal rst_controller_reset_out_reset                                : std_logic;                      -- rst_controller:reset_out -> [irq_mapper:reset, mm_bridge_0:reset, mm_interconnect_0:fpga_only_master_clk_reset_reset_bridge_in_reset_reset, mm_interconnect_0:onchip_memory2_0_reset1_reset_bridge_in_reset_reset, mm_interconnect_1:mm_bridge_0_reset_reset_bridge_in_reset_reset, mm_interconnect_2:hps_only_master_clk_reset_reset_bridge_in_reset_reset, mm_interconnect_2:hps_only_master_master_translator_reset_reset_bridge_in_reset_reset, mm_interconnect_3:f2sdram_only_master_clk_reset_reset_bridge_in_reset_reset, mm_interconnect_3:f2sdram_only_master_master_translator_reset_reset_bridge_in_reset_reset, onchip_memory2_0:reset, rst_controller_reset_out_reset:in, rst_translator:in_reset]
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_readdata              : std_logic_vector(255 downto 0); -- hps_0:f2h_sdram0_READDATA -> mm_interconnect_3:hps_0_f2h_sdram0_data_readdata
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_waitrequest           : std_logic;                      -- hps_0:f2h_sdram0_WAITREQUEST -> mm_interconnect_3:hps_0_f2h_sdram0_data_waitrequest
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_address               : std_logic_vector(26 downto 0);  -- mm_interconnect_3:hps_0_f2h_sdram0_data_address -> hps_0:f2h_sdram0_ADDRESS
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_read                  : std_logic;                      -- mm_interconnect_3:hps_0_f2h_sdram0_data_read -> hps_0:f2h_sdram0_READ
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_byteenable            : std_logic_vector(31 downto 0);  -- mm_interconnect_3:hps_0_f2h_sdram0_data_byteenable -> hps_0:f2h_sdram0_BYTEENABLE
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_readdatavalid         : std_logic;                      -- hps_0:f2h_sdram0_READDATAVALID -> mm_interconnect_3:hps_0_f2h_sdram0_data_readdatavalid
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_write                 : std_logic;                      -- mm_interconnect_3:hps_0_f2h_sdram0_data_write -> hps_0:f2h_sdram0_WRITE
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_writedata             : std_logic_vector(255 downto 0); -- mm_interconnect_3:hps_0_f2h_sdram0_data_writedata -> hps_0:f2h_sdram0_WRITEDATA
+  signal mm_interconnect_3_hps_0_f2h_sdram0_data_burstcount            : std_logic_vector(7 downto 0);   -- mm_interconnect_3:hps_0_f2h_sdram0_data_burstcount -> hps_0:f2h_sdram0_BURSTCOUNT
+  signal rst_controller_001_reset_out_reset                            : std_logic;                      -- rst_controller_001:reset_out -> [mm_interconnect_0:hps_0_h2f_axi_master_agent_clk_reset_reset_bridge_in_reset_reset, mm_interconnect_2:hps_0_f2h_axi_slave_agent_reset_sink_reset_bridge_in_reset_reset, mm_interconnect_3:hps_0_f2h_sdram0_data_translator_reset_reset_bridge_in_reset_reset]
+
 begin
 
   m_h2f_axi_out(0).A.RESETN <= hps_fpga_reset_n;
@@ -455,6 +655,180 @@ begin
       signal_in => hps_reset_req(2),
       pulse_out => hps_debug_reset);
 
+  f2sdram_only_master : soc_system_f2sdram_only_master
+		generic map (
+			USE_PLI     => 0,
+			PLI_PORT    => 50000,
+			FIFO_DEPTHS => 2
+		)
+		port map (
+			clk_clk              => hps_in.CLK,                               --          clk.clk
+			clk_reset_reset      => hps_fpga_reset_n,                         --    clk_reset.reset
+			master_address       => f2sdram_only_master_master_address,       --       master.address
+			master_readdata      => f2sdram_only_master_master_readdata,      --             .readdata
+			master_read          => f2sdram_only_master_master_read,          --             .read
+			master_write         => f2sdram_only_master_master_write,         --             .write
+			master_writedata     => f2sdram_only_master_master_writedata,     --             .writedata
+			master_waitrequest   => f2sdram_only_master_master_waitrequest,   --             .waitrequest
+			master_readdatavalid => f2sdram_only_master_master_readdatavalid, --             .readdatavalid
+			master_byteenable    => f2sdram_only_master_master_byteenable,    --             .byteenable
+			master_reset_reset   => open                                      -- master_reset.reset
+	  );
+
+  rst_controller : soc_system_rst_controller
+  		generic map (
+  			NUM_RESET_INPUTS          => 1,
+  			OUTPUT_RESET_SYNC_EDGES   => "deassert",
+  			SYNC_DEPTH                => 2,
+  			RESET_REQUEST_PRESENT     => 1,
+  			RESET_REQ_WAIT_TIME       => 1,
+  			MIN_RST_ASSERTION_TIME    => 3,
+  			RESET_REQ_EARLY_DSRT_TIME => 1,
+  			USE_RESET_REQUEST_IN0     => 0,
+  			USE_RESET_REQUEST_IN1     => 0,
+  			USE_RESET_REQUEST_IN2     => 0,
+  			USE_RESET_REQUEST_IN3     => 0,
+  			USE_RESET_REQUEST_IN4     => 0,
+  			USE_RESET_REQUEST_IN5     => 0,
+  			USE_RESET_REQUEST_IN6     => 0,
+  			USE_RESET_REQUEST_IN7     => 0,
+  			USE_RESET_REQUEST_IN8     => 0,
+  			USE_RESET_REQUEST_IN9     => 0,
+  			USE_RESET_REQUEST_IN10    => 0,
+  			USE_RESET_REQUEST_IN11    => 0,
+  			USE_RESET_REQUEST_IN12    => 0,
+  			USE_RESET_REQUEST_IN13    => 0,
+  			USE_RESET_REQUEST_IN14    => 0,
+  			USE_RESET_REQUEST_IN15    => 0,
+  			ADAPT_RESET_REQUEST       => 0
+  		)
+  		port map (
+  			reset_in0      => hps_fpga_reset_n,                   -- reset_in0.reset
+  			clk            => hps_in.CLK,                         --       clk.clk
+  			reset_out      => rst_controller_reset_out_reset,     -- reset_out.reset
+  			reset_req      => open,                               --          .reset_req
+  			reset_req_in0  => '0',                                -- (terminated)
+  			reset_in1      => '0',                                -- (terminated)
+  			reset_req_in1  => '0',                                -- (terminated)
+  			reset_in2      => '0',                                -- (terminated)
+  			reset_req_in2  => '0',                                -- (terminated)
+  			reset_in3      => '0',                                -- (terminated)
+  			reset_req_in3  => '0',                                -- (terminated)
+  			reset_in4      => '0',                                -- (terminated)
+  			reset_req_in4  => '0',                                -- (terminated)
+  			reset_in5      => '0',                                -- (terminated)
+  			reset_req_in5  => '0',                                -- (terminated)
+  			reset_in6      => '0',                                -- (terminated)
+  			reset_req_in6  => '0',                                -- (terminated)
+  			reset_in7      => '0',                                -- (terminated)
+  			reset_req_in7  => '0',                                -- (terminated)
+  			reset_in8      => '0',                                -- (terminated)
+  			reset_req_in8  => '0',                                -- (terminated)
+  			reset_in9      => '0',                                -- (terminated)
+  			reset_req_in9  => '0',                                -- (terminated)
+  			reset_in10     => '0',                                -- (terminated)
+  			reset_req_in10 => '0',                                -- (terminated)
+  			reset_in11     => '0',                                -- (terminated)
+  			reset_req_in11 => '0',                                -- (terminated)
+  			reset_in12     => '0',                                -- (terminated)
+  			reset_req_in12 => '0',                                -- (terminated)
+  			reset_in13     => '0',                                -- (terminated)
+  			reset_req_in13 => '0',                                -- (terminated)
+  			reset_in14     => '0',                                -- (terminated)
+  			reset_req_in14 => '0',                                -- (terminated)
+  			reset_in15     => '0',                                -- (terminated)
+  			reset_req_in15 => '0'                                 -- (terminated)
+  	  );
+      rst_controller_001 : component soc_system_rst_controller_001
+    		generic map (
+    			NUM_RESET_INPUTS          => 1,
+    			OUTPUT_RESET_SYNC_EDGES   => "deassert",
+    			SYNC_DEPTH                => 2,
+    			RESET_REQUEST_PRESENT     => 0,
+    			RESET_REQ_WAIT_TIME       => 1,
+    			MIN_RST_ASSERTION_TIME    => 3,
+    			RESET_REQ_EARLY_DSRT_TIME => 1,
+    			USE_RESET_REQUEST_IN0     => 0,
+    			USE_RESET_REQUEST_IN1     => 0,
+    			USE_RESET_REQUEST_IN2     => 0,
+    			USE_RESET_REQUEST_IN3     => 0,
+    			USE_RESET_REQUEST_IN4     => 0,
+    			USE_RESET_REQUEST_IN5     => 0,
+    			USE_RESET_REQUEST_IN6     => 0,
+    			USE_RESET_REQUEST_IN7     => 0,
+    			USE_RESET_REQUEST_IN8     => 0,
+    			USE_RESET_REQUEST_IN9     => 0,
+    			USE_RESET_REQUEST_IN10    => 0,
+    			USE_RESET_REQUEST_IN11    => 0,
+    			USE_RESET_REQUEST_IN12    => 0,
+    			USE_RESET_REQUEST_IN13    => 0,
+    			USE_RESET_REQUEST_IN14    => 0,
+    			USE_RESET_REQUEST_IN15    => 0,
+    			ADAPT_RESET_REQUEST       => 0
+    		)
+    		port map (
+    			reset_in0      => hps_fpga_reset_n,                   -- reset_in0.reset
+    			clk            => hps_in.CLK,                         --       clk.clk
+    			reset_out      => rst_controller_001_reset_out_reset, -- reset_out.reset
+    			reset_req      => open,                               -- (terminated)
+    			reset_req_in0  => '0',                                -- (terminated)
+    			reset_in1      => '0',                                -- (terminated)
+    			reset_req_in1  => '0',                                -- (terminated)
+    			reset_in2      => '0',                                -- (terminated)
+    			reset_req_in2  => '0',                                -- (terminated)
+    			reset_in3      => '0',                                -- (terminated)
+    			reset_req_in3  => '0',                                -- (terminated)
+    			reset_in4      => '0',                                -- (terminated)
+    			reset_req_in4  => '0',                                -- (terminated)
+    			reset_in5      => '0',                                -- (terminated)
+    			reset_req_in5  => '0',                                -- (terminated)
+    			reset_in6      => '0',                                -- (terminated)
+    			reset_req_in6  => '0',                                -- (terminated)
+    			reset_in7      => '0',                                -- (terminated)
+    			reset_req_in7  => '0',                                -- (terminated)
+    			reset_in8      => '0',                                -- (terminated)
+    			reset_req_in8  => '0',                                -- (terminated)
+    			reset_in9      => '0',                                -- (terminated)
+    			reset_req_in9  => '0',                                -- (terminated)
+    			reset_in10     => '0',                                -- (terminated)
+    			reset_req_in10 => '0',                                -- (terminated)
+    			reset_in11     => '0',                                -- (terminated)
+    			reset_req_in11 => '0',                                -- (terminated)
+    			reset_in12     => '0',                                -- (terminated)
+    			reset_req_in12 => '0',                                -- (terminated)
+    			reset_in13     => '0',                                -- (terminated)
+    			reset_req_in13 => '0',                                -- (terminated)
+    			reset_in14     => '0',                                -- (terminated)
+    			reset_req_in14 => '0',                                -- (terminated)
+    			reset_in15     => '0',                                -- (terminated)
+    			reset_req_in15 => '0'                                 -- (terminated)
+    		);
+
+    mm_interconnect_3 : soc_system_mm_interconnect_3
+    		port map (
+    			clk_0_clk_clk                                                           => hps_in.CLK,                                            --                                                         clk_0_clk.clk
+    			f2sdram_only_master_clk_reset_reset_bridge_in_reset_reset               => rst_controller_reset_out_reset,                        --               f2sdram_only_master_clk_reset_reset_bridge_in_reset.reset
+    			f2sdram_only_master_master_translator_reset_reset_bridge_in_reset_reset => rst_controller_reset_out_reset,                        -- f2sdram_only_master_master_translator_reset_reset_bridge_in_reset.reset
+    			hps_0_f2h_sdram0_data_translator_reset_reset_bridge_in_reset_reset      => rst_controller_001_reset_out_reset,                    --      hps_0_f2h_sdram0_data_translator_reset_reset_bridge_in_reset.reset
+    			f2sdram_only_master_master_address                                      => f2sdram_only_master_master_address,                    --                                        f2sdram_only_master_master.address
+    			f2sdram_only_master_master_waitrequest                                  => f2sdram_only_master_master_waitrequest,                --                                                                  .waitrequest
+    			f2sdram_only_master_master_byteenable                                   => f2sdram_only_master_master_byteenable,                 --                                                                  .byteenable
+    			f2sdram_only_master_master_read                                         => f2sdram_only_master_master_read,                       --                                                                  .read
+    			f2sdram_only_master_master_readdata                                     => f2sdram_only_master_master_readdata,                   --                                                                  .readdata
+    			f2sdram_only_master_master_readdatavalid                                => f2sdram_only_master_master_readdatavalid,              --                                                                  .readdatavalid
+    			f2sdram_only_master_master_write                                        => f2sdram_only_master_master_write,                      --                                                                  .write
+    			f2sdram_only_master_master_writedata                                    => f2sdram_only_master_master_writedata,                  --                                                                  .writedata
+    			hps_0_f2h_sdram0_data_address                                           => mm_interconnect_3_hps_0_f2h_sdram0_data_address,       --                                             hps_0_f2h_sdram0_data.address
+    			hps_0_f2h_sdram0_data_write                                             => mm_interconnect_3_hps_0_f2h_sdram0_data_write,         --                                                                  .write
+    			hps_0_f2h_sdram0_data_read                                              => mm_interconnect_3_hps_0_f2h_sdram0_data_read,          --                                                                  .read
+    			hps_0_f2h_sdram0_data_readdata                                          => mm_interconnect_3_hps_0_f2h_sdram0_data_readdata,      --                                                                  .readdata
+    			hps_0_f2h_sdram0_data_writedata                                         => mm_interconnect_3_hps_0_f2h_sdram0_data_writedata,     --                                                                  .writedata
+    			hps_0_f2h_sdram0_data_burstcount                                        => mm_interconnect_3_hps_0_f2h_sdram0_data_burstcount,    --                                                                  .burstcount
+    			hps_0_f2h_sdram0_data_byteenable                                        => mm_interconnect_3_hps_0_f2h_sdram0_data_byteenable,    --                                                                  .byteenable
+    			hps_0_f2h_sdram0_data_readdatavalid                                     => mm_interconnect_3_hps_0_f2h_sdram0_data_readdatavalid, --                                                                  .readdatavalid
+    			hps_0_f2h_sdram0_data_waitrequest                                       => mm_interconnect_3_hps_0_f2h_sdram0_data_waitrequest    --                                                                  .waitrequest
+        );
+
   hps_0 : soc_system_hps_0
     generic map (
       F2S_Width => 2, -- "0:Unused" "1:32-bit" "2:64-bit" "3:128-bit"
@@ -465,70 +839,70 @@ begin
       f2h_dbg_rst_req_n        => hps_debug_reset_n,                                     -- f2h_debug_reset_req.reset_n
       f2h_warm_rst_req_n       => hps_warm_reset_n,                                      --  f2h_warm_reset_req.reset_n
       f2h_stm_hwevents         => (others => '0'),                                       --   f2h_stm_hw_events.stm_hwevents
-      mem_a                    => open,                                                  --              memory.mem_a
-      mem_ba                   => open,                                                  --                    .mem_ba
-      mem_ck                   => open,                                                  --                    .mem_ck
-      mem_ck_n                 => open,                                                  --                    .mem_ck_n
-      mem_cke                  => open,                                                  --                    .mem_cke
-      mem_cs_n                 => open,                                                  --                    .mem_cs_n
-      mem_ras_n                => open,                                                  --                    .mem_ras_n
-      mem_cas_n                => open,                                                  --                    .mem_cas_n
-      mem_we_n                 => open,                                                  --                    .mem_we_n
-      mem_reset_n              => open,                                                  --                    .mem_reset_n
-      mem_dq                   => open,                                                  --                    .mem_dq
-      mem_dqs                  => open,                                                  --                    .mem_dqs
-      mem_dqs_n                => open,                                                  --                    .mem_dqs_n
-      mem_odt                  => open,                                                  --                    .mem_odt
-      mem_dm                   => open,                                                  --                    .mem_dm
+      mem_a                    => hps_out.ddr3_hps_a,                                    --              memory.mem_a
+      mem_ba                   => hps_out.ddr3_hps_ba,                                   --                    .mem_ba
+      mem_ck                   => hps_out.ddr3_hps_clk_p,                                --                    .mem_ck
+      mem_ck_n                 => hps_out.ddr3_hps_clk_n,                                --                    .mem_ck_n
+      mem_cke                  => hps_out.ddr3_hps_cke,                                  --                    .mem_cke
+      mem_cs_n                 => hps_out.ddr3_hps_csn,                                  --                    .mem_cs_n
+      mem_ras_n                => hps_out.ddr3_hps_rasn,                                 --                    .mem_ras_n
+      mem_cas_n                => hps_out.ddr3_hps_casn,                                 --                    .mem_cas_n
+      mem_we_n                 => hps_out.ddr3_hps_wen,                                  --                    .mem_we_n
+      mem_reset_n              => hps_out.ddr3_hps_resetn,                               --                    .mem_reset_n
+      mem_dq                   => hps_inout.ddr3_hps_dq,                                 --                    .mem_dq
+      mem_dqs                  => hps_inout.ddr3_hps_dqs_p,                              --                    .mem_dqs
+      mem_dqs_n                => hps_inout.ddr3_hps_dqs_n,                              --                    .mem_dqs_n
+      mem_odt                  => hps_out.ddr3_hps_odt,                                  --                    .mem_odt
+      mem_dm                   => hps_out.ddr3_hps_dm,                                   --                    .mem_dm
       oct_rzqin                => hps_in.oct_rzqin,                                      --                    .oct_rzqin
-      hps_io_emac1_inst_TX_CLK => open,                                                  --              hps_io.hps_io_emac1_inst_TX_CLK
-      hps_io_emac1_inst_TXD0   => open,                                                  --                    .hps_io_emac1_inst_TXD0
-      hps_io_emac1_inst_TXD1   => open,                                                  --                    .hps_io_emac1_inst_TXD1
-      hps_io_emac1_inst_TXD2   => open,                                                  --                    .hps_io_emac1_inst_TXD2
-      hps_io_emac1_inst_TXD3   => open,                                                  --                    .hps_io_emac1_inst_TXD3
-      hps_io_emac1_inst_RXD0   => '0',                                                   --                    .hps_io_emac1_inst_RXD0
+      hps_io_emac1_inst_TX_CLK => hps_out.enet_hps_gtx_clk,                              --              hps_io.hps_io_emac1_inst_TX_CLK
+      hps_io_emac1_inst_TXD0   => hps_out.enet_hps_txd(0),                               --                    .hps_io_emac1_inst_TXD0
+      hps_io_emac1_inst_TXD1   => hps_out.enet_hps_txd(1),                               --                    .hps_io_emac1_inst_TXD1
+      hps_io_emac1_inst_TXD2   => hps_out.enet_hps_txd(2),                               --                    .hps_io_emac1_inst_TXD2
+      hps_io_emac1_inst_TXD3   => hps_out.enet_hps_txd(3),                               --                    .hps_io_emac1_inst_TXD3
+      hps_io_emac1_inst_RXD0   => hps_in.enet_hps_rxd(0),                                --                    .hps_io_emac1_inst_RXD0
       hps_io_emac1_inst_MDIO   => hps_inout.hps_io_emac1_inst_MDIO,                      --                    .hps_io_emac1_inst_MDIO
-      hps_io_emac1_inst_MDC    => open,                                                  --                    .hps_io_emac1_inst_MDC
-      hps_io_emac1_inst_RX_CTL => '0',                                                   --                    .hps_io_emac1_inst_RX_CTL
-      hps_io_emac1_inst_TX_CTL => open,                                                  --                    .hps_io_emac1_inst_TX_CTL
-      hps_io_emac1_inst_RX_CLK => '0',                                                   --                    .hps_io_emac1_inst_RX_CLK
-      hps_io_emac1_inst_RXD1   => '0',                                                   --                    .hps_io_emac1_inst_RXD1
-      hps_io_emac1_inst_RXD2   => '0',                                                   --                    .hps_io_emac1_inst_RXD2
-      hps_io_emac1_inst_RXD3   => '0',                                                   --                    .hps_io_emac1_inst_RXD3
-      hps_io_qspi_inst_IO0     => hps_inout.hps_io_qspi_inst_IO0,                        --                    .hps_io_qspi_inst_IO0
-      hps_io_qspi_inst_IO1     => hps_inout.hps_io_qspi_inst_IO1,                        --                    .hps_io_qspi_inst_IO1
-      hps_io_qspi_inst_IO2     => hps_inout.hps_io_qspi_inst_IO2,                        --                    .hps_io_qspi_inst_IO2
-      hps_io_qspi_inst_IO3     => hps_inout.hps_io_qspi_inst_IO3,                        --                    .hps_io_qspi_inst_IO3
+      hps_io_emac1_inst_MDC    => hps_out.enet_hps_mdc,                                  --                    .hps_io_emac1_inst_MDC
+      hps_io_emac1_inst_RX_CTL => hps_in.enet_hps_rx_dv,                                 --                    .hps_io_emac1_inst_RX_CTL
+      hps_io_emac1_inst_TX_CTL => hps_out.enet_hps_tx_en,                                --                    .hps_io_emac1_inst_TX_CTL
+      hps_io_emac1_inst_RX_CLK => hps_in.enet_hps_rx_clk,                                --                    .hps_io_emac1_inst_RX_CLK
+      hps_io_emac1_inst_RXD1   => hps_in.enet_hps_rxd(1),                                --                    .hps_io_emac1_inst_RXD1
+      hps_io_emac1_inst_RXD2   => hps_in.enet_hps_rxd(2),                                --                    .hps_io_emac1_inst_RXD2
+      hps_io_emac1_inst_RXD3   => hps_in.enet_hps_rxd(3),                                --                    .hps_io_emac1_inst_RXD3
+      hps_io_qspi_inst_IO0     => hps_inout.hps_io_qspi_inst_IO(0),                      --                    .hps_io_qspi_inst_IO0
+      hps_io_qspi_inst_IO1     => hps_inout.hps_io_qspi_inst_IO(1),                      --                    .hps_io_qspi_inst_IO1
+      hps_io_qspi_inst_IO2     => hps_inout.hps_io_qspi_inst_IO(2),                      --                    .hps_io_qspi_inst_IO2
+      hps_io_qspi_inst_IO3     => hps_inout.hps_io_qspi_inst_IO(3),                      --                    .hps_io_qspi_inst_IO3
       hps_io_qspi_inst_SS0     => open,                                                  --                    .hps_io_qspi_inst_SS0
       hps_io_qspi_inst_CLK     => open,                                                  --                    .hps_io_qspi_inst_CLK
       hps_io_sdio_inst_CMD     => hps_inout.hps_io_sdio_inst_CMD,                        --                    .hps_io_sdio_inst_CMD
-      hps_io_sdio_inst_D0      => hps_inout.hps_io_sdio_inst_D0,                         --                    .hps_io_sdio_inst_D0
-      hps_io_sdio_inst_D1      => hps_inout.hps_io_sdio_inst_D1,                         --                    .hps_io_sdio_inst_D1
+      hps_io_sdio_inst_D0      => hps_inout.hps_io_sdio_inst_D(0),                       --                    .hps_io_sdio_inst_D0
+      hps_io_sdio_inst_D1      => hps_inout.hps_io_sdio_inst_D(1),                       --                    .hps_io_sdio_inst_D1
       hps_io_sdio_inst_CLK     => open,                                                  --                    .hps_io_sdio_inst_CLK
-      hps_io_sdio_inst_D2      => hps_inout.hps_io_sdio_inst_D2,                         --                    .hps_io_sdio_inst_D2
-      hps_io_sdio_inst_D3      => hps_inout.hps_io_sdio_inst_D3,                         --                    .hps_io_sdio_inst_D3
-      hps_io_usb1_inst_D0      => hps_inout.hps_io_usb1_inst_D0,                         --                    .hps_io_usb1_inst_D0
-      hps_io_usb1_inst_D1      => hps_inout.hps_io_usb1_inst_D1,                         --                    .hps_io_usb1_inst_D1
-      hps_io_usb1_inst_D2      => hps_inout.hps_io_usb1_inst_D2,                         --                    .hps_io_usb1_inst_D2
-      hps_io_usb1_inst_D3      => hps_inout.hps_io_usb1_inst_D3,                         --                    .hps_io_usb1_inst_D3
-      hps_io_usb1_inst_D4      => hps_inout.hps_io_usb1_inst_D4,                         --                    .hps_io_usb1_inst_D4
-      hps_io_usb1_inst_D5      => hps_inout.hps_io_usb1_inst_D5,                         --                    .hps_io_usb1_inst_D5
-      hps_io_usb1_inst_D6      => hps_inout.hps_io_usb1_inst_D6,                         --                    .hps_io_usb1_inst_D6
-      hps_io_usb1_inst_D7      => hps_inout.hps_io_usb1_inst_D7,                         --                    .hps_io_usb1_inst_D7
-      hps_io_usb1_inst_CLK     => '0',                                                   --                    .hps_io_usb1_inst_CLK
-      hps_io_usb1_inst_STP     => open,                                                  --                    .hps_io_usb1_inst_STP
-      hps_io_usb1_inst_DIR     => '0',                                                   --                    .hps_io_usb1_inst_DIR
-      hps_io_usb1_inst_NXT     => '0',                                                   --                    .hps_io_usb1_inst_NXT
-      hps_io_spim0_inst_CLK    => open,                                                  --                    .hps_io_spim0_inst_CLK
-      hps_io_spim0_inst_MOSI   => open,                                                  --                    .hps_io_spim0_inst_MOSI
-      hps_io_spim0_inst_MISO   => '0',                                                   --                    .hps_io_spim0_inst_MISO
-      hps_io_spim0_inst_SS0    => open,                                                  --                    .hps_io_spim0_inst_SS0
-      hps_io_uart0_inst_RX     => '0',                                                   --                    .hps_io_uart0_inst_RX
-      hps_io_uart0_inst_TX     => open,                                                  --                    .hps_io_uart0_inst_TX
-      hps_io_i2c0_inst_SDA     => open,                                                  --                    .hps_io_i2c0_inst_SDA
-      hps_io_i2c0_inst_SCL     => open,                                                  --                    .hps_io_i2c0_inst_SCL
-      hps_io_can0_inst_RX      => '0',                                                   --                    .hps_io_can0_inst_RX
-      hps_io_can0_inst_TX      => open,                                                  --                    .hps_io_can0_inst_TX
+      hps_io_sdio_inst_D2      => hps_inout.hps_io_sdio_inst_D(2),                       --                    .hps_io_sdio_inst_D2
+      hps_io_sdio_inst_D3      => hps_inout.hps_io_sdio_inst_D(3),                       --                    .hps_io_sdio_inst_D3
+      hps_io_usb1_inst_D0      => hps_inout.hps_io_usb1_inst_D(0),                       --                    .hps_io_usb1_inst_D0
+      hps_io_usb1_inst_D1      => hps_inout.hps_io_usb1_inst_D(1),                       --                    .hps_io_usb1_inst_D1
+      hps_io_usb1_inst_D2      => hps_inout.hps_io_usb1_inst_D(2),                       --                    .hps_io_usb1_inst_D2
+      hps_io_usb1_inst_D3      => hps_inout.hps_io_usb1_inst_D(3),                       --                    .hps_io_usb1_inst_D3
+      hps_io_usb1_inst_D4      => hps_inout.hps_io_usb1_inst_D(4),                       --                    .hps_io_usb1_inst_D4
+      hps_io_usb1_inst_D5      => hps_inout.hps_io_usb1_inst_D(5),                       --                    .hps_io_usb1_inst_D5
+      hps_io_usb1_inst_D6      => hps_inout.hps_io_usb1_inst_D(6),                       --                    .hps_io_usb1_inst_D6
+      hps_io_usb1_inst_D7      => hps_inout.hps_io_usb1_inst_D(7),                       --                    .hps_io_usb1_inst_D7
+      hps_io_usb1_inst_CLK     => hps_in.usb_clk,                                        --                    .hps_io_usb1_inst_CLK
+      hps_io_usb1_inst_STP     => hps_out.usb_stp,                                       --                    .hps_io_usb1_inst_STP
+      hps_io_usb1_inst_DIR     => hps_in.usb_dir,                                        --                    .hps_io_usb1_inst_DIR
+      hps_io_usb1_inst_NXT     => hps_in.usb_nxt,                                        --                    .hps_io_usb1_inst_NXT
+      hps_io_spim0_inst_CLK    => hps_out.spi_sck,                                       --                    .hps_io_spim0_inst_CLK
+      hps_io_spim0_inst_MOSI   => hps_out.spi_mosi,                                      --                    .hps_io_spim0_inst_MOSI
+      hps_io_spim0_inst_MISO   => hps_in.spi_miso,                                       --                    .hps_io_spim0_inst_MISO
+      hps_io_spim0_inst_SS0    => hps_out.spi_csn,                                       --                    .hps_io_spim0_inst_SS0
+      hps_io_uart0_inst_RX     => hps_in.hps_io_uart0_inst_RX,                           --                    .hps_io_uart0_inst_RX
+      hps_io_uart0_inst_TX     => hps_out.hps_io_uart0_inst_TX,                          --                    .hps_io_uart0_inst_TX
+      hps_io_i2c0_inst_SDA     => hps_inout.hps_io_i2c0_inst_SDA,                        --                    .hps_io_i2c0_inst_SDA
+      hps_io_i2c0_inst_SCL     => hps_inout.hps_io_i2c0_inst_SCL,                        --                    .hps_io_i2c0_inst_SCL
+      hps_io_can0_inst_RX      => hps_in.can_0_rx,                                       --                    .hps_io_can0_inst_RX
+      hps_io_can0_inst_TX      => hps_out.can_0_tx,                                      --                    .hps_io_can0_inst_TX
       hps_io_trace_inst_CLK    => open,                                                  --                    .hps_io_trace_inst_CLK
       hps_io_trace_inst_D0     => open,                                                  --                    .hps_io_trace_inst_D0
       hps_io_trace_inst_D1     => open,                                                  --                    .hps_io_trace_inst_D1
@@ -545,16 +919,16 @@ begin
       hps_io_gpio_inst_GPIO43  => hps_inout.hps_io_gpio_inst_GPIO43,                     --                    .hps_io_gpio_inst_GPIO43
       hps_io_gpio_inst_GPIO44  => hps_inout.hps_io_gpio_inst_GPIO44,                     --                    .hps_io_gpio_inst_GPIO44
       h2f_rst_n                => hps_fpga_reset_n,                                      --           h2f_reset.reset_n
-      f2h_sdram0_clk           => '0',                                                   --    f2h_sdram0_clock.clk
-      f2h_sdram0_ADDRESS       => (others => '0'),                                       --     f2h_sdram0_data.address
-      f2h_sdram0_BURSTCOUNT    => (others => '0'),                                       --                    .burstcount
-      f2h_sdram0_WAITREQUEST   => open,                                                  --                    .waitrequest
-      f2h_sdram0_READDATA      => open,                                                  --                    .readdata
-      f2h_sdram0_READDATAVALID => open,                                                  --                    .readdatavalid
-      f2h_sdram0_READ          => '0',                                                   --                    .read
-      f2h_sdram0_WRITEDATA     => (others => '0'),                                       --                    .writedata
-      f2h_sdram0_BYTEENABLE    => (others => '0'),                                       --                    .byteenable
-      f2h_sdram0_WRITE         => '0',                                                   --                    .write
+      f2h_sdram0_clk           => hps_in.CLK,                                            --    f2h_sdram0_clock.clk
+      f2h_sdram0_ADDRESS       => mm_interconnect_3_hps_0_f2h_sdram0_data_address,       --     f2h_sdram0_data.address
+      f2h_sdram0_BURSTCOUNT    => mm_interconnect_3_hps_0_f2h_sdram0_data_burstcount,    --                    .burstcount
+      f2h_sdram0_WAITREQUEST   => mm_interconnect_3_hps_0_f2h_sdram0_data_waitrequest,   --                    .waitrequest
+      f2h_sdram0_READDATA      => mm_interconnect_3_hps_0_f2h_sdram0_data_readdata,      --                    .readdata
+      f2h_sdram0_READDATAVALID => mm_interconnect_3_hps_0_f2h_sdram0_data_readdatavalid, --                    .readdatavalid
+      f2h_sdram0_READ          => mm_interconnect_3_hps_0_f2h_sdram0_data_read,          --                    .read
+      f2h_sdram0_WRITEDATA     => mm_interconnect_3_hps_0_f2h_sdram0_data_writedata,     --                    .writedata
+      f2h_sdram0_BYTEENABLE    => mm_interconnect_3_hps_0_f2h_sdram0_data_byteenable,    --                    .byteenable
+      f2h_sdram0_WRITE         => mm_interconnect_3_hps_0_f2h_sdram0_data_write,         --                    .write
       h2f_axi_clk              => m_h2f_axi_in(0).A.CLK,                                 --       h2f_axi_clock.clk
       h2f_AWID                 => m_h2f_axi_out(0).AW.ID,                                --      h2f_axi_master.awid
       h2f_AWADDR               => m_h2f_axi_out(0).AW.ADDR,                              --                    .awaddr

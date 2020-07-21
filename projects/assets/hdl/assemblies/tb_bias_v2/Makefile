@@ -18,6 +18,6 @@
 
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
-
+ComponentLibraries=util_comps base_comps misc_comps dsp_comps comms_comps devices
 Containers=ml6_fl
 include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk

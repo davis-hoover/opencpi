@@ -15,120 +15,203 @@
   <!-- <Signal  input='fpga_button_pio' width='4'/>
   <Signal  input='fpga_dipsw_pio' width='4'/>
   <Signal output='fpga_led_pio'  width='4'/> -->
-  <signal input="fpga_clk_50"/>
+  <signal input="fpga_clk_50"/> <!-- PIN AC18-->
   <!-- <signal input="fpga_reset_n"/> -->
   <property name="axi_error" type="bool" arraylength='4' volatile='true'/>
   <property name="sdpDropCount" type='uchar' volatile='true'/>
-  <signal inout='hps_io_emac1_inst_MDIO' width='1' pin='true'/> <!--E21-->
-  <signal inout='hps_io_qspi_inst_IO0' width='1' pin='true'/> <!--C20-->
-  <signal inout='hps_io_qspi_inst_IO1' width='1' pin='true'/> <!--H18-->
-  <signal inout='hps_io_qspi_inst_IO2' width='1' pin='true'/> <!--A19-->
-  <signal inout='hps_io_qspi_inst_IO3' width='1' pin='true'/> <!--E19-->
-  <signal inout='hps_io_sdio_inst_CMD' width='1' pin='true'/> <!--F18-->
-  <signal inout='hps_io_sdio_inst_D0'  width='1' pin='true'/> <!--G18-->
-  <signal inout='hps_io_sdio_inst_D1'  width='1' pin='true'/> <!--C17-->
-  <signal inout='hps_io_sdio_inst_D2'  width='1' pin='true'/> <!--D17-->
-  <signal inout='hps_io_sdio_inst_D3'  width='1' pin='true'/> <!--B16-->
-  <signal inout='hps_io_usb1_inst_D0'  width='1' pin='true'/> <!--E16-->
-  <signal inout='hps_io_usb1_inst_D1'  width='1' pin='true'/> <!--G16-->
-  <signal inout='hps_io_usb1_inst_D2'  width='1' pin='true'/> <!--D16-->
-  <signal inout='hps_io_usb1_inst_D3'  width='1' pin='true'/> <!--D14-->
-  <signal inout='hps_io_usb1_inst_D4'  width='1' pin='true'/> <!--A15-->
-  <signal inout='hps_io_usb1_inst_D5'  width='1' pin='true'/> <!--C14-->
-  <signal inout='hps_io_usb1_inst_D6'  width='1' pin='true'/> <!--D15-->
-  <signal inout='hps_io_usb1_inst_D7'  width='1' pin='true'/> <!--M17-->
-  <signal inout='hps_io_gpio_inst_GPIO09'  width='1' pin='true'/>  <!--B15-->
-  <signal inout='hps_io_gpio_inst_GPIO35'  width='1' pin='true'/> <!--C19-->
-  <signal inout='hps_io_gpio_inst_GPIO41'  width='1' pin='true'/> <!--C18-->
-  <signal inout='hps_io_gpio_inst_GPIO42'  width='1' pin='true'/> <!--G17-->
-  <signal inout='hps_io_gpio_inst_GPIO43'  width='1' pin='true'/> <!--E18-->
-  <signal inout='hps_io_gpio_inst_GPIO44'  width='1' pin='true'/> <!--E17-->
-  <signal input='oct_rzqin' width='1'/>
-  <!-- <signal output='hps_memory_mem_ck' width='1'/>
-  <signal output='hps_memory_mem_ck_n' width='1'/>
-  <signal output='hps_memory_mem_a' width='17'/>
-  <signal output='hps_memory_mem_act_n' width='1'/>
-  <signal output='hps_memory_mem_ba' width='2'/>
-  <signal output='hps_memory_mem_bg'  width='1'/>
-  <signal output='hps_memory_mem_cke' width='1'/>
-  <signal output='hps_memory_mem_cs_n' width='1'/>
-  <signal output='hps_memory_mem_odt' width='1'/>
-  <signal output='hps_memory_mem_reset_n' width='1'/>
-  <signal output='hps_memory_mem_par' width='1'/>
-  <signal input='hps_memory_mem_alert_n' width='1'/> -->
-
- <!-- <signal inout='hps_memory_mem_dqs' width='4' pin='true'/>
- <signal inout='hps_memory_mem_dqs_n' width='4' pin='true'/>
- <signal inout='hps_memory_mem_dq' width='32' pin='true'/>
- <signal inout='hps_memory_mem_dbi_n' width='4' pin='true'/>
-
- <signal input='hps_memory_oct_rzqin'/>
- <signal input='emif_ref_clk'/>
-
- <signal output='hps_emac0_TX_CLK'/>
- <signal output='hps_emac0_TXD0'/>
- <signal output='hps_emac0_TXD1'/>
- <signal output='hps_emac0_TXD2'/>
- <signal output='hps_emac0_TXD3'/>
- <signal input='hps_emac0_RX_CTL'/>
- <signal output='hps_emac0_TX_CTL'/>
- <signal input='hps_emac0_RX_CLK'/>
- <signal input='hps_emac0_RXD0'/>
- <signal input='hps_emac0_RXD1'/>
- <signal input='hps_emac0_RXD2'/>
- <signal input='hps_emac0_RXD3'/>
- <signal inout='hps_emac0_MDIO' pin='true'/>
-
- <signal output='hps_emac0_MDC'/>
-
-
- <signal inout='hps_sdio_CMD' pin='true'/>
- <signal inout='hps_sdio_D1' pin='true'/>
- <signal inout='hps_sdio_D2' pin='true'/>
- <signal inout='hps_sdio_D3' pin='true'/>
- <signal inout='hps_sdio_D4' pin='true'/>
- <signal inout='hps_sdio_D5' pin='true'/>
- <signal inout='hps_sdio_D6' pin='true'/>
- <signal inout='hps_sdio_D7' pin='true'/>
-
- <signal output='hps_sdio_CLK'/>
-
- <signal inout='hps_usb0_D0' pin='true'/>
- <signal inout='hps_usb0_D1' pin='true'/>
- <signal inout='hps_usb0_D2' pin='true'/>
- <signal inout='hps_usb0_D3' pin='true'/>
- <signal inout='hps_usb0_D4' pin='true'/>
- <signal inout='hps_usb0_D5' pin='true'/>
- <signal inout='hps_usb0_D6' pin='true'/>
- <signal inout='hps_usb0_D7' pin='true'/>
- <signal input='hps_usb0_CLK'/>
- <signal output='hps_usb0_STP'/>
- <signal input='hps_usb0_DIR'/>
- <signal input='hps_usb0_NXT'/>
-
- <signal output='hps_spim1_CLK'/>
- <signal output='hps_spim1_MOSI'/>
- <signal input='hps_spim1_MISO'/>
- <signal output='hps_spim1_SS0_N'/>
- <signal output='hps_spim1_SS1_N'/>
-
- <signal output='hps_trace_CLK'/>
- <signal output='hps_trace_D0'/>
- <signal output='hps_trace_D1'/>
- <signal output='hps_trace_D2'/>
- <signal output='hps_trace_D3'/>
-
- <signal input='hps_uart1_RX'/>
- <signal output='hps_uart1_TX'/>
-
- <signal inout='hps_i2c1_SDA' pin='true'/>
- <signal inout='hps_i2c1_SCL' pin='true'/>
-
- <signal inout='hps_gpio_GPIO05' pin='true'/>
- <signal inout='hps_gpio_GPIO14' pin='true'/>
- <signal inout='hps_gpio_GPIO16' pin='true'/>
- <signal inout='hps_gpio_GPIO17' pin='true'/>    -->
-
+  <signal inout='hps_io_emac1_inst_MDIO' width='1' pin='true'/> <!-- PIN E21-->
+  <signal inout='hps_io_qspi_inst_IO' width='4' pin='true'/> <!-- hps_io_qspi_inst_IO[0] : PIN C20--> <!-- hps_io_qspi_inst_IO[1] : PIN H18-->
+  <!-- hps_io_qspi_inst_IO[2] : PIN A19--> <!-- hps_io_qspi_inst_IO[3] : PIN E19-->
+  <!-- <signal inout='hps_io_qspi_inst_IO1' width='1' pin='true'/>  PIN H18 -->
+  <!-- <signal inout='hps_io_qspi_inst_IO2' width='1' pin='true'/> PIN A19 -->
+  <!-- <signal inout='hps_io_qspi_inst_IO3' width='1' pin='true'/> PIN E19 -->
+  <signal inout='hps_io_sdio_inst_CMD' width='1' pin='true'/> <!-- PIN F18-->
+  <signal inout='hps_io_sdio_inst_D'   width='4' pin='true'/> <!-- hps_io_sdio_inst_D[0] : PIN G18--> <!-- hps_io_sdio_inst_D[1] : PIN C17-->
+  <!-- hps_io_sdio_inst_D[2] : PIN D17--> <!-- hps_io_sdio_inst_D[3] : PIN B16-->
+  <!-- <signal inout='hps_io_sdio_inst_D1'  width='1' pin='true'/> PIN C17 -->
+  <!-- <signal inout='hps_io_sdio_inst_D2'  width='1' pin='true'/> PIN D17 -->
+  <!-- <signal inout='hps_io_sdio_inst_D3'  width='1' pin='true'/> PIN B16 -->
+  <signal inout='hps_io_usb1_inst_D'  width='8' pin='true'/> <!-- hps_io_usb1_inst_D[0] PIN E16--> <!-- hps_io_usb1_inst_D[1] PIN G16-->
+  <!-- hps_io_usb1_inst_D[2] PIN D16--> <!-- hps_io_usb1_inst_D[3] PIN D14--> <!-- hps_io_usb1_inst_D[4] PIN A15-->
+  <!-- hps_io_usb1_inst_D[5] PIN C14--> <!-- hps_io_usb1_inst_D[6] PIN D15--> <!-- hps_io_usb1_inst_D[7] PIN M17-->
+  <!-- <signal inout='hps_io_usb1_inst_D1'  width='1' pin='true'/> PIN G16 -->
+  <!-- <signal inout='hps_io_usb1_inst_D2'  width='1' pin='true'/> PIN D16 -->
+  <!-- <signal inout='hps_io_usb1_inst_D3'  width='1' pin='true'/> PIN D14 -->
+  <!-- <signal inout='hps_io_usb1_inst_D4'  width='1' pin='true'/> PIN A15 -->
+  <!-- <signal inout='hps_io_usb1_inst_D5'  width='1' pin='true'/> PIN C14 -->
+  <!-- <signal inout='hps_io_usb1_inst_D6'  width='1' pin='true'/> PIN D15 -->
+  <!-- <signal inout='hps_io_usb1_inst_D7'  width='1' pin='true'/> PIN M17 -->
+  <signal inout='hps_io_gpio_inst_GPIO09'  width='1' pin='true'/>  <!-- PIN B15-->
+  <signal inout='hps_io_gpio_inst_GPIO35'  width='1' pin='true'/> <!-- PIN C19-->
+  <signal inout='hps_io_gpio_inst_GPIO41'  width='1' pin='true'/> <!-- PIN C18-->
+  <signal inout='hps_io_gpio_inst_GPIO42'  width='1' pin='true'/> <!-- PIN G17-->
+  <signal inout='hps_io_gpio_inst_GPIO43'  width='1' pin='true'/> <!-- PIN E18-->
+  <signal inout='hps_io_gpio_inst_GPIO44'  width='1' pin='true'/> <!-- PIN E17-->
+  <signal input='oct_rzqin' width='1'/> <!-- PIN D27 -->
+<!-- ############################################################################# -->
+  <signal output='ddr3_hps_a'  width='15'/>
+  <signal output='ddr3_hps_ba'  width='3'/>
+  <signal output='ddr3_hps_dm'  width='5'/>
+  <signal inout='ddr3_hps_dq'  width='40' pin='true'/>
+  <signal inout='ddr3_hps_dqs_n'  width='5' pin='true'/>
+  <signal inout='ddr3_hps_dqs_p'  width='5' pin='true'/>
+  <signal output='ddr3_hps_casn'  width='1'/>
+  <signal output='ddr3_hps_cke'  width='1'/>
+  <signal output='ddr3_hps_clk_n'  width='1'/>
+  <signal output='ddr3_hps_clk_p'  width='1'/>
+  <signal output='ddr3_hps_csn'  width='1'/>
+  <signal output='ddr3_hps_odt'  width='1'/>
+  <signal output='ddr3_hps_rasn'  width='1'/>
+  <signal output='ddr3_hps_resetn'  width='1'/>
+  <signal output='ddr3_hps_wen'  width='1'/>
+  <signal input='clk_osc2'  width='1'/>
+  <signal inout='mictor_rstn'  width='1' pin='true'/>
+  <signal input='hps_resetn'  width='1'/>
+  <signal input='user_dipsw_hps'  width='4'/>
+  <signal input='user_pb_hps'  width='2'/>
+  <signal input='uart_rx'  width='1'/>
+  <signal output='uart_tx'  width='1'/>
+  <signal inout='i2c_scl_hps'  width='1' pin='true'/>
+  <signal inout='i2c_sda_hps'  width='1' pin='true'/>
+  <signal output='spi_csn'  width='1'/>
+  <signal input='spi_miso'  width='1'/>
+  <signal output='spi_mosi'  width='1'/>
+  <signal output='spi_sck'  width='1'/>
+  <signal output='qspi_clk'  width='1'/>
+  <signal output='qspi_ss0'  width='1'/>
+  <signal output='sd_clk'  width='1'/>
+  <signal output='sd_pwren'  width='1'/>
+  <signal input='usb_clk'  width='1'/>
+  <signal input='usb_nxt'  width='1'/>
+  <signal input='usb_dir'  width='1'/>
+  <signal output='usb_stp'  width='1'/>
+  <signal output='enet_hps_gtx_clk'  width='1'/>
+  <signal output='enet_hps_mdc'  width='1'/>
+  <signal input='enet_hps_rx_clk'  width='1'/>
+  <signal input='enet_hps_rx_dv'  width='1'/>
+  <signal input='enet_hps_rxd'  width='4'/>
+  <signal output='enet_hps_tx_en'  width='1'/>
+  <signal output='enet_hps_txd'  width='4'/>
+  <signal input='can_0_rx'  width='1'/>
+  <signal output='can_0_tx'  width='1'/>
+  <signal output='trace_clk_mic'  width='1'/>
+  <signal output='trace_data'  width='4'/>
+  <signal inout='hps_io_i2c0_inst_SCL'  width='1' pin='true'/>
+  <signal inout='hps_io_i2c0_inst_SDA'  width='1' pin='true'/>
+  <signal input='hps_io_uart0_inst_RX' width='1'/>
+  <signal output='hps_io_uart0_inst_TX' width='1'/>
+  <signal input='clk_100m_fpga'  width='1'/>
+  <signal input='clk_bot1'  width='1'/>
+  <signal input='clk_enet_fpga_p'  width='1'/>
+  <signal input='clk_top1'  width='1'/>
+  <signal output='ddr3_fpga_a'  width='15'/>
+  <signal output='ddr3_fpga_ba'  width='3'/>
+  <signal output='ddr3_fpga_casn'  width='1'/>
+  <signal output='ddr3_fpga_cke'  width='1'/>
+  <signal output='ddr3_fpga_clk_n'  width='1'/>
+  <signal output='ddr3_fpga_clk_p'  width='1'/>
+  <signal output='ddr3_fpga_csn'  width='1'/>
+  <signal output='ddr3_fpga_dm'  width='4'/>
+  <signal inout='ddr3_fpga_dq'  width='32' pin='true'/>
+  <signal inout='ddr3_fpga_dqs_n'  width='5' pin='true'/>
+  <signal inout='ddr3_fpga_dqs_p'  width='5' pin='true'/>
+  <signal output='ddr3_fpga_odt'  width='1'/>
+  <signal input='ddr3_fpga_rasn'  width='1'/>
+  <signal input='ddr3_fpga_resetn'  width='1'/>
+  <signal input='ddr3_fpga_wen'  width='1'/>
+  <signal output='hsma_tx_p'  width='4'/>
+  <signal output='hsma_tx_n'  width='4'/>
+  <signal output='hsma_tx_d_p'  width='17'/>
+  <signal output='hsma_tx_d_n'  width='17'/>
+  <signal inout='hsma_sda'  width='1' pin='true'/>
+  <signal output='hsma_scl'  width='1'/>
+  <signal input='hsma_rx_p'  width='4'/>
+  <signal input='hsma_rx_n'  width='4'/>
+  <signal input='hsma_rx_d_p'  width='17'/>
+  <signal input='hsma_rx_d_n'  width='17'/>
+  <signal input='hsma_prsntn'  width='1'/>
+  <signal inout='hsma_d'  width='4' pin='true'/>
+  <signal output='hsma_clk_out0'  width='1'/>
+  <signal output='hsma_clk_out_p2'  width='1'/>
+  <signal output='hsma_clk_out_n2'  width='1'/>
+  <signal input='hsma_clk_in0'  width='1'/>
+  <signal input='hsma_clk_in_p2'  width='1'/>
+  <signal input='hsma_clk_in_n2'  width='1'/>
+  <signal output='enet1_tx_en'  width='1'/>
+  <signal output='enet1_tx_d'  width='4'/>
+  <signal output='enet1_tx_clk_fb'  width='1'/>
+  <signal input='enet1_rx_error'  width='1'/>
+  <signal input='enet1_rx_dv'  width='1'/>
+  <signal input='enet1_rx_d'  width='4'/>
+  <signal input='enet1_rx_clk'  width='1'/>
+  <signal output='enet2_tx_en'  width='1'/>
+  <signal output='enet2_tx_d'  width='4'/>
+  <signal output='enet2_tx_clk_fb'  width='1'/>
+  <signal input='enet2_rx_error'  width='1'/>
+  <signal input='enet2_rx_dv'  width='1'/>
+  <signal input='enet2_rx_d'  width='4'/>
+  <signal input='enet2_rx_clk'  width='1'/>
+  <signal output='sdi_tx_sd_hdn'  width='1'/>
+  <signal output='sdi_tx_en'  width='1'/>
+  <signal output='sdi_rx_en'  width='1'/>
+  <signal output='sdi_rx_bypass'  width='1'/>
+  <signal output='sdi_rsti'  width='1'/>
+  <signal input='sdi_fault'  width='1'/>
+  <signal output='sdi_clk148_up'  width='1'/>
+  <signal output='sdi_clk148_dn'  width='1'/>
+  <signal input='user_dipsw_fpga'  width='4'/>
+  <signal input='user_led_fpga'  width='4'/>
+  <signal input='user_pb_fpga'  width='2'/>
+  <signal input='ddr3_fpga_rzq'  width='1'/>
+  <signal input='pcie_perstn_in'  width='1'/>
+  <signal output='pcie_perstn_out'  width='1'/>
+  <signal input='pcie_refclk_n'  width='1'/>
+  <signal input='pcie_refclk_p'  width='1'/>
+  <signal input='pcie_rx_n'  width='4'/>
+  <signal input='pcie_rx_p'  width='4'/>
+  <signal output='pcie_tx_n'  width='4'/>
+  <signal output='pcie_tx_p'  width='4'/>
+  <signal input='usb_b2_clk'  width='1'/>
+  <signal inout='usb_b2_data'  width='8' pin='true'/>
+  <signal input='cpu_resetn'  width='1'/>
+  <signal input='enet1_tx_error'  width='1'/>
+  <signal input='enet2_tx_error'  width='1'/>
+  <signal output='enet_dual_resetn'  width='1'/>
+  <signal input='clk_148_p'  width='1'/>
+  <signal inout='i2c_scl_fpga'  width='1' pin='true'/>
+  <signal inout='i2c_sda_fpga'  width='1' pin='true'/>
+  <signal input='usb_empty'  width='1'/>
+  <signal input='usb_full'  width='1'/>
+  <signal output='usb_oen'  width='1'/>
+  <signal output='usb_rdn'  width='1'/>
+  <signal output='usb_resetn'  width='1'/>
+  <signal output='usb_scl'  width='1'/>
+  <signal inout='usb_sda'  width='1' pin='true'/>
+  <signal output='usb_wrn'  width='1'/>
+  <signal input='enet_fpga_mdc'  width='1'/>
+  <signal input='enet_fpga_mdio'  width='1'/>
+  <signal input='clk_148_n'  width='1'/>
+  <signal input='clk_enet_fpga_n'  width='1'/>
+  <signal input='gxb_rx_l4_n'  width='1'/>
+  <signal input='gxb_rx_l4_p'  width='1'/>
+  <signal output='gxb_tx_l4_n'  width='1'/>
+  <signal output='gxb_tx_l4_p'  width='1'/>
+  <signal input='refclk_ql2_n'  width='1'/>
+  <signal input='refclk_ql2_p'  width='1'/>
+  <signal inout='pcie_smbclk'  width='1' pin='true'/>
+  <signal inout='pcie_smbdat'  width='1' pin='true'/>
+  <signal inout='pcie_waken'  width='1' pin='true'/>
+  <signal output='max_fpga_miso'  width='1'/>
+  <signal input='max_fpga_mosi'  width='1'/>
+  <signal inout='max_fpga_sck'  width='1' pin='true'/>
+  <signal inout='max_fpga_ssel'  width='1' pin='true'/>
+  <signal input='pcie_prsnt2_x1'  width='1'/>
+  <signal input='pcie_prsnt2_x4'  width='1'/>
+  <signal input='clk_25m_fpga'  width='1'/>
+  <signal output='hsma_clk_out_p1'  width='1'/>
+  <signal output='hsma_clk_out_n1'  width='1'/>
+  <signal input='hsma_clk_in_p1'  width='1'/>
+  <signal input='hsma_clk_in_n1'  width='1'/>
   <!-- Put any additional platform-specific properties here using <Property> -->
   <!-- Put any built-in (always present) devices here using <device> -->
   <!-- Put any card slots here using <slot> -->
