@@ -141,12 +141,13 @@ def upload(args, env):
 
     # If timestamp passed, find all files created/updated since the timestamp
     if args.timestamp:
-        timestamp = os.path.getmtime(args.timestamp)
+        timestamp = os.lstat(args.timestamp).st_mtime
 
         for dirpath, dirnames, filenames in os.walk('.'):
             for filename in filenames:
                 filepath = os.path.join(dirpath, filename)
-                if os.path.getmtime(filepath) > timestamp:
+
+                if os.lstat(filepath).st_mtime > timestamp:
                     files.append(filepath)              
     else:
         files.append(args.artifact)
@@ -156,7 +157,7 @@ def upload(args, env):
         for f in files:
             if f:
                 tar.add(f, exclude=exclude_files)
-
+        print(tar.getmembers())
     # Create and execute command to upload tar
     cmd = ['aws', 's3', 'cp', 'tar', 
         's3://opencpi-ci-artifacts/{}'.format(s3_object),
