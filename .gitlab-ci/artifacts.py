@@ -108,16 +108,16 @@ def make_parser():
     return parser
 
 
-def exclude_files(filepath):
-    """ Excludes certain files from being added to tar.
+def exclude_paths(path):
+    """ Excludes certain path from being added to tar.
 
     Args:
-        filepath: File to be validated for exclusion
+        path: Path to be validated for exclusion
 
         Returns:
-            True if file should be excluded; else False
+            True if path should be excluded; else False
     """
-    if filepath.endswith('.git'):
+    if '.git' in path:
         return True
     
     return False
@@ -141,22 +141,25 @@ def upload(args, env):
 
     # If timestamp passed, find all files created/updated since the timestamp
     if args.timestamp:
-        timestamp = os.path.getmtime(args.timestamp)
+        timestamp = os.lstat(args.timestamp).st_ctime
+        recursive = False
 
         for dirpath, dirnames, filenames in os.walk('.'):
-            for filename in filenames:
-                filepath = os.path.join(dirpath, filename)
-                if os.path.getmtime(filepath) > timestamp:
-                    files.append(filepath)              
+            paths = [os.path.join(dirpath, name) for name in dirnames + filenames]
+
+            for path in paths:
+                if os.lstat(path).st_ctime > timestamp:
+                    files.append(path)              
     else:
         files.append(args.artifact)
+        recursive =  True
 
     # Create the tar
     with tarfile.open('tar', "w:gz") as tar:
         for f in files:
             if f:
-                tar.add(f, exclude=exclude_files)
-
+                tar.add(f, exclude=exclude_paths, recursive=recursive)
+        
     # Create and execute command to upload tar
     cmd = ['aws', 's3', 'cp', 'tar', 
         's3://opencpi-ci-artifacts/{}'.format(s3_object),
@@ -214,7 +217,7 @@ def download(args, env):
     print(process.stdout.read().strip())
 
     # Walk temp_dir and extract tar files
-    for dirpath, dirnames, filenames in os.walk(temp_dir):
+    for dirpath, _, filenames in os.walk(temp_dir):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             print('Extracting: {}'.format(filepath))
