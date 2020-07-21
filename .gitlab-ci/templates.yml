@@ -674,8 +674,7 @@
   before_script:
     - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar.gz" "*centos7.tar.gz"
     - sleep 5
-    - date "+%Y-%m-%d %H:%M:%S" > timestamp
-    - cat timestamp
+    - touch timestamp
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
     - ocpiadmin deploy platform "$HW_PLATFORM" "$SW_PLATFORM"
