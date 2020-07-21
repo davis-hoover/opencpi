@@ -157,7 +157,7 @@ def upload(args, env):
         for f in files:
             if f:
                 tar.add(f, exclude=exclude_files)
-        print(tar.getmembers())
+
     # Create and execute command to upload tar
     cmd = ['aws', 's3', 'cp', 'tar', 
         's3://opencpi-ci-artifacts/{}'.format(s3_object),
