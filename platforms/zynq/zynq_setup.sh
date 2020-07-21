@@ -19,6 +19,10 @@
 # If there is a "mysetup.sh" script in this directory it will run it after the
 # other setup items, and arrange for it to be run in any login scripts later
 # e.g. ssh logins
+#
+# Set time using ntpd
+# If ntpd fails because it could not find ntp.conf fall back on time server
+# passed in as the first parameter
 
 if test $# != 2; then
   echo You must supply 2 arguments to this script.
@@ -37,9 +41,10 @@ else
   OCPI_CDK_DIR=$OCPI_DIR
   cat <<EOF > $HOME/.profile
     echo Executing $HOME/.profile.
-    export OCPI_CDK_DIR=$OCPI_DIR
-    export OCPI_TOOL_PLATFORM
+    export OCPI_CDK_DIR=$OCPI_CDK_DIR
+    export OCPI_TOOL_PLATFORM=$OCPI_TOOL_PLATFORM
     export OCPI_TOOL_OS=linux
+	cd $OCPI_CDK_DIR
     # There is no multimode support when running standalone
     export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
     export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/artifacts

@@ -28,10 +28,10 @@
 trap "trap - ERR; break" ERR; for i in 1; do
 
 if test "$OCPI_CDK_DIR" = ""; then
-  source ./zynq_setup_common.sh setup.sh time.nist.gov
-  if test "$1" = ""; then
+  if test "$2" = ""; then
      echo It appears that the environment is not set up yet.
-     echo You must supply the IP address of the OpenCPI server machine as an argument to this script.
+     echo You must supply the IP address of the OpenCPI server machine as an argument to this script as well as the directory you would like to mount to
+	 echo Proper use of this script: 'source ./mynetsetup.sh <IP-Address of server machine> < Directory to mount>'
      break
   fi
   # Uncomment this section and change the MAC address for an environment with multiple
@@ -40,10 +40,10 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 hw ether 00:0a:35:00:01:23
   # ifconfig eth0 up
   # udhcpc
-  
+  source ./zynq_setup_common.sh time.nist.gov
   # add or remove mount points based on your needs
   mkdir -p /mnt/net
-  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net
+  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net  # second argument should be location of opencpi directory
   # mkdir -p /mnt/ocpi_core
   # mount -t nfs -o udp,nolock,soft,intr $1:/home/developer/opencpi/projects/core /mnt/ocpi_core
   # mkdir -p /mnt/ocpi_assets
@@ -65,7 +65,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   # Fourth argument is backup time server for the time protocol used by the ntp command
   # Fifth arg is timezone spec - see "man timezone" for the format.
   
-  source ./zynq_net_setup.sh $1 /opt/opencpi cdk time.nist.gov EST5EDT,M3.2.0,M11.1.0
+  source ./zynq_net_setup.sh $1 cdk time.nist.gov EST5EDT,M3.2.0,M11.1.0
   
   # add any commands to be run only the first time this script is run
 

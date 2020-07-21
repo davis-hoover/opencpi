@@ -1,7 +1,7 @@
 set_tool_platform() { 
   if test "$OCPI_TOOL_PLATFORM" == ""; then
     for m in /mnt/card /run/media/mmcblk0p1; do
-      [ -d $m/opencpi ] && OCPI_DIR=$m/opencpi
+      [ -d $m/opencpi ] && export OCPI_DIR=$m/opencpi
     done
     if test -f release; then  # checks to see if xilinx13_4 platform is being ran
       read OCPI_RELEASE OCPI_TOOL_PLATFORM HDL_PLATFORM < release
@@ -12,13 +12,9 @@ set_tool_platform() {
   fi
 }
 
-# Set time using ntpd
-# If ntpd fails because it could not find ntp.conf fall back on time server
-# passed in as the first parameter
-
 set_time() {
   if test "$1" != -; then
-    echo Attempting to set time from the time server
+    echo Attempting to set time from $1
     # Calling ntpd without any options will run it as a dameon
     OPTS=""
     BUSYBOX_PATH="$OCPI_DIR/$OCPI_TOOL_PLATFORM/bin"
@@ -31,8 +27,7 @@ set_time() {
     # AV-5422 Timeout ntpd command after $TIMEOUT in seconds
     if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS > /dev/null 2>&1; then
       echo $MSG
-	elif rdate -p time.nist.gov; then
-	  rdate -s time.nist.gov
+	elif rdate -s time.nist.gov; then
 	  echo time set from time.nist.gov server
     else
       echo ====YOU HAVE NO NETWORK CONNECTION and NO HARDWARE CLOCK====
