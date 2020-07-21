@@ -108,16 +108,16 @@ def make_parser():
     return parser
 
 
-def exclude_files(filepath):
-    """ Excludes certain files from being added to tar.
+def exclude_paths(path):
+    """ Excludes certain path from being added to tar.
 
     Args:
-        filepath: File to be validated for exclusion
+        path: Path to be validated for exclusion
 
         Returns:
-            True if file should be excluded; else False
+            True if path should be excluded; else False
     """
-    if filepath.endswith('.git'):
+    if '.git' in path:
         return True
     
     return False
@@ -158,7 +158,7 @@ def upload(args, env):
     with tarfile.open('tar', "w:gz") as tar:
         for f in files:
             if f:
-                tar.add(f, exclude=exclude_files, recursive=recursive)
+                tar.add(f, exclude=exclude_paths, recursive=recursive)
         
     # Create and execute command to upload tar
     cmd = ['aws', 's3', 'cp', 'tar', 
@@ -217,7 +217,7 @@ def download(args, env):
     print(process.stdout.read().strip())
 
     # Walk temp_dir and extract tar files
-    for dirpath, dirnames, filenames in os.walk(temp_dir):
+    for dirpath, _, filenames in os.walk(temp_dir):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             print('Extracting: {}'.format(filepath))
