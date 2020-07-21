@@ -108,6 +108,21 @@ def make_parser():
     return parser
 
 
+def exclude_files(filepath):
+    """ Excludes certain files from being added to tar.
+
+    Args:
+        filepath: File to be validated for exclusion
+
+        Returns:
+            True if file should be excluded; else False
+    """
+    if filepath.endswith('.git'):
+        return True
+    
+    return False
+
+
 def upload(args, env):
     """ Uploads artifacts to aws.
 
@@ -122,20 +137,25 @@ def upload(args, env):
     # Will appear on aws as:
     # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID/CI_JOB_STAGE[-failed]/CI_JOB_NAME'
     s3_object = '/'.join([env.pipeline, env.stage, env.job]) + '.tar.gz'
+    files = []
 
     # If timestamp passed, find all files created/updated since the timestamp
     if args.timestamp:
-        cmd = ['find', args.artifact, '-not', '-type', 'd', '-newerct', args.timestamp]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-        files = process.stdout.read().split('\n')
+        timestamp = os.path.getmtime(args.timestamp)
+
+        for dirpath, dirnames, filenames in os.walk('.'):
+            for filename in filenames:
+                filepath = os.path.join(dirpath, filename)
+                if os.path.getmtime(filepath) > timestamp:
+                    files.append(filepath)              
     else:
-        files = [args.artifact]
+        files.append(args.artifact)
 
     # Create the tar
     with tarfile.open('tar', "w:gz") as tar:
         for f in files:
             if f:
-                tar.add(f)
+                tar.add(f, exclude=exclude_files)
 
     # Create and execute command to upload tar
     cmd = ['aws', 's3', 'cp', 'tar', 

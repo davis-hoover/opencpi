@@ -55,8 +55,7 @@ default:
   before_script:
     - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar.gz" "*centos7.tar.gz"
     - sleep 2
-    - date "+%Y-%m-%d %H:%M:%S" > timestamp
-    - cat timestamp
+    - touch timestamp
     - sleep 2
     - ls -lh
   after_script:
@@ -66,7 +65,7 @@ default:
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
-    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s "$(< timestamp)"
+    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s timestamp
   timeout: 24h
   artifacts: 
     paths: []
