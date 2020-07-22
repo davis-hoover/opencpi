@@ -1,4 +1,4 @@
-<HdlDevice language="vhdl" version='2' Libraries='sdp platform cdc'>
+<HdlDevice language="vhdl" version='2' Libraries='sdp platform util'>
   <componentspec/>
   <xi:include href='sdp-properties.xml'/>
   <!-- the number of messages that preceded the first one that was truncated -->

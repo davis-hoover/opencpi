@@ -1,4 +1,4 @@
-<HdlDevice language="vhdl">
+<HdlDevice language="vhdl" libraries='ocpi.core.bsv util'>
 
   <!-- By design, this worker provides control and/or data plane functionality
        that is never intended to be exposed by any other worker. Accordingly,

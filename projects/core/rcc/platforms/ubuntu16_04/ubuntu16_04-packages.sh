@@ -127,8 +127,10 @@ PKGS_E+=(python3-numpy python3-scipy python3-matplotlib)
 PKGS_E+=(ocl-icd-libopencl1)
 #    Needed to build gpsd
 PKGS_E+=(scons)
+#    Needed to build/run ocpigr
+PKGS_E+=(libyaml-cpp-dev)
 #    Needed to build plutosdr osp
-PKGS_D+=(libssl-dev device-tree-compiler)
+PKGS_E+=(libssl-dev device-tree-compiler)
 
 #
 # Comments around/within the next two functions are for my own

@@ -140,7 +140,7 @@ HdlToolSet_stratix5:=quartus
 HdlToolSet_arria10soc:=quartus_pro
 HdlToolSet_arria10soc_std:=quartus
 HdlToolSet_cyclone5:=quartus
-	
+
 # Call the tool-specific function to get the full part incase the
 # tool needs to rearrange the different part elements
 # If the tool does not define this function, return part as-is
@@ -189,7 +189,7 @@ HdlAddPlatform=\
   $(if $(HdlPlatformDir_$2),,\
     $(eval include $1/$2.mk)\
     $(if $(call HdlGetFamily,$(HdlPart_$2)),\
-      $(eval HdlAllPlatforms+=$2)\
+      $(eval HdlAllPlatforms:=$(strip $(HdlAllPlatforms) $2))\
       $(eval HdlPlatformDir_$2:=$3)\
       $(if $(or \
              $(call OcpiExists,$3/lib/hdl/$(HdlFamily_$(HdlPart_$2))),\
@@ -278,8 +278,8 @@ export OCPI_ALL_HDL_TARGETS:=$(HdlAllTargets)
 
 $(call OcpiDbgVar,HdlAllPlatforms)
 # This is dirs where platforms might be found
-OcpiHdlPlatformPaths=$(call Unique,\
-  $(foreach p,$(OCPI_PROJECT_REL_DIR),\
+OcpiHdlPlatformPaths=$(call Unique,$(infox PRD:$(OCPI_PROJECT_REL_DIR))\
+  $(foreach p,$(OCPI_PROJECT_REL_DIR),$(infox PPPPPP:$p:$(CURDIR))\
     $(call OcpiExists,$p/hdl/platforms))\
   $(foreach p,$(OcpiGetExtendedProjectPath),\
     $(or $(call OcpiExists,$p/exports/hdl/platforms),$(strip\

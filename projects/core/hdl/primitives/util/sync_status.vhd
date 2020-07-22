@@ -18,7 +18,7 @@
 
 -- A status bit that is set based on an event in the "other" clock domain,
 -- only after the monitoring is "started".
-library IEEE, ocpi, bsv;
+library IEEE, ocpi, ocpi_core_bsv; use ocpi_core_bsv.all;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all, ocpi.util.all;
 entity sync_status is
   port (-- ctl side signals
@@ -64,14 +64,14 @@ begin
   end process;        
   -- Synchronizing handshake to reliably send a pulse from other side to control side
   -- First we need a reset in the other clock domain
-  sreset : bsv.bsv.SyncResetA
+  sreset : bsv_pkg.SyncResetA
     generic map(RSTDELAY => 0)
     port map(   IN_RST    => reset,
                 CLK       => other_clk,
                 OUT_RST   => syncd_reset);
   other_reset   <= syncd_reset;     -- output port
   other_reset_n <= not syncd_reset; -- input to handshake
-  sync : bsv.bsv.SyncHandshake
+  sync : bsv_pkg.SyncHandshake
     port map(sCLK      => other_clk,
              sRST      => other_reset_n,
              dCLK      => clk,

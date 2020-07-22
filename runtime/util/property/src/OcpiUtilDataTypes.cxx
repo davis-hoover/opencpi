@@ -203,9 +203,16 @@ namespace OCPI {
 	m_pretty = m_name;
       OE::getOptionalString(xm, m_description, "Description");
       ezxml_t desc = ezxml_cchild(xm, "description");
-      if (desc)
+      if (desc) {
+	if (!m_description.empty())
+	  return esprintf("Having both description attributes and description elements is invalid");
 	m_description = ezxml_txt(desc);
+      }
       OE::unindent(m_description);
+      ocpiLog(10, "Description of property %s: \"%s\"", cname(), m_description.c_str());
+      if (OS::logWillLog(10))
+	for (TokenIter ti(m_description, "\n"); ti.token(); ti.next())
+	  ocpiLog(10, "|%s|", ti.token());
       OE::getOptionalString(xm, m_format, "Format");
       const char *typeName = ezxml_cattr(xm, "Type");
       if (!typeName)

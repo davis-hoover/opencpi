@@ -882,11 +882,12 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	      err = -EFAULT;
 	      log_debug("load fpga loading to: %px\n", buf);
 	      if (!copy_from_user((void *)buf, (void __user *)request.data, request.length)) {
+  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
 	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
-  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
 		err = fpga_mgr_buf_load(mgr, 0, buf, request.length);
   #else
 		struct fpga_image_info *info;
+	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
 		err = -ENOMEM;
     #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {

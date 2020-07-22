@@ -23,8 +23,9 @@
 # Thus this file has significant side-effects
 ifndef RCC_MAKE_MK
 RCC_MAKE_MK:=xxx
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 include $(OCPI_CDK_DIR)/include/rcc/rcc-targets.mk
-
+endif
 $(call OcpiDbgVar,RccPlatforms)
 $(call OcpiDbgVar,RccTargets)
 
@@ -105,7 +106,8 @@ RccTargetDirTail=$(infox RTDT:$1:$(RccTarget_$1):$(RccPlatform))$(strip\
 # Transfer build options to target from platform
 # $(call RccPlatformTarget,<platform>,<target>)
 RccPlatformTarget=$2$(foreach b,$(word 2,$(subst -, ,$1)),$(and $b,-$b))
-ifdef RccPlatforms
+# Only look at platforms if some are specified and we are not cleaning
+ifneq ($(and $(RccPlatforms),$(if $(filter clean%,$(MAKECMDGOALS)),,x)),)
   # Exclude any platform whose real platform matches one in the exluded platform lists
   override RccPlatforms:=$(strip\
     $(foreach p,$(RccPlatforms),\

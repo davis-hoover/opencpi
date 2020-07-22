@@ -19,6 +19,7 @@
 library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all;
 library ocpi; use ocpi.all, ocpi.types.all;
 library work; use work.platform_pkg.all; use work.time_client_defs.all; 
+library cdc;
 entity time_client_rv is
   port(
     wci_Clk     : in std_logic;
@@ -30,27 +31,6 @@ entity time_client_rv is
 end entity time_client_rv;
 architecture rtl of time_client_rv is
 
-  component SyncRegister is
-    generic (
-      width : positive;
-      init  : natural);
-    port (
-      sCLK   : in  std_logic;
-      dCLK   : in  std_logic;
-      sRST   : in  std_logic;
-      sD_IN  : in  std_logic_vector(width-1 downto 0);
-      sEN    : in  std_logic;
-      dD_OUT : out std_logic_vector(width-1 downto 0);
-      sRDY   : out std_logic);
-  end component;
-
-  component reset is
-    port (
-      src_rst : in std_logic;
-      dst_clk : in std_logic;
-      dst_rst : out std_logic);
-  end component;
-
   signal wci_reset          : std_logic;
   signal wci2timebase_reset : std_logic;
   signal sync_reg_in        : std_logic_vector(time_in.now'length downto 0);
@@ -60,25 +40,25 @@ begin
 
   wci_reset <= not wci_Reset_n;
 
-  wci2timebase_rst : reset
+  wci2timebase_rst : cdc.cdc.reset
     port map   (src_rst => wci_reset,
                 dst_clk => time_in.clk,
                 dst_rst => wci2timebase_reset);
 
   sync_reg_in <= time_in.valid & std_logic_vector(time_in.now);
   
-  syncReg : SyncRegister
+  syncReg : cdc.cdc.bits_feedback
     generic map (
-      width => time_in.now'length+1,-- +1 is for the valid flag
-      init  => 0)
+      width => time_in.now'length+1) -- +1 is for the valid flag
     port map (
-      sCLK   => time_in.clk,
-      dCLK   => wti_in.Clk,
-      sRST   => wci2timebase_reset,
-      sD_IN  => sync_reg_in,
-      sEN    => '1',
-      dD_OUT => sync_reg_out,
-      sRDY   => open);
+      src_CLK => time_in.clk,
+      dst_CLK => wti_in.Clk,
+      src_RST => wci2timebase_reset,
+      dst_rst => wci_reset, -- this will be released earlier than the time will be used.
+      src_IN  => sync_reg_in,
+      src_EN  => '1',
+      dst_OUT => sync_reg_out,
+      src_RDY => open);
 
   wti_out.MData <= sync_reg_out(time_in.now'length-1 downto 0);
   wti_out.MCmd <= ocp.MCmd_WRITE when its(sync_reg_out(time_in.now'length)) else

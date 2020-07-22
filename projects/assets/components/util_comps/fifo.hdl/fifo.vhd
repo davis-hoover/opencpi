@@ -24,7 +24,7 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 use ieee.math_real.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library bsv; use bsv.bsv.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 architecture rtl of fifo_worker is
 
   -- mandatory input port logic, don't touch this
@@ -116,7 +116,7 @@ begin
   fifo_reset_n <= ctl_in_reset_n and (not oneshot_and_done_deq_d);
 
   -- TODO / FIXME - separate structural code from behavioral code
-  rx_data_fifo : bsv.bsv.SizedFIFO
+  rx_data_fifo : bsv_pkg.SizedFIFO
     generic map (
       p1width      => 36, -- FIFO data bus width
       p2depth      => to_integer(FIFO_DEPTH_p),

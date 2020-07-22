@@ -16,20 +16,19 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- non-vendor-specific "input buffer" (needed for sim platforms), supports both
+-- non-vendor-specific "output buffer" (needed for sim platforms), supports both
 -- single ended and differential iostandards
 library IEEE;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library util; use util.types.all;
-entity BUFFER_IN_1 is
-  generic (IOSTANDARD   :     iostandard_t := UNSPECIFIED;
-           DIFFERENTIAL :     boolean; -- only used if IOSTANDARD is UNSPECIFIED
-           GLOBAL_CLOCK :     boolean       := FALSE);
-  port (   I            : in  std_logic             ;
-           IBAR         : in  std_logic     := 'X'  ; -- only used if relevant to IOSTANDARD
-           O            : out std_logic             );
-end entity BUFFER_IN_1;
-architecture rtl of BUFFER_IN_1 is
+use work.platform_pkg.all;
+entity BUFFER_OUT_1 is
+  generic (IOSTANDARD   :   iostandard_t := UNSPECIFIED;
+           DIFFERENTIAL :   boolean); -- only used if IOSTANDARD is UNSPECIFIED
+  port (   I          : in  std_logic;
+           O          : out std_logic;
+           OBAR       : out std_logic := 'X'); -- only use if relevant to IOSTANDARD
+end entity BUFFER_OUT_1;
+architecture rtl of BUFFER_OUT_1 is
 begin
   O <= I;
 end rtl;

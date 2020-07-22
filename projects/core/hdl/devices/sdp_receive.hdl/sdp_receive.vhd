@@ -19,9 +19,9 @@
 -- The SDP receiver, to take data from the SDP port, and put it out on a WSI port,
 -- buffering messages in BRAM.  The WSI width is the SDP width.
 
-library IEEE, ocpi, util, bsv, sdp;
+library IEEE, ocpi, util, ocpi_core_bsv, sdp, cdc;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all;
+use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all, ocpi_core_bsv.all;
 architecture rtl of worker is
   -- Local worker constants
   constant sdp_width_c     : natural := to_integer(sdp_width);
@@ -256,7 +256,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- I.e. when the SDP side is done PULLING data, it indicates the buffer is full,
   -- and then the WSI processing can send the message, according to the metadata Fifo.
   -- SDP -> WSI
-  availfifo : component bsv.bsv.SizedFIFO
+  availfifo : component bsv_pkg.SizedFIFO
    generic map(p1Width      => 1,
                p2depth      => roundup_2_power_of_2(max_buffers_c),
                p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))

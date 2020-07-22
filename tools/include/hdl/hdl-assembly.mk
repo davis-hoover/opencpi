@@ -24,6 +24,7 @@ include $(OCPI_CDK_DIR)/include/util.mk
 $(if $(call DoShell,! echo $(CwdName) | grep -s '[A-Z]',Var1),\
   $(error "This HDL assembly, $(CwdName), has upper case letters in its name, which is not supported due to limitations of some tools."))
 $(OcpiIncludeProject)
+ComponentLibraries+=$(OCPI_PROJECT_COMPONENT_LIBRARIES)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
 # These next lines are similar to what worker.mk does
@@ -42,7 +43,6 @@ ifndef OcpiLanguage
   OcpiLanguage:=verilog
 endif
 override LibDir=lib/hdl
-override HdlLibraries+=platform
 # If HdlPlatforms is explicitly defined to nothing, then don't build containers.
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
   ifneq ($(origin HdlPlatforms),undefined)
@@ -217,11 +217,12 @@ else
         $(call HdlContResult,$1): links
 	  $(AT)mkdir -p $(call HdlContOutDir,$1)
 	  $(AT)$(MAKE) -C $(call HdlContOutDir,$1) -f $(OCPI_CDK_DIR)/include/hdl/hdl-container.mk \
+	       $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
                HdlAssembly=../../$(CwdName)  HdlConfig=$(HdlConfig_$1) \
                HdlConstraints=$(call AdjustRelative,$(HdlConstraints_$1)) \
                HdlPlatforms=$(HdlPlatform_$1) HdlPlatform=$(HdlPlatform_$1) \
 	       ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
-	       HdlLibrariesInternal="$(call OcpiAdjustLibraries,$(HdlMyLibraries))" \
+	       HdlExplicitLibraries="$(call OcpiAdjustLibraries,$(HdlExplicitLibraries))" \
                XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))"
       endef
       $(foreach c,$(HdlContainers),$(and $(filter $(HdlPlatform_$c),$(HdlPlatforms)),$(eval $(call doContainer,$c))))

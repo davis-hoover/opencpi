@@ -69,6 +69,7 @@ HdlToolNeedBB=
 # It might adjust (genericize?) the target
 HdlToolCoreRef=$(call HdlRmRv,$1)
 HdlToolCoreRef_xsim=$(call HdlRmRv,$1)
+HdlRecurseLibraries_xsim=yes
 
 XsimFiles=\
   $(foreach f,$(HdlSources),\
@@ -79,43 +80,24 @@ $(call OcpiDbgVar,XsimFiles)
 XsimCoreLibraryChoices=$(strip \
   $(foreach c,$(call HdlRmRv,$1),$(call HdlCoreRef,$c,xsim)))
 
-ifneq (,)
 XsimLibs=\
-  $(and $(filter assembly container,$(HdlMode)),\
-  $(eval $(HdlSetWorkers)) \
-  $(foreach w,$(HdlWorkers),\
-    $(foreach f,$(firstword \
-                  $(or $(foreach c,$(ComponentLibraries), \
-                         $(foreach d,$(call HdlComponentLibrary,$c,xsim),\
-	                   $(wildcard $d/$w))),\
-                       $(error Worker $w not found in any component library.))),\
-      -lib $w=$(call FindRelative,$(TargetDir),$f)))) \
-  $(foreach l,\
-    $(HdlLibrariesInternal) $(Cores),\
-    -lib $(notdir $(l))=$(strip \
-          $(call FindRelative,$(TargetDir),$(call HdlLibraryRefDir,$l,xsim,,xsim))))
-else
-XsimLibs=\
-    $(foreach l,\
-      $(HdlLibrariesInternal),\
-      -lib $(notdir $l)=$(strip \
-            $(call FindRelative,$(TargetDir),$(call HdlLibraryRefDir,$l,xsim,,xsim)))) \
+    $(eval XsimTempLibs:=$(call HdlCollectLibraries,isim))\
+    $(foreach l,$(XsimTempLibs),$(infox LLL:$l)\
+      -lib $(word 2,$(subst :, ,$l))=$(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,xsim)))\
     $(foreach c,$(call HdlCollectCorePaths),$(infox CCC:$c)\
-      -lib $(call HdlRmRv,$(notdir $(c)))=$(infox fc:$c)$(call FindRelative,$(TargetDir),$(strip \
-          $(firstword $(foreach l,$(call XsimCoreLibraryChoices,$c),$(call HdlExists,$l))))))
+      $(- for each core, specify any libraries it needs)\
+      $(eval XsimCoreLibs:=$(call HdlCollectCoreLibraries,$c,$(XsimTempLibs)))\
+      $(foreach l,$(XsimCoreLibs),$(infox LLL1:$l)\
+        -lib $(lastword $(subst :, ,$l))=$(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,xsim)))\
+       -lib $(notdir $c)=$(call AdjustRelative,$(call HdlCoreRef,$c,xsim))\
+      $(eval XsimTempLibs+=$(XsimCoreLibs)))
 
-endif
-ifneq (,)
-MyIncs=\
-  $(foreach d,$(VerilogDefines),-d $d) \
-  $(foreach d,$(VerilogIncludeDirs),-i $(call FindRelative,$(TargetDir),$(d))) \
-  $(foreach l,$(call HdlXmlComponentLibraries,$(ComponentLibraries)),-i $(call FindRelative,$(TargetDir),$l))
-else
+#        -lib $(call HdlRmRv,$(lastword $(subst :, ,$l)))=$(info fc:$l)$(call FindRelative,$(TargetDir),$(strip \
+
 XsimVerilogIncs=\
   $(foreach d,$(VerilogDefines),-d $d) \
   $(foreach d,$(VerilogIncludeDirs),-i $(call FindRelative,$(TargetDir),$(d))) \
   $(foreach l,$(HdlXmlComponentLibraries),-i $(call FindRelative,$(TargetDir),$l))
-endif
 
 ifndef XsimTop
 XsimTop=$(Worker).$(Worker)
@@ -136,20 +118,21 @@ XsimXelabArgs= -O3 $(XsimXelabExtraArgs)
 
 HdlToolCompile=\
   $(OcpiXilinxVivadoInit); \
-  echo verilog work $(OcpiXilinxVivadoDir)/data/verilog/src/glbl.v \
-    >> $(Worker).prj; \
+  (echo verilog work $(OcpiXilinxVivadoDir)/data/verilog/src/glbl.v \
+    > $(LibName).prj \
   $(and $(filter %.vhd %.vhdl,$(XsimFiles)),\
-    xvhdl $(XsimArgs) $(XsimLibs) $(filter %.vhd %.vhdl,$(XsimFiles)) -prj $(Worker).prj ; ) \
+    && xvhdl $(XsimArgs) $(XsimLibs) $(filter %.vhd %.vhdl,$(XsimFiles)) -prj $(LibName).prj) \
   $(and $(filter %.v,$(XsimFiles))$(findstring $(HdlMode),platform),\
-    xvlog $(XsimVerilogIncs) $(XsimArgs) $(XsimLibs) $(filter %.v,$(XsimFiles)) \
+    && xvlog $(XsimVerilogIncs) $(XsimArgs) $(XsimLibs) $(filter %.v,$(XsimFiles)) \
       $(and $(findstring $(HdlMode),platform),\
-        $(OcpiXilinxVivadoDir)/data/verilog/src/glbl.v) -prj $(Worker).prj ;) \
+        $(OcpiXilinxVivadoDir)/data/verilog/src/glbl.v) -prj $(LibName).prj) \
   $(if $(filter worker platform config assembly,$(HdlMode)),\
     $(if $(HdlNoSimElaboration),, \
-      xelab $(WorkLib).$(WorkLib)$(and $(filter assembly config,$(HdlMode)),_rv) work.glbl -v 2 \
-             -prj $(Worker).prj -L unisims_ver -s $(Worker).exe --timescale 10ns/1ps \
+      && xelab $(WorkLib).$(WorkLib)$(and $(filter assembly config,$(HdlMode)),_rv) work.glbl -v 2 \
+             -prj $(LibName).prj -L unisims_ver -s $(Worker).exe --timescale 10ns/1ps \
              --override_timeprecision --override_timeunit --timeprecision_vhdl 1ps \
-             $(XsimXelabArgs) $(XsimXelabExtraArgs) -lib $(WorkLib)=$(WorkLib) $(XsimLibs)))
+             $(XsimXelabArgs) $(XsimXelabExtraArgs) -lib $(WorkLib)=$(WorkLib) $(XsimLibs)))\
+   ) || (rm -r -f $(LibName) && exit 1)
 
 # Since there is not a singular output, make's builtin deletion will not work
 HdlToolPost=\
@@ -171,32 +154,4 @@ $1/$3.tar:
 	      tar cf $3.tar metadatarom.dat xsim.dir) > $1/$3-xelab.out 2>&1
 
 endef
-ifneq (,)
- -s $3.exe ;\
-XsimPlatform:=xsim_pf
-XsimAppName=$(call AppName,$(XsimPlatform))
-ExeFile=$(XsimAppName).exe
-BitFile=$(XsimAppName).bit
-BitName=$(call PlatformDir,$(XsimPlatform))/$(BitFile)
-XsimPlatformDir=$(HdlPlatformsDir)/$(XsimPlatform)
-XsimTargetDir=$(call PlatformDir,$(XsimPlatform))
-XsimFuseCmd=\
-  $(VivadoXilinx); xelab $(XsimPlatform).main $(XsimPlatform).glbl -v 2 -debug typical \
-		-lib $(XsimPlatform)=$(XsimPlatformDir)/target-xsim/$(XsimPlatform) \
-		-lib mkOCApp4B=mkOCApp4B \
-	        -lib $(Worker)=../target-xsim/$(Worker) \
-	$$(XsimLibs) -L unisims_ver -s $(ExeFile) && \
-	tar -c -f $(BitFile) xsim.dir metadatarom.data
-
-define HdlToolDoPlatform
-# Generate bitstream
-$$(BitName): TargetDir=$(call PlatformDir,$(XsimPlatform))
-$$(BitName): HdlToolCompile=$(XsimFuseCmd)
-$$(BitName): HdlToolSet=xelab
-$$(BitName): override HdlTarget=xsim
-$$(BitName): $(XsimPlatformDir)/target-xsim/$(XsimPlatform) $(XsimTargetDir)/mkOCApp4B | $(XsimTargetDir)
-	$(AT)echo Building xsim simulation executable: $$(BitName).  Details in $$(XsimAppName)-xelab.out
-	$(AT)$$(HdlCompile)
-endef
-endif
 endif
