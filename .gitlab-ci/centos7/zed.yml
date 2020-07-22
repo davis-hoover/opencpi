@@ -435,6 +435,8 @@ test-core:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-core:centos7:zed
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed
 
 test-assets-base:centos7:zed:
   extends:
@@ -450,6 +452,8 @@ test-assets-base:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-base:centos7:zed
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed
 
 test-assets-comms:centos7:zed:
   extends:
@@ -465,6 +469,8 @@ test-assets-comms:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-comms:centos7:zed
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed
 
 test-assets-dsp:centos7:zed:
   extends:
@@ -480,6 +486,8 @@ test-assets-dsp:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-dsp:centos7:zed
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed
 
 test-assets-misc:centos7:zed:
   extends:
@@ -495,6 +503,8 @@ test-assets-misc:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-misc:centos7:zed
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed
 
 test-assets-util:centos7:zed:
   extends:
@@ -510,7 +520,9 @@ test-assets-util:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-util:centos7:zed
-    
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed 
+
 test-assets_ts:centos7:zed:
   extends:
     - .test-assets_ts
@@ -527,6 +539,8 @@ test-assets_ts:centos7:zed:
     - build-components-assets_ts:centos7:zed
     - build-devices-assets_ts:centos7:zed
     - build-test-assets_ts:centos7:zed
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed
 
 test-inactive:centos7:zed:
   extends:
@@ -543,3 +557,5 @@ test-inactive:centos7:zed:
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
     - build-test-inactive:centos7:zed
+    - build-assemblies-assets:centos7:zed
+  resource_group: zed
