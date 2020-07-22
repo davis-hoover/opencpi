@@ -18,7 +18,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all, ocpi.util.all; // remove this to avoid all ocpi name collisions
-library util; use util.util.all;
+library platform; use platform.platform_pkg.all;
 library unisim; use unisim.vcomponents.all; -- ODDR, etc
 architecture rtl of platform_ad9361_data_sub_worker is
   constant adc_c        : natural := 0;

@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #Only tested targets
-OnlyTargets=zynq zynq_ise virtex6 isim xsim # cause of BUFR primitive
+OnlyTargets=zynq zynq_ise zynq_ultra virtex6 isim xsim # cause of BUFR primitive
 
 # During the build process, swap HdlTarget with 'actual' target part of the target platform
 # We do this to build for a part with the correct number of resources, such as hardware
@@ -28,6 +28,7 @@ OnlyTargets=zynq zynq_ise virtex6 isim xsim # cause of BUFR primitive
 HdlExactPart=\
 	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
 	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484), \
+        $(and $(filter zynq_ultra,$(HdlTarget)),xczu7ev-2-ffvc1156e), \
 	$(and $(filter virtex6,$(HdlTarget)),xc6vlx240t-1-ff1156), \
 	$(and $(filter stratix4,$(HdlTarget)),ep4sgx230k-c2-f40))
 

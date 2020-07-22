@@ -17,7 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
-Containers=cnt_zed_fmcomms_2_3_scdcd
+Containers=cnt_zed_fmcomms_2_3_scdcd \
+           cnt_zcu104_fmcomms_2_3_scdcd
 DefaultContainers=
 ComponentLibraries=util_comps base_comps misc_comps dsp_comps comms_comps devices
+ProjectDependencies=ocpi.platform
 include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk

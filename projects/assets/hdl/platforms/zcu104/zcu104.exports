@@ -26,6 +26,6 @@
 =<platform-dir>/98-zcu104.rules udev-rules/
 
 # Assume that all the boot files are in the software platforms for now
-@<rcc-platform-dir>/hdl/zed/boot/*
+@<rcc-platform-dir>/hdl/zcu104/boot/*
 @<platform-dir>/system.xml opencpi/
 

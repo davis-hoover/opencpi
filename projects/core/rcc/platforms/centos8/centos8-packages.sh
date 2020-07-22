@@ -116,6 +116,8 @@ PKGS_E+=(fakeroot)
 PKGS_E+=(ocl-icd)
 #    Needed to build gpsd
 PKGS_E+=(python3-scons)
+#    Needed to build/run ocpigr
+PKGS_E+=(yaml-cpp-devel)
 #    Needed to build certain linux kernels or u-boot.
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 

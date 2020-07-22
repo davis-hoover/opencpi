@@ -17,50 +17,47 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-# Originally, this script was also known as "install-platform.sh".  A decision
-# was made to integrate the functionality of "deploy-opencpi.sh".  Accordingly,
-# both of the original scripts have gone away because it made no sense to have
-# one integrated script with three names.  Like the originals, this script must
-# be runnable regardless of whether the OpenCPI environment has been properly
-# initialized.
+# Originally, this script began life as "scripts/install-platform.sh".  Then,
+# the functionality of "scripts/deploy-opencpi.sh" was integrated.  Now, both
+# of the original scripts have gone away because it made no sense to have one
+# integrated script with three names.  Unlike the originals (which were never
+# exported, but it was discovered they needed to be), this script must be run
+# with the OpenCPI environment properly initialized.
 
 set -e
 
 if [ x$OCPI_CDK_DIR = x ]
 then
   #
-  # OpenCPI environment not initialized: not a fatal error
-  # unless we are not in the top-level OpenCPI directory.
+  # OpenCPI environment not initialized: fatal error.
   #
-  [ -d runtime -a -d build -a -d scripts -a -d tools ] || {
-    echo "$0: ERROR: either OCPI_CDK_DIR must be set OR this script must be run from the top level of the OpenCPI source tree." >&2
-    exit 1
-  }
-  # Ensure exports (or cdk) exists and has scripts.
-  source ./scripts/init-opencpi.sh
-
-  # Ensure CDK and TOOL variables are set.
-  OCPI_BOOTSTRAP=`pwd`/cdk/scripts/ocpibootstrap.sh ; source $OCPI_BOOTSTRAP
-else
-  cd $OCPI_CDK_DIR/..
+  echo "$0: ERROR: OCPI_CDK_DIR not set!" >&2
+  echo "From the top-level \"opencpi\" directory, try \"source cdk/opencpi-setup.sh -s\"." >&2
+  exit 1
 fi
 
 # install platform syntax:
-#   ocpiadmin install platform <platform> <project-package-id> <url> <checkout>
+#   ocpiadmin install platform <platform> [<project-package-id>] [<url>] [<checkout>]
 # deploy platform syntax:
-#   ocpiadmin deploy platform <rcc_platform> <hdl_platform>
+#   ocpiadmin deploy platform <rcc_platform> [<hdl_platform>]
 #   (<hdl_platform> is optional)
 
 if [ $# -lt 3 ] || [ $1 != "install" -a $1 != "deploy" ] || [ $2 != "platform" ]
 then
   cat <<-EOF
     To install a platform (by downloading it, if necessary, and building it):
-      $0 install platform <platform> <project-package-id> <url> <checkout>
+      $0 install platform <platform> [<project-package-id>] [<url>] [<checkout>]
     To deploy a platform:
       $0 deploy platform <rcc_platform> [<hdl_platform>]
 EOF
   exit 1
 fi
+
+#
+# Must be in the OpenCPI base directory, at least until a
+# clean way of dealing with relative paths can be implemented.
+#
+cd $OCPI_CDK_DIR/..
 
 #
 # Figure out what we are doing early.
@@ -117,7 +114,7 @@ if getvars; then
 else
     echo The platform \"$platform\" is not defined in this installation yet.
     if [ -z "$project" ]; then
-	echo There is no project package-id supplied as the second argument, and
+	echo ERROR: no project package-id was specified, and
 	echo platform \"$platform\" is not in a built-in project.
 	echo Either the platform name is misspelled or you must supply a project package-id.
 	exit 1
@@ -131,13 +128,13 @@ else
     else
 	if [ -z "$url" ]; then
 	    url=https://gitlab.com/opencpi/osp/$project.git
-	    echo No URL was supplied as the third argument, so it will be located at the OpenCPI repo site: $url
+	    echo No URL was specified, so it will default to the OpenCPI repo site: $url
 	fi
 	echo "Downloading (git cloning) from $url..."
 	if git clone --no-checkout $url $project_dir && test -d $project_dir; then
 	    echo "Download/clone successful into $project_dir."
 	else
-	    echo "Download/clone of project \"$project\" for platforn \"$platform\" failed."
+	    echo "ERROR: download/clone of project \"$project\" for platforn \"$platform\" failed."
 	    rm -r -f $project_dir
 	    exit 1
 	fi
@@ -151,22 +148,22 @@ else
 	    if branch=$(git branch --contains $(git rev-parse tags/$tag)); then
 		echo "The branch for tag $tag is $branch";
 	    else
-		echo "Error: No git branch found for tag $tag"
+		echo "ERROR: no git branch found for tag $tag"
 		exit 1
 	    fi
 	elif branch=$(git branch --contains); then
 	    branch=${branch#* }
 	    echo "The OpenCPI (framework) repo is on branch: $branch."
 	else
-	    echo "Error: cannot determine branch of OpenCPI repo"
+	    echo "ERROR: cannot determine branch of OpenCPI repo"
 	    exit 1
 	fi
 	if [ -n "$checkout" ]; then
-	    echo Checking out the OSP project at $project_dir using the user-supplied checkout: $checkout
+	    echo Checking out the OSP at $project_dir using the user-supplied checkout: $checkout
 	    if (cd $project_dir && git checkout $checkout); then
 		echo The OSP at $project_dir checked out for branch/tag: $checkout
 	    else
-		echo Error: failed to checkout the OSP for branch/tag \"$checkout\".
+		echo ERROR: failed to checkout the OSP for branch/tag \"$checkout\".
 		exit 1
 	    fi
 	elif [ -n "$tag" ]; then
@@ -178,16 +175,16 @@ else
 		if (cd $project_dir && git checkout $branch); then
 		    echo The OSP at $project_dir checked out for branch: $branch
 		else
-		    echo Error: failed to checkout the OSP for either tag \"$tag\" or branch \"$branch\".
+		    echo ERROR: failed to checkout the OSP for either tag \"$tag\" or branch \"$branch\".
 		    exit 1
 		fi
 	    fi
 	else
-	    echo Checking out the OSP project at $project_dir for branch $branch.
+	    echo Checking out the OSP at $project_dir for branch $branch.
 	    if (cd $project_dir && git checkout $branch); then
 		echo The OSP at $project_dir checked out for branch: $branch
 	    else
-		echo Error: failed to checkout the OSP for branch \"$branch\".
+		echo ERROR: failed to checkout the OSP for branch \"$branch\".
 		exit 1
 	    fi
 	fi
@@ -197,7 +194,7 @@ else
     if getvars; then
 	echo The $model platform \"$platform\" found after using the new project \"$project\".
     else
-	echo Error: in the downloaded project \"$project\", at $project_dir, platform \"$platform\" is not visible.
+	echo ERROR: in the downloaded project \"$project\", at $project_dir, platform \"$platform\" is not visible.
 	echo If you want to download it again, you must remove that directory and its contents.
 	exit 1
     fi
@@ -205,7 +202,7 @@ else
 	if ocpidev register project $project_dir; then
 	    echo The OSP at $project_dir has now been registered.
 	else
-	    echo Error: the project \"$project\", at $project_dir, cannot be registered.
+	    echo ERROR: the project \"$project\", at $project_dir, cannot be registered.
 	    echo If you want to download it again, you must remove that directory and its contents.
 	    exit 1
 	fi

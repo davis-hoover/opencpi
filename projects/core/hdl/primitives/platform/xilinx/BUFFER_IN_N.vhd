@@ -20,7 +20,7 @@
 -- iostandards
 library IEEE;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library util; use util.types.all;
+use work.platform_pkg.all;
 library unisim; use unisim.vcomponents.all;
 entity BUFFER_IN_N is
   generic (width        :     natural;

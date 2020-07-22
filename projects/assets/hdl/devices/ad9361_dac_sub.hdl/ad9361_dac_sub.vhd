@@ -30,7 +30,7 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 use ocpi.util.all;
-library bsv; use bsv.bsv.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 library unisim; use unisim.vcomponents.all;
 architecture rtl of ad9361_dac_sub_worker is
   constant dac_width  : positive := 12; -- must not be > 15 due to WSI width, must be multiple of 2 due to LVDS generate loop
@@ -228,7 +228,7 @@ begin
     -- domain), note that we don't care if WSI clock is much faster and bits are
     -- dropped - wsi_use_two_r_two_t_timing is a configuration bit which is
     -- expected to change very rarely in relation to either clock
-    second_chan_enable_sync : bsv.bsv.SyncBit
+    second_chan_enable_sync : bsv_pkg.SyncBit
       generic map(
         init   => 0)
       port map(
