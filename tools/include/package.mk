@@ -36,7 +36,8 @@ include $(OCPI_CDK_DIR)/include/util.mk
 ###############################################################################
 
 define OcpiCreatePackageId
-
+  $(infox OcpiCreatePackageId1:$1:$2:$3:$(realpath $1):$(ParentPackage):$(PackagePrefix)=)
+  $$(infox OcpiCreatePackageId2:$1:$2:$3:$$(realpath $1):$$(ParentPackage):$$(PackagePrefix)=)
 ###############################################################################
 # Determine where the 'lib' directory is relative to the current location
 # TODO this list of directory-types that are supported for where the 'lib/'
@@ -46,21 +47,16 @@ define OcpiCreatePackageId
 #      This hardcoded list here is not very scalable.
 #  Note "application" is in the list here to allow applications to have private libraries in the same dir
 #  as long as the last include line is "application"
-LibIsInCwd=$$(filter application lib library %-platform %-platforms %-primitives,$$(call OcpiGetDirType,$$(or $1,./)))
-LibIsInParent=$$(filter lib library %-platform %-platforms %-primitives,$$(call OcpiGetDirType,$$(or $1,.)/../))
-
-# Determine the directory containing the 'lib' directory to place package-id
-DirContainingLib=$$(if $$(LibIsInCwd),$$(or $1,.)/,$$(and $$(LibIsInParent),$$(or $1,.)/../))
 
 # For legacy support, we need to expect Package= in library/Makefile
 # So, we grep for it here to include if building from the worker level
 #   (if building from the worker level, <library>/Library.mk is included,
 #    but not <library>/Makefile)
-$$(foreach p,$$(shell [ -f $$(DirContainingLib)/Makefile ] && grep "^\s*Package\s*:\?=\s*.*" $$(DirContainingLib)/Makefile),\
-  $$(if $$(filter clean%,$$(MAKECMDGOALS)),,\
-    $$(warning The Package variable can be set in either Project.mk, Library.mk, Platforms.mk or Platform.mk. Setting of Package= in 'Makefile' is deprecated and will not be supported in future releases.))\
+# This is for overriding the default based on parent.
+$$(foreach p,$$(shell [ -f $1/Makefile ] && grep "^\s*Package\s*:\?=\s*.*" $1/Makefile),\
   $$(eval $$p))
 
+$$(infox P0:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 ###############################################################################
 # If ParentPackage is unset, assume the parent is the project
 ifeq ($$(ParentPackage),)
@@ -75,17 +71,15 @@ endif
 ###############################################################################
 # If the PackageName is not set, set it to dirname
 #   (or blank if dirname == components)
+$$(infox P1:$$(PackagePrefix):$$(PackageName):$$(Package))
 ifeq ($$(PackageName),)
-  # Get the 'notdir' of the directory containing 'lib' (CWD or parent)
-  # Return that 'notdir' unless it is components in which case return empty
-  export PackageName:=$$(filter-out components,$$(strip $$(if $$(LibIsInCwd),\
-                                                          $$(notdir $$(call OcpiAbsDir,$$(or $1,.))),\
-                                                          $$(if $$(LibIsInParent),\
-                                                            $$(notdir $$(call OcpiAbsDir,$$(or $1,.)/..))))))
+  export PackageName:=$$(foreach d,$$(notdir $$(realpath $1)),$$(filter-out components,$$d))
 endif
+$$(infox P2:$$(PackagePrefix):$$(PackageName):$$(Package))
 
 # If PackageName is nonempty, prepend it with '.'
 export PackageName:=$$(if $$(PackageName),.$$(patsubst .%,%,$$(PackageName)))
+$$(infox P3:$$(PackagePrefix):$$(PackageName):$$(Package))
 
 ###############################################################################
 # Arg2 to OcpiCreatePackageId is an optional Authoring Model Prefix Segment
@@ -113,12 +107,12 @@ endif
 # Check/Generate the package-id file
 #
 # Do nothing about packages if we are cleaning
+$$(infox P4:$$(PackagePrefix):$$(PackageName):$$(Package):$$(PackageFile))
 ifeq ($$(filter clean%,$$(MAKECMDGOALS)),)
-  ifneq ($$(LibIsInCwd)$$(LibIsInParent),)
-    PackageFile:=$$(DirContainingLib)lib/package-id
-    ifeq ($$(call OcpiExists,$$(DirContainingLib)lib),)
-      $$(shell mkdir -p $$(DirContainingLib)lib)
-    endif
+  ifneq ($$(filter application lib library %-platform %-platforms %-primitives,$3),)
+    PackageFile:=$1/lib/package-id
+    $$(infox PACKAGE_FILE:$$(PackageFile):$$(realpath $$(PackageFile)):$(CURDIR))
+    $$(shell mkdir -p $1/lib)
     # If package-id file does not yet exist, create it based on Package
     ifeq ($$(call OcpiExists,$$(PackageFile)),)
       $$(shell echo $$(Package) > $$(PackageFile))
@@ -133,8 +127,12 @@ ifeq ($$(filter clean%,$$(MAKECMDGOALS)),)
 endif
 
 ###############################################################################
+$$(infox P5:$$(PackagePrefix):$$(PackageName):$$(Package):$$(PackageFile))
 
 endef # define OcpiCreatePackageId
 
 # Create the Package-ID for dir $1 and return it (the Package variable)
-OcpiSetAndGetPackageId=$(eval $(call OcpiCreatePackageId,$1,$2))$(Package)
+OcpiSetAndGetPackageId=$(strip \
+  $(infox CSGP:$1:$2:$3:$(PackagePrefix))\
+  $(eval $(call OcpiCreatePackageId,$1,$2,$3))\
+  $(infox PACKAGE RETURNED:$(Package))$(Package))

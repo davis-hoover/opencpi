@@ -82,4 +82,10 @@ component clock_limiter
        ready    : out bool_t);
 end component clock_limiter;
 
+component in2out is
+  port(
+    in_port  : in std_logic;
+    out_port : out std_logic);
+end component;
+
 end package util;

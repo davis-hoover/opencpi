@@ -17,134 +17,55 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
-\author{} % Force author to be blank
 %----------------------------------------------------------------------------------------
-% Snippets
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\snippetpath{../../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-%----------------------------------------------------------------------------------------
-% Paper size, orientation and margins
-%----------------------------------------------------------------------------------------
-\usepackage{geometry}
-\geometry{
-	letterpaper,			% paper type
-	portrait,				% text direction
-	left=.75in,				% left margin
-	top=.75in,				% top margin
-	right=.75in,			% right margin
-	bottom=.75in			% bottom margin
- }
-%----------------------------------------------------------------------------------------
-% Header/Footer
-%----------------------------------------------------------------------------------------
-\usepackage{fancyhdr} \pagestyle{fancy} % required for fancy headers
-\renewcommand{\headrulewidth}{0.5pt}
-\renewcommand{\footrulewidth}{0.5pt}
-\rhead{\small{ANGRYVIPER Team}}
-%----------------------------------------------------------------------------------------
-% Appendix packages
-%----------------------------------------------------------------------------------------
-\usepackage[toc,page]{appendix}
-%----------------------------------------------------------------------------------------
-% Defined Commands & Renamed Commands
-%----------------------------------------------------------------------------------------
-\renewcommand{\contentsname}{Table of Contents}
-\renewcommand{\listfigurename}{List of Figures}
-\renewcommand{\listtablename}{List of Tables}
-%----------------------------------------------------------------------------------------
-% Various packages
-%----------------------------------------------------------------------------------------
-\usepackage{hyperref} % for linking urls and lists
-\usepackage{graphicx} % for including pictures by file
-\usepackage{listings} % for coding language styles
-\usepackage{rotating} % for sideways table
-\usepackage{pifont}   % for sideways table
-\usepackage{pdflscape} % for landscape view
-%----------------------------------------------------------------------------------------
-% Table packages
-%----------------------------------------------------------------------------------------
-\usepackage{longtable} % for long possibly multi-page tables
-\usepackage{tabularx} % c=center,l=left,r=right,X=fill
-\usepackage{float}
-\floatstyle{plaintop}
-\usepackage[tableposition=top]{caption}
-%----------------------------------------------------------------------------------------
-% Block Diagram / FSM Drawings
-%----------------------------------------------------------------------------------------
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows,fit,positioning}
-\usetikzlibrary{automata} % used for the fsm
-%----------------------------------------------------------------------------------------
-% Colors Used
-%----------------------------------------------------------------------------------------
-\usepackage{colortbl}
-\definecolor{blue}{rgb}{.7,.8,.9}
-\definecolor{ceruleanblue}{rgb}{0.16, 0.32, 0.75}
-\definecolor{drkgreen}{rgb}{0,0.6,0}
-\definecolor{deepmagenta}{rgb}{0.8, 0.0, 0.8}
-\definecolor{cyan}{rgb}{0.0,0.6,0.6}
-\definecolor{maroon}{rgb}{0.5,0,0}
-%----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
-%----------------------------------------------------------------------------------------
-\def\docTitle{Component Data Sheet}
-\def\docVersion{1.6}
-%----------------------------------------------------------------------------------------
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small{\docTitle}}
-
-\def\comp{capture\_v2}
-\graphicspath{ {figures/} }
-
-\def\comp{Capture\_v2}
+\def\comp{capture\_{}v2}
 \edef\ecomp{capture_v2}
-\def\Comp{Capture\_v2}
+\def\Comp{Capture v2}
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
-
-\section*{Summary - \comp}
-	\begin{tabular}{|c|M{13.5cm}|}
-		\hline
-		\rowcolor{blue}
-		• & • \\
-		\hline
-		Name & \comp \\
-		\hline
-		Version & v\docVersion \\
-		\hline
-		Release Date & 11/2019 \\
-		\hline
-		Component Library & ocpi.assets.util\_comps \\
-		\hline
-		Workers & \comp.hdl \\
-		\hline
-		Tested Platforms & xsim, isim, Matchstiq-Z1(PL), ZedBoard(PL) \\
-		\hline
-	\end{tabular}
+\maketitle
+\thispagestyle{empty}
+\newpage
 
 \begin{center}
 	\textit{\textbf{Revision History}}
-		\begin{table}[H]
+	\begin{table}[H]
 		\label{table:revisions} % Add "[H]" to force placement of table
-			\begin{tabularx}{\textwidth}{|c|X|l|}
+		\begin{tabularx}{\textwidth}{|c|X|l|}
 			\hline
 			\rowcolor{blue}
 			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
 		    \hline
 		    v1.4 & Initial Release & 10/2018 \\
 		    \hline
-        v1.5 & Version bump. & 4/2019 \\
+            v1.5 & Version bump. & 4/2019 \\
 		    \hline
 		     v1.6 & Converted Worker to version 2 & 11/2019 \\
 		    \hline
 		    v1.7 & Table of Worker Configurations and Resource Utilization Table removed & 5/2020 \\
 			\hline
-			\end{tabularx}
-		\end{table}
-	\end{center}
+		\end{tabularx}
+	\end{table}
+\end{center}
+\newpage
+
+\def\name{\comp}
+\def\workertype{}
+\def\version{\ocpiversion}
+\def\releasedate{11/2019}
+\def\componentlibrary{ocpi.assets.util\_{}comps}
+\def\workers{\comp{}.hdl}
+\def\testedplatforms{isim, Matchstiq-Z1(PL), xsim, ZedBoard(PL)}
+\input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
 \begin{flushleft}

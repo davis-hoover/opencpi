@@ -17,7 +17,7 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library util; use util.util.all;
+library platform; use platform.platform_pkg.all;
 entity signals is
   port (w_SPI_DI     : in  std_logic;
         w_SPI_CLK    : in  std_logic;

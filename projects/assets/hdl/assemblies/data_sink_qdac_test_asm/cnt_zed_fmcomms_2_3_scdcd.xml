@@ -8,7 +8,9 @@
   <Device name='platform_ad9361_data_sub' card='fmcomms_2_3_lpc_scdcd'>
     <Property name='lvds_p' value='true'/>
     <Property name='DATA_CLK_Delay' value='3'/>
-    <Property name='RX_Data_Delay' value='0'/>
+    <Property name='RX_Data_Delay'  value='0'/>
+    <Property name='FB_CLK_Delay'   value='7'/>
+    <Property name='TX_Data_Delay'  value='0'/>
   </Device>
   <Device name='platform_ad9361_config' card='fmcomms_2_3_lpc_scdcd'>
     <Property name='pin_control_p' value='true'/>

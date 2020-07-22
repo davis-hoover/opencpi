@@ -18,27 +18,25 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ AD9361 ADC Test App Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{AD9361 ADC Test App Guide}
 \def\snippetpath{../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{AD9361 ADC Test App Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
-\usepackage{listings}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
+\newpage
+
+% No revision history
+
+\tableofcontents
+\newpage
 
 \section{Description}
 This application is intended to perform a hardware-in-the-loop test of the ad9361\_adc.hdl worker.

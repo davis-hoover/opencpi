@@ -16,7 +16,8 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-library IEEE, ocpi, bsv, util;
+library IEEE, ocpi, util;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all, ocpi.util.all;
 entity adc_ts_fifo is
   generic (width : positive := 32;
@@ -113,7 +114,7 @@ begin
 
   adc_data_with_overrun_event <= overrun_event_r & adc_data;
 
-  fifo : bsv.bsv.SyncFIFO
+  fifo : bsv_pkg.SyncFIFO
     generic map (dataWidth => width+1,
                  depth     => depth,
                  indxWidth => width_for_max(depth-1))

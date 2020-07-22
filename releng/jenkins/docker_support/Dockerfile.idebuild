@@ -1,4 +1,4 @@
-# ANGRYVIPER IDE Builder Docker container
+# AV IDE Builder Docker container
 # Do not execute manually: use "build_docker_idebuild.sh"
 # Remember to maximize RUN lines to minimize intermediate layers (AV-1746)
 
@@ -45,7 +45,7 @@ ARG VERSION
 ARG NAME
 ARG GIT_PORT
 ARG GIT_SERVER
-LABEL maintainer="ANGRYVIPER Team <discuss@lists.opencpi.org>"
+LABEL maintainer="OpenCPI <discuss@lists.opencpi.org>"
 LABEL name="${NAME}"
 LABEL version="${VERSION}"
 

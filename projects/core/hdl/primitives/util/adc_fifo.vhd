@@ -20,7 +20,7 @@
 -- Overrun is reported (and cleared) in the WSI clock domain
 -- Should be used in all ADC workers
 -- FIXME: enable SRL FIFOs
-library IEEE, ocpi, bsv, util;
+library IEEE, ocpi, ocpi_core_bsv, util; use ocpi_core_bsv.all;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ocpi.types.all, ocpi.util.all;
 entity adc_fifo is
   generic (width : positive := 32;
@@ -92,7 +92,7 @@ begin
   --fifo_s_enq     <= fifo_s_not_full and adc_give and operating;
   fifo_s_enq     <= fifo_s_not_full and adc_give;
 
-  fifo : bsv.bsv.SyncFIFO
+  fifo : bsv_pkg.SyncFIFO
     generic map (dataWidth => width,
                  depth     => depth,
                  indxWidth => width_for_max(depth-1))

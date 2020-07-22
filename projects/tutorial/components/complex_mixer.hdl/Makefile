@@ -22,7 +22,7 @@ include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
 # "xilinx" covers xsim, zynq, etc.
 OnlyTargets=xilinx
-
+ComponentLibraries=dsp_comps # use the spec from the assets one
 # For vivado we use vivado stubs with netlists
 # For xsim we use simulation netlists
 SourceFiles=\

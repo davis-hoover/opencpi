@@ -78,6 +78,7 @@ ifneq ($(MAKECMDGOALS),clean)
        RET=; \
        echo ======= Entering the \"devices\" library for the \"$(Worker)\" platform. 1>&2; \
        $(MAKE) -C devices --no-print-directory \
+         OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) \
          ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
          XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))" \
          HdlPlatforms="$(HdlPlatforms)" HdlPlatform="$(HdlPlatform)" \
@@ -108,7 +109,7 @@ else
   $(call OcpiDbgVar,XmlIncludeDirsInternal)
   $(infox HP1:$(HdlPlatforms))
   $(call OcpiDbgVar,HdlPlatforms)
-  SubCores_$(call HdlGetFamily,$(Worker)):=$(Cores)
+  SubCores_$(call HdlGetFamily,$(Worker)):=$(call HdlFindCores,$(Cores))
   OnlyPlatforms:=$(Worker)
   OnlyTargets:=$(call HdlGetFamily,$(Worker))
   override HdlPlatform:=$(Worker)
@@ -176,9 +177,10 @@ ifndef HdlSkip
 	$(AT)mkdir -p $$@
 	$(AT)echo ======= Entering the \"$1\" configuration for the \"$(Worker)\" platform.
 	$(AT)$(MAKE) -C $$@ -f $(OCPI_CDK_DIR)/include/hdl/hdl-config.mk --no-print-directory \
+               OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) \
                HdlPlatforms=$(Worker) \
                HdlPlatformWorker=../../$(Worker) \
-               HdlLibrariesInternal="$(call OcpiAdjustLibraries,$(HdlLibraries) $(Libraries))" \
+               HdlExplicitLibraries="$(call OcpiAdjustLibraries,$(HdlExplicitLibraries))" \
                ComponentLibrariesInternal="$(call OcpiAdjustLibraries,$(ComponentLibraries))" \
                XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))" \
 	       $(MAKECMDGOALS)
@@ -199,7 +201,7 @@ test:
 
 clean::
 	$(AT)if test -d devices; then make -C devices clean; fi
-	$(AT) rm -r -f config-* lib
+	$(AT) rm -r -f config-* lib gen target-*
 
 ifdef ShellHdlPlatformVars
 showinfo:

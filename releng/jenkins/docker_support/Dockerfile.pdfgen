@@ -30,7 +30,7 @@ ARG NAME
 ARG VERSION
 ARG GIT_PORT
 ARG GIT_SERVER
-LABEL maintainer="ANGRYVIPER Team <discuss@lists.opencpi.org>"
+LABEL maintainer="OpenCPI <discuss@lists.opencpi.org>"
 LABEL name="${NAME}"
 LABEL version="${VERSION}"
 

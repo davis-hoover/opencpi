@@ -25,7 +25,7 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library unisim; use unisim.vcomponents.all;
 library util; use util.util.all;
-library bsv; use bsv.bsv.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 architecture rtl of worker is
   constant adc_width  : positive := 12; -- must not be > 16 due to WSI width and multiple of 2 due to LVDS generate loop
 
@@ -520,7 +520,7 @@ begin
   -- expected to change very rarely in relation to either clock
   wsi_reset_n <= not ctl_in.reset;
   wsi_channels_are_swapped <= '1' when (props_in.channels_are_swapped = btrue) else '0';
-  chan_swap_sync: bsv.bsv.SyncBit
+  chan_swap_sync: bsv_pkg.SyncBit
     generic map(
       init   => 0)
     port map(
