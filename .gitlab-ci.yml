@@ -17,6 +17,7 @@ stages:
   - build-workers
   - build-platforms
   - build-assemblies
+  - build-sdcard
   - test
   - deploy
 

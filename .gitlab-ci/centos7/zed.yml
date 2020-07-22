@@ -308,8 +308,6 @@ build-test-core:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
-    - prereq:centos7:xilinx13_4
-    - build-rcc:centos7:xilinx13_4
 
 build-test-assets-base:centos7:zed:
   extends:
@@ -323,8 +321,6 @@ build-test-assets-base:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
-    - prereq:centos7:xilinx13_4
-    - build-rcc:centos7:xilinx13_4
 
 build-test-assets-comms:centos7:zed:
   extends:
@@ -338,8 +334,6 @@ build-test-assets-comms:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
-    - prereq:centos7:xilinx13_4
-    - build-rcc:centos7:xilinx13_4
 
 build-test-assets-dsp:centos7:zed:
   extends:
@@ -353,8 +347,6 @@ build-test-assets-dsp:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
-    - prereq:centos7:xilinx13_4
-    - build-rcc:centos7:xilinx13_4
 
 build-test-assets-misc:centos7:zed:
   extends:
@@ -368,8 +360,6 @@ build-test-assets-misc:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
-    - prereq:centos7:xilinx13_4
-    - build-rcc:centos7:xilinx13_4
 
 build-test-assets-util:centos7:zed:
   extends:
@@ -383,8 +373,6 @@ build-test-assets-util:centos7:zed:
     - build-platforms-core:centos7:zed
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
-    - prereq:centos7:xilinx13_4
-    - build-rcc:centos7:xilinx13_4
 
 build-test-assets_ts:centos7:zed:
   extends:
@@ -400,8 +388,6 @@ build-test-assets_ts:centos7:zed:
     - build-platforms-assets:centos7:zed
     - build-components-assets_ts:centos7:zed
     - build-devices-assets_ts:centos7:zed
-    - prereq:centos7:xilinx13_4
-    - build-rcc:centos7:xilinx13_4
 
 build-test-inactive:centos7:zed:
   extends:
@@ -416,6 +402,26 @@ build-test-inactive:centos7:zed:
     - build-platforms-inactive:centos7:zed
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
+
+
+##################
+# Build - SDcard #
+##################
+build-sdcard:centos7:zed:
+  extends:
+    - .build-sdcard
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7:xilinx13_4
+      artifacts: false
+    - build-rcc:centos7:xilinx13_4
+    - prereq:centos7
+    - build:centos7
+    - build-assemblies-assets:centos7:zed
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
 
 
 ###############
@@ -435,7 +441,7 @@ test-core:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-core:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed
 
 test-assets-base:centos7:zed:
@@ -452,7 +458,7 @@ test-assets-base:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-base:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed
 
 test-assets-comms:centos7:zed:
@@ -469,7 +475,7 @@ test-assets-comms:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-comms:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed
 
 test-assets-dsp:centos7:zed:
@@ -486,7 +492,7 @@ test-assets-dsp:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-dsp:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed
 
 test-assets-misc:centos7:zed:
@@ -503,7 +509,7 @@ test-assets-misc:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-misc:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed
 
 test-assets-util:centos7:zed:
@@ -520,7 +526,7 @@ test-assets-util:centos7:zed:
     - build-platforms-platform:centos7:zed
     - build-platforms-assets:centos7:zed
     - build-test-assets-util:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed 
 
 test-assets_ts:centos7:zed:
@@ -539,7 +545,7 @@ test-assets_ts:centos7:zed:
     - build-components-assets_ts:centos7:zed
     - build-devices-assets_ts:centos7:zed
     - build-test-assets_ts:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed
 
 test-inactive:centos7:zed:
@@ -557,5 +563,5 @@ test-inactive:centos7:zed:
     - prereq:centos7:xilinx13_4
     - build-rcc:centos7:xilinx13_4
     - build-test-inactive:centos7:zed
-    - build-assemblies-assets:centos7:zed
+    - build-sdcard:centos7:zed
   resource_group: zed
