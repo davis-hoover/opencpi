@@ -294,7 +294,7 @@ real_platforms:=$(call Unique,$(call RccRealPlatforms,$(RccPlatforms)))
 # e.g.: make rpm Platforms="zed:xilinx13_4"
 
 # Call the right rpm packaging script with the right arguments.  This macro takes
-# one argument which if set indicates hw deployment rather than RPM building
+# one argument which if set indicates hw deployment rather than RPM building.
 DoRpmOrDeployHw=\
   $(foreach arg,$(or $(Platforms),$(OCPI_TOOL_PLATFORM)),\
     $(foreach pair,$(call GetRccHdlPlatform,$(arg)),\
