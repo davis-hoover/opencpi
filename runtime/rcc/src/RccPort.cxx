@@ -102,6 +102,7 @@ namespace OCPI {
 	if (ready && max && max > m_rccPort.current.maxLength)
 	  throw OU::Error("Output buffer request/advance (size %zu) greater than buffer size "
 			  " (%zu)", max, m_rccPort.current.maxLength);
+	return ready;
       } catch (std::string &e) {
 	error(e);
       }
