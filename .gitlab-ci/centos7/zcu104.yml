@@ -1,6 +1,6 @@
-##########################
-# Jobs - Build-Primitives#
-##########################
+################################
+# Jobs - Build-Primitives-Core #
+################################
 build-primitives:centos7:zcu104:
   extends:
     - .build-primitives
@@ -8,7 +8,7 @@ build-primitives:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
 
 
@@ -22,7 +22,7 @@ build-components-core:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -33,7 +33,7 @@ build-components-assets:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -44,7 +44,7 @@ build-components-assets_ts:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -55,7 +55,7 @@ build-components-inactive:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -70,7 +70,7 @@ build-adapters-core:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -81,7 +81,7 @@ build-adapters-assets:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -96,7 +96,7 @@ build-devices-core:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -107,7 +107,7 @@ build-devices-platform:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -118,7 +118,7 @@ build-devices-assets:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -129,7 +129,7 @@ build-devices-assets_ts:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -140,7 +140,7 @@ build-devices-inactive:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -155,7 +155,7 @@ build-cards-core:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -166,7 +166,7 @@ build-cards-assets:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -177,7 +177,7 @@ build-cards-inactive:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
 
@@ -192,7 +192,7 @@ build-platforms-core:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-devices-core:centos7:zcu104
@@ -207,7 +207,7 @@ build-platforms-platform:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-devices-platform:centos7:zcu104
     - build-primitives:centos7:zcu104
@@ -220,7 +220,7 @@ build-platforms-assets:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-devices-platform:centos7:zcu104
     - build-primitives:centos7:zcu104
@@ -237,7 +237,7 @@ build-platforms-inactive:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-devices-inactive:centos7:zcu104
@@ -255,7 +255,7 @@ build-assemblies-platform:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
@@ -268,7 +268,7 @@ build-assemblies-assets:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
@@ -282,7 +282,7 @@ build-assemblies-assets_ts:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
@@ -298,7 +298,7 @@ build-assemblies-inactive:centos7:zcu104:
     - .zcu104
   needs:
     - job: prereq:centos7
-      artifacts: false
+      artifacts: true
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
@@ -310,98 +310,91 @@ build-assemblies-inactive:centos7:zcu104:
 #####################
 # Jobs - Build-Test #
 #####################
-build-test-core:centos7:zcu104:
+test-core:centos7:zcu104:
   extends:
-    - .build-test-core
+    - .test-core
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
     - build-platforms-platform:centos7:zcu104
     - build-platforms-assets:centos7:zcu104
 
-build-test-assets-base:centos7:zcu104:
+test-assets-base:centos7:zcu104:
   extends:
-    - .build-test-assets-base
+    - .test-assets-base
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
     - build-platforms-platform:centos7:zcu104
     - build-platforms-assets:centos7:zcu104
 
-build-test-assets-comms:centos7:zcu104:
+test-assets-comms:centos7:zcu104:
   extends:
-    - .build-test-assets-comms
+    - .test-assets-comms
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
     - build-platforms-platform:centos7:zcu104
     - build-platforms-assets:centos7:zcu104
 
-build-test-assets-dsp:centos7:zcu104:
+test-assets-dsp:centos7:zcu104:
   extends:
-    - .build-test-assets-dsp
+    - .test-assets-dsp
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
     - build-platforms-platform:centos7:zcu104
     - build-platforms-assets:centos7:zcu104
 
-build-test-assets-misc:centos7:zcu104:
+test-assets-misc:centos7:zcu104:
   extends:
-    - .build-test-assets-misc
+    - .test-assets-misc
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
     - build-platforms-platform:centos7:zcu104
     - build-platforms-assets:centos7:zcu104
 
-build-test-assets-util:centos7:zcu104:
+test-assets-util:centos7:zcu104:
   extends:
-    - .build-test-assets-util
+    - .test-assets-util
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
     - build-platforms-platform:centos7:zcu104
     - build-platforms-assets:centos7:zcu104
 
-build-test-assets_ts:centos7:zcu104:
+test-assets_ts:centos7:zcu104:
   extends:
-    - .build-test-assets_ts
+    - .test-assets_ts
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-core:centos7:zcu104
@@ -410,14 +403,13 @@ build-test-assets_ts:centos7:zcu104:
     - build-components-assets_ts:centos7:zcu104
     - build-devices-assets_ts:centos7:zcu104
 
-build-test-inactive:centos7:zcu104:
+test-inactive:centos7:zcu104:
   extends:
-    - .build-test-inactive
+    - .test-inactive
     - .centos7
     - .zcu104
-  needs:
-    - job: prereq:centos7
-      artifacts: false
+  dependencies:
+    - prereq:centos7
     - build:centos7
     - build-primitives:centos7:zcu104
     - build-platforms-platform:centos7:zcu104
