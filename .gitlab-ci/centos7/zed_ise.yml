@@ -8,7 +8,7 @@ build-primitives:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
 
 
@@ -22,7 +22,7 @@ build-components-core:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -33,7 +33,7 @@ build-components-assets:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -44,7 +44,7 @@ build-components-assets_ts:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -55,7 +55,7 @@ build-components-inactive:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -70,7 +70,7 @@ build-adapters-core:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -81,7 +81,7 @@ build-adapters-assets:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -96,7 +96,18 @@ build-devices-core:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed_ise
+
+build-devices-platform:centos7:zed_ise:
+  extends: 
+    - .build-devices-platform
+    - .centos7
+    - .zed_ise-xilinx13_4
+  needs:
+    - job: prereq:centos7
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -107,7 +118,7 @@ build-devices-assets:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -118,7 +129,7 @@ build-devices-assets_ts:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -129,7 +140,7 @@ build-devices-inactive:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -144,7 +155,7 @@ build-cards-core:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -155,7 +166,7 @@ build-cards-assets:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -166,7 +177,7 @@ build-cards-inactive:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
 
@@ -181,13 +192,26 @@ build-platforms-core:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-devices-core:centos7:zed_ise
     - build-cards-core:centos7:zed_ise
     - build-adapters-core:centos7:zed_ise
     - build-components-core:centos7:zed_ise
+
+build-platforms-platform:centos7:zed_ise:
+  extends: 
+    - .build-platforms-platform
+    - .centos7
+    - .zed_ise-xilinx13_4
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-devices-platform:centos7:zed_ise
+    - build-primitives:centos7:zed_ise
+    - build-devices-core:centos7:zed_ise
 
 build-platforms-assets:centos7:zed_ise:
   extends:
@@ -196,8 +220,9 @@ build-platforms-assets:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
+    - build-devices-platform:centos7:zed_ise
     - build-primitives:centos7:zed_ise
     - build-devices-assets:centos7:zed_ise
     - build-cards-assets:centos7:zed_ise
@@ -212,7 +237,7 @@ build-platforms-inactive:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-devices-inactive:centos7:zed_ise
@@ -223,6 +248,19 @@ build-platforms-inactive:centos7:zed_ise:
 #####################
 # Jobs - Assemblies #
 #####################
+build-assemblies-platform:centos7:zed_ise:
+  extends:
+    - .build-assemblies-platform
+    - .centos7
+    - .zed_ise-xilinx13_4
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed_ise
+    - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
+
 build-assemblies-assets:centos7:zed_ise:
   extends:
     - .build-assemblies-assets
@@ -230,10 +268,11 @@ build-assemblies-assets:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
 
 build-assemblies-assets_ts:centos7:zed_ise:
@@ -243,10 +282,11 @@ build-assemblies-assets_ts:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
     - build-components-assets_ts:centos7:zed_ise
     - build-devices-assets_ts:centos7:zed_ise
@@ -258,10 +298,11 @@ build-assemblies-inactive:centos7:zed_ise:
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
     - build-platforms-inactive:centos7:zed_ise
 
@@ -269,107 +310,115 @@ build-assemblies-inactive:centos7:zed_ise:
 #####################
 # Jobs - Build-Test #
 #####################
-test-core:centos7:zed_ise:
+build-test-core:centos7:zed_ise:
   extends:
-    - .test-core
+    - .build-test-core
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
 
-test-assets-base:centos7:zed_ise:
+build-test-assets-base:centos7:zed_ise:
   extends:
-    - .test-assets-base
+    - .build-test-assets-base
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
 
-test-assets-comms:centos7:zed_ise:
+build-test-assets-comms:centos7:zed_ise:
   extends:
-    - .test-assets-comms
+    - .build-test-assets-comms
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
 
-test-assets-dsp:centos7:zed_ise:
+build-test-assets-dsp:centos7:zed_ise:
   extends:
-    - .test-assets-dsp
+    - .build-test-assets-dsp
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
 
-test-assets-misc:centos7:zed_ise:
+build-test-assets-misc:centos7:zed_ise:
   extends:
-    - .test-assets-misc
+    - .build-test-assets-misc
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
 
-test-assets-util:centos7:zed_ise:
+build-test-assets-util:centos7:zed_ise:
   extends:
-    - .test-assets-util
+    - .build-test-assets-util
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
 
-test-assets_ts:centos7:zed_ise:
+build-test-assets_ts:centos7:zed_ise:
   extends:
-    - .test-assets_ts
+    - .build-test-assets_ts
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
     - build-platforms-core:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-assets:centos7:zed_ise
     - build-components-assets_ts:centos7:zed_ise
     - build-devices-assets_ts:centos7:zed_ise
 
-test-inactive:centos7:zed_ise:
+build-test-inactive:centos7:zed_ise:
   extends:
-    - .test-inactive
+    - .build-test-inactive
     - .centos7
     - .zed_ise-xilinx13_4
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:zed_ise
+    - build-platforms-platform:centos7:zed_ise
     - build-platforms-inactive:centos7:zed_ise
