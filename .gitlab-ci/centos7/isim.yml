@@ -17,7 +17,7 @@ build-primitives:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
 
 
@@ -30,7 +30,7 @@ build-components-core:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -40,7 +40,7 @@ build-components-assets:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -50,7 +50,7 @@ build-components-assets_ts:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -60,7 +60,7 @@ build-components-inactive:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -74,7 +74,7 @@ build-adapters-core:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -84,7 +84,7 @@ build-adapters-assets:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -98,7 +98,7 @@ build-devices-core:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -108,7 +108,7 @@ build-devices-platform:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -118,7 +118,7 @@ build-devices-assets:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -128,7 +128,7 @@ build-devices-assets_ts:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -138,7 +138,7 @@ build-devices-inactive:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -152,7 +152,7 @@ build-cards-core:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -162,7 +162,7 @@ build-cards-assets:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -172,7 +172,7 @@ build-cards-inactive:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
 
@@ -186,7 +186,7 @@ build-platforms-core:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-devices-core:centos7:isim
@@ -200,7 +200,7 @@ build-platforms-platform:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-devices-platform:centos7:isim
     - build-primitives:centos7:isim
@@ -212,7 +212,7 @@ build-platforms-assets:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-devices-platform:centos7:isim
     - build-primitives:centos7:isim
@@ -228,7 +228,7 @@ build-platforms-inactive:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-devices-inactive:centos7:isim
@@ -245,7 +245,7 @@ build-assemblies-platform:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
@@ -257,7 +257,7 @@ build-assemblies-assets:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
@@ -270,7 +270,7 @@ build-assemblies-assets_ts:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
@@ -283,10 +283,115 @@ build-assemblies-inactive:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-platforms-inactive:centos7:isim
     - build-primitives:centos7:isim
+
+
+#####################
+# Jobs - Build-Test #
+#####################
+build-test-core:centos7:isim:
+  extends:
+    - .build-test-core
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-core:centos7:isim
+
+build-test-assets-base:centos7:isim:
+  extends:
+    - .build-test-assets-base
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-core:centos7:isim
+    - build-platforms-platform:centos7:isim
+    - build-platforms-assets:centos7:isim
+
+build-test-assets-comms:centos7:isim:
+  extends:
+    - .build-test-assets-comms
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-core:centos7:isim
+    - build-platforms-platform:centos7:isim
+    - build-platforms-assets:centos7:isim
+
+build-test-assets-dsp:centos7:isim:
+  extends:
+    - .build-test-assets-dsp
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-core:centos7:isim
+    - build-platforms-platform:centos7:isim
+    - build-platforms-assets:centos7:isim
+
+build-test-assets-misc:centos7:isim:
+  extends:
+    - .build-test-assets-misc
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-core:centos7:isim
+    - build-platforms-platform:centos7:isim
+    - build-platforms-assets:centos7:isim
+
+build-test-assets-util:centos7:isim:
+  extends:
+    - .build-test-assets-util
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-core:centos7:isim
+    - build-platforms-platform:centos7:isim
+    - build-platforms-assets:centos7:isim
+
+build-test-assets_ts:centos7:isim:
+  extends:
+    - .build-test-assets_ts
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-core:centos7:isim
+    - build-platforms-platform:centos7:isim
+    - build-components-assets_ts:centos7:isim
+
+build-test-inactive:centos7:isim:
+  extends:
+    - .build-test-inactive
+    - .isim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:isim
+    - build-platforms-platform:centos7:isim
+    - build-platforms-inactive:centos7:isim
 
 
 ###############
@@ -298,10 +403,11 @@ test-core:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
+    - build-test-core:centos7:isim
 
 test-assets-base:centos7:isim:
   extends:
@@ -309,12 +415,13 @@ test-assets-base:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-platforms-assets:centos7:isim
+    - build-test-assets-base:centos7:isim
 
 test-assets-comms:centos7:isim:
   extends:
@@ -322,12 +429,13 @@ test-assets-comms:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-platforms-assets:centos7:isim
+    - build-test-assets-comms:centos7:isim
 
 test-assets-dsp:centos7:isim:
   extends:
@@ -335,12 +443,13 @@ test-assets-dsp:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-platforms-assets:centos7:isim
+    - build-test-assets-dsp:centos7:isim
 
 test-assets-misc:centos7:isim:
   extends:
@@ -348,12 +457,13 @@ test-assets-misc:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-platforms-assets:centos7:isim
+    - build-test-assets-misc:centos7:isim
 
 test-assets-util:centos7:isim:
   extends:
@@ -361,12 +471,13 @@ test-assets-util:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-platforms-assets:centos7:isim
+    - build-test-assets-misc:centos7:isim
 
 test-assets_ts:centos7:isim:
   extends:
@@ -374,12 +485,13 @@ test-assets_ts:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-core:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-components-assets_ts:centos7:isim
+    - build-test-assets_ts:centos7:isim
 
 test-inactive:centos7:isim:
   extends:
@@ -387,8 +499,9 @@ test-inactive:centos7:isim:
     - .isim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:isim
     - build-platforms-platform:centos7:isim
     - build-platforms-inactive:centos7:isim
+    - build-test-inactive:centos7:isim

@@ -3,15 +3,22 @@
 #################
 .install-packages:
   stage: prereq
+  before_script: []
   script:
     - yum -y distro-sync
     - ./scripts/install-packages.sh
     - touch "${CI_PROJECT_DIR}/.success"
+  after_script: []
 
 .install-prereqs:
   extends:
     - .standard-artifacts
   stage: prereq
+  before_script:
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp
+    - cat timestamp
+    - sleep 2
+    - ls -lh
   script:
     - ./scripts/install-prerequisites.sh $PLATFORM
     - touch "${CI_PROJECT_DIR}/.success"
@@ -240,25 +247,9 @@
 ##########################
 # Jobs - Build-Platforms #
 ##########################
-.build-platforms:
-  after_script:
-    - |-
-      if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
-        "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
-        exit 1
-      fi
-    - rm -f "${CI_PROJECT_DIR}/.success"
-    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt
-    - tar -T artifacts-$CI_JOB_STAGE-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts-build-workers-*.tar; do tar --concatenate -f artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar $f; done;
-    - ls -lh artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
-    - for f in artifacts*.tar; do if [ "$f" != artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar ]; then rm -rf "$f"; fi; done
-
 .build-platforms-core:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -268,7 +259,6 @@
 .build-platforms-platform:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -278,7 +268,6 @@
 .build-platforms-assets:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -288,7 +277,6 @@
 .build-platforms-inactive:
   extends:
     - .standard-artifacts
-    - .build-platforms
   stage: build-platforms
   script:
     - source ./cdk/opencpi-setup.sh -e
@@ -336,6 +324,90 @@
     - touch "${CI_PROJECT_DIR}/.success"
 
 
+#####################
+# Jobs - Build-Test #
+#####################
+.build-test-opencpi:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - ./scripts/test-opencpi.sh --no-hdl
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-core:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-base:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-comms:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/comms_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-dsp:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-misc:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-util:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/util_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets_ts:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-inactive:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/inactive --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
 ###############
 # Jobs - Test #
 ###############
@@ -353,8 +425,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-base:
@@ -363,8 +434,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-comms:
@@ -373,8 +443,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/comms_comps --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-dsp:
@@ -383,8 +452,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-misc:
@@ -393,8 +461,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets-util:
@@ -403,8 +470,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets/components/util_comps --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 .test-assets_ts:
@@ -413,8 +479,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 .test-inactive:
@@ -423,8 +488,7 @@
     paths: []
   script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpidev build test -d projects/inactive --$MODEL-platform $PLATFORM
-    - '[ -z "$IP" ] && ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify'
+    - ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
     - touch "${CI_PROJECT_DIR}/.success"
 
 
@@ -451,12 +515,11 @@
     - centos6
     - shell
   variables:
+    HOST_PLATFORM: 'centos6'
     PLATFORM: 'centos6'
     IMAGE: 'centos:6'
 
 .xsim:
-  extends:
-    - .vivado
   variables:
     PLATFORM: 'xsim'
     MODEL: 'hdl'
@@ -486,8 +549,6 @@
     - if: '$CI_HDL_PLATFORM =~ /(^| )(modelsim|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
 
 .isim:
-  extends:
-    - .vivado
   variables:
     PLATFORM: 'isim'
     MODEL: 'hdl'
@@ -500,48 +561,30 @@
 
 .xilinx13_3:
   extends:
-    - .vivado
     - .rules-default
   variables:
     PLATFORM: 'xilinx13_3'
     HW_PLATFORM: 'zed'
     SW_PLATFORM: 'xilinx13_3'
-    IP: '10.0.0.103'
-    PORT: '1000'
     MODEL: 'rcc'
 
 .xilinx13_4:
   extends:
-    - .vivado
     - .rules-default
   variables:
     PLATFORM: 'xilinx13_4'
     HW_PLATFORM: 'zed'
     SW_PLATFORM: 'xilinx13_4'
-    IP: '10.0.0.103'
-    PORT: '1000'
     MODEL: 'rcc'
 
-.zed-xilinx13_3:
-  extends:
-    - .vivado
-  variables:
-    PLATFORM: 'zed'
-    HW_PLATFORM: 'zed'
-    SW_PLATFORM: 'xilinx13_3'
-    IP: '10.0.0.103'
-    PORT: '1000'
-    MODEL: 'hdl'
-
-.zed-xilinx13_4:
-  extends:
-    - .vivado
+.zed:
   variables:
     PLATFORM: 'zed'
     HW_PLATFORM: 'zed'
     SW_PLATFORM: 'xilinx13_4'
     IP: '10.0.0.103'
     PORT: '1000'
+    OCPI_SERVER_ADDRESSES: '10.0.0.103:1000'
     MODEL: 'hdl'
   rules:
     - if: '$CI_HDL_PLATFORM =~ /(^| )(zed|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
@@ -551,8 +594,6 @@
     - if: '$CI_HDL_PLATFORM =~ /(^| )(zed|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
 
 .matchstiq_z1-xilinx13_3:
-  extends:
-    - .vivado
   variables:
     PLATFORM: 'matchstiq_z1'
     HW_PLATFORM: 'matchstiq_z1'
@@ -568,8 +609,6 @@
     - if: '$CI_HDL_PLATFORM =~ /(^| )(matchstiq_z1|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
 
 .zed_ise-xilinx13_4:
-  extends:
-    - .vivado
   variables:
     PLATFORM: 'zed_ise'
     HW_PLATFORM: 'zed_ise'
@@ -619,24 +658,12 @@
 # Misc #
 ########
 .standard-artifacts:
-  artifacts:
-    when: on_success
-    expire_in: '3d'
-    paths:
-      - artifacts-$CI_JOB_STAGE-$CI_JOB_ID.tar
+  artifacts: 
+    paths: []
 
 .rules-default:
   rules:
     - when: on_success
-
-.vivado:
-  before_script:
-    - export HOME=$CI_PROJECT_DIR
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f"; fi; done
-    - sleep 5
-    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
-    - cat timestamp.txt
-    - ls -lh
 
 .docker:
   tags:
@@ -645,30 +672,27 @@
 
 .ocpiremote:
   before_script:
-    - export HOME=$CI_PROJECT_DIR
-    - for f in artifacts*.tar; do if [ -f "$f" ]; then tar -xf "$f"; fi; done
-    - rm -f artifacts*.tar
+    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar.gz" "*centos7.tar.gz"
     - sleep 5
-    - date "+%Y-%m-%d %H:%M:%S" > timestamp.txt
-    - cat timestamp.txt
+    - touch timestamp
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
-    - make deploy Platforms=$HW_PLATFORM:$SW_PLATFORM
-    - 'echo "IP:   $IP"'
-    - 'echo "PORT: $PORT"'
-    - 'echo "HW:   $HW_PLATFORM"'
-    - 'echo "SW:   $SW_PLATFORM"'
-    - ocpiremote load -i $IP -r $PORT -w $HW_PLATFORM -s $SW_PLATFORM
-    - ocpiremote start -i $IP
+    - ocpiadmin deploy platform "$HW_PLATFORM" "$SW_PLATFORM"
+    - echo "IP- ${IP}"
+    - echo "PORT- ${PORT}"
+    - echo "HW- ${HW_PLATFORM}"
+    - echo "SW- ${SW_PLATFORM}"
+    - ocpiremote deploy -i "$IP" -s "$SW_PLATFORM" -w "$HW_PLATFORM"
+    - sleep 5
+    - ocpiremote load -i "$IP" -r "$PORT" -w "$HW_PLATFORM" -s "$SW_PLATFORM"
+    - ocpiremote start -i "$IP"
   after_script:
     - source ./cdk/opencpi-setup.sh -e
-    - ocpiremote unload -i $IP
+    - ocpiremote unload -i "$IP"
     - |-
       if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
-        "${CI_PROJECT_DIR}/.gitlab-ci/upload-failed-job.sh"
+        "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py" upload . -t 'failed-job'
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
-    - find -not -type d -newerct "$(< timestamp.txt)" > artifacts-$CI_JOB_ID.txt
-    - tar -T artifacts-$CI_JOB_ID.txt -cf artifacts-$CI_JOB_ID.tar
-    - ls -lh artifacts-$CI_JOB_ID.tar
+    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s "$(< timestamp)"
