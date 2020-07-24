@@ -1,0 +1,123 @@
+OCPIDEV-CLEAN(1)
+================
+
+
+NAME
+----
+ocpidev-clean - cleans OpenCPI assets
+
+
+SYNOPSIS
+--------
+*ocpidev* ['<options>'] *clean* ['<noun>' ['<name>' ]]
+
+
+DESCRIPTION
+-----------
+The *clean* verb cleans the OpenCPI assets specified by the noun used
+in the command. If no nouns are provided, *ocpidev* cleans the current
+directory. When the plural version of the nouns are used, no name is
+specified and all assets of that type are cleaned.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*application*(*s*)::
+    Clean all applications or a specific ACI application.
+
+*hdl*::
+    A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
+    Possible HDL assets are:
+
+        *assembly*|*ies*;;
+	Clean all or a specified HDL assembly.
+	
+	*device*;;
+	Clean an HDL device worker in a
+	specified library.
+	
+	*platform*(*s*);;
+	Clean all or a specified HDL platform.
+	
+	*primitive*(*s*);;
+	Clean all or a specified HDL primitive of a specified type.
+	Possible HDL primitive types are:
+	
+	    *library*:::
+	    Clean a primitive that results in a library of modules.
+	    
+	    *core*:::
+	    Clean a primitive that results in a synthesized
+	    core/netlist.
+
+*library*::
+    Clean the specified component library.
+
+*project*::
+    Clean all assets in a project.
+
+*worker*::
+    Clean the specified worker.
+    
+*test*::
+    Clean but do not run the specified component unit test.
+
+OPTIONS
+-------
+There are no verb-specific options.
+
+EXAMPLES
+--------
+. Clean the current asset or directory and the assets underneath it.
++
+----------
+ocpidev clean
+----------
++
+. Clean the *`assets`* project. Omit the name *`assets`* if
+inside the *`assets`* project.
++
+--------------------------------------------
+ocpidev clean project assets
+-------------------------------------------
++			 
+. Inside the *`assets`* project, clean the *`dsp_comps`* library
+located at *`components/dsp_comps`*.
++
+--------------------------------------------------
+ocpidev clean library dsp_comps
+--------------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

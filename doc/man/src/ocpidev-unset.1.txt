@@ -1,0 +1,80 @@
+OCPIDEV-UNSET(1)
+================
+
+
+NAME
+----
+ocpidev-unset - manually disassociate the current project from a registry.
+
+
+SYNOPSIS
+--------
+*ocpidev* ['<options>'] *unset registry*
+
+
+DESCRIPTION
+-----------
+Projects are automatically associated with the current
+registry when they are created or used. A project can
+be manually associated with or disassociated
+from a particular registry. Use the *ocpidev unset registry*
+command to remove an association between the current project
+and a particular registry.
+
+You must run this command from within a project.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*registry*::
+    Unset the registry for the current project.
+
+OPTIONS
+-------
+You can use the general-purpose options *`-v`* and *`-d`* '<directory>'
+with this command. In particular, you can use the *`-d`* '<directory>'
+option to specify the pathname of the registry being unset.
+
+There are no verb-specific options.
+
+EXAMPLES
+--------
+. Unset the current project's registry. The next time the project
+is built, the default registry will be used.
++
+----------------------
+ocpidev unset registry
+----------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

@@ -1,0 +1,82 @@
+OCPIDEV-REGISTER(1)
+==================
+
+
+NAME
+----
+ocpidev-register - add a project to a project registry.
+
+
+SYNOPSIS
+--------
+*ocpidev* ['<options>'] *register project*
+
+
+DESCRIPTION
+-----------
+The *register* verb adds the current project to its registry.
+If the project has no associated registry, the default one is used and
+becomes persistently associated with the project. The default registry
+is the one in the OpenCPI installation unless overridden by the
+*`OCPI_PROJECT_REGISTRY_DIR`* environment variable.  Registering a
+project makes its exports visible and usable to other projects
+using the same registry.
+
+The *register* verb creates exports for the currently
+available and built assets in the project. If the project
+is already registered, the exports are still recreated.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*project*::
+    Register the project in a registry.
+
+OPTIONS
+-------
+The general purpose options (*`-v`* and *`-d`* '<directory>') can be used.
+In particular, the *`-d`* '<directory>' option can be used to specify
+the pathname of the project being registered.
+There are no verb-specific options.
+
+EXAMPLES
+--------
+. Register the current project to its registry (or the default
+if it doesn't have one yet):
++
+----------------------
+ocpidev register project
+----------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+
