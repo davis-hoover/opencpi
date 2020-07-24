@@ -20,7 +20,8 @@ Name:      opencpi-doc
 Version:   %{RPM_VERSION}
 Release:   %{RPM_RELEASE}%{?RELEASE_TAG}%{?COMMIT_TAG}%{?dist}
 BuildArch: noarch
-Source0:   %{name}-%{RPM_VERSION}.tar.gz
+%global    prefix0 /opt/opencpi
+Prefix:    %{prefix0}
 
 Summary:   OpenCPI Documentation
 Group:     Documentation
@@ -33,7 +34,7 @@ Packager:  OpenCPI <discuss@lists.opencpi.org>
 Requires:  man
 
 %description
-Man pages, PDFs and HTML index files installed into /opt/opencpi/doc
+Man pages, PDFs and HTML index files installed into %{prefix0}/doc
 
 %{?RPM_HASH:ReleaseID: %{RPM_HASH}}
 
@@ -44,14 +45,14 @@ Man pages, PDFs and HTML index files installed into /opt/opencpi/doc
 %install
 cd %{RPM_OPENCPI}
 set -e
-rm -rf %{buildroot}/opt/opencpi
+rm -rf %{buildroot}%{prefix0}
 ./packaging/prepare-rpm-doc-files.sh %{RPM_PLATFORM} "%{?RPM_CROSS:1}" \
-                                     %{buildroot} /opt/opencpi %{_builddir} %{RPM_VERSION}
+                                     %{buildroot} %{prefix0} %{_builddir} %{RPM_VERSION}
 cd %{_builddir}/opencpi-doc-%{RPM_VERSION}
-%{__mkdir_p} %{buildroot}/opt/opencpi
-%{__cp} -r . %{buildroot}/opt/opencpi
+%{__mkdir_p} %{buildroot}%{prefix0}
+%{__cp} -r . %{buildroot}%{prefix0}
 
 %files
 %defattr(0444,root,root,0555)
-%dir /opt/opencpi/doc
-%doc /opt/opencpi/doc/*
+%dir %{prefix0}/doc
+%doc %{prefix0}/doc/*

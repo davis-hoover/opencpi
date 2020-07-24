@@ -39,17 +39,6 @@ prefix=$4
 builddir=$5
 version=$6
 [ -z "${builddir}" ] && echo "Don't run this by hand." && exit 1
-mkdir -p $buildroot$prefix
-#
-# Note verified assumption that CWD is OpenCPI top-level directory.
-#
-# Create the PDFs.
-#
-./doc/build-pages.py HEAD
-#
-# Update exports.
-#
-make exports
 #
 # In lieu of creating a proper "SOURCES" tarball, use "tar"
 # as a symlink-resolving "cp" with complete control over the
