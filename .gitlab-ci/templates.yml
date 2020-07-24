@@ -416,7 +416,7 @@
   artifacts:
     paths: []
   script:
-    - artifacts.py download -i "*${SW_PLATFORM.tar.gz}"
+    - artifacts.py download -i "*${SW_PLATFORM}.tar.gz"
     - source ./cdk/opencpi-setup.sh -e
     - ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"
     - touch "${CI_PROJECT_DIR}/.success"
