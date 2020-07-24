@@ -1,0 +1,236 @@
+OCPIDEV-RUN(1)
+================
+
+
+NAME
+----
+ocpidev-run - runs applications and component unit tests.
+
+
+SYNOPSIS
+--------
+*ocpidev* *run* ['<options>'] '<noun>' ['<name>']
+
+
+DESCRIPTION
+-----------
+The *run* verb invokes the OpenCPI tool for running component unit tests
+and applications. Applications that are simply an application XML
+are not yet implemented using *ocpidev*.
+
+Component unit tests have five phases:
+
+- Generate: generate testing artifacts after finding the
+component spec and the workers.
+
+- Build: build HDL bitstream/executable artifacts for testing.
+
+- Prepare: examine available built workers and available platforms,
+creating execution scripts to use them all for executing feasible tests.
+
+- Run: execute tests for all workers, configurations, test cases and platforms.
+
+- Verify: verify results from the execution of tests on workers and platforms.
+
+One or more "modes" based on these phases can be specified
+with the *--mode* option to the *run* verb.
+	
+There are two types of options for setting platforms.
+The first type (*`--rcc-platform`* and *`--hdl-platform`*) cause
+the tool to build (run generate and build phases) for the
+specified platforms. The second type (*`--only-platform`*,
+*`--exclude-platform`*) are used to limit the runtime available
+platform (prepare, run, and verify phases) where the command is executed.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*application*::
+    Run the specified application.
+
+*applications*::
+    Run all the applications in a project.
+
+*library*::
+    Run all the unit tests in the specified component library.
+    
+*project*::
+    Run all applications and component unit tests in
+    the specified project.
+
+*test*::
+    Run the specified component unit test.
+
+*tests*::
+    Run all the component unit tests in a
+    project or library.
+
+OPTIONS
+-------
+In the option descriptions below, a plus sign (+) indicates that
+the option can be specified more than once on the command line.
+
+Options That Apply to Applications and Unit Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--rcc-platform=`*'<platform>'+:: 
+    Specify the RCC platform to use to generate and build the unit tests
+    and build the ACI application.
+
+Options That Apply to Applications Only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--before`* '<args>'+:: 
+    Specify the argument(s) to insert before the ACI executable or
+    the *`ocpirun`* command; for example, environment settings or prefix commands.
+    
+*`--after`* '<args>'+::
+    Specify the argument(s) to insert at the end of the execution command line.
+	
+*`--run-arg`* '<args>'+::
+    Specify the argument(s) to insert immediately after the ACI executable or
+    the *`ocpirun`* command.
+
+You can also add run-arg arguments after the application '<name>';
+for example, to specify options to *`ocpirun`* for XML applications.
+Preface these arguments with the double hyphen (*`--`*) notation
+to indicate that they are not options to the *`ocpidev`* command
+itself. For example, if you want to run an application with a
+number of *`run-arg`* arguments, you can use any of the following
+syntaxes:
+
+   ocpidev run application myapp -- -v -d -Pxsim
+   
+   ocpidev run application myapp --run-arg=-v --run-arg=-d --run-arg=-Pxsim
+   
+   ocpidev run application myapp --run-arg=”-v -d -Pxsim”
+
+For an XML application, these command lines perform the command:
+
+   ocpirun -v -d -Pxsim myapp
+
+For more information on how to use these options, see the section "Applications
+in Projects" in the 'OpenCPI Application Development Guide'.
+
+Options That Apply to Unit Tests Only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-l`* '<library>'::
+    Run the unit test in the specified library.
+    
+*`--case=`*'<case-name>'[*,*'<case-name>'[*,*'<case-name>'...]]::
+    Specify the test case(s) to be run/verified. If this option is not used,
+    the default case run/verified is *`case00`*. You can specify wildcards
+    in '<case-name>'. To specify a subcase, use the notation
+    '<case-name>'*.*'<subcase-number>'. Examples: case*., case0.0*, case00.01
+    
+*`--accumulate-errors`*:: 
+    Report execution or verification errors as they occur rather
+    than ending the test on the first failure detected.
+    
+*`--exclude-platform=`*'<platform>', *-Q* '<platform>'+::
+    Specify the runtime platform to omit from a unit test.
+    
+*`--hdl-platform=`*'<platform>'+::
+    Specify the HDL platform to use with the unit test. This option is only
+    valid in generate and build phases.
+    
+*`--keep-simulations`*:: 
+    Keep HDL simulation files regardless of verification results.
+    By default, simulation files are removed if the verification
+    is successful. Warning: Simulation files can become large!
+    
+*`--mode=`*'<mode>'[,'<mode>'[,'<mode>'...]]::
+    Specify which phase(s) of the unit test to execute.
+    Valid modes are:
+    - *all*:  execute all five phases (the default if the *`--mode`* option is not used)
+    - *gen*: execute generate phase
+    - *gen_build*: execute generate and build phases
+    - *prep_run_verify*: execute prepare, run, and verify phases
+    - *prep*: execute prepare phase
+    - *run*: execute run phase
+    - *prep_run*: execute prepare and run phases
+    - *verify*: execute verify phase 
+    - *view*: execute the view script (view.sh) on an already executed run  
+    - *clean_all*: clean all generated files
+    - *clean_run*: clean all files generated during the run phase
+    
+*`--only-platform=`*'<platform>', *-G* '<platform>'+::
+    Specify the runtime platform to use with a unit test.
+    
+*`--remotes=`*'<system>'::
+    Specify the remote system to run the test(s) by setting the
+    *`OCPI_REMOTE_TEST_SYS`* variable. See the section
+    "Defining Remote Systems for Executing Tests"
+    in the 'OpenCPI Component Development Guide' for more information.
+    
+*`--view`*::
+    Run the view script (view.sh) for the test at the conclusion of the
+    test's execution.
+    
+
+EXAMPLES
+--------
+. Run an application named *myapp*:
++
+----------------------------
+ocpidev run application myapp
+-----------------------------
++
+. Run all the applications in the current project:
++
+--------------------------------------------
+ocpidev run applications
+-------------------------------------------
++
+. Inside the *`assets`* project, run the *`fir_real_see`* unit test
+in the *`dsp_comps`* library located at *`components/dsp_comps`*:
++
+----------------------------------------------
+ocpidev run -l dsp_comps test fir_real_sse
+----------------------------------------------
++			 
+. Inside the *`assets`* project, run all tests in the *`dsp_comps`* library
+located at *`components/dsp_comps`*:
++
+--------------------------------------------------
+ocpidev run library dsp_comps
+--------------------------------------------------
++
+. Inside the *`assets`* project, run the generate and
+build stages of the *`fir_real_sse`* test in the *`dsp_comps`* library
+located at *`components/dsp_comps`*:
++
+--------------------------------------------------------
+ocpidev run -l dsp_comps --mode=gen_build test fir_real_sse
+--------------------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-registry</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140629109257280"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-registry — manage an OpenCPI project registry.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">registry</code></strong></span> [<span class="emphasis"><em>&lt;name&gt;</em></span>]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">registry</code></strong></span> noun represents an OpenCPI project registry, which is a
+directory that contains references to OpenCPI projects.
+An OpenCPI project registry is a way to manage project interdependencies.
+A project is  automatically <span class="emphasis"><em>associated</em></span> with a registry when it is created,
+allowing it to view and depend on other projects registered there.
+A project can also be <span class="emphasis"><em>registered</em></span> in its associated project
+registry, allowing it to be visible to other projects associated there.
+Projects are not initially registered; the <span class="strong"><strong><code class="literal">ocpidev register</code></strong></span> operation
+for a project can be used to register them.</p><p>The OpenCPI installation provides a default project registry at
+$OCPI_CDK_DIR/../project-registry. However, in some project development
+environments, it can be useful to have an additional "sandbox" project
+registry for use as an alternative to the OpenCPI default.</p><p>The OpenCPI environment variable <span class="strong"><strong><code class="literal">OCPI_PROJECT_REGISTRY_DIR</code></strong></span> can
+be set to point to an alternative project registry; setting this
+variable allows subsequently created projects to be associated
+with this registry and not with the OpenCPI default.</p><p>For more information about project registries and how to manage them,
+see the section "The Project Registry: How Projects Depend on
+and Find Each Other" in the <span class="emphasis"><em>OpenCPI Component Development Guide</em></span>.</p><p>Verbs that can operate on a project registry are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">create</code></strong></span>
+</span></dt><dd>
+    Create the named project registry at the specified location.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">delete</code></strong></span>
+</span></dt><dd>
+    Remove the named project registry from the specified location.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">set</code></strong></span>
+</span></dt><dd>
+    Manually associate a project with a project registry.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">show</code></strong></span>
+</span></dt><dd>
+    Display a list of projects registered with a project registry and their locations.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">unset</code></strong></span>
+</span></dt><dd>
+    Manually remove the association between a project and a project registry.
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><div class="refsect2"><a id="_options_that_apply_to_all_operations_verbs_on_registries"></a><h3>Options That Apply to All Operations (Verbs) on Registries</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>
+</span></dt><dd>
+    Specify the directory in which the command should be run.
+    Analogous to the <span class="strong"><strong>-C</strong></span> option in the POSIX <span class="strong"><strong>make</strong></span> command.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-v</code></strong></span>, <span class="strong"><strong><code class="literal">--verbose</code></strong></span>
+</span></dt><dd>
+    Describe what is happening in command execution in more detail.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_creating_and_setting_registries"></a><h3>Options When Creating and Setting Registries</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>
+</span></dt><dd>
+    Specify the path to the registry being created or set.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_deleting_registries"></a><h3>Options When Deleting Registries</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-f</code></strong></span>
+</span></dt><dd>
+    Force deletion: do not ask for confirmation when deleting
+    a project registry. Normally, you are asked to confirm a deletion.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_showing_registries"></a><h3>Options When Showing Registries</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--json</code></strong></span>
+</span></dt><dd>
+    Format the output in Javascript Object Notation (JSON) format
+    for integration with other software.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--global-scope</code></strong></span>
+</span></dt><dd>
+    Display information about all project registries.
+    This is the default scope used if <span class="strong"><strong><code class="literal">-local-scope</code></strong></span> is not used.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--local-scope</code></strong></span>
+</span></dt><dd>
+    Only display information about the local project registry.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--simple</code></strong></span>
+</span></dt><dd>
+    Format the output as simply as possible.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--table</code></strong></span>
+</span></dt><dd>
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if <span class="strong"><strong>--simple</strong></span> or <span class="strong"><strong>--json</strong></span> are not used.
+</dd></dl></div></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Create a registry <span class="strong"><strong><code class="literal">~/workspace/my-registry</code></strong></span>. Note that this registry will
+not have the <span class="strong"><strong><code class="literal">core</code></strong></span> project registered, so you must locate and register
+the core project in <span class="strong"><strong><code class="literal">my-registry</code></strong></span> after creating it.
+</p><pre class="screen">ocpidev create registry my-registry -d ~/workspace</pre></li><li class="listitem"><p class="simpara">
+Display information about the projects in the current registry:
+</p><pre class="screen">ocpidev show registry</pre></li><li class="listitem"><p class="simpara">
+Inside the project, associate the project with the default registry:
+</p><pre class="screen">ocpidev set registry</pre></li><li class="listitem"><p class="simpara">
+Inside the project, associate the project with the registry named
+<span class="strong"><strong><code class="literal">my-registry</code></strong></span> located at ~/workspace/:
+</p><pre class="screen">ocpidev -d ~/workspace set registry my-registry</pre></li><li class="listitem"><p class="simpara">
+Inside the project, remove the association between the project
+and a registry. The next time the project is built, the default
+project registry will be used:
+</p><pre class="screen">ocpidev unset registry</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
+<a class="ulink" href="ocpidev-set.1.html" target="_top">ocpidev-set(1)</a>
+<a class="ulink" href="ocpidev-show.1.html" target="_top">ocpidev-show(1)</a>
+<a class="ulink" href="ocpidev-unset.1.html" target="_top">ocpidev-unset(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>
