@@ -3972,7 +3972,7 @@
       <text:p text:style-name="P49"><text:span text:style-name="Code">aslt4, aslt4x</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/Alst4_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">Aslt4 Getting Started Guide</text:span></text:a></text:p>
+      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.0.0-beta.1/docs/assets/Alst4_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">Aslt4 Getting Started Guide</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -3980,7 +3980,7 @@
       <text:p text:style-name="P49"><text:span text:style-name="Code">matchstiq_z1</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/Matchstiq_Z1_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">Match</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/Matchstiq_Z1_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis"><text:span text:style-name="T70">s</text:span></text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/Matchstiq_Z1_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">tiq Z1 Getting Started Guide</text:span></text:a></text:p>
+      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.0.0-beta.1/docs/assets/Matchstiq_Z1_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">Match</text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.0.0-beta.1/docs/assets/Matchstiq_Z1_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis"><text:span text:style-name="T70">s</text:span></text:span></text:a><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.0.0-beta.1/docs/assets/Matchstiq_Z1_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">tiq Z1 Getting Started Guide</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -3988,7 +3988,7 @@
       <text:p text:style-name="P49"><text:span text:style-name="Code">ml605</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/ML605_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">ML605 Getting Started Guide</text:span></text:a></text:p>
+      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.0.0-beta.1/docs/assets/ML605_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">ML605 Getting Started Guide</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
@@ -3996,7 +3996,7 @@
       <text:p text:style-name="P49"><text:span text:style-name="Code">zed, zed_ise</text:span></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.B2" office:value-type="string">
-      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/assets/ZedBoard_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">Zedboard Getting Started Guide</text:span></text:a></text:p>
+      <text:p text:style-name="P49"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v2.0.0-beta.1/docs/assets/ZedBoard_Getting_Started_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">Zedboard Getting Started Guide</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
