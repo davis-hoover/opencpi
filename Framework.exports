@@ -128,7 +128,7 @@
 # so it is "place" in the internal dir to avoid runtime, and exported explicitly for devel
 # we are removing it from the distribution entirely before deciding about the RH stuff
 #+build/autotools/target-<target>/staging/bin/internal/ocpisca <target>/bin/
-+scripts/ocpiadmin.sh <target>/bin/ocpiadmin
++tools/scripts/ocpiadmin.sh <target>/bin/ocpiadmin
 # Allow installations to run this, but not documented yet
 # It will run only runtime env tests if that's where it is
 # Perhaps migrate this to bin with a new name at some point
@@ -300,7 +300,8 @@
 +runtime/remote-support/scripts/ocpiremote.py <target>/bin/ocpiremote
 ################################################################################
 # Man pages (initially premade)
-+doc/man doc/
++doc/man/man1 doc/man/
++doc/man/html doc/man/
 # PDFs and HTML (aka gitlab.io)
 +.public/releases/* doc/pdfs/
 

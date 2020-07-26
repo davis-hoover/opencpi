@@ -90,6 +90,7 @@ endif
 QuartusFamily_stratix4:=Stratix IV
 QuartusFamily_stratix5:=Stratix V
 QuartusFamily_arria10soc_std:=Arria 10
+QuartusFamily_cyclone5:=Cyclone V
 
 QuartusMakePart1=$(firstword $1)$(word 3,$1)$(word 2,$1)
 # Strip out _std_alias if present (e.g. if there is a Pro version of this part as well)
@@ -247,7 +248,11 @@ HdlToolPost=\
   fi;\
   for s in $(HdlToolFiles); do \
     if [[ $$s == *.vhd ]]; then \
+<<<<<<< HEAD
       echo -- synthesis library $(WorkLib) | cat - $$s > $(WorkLib)/`basename $$s`; \
+=======
+      echo -- synthesis library $(LibName) | cat - $$s > $(WorkLib)/`basename $$s`; \
+>>>>>>> origin/develop
     else \
       ln -s ../$$s $(WorkLib); \
     fi; \

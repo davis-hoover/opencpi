@@ -100,7 +100,11 @@ begin
     end if;
   end process;
 
+<<<<<<< HEAD
   nff_synchronizer : work.cdc.single_bit
+=======
+  nff_synchronizer : entity work.single_bit
+>>>>>>> origin/develop
     generic map (
       N    => N,
       IREG => '0')

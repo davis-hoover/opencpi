@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-register</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140626712520576"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-register — add a project to a project registry.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong>ocpidev</strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="strong"><strong>register project</strong></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong>register</strong></span> verb adds the current project to its registry.
+If the project has no associated registry, the default one is used and
+becomes persistently associated with the project. The default registry
+is the one in the OpenCPI installation unless overridden by the
+<span class="strong"><strong><code class="literal">OCPI_PROJECT_REGISTRY_DIR</code></strong></span> environment variable.  Registering a
+project makes its exports visible and usable to other projects
+using the same registry.</p><p>The <span class="strong"><strong>register</strong></span> verb creates exports for the currently
+available and built assets in the project. If the project
+is already registered, the exports are still recreated.</p><p>Asset types to be specified in the <span class="emphasis"><em>&lt;noun&gt;</em></span> argument are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>project</strong></span>
+</span></dt><dd>
+    Register the project in a registry.
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>The general purpose options (<span class="strong"><strong><code class="literal">-v</code></strong></span> and <span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>) can be used.
+In particular, the <span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span> option can be used to specify
+the pathname of the project being registered.
+There are no verb-specific options.</p></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Register the current project to its registry (or the default
+if it doesn’t have one yet):
+</p><pre class="screen">ocpidev register project</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-build.1.html" target="_top">ocpidev-build(1)</a>
+<a class="ulink" href="ocpidev-clean.1.html" target="_top">ocpidev-clean(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-refresh.1.html" target="_top">ocpidev-refresh(1)</a>
+<a class="ulink" href="ocpidev-run.1.html" target="_top">ocpidev-run(1)</a>
+<a class="ulink" href="ocpidev-set.1.html" target="_top">ocpidev-set(1)</a>
+<a class="ulink" href="ocpidev-show.1.html" target="_top">ocpidev-show(1)</a>
+<a class="ulink" href="ocpidev-unregister.1.html" target="_top">ocpidev-unregister(1)</a>
+<a class="ulink" href="ocpidev-unset.1.html" target="_top">ocpidev-unset(1)</a>
+<a class="ulink" href="ocpidev-utilization.1.html" target="_top">ocpidev-utilization(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

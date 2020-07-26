@@ -1,0 +1,221 @@
+OCPIDEV-BUILD(1)
+==============
+
+
+NAME
+----
+ocpidev-build - compiles OpenCPI assets
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] *`build`* ['<noun>' ['<name>' ]]
+
+
+DESCRIPTION
+-----------
+The *`build`* verb compiles the OpenCPI assets specified by the noun used
+in the command. If no nouns are provided, *ocpidev* builds the current
+directory or asset. When the plural version of the nouns are used, no name is
+specified and all assets of that type are built.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*`application`*(*`s`*)::
+    Build all (*`applications`*) or a specific ACI application.
+    This includes any custom bilding specified by a customized
+    application *Makefile*.
+
+*`hdl`*::
+    A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
+    Possible HDL assets are:
+
+        *`assembly`*|*`ies`*;;
+	Build all or a specified HDL assembly.
+	
+	*`device`*;;
+	Build an HDL device worker in a
+	specified library.
+	
+	*`platform`*(*`s`*);;
+	Build all or a specified HDL platform.
+	
+	*`primitive`*(*`s`*);;
+	Build all HDL primitives or a specified HDL primitive
+	of a specified type. Possible HDL primitive types are:
+	
+	    *`core`*:::
+	    Build a primitive that results in a synthesized
+	    core/netlist.
+
+	    *`library`*:::
+	    Build a primitive that results in a library of modules.
+	    
+*`library`*::
+    Build a component library.
+
+*`project`*::
+    Build all assets in a project.
+
+*`test`*::
+    Build but do not run a component unit test.
+
+*`worker`*::
+    Build a worker.
+
+
+OPTIONS
+-------
+The options to the *`build`* verb are primarily used to limit what is built
+(focus the build process on specific assets of interest), or specify the
+platforms and targets to build the assets for.
+
+In the descriptions that follow, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options When Building Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-assembly=`*'<hdl-assembly>'+::
+    Limit the assemblies being built to the specified assembly. This option
+    can also be used in the *hdl/assemblies* directory.
+
+*`--no-assemblies`*::
+    Don't build the assemblies in the project. Building HDL assemblies
+    (and their containers) can be slow.
+
+Options When Building Projects or Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl`*::
+    Limit the assets being built to HDL primitives, workers, platforms
+    or assemblies.
+
+*`--rcc`*::
+    Limit the assets being built to RCC workers.
+
+*`--worker=`*'<worker>'+::
+    Limits the assets being built to the specified worker.
+    Note that the *`--worker`* option differs from the
+    *`worker`* noun: the noun is used to build
+    a single worker, while the *`--worker`* option is used
+    to limit the build to an individual worker (or a list of
+    workers if *`--worker`* option is specified
+    multiple times) when building a project or library.
+    If the *`--worker`* option is not used,
+    all workers in a project or library are built.
+
+Options When Building Projects, Libraries, Tests, RCC Workers or ACI Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-rcc-platform=`*'<platform>'+::
+    Build RCC/ACI assets for the RCC platforms associated with the
+    specified HDL platform. If this option is not used (and *`--rcc-platform`*
+    '<platform>' is also not used), the current development software
+    platform is used as the single RCC platform used for building.
+
+*`--rcc-platform=`*'<platform>'+::
+    Build RCC/ACI assets for the specified RCC platform. If this
+    option is not used (and *`--hdl-rcc-platform=`*'<platform>' is also not used),
+    the current development software platform is used as the single
+    RCC platform used for building.
+
+Options When Building Projects, Libraries, Tests with HDL Workers or other HDL Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-target=`*'<target>'+::
+    Build HDL assets for the specified HDL target. If only HDL targets
+    are specified (and no HDL platforms), containers will not be
+    built for assemblies or unit tests.
+
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build HDL assets for the specified HDL platform.
+
+Options When Building Workers, Tests and other Assets in Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-l`* '<library>'::
+    Build the asset located in the specified library. This option can
+    be used to identify a particular library when operating in a
+    project with multiple component libraries. It's not needed when
+    operating in a project with only a single top-level    
+    *`components`* library. Note that the *`library`* noun differs
+    from the *`-l`* option in that the *`library`* noun is used when
+    building the library itself, while the *`-l`* option is used when
+    building an asset inside a library.
+
+EXAMPLES
+--------
+. Build the current asset or directory and those underneath it
+for the *`zed`* HDL platform and the *`xilinx13_3`* RCC platform.
++
+---------------
+ocpidev build --hdl-platform=zed --rcc-platform=xilinx13_3
+---------------
++
+. Build the *`assets`* project for the *`zed`* HDL platform and
+`*`xilinx13_3`* RCC platform.  Omit the name *`assets`* if
+inside the *`assets`* project.
++
+--------------------------------------------
+ocpidev build project assets --hdl-platform=zed
+                             --rcc-platform=xilinx13_3
+-------------------------------------------
++
+. Inside the *`assets`* project, build the *`complex_mixer.hdl`*
+worker in the *`dsp_comps`* library for the *`zed`* HDL platform
+and *`xilinx13_3`* RCC platform. You can omit the *`-l dsp_comps`*
+option if operating in a project with only a single top-level
+*`components`* library.
++
+----------------------------------------------
+ocpidev -l dsp_comps build worker complex_mixer.hdl
+                         --hdl-platform=zed
+                         --rcc-platform=xilinx13_3
+----------------------------------------------
++			 
+. Inside the *`assets`* project, build the *`dsp_comps`* library
+located at *`components/dsp_comps`* for the *`zed`* HDL platform
+and *`xilinx13_3 RCC`* platform.
++
+--------------------------------------------------
+ocpidev build library dsp_comps --hdl-platform=zed
+                                --rcc-platform=xilinx13_3
+--------------------------------------------------
++
+. Inside the *`assets`* project, build the *`dsp_comps`* library,
+but limit the build to the *`complex_mixer.hdl`* and
+*`cic_dec.hdl`* workers.
++
+---------------------------------------------------------
+ocpidev build library dsp_comps --worker=complex_mixer.hdl
+	      	      		--worker=cic_dec.hdl
+				--hdl-platform=zed
+---------------------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: <www.opencpi.org>
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
