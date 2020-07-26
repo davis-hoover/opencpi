@@ -1739,7 +1739,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   // This will be parsed again for build/Makefile purposes.
   // THIS MUST BE IN SYNC WITH THE gnumake VERSION in util.mk! Ugh.
   OrderedStringSet dirs;
-  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), NULL, dirs)))
+  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), NULL, true, dirs)))
     return err;
   for (auto it = dirs.begin(); it != dirs.end(); ++it)
     addInclude(*it);

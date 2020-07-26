@@ -57,7 +57,7 @@ extern const char
   *getHdlPrimitive(const char *prim, const char *type, OrderedStringSet &prims),
   *getComponentLibrary(const char *lib, OrderedStringSet &libs),
   // model argument indicates XML searchs
-  *getComponentLibraries(const char *libs, const char *model, OrderedStringSet &places),
+  *getComponentLibraries(const char *libs, const char *model, bool topSpecs, OrderedStringSet &places),
   *getComponentLibrary(const char *lib, std::string &path),
   *getRccPlatforms(const StringSet *&platforms),
   *getHdlPlatforms(const StringSet *&platforms),

@@ -198,7 +198,7 @@ getProjectRelDir(std::string &dir) {
 // This implementation mirrors the one in util./mk for OcpiXmlComponentLibraries
 // I.e. implements the same search rules
 const char *
-getComponentLibraries(const char *libs, const char *model, OrderedStringSet &places) {
+getComponentLibraries(const char *libs, const char *model, bool topSpecs, OrderedStringSet &places) {
   // First pass just take the slash-containing ones
   OrderedStringSet dirs, nonSlashes;
   const char *err;
@@ -240,7 +240,7 @@ getComponentLibraries(const char *libs, const char *model, OrderedStringSet &pla
       }
     }
     std::string dir(pDir + "/specs");
-    if (OF::exists(dir))
+    if (topSpecs && OF::exists(dir))
       dirs.push_back(dir);
   }
   for (auto it = nonSlashes.begin(); it != nonSlashes.end(); ++it)

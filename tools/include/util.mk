@@ -474,7 +474,6 @@ OcpiComponentLibraryExists=$(or $(call OcpiExists,$1/lib),$(call OcpiExists,$1))
 # Second arg means it is a local project rather than a project-path (ProjectDependencies) project
 # $(call OcpiSearchComponentLibrariesInProject,<project-dir>,<local-project?>)
 OcpiSearchComponentLibrariesInProject=$(infox OSCLIP:$1:$2:$3:$4)$(strip \
-  $(and $4,$(call OcpiExists,$(if $3,$1,$(or $(call OcpiExists,$1/exports),$1))/specs))\
   $(if $3,\
     $(foreach l,$2,\
       $(foreach d,$(if $(filter devices cards adapters,$l),hdl/$l,components$(if $(filter components,$l),,/$l)),\
@@ -521,13 +520,6 @@ OcpiComponentLibraries=$(infox OCL:$(OCPI_PROJECT_REL_DIR):$(OCPI_PROJECT_DIR):$
        $(info For searching for ComponentLibraries, found directories are:))\
     $(foreach d,$(OcpiTempFound),$(infox * $d)))\
   $(OcpiTempFound))
-
-# Return the list of XML search directories for component libraries
-# it searches the hdl subdir
-# since hdl workers need to be referenced by rcc workers.
-OcpiXmlComponentLibraries=$(infox HXC NOT NEEDED)\
-  $(foreach c,$(call OcpiComponentLibraries,true),\
-     $(or $(filter $c,%/specs),$(call OcpiExists,$c/hdl $c/$(Model)) $c))
 
 # Return a colon separated default OCPI_LIBRARY_PATH. It contains:
 # 1. arg1 if present
@@ -1130,7 +1122,7 @@ $(eval override XmlIncludeDirsInternal:=\
     $(comment this is unreliable: Models:%=../lib/%) ../lib\
     ../specs \
     $(comment we are out of the component library so look in projects, including ours) \
-    $(comment we let c++ add the OcpiXmlComponentLibraries)))
+    $(comment we let c++ add the Xml ComponentLibraries)))
 endef
 
 # Used wherever test goals are processed.  runtests is for compatibility

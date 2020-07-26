@@ -60,7 +60,7 @@ OcpiLanguage:=vhdl
 ComponentLibraries+=\
  $(wildcard ./devices)\
  $(infox PCL:$(ComponentLibraries_$(Worker)):$(shell pwd))$(ComponentLibraries_$(Worker)) \
- devices cards components
+ devices cards
 LibDir=lib/hdl
 $(call OcpiDbgVar,HdlPlatforms)
 ifeq ($(origin HdlPlatforms),undefined)

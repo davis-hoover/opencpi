@@ -107,7 +107,7 @@ define HdlSetWorkers
        $$(foreach w,$$(HdlWorkers),\
           $$(or $$(strip\
              $$(firstword \
-                $$(foreach l,$$(OcpiComponentLibraries),$$(infox CORELIB:$$l:$$l/hdl/$$f/$$w$$(HdlBin))\
+                $$(foreach l,$$(call OcpiComponentLibraries),$$(infox CORELIB:$$l:$$l/hdl/$$f/$$w$$(HdlBin))\
                    $$(or $$(call HdlExists,$$l/hdl/$$f/$$w$$(HdlBin)),\
                          $$(if $$(call HdlExists,$$l/hdl/$$w.xml),\
                              $$(foreach lib,$$(l:%/lib=%),\

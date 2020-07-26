@@ -39,6 +39,7 @@ toolsDir:=$(call OcpiXilinxIseDir,$(and $(filter clean%,$(MAKECMDGOALS)),warning
 # point in fussing over "incremental" mode.
 # So there is not a specific file name we can look for
 HdlToolLibraryFile=$2
+HdlRecurseLibraries_isim=yes
 ################################################################################
 # Function required by toolset: given a list of targets for this tool set
 # Reduce it to the set of library targets.
@@ -78,29 +79,37 @@ $(call OcpiDbgVar,IsimFiles)
 IsimCoreLibraryChoices=$(strip \
   $(foreach c,$(call HdlRmRv,$1),$(call HdlCoreRef,$c,isim)))
 
-IsimLibs=\
-    $(foreach l,$(call HdlCollectLibraries,isim),\
-      -lib $(word 2,$(subst :, ,$l))=$(strip \
-            $(call FindRelative,$(TargetDir),$(call HdlLibraryRefDir,$l,isim,,isim)))) \
-    $(foreach c,$(call HdlCollectCorePaths),$(infox CCC:$c)\
-      -lib $(call HdlRmRv,$(notdir $(c)))=$(infox fc:$c)$(call FindRelative,$(TargetDir),$(strip \
-          $(firstword $(foreach l,$(call IsimCoreLibraryChoices,$c),$(call HdlExists,$l))))))
-
 MyIncs=\
   $(foreach d,$(VerilogDefines),-d $d) \
   $(foreach d,$(VerilogIncludeDirs),-i $(call FindRelative,$(TargetDir),$(d))) \
   $(foreach l,$(HdlXmlComponentLibraries),-i $(call FindRelative,$(TargetDir),$l))
 
-IsimArgs=-v 2 -work $(call ToLower,$(WorkLib))=$(WorkLib) $(IsimLibs)
+IsimArgs=-v 2 -work $(call ToLower,$(WorkLib))=$(WorkLib)
+
+IsimLibs=\
+  $(eval IsimLibsTemp:=$(call HdlCollectLibraries,isim))\
+  $(foreach l,$(IsimLibsTemp),\
+    -lib $(word 2,$(subst :, ,$l))=$(strip \
+        $(call FindRelative,$(TargetDir),$(call HdlLibraryRefDir,$l,isim,,isim))))\
+  $(foreach c,$(call HdlCollectCorePaths),$(infox CCCisim:$c)\
+     $(- for each core, specify any libraries it needs)\
+     $(eval IsimCoreLibs:=$(call HdlCollectCoreLibraries,$c,$(IsimLibsTemp)))\
+     $(foreach l,$(IsimCoreLibs),$(infox LLL1:$l)\
+        -lib $(lastword $(subst :, ,$l))=$(strip\
+          $(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,isim))))\
+     $(eval IsimLibsTemp+=$(IsimCoreLibs)) \
+     -lib $(call HdlRmRv,$(notdir $(c)))=$(call FindRelative,$(TargetDir),$(strip \
+          $(call HdlCoreRef,$(call HdlRmRv,$c),isim))))
 
 HdlToolCompile=\
   $(OcpiXilinxIseInit);\
   $(call OcpiDbgVar,IsimFiles,htc) $(call OcpiDbgVar,SourceFiles,htc) $(call OcpiDbgVar,CompiledSourceFiles,htc)\
+  $(eval IsimLibsOnce:=$(IsimLibs)) \
   $(and $(filter %.v,$(IsimFiles))$(findstring $(HdlMode),platform),\
-    vlogcomp $(MyIncs) $(IsimArgs) $(filter %.v,$(IsimFiles)) \
+    vlogcomp $(MyIncs) $(IsimArgs) $(IsimLibs) $(filter %.v,$(IsimFiles)) \
        $(and $(findstring $(HdlMode),platform), $(toolsDir)/ISE/verilog/src/glbl.v) ;) \
   $(and $(filter %.vhd,$(IsimFiles)),\
-    vhpcomp $(IsimArgs) $(filter %.vhd,$(IsimFiles)) ;)\
+    vhpcomp $(IsimArgs) $(IsimLibs) $(filter %.vhd,$(IsimFiles)) ;)\
   $(if $(filter worker platform config assembly,$(HdlMode))$(HdlIsimProbe),\
     $(if $(HdlNoSimElaboration),, \
       echo verilog work $(toolsDir)/ISE/verilog/src/glbl.v \
