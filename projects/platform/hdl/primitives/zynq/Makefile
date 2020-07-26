@@ -59,8 +59,8 @@ VivadoZynqSources=$(foreach f,atc aw_atc b_atc trace_buffer w_atc,\
 # so the "SourceFiles" to build includes the module whose name is determined by the tcl.
 # It actually depends on the tcl script (which is in ../zynq) and of course the particular
 # version of Vivado installed. If either of those changes a clean build here is required.
-ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
-  ifndef UseISE                            # if non-ISE targets
+ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleaning and building hdl target
+  ifndef UseISE                            			# if non-ISE targets
     VivadoWrapperFile=$(wildcard gen/$(XilinxCoreName)*.v)
     ifeq ($(VivadoWrapperFile),) # if wrapper-module not determined yet
       $(info Generating the verilog wrapper for the Zynq 7000 PS (PS7 primitive).)
