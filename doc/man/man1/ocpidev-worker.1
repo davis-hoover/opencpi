@@ -1,12 +1,13 @@
+'\" t
 .\"     Title: ocpidev-worker
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 07/14/2020
+.\"      Date: 07/26/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIDEV\-WORKER" "1" "07/14/2020" "\ \&" "\ \&"
+.TH "OCPIDEV\-WORKER" "1" "07/26/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -206,9 +207,14 @@ Keywords for architectures supported by OpenCPI that can be specified in the \fI
 .PP
 \fB\-\-hdl\-library=\fR\fI<hdl\-library>\fR
 .RS 4
-Specify the HDL library in which to operate on the worker\&. HDL libraries exist underneath the
+Specify the HDL library under the
 \fBhdl/\fR
-directory located at the top level of a project\&.
+directory of the project in which to operate on the worker\&. Valid values are only one of:
+\fBdevices\fR,
+\fBcards\fR,
+\fBadapters\fR\&. See
+ocpidev\-device(1)
+for more information about this option\&.
 .RE
 .PP
 \fB\-\-library=\fR\fI<component\-library>\fR, \fB\-l\fR \fI<component\-library>\fR
@@ -273,13 +279,11 @@ file\&.
 .PP
 \fB\-P\fR \fI<hdl\-platform>\fR
 .RS 4
-Specify that the worker should be created in the
-\fBdevices\fR
-library for the specified HDL platform in the project\&. This option is intended for use when creating a platform\-specific device worker or device proxy\&. A
-\fBdevices\fR
-library is located in
-\fI<project>\fR\fB/hdl/platforms/\fR\fI<hdl\-platform>\fR\fB/devices/\fR\&. For example,
-\fBhdl/platforms/matchstiq_z1/devices\fR\&.
+Specify that the worker being created is a platform\-specific HDL device worker or device proxy to be created in the
+\fBdevices/\fR
+library for the specified HDL platform in the project\&. See
+ocpidev\-device(1)
+for more information about this option\&.
 .RE
 .PP
 \fB\-S\fR \fI<component\-spec>\fR
@@ -378,6 +382,17 @@ Build RCC/ACI assets for the specified RCC platform\&. If this option is not use
 \fB\-\-hdl\-rcc\-platform\fR
 \fI<platform>\fR
 is also not used), the current development software platform is used as the single RCC platform used for building\&.
+.RE
+.SS "Options When Building HDL Workers"
+.PP
+\fB\-\-hdl\-platform=\fR\fI<hdl\-platform>\fR+
+.RS 4
+Build the HDL device worker for the specified HDL platform\&.
+.RE
+.PP
+\fB\-\-hdl\-target=\fR\fI<target>\fR+
+.RS 4
+Build the HDL device worker for the specified HDL architecture\&.
 .RE
 .SS "Options When Showing Workers"
 .PP
@@ -762,7 +777,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpidev(1) ocpidev\-application(1) ocpidev\-build(1) ocpidev\-clean(1) ocpidev\-component(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-library(1) ocpidev\-project(1) ocpidev\-show(1) ocpidev\-utilization(1)
+ocpidev(1) ocpidev\-application(1) ocpidev\-build(1) ocpidev\-clean(1) ocpidev\-component(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-device(1) ocpidev\-library(1) ocpidev\-project(1) ocpidev\-show(1) ocpidev\-utilization(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

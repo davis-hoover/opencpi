@@ -1,12 +1,13 @@
+'\" t
 .\"     Title: ocpidev-platform
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 07/14/2020
+.\"      Date: 07/26/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIDEV\-PLATFORM" "1" "07/14/2020" "\ \&" "\ \&"
+.TH "OCPIDEV\-PLATFORM" "1" "07/26/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -45,8 +46,10 @@ An HDL platform is described by an OpenCPI HDL Platform Description (OHPD), whic
 .sp -1
 .IP \(bu 2.3
 .\}
-The worker description file (OWD) for the
-\fIHDL platform worker\fR, which is a special type of device worker that contains the logic for running the HDL platform
+The OpenCPI Worker Description (OWD) for the
+\fIHDL platform worker\fR, which is a special type of
+\fIHDL device worker\fR
+that contains the logic for running the HDL platform
 .RE
 .sp
 .RS 4
@@ -57,7 +60,7 @@ The worker description file (OWD) for the
 .sp -1
 .IP \(bu 2.3
 .\}
-The devices that are attached to the HDL platform and are available for use
+The devices (controlled by HDL device workers) that are attached to the HDL platform and are available for use
 .RE
 .sp
 In a project, an HDL platform resides in its own directory \fI<name>\fR (which is usually the lowercase version of the name used by the platform\(cqs vendor) under a \fBplatforms/\fR subdirectory in the project\(cqs \fBhdl/\fR directory\&.
@@ -74,7 +77,7 @@ An HDL platform directory can also optionally contain:
 .sp -1
 .IP \(bu 2.3
 .\}
-Device workers that are unique to the HDL platform, in a
+HDL device workers that are unique to the HDL platform, in a
 \fBdevices/\fR
 library
 .RE
@@ -115,11 +118,11 @@ files for use with a specific platform configuration instead of the default conf
 File(s) that specify vendor tool build\-time options
 .RE
 .sp
-The \fBocpidev build\fR operation generates exported files that enable HDL assemblies to be built for the platform and a \fB/lib\fR subdirectory that contains links to the files that are necessary for other OpenCPI assets to use the platform\&. Note that building a OpenCPI platform (whether HDL or RCC) is usually done at installation time because a platform cannot be used by other OpenCPI assets until it has been built\&. See the \fIOpenCPI Installation Guide\fR for a description of how OpenCPI platforms are built\&.
+The \fBocpidev build\fR operation generates exported files that enable HDL assemblies to be built for the platform and a \fBlib/\fR subdirectory that contains links to the files that are necessary for other OpenCPI assets to use the platform\&. Note that building a OpenCPI platform (whether HDL or RCC) is usually done at installation time because a platform cannot be used by other OpenCPI assets until it has been built\&. See the \fIOpenCPI Installation Guide\fR for a description of how OpenCPI platforms are built\&.
 .sp
 For information on the HDL build flow as it relates to HDL platforms and other HDL assets, see the chapter "Building HDL Assets" in the \fIOpenCPI HDL Development Guide\fR\&.
 .sp
-For information on developing an HDL platform, including structure and syntax descriptions of HDL platform/platform worker and HDL platform configuration XML files and how to develop a device worker, see the section "Enabling Execution for FPGA Platforms" in the \fIOpenCPI Platform Development Guide\fR\&.
+For information on developing an HDL platform, including structure and syntax descriptions of HDL platform/platform worker and HDL platform configuration XML files and how to develop an HDL device worker, see the section "Enabling Execution for FPGA Platforms" in the \fIOpenCPI Platform Development Guide\fR\&.
 .sp
 Verbs that can operate on an HDL platform are:
 .PP
@@ -159,15 +162,15 @@ The verbs that can be performed on the \fBhdl platforms\fR noun are:
 \fBbuild\fR
 .RS 4
 Build all of the HDL platforms in the project or the
-\fB/hdl\fR
-subdirectory of the project [??Does it operate on the hdl subdirectory?], creating directories and files as required\&.
+\fBhdl/\fR
+subdirectory of the project, creating directories and files as required\&.
 .RE
 .PP
 \fBclean\fR
 .RS 4
 Remove all the generated and compiled files from all HDL platforms in the project or the
-\fB/hdl\fR
-subdirectory of the project [correct?]\&.
+\fBhdl/\fR
+subdirectory of the project\&.
 .RE
 .PP
 \fBshow\fR
@@ -181,7 +184,7 @@ formatting options can be specified\&.
 .RS 4
 Display FPGA resource usage information for all built HDL platforms in the project\&. The general\-pupose options and the
 \fButilization\fR
-options [???all of them??] can be specified\&.
+options can be specified\&.
 .RE
 .SH "OPTIONS"
 .sp
@@ -256,7 +259,7 @@ Force deletion: do not ask for confirmation when deleting an HDL platform\&. Nor
 .PP
 \fB\-\-hdl\-target=\fR\fI<target>\fR+
 .RS 4
-Build the HDL platform(s) for the specified HDL target\&. If only HDL targets are specified (and no HDL platforms), containers are not built\&.
+Build the HDL platform(s) for the specified HDL architecture\&. If only HDL targets are specified (and no HDL platforms), containers are not built\&.
 .RE
 .PP
 \fB\-\-hdl\-platform=\fR\fI<hdl\-platform>\fR+
@@ -536,7 +539,7 @@ ocpidev show hdl platforms
 .IP "  9." 4.2
 .\}
 Inside the project (from the top level of the
-\fB/hdl/platforms/\fR
+\fBhdl/platforms/\fR
 directory), display information about FPGA resource use by the
 \fBmyplatform\fR
 HDL platform:
@@ -561,7 +564,7 @@ ocpidev utilization hdl platform myplatform
 .IP "10." 4.2
 .\}
 Inside the project (from the top level of the
-\fB/hdl/platforms/\fR
+\fBhdl/platforms/\fR
 directory), display information about FPGA resource use by the HDL platforms in the project:
 .sp
 .if n \{\
@@ -582,7 +585,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-build(1) ocpidev\-create(1) ocpidev\-clean(1) ocpidev\-delete(1) ocpidev\-library(1) ocpidev\-project(1) ocpidev\-show(1) ocpidev\-worker(1) ocpidev\-utilization(1)
+ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-build(1) ocpidev\-card(1) ocpidev\-create(1) ocpidev\-clean(1) ocpidev\-delete(1) ocpidev\-device(1) ocpidev\-library(1) ocpidev\-project(1) ocpidev\-slot(1) ocpidev\-show(1) ocpidev\-worker(1) ocpidev\-utilization(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

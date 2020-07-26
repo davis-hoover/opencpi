@@ -1,12 +1,13 @@
+'\" t
 .\"     Title: ocpidev-card
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 07/14/2020
+.\"      Date: 07/26/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIDEV\-CARD" "1" "07/14/2020" "\ \&" "\ \&"
+.TH "OCPIDEV\-CARD" "1" "07/26/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -33,45 +34,27 @@ ocpidev-card \- manage an OpenCPI HDL card\&.
 \fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl card\fR \fI<name>\fR
 .SH "DESCRIPTION"
 .sp
-The \fBhdl card\fR noun represents an OpenCPI HDL card, which describes XXXXXXX TBD XXXXXXXX\&.
+The \fBhdl card\fR noun represents an OpenCPI HDL card, which defines a hardware component that contains devices and plugs into a \fIslot\fR on an HDL platform\&. Devices are either directly attached to the pins on an HDL platform or attached to cards that plug into compatible slots on the platform\&. Devices on a card are considered to be part of the card, which can be plugged into a certain type of slot on any platform, rather than part of the platform itself\&.
 .sp
-XXXXXX \- BELOW TO BE EDITED FOR HDL CARD \- XXXXXXX
+An HDL card is described by an HDL card definition, which is an XML file that describes the slot type of the card, the HDL devices (controlled by HDL device workers) that are present on the card, and how they are wired to the slot\&. There is no HDL code associated with an HDL card\&. For more information about the HDL card definition\(cqs XML structure and how it relates to HDL platforms, slots and HDL device workers, see the \fIOpenCPI Platform Development Guide\fR\&.
 .sp
-A protocol is described by an OpenCPI Protocol Specification (OPS), which is an XML file that describes the set of messages defined in the protocol, as well as some top\-level attributes for the protocol\&. \fIOperation\fR elements in the OPS describe the messages that can be used, while \fIargument\fR elements describe the individual fields of a message\&. A protocol is specified in the \fIport\fR element of a component spec (OCS)\&. In a connection between component ports, the specs of both ports, in their port elements, refer to the same OPS\&. At present, a protocol consists of only the OPS XML file\&.
+In a project, an HDL card resides in the \fBspecs/\fR subdirectory of the \fBhdl/cards/\fR subdirectory and is named \fI<name>\fR\fB\&.xml\fR\&. The HDL device workers that are specific to the card reside in the \fBhdl/cards/\fR subdirectory\&.
 .sp
-For more information about a protocol\(cqs XML structure, see the chapter "Protocol Specifications" in the \fIOpenCPI Component Development Guide\fR\&.
-.sp
-In a project, a protocol resides in a \fBspecs/\fR directory located either in a component library or at the top level of a project and is named \fI<name>\fR\fB\-prot\&.xml\fR\&. Note that protocols with older naming formats like \fI<name>\fR\fB_protocol\&.xml\fR and \fI<name>\fR\fB\-protocol\&.xml\fR also exist; for example, some of the protocols in the built\-in OpenCPI \fBcore\fR project (\fB\&.\&./projects/core/specs/\fR) use these formats\&.
-.sp
-Verbs that can operate on a protocol are:
+Verbs that can operate on an HDL card are:
 .PP
 \fBcreate\fR
 .RS 4
-Create the named protocol according to the specified options, creating directories and files as required\&.
+Create the named HDL card according to the specified options, creating directories and files as required\&.
 .RE
 .PP
 \fBdelete\fR
 .RS 4
-Remove all files associated with the named protocol\&.
+Remove all files associated with the named HDL card\&.
 .RE
 .SH "OPTIONS"
 .sp
 In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
-.SS "Options That Apply to All Operations (Verbs) on Protocols"
-.PP
-\fB\-\-hdl\-library=\fR\fI<hdl\-library>\fR
-.RS 4
-Specify the HDL library in which to operate on the protocol\&. HDL libraries exist underneath the
-\fBhdl/\fR
-directory located at the top level of a project\&.
-.RE
-.PP
-\fB\-\-library=\fR\fI<component\-library>\fR, \fB\-l\fR \fI<component\-library>\fR
-.RS 4
-Specify the component library in which to operate on the protocol\&. When a project contains multiple component libraries, this option can be used to specify one of them\&. Multiple component libraries are located underneath the
-\fBcomponents\fR
-directory at the top level of a project\&.
-.RE
+.SS "Options That Apply to All Operations (Verbs) on HDL Cards"
 .PP
 \fB\-d\fR \fI<directory>\fR
 .RS 4
@@ -86,33 +69,17 @@ command\&.
 .RS 4
 Describe what is happening in command execution in more detail\&.
 .RE
-.SS "Options When Creating and Deleting Protocols"
-.PP
-\fB\-p\fR
-.RS 4
-Specify that the protocol is to be created in or deleted from the
-\fBspecs/\fR
-directory of the project instead of the
-\fBspecs/\fR
-directory of a component library\&. The
-\fB\-l\fR
-and
-\fB\-p\fR
-options specify the location of the protocol\&. When neither one of these options is used, the location is the
-\fBcomponents\fR
-library and thus is an error if other component libraries exist\&.
-.RE
-.SS "Options When Creating Protocols"
+.SS "Options When Creating HDL Cards"
 .PP
 \fB\-k\fR
 .RS 4
-Keep files and directories created after a protocol creation fails\&. Normally, all such files and directories are removed on any failure\&.
+Keep files and directories created after an HDL card creation fails\&. Normally, all such files and directories are removed on any failure\&.
 .RE
-.SS "Options When Deleting Protocols"
+.SS "Options When Deleting HDL Cards"
 .PP
 \fB\-f\fR
 .RS 4
-Force deletion: do not ask for confirmation when deleting a protocol\&. Normally, you are asked to confirm a deletion\&.
+Force deletion: do not ask for confirmation when deleting an HDL card\&. Normally, you are asked to confirm a deletion\&.
 .RE
 .SH "EXAMPLES"
 .sp
@@ -124,15 +91,17 @@ Force deletion: do not ask for confirmation when deleting a protocol\&. Normally
 .sp -1
 .IP "  1." 4.2
 .\}
-Create a protocol spec with the name
-\fBmyprotocol\fR\&. The protocol spec will be placed in the default location
-\fBcomponents/specs/\fR:
+Inside the project, create an HDL card with the name
+\fBmycard\fR\&. The HDL card definition named
+\fBmycard\&.xml\fR
+will be placed in the subdirectory
+\fBhdl/cards/specs/\fR:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpidev create protocol myprotocol
+ocpidev create hdl card mycard
 .fi
 .if n \{\
 .RE
@@ -147,75 +116,17 @@ ocpidev create protocol myprotocol
 .sp -1
 .IP "  2." 4.2
 .\}
-Create a protocol named
-\fBmyprotocol\fR
-in the component library named
-\fBmyutilcomps\fR\&. The protocol spec will be placed in the
-\fBspecs\fR
-directory in
-\fBmyutilcomps\fR
-sublibrary within the
-\fBcomponents\fR
-library (\fBcomponents/myutilcomps/specs/\fR):
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-ocpidev create protocol myprotocol \-l myutilcomps
-.fi
-.if n \{\
-.RE
-.\}
-.RE
-.sp
-.RS 4
-.ie n \{\
-\h'-04' 3.\h'+01'\c
-.\}
-.el \{\
-.sp -1
-.IP "  3." 4.2
-.\}
-Inside the project
-\fBMyProject\fR, create a protocol spec with the name
-\fBmyprotocol\fR
-in the project\(cqs
-\fBspecs/\fR
-directory\&. The protocol spec will be placed in
-\fBMyProject/specs/\fR:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-ocpidev create protocol myprotocol \-p
-.fi
-.if n \{\
-.RE
-.\}
-.RE
-.sp
-.RS 4
-.ie n \{\
-\h'-04' 4.\h'+01'\c
-.\}
-.el \{\
-.sp -1
-.IP "  4." 4.2
-.\}
-Delete a protocol named
-\fBMyAdapterProtocol\fR
+Inside the project, delete an HDL card definition named
+\fBmycard\&.xml\fR
 from a project\(cqs
-\fBadapters\fR
-library (deletes it from
-\fBhdl/adapters/specs/\fR):
+\fBhdl/cards/specs/\fR
+subdirectory:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpidev delete protocol MyAdapterProtocol \-\-hdl\-library=adapters
+ocpidev delete hdl card mycard
 .fi
 .if n \{\
 .RE
@@ -229,7 +140,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpidev(1) ocpidev\-application(1) ocpidev\-component(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-library(1) ocpidev\-project(1)
+ocpidev(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-device(1) ocpidev\-platform(1) ocpidev\-project(1) ocpidev\-slot(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

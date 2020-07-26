@@ -235,7 +235,7 @@ ocpidev build --hdl-target=zynq
 -------------------------------
 +
 . Inside the project (from the top level of the
-*`/hdl/assemblies`* directory) display information
+*`hdl/assemblies`* directory) display information
 about FPGA resource use by the *`myassy`* assembly:
 +
 --------------------------------------
@@ -243,7 +243,7 @@ ocpidev utilization hdl assembly myassy
 --------------------------------------
 +
 . Inside the project (from the top level of the
-*`/hdl/assemblies`* directory) display information
+*`hdl/assemblies`* directory) display information
 about FPGA resource use by the assemblies in the project:
 +
 ----------------------------------
