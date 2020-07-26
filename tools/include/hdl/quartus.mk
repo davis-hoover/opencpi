@@ -248,11 +248,7 @@ HdlToolPost=\
   fi;\
   for s in $(HdlToolFiles); do \
     if [[ $$s == *.vhd ]]; then \
-<<<<<<< HEAD
       echo -- synthesis library $(WorkLib) | cat - $$s > $(WorkLib)/`basename $$s`; \
-=======
-      echo -- synthesis library $(LibName) | cat - $$s > $(WorkLib)/`basename $$s`; \
->>>>>>> origin/develop
     else \
       ln -s ../$$s $(WorkLib); \
     fi; \

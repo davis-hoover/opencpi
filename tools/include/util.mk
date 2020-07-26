@@ -474,10 +474,6 @@ OcpiComponentLibraryExists=$(or $(call OcpiExists,$1/lib),$(call OcpiExists,$1))
 # Second arg means it is a local project rather than a project-path (ProjectDependencies) project
 # $(call OcpiSearchComponentLibrariesInProject,<project-dir>,<local-project?>)
 OcpiSearchComponentLibrariesInProject=$(infox OSCLIP:$1:$2:$3:$4)$(strip \
-<<<<<<< HEAD
-=======
-  $(and $4,$(call OcpiExists,$(if $3,$1,$(or $(call OcpiExists,$1/exports),$1))/specs))\
->>>>>>> origin/develop
   $(if $3,\
     $(foreach l,$2,\
       $(foreach d,$(if $(filter devices cards adapters,$l),hdl/$l,components$(if $(filter components,$l),,/$l)),\
