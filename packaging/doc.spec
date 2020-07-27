@@ -46,13 +46,11 @@ Man pages, PDFs and HTML index files installed into %{prefix0}/doc
 cd %{RPM_OPENCPI}
 set -e
 rm -rf %{buildroot}%{prefix0}
-./packaging/prepare-rpm-doc-files.sh %{RPM_PLATFORM} "%{?RPM_CROSS:1}" \
-                                     %{buildroot} %{prefix0} %{_builddir} %{RPM_VERSION}
-cd %{_builddir}/opencpi-doc-%{RPM_VERSION}
-%{__mkdir_p} %{buildroot}%{prefix0}
-%{__cp} -r . %{buildroot}%{prefix0}
+./packaging/prepare-rpm-files.sh doc %{RPM_PLATFORM} "%{?RPM_CROSS:1}" \
+                                     %{buildroot} %{prefix0} %{_builddir}
 
-%files
+%files -f doc-files
 %defattr(0444,root,root,0555)
-%dir %{prefix0}/doc
-%doc %{prefix0}/doc/*
+# Avoid "warning: File listed twice: <file>"
+# noise from "rpmbuild" due to wildcard ('*').
+# %doc %{prefix0}/doc/*
