@@ -16,8 +16,8 @@ DESCRIPTION
 -----------
 The *`hdl slot`* noun represents an OpenCPI HDL slot,
 which defines an integral part of an HDL platform
-that enables an 'HDL card' to be plugged in to make its
-attached devices accessible to the platform. An HDL
+that enables an 'HDL card' to be plugged in so that
+its attached devices are accessible to the platform. An HDL
 platform has defined slot types; HDL cards
 that are designed for the same slot type can be plugged in
 to the defined slots on the platform.
@@ -30,20 +30,32 @@ be used in HDL Platform Descriptions (OHPDs) and HDL card
 definitions. OpenCPI provides HDL slot definitions for a number of
 standard slot types, like the FMC (FPGA Mezzanine Card), which
 is defined by the by the VITA standards organization as VITA-57.1.
-Defining a new slot type for use in OpenCPI consists of defining
-an HDL slot type definition for it; writing HDL code to support
+Defining a new slot type for use in OpenCPI consists of creating
+an HDL slot type definition from the information
+given in the standard document for the slot; writing HDL code to support
 an HDL slot is not normally necessary. For more information
 about the XML structure of an HDL slot type definition
 and how it relates to HDL platforms, devices and cards, see the
 section "Slots - How Cards Plug into Platforms" in the
 'OpenCPI Platform Development Guide'.
 
-In a project, an HDL slot resides in the *`specs/`* subdirectory of
-the *`hdl/cards/`* subdirectory and is named '<name>'*`.xml`*, where '<name>'
+An HDL slot is named '<name>'*`.xml`*, where '<name>'
 must be a name that can be used in programming languages (uses underscores
 rather than hyphens) but is otherwise case insensitive. The HDL slot
 name should normally be the exact name used in the standard document
 that defines the slot type.
+
+In a project, an HDL slot resides in one of the following locations
+depending on its intended use:
+
+- In the subdirectory *`hdl/cards/specs/`* when the HDL
+slot is platform-independent
+
+- In the subdirectory *`hdl/platforms/`*'<platform>'*`/devices/specs/`* when
+the HDL slot is platform-specific
+
+OpenCPI-defined HDL slots are located in the subdirectory
+*`hdl/cards/specs/`* in the OpenCPI built-in *`core`* project.
 
 Verbs that can operate on an HDL slot are:
 
@@ -54,12 +66,15 @@ Verbs that can operate on an HDL slot are:
 *`delete`*::
     Remove all files associated with the named HDL slot.
 
+The *`create`* operation creates an initial HDL slot type definition
+XML file that can be edited as necessary to define the slot type.
+
 OPTIONS
 -------
 In the descriptions below, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
-Options That Apply to All Operations (Verbs) on Protocols
+Options That Apply to All Operations (Verbs) on HDL Slots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-d`* '<directory>'::
     Specify the directory in which the command should be run.
@@ -70,6 +85,11 @@ Options That Apply to All Operations (Verbs) on Protocols
     
 Options When Creating HDL Slots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-P`* '<hdl-platform>'::
+    Specify that the HDL slot being created is a platform-specific
+    HDL slot to be created in the *`devices/specs/`*
+    subdirectory in the specified HDL platform in the project.
+
 *-k*::
     Keep files and directories created after an HDL slot creation
     fails. Normally, all such files and directories are removed
@@ -83,19 +103,30 @@ Options When Deleting HDL Slots
     
 EXAMPLES
 --------
-. Inside the project, create an HDL slot with the name *`myslot`*.
-The HDL slot definition named *`myslot.xml`* will be placed
+. At the top level of the project, create an HDL slot
+with the name *`myslot`*. The HDL slot definition
+named *`myslot.xml`* will be placed
 in the subdirectory *`hdl/cards/specs/`*:
 +
 ------------------------------
-ocpidev create hdl card myslot
+ocpidev create hdl slot myslot
 ------------------------------
++
+. At the top level of the project, create an HDL slot
+with the name *`myslot`* for the platform *`myplatform`*.
+The HDL slot definition named *`myslot.xml`* will
+be placed in the
+subdirectory *`platforms/myplatform/hdl/devices/specs/`*:
++
+--------------------------------------------
+ocpidev create hdl slot myslot -P myplatform
+--------------------------------------------
 +
 . Inside the project, delete an HDL slot definition named *`myslot.xml`* from
 a project's *`hdl/cards/specs/`* subdirectory:
 +
 ------------------------------
-ocpidev delete hdl card myslot
+ocpidev delete hdl slot myslot
 ------------------------------
 
 

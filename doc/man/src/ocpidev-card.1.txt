@@ -31,10 +31,14 @@ with an HDL card. For more information about the HDL card
 definition's XML structure and how it relates to HDL platforms,
 slots and HDL device workers, see the 'OpenCPI Platform Development Guide'.
 
-In a project, an HDL card resides in the *`specs/`* subdirectory
-of the *`hdl/cards/`* subdirectory and is named '<name>'*`.xml`*.
-The HDL device workers that are specific to the card
-reside in the *`hdl/cards/`* subdirectory.
+In a project, an HDL card is named '<name>'*`.xml`* and resides
+in one of the following locations depending on its intended use:
+
+- In the subdirectory *`hdl/cards/specs/`* when the HDL
+card is platform-independent
+
+- In the subdirectory *`hdl/platforms/`*'<platform>'*`/devices/specs/`* when
+the HDL card is platform-specific
 
 Verbs that can operate on an HDL card are:
 
@@ -44,6 +48,10 @@ Verbs that can operate on an HDL card are:
 
 *`delete`*::
     Remove all files associated with the named HDL card.
+
+The *`create`* operation creates an initial HDL card definition
+XML file that can be edited as necessary to define the card.
+
 
 OPTIONS
 -------
@@ -60,7 +68,12 @@ Options That Apply to All Operations (Verbs) on HDL Cards
     Describe what is happening in command execution in more detail.
     
 Options When Creating HDL Cards
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-P`* '<hdl-platform>'::
+    Specify that the HDL card being created is a platform-specific
+    HDL card to be created in the *`devices/specs/`*
+    subdirectory in the specified HDL platform in the project.
+
 *-k*::
     Keep files and directories created after an HDL card creation
     fails. Normally, all such files and directories are removed
@@ -74,13 +87,23 @@ Options When Deleting HDL Cards
     
 EXAMPLES
 --------
-. Inside the project, create an HDL card with the name *`mycard`*.
-The HDL card definition named *`mycard.xml`* will be placed
+. At the top level of the project, create an HDL card
+with the name *`mycard`*. The HDL card definition
+named *`mycard.xml`* will be placed
 in the subdirectory *`hdl/cards/specs/`*:
 +
 ------------------------------
 ocpidev create hdl card mycard
 ------------------------------
+. At the top level of the project, create an HDL card
+with the name *`mycard`* for the platform *`myplatform`*.
+The HDL card definition
+named *`mycard.xml`* will be placed
+in the subdirectory *`hdl/platforms/myplatform/devices/specs/`*:
++
+--------------------------------------------
+ocpidev create hdl card mycard -P myplatform
+--------------------------------------------
 +
 . Inside the project, delete an HDL card definition named *`mycard.xml`* from
 a project's *`hdl/cards/specs/`* subdirectory:

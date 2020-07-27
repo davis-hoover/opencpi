@@ -1,13 +1,12 @@
-'\" t
 .\"     Title: ocpidev-card
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 07/26/2020
+.\"      Date: 07/27/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIDEV\-CARD" "1" "07/26/2020" "\ \&" "\ \&"
+.TH "OCPIDEV\-CARD" "1" "07/27/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -38,7 +37,33 @@ The \fBhdl card\fR noun represents an OpenCPI HDL card, which defines a hardware
 .sp
 An HDL card is described by an HDL card definition, which is an XML file that describes the slot type of the card, the HDL devices (controlled by HDL device workers) that are present on the card, and how they are wired to the slot\&. There is no HDL code associated with an HDL card\&. For more information about the HDL card definition\(cqs XML structure and how it relates to HDL platforms, slots and HDL device workers, see the \fIOpenCPI Platform Development Guide\fR\&.
 .sp
-In a project, an HDL card resides in the \fBspecs/\fR subdirectory of the \fBhdl/cards/\fR subdirectory and is named \fI<name>\fR\fB\&.xml\fR\&. The HDL device workers that are specific to the card reside in the \fBhdl/cards/\fR subdirectory\&.
+In a project, an HDL card is named \fI<name>\fR\fB\&.xml\fR and resides in one of the following locations depending on its intended use:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/cards/specs/\fR
+when the HDL card is platform\-independent
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/platforms/\fR\fI<platform>\fR\fB/devices/specs/\fR
+when the HDL card is platform\-specific
+.RE
 .sp
 Verbs that can operate on an HDL card are:
 .PP
@@ -51,6 +76,8 @@ Create the named HDL card according to the specified options, creating directori
 .RS 4
 Remove all files associated with the named HDL card\&.
 .RE
+.sp
+The \fBcreate\fR operation creates an initial HDL card definition XML file that can be edited as necessary to define the card\&.
 .SH "OPTIONS"
 .sp
 In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
@@ -70,6 +97,13 @@ command\&.
 Describe what is happening in command execution in more detail\&.
 .RE
 .SS "Options When Creating HDL Cards"
+.PP
+\fB\-P\fR \fI<hdl\-platform>\fR
+.RS 4
+Specify that the HDL card being created is a platform\-specific HDL card to be created in the
+\fBdevices/specs/\fR
+subdirectory in the specified HDL platform in the project\&.
+.RE
 .PP
 \fB\-k\fR
 .RS 4
@@ -91,7 +125,7 @@ Force deletion: do not ask for confirmation when deleting an HDL card\&. Normall
 .sp -1
 .IP "  1." 4.2
 .\}
-Inside the project, create an HDL card with the name
+At the top level of the project, create an HDL card with the name
 \fBmycard\fR\&. The HDL card definition named
 \fBmycard\&.xml\fR
 will be placed in the subdirectory
@@ -115,6 +149,33 @@ ocpidev create hdl card mycard
 .el \{\
 .sp -1
 .IP "  2." 4.2
+.\}
+At the top level of the project, create an HDL card with the name
+\fBmycard\fR
+for the platform
+\fBmyplatform\fR\&. The HDL card definition named
+\fBmycard\&.xml\fR
+will be placed in the subdirectory
+\fBhdl/platforms/myplatform/devices/specs/\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl card mycard \-P myplatform
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
 .\}
 Inside the project, delete an HDL card definition named
 \fBmycard\&.xml\fR
