@@ -163,7 +163,7 @@ QuartusMakeQsf=\
       $(call QuartusEchoFiles,$c,$(call HdlExtractSourcesForLib,$(HdlTarget),$c,$(TargetDir))),\
       $(foreach w,$(subst _rv,,$(basename $(notdir $c))),$(infox WWW:$w)\
         $(- for assemblies, where the assy file is verilog, we do not want any source files since\
-            since we are not instantiating using "component" in VHDL)\
+            we are not instantiating using "component" in VHDL)\
         $(and $(filter-out assembly,$(HdlMode)),$(call QuartusEchoFiles,$w,\
           $(foreach d,$(dir $c),$(infox DDD:$d)\
             $(foreach l,$(if $(filter vhdl,$(HdlLanguage)),vhd,v),$(infox LLLLL:$l)\
