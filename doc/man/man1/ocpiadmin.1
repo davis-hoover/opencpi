@@ -1,0 +1,182 @@
+'\" t
+.\"     Title: ocpiadmin
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/29/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIADMIN" "1" "07/29/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpiadmin \- command\-line tool for managing an OpenCPI installation\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpiadmin\fR [\fI<options>\fR] \fI<verb>\fR \fI<noun>\fR [\fI<name>\fR [\fI<argument>\fR\&... ]]
+.SH "DESCRIPTION"
+.sp
+The \fBocpiadmin(1)\fR command line tool is used to perform installation and deployment tasks that are carried out on an OpenCPI installation after the basic installation procedure is completed to prepare OpenCPI for use on embedded systems\&. These tasks include:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Building platforms and simulators that are intended as targets for OpenCPI development that have not been automatically built as part of the basic OpenCPI installation\&. Building a platform enables OpenCPI assets for that platform to be developed in OpenCPI projects\&. It also enables the platform to be integrated into system boot kits \- for example, on bootable SD cards \- to be created for embedded systems that use them\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Creating a bootable media directory tree (\fISD card contents\fR) for OpenCPI required by the software (RCC) and hardware (HDL/FPGA) platforms that comprise the embedded system\&. The bootable media directory tree for a particular software\-hardware platform configuration can then be written to the manufacturer\(cqs SD card to enable booting the embedded system for OpenCPI\&.
+.RE
+.sp
+For more information about these tasks and how they relate to enabling OpenCPI development on embedded systems, see The \fIOpenCPI Installation Guide\fR\&.
+.sp
+The general usage concept for \fBocpiadmin\fR is: perform the \fI<verb>\fR operation on the \fI<noun>\fR whose name is \fI<name>\fR\&.
+.SH "VERBS"
+.sp
+The verbs supported by \fBocpiadmin\fR are:
+.PP
+\fBdeploy\fR
+.RS 4
+Create a bootable media directory tree for the named RCC (software) platform on the named HDL (FPGA) platform\&. The specified platforms must have been previously built\&.
+.RE
+.PP
+\fBinstall\fR
+.RS 4
+Prepare the OpenCPI installation for using the named RCC or HDL platform or simulator\&.
+.RE
+.SH "NOUNS"
+.sp
+The nouns supported by \fBocpiadmin\fR are:
+.PP
+\fBplatform\fR
+.RS 4
+A particular type of processing hardware and/or software that can host a container for executing OpenCPI workers\&.
+.RE
+.SH "OPTIONS"
+.sp
+There are currently no options to \fBocpiadmin\fR verbs\&.
+.SH "OPERATIONS"
+.sp
+The command syntax for the \fBinstall platform\fR operation is:
+.sp
+\fBocpiadmin install platform\fR \fI<platform>\fR
+.sp
+where \fI<platform>\fR is the name of an RCC platform, HDL platform or HDL simulator to be built for OpenCPI\&. The operation downloads the platform\(cqs \fIOpenCPI Platform System support Project\fR (its \fIOSP\fR) if necessary and then builds the built\-in projects for the specified platform\&. If the specified platform is an HDL platform, the operation also builds a single test artifact/bitstream: the \fBtestbias\fR assembly in the \fBassets\fR project\&. After the operation is performed, any asset in any project can be built for the specified platform\&.
+.sp
+The command syntax for the \fBdeploy platform\fR operation is:
+.sp
+\fBocpiadmin deploy platform\fR \fI<rcc\-platform> <hdl\-platform>\fR
+.sp
+where \fI<rcc\-platform>\fR and \fI<hdl\-platform>\fR are the names of the software (RCC) and hardware/FPGA (HDL) platforms for which the bootable media should be created\&. The operation creates the directory \fBcdk/\fR\fI<hdl\-platform>\fR\fB/sdcard\-\fR\fI<rcc\-platform>\fR, whose contents can be copied to an SD card\&.
+.sp
+Keywords for specifying platform names are given in tables in the \fIOpenCPI Installation Guide\fR\&.
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Build the Ettus USRP E310 (\fBe31x\fR) HDL platform for OpenCPI:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiadmin install platform e31x
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Build the Analog Devices Pluto Linux 0\&.31 (\fBadi_plutosdr0_31\fR) embedded software (RCC) platform for OpenCPI:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiadmin install platform adi_plutosdr0_31
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Create a bootable media directory tree for booting the RCC platform
+\fBxilinx_19_2_aarch32\fR
+on the HDL platform
+\fBzed\fR\&. This operation creates the directory
+\fBcdk/zed/sdcard\-xilinx_19_2_aarch32/\fR, whose contents can be copied to an SD card:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiadmin deploy platform xilinx_19_2_aarch32 zed
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

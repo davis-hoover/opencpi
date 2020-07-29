@@ -1,12 +1,13 @@
+'\" t
 .\"     Title: ocpidev
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 05/28/2020
+.\"      Date: 07/29/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIDEV" "1" "05/28/2020" "\ \&" "\ \&"
+.TH "OCPIDEV" "1" "07/29/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -145,9 +146,9 @@ A unit test suite for a component specification\&.
 A worker that implements a component specification\&.
 .RE
 .sp
-Note that the assets \fBapplication\fR, \fBapplications\fR, \fBlibrary\fR, \fBproject\fR and \fBregistry\fR do not reside in libraries\&. The assets \fBproperties\fR, \fBprotocol\fR, \fBcomponent\fR, \fBtest\fR and \fBworker\fR are in libraries\&.
+Note that the assets \fBapplication\fR, \fBapplications\fR, \fBlibrary\fR, \fBproject\fR and \fBregistry\fR do not reside in libraries\&. The assets \fBproperties\fR, \fBprotocol\fR, \fBcomponent\fR, \fBtest\fR and \fBworker\fR reside in libraries\&.
 .sp
-The HDL\-specific assets (located under the \fBhdl\fR subdirectory supported by \fBocpidev\fR are:
+The HDL\-specific assets (located under the \fBhdl/\fR subdirectory supported by \fBocpidev\fR are:
 .PP
 \fBhdl assembly\fR
 .RS 4
@@ -166,36 +167,38 @@ A card specification XML file at a project level or an HDL library level\&.
 .PP
 \fBhdl device\fR
 .RS 4
-An HDL device worker in an HDL component library (\fBadapters\fR,
-\fBcards\fR,
-\fBdevices\fR
+An HDL device worker in an HDL component library (\fBadapters/\fR,
+\fBcards/\fR,
+\fBdevices/\fR
 or an HDL platform\(cqs
-\fBdevices\fR)\&.
+\fBdevices/\fR)\&.
 .RE
 .PP
 \fBhdl platform\fR
 .RS 4
-An HDL platform worker in an HDL platforms diretory, including its platform configurations\&.
+An HDL platform worker in an HDL
+\fBplatforms/\fR
+directory, including its platform configurations\&.
 .RE
 .PP
 \fBhdl platforms\fR
 .RS 4
 All HDL platforms in a project or in a project\(cqs
-\fBhdl/platforms\fR
+\fBhdl/platforms/\fR
 directory\&.
 .RE
 .PP
 \fBhdl primitive core\fR
 .RS 4
 An HDL primitive core in a project or in a project\(cqs
-\fBhdl/primitives\fR
+\fBhdl/primitives/\fR
 directory\&.
 .RE
 .PP
 \fBhdl primitive library\fR
 .RS 4
 An HDL primitive library in a project or in a project\(cqs
-\fBhdl/primitives\fR
+\fBhdl/primitives/\fR
 directory\&.
 .RE
 .PP
@@ -211,7 +214,7 @@ A signals specification XML file at a project level or an HDL library level\&.
 .PP
 \fBhdl slot\fR
 .RS 4
-A slot type specification XML file at the project level or the HDL library level\&.
+A slot type definition XML file at the project level or the HDL library level\&.
 .RE
 .PP
 \fBhdl subdevice\fR
@@ -219,7 +222,7 @@ A slot type specification XML file at the project level or the HDL library level
 An HDL subdevice worker in an HDL devices library that supports other HDL device workers\&.
 .RE
 .sp
-Note that the HDL assets \fBcard\fR, \fBdevice\fR and \fBsubdevice\fR reside in one of the fixed HDL libraries in a project (\fBhdl/adapters\fR, \fBhdl/cards\fR, and \fBhdl/devices\fR) or the \fBdevices\fR library within an HDL platform\(cqs directory\&. The remaining HDL assets listed here do not reside in these libraries\&.
+Note that the HDL assets \fBcard\fR, \fBdevice\fR and \fBsubdevice\fR reside in one of the fixed HDL libraries in a project (\fBhdl/adapters/\fR, \fBhdl/cards/\fR, and \fBhdl/devices/\fR) or the \fBdevices/\fR library within an HDL platform\(cqs directory\&. The remaining HDL assets listed here do not reside in these libraries\&.
 .SH "OPTIONS"
 .sp
 Options are either single letters following one hyphen or complete words or acronyms following two hyphens and separated by hyphens\&. Most options are only valid for specific verbs or nouns\&. The general\-purpose options are:

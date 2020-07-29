@@ -1,5 +1,5 @@
 OCPIDEV(1)
-===========
+==========
 
 
 NAME
@@ -28,135 +28,135 @@ The general usage concept is: perform the '<verb>' operation on the
 
 VERBS
 -----
-The verbs supported by *ocpidev* are:
+The verbs supported by *`ocpidev`* are:
 
-*build*::
+*`build`*::
     Build the asset(s), running appropriate tools to create
     the binary files.
 
-*clean*::
+*`clean`*::
     Remove all the generated and compiled files for the assets.
 
-*create*::
+*`create`*::
     Create the named asset, creating files and directories as required,
     and creating any skeleton files for future editing.
 
-*delete*::
+*`delete`*::
     Remove all directories and files associated with the named asset.
 
-*refresh*::
+*`refresh`*::
     Manually regenerate the metadata associated with the project.
 
-*run*::
+*`run`*::
     Execute the unit test or application.
 
-*show*::
+*`show`*::
     Display information about assets in registered projects
     and the current build environment (preliminary).  
     
-*register*, *unregister*::
+*`register`*, *`unregister`*::
     Register/unregister a project in its registry.
 
-*set*, *unset*::
+*`set`*, *`unset`*::
     Set/unset the registry used by the current project.
 
-*utilization*::
+*`utilization`*::
     Display or record FPGA resource use for HDL OpenCPI assets.
 
 NOUNS
 -----
-The assets (nouns) supported by *ocpidev* are:
+The assets (nouns) supported by *`ocpidev`* are:
 
-*application*::
+*`application`*::
     A component application, specified in either XML or C++.
 
-*applications*::
+*`applications`*::
     All applications in a project's *applications* directory.
 
-*component*::
+*`component`*::
     A component specification XML file (OCS) at a project or
     a library level.
 
-*library*::
+*`library`*::
     A component library.
 
-*project*::
+*`project`*::
     A project containing all other asset types.
 
-*properties*::
+*`properties`*::
     A properties XML file at a project or a library level.
 
-*protocol*::
+*`protocol`*::
     A protocol specification XML file (OPS) at a project or
     a library level.
 
-*registry*::
+*`registry`*::
     A registry for projects to import/export dependencies from/to.
 
-*test*::
+*`test`*::
     A unit test suite for a component specification.
 
-*worker*::
+*`worker`*::
     A worker that implements a component specification.
 
-Note that the assets *application*, *applications*, *library*,
-*project* and *registry* do not reside in libraries. The assets
-*properties*, *protocol*, *component*, *test* and *worker*
-are in libraries.
+Note that the assets *`application`*, *`applications`*, *`library`*,
+*`project`* and *`registry`* do not reside in libraries. The assets
+*`properties`*, *`protocol`*, *`component`*, *`test`* and *`worker`*
+reside in libraries.
 
-The HDL-specific assets (located under the *hdl* subdirectory
-supported by *ocpidev* are:
+The HDL-specific assets (located under the *`hdl/`* subdirectory
+supported by *`ocpidev`* are:
 
-*hdl assembly*::
+*`hdl assembly`*::
     An assembly of HDL workers used to build HDL containers.
 
-*hdl assemblies*::
+*`hdl assemblies`*::
     All the assemblies in a project or in an HDL assemblies
     directory.
 
-*hdl card*::
+*`hdl card`*::
     A card specification XML file at a project level or
     an HDL library level.
 
-*hdl device*::
+*`hdl device`*::
     An HDL device worker in an HDL component library
-    (*adapters*, *cards*, *devices* or an HDL platform's
-    *devices*).
+    (*`adapters/`*, *`cards/`*, *`devices/`* or an HDL platform's
+    *`devices/`*).
 
-*hdl platform*::
-    An HDL platform worker in an HDL platforms diretory,
+*`hdl platform`*::
+    An HDL platform worker in an HDL *`platforms/`* directory,
     including its platform configurations.
 
-*hdl platforms*::
+*`hdl platforms`*::
     All HDL platforms in a project or in a project's
-    *hdl/platforms* directory.
+    *`hdl/platforms/`* directory.
 
-*hdl primitive core*::
+*`hdl primitive core`*::
     An HDL primitive core in a project or in a project's
-    *hdl/primitives* directory.
+    *`hdl/primitives/`* directory.
 
-*hdl primitive library*::
+*`hdl primitive library`*::
     An HDL primitive library in a project or in a project's
-    *hdl/primitives* directory.
+    *`hdl/primitives/`* directory.
 
-*hdl primitives*::
+*`hdl primitives`*::
     All HDL primitives (cores or libraries) in a project.
 
 *hdl signals*::
     A signals specification XML file at a project level or
     an HDL library level.
 
-*hdl slot*::
-    A slot type specification XML file at the project level or
+*`hdl slot`*::
+    A slot type definition XML file at the project level or
     the HDL library level.
     
-*hdl subdevice*::
+*`hdl subdevice`*::
     An HDL subdevice worker in an HDL devices library that
     supports other HDL device workers.
 
-Note that the HDL assets *card*, *device* and *subdevice* reside
-in one of the fixed HDL libraries in a project (*`hdl/adapters`*,
-*`hdl/cards`*, and *`hdl/devices`*) or the *`devices`* library
+Note that the HDL assets *`card`*, *`device`* and *`subdevice`* reside
+in one of the fixed HDL libraries in a project (*`hdl/adapters/`*,
+*`hdl/cards/`*, and *`hdl/devices/`*) or the *`devices/`* library
 within an HDL platform's directory. The remaining HDL assets
 listed here do not reside in these libraries.
 

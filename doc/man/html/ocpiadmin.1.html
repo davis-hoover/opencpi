@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpiadmin</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140291288873792"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpiadmin — command-line tool for managing an OpenCPI installation.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong>ocpiadmin</strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="emphasis"><em>&lt;noun&gt;</em></span> [<span class="emphasis"><em>&lt;name&gt;</em></span> [<span class="emphasis"><em>&lt;argument&gt;</em></span>… ]]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpiadmin(1)</code></strong></span> command line tool is used to perform installation
+and deployment tasks that are carried out on an OpenCPI installation
+after the basic installation procedure is completed to prepare
+OpenCPI for use on embedded systems. These tasks include:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Building platforms and simulators that are intended
+as targets for OpenCPI development that have not been
+automatically built as part of the basic OpenCPI
+installation. Building a platform enables
+OpenCPI assets for that platform to be developed in OpenCPI
+projects. It also enables the platform to be integrated into
+system boot kits - for example, on bootable SD cards - to
+be created for embedded systems that use them.
+</li><li class="listitem">
+Creating a bootable media directory tree (<span class="emphasis"><em>SD card contents</em></span>)
+for OpenCPI required by the software (RCC) and hardware
+(HDL/FPGA) platforms that comprise the embedded system.
+The bootable media directory tree for a particular
+software-hardware platform configuration can
+then be written to the manufacturer’s SD card
+to enable booting the embedded system for OpenCPI.
+</li></ul></div><p>For more information about these tasks and how they
+relate to enabling OpenCPI development on embedded systems,
+see The <span class="emphasis"><em>OpenCPI Installation Guide</em></span>.</p><p>The general usage concept for <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> is:
+perform the <span class="emphasis"><em>&lt;verb&gt;</em></span> operation on the
+<span class="emphasis"><em>&lt;noun&gt;</em></span> whose name is <span class="emphasis"><em>&lt;name&gt;</em></span>.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>The verbs supported by <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">deploy</code></strong></span>
+</span></dt><dd>
+    Create a bootable media directory tree for the named
+    RCC (software) platform on the named HDL (FPGA)
+    platform. The specified platforms must have
+    been previously built.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">install</code></strong></span>
+</span></dt><dd>
+    Prepare the OpenCPI installation for using the named
+    RCC or HDL platform or simulator.
+</dd></dl></div></div><div class="refsect1"><a id="_nouns"></a><h2>NOUNS</h2><p>The nouns supported by <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">platform</code></strong></span>
+</span></dt><dd>
+    A particular type of processing hardware and/or software that
+    can host a container for executing OpenCPI workers.
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>There are currently no options to <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> verbs.</p></div><div class="refsect1"><a id="_operations"></a><h2>OPERATIONS</h2><p>The command syntax for the <span class="strong"><strong><code class="literal">install platform</code></strong></span> operation is:</p><p><span class="strong"><strong><code class="literal">ocpiadmin install platform</code></strong></span> <span class="emphasis"><em>&lt;platform&gt;</em></span></p><p>where <span class="emphasis"><em>&lt;platform&gt;</em></span> is the name of an RCC platform, HDL platform or HDL simulator
+to be built for OpenCPI. The operation downloads
+the platform’s <span class="emphasis"><em>OpenCPI Platform System support Project</em></span> (its <span class="emphasis"><em>OSP</em></span>) if necessary and then builds the
+built-in projects for the specified platform. If the specified platform is
+an HDL platform, the operation also builds a single test artifact/bitstream:
+the <span class="strong"><strong><code class="literal">testbias</code></strong></span> assembly in the <span class="strong"><strong><code class="literal">assets</code></strong></span> project. After
+the operation is performed, any asset in any project can be
+built for the specified platform.</p><p>The command syntax for the <span class="strong"><strong><code class="literal">deploy platform</code></strong></span> operation is:</p><p><span class="strong"><strong><code class="literal">ocpiadmin deploy platform</code></strong></span> <span class="emphasis"><em>&lt;rcc-platform&gt; &lt;hdl-platform&gt;</em></span></p><p>where <span class="emphasis"><em>&lt;rcc-platform&gt;</em></span> and <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span> are the names of the
+software (RCC) and hardware/FPGA (HDL) platforms for which the bootable
+media should be created. The operation creates the directory
+<span class="strong"><strong><code class="literal">cdk/</code></strong></span><span class="emphasis"><em>&lt;hdl-platform&gt;</em></span><span class="strong"><strong><code class="literal">/sdcard-</code></strong></span><span class="emphasis"><em>&lt;rcc-platform&gt;</em></span>,
+whose contents can be copied to an SD card.</p><p>Keywords for specifying platform names are given in tables in the
+<span class="emphasis"><em>OpenCPI Installation Guide</em></span>.</p></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Build the Ettus USRP E310 (<span class="strong"><strong><code class="literal">e31x</code></strong></span>) HDL platform for OpenCPI:
+</p><pre class="screen">ocpiadmin install platform e31x</pre></li><li class="listitem"><p class="simpara">
+Build the Analog Devices Pluto Linux 0.31 (<span class="strong"><strong><code class="literal">adi_plutosdr0_31</code></strong></span>)
+embedded software (RCC) platform for OpenCPI:
+</p><pre class="screen">ocpiadmin install platform adi_plutosdr0_31</pre></li><li class="listitem"><p class="simpara">
+Create a bootable media directory tree
+for booting the RCC platform <span class="strong"><strong><code class="literal">xilinx_19_2_aarch32</code></strong></span> on
+the HDL platform <span class="strong"><strong><code class="literal">zed</code></strong></span>. This operation creates the
+directory <span class="strong"><strong><code class="literal">cdk/zed/sdcard-xilinx_19_2_aarch32/</code></strong></span>,
+whose contents can be copied to an SD card:
+</p><pre class="screen">ocpiadmin deploy platform xilinx_19_2_aarch32 zed</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>
