@@ -1,0 +1,158 @@
+OCPIDEV-DELETE(1)
+=================
+
+
+NAME
+----
+ocpidev-delete - delete OpenCPI assets
+
+
+SYNOPSIS
+--------
+*ocpidev* ['<options>'] *delete* '<noun>' '<name>'
+
+
+DESCRIPTION
+-----------
+The *`delete`* verb deletes OpenCPI assets from a
+project specified by the '<noun>' argument that follows the verb.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*application*::
+    Delete an application.
+
+*hdl*::
+    A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
+    Possible HDL assets are:
+    
+        *assembly*;;
+	Delete an HDL assembly.
+	
+	*card*;;
+	Delete an HDL card definition.
+	
+	*device*;;
+	Create/delete an HDL device worker, possibly in a
+	specified platform.
+	
+	*platform*;;
+	Delete an HDL platform.
+	
+	*primitive*;;
+	Delete an HDL primitive. Possible primitive types are:
+		    
+	    *core*:::
+	    A single primitive module, perhaps presynthesized
+	    (that is, from coregen or megawizard).
+	    
+	    *library*:::
+	    A set of HDL primitive modules to use in workers as a library.
+
+	*`slot`*;;
+	Delete an HDL slot definition.    
+
+*library*::
+    Delete a component library.
+    
+*project*::
+    Delete a project which holds and organizes OpenCPI assets.
+
+*protocol*::
+    Delete a protocol in a library or project.
+
+*registry*::
+    Delete a registry that enables projects to depend on each other.
+
+*spec*::
+    Delete a component specification in a library or project.
+
+*test*::
+    Delete a component unit test in a library.
+
+*worker*::
+    Delete a worker in a library.
+
+All HDL assets should avoid having names that are Verilog or VHDL-
+reserved identifiers, such as `reg`, etc.
+
+OPTIONS
+-------
+The options for *delete* are usually specific to the asset type
+that is being deleted. When deleting an asset, *ocpidev* will
+ask for confirmation. You can override this with the *-f* option
+to force deletion without confirmation.
+
+In the option descriptions below, a plus sign (+) indicates that
+the option can be specified more than once on the command line.
+
+Option When Deleting Any Asset Type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-f*::
+    Force deletion: do not ask for confirmation when deleting
+    an asset. Normally, you are asked to confirm a deletion.
+
+Option When Deleting Specs or Protocols
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-p*::
+   Delete the spec or protocol from the *specs*
+   directory of the project, not from a library's
+   *specs* directory.
+
+Options When Deleting Specs, Protocols, Workers or HDL Devices
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*--hdl-library=*'<hdl-library>'::
+   Delete the asset from the specified library under the
+   *hdl* directory of the project. Valid values for
+   '<hdl-library>' are one of *devices*, *cards* or *adapters*.
+
+*-l* '<library>'::
+   Delete the asset from the specified library.
+
+EXAMPLES
+--------
+. Delete the project *my-project*:
++
+-------------------------------
+ocpidev delete project my-project
+--------------------------------
++
+. Delete the worker named *myworker.hdl* from the library named *my-complib*:
+
+-------------------------------
+ocpidev delete -l my-complib worker myworker.hdl
+------------------------------
+
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

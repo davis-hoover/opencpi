@@ -1,0 +1,167 @@
+OCPIDEV-REGISTRY(1)
+==================
+
+
+NAME
+----
+ocpidev-registry - manage an OpenCPI project registry.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`registry`* ['<name>']
+
+
+DESCRIPTION
+-----------
+The *`registry`* noun represents an OpenCPI project registry, which is a
+directory that contains references to OpenCPI projects.
+An OpenCPI project registry is a way to manage project interdependencies.
+A project is  automatically 'associated' with a registry when it is created,
+allowing it to view and depend on other projects registered there.
+A project can also be 'registered' in its associated project
+registry, allowing it to be visible to other projects associated there.
+Projects are not initially registered; the *`ocpidev register`* operation
+for a project can be used to register them.
+
+The OpenCPI installation provides a default project registry at
+$OCPI_CDK_DIR/../project-registry. However, in some project development
+environments, it can be useful to have an additional "sandbox" project
+registry for use as an alternative to the OpenCPI default.
+
+The OpenCPI environment variable *`OCPI_PROJECT_REGISTRY_DIR`* can
+be set to point to an alternative project registry; setting this
+variable allows subsequently created projects to be associated
+with this registry and not with the OpenCPI default.
+
+For more information about project registries and how to manage them,
+see the section "The Project Registry: How Projects Depend on
+and Find Each Other" in the 'OpenCPI Component Development Guide'.
+
+Verbs that can operate on a project registry are:
+    
+*`create`*::
+    Create the named project registry at the specified location.
+    
+*`delete`*::
+    Remove the named project registry from the specified location.
+
+*`set`*::
+    Manually associate a project with a project registry.
+    
+*`show`*::
+    Display a list of projects registered with a project registry and their locations.
+    
+*`unset`*::
+    Manually remove the association between a project and a project registry.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options That Apply to All Operations (Verbs) on Registries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-d`* '<directory>'::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+    
+*`-v`*, *`--verbose`*::
+    Describe what is happening in command execution in more detail.
+
+Options When Creating and Setting Registries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-d`* '<directory>'::
+    Specify the path to the registry being created or set.
+    
+Options When Deleting Registries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-f`*::
+    Force deletion: do not ask for confirmation when deleting
+    a project registry. Normally, you are asked to confirm a deletion.
+
+Options When Showing Registries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--json`*::
+    Format the output in Javascript Object Notation (JSON) format
+    for integration with other software.
+
+*`--global-scope`*::
+    Display information about all project registries.
+    This is the default scope used if *`-local-scope`* is not used.
+
+*`--local-scope`*:: 
+    Only display information about the local project registry.
+
+*`--simple`*::
+    Format the output as simply as possible.
+
+*`--table`*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *--simple* or *--json* are not used.
+
+EXAMPLES
+--------
+. Create a registry *`~/workspace/my-registry`*. Note that this registry will
+not have the *`core`* project registered, so you must locate and register
+the core project in *`my-registry`* after creating it.
++
+--------------------------------------------------
+ocpidev create registry my-registry -d ~/workspace
+--------------------------------------------------
++
+. Display information about the projects in the current registry:
++
+----------------------
+ocpidev show registry
+----------------------
++
+. Inside the project, associate the project with the default registry:
++
+---------------------
+ocpidev set registry
+--------------------
+. Inside the project, associate the project with the registry named
+*`my-registry`* located at ~/workspace/:
++
+-----------------------------------------------
+ocpidev -d ~/workspace set registry my-registry
+-----------------------------------------------
++
+. Inside the project, remove the association between the project
+and a registry. The next time the project is built, the default
+project registry will be used:
++
+---------------------
+ocpidev unset registry
+---------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

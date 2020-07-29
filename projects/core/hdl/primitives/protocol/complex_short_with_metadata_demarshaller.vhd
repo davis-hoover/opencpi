@@ -143,6 +143,7 @@ begin
       if(rising_edge(clk)) then
         if(rst = '1') then
           oprotocol <= PROTOCOL_ZERO;
+          oeof      <= '0';
           --itake_s <= '0';
         else
           --itake_s <= take;

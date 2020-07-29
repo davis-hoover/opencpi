@@ -1,0 +1,386 @@
+OCPIDEV-TEST(1)
+==============
+
+
+NAME
+----
+ocpidev-test - manage an OpenCPI component unit test suite.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`test`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *test* noun represents an OpenCPI component unit test suite, which
+is a collection of 'test cases' for testing all workers that implement the
+a single component specification (OCS) across all available platforms for
+which the workers have been built. The workers tested by the component
+unit test suite can be written to different authoring models or languages or
+can be different source code implementations of the same component
+specification. As long as they implement the same component specification,
+they can be tested with the same unit test suite.
+
+A 'test case' is a parameterized test that uses a defined set of inputs
+or generation scripts and a defined set of outputs or verification scripts
+using a defined matrix of property values. OpenCPI supplies a default test case
+that tests all parameter combinations as derived from all
+worker parameter/build configurations or all workers. A developer can
+supply runtime property settings with multiple values for each, resulting
+in the cross-product of subcases. The default test case has one generation
+script and one verification script, per port, parameterized by
+'test subcase' (specific test) property values.
+
+A component unit test suite has five phases:
+
+- Generate: generate testing artifacts after finding the OCS and the workers.
+
+- Build: build HDL bitstream/executable artifacts for testing. This phase is
+only meaningful for test suites that operate on HDL workers.
+
+- Prepare: examine available built workers and available platforms,
+creating execution scripts to use them all for executing feasible tests.
+
+- Run: execute tests for all workers, configurations, test cases and platforms.
+
+- Verify: verify results from the execution of tests on workers and platforms.
+
+The *`--mode=`* option to the *`run`* operation for a test suite can
+be used to set these phases. Note that HDL workers must be built before
+generating/building tests for them.
+
+A component unit test suite is described by an OpenCPI Test Suite
+Description (OTSD), which is an XML file that specifies the test cases and
+the defaults that apply to all test cases.
+
+In a project, a component unit test suite resides in its own
+directory named '<component-name>'*`.test`* within a component library.
+Within the test suite directory are:
+
+- The test suite's "make" file (named *`Makefile`*)
+
+- The Test Suite Description file (named '<component-name>'*`-test.xml`*)
+
+- A generator script to create input data files for ports or property value files (one generator script for each port) (initially named *`generator.py`*)
+
+- A verifier script to verify test output data produced by the output ports (one verifier script for each port) (initially named *`verify.py`*)
+
+- A viewer script to view the results of test execution; for example, a plot (initially named *`view.sh`*)
+
+The *`ocpidev create`* operation produces initial versions of these files that can then be edited as necessary to implement the test suite.
+
+Running the build and generate phases creates two additional subdirectories:
+
+- A *`gen/`* subdirectory that contains the built test cases and a text file that describes them
+
+- An *`applications/`* subdirectory that contains OpenCPI Application Specification (OAS) files and scripts used by the OpenCPI test framework to execute the test cases
+
+Running the prepare and run phases creates an additional *`run/`* subdirectory
+that contains the results of the test case executions, such as output data
+from each output port, final values of all properties, including volatile
+properties, and a log file of the actual test execution.
+
+Running *`ocpidev clean`* removes the *`application/`*, *`gen/`* and *`run`/* subdirectories.
+
+The chapter "Unit Testing of Workers" in the 'OpenCPI Component Development
+Guide' provides details on the OpenCPI Test Suite Description XML structure
+and syntax, test suite phase operations, and the development process for OpenCPI
+component unit test suites.
+
+Verbs that can operate on a component unit test suite are:
+
+*`build`*::
+    Build the component unit test suite, creating directories and files
+    as necessary.
+
+*`clean`*::
+    Remove all the generated and compiled files for the
+    component unit test suite.
+
+*`create`*::
+    Create the named component unit test suite, creating files and directories as required.
+
+*`delete`*::
+    Remove all directories and files associated with the named
+    component unit test suite.
+
+*`run`*::
+    Run the component unit test suite, creating files and directories as required.
+    
+Note that an asset's name is implied by the directory you're in when
+you issue the *`ocpidev`* command. For a component unit test suite, this
+means that you can perform operations (verbs) on the unit test
+without having to specify its
+name when you issue the *`ocpidev`* command from inside the
+the component unit test suite's directory.
+
+The *`ocpidev`* tool can also operate on a plural *`tests`* noun.
+The syntax is:
+
+*`ocpidev`* ['<options>'] [*`run`*|*`show`*] *`tests`*
+
+The verbs that can be performed on the *`tests`* noun are:
+
+*`run`*::
+    Run all the component unit tests suites in the given library.
+    The general-purpose options and all *`run`* options
+    for component unit test suites can be used.
+
+*`show`*::
+    Display information about component unit test suites in the current scope.
+    The general-purpose options and the *`show`* formatting options can
+    be used.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Keywords for platforms supported by OpenCPI that can be
+specified in the '<platform>' argument to an option
+can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
+
+Keywords for architectures supported by OpenCPI that can be specified
+in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
+*`stratix4`*, *`virtex6`*, *`zynq`*.
+
+Options That Apply to All Operations (Verbs) on Test Suites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-d`* '<directory>'::
+    Specify the directory in which the command  should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+
+*`-v`*, *`--verbose`*::
+    Describe what is happening in command execution in more detail.
+
+Options When Creating Unit Test Suites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+    Do not build the component unit test suite for the specified platform.
+
+*`--only-platform=`*'<platform>', *`-G`* '<platform>'+::
+    Only build the component unit test suite for the specified platform.
+
+*`-S`* '<component-spec>'::
+    Specify the component spec (OCS) that the component unit
+    test suite implements.
+    The default is '<name>'*`-spec`* or '<name>'*`_spec`*
+    depending on what *`ocpidev`* finds in the *`specs`* directory
+    of the library or project (or libraries specified with the *`-y`*
+    option or other projects specified by the *`-D`* option when the
+    project that contains the component unit test suite was created).
+
+*`-T`* '<target>'+::
+    Only build the component unit test suite for the specified architecture.
+
+*-k*::
+    Keep files and directories created after a component unit test suite
+    creation fails. Normally, all such files and directories are removed
+    on any failure.
+
+Options When Deleting Unit Test Suites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-f*::
+    Force deletion: do not ask for confirmation when deleting
+    a component unit test suite. Normally, you are asked to confirm a deletion.
+
+Options When Building Component Unit Test Suites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-rcc-platform=`*'<platform>'+::
+    Build the component unit test(s) for the RCC platforms
+    associated with the specified HDL platform. If this
+    option is not used (and *`--rcc-platform`* '<platform>' is also not used),
+    the current development software platform is used as
+    the single RCC platform used for building.
+
+*`--rcc-platform=`*'<platform>'+::
+    Build the component unit test(s) for the specified RCC platform. If this
+    option is not used (and *`--hdl-rcc-platform`* '<platform>'
+    is also not used), the current development software platform
+    is used as the single RCC platform used for building.
+
+Options When Building Component Unit Test Suites with HDL Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build the component unit test suite(s) for the specified HDL platform.
+
+*`--hdl-target=`*'<target>'+::
+    Build the component unit test suite(s) for the specified HDL architecture.
+    If only HDL targets are specified (and no HDL platforms), containers for
+    the unit test suite(s) are not built.
+
+Options When Running Component Unit Tests Suites
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+*`--accumulate-errors`*:: 
+    Report execution or verification errors as they occur rather
+    than ending the test on the first failure detected.
+
+*`--case=`*'<test-case>'+::
+    Specify the test case(s) to be run and verified. You can use
+    the wildcard character in '<test-case>'; for example, case*, case0.0*.
+    
+*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+    Specify the runtime platform to omit from the component unit test suite(s).
+    
+*`--hdl-platform=`*'<platform>'+::
+    Specify the HDL platform to use with the component unit test suite(s).
+    This option is only valid in generate and build phases.
+
+*`--keep-simulations`*:: 
+    Keep HDL simulation files regardless of verification results.
+    By default, simulation files are removed if the verification
+    is successful. Warning: Simulation files can become large!
+
+*`--library=`*'<library>', *`-l`* '<library>'::
+    Run the component unit test suite(s) in the specified library.
+    
+*`--mode=`*'<mode>'[,'<mode>'[,'<mode>'...]]::
+    Specify which phase(s) of the component unit test suite(s) to execute. Valid modes are:
+    - *all*:  execute all five phases (the default if *`--mode`* is not used)
+    - *gen*: execute generate phase
+    - *gen_build*: execute generate and build phases. This mode is
+      analagous to the *`build`* verb.
+    - *prep_run_verify*: execute prepare, run, and verify phases
+    - *prep*: execute prepare phase
+    - *run*: execute run phase
+    - *prep_run*: execute prepare and run phases
+    - *verify*: execute verify phase 
+    - *view*: execute the view script (view.sh) on an already executed run  
+    - *clean_all*: clean all generated files. This mode is analogous to the *`clean`* verb.
+    - *clean_run*: clean all files generated during the run phase 
+    
+*`--only-platform=`*'<platform>', *`-G`* '<platform>'+:: 
+    Specify the runtime platform to use with the component unit test suite(s).
+
+*`--rcc-platform=`*'<platform>'+:: 
+    Specify the RCC platform to use to build and generate the component unit test suite(s).
+
+*`--remotes=`*'<system>'::
+    Specify the remote system to run the component unit
+    test suite(s) by setting the
+    *`OCPI_REMOTE_TEST_SYS`* variable. See the section
+    "Defining Remote Systems for Executing Tests"
+    in the 'OpenCPI Component Development Guide' for more information.
+    
+*`--view`*::
+    Run the view script (*`view.sh`*) at the conclusion of the
+    test suite's execution.
+
+Options When Showing Component Unit Test Suites (plural noun only)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*--json*::
+    Format the output in Javascript Object Notation (JSON) format
+    for integration with other software.
+
+*--local-scope*:: 
+    Only display information about the component unit tests in the local library.
+
+*--simple*::
+    Format the output as simply as possible.
+
+*--table*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *--simple* or *--json* are not used.
+
+EXAMPLES
+--------
+. From the project's *`components`* library, create a component
+unit test suite for the *`mycomp`* component:
++
+--------------------------
+ocpidev create test mycomp
+--------------------------
++
+. Inside the *`components`* library, create a test suite for the *`mycomp`*
+component that only runs on the *`centos7`* platform:
++
+-------------------------------------------------
+ocpidev create test mycomp --only-platform=centos7
+-------------------------------------------------
++
+. Inside the *`components`* library, create a test suite for the *`mycomp`*
+component that only runs on platforms that implement the *`zynq`* architecture:
++
+----------------------------------
+ocpidev create test mycomp -T zynq
+----------------------------------
++
+. Inside the *`mycomp.test`* directory, build the component
+unit test suite for the *`zed`* HDL platform and *`xilinx13_3`* RCC platform.
++
+---------------------------------------------------------------
+ocpidev build test --hdl-platform zed --rcc-platform xilinx13_3
+--------------------------------------------------------------
++
+. Inside the *`mycomp.test`* directory, clean the directory:
++
+------------------
+ocpidev clean test
+------------------
++
+. Inside the *`components`* library in the current project, run
+the prepare, run and verify phases of the unit test suite for
+the *`mycomp`* component, accumulating any errors and invoking
+the viewer shell script (*`view.sh`*) to view the plotted test results:
++
+--------------------------------------------
+ocpidev run test mycomp.test --accumulate_errors
+                             --mode=prep_run_verify
+                             --view
+---------------------------------------------
++
+. Inside the *`assets`* project, run the test suite for the timestamper
+component in the *`util_comps`* library:
++
+------------------------------------------------------
+ocpidev run test timestamper.test --library=util_comps
+------------------------------------------------------
++
+. Inside the *`components`* library in the current project, run
+all the component unit test suites in the library:
++
+-----------------
+ocpidev run tests
+----------------
++
+. Display information about the component unit test suites in the current project:
++
+--------------------------------
+ocpidev show tests --local-scope
+--------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-component.1.html[ocpidev-component(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
