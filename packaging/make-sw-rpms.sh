@@ -58,6 +58,9 @@ mkdir -p $target
 if [ "$package" = driver ]; then
   msg='driver package (opencpi-driver)'
   spec=driver.spec
+elif [ "$package" = doc ]; then
+  msg='doc package (opencpi-doc)'
+  spec=doc.spec
 else
   msg='runtime (opencpi) and development (opencpi-devel) packages'
   spec=cdk.spec

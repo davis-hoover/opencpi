@@ -52,10 +52,10 @@ Release ID: %{RPM_HASH}
 %endif
 
 %prep
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %build
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %install
 %{__mkdir_p} %{buildroot}%{prefix0}/%{deploy_dir}/%{RPM_PLATFORM}
