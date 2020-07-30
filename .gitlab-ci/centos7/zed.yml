@@ -7,15 +7,9 @@
     - zed
     - shell
 
-<<<<<<< HEAD
 ##########################
 # Jobs - Build-Primitives#
 ##########################
-=======
-################################
-# Jobs - Build-Primitives-Core #
-################################
->>>>>>> becce7697c6da6d9bf14f46b7d6399c2185eea6a
 build-primitives:centos7:zed:
   extends:
     - .build-primitives
