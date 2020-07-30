@@ -254,11 +254,11 @@ TreeHash=`(if test -f $(1); then \
              find -L . -type f | sort | xargs cat; \
            fi) \
            | $(MD5)`
-ReplaceIfDifferent=$(infox REPLACE:$1:$2:$3)\
+ReplaceIfDifferent=$(infox REPLACE:$1:$2:$3:$4)\
   TAIL=`basename $(1)`; \
   while test 1; do \
     if test -f $(1); then OLD=$(2)/$$TAIL; else OLD=$(2); fi;\
-    if test -e $$NEW; then \
+    if test -e $1; then \
       NEWHASH=$(call TreeHash,$(1));\
       OLDHASH=$(call TreeHash,$$OLD);\
       if test "$$OLDHASH" = "$$NEWHASH"; then\
