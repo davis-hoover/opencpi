@@ -7,9 +7,15 @@
     - zed
     - shell
 
+<<<<<<< HEAD
 ##########################
 # Jobs - Build-Primitives#
 ##########################
+=======
+################################
+# Jobs - Build-Primitives-Core #
+################################
+>>>>>>> becce7697c6da6d9bf14f46b7d6399c2185eea6a
 build-primitives:centos7:zed:
   extends:
     - .build-primitives
@@ -444,7 +450,7 @@ test-core:centos7:zed:
     - build-sdcard:centos7:zed
   resource_group: zed
 
-build-test-assets-base:centos7:zed:
+test-assets-base:centos7:zed:
   extends:
     - .test-assets-base
     - .zed-centos7
@@ -461,7 +467,7 @@ build-test-assets-base:centos7:zed:
     - build-sdcard:centos7:zed
   resource_group: zed
 
-build-test-assets-comms:centos7:zed:
+test-assets-comms:centos7:zed:
   extends:
     - .test-assets-comms
     - .zed-centos7
@@ -478,7 +484,7 @@ build-test-assets-comms:centos7:zed:
     - build-sdcard:centos7:zed
   resource_group: zed
 
-build-test-assets-dsp:centos7:zed:
+test-assets-dsp:centos7:zed:
   extends:
     - .test-assets-dsp
     - .zed-centos7
@@ -495,7 +501,7 @@ build-test-assets-dsp:centos7:zed:
     - build-sdcard:centos7:zed
   resource_group: zed
 
-build-test-assets-misc:centos7:zed:
+test-assets-misc:centos7:zed:
   extends:
     - .test-assets-misc
     - .zed-centos7
@@ -512,7 +518,7 @@ build-test-assets-misc:centos7:zed:
     - build-sdcard:centos7:zed
   resource_group: zed
 
-build-test-assets-util:centos7:zed:
+test-assets-util:centos7:zed:
   extends:
     - .test-assets-util
     - .zed-centos7
@@ -529,7 +535,7 @@ build-test-assets-util:centos7:zed:
     - build-sdcard:centos7:zed
   resource_group: zed 
 
-build-test-assets_ts:centos7:zed:
+test-assets_ts:centos7:zed:
   extends:
     - .test-assets_ts
     - .zed-centos7
@@ -548,7 +554,7 @@ build-test-assets_ts:centos7:zed:
     - build-sdcard:centos7:zed
   resource_group: zed
 
-build-test-inactive:centos7:zed:
+test-inactive:centos7:zed:
   extends:
     - .test-inactive
     - .zed-centos7
