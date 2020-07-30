@@ -39,6 +39,7 @@ begin
     if(rising_edge(clk)) then
       if(rst = '1') then
         protocol_r <= protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+        oeof       <= '0';
       elsif(ordy = '1') then
         protocol_r.samples        <= iprotocol.samples;
         protocol_r.samples_vld    <= iprotocol.samples_vld;

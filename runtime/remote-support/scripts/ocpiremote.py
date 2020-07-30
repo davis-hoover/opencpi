@@ -452,7 +452,7 @@ def deploy(args):
     if not os.path.isdir(local_dir):
         print("Error: {} does not exist".format(local_dir))
         print("Try running 'ocpiadmin deploy platform {} {}'".format(
-                    args.hw_platform, args.sw_platform)
+                args.sw_platform, args.hw_platform)
             )
 
         return 1

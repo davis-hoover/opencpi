@@ -57,37 +57,38 @@ The Release Notes from previous releases are included here as reference for stil
 \newpage
 
 \pagenumbering{roman}
-	\begin{center}
+\begin{center}
 	\textit{\textbf{Revision History}}
-		\begin{table}[H]
+	\begin{table}[H]
 		\label{table:revisions} % Add "[H]" to force placement of table
-			\begin{tabularx}{\textwidth}{|c|X|l|}
+		\begin{tabularx}{\textwidth}{|c|X|l|}
 			\hline
 			\rowcolor{blue}
 			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
 		    \hline
-			v1.0.1 & Initial creation & 5/2016 \\
+			v1.0.1 & Initial creation & 05/2016 \\
 			\hline
-			v1.1.0 & Updates for 1.1 release & 3/2017 \\
+			v1.1.0 & Updates for 1.1 release & 03/2017 \\
 			\hline
-			v1.2.0 & Updates for 1.2 release & 8/2017 \\
+			v1.2.0 & Updates for 1.2 release & 08/2017 \\
 			\hline
-			v1.3.0 & Updates for 1.3 release & 1/2018 \\
+			v1.3.0 & Updates for 1.3 release & 01/2018 \\
 			\hline
-			v1.3.1 & Updates for 1.3.1 release & 3/2018 \\
+			v1.3.1 & Updates for 1.3.1 release & 03/2018 \\
 			\hline
 			v1.4.0 & Updates for 1.4.0 release and moved previous to appendices & 10/2018 \\
 			\hline
-			v1.5.0 & Updates for 1.5.0 release & 4/2019 \\
+			v1.5.0 & Updates for 1.5.0 release & 04/2019 \\
 			\hline
-			v1.6.0 & Updates for 1.6.0 release & 1/2020 \\
+			v1.6.0 & Updates for 1.6.0 release & 01/2020 \\
 			\hline
-			v1.7.0 & Updates for 1.7.0 release & 6/2020 \\
+			v1.7.0 & Updates for 1.7.0 release & 06/2020 \\
 			\hline
-			\end{tabularx}
-		\end{table}
-	\end{center}
-
+			v2.0.0 & Updates for 2.0.0 release & 07/2020 \\
+			\hline
+		\end{tabularx}
+	\end{table}
+\end{center}
 \newpage
 
 \tableofcontents
@@ -116,8 +117,87 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 % === End of XXX
 \fi
 
-%\origsection{Release 1.7.0}
-\def\ocpiversion{latest}
+%\origsection{Release XXX}
+\def\ocpiversion{latest}  % Need to redefine so doc links are correct
+\section{Enhancements}
+
+\subsection{CentOS 8}
+\label{sec:20_centos8}
+Support for CentOS 8 as an RCC only development platform has been added. HDL support will be made available when vendor tools support CentOS 8. CentOS 7 is still the recommended development platform for new and existing OpenCPI projects.
+
+\subsection{Man Pages}
+\label{sec:20_man_pages}
+Additional man pages for \code{ocpidev} nouns are available. Also, man pages are available in HTML form at\\ \code{\${}OCPI\_{}CDK\_{}DIR/doc/man/html} including cross references between man pages.
+
+\subsection{\code{ocpiadmin}}
+\label{sec:20_ocpiadmin}
+A new command line tool \code{ocpiremote} has been added. This new tool replaces \code{scripts/install-platform.sh} and \code{scripts/deploy-opencpi.sh} on source-installed OpenCPI development platforms. Usage of \code{ocpiadmin} requires the OpenCPI environment be setup.\\
+Example usage of \code{ocpiadmin}:
+\begin{lstlisting}
+# Required
+source cdk/opencpi-setup.sh -s
+
+# Install xsim platform
+ocpiadmin install platform xsim
+
+# Install e31x platform
+ocpiadmin install platform e31x ocpi.osp.e3xx
+\end{lstlisting}
+
+\subsection{Ubuntu 18.04}
+\label{sec:20_ubuntu18}
+Support for Ubuntu 18.04 as a full development host has been added. Ubuntu 18.04 is the only platform that supports OpenCPI integration with GNU Radio's ``GNU Radio Companion''. Developers and users of OpenCPI looking to use Ubuntu as a development host platform instead of CentOS are highly encouraged to use Ubuntu 18.04 instead of Ubuntu 16.04.
+
+\subsection{Xilinx RCC Platforms}
+\label{sec:20_xilinx_rcc_platforms}
+Support for additional Xilinx platforms as been added. New additions include: \code{xilinx13\_{}4\_{}arm}, \code{xilinx17\_{}1\_{}aarch32}, \code{xilinx17\_{}1\_{}aarch64}, \code{xilinx17\_{}2\_{}aarch32}, \code{xilinx17\_{}2\_{}aarch64}.\\
+
+These new platforms, along with existing platforms, can be built using the new \code{ocpiadmin} tool.
+
+
+\section{Changes and Notes}
+
+\subsection{Deprecations}
+\label{sec:20_deprecations}
+The following have been marked as ``deprecated'' and support has been been removed, or will be removed, in OpenCPI 2.x.
+\begin{itemize}
+\item CentOS 6 reaches end-of-life on 30 Nov 2020 and will no longer receive updates or security patches by the CentOS maintainers. Because of this, OpenCPI has dropped support for CentOS 6 as a development platform and an RCC runtime platform.
+\end{itemize}
+
+\subsection{Component Library Searching Algorithm}
+\label{sec:20_component_library_searching}
+Component Libraries are searched per project, with all indicated libraries searched in a project before moving to the next project. Previously, this was "library first" which caused confusing results. If a worker in an assembly is found in a library, it is chosen even if not built for the target platform. This is to maintain consistency between library searching that is target-independent with library searching by tools that is target-dependent.
+
+\subsection{\code{util} and \code{bsv} Primitive Libraries}
+\label{sec:20_util_bsv_library}
+The util and bsv primitive libraries are not automatically made available to workers, to reduce namespace pollution. Primitive libraries are transitive - if a worker needs a library, the assembly automatically knows that and you do not have to mention the primitive library for the assembly.\\
+
+The bsv library usage is deprecated and it is now scoped in VHDL by the name of the package it exists in, so that a typical usage in VHDL is: \code{library ocpi\_{}core\_{}bsv; use ocpi\_{}core\_{}bsv.all}\\
+
+In general, primitive libraries can be labeled as being qualified by the package id of the project it is in, so that a developer does not need to now if the library name is used elsewhere.
+
+\section{Major Known Deficiencies}
+\label{sec:20_bugs}
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 2.0:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1113}
+\item \bugref{1392}
+\item \bugref{2400}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+% === End of 2.0.0
+
+\beginoldnotes
+\origsection{Release 1.7.0}
+\def\ocpiversion{v1.7.0}
 \section{Enhancements}
 \subsection{ADC/DAC Clocking Architecture}
 \label{sec:17_adc_dac}
@@ -137,7 +217,7 @@ A new clocking library has been added to \path{core/hdl/primitives}. This is a p
 
 \subsection{Man Pages}
 \label{sec:17_man_pages}
-Man pages are available for the ocpidev command and its subcommands. When the OpenCPI environment is setup using \code{opencpi-setup.sh}, the man pages can be viewed using the man command, e.g. "man ocpidev".
+Man pages are available for the \code{ocpidev} command and its subcommands. When the OpenCPI environment is setup using \code{opencpi-setup.sh}, the man pages can be viewed using the man command, e.g. "man ocpidev".
 
 \subsection{\code{ocpiremote}}
 \label{sec:17_ocpiremote}
@@ -226,7 +306,6 @@ The following deficiencies are still present in 1.7:
 
 % === End of 1.7
 
-\beginoldnotes
 \origsection{Release 1.6.0}
 \def\ocpiversion{v1.6.2}  % Need to redefine so doc links are correct
 \section{Enhancements}
