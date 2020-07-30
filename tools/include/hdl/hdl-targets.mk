@@ -323,6 +323,7 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
        $(foreach p,$(HdlAllPlatforms),\
          HdlFamily_$(HdlPart_$p)=$(call HdlGetFamily,$(HdlPart_$p));)\
        $(foreach p,$(HdlAllPlatforms),\
-         HdlPlatformDir_$(p)="$(realpath $(HdlPlatformDir_$(p)))";))
+         $(- only use realpath if its there.  If not we are bootstrapping and leave it alone)\
+         HdlPlatformDir_$(p)="$(or $(realpath $(HdlPlatformDir_$p)),$(HdlPlatformDir_$p))";))
 endif
 endif
