@@ -261,7 +261,10 @@ namespace {
       ocpiCheck(excludeWorkersTmp.erase(wname) == 1);
       return NULL;
     }
-    OU::format(file, "../%s/%s.xml", wname, name.c_str());
+    //OU::format(file, "../%s/%s.xml", wname, name.c_str());
+    // Find the worker under lib, so we are looking at things that are built and also so that
+    // the actual platform-specific build is easily relative to the OWD here
+    OU::format(file, "../lib/%s/%s.xml", dot+1, name.c_str());
     if (!OS::FileSystem::exists(file)) {
       if (matchSpec && specific)
         return OU::esprintf("For worker \"%s\", cannot open file \"%s\"", wname, file.c_str());
@@ -1650,6 +1653,33 @@ namespace {
     OS::FileSystem::mkdir(dir, true);
     assyDirs.insert(name);
     const char *err;
+    ocpiInfo("Generating assembly for worker: %s in file %s filename %s spec %s",
+	     w.cname(), w.m_file.c_str(), w.m_fileName.c_str(), w.m_specFile.c_str());
+    std::string makeFile;
+    // Exclude building the assembly for targets that are not built
+    if (hdlFileIO)
+      makeFile +=
+	"override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
+	"override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n";
+    makeFile += "OnlyTargets=";
+    // Only build for targets for which the worker is built
+    for (OS::FileIterator iter("../lib/hdl", "*"); !iter.end(); iter.next()) {
+      std::string
+	target = iter.relativeName(),
+	dir = "../lib/hdl/" + target;
+      bool isDir;
+      if (OS::FileSystem::exists(dir, &isDir) && isDir) {
+	if (OS::FileSystem::exists(dir + "/" + w.m_implName + ".vhd")) {
+	  ocpiInfo("Found that worker was built for target: %s", target.c_str());
+	  makeFile += target + " ";
+	}
+      }
+    }
+    makeFile += "\ninclude $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n";
+#if 1
+    if ((err = OU::string2File(makeFile, dir + "/Makefile", false, true)))
+      return err;
+#else
     if ((err = OU::string2File(hdlFileIO ?
                      "override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
                      "override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n"
@@ -1657,6 +1687,7 @@ namespace {
                      "include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n",
                      dir + "/Makefile", false, true)))
         return err;
+#endif
     std::string assy;
     OU::format(assy,
                "<HdlAssembly%s>\n"

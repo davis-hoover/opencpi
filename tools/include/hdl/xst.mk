@@ -257,7 +257,7 @@ XstNeedIni=$(XstCores)$(HdlLibrariesInternal)
 # Choices as to where a bb might be
 # 1. For pointing to a built target directory with the filename being the core name,
 #    where the core, and bblib is built.  Core is $1.$(HdlBin) Lib is $(dir $1)/bb/$(notdir $1)
-XstCoreLibraryChoices=$(info XCLT:$1:$2)$(strip \
+XstCoreLibraryChoices=$(infox XCLT:$1:$2)$(strip \
   $(and $(filter target-%,$(subst /, ,$1)),$(dir $1)/bb/$(notdir $1)) \
   $(and $(filter target-%,$(subst /, ,$1)),$(dir $1)/bb/$(patsubst %_rv,%,$(notdir $1))) \
   $(call HdlLibraryRefDir,$1_bb,$(if $(HdlTarget),$(call HdlGetFamily,$(HdlTarget)),NONE3),x,X1) \
@@ -273,7 +273,7 @@ XstCoreLibraryChoices=$(info XCLT:$1:$2)$(strip \
 # 3. Black box core libraries
 # This must be consistent with the XstMakeIni
 # The trick is to filter out component library BB libs from the cores.
-XstCompLibs=$(info CLLL:$(ComponentLibraries))$(ComponentLibraries) $(DeviceLibraries) $(CDKComponentLibraries) $(CDKDeviceLibraries)
+XstCompLibs=$(infox CLLL:$(ComponentLibraries))$(ComponentLibraries) $(DeviceLibraries) $(CDKComponentLibraries) $(CDKDeviceLibraries)
 # Remove the RV in the middle or at the end.
 # This will get fixed when we put the RV at the end everywhere...
 XstLibFromCore=$(foreach n,$(patsubst %_rv,%,$(basename $(notdir $1))),\
@@ -284,10 +284,10 @@ XstMakeLso=\
   (\
    $(eval XstLibs:=$(call HdlCollectLibraries,$(HdlTarget)))\
    $(foreach l,$(XstLibs),$(infox LLL:$l)echo $(lastword $(subst :, ,$l));) \
-   $(foreach c,$(call HdlCollectCorePaths),$(info CCCi:$c)\
+   $(foreach c,$(call HdlCollectCorePaths),$(infox CCCi:$c)\
       $(- for each core, specify any libraries it needs)\
       $(eval XstCoreLibs:=$(call HdlCollectCoreLibraries,$(call XstPathFromCore,$c),$(XstLibs)))\
-      $(foreach l,$(XstCoreLibs),$(info LLL1:$l)echo $(lastword $(subst :, ,$l));)\
+      $(foreach l,$(XstCoreLibs),$(infox LLL1:$l)echo $(lastword $(subst :, ,$l));)\
       $(eval XstLibs+=$(XstCoreLibs))echo $(call XstLibFromCore,$c);) \
   ) > $(XstLsoFile);
 
@@ -306,10 +306,10 @@ XstMakeIni=\
       echo $(lastword $(subst :, ,$l))=$(strip \
         $(call FindRelative,$(TargetDir),$(strip \
            $(call HdlLibraryRefDir,$l,$(HdlTarget),,xst))));) \
-   $(foreach c,$(call HdlCollectCorePaths),$(info CCCi:$c)\
+   $(foreach c,$(call HdlCollectCorePaths),$(infox CCCi:$c)\
       $(- for each core, specify any libraries it needs)\
       $(eval XstCoreLibs:=$(call HdlCollectCoreLibraries,$(call XstPathFromCore,$c),$(XstLibs)))\
-      $(foreach l,$(XstCoreLibs),$(info LLL1:$l)\
+      $(foreach l,$(XstCoreLibs),$(infox LLL1:$l)\
         echo $(lastword $(subst :, ,$l))=$(strip\
           $(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,xst)));)\
       $(eval XstLibs+=$(XstCoreLibs))$(strip \
