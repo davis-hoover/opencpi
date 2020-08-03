@@ -1656,25 +1656,32 @@ namespace {
     ocpiInfo("Generating assembly for worker: %s in file %s filename %s spec %s",
 	     w.cname(), w.m_file.c_str(), w.m_fileName.c_str(), w.m_specFile.c_str());
     std::string makeFile;
-    // Exclude building the assembly for targets that are not built
+    // Only build for sim targets if using vhdlfileio
     if (hdlFileIO)
       makeFile +=
 	"override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
 	"override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n";
-    makeFile += "OnlyTargets=";
+    // Only build the assembly for targets that are built
+    std::string targets;
     // Only build for targets for which the worker is built
+    // Note the worker may have been build for "no targets", and thus exist in the "lib" directory
+    // of the library, without having been built for.
     for (OS::FileIterator iter("../lib/hdl", "*"); !iter.end(); iter.next()) {
       std::string
 	target = iter.relativeName(),
-	dir = "../lib/hdl/" + target;
+	targetDir = "../lib/hdl/" + target;
       bool isDir;
-      if (OS::FileSystem::exists(dir, &isDir) && isDir) {
-	if (OS::FileSystem::exists(dir + "/" + w.m_implName + ".vhd")) {
+      if (OS::FileSystem::exists(targetDir, &isDir) && isDir) {
+	if (OS::FileSystem::exists(targetDir + "/" + w.m_implName + ".vhd")) {
 	  ocpiInfo("Found that worker was built for target: %s", target.c_str());
-	  makeFile += target + " ";
+	  targets += " " + target;
 	}
       }
     }
+    if (targets.empty()) // don't build for anything since worker was not built for anything
+      makeFile += "override HdlPlatforms:=\noverride HdlPlatform:=\n";
+    else
+      makeFile += "OnlyTargets=" + targets + "\n";
     makeFile += "\ninclude $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n";
 #if 1
     if ((err = OU::string2File(makeFile, dir + "/Makefile", false, true)))
