@@ -1462,7 +1462,7 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *pa
 HdlAssembly::
 HdlAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err)
   : Worker(xml, xfile, parentFile, Worker::Assembly, parent, NULL, err) {
-  if (!(err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS, (void*)0)) &&
+  if (!err && !(err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS, (void*)0)) &&
       !(err = OE::checkElements(xml, IMPL_ELEMS, HDL_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
     err = parseHdl();
 }

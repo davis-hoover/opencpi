@@ -37,7 +37,7 @@
 
 
 // N -bit counter with load, set and 2 increment
-module Counter(CLK,
+module BsvCounter(CLK,
                RST,
                Q_OUT,
                DATA_A, ADDA,

@@ -1148,7 +1148,7 @@ parse(ezxml_t x, const char *buildFile) {
     else
       return OU::esprintf("The include directory: \"%s\" is not a directory", ti.token());
   }
-  if ((err = getComponentLibraries(ezxml_cattr(x, "componentlibraries"), NULL,
+  if ((err = getComponentLibraries(ezxml_cattr(x, "componentlibraries"), NULL, false,
 				   m_componentLibraries)))
     return err;
   std::string prereqs;

@@ -89,7 +89,7 @@ override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlE
 # context when HdlTarget is set, but can also just supply it as $1.  The returned list is of the
 # form <path>:<lib>, where if the library is in the global namespace <lib> is the same as basename
 # <path>, but when the library is in the qualified namespace it is qualified
-override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlExplicitLibraries):$(MAKECMDGOALS):$(CURDIR))\
+override HdlLibrariesInternal=$(infox HLI:$1:$(HdlTarget):$(HdlExplicitLibraries))$(strip \
 $(if $(findstring clean,$(MAKECMDGOALS)),,\
 $(foreach l,$(call Unique,\
               $(- first process explicitly supplied libraries)\
@@ -106,7 +106,7 @@ $(foreach l,$(call Unique,\
                     $(foreach v,$(call HdlGetTop,$f),$(infox VVV:$v)\
 	              $(foreach x,$(filter-out $(LibName),fixed_float ocpi ocpi.core.bsv cdc),\
                         $(call HdlSearchPrimitivePath,$x,,HLI))))))),\
-  $(infox HLI:returning $l)$l))
+  $(infox HLI:returning $l)$l)))
 
 # For use by some tools
 define HdlSimNoLibraries

@@ -93,7 +93,7 @@ __HDL_SEARCH_MK__=x
 #  itself.
 
 # Return the list of exported HDL subdirectories of component libraries that have anything built for HDL
-HdlComponentLibraries=$(foreach d,$(OcpiComponentLibraries),$(call HdlExists,$d/hdl))
+HdlComponentLibraries=$(foreach d,$(call OcpiComponentLibraries),$(call HdlExists,$d/hdl))
 
 # Return list of target directories in all possible component libraries
 # For example, return a list of all component-library "target" directories.

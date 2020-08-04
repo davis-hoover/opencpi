@@ -17,5 +17,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 SourceFiles=trunc_round_16_to_12_signed.vhd
-ExcludeTargets=arria10soc_std
+ExcludeTargets=arria10soc_std cyclone5
 include $(OCPI_CDK_DIR)/include/worker.mk

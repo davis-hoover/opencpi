@@ -508,7 +508,7 @@ class HdlPlatform(Platform):
         self.exactpart = exactpart
         self.built = built
         self.dir = ocpiutil.rchop(directory, "/lib")
-        if self.dir and not package_id:
+        if self.dir and not package_id and os.path.exists(self.dir):
             self.package_id = ocpiutil.set_vars_from_make(self.dir + "/Makefile",
                                                           "ShellHdlPlatformVars=1 showpackage",
                                                           "verbose")["Package"][0]

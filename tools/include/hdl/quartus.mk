@@ -38,6 +38,7 @@ include $(OCPI_CDK_DIR)/include/hdl/altera.mk
 # For quartus, no precompilation is available, so it is just a directory
 # full of links whose name is the name of the library
 HdlToolLibraryFile=$2
+HdlRecurseLibraries_quartus=yes
 ################################################################################
 # Function required by toolset: given a list of targets for this tool set
 # Reduce it to the set of library targets.
@@ -161,7 +162,9 @@ QuartusMakeQsf=\
     $(if $(filter $c,$(Cores)),\
       $(call QuartusEchoFiles,$c,$(call HdlExtractSourcesForLib,$(HdlTarget),$c,$(TargetDir))),\
       $(foreach w,$(subst _rv,,$(basename $(notdir $c))),$(infox WWW:$w)\
-        $(call QuartusEchoFiles,$w,\
+        $(- for assemblies, where the assy file is verilog, we do not want any source files since\
+            we are not instantiating using "component" in VHDL)\
+        $(and $(filter-out assembly,$(HdlMode)),$(call QuartusEchoFiles,$w,\
           $(foreach d,$(dir $c),$(infox DDD:$d)\
             $(foreach l,$(if $(filter vhdl,$(HdlLanguage)),vhd,v),$(infox LLLLL:$l)\
               $(foreach f,$(or $(xxcall HdlExists,$d../gen/$w-defs.$l),\
@@ -170,15 +173,16 @@ QuartusMakeQsf=\
             $(and $(filter vhdl,$(HdlLanguage)),\
               $(foreach g,$(or $(call HdlExists,$d/generics.vhd),\
                                $(call HdlExists,$d/$(basename $(notdir $c))-generics.vhd)),\
-                $(call FindRelative,$(TargetDir),$g) )))))))\
+                $(call FindRelative,$(TargetDir),$g) ))))))))\
   echo '\# Search path(s) for local files'; \
   $(foreach d,$(call Unique,$(patsubst %/,%,$(dir $(QuartusSources)) $(VerilogIncludeDirs))), \
     echo set_global_assignment -name SEARCH_PATH '\"'$(strip \
      $(call FindRelative,$(TargetDir),$d))'\"';) \
   \
-  $(and $(HdlLibrariesInternal),echo '\#' Assignments for adding libraries to search path;) \
-  $(foreach l,$(HdlLibrariesInternal),\
-    $(foreach hlr,$(call HdlLibraryRefDir,$l,$(HdlTarget),,qts),$(info HLR:$(hlr))\
+  $(eval QuartusLibraries:=$(call HdlCollectLibraries,$(HdlTarget)))$(infox QLIBS:$(QuartusLibraries))\
+  $(and $(QuartusLibraries),echo '\#' Assignments for adding libraries to search path;) \
+  $(foreach l,$(QuartusLibraries),\
+    $(foreach hlr,$(call HdlLibraryRefDir,$l,$(HdlTarget),,qts),$(infox HLR:$(hlr))\
       $(if $(realpath $(hlr)),,$(error No altera library for $l at $(abspath $(hlr))))\
       echo set_global_assignment -name SEARCH_PATH '\"'$(call FindRelative,$(TargetDir),$(hlr))'\"'; \
       $(foreach f,$(wildcard $(hlr)/*_pkg.vhd),\
@@ -244,7 +248,7 @@ HdlToolPost=\
   fi;\
   for s in $(HdlToolFiles); do \
     if [[ $$s == *.vhd ]]; then \
-      echo -- synthesis library $(LibName) | cat - $$s > $(WorkLib)/`basename $$s`; \
+      echo -- synthesis library $(WorkLib) | cat - $$s > $(WorkLib)/`basename $$s`; \
     else \
       ln -s ../$$s $(WorkLib); \
     fi; \
