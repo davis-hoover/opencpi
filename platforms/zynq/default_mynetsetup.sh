@@ -74,7 +74,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   break # this script will be rerun recursively by setup.sh
 fi
 # Below this (until "done") is optional user customizations
-alias ll='ls -lt --color=auto'
+
 # Tell the ocpihdl utility to always assume the FPGA device is the zynq PL.
 export OCPI_DEFAULT_HDL_DEVICE=pl:0
 #prevent looking for simulation tools such as xsim
