@@ -23,8 +23,8 @@ TestApplications = test_data_generator
 include $(OCPI_CDK_DIR)/include/test.mk
 
 # Our input generator depends on this file.
-inputs: gen/mytestdata
+inputs: | gen/mytestdata
 
 gen/mytestdata: | gen
 	$(AT)echo Generating test data file: $@
-	$(AT)ln -s `which ocpirun` gen/mytestdata
+	$(AT)rm -f gen/mytestdata && cp `which ocpirun` gen/mytestdata

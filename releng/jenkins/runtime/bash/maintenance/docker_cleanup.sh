@@ -43,7 +43,7 @@ docker_rm() {
 
 docker_rmi() {
   echo "--- Removing image '$1' ---"
-  if [[ ! "$1" =~ angryviper ]]; then
+  if [[ ! "$1" =~ av ]]; then
     # Echo given direct hash; tell clean name
     docker images | grep $1
   fi
@@ -95,15 +95,15 @@ done
 echo "Erase old prereq images:"
 declare -A imgs
 # imgs[develop-7]=99
-for img in $(docker images angryviper/rpmbuild --format "{{.Tag}}" | sort -rn); do
-  img_os=$(docker inspect angryviper/rpmbuild:${img} | grep jenkins/ocpibuild | perl -ne '/-C(\d)/ && print $1')
-  img_branch=$(docker inspect angryviper/rpmbuild:${img} | perl -ne '/GIT_BRANCH_NAME=(.*?)"/ && print $1')
+for img in $(docker images av/rpmbuild --format "{{.Tag}}" | sort -rn); do
+  img_os=$(docker inspect av/rpmbuild:${img} | grep jenkins/ocpibuild | perl -ne '/-C(\d)/ && print $1')
+  img_branch=$(docker inspect av/rpmbuild:${img} | perl -ne '/GIT_BRANCH_NAME=(.*?)"/ && print $1')
   echo "Found Image: ${img}: OS=${img_os} Branch=${img_branch}"
   if [ -z "${imgs[${img_branch}-${img_os}]}" ]; then
     eval "imgs[${img_branch}-${img_os}]=${img}"
   else
     echo "That OS/Branch combo was already found in ${imgs[${img_branch}-${img_os}]}"
-    docker_rmi angryviper/rpmbuild:${img}
+    docker_rmi av/rpmbuild:${img}
   fi
 done
 unset imgs
@@ -111,28 +111,28 @@ unset imgs
 # A lot of copy/paste...
 # These are versioned as "XXX-CX"
 # Should probably only erase more than X days: https://stackoverflow.com/a/33855110
-# docker inspect -f '{{.Id}} {{.Created }}' $(docker images angryviper/rpminstalled -q)
+# docker inspect -f '{{.Id}} {{.Created }}' $(docker images av/rpminstalled -q)
 echo "Erase old installed RPM images:"
 declare -A imgs
-for img in $(docker images angryviper/rpminstalled --format "{{.Tag}}" | sort -rn); do
-  # img_os=$(docker inspect angryviper/rpminstalled:${img} | grep jenkins/ocpibuild | perl -ne '/-C(\d)/ && print $1')
+for img in $(docker images av/rpminstalled --format "{{.Tag}}" | sort -rn); do
+  # img_os=$(docker inspect av/rpminstalled:${img} | grep jenkins/ocpibuild | perl -ne '/-C(\d)/ && print $1')
   img_os=$(echo ${img} | perl -ne '/-C(\d)/ && print $1')
-  img_branch=$(docker inspect angryviper/rpminstalled:${img} | perl -ne '/GIT_BRANCH_NAME=(.*?)"/ && print $1')
+  img_branch=$(docker inspect av/rpminstalled:${img} | perl -ne '/GIT_BRANCH_NAME=(.*?)"/ && print $1')
   echo "Found Image: ${img}: OS=${img_os} Branch=${img_branch}"
   if [ -z "${imgs[${img_branch}-${img_os}]}" ]; then
     eval "imgs[${img_branch}-${img_os}]=${img}"
   else
     echo "That OS/Branch combo was already found in ${imgs[${img_branch}-${img_os}]}"
-    docker_rmi angryviper/rpminstalled:${img}
+    docker_rmi av/rpminstalled:${img}
   fi
 done
 unset imgs
 
 # Now the same with the Jenkins 2 stuff
-# Images will have format of angryviper/BRANCHNAMEx or angryviper/BRANCHNAME-prereq :(bldid)-C{6,7}
+# Images will have format of av/BRANCHNAMEx or av/BRANCHNAME-prereq :(bldid)-C{6,7}
 # (I don't think the prereq ones exist any more)
 echo "Erase old install RPM images (Jenkins 2):"
-for branch in $(docker images 'angryviper/*' --format "{{.Repository}}" | sed -e 's/-prereq//g' | sort -u | cut -f2 -d/); do
+for branch in $(docker images 'av/*' --format "{{.Repository}}" | sed -e 's/-prereq//g' | sort -u | cut -f2 -d/); do
   # Might have an extra 'x' at the end
   branch=${branch%x}
   echo "Checking branch: ${branch}"
@@ -144,17 +144,17 @@ for branch in $(docker images 'angryviper/*' --format "{{.Repository}}" | sed -e
     rmi_limit="0" # Delete all
   fi
   for os in 6 7; do
-    for tag in $(docker images angryviper/${branch}-prereq --format "{{.Tag}}" | sort -n | grep C${os} | head -n -${rmi_limit}); do
-      # echo "Removing prereq: angryviper/${branch}-prereq:${tag}"
-      docker_rmi angryviper/${branch}-prereq:${tag}
+    for tag in $(docker images av/${branch}-prereq --format "{{.Tag}}" | sort -n | grep C${os} | head -n -${rmi_limit}); do
+      # echo "Removing prereq: av/${branch}-prereq:${tag}"
+      docker_rmi av/${branch}-prereq:${tag}
     done
-    for tag in $(docker images angryviper/${branch} --format "{{.Tag}}" | sort -n | grep C${os} | head -n -${rmi_limit}); do
-      # echo "Removing non-prereq: angryviper/${branch}:${tag}"
-      docker_rmi angryviper/${branch}:${tag}
+    for tag in $(docker images av/${branch} --format "{{.Tag}}" | sort -n | grep C${os} | head -n -${rmi_limit}); do
+      # echo "Removing non-prereq: av/${branch}:${tag}"
+      docker_rmi av/${branch}:${tag}
     done
   done # os
   echo "The following images remain for the branch ${branch}:"
-  docker images angryviper/${branch}* --format "{{.Repository}}:{{.Tag}}*{{.CreatedSince}}*({{.Size}})" | column -t -s '*' | sort | egrep "\b${branch}\b"
+  docker images av/${branch}* --format "{{.Repository}}:{{.Tag}}*{{.CreatedSince}}*({{.Size}})" | column -t -s '*' | sort | egrep "\b${branch}\b"
 done # branch
 
 echo "Erasing dangling images:"
@@ -168,7 +168,7 @@ fi
 
 echo "Erasing old images:"
 # Now check for super old images
-for img in $(docker images 'angryviper/*' | grep 'months ago' | column -t -o'*' | cut -f3 -d'*'); do
+for img in $(docker images 'av/*' | grep 'months ago' | column -t -o'*' | cut -f3 -d'*'); do
   docker_rmi ${img}
 done
 

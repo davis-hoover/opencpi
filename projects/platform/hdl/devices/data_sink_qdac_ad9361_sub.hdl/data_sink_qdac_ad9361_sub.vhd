@@ -25,7 +25,7 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 use ocpi.util.all;
-library bsv; use bsv.bsv.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 library unisim; use unisim.vcomponents.all;
 library protocol, cdc;
 architecture rtl of worker is
@@ -77,22 +77,19 @@ architecture rtl of worker is
   signal wsi_full_duplex : std_logic := '0';
   signal wsi_data_rate   : std_logic := '0';
   signal wsi_clear       : std_logic := '0';
-  signal wsi_reset_n     : std_logic := '1';
-  signal wsi_use_two_r_two_t_timing : std_logic := '0';
-  signal wsi_txen                   : std_logic := '0';
-  -- AD9361 TX clock divided by 2 clock domain signals
-  signal dacd2_clk              : std_logic := '0';
+  signal wsi_txen        : std_logic := '0';
+  signal dacd2_clk       : std_logic := '0';
 
   -- manually duplicate these register to aid in timing
   signal dacd2_processing_ch0   : std_logic_vector(dac_width-1 downto 0) := (others => '1');
   signal dacd2_processing_ch0_r : std_logic_vector(dac_width-1 downto 0) := (others => '1');
 
-  signal dacd2_ch0_i_r          : std_logic_vector(dac_width-1 downto 0) := (others => '0');
-  signal dacd2_ch0_q_r          : std_logic_vector(dac_width-1 downto 0) := (others => '0');
-  signal dacd2_ch1_i_r          : std_logic_vector(dac_width-1 downto 0) := (others => '0');
-  signal dacd2_ch1_q_r          : std_logic_vector(dac_width-1 downto 0) := (others => '0');
-  signal dacd2_i_r              : std_logic_vector(dac_width-1 downto 0) := (others => '0');
-  signal dacd2_q_r              : std_logic_vector(dac_width-1 downto 0) := (others => '0');
+  signal dacd2_data_i           : dac.dac.array_data_t(0 to NUM_CHANS-1) := (others => (others => '0'));
+  signal dacd2_data_q           : dac.dac.array_data_t(0 TO NUM_CHANS-1) := (others => (others => '0'));
+  signal dacd2_data_i_r         : dac.dac.array_data_t(0 to NUM_CHANS-1) := (others => (others => '0'));
+  signal dacd2_data_q_r         : dac.dac.array_data_t(0 TO NUM_CHANS-1) := (others => (others => '0'));
+  signal dacd2_data_i_chans     : std_logic_vector(dac_width-1 downto 0) := (others => '0');
+  signal dacd2_data_q_chans     : std_logic_vector(dac_width-1 downto 0) := (others => '0');
   signal dacd2_use_two_r_two_t_timing_rr : std_logic := '0';
   signal dacd2_num_channels_config : std_logic_vector(1 downto 0) := (others => '0'); -- 00 : 1R1T
                                                                                       -- 01 : 1R2T
@@ -100,6 +97,10 @@ architecture rtl of worker is
                                                                                       -- 11 : 2R2T
   signal dacd2_tx_frame_ddr_first_r : std_logic := '0';
   signal dacd2_tx_frame_ddr_second_r : std_logic := '1';
+  signal dacd2_take     : std_logic_vector(0 to NUM_CHANS-1) :=
+                          (others => '0');
+  signal dacd2_data_vld   : std_logic_vector(0 to NUM_CHANS-1) :=
+                            (others => '0');
   -- AD9361 TX clock domain signals
   signal dac_data_ddr_first_r   : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
   signal dac_data_ddr_second_r  : std_logic_vector(data_width_from_pins-1 downto 0) := (others => '0');
@@ -110,6 +111,8 @@ architecture rtl of worker is
   signal TX_FRAME_P_s : std_logic := '0';
 
   signal wci_use_two_r_two_t_timing : std_logic := '0';
+  signal wci_reset_n                : std_logic := '1';
+  signal wci_is_operating           : std_logic := '0';
   signal wsi_clk        : std_logic := '0';
   signal wsi_data_i     : dac.dac.array_data_t(0 to NUM_CHANS-1) :=
                           (others=> (others => '0'));
@@ -138,7 +141,6 @@ architecture rtl of worker is
   signal wsi_in0_connected : std_logic := '0';
   signal wsi_in1_connected : std_logic := '0';
   signal wsi_is_operating  : std_logic := '0';
-  signal wci_is_operating  : std_logic := '0';
 
   attribute equivalent_register_removal : string;
   attribute equivalent_register_removal of dacd2_processing_ch0 : signal is "no";
@@ -180,6 +182,21 @@ begin
 
   end generate;
 
+  wsi_data_i(0)     <= dev_data_ch0_in_in.data_i(
+      dev_data_ch0_in_in.data_i'left downto 
+      dev_data_ch0_in_in.data_i'left-dac_width+1);
+  wsi_data_i(1)     <= dev_data_ch1_in_in.data_i(
+      dev_data_ch0_in_in.data_i'left downto 
+      dev_data_ch0_in_in.data_i'left-dac_width+1);
+  wsi_data_q(0)     <= dev_data_ch0_in_in.data_q(
+      dev_data_ch0_in_in.data_i'left downto 
+      dev_data_ch0_in_in.data_i'left-dac_width+1);
+  wsi_data_q(1)     <= dev_data_ch1_in_in.data_q(
+      dev_data_ch0_in_in.data_i'left downto 
+      dev_data_ch0_in_in.data_i'left-dac_width+1);
+  wsi_data_valid(0) <= dev_data_ch0_in_in.valid;
+  wsi_data_valid(1) <= dev_data_ch1_in_in.valid;
+
   -- ******* ALL CMOS-SPECIFIC DAC DATA INTERLEAVING HDL CODE IS *******
   -- ******* INTENDED TO EXIST WITHIN THIS IF/GENERATE           *******
   data_mode_cmos : if LVDS_p = bfalse generate
@@ -191,24 +208,14 @@ begin
                             (HALF_DUPLEX_p = bfalse) and
                             (DATA_RATE_CONFIG_p = DDR_e) generate
 
-      wsi_data_i(0)     <= dev_data_ch0_in_in.data_i(
-          dev_data_ch0_in_in.data_i'left downto 
-          dev_data_ch0_in_in.data_i'left-dac_width+1);
-      wsi_data_i(1)     <= dev_data_ch1_in_in.data_i(
-          dev_data_ch0_in_in.data_i'left downto 
-          dev_data_ch0_in_in.data_i'left-dac_width+1);
-      wsi_data_q(0)     <= dev_data_ch0_in_in.data_q(
-          dev_data_ch0_in_in.data_i'left downto 
-          dev_data_ch0_in_in.data_i'left-dac_width+1);
-      wsi_data_q(1)     <= dev_data_ch1_in_in.data_q(
-          dev_data_ch0_in_in.data_i'left downto 
-          dev_data_ch0_in_in.data_i'left-dac_width+1);
-      wsi_data_valid(0) <= dev_data_ch0_in_in.valid;
-      wsi_data_valid(1) <= dev_data_ch1_in_in.valid;
-
       wsi_clk_gen : entity work.one_wsi_clock_per_dac_sample_generator
         generic map(
-          NUM_CHANS => NUM_CHANS)
+          NUM_CHANS                  => NUM_CHANS,
+          MODE                       => "CMOS",
+          FIRST_DIVIDER_TYPE         => "REGISTER",
+          FIRST_DIVIDER_ROUTABILITY  => "GLOBAL",
+          SECOND_DIVIDER_TYPE        => "REGISTER",
+          SECOND_DIVIDER_ROUTABILITY => "GLOBAL")
         port map(
           -- to/from supported worker
           wci_use_two_r_two_t_timing => wci_use_two_r_two_t_timing,
@@ -216,15 +223,16 @@ begin
           wsi_data_in_i              => wsi_data_i,
           wsi_data_in_q              => wsi_data_q,
           wsi_data_in_valid          => wsi_data_valid,
+          wsi_txen                   => wsi_txen,
           -- clock handling
           dac_clk                    => dev_data_clk_in.DATA_CLK_P,
-          dacd2_clk                  => open,
-          dacd4_clk                  => open,
+          someclk                    => open,
           -- to/from data_interleaver
-          dac_data_i                 => dac_data_i,
-          dac_data_q                 => dac_data_q,
-          dac_data_vld               => dac_data_vld,
-          dac_take                   => dac_take);
+          someclk_data_i             => dac_data_i,
+          someclk_data_q             => dac_data_q,
+          someclk_data_vld           => dac_data_vld,
+          someclk_take               => dac_take,
+          dac_txen                   => dev_txen_out.txen);
 
       --dac_data_test_gen : process(dev_data_clk_in.DATA_CLK_P)
       --begin
@@ -275,24 +283,15 @@ begin
                       (HALF_DUPLEX_p       = bfalse) and
                       (DATA_RATE_CONFIG_p  = DDR_e) generate
   begin
-    wsi_data_i(0)     <= dev_data_ch0_in_in.data_i(
-        dev_data_ch0_in_in.data_i'left downto 
-        dev_data_ch0_in_in.data_i'left-dac_width+1);
-    wsi_data_i(1)     <= dev_data_ch1_in_in.data_i(
-        dev_data_ch0_in_in.data_i'left downto 
-        dev_data_ch0_in_in.data_i'left-dac_width+1);
-    wsi_data_q(0)     <= dev_data_ch0_in_in.data_q(
-        dev_data_ch0_in_in.data_i'left downto 
-        dev_data_ch0_in_in.data_i'left-dac_width+1);
-    wsi_data_q(1)     <= dev_data_ch1_in_in.data_q(
-        dev_data_ch0_in_in.data_i'left downto 
-        dev_data_ch0_in_in.data_i'left-dac_width+1);
-    wsi_data_valid(0) <= dev_data_ch0_in_in.valid;
-    wsi_data_valid(1) <= dev_data_ch1_in_in.valid;
 
     wsi_clk_gen : entity work.one_wsi_clock_per_dac_sample_generator
       generic map(
-        NUM_CHANS => NUM_CHANS)
+        NUM_CHANS                  => NUM_CHANS,
+        MODE                       => "LVDS",
+        FIRST_DIVIDER_TYPE         => "BUFFER",
+        FIRST_DIVIDER_ROUTABILITY  => "REGIONAL",
+        SECOND_DIVIDER_TYPE        => "REGISTER",
+        SECOND_DIVIDER_ROUTABILITY => "GLOBAL")
       port map(
         -- to/from supported worker
         wci_use_two_r_two_t_timing => wci_use_two_r_two_t_timing,
@@ -300,15 +299,16 @@ begin
         wsi_data_in_i              => wsi_data_i,
         wsi_data_in_q              => wsi_data_q,
         wsi_data_in_valid          => wsi_data_valid,
+        wsi_txen                   => wsi_txen,
         -- clock handling
         dac_clk                    => dev_data_clk_in.DATA_CLK_P,
-        dacd2_clk                  => dacd2_clk,
-        dacd4_clk                  => open,
+        someclk                    => dacd2_clk,
         -- to/from data_interleaver
-        dac_data_i                 => dac_data_i,
-        dac_data_q                 => dac_data_q,
-        dac_data_vld               => dac_data_vld,
-        dac_take                   => dac_take);
+        someclk_data_i             => dacd2_data_i,
+        someclk_data_q             => dacd2_data_q,
+        someclk_data_vld           => dacd2_data_vld,
+        someclk_take               => dacd2_take,
+        dac_txen                   => dev_txen_out.txen);
 
     dev_data_ch0_in_out.clk <= wsi_clk;
     dev_data_ch1_in_out.clk <= wsi_clk;
@@ -319,24 +319,24 @@ begin
     -- capture timing are the same as if configured for a 2R2T system.
     -- However, in the path with only a single channel used, the
     -- disabled channel’s I-Q pair in each data group is unused."
-    wsi_use_two_r_two_t_timing <= dev_cfg_data_in.config_is_two_r or
+    wci_use_two_r_two_t_timing <= dev_cfg_data_in.config_is_two_r or
                                   dev_cfg_data_tx_in.config_is_two_t or
                                   dev_cfg_data_tx_in.force_two_r_two_t_timing;
 
-    wsi_reset_n <= not wci_reset;
+    wci_reset_n <= not wci_reset;
     -- sync (WSI clock domain) -> (DAC clock divided by 2
     -- domain), note that we don't care if WSI clock is much faster and bits are
     -- dropped - wsi_use_two_r_two_t_timing is a configuration bit which is
     -- expected to change very rarely in relation to either clock
-    second_chan_enable_sync : bsv.bsv.SyncBit
+    second_chan_enable_sync : bsv_pkg.SyncBit
       generic map(
         init   => 0)
       port map(
         sCLK   => wci_clk,
-        sRST   => wsi_reset_n, -- apparently sRST is active-low
+        sRST   => wci_reset_n, -- apparently sRST is active-low
         dCLK   => dacd2_clk,
         sEN    => '1',
-        sD_IN  => wsi_use_two_r_two_t_timing,
+        sD_IN  => wci_use_two_r_two_t_timing,
         dD_OUT => dacd2_use_two_r_two_t_timing_rr); -- delayed by one WSI clock, two DACD2 clocks
 
     -- take is delayed version of vld to ensure that there is always at least
@@ -345,11 +345,14 @@ begin
     take_regs : process(dacd2_clk)
     begin
       if rising_edge(dacd2_clk) then
+        -- CDC between clocks that have a fixed-phase relationship, so there is no expected
+        -- metastability here (relying on static timing analysis to identify setup/hold violations)
+        --
         -- chose dacd2_processing_ch0 idx 0 but we could have done any idx
-        dac_take(0) <= dac_data_vld(0) and
-                       dacd2_processing_ch0(0);
-        dac_take(1)<= dac_data_vld(1) and
-                      (not dacd2_processing_ch0(0));
+        dacd2_take(0) <= dacd2_data_vld(0) and
+                         dacd2_processing_ch0(0);
+        dacd2_take(1)<= dacd2_data_vld(1) and
+                        (not dacd2_processing_ch0(0));
       end if;
     end process;
 
@@ -368,9 +371,9 @@ begin
       dacd2_ch0_regs : process(dacd2_clk)
       begin
         if rising_edge(dacd2_clk) then
-          if (dac_data_vld(0) = '1') and (dacd2_processing_ch0(idx) = '1') then
-            dacd2_ch0_i_r(idx) <= dev_data_ch0_in_in.data_i(idx);
-            dacd2_ch0_q_r(idx) <= dev_data_ch0_in_in.data_q(idx);
+          if (dacd2_data_vld(0) = '1') and (dacd2_processing_ch0(idx) = '1') then
+            dacd2_data_i_r(0)(idx) <= dacd2_data_i(0)(idx);
+            dacd2_data_q_r(0)(idx) <= dacd2_data_q(0)(idx);
           end if;
         end if;
       end process;
@@ -378,20 +381,20 @@ begin
       dacd2_ch1_regs : process(dacd2_clk)
       begin
         if rising_edge(dacd2_clk) then
-          if (dac_data_vld(1) = '1') and (dacd2_processing_ch0(idx) = '0') then
-            dacd2_ch1_i_r(idx) <= dev_data_ch1_in_in.data_i(idx);
-            dacd2_ch1_q_r(idx) <= dev_data_ch1_in_in.data_q(idx);
+          if (dacd2_data_vld(1) = '1') and (dacd2_processing_ch0(idx) = '0') then
+            dacd2_data_i_r(1)(idx) <= dacd2_data_i(1)(idx);
+            dacd2_data_q_r(1)(idx) <= dacd2_data_q(1)(idx);
           end if;
         end if;
       end process;
 
       -- channel serialization mux (chan 0 one dacd2_clk, chan 1 next dacd2_clk)
-      dacd2_i_r(idx) <= dacd2_ch0_i_r(idx) when
-                        (dacd2_processing_ch0_r(idx) = '1') else
-                        dacd2_ch1_i_r(idx);
-      dacd2_q_r(idx) <= dacd2_ch0_q_r(idx) when
-                        (dacd2_processing_ch0_r(idx) = '1') else
-                        dacd2_ch1_q_r(idx);
+      dacd2_data_i_chans(idx) <= dacd2_data_i_r(0)(idx) when
+                                 (dacd2_processing_ch0_r(idx) = '1') else
+                                 dacd2_data_i_r(1)(idx);
+      dacd2_data_q_chans(idx) <= dacd2_data_q_r(0)(idx) when
+                                 (dacd2_processing_ch0_r(idx) = '1') else
+                                 dacd2_data_q_r(1)(idx);
     end generate reg_duplication_loop;
 
     -- 12-bit word-> 6-bit word serialization registers (high 6 bits one
@@ -400,11 +403,15 @@ begin
     begin
       if rising_edge(dev_data_clk_in.DATA_CLK_P) then
         if dacd2_clk = '1' then
-          dac_data_ddr_first_r  <= dacd2_i_r(dac_width-1 downto dac_width/2);
-          dac_data_ddr_second_r <= dacd2_q_r(dac_width-1 downto dac_width/2);
+          -- CDC between clocks that have a fixed-phase relationship, so there is no expected
+          -- metastability here (relying on static timing analysis to identify setup/hold violations)
+          dac_data_ddr_first_r  <= dacd2_data_i_chans(dac_width-1 downto dac_width/2);
+          dac_data_ddr_second_r <= dacd2_data_q_chans(dac_width-1 downto dac_width/2);
         else
-          dac_data_ddr_first_r  <= dacd2_i_r((dac_width/2)-1 downto 0);
-          dac_data_ddr_second_r <= dacd2_q_r((dac_width/2)-1 downto 0);
+          -- CDC between clocks that have a fixed-phase relationship, so there is no expected
+          -- metastability here (relying on static timing analysis to identify setup/hold violations)
+          dac_data_ddr_first_r  <= dacd2_data_i_chans((dac_width/2)-1 downto 0);
+          dac_data_ddr_second_r <= dacd2_data_q_chans((dac_width/2)-1 downto 0);
         end if;
       end if;
     end process;
@@ -544,7 +551,5 @@ begin
       event_in_connected_1 => wsi_in1_connected,
       is_operating_1       => wsi_is_operating,
       txen                 => wsi_txen);
-
-  dev_txen_out.txen <= wsi_txen;
 
 end rtl;

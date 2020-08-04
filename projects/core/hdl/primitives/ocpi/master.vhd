@@ -18,7 +18,7 @@
 
 -- A WSI master
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
-library ocpi; use ocpi.all, ocpi.types.all, ocpi.wsi.all, ocpi.util.all;
+library ocpi; use ocpi.all, ocpi.types.all, ocpi.util.all;
 entity master is
   generic (precise          : boolean; -- are we precise-only?
            mdata_width      : natural; -- width of mdata path

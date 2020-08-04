@@ -1,0 +1,73 @@
+OCPIDEV-UNREGISTER(1)
+=====================
+
+
+NAME
+----
+ocpidev-unregister - remove a project from a project registry.
+
+
+SYNOPSIS
+--------
+*ocpidev* ['<options>'] *unregister project*
+
+
+DESCRIPTION
+-----------
+The *ocpidev unregister* command removes the current project from its registry.
+Registering a project makes its exports visible and usable to other projects
+using the same registry. Unregistering a project removes this visiblity.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*project*::
+    Register the project in a registry.
+
+OPTIONS
+-------
+The general purpose options (*`-v`* and *`-d`* '<directory>') can be used.
+In particular, the *`-d`* '<directory>' option can be used to specify
+the pathname of the project being unregistered.
+There are no verb-specific options.
+
+EXAMPLES
+--------
+. Unregister the current project from its registry:
++
+----------------------
+ocpidev unregister project
+----------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

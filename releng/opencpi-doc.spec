@@ -16,44 +16,39 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Name: opencpi-doc
-Version: %{RPM_VERSION}
-Release: %{RPM_RELEASE}%{?RELEASE_TAG}%{?COMMIT_TAG}%{?dist}
+Name:      opencpi-doc
+Version:   %{RPM_VERSION}
+Release:   %{RPM_RELEASE}%{?RELEASE_TAG}%{?COMMIT_TAG}%{?dist}
 BuildArch: noarch
-BuildRequires: ghostscript rubber unoconv
+Source0:   %{name}-%{RPM_VERSION}.tar.gz
 
 Summary:   OpenCPI Documentation
 Group:     Documentation
 
-License:        LGPLv3+
-Vendor:         ANGRYVIPER Team
-Packager:       ANGRYVIPER Team <discuss@lists.opencpi.org>
+License:   LGPLv3+
+URL:       https://opencpi.org
+Vendor:    OpenCPI
+Packager:  OpenCPI <discuss@lists.opencpi.org>
+
+Requires:  man
 
 %description
-PDFs and HTML index file installed into %{_pkgdocdir}
+Man pages, PDFs and HTML index files installed into %{_pkgdocdir}
 %if "0%{?COMMIT_HASH}"
 Release ID: %{COMMIT_HASH}
 %endif
 
 %prep
-# Empty; rpmlint recommendeds it is present anyway
+%setup -c -q
 
 %build
-cd %{SRC_BASE}
-make doc
-find doc/pdfs -type d \( -name '*@tmp' -o -name logs \) -print0 | xargs -r0 rm -rf
+# Nothing to build
 
 %install
-%{__mkdir_p} %{buildroot}/%{_pkgdocdir}/
-cd %{SRC_BASE}/doc/pdfs
-%{__cp} -R . %{buildroot}/%{_pkgdocdir}/
-%{__mkdir_p} %{buildroot}/opt/opencpi/
-%{__ln_s} -f %{_pkgdocdir}/ %{buildroot}/opt/opencpi/doc
-%{__ln_s} -f %{_pkgdocdir}/index.html %{buildroot}/opt/opencpi/documentation.html
+%{__mkdir_p} %{buildroot}/opt/opencpi/doc/
+%{__cp} -r . %{buildroot}/opt/opencpi/doc/
 
 %files
-%defattr(-,opencpi,opencpi,-)
-%dir %{_pkgdocdir}
-%doc %{_pkgdocdir}
-%doc /opt/opencpi/doc
-%doc /opt/opencpi/documentation.html
+%defattr(0444,root,root,0555)
+%dir /opt/opencpi/doc
+%doc /opt/opencpi/doc/*

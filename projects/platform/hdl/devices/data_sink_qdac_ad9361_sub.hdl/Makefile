@@ -16,11 +16,14 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-OnlyTargets=zynq zynq_ise isim xsim # cause of BUFR primitive
+OnlyTargets=zynq zynq_ise zynq_ultra isim xsim # cause of BUFR primitive
 
-SourceFiles+=ad936x_tx_data_cmos_single_port_fdd_ddr.vhd \
+SourceFiles+= \
+	clock_selector_with_async_select.vhd \
+	ad936x_tx_data_cmos_single_port_fdd_ddr.vhd \
 	ad9361_dac_sub_cmos_single_port_fdd_ddr.vhd \
-	clock_manager_xilinx_7_series.vhd \
+	clock_divider.vhd \
+	clock_manager.vhd \
 	one_wsi_clock_per_dac_sample_generator.vhd
 
 # During the build process, swap HdlTarget with 'actual' target part of the target platform
@@ -31,7 +34,4 @@ HdlExactPart=\
 	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
 	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484))
 
-HdlLibraries+=cdc
-HdlLibraries+=dac
-HdlLibraries+=protocol
 include $(OCPI_CDK_DIR)/include/worker.mk

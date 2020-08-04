@@ -140,7 +140,7 @@ HdlToolSet_stratix5:=quartus
 HdlToolSet_arria10soc:=quartus_pro
 HdlToolSet_arria10soc_std:=quartus
 HdlToolSet_cyclone5:=quartus
-	
+
 # Call the tool-specific function to get the full part incase the
 # tool needs to rearrange the different part elements
 # If the tool does not define this function, return part as-is
@@ -189,7 +189,7 @@ HdlAddPlatform=\
   $(if $(HdlPlatformDir_$2),,\
     $(eval include $1/$2.mk)\
     $(if $(call HdlGetFamily,$(HdlPart_$2)),\
-      $(eval HdlAllPlatforms+=$2)\
+      $(eval HdlAllPlatforms:=$(strip $(HdlAllPlatforms) $2))\
       $(eval HdlPlatformDir_$2:=$3)\
       $(if $(or \
              $(call OcpiExists,$3/lib/hdl/$(HdlFamily_$(HdlPart_$2))),\
@@ -219,15 +219,18 @@ HdlDoPlatform=\
 
 # Handle a directory named "platforms", exported or not
 HdlDoPlatformsDir=\
+  $(- if the project has been exported at all, even without building, the $1/mk will be there)\
   $(if $(wildcard $1/mk),\
     $(foreach d,$(wildcard $1/mk/*.mk),\
       $(foreach p,$(basename $(notdir $d)),\
+        $(- the 3rd arg is a directory that may not exist yet)\
         $(call HdlAddPlatform,$1/mk,$p,$1/$p))),\
     \
+    $(- no $1/mk means we are pointing into the source tree, so the platform dir points into "lib")\
+    $(- and the lib subdir may not exist yet)\
     $(foreach d,$(wildcard $1/*),\
       $(foreach p,$(notdir $d),\
-        $(if $(wildcard $d/$p.mk)$(wildcard $d/lib/$p.mk),\
-          $(call HdlDoPlatform,$d)))))
+        $(and $(wildcard $d/$p.mk),$(call HdlDoPlatform,$d)))))
 
 ################################################################################
 # $(call HdlGetTargetFromPart,hdl-part)
@@ -278,8 +281,8 @@ export OCPI_ALL_HDL_TARGETS:=$(HdlAllTargets)
 
 $(call OcpiDbgVar,HdlAllPlatforms)
 # This is dirs where platforms might be found
-OcpiHdlPlatformPaths=$(call Unique,\
-  $(foreach p,$(OCPI_PROJECT_REL_DIR),\
+OcpiHdlPlatformPaths=$(call Unique,$(infox PRD:$(OCPI_PROJECT_REL_DIR))\
+  $(foreach p,$(OCPI_PROJECT_REL_DIR),$(infox PPPPPP:$p:$(CURDIR))\
     $(call OcpiExists,$p/hdl/platforms))\
   $(foreach p,$(OcpiGetExtendedProjectPath),\
     $(or $(call OcpiExists,$p/exports/hdl/platforms),$(strip\
@@ -323,6 +326,7 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
        $(foreach p,$(HdlAllPlatforms),\
          HdlFamily_$(HdlPart_$p)=$(call HdlGetFamily,$(HdlPart_$p));)\
        $(foreach p,$(HdlAllPlatforms),\
-         HdlPlatformDir_$(p)="$(realpath $(HdlPlatformDir_$(p)))";))
+         $(- only use realpath if its there.  If not we are bootstrapping and leave it alone)\
+         HdlPlatformDir_$(p)="$(or $(realpath $(HdlPlatformDir_$p)),$(HdlPlatformDir_$p))";))
 endif
 endif

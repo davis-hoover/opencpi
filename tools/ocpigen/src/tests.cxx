@@ -261,7 +261,10 @@ namespace {
       ocpiCheck(excludeWorkersTmp.erase(wname) == 1);
       return NULL;
     }
-    OU::format(file, "../%s/%s.xml", wname, name.c_str());
+    //OU::format(file, "../%s/%s.xml", wname, name.c_str());
+    // Find the worker under lib, so we are looking at things that are built and also so that
+    // the actual platform-specific build is easily relative to the OWD here
+    OU::format(file, "../lib/%s/%s.xml", dot+1, name.c_str());
     if (!OS::FileSystem::exists(file)) {
       if (matchSpec && specific)
         return OU::esprintf("For worker \"%s\", cannot open file \"%s\"", wname, file.c_str());
@@ -274,7 +277,7 @@ namespace {
     bool missing;
     if (!err && (matchSpec ? w->m_specName == matchName :
                  w->m_emulate && w->m_emulate->m_implName == matchName) &&
-        !(err = w->parseBuildFile(true, &missing, &testFile))) {
+        !(err = w->parseBuildFile(true, &missing, testFile))) {
       if (verbose)
         fprintf(stderr,
                 "Found worker for %s:  %s\n", matchSpec ? "this spec" : "emulating this worker",
@@ -1650,6 +1653,40 @@ namespace {
     OS::FileSystem::mkdir(dir, true);
     assyDirs.insert(name);
     const char *err;
+    ocpiInfo("Generating assembly for worker: %s in file %s filename %s spec %s",
+	     w.cname(), w.m_file.c_str(), w.m_fileName.c_str(), w.m_specFile.c_str());
+    std::string makeFile;
+    // Only build for sim targets if using vhdlfileio
+    if (hdlFileIO)
+      makeFile +=
+	"override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
+	"override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n";
+    // Only build the assembly for targets that are built
+    std::string targets;
+    // Only build for targets for which the worker is built
+    // Note the worker may have been build for "no targets", and thus exist in the "lib" directory
+    // of the library, without having been built for.
+    for (OS::FileIterator iter("../lib/hdl", "*"); !iter.end(); iter.next()) {
+      std::string
+	target = iter.relativeName(),
+	targetDir = "../lib/hdl/" + target;
+      bool isDir;
+      if (OS::FileSystem::exists(targetDir, &isDir) && isDir) {
+	if (OS::FileSystem::exists(targetDir + "/" + w.m_implName + ".vhd")) {
+	  ocpiInfo("Found that worker was built for target: %s", target.c_str());
+	  targets += " " + target;
+	}
+      }
+    }
+    if (targets.empty()) // don't build for anything since worker was not built for anything
+      makeFile += "override HdlPlatforms:=\noverride HdlPlatform:=\n";
+    else
+      makeFile += "OnlyTargets=" + targets + "\n";
+    makeFile += "\ninclude $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n";
+#if 1
+    if ((err = OU::string2File(makeFile, dir + "/Makefile", false, true)))
+      return err;
+#else
     if ((err = OU::string2File(hdlFileIO ?
                      "override HdlPlatform:=$(filter %sim,$(HdlPlatform))\n"
                      "override HdlPlatforms:=$(filter %sim,$(HdlPlatforms))\n"
@@ -1657,6 +1694,7 @@ namespace {
                      "include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk\n",
                      dir + "/Makefile", false, true)))
         return err;
+#endif
     std::string assy;
     OU::format(assy,
                "<HdlAssembly%s>\n"
@@ -1739,7 +1777,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   // This will be parsed again for build/Makefile purposes.
   // THIS MUST BE IN SYNC WITH THE gnumake VERSION in util.mk! Ugh.
   OrderedStringSet dirs;
-  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), NULL, dirs)))
+  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), NULL, true, dirs)))
     return err;
   for (auto it = dirs.begin(); it != dirs.end(); ++it)
     addInclude(*it);

@@ -38,6 +38,7 @@ include $(OCPI_CDK_DIR)/include/hdl/altera.mk
 # For quartus, no precompilation is available, so it is just a directory
 # full of links whose name is the name of the library
 HdlToolLibraryFile=$2
+HdlRecurseLibraries_quartus=yes
 ################################################################################
 # Function required by toolset: given a list of targets for this tool set
 # Reduce it to the set of library targets.
@@ -89,6 +90,7 @@ endif
 QuartusFamily_stratix4:=Stratix IV
 QuartusFamily_stratix5:=Stratix V
 QuartusFamily_arria10soc_std:=Arria 10
+QuartusFamily_cyclone5:=Cyclone V
 
 QuartusMakePart1=$(firstword $1)$(word 3,$1)$(word 2,$1)
 # Strip out _std_alias if present (e.g. if there is a Pro version of this part as well)
@@ -96,6 +98,8 @@ QuartusMakePart=$(call QuartusMakePart1,$(subst -, ,$(subst _std_alias,,$1)))
 # Defining HdlFullPart below allos HdlChoosePart to use Quartus' custom functions
 # for performing string opertations on Parts/Devices
 HdlFullPart_quartus=$(call ToUpper,$(call QuartusMakePart,$1))
+HdlQuartusPart=$(foreach p,$(subst _std_alias,,$(HdlChoosePart)),$(infox HQP:$p)$(call HdlFullPart_quartus,$p))
+
 
 # Make the file that lists the files in order when we are building a library
 QuartusMakeExport= \
@@ -116,7 +120,7 @@ QuartusMakeDevices=$(infox QMD:$1)\
   $(and $(call QuartusMakeFamily,$1),\
     echo set_global_assignment -name FAMILY '\"'$(call QuartusMakeFamily,$1)'\"'; )\
   $(if $(filter-out NONE,$(HdlChoosePart)),\
-    echo set_global_assignment -name DEVICE $(subst _std_alias,,$(HdlChoosePart)); )
+    echo set_global_assignment -name DEVICE $(HdlQuartusPart); )
 
 # The constraint file(s) to use, first/only arg is platform
 HdlConstraintsSuffix_quartus=.qsf
@@ -130,7 +134,7 @@ QuartusConstraints=$(or $(HdlConstraints),$(QuartusConstraints_default))
 QuartusEchoFiles=$(strip \
     hdl_files $1 $2; )
 QuartusEchoFilesNoVlgLibs=$(strip \
-    hdl_files_no_vlg_libs $1 $2; )
+    hdl_files $1 $2; )
 # Make the settings file
 # Note that the local source files use notdir names and search paths while the
 # remote libraries use pathnames so that you can have files with the same names.
@@ -158,7 +162,9 @@ QuartusMakeQsf=\
     $(if $(filter $c,$(Cores)),\
       $(call QuartusEchoFiles,$c,$(call HdlExtractSourcesForLib,$(HdlTarget),$c,$(TargetDir))),\
       $(foreach w,$(subst _rv,,$(basename $(notdir $c))),$(infox WWW:$w)\
-        $(call QuartusEchoFiles,$w,\
+        $(- for assemblies, where the assy file is verilog, we do not want any source files since\
+            we are not instantiating using "component" in VHDL)\
+        $(and $(filter-out assembly,$(HdlMode)),$(call QuartusEchoFiles,$w,\
           $(foreach d,$(dir $c),$(infox DDD:$d)\
             $(foreach l,$(if $(filter vhdl,$(HdlLanguage)),vhd,v),$(infox LLLLL:$l)\
               $(foreach f,$(or $(xxcall HdlExists,$d../gen/$w-defs.$l),\
@@ -167,25 +173,26 @@ QuartusMakeQsf=\
             $(and $(filter vhdl,$(HdlLanguage)),\
               $(foreach g,$(or $(call HdlExists,$d/generics.vhd),\
                                $(call HdlExists,$d/$(basename $(notdir $c))-generics.vhd)),\
-                $(call FindRelative,$(TargetDir),$g) )))))))\
+                $(call FindRelative,$(TargetDir),$g) ))))))))\
   echo '\# Search path(s) for local files'; \
   $(foreach d,$(call Unique,$(patsubst %/,%,$(dir $(QuartusSources)) $(VerilogIncludeDirs))), \
     echo set_global_assignment -name SEARCH_PATH '\"'$(strip \
      $(call FindRelative,$(TargetDir),$d))'\"';) \
   \
-  $(and $(HdlLibrariesInternal),echo '\#' Assignments for adding libraries to search path;) \
-  $(foreach l,$(HdlLibrariesInternal),\
-    $(foreach hlr,$(call HdlLibraryRefDir,$l,$(HdlTarget),,qts),\
+  $(eval QuartusLibraries:=$(call HdlCollectLibraries,$(HdlTarget)))$(infox QLIBS:$(QuartusLibraries))\
+  $(and $(QuartusLibraries),echo '\#' Assignments for adding libraries to search path;) \
+  $(foreach l,$(QuartusLibraries),\
+    $(foreach hlr,$(call HdlLibraryRefDir,$l,$(HdlTarget),,qts),$(infox HLR:$(hlr))\
       $(if $(realpath $(hlr)),,$(error No altera library for $l at $(abspath $(hlr))))\
       echo set_global_assignment -name SEARCH_PATH '\"'$(call FindRelative,$(TargetDir),$(hlr))'\"'; \
       $(foreach f,$(wildcard $(hlr)/*_pkg.vhd),\
-        echo set_global_assignment -name VHDL_FILE -library $(notdir $l) '\"'$f'\"';\
+        echo set_global_assignment -name VHDL_FILE -library $(word 2,$(subst :, ,$l)) '\"'$f'\"';\
         $(foreach b,$(subst _pkg.vhd,_body.vhd,$f),\
           $(and $(wildcard $b),\
-          echo set_global_assignment -name VHDL_FILE -library $(notdir $l) '\"'$b'\"';))))) \
+          echo set_global_assignment -name VHDL_FILE -library $(word 2,$(subst :, ,$l)) '\"'$b'\"';))))) \
   \
   echo '\#' Assignment for local source files using search paths above; \
-  $(call QuartusEchoFilesNoVlgLibs,$(LibName),\
+  $(call QuartusEchoFilesNoVlgLibs,$(WorkLib),\
     $(foreach s,$(QuartusSources), \
       $(call FindRelative,$(TargetDir),$s) ))\
   \
@@ -234,16 +241,16 @@ HdlToolFiles=\
 # force them into the correct library when they are "discovered" via SEARCH_PATH.
 ifeq ($(HdlMode),library)
 HdlToolPost=\
-  if ! test -d $(LibName); then \
-    mkdir $(LibName); \
+  if ! test -d $(WorkLib); then \
+    mkdir $(WorkLib); \
   else \
-    rm -f $(LibName)/*; \
+    rm -f $(WorkLib)/*; \
   fi;\
   for s in $(HdlToolFiles); do \
     if [[ $$s == *.vhd ]]; then \
-      echo -- synthesis library $(LibName) | cat - $$s > $(LibName)/`basename $$s`; \
+      echo -- synthesis library $(WorkLib) | cat - $$s > $(WorkLib)/`basename $$s`; \
     else \
-      ln -s ../$$s $(LibName); \
+      ln -s ../$$s $(WorkLib); \
     fi; \
   done;
 endif

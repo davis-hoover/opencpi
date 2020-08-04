@@ -2,7 +2,6 @@
 -- http://www.sunburst-design.com/papers/CummingsSNUG2008Boston_CDC.pdf,
 -- modified to support sticky bit output and clear in destination clock domain
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library cdc;
 
 entity fast_pulse_to_slow_sticky is
   port(
@@ -40,7 +39,7 @@ begin
     end if;
   end process fast_pulse_sticky_gen;
 
-  clr_two_reg_sync : cdc.cdc.single_bit
+  clr_two_reg_sync : work.cdc.single_bit
     generic map(
       N         => 2,
       IREG      => '1',
@@ -58,7 +57,7 @@ begin
   -- slow clock domain
   ------------------------------------------------------------------------------
 
-  sticky_two_reg_sync : cdc.cdc.single_bit
+  sticky_two_reg_sync : work.cdc.single_bit
     generic map(
       N         => 2,
       IREG      => '0', -- no input reg, since it is effectively done by

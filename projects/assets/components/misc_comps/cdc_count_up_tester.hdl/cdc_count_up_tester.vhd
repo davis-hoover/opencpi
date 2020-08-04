@@ -47,17 +47,17 @@ architecture rtl of worker is
   signal s_count_up_fifo_dout : std_logic_vector(c_count_up_width-1 downto 0) := (others => '0');
 
   begin
- 
-   gen_clk : entity work.gen_clk
-       generic map (src_clk_hz => c_src_clk_hz,
-                    dst_clk_hz => c_dst_clk_hz)
-       port map (
-               ctl_clk => ctl_in.clk,
-               ctl_rst => ctl_in.reset,
-               src_clk => s_src_clk,
-               src_rst => s_src_rst,
-               dst_clk => s_dst_clk,
-               dst_rst => s_dst_rst);
+
+    gen_clk : entity work.cdc_clk_gen
+      generic map (src_clk_hz => c_src_clk_hz,
+                   dst_clk_hz => c_dst_clk_hz)
+      port map (
+              ctl_clk => ctl_in.clk,
+              ctl_rst => ctl_in.reset,
+              src_clk => s_src_clk,
+              src_rst => s_src_rst,
+              dst_clk => s_dst_clk,
+              dst_rst => s_dst_rst);
 
    gen_reset_sync : misc_prims.misc_prims.gen_reset_sync
       generic map (src_clk_hz => c_src_clk_hz,

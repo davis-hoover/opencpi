@@ -20,9 +20,9 @@
 """
 Data Sink DAC: Verify output data
 
-Output is verified by: 
+Output is verified by:
 1. Checking for underrun. It is expected when dac_clk_freq_hz > SDP_CLK_FREQ
-2. Comparing input and output data. Data should be the same when underrun 
+2. Comparing input and output data. Data should be the same when underrun
    hasn't occurred
 """
 import sys
@@ -61,14 +61,14 @@ else:
     idata = np.fromfile(sys.argv[2], dtype=utu.dt_iq_pair, count=-1)
 
     #Compare expected output to actual output
+    bitshift = iqm.SAMPLES_BIT_WIDTH - DAC_WIDTH_BITS
     if DAC_OUTPUT_IS_LSB_OF_IN_PORT == "true":
         print("    Comparing Expected I data to Actual I Data")
-        utu.compare_arrays(idata['real_idx'], odata['real_idx'])
+        utu.compare_arrays(np.left_shift(idata['real_idx'],bitshift), odata['real_idx'])
         print("    Comparing Expected Q data to Actual Q Data")
-        utu.compare_arrays(idata['imag_idx'], odata['imag_idx'])
+        utu.compare_arrays(np.left_shift(idata['imag_idx'],bitshift), odata['imag_idx'])
     else:
-        bitshift = iqm.SAMPLES_BIT_WIDTH - DAC_WIDTH_BITS
         print("    Comparing Expected I data to Actual I Data")
-        utu.compare_arrays(np.right_shift(idata['real_idx'],bitshift), odata['real_idx'])
+        utu.compare_arrays(np.right_shift(idata['real_idx'],bitshift), np.right_shift(odata['real_idx'],bitshift))
         print("    Comparing Expected Q data to Actual Q Data")
-        utu.compare_arrays(np.right_shift(idata['imag_idx'],bitshift), odata['imag_idx'])
+        utu.compare_arrays(np.right_shift(idata['imag_idx'],bitshift), np.right_shift(odata['imag_idx'],bitshift))

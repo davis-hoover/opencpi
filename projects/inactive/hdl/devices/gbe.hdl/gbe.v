@@ -1453,7 +1453,7 @@ module mkGbeWorker(CLK_gmii_rx_clk,
 							 .EMPTY_N(mdi_fResponse$EMPTY_N));
 
   // submodule mdi_rPlayIndex
-  Counter #(.width(32'd8), .init(8'd0)) mdi_rPlayIndex(.CLK(wciS0_Clk),
+  BsvCounter #(.width(32'd8), .init(8'd0)) mdi_rPlayIndex(.CLK(wciS0_Clk),
 						       .RST(wciS0_MReset_n),
 						       .DATA_A(mdi_rPlayIndex$DATA_A),
 						       .DATA_B(mdi_rPlayIndex$DATA_B),
@@ -1466,7 +1466,7 @@ module mkGbeWorker(CLK_gmii_rx_clk,
 						       .Q_OUT(mdi_rPlayIndex$Q_OUT));
 
   // submodule mdi_rPrescaler
-  Counter #(.width(32'd4), .init(4'd6)) mdi_rPrescaler(.CLK(wciS0_Clk),
+  BsvCounter #(.width(32'd4), .init(4'd6)) mdi_rPrescaler(.CLK(wciS0_Clk),
 						       .RST(wciS0_MReset_n),
 						       .DATA_A(mdi_rPrescaler$DATA_A),
 						       .DATA_B(mdi_rPrescaler$DATA_B),

@@ -79,22 +79,6 @@ $(call OcpiDbgVar,X4simFiles)
 X4simCoreLibraryChoices=$(strip \
   $(foreach c,$(call HdlRmRv,$1),$(call HdlCoreRef,$c,x4sim)))
 
-ifneq (,)
-X4simLibs=\
-  $(and $(filter assembly container,$(HdlMode)),\
-  $(eval $(HdlSetWorkers)) \
-  $(foreach w,$(HdlWorkers),\
-    $(foreach f,$(firstword \
-                  $(or $(foreach c,$(ComponentLibraries), \
-                         $(foreach d,$(call HdlComponentLibrary,$c,x4sim),\
-	                   $(wildcard $d/$w))),\
-                       $(error Worker $w not found in any component library.))),\
-      -lib $w=$(call FindRelative,$(TargetDir),$f)))) \
-  $(foreach l,\
-    $(HdlLibrariesInternal) $(Cores),\
-    -lib $(notdir $(l))=$(strip \
-          $(call FindRelative,$(TargetDir),$(call HdlLibraryRefDir,$l,x4sim,,x4sim))))
-else
 X4simLibs=\
     $(foreach l,\
       $(HdlLibrariesInternal),\
@@ -104,18 +88,10 @@ X4simLibs=\
       -lib $(call HdlRmRv,$(notdir $(c)))=$(infox fc:$c)$(call FindRelative,$(TargetDir),$(strip \
           $(firstword $(foreach l,$(call X4simCoreLibraryChoices,$c),$(call HdlExists,$l))))))
 
-endif
-ifneq (,)
-MyIncs=\
-  $(foreach d,$(VerilogDefines),-d $d) \
-  $(foreach d,$(VerilogIncludeDirs),-i $(call FindRelative,$(TargetDir),$(d))) \
-  $(foreach l,$(call HdlXmlComponentLibraries,$(ComponentLibraries)),-i $(call FindRelative,$(TargetDir),$l))
-else
 X4simVerilogIncs=\
   $(foreach d,$(VerilogDefines),-d $d) \
   $(foreach d,$(VerilogIncludeDirs),-i $(call FindRelative,$(TargetDir),$(d))) \
   $(foreach l,$(HdlXmlComponentLibraries),-i $(call FindRelative,$(TargetDir),$l))
-endif
 
 ifndef X4simTop
 X4simTop=$(Worker).$(Worker)
@@ -171,32 +147,4 @@ $1/$3.tar:
 	      tar cf $3.tar metadatarom.dat xsim.dir) > $1/$3-xelab.out 2>&1
 
 endef
-ifneq (,)
- -s $3.exe ;\
-X4simPlatform:=x4sim_pf
-X4simAppName=$(call AppName,$(X4simPlatform))
-ExeFile=$(X4simAppName).exe
-BitFile=$(X4simAppName).bit
-BitName=$(call PlatformDir,$(X4simPlatform))/$(BitFile)
-X4simPlatformDir=$(HdlPlatformsDir)/$(X4simPlatform)
-X4simTargetDir=$(call PlatformDir,$(X4simPlatform))
-X4simFuseCmd=\
-  $(VivadoXilinx); xelab $(X4simPlatform).main $(X4simPlatform).glbl -v 2 -debug typical \
-		-lib $(X4simPlatform)=$(X4simPlatformDir)/target-x4sim/$(X4simPlatform) \
-		-lib mkOCApp4B=mkOCApp4B \
-	        -lib $(Worker)=../target-x4sim/$(Worker) \
-	$$(X4simLibs) -L unisims_ver -s $(ExeFile) && \
-	tar -c -f $(BitFile) xsim.dir metadatarom.data
-
-define HdlToolDoPlatform
-# Generate bitstream
-$$(BitName): TargetDir=$(call PlatformDir,$(X4simPlatform))
-$$(BitName): HdlToolCompile=$(X4simFuseCmd)
-$$(BitName): HdlToolSet=xelab
-$$(BitName): override HdlTarget=x4sim
-$$(BitName): $(X4simPlatformDir)/target-x4sim/$(X4simPlatform) $(X4simTargetDir)/mkOCApp4B | $(X4simTargetDir)
-	$(AT)echo Building x4sim simulation executable: $$(BitName).  Details in $$(X4simAppName)-xelab.out
-	$(AT)$$(HdlCompile)
-endef
-endif
 endif

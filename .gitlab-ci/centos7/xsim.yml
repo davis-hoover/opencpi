@@ -17,7 +17,7 @@ build-primitives:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
 
 
@@ -28,9 +28,9 @@ build-components-core:centos7:xsim:
   extends:
     - .build-components-core
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -40,7 +40,7 @@ build-components-assets:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -50,7 +50,7 @@ build-components-assets_ts:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -60,7 +60,7 @@ build-components-inactive:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -72,9 +72,9 @@ build-adapters-core:centos7:xsim:
   extends:
     - .build-adapters-core
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -84,7 +84,7 @@ build-adapters-assets:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -96,19 +96,19 @@ build-devices-core:centos7:xsim:
   extends:
     - .build-devices-core
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
 build-devices-platform:centos7:xsim:
-  extends: 
+  extends:
     - .build-devices-platform
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -118,7 +118,7 @@ build-devices-assets:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -128,7 +128,7 @@ build-devices-assets_ts:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -138,7 +138,7 @@ build-devices-inactive:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -150,9 +150,9 @@ build-cards-core:centos7:xsim:
   extends:
     - .build-cards-core
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -162,7 +162,7 @@ build-cards-assets:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -172,7 +172,7 @@ build-cards-inactive:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
 
@@ -184,9 +184,9 @@ build-platforms-core:centos7:xsim:
   extends:
     - .build-platforms-core
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-devices-core:centos7:xsim
@@ -195,12 +195,12 @@ build-platforms-core:centos7:xsim:
     - build-components-core:centos7:xsim
 
 build-platforms-platform:centos7:xsim:
-  extends: 
+  extends:
     - .build-platforms-platform
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-devices-platform:centos7:xsim
     - build-primitives:centos7:xsim
@@ -210,9 +210,9 @@ build-platforms-assets:centos7:xsim:
   extends:
     - .build-platforms-assets
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-devices-platform:centos7:xsim
     - build-primitives:centos7:xsim
@@ -226,9 +226,9 @@ build-platforms-inactive:centos7:xsim:
   extends:
     - .build-platforms-inactive
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-devices-inactive:centos7:xsim
@@ -240,12 +240,12 @@ build-platforms-inactive:centos7:xsim:
 # Jobs - Assemblies #
 #####################
 build-assemblies-platform:centos7:xsim:
-  extends: 
+  extends:
     - .build-assemblies-platform
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
@@ -257,7 +257,7 @@ build-assemblies-assets:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
@@ -270,7 +270,7 @@ build-assemblies-assets_ts:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
@@ -283,10 +283,115 @@ build-assemblies-inactive:centos7:xsim:
     - .xsim-centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-platforms-inactive:centos7:xsim
     - build-primitives:centos7:xsim
+
+
+#####################
+# Jobs - Build-Test #
+#####################
+build-test-core:centos7:xsim:
+  extends:
+    - .build-test-core
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-core:centos7:xsim
+
+build-test-assets-base:centos7:xsim:
+  extends:
+    - .build-test-assets-base
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-core:centos7:xsim
+    - build-platforms-platform:centos7:xsim
+    - build-platforms-assets:centos7:xsim
+
+build-test-assets-comms:centos7:xsim:
+  extends:
+    - .build-test-assets-comms
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-core:centos7:xsim
+    - build-platforms-platform:centos7:xsim
+    - build-platforms-assets:centos7:xsim
+
+build-test-assets-dsp:centos7:xsim:
+  extends:
+    - .build-test-assets-dsp
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-core:centos7:xsim
+    - build-platforms-platform:centos7:xsim
+    - build-platforms-assets:centos7:xsim
+
+build-test-assets-misc:centos7:xsim:
+  extends:
+    - .build-test-assets-misc
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-core:centos7:xsim
+    - build-platforms-platform:centos7:xsim
+    - build-platforms-assets:centos7:xsim
+
+build-test-assets-util:centos7:xsim:
+  extends:
+    - .build-test-assets-util
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-core:centos7:xsim
+    - build-platforms-platform:centos7:xsim
+    - build-platforms-assets:centos7:xsim
+
+build-test-assets_ts:centos7:xsim:
+  extends:
+    - .build-test-assets_ts
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-core:centos7:xsim
+    - build-platforms-platform:centos7:xsim
+    - build-components-assets_ts:centos7:xsim
+
+build-test-inactive:centos7:xsim:
+  extends:
+    - .build-test-inactive
+    - .xsim-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:xsim
+    - build-platforms-platform:centos7:xsim
+    - build-platforms-inactive:centos7:xsim
 
 
 ###############
@@ -296,100 +401,107 @@ test-core:centos7:xsim:
   extends:
     - .test-core
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
+    - build-test-core:centos7:xsim
 
 test-assets-base:centos7:xsim:
   extends:
     - .test-assets-base
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
     - build-platforms-platform:centos7:xsim
     - build-platforms-assets:centos7:xsim
+    - build-test-assets-base:centos7:xsim
 
 test-assets-comms:centos7:xsim:
   extends:
     - .test-assets-comms
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
     - build-platforms-platform:centos7:xsim
     - build-platforms-assets:centos7:xsim
+    - build-test-assets-comms:centos7:xsim
 
 test-assets-dsp:centos7:xsim:
   extends:
     - .test-assets-dsp
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
     - build-platforms-platform:centos7:xsim
     - build-platforms-assets:centos7:xsim
+    - build-test-assets-dsp:centos7:xsim
 
 test-assets-misc:centos7:xsim:
   extends:
     - .test-assets-misc
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
     - build-platforms-platform:centos7:xsim
     - build-platforms-assets:centos7:xsim
+    - build-test-assets-misc:centos7:xsim
 
 test-assets-util:centos7:xsim:
   extends:
     - .test-assets-util
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
     - build-platforms-platform:centos7:xsim
     - build-platforms-assets:centos7:xsim
+    - build-test-assets-misc:centos7:xsim
 
 test-assets_ts:centos7:xsim:
   extends:
     - .test-assets_ts
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-core:centos7:xsim
     - build-platforms-platform:centos7:xsim
     - build-components-assets_ts:centos7:xsim
+    - build-test-assets_ts:centos7:xsim
 
 test-inactive:centos7:xsim:
   extends:
     - .test-inactive
     - .xsim-centos7
-  needs: 
+  needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - build-primitives:centos7:xsim
     - build-platforms-platform:centos7:xsim
     - build-platforms-inactive:centos7:xsim
-
+    - build-test-inactive:centos7:xsim

@@ -21,29 +21,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
-\section*{Summary - \Comp}
-% Make table whose width is equal to which will be used for text
-% wrapping, split into 2 equal columns
-\begin{longtable}{|p{\dimexpr0.5\textwidth-2\tabcolsep\relax}
-                  |p{\dimexpr0.5\textwidth-2\tabcolsep\relax}|}
-  \hline
-  \rowcolor{blue}
-  & \\
-  \hline
-	Name              & \comp                                              \\
-  \hline
-  Latest Version    &  \docVersion (release date TBD) \\
-  \hline
-	Worker Type       & Application                                        \\
-  \hline
-	Component Library & ocpi.assets.util\_comps                             \\
-  \hline
-	Workers           & \comp.rcc (version 2)                               \\
-  \hline
-	Tested Platforms  & CentOS7 \\
-  \hline
-\end{longtable}
-
 \begin{center}
   \textit{\textbf{Revision History}}
 \end{center}
@@ -63,6 +40,17 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
   v1.7 & Erroneous doc property tables updated for accuracy. & 4/2020 \\
   \hline
 \end{longtable}
+\newpage
+
+
+\def\name{\comp}
+\def\workertype{Application}
+\def\version{\ocpiversion}
+\def\releasedate{04/2020}
+\def\componentlibrary{ocpi.assets.util\_{}comps}
+\def\workers{\comp{}.rcc}
+\def\testedplatforms{CentOS7}
+\input{\snippetpath/component_summary_table}
 
 \section*{Worker Implementation Details}
 When writing a value to the txen property that is different from its

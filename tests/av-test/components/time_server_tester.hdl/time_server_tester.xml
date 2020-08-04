@@ -2,5 +2,6 @@
   <componentspec/>
   <property name='timestamp_sec' volatile='true' arraylength='2'/>
   <property name='timestamp_frac' volatile='true' arraylength='2'/>
+  <property name='mode' type='enum' enums='valid,rollover' initial='true' default='valid'/>
   <timeinterface name='time' secondswidth='32' fractionwidth='32' allowunavailable='true'/>
 </hdlworker>

@@ -97,8 +97,9 @@ define DoBuildAci
 	$(AT)$$(call LinkBinary,$$^)
   aciapps: $(call AciExe,$1,$2)
 endef
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(foreach p,$(RccPlatforms),$(foreach a,$(OcpiAppsCC),$(infox App=$a Platform=$p)$(eval $(call DoBuildAci,$p,$a))))
-
+endif
 aciapps:
 	$(AT)touch aciapps
 clean::

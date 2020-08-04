@@ -18,7 +18,9 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library bsv; use bsv.bsv.all;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
+library platform; use platform.all;
+library unisim;
 architecture rtl of platform_ad9361_config_worker is
   constant adc_sub_c  : natural := 0;
   constant dac_sub_c  : natural := 1;
@@ -158,7 +160,7 @@ begin
   wci_reset_n <= not ctl_in.reset;
 
   -- TODO / FIXME - for now rxen functionality is not supported, so we are assuming wci_enable is static while dac_txnrx is toggling (this is true after the AD9361 is initialized, but it is not universally true..), this seperate-synchronizers-for-ENABLE-and-TXNRX-solution is a NON-IDEAL synchronization solution for independent control signals
-  sync_enable : bsv.bsv.SyncBit
+  sync_enable : bsv_pkg.SyncBit
     generic map(
       init   => 0)
     port map(
@@ -173,7 +175,23 @@ begin
   -- during AD9361 initialization
   ENABLE_s <= dac_enable;
 
-  TXNRX_s <= dac_txnrx;
+  -- ODDR was added to TX data lines in order to minimize skew between
+  -- high-speed TX data and its clock (the clock used ODDR as its forwarding
+  -- mechanism, as per Xilinx documentation recommendation), and since TXNRX is
+  -- on the same clock domain, a similar design methodology is employed
+  txen_oddr : unisim.vcomponents.ODDR
+    generic map(
+      DDR_CLK_EDGE => "SAME_EDGE",
+      INIT         => '0',
+      SRTYPE       => "ASYNC")
+    port map(
+      Q  => TXNRX_s,
+      C  => dac_clk,
+      CE => '1',
+      D1  => dac_txnrx,
+      D2  => dac_txnrx,
+      R  => '0',
+      S  => '0');
 
   signals : entity work.signals
     port map(

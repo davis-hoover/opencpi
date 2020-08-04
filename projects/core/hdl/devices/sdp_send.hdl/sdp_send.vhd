@@ -19,9 +19,9 @@
 -- The SDP Sender, to take data from a WSI port, and put it in memory, making it available
 -- for someone to read it out and acknowledge that reading.
 
-library IEEE, ocpi, util, bsv, sdp, cdc;
+library IEEE, ocpi, util, ocpi_core_bsv, sdp, cdc;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-use ocpi.types.all, ocpi.util.all, sdp.all, sdp.sdp.all;
+use ocpi.types.all, ocpi.util.all, sdp.all, sdp.sdp.all, ocpi_core_bsv.all;
 architecture rtl of worker is
   -- Local worker constants
   constant sdp_width_c    : natural := to_integer(sdp_width);
@@ -217,7 +217,7 @@ begin
                 DOB        => bramb_out);
 
   -- wsi to sdp, telling SDP to send next buffer with this metadata, same clock domain
-  metafifo : component bsv.bsv.SizedFifo
+  metafifo : component bsv_pkg.SizedFifo
    generic map(p1Width      => metawidth_c,
                p2depth      => roundup_2_power_of_2(max_buffers_c),
                p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))

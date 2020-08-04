@@ -1,0 +1,163 @@
+OCPIDEV-SLOT(1)
+==============
+
+
+NAME
+----
+ocpidev-slot - manage an OpenCPI HDL slot.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`hdl slot`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *`hdl slot`* noun represents an OpenCPI HDL slot,
+which describes XXXXXXX TBD FOR HDL SLOT XXXXX. 
+
+An HDL slot is described by XXXXXXXX.
+
+----BELOW TO BE UPDATED FOR HDL SLOT ----------
+an OpenCPI Protocol Specification (OPS),
+which is an XML file that describes the set of messages defined in the
+protocol, as well as some top-level attributes for the protocol.
+'Operation' elements in the OPS describe the messages that can be used,
+while 'argument' elements describe the individual fields of a message.
+A protocol is specified in the 'port' element of a component spec (OCS).
+In a connection between component ports, the specs of both
+ports, in their port elements, refer to the same OPS.
+At present, a protocol consists of only the OPS XML file.
+
+For more information about a protocol's XML structure, see the chapter "Protocol
+Specifications" in the 'OpenCPI Component Development Guide'.
+
+In a project, a protocol resides in a *`specs/`* directory
+located either in a component library or at the top level of a project
+and is named '<name>'*`-prot.xml`*. Note that protocols with older
+naming formats like '<name>'*`_protocol.xml`* and '<name>'*`-protocol.xml`*
+also exist; for example, some of the protocols in the built-in
+OpenCPI *`core`* project (*`../projects/core/specs/`*) use these formats.
+
+Verbs that can operate on a protocol are:
+
+*`create`*::
+    Create the named protocol according to the specified options,
+    creating directories and files as required.
+
+*`delete`*::
+    Remove all files associated with the named protocol.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options That Apply to All Operations (Verbs) on Protocols
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-library=`*'<hdl-library>'::
+    Specify the HDL library in which to operate on the 
+    protocol. HDL libraries exist underneath the *`hdl/`*
+    directory located at the top level of a project.
+
+*`--library=`*'<component-library>', *`-l`* '<component-library>'::
+    Specify the component library in which to operate on the protocol.
+    When a project contains multiple component libraries, this option
+    can be used to specify one of them. Multiple component
+    libraries are located underneath the *`components`* directory
+    at the top level of a project.
+
+*`-d`* '<directory>'::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+
+*-v, --verbose*::
+    Describe what is happening in command execution in more detail.
+    
+Options When Creating and Deleting Protocols
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-p*::
+    Specify that the protocol is to be created in or
+    deleted from the *`specs/`* directory of the project
+    instead of the *`specs/`* directory of a component library.
+    The *`-l`* and *`-p`* options specify the location
+    of the protocol. When neither one of these options
+    is used, the location is the *`components`* library
+    and thus is an error if other component libraries exist.
+
+Options When Creating Protocols
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+*-k*::
+    Keep files and directories created after a protocol creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+  
+Options When Deleting Protocols
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-f`*::
+    Force deletion: do not ask for confirmation when deleting
+    a protocol. Normally, you are asked to confirm a deletion.
+    
+EXAMPLES
+--------
+. Create a protocol spec with the name *`myprotocol`*. The protocol
+spec will be placed in the default location *`components/specs/`*:
++
+-------------------------------
+ocpidev create protocol myprotocol
+--------------------------------
++
+. Create a protocol named *`myprotocol`* in the component library
+named *`myutilcomps`*. The protocol spec will be placed in
+the *`specs`* directory in *`myutilcomps`* sublibrary
+within the *`components`* library (*`components/myutilcomps/specs/`*):
++
+--------------------------------------------------
+ocpidev create protocol myprotocol -l myutilcomps
+--------------------------------------------------
++
+. Inside the project *`MyProject`*, create a protocol spec with the
+name *`myprotocol`* in the project's *`specs/`* directory.
+The protocol spec will be placed in *`MyProject/specs/`*:
++
+------------------------------------
+ocpidev create protocol myprotocol -p
+------------------------------------
++
+. Delete a protocol named *`MyAdapterProtocol`* from
+a project's *`adapters`* library (deletes it
+from *`hdl/adapters/specs/`*):
++
+--------------------------------------------------------
+ocpidev delete protocol MyAdapterProtocol --hdl-library=adapters
+--------------------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-component.1.html[ocpidev-component(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-library.1.html[ocpidev-library(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

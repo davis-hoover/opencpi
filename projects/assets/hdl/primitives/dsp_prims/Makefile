@@ -23,7 +23,7 @@
 # If they are in this project, they must be compiled first, and this requires that the
 # PrimitiveLibraries variable be set in the hdl/primitives/Makefile such that the
 # libraries are in dependency order.
-Libraries=fixed_float ocpi protocol misc_prims
+Libraries=misc_prims
 
 # Set this variable to the list of source files in dependency order
 # If it is not set, all .vhd and .v files will be compiled in wildcard/random order,

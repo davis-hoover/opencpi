@@ -41,7 +41,8 @@ Group:          Applications/Engineering
 License:        LGPLv3+
 Source0:        %{RPM_PLATFORM}
 Vendor:         OpenCPI
-Packager:       ANGRYVIPER Team <discuss@lists.opencpi.org>
+Packager:       OpenCPI <discuss@lists.opencpi.org>
+URL:            https://opencpi.org
 
 %description
 Contains the content needed to deploy opencpi to %{RPM_PLATFORM}
@@ -51,10 +52,10 @@ Release ID: %{RPM_HASH}
 %endif
 
 %prep
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %build
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %install
 %{__mkdir_p} %{buildroot}%{prefix0}/%{deploy_dir}/%{RPM_PLATFORM}

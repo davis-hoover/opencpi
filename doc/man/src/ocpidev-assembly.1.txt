@@ -1,0 +1,283 @@
+OCPIDEV-ASSEMBLY(1)
+==================
+
+
+NAME
+----
+ocpidev-assembly - manage an OpenCPI HDL assembly.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`hdl assembly`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *`hdl assembly`* noun represents an OpenCPI HDL assembly, which is a
+group of pre-connected HDL workers built as an 'artifact' - a binary
+executable compiled from the workers - intended
+for use as an FPGA-based subset of an OpenCPI application.
+
+An HDL assembly is described by an OpenCPI HDL Assembly Description (OHAD),
+which is an XML file that specifies the HDL workers that make up
+the HDL assembly and the connections between them. The OHAD defines
+the worker instances, any properties and parameter settings, connections
+between workers and external ports for any data flowing into or out of
+the assembly. For information about the OHAD's XML structure,
+see the section "The HDL Assembly XML File" in the 'OpenCPI HDL
+Development Guide'
+
+In a project, an HDL assembly resides in its own directory '<name>'
+under an *`assemblies/`* subdirectory in the project's *`hdl/`* directory.
+An HDL assembly directory contains the assembly's OHAD XML file
+(named '<name>'*`.xml`*) and its "make" file (named *`Makefile`*).
+The *`ocpidev create`* operation produces initial versions of these
+files that can then be edited as necessary.
+
+When an HDL assembly is built, the result - the executable artifact
+file (with the suffix *`.bitz`* or *`.gz`*) - is placed in
+an *`artifacts`* directory at the top level of the project.
+The *`ocpidev build`* operation also creates additional directories
+and files in the HDL assembly's directory, including a container
+artifact built for the target platform in a directory
+*`container-`*'<platform>'.
+The *`ocpidev clean`* operation removes the files created by
+the *`ocpidev build`* operation.
+
+For information on how to develop an HDL assembly,
+see the chapter "HDL Assemblies for Creating Bitstreams/Executables"
+in the 'OpenCPI HDL Development Guide'.
+
+Verbs that can operate on an HDL assembly are:
+
+*`build`*::
+    Build the HDL assembly, creating directories and files
+    as required.
+
+*`clean`*::
+    Remove all the generated and compiled files for all assets
+    in the HDL assembly.
+    
+*`create`*::
+    Create the named HDL assembly, creating files and directories as required.
+    
+*`delete`*::
+    Remove all directories and files associated with the named HDL assembly.
+    
+*`utilization`*::
+    Display information about FPGA resource use by the HDL assembly.
+
+Note that an asset's name is implied by the directory you're in when
+you issue the *`ocpidev`* command. For HDL assemblies, this
+means that you can perform operations (verbs) on the HDL assembly
+without having to specify its name when you issue the
+*`ocpidev`* command from inside the HDL assembly's directory.
+
+The *`ocpidev`* tool can also operate on a plural *`hdl assemblies`* noun.
+The syntax is:
+
+*`ocpidev`* ['<options>'] [*`build|clean|utilization`*] *`hdl assemblies`*
+
+The verbs that can be performed on the *`hdl assemblies`* noun are:
+
+*`build`*::
+    Build all of the HDL assemblies in the project or the *`/hdl`*
+    subdirectory of the project, creating directories and files as required.
+    
+*`clean`*::
+    Remove all the generated and compiled files in all HDL assemblies
+    in the project or the *`/hdl`* subdirectory of the project.
+    
+*`utilization`*::
+    Display FPGA resource usage information for all built HDL assemblies
+    in the project. The general-pupose options and the *`utilization`*
+    options can be specified.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Keywords for platforms supported by OpenCPI that can be
+specified in the '<platform>' argument to an option
+can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
+
+Keywords for architectures supported by OpenCPI that can be specified
+in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
+*`xsim`*, *`stratix4`*, *`stratix5`*, *`virtex5`*, *`virtex6`*, *`zynq`*,
+*`zynq_is`*, *`spartan3adsp`*.
+
+Options That Apply to All Operations (Verbs) on HDL Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-d <directory>*::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+    
+*-v, --verbose*::
+    Describe what is happening in command execution in more detail.
+
+Options When Creating HDL Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+    Do not build the HDL assembly for the specified HDL platform.
+   
+*`--only-platform=`*'<platform>', *-G* '<platform>'+::
+    Only build the HDL assembly for the specified HDL platform.
+   
+*-T* '<target>'+::
+    Only build the HDL assembly for the specified HDL architecture.
+   
+*-Z* '<target>'+::
+    Do not build the HDL assembly for the specified HDL architecture.
+   
+*-k*::
+    Keep files and directories created after an HDL assembly creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+
+Options When Deleting HDL Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-f*::
+    Force deletion: do not ask for confirmation when deleting
+    an HDL assembly. Normally, you are asked to confirm a deletion.
+
+Options When Building HDL Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-target=`*'<target>'+::
+    Build the HDL assembly/ies for the specified HDL architecture.
+    If only HDL targets
+    are specified (and no HDL platforms), containers are not built.
+
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build the HDL assembly/ies for the specified HDL platform.
+
+Options When Using Utilization on HDL Assemblies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--format=`*{*`table`*|*`latex`*}::
+    Specify the format in which to output the FPGA resource usage information.
+    Specifying *`table`* sends the information to stdout in tabular format.
+    Specifying *`latex`* bypasses *`stdout`* and writes all output to
+    *`utilization.inc`* files in the directories for the assets on
+    which it operates.
+    
+*`--hdl-platform=`*'<platform>'+::
+    Display information about FPGA resource use by the built HDL assemblies
+    on the specified HDL platform.
+
+*`--hdl-library=`*'<library>'::
+    Display information about FPGA resource use by the built
+    HDL assemblies in the specified HDL primitive library.
+
+*`--library=`*'<library>', *`-l`* '<library>'::
+    Display information about FPGA resource use by the built
+    HDL assemblies in the specified component library.
+
+*`-P`* '<hdl-platform>'::
+    Display information about FPGA resource use by the built
+    HDL assemblies on the specified HDL platform.
+
+EXAMPLES
+--------
+. Inside the project (at the top level), create the
+HDL assembly *`myassy`*. The directory *`myassy`*
+is created in the *`hdl/assemblies`* directory
+(which is also created if it doesn't exist):
++
+----------------------------------
+ocpidev create hdl assembly myassy
+----------------------------------
++
+. Inside the project (at the top level), create the
+HDL assembly *`myassy`*, specifying that it can
+only be built for the *`zed`* HDL platform:
++
+-----------------------------------------------------
+ocpidev create hdl assembly myassy --only-platform=zed
+-----------------------------------------------------
++
+. Inside the project (at the top level), create the
+HDL assembly *`myassy`*, specifying that it can
+only be built for the *`zynq`* HDL chip architecture:
++
+-----------------------------------------------------
+ocpidev create hdl assembly myassy -T zynq
+-----------------------------------------------------
++
+. Inside the project (from the top level or the
+*`hdl/assemblies`* directory), delete
+the HDL assembly *`myassy`*:
++
+----------------------------------
+ocpidev delete hdl assembly myassy
+----------------------------------
++
+. Inside the *`myassy`* HDL assembly's directory, build
+the *`myassy`* assembly for the *`xsim`* HDL platform:
++
+---------------------------------
+ocpidev build --hdl-platform=xsim
+---------------------------------
++
+. Inside the project (from the top level or the
+*`hdl/assemblies`* directory), build all existing
+HDL assemblies:
++
+---------------------------
+ocpidev build hdl assemblies
+---------------------------
++
+. Inside the *`myassy`* HDL assembly's directory,
+built the *`myassy`* assembly for the *zynq* HDL chip architecture:
++
+-------------------------------
+ocpidev build --hdl-target=zynq
+-------------------------------
++
+. Inside the project (from the top level of the
+*`/hdl/assemblies`* directory) display information
+about FPGA resource use by the *`myassy`* assembly:
++
+--------------------------------------
+ocpidev utilization hdl assembly myassy
+--------------------------------------
++
+. Inside the project (from the top level of the
+*`/hdl/assemblies`* directory) display information
+about FPGA resource use by the assemblies in the project:
++
+----------------------------------
+ocpidev utilization hdl assemblies
+----------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-library.1.html[ocpidev-library(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

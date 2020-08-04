@@ -83,10 +83,8 @@
 	     return;
 	   }
 	   if (isProgrammed(err)) {
-	     if (init(err)) {
-	       if (forLoad)
-		 err.clear();
-	     }
+	     if (!forLoad)
+	       init(err);
 	   } else if (err.empty())
 	       ocpiInfo("There is no bitstream loaded on this HDL device: %s", a_name.c_str());
 	 }
@@ -480,7 +478,7 @@
 	     std::string &error) {
 	// Opening implies canonicalizing the name, which is needed for excludes
 	ocpiInfo("Searching for local Zynq/PL HDL device.");
-	OCPI::HDL::Device *dev = open("0", true, params, error);
+	OCPI::HDL::Device *dev = open("0", false, params, error);
 	return dev && !found(*dev, exclude, discoveryOnly, error) ? 1 : 0;
       }
 
@@ -494,7 +492,7 @@
 	if (error.empty())
 	  return dev;
 	delete dev;
-	ocpiBad("When searching for PL device '%s': %s", busName, error.c_str());
+	ocpiInfo("When searching for PL device '%s': %s", busName, error.c_str());
 #else
 	(void)forLoad;
 	error.clear();

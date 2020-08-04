@@ -1,0 +1,174 @@
+OCPIDEV-SHOW(1)
+================
+
+
+NAME
+----
+ocpidev-show - displays information about OpenCPI assets.
+
+
+SYNOPSIS
+--------
+*ocpidev*  *show* ['<options>'] '<noun>'
+
+
+DESCRIPTION
+-----------
+The *`show`* verb is slightly different from other verbs since the command
+currently is not associated with a project, but with the operating
+environment by default.  There are two scoping options to associate
+with the command. By default, the *`--global-scope`* option is set and
+it will look in all registered projects (and the current project
+if applicable). The registry used is the one in the OpenCPI
+installation unless overridden using the *`OCPI_PROJECT_REGISTRY_DIR`*
+environment variable.  Use the *`--local-scope`* option to run the
+command in just the current project.
+
+Asset types to be specified in the '<noun>' argument are:
+
+*component*::
+    Display information on the specified component.
+    
+*components*::
+    Display all components in registered projects.
+
+*libraries*::
+    Display information on all the libraries in the current scope.
+
+*platforms*::
+    Display all platforms that assets can be built for.
+
+*project*::
+    Display information about a project.
+
+*projects*::
+    Display all registered projects.
+
+*registry*::
+    Display information on the registry.
+
+*targets*::
+    Display all targets that assets can be built for.
+
+*tests*::
+    Display information on the unit tests in the current
+    scope.
+
+*worker*::
+    Display information on the specified worker.
+
+*workers*::
+    Display all workers in registered projects.
+
+Use the keywords *`rcc`* and *`hdl`* to scope what is displayed
+for the *platforms* and *targets* nouns. For example, the command:
+
+-------------------------
+ocpidev show rcc platforms
+--------------------------
+
+only shows the available RCC platforms.
+
+
+OPTIONS
+-------
+In the option descriptions below, a plus sign (+) indicates that
+the option can be specified more than once on the command line.
+
+*`--simple`*::
+    Format the output as simply as possible.
+    
+*`--json`*::
+    Format the output in JSON format for integration with
+    other software.
+
+*`--global-scope`*::
+   Show assets from all registered projects and the current project
+   if applicable. This is the default scope used if *`-local-scope`*
+   is not used.
+
+*--hdl-library=*'<hdl-library>'::
+    Specify the HDL library in which this operation
+    will be performed.
+
+*--library=*'<library>', *-l* '<library>'::
+    Specify the component library in which this operation
+    will be performed.
+
+*--local-scope*::
+   Only show assets in the local project.
+
+*`--table`*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *`--simple`* or *`--json`* are not used.
+    
+*--very-verbose*::
+    Be very verbose with output.
+    
+*--very-very-verbose*::
+    Be very, very verbose with output.
+
+*`-P`* '<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which to operate.
+	
+EXAMPLES
+--------
+. List all RCC and HDL platforms that assets can be built for:
++
+---------------------
+ocpidev show platforms
+----------------------
++
+. List all HDL platforms that HDL assets can be built for:
++
+--------------------------
+ocpidev show hdl platforms
+--------------------------
++
+. List all components in any registered projects
+(omits components at the top level of project due to a defect):
++
+-----------------------
+ocpidev show components
+-----------------------
++
+. Display a table of the registered projects and their locations:
++
+-----------------------------
+ocpidev show --table registry
+------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

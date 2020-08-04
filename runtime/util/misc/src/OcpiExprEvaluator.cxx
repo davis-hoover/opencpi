@@ -185,10 +185,10 @@ public:
     base = defaultBase;
     if (*cp == '0' && cp < last - 1) {
       base =
-	isdigit(cp[1]) ? (cp++, 8) :
-	(cp[1] == 'x' || cp[1] == 'X') ? (cp += 2, 16) :
-	(cp[1] == 'b' || cp[1] == 'B') ? (cp += 2, 2) :
-	(cp[1] == 't' || cp[1] == 'T') ? (cp += 2, 10) :
+	isdigit(cp[1]) ? (cp++, 8u) :
+	(cp[1] == 'x' || cp[1] == 'X') ? (cp += 2, 16u) :
+	(cp[1] == 'b' || cp[1] == 'B') ? (cp += 2, 2u) :
+	(cp[1] == 't' || cp[1] == 'T') ? (cp += 2, 10u) :
 	defaultBase;
       if (cp == last)
 	return "invalid numeric constant";
@@ -242,7 +242,7 @@ public:
 	  return "missing close quote on string";
 	end = cp++;
 	op = OpConstant;
-	m_string.assign(start, end - start);
+	m_string.assign(start, OCPI_SIZE_T_DIFF(end, start));
 	m_isString = true;
 	break;
       }
@@ -255,7 +255,7 @@ public:
 	if ((err = getNumber(cp, last, mstart, end, mbase, mmult, true, 10)))
 	  return err;
 	std::string mpf;
-	mpf.assign(mstart, (end - mstart) - (mmult == 1 ? 0 : 1));
+	mpf.assign(mstart, OCPI_SIZE_T_DIFF(end, mstart) - (mmult == 1 ? 0 : 1));
 	if (cp < last && (*cp == 'e' || *cp == 'E' || *cp == '@')) {
 	  mpf += *cp++;
 	  if (cp < last && (*cp == '-' || *cp == '+'))
@@ -274,13 +274,22 @@ public:
 	  // convert it to decimal
 	  errno = 0;
 	  char *eend;
-	  unsigned long ul = strtoul(estart, &eend, ebase);
+	  unsigned long ul = strtoul(estart, &eend, (int)ebase);
 	  if (errno || eend != end)
 	    return "invalid exponent";
 	  ul *= emult;
 	  OU::formatAdd(mpf, "%lu", ul);
 	}
-	if (m_number.set_str(mpf, -mbase))
+	// When we take in floating point numbers, we must convert them to the most accurate number
+	// that is represented by a double, since otherwise the GMP conversion will not end up
+	// with a proper round-trip equal value.
+	if (strchr(mpf.c_str(), '.') && mbase == 10) {
+	  errno = 0;
+	  double d = strtod(mpf.c_str(), NULL);
+	  if (errno)
+	    return OU::esprintf("invalid numeric (double) constant: '%s'", mpf.c_str());
+	  m_number = d;
+	} else if (m_number.set_str(mpf, -mbase))
 	  return OU::esprintf("invalid numeric constant: '%s'", mpf.c_str());
 	m_number *= mmult;
 	op = OpConstant;
@@ -518,7 +527,7 @@ parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver 
       break;
     case OpIdent:
       {
-	std::string sym(t->start, t->end - t->start);
+	std::string sym(t->start, OCPI_SIZE_T_DIFF(t->end, t->start));
 	if (!strcasecmp(sym.c_str(), "false")) {
 	  t->op = OpConstant;
 	  t->value.m_isString = false;
@@ -689,7 +698,7 @@ makeCexpression(const char *cp, const char *prefix, const char *suffix, bool toU
     }
     out += before;
     if (t.start != t.end)
-      out.append(t.start, t.end - t.start);
+      out.append(t.start, OCPI_SIZE_T_DIFF(t.end, t.start));
     out += after;
   }
   return err;

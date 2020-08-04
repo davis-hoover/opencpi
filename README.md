@@ -68,7 +68,9 @@ the OpenCPI GitLab repository.  The default git branch, `develop`, is the most
 up-to-date branch and is **_not_** guaranteed to be stable, although every
 effort is made to try and make it so.  Therefore, using `develop` is "at your
 own risk" and documentation is likely not up-to-date, especially for new
-features being added.  The source installation method downloads, builds and uses
+features being added.
+
+The source installation method downloads, builds and uses
 the software in a directory of the user's choosing (_e.g._ `~/opencpi`).  Thus
 multiple versions can be downloaded and coexist, but not execute simultaneously.
 
@@ -94,8 +96,8 @@ To download the tar file associated with a release, select the release on the
 OpenCPI repository releases[releases] page and select the tar file to download.
 When the tar file is extracted it will create a directory called
 <code>opencpi-<em>\<release-tag\></em></code>, which you should `cd` into.
-Some browsers will automatically extract the file, but the first command assumes
-it does not.
+Some browsers will automatically extract the file, but the first command below
+assumes it does not.
 ```bash
 tar xzf opencpi-<release-tag>.tar.gz
 cd opencpi-<release-tag>
@@ -104,15 +106,17 @@ cd opencpi-<release-tag>
 #### Obtaining Sources via Cloning the OpenCPI git Repository.
 To download via cloning the entire OpenCPI repo, first ensure that you have
 `git` installed on your system.  If `git` is not installed, it can be installed
-by executing the following command:
+(on CentOS7) by executing the following command:
 ```bash
 sudo yum install git
 ```
 
-After git is installed, execute the following commands:
+After git is installed, execute the following commands.  Note the output of the `git tag`
+command will show available releases.
 ```bash
 git clone https://gitlab.com/opencpi/opencpi.git
 cd opencpi
+git tag
 git checkout <release-tag>
 ```
 
@@ -159,7 +163,7 @@ when you start a new **login shell** using `bash -l`.
 
 
 ## YUM/RPM Installation
-> Currently not availale for OpenCPI 1.6.x
+> Currently not availale for OpenCPI 1.7.x
 
 For CentOS6 or CentOS7 Linux, there is a binary/pre-built RPM installation
 available using the `yum` command.

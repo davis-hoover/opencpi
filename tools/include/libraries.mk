@@ -24,7 +24,12 @@ ifndef Libraries
   Libraries=$(call OcpiFindSubdirs,library)
 endif
 
-DoLibGoal=$(AT)set -e; for l in $(Libraries); do echo ====== Entering library $$l for goal: $(@); $(MAKE) -C $$l $(@); done
+DoLibGoal=$(AT)\
+  set -e; \
+  for l in $(Libraries); do \
+    echo ====== Entering library $$l for goal: $(@); \
+    $(MAKE) -C $$l OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) $@; \
+  done
 
 Goals=run all clean $(Models) $(Models:%=clean%) $(OcpiTestGoals)
 

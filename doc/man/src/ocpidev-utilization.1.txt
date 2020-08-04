@@ -1,0 +1,187 @@
+OCPIDEV-UTILIZATION(1)
+=====================
+
+
+NAME
+----
+ocpidev-utilization - displays or records FPGA resource use for HDL OpenCPI assets.
+
+
+SYNOPSIS
+--------
+*ocpidev* ['<options>'] *utilization* ['<noun>' ['<name>' ]]
+
+
+DESCRIPTION
+-----------
+The *`utilization`* verb invokes the OpenCPI tool that
+displays or records FPGA resource use for HDL OpenCPI assets.
+In order to display usage information about an HDL asset for
+a given platform, the asset needs to be built for that platform.  
+
+Asset types to be specified in the '<noun>' argument are:
+
+*hdl*::
+    A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
+    Possible HDL assets are:
+
+        *assembly*|*ies*;;
+	Display usage information for all built assemblies
+	contained in the current project or a for specified built
+	HDL assembly contained in the current project.
+	
+	*platform*|*s*;;
+	Display usage information for all built platforms
+	or for a specified built HDL platform contained
+	in the current project.
+	
+*library*::
+    Display usage information for all built workers
+    contained in a component library.
+
+*project*::
+    Display usage information for all built workers,
+    platforms, and assemblies contained in a project.
+
+*worker*::
+    Display usage information for the specified worker.
+    
+*workers*::
+    Display usage information for all built workers
+    contained in the current project.
+
+OPTIONS
+-------
+In the description below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+*`--format=table`*|*`latex`*::
+    Specify how to output the usage information.
+    Specifying *`table`* sends the information to stdout in tabular format.
+    Specifying *`latex`* bypasses *`stdout`* and writes all output to
+    *`utilization.inc`* files in the directories for the assets on
+    which it operates.
+    
+*`--hdl-library=`*'<hdl-primitive-library>'::
+    Specify the HDL primitive library in which this
+    operation is to be performed.
+    
+*`--hdl-platform=`*'<platform>'+::
+    Specify the buildable HDL platform for which
+    to display usage information.
+    
+*`--hdl-target=`*'<target>'+::
+    Specify the HDL target for which to display
+    worker (not assembly) usage information.
+
+ *`--library=`*'<library>', *`-l`* '<library>'::
+    Specify the component library in which the utilization operation
+    is to be performed.
+
+*`-P`* '<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which the
+    utilization operation is to be performed.
+
+EXAMPLES
+--------
+. Show usage information for the worker named *`complex_mixer`*
+using build results from all platforms:
++
+--------------------------------
+ocpidev utilization worker complex_mixer
+---------------------------------------
++
+. Show usage information for the worker named *`complex_mixer`*
+using build results from the *`xsim`* platform:
++
+-----------------------------------------------------------
+ocpidev utilization worker complex_mixer --hdl-platform=xsim
+-----------------------------------------------------------
++
+. Show usage information for all workers in the current
+location (project, library, etc.):
++
+----------------------------
+ocpidev utilization workers
+----------------------------
++
+. Show usage information for the *fir_real_sse* worker
+in the */components/dsp_comps* library:
++
+---------------------------------------------------
+ocpidev utilization worker fir_real_sse -l dsp_comps
+---------------------------------------------------
++
+. Show usage information for the *`xsim`* platform:
++
+------------------------
+ocpidev utilization hdl-platform=xsim
+------------------------
++
+. Show usage information for all HDL platforms
+in the current project:
++
+-------------------------------
+ocpidev utilization hdl-platforms
+-------------------------------
++
+. Show usage information for an HDL assembly named *`my_assy`*:
++
+---------------------------
+ocpidev utilization hdl assembly my_assy
+-----------------------------
++
+. Show usage information for all HDL assemblies in the current project:
++
+-------------------
+ocpidev utilization hdl assemblies
+--------------------
++
+. Record usage information for an HDL assembly
+named *`my_assy`* in LaTeX format:
++
+---------------------------
+ocpidev utilization hdl assembly my_assy --format=latex
+---------------------------
++
+. Show usage information for all supported assets in a project:
++
+----------------------------
+ocpidev utilization project
+----------------------------
++
+. Record usage information for all supported assets in a project in LaTeX format:
++
+---------------------------------------
+ocpidev utilization project --format=latex
+--------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

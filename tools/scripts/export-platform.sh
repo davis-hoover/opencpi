@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ####################################################################################################
-# Create the local exports in a platform directory, under the directory specified in $1, usually lib/
+# Create the local exports in a platform's directory, under the directory specified in $1, usually lib/
 # I.e. everything that needs to be exposed to users is made available here, and this is what will
 # be exported/visible from outside the project.
 # This is a precursor to the Framework-level cdk exporting that is done per-platform.
@@ -39,7 +39,7 @@ exports=$platform.exports
 echo Performing local exports into the $lib/ subdirectory for platform $platform.
 [ -e $exports ] && echo Exports file \"$exports\" will be processed || :
 
-# FIXME: Share this functionality with makeExportLinks.sh or makeProjectExports.sh
+# FIXME: Share this functionality with export-utils.sh
 function make_link {
   # echo make_link $1 $2
   # Figure out what the relative prefix should be

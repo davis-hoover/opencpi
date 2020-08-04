@@ -75,6 +75,7 @@ architecture rtl of worker is
 
   signal oclk_data   : std_logic_vector(out_out.data'range) := (others => '0');
   signal oclk_opcode : protocol.complex_short_with_metadata.opcode_t := SAMPLES;
+  signal oclk_eof    : std_logic := '0';
 begin
 
   ------------------------------------------------------------------------------
@@ -276,6 +277,8 @@ begin
 
   oclk_data_cdc_odeq <= oclk_out_adapter_irdy and oclk_data_cdc_oempty_n;
 
+  oclk_eof <= oclk_data_cdc_oempty_n and oclk_data_cdc_oeof;
+
   out_marshaller : complex_short_with_metadata_marshaller
     generic map(
       WSI_DATA_WIDTH    => to_integer(OUT_PORT_DATA_WIDTH),
@@ -285,7 +288,7 @@ begin
       rst          => out_in.reset,
       -- INPUT
       iprotocol    => oclk_data_cdc_oprotocol,
-      ieof         => oclk_data_cdc_oeof,
+      ieof         => oclk_eof,
       irdy         => oclk_out_adapter_irdy,
       -- OUTPUT
       odata        => oclk_data,
