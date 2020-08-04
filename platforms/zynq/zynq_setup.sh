@@ -41,13 +41,14 @@ else
   OCPI_CDK_DIR=$OCPI_DIR
   cat <<EOF > $HOME/.profile
     echo Executing $HOME/.profile.
-    export OCPI_CDK_DIR=$OCPI_CDK_DIR
-    export OCPI_TOOL_PLATFORM=$OCPI_TOOL_PLATFORM
-    export OCPI_TOOL_OS=linux
+	export OCPI_CDK_DIR=$OCPI_CDK_DIR
 	cd $OCPI_CDK_DIR
+	source ./zynq_setup_common.sh
+	set_tool_platform
+    export OCPI_TOOL_OS=linux
     # There is no multimode support when running standalone
-    export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
-    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/artifacts
+    export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
+    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/artifacts:$OCPI_CDK_DIR/artifacts
     export PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/bin:\$PATH
     export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/sdk/lib:\$LD_LIBRARY_PATH
     ocpidriver load
@@ -56,6 +57,8 @@ else
     if test -r $OCPI_CDK_DIR/mysetup.sh; then
        source $OCPI_CDK_DIR/mysetup.sh
     fi
+	
+	alias ls='ls --color=auto'	
 EOF
   echo Running login script. OCPI_CDK_DIR is now $OCPI_CDK_DIR.
   source $HOME/.profile

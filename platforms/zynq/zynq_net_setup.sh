@@ -58,10 +58,12 @@ else
   if test -e /mnt/net/$2; then
     echo Executing $PROFILE_FILE
     export OCPI_CDK_DIR=$OCPI_CDK_DIR
-    export OCPI_TOOL_PLATFORM=$OCPI_TOOL_PLATFORM
+	export OCPI_DIR=$OCPI_DIR
+    cd $OCPI_DIR
+	source ./zynq_setup_common.sh
+	set_tool_platform
     export OCPI_TOOL_OS=linux
     export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
-	export OCPI_DIR=$OCPI_DIR
 	cd $OCPI_DIR
     # As a default, access all built artifacts in the core project as well as
     # the bare-bones set of prebuilt runtime artifacts for this SW platform
@@ -99,6 +101,8 @@ else
   else
     echo NFS mounts not yet set up. Please mount the OpenCPI CDK into /mnt/net/.
   fi
+  
+  alias ls='ls --color=auto'	
 EOF
   echo Running login script. OCPI_CDK_DIR is now $OCPI_CDK_DIR.
   source $PROFILE_FILE

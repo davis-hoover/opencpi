@@ -40,7 +40,9 @@ if test "$OCPI_CDK_DIR" = ""; then
   # ifconfig eth0 hw ether 00:0a:35:00:01:23
   # ifconfig eth0 up
   # udhcpc
-  source ./zynq_setup_common.sh time.nist.gov
+  source ./zynq_setup_common.sh
+  set_tool_platform
+  set_time time.nist.gov
   # add or remove mount points based on your needs
   mkdir -p /mnt/net
   mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net  # second argument should be location of opencpi directory
@@ -83,6 +85,13 @@ export OCPI_ENABLE_HDL_SIMULATOR_DISCOVERY=0
 PS1='% '
 # add any commands to be run every time this script is run
 
+echo Loading hdl bitstream
+if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_DIR/artifacts/testbias_$HDL_PLATFORM\_base.bitz; then
+  echo Bitstream successfully loaded
+else
+  echo Bitstream load error
+fi
+  
 # Print the available containers as a sanity check
 echo Discovering available containers...
 ocpirun -C
