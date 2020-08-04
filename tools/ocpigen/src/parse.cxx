@@ -1097,7 +1097,8 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
   // This will be parsed again for build/Makefile purposes.
   // THIS MUST BE IN SYNC WITH THE gnumake VERSION in util.mk! Ugh.
   OrderedStringSet dirs;
-  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, dirs)))
+  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, true,
+				   dirs)))
     return;
   for (auto it = dirs.begin(); it != dirs.end(); ++it)
     addInclude(*it);
