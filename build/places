@@ -105,4 +105,5 @@ tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/
 #tools/ocpisca -n -d internal
 tools/ocpirh
 tools/ocpigr -t -I tools/cdkutils/include -I runtime/library/include -L cdkutils -L library
+tools/ocpigr37 -t -I tools/cdkutils/include -I runtime/library/include -L cdkutils -L library
 tools/ocpidds -d cxxtests -n -r -t -I tools/cdkutils/include -L cdkutils
