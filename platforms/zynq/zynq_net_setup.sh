@@ -67,7 +67,7 @@ else
 	cd $OCPI_DIR
     # As a default, access all built artifacts in the core project as well as
     # the bare-bones set of prebuilt runtime artifacts for this SW platform
-    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/artifacts:$OCPI_CDK_DIR/../projects/assets/artifacts:$OCPI_DIR/\$OCPI_TOOL_DIR/artifacts
+    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/artifacts:$OCPI_CDK_DIR/../projects/assets/artifacts:$OCPI_DIR/\$OCPI_TOOL_DIR/artifacts:$OCPI_DIR/artifacts
     # Priorities for finding system.xml:
     # 1. If is it on the local system it is considered customized for this system - use it.
     if test -r $OCPI_DIR/system.xml; then
