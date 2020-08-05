@@ -23,7 +23,7 @@ Configurations=\
   base \
   gp1 \
 
-ExportFiles=zed_ise.ucf zed_ise.ut testbias_zed_ise_base.bitz 98-zedboard.rules sd_card
+ExportFiles=zed_ise.ucf zed_ise.ut 98-zedboard.rules sd_card
 
 include $(OCPI_CDK_DIR)/include/util.mk
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
