@@ -183,7 +183,7 @@ else
     done
     # See if its a swig library. If so just leave it alone in this static case
     for s in $swigs; do
-      [ _$s = "$me" ] && continue 2
+      [ _$s = "$me" -o _${s}2 = "$me" ] && continue 2
     done
     # At some point this may be needed but probably not here in any case
     # for p in $prereqs; do
