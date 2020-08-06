@@ -105,11 +105,11 @@ setError(const char *fmt, va_list ap) {
   return RCC_ERROR;
 }
 
-OC::Worker &Worker::
+OC::Worker *Worker::
 getSlave(unsigned n) {
   if (slaves().empty() || n >= slaves().size())
     throw OU::Error("No slave has been set for worker '%s'", name().c_str());
-  return *slaves()[n];
+  return slaves()[n];
 }
 
 Worker::
@@ -1435,5 +1435,11 @@ OCPI_CONTROL_OPS
    ~RCCUserSlave() {
    }
 #endif
+   void RCCUserSlave::
+   checkSlave(const char *name) const {
+     if (!m_worker)
+       throw OU::Error("proxy worker is accessing slave \"%s\" which is not present in the application",
+		       name);
+  }
   }
 }

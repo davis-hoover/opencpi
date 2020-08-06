@@ -20,6 +20,7 @@
 
 #include <set>
 #include <limits>
+#include <climits>
 #include "OcpiUtilExceptionApi.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
@@ -417,19 +418,42 @@ namespace OCPI {
 
     Assembly::Instance::Instance() : m_freeXml(false) {}
     Assembly::Instance::~Instance() { if (m_freeXml) ezxml_free(m_xml); }
+
     const char *Assembly::Instance::
-    checkSlave(Assembly &a, const char *name) {
-      unsigned n;
-      const char *err = a.getInstance(name, n);
-      if (err)
-	return err;
-      Instance &slave = *a.m_instances[n];
-      if (slave.m_hasMaster)
-	  return esprintf("Instance %s is slave to multiple proxies", slave.m_name.c_str());
-      m_slaves.emplace_back(n);
-      slave.m_hasMaster = true;
-      slave.m_master = m_ordinal;
+    checkSlave(Assembly &a, const char *instance, const char *slave) {
+      unsigned n = UINT_MAX;
+      if (instance) { // if no instance, this is a placeholder
+	const char *err;
+	if ((err = a.getInstance(instance, n)))
+	  return err;
+	Instance &si = *a.m_instances[n];
+	if (si.m_hasMaster)
+	  return esprintf("Instance %s is slave to multiple proxies", si.m_name.c_str());
+	si.m_hasMaster = true;
+	si.m_master = m_ordinal;
+      }
+      m_slaveInstances.emplace_back(n);
+      m_slaveNames.emplace_back(slave);
       return NULL;
+    }
+
+    const char *Assembly::Instance::
+    parseSlave(Assembly &a, ezxml_t sx) {
+      // new way uses instance and slave attrs, old way used "name" as instance name
+      const char *err;
+      if ((err = OE::checkAttrs(sx, "name", "instance", "slave", NULL)))
+	return err;
+      const char
+	*name = ezxml_cattr(sx, "name"),
+	*slave = ezxml_cattr(sx, "slave"),
+	*instance = ezxml_cattr(sx, "instance");
+      if (name) {
+	if (slave || instance)
+	  return esprintf("slave elements should have only \"slave\" and \"instance\" attributes");
+	instance = name;
+      } else if (!instance)
+	return esprintf("slave elements must have \"instance\" attributes");
+      return checkSlave(a, instance, slave);
     }
 
     // connect, then optionally, which local port (from) and which dest port (to).
@@ -453,37 +477,16 @@ namespace OCPI {
       if ((e = ezxml_cattr(ix, "external")) &&
 	  (err = a.addExternalConnection(ix, m_ordinal, e, params)))
 	return err;
-#if 1
       const char *slave = ezxml_cattr(ix, "slave");
       if (slave) {
 	if (ezxml_cchild(ix, "slave"))
 	  return esprintf("cannot have slave elements when you have a slave attribute");
-	if ((err = checkSlave(a, slave)))
+	if ((err = checkSlave(a, slave, NULL)))
 	  return err;
       } else
-	for (ezxml_t cx = ezxml_cchild(ix, "slave"); cx; cx = ezxml_cnext(cx)) {
-	  if (!(slave = ezxml_cattr(cx, "name")))
-	    return esprintf("Missing \"name\" attribute for \"slave\" element");
-	  if ((err = checkSlave(a, slave)))
+	for (ezxml_t cx = ezxml_cchild(ix, "slave"); cx; cx = ezxml_cnext(cx))
+	  if ((err = parseSlave(a, cx)))
 	    return err;
-	}
-#else
-      if ((s = ezxml_cattr(ix, "slave"))) {
-	if ((err = a.getInstance(s, m_slave)))
-	  return err;
-	else {
-	  Instance &slave = *a.m_instances[m_slave];
-	  if (slave.m_hasMaster)
-	    return esprintf("Instance %s is slave to multiple proxies",
-			    slave.m_name.c_str());
-	  else {
-	    m_hasSlave = true;
-	    slave.m_hasMaster = true;
-	    slave.m_master = m_ordinal;
-	  }
-	}
-      }
-#endif
       return NULL;
     }
 

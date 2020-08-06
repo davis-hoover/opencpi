@@ -465,40 +465,42 @@ typedef struct {
  // It forwards all the API methods
  class RCCUserSlave {
  protected:
-   OCPI::API::Worker &m_worker;
+   OCPI::API::Worker *m_worker;
    RCCUserSlave(unsigned n = 0);
+   void checkSlave(const char *) const;
  public:
-   inline bool isOperating() const { return m_worker.isOperating(); }
-   inline void start() { m_worker.start(); }
-   inline void stop() { m_worker.stop(); }
-   inline void beforeQuery() { m_worker.beforeQuery(); }
-   inline void afterConfigure() { m_worker.afterConfigure(); }
+   inline bool isPresent() const { return m_worker != NULL; }
+   inline bool isOperating() const { return m_worker->isOperating(); }
+   inline void start() { m_worker->start(); }
+   inline void stop() { m_worker->stop(); }
+   inline void beforeQuery() { m_worker->beforeQuery(); }
+   inline void afterConfigure() { m_worker->afterConfigure(); }
    // Untyped property setting - slowest but convenient
    inline void setProperty(const char *name, const char *value,
 			   OCPI::API::AccessList &list = OCPI::API::emptyList) {
-     m_worker.setProperty(name, value, list);
+     m_worker->setProperty(name, value, list);
    }
    inline const char *getProperty(unsigned ordinal, std::string &value,
 				  OCPI::API::AccessList &list,
 				  OCPI::API::PropertyOptionList &options,
 				  OCPI::API::PropertyAttributes *attributes) const {
-     return m_worker.getProperty(ordinal, value, list, options, attributes);
+     return m_worker->getProperty(ordinal, value, list, options, attributes);
    }
    // Untyped property list setting - slow but convenient
    inline void setProperties(const char *props[][2]) {
-     m_worker.setProperties(props);
+     m_worker->setProperties(props);
    }
    // Typed property list setting - slightly safer, still slow
-   inline void setProperties(const OCPI::API::PValue *props) { m_worker.setProperties(props); }
+   inline void setProperties(const OCPI::API::PValue *props) { m_worker->setProperties(props); }
    inline bool getProperty(unsigned ordinal, std::string &name, std::string &value,
                            bool *unreadablep = NULL, bool hex = false) {
-     return m_worker.getProperty(ordinal, name, value, unreadablep, hex);
+     return m_worker->getProperty(ordinal, name, value, unreadablep, hex);
    }
    inline void getRawPropertyBytes(size_t offset, uint8_t *buf, size_t count) {
-     m_worker.getRawPropertyBytes(offset, buf, count);
+     m_worker->getRawPropertyBytes(offset, buf, count);
    }
    inline void setRawPropertyBytes(size_t offset, const uint8_t *buf, size_t count) {
-     m_worker.setRawPropertyBytes(offset, buf, count);
+     m_worker->setRawPropertyBytes(offset, buf, count);
    }
  };
 }} // end of namespace OCPI::RCC

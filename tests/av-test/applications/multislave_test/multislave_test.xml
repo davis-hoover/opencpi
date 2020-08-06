@@ -44,8 +44,8 @@
     <Property Name="test_ushort" Value="0"></Property>
   </Instance>
   <Instance Name='proxy1' component="av.test.proxy1">
-    <slave name='comp1'/>
-    <slave name='comp2'/>
+    <slave instance='comp2' slave='second_wkr1'/>
+    <slave instance='comp1' slave='first_wkr1'/>
     <slave name='comp3'/>
   </Instance>
 </Application>
