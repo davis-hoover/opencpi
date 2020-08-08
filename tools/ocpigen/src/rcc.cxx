@@ -30,7 +30,6 @@
 
 namespace OU = OCPI::Util;
 namespace OF = OCPI::OS::FileSystem;
-namespace OX = OCPI::Util::EzXml;
 
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
@@ -1355,11 +1354,12 @@ parseSlaves() {
   }
   for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
     std::string wkr, name;
-    if ((err = OX::getRequiredString(slave, wkr, "worker", "slave")))
+    if ((err = OE::checkAttrs(slave, "worker", "name", "optional", (void*)0)) ||
+	(err = OE::getRequiredString(slave, wkr, "worker", "slave")))
       return err;
-    OX::getOptionalString(slave, name, "name");
+    OE::getOptionalString(slave, name, "name");
     bool optional = false;
-    if ((err = OE::getBoolean(m_xml, "optional", &optional)))
+    if ((err = OE::getBoolean(slave, "optional", &optional)))
       return err;
     size_t dot = wkr.find_last_of('.');
     if (dot == std::string::npos)

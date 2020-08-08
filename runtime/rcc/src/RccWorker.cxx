@@ -1438,7 +1438,7 @@ OCPI_CONTROL_OPS
    void RCCUserSlave::
    checkSlave(const char *name) const {
      if (!m_worker)
-       throw OU::Error("proxy worker is accessing slave \"%s\" which is not present in the application",
+       throw OU::Error("proxy worker accessed an optional slave \"%s\" which is not present",
 		       name);
   }
   }

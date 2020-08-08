@@ -123,7 +123,7 @@ namespace OCPI {
 	    *n = ezxml_cattr(cx, "name");
 	  assert(w);
 	  bool optional = false;
-	  if ((err = OE::getBoolean(xml, "optional", &optional)))
+	  if ((err = OE::getBoolean(cx, "optional", &optional)))
 	    return err;
 	  m_slaves.emplace_back(n, w, optional);
 	}
