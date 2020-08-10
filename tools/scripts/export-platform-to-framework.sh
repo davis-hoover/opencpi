@@ -71,6 +71,8 @@ for a in $deployments; do
 done
 
 if [ $model = hdl ]; then
+  # Make sure the artifacts are exported
+  make -C projects/assets exports
   tbz=projects/assets/exports/artifacts/ocpi.assets.testbias_${platform}_base.hdl.0.${platform}.bitz
   if [ -f $tbz ]; then
     make_relative_link $tbz exports/$platform/$(basename $tbz)
