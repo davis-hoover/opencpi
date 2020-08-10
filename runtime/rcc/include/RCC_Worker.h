@@ -480,6 +480,12 @@ typedef struct {
 			   OCPI::API::AccessList &list = OCPI::API::emptyList) {
      m_worker->setProperty(name, value, list);
    }
+   inline const char *getProperty(const char *name, std::string &value,
+				  OCPI::API::AccessList &list = OCPI::API::emptyList,
+				  OCPI::API::PropertyOptionList &options = OCPI::API::noPropertyOptions,
+				  OCPI::API::PropertyAttributes *attributes = NULL) const {
+     return m_worker->getProperty(name, value, list, options, attributes);
+   }
    inline const char *getProperty(unsigned ordinal, std::string &value,
 				  OCPI::API::AccessList &list,
 				  OCPI::API::PropertyOptionList &options,

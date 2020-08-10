@@ -71,15 +71,15 @@ endif
 ###############################################################################
 # If the PackageName is not set, set it to dirname
 #   (or blank if dirname == components)
-$$(infox P1:$$(PackagePrefix):$$(PackageName):$$(Package))
+$$(infox P1:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 ifeq ($$(PackageName),)
   export PackageName:=$$(foreach d,$$(notdir $$(realpath $1)),$$(filter-out components,$$d))
 endif
-$$(infox P2:$$(PackagePrefix):$$(PackageName):$$(Package))
+$$(infox P2:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 
 # If PackageName is nonempty, prepend it with '.'
 export PackageName:=$$(if $$(PackageName),.$$(patsubst .%,%,$$(PackageName)))
-$$(infox P3:$$(PackagePrefix):$$(PackageName):$$(Package))
+$$(infox P3:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 
 ###############################################################################
 # Arg2 to OcpiCreatePackageId is an optional Authoring Model Prefix Segment
@@ -96,10 +96,10 @@ endif
 # Otherwise, if Package starts with '.',
 #   set it to $$(CurrentPackagePrefix)$$(Package)
 ifeq ($$(Package),)
-  export Package:=$$(PackagePrefix)$$(PackageName)
+  export override Package:=$$(PackagePrefix)$$(PackageName)
 else
   ifneq ($$(filter .%,$$(Package)),)
-    export Package:=$$(PackagePrefix)$$(Package)
+    export override Package:=$$(PackagePrefix)$$(Package)
   endif
 endif
 
@@ -135,4 +135,4 @@ endef # define OcpiCreatePackageId
 OcpiSetAndGetPackageId=$(strip \
   $(infox CSGP:$1:$2:$3:$(PackagePrefix))\
   $(eval $(call OcpiCreatePackageId,$1,$2,$3))\
-  $(infox PACKAGE RETURNED:$(Package))$(Package))
+  $(infox PACKAGE RETURNED:$(Package)))
