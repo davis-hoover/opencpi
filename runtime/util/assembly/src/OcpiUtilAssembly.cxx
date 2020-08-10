@@ -135,9 +135,12 @@ namespace OCPI {
       }
       OE::getNameWithDefault(ax, m_name, defaultName ? defaultName : "unnamed%u", s_count);
       OE::getOptionalString(ax, m_package, "package");
-      if (m_package.empty()) {
+      if (m_package.empty() || m_package[0] == '.') {
 	const char *env = getenv("OCPI_PROJECT_PACKAGE");
-        m_package = env ? env : "local";
+	std::string prefix = env ? env : "local";
+       if (m_package[0] == '.')
+	 prefix += m_package;
+       m_package = prefix;
       }
       for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix))
         if ((err = addInstance(ix, extraInstAttrs, params)))
@@ -624,7 +627,6 @@ namespace OCPI {
         return err;
       m_xml = ix;
       std::string component, myBase;
-      const char *compName = 0;
       if (a.isImpl()) {
         if (ezxml_cattr(ix, "component"))
           return "'component' attributes are invalid in this implementation assembly";
@@ -634,15 +636,15 @@ namespace OCPI {
       } else if ((err = OE::getRequiredString(ix, component, "component", "instance")))
         return err;
       else {
-        if ((compName = strrchr(component.c_str(), '.')))
-          compName++;
-        else {
-          m_specName = a.m_package;
-          m_specName += ".";
-          compName = component.c_str();
-        }
-        m_specName += component;
-        myBase = compName;
+	const char *compName = strrchr(component.c_str(), '.');
+	if (compName)
+	  if (component[0] == '.')
+	    m_specName = a.m_package + component;
+	  else
+	    m_specName = component;
+	else
+	  m_specName = a.m_package + "." + component;
+        myBase = compName ? ++compName : component.c_str();
       }
       // FIXME: somehow pass in valid elements or do this test somewhere else...
       if ((err = OE::checkElements(ix, "property", "signal", "slave", NULL)))
