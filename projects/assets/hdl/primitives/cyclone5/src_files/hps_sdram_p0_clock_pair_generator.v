@@ -6,12 +6,12 @@
 
 
 // Copyright (C) 2017  Intel Corporation. All rights reserved.
-//  Your use of Intel Corporation's design tools, logic functions
-//  and other software and tools, and its AMPP partner logic
-//  functions, and any output files from any of the foregoing
-//  (including device programming or simulation files), and any
-//  associated documentation or information are expressly subject
-//  to the terms and conditions of the Intel Program License
+//  Your use of Intel Corporation's design tools, logic functions 
+//  and other software and tools, and its AMPP partner logic 
+//  functions, and any output files from any of the foregoing 
+//  (including device programming or simulation files), and any 
+//  associated documentation or information are expressly subject 
+//  to the terms and conditions of the Intel Program License 
 //  Subscription Agreement, the Intel Quartus Prime License Agreement,
 //  the Intel FPGA IP License Agreement, or other applicable license
 //  agreement, including, without limitation, that your use is for
@@ -21,12 +21,12 @@
 
 
 
-//synthesis_resources = cyclonev_io_obuf 2 cyclonev_pseudo_diff_out 1
+//synthesis_resources = cyclonev_io_obuf 2 cyclonev_pseudo_diff_out 1 
 //synopsys translate_off
 `timescale 1 ps / 1 ps
 //synopsys translate_on
 module  hps_sdram_p0_clock_pair_generator
-	(
+	( 
 	datain,
 	dataout,
 	dataout_b) /* synthesis synthesis_clearbox=1 */;
@@ -46,7 +46,7 @@ module  hps_sdram_p0_clock_pair_generator
 	wire  [0:0]  oe_w;
 
 	cyclonev_io_obuf   obuf_ba_0
-	(
+	( 
 	.i(wire_pseudo_diffa_obar),
 	.o(wire_obuf_ba_o[0:0]),
 	.obar(),
@@ -73,7 +73,7 @@ module  hps_sdram_p0_clock_pair_generator
 	assign
 		wire_obuf_ba_oe = {(~ wire_pseudo_diffa_oebout[0])};
 	cyclonev_io_obuf   obufa_0
-	(
+	( 
 	.i(wire_pseudo_diffa_o),
 	.o(wire_obufa_o[0:0]),
 	.obar(),
@@ -100,7 +100,7 @@ module  hps_sdram_p0_clock_pair_generator
 	assign
 		wire_obufa_oe = {(~ wire_pseudo_diffa_oeout[0])};
 	cyclonev_pseudo_diff_out   pseudo_diffa_0
-	(
+	( 
 	.dtc(),
 	.dtcbar(),
 	.i(datain),

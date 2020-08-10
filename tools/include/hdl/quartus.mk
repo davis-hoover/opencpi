@@ -202,7 +202,7 @@ QuartusMakeQsf=\
   $(if $(findstring $(HdlMode),container),\
     echo '\#' Include the platform-related assignments. ;\
     echo source $(call AdjustRelative,$(call QuartusConstraints,$(HdlPlatform)));) \
- ) > $(Core).qsf; echo fit_stratixii_disallow_slm=On > quartus.ini && echo sci_use_legacy_sld_flow=on >> quartus.ini;
+ ) > $(Core).qsf; echo fit_stratixii_disallow_slm=On > quartus.ini;
 
 # Be safe for now - remove all previous stuff
 HdlToolCompile=\

@@ -28,8 +28,7 @@ SourceFiles=cyclone5_sockit.qsf soc_system.qip
 
 # The QSF file is included at the platform, config and container levels for QPro platforms
 ExportFiles=\
-  cyclone5_sockit.qsf \
-	soc_system.qip
+  cyclone5_sockit.qsf soc_system.qip
 
 
 
