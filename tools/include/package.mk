@@ -96,13 +96,13 @@ endif
 # Otherwise, if Package starts with '.',
 #   set it to $$(CurrentPackagePrefix)$$(Package)
 ifeq ($$(Package),)
-  export override Package:=$$(PackagePrefix)$$(PackageName)
+  override Package:=$$(PackagePrefix)$$(PackageName)
 else
   ifneq ($$(filter .%,$$(Package)),)
-    export override Package:=$$(PackagePrefix)$$(Package)
+    override Package:=$$(PackagePrefix)$$(Package)
   endif
 endif
-
+export Package # note that older versions of make cannot use "export override..."
 ###############################################################################
 # Check/Generate the package-id file
 #
