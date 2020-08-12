@@ -54,8 +54,8 @@ begin
   ctl_rst            <= not ctl_rst_n;
   timebase_out.clk   <= ctl_clk; -- changed from sys0_clk because of AV-5437
   timebase_out.reset <= not ctl_rst_n; -- changed from sys0_rst because of AV-5437
-  timebase_out.ppsIn <= ppsExtIn;
-  ppsOut             <= timebase_in.ppsOut;
+  timebase_out.pps   <= ppsExtIn;
+  ppsOut             <= timebase_in.pps;
   -- Provide the highest available quality clock and reset used for the time server,
   -- without regard for it being in any particular time domain.
 

@@ -935,7 +935,9 @@ OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
   $(if $(wildcard $1/Project.mk),\
     $(if $(wildcard $1/Makefile)$(wildcard $1/Makefile.am),\
       $(if $(filter project,$(call OcpiGetDirType,$1)),\
-        $(infox found project in $1)$(eval $(call OcpiSetProject,$1))$(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)),\
+        $(infox found project in $1)\
+        $(eval $(call OcpiSetProject,$1))\
+        $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
         $(error no proper Makefile found in the directory where Project.mk was found ($1))),\
       $(error no Makefile found in the directory where Project.mk was found ($1))),\
     $(if $(foreach r,$(realpath $1/..),$(filter-out /,$r)),\
@@ -1037,11 +1039,12 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
         $(if $(filter-out undefined,$(origin OcpiIncludeParentAsset_$s)),\
           $(call OcpiIncludeParentAsset_$s,$1,$2,$3),\
           $(call OcpiIncludeProject,$3,asset))\
+        $(if $(Package),,$(eval override Package:=$(OCPI_PROJECT_PACKAGE)))\
+        $(eval override ParentPackage:=$(Package))\
+        $(eval override Package:=)\
         $(eval $(call OcpiSetAsset,$1,$c))\
-        $(eval ParentPackage:=)\
-        $(eval unexport ParentPackage)\
-        $(infox SAG:$(PackagePrefix))\
-        $(eval override ParentPackage:=$(call OcpiSetAndGetPackageId,$1,$2,$t))))))
+        $(call OcpiSetAndGetPackageId,$1,$2,$t)\
+        $(infox PARENT:$(origin ParentPackage):$(ParentPackage))))))
 
 # Wrapper function for OcpiIncludeAssetAndParentX. package.mk is included here
 # so that it is not included many times during recursive calls of the *X
@@ -1053,6 +1056,8 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
 #   Arg3 = error/warning/info mode (optional)
 OcpiIncludeAssetAndParent=\
   $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
+    $(eval override ParentPackage:=)\
+    $(eval override Package:=)\
     $(eval include $(OCPI_CDK_DIR)/include/package.mk)\
     $(call OcpiIncludeAssetAndParentX,$(or $1,.),$2,$3))
 
@@ -1177,7 +1182,7 @@ OcpiDirName=$(patsubst %/,%,$(dir $1))
 #    <artifact-file-input>,<output-file-to-modify>,<packageparent>,<config>,<platform>)
 # old name based on xml uuid not used anymore since we rely on package ids
 #    $(comment uuid=`sed -n '/artifact uuid/s/^.*artifact uuid="\([^"]*\)".*$$/\1/p' $1` &&)
-OcpiPrepareArtifact=\
+OcpiPrepareArtifact=$(infox PREPARE:$1:$2:$3:$4:$5=$(OCPI_PROJECT_DIR))\
   $(ToolsDir)/ocpixml add $2 $1 \
   $(and $(OCPI_PROJECT_DIR), &&\
     adir=$(OCPI_PROJECT_DIR)/artifacts &&\
