@@ -24,5 +24,5 @@
 +components/util_comps/drs_controller.rcc/target-<target>/libsimpledrs_wrapper.so lib/util_comps/rcc/<target>/
 +components/util_comps/drs_controller.rcc/target-<target>/libdubri.so lib/util_comps/rcc/<target>/
 # Enable all local bitstreams to be seen in one place for convenience of OCPI_LIBRARY_PATH:
-+hdl/assemblies/*/container-*/target-*/*.bitz lib/hdl/assemblies/
++hdl/assemblies/*/container-*/target-*/*.bitz artifacts/
 all

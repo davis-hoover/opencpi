@@ -69,8 +69,10 @@ python_PYTHON=
 pythondir=$(libdir)
 # It doesn't appear that autoconf macros actually gives us the proper runtime prefix
 PYTHON_INCLUDES=$(shell python@PYTHON_VERSION@-config --includes)
+PYTHON2_INCLUDES=$(shell command -v python2-config > /dev/null && [[ $$(python2 -c "import sys;print(sys.version)") == 2* ]] && python2-config --includes)
 # And we need to define a similar variable for the python library
 PYTHON_LIBS=$(shell python@PYTHON_VERSION@-config --libs | sed 's/.*\(-lpython[^ ]*\).*/\1/')
+PYTHON2_LIBS=$(shell command -v python2-config > /dev/null && [[ $$(python2 -c "import sys;print(sys.version)") == 2* ]] && python2-config --libs | sed 's/.*\(-lpython[^ ]*\).*/\1/')
 # Avoid automake limitations by defining a variable used later
 ocpi_extra_libs=$(patsubst %,-l%,@OcpiExtraLibs@)
 
@@ -158,7 +160,7 @@ function print_libs {
 }
 
 # create a library
-# args are 1:<type> 2:<name> 3:<sources> 4:<extra c/cxxflags> 5:<ldflags> 6:<ldadd> 7:<dest>
+# args are 1:<type> 2:<name> 3:<sources> 4:<extra c/cxxflags> 5:<ldflags> 6:<ldadd> 7:<dest> 8:<pysuffix>
 function do_library {
   [ -n "$verbose" ] && echo for $1 library $2 sources are \"$3\"  >&2
   printf "# for $1 library $2\n"
@@ -168,7 +170,9 @@ function do_library {
       amname=__ocpi_build_dir__libocpi_${2}_la
   fi
   do_flags $amname "$4" $1 
-  printf "${amname}_LDFLAGS = $5\n"
+  local ldflags=$5
+  [ "$1" = swig ] && ldflags+=" \$(PYTHON$8_LIBS)"
+  printf "${amname}_LDFLAGS = $ldflags\n"
   printf "${amname}_SOURCES ="
   for s in $3; do printf ' \\\n  '$s; done
   echo
@@ -183,11 +187,11 @@ function do_library {
   fi
   if [ "$1" = swig ]; then
     printf "${7}_LTLIBRARIES += \$(ocpi_build_dir)/_$2.la\n"
-    printf "${amname}_CPPFLAGS+=\$(PYTHON_INCLUDES)\\n"
+    printf "${amname}_CPPFLAGS+=\$(PYTHON$8_INCLUDES)\\n"
     printf "\$(ocpi_build_dir)/$3: $swig\\n"
     printf "\\t\$(AT)@OcpiSWIG@ -c++ -python -classic -outdir \$(@D) -o \$@ "
     printf "\$(${amname}_CPPFLAGS) \$<\\n"
-    printf "python_PYTHON+=$(dirname $swig)/$2.py\\n"
+    [[ $2 != *2 ]] && printf "python_PYTHON+=$(dirname $swig)/$2.py\\n"
   else
     printf "\n${7}_LTLIBRARIES += \$(ocpi_build_dir)/libocpi_$2.la\n"
   fi
@@ -333,20 +337,15 @@ while read path opts; do
 	wrap="$(dirname $swig)/${base}_wrap.cxx"
 	swigs="$swigs $base"
 	# It appears that libtool ignores -export-dynamic
-#	ldflags="-module -export-dynamic -shrext @OcpiDynamicLibrarySuffix@ 
 	# Even on a mac, the swig suffix is always .so...
 	ldflags="-module -export-dynamic -shrext .so \
                  @libtool_dynamic_library_flags@ @ocpi_swig_flags@"
-	ldflags+=" \$(PYTHON_LIBS)"
 	ldflags+=" $ocpi_prereq_ldflags"
 	ldadd="libocpi_${lname} $ldadd"
 	echo "if !ocpi_is_cross"
-#	echo "if ocpi_is_dynamic"
-#	do_library "swig" $base $wrap "" "$ldflags" "$ldadd $dynamic_prereqs" $dest
-#	echo else
 	do_library "swig" $base $wrap "-prefer-pic" "$ldflags" "$ldadd" $dest
-#		   "$(for l in $ldadd; do echo ${l}_d; done) $static_prereqs" $dest
-#	echo endif
+	command -v python2-config > /dev/null && [[ $(python -c "import sys;print(sys.version)") == 2* ]] && 
+          do_library "swig" ${base}2 $wrap "-prefer-pic" "$ldflags" "$ldadd" $dest 2
 	echo endif
     fi
   }
@@ -372,7 +371,7 @@ while read path opts; do
 	  maybe_add_directory bin
           dir=bin
           break
-	fi    
+	fi
       done
       echo "${dir}_PROGRAMS += \$(ocpi_build_dir)/$pname"
     done

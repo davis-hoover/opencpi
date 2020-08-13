@@ -16,15 +16,20 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This core was generated for one target
-Top=v6_pcie_v1_3
-OnlyTargets=xc6vlx240t
-Imports= \
- $(OCPI_HDL_IMPORTS_DIR)/coregen/pcie_4243_trn_v6es_gtx_x4_250/source/*.v
-include $(OCPI_CDK_DIR)/include/hdl/hdl-core.mk # We are a (compiled) core
+# This file will run when anything "under" opencpi is imported.
 
+# We always load the (single) aci swig module now.
+# In the future if we have more subpackages we can use one of the variety of techniques
+# for lazy import of subpackages.
 
+# The former version of this script was a no-op for
+# "sys.version_info >= (3, 0)" for whatever reason.
 
-
-
-
+# This file is only functional when exported, and with swig libraries collocated.
+import sys
+old=sys.getdlopenflags()
+if sys.platform != 'darwin':
+   import ctypes
+   sys.setdlopenflags(old|ctypes.RTLD_GLOBAL)
+import opencpi2.aci
+sys.setdlopenflags(old)

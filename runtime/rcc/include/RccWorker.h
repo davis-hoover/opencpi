@@ -184,7 +184,7 @@ namespace OCPI {
       // Mutable since this is a side effect of clearing the worker-set error when reported
       mutable char     *m_errorString;         // error string set via "setError"
     protected:
-      OCPI::Container::Worker &getSlave(unsigned i);
+      OCPI::Container::Worker *getSlave(unsigned i);
       RCCPort &portInit() { return m_context->ports[m_portInit++]; }
       inline uint8_t * getPropertyVaddr() const { return  (uint8_t*)m_context->properties; }
 
