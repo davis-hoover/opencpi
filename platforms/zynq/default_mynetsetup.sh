@@ -25,6 +25,11 @@
 # For Dev Testing: export OCPI_TOOL_PLATFORM and OCPI_DIR for testing platforms 
 # in the future without touching the set_tool_platform function or script in general
 
+if [[ "$BASH_SOURCE" = "$0" ]]; then  # script has to be sourced in order to run applications
+  echo "Script is NOT sourced. Expected form 'source ./mynetsetup.sh <IP-Address of server machine> < Directory to mount>'"
+  exit 1  # note exit and not return since we are not being sourced
+fi
+
 trap "trap - ERR; break" ERR; for i in 1; do
 
 if test "$OCPI_CDK_DIR" = ""; then
