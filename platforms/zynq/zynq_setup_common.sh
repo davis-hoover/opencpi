@@ -19,7 +19,7 @@ set_time() {
     # Calling ntpd without any options will run it as a dameon
     OPTS=""
     BUSYBOX_PATH="$OCPI_DIR/$OCPI_TOOL_PLATFORM/bin"
-    TIMEOUT=5
+    TIMEOUT=20
     MSG="Succeeded in setting the time from $OCPI_DIR/ntp.conf"
     if [ ! -e $OCPI_DIR/ntp.conf ]; then
       OPTS="-p $1"
