@@ -27,7 +27,7 @@
 # in the future without touching the set_tool_platform function or script in general
 
 if [[ "$BASH_SOURCE" = "$0" ]]; then  # script has to be sourced in order to run applications
-  echo "Script is NOT sourced. Expected form 'source ./mynetsetup.sh <IP-Address of server machine> < Directory to mount>'"
+  echo "Script is NOT sourced. Expected form 'source ./mysetup.sh'"
   exit 1  # note exit and not return since we are not being sourced
 fi
 
