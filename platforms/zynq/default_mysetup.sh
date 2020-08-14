@@ -36,8 +36,8 @@ trap "trap - ERR; break" ERR
 for i in 1; do
   if test "$OCPI_CDK_DIR" = ""; then
     source ./zynq_setup_common.sh
-	set_tool_platform
-	set_time time.nist.gov
+	  set_tool_platform
+	  set_time time.nist.gov
     # Uncomment this section and change the MAC address for an environment with multiple
     # ZedBoards on one network (only needed on xilinx13_3)
     # ifconfig eth0 down
@@ -63,12 +63,12 @@ for i in 1; do
   PS1='% '
   # add any commands to be run every time this script is run
 
-echo Loading hdl bitstream
-if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_DIR/artifacts/testbias_$HDL_PLATFORM\_base.bitz; then
-  echo Bitstream successfully loaded
-else
-  echo Bitstream load error
-fi
+  echo Loading hdl bitstream
+  if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_DIR/artifacts/testbias_$HDL_PLATFORM\_base.bitz; then
+    echo Bitstream successfully loaded
+  else
+    echo Bitstream load error
+  fi
   
   # Print the available containers as a sanity check
   echo Discovering available containers...

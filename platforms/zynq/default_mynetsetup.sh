@@ -36,7 +36,7 @@ if test "$OCPI_CDK_DIR" = ""; then
   if test "$2" = ""; then
      echo It appears that the environment is not set up yet.
      echo You must supply the IP address of the OpenCPI server machine as an argument to this script as well as the directory you would like to mount to
-	 echo Proper use of this script: 'source ./mynetsetup.sh <IP-Address of server machine> < Directory to mount>'
+	   echo Proper use of this script: 'source ./mynetsetup.sh <IP-Address of server machine> < Directory to mount>'
      break
   fi
   # Uncomment this section and change the MAC address for an environment with multiple

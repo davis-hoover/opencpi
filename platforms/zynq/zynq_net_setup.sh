@@ -58,13 +58,13 @@ else
   if test -e /mnt/net/$2; then
     echo Executing $PROFILE_FILE
     export OCPI_CDK_DIR=$OCPI_CDK_DIR
-	export OCPI_DIR=$OCPI_DIR
+	  export OCPI_DIR=$OCPI_DIR
     cd $OCPI_DIR
-	source ./zynq_setup_common.sh
-	set_tool_platform
+	  source ./zynq_setup_common.sh
+	  set_tool_platform
     export OCPI_TOOL_OS=linux
     export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
-	cd $OCPI_DIR
+	  cd $OCPI_DIR
     # As a default, access all built artifacts in the core project as well as
     # the bare-bones set of prebuilt runtime artifacts for this SW platform
     export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/artifacts:$OCPI_CDK_DIR/../projects/assets/artifacts:$OCPI_DIR/\$OCPI_TOOL_DIR/artifacts:$OCPI_DIR/artifacts
