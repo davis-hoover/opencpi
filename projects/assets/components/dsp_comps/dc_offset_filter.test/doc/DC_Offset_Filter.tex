@@ -73,9 +73,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 	The transfer function for the component is as follows.
 
   \begin{center}
-    \begin{math}
-       H(z) = \frac{1-z^{-1}}{1-\alpha\footnote{\alpha defaults to 121/128} z^{-1}}
-    \end{math}
+     $H(z) = \frac{1-z^{-1}}{1-\alpha\footnote{$\alpha$ defaults to 121/128} z^{-1}}$
   \end{center}
 
 	The component inputs complex signed samples, filters the DC bias from both I and Q input rails using an IIR filter, and outputs complex signed samples. The response time of the filter is programmable, as is the ability to bypass the filter and to update/hold the calculated DC value to be removed. For the HDL worker, a generic controls insertion of a peak detection circuit applied to the worker's output samples.\medskip
