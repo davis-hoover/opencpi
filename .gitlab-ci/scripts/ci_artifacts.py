@@ -138,9 +138,8 @@ def upload(args, env):
     # Set s3 object
     # Will appear on aws as:
     # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID/CI_JOB_STAGE[-failed]/CI_JOB_NAME'
-    if 'tag' in args and args.tag == 'failed-job':
-        job_stage += '-failed'
-    s3_object = '/'.join([env.pipeline_id, job_stage, env.job]) + '.tar.gz'
+    s3_object = '/'.join([env.pipeline, env.stage, env.job]) + '.tar.gz'
+    s3_url = 'https://opencpi-ci-artifacts.s3.us-east-2.amazonaws.com/{}'.format(s3_object)
     files = []
 
     # If timestamp passed, find all files created/updated since the timestamp
@@ -163,15 +162,18 @@ def upload(args, env):
         for f in files:
             if f:
                 tar.add(f, exclude=exclude_paths, recursive=recursive)
-        
+    
     # Create and execute command to upload tar
     cmd = ['aws', 's3', 'cp', 'tar', 
         's3://opencpi-ci-artifacts/{}'.format(s3_object),
         '--no-progress']
     print('Executing: "{}"'.format(' '.join(cmd)))
-    print('Uploading to: s3://opencpi-ci-artifacts/{}'.format(s3_object))
+    print('Uploading artifacts to: {}'.format(s3_url))
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    print(process.stdout.read().strip())
+    process.wait()
+
+    if process.stderr:
+        print(process.stderr.read().strip())
 
     # If tag passed, tag uploaded artifact
     if args.tag:
@@ -218,7 +220,13 @@ def download(args, env):
 
     # Execute command to download artifacts
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    print(process.stdout.read().strip())
+    process.wait()
+
+    if process.stdout:
+        print(process.stdout.read().strip())
+    
+    if process.stderr:
+        print(process.stderr.read().strip())
 
     # Walk temp_dir and extract tar files
     for dirpath, _, filenames in os.walk(temp_dir):
@@ -249,6 +257,7 @@ def tag(args, s3_object):
     
     # Execute command to tag artifact
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    process.wait()
     out = (process.stdout.read())
 
     if out:
@@ -258,12 +267,15 @@ def tag(args, s3_object):
     cmd = ['aws', '--output', 'yaml', 's3api', 'head-object', 
         '--bucket', 'opencpi-ci-artifacts', '--key', s3_object]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    out = process.stdout.read()
-
-    # Command returns yaml
-    # Grab only the necessary part
-    expiration = out.split('Expiration', 1)[1].split('"')[1]
-    print('Expires on {}'.format(expiration))
+    
+    if process.stderr:
+        print(process.stderr.read().strip())
+    elif process.stdout:
+        # Command returns yaml
+        # Grab only the necessary part
+        out = process.stdout.read().strip()
+        expiration = out.split('Expiration', 1)[1].split('"')[1]
+        print('Expires on {}'.format(expiration))
 
 
 main()

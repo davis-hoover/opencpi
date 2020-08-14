@@ -225,13 +225,13 @@ namespace OCPI {
 	       otherImpl ? otherImpl->m_metadataImpl.cname() : "none",
 	       otherPort ? otherPort->m_name.c_str() : "none");
       if (otherImpl) {
-	m_internals |= 1 << myPort.m_ordinal;
+	m_internals |= 1u << myPort.m_ordinal;
 	if (!m_connections)
 	  m_connections = new Connection[m_metadataImpl.nPorts()];
 	m_connections[myPort.m_ordinal].impl = otherImpl;
 	m_connections[myPort.m_ordinal].port = otherPort;
       } else {
-	m_externals |= 1 << myPort.m_ordinal;
+	m_externals |= 1u << myPort.m_ordinal;
       }
     }
     Driver::
@@ -543,14 +543,14 @@ namespace OCPI {
 	      if (otherImpl.m_inserted) {
 		// Big assumption that adapters only have two ports
 		unsigned other = i.m_connections[nn].port->m_ordinal ? 0 : 1;
-		if (otherImpl.m_internals & (1 << other)) {
+		if (otherImpl.m_internals & (1u << other)) {
 		  i.m_connections[nn] = otherImpl.m_connections[other];
 		  otherImpl.m_connections[other].impl = &i;
 		  otherImpl.m_connections[other].port = &i.m_metadataImpl.getPorts()[nn];
 		} else {
 		  // other side of the adapter is external so this is external
-		  i.m_internals &= ~(1 << nn);
-		  i.m_externals |= 1 << nn;
+		  i.m_internals &= ~(1u << nn);
+		  i.m_externals |= 1u << nn;
 		}
 	      }
 	    }

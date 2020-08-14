@@ -258,7 +258,7 @@ ReplaceIfDifferent=$(infox REPLACE:$1:$2:$3)\
   TAIL=`basename $(1)`; \
   while test 1; do \
     if test -f $(1); then OLD=$(2)/$$TAIL; else OLD=$(2); fi;\
-    if test -e $$NEW; then \
+    if test -e $1; then \
       NEWHASH=$(call TreeHash,$(1));\
       OLDHASH=$(call TreeHash,$$OLD);\
       if test "$$OLDHASH" = "$$NEWHASH"; then\
@@ -474,7 +474,6 @@ OcpiComponentLibraryExists=$(or $(call OcpiExists,$1/lib),$(call OcpiExists,$1))
 # Second arg means it is a local project rather than a project-path (ProjectDependencies) project
 # $(call OcpiSearchComponentLibrariesInProject,<project-dir>,<local-project?>)
 OcpiSearchComponentLibrariesInProject=$(infox OSCLIP:$1:$2:$3:$4)$(strip \
-  $(and $4,$(call OcpiExists,$(if $3,$1,$(or $(call OcpiExists,$1/exports),$1))/specs))\
   $(if $3,\
     $(foreach l,$2,\
       $(foreach d,$(if $(filter devices cards adapters,$l),hdl/$l,components$(if $(filter components,$l),,/$l)),\
@@ -521,13 +520,6 @@ OcpiComponentLibraries=$(infox OCL:$(OCPI_PROJECT_REL_DIR):$(OCPI_PROJECT_DIR):$
        $(info For searching for ComponentLibraries, found directories are:))\
     $(foreach d,$(OcpiTempFound),$(infox * $d)))\
   $(OcpiTempFound))
-
-# Return the list of XML search directories for component libraries
-# it searches the hdl subdir
-# since hdl workers need to be referenced by rcc workers.
-OcpiXmlComponentLibraries=$(infox HXC NOT NEEDED)\
-  $(foreach c,$(call OcpiComponentLibraries,true),\
-     $(or $(filter $c,%/specs),$(call OcpiExists,$c/hdl $c/$(Model)) $c))
 
 # Return a colon separated default OCPI_LIBRARY_PATH. It contains:
 # 1. arg1 if present
@@ -943,7 +935,9 @@ OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
   $(if $(wildcard $1/Project.mk),\
     $(if $(wildcard $1/Makefile)$(wildcard $1/Makefile.am),\
       $(if $(filter project,$(call OcpiGetDirType,$1)),\
-        $(infox found project in $1)$(eval $(call OcpiSetProject,$1))$(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)),\
+        $(infox found project in $1)\
+        $(eval $(call OcpiSetProject,$1))\
+        $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
         $(error no proper Makefile found in the directory where Project.mk was found ($1))),\
       $(error no Makefile found in the directory where Project.mk was found ($1))),\
     $(if $(foreach r,$(realpath $1/..),$(filter-out /,$r)),\
@@ -1045,11 +1039,12 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
         $(if $(filter-out undefined,$(origin OcpiIncludeParentAsset_$s)),\
           $(call OcpiIncludeParentAsset_$s,$1,$2,$3),\
           $(call OcpiIncludeProject,$3,asset))\
+        $(if $(Package),,$(eval override Package:=$(OCPI_PROJECT_PACKAGE)))\
+        $(eval override ParentPackage:=$(Package))\
+        $(eval override Package:=)\
         $(eval $(call OcpiSetAsset,$1,$c))\
-        $(eval ParentPackage:=)\
-        $(eval unexport ParentPackage)\
-        $(infox SAG:$(PackagePrefix))\
-        $(eval override ParentPackage:=$(call OcpiSetAndGetPackageId,$1,$2,$t))))))
+        $(call OcpiSetAndGetPackageId,$1,$2,$t)\
+        $(infox PARENT:$(origin ParentPackage):$(ParentPackage))))))
 
 # Wrapper function for OcpiIncludeAssetAndParentX. package.mk is included here
 # so that it is not included many times during recursive calls of the *X
@@ -1061,6 +1056,8 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
 #   Arg3 = error/warning/info mode (optional)
 OcpiIncludeAssetAndParent=\
   $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
+    $(eval override ParentPackage:=)\
+    $(eval override Package:=)\
     $(eval include $(OCPI_CDK_DIR)/include/package.mk)\
     $(call OcpiIncludeAssetAndParentX,$(or $1,.),$2,$3))
 
@@ -1130,7 +1127,7 @@ $(eval override XmlIncludeDirsInternal:=\
     $(comment this is unreliable: Models:%=../lib/%) ../lib\
     ../specs \
     $(comment we are out of the component library so look in projects, including ours) \
-    $(comment we let c++ add the OcpiXmlComponentLibraries)))
+    $(comment we let c++ add the Xml ComponentLibraries)))
 endef
 
 # Used wherever test goals are processed.  runtests is for compatibility
@@ -1185,7 +1182,7 @@ OcpiDirName=$(patsubst %/,%,$(dir $1))
 #    <artifact-file-input>,<output-file-to-modify>,<packageparent>,<config>,<platform>)
 # old name based on xml uuid not used anymore since we rely on package ids
 #    $(comment uuid=`sed -n '/artifact uuid/s/^.*artifact uuid="\([^"]*\)".*$$/\1/p' $1` &&)
-OcpiPrepareArtifact=\
+OcpiPrepareArtifact=$(infox PREPARE:$1:$2:$3:$4:$5=$(OCPI_PROJECT_DIR))\
   $(ToolsDir)/ocpixml add $2 $1 \
   $(and $(OCPI_PROJECT_DIR), &&\
     adir=$(OCPI_PROJECT_DIR)/artifacts &&\

@@ -107,7 +107,7 @@ checkout=$4
 
 if getvars; then
     echo The $model platform \"$platform\" is already defined in this installation, in $platform_dir.
-    project_dir=$(echo $platform_dir | sed -e "s=/.../platforms/$platform==" -e 's=/lib$==')
+    project_dir=$(echo $platform_dir | sed -e 's=/exports/=/=' -e "s=/.../platforms/$platform==" -e 's=/lib$==')
     if [ -n "$project" ]; then
 	echo The supplied project package-id for this platform, \"$project\", will be ignored.
     fi
@@ -217,9 +217,9 @@ else
     ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
     # Make sure that tutorials can run after installation, note will do rcc too.
     [ "$platform" != xsim ] || ocpidev -d projects/tutorial build --hdl-platform=$platform
-    # If project dir is not one of the core projects build platoform  
+    # If project dir is not one of the core projects, build the platform
     if [[ "$platform_dir" != *"/projects/core/"* && "$platform_dir" != *"/projects/platform/"* && \
-            "$platform_dir" != *"/projects/assets/"* && -n "$platform_dir" ]]; then 
+            "$platform_dir" != *"/projects/assets/"* && -n "$platform_dir" ]]; then
 	ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
 	echo "HDL platform \"$platform\" built for OSP in $project_dir, including assemblies."
     fi

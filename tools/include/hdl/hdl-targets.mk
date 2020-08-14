@@ -219,15 +219,18 @@ HdlDoPlatform=\
 
 # Handle a directory named "platforms", exported or not
 HdlDoPlatformsDir=\
+  $(- if the project has been exported at all, even without building, the $1/mk will be there)\
   $(if $(wildcard $1/mk),\
     $(foreach d,$(wildcard $1/mk/*.mk),\
       $(foreach p,$(basename $(notdir $d)),\
+        $(- the 3rd arg is a directory that may not exist yet)\
         $(call HdlAddPlatform,$1/mk,$p,$1/$p))),\
     \
+    $(- no $1/mk means we are pointing into the source tree, so the platform dir points into "lib")\
+    $(- and the lib subdir may not exist yet)\
     $(foreach d,$(wildcard $1/*),\
       $(foreach p,$(notdir $d),\
-        $(if $(wildcard $d/$p.mk)$(wildcard $d/lib/$p.mk),\
-          $(call HdlDoPlatform,$d)))))
+        $(and $(wildcard $d/$p.mk),$(call HdlDoPlatform,$d)))))
 
 ################################################################################
 # $(call HdlGetTargetFromPart,hdl-part)
@@ -323,6 +326,7 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
        $(foreach p,$(HdlAllPlatforms),\
          HdlFamily_$(HdlPart_$p)=$(call HdlGetFamily,$(HdlPart_$p));)\
        $(foreach p,$(HdlAllPlatforms),\
-         HdlPlatformDir_$(p)="$(realpath $(HdlPlatformDir_$(p)))";))
+         $(- only use realpath if its there.  If not we are bootstrapping and leave it alone)\
+         HdlPlatformDir_$(p)="$(or $(realpath $(HdlPlatformDir_$p)),$(HdlPlatformDir_$p))";))
 endif
 endif

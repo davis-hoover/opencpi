@@ -384,6 +384,8 @@ emitSubdeviceConnections(std::string &assy,  DevInstances *baseInstances) {
 	  uint64_t mask = ~(UINT64_MAX << supPort.count());
 	  assert(!(sdi->m_connected[supOrdinal] & mask));
 	  sdi->m_connected[supOrdinal] |= mask;
+	  assert(supPort.count() == (*sci).m_port->count());
+          (*dii).m_connected[(*sci).m_port->m_ordinal] |= mask;
 	}
 	OU::formatAdd(assy,
 		      "/>\n"

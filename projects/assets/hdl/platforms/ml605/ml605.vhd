@@ -31,7 +31,7 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library unisim; use unisim.vcomponents.all;
 library platform; use platform.pci_pkg.all, platform.platform_pkg.all;
-library bsv;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 library ml605;
 architecture rtl of ml605_worker is
   signal ctl_clk                : std_logic;        -- clock we produce and use for the control plane
@@ -54,8 +54,8 @@ begin
   ctl_rst            <= not ctl_rst_n;
   timebase_out.clk   <= ctl_clk; -- changed from sys0_clk because of AV-5437
   timebase_out.reset <= not ctl_rst_n; -- changed from sys0_rst because of AV-5437
-  timebase_out.ppsIn <= ppsExtIn;
-  ppsOut             <= timebase_in.ppsOut;
+  timebase_out.pps   <= ppsExtIn;
+  ppsOut             <= timebase_in.pps;
   -- Provide the highest available quality clock and reset used for the time server,
   -- without regard for it being in any particular time domain.
 
@@ -68,7 +68,7 @@ begin
                                 O => sys0_clk);
 
   -- Create a reset sync'd with sys0_clk, based on our control reset
-  sys0_sr : bsv.bsv.SyncResetA
+  sys0_sr : bsv_pkg.SyncResetA
     generic map(RSTDELAY => 0)
     port    map(CLK      => sys0_clk,
                 IN_RST   => ctl_rst,

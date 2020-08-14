@@ -529,8 +529,11 @@ emitXmlWorker(FILE *f, bool verbose) {
     }
   }
   for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it){
-    fprintf(f, "  <slave worker='%s.%s'/>\n", (*it).second->m_implName,
-                                              (*it).second->m_modelString);
+    fprintf(f, "  <slave name='%s' worker='%s.%s'", (*it).first.c_str(), (*it).second->m_implName,
+	    (*it).second->m_modelString);
+    if ((*it).second->m_isOptional)
+      fprintf(f, " optional='1'");
+    fprintf(f, "/>\n");
   }
   std::string out;
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {

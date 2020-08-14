@@ -22,7 +22,7 @@ library platform;
 library zynq; use zynq.zynq_pkg.all;
 library axi;
 library unisim; use unisim.vcomponents.all;
-library bsv;
+library ocpi_core_bsv; use ocpi_core_bsv.all;
 architecture rtl of worker is
   constant whichGP : natural := to_integer(unsigned(from_bool(useGP1)));
   signal ps_m_axi_gp_in   : axi.zynq_7000_m_gp.axi_s2m_array_t(0 to C_M_AXI_GP_COUNT-1); -- s2m
@@ -54,7 +54,7 @@ begin
                              O => clk);
   -- The FCLKRESET signals from the PS are documented as asynchronous with the
   -- associated FCLK for whatever reason.  Here we make a synchronized reset from it.
-  sr : bsv.bsv.SyncResetA
+  sr : bsv_pkg.SyncResetA
     generic map(RSTDELAY => 17)
     port map   (IN_RST  => raw_rst_n,
                 CLK     => clk,

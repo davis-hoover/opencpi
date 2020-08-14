@@ -70,6 +70,17 @@ for a in $deployments; do
   do_addition $a -- $platform $platform_dir
 done
 
+if [ $model = hdl ]; then
+  # Make sure the artifacts are exported
+  make -C projects/assets exports
+  tbz=projects/assets/exports/artifacts/ocpi.assets.testbias_${platform}_base.hdl.0.${platform}.bitz
+  if [ -f $tbz ]; then
+    make_relative_link $tbz exports/$platform/$(basename $tbz)
+  else
+    echo The file \"$tbz\" is not present, which is a failure for hdl platforms.
+    exit 1
+  fi
+fi
 [ $model != rcc ] && exit 0
 
 [ -n "$verbose" ] && echo Processing framework source-code-based links for rcc platform $platform
@@ -137,12 +148,26 @@ while read path opts; do
   fi
   [ -n "$swig" ] && {
     base=$(basename $swig .i)
-    for f in build/autotools/target-$platform/staging/lib/{,_}$base.* ; do
-        make_filtered_link $f exports/$platform/lib/opencpi/$(basename $f)
+    fromdir=build/autotools/target-$platform/staging/lib
+    file=_$base.so
+    if [ -f $fromdir/$file ]; then
+        make_filtered_link $fromdir/$file exports/$platform/lib/opencpi/$file
+        make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi/$base.py
         # swig would be runtime on systems with python and users' ACI programs that used it
-        [ -z "$tools" ] &&
-          make_filtered_link $f exports/runtime/$platform/lib/opencpi/$(basename $f)
-    done
+        [ -z "$tools" ] && {
+	    make_filtered_link $fromdir/$file exports/runtime/$platform/lib/opencpi/$file
+            make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi/$base.py
+	}
+    fi
+    file=_${base}2.so
+    if [ -f $fromdir/$file ]; then
+        make_filtered_link $fromdir/$file exports/$platform/lib/opencpi2/_${base}.so
+        make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi2/$base.py
+        [ -z "$tools" ] && {
+	    make_filtered_link $fromdir/$file exports/runtime/$platform/lib/opencpi2/$file
+            make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi2/$base.py
+	}
+    fi
   }
   shopt -u nullglob
   [ -n "$api_incs" ] && {
