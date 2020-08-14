@@ -1,29 +1,27 @@
-from pathlib import Path
+#!/usr/bin/env python3
 
+from pathlib import Path
+from .project import Project
+import requests
 
 class Platform():
 
-
-    def __init__(self, path, name=None, model=None, links=None, is_host=False, is_osp=False):
-        self.path = path
-        self.name = name if name else path.stem
-        self.model = model if model else path.parents[1].stem
+    def __init__(self, name, model, is_host=False, is_osp=False, links=None, repo=None):
+        self.name = name
+        self.model = model
+        self.links = links
         self.is_host = is_host
         self.is_osp = is_osp
+        self.repo = repo
 
-        if not links:
-            links = []
-
-        self.links = list(links)
-
-    
     @classmethod
-    def discover_platforms(cls, projects, platform_directive=None):
+    def discover_platforms(cls, projects, platform_filter=None, platform_links=None, only_child=None, do_osp_search=True):
         platforms = []
-        osps = []
 
-        if not isinstance(projects, list):
+        if isinstance(projects, Project):
             projects = [projects]
+        elif not all(isinstance(project, Project) for project in projects):
+            raise TypeError('projects must be a Project or Project list')
 
         for project in projects:
             hdl_platforms_path = Path(project.path, 'hdl', 'platforms')
@@ -33,7 +31,9 @@ class Platform():
                 if platforms_path.is_dir():
 
                     for platform_path in platforms_path.glob('*'):
-                        if platform_directive and platform_path.stem not in platform_directive.keys():
+                        platform_name = platform_path.stem
+
+                        if platform_filter and platform_name not in platform_filter:
                             continue
                         
                         if platform_path is hdl_platforms_path:
@@ -43,51 +43,75 @@ class Platform():
                             makefile = Path(platform_path, '{}.mk'.format(platform_path.stem))
                             is_host = Path(platform_path, '{}-check.sh'.format(platform_path.stem)).is_file()
 
+                        if only_child and not is_host and platform_name != only_child:
+                            continue
+
                         if makefile.is_file():
-                            links = platform_directive[platform_path.stem] if platform_directive else None
-                            platform = cls(platform_path, links=links, is_host=is_host)
+
+                            if platform_links:
+                                links = platform_links[platform_name]
+                            else:
+                                links = []
+
+                            platform_model = platform_path.parents[1].stem
+                            platform = cls(name=platform_name, model=platform_model,
+                                                is_host=is_host, is_osp=False, links=links)
                             platforms.append(platform)
 
-        # response = requests.get('https://gitlab.com/api/v4/groups/6009537/projects').json()
+        if not do_osp_search:
+            return platforms
 
-        # for osp in response:
-        #     platform_path = osp['http_url_to_repo']
-        #     platform_name = osp['name'].lower().replace(' ', '')
-        #     links = platform_directive[platform_name]
-        #     platform = Platform(platform_path, name=platform_name, model='hdl', links=links, is_osp=True)
-        #     platforms.append(platform)
+        response = requests.get('https://gitlab.com/api/v4/groups/6009537/projects').json()
 
-        return platforms
+        for osp in response:
+            platform_name = osp['name'].lower().replace(' ', '')
 
+            if platform_filter and platform_name not in platform_filter:
+                continue
+
+            if platform_links:
+                links = platform_links[platform_name]
+            else:
+                links = []
+
+            platform_repo = osp['path_with_namespace']
+            platform = Platform(name=platform_name, model='hdl', is_osp=True, repo=platform_repo, links=links)
+            platforms.append(platform)
+
+        return platforms   
+
+    # @classmethod
+    # def link_platforms(cls, platforms, links_dict):
+    #     for platform_name, links in links_dict.items():
+    #         platform = cls.get_platform(platform_name, platforms)
+
+    #         if platform:
+    #             for link in links:
+    #                 linked_platform = cls.get_platform(link, platforms)
+
+    #                 if linked_platform:
+    #                     platform.linked_platforms.append(linked_platform)
 
     @staticmethod
-    def get_platform(platforms, platform_name):
+    def get_platform(platform_name, platforms):
         for platform in platforms:
-            if platform.name == platform_name:
+            if platform_name == platform.name:
                 return platform
-
-
-    @staticmethod
-    def get_model_platforms(platforms, model):
-        return [platform for platform in platforms if platform.model == model]
-
-
-    @staticmethod
-    def get_hdl_platforms(platforms):
-        return get_model_platforms(platforms, 'hdl')
-
-    
-    @staticmethod
-    def get_rcc_platforms(platforms):
-        return get_model_platforms(platforms, 'rcc')
-
-
-    @staticmethod
-    def get_host_platforms(platforms):
-        return [platform for platform in platforms if platform.is_host]
-
 
     @staticmethod
     def get_cross_platforms(platforms):
-        return [platform for platform in platforms if not platform.is_host]
-        
+        cross_platforms = []
+        for platform in platforms:
+            if not platform.is_host:
+                cross_platforms.append(platform)
+
+        return cross_platforms
+
+    @staticmethod
+    def get_host_platforms(platforms):
+        host_platforms = []
+        for platform in platforms:
+            if platform.is_host:
+                host_platforms.append(platform)
+
+        return host_platforms

@@ -1,4 +1,6 @@
-from .project import Project
+#!/usr/bin/env python3
+
+from .project import Project, Library
 from .platform import Platform
-from .job import Job
 from .pipeline import Pipeline
+from .job import Job
