@@ -111,9 +111,9 @@ class Worker
 
   void read(size_t /*offset*/, size_t /*nBytes*/, void */*p_data*/) {}
   void write(size_t /*offset*/, size_t /*nBytes*/, const void */*p_data*/ ) {}
-  void setPropertyBytes(const OA::PropertyInfo &/*info*/, size_t /*offset*/,
-			const uint8_t */*data*/, size_t /*nBytes*/, unsigned /*idx*/) const {
-    assert("No implementation for remote setPropertyBytes"==NULL);
+  void setPropertyBytes(const OA::PropertyInfo &info, size_t offset,
+			const uint8_t *data, size_t nBytes, unsigned idx) const {
+    m_launcher.setPropertyBytes(m_remoteInstance, info.m_ordinal, offset, data, nBytes, idx);
   };
   void setProperty8(const OA::PropertyInfo &info, size_t offset, uint8_t data,
 		    unsigned idx) const {
@@ -139,16 +139,15 @@ class Worker
     snprintf(unparsed, sizeof(unparsed), "0x%" PRIx64, data);
     setProperty(info, unparsed, info, offset + idx*sizeof(uint64_t), 0);
   }
-  void getPropertyBytes(const OA::PropertyInfo &/*info*/, size_t /*offset*/,
-			uint8_t */*data*/, size_t /*nBytes*/, unsigned /*idx*/, bool /*string*/)
-    const {
+  void getPropertyBytes(const OA::PropertyInfo &info, size_t offset, uint8_t *data, size_t nBytes,
+			unsigned idx, bool string) const {
+    m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, data, nBytes, idx, string);
   }
   uint8_t getProperty8(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const { return 0; }
   uint16_t getProperty16(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const { return 0; }
   uint32_t getProperty32(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const  { return 0; }
   uint64_t getProperty64(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const  { return 0; }
 
-      
   void propertyWritten(unsigned /*ordinal*/) const {};
   void propertyRead(unsigned /*ordinal*/) const {};
   void prepareProperty(OU::Property &,

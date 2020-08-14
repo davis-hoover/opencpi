@@ -501,9 +501,13 @@ namespace OCPI {
       try {
 	if (get || set) {
 	  OU::Property &p = w.properties()[n];
-	  size_t offset, dimension;
+	  size_t offset, dimension, idx, nBytes;
+	  bool haveNbytes, string;
 	  if ((err = OX::getNumber(m_rx, "offset", &offset)) ||
-	      (err = OX::getNumber(m_rx, "dimension", &dimension)))
+	      (err = OX::getNumber(m_rx, "dimension", &dimension)) ||
+	      (err = OX::getNumber(m_rx, "nbytes", &nBytes, &haveNbytes)) ||
+	      (err = OX::getBoolean(m_rx, "string", &string)) ||
+	      (err = OX::getNumber(m_rx, "idx", &idx)))
 	    return OU::eformat(error, "Get/set property control message error: %s", err);
 	  OU::Member *m = &p;
 	  for (const char *path = ezxml_cattr(m_rx, "path");
@@ -520,12 +524,29 @@ namespace OCPI {
 	      m = m->m_type;
 	    }
 	  }
+	  std::vector<uint8_t> data;
+	  if (haveNbytes)
+	    data.resize(nBytes); // allocate binary buffer
 	  if (get) {
 	    OA::PropertyAttributes a;
-
-	    w.getProperty(p, m_response, *m, offset, dimension,
-			  OA::PropertyOptionList({ hex ? OA::HEX : OA::NONE, OA::APPEND,
-				                   unreadableOK ? OA::UNREADABLE_OK : OA::NONE}), &a);
+	    if (haveNbytes) { // get property bytes into binary buffer, then convert to text
+	      w.getPropertyBytes(p, offset, &data[0], nBytes, OCPI_UTRUNCATE(unsigned, idx), string);
+	      for (size_t i = 0; i < nBytes; ++i) {
+		OU::formatAdd(m_response, "%02x", data[i]);
+		if (string && !data[i])
+		  break;
+	      }
+	    } else // get property value into string
+	      w.getProperty(p, m_response, *m, offset, dimension,
+			    OA::PropertyOptionList({ hex ? OA::HEX : OA::NONE, OA::APPEND,
+				  unreadableOK ? OA::UNREADABLE_OK : OA::NONE}), &a);
+	  } else if (haveNbytes) { // convert text to binary, then use setBytes
+	    const char *cp = ezxml_txt(m_rx);
+	    while (isspace(*cp)) cp++;
+	    for (size_t i = 0; i < nBytes; ++i)
+	      ocpiCheck(sscanf(cp, "%2hhx", (unsigned char *)&data[i]) == 1);
+	    // make data
+	    w.setPropertyBytes(p, offset, &data[0], nBytes, OCPI_UTRUNCATE(unsigned,idx));
 	  } else
 	    w.setProperty(p, ezxml_txt(m_rx), *m, offset, dimension);
 	} else if (op)
