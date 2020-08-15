@@ -3,7 +3,7 @@ build:macos10_15:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - source cdk/opencpi-setup.sh -e
@@ -20,7 +20,7 @@ prereqs:macos10_15:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - source cdk/opencpi-setup.sh -e
@@ -37,7 +37,7 @@ test:macos10_15:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - source cdk/opencpi-setup.sh -e
@@ -54,7 +54,7 @@ trigger-children:macos10_15:alst4:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alst4)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alst4)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(alst4)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(alst4)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(alst4)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alst4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -67,7 +67,7 @@ trigger-children:macos10_15:alst4x:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alst4x)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alst4x)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(alst4x)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(alst4x)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(alst4x)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alst4x)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -80,7 +80,7 @@ trigger-children:macos10_15:alt_test:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alt_test)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alt_test)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(alt_test)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(alt_test)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(alt_test)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(alt_test)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -93,7 +93,7 @@ trigger-children:macos10_15:epiq_matchstiq:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(epiq_matchstiq)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(epiq_matchstiq)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -106,7 +106,7 @@ trigger-children:macos10_15:isim:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(isim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(isim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(isim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(isim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(isim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(isim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -119,7 +119,7 @@ trigger-children:macos10_15:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(matchstiq_z1)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(matchstiq_z1)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -132,7 +132,7 @@ trigger-children:macos10_15:ml605:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(ml605)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(ml605)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -145,7 +145,7 @@ trigger-children:macos10_15:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(modelsim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(modelsim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -158,7 +158,7 @@ trigger-children:macos10_15:x4sim:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(x4sim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(x4sim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -171,7 +171,7 @@ trigger-children:macos10_15:xilinx13_3:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_3)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_3)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx13_3)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx13_3)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx13_3)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_3)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -184,7 +184,7 @@ trigger-children:macos10_15:xilinx13_4:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx13_4)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx13_4)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -197,7 +197,7 @@ trigger-children:macos10_15:xilinx13_4_arm:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4_arm)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4_arm)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx13_4_arm)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx13_4_arm)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx13_4_arm)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4_arm)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -210,7 +210,7 @@ trigger-children:macos10_15:xilinx17_1_aarch32:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_1_aarch32)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_1_aarch32)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch32)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -223,7 +223,7 @@ trigger-children:macos10_15:xilinx17_1_aarch64:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_1_aarch64)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_1_aarch64)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_1_aarch64)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -236,7 +236,7 @@ trigger-children:macos10_15:xilinx17_2_aarch32:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_2_aarch32)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_2_aarch32)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch32)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -249,7 +249,7 @@ trigger-children:macos10_15:xilinx17_2_aarch64:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_2_aarch64)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx17_2_aarch64)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx17_2_aarch64)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -262,7 +262,7 @@ trigger-children:macos10_15:xilinx19_2_aarch32:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch32)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx19_2_aarch32)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx19_2_aarch32)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch32)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -275,7 +275,7 @@ trigger-children:macos10_15:xilinx19_2_aarch64:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch64)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx19_2_aarch64)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xilinx19_2_aarch64)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx19_2_aarch64)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -288,7 +288,7 @@ trigger-children:macos10_15:xsim:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xsim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xsim)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -301,7 +301,7 @@ trigger-children:macos10_15:zcu104:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zcu104)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zcu104)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(zcu104)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zcu104)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zcu104)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zcu104)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -314,7 +314,7 @@ trigger-children:macos10_15:zed:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(zed)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -327,7 +327,7 @@ trigger-children:macos10_15:zed_ise:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed_ise)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed_ise)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(zed_ise)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed_ise)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed_ise)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed_ise)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:
@@ -340,7 +340,7 @@ trigger-children:macos10_15:zed_zipper:
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed_zipper)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed_zipper)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(zed_zipper)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed_zipper)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(macos10_15)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed_zipper)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(macos10_15)( |:|$)/i && $CI_PLATFORMS =~ /(^| |:)(zed_zipper)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
   trigger:

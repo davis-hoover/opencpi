@@ -190,7 +190,7 @@ def make_parent_rules(platform):
                     ]).format( platform.name)},
         {'if': ' '.join([
                     '' '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +({})( \S*)*\]/i',
-                       '&& $CI_PIPELINE_SOURCE == "merge_request_event"'' '
+                       '&& $CI_PIPELINE_SOURCE == "push"'' '
                     ]).format(platform.name)},
         {'if': ' '.join([
                     '' '$CI_PLATFORMS =~ /(^| |:)({})( |:|$)/i',
@@ -221,7 +221,7 @@ def make_trigger_rules(platform, host_platform):
         {'if': ' '.join([
                     '' '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +({})( \S*)*\]/i',
                        '&& $CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +({})( \S*)*\]/i',
-                       '&& $CI_PIPELINE_SOURCE == "merge_request_event"'' '
+                       '&& $CI_PIPELINE_SOURCE == "push"'' '
                     ]).format(host_platform.name, platform.name)},
         {'if': ' '.join([
                     '' '$CI_PLATFORMS =~ /(^| |:)({})( |:|$)/i',
