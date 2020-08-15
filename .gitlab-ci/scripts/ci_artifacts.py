@@ -19,7 +19,6 @@ def main():
     """
     parser = make_parser()
     args = parser.parse_args()
-    ci_utils.set_test_env()
     ci_env = ci_utils.get_ci_env()
 
     if 'func' in args:
@@ -111,8 +110,8 @@ def upload(args, ci_env):
     # Set s3 object
     # Will appear on aws as:
     # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID/CI_JOB_STAGE[-failed]/CI_JOB_NAME'
-    stage = '{}-{}'.format(ci_env.stage, 'failed') if args.tag == 'failed-job' else ci_env.stage
-    s3_object = '{}.tar.gz'.format('/'.join([args.pipeline, stage, ci_env.job]))
+    stage = '{}-{}'.format(ci_env.job_stage, 'failed') if args.tag == 'failed-job' else ci_env.job_stage
+    s3_object = '{}.tar.gz'.format('/'.join([args.pipeline_id, stage, ci_env.job_name]))
     s3_url = 'https://opencpi-ci-artifacts.s3.us-east-2.amazonaws.com/{}'.format(s3_object)
     files = []
 

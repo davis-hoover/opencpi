@@ -12,7 +12,7 @@ from ci_yaml_generator import ci_project, ci_platform, ci_pipeline, ci_job
 def main():
     parser = make_parser()
     args = parser.parse_args()
-    ci_utils.set_test_env()
+
     if 'func' in args:
         args.func(args)
     else:

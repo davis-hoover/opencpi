@@ -21,7 +21,7 @@ def get_ci_env():
 def set_test_env():
     os.environ["CI_PROJECT_DIR"] = os.getcwd()
     os.environ["CI_JOB_STAGE"] = "test_stage"
-    os.environ["CI_JOB_ID"] = "test_job"
+    os.environ["CI_JOB_NAME"] = "test_job"
     os.environ["CI_COMMIT_MESSAGE"] = "[ci ubuntu18_04 centos7 zed,matchstiq_z1:xilinx13_3,xilinx13_4 \
         zcu104:xilinx13_4, xilinx13_4:zcu104, zcu104:xilinx13_3, plutosdr]"
     os.environ["CI_PIPELINE_ID"] = "test_pipeline"
