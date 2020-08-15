@@ -1,6 +1,6 @@
 build:centos8:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/artifacts.py upload -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos8.tar.gz -e */build/* */test/* */generate-yaml/* */trigger-children/* */deploy/*
   - sleep 2
@@ -13,7 +13,7 @@ build:centos8:
   - if: '$CI_PLATFORMS =~ /(^| |:)(centos8)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - source cdk/opencpi-setup.sh -e
-  - scripts/install-opencpi.sh centos8
+  - scripts/build-opencpi.sh centos8
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -s .timestamp -t "successful-job"
   - touch .success
   stage: build
@@ -23,7 +23,7 @@ build:centos8:
   - opencpi
 prereqs:centos8:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/artifacts.py upload -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos8.tar.gz -e */prereqs/* */build/* */test/* */generate-yaml/* */trigger-children/* */deploy/*
   - sleep 2
@@ -45,7 +45,7 @@ prereqs:centos8:
   - opencpi
 test:centos8:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/artifacts.py upload -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos8.tar.gz -e */test/* */generate-yaml/* */trigger-children/* */deploy/*
   - sleep 2
