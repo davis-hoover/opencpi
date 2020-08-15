@@ -4,10 +4,10 @@ import subprocess
 import os
 import tarfile
 import sys
+import ci_utils
 from collections import namedtuple
 from shutil import rmtree
 from argparse import ArgumentParser
-from ci_env import get_ci_env
 
 
 def main():
@@ -19,49 +19,14 @@ def main():
     """
     parser = make_parser()
     args = parser.parse_args()
-    env = get_ci_env()
-    print(env)
+    ci_utils.set_test_env()
+    ci_env = ci_utils.get_ci_env()
 
     if 'func' in args:
-        args.func(args, env)
+        rc = args.func(args, ci_env)
+        exit(rc)
     else:
         parser.print_help()
-
-
-# def get_env(args):
-#     """ Creates an Env NamedTuple.
-
-#     Creates an Env NamedTuple with members set to CI environment variables.
-
-#     Args:
-#         args: User command line arguments
-
-#     Returns:
-#         Env NamedTuple 
-#     """
-#     Env = namedtuple('Env', 'project_dir, pipeline, stage, job')
-
-#     try:
-#         job_stage = os.environ['CI_JOB_STAGE']
-
-#         # Append failed status to job stage if tagged as failed-job
-#         # Makes it easier to exclude when downloading artifacts
-#         if 'tag' in args and args.tag == 'failed-job':
-#             job_stage += '-failed'
-
-#         env = Env(os.environ['CI_PROJECT_DIR'],
-#                   os.environ['CI_PIPELINE_ID'],
-#                   job_stage,
-#                   os.environ['CI_JOB_NAME'])
-#     except:
-#         sys.exit('Error: Script is intended to run from within CI pipeline. ' \
-#                  'Set CI environment variables for testing.')
-#     os.getcwd()
-#     if os.getcwd() != env.project_dir:
-#         sys.exit('Error: Script in intended to run in CI_PROJECT_DIR: {}'.format(env.project_dir))
-
-
-#     return env
 
 
 def make_parser():
@@ -87,6 +52,10 @@ def make_parser():
         '-i', '--include', 
         help='artifacts to include in download. Can take any number of arguments', 
         nargs='+', metavar='')
+    subparser.add_argument(
+        'pipeline_id', 
+        help='ID of pipeline to download artifacts from', 
+        metavar='pipeline_id')
     subparser.set_defaults(func=download)
 
     # Create upload subparser
@@ -104,6 +73,10 @@ def make_parser():
         '-t', '--tag', 
         help='tag to give the artifact', 
         metavar='')
+    subparser.add_argument(
+        'pipeline_id', 
+        help='ID of pipeline to upload artifacts to', 
+        metavar='pipeline_id')
     subparser.set_defaults(func=upload)
 
 
@@ -125,7 +98,7 @@ def exclude_paths(path):
     return False
 
 
-def upload(args, env):
+def upload(args, ci_env):
     """ Uploads artifacts to aws.
 
     Tars artifacts and constructs and executes command to upload artifacts to aws.
@@ -133,12 +106,13 @@ def upload(args, env):
 
     Args:
         args: User command line arguments
-        env:  CI envinronment variables
+        ci_env:  CI envinronment variables
     """
     # Set s3 object
     # Will appear on aws as:
     # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID/CI_JOB_STAGE[-failed]/CI_JOB_NAME'
-    s3_object = '/'.join([env.pipeline, env.stage, env.job]) + '.tar.gz'
+    stage = '{}-{}'.format(ci_env.stage, 'failed') if args.tag == 'failed-job' else ci_env.stage
+    s3_object = '{}.tar.gz'.format('/'.join([args.pipeline, stage, ci_env.job]))
     s3_url = 'https://opencpi-ci-artifacts.s3.us-east-2.amazonaws.com/{}'.format(s3_object)
     files = []
 
@@ -182,8 +156,10 @@ def upload(args, env):
     # Delete tar
     os.remove('tar')
 
+    return process.returncode
 
-def download(args, env):
+
+def download(args, ci_env):
     """ Downloads artifacts from aws.
 
     Constructs and executes command to download tar artifacts from aws into temp folder
@@ -191,14 +167,14 @@ def download(args, env):
 
     Args:
         args: User command line arguments
-        env:  CI envinronment variables
+        ci_env:  CI envinronment variables
     """
     # temp dir to download artifact into
     temp_dir = os.path.join('.', 'temp', '')
 
     # Create command to download artifacts, appending optional arguments
     cmd = ['aws', 's3', 'cp', 
-        's3://opencpi-ci-artifacts/{}'.format(env.pipeline_id), temp_dir,
+        's3://opencpi-ci-artifacts/{}'.format(args.pipeline_id), temp_dir,
         '--no-progress', '--recursive']
 
     if args.exclude:
@@ -210,12 +186,8 @@ def download(args, env):
         for include in args.include:
             cmd += ['--include', include]
 
-    # Do not download artifacts from same stage
-    # Necessary in case a job is restarted
-    cmd += ['--exclude', '/'.join([env.job_stage, '*'])]
-
     # Do not download failed jobs
-    cmd += ['--exclude', '/'.join(['*-failed', '*'])]
+    cmd += ['--exclude', '*-failed/*']
     print('Executing: "{}"'.format(' '.join(cmd)))
 
     # Execute command to download artifacts
@@ -238,6 +210,8 @@ def download(args, env):
 
     # Delete temp_dir and its contents
     rmtree(temp_dir)
+
+    return process.returncode
 
 
 def tag(args, s3_object):

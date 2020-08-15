@@ -1,24 +1,27 @@
-stages:
-  - create-children
-  - launch-children
-
-create-children:
-  stage: create-children
-  tags:
-    - opencpi
-    - centos7
-    - shell
-  script:
-    - .gitlab-ci/yaml_generator.py centos7 zed
-    - cat .gitlab-ci/centos7-zed.yml
+generate-yaml:
   artifacts:
-    paths: 
-      - .gitlab-ci/centos7-zed.yml
-
-launch-children:
-  stage: launch-children
-  trigger:
-    strategy: depend
-    include:
-      - artifact: .gitlab-ci/centos7-zed.yml
-        job: create-children
+    paths:
+    - .gitlab-ci/yaml-generated/
+  script: .gitlab-ci/scripts/ci_generate_yaml.py child
+  stage: generate-yaml
+include:
+- .gitlab-ci/yaml/centos6.yml
+- .gitlab-ci/yaml/macos10_15.yml
+- .gitlab-ci/yaml/docs.yml
+- .gitlab-ci/yaml/ubuntu16_04.yml
+- .gitlab-ci/yaml/macos10_14.yml
+- .gitlab-ci/yaml/mint19.yml
+- .gitlab-ci/yaml/macos10_13.yml
+- .gitlab-ci/yaml/e3xx.yml
+- .gitlab-ci/yaml/centos8.yml
+- .gitlab-ci/yaml/plutosdr.yml
+- .gitlab-ci/yaml/templates.yml
+- .gitlab-ci/yaml/mint18.yml
+- .gitlab-ci/yaml/centos7.yml
+- .gitlab-ci/yaml/ubuntu18_04.yml
+stages:
+- prereqs
+- build
+- test
+- generate-yaml
+- trigger-children

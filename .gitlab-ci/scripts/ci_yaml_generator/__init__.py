@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from .project import Project, Library
-from .platform import Platform
-from .pipeline import Pipeline
-from .job import Job
+from .ci_project import *
+from .ci_platform import *
+from .ci_pipeline import *
+from .ci_job import *
