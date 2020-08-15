@@ -258,7 +258,7 @@ def make_before_script(stage, stages, platform, host_platform=None, link=None):
 
 def make_after_script():
     return [
-      'if [ ! -f ".success" ]; then .gitlab-ci/artifacts.py upload -t "failed-job"; fi'
+      'if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi'
     ]
 
 
@@ -291,7 +291,7 @@ def make_script(stage, stages, platform, host_platform=None, path=None):
         if stage == 'prereqs':
             build_cmd = 'scripts/install-prerequisites.sh {}'.format(platform.name)
         elif stage == 'build':
-            build_cmd = 'scripts/install-opencpi.sh {}'.format(platform.name)
+            build_cmd = 'scripts/build-opencpi.sh {}'.format(platform.name)
         elif stage == 'test':
             if platform.is_host:
                 build_cmd = 'scripts/test-opencpi.sh --no-hdl'
