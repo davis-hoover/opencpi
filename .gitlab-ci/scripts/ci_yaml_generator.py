@@ -81,7 +81,8 @@ def parent(args):
 
     host_platforms = ci_platform.get_host_platforms(platforms)
     cross_platforms = ci_platform.get_cross_platforms(platforms)
-    stages = ['prereqs', 'build', 'test', 'generate-yaml', 'trigger-children']
+    stages = ['prereqs', 'build', 'test', 'generate-yaml', 
+              'trigger-children', 'deploy']
     yaml_generator_job = ci_job.make_yaml_generator_job()
     
     for host_platform in host_platforms:

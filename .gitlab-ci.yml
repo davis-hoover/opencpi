@@ -25,3 +25,4 @@ stages:
 - test
 - generate-yaml
 - trigger-children
+- deploy

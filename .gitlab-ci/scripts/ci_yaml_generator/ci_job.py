@@ -43,7 +43,7 @@ def make_parent_jobs(stages, yaml_generator_job,
                 job = make_trigger_job(stage, yaml_generator_job, 
                                        host_platform, platform)
                 jobs.append(job)
-        elif stage != 'generate-yaml':
+        elif stage not in ['generate-yaml', 'deploy']:
             for platform in platforms:
                 name = ':'.join([stage, host_platform.name])
                 before_script = make_before_script(stage, stages, host_platform)
