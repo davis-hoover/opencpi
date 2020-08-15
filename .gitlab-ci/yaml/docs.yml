@@ -1,0 +1,64 @@
+build:pages:
+  rules:
+    - when: on_success
+  stage: build
+  tags:
+    - docker
+  image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
+  dependencies: []
+  before_script: []
+  script:
+    - make doc
+    - REF_NAME=${CI_COMMIT_REF_NAME//\//-}  # Convert '/' to '-'
+    - mkdir -p .public/releases/$REF_NAME/docs/
+    - mv doc/pdfs/* .public/releases/$REF_NAME/docs/
+      # These are used in trigger-downstream
+    - echo "JOB_ID=$CI_JOB_ID"   > build-pages.vars
+    - echo "REF_NAME=$REF_NAME" >> build-pages.vars
+  after_script: []
+  artifacts:
+    paths:
+      - .public/
+      - build-pages.vars
+
+trigger-downstream:docs:
+  stage: deploy
+  tags:
+    - docker
+  image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
+    - if: "$CI_COMMIT_TAG"
+  dependencies:
+    - build:pages
+  before_script: []
+  script:
+    - cat build-pages.vars
+    - source build-pages.vars
+      # JOB_ID comes from opencpi/build:pages
+    - >
+      curl --request POST
+      --form token=$CI_JOB_TOKEN
+      --form ref=develop
+      --form "variables[JOB_ID]=$JOB_ID"
+      --form "variables[REF_NAME]=$REF_NAME"
+      https://gitlab.com/api/v4/projects/16024285/trigger/pipeline
+  after_script: []
+
+# This just redirects opencpi.gitlab.io/opencpi to opencpi.gitlab.io/releases/latest
+pages:
+  stage: deploy
+  tags:
+    - docker
+  image: centos:latest
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
+  dependencies: []
+  before_script: []
+  script:
+    - mv .gitlab/public/ .
+  after_script: []
+  artifacts:
+    paths:
+      - public/
