@@ -167,7 +167,7 @@ def make_bridge_job(stage, platform):
 def make_yaml_generator_job():
     stage = 'generate-yaml'
     name = stage
-    script = '.gitlab-ci/scripts/ci_generate_yaml.py child'
+    script = '.gitlab-ci/scripts/ci_yaml_generator.py child'
     artifacts = {'paths': [
         '.gitlab-ci/yaml-generated/'
     ]}

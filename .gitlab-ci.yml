@@ -2,7 +2,7 @@ generate-yaml:
   artifacts:
     paths:
     - .gitlab-ci/yaml-generated/
-  script: .gitlab-ci/scripts/ci_generate_yaml.py child
+  script: .gitlab-ci/scripts/ci_yaml_generator.py child
   stage: generate-yaml
 include:
 - .gitlab-ci/yaml/centos6.yml

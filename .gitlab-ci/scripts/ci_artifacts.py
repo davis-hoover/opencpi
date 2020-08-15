@@ -176,14 +176,14 @@ def download(args, ci_env):
         's3://opencpi-ci-artifacts/{}'.format(args.pipeline_id), temp_dir,
         '--no-progress', '--recursive']
 
-    if args.exclude:
-        for exclude in args.exclude:
-            cmd += ['--exclude', exclude]
     if args.include:
         # By default in aws, '--include' does nothing unless '--exclude "*"' is passed first
         cmd += ['--exclude', '*']
         for include in args.include:
             cmd += ['--include', include]
+    if args.exclude:
+        for exclude in args.exclude:
+            cmd += ['--exclude', exclude]
 
     # Do not download failed jobs
     cmd += ['--exclude', '*-failed/*']
