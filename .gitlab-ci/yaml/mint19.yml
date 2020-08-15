@@ -1,4 +1,10 @@
 build:mint19:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/artifacts.py upload -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *mint19.tar.gz -e */build/* */test/* */generate-yaml/* */trigger-children/* */deploy/*
+  - sleep 2
+  - touch .timestamp
   rules:
   - if: '$CI_PLATFORMS =~ /(^| |:)(mint19)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(mint19)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -16,6 +22,12 @@ build:mint19:
   - shell
   - opencpi
 prereqs:mint19:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/artifacts.py upload -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *mint19.tar.gz -e */prereqs/* */build/* */test/* */generate-yaml/* */trigger-children/* */deploy/*
+  - sleep 2
+  - touch .timestamp
   rules:
   - if: '$CI_PLATFORMS =~ /(^| |:)(mint19)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(mint19)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -23,7 +35,6 @@ prereqs:mint19:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(mint19)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(mint19)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - source cdk/opencpi-setup.sh -e
   - scripts/install-prerequisites.sh mint19
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -s .timestamp -t "successful-job"
   - touch .success
@@ -33,6 +44,12 @@ prereqs:mint19:
   - shell
   - opencpi
 test:mint19:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/artifacts.py upload -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *mint19.tar.gz -e */test/* */generate-yaml/* */trigger-children/* */deploy/*
+  - sleep 2
+  - touch .timestamp
   rules:
   - if: '$CI_PLATFORMS =~ /(^| |:)(mint19)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| |:)(mint19)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '

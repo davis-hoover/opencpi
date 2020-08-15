@@ -51,7 +51,9 @@ def make_parent_jobs(stages, yaml_generator_job,
                 after_script = make_after_script()
                 tags = [host_platform.name, 'shell', 'opencpi']
                 rules = make_parent_rules(host_platform)
-                job = make_job(name, stage, script, tags=tags, rules=rules)
+                job = make_job(name, stage, script, tags=tags, 
+                               rules=rules, before_script=before_script, 
+                               after_script=after_script)
                 jobs.append(job)
     
     return jobs
@@ -296,8 +298,12 @@ def make_script(stage, stages, platform, host_platform=None, path=None):
             else:
                 build_cmd = 'ocpidev run tests {} --only-platform {}'.format(path, platform.name)
 
+    if stage != 'prereqs':
+        cmds = [source_cmd, build_cmd, upload_cmd, success_cmd]
+    else:
+        cmds = [build_cmd, upload_cmd, success_cmd]
 
-    return [source_cmd, build_cmd, upload_cmd, success_cmd] 
+    return cmds 
 
 
 def stage_from_library(library):
