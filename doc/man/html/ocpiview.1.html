@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpiview</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140400140840800"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpiview — command-line tool for viewing the results of simulation runs on HDL (FPGA) simulator platforms</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpiview</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] [<span class="emphasis"><em>&lt;directory&gt;</em></span>]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpiview</code></strong></span> tool displays the results of a simulation run
+on an HDL (FPGA) simulator platform using
+the simulation viewer provided by the simulator platform
+associated with that run.
+OpenCPI application developers generally run <span class="strong"><strong><code class="literal">ocpiview</code></strong></span> after
+application execution if they need
+to examine the simulation results in detail. OpenCPI component
+developers can also use <span class="strong"><strong><code class="literal">ocpiview</code></strong></span> to examine the results of component unit test
+executions on simulator platforms.</p><p>In a project, the results of FPGA simulator runs for OpenCPI applications
+reside in the the <span class="strong"><strong><code class="literal">simulations/</code></strong></span> subdirectory of the <span class="strong"><strong><code class="literal">applications/</code></strong></span> directory.
+Each time a simulator runs under <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> (or <span class="strong"><strong><code class="literal">ocpidev run</code></strong></span> with the
+<span class="strong"><strong><code class="literal">--keep-simulations</code></strong></span> option), it
+executes in a new subdirectory within the <span class="strong"><strong><code class="literal">simulations/</code></strong></span> subdirectory
+created for that simulation run with the name
+<span class="emphasis"><em>&lt;assembly-name&gt;</em></span><span class="strong"><strong><code class="literal">.</code></strong></span><span class="emphasis"><em>&lt;sim-platform&gt;</em></span><span class="strong"><strong><code class="literal">.</code></strong></span><span class="emphasis"><em>&lt;date-time&gt;</em></span>.
+Thus, running OpenCPI applications that use simulators results
+in one or more subdirectories that hold the simulation
+results for each simulation run.</p><p>The results of an FPGA simulator run for a component unit test
+reside in a <span class="emphasis"><em>&lt;sim-platform&gt;</em></span><span class="strong"><strong><code class="literal">/</code></strong></span> subdirectory of the
+component unit test’s <span class="strong"><strong><code class="literal">run/</code></strong></span> directory with the name
+<span class="emphasis"><em>&lt;test-case-name&gt;</em></span><span class="strong"><strong><code class="literal">.</code></strong></span><span class="emphasis"><em>&lt;unit-test-name&gt;</em></span><span class="strong"><strong><code class="literal">.hdl.simulation</code></strong></span>.</p><p>The <span class="emphasis"><em>&lt;directory&gt;</em></span> argument specifies the directory that contains
+a particular simulation run. If it is not used, the tool runs
+the most recent simulation run in the <span class="strong"><strong><code class="literal">simulations/</code></strong></span> subdirectory.</p><p>The chapter "Execution of Simulation Bitstreams and Containers"
+in the <span class="emphasis"><em>OpenCPI HDL Development Guide</em></span> provides more information
+about using FPGA simulators to run OpenCPI applications. The chapter
+"Unit Testing of Workers" in the <span class="emphasis"><em>OpenCPI Component Development Guide</em></span>
+provides more information about developing component unit tests, as
+does <a class="ulink" href="ocpidev-test.1.html" target="_top">ocpidev-test(1)</a>.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>None.</p></div><div class="refsect1"><a id="_nouns"></a><h2>NOUNS</h2><p>None.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-h</code></strong></span>
+</span></dt><dd>
+    Display help information about the tool.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-v</code></strong></span>
+</span></dt><dd>
+    Describe what is happening in command execution in more detail.
+</dd></dl></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Inside the project, display the results of running an HDL
+assembly named <span class="strong"><strong><code class="literal">myassembly</code></strong></span> on the <span class="strong"><strong><code class="literal">xsim</code></strong></span> FPGA simulator:
+</p><pre class="screen">ocpiview simulations/myassembly.xsim.20200815143505</pre></li><li class="listitem"><p class="simpara">
+Inside the project, display the results of the most recent
+simulation run with verbose command output:
+</p><pre class="screen">ocpiview -v</pre></li><li class="listitem"><p class="simpara">
+Inside the component unit test’s directory in the project,
+display the results of running a component unit test
+named <span class="strong"><strong><code class="literal">mytest</code></strong></span> on the <span class="strong"><strong><code class="literal">xsim</code></strong></span> FPGA simulator
+platform using the default test case:
+</p><pre class="screen">$ ocpiview run/xsim/case00.00.mytest.hdl.simulation</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
+<a class="ulink" href="ocpidev-assembly.1.html" target="_top">ocpidev-assembly(1)</a>
+<a class="ulink" href="ocpidev-run.1.html" target="_top">ocpidev-run(1)</a>
+<a class="ulink" href="ocpidev-test.1.html" target="_top">ocpidev-test(1)</a>
+<a class="ulink" href="ocpirun.1.html" target="_top">ocpirun(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

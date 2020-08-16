@@ -1,7 +1,12 @@
-OPENCPI MAN PAGES - STATUS 7/29/20
+OPENCPI MAN PAGES - STATUS 8/16/20
 ----------------------------------
 
 ocpiadmin - ready for review
+ocpidriver - ready for review
+ocpiremote - ready for review
+ocpirun - ready for review
+ocpiserve - ready for review
+ocpiview - ready for review
 
 ocpidev Man Pages
 -----------------
@@ -43,17 +48,12 @@ ocpidev-utilization - ready for review
 Man pages to be created:
 
 ocpiav
-ocpidriver
 ocpigen
 ocpigr
 ocpihdl
 ocpiocl
 ocpiocltest
-ocpiremote
-ocpirun
-ocpiserve
 ocpitest
-ocpiview
 ocpixml
 ocpizynq
 

@@ -1,0 +1,140 @@
+OCPIDRIVER(1)
+============
+
+
+NAME
+----
+ocpidriver - command-line utility for managing the OpenCPI
+loadable Linux kernel module driver
+
+
+SYNOPSIS
+--------
+*`ocpidriver`* '<verb>'
+
+
+DESCRIPTION
+-----------
+The *`ocpidriver`* tool controls the OpenCPI Linux kernel module driver
+on an 'OpenCPI system':
+a collection of processors that can be used together as resources for
+running OpenCPI applications. Whether or not the Linux kernel module
+driver is required depends on the 'platforms' (processors and their
+directly-connected hardware) enabled for use by OpenCPI during
+application execution and the 'interconnect' technology that wires them
+together: the driver is necessary for access by OpenCPI to platforms
+connected to a system bus (such as PCI-Express or
+the Zynq FPGA subsystem) but is not needed on systems that do
+not have such a bus or fabric. Developers use the *`ocpidriver`* tool
+to load and control the driver when it is required for running OpenCPI on a system.
+
+The OpenCPI Linux kernel module driver uses DMA memory for communication
+with platforms via the system bus. By default, Linux allocates
+128KB of DMA memory for the OpenCPI Linux kernel module driver.
+The OpenCPI "getting started guides" for the relevant platforms
+attached to the system bus (for example,
+the 'ML605 Getting Started Guide' and the 'Alst4 Getting Started Guide')
+describe how to reserve additional DMA memory for the driver
+when OpenCPI applications require it.
+
+VERBS
+-----
+The verbs supported by *`ocpidriver`* are:
+
+*`load`*::
+    Load an OpenCPI Linux kernel module driver to a system.
+    
+*`reload`*::
+    Remove an OpenCPI Linux kernel module driver from a system and then load it.
+
+*`status`*::
+    Get the status of an OpenCPI Linux kernel module driver on a system.
+
+*`unload`*::
+    Remove an OpenCPI Linux kernel module driver from a system.
+
+Performing these operations requires *`root`*/*`sudo`* privileges.
+
+NOUNS
+-----
+None.
+
+OPTIONS
+-------
+None.
+
+EXAMPLES
+--------
+. Using the *`root`* account, load the OpenCPI Linux kernel module driver
+on a system that has the Altera Stratix IV (*`alst4`*) and Xilinx (*`ml605`*) PCI-Express
+platforms installed and which has reserved an additional 128KB of DMA memory for the driver:
++
+---------------
+ocpidriver load
+---------------
++
+On success, the tool generates the following message:
++
+----------------------------------------------------------------
+Found generic reserved DMA memory on the linux boot command line
+and assuming it is for OpenCPI: [memmap=128M$0x1000000]
+Driver loaded successfully.
+----------------------------------------------------------------
++
+Now perform the command:
++
+--------------
+ocpirun --list
+--------------
++
+The output from the command is:
++
+-------------------------------------------------------
+Available containers:
+   #  Model Platform   OS    OS-Version   Arch   Name
+   0  hdl   ml605                                PCI:0000:08:00.0
+   1  hdl   alst4                                PCI:0000:03:00.0
+   2  rcc   centos7    linux c7           x86_64 rcc0
+-------------------------------------------------------
++
+. Unload the OpenCPI Linux kernel module driver:
++
+------------------
+ocpidriver unload
+------------------
++
+On success, the tool returns the message:
++
+--------------------------------------------
+The driver module was successfully unloaded.
+--------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-card.1.html[ocpidev-card(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-slot.1.html[ocpidev-slot(1)]
+link:ocpirun.1.html[ocpirun(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+
+

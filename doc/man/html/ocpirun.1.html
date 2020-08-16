@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpirun</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140278632108784"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpirun — command-line tool for running OpenCPI applications.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpirun</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;application-name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpirun(1)</code></strong></span> command line tool is used to execute OpenCPI
+component-based <span class="emphasis"><em>applications</em></span> in OpenCPI <span class="emphasis"><em>containers</em></span> on OpenCPI <span class="emphasis"><em>platforms</em></span>.
+An OpenCPI application is defined as an assembly of component
+instances with connections among them. An OpenCPI application
+can be specified in two different ways:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+As a standalone XML file called an <span class="emphasis"><em>OpenCPI Application Specification</em></span> (<span class="emphasis"><em>OAS</em></span>)
+</li><li class="listitem">
+As an XML document embedded in and manipulated by a C++ program using
+the <span class="emphasis"><em>OpenCPI Application Control Interface</em></span> (<span class="emphasis"><em>ACI</em></span>)
+</li></ul></div><p>The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> utility directly executes the applications
+defined in OAS XML files. The argument <span class="emphasis"><em>&lt;application-name&gt;</em></span>
+is the name of an OAS file without the <span class="strong"><strong><code class="literal">.xml</code></strong></span> extension.
+The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> tool reads the OAS associated with the named
+application and then runs it.</p><p>Execution ends when the application described in the OAS is "done"
+or a time duration (set with an option to <span class="strong"><strong><code class="literal">ocpirun</code></strong></span>) is exceeded.
+An application is done when all its workers indicate that they
+are "done" or when a single worker identified with the <span class="strong"><strong><code class="literal">done</code></strong></span>
+XML attribute in the OAS indicates that it is "done".</p><p>The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> utility runs applications in OpenCPI <span class="emphasis"><em>projects</em></span>,
+which are development work areas for groups of assets like components
+and applications.</p><p>When <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> executes an application, it makes deployment decisions
+that determine, for each component instance in the application:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+which worker in which compiled artifact should be used
+</li><li class="listitem">
+which container the worker should run in
+</li></ul></div><p>The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> tool uses an automatic built-in algorithm to make
+these decisions that can be guided or overridden by using specific
+options.</p><p>Options to <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> are either single letters following one hyphen or complete
+words or acronyms following two hyphens and separated by hyphens.
+Options can occur anywhere in the command for the user’s convenience.
+The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> command supports the following option categories:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+General-purpose options
+</li><li class="listitem">
+Function options, which direct the command to perform functions
+<span class="emphasis"><em>other than executing the application</em></span>.
+</li><li class="listitem">
+Instance options, which allow a value to be specified that applies
+to all instances in the application or to a single instance
+in the application. Instance options typically
+provide constraints on the <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> deployment algorithm to
+consider only certain workers or certain containers.
+</li><li class="listitem">
+Instance port options, which apply to specific ports of instances
+in the application and modify the default behavior of communications
+occurring at that port. When a port is connected to a port of another
+instance, the connection is between two ports. Some instance
+port options apply only to one end (one port) of the connection,
+while others apply to the connection as a whole and thus to both the
+specified port and the port to which it is connected.
+</li><li class="listitem">
+External port options, which apply to the external ports
+of the application (which are not connected to anything else in the OAS).
+</li><li class="listitem">
+Simulation options, which control containers running HDL (FPGA)
+simulators and are used during HDL component development and
+testing. The <span class="emphasis"><em>OpenCPI HDL Development Guide</em></span> provides more
+information on simulators.
+</li></ul></div><p>Some of these options can also be expressed as XML attributes in
+the application OAS and some can be used in applications that
+use the Application Control Interface (ACI). See the "Options
+Summary" section in the <span class="emphasis"><em>OpenCPI Application Development Guide</em></span>
+for information on how to invoke these options with <span class="strong"><strong><code class="literal">ocpirun</code></strong></span>,
+as OAS XML attributes and for ACI.</p><p>When invoked without any arguments, <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> displays information
+about all of its options.</p><p>The <span class="emphasis"><em>OpenCPI Application Development Guide</em></span> describes the
+XML structure of an application OAS and describes
+OpenCPI application development and execution in detail.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+Arguments to word-form options are preceded by an equal sign (=)
+(as shown in the following descriptions) or a space. Arguments to
+letter options are preceded by a space.</p><div class="refsect2"><a id="_general_options"></a><h3>General Options</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--component</code></strong></span>
+</span></dt><dd>
+    Specify that the first command argument that is not an option
+    is a component name for a single-component application
+    rather than the filename of an OAS.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--deploy-out=</code></strong></span><span class="emphasis"><em>&lt;file&gt;</em></span>
+</span></dt><dd>
+    Specify the filename in which to record deployment decisions
+    for this execution, in XML format, that can be used for
+    execution later on with the <span class="strong"><strong><code class="literal">--deployment</code></strong></span> option.
+    The file generated with this option can contain the
+    exact deployment recorded from a previous run or
+    from a run that is executed with the
+    <span class="strong"><strong><code class="literal">no-execute</code></strong></span> option.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--deployment=</code></strong></span><span class="emphasis"><em>&lt;file&gt;</em></span>
+</span></dt><dd>
+    Specify a filename to read for deployment decisions
+    rather than using the built-in deployment algorithm.
+    See the <span class="strong"><strong><code class="literal">deploy-out</code></strong></span> option.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--dump</code></strong></span>, <span class="strong"><strong><code class="literal">-d</code></strong></span>
+</span></dt><dd>
+    Write property values to <span class="strong"><strong><code class="literal">stderr</code></strong></span> before starting the
+    application and after it is done.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--dump-file=</code></strong></span><span class="emphasis"><em>&lt;file&gt;</em></span>
+</span></dt><dd>
+    Specify the file in which to record the final property
+    values in machine-parseable form.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--dump-platforms</code></strong></span>, <span class="strong"><strong><code class="literal">-M</code></strong></span>
+</span></dt><dd>
+    Write all platform worker and HDL device worker properties
+    in addition to properties of the workers in the application
+    to <span class="strong"><strong><code class="literal">stderr</code></strong></span> before starting the application and when it is done.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--duration=</code></strong></span><span class="emphasis"><em>&lt;seconds&gt;</em></span>, <span class="strong"><strong><code class="literal">-t</code></strong></span> <span class="emphasis"><em>&lt;seconds&gt;</em></span>
+</span></dt><dd>
+    Specify the number of seconds after which execution
+    should stop. If the application is not done before
+    <span class="emphasis"><em>&lt;seconds&gt;</em></span> is reached, the application stops and
+    is considered to have executed successfully (the
+    ocpirun exit code is zero).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hex</code></strong></span>
+</span></dt><dd>
+    Output numeric property values in hex, not decimal.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--library-path=</code></strong></span><span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+    Override the OCPI_LIBRARY_PATH environment variable
+    with the specified library.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--log-level=</code></strong></span><span class="emphasis"><em>&lt;level&gt;</em></span>, <span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;level&gt;</em></span>
+</span></dt><dd>
+    Set the OpenCPI log level to the specified level.
+    See the description of the OCPI_LOG_LEVEL environment
+    variable in the <span class="emphasis"><em>OpenCPI User Guide</em></span> for a description
+    of possible values. Using this option overrides the
+    level set in the OCPI_LOG_LEVEL environment variable.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--no-execute</code></strong></span>
+</span></dt><dd>
+    Specify that all deployment decisions should be made
+    but the application should not be executed. This option
+    can be used with the <span class="strong"><strong><code class="literal">--deploy-out</code></strong></span> option to write
+    the deployment decisions to a file.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--processors=</code></strong></span><span class="emphasis"><em>&lt;number-of-RCC-containers&gt;</em></span>, <span class="strong"><strong><code class="literal">-n</code></strong></span> <span class="emphasis"><em>&lt;number-of-RCC-containers&gt;</em></span>
+</span></dt><dd>
+    Specify the number of RCC containers to create. The default is 1.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--remote</code></strong></span>, <span class="strong"><strong><code class="literal">-R</code></strong></span>
+</span></dt><dd>
+    Automatically discover servers that offer remote containers
+    using multicast User Data Protocol (UDP). See the <span class="emphasis"><em>OpenCPI
+    Application Development Guide</em></span> for information on using
+    <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> with remote containers.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--server=</code></strong></span><span class="emphasis"><em>&lt;name-or-IP-address&gt;</em></span>, <span class="strong"><strong><code class="literal">-S</code></strong></span> <span class="emphasis"><em>&lt;name-or-IP-address&gt;</em></span>+
+</span></dt><dd>
+    Specify the server name or IP address to be explicitly contacted
+    for remote containers whether or not the <span class="strong"><strong><code class="literal">--remote</code></strong></span> (<span class="strong"><strong><code class="literal">-R</code></strong></span>) option is
+    specified. See the <span class="emphasis"><em>OpenCPI Application Development Guide</em></span> for
+    information on using <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> with remote containers.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--timeout=</code></strong></span><span class="emphasis"><em>&lt;seconds&gt;</em></span>, <span class="strong"><strong><code class="literal">-O</code></strong></span> <span class="emphasis"><em>&lt;seconds&gt;</em></span>
+</span></dt><dd>
+    Specify the number of seconds after which the application is
+    stopped and considered to have failed (the <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> exit
+    code is 1.)
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--uncached</code></strong></span>, <span class="strong"><strong><code class="literal">-U</code></strong></span>
+</span></dt><dd>
+    When dumping property values, do not use values cached
+    by <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> when they are written. Instead, query the
+    worker in its execution environment (which is much
+    more expensive).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--verbose</code></strong></span>, <span class="strong"><strong><code class="literal">-v</code></strong></span>
+</span></dt><dd>
+    Describe what is happening in command execution in more detail.
+</dd></dl></div></div><div class="refsect2"><a id="_function_options"></a><h3>Function Options</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--list</code></strong></span>, <span class="strong"><strong><code class="literal">-C</code></strong></span>
+</span></dt><dd>
+    List all available containers, including those discovered on
+    the network if the <span class="strong"><strong><code class="literal">-remote</code></strong></span> (<span class="strong"><strong><code class="literal">-R</code></strong></span>) or <span class="strong"><strong><code class="literal">--server</code></strong></span> (<span class="strong"><strong><code class="literal">-S</code></strong></span>)
+    options are specified. The option assigns each container a number
+    for easy specification with the <span class="strong"><strong><code class="literal">--container</code></strong></span> (<span class="strong"><strong><code class="literal">-c</code></strong></span>) option
+    and returns it as output along with the authoring model, platform
+    name, operating system and version, architecture and container name.
+    Note that the application is still executed if an application
+    filename argument is specified after the options.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--list-artifacts</code></strong></span>, <span class="strong"><strong><code class="literal">-A</code></strong></span>
+</span></dt><dd>
+    Search for all artifacts for the targets or
+    platforms specified with the <span class="strong"><strong><code class="literal">--target</code></strong></span> (<span class="strong"><strong><code class="literal">-r</code></strong></span>) option, based on
+    OCPI_LIBRARY_PATH, and then write the resulting list to
+    <span class="strong"><strong><code class="literal">stdout</code></strong></span>. Use this function to collect artifacts
+    for a specific system.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--list-specs</code></strong></span>
+</span></dt><dd>
+    Search for all specs for the targets or platforms
+    specified with the <span class="strong"><strong><code class="literal">--target</code></strong></span> (<span class="strong"><strong><code class="literal">-r</code></strong></span>) option, based on
+    OCPI_LIBRARY_PATH, and then print the resulting list to
+    <span class="strong"><strong><code class="literal">stdout</code></strong></span>. Use this function to collect available specs
+    for a specific system.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--no-execute</code></strong></span>
+</span></dt><dd>
+    For each instance, determine the container on which it will run
+    and the artifact to be used to run it without actually allocating
+    any resources for performing the execution. Use this option
+    with the <span class="strong"><strong><code class="literal">--deploy-out</code></strong></span> option to execute a "dry run"
+    of an application to see the results and record the deployment
+    decisions in an XML file that can then be used with the
+    <span class="strong"><strong><code class="literal">--deployment</code></strong></span> option.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--only-platforms</code></strong></span>
+</span></dt><dd>
+    Use with the <span class="strong"><strong><code class="literal">--list</code></strong></span> (<span class="strong"><strong><code class="literal">-C</code></strong></span>) option to direct it to
+    output only the available platforms, listing any available
+    platform only once even if there is more than one container
+    with the same platform type.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--target=</code></strong></span><span class="emphasis"><em>&lt;target&gt;</em></span>, <span class="strong"><strong><code class="literal">-r</code></strong></span> <span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Use with the <span class="strong"><strong><code class="literal">--list-artifacts</code></strong></span> and
+    <span class="strong"><strong><code class="literal">--list-specs</code></strong></span> options to limit the list
+    to the specified architecture. Specify the
+    target in the format <span class="emphasis"><em>&lt;os&gt;</em></span><span class="strong"><strong><code class="literal">-</code></strong></span><span class="emphasis"><em>&lt;os-version&gt;</em></span><span class="strong"><strong><code class="literal">-</code></strong></span><span class="emphasis"><em>&lt;arch&gt;</em></span>;
+    for example, <span class="strong"><strong><code class="literal">linux-c7-x86_64</code></strong></span>.
+</dd></dl></div></div><div class="refsect2"><a id="_instance_options"></a><h3>Instance Options</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--container</code></strong></span>[<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;container&gt;</em></span>, <span class="strong"><strong><code class="literal">-c</code></strong></span>[<span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;container&gt;</em></span>+
+</span></dt><dd>
+    Assign the named instance or all instances to the specified
+    container using the container name or number
+    returned by the <span class="strong"><strong><code class="literal">--list</code></strong></span> (<span class="strong"><strong><code class="literal">-C</code></strong></span>) option.
+    Examples: -cfft=1, -cfir=rcc2, --container=fft=1,
+    --container=rcc2, -c=1, --container fft=1.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--model</code></strong></span>[<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;authoring-model&gt;</em></span>, <span class="strong"><strong><code class="literal">-m</code></strong></span>[<span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;authoring-model&gt;</em></span>+
+</span></dt><dd>
+    Specify the authoring model of the named instance
+    or all instances so that the worker used for the
+    instance/all instances must have this model.
+    The value of <span class="emphasis"><em>&lt;authoring-model&gt;</em></span> is <span class="strong"><strong><code class="literal">hdl</code></strong></span> or <span class="strong"><strong><code class="literal">rcc</code></strong></span>.
+    Examples: -mfft=hdl, -m=hdl, --model=rcc, --model=fir=hdl, --model fir=hdl.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--platform</code></strong></span>[<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;=</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;platform-type&gt;</em></span>, <span class="strong"><strong><code class="literal">-P</code></strong></span>[<span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;platform-type&gt;</em></span>+
+</span></dt><dd>
+    Assign the named instance or all instances only to
+    available containers for the specified platform type.
+    Examples: -Pfft=ml605, --platform=centos7.
+    Use the <span class="strong"><strong><code class="literal">--list</code></strong></span> (<span class="strong"><strong><code class="literal">-C</code></strong></span>) option to determine the
+    available containers and platform types.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--property</code></strong></span>[<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;property-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>, <span class="strong"><strong><code class="literal">-p</code></strong></span>[<span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;property-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>+
+</span></dt><dd>
+    Set the value of a property. Specify the instance name for
+    per-instance property value settings. Omit the instance name
+    for application-level property value settings. See the
+    <span class="emphasis"><em>OpenCPI Application Development Guide</em></span> for detailed
+    information on specifying property values.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--selection</code></strong></span>[<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;expression&gt;</em></span>, <span class="strong"><strong><code class="literal">-s</code></strong></span>[<span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;expression&gt;</em></span>
+</span></dt><dd>
+    Set the selection expression for a single instance
+    or all instances. See the description of the <span class="strong"><strong><code class="literal">selection</code></strong></span> OAS XML attribute in the
+    <span class="emphasis"><em>OpenCPI Application Development Guide</em></span> for details.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--worker=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;worker-name&gt;</em></span>, <span class="strong"><strong><code class="literal">-w</code></strong></span>[<span class="emphasis"><em>&lt;instance-name&gt;</em></span>]<span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;worker-name&gt;</em></span>
+</span></dt><dd>
+    Specify the name of the worker (specific implementation)
+    to be used for the instance. Do not include
+    the authoring model suffix or the package prefix in <span class="emphasis"><em>&lt;worker-name&gt;</em></span>.
+    Examples: --worker=mycomp2=worker3, --worker mycomp2=worker3, -wmycomp2=worker3.
+</dd></dl></div></div><div class="refsect2"><a id="_instance_port_options"></a><h3>Instance Port Options</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--buffer-count=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>, <span class="strong"><strong><code class="literal">-B</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>+
+</span></dt><dd>
+    Specify the number of buffers at this instance port, not
+    for all the ports in the connection. The default is
+    usually 2. Use this option to allow the number of
+    buffers to be different on each end of the connection.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--buffer-size=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>, <span class="strong"><strong><code class="literal">-Z</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>+
+</span></dt><dd>
+    Specify the buffer size for the connection (the specified
+    port and the port to which it is connected). The default
+    is usually determined by a combination of the protocol
+    used on the connection and other system constraints.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--transport=</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;identifier&gt;</em></span>, <span class="strong"><strong><code class="literal">-T</code></strong></span><span class="emphasis"><em>&lt;instance-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;identifier&gt;</em></span>+
+</span></dt><dd>
+    Specify the transport technology to use for the
+    connection (the specified port and the port
+    to which it is connected). This option applies
+    when using remote containers.
+    See the description of the <span class="strong"><strong><code class="literal">transport</code></strong></span> attribute
+    of a <span class="strong"><strong><code class="literal">connection</code></strong></span> element in the <span class="emphasis"><em>OpenCPI Application
+    Development Guide</em></span> for the list of identifiers that
+    correspond to the transport technologies supported
+    by OpenCPI.
+</dd></dl></div></div><div class="refsect2"><a id="_external_port_options"></a><h3>External Port Options</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--buffer-count=</code></strong></span><span class="emphasis"><em>&lt;external-port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>, <span class="strong"><strong><code class="literal">-B</code></strong></span> <span class="emphasis"><em>&lt;port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>+
+</span></dt><dd>
+    Specify the number of buffers for the specified external port.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--buffer-size=</code></strong></span><span class="emphasis"><em>&lt;external-port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>, <span class="strong"><strong><code class="literal">-Z</code></strong></span> <span class="emphasis"><em>&lt;external-port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>+
+</span></dt><dd>
+    Specify the the buffer size for the specified
+    external port and the port inside the OAS to which
+    it is connected.
+    The default is usually determined by a combination of
+    the protocol used on the connection and other system
+    constraints.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--file=</code></strong></span><span class="emphasis"><em>&lt;external-port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;file-name&gt;</em></span>, <span class="strong"><strong><code class="literal">-f</code></strong></span> <span class="emphasis"><em>&lt;external-port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;file-name&gt;</em></span>+
+</span></dt><dd>
+    Specify the file to be connected to the
+    specified external port. Use this option to
+    insert a <span class="strong"><strong><code class="literal">file_read</code></strong></span> or <span class="strong"><strong><code class="literal">file_write</code></strong></span> utility component
+    into the application and connect it to the
+    specified external port. It allows an OAS with
+    external ports to be connected to files while also
+    allowing it to be used with those same ports
+    connected to an ACI application. See the
+    description of the utility components and
+    ACI applications in the <span class="emphasis"><em>OpenCPI Application
+    Development Guide</em></span> for details.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--transport=</code></strong></span><span class="emphasis"><em>&lt;external-port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;identifier&gt;</em></span>, <span class="strong"><strong><code class="literal">-T</code></strong></span> <span class="emphasis"><em>&lt;external-port-name&gt;</em></span><span class="strong"><strong><code class="literal">=</code></strong></span><span class="emphasis"><em>&lt;identifier&gt;</em></span>+
+</span></dt><dd>
+    Specify the transport technology used for the connection
+    (for this port and the port to which it is connected).
+    This option applies when using remote containers.
+    See the description of the <span class="strong"><strong><code class="literal">transport</code></strong></span> attribute
+    of a <span class="strong"><strong><code class="literal">connection</code></strong></span> element in the <span class="emphasis"><em>OpenCPI Application
+    Development Guide</em></span> for the list of identifiers that
+    correspond to the transport technologies supported
+    by OpenCPI.
+</dd></dl></div></div><div class="refsect2"><a id="_simulation_options"></a><h3>Simulation Options</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--sim_dir=</code></strong></span><span class="emphasis"><em>&lt;directory&gt;</em></span>
+</span></dt><dd>
+    Specify the name of a directory where simulation outputs
+    will be placed. The default directory is <span class="strong"><strong><code class="literal">simulations/</code></strong></span>
+    relative to where <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> is running.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--sim-ticks=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>
+</span></dt><dd>
+    The number of simulation clock cycles to execute or
+    until the application is done.
+</dd></dl></div><p>The section "Execution of Simulation Bitstreams and Containers" in the
+<span class="emphasis"><em>OpenCPI HDL Development Guide</em></span> provides more information about running
+applications on HDL (FPGA) simulators. See <a class="ulink" href="ocpiview.1.html" target="_top">ocpiview(1)</a>
+for information on viewing the results of simulation runs.</p></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>.
+The command locates and reads the application OAS
+and runs the application:
+</p><pre class="screen">ocpirun myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, displaying information
+about what is happening, dumping the property values
+after initialization, and limiting execution time to
+10 seconds:
+</p><pre class="screen">ocpirun --verbose --dump --duration=10 myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, specifying that
+all application instances must use the RCC
+authoring model:
+</p><pre class="screen">ocpirun --model=rcc myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, specifying that
+the <span class="strong"><strong><code class="literal">ctl</code></strong></span> instance in the application must
+use the RCC authoring model:
+</p><pre class="screen">ocpirun -model=ctl=rcc myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, specifying that
+all the instances in the application except for
+the <span class="strong"><strong><code class="literal">filter</code></strong></span> instance must use the RCC authoring
+model. Specifying the <span class="strong"><strong><code class="literal">--model</code></strong></span> option with an empty
+value for <span class="strong"><strong><code class="literal">filter</code></strong></span> unsets the previous
+setting for it made with the <span class="strong"><strong><code class="literal">--model=rcc</code></strong></span> option:
+</p><pre class="screen">ocpirun --model=rcc --model=filter= myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, specify that all instances
+in the application described by the OAS named
+<span class="strong"><strong><code class="literal">myapp.xml</code></strong></span> should be run only on the ml605 HDL (FPGA) platform:
+</p><pre class="screen">ocpirun --platform=ml605 myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, specify that the instance
+<span class="strong"><strong><code class="literal">mycomp</code></strong></span> in the application described by the OAS
+named <span class="strong"><strong><code class="literal">myapp</code></strong></span> should be run only on the <span class="strong"><strong><code class="literal">xsim</code></strong></span>
+HDL (FPGA) simulator platform:
+</p><pre class="screen">ocpirun --platform=mycomp=xsim myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, setting the
+top-level application property named <span class="strong"><strong><code class="literal">control</code></strong></span>
+to <span class="strong"><strong><code class="literal">5</code></strong></span>:
+</p><pre class="screen">ocpirun --property control=5 myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, setting the
+<span class="strong"><strong><code class="literal">filename</code></strong></span> property value of the <span class="strong"><strong><code class="literal">file_read</code></strong></span>
+instance to the file <span class="strong"><strong><code class="literal">myinput.data</code></strong></span>:
+</p><pre class="screen">ocpirun --property file_read=filename=myinput.data myapp</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, connecting the
+external port named <span class="strong"><strong><code class="literal">input</code></strong></span> to the file
+<span class="strong"><strong><code class="literal">myinput.txt</code></strong></span> and setting the inserted <span class="strong"><strong><code class="literal">file_read</code></strong></span> properties
+<span class="strong"><strong><code class="literal">opcode</code></strong></span> to <span class="strong"><strong><code class="literal">2</code></strong></span> and <span class="strong"><strong><code class="literal">suppressEOF</code></strong></span> to <span class="strong"><strong><code class="literal">false</code></strong></span>.
+Enclose the option value in quotes because the question mark
+and the semicolon are shell metacharacters:
+</p><pre class="screen">ocpirun --file 'input=myinput.txt?opcode=2;suppressEOF=false' myapp</pre></li><li class="listitem"><p class="simpara">
+On a CentOS7 system with <span class="strong"><strong><code class="literal">modelsim</code></strong></span> and <span class="strong"><strong><code class="literal">isim</code></strong></span> HDL (FPGA) simulators
+installed for OpenCPI, list the available platforms:
+</p><pre class="screen">ocpirun --list</pre><p class="simpara">The output from the command is:</p><pre class="screen">Available containers:
+   #  Model Platform   OS    OS-Version   Arch   Name
+   0  hdl   isim                                 lsim:isim
+   1  hdl   modelsim                             lsim:modelsim
+   2  rcc   centos7    linux c7           x86_64 rcc0</pre></li><li class="listitem"><p class="simpara">
+Inside a project, run the application described
+by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>, using for the <span class="strong"><strong><code class="literal">ctl</code></strong></span>
+instance only those workers whose <span class="strong"><strong><code class="literal">snr</code></strong></span> property
+is less than 5:
+</p><pre class="screen">ocpirun --selection=ctl=snr&lt;5 myapp</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
+<a class="ulink" href="ocpidev-assembly.1.html" target="_top">ocpidev-assembly(1)</a>
+<a class="ulink" href="ocpidev-component.1.html" target="_top">ocpidev-component(1)</a>
+<a class="ulink" href="ocpidev-platform.1.html" target="_top">ocpidev-platform(1)</a>
+<a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
+<a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-worker(1)</a>
+<a class="ulink" href="ocpiview.1.html" target="_top">ocpiview(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

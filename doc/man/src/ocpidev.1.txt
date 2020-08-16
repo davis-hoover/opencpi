@@ -9,7 +9,7 @@ ocpidev - command-line tool for managing OpenCPI assets.
 
 SYNOPSIS
 --------
-*ocpidev* ['<options>'] '<verb>' ['<noun>' ['<name>' ]]
+*`ocpidev`* ['<options>'] '<verb>' ['<noun>' ['<name>' ]]
 
 
 DESCRIPTION
@@ -168,7 +168,7 @@ words or acronyms following two hyphens and separated by hyphens.
 Most options are only valid for specific verbs or nouns. The
 general-purpose options are:
 
-*`-d`* 'directory>'::
+*`-d`* '<directory>'::
     Specify the directory in which this command should be run.
     Analogous to the *-C* option in the POSIX *make* command.
     This option can be specified more than once on the command line.

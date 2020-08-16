@@ -1,0 +1,209 @@
+.\"     Title: ocpiserve
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 08/16/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPISERVE" "1" "08/16/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpiserve \- command\-line tool for making local OpenCPI containers available for remote access
+.SH "SYNOPSIS"
+.sp
+\fBocpiserve\fR [\fI<options>\fR]
+.SH "DESCRIPTION"
+.sp
+When an application is run, the OpenCPI framework finds "local" containers \- those that are part of or directly attached to the local system \- where workers based on artifacts can execute\&. A local system can use the \fBocpiserve\fR command to offer its local containers to other network\-based systems for use as "remote" containers\&.
+.sp
+The \fBocpiserve\fR command is part of OpenCPI\(cqs \fB\fIremote containers\fR\fR feature, which adds containers available in other systems on the network to the set of containers considered for application execution\&.
+.sp
+The \fBocpiserve\fR command runs as a \fB\fIcontainer server\fR\fR, serving up local containers as remotely accessible containers to network clients\&. Remote clients use \fBocpirun\fR options to find the systems on the network that are running \fBocpiserve\fR and list the available containers\&.
+.sp
+When started, \fBocpiserve\fR discovers all local network interfaces and prepares to be contacted by clients for all of them\&. It optionally (if the \fB\-\-discoverable\fR option is used) also prepares to receive multicast queries from clients on all network interfaces\&. The \fBocpiserve\fR container server is a fully multi\-homed server, using all network interfaces for normal use (TCP) discovery (via the User Datagram Protocol (UDP))\&.
+.sp
+The \fBocpiserve\fR container server does not run, initiate or control entire OpenCPI applications, so it requires fewer resources than \fBocpirun\fR or ACI executables\&.
+.sp
+\fIArtifacts\fR \- binary executables compiled from OpenCPI \fIworkers\fR \- are not required to reside on the system running \fBocpiserve\fR\&. Instead, they are downloaded on demand to the \fBocpiserve\fR container server from the remote system on which the application is initiated and controlled and then cached for possible re\-use\&. The \fBocpiserve\fR container server maintains this cache in a directory named \fBartifacts\fR unless the \fB\-\-directory\fR option is used to change it\&. The cache is normally maintained after \fBocpiserve\fR exits unless the \fB\-\-remove\fR option is used to delete it\&.
+.sp
+Starting \fBocpiserve\fR locally requires logging in to the console on the system with a username and password\&. CTRL/C can be used to exit \fBocpiserve\fR locally\&. Alternatively, the ocpiremote(1) tool can be used to start, stop, and otherwise control an \fBocpiserve\fR container server from a remote client\&.
+.sp
+Options can occur anywhere in the command for the user\(cqs convenience\&. When invoked without any options, \fBocpiserve\fR displays information about all of its options\&.
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.PP
+\fB\-\-addresses=\fR\fI<file>\fR, \fB\-a\fR \fI<file>\fR
+.RS 4
+Specify a file to which
+\fBocpiserve\fR
+should write all its TCP/IP addresses\&. See the description of the OCPI_SERVER_ADDRESSES_FILE in the
+\fIOpenCPI Application Development Guide\fR
+for details\&.
+.RE
+.PP
+\fB\-\-directory=\fR \fI<directory\-name>\fR, \fB\-D\fR \fI<directory\-name>\fR
+.RS 4
+Specify the name of a directory to use for caching downloaded artifacts\&. The default directory name is
+\fBartifacts\fR\&.
+.RE
+.PP
+\fB\-\-discoverable\fR, \fB\-d\fR
+.RS 4
+Enable
+\fBocpiserve\fR
+to receive UDP multicast discovery queries from clients on all network interfaces\&.
+.RE
+.PP
+\fB\-\-help\fR, \fB\-h\fR
+.RS 4
+Display help information for
+\fBocpiserve\fR\&.
+.RE
+.PP
+\fB\-\-log\-level=\fR\fI<value>\fR, \fB\-l\fR \fI<value>\fR
+.RS 4
+Specify the OpenCPI log level to be used during execution\&. See the description of the OCPI_LOG_LEVEL environment variable in the
+\fIOpenCPI User Guide\fR
+for a description of possible values\&. Using this option overrides the level set in the OCPI_LOG_LEVEL environment variable\&. The default log level is 0 (no logging)\&.
+.RE
+.PP
+\fB\-\-loopback\fR, \fB\-L\fR
+.RS 4
+Enable/add UDP multicast discovery on the local loopback subnet\&.
+.RE
+.PP
+\fB\-\-onlyloopback\fR, \fB\-O\fR
+.RS 4
+Allow UDP multicast discovery
+\fIonly\fR
+on the local loopback subnet\&.
+.RE
+.PP
+\fB\-\-port=\fR \fI<value>\fR, \fB\-p\fR \fI<value>\fR
+.RS 4
+Specify the TCP port number to use for
+\fBocpiserve\fR
+ports\&. The default is to use dynamically assigned port numbers\&.
+.RE
+.PP
+\fB\-\-processors=\fR\fI<number\-of\-RCC\-containers>\fR, \fB\-n\fR \fI<number\-of\-RCC\-containers>\fR
+.RS 4
+Specify the number of RCC containers to create and serve\&. The default is 1\&.
+.RE
+.PP
+\fB\-\-remove\fR, \fB\-r\fR
+.RS 4
+Remove the artifact cache when
+\fBocpiserve\fR
+exits\&.
+.RE
+.PP
+\fB\-\-verbose\fR, \fB\-v\fR
+.RS 4
+Display status and progress as
+\fBocpiserve\fR
+executes\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Start the
+\fBocpiserve\fR
+container server, allowing it to be discoverable via UDP multicast from client systems and displaying status and progress information:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiserve \-\-verbose \-\-discoverable
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Start the
+\fBocpiserve\fR
+container server and direct it to write its TCP/IP addresses to the file named
+\fBmyserveraddrs\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiserve \-\-address=myserveraddrs
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Start the
+\fBocpiserve\fR
+container server and direct it to use the TCP port 9233 as the TCP port:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiserve \-\-port=9233
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-worker(1) ocpiremote(1) ocpirun(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.
