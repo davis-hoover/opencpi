@@ -266,7 +266,38 @@ std::string checkValues(OCPI::API::Application* app, std::string comp_name)
   return ret_val;
 }
 
-int main(int /*argc*/, char **/*argv*/)
+static const char
+*appWithSlave =
+  "<Application>\n"
+  "  <Instance component='av.test.comp1' name='comp1'>\n"
+  "    <Property Name='my_string' Value='\"bad\"'></Property>\n"
+  "  </Instance>\n"
+  "  <Instance component='av.test.comp1' name='comp2'>\n"
+  "    <Property Name='my_string' Value='\"bad\"'></Property>\n"
+  "  </Instance>\n"
+  "  <Instance component='av.test.comp2' name='comp3'/>\n"
+  "  <Instance Name='proxy1' component='av.test.proxy1'>\n"
+  "    <slave instance='comp2' slave='second_wkr1'/>\n"
+  "    <slave instance='comp1' slave='first_wkr1'/>\n"
+  "    <slave name='comp3'/>\n"
+  "  </Instance>\n"
+  "</Application>\n",
+*appWithoutSlave =
+  "<Application>\n"
+  "  <Instance component='av.test.comp1' name='comp1'>\n"
+  "    <Property Name='my_string' Value='\"bad\"'></Property>\n"
+  "  </Instance>\n"
+  "  <Instance component='av.test.comp1' name='comp2'>\n"
+  "    <Property Name='my_string' Value='\"bad\"'></Property>\n"
+  "  </Instance>\n"
+  "  <Instance Name='proxy1' component='av.test.proxy1'>\n"
+  "    <slave instance='comp2' slave='second_wkr1'/>\n"
+  "    <slave instance='comp1' slave='first_wkr1'/>\n"
+  "    <!-- <slave name='comp3'/> -->\n"
+  "  </Instance>\n"
+  "</Application>\n";
+
+int main(int /*argc*/, char **argv)
 {
   // Reference OpenCPI_Application_Development document for an explanation of the ACI
   try
@@ -275,7 +306,7 @@ int main(int /*argc*/, char **/*argv*/)
 			 OA::PVBool("dump", true),
 			 OA::PVBool("hidden", true),
 			 OA::PVEnd };
-    OCPI::API::Application app("multislave_test.xml", pvs);
+    OCPI::API::Application app(argv[1] ? appWithSlave : appWithoutSlave, pvs);
     app.initialize(); // all resources have been allocated
     app.start();      // execution is started
     app.wait();       // wait until app is "done"
@@ -306,7 +337,8 @@ int main(int /*argc*/, char **/*argv*/)
       std::cerr << "app failed: " << err << std::endl;
       return 5;
     }
-    err = checkValues(&app, "comp3");
+    if (app.getPropertyValue<bool>("proxy1", "wkr2Present"))
+      err = checkValues(&app, "comp3");
     if (!err.empty())
     {
       std::cerr << "app failed: " << err << std::endl;

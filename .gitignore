@@ -55,6 +55,9 @@ doc/pdfs/
 **/doc/*.inc
 !**/doc/developer_doc.inc
 
+# OSP's
+project-registry/ocpi.osp.*
+
 # GitLab Pages staging area
 .public/
 

@@ -423,6 +423,7 @@ class Worker : public OU::Worker {
   unsigned m_maxLevel;        // when data type processing
   bool m_dynamic;
   bool m_isSlave;
+  bool m_isOptional;                // is this slave optional
   Worker(ezxml_t xml, const char *xfile, const std::string &parentFile, WType type,
 	 Worker *parent, OU::Assembly::Properties *ipvs, const char *&err);
   virtual ~Worker();
@@ -441,7 +442,7 @@ class Worker : public OU::Worker {
   OU::Port *findMetaPort(const char *id, const OU::Port *except) const;
   const char* parseSlaves();
   std::string print_map();
-  const char* addSlave(const std::string worker_name, const std::string slave_name);
+  const char* addSlave(const std::string worker_name, const std::string slave_name, bool optional);
   virtual OU::Port &metaPort(unsigned long which) const;
   const char
     *addBuiltinProperties(),

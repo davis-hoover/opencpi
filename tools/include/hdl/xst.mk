@@ -250,8 +250,8 @@ XstIniFile=$(Core).ini
 
 XstLibraries=$(HdlLibrariesInternal)
 
-XstNeedLso= $(strip $(XstCompLibs)$(HdlLibrariesInternal)$(XstCores))
-XstNeedIni= $(strip $(XstCores)$(HdlLibrariesInternal))
+XstNeedLso=$(XstCores)$(HdlLibrariesInternal)
+XstNeedIni=$(XstCores)$(HdlLibrariesInternal)
 #   $(and $(findstring worker,$(HdlMode)),echo $(call ToLower,$(Worker))=$(call ToLower,$(Worker));) 
 
 # Choices as to where a bb might be
@@ -273,7 +273,7 @@ XstCoreLibraryChoices=$(infox XCLT:$1:$2)$(strip \
 # 3. Black box core libraries
 # This must be consistent with the XstMakeIni
 # The trick is to filter out component library BB libs from the cores.
-XstCompLibs=$(ComponentLibraries) $(DeviceLibraries) $(CDKComponentLibraries) $(CDKDeviceLibraries)
+XstCompLibs=$(infox CLLL:$(ComponentLibraries))$(ComponentLibraries) $(DeviceLibraries) $(CDKComponentLibraries) $(CDKDeviceLibraries)
 # Remove the RV in the middle or at the end.
 # This will get fixed when we put the RV at the end everywhere...
 XstLibFromCore=$(foreach n,$(patsubst %_rv,%,$(basename $(notdir $1))),\
@@ -282,26 +282,39 @@ XstPathFromCore=$(foreach n,$(call XstLibFromCore,$1),$(and $(findstring /,$1),$
 
 XstMakeLso=\
   (\
-   $(foreach l,$(XstCompLibs),\
-      $(infox CL:$l) \
-      echo $(lastword $(subst -, ,$(notdir $l)));)\
-   $(foreach l,$(HdlLibrariesInternal),\
-      $(infox HL:$l) \
-      echo $(lastword $(subst -, ,$(notdir $l)));)\
-   $(foreach l,$(XstCores), \
-      $(infox CC:$l) \
-      echo $(call XstLibFromCore,$l);)\
+   $(eval XstLibs:=$(call HdlCollectLibraries,$(HdlTarget)))\
+   $(foreach l,$(XstLibs),$(infox LLL:$l)echo $(lastword $(subst :, ,$l));) \
+   $(foreach c,$(call HdlCollectCorePaths),$(infox CCCi:$c)\
+      $(- for each core, specify any libraries it needs)\
+      $(eval XstCoreLibs:=$(call HdlCollectCoreLibraries,$(call XstPathFromCore,$c),$(XstLibs)))\
+      $(foreach l,$(XstCoreLibs),$(infox LLL1:$l)echo $(lastword $(subst :, ,$l));)\
+      $(eval XstLibs+=$(XstCoreLibs))echo $(call XstLibFromCore,$c);) \
   ) > $(XstLsoFile);
 
-XstMakeIni=\
-  (\
-   $(foreach l,$(HdlLibrariesInternal),\
+xxx=   $(foreach l,$(HdlLibrariesInternal),\
       echo $(lastword $(subst -, ,$(notdir $(l))))=$(strip \
         $(call FindRelative,$(TargetDir),$(strip \
            $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X4))));) \
    $(foreach l,$(XstCores),$(infox XstCore:$l)\
       echo $(call XstLibFromCore,$l)=$(call FindRelative,$(TargetDir),$(strip \
-          $(firstword $(foreach c,$(call XstCoreLibraryChoices,$(call XstPathFromCore,$l),a),$(infox CECEL:$c)$(call HdlExists,$c)))));) \
+          $(firstword $(foreach c,$(call XstCoreLibraryChoices,$(call XstPathFromCore,$l),a),$(infox CECEL:$c)$(call HdlExists,$c)))));)
+
+XstMakeIni=\
+  (\
+   $(eval XstLibs:=$(call HdlCollectLibraries,$(HdlTarget)))\
+   $(foreach l,$(XstLibs),$(infox LLL:$l)\
+      echo $(lastword $(subst :, ,$l))=$(strip \
+        $(call FindRelative,$(TargetDir),$(strip \
+           $(call HdlLibraryRefDir,$l,$(HdlTarget),,xst))));) \
+   $(foreach c,$(call HdlCollectCorePaths),$(infox CCCi:$c)\
+      $(- for each core, specify any libraries it needs)\
+      $(eval XstCoreLibs:=$(call HdlCollectCoreLibraries,$(call XstPathFromCore,$c),$(XstLibs)))\
+      $(foreach l,$(XstCoreLibs),$(infox LLL1:$l)\
+        echo $(lastword $(subst :, ,$l))=$(strip\
+          $(call AdjustRelative,$(call HdlLibraryRefDir,$l,$(HdlTarget),,xst)));)\
+      $(eval XstLibs+=$(XstCoreLibs))$(strip \
+      echo $(call XstLibFromCore,$c)=$(call FindRelative,$(TargetDir),$(strip \
+        $(call XstPathFromCore,$c);))))\
   ) > $(XstIniFile);
 
 XstOptions += $(and $(XstNeedLso),-lso $(XstLsoFile))
@@ -366,32 +379,10 @@ XstOptions +=\
 
 XstNgdOptions=$(foreach c,$(XstCoreSearchList),-sd $c )
 
-#     $(foreach c,$(XstCores),$(infox XNO:$c)-sd $(call FindRelative,$(TargetDir),$(dir $(call HdlCoreRef,$c,$(HdlTarget)))))
-
-ifneq (,)
-# ???
-  $(foreach l,$(CDKComponentLibraries), -sd \
-    $(call FindRelative,$(TargetDir),$(l)/hdl/$(or $(HdlPart),$(HdlTarget))))\
-  $(foreach l,$(CDKDeviceLibraries), -sd \
-    $(call FindRelative,$(TargetDir),$(l)/hdl/$(or $(HdlPart),$(HdlTarget))))\
-  $(foreach l,$(ComponentLibraries), -sd \
-    $(call FindRelative,$(TargetDir),$(l)/hdl/$(or $(HdlPart),$(HdlTarget))))\
-  $(foreach l,$(DeviceLibraries), -sd \
-    $(call FindRelative,$(TargetDir),$(l)/lib/hdl/$(or $(HdlPart),$(HdlTarget))))\
-  $(foreach c,$(XstCores), -sd \
-    $(call FindRelative,$(TargetDir),$(dir $(call HdlCoreRef,$c,$(HdlTarget)))))
-endif
-#$(info lib=$(HdlLibrariesInternal)= cores=$(XstCores)= Comps=$(ComponentLibraries)= td=$(TargetDir)= @=$(@))
-
 HdlToolCompile=\
   $(foreach l,$(XstLibraries),\
      $(if $(wildcard $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X5)),,\
           $(error Error: Specified library: "$l", in the "HdlLibraries" variable, was not found for $(call HdlGetFamily,$(HdlTarget)).))) \
-  $(foreach l,$(XstCores),$(infox AC:$l)\
-    $(if $(foreach x,$(call XstCoreLibraryChoices,$l,b),$(call HdlExists,$x)),,\
-	$(info Error: Specified core library for "$l", in the "Cores" variable, was not found.) \
-        $(error Error:   after looking in $(call HdlExists,$(call XstCoreLibraryChoices,$l,c))))) \
-  $(infox ALLCORE1) \
   echo '  'Creating $@ with top == $(Top)\; details in $(TargetDir)/xst-$(Core).out.;\
   rm -f $(notdir $@);\
   $(XstMakeGenerics)\

@@ -187,11 +187,17 @@ cleaneverything distclean: clean cleandriver cleanpackaging
 	$(AT)rm -r -f exports
 
 # Documentation (AV-4402)
-.PHONY: doc
-.SILENT: doc
+# The "pages" target creates the HTML index files for the generated documentation.
+# "make pages" must happen before "make rpm Package=doc" is attempted if you want
+# the optional HTML index pages to be included as part of the doc RPM.
+.PHONY: doc pages
+.SILENT: doc pages
 doc:
 	$(AT)rm -rf doc/{pdfs,html}
 	$(AT)bash doc/generator/genDocumentation.sh
+
+pages:
+	$(AT)doc/build-pages.py HEAD
 
 
 ##########################################################################################
@@ -294,7 +300,7 @@ real_platforms:=$(call Unique,$(call RccRealPlatforms,$(RccPlatforms)))
 # e.g.: make rpm Platforms="zed:xilinx13_4"
 
 # Call the right rpm packaging script with the right arguments.  This macro takes
-# one argument which if set indicates hw deployment rather than RPM building
+# one argument which if set indicates hw deployment rather than RPM building.
 DoRpmOrDeployHw=\
   $(foreach arg,$(or $(Platforms),$(OCPI_TOOL_PLATFORM)),\
     $(foreach pair,$(call GetRccHdlPlatform,$(arg)),\

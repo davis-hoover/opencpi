@@ -33,8 +33,8 @@ main(int, char **) {
     OA::PValue pvs[] = { OA::PVString("model", "=rcc"), OA::PVBool("verbose", true), OA::PVBool("dump", true),
 			 OA::PVEnd };
     OA::Application app("<application>"
-			"  <instance component='local.copy' worker='copy' externals='true' connect='copy1'/>"
-			"  <instance component='local.copy' worker='copy_cc'externals='true'/>"
+			"  <instance component='.copy.copy' worker='copy' externals='true' connect='copy1'/>"
+			"  <instance component='.copy.copy' worker='copy_cc'externals='true'/>"
 		        "</application>", pvs);
     app.initialize();
     OA::ExternalPort
@@ -46,11 +46,11 @@ main(int, char **) {
       *in = fdopen(0, "r"),
       *out = fdopen(1, "w");
     assert(in && out);
+    bool end;
     do {
       OA::ExternalBuffer *bFromMe, *bToMe;
       uint8_t *data;
       uint8_t opcode;
-      bool end;
       // Get a buffer (that is empty) to put data into that is from me
       while (!(bFromMe = pFromMe.getBuffer(data, length)))
 	usleep(1000);
@@ -70,7 +70,7 @@ main(int, char **) {
       // Give the buffer back to the system, I'm done with it.
       bToMe->release();
     } while (length);
-    app.wait();
+    assert(end);
     app.finish();
   } catch (std::string &e) {
     fprintf(stderr, "Exception thrown: %s\n", e.c_str());

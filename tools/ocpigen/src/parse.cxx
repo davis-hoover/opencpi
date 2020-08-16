@@ -1016,7 +1016,7 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     m_emulate(NULL), m_emulator(NULL), m_library(NULL), m_outer(false),
     m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_build(*this),
     m_paramConfig(NULL), m_parent(parent), m_scalable(false), m_requiredWorkGroupSize(0),
-    m_maxLevel(0), m_dynamic(false), m_isSlave(false)
+    m_maxLevel(0), m_dynamic(false), m_isSlave(false), m_isOptional(false)
 {
   if ((err = getNames(xml, xfile, NULL, m_name, m_fileName)))
     return;
@@ -1097,7 +1097,8 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
   // This will be parsed again for build/Makefile purposes.
   // THIS MUST BE IN SYNC WITH THE gnumake VERSION in util.mk! Ugh.
   OrderedStringSet dirs;
-  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, dirs)))
+  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, true,
+				   dirs)))
     return;
   for (auto it = dirs.begin(); it != dirs.end(); ++it)
     addInclude(*it);

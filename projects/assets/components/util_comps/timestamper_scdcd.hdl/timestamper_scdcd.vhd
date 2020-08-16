@@ -277,16 +277,7 @@ begin
 
   oclk_data_cdc_odeq <= oclk_out_adapter_irdy and oclk_data_cdc_oempty_n;
 
-  oeof: process(out_in.clk)
-  begin
-    if rising_edge(out_in.clk) then
-      if its(out_in.reset) then
-        oclk_eof <= '0';
-      elsif oclk_data_cdc_oempty_n and oclk_data_cdc_oeof then
-        oclk_eof <= '1';
-      end if;
-    end if;
-  end process;
+  oclk_eof <= oclk_data_cdc_oempty_n and oclk_data_cdc_oeof;
 
   out_marshaller : complex_short_with_metadata_marshaller
     generic map(

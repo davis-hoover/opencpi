@@ -154,7 +154,10 @@ def main():
 
     # If a subcommand was passed, call it. Else print help message
     if 'func' in args:
-        args.func(args)
+        rc = args.func(args)
+
+        if rc != 0:
+            sys.exit(rc)
     else:
         parser.print_help()
 
@@ -310,9 +313,10 @@ def execute_command(command, args):
                     stderr = process.stderr.read().strip()
 
         except Exception as e:
+            print('help')
             raise ocpiutil.OCPIException(
                 'SSH/SCP call failed in a way we cannot handle; quitting. {}'.format(e))
-
+        
         if stderr and command.stderr:
             print(stderr)
 
@@ -447,8 +451,8 @@ def deploy(args):
 
     if not os.path.isdir(local_dir):
         print("Error: {} does not exist".format(local_dir))
-        print("Try running 'scripts/install-platform.sh {} && scripts/install-platform.sh {}'".format(
-                    args.hw_platform, args.sw_platform)
+        print("Try running 'ocpiadmin deploy platform {} {}'".format(
+                args.sw_platform, args.hw_platform)
             )
 
         return 1
@@ -460,12 +464,15 @@ def deploy(args):
         tar_path = make_tar(tar_files, tar_files, tempdir)
 
         tar_commands.append(make_command(
+            'if [ ! -d {} ]; then mkdir {}; fi'.format(args.remote_dir, args.remote_dir),
+            args))
+        tar_commands.append(make_command(
             'scp {} {} {}@{}:./{}'.format(
                 args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
             args,
             ssh=False))
         tar_commands.append(make_command(
-            'tar -xf {}/tar.tgz'.format(args.remote_dir),
+            'gunzip -c {}/tar.tgz | tar xf -'.format(args.remote_dir),
             args))
 
         print('Deploying Opencpi boot files to remote device from {} ...'.format(local_dir))
@@ -474,14 +481,6 @@ def deploy(args):
     if rc == 0:
         print('Opencpi boot files deployed successfully.')
         rc = reboot(args)
-
-    # cmd = 'scp {} -r {}/. {}@{}:/mnt/card'.format(
-    #     args.scp_opts, local_dir, args.user, args.ip_addr)
-    # command = make_command(cmd, args, ssh=False)
-    # rc = execute_command(command, args)
-
-    # if rc in command.rc:
-    #     rc = reboot(args)
 
     return rc
 

@@ -65,11 +65,6 @@ install: $(OutLibFiles) | $(HdlInstallLibDir)
 	  $(call ReplaceIfDifferent,$(strip \
              $(OutDir)target-$$f/$(WorkLib)),$(strip \
              $(HdlInstallLibDir)/$$f)); \
-	  [ -f $(OutDir)target-$$f/$(LibName).sources ] && (\
-            $(call ReplaceIfDifferent,$(strip \
-              $(OutDir)target-$$f/$(LibName).sources),$(strip \
-              $(HdlInstallLibDir)/$$f))); \
-	  $(call ReplaceIfDifferent,$(GeneratedDir)/$(LibName).libs,$(HdlInstallLibDir));\
 	done
 
 endif

@@ -137,13 +137,20 @@ for t in $tests; do
     # After this we are depending on the core project being built for the targeted platform
     swig)
       echo ======================= Running python swig test
-      # OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts
+      set -vx
       OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
-		       PYTHONPATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib \
 		       python3 <<-EOF
 	import opencpi.aci as OA
 	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
 	EOF
+      [ -f $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib/opencpi2/_aci.so ] &&
+      command -v python2-config > /dev/null && [[ $(python2 -c "import sys;print(sys.version)") == 2* ]] &&
+	  OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
+		       python2 <<-EOF
+	import opencpi2.aci as OA
+	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
+	EOF
+      set +vx
       ;;
     core)
       echo ======================= Running unit tests in project/core

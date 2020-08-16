@@ -3,10 +3,9 @@
 #################
 prereq:centos7:xilinx13_3:
   extends:
-    - .install-prereqs
     - .centos7
     - .xilinx13_3
-
+    - .install-prereqs
 
 ################
 # Jobs - Build #
@@ -18,7 +17,7 @@ build-rcc:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
 
@@ -33,7 +32,7 @@ test-core:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
@@ -45,7 +44,7 @@ test-assets-base:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
@@ -57,7 +56,7 @@ test-assets-comms:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
@@ -69,7 +68,7 @@ test-assets-dsp:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
@@ -81,7 +80,7 @@ test-assets-misc:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
@@ -93,7 +92,7 @@ test-assets-util:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
@@ -105,7 +104,7 @@ test-assets_ts:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
@@ -117,7 +116,7 @@ test-inactive:centos7:xilinx13_3:
     - .xilinx13_3
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7
     - prereq:centos7:xilinx13_3
     - build-rcc:centos7:xilinx13_3
