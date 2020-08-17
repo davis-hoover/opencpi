@@ -4,7 +4,9 @@ generate-yaml:
     - .gitlab-ci/yaml-generated/
   image: centos:7
   script:
-  - yum install PyYAML -y
+  - yum install git -y
+  - yum install python3 -y
+  - pip3 install PyYAML
   - .gitlab-ci/scripts/ci_yaml_generator.py child
   stage: generate-yaml
   tags:

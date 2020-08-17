@@ -170,7 +170,9 @@ def make_yaml_generator_job():
     image = 'centos:7'
     tags = ['docker']
     script = [
-        'yum install PyYAML -y',
+        'yum install git -y',
+        'yum install python3 -y',
+        'pip3 install PyYAML',
         '.gitlab-ci/scripts/ci_yaml_generator.py child'
     ]
     artifacts = {'paths': [
