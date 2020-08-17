@@ -17,7 +17,7 @@ def get_ci_env():
     else:
         exit('Error: No CI env vars exist')
 
-        return ci_env
+    return ci_env
 
 
 def set_test_env():

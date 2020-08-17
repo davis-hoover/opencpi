@@ -258,7 +258,7 @@ def make_before_script(stage, stages, platform, host_platform=None, link=None):
 
 def make_after_script():
     return [
-      'if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi'
+      'if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload -t "failed-job"; fi'
     ]
 
 
