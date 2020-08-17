@@ -452,8 +452,8 @@ void Launcher::
 getPropertyBytes(unsigned remoteInstance, size_t propN, size_t offset, const uint8_t *data,
 		 size_t nBytes, unsigned idx, bool string) {
   OU::SelfAutoMutex guard(this);
-  OU::format(m_request, "<control id='%u' set='%zu' offset='%zu' idx='%u' string='%u'>",
-	     remoteInstance, propN, offset, idx, string);
+  OU::format(m_request, "<control id='%u' get='%zu' offset='%zu' idx='%u' nbytes='%zu' string='%u'>",
+	     remoteInstance, propN, offset, idx, nBytes, string);
   send();
   receive();
   assert(!strcasecmp(OX::ezxml_tag(m_rx), "control"));
@@ -462,7 +462,7 @@ getPropertyBytes(unsigned remoteInstance, size_t propN, size_t offset, const uin
     throw OU::Error("Error setting property: %s", err);
   const char *cp = ezxml_txt(m_rx);
   while (isspace(*cp)) cp++;
-  for (unsigned n = 0; n < nBytes; ++n, ++data) {
+  for (unsigned n = 0; n < nBytes; ++n, ++data, cp += 2) {
     ocpiCheck(sscanf(cp, "%2hhx", (unsigned char *)data) == 1);
     if (string && !*data)
       break;

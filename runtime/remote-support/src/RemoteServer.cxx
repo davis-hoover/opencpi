@@ -543,7 +543,7 @@ namespace OCPI {
 	  } else if (haveNbytes) { // convert text to binary, then use setBytes
 	    const char *cp = ezxml_txt(m_rx);
 	    while (isspace(*cp)) cp++;
-	    for (size_t i = 0; i < nBytes; ++i)
+	    for (size_t i = 0; i < nBytes; ++i, cp += 2)
 	      ocpiCheck(sscanf(cp, "%2hhx", (unsigned char *)&data[i]) == 1);
 	    // make data
 	    w.setPropertyBytes(p, offset, &data[0], nBytes, OCPI_UTRUNCATE(unsigned,idx));
