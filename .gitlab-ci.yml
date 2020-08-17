@@ -4,10 +4,11 @@ generate-yaml:
     - .gitlab-ci/yaml-generated/
   image: centos:7
   script:
+  - yum install epel-release -y
   - yum install git -y
   - yum install python3 -y
-  - pip3 install PyYAML
-  - .gitlab-ci/scripts/ci_yaml_generator.py child
+  - yum install python36-PyYAML -y
+  - .gitlab-ci/scripts/ci_yaml_generator.py children
   stage: generate-yaml
   tags:
   - docker
