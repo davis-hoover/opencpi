@@ -138,7 +138,7 @@ def make_trigger_job(stage, yaml_generater_job, host_platform, platform):
     trigger = {
         'strategy': 'depend',
         'include': [{
-            'artifact': '.gitlab-ci/yaml_dynamic/{}-{}.yml'.format(
+            'artifact': '.gitlab-ci/yaml_dynamic/{}/{}.yml'.format(
                 host_platform.name, platform.name),
             'job': yaml_generater_job.name
         }]
@@ -177,7 +177,7 @@ def make_yaml_generator_job():
         '.gitlab-ci/scripts/ci_yaml_generator.py children'
     ]
     artifacts = {'paths': [
-        '.gitlab-ci/yaml-generated/'
+        '.gitlab-ci/yaml_dynamic/'
     ]}
     job = make_job(name, stage, script, artifacts=artifacts, tags=tags, 
                    image=image)
