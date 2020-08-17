@@ -6,7 +6,7 @@ from collections import namedtuple
 Job = namedtuple('job', 'name stage script \
                          before_script after_script \
                          artifacts tags resource_group \
-                         trigger rules')
+                         trigger rules image')
         
 
 def to_dict(job):
@@ -23,12 +23,12 @@ def make_job(name, stage, script=None,
              before_script=None, after_script=None, 
              artifacts=None, tags=None, 
              resource_group=None, trigger=None, 
-             rules=None):
+             rules=None, image=None):
     
     return Job(name=name, stage=stage, script=script,
                before_script=before_script, after_script=after_script,
                artifacts=artifacts, tags=tags, resource_group=resource_group,
-               trigger=trigger, rules=rules)
+               trigger=trigger, rules=rules, image=image)
 
 
 def make_parent_jobs(stages, yaml_generator_job, 
@@ -167,11 +167,17 @@ def make_bridge_job(stage, platform):
 def make_yaml_generator_job():
     stage = 'generate-yaml'
     name = stage
-    script = '.gitlab-ci/scripts/ci_yaml_generator.py child'
+    image = 'centos:7'
+    tags = ['docker']
+    script = [
+        'yum install PyYAML -y',
+        '.gitlab-ci/scripts/ci_yaml_generator.py child'
+    ]
     artifacts = {'paths': [
         '.gitlab-ci/yaml-generated/'
     ]}
-    job = make_job(name, stage, script, artifacts=artifacts)
+    job = make_job(name, stage, script, artifacts=artifacts, tags=tags, 
+                   image=image)
     
     return job
 

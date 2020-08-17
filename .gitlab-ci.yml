@@ -2,8 +2,13 @@ generate-yaml:
   artifacts:
     paths:
     - .gitlab-ci/yaml-generated/
-  script: .gitlab-ci/scripts/ci_yaml_generator.py child
+  image: centos:7
+  script:
+  - yum install PyYAML -y
+  - .gitlab-ci/scripts/ci_yaml_generator.py child
   stage: generate-yaml
+  tags:
+  - docker
 include:
 - .gitlab-ci/yaml/centos6.yml
 - .gitlab-ci/yaml/macos10_15.yml

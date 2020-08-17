@@ -1,6 +1,6 @@
 build:macos10_15:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *macos10_15.tar.gz -e */build/* */test/* */generate-yaml/* */trigger-children/* */deploy/*
   - sleep 2
@@ -23,7 +23,7 @@ build:macos10_15:
   - opencpi
 prereqs:macos10_15:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *macos10_15.tar.gz -e */prereqs/* */build/* */test/* */generate-yaml/* */trigger-children/* */deploy/*
   - sleep 2
@@ -45,7 +45,7 @@ prereqs:macos10_15:
   - opencpi
 test:macos10_15:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/artifacts.py upload -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *macos10_15.tar.gz -e */test/* */generate-yaml/* */trigger-children/* */deploy/*
   - sleep 2
