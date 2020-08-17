@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import requests
 from collections import namedtuple
 from pathlib import Path
 from .ci_project import Project
 
 Platform = namedtuple('platform', 'name model is_host is_osp links repo')
 
-def discover_platforms(projects, platform_filter=None, platform_links=None, do_osps=True):
+def discover_platforms(projects, platform_links=None, do_osps=True):
     platforms = []
 
     for project in projects:
@@ -19,9 +18,6 @@ def discover_platforms(projects, platform_filter=None, platform_links=None, do_o
 
                 for platform_path in platforms_path.glob('*'):
                     platform_name = platform_path.stem
-
-                    if platform_filter and platform_name not in platform_filter:
-                        continue
                     
                     if platform_path is hdl_platforms_path:
                         makefile = Path(platform_path, 'Makefile')
@@ -43,28 +39,51 @@ def discover_platforms(projects, platform_filter=None, platform_links=None, do_o
                                             repo=None)
                         platforms.append(platform)
 
-    if not do_osps:
-        return platforms
+    # if not do_osps:
+    #     return platforms
 
-    response = requests.get('https://gitlab.com/api/v4/groups/6009537/projects').json()
+    # response = requests.get('https://gitlab.com/api/v4/groups/6009537/projects').json()
 
-    for osp in response:
-        platform_name = osp['name'].lower().replace(' ', '')
+    # for osp in response:
+    #     platform_name = osp['name'].lower().replace(' ', '')
 
-        if platform_filter and platform_name not in platform_filter:
-            continue
+    #     if platform_filter and platform_name not in platform_filter:
+    #         continue
 
-        if platform_links:
-            links = platform_links[platform_name]
-        else:
-            links = []
+    #     if platform_links:
+    #         links = platform_links[platform_name]
+    #     else:
+    #         links = []
 
-        platform_repo = osp['path_with_namespace']
-        platform = Platform(name=platform_name, model='hdl', is_host=False, 
-                            is_osp=True, repo=platform_repo, links=links)
-        platforms.append(platform)
+    #     platform_repo = osp['path_with_namespace']
+    #     platform = Platform(name=platform_name, model='hdl', is_host=False, 
+    #                         is_osp=True, repo=platform_repo, links=links)
+    #     platforms.append(platform)
 
     return platforms   
+
+
+def filter_platforms(platforms, default_platforms, whitelist=None, blacklist=None):
+    filtered_platforms = []
+    exists_host = False
+
+    for platform in platforms:
+        if whitelist and platform.name in whitelist:
+            if not blacklist or platform.name not in blacklist:
+                if platform.is_host:
+                    exists_host = True
+                filtered_platforms.append(platform)
+        elif blacklist and platform.name not in blacklist:
+            if platform.is_host:
+                exists_host = True
+            filtered_platforms.append(platform)
+    
+    if not exists_host:
+        for platform in platforms:
+            if platform.is_host and platform.name in default_platforms:
+                filtered_platforms.append(platform)
+
+    return filtered_platforms
 
 
 def get_platform(platform_name, platforms):

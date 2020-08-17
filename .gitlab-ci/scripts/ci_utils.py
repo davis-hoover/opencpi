@@ -14,6 +14,8 @@ def get_ci_env():
     if ci_env_dict:
         Ci_Env = namedtuple('Env', ci_env_dict.keys())
         ci_env = Ci_Env(*ci_env_dict.values())
+    else:
+        exit('Error: No CI env vars exist')
 
         return ci_env
 

@@ -39,20 +39,22 @@ def make_parser():
 
 
 def children(args):
-    ci_utils.set_test_env()
     ci_env = ci_utils.get_ci_env()
     platform_directive = get_platform_directive(ci_env)
     project_path = Path(ci_env.project_dir, 'projects')
     projects = ci_project.discover_projects(project_path)
 
     if platform_directive:
-        platform_filter = platform_directive.keys()
+        platform_filter = list(platform_directive.keys())
     else:
         platform_filter = None
-
-    platforms = ci_platform.discover_platforms(projects, platform_filter, 
-                                               platform_directive, 
+    
+    platforms = ci_platform.discover_platforms(projects, platform_directive, 
                                                do_osps=False)
+    
+    if platform_filter:
+        platforms = ci_platform.filter_platforms(platforms, ci_env.platforms, 
+                                                 whitelist=platform_filter)
 
     host_platforms = ci_platform.get_host_platforms(platforms)
     cross_platforms = ci_platform.get_cross_platforms(platforms)
@@ -128,8 +130,6 @@ def get_platform_directive(ci_env):
             platform_names = ci_env.platforms
     else:
         return []
-
-    print(platform_names)
 
     spaces = space_pattern.findall(platform_names)
     for space in spaces:
