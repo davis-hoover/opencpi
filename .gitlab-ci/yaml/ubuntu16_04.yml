@@ -76,7 +76,7 @@ trigger-children:ubuntu16_04:alst4:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-alst4.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/alst4.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:alst4x:
@@ -89,7 +89,7 @@ trigger-children:ubuntu16_04:alst4x:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-alst4x.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/alst4x.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:alt_test:
@@ -102,7 +102,7 @@ trigger-children:ubuntu16_04:alt_test:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-alt_test.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/alt_test.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:epiq_matchstiq:
@@ -115,7 +115,7 @@ trigger-children:ubuntu16_04:epiq_matchstiq:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-epiq_matchstiq.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/epiq_matchstiq.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:isim:
@@ -128,7 +128,7 @@ trigger-children:ubuntu16_04:isim:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-isim.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/isim.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:matchstiq_z1:
@@ -141,7 +141,7 @@ trigger-children:ubuntu16_04:matchstiq_z1:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-matchstiq_z1.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/matchstiq_z1.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:ml605:
@@ -154,7 +154,7 @@ trigger-children:ubuntu16_04:ml605:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-ml605.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/ml605.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:modelsim:
@@ -167,7 +167,7 @@ trigger-children:ubuntu16_04:modelsim:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-modelsim.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/modelsim.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:x4sim:
@@ -180,7 +180,7 @@ trigger-children:ubuntu16_04:x4sim:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-x4sim.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/x4sim.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx13_3:
@@ -193,7 +193,7 @@ trigger-children:ubuntu16_04:xilinx13_3:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx13_3.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx13_3.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx13_4:
@@ -206,7 +206,7 @@ trigger-children:ubuntu16_04:xilinx13_4:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx13_4.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx13_4.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx13_4_arm:
@@ -219,7 +219,7 @@ trigger-children:ubuntu16_04:xilinx13_4_arm:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx13_4_arm.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx13_4_arm.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx17_1_aarch32:
@@ -232,7 +232,7 @@ trigger-children:ubuntu16_04:xilinx17_1_aarch32:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx17_1_aarch32.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx17_1_aarch32.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx17_1_aarch64:
@@ -245,7 +245,7 @@ trigger-children:ubuntu16_04:xilinx17_1_aarch64:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx17_1_aarch64.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx17_1_aarch64.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx17_2_aarch32:
@@ -258,7 +258,7 @@ trigger-children:ubuntu16_04:xilinx17_2_aarch32:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx17_2_aarch32.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx17_2_aarch32.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx17_2_aarch64:
@@ -271,7 +271,7 @@ trigger-children:ubuntu16_04:xilinx17_2_aarch64:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx17_2_aarch64.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx17_2_aarch64.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx19_2_aarch32:
@@ -284,7 +284,7 @@ trigger-children:ubuntu16_04:xilinx19_2_aarch32:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx19_2_aarch32.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx19_2_aarch32.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xilinx19_2_aarch64:
@@ -297,7 +297,7 @@ trigger-children:ubuntu16_04:xilinx19_2_aarch64:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xilinx19_2_aarch64.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xilinx19_2_aarch64.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:xsim:
@@ -310,7 +310,7 @@ trigger-children:ubuntu16_04:xsim:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-xsim.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/xsim.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:zcu104:
@@ -323,7 +323,7 @@ trigger-children:ubuntu16_04:zcu104:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-zcu104.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/zcu104.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:zed:
@@ -336,7 +336,7 @@ trigger-children:ubuntu16_04:zed:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-zed.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/zed.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:zed_ise:
@@ -349,7 +349,7 @@ trigger-children:ubuntu16_04:zed_ise:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-zed_ise.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/zed_ise.yml
       job: generate-yaml
     strategy: depend
 trigger-children:ubuntu16_04:zed_zipper:
@@ -362,6 +362,6 @@ trigger-children:ubuntu16_04:zed_zipper:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04-zed_zipper.yml
+    - artifact: .gitlab-ci/yaml_dynamic/ubuntu16_04/zed_zipper.yml
       job: generate-yaml
     strategy: depend

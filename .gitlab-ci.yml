@@ -1,7 +1,7 @@
 generate-yaml:
   artifacts:
     paths:
-    - .gitlab-ci/yaml-generated/
+    - .gitlab-ci/yaml_dynamic/
   image: centos:7
   script:
   - yum install epel-release -y
