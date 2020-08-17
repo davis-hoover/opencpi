@@ -99,8 +99,10 @@ PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
 #    for building kernel drivers (separate from pre-packaged driver)
-KVER=`uname -r`
-PKGS_S+=(linux-headers-$KVER)
+#    don't install if in a "docker" container
+[[ -e /.dockerenv || -e /run/.containerenv ]] || {
+  PKGS_S+=(linux-headers-$(uname -r))
+}
 #    for "make rpm":
 #      does not necessarily make sense for debian-based
 #      distros, but will include for completeness
