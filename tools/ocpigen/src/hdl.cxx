@@ -202,7 +202,8 @@ parseHdlImpl(const char *a_package) {
   // 1. Convert any data ports to WSI if they were not mentioned and determine if a wci clk is
   //    needed.
   for (unsigned i = 0; i < m_ports.size(); i++)
-    m_ports[i]->finalizeHdlDataPort(); // This will convert to a concrete impl type if not one yet
+    if ((err = m_ports[i]->finalizeHdlDataPort())) // This will convert to a concrete impl type if not one yet
+      return err;
   // 2. Resolve clock references between ports
   if (!m_wciClock)
     addWciClockReset();
