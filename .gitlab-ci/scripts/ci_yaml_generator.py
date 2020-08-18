@@ -41,18 +41,13 @@ def make_parser():
 def children(args):
     ci_env = ci_utils.get_ci_env()
     platform_directive = get_platform_directive(ci_env)
-    project_path = Path(ci_env.project_dir, 'projects')
+    project_path = Path('projects')
     projects = ci_project.discover_projects(project_path)
-
-    if platform_directive:
-        platform_filter = list(platform_directive.keys())
-    else:
-        platform_filter = None
-    
     platforms = ci_platform.discover_platforms(projects, platform_directive, 
                                                do_osps=False)
     
-    if platform_filter:
+    if platform_directive:
+        platform_filter = list(platform_directive.keys())
         platforms = ci_platform.filter_platforms(platforms, ci_env.platforms, 
                                                  whitelist=platform_filter)
 
@@ -77,7 +72,7 @@ def children(args):
 
 
 def parent(args):
-    project_registry_path = Path('project-registry')
+    project_registry_path = Path('projects')
     projects = ci_project.discover_projects(project_registry_path)
     platforms = ci_platform.discover_platforms(projects)
 

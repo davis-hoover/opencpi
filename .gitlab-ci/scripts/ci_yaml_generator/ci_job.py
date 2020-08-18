@@ -65,11 +65,16 @@ def make_child_jobs(stages, projects, platform, host_platform):
     if platform.model == 'hdl':
         for project in projects:
             for library in project.libraries:
+                if library.name == 'platforms':
+                    path = project.path
+                else:
+                    path = library.path
+
                 stage = stage_from_library(library)
                 name = ':'.join([stage, project.name, library.name, 
                                  host_platform.name, platform.name])
-                job = make_build_job(name, stage, stages, 
-                                     platform, host_platform)
+                job = make_build_job(name, stage, stages, platform,
+                                     host_platform, path)
                 jobs.append(job)
 
                 # if library.is_testable:
@@ -98,9 +103,9 @@ def make_child_jobs(stages, projects, platform, host_platform):
     return jobs
 
 
-def make_build_job(name, stage, stages, platform, host_platform):
+def make_build_job(name, stage, stages, platform, host_platform, path=None):
     before_script = make_before_script(stage, stages, platform, host_platform)
-    script = make_script(stage, stages, platform, host_platform)
+    script = make_script(stage, stages, platform, host_platform, path)
     after_script = make_after_script()
     tags = [host_platform.name, 'shell', 'opencpi']
 

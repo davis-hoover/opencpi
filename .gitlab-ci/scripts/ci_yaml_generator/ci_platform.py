@@ -28,7 +28,7 @@ def discover_platforms(projects, platform_links=None, do_osps=True):
 
                     if makefile.is_file():
 
-                        if platform_links:
+                        if platform_links and platform_name in platform_links.keys():
                             links = platform_links[platform_name]
                         else:
                             links = []
