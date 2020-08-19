@@ -77,6 +77,10 @@ unsigned int throwNumber(std::string propname)
   {
     retVal = 2;
   }
+  else if (propname == "test_string")
+  {
+    retVal = 0;
+  }
   
   return retVal; 
 }
@@ -151,6 +155,7 @@ void printProp(OA::Application* app, std::string propname)
   app->getPropertyValue("test_worker", propname, ulong_prop);
   cout << "ulong output for " << propname << " is: " << ulong_prop << endl << endl;
   throwNum++;
+
   }
   catch (std::string &e)
   {
@@ -181,16 +186,25 @@ void printPhase(OA::Application* app)
   printProp(app, "test_uchar");
   printProp(app, "test_ulonglong");
   printProp(app, "test_ushort");
+  app->setPropertyValue("test_worker", "test_string", "test-string-value");
+  std::string string_prop;
+  app->getPropertyValue("test_worker", "test_string", string_prop);
+  cout << "string output for " << "test_string" << " is: " << string_prop << endl << endl;
 }
 
-int main(/*int argc, char **argv*/) {
+int main(int /*argc*/, char **argv) {
   programRet = 0; 
 
   try {
-  OA::Application app("test_app.xml", NULL);
+    std::string plat("=");
+
+    OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", true),
+			 OA::PVString(argv[1] ? "platform" : NULL,
+				      argv[1] ? (plat + argv[1]).c_str() : NULL), OA::PVEnd };
+
+  OA::Application app("test_app.xml", pvs);
 
   app.initialize();
-  app.dumpProperties();
 
   cout << "______INITIALIZED______" << endl;
   printPhase(&app);
@@ -203,7 +217,6 @@ int main(/*int argc, char **argv*/) {
   cout << "______STOPPED______" << endl;
   printPhase(&app);
 
-  app.dumpProperties(false);
   }
   catch (std::string &e)
   {

@@ -31,6 +31,7 @@ typedef uint8_t OcpiBoolean;
 #define OCPI_ALL_PORTS (~(OcpiPortMask)0) // macro here, const in C++
 #define OCPI_NO_PORTS ((OcpiPortMask)0)   // macro here, const in C++
 #else
+#include <climits>
 #include <cstdint>
 #include <cstdarg>
 #include <cstdlib>
@@ -98,7 +99,7 @@ public: // Should these be protected with friends reading?
 			"Default constructor now defaults to all ports. Use constructor call with "
 			"proper port mask if you need non-default.")
   {
-    m_myMasks[0] = (OcpiPortMask)~(-1 << nPorts);
+    m_myMasks[0] = (OcpiPortMask)~(UINT_MAX << nPorts);
     m_myMasks[1] = 0;
     m_portMasks = nPorts ? m_myMasks : NULL;
     m_allMasks = m_myMasks[0];
