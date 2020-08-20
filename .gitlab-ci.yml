@@ -1,36 +1,17 @@
-generate-yaml:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml_dynamic/
-  image: centos:7
-  script:
-  - yum install epel-release -y
-  - yum install git -y
-  - yum install python3 -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py children
-  stage: generate-yaml
-  tags:
-  - docker
 include:
-- .gitlab-ci/yaml/centos6.yml
-- .gitlab-ci/yaml/macos10_15.yml
-- .gitlab-ci/yaml/docs.yml
-- .gitlab-ci/yaml/ubuntu16_04.yml
-- .gitlab-ci/yaml/macos10_14.yml
-- .gitlab-ci/yaml/mint19.yml
-- .gitlab-ci/yaml/macos10_13.yml
 - .gitlab-ci/yaml/e3xx.yml
-- .gitlab-ci/yaml/centos8.yml
 - .gitlab-ci/yaml/plutosdr.yml
 - .gitlab-ci/yaml/templates.yml
-- .gitlab-ci/yaml/mint18.yml
 - .gitlab-ci/yaml/centos7.yml
-- .gitlab-ci/yaml/ubuntu18_04.yml
 stages:
 - prereqs
-- build
+- build-host
+- build-rcc
+- build-primitives
+- build-primitives
+- build-libraries
+- build-platforms
+- build-assemblies
+- build-sdcards
 - test
-- generate-yaml
-- trigger-children
 - deploy

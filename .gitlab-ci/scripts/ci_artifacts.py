@@ -251,4 +251,5 @@ def tag(args, s3_object):
         print('Expires on {}'.format(expiration))
 
 
-main()
+if __name__ == '__main__':
+    main()
