@@ -110,8 +110,10 @@ for f in runtime/*; do
    done)
 done
 
-# 2. move any SW-specific system.xml into $sd/opencpi
-[ ! -f runtime/$rcc_platform/system.xml ] || cp $verbose -R -L -H runtime/$rcc_platform/system.xml $sd/opencpi
+# 2. Move any SW-specific "system.xml" into "$sd/opencpi".  An existing
+#    "system.xml" (presumably from the HDL platform) takes precedence.
+[ -f $sd/opencpi/system.xml ] || [ ! -f runtime/$rcc_platform/system.xml ] || \
+  cp $verbose -R -L -H runtime/$rcc_platform/system.xml $sd/opencpi
 
 # 3. copy in one bit stream file for loading and testing
 [ -n "$hdl_platform" ] || exit 0
