@@ -68,11 +68,6 @@ source $OCPI_CDK_DIR/scripts/util.sh
 function getvars {
   setVarsFromMake $OCPI_CDK_DIR/include/hdl/hdl-targets.mk ShellHdlTargetsVars=1
   setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
-  if [ $action = "deploy" ]
-  then
-    export OCPI_ALL_RCC_PLATFORMS="$RccAllPlatforms" OCPI_ALL_HDL_PLATFORMS="$HdlAllPlatforms"
-    return 0
-  fi
   platforms="$RccAllPlatforms $HdlAllPlatforms"
   if isPresent $platform $platforms; then
     if isPresent $platform $RccAllPlatforms; then
@@ -95,7 +90,6 @@ function getvars {
 #
 if [ $action = "deploy" ]
 then
-  getvars
   $OCPI_CDK_DIR/scripts/deploy-platform.sh $verbose $1 $2
   exit $?
 fi
@@ -226,6 +220,21 @@ else
     ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
+    #
+    # At this point, we have an issue applicable to OSPs that have not been
+    # previously installed.  A previous "getvars" call (above) incorrectly
+    # sets "platform_dir" to
+    #   "./projects/osps/<project_ID>/hdl/platforms/<hdl_platform>"
+    # because
+    #   "./projects/osps/<project_ID>/hdl/platforms/<hdl_platform>/lib"
+    # does not exist until the above "ocpidev" commands have been run.
+    # We can either fix "platform_dir" here by calling "getvars" one
+    # more time (after everything is built), or incur the overhead in
+    # "export-platform-to-framework.sh".
+    #
+    # No need to check the return value from "getvars" at this point.
+    #
+    getvars
     $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform $platform_dir
 fi
 echo "Platform installation (download and build) for platform \"$platform\" succeeded."
