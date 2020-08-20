@@ -12,31 +12,6 @@ build-host:centos7:
   - centos7
   - shell
   - opencpi
-include:
-  include:
-  - .gitlab-ci/yaml/centos7/alst4.yml
-  - .gitlab-ci/yaml/centos7/zed_zipper.yml
-  - .gitlab-ci/yaml/centos7/zed.yml
-  - .gitlab-ci/yaml/centos7/xilinx17_1_aarch64.yml
-  - .gitlab-ci/yaml/centos7/zcu104.yml
-  - .gitlab-ci/yaml/centos7/x4sim.yml
-  - .gitlab-ci/yaml/centos7/xilinx17_1_aarch32.yml
-  - .gitlab-ci/yaml/centos7/xilinx19_2_aarch32.yml
-  - .gitlab-ci/yaml/centos7/ml605.yml
-  - .gitlab-ci/yaml/centos7/zed_ise.yml
-  - .gitlab-ci/yaml/centos7/xilinx13_3.yml
-  - .gitlab-ci/yaml/centos7/xilinx19_2_aarch64.yml
-  - .gitlab-ci/yaml/centos7/modelsim.yml
-  - .gitlab-ci/yaml/centos7/xilinx17_2_aarch64.yml
-  - .gitlab-ci/yaml/centos7/alst4x.yml
-  - .gitlab-ci/yaml/centos7/epiq_matchstiq.yml
-  - .gitlab-ci/yaml/centos7/xsim.yml
-  - .gitlab-ci/yaml/centos7/xilinx13_4.yml
-  - .gitlab-ci/yaml/centos7/alt_test.yml
-  - .gitlab-ci/yaml/centos7/xilinx13_4_arm.yml
-  - .gitlab-ci/yaml/centos7/isim.yml
-  - .gitlab-ci/yaml/centos7/matchstiq_z1.yml
-  - .gitlab-ci/yaml/centos7/xilinx17_2_aarch32.yml
 prereqs:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
@@ -68,3 +43,27 @@ test:centos7:
   - centos7
   - shell
   - opencpi
+include:
+- .gitlab-ci/yaml/centos7/alst4.yml
+- .gitlab-ci/yaml/centos7/zed_zipper.yml
+- .gitlab-ci/yaml/centos7/zed.yml
+- .gitlab-ci/yaml/centos7/xilinx17_1_aarch64.yml
+- .gitlab-ci/yaml/centos7/zcu104.yml
+- .gitlab-ci/yaml/centos7/x4sim.yml
+- .gitlab-ci/yaml/centos7/xilinx17_1_aarch32.yml
+- .gitlab-ci/yaml/centos7/xilinx19_2_aarch32.yml
+- .gitlab-ci/yaml/centos7/ml605.yml
+- .gitlab-ci/yaml/centos7/zed_ise.yml
+- .gitlab-ci/yaml/centos7/xilinx13_3.yml
+- .gitlab-ci/yaml/centos7/xilinx19_2_aarch64.yml
+- .gitlab-ci/yaml/centos7/modelsim.yml
+- .gitlab-ci/yaml/centos7/xilinx17_2_aarch64.yml
+- .gitlab-ci/yaml/centos7/alst4x.yml
+- .gitlab-ci/yaml/centos7/epiq_matchstiq.yml
+- .gitlab-ci/yaml/centos7/xsim.yml
+- .gitlab-ci/yaml/centos7/xilinx13_4.yml
+- .gitlab-ci/yaml/centos7/alt_test.yml
+- .gitlab-ci/yaml/centos7/xilinx13_4_arm.yml
+- .gitlab-ci/yaml/centos7/isim.yml
+- .gitlab-ci/yaml/centos7/matchstiq_z1.yml
+- .gitlab-ci/yaml/centos7/xilinx17_2_aarch32.yml
