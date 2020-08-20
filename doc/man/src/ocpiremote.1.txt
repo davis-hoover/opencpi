@@ -4,8 +4,7 @@ OCPIREMOTE(1)
 
 NAME
 ----
-ocpiremote - command-line tool for managing an OpenCPI container server
-(*`ocpiserve(1)`*) remotely
+ocpiremote - command-line tool for remotely managing an OpenCPI container server
 
 
 SYNOPSIS
@@ -15,8 +14,8 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`ocpiremote`* command-line tool can be used on a local system
-to load, start, and control an *`ocpiserve`* container server on a
+The *`ocpiremote(1)`* command-line tool can be used on a local system
+to load, start, and control an *`ocpiserve(1)`* container server on a
 remote system. The target remote system requires the Secure Shell (SSH),
 the *`bash`* shell and the *`tar`* command in addition to
 an OpenCPI-supported software (RCC) platform.
@@ -282,7 +281,7 @@ link:ocpidev.1.html[ocpidev(1)]
 link:ocpidev-application.1.html[ocpidev-application(1)]
 link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
 link:ocpidev-worker.1.html[ocpidev-worker(1)]
-link:ocpiserve.1.html[ocpiremote(1)]
+link:ocpiserve.1.html[ocpiserve(1)]
 link:ocpirun.1.html[ocpirun(1)]
 
 COPYING

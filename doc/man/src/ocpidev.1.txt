@@ -4,7 +4,7 @@ OCPIDEV(1)
 
 NAME
 ----
-ocpidev - command-line tool for managing OpenCPI assets.
+ocpidev - command-line tool for managing OpenCPI assets
 
 
 SYNOPSIS
@@ -14,7 +14,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`ocpidev(1)`* command line tool is used to perform various development-
+The *`ocpidev(1)`* command-line tool is used to perform various development-
 related tasks inside projects as well as retrieve information about
 the environment. When used in projects, it can be invoked at the top
 level of the project or in lower-level directories of the project as

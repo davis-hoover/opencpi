@@ -1,12 +1,12 @@
 .\"     Title: ocpiserve
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 08/16/2020
+.\"      Date: 08/20/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPISERVE" "1" "08/16/2020" "\ \&" "\ \&"
+.TH "OCPISERVE" "1" "08/20/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -33,11 +33,11 @@ ocpiserve \- command\-line tool for making local OpenCPI containers available fo
 \fBocpiserve\fR [\fI<options>\fR]
 .SH "DESCRIPTION"
 .sp
-When an application is run, the OpenCPI framework finds "local" containers \- those that are part of or directly attached to the local system \- where workers based on artifacts can execute\&. A local system can use the \fBocpiserve\fR command to offer its local containers to other network\-based systems for use as "remote" containers\&.
+When an application is run, the OpenCPI framework finds "local" containers \- those that are part of or directly attached to the local system \- where workers based on artifacts can execute\&. A local system can use the \fBocpiserve(1)\fR tool to offer its local containers to other network\-based systems for use as "remote" containers\&.
 .sp
-The \fBocpiserve\fR command is part of OpenCPI\(cqs \fB\fIremote containers\fR\fR feature, which adds containers available in other systems on the network to the set of containers considered for application execution\&.
+The \fBocpiserve\fR command\-line tool is part of OpenCPI\(cqs \fB\fIremote containers\fR\fR feature, which adds containers available in other systems on the network to the set of containers considered for application execution\&.
 .sp
-The \fBocpiserve\fR command runs as a \fB\fIcontainer server\fR\fR, serving up local containers as remotely accessible containers to network clients\&. Remote clients use \fBocpirun\fR options to find the systems on the network that are running \fBocpiserve\fR and list the available containers\&.
+The \fBocpiserve\fR tool runs as a \fIcontainer server\fR, serving up local containers as remotely accessible containers to network clients\&. Remote clients use \fBocpirun\fR options to find the systems on the network that are running \fBocpiserve\fR and list the available containers\&.
 .sp
 When started, \fBocpiserve\fR discovers all local network interfaces and prepares to be contacted by clients for all of them\&. It optionally (if the \fB\-\-discoverable\fR option is used) also prepares to receive multicast queries from clients on all network interfaces\&. The \fBocpiserve\fR container server is a fully multi\-homed server, using all network interfaces for normal use (TCP) discovery (via the User Datagram Protocol (UDP))\&.
 .sp

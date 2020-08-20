@@ -1,12 +1,12 @@
 .\"     Title: ocpiremote
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 08/16/2020
+.\"      Date: 08/20/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIREMOTE" "1" "08/16/2020" "\ \&" "\ \&"
+.TH "OCPIREMOTE" "1" "08/20/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -27,13 +27,13 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-ocpiremote \- command\-line tool for managing an OpenCPI container server (*`ocpiserve(1)`*) remotely
+ocpiremote \- command\-line tool for remotely managing an OpenCPI container server
 .SH "SYNOPSIS"
 .sp
 \fBocpiremote\fR [\fI<options>\fR] [\fI<verb>\fR]
 .SH "DESCRIPTION"
 .sp
-The \fBocpiremote\fR command\-line tool can be used on a local system to load, start, and control an \fBocpiserve\fR container server on a remote system\&. The target remote system requires the Secure Shell (SSH), the \fBbash\fR shell and the \fBtar\fR command in addition to an OpenCPI\-supported software (RCC) platform\&. No additional installation is necessary\&.
+The \fBocpiremote(1)\fR command\-line tool can be used on a local system to load, start, and control an \fBocpiserve(1)\fR container server on a remote system\&. The target remote system requires the Secure Shell (SSH), the \fBbash\fR shell and the \fBtar\fR command in addition to an OpenCPI\-supported software (RCC) platform\&. No additional installation is necessary\&.
 .sp
 The \fBocpiremote\fR tool loads an \fBocpiserve\fR executable "package" with Secure Copy Protocol (SCP) over an SSH connection into a "sandbox" directory (by default, \fB~/sandbox/\fR) on the remote system and can subsequently be used to start it\&. When started, the \fBocpiserve\fR container server makes its local containers available to any and all remote clients through the local network interfaces on the remote system\&. See the ocpiserve(1) tool for details\&. The \fBocpiremote\fR tool manages the container server in the sandbox directory without affecting the rest of the remote system\(cqs installation and provides a convenient way to set up and operate container servers remotely\&.
 .sp
@@ -397,7 +397,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpiadmin(1) ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-worker(1) ocpiremote(1) ocpirun(1)
+ocpiadmin(1) ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-worker(1) ocpiserve(1) ocpirun(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

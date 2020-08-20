@@ -15,7 +15,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`ocpiview`* tool displays the results of a simulation run
+The *`ocpiview(1)`* tool displays the results of a simulation run
 on an HDL (FPGA) simulator platform using
 the simulation viewer provided by the simulator platform
 associated with that run.

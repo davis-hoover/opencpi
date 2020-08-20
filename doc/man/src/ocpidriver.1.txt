@@ -15,7 +15,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`ocpidriver`* tool controls the OpenCPI Linux kernel module driver
+The *`ocpidriver(1)`* tool controls the OpenCPI Linux kernel module driver
 on an 'OpenCPI system':
 a collection of processors that can be used together as resources for
 running OpenCPI applications. Whether or not the Linux kernel module

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpiserve</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140655369063856"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpiserve — command-line tool for making local OpenCPI containers available for remote access</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>When an application is run, the OpenCPI framework finds "local"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpiserve</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140609445424544"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpiserve — command-line tool for making local OpenCPI containers available for remote access</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>When an application is run, the OpenCPI framework finds "local"
 containers - those that are part of or directly attached to
 the local system - where workers based on artifacts can execute.
-A local system can use the <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> command to offer its
+A local system can use the <span class="strong"><strong><code class="literal">ocpiserve(1)</code></strong></span> tool to offer its
 local containers to other network-based systems for use as
-"remote" containers.</p><p>The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> command is part of OpenCPI’s
+"remote" containers.</p><p>The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> command-line tool is part of OpenCPI’s
 <span class="strong"><strong><span class="emphasis"><em>remote containers</em></span></strong></span> feature, which adds containers
 available in other systems on the network to the set
-of containers considered for application execution.</p><p>The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> command runs as a <span class="strong"><strong><span class="emphasis"><em>container server</em></span></strong></span>, serving up
+of containers considered for application execution.</p><p>The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> tool runs as a <span class="emphasis"><em>container server</em></span>, serving up
 local containers as remotely accessible containers to network clients.
 Remote clients use <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> options to find the systems on the
 network that are running <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> and list the available containers.</p><p>When started, <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> discovers all local network interfaces and
@@ -18,7 +18,8 @@ interfaces. The <span class="strong"><strong><code class="literal">ocpiserve</co
 server, using all network interfaces for normal use (TCP) discovery (via the
 User Datagram Protocol (UDP)).</p><p>The  <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server does not run, initiate or control
 entire OpenCPI applications, so it requires fewer resources than
-<span class="strong"><strong><code class="literal">ocpirun</code></strong></span> or ACI executables.</p><p><span class="emphasis"><em>Artifacts</em></span> - binary executables compiled from OpenCPI <span class="emphasis"><em>workers</em></span> -  are not required to reside on the system running
+<span class="strong"><strong><code class="literal">ocpirun</code></strong></span> or ACI executables.</p><p><span class="emphasis"><em>Artifacts</em></span> - binary executables compiled from OpenCPI <span class="emphasis"><em>workers</em></span> -
+are not required to reside on the system running
 <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span>. Instead, they are downloaded on demand
 to the <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server from
 the remote system on which the application is initiated

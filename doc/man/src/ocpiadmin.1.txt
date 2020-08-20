@@ -14,7 +14,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`ocpiadmin(1)`* command line tool is used to perform installation
+The *`ocpiadmin(1)`* command-line tool is used to perform installation
 and deployment tasks that are carried out on an OpenCPI installation
 after the basic installation procedure is completed to prepare
 OpenCPI for use on embedded systems. These tasks include:
@@ -137,9 +137,9 @@ See the main web site: https://www.opencpi.org
 
 SEE ALSO
 --------
-
 link:ocpidev.1.html[ocpidev(1)]
-
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING
 -------

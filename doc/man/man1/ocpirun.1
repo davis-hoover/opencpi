@@ -1,12 +1,12 @@
 .\"     Title: ocpirun
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 08/16/2020
+.\"      Date: 08/20/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIRUN" "1" "08/16/2020" "\ \&" "\ \&"
+.TH "OCPIRUN" "1" "08/20/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -27,13 +27,13 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-ocpirun \- command\-line tool for running OpenCPI applications\&.
+ocpirun \- command\-line tool for running OpenCPI applications
 .SH "SYNOPSIS"
 .sp
 \fBocpirun\fR [\fI<options>\fR] \fI<application\-name>\fR
 .SH "DESCRIPTION"
 .sp
-The \fBocpirun(1)\fR command line tool is used to execute OpenCPI component\-based \fIapplications\fR in OpenCPI \fIcontainers\fR on OpenCPI \fIplatforms\fR\&. An OpenCPI application is defined as an assembly of component instances with connections among them\&. An OpenCPI application can be specified in two different ways:
+The \fBocpirun(1)\fR command\-line tool is used to execute OpenCPI component\-based \fIapplications\fR in OpenCPI \fIcontainers\fR on OpenCPI \fIplatforms\fR\&. An OpenCPI application is defined as an assembly of component instances with connections among them\&. An OpenCPI application can be specified in two different ways:
 .sp
 .RS 4
 .ie n \{\
@@ -61,11 +61,11 @@ As an XML document embedded in and manipulated by a C++ program using the
 (\fIACI\fR)
 .RE
 .sp
-The \fBocpirun\fR utility directly executes the applications defined in OAS XML files\&. The argument \fI<application\-name>\fR is the name of an OAS file without the \fB\&.xml\fR extension\&. The \fBocpirun\fR tool reads the OAS associated with the named application and then runs it\&.
+The \fBocpirun\fR tool directly executes the applications defined in OAS XML files\&. The argument \fI<application\-name>\fR is the name of an OAS file without the \fB\&.xml\fR extension\&. The \fBocpirun\fR tool reads the OAS associated with the named application and then runs it\&.
 .sp
 Execution ends when the application described in the OAS is "done" or a time duration (set with an option to \fBocpirun\fR) is exceeded\&. An application is done when all its workers indicate that they are "done" or when a single worker identified with the \fBdone\fR XML attribute in the OAS indicates that it is "done"\&.
 .sp
-The \fBocpirun\fR utility runs applications in OpenCPI \fIprojects\fR, which are development work areas for groups of assets like components and applications\&.
+The \fBocpirun\fR tool runs applications in OpenCPI \fIprojects\fR, which are development work areas for groups of assets like components and applications\&.
 .sp
 When \fBocpirun\fR executes an application, it makes deployment decisions that determine, for each component instance in the application:
 .sp

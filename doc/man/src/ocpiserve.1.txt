@@ -18,16 +18,16 @@ DESCRIPTION
 When an application is run, the OpenCPI framework finds "local"
 containers - those that are part of or directly attached to
 the local system - where workers based on artifacts can execute.
-A local system can use the *`ocpiserve`* command to offer its
+A local system can use the *`ocpiserve(1)`* tool to offer its
 local containers to other network-based systems for use as
 "remote" containers.
 
-The *`ocpiserve`* command is part of OpenCPI's
+The *`ocpiserve`* command-line tool is part of OpenCPI's
 *'remote containers'* feature, which adds containers
 available in other systems on the network to the set
 of containers considered for application execution.
 
-The *`ocpiserve`* command runs as a *'container server'*, serving up
+The *`ocpiserve`* tool runs as a 'container server', serving up
 local containers as remotely accessible containers to network clients.
 Remote clients use *`ocpirun`* options to find the systems on the
 network that are running *`ocpiserve`* and list the available containers.
@@ -44,7 +44,8 @@ The  *`ocpiserve`* container server does not run, initiate or control
 entire OpenCPI applications, so it requires fewer resources than
 *`ocpirun`* or ACI executables.
 
-'Artifacts' - binary executables compiled from OpenCPI 'workers' -  are not required to reside on the system running
+'Artifacts' - binary executables compiled from OpenCPI 'workers' -
+are not required to reside on the system running
 *`ocpiserve`*. Instead, they are downloaded on demand
 to the *`ocpiserve`* container server from
 the remote system on which the application is initiated

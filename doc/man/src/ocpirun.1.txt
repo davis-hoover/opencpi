@@ -4,7 +4,7 @@ OCPIRUN(1)
 
 NAME
 ----
-ocpirun - command-line tool for running OpenCPI applications.
+ocpirun - command-line tool for running OpenCPI applications
 
 
 SYNOPSIS
@@ -14,7 +14,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The *`ocpirun(1)`* command line tool is used to execute OpenCPI
+The *`ocpirun(1)`* command-line tool is used to execute OpenCPI
 component-based 'applications' in OpenCPI 'containers' on OpenCPI 'platforms'.
 An OpenCPI application is defined as an assembly of component
 instances with connections among them. An OpenCPI application
@@ -25,7 +25,7 @@ can be specified in two different ways:
 - As an XML document embedded in and manipulated by a C++ program using
 the 'OpenCPI Application Control Interface' ('ACI')
 
-The *`ocpirun`* utility directly executes the applications
+The *`ocpirun`* tool directly executes the applications
 defined in OAS XML files. The argument '<application-name>'
 is the name of an OAS file without the *`.xml`* extension.
 The *`ocpirun`* tool reads the OAS associated with the named
@@ -37,7 +37,7 @@ An application is done when all its workers indicate that they
 are "done" or when a single worker identified with the *`done`*
 XML attribute in the OAS indicates that it is "done".
 
-The *`ocpirun`* utility runs applications in OpenCPI 'projects',
+The *`ocpirun`* tool runs applications in OpenCPI 'projects',
 which are development work areas for groups of assets like components
 and applications.
 

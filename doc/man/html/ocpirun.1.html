@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpirun</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140278632108784"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpirun — command-line tool for running OpenCPI applications.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpirun</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;application-name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpirun(1)</code></strong></span> command line tool is used to execute OpenCPI
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpirun</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140349879560832"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpirun — command-line tool for running OpenCPI applications</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpirun</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;application-name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpirun(1)</code></strong></span> command-line tool is used to execute OpenCPI
 component-based <span class="emphasis"><em>applications</em></span> in OpenCPI <span class="emphasis"><em>containers</em></span> on OpenCPI <span class="emphasis"><em>platforms</em></span>.
 An OpenCPI application is defined as an assembly of component
 instances with connections among them. An OpenCPI application
@@ -8,7 +8,7 @@ As a standalone XML file called an <span class="emphasis"><em>OpenCPI Applicatio
 </li><li class="listitem">
 As an XML document embedded in and manipulated by a C++ program using
 the <span class="emphasis"><em>OpenCPI Application Control Interface</em></span> (<span class="emphasis"><em>ACI</em></span>)
-</li></ul></div><p>The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> utility directly executes the applications
+</li></ul></div><p>The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> tool directly executes the applications
 defined in OAS XML files. The argument <span class="emphasis"><em>&lt;application-name&gt;</em></span>
 is the name of an OAS file without the <span class="strong"><strong><code class="literal">.xml</code></strong></span> extension.
 The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> tool reads the OAS associated with the named
@@ -16,7 +16,7 @@ application and then runs it.</p><p>Execution ends when the application describe
 or a time duration (set with an option to <span class="strong"><strong><code class="literal">ocpirun</code></strong></span>) is exceeded.
 An application is done when all its workers indicate that they
 are "done" or when a single worker identified with the <span class="strong"><strong><code class="literal">done</code></strong></span>
-XML attribute in the OAS indicates that it is "done".</p><p>The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> utility runs applications in OpenCPI <span class="emphasis"><em>projects</em></span>,
+XML attribute in the OAS indicates that it is "done".</p><p>The <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> tool runs applications in OpenCPI <span class="emphasis"><em>projects</em></span>,
 which are development work areas for groups of assets like components
 and applications.</p><p>When <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> executes an application, it makes deployment decisions
 that determine, for each component instance in the application:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">

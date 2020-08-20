@@ -1,12 +1,12 @@
 .\"     Title: ocpiview
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 08/16/2020
+.\"      Date: 08/20/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIVIEW" "1" "08/16/2020" "\ \&" "\ \&"
+.TH "OCPIVIEW" "1" "08/20/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -33,7 +33,7 @@ ocpiview \- command\-line tool for viewing the results of simulation runs on HDL
 \fBocpiview\fR [\fI<options>\fR] [\fI<directory>\fR]
 .SH "DESCRIPTION"
 .sp
-The \fBocpiview\fR tool displays the results of a simulation run on an HDL (FPGA) simulator platform using the simulation viewer provided by the simulator platform associated with that run\&. OpenCPI application developers generally run \fBocpiview\fR after application execution if they need to examine the simulation results in detail\&. OpenCPI component developers can also use \fBocpiview\fR to examine the results of component unit test executions on simulator platforms\&.
+The \fBocpiview(1)\fR tool displays the results of a simulation run on an HDL (FPGA) simulator platform using the simulation viewer provided by the simulator platform associated with that run\&. OpenCPI application developers generally run \fBocpiview\fR after application execution if they need to examine the simulation results in detail\&. OpenCPI component developers can also use \fBocpiview\fR to examine the results of component unit test executions on simulator platforms\&.
 .sp
 In a project, the results of FPGA simulator runs for OpenCPI applications reside in the the \fBsimulations/\fR subdirectory of the \fBapplications/\fR directory\&. Each time a simulator runs under \fBocpirun\fR (or \fBocpidev run\fR with the \fB\-\-keep\-simulations\fR option), it executes in a new subdirectory within the \fBsimulations/\fR subdirectory created for that simulation run with the name \fI<assembly\-name>\fR\fB\&.\fR\fI<sim\-platform>\fR\fB\&.\fR\fI<date\-time>\fR\&. Thus, running OpenCPI applications that use simulators results in one or more subdirectories that hold the simulation results for each simulation run\&.
 .sp
