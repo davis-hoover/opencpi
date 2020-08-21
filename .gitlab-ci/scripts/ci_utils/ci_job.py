@@ -307,10 +307,12 @@ def make_before_script(stage, stages, platform, host_platform=None,
     timestamp_cmd = 'touch .timestamp'
     source_cmd = 'source cdk/opencpi-setup.sh -e'
 
-    if stage not in ['prereqs', 'build-host']:
-        return [download_cmd, sleep_cmd, timestamp_cmd, source_cmd]
-    else:
+    if stage == 'prereqs':
         return [timestamp_cmd]
+    if stage == 'build-host':
+        return [download_cmd, sleep_cmd, timestamp_cmd]
+    else:
+        return [download_cmd, sleep_cmd, timestamp_cmd, source_cmd]
 
 
 def make_after_script():
