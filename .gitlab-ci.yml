@@ -1,4 +1,5 @@
 include:
+- .gitlab-ci/yaml/docs.yml
 - .gitlab-ci/yaml/e3xx.yml
 - .gitlab-ci/yaml/plutosdr.yml
 - .gitlab-ci/yaml/templates.yml
@@ -7,7 +8,7 @@ stages:
 - prereqs
 - build-host
 - build-rcc
-- build-primitives
+- build-primitives-core
 - build-primitives
 - build-libraries
 - build-platforms

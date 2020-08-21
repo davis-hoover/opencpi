@@ -20,12 +20,12 @@ def main():
     with open(host_platform_whitelist_path) as f:
         host_platform_whitelist = f.read().splitlines()
 
-    projects_blacklist = ['tutorials']
+    projects_blacklist = ['tutorial']
     projects = ci_project.discover_projects(projects_path, projects_blacklist)
     platforms = ci_platform.discover_platforms(projects, 
                                                host_platform_whitelist)
 
-    stages = ['prereqs', 'build-host', 'build-rcc', 'build-primitives', 
+    stages = ['prereqs', 'build-host', 'build-rcc', 'build-primitives-core', 
               'build-primitives', 'build-libraries', 'build-platforms', 
               'build-assemblies', 'build-sdcards', 'test', 'deploy']
 
