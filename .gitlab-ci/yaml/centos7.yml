@@ -6,9 +6,9 @@ build-host:centos7:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/build-opencpi.sh centos7
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -26,9 +26,9 @@ prereqs:centos7:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/install-prerequisites.sh centos7
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -49,9 +49,9 @@ test:centos7:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/test-opencpi.sh --no-hdl
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"

@@ -7,11 +7,11 @@ build-rcc:centos7:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/build-opencpi.sh epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -27,11 +27,11 @@ prereqs:centos7:epiq_matchstiq:
   before_script:
   - touch .timestamp
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/install-prerequisites.sh epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -50,11 +50,11 @@ test:centos7:assets:base_comps:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/base_comps --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -73,11 +73,11 @@ test:centos7:assets:comms_comps:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/comms_comps --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -96,11 +96,11 @@ test:centos7:assets:dsp_comps:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -119,11 +119,11 @@ test:centos7:assets:misc_comps:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/misc_comps --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -142,11 +142,11 @@ test:centos7:assets:util_comps:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/util_comps --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -165,11 +165,11 @@ test:centos7:assets_ts:components:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets_ts/components --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -188,11 +188,11 @@ test:centos7:core:components:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/core/components --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -211,11 +211,11 @@ test:centos7:inactive:components:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/inactive/components --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -234,11 +234,11 @@ test:centos7:tutorial:components:epiq_matchstiq:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(epiq_matchstiq)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(epiq_matchstiq)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/tutorial/components --only-platform epiq_matchstiq
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"

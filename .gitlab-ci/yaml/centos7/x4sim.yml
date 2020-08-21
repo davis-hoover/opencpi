@@ -7,11 +7,11 @@ build-assemblies:centos7:assets:assemblies:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/assemblies --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -30,11 +30,11 @@ build-assemblies:centos7:assets_ts:assemblies:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/assemblies --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -53,11 +53,11 @@ build-assemblies:centos7:inactive:assemblies:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/assemblies --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -76,11 +76,11 @@ build-assemblies:centos7:platform:assemblies:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/assemblies --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -99,11 +99,11 @@ build-assemblies:centos7:tutorial:assemblies:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/tutorial/hdl/assemblies --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -122,11 +122,11 @@ build-libraries:centos7:assets:adapters:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/adapters --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -145,11 +145,11 @@ build-libraries:centos7:assets:base_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/base_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -168,11 +168,11 @@ build-libraries:centos7:assets:cards:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/cards --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -191,11 +191,11 @@ build-libraries:centos7:assets:comms_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/comms_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -214,11 +214,11 @@ build-libraries:centos7:assets:devices:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/devices --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -237,11 +237,11 @@ build-libraries:centos7:assets:dsp_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/dsp_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -260,11 +260,11 @@ build-libraries:centos7:assets:misc_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/misc_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -283,11 +283,11 @@ build-libraries:centos7:assets:util_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/util_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -306,11 +306,11 @@ build-libraries:centos7:assets_ts:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -329,11 +329,11 @@ build-libraries:centos7:assets_ts:devices:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/devices --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -352,11 +352,11 @@ build-libraries:centos7:core:adapters:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/adapters --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -375,11 +375,11 @@ build-libraries:centos7:core:cards:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/cards --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -398,11 +398,11 @@ build-libraries:centos7:core:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -421,11 +421,11 @@ build-libraries:centos7:core:devices:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/devices --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -444,11 +444,11 @@ build-libraries:centos7:inactive:cards:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/cards --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -467,11 +467,11 @@ build-libraries:centos7:inactive:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -490,11 +490,11 @@ build-libraries:centos7:inactive:devices:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/devices --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -513,11 +513,11 @@ build-libraries:centos7:platform:devices:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/devices --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -536,11 +536,11 @@ build-libraries:centos7:tutorial:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/tutorial/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -559,11 +559,11 @@ build-platforms:centos7:assets:platforms:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/assets --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -582,11 +582,11 @@ build-platforms:centos7:core:platforms:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/core --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -605,11 +605,11 @@ build-platforms:centos7:inactive:platforms:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/inactive --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -628,11 +628,11 @@ build-platforms:centos7:platform:platforms:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/platform --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -651,11 +651,11 @@ build-primitives:centos7:assets:primitives:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/primitives --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -674,11 +674,11 @@ build-primitives:centos7:core:primitives:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/primitives --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -697,11 +697,11 @@ build-primitives:centos7:inactive:primitives:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/primitives --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -720,11 +720,11 @@ build-primitives:centos7:platform:primitives:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/primitives --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -743,11 +743,11 @@ build-primitives:centos7:tutorial:primitives:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/tutorial/hdl/primitives --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1019,11 +1019,11 @@ build-tests:centos7:assets:base_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/base_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1042,11 +1042,11 @@ build-tests:centos7:assets:comms_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/comms_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1065,11 +1065,11 @@ build-tests:centos7:assets:dsp_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/dsp_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1088,11 +1088,11 @@ build-tests:centos7:assets:misc_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/misc_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1111,11 +1111,11 @@ build-tests:centos7:assets:util_comps:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/util_comps --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1134,11 +1134,11 @@ build-tests:centos7:assets_ts:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets_ts/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1157,11 +1157,11 @@ build-tests:centos7:core:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/core/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1180,11 +1180,11 @@ build-tests:centos7:inactive:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/inactive/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
@@ -1203,11 +1203,11 @@ build-tests:centos7:tutorial:components:x4sim:
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(x4sim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(x4sim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/tutorial/components --hdl-platform x4sim
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
