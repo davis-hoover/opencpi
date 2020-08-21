@@ -1,0 +1,1219 @@
+build-assemblies:centos7:assets:assemblies:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/hdl/assemblies --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-assemblies:centos7:assets_ts:assemblies:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets_ts/hdl/assemblies --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-assemblies:centos7:inactive:assemblies:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/inactive/hdl/assemblies --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-assemblies:centos7:platform:assemblies:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/platform/hdl/assemblies --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-assemblies:centos7:tutorial:assemblies:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/tutorial/hdl/assemblies --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:adapters:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/hdl/adapters --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:base_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/components/base_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:cards:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/hdl/cards --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:comms_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/components/comms_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:devices:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/hdl/devices --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:dsp_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/components/dsp_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:misc_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/components/misc_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets:util_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/components/util_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets_ts:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets_ts/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:assets_ts:devices:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets_ts/hdl/devices --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:core:adapters:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/core/hdl/adapters --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:core:cards:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/core/hdl/cards --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:core:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/core/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:core:devices:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/core/hdl/devices --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:inactive:cards:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/inactive/hdl/cards --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:inactive:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/inactive/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:inactive:devices:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/inactive/hdl/devices --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:platform:devices:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/platform/hdl/devices --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-libraries:centos7:tutorial:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/tutorial/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-libraries
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-platforms:centos7:assets:platforms:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build hdl platforms -d projects/assets --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-platforms
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-platforms:centos7:core:platforms:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build hdl platforms -d projects/core --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-platforms
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-platforms:centos7:inactive:platforms:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build hdl platforms -d projects/inactive --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-platforms
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-platforms:centos7:platform:platforms:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build hdl platforms -d projects/platform --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-platforms
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-primitives:centos7:assets:primitives:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-primitives/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/assets/hdl/primitives --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-primitives
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-primitives:centos7:core:primitives:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-primitives/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/core/hdl/primitives --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-primitives
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-primitives:centos7:inactive:primitives:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-primitives/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/inactive/hdl/primitives --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-primitives
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-primitives:centos7:platform:primitives:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-primitives/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/platform/hdl/primitives --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-primitives
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-primitives:centos7:tutorial:primitives:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-primitives/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build  -d projects/tutorial/hdl/primitives --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-primitives
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:alt_test:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *alt_test.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:alt_test|alt_test:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:alt_test:alt_test:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:alt_test|alt_test:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:alt_test|alt_test:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:alt_test|alt_test:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform alt_test ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:epiq_matchstiq:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *epiq_matchstiq.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:epiq_matchstiq|epiq_matchstiq:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:epiq_matchstiq:epiq_matchstiq:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:epiq_matchstiq|epiq_matchstiq:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:epiq_matchstiq|epiq_matchstiq:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:epiq_matchstiq|epiq_matchstiq:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform epiq_matchstiq ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx13_3:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx13_3.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_3|xilinx13_3:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_3:xilinx13_3:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx13_3|xilinx13_3:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx13_3|xilinx13_3:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_3|xilinx13_3:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx13_3 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx13_4:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx13_4.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_4|xilinx13_4:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_4:xilinx13_4:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx13_4|xilinx13_4:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx13_4|xilinx13_4:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_4|xilinx13_4:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx13_4 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx13_4_arm:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx13_4_arm.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_4_arm|xilinx13_4_arm:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_4_arm:xilinx13_4_arm:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx13_4_arm|xilinx13_4_arm:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx13_4_arm|xilinx13_4_arm:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx13_4_arm|xilinx13_4_arm:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx13_4_arm ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx17_1_aarch32:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx17_1_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch32|xilinx17_1_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch32:xilinx17_1_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch32|xilinx17_1_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx17_1_aarch32|xilinx17_1_aarch32:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch32|xilinx17_1_aarch32:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx17_1_aarch32 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx17_1_aarch64:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx17_1_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch64|xilinx17_1_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch64:xilinx17_1_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch64|xilinx17_1_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx17_1_aarch64|xilinx17_1_aarch64:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_1_aarch64|xilinx17_1_aarch64:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx17_1_aarch64 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx17_2_aarch32:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx17_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch32|xilinx17_2_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch32:xilinx17_2_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch32|xilinx17_2_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx17_2_aarch32|xilinx17_2_aarch32:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch32|xilinx17_2_aarch32:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx17_2_aarch32 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx17_2_aarch64:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx17_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch64|xilinx17_2_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch64:xilinx17_2_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch64|xilinx17_2_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx17_2_aarch64|xilinx17_2_aarch64:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx17_2_aarch64|xilinx17_2_aarch64:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx17_2_aarch64 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx19_2_aarch32:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx19_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch32|xilinx19_2_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch32:xilinx19_2_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch32|xilinx19_2_aarch32:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx19_2_aarch32|xilinx19_2_aarch32:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch32|xilinx19_2_aarch32:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx19_2_aarch32 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-sdcards:centos7:xilinx19_2_aarch64:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz *xilinx19_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch64|xilinx19_2_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch64:xilinx19_2_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch64|xilinx19_2_aarch64:ml605)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605:xilinx19_2_aarch64|xilinx19_2_aarch64:ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(ml605:xilinx19_2_aarch64|xilinx19_2_aarch64:ml605)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpiadmin deploy platform xilinx19_2_aarch64 ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-sdcards
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:assets:base_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/assets/components/base_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:assets:comms_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/assets/components/comms_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:assets:dsp_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/assets/components/dsp_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:assets:misc_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/assets/components/misc_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:assets:util_comps:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/assets/components/util_comps --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:assets_ts:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/assets_ts/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:core:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/core/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:inactive:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/inactive/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi
+build-tests:centos7:tutorial:components:ml605:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *ml605.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_MR_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(ml605)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i$CI_PLATFORMS =~ /(^| |:)(ml605)( |:|$)/i&& $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i&& $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev build test -d projects/tutorial/components --hdl-platform ml605
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-assemblies
+  tags:
+  - centos7
+  - shell
+  - opencpi

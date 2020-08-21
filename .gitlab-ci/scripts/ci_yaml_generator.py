@@ -5,8 +5,7 @@ import yaml
 from collections import defaultdict
 import re
 from pathlib import Path
-import subprocess
-from ci_utils import ci_project, ci_platform, ci_job, ci_env
+from ci_utils import ci_project, ci_platform, ci_job
 
 
 def main():
@@ -56,7 +55,7 @@ def main():
         host_dict = {'include': host_include}
         dump(host_dict, host_path, 'a')
 
-    print('Updating .gitlab-ci.yml')
+    print('\nUpdating "include" section of .gitlab-ci.yml')
     gitlab_yml_path = Path('.gitlab-ci.yml')
     gitlab_yml_include = [str(path) for path in Path(yaml_path).glob('*.yml')]
     gitlab_yml_dict = {
@@ -64,6 +63,10 @@ def main():
         'stages': stages
     }
     dump(gitlab_yml_dict, gitlab_yml_path, 'w+')
+
+    print('\nYaml files available at: {}/'
+          '\n*IMPORTANT: If any files were created for a new platform,'
+          ' be sure to commit them.'.format(Path(Path.cwd(), yaml_path)))
 
 
 def dump(yaml_dict, yaml_path, mode):

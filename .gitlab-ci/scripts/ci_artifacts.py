@@ -1,38 +1,35 @@
 #!/usr/bin/env python3
 
-import subprocess
 import os
-import tarfile
+import subprocess
 import sys
-import ci_utils
+import tarfile
+from argparse import ArgumentParser
 from collections import namedtuple
 from shutil import rmtree
-from argparse import ArgumentParser
 
 
 def main():
-    """Gets user arguments, CI environment variables, and calls appropriate function.
+    """Gets user arguments and calls appropriate function.
 
     Calls make_parser() to get parser and parses user args.
-    Calls get_env() to get CI environment variables. 
-    Calls function specified by user argument, passing user args and CI env vars.
+    Calls function specified by user argument, passing user args.
     """
     parser = make_parser()
     args = parser.parse_args()
-    ci_env = ci_utils.get_ci_env()
 
     if 'func' in args:
-        rc = args.func(args, ci_env)
+        rc = args.func(args)
         exit(rc)
     else:
         parser.print_help()
 
 
 def make_parser():
-    """ Creates an argparse ArgumentParser.
+    """Creates an argparse ArgumentParser.
 
     Returns:
-        argparse ArgumentParser
+        parser: argparse ArgumentParser
     """
     # Create parser
     parser = ArgumentParser()
@@ -41,41 +38,47 @@ def make_parser():
     # Create download subparser
     subparser = subparsers.add_parser(
         name='download', 
-        help='download artifacts from aws. ' \
-             'Default: all pipeline artifacts not in current stage and not failed')
-    subparser.add_argument(
-        '-e', '--exclude', 
-        help='artifacts to exclude from download. Can take any number of arguments', 
-        nargs='+', metavar='')
-    subparser.add_argument(
-        '-i', '--include', 
-        help='artifacts to include in download. Can take any number of arguments', 
-        nargs='+', metavar='')
+        help='Download artifacts from aws')
     subparser.add_argument(
         'pipeline_id', 
         help='ID of pipeline to download artifacts from', 
         metavar='pipeline_id')
+    subparser.add_argument(
+        '-e', '--exclude', 
+        help=('Artifacts to exclude from download.'
+             ' Can take any number of arguments'), 
+        nargs='+', metavar='')
+    subparser.add_argument(
+        '-i', '--include', 
+        help=('Artifacts to include in download.' 
+             ' Can take any number of arguments'), 
+        nargs='+', metavar='')
     subparser.set_defaults(func=download)
 
     # Create upload subparser
     subparser = subparsers.add_parser(
         name='upload', 
-        help='upload artifacts to aws')
+        help='Upload artifacts to aws')
     subparser.add_argument('artifact', 
-        help='directory or file to upload to aws. Default: cwd',
+        help='Directory or file to upload to aws. Default: cwd',
         nargs='?', default='.')
-    subparser.add_argument(
-        '-s', '--timestamp', 
-        help='upload artifacts in directory updated/created since timestamp', 
-        metavar='')
-    subparser.add_argument(
-        '-t', '--tag', 
-        help='tag to give the artifact', 
-        metavar='')
     subparser.add_argument(
         'pipeline_id', 
         help='ID of pipeline to upload artifacts to', 
         metavar='pipeline_id')
+    subparser.add_argument(
+        'job_name', 
+        help='ID of pipeline to upload artifacts to', 
+        metavar='job_name')
+    subparser.add_argument(
+        '-s', '--timestamp', 
+        help=('Upload artifacts in directory updated/created since'
+              ' timestamp'), 
+        metavar='')
+    subparser.add_argument(
+        '-t', '--tag', 
+        help='Tag to give the artifact', 
+        metavar='')
     subparser.set_defaults(func=upload)
 
 
@@ -83,13 +86,13 @@ def make_parser():
 
 
 def exclude_paths(path):
-    """ Excludes certain path from being added to tar.
+    """Excludes certain path from being added to tar.
 
     Args:
         path: Path to be validated for exclusion
 
-        Returns:
-            True if path should be excluded; else False
+    Returns:
+        bool: True if path should be excluded; else False
     """
     if '.git' in path:
         return True
@@ -97,31 +100,40 @@ def exclude_paths(path):
     return False
 
 
-def upload(args, ci_env):
-    """ Uploads artifacts to aws.
+def upload(args):
+    """Uploads artifacts to aws.
 
-    Tars artifacts and constructs and executes command to upload artifacts to aws.
-    Calls tag() if a tag is passed as user argument.
+    Tars artifacts and constructs and executes command to upload 
+    artifacts to aws. Calls tag() if a tag is passed as user argument.
 
     Args:
         args: User command line arguments
-        ci_env:  CI envinronment variables
+
+    Returns:
+        Return code of subprocess call to upload artifacts to AWS
     """
     # Set s3 object
     # Will appear on aws as:
-    # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID/CI_JOB_STAGE[-failed]/CI_JOB_NAME'
-    stage = '{}-{}'.format(ci_env.job_stage, 'failed') if args.tag == 'failed-job' else ci_env.job_stage
-    s3_object = '{}.tar.gz'.format('/'.join([args.pipeline_id, stage, ci_env.job_name]))
-    s3_url = 'https://opencpi-ci-artifacts.s3.us-east-2.amazonaws.com/{}'.format(s3_object)
+    # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID[/failed]/CI_JOB_NAME'
+    if args.tag == 'failed-job':
+        s3_object = '{}/failed/{}.tar.gz'.format(args.pipeline_id, 
+                                                 args.job_name)
+    else:
+        s3_object = '{}/{}.tar.gz'.format(args.pipeline_id, args.job_name)
+        
+    s3_url = ('https://opencpi-ci-artifacts.s3.us-east-2.amazonaws.com/'
+              '{}'.format(s3_object))
     files = []
 
-    # If timestamp passed, find all files created/updated since the timestamp
+    # If timestamp passed, find all files created/updated since the 
+    # timestamp
     if args.timestamp:
         timestamp = os.lstat(args.timestamp).st_ctime
         recursive = False
 
         for dirpath, dirnames, filenames in os.walk('.'):
-            paths = [os.path.join(dirpath, name) for name in dirnames + filenames]
+            paths = [os.path.join(dirpath, name) 
+                     for name in dirnames + filenames]
 
             for path in paths:
                 if os.lstat(path).st_ctime > timestamp:
@@ -142,7 +154,8 @@ def upload(args, ci_env):
         '--no-progress']
     print('Executing: "{}"'.format(' '.join(cmd)))
     print('Uploading artifacts to: {}'.format(s3_url))
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+                               universal_newlines=True)
     process.wait()
 
     if process.stderr:
@@ -158,15 +171,17 @@ def upload(args, ci_env):
     return process.returncode
 
 
-def download(args, ci_env):
-    """ Downloads artifacts from aws.
+def download(args):
+    """Downloads artifacts from aws.
 
-    Constructs and executes command to download tar artifacts from aws into temp folder
-    and extracts the files from the tar artifacts.
+    Constructs and executes command to download tar artifacts from aws 
+    into temp folder and extracts the files from the tar artifacts.
 
     Args:
         args: User command line arguments
-        ci_env:  CI envinronment variables
+
+    Returns:
+        Return code of subprocess call to download artifacts to AWS
     """
     # temp dir to download artifact into
     temp_dir = os.path.join('.', 'temp', '')
@@ -177,7 +192,8 @@ def download(args, ci_env):
         '--no-progress', '--recursive']
 
     if args.include:
-        # By default in aws, '--include' does nothing unless '--exclude "*"' is passed first
+        # By default in aws, '--include' does nothing unless 
+        # '--exclude "*"' is passed first
         cmd += ['--exclude', '*']
         for include in args.include:
             cmd += ['--include', include]
@@ -186,11 +202,12 @@ def download(args, ci_env):
             cmd += ['--exclude', exclude]
 
     # Do not download failed jobs
-    cmd += ['--exclude', '*-failed/*']
+    cmd += ['--exclude', 'failed/*']
     print('Executing: "{}"'.format(' '.join(cmd)))
 
     # Execute command to download artifacts
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+                               universal_newlines=True)
     process.wait()
 
     if process.stdout:
@@ -217,7 +234,8 @@ def tag(args, s3_object):
     """ Tags artifacts on aws.
 
     Constructs and executes command to tag artifacts on aws.
-    Constructs and executes command to get artifact expiration date based on applied tag.
+    Constructs and executes command to get artifact expiration date 
+    based on applied tag.
 
     Args:
         args:       User command line arguments
@@ -229,7 +247,8 @@ def tag(args, s3_object):
         '--tagging', 'TagSet=[{{Key=type,Value={}}}]'.format(args.tag)]
     
     # Execute command to tag artifact
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+                               universal_newlines=True)
     process.wait()
     out = (process.stdout.read())
 
@@ -239,7 +258,8 @@ def tag(args, s3_object):
     # Get expiration date of artifact based on applied tag
     cmd = ['aws', '--output', 'yaml', 's3api', 'head-object', 
         '--bucket', 'opencpi-ci-artifacts', '--key', s3_object]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+                               universal_newlines=True)
     
     if process.stderr:
         print(process.stderr.read().strip())
