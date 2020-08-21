@@ -1,6 +1,6 @@
 build-assemblies:centos7:assets:assemblies:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -14,7 +14,7 @@ build-assemblies:centos7:assets:assemblies:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/assemblies --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -23,7 +23,7 @@ build-assemblies:centos7:assets:assemblies:matchstiq_z1:
   - opencpi
 build-assemblies:centos7:assets_ts:assemblies:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -37,7 +37,7 @@ build-assemblies:centos7:assets_ts:assemblies:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/assemblies --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -46,7 +46,7 @@ build-assemblies:centos7:assets_ts:assemblies:matchstiq_z1:
   - opencpi
 build-assemblies:centos7:inactive:assemblies:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -60,7 +60,7 @@ build-assemblies:centos7:inactive:assemblies:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/assemblies --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -69,7 +69,7 @@ build-assemblies:centos7:inactive:assemblies:matchstiq_z1:
   - opencpi
 build-assemblies:centos7:platform:assemblies:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -83,7 +83,7 @@ build-assemblies:centos7:platform:assemblies:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/assemblies --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -92,7 +92,7 @@ build-assemblies:centos7:platform:assemblies:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:adapters:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -106,7 +106,7 @@ build-libraries:centos7:assets:adapters:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/adapters --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -115,7 +115,7 @@ build-libraries:centos7:assets:adapters:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:base_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -129,7 +129,7 @@ build-libraries:centos7:assets:base_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/base_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -138,7 +138,7 @@ build-libraries:centos7:assets:base_comps:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:cards:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -152,7 +152,7 @@ build-libraries:centos7:assets:cards:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/cards --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -161,7 +161,7 @@ build-libraries:centos7:assets:cards:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:comms_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -175,7 +175,7 @@ build-libraries:centos7:assets:comms_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/comms_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -184,7 +184,7 @@ build-libraries:centos7:assets:comms_comps:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:devices:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -198,7 +198,7 @@ build-libraries:centos7:assets:devices:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/devices --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -207,7 +207,7 @@ build-libraries:centos7:assets:devices:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:dsp_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -221,7 +221,7 @@ build-libraries:centos7:assets:dsp_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/dsp_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -230,7 +230,7 @@ build-libraries:centos7:assets:dsp_comps:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:misc_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -244,7 +244,7 @@ build-libraries:centos7:assets:misc_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/misc_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -253,7 +253,7 @@ build-libraries:centos7:assets:misc_comps:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets:util_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -267,7 +267,7 @@ build-libraries:centos7:assets:util_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/util_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -276,7 +276,7 @@ build-libraries:centos7:assets:util_comps:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets_ts:components:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -290,7 +290,7 @@ build-libraries:centos7:assets_ts:components:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/components --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -299,7 +299,7 @@ build-libraries:centos7:assets_ts:components:matchstiq_z1:
   - opencpi
 build-libraries:centos7:assets_ts:devices:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -313,7 +313,7 @@ build-libraries:centos7:assets_ts:devices:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/devices --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -322,7 +322,7 @@ build-libraries:centos7:assets_ts:devices:matchstiq_z1:
   - opencpi
 build-libraries:centos7:core:adapters:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -336,7 +336,7 @@ build-libraries:centos7:core:adapters:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/adapters --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -345,7 +345,7 @@ build-libraries:centos7:core:adapters:matchstiq_z1:
   - opencpi
 build-libraries:centos7:core:cards:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -359,7 +359,7 @@ build-libraries:centos7:core:cards:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/cards --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -368,7 +368,7 @@ build-libraries:centos7:core:cards:matchstiq_z1:
   - opencpi
 build-libraries:centos7:core:components:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -382,7 +382,7 @@ build-libraries:centos7:core:components:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/components --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -391,7 +391,7 @@ build-libraries:centos7:core:components:matchstiq_z1:
   - opencpi
 build-libraries:centos7:core:devices:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -405,7 +405,7 @@ build-libraries:centos7:core:devices:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/devices --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -414,7 +414,7 @@ build-libraries:centos7:core:devices:matchstiq_z1:
   - opencpi
 build-libraries:centos7:inactive:cards:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -428,7 +428,7 @@ build-libraries:centos7:inactive:cards:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/cards --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -437,7 +437,7 @@ build-libraries:centos7:inactive:cards:matchstiq_z1:
   - opencpi
 build-libraries:centos7:inactive:components:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -451,7 +451,7 @@ build-libraries:centos7:inactive:components:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/components --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -460,7 +460,7 @@ build-libraries:centos7:inactive:components:matchstiq_z1:
   - opencpi
 build-libraries:centos7:inactive:devices:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -474,7 +474,7 @@ build-libraries:centos7:inactive:devices:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/devices --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -483,7 +483,7 @@ build-libraries:centos7:inactive:devices:matchstiq_z1:
   - opencpi
 build-libraries:centos7:platform:devices:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -497,7 +497,7 @@ build-libraries:centos7:platform:devices:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/devices --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-libraries
   tags:
@@ -506,7 +506,7 @@ build-libraries:centos7:platform:devices:matchstiq_z1:
   - opencpi
 build-platforms:centos7:assets:platforms:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -520,7 +520,7 @@ build-platforms:centos7:assets:platforms:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/assets --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-platforms
   tags:
@@ -529,7 +529,7 @@ build-platforms:centos7:assets:platforms:matchstiq_z1:
   - opencpi
 build-platforms:centos7:core:platforms:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -543,7 +543,7 @@ build-platforms:centos7:core:platforms:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/core --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-platforms
   tags:
@@ -552,7 +552,7 @@ build-platforms:centos7:core:platforms:matchstiq_z1:
   - opencpi
 build-platforms:centos7:inactive:platforms:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -566,7 +566,7 @@ build-platforms:centos7:inactive:platforms:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/inactive --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-platforms
   tags:
@@ -575,7 +575,7 @@ build-platforms:centos7:inactive:platforms:matchstiq_z1:
   - opencpi
 build-platforms:centos7:platform:platforms:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -589,7 +589,7 @@ build-platforms:centos7:platform:platforms:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/platform --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-platforms
   tags:
@@ -598,7 +598,7 @@ build-platforms:centos7:platform:platforms:matchstiq_z1:
   - opencpi
 build-primitives-core:centos7:core:primitives:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-primitives-core/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -612,7 +612,7 @@ build-primitives-core:centos7:core:primitives:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/primitives --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-primitives-core
   tags:
@@ -621,7 +621,7 @@ build-primitives-core:centos7:core:primitives:matchstiq_z1:
   - opencpi
 build-primitives:centos7:assets:primitives:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -635,7 +635,7 @@ build-primitives:centos7:assets:primitives:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/primitives --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-primitives
   tags:
@@ -644,7 +644,7 @@ build-primitives:centos7:assets:primitives:matchstiq_z1:
   - opencpi
 build-primitives:centos7:inactive:primitives:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -658,7 +658,7 @@ build-primitives:centos7:inactive:primitives:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/primitives --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-primitives
   tags:
@@ -667,7 +667,7 @@ build-primitives:centos7:inactive:primitives:matchstiq_z1:
   - opencpi
 build-primitives:centos7:platform:primitives:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -681,7 +681,7 @@ build-primitives:centos7:platform:primitives:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/primitives --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-primitives
   tags:
@@ -690,7 +690,7 @@ build-primitives:centos7:platform:primitives:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:alt_test:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *alt_test.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -704,7 +704,7 @@ build-sdcards:centos7:alt_test:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:alt_test|alt_test:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform alt_test matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -713,7 +713,7 @@ build-sdcards:centos7:alt_test:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:epiq_matchstiq:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *epiq_matchstiq.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -727,7 +727,7 @@ build-sdcards:centos7:epiq_matchstiq:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:epiq_matchstiq|epiq_matchstiq:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform epiq_matchstiq matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -736,7 +736,7 @@ build-sdcards:centos7:epiq_matchstiq:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx13_3:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx13_3.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -750,7 +750,7 @@ build-sdcards:centos7:xilinx13_3:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx13_3|xilinx13_3:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_3 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -759,7 +759,7 @@ build-sdcards:centos7:xilinx13_3:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx13_4:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx13_4.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -773,7 +773,7 @@ build-sdcards:centos7:xilinx13_4:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx13_4|xilinx13_4:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_4 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -782,7 +782,7 @@ build-sdcards:centos7:xilinx13_4:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx13_4_arm:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx13_4_arm.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -796,7 +796,7 @@ build-sdcards:centos7:xilinx13_4_arm:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx13_4_arm|xilinx13_4_arm:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_4_arm matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -805,7 +805,7 @@ build-sdcards:centos7:xilinx13_4_arm:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx17_1_aarch32:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx17_1_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -819,7 +819,7 @@ build-sdcards:centos7:xilinx17_1_aarch32:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx17_1_aarch32|xilinx17_1_aarch32:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_1_aarch32 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -828,7 +828,7 @@ build-sdcards:centos7:xilinx17_1_aarch32:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx17_1_aarch64:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx17_1_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -842,7 +842,7 @@ build-sdcards:centos7:xilinx17_1_aarch64:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx17_1_aarch64|xilinx17_1_aarch64:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_1_aarch64 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -851,7 +851,7 @@ build-sdcards:centos7:xilinx17_1_aarch64:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx17_2_aarch32:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx17_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -865,7 +865,7 @@ build-sdcards:centos7:xilinx17_2_aarch32:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx17_2_aarch32|xilinx17_2_aarch32:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_2_aarch32 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -874,7 +874,7 @@ build-sdcards:centos7:xilinx17_2_aarch32:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx17_2_aarch64:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx17_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -888,7 +888,7 @@ build-sdcards:centos7:xilinx17_2_aarch64:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx17_2_aarch64|xilinx17_2_aarch64:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_2_aarch64 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -897,7 +897,7 @@ build-sdcards:centos7:xilinx17_2_aarch64:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx19_2_aarch32:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx19_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -911,7 +911,7 @@ build-sdcards:centos7:xilinx19_2_aarch32:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx19_2_aarch32|xilinx19_2_aarch32:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx19_2_aarch32 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -920,7 +920,7 @@ build-sdcards:centos7:xilinx19_2_aarch32:matchstiq_z1:
   - opencpi
 build-sdcards:centos7:xilinx19_2_aarch64:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz *xilinx19_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -934,7 +934,7 @@ build-sdcards:centos7:xilinx19_2_aarch64:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(matchstiq_z1:xilinx19_2_aarch64|xilinx19_2_aarch64:matchstiq_z1)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx19_2_aarch64 matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-sdcards
   tags:
@@ -943,7 +943,7 @@ build-sdcards:centos7:xilinx19_2_aarch64:matchstiq_z1:
   - opencpi
 build-tests:centos7:assets:base_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -957,7 +957,7 @@ build-tests:centos7:assets:base_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/base_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -966,7 +966,7 @@ build-tests:centos7:assets:base_comps:matchstiq_z1:
   - opencpi
 build-tests:centos7:assets:comms_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -980,7 +980,7 @@ build-tests:centos7:assets:comms_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/comms_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -989,7 +989,7 @@ build-tests:centos7:assets:comms_comps:matchstiq_z1:
   - opencpi
 build-tests:centos7:assets:dsp_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -1003,7 +1003,7 @@ build-tests:centos7:assets:dsp_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/dsp_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -1012,7 +1012,7 @@ build-tests:centos7:assets:dsp_comps:matchstiq_z1:
   - opencpi
 build-tests:centos7:assets:misc_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -1026,7 +1026,7 @@ build-tests:centos7:assets:misc_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/misc_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -1035,7 +1035,7 @@ build-tests:centos7:assets:misc_comps:matchstiq_z1:
   - opencpi
 build-tests:centos7:assets:util_comps:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -1049,7 +1049,7 @@ build-tests:centos7:assets:util_comps:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/util_comps --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -1058,7 +1058,7 @@ build-tests:centos7:assets:util_comps:matchstiq_z1:
   - opencpi
 build-tests:centos7:assets_ts:components:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -1072,7 +1072,7 @@ build-tests:centos7:assets_ts:components:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets_ts/components --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -1081,7 +1081,7 @@ build-tests:centos7:assets_ts:components:matchstiq_z1:
   - opencpi
 build-tests:centos7:core:components:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -1095,7 +1095,7 @@ build-tests:centos7:core:components:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/core/components --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:
@@ -1104,7 +1104,7 @@ build-tests:centos7:core:components:matchstiq_z1:
   - opencpi
 build-tests:centos7:inactive:components:matchstiq_z1:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *matchstiq_z1.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
@@ -1118,7 +1118,7 @@ build-tests:centos7:inactive:components:matchstiq_z1:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(matchstiq_z1)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/inactive/components --hdl-platform matchstiq_z1
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-assemblies
   tags:

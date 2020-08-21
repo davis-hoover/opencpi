@@ -1,6 +1,6 @@
 build-host:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - touch .timestamp
   rules:
@@ -11,7 +11,7 @@ build-host:centos7:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/build-opencpi.sh centos7
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: build-host
   tags:
@@ -20,7 +20,7 @@ build-host:centos7:
   - opencpi
 prereqs:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - touch .timestamp
   rules:
@@ -31,7 +31,7 @@ prereqs:centos7:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/install-prerequisites.sh centos7
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: prereqs
   tags:
@@ -40,7 +40,7 @@ prereqs:centos7:
   - opencpi
 test:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
@@ -54,7 +54,7 @@ test:centos7:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - scripts/test-opencpi.sh --no-hdl
-  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME -s .timestamp -t "successful-job"
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
   tags:
