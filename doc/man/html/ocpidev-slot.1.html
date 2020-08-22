@@ -1,45 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-slot</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140687825459184"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-slot — manage an OpenCPI HDL slot.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">hdl slot</code></strong></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">hdl slot</code></strong></span> noun represents an OpenCPI HDL slot,
-which describes XXXXXXX TBD FOR HDL SLOT XXXXX.</p><p>An HDL slot is described by XXXXXXXX.</p><p>----BELOW TO BE UPDATED FOR HDL SLOT ----------
-an OpenCPI Protocol Specification (OPS),
-which is an XML file that describes the set of messages defined in the
-protocol, as well as some top-level attributes for the protocol.
-<span class="emphasis"><em>Operation</em></span> elements in the OPS describe the messages that can be used,
-while <span class="emphasis"><em>argument</em></span> elements describe the individual fields of a message.
-A protocol is specified in the <span class="emphasis"><em>port</em></span> element of a component spec (OCS).
-In a connection between component ports, the specs of both
-ports, in their port elements, refer to the same OPS.
-At present, a protocol consists of only the OPS XML file.</p><p>For more information about a protocol’s XML structure, see the chapter "Protocol
-Specifications" in the <span class="emphasis"><em>OpenCPI Component Development Guide</em></span>.</p><p>In a project, a protocol resides in a <span class="strong"><strong><code class="literal">specs/</code></strong></span> directory
-located either in a component library or at the top level of a project
-and is named <span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">-prot.xml</code></strong></span>. Note that protocols with older
-naming formats like <span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">_protocol.xml</code></strong></span> and <span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">-protocol.xml</code></strong></span>
-also exist; for example, some of the protocols in the built-in
-OpenCPI <span class="strong"><strong><code class="literal">core</code></strong></span> project (<span class="strong"><strong><code class="literal">../projects/core/specs/</code></strong></span>) use these formats.</p><p>Verbs that can operate on a protocol are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-slot</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140187533676880"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-slot — manage an OpenCPI HDL slot.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">hdl slot</code></strong></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">hdl slot</code></strong></span> noun represents an OpenCPI HDL slot,
+which defines an integral part of an HDL platform
+that enables an <span class="emphasis"><em>HDL card</em></span> to be plugged in so that
+its attached devices are accessible to the platform. An HDL
+platform has defined slot types; HDL cards
+that are designed for the same slot type can be plugged in
+to the defined slots on the platform.</p><p>An HDL slot is described by an OpenCPI HDL slot type definition,
+which is an XML file that defines the signal connections to
+the pins of the connectors associated with the slot type and
+provides an (optional) name for the slot type that can
+be used in HDL Platform Descriptions (OHPDs) and HDL card
+definitions. OpenCPI provides HDL slot definitions for a number of
+standard slot types, like the FMC (FPGA Mezzanine Card), which
+is defined by the by the VITA standards organization as VITA-57.1.
+Defining a new slot type for use in OpenCPI consists of creating
+an HDL slot type definition from the information
+given in the standard document for the slot; writing HDL code to support
+an HDL slot is not normally necessary. For more information
+about the XML structure of an HDL slot type definition
+and how it relates to HDL platforms, devices and cards, see the
+section "Slots - How Cards Plug into Platforms" in the
+<span class="emphasis"><em>OpenCPI Platform Development Guide</em></span>.</p><p>An HDL slot is named <span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">.xml</code></strong></span>, where <span class="emphasis"><em>&lt;name&gt;</em></span>
+must be a name that can be used in programming languages (uses underscores
+rather than hyphens) but is otherwise case insensitive. The HDL slot
+name should normally be the exact name used in the standard document
+that defines the slot type.</p><p>In a project, an HDL slot resides in one of the following locations
+depending on its intended use:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+In the subdirectory <span class="strong"><strong><code class="literal">hdl/cards/specs/</code></strong></span> when the HDL
+slot is platform-independent
+</li><li class="listitem">
+In the subdirectory <span class="strong"><strong><code class="literal">hdl/platforms/</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span><span class="strong"><strong><code class="literal">/devices/specs/</code></strong></span> when
+the HDL slot is platform-specific
+</li></ul></div><p>OpenCPI-defined HDL slots are located in the subdirectory
+<span class="strong"><strong><code class="literal">hdl/cards/specs/</code></strong></span> in the OpenCPI built-in <span class="strong"><strong><code class="literal">core</code></strong></span> project.</p><p>Verbs that can operate on an HDL slot are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 <span class="strong"><strong><code class="literal">create</code></strong></span>
 </span></dt><dd>
-    Create the named protocol according to the specified options,
+    Create the named HDL slot according to the specified options,
     creating directories and files as required.
 </dd><dt><span class="term">
 <span class="strong"><strong><code class="literal">delete</code></strong></span>
 </span></dt><dd>
-    Remove all files associated with the named protocol.
-</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
-that it can be specified more than once on the command line.</p><div class="refsect2"><a id="_options_that_apply_to_all_operations_verbs_on_protocols"></a><h3>Options That Apply to All Operations (Verbs) on Protocols</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
-<span class="strong"><strong><code class="literal">--hdl-library=</code></strong></span><span class="emphasis"><em>&lt;hdl-library&gt;</em></span>
-</span></dt><dd>
-    Specify the HDL library in which to operate on the
-    protocol. HDL libraries exist underneath the <span class="strong"><strong><code class="literal">hdl/</code></strong></span>
-    directory located at the top level of a project.
-</dd><dt><span class="term">
-<span class="strong"><strong><code class="literal">--library=</code></strong></span><span class="emphasis"><em>&lt;component-library&gt;</em></span>, <span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;component-library&gt;</em></span>
-</span></dt><dd>
-    Specify the component library in which to operate on the protocol.
-    When a project contains multiple component libraries, this option
-    can be used to specify one of them. Multiple component
-    libraries are located underneath the <span class="strong"><strong><code class="literal">components</code></strong></span> directory
-    at the top level of a project.
-</dd><dt><span class="term">
+    Remove all files associated with the named HDL slot.
+</dd></dl></div><p>The <span class="strong"><strong><code class="literal">create</code></strong></span> operation creates an initial HDL slot type definition
+XML file that can be edited as necessary to define the slot type.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><div class="refsect2"><a id="_options_that_apply_to_all_operations_verbs_on_hdl_slots"></a><h3>Options That Apply to All Operations (Verbs) on HDL Slots</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 <span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>
 </span></dt><dd>
     Specify the directory in which the command should be run.
@@ -48,49 +52,43 @@ that it can be specified more than once on the command line.</p><div class="refs
 <span class="strong"><strong>-v, --verbose</strong></span>
 </span></dt><dd>
     Describe what is happening in command execution in more detail.
-</dd></dl></div></div><div class="refsect2"><a id="_options_when_creating_and_deleting_protocols"></a><h3>Options When Creating and Deleting Protocols</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
-<span class="strong"><strong>-p</strong></span>
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_creating_hdl_slots"></a><h3>Options When Creating HDL Slots</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-P</code></strong></span> <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>
 </span></dt><dd>
-    Specify that the protocol is to be created in or
-    deleted from the <span class="strong"><strong><code class="literal">specs/</code></strong></span> directory of the project
-    instead of the <span class="strong"><strong><code class="literal">specs/</code></strong></span> directory of a component library.
-    The <span class="strong"><strong><code class="literal">-l</code></strong></span> and <span class="strong"><strong><code class="literal">-p</code></strong></span> options specify the location
-    of the protocol. When neither one of these options
-    is used, the location is the <span class="strong"><strong><code class="literal">components</code></strong></span> library
-    and thus is an error if other component libraries exist.
-</dd></dl></div></div><div class="refsect2"><a id="_options_when_creating_protocols"></a><h3>Options When Creating Protocols</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+    Specify that the HDL slot being created is a platform-specific
+    HDL slot to be created in the <span class="strong"><strong><code class="literal">devices/specs/</code></strong></span>
+    subdirectory in the specified HDL platform in the project.
+</dd><dt><span class="term">
 <span class="strong"><strong>-k</strong></span>
 </span></dt><dd>
-    Keep files and directories created after a protocol creation
+    Keep files and directories created after an HDL slot creation
     fails. Normally, all such files and directories are removed
     on any failure.
-</dd></dl></div></div><div class="refsect2"><a id="_options_when_deleting_protocols"></a><h3>Options When Deleting Protocols</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_deleting_hdl_slots"></a><h3>Options When Deleting HDL Slots</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 <span class="strong"><strong><code class="literal">-f</code></strong></span>
 </span></dt><dd>
     Force deletion: do not ask for confirmation when deleting
     a protocol. Normally, you are asked to confirm a deletion.
 </dd></dl></div></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
-Create a protocol spec with the name <span class="strong"><strong><code class="literal">myprotocol</code></strong></span>. The protocol
-spec will be placed in the default location <span class="strong"><strong><code class="literal">components/specs/</code></strong></span>:
-</p><pre class="screen">ocpidev create protocol myprotocol</pre></li><li class="listitem"><p class="simpara">
-Create a protocol named <span class="strong"><strong><code class="literal">myprotocol</code></strong></span> in the component library
-named <span class="strong"><strong><code class="literal">myutilcomps</code></strong></span>. The protocol spec will be placed in
-the <span class="strong"><strong><code class="literal">specs</code></strong></span> directory in <span class="strong"><strong><code class="literal">myutilcomps</code></strong></span> sublibrary
-within the <span class="strong"><strong><code class="literal">components</code></strong></span> library (<span class="strong"><strong><code class="literal">components/myutilcomps/specs/</code></strong></span>):
-</p><pre class="screen">ocpidev create protocol myprotocol -l myutilcomps</pre></li><li class="listitem"><p class="simpara">
-Inside the project <span class="strong"><strong><code class="literal">MyProject</code></strong></span>, create a protocol spec with the
-name <span class="strong"><strong><code class="literal">myprotocol</code></strong></span> in the project’s <span class="strong"><strong><code class="literal">specs/</code></strong></span> directory.
-The protocol spec will be placed in <span class="strong"><strong><code class="literal">MyProject/specs/</code></strong></span>:
-</p><pre class="screen">ocpidev create protocol myprotocol -p</pre></li><li class="listitem"><p class="simpara">
-Delete a protocol named <span class="strong"><strong><code class="literal">MyAdapterProtocol</code></strong></span> from
-a project’s <span class="strong"><strong><code class="literal">adapters</code></strong></span> library (deletes it
-from <span class="strong"><strong><code class="literal">hdl/adapters/specs/</code></strong></span>):
-</p><pre class="screen">ocpidev delete protocol MyAdapterProtocol --hdl-library=adapters</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
-<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
-<a class="ulink" href="ocpidev-component.1.html" target="_top">ocpidev-component(1)</a>
+At the top level of the project, create an HDL slot
+with the name <span class="strong"><strong><code class="literal">myslot</code></strong></span>. The HDL slot definition
+named <span class="strong"><strong><code class="literal">myslot.xml</code></strong></span> will be placed
+in the subdirectory <span class="strong"><strong><code class="literal">hdl/cards/specs/</code></strong></span>:
+</p><pre class="screen">ocpidev create hdl slot myslot</pre></li><li class="listitem"><p class="simpara">
+At the top level of the project, create an HDL slot
+with the name <span class="strong"><strong><code class="literal">myslot</code></strong></span> for the platform <span class="strong"><strong><code class="literal">myplatform</code></strong></span>.
+The HDL slot definition named <span class="strong"><strong><code class="literal">myslot.xml</code></strong></span> will
+be placed in the
+subdirectory <span class="strong"><strong><code class="literal">platforms/myplatform/hdl/devices/specs/</code></strong></span>:
+</p><pre class="screen">ocpidev create hdl slot myslot -P myplatform</pre></li><li class="listitem"><p class="simpara">
+Inside the project, delete an HDL slot definition named <span class="strong"><strong><code class="literal">myslot.xml</code></strong></span> from
+a project’s <span class="strong"><strong><code class="literal">hdl/cards/specs/</code></strong></span> subdirectory:
+</p><pre class="screen">ocpidev delete hdl slot myslot</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-card.1.html" target="_top">ocpidev-card(1)</a>
 <a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
 <a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
-<a class="ulink" href="ocpidev-library.1.html" target="_top">ocpidev-library(1)</a>
+<a class="ulink" href="ocpidev-device.1.html" target="_top">ocpidev-device(1)</a>
+<a class="ulink" href="ocpidev-platform.1.html" target="_top">ocpidev-platform(1)</a>
 <a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free

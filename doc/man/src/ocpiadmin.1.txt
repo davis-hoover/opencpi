@@ -1,0 +1,150 @@
+OCPIADMIN(1)
+===========
+
+
+NAME
+----
+ocpiadmin - command-line tool for managing an OpenCPI installation.
+
+
+SYNOPSIS
+--------
+*ocpiadmin* ['<options>'] '<verb>' '<noun>' ['<name>' ['<argument>'... ]]
+
+
+DESCRIPTION
+-----------
+The *`ocpiadmin(1)`* command-line tool is used to perform installation
+and deployment tasks that are carried out on an OpenCPI installation
+after the basic installation procedure is completed to prepare
+OpenCPI for use on embedded systems. These tasks include:
+
+- Building platforms and simulators that are intended
+as targets for OpenCPI development that have not been
+automatically built as part of the basic OpenCPI
+installation. Building a platform enables
+OpenCPI assets for that platform to be developed in OpenCPI
+projects. It also enables the platform to be integrated into
+system boot kits - for example, on bootable SD cards - to
+be created for embedded systems that use them.
+
+- Creating a bootable media directory tree ('SD card contents')
+for OpenCPI required by the software (RCC) and hardware
+(HDL/FPGA) platforms that comprise the embedded system.
+The bootable media directory tree for a particular
+software-hardware platform configuration can
+then be written to the manufacturer's SD card
+to enable booting the embedded system for OpenCPI.
+
+For more information about these tasks and how they
+relate to enabling OpenCPI development on embedded systems,
+see The 'OpenCPI Installation Guide'.
+
+The general usage concept for *`ocpiadmin`* is:
+perform the '<verb>' operation on the
+'<noun>' whose name is '<name>'.
+
+
+VERBS
+-----
+The verbs supported by *`ocpiadmin`* are:
+
+*`deploy`*::
+    Create a bootable media directory tree for the named
+    RCC (software) platform on the named HDL (FPGA)
+    platform. The specified platforms must have
+    been previously built.
+
+*`install`*::
+    Prepare the OpenCPI installation for using the named
+    RCC or HDL platform or simulator.
+
+NOUNS
+-----
+The nouns supported by *`ocpiadmin`* are:
+
+*`platform`*::
+    A particular type of processing hardware and/or software that
+    can host a container for executing OpenCPI workers. 
+
+OPTIONS
+-------
+There are currently no options to *`ocpiadmin`* verbs.
+
+OPERATIONS
+----------
+The command syntax for the *`install platform`* operation is:
+
+*`ocpiadmin install platform`* '<platform>'
+
+where '<platform>' is the name of an RCC platform, HDL platform or HDL simulator
+to be built for OpenCPI. The operation downloads
+the platform's 'OpenCPI Platform System support Project' (its 'OSP') if necessary and then builds the
+built-in projects for the specified platform. If the specified platform is
+an HDL platform, the operation also builds a single test artifact/bitstream:
+the *`testbias`* assembly in the *`assets`* project. After
+the operation is performed, any asset in any project can be
+built for the specified platform.
+
+The command syntax for the *`deploy platform`* operation is:
+
+*`ocpiadmin deploy platform`* '<rcc-platform> <hdl-platform>'
+
+where '<rcc-platform>' and '<hdl-platform>' are the names of the
+software (RCC) and hardware/FPGA (HDL) platforms for which the bootable
+media should be created. The operation creates the directory
+*`cdk/`*'<hdl-platform>'*`/sdcard-`*'<rcc-platform>',
+whose contents can be copied to an SD card.
+
+Keywords for specifying platform names are given in tables in the
+'OpenCPI Installation Guide'.
+
+
+EXAMPLES
+--------
+. Build the Ettus USRP E310 (*`e31x`*) HDL platform for OpenCPI:
++
+-------------------------------
+ocpiadmin install platform e31x
+-------------------------------
++
+. Build the Analog Devices Pluto Linux 0.31 (*`adi_plutosdr0_31`*)
+embedded software (RCC) platform for OpenCPI:
++
+-------------------------------------------
+ocpiadmin install platform adi_plutosdr0_31
+-------------------------------------------
++
+. Create a bootable media directory tree
+for booting the RCC platform *`xilinx_19_2_aarch32`* on
+the HDL platform *`zed`*. This operation creates the
+directory *`cdk/zed/sdcard-xilinx_19_2_aarch32/`*,
+whose contents can be copied to an SD card:
++
+-------------------------------------------------
+ocpiadmin deploy platform xilinx_19_2_aarch32 zed
+-------------------------------------------------
+
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
