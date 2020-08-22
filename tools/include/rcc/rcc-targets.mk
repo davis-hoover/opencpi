@@ -79,7 +79,6 @@ $(info RccAllPlatforms="$(sort $(RccAllPlatforms))";\
        RccTargets="$(sort $(RccTargets))";\
        $(foreach p,$(sort $(RccAllPlatforms)),\
          $(if $(RccTarget_$p),RccTarget_$p="$(RccTarget_$p)";\
-		 RccPlatDir_$p="$(realpath $(call OcpiGetRccPlatformDir,$p))";))\
-       export OCPI_ALL_RCC_PLATFORMS="$(RccAllPlatforms)";)
+		 RccPlatDir_$p="$(realpath $(call OcpiGetRccPlatformDir,$p))";)))
 endif
 endif # end of the info not being set

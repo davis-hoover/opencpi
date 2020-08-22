@@ -327,7 +327,6 @@ $(info HdlTopTargets="$(HdlTopTargets)";\
          HdlFamily_$(HdlPart_$p)=$(call HdlGetFamily,$(HdlPart_$p));)\
        $(foreach p,$(HdlAllPlatforms),\
          $(- only use realpath if its there.  If not we are bootstrapping and leave it alone)\
-         HdlPlatformDir_$(p)="$(or $(realpath $(HdlPlatformDir_$p)),$(HdlPlatformDir_$p))";)\
-       export OCPI_ALL_HDL_PLATFORMS="$(HdlAllPlatforms)";)
+         HdlPlatformDir_$(p)="$(or $(realpath $(HdlPlatformDir_$p)),$(HdlPlatformDir_$p))";))
 endif
 endif
