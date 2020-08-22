@@ -2,7 +2,7 @@ build-rcc:centos7:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /build-rcc/* /build-primitives-core/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /build-rcc/* /build-primitives-core/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -45,7 +45,7 @@ test:centos7:assets:base_comps:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -68,7 +68,7 @@ test:centos7:assets:comms_comps:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -91,7 +91,7 @@ test:centos7:assets:dsp_comps:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -114,7 +114,7 @@ test:centos7:assets:misc_comps:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -137,7 +137,7 @@ test:centos7:assets:util_comps:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -160,7 +160,7 @@ test:centos7:assets_ts:components:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -183,7 +183,7 @@ test:centos7:core:components:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -206,7 +206,7 @@ test:centos7:inactive:components:xilinx13_3:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_3.tar.gz *centos7.tar.gz -e /test/* /deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e

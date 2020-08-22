@@ -222,8 +222,9 @@ def make_job(stage, stages, platform,
     Returns:
         Job namedtuples
     """
-    before_script = make_before_script(stage, stages, platform, 
-                                       linked_platform)
+    before_script = make_before_script(stage, stages, platform,
+                                       host_platform=host_platform, 
+                                       linked_platform=linked_platform)
     script = make_script(stage, platform, project=project, library=library, 
                          linked_platform=linked_platform)
     after_script = make_after_script()
@@ -326,7 +327,8 @@ def make_after_script():
     """
     pipeline_id = '"$CI_PIPELINE_ID"'
     job_name = '"$CI_JOB_NAME"'
-    upload_cmd = ' '.join(['if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload',
+    upload_cmd = ' '.join(['if [ ! -f ".success" ];', 
+                           'then .gitlab-ci/scripts/ci_artifacts.py upload',
                            pipeline_id, job_name,
                            '-t "failed-job"; fi'])
 
