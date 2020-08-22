@@ -59,14 +59,16 @@ cd $OCPI_CDK_DIR
 sd=$hdl_platform/sdcard-$rcc_platform
 rm $verbose -rf $sd
 mkdir $verbose -p $sd/opencpi
-# Add a proper first "release" argument when we have that file in the source tree
+
 # FIXME: the release tag needs to be set from a reference location
 # rather than hard-coded in each place where it is used.
 if [ "$verbose" ]
 then
   echo "Release is \"opencpi-v2.0.0 $rcc_platform $hdl_platform\"."
 fi
-echo opencpi-v2.0.0 $rcc_platform $hdl_platform  > $sd/opencpi/release
+
+source "$OCPI_CDK_DIR/VERSION"
+echo "opencpi-$OCPI_RELEASE $rcc_platform $hdl_platform"  > $sd/opencpi/release
 
 ####################################################################################################
 # Prepare the "boot" or SD root directory from various sources.  These are not OpenCPI files.
