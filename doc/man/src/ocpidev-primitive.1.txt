@@ -41,7 +41,7 @@ An HDL primitive is described by its *`Makefile`* and its source
 and binary forms, but does not have an XML definition.
 
 In a project, an HDL primitive resides in its own directory '<name>' in the
-*`/hdl/primitives/`* subdirectory. An HDL primitive cannot have the same
+*`hdl/primitives/`* subdirectory. An HDL primitive cannot have the same
 name as a worker. The directory contains the HDL primitive *`Makefile`* and
 its source code (Verilog or VHDL, with possible pre-built files
 for HDL primitive cores). The *`ocpidev create`* operation for an HDL primitive
@@ -49,7 +49,7 @@ creates an initial version of the *`Makefile`* that can then be edited as
 necessary to implement the HDL primitive.
 
 The *`ocpidev build`* operation generates the exportable
-results in a *`/lib`* subdirectory. The *`ocpidev clean`* operation
+results in a *`lib/`* subdirectory. The *`ocpidev clean`* operation
 removes this subdirectory and the generated results.
 
 For details on how to develop an HDL primitive, see the chapter
@@ -218,6 +218,7 @@ link:ocpidev-build.1.html[ocpidev-build(1)]
 link:ocpidev-clean.1.html[ocpidev-clean(1)]
 link:ocpidev-create.1.html[ocpidev-create(1)]
 link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-device.1.html[ocpidev-device(1)]
 link:ocpidev-library.1.html[ocpidev-library(1)]
 link:ocpidev-platform.1.html[ocpidev-platform(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]

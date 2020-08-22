@@ -23,10 +23,11 @@ as an OpenCPI 'container' (runtime environment) for
 An HDL platform is described by an OpenCPI HDL Platform Description (OHPD),
 which is an XML file that specifies:
 
-- The worker description file (OWD) for the 'HDL platform worker', which
-is a special type of device worker that contains the logic for running the HDL platform
+- The OpenCPI Worker Description (OWD) for the 'HDL platform worker', which
+is a special type of 'HDL device worker' that contains the logic for running the HDL platform
 
-- The devices that are attached to the HDL platform and are available for use
+- The devices (controlled by HDL device workers) that are attached to
+the HDL platform and are available for use
 
 In a project, an HDL platform resides in its own directory '<name>' (which is
 usually the lowercase version of the name used by the platform's vendor)
@@ -40,7 +41,7 @@ initial versions of these files that can then be edited as necessary.
 
 An HDL platform directory can also optionally contain:
 
-- Device workers that are unique to the HDL platform, in a *`devices/`* library
+- HDL device workers that are unique to the HDL platform, in a *`devices/`* library
 
 - XML files that specify different configurations of the devices
 that are available on the HDL platform, called 'platform configuration files'
@@ -51,7 +52,7 @@ instead of the default configuration for the platfor
 - File(s) that specify vendor tool build-time options
 
 The *`ocpidev build`* operation generates exported files that enable HDL
-assemblies to be built for the platform and a *`/lib`* subdirectory
+assemblies to be built for the platform and a *`lib/`* subdirectory
 that contains links to the files that are necessary for other OpenCPI
 assets to use the platform. Note that building a OpenCPI platform (whether
 HDL or RCC) is usually done at installation time because a platform
@@ -65,7 +66,7 @@ and other HDL assets, see the chapter "Building HDL Assets" in the
 
 For information on developing an HDL platform, including structure and syntax
 descriptions of HDL platform/platform worker and HDL platform configuration XML
-files and how to develop a device worker, see the section "Enabling Execution for
+files and how to develop an HDL device worker, see the section "Enabling Execution for
 FPGA Platforms" in the 'OpenCPI Platform Development Guide'.
 
 Verbs that can operate on an HDL platform are:
@@ -101,12 +102,12 @@ The syntax is:
 The verbs that can be performed on the *`hdl platforms`* noun are:
 
 *`build`*::
-    Build all of the HDL platforms in the project or the *`/hdl`*
-    subdirectory of the project [??Does it operate on the hdl subdirectory?], creating directories and files as required.
+    Build all of the HDL platforms in the project or the *`hdl/`*
+    subdirectory of the project, creating directories and files as required.
     
 *`clean`*::
     Remove all the generated and compiled files from all HDL platforms
-    in the project or the *`/hdl`* subdirectory of the project [correct?].
+    in the project or the *`hdl/`* subdirectory of the project.
 
 *`show`*::
     List all HDL platforms in all registered projects and the current project.
@@ -116,7 +117,7 @@ The verbs that can be performed on the *`hdl platforms`* noun are:
 *`utilization`*::
     Display FPGA resource usage information for all built HDL platforms
     in the project. The general-pupose options and the *`utilization`*
-    options [???all of them??] can be specified.
+    options can be specified.
 
 OPTIONS
 -------
@@ -182,7 +183,7 @@ Options When Deleting HDL Platforms
 Options When Building HDL Platforms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--hdl-target=`*'<target>'+::
-    Build the HDL platform(s) for the specified HDL target. If only HDL targets
+    Build the HDL platform(s) for the specified HDL architecture. If only HDL targets
     are specified (and no HDL platforms), containers are not built.
 
 *`--hdl-platform=`*'<hdl-platform>'+::
@@ -301,7 +302,7 @@ ocpidev show hdl platforms
 --------------------------
 +
 . Inside the project (from the top level of the
-*`/hdl/platforms/`* directory), display information
+*`hdl/platforms/`* directory), display information
 about FPGA resource use by the *`myplatform`* HDL platform:
 +
 -------------------------------------------
@@ -309,7 +310,7 @@ ocpidev utilization hdl platform myplatform
 -------------------------------------------
 +
 . Inside the project (from the top level of the
-*`/hdl/platforms/`* directory), display information
+*`hdl/platforms/`* directory), display information
 about FPGA resource use by the HDL platforms in the project:
 +
 --------------------------------
@@ -332,11 +333,14 @@ link:ocpidev.1.html[ocpidev(1)]
 link:ocpidev-application.1.html[ocpidev-application(1)]
 link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
 link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-card.1.html[ocpidev-card(1)]
 link:ocpidev-create.1.html[ocpidev-create(1)]
 link:ocpidev-clean.1.html[ocpidev-clean(1)]
 link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-device.1.html[ocpidev-device(1)]
 link:ocpidev-library.1.html[ocpidev-library(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-slot.1.html[ocpidev-slot(1)]
 link:ocpidev-show.1.html[ocpidev-show(1)]
 link:ocpidev-worker.1.html[ocpidev-worker(1)]
 link:ocpidev-utilization.1.html[ocpidev-utilization(1)]

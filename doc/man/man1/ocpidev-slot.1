@@ -1,12 +1,12 @@
 .\"     Title: ocpidev-slot
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 07/14/2020
+.\"      Date: 07/27/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIDEV\-SLOT" "1" "07/14/2020" "\ \&" "\ \&"
+.TH "OCPIDEV\-SLOT" "1" "07/27/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -33,45 +33,59 @@ ocpidev-slot \- manage an OpenCPI HDL slot\&.
 \fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl slot\fR \fI<name>\fR
 .SH "DESCRIPTION"
 .sp
-The \fBhdl slot\fR noun represents an OpenCPI HDL slot, which describes XXXXXXX TBD FOR HDL SLOT XXXXX\&.
+The \fBhdl slot\fR noun represents an OpenCPI HDL slot, which defines an integral part of an HDL platform that enables an \fIHDL card\fR to be plugged in so that its attached devices are accessible to the platform\&. An HDL platform has defined slot types; HDL cards that are designed for the same slot type can be plugged in to the defined slots on the platform\&.
 .sp
-An HDL slot is described by XXXXXXXX\&.
+An HDL slot is described by an OpenCPI HDL slot type definition, which is an XML file that defines the signal connections to the pins of the connectors associated with the slot type and provides an (optional) name for the slot type that can be used in HDL Platform Descriptions (OHPDs) and HDL card definitions\&. OpenCPI provides HDL slot definitions for a number of standard slot types, like the FMC (FPGA Mezzanine Card), which is defined by the by the VITA standards organization as VITA\-57\&.1\&. Defining a new slot type for use in OpenCPI consists of creating an HDL slot type definition from the information given in the standard document for the slot; writing HDL code to support an HDL slot is not normally necessary\&. For more information about the XML structure of an HDL slot type definition and how it relates to HDL platforms, devices and cards, see the section "Slots \- How Cards Plug into Platforms" in the \fIOpenCPI Platform Development Guide\fR\&.
 .sp
-\-\-\-\-BELOW TO BE UPDATED FOR HDL SLOT \-\-\-\-\-\-\-\-\-\- an OpenCPI Protocol Specification (OPS), which is an XML file that describes the set of messages defined in the protocol, as well as some top\-level attributes for the protocol\&. \fIOperation\fR elements in the OPS describe the messages that can be used, while \fIargument\fR elements describe the individual fields of a message\&. A protocol is specified in the \fIport\fR element of a component spec (OCS)\&. In a connection between component ports, the specs of both ports, in their port elements, refer to the same OPS\&. At present, a protocol consists of only the OPS XML file\&.
+An HDL slot is named \fI<name>\fR\fB\&.xml\fR, where \fI<name>\fR must be a name that can be used in programming languages (uses underscores rather than hyphens) but is otherwise case insensitive\&. The HDL slot name should normally be the exact name used in the standard document that defines the slot type\&.
 .sp
-For more information about a protocol\(cqs XML structure, see the chapter "Protocol Specifications" in the \fIOpenCPI Component Development Guide\fR\&.
+In a project, an HDL slot resides in one of the following locations depending on its intended use:
 .sp
-In a project, a protocol resides in a \fBspecs/\fR directory located either in a component library or at the top level of a project and is named \fI<name>\fR\fB\-prot\&.xml\fR\&. Note that protocols with older naming formats like \fI<name>\fR\fB_protocol\&.xml\fR and \fI<name>\fR\fB\-protocol\&.xml\fR also exist; for example, some of the protocols in the built\-in OpenCPI \fBcore\fR project (\fB\&.\&./projects/core/specs/\fR) use these formats\&.
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/cards/specs/\fR
+when the HDL slot is platform\-independent
+.RE
 .sp
-Verbs that can operate on a protocol are:
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/platforms/\fR\fI<platform>\fR\fB/devices/specs/\fR
+when the HDL slot is platform\-specific
+.RE
+.sp
+OpenCPI\-defined HDL slots are located in the subdirectory \fBhdl/cards/specs/\fR in the OpenCPI built\-in \fBcore\fR project\&.
+.sp
+Verbs that can operate on an HDL slot are:
 .PP
 \fBcreate\fR
 .RS 4
-Create the named protocol according to the specified options, creating directories and files as required\&.
+Create the named HDL slot according to the specified options, creating directories and files as required\&.
 .RE
 .PP
 \fBdelete\fR
 .RS 4
-Remove all files associated with the named protocol\&.
+Remove all files associated with the named HDL slot\&.
 .RE
+.sp
+The \fBcreate\fR operation creates an initial HDL slot type definition XML file that can be edited as necessary to define the slot type\&.
 .SH "OPTIONS"
 .sp
 In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
-.SS "Options That Apply to All Operations (Verbs) on Protocols"
-.PP
-\fB\-\-hdl\-library=\fR\fI<hdl\-library>\fR
-.RS 4
-Specify the HDL library in which to operate on the protocol\&. HDL libraries exist underneath the
-\fBhdl/\fR
-directory located at the top level of a project\&.
-.RE
-.PP
-\fB\-\-library=\fR\fI<component\-library>\fR, \fB\-l\fR \fI<component\-library>\fR
-.RS 4
-Specify the component library in which to operate on the protocol\&. When a project contains multiple component libraries, this option can be used to specify one of them\&. Multiple component libraries are located underneath the
-\fBcomponents\fR
-directory at the top level of a project\&.
-.RE
+.SS "Options That Apply to All Operations (Verbs) on HDL Slots"
 .PP
 \fB\-d\fR \fI<directory>\fR
 .RS 4
@@ -86,29 +100,20 @@ command\&.
 .RS 4
 Describe what is happening in command execution in more detail\&.
 .RE
-.SS "Options When Creating and Deleting Protocols"
+.SS "Options When Creating HDL Slots"
 .PP
-\fB\-p\fR
+\fB\-P\fR \fI<hdl\-platform>\fR
 .RS 4
-Specify that the protocol is to be created in or deleted from the
-\fBspecs/\fR
-directory of the project instead of the
-\fBspecs/\fR
-directory of a component library\&. The
-\fB\-l\fR
-and
-\fB\-p\fR
-options specify the location of the protocol\&. When neither one of these options is used, the location is the
-\fBcomponents\fR
-library and thus is an error if other component libraries exist\&.
+Specify that the HDL slot being created is a platform\-specific HDL slot to be created in the
+\fBdevices/specs/\fR
+subdirectory in the specified HDL platform in the project\&.
 .RE
-.SS "Options When Creating Protocols"
 .PP
 \fB\-k\fR
 .RS 4
-Keep files and directories created after a protocol creation fails\&. Normally, all such files and directories are removed on any failure\&.
+Keep files and directories created after an HDL slot creation fails\&. Normally, all such files and directories are removed on any failure\&.
 .RE
-.SS "Options When Deleting Protocols"
+.SS "Options When Deleting HDL Slots"
 .PP
 \fB\-f\fR
 .RS 4
@@ -124,15 +129,17 @@ Force deletion: do not ask for confirmation when deleting a protocol\&. Normally
 .sp -1
 .IP "  1." 4.2
 .\}
-Create a protocol spec with the name
-\fBmyprotocol\fR\&. The protocol spec will be placed in the default location
-\fBcomponents/specs/\fR:
+At the top level of the project, create an HDL slot with the name
+\fBmyslot\fR\&. The HDL slot definition named
+\fBmyslot\&.xml\fR
+will be placed in the subdirectory
+\fBhdl/cards/specs/\fR:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpidev create protocol myprotocol
+ocpidev create hdl slot myslot
 .fi
 .if n \{\
 .RE
@@ -147,22 +154,19 @@ ocpidev create protocol myprotocol
 .sp -1
 .IP "  2." 4.2
 .\}
-Create a protocol named
-\fBmyprotocol\fR
-in the component library named
-\fBmyutilcomps\fR\&. The protocol spec will be placed in the
-\fBspecs\fR
-directory in
-\fBmyutilcomps\fR
-sublibrary within the
-\fBcomponents\fR
-library (\fBcomponents/myutilcomps/specs/\fR):
+At the top level of the project, create an HDL slot with the name
+\fBmyslot\fR
+for the platform
+\fBmyplatform\fR\&. The HDL slot definition named
+\fBmyslot\&.xml\fR
+will be placed in the subdirectory
+\fBplatforms/myplatform/hdl/devices/specs/\fR:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpidev create protocol myprotocol \-l myutilcomps
+ocpidev create hdl slot myslot \-P myplatform
 .fi
 .if n \{\
 .RE
@@ -177,45 +181,17 @@ ocpidev create protocol myprotocol \-l myutilcomps
 .sp -1
 .IP "  3." 4.2
 .\}
-Inside the project
-\fBMyProject\fR, create a protocol spec with the name
-\fBmyprotocol\fR
-in the project\(cqs
-\fBspecs/\fR
-directory\&. The protocol spec will be placed in
-\fBMyProject/specs/\fR:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-ocpidev create protocol myprotocol \-p
-.fi
-.if n \{\
-.RE
-.\}
-.RE
-.sp
-.RS 4
-.ie n \{\
-\h'-04' 4.\h'+01'\c
-.\}
-.el \{\
-.sp -1
-.IP "  4." 4.2
-.\}
-Delete a protocol named
-\fBMyAdapterProtocol\fR
+Inside the project, delete an HDL slot definition named
+\fBmyslot\&.xml\fR
 from a project\(cqs
-\fBadapters\fR
-library (deletes it from
-\fBhdl/adapters/specs/\fR):
+\fBhdl/cards/specs/\fR
+subdirectory:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpidev delete protocol MyAdapterProtocol \-\-hdl\-library=adapters
+ocpidev delete hdl slot myslot
 .fi
 .if n \{\
 .RE
@@ -229,7 +205,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpidev(1) ocpidev\-application(1) ocpidev\-component(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-library(1) ocpidev\-project(1)
+ocpidev(1) ocpidev\-card(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-device(1) ocpidev\-platform(1) ocpidev\-project(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

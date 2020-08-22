@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidriver</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140640994356064"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidriver — command-line utility for managing the OpenCPI loadable Linux kernel module driver</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidriver</code></strong></span> <span class="emphasis"><em>&lt;verb&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpidriver(1)</code></strong></span> tool controls the OpenCPI Linux kernel module driver
+on an <span class="emphasis"><em>OpenCPI system</em></span>:
+a collection of processors that can be used together as resources for
+running OpenCPI applications. Whether or not the Linux kernel module
+driver is required depends on the <span class="emphasis"><em>platforms</em></span> (processors and their
+directly-connected hardware) enabled for use by OpenCPI during
+application execution and the <span class="emphasis"><em>interconnect</em></span> technology that wires them
+together: the driver is necessary for access by OpenCPI to platforms
+connected to a system bus (such as PCI-Express or
+the Zynq FPGA subsystem) but is not needed on systems that do
+not have such a bus or fabric. Developers use the <span class="strong"><strong><code class="literal">ocpidriver</code></strong></span> tool
+to load and control the driver when it is required for running OpenCPI on a system.</p><p>The OpenCPI Linux kernel module driver uses DMA memory for communication
+with platforms via the system bus. By default, Linux allocates
+128KB of DMA memory for the OpenCPI Linux kernel module driver.
+The OpenCPI "getting started guides" for the relevant platforms
+attached to the system bus (for example,
+the <span class="emphasis"><em>ML605 Getting Started Guide</em></span> and the <span class="emphasis"><em>Alst4 Getting Started Guide</em></span>)
+describe how to reserve additional DMA memory for the driver
+when OpenCPI applications require it.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>The verbs supported by <span class="strong"><strong><code class="literal">ocpidriver</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">load</code></strong></span>
+</span></dt><dd>
+    Load an OpenCPI Linux kernel module driver to a system.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">reload</code></strong></span>
+</span></dt><dd>
+    Remove an OpenCPI Linux kernel module driver from a system and then load it.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">status</code></strong></span>
+</span></dt><dd>
+    Get the status of an OpenCPI Linux kernel module driver on a system.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">unload</code></strong></span>
+</span></dt><dd>
+    Remove an OpenCPI Linux kernel module driver from a system.
+</dd></dl></div><p>Performing these operations requires <span class="strong"><strong><code class="literal">root</code></strong></span>/<span class="strong"><strong><code class="literal">sudo</code></strong></span> privileges.</p></div><div class="refsect1"><a id="_nouns"></a><h2>NOUNS</h2><p>None.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>None.</p></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Using the <span class="strong"><strong><code class="literal">root</code></strong></span> account, load the OpenCPI Linux kernel module driver
+on a system that has the Altera Stratix IV (<span class="strong"><strong><code class="literal">alst4</code></strong></span>) and Xilinx (<span class="strong"><strong><code class="literal">ml605</code></strong></span>) PCI-Express
+platforms installed and which has reserved an additional 128KB of DMA memory for the driver:
+</p><pre class="screen">ocpidriver load</pre><p class="simpara">On success, the tool generates the following message:</p><pre class="screen">Found generic reserved DMA memory on the linux boot command line
+and assuming it is for OpenCPI: [memmap=128M$0x1000000]
+Driver loaded successfully.</pre><p class="simpara">Now perform the command:</p><pre class="screen">ocpirun --list</pre><p class="simpara">The output from the command is:</p><pre class="screen">Available containers:
+   #  Model Platform   OS    OS-Version   Arch   Name
+   0  hdl   ml605                                PCI:0000:08:00.0
+   1  hdl   alst4                                PCI:0000:03:00.0
+   2  rcc   centos7    linux c7           x86_64 rcc0</pre></li><li class="listitem"><p class="simpara">
+Unload the OpenCPI Linux kernel module driver:
+</p><pre class="screen">ocpidriver unload</pre><p class="simpara">On success, the tool returns the message:</p><pre class="screen">The driver module was successfully unloaded.</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
+<a class="ulink" href="ocpidev-card.1.html" target="_top">ocpidev-card(1)</a>
+<a class="ulink" href="ocpidev-platform.1.html" target="_top">ocpidev-platform(1)</a>
+<a class="ulink" href="ocpidev-slot.1.html" target="_top">ocpidev-slot(1)</a>
+<a class="ulink" href="ocpirun.1.html" target="_top">ocpirun(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

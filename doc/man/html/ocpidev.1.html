@@ -1,142 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140659911365008"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev — command-line tool for managing OpenCPI assets.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong>ocpidev</strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> [<span class="emphasis"><em>&lt;noun&gt;</em></span> [<span class="emphasis"><em>&lt;name&gt;</em></span> ]]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpidev(1)</code></strong></span> command line tool is used to perform various development-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140229134924832"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev — command-line tool for managing OpenCPI assets</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> [<span class="emphasis"><em>&lt;noun&gt;</em></span> [<span class="emphasis"><em>&lt;name&gt;</em></span> ]]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpidev(1)</code></strong></span> command-line tool is used to perform various development-
 related tasks inside projects as well as retrieve information about
 the environment. When used in projects, it can be invoked at the top
 level of the project or in lower-level directories of the project as
 appropriate to the particular command being used. The <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> command
 has full tab completion for its options and arguments.</p><p>Options can occur anywhere in the command for the user’s convenience.
 The general usage concept is: perform the <span class="emphasis"><em>&lt;verb&gt;</em></span> operation on the
-<span class="emphasis"><em>&lt;noun&gt;</em></span> asset type whose name is <span class="emphasis"><em>&lt;name&gt;</em></span>.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>The verbs supported by <span class="strong"><strong>ocpidev</strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
-<span class="strong"><strong>build</strong></span>
+<span class="emphasis"><em>&lt;noun&gt;</em></span> asset type whose name is <span class="emphasis"><em>&lt;name&gt;</em></span>.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>The verbs supported by <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">build</code></strong></span>
 </span></dt><dd>
     Build the asset(s), running appropriate tools to create
     the binary files.
 </dd><dt><span class="term">
-<span class="strong"><strong>clean</strong></span>
+<span class="strong"><strong><code class="literal">clean</code></strong></span>
 </span></dt><dd>
     Remove all the generated and compiled files for the assets.
 </dd><dt><span class="term">
-<span class="strong"><strong>create</strong></span>
+<span class="strong"><strong><code class="literal">create</code></strong></span>
 </span></dt><dd>
     Create the named asset, creating files and directories as required,
     and creating any skeleton files for future editing.
 </dd><dt><span class="term">
-<span class="strong"><strong>delete</strong></span>
+<span class="strong"><strong><code class="literal">delete</code></strong></span>
 </span></dt><dd>
     Remove all directories and files associated with the named asset.
 </dd><dt><span class="term">
-<span class="strong"><strong>refresh</strong></span>
+<span class="strong"><strong><code class="literal">refresh</code></strong></span>
 </span></dt><dd>
     Manually regenerate the metadata associated with the project.
 </dd><dt><span class="term">
-<span class="strong"><strong>run</strong></span>
+<span class="strong"><strong><code class="literal">run</code></strong></span>
 </span></dt><dd>
     Execute the unit test or application.
 </dd><dt><span class="term">
-<span class="strong"><strong>show</strong></span>
+<span class="strong"><strong><code class="literal">show</code></strong></span>
 </span></dt><dd>
     Display information about assets in registered projects
     and the current build environment (preliminary).
 </dd><dt><span class="term">
-<span class="strong"><strong>register</strong></span>, <span class="strong"><strong>unregister</strong></span>
+<span class="strong"><strong><code class="literal">register</code></strong></span>, <span class="strong"><strong><code class="literal">unregister</code></strong></span>
 </span></dt><dd>
     Register/unregister a project in its registry.
 </dd><dt><span class="term">
-<span class="strong"><strong>set</strong></span>, <span class="strong"><strong>unset</strong></span>
+<span class="strong"><strong><code class="literal">set</code></strong></span>, <span class="strong"><strong><code class="literal">unset</code></strong></span>
 </span></dt><dd>
     Set/unset the registry used by the current project.
 </dd><dt><span class="term">
-<span class="strong"><strong>utilization</strong></span>
+<span class="strong"><strong><code class="literal">utilization</code></strong></span>
 </span></dt><dd>
     Display or record FPGA resource use for HDL OpenCPI assets.
-</dd></dl></div></div><div class="refsect1"><a id="_nouns"></a><h2>NOUNS</h2><p>The assets (nouns) supported by <span class="strong"><strong>ocpidev</strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
-<span class="strong"><strong>application</strong></span>
+</dd></dl></div></div><div class="refsect1"><a id="_nouns"></a><h2>NOUNS</h2><p>The assets (nouns) supported by <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">application</code></strong></span>
 </span></dt><dd>
     A component application, specified in either XML or C++.
 </dd><dt><span class="term">
-<span class="strong"><strong>applications</strong></span>
+<span class="strong"><strong><code class="literal">applications</code></strong></span>
 </span></dt><dd>
     All applications in a project’s <span class="strong"><strong>applications</strong></span> directory.
 </dd><dt><span class="term">
-<span class="strong"><strong>component</strong></span>
+<span class="strong"><strong><code class="literal">component</code></strong></span>
 </span></dt><dd>
     A component specification XML file (OCS) at a project or
     a library level.
 </dd><dt><span class="term">
-<span class="strong"><strong>library</strong></span>
+<span class="strong"><strong><code class="literal">library</code></strong></span>
 </span></dt><dd>
     A component library.
 </dd><dt><span class="term">
-<span class="strong"><strong>project</strong></span>
+<span class="strong"><strong><code class="literal">project</code></strong></span>
 </span></dt><dd>
     A project containing all other asset types.
 </dd><dt><span class="term">
-<span class="strong"><strong>properties</strong></span>
+<span class="strong"><strong><code class="literal">properties</code></strong></span>
 </span></dt><dd>
     A properties XML file at a project or a library level.
 </dd><dt><span class="term">
-<span class="strong"><strong>protocol</strong></span>
+<span class="strong"><strong><code class="literal">protocol</code></strong></span>
 </span></dt><dd>
     A protocol specification XML file (OPS) at a project or
     a library level.
 </dd><dt><span class="term">
-<span class="strong"><strong>registry</strong></span>
+<span class="strong"><strong><code class="literal">registry</code></strong></span>
 </span></dt><dd>
     A registry for projects to import/export dependencies from/to.
 </dd><dt><span class="term">
-<span class="strong"><strong>test</strong></span>
+<span class="strong"><strong><code class="literal">test</code></strong></span>
 </span></dt><dd>
     A unit test suite for a component specification.
 </dd><dt><span class="term">
-<span class="strong"><strong>worker</strong></span>
+<span class="strong"><strong><code class="literal">worker</code></strong></span>
 </span></dt><dd>
     A worker that implements a component specification.
-</dd></dl></div><p>Note that the assets <span class="strong"><strong>application</strong></span>, <span class="strong"><strong>applications</strong></span>, <span class="strong"><strong>library</strong></span>,
-<span class="strong"><strong>project</strong></span> and <span class="strong"><strong>registry</strong></span> do not reside in libraries. The assets
-<span class="strong"><strong>properties</strong></span>, <span class="strong"><strong>protocol</strong></span>, <span class="strong"><strong>component</strong></span>, <span class="strong"><strong>test</strong></span> and <span class="strong"><strong>worker</strong></span>
-are in libraries.</p><p>The HDL-specific assets (located under the <span class="strong"><strong>hdl</strong></span> subdirectory
-supported by <span class="strong"><strong>ocpidev</strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
-<span class="strong"><strong>hdl assembly</strong></span>
+</dd></dl></div><p>Note that the assets <span class="strong"><strong><code class="literal">application</code></strong></span>, <span class="strong"><strong><code class="literal">applications</code></strong></span>, <span class="strong"><strong><code class="literal">library</code></strong></span>,
+<span class="strong"><strong><code class="literal">project</code></strong></span> and <span class="strong"><strong><code class="literal">registry</code></strong></span> do not reside in libraries. The assets
+<span class="strong"><strong><code class="literal">properties</code></strong></span>, <span class="strong"><strong><code class="literal">protocol</code></strong></span>, <span class="strong"><strong><code class="literal">component</code></strong></span>, <span class="strong"><strong><code class="literal">test</code></strong></span> and <span class="strong"><strong><code class="literal">worker</code></strong></span>
+reside in libraries.</p><p>The HDL-specific assets (located under the <span class="strong"><strong><code class="literal">hdl/</code></strong></span> subdirectory
+supported by <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">hdl assembly</code></strong></span>
 </span></dt><dd>
     An assembly of HDL workers used to build HDL containers.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl assemblies</strong></span>
+<span class="strong"><strong><code class="literal">hdl assemblies</code></strong></span>
 </span></dt><dd>
     All the assemblies in a project or in an HDL assemblies
     directory.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl card</strong></span>
+<span class="strong"><strong><code class="literal">hdl card</code></strong></span>
 </span></dt><dd>
     A card specification XML file at a project level or
     an HDL library level.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl device</strong></span>
+<span class="strong"><strong><code class="literal">hdl device</code></strong></span>
 </span></dt><dd>
     An HDL device worker in an HDL component library
-    (<span class="strong"><strong>adapters</strong></span>, <span class="strong"><strong>cards</strong></span>, <span class="strong"><strong>devices</strong></span> or an HDL platform’s
-    <span class="strong"><strong>devices</strong></span>).
+    (<span class="strong"><strong><code class="literal">adapters/</code></strong></span>, <span class="strong"><strong><code class="literal">cards/</code></strong></span>, <span class="strong"><strong><code class="literal">devices/</code></strong></span> or an HDL platform’s
+    <span class="strong"><strong><code class="literal">devices/</code></strong></span>).
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl platform</strong></span>
+<span class="strong"><strong><code class="literal">hdl platform</code></strong></span>
 </span></dt><dd>
-    An HDL platform worker in an HDL platforms diretory,
+    An HDL platform worker in an HDL <span class="strong"><strong><code class="literal">platforms/</code></strong></span> directory,
     including its platform configurations.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl platforms</strong></span>
+<span class="strong"><strong><code class="literal">hdl platforms</code></strong></span>
 </span></dt><dd>
     All HDL platforms in a project or in a project’s
-    <span class="strong"><strong>hdl/platforms</strong></span> directory.
+    <span class="strong"><strong><code class="literal">hdl/platforms/</code></strong></span> directory.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl primitive core</strong></span>
+<span class="strong"><strong><code class="literal">hdl primitive core</code></strong></span>
 </span></dt><dd>
     An HDL primitive core in a project or in a project’s
-    <span class="strong"><strong>hdl/primitives</strong></span> directory.
+    <span class="strong"><strong><code class="literal">hdl/primitives/</code></strong></span> directory.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl primitive library</strong></span>
+<span class="strong"><strong><code class="literal">hdl primitive library</code></strong></span>
 </span></dt><dd>
     An HDL primitive library in a project or in a project’s
-    <span class="strong"><strong>hdl/primitives</strong></span> directory.
+    <span class="strong"><strong><code class="literal">hdl/primitives/</code></strong></span> directory.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl primitives</strong></span>
+<span class="strong"><strong><code class="literal">hdl primitives</code></strong></span>
 </span></dt><dd>
     All HDL primitives (cores or libraries) in a project.
 </dd><dt><span class="term">
@@ -145,24 +145,24 @@ supported by <span class="strong"><strong>ocpidev</strong></span> are:</p><div c
     A signals specification XML file at a project level or
     an HDL library level.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl slot</strong></span>
+<span class="strong"><strong><code class="literal">hdl slot</code></strong></span>
 </span></dt><dd>
-    A slot type specification XML file at the project level or
+    A slot type definition XML file at the project level or
     the HDL library level.
 </dd><dt><span class="term">
-<span class="strong"><strong>hdl subdevice</strong></span>
+<span class="strong"><strong><code class="literal">hdl subdevice</code></strong></span>
 </span></dt><dd>
     An HDL subdevice worker in an HDL devices library that
     supports other HDL device workers.
-</dd></dl></div><p>Note that the HDL assets <span class="strong"><strong>card</strong></span>, <span class="strong"><strong>device</strong></span> and <span class="strong"><strong>subdevice</strong></span> reside
-in one of the fixed HDL libraries in a project (<span class="strong"><strong><code class="literal">hdl/adapters</code></strong></span>,
-<span class="strong"><strong><code class="literal">hdl/cards</code></strong></span>, and <span class="strong"><strong><code class="literal">hdl/devices</code></strong></span>) or the <span class="strong"><strong><code class="literal">devices</code></strong></span> library
+</dd></dl></div><p>Note that the HDL assets <span class="strong"><strong><code class="literal">card</code></strong></span>, <span class="strong"><strong><code class="literal">device</code></strong></span> and <span class="strong"><strong><code class="literal">subdevice</code></strong></span> reside
+in one of the fixed HDL libraries in a project (<span class="strong"><strong><code class="literal">hdl/adapters/</code></strong></span>,
+<span class="strong"><strong><code class="literal">hdl/cards/</code></strong></span>, and <span class="strong"><strong><code class="literal">hdl/devices/</code></strong></span>) or the <span class="strong"><strong><code class="literal">devices/</code></strong></span> library
 within an HDL platform’s directory. The remaining HDL assets
 listed here do not reside in these libraries.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>Options are either single letters following one hyphen or complete
 words or acronyms following two hyphens and separated by hyphens.
 Most options are only valid for specific verbs or nouns. The
 general-purpose options are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
-<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>directory&gt;</em></span>
+<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>
 </span></dt><dd>
     Specify the directory in which this command should be run.
     Analogous to the <span class="strong"><strong>-C</strong></span> option in the POSIX <span class="strong"><strong>make</strong></span> command.
