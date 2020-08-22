@@ -70,9 +70,7 @@ function getvars {
   setVarsFromMake $OCPI_CDK_DIR/include/rcc/rcc-targets.mk ShellRccTargetsVars=1
   if [ $action = "deploy" ]
   then
-    # "OCPI_ALL_RCC_PLATFORMS" and "OCPI_ALL_HDL_PLATFORMS"
-    # are set and exported by "setVarsFromMake", and that
-    # is all we need for the "deploy" case.
+    export OCPI_ALL_RCC_PLATFORMS="$RccAllPlatforms" OCPI_ALL_HDL_PLATFORMS="$HdlAllPlatforms"
     return 0
   fi
   platforms="$RccAllPlatforms $HdlAllPlatforms"
