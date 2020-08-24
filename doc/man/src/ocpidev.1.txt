@@ -1,0 +1,216 @@
+OCPIDEV(1)
+==========
+
+
+NAME
+----
+ocpidev - command-line tool for managing OpenCPI assets
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' ['<noun>' ['<name>' ]]
+
+
+DESCRIPTION
+-----------
+The *`ocpidev(1)`* command-line tool is used to perform various development-
+related tasks inside projects as well as retrieve information about
+the environment. When used in projects, it can be invoked at the top
+level of the project or in lower-level directories of the project as
+appropriate to the particular command being used. The *`ocpidev`* command
+has full tab completion for its options and arguments.
+
+Options can occur anywhere in the command for the user's convenience.
+The general usage concept is: perform the '<verb>' operation on the
+'<noun>' asset type whose name is '<name>'.
+
+
+VERBS
+-----
+The verbs supported by *`ocpidev`* are:
+
+*`build`*::
+    Build the asset(s), running appropriate tools to create
+    the binary files.
+
+*`clean`*::
+    Remove all the generated and compiled files for the assets.
+
+*`create`*::
+    Create the named asset, creating files and directories as required,
+    and creating any skeleton files for future editing.
+
+*`delete`*::
+    Remove all directories and files associated with the named asset.
+
+*`refresh`*::
+    Manually regenerate the metadata associated with the project.
+
+*`run`*::
+    Execute the unit test or application.
+
+*`show`*::
+    Display information about assets in registered projects
+    and the current build environment (preliminary).  
+    
+*`register`*, *`unregister`*::
+    Register/unregister a project in its registry.
+
+*`set`*, *`unset`*::
+    Set/unset the registry used by the current project.
+
+*`utilization`*::
+    Display or record FPGA resource use for HDL OpenCPI assets.
+
+NOUNS
+-----
+The assets (nouns) supported by *`ocpidev`* are:
+
+*`application`*::
+    A component application, specified in either XML or C++.
+
+*`applications`*::
+    All applications in a project's *applications* directory.
+
+*`component`*::
+    A component specification XML file (OCS) at a project or
+    a library level.
+
+*`library`*::
+    A component library.
+
+*`project`*::
+    A project containing all other asset types.
+
+*`properties`*::
+    A properties XML file at a project or a library level.
+
+*`protocol`*::
+    A protocol specification XML file (OPS) at a project or
+    a library level.
+
+*`registry`*::
+    A registry for projects to import/export dependencies from/to.
+
+*`test`*::
+    A unit test suite for a component specification.
+
+*`worker`*::
+    A worker that implements a component specification.
+
+Note that the assets *`application`*, *`applications`*, *`library`*,
+*`project`* and *`registry`* do not reside in libraries. The assets
+*`properties`*, *`protocol`*, *`component`*, *`test`* and *`worker`*
+reside in libraries.
+
+The HDL-specific assets (located under the *`hdl/`* subdirectory
+supported by *`ocpidev`* are:
+
+*`hdl assembly`*::
+    An assembly of HDL workers used to build HDL containers.
+
+*`hdl assemblies`*::
+    All the assemblies in a project or in an HDL assemblies
+    directory.
+
+*`hdl card`*::
+    A card specification XML file at a project level or
+    an HDL library level.
+
+*`hdl device`*::
+    An HDL device worker in an HDL component library
+    (*`adapters/`*, *`cards/`*, *`devices/`* or an HDL platform's
+    *`devices/`*).
+
+*`hdl platform`*::
+    An HDL platform worker in an HDL *`platforms/`* directory,
+    including its platform configurations.
+
+*`hdl platforms`*::
+    All HDL platforms in a project or in a project's
+    *`hdl/platforms/`* directory.
+
+*`hdl primitive core`*::
+    An HDL primitive core in a project or in a project's
+    *`hdl/primitives/`* directory.
+
+*`hdl primitive library`*::
+    An HDL primitive library in a project or in a project's
+    *`hdl/primitives/`* directory.
+
+*`hdl primitives`*::
+    All HDL primitives (cores or libraries) in a project.
+
+*hdl signals*::
+    A signals specification XML file at a project level or
+    an HDL library level.
+
+*`hdl slot`*::
+    A slot type definition XML file at the project level or
+    the HDL library level.
+    
+*`hdl subdevice`*::
+    An HDL subdevice worker in an HDL devices library that
+    supports other HDL device workers.
+
+Note that the HDL assets *`card`*, *`device`* and *`subdevice`* reside
+in one of the fixed HDL libraries in a project (*`hdl/adapters/`*,
+*`hdl/cards/`*, and *`hdl/devices/`*) or the *`devices/`* library
+within an HDL platform's directory. The remaining HDL assets
+listed here do not reside in these libraries.
+
+
+OPTIONS
+-------
+Options are either single letters following one hyphen or complete
+words or acronyms following two hyphens and separated by hyphens.
+Most options are only valid for specific verbs or nouns. The
+general-purpose options are:
+
+*`-d`* '<directory>'::
+    Specify the directory in which this command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+    This option can be specified more than once on the command line.
+
+*`--help`*::
+    Display help information. This option can be used in conjunction with
+    a verb to display verb-specific information. For example:
+    *`ocpidev --help show`*.
+
+*`--verbose`*, *`-v`*::
+    Describe what is happening in command execution in more detail.
+
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-delete</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140464347982240"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-delete — delete OpenCPI assets</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong>ocpidev</strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="strong"><strong>delete</strong></span> <span class="emphasis"><em>&lt;noun&gt;</em></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">delete</code></strong></span> verb deletes OpenCPI assets from a
+project specified by the <span class="emphasis"><em>&lt;noun&gt;</em></span> argument that follows the verb.</p><p>Asset types to be specified in the <span class="emphasis"><em>&lt;noun&gt;</em></span> argument are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>application</strong></span>
+</span></dt><dd>
+    Delete an application.
+</dd><dt><span class="term">
+<span class="strong"><strong>hdl</strong></span>
+</span></dt><dd><p class="simpara">
+    A prefix to indicate an HDL asset in the <span class="strong"><strong>hdl</strong></span> subdirectory of a project.
+    Possible HDL assets are:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>assembly</strong></span>
+</span></dt><dd>
+        Delete an HDL assembly.
+</dd><dt><span class="term">
+<span class="strong"><strong>card</strong></span>
+</span></dt><dd>
+        Delete an HDL card definition.
+</dd><dt><span class="term">
+<span class="strong"><strong>device</strong></span>
+</span></dt><dd>
+        Create/delete an HDL device worker, possibly in a
+        specified platform.
+</dd><dt><span class="term">
+<span class="strong"><strong>platform</strong></span>
+</span></dt><dd>
+        Delete an HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong>primitive</strong></span>
+</span></dt><dd><p class="simpara">
+        Delete an HDL primitive. Possible primitive types are:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>core</strong></span>
+</span></dt><dd>
+            A single primitive module, perhaps presynthesized
+            (that is, from coregen or megawizard).
+</dd><dt><span class="term">
+<span class="strong"><strong>library</strong></span>
+</span></dt><dd>
+            A set of HDL primitive modules to use in workers as a library.
+</dd></dl></div></dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">slot</code></strong></span>
+</span></dt><dd>
+        Delete an HDL slot definition.
+</dd></dl></div></dd><dt><span class="term">
+<span class="strong"><strong>library</strong></span>
+</span></dt><dd>
+    Delete a component library.
+</dd><dt><span class="term">
+<span class="strong"><strong>project</strong></span>
+</span></dt><dd>
+    Delete a project which holds and organizes OpenCPI assets.
+</dd><dt><span class="term">
+<span class="strong"><strong>protocol</strong></span>
+</span></dt><dd>
+    Delete a protocol in a library or project.
+</dd><dt><span class="term">
+<span class="strong"><strong>registry</strong></span>
+</span></dt><dd>
+    Delete a registry that enables projects to depend on each other.
+</dd><dt><span class="term">
+<span class="strong"><strong>spec</strong></span>
+</span></dt><dd>
+    Delete a component specification in a library or project.
+</dd><dt><span class="term">
+<span class="strong"><strong>test</strong></span>
+</span></dt><dd>
+    Delete a component unit test in a library.
+</dd><dt><span class="term">
+<span class="strong"><strong>worker</strong></span>
+</span></dt><dd>
+    Delete a worker in a library.
+</dd></dl></div><p>All HDL assets should avoid having names that are Verilog or VHDL-
+reserved identifiers, such as <code class="literal">reg</code>, etc.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>The options for <span class="strong"><strong>delete</strong></span> are usually specific to the asset type
+that is being deleted. When deleting an asset, <span class="strong"><strong>ocpidev</strong></span> will
+ask for confirmation. You can override this with the <span class="strong"><strong>-f</strong></span> option
+to force deletion without confirmation.</p><p>In the option descriptions below, a plus sign (+) indicates that
+the option can be specified more than once on the command line.</p><div class="refsect2"><a id="_option_when_deleting_any_asset_type"></a><h3>Option When Deleting Any Asset Type</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>-f</strong></span>
+</span></dt><dd>
+    Force deletion: do not ask for confirmation when deleting
+    an asset. Normally, you are asked to confirm a deletion.
+</dd></dl></div></div><div class="refsect2"><a id="_option_when_deleting_specs_or_protocols"></a><h3>Option When Deleting Specs or Protocols</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>-p</strong></span>
+</span></dt><dd>
+   Delete the spec or protocol from the <span class="strong"><strong>specs</strong></span>
+   directory of the project, not from a library’s
+   <span class="strong"><strong>specs</strong></span> directory.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_deleting_specs_protocols_workers_or_hdl_devices"></a><h3>Options When Deleting Specs, Protocols, Workers or HDL Devices</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>--hdl-library=</strong></span><span class="emphasis"><em>&lt;hdl-library&gt;</em></span>
+</span></dt><dd>
+   Delete the asset from the specified library under the
+   <span class="strong"><strong>hdl</strong></span> directory of the project. Valid values for
+   <span class="emphasis"><em>&lt;hdl-library&gt;</em></span> are one of <span class="strong"><strong>devices</strong></span>, <span class="strong"><strong>cards</strong></span> or <span class="strong"><strong>adapters</strong></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong>-l</strong></span> <span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+   Delete the asset from the specified library.
+</dd></dl></div></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Delete the project <span class="strong"><strong>my-project</strong></span>:
+</p><pre class="screen">ocpidev delete project my-project</pre></li><li class="listitem">
+Delete the worker named <span class="strong"><strong>myworker.hdl</strong></span> from the library named <span class="strong"><strong>my-complib</strong></span>:
+</li></ol></div><pre class="screen">ocpidev delete -l my-complib worker myworker.hdl</pre></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-build.1.html" target="_top">ocpidev-build(1)</a>
+<a class="ulink" href="ocpidev-clean.1.html" target="_top">ocpidev-clean(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-refresh.1.html" target="_top">ocpidev-refresh(1)</a>
+<a class="ulink" href="ocpidev-register.1.html" target="_top">ocpidev-register(1)</a>
+<a class="ulink" href="ocpidev-run.1.html" target="_top">ocpidev-run(1)</a>
+<a class="ulink" href="ocpidev-set.1.html" target="_top">ocpidev-set(1)</a>
+<a class="ulink" href="ocpidev-show.1.html" target="_top">ocpidev-show(1)</a>
+<a class="ulink" href="ocpidev-unregister.1.html" target="_top">ocpidev-unregister(1)</a>
+<a class="ulink" href="ocpidev-unset.1.html" target="_top">ocpidev-unset(1)</a>
+<a class="ulink" href="ocpidev-utilization.1.html" target="_top">ocpidev-utilization(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

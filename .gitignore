@@ -50,8 +50,13 @@ projects/*/specs/package-id
 doc/tex/build
 vendor/
 
-# Generated PDFs
+# Generated files
 doc/pdfs/
+**/doc/*.inc
+!**/doc/developer_doc.inc
+
+# OSP's
+project-registry/ocpi.osp.*
 
 # GitLab Pages staging area
 .public/

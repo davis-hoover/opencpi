@@ -1,4 +1,3 @@
-\documentclass{article}
 \iffalse
 This file is protected by Copyright. Please refer to the COPYRIGHT file
 distributed with this source distribution.
@@ -17,111 +16,151 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
-\author{} % Force author to be blank
+
+% Sets OpenCPI Version used throughout all the docs. This is updated by
+% scripts/update-release.sh when a release is being made and must not
+% be changed manually.
+\def\ocpiversion{develop}
+
+\documentclass{article}
+\author{}  % Force author to be blank
+\date{OpenCPI Release:\ \ \ocpiversion}  % Force date to be blank and override date with version
+\title{OpenCPI\\\docTitle}  % docTitle must be defined before including this file
 %----------------------------------------------------------------------------------------
 % Paper size, orientation and margins
 %----------------------------------------------------------------------------------------
 \usepackage{geometry}
 \geometry{
-        letterpaper, % paper type
-        portrait,    % text direction
-        left=.75in,  % left margin
-        top=.75in,   % top margin
-        right=.75in, % right margin
-        bottom=.75in % bottom margin
- }
+  letterpaper,  % paper type
+  portrait,     % text direction
+  left=.75in,   % left margin
+  top=.75in,    % top margin
+  right=.75in,  % right margin
+  bottom=.75in  % bottom margin
+}
 %----------------------------------------------------------------------------------------
 % Header/Footer
 %----------------------------------------------------------------------------------------
-\usepackage{fancyhdr} \pagestyle{fancy} % required for fancy headers
+\usepackage{fancyhdr} \pagestyle{fancy}  % required for fancy headers
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.5pt}
+\lhead{\small{\docTitle}}
 \rhead{\small{OpenCPI}}
-% \rfoot{\thepage}
-%----------------------------------------------------------------------------------------
-% Appendix packages
-%----------------------------------------------------------------------------------------
-\usepackage[toc,page]{appendix}
-%----------------------------------------------------------------------------------------
-% Defined Commands & Renamed Commands
-%----------------------------------------------------------------------------------------
-\renewcommand{\contentsname}{Table of Contents}
-\renewcommand{\listfigurename}{List of Figures}
-\renewcommand{\listtablename}{List of Tables}
 %----------------------------------------------------------------------------------------
 % Various packages
 %----------------------------------------------------------------------------------------
-\usepackage[usenames,dvipsnames]{xcolor} % for color names see https://en.wikibooks.org/wiki/LaTeX/Colors
-\usepackage{hyperref}  % for linking urls and lists
-\usepackage{graphicx}  % for including pictures by file
-\usepackage{listings}  % for coding language styles
-\usepackage{rotating}  % for sideways table
-\usepackage{pifont}    % for sideways table
-\usepackage{pdflscape} % for landscape view
+\usepackage{amsmath}
+\usepackage[page,toc]{appendix}  % for appendix stuff
+\usepackage{enumitem}
+\usepackage{graphicx}   % for including pictures by file
+\usepackage{hyperref}   % for linking urls and lists
+\usepackage{listings}   % for coding language styles
+\usepackage{pdflscape}  % for landscape view
+\usepackage{pifont}     % for sideways table
+\usepackage{ragged2e}   % for justify
+\usepackage{rotating}   % for sideways table
+\usepackage{scrextend}
+\usepackage{setspace}
 \usepackage{subfig}
+\usepackage{textcomp}
+\usepackage[dvipsnames,usenames]{xcolor}  % for color names see https://en.wikibooks.org/wiki/LaTeX/Colors
 \usepackage{xstring}
-\uchyph=0 % Never hyphenate acronyms like RCC (I think this overrides ANGRYVIPER above)
-\renewcommand\_{\textunderscore\allowbreak} % Allow words to break/newline on underscores
+\uchyph=0  % Never hyphenate acronyms like RCC
+\renewcommand\_{\textunderscore\allowbreak}  % Allow words to break/newline on underscores
 %----------------------------------------------------------------------------------------
 % Table packages
 %----------------------------------------------------------------------------------------
-\usepackage{longtable} % for long possibly multi-page tables
-\usepackage{tabularx} % c=center,l=left,r=right,X=fill
-% These define tabularx columns "C" and "R" to match "X" but center/right aligned
-\newcolumntype{C}{>{\centering\arraybackslash}X}
-\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\usepackage[tableposition=top]{caption}
 \usepackage{float}
 \floatstyle{plaintop}
-\usepackage[tableposition=top]{caption}
-\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\usepackage{longtable}  % for long possibly multi-page tables
+\usepackage{multicol}   % for more advanced table layout
+\usepackage{multirow}   % for more advanced table layout
+\usepackage{tabularx}   % c=center,l=left,r=right,X=fill
+% These define tabularx columns "C" and "R" to match "X" but center/right aligned
+\newcolumntype{C}{>{\centering\arraybackslash}X}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
 %----------------------------------------------------------------------------------------
 % Block Diagram / FSM Drawings
 %----------------------------------------------------------------------------------------
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows,fit,positioning}
-\usetikzlibrary{automata} % used for the fsm
+\usetikzlibrary{arrows,decorations.markings,fit,positioning,shapes}
+\usetikzlibrary{automata}  % used for the fsm
+\usetikzlibrary{calc}      % for duplicating clients
+\usepgfmodule{oo}          % to define a client box
 %----------------------------------------------------------------------------------------
 % Colors Used
 %----------------------------------------------------------------------------------------
 \usepackage{colortbl}
 \definecolor{blue}{rgb}{.7,.8,.9}
 \definecolor{ceruleanblue}{rgb}{0.16, 0.32, 0.75}
-\definecolor{drkgreen}{rgb}{0,0.6,0}
-\definecolor{deepmagenta}{rgb}{0.8, 0.0, 0.8}
 \definecolor{cyan}{rgb}{0.0,0.6,0.6}
+\definecolor{darkgreen}{rgb}{0,0.6,0}
+\definecolor{deepmagenta}{rgb}{0.8, 0.0, 0.8}
 \definecolor{maroon}{rgb}{0.5,0,0}
+%----------------------------------------------------------------------------------------
+% Define where to hyphenate
+%----------------------------------------------------------------------------------------
+\hyphenation{Cent-OS}
+\hyphenation{install-ation}
+%----------------------------------------------------------------------------------------
+% Define Commands & Rename Commands
+%----------------------------------------------------------------------------------------
+\newcommand{\code}[1]{\texttt{#1}}  % For inline code snippet or command line
+\newcommand{\sref}[1]{Section~\ref{#1}}  % To quickly reference a section
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1}}  % To do notes
+\renewcommand{\contentsname}{Table of Contents}
+\renewcommand{\listfigurename}{List of Figures}
+\renewcommand{\listtablename}{List of Tables}
+
+% This gives a link to gitlab.io document. By default, it outputs the filename.
+% You can optionally change the link, e.g.
+% \githubio{FPGA\_Vendor\_Tools\_Installation\_Guide.pdf} vs.
+% \githubio[\textit{FPGA Vendor Tools Installation Guide}]{FPGA\_Vendor\_Tools\_Installation\_Guide.pdf}
+% or if you want the raw ugly URL to come out, \githubioURL{FPGA_Vendor_Tools_Installation_Guide.pdf}
+\newcommand{\githubio}[2][]{% The default is for FIRST param!
+\href{http://opencpi.gitlab.io/releases/\ocpiversion/docs/#2}{\ifthenelse{\equal{#1}{}}{\texttt{#2}}{#1}}}
+\newcommand{\gitlabcom}[2][]{% The default is for FIRST param!
+\href{http://gitlab.com/opencpi/#2}{\ifthenelse{\equal{#1}{}}{\texttt{#2}}{#1}}}
+\newcommand{\githubioURL}[1]{\url{http://opencpi.gitlab.io/releases/\ocpiversion/docs/#1}}
+% Lastly, if you want a SINGLE leading path stripped, e.g. assets/X.pdf => X.pdf:
+\newcommand{\githubioFlat}[1]{%
+\StrBehind{#1}{/}[\den]%
+\href{http://opencpi.gitlab.io/releases/\ocpiversion/docs/#1}{\texttt{\den}}%
+}
 %----------------------------------------------------------------------------------------
 % VHDL Coding Language Style
 % modified from: http://latex-community.org/forum/viewtopic.php?f=44&t=22076
 %----------------------------------------------------------------------------------------
 \lstdefinelanguage{VHDL}
 {
-        basicstyle=\ttfamily\footnotesize,
-        columns=fullflexible,keepspaces,      % https://tex.stackexchange.com/a/46695/87531
-        keywordstyle=\color{ceruleanblue},
-        commentstyle=\color{drkgreen},
-        morekeywords={
-    library,use,all,entity,is,port,in,out,end,architecture,of,
-    begin,and, signal, when, if, else, process, end,
-        },
-        morecomment=[l]--
+  basicstyle=\ttfamily\footnotesize,
+  columns=fullflexible,keepspaces,  % https://tex.stackexchange.com/a/46695/87531
+  keywordstyle=\color{ceruleanblue},
+  commentstyle=\color{darkgreen},
+  morekeywords={
+    library, use, all, entity, is, port, in, out, end, architecture, of,
+    begin, and, signal, when, if, else, process, end,
+  },
+  morecomment=[l]--
 }
 %----------------------------------------------------------------------------------------
 % XML Coding Language Style
-% modified from: http://tex.stackexchange.com/questions/10255/xml-syntax-highlighting
+% modified from http://tex.stackexchange.com/questions/10255/xml-syntax-highlighting
 %----------------------------------------------------------------------------------------
 \lstdefinelanguage{XML}
 {
-        basicstyle=\ttfamily\footnotesize,
-        columns=fullflexible,keepspaces,
-        morestring=[s]{"}{"},
-        morecomment=[s]{!--}{--},
-        commentstyle=\color{drkgreen},
-        moredelim=[s][\color{black}]{>}{<},
-        moredelim=[s][\color{cyan}]{\ }{=},
-        stringstyle=\color{maroon},
-        identifierstyle=\color{ceruleanblue}
+  basicstyle=\ttfamily\footnotesize,
+  columns=fullflexible,keepspaces,
+  morestring=[s]{"}{"},
+  morecomment=[s]{!--}{--},
+  commentstyle=\color{darkgreen},
+  moredelim=[s][\color{black}]{>}{<},
+  moredelim=[s][\color{cyan}]{\ }{=},
+  stringstyle=\color{maroon},
+  identifierstyle=\color{ceruleanblue}
 }
 %----------------------------------------------------------------------------------------
 % DIFF Coding Language Style
@@ -129,30 +168,30 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 %----------------------------------------------------------------------------------------
 \lstdefinelanguage{diff}
 {
-        basicstyle=\ttfamily\footnotesize,
-        columns=fullflexible,keepspaces,
-        breaklines=true,                                % wrap text
-        morecomment=[f][\color{ceruleanblue}]{@@},      % group identifier
-        morecomment=[f][\color{red}]-,                  % deleted lines
-        morecomment=[f][\color{drkgreen}]+,             % added lines
-        morecomment=[f][\color{deepmagenta}]{---},      % Diff header lines (must appear after +,-)
-        morecomment=[f][\color{deepmagenta}]{+++},
+  basicstyle=\ttfamily\footnotesize,
+  columns=fullflexible,keepspaces,
+  breaklines=true,                            % wrap text
+  morecomment=[f][\color{ceruleanblue}]{@@},  % group identifier
+  morecomment=[f][\color{red}]-,              % deleted lines
+  morecomment=[f][\color{darkgreen}]+,        % added lines
+  morecomment=[f][\color{deepmagenta}]{---},  % Diff header lines (must appear after +,-)
+  morecomment=[f][\color{deepmagenta}]{+++},
 }
 %----------------------------------------------------------------------------------------
 % Python Coding Language Style
-% modified from
 %----------------------------------------------------------------------------------------
 \lstdefinelanguage{python}
 {
-        basicstyle=\ttfamily\footnotesize,
-        columns=fullflexible,keepspaces,
-        keywordstyle=\color{ceruleanblue},
-        commentstyle=\color{drkgreen},
-        stringstyle=\color{orange},
-        morekeywords={
-    print, if, sys, len, from, import, as, open,close, def, main, for, else, write, read, range,
-        },
-        comment=[l]{\#}
+  basicstyle=\ttfamily\footnotesize,
+  columns=fullflexible,keepspaces,
+  keywordstyle=\color{ceruleanblue},
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{orange},
+  morekeywords={
+    print, if, sys, len, from, import, as, open,close, def, main, for, else,
+    write, read, range,
+  },
+  comment=[l]{\#}
 }
 %----------------------------------------------------------------------------------------
 % Fontsize Notes in order from smallest to largest

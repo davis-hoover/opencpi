@@ -77,6 +77,12 @@ PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
+#    Needed by Xilinx ISE 14.7
+PKGS_D+=(libSM libXi libXrandr)
+#    for the new "xilinx19_2_aarch*" platforms
+PKGS_D+=(openssl-devel)
+
+
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
@@ -121,6 +127,8 @@ PKGS_E+=(${python3_ver}-scons)
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
+#    Needed to build/run ocpigr
+PKGS_E+=(yaml-cpp-devel)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available
@@ -131,6 +139,13 @@ PKGS_E+=(perl-ExtUtils-MakeMaker)
 #    now, assume the justification for a package in this category is the same
 #    as for its python2 counterpart as given above.
 PKGS_P+=(matplotlib)
+
+#
+# Because long option strings impair readability.
+# Verified it is safe to invoke "yum" this way
+# regardless of the command (list, install, erase).
+#  
+YUM="yum --assumeyes --setopt=skip_missing_names_on_install=False"
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {
@@ -159,8 +174,9 @@ function install_swig3 {
 
   if [ $need_swig3 -eq 1 ]
   then
-    $SUDO yum -y erase swig
-    $SUDO yum -y install swig3
+    $SUDO $YUM list swig3 > /dev/null 2>&1 || bad "swig3 package unavailable"
+    $SUDO $YUM erase swig
+    $SUDO $YUM install swig3
   fi
 }
 
@@ -184,11 +200,11 @@ fi
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source
-$SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
+$SUDO $YUM install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
 [ $? -ne 0 ] && bad "Installing required packages failed"
 
 # Now those that depend on epel
-$SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
+$SUDO $YUM install $(ypkgs PKGS_E)
 [ $? -ne 0 ] && bad "Installing EPEL packages failed"
 
 # SWIG is a special case on CentOS 7

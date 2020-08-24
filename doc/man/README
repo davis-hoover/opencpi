@@ -1,0 +1,60 @@
+OPENCPI MAN PAGES - STATUS 8/20/20
+----------------------------------
+
+ocpiadmin - ready for review
+ocpidriver - ready for review
+ocpihdl - ready for review
+ocpiremote - ready for review
+ocpirun - ready for review
+ocpiserve - ready for review
+ocpiview - ready for review
+
+ocpidev Man Pages
+-----------------
+ocpidev - reviewed once, updates since
+
+ocpidev Nouns
+-------------
+application - reviewed once, updates since
+assembly - ready for review
+card - ready for review
+component - reviewed once, updates since
+device - ready for review
+library - reviewed once, udpates since
+platform - ready for review, has embedded questions
+primitive - ready for review
+project - reviewed once, updates since
+protocol - ready for review
+registry - ready for review
+slot - ready for review
+test - ready for review
+worker - reviewed once, updates since
+
+ocpidev Verbs
+--------------
+ocpidev-build - ready for review
+ocpidev-clean - ready for review
+ocpidev-create - ready for review
+ocpidev-delete - ready for review
+ocpidev-refresh - ready for review
+ocpidev-register - ready for review
+ocpidev-run - ready for review
+ocpidev-set - ready for review
+ocpidev-show - ready for review
+ocpidev-unregister - ready for review
+ocpidev-unset - ready for review
+ocpidev-utilization - ready for review
+-----------------------------
+
+Man pages to be created:
+
+ocpiav
+ocpigen
+ocpigr
+ocpiocl
+ocpiocltest
+ocpitest
+ocpixml
+ocpizynq
+
+

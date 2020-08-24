@@ -21,7 +21,7 @@ include $(OCPI_CDK_DIR)/include/util.mk
 # Plain workers do not have their own package-id file
 # They inherit the containing library's package-id
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-$(call OcpiIncludeAssetAndParent,..)
+$(call OcpiIncludeAssetAndParent)
 endif
 ifndef Model
   $(error This directory named $(CwdName) does not end in any of: $(Models))
@@ -69,6 +69,18 @@ $(eval $(call OcpiSetLanguage,$(ImplXmlFiles)))
 $(call OcpiDbgVar,Workers)
 $(call OcpiDbgVar,Worker)
 
-$(eval $(OcpiProcessBuildFiles))
-
-include $(OCPI_CDK_DIR)/include/$(Model)/$(Model)-worker.mk
+ifeq (X$(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$($(CapModel)Target)$($(CapModel)Targets)$($(CapModel)Platform)$($(CapModel)Platforms),)
+  $(info This $(UCModel) worker $(Worker) was not built since no $(UCModel) targets or platforms specified)
+else
+  # Add any inbound command line libraries to what is specified in the makefile
+  # This list is NOT target dependent
+  # This variable is immediately assigned here and indicates what libraries might be
+  # explicitly referenced by local source code.
+  # This assignment is redundant with what is in hdl-pre.mk, but it is needed here earlier than that
+  # and we don't yet have something like: include $(Model)-pre.mk
+  override $(CapModel)ExplicitLibraries:=$(call Unique,$($(CapModel)Libraries) $(Libraries) $($(CapModel)ExplicitLibraries))
+  $(infox override $(CapModel)ExplicitLibraries:=$(call Unique,$($(CapModel)Libraries) $(Libraries) $($(CapModel)ExplicitLibraries)))
+  $(call OcpiDbgVar,$(CapModel)ExplicitLibraries)
+  $(if $(filter clean%,$(MAKECMDGOALS)),,$(eval $(OcpiProcessBuildFiles)))
+  include $(OCPI_CDK_DIR)/include/$(Model)/$(Model)-worker.mk
+endif

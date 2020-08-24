@@ -1,0 +1,207 @@
+.\"     Title: ocpidev-card
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/27/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-CARD" "1" "07/27/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-card \- manage an OpenCPI HDL card\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl card\fR \fI<name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBhdl card\fR noun represents an OpenCPI HDL card, which defines a hardware component that contains devices and plugs into a \fIslot\fR on an HDL platform\&. Devices are either directly attached to the pins on an HDL platform or attached to cards that plug into compatible slots on the platform\&. Devices on a card are considered to be part of the card, which can be plugged into a certain type of slot on any platform, rather than part of the platform itself\&.
+.sp
+An HDL card is described by an HDL card definition, which is an XML file that describes the slot type of the card, the HDL devices (controlled by HDL device workers) that are present on the card, and how they are wired to the slot\&. There is no HDL code associated with an HDL card\&. For more information about the HDL card definition\(cqs XML structure and how it relates to HDL platforms, slots and HDL device workers, see the \fIOpenCPI Platform Development Guide\fR\&.
+.sp
+In a project, an HDL card is named \fI<name>\fR\fB\&.xml\fR and resides in one of the following locations depending on its intended use:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/cards/specs/\fR
+when the HDL card is platform\-independent
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/platforms/\fR\fI<platform>\fR\fB/devices/specs/\fR
+when the HDL card is platform\-specific
+.RE
+.sp
+Verbs that can operate on an HDL card are:
+.PP
+\fBcreate\fR
+.RS 4
+Create the named HDL card according to the specified options, creating directories and files as required\&.
+.RE
+.PP
+\fBdelete\fR
+.RS 4
+Remove all files associated with the named HDL card\&.
+.RE
+.sp
+The \fBcreate\fR operation creates an initial HDL card definition XML file that can be edited as necessary to define the card\&.
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.SS "Options That Apply to All Operations (Verbs) on HDL Cards"
+.PP
+\fB\-d\fR \fI<directory>\fR
+.RS 4
+Specify the directory in which the command should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&.
+.RE
+.PP
+\fB\-v, \-\-verbose\fR
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Options When Creating HDL Cards"
+.PP
+\fB\-P\fR \fI<hdl\-platform>\fR
+.RS 4
+Specify that the HDL card being created is a platform\-specific HDL card to be created in the
+\fBdevices/specs/\fR
+subdirectory in the specified HDL platform in the project\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Keep files and directories created after an HDL card creation fails\&. Normally, all such files and directories are removed on any failure\&.
+.RE
+.SS "Options When Deleting HDL Cards"
+.PP
+\fB\-f\fR
+.RS 4
+Force deletion: do not ask for confirmation when deleting an HDL card\&. Normally, you are asked to confirm a deletion\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+At the top level of the project, create an HDL card with the name
+\fBmycard\fR\&. The HDL card definition named
+\fBmycard\&.xml\fR
+will be placed in the subdirectory
+\fBhdl/cards/specs/\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl card mycard
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+At the top level of the project, create an HDL card with the name
+\fBmycard\fR
+for the platform
+\fBmyplatform\fR\&. The HDL card definition named
+\fBmycard\&.xml\fR
+will be placed in the subdirectory
+\fBhdl/platforms/myplatform/devices/specs/\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl card mycard \-P myplatform
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside the project, delete an HDL card definition named
+\fBmycard\&.xml\fR
+from a project\(cqs
+\fBhdl/cards/specs/\fR
+subdirectory:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev delete hdl card mycard
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-device(1) ocpidev\-platform(1) ocpidev\-project(1) ocpidev\-slot(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

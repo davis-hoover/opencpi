@@ -82,7 +82,7 @@ function setVarsFromMake {
   vars=$(set -o pipefail;\
          eval make -n -r -s -f $1 $2 ${quiet:+2>/dev/null} | \
 	 tr ';' '\n' | sed -e '/^ *$/d' -e 's/^ *//' -e 's/ *$//' | grep '^[a-zA-Z_][a-zA-Z0-9_]*=')
-   [ $? != 0 ] && return 1
+  [ $? != 0 ] && return 1
   eval $vars
 }
 
@@ -106,8 +106,8 @@ function onlyExclude {
   return 1
 }
 
-# This is a copy of a function from makeExportLinks.sh, due to bootstrapping issues
-# FIXME: allow makeExportLinks.sh to use this one
+# This is a copy of a function from export-utils.sh, due to bootstrapping issues
+# FIXME: allow use of the one in export-utils.sh and nuke this one.
 function makeRelativeLink {
   # echo make_relative_link $1 $2
   # Figure out what the relative prefix should be

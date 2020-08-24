@@ -50,7 +50,7 @@ ifeq ($(filter imports projectpackage,$(MAKECMDGOALS)),)
 endif
 
 ifeq ($(NoExports)$(wildcard exports)$(filter projectpackage,$(MAKECMDGOALS)),)
-  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/makeProjectExports.sh - $(OCPI_PROJECT_PACKAGE) xxx)
+  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh - $(OCPI_PROJECT_PACKAGE) xxx)
   ifeq ($(filter clean%,$(MAKECMDGOALS)),)
     $(info Setting up exports)
     $(infox $(doexports))
@@ -90,10 +90,10 @@ ifneq ($(wildcard specs),)
     # This can be accomplished by having imports depend on it.
     imports: specs/package-id
     # If Project.mk changes, recreate specs/package-id file unless the package-id file contents
-    # exactly match ProjectPackage.
+    # exactly match OCPI_PROJECT_PACKAGE.
     specs/package-id: Project.mk
-	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(ProjectPackage)" ]; then \
-	       echo "$(ProjectPackage)" > specs/package-id; \
+	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
+	      echo HIHI; echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
 	     fi
   endif
 endif
@@ -128,7 +128,7 @@ imports:
 	  if [ -n "$(OCPI_PROJECT_REGISTRY_DIR)" ]; then \
 	    if [ "$(realpath $(OCPI_PROJECT_REGISTRY_DIR))" != "$(realpath imports)" ]; then \
 	      echo "Warning: OCPI_PROJECT_REGISTRY_DIR is globally set to \"$(OCPI_PROJECT_REGISTRY_DIR)\"," >&2 ; \
-	      echo "         but the '$(ProjectPackage)' project located at '$$(pwd)' is using" >&2 ; \
+	      echo "         but the '$(OCPI_PROJECT_PACKAGE)' project located at '$$(pwd)' is using" >&2 ; \
 	      echo "         'imports -> $(realpath imports)'" >&2 ; \
 	      echo "         The project's 'imports' link will take precedence when within the project." >&2 ; \
 	    fi; \
@@ -147,7 +147,7 @@ imports:
 	fi
 
 exports:
-	$(OCPI_CDK_DIR)/scripts/makeProjectExports.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
+	$(OCPI_CDK_DIR)/scripts/export-project.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
 
 components: hdlprimitives
 	$(MAKE) imports
@@ -245,7 +245,7 @@ cleanapplications:
 # needs to be accessible via imports for projects other than core
 # (e.g. for cleaning rcc)
 clean: cleancomponents cleanapplications cleanrcc cleanhdl cleanexports cleanimports
-	rm -r -f artifacts
+	rm -r -f artifacts project.xml
 
 # Iterate through symlinks in imports. If the link points to the project registry dir,
 # it is the CDK, or is a broken link, it can be cleaned/removed. If the imports directory
@@ -269,7 +269,7 @@ cleaneverything: clean
 
 ifdef ShellProjectVars
 projectpackage:
-	$(info ProjectPackage="$(ProjectPackage)";)
+	$(info ProjectPackage="$(OCPI_PROJECT_PACKAGE)";)
 projectdeps:
 	$(info ProjectDependencies="$(ProjectDependencies)";)
 projectincludes:

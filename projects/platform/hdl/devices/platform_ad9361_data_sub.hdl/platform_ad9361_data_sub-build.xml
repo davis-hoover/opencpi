@@ -14,12 +14,22 @@
     <parameter name='SINGLE_PORT_p' value='false'/>
     <parameter name='HALF_DUPLEX_p' value='false'/>
     <parameter name='SWAP_PORTS_p' value='false'/>
-    <parameter name='DATA_CLK_Delay' value='3'/>
+    <parameter name='DATA_CLK_Delay' value='4'/>
     <parameter name='RX_Data_Delay' value='0'/>
     <parameter name='FB_CLK_Delay' value='7'/>
     <parameter name='TX_Data_Delay' value='0'/>
   </configuration>
   <configuration id='2'>
+    <parameter name='LVDS_p' value='true'/>
+    <parameter name='SINGLE_PORT_p' value='false'/>
+    <parameter name='HALF_DUPLEX_p' value='false'/>
+    <parameter name='SWAP_PORTS_p' value='false'/>
+    <parameter name='DATA_CLK_Delay' value='3'/>
+    <parameter name='RX_Data_Delay' value='0'/>
+    <parameter name='FB_CLK_Delay' value='7'/>
+    <parameter name='TX_Data_Delay' value='0'/>
+  </configuration>
+  <configuration id='3'>
     <parameter name='LVDS_p' value='false'/>
     <parameter name='SINGLE_PORT_p' value='true'/>
     <parameter name='HALF_DUPLEX_p' value='false'/>
@@ -29,7 +39,7 @@
     <parameter name='FB_CLK_Delay' value='12'/>
     <parameter name='TX_Data_Delay' value='0' />
   </configuration>
-  <configuration id='3'>
+  <configuration id='4'>
     <parameter name='LVDS_p' value='false'/>
     <parameter name='SINGLE_PORT_p' value='true'/>
     <parameter name='HALF_DUPLEX_p' value='false'/>
@@ -39,7 +49,7 @@
     <parameter name='FB_CLK_Delay' value='12'/>
     <parameter name='TX_Data_Delay' value='0' />
   </configuration>
-  <configuration id='4'>
+  <configuration id='5'>
     <parameter name='LVDS_p' value='false'/>
     <parameter name='SINGLE_PORT_p' value='false'/>
     <parameter name='HALF_DUPLEX_p' value='false'/>
@@ -49,7 +59,7 @@
     <parameter name='FB_CLK_Delay' value='12'/>
     <parameter name='TX_Data_Delay' value='0' />
   </configuration>
-  <configuration id='5'>
+  <configuration id='6'>
     <parameter name='LVDS_p' value='false'/>
     <parameter name='SINGLE_PORT_p' value='false'/>
     <parameter name='HALF_DUPLEX_p' value='false'/>

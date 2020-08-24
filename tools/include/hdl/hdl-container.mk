@@ -144,7 +144,6 @@ ifneq ($(MAKECMDGOALS),clean)
       # Now we need to make a bit file from every paramconfig for this worker
       HdlBitName=$(call BitFile_$(HdlToolSet_$(HdlTarget)),$(call HdlContName,$1))
       HdlContBitName=$(call WkrTargetDir,$(HdlTarget),$1)/$(call HdlBitName,$1)
-      HdlContBitZName=$(call HdlContBitName,$1).gz
       HdlContBitZ=$(basename $(call HdlContBitName,$1)).bitz
       define ContDoConfig
         $(infox ART:$(call ArtifactXmlName,$1):UUID:$(call UUIDFileName,$1):BIT:$(call HdlBitName,$1):ROM:$(call MetadataRom,$1):BIN:$(call WkrBinary,$(HdlTarget),$1))
@@ -154,17 +153,13 @@ ifneq ($(MAKECMDGOALS),clean)
         $(call WkrBinary,$(HdlTarget),$1): TargetSourceFiles_$1+=$(call UUIDFileName,$1)
         $(call WkrBinary,$(HdlTarget),$1): HdlExactPart=$(HdlPart_$(Platform))
         $(call HdlContBitName,$1): $(call WkrBinary,$(HdlTarget),$1)
-        $(call HdlContBitZName,$1): $(call HdlContBitName,$1)
+        $(call HdlContBitZ,$1): $(call HdlContBitName,$1)
 	   $(AT)echo Making compressed bit file: $$@ from $$< and $(call ArtifactXmlName,$1)
 	   $(AT)gzip -c $(call HdlContBitName,$1) > $$@
-	   $(AT)$$(call OcpiPrepareArtifact,$(call ArtifactXmlName,$1),$$@,$(strip\
-                   $(or $(ParentPackage),$(ProjectPackage))),0,$(Platform))
+	   $(AT)$$(call OcpiPrepareArtifact,$(call ArtifactXmlName,$1),$$@,$(OCPI_PROJECT_PACKAGE),0,$(Platform))
+	   $(AT)$(OCPI_CDK_DIR)/scripts/export-file.sh - $$@
 
-        $(call HdlContBitZ,$1): | $(call HdlContBitZName,$1)
-	    $(AT)ln -s $(notdir $(call HdlContBitZName,$1)) $$@
-	    $(AT)$(OCPI_CDK_DIR)/scripts/maybeExport.sh - $$@
-
-        all: $(call HdlContBitZName,$1) $(call HdlContBitZ,$1)
+        all: $(call HdlContBitZ,$1)
 
         # Invoke tool build: <target-dir>,<assy-name>,<core-file-name>,<config>,<platform>
         $(eval $(call HdlToolDoPlatform_$(HdlToolSet_$(HdlTarget)),$(call WkrTargetDir,$(HdlTarget),$1),$(Assembly),$(Worker),$(HdlConfig),$(HdlPlatform),$1))

@@ -31,8 +31,8 @@ It results in a "kernel headers" package necessary to build the OpenCPI linux ke
 a few other files necessary for later processing (e.g. tools for manipulating image files).
 
 It assumes:
-- a git repo for Xilinx linux kernel and u-boot has been established (cloned) using:
-      getXilinxLinuxSources.sh <git-repo-dir>
+- a git repo for Xilinx linux kernel and u-boot has been established (cloned) in the git/ subdirectory
+  of where the Xilinx tools are installed, e.g. /tools/Xilinx/git
 - a Xilinx EDK (ISE) or SDK (Vivado) installation for OpenCPI exists in the environment
 - the OCPI_CDK_DIR environment variable points to an OpenCPI installation
   (i.e. opencpi-setup.sh has been sourced)
@@ -81,7 +81,7 @@ case $arch in
       karch=arm
       uarch=arm
       kconfig=xilinx_zynq_defconfig
-      uconfig=zynq_zed_config
+      uconfig="zynq_zed_config zynq_zed_defconfig"
       kargs="UIMAGE_LOADADDR=0x8000 uImage"
 
       ;;
@@ -89,14 +89,14 @@ case $arch in
       karch=arm
       uarch=arm
       kconfig=xilinx_zynq_defconfig
-      uconfig=zynq_zed_config
+      uconfig=zynq_zed_defconfig
       kargs="UIMAGE_LOADADDR=0x8000 uImage"
       ;;
     (aarch64)
       karch=arm64
       uarch=arm
       kconfig=xilinx_zynqmp_defconfig
-      uconfig=xilinx_zynqmp_defconfig # only on oldest versions, see uconfig below
+      uconfig="xilinx_zynqmp_ep_defconfig xilinx_zynqmp_mini_defconfig" # set of possibilities
       kargs=Image.gz
       ;;
     (*)
@@ -134,7 +134,15 @@ if [ $arch = aarch64 ]; then
 fi
 echo ==============================================================================
 echo Building u-boot to get the mkimage and other commands.
-make ARCH=$uarch $uconfig CROSS_COMPILE=$CROSS_COMPILE
+found=
+# Look where later u-boots want it
+for c in $uconfig; do
+    ([ -e configs/$c ] ||
+	 ( [ -e boards.cfg ] && grep -q '[^#]*[ 	][ 	]*'${c%_config}'[ 	]' boards.cfg)) &&
+	found=$c
+done
+[ -z "$found" ] && echo No u-boot configs found among: $uconfig && exit 1
+make ARCH=$uarch $found CROSS_COMPILE=$CROSS_COMPILE
 make ARCH=$uarch CROSS_COMPILE=$CROSS_COMPILE ${MAKE_PARALLEL}
 cp tools/mkimage $RELDIR
 if [ -f tools/fit_info ]; then
@@ -224,7 +232,7 @@ mkdir kernel-headers
 # otherwise it would be:
 #    cp -R ../git/linux-xlnx/{Makefile,Module.symvers,include,scripts,arch} kernel-headers
 (cd $gdir/linux-xlnx;
-  for f in Makefile Module.symvers include scripts arch/$karch .config; do
+  for f in Makefile Module.symvers include scripts arch/$karch arch/arm .config; do
     find $f -type d -exec mkdir -p $RELDIR/kernel-headers/{} \;
     find $f -type f -exec sh -c \
      "if test -e $RELDIR/kernel-headers/{}; then

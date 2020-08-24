@@ -1,4 +1,4 @@
-<HdlImplementation Name="sma" Language="Verilog" Pattern="%w%M%0_" spec="sma_spec.xml">
+<HdlImplementation Name="sma" Language="Verilog" Pattern="%w%M%0_" spec="sma_spec.xml" libraries='util'>
   <Property Name="smaCtrl" readback="true" Writable="true"/>
   <ControlInterface Sub32BitConfigProperties="true" SizeOfConfigSpace="4g" ControlOperations="initialize"/>
   <Property Name="mesgCount" Readback="true"/>

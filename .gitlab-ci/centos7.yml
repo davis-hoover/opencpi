@@ -15,7 +15,7 @@ build:centos7:
     - .centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
 
 test:centos7:
   extends:
@@ -23,5 +23,5 @@ test:centos7:
     - .centos7
   needs:
     - job: prereq:centos7
-      artifacts: true
+      artifacts: false
     - build:centos7

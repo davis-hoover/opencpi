@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-card</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140290926571504"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-card — manage an OpenCPI HDL card.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">hdl card</code></strong></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">hdl card</code></strong></span> noun represents an OpenCPI HDL card,
+which defines a hardware component that contains devices
+and plugs into a <span class="emphasis"><em>slot</em></span> on an HDL platform. Devices are
+either directly attached to the pins on an HDL platform
+or attached to cards that plug into compatible slots on the platform.
+Devices on a card are considered to be part of the card, which can
+be plugged into a certain type of slot on any platform, rather than
+part of the platform itself.</p><p>An HDL card is described by an HDL card definition, which is an
+XML file that describes the slot type of the card, the HDL devices
+(controlled by HDL device workers) that are present on the card,
+and how they are wired to the slot. There is no HDL code associated
+with an HDL card. For more information about the HDL card
+definition’s XML structure and how it relates to HDL platforms,
+slots and HDL device workers, see the <span class="emphasis"><em>OpenCPI Platform Development Guide</em></span>.</p><p>In a project, an HDL card is named <span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">.xml</code></strong></span> and resides
+in one of the following locations depending on its intended use:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+In the subdirectory <span class="strong"><strong><code class="literal">hdl/cards/specs/</code></strong></span> when the HDL
+card is platform-independent
+</li><li class="listitem">
+In the subdirectory <span class="strong"><strong><code class="literal">hdl/platforms/</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span><span class="strong"><strong><code class="literal">/devices/specs/</code></strong></span> when
+the HDL card is platform-specific
+</li></ul></div><p>Verbs that can operate on an HDL card are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">create</code></strong></span>
+</span></dt><dd>
+    Create the named HDL card according to the specified options,
+    creating directories and files as required.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">delete</code></strong></span>
+</span></dt><dd>
+    Remove all files associated with the named HDL card.
+</dd></dl></div><p>The <span class="strong"><strong><code class="literal">create</code></strong></span> operation creates an initial HDL card definition
+XML file that can be edited as necessary to define the card.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><div class="refsect2"><a id="_options_that_apply_to_all_operations_verbs_on_hdl_cards"></a><h3>Options That Apply to All Operations (Verbs) on HDL Cards</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>
+</span></dt><dd>
+    Specify the directory in which the command should be run.
+    Analogous to the <span class="strong"><strong>-C</strong></span> option in the POSIX <span class="strong"><strong>make</strong></span> command.
+</dd><dt><span class="term">
+<span class="strong"><strong>-v, --verbose</strong></span>
+</span></dt><dd>
+    Describe what is happening in command execution in more detail.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_creating_hdl_cards"></a><h3>Options When Creating HDL Cards</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-P</code></strong></span> <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>
+</span></dt><dd>
+    Specify that the HDL card being created is a platform-specific
+    HDL card to be created in the <span class="strong"><strong><code class="literal">devices/specs/</code></strong></span>
+    subdirectory in the specified HDL platform in the project.
+</dd><dt><span class="term">
+<span class="strong"><strong>-k</strong></span>
+</span></dt><dd>
+    Keep files and directories created after an HDL card creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_deleting_hdl_cards"></a><h3>Options When Deleting HDL Cards</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-f</code></strong></span>
+</span></dt><dd>
+    Force deletion: do not ask for confirmation when deleting
+    an HDL card. Normally, you are asked to confirm a deletion.
+</dd></dl></div></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+At the top level of the project, create an HDL card
+with the name <span class="strong"><strong><code class="literal">mycard</code></strong></span>. The HDL card definition
+named <span class="strong"><strong><code class="literal">mycard.xml</code></strong></span> will be placed
+in the subdirectory <span class="strong"><strong><code class="literal">hdl/cards/specs/</code></strong></span>:
+</p><pre class="screen">ocpidev create hdl card mycard</pre></li><li class="listitem"><p class="simpara">
+At the top level of the project, create an HDL card
+with the name <span class="strong"><strong><code class="literal">mycard</code></strong></span> for the platform <span class="strong"><strong><code class="literal">myplatform</code></strong></span>.
+The HDL card definition
+named <span class="strong"><strong><code class="literal">mycard.xml</code></strong></span> will be placed
+in the subdirectory <span class="strong"><strong><code class="literal">hdl/platforms/myplatform/devices/specs/</code></strong></span>:
+</p><pre class="screen">ocpidev create hdl card mycard -P myplatform</pre></li><li class="listitem"><p class="simpara">
+Inside the project, delete an HDL card definition named <span class="strong"><strong><code class="literal">mycard.xml</code></strong></span> from
+a project’s <span class="strong"><strong><code class="literal">hdl/cards/specs/</code></strong></span> subdirectory:
+</p><pre class="screen">ocpidev delete hdl card mycard</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-device.1.html" target="_top">ocpidev-device(1)</a>
+<a class="ulink" href="ocpidev-platform.1.html" target="_top">ocpidev-platform(1)</a>
+<a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
+<a class="ulink" href="ocpidev-slot.1.html" target="_top">ocpidev-slot(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

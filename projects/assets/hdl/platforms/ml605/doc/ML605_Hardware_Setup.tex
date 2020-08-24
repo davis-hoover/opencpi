@@ -18,32 +18,28 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
-\def\docTitle{OpenCPI\\ ML605 Hardware Setup Guide}
-\def\docVersion{1.5}
-%----------------------------------------------------------------------------------------
+\def\docTitle{ML605 Hardware Setup Guide}
 \def\snippetpath{../../../../../../doc/av/tex/snippets}
-\input{\snippetpath/includes}
-\input{LaTeX_Header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{ML605 Hardware Setup Guide}
 %----------------------------------------------------------------------------------------
-%\usepackage[T1]{fontenc} % http://tex.stackexchange.com/a/181119
-\usepackage{graphicx}
-\graphicspath{ {figures/} }
-\usepackage{textcomp}
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+\graphicspath{{figures/}}
 \newcommand{\shellcmd}[1]{\texttt{\$ #1\\}}
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 \maketitle
-%\thispagestyle{fancy}
+\thispagestyle{empty}
 \newpage
-	\begin{center}
+
+\begin{center}
 	\textit{\textbf{Revision History}}
-		\begin{table}[H]
+	\begin{table}[H]
 		\label{table:revisions} % Add "[H]" to force placement of table
-			\begin{tabularx}{\textwidth}{|c|X|l|}
+		\begin{tabularx}{\textwidth}{|c|X|l|}
 			\hline
 			\rowcolor{blue}
 			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
@@ -60,12 +56,14 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 			v1.5 & Updated description for modification of system.xml & 4/2019\\
 			\hline
-			\end{tabularx}
-		\end{table}
-	\end{center}
+		\end{tabularx}
+	\end{table}
+\end{center}
 \newpage
+
 \tableofcontents
-\pagebreak
+\newpage
+
 \section{ML605 Hardware Setup}
 \subsection{Prerequisites}
 \begin{itemize}

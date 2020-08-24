@@ -40,7 +40,7 @@
 --   throttle number of issued reads in case tags can't encode then
 --   can we use eop more efficiently than counting?
 
-library IEEE, ocpi, util, bsv, sdp;
+library IEEE, ocpi, util, sdp;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all;
 use work.sdp_receive_constants.all;

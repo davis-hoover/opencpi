@@ -1,0 +1,211 @@
+.\"     Title: ocpidev-slot
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/27/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-SLOT" "1" "07/27/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-slot \- manage an OpenCPI HDL slot\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl slot\fR \fI<name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBhdl slot\fR noun represents an OpenCPI HDL slot, which defines an integral part of an HDL platform that enables an \fIHDL card\fR to be plugged in so that its attached devices are accessible to the platform\&. An HDL platform has defined slot types; HDL cards that are designed for the same slot type can be plugged in to the defined slots on the platform\&.
+.sp
+An HDL slot is described by an OpenCPI HDL slot type definition, which is an XML file that defines the signal connections to the pins of the connectors associated with the slot type and provides an (optional) name for the slot type that can be used in HDL Platform Descriptions (OHPDs) and HDL card definitions\&. OpenCPI provides HDL slot definitions for a number of standard slot types, like the FMC (FPGA Mezzanine Card), which is defined by the by the VITA standards organization as VITA\-57\&.1\&. Defining a new slot type for use in OpenCPI consists of creating an HDL slot type definition from the information given in the standard document for the slot; writing HDL code to support an HDL slot is not normally necessary\&. For more information about the XML structure of an HDL slot type definition and how it relates to HDL platforms, devices and cards, see the section "Slots \- How Cards Plug into Platforms" in the \fIOpenCPI Platform Development Guide\fR\&.
+.sp
+An HDL slot is named \fI<name>\fR\fB\&.xml\fR, where \fI<name>\fR must be a name that can be used in programming languages (uses underscores rather than hyphens) but is otherwise case insensitive\&. The HDL slot name should normally be the exact name used in the standard document that defines the slot type\&.
+.sp
+In a project, an HDL slot resides in one of the following locations depending on its intended use:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/cards/specs/\fR
+when the HDL slot is platform\-independent
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the subdirectory
+\fBhdl/platforms/\fR\fI<platform>\fR\fB/devices/specs/\fR
+when the HDL slot is platform\-specific
+.RE
+.sp
+OpenCPI\-defined HDL slots are located in the subdirectory \fBhdl/cards/specs/\fR in the OpenCPI built\-in \fBcore\fR project\&.
+.sp
+Verbs that can operate on an HDL slot are:
+.PP
+\fBcreate\fR
+.RS 4
+Create the named HDL slot according to the specified options, creating directories and files as required\&.
+.RE
+.PP
+\fBdelete\fR
+.RS 4
+Remove all files associated with the named HDL slot\&.
+.RE
+.sp
+The \fBcreate\fR operation creates an initial HDL slot type definition XML file that can be edited as necessary to define the slot type\&.
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.SS "Options That Apply to All Operations (Verbs) on HDL Slots"
+.PP
+\fB\-d\fR \fI<directory>\fR
+.RS 4
+Specify the directory in which the command should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&.
+.RE
+.PP
+\fB\-v, \-\-verbose\fR
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Options When Creating HDL Slots"
+.PP
+\fB\-P\fR \fI<hdl\-platform>\fR
+.RS 4
+Specify that the HDL slot being created is a platform\-specific HDL slot to be created in the
+\fBdevices/specs/\fR
+subdirectory in the specified HDL platform in the project\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Keep files and directories created after an HDL slot creation fails\&. Normally, all such files and directories are removed on any failure\&.
+.RE
+.SS "Options When Deleting HDL Slots"
+.PP
+\fB\-f\fR
+.RS 4
+Force deletion: do not ask for confirmation when deleting a protocol\&. Normally, you are asked to confirm a deletion\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+At the top level of the project, create an HDL slot with the name
+\fBmyslot\fR\&. The HDL slot definition named
+\fBmyslot\&.xml\fR
+will be placed in the subdirectory
+\fBhdl/cards/specs/\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl slot myslot
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+At the top level of the project, create an HDL slot with the name
+\fBmyslot\fR
+for the platform
+\fBmyplatform\fR\&. The HDL slot definition named
+\fBmyslot\&.xml\fR
+will be placed in the subdirectory
+\fBplatforms/myplatform/hdl/devices/specs/\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl slot myslot \-P myplatform
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside the project, delete an HDL slot definition named
+\fBmyslot\&.xml\fR
+from a project\(cqs
+\fBhdl/cards/specs/\fR
+subdirectory:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev delete hdl slot myslot
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-card(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-device(1) ocpidev\-platform(1) ocpidev\-project(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

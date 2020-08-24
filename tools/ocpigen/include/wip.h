@@ -423,6 +423,7 @@ class Worker : public OU::Worker {
   unsigned m_maxLevel;        // when data type processing
   bool m_dynamic;
   bool m_isSlave;
+  bool m_isOptional;                // is this slave optional
   Worker(ezxml_t xml, const char *xfile, const std::string &parentFile, WType type,
 	 Worker *parent, OU::Assembly::Properties *ipvs, const char *&err);
   virtual ~Worker();
@@ -441,7 +442,7 @@ class Worker : public OU::Worker {
   OU::Port *findMetaPort(const char *id, const OU::Port *except) const;
   const char* parseSlaves();
   std::string print_map();
-  const char* addSlave(const std::string worker_name, const std::string slave_name);
+  const char* addSlave(const std::string worker_name, const std::string slave_name, bool optional);
   virtual OU::Port &metaPort(unsigned long which) const;
   const char
     *addBuiltinProperties(),
@@ -465,7 +466,7 @@ class Worker : public OU::Worker {
     //    *preParseSpecDataPort(ezxml_t x),
     //    *parseSpecPort(Port *p),
     *parseHdlImpl(const char* package = NULL),
-    *parseBuildFile(bool optional, bool *missing = NULL, const std::string *parent = NULL),
+    *parseBuildFile(bool optional, bool *missing, const std::string &parent),
     *parseBuildXml(ezxml_t x, const std::string &file),
     *startBuildXml(FILE *&f),
     *doProperties(ezxml_t top, const char *parent, bool impl, bool anyIsBad, const char *firstRaw, bool AllRaw),
@@ -494,7 +495,7 @@ class Worker : public OU::Worker {
     *emitMakefile(FILE *xmlFile = NULL),
     *emitHDLConstants(size_t config, bool other),
     *setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
-		    const std::string *parent = NULL),
+		    const std::string &parent),
     *finalizeProperties(),
     *finalizeHDL(),
     *deriveOCP(),
@@ -536,6 +537,7 @@ class Worker : public OU::Worker {
     emitXmlInstances(FILE *f),
     emitXmlConnections(FILE *f);
   void
+    emitVhdlLibraries(FILE *f),
     emitCppTypesNamespace(FILE *f, std::string &nsName, const std::string &slaveName=""),
     emitDeviceConnectionSignals(FILE *f, const char *iname, bool container),
     setParent(Worker *p), // when it can't happen at construction
@@ -598,7 +600,7 @@ extern const char
   *checkSuffix(const char *str, const char *suff, const char *last),
   *createTests(const char *file, const char *package, const char *outDir, bool verbose),
   *createCases(const char **args, const char *package, const char *outDir, bool verbose),
-  *addLibrary(const char *lib),
+//  *addLibrary(const char *lib),
   *extractExprValue(const OU::Property &p, const OU::Value &v, OU::ExprValue &val),
   *tryInclude(ezxml_t x, const std::string &parent, const char *element, ezxml_t *parsed,
 	      std::string &child, bool optional),
@@ -610,8 +612,8 @@ extern const char
   *rccValue(OU::Value &v, std::string &value),
   *g_platform, *g_device, *load, *g_os, *g_os_version, *g_arch, **libraries, **mappedLibraries,
   *assembly, *attribute, *platformDir,
-  *addLibMap(const char *),
-  *findLibMap(const char *file), // returns mapped lib name from dir name of file or NULL
+//  *addLibMap(const char *),
+//  *findLibMap(const char *file), // returns mapped lib name from dir name of file or NULL
   *propertyTypes[],
   *getNames(ezxml_t xml, const char *file, const char *tag, std::string &name, std::string &fileName),
   *tryOneChildInclude(ezxml_t top, const std::string &parent, const char *element,

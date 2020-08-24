@@ -50,7 +50,7 @@ create_generated_clock -name FMC_LA08_P_DIV4 -divide_by 2 -source [get_pins {fto
 
 # following methodology in "Figure 3-77: Muxed Clocks" / "Case in which only the paths A or B or C exist" in https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
 create_generated_clock -name clkdiv2_mux -divide_by 1 -source [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O}] [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
-create_generated_clock -name clkdiv4_mux -divide_by 1 -add master_clock FMC_LA08_P_DIV4 -source [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}] [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
+create_generated_clock -name clkdiv4_mux -divide_by 1 -add -master_clock FMC_LA08_P_DIV4 -source [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}] [get_pins {ftop/FMC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
 set_clock_groups -physically_exclusive -group clkdiv2_mux -group clkdiv4_mux
 
 # ----------------------------------------------------------------------------

@@ -3866,7 +3866,7 @@
    </text:list>
    <text:p text:style-name="Body">ANSWER: REUSE. <text:span text:style-name="T11">The</text:span> OCS XML file is available from <text:span text:style-name="T76">the</text:span> t<text:span text:style-name="T55">utorial project</text:span>.</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc80945_3495623107"/>Step 3: Create Worker<text:bookmark-end text:name="__RefHeading___Toc80945_3495623107"/></text:h>
-   <text:p text:style-name="Body"><text:span text:style-name="T55">To create the worker using the ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="Body"><text:span text:style-name="T55">To create the worker using the AV GUI</text:span>:</text:p>
    <text:list xml:id="list113139264933859" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P67">File → New → Other → ANGRYVIPER → OpenCPI Asset Wizard</text:p>
@@ -3899,7 +3899,7 @@
    <text:p text:style-name="P49">TBD</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc80947_3495623107"/>Step 3: Build <text:span text:style-name="T11">Generated </text:span>Skeleton <text:span text:style-name="T11">Code</text:span><text:bookmark-end text:name="__RefHeading___Toc80947_3495623107"/></text:h>
    <text:p text:style-name="Body">Why? Because, although <text:span text:style-name="T4">it’s </text:span>not very exciting, this step proves that the skeleton source code is buildable and that the build engine is functional.</text:p>
-   <text:p text:style-name="Body">To build <text:span text:style-name="T55">the </text:span>generated skeleton code <text:span text:style-name="T55">using the ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="Body">To build <text:span text:style-name="T55">the </text:span>generated skeleton code <text:span text:style-name="T55">using the AV GUI</text:span>:</text:p>
    <text:list xml:id="list113137592200341" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P67">In the IDE, add the <text:span text:style-name="T15">w</text:span>orker to the Project Operations panel.</text:p>
@@ -3929,7 +3929,7 @@
      <loext:sender-initials>LZ</loext:sender-initials>
      <text:p text:style-name="P86"><text:span text:style-name="T81">Should the reader set this property to zero when he adds it?</text:span></text:p>
     </office:annotation><text:span text:style-name="T56">The default value for this property is 0 (input).</text:span><office:annotation-end office:name="__Annotation__86675_3495623107"/></text:p>
-   <text:p text:style-name="P49">To add the <text:span text:style-name="T56">data_select property</text:span> using the ANGRYVIPER GUI, use the Design tab. <office:annotation office:name="__Annotation__86674_3495623107">
+   <text:p text:style-name="P49">To add the <text:span text:style-name="T56">data_select property</text:span> using the AV GUI, use the Design tab. <office:annotation office:name="__Annotation__86674_3495623107">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2019-11-24T11:53:37.327937692</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
@@ -3941,7 +3941,7 @@
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc80951_3495623107"/>Step 3: Convert Data <text:span text:style-name="T11">P</text:span>ort Interface f<text:span text:style-name="T57">or </text:span>Parallel <text:span text:style-name="T57">Transmission</text:span><text:bookmark-end text:name="__RefHeading___Toc80951_3495623107"/></text:h>
    <text:p text:style-name="P51"><text:span text:style-name="T53">By default, the iqstream_protocol is interleaved 16-bit I/Q sample data. We need to c</text:span>onvert <text:span text:style-name="T58">the </text:span>data port interface from <text:span text:style-name="T53">i</text:span>nterleaved to <text:span text:style-name="T53">p</text:span>arallel. </text:p>
    <text:p text:style-name="P51">Determine <text:span text:style-name="T53">the </text:span>port configuration settings by examining the &quot;Worker Interfaces&quot; table in the <text:span text:style-name="T58">c</text:span>omponent data sheet.</text:p>
-   <text:p text:style-name="P46">Using the <text:span text:style-name="T57">ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="P46">Using the <text:span text:style-name="T57">AV GUI</text:span>:</text:p>
    <text:list xml:id="list113138248523940" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P68"><text:span text:style-name="T53">In the </text:span>Design tab <text:span text:style-name="T53">(the OWD HDL Editor)</text:span>:</text:p>
@@ -3955,9 +3955,9 @@
    <text:p text:style-name="P46">TBD</text:p>
    <text:p text:style-name="P51">Expanding the data interface to 32 bit allows 16-bit I and 16-bit Q data to be transmitted simultaneously; that is, in parallel.</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc80953_3495623107"/>Step 3: Configure for Version 2 HDL API<text:bookmark-end text:name="__RefHeading___Toc80953_3495623107"/></text:h>
-   <text:p text:style-name="P1">The v1.5 release of the <text:span text:style-name="T57">ANGRYVIPER GUI</text:span> does not provide a field for declaring Version 2 HDL API, so you must manually modify the XML <text:span text:style-name="T17">and then change the name of the architecture in the generated VHDL</text:span>. <text:span text:style-name="T57">The next sections describe these steps.</text:span></text:p>
+   <text:p text:style-name="P1">The v1.5 release of the <text:span text:style-name="T57">AV GUI</text:span> does not provide a field for declaring Version 2 HDL API, so you must manually modify the XML <text:span text:style-name="T17">and then change the name of the architecture in the generated VHDL</text:span>. <text:span text:style-name="T57">The next sections describe these steps.</text:span></text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc88909_3495623107"/><text:s/><text:span text:style-name="T17">Edit Worker XML</text:span><text:bookmark-end text:name="__RefHeading___Toc88909_3495623107"/></text:h>
-   <text:p text:style-name="P50">To use the ANGRYVIPER GUI to edit the HDL worker XML:</text:p>
+   <text:p text:style-name="P50">To use the AV GUI to edit the HDL worker XML:</text:p>
    <text:list xml:id="list113138268929746" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P67">Switch the tab from “Design” to “Source”.</text:p>
@@ -4017,7 +4017,7 @@
      <loext:sender-initials>LZ</loext:sender-initials>
      <text:p text:style-name="P86"><text:span text:style-name="T81">What is gen/*? I think this is the first time it’s referenced.</text:span></text:p>
     </office:annotation><text:span text:style-name="T53">Now rebuild the worker with the changes from the OWD to update the gen/*.</text:span><office:annotation-end office:name="__Annotation__67986_3495623107"/></text:p>
-   <text:p text:style-name="P51">Using the <text:span text:style-name="T59">ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="P51">Using the <text:span text:style-name="T59">AV GUI</text:span>:</text:p>
    <text:list xml:id="list113137660274591" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P68">Refresh the OpenCPI Projects panel.</text:p>
@@ -4074,7 +4074,7 @@
    <text:p text:style-name="P35">Wire signals to the <text:span text:style-name="T57">third-party</text:span> <text:span text:style-name="T57">IP cores</text:span> instantiations.</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc80961_3495623107"/>Step 4: Build Worker<text:bookmark-end text:name="__RefHeading___Toc80961_3495623107"/></text:h>
    <text:p text:style-name="Body">Now build the HDL worker <text:span text:style-name="T62">only</text:span><text:span text:style-name="T57"> for </text:span>XSIM <text:span text:style-name="T23">t</text:span>argets. </text:p>
-   <text:p text:style-name="Body"><text:span text:style-name="T46">Using the ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="Body"><text:span text:style-name="T46">Using the AV GUI</text:span>:</text:p>
    <text:list xml:id="list113138517351065" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P67">Add the <text:span text:style-name="T12">w</text:span>orker to the Project Operations panel.</text:p>
@@ -4149,7 +4149,7 @@
    <text:p text:style-name="P39">Now we’ll build the unit test and examine the generated artifacts.</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc80971_3495623107"/>Build Unit Test<text:bookmark-end text:name="__RefHeading___Toc80971_3495623107"/></text:h>
    <text:p text:style-name="P40"><text:span text:style-name="T46">First, b</text:span>uild <text:span text:style-name="T31">the u</text:span>nit <text:span text:style-name="T32">t</text:span>est <text:span text:style-name="T32">s</text:span>uite for target simulation platform.</text:p>
-   <text:p text:style-name="P44">Using the <text:span text:style-name="T57">ANGRYVIPER GUI</text:span>:</text:p>
+   <text:p text:style-name="P44">Using the <text:span text:style-name="T57">AV GUI</text:span>:</text:p>
    <text:list xml:id="list113139202085962" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P67"><text:span text:style-name="T46">A</text:span>dd the <text:span text:style-name="T32">u</text:span>nit <text:span text:style-name="T32">t</text:span>est to the Project Operations panel.</text:p>
@@ -4213,7 +4213,7 @@
    <text:p text:style-name="P34">- <text:span text:style-name="T30">e</text:span>xecution file for execution onto a <text:span text:style-name="T30">s</text:span>imulation platform</text:p>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc80977_3495623107"/>Step 7: Run Unit Test (Xilinx XSIM)<text:bookmark-end text:name="__RefHeading___Toc80977_3495623107"/></text:h>
    <text:p text:style-name="Body"><text:span text:style-name="T23">In this step,</text:span> we’ll run the unit test suite for the target simulation platform.</text:p>
-   <text:p text:style-name="P44">To run the unit test using <text:span text:style-name="T47">the </text:span>ANGRYVIPER GUI<text:span text:style-name="T47">:</text:span></text:p>
+   <text:p text:style-name="P44">To run the unit test using <text:span text:style-name="T47">the </text:span>AV GUI<text:span text:style-name="T47">:</text:span></text:p>
    <text:list xml:id="list113137671207896" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P67"><text:span text:style-name="T33">A</text:span>dd the Unit Test (.test) to the Project Operations panel.</text:p>

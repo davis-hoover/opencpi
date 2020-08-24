@@ -1,0 +1,120 @@
+This is an attempt to capture some analysis notes taken during the
+integration of the document packaging logic that's in the "releng"
+directory.
+
+A quick opening comment about the whole "spoof my hostname" mess...
+There are reasons why RPMs haven't been provided since v1.5.0 was
+released.  The packaging machinery has very much been a work-in-
+progress since then.  Determining the original design intent has
+been difficult due to the complexity involved in trying to do things
+"the right way" from a RedHat packaging perspective.  The reader will
+see a prime example of this when the hostname spoofing logic gets
+picked apart below.
+
+First, the relevant lines from "releng/Makefile":
+
+.PHONY: doc_rpm
+.SILENT: doc_rpm
+doc_rpm: libmyhostname cleanrpmbuild
+	../doc/build-pages.py HEAD
+	$(MAKE) -C ../ exports
+	tar -czhf "opencpi-doc-$(RPM_VERSION).tar.gz" -C ../exports/ doc/
+	mv "opencpi-doc-$(RPM_VERSION).tar.gz" ~/rpmbuild/SOURCES/
+	$(SPOOF_HOSTNAME) rpmbuild -bb opencpi-doc.spec \
+	--define="COMMIT_HASH $(COMMIT_HASH)" \
+	--define="COMMIT_TAG $(shell echo "$(COMMIT_TAG)" | tr -d ' ')" \
+	--define="RELEASE_TAG $(RELEASE_TAG)" \
+	--define="RPM_RELEASE $(RPM_RELEASE)" \
+	--define="RPM_VERSION $(RPM_VERSION)" \
+	--define="SRC_BASE $(CURDIR)/../"
+	cp -v ~/rpmbuild/RPMS/noarch/opencpi-doc-$(RPM_VERSION)*.rpm .
+
+Misc comments about vars above, mostly in the order in which
+they are encountered:
+
+RPM_VERSION:
+    Supplied by "make-*-rpms.sh" and set to value of $version which is passed in
+    as part of the following (make-*-rpms.sh called from top-level Makefile):
+
+        # Parse args
+	verbose=--quiet
+	[ "$1" = -v ] && verbose=-vv && shift
+	platform=$1 && shift
+	cross=0
+	[ -n "$1" ] && cross=1
+	shift
+	package=$1 && shift
+	base=$1 && shift
+	name=$1 && shift
+	release=$1 && shift
+	version=$1 && shift
+	hash=$1 && shift
+	# and "make-hw-rpms.sh" adds the following:
+	hdl_rcc_platform=$1 && shift
+
+
+SPOOF_HOSTNAME:
+    Evidently, no final decision was reached on how to name the 32-bit and
+    64-bit versions of "libmyhostname.so", but the current (as of this writing)
+    scheme is:
+
+        32-bit: libmyhostname.so
+        64-bit: lib64myhostname.so
+
+    There's evidence from looking at various files under "releng" and in the
+    source tree for "myhostname" that another scheme, based on "uname -m", was
+    considered:
+
+        32-bit: libmyhostname_i386.so
+        64-bit: libmyhostname_x86_64.so
+
+    Both schemes are clever for different reasons, but broken.  The first attempts
+    to leverage the value of "${LIB}" which will be either "lib" or "lib64".  The
+    second attempts to leverage the value of "uname -m" as mentioned earlier.  The
+    proper way to do this is have the 32-bit libraries under a "lib" directory, and
+    the 64-bit libraries under a "lib64" directory.  The actual name of the library
+    in each of those directories would be the same, i.e., "libmyhostname.so".  I've
+    been trying to avoid fixing this, but it needs to be done.  My understanding is,
+    the library is not used except by the RPM packaging machinery, so any breakage
+    would be limited in scope.
+
+    There are at least two ways to use the special lib{64}myhostname.so library
+    to hide the actual build hostname.  The documented way, per the README file
+    in "build/prerequisites/myhostname", is to have a higher-level Makefile
+    include "myhostname.mk": this sets SPOOF_HOSTNAME to a string which, when
+    evaluated, sets LD_PRELOAD to use "libmyhostname.so".  Note there are two
+    versions of "myhostname.mk" in the OpenCPI source tree, and the one in
+    "build/prerequisites/myhostname" is different from the one in "releng".
+    The version in "releng" is the one used by the "doc_rpm" build in that
+    directory.
+
+    The second way is to source "build/prerequisites/myhostname/myhostname.sh",
+    which sets MYHOSTNAME_SPOOF which is what the current incarnation of
+    "packaging/make-sw-rpms.sh" uses.
+
+    "packaging/make-hw-rpms.sh" is broken.  "eval ${SPOOF_HOSTNAME}" appears
+    in that file, but SPOOF_HOSTNAME is never set.
+
+COMMIT_HASH:
+    Corresponds exactly to "git_hash" as set in the top-level "Makefile".
+    Passed in to "make-*-rpms.sh" as "hash" argument.
+
+COMMIT_TAG:
+    Corresponds exactly to "git_tag" as set in the top-level "Makefile".
+    Part of "release" string if it's set to "snapshot$(tag)$(git_tag)".
+    "release" passed in to "make-*-rpms.sh" as "release" argument.
+
+RELEASE_TAG:
+    Corresponds exactly to "timestamp" as set in the top-level "Makefile".
+    "timestamp" is assigned to "tag" unless "git_version" is non-null.
+    Part of "release" string if it's set to "snapshot$(tag)$(git_tag)".
+
+RPM_RELEASE:
+    Corresponds exactly to the string "snapshot" that is potentially part
+    of the "release" string, i.e., it can be null.  In "releng/Makefile",
+    RPM_RELEASE defaults to "snapshot" if it's not already set.  Obviously
+    part of "release" string if it's set to "snapshot$(tag)$(git_tag)".
+    it gets set to "snapshot" if it doesn't have a value already.
+
+SRC_BASE:
+    The top-level "opencpi" directory.

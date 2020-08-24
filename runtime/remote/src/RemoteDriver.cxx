@@ -111,44 +111,54 @@ class Worker
 
   void read(size_t /*offset*/, size_t /*nBytes*/, void */*p_data*/) {}
   void write(size_t /*offset*/, size_t /*nBytes*/, const void */*p_data*/ ) {}
-  void setPropertyBytes(const OA::PropertyInfo &/*info*/, size_t /*offset*/,
-			const uint8_t */*data*/, size_t /*nBytes*/, unsigned /*idx*/) const {
-    assert("No implementation for remote setPropertyBytes"==NULL);
+  void setPropertyBytes(const OA::PropertyInfo &info, size_t offset,
+			const uint8_t *data, size_t nBytes, unsigned idx) const {
+    m_launcher.setPropertyBytes(m_remoteInstance, info.m_ordinal, offset, data, nBytes, idx);
   };
   void setProperty8(const OA::PropertyInfo &info, size_t offset, uint8_t data,
 		    unsigned idx) const {
-    char unparsed[2+8/4+1];
-    snprintf(unparsed, sizeof(unparsed), "0x%" PRIx8, data);
-    setProperty(info, unparsed, info, offset + idx*sizeof(uint8_t), 0);
+    m_launcher.setPropertyBytes(m_remoteInstance, info.m_ordinal, offset, &data, sizeof(data), idx);
   }
   void setProperty16(const OA::PropertyInfo &info, size_t offset, uint16_t data,
 		     unsigned idx) const {
-    char unparsed[2+16/4+1];
-    snprintf(unparsed, sizeof(unparsed), "0x%" PRIx16, data);
-    setProperty(info, unparsed, info, offset + idx*sizeof(uint16_t), 0);
+    m_launcher.setPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t*)&data, sizeof(data), idx);
   }
   void setProperty32(const OA::PropertyInfo &info, size_t offset, uint32_t data,
 		     unsigned idx) const {
-    char unparsed[2+32/4+1];
-    snprintf(unparsed, sizeof(unparsed), "0x%" PRIx32, data);
-    setProperty(info, unparsed, info, offset + idx*sizeof(uint32_t), 0);
+    m_launcher.setPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t*)&data, sizeof(data), idx);
   }
   void setProperty64(const OA::PropertyInfo &info, size_t offset, uint64_t data,
 		     unsigned idx) const {
-    char unparsed[2+64/4+1];
-    snprintf(unparsed, sizeof(unparsed), "0x%" PRIx64, data);
-    setProperty(info, unparsed, info, offset + idx*sizeof(uint64_t), 0);
+    m_launcher.setPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t*)&data, sizeof(data), idx);
   }
-  void getPropertyBytes(const OA::PropertyInfo &/*info*/, size_t /*offset*/,
-			uint8_t */*data*/, size_t /*nBytes*/, unsigned /*idx*/, bool /*string*/)
-    const {
+  void getPropertyBytes(const OA::PropertyInfo &info, size_t offset, uint8_t *data, size_t nBytes,
+			unsigned idx, bool string) const {
+    m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, data, nBytes, idx, string);
   }
-  uint8_t getProperty8(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const { return 0; }
-  uint16_t getProperty16(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const { return 0; }
-  uint32_t getProperty32(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const  { return 0; }
-  uint64_t getProperty64(const OA::PropertyInfo &/*info*/, size_t /*offset*/, unsigned /*idx*/) const  { return 0; }
-
-      
+  uint8_t getProperty8(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
+    uint8_t data;
+    m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, &data, sizeof(data),
+				idx, false);
+    return data;
+  }
+  uint16_t getProperty16(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
+    uint16_t data;
+    m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t *)&data,
+				sizeof(data), idx, false);
+    return data;
+  }
+  uint32_t getProperty32(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
+    uint32_t data;
+    m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t *)&data,
+				sizeof(data), idx, false);
+    return data;
+  }
+  uint64_t getProperty64(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
+    uint64_t data;
+    m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t *)&data,
+				sizeof(data), idx, false);
+    return data;
+  }
   void propertyWritten(unsigned /*ordinal*/) const {};
   void propertyRead(unsigned /*ordinal*/) const {};
   void prepareProperty(OU::Property &,
@@ -167,10 +177,6 @@ class Worker
     setProperty(info, s.c_str(), m, offset + idx * m.m_elementBytes,	\
 		m.m_isSequence || m.m_arrayRank ? 1 : 0);		\
   }									\
-  void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
-			     size_t offset, const run val, unsigned idx) const { \
-    set##pretty##Property(info, m, offset, val, idx); \
-  } \
   void set##pretty##SequenceProperty(const OA::PropertyInfo &info, const run *vals, \
 				     size_t length) const { \
     OU::Unparser up;					    \
@@ -179,6 +185,13 @@ class Worker
       up.unparse##pretty(s, *vals++, true);		    \
     setProperty(info, s.c_str(), info, 0, 0);		    \
   }
+#if 0
+  void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
+			     size_t offset, const run val, unsigned idx) const { \
+    set##pretty##Property(info, m, offset, val, idx); \
+  } \
+
+#endif
   // Set a string property value
   // ASSUMPTION:  strings always occupy at least 4 bytes, and
   // are aligned on 4 byte boundaries.  The offset calculations
@@ -192,12 +205,15 @@ class Worker
     setProperty(info, s.c_str(), m, offset + idx * m.m_elementBytes,	\
 		m.m_isSequence || m.m_arrayRank ? 1 : 0);		\
   }									\
+  void set##pretty##SequenceProperty(const OA::PropertyInfo &/*p*/, const run */*vals*/, \
+				     size_t /*length*/) const {}
+#if 0
   void set##pretty##Cached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m, \
 			   size_t offset, const run val, unsigned idx) const { \
     set##pretty##Property(info, m, offset, val, idx);			\
   }									\
-  void set##pretty##SequenceProperty(const OA::PropertyInfo &/*p*/, const run */*vals*/, \
-				     size_t /*length*/) const {}
+
+#endif
   OCPI_PROPERTY_DATA_TYPES
 #undef OCPI_DATA_TYPE_S
 #undef OCPI_DATA_TYPE
@@ -216,10 +232,6 @@ class Worker
     (void)v.parse(uValue.c_str());					\
     return v.m_##pretty;						\
   }									\
-  run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
-			  size_t offset, unsigned idx) const {		\
-    return get##pretty##Property(info, m, offset, idx);			\
-  }									\
   unsigned get##pretty##SequenceProperty(const OA::PropertyInfo &info, run *vals, \
 					 size_t length) const {		\
     std::string uValue; /* unparsed value */				\
@@ -233,6 +245,13 @@ class Worker
     }									\
     return OCPI_UTRUNCATE(unsigned, v.m_nTotal);			\
   }
+#if 0
+  run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
+			  size_t offset, unsigned idx) const {		\
+    return get##pretty##Property(info, m, offset, idx);			\
+  }									\
+
+#endif
   // ASSUMPTION:  strings always occupy at least 4 bytes, and
   // are aligned on 4 byte boundaries.  The offset calculations
   // and structure padding are assumed to do this.
@@ -245,14 +264,17 @@ class Worker
 		m.m_isSequence || m.m_arrayRank ? 1 : 0, OA::PropertyOptionList({ OA::HEX }));	\
     strncpy(cp, uValue.c_str(), length); \
   }									\
+  unsigned get##pretty##SequenceProperty				\
+  (const OA::PropertyInfo &/*p*/, char **/*vals*/, size_t /*length*/, char */*buf*/, \
+   size_t /*space*/) const { return 0; }
+#if 0
   run get##pretty##Cached(const OCPI::API::PropertyInfo &info, const Util::Member &m, \
 			   size_t offset, char *cp, size_t length, unsigned idx) const { \
     get##pretty##Property(info, m, offset, cp, length, idx); \
     return cp; \
   } \
-  unsigned get##pretty##SequenceProperty				\
-  (const OA::PropertyInfo &/*p*/, char **/*vals*/, size_t /*length*/, char */*buf*/, \
-   size_t /*space*/) const { return 0; }
+
+#endif
 
   OCPI_PROPERTY_DATA_TYPES
 #undef OCPI_DATA_TYPE_S

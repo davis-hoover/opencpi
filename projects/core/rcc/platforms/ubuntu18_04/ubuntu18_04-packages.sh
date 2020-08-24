@@ -99,8 +99,10 @@ PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
 #    for building kernel drivers (separate from pre-packaged driver)
-KVER=`uname -r`
-PKGS_S+=(linux-headers-$KVER)
+#    don't install if in a "docker" container
+[[ -e /.dockerenv || -e /run/.containerenv ]] || {
+  PKGS_S+=(linux-headers-$(uname -r))
+}
 #    for "make rpm":
 #      does not necessarily make sense for debian-based
 #      distros, but will include for completeness
@@ -133,8 +135,10 @@ PKGS_E+=(python3-numpy python3-scipy python3-matplotlib)
 PKGS_E+=(ocl-icd-libopencl1)
 #    Needed to build gpsd
 PKGS_E+=(scons)
+#    Needed to build/run ocpigr
+PKGS_E+=(libyaml-cpp-dev)
 #    Needed to build plutosdr osp
-PKGS_D+=(libssl-dev device-tree-compiler)
+PKGS_E+=(libssl-dev device-tree-compiler)
 
 #
 # Comments around/within the next two functions are for my own

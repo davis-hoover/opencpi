@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-utilization</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140386802516064"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-utilization — displays or records FPGA resource use for HDL OpenCPI assets.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong>ocpidev</strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="strong"><strong>utilization</strong></span> [<span class="emphasis"><em>&lt;noun&gt;</em></span> [<span class="emphasis"><em>&lt;name&gt;</em></span> ]]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">utilization</code></strong></span> verb invokes the OpenCPI tool that
+displays or records FPGA resource use for HDL OpenCPI assets.
+In order to display usage information about an HDL asset for
+a given platform, the asset needs to be built for that platform.</p><p>Asset types to be specified in the <span class="emphasis"><em>&lt;noun&gt;</em></span> argument are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>hdl</strong></span>
+</span></dt><dd><p class="simpara">
+    A prefix to indicate an HDL asset in the <span class="strong"><strong>hdl</strong></span> subdirectory of a project.
+    Possible HDL assets are:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>assembly</strong></span>|<span class="strong"><strong>ies</strong></span>
+</span></dt><dd>
+        Display usage information for all built assemblies
+        contained in the current project or a for specified built
+        HDL assembly contained in the current project.
+</dd><dt><span class="term">
+<span class="strong"><strong>platform</strong></span>|<span class="strong"><strong>s</strong></span>
+</span></dt><dd>
+        Display usage information for all built platforms
+        or for a specified built HDL platform contained
+        in the current project.
+</dd></dl></div></dd><dt><span class="term">
+<span class="strong"><strong>library</strong></span>
+</span></dt><dd>
+    Display usage information for all built workers
+    contained in a component library.
+</dd><dt><span class="term">
+<span class="strong"><strong>project</strong></span>
+</span></dt><dd>
+    Display usage information for all built workers,
+    platforms, and assemblies contained in a project.
+</dd><dt><span class="term">
+<span class="strong"><strong>worker</strong></span>
+</span></dt><dd>
+    Display usage information for the specified worker.
+</dd><dt><span class="term">
+<span class="strong"><strong>workers</strong></span>
+</span></dt><dd>
+    Display usage information for all built workers
+    contained in the current project.
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the description below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--format=table</code></strong></span>|<span class="strong"><strong><code class="literal">latex</code></strong></span>
+</span></dt><dd>
+    Specify how to output the usage information.
+    Specifying <span class="strong"><strong><code class="literal">table</code></strong></span> sends the information to stdout in tabular format.
+    Specifying <span class="strong"><strong><code class="literal">latex</code></strong></span> bypasses <span class="strong"><strong><code class="literal">stdout</code></strong></span> and writes all output to
+    <span class="strong"><strong><code class="literal">utilization.inc</code></strong></span> files in the directories for the assets on
+    which it operates.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-library=</code></strong></span><span class="emphasis"><em>&lt;hdl-primitive-library&gt;</em></span>
+</span></dt><dd>
+    Specify the HDL primitive library in which this
+    operation is to be performed.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>+
+</span></dt><dd>
+    Specify the buildable HDL platform for which
+    to display usage information.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-target=</code></strong></span><span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Specify the HDL target for which to display
+    worker (not assembly) usage information.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--library=</code></strong></span><span class="emphasis"><em>&lt;library&gt;</em></span>, <span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+    Specify the component library in which the utilization operation
+    is to be performed.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-P</code></strong></span> <span class="emphasis"><em>&lt;hdl-platform-directory&gt;</em></span>
+</span></dt><dd>
+    Specify the HDL platform subdirectory in which the
+    utilization operation is to be performed.
+</dd></dl></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Show usage information for the worker named <span class="strong"><strong><code class="literal">complex_mixer</code></strong></span>
+using build results from all platforms:
+</p><pre class="screen">ocpidev utilization worker complex_mixer</pre></li><li class="listitem"><p class="simpara">
+Show usage information for the worker named <span class="strong"><strong><code class="literal">complex_mixer</code></strong></span>
+using build results from the <span class="strong"><strong><code class="literal">xsim</code></strong></span> platform:
+</p><pre class="screen">ocpidev utilization worker complex_mixer --hdl-platform=xsim</pre></li><li class="listitem"><p class="simpara">
+Show usage information for all workers in the current
+location (project, library, etc.):
+</p><pre class="screen">ocpidev utilization workers</pre></li><li class="listitem"><p class="simpara">
+Show usage information for the <span class="strong"><strong>fir_real_sse</strong></span> worker
+in the <span class="strong"><strong>/components/dsp_comps</strong></span> library:
+</p><pre class="screen">ocpidev utilization worker fir_real_sse -l dsp_comps</pre></li><li class="listitem"><p class="simpara">
+Show usage information for the <span class="strong"><strong><code class="literal">xsim</code></strong></span> platform:
+</p><pre class="screen">ocpidev utilization hdl-platform=xsim</pre></li><li class="listitem"><p class="simpara">
+Show usage information for all HDL platforms
+in the current project:
+</p><pre class="screen">ocpidev utilization hdl-platforms</pre></li><li class="listitem"><p class="simpara">
+Show usage information for an HDL assembly named <span class="strong"><strong><code class="literal">my_assy</code></strong></span>:
+</p><pre class="screen">ocpidev utilization hdl assembly my_assy</pre></li><li class="listitem"><p class="simpara">
+Show usage information for all HDL assemblies in the current project:
+</p><pre class="screen">ocpidev utilization hdl assemblies</pre></li><li class="listitem"><p class="simpara">
+Record usage information for an HDL assembly
+named <span class="strong"><strong><code class="literal">my_assy</code></strong></span> in LaTeX format:
+</p><pre class="screen">ocpidev utilization hdl assembly my_assy --format=latex</pre></li><li class="listitem"><p class="simpara">
+Show usage information for all supported assets in a project:
+</p><pre class="screen">ocpidev utilization project</pre></li><li class="listitem"><p class="simpara">
+Record usage information for all supported assets in a project in LaTeX format:
+</p><pre class="screen">ocpidev utilization project --format=latex</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-build.1.html" target="_top">ocpidev-build(1)</a>
+<a class="ulink" href="ocpidev-clean.1.html" target="_top">ocpidev-clean(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-refresh.1.html" target="_top">ocpidev-refresh(1)</a>
+<a class="ulink" href="ocpidev-register.1.html" target="_top">ocpidev-register(1)</a>
+<a class="ulink" href="ocpidev-run.1.html" target="_top">ocpidev-run(1)</a>
+<a class="ulink" href="ocpidev-set.1.html" target="_top">ocpidev-set(1)</a>
+<a class="ulink" href="ocpidev-show.1.html" target="_top">ocpidev-show(1)</a>
+<a class="ulink" href="ocpidev-unset.1.html" target="_top">ocpidev-unset(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

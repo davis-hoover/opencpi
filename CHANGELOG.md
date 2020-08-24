@@ -1,3 +1,58 @@
+# [v2.0.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v1.7.0...v2.0.0-beta.1) (2020-07-24)
+
+Changes/additions since OpenCPI Release v1.7.0
+
+### New Features
+- **devops**: upload entire OpenCPI tree to AWS S3 when a job fails. (!297)(6708dc22)
+- **osp**: add support for additional xilinx software platforms: xilinx13_4_aarch32, xilinx19_2_aarch{32,64}. (!173)(5e034a9a)
+- **tools**: add AV GUI to ubuntu18_04 platform. (!294)(d74f201c)
+- **tools**: add centos8 RCC development platform. (!312)(c85641a3)
+- **tools**: initial add of "ubuntu18_04" development platform. (!278)(e053aac5)
+
+### Enhancements
+- **devops**: add ability for opencpi pipeline to launch downstream plutosdr pipeline. (!303)(ddb5b49e)
+- **devops**: add weekly scheduled CI pipeline to lessen load on MR pipelines. (!287)(c47409e0)
+- **devops**: move CI artifact hosting from gitlab to AWS. (!325)(8c28c710)
+- **doc**: add generation of html man pages. (!327)(196ab92e)
+- **doc**: add man pages for ocpidev nouns (previous ones are for verbs). (!327)(196ab92e)
+- **doc,tools**: export PDFs so they can more easily be packaged in an RPM. (!311)(fb4c4f4c)
+- **hdl base**: allow bitstream loading in linux 4.10, and avoid probing a bitstream when unloading or loading. (!316)(d3dabaf9)
+- **hdl base,tools**: component library searching is now all-libs-in-project, per project, not each-lib-in-all-projects. (!316)(d3dabaf9)
+- **hdl base,tools**: primitive libraries can be qualified by the project's package id. (!316)(d3dabaf9)
+- **hdl base,tools**: workers chosen for an assembly are not affected by what is built as long as anything is built. (!316)(d3dabaf9)
+- **osp**: add initial support of ad9361 fmcomms transceiver for zcu104 platform. (!302)(bfe43f20)
+- **tools**: `ocpigr`: emit yaml instead of xml to support grc 3.8. (!306)(b2b8617d)
+- **tools**: refactor ocpiadmin.sh and relocate to `tools/scripts/`. (!319)(f37f3732)
+
+### Bug Fixes
+- **devops**: fix hdl platforms building in pipelines when they shouldn't. (!317)(2c557552)
+- **hdl base**: check for hdl target before building zynq primitive wrapper. (!326)(308f360e)
+- **tools**: fix MANPATH and PYTHONPATH settings in "opencpi-setup.sh". (!323)(3312352c)
+- **tools**: fix centos7 platform installation error when swig3 package not available. (!328)(8bf294e7)
+- **tools**: fix incorrect package-ids in artifacts using top-level specs (not specs in libraries). (!321)(380f6c63)
+- **tools**: fix ocpigr build issues. (!324)(543ab821)
+- **tools**: suppress cross-compilation for items in `build/places` that use the `-t` flag. (!307)(894f6e81)
+
+### Miscellaneous
+- **devops**: remove CentOS 6 from CI pipeline. (!308)(5006cbc1)
+- **devops,tools**: revamp OpenCPI RPM package production process. (!304)(2b62a34a)
+- **doc**: update ubuntu* and centos8 platform README files. (!315)(77e3a53c)
+- **osp**: exclude plutosdr in assets assemblies not capable of building. (!295)(a2c8fb98)
+
+# [v1.7.0](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-rc.1...v1.7.0) (2020-07-09)
+
+Changes/additions since OpenCPI Release v1.7.0-rc.1
+
+[Consolidated changelog](https://gitlab.com/opencpi/opencpi/-/releases/v1.7.0)  
+Full [diff](https://gitlab.com/opencpi/opencpi/compare/v1.6.2...v1.7.0) between v1.6.2 and v1.7.0
+
+### Enhancements
+- **doc**: tex documents are more consistent in terms of layout. (!286)(98c0cafb)
+- **tools**: revamp export script modularity to support RPM installs. (!299)(f66e7180)
+
+### Bug Fixes
+- **hdl base**: fix fractional and integer second misalignment in time_server.hdl. (!296)(9b9dc17a)
+
 # [v1.7.0-rc.1](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-beta.1...v1.7.0-rc.1) (2020-06-25)
 
 Changes/additions since OpenCPI Release v1.7.0-beta.1

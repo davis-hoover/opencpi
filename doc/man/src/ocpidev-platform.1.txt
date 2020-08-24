@@ -1,0 +1,355 @@
+OCPIDEV-PLATFORM(1)
+==================
+
+
+NAME
+----
+ocpidev-platform - manage an OpenCPI HDL platform.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`hdl platform`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *`hdl platform`* noun represents an OpenCPI HDL platform, which is
+either a specific FPGA part on a circuit board with optionally attached
+devices or an FPGA simulator that has the infrastructure to serve
+as an OpenCPI 'container' (runtime environment) for
+'HDL assemblies' (FPGA-based subsets of OpenCPI applications).
+
+An HDL platform is described by an OpenCPI HDL Platform Description (OHPD),
+which is an XML file that specifies:
+
+- The OpenCPI Worker Description (OWD) for the 'HDL platform worker', which
+is a special type of 'HDL device worker' that contains the logic for running the HDL platform
+
+- The devices (controlled by HDL device workers) that are attached to
+the HDL platform and are available for use
+
+In a project, an HDL platform resides in its own directory '<name>' (which is
+usually the lowercase version of the name used by the platform's vendor)
+under a *`platforms/`* subdirectory in the project's *`hdl/`* directory.
+
+An HDL platform directory contains the platform's OHPD (named '<name>'*`.xml`*),
+its "make" file (named *`Makefile`*) and the VHDL source code skeleton file
+'<name>'*`.vhd`* for the HDL platform worker.
+The *`ocpidev create`* operation for an HDL platform produces
+initial versions of these files that can then be edited as necessary.
+
+An HDL platform directory can also optionally contain:
+
+- HDL device workers that are unique to the HDL platform, in a *`devices/`* library
+
+- XML files that specify different configurations of the devices
+that are available on the HDL platform, called 'platform configuration files'
+
+- Vendor FPGA 'constraints' files for use with a specific platform configuration
+instead of the default configuration for the platfor
+
+- File(s) that specify vendor tool build-time options
+
+The *`ocpidev build`* operation generates exported files that enable HDL
+assemblies to be built for the platform and a *`lib/`* subdirectory
+that contains links to the files that are necessary for other OpenCPI
+assets to use the platform. Note that building a OpenCPI platform (whether
+HDL or RCC) is usually done at installation time because a platform
+cannot be used by other OpenCPI assets until it has been built.
+See the 'OpenCPI Installation Guide' for a description of how OpenCPI
+platforms are built.
+
+For information on the HDL build flow as it relates to HDL platforms
+and other HDL assets, see the chapter "Building HDL Assets" in the
+'OpenCPI HDL Development Guide'. 
+
+For information on developing an HDL platform, including structure and syntax
+descriptions of HDL platform/platform worker and HDL platform configuration XML
+files and how to develop an HDL device worker, see the section "Enabling Execution for
+FPGA Platforms" in the 'OpenCPI Platform Development Guide'.
+
+Verbs that can operate on an HDL platform are:
+
+*`build`*::
+    Build the HDL platform, creating directories and files
+    as required.
+
+*`clean`*::
+    Remove all the generated and compiled files for all assets
+    in the HDL platform.
+    
+*`create`*::
+    Create the named HDL platform, creating files and directories as required.
+    
+*`delete`*::
+    Remove all directories and files associated with the named HDL platform.
+    
+*`utilization`*::
+    Display information about FPGA resource use by the HDL platform.
+
+Note that an asset's name is implied by the directory you're in when
+you issue the *`ocpidev`* command. For HDL platforms, this
+means that you can perform operations (verbs) on the HDL platform
+without having to specify its name when you issue the
+*`ocpidev`* command from inside the HDL platform's directory.
+
+The *`ocpidev`* tool can also operate on a plural *`hdl platforms`* noun.
+The syntax is:
+
+*`ocpidev`* ['<options>'] [*`build|clean|show|utilization`*] *`hdl platforms`*
+
+The verbs that can be performed on the *`hdl platforms`* noun are:
+
+*`build`*::
+    Build all of the HDL platforms in the project or the *`hdl/`*
+    subdirectory of the project, creating directories and files as required.
+    
+*`clean`*::
+    Remove all the generated and compiled files from all HDL platforms
+    in the project or the *`hdl/`* subdirectory of the project.
+
+*`show`*::
+    List all HDL platforms in all registered projects and the current project.
+    The general-purpose options and the *`show`* formatting options
+    can be specified.
+    
+*`utilization`*::
+    Display FPGA resource usage information for all built HDL platforms
+    in the project. The general-pupose options and the *`utilization`*
+    options can be specified.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Keywords for platforms supported by OpenCPI that can be
+specified in the '<platform>' argument to an option
+can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
+
+Keywords for architectures supported by OpenCPI that can be specified
+in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
+*`xsim`*, *`stratix4`*, *`stratix5`*, *`virtex5`*, *`virtex6`*, *`zynq`*,
+*`zynq_is`*, *`spartan3adsp`*.
+
+Options That Apply to All Operations (Verbs) on HDL Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+*`-d`* '<directory>'::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+    
+*`-v, --verbose`*::
+    Describe what is happening in command execution in more detail.
+
+Options When Creating HDL Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+*`-A`* '<directory>'+::
+    Specify a directory to search for XML include files.
+
+*`-C`* '<core>'+::
+    Specify an HDL primitive core on which the HDL platform
+    (or assets it contains) depends and with which it should be built.
+
+*`-I`* '<directory>'+::
+    Specify a directory to search for include files (C, C++,
+    Verilog).
+
+*`-T`* '<target>'+::
+    Only build the HDL platform for the specified HDL architecture.
+
+*`-Y`* '<primitive-library>'+::
+    Specify a primitive library on which the HDL platform (or assets
+    it contains) depends.  
+   
+*`-Z`* '<target>'+::
+    Do not build the HDL platform for the specified HDL architecture.
+   
+*`-k`*::
+    Keep files and directories created after an HDL platform creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+
+*`-y`* '<component-library>'+::
+    Specify a component library to search for workers, devices
+    and/or specs referenced by one or more assets in the created HDL platform.
+
+Options When Deleting HDL Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-f`*::
+    Force deletion: do not ask for confirmation when deleting
+    an HDL platform. Normally, you are asked to confirm a deletion.
+
+Options When Building HDL Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-target=`*'<target>'+::
+    Build the HDL platform(s) for the specified HDL architecture. If only HDL targets
+    are specified (and no HDL platforms), containers are not built.
+
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build the HDL platform(s) for the specified HDL platform.
+
+Options When Showing HDL Platforms (plural noun only)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--global-scope`*::
+    Show HDL platforms from all registered projects and the
+    current project if applicable.
+    This is the default scope used if *`--local-scope`* is not used.
+
+*`--json`*::
+    Format the output in Javascript Object Notation (JSON) format
+    for integration with other software.
+
+*`--local-scope`*:: 
+    Only display information about the local HDL platform.
+
+*`--simple`*::
+    Format the output as simply as possible.
+
+*`--table`*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *--simple* or *--json* are not used.
+    
+Options When Using Utilization on HDL Platforms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--format=`*{*`table`*|*`latex`*}::
+    Specify the format in which to output the FPGA resource usage information.
+    Specifying *`table`* sends the information to stdout in tabular format.
+    Specifying *`latex`* bypasses *`stdout`* and writes all output to
+    *`utilization.inc`* files in the directories for the assets on
+    which it operates.
+    
+*`--hdl-platform=`*'<platform>'+::
+    Display information about FPGA resource use by the built HDL platforms
+    on the specified HDL platform. (???This and the others below don't make sense.
+    Is it "the built assets in the HDL platform" that usage info is generated for?)
+
+*`--hdl-library=`*'<library>'::
+    Display information about FPGA resource use by the built
+    HDL platforms in the specified HDL library.
+
+*`--library=`*'<library>', *`-l`* '<library>'::
+    Display information about FPGA resource use by the built
+    HDL platforms in the specified component library.
+
+*`-P`* '<hdl-platform>'::
+    Display information about FPGA resource use by the built
+    HDL platforms on the specified HDL platform.
+
+EXAMPLES
+--------
+. Inside the project (at the top level), create the
+HDL platform *`myplatform`*. The directory *`myplatform`*
+is created in the *`hdl/platforms`* directory
+(which is also created if it doesn't exist):
++
+--------------------------------------
+ocpidev create hdl platform myplatform
+--------------------------------------
++
+. Inside the project (at the top level), create the
+HDL platform *`myplatform`*, specifying that it can
+only be built for the *`zed`* HDL platform:
++
+----------------------------------------------------------
+ocpidev create hdl platform myplatform --only-platform=zed
+----------------------------------------------------------
++
+. Inside the project (at the top level), create the
+HDL platform *`myplatform`*, specifying that it can
+only be built for the *`zynq`* HDL target:
++
+-----------------------------------------------
+ocpidev create hdl platform  myplatform -T zynq
+-----------------------------------------------
++
+. Inside the project (from the top level or the
+*`hdl/platforms/`* directory), delete
+the HDL platform *`myplatform`*:
++
+--------------------------------------
+ocpidev delete hdl platform myplatform
+--------------------------------------
++
+. Inside the *`myplatform`* HDL platform's directory, build
+the *`myplatform`* platform for the *`xsim`* HDL platform:
++
+---------------------------------
+ocpidev build --hdl-platform=xsim
+---------------------------------
++
+. Inside the project (from the top level or the
+*`hdl/platforms/`* directory), build all existing
+HDL platforms:
++
+---------------------------
+ocpidev build hdl platforms
+---------------------------
++
+. Inside the *`myplatform`* HDL platform's directory,
+build the *`myplatform`* platform for the *`zynq`* HDL target:
++
+-------------------------------
+ocpidev build --hdl-target=zynq
+-------------------------------
++
+. List all HDL platforms in all registered projects
+and the current project on which assets can be built:
++
+--------------------------
+ocpidev show hdl platforms
+--------------------------
++
+. Inside the project (from the top level of the
+*`hdl/platforms/`* directory), display information
+about FPGA resource use by the *`myplatform`* HDL platform:
++
+-------------------------------------------
+ocpidev utilization hdl platform myplatform
+-------------------------------------------
++
+. Inside the project (from the top level of the
+*`hdl/platforms/`* directory), display information
+about FPGA resource use by the HDL platforms in the project:
++
+--------------------------------
+ocpidev utilization hdl platforms
+--------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-card.1.html[ocpidev-card(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-device.1.html[ocpidev-device(1)]
+link:ocpidev-library.1.html[ocpidev-library(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-slot.1.html[ocpidev-slot(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

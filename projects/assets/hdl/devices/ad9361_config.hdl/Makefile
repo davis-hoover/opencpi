@@ -29,5 +29,5 @@ HdlExactPart=\
 	$(and $(filter stratix4,$(HdlTarget)),ep4sgx230k-c2-f40))
 
 SourceFiles=signals.vhd
-
+Libraries=platform
 include $(OCPI_CDK_DIR)/include/worker.mk

@@ -17,8 +17,8 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 -- A WSI master
-library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi; use ocpi.all; use ocpi.types.all; use ocpi.wsi.all; use ocpi.util.all;
+library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library ocpi; use ocpi.all, ocpi.types.all, ocpi.util.all;
 entity part_master is
   generic (precise            : boolean; -- are we precise-only?
            mdata_width        : natural; -- width of data path

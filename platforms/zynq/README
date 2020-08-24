@@ -25,7 +25,7 @@ of three things:  the EDK, the binary Linux release, and the kernel sources.  Xi
 releases based on calendar year and quarter (e.g. 2013.4), and ideally all three items from
 Xilinx should be at the same release.
 
-NOTE: The ANGRYVIPER Team only supports the xilinx13_3 release due to FSBL compatibility with the
+NOTE: OpenCPI only supports the xilinx13_3 release due to FSBL compatibility with the
 matchstiq_z1 (located in the ocpi.assets project).  The FSBL that is flashed onto the matchstiq_z1
 only works with a certain version of the Xilinx Linux release and this would need to be changed
 in order to update the Linux version.
