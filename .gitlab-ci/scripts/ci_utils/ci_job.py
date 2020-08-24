@@ -236,8 +236,10 @@ def make_job(stage, stages, platform,
                          linked_platform=linked_platform)
     after_script = make_after_script()
 
-    if platform.is_host or (stage == 'test' and platform.model == 'hdl'):
+    if platform.is_host: 
         tags = [platform.name, 'shell', 'opencpi']
+    elif (platform.is_sim or (stage == 'test' and platform.model == 'hdl')):
+        tags = [host_platform.name, platform.name, 'shell', 'opencpi']
     else:
         tags = [host_platform.name, 'shell', 'opencpi']
 
@@ -306,7 +308,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
                     if platform]
 
     # Don't download artifacts in current or later stages
-    excludes = ['{}/*'.format(stage) for stage in stages[stage_idx:]]
+    excludes = ['{}*'.format(stage) for stage in stages[stage_idx:]]
 
     download_cmd = ' '.join(['.gitlab-ci/scripts/ci_artifacts.py download',
                              pipeline_id,
