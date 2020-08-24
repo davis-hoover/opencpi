@@ -18,19 +18,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ####################################################################################################
-# This internal script creates a directory that can be copied to bootable media for a system
-# consisting of platforms.
-# The first argument is the primary RCC platform, and the rest are other platforms.
-# Initially the only real supported combination is a standalone RCC platform or an RCC platform
-# combined with an HDL platform.
-# It is expected/assumed that all mentioned platforms have already been installed independently
-# so in fact all the inputs are in the CDK/framework tree already.
-
-# It is expected to be called with OCPI_ALL_RCC_PLATFORMS and OCPI_ALL_HDL_PLATFORMS set
-# And OCPI_CDK_DIR set as normal
+# This internal script creates a directory that can be copied
+# to bootable media for a system consisting of platforms.
+# The first argument is the primary RCC platform, and the rest
+# are other platforms.
+# Initially the only real supported combination is a standalone
+# RCC platform or an RCC platform combined with an HDL platform.
+# It is expected/assumed that all mentioned platforms have already
+# been installed independently, so in fact, all the inputs should
+# be in the CDK/framework tree already.
+#
+# This script expects the OCPI_ALL_RCC_PLATFORMS, OCPI_ALL_HDL_PLATFORMS,
+# and OCPI_CDK_DIR environment variables to be set.
+#
 [ "$1" = -v ] && verbose=-v && shift
 rcc_platform=$1 && shift
 [ -n "$1" ] && hdl_platform=$1 && shift
+
 set -e
 
 # copied functions
@@ -53,29 +57,35 @@ cd $OCPI_CDK_DIR
 
 # create the dir for the SD card
 sd=$hdl_platform/sdcard-$rcc_platform
-rm -r -f $sd
-mkdir -p $sd/opencpi
-# Add a proper first "release" argument when we have that file in the source tree
-echo opencpi-v1.7.0 $rcc_platform $hdl_platform  > $sd/opencpi/release
+rm $verbose -rf $sd
+mkdir $verbose -p $sd/opencpi
+
+source "$OCPI_CDK_DIR/VERSION"
+
+if [ "$verbose" ]
+then
+  echo "Release is \"opencpi-$OCPI_RELEASE $rcc_platform $hdl_platform\"."
+fi
+echo "opencpi-$OCPI_RELEASE $rcc_platform $hdl_platform"  > $sd/opencpi/release
 
 ####################################################################################################
 # Prepare the "boot" or SD root directory from various sources.  These are not OpenCPI files.
 
 # 1. move the RCC platform's generic (hw-independent) deploy files into the SD root, if any
-[ ! -d deploy/$rcc_platform ] || cp -R -L deploy/$rcc_platform/* $sd
+[ ! -d deploy/$rcc_platform ] || cp $verbose -R -L deploy/$rcc_platform/* $sd
 
 # 2. move hw-specific files from the RCC platform's *development* exports into the SD root, if any
 [ -z "$hdl_platform" -o ! -d $rcc_platform/hdl/$hdl_platform/boot ] ||
-    cp -R -L -H $rcc_platform/hdl/$hdl_platform/boot/* $sd
+    cp $verbose -R -L -H $rcc_platform/hdl/$hdl_platform/boot/* $sd
 
 # 3. move the top level deploy sw files from the HW platform's deployment into the SD root, if any
 [ -z "$hdl_platform" -o ! -d deploy/$hdl_platform/$rcc_platform ] ||
-    cp -R -L deploy/$hdl_platform/$rcc_platform/* $sd
+    cp $verbose -R -L deploy/$hdl_platform/$rcc_platform/* $sd
 
 # 4. move the top level hw files (not specific to any SW platform) into the SD root, if any
 [ -z "$hdl_platform" ] || for f in $(shopt -s nullglob; echo deploy/$hdl_platform/*); do
   is_platform $f && continue;
-  cp -R -L -H $f $sd
+  cp $verbose -R -L -H $f $sd
 done
 
 ####################################################################################################
@@ -91,20 +101,22 @@ for f in runtime/*; do
    for x in $(find -L $(basename $f)); do
        case $x in *env*|*include*) continue;; esac # not sure how to explain this
        if [ -d $x ]; then
-	  mkdir ../$sd/opencpi/$x
+	  mkdir $verbose ../$sd/opencpi/$x
        elif [ -L $x ] && [[ $(readlink $x) != */* ]]; then
-	  cp -R $x ../$sd/opencpi/$x # keep symlink as is
+	  cp $verbose -R $x ../$sd/opencpi/$x # keep symlink as is
        else
-	  cp -R -H -L $x ../$sd/opencpi/$x # copy following links
+	  cp $verbose -R -H -L $x ../$sd/opencpi/$x # copy following links
        fi
    done)
 done
 
-# 2. move any SW-specific system.xml into $sd/opencpi
-[ ! -f runtime/$rcc_platform/system.xml ] || cp -R -L -H runtime/$rcc_platform/system.xml $sd/opencpi
+# 2. Move any SW-specific "system.xml" into "$sd/opencpi".  An existing
+#    "system.xml" (presumably from the HDL platform) takes precedence.
+[ -f $sd/opencpi/system.xml ] || [ ! -f runtime/$rcc_platform/system.xml ] || \
+  cp $verbose -R -L -H runtime/$rcc_platform/system.xml $sd/opencpi
 
 # 3. copy in one bit stream file for loading and testing
 [ -n "$hdl_platform" ] || exit 0
-mkdir -p $sd/opencpi/artifacts
-cp -L ../projects/assets/hdl/assemblies/testbias/container-testbias_${hdl_platform}_base/target-*/*.bitz \
+mkdir $verbose -p $sd/opencpi/artifacts
+cp $verbose -L ../projects/assets/hdl/assemblies/testbias/container-testbias_${hdl_platform}_base/target-*/*.bitz \
    $sd/opencpi/artifacts

@@ -155,9 +155,11 @@ Options That Apply to All Operations (Verbs) on Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *`--hdl-library=`*'<hdl-library>'::
-    Specify the HDL library in which to operate on the worker.
-    HDL libraries exist underneath the *`hdl/`* directory
-    located at the top level of a project.
+    Specify the HDL library under the *`hdl/`* directory of the project
+    in which to operate on the worker. Valid values are
+    only one of: *`devices`*, *`cards`*, *`adapters`*.
+    See link:ocpidev-device.1.html[ocpidev-device(1)]
+    for more information about this option.
 
 *`--library=`*'<component-library>', *`-l`* '<component-library>'::
     Specify the component library in which to operate on the worker.
@@ -204,12 +206,11 @@ Options When Creating Workers
     addition to the '<name>'*`.`*'<authoring-language-suffix>' file.
 
 *`-P`* '<hdl-platform>'::
-    Specify that the worker should be created in the *`devices`*
-    library for the specified HDL platform in the project. This
-    option is intended for use when creating a platform-specific
-    device worker or device proxy. A *`devices`* library is located
-    in '<project>'*`/hdl/platforms/`*'<hdl-platform>'*`/devices/`*.
-    For example, *`hdl/platforms/matchstiq_z1/devices`*.
+    Specify that the worker being created is a platform-specific
+    HDL device worker or device proxy to be created in the *`devices/`*
+    library for the specified HDL platform in the project.
+    See link:ocpidev-device.1.html[ocpidev-device(1)]
+    for more information about this option.
 
 *`-S`* '<component-spec>'::
     Specify the component spec (OCS) that the worker implements.
@@ -287,6 +288,14 @@ Options When Building RCC Workers
     option is not used (and *`--hdl-rcc-platform`* '<platform>'
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
+
+Options When Building HDL Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build the HDL device worker for the specified HDL platform.
+
+*`--hdl-target=`*'<target>'+::
+    Build the HDL device worker for the specified HDL architecture.
 
 Options When Showing Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -447,6 +456,7 @@ link:ocpidev-clean.1.html[ocpidev-clean(1)]
 link:ocpidev-component.1.html[ocpidev-component(1)]
 link:ocpidev-create.1.html[ocpidev-create(1)]
 link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-device.1.html[ocpidev-device(1)]
 link:ocpidev-library.1.html[ocpidev-library(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
 link:ocpidev-show.1.html[ocpidev-show(1)]
