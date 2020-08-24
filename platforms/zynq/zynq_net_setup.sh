@@ -19,31 +19,12 @@
 # If there is a "mynetsetup.sh" script in this directory it will run it after the
 # other setup items, and arrange for it to be run in any login scripts later
 # e.g. ssh logins
-#
-# Set time using ntpd
-# If ntpd fails because it could not find ntp.conf fall back on time server
-# passed in as the first parameter
 
-if test -z  "$4"; then
-  echo You must supply at least 4 arguments to this script.
-  echo Usage is: zynq_net_setup.sh '<nfs-ip-address> <opencpi-dir> <time-server> <timezone> [<hdl-platform>]'
-  echo A good example timezone is: EST5EDT,M3.2.0,M11.1.0
-else
-  if test -n "$5"; then
-     echo OCPI_HDL_PLATFORM set to $5.
-  fi
-  if ifconfig | grep -v 127.0.0.1 | grep 'inet addr:' > /dev/null; then
-     echo An IP address was detected.
-  else
-     echo No IP address was detected! No network or no DHCP.
-     break;
+  if test -n "$3"; then
+    echo OCPI_HDL_PLATFORM set to $3.
+    export OCPI_HDL_PLATFORM=$3
   fi
   
-  # Make sure the hostname is in the host table
-  myipaddr=`ifconfig | grep -v 127.0.0.1 | sed -n '/inet addr:/s/^.*inet addr: *\([^ ]*\).*$/\1/p'`
-  myhostname=`hostname`
-  echo My IP address is: $myipaddr, and my hostname is: $myhostname
-  if ! grep -q $myhostname /etc/hosts; then echo $myipaddr $myhostname >> /etc/hosts; fi
   # Run the generic script to setup the OpenCPI environment
   # Note the ocpidriver load command is innocuous if run redundantly
   # Some Zynq-based SD cards are ephemeral and lose $HOME on reboots. Others don't.
@@ -58,16 +39,16 @@ else
   if test -e /mnt/net/$2; then
     echo Executing $PROFILE_FILE
     export OCPI_CDK_DIR=$OCPI_CDK_DIR
-	  export OCPI_DIR=$OCPI_DIR
+	export OCPI_DIR=$OCPI_DIR
     cd $OCPI_DIR
-	  source ./zynq_setup_common.sh
-	  set_tool_platform
+	source $OCPI_DIR/zynq_setup_common.sh set_tool_platform
     export OCPI_TOOL_OS=linux
-    export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
-	  cd $OCPI_DIR
+    export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
+	export OCPI_HDL_PLATFORM=$OCPI_HDL_PLATFORM
+	cd $OCPI_DIR
     # As a default, access all built artifacts in the core project as well as
     # the bare-bones set of prebuilt runtime artifacts for this SW platform
-    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/artifacts:$OCPI_CDK_DIR/../projects/assets/artifacts:$OCPI_DIR/\$OCPI_TOOL_DIR/artifacts:$OCPI_DIR/artifacts
+    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/artifacts:$OCPI_CDK_DIR/../projects/assets/artifacts:$OCPI_DIR/\$OCPI_TOOL_DIR/artifacts
     # Priorities for finding system.xml:
     # 1. If is it on the local system it is considered customized for this system - use it.
     if test -r $OCPI_DIR/system.xml; then
@@ -102,8 +83,7 @@ else
     echo NFS mounts not yet set up. Please mount the OpenCPI CDK into /mnt/net/.
   fi
   
-  alias ls='ls --color=auto'	
+  alias ls='ls --color=auto'
 EOF
   echo Running login script. OCPI_CDK_DIR is now $OCPI_CDK_DIR.
   source $PROFILE_FILE
-fi

@@ -1,3 +1,5 @@
+# expects to find the opencpi diretory in one of those two directories
+# make sure that the release text file is also present
 set_tool_platform() { 
   if test "$OCPI_TOOL_PLATFORM" == ""; then
     for m in /mnt/card /run/media/mmcblk0p1; do
@@ -13,13 +15,16 @@ set_tool_platform() {
   fi
 }
 
+# Set time using ntpd
+# If ntpd fails because it could not find ntp.conf fall back on time server
+# passed in as the first parameter
 set_time() {
   if test "$1" != -; then
     echo Attempting to set time from $1
     # Calling ntpd without any options will run it as a dameon
     OPTS=""
     BUSYBOX_PATH="$OCPI_DIR/$OCPI_TOOL_PLATFORM/bin"
-    TIMEOUT=20
+    TIMEOUT=5
     MSG="Succeeded in setting the time from $OCPI_DIR/ntp.conf"
     if [ ! -e $OCPI_DIR/ntp.conf ]; then
       OPTS="-p $1"
@@ -36,4 +41,12 @@ set_time() {
     fi
   fi
 }
+
+if test "$1" = "set_tool_platform"; then
+  set_tool_platform
+fi
+
+if test "$2" = "set_time"; then
+  set_time $3
+fi
 
