@@ -527,7 +527,7 @@ def make_host_rules(platform):
         {'if':
             # If platform in CI_COMMIT_MESSAGE env var and pipeline source
             # is a push 
-            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)({})(( |:)\S*)*\]/i'
+            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({})(( |:)\S*)*\]/i'
              r' && $CI_PIPELINE_SOURCE == "push"'
              r' ').format(platform.name)
         },
@@ -577,8 +577,8 @@ def make_cross_rules(platform, host_platform):
              r' ').format(host_platform.name, platform.name)
         },
         {'if': 
-            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)({})(( |:)\S*)*\]/i'
-             r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)({})(( |:)\S*)*\]/i'
+            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({})(( |:)\S*)*\]/i'
+             r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({})(( |:)\S*)*\]/i'
              r' && $CI_PIPELINE_SOURCE == "push"'
              r' ').format(host_platform.name, platform.name)
         },
@@ -630,7 +630,7 @@ def make_linked_rules(platform, host_platform, linked_platform):
         },
         {'if': 
             (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)({})(( |:)\S*)*\]/i'
-             r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)({}|{})(( |:)\S*)*\]/i'
+             r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({}|{})(( |:)\S*)*\]/i'
              r' && $CI_PIPELINE_SOURCE == "push"'
              r' ').format(host_platform.name, platform_link, link_platform)
         },

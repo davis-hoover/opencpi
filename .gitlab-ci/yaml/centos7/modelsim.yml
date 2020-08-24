@@ -11,7 +11,7 @@ build-assemblies:centos7:assets:assemblies:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/assemblies --hdl-platform modelsim
@@ -35,7 +35,7 @@ build-assemblies:centos7:assets_ts:assemblies:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/assemblies --hdl-platform modelsim
@@ -59,7 +59,7 @@ build-assemblies:centos7:inactive:assemblies:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/assemblies --hdl-platform modelsim
@@ -83,7 +83,7 @@ build-assemblies:centos7:platform:assemblies:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/assemblies --hdl-platform modelsim
@@ -107,7 +107,7 @@ build-libraries:centos7:assets:adapters:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/adapters --hdl-platform modelsim
@@ -131,7 +131,7 @@ build-libraries:centos7:assets:base_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/base_comps --hdl-platform modelsim
@@ -155,7 +155,7 @@ build-libraries:centos7:assets:cards:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/cards --hdl-platform modelsim
@@ -179,7 +179,7 @@ build-libraries:centos7:assets:comms_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/comms_comps --hdl-platform modelsim
@@ -203,7 +203,7 @@ build-libraries:centos7:assets:devices:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/devices --hdl-platform modelsim
@@ -227,7 +227,7 @@ build-libraries:centos7:assets:dsp_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/dsp_comps --hdl-platform modelsim
@@ -251,7 +251,7 @@ build-libraries:centos7:assets:misc_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/misc_comps --hdl-platform modelsim
@@ -275,7 +275,7 @@ build-libraries:centos7:assets:util_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/util_comps --hdl-platform modelsim
@@ -299,7 +299,7 @@ build-libraries:centos7:assets_ts:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/components --hdl-platform modelsim
@@ -323,7 +323,7 @@ build-libraries:centos7:assets_ts:devices:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/devices --hdl-platform modelsim
@@ -347,7 +347,7 @@ build-libraries:centos7:core:adapters:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/adapters --hdl-platform modelsim
@@ -371,7 +371,7 @@ build-libraries:centos7:core:cards:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/cards --hdl-platform modelsim
@@ -395,7 +395,7 @@ build-libraries:centos7:core:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/components --hdl-platform modelsim
@@ -419,7 +419,7 @@ build-libraries:centos7:core:devices:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/devices --hdl-platform modelsim
@@ -443,7 +443,7 @@ build-libraries:centos7:inactive:cards:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/cards --hdl-platform modelsim
@@ -467,7 +467,7 @@ build-libraries:centos7:inactive:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/components --hdl-platform modelsim
@@ -491,7 +491,7 @@ build-libraries:centos7:inactive:devices:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/devices --hdl-platform modelsim
@@ -515,7 +515,7 @@ build-libraries:centos7:platform:devices:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/devices --hdl-platform modelsim
@@ -539,7 +539,7 @@ build-platforms:centos7:assets:platforms:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/assets --hdl-platform modelsim
@@ -563,7 +563,7 @@ build-platforms:centos7:core:platforms:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/core --hdl-platform modelsim
@@ -587,7 +587,7 @@ build-platforms:centos7:inactive:platforms:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/inactive --hdl-platform modelsim
@@ -611,7 +611,7 @@ build-platforms:centos7:platform:platforms:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/platform --hdl-platform modelsim
@@ -635,7 +635,7 @@ build-primitives-core:centos7:core:primitives:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/primitives --hdl-platform modelsim
@@ -659,7 +659,7 @@ build-primitives:centos7:assets:primitives:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/primitives --hdl-platform modelsim
@@ -683,7 +683,7 @@ build-primitives:centos7:inactive:primitives:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/primitives --hdl-platform modelsim
@@ -707,7 +707,7 @@ build-primitives:centos7:platform:primitives:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/primitives --hdl-platform modelsim
@@ -731,7 +731,7 @@ build-sdcards:centos7:alt_test:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:alt_test|alt_test:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:alt_test|alt_test:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform alt_test modelsim
@@ -755,7 +755,7 @@ build-sdcards:centos7:epiq_matchstiq:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform epiq_matchstiq modelsim
@@ -779,7 +779,7 @@ build-sdcards:centos7:xilinx13_3:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx13_3|xilinx13_3:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx13_3|xilinx13_3:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_3 modelsim
@@ -803,7 +803,7 @@ build-sdcards:centos7:xilinx13_4:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx13_4|xilinx13_4:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx13_4|xilinx13_4:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_4 modelsim
@@ -827,7 +827,7 @@ build-sdcards:centos7:xilinx13_4_arm:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_4_arm modelsim
@@ -851,7 +851,7 @@ build-sdcards:centos7:xilinx17_1_aarch32:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_1_aarch32 modelsim
@@ -875,7 +875,7 @@ build-sdcards:centos7:xilinx17_1_aarch64:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_1_aarch64 modelsim
@@ -899,7 +899,7 @@ build-sdcards:centos7:xilinx17_2_aarch32:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_2_aarch32 modelsim
@@ -923,7 +923,7 @@ build-sdcards:centos7:xilinx17_2_aarch64:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_2_aarch64 modelsim
@@ -947,7 +947,7 @@ build-sdcards:centos7:xilinx19_2_aarch32:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx19_2_aarch32 modelsim
@@ -971,7 +971,7 @@ build-sdcards:centos7:xilinx19_2_aarch64:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx19_2_aarch64 modelsim
@@ -995,7 +995,7 @@ build-tests:centos7:assets:base_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/base_comps --hdl-platform modelsim
@@ -1019,7 +1019,7 @@ build-tests:centos7:assets:comms_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/comms_comps --hdl-platform modelsim
@@ -1043,7 +1043,7 @@ build-tests:centos7:assets:dsp_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/dsp_comps --hdl-platform modelsim
@@ -1067,7 +1067,7 @@ build-tests:centos7:assets:misc_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/misc_comps --hdl-platform modelsim
@@ -1091,7 +1091,7 @@ build-tests:centos7:assets:util_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/util_comps --hdl-platform modelsim
@@ -1115,7 +1115,7 @@ build-tests:centos7:assets_ts:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets_ts/components --hdl-platform modelsim
@@ -1139,7 +1139,7 @@ build-tests:centos7:core:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/core/components --hdl-platform modelsim
@@ -1163,7 +1163,7 @@ build-tests:centos7:inactive:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/inactive/components --hdl-platform modelsim
@@ -1187,7 +1187,7 @@ test:centos7:assets:base_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/base_comps --only-platform modelsim --mode prep_run_verify
@@ -1211,7 +1211,7 @@ test:centos7:assets:comms_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/comms_comps --only-platform modelsim --mode prep_run_verify
@@ -1235,7 +1235,7 @@ test:centos7:assets:dsp_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform modelsim --mode prep_run_verify
@@ -1259,7 +1259,7 @@ test:centos7:assets:misc_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/misc_comps --only-platform modelsim --mode prep_run_verify
@@ -1283,7 +1283,7 @@ test:centos7:assets:util_comps:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets/components/util_comps --only-platform modelsim --mode prep_run_verify
@@ -1307,7 +1307,7 @@ test:centos7:assets_ts:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/assets_ts/components --only-platform modelsim --mode prep_run_verify
@@ -1331,7 +1331,7 @@ test:centos7:core:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/core/components --only-platform modelsim --mode prep_run_verify
@@ -1355,7 +1355,7 @@ test:centos7:inactive:components:modelsim:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(modelsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev run tests -d projects/inactive/components --only-platform modelsim --mode prep_run_verify

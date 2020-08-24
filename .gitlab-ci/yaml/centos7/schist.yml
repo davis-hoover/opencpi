@@ -11,7 +11,7 @@ build-assemblies:centos7:assets:assemblies:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/assemblies --hdl-platform schist
@@ -35,7 +35,7 @@ build-assemblies:centos7:assets_ts:assemblies:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/assemblies --hdl-platform schist
@@ -59,7 +59,7 @@ build-assemblies:centos7:inactive:assemblies:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/assemblies --hdl-platform schist
@@ -83,7 +83,7 @@ build-assemblies:centos7:platform:assemblies:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/assemblies --hdl-platform schist
@@ -107,7 +107,7 @@ build-libraries:centos7:assets:adapters:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/adapters --hdl-platform schist
@@ -131,7 +131,7 @@ build-libraries:centos7:assets:base_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/base_comps --hdl-platform schist
@@ -155,7 +155,7 @@ build-libraries:centos7:assets:cards:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/cards --hdl-platform schist
@@ -179,7 +179,7 @@ build-libraries:centos7:assets:comms_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/comms_comps --hdl-platform schist
@@ -203,7 +203,7 @@ build-libraries:centos7:assets:devices:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/devices --hdl-platform schist
@@ -227,7 +227,7 @@ build-libraries:centos7:assets:dsp_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/dsp_comps --hdl-platform schist
@@ -251,7 +251,7 @@ build-libraries:centos7:assets:misc_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/misc_comps --hdl-platform schist
@@ -275,7 +275,7 @@ build-libraries:centos7:assets:util_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/components/util_comps --hdl-platform schist
@@ -299,7 +299,7 @@ build-libraries:centos7:assets_ts:components:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/components --hdl-platform schist
@@ -323,7 +323,7 @@ build-libraries:centos7:assets_ts:devices:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets_ts/hdl/devices --hdl-platform schist
@@ -347,7 +347,7 @@ build-libraries:centos7:core:adapters:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/adapters --hdl-platform schist
@@ -371,7 +371,7 @@ build-libraries:centos7:core:cards:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/cards --hdl-platform schist
@@ -395,7 +395,7 @@ build-libraries:centos7:core:components:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/components --hdl-platform schist
@@ -419,7 +419,7 @@ build-libraries:centos7:core:devices:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/devices --hdl-platform schist
@@ -443,7 +443,7 @@ build-libraries:centos7:inactive:cards:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/cards --hdl-platform schist
@@ -467,7 +467,7 @@ build-libraries:centos7:inactive:components:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/components --hdl-platform schist
@@ -491,7 +491,7 @@ build-libraries:centos7:inactive:devices:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/devices --hdl-platform schist
@@ -515,7 +515,7 @@ build-libraries:centos7:platform:devices:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/devices --hdl-platform schist
@@ -539,7 +539,7 @@ build-platforms:centos7:assets:platforms:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/assets --hdl-platform schist
@@ -563,7 +563,7 @@ build-platforms:centos7:core:platforms:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/core --hdl-platform schist
@@ -587,7 +587,7 @@ build-platforms:centos7:inactive:platforms:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/inactive --hdl-platform schist
@@ -611,7 +611,7 @@ build-platforms:centos7:platform:platforms:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build hdl platforms -d projects/platform --hdl-platform schist
@@ -635,7 +635,7 @@ build-primitives-core:centos7:core:primitives:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/core/hdl/primitives --hdl-platform schist
@@ -659,7 +659,7 @@ build-primitives:centos7:assets:primitives:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/assets/hdl/primitives --hdl-platform schist
@@ -683,7 +683,7 @@ build-primitives:centos7:inactive:primitives:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/inactive/hdl/primitives --hdl-platform schist
@@ -707,7 +707,7 @@ build-primitives:centos7:platform:primitives:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build  -d projects/platform/hdl/primitives --hdl-platform schist
@@ -731,7 +731,7 @@ build-sdcards:centos7:alt_test:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:alt_test|alt_test:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:alt_test|alt_test:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:alt_test|alt_test:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:alt_test|alt_test:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:alt_test|alt_test:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:alt_test|alt_test:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform alt_test schist
@@ -755,7 +755,7 @@ build-sdcards:centos7:epiq_matchstiq:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:epiq_matchstiq|epiq_matchstiq:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:epiq_matchstiq|epiq_matchstiq:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:epiq_matchstiq|epiq_matchstiq:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:epiq_matchstiq|epiq_matchstiq:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:epiq_matchstiq|epiq_matchstiq:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:epiq_matchstiq|epiq_matchstiq:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform epiq_matchstiq schist
@@ -779,7 +779,7 @@ build-sdcards:centos7:xilinx13_3:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_3|xilinx13_3:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_3|xilinx13_3:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx13_3|xilinx13_3:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx13_3|xilinx13_3:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx13_3|xilinx13_3:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_3|xilinx13_3:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_3 schist
@@ -803,7 +803,7 @@ build-sdcards:centos7:xilinx13_4:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_4|xilinx13_4:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_4|xilinx13_4:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx13_4|xilinx13_4:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx13_4|xilinx13_4:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx13_4|xilinx13_4:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_4|xilinx13_4:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_4 schist
@@ -827,7 +827,7 @@ build-sdcards:centos7:xilinx13_4_arm:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_4_arm|xilinx13_4_arm:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_4_arm|xilinx13_4_arm:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx13_4_arm|xilinx13_4_arm:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx13_4_arm|xilinx13_4_arm:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx13_4_arm|xilinx13_4_arm:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx13_4_arm|xilinx13_4_arm:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx13_4_arm schist
@@ -851,7 +851,7 @@ build-sdcards:centos7:xilinx17_1_aarch32:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch32|xilinx17_1_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch32|xilinx17_1_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch32|xilinx17_1_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx17_1_aarch32|xilinx17_1_aarch32:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx17_1_aarch32|xilinx17_1_aarch32:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch32|xilinx17_1_aarch32:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_1_aarch32 schist
@@ -875,7 +875,7 @@ build-sdcards:centos7:xilinx17_1_aarch64:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch64|xilinx17_1_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch64|xilinx17_1_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch64|xilinx17_1_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx17_1_aarch64|xilinx17_1_aarch64:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx17_1_aarch64|xilinx17_1_aarch64:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_1_aarch64|xilinx17_1_aarch64:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_1_aarch64 schist
@@ -899,7 +899,7 @@ build-sdcards:centos7:xilinx17_2_aarch32:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch32|xilinx17_2_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch32|xilinx17_2_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch32|xilinx17_2_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx17_2_aarch32|xilinx17_2_aarch32:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx17_2_aarch32|xilinx17_2_aarch32:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch32|xilinx17_2_aarch32:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_2_aarch32 schist
@@ -923,7 +923,7 @@ build-sdcards:centos7:xilinx17_2_aarch64:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch64|xilinx17_2_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch64|xilinx17_2_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch64|xilinx17_2_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx17_2_aarch64|xilinx17_2_aarch64:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx17_2_aarch64|xilinx17_2_aarch64:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx17_2_aarch64|xilinx17_2_aarch64:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx17_2_aarch64 schist
@@ -947,7 +947,7 @@ build-sdcards:centos7:xilinx19_2_aarch32:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch32|xilinx19_2_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch32|xilinx19_2_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch32|xilinx19_2_aarch32:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx19_2_aarch32|xilinx19_2_aarch32:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx19_2_aarch32|xilinx19_2_aarch32:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch32|xilinx19_2_aarch32:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx19_2_aarch32 schist
@@ -971,7 +971,7 @@ build-sdcards:centos7:xilinx19_2_aarch64:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch64|xilinx19_2_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch64|xilinx19_2_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch64|xilinx19_2_aarch64:schist)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist:xilinx19_2_aarch64|xilinx19_2_aarch64:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist:xilinx19_2_aarch64|xilinx19_2_aarch64:schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(schist:xilinx19_2_aarch64|xilinx19_2_aarch64:schist)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpiadmin deploy platform xilinx19_2_aarch64 schist
@@ -995,7 +995,7 @@ build-tests:centos7:assets:base_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/base_comps --hdl-platform schist
@@ -1019,7 +1019,7 @@ build-tests:centos7:assets:comms_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/comms_comps --hdl-platform schist
@@ -1043,7 +1043,7 @@ build-tests:centos7:assets:dsp_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/dsp_comps --hdl-platform schist
@@ -1067,7 +1067,7 @@ build-tests:centos7:assets:misc_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/misc_comps --hdl-platform schist
@@ -1091,7 +1091,7 @@ build-tests:centos7:assets:util_comps:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets/components/util_comps --hdl-platform schist
@@ -1115,7 +1115,7 @@ build-tests:centos7:assets_ts:components:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/assets_ts/components --hdl-platform schist
@@ -1139,7 +1139,7 @@ build-tests:centos7:core:components:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/core/components --hdl-platform schist
@@ -1163,7 +1163,7 @@ build-tests:centos7:inactive:components:schist:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(schist)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(schist)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - ocpidev build test -d projects/inactive/components --hdl-platform schist
