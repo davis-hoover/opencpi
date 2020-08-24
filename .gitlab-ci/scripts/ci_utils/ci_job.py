@@ -618,7 +618,7 @@ def make_linked_rules(platform, host_platform, linked_platform):
         },
         {'if': 
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PLATFORMS =~ /(^| )({}:{})( |$)/i'
+             r' && $CI_PLATFORMS =~ /(^| )({}|{})( |$)/i'
              r' && $CI_PIPELINE_SOURCE == "web"'
              r' ').format(host_platform.name, platform_link, link_platform)
         },

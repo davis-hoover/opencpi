@@ -729,7 +729,7 @@ build-sdcards:centos7:alt_test:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:alt_test:alt_test:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:alt_test|alt_test:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:alt_test|alt_test:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -753,7 +753,7 @@ build-sdcards:centos7:epiq_matchstiq:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq:epiq_matchstiq:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:epiq_matchstiq|epiq_matchstiq:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -777,7 +777,7 @@ build-sdcards:centos7:xilinx13_3:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_3:xilinx13_3:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx13_3|xilinx13_3:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_3|xilinx13_3:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -801,7 +801,7 @@ build-sdcards:centos7:xilinx13_4:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4:xilinx13_4:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx13_4|xilinx13_4:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4|xilinx13_4:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -825,7 +825,7 @@ build-sdcards:centos7:xilinx13_4_arm:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm:xilinx13_4_arm:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx13_4_arm|xilinx13_4_arm:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -849,7 +849,7 @@ build-sdcards:centos7:xilinx17_1_aarch32:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32:xilinx17_1_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch32|xilinx17_1_aarch32:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -873,7 +873,7 @@ build-sdcards:centos7:xilinx17_1_aarch64:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64:xilinx17_1_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_1_aarch64|xilinx17_1_aarch64:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -897,7 +897,7 @@ build-sdcards:centos7:xilinx17_2_aarch32:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32:xilinx17_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch32|xilinx17_2_aarch32:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -921,7 +921,7 @@ build-sdcards:centos7:xilinx17_2_aarch64:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64:xilinx17_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx17_2_aarch64|xilinx17_2_aarch64:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -945,7 +945,7 @@ build-sdcards:centos7:xilinx19_2_aarch32:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32:xilinx19_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch32|xilinx19_2_aarch32:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -969,7 +969,7 @@ build-sdcards:centos7:xilinx19_2_aarch64:modelsim:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64:xilinx19_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(modelsim:xilinx19_2_aarch64|xilinx19_2_aarch64:modelsim)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '

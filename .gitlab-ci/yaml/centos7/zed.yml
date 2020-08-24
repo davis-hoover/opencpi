@@ -729,7 +729,7 @@ build-sdcards:centos7:alt_test:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:alt_test|alt_test:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:alt_test:alt_test:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:alt_test|alt_test:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:alt_test|alt_test:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:alt_test|alt_test:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:alt_test|alt_test:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -753,7 +753,7 @@ build-sdcards:centos7:epiq_matchstiq:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:epiq_matchstiq|epiq_matchstiq:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:epiq_matchstiq:epiq_matchstiq:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:epiq_matchstiq|epiq_matchstiq:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:epiq_matchstiq|epiq_matchstiq:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:epiq_matchstiq|epiq_matchstiq:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:epiq_matchstiq|epiq_matchstiq:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -777,7 +777,7 @@ build-sdcards:centos7:xilinx13_3:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3:xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx13_3|xilinx13_3:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -801,7 +801,7 @@ build-sdcards:centos7:xilinx13_4:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4:xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx13_4|xilinx13_4:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -825,7 +825,7 @@ build-sdcards:centos7:xilinx13_4_arm:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4_arm|xilinx13_4_arm:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4_arm:xilinx13_4_arm:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4_arm|xilinx13_4_arm:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx13_4_arm|xilinx13_4_arm:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx13_4_arm|xilinx13_4_arm:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4_arm|xilinx13_4_arm:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -849,7 +849,7 @@ build-sdcards:centos7:xilinx17_1_aarch32:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch32|xilinx17_1_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch32:xilinx17_1_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch32|xilinx17_1_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch32|xilinx17_1_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx17_1_aarch32|xilinx17_1_aarch32:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch32|xilinx17_1_aarch32:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -873,7 +873,7 @@ build-sdcards:centos7:xilinx17_1_aarch64:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch64|xilinx17_1_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch64:xilinx17_1_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch64|xilinx17_1_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch64|xilinx17_1_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx17_1_aarch64|xilinx17_1_aarch64:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_1_aarch64|xilinx17_1_aarch64:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -897,7 +897,7 @@ build-sdcards:centos7:xilinx17_2_aarch32:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch32|xilinx17_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch32:xilinx17_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch32|xilinx17_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch32|xilinx17_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx17_2_aarch32|xilinx17_2_aarch32:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch32|xilinx17_2_aarch32:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -921,7 +921,7 @@ build-sdcards:centos7:xilinx17_2_aarch64:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch64|xilinx17_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch64:xilinx17_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch64|xilinx17_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch64|xilinx17_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx17_2_aarch64|xilinx17_2_aarch64:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx17_2_aarch64|xilinx17_2_aarch64:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -945,7 +945,7 @@ build-sdcards:centos7:xilinx19_2_aarch32:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch32|xilinx19_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch32:xilinx19_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch32|xilinx19_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch32|xilinx19_2_aarch32:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx19_2_aarch32|xilinx19_2_aarch32:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch32|xilinx19_2_aarch32:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
@@ -969,7 +969,7 @@ build-sdcards:centos7:xilinx19_2_aarch64:zed:
   - source cdk/opencpi-setup.sh -e
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64:xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
