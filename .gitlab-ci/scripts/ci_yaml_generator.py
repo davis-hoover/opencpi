@@ -9,14 +9,18 @@ from ci_utils import ci_project, ci_platform, ci_job
 def main():
     opencpi_path = Path(__file__, '..', '..', '..').resolve()
     os.chdir(opencpi_path)
-    gitlab_yml_path = Path('.gitlab-ci')
-    yaml_path = Path(gitlab_yml_path, 'yaml')
+    gitlab_ci_path = Path('.gitlab-ci')
+    yaml_path = Path(gitlab_ci_path, 'yaml')
     projects_path = Path('projects')
-    host_platform_whitelist_path = Path(gitlab_yml_path, 'scripts', 
+    host_platform_whitelist_path = Path(gitlab_ci_path, 'scripts', 
                                         'host_platform_whitelist.txt')
+    variables_path = Path(gitlab_ci_path, 'scripts', 'variables.yml')
 
     with open(host_platform_whitelist_path) as f:
         host_platform_whitelist = f.read().splitlines()
+
+    with open(variables_path) as f:
+        variables_dict = yaml.safe_load(f)
 
     projects_blacklist = ['tutorial']
     projects = ci_project.discover_projects(projects_path, projects_blacklist)
@@ -37,14 +41,18 @@ def main():
         for cross_platform in cross_platforms:
             print('\t{}'.format(cross_platform.name))
 
+            variables = get_variables(cross_platform, variables_dict)
             cross_jobs = ci_job.make_jobs(stages, cross_platform, projects, 
                                           platforms=platforms, 
-                                          host_platform=host_platform)
+                                          host_platform=host_platform,
+                                          variables=variables)
             cross_path = Path(yaml_path, host_platform.name, 
                               '{}.yml'.format(cross_platform.name))
             ci_job.dump(cross_jobs, cross_path)
 
-        host_jobs = ci_job.make_jobs(stages, host_platform, projects)
+        variables = get_variables(host_platform, variables_dict)
+        host_jobs = ci_job.make_jobs(stages, host_platform, projects, 
+                                     variables=variables)
         host_path = Path(yaml_path, '{}.yml'.format(host_platform.name))
         ci_job.dump(host_jobs, host_path)
         
@@ -65,6 +73,15 @@ def main():
     print('\nYaml files available at: {}/'
           '\n*IMPORTANT: If any files were created for a new platform,'
           ' be sure to commit them.'.format(Path(Path.cwd(), yaml_path)))
+
+
+def get_variables(platform, variables_dict):
+    yaml.SafeDumper.ignore_aliases = lambda *args : True
+    
+    if platform.name in variables_dict.keys():
+        return variables_dict[platform.name]
+
+    return None
 
 
 def dump(yaml_dict, yaml_path, mode):

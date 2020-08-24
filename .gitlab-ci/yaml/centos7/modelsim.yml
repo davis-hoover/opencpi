@@ -23,6 +23,9 @@ build-assemblies:centos7:assets:assemblies:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-assemblies:centos7:assets_ts:assemblies:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -48,6 +51,9 @@ build-assemblies:centos7:assets_ts:assemblies:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-assemblies:centos7:inactive:assemblies:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -73,6 +79,9 @@ build-assemblies:centos7:inactive:assemblies:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-assemblies:centos7:platform:assemblies:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -98,6 +107,9 @@ build-assemblies:centos7:platform:assemblies:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:adapters:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -123,6 +135,9 @@ build-libraries:centos7:assets:adapters:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:base_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -148,6 +163,9 @@ build-libraries:centos7:assets:base_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:cards:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -173,6 +191,9 @@ build-libraries:centos7:assets:cards:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:comms_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -198,6 +219,9 @@ build-libraries:centos7:assets:comms_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:devices:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -223,6 +247,9 @@ build-libraries:centos7:assets:devices:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:dsp_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -248,6 +275,9 @@ build-libraries:centos7:assets:dsp_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:misc_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -273,6 +303,9 @@ build-libraries:centos7:assets:misc_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets:util_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -298,6 +331,9 @@ build-libraries:centos7:assets:util_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets_ts:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -323,6 +359,9 @@ build-libraries:centos7:assets_ts:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:assets_ts:devices:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -348,6 +387,9 @@ build-libraries:centos7:assets_ts:devices:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:core:adapters:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -373,6 +415,9 @@ build-libraries:centos7:core:adapters:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:core:cards:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -398,6 +443,9 @@ build-libraries:centos7:core:cards:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:core:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -423,6 +471,9 @@ build-libraries:centos7:core:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:core:devices:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -448,6 +499,9 @@ build-libraries:centos7:core:devices:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:inactive:cards:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -473,6 +527,9 @@ build-libraries:centos7:inactive:cards:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:inactive:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -498,6 +555,9 @@ build-libraries:centos7:inactive:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:inactive:devices:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -523,6 +583,9 @@ build-libraries:centos7:inactive:devices:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-libraries:centos7:platform:devices:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -548,6 +611,9 @@ build-libraries:centos7:platform:devices:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-platforms:centos7:assets:platforms:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -573,6 +639,9 @@ build-platforms:centos7:assets:platforms:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-platforms:centos7:core:platforms:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -598,6 +667,9 @@ build-platforms:centos7:core:platforms:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-platforms:centos7:inactive:platforms:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -623,6 +695,9 @@ build-platforms:centos7:inactive:platforms:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-platforms:centos7:platform:platforms:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -648,6 +723,9 @@ build-platforms:centos7:platform:platforms:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-primitives-core:centos7:core:primitives:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -673,6 +751,9 @@ build-primitives-core:centos7:core:primitives:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-primitives:centos7:assets:primitives:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -698,6 +779,9 @@ build-primitives:centos7:assets:primitives:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-primitives:centos7:inactive:primitives:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -723,6 +807,9 @@ build-primitives:centos7:inactive:primitives:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-primitives:centos7:platform:primitives:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -748,6 +835,9 @@ build-primitives:centos7:platform:primitives:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:alt_test:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -773,6 +863,9 @@ build-sdcards:centos7:alt_test:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:epiq_matchstiq:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -798,6 +891,9 @@ build-sdcards:centos7:epiq_matchstiq:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx13_3:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -823,6 +919,9 @@ build-sdcards:centos7:xilinx13_3:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx13_4:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -848,6 +947,9 @@ build-sdcards:centos7:xilinx13_4:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx13_4_arm:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -873,6 +975,9 @@ build-sdcards:centos7:xilinx13_4_arm:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx17_1_aarch32:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -898,6 +1003,9 @@ build-sdcards:centos7:xilinx17_1_aarch32:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx17_1_aarch64:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -923,6 +1031,9 @@ build-sdcards:centos7:xilinx17_1_aarch64:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx17_2_aarch32:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -948,6 +1059,9 @@ build-sdcards:centos7:xilinx17_2_aarch32:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx17_2_aarch64:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -973,6 +1087,9 @@ build-sdcards:centos7:xilinx17_2_aarch64:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx19_2_aarch32:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -998,6 +1115,9 @@ build-sdcards:centos7:xilinx19_2_aarch32:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-sdcards:centos7:xilinx19_2_aarch64:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1023,6 +1143,9 @@ build-sdcards:centos7:xilinx19_2_aarch64:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:assets:base_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1048,6 +1171,9 @@ build-tests:centos7:assets:base_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:assets:comms_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1073,6 +1199,9 @@ build-tests:centos7:assets:comms_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:assets:dsp_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1098,6 +1227,9 @@ build-tests:centos7:assets:dsp_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:assets:misc_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1123,6 +1255,9 @@ build-tests:centos7:assets:misc_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:assets:util_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1148,6 +1283,9 @@ build-tests:centos7:assets:util_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:assets_ts:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1173,6 +1311,9 @@ build-tests:centos7:assets_ts:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:core:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1198,6 +1339,9 @@ build-tests:centos7:core:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 build-tests:centos7:inactive:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1223,6 +1367,9 @@ build-tests:centos7:inactive:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:assets:base_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1248,6 +1395,9 @@ test:centos7:assets:base_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:assets:comms_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1273,6 +1423,9 @@ test:centos7:assets:comms_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:assets:dsp_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1298,6 +1451,9 @@ test:centos7:assets:dsp_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:assets:misc_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1323,6 +1479,9 @@ test:centos7:assets:misc_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:assets:util_comps:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1348,6 +1507,9 @@ test:centos7:assets:util_comps:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:assets_ts:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1373,6 +1535,9 @@ test:centos7:assets_ts:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:core:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1398,6 +1563,9 @@ test:centos7:core:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net
 test:centos7:inactive:components:modelsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
@@ -1423,3 +1591,6 @@ test:centos7:inactive:components:modelsim:
   - modelsim
   - shell
   - opencpi
+  variables:
+    OCPI_MODELSIM_DIR: /opt/Mentor/modelsim_dlx
+    OCPI_MODELSIM_LICENSE_FILE: 2103@sembach.opencpi.net

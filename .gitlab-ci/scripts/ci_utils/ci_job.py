@@ -43,13 +43,15 @@ def dump(jobs_dict, path):
     for parent in parents[::-1]:
         parent.mkdir(exist_ok=True)
 
+    yaml.SafeDumper.ignore_aliases = lambda *args : True
+
     with open(path, 'w+') as yml:
         yaml.safe_dump(jobs_dict, yml, width=1000, default_flow_style=False)
 
 
 def Job(name, stage=None, script=None, before_script=None,
                     after_script=None, artifacts=None, tags=None, 
-                    resource_group=None, rules=None):
+                    resource_group=None, rules=None, variables=None):
     """Constructs a Job namedtuple
 
         namedtuples do not support default values in python versions
@@ -72,6 +74,7 @@ def Job(name, stage=None, script=None, before_script=None,
                         to run at a time within pipeline
         rules:          Dictionary of rules that define the conditions
                         that allow a job to execute in a pipeline
+        variables:      Dictionary of variables to add to job
 
     Returns:
         Job namedtuple
@@ -79,16 +82,16 @@ def Job(name, stage=None, script=None, before_script=None,
 
     Job = namedtuple('job', 'name stage script before_script' 
                             ' after_script artifacts tags'
-                            ' resource_group rules')
+                            ' resource_group rules variables')
 
     return Job(name=name, stage=stage, script=script,
                before_script=before_script, after_script=after_script,
-               artifacts=artifacts, tags=tags, 
-               resource_group=resource_group, rules=rules)
+               artifacts=artifacts, tags=tags, resource_group=resource_group, 
+               rules=rules, variables=variables)
 
 
 def make_jobs(stages, platform, projects, 
-              platforms=None, host_platform=None):
+              platforms=None, host_platform=None, variables=None):
     """Creates Job namedtuple(s) for project/platform combinations
 
     Calls either make_hdl_jobs() or make_rcc_jobs() based on model
@@ -99,6 +102,7 @@ def make_jobs(stages, platform, projects,
         platform:       Platform to make jobs for
         projects:       List of projects to make jobs for
         host_platform:  Host platform to create jobs for
+        variables:      Dictionary of variables to add to job
 
     Returns:
         Job namedtuples
@@ -108,14 +112,16 @@ def make_jobs(stages, platform, projects,
     """
     if platform.model == 'hdl':
         return make_hdl_jobs(stages, platform, projects, platforms, 
-                             host_platform)
+                             host_platform, variables)
     elif platform.model == 'rcc':
-        return make_rcc_jobs(stages, platform, projects, host_platform)
+        return make_rcc_jobs(stages, platform, projects, host_platform, 
+                             variables)
     else:
         raise ValueError('Unknown model: {}'.format(platform.model))
 
 
-def make_rcc_jobs(stages, platform, projects, host_platform=None):
+def make_rcc_jobs(stages, platform, projects, host_platform=None, 
+                  variables=None):
     """Creates Job namedtuple(s) for project/platform combinations of
         model 'rcc'
 
@@ -126,6 +132,7 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None):
         platform:       Platform to make jobs for
         projects:       List of projects to make jobs for
         host_platform:  Host platform to create jobs for
+        variables:      Dictionary of variables to add to job
 
     Returns:
         Job namedtuples
@@ -154,7 +161,8 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None):
     return jobs
 
 
-def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None):
+def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
+                  variables=None):
     """Creates Job namedtuple(s) for project/platform combinations of
         model 'hdl'
 
@@ -167,6 +175,7 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None):
         platforms:      List of platforms needed for making jobs
                         requiring an associated rcc platform
         host_platform:  Host platform to create jobs for
+        variables:      Dictionary of variables to add to job
 
     Returns:
         Job namedtuples
@@ -180,7 +189,8 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None):
             if library.is_buildable:
                 stage = stage_from_library(library)
                 job = make_job(stage, stages, platform, project=project,
-                               host_platform=host_platform, library=library)
+                               host_platform=host_platform, library=library,
+                               variables=variables)
                 jobs.append(job)
 
             if library.is_testable:
@@ -189,20 +199,21 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None):
                 build_test_job = make_job('build-assemblies', stages, platform, 
                                           name=name, project=project, 
                                           host_platform=host_platform, 
-                                          library=library)
+                                          library=library, variables=variables)
                 jobs.append(build_test_job)
 
                 if platform.is_sim:
                     run_test_job = make_job('test', stages, platform, 
                                             project=project, library=library,
-                                            host_platform=host_platform)
+                                            host_platform=host_platform,
+                                            variables=variables)
                     jobs.append(run_test_job)
                 
 
     for rcc_platform in rcc_platforms:
         job = make_job('build-sdcards', stages, platform, 
                        host_platform=host_platform, 
-                       linked_platform=rcc_platform)
+                       linked_platform=rcc_platform, variables=variables)
         jobs.append(job)
     
     return jobs
@@ -210,7 +221,7 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None):
 
 def make_job(stage, stages, platform, 
              project=None, name=None, host_platform=None, library=None, 
-             linked_platform=None):
+             linked_platform=None, variables=None):
     """Creates Job namedtuple(s) for project/platform combinations
 
     Calls before_script(), after_script(), script(), and if
@@ -225,6 +236,7 @@ def make_job(stage, stages, platform,
         platforms:      List of platforms needed for making jobs
                         requiring an associated rcc platform
         host_platform:  Host platform to create jobs for
+        variables:      Dictionary of variables to add to job
 
     Returns:
         Job namedtuples
@@ -249,9 +261,9 @@ def make_job(stage, stages, platform,
 
     rules = make_rules(platform, host_platform, linked_platform)
 
-    job = Job(name, stage, script, tags=tags, 
-                    before_script=before_script,
-                    after_script=after_script, rules=rules)
+    job = Job(name, stage, script, tags=tags, before_script=before_script,
+                    after_script=after_script, rules=rules, 
+                    variables=variables)
 
     return job
 

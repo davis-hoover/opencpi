@@ -1,0 +1,3 @@
+modelsim:
+  OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
+  OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
