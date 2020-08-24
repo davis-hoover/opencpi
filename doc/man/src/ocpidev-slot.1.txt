@@ -15,59 +15,67 @@ SYNOPSIS
 DESCRIPTION
 -----------
 The *`hdl slot`* noun represents an OpenCPI HDL slot,
-which describes XXXXXXX TBD FOR HDL SLOT XXXXX. 
+which defines an integral part of an HDL platform
+that enables an 'HDL card' to be plugged in so that
+its attached devices are accessible to the platform. An HDL
+platform has defined slot types; HDL cards
+that are designed for the same slot type can be plugged in
+to the defined slots on the platform.
 
-An HDL slot is described by XXXXXXXX.
+An HDL slot is described by an OpenCPI HDL slot type definition,
+which is an XML file that defines the signal connections to
+the pins of the connectors associated with the slot type and
+provides an (optional) name for the slot type that can
+be used in HDL Platform Descriptions (OHPDs) and HDL card
+definitions. OpenCPI provides HDL slot definitions for a number of
+standard slot types, like the FMC (FPGA Mezzanine Card), which
+is defined by the by the VITA standards organization as VITA-57.1.
+Defining a new slot type for use in OpenCPI consists of creating
+an HDL slot type definition from the information
+given in the standard document for the slot; writing HDL code to support
+an HDL slot is not normally necessary. For more information
+about the XML structure of an HDL slot type definition
+and how it relates to HDL platforms, devices and cards, see the
+section "Slots - How Cards Plug into Platforms" in the
+'OpenCPI Platform Development Guide'.
 
-----BELOW TO BE UPDATED FOR HDL SLOT ----------
-an OpenCPI Protocol Specification (OPS),
-which is an XML file that describes the set of messages defined in the
-protocol, as well as some top-level attributes for the protocol.
-'Operation' elements in the OPS describe the messages that can be used,
-while 'argument' elements describe the individual fields of a message.
-A protocol is specified in the 'port' element of a component spec (OCS).
-In a connection between component ports, the specs of both
-ports, in their port elements, refer to the same OPS.
-At present, a protocol consists of only the OPS XML file.
+An HDL slot is named '<name>'*`.xml`*, where '<name>'
+must be a name that can be used in programming languages (uses underscores
+rather than hyphens) but is otherwise case insensitive. The HDL slot
+name should normally be the exact name used in the standard document
+that defines the slot type.
 
-For more information about a protocol's XML structure, see the chapter "Protocol
-Specifications" in the 'OpenCPI Component Development Guide'.
+In a project, an HDL slot resides in one of the following locations
+depending on its intended use:
 
-In a project, a protocol resides in a *`specs/`* directory
-located either in a component library or at the top level of a project
-and is named '<name>'*`-prot.xml`*. Note that protocols with older
-naming formats like '<name>'*`_protocol.xml`* and '<name>'*`-protocol.xml`*
-also exist; for example, some of the protocols in the built-in
-OpenCPI *`core`* project (*`../projects/core/specs/`*) use these formats.
+- In the subdirectory *`hdl/cards/specs/`* when the HDL
+slot is platform-independent
 
-Verbs that can operate on a protocol are:
+- In the subdirectory *`hdl/platforms/`*'<platform>'*`/devices/specs/`* when
+the HDL slot is platform-specific
+
+OpenCPI-defined HDL slots are located in the subdirectory
+*`hdl/cards/specs/`* in the OpenCPI built-in *`core`* project.
+
+Verbs that can operate on an HDL slot are:
 
 *`create`*::
-    Create the named protocol according to the specified options,
+    Create the named HDL slot according to the specified options,
     creating directories and files as required.
 
 *`delete`*::
-    Remove all files associated with the named protocol.
+    Remove all files associated with the named HDL slot.
+
+The *`create`* operation creates an initial HDL slot type definition
+XML file that can be edited as necessary to define the slot type.
 
 OPTIONS
 -------
 In the descriptions below, a plus sign (+) after the option indicates
 that it can be specified more than once on the command line.
 
-Options That Apply to All Operations (Verbs) on Protocols
+Options That Apply to All Operations (Verbs) on HDL Slots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--hdl-library=`*'<hdl-library>'::
-    Specify the HDL library in which to operate on the 
-    protocol. HDL libraries exist underneath the *`hdl/`*
-    directory located at the top level of a project.
-
-*`--library=`*'<component-library>', *`-l`* '<component-library>'::
-    Specify the component library in which to operate on the protocol.
-    When a project contains multiple component libraries, this option
-    can be used to specify one of them. Multiple component
-    libraries are located underneath the *`components`* directory
-    at the top level of a project.
-
 *`-d`* '<directory>'::
     Specify the directory in which the command should be run.
     Analogous to the *-C* option in the POSIX *make* command.
@@ -75,25 +83,19 @@ Options That Apply to All Operations (Verbs) on Protocols
 *-v, --verbose*::
     Describe what is happening in command execution in more detail.
     
-Options When Creating and Deleting Protocols
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*-p*::
-    Specify that the protocol is to be created in or
-    deleted from the *`specs/`* directory of the project
-    instead of the *`specs/`* directory of a component library.
-    The *`-l`* and *`-p`* options specify the location
-    of the protocol. When neither one of these options
-    is used, the location is the *`components`* library
-    and thus is an error if other component libraries exist.
+Options When Creating HDL Slots
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-P`* '<hdl-platform>'::
+    Specify that the HDL slot being created is a platform-specific
+    HDL slot to be created in the *`devices/specs/`*
+    subdirectory in the specified HDL platform in the project.
 
-Options When Creating Protocols
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 *-k*::
-    Keep files and directories created after a protocol creation
+    Keep files and directories created after an HDL slot creation
     fails. Normally, all such files and directories are removed
     on any failure.
   
-Options When Deleting Protocols
+Options When Deleting HDL Slots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`-f`*::
     Force deletion: do not ask for confirmation when deleting
@@ -101,37 +103,32 @@ Options When Deleting Protocols
     
 EXAMPLES
 --------
-. Create a protocol spec with the name *`myprotocol`*. The protocol
-spec will be placed in the default location *`components/specs/`*:
+. At the top level of the project, create an HDL slot
+with the name *`myslot`*. The HDL slot definition
+named *`myslot.xml`* will be placed
+in the subdirectory *`hdl/cards/specs/`*:
 +
--------------------------------
-ocpidev create protocol myprotocol
---------------------------------
+------------------------------
+ocpidev create hdl slot myslot
+------------------------------
 +
-. Create a protocol named *`myprotocol`* in the component library
-named *`myutilcomps`*. The protocol spec will be placed in
-the *`specs`* directory in *`myutilcomps`* sublibrary
-within the *`components`* library (*`components/myutilcomps/specs/`*):
+. At the top level of the project, create an HDL slot
+with the name *`myslot`* for the platform *`myplatform`*.
+The HDL slot definition named *`myslot.xml`* will
+be placed in the
+subdirectory *`platforms/myplatform/hdl/devices/specs/`*:
 +
---------------------------------------------------
-ocpidev create protocol myprotocol -l myutilcomps
---------------------------------------------------
+--------------------------------------------
+ocpidev create hdl slot myslot -P myplatform
+--------------------------------------------
 +
-. Inside the project *`MyProject`*, create a protocol spec with the
-name *`myprotocol`* in the project's *`specs/`* directory.
-The protocol spec will be placed in *`MyProject/specs/`*:
+. Inside the project, delete an HDL slot definition named *`myslot.xml`* from
+a project's *`hdl/cards/specs/`* subdirectory:
 +
-------------------------------------
-ocpidev create protocol myprotocol -p
-------------------------------------
-+
-. Delete a protocol named *`MyAdapterProtocol`* from
-a project's *`adapters`* library (deletes it
-from *`hdl/adapters/specs/`*):
-+
---------------------------------------------------------
-ocpidev delete protocol MyAdapterProtocol --hdl-library=adapters
---------------------------------------------------------
+------------------------------
+ocpidev delete hdl slot myslot
+------------------------------
+
 
 BUGS
 ----
@@ -146,11 +143,11 @@ See the main web site: https://www.opencpi.org
 SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
-link:ocpidev-application.1.html[ocpidev-application(1)]
-link:ocpidev-component.1.html[ocpidev-component(1)]
+link:ocpidev-card.1.html[ocpidev-card(1)]
 link:ocpidev-create.1.html[ocpidev-create(1)]
 link:ocpidev-delete.1.html[ocpidev-delete(1)]
-link:ocpidev-library.1.html[ocpidev-library(1)]
+link:ocpidev-device.1.html[ocpidev-device(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
 
 

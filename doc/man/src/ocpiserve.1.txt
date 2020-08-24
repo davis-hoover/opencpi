@@ -1,0 +1,167 @@
+OCPISERVE(1)
+===========
+
+
+NAME
+----
+ocpiserve - command-line tool for making local OpenCPI containers available
+for remote access
+
+
+SYNOPSIS
+--------
+*`ocpiserve`* ['<options>']
+
+
+DESCRIPTION
+-----------
+When an application is run, the OpenCPI framework finds "local"
+containers - those that are part of or directly attached to
+the local system - where workers based on artifacts can execute.
+A local system can use the *`ocpiserve(1)`* tool to offer its
+local containers to other network-based systems for use as
+"remote" containers.
+
+The *`ocpiserve`* command-line tool is part of OpenCPI's
+*'remote containers'* feature, which adds containers
+available in other systems on the network to the set
+of containers considered for application execution.
+
+The *`ocpiserve`* tool runs as a 'container server', serving up
+local containers as remotely accessible containers to network clients.
+Remote clients use *`ocpirun`* options to find the systems on the
+network that are running *`ocpiserve`* and list the available containers.
+
+When started, *`ocpiserve`* discovers all local network interfaces and
+prepares to be contacted by clients for all of them. It optionally (if the
+*`--discoverable`* option is used) also
+prepares to receive multicast queries from clients on all network
+interfaces. The *`ocpiserve`* container server is a fully multi-homed
+server, using all network interfaces for normal use (TCP) discovery (via the
+User Datagram Protocol (UDP)).
+
+The  *`ocpiserve`* container server does not run, initiate or control
+entire OpenCPI applications, so it requires fewer resources than
+*`ocpirun`* or ACI executables.
+
+'Artifacts' - binary executables compiled from OpenCPI 'workers' -
+are not required to reside on the system running
+*`ocpiserve`*. Instead, they are downloaded on demand
+to the *`ocpiserve`* container server from
+the remote system on which the application is initiated
+and controlled and then cached for possible re-use. The *`ocpiserve`*
+container server maintains this cache in a directory
+named *`artifacts`* unless the *`--directory`* option is used
+to change it. The cache is normally maintained after *`ocpiserve`*
+exits unless the *`--remove`* option is used to delete it.
+
+Starting *`ocpiserve`* locally requires logging in to the console on
+the system with a username and password. CTRL/C can be used to
+exit *`ocpiserve`* locally. Alternatively,
+the link:ocpiremote.1.html[ocpiremote(1)] tool can be used to start,
+stop, and otherwise control an *`ocpiserve`* container server
+from a remote client.
+
+Options can occur anywhere in the command for the user's convenience.
+When invoked without any options, *`ocpiserve`* displays information
+about all of its options.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+*`--addresses=`*'<file>', *`-a`* '<file>'::
+    Specify a file to which *`ocpiserve`* should write all its TCP/IP
+    addresses. See the description of the OCPI_SERVER_ADDRESSES_FILE
+    in the 'OpenCPI Application Development Guide' for details.
+
+*`--directory=`* '<directory-name>', *`-D`* '<directory-name>'::
+    Specify the name of a directory to use for caching downloaded
+    artifacts. The default directory name is *`artifacts`*.
+
+*`--discoverable`*, *`-d`*::
+    Enable *`ocpiserve`* to receive UDP multicast discovery
+    queries from clients on all network interfaces.
+
+*`--help`*, *`-h`*::
+    Display help information for *`ocpiserve`*.
+
+*`--log-level=`*'<value>', *`-l`* '<value>'::
+    Specify the OpenCPI log level to be used during execution.
+    See the description of the OCPI_LOG_LEVEL environment
+    variable in the 'OpenCPI User Guide' for a description
+    of possible values. Using this option overrides the
+    level set in the OCPI_LOG_LEVEL environment variable.
+    The default log level is 0 (no logging).
+
+*`--loopback`*, *`-L`*::
+    Enable/add UDP multicast discovery on the local loopback subnet.
+
+*`--onlyloopback`*, *`-O`*::
+    Allow UDP multicast discovery 'only' on the local loopback subnet.
+
+*`--port=`* '<value>', *`-p`* '<value>'::
+    Specify the TCP port number to use for *`ocpiserve`* ports.
+    The default is to use dynamically assigned port numbers.
+
+*`--processors=`*'<number-of-RCC-containers>', *`-n`* '<number-of-RCC-containers>'::
+    Specify the number of RCC containers to create and serve. The default is 1.
+
+*`--remove`*, *`-r`*::
+    Remove the artifact cache when *`ocpiserve`* exits.
+
+*`--verbose`*, *`-v`*::
+    Display status and progress as *`ocpiserve`* executes.
+
+
+EXAMPLES
+---------
+. Start the *`ocpiserve`* container server, allowing it
+to be discoverable via UDP multicast from client systems
+and displaying status and progress information:
++
+---------------------------------
+ocpiserve --verbose --discoverable
+---------------------------------
++
+. Start the *`ocpiserve`* container server and direct it
+to write its TCP/IP addresses to the file named *`myserveraddrs`*:
++
+---------------------------------
+ocpiserve --address=myserveraddrs
+---------------------------------
++
+. Start the *`ocpiserve`* container server and direct
+it to use the TCP port 9233 as the TCP port:
++
+---------------------
+ocpiserve --port=9233
+---------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+link:ocpiremote.1.html[ocpiremote(1)]
+link:ocpirun.1.html[ocpirun(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
