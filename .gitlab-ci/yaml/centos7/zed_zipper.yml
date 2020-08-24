@@ -1,8 +1,9 @@
 build-assemblies:centos7:assets:assemblies:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -24,8 +25,9 @@ build-assemblies:centos7:assets:assemblies:zed_zipper:
 build-assemblies:centos7:assets_ts:assemblies:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -47,8 +49,9 @@ build-assemblies:centos7:assets_ts:assemblies:zed_zipper:
 build-assemblies:centos7:inactive:assemblies:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -70,8 +73,9 @@ build-assemblies:centos7:inactive:assemblies:zed_zipper:
 build-assemblies:centos7:platform:assemblies:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -93,8 +97,9 @@ build-assemblies:centos7:platform:assemblies:zed_zipper:
 build-libraries:centos7:assets:adapters:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -116,8 +121,9 @@ build-libraries:centos7:assets:adapters:zed_zipper:
 build-libraries:centos7:assets:base_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -139,8 +145,9 @@ build-libraries:centos7:assets:base_comps:zed_zipper:
 build-libraries:centos7:assets:cards:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -162,8 +169,9 @@ build-libraries:centos7:assets:cards:zed_zipper:
 build-libraries:centos7:assets:comms_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -185,8 +193,9 @@ build-libraries:centos7:assets:comms_comps:zed_zipper:
 build-libraries:centos7:assets:devices:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -208,8 +217,9 @@ build-libraries:centos7:assets:devices:zed_zipper:
 build-libraries:centos7:assets:dsp_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -231,8 +241,9 @@ build-libraries:centos7:assets:dsp_comps:zed_zipper:
 build-libraries:centos7:assets:misc_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -254,8 +265,9 @@ build-libraries:centos7:assets:misc_comps:zed_zipper:
 build-libraries:centos7:assets:util_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -277,8 +289,9 @@ build-libraries:centos7:assets:util_comps:zed_zipper:
 build-libraries:centos7:assets_ts:components:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -300,8 +313,9 @@ build-libraries:centos7:assets_ts:components:zed_zipper:
 build-libraries:centos7:assets_ts:devices:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -323,8 +337,9 @@ build-libraries:centos7:assets_ts:devices:zed_zipper:
 build-libraries:centos7:core:adapters:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -346,8 +361,9 @@ build-libraries:centos7:core:adapters:zed_zipper:
 build-libraries:centos7:core:cards:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -369,8 +385,9 @@ build-libraries:centos7:core:cards:zed_zipper:
 build-libraries:centos7:core:components:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -392,8 +409,9 @@ build-libraries:centos7:core:components:zed_zipper:
 build-libraries:centos7:core:devices:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -415,8 +433,9 @@ build-libraries:centos7:core:devices:zed_zipper:
 build-libraries:centos7:inactive:cards:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -438,8 +457,9 @@ build-libraries:centos7:inactive:cards:zed_zipper:
 build-libraries:centos7:inactive:components:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -461,8 +481,9 @@ build-libraries:centos7:inactive:components:zed_zipper:
 build-libraries:centos7:inactive:devices:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -484,8 +505,9 @@ build-libraries:centos7:inactive:devices:zed_zipper:
 build-libraries:centos7:platform:devices:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -507,8 +529,9 @@ build-libraries:centos7:platform:devices:zed_zipper:
 build-platforms:centos7:assets:platforms:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -530,8 +553,9 @@ build-platforms:centos7:assets:platforms:zed_zipper:
 build-platforms:centos7:core:platforms:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -553,8 +577,9 @@ build-platforms:centos7:core:platforms:zed_zipper:
 build-platforms:centos7:inactive:platforms:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -576,8 +601,9 @@ build-platforms:centos7:inactive:platforms:zed_zipper:
 build-platforms:centos7:platform:platforms:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -599,8 +625,9 @@ build-platforms:centos7:platform:platforms:zed_zipper:
 build-primitives-core:centos7:core:primitives:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-primitives-core/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-primitives-core/* build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -622,8 +649,9 @@ build-primitives-core:centos7:core:primitives:zed_zipper:
 build-primitives:centos7:assets:primitives:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -645,8 +673,9 @@ build-primitives:centos7:assets:primitives:zed_zipper:
 build-primitives:centos7:inactive:primitives:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -668,8 +697,9 @@ build-primitives:centos7:inactive:primitives:zed_zipper:
 build-primitives:centos7:platform:primitives:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -691,8 +721,9 @@ build-primitives:centos7:platform:primitives:zed_zipper:
 build-sdcards:centos7:alt_test:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *alt_test.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *alt_test.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -714,8 +745,9 @@ build-sdcards:centos7:alt_test:zed_zipper:
 build-sdcards:centos7:epiq_matchstiq:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *epiq_matchstiq.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *epiq_matchstiq.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -737,8 +769,9 @@ build-sdcards:centos7:epiq_matchstiq:zed_zipper:
 build-sdcards:centos7:xilinx13_3:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx13_3.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx13_3.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -760,8 +793,9 @@ build-sdcards:centos7:xilinx13_3:zed_zipper:
 build-sdcards:centos7:xilinx13_4:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx13_4.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx13_4.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -783,8 +817,9 @@ build-sdcards:centos7:xilinx13_4:zed_zipper:
 build-sdcards:centos7:xilinx13_4_arm:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx13_4_arm.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx13_4_arm.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -806,8 +841,9 @@ build-sdcards:centos7:xilinx13_4_arm:zed_zipper:
 build-sdcards:centos7:xilinx17_1_aarch32:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_1_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_1_aarch32.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -829,8 +865,9 @@ build-sdcards:centos7:xilinx17_1_aarch32:zed_zipper:
 build-sdcards:centos7:xilinx17_1_aarch64:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_1_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_1_aarch64.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -852,8 +889,9 @@ build-sdcards:centos7:xilinx17_1_aarch64:zed_zipper:
 build-sdcards:centos7:xilinx17_2_aarch32:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_2_aarch32.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -875,8 +913,9 @@ build-sdcards:centos7:xilinx17_2_aarch32:zed_zipper:
 build-sdcards:centos7:xilinx17_2_aarch64:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx17_2_aarch64.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -898,8 +937,9 @@ build-sdcards:centos7:xilinx17_2_aarch64:zed_zipper:
 build-sdcards:centos7:xilinx19_2_aarch32:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx19_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx19_2_aarch32.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -921,8 +961,9 @@ build-sdcards:centos7:xilinx19_2_aarch32:zed_zipper:
 build-sdcards:centos7:xilinx19_2_aarch64:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx19_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz *xilinx19_2_aarch64.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -944,8 +985,9 @@ build-sdcards:centos7:xilinx19_2_aarch64:zed_zipper:
 build-tests:centos7:assets:base_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -967,8 +1009,9 @@ build-tests:centos7:assets:base_comps:zed_zipper:
 build-tests:centos7:assets:comms_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -990,8 +1033,9 @@ build-tests:centos7:assets:comms_comps:zed_zipper:
 build-tests:centos7:assets:dsp_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1013,8 +1057,9 @@ build-tests:centos7:assets:dsp_comps:zed_zipper:
 build-tests:centos7:assets:misc_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1036,8 +1081,9 @@ build-tests:centos7:assets:misc_comps:zed_zipper:
 build-tests:centos7:assets:util_comps:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1059,8 +1105,9 @@ build-tests:centos7:assets:util_comps:zed_zipper:
 build-tests:centos7:assets_ts:components:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1082,8 +1129,9 @@ build-tests:centos7:assets_ts:components:zed_zipper:
 build-tests:centos7:core:components:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1105,8 +1153,9 @@ build-tests:centos7:core:components:zed_zipper:
 build-tests:centos7:inactive:components:zed_zipper:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *zed_zipper.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e

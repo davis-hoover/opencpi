@@ -2,10 +2,8 @@
 
 import os
 import subprocess
-import sys
 import tarfile
 from argparse import ArgumentParser
-from collections import namedtuple
 from shutil import rmtree
 
 

@@ -192,6 +192,13 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None):
                                           library=library)
                 jobs.append(build_test_job)
 
+                if platform.is_sim:
+                    run_test_job = make_job('test', stages, platform, 
+                                            project=project, library=library,
+                                            host_platform=host_platform)
+                    jobs.append(run_test_job)
+                
+
     for rcc_platform in rcc_platforms:
         job = make_job('build-sdcards', stages, platform, 
                        host_platform=host_platform, 
@@ -293,11 +300,13 @@ def make_before_script(stage, stages, platform, host_platform=None,
     
     stage_idx = stages.index(stage)
 
+    # Download artifacts for platform, host_platform, and linked_platform
     includes = ["*{}.tar.gz".format(platform.name) 
                     for platform in [platform, host_platform, linked_platform] 
                     if platform]
 
-    excludes = ['/{}/*'.format(stage) for stage in stages[stage_idx:]]
+    # Don't download artifacts in current or later stages
+    excludes = ['{}/*'.format(stage) for stage in stages[stage_idx:]]
 
     download_cmd = ' '.join(['.gitlab-ci/scripts/ci_artifacts.py download',
                              pipeline_id,
@@ -320,7 +329,7 @@ def make_after_script():
     """Creates list of commands to run in job's after_script step
 
         Constructs command for uploading opencpi tree to AWS if job
-        failed.
+        failed, and cleans entire project directory as final cmd.
 
     Returns:
         list of command strings
@@ -331,8 +340,9 @@ def make_after_script():
                            'then .gitlab-ci/scripts/ci_artifacts.py upload',
                            pipeline_id, job_name,
                            '-t "failed-job"; fi'])
+    clean_cmd = 'rm -rf *'
 
-    return [upload_cmd]
+    return [upload_cmd, clean_cmd]
 
 
 def make_script(stage, platform, project=None, linked_platform=None,
@@ -447,7 +457,8 @@ def make_ocpidev_cmd(verb, platform, path, noun=None):
         raise Exception('Uknown noun: {}'.format(noun))
 
     if verb == 'run':
-        options = '-d {} --only-platform {}'.format(path, platform.name)
+        options = '-d {} --only-platform {} --mode prep_run_verify'.format(
+            path, platform.name)
     else:
         options = '-d {} --hdl-platform {}'.format(path, platform.name)
 

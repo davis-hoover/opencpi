@@ -1,8 +1,9 @@
 build-host:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos7.tar.gz -e /build-host/* /build-rcc/* /build-primitives-core/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos7.tar.gz -e build-host/* build-rcc/* build-primitives-core/* build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   rules:
@@ -23,6 +24,7 @@ build-host:centos7:
 prereqs:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
   - touch .timestamp
   rules:
@@ -43,8 +45,9 @@ prereqs:centos7:
 test:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -65,6 +68,7 @@ test:centos7:
   - opencpi
 include:
 - .gitlab-ci/yaml/centos7/alst4.yml
+- .gitlab-ci/yaml/centos7/ml555.yml
 - .gitlab-ci/yaml/centos7/zed_zipper.yml
 - .gitlab-ci/yaml/centos7/zed.yml
 - .gitlab-ci/yaml/centos7/xilinx17_1_aarch64.yml
@@ -75,6 +79,7 @@ include:
 - .gitlab-ci/yaml/centos7/ml605.yml
 - .gitlab-ci/yaml/centos7/zed_ise.yml
 - .gitlab-ci/yaml/centos7/xilinx13_3.yml
+- .gitlab-ci/yaml/centos7/schist.yml
 - .gitlab-ci/yaml/centos7/xilinx19_2_aarch64.yml
 - .gitlab-ci/yaml/centos7/modelsim.yml
 - .gitlab-ci/yaml/centos7/xilinx17_2_aarch64.yml

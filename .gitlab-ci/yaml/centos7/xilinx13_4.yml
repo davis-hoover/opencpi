@@ -1,8 +1,9 @@
 build-rcc:centos7:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /build-rcc/* /build-primitives-core/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e build-rcc/* build-primitives-core/* build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -24,6 +25,7 @@ build-rcc:centos7:xilinx13_4:
 prereqs:centos7:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
   - touch .timestamp
   rules:
@@ -44,8 +46,9 @@ prereqs:centos7:xilinx13_4:
 test:centos7:assets:base_comps:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -56,7 +59,7 @@ test:centos7:assets:base_comps:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/assets/components/base_comps --only-platform xilinx13_4
+  - ocpidev run tests -d projects/assets/components/base_comps --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
@@ -67,8 +70,9 @@ test:centos7:assets:base_comps:xilinx13_4:
 test:centos7:assets:comms_comps:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -79,7 +83,7 @@ test:centos7:assets:comms_comps:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/assets/components/comms_comps --only-platform xilinx13_4
+  - ocpidev run tests -d projects/assets/components/comms_comps --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
@@ -90,8 +94,9 @@ test:centos7:assets:comms_comps:xilinx13_4:
 test:centos7:assets:dsp_comps:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -102,7 +107,7 @@ test:centos7:assets:dsp_comps:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform xilinx13_4
+  - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
@@ -113,8 +118,9 @@ test:centos7:assets:dsp_comps:xilinx13_4:
 test:centos7:assets:misc_comps:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -125,7 +131,7 @@ test:centos7:assets:misc_comps:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/assets/components/misc_comps --only-platform xilinx13_4
+  - ocpidev run tests -d projects/assets/components/misc_comps --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
@@ -136,8 +142,9 @@ test:centos7:assets:misc_comps:xilinx13_4:
 test:centos7:assets:util_comps:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -148,7 +155,7 @@ test:centos7:assets:util_comps:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/assets/components/util_comps --only-platform xilinx13_4
+  - ocpidev run tests -d projects/assets/components/util_comps --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
@@ -159,8 +166,9 @@ test:centos7:assets:util_comps:xilinx13_4:
 test:centos7:assets_ts:components:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -171,7 +179,7 @@ test:centos7:assets_ts:components:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/assets_ts/components --only-platform xilinx13_4
+  - ocpidev run tests -d projects/assets_ts/components --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
@@ -182,8 +190,9 @@ test:centos7:assets_ts:components:xilinx13_4:
 test:centos7:core:components:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -194,7 +203,7 @@ test:centos7:core:components:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/core/components --only-platform xilinx13_4
+  - ocpidev run tests -d projects/core/components --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test
@@ -205,8 +214,9 @@ test:centos7:core:components:xilinx13_4:
 test:centos7:inactive:components:xilinx13_4:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xilinx13_4.tar.gz *centos7.tar.gz -e test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -217,7 +227,7 @@ test:centos7:inactive:components:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xilinx13_4)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xilinx13_4)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
-  - ocpidev run tests -d projects/inactive/components --only-platform xilinx13_4
+  - ocpidev run tests -d projects/inactive/components --only-platform xilinx13_4 --mode prep_run_verify
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
   - touch .success
   stage: test

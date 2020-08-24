@@ -1,8 +1,9 @@
 build-assemblies:centos7:assets:assemblies:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -24,8 +25,9 @@ build-assemblies:centos7:assets:assemblies:xsim:
 build-assemblies:centos7:assets_ts:assemblies:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -47,8 +49,9 @@ build-assemblies:centos7:assets_ts:assemblies:xsim:
 build-assemblies:centos7:inactive:assemblies:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -70,8 +73,9 @@ build-assemblies:centos7:inactive:assemblies:xsim:
 build-assemblies:centos7:platform:assemblies:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -93,8 +97,9 @@ build-assemblies:centos7:platform:assemblies:xsim:
 build-libraries:centos7:assets:adapters:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -116,8 +121,9 @@ build-libraries:centos7:assets:adapters:xsim:
 build-libraries:centos7:assets:base_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -139,8 +145,9 @@ build-libraries:centos7:assets:base_comps:xsim:
 build-libraries:centos7:assets:cards:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -162,8 +169,9 @@ build-libraries:centos7:assets:cards:xsim:
 build-libraries:centos7:assets:comms_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -185,8 +193,9 @@ build-libraries:centos7:assets:comms_comps:xsim:
 build-libraries:centos7:assets:devices:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -208,8 +217,9 @@ build-libraries:centos7:assets:devices:xsim:
 build-libraries:centos7:assets:dsp_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -231,8 +241,9 @@ build-libraries:centos7:assets:dsp_comps:xsim:
 build-libraries:centos7:assets:misc_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -254,8 +265,9 @@ build-libraries:centos7:assets:misc_comps:xsim:
 build-libraries:centos7:assets:util_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -277,8 +289,9 @@ build-libraries:centos7:assets:util_comps:xsim:
 build-libraries:centos7:assets_ts:components:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -300,8 +313,9 @@ build-libraries:centos7:assets_ts:components:xsim:
 build-libraries:centos7:assets_ts:devices:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -323,8 +337,9 @@ build-libraries:centos7:assets_ts:devices:xsim:
 build-libraries:centos7:core:adapters:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -346,8 +361,9 @@ build-libraries:centos7:core:adapters:xsim:
 build-libraries:centos7:core:cards:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -369,8 +385,9 @@ build-libraries:centos7:core:cards:xsim:
 build-libraries:centos7:core:components:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -392,8 +409,9 @@ build-libraries:centos7:core:components:xsim:
 build-libraries:centos7:core:devices:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -415,8 +433,9 @@ build-libraries:centos7:core:devices:xsim:
 build-libraries:centos7:inactive:cards:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -438,8 +457,9 @@ build-libraries:centos7:inactive:cards:xsim:
 build-libraries:centos7:inactive:components:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -461,8 +481,9 @@ build-libraries:centos7:inactive:components:xsim:
 build-libraries:centos7:inactive:devices:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -484,8 +505,9 @@ build-libraries:centos7:inactive:devices:xsim:
 build-libraries:centos7:platform:devices:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -507,8 +529,9 @@ build-libraries:centos7:platform:devices:xsim:
 build-platforms:centos7:assets:platforms:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -530,8 +553,9 @@ build-platforms:centos7:assets:platforms:xsim:
 build-platforms:centos7:core:platforms:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -553,8 +577,9 @@ build-platforms:centos7:core:platforms:xsim:
 build-platforms:centos7:inactive:platforms:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -576,8 +601,9 @@ build-platforms:centos7:inactive:platforms:xsim:
 build-platforms:centos7:platform:platforms:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -599,8 +625,9 @@ build-platforms:centos7:platform:platforms:xsim:
 build-primitives-core:centos7:core:primitives:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-primitives-core/* /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-primitives-core/* build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -622,8 +649,9 @@ build-primitives-core:centos7:core:primitives:xsim:
 build-primitives:centos7:assets:primitives:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -645,8 +673,9 @@ build-primitives:centos7:assets:primitives:xsim:
 build-primitives:centos7:inactive:primitives:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -668,8 +697,9 @@ build-primitives:centos7:inactive:primitives:xsim:
 build-primitives:centos7:platform:primitives:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-primitives/* /build-libraries/* /build-platforms/* /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-primitives/* build-libraries/* build-platforms/* build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -691,8 +721,9 @@ build-primitives:centos7:platform:primitives:xsim:
 build-sdcards:centos7:alt_test:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *alt_test.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *alt_test.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -714,8 +745,9 @@ build-sdcards:centos7:alt_test:xsim:
 build-sdcards:centos7:epiq_matchstiq:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *epiq_matchstiq.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *epiq_matchstiq.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -737,8 +769,9 @@ build-sdcards:centos7:epiq_matchstiq:xsim:
 build-sdcards:centos7:xilinx13_3:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx13_3.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx13_3.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -760,8 +793,9 @@ build-sdcards:centos7:xilinx13_3:xsim:
 build-sdcards:centos7:xilinx13_4:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx13_4.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx13_4.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -783,8 +817,9 @@ build-sdcards:centos7:xilinx13_4:xsim:
 build-sdcards:centos7:xilinx13_4_arm:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx13_4_arm.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx13_4_arm.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -806,8 +841,9 @@ build-sdcards:centos7:xilinx13_4_arm:xsim:
 build-sdcards:centos7:xilinx17_1_aarch32:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_1_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_1_aarch32.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -829,8 +865,9 @@ build-sdcards:centos7:xilinx17_1_aarch32:xsim:
 build-sdcards:centos7:xilinx17_1_aarch64:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_1_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_1_aarch64.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -852,8 +889,9 @@ build-sdcards:centos7:xilinx17_1_aarch64:xsim:
 build-sdcards:centos7:xilinx17_2_aarch32:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_2_aarch32.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -875,8 +913,9 @@ build-sdcards:centos7:xilinx17_2_aarch32:xsim:
 build-sdcards:centos7:xilinx17_2_aarch64:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx17_2_aarch64.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -898,8 +937,9 @@ build-sdcards:centos7:xilinx17_2_aarch64:xsim:
 build-sdcards:centos7:xilinx19_2_aarch32:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx19_2_aarch32.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx19_2_aarch32.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -921,8 +961,9 @@ build-sdcards:centos7:xilinx19_2_aarch32:xsim:
 build-sdcards:centos7:xilinx19_2_aarch64:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx19_2_aarch64.tar.gz -e /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz *xilinx19_2_aarch64.tar.gz -e build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -944,8 +985,9 @@ build-sdcards:centos7:xilinx19_2_aarch64:xsim:
 build-tests:centos7:assets:base_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -967,8 +1009,9 @@ build-tests:centos7:assets:base_comps:xsim:
 build-tests:centos7:assets:comms_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -990,8 +1033,9 @@ build-tests:centos7:assets:comms_comps:xsim:
 build-tests:centos7:assets:dsp_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1013,8 +1057,9 @@ build-tests:centos7:assets:dsp_comps:xsim:
 build-tests:centos7:assets:misc_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1036,8 +1081,9 @@ build-tests:centos7:assets:misc_comps:xsim:
 build-tests:centos7:assets:util_comps:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1059,8 +1105,9 @@ build-tests:centos7:assets:util_comps:xsim:
 build-tests:centos7:assets_ts:components:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1082,8 +1129,9 @@ build-tests:centos7:assets_ts:components:xsim:
 build-tests:centos7:core:components:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1105,8 +1153,9 @@ build-tests:centos7:core:components:xsim:
 build-tests:centos7:inactive:components:xsim:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
   before_script:
-  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e /build-assemblies/* /build-sdcards/* /test/* /deploy/*
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e build-assemblies/* build-sdcards/* test/* deploy/*
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
@@ -1123,5 +1172,197 @@ build-tests:centos7:inactive:components:xsim:
   stage: build-assemblies
   tags:
   - centos7
+  - shell
+  - opencpi
+test:centos7:assets:base_comps:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/assets/components/base_comps --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
+  - shell
+  - opencpi
+test:centos7:assets:comms_comps:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/assets/components/comms_comps --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
+  - shell
+  - opencpi
+test:centos7:assets:dsp_comps:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
+  - shell
+  - opencpi
+test:centos7:assets:misc_comps:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/assets/components/misc_comps --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
+  - shell
+  - opencpi
+test:centos7:assets:util_comps:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/assets/components/util_comps --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
+  - shell
+  - opencpi
+test:centos7:assets_ts:components:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/assets_ts/components --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
+  - shell
+  - opencpi
+test:centos7:core:components:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/core/components --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
+  - shell
+  - opencpi
+test:centos7:inactive:components:xsim:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i *xsim.tar.gz *centos7.tar.gz -e test/* deploy/*
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)(xsim)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:)(xsim)( |:|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - ocpidev run tests -d projects/inactive/components --only-platform xsim --mode prep_run_verify
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - xsim
   - shell
   - opencpi

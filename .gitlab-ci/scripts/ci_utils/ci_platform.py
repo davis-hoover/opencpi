@@ -3,7 +3,7 @@
 from collections import namedtuple
 from pathlib import Path
 
-Platform = namedtuple('platform', 'name model is_host')
+Platform = namedtuple('platform', 'name model is_host is_sim')
 
 def discover_platforms(projects, host_platform_whitelist):
     platforms = []
@@ -19,14 +19,17 @@ def discover_platforms(projects, host_platform_whitelist):
                     platform_name = platform_path.stem
 
                     
-                    if platform_path is hdl_platforms_path:
+                    if platforms_path is hdl_platforms_path:
                         makefile = Path(platform_path, 'Makefile')
                         is_host = False
+                        is_sim = Path(platform_path, 'runSimExec.{}'.format(
+                            platform_name)).is_file()
                     else:
                         makefile = Path(platform_path, '{}.mk'.format(
                             platform_path.stem))
                         is_host = Path(platform_path, '{}-check.sh'.format(
                             platform_path.stem)).is_file()
+                        is_sim = False
 
                     if is_host and host_platform_whitelist:
                         if platform_name not in host_platform_whitelist:
@@ -36,7 +39,8 @@ def discover_platforms(projects, host_platform_whitelist):
                         platform_model = platform_path.parents[1].stem
                         platform = Platform(name=platform_name, 
                                             model=platform_model,
-                                            is_host=is_host)
+                                            is_host=is_host,
+                                            is_sim=is_sim)
                         platforms.append(platform)
 
     return platforms   

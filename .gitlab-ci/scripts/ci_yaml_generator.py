@@ -2,8 +2,6 @@
 
 import os
 import yaml
-from collections import defaultdict
-import re
 from pathlib import Path
 from ci_utils import ci_project, ci_platform, ci_job
 
