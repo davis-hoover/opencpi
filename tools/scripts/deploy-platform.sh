@@ -60,14 +60,12 @@ sd=$hdl_platform/sdcard-$rcc_platform
 rm $verbose -rf $sd
 mkdir $verbose -p $sd/opencpi
 
-# FIXME: the release tag needs to be set from a reference location
-# rather than hard-coded in each place where it is used.
+source "$OCPI_CDK_DIR/VERSION"
+
 if [ "$verbose" ]
 then
-  echo "Release is \"opencpi-v2.0.0 $rcc_platform $hdl_platform\"."
+  echo "Release is \"opencpi-$OCPI_RELEASE $rcc_platform $hdl_platform\"."
 fi
-
-source "$OCPI_CDK_DIR/VERSION"
 echo "opencpi-$OCPI_RELEASE $rcc_platform $hdl_platform"  > $sd/opencpi/release
 
 ####################################################################################################
