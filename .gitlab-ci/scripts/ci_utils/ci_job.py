@@ -274,6 +274,7 @@ def make_job(stage, stages, platform,
         if name.startswith('packages'): 
             tags = ['docker']
             image = platform.image
+            after_script = None
         else:
             tags = [platform.name, 'shell', 'opencpi']
     elif (platform.is_sim or (stage == 'test' and platform.model == 'hdl')):
