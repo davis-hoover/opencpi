@@ -479,9 +479,8 @@ set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ADVANCED_TRIGGER_
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIPELINE=1" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id auto_signaltap_0
 
-set qipfilepath $::env(QUARTUS_QIP_FILE)
 
-set_global_assignment -name QIP_FILE $qipfilepath/soc_system.qip
+set_global_assignment -name QIP_FILE soc_system.qip
 # set_global_assignment -name QIP_FILE cyclone5_hps/synthesis/cyclone5_hps.qip
 # set_global_assignment -name QIP_FILE ip/altsource_probe/hps_reset.qip
 # set_global_assignment -name VERILOG_FILE ip/edge_detect/altera_edge_detector.v

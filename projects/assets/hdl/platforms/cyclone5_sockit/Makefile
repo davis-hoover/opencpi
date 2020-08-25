@@ -24,12 +24,18 @@ Libraries=axi cyclone5 sdp
 
 Configurations=base
 
-SourceFiles=cyclone5_sockit.qsf soc_system.qip
+export QIPFILE:=$(CURDIR)/soc_system.qip
+export QSFFILE:=$(CURDIR)/cyclone5_sockit.qsf
+# export SRCFILES:=$(CURDIR)/../../primitives/lib/cyclone5/cyclone5/*
+export SOPCINFO:=$(CURDIR)/soc_system.sopcinfo
+export QSYSFILE:=$(CURDIR)/soc_system.qsys
+# export SEQEUNCER:=$(CURDIR)/sequencer/*
+
+SourceFiles=$(QSFFILE) $(QIPFILE)
+
 
 # The QSF file is included at the platform, config and container levels for QPro platforms
-ExportFiles=\
-  cyclone5_sockit.qsf soc_system.qip
-
+ExportFiles=$(QIPFILE) $(QSFFILE) $(SOPCINFO) $(QSYSFILE)
 
 
 

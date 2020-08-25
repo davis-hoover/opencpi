@@ -1,21 +1,17 @@
-set qipfilepath $::env(QUARTUS_QIP_FILE)
-set srcfilepath $::env(HPS_SRC_FILES)
-set seqeuncerfilepath $::env(HPS_SEQUENCER_FILES)
-set tclfilepath $::env(HPS_TCL_FILES)
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_TOOL_NAME "Qsys"
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_TOOL_VERSION "17.1"
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_TOOL_ENV "Qsys"
-set_global_assignment -library "soc_system" -name SOPCINFO_FILE $qipfilepath/soc_system.sopcinfo
+set_global_assignment -library "soc_system" -name SOPCINFO_FILE soc_system.sopcinfo
 set_global_assignment -entity "soc_system" -library "soc_system" -name SLD_INFO "QSYS_NAME soc_system HAS_SOPCINFO 1 GENERATION_ID 1596136913"
-set_global_assignment -library "soc_system" -name MISC_FILE $qipfilepath/soc_system.cmp
-set_global_assignment -library "soc_system" -name SLD_FILE $qipfilepath/soc_system.regmap
-set_global_assignment -library "soc_system" -name MISC_FILE $qipfilepath/soc_system_hps_0_hps.svd
-set_global_assignment -library "soc_system" -name SLD_FILE $qipfilepath/soc_system.debuginfo
+set_global_assignment -library "soc_system" -name MISC_FILE soc_system.cmp
+set_global_assignment -library "soc_system" -name SLD_FILE soc_system.regmap
+set_global_assignment -library "soc_system" -name MISC_FILE soc_system_hps_0_hps.svd
+set_global_assignment -library "soc_system" -name SLD_FILE soc_system.debuginfo
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_TARGETED_DEVICE_FAMILY "Cyclone V"
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_GENERATED_DEVICE_FAMILY "{Cyclone V}"
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_QSYS_MODE "SYSTEM"
 set_global_assignment -name SYNTHESIS_ONLY_QIP ON
-set_global_assignment -library "soc_system" -name MISC_FILE $qipfilepath/soc_system.qsys
+set_global_assignment -library "soc_system" -name MISC_FILE soc_system.qsys
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_COMPONENT_NAME "c29jX3N5c3RlbQ=="
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_COMPONENT_DISPLAY_NAME "c29jX3N5c3RlbQ=="
 set_global_assignment -entity "soc_system" -library "soc_system" -name IP_COMPONENT_REPORT_HIERARCHY "On"
@@ -5713,66 +5709,66 @@ set_global_assignment -entity "soc_system_hps_0_fpga_interfaces" -library "soc_s
 set_global_assignment -entity "soc_system_hps_0_fpga_interfaces" -library "soc_system" -name IP_COMPONENT_PARAMETER "ZGV2aWNl::NUNTWEZDNkQ2RjMxQzhFUw==::ZGV2aWNl"
 
 # set_global_assignment -library "soc_system" -name VHDL_FILE soc_system.vhd
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/soc_system_hps_0.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/soc_system_hps_0_hps_io.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram.v
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/hps_sdram_pll.sv
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_clock_pair_generator.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_acv_hard_addr_cmd_pads.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_acv_hard_memphy.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_acv_ldc.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_acv_hard_io_pads.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_generic_ddio.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_reset.v
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_reset_sync.v
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/hps_sdram_p0_phy_csr.sv
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_iss_probe.v
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/hps_sdram_p0.sv
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/hps_sdram_p0_altdqdqs.v
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/altdq_dqs2_acv_connect_to_hard_phy_cyclonev.sv
-set_global_assignment -library "soc_system" -name SOURCE_FILE $srcfilepath/hps_sdram_p0.ppf
-set_global_assignment -library "soc_system" -name SDC_FILE $srcfilepath/hps_sdram_p0.sdc
-set_global_assignment -library "soc_system" -name TCL_FILE $tclfilepath/hps_sdram_p0_timing.tcl
-set_global_assignment -library "soc_system" -name TCL_FILE $tclfilepath/hps_sdram_p0_report_timing.tcl
-set_global_assignment -library "soc_system" -name TCL_FILE $tclfilepath/hps_sdram_p0_report_timing_core.tcl
-set_global_assignment -library "soc_system" -name TCL_FILE $tclfilepath/hps_sdram_p0_pin_map.tcl
-set_global_assignment -library "soc_system" -name TCL_FILE $tclfilepath/hps_sdram_p0_pin_assignments.tcl
-set_global_assignment -library "soc_system" -name TCL_FILE $tclfilepath/hps_sdram_p0_parameters.tcl
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/sdram_io.pre.h
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/sdram_io.pre.h
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/alt_types.pre.h
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/alt_types.pre.h
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/system.pre.h
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/system.pre.h
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/sequencer.pre.c
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/sequencer.pre.c
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/sequencer.pre.h
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/sequencer.pre.h
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/tclrpt.pre.c
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/tclrpt.pre.c
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/tclrpt.pre.h
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/tclrpt.pre.h
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/sequencer_defines.pre.h
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/sequencer_defines.pre.h
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/sequencer_auto_ac_init.pre.c
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/sequencer_auto_ac_init.pre.c
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/sequencer_auto_inst_init.pre.c
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/sequencer_auto_inst_init.pre.c
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/sequencer_auto.pre.h
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/sequencer_auto.pre.h
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $seqeuncerfilepath/emif.pre.xml
-set_global_assignment -library "soc_system" -name MISC_FILE $seqeuncerfilepath/emif.pre.xml
-set_global_assignment -library "soc_system" -name VERILOG_FILE $srcfilepath/altera_mem_if_hhp_qseq_synth_top.v
-set_global_assignment -library "soc_system" -name SOURCE_FILE $srcfilepath/hps_AC_ROM.hex
-set_global_assignment -library "soc_system" -name SOURCE_FILE $srcfilepath/hps_inst_ROM.hex
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/altera_mem_if_hard_memory_controller_top_cyclonev.sv
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/altera_mem_if_oct_cyclonev.sv
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/altera_mem_if_dll_cyclonev.sv
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/soc_system_hps_0_hps_io_border.sv
-set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE $srcfilepath/hps.pre.xml
-set_global_assignment -library "soc_system" -name MISC_FILE $srcfilepath/hps.pre.xml
-set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE $srcfilepath/soc_system_hps_0_fpga_interfaces.sv
-set_global_assignment -library "soc_system" -name SDC_FILE $srcfilepath/soc_system_hps_0_fpga_interfaces.sdc
+set_global_assignment -library "soc_system" -name VERILOG_FILE soc_system_hps_0.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE soc_system_hps_0_hps_io.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram.v
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE hps_sdram_pll.sv
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_clock_pair_generator.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_acv_hard_addr_cmd_pads.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_acv_hard_memphy.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_acv_ldc.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_acv_hard_io_pads.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_generic_ddio.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_reset.v
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_reset_sync.v
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE hps_sdram_p0_phy_csr.sv
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_iss_probe.v
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE hps_sdram_p0.sv
+set_global_assignment -library "soc_system" -name VERILOG_FILE hps_sdram_p0_altdqdqs.v
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE altdq_dqs2_acv_connect_to_hard_phy_cyclonev.sv
+set_global_assignment -library "soc_system" -name SOURCE_FILE hps_sdram_p0.ppf
+set_global_assignment -library "soc_system" -name SDC_FILE hps_sdram_p0.sdc
+set_global_assignment -library "soc_system" -name TCL_FILE hps_sdram_p0_timing.tcl
+set_global_assignment -library "soc_system" -name TCL_FILE hps_sdram_p0_report_timing.tcl
+set_global_assignment -library "soc_system" -name TCL_FILE hps_sdram_p0_report_timing_core.tcl
+set_global_assignment -library "soc_system" -name TCL_FILE hps_sdram_p0_pin_map.tcl
+set_global_assignment -library "soc_system" -name TCL_FILE hps_sdram_p0_pin_assignments.tcl
+set_global_assignment -library "soc_system" -name TCL_FILE hps_sdram_p0_parameters.tcl
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/sdram_io.pre.h
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/sdram_io.pre.h
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/alt_types.pre.h
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/alt_types.pre.h
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/system.pre.h
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/system.pre.h
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/sequencer.pre.c
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/sequencer.pre.c
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/sequencer.pre.h
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/sequencer.pre.h
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/tclrpt.pre.c
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/tclrpt.pre.c
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/tclrpt.pre.h
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/tclrpt.pre.h
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/sequencer_defines.pre.h
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/sequencer_defines.pre.h
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/sequencer_auto_ac_init.pre.c
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/sequencer_auto_ac_init.pre.c
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/sequencer_auto_inst_init.pre.c
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/sequencer_auto_inst_init.pre.c
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/sequencer_auto.pre.h
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/sequencer_auto.pre.h
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE seqeuncer/emif.pre.xml
+set_global_assignment -library "soc_system" -name MISC_FILE seqeuncer/emif.pre.xml
+set_global_assignment -library "soc_system" -name VERILOG_FILE altera_mem_if_hhp_qseq_synth_top.v
+set_global_assignment -library "soc_system" -name SOURCE_FILE hps_AC_ROM.hex
+set_global_assignment -library "soc_system" -name SOURCE_FILE hps_inst_ROM.hex
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE altera_mem_if_hard_memory_controller_top_cyclonev.sv
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE altera_mem_if_oct_cyclonev.sv
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE altera_mem_if_dll_cyclonev.sv
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE soc_system_hps_0_hps_io_border.sv
+set_instance_assignment -entity "soc_system_hps_0_hps_io_border" -library "soc_system" -name HPS_ISW_FILE hps.pre.xml
+set_global_assignment -library "soc_system" -name MISC_FILE hps.pre.xml
+set_global_assignment -library "soc_system" -name SYSTEMVERILOG_FILE soc_system_hps_0_fpga_interfaces.sv
+set_global_assignment -library "soc_system" -name SDC_FILE soc_system_hps_0_fpga_interfaces.sdc
 
 set_global_assignment -entity "soc_system_hps_0" -library "soc_system" -name IP_TOOL_NAME "altera_hps"
 set_global_assignment -entity "soc_system_hps_0" -library "soc_system" -name IP_TOOL_VERSION "17.1"
