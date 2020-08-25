@@ -193,6 +193,7 @@ $SUDO dpkg --add-architecture i386
 # Enable TimSC Personal Package Archive (PPA): needed for "swig"
 if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
 then
+  $SUDO apt-get install software-properties-common
   $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
 fi
 

@@ -74,9 +74,9 @@ def main():
     }
     dump(gitlab_yml_dict, gitlab_yml_path, 'w+')
 
-    print('\nYaml files available at: {}/'
-          '\n*IMPORTANT: If any files were created for a new platform,'
-          ' be sure to commit them.'.format(Path(Path.cwd(), yaml_path)))
+    print('\nYaml files available at: {}').format(Path(Path.cwd(), yaml_path))
+    print('*IMPORTANT: If a new platform was added,'
+          ' be sure to commit any newly generated yaml files.')
 
 
 def get_overrides(platform, overrides_dict):

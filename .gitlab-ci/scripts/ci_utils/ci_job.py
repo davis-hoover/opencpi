@@ -6,14 +6,13 @@ from .ci_platform import get_rcc_platforms
 
 
 def to_dict(jobs):
-    """Converts Job namedtuple(s) to a dictionary
+    """Converts Job(s) to a dictionary
 
     Args:
-        jobs: A single Job namedtuple or list of Job namedtuples to
-              convert into a dictionary
+        jobs: A single Job or list of Jobs to convert into a dictionary
 
     Returns:
-        jobs_dict: A dictionary conversion of Job namedtuples
+        jobs_dict: A dictionary conversion of Job(s)
     """
     if not isinstance(jobs, list):
         jobs = [jobs]
@@ -30,7 +29,11 @@ def to_dict(jobs):
 
 
 def dump(jobs_dict, path):
-    """Outputs a dictionary to a yaml file
+    """Outputs Job(s) to yaml file
+
+    Provided jobs may be either a dictionary, a single Job, or a list of 
+    Jobs. Will override yaml path if it exists. Will create path's 
+    parent directories if they don't exist.
 
     Args:
         jobs_dict:  Dictionary to output to a yaml file
@@ -53,7 +56,7 @@ def dump(jobs_dict, path):
 def Job(name, stage=None, script=None, before_script=None, after_script=None, 
         artifacts=None, tags=None, resource_group=None, rules=None, 
         variables=None, image=None, overrides=None):
-    """Constructs a Job namedtuple
+    """Constructs a Job
 
         namedtuples do not support default values in python versions
         prior to 3.7, so this helper function is used until the
@@ -78,10 +81,12 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
         variables:      Dictionary of variables to set when job runs in
                         pipeline
         image:          Docker image for job to run in
-        overrides:      Dictionary to override standard values of above args
+        overrides:      Dictionary to override standard values of above 
+                        args
 
     Returns:
-        Job namedtuple
+        Job: namedtuple containing data necessary to create a job in a
+             pipeline
     """
     args = locals()
 
@@ -105,7 +110,7 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
 
 def make_jobs(stages, platform, projects, platforms=None, host_platform=None, 
               overrides=None):
-    """Creates Job namedtuple(s) for project/platform combinations
+    """Creates Job(s) for project/platform combinations
 
     Calls either make_hdl_jobs() or make_rcc_jobs() based on model
     of platform.
@@ -118,10 +123,11 @@ def make_jobs(stages, platform, projects, platforms=None, host_platform=None,
         overrides:      Dictionary to override standard job values
 
     Returns:
-        Job namedtuples
+        Jobs: collection containing data necessary to create jobs in a
+              pipeline
 
     Raises:
-        ValueError: if platform model is neither 'rcc' or 'hdl'
+        ValueError: if platform model is neither 'rcc' nor 'hdl'
     """
     if platform.model == 'hdl':
         return make_hdl_jobs(stages, platform, projects, platforms, 
@@ -135,8 +141,7 @@ def make_jobs(stages, platform, projects, platforms=None, host_platform=None,
 
 def make_rcc_jobs(stages, platform, projects, host_platform=None, 
                   overrides=None):
-    """Creates Job namedtuple(s) for project/platform combinations of
-        model 'rcc'
+    """Creates Job(s) for project/platform combinations of model 'rcc'
 
     Determines arguments to pass to make_job().
 
@@ -148,7 +153,8 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
         overrides:      Dictionary to override standard job values
 
     Returns:
-        Job namedtuples
+        Jobs: collection containing data necessary to create jobs in a
+              pipeline
     """
     jobs = []
 
@@ -183,8 +189,7 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
 
 def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
                   overrides=None):
-    """Creates Job namedtuple(s) for project/platform combinations of
-        model 'hdl'
+    """Creates Job(s) for project/platform combinations of model 'hdl'
 
     Determines arguments to pass to make_job().
 
@@ -197,8 +202,8 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
         host_platform:  Host platform to create jobs for
         overrides:      Dictionary to override standard job values
 
-    Returns:
-        Job namedtuples
+    Jobs: collection containing data necessary to create jobs in a
+          pipeline
     """
     jobs = []
     rcc_platforms = get_rcc_platforms(platforms)
@@ -239,14 +244,13 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
     return jobs
 
 
-def make_job(stage, stages, platform, 
-             project=None, name=None, host_platform=None, library=None, 
-             linked_platform=None, overrides=None):
-    """Creates Job namedtuple(s) for project/platform combinations
+def make_job(stage, stages, platform, project=None, name=None, 
+             host_platform=None, library=None, linked_platform=None, 
+             overrides=None):
+    """Creates Job(s) for project/platform combinations
 
     Calls before_script(), after_script(), script(), and if
-    necessary, make_name() to get arguments for construction of a 
-    Job namedtuple.
+    necessary, make_name() to get arguments for construction of a Job.
 
     Args:
         stage:          Stage of pipeline for job to execute in
@@ -259,7 +263,7 @@ def make_job(stage, stages, platform,
         overrides:      Dictionary to override standard job values
 
     Returns:
-        Job namedtuples
+        Job: contains data necessary to create a job in a pipeline
     """
     if not name:
         name = make_name(stage, platform, project, host_platform, 
@@ -300,7 +304,7 @@ def make_job(stage, stages, platform,
 
 def make_name(stage, platform, project=None, host_platform=None, 
               linked_platform=None, library=None):
-    """Creates a name for a Job namedtuple
+    """Creates a name for a job
 
     Args:
         stage:           Stage of pipeline for job to execute in
@@ -496,14 +500,17 @@ def make_ocpidev_cmd(verb, platform, path, noun=None):
 
     Returns:
         ocpidev command string
+
+    Raises:
+        ValueError: if unrecognized verb or noun passed
     """
     if verb not in ['build', 'run']:
-        raise Exception('Uknown verb: {}'.format(verb))
+        raise ValueError('Uknown verb: {}'.format(verb))
     
     if not noun:
         noun = ''
     elif noun not in ['tests', 'test', 'hdl platforms']:
-        raise Exception('Uknown noun: {}'.format(noun))
+        raise ValueError('Uknown noun: {}'.format(noun))
 
     if verb == 'run':
         options = '-d {} --only-platform {} --mode prep_run_verify'.format(
@@ -701,6 +708,9 @@ def stage_from_library(library):
 
     Returns:
         stage string of job
+
+    Raises:
+        ValueError: if unrecognized library passed
     """
 
     if library.name in ['platforms', 'assemblies']:
@@ -716,4 +726,4 @@ def stage_from_library(library):
         else:
             return 'build-primitives'
 
-    raise Exception('Unable to get stage from library {}'.format(library.name))
+    raise ValueError('Unable to get stage from library {}'.format(library.name))
