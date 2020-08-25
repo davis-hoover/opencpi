@@ -947,8 +947,8 @@ OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
 # One arg is what to do if not found: error, warning, nothing
 OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(OCPI_PROJECT_REL_DIR))\
   $(if $(or $(filter clean%,$(MAKECMDGOALS)),$(OCPI_PROJECT_PACKAGE)),$(infox OIPSKIPPED),\
-    $(call OcpiIncludeProjectX,$(or $(OCPI_PROJECT_REL_DIR),.),$1,$(call OcpiAbsDir,.))\
-    $(eval ComponentLibraries+=$(OCPI_PROJECT_COMPONENT_LIBRARIES)))
+    $(call OcpiIncludeProjectX,$(or $(OCPI_PROJECT_REL_DIR),.),$1,$(call OcpiAbsDir,.)))\
+  $(eval ComponentLibraries+=$(OCPI_PROJECT_COMPONENT_LIBRARIES))
 
 # OcpiIncludeParentAsset_<asset-type> defines how to include an asset's parent.
 # This is done on a per-asset-type basis (e.g. platform, platforms, library ...).
