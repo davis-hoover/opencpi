@@ -7,6 +7,11 @@ from ci_utils import ci_project, ci_platform, ci_job
 
 
 def main():
+    """Creates yaml files for jobs based on projects and platforms
+
+    Discovers opencpi projects and platforms, constructs jobs, and dumps
+    them out to yaml files.
+    """
     opencpi_path = Path(__file__, '..', '..', '..').resolve()
     os.chdir(opencpi_path)
     gitlab_ci_path = Path('.gitlab-ci')
@@ -75,6 +80,18 @@ def main():
 
 
 def get_overrides(platform, overrides_dict):
+    """Gets job overrides for a platform from a dictionary of overrides
+
+    Overrides will replace default job values (tags, script, etc.).
+
+    Args:
+        platform:       Platform to get overrides for
+        overrides_dict: Dictionary with platform names as keys and the
+                        overrides as values
+
+    Returns:
+        A dictionary of job overrides for a specified platform
+    """
     yaml.SafeDumper.ignore_aliases = lambda *args : True
     
     if platform.name in overrides_dict.keys():
@@ -84,6 +101,13 @@ def get_overrides(platform, overrides_dict):
 
 
 def dump(yaml_dict, yaml_path, mode):
+    """Dumps a dictionary to a yaml file
+
+    Args:
+        yaml_dict:  Dictionary to dump to a yaml file
+        yaml_path:  Path of yaml file to dump dictionary to
+        mode:       Mode to open file in
+    """
     with open(yaml_path, mode) as yml:
         yaml.safe_dump(yaml_dict, yml, width=1000, default_flow_style=False)
 

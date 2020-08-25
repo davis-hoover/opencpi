@@ -43,6 +43,7 @@ def dump(jobs_dict, path):
     for parent in parents[::-1]:
         parent.mkdir(exist_ok=True)
 
+    # Don't use anchors 
     yaml.SafeDumper.ignore_aliases = lambda *args : True
 
     with open(path, 'w+') as yml:
@@ -89,7 +90,10 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
                             ' resource_group rules variables image')
 
     job_args = {}
-    # If overrides were provided, collect them before constructing Job
+    # Check if current job is specified in overrides
+    if 'job' in overrides and name in overrides['job']:
+        overrides = overrides['job'][name]
+    # Collect overrides
     for key,value in args.items():
         if key in overrides:
             job_args[key] = overrides[key]
@@ -168,7 +172,7 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
                            host_platform=host_platform, overrides=overrides)
             jobs.append(job)
 
-        if stage == 'prereqs' and platform.is_host:
+        if stage == 'prereqs' and platform.is_host and platform.image:
             name = make_name('packages', platform)
             job = make_job(stage, stages, platform, name=name, 
                            overrides=overrides)
@@ -261,39 +265,35 @@ def make_job(stage, stages, platform,
         name = make_name(stage, platform, project, host_platform, 
                          linked_platform, library)
 
+    rules = make_rules(platform, host_platform, linked_platform)
+
     if platform.is_host and name.startswith('packages'): 
         tags = ['docker']
         image = platform.image
-        before_script = None
-        after_script = None
         script = make_scripts_cmd(stage, platform, name)
+
+        job = Job(name, stage, script, tags=tags, before_script=None,
+                  after_script=None, rules=rules, image=image,
+                  overrides=overrides)
+        
+        return job
+
+    before_script = make_before_script(stage, stages, platform,
+                                        host_platform=host_platform, 
+                                        linked_platform=linked_platform)
+    script = make_script(stage, platform, project=project, library=library, 
+                        linked_platform=linked_platform, name=name)
+    after_script = make_after_script()
+
+    if platform.is_host:
+        tags = [platform.name, 'shell', 'opencpi']
+    elif platform.is_sim or (stage == 'test' and platform.model == 'hdl'):
+        tags = [host_platform.name, platform.name, 'shell', 'opencpi']
     else:
-        before_script = make_before_script(stage, stages, platform,
-                                           host_platform=host_platform, 
-                                           linked_platform=linked_platform)
-        script = make_script(stage, platform, project=project, library=library, 
-                            linked_platform=linked_platform, name=name)
-        after_script = make_after_script()
-        image = None
-
-        if platform.is_host:
-            if name.startswith('packages'): 
-                tags = ['docker']
-                image = platform.image
-                after_script = None
-                script = make_scripts_cmd(stage, platform, name)
-            else:
-                tags = [platform.name, 'shell', 'opencpi']
-        elif platform.is_sim or (stage == 'test' and platform.model == 'hdl'):
-            tags = [host_platform.name, platform.name, 'shell', 'opencpi']
-        else:
-            tags = [host_platform.name, 'shell', 'opencpi']
-
-    rules = make_rules(platform, host_platform, linked_platform)
+        tags = [host_platform.name, 'shell', 'opencpi']
 
     job = Job(name, stage, script, tags=tags, before_script=before_script,
-              after_script=after_script, rules=rules, image=image,
-              overrides=overrides)
+              after_script=after_script, rules=rules, overrides=overrides)
 
     return job
 

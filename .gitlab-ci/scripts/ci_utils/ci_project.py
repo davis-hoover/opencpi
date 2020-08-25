@@ -9,6 +9,17 @@ Library = namedtuple('library', ('name path project_name'
 
 
 def discover_projects(projects_path, blacklist=None):
+    """Search opencpi for projects
+
+    Calls discover_libraries() to search for project libraries.
+
+    Args:
+       projects_path:   Path to opencpi projects
+       blacklist:       List of projects not to include
+
+    Returns:
+        projects: List of opencpi projects
+    """
     projects = []
     for project_path in projects_path.glob('*'):
         project_name = project_path.stem
@@ -16,7 +27,9 @@ def discover_projects(projects_path, blacklist=None):
         if project_name in blacklist:
             continue
 
-        project_libraries = discover_libraries(project_name, project_path)
+        library_blacklist = ['vendors']
+        project_libraries = discover_libraries(project_name, project_path, 
+                                               blacklist=library_blacklist)
         project = Project(name=project_name, libraries=project_libraries, 
                           path=project_path)
         projects.append(project)
@@ -24,12 +37,30 @@ def discover_projects(projects_path, blacklist=None):
     return projects
 
 
-def discover_libraries(project_name, project_path):
+def discover_libraries(project_name, project_path, blacklist=None):
+    """Search for libraries for opencpi project
+
+    Will search for hdl libraries in:
+        <project_path>/hdl/
+    and for components in:
+        <project_path>/components/
+    Determines if a directory is a component library by existence of 
+    directory
+        specs 
+    Determines if a directory is an hdl library by existence of 
+        Makefile
+
+    Args:
+       projects_name: Name of project to find libraries for
+       project_path:  Path of project to search for libraries in
+       blacklist:     List of libraries not to include 
+
+    Returns:
+        libraries: List of project libraries
+    """
     libraries = []
     components_path = Path(project_path, 'components')
     hdl_path = Path(project_path, 'hdl')
-    library_names = ['primitives', 'devices', 'cards', 
-                     'adapters', 'platforms', 'assemblies']
 
     for library_path in hdl_path.glob('*'):
 
@@ -37,10 +68,13 @@ def discover_libraries(project_name, project_path):
             continue
 
         library_name = library_path.stem
-        if library_name in library_names:
-            library = Library(library_name, library_path, project_name,
-                              is_buildable=True, is_testable=False)
-            libraries.append(library)
+
+        if blacklist and library_name in blacklist:
+            continue
+
+        library = Library(library_name, library_path, project_name,
+                            is_buildable=True, is_testable=False)
+        libraries.append(library)
 
     if Path(components_path, 'specs').is_dir():
         library_name = components_path.stem
