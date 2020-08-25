@@ -257,30 +257,37 @@ def make_job(stage, stages, platform,
     Returns:
         Job namedtuples
     """
-
     if not name:
         name = make_name(stage, platform, project, host_platform, 
                          linked_platform, library)
 
-    before_script = make_before_script(stage, stages, platform,
-                                       host_platform=host_platform, 
-                                       linked_platform=linked_platform)
-    script = make_script(stage, platform, project=project, library=library, 
-                         linked_platform=linked_platform, name=name)
-    after_script = make_after_script()
-    image = None
-
-    if platform.is_host:
-        if name.startswith('packages'): 
-            tags = ['docker']
-            image = platform.image
-            after_script = None
-        else:
-            tags = [platform.name, 'shell', 'opencpi']
-    elif (platform.is_sim or (stage == 'test' and platform.model == 'hdl')):
-        tags = [host_platform.name, platform.name, 'shell', 'opencpi']
+    if platform.is_host and name.startswith('packages'): 
+        tags = ['docker']
+        image = platform.image
+        before_script = None
+        after_script = None
+        script = make_scripts_cmd(stage, platform, name)
     else:
-        tags = [host_platform.name, 'shell', 'opencpi']
+        before_script = make_before_script(stage, stages, platform,
+                                           host_platform=host_platform, 
+                                           linked_platform=linked_platform)
+        script = make_script(stage, platform, project=project, library=library, 
+                            linked_platform=linked_platform, name=name)
+        after_script = make_after_script()
+        image = None
+
+        if platform.is_host:
+            if name.startswith('packages'): 
+                tags = ['docker']
+                image = platform.image
+                after_script = None
+                script = make_scripts_cmd(stage, platform, name)
+            else:
+                tags = [platform.name, 'shell', 'opencpi']
+        elif platform.is_sim or (stage == 'test' and platform.model == 'hdl'):
+            tags = [host_platform.name, platform.name, 'shell', 'opencpi']
+        else:
+            tags = [host_platform.name, 'shell', 'opencpi']
 
     rules = make_rules(platform, host_platform, linked_platform)
 
