@@ -192,17 +192,20 @@ fi
 # an error to run "dpkg --add-architecture i386" more than once.
 $SUDO dpkg --add-architecture i386
 
-# Enable TimSC Personal Package Archive (PPA): needed for "swig"
-if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
-then
-  $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
-fi
-
 # Make sure "apt-get" knows about the latest available packages
 # in all configured repositories.  Although running this is in
 # accordance with best practices anyway, it is mandatory if we
 # added the i386 architecture or the TimSC PPA above. 
 $SUDO apt-get update
+
+# Need this for `add-apt-repository` command used later
+$SUDO apt-get --yes install software-properties-common
+
+# Enable TimSC Personal Package Archive (PPA): needed for "swig"
+if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
+then
+  $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
+fi
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source.  Specify "--no-act" for debugging.

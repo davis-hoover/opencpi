@@ -13,7 +13,7 @@ def main():
     them out to yaml files.
     """
     opencpi_path = Path(__file__, '..', '..', '..').resolve()
-    os.chdir(opencpi_path)
+    os.chdir(str(opencpi_path))
     gitlab_ci_path = Path('.gitlab-ci')
     yaml_path = Path(gitlab_ci_path, 'yaml')
     projects_path = Path('projects')
@@ -21,10 +21,10 @@ def main():
                                         'host_platforms.yml')
     overrides_path = Path(gitlab_ci_path, 'scripts', 'overrides.yml')
 
-    with open(host_platforms_path) as yml:
+    with open(str(host_platforms_path)) as yml:
         host_platforms = yaml.safe_load(yml)
 
-    with open(overrides_path) as yml:
+    with open(str(overrides_path)) as yml:
         overrides_dict = yaml.safe_load(yml)
 
     projects_blacklist = ['tutorial']
@@ -74,7 +74,7 @@ def main():
     }
     dump(gitlab_yml_dict, gitlab_yml_path, 'w+')
 
-    print('\nYaml files available at: {}').format(Path(Path.cwd(), yaml_path))
+    print('\nYaml files available at: {}'.format(Path(Path.cwd(), yaml_path)))
     print('*IMPORTANT: If a new platform was added,'
           ' be sure to commit any newly generated yaml files.')
 

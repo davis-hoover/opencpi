@@ -49,7 +49,7 @@ def dump(jobs_dict, path):
     # Don't use anchors 
     yaml.SafeDumper.ignore_aliases = lambda *args : True
 
-    with open(path, 'w+') as yml:
+    with open(str(path), 'w+') as yml:
         yaml.safe_dump(jobs_dict, yml, width=1000, default_flow_style=False)
 
 
