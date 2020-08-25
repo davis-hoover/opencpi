@@ -3,8 +3,10 @@ include:
 - .gitlab-ci/yaml/e3xx.yml
 - .gitlab-ci/yaml/plutosdr.yml
 - .gitlab-ci/yaml/templates.yml
+- .gitlab-ci/yaml/verify-pipeline.yml
 - .gitlab-ci/yaml/centos7.yml
 stages:
+- .pre
 - prereqs
 - build-host
 - build-rcc

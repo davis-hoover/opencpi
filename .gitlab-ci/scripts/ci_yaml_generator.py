@@ -18,7 +18,7 @@ def main():
     yaml_path = Path(gitlab_ci_path, 'yaml')
     projects_path = Path('projects')
     host_platforms_path = Path(gitlab_ci_path, 'scripts', 
-                                        'host_platforms.yml')
+                               'host_platforms.yml')
     overrides_path = Path(gitlab_ci_path, 'scripts', 'overrides.yml')
 
     with open(str(host_platforms_path)) as yml:
@@ -31,9 +31,10 @@ def main():
     projects = ci_project.discover_projects(projects_path, projects_blacklist)
     platforms = ci_platform.discover_platforms(projects, host_platforms)
 
-    stages = ['prereqs', 'build-host', 'build-rcc', 'build-primitives-core', 
-              'build-primitives', 'build-libraries', 'build-platforms', 
-              'build-assemblies', 'build-sdcards', 'test', 'deploy']
+    stages = ['.pre', 'prereqs', 'build-host', 'build-rcc', 
+              'build-primitives-core', 'build-primitives', 'build-libraries', 
+              'build-platforms', 'build-assemblies', 'build-sdcards', 'test', 
+              'deploy']
 
     host_platforms = ci_platform.get_host_platforms(platforms)
     cross_platforms = ci_platform.get_cross_platforms(platforms)
