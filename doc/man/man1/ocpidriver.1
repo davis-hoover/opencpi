@@ -1,0 +1,180 @@
+.\"     Title: ocpidriver
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 08/20/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDRIVER" "1" "08/20/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidriver \- command\-line utility for managing the OpenCPI loadable Linux kernel module driver
+.SH "SYNOPSIS"
+.sp
+\fBocpidriver\fR \fI<verb>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBocpidriver(1)\fR tool controls the OpenCPI Linux kernel module driver on an \fIOpenCPI system\fR: a collection of processors that can be used together as resources for running OpenCPI applications\&. Whether or not the Linux kernel module driver is required depends on the \fIplatforms\fR (processors and their directly\-connected hardware) enabled for use by OpenCPI during application execution and the \fIinterconnect\fR technology that wires them together: the driver is necessary for access by OpenCPI to platforms connected to a system bus (such as PCI\-Express or the Zynq FPGA subsystem) but is not needed on systems that do not have such a bus or fabric\&. Developers use the \fBocpidriver\fR tool to load and control the driver when it is required for running OpenCPI on a system\&.
+.sp
+The OpenCPI Linux kernel module driver uses DMA memory for communication with platforms via the system bus\&. By default, Linux allocates 128KB of DMA memory for the OpenCPI Linux kernel module driver\&. The OpenCPI "getting started guides" for the relevant platforms attached to the system bus (for example, the \fIML605 Getting Started Guide\fR and the \fIAlst4 Getting Started Guide\fR) describe how to reserve additional DMA memory for the driver when OpenCPI applications require it\&.
+.SH "VERBS"
+.sp
+The verbs supported by \fBocpidriver\fR are:
+.PP
+\fBload\fR
+.RS 4
+Load an OpenCPI Linux kernel module driver to a system\&.
+.RE
+.PP
+\fBreload\fR
+.RS 4
+Remove an OpenCPI Linux kernel module driver from a system and then load it\&.
+.RE
+.PP
+\fBstatus\fR
+.RS 4
+Get the status of an OpenCPI Linux kernel module driver on a system\&.
+.RE
+.PP
+\fBunload\fR
+.RS 4
+Remove an OpenCPI Linux kernel module driver from a system\&.
+.RE
+.sp
+Performing these operations requires \fBroot\fR/\fBsudo\fR privileges\&.
+.SH "NOUNS"
+.sp
+None\&.
+.SH "OPTIONS"
+.sp
+None\&.
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Using the
+\fBroot\fR
+account, load the OpenCPI Linux kernel module driver on a system that has the Altera Stratix IV (\fBalst4\fR) and Xilinx (\fBml605\fR) PCI\-Express platforms installed and which has reserved an additional 128KB of DMA memory for the driver:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidriver load
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+On success, the tool generates the following message:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Found generic reserved DMA memory on the linux boot command line
+and assuming it is for OpenCPI: [memmap=128M$0x1000000]
+Driver loaded successfully\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Now perform the command:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-list
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The output from the command is:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Available containers:
+   #  Model Platform   OS    OS\-Version   Arch   Name
+   0  hdl   ml605                                PCI:0000:08:00\&.0
+   1  hdl   alst4                                PCI:0000:03:00\&.0
+   2  rcc   centos7    linux c7           x86_64 rcc0
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Unload the OpenCPI Linux kernel module driver:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidriver unload
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+On success, the tool returns the message:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+The driver module was successfully unloaded\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-application(1) ocpidev\-card(1) ocpidev\-platform(1) ocpidev\-slot(1) ocpirun(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

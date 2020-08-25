@@ -15,4 +15,5 @@
     <Property type="uChar" name="test_uchar"volatile="true" writable="true" ></Property>
     <Property type="uLongLong" name="test_ulonglong"volatile="true" writable="true" ></Property>
     <Property type="uShort" name="test_ushort"volatile="true" writable="true" ></Property>
+    <Property type="string" name="test_string" stringlength='20' volatile="true" writable="true" ></Property>
 </ComponentSpec>

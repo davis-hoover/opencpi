@@ -1,0 +1,6 @@
+# Generated files
+vivado_clk_wiz/timestamp-clk_wiz
+xsim/mmcme2.vhd
+xsim/plle2.vhd
+zynq/mmcme2.v
+zynq/plle2.v
