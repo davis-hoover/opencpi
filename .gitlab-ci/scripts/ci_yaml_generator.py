@@ -12,20 +12,19 @@ def main():
     gitlab_ci_path = Path('.gitlab-ci')
     yaml_path = Path(gitlab_ci_path, 'yaml')
     projects_path = Path('projects')
-    host_platform_whitelist_path = Path(gitlab_ci_path, 'scripts', 
-                                        'host_platform_whitelist.txt')
-    variables_path = Path(gitlab_ci_path, 'scripts', 'variables.yml')
+    host_platforms_path = Path(gitlab_ci_path, 'scripts', 
+                                        'host_platforms.yml')
+    overrides_path = Path(gitlab_ci_path, 'scripts', 'overrides.yml')
 
-    with open(host_platform_whitelist_path) as f:
-        host_platform_whitelist = f.read().splitlines()
+    with open(host_platforms_path) as yml:
+        host_platforms = yaml.safe_load(yml)
 
-    with open(variables_path) as f:
-        variables_dict = yaml.safe_load(f)
+    with open(overrides_path) as yml:
+        overrides_dict = yaml.safe_load(yml)
 
     projects_blacklist = ['tutorial']
     projects = ci_project.discover_projects(projects_path, projects_blacklist)
-    platforms = ci_platform.discover_platforms(projects, 
-                                               host_platform_whitelist)
+    platforms = ci_platform.discover_platforms(projects, host_platforms)
 
     stages = ['prereqs', 'build-host', 'build-rcc', 'build-primitives-core', 
               'build-primitives', 'build-libraries', 'build-platforms', 
@@ -41,18 +40,18 @@ def main():
         for cross_platform in cross_platforms:
             print('\t{}'.format(cross_platform.name))
 
-            variables = get_variables(cross_platform, variables_dict)
+            overrides = get_overrides(cross_platform, overrides_dict)
             cross_jobs = ci_job.make_jobs(stages, cross_platform, projects, 
                                           platforms=platforms, 
                                           host_platform=host_platform,
-                                          variables=variables)
+                                          overrides=overrides)
             cross_path = Path(yaml_path, host_platform.name, 
                               '{}.yml'.format(cross_platform.name))
             ci_job.dump(cross_jobs, cross_path)
 
-        variables = get_variables(host_platform, variables_dict)
+        overrides = get_overrides(host_platform, overrides_dict)
         host_jobs = ci_job.make_jobs(stages, host_platform, projects, 
-                                     variables=variables)
+                                     overrides=overrides)
         host_path = Path(yaml_path, '{}.yml'.format(host_platform.name))
         ci_job.dump(host_jobs, host_path)
         
@@ -75,13 +74,13 @@ def main():
           ' be sure to commit them.'.format(Path(Path.cwd(), yaml_path)))
 
 
-def get_variables(platform, variables_dict):
+def get_overrides(platform, overrides_dict):
     yaml.SafeDumper.ignore_aliases = lambda *args : True
     
-    if platform.name in variables_dict.keys():
-        return variables_dict[platform.name]
+    if platform.name in overrides_dict.keys():
+        return overrides_dict[platform.name]
 
-    return None
+    return {}
 
 
 def dump(yaml_dict, yaml_path, mode):

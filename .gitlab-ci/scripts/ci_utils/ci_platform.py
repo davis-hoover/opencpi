@@ -3,9 +3,9 @@
 from collections import namedtuple
 from pathlib import Path
 
-Platform = namedtuple('platform', 'name model is_host is_sim')
+Platform = namedtuple('platform', 'name model image is_host is_sim')
 
-def discover_platforms(projects, host_platform_whitelist):
+def discover_platforms(projects, host_platforms):
     platforms = []
 
     for project in projects:
@@ -31,16 +31,22 @@ def discover_platforms(projects, host_platform_whitelist):
                             platform_path.stem)).is_file()
                         is_sim = False
 
-                    if is_host and host_platform_whitelist:
-                        if platform_name not in host_platform_whitelist:
+                    if is_host and host_platforms:
+                        if platform_name not in host_platforms.keys():
                             continue
+                        if 'image' not in host_platforms[platform_name]:
+                            raise Exception('No docker image defined'
+                                            ' for host_platform "{}"'.format(
+                                                platform_name))
+                        image = host_platforms[platform_name]['image']
+                    else:
+                        image = None
 
                     if makefile.is_file():
                         platform_model = platform_path.parents[1].stem
                         platform = Platform(name=platform_name, 
-                                            model=platform_model,
-                                            is_host=is_host,
-                                            is_sim=is_sim)
+                                            model=platform_model, image=image,
+                                            is_host=is_host, is_sim=is_sim)
                         platforms.append(platform)
 
     return platforms   
