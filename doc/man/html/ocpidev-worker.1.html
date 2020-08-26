@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-worker</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140667459840592"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-worker — manage an OpenCPI worker.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">worker</code></strong></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">worker</code></strong></span> noun represents an OpenCPI worker, which is a specific
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-worker</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140338586281648"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-worker — manage an OpenCPI worker.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">worker</code></strong></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">worker</code></strong></span> noun represents an OpenCPI worker, which is a specific
 implementation of a component with source code written according
 to an OpenCPI <span class="emphasis"><em>authoring model</em></span>. An authoring model represents
 a way to implement a component in a specific language - for example,
@@ -113,9 +113,11 @@ in the <span class="emphasis"><em>&lt;target&gt;</em></span> argument to an opti
 <span class="strong"><strong><code class="literal">zynq_is</code></strong></span>, <span class="strong"><strong><code class="literal">spartan3adsp</code></strong></span>.</p><div class="refsect2"><a id="_options_that_apply_to_all_operations_verbs_on_workers"></a><h3>Options That Apply to All Operations (Verbs) on Workers</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 <span class="strong"><strong><code class="literal">--hdl-library=</code></strong></span><span class="emphasis"><em>&lt;hdl-library&gt;</em></span>
 </span></dt><dd>
-    Specify the HDL library in which to operate on the worker.
-    HDL libraries exist underneath the <span class="strong"><strong><code class="literal">hdl/</code></strong></span> directory
-    located at the top level of a project.
+    Specify the HDL library under the <span class="strong"><strong><code class="literal">hdl/</code></strong></span> directory of the project
+    in which to operate on the worker. Valid values are
+    only one of: <span class="strong"><strong><code class="literal">devices</code></strong></span>, <span class="strong"><strong><code class="literal">cards</code></strong></span>, <span class="strong"><strong><code class="literal">adapters</code></strong></span>.
+    See <a class="ulink" href="ocpidev-device.1.html" target="_top">ocpidev-device(1)</a>
+    for more information about this option.
 </dd><dt><span class="term">
 <span class="strong"><strong><code class="literal">--library=</code></strong></span><span class="emphasis"><em>&lt;component-library&gt;</em></span>, <span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;component-library&gt;</em></span>
 </span></dt><dd>
@@ -170,12 +172,11 @@ in the <span class="emphasis"><em>&lt;target&gt;</em></span> argument to an opti
 </dd><dt><span class="term">
 <span class="strong"><strong><code class="literal">-P</code></strong></span> <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>
 </span></dt><dd>
-    Specify that the worker should be created in the <span class="strong"><strong><code class="literal">devices</code></strong></span>
-    library for the specified HDL platform in the project. This
-    option is intended for use when creating a platform-specific
-    device worker or device proxy. A <span class="strong"><strong><code class="literal">devices</code></strong></span> library is located
-    in <span class="emphasis"><em>&lt;project&gt;</em></span><span class="strong"><strong><code class="literal">/hdl/platforms/</code></strong></span><span class="emphasis"><em>&lt;hdl-platform&gt;</em></span><span class="strong"><strong><code class="literal">/devices/</code></strong></span>.
-    For example, <span class="strong"><strong><code class="literal">hdl/platforms/matchstiq_z1/devices</code></strong></span>.
+    Specify that the worker being created is a platform-specific
+    HDL device worker or device proxy to be created in the <span class="strong"><strong><code class="literal">devices/</code></strong></span>
+    library for the specified HDL platform in the project.
+    See <a class="ulink" href="ocpidev-device.1.html" target="_top">ocpidev-device(1)</a>
+    for more information about this option.
 </dd><dt><span class="term">
 <span class="strong"><strong><code class="literal">-S</code></strong></span> <span class="emphasis"><em>&lt;component-spec&gt;</em></span>
 </span></dt><dd>
@@ -259,6 +260,14 @@ in the <span class="emphasis"><em>&lt;target&gt;</em></span> argument to an opti
     option is not used (and <span class="strong"><strong><code class="literal">--hdl-rcc-platform</code></strong></span> <span class="emphasis"><em>&lt;platform&gt;</em></span>
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_building_hdl_workers"></a><h3>Options When Building HDL Workers</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-platform=</code></strong></span><span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>+
+</span></dt><dd>
+    Build the HDL device worker for the specified HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-target=</code></strong></span><span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Build the HDL device worker for the specified HDL architecture.
 </dd></dl></div></div><div class="refsect2"><a id="_options_when_showing_workers"></a><h3>Options When Showing Workers</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 <span class="strong"><strong><code class="literal">--global-scope</code></strong></span>
 </span></dt><dd>
@@ -358,6 +367,7 @@ component library using build results from all platforms:
 <a class="ulink" href="ocpidev-component.1.html" target="_top">ocpidev-component(1)</a>
 <a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
 <a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-device.1.html" target="_top">ocpidev-device(1)</a>
 <a class="ulink" href="ocpidev-library.1.html" target="_top">ocpidev-library(1)</a>
 <a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
 <a class="ulink" href="ocpidev-show.1.html" target="_top">ocpidev-show(1)</a>

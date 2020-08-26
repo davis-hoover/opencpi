@@ -439,7 +439,7 @@ namespace OCPI {
       if (c.impl->m_staticInstance && b.m_artifact &&
           (b.m_artifact != &c.impl->m_artifact ||
            b.m_usedImpls & (1u << c.impl->m_ordinal))) {
-        ocpiDebug("For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
+        ocpiInfo("For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
                   "from artifact \"%s\" due to insufficient available containers",
                   m_assembly.instance(n).name().c_str(),
                   m_assembly.instance(n).specName().c_str(),

@@ -299,14 +299,20 @@ static const char
 
 int main(int /*argc*/, char **argv)
 {
+  std::string platform;
+  if (argv[1] && argv[2]) {
+    platform = "comp2=";
+    platform += argv[2];
+  }
   // Reference OpenCPI_Application_Development document for an explanation of the ACI
   try
   {
     OA::PValue pvs[] = { OA::PVBool("verbose", true),
 			 OA::PVBool("dump", true),
 			 OA::PVBool("hidden", true),
+			 OA::PVString(platform.empty() ? NULL : "platform", platform.c_str()),
 			 OA::PVEnd };
-    OCPI::API::Application app(argv[1] ? appWithSlave : appWithoutSlave, pvs);
+    OCPI::API::Application app(argv[1] && argv[1][0] ? appWithSlave : appWithoutSlave, pvs);
     app.initialize(); // all resources have been allocated
     app.start();      // execution is started
     app.wait();       // wait until app is "done"
