@@ -81,9 +81,14 @@ function setVarsFromMake {
   # we silently remove assignments that have hyphens in variable names, rather than have an error
   vars=$(set -o pipefail;\
          eval make -n -r -s -f $1 $2 ${quiet:+2>/dev/null} | \
-	 tr ';' '\n' | sed -e '/^ *$/d' -e 's/^ *//' -e 's/ *$//' | grep '^[a-zA-Z_][a-zA-Z0-9_]*=')
+	 tr ';' '\n' | sed -e '/^ *$/d' -e 's/^ *//' -e 's/ *$//' | grep '^\(export \)\?[a-zA-Z_][a-zA-Z0-9_]*=')
   [ $? != 0 ] && return 1
-  eval $vars
+  # Next bit of elegance courtesy of
+  # https://unix.stackexchange.com/questions/9784/how-can-i-read-line-by-line-from-a-variable-in-bash
+  while IFS= read -r x
+  do
+    eval "$x"
+  done < <(printf "%s\n" "$vars")
 }
 
 function isPresent {
