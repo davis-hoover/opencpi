@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -19,6 +19,8 @@
 
 import os
 import sys
+
+# 3rd party imports
 import numpy as np
 
 """
@@ -26,19 +28,18 @@ Use this script to validate your output data against your input data.
 Args: <list-of-user-defined-args> <output-file> <input-files>
 """
 def main():
+    with open(sys.argv[1], 'rb') as ofile:
+        contents = np.fromfile(ofile, dtype=np.uint8, count=-1)
 
     max_count_value = int(os.environ.get('OCPI_TEST_max_count_value'))
-
-    ofile = open(sys.argv[1], 'rb')
-    contents = np.fromfile(ofile, dtype=np.uint8, count=-1)
     if max_count_value > 0:
         if(len(contents) == 0):
-            msg = 'FAIL: Output file was empty when 1 or more messages was '
-            msg += 'expected to be written to file'
-            print(msg)
-            sys.exit(1)
+            print('FAIL: Output file was empty when one or more messages were expected '
+                  'to be written to file')
+            return 1
 
     print('PASS')
+    return 0
 
 if __name__ == "__main__":
-    main()
+    exit(main())

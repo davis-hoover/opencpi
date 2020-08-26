@@ -1,23 +1,24 @@
-This directory (in any project) is for OpenCPI runtime platforms, whether development-capable
-platforms or embedded runtime-only platforms.  The name of each subdirectory is a unique name
-for the platform.  The contents of each directory is a set of platform-specific files and
-scripts making it the home for platform-specific "stuff".
+This directory (in any project) is for OpenCPI runtime software platforms, whether
+development-capable platforms or embedded runtime-only platforms.  The name of each subdirectory is
+a unique name for the platform.  The contents of each directory is a set of platform-specific files
+and scripts making it the home for all platform-specific "stuff".
+
+The details about all this are in the platform development guide at:
+http:://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Platform_Development.pdf
 
 There are a few standard files that are expected to be in each platform subdirectory:
 
-README:                  Describes the platform
+README or README.md:    Describes the platform
 <platform>-packages.sh: Script to download and install packages from the standard repositories
-                        for the OS
-                        (optional, development platforms only)
+                        for the OS (optional, development platforms only)
 <platform>-check.sh:    A script to verify you are running on this platform
                         (development platforms only)
 <platform>.mk:          Settings for building code targeting this platform
-                        See include/platform-defaults.mk for a list of valid variables
+                        See cdk/include/platform-defaults.mk for a list of valid variables
                         that can be defined as well as their defaults.
 <platform>.exports:     Allows a software platform to "add and subtract" from the standard
                         framework exports. The + and = lines have the same meaning as in
-                        Project.exports. See the Platform Development Guide for more details.
-                        (optional)
+                        Project.exports. @ lines populate the SD card. (optional)
 
 If any platform-specific prerequisites are mentioned in the <platform>.mk file
 ("OcpiPlatformPrerequisites"), then for each one there should exist a script named
@@ -36,7 +37,27 @@ Therefore, adding a platform requires at least these steps:
      ./scripts/install-packages.sh <platform>
      ./scripts/install-prerequisites.sh <platform>
      ./scripts/build-opencpi.sh <platform>
-     ./scripts/test-opencpi.sh <platform>
+     ./scripts/test-opencpi.sh -- for development platforms only
    All these scripts take an optional <platform> argument.
    The test-opencpi.sh will not run on cross-platforms.
    The scripts/install-opencpi.sh runs all 4 scripts and also takes a platform argument.
+
+Some platforms require running scripts and building things to become available and operational.
+Others are "static" in that all the parts necessary are simply statically edited or copied in the
+platform's directory.
+
+When a platform has prerequisites those are installed and built automatically.
+When a platform has things to build, or retrieve/copy from outside the project, it has a Makefile
+which will perform these functions under the default make goal (first one).
+Examples might be things that need to be copied or linked from outside the tree.
+
+TODO:
+
+There is a caching issue of things that are copied into this directory from other locations outside the tree.
+In some cases it is advantageous and useful to git-commit things into this directory so that it stands alone.
+So other than the typical "make" to get that stuff if it is not already present, we need:
+- a "clean" that truly throws all the generated/imported files away even if they are in the repo
+- a "force" which rebuilds things from external sources.
+- a "add-commit" to put them into the repo
+Exporting:
+- make exports closer to hdl platforms

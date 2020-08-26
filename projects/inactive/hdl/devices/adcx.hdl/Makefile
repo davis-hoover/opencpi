@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Libraries=xilinx
+Libraries=xilinx util
 SimLibraries=\
  $(OCPI_XILINX_TOOLS_DIR)/ISE/verilog/src/unisims
 SimFiles=\

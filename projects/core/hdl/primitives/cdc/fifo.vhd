@@ -31,7 +31,7 @@
 --  immediately when the FIFO becomes FULL or EMPTY, but their deassertion
 --  is delayed due to synchronization latency.
 --
---  When the FIFO is in the empty/full state consistenly, this latency
+--  When the FIFO is in the empty/full state consistently, this latency
 --  can impact throughput. To minimize the impact of this latency, the depth of
 --  the FIFO should be at least 2*latency (2 to cover both the latency of
 --  clearing the FULL and the EMPTY flags) or 10. 16 is the recommended value
@@ -51,9 +51,8 @@
 --
 ---------------------------------------------------------------------------------
 
-library IEEE, ocpi;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library IEEE;
+use IEEE.std_logic_1164.all,ieee.math_real.all, IEEE.numeric_std.all;
 
 entity fifo is
   generic (
@@ -73,7 +72,7 @@ end entity fifo;
 
 architecture rtl of fifo is
 
-  constant INDXWIDTH : natural := ocpi.util.width_for_max(DEPTH-1);          --minimum 1
+  constant INDXWIDTH : natural := natural(ceil(log2(real(DEPTH))));
   function msb12set return std_logic_vector is
     variable v : std_logic_vector(INDXWIDTH downto 0) := (others => '0');
   begin
@@ -139,7 +138,7 @@ architecture rtl of fifo is
     variable incrGray  : std_logic_vector(INDXWIDTH downto 0);
   begin
     flips(0) := not parity;
-    for i in 1 to INDXWIDTH loop
+    for i in 1 to INDXWIDTH-1 loop
       tempshift := std_logic_vector(signed(grayin) sll (2 + INDXWIDTH - i));
       flips(i)  := parity and grayin(i-1) and (not or_reduce(tempshift));
     end loop;

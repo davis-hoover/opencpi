@@ -518,8 +518,8 @@ namespace OCPI {
 		    apName, apValue, pStr.c_str());
 	}
       }
-      if (m_utilInstance.slaves().size() && impl.m_metadataImpl.slaves().empty()) {
-	ocpiInfo("Rejected because the instance in application indicates slaves therefore is a proxy,"
+      if (m_utilInstance.slaveInstances().size() && impl.m_metadataImpl.slaves().empty()) {
+	ocpiInfo("Rejected because the instance in the application indicates slaves therefore is a proxy,"
 	         "but the candidate implementation which implements the correct OCS is not a proxy");
 	return false;
       }

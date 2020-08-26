@@ -34,9 +34,10 @@ namespace OCPI {
 
     namespace OE = OCPI::Util::EzXml;
     Worker::Worker()
-      : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0), m_version(0),
-        m_totalPropertySize(0), m_isSource(false), m_isDebug(false), m_nProperties(0), m_properties(NULL),
-	m_firstRaw(NULL), m_xml(NULL), m_ordinal(0) {
+      : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
+	m_version(0), m_workerEOF(false), m_totalPropertySize(0), m_isSource(false),
+	m_isDebug(false), m_nProperties(0), m_properties(NULL), m_firstRaw(NULL), m_xml(NULL),
+        m_ordinal(0) {
     }
 
     Worker::~Worker() {
@@ -114,13 +115,17 @@ namespace OCPI {
       if (slave) {
 	if (ezxml_cchild(xml, "slave"))
 	  return esprintf("cannot have slave elements when you have a slave attribute");
-	m_slaves.push_back(slave);
+	m_slaves.emplace_back(slave, slave, false);
       } else
 	for (ezxml_t cx = ezxml_cchild(xml, "slave"); cx; cx = ezxml_cnext(cx)) {
-	  const char *w = ezxml_cattr(cx, "worker");
-	  if (!w)
-	    return esprintf("Missing \"worker\" attribute for \"slave\" element");
-	  m_slaves.push_back(w);
+	  const char
+	    *w = ezxml_cattr(cx, "worker"),
+	    *n = ezxml_cattr(cx, "name");
+	  assert(w);
+	  bool optional = false;
+	  if ((err = OE::getBoolean(cx, "optional", &optional)))
+	    return err;
+	  m_slaves.emplace_back(n, w, optional);
 	}
       if ((m_nProperties = OE::countChildren(xml, "property")))
 	m_properties = new Property[m_nProperties];

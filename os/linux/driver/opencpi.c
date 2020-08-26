@@ -652,7 +652,7 @@ opencpi_vma_close(struct vm_area_struct *vma) {
 
 // Map an individual page - in our case only for kernel allocation (not mmio, not reserved)
 #if defined(RHEL_MAJOR)
-#if RHEL_MAJOR==6 || RHEL_MAJOR==7
+#if RHEL_MAJOR>=6
 #define OCPI_RH6
 #else
 #define OCPI_RH5
@@ -681,7 +681,18 @@ opencpi_vma_nopage(struct vm_area_struct *vma, unsigned long virt_addr, int *typ
   return NOPAGE_SIGBUS; /* send a SIGBUS */
 }
 #else
+/*
+*  This got changed to "vm_fault_t opencpi_vma_fault"
+*  in kernel version 5.0-rcX.  See "linux/mm_types.h".
+*
+*  Looks like RedHat/CentOS made the switch as of
+*  major release 8 with kernel version 4.18.0.
+*/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 18, 0)
+static vm_fault_t opencpi_vma_fault
+#else
 static int opencpi_vma_fault
+#endif
 #if LINUX_VERSION_CODE > KERNEL_VERSION(4, 10, 0)
   (struct vm_fault *vmf) {
   ocpi_block_t *block = vmf->vma->vm_private_data;
@@ -871,19 +882,23 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	      err = -EFAULT;
 	      log_debug("load fpga loading to: %px\n", buf);
 	      if (!copy_from_user((void *)buf, (void __user *)request.data, request.length)) {
-  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
-		err = fpga_mgs_buf_load(mgr, 0, buf, request.length);
+  #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0)
+	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
+		err = fpga_mgr_buf_load(mgr, 0, buf, request.length);
   #else
 		struct fpga_image_info *info;
+	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
 		err = -ENOMEM;
     #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {
 		  info->buf = buf;
 		  info->count = request.length;
-		  log_debug("loading fpga\n");
+		  log_debug("locking fpga\n");
 		  err = -EBUSY;
 		  if (!fpga_mgr_lock(mgr)) {
+		    log_debug("loading fpga\n");
 		    err = fpga_mgr_load(mgr, info);
+		    log_debug("unlocking fpga %d\n", err);
 		    fpga_mgr_unlock(mgr);
 		  }
 		  fpga_image_info_free(info);
@@ -1824,6 +1839,13 @@ opencpi_init(void) {
       break;
     }
     opencpi_pci_registered = 1;
+#endif
+#ifdef CONFIG_ARCH_ZYNQMP
+    if (make_block(0xA8000000, 0xA8000000, sizeof(OccpSpace), ocpi_mmio, false,
+        0, NULL, 0) == NULL) {
+      break;
+    }
+    log_debug("Control Plane physical addr space for ZynqMP HP0 slave reserved\n");
 #endif
 #ifdef CONFIG_ARCH_ZYNQ
     // Register the memory range of the control plane GP0 or GP1 on the PL

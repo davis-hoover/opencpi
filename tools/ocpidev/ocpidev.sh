@@ -118,7 +118,7 @@ function check_dirtype {
 # Determine the path to the current project's top level
 function get_project_top {
   # TODO get project, project.dir
-  project_top=`python3.4 -c "\
+  project_top=`python3 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.get_path_to_project_top());"`
   [ "$project_top" != None ] || bad failure to find project containing path \"`pwd`\"
@@ -127,7 +127,7 @@ import _opencpi.util as ocpiutil; print(ocpiutil.get_path_to_project_top());"`
 # Determine the package-id of the current project
 function get_project_package {
   # TODO get project, project.package_id
-  project_pkg=`python3.4 -c "\
+  project_pkg=`python3 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import Asset; print(Asset.Project(directory=\".\").package);"`
   [ "$project_pkg" != None ] || bad failure to find project package for path \"`pwd`\"
@@ -136,7 +136,7 @@ import Asset; print(Asset.Project(directory=\".\").package);"`
 # Create the link to a project in the installation registry (OCPI_PROJECT_REGISTRY_DIR)
 # based on the project's package name
 function py_try_return_bool {
-  python3.4 -c "\
+  python3 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\")
 import logging
 import _opencpi.util as ocpiutil
@@ -167,7 +167,7 @@ function register_project {
 
   # We want to export a project on register, but only if it is not
   # an exported project itself
-  is_exported=`python3.4 -c "\
+  is_exported=`python3 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.is_path_in_exported_project(\"$project\"));"`
   if [ "$is_exported" == "False" ]; then
@@ -527,7 +527,7 @@ $CheckCDK
 include \$(OCPI_CDK_DIR)/include/project.mk
 EOF
 
-package_id=`python3.4 -c "\
+package_id=`python3 -c "\
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.get_project_package());"`
 
@@ -1276,6 +1276,8 @@ ${specelems[$w]}
 ${supportselem[@]}
 </$elem>
 EOF
+    # The following check cannot be done since we are not looking at the right place for the file.
+    if false; then
     specfile=${specs[$w]}
     case "$specfile" in
       (*.xml) ;;
@@ -1290,6 +1292,7 @@ EOF
         fi
     esac
     [ -n "$verbose" -a "${specs[$w]}" != none -a ! -e "$specfile" ] && echo Warning:  spec file \"$specfile\" does not exist
+    fi
   done
   [ -z "$verbose" ] || echo Running \"make skeleton\" to make initial skeleton for worker $1
   # FIXME: how do we get the project's or library's xmlincludepath etc.
@@ -1401,9 +1404,9 @@ EOF
        Use Test='true' to create a test-exclusive property. -->
 </Tests>
 EOF
-    #   create generate.py: #!/usr/bin/env python2
+    #   create generate.py: #!/usr/bin/env python3
     cat <<EOF > $testdir/generate.py
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 Use this file to generate your input data.
@@ -1411,9 +1414,9 @@ Args: <list-of-user-defined-args> <input-file>
 """
 EOF
     chmod +x $testdir/generate.py
-    #   create verify.py: #!/usr/bin/env python2
+    #   create verify.py: #!/usr/bin/env python3
     cat <<EOF > $testdir/verify.py
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 Use this script to validate your output data against your input data.
@@ -2363,7 +2366,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--*=*)
 	 flag=${argv[0]%%=*}
          val="${argv[0]#*=}"
-	 echo FLAG:$flag VAL:$val ARG:${argv[0]}
+	 #echo FLAG:$flag VAL:$val ARG:${argv[0]}
 	 unset argv[0]
 	 argv=($flag "$val" "${argv[@]}")
 	 ;;
@@ -2374,7 +2377,7 @@ while [[ "${argv[0]}" != "" ]] ; do
 	 val=${argv[0]:2}
 	 unset argv[0]
 	 argv=($flag $val ${argv[@]})
-	 echo FIXING: flag=$flag val=$val new=:${argv[@]}: >&2
+	 # echo FIXING: flag=$flag val=$val new=:${argv[@]}: >&2
 	 ;;
     esac
     case "${argv[0]}" in

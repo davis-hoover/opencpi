@@ -35,5 +35,5 @@
 ./releng/jenkins/docker_support/yum.repos.template
 ./runtime/hdl-support/scripts/donft
 ./scripts/copyright/whitelist
-./tools/cdk/include/xm/fortran.h
-./tools/cdk/include/xm/xmpfc.cnf
+./tools/include/xm/fortran.h
+./tools/include/xm/xmpfc.cnf

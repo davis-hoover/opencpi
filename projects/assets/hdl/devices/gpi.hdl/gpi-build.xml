@@ -67,4 +67,25 @@
      <Parameter Name="RISING" Value="true"/>
      <Parameter Name="USE_TOGGLE" Value="true"/>
    </configuration>
+<configuration id="9">
+    <Parameter Name="NUM_INPUTS" Value="4"/>
+    <Parameter Name="USE_DEBOUNCE" Value="true"/>
+    <Parameter Name="EDGE_MODE" Value="true"/>
+    <Parameter Name="RISING" Value="true"/>
+    <Parameter Name="USE_TOGGLE" Value="true"/>
+  </configuration>
+<configuration id="10">
+    <Parameter Name="NUM_INPUTS" Value="4"/>
+    <Parameter Name="USE_DEBOUNCE" Value="true"/>
+    <Parameter Name="EDGE_MODE" Value="false"/>
+    <Parameter Name="RISING" Value="true"/>
+    <Parameter Name="USE_TOGGLE" Value="false"/>
+  </configuration>
+<configuration id="11">
+    <Parameter Name="NUM_INPUTS" Value="2"/>
+    <Parameter Name="USE_DEBOUNCE" Value="true"/>
+    <Parameter Name="EDGE_MODE" Value="false"/>
+    <Parameter Name="RISING" Value="true"/>
+    <Parameter Name="USE_TOGGLE" Value="false"/>
+  </configuration>
 </build>

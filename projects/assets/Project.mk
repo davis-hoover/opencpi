@@ -26,9 +26,10 @@
 PackageName=assets
 PackagePrefix=ocpi
 
-ProjectDependencies=
+ProjectDependencies=ocpi.platform
 
 # These assignments support building from any directory.
-ComponentLibraries+=misc_comps util_comps dsp_comps comms_comps base_comps devices cards
+# This is bad, and will be moved to HDL assemblies when there is an XML file there
+ComponentLibraries=util_comps base_comps misc_comps dsp_comps comms_comps devices
 #example remote system: note there can be multiple remote systems, colon-separated.
 #export OCPI_REMOTE_TEST_SYSTEMS:=10.0.1.16=root=root=/mnt/net/workspace/git/ocpi.assets

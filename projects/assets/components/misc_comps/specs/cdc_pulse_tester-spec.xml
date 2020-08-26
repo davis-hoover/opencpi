@@ -11,6 +11,11 @@
                                Default="100000000.0"
                                Description="Destination clock frequency"/>
 
+   <Property Name="num_input_samples" Type="uchar"
+                                      Parameter="true"
+                                      Default="15"
+                                      Description="Number of input samples sent."/>
+
   <Port Name="out" Producer="true"/>
 
 </ComponentSpec>

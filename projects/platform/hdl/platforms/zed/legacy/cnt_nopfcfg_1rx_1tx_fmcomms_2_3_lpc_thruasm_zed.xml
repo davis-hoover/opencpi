@@ -1,0 +1,32 @@
+<HdlContainer constraints='cst_nopfcfg_nrx_ntx_fmcomms_2_3_lpc_zed.xdc'
+              only='zed'>
+  <Device name='ad9361_spi' card='fmcomms_2_3_lpc'>
+    <Property name='CP_CLK_FREQ_HZ_p' value='100e6'/>
+  </Device>
+  <Device name='ad9361_data_sub' card='fmcomms_2_3_lpc'>
+    <Property name='LVDS_p' value='true'/>
+    <Property name='DATA_CLK_Delay' value='3'/>
+    <Property name='RX_Data_Delay' value='0'/>
+    <Property name='FB_CLK_Delay' value='7'/>
+    <Property name='TX_Data_Delay' value='0'/>
+  </Device>
+  <Device name='ad9361_config' card='fmcomms_2_3_lpc'>
+    <Property name='pin_control_p' value='true'/>
+  </Device>
+  <Device name='ad9361_adc_sub' card='fmcomms_2_3_lpc'/>
+  <Device name='ad9361_adc0' card='fmcomms_2_3_lpc'/>
+  <Device name='ad9361_dac_sub' card='fmcomms_2_3_lpc'/>
+  <Device name='ad9361_dac0' card='fmcomms_2_3_lpc'/>
+  <Connection external='in_to_asm_rx_path_from_adc'
+              port='out'
+              device='ad9361_adc0'
+              card='fmcomms_2_3_lpc'/>
+  <Connection external='out_from_asm_tx_path_to_dac'
+              port='in'
+              device='ad9361_dac0'
+              card='fmcomms_2_3_lpc'/>
+  <Connection external='out_from_asm_rx_path'
+              interconnect='zynq'/>
+  <Connection external='in_to_asm_tx_path'
+              interconnect='zynq'/>
+</HdlContainer>

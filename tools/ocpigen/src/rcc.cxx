@@ -22,11 +22,14 @@
 #include <algorithm>
 #include <vector>
 
+#include "OcpiOsFileSystem.h"
+
 #include "assembly.h"
 #include "data.h"
 #include "rcc.h"
 
 namespace OU = OCPI::Util;
+namespace OF = OCPI::OS::FileSystem;
 
 // Generate the readonly implementation file.
 // What implementations must explicitly (verilog) or implicitly (VHDL) include.
@@ -748,7 +751,8 @@ emitImplRCC() {
       // for each slave declare the slave class which extends RCCUserSlave and is named generically
       // Slave1, Slave2 ... etc
       for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
-        // This worker is a proxy.  Give it access to each of its slaves
+	const char *name = (*it).first.c_str();
+	// This worker is a proxy.  Give it access to each of its slaves
         fprintf(f,
                 "  /*\n"
                 "   * This class defines the properties of a slave for convenient access.\n"
@@ -803,15 +807,6 @@ emitImplRCC() {
             offset = ", 0";
           if (!p.m_isPadding) {
             // always expose the string based interface to the property
-#if 0
-            fprintf(f,
-                    "    inline std::string & getProperty_%s(std::string &val) {\n"
-                    "      // get the string value of the property based on the ordinal\n"
-                    "      m_worker.getProperty(%u, dont_care_temp, val);\n"
-                    "      return val;\n"
-                    "    }\n",
-                    p.m_name.c_str(),  p.m_ordinal);
-#else
             fprintf(f,
                     "    inline const char *getProperty_%s(std::string &val,\n"
 		    "                                      OCPI::API::AccessList &list = "
@@ -820,38 +815,41 @@ emitImplRCC() {
 		    "OCPI::API::noPropertyOptions,\n"
 		    "                                      OCPI::API::PropertyAttributes *attrs = "
 		    "NULL) {\n"
+                    "      checkSlave(\"%s\");\n"
                     "      // get the string value of the property based on the ordinal\n"
-                    "      m_worker.getProperty(%uu, val, list, options, attrs);\n"
+                    "      m_worker->getProperty(%uu, val, list, options, attrs);\n"
                     "      return val.c_str();\n"
                     "    }\n",
-                    p.cname(),  p.m_ordinal);
-#endif
+                    p.cname(), name, p.m_ordinal);
             // expose the faster/typed non-string based interface if it exists
             if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
               fprintf(f,
                       "    inline char *get_%s(%s%schar *buf, size_t length) {\n"
-                      "      m_worker.get%s%s(%uu, buf, length%s%s);\n"
+		      "      checkSlave(\"%s\");\n"
+                      "      m_worker->get%s%s(%uu, buf, length%s%s);\n"
                       "      return buf;\n"
                       "    }\n"
                       "    std::string &get_%s(%s%sstd::string &s) {\n"
+                      "      checkSlave(\"%s\");\n"
                       "      size_t len = getLength_%s() + 1;\n"
                       "      char *buf = new char[len];\n"
-                      "      m_worker.get%s%s(%uu, buf, len%s%s);\n"
+                      "      m_worker->get%s%s(%uu, buf, len%s%s);\n"
                       "      s = buf;\n"
                       "      delete [] buf;\n"
                       "      return s;\n"
                       "   }\n",
-                      p.m_name.c_str(), dims.c_str(), comma, pretty.c_str(),
+                      p.m_name.c_str(), dims.c_str(), comma, name, pretty.c_str(),
                       p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal, comma,
-                      offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, p.m_name.c_str(),
+                      offset.c_str(), p.m_name.c_str(), dims.c_str(), comma, name, p.m_name.c_str(),
                       pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
                       comma, offset.c_str());
             else if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence)
               fprintf(f,
                       "    inline %s get_%s(%s) {\n"
-                      "      return %sm_worker.get%s%s(%u%s%s);\n"
+		      "      checkSlave(\"%s\");\n"
+                      "      return %sm_worker->get%s%s(%u%s%s);\n"
                       "    }\n",
-                      type.c_str(), p.m_name.c_str(), dims.c_str(),
+                      type.c_str(), p.m_name.c_str(), dims.c_str(), name,
                       cast.c_str(),  // if val needs to be cast in the case of an enum
                       pretty.c_str(), p.m_isParameter ? "Parameter" : "PropertyOrd", p.m_ordinal,
                       comma, offset.c_str());
@@ -861,8 +859,9 @@ emitImplRCC() {
             fprintf(f,
                     "    inline void setProperty_%s(const char* val, OCPI::API::AccessList &list "
 		    "= OCPI::API::emptyList) {\n"
-                    "      m_worker.setProperty(\"%s\", val, list);\n",
-                    p.cname(), p.cname());
+                    "      checkSlave(\"%s\");\n"
+                    "      m_worker->setProperty(\"%s\", val, list);\n",
+                    p.cname(), name, p.cname());
             fprintf(f,
                     "#if !defined(NDEBUG)\n"
 		    "      OCPI::OS::logPrint(OCPI_LOG_DEBUG, \"Setting slave.setProperty_%s",
@@ -880,17 +879,18 @@ emitImplRCC() {
             // expose the faster/typed non-string based interface to the property
             if (p.m_baseType != OA::OCPI_Struct && !p.m_isSequence) {
               fprintf(f,
-                      "    inline void set_%s(%s%s%s val) {\n",
-                      p.m_name.c_str(), dims.c_str(), comma, type.c_str());
+                      "    inline void set_%s(%s%s%s val) {\n"
+		      "      checkSlave(\"%s\");\n",
+                      p.m_name.c_str(), dims.c_str(), comma, type.c_str(), name);
               if (p.m_arrayRank) {
                 fprintf(f,
                         "      unsigned idx = %s;\n"
-                        "      m_worker.set%sPropertyOrd(%u, %sval, idx);\n",
+                        "      m_worker->set%sPropertyOrd(%u, %sval, idx);\n",
                         offset.c_str(), pretty.c_str(), p.m_ordinal,
                         cast.c_str());  // if val needs to be cast in the case of an enum
               } else
                 fprintf(f,
-                        "      m_worker.set%sPropertyOrd(%u, %sval, 0);\n",
+                        "      m_worker->set%sPropertyOrd(%u, %sval, 0);\n",
                         pretty.c_str(), p.m_ordinal,
                         cast.c_str());  // if val needs to be cast in the case of an enum
               fprintf(f,
@@ -910,9 +910,10 @@ emitImplRCC() {
             if (p.m_baseType == OA::OCPI_String && !p.m_isSequence)
               fprintf(f,
                       "    inline void set_%s(%s%sconst std::string &val) {\n"
-                      "      m_worker.setStringPropertyOrd(%u, val.c_str()%s%s);\n"
+		      "      checkSlave(\"%s\");\n"
+                      "      m_worker->setStringPropertyOrd(%u, val.c_str()%s%s);\n"
                       "    }\n",
-                      p.m_name.c_str(), dims.c_str(), comma, p.m_ordinal, comma, offset.c_str());
+                      p.m_name.c_str(), dims.c_str(), comma, name, p.m_ordinal, comma, offset.c_str());
           }
         } // for iterate over m_ctl.properties
         fprintf(f,
@@ -1286,20 +1287,22 @@ emitSkelRCC() {
   return 0;
 }
 
-
 const char *Worker::
-addSlave(const std::string worker_name, const std::string slave_name) {
+addSlave(const std::string worker_name, const std::string slave_name, bool optional) {
   const char *err = NULL;
   std::string sw;
   const char *dot = strrchr(worker_name.c_str(), '.');
-  OU::format(sw, "../%s/%.*s.xml", worker_name.c_str(), (int)(dot - worker_name.c_str()),
-             worker_name.c_str());
-
-  Worker *wkr = Worker::create(sw.c_str(), m_file, NULL, m_outDir, NULL, NULL, 0, err);
+  // Here we try a shortcut to find the slave worker's XML even when it has not been built
+  // or the library has not been "generated".
+  OU::format(sw, "../%s/%.*s.xml", worker_name.c_str(), (int)(dot - worker_name.c_str()), worker_name.c_str());
+  if (!OF::exists(sw)) // make it findable in any generated/built library
+    OU::format(sw, "%s/%.*s.xml", dot + 1, (int)(dot - worker_name.c_str()), worker_name.c_str());
+  Worker *wkr = Worker::create(sw.c_str(), m_file, NULL, m_outDir, this, NULL, 0, err);
   if (!wkr) {
     return OU::esprintf("for slave worker %s: %s", worker_name.c_str(), err);
   }
   wkr->m_isSlave = true;
+  wkr->m_isOptional = optional;
   m_slaves[slave_name] = wkr;
   return err;
 }
@@ -1325,11 +1328,11 @@ print_map() {
  */
 const char* Worker::
 parseSlaves() {
-  const char *err = NULL;
+  const char *err;
   std::string l_slave;
   std::vector <StringPair> all_slaves;
   if (OE::getOptionalString(m_xml, l_slave, "slave") &&
-      (err = addSlave(l_slave, l_slave.substr(0, l_slave.find(".", 0)))))
+      (err = addSlave(l_slave, l_slave.substr(0, l_slave.find(".", 0)), false)))
     return err;
   std::map<std::string, unsigned int> wkr_num_map;
   std::map<std::string, unsigned int> wkr_idx_map;
@@ -1349,42 +1352,32 @@ parseSlaves() {
     ++wkr_num_map[wkr];
     wkr_idx_map[wkr] = 0;
   }
-  for (ezxml_t slave_element = ezxml_cchild(m_xml, "slave");
-      slave_element;
-      slave_element = ezxml_cnext(slave_element)) {
-    //put into a const char* first in case it is blank, this prevents it from throwing an
-    //exception when trying to assign Null to std::string
-    const char* wkr_attr = ezxml_cattr(slave_element, "worker");
-    std::string wkr = wkr_attr ? wkr_attr: "";
-    const char* name_attr = ezxml_cattr(slave_element, "name");
-    std::string name = name_attr ? name_attr: "";
-
-    if (wkr.empty()){
-      return OU::esprintf("Missing \"worker\" attribute for \"slave\" element");
-    }
-
+  for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
+    std::string wkr, name;
+    if ((err = OE::checkAttrs(slave, "worker", "name", "optional", (void*)0)) ||
+	(err = OE::getRequiredString(slave, wkr, "worker", "slave")))
+      return err;
+    OE::getOptionalString(slave, name, "name");
+    bool optional = false;
+    if ((err = OE::getBoolean(slave, "optional", &optional)))
+      return err;
     size_t dot = wkr.find_last_of('.');
-    if (!dot)
-      return OU::esprintf("slave attribute: '%s' has no authoring model suffix", wkr.c_str());
-    std::string wkr_sub = wkr.substr(0, dot);
-
+    if (dot == std::string::npos)
+      return OU::esprintf("slave worker: \"%s\" has no authoring model suffix", wkr.c_str());
     // If we need to auto generate the name
-    if (name.empty()){
-          unsigned int idx = wkr_idx_map[wkr]++;
-          if (name.empty()) {
-            name = wkr_sub;
-            if (wkr_num_map[wkr] > 1)
-              OU::formatAdd(name, "_%u", idx - 1);
-          }
-          if (m_slaves.find(name) != m_slaves.end()){
-                std::string printMap = print_map();
-                return OU::esprintf("Invalid slave name specified: %s", name.c_str());
-          }
+    if (name.empty()) {
+      unsigned int idx = wkr_idx_map[wkr]++;
+      std::string wkr_sub = 
+      name = wkr.substr(0, dot);
+      if (wkr_num_map[wkr] > 1)
+	OU::formatAdd(name, "_%u", idx - 1);
+      if (m_slaves.find(name) != m_slaves.end())
+	return OU::esprintf("Invalid slave name specified: %s", name.c_str());
     }
-    if ((err = addSlave(wkr, name)))
+    if ((err = addSlave(wkr, name, optional)))
       return err;
   }
-  return err;
+  return NULL;
 }
 
 /*
@@ -1516,8 +1509,8 @@ parseRcc(const char *a_package) {
 }
 
 RccAssembly *RccAssembly::
-create(ezxml_t xml, const char *xfile, const char *&err) {
-  RccAssembly *ha = new RccAssembly(xml, xfile, err);
+create(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err) {
+  RccAssembly *ha = new RccAssembly(xml, xfile, parentFile, err);
   if (err) {
     delete ha;
     ha = NULL;
@@ -1526,8 +1519,8 @@ create(ezxml_t xml, const char *xfile, const char *&err) {
 }
 
 RccAssembly::
-RccAssembly(ezxml_t xml, const char *xfile, const char *&err)
-  : Worker(xml, xfile, "", Worker::Assembly, this, NULL, err) {
+RccAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err)
+  : Worker(xml, xfile, parentFile, Worker::Assembly, NULL, NULL, err) {
   if (!(err = OE::checkAttrs(xml, IMPL_ATTRS, RCC_TOP_ATTRS, (void*)0)) &&
       !(err = OE::checkElements(xml, IMPL_ELEMS, RCC_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
     err = parseRcc();

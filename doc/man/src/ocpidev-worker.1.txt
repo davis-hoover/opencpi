@@ -1,0 +1,462 @@
+OCPIDEV-WORKER(1)
+================
+
+
+NAME
+----
+ocpidev-worker - manage an OpenCPI worker.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`worker`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *`worker`* noun represents an OpenCPI worker, which is a specific
+implementation of a component with source code written according
+to an OpenCPI 'authoring model'. An authoring model represents
+a way to implement a component in a specific language - for example,
+C++ or VHDL - using a specific OpenCPI API between the component
+and its execution environment. 
+
+A worker is described by an OpenCPI Worker Description (OWD), which
+is an XML file that specifies the component that the worker implements,
+the language used for its source code, and any additional property
+and port information that fine-tunes the component specification (OCS)
+for the worker.
+
+In a project, a worker generally resides in its own directory
+within a component library. However, some authoring models allow
+multiple workers to reside in one worker directory.
+
+The workers that implement a component usually reside in the same library
+as the component, although command options allow them to be created
+in different libraries or even different projects.
+
+Several types of worker exist:
+
+- An 'RCC worker', which implements the Resource-Constrained C/C++ (RCC) authoring model.
+The 'OpenCPI RCC Development Guide' provides details on how to develop an RCC worker.
+
+- An 'HDL worker', which implements the Hardware Definition Language (HDL) model.
+The 'OpenCPI HDL Development Guide' provides details on how to develop an HDL worker.
+
+- An 'application worker', which can be an RCC or HDL worker and is a portable,
+hardware-independent implementation of a component spec. See the respective
+authoring model guides ('OpenCPI RCC Development Guide' and 'OpenCPI HDL Development Guide')
+for details on how to develop an application worker.
+
+- An 'HDL device worker', which is a special type of HDL application worker that supports
+external devices attached to an FPGA. The 'OpenCPI Platform Development Guide'
+provides details on how to develop an HDL device worker.
+
+- An 'HDL adapter worker', which is a special type of HDL application worker that connects workers
+with incompatible ports (for example, incompatible protocols). The 'OpenCPI HDL
+Development Guide' provide information about developing HDL adapter workers.
+
+- An 'HDL platform worker', which is a special type of HDL device worker that provides
+the necessary platform-wide functions for the HDL platform. The 'OpenCPI Platform
+Development Guide' provides details on how to develop an HDL platform worker.
+
+Verbs that can operate on a worker are:
+
+*`build`*::
+    Compile the worker source code, creating files and directories
+    as required. A single worker implementation generally exists
+    in its own directory and when compiled, results in a single
+    'artifact' (a binary executable compiled from the worker),
+    although some authoring models (for example, RCC) allow
+    multiple workers to be built as a single artifact.
+    
+*`clean`*::
+    Remove all generated and compiled files for the worker.
+
+*`create`*::
+    Create the named worker, creating files and directories as required.
+    The worker is created in a directory '<name>'*`.`*'<authoring-model-suffix>'
+    under the current working directory where *`ocpidev`* 
+    is executed. The general-purpose option *`-d`* '<directory>'
+    can be used to create the worker under a different directory.
+    Note that multiple workers that implement the same component must
+    have different names and at least one of the names must be different
+    from the name implied by the component specification.
+
+*`delete`*::
+    Remove all directories and files associated with the named worker.
+    
+*`show`*::
+    Display information about the worker.
+
+*`utilization`*::
+    Display information about FPGA resource use by an HDL worker.
+
+Within the worker's directory are the worker's "make" file (named Makefile),
+its OWD (named '<name>'*`.xml`*) and its primary source code file (named
+'<name>'*`.`*'<auth-model-language-suffix>', for example, *`.c`*, *`.cc`*
+or *`vhd`*). The *`ocpidev create`* operation produces initial versions
+of these files that can then be edited as necessary to produce the worker
+implementation.
+
+The *`ocpidev build`* operation creates additional files in a worker's directory,
+such as architecture-independent source code and XML files, in a directory
+named *`gen`* and architecture-specific object and binary files for
+the compilation target being built, in a directory named
+*`target-`*'<platform>'; for example, *`target-centos7`* or *`target-xsim`*.
+These are the files that the *`ocpidev clean`* operation removes.
+
+For general information on how to develop a worker, see the chapters
+"Introduction to Worker Development" and "Developing Workers"
+in the 'OpenCPI Component Development Guide'. For detailed information
+on the OpenCPI authoring models and how to use them to develop worker
+source code, see the 'OpenCPI RCC Development Guide', the
+'OpenCPI HDL Development Guide', and the 'OpenCPI OpenCL
+Development Guide' (OpenCL is currently an experimental
+authoring model).
+
+Note that an asset's name is implied by the directory you're in when
+you issue the *`ocpidev`* command. For workers, this means that you can
+perform operations (verbs) on the worker without having to specify its
+name when you issue the *`ocpidev`* command from inside the worker directory.
+
+The *`ocpidev`* tool can also operate on a plural *`workers`* noun.
+The syntax is:
+
+*`ocpidev`* ['<options>'] [*`show`*|*`utilization`*] *`workers`*
+
+The verbs that can be performed on the *`workers`* noun are:
+
+*`show`*::
+    Display information about all workers in any registered
+    projects. The general-purpose options and the *`show`*
+    formatting options can be specified.
+
+*`utilization`*::
+    Display information about FPGA resource use for all built HDL workers
+    in a project or library. The general-purpose options
+    and the *`utilization`* options can be specified.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Keywords for platforms supported by OpenCPI that can be
+specified in the '<platform>' argument to an option
+can be found in the tables of supported platforms in the 'OpenCPI User Guide'.
+
+Keywords for architectures supported by OpenCPI that can be specified
+in the '<target>' argument to an option include *`isim`*, *`modelsim`*,
+*`xsim`*, *`stratix4`*, *`stratix5`*, *`virtex5`*, *`virtex6`*, *`zynq`*,
+*`zynq_is`*, *`spartan3adsp`*.
+
+Options That Apply to All Operations (Verbs) on Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*`--hdl-library=`*'<hdl-library>'::
+    Specify the HDL library in which to operate on the worker.
+    HDL libraries exist underneath the *`hdl/`* directory
+    located at the top level of a project.
+
+*`--library=`*'<component-library>', *`-l`* '<component-library>'::
+    Specify the component library in which to operate on the worker.
+    When a project contains multiple component libraries, this option
+    can be used to specify one of them. Multiple component
+    libraries are located underneath the *`components`* directory
+    at the top level of a project.
+
+*`-d`* '<directory>'::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+    
+*`-v`*, *`--verbose`*::
+    Describe what is happening in command execution in more detail.
+
+Options When Creating Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+    Do not build the worker for the specified platform. See
+    also the description of the *`ExcludePlatforms=`* OWD attribute
+    in the 'OpenCPI Component Development Guide'.
+
+*`--only-platform=`*'<platform>', *`-G`* '<platform>'+::
+    Only build the worker for the specified platform. See also
+    the description of the *`OnlyPlatforms`* OWD attribute in
+    the 'OpenCPI Component Development Guide'.
+
+*`-A`* '<directory>'+::
+    Specify a directory to search for XML include files.
+
+*`-I`* '<directory>'+::
+    Specify a directory to search for include files (C, C++,
+    Verilog).
+
+*`-L`* '<language>'::
+    Specify the source language for the worker being
+    created. By default, the worker is created for
+    the default language for the authoring model, which
+    must be C or C++ for RCC workers and VHDL for HDL workers.
+
+*`-O`* '<file>'+::
+    Specify a source code file to compile when building the
+    worker that is not included by default; that is, in
+    addition to the '<name>'*`.`*'<authoring-language-suffix>' file.
+
+*`-P`* '<hdl-platform>'::
+    Specify that the worker should be created in the *`devices`*
+    library for the specified HDL platform in the project. This
+    option is intended for use when creating a platform-specific
+    device worker or device proxy. A *`devices`* library is located
+    in '<project>'*`/hdl/platforms/`*'<hdl-platform>'*`/devices/`*.
+    For example, *`hdl/platforms/matchstiq_z1/devices`*.
+
+*`-S`* '<component-spec>'::
+    Specify the component spec (OCS) that the worker implements.
+    The default is '<name>'*`-spec`* or '<name>'*`_spec`*
+    depending on what *`ocpidev`* finds in the *`specs`* directory
+    of the library or project (or libraries specified with the *`-y`*
+    option or other projects specified by the *`-D`* option when the
+    project that contains the worker was created).
+   
+*`-T`* '<target>'+::
+    Only build the worker for the specified architecture. See also the
+    description of the *`OnlyTargets`* OWD attribute in the 'OpenCPI
+    Component Development Guide'.
+
+*`-Y`* '<primitive-library>'+::
+    Specify a primitive library on which the worker
+    depends.
+   
+*`-Z`* '<target>'+::
+    Do not build the worker for the specified architecture. See also
+    the description of the *`ExcludeTargets`* OWD attribute in
+    the 'OpenCPI Component Development Guide'.
+
+*`-k`*::
+    Keep files and directories created after a worker creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+
+*`-y`* '<component-library>'+::
+   Specify a component library to search for workers, devices
+   and/or specs that this worker references.
+
+Options When Creating RCC Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-R`* '<prereq-library>'+::
+    Specify a library on which the worker depends and
+    to which it should be statically linked.
+
+*`-W`* '<worker>'+::
+    Specify one of multiple workers implemented in this RCC
+    worker's directory when a single RCC worker directory
+    is creating a multi-worker artifact. This option is
+    supported but is rarely required or used.
+
+*`-V`* '<worker>'::
+    Specify a slave worker for which the worker being
+    created is a proxy.
+
+*`-r`* '<prereq-library>'+::
+    Specify a library on which the worker depends and
+    to which it should be dynamically linked.
+
+Options When Creating HDL Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-C`* '<core>'+::
+    Specify an HDL primitive core on which the worker
+    depends and with which it should be built.
+
+Options When Deleting Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-f`*::
+    Force deletion: do not ask for confirmation when deleting
+    a worker. Normally, you are asked to confirm a deletion.
+
+Options When Building RCC Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-rcc-platform=`*'<platform>'+::
+    Build RCC/ACI assets for the RCC platforms associated with the
+    specified HDL platform. If this option is not used (and *`--rcc-platform`*
+    '<platform>' is also not used), the current development software
+    platform is used as the single RCC platform used for building.
+
+*`--rcc-platform=`*'<platform>'+::
+    Build RCC/ACI assets for the specified RCC platform. If this
+    option is not used (and *`--hdl-rcc-platform`* '<platform>'
+    is also not used), the current development software platform
+    is used as the single RCC platform used for building.
+
+Options When Showing Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--global-scope`*::
+    Show workers from all registered projects and the
+    current project if applicable.
+    This is the default scope used if *`-local-scope`* is not used.
+    
+*`--json`*::
+    Format the output in JavaScript Object Notation (JSON) format
+    for integration with other software.
+
+*`--local-scope`*::
+    Only show workers in the local project.
+
+*`--simple`*::
+    Format the output as simply as possible.
+  
+*`--table`*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *`--simple`* or *`--json`* are not used.
+
+*`-P`* '<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which to operate.
+
+Options When Using Utilization on HDL Workers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--format=`*{*`table`*|*`latex`*}::
+    Specify the format in which to output the FPGA resource usage information.
+    Specifying *`table`* sends the information to *`stdout`* in tabular format.
+    Specifying *`latex`* bypasses *`stdout`* and writes all output to
+    *`utilization.inc`* files in the directories for the assets on
+    which it operates.
+    
+*`--hdl-platform=`*'<platform>'+::
+    Specify the buildable HDL platform for which to
+    display FPGA resource usage information for the worker(s).
+    
+*`--hdl-target=`*'<target>'+::
+    Specify the buildable HDL architecture for which to
+    display FPGA resource usage information for the worker(s).
+    
+*`-P`* '<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which
+    to operate on the worker(s).
+
+EXAMPLES
+--------
+. Create an HDL worker named *`myworker`* that implements
+the component named *`mycomp`*. (If the worker is named
+*`mycomp`*, you can omit the *`-S`* option because the default
+component spec name is '<worker-name>'*`-spec.xml`*).
++
+----------------------------------------------
+ocpidev create worker myworker.hdl -S mycomp-spec
+---------------------------------------------
++
+. Create a C++ RCC worker named *`mycomp`* that implements
+the *`mycomp`* spec:
++
+---------------------------------------
+ocpidev create worker mycomp.rcc -L c++
+---------------------------------------
++
+. In the worker's directory, compile the worker's source code:
++
+-------------------
+ocpidev build worker
+-------------------
++
+. In the project that contains the worker, compile
+the source code for the RCC worker named *`myworker`*
+for the centOS7 platform:
++
+-------------------------------------------------------
+ocpidev build worker myworker.rcc --rcc-platform=centos7
+-------------------------------------------------------
++
+. In the project that contains the worker, compile
+the source code for the RCC worker named *`myworker`*
+for the RCC platform side of the Zynq SoC chip family:
++
+---------------------------------------------------------
+ocpidev build worker myworker.rcc --hdl-rcc-platform=zynq
+---------------------------------------------------------
++
+. Inside the worker's directory, remove the compiled
+worker source code for the worker named *`myworker`*:
++
+--------------------
+ocpidev clean worker
+--------------------
++
+. Display information about the current worker:
++
+------------------
+ocpidev show worker
+------------------
++
+. Display information about all workers in all registered projects:
++
+-------------------
+ocpidev show workers
+-------------------
++
+. Show FPGA resource usage information for a single HDL worker *`myworker`* using
+build results from all platforms:
++
+-----------------------------------
+ocpidev utilization worker myworker
+-----------------------------------
++
+. Show FPGA resource usage information for a single HDL worker *`myworker`* using
+build results from the *`xsim`* platform:
++
+-------------------------------------------------------
+ocpidev utilization worker myworker --hdl-platform xsim
+-------------------------------------------------------
++
+. Show FPGA resource usage information for all HDL workers in the current project or library:
++
+---------------------------
+ocpidev utilization workers
+---------------------------
++
+. Show FPGA resource usage information for a single HDL worker named *`myworker`* using
+build results from the HDL target named *`virtex6`*:
++
+--------------------------------------------------------
+ocpidev utilization worker myworker --hdl-target virtex6
+--------------------------------------------------------
++
+. Inside the *`assets`* project's *`components`* library, show
+FPGA resource usage information for the *`complex_mixer`* HDL worker in the *`dsp_comps`*
+component library using build results from all platforms:
++
+--------------------------------------------------------
+ocpidev utilization worker complex_mixer.hdl -l dsp_comps
+--------------------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-component.1.html[ocpidev-component(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-library.1.html[ocpidev-library(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

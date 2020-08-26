@@ -1,0 +1,682 @@
+.\"     Title: ocpidev-subdevice
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/14/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-SUBDEVICE" "1" "07/14/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-subdevice \- manage an OpenCPI HDL subdevice worker\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl subdevice\fR \fI<name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBhdl subdevice\fR noun represents an OpenCPI HDL subdevice worker, which is a special type of HDL application worker that supports a device worker defined in another library The \fIOpenCPI Platform Development Guide\fR fprovides details on how to develop an HDL subdevice worker\&.
+.sp
+An HDL subdevice worker is described by an OpenCPI Worker Description (OWD), which is an XML file that specifies the component that the worker implements, the language used for its source code, and any additional property and port information that fine\-tunes the component specification (OCS) for the worker\&. XXXX TBD EDIT THIS FOR DEVICE WORKER XXXXX
+.sp
+In a project, an HDL subdevice worker generally resides in its own directory within an HDL device library\&. XXXXX TBD EDIT FOR HDL SUBDEVICE WORKER XXXXX
+.sp
+Verbs that can operate on an HDL subdevice worker are:
+.sp
+XXXXX TBD \- UPDATE ALL BELOW FOR HDL SUBDEVICE WORKER \- XXXXXX
+.PP
+\fBbuild\fR
+.RS 4
+Compile the worker source code, creating files and directories as required\&. A single worker implementation generally exists in its own directory and when compiled, results in a single
+\fIartifact\fR
+(a binary executable compiled from the worker), although some authoring models (for example, RCC) allow multiple workers to be built as a single artifact\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Remove all generated and compiled files for the worker\&.
+.RE
+.PP
+\fBcreate\fR
+.RS 4
+Create the named worker, creating files and directories as required\&. The worker is created in a directory
+\fI<name>\fR\fB\&.\fR\fI<authoring\-model\-suffix>\fR
+under the current working directory where
+\fBocpidev\fR
+is executed\&. The general\-purpose option
+\fB\-d\fR
+\fI<directory>\fR
+can be used to create the worker under a different directory\&. Note that multiple workers that implement the same component must have different names and at least one of the names must be different from the name implied by the component specification\&.
+.RE
+.PP
+\fBdelete\fR
+.RS 4
+Remove all directories and files associated with the named worker\&.
+.RE
+.PP
+\fBshow\fR
+.RS 4
+Display information about the worker\&.
+.RE
+.PP
+\fButilization\fR
+.RS 4
+Display information about FPGA resource use by an HDL worker\&.
+.RE
+.sp
+Within the worker\(cqs directory are the worker\(cqs "make" file (named Makefile), its OWD (named \fI<name>\fR\fB\&.xml\fR) and its primary source code file (named \fI<name>\fR\fB\&.\fR\fI<auth\-model\-language\-suffix>\fR, for example, \fB\&.c\fR, \fB\&.cc\fR or \fBvhd\fR)\&. The \fBocpidev create\fR operation produces initial versions of these files that can then be edited as necessary to produce the worker implementation\&.
+.sp
+The \fBocpidev build\fR operation creates additional files in a worker\(cqs directory, such as architecture\-independent source code and XML files, in a directory named \fBgen\fR and architecture\-specific object and binary files for the compilation target being built, in a directory named \fBtarget\-\fR\fI<platform>\fR; for example, \fBtarget\-centos7\fR or \fBtarget\-xsim\fR\&. These are the files that the \fBocpidev clean\fR operation removes\&.
+.sp
+For general information on how to develop a worker, see the chapters "Introduction to Worker Development" and "Developing Workers" in the \fIOpenCPI Component Development Guide\fR\&. For detailed information on the OpenCPI authoring models and how to use them to develop worker source code, see the \fIOpenCPI RCC Development Guide\fR, the \fIOpenCPI HDL Development Guide\fR, and the \fIOpenCPI OpenCL Development Guide\fR (OpenCL is currently an experimental authoring model)\&.
+.sp
+Note that an asset\(cqs name is implied by the directory you\(cqre in when you issue the \fBocpidev\fR command\&. For workers, this means that you can perform operations (verbs) on the worker without having to specify its name when you issue the \fBocpidev\fR command from inside the worker directory\&.
+.sp
+The \fBocpidev\fR tool can also operate on a plural \fBworkers\fR noun\&. The syntax is:
+.sp
+\fBocpidev\fR [\fI<options>\fR] [\fBshow\fR|\fButilization\fR] \fBworkers\fR
+.sp
+The verbs that can be performed on the \fBworkers\fR noun are:
+.PP
+\fBshow\fR
+.RS 4
+Display information about all workers in any registered projects\&. The general\-purpose options and the
+\fBshow\fR
+formatting options can be specified\&.
+.RE
+.PP
+\fButilization\fR
+.RS 4
+Display information about FPGA resource use for all built HDL workers in a project or library\&. The general\-purpose options and the
+\fButilization\fR
+options can be specified\&.
+.RE
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.sp
+Keywords for platforms supported by OpenCPI that can be specified in the \fI<platform>\fR argument to an option can be found in the tables of supported platforms in the \fIOpenCPI User Guide\fR\&.
+.sp
+Keywords for architectures supported by OpenCPI that can be specified in the \fI<target>\fR argument to an option include \fBisim\fR, \fBmodelsim\fR, \fBxsim\fR, \fBstratix4\fR, \fBstratix5\fR, \fBvirtex5\fR, \fBvirtex6\fR, \fBzynq\fR, \fBzynq_is\fR, \fBspartan3adsp\fR\&.
+.SS "Options That Apply to All Operations (Verbs) on Workers"
+.PP
+\fB\-\-hdl\-library=\fR\fI<hdl\-library>\fR
+.RS 4
+Specify the HDL library in which to operate on the worker\&. HDL libraries exist underneath the
+\fBhdl/\fR
+directory located at the top level of a project\&.
+.RE
+.PP
+\fB\-\-library=\fR\fI<component\-library>\fR, \fB\-l\fR \fI<component\-library>\fR
+.RS 4
+Specify the component library in which to operate on the worker\&. When a project contains multiple component libraries, this option can be used to specify one of them\&. Multiple component libraries are located underneath the
+\fBcomponents\fR
+directory at the top level of a project\&.
+.RE
+.PP
+\fB\-d\fR \fI<directory>\fR
+.RS 4
+Specify the directory in which the command should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-verbose\fR
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Options When Creating Workers"
+.PP
+\fB\-\-exclude\-platform=\fR\fI<platform>\fR, \fB\-Q\fR \fI<platform>\fR+
+.RS 4
+Do not build the worker for the specified platform\&. See also the description of the
+\fBExcludePlatforms=\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-\-only\-platform=\fR\fI<platform>\fR, \fB\-G\fR \fI<platform>\fR+
+.RS 4
+Only build the worker for the specified platform\&. See also the description of the
+\fBOnlyPlatforms\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-A\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for XML include files\&.
+.RE
+.PP
+\fB\-I\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for include files (C, C++, Verilog)\&.
+.RE
+.PP
+\fB\-L\fR \fI<language>\fR
+.RS 4
+Specify the source language for the worker being created\&. By default, the worker is created for the default language for the authoring model, which must be C or C++ for RCC workers and VHDL for HDL workers\&.
+.RE
+.PP
+\fB\-O\fR \fI<file>\fR+
+.RS 4
+Specify a source code file to compile when building the worker that is not included by default; that is, in addition to the
+\fI<name>\fR\fB\&.\fR\fI<authoring\-language\-suffix>\fR
+file\&.
+.RE
+.PP
+\fB\-P\fR \fI<hdl\-platform>\fR
+.RS 4
+Specify that the worker should be created in the
+\fBdevices\fR
+library for the specified HDL platform in the project\&. This option is intended for use when creating a platform\-specific device worker or device proxy\&. A
+\fBdevices\fR
+library is located in
+\fI<project>\fR\fB/hdl/platforms/\fR\fI<hdl\-platform>\fR\fB/devices/\fR\&. For example,
+\fBhdl/platforms/matchstiq_z1/devices\fR\&.
+.RE
+.PP
+\fB\-S\fR \fI<component\-spec>\fR
+.RS 4
+Specify the component spec (OCS) that the worker implements\&. The default is
+\fI<name>\fR\fB\-spec\fR
+or
+\fI<name>\fR\fB_spec\fR
+depending on what
+\fBocpidev\fR
+finds in the
+\fBspecs\fR
+directory of the library or project (or libraries specified with the
+\fB\-y\fR
+option or other projects specified by the
+\fB\-D\fR
+option when the project that contains the worker was created)\&.
+.RE
+.PP
+\fB\-T\fR \fI<target>\fR+
+.RS 4
+Only build the worker for the specified architecture\&. See also the description of the
+\fBOnlyTargets\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-Y\fR \fI<primitive\-library>\fR+
+.RS 4
+Specify a primitive library on which the worker depends\&.
+.RE
+.PP
+\fB\-Z\fR \fI<target>\fR+
+.RS 4
+Do not build the worker for the specified architecture\&. See also the description of the
+\fBExcludeTargets\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Keep files and directories created after a worker creation fails\&. Normally, all such files and directories are removed on any failure\&.
+.RE
+.PP
+\fB\-y\fR \fI<component\-library>\fR+
+.RS 4
+Specify a component library to search for workers, devices and/or specs that this worker references\&.
+.RE
+.SS "Options When Creating RCC Workers"
+.PP
+\fB\-R\fR \fI<prereq\-library>\fR+
+.RS 4
+Specify a library on which the worker depends and to which it should be statically linked\&.
+.RE
+.PP
+\fB\-W\fR \fI<worker>\fR+
+.RS 4
+Specify one of multiple workers implemented in this RCC worker\(cqs directory when a single RCC worker directory is creating a multi\-worker artifact\&. This option is supported but is rarely required or used\&.
+.RE
+.PP
+\fB\-V\fR \fI<worker>\fR
+.RS 4
+Specify a slave worker for which the worker being created is a proxy\&.
+.RE
+.PP
+\fB\-r\fR \fI<prereq\-library>\fR+
+.RS 4
+Specify a library on which the worker depends and to which it should be dynamically linked\&.
+.RE
+.SS "Options When Creating HDL Workers"
+.PP
+\fB\-C\fR \fI<core>\fR+
+.RS 4
+Specify an HDL primitive core on which the worker depends and with which it should be built\&.
+.RE
+.SS "Options When Deleting Workers"
+.PP
+\fB\-f\fR
+.RS 4
+Force deletion: do not ask for confirmation when deleting a worker\&. Normally, you are asked to confirm a deletion\&.
+.RE
+.SS "Options When Building RCC Workers"
+.PP
+\fB\-\-hdl\-rcc\-platform=\fR\fI<platform>\fR+
+.RS 4
+Build RCC/ACI assets for the RCC platforms associated with the specified HDL platform\&. If this option is not used (and
+\fB\-\-rcc\-platform\fR
+\fI<platform>\fR
+is also not used), the current development software platform is used as the single RCC platform used for building\&.
+.RE
+.PP
+\fB\-\-rcc\-platform=\fR\fI<platform>\fR+
+.RS 4
+Build RCC/ACI assets for the specified RCC platform\&. If this option is not used (and
+\fB\-\-hdl\-rcc\-platform\fR
+\fI<platform>\fR
+is also not used), the current development software platform is used as the single RCC platform used for building\&.
+.RE
+.SS "Options When Showing Workers"
+.PP
+\fB\-\-global\-scope\fR
+.RS 4
+Show workers from all registered projects and the current project if applicable\&. This is the default scope used if
+\fB\-local\-scope\fR
+is not used\&.
+.RE
+.PP
+\fB\-\-json\fR
+.RS 4
+Format the output in JavaScript Object Notation (JSON) format for integration with other software\&.
+.RE
+.PP
+\fB\-\-local\-scope\fR
+.RS 4
+Only show workers in the local project\&.
+.RE
+.PP
+\fB\-\-simple\fR
+.RS 4
+Format the output as simply as possible\&.
+.RE
+.PP
+\fB\-\-table\fR
+.RS 4
+Display the output in an easy\-to\-read table\&. This is the default display format used if
+\fB\-\-simple\fR
+or
+\fB\-\-json\fR
+are not used\&.
+.RE
+.PP
+\fB\-P\fR \fI<hdl\-platform\-directory>\fR
+.RS 4
+Specify the HDL platform subdirectory in which to operate\&.
+.RE
+.SS "Options When Using Utilization on HDL Workers"
+.PP
+\fB\-\-format=\fR{\fBtable\fR|\fBlatex\fR}
+.RS 4
+Specify the format in which to output the FPGA resource usage information\&. Specifying
+\fBtable\fR
+sends the information to
+\fBstdout\fR
+in tabular format\&. Specifying
+\fBlatex\fR
+bypasses
+\fBstdout\fR
+and writes all output to
+\fButilization\&.inc\fR
+files in the directories for the assets on which it operates\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<platform>\fR+
+.RS 4
+Specify the buildable HDL platform for which to display FPGA resource usage information for the worker(s)\&.
+.RE
+.PP
+\fB\-\-hdl\-target=\fR\fI<target>\fR+
+.RS 4
+Specify the buildable HDL architecture for which to display FPGA resource usage information for the worker(s)\&.
+.RE
+.PP
+\fB\-P\fR \fI<hdl\-platform\-directory>\fR
+.RS 4
+Specify the HDL platform subdirectory in which to operate on the worker(s)\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Create an HDL worker named
+\fBmyworker\fR
+that implements the component named
+\fBmycomp\fR\&. (If the worker is named
+\fBmycomp\fR, you can omit the
+\fB\-S\fR
+option because the default component spec name is
+\fI<worker\-name>\fR\fB\-spec\&.xml\fR)\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create worker myworker\&.hdl \-S mycomp\-spec
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Create a C++ RCC worker named
+\fBmycomp\fR
+that implements the
+\fBmycomp\fR
+spec:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create worker mycomp\&.rcc \-L c++
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+In the worker\(cqs directory, compile the worker\(cqs source code:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build worker
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+In the project that contains the worker, compile the source code for the RCC worker named
+\fBmyworker\fR
+for the centOS7 platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build worker myworker\&.rcc \-\-rcc\-platform=centos7
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+In the project that contains the worker, compile the source code for the RCC worker named
+\fBmyworker\fR
+for the RCC platform side of the Zynq SoC chip family:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build worker myworker\&.rcc \-\-hdl\-rcc\-platform=zynq
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 6.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  6." 4.2
+.\}
+Inside the worker\(cqs directory, remove the compiled worker source code for the worker named
+\fBmyworker\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev clean worker
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 7.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  7." 4.2
+.\}
+Display information about the current worker:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show worker
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 8.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  8." 4.2
+.\}
+Display information about all workers in all registered projects:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show workers
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 9.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  9." 4.2
+.\}
+Show FPGA resource usage information for a single HDL worker
+\fBmyworker\fR
+using build results from all platforms:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization worker myworker
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'10.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "10." 4.2
+.\}
+Show FPGA resource usage information for a single HDL worker
+\fBmyworker\fR
+using build results from the
+\fBxsim\fR
+platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization worker myworker \-\-hdl\-platform xsim
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'11.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "11." 4.2
+.\}
+Show FPGA resource usage information for all HDL workers in the current project or library:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization workers
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'12.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "12." 4.2
+.\}
+Show FPGA resource usage information for a single HDL worker named
+\fBmyworker\fR
+using build results from the HDL target named
+\fBvirtex6\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization worker myworker \-\-hdl\-target virtex6
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'13.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "13." 4.2
+.\}
+Inside the
+\fBassets\fR
+project\(cqs
+\fBcomponents\fR
+library, show FPGA resource usage information for the
+\fBcomplex_mixer\fR
+HDL worker in the
+\fBdsp_comps\fR
+component library using build results from all platforms:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization worker complex_mixer\&.hdl \-l dsp_comps
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-application(1) ocpidev\-build(1) ocpidev\-clean(1) ocpidev\-component(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-library(1) ocpidev\-platform(1) ocpidev\-primitive(1) ocpidev\-project(1) ocpidev\-show(1) ocpidev\-utilization(1) ocpidev\-worker(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

@@ -1,4 +1,4 @@
-<HdlDevice language="vhdl">
+<HdlDevice language="vhdl" libraries='util'>
   <ComponentSpec nocontrol="true"/>
 
   <!-- Parameters:  per modes in Table 48 and Table 50 in reference manual and Table 11 in the 

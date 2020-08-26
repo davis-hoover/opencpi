@@ -19,7 +19,7 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable is not set correctly.))
 Containers= \
 	cnt_0rx_1tx_bypassasm_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_0rx_1tx_bypassasm_fmcomms_2_3_lpc_LVDS_zed \
+	cnt_nopfcfg_0rx_1tx_fmcomms_2_3_lpc_bypassasm_zed \
 	cnt_0rx_1tx_bypassasm_matchstiq_z1 \
 	cnt_0rx_1tx_bypassasm_zipper_hpc_ml605 \
 	cnt_0rx_1tx_bypassasm_zipper_hsmc_a_alst4 \
@@ -28,7 +28,7 @@ Containers= \
 	cnt_0rx_1tx_bypassasm_zipper_lpc_zed \
 	cnt_1rx_0tx_bypassasm_fmcomms_2_3_hpc_LVDS_ml605 \
 	cnt_1rx_0tx_bypassasm_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_1rx_0tx_bypassasm_fmcomms_2_3_lpc_LVDS_zed \
+	cnt_nopfcfg_1rx_0tx_fmcomms_2_3_lpc_bypassasm_zed \
 	cnt_1rx_0tx_bypassasm_matchstiq_z1 \
 	cnt_1rx_0tx_bypassasm_zipper_hpc_ml605 \
 	cnt_1rx_0tx_bypassasm_zipper_hsmc_a_alst4 \
@@ -36,14 +36,14 @@ Containers= \
 	cnt_1rx_0tx_bypassasm_zipper_lpc_ml605 \
 	cnt_1rx_0tx_bypassasm_zipper_lpc_zed \
 	cnt_1rx_1tx_bypassasm_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_1rx_1tx_bypassasm_fmcomms_2_3_lpc_LVDS_zed \
+	cnt_nopfcfg_1rx_1tx_fmcomms_2_3_lpc_bypassasm_zed \
 	cnt_1rx_1tx_bypassasm_matchstiq_z1 \
 	cnt_1rx_1tx_bypassasm_zipper_hpc_ml605 \
 	cnt_1rx_1tx_bypassasm_zipper_hsmc_a_alst4 \
 	cnt_1rx_1tx_bypassasm_zipper_hsmc_b_alst4 \
 	cnt_1rx_1tx_bypassasm_zipper_lpc_ml605 \
 	cnt_1rx_1tx_bypassasm_zipper_lpc_zed \
-	cnt_2rx_2tx_bypassasm_fmcomms_2_3_lpc_LVDS_zed \
+	cnt_nopfcfg_2rx_2tx_fmcomms_2_3_lpc_bypassasm_zed \
 	cnt_hsmc_alst4_debug_header_breakout_card_hsmc_alst4_a \
 	cnt_hsmc_alst4_debug_header_breakout_card_hsmc_alst4_b \
 	cnt_hsmc_loopback_card_hsmc_alst4_a_hsmc_alst4_b.xml

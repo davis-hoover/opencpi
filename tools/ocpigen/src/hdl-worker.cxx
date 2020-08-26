@@ -875,8 +875,18 @@ emitVhdlPropMember(FILE *f, OU::Property &pr, unsigned maxPropName, bool in2work
     emitVhdlPropMemberData(f, pr, maxPropName);
 }
 
-void
+void Worker::
 emitVhdlLibraries(FILE *f) {
+#if 1
+  //assert(mappedLibraries == NULL && libraries == NULL);
+  // New way:
+  bool first = true;
+  for (auto it = m_build.m_checkedLibraries.begin();
+       it != m_build.m_checkedLibraries.end(); ++it, first = false)
+    fprintf(f, "%s %s", first ? "library" : ",", strrchr(it->c_str(),':')+1);
+  if (!first)
+    fprintf(f, ";\n");
+#else
   if ((libraries && libraries[0])
 #if 1
       || (mappedLibraries && mappedLibraries[0])
@@ -898,6 +908,7 @@ emitVhdlLibraries(FILE *f) {
     }
     fprintf(f, ";\n");
   }
+#endif
 }
 
 const char *Worker::
@@ -1301,14 +1312,27 @@ emitVhdlEnts() {
   return NULL;
 }
 
-
 void Worker::
 emitVhdlShell(FILE *f) {
   fprintf(f,
 	  "library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;\n"
 	  "library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions\n"
+	  "library cdc; use cdc.all;\n"
 	  "architecture rtl of %s_rv--__\n  is\n",
 	  m_implName);
+  std::string dataClockCDCs; // instantiations for the CDCs for per-clock reset and is_operating, if any
+  if (m_type != Container) {
+    fprintf(f,"  constant num_reset_cycles     : natural := 17;\n");
+    for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
+      const Clock *clk = *ci; // set to NULL when used for a port
+      if (clk != m_wciClock)
+	for (unsigned i = 0; i < m_ports.size(); i++)
+	  if (m_ports[i]->isData() && m_ports[i]->m_clock == clk) {
+	    clk->emitDataClockCDCs(f, *m_wciClock, dataClockCDCs);
+	    break;
+	  }
+    }
+  }
   if (!m_wci) {
     // with no control interface we have to directly generate wci_reset and wci_is_operating
     fprintf(f,
@@ -1392,6 +1416,7 @@ emitVhdlShell(FILE *f) {
 	      "             props_to_worker   => props_to_worker");
     fprintf(f, ");\n");
   }
+  fprintf(f, "%s", dataClockCDCs.c_str());
   for (unsigned i = 0; i < m_ports.size(); i++)
     m_ports[i]->emitVhdlShell(f, m_wci);
   fprintf(f,

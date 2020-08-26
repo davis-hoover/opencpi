@@ -519,7 +519,8 @@ finalizeProperties() {
 #endif
   // Ensure all parameters are in all paramConfigs, since some may have been added.
   for (unsigned n = 0; n < m_paramConfigs.size(); n++)
-    m_paramConfigs[n]->doDefaults();
+    if (m_paramConfigs[n])
+      m_paramConfigs[n]->doDefaults();
   return NULL;
 }
 
@@ -829,17 +830,17 @@ create(const char *file, const std::string &parentFile, const char *package, con
   }
   Worker *w;
   if (!strcasecmp("HdlPlatform", name))
-    w = HdlPlatform::create(xml, xfile, parent, err);
+    w = HdlPlatform::create(xml, xfile, parentFile, parent, err);
   else if (!strcasecmp("HdlConfig", name))
-    w = HdlConfig::create(xml, NULL, xfile, parent, err);
+    w = HdlConfig::create(xml, NULL, xfile, parentFile, parent, err);
   else if (!strcasecmp("HdlContainer", name))
-    w = HdlContainer::create(xml, xfile, err);
+    w = HdlContainer::create(xml, xfile, parentFile, err);
   else if (!strcasecmp("HdlAssembly", name))
-    w = HdlAssembly::create(xml, xfile, parent, err);
+    w = HdlAssembly::create(xml, xfile, parentFile, parent, err);
   else if (!strcasecmp("HdlDevice", name)) {
-    w = HdlDevice::create(xml, xfile, NULL, parent, instancePVs, err);
+    w = HdlDevice::create(xml, xfile, parentFile, parent, instancePVs, err);
   } else if (!strcasecmp("RccAssembly", name))
-    w = RccAssembly::create(xml, xfile, err);
+    w = RccAssembly::create(xml, xfile, parentFile, err);
   else if ((w = new Worker(xml, xfile, parentFile, Worker::Application, parent, instancePVs,
                            err)) && !err) {
     if (!strcasecmp("RccImplementation", name) || !strcasecmp("RccWorker", name))
@@ -860,7 +861,7 @@ create(const char *file, const std::string &parentFile, const char *package, con
       err = OU::esprintf("Unrecognized top level tag: \"%s\" in file \"%s\"", name, xfile);
   }
   if (err ||
-      (err = w->setParamConfig(instancePVs, paramConfig, &parentFile)) ||
+      (err = w->setParamConfig(instancePVs, paramConfig, parentFile)) ||
       // Resolving expressions finalizes data ports, which may add built-in properties for ports
       (err = w->resolveExpressions(*w)) ||
       (err = w->finalizeProperties()) ||
@@ -870,14 +871,18 @@ create(const char *file, const std::string &parentFile, const char *package, con
   } else {
     w->m_outDir = outDir;
     if (w->m_library) {
+      Worker *top = w; // surprising that we do not have this.
+      while (top->m_parent)
+	top = top->m_parent;
       std::string lib(w->m_library);
       w->addParamConfigSuffix(lib);
-      addLibMap(lib.c_str());
+      top->m_build.m_checkedLibraries.push_back(":" + lib); // no path here
     }
   }
   return w;
 }
 
+#if 0
 // TODO: Move to vector
 static unsigned nLibraries;
 const char **libraries;
@@ -941,7 +946,7 @@ findLibMap(const char *file) {
   }
   return NULL;
 }
-
+#endif
 Control::
 Control()
   : sizeOfConfigSpace(0), controlOps(0), offset(0), ordinal(0), firstRaw(NULL),
@@ -1011,7 +1016,7 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     m_emulate(NULL), m_emulator(NULL), m_library(NULL), m_outer(false),
     m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_build(*this),
     m_paramConfig(NULL), m_parent(parent), m_scalable(false), m_requiredWorkGroupSize(0),
-    m_maxLevel(0), m_dynamic(false), m_isSlave(false)
+    m_maxLevel(0), m_dynamic(false), m_isSlave(false), m_isOptional(false)
 {
   if ((err = getNames(xml, xfile, NULL, m_name, m_fileName)))
     return;
@@ -1054,8 +1059,10 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     }
     if ((m_library = ezxml_cattr(xml, "library")))
       ocpiDebug("m_library set from xml attr: %s", m_library);
+#if 0
     else if (xfile && (m_library = findLibMap(xfile)))
       ocpiDebug("m_library set from map from file %s: %s", xfile, m_library);
+#endif
     else if (m_parent && (m_library = m_implName))
       ocpiDebug("m_library set from worker name: %s parent: %s", m_implName, parent->m_implName);
     else
@@ -1088,15 +1095,13 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
   }
   // This is a convenient way to specify XML include dirs in component libraries
   // This will be parsed again for build/Makefile purposes.
-  for (OU::TokenIter ti(ezxml_cattr(xml, "componentlibraries")); ti.token(); ti.next()) {
-    std::string inc;
-    if ((err = getComponentLibrary(ti.token(), inc)))
-      return;
-    if (m_model != HdlModel)
-      addInclude(inc + "/hdl"); // for proxies accessing hdl
-    addInclude(inc + "/" + m_modelString);
-    addInclude(inc);
-  }
+  // THIS MUST BE IN SYNC WITH THE gnumake VERSION in util.mk! Ugh.
+  OrderedStringSet dirs;
+  if ((err = getComponentLibraries(ezxml_cattr(xml, "componentlibraries"), m_modelString, true,
+				   dirs)))
+    return;
+  for (auto it = dirs.begin(); it != dirs.end(); ++it)
+    addInclude(*it);
   err = m_build.parse(xml);
 }
 
@@ -1256,6 +1261,7 @@ deriveOCP() {
   const char *err;
   for (unsigned i = 0; i < m_ports.size(); i++) {
     Port *p = m_ports[i];
+    // FIXME? why can't we derive OCP here on a cloned port>?
     if (p->isOCP() && !p->isCloned() && (err = p->deriveOCP()))
       return err;
   }

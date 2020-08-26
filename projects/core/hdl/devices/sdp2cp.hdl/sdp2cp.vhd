@@ -34,7 +34,7 @@
 library IEEE, ocpi, sdp, platform;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all, ocpi.types.all,
   sdp.sdp.all, ocpi.util.all, platform.platform_pkg.all;
-architecture rtl of sdp2cp_rv is
+architecture rtl of sdp2cp_worker is
   constant addr_shift   : natural := natural(log2(real(datum_bytes/4)));
   constant hi_dw        : natural := to_integer(sdp_width) - 1;
   type address_state_t is (a_idle_e,   -- nothing is happening
@@ -90,7 +90,7 @@ begin
   cp_out.address <= addr_r;
   cp_out.byte_en <= be_r;
   cp_out.data    <= slv(tag_r, dword_size) when its(in_read_r) else
-                    s2c_dwords_r(hi_dw) when a_state_r = a_last_e and in_64_r else
+                    s2c_dwords_r(1) when a_state_r = a_last_e and in_64_r and sdp_width > 1 else
                     s2c_dwords_r(0);
   -- take read data from the CP if it will be accepted by the SDP. We don't pipeline
   cp_out.take    <= to_bool(cp_in.valid and

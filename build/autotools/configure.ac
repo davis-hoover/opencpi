@@ -18,7 +18,7 @@ dnl along with this program. If not, see <http://www.gnu.org/licenses/>.
 dnl
 dnl ================================================================================
 dnl Naming conventions:
-dnl  AC_DEFINE variables are CPP macro names and are thus in uppoer case
+dnl  AC_DEFINE variables are CPP macro names and are thus in upper case
 dnl  Other variables here in upper case are environment variables which we generally avoid
 dnl  Variables in camel case come from OpenCPI (platform variables)
 dnl  Variables in lower case with underscores are variables we define and use here or Makefile.am
@@ -27,11 +27,11 @@ dnl ============================================================================
 dnl 0. Set constants for the software, and autoconf (not auto-discovered values)
 dnl ================================================================================
 dnl If changing version number here, also get minor/patchlevel below:
-AC_INIT([opencpi],[1.5.0],[discuss@lists.opencpi.org])
+AC_INIT([opencpi],[2.0.0],[discuss@lists.opencpi.org])
 dnl This version is what comes with centos6, which is as far back as we want to go.
 AC_PREREQ([2.63])
-AC_DEFINE([VERSION_MAJOR],1,[Major version])
-AC_DEFINE([VERSION_MINOR],5,[Minor version])
+AC_DEFINE([VERSION_MAJOR],2,[Major version])
+AC_DEFINE([VERSION_MINOR],0,[Minor version])
 AC_DEFINE([VERSION_PATCHLEVEL],0,[Patchlevel version])
 dnl Note that this is renamed by AX_PREFIX_CONFIG below
 AC_CONFIG_HEADERS([config.h])
@@ -133,8 +133,9 @@ m4_foreach_w([ocpi_var],[
   libtool_static_library_flags libtool_dynamic_library_flags libtool_plugin_library_flags
   libtool_library_flags libtool_program_flags
   common_cppflags common_cflags common_cxxflags strict_cppflags strict_cflags strict_cxxflags
-  ocpi_dynamic ocpi_library_suffix ocpi_library_flags ocpi_program_flags ocpi_swig_flags OcpiSWIG
-  PYTHON_VERSION OcpiPythonInclude
+  ocpi_dynamic ocpi_library_suffix ocpi_library_flags ocpi_program_flags ocpi_swig_flags
+  OcpiSWIG
+  PYTHON_VERSION PYTHON_LIBS
 ], [AC_SUBST(ocpi_var)])
 
 # These are needed in ocpi-config.h and ocpi-platform-config.h
@@ -166,8 +167,8 @@ AM_CONDITIONAL([ocpi_can_remove_needed],[test x"$OcpiCanRemoveNeeded" = x1])
 # Unfortunately it does not provide the sys.prefix() from the running python.
 # It sets PYTHON_PREFIX to the install location, not the current location.
 # So we find PYTHON_PREFIX when the makefiles are executed $(shell....)
-# It is python 2.6 since that is what centos6 has.
-AM_PATH_PYTHON([2.6])
+# Default to "3.4" since we are now a python3 shop.
+AM_PATH_PYTHON([3.4])
 dnl
 dnl ================================================================================
 dnl 4. Enable generation of ocpi-config.h

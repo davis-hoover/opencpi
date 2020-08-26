@@ -19,7 +19,6 @@
 -- package for letting VHDL access the verilogs in this library
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
-library util; use util.types.all;
 package util is
 component ROM
   generic (WIDTH    : natural;
@@ -72,68 +71,6 @@ component cwd_internal is
    port   (cwd    : out std_logic_vector(0 to length*8-1);
            len_err : out std_logic);
 end component cwd_internal;
-
-component TSINOUT_1 is
-  generic (DIFFERENTIAL : boolean := false);
-  port    (I  : in    std_logic;  -- OUTPUT to PIN when OE = 1
-           OE : in    std_logic;                           -- output enable, 1 = enabled
-           O  : out   std_logic;  -- INPUT from pin, all the time
-           IO : inout std_logic;  -- pin/pad
-           IOBAR : inout std_logic := 'Z');
-end component TSINOUT_1;
-
-component TSINOUT_N is
-  generic (width : natural);
-  port    (I  : in    std_logic_vector(width-1 downto 0);  -- OUTPUT to PIN when OE = 1
-           OE : in    std_logic;                           -- output enable, 1 = enabled
-           O  : out   std_logic_vector(width-1 downto 0);  -- INPUT from pin, all the time
-           IO : inout std_logic_vector(width-1 downto 0)); -- pin/pad
-end component TSINOUT_N;
-
--- instantiate vendor-specific input buffer primitive(s) (i.e., IBUF/IBUFDS/
--- IBUFG/IBUFGDS for Xilinx, ALT_INBUF/ALT_INBUF_DIFF plus optional GLOBAL for
--- Altera) and (optionally) enforce IOSTANDARD
-component BUFFER_IN_1 is
-  generic (IOSTANDARD   :     iostandard_t := UNSPECIFIED;
-           DIFFERENTIAL :     boolean; -- only used if IOSTANDARD is UNSPECIFIED
-           GLOBAL_CLOCK :     boolean       := FALSE);
-  port (   I            : in  std_logic             ;
-           IBAR         : in  std_logic     := 'X'  ; -- only used if relevant
-                                                      -- to IOSTANDARD
-           O            : out std_logic             );
-end component BUFFER_IN_1;
-
-component BUFFER_IN_N is
-  generic (width        :     natural;
-           IOSTANDARD   :     iostandard_t := UNSPECIFIED;
-           DIFFERENTIAL :     boolean; -- only used if IOSTANDARD is UNSPECIFIED
-           GLOBAL_CLOCK :     boolean       := FALSE);
-  port (   I            : in  std_logic_vector(width-1 downto 0);
-           IBAR         : in  std_logic_vector(width-1 downto 0) := (others => 'X'); -- only used if relevant to IOSTANDARD
-           O            : out std_logic_vector(width-1 downto 0));
-end component BUFFER_IN_N;
-
--- instantiate vendor-specific output buffer primitive(s) (i.e., OBUF/OBUFDS for
--- Xilinx, ALT_OUTBUF/ALT_OUTBUF_DIFF for Quartus) and (optionally) enforce
--- IOSTANDARD
-component BUFFER_OUT_1 is
-  generic (IOSTANDARD   :   iostandard_t := UNSPECIFIED;
-           DIFFERENTIAL :   boolean); -- only used if IOSTANDARD is UNSPECIFIED
-  port (   I          : in  std_logic;
-           O          : out std_logic;
-           OBAR       : out std_logic := 'X'); -- only used if relevant to
-                                               -- IOSTANDARD
-end component BUFFER_OUT_1;
-
-component BUFFER_OUT_N is
-  generic (width        :   natural;
-           IOSTANDARD   :   iostandard_t := UNSPECIFIED;
-           DIFFERENTIAL :   boolean); -- only used if IOSTANDARD is UNSPECIFIED
-  port (   I          : in  std_logic_vector(width-1 downto 0);
-           O          : out std_logic_vector(width-1 downto 0);
-           OBAR       : out std_logic_vector(width-1 downto 0) := (others =>'X')); -- only used if relevant to IOSTANDARD
-end component BUFFER_OUT_N;
-
 component SyncRegister is
   generic (
       width : positive := 1;
@@ -307,23 +244,60 @@ component clock_forward
     CLK_OUT_N : out std_logic);
 end component clock_forward;
 
-component zlm_detector is
-  port(
-    clk         : in  std_logic;  -- control plane clock
-    reset       : in  std_logic;  -- control plane reset (active-high)
-    som         : in  std_logic;  -- input port SOM
-    valid       : in  std_logic;  -- input port valid
-    eom         : in  std_logic;  -- input port EOM
-    ready       : in  std_logic;  -- input port ready
-    take        : in  std_logic;  -- input port take
-    eozlm_pulse : out std_logic;  -- pulse-per-end-of-ZLM
-    eozlm       : out std_logic); -- same as EOM but only for end of ZLMs
-end component;
-
 component in2out is
   port(
     in_port  : in std_logic;
     out_port : out std_logic);
+end component;
+
+component counter is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk      : in  std_logic;
+    rst      : in  std_logic;
+    en       : in  std_logic;
+    cnt      : out unsigned(BIT_WIDTH-1 downto 0));
+end component;
+
+component set_clr
+  port(
+    clk : in  std_logic;
+    rst : in  std_logic;
+    set : in  std_logic;
+    clr : in  std_logic;
+    q   : out std_logic;
+    q_r : out std_logic);
+end component set_clr;
+
+component lfsr
+  generic (
+    POLYNOMIAL : std_logic_vector;
+    SEED       : std_logic_vector); -- must never be all zeros
+  port (
+    CLK      : in std_logic; -- rising edge clock
+    RST      : in std_logic; -- synchronous, active high
+    EN       : in std_logic; -- synchronous, active high
+    REG      : out std_logic_vector(POLYNOMIAL'length-1 downto 0));
+end component;
+
+component reset_detector is
+  port(
+    clk                     : in  std_logic;
+    rst                     : in  std_logic;
+    clr                     : in  std_logic;  -- clears all rst_*
+    rst_detected            : out std_logic;  -- synchronous reset detected
+    rst_then_unrst_detected : out std_logic); -- synchronous reset, followed by
+                                              -- a synchronous unreset, detected
+end component;
+
+component edge_detector is
+  port(
+    clk               : in  std_logic;  -- input clock
+    reset             : in  std_logic;  -- reset (active-high)
+    din               : in  std_logic;  -- input
+    rising_pulse      : out std_logic;  -- rising edge pulse
+    falling_pulse     : out std_logic); -- falling edge pulse
 end component;
 
 end package util;

@@ -1,0 +1,74 @@
+OCPIDEV-REFRESH(1)
+================
+
+
+NAME
+----
+ocpidev-refresh - manually refresh an OpenCPI project's metadata.
+
+
+SYNOPSIS
+--------
+*ocpidev* ['<options>'] *refresh project*
+
+
+DESCRIPTION
+-----------
+Projects have some metadata associated with them.
+This metadata is used by *ocpidev show* and can be used
+by other programs to interface with projects.
+If *ocpidev* is used throughout the use of the project,
+the project metadata is automatically updated.
+The *refresh* verb is only required if
+something outside of *ocpidev* operates on the project.  
+
+Asset types to be specified in the '<noun>' argument are:
+
+*project*::
+    Refresh the current project's metadata.
+
+OPTIONS
+-------
+There are no verb-specific options for *refresh*.
+
+EXAMPLES
+--------
+. Manually regenerate the project's metadata:
++
+----------------------
+ocpidev refresh project
+----------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-set.1.html[ocpidev-set(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-unset.1.html[ocpidev-unset(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+

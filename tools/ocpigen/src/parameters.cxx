@@ -538,7 +538,7 @@ equal(ParamConfig &other) {
 }
 
 const char *Worker::
-parseBuildFile(bool optional, bool *missing, const std::string *parent) {
+parseBuildFile(bool optional, bool *missing, const std::string &parent) {
   const char *err;
   std::string fname;
   if (missing)
@@ -573,8 +573,7 @@ parseBuildFile(bool optional, bool *missing, const std::string *parent) {
   }
   ezxml_t x;
   std::string xfile;
-  std::string empty;
-  if ((err = parseFile(fname.c_str(), parent ? *parent : empty, "build", &x, xfile, false, true, optional)))
+  if ((err = parseFile(fname.c_str(), parent, "build", &x, xfile, false, true, optional)))
     return err;
   if ((err = parseBuildXml(x, xfile)))
     return OU::esprintf("when processing build file \"%s\": %s", xfile.c_str(), err);
@@ -670,7 +669,7 @@ addConfig(ParamConfig &info, bool fromXml) {
   // Check that the configuration we have is not already in the existing file
   ocpiDebug("Possibly adding parameter config. n=%zu", m_paramConfigs.size());
   for (unsigned n = 0; n < m_paramConfigs.size(); n++)
-    if (m_paramConfigs[n]->equal(info)) {
+    if (m_paramConfigs[n] && m_paramConfigs[n]->equal(info)) {
       // Mark the old config as used so it will be written to the Makefile
       m_paramConfigs[n]->used = true;
       ocpiInfo("Parameter config %zu is skipped since it is identical to config %u",
@@ -784,11 +783,12 @@ writeParamFiles(FILE *mkFile, FILE *xmlFile) {
   m_build.writeMakeVars(mkFile);
   fprintf(mkFile, "ParamConfigurations:=");
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
-    if (m_paramConfigs[n]->used)
+    if (m_paramConfigs[n] && m_paramConfigs[n]->used)
       fprintf(mkFile, "%s%zu", n ? " " : "", n);
   fprintf(mkFile, "\nWorkerName_%s:=%s\n", m_fileName.c_str(), m_implName);
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
-    m_paramConfigs[n]->write(xmlFile, mkFile);
+    if (m_paramConfigs[n])
+      m_paramConfigs[n]->write(xmlFile, mkFile);
   if (xmlFile)
     fprintf(xmlFile, "</build>\n");
   ocpiDebug("xmlFile closing %p mkFile closing %p", xmlFile, mkFile);
@@ -818,7 +818,7 @@ emitToolParameters() {
     startBuildXml(f);
     return emitMakefile(f);
   }
-  if ((m_paramConfigs.size() == 0 && (err = parseBuildFile(true))) ||
+  if ((m_paramConfigs.size() == 0 && (err = parseBuildFile(true, NULL, m_parentFile))) ||
       (err = parseRawParams(x)) ||
       (err = openOutput(m_fileName.c_str(), m_outDir, "", "", ".mk", NULL, mkFile)))
     return err;
@@ -883,11 +883,12 @@ const char *Worker::
 emitMakefile(FILE *xmlFile) {
   const char *err;
   FILE *mkFile;
-  if ((!m_emulate && (err = parseBuildFile(false))) ||
+  if ((!m_emulate && (err = parseBuildFile(false, NULL, m_parentFile))) ||
       (err = openOutput(m_fileName.c_str(), m_outDir, "", "", ".mk", NULL, mkFile)))
     return err;
   for (size_t n = 0; n < m_paramConfigs.size(); n++)
-    m_paramConfigs[n]->used = true;
+    if (m_paramConfigs[n])
+      m_paramConfigs[n]->used = true;
   return writeParamFiles(mkFile, xmlFile);
 }
 // Based on worker xml, read the <worker>-build.xml, and emit the generics file
@@ -896,8 +897,7 @@ emitHDLConstants(size_t config, bool other) {
   const char *err;
   FILE *f;
   Language lang = other ? (m_language == VHDL ? Verilog : VHDL) : m_language;
-  if (//(err = parseBuildFile(false)) ||
-      (err = openOutput("generics", m_outDir, "", "", lang == VHDL ? VHD : ".vh", NULL, f)))
+  if ((err = openOutput("generics", m_outDir, "", "", lang == VHDL ? VHD : ".vh", NULL, f)))
     return err;
   if (config >= m_paramConfigs.size() || m_paramConfigs[config] == NULL)
     return OU::esprintf("Invalid parameter configuration for VHDL generics: %zu", config);
@@ -915,7 +915,7 @@ emitHDLConstants(size_t config, bool other) {
 // If instancePVs is NULL, use paramconfig
 const char *Worker::
 setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
-	       const std::string *parent) {
+	       const std::string &parent) {
   const char *err;
   // So we have parameter configurations
   // FIXME: we could cache this parsing in one place, but workers can still be
@@ -1094,31 +1094,63 @@ parse(ezxml_t x, const char *buildFile) {
 #endif
     m_sourceFiles.push_back(ti.token());
   }
-  for (OU::TokenIter ti(ezxml_cattr(x, "libraries")); ti.token(); ti.next())
-    if (m != HdlModel)
-      return "Invalid \"libraries\" attribute:  worker model is not HDL";
-    else if ((err = getHdlPrimitive(ti.token(), "library", m_libraries)))
-      return err;
+  // Do not bother parsing this stuff if the worker is not the top level worker
+  // i.e. for emulatees or slaves...
+  static const char builtinLibs[] = "fixed_float ocpi ocpi.core.bsv cdc";
+#if 0
+  if (!m_worker.m_parent && m_worker.m_parentFile.empty()) {
+    for (OU::TokenIter ti(ezxml_cattr(x, "libraries")); ti.token(); ti.next())
+      if (m != HdlModel)
+	return "Invalid \"libraries\" attribute:  worker model is not HDL";
+      else if ((err = getHdlPrimitive(ti.token(), "library", m_checkedLibraries)))
+	return err;
+      else
+	m_libraries.push_back(ti.token());
+    if (m == HdlModel) {
+      for (OU::TokenIter ti(getenv("OCPI_HDL_LIBRARIES")); ti.token(); ti.next())
+	if ((err = getHdlPrimitive(ti.token(), "library", m_checkedLibraries)))
+	  return err;
+	else
+	  m_libraries.push_back(ti.token());
+      // These are not explicit, but must be available for generated code IN SYNC WITH
+      for (OU::TokenIter ti(builtinLibs); ti.token(); ti.next())
+	if ((err = getHdlPrimitive(ti.token(), "library", m_checkedLibraries)))
+	  return err;
+    }
+  } else
+#endif
+    {
+    // do less work - simply collect them with no error checking
+    for (OU::TokenIter ti(ezxml_cattr(x, "libraries")); ti.token(); ti.next())
+      m_libraries.push_back(ti.token());
+    for (OU::TokenIter ti(getenv("OCPI_HDL_LIBRARIES")); ti.token(); ti.next())
+      m_libraries.push_back(ti.token());
+    for (OU::TokenIter ti(builtinLibs); ti.token(); ti.next())
+      m_libraries.push_back(ti.token());
+    for (auto it = m_libraries.begin(); it != m_libraries.end(); ++it) {
+      const char *slash = strrchr(it->c_str(), '/');
+      std::string lib(*it + ":");
+      for (const char *cp = slash ? slash + 1 : it->c_str(); *cp; ++cp)
+	lib += *cp == '.' ? '_' : *cp;
+      m_checkedLibraries.push_back(lib);
+    }
+  }
   for (OU::TokenIter ti(ezxml_cattr(x, "cores")); ti.token(); ti.next())
     if (m != HdlModel)
       return "Invalid \"cores\" attribute:  worker model is not HDL";
     else if ((err = getHdlPrimitive(ti.token(), "core", m_cores)))
       return err;
   bool isDir;
-  // xmlincudedirs is handled specially in owd parsing for bootstrap reasons
+  // xmlincludedirs is handled specially in owd parsing for bootstrap reasons
   for (OU::TokenIter ti(ezxml_cattr(x, "includedirs")); ti.token(); ti.next()) {
     if (OS::FileSystem::exists(ti.token(), &isDir) && isDir)
       m_includeDirs.push_back(ti.token());
     else
       return OU::esprintf("The include directory: \"%s\" is not a directory", ti.token());
   }
-  for (OU::TokenIter ti(ezxml_cattr(x, "componentlibraries")); ti.token(); ti.next())
-#if 0 // note: componentlibraries can be used for other xml files like specs etc.
-    if (!m_worker.m_isSlave && !m_worker.m_emulate)
-      return OU::esprintf("componentlibraries only valid on workers with slaves or emulators");
-#endif
-    if ((err = getComponentLibrary(ti.token(), m_componentLibraries)))
-      return err;
+  if ((err = getComponentLibraries(ezxml_cattr(x, "componentlibraries"), NULL, false,
+				   m_componentLibraries)))
+    return err;
   std::string prereqs;
   if ((err = getPrereqDir(prereqs)))
     return err;
@@ -1148,7 +1180,7 @@ parse(ezxml_t x, const char *buildFile) {
 static void writeVar(FILE *f, const char *var, OrderedStringSet &vals) {
   if (vals.empty())
     return;
-  fprintf(f,"$(call OcpiCheckVars,%s)\n%s:=", var, var);
+  fprintf(f,"%s:=", var);
   for (auto i = vals.begin(); i != vals.end(); ++i)
     fprintf(f, "%s%s", i == vals.begin() ? "" : " ", (*i).c_str());
   fprintf(f, "\n");

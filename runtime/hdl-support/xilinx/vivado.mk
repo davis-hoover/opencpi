@@ -54,7 +54,7 @@
 #   options, functionality, and usage of this file and the vivado tool with
 #   OpenCPI
 
-include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
+include $(OCPI_CDK_DIR)/include/xilinx/xilinx.mk
 
 
 ################################################################################
@@ -95,7 +95,6 @@ HdlToolNeedBB_vivado=
 HdlToolCoreRef=$1
 HdlToolCoreRef_vivado=$1
 
-CoreOrLibName=$(or $(Core),$(LibName))
 ################################################################################
 # Variable required by toolset: HdlToolNeedsSourceList_<tool>=yes
 # Set if the tool requires a listing of source files and libraries
@@ -107,11 +106,17 @@ HdlToolNeedsSourceList_vivado=yes
 empty:=
 space:=$(empty) $(empty)
 
-VivadoRearrangePart=$(firstword $1)$(word 3,$1) $(word 2,$1)
-HdlFullPart_vivado=$(if $1,$(subst $(space),-,$(call VivadoRearrangePart,$(subst -, ,$1))))
+# If there is no speed or package, return the single part designator.
+# Otherwise change <die>-<speed>-<package> to <die>-<package>-<speed>[-<temp>]
+# Where <temp> is included as i or e at the end of <package>
+VivadoRearrangePart=$(strip\
+  $(if $(filter 1,$(words $1)),$1,\
+   $(foreach package,$(patsubst %e,%,$(patsubst %i,%,$(word 3,$1))),\
+     $(word 1,$1) $(package) $(word 2,$1) $(filter i e,$(patsubst %e,e,$(patsubst %i,i,$(word 3,$1)))))))
+HdlFullPart_vivado=$(and $1,$(subst $(space),-,$(call VivadoRearrangePart,$(subst -, ,$1))))
 
 ifeq ($(HdlMode),library)
-CoreOrLibName=$(LibName)
+CoreOrLibName=$(WorkLib)
 ifeq ($(Core),)
 Core=$(LibName)
 endif
@@ -169,7 +174,7 @@ VivadoBadOptions_synth=\
 $(VivadoBadOptions_all)
 
 VivadoDefaultOptions_synth=\
--part $(HdlChoosePart) \
+-part $(HdlVivadoPart) \
 $(VivadoDefaultOptions_synth_$(HdlMode))
 
 
@@ -450,6 +455,7 @@ VivadoPruneOption=\
 
 # Check our extra options, prune our options and concatenate our defaults, extras, and internals
 VivadoOptions=$(strip \
+$(and $(VerilogDefines),$(foreach d,$(VerilogDefines),-verilog_define $d)}) \
 $(call VivadoCheckOptions,$(call VivadoMyExtraOptions,$1),$1)\
 $(call VivadoPruneOption,$(VivadoDefaultOptions_$1),$1) $(call VivadoMyExtraOptions,$1) $(VivadoInternalOptions_$1))
 
@@ -466,9 +472,9 @@ VivadoIncludeDependencies=\
   $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),$(infox IncLib:$l)\
     $(call VivadoIncludeSources,\
       $(call HdlExtractSourcesForLib,$(HdlTarget),$l,$(TargetDir)),\
-      $(notdir $(call HdlRmRv,$l))))\
+      $(word 2,$(subst :, ,$l))))\
   $(call VivadoIncludeCores,$(SubCores_$(HdlTarget)),$(CoreOrLibName))\
-  $(call VivadoIncludeSources,$(foreach s,$(HdlSources),$(call FindRelative,$(TargetDir),$s)),$(CoreOrLibName))\
+  $(call VivadoIncludeSources,$(infox VIS:$(WorkLib):$(CoreOrLibName):$(Core))$(foreach s,$(HdlSources),$(call FindRelative,$(TargetDir),$s)),$(CoreOrLibName))\
   $(call VivadoIncludeIncludedirs,$(call Unique,$(patsubst %/,%,$(dir $(HdlSources)) $(VerilogIncludeDirs))),$(CoreOrLibName))\
 
 ###############################################################################
@@ -484,7 +490,7 @@ VivadoIncludeCores=\
   $(foreach c,$1,\
     echo read_edif_or_dcp $(call FindRelative,$(TargetDir),$(call HdlCoreRefMaybeTargetSpecificFile,$c,$(HdlTarget))) >> $(CoreOrLibName)-imports.tcl;\
     $(if $(filter $c,$(Cores)),\
-        echo add_files_set_lib $c '\"'$(call HdlExtractSourcesForLib,$(HdlTarget),$c,$(TargetDir))'\"' >> $(CoreOrLibName)-imports.tcl;,\
+        echo add_files_set_lib $c '\"'$(call HdlExtractSourcesForLib,$(HdlTarget),$c:$(notdir $c),$(TargetDir))'\"' >> $(CoreOrLibName)-imports.tcl;,\
       $(foreach w,$(subst _rv,,$(basename $(notdir $c))),\
         $(foreach d,$(dir $c),\
           $(foreach l,$(if $(filter vhdl,$(HdlLanguage)),vhd,v),\
@@ -497,7 +503,7 @@ VivadoIncludeCores=\
                    echo read_vhdl -library $w $(call FindRelative,$(TargetDir),$g) >> $(CoreOrLibName)-imports.tcl;))))))))
 
 # Vivado's function for including sources
-VivadoIncludeSources=$(infox IncSrcs:$1:$2)\
+VivadoIncludeSources=$(infox IncSrcs:$1:$2:$(WorkLib))\
       echo puts '\"'Assignments for $2 local source files'\"' >> $(CoreOrLibName)-imports.tcl; \
       echo add_files_set_lib $2 '\"'$1'\"' >> $(CoreOrLibName)-imports.tcl;
 
@@ -513,15 +519,24 @@ VivadoIncludeIncludedirs=\
 
 # Here we actually run the synthesis step. This is executed for primitive cores/libraries, workers, platforms, configs, assemblies, containers
 #   We call the vivado-synth.tcl script to actually perform synthesis, and we pass it information via tclargs
+ifeq ($(HdlLibraryElaboration),1)
+  override HdlNoElaboration=
+else ifndef HdlNoElaboration
+  override HdlNoElaboration=1
+endif
+
+# This old stuff is redundant error checking that is already done.
+  # $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),\
+  #    $(if $(wildcard $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X5)),,\
+  #         $(error Error: Specified library: "$l", in the "HdlLibraries" variable, was not found for $(call HdlGetFamily,$(HdlTarget)).))) \
+  # $(foreach l,$(SubCores_$(HdlTarget)),$(info AC:$l)\
+  #   $(if $(findstring $l),,$(error UNEXPECTED SUBCORE WITHOUT SLASH: $l))\
+  #   $(if $(foreach x,$(call FindRelative,.,$(if $(findstring /,$l),$l,$(call HdlCoreRef,$l,$(HdlTarget)))),$(call HdlExists,$x)),,\
+  # 	$(info Error: Specified primitive core for "$l", in the "Cores" variable, was not found.) \
+  #       $(error Error:   after looking in $(call HdlExists,$(call FindRelative,.,$(call HdlCoreRef,$c,$(HdlTarget))))))) \
+  # $(infox ALLCORE1) \
+
 HdlToolCompile=\
-  $(foreach l,$(HdlLibrariesInternal),\
-     $(if $(wildcard $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X5)),,\
-          $(error Error: Specified library: "$l", in the "HdlLibraries" variable, was not found for $(call HdlGetFamily,$(HdlTarget)).))) \
-  $(foreach l,$(SubCores_$(HdlTarget)),$(infox AC:$l)\
-    $(if $(foreach x,$(call FindRelative,.,$(if $(findstring /,$l),$l,$(call HdlCoreRef,$l,$(HdlTarget)))),$(call HdlExists,$x)),,\
-	$(info Error: Specified core library for "$l", in the "Cores" variable, was not found.) \
-        $(error Error:   after looking in $(call HdlExists,$(call FindRelative,.,$(call HdlCoreRef,$c,$(HdlTarget))))))) \
-  $(infox ALLCORE1) \
   echo '  'Creating $@ with top == $(Top)\; details in $(TargetDir)/vivado-$(Core).out.;\
   if test -f vivado.jou ; then mv -f vivado.jou vivado.jou.bak ; fi;\
   echo Doing Vivado compile ;\
@@ -533,7 +548,7 @@ HdlToolCompile=\
     artifact='$(notdir $@)' \
     hdl_mode='$(HdlMode)' \
     top_mod='$(Top)' \
-    synth_part='$(HdlChoosePart)' \
+    synth_part='$(HdlVivadoPart)' \
     synth_opts='$(call VivadoOptions,synth)' \
     edif_opts='$(VivadoEdifOptions)';)
 
@@ -649,6 +664,8 @@ HdlConstraintsSuffix_vivado=.xdc
 VivadoConstraints_default=$(HdlPlatformDir_$1)/$1$(HdlConstraintsSuffix_vivado)
 VivadoConstraints=$(or $(HdlConstraints),$(VivadoConstraints_default))
 
+HdlVivadoPart=$(foreach p,$(HdlChoosePart),$(infox HVP:$p)$(call HdlFullPart_vivado,$p))
+
 # For synth rule: load dcp files of platform and app workers.
 define HdlToolDoPlatform_vivado
 
@@ -657,7 +674,7 @@ $(call OptName,$1,$3): $(call SynthName,$1,$3) $(call VivadoConstraints,$5)
 	$(AT)$(call DoVivado,vivado-impl.tcl,$1,-tclargs \
 		stage=opt \
 		target_file=$(notdir $(call OptName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
 		edif_file=$(notdir $(call SynthName,$1,$3)) \
 		constraints='$(foreach u,$(call VivadoConstraints,$5),$(call AdjustRelative,$u))' \
 		impl_opts='$(call VivadoOptions,opt)' \
@@ -670,7 +687,7 @@ $(call PlaceName,$1,$3): $(call OptName,$1,$3)
 		stage=place \
 		target_file=$(notdir $(call PlaceName,$1,$3)) \
 		checkpoint=$(notdir $(call OptName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
 		impl_opts='$(call VivadoOptions,place)' \
 		post_place_opt=$(if $(VivadoPostPlaceOpt),true,false) \
 		phys_opt_opts='$(call VivadoOptions,post_place_phys_opt)' \
@@ -683,7 +700,7 @@ $(call RouteName,$1,$3): $(call PlaceName,$1,$3)
 		stage=route \
 		target_file=$(notdir $(call RouteName,$1,$3)) \
 		checkpoint=$(notdir $(call PlaceName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
 		impl_opts='$(call VivadoOptions,route)' \
 		post_route_opt=$(if $(VivadoPostRouteOpt),true,false) \
 		phys_opt_opts='$(call VivadoOptions,post_route_phys_opt)' \
@@ -696,7 +713,7 @@ $(call TimingName,$1,$3): $(call RouteName,$1,$3)
 		stage=timing \
 		target_file=$(notdir $(call TimingName,$1,$3)) \
 		checkpoint=$(notdir $(call RouteName,$1,$3)) \
-		part=$(HdlChoosePart) \
+		part=$(HdlVivadoPart) \
                 impl_opts='$(call VivadoOptions,timing)' \
 		,timing)
 
@@ -706,8 +723,8 @@ $(call BitName,$1,$3,$6): $(call RouteName,$1,$3) $(call TimingName,$1,$3) $(wil
 		stage=bit \
 		target_file=$(notdir $(call BitName,$1,$3,$6)) \
 		checkpoint=$(notdir $(call RouteName,$1,$3)) \
-		part=$(HdlChoosePart) \
-		constraints='$(wildcard $(HdlPlatformDir_$5)/*_bit.xdc)' \
+		part=$(HdlVivadoPart) \
+		constraints='$(call AdjustRelative,$(wildcard $(HdlPlatformDir_$5)/*_bit.xdc))' \
                 impl_opts='$(call VivadoOptions,bit)' \
 		,bit)
 

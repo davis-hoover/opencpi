@@ -85,15 +85,18 @@ class HdlConfig : public Worker, public HdlHasDevInstances {
   friend class HdlContainer;
   const HdlPlatform &m_platform;
   Plugged      m_plugged;      // what card is in each slot in this configuration
-  size_t       m_sdpWidth;
+  uint8_t      m_sdpWidth;
+  uint16_t     m_sdpLength;
 public:
   static HdlConfig *
-  create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent,
-	 const char *&err);
-  HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, Worker *parent, const char *&err);
+    create(ezxml_t xml, const char *knownPlatform, const char *xfile, const std::string &parentFile,
+	   Worker *parent, const char *&err);
+  HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &parentFile,
+	    Worker *parent, const char *&err);
   virtual ~HdlConfig();
 
   size_t sdpWidth() { return m_sdpWidth; }
+  size_t sdpLength() { return m_sdpLength; }
   const HdlPlatform &platform() { return m_platform; }
   const char
     *addControlConnection(std::string &assy),

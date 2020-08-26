@@ -27,6 +27,7 @@
 # runtime: minimal runtime (plus some tests) for the platform(s)
 # devel:   development configuration minus runtime
 # deploy:  runtime with redundant non-platform-specific files
+# doc:     generated documention, possibly including optional HTML indexing
 #
 # Basically we generate a set of directories and files for export that are
 # minimal for the export type.
@@ -105,14 +106,37 @@ function emit_project_dir {
   exit $?
 }
 
-for l in `find cdk -follow -type l`; do
-  bad=1
-  echo Dead exports link found: $l >&2
+#
+# In general, broken symlinks under "cdk" are bad news.  Warn
+# about anchored symlinks on the assumption they will resolve
+# properly in the context in which they will be dereferenced.
+# Other broken symlinks will be flagged as errors.
+#
+# Using "readlink" and looking at the first character of the
+# dereferenced symlink (to determine whether it is anchored)
+# would have been a clever approach, but otherwise valid
+# *relative* symlinks pointing to broken anchored symlinks
+# (at *least* one level of indirection) were getting flagged
+# as bad.  The current approach is to determine whether the
+# broken symlink is under a "root" directory structure such
+# as would be expected to exist for platforms.
+#
+for l in `find -L cdk -type l -print`; do
+  if [[ $l =~ '/root/' ]]
+  then
+    echo "WARNING: dead exports link found: $l" >&2
+  else
+    bad=1
+    echo "ERROR: dead exports link found: $l" >&2
+  fi
 done
 # We must allow directories that start with '-' due to a Jenkins bug: JENKINS-38706
-for l in `find -H . -type f -name "-*"`; do
+# Ignore the AV directory if present, because
+# (a) we do not care about it in this context; and
+# (b) it contains cache files that start with '-'.
+for l in `find -H . -path ./av -prune -o -type f -name "-*" -print`; do
   bad=1
-  echo Found files starting with hyphen >&2
+  echo "ERROR: found file starting with hyphen: $l" >&2
 done
 [ -n "$bad" ] && echo Errors found so no files produced >&2 && exit 1
 
@@ -177,6 +201,9 @@ case $type in
           pfound=
           [ -z "$cross" -a -d $d/bin ] && find -L $d/bin ! -type d &&
             find -L $d/bin -type d -exec echo {}/ \; && pfound=1
+	  # So far, this only applies to "gpsd".
+          [ -z "$cross" -a -d $d/sbin ] && find -L $d/sbin ! -type d &&
+            find -L $d/sbin -type d -exec echo {}/ \; && pfound=1
           [ -d $d/include ] && find -L $d/include ! -type d &&
             find -L $d/include -type d -exec echo {}/ \; && pfound=1
           # Prereq libraries are in the single lib dir for the platform
@@ -203,6 +230,8 @@ case $type in
       emit_project_dir projects/core
       emit_project_dir projects/assets
       emit_project_dir projects/assets_ts
+      emit_project_dir projects/platform
+      emit_project_dir projects/tutorial
     fi
     ;;
   driver)
@@ -216,6 +245,12 @@ case $type in
       done
     ) | sed 's/$/ driver/'
     echo driver/ driver
+    ;;
+  doc)
+    # We get out easy for docs, because everything is in one
+    # convenient place.  Directory names are expected to end
+    # in '/'.  Otherwise, simply emit the file source/dest.
+    ( cd cdk ; find -L doc -type d -exec echo {}/ \; -o -exec bash -c 'echo -n "cdk/{} " ; dirname {}' \; )
     ;;
   *) echo "Unknown export type" >&2;;
 esac

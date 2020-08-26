@@ -202,7 +202,8 @@ parseHdlImpl(const char *a_package) {
   // 1. Convert any data ports to WSI if they were not mentioned and determine if a wci clk is
   //    needed.
   for (unsigned i = 0; i < m_ports.size(); i++)
-    m_ports[i]->finalizeHdlDataPort(); // This will convert to a concrete impl type if not one yet
+    if ((err = m_ports[i]->finalizeHdlDataPort())) // This will convert to a concrete impl type if not one yet
+      return err;
   // 2. Resolve clock references between ports
   if (!m_wciClock)
     addWciClockReset();
@@ -418,6 +419,9 @@ parseSignals(ezxml_t xml, const std::string &parent, Signals &signals, SigMap &s
   }
   // process ad hoc signals
   for (ezxml_t xs = ezxml_cchild(xml, "Signal"); !err && xs; xs = ezxml_cnext(xs)) {
+    // Avoid mapping-only elements
+    if (ezxml_cattr(xs, "name") && ezxml_cattr(xs, "platform") && !ezxml_cattr(xs, "direction"))
+      continue;
     Signal *s = new Signal;
     if (!(err = s->parse(xs, w)))  {
       if (sigmap.find(s->m_name.c_str()) == sigmap.end()) {

@@ -135,7 +135,7 @@ stage(stage_name) {
     cached_checkout this, scm
     // sh """git clean -ffdx -e ".jenkins-*/" || :""" // Cleanup (see JENKINS-31924 for formula)
     previous_changesets = find_last_success()
-    def import_config = load("releng/jenkins/runtime/groovy/lib/import_config.groovy")
+    def import_config = load("releng/jenkins/runtime/groovy/shared/import_config.groovy")
     branch_config = import_config()
     // Build Platform*RPMs by walking the branch configuration
     def BSPURLs = [] as Set // If multiple platforms share a repo, only build it once
@@ -1457,7 +1457,7 @@ Closure transformManifestBuildStep(in_OS) {
           }
           sh """
             set +x
-            rm *_rpms/angryviper-ide*.rpm # Not IDE RPMs
+            rm *_rpms/av-ide*.rpm # Not IDE RPMs
             rpm -qlp old_rpms/*rpm | grep -v /usr/lib/debug/ | sort -u > ${results_dir}B${old}_files.txt
             rpm -qlp new_rpms/*rpm | grep -v /usr/lib/debug/ | sort -u > ${results_dir}B${new_}_files.txt
             (cd old_rpms; ls -alF *rpm) >> ${results_dir}B${old}_info.txt
@@ -1652,7 +1652,7 @@ Closure BuildIDE() {
         deleteDir()
         copyArtifacts (
           projectName: ide_job.getFullProjectName(),
-          filter: "**/angryviper-ide-*rpm",
+          filter: "**/av-ide-*rpm",
           fingerprintArtifacts: true,
           selector: specific(ide_job.getId()),
           //target: tgt_path,
@@ -1825,10 +1825,10 @@ Closure transformDeployStep(in_OS) {
           rm -rf cdk_rpms *.repo
           """
         // Create downloadable .repo file
-        writeFile file: "angryviper-jenkins-${env.BRANCH_NAME}.repo",
+        writeFile file: "av-jenkins-${env.BRANCH_NAME}.repo",
           text: """\
-          [angryviper-jenkins-${env.BRANCH_NAME}]
-          name=ANGRYVIPER-Jenkins-${env.BRANCH_NAME}
+          [av-jenkins-${env.BRANCH_NAME}]
+          name=av-Jenkins-${env.BRANCH_NAME}
           baseurl=${global_config.yum_repo_url()}${env.BRANCH_NAME}/\$releasever
           cost=10000
           enabled=0
@@ -1837,7 +1837,7 @@ Closure transformDeployStep(in_OS) {
           metadata_expire=5m
           skip_if_unavailable=1
           """.stripIndent()
-        archiveArtifacts artifacts: "angryviper-jenkins-${env.BRANCH_NAME}.repo", fingerprint: true, onlyIfSuccessful: true
+        archiveArtifacts artifacts: "av-jenkins-${env.BRANCH_NAME}.repo", fingerprint: true, onlyIfSuccessful: true
       } // node
     } // lock
   } // closure

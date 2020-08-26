@@ -40,7 +40,7 @@
 --   throttle number of issued reads in case tags can't encode then
 --   can we use eop more efficiently than counting?
 
-library IEEE, ocpi, util, bsv, sdp;
+library IEEE, ocpi, util, sdp;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all;
 use work.sdp_receive_constants.all;
@@ -52,7 +52,7 @@ entity sdp_receive_dma is
   port (   operating        : in bool_t;
            reset            : in bool_t;
            -- properties
-           buffer_ndws      : in  unsigned(width_for_max(memory_depth - 1)-1 downto 0);
+           buffer_ndws      : in  unsigned(width_for_max(memory_depth * sdp_width)-1 downto 0);
            lcl_buffer_count : in  unsigned(width_for_max(max_buffers)-1 downto 0);
            role             : in  role_t;
            rem_flag_addr    : in  ulonglong_t;
@@ -107,7 +107,8 @@ architecture rtl of sdp_receive_dma is
     if sdp_width = 1 then
       return to_unsigned(0, sdp_xfr_dw_t'length);
     else
-      return addr(width_for_max(ocpi.util.max(1, sdp_width-1))-1 downto 0);
+--      return to_unsigned(to_integer(addr(ocpi.util.max(1,sdp_xfr_dw_t'left) - 1 downto 0)), sdp_xfr_dw_t'length);
+      return resize(addr(ocpi.util.max(1,width_for_max(sdp_width-1)) - 1 downto 0), sdp_xfr_dw_t'length);
     end if;
   end sdp_addr_dw_offset;
   signal sending_flag        : bool_t;
@@ -157,6 +158,7 @@ architecture rtl of sdp_receive_dma is
   signal reading_r           : bool_t; -- a read is being issued waiting to be accepted
   signal read_accepted       : bool_t; -- last cycle of a read request
   signal read_complete       : bool_t; -- cycle when the last data for a read has arrived
+  signal read_complete_r     : bool_t; -- cycle after the last data for a read has arrived
   signal flag_needed         : bool_t; -- a flag cycle is needed
 --  signal flagging            : bool_t; -- a flag cycle is in progress
   signal flagging_r          : bool_t; -- a flag write is being issues waiting to be accepted
@@ -225,7 +227,7 @@ begin
                        length_not_empty;
   avail_enq         <= length_not_empty
                        when role = activeflowcontrol_e else
-                       read_complete;
+                       read_complete_r;
   faults            <= faults_r;
   --------------------------------------------------------------------------------
   -- Mastering the SDP to issue requests - either read requests or flag writes
@@ -235,7 +237,11 @@ begin
   read_starting <= to_bool(role = activemessage_e and length_not_empty and
                            not its(length_zlm_out) and lcl_buffers_empty_r /= 0 and
                            not its(reading_r) and not its(flagging_r));
-  read_accepted <= (length_not_empty and length_zlm_out) or (reading_r and sdp_in.sdp.ready);
+  -- If we are optimizing ZLM/EOFs, and not actually issueing a data read, we still need to
+  -- wait until any previous reads complete, hence we wait for all buffers to be empty.
+  read_accepted <= to_bool((its(length_not_empty) and length_zlm_out and
+                            lcl_buffers_empty_r = lcl_buffer_count) or
+                           its(reading_r and sdp_in.sdp.ready));
   -- Flags are different than reads - they can happen in one cycle, and don't need idles
   -- Reads take precedence over flags
   flag_needed   <= to_bool(flags_to_send_r /= 0 or read_complete);
@@ -246,8 +252,8 @@ begin
   --------------------------------------------------------------------------------
   -- The current xfer of the current read response is the last in the entire message
   read_complete     <= to_bool(role = activemessage_e and
-                               (its(length_not_empty and length_zlm_out) or
-                                (taking and 
+                               (its(length_not_empty and length_zlm_out and read_accepted) or
+                                (taking and
                                  sdp_am_addr = sdp_am_last_r(to_integer(sdp_am_buffer_idx)))));
   -- We are taking a xfer from the SDP
   taking            <= sdp_in.sdp.valid and can_take;
@@ -258,14 +264,14 @@ begin
   bram_addr         <= sdp_addr(bram_addr'left + dw_addr_shift_c downto dw_addr_shift_c);
   bramb_addr        <= bram_addr;
 g1: for i in 0 to sdp_width-1 generate
-  bramb_write(i)    <= bfalse when i < first_dw or i > first_dw + dws_in_xfer
+  bramb_write(i)    <= bfalse when i < first_dw or i > first_dw + dws_in_xfer - 1
                        else sdp_in.sdp.valid;
   bramb_in(i)       <= sdp_in_data(i);
   end generate g1;
   --------------------------------------------------------------------------------
   -- Module output ports on the SDP side
   --------------------------------------------------------------------------------
-  -- For data arriving on sdp_in: 
+  -- For data arriving on sdp_in:
   sdp_out.sdp.ready          <= taking;
   -- For flag writes and data reads leaving on sdp_out:
   sdp_out.sdp.header.op      <= read_e when its(reading_r) else write_e;
@@ -285,7 +291,7 @@ g1: for i in 0 to sdp_width-1 generate
   sdp_out.sdp.valid          <= flagging_r or reading_r;
   sdp_out.dropCount          <= (others => '0');
 g2: for i in 0 to sdp_width-1 generate
-    sdp_out_data(i) <= slvn(1, dword_size) when i = 0 else (others => '0');
+    sdp_out_data(i) <= slvn(1, dword_size); -- when i = 0 else (others => '0');
   end generate g2;
 
   --------------------------------------------------------------------------------
@@ -315,6 +321,7 @@ g2: for i in 0 to sdp_width-1 generate
         sdp_am_last_r       <= (others => (others => '0')); --for cleaner sim
         flagging_r          <= bfalse;
         reading_r           <= bfalse;
+        read_complete_r     <= bfalse;
         --status1_r           <= (others => '0');
         --status2_r           <= (others => '0');
         --status3_r           <= (others => '0');
@@ -326,6 +333,7 @@ g2: for i in 0 to sdp_width-1 generate
         rem_flag_addr_r     <= rem_flag_addr(rem_flag_addr_r'left+2 downto 2);
         rem_read_addr_r     <= rem_data_addr(rem_read_addr_r'left+2 downto 2);
       else
+        read_complete_r <= read_complete;
         if  bram_addr >= memory_depth then
           faults_r(6) <= btrue;
         end if;
@@ -337,7 +345,8 @@ g2: for i in 0 to sdp_width-1 generate
           reading_r <= btrue;
           sdp_am_addr_r(to_integer(lcl_read_idx_r)) <= lcl_response_addr_r;
           sdp_am_last_r(to_integer(lcl_read_idx_r)) <=
-            resize(lcl_response_addr_r + length_out - 1, sdp_addr_t'length);
+            resize(lcl_response_addr_r + length_out - 1, sdp_addr_t'length) and
+            not unsigned(slvn(sdp_width-1, sdp_addr_t'length));
         end if;
         if its(read_accepted) then
           reading_r <= bfalse; -- yes, there will be a dead cycle between reads
@@ -347,7 +356,7 @@ g2: for i in 0 to sdp_width-1 generate
             lcl_response_addr_r <= (others => '0');
           else
             lcl_read_idx_r      <= lcl_read_idx_r + 1;
-            lcl_response_addr_r <= lcl_response_addr_r + buffer_ndws;
+            lcl_response_addr_r <= lcl_response_addr_r + buffer_ndws(sdp_addr_t'range);
           end if;
           -- Remote side bookkeepping
           if rem_read_idx_r = rem_last_buffer_idx then
@@ -378,9 +387,9 @@ g2: for i in 0 to sdp_width-1 generate
         end if;
         -- Maintain buffer empty count and queued consumption events (AFC only)
         case role is
-          when passive_e =>                            
+          when passive_e =>
             incdec(lcl_buffers_empty_r, buffer_consumed, length_not_empty);
-          when activeflowcontrol_e =>                            
+          when activeflowcontrol_e =>
             incdec(flags_to_send_r, buffer_consumed, flag_accepted);
             -- should the decrement happen on length_dequeue? rather then length_not_empty?
             incdec(lcl_buffers_empty_r, buffer_consumed, length_not_empty);

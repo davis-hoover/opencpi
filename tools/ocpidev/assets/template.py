@@ -94,7 +94,9 @@ PackagePrefix={{package_prefix}}
 {%if package_id: %}
 Package={{package_id}}
 {% endif %}
+{%if depend: %}
 ProjectDependencies={{depend}}
+{% endif %}
 {%if prim_lib: %}
 Libraries={{prim_lib}}
 {% endif %}

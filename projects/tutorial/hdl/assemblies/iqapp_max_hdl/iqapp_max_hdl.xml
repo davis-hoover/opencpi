@@ -1,0 +1,16 @@
+<!-- The iqapp_max_hdl HDL assembly xml file -->
+<HdlAssembly>
+  <Instance worker="peak_detector"
+     name="peak_detector_file_out"
+     external="in" connect="complex_mixer"/>
+  <Instance worker="complex_mixer"
+     connect="peak_detector_agc_in"/>
+  <Instance worker="peak_detector"
+     name="peak_detector_agc_in" connect="agc_complex"/>
+   <Instance worker="agc_complex"
+     name="agc_complex" connect="peak_detector_agc_out"/>
+   <Instance worker="peak_detector"
+     name="peak_detector_agc_out" connect="timestamper"/>
+  <Instance worker="timestamper"
+    name="timestamper" external="out"/>
+</HdlAssembly>

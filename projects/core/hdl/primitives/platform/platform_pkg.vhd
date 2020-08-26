@@ -21,6 +21,11 @@ library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all;
 library ocpi; use ocpi.all, ocpi.types.all, ocpi.util.all;
 package platform_pkg is
 
+type iostandard_t is (CMOS18,  -- technology: CMOS, supply voltage: 1.8V
+                      CMOS25,  -- technology: CMOS, supply voltage: 2.5V
+                      LVDS25,  -- technology: LVDS (TIA/EIA-644 specification), supply voltage: 2.5V,
+                               -- note that the TIA/EIA-644 specification does not specify power-supply voltages
+                      UNSPECIFIED); -- technology and supply voltage are unspecified
 
 --------------------------------------------------------------------------------
 -- Control Plane definitions
@@ -370,6 +375,67 @@ component wci_master is
     worker_in  : in  worker_in_t;
     worker_out : out worker_out_t);
 end component wci_master;
+
+component TSINOUT_1 is
+  generic (DIFFERENTIAL : boolean := false);
+  port    (I  : in    std_logic;  -- OUTPUT to PIN when OE = 1
+           OE : in    std_logic;                           -- output enable, 1 = enabled
+           O  : out   std_logic;  -- INPUT from pin, all the time
+           IO : inout std_logic;  -- pin/pad
+           IOBAR : inout std_logic := 'Z');
+end component TSINOUT_1;
+
+component TSINOUT_N is
+  generic (width : natural);
+  port    (I  : in    std_logic_vector(width-1 downto 0);  -- OUTPUT to PIN when OE = 1
+           OE : in    std_logic;                           -- output enable, 1 = enabled
+           O  : out   std_logic_vector(width-1 downto 0);  -- INPUT from pin, all the time
+           IO : inout std_logic_vector(width-1 downto 0)); -- pin/pad
+end component TSINOUT_N;
+
+-- instantiate vendor-specific input buffer primitive(s) (i.e., IBUF/IBUFDS/
+-- IBUFG/IBUFGDS for Xilinx, ALT_INBUF/ALT_INBUF_DIFF plus optional GLOBAL for
+-- Altera) and (optionally) enforce IOSTANDARD
+component BUFFER_IN_1 is
+  generic (IOSTANDARD   :     iostandard_t := UNSPECIFIED;
+           DIFFERENTIAL :     boolean; -- only used if IOSTANDARD is UNSPECIFIED
+           GLOBAL_CLOCK :     boolean       := FALSE);
+  port (   I            : in  std_logic             ;
+           IBAR         : in  std_logic     := 'X'  ; -- only used if relevant
+                                                      -- to IOSTANDARD
+           O            : out std_logic             );
+end component BUFFER_IN_1;
+
+component BUFFER_IN_N is
+  generic (width        :     natural;
+           IOSTANDARD   :     iostandard_t := UNSPECIFIED;
+           DIFFERENTIAL :     boolean; -- only used if IOSTANDARD is UNSPECIFIED
+           GLOBAL_CLOCK :     boolean       := FALSE);
+  port (   I            : in  std_logic_vector(width-1 downto 0);
+           IBAR         : in  std_logic_vector(width-1 downto 0) := (others => 'X'); -- only used if relevant to IOSTANDARD
+           O            : out std_logic_vector(width-1 downto 0));
+end component BUFFER_IN_N;
+
+-- instantiate vendor-specific output buffer primitive(s) (i.e., OBUF/OBUFDS for
+-- Xilinx, ALT_OUTBUF/ALT_OUTBUF_DIFF for Quartus) and (optionally) enforce
+-- IOSTANDARD
+component BUFFER_OUT_1 is
+  generic (IOSTANDARD   :   iostandard_t := UNSPECIFIED;
+           DIFFERENTIAL :   boolean); -- only used if IOSTANDARD is UNSPECIFIED
+  port (   I          : in  std_logic;
+           O          : out std_logic;
+           OBAR       : out std_logic := 'X'); -- only used if relevant to
+                                               -- IOSTANDARD
+end component BUFFER_OUT_1;
+
+component BUFFER_OUT_N is
+  generic (width        :   natural;
+           IOSTANDARD   :   iostandard_t := UNSPECIFIED;
+           DIFFERENTIAL :   boolean); -- only used if IOSTANDARD is UNSPECIFIED
+  port (   I          : in  std_logic_vector(width-1 downto 0);
+           O          : out std_logic_vector(width-1 downto 0);
+           OBAR       : out std_logic_vector(width-1 downto 0) := (others =>'X')); -- only used if relevant to IOSTANDARD
+end component BUFFER_OUT_N;
 
 end package platform_pkg;
 

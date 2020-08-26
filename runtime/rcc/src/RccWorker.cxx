@@ -105,11 +105,11 @@ setError(const char *fmt, va_list ap) {
   return RCC_ERROR;
 }
 
-OC::Worker &Worker::
+OC::Worker *Worker::
 getSlave(unsigned n) {
   if (slaves().empty() || n >= slaves().size())
     throw OU::Error("No slave has been set for worker '%s'", name().c_str());
-  return *slaves()[n];
+  return slaves()[n];
 }
 
 Worker::
@@ -512,7 +512,7 @@ doEOF() {
   // But if any output port needs to handle it, then we must give it to the input anyway.
   RCCPort *rccPort = m_context->ports;
   for (unsigned n = 0, mask = 1; n < m_nPorts; n++, rccPort++, mask <<= 1)
-    if (!rccPort->metaPort->m_provider) { // if output
+    if (!rccPort->metaPort->m_provider && rccPort->containerPort) { // if output and connected
       if (rccPort->metaPort->m_workerEOF) // if it is handling the EOF itself
 	fallThrough = true; // some output is handled by the worker, so we have to give this eof anyway
       else if (!(m_eofSent & mask)) {
@@ -522,8 +522,10 @@ doEOF() {
 	  rccPort->current.eof_ = true;
 	  rccPort->containerPort->advanceRcc(0);
 	  m_eofSent |= mask;
-	} else
+	} else {
 	  moreOutputs = true;
+	  rccRequest(rccPort, 0); // in case it was never requested, by non-default run condition
+	}
       }
     }
   if (moreOutputs)
@@ -1433,5 +1435,11 @@ OCPI_CONTROL_OPS
    ~RCCUserSlave() {
    }
 #endif
+   void RCCUserSlave::
+   checkSlave(const char *name) const {
+     if (!m_worker)
+       throw OU::Error("proxy worker accessed an optional slave \"%s\" which is not present",
+		       name);
+  }
   }
 }

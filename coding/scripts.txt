@@ -1,5 +1,5 @@
 Scripts (not C++ main programs) fall into several categories, but are generally placed in
-tools/cdk/scripts (soon to become tools/scripts).
+"tools/scripts/"
 
 Scripts that are exposed to users must follow these rules:
 ==========================================================
@@ -9,19 +9,24 @@ Scripts that are exposed to users must follow these rules:
    same environment rather than an outlier.
 
 2. any language suffix should not be present in the exported name so that the documented use
-   of the tool does not depend upon its implementation language - the file in "scripts" can
-   have the suffix, but it cannot be exported or documented with it.  I.e. if you write
+   of the tool does not depend upon its implementation language - the file in "tools/scripts/" can
+   and should have the suffix, but it cannot be exported or documented with it.  I.e. if you write
    ocpifoo.py or ocpifoo.sh, export it as ocpifoo.
 
-3. scripts should be exported to bin directories so they are available in the user's path
-   with only a single directory added by OpenCPI.  The "scripts" directory is not put into
-   user paths and may contain internal scripts not intended for users.
+3. scripts for users should be exported to bin directories so they are available in the user's path
+   with only a single directory added by OpenCPI.  Neither the "tools/scripts/" source directory
+   nor the binary cdk's "cdk/scripts/" directory is put into user paths and thus may contain internal
+   scripts not intended for users.
 
-4. command arguments should attempt to follow the same conventions used for C++ executables.
+4. scripts used internally (called from other scripts or other executables) should be exported under
+   their normal name, with suffixes, in the "cdk/scripts/" directory, not in the "cdk/bin/" directory.  See below.
+
+5. command arguments should attempt to follow the same conventions used for C++ executables.
 e.g.:
  single hyphen options are single letters
  double hyphen options should be hyphen-separated words, not abbreviations
     except things like "init", etc. (we should have a list of some common abbreviations).
+    values should be able to be specified using =, as in --my-option=foo.
  when the command does multiple things, the first non-option arg should be a "verb" saying
  what sub-command is being invoked.
  arguments after the options and verb are verb-specific, but are usually "nouns".
@@ -44,27 +49,57 @@ Scripts not documented for users and only used by other scripts:
 These should not be exported to bin, and should not be accessed without explicit reference to
 their exported location in OCPI_CDK_DIR, i.e. is $OCPI_CDK_DIR/scripts/foo.
 
-These can have any language suffix.
+These can and should have a language suffix, which violates the "hide the implementation
+language" rule for a good purpose.  It makes it easier to find callers in the repo.
+
+Scripts that are not intended to be run in a binary installation environment
+============================================================================
+
+These are mostly legacy, but the poster child for this type of script is:
+
+./scripts/install-opencpi.sh
+
+These scripts must live in the top level "scripts/" directory, and *not*
+in the "tools/scripts/" directory to make it clear that they are special in this
+way (not used in a binary installation and not part of the CDK).  They should never be exported.
+They should never be put in a PATH and are designed to be executed only from
+the root of a source installation using their explicit pathname.
+Although this directory has lots of scripts, 90% are legacy, and will probably go away.
+
+If one of these scripts calls some other script, and that script is used
+in a binary CDK environment as well as a source environment it is considered
+a normal internal script and should be in "tools/scripts/".  The reference to such a
+script should normally be via $OCPI_CDK_DIR.
 
 Shell scripts are written for two distinct environments:
 ========================================================
 
-When they are for use in a development environment, they may make full use of bash, but should
-generally use the --noprofile option to avoid being affected by user shell settings.
+When they are for use in a development environment, they may make full use of bash and
+use the #!/bin/bash shebang.
 
 When they are for a target/embedded/runtime environment, they should stick to the basic POSIX
-shell capabilities and NOT use BASH features not supported by many small embedded shell
-implementations.
+shell capabilities and NOT use BASH features that are not supported by many small embedded shell
+implementations.  They should also use #!/bin/sh rather than the normal #!/bin/bash shebang.
+"/bin/sh" on some systems does indeed point to /bin/bash, but on others it can point to a
+very minimum shell, which only supports what is defined by POSIX, and sometimes even less than that.
+
 (todo: What was that script that tested for non-posix features?)
 (todo: add stuff that doesn't work on things like busybox/ash etc.)
 
 A comment at the top of embedded scripts should make it VERY CLEAR that the script is for
 limited/embedded environments so that maintainers don't trash it unwittingly by adding use
-of BASH features.
+of BASH features.  An example of this type of script is the "tools/cdk/ocpiserver.sh" script, which is
+the "server side" of the ocpiremote command.
 
 Python:
 =======
 
-The availability of python 2.x can be assumed in development environments, but not (yet) in
-embedded environments.
+The availability of python 3.x can be assumed in development environments, but not in
+embedded environments.  Python scripts intended to be called from other scripts or users
+should be executable and use the:
+
+#!/usr/bin/env python3
+
+shebang.
+
 

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-assembly</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140308202505856"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-assembly — manage an OpenCPI HDL assembly.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">hdl assembly</code></strong></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">hdl assembly</code></strong></span> noun represents an OpenCPI HDL assembly, which is a
+group of pre-connected HDL workers built as an <span class="emphasis"><em>artifact</em></span> - a binary
+executable compiled from the workers - intended
+for use as an FPGA-based subset of an OpenCPI application.</p><p>An HDL assembly is described by an OpenCPI HDL Assembly Description (OHAD),
+which is an XML file that specifies the HDL workers that make up
+the HDL assembly and the connections between them. The OHAD defines
+the worker instances, any properties and parameter settings, connections
+between workers and external ports for any data flowing into or out of
+the assembly. For information about the OHAD’s XML structure,
+see the section "The HDL Assembly XML File" in the <span class="emphasis"><em>OpenCPI HDL
+Development Guide</em></span></p><p>In a project, an HDL assembly resides in its own directory <span class="emphasis"><em>&lt;name&gt;</em></span>
+under an <span class="strong"><strong><code class="literal">assemblies/</code></strong></span> subdirectory in the project’s <span class="strong"><strong><code class="literal">hdl/</code></strong></span> directory.
+An HDL assembly directory contains the assembly’s OHAD XML file
+(named <span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">.xml</code></strong></span>) and its "make" file (named <span class="strong"><strong><code class="literal">Makefile</code></strong></span>).
+The <span class="strong"><strong><code class="literal">ocpidev create</code></strong></span> operation produces initial versions of these
+files that can then be edited as necessary.</p><p>When an HDL assembly is built, the result - the executable artifact
+file (with the suffix <span class="strong"><strong><code class="literal">.bitz</code></strong></span> or <span class="strong"><strong><code class="literal">.gz</code></strong></span>) - is placed in
+an <span class="strong"><strong><code class="literal">artifacts</code></strong></span> directory at the top level of the project.
+The <span class="strong"><strong><code class="literal">ocpidev build</code></strong></span> operation also creates additional directories
+and files in the HDL assembly’s directory, including a container
+artifact built for the target platform in a directory
+<span class="strong"><strong><code class="literal">container-</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>.
+The <span class="strong"><strong><code class="literal">ocpidev clean</code></strong></span> operation removes the files created by
+the <span class="strong"><strong><code class="literal">ocpidev build</code></strong></span> operation.</p><p>For information on how to develop an HDL assembly,
+see the chapter "HDL Assemblies for Creating Bitstreams/Executables"
+in the <span class="emphasis"><em>OpenCPI HDL Development Guide</em></span>.</p><p>Verbs that can operate on an HDL assembly are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">build</code></strong></span>
+</span></dt><dd>
+    Build the HDL assembly, creating directories and files
+    as required.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">clean</code></strong></span>
+</span></dt><dd>
+    Remove all the generated and compiled files for all assets
+    in the HDL assembly.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">create</code></strong></span>
+</span></dt><dd>
+    Create the named HDL assembly, creating files and directories as required.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">delete</code></strong></span>
+</span></dt><dd>
+    Remove all directories and files associated with the named HDL assembly.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">utilization</code></strong></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the HDL assembly.
+</dd></dl></div><p>Note that an asset’s name is implied by the directory you’re in when
+you issue the <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> command. For HDL assemblies, this
+means that you can perform operations (verbs) on the HDL assembly
+without having to specify its name when you issue the
+<span class="strong"><strong><code class="literal">ocpidev</code></strong></span> command from inside the HDL assembly’s directory.</p><p>The <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> tool can also operate on a plural <span class="strong"><strong><code class="literal">hdl assemblies</code></strong></span> noun.
+The syntax is:</p><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] [<span class="strong"><strong><code class="literal">build|clean|utilization</code></strong></span>] <span class="strong"><strong><code class="literal">hdl assemblies</code></strong></span></p><p>The verbs that can be performed on the <span class="strong"><strong><code class="literal">hdl assemblies</code></strong></span> noun are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">build</code></strong></span>
+</span></dt><dd>
+    Build all of the HDL assemblies in the project or the <span class="strong"><strong><code class="literal">/hdl</code></strong></span>
+    subdirectory of the project, creating directories and files as required.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">clean</code></strong></span>
+</span></dt><dd>
+    Remove all the generated and compiled files in all HDL assemblies
+    in the project or the <span class="strong"><strong><code class="literal">/hdl</code></strong></span> subdirectory of the project.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">utilization</code></strong></span>
+</span></dt><dd>
+    Display FPGA resource usage information for all built HDL assemblies
+    in the project. The general-pupose options and the <span class="strong"><strong><code class="literal">utilization</code></strong></span>
+    options can be specified.
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><p>Keywords for platforms supported by OpenCPI that can be
+specified in the <span class="emphasis"><em>&lt;platform&gt;</em></span> argument to an option
+can be found in the tables of supported platforms in the <span class="emphasis"><em>OpenCPI User Guide</em></span>.</p><p>Keywords for architectures supported by OpenCPI that can be specified
+in the <span class="emphasis"><em>&lt;target&gt;</em></span> argument to an option include <span class="strong"><strong><code class="literal">isim</code></strong></span>, <span class="strong"><strong><code class="literal">modelsim</code></strong></span>,
+<span class="strong"><strong><code class="literal">xsim</code></strong></span>, <span class="strong"><strong><code class="literal">stratix4</code></strong></span>, <span class="strong"><strong><code class="literal">stratix5</code></strong></span>, <span class="strong"><strong><code class="literal">virtex5</code></strong></span>, <span class="strong"><strong><code class="literal">virtex6</code></strong></span>, <span class="strong"><strong><code class="literal">zynq</code></strong></span>,
+<span class="strong"><strong><code class="literal">zynq_is</code></strong></span>, <span class="strong"><strong><code class="literal">spartan3adsp</code></strong></span>.</p><div class="refsect2"><a id="_options_that_apply_to_all_operations_verbs_on_hdl_assemblies"></a><h3>Options That Apply to All Operations (Verbs) on HDL Assemblies</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>-d &lt;directory&gt;</strong></span>
+</span></dt><dd>
+    Specify the directory in which the command should be run.
+    Analogous to the <span class="strong"><strong>-C</strong></span> option in the POSIX <span class="strong"><strong>make</strong></span> command.
+</dd><dt><span class="term">
+<span class="strong"><strong>-v, --verbose</strong></span>
+</span></dt><dd>
+    Describe what is happening in command execution in more detail.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_creating_hdl_assemblies"></a><h3>Options When Creating HDL Assemblies</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--exclude-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>, <span class="strong"><strong><code class="literal">-Q</code></strong></span> <span class="emphasis"><em>&lt;platform&gt;</em></span>+
+</span></dt><dd>
+    Do not build the HDL assembly for the specified HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--only-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>, <span class="strong"><strong>-G</strong></span> <span class="emphasis"><em>&lt;platform&gt;</em></span>+
+</span></dt><dd>
+    Only build the HDL assembly for the specified HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong>-T</strong></span> <span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Only build the HDL assembly for the specified HDL architecture.
+</dd><dt><span class="term">
+<span class="strong"><strong>-Z</strong></span> <span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Do not build the HDL assembly for the specified HDL architecture.
+</dd><dt><span class="term">
+<span class="strong"><strong>-k</strong></span>
+</span></dt><dd>
+    Keep files and directories created after an HDL assembly creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_deleting_hdl_assemblies"></a><h3>Options When Deleting HDL Assemblies</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong>-f</strong></span>
+</span></dt><dd>
+    Force deletion: do not ask for confirmation when deleting
+    an HDL assembly. Normally, you are asked to confirm a deletion.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_building_hdl_assemblies"></a><h3>Options When Building HDL Assemblies</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-target=</code></strong></span><span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Build the HDL assembly/ies for the specified HDL architecture.
+    If only HDL targets
+    are specified (and no HDL platforms), containers are not built.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-platform=</code></strong></span><span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>+
+</span></dt><dd>
+    Build the HDL assembly/ies for the specified HDL platform.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_using_utilization_on_hdl_assemblies"></a><h3>Options When Using Utilization on HDL Assemblies</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--format=</code></strong></span>{<span class="strong"><strong><code class="literal">table</code></strong></span>|<span class="strong"><strong><code class="literal">latex</code></strong></span>}
+</span></dt><dd>
+    Specify the format in which to output the FPGA resource usage information.
+    Specifying <span class="strong"><strong><code class="literal">table</code></strong></span> sends the information to stdout in tabular format.
+    Specifying <span class="strong"><strong><code class="literal">latex</code></strong></span> bypasses <span class="strong"><strong><code class="literal">stdout</code></strong></span> and writes all output to
+    <span class="strong"><strong><code class="literal">utilization.inc</code></strong></span> files in the directories for the assets on
+    which it operates.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>+
+</span></dt><dd>
+    Display information about FPGA resource use by the built HDL assemblies
+    on the specified HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-library=</code></strong></span><span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the built
+    HDL assemblies in the specified HDL primitive library.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--library=</code></strong></span><span class="emphasis"><em>&lt;library&gt;</em></span>, <span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the built
+    HDL assemblies in the specified component library.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-P</code></strong></span> <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the built
+    HDL assemblies on the specified HDL platform.
+</dd></dl></div></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Inside the project (at the top level), create the
+HDL assembly <span class="strong"><strong><code class="literal">myassy</code></strong></span>. The directory <span class="strong"><strong><code class="literal">myassy</code></strong></span>
+is created in the <span class="strong"><strong><code class="literal">hdl/assemblies</code></strong></span> directory
+(which is also created if it doesn’t exist):
+</p><pre class="screen">ocpidev create hdl assembly myassy</pre></li><li class="listitem"><p class="simpara">
+Inside the project (at the top level), create the
+HDL assembly <span class="strong"><strong><code class="literal">myassy</code></strong></span>, specifying that it can
+only be built for the <span class="strong"><strong><code class="literal">zed</code></strong></span> HDL platform:
+</p><pre class="screen">ocpidev create hdl assembly myassy --only-platform=zed</pre></li><li class="listitem"><p class="simpara">
+Inside the project (at the top level), create the
+HDL assembly <span class="strong"><strong><code class="literal">myassy</code></strong></span>, specifying that it can
+only be built for the <span class="strong"><strong><code class="literal">zynq</code></strong></span> HDL chip architecture:
+</p><pre class="screen">ocpidev create hdl assembly myassy -T zynq</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level or the
+<span class="strong"><strong><code class="literal">hdl/assemblies</code></strong></span> directory), delete
+the HDL assembly <span class="strong"><strong><code class="literal">myassy</code></strong></span>:
+</p><pre class="screen">ocpidev delete hdl assembly myassy</pre></li><li class="listitem"><p class="simpara">
+Inside the <span class="strong"><strong><code class="literal">myassy</code></strong></span> HDL assembly’s directory, build
+the <span class="strong"><strong><code class="literal">myassy</code></strong></span> assembly for the <span class="strong"><strong><code class="literal">xsim</code></strong></span> HDL platform:
+</p><pre class="screen">ocpidev build --hdl-platform=xsim</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level or the
+<span class="strong"><strong><code class="literal">hdl/assemblies</code></strong></span> directory), build all existing
+HDL assemblies:
+</p><pre class="screen">ocpidev build hdl assemblies</pre></li><li class="listitem"><p class="simpara">
+Inside the <span class="strong"><strong><code class="literal">myassy</code></strong></span> HDL assembly’s directory,
+built the <span class="strong"><strong><code class="literal">myassy</code></strong></span> assembly for the <span class="strong"><strong>zynq</strong></span> HDL chip architecture:
+</p><pre class="screen">ocpidev build --hdl-target=zynq</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level of the
+<span class="strong"><strong><code class="literal">/hdl/assemblies</code></strong></span> directory) display information
+about FPGA resource use by the <span class="strong"><strong><code class="literal">myassy</code></strong></span> assembly:
+</p><pre class="screen">ocpidev utilization hdl assembly myassy</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level of the
+<span class="strong"><strong><code class="literal">/hdl/assemblies</code></strong></span> directory) display information
+about FPGA resource use by the assemblies in the project:
+</p><pre class="screen">ocpidev utilization hdl assemblies</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
+<a class="ulink" href="ocpidev-build.1.html" target="_top">ocpidev-build(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-clean.1.html" target="_top">ocpidev-clean(1)</a>
+<a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-library.1.html" target="_top">ocpidev-library(1)</a>
+<a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
+<a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-worker(1)</a>
+<a class="ulink" href="ocpidev-utilization.1.html" target="_top">ocpidev-utilization(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

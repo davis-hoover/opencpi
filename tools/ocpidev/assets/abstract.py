@@ -194,7 +194,6 @@ class HDLBuildableAsset(BuildableAsset):
                 self.hdl_targets = set(hdltargets.HdlToolFactory.get_or_create_all("hdltarget"))
             elif "local" not in self.hdl_plat_strs:
                 for plat in self.hdl_plat_strs:
-                    print("HDLbuildable plat: "+ plat)
                     plat = hdltargets.HdlToolFactory.factory("hdlplatform", plat)
                     self.hdl_platforms.add(plat)
                     self.hdl_targets.add(plat.target)

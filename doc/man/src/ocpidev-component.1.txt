@@ -1,0 +1,229 @@
+OCPIDEV-COMPONENT(1)
+===================
+
+
+NAME
+----
+ocpidev-component - manage an OpenCPI component.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`component`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *`component`* noun represents an OpenCPI component, which is a defined
+function that has 'properties' that configure and control it and 'ports'
+where data messages are sent and received and which support 'protocols'
+that define the allowed/expected messages.
+
+A component is described by an OpenCPI Component Specification (OCS),
+which is an XML file that defines the component's properties and ports
+and usually references one or more OpenCPI Protocol Specifications (OPS)
+in the port definitions.
+The OCS establishes the interface requirements for all worker implementations
+of the component in any authoring model. At present, a component consists
+of only the OCS XML file. For more information about a component's XML
+structure, see the chapter "Component Specifications" in the
+'OpenCPI Component Development Guide'.
+
+In a project, a component resides in a *`specs/`* directory located
+either in a component library or at the top level of a project and
+is named '<component-name>'*`-spec.xml`*.
+Note that components with an older naming format '<name>'*`_spec.xml`* also exist;
+for example, some of the components in the built-in OpenCPI projects *`assets`* and *`core`*.
+
+In general, the workers that implement the component
+and any unit tests created for the component reside in the same library
+as the component, although a component's worker implementations
+can be created in different libraries or even different projects.
+
+Verbs that can operate on a component are:
+
+*`create`*::
+    Create the named component according to the specified options,
+    creating directories and files as required.
+
+*`delete`*::
+    Remove all files associated with the named component.
+    
+*`show`*::
+    Display information associated with a component, such as its defined
+    properties and ports.
+
+The *`ocpidev`* tool can also operate on a plural *`components`* noun.
+The syntax is:
+
+*`ocpidev`* ['<options>'] *`show components`*
+
+where *`show`* is the only valid verb and the options that can be specified
+are *`-d`* '<directory>' and the *`show`* verb options.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options That Apply to All Operations (Verbs) on Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-library=`*'<hdl-library>'::
+    Specify the HDL library in which to operate on the
+    component. HDL libraries exist underneath the *`hdl/`*
+    directory located at the top level of a project.
+
+*`--library=`*'<component-library>', *`-l`* '<component-library>'::
+    Specify the component library in which to operate on the component.
+    When a project contains multiple component libraries, this option
+    can be used to specify one of them. Multiple component
+    libraries are located underneath the *`components`* directory
+    at the top level of a project.
+
+*`-d`* '<directory>'::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+
+*-v, --verbose*::
+    Describe what is happening in command execution in more detail.
+    
+Options When Creating and Deleting Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*-p*::
+    Specify that the component is to be created in or
+    deleted from the *`specs`* directory of the project
+    instead of the *`specs`* directory of a component library.
+    The *`-l`* and *`-p`* options specify the location
+    of the component. When neither one of these options
+    is used, the location is the *`components`* library
+    and thus is an error if other component libraries exist.
+
+Options When Creating Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+*-k*::
+    Keep files and directories created after a component creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+
+*`-n`*::
+   Specify that the component has no control interface. This option
+   is rarely used or recommended, but is required for certain
+   infrastructure components. It applies only to components
+   with HDL-only implementations.
+  
+Options When Deleting Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-f`*::
+    Force deletion: do not ask for confirmation when deleting
+    a component. Normally, you are asked to confirm a deletion.
+
+Options When Showing Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*--`global-scope`*::
+    Show components from all registered projects and the
+    current project if applicable.
+    This is the default scope used if *-local-scope* is not used.
+
+*`--json`*::
+    Format the output in JavaScript Object Notation (JSON) format
+    for integration with other software.
+
+*`--local-scope`*::
+    Only show components in the local project.
+
+*`--simple`*::
+    Format the output as simply as possible.
+
+*`--table`*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *--simple* or *--json* are not used.
+
+*`-P`* '<hdl-platform-directory>'::
+    Specify the HDL platform subdirectory in which to operate.
+    
+EXAMPLES
+--------
+. Create a component spec with the name *`mycomp`*. The component
+spec will be placed in the default location *`components/specs/`*:
++
+-------------------------------
+ocpidev create component mycomp
+--------------------------------
++
+. Create a component named *`mycomp`* in the library named
+*`myutilcomps`*. The component spec will be placed in
+the *`specs`* directory in *`myutilcomps`* sublibrary
+within the *`components`* library (*`components/myutilcomps/specs/`*):
++
+--------------------------------------------------------
+ocpidev create component mycomp -l myutilcomps
+--------------------------------------------------------
++
+. Delete a component named *`mydevcomp`* from the
+*`devices`* library underneath the project's *`hdl`* library
+(deletes it from *`hdl/devices/specs/`*):
++
+--------------------------------------------------------
+ocpidev delete component mydevcomp --hdl-library=devices
+--------------------------------------------------------
++
+. Inside the *`assets`* project, display information about
+the component named *`capture`* in the *`specs`* directory
+of the *`base_comps`* library in the *`components`* library:
++
+--------------------------------------------------------
+ocpidev show component capture -l components/base_comps
+--------------------------------------------------------
++
+. Inside the *`assets`* project, display information about
+the component named *`qadc`* in the *`specs`* directory
+of the *`devices`* library in the *`hdl`* library:
++
+-------------------------------------------------
+ocpidev show component qadc --hdl-library=devices
+-------------------------------------------------
++
+. Inside the *`assets`* project, display information about
+all components that are local to the *`assets`* project:
++
+--------------------------------------------
+ocpidev show components --local-scope
+-------------------------------------------
++
+. Display information about all components local
+to the project *`/home/workspace/MyProject`*:
++
+------------------------------------------------------------------
+ocpidev show components --local-scope  -d /home/workspace/MyProject
+-----------------------------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-protocol.1.html[ocpidev-protocol(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-test.1.html[ocpidev-test(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

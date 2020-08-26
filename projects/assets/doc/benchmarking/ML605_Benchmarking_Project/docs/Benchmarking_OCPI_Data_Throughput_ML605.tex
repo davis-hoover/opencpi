@@ -18,35 +18,35 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \fi
 
 %----------------------------------------------------------------------------------------
-% Update the docTitle and docVersion per document
+% Required document specific properties
 %----------------------------------------------------------------------------------------
 \def\docTitle{Benchmarking OCPI PCIe Data Throughput on the ML605}
-\def\docVersion{1.0}
+\def\snippetpath{../../../../../../doc/av/tex/snippets}
 %----------------------------------------------------------------------------------------
-\input{snippets/Benchmarking_header}
-\date{Version \docVersion} % Force date to be blank and override date with version
-\title{\docTitle}
-\lhead{\small {\docTitle} }
+% Global latex header (this must be after document specific properties)
 %----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 \maketitle
-\thispagestyle{fancy}
+\thispagestyle{empty}
 \newpage
 
-	\begin{center}
+\begin{center}
 	\textit{\textbf{Revision History}}
-		\begin{table}[H]
+	\begin{table}[H]
 		\label{table:revisions} % Add "[H]" to force placement of table
-			\begin{tabularx}{\textwidth}{|c|X|l|}
+		\begin{tabularx}{\textwidth}{|c|X|l|}
 			\hline
 			\rowcolor{blue}
 			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
 		    \hline
 			1.0.0-alpha & Initial document creation & 2/2017 \\
 			\hline
-			\end{tabularx}
-		\end{table}
-	\end{center}
+		\end{tabularx}
+	\end{table}
+\end{center}
 
 \newpage
 
@@ -263,7 +263,7 @@ Application workers are:
 
  Above we see that the ocdp has index 2, the sma has index 3, and the multirate\_counter has index 1.  Now we can modify the workers in nft as below:
 
-\begin{lstlisting}[language=customc]
+\begin{lstlisting}[language=c] 
 //#define WORKER_DP0 (2)
 //#define WORKER_DP1 (4)
 //#define WORKER_SMA0 (3)
@@ -277,7 +277,7 @@ Application workers are:
 
 
 \item Next change the names of your volatiles to reflect the new worker names:
-\begin{lstlisting}[language=customc]
+\begin{lstlisting}[language=c]
 //  volatile OcdpProperties *dp0Props, *dp1Props;
 //  volatile uint32_t *sma0Props, *sma1Props, *biasProps;
 //  volatile OccpWorkerRegisters *dp0, *dp1, *sma0, *sma1, *bias;
@@ -288,7 +288,7 @@ Application workers are:
 \end{lstlisting}
 \item Remove function calls associated with unused workers, and add corresponding function calls for new workers:
 
-\begin{lstlisting}[language=customc]
+\begin{lstlisting}[language=c]
 //dp1Props = (OcdpProperties*)occp->config[WORKER_DP1];
 
 //sma1Props = (uint32_t*)occp->config[WORKER_SMA1];
@@ -332,7 +332,7 @@ start(multirateCounter);
 \end{lstlisting}
 
 \item Lastly, since our data flows only from the FPGA to the CPU, we can remove any code inferring data flow in the other direction.
-\begin{lstlisting}[language=customc]
+\begin{lstlisting}[language=c]
 //#if 0
 //     for (n = 1000000000; n && !(tcons = fromCpu.flags[fromCpu.bufIdx]); n--) {
 //     }

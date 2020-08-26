@@ -34,8 +34,9 @@ Summary:   The OpenCPI Linux Kernel Driver
 Group:     System Environment/Kernel
 
 License:   LGPLv3+
-Vendor:    ANGRYVIPER Team
-Packager:  ANGRYVIPER Team <discuss@lists.opencpi.org>
+Vendor:    OpenCPI
+Packager:  OpenCPI <discuss@lists.opencpi.org>
+URL:       https://opencpi.org
 
 # BuildRoot is deprecated, but maybe this was for OLD rpmbuild in centos6?
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -53,10 +54,10 @@ startup script that will rebuild the driver as needed.
 %{?RPM_HASH:ReleaseID: %{RPM_HASH}}
 
 %prep
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %build
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %install
 cd %{RPM_OPENCPI}

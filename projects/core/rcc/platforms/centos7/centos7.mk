@@ -18,15 +18,25 @@
 
 ##########################################################################################
 # This file defines the CentOS7 software platform.
-# It sets platform variables as necessary to override the defaults in the file:
-#   include/platform-defaults.mk file.
+# It sets platform variables as necessary to override the defaults in
+#   "tools/cdk/include/platform-defaults.mk".
 # See that file for a description of valid variables and their defaults.
-
-# we have nothing that overrides centos6 defaults (yet)
 
 OcpiPlatformOs=linux
 OcpiPlatformOsVersion=c7
 OcpiPlatformArch=x86_64
-
-
-
+OcpiExtraLibs+=yaml-cpp
+#
+# "OcpiKernelDir" must be set if it is appropriate to build
+# the "opencpi.ko" driver module for this platform.
+#
+# There are less expensive ways to find a kernel headers directory if
+# the stars align properly, but the method below is guaranteed to find
+# one on "centosX" if one exists.
+#
+OcpiKernelDir:=\
+$(strip $(foreach krel,$(shell uname -r),\
+  $(foreach hver,$(word 1, $(shell rpm -q --qf=%{version}-%{release}.%{arch} kernel-headers)),\
+    $(if $(filter $(krel),$(hver)),,$(info Warning: probable running kernel vs. installed kernel mismatch detected: the OpenCPI kernel driver will be built for kernel version $(hver).  The detected mismatch usually means the kernel has been updated recently, but the system has not been rebooted since the update.  Please reboot your system if you have not already done so.))\
+    $(foreach kdir,/usr/src/kernels/$(hver),\
+      $(or $(wildcard $(kdir)),$(info Warning: no kernel headers directory found))))))

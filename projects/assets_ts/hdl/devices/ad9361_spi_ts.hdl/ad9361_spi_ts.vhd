@@ -23,7 +23,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-library util; use util.util.all; use util.types.all;
+library util;
 architecture rtl of ad9361_spi_ts_worker is
   constant addr_width_c : natural := 15;
   -- Internal signals

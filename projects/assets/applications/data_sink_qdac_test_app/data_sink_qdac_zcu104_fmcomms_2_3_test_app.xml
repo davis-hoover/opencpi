@@ -1,0 +1,70 @@
+<Application>
+  <Instance component='ocpi.assets.misc_comps.cswm_to_iqstream'
+            model='hdl'
+            connect='iqstream_max_calculator_adc'/>
+  <Instance component='ocpi.assets.util_comps.iqstream_max_calculator'
+            model='hdl'
+            name='iqstream_max_calculator_adc'
+            connect='fifo'/>
+  <Instance component='ocpi.assets.util_comps.fifo'
+            model='hdl'
+            connect='file_write'>
+    <Property name='FIFO_DEPTH_p' value='8192'/>
+    <Property name='oneshot' value='true'/>
+  </Instance>
+  <Instance component='ocpi.core.file_write' model='rcc'>
+    <Property name='fileName' value='data_sink_qdac_zcu104_fmcomms_2_3_test_app.out'/>
+  </Instance>
+  <Instance component='ocpi.assets.misc_comps.data_src'
+            connect='iqstream_max_calculator_dac'>
+    <Property name='LFSR_bit_reverse' value='false'/>
+    <Property name='mode' value='lfsr'/>
+  </Instance>
+  <Instance component='ocpi.assets.util_comps.iqstream_max_calculator'
+            model='hdl'
+            name='iqstream_max_calculator_dac'
+            connect='iqstream_to_cswm'/>
+  <Instance component='ocpi.assets.misc_comps.iqstream_to_cswm' model='hdl'/>
+  <Connection>
+    <Port instance='iqstream_to_cswm' name='out'/>
+    <Port instance='data_sink_qdac' name='in'/>
+  </Connection>
+  <Connection>
+    <Port instance='data_sink_qdac' name='on_off'/>
+    <Port instance='data_sink_qdac_ad9361_sub' name='on_off0'/>
+  </Connection>
+  <Instance component='ocpi.platform.devices.data_sink_qdac_ad9361_sub'/>
+
+  <!-- must be instanced here as workaround for AV-3799 -->
+  <Instance component='ocpi.platform.devices.platform_ad9361_spi'/>
+
+  <Instance component='ocpi.platform.devices.platform_ad9361_config'/>
+  <Instance component='ocpi.platform.devices.ad9361_config_proxy'
+            slave='platform_ad9361_config'>
+    <Property name='ad9361_init' value='reference_clk_rate 40000000,one_rx_one_tx_mode_use_rx_num 0,one_rx_one_tx_mode_use_tx_num 0,frequency_division_duplex_mode_enable 1,xo_disable_use_ext_refclk_enable 0,two_t_two_r_timing_enable false,pp_tx_swap_enable 0,pp_rx_swap_enable 0,tx_channel_swap_enable 0,rx_channel_swap_enable 0,delay_rx_data 0,rx_data_clock_delay 4,rx_data_delay 0,tx_fb_clock_delay 7,tx_data_delay 0'/>
+    <Property name='rx_fir_en_dis' value='0'/>
+    <Property name='rx_sampling_freq' value='15360000'/>
+    <Property name='tx_sampling_freq' value='15360000'/> <!-- to override tx_sampling_freq default, which would override the rx_sampling_freq value set above -->
+    <Property name='bist_loopback' value='1'/>
+    <Property name='bist_prbs' value='2'/> <!-- BIST_INJ_RX -->
+    <Property name='en_state_machine_mode' value='3'/> <!-- ENSM_MODE_FDD -->
+  </Instance>
+
+  <Instance component='ocpi.platform.devices.data_sink_qdac'
+            model='hdl'
+            selection='DAC_OUTPUT_IS_LSB_OF_IN_PORT == false && IN_PORT_DATA_WIDTH == 32 && DAC_WIDTH_BITS == 12'/>
+  <!-- Because:
+       1) this worker has a port in a clock domain of a device-supplied clock,
+       2) that clock does not start ticking until a device proxy reaches
+          the initialized state (ad9361_config_proxy), and
+       3) this worker will not succesfully initialize until the port clock is
+          ticking,
+       this worker *must* be initialized after said proxy.
+
+       UNDOCUMENTED AND SUSCEPTIBLE TO CHANGES - This initialization order is forced by
+       putting this instance at the end of the app XML -->
+  <Instance component='ocpi.platform.devices.data_src_qadc'
+            model='hdl'
+            connect='cswm_to_iqstream'
+            selection='ADC_INPUT_IS_LSB_OF_OUT_PORT == true && OUT_PORT_DATA_WIDTH == 32 && ADC_WIDTH_BITS == 12'/>
+</Application>

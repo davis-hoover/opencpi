@@ -512,7 +512,8 @@ parseHdlAssy() {
 	InstancePort &ip = (**ai).m_instPort;
 	if (!ip.m_port->isOCP() || ip.m_external)
 	  continue;
-	if (ip.m_port->m_myClock && !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
+	if ((ip.m_port->m_myClock || ip.m_port->m_clockPort != SIZE_MAX) &&
+	    !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
 	    ocpiInfo("Promoting the %s clock of instance %s port %s to be the assembly's clock "
 		     "for external port %s", ip.m_port->m_clock->m_output ? "output" : "input",
 		     ip.m_instance->cname(), ip.m_port->pname(),
@@ -570,6 +571,7 @@ parseHdlAssy() {
       }
     }
   }
+#if 0 // TODO / FIXME - do we need to restore the error check but with it being ok if it is optional and not connected?
   // Check for unconnected ports without clocks
   for (n = 0, i = &a->m_instances[0]; n < a->m_instances.size(); n++, i++)
     if (i->m_worker && !i->m_worker->m_assembly) {
@@ -584,6 +586,7 @@ parseHdlAssy() {
 	  }
 	}
     }
+#endif
   // Look at connections for inserting adapters between ports
   for (ConnectionsIter ci = a->m_connections.begin(); ci != a->m_connections.end(); ci++) {
     Connection &c = **ci;
@@ -1063,7 +1066,7 @@ emitAssyHDL() {
   } else {
     fprintf(f,
 	    "library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all;\n"
-	    "library ocpi, util;\n");
+	    "library ocpi;\n");
     emitVhdlLibraries(f);
     fprintf(f,
 	    "architecture rtl of %s_rv is\n",
@@ -1159,7 +1162,7 @@ emitAssyHDL() {
       fprintf(f, "%s assign the external clock output from the internal port that is driving it\n",
 	      myComment());
       if (m_language == VHDL)
-	fprintf(f, "  assign_%s_i : util.util.in2out port map (in_port => %s, out_port => %s_out.Clk);\n",
+	fprintf(f, "  assign_%s_i : ocpi.util.in2out port map (in_port => %s, out_port => %s_out.Clk);\n",
 		c.signal(), c.signal(), c.m_port->pname());
       else
 	fprintf(f, "  assign %s_Clk = %s;\n", c.m_port->pname(), c.signal());
@@ -1447,8 +1450,8 @@ emitAssyImplHDL(FILE *f, bool wrap) {
 }
 
 HdlAssembly *HdlAssembly::
-create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err) {
-  HdlAssembly *ha = new HdlAssembly(xml, xfile, parent, err);
+create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err) {
+  HdlAssembly *ha = new HdlAssembly(xml, xfile, parentFile, parent, err);
   if (err) {
     delete ha;
     ha = NULL;
@@ -1457,9 +1460,9 @@ create(ezxml_t xml, const char *xfile, Worker *parent, const char *&err) {
 }
 
 HdlAssembly::
-HdlAssembly(ezxml_t xml, const char *xfile, Worker *parent, const char *&err)
-  : Worker(xml, xfile, "", Worker::Assembly, parent, NULL, err) {
-  if (!(err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS, (void*)0)) &&
+HdlAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *parent, const char *&err)
+  : Worker(xml, xfile, parentFile, Worker::Assembly, parent, NULL, err) {
+  if (!err && !(err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS, (void*)0)) &&
       !(err = OE::checkElements(xml, IMPL_ELEMS, HDL_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
     err = parseHdl();
 }

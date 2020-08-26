@@ -1,34 +1,64 @@
 build:pages:
+  rules:
+    - when: on_success
   stage: build
   tags:
     - docker
-  image: $CI_REGISTRY_IMAGE/build-pages:latest
+  image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
+  dependencies: []
+  before_script: []
+  script:
+    - make doc
+    - REF_NAME=${CI_COMMIT_REF_NAME//\//-}  # Convert '/' to '-'
+    - mkdir -p .public/releases/$REF_NAME/docs/
+    - mv doc/pdfs/* .public/releases/$REF_NAME/docs/
+      # These are used in trigger-downstream
+    - echo "JOB_ID=$CI_JOB_ID"   > build-pages.vars
+    - echo "REF_NAME=$REF_NAME" >> build-pages.vars
+  after_script: []
   artifacts:
     paths:
       - .public/
-  # Overwrite default before and after script
-  before_script: []
-  after_script: []
-  dependencies:
-  script:
-    - make doc
-    - mkdir -p .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
-    - mv doc/pdfs/* .public/releases/${CI_COMMIT_REF_NAME//\//-}/docs/
+      - build-pages.vars
 
-# Trigger downstream pipeline in opencpi.gitlab.io project
-trigger:opencpi.gitlab.io:
+trigger-downstream:docs:
   stage: deploy
-  only:
-    - develop
-    - master
-    - tags
-  trigger:
-    project: opencpi/opencpi.gitlab.io
-    branch: develop
-    strategy: depend
-  variables:
-    JOB_NAME: 'build:pages'
-    REF_NAME: $CI_COMMIT_REF_NAME
-    PIPELINE_ID: $CI_PIPELINE_ID
-    PROJECT_ID: $CI_PROJECT_ID
-    PROJECT_PATH: $CI_PROJECT_PATH
+  tags:
+    - docker
+  image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
+    - if: "$CI_COMMIT_TAG"
+  dependencies:
+    - build:pages
+  before_script: []
+  script:
+    - cat build-pages.vars
+    - source build-pages.vars
+      # JOB_ID comes from opencpi/build:pages
+    - >
+      curl --request POST
+      --form token=$CI_JOB_TOKEN
+      --form ref=develop
+      --form "variables[JOB_ID]=$JOB_ID"
+      --form "variables[REF_NAME]=$REF_NAME"
+      https://gitlab.com/api/v4/projects/16024285/trigger/pipeline
+  after_script: []
+
+# This just redirects opencpi.gitlab.io/opencpi to opencpi.gitlab.io/releases/latest
+pages:
+  stage: deploy
+  tags:
+    - docker
+  image: centos:latest
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'develop'"
+  dependencies: []
+  before_script: []
+  script:
+    - mv .gitlab/public/ .
+  after_script: []
+  artifacts:
+    paths:
+      - public/

@@ -30,7 +30,6 @@ Tests = \
 	gpi.test \
 	gpo.test \
 	lime_dac_ts.test \
-	data_sink_dac.test
 
 # Build Ordering Rules:
 # 1) Subdevices that support other devices must occur AFTER the devices they support.
@@ -45,8 +44,6 @@ Workers = \
 	ad9361_dac_sub.hdl \
 	ad9361_data_sub.hdl \
 	ad9361_spi.hdl \
-	data_src_adc.hdl \
-	data_src_adc_em.hdl \
 	cstest.hdl \
 	flash.hdl \
 	gpi.hdl \
@@ -72,8 +69,6 @@ Workers = \
 	stm_mc24c02.hdl \
 	tmp100.hdl \
 	tmp100_proxy.rcc \
-	data_sink_dac.hdl \
-	data_sink_dac_em.hdl \
 	signal_time_tagger.hdl
 
 include $(OCPI_CDK_DIR)/include/library.mk

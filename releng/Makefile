@@ -71,7 +71,7 @@ ifeq "$(GIT_VERSION)" ''
   # Number of 6-minute increments since release in 5 digits (rolls over >1/yr)
   RELEASE_TAG=_$(shell printf %05d $(shell expr `date -u +"%s"` / 360 - 4273900))
   # When bumping this, don't miss configure.ac as well (AV-3433)
-  RPM_VERSION:=1.5.0
+  RPM_VERSION:=1.7.0
 else
   # This is a specific version branch
   RELEASE_TAG=%{nil}
@@ -113,24 +113,22 @@ clean: myhostnameclean
 cleanrpmbuild:
 	rm -rf ~/rpmbuild/*
 	mkdir -p ~/rpmbuild/SOURCES/
-	rm -rf $(CURDIR)/rpmbuild-doc-tmpdir
 
-# AV-4267
-# The _topdir was because the jenkins user didn't have a home in Docker containers, but that might not be the case any more
 .PHONY: doc_rpm
 .SILENT: doc_rpm
 doc_rpm: libmyhostname cleanrpmbuild
-	$(SPOOF_HOSTNAME) rpmbuild -ba opencpi-doc.spec \
+	../doc/build-pages.py HEAD
+	$(MAKE) -C ../ exports
+	tar -czhf "opencpi-doc-$(RPM_VERSION).tar.gz" -C ../exports/ doc/
+	mv "opencpi-doc-$(RPM_VERSION).tar.gz" ~/rpmbuild/SOURCES/
+	$(SPOOF_HOSTNAME) rpmbuild -bb opencpi-doc.spec \
 	--define="COMMIT_HASH $(COMMIT_HASH)" \
 	--define="COMMIT_TAG $(shell echo "$(COMMIT_TAG)" | tr -d ' ')" \
 	--define="RELEASE_TAG $(RELEASE_TAG)" \
 	--define="RPM_RELEASE $(RPM_RELEASE)" \
-	--define="RPM_VERSION ${RPM_VERSION}" \
-	--define="SRC_BASE $(CURDIR)/../" \
-	--define="_topdir $(CURDIR)/rpmbuild-doc-tmpdir"
-	# Prevent more than one doc rpm from lying around
-	rm -f opencpi-doc-*
-	cp -v $(CURDIR)/rpmbuild-doc-tmpdir/RPMS/noarch/opencpi-doc-* .
+	--define="RPM_VERSION $(RPM_VERSION)" \
+	--define="SRC_BASE $(CURDIR)/../"
+	cp -v ~/rpmbuild/RPMS/noarch/opencpi-doc-$(RPM_VERSION)*.rpm .
 
 # This will force any bsp to be rebuilt if you can find the directory
 # Cannot use Make "if" because $@ is undefined in first pass; must be shell "if"

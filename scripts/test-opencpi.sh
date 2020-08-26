@@ -19,6 +19,21 @@
 
 ##########################################################################################
 # Run all the go-no-go tests we have
+set -e
+
+# Arg 1 is the directory under tests/ to go
+function framework_test {
+  local dir=$OCPI_CDK_DIR/../tests/$1
+  [ -d $dir ] || {
+    dir=tests/$1
+    [ -d tests/$1 ] || {
+      echo The framework tests in tests/$1 is not present >&2
+      exit 1
+    }
+  }
+  cd $dir
+}
+
 
 # This are in order.
 # Run three categories of tests in this order:
@@ -32,26 +47,35 @@ alltests="$minimal_tests $network_tests $dev_tests"
 tests="$minimal_tests"
 # runtime/standalone tests we can run
 platform=
-case "$1" in
-  --showtests)
-    echo $alltests && exit 0;;
-  --help|-h) 
-    echo This script runs various built-in tests.
-    echo Available tests are: $alltests
-    echo 'Usage is: ocpitest [--showtests | --help ] [<platform> [ <test> ... ]]'
-    exit 1;;
-  --platform)
-    platform=$2; shift; shift;;
-  -*)
-    echo Unknown option: $1
-    exit 1;;  
-esac
-the_tests="$*"
+no_hdl=
+while [ -n "$1" ]; do
+  case "$1" in
+    --showtests)
+      echo $alltests && exit 0;;
+    --help|-h)
+      echo This script runs various built-in tests.
+      echo Available tests are: $alltests
+      echo 'Usage is: ocpitest [--showtests | --help ] [<platform> [ <test> ... ]]'
+      exit 1;;
+    --platform)
+      platform=$2; shift; shift;;
+    --no-hdl)
+      no_hdl=1; shift ;;
+    -*)
+      echo Unknown option: $1
+      exit 1;;
+    *)
+       the_tests="$the_tests $1"; shift ;;
+  esac
+done
+
 # Note the -e is so, especially in embedded environments, we do not deal with getPlatform.sh etc.
 [ -L cdk ] && source `pwd`/cdk/opencpi-setup.sh -e 
 [ -z "$OCPI_CDK_DIR" ] && echo No OpenCPI CDK available && exit 1
+
 runtime=1
-which make > /dev/null && [ -d $OCPI_CDK_DIR/../project-registry ] && runtime=
+command -v make > /dev/null && [ -d $OCPI_CDK_DIR/../project-registry ] && runtime=
+
 if [ -n "$the_tests" ]; then
   tests="$the_tests"
 else
@@ -59,7 +83,6 @@ else
     echo ========= Running project-based tests since the ocpi.assets project is available
     tests="$tests $network_tests"
   fi
-  # Note "which -s" not available on busybox
   if [ -z "$runtime" ] ;  then
     echo ========= Running dev system tests since \"make\" and project-registry is available.
     tests="$tests $dev_tests"   
@@ -72,35 +95,33 @@ else
     }
   fi
 fi
-[ -z "$OCPI_TARGET_PLATFORM" ] && {
+
+if [ -z "$OCPI_TARGET_PLATFORM" ]; then
   # Set just enough target variables to run runtime tests
   export OCPI_TARGET_PLATFORM=$OCPI_TOOL_PLATFORM
   export OCPI_TARGET_OS=$OCPI_TOOL_OS
   export OCPI_TARGET_DIR=$OCPI_TOOL_DIR
-}
+fi
+
+if [ -n "$no_hdl" ]; then
+  # Have to set these to nothing (NULL) to suppress HDL building and
+  # testing. Unsetting these variables will cause HDL platform discovery,
+  # which is NOT what we want.
+  export HdlPlatform=
+  export HdlPlatforms=
+  export HDL_PLATFORM=
+  export OCPI_ENABLE_HDL_DISCOVERY=0
+fi
+
 bin=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/bin
-set -e
-[ -z "$TESTS" ] && TESTS="$tests"
-echo ======================= Running these tests: $TESTS
-# Arg 1 is the directory under tests/ to go
-function framework_test {
-  local dir=$OCPI_CDK_DIR/../tests/$1
-  [ -d $dir ] || {
-    dir=tests/$1 
-    [ -d tests/$1 ] || {
-      echo The framework tests in tests/$1 is not present >&2
-      exit 1
-    }
-  }
-  cd $dir
-}
+echo ======================= Running these tests: $tests
 
 # Some tests are designed to fail and as a result ouput usage/help uses a pager.
 # This causes the tests to hang waiting for user input to exit the pager.
 # To prevent that, this sets the pager to `cat`.
 export PAGER=$(command -v cat)
 
-for t in $TESTS; do
+for t in $tests; do
   set -e # required inside a for;do;done to enable this case/esac to fail
   case $t in
     os)
@@ -116,12 +137,20 @@ for t in $TESTS; do
     # After this we are depending on the core project being built for the targeted platform
     swig)
       echo ======================= Running python swig test
-      OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts \
-		       PYTHONPATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib \
-		       python <<-EOF
+      set -vx
+      OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
+		       python3 <<-EOF
 	import opencpi.aci as OA
-	app=OA.Application("$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
+	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
 	EOF
+      [ -f $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib/opencpi2/_aci.so ] &&
+      command -v python2-config > /dev/null && [[ $(python2 -c "import sys;print(sys.version)") == 2* ]] &&
+	  OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
+		       python2 <<-EOF
+	import opencpi2.aci as OA
+	app=OA.Application(b"$OCPI_CDK_DIR/../projects/assets/applications/bias.xml")
+	EOF
+      set +vx
       ;;
     core)
       echo ======================= Running unit tests in project/core
@@ -150,8 +179,7 @@ for t in $TESTS; do
       echo ======================= Running ocpidev tests
       (framework_test ocpidev && HDL_TEST_PLATFORM=$hplats ./run-dropin-tests.sh)
       echo ======================= Running ocpidev_test tests
-      (unset HdlPlatforms; unset HdlPlatforms; \
-       framework_test ocpidev_test && rm -r -f test_project && \
+      (framework_test ocpidev_test && rm -r -f test_project &&
          HDL_PLATFORM=$hplats ./test-ocpidev.sh);;
     load-drivers)
       echo ======================= Loading all the OpenCPI plugins/drivers.
@@ -159,7 +187,7 @@ for t in $TESTS; do
     driver)
       if [ ! -e $OCPI_CDK_DIR/scripts/ocpi_${OCPI_TOOL_OS}_driver ]; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  not supported.
-      elif [ -e /.dockerenv ] ; then
+      elif [ -e /.dockerenv ] || [ -e /run/.containerenv ] ; then
         echo ======================= Skipping loading the OpenCPI kernel driver:  running in a docker container.
       else
         echo ======================= Loading the OpenCPI Linux Kernel driver. &&
@@ -172,4 +200,4 @@ for t in $TESTS; do
       exit 1;;
   esac
 done
-echo ======================= All tests passed: $TESTS
+echo ======================= All tests passed: $tests

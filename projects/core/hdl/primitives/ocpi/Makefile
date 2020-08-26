@@ -19,8 +19,8 @@
 # This primitive library contains VHDL primitive modules that are used
 # by all workers
 
+HdlLibraries=ocpi.core.bsv fixed_float
 # the generated entities for each property type
-HdlLibraries=bsv fixed_float
 Types=bool char double float short long uchar ulong ushort longlong ulonglong string
 TypeEntities=$(foreach t,$(Types),$t_property $t_array_property $t_read_property $t_read_array_property)
 TypeFiles=$(TypeEntities:%=gen/%.vhd)
@@ -32,7 +32,7 @@ SourceFiles=ocp_pkg.vhd types_pkg.vhd util_pkg.vhd wci_pkg.vhd wsi_pkg.vhd ocpi_
             gen/props_pkg.vhd \
 	    master.vhd slave.vhd  \
 	    part_master.vhd part_slave.vhd  \
-	    message_bounds.vhd clock_limiter.vhd \
+	    message_bounds.vhd clock_limiter.vhd zlm_detector.vhd \
 	    raw_arb.vhd delayline.vhd\
 	    $(TypeFiles)
 

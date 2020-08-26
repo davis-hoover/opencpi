@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=OpenCPI ANGRYVIPER GUI
-Comment=OpenCPI ANGRYVIPER GUI Development Tool
-Icon=esd
-Exec=bash -c "source OCPI_CDK_DIR/opencpi-setup.sh -s && exec ocpiav run"
-Terminal=false
-Categories=Development;IDE;

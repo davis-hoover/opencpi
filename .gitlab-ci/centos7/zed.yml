@@ -1,0 +1,418 @@
+.zed-centos7:
+  extends:
+    - .zed
+  tags:
+    - opencpi
+    - centos7
+    - zed
+    - shell
+
+################################
+# Jobs - Build-Primitives-Core #
+################################
+build-primitives:centos7:zed:
+  extends:
+    - .build-primitives
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+
+
+###########################
+# Jobs - Build-Components #
+###########################
+build-components-core:centos7:zed:
+  extends:
+    - .build-components-core
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-components-assets:centos7:zed:
+  extends:
+    - .build-components-assets
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-components-assets_ts:centos7:zed:
+  extends:
+    - .build-components-assets_ts
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-components-inactive:centos7:zed:
+  extends:
+    - .build-components-inactive
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+
+#########################
+# Jobs - Build-Adapters #
+#########################
+build-adapters-core:centos7:zed:
+  extends:
+    - .build-adapters-core
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-adapters-assets:centos7:zed:
+  extends:
+    - .build-adapters-assets
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+
+########################
+# Jobs - Build-Devices #
+########################
+build-devices-core:centos7:zed:
+  extends:
+    - .build-devices-core
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-devices-platform:centos7:zed:
+  extends:
+    - .build-devices-platform
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-devices-assets:centos7:zed:
+  extends:
+    - .build-devices-assets
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-devices-assets_ts:centos7:zed:
+  extends:
+    - .build-devices-assets_ts
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-devices-inactive:centos7:zed:
+  extends:
+    - .build-devices-inactive
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+
+######################
+# Jobs - Build-Cards #
+######################
+build-cards-core:centos7:zed:
+  extends:
+    - .build-cards-core
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-cards-assets:centos7:zed:
+  extends:
+    - .build-cards-assets
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+build-cards-inactive:centos7:zed:
+  extends:
+    - .build-cards-inactive
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+
+
+##########################
+# Jobs - Build-Platforms #
+##########################
+build-platforms-core:centos7:zed:
+  extends:
+    - .build-platforms-core
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-devices-core:centos7:zed
+    - build-cards-core:centos7:zed
+    - build-adapters-core:centos7:zed
+    - build-components-core:centos7:zed
+
+build-platforms-platform:centos7:zed:
+  extends:
+    - .build-platforms-platform
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-devices-platform:centos7:zed
+    - build-primitives:centos7:zed
+    - build-devices-core:centos7:zed
+
+build-platforms-assets:centos7:zed:
+  extends:
+    - .build-platforms-assets
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-devices-platform:centos7:zed
+    - build-primitives:centos7:zed
+    - build-devices-assets:centos7:zed
+    - build-cards-assets:centos7:zed
+    - build-adapters-assets:centos7:zed
+    - build-components-assets:centos7:zed
+    - build-devices-core:centos7:zed
+
+build-platforms-inactive:centos7:zed:
+  extends:
+    - .build-platforms-inactive
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-devices-inactive:centos7:zed
+    - build-cards-inactive:centos7:zed
+    - build-components-inactive:centos7:zed
+
+
+#####################
+# Jobs - Assemblies #
+#####################
+build-assemblies-platform:centos7:zed:
+  extends:
+    - .build-assemblies-platform
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+
+build-assemblies-assets:centos7:zed:
+  extends:
+    - .build-assemblies-assets
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+
+build-assemblies-assets_ts:centos7:zed:
+  extends:
+    - .build-assemblies-assets_ts
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - build-components-assets_ts:centos7:zed
+    - build-devices-assets_ts:centos7:zed
+
+build-assemblies-inactive:centos7:zed:
+  extends:
+    - .build-assemblies-inactive
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - build-platforms-inactive:centos7:zed
+
+
+#####################
+# Jobs - Build-Test #
+#####################
+build-test-core:centos7:zed:
+  extends:
+    - .build-test-core
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4
+
+build-test-assets-base:centos7:zed:
+  extends:
+    - .build-test-assets-base
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4
+
+build-test-assets-comms:centos7:zed:
+  extends:
+    - .build-test-assets-comms
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4
+
+build-test-assets-dsp:centos7:zed:
+  extends:
+    - .build-test-assets-dsp
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4
+
+build-test-assets-misc:centos7:zed:
+  extends:
+    - .build-test-assets-misc
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4
+
+build-test-assets-util:centos7:zed:
+  extends:
+    - .build-test-assets-util
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4
+
+build-test-assets_ts:centos7:zed:
+  extends:
+    - .build-test-assets_ts
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-core:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-assets:centos7:zed
+    - build-components-assets_ts:centos7:zed
+    - build-devices-assets_ts:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4
+
+build-test-inactive:centos7:zed:
+  extends:
+    - .build-test-inactive
+    - .zed-centos7
+  needs:
+    - job: prereq:centos7
+      artifacts: false
+    - build:centos7
+    - build-primitives:centos7:zed
+    - build-platforms-platform:centos7:zed
+    - build-platforms-inactive:centos7:zed
+    - prereq:centos7:xilinx13_4
+    - build-rcc:centos7:xilinx13_4

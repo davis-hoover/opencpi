@@ -1,0 +1,1 @@
+../cdc_bits_tester.hdl/cdc_clk_gen.vhd

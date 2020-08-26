@@ -138,6 +138,9 @@ connect(const std::string & remoteHost, uint16_t remotePort, bool udp) throw (st
         e = "gethostbyname() failed0";
       }
       s += e;
+      s += ":";
+      s += strerror(err);
+      s += remoteHost;
       throw s;
     }
     Posix::netDbUnlock ();

@@ -1,0 +1,48 @@
+<HdlWorker language="vhdl" version="2" DataWidth="32" libraries="clocking cdc">
+  <ComponentSpec>
+    <Property Name="CLK_IN_FREQUENCY_MHz" Type="float"
+                                Parameter="true"
+                                Default="100.0"
+                                Description="Input clock frequency"/>
+
+    <Property Name="CLK_OUT_FREQUENCY_MHz" Type="float"
+                                Parameter="true"
+                                Default="100.0"
+                                Description="Output clock frequency"/>
+
+
+    <Property Name="CLKOUT_DUTY_CYCLE" Type="float"
+                                Parameter="true"
+                                Default="0.5"
+                                Description="Duty Cycle"/>
+
+    <Property Name="Clock_Primitive" Type="string"
+                                Parameter="true"
+                                stringLength='32'
+                                Default="plle2"
+                                Description="Which clock primitive to use"/>
+
+    <Port Name="in"/>
+    <Port Name="out" Producer="true"/>
+  </ComponentSpec>
+  <Property Name="M" Type="float"
+                              Parameter="true"
+                              Default="16"
+                              Description="Multiply Parameter"/>
+
+  <Property Name="N" Type="ulong"
+                              Parameter="true"
+                              Default="1"
+                              Description="Divide Parameter"/>
+
+  <Property Name="O" Type="float"
+                              Parameter="true"
+                              Default="16"
+                              Description="Output Clock Divide Parameter"/>
+
+  <StreamInterface Name="in"
+                   NumberOfOpcodes="256" DataValueWidth="8"
+                   ZeroLengthMessages="true" clockDirection="out"/>
+  <StreamInterface Name="out" DataValueWidth="8" NumberOfOpcodes="256"
+                   ZeroLengthMessages="true" clockDirection="out"/>
+</HdlWorker>

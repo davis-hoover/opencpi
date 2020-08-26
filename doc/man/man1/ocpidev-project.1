@@ -1,0 +1,888 @@
+.\"     Title: ocpidev-project
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/14/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-PROJECT" "1" "07/14/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-project \- manage an OpenCPI project\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBproject\fR \fI<name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBproject\fR noun represents an OpenCPI project that holds and organizes OpenCPI assets\&. A project is a workspace in a directory where assets are developed\&. A project can contain:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Component libraries with component specifications, component unit test suites and workers (described in the
+\fIOpenCPI Component Development Guide\fR)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Applications (described in the
+\fIOpenCPI Application Development Guide\fR)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+HDL primitives and HDL assemblies (described in the
+\fIOpenCPI HDL Development Guide\fR)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+HDL devices, cards and slots (described in the
+\fIOpenCPI HDL Development Guide\fR)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Platform support assets (described in the
+\fIOpenCPI Platform Development Guide\fR)
+.RE
+.sp
+A project has:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A defined directory structure for storing assets in both source and built forms
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A project "make" file (named
+\fBMakefile\fR) that builds all the buildable assets that the project contains
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A project "make" file fragment (named
+\fBProject\&.mk\fR) that defines make variables and options to be applied to all assets in the project
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+An optional export file (named
+\fBProject\&.exports\fR) that specifies the assets and files that are to be visible to other projects that use this project\(cqs assets
+.RE
+.sp
+The \fBocpidev create\fR operation produces a skeleton directory structure and initial versions of the files that can then be edited as necessary during project and asset development\&.
+.sp
+For details on project directory structure and how it is populated and built, see the chapter "Developing OpenCPI Assets in Projects" in the \fIOpenCPI Component Development Guide\fR\&.
+.sp
+Verbs that can operate on a project are:
+.PP
+\fBbuild\fR
+.RS 4
+Build all assets in the project\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Remove all the generated and compiled files for all assets in the project\&.
+.RE
+.PP
+\fBcreate\fR
+.RS 4
+Create the named project, creating files and directories as required\&. The project is created in a directory
+\fI<name>\fR, which must be a name without slashes\&. The project directory is created under the current working directory where
+\fBocpidev\fR
+is executed\&. The general\-purpose option
+\fB\-d\fR
+\fI<directory>\fR
+can be used to create the project\(cqs directory under a different directory\&.
+.RE
+.PP
+\fBdelete\fR
+.RS 4
+Remove all directories and files associated with the named project\&.
+.RE
+.PP
+\fBrefresh\fR
+.RS 4
+Manually regenerate the metadata associated with the project\&.
+.RE
+.PP
+\fBrun\fR
+.RS 4
+Run all applications and unit test suites in the project\&.
+.RE
+.PP
+\fBshow\fR
+.RS 4
+Display information associated with the project\&.
+.RE
+.PP
+\fB[un]register\fR
+.RS 4
+Register/unregister the named project in a registry\&.
+.RE
+.PP
+\fButilization\fR
+.RS 4
+Display usage information for all built workers, platforms, and assemblies contained in the project\&.
+.RE
+.sp
+Note that an asset\(cqs name is implied by the directory you\(cqre in when you issue the \fBocpidev\fR command\&. For projects, this means that you can perform operations (verbs) on the project without having to specify its name when you issue the \fBocpidev\fR command from inside the project directory\&.
+.sp
+The \fBocpidev\fR tool can also operate on a plural \fBprojects\fR noun\&. The syntax is:
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fBshow projects\fR
+.sp
+where \fBshow\fR is the only valid verb, the default global scope is the only valid scope, and the valid options are \fB\-d\fR \fI<directory>\fR and the \fBshow\fR verb formatting options (\fB\-\-json\fR, \fB\-\-simple\fR, \fB\-\-table\fR)\&. The \fBocpidev show projects\fR command displays information about all registered OpenCPI projects\&.
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.SS "Options That Apply to All Operations (Verbs) on Projects"
+.PP
+\fB\-d\fR \fI<directory>\fR+
+.RS 4
+Specify the directory in which the command should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-verbose\fR+
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Options When Creating Projects"
+.PP
+\fB\-\-exclude\-platform=\fR\fI<platform>\fR, \fB\-Q\fR \fI<platform>\fR+
+.RS 4
+Do not build the project for the specified platform\&.
+.RE
+.PP
+\fB\-\-only\-platform=\fR\fI<platform>\fR, \fB\-G\fR \fI<platform>\fR+
+.RS 4
+Only build the project for the specified platform\&.
+.RE
+.PP
+\fB\-\-register\fR
+.RS 4
+Register the project as part of creating it\&.
+.RE
+.PP
+\fB\-A\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for XML include files\&.
+.RE
+.PP
+\fB\-D\fR \fI<package\-ID>\fR+
+.RS 4
+Specify the package\-ID of a project on which the project being created depends\&.
+.RE
+.PP
+\fB\-F\fR \fI<package\-prefix>\fR
+.RS 4
+Specify the package prefix of the created project\&. The default is
+\fBlocal\fR
+for projects\&.
+.RE
+.PP
+\fB\-I\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for include files (C, C++, Verilog)\&.
+.RE
+.PP
+\fB\-K\fR \fI<package\-ID>\fR
+.RS 4
+Specify the package\-ID directly\&. The default is
+\fI<package\-prefix>\fR\fB\&.\fR\fI<package\-name>\fR\&.
+.RE
+.PP
+\fB\-N\fR \fI<packge\-name>\fR
+.RS 4
+Specify the package name of the created project\&. The default is the
+\fI<name>\fR
+argument given after the
+\fBcreate\fR
+verb\&.
+.RE
+.PP
+\fB\-T\fR \fI<target>\fR+
+.RS 4
+Only build the project for the specified architecture\&.
+.RE
+.PP
+\fB\-Y\fR \fI<primitive\-library>\fR+
+.RS 4
+Specify a primitive library on which the project (or assets it contains) depends\&.
+.RE
+.PP
+\fB\-Z\fR \fI<target>\fR+
+.RS 4
+Do not build the project for the specified architecture\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Keep files and directories created after a project creation fails\&. Normally, all such files and directories are removed on any failure\&.
+.RE
+.PP
+\fB\-y\fR \fI<component\-library>\fR+
+.RS 4
+Specify a component library to search for workers, devices and/or specs that this project (or assets it contains) references\&.
+.RE
+.SS "Options When Deleting Projects"
+.PP
+\fB\-f\fR
+.RS 4
+Force deletion: do not ask for confirmation when deleting a project\&. Normally, you are asked to confirm a deletion\&.
+.RE
+.SS "Options When Building Projects"
+.PP
+\fB\-\-hdl\-assembly=\fR\fI<hdl\-assembly>\fR+
+.RS 4
+Limit the HDL assemblies being built to the specified assembly\&. This option can also be used in the
+\fBhdl/assemblies\fR
+directory\&.
+.RE
+.PP
+\fB\-\-hdl\fR
+.RS 4
+Limit the assets being built to HDL primitives, workers, platforms or assemblies\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<hdl\-platform>\fR+
+.RS 4
+Build HDL assets for the specified HDL platform\&.
+.RE
+.PP
+\fB\-\-hdl\-rcc\-platform=\fR\fI<platform>\fR+
+.RS 4
+Build RCC/ACI assets for the RCC platforms associated with the specified HDL platform\&. If this option is not used (and
+\fB\-\-rcc\-platform\fR
+\fI<platform>\fR
+is also not used), the current development software platform is used as the single RCC platform used for building\&.
+.RE
+.PP
+\fB\-\-hdl\-target=\fR\fI<target>\fR+
+.RS 4
+Build HDL assets for the specified HDL architecture\&. If only HDL targets are specified (and no HDL platforms), containers are not built for HDL assemblies or component unit test suites\&.
+.RE
+.PP
+\fB\-\-no\-assemblies\fR
+.RS 4
+Don\(cqt build the HDL assemblies in the project\&. Building HDL assemblies (and their containers) can be slow\&.
+.RE
+.PP
+\fB\-\-rcc\fR
+.RS 4
+Limit the assets being built to RCC workers\&.
+.RE
+.PP
+\fB\-\-rcc\-platform=\fR\fI<platform>\fR+
+.RS 4
+Build RCC/ACI assets for the specified RCC platform\&. If this option is not used (and
+\fB\-\-hdl\-rcc\-platform\fR
+\fI<platform>\fR
+is also not used), the current development software platform is used as the single RCC platform used for building\&.
+.RE
+.PP
+\fB\-\-worker=\fR\fI<worker>\fR+
+.RS 4
+Limits the assets being built to the specified worker\&.
+.RE
+.SS "Options When Running Projects"
+.sp
+The options described here, when used in an "ocpidev run project" command, are applied as appropriate to all of the runnable assets (applications and unit test suites) that reside in the project\&. Note that any application\-specific options supplied on the command line are only applied to XML applications and not to ACI applications\&.
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBOptions That Apply to Applications and Unit Tests\fR
+.RS 4
+.PP
+\fB\-\-rcc\-platform=\fR\fI<platform>\fR+
+.RS 4
+Specify the RCC platform to use to build and generate the unit test suites and build the ACI applications\&.
+.RE
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBOptions That Apply to Applications Only\fR
+.RS 4
+.PP
+\fB\-\-after=\fR\fI<args>\fR+
+.RS 4
+Specify the argument(s) to insert at the end of the execution command line\&.
+.RE
+.PP
+\fB\-\-before=\fR\fI<args>\fR+
+.RS 4
+Specify the argument(s) to insert before the ACI executable or the
+\fBocpirun\fR
+command; for example, environment settings or prefix commands\&.
+.RE
+.PP
+\fB\-\-run\-arg=\fR\fI<args>\fR+
+.RS 4
+Specify the argument(s) to insert immediately after the ACI executable or the
+\fBocpirun\fR
+command\&.
+.RE
+.sp
+For details on how to use these options, see the section "Applications in Projects" in the \fIOpenCPI Application Development Guide\fR\&.
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBOptions That Apply to Component Unit Test Suites Only\fR
+.RS 4
+.PP
+\fB\-\-accumulate\-errors\fR
+.RS 4
+Report execution or verification errors as they occur rather than ending the test on the first failure detected\&.
+.RE
+.PP
+\fB\-\-exclude\-platform=\fR\fI<platform>\fR, \fB\-Q\fR \fI<platform>\fR+
+.RS 4
+Specify the runtime platform to omit from a unit test suite\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<platform>\fR+
+.RS 4
+Specify the HDL platform to use with the unit test suite\&. This option is only valid in generate and build phases\&.
+.RE
+.PP
+\fB\-\-keep\-simulations\fR
+.RS 4
+Keep HDL simulation files regardless of verification results\&. By default, simulation files are removed if the verification is successful\&. Warning: Simulation files can become large!
+.RE
+.PP
+\fB\-\-mode=\fR\fI<mode>\fR[,\fI<mode>\fR[,\fI<mode>\fR\&...]]
+.RS 4
+Specify which phase(s) of the unit test to execute\&. Valid modes are:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBall\fR: execute all five phases (the default if
+\fB\-\-mode\fR
+is not used)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBgen\fR: execute generate phase
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBgen_build\fR: execute generate and build phases
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBprep_run_verify\fR: execute prepare, run, and verify phases
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBprep\fR: execute prepare phase
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBrun\fR: execute run phase
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBprep_run\fR: execute prepare and run phases
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBverify\fR: execute verify phase
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBview\fR: execute the view script (view\&.sh) on an already executed run
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBclean_all\fR: clean all generated files
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBclean_run\fR: clean all files generated during the run phase
+.RE
+.RE
+.PP
+\fB\-\-only\-platform=\fR\fI<platform>\fR, \fB\-G\fR \fI<platform>\fR+
+.RS 4
+Specify the runtime platform to use with a unit test suite\&.
+.RE
+.PP
+\fB\-\-remotes=\fR\fI<system>\fR
+.RS 4
+Specify the remote system to run the unit test suite(s) by setting the
+\fBOCPI_REMOTE_TEST_SYS\fR
+variable\&. See the section "Defining Remote Systems for Executing Tests" in the
+\fIOpenCPI Component Development Guide\fR
+for more information\&.
+.RE
+.PP
+\fB\-\-view\fR
+.RS 4
+Run the view script (\fBview\&.sh\fR) for the test at the conclusion of the test\(cqs execution\&.
+.RE
+.PP
+\fB\-l\fR \fI<library>\fR
+.RS 4
+Run the unit test suite(s) in the specified library\&.
+.RE
+.RE
+.SS "Options When Showing Projects"
+.PP
+\fB\-\-global\-scope\fR
+.RS 4
+Show assets from all registered projects and the current project if applicable\&. This is the default scope used if
+\fB\-local\-scope\fR
+is not used\&.
+.RE
+.PP
+\fB\-\-json\fR
+.RS 4
+Format the output in json format, for integration with other software\&.
+.RE
+.PP
+\fB\-\-local\-scope\fR
+.RS 4
+Only show assets in the local project\&.
+.RE
+.PP
+\fB\-\-simple\fR
+.RS 4
+Format the output as simply as possible\&.
+.RE
+.PP
+\fB\-\-table\fR
+.RS 4
+Display the output in an easy\-to\-read table\&. This is the default display format used if
+\fB\-\-simple\fR
+or
+\fB\-\-json\fR
+are not used\&.
+.RE
+.SS "Options When Using Utilization on Projects"
+.PP
+\fB\-\-format\fR{\fB=table\fR|\fBlatex\fR}
+.RS 4
+Specify the format in which to output the usage information\&. Specifying
+\fBtable\fR
+sends the information to stdout in tabular format\&. Specifying
+\fBlatex\fR
+bypasses
+\fBstdout\fR
+and writes all output to
+\fButilization\&.inc\fR
+files in the directories for the assets on which it operates\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<platform>\fR+
+.RS 4
+Specify the buildable HDL platform for which to display usage information\&. This option can be specified more than once on the command line\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Create a project with the name
+\fBmy\-project\fR\&. This project\(cqs package\-ID will be
+\fBlocal\&.my\-project\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create project my\-project
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Create a project with the package\-prefix
+\fBorg\&.my\-organization\fR
+and the name
+\fBmy\-project\fR\&. This project\(cqs package\-ID will be
+\fBorg\&.my\-organization\&.my\-project\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create project my\-project \-F org\&.my\-organization
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Build the
+\fBassets\fR
+project for the
+\fBzed\fR
+HDL platform and
+\fBxilinx13_3\fR
+RCC platform\&. Omit the name
+\fBassets\fR
+if inside the
+\fBassets\fR
+project\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build project assets \-\-hdl\-platform zed
+                             \-\-rcc\-platform xilinx13_3
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Clean the
+\fBassets\fR
+project:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev clean project assets
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Register the current project to its registry (or the default if it doesn\(cqt have one yet):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev register project
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 6.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  6." 4.2
+.\}
+Unregister the current project:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev unregister project
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 7.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  7." 4.2
+.\}
+Run all the applications and unit tests in the project named
+\fBMyProject\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev run project MyProject
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 8.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  8." 4.2
+.\}
+Display information about the current project:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show project
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 9.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  9." 4.2
+.\}
+Show usage information for all supported assets in a project:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization project
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'10.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "10." 4.2
+.\}
+Record usage information in LaTeX format for all supported assets in a project:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization project \-\-format=latex
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-build(1) ocpidev\-create(1) ocpidev\-clean(1) ocpidev\-delete(1) ocpidev\-refresh(1) ocpidev\-register(1) ocpidev\-run(1) ocpidev\-show(1) ocpidev\-unregister(1) ocpidev\-utilization(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

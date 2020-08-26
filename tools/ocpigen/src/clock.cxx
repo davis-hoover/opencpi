@@ -113,6 +113,7 @@ addMyClock(bool output) {
   m_clock = &m_worker->addClock(pname(), output);
   m_clock->m_port = this;
   m_myClock = true;
+  deriveOCP(); // this might have changed the port's clock signals
   return *m_clock;
 }
 
@@ -204,4 +205,49 @@ rename(const char *name, Port *port) {
     m_port->m_myClock = true;
     m_port->deriveOCP();
   }
+}
+
+// The name of the signal inside the worker shell for the clock signal
+const char *Clock::
+internalName() const {
+  if (m_internalName.empty()) {
+    if (m_port) {
+      if (m_output) {
+	if (m_port->isDataProducer())
+	  m_internalName = m_port->typeNameOut + "_temp.";
+	else
+	  m_internalName = m_port->pname(), m_internalName += "_";
+      } else
+	m_internalName = m_port->typeNameIn + ".";
+      m_internalName += "Clk";
+    } else
+      m_internalName = m_signal;
+  }
+  return m_internalName.c_str();
+}
+
+void Clock::
+emitDataClockCDCs(FILE *f, const Clock &wciClock, std::string &instances) const {
+  fprintf(f,
+	  "  signal wsi_reset_%s        : Bool_t;\n"
+	  "  signal wsi_is_operating_%s : Bool_t;\n",
+	  cname(), cname());
+  OU::formatAdd(instances,
+		"  clock_%s_wsi_reset_inst : component cdc.cdc.reset\n"
+		"    generic map(RST_DELAY    => num_reset_cycles)\n"
+		"    port map   (src_rst      => wci_reset,\n"
+		"                dst_clk      => %s,\n"
+		"                dst_rst      => wsi_reset_%s);\n"
+		"  clock_%s_wsi_is_operating_inst : component cdc.cdc.single_bit\n"
+		"    generic map(IREG      => '1',\n"
+		"                RST_LEVEL => '0')\n"
+		"    port map   (src_clk      => %s,\n"
+		"                src_rst      => wci_reset,\n"
+		"                src_en       => '1',\n"
+		"                src_in       => wci_is_operating,\n"
+		"                dst_clk      => %s,\n"
+		"                dst_rst      => wsi_reset_%s,\n"
+		"                dst_out      => wsi_is_operating_%s);\n",
+		cname(), internalName(), cname(),
+		cname(), wciClock.internalName(), internalName(), cname(), cname());
 }

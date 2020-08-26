@@ -19,18 +19,12 @@
 # This is the Makefile for the test directory which tests component "time_demux"
 
 TestApplications = test_data_generator
-include $(OCPI_CDK_DIR)/include/ocpisetup.mk
-
-# This "generate" needs to be BEFORE the main one to make test file first
-generate: mytestvmlinuz
-.DEFAULT: test
 
 include $(OCPI_CDK_DIR)/include/test.mk
 
-clean:: myclean
+# Our input generator depends on this file.
+inputs: | gen/mytestdata
 
-mytestvmlinuz:
-	$(AT)cp /boot/vmlinuz-$(shell uname -r) $@
-
-myclean:
-	$(AT)rm -rf mytestvmlinuz
+gen/mytestdata: | gen
+	$(AT)echo Generating test data file: $@
+	$(AT)rm -f gen/mytestdata && cp `which ocpirun` gen/mytestdata

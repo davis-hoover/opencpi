@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -47,7 +47,7 @@ def main():
     lfsr_table = gen_lfsr_table()
 
     f = open("lfsr_tables.py", "wb")
-    f.write(bytes("#!/usr/bin/env python3.4\n", "UTF-8"))
+    f.write(bytes("#!/usr/bin/env python3\n", "UTF-8"))
     f.write(bytes("# This file is protected by Copyright. Please refer to the COPYRIGHT file\n", "UTF-8"))
     f.write(bytes("# distributed with this source distribution.\n", "UTF-8"))
     f.write(bytes("#\n", "UTF-8"))

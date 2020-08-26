@@ -1,0 +1,442 @@
+OCPIDEV-PROJECT(1)
+=================
+
+
+NAME
+----
+ocpidev-project - manage an OpenCPI project.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`project`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *`project`* noun represents an OpenCPI project that holds and
+organizes OpenCPI assets. A project is a workspace in a directory
+where assets are developed. A project can contain:
+
+- Component libraries with component specifications, component unit
+test suites and workers (described in the 'OpenCPI Component Development Guide')
+
+- Applications (described in the 'OpenCPI Application Development Guide')
+
+- HDL primitives and HDL assemblies (described in the 'OpenCPI
+HDL Development Guide')
+
+- HDL devices, cards and slots (described in the 'OpenCPI HDL
+Development Guide')
+
+- Platform support assets (described in the 'OpenCPI Platform
+Development Guide')
+
+A project has:
+
+- A defined directory structure for storing assets
+in both source and built forms
+
+- A project "make" file (named *`Makefile`*) that
+builds all the buildable assets that the project contains
+
+- A project "make" file fragment (named *`Project.mk`*)
+that defines make variables and options to be applied to all
+assets in the project
+
+- An optional export file (named *`Project.exports`*)
+that specifies the assets and files that are to be visible
+to other projects that use this project's assets
+
+The *`ocpidev create`* operation produces a skeleton directory
+structure and initial versions of the files
+that can then be edited as necessary during project
+and asset development.
+
+For details on project directory structure and how
+it is populated and built, see the chapter "Developing OpenCPI
+Assets in Projects" in the 'OpenCPI Component Development
+Guide'.
+
+Verbs that can operate on a project are:
+
+*`build`*::
+    Build all assets in the project.
+
+*`clean`*::
+    Remove all the generated and compiled files for all assets
+    in the project.
+
+*`create`*::
+    Create the named project, creating files and directories as required.
+    The project is created in a directory '<name>', which must be a name
+    without slashes. The project directory is created under the current
+    working directory where *`ocpidev`* is executed. The general-purpose
+    option *`-d`* '<directory>' can be used to create the
+    project's directory under a different directory.
+
+*`delete`*::
+    Remove all directories and files associated with the named project.
+
+*`refresh`*::
+    Manually regenerate the metadata associated with the project.
+
+*`run`*::
+    Run all applications and unit test suites in the project.
+    
+*`show`*::
+    Display information associated with the project.
+
+*`[un]register`*::
+    Register/unregister the named project in a registry.
+
+*`utilization`*::
+    Display usage information for all built workers, platforms,
+    and assemblies contained in the project.
+
+Note that an asset's name is implied by the directory you're in when
+you issue the *`ocpidev`* command. For projects, this means that you can
+perform operations (verbs) on the project without having to specify its
+name when you issue the *`ocpidev`* command from inside the project directory.
+
+The *`ocpidev`* tool can also operate on a plural *`projects`* noun.
+The syntax is:
+
+*`ocpidev`* ['<options>'] *`show projects`*
+
+where *`show`* is the only valid verb, the default global
+scope is the only valid scope, and the valid options
+are *`-d`* '<directory>' and the *`show`* verb formatting
+options (*`--json`*, *`--simple`*, *`--table`*).
+The *`ocpidev show projects`* command displays
+information about all registered OpenCPI projects.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options That Apply to All Operations (Verbs) on Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-d`* '<directory>'+::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+
+*`-v`*, *`--verbose`*+::
+    Describe what is happening in command execution in more detail.
+
+Options When Creating Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+   Do not build the project for the specified platform.
+
+*`--only-platform=`*'<platform>', *-G* '<platform>'+::
+   Only build the project for the specified platform.
+   
+*`--register`*::
+   Register the project as part of creating it.   
+
+*`-A`* '<directory>'+::
+   Specify a directory to search for XML include files.
+   
+*`-D`* '<package-ID>'+::
+    Specify the package-ID of a project on which the project being
+    created depends.
+
+*`-F`* '<package-prefix>'::
+   Specify the package prefix of the created project. The default
+   is *local* for projects.
+
+*`-I`* '<directory>'+::
+   Specify a directory to search for include files (C, C++,
+   Verilog).
+
+*`-K`* '<package-ID>'::
+   Specify the package-ID directly. The default is
+   '<package-prefix>'*.*'<package-name>'.
+
+*-N* '<packge-name>'::
+   Specify the package name of the created project. The
+   default is the '<name>' argument given after the *create* verb.
+   
+*`-T`* '<target>'+::
+   Only build the project for the specified architecture.
+
+*`-Y`* '<primitive-library>'+::
+   Specify a primitive library on which the project (or assets
+   it contains) depends.
+   
+*`-Z`* '<target>'+::
+   Do not build the project for the specified architecture.
+
+*`-k`*::
+    Keep files and directories created after a project creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+
+*`-y`* '<component-library>'+::
+   Specify a component library to search for workers, devices
+   and/or specs that this project (or assets it contains) references.
+
+Options When Deleting Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-f`*::
+    Force deletion: do not ask for confirmation when deleting
+    a project. Normally, you are asked to confirm a deletion.
+
+Options When Building Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hdl-assembly=`*'<hdl-assembly>'+::
+    Limit the HDL assemblies being built to the specified assembly. This option
+    can also be used in the *hdl/assemblies* directory.
+
+*`--hdl`*::
+    Limit the assets being built to HDL primitives, workers, platforms
+    or assemblies.
+
+*`--hdl-platform=`*'<hdl-platform>'+::
+    Build HDL assets for the specified HDL platform.
+
+*`--hdl-rcc-platform=`*'<platform>'+::
+    Build RCC/ACI assets for the RCC platforms associated with the
+    specified HDL platform. If this option is not used (and *`--rcc-platform`*
+    '<platform>' is also not used), the current development software
+    platform is used as the single RCC platform used for building.
+
+*`--hdl-target=`*'<target>'+::
+    Build HDL assets for the specified HDL architecture. If only HDL targets
+    are specified (and no HDL platforms), containers are not
+    built for HDL assemblies or component unit test suites.
+    
+*`--no-assemblies`*::
+    Don't build the HDL assemblies in the project. Building HDL assemblies
+    (and their containers) can be slow.
+
+*`--rcc`*::
+    Limit the assets being built to RCC workers.
+
+*`--rcc-platform=`*'<platform>'+::
+    Build RCC/ACI assets for the specified RCC platform. If this
+    option is not used (and *`--hdl-rcc-platform`* '<platform>'
+    is also not used), the current development software platform
+    is used as the single RCC platform used for building.
+
+*`--worker=`*'<worker>'+::
+    Limits the assets being built to the specified worker.
+
+Options When Running Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The options described here, when used in an "ocpidev run project" command,
+are applied as appropriate to all of the runnable assets (applications
+and unit test suites) that reside in the project. Note that any application-specific
+options supplied on the command line are only applied to XML applications
+and not to ACI applications.
+
+Options That Apply to Applications and Unit Tests
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*`--rcc-platform=`*'<platform>'+:: 
+    Specify the RCC platform to use to build and generate the unit test suites
+    and build the ACI applications.
+
+Options That Apply to Applications Only
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
+*`--after=`*'<args>'+::
+    Specify the argument(s) to insert at the end of the execution command line.
+    
+*`--before=`*'<args>'+:: 
+    Specify the argument(s) to insert before the ACI executable or
+    the *`ocpirun`* command; for example, environment settings
+    or prefix commands.
+	
+*`--run-arg=`*'<args>'+::
+    Specify the argument(s) to insert immediately after the ACI executable or
+    the *`ocpirun`* command.
+
+For details on how to use these options, see the section "Applications
+in Projects" in the 'OpenCPI Application Development Guide'.
+
+Options That Apply to Component Unit Test Suites Only
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*`--accumulate-errors`*:: 
+    Report execution or verification errors as they occur rather
+    than ending the test on the first failure detected.
+    
+*`--exclude-platform=`*'<platform>', *`-Q`* '<platform>'+::
+    Specify the runtime platform to omit from a unit test suite.
+    
+*`--hdl-platform=`*'<platform>'+::
+    Specify the HDL platform to use with the unit test suite. This option is only
+    valid in generate and build phases.
+
+*`--keep-simulations`*:: 
+    Keep HDL simulation files regardless of verification results.
+    By default, simulation files are removed if the verification
+    is successful. Warning: Simulation files can become large!
+    
+*`--mode=`*'<mode>'[,'<mode>'[,'<mode>'...]]::
+    Specify which phase(s) of the unit test to execute. Valid modes are:
+    - *`all`*:  execute all five phases (the default if *`--mode`* is not used)
+    - *`gen`*: execute generate phase
+    - *`gen_build`*: execute generate and build phases
+    - *`prep_run_verify`*: execute prepare, run, and verify phases
+    - *`prep`*: execute prepare phase
+    - *`run`*: execute run phase
+    - *`prep_run`*: execute prepare and run phases
+    - *`verify`*: execute verify phase 
+    - *`view`*: execute the view script (view.sh) on an already executed run  
+    - *`clean_all`*: clean all generated files
+    - *`clean_run`*: clean all files generated during the run phase   
+    
+*`--only-platform=`*'<platform>', *`-G`* '<platform>'+:: 
+    Specify the runtime platform to use with a unit test suite.
+
+*`--remotes=`*'<system>'::
+    Specify the remote system to run the unit test suite(s) by setting the
+    *`OCPI_REMOTE_TEST_SYS`* variable. See the section
+    "Defining Remote Systems for Executing Tests"
+    in the 'OpenCPI Component Development Guide' for more information.
+    
+*`--view`*::
+    Run the view script (*`view.sh`*) for the test at the conclusion of the
+    test's execution.
+
+*`-l`* '<library>'::
+    Run the unit test suite(s) in the specified library.
+
+Options When Showing Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--global-scope`*::
+   Show assets from all registered projects and the
+   current project if applicable.
+   This is the default scope used if *`-local-scope`* is not used.
+    
+*`--json`*::
+    Format the output in json format, for integration with other software.
+
+*`--local-scope`*::
+   Only show assets in the local project.
+
+*`--simple`*::
+    Format the output as simply as possible.
+  
+*`--table`*::
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if *`--simple`* or *`--json`* are not used.
+
+Options When Using Utilization on Projects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--format`*{*`=table`*|*`latex`*}::
+    Specify the format in which to output the usage information.
+    Specifying *`table`* sends the information to stdout in tabular format.
+    Specifying *`latex`* bypasses *`stdout`* and writes all output to
+    *`utilization.inc`* files in the directories for the assets on
+    which it operates.
+    
+*`--hdl-platform=`*'<platform>'+::
+    Specify the buildable HDL platform for which to
+    display usage information.
+    This option can be specified more than once on the command line.
+
+EXAMPLES
+--------
+. Create a project with the name *`my-project`*. This project's
+package-ID will be *`local.my-project`*:
++
+-------------------------------
+ocpidev create project my-project
+--------------------------------
++
+. Create a project with the package-prefix *`org.my-organization`* and
+the name *`my-project`*. This project's package-ID will be
+*`org.my-organization.my-project`*:
++
+--------------------------------------------------------
+ocpidev create project my-project -F org.my-organization
+--------------------------------------------------------
++
+. Build the *`assets`* project for the *`zed`* HDL platform and
+*`xilinx13_3`* RCC platform.  Omit the name *`assets`* if
+inside the *`assets`* project.
++
+--------------------------------------------
+ocpidev build project assets --hdl-platform zed
+                             --rcc-platform xilinx13_3
+-------------------------------------------
++
+. Clean the *`assets`* project:
++
+---------------------------
+ocpidev clean project assets
+----------------------------
++
+. Register the current project to its registry
+(or the default if it doesn't have one yet):
++
+-----------------------
+ocpidev register project
+-----------------------
++
+. Unregister the current project:
++
+-------------------------
+ocpidev unregister project
+--------------------------
++
+. Run all the applications and unit tests in the project named *`MyProject`*:
++
+-----------------------------
+ocpidev run project MyProject
+-----------------------------
++
+. Display information about the current project:
++
+--------------------
+ocpidev show project
+---------------------
++
+. Show usage information for all supported assets in a project:
++
+--------------------------
+ocpidev utilization project
+--------------------------
++
+. Record usage information in LaTeX format for all supported assets
+in a project:
++
+----------------------------------------
+ocpidev utilization project --format=latex
+----------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-build.1.html[ocpidev-build(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-clean.1.html[ocpidev-clean(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-refresh.1.html[ocpidev-refresh(1)]
+link:ocpidev-register.1.html[ocpidev-register(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
+link:ocpidev-show.1.html[ocpidev-show(1)]
+link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
+link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

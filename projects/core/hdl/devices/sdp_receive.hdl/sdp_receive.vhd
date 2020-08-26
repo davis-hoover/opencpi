@@ -19,9 +19,9 @@
 -- The SDP receiver, to take data from the SDP port, and put it out on a WSI port,
 -- buffering messages in BRAM.  The WSI width is the SDP width.
 
-library IEEE, ocpi, util, bsv, sdp;
+library IEEE, ocpi, util, ocpi_core_bsv, sdp, cdc;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all;
+use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all, ocpi_core_bsv.all;
 architecture rtl of worker is
   -- Local worker constants
   constant sdp_width_c     : natural := to_integer(sdp_width);
@@ -37,7 +37,7 @@ architecture rtl of worker is
     ndws_left : metalength_dws_t; -- left AFTER FIRST WSI XFER
     zlm       : bool_t;           -- this is a zlm
     eof       : bool_t;           -- this is an EOF
-    last_be   : std_logic_vector(dword_bytes * sdp_width_c-1 downto 0);    
+    last_be   : std_logic_vector(dword_bytes * sdp_width_c-1 downto 0);
     opcode    : std_logic_vector(meta_opcode_width_c-1 downto 0);
   end record msginfo_t;
   constant msginfo_width_c : natural :=
@@ -120,14 +120,13 @@ architecture rtl of worker is
   -- Signals and definitions for talking to the SDP side
   --------------------------------------------------------------------------------
   -- to the SDP side
-  signal buffer_ndws     : bram_addr_t;
+  signal buffer_ndws     : unsigned(width_for_max(memory_depth_c * sdp_width_c)-1 downto 0);
   signal buffer_count    : buffer_count_t;
   signal md_not_full     : std_logic;
   -- from the SDP side
   signal bramb_addr      : bram_addr_t;
   signal bramb_in        : dword_array_t(0 to sdp_width_c-1);
   signal bramb_write     : bool_array_t(0 to sdp_width_c-1);
-  signal bad_write       : bool_t;
   signal md_enq          : bool_t;
 
   ---- Global state
@@ -232,7 +231,7 @@ g0: for i in 0 to sdp_width_c-1 generate
     when md_in_byte_bits = 0 and md_in_dws_bits >= sdp_width else
     md_in_dws_bits - (sdp_width - 1)
     when md_in_byte_bits /= 0 and md_in_dws_bits >= sdp_width - 1 else
-    (others => '0');   
+    (others => '0');
   md_in.last_be <=
     (others => '1') when md_in_raw.length(addr_shift_c-1 downto 0) = 0 else
     slv(not (unsigned(slv1(sdp_width_c*dword_bytes)) sll
@@ -257,7 +256,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- I.e. when the SDP side is done PULLING data, it indicates the buffer is full,
   -- and then the WSI processing can send the message, according to the metadata Fifo.
   -- SDP -> WSI
-  availfifo : component bsv.bsv.SizedFIFO
+  availfifo : component bsv_pkg.SizedFIFO
    generic map(p1Width      => 1,
                p2depth      => roundup_2_power_of_2(max_buffers_c),
                p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
@@ -299,8 +298,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   last_give            <= to_bool(wsi_dws_left = 0);
   giving               <= to_bool(will_give and not its(md_out.eof));
   wsi_dws_left         <= md_out.ndws_left when its(wsi_starting_r) else wsi_dws_left_r;
-  buffer_ndws          <= props_in.buffer_size(bram_addr_t'left + addr_shift_c
-                                               downto addr_shift_c);
+  buffer_ndws          <= props_in.buffer_size(buffer_ndws'left + dword_shift downto dword_shift);
   faults                <= faults_r or dma_faults;
   --------------------------------------------------------------------------------
   -- Module output ports on the CTL/WSI side
@@ -372,7 +370,7 @@ g0: for i in 0 to sdp_width_c-1 generate
               wsi_buffer_index_r <= wsi_buffer_index_r + 1;
             end if;
           else
-            wsi_dws_left_r       <= wsi_dws_left - sdp_width_c;
+            wsi_dws_left_r       <= wsi_dws_left - ocpi.util.min(wsi_dws_left, sdp_width_c);
             wsi_starting_r       <= bfalse;
           end if;
         end if; -- will_give

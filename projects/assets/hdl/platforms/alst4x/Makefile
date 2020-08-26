@@ -18,11 +18,12 @@
 
 # The alst4x platform, mostly a clone of the alst4 platform
 Libraries=stratix4 pcie_4243_hip_s4gx_gen2_x4_128
-ExportFiles=alst4x.qsf alst4x.sdc jtagSupport_alst4x loadFlash_alst4x testbias_alst4x_base.bitz
+ExportFiles=alst4x.qsf alst4x.sdc jtagSupport_alst4x loadFlash_alst4x
 Configurations=\
   base $(basename $(notdir $(subst /alst4,/alst4x,$(wildcard ../alst4/alst4_zipper*.xml))))
 # FIXME: we need a better way to "clone" a platform
 # Unfortunately, the xml file must exist prior to dependencies, so we just do them all immediately
+include $(OCPI_CDK_DIR)/include/util.mk
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
     test -e alst4x.xml || sed "s/'alst4'/'alst4x'/" ../alst4/alst4.xml > alst4x.xml; \

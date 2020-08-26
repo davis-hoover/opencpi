@@ -24,6 +24,7 @@ package cdc is
 
   component reset
     generic (
+      SRC_RST_VALUE : std_logic :='1'; 
       RST_DELAY : integer := 2);
     port (
       src_rst : in  std_logic;
@@ -117,5 +118,33 @@ package cdc is
       slow_sticky : out std_logic); -- sticky bit set when fast_pulse is high,
                                     -- sync'd to slow clock domain
   end component fast_pulse_to_slow_sticky;
+
+  component pulse_handshake is
+    generic (
+      N : natural := 2);
+    port (
+      src_clk    : in  std_logic;
+      src_rst    : in  std_logic;
+      src_pulse  : in  std_logic;
+      src_rdy    : out std_logic;
+      dst_clk   : in  std_logic;
+      dst_rst   : in  std_logic;
+      dst_pulse : out std_logic);
+  end component pulse_handshake;
+
+  component bits_feedback is
+    generic (
+      WIDTH : positive := 1);
+    port (
+      src_clk   : in  std_logic;
+      src_rst   : in  std_logic;
+      src_en    : in  std_logic;
+      src_rdy   : out std_logic;
+      src_in    : in  std_logic_vector(WIDTH-1 downto 0);
+      dst_clk   : in  std_logic;
+      dst_rst   : in  std_logic;
+      dst_out   : out std_logic_vector(WIDTH-1 downto 0)
+      );
+  end component;
 
 end package cdc;

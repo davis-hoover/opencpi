@@ -42,65 +42,39 @@ function do_stop() {
 # We'll write a file here in case someone also wants to do env setup
 cat >setup.sh <<'EOF'
 export OCPI_CDK_DIR=`pwd`
-export OCPI_TOOL_PLATFORM=$(< swplatform)
+export OCPI_TOOL_PLATFORM=$(cat swplatform)
 export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
 PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
-export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/system.xml
-export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/lib/sdk/lib
+export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/system.xml
+export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/sdk/lib
 EOF
 . ./setup.sh
 platform=$OCPI_TOOL_PLATFORM
 
 echo Executing remote configuration command: $* 
 
-while [[ "$1" = -* ]]; do
-  case $1 in
-  -u)
-    shift
-    user=$1
-    ;;
-  -l)
-    shift
-    logopt=-l$1
-    ;;
-  -w)
-    shift
-    passwd=$1
-    ;;
-  -a)
-    shift
-    host=$1
-    ;;
-  -p)
-    shift
-    port="$1"
-    ;;
-  -s)
-    shift
-    sshopts="$1"
-    ;;
-  -d)
-    shift
-    rdir="$1"
-    ;;
-  -h | --help) help ;;
-  -o)
-    shift
-    options="$1"
-    ;;
-  -P)
-    shift
-    platform="$1"
-    ;;
-  -V) vg=-V ;;
-  *) echo Unknown option: $1 && exit 1 ;;
-  esac
-  shift
+action=$1; shift
+
+while getopts u:l:w:a:p:s:d:o:P:Vh o
+do 
+  case "$o" in 
+    u) user=$OPTARG ;;
+    l) logopt="-l $OPTARG" ;;
+    w) passwd=$OPTARG ;;
+    a) host=$OPTARG ;;
+    p) port=$OPTARG ;;
+    s) sshopts=$OPTARG ;;
+    d) rdir=$OPTARG ;;
+    h) help ;;
+    o) options=$OPTARG ;; 
+    P) platform=$OPTARG ;;
+    V) vg=-V ;;
+  esac 
 done
-case $1 in
+case $action in
 start)
-  if [ -f ocpiserve.pid ] && kill -s CONT $(<ocpiserve.pid); then
+  if [ -f ocpiserve.pid ] && kill -s CONT $(cat ocpiserve.pid); then
     echo ocpiserve is still running. >&2
     exit 1
   fi
@@ -119,8 +93,8 @@ start)
   fi
   echo PATH=$PATH >&2
   echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH >&2
-  echo nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(<port) \> $log >&2
-  nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(<port) >$log 2>&1 &
+  echo nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
+  nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
   pid=$!
   sleep 1
   if kill -s CONT $pid; then
@@ -139,7 +113,7 @@ stop)
     echo No ocpiserve appears to be running: no pid file >&2
     exit 1
   fi
-  pid=$(<ocpiserve.pid)
+  pid=$(cat ocpiserve.pid)
   if ! kill -s CONT $pid; then
     echo No ocpiserve appears to be running \(pid $pid\). Process does not exist. >&2
     exit 1
@@ -148,24 +122,28 @@ stop)
   ;;
 stop_if)
   [ -f ocpiserve.pid ] && {
-    pid=$(<ocpiserve.pid)
+    pid=$(cat ocpiserve.pid)
     kill -s CONT $pid && (do_stop || :)
     rm ocpiserve.pid
   } || :
   ;;
-log)
-  logs=($(
-    shopt -s nullglob
-    echo *.log
-  ))
+log) 
+  for log_file in ./*.log ; do 
+    if [ -e "$log_file" ] ; then
+      logs=$(echo *.log)
+      break
+    fi 
+  done 
   if [ -z "$logs" ]; then
     echo No logs found. >&2
     exit 1
   fi
-  last=${logs[${#logs[@]} - 1]}
+  for log_file in ./*.log ; do 
+    last=$log_file
+  done
   if [ -f ocpiserve.pid ]; then
-    pid=$(<ocpiserve.pid)
-    if kill -s CONT $(<ocpiserve.pid); then
+    pid=$(cat ocpiserve.pid)
+    if kill -s CONT $(cat ocpiserve.pid); then
       echo Log is $last, pid is $pid >&2
       tail +0 -f $last
     fi
@@ -178,11 +156,28 @@ status)
     echo No ocpiserve appears to be running: no pid file >&2
     exit 1
   fi
-  pid=$(<ocpiserve.pid)
+  pid=$(cat ocpiserve.pid)
   if ! kill -s CONT $pid; then
     echo No ocpiserve appears to be running \(pid $pid\). Process does not exist. >&2
     exit 1
   fi
-  echo Server is running with port: $(<port) and pid: $pid >&2
+  echo Server is running with port: $(cat port) and pid: $pid
   ;;
+mount)
+  for i in /mnt/card /media/card /run/media/mmc*; do
+      echo Trying $i...
+      if [ -r $i/u-boot.elf ]; then
+	  echo Found $i...
+	  rm -f /mnt/opencpi-boot
+	  ln -s $i /mnt/opencpi-boot
+          exit 0
+      fi
+  done
+  echo Nothing found.  Trying to mount /dev/mmcblk0p1 on /mnt/card
+  if [ -b /dev/mmcblk0p1 ]; then
+      mkdir -o /mnt/card
+      mount /dev/mmcblk0p1 /mnt/card
+      rm -f /mnt/opencpi-boot
+      ln -s /mnt/card /mnt/opencpi-boot
+  fi
 esac

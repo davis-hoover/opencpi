@@ -384,6 +384,8 @@ emitSubdeviceConnections(std::string &assy,  DevInstances *baseInstances) {
 	  uint64_t mask = ~(UINT64_MAX << supPort.count());
 	  assert(!(sdi->m_connected[supOrdinal] & mask));
 	  sdi->m_connected[supOrdinal] |= mask;
+	  assert(supPort.count() == (*sci).m_port->count());
+          (*dii).m_connected[(*sci).m_port->m_ordinal] |= mask;
 	}
 	OU::formatAdd(assy,
 		      "/>\n"
@@ -394,8 +396,8 @@ emitSubdeviceConnections(std::string &assy,  DevInstances *baseInstances) {
 }
 
 HdlConfig *HdlConfig::
-create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent,
-       const char *&err) {
+create(ezxml_t xml, const char *knownPlatform, const char *xfile, const std::string &parentFile,
+       Worker *parent, const char *&err) {
   err = NULL;
   std::string myPlatform;
   OE::getOptionalString(xml, myPlatform, "platform");
@@ -439,9 +441,9 @@ create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent
   HdlPlatform *pf;
 
   if ((err = parseFile(myPlatform.c_str(), xfile, "HdlPlatform", &pxml, pfile)) ||
-      !(pf = HdlPlatform::create(pxml, pfile.c_str(), NULL, err)))
+      !(pf = HdlPlatform::create(pxml, pfile.c_str(), parentFile, NULL, err)))
     return NULL;
-  HdlConfig *p = new HdlConfig(*pf, xml, xfile, parent, err);
+  HdlConfig *p = new HdlConfig(*pf, xml, xfile, parentFile, parent, err);
   if (err) {
     delete p;
     p = NULL;
@@ -450,22 +452,16 @@ create(ezxml_t xml, const char *knownPlatform, const char *xfile, Worker *parent
 }
 
 HdlConfig::
-HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, Worker *parent, const char *&err)
-  : Worker(xml, xfile, "", Worker::Configuration, parent, NULL, err),
+HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &parentFile,
+	  Worker *parent, const char *&err)
+  : Worker(xml, xfile, parentFile, Worker::Configuration, parent, NULL, err),
     HdlHasDevInstances(pf, m_plugged, *this),
-    m_platform(pf), m_sdpWidth(1) {
+    m_platform(pf), m_sdpWidth(1), m_sdpLength(32) { // 32 is for backward compatibility (zynq w/64 bit AXI)
   if (err ||
       (err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS,
 			    HDL_CONFIG_ATTRS, (void*)0)) ||
-      (err = OE::checkElements(xml, HDL_CONFIG_ELEMS, (void*)0)) ||
-      (err = OE::getNumber(xml, "sdp_width", &m_sdpWidth, NULL, 0, false)))
+      (err = OE::checkElements(xml, HDL_CONFIG_ELEMS, (void*)0)))
     return;
-#if 0
-  if (m_sdpWidth & (32-1)) {
-    err = "SDP Width must be a multiple of 32";
-    return;
-  }
-#endif
   pf.setParent(this);
   // Determine whether this platform worker has a control plane master port
   bool control = false;
@@ -479,9 +475,15 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, Worker *parent, const
   // Add the platform worker as a device instance
   const DevInstance *pfdi;
   const HdlPlatform &cpf = pf;
+  const OU::Value *v;
   if ((err = addDevInstance(cpf, NULL, NULL, control, NULL, NULL, xml, pfdi)) ||
-      (err = pf.parseSignalMappings(xml, pf, NULL)))
+      (err = pf.parseSignalMappings(xml, pf, NULL)) ||
+      (err = pfdi->m_worker->m_paramConfig->getParamValue("sdp_width", v)))
     return;
+  m_sdpWidth = v->m_UChar; // capture this after param config of platform worker is chosen
+  if ((err = pfdi->m_worker->m_paramConfig->getParamValue("sdp_length", v)))
+    return;
+  m_sdpLength = v->m_UShort; // FIXME: error check that pf config value is not > than pf's value
   //hdlAssy = true;
   m_plugged.resize(pf.m_slots.size());
   if (!OE::findChildWithAttr(xml, "device", "name", "time_server")) {
@@ -600,15 +602,15 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, Worker *parent, const
 	     assy.c_str());
   // Now we update the (inherited) worker to have the xml for the assembly we just generated.
   char *copy = strdup(assy.c_str());
-  ezxml_t x;
-  if ((err = OE::ezxml_parse_str(copy, strlen(copy), x)))
+  if ((err = OE::ezxml_parse_str(copy, strlen(copy), m_xml)))
     err = OU::esprintf("XML Parsing error on generated platform configuration: %s", err);
-  else {
-    m_xml = x;
+  else
     err = parseHdl();
-  }
   if (err)
     return;
+  // Set the sdp values for the config to the values from the platform
+  findProperty("sdp_width")->m_default->m_UChar = m_sdpWidth;
+  findProperty("sdp_length")->m_default->m_UShort = m_sdpLength;
   // Externalize all the device signals, and cross-reference device instances to assy instances
   unsigned n = 0;
   for (Instance *i = &m_assembly->m_instances[0]; n < m_assembly->m_instances.size(); i++, n++) {
