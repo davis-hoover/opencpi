@@ -3,9 +3,32 @@
 from collections import namedtuple
 from pathlib import Path
 
-Platform = namedtuple('platform', 'name model image is_host is_sim')
 
-def discover_platforms(projects, host_platforms):
+_Platform = namedtuple('platform', 'name model image ip port is_host is_sim')
+
+
+def Platform(name, model, is_host=False, is_sim=False, image=None, ip=None, 
+             port=None):
+    """Creates a Platform namedtuple
+
+    Args:
+        name:    Name of platform
+        model:   Model of platform
+        image:   Docker image of platform
+        ip:      IP adress of platform device
+        port:    Port of platform device
+        is_host: Whether platform is a host platform
+        is_sim:  Whether platform is a simulator
+    
+    Returns:
+        a Platform
+    """
+
+    return _Platform(name=name, model=model, is_host=is_host, is_sim=is_sim, 
+                    image=image, ip=ip, port=port)
+
+
+def discover_platforms(projects, platform_data=None):
     """Search opencpi projects for platforms
 
     Will search for hdl platforms in:
@@ -20,10 +43,9 @@ def discover_platforms(projects, host_platforms):
         runSimExec.<platform_name>
 
     Args:
-       projects:        List of opencpi projects to search for platforms
-       host_platforms:  Whitelist of host_platforms to include. Can be
-                        dictionary with additional platform info 
-                        (e.g., docker image).
+       projects:      List of opencpi projects to search for platforms
+       platform_data: Dictionary which includes host_platform whitelist
+                      and additional platform data
 
     Returns:
         platforms: List of opencpi platforms
@@ -39,7 +61,6 @@ def discover_platforms(projects, host_platforms):
 
                 for platform_path in platforms_path.glob('*'):
                     platform_name = platform_path.stem
-
                     
                     if platforms_path is hdl_platforms_path:
                         makefile = Path(platform_path, 'Makefile')
@@ -53,24 +74,38 @@ def discover_platforms(projects, host_platforms):
                             platform_path.stem)).is_file()
                         is_sim = False
 
-                    if is_host and host_platforms:
-                        if platform_name not in host_platforms.keys():
-                            continue
-                        elif 'image' in host_platforms[platform_name]:
-                            image = host_platforms[platform_name]['image']
-                        else:
-                            image = None
-                    else:
-                        image = None
+                    if not makefile.is_file():
+                        continue
 
-                    if makefile.is_file():
-                        platform_model = platform_path.parents[1].stem
-                        platform = Platform(name=platform_name, 
-                                            model=platform_model, image=image,
-                                            is_host=is_host, is_sim=is_sim)
-                        platforms.append(platform)
+                    if platform_data:
+                        data = get_data(platform_name, platform_data)
 
-    return platforms   
+                    if is_host and not data:
+                        continue
+
+                    platform_model = platform_path.parents[1].stem
+                    platform = Platform(name=platform_name, 
+                                        model=platform_model, is_host=is_host, 
+                                        is_sim=is_sim, **data)
+                    platforms.append(platform)
+
+    return platforms 
+
+
+def get_data(platform_name, platform_data):
+    """Gets platform data from a dictionary of platforms
+
+    Args:
+        platform:       Platform to get overrides for
+        platforms_data: Dictionary with platform names as keys
+
+    Returns:
+        A dictionary of additional data for a specified platform
+    """
+    try:
+        return platform_data[platform_name]['data']
+    except:
+        return {}
 
 
 def get_platform(platform_name, platforms):
@@ -190,7 +225,7 @@ def get_hdl_platforms(platforms, do_sim=True):
     Returns:
         List of platforms matching model 'hdl'
     """
-    return get_platforms_by_model(platforms, 'hdl')
+    return get_platforms_by_model(platforms, 'hdl', do_sim)
 
 
 def get_simulators(platforms):

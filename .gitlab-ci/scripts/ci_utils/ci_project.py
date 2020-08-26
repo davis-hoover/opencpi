@@ -51,9 +51,9 @@ def discover_libraries(project_name, project_path, blacklist=None):
         Makefile
 
     Args:
-       projects_name: Name of project to find libraries for
-       project_path:  Path of project to search for libraries in
-       blacklist:     List of libraries not to include 
+       project_name: Name of project to find libraries for
+       project_path: Path of project to search for libraries in
+       blacklist:    List of libraries not to include 
 
     Returns:
         libraries: List of project libraries

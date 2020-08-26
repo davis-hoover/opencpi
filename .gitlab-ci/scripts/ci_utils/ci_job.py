@@ -5,6 +5,61 @@ from collections import namedtuple
 from .ci_platform import get_rcc_platforms
 
 
+_Job = namedtuple('job', 'name stage script before_script after_script' 
+                         ' artifacts tags resource_group rules'
+                         ' variables image')
+
+
+def Job(name, stage=None, script=None, before_script=None, after_script=None, 
+        artifacts=None, tags=None, resource_group=None, rules=None, 
+        variables=None, image=None, overrides=None):
+    """Constructs a Job
+
+        Will use values in overrides to replace values of other args in
+        construction of Job.
+
+    Args:
+        name:           Name of job in pipeline
+        stage:          Stage of pipeline for job to execute in
+        script:         List of commands to be executed in pipeline 
+                        'script' step
+        before_script:  List of commands to be executed in pipeline 
+                        'before_script' step
+        after_script:   List of scripts to be executed in pipeline
+                        'after_script' step
+        artifacts:      List of artifacts to be handled by gitlab 
+                        (NOT AWS)
+        tags:           List of tags for matching job to runner
+        resource_group: Label for allowing only one job with same label
+                        to run at a time within pipeline
+        rules:          Dictionary of rules that define the conditions
+                        that allow a job to execute in a pipeline
+        variables:      Dictionary of variables to set when job runs in
+                        pipeline
+        image:          Docker image for job to run in
+        overrides:      Dictionary to override standard values of above 
+                        args
+
+    Returns:
+        Job: namedtuple containing data necessary to create a job in a
+             pipeline
+    """
+    args = locals()
+    job_args = {}
+
+    # Check if current job is specified in overrides
+    if 'job' in overrides and name in overrides['job']:
+        overrides = overrides['job'][name]
+    # Collect overrides
+    for key,value in args.items():
+        if key in overrides:
+            job_args[key] = overrides[key]
+        elif key != 'overrides':
+            job_args[key] = value
+
+    return _Job(**job_args)
+
+
 def to_dict(jobs):
     """Converts Job(s) to a dictionary
 
@@ -53,63 +108,8 @@ def dump(jobs_dict, path):
         yaml.safe_dump(jobs_dict, yml, width=1000, default_flow_style=False)
 
 
-def Job(name, stage=None, script=None, before_script=None, after_script=None, 
-        artifacts=None, tags=None, resource_group=None, rules=None, 
-        variables=None, image=None, overrides=None):
-    """Constructs a Job
-
-        namedtuples do not support default values in python versions
-        prior to 3.7, so this helper function is used until the
-        version of python opencpi uses is updated.
-
-    Args:
-        name:           Name of job in pipeline
-        stage:          Stage of pipeline for job to execute in
-        script:         List of commands to be executed in pipeline 
-                        'script' step
-        before_script:  List of commands to be executed in pipeline 
-                        'before_script' step
-        after_script:   List of scripts to be executed in pipeline
-                        'after_script' step
-        artifacts:      List of artifacts to be handled by gitlab 
-                        (NOT AWS)
-        tags:           List of tags for matching job to runner
-        resource_group: Label for allowing only one job with same label
-                        to run at a time within pipeline
-        rules:          Dictionary of rules that define the conditions
-                        that allow a job to execute in a pipeline
-        variables:      Dictionary of variables to set when job runs in
-                        pipeline
-        image:          Docker image for job to run in
-        overrides:      Dictionary to override standard values of above 
-                        args
-
-    Returns:
-        Job: namedtuple containing data necessary to create a job in a
-             pipeline
-    """
-    args = locals()
-
-    Job = namedtuple('job', 'name stage script before_script' 
-                            ' after_script artifacts tags'
-                            ' resource_group rules variables image')
-
-    job_args = {}
-    # Check if current job is specified in overrides
-    if 'job' in overrides and name in overrides['job']:
-        overrides = overrides['job'][name]
-    # Collect overrides
-    for key,value in args.items():
-        if key in overrides:
-            job_args[key] = overrides[key]
-        elif key != 'overrides':
-            job_args[key] = value
-
-    return Job(**job_args)
-
-
-def make_jobs(stages, platform, projects, platforms=None, host_platform=None, 
-              overrides=None):
+def make_jobs(stages, platform, projects, rcc_platforms=None, 
+              host_platform=None, overrides=None):
     """Creates Job(s) for project/platform combinations
 
     Calls either make_hdl_jobs() or make_rcc_jobs() based on model
@@ -119,6 +119,8 @@ def make_jobs(stages, platform, projects, platforms=None, host_platform=None,
         stages:         List of pipeline stages
         platform:       Platform to make jobs for
         projects:       List of projects to make jobs for
+        rcc_platforms:  List of rcc platforms for hdl platform jobs that 
+                        require an associated rcc platform
         host_platform:  Host platform to create jobs for
         overrides:      Dictionary to override standard job values
 
@@ -129,8 +131,8 @@ def make_jobs(stages, platform, projects, platforms=None, host_platform=None,
     Raises:
         ValueError: if platform model is neither 'rcc' nor 'hdl'
     """
-    if platform.model == 'hdl':
-        return make_hdl_jobs(stages, platform, projects, platforms, 
+    if platform.model == 'hdl': 
+        return make_hdl_jobs(stages, platform, projects, rcc_platforms, 
                              host_platform, overrides)
     elif platform.model == 'rcc':
         return make_rcc_jobs(stages, platform, projects, host_platform, 
@@ -187,8 +189,8 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
     return jobs
 
 
-def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
-                  overrides=None):
+def make_hdl_jobs(stages, platform, projects, rcc_platforms, 
+                  host_platform=None, overrides=None):
     """Creates Job(s) for project/platform combinations of model 'hdl'
 
     Determines arguments to pass to make_job().
@@ -197,8 +199,8 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
         stages:         List of pipeline stages
         platform:       Platform to make jobs for
         projects:       List of projects to make jobs for
-        platforms:      List of platforms needed for making jobs
-                        requiring an associated rcc platform
+        rcc_platforms:  List of rcc platforms for hdl platform jobs that 
+                        require an associated rcc platform
         host_platform:  Host platform to create jobs for
         overrides:      Dictionary to override standard job values
 
@@ -206,7 +208,6 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
           pipeline
     """
     jobs = []
-    rcc_platforms = get_rcc_platforms(platforms)
 
     for project in projects:
         for library in project.libraries:
@@ -233,7 +234,19 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
                                             host_platform=host_platform,
                                             overrides=overrides)
                     jobs.append(run_test_job)
-                
+
+                if not platform.ip or not platform.port:
+                    continue    
+
+                for rcc_platform in rcc_platforms:
+                    run_test_job = make_job('test', stages, platform, 
+                                            project=project, 
+                                            library=library,
+                                            host_platform=host_platform,
+                                            linked_platform=rcc_platform,
+                                            overrides=overrides,
+                                            do_ocpiremote=True)
+                    jobs.append(run_test_job)
 
     for rcc_platform in rcc_platforms:
         job = make_job('build-sdcards', stages, platform, 
@@ -246,21 +259,25 @@ def make_hdl_jobs(stages, platform, projects, platforms, host_platform=None,
 
 def make_job(stage, stages, platform, project=None, name=None, 
              host_platform=None, library=None, linked_platform=None, 
-             overrides=None):
+             overrides=None, do_ocpiremote=False):
     """Creates Job(s) for project/platform combinations
 
     Calls before_script(), after_script(), script(), and if
     necessary, make_name() to get arguments for construction of a Job.
 
     Args:
-        stage:          Stage of pipeline for job to execute in
-        stages:         List of pipeline stages
-        platform:       Platform to make jobs for
-        projects:       List of projects to make jobs for
-        platforms:      List of platforms needed for making jobs
-                        requiring an associated rcc platform
-        host_platform:  Host platform to create jobs for
-        overrides:      Dictionary to override standard job values
+        stage:           Stage of pipeline for job to execute in
+        stages:          List of pipeline stages
+        platform:        Platform to make jobs for
+        project:         Project to make jobs for
+        name:            Name of job
+        host_platform:   Host platform to create jobs for
+        library:         Library to make job for
+        linked_platform: List of platforms needed for making jobs
+                         requiring an associated rcc platform
+        
+        overrides:     Dictionary to override standard job values
+        do_ocpiremote: Whether jobs should run ocpiremote commands
 
     Returns:
         Job: contains data necessary to create a job in a pipeline
@@ -284,10 +301,11 @@ def make_job(stage, stages, platform, project=None, name=None,
 
     before_script = make_before_script(stage, stages, platform,
                                         host_platform=host_platform, 
-                                        linked_platform=linked_platform)
+                                        linked_platform=linked_platform,
+                                        do_ocpiremote=do_ocpiremote)
     script = make_script(stage, platform, project=project, library=library, 
                         linked_platform=linked_platform, name=name)
-    after_script = make_after_script()
+    after_script = make_after_script(platform, do_ocpiremote=do_ocpiremote)
 
     if platform.is_host:
         tags = [platform.name, 'shell', 'opencpi']
@@ -327,7 +345,7 @@ def make_name(stage, platform, project=None, host_platform=None,
     
 
 def make_before_script(stage, stages, platform, host_platform=None, 
-                       linked_platform=None):
+                       linked_platform=None, do_ocpiremote=False):
     """Creates list of commands to run in job's before_script step
 
         Constructs commands for downloading AWS artifacts, creating
@@ -337,9 +355,11 @@ def make_before_script(stage, stages, platform, host_platform=None,
         stage:           Stage of pipeline for job to execute in.
                          Used to exclude artifacts in same and later
                          stages
+        stages:          List of all pipeline stages
         platform:        Platform to download artifacts for
         host_platform:   Host_platform to download artifacts for
         linked_platform: Associated platform to downloaded artifacts for
+        do_ocpiremote:   Whether jobs should run ocpiremote commands
 
     Returns:
         list of command strings
@@ -366,18 +386,37 @@ def make_before_script(stage, stages, platform, host_platform=None,
     source_cmd = 'source cdk/opencpi-setup.sh -e'
 
     if stage == 'prereqs':
-        return [timestamp_cmd]
-    if stage == 'build-host':
-        return [download_cmd, sleep_cmd, timestamp_cmd]
+        cmds = [timestamp_cmd]
+    elif stage == 'build-host':
+        cmds = [download_cmd, sleep_cmd, timestamp_cmd]
     else:
-        return [download_cmd, sleep_cmd, timestamp_cmd, source_cmd]
+        cmds = [download_cmd, sleep_cmd, timestamp_cmd, source_cmd]
+
+    if do_ocpiremote:
+        cmds += [
+            make_ocpiremote_cmd('deploy', platform, 
+                                linked_platform=linked_platform),
+            'sleep 5',
+            make_ocpiremote_cmd('load', platform,
+                                linked_platform=linked_platform),
+            make_ocpiremote_cmd('start', platform,
+                                linked_platform=linked_platform),
+            'export OCPI_SERVER_ADDRESSES={}:{}'.format(platform.ip,
+                                                        platform.port)
+        ]
+
+    return cmds
 
 
-def make_after_script():
+def make_after_script(platform, do_ocpiremote=False):
     """Creates list of commands to run in job's after_script step
 
         Constructs command for uploading opencpi tree to AWS if job
         failed, and cleans entire project directory as final cmd.
+
+    Args:
+        platform:      Platform of job
+        do_ocpiremote: Whether jobs should run ocpiremote commands
 
     Returns:
         list of command strings
@@ -389,8 +428,15 @@ def make_after_script():
                            pipeline_id, job_name,
                            '-t "failed-job"; fi'])
     clean_cmd = 'rm -rf *'
+    
+    cmds = [upload_cmd]
+    
+    if do_ocpiremote:
+        cmds.append(make_ocpiremote_cmd('unload', platform))
 
-    return [upload_cmd, clean_cmd]
+    cmds.append(clean_cmd)
+
+    return cmds
 
 
 def make_script(stage, platform, project=None, linked_platform=None,
@@ -477,9 +523,12 @@ def make_ocpiadmin_cmd(verb, platform, linked_platform=None):
 
     Returns:
         ocpiadmin command string
+
+    Raises:
+        ValueError: if unrecognized verb provided
     """
     if verb not in ['install', 'deploy']:
-        raise Exception('Uknown verb: {}'.format(verb))
+        raise ValueError('Unknown verb: {}'.format(verb))
 
     if linked_platform:
         return 'ocpiadmin {} platform {} {}'.format(verb, 
@@ -502,15 +551,15 @@ def make_ocpidev_cmd(verb, platform, path, noun=None):
         ocpidev command string
 
     Raises:
-        ValueError: if unrecognized verb or noun passed
+        ValueError: if unrecognized verb or noun provided
     """
     if verb not in ['build', 'run']:
-        raise ValueError('Uknown verb: {}'.format(verb))
+        raise ValueError('Unknown verb: {}'.format(verb))
     
     if not noun:
         noun = ''
     elif noun not in ['tests', 'test', 'hdl platforms']:
-        raise ValueError('Uknown noun: {}'.format(noun))
+        raise ValueError('Unknown noun: {}'.format(noun))
 
     if verb == 'run':
         options = '-d {} --only-platform {} --mode prep_run_verify'.format(
@@ -519,6 +568,33 @@ def make_ocpidev_cmd(verb, platform, path, noun=None):
         options = '-d {} --hdl-platform {}'.format(path, platform.name)
 
     return 'ocpidev {} {} {}'.format(verb, noun, options)
+
+
+def make_ocpiremote_cmd(verb, platform, linked_platform=None):
+
+    if verb == 'deploy':
+        return ' '.join([
+            'ocpiremote deploy', 
+            '-i {}'.format(platform.ip), 
+            '-w {}'.format(platform.name),
+            '-s {}'.format(linked_platform.name)
+        ])
+
+    if verb == 'load':
+        return ' '.join([
+            'ocpiremote load', 
+            '-i {}'.format(platform.ip),
+            '-p {}'.format(platform.port), 
+            '-w {}'.format(platform.name),
+            '-s {}'.format(linked_platform.name)
+        ])
+
+    if verb in ['start', 'unload']:
+        return ' '.join([
+            'ocpiremote {}'.format(verb), 
+            '-i {}'.format(platform.ip),
+        ])
+
 
 
 def make_rules(platform, host_platform, linked_platform=None):
@@ -530,7 +606,7 @@ def make_rules(platform, host_platform, linked_platform=None):
     Args:
         platform:        Platform of job to make rules for
         host_platform:   Host_platform of job if platform to make rules
-                         for if not a host_paltform
+                         for if not a host_platform
         linked_platform: Associated platform of job to make rules for
 
     Returns:
