@@ -20,7 +20,7 @@
 Libraries=virtex6 xilinx pcie_4243_trn_v6_gtx_x4_250
 #Cores=./chipscope_icon ./chipscope_ila
 ExportFiles=jtagSupport_ml605 loadFlash_ml605 \
-            ml605.ucf ml605.ut ml605.mk testbias_ml605_base.bitz
+            ml605.ucf ml605.ut ml605.mk
 # We specify these to get the order we want
 SourceFiles= ml605_pkg.vhd ml605.vhd pci_ml605.v 
 #SourceFiles=chipscope_pkg.vhd ml605_pkg.vhd ml605.vhd pci_ml605.v 

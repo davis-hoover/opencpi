@@ -99,8 +99,10 @@ PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
 #    for building kernel drivers (separate from pre-packaged driver)
-KVER=`uname -r`
-PKGS_S+=(linux-headers-$KVER)
+#    don't install if in a "docker" container
+[[ -e /.dockerenv || -e /run/.containerenv ]] || {
+  PKGS_S+=(linux-headers-$(uname -r))
+}
 #    for "make rpm":
 #      does not necessarily make sense for debian-based
 #      distros, but will include for completeness
@@ -113,6 +115,8 @@ PKGS_S+=(libc6-dev-i386)
 PKGS_S+=(oxygen5-icon-theme openjdk-8-jre openjdk-8-jre-headless tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
+#    Needed to generate gitlab-ci yaml
+PKGS_S+=(python3-yaml)
 
 ##########################################################################################
 # E. installations that have to happen after we run "apt-get install" once, and also

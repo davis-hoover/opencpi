@@ -129,6 +129,8 @@ PKGS_E+=(dtc openssl-devel)
 PKGS_E+=(perl-ExtUtils-MakeMaker)
 #    Needed to build/run ocpigr
 PKGS_E+=(yaml-cpp-devel)
+#    Needed to generate gitlab-ci yaml
+PKGS_E+=(python36-PyYAML)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available

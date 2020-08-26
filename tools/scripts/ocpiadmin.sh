@@ -107,7 +107,7 @@ checkout=$4
 
 if getvars; then
     echo The $model platform \"$platform\" is already defined in this installation, in $platform_dir.
-    project_dir=$(echo $platform_dir | sed -e "s=/.../platforms/$platform==" -e 's=/lib$==')
+    project_dir=$(echo $platform_dir | sed -e 's=/exports/=/=' -e "s=/.../platforms/$platform==" -e 's=/lib$==')
     if [ -n "$project" ]; then
 	echo The supplied project package-id for this platform, \"$project\", will be ignored.
     fi
@@ -217,15 +217,30 @@ else
     ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
     # Make sure that tutorials can run after installation, note will do rcc too.
     [ "$platform" != xsim ] || ocpidev -d projects/tutorial build --hdl-platform=$platform
-    # If project dir is not one of the core projects build platoform  
+    # If project dir is not one of the core projects, build the platform
     if [[ "$platform_dir" != *"/projects/core/"* && "$platform_dir" != *"/projects/platform/"* && \
-            "$platform_dir" != *"/projects/assets/"* && -n "$platform_dir" ]]; then 
+            "$platform_dir" != *"/projects/assets/"* && -n "$platform_dir" ]]; then
 	ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
 	echo "HDL platform \"$platform\" built for OSP in $project_dir, including assemblies."
     fi
     ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
+    #
+    # At this point, we have an issue applicable to OSPs that have not
+    # been previously installed.  A previous "getvars" call (above) sets
+    # "platform_dir" to
+    #   "./projects/osps/<project_ID>/hdl/platforms/<hdl_platform>"
+    # because
+    #   "./projects/osps/<project_ID>/hdl/platforms/<hdl_platform>/lib"
+    # does not exist until the above "ocpidev" commands have been run,
+    # i.e., this is a bootstrapping issue.  "platform_dir" can be updated
+    # here by calling "getvars" one more time (after everything is built),
+    # or in the "export-platform-to-framework.sh" script.
+    #
+    # No need to check the return value from "getvars" at this point.
+    #
+    getvars
     $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform $platform_dir
 fi
 echo "Platform installation (download and build) for platform \"$platform\" succeeded."

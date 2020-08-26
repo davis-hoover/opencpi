@@ -1,0 +1,106 @@
+build-host:centos7:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "build-host:*" "build-rcc:*" "build-primitives-core:*" "build-primitives:*" "build-libraries:*" "build-platforms:*" "build-assemblies:*" "build-sdcards:*" "test:*" "deploy:*"
+  - sleep 2
+  - touch .timestamp
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - scripts/build-opencpi.sh centos7
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: build-host
+  tags:
+  - centos7
+  - shell
+  - opencpi
+packages:centos7:
+  image: centos:7
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script: scripts/install-packages.sh centos7
+  stage: prereqs
+  tags:
+  - docker
+prereqs:centos7:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - touch .timestamp
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - scripts/install-prerequisites.sh centos7
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: prereqs
+  tags:
+  - centos7
+  - shell
+  - opencpi
+test:centos7:
+  after_script:
+  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - rm -rf *
+  before_script:
+  - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "test:*" "deploy:*"
+  - sleep 2
+  - touch .timestamp
+  - source cdk/opencpi-setup.sh -e
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)(centos7)(( |:)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - scripts/test-opencpi.sh --no-hdl
+  - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
+  - touch .success
+  stage: test
+  tags:
+  - centos7
+  - shell
+  - opencpi
+include:
+- .gitlab-ci/yaml/centos7/alst4.yml
+- .gitlab-ci/yaml/centos7/ml555.yml
+- .gitlab-ci/yaml/centos7/zed_zipper.yml
+- .gitlab-ci/yaml/centos7/zed.yml
+- .gitlab-ci/yaml/centos7/xilinx17_1_aarch64.yml
+- .gitlab-ci/yaml/centos7/zcu104.yml
+- .gitlab-ci/yaml/centos7/x4sim.yml
+- .gitlab-ci/yaml/centos7/xilinx17_1_aarch32.yml
+- .gitlab-ci/yaml/centos7/xilinx19_2_aarch32.yml
+- .gitlab-ci/yaml/centos7/ml605.yml
+- .gitlab-ci/yaml/centos7/zed_ise.yml
+- .gitlab-ci/yaml/centos7/xilinx13_3.yml
+- .gitlab-ci/yaml/centos7/schist.yml
+- .gitlab-ci/yaml/centos7/xilinx19_2_aarch64.yml
+- .gitlab-ci/yaml/centos7/modelsim.yml
+- .gitlab-ci/yaml/centos7/xilinx17_2_aarch64.yml
+- .gitlab-ci/yaml/centos7/alst4x.yml
+- .gitlab-ci/yaml/centos7/epiq_matchstiq.yml
+- .gitlab-ci/yaml/centos7/xsim.yml
+- .gitlab-ci/yaml/centos7/xilinx13_4.yml
+- .gitlab-ci/yaml/centos7/alt_test.yml
+- .gitlab-ci/yaml/centos7/xilinx13_4_arm.yml
+- .gitlab-ci/yaml/centos7/isim.yml
+- .gitlab-ci/yaml/centos7/matchstiq_z1.yml
+- .gitlab-ci/yaml/centos7/xilinx17_2_aarch32.yml

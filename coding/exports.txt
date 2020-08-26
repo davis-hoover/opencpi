@@ -96,7 +96,7 @@ The OpenCPI source tree has a variety of files as well as a set of builtin proje
 There is a top-level Framework.exports (was Project.exports) file that specifies exports for the framework
 as a whole, and the exports tree generated from this file is the basis for binary packaged distributions
 for OpenCPI.  This exports tree indicates everything that may be distributed in any non-source
-binary distributions of OpenCPI.  As with other exports trees, it contains all the platforms that
+binary distributions of OpenCPI.  As with other exports trees, it contains results from all the platforms that
 have been built and can be used simultaneously for multiple platforms.
 
 This exports tree is populated based on the following distinct phases, each of which rely on
@@ -105,7 +105,7 @@ previous ones.
 1. early in the first build process on a fresh source tree, a static/permanent read-only exports tree
 is used.  This is the "bootstrap" directory in the root of the source tree.
 
-2. in a fresh source tree the exports tree is initially populated  with files that do not depend on building,
+2. in a fresh source tree the exports tree is initially populated with files that do not depend on building,
 e.g. the scripts that actually perform building, but nothing that is compiled
 
 3. when the framework sources are built for a development host, all the tools and runtime software that are built
@@ -116,18 +116,101 @@ hosts and used by them (presumably with shared network mounts).
 are populated in the framework exports tree.  While the RCC platform lives in a project, and is exported from
 that project, it is used to cross-build the framework itself (which is not a project).
 Thus what is exported at the framework level is a combination of files resulting from building the framework,
-and files exported from the platform itself.
+and files exported from the platform itself (originating from the project containing that platform asset).
 
-5. when an HDL platform in a project is built, it has its own exports within the project, and also is usually
-exported from that project.  The platform's exports may also be used to populate the framework exports tree with
-some files needed to create SD cards (bootable media) that combines files from two platforms
-(RCC and HDL) that may be from different projects.
+5. when an HDL platform in a project is built, it has its own exports within the project (in the platform's
+directory in the project), and also is usually exported from that project.  The platform's exports may also
+be used to populate the framework exports tree with some files needed to create SD cards (bootable media)
+that combines files from two platforms (RCC and HDL) that may be from different projects.
 
 So in the framework exports tree a platform may appear in several places for different purposes:
 
 <platform>/        - exports for a platform for use during development
 runtime/<platform> - exports for a platform used when executing on that platform, with this tree on a server
 deploy/<platform>  - exports staged here to enable creation of SD cards later.
+
+Lifecycle of Framework-level Exports
+====================================
+
+1. Pure cloned repo, or untar'd source tarball:
+-----------------------------------------------
+
+There are no exports, there is no exports subdirectory, and "cdk" is simply a link to "exports"
+(which does not yet exist).  In a binary distribution, the "cdk" is a subdir containing all the actual files.
+
+There is a "bootstrap" directory containing a skeletal subset of export links (which are repo items) needed
+before anything else is done.
+
+2. Initial building steps when the OpenCPI environment is not set up at all
+---------------------------------------------------------------------------
+
+During the very early initial phase of building, the OCPI_CDK_DIR variable is set up to point
+to the bootstrap/ directory of permanent (in-repo), hand-created symlinks.  This creates
+a very minimal environment during bootstrapping a source tree.
+In the early steps of using a source tree the first thing actually created is a
+skeletal/initial framework exports/ tree (exports subdir), which has export links for
+files that are not created by building but are pre-existing as repo items in the source tree.
+Thus the "bootstrap" exports tree is used for a very short time to create the
+initial skeletal exports tree, which has no links for build results.
+
+3. Skeleton/subset of exports tree that contains no target-specific build results
+---------------------------------------------------------------------------------
+
+During the actual building of the framewok for development hosts (and thus building tools
+and runtime for the development host), the exports tree is "skeletal" in that it contains
+no links to "built" files like libraries and executables.  This skeleton exports tree is
+created when the (internal) scripts/export-framework.sh script is run with a single hyphen as an argument,
+which says "create all exports except those that are target-specific".
+
+4. Exports tree after building for software (RCC, dev hosts, cross hosts etc.) platform
+--------------------------------------------------------------------------
+
+When building happens in the source tree (using the internal script build/build-opencpi.sh),
+there is another interesting bootstrap action due to the fact that software platforms
+are in fact "just assets in a project".  So before building the framework sources for
+any software platform, we need to export that platform from its project so it can be
+used to build the framework.  These "platform exports from a project" are the necessities for
+building/compiling the framework for that platform.  Thus when the framework is built
+for a software platform, it is using the tools indicated by the platform's exports
+from its project.
+
+When the framework is built (using the internal build/build-opencpi.sh), the framework exports
+tree is finally populated with target-specific files like executables and libraries.
+These are target-specific files resulting from building framework sources (and prerequisites).
+
+Note:  the actual tools specifying how to build for the platform (e.g. cross-tools and compiler specs),
+are NOT exported in the framework's exports tree, but are always used from the exports of the platform's
+project.  The implication is that the cdk (exports tree) is *not* usable for building software
+without the target platform's project's exports being present.  (This could change).
+
+Note:  embedded/cross hosts cannot be built until the dev host is built
+
+5. Exports tree after building for HDL platforms (ocpiadmin install platform)
+-----------------------------------------------------------------------------
+
+Note: after building for the dev host there is no order dependency on building/installing
+an RCC platform and an HDL platform, so other than the "dev-host first" requirement,
+there no realy ordering between #4 and #5.
+
+As with software platforms, the building tools for HDL platforms are not necessarily
+in projects or exports.  Building an HDL platform, using "ocpiadmin install platform",
+does put several items in the framework exports directory for that platform:
+- the test bitstream
+- any other items needed for using the platform at *runtime* (not for building)
+
+Also as with software platforms, *building* assets for the platform *does* use the platform's
+exports from the *project*.
+
+So the framework level exports for an HDL platform are for:
+- runtime use of the platform (like udev scripts or jtag loading or test bitstream)
+- any files needed for "deployment", i.e. making an SD card.
+
+Deployment files (if any) are exported to the framework under the exports/deploy/<platform> directory.
+This is the HDL platform's *preparation* for (contribution to) deployment, and *not* the SD card itself.
+
+This enables the "deployment" action for an HDL platform (along with some software platform),
+to be done *without* access to the platform's project.  The exports/deploy/<hdl-platform> directory
+can be thought of as a staging area for deployment with whatever software platforms are chosen to deploy.
 
 How exports relate to binary distributions:
 ====================================================================================================
@@ -142,11 +225,11 @@ are essentially reconstructing the same contents that were in the exports tree.
 
 Beyond the exports tree reconstruction, the following additional top-level entities are in the installation:
 
-- project-repository directory - containing pointers to the builtin-projects
+- project-repository directory - initially containing pointers to the builtin-projects
 - projects/* - the built-in projects in source form
 - userenv.sh - for customizing the installation's user environment
 - system.xml - for customizing the OpenCPI system configuration for the dev host itself
-- cdk - the exports tree(s)
+- cdk - the exports tree(s) in source installations, or the binary package in binary installations
 
 Binary distributions are not made for HDL platforms (yet).  Mostly this is due to users having
 different versions of tools to satisfy various policies and constraints in their organization,

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpiserve</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140609445424544"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpiserve — command-line tool for making local OpenCPI containers available for remote access</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>When an application is run, the OpenCPI framework finds "local"
+containers - those that are part of or directly attached to
+the local system - where workers based on artifacts can execute.
+A local system can use the <span class="strong"><strong><code class="literal">ocpiserve(1)</code></strong></span> tool to offer its
+local containers to other network-based systems for use as
+"remote" containers.</p><p>The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> command-line tool is part of OpenCPI’s
+<span class="strong"><strong><span class="emphasis"><em>remote containers</em></span></strong></span> feature, which adds containers
+available in other systems on the network to the set
+of containers considered for application execution.</p><p>The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> tool runs as a <span class="emphasis"><em>container server</em></span>, serving up
+local containers as remotely accessible containers to network clients.
+Remote clients use <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> options to find the systems on the
+network that are running <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> and list the available containers.</p><p>When started, <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> discovers all local network interfaces and
+prepares to be contacted by clients for all of them. It optionally (if the
+<span class="strong"><strong><code class="literal">--discoverable</code></strong></span> option is used) also
+prepares to receive multicast queries from clients on all network
+interfaces. The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server is a fully multi-homed
+server, using all network interfaces for normal use (TCP) discovery (via the
+User Datagram Protocol (UDP)).</p><p>The  <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server does not run, initiate or control
+entire OpenCPI applications, so it requires fewer resources than
+<span class="strong"><strong><code class="literal">ocpirun</code></strong></span> or ACI executables.</p><p><span class="emphasis"><em>Artifacts</em></span> - binary executables compiled from OpenCPI <span class="emphasis"><em>workers</em></span> -
+are not required to reside on the system running
+<span class="strong"><strong><code class="literal">ocpiserve</code></strong></span>. Instead, they are downloaded on demand
+to the <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server from
+the remote system on which the application is initiated
+and controlled and then cached for possible re-use. The <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span>
+container server maintains this cache in a directory
+named <span class="strong"><strong><code class="literal">artifacts</code></strong></span> unless the <span class="strong"><strong><code class="literal">--directory</code></strong></span> option is used
+to change it. The cache is normally maintained after <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span>
+exits unless the <span class="strong"><strong><code class="literal">--remove</code></strong></span> option is used to delete it.</p><p>Starting <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> locally requires logging in to the console on
+the system with a username and password. CTRL/C can be used to
+exit <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> locally. Alternatively,
+the <a class="ulink" href="ocpiremote.1.html" target="_top">ocpiremote(1)</a> tool can be used to start,
+stop, and otherwise control an <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server
+from a remote client.</p><p>Options can occur anywhere in the command for the user’s convenience.
+When invoked without any options, <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> displays information
+about all of its options.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--addresses=</code></strong></span><span class="emphasis"><em>&lt;file&gt;</em></span>, <span class="strong"><strong><code class="literal">-a</code></strong></span> <span class="emphasis"><em>&lt;file&gt;</em></span>
+</span></dt><dd>
+    Specify a file to which <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> should write all its TCP/IP
+    addresses. See the description of the OCPI_SERVER_ADDRESSES_FILE
+    in the <span class="emphasis"><em>OpenCPI Application Development Guide</em></span> for details.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--directory=</code></strong></span> <span class="emphasis"><em>&lt;directory-name&gt;</em></span>, <span class="strong"><strong><code class="literal">-D</code></strong></span> <span class="emphasis"><em>&lt;directory-name&gt;</em></span>
+</span></dt><dd>
+    Specify the name of a directory to use for caching downloaded
+    artifacts. The default directory name is <span class="strong"><strong><code class="literal">artifacts</code></strong></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--discoverable</code></strong></span>, <span class="strong"><strong><code class="literal">-d</code></strong></span>
+</span></dt><dd>
+    Enable <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> to receive UDP multicast discovery
+    queries from clients on all network interfaces.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--help</code></strong></span>, <span class="strong"><strong><code class="literal">-h</code></strong></span>
+</span></dt><dd>
+    Display help information for <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--log-level=</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>, <span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;value&gt;</em></span>
+</span></dt><dd>
+    Specify the OpenCPI log level to be used during execution.
+    See the description of the OCPI_LOG_LEVEL environment
+    variable in the <span class="emphasis"><em>OpenCPI User Guide</em></span> for a description
+    of possible values. Using this option overrides the
+    level set in the OCPI_LOG_LEVEL environment variable.
+    The default log level is 0 (no logging).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--loopback</code></strong></span>, <span class="strong"><strong><code class="literal">-L</code></strong></span>
+</span></dt><dd>
+    Enable/add UDP multicast discovery on the local loopback subnet.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--onlyloopback</code></strong></span>, <span class="strong"><strong><code class="literal">-O</code></strong></span>
+</span></dt><dd>
+    Allow UDP multicast discovery <span class="emphasis"><em>only</em></span> on the local loopback subnet.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--port=</code></strong></span> <span class="emphasis"><em>&lt;value&gt;</em></span>, <span class="strong"><strong><code class="literal">-p</code></strong></span> <span class="emphasis"><em>&lt;value&gt;</em></span>
+</span></dt><dd>
+    Specify the TCP port number to use for <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> ports.
+    The default is to use dynamically assigned port numbers.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--processors=</code></strong></span><span class="emphasis"><em>&lt;number-of-RCC-containers&gt;</em></span>, <span class="strong"><strong><code class="literal">-n</code></strong></span> <span class="emphasis"><em>&lt;number-of-RCC-containers&gt;</em></span>
+</span></dt><dd>
+    Specify the number of RCC containers to create and serve. The default is 1.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--remove</code></strong></span>, <span class="strong"><strong><code class="literal">-r</code></strong></span>
+</span></dt><dd>
+    Remove the artifact cache when <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> exits.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--verbose</code></strong></span>, <span class="strong"><strong><code class="literal">-v</code></strong></span>
+</span></dt><dd>
+    Display status and progress as <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> executes.
+</dd></dl></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Start the <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server, allowing it
+to be discoverable via UDP multicast from client systems
+and displaying status and progress information:
+</p><pre class="screen">ocpiserve --verbose --discoverable</pre></li><li class="listitem"><p class="simpara">
+Start the <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server and direct it
+to write its TCP/IP addresses to the file named <span class="strong"><strong><code class="literal">myserveraddrs</code></strong></span>:
+</p><pre class="screen">ocpiserve --address=myserveraddrs</pre></li><li class="listitem"><p class="simpara">
+Start the <span class="strong"><strong><code class="literal">ocpiserve</code></strong></span> container server and direct
+it to use the TCP port 9233 as the TCP port:
+</p><pre class="screen">ocpiserve --port=9233</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
+<a class="ulink" href="ocpidev-assembly.1.html" target="_top">ocpidev-assembly(1)</a>
+<a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-worker(1)</a>
+<a class="ulink" href="ocpiremote.1.html" target="_top">ocpiremote(1)</a>
+<a class="ulink" href="ocpirun.1.html" target="_top">ocpirun(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

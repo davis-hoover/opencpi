@@ -1,0 +1,298 @@
+OCPIREMOTE(1)
+============
+
+
+NAME
+----
+ocpiremote - command-line tool for remotely managing an OpenCPI container server
+
+
+SYNOPSIS
+--------
+*`ocpiremote`* ['<options>'] ['<verb>']
+
+
+DESCRIPTION
+-----------
+The *`ocpiremote(1)`* command-line tool can be used on a local system
+to load, start, and control an *`ocpiserve(1)`* container server on a
+remote system. The target remote system requires the Secure Shell (SSH),
+the *`bash`* shell and the *`tar`* command in addition to
+an OpenCPI-supported software (RCC) platform.
+No additional installation is necessary.
+
+The *`ocpiremote`* tool loads an *`ocpiserve`* executable
+"package" with Secure Copy Protocol (SCP) over an SSH connection
+into a "sandbox" directory
+(by default, *`~/sandbox/`*) on the remote system
+and can subsequently be used to start it. When started, the *`ocpiserve`* container server
+makes its local containers available to any and
+all remote clients through the local network interfaces
+on the remote system. See the link:ocpiserve.1.html[ocpiserve(1)]
+tool for details. The *`ocpiremote`* tool manages the container server
+in the sandbox directory without affecting the rest of the remote system's
+installation and provides a convenient way to set up and operate
+container servers remotely.
+
+The *`ocpiremote`* command-line tool is part of OpenCPI's
+*'remote containers'* feature, which allows for the addition of containers
+available in other systems on the network to the set
+of containers considered for application execution.
+See the chapter "Using Remote Containers: Network-Connected Processors"
+in the 'OpenCPI Application Development Guide' for information
+on how to set up and use this feature.
+
+VERBS
+-----
+The *`ocpiremote`* command operates on the remote system
+whose IP address and TCP port are listed first in
+the OCPI_SERVER_ADDRESSES environment variable or whose
+IP address and (optional) TCP port are specified as options
+on the command line.
+
+The verbs supported by *`ocpiremote`* are:
+
+*`deploy`*::
+    Copy an OpenCPI bootable media directory tree (also called
+    a "deployment package" or "SD card contents") to a
+    remote system (usually to an SD card inserted into that
+    system) and then reboot it. See the 'OpenCPI
+    Installation Guide', the 'OpenCPI Platform Development Guide', and
+    the link:ocpiadmin.1.html[ocpiadmin(1)] tool for more
+    information about creating bootable media directory
+    trees for embedded systems.
+
+*`load`*::
+    Create a sandbox directory on a remote system and then send
+    an *`ocpiserve`* container server package to that directory.
+
+*`log`*::
+    Interactively view *`ocpiserve`* container server logging.
+
+*`reboot`*::
+    Reboot a remote system.
+
+*`reload`*::
+    Delete an *`ocpiserve`* container server sandbox directory and then reload it.
+
+*`restart`*::
+    Stop and then start an *`ocpiserve`* container server on a remote system.
+
+*`start`*::
+    Start an *`ocpiserve`* container server on a remote system.
+
+*`status`*::
+    Get the status of an *`ocpiserve`* container server on a remote system.
+
+*`stop`*::
+    Stop an *`ocpiserve`* container server on a remote system.
+
+*`test`*::
+    Test the basic connectivity between the local system
+    and an *`ocpiserve`* container server on a remote system.
+
+*`unload`*::
+    Delete a container server sandbox directory.
+
+None of these verbs take any arguments.
+
+NOUNS
+-----
+There are no nouns for *`ocpiremote`*.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options Common to All Operations on a Container Server or Remote System
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--ip_addr=`*'<ip-address>', *`-i`* '<ip-address>'::
+    Specify the IP address of the target remote system.
+    If this option is not specified, the first IP address in the
+    OCPI_SERVER_ADDRESSES environment variable is used.
+
+*`--password=`*'<password>', *`-p`* '<password>'::
+    Specify the password associated with the username used
+    for login to the target remote system.
+    The default password is *`root`*.
+
+*`--remote_dir=`*'<directory-name>', *`-d`* '<directory-name>'::
+    Specify the name of a directory on the target remote system in
+    which to create and use a container server sandbox.
+    If this option is not used, the default directory
+    name *`sandbox/`* is created in the home directory
+    of the specified user.
+
+*`--ssh_opts=`*'<options>', *`-o`* '<options>'::
+    Specify the SSH options for connecting to the target remote system.
+    If this option is not used, the SSH options for automatically
+    accepting host keys without notification and for suppressing
+    most warning and diagnostic messages are used.
+
+*`--scp_opts=`*'<options>', *`-c`* '<options>'::
+    Specify the SCP options for connecting to the target remote system.
+    If this option is not used, the SCP options for automatically
+    accepting host keys without notification and for suppressing
+    most warning and diagnostic messages are used.
+
+*`--user=`*'<username>', *`-u`* '<username>'::
+    Specify the username used for login to the target remote system.
+    The default username is *`root`*.
+
+Options When Loading or Reloading a Container Server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*--`hw_platform=`*'<HDL-platform-identifier>', *`-s`* '<HDL-platform-identifier>'::
+    Specify the identifier of the HDL (FPGA) platform in use
+    for the container server environment on the target remote system.
+    If this option is not used, the default is *`zed`*. See
+    the 'OpenCPI User Guide' for the possible identifiers
+    for OpenCPI HDL platforms.
+
+*`--port=`*'<tcp-port-number>', *`-r`* '<tcp-port-number>'::
+    Specify the TCP port of the container server on the target remote system.
+    If this option is not specified, the first port number in
+    the OCPI_SERVER_ADDRESSES environment variable is used.
+
+*`--sw_platform=`*'<RCC-platform-identifier>', *`-s`* '<RCC-platform-identifier>'::
+    Specify the identifier of the RCC (software) platform in use
+    for the container server environment on the target remote system.
+    If this option is not used, the default is *`xilinx13_4`*.
+    See the 'OpenCPI User Guide' for the possible identifiers
+    for OpenCPI RCC platforms.
+
+Options When Deploying OpenCPI Bootable Media Files to a Remote System
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--hw_platform=`*'<HDL-platform-identifier>', *`-s`* '<HDL-platform-identifier>'::
+    Specify the identifier of the HDL (FPGA) platform in use
+    for the container server environment on the target remote system.
+    If this option is not
+    used, the default is *`zed`*. See the 'OpenCPI User Guide'
+    for the possible identifiers for OpenCPI HDL platforms.
+
+*`--sw_platform=`*'<RCC-platform-identifier>', *`-s`* '<RCC-platform-identifier>'::
+    Specify the identifier of the RCC (software) platform in use
+    for the container server environment on the target remote system.
+    If this option is not
+    used, the default is *`xilinx13_4`*. See the 'OpenCPI User Guide'
+    for the possible identifiers for OpenCPI RCC platforms.
+
+Options When Starting or Restarting a Container Server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--log-level=`*'<value>', *`-l`*'<value>'::
+    Specify the OpenCPI log level to be used during
+    container server execution.
+    See the description of the OCPI_LOG_LEVEL environment
+    variable in the 'OpenCPI User Guide' for a description
+    of possible values. Using this option overrides the
+    level set in the OCPI_LOG_LEVEL environment variable.
+    The default log level is 0 (no logging).
+
+ENVIRONMENT VARIABLES
+---------------------
+The following OpenCPI environment variables affect *`ocpiremote`* execution:
+
+*`OCPI_ENABLE_REMOTE_DISCOVERY`*::
+    Whether (set to *`1`*) or not (set to *`0`*) multicast User Datagram
+    Protocol (UDP) discovery of remote systems running *`ocpiserve`* is enabled.
+
+*`OCPI_SERVER_ADDRESSES`*::
+    A comma- or space-separated list of IP addresses/TCP ports of remote systems to contact, where
+    each IP/TCP address is in the format '<ip-address>'*`:`*'<tcp-port>'. For example,
+    192.168.1.102:12345. Starting *`ocpiserve`* with the *`--verbose`* option directs it to output its
+    IP addresses/TCP ports.
+
+*`OCPI_SERVER_ADDRESSES_FILE`*::
+    The name of a file that contains remote system IP addresses/TCP ports, one per line. Each
+    IP address is in the format '<ip-address>'*`:`*'<tcp-port>'. For example,
+    192.168.1.102:12345.
+
+*`OCPI_OCPI_SOCKET_INTERFACE`*::
+    The name of the network interface (from the list of network interfaces
+    returned by the Linux *`ifconfig`* command) to be used for contacting
+    remote systems running *`ocpiserve`* container servers. Set this variable
+    to the interface with the same network address
+    (IP address anded with the netmask) as the container servers being used.
+
+The chapter "Using Remote Containers: Network-Connected Processors" in
+the 'OpenCPI Application Development Guide' provides more information
+about when to use these environment variables and why.
+
+EXAMPLES
+---------
+. Load an *`ocpiserve`* container server on the remote system
+with IP address 192.168.1.102. The operation creates the
+container server executable in the directory *`~/sandbox/.`*
++
+-----------------------------------------
+ocpiremote --ip_addr=192.168.1.102 load
+-----------------------------------------
++
+. Start a previously loaded *`ocpiserve`* container server
+on the remote system with IP address 192.168.1.102:
++
+-----------------------------------------
+ocpiremote --ip_addr=192.168.1.102 start
+-----------------------------------------
++
+. Stop the *`ocpiserve`* container server on the remote system
+with IP address 192.168.1.102:
++
+-----------------------------------------
+ocpiremote --ip_addr=192.168.1.102 stop
+-----------------------------------------
++
+. Observe logging on the *`ocpiserve`* container server
+on the remote system with IP address 192.168.1.102:
++
+-----------------------------------------
+ocpiremote --ip_addr=192.168.1.102 log
+-----------------------------------------
++
+. Load an *`ocpiserve`* container server into the *`~/myserver/`*
+directory on the remote system listed
+first in the OCPI_SERVER_ADDRESSES environment variable:
++
+-----------------------------------------
+ocpiremote --remote_dir=myserver load
+-----------------------------------------
++
+. Delete and then load an *`ocpiserve`* container server
+on the remote system with the IP address 192.168.1.102
+and the TCP port 9233:
++
+-----------------------------------------------------
+ocpiremote --ip_addr=192.168.1.102 --port=9233 reload
+-----------------------------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpiadmin.1.html[ocpiadmin(1)]
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+link:ocpiserve.1.html[ocpiserve(1)]
+link:ocpirun.1.html[ocpirun(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+
+
+
+

@@ -70,7 +70,13 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 
 \section*{Functionality}
 \begin{flushleft}
-	The DC Offset Cancellation Filter worker inputs complex signed samples, filters the DC bias from both I and Q input rails using separate 1st-order IIR filters, and outputs complex signed samples. The response time of the filter is programmable, as is the ability to bypass the filter and to update/hold the calculated DC value to be removed. For the HDL worker, a generic controls insertion of a peak detection circuit applied to the worker's output samples.\medskip
+	The transfer function for the component is as follows.
+
+  \begin{center}
+     $H(z) = \frac{1-z^{-1}}{1-\alpha\footnote{$\alpha$ defaults to 121/128} z^{-1}}$
+  \end{center}
+
+	The component inputs complex signed samples, filters the DC bias from both I and Q input rails using an IIR filter, and outputs complex signed samples. The response time of the filter is programmable, as is the ability to bypass the filter and to update/hold the calculated DC value to be removed. For the HDL worker, a generic controls insertion of a peak detection circuit applied to the worker's output samples.\medskip
 
 	The time constant input $TC = 128*\alpha$ is limited to a signed eight-bit number, which helps to control the bit growth of the multiplier. Rearranging the equation, $\alpha = TC/128$, where a maximum value of +127 is allowed due to signed multiplication. Furthermore, $0<\alpha<1$ for stable operation. Larger values of $TC$ give both a faster filter response and a narrower frequency magnitude notch at zero Hertz. A typical value of $TC = 121$ $(\alpha = 0.95)$ is used by default.
 \end{flushleft}

@@ -68,7 +68,7 @@ begin
   --timebase_out.clk   <= sys0_clk;
   timebase_out.clk   <= ctl_clk;
   timebase_out.reset <= not ctl_rst_n;
-  timebase_out.ppsIn <= '0';
+  timebase_out.pps <= '0';
 
   -- Instantiate the PCI core, which will also provide back to us a 125MHz clock
   -- based on the incoming 250Mhz PCI clock (based on the backplane 100Mhz PCI clock).

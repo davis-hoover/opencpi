@@ -82,7 +82,7 @@ function setVarsFromMake {
   vars=$(set -o pipefail;\
          eval make -n -r -s -f $1 $2 ${quiet:+2>/dev/null} | \
 	 tr ';' '\n' | sed -e '/^ *$/d' -e 's/^ *//' -e 's/ *$//' | grep '^[a-zA-Z_][a-zA-Z0-9_]*=')
-   [ $? != 0 ] && return 1
+  [ $? != 0 ] && return 1
   eval $vars
 }
 

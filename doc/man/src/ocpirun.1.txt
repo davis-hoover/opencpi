@@ -1,0 +1,517 @@
+OCPIRUN(1)
+=========
+
+
+NAME
+----
+ocpirun - command-line tool for running OpenCPI applications
+
+
+SYNOPSIS
+--------
+*`ocpirun`* ['<options>'] '<application-name>'
+
+
+DESCRIPTION
+-----------
+The *`ocpirun(1)`* command-line tool is used to execute OpenCPI
+component-based 'applications' in OpenCPI 'containers' on OpenCPI 'platforms'.
+An OpenCPI application is defined as an assembly of component
+instances with connections among them. An OpenCPI application
+can be specified in two different ways:
+
+- As a standalone XML file called an 'OpenCPI Application Specification' ('OAS')
+
+- As an XML document embedded in and manipulated by a C++ program using
+the 'OpenCPI Application Control Interface' ('ACI')
+
+The *`ocpirun`* tool directly executes the applications
+defined in OAS XML files. The argument '<application-name>'
+is the name of an OAS file without the *`.xml`* extension.
+The *`ocpirun`* tool reads the OAS associated with the named
+application and then runs it.
+
+Execution ends when the application described in the OAS is "done"
+or a time duration (set with an option to *`ocpirun`*) is exceeded.
+An application is done when all its workers indicate that they
+are "done" or when a single worker identified with the *`done`*
+XML attribute in the OAS indicates that it is "done".
+
+The *`ocpirun`* tool runs applications in OpenCPI 'projects',
+which are development work areas for groups of assets like components
+and applications.
+
+When *`ocpirun`* executes an application, it makes deployment decisions
+that determine, for each component instance in the application:
+
+- which worker in which compiled artifact should be used
+
+- which container the worker should run in
+
+The *`ocpirun`* tool uses an automatic built-in algorithm to make
+these decisions that can be guided or overridden by using specific
+options.
+
+Options to *`ocpirun`* are either single letters following one hyphen or complete
+words or acronyms following two hyphens and separated by hyphens.
+Options can occur anywhere in the command for the user's convenience.
+The *`ocpirun`* command supports the following option categories:
+
+- General-purpose options
+
+- Function options, which direct the command to perform functions
+'other than executing the application'.
+
+- Instance options, which allow a value to be specified that applies
+to all instances in the application or to a single instance
+in the application. Instance options typically
+provide constraints on the *`ocpirun`* deployment algorithm to
+consider only certain workers or certain containers.
+
+- Instance port options, which apply to specific ports of instances
+in the application and modify the default behavior of communications
+occurring at that port. When a port is connected to a port of another
+instance, the connection is between two ports. Some instance
+port options apply only to one end (one port) of the connection,
+while others apply to the connection as a whole and thus to both the
+specified port and the port to which it is connected.
+
+- External port options, which apply to the external ports
+of the application (which are not connected to anything else in the OAS).
+
+- Simulation options, which control containers running HDL (FPGA)
+simulators and are used during HDL component development and
+testing. The 'OpenCPI HDL Development Guide' provides more
+information on simulators.
+
+Some of these options can also be expressed as XML attributes in
+the application OAS and some can be used in applications that
+use the Application Control Interface (ACI). See the "Options
+Summary" section in the 'OpenCPI Application Development Guide'
+for information on how to invoke these options with *`ocpirun`*,
+as OAS XML attributes and for ACI.
+
+When invoked without any arguments, *`ocpirun`* displays information
+about all of its options.
+
+The 'OpenCPI Application Development Guide' describes the
+XML structure of an application OAS and describes
+OpenCPI application development and execution in detail.
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+Arguments to word-form options are preceded by an equal sign (=)
+(as shown in the following descriptions) or a space. Arguments to
+letter options are preceded by a space.
+
+General Options
+~~~~~~~~~~~~~~
+*`--component`*::
+    Specify that the first command argument that is not an option
+    is a component name for a single-component application
+    rather than the filename of an OAS.
+
+*`--deploy-out=`*'<file>'::
+    Specify the filename in which to record deployment decisions
+    for this execution, in XML format, that can be used for
+    execution later on with the *`--deployment`* option.
+    The file generated with this option can contain the
+    exact deployment recorded from a previous run or
+    from a run that is executed with the
+    *`no-execute`* option.
+
+*`--deployment=`*'<file>'::
+    Specify a filename to read for deployment decisions
+    rather than using the built-in deployment algorithm.
+    See the *`deploy-out`* option.
+
+*`--dump`*, *`-d`*::
+    Write property values to *`stderr`* before starting the
+    application and after it is done. 
+
+*`--dump-file=`*'<file>'::
+    Specify the file in which to record the final property
+    values in machine-parseable form.
+
+*`--dump-platforms`*, *`-M`*::
+    Write all platform worker and HDL device worker properties
+    in addition to properties of the workers in the application
+    to *`stderr`* before starting the application and when it is done.
+
+*`--duration=`*'<seconds>', *`-t`* '<seconds>'::
+    Specify the number of seconds after which execution
+    should stop. If the application is not done before
+    '<seconds>' is reached, the application stops and
+    is considered to have executed successfully (the
+    ocpirun exit code is zero).
+
+*`--hex`*::
+    Output numeric property values in hex, not decimal.
+
+*`--library-path=`*'<library>'::
+    Override the OCPI_LIBRARY_PATH environment variable
+    with the specified library.
+
+*`--log-level=`*'<level>', *`-l`* '<level>'::
+    Set the OpenCPI log level to the specified level.
+    See the description of the OCPI_LOG_LEVEL environment
+    variable in the 'OpenCPI User Guide' for a description
+    of possible values. Using this option overrides the
+    level set in the OCPI_LOG_LEVEL environment variable.
+
+*`--no-execute`*::
+    Specify that all deployment decisions should be made
+    but the application should not be executed. This option
+    can be used with the *`--deploy-out`* option to write
+    the deployment decisions to a file.
+
+*`--processors=`*'<number-of-RCC-containers>', *`-n`* '<number-of-RCC-containers>'::
+    Specify the number of RCC containers to create. The default is 1.
+
+*`--remote`*, *`-R`*::
+    Automatically discover servers that offer remote containers
+    using multicast User Data Protocol (UDP). See the 'OpenCPI
+    Application Development Guide' for information on using
+    *`ocpirun`* with remote containers.
+
+*`--server=`*'<name-or-IP-address>', *`-S`* '<name-or-IP-address>'+::
+    Specify the server name or IP address to be explicitly contacted
+    for remote containers whether or not the *`--remote`* (*`-R`*) option is
+    specified. See the 'OpenCPI Application Development Guide' for
+    information on using *`ocpirun`* with remote containers.
+
+*`--timeout=`*'<seconds>', *`-O`* '<seconds>'::
+    Specify the number of seconds after which the application is
+    stopped and considered to have failed (the *`ocpirun`* exit
+    code is 1.)
+    
+*`--uncached`*, *`-U`*::
+    When dumping property values, do not use values cached
+    by *`ocpirun`* when they are written. Instead, query the
+    worker in its execution environment (which is much
+    more expensive).
+
+*`--verbose`*, *`-v`*::
+    Describe what is happening in command execution in more detail.
+
+Function Options
+~~~~~~~~~~~~~~~~
+*`--list`*, *`-C`*::
+    List all available containers, including those discovered on
+    the network if the *`-remote`* (*`-R`*) or *`--server`* (*`-S`*)
+    options are specified. The option assigns each container a number
+    for easy specification with the *`--container`* (*`-c`*) option
+    and returns it as output along with the authoring model, platform
+    name, operating system and version, architecture and container name.
+    Note that the application is still executed if an application
+    filename argument is specified after the options.
+
+*`--list-artifacts`*, *`-A`*::
+    Search for all artifacts for the targets or
+    platforms specified with the *`--target`* (*`-r`*) option, based on
+    OCPI_LIBRARY_PATH, and then write the resulting list to
+    *`stdout`*. Use this function to collect artifacts
+    for a specific system.
+
+*`--list-specs`*::
+    Search for all specs for the targets or platforms
+    specified with the *`--target`* (*`-r`*) option, based on
+    OCPI_LIBRARY_PATH, and then print the resulting list to
+    *`stdout`*. Use this function to collect available specs
+    for a specific system.
+
+*`--no-execute`*::
+    For each instance, determine the container on which it will run
+    and the artifact to be used to run it without actually allocating
+    any resources for performing the execution. Use this option
+    with the *`--deploy-out`* option to execute a "dry run"
+    of an application to see the results and record the deployment
+    decisions in an XML file that can then be used with the
+    *`--deployment`* option.
+
+*`--only-platforms`*::
+    Use with the *`--list`* (*`-C`*) option to direct it to
+    output only the available platforms, listing any available
+    platform only once even if there is more than one container
+    with the same platform type.
+
+*`--target=`*'<target>', *`-r`* '<target>'+::
+    Use with the *`--list-artifacts`* and
+    *`--list-specs`* options to limit the list
+    to the specified architecture. Specify the
+    target in the format '<os>'*`-`*'<os-version>'*`-`*'<arch>';
+    for example, *`linux-c7-x86_64`*.
+
+Instance Options
+~~~~~~~~~~~~~~~~
+*`--container`*[*`=`*'<instance-name>']*`=`*'<container>', *`-c`*['<instance-name>']*`=`*'<container>'+::
+    Assign the named instance or all instances to the specified
+    container using the container name or number
+    returned by the *`--list`* (*`-C`*) option.
+    Examples: -cfft=1, -cfir=rcc2, --container=fft=1,
+    --container=rcc2, -c=1, --container fft=1.
+
+*`--model`*[*`=`*'<instance-name>']*`=`*'<authoring-model>', *`-m`*['<instance-name>']*`=`*'<authoring-model>'+::
+    Specify the authoring model of the named instance
+    or all instances so that the worker used for the
+    instance/all instances must have this model.
+    The value of '<authoring-model>' is *`hdl`* or *`rcc`*.
+    Examples: -mfft=hdl, -m=hdl, --model=rcc, --model=fir=hdl, --model fir=hdl.
+
+*`--platform`*[*`=`*'<instance-name>=']*`=`*'<platform-type>', *`-P`*['<instance-name>']*`=`*'<platform-type>'+::
+    Assign the named instance or all instances only to
+    available containers for the specified platform type.
+    Examples: -Pfft=ml605, --platform=centos7.
+    Use the *`--list`* (*`-C`*) option to determine the
+    available containers and platform types. 
+
+*`--property`*[*`=`*'<instance-name>']*`=`*'<property-name>'*`=`*'<value>', *`-p`*['<instance-name>']*`=`*'<property-name>'*`=`*'<value>'+::
+    Set the value of a property. Specify the instance name for
+    per-instance property value settings. Omit the instance name
+    for application-level property value settings. See the
+    'OpenCPI Application Development Guide' for detailed
+    information on specifying property values.
+
+*`--selection`*[*`=`*'<instance-name>']*`=`*'<expression>', *`-s`*['<instance-name>']*`=`*'<expression>'::
+    Set the selection expression for a single instance
+    or all instances. See the description of the *`selection`* OAS XML attribute in the
+    'OpenCPI Application Development Guide' for details.
+
+*`--worker=`*'<instance-name>'*`=`*'<worker-name>', *`-w`*['<instance-name>']*`=`*'<worker-name>'::
+    Specify the name of the worker (specific implementation)
+    to be used for the instance. Do not include
+    the authoring model suffix or the package prefix in '<worker-name>'.
+    Examples: --worker=mycomp2=worker3, --worker mycomp2=worker3, -wmycomp2=worker3.
+
+Instance Port Options
+~~~~~~~~~~~~~~~~~~~~~
+*`--buffer-count=`*'<instance-name>'*`=`*'<port-name>'*`=`*'<value>', *`-B`*'<instance-name>'*`=`*'<port-name>'*`=`*'<value>'+::
+    Specify the number of buffers at this instance port, not
+    for all the ports in the connection. The default is
+    usually 2. Use this option to allow the number of
+    buffers to be different on each end of the connection.
+
+*`--buffer-size=`*'<instance-name>'*`=`*'<port-name>'*`=`*'<value>', *`-Z`*'<instance-name>'*`=`*'<port-name>'*`=`*'<value>'+::
+    Specify the buffer size for the connection (the specified
+    port and the port to which it is connected). The default
+    is usually determined by a combination of the protocol
+    used on the connection and other system constraints.
+
+*`--transport=`*'<instance-name>'*`=`*'<port-name>'*`=`*'<identifier>', *`-T`*'<instance-name>'*`=`*'<port-name>'*`=`*'<identifier>'+::
+    Specify the transport technology to use for the
+    connection (the specified port and the port
+    to which it is connected). This option applies
+    when using remote containers.
+    See the description of the *`transport`* attribute
+    of a *`connection`* element in the 'OpenCPI Application
+    Development Guide' for the list of identifiers that
+    correspond to the transport technologies supported
+    by OpenCPI.
+
+External Port Options
+~~~~~~~~~~~~~~~~~~~~~
+*`--buffer-count=`*'<external-port-name>'*`=`*'<value>', *`-B`* '<port-name>'*`=`*'<value>'+::
+    Specify the number of buffers for the specified external port.
+
+*`--buffer-size=`*'<external-port-name>'*`=`*'<value>', *`-Z`* '<external-port-name>'*`=`*'<value>'+::
+    Specify the the buffer size for the specified
+    external port and the port inside the OAS to which
+    it is connected.
+    The default is usually determined by a combination of
+    the protocol used on the connection and other system
+    constraints.
+
+*`--file=`*'<external-port-name>'*`=`*'<file-name>', *`-f`* '<external-port-name>'*`=`*'<file-name>'+::
+    Specify the file to be connected to the
+    specified external port. Use this option to
+    insert a *`file_read`* or *`file_write`* utility component
+    into the application and connect it to the
+    specified external port. It allows an OAS with
+    external ports to be connected to files while also
+    allowing it to be used with those same ports
+    connected to an ACI application. See the
+    description of the utility components and
+    ACI applications in the 'OpenCPI Application
+    Development Guide' for details.
+
+*`--transport=`*'<external-port-name>'*`=`*'<identifier>', *`-T`* '<external-port-name>'*`=`*'<identifier>'+::
+    Specify the transport technology used for the connection
+    (for this port and the port to which it is connected).
+    This option applies when using remote containers.
+    See the description of the *`transport`* attribute
+    of a *`connection`* element in the 'OpenCPI Application
+    Development Guide' for the list of identifiers that
+    correspond to the transport technologies supported
+    by OpenCPI.
+
+Simulation Options
+~~~~~~~~~~~~~~~~~~
+*`--sim_dir=`*'<directory>'::
+    Specify the name of a directory where simulation outputs
+    will be placed. The default directory is *`simulations/`*
+    relative to where *`ocpirun`* is running.
+
+*`--sim-ticks=`*'<value>'::
+    The number of simulation clock cycles to execute or
+    until the application is done.
+
+The section "Execution of Simulation Bitstreams and Containers" in the
+'OpenCPI HDL Development Guide' provides more information about running
+applications on HDL (FPGA) simulators. See link:ocpiview.1.html[ocpiview(1)]
+for information on viewing the results of simulation runs.
+
+
+EXAMPLES
+--------
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*.
+The command locates and reads the application OAS
+and runs the application:
++
+-------------
+ocpirun myapp
+-------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, displaying information
+about what is happening, dumping the property values
+after initialization, and limiting execution time to
+10 seconds:
++
+--------------------------------------------
+ocpirun --verbose --dump --duration=10 myapp
+--------------------------------------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, specifying that
+all application instances must use the RCC
+authoring model:
++
+------------------------
+ocpirun --model=rcc myapp
+------------------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, specifying that
+the *`ctl`* instance in the application must
+use the RCC authoring model:
++
+----------------------------
+ocpirun -model=ctl=rcc myapp
+----------------------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, specifying that
+all the instances in the application except for
+the *`filter`* instance must use the RCC authoring
+model. Specifying the *`--model`* option with an empty
+value for *`filter`* unsets the previous 
+setting for it made with the *`--model=rcc`* option:
++
+-----------------------------------------
+ocpirun --model=rcc --model=filter= myapp
+-----------------------------------------
++
+. Inside a project, specify that all instances
+in the application described by the OAS named
+*`myapp.xml`* should be run only on the ml605 HDL (FPGA) platform:
++
+------------------------------
+ocpirun --platform=ml605 myapp
+-----------------------------
++
+. Inside a project, specify that the instance
+*`mycomp`* in the application described by the OAS
+named *`myapp`* should be run only on the *`xsim`*
+HDL (FPGA) simulator platform:
++
+------------------------------------
+ocpirun --platform=mycomp=xsim myapp
+------------------------------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, setting the
+top-level application property named *`control`*
+to *`5`*:
++
+----------------------------------
+ocpirun --property control=5 myapp
+----------------------------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, setting the
+*`filename`* property value of the *`file_read`*
+instance to the file *`myinput.data`*:
++
+-------------------------------------------------------
+ocpirun --property file_read=filename=myinput.data myapp
+-------------------------------------------------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, connecting the
+external port named *`input`* to the file
+*`myinput.txt`* and setting the inserted *`file_read`* properties
+*`opcode`* to *`2`* and *`suppressEOF`* to *`false`*.
+Enclose the option value in quotes because the question mark
+and the semicolon are shell metacharacters:
++
+-------------------------------------------------------------------
+ocpirun --file 'input=myinput.txt?opcode=2;suppressEOF=false' myapp
+-------------------------------------------------------------------
++
+. On a CentOS7 system with *`modelsim`* and *`isim`* HDL (FPGA) simulators
+installed for OpenCPI, list the available platforms:
++
+--------------
+ocpirun --list
+--------------
++
+The output from the command is:
++
+-------------------------------------------------------
+Available containers:
+   #  Model Platform   OS    OS-Version   Arch   Name
+   0  hdl   isim                                 lsim:isim
+   1  hdl   modelsim                             lsim:modelsim
+   2  rcc   centos7    linux c7           x86_64 rcc0
+-------------------------------------------------------
++
+. Inside a project, run the application described
+by the OAS named *`myapp.xml`*, using for the *`ctl`*
+instance only those workers whose *`snr`* property
+is less than 5:
++
+-------------------------------------
+ocpirun --selection=ctl=snr<5 myapp
+-------------------------------------
+ 
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-application.1.html[ocpidev-application(1)]
+link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
+link:ocpidev-component.1.html[ocpidev-component(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+link:ocpiview.1.html[ocpiview(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

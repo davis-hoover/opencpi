@@ -19,7 +19,7 @@
 -- Altera-specific input buffer, supports both single ended and differential
 library IEEE;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library util; use util.types.all;
+library work; use work.platform_pkg.all;
 library altera; use altera.altera_primitives_components.all;
 entity BUFFER_IN_1 is
   generic (IOSTANDARD   :     iostandard_t := UNSPECIFIED;

@@ -27,9 +27,9 @@
 namespace OA = OCPI::API;
 
 int main(int /* argc */, char ** /* argv */) {
-  std::string hello("<application>"
+  std::string hello("<application package='.hello_xml'>"
 		    // instance name defaults to hello since there is only one
-		    "  <instance component='local.hello' selection='model==\"rcc\"'/>"
+		    "  <instance component='hello' selection='model==\"rcc\"'/>"
 		    "  <connection>"
 		    "    <external name='out'/>"
 		    "    <port instance='hello' name='out'/>"

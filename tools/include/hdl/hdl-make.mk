@@ -107,7 +107,7 @@ define HdlSetWorkers
        $$(foreach w,$$(HdlWorkers),\
           $$(or $$(strip\
              $$(firstword \
-                $$(foreach l,$$(OcpiComponentLibraries),$$(infox CORELIB:$$l:$$l/hdl/$$f/$$w$$(HdlBin))\
+                $$(foreach l,$$(call OcpiComponentLibraries),$$(infox CORELIB:$$l:$$l/hdl/$$f/$$w$$(HdlBin))\
                    $$(or $$(call HdlExists,$$l/hdl/$$f/$$w$$(HdlBin)),\
                          $$(if $$(call HdlExists,$$l/hdl/$$w.xml),\
                              $$(foreach lib,$$(l:%/lib=%),\
@@ -758,20 +758,18 @@ define HdlInstallLibsAndSources
   HdlLibsList=install_libs
 
   $$(HdlLibsList):
-	$(AT)for f in $$(HdlActualTargets); do \
-          if test -f $(GeneratedDir)/$(call RmRv,$(LibName)).libs; then \
+	$(AT) if test -f $(GeneratedDir)/$(call RmRv,$(LibName)).libs; then \
 	    $$(call ReplaceIfDifferent,$$(strip \
 	        $(GeneratedDir)/$(call RmRv,$(LibName)).libs),$(strip \
-	        $(HdlInstallLibDir)/$$f))\
+	        $(HdlInstallLibDir)))\
           fi;\
-	done
 
   ifdef HdlToolNeedsSourceList_$(HdlToolSet)
     HdlSourcesList=install_sources
 
     $$(HdlSourcesList):
 	$(AT)for f in $$(HdlActualTargets); do \
-          if test -f $(OutDir)target-$$f/$(call RmRv,$(LibName)).sources; then \
+          if test -f $(OutDir)target-$$$$f/$(call RmRv,$(LibName)).sources; then \
             $$(call ReplaceIfDifferent,$(strip \
 	        $(OutDir)target-$$$$f/$(call RmRv,$(LibName)).sources),$(strip \
 	        $(OutDir)target-$$$$f/$(WorkLib)));\
