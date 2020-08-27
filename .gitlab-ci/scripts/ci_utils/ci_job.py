@@ -48,8 +48,8 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
     job_args = {}
 
     # Check if current job is specified in overrides
-    if 'job' in overrides and name in overrides['job']:
-        overrides = overrides['job'][name]
+    if overrides and name in overrides:
+        overrides = overrides[name]
     # Collect overrides
     for key,value in args.items():
         if key in overrides:
@@ -180,8 +180,15 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
                            host_platform=host_platform, overrides=overrides)
             jobs.append(job)
 
-        if stage == 'prereqs' and platform.is_host and platform.image:
+        if stage == 'prereqs' and platform.is_host:
             name = make_name('packages', platform)
+
+            if not overrides:
+                continue
+            if not 'image' in overrides:
+                if name not in overrides or 'image' not in overrides[name]:
+                    continue
+
             job = make_job(stage, stages, platform, name=name, 
                            overrides=overrides)
             jobs.append(job)
@@ -288,14 +295,12 @@ def make_job(stage, stages, platform, project=None, name=None,
 
     rules = make_rules(platform, host_platform, linked_platform)
 
-    if platform.is_host and name.startswith('packages'): 
+    if platform.is_host and name.startswith('packages'):
         tags = ['docker']
-        image = platform.image
         script = make_scripts_cmd(stage, platform, name)
 
         job = Job(name, stage, script, tags=tags, before_script=None,
-                  after_script=None, rules=rules, image=image,
-                  overrides=overrides)
+                  after_script=None, rules=rules, overrides=overrides)
         
         return job
 
@@ -428,7 +433,7 @@ def make_after_script(platform, do_ocpiremote=False):
                            pipeline_id, job_name,
                            '-t "failed-job"; fi'])
     clean_cmd = 'rm -rf *'
-    
+
     cmds = [upload_cmd]
     
     if do_ocpiremote:
@@ -504,7 +509,7 @@ def make_scripts_cmd(stage, platform, name=None):
         return 'scripts/test-opencpi.sh --no-hdl'
 
     if stage == 'prereqs':
-        if name.startswith('prereqs'):
+        if name and name.startswith('prereqs'):
             return 'scripts/install-prerequisites.sh {}'.format(platform.name)
         else:
             return 'scripts/install-packages.sh {}'.format(platform.name)
@@ -527,18 +532,23 @@ def make_ocpiadmin_cmd(verb, platform, linked_platform=None):
     Raises:
         ValueError: if unrecognized verb provided
     """
-    if verb not in ['install', 'deploy']:
-        raise ValueError('Unknown verb: {}'.format(verb))
+    if verb == 'install':
+        return ' '.join([
+            'ocpiadmin install platform',
+            platform.name
+        ])
 
-    if linked_platform:
-        return 'ocpiadmin {} platform {} {}'.format(verb, 
-                                                    linked_platform.name,
-                                                    platform.name)
+    if verb == 'deploy':
+        return ' '.join([
+            'ocpiadmin deploy platform',
+            linked_platform.name,
+            platform.name,
+        ])
 
-    return 'ocpiadmin {} platform {}'.format(verb, platform.name) 
+    raise ValueError('Unknown verb: {}'.format(verb))
 
 
-def make_ocpidev_cmd(verb, platform, path, noun=None):
+def make_ocpidev_cmd(verb, platform, path, noun=''):
     """Makes ocpidev command
 
     Args:
@@ -553,24 +563,44 @@ def make_ocpidev_cmd(verb, platform, path, noun=None):
     Raises:
         ValueError: if unrecognized verb or noun provided
     """
-    if verb not in ['build', 'run']:
-        raise ValueError('Unknown verb: {}'.format(verb))
     
-    if not noun:
-        noun = ''
-    elif noun not in ['tests', 'test', 'hdl platforms']:
+    if noun and noun not in ['tests', 'test', 'hdl platforms']:
         raise ValueError('Unknown noun: {}'.format(noun))
 
-    if verb == 'run':
-        options = '-d {} --only-platform {} --mode prep_run_verify'.format(
-            path, platform.name)
-    else:
-        options = '-d {} --hdl-platform {}'.format(path, platform.name)
+    if verb == 'build':
+        return ' '.join([
+            'ocpidev build',
+            noun,
+            '-d {}'.format(path),
+            '--hdl-platform {}'.format(platform.name)
+        ])
 
-    return 'ocpidev {} {} {}'.format(verb, noun, options)
+    if verb == 'run':
+        return ' '.join([
+            'ocpidev run',
+            noun,
+            '-d {}'.format(path),
+            '--only-platform {}'.format(platform.name),
+            '--mode prep_run_verify'
+        ])
+
+    raise ValueError('Unknown verb: {}'.format(verb))
 
 
 def make_ocpiremote_cmd(verb, platform, linked_platform=None):
+    """Makes ocpiremote command
+
+    Args:
+        verb:            String to pass to ocpiremote
+        platform:        Platform of job to pass to ocpiremote
+        linked_platform: Associated platform to pass to ocpiremote
+
+    Returns:
+        ocpiadmin command string
+
+    Raises:
+        ValueError: if unrecognized verb provided
+    """
 
     if verb == 'deploy':
         return ' '.join([
@@ -594,6 +624,8 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
             'ocpiremote {}'.format(verb), 
             '-i {}'.format(platform.ip),
         ])
+
+    raise ValueError('Unknown verb: {}'.format(verb))
 
 
 

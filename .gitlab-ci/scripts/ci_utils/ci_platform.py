@@ -4,31 +4,29 @@ from collections import namedtuple
 from pathlib import Path
 
 
-_Platform = namedtuple('platform', 'name model image ip port is_host is_sim')
+_Platform = namedtuple('platform', 'name model ip port is_host is_sim')
 
 
-def Platform(name, model, is_host=False, is_sim=False, image=None, ip=None, 
-             port=None):
+def Platform(name, model, is_host=False, is_sim=False, ip=None, port=None):
     """Creates a Platform namedtuple
 
     Args:
         name:    Name of platform
         model:   Model of platform
-        image:   Docker image of platform
-        ip:      IP adress of platform device
-        port:    Port of platform device
         is_host: Whether platform is a host platform
         is_sim:  Whether platform is a simulator
+        ip:      IP adress of platform device
+        port:    Port of platform device
     
     Returns:
         a Platform
     """
 
     return _Platform(name=name, model=model, is_host=is_host, is_sim=is_sim, 
-                    image=image, ip=ip, port=port)
+                     ip=ip, port=port)
 
 
-def discover_platforms(projects, platform_data=None):
+def discover_platforms(projects, config=None):
     """Search opencpi projects for platforms
 
     Will search for hdl platforms in:
@@ -43,9 +41,10 @@ def discover_platforms(projects, platform_data=None):
         runSimExec.<platform_name>
 
     Args:
-       projects:      List of opencpi projects to search for platforms
-       platform_data: Dictionary which includes host_platform whitelist
-                      and additional platform data
+        projects:       List of opencpi projects to search for 
+                        platforms
+        config:         Dictionary with platform names as keys and
+                        additional platform configs as values
 
     Returns:
         platforms: List of opencpi platforms
@@ -76,36 +75,21 @@ def discover_platforms(projects, platform_data=None):
 
                     if not makefile.is_file():
                         continue
-
-                    if platform_data:
-                        data = get_data(platform_name, platform_data)
-
-                    if is_host and not data:
-                        continue
+                    
+                    if config and platform_name in config:
+                        platform_data = {key:value for key,value 
+                                         in config[platform_name].items()
+                                         if key in ['ip', 'port']}
+                    else:
+                        platform_data = {}
 
                     platform_model = platform_path.parents[1].stem
                     platform = Platform(name=platform_name, 
                                         model=platform_model, is_host=is_host, 
-                                        is_sim=is_sim, **data)
+                                        is_sim=is_sim, **platform_data)
                     platforms.append(platform)
 
     return platforms 
-
-
-def get_data(platform_name, platform_data):
-    """Gets platform data from a dictionary of platforms
-
-    Args:
-        platform:       Platform to get overrides for
-        platforms_data: Dictionary with platform names as keys
-
-    Returns:
-        A dictionary of additional data for a specified platform
-    """
-    try:
-        return platform_data[platform_name]['data']
-    except:
-        return {}
 
 
 def get_platform(platform_name, platforms):
