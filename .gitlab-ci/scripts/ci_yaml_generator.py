@@ -51,11 +51,18 @@ def main():
                 if cross_platform.name not in whitelist[host_platform.name]:
                     continue
                 
+                linked_platforms = [rcc_platform for rcc_platform 
+                                    in rcc_platforms 
+                                    if rcc_platform.name 
+                                    in whitelist[host_platform.name]]
+            else:
+                linked_platforms = rcc_platforms
+                
             print('\t{}'.format(cross_platform.name))
 
             overrides = get_overrides(cross_platform, config)
             cross_jobs = ci_job.make_jobs(stages, cross_platform, projects, 
-                                          rcc_platforms=rcc_platforms, 
+                                          linked_platforms=linked_platforms, 
                                           host_platform=host_platform,
                                           overrides=overrides)
             cross_path = Path(yaml_path, host_platform.name, 

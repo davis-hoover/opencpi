@@ -2,7 +2,6 @@
 
 import yaml
 from collections import namedtuple
-from .ci_platform import get_rcc_platforms
 
 
 _Job = namedtuple('job', 'name stage script before_script after_script' 
@@ -108,7 +107,7 @@ def dump(jobs_dict, path):
         yaml.safe_dump(jobs_dict, yml, width=1000, default_flow_style=False)
 
 
-def make_jobs(stages, platform, projects, rcc_platforms=None, 
+def make_jobs(stages, platform, projects, linked_platforms=None, 
               host_platform=None, overrides=None):
     """Creates Job(s) for project/platform combinations
 
@@ -116,13 +115,13 @@ def make_jobs(stages, platform, projects, rcc_platforms=None,
     of platform.
 
     Args:
-        stages:         List of pipeline stages
-        platform:       Platform to make jobs for
-        projects:       List of projects to make jobs for
-        rcc_platforms:  List of rcc platforms for hdl platform jobs that 
-                        require an associated rcc platform
-        host_platform:  Host platform to create jobs for
-        overrides:      Dictionary to override standard job values
+        stages:           List of pipeline stages
+        platform:         Platform to make jobs for
+        projects:         List of projects to make jobs for
+        linked_platforms: List of platforms for jobs that require an 
+                          associated platform
+        host_platform:    Host platform to create jobs for
+        overrides:        Dictionary to override standard job values
 
     Returns:
         Jobs: collection containing data necessary to create jobs in a
@@ -132,7 +131,7 @@ def make_jobs(stages, platform, projects, rcc_platforms=None,
         ValueError: if platform model is neither 'rcc' nor 'hdl'
     """
     if platform.model == 'hdl': 
-        return make_hdl_jobs(stages, platform, projects, rcc_platforms, 
+        return make_hdl_jobs(stages, platform, projects, linked_platforms, 
                              host_platform, overrides)
     elif platform.model == 'rcc':
         return make_rcc_jobs(stages, platform, projects, host_platform, 
@@ -148,11 +147,11 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
     Determines arguments to pass to make_job().
 
     Args:
-        stages:         List of pipeline stages
-        platform:       Platform to make jobs for
-        projects:       List of projects to make jobs for
-        host_platform:  Host platform to create jobs for
-        overrides:      Dictionary to override standard job values
+        stages:        List of pipeline stages
+        platform:      Platform to make jobs for
+        projects:      List of projects to make jobs for
+        host_platform: Host platform to create jobs for
+        overrides:     Dictionary to override standard job values
 
     Returns:
         Jobs: collection containing data necessary to create jobs in a
@@ -196,20 +195,20 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
     return jobs
 
 
-def make_hdl_jobs(stages, platform, projects, rcc_platforms, 
+def make_hdl_jobs(stages, platform, projects, linked_platforms, 
                   host_platform=None, overrides=None):
     """Creates Job(s) for project/platform combinations of model 'hdl'
 
     Determines arguments to pass to make_job().
 
     Args:
-        stages:         List of pipeline stages
-        platform:       Platform to make jobs for
-        projects:       List of projects to make jobs for
-        rcc_platforms:  List of rcc platforms for hdl platform jobs that 
-                        require an associated rcc platform
-        host_platform:  Host platform to create jobs for
-        overrides:      Dictionary to override standard job values
+        stages:           List of pipeline stages
+        platform:         Platform to make jobs for
+        projects:         List of projects to make jobs for
+        linked_platforms: List of platforms for jobs that require an 
+                          associated platform
+        host_platform:    Host platform to create jobs for
+        overrides:        Dictionary to override standard job values
 
     Jobs: collection containing data necessary to create jobs in a
           pipeline
@@ -245,20 +244,20 @@ def make_hdl_jobs(stages, platform, projects, rcc_platforms,
                 if not platform.ip or not platform.port:
                     continue    
 
-                for rcc_platform in rcc_platforms:
+                for linked_platform in linked_platforms:
                     run_test_job = make_job('test', stages, platform, 
                                             project=project, 
                                             library=library,
                                             host_platform=host_platform,
-                                            linked_platform=rcc_platform,
+                                            linked_platform=linked_platform,
                                             overrides=overrides,
                                             do_ocpiremote=True)
                     jobs.append(run_test_job)
 
-    for rcc_platform in rcc_platforms:
+    for linked_platform in linked_platforms:
         job = make_job('build-sdcards', stages, platform, 
                        host_platform=host_platform, 
-                       linked_platform=rcc_platform, overrides=overrides)
+                       linked_platform=linked_platform, overrides=overrides)
         jobs.append(job)
     
     return jobs
