@@ -40,8 +40,6 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
   v1.7 & Erroneous doc property tables updated for accuracy. & 4/2020 \\
   \hline
 \end{longtable}
-<<<<<<< HEAD
-=======
 \newpage
 
 
@@ -53,7 +51,6 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \def\workers{\comp{}.rcc}
 \def\testedplatforms{CentOS7}
 \input{\snippetpath/component_summary_table}
->>>>>>> develop
 
 \section*{Worker Implementation Details}
 When writing a value to the txen property that is different from its
