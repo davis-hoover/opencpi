@@ -1,11 +1,16 @@
 # Additional data for a platform at discovery as well as overrides of 
 # job values. Overrides apply to all jobs for a platform by default,
 # To apply overrides to only a specific job, nest the values under the
-# job name like done for 'centos7' below.
+# job name like done for 'centos7' below. A platform or a specific job
+# can be skipped by setting its value to 'skip'.
 centos7:
   overrides:
     packages:centos7:
         image: centos:7
+        tags: docker
+        script: scripts/install-packages.sh centos7
+        before_script: []
+        after_script: []
 modelsim:
   overrides:
     variables:

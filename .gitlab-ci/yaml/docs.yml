@@ -1,6 +1,4 @@
 build:pages:
-  rules:
-    - when: on_success
   stage: build-host
   tags:
     - docker
