@@ -33,6 +33,9 @@ type metadata_t is record
   ctrl_tx_on_off : std_logic; -- high when transmitter should be powered on
                               -- low when transmitter should be powered off
 end record metadata_t;
+constant METADATA_BIT_WIDTH : positive := 1 + 1;
+
+constant METADATA_ZERO : metadata_t := ('0', '0');
 
 type underrun_detector_status_t is record
   underrun_error : std_logic;

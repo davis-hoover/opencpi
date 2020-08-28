@@ -16,19 +16,18 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- TODO / FIXME - this is a primitive-with-shadowing candidate
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library unisim; -- BUFGMUX_CTRL
+library unisim;
 
-entity clock_selector_with_async_select is
+entity ad936x_clock_selector is
   port(
     async_select : in  std_logic;
     clk_in0      : in  std_logic;
     clk_in1      : in  std_logic;
     clk_out      : out std_logic);
-end entity clock_selector_with_async_select;
+end entity ad936x_clock_selector;
 
-architecture rtl of clock_selector_with_async_select is
+architecture rtl of ad936x_clock_selector is
 begin
 
   -- With BUFGMUX "glitches or short pulses can appear on the output" when setup/hold is not met for
@@ -36,7 +35,7 @@ begin
   -- BUFGMUX_CTRL, however, does not have this shortcoming, implying that select is allowed to be
   -- asynchronous.
   -- For more info see Xilinx UG472.
-  bufgmux : unisim.vcomponents.BUFGMUX_CTRL
+  selector : unisim.vcomponents.BUFGMUX_CTRL
     port map(
       O  => clk_out,
       I0 => clk_in0,

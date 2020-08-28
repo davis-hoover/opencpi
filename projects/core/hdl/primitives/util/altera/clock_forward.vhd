@@ -20,6 +20,7 @@ library IEEE;
 use IEEE.std_logic_1164.all, IEEE.numeric_std.all;
 library altera_mf;
 use altera_mf.altera_mf_components.all;
+library util;
 
 entity clock_forward is
   generic (
@@ -39,62 +40,23 @@ architecture rtl of clock_forward is
   signal clk_fwd : std_logic_vector(0 downto 0);
   signal clk_p   : std_logic_vector(0 downto 0);
   signal clk_n   : std_logic_vector(0 downto 0);
+  signal din_ris : std_logic := '0';
+  signal din_fal : std_logic := '0';
 
 begin
 
-  noninverted_clock : if (INVERT_CLOCK = false) generate
-    altddio_out_inst : altddio_out
-      generic map (
-        intended_device_family => "unused",
-        extend_oe_disable      => "OFF",
-        invert_output          => "OFF",
-        oe_reg                 => "UNREGISTERED",
-        power_up_high          => "OFF",
-        width                  => 1,
-        lpm_hint               => "UNUSED",
-        lpm_type               => "altddio_out"
-      )
-      port map (
-        aclr       => '0',
-        aset       => '0',
-        datain_h   => (others => '1'),
-        datain_l   => (others => '0'),
-        dataout    => clk_fwd,
-        oe         => '1',
-        oe_out     => open,
-        outclock   => CLK_IN,
-        outclocken => '1',
-        sclr       => RST,
-        sset       => '0'
-      );
-  end generate noninverted_clock;
+  din_ris <= '0' when INVERT_CLOCK else '1';
+  din_fal <= '1' when INVERT_CLOCK else '0';
 
-  inverted_clock : if (INVERT_CLOCK = true) generate
-    altddio_out_inst : altddio_out
-      generic map (
-        intended_device_family => "unused",
-        extend_oe_disable      => "OFF",
-        invert_output          => "OFF",
-        oe_reg                 => "UNREGISTERED",
-        power_up_high          => "OFF",
-        width                  => 1,
-        lpm_hint               => "UNUSED",
-        lpm_type               => "altddio_out"
-      )
-      port map (
-        aclr       => '0',
-        aset       => '0',
-        datain_h   => (others => '0'),
-        datain_l   => (others => '1'),
-        dataout    => clk_fwd,
-        oe         => '1',
-        oe_out     => open,
-        outclock   => CLK_IN,
-        outclocken => '1',
-        sclr       => RST,
-        sset       => '0'
-      );
-  end generate inverted_clock;
+  prim : util.util.oddr
+    port map(
+      clk     => CLK_IN,
+      rst     => RST,
+      din_ris => din_ris,
+      din_fal => din_fal,
+      ddr_out => clk_fwd(0));
+
+  -- TODO / FIXME - investigate replacement of altera_mf.altera_mf_components.altiobuf_out w/ util.util.BUFFER_OUT_1
 
   diff_clk_out : if (SINGLE_ENDED = false) generate
     altiobuf_out_inst : altiobuf_out

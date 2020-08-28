@@ -15,5 +15,5 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-Libraries=ocpi fixed_float protocol
+Libraries=ocpi fixed_float util sync protocol
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

@@ -16,8 +16,6 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- this "primitive" is by-design vendor-agnostic
-
 --------------------------------------------------------------------------------
 -- clock domain: description                | fixed-phase  | frequency-locked  |
 --                                          | relationship | with              |
@@ -25,69 +23,62 @@
 --------------------------------------------------------------------------------
 -- async: N/A                               | N/A          | N/A               |
 --------------------------------------------------------------------------------
--- data_clk:                                | AD9361       | AD9361            |
+-- dac_clk:                                 | AD9361       | AD9361            |
 --                                          | DATA_CLK     | DATA_CLK          |
 --------------------------------------------------------------------------------
--- datad2_clk: data_clk divided by 2        | AD9361       |                   |
+-- dacd2_clk: dac_clk divided by 2          | AD9361       |                   |
 --                                          | DATA_CLK     |                   |
 --------------------------------------------------------------------------------
--- datad4_clk: data_clk divided by 4        | AD9361       |                   |
+-- dacd4_clk: dac_clk divided by 4          | AD9361       |                   |
 --                                          | DATA_CLK     |                   |
 --------------------------------------------------------------------------------
 -- ocps: one clock per ADC/DAC sample       | AD9361       |                   |
---       (will be either datad2_clk         | DATA_CLK     |                   |
---       or datad4_clk based upon           |              |                   |
+--       (will be either dacd2_clk          | DATA_CLK     |                   |
+--       or dacd4_clk based upon            |              |                   |
 --       runtime selection)                 |              |                   |
 --------------------------------------------------------------------------------
-library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 
-entity clock_manager is
-  generic(
-     -- first divider provides data_clk divided-by-2 signal
-    FIRST_DIVIDER_TYPE         : string; -- "BUFFER", "REGISTER"
-    FIRST_DIVIDER_ROUTABILITY  : string; -- "GLOBAL", "REGIONAL"
-     -- second divider provides data_clk divided-by-4 signal
-    SECOND_DIVIDER_TYPE        : string; -- "BUFFER", "REGISTER"
-    SECOND_DIVIDER_ROUTABILITY : string); -- "GLOBAL", "REGIONAL"
+library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library util;
+
+entity ad936x_clock_per_sample_generator is
   port(
     async_select_0_d2_1_d4 : in  std_logic; -- 0: divide-by-2, 1: divide-by-4
-    data_clk               : in  std_logic;
-    datad2_clk             : out std_logic;
-    datad4_clk             : out std_logic;
+    dac_clk                : in  std_logic;
+    dacd2_clk              : out std_logic;
+    dacd4_clk              : out std_logic;
     ocps_clk               : out std_logic);
-end entity clock_manager;
+end entity ad936x_clock_per_sample_generator;
 
-architecture rtl of clock_manager is
-  signal datad2_clk_s : std_logic := '0';
-  signal datad4_clk_s : std_logic := '0';
+architecture rtl of ad936x_clock_per_sample_generator is
+
+  signal dacd2_clk_s : std_logic := '0';
+  signal dacd4_clk_s : std_logic := '0';
+
 begin
 
-  first_divider : entity work.clock_divider
-    generic map(
-      DIVIDER_TYPE => FIRST_DIVIDER_TYPE,
-      ROUTABILITY  => FIRST_DIVIDER_ROUTABILITY,
-      DIVISOR      => "2")
-    port map(
-      clk_in  => data_clk,
-      clk_out => datad2_clk_s);
+  first_divider : process(dac_clk)
+  begin
+    if rising_edge(dac_clk) then
+      dacd2_clk_s <= not dacd2_clk_s;
+    end if;
+  end process first_divider;
 
-  second_divider : entity work.clock_divider
-    generic map(
-      DIVIDER_TYPE => SECOND_DIVIDER_TYPE,
-      ROUTABILITY  => SECOND_DIVIDER_ROUTABILITY,
-      DIVISOR      => "2")
-    port map(
-      clk_in  => datad2_clk_s,
-      clk_out => datad4_clk_s);
+  second_divider : process(dacd2_clk_s)
+  begin
+    if rising_edge(dacd2_clk_s) then
+      dacd4_clk_s <= not dacd4_clk_s;
+    end if;
+  end process second_divider;
 
-  clock_selector : entity work.clock_selector_with_async_select
+  clock_selector : util.util.clock_selector
     port map(
       async_select => async_select_0_d2_1_d4,
-      clk_in0      => datad2_clk_s,
-      clk_in1      => datad4_clk_s,
+      clk_in0      => dacd2_clk_s,
+      clk_in1      => dacd4_clk_s,
       clk_out      => ocps_clk);
 
-  datad2_clk <= datad2_clk_s;
-  datad4_clk <= datad4_clk_s;
+  dacd2_clk <= dacd2_clk_s;
+  dacd4_clk <= dacd4_clk_s;
 
 end rtl;

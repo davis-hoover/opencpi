@@ -299,13 +299,22 @@ end component;
 component clock_forward
   generic (
     INVERT_CLOCK : boolean := false;
-    SINGLE_ENDED : boolean := true);
+    SINGLE_ENDED : boolean := true;
+    INCLUDE_BUF  : boolean := true);
   port (
     RST       : in  std_logic;
     CLK_IN    : in  std_logic;
     CLK_OUT_P : out std_logic;
     CLK_OUT_N : out std_logic);
 end component clock_forward;
+
+component clock_selector is
+  port(
+    async_select : in  std_logic;
+    clk_in0      : in  std_logic;
+    clk_in1      : in  std_logic;
+    clk_out      : out std_logic);
+end component;
 
 component in2out is
   port(
@@ -361,6 +370,26 @@ component edge_detector is
     din               : in  std_logic;  -- input
     rising_pulse      : out std_logic;  -- rising edge pulse
     falling_pulse     : out std_logic); -- falling edge pulse
+end component;
+
+component oddr is
+  port(
+    clk     : in  std_logic;
+    rst     : in  std_logic; -- synchronous w/ the rising clock edge
+    din_ris : in  std_logic;
+    din_fal : in  std_logic;
+    ddr_out : out std_logic);
+end component;
+
+component oddr_slv is
+  generic(
+    BIT_WIDTH : positive);
+  port(
+    clk     : in  std_logic;
+    rst     : in  std_logic; -- synchronous w/ the rising clock edge
+    din_ris : in  std_logic_vector(BIT_WIDTH-1 downto 0);
+    din_fal : in  std_logic_vector(BIT_WIDTH-1 downto 0);
+    ddr_out : out std_logic_vector(BIT_WIDTH-1 downto 0));
 end component;
 
 end package util;

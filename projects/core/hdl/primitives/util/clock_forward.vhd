@@ -16,13 +16,14 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-library IEEE;
-use IEEE.std_logic_1164.all, IEEE.numeric_std.all;
+library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
+library util;
 
 entity clock_forward is
   generic (
     INVERT_CLOCK : boolean := false;
-    SINGLE_ENDED : boolean := true
+    SINGLE_ENDED : boolean := true;
+    INCLUDE_BUF  : boolean := true
   );
   port (
     RST       : in  std_logic;
@@ -35,11 +36,33 @@ end entity clock_forward;
 architecture rtl of clock_forward is
 
   signal clk_fwd : std_logic;
+  signal din_ris : std_logic := '0';
+  signal din_fal : std_logic := '0';
+  signal o_s     : std_logic := '0';
+  signal obar_s  : std_logic := '0';
 
 begin
 
-  clk_fwd   <= CLK_IN when (INVERT_CLOCK = false) else not(CLK_IN);
-  CLK_OUT_P <= clk_fwd;
-  CLK_OUT_N <= not(clk_fwd);
+  din_ris <= '0' when INVERT_CLOCK else '1';
+  din_fal <= '1' when INVERT_CLOCK else '0';
+
+  clock_generator : util.util.oddr
+    port map(
+      clk     => CLK_IN,
+      rst     => RST,
+      din_ris => din_ris,
+      din_fal => din_fal,
+      ddr_out => clk_fwd);
+
+  out_buffer : util.util.BUFFER_OUT_1
+    generic map(
+      DIFFERENTIAL => SINGLE_ENDED)
+    port map(
+      I    => clk_fwd,
+      O    => o_s,
+      OBAR => obar_s);
+
+  CLK_OUT_P <= o_s when INCLUDE_BUF else clk_fwd;
+  CLK_OUT_N <= (not clk_fwd) when (SINGLE_ENDED or (INCLUDE_BUF = false)) else obar_s;
 
 end rtl;
