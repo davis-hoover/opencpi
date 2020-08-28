@@ -992,11 +992,12 @@ test:centos7:assets:base_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1023,11 +1024,12 @@ test:centos7:assets:base_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1054,11 +1056,12 @@ test:centos7:assets:base_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1085,11 +1088,12 @@ test:centos7:assets:comms_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1116,11 +1120,12 @@ test:centos7:assets:comms_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1147,11 +1152,12 @@ test:centos7:assets:comms_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1178,11 +1184,12 @@ test:centos7:assets:dsp_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1209,11 +1216,12 @@ test:centos7:assets:dsp_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1240,11 +1248,12 @@ test:centos7:assets:dsp_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1271,11 +1280,12 @@ test:centos7:assets:misc_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1302,11 +1312,12 @@ test:centos7:assets:misc_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1333,11 +1344,12 @@ test:centos7:assets:misc_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1364,11 +1376,12 @@ test:centos7:assets:util_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1395,11 +1408,12 @@ test:centos7:assets:util_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1426,11 +1440,12 @@ test:centos7:assets:util_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1457,11 +1472,12 @@ test:centos7:assets_ts:components:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1488,11 +1504,12 @@ test:centos7:assets_ts:components:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1519,11 +1536,12 @@ test:centos7:assets_ts:components:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1550,11 +1568,12 @@ test:centos7:core:components:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1581,11 +1600,12 @@ test:centos7:core:components:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1612,11 +1632,12 @@ test:centos7:core:components:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1643,11 +1664,12 @@ test:centos7:inactive:components:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_3|xilinx13_3:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1674,11 +1696,12 @@ test:centos7:inactive:components:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx13_4|xilinx13_4:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -1705,11 +1728,12 @@ test:centos7:inactive:components:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -p 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
   - export OCPI_SERVER_ADDRESSES=10.0.0.103:1000
+  resource_group: zed
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| )(zed:xilinx19_2_aarch64|xilinx19_2_aarch64:zed)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
