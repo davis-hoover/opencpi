@@ -13,6 +13,7 @@
 // Include asio FIRST always - http://stackoverflow.com/a/33082763
 #include <asio.hpp>
 #include <deque>
+#include <functional>
 #ifdef ASIO_STANDALONE
 #include <memory> // enable_shared_from_this
 #else
