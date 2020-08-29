@@ -3571,7 +3571,7 @@
    <text:p text:style-name="P139"><text:bookmark-start text:name="__DdeLink__6167_3484681333"/><text:bookmark-start text:name="__DdeLink__15612_1276242887"/>OpenCPI<text:line-break/><text:span text:style-name="T12">Component Development Best Practices Guide</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  v2.0.0-beta.1</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  v2.0.0-rc.1</text:p>
    </text:section>
    <text:p text:style-name="P94"><text:bookmark-end text:name="__DdeLink__15612_1276242887"/>Revision History</text:p>
    <table:table table:name="Table2" table:style-name="Table2">
