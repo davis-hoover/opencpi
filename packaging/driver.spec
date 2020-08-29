@@ -54,10 +54,10 @@ startup script that will rebuild the driver as needed.
 %{?RPM_HASH:ReleaseID: %{RPM_HASH}}
 
 %prep
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %build
-# Empty; rpmlint recommendeds it is present anyway
+# Empty; rpmlint recommends it is present anyway
 
 %install
 cd %{RPM_OPENCPI}

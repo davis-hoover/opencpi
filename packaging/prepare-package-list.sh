@@ -27,6 +27,7 @@
 # runtime: minimal runtime (plus some tests) for the platform(s)
 # devel:   development configuration minus runtime
 # deploy:  runtime with redundant non-platform-specific files
+# doc:     generated documention, possibly including optional HTML indexing
 #
 # Basically we generate a set of directories and files for export that are
 # minimal for the export type.
@@ -244,6 +245,12 @@ case $type in
       done
     ) | sed 's/$/ driver/'
     echo driver/ driver
+    ;;
+  doc)
+    # We get out easy for docs, because everything is in one
+    # convenient place.  Directory names are expected to end
+    # in '/'.  Otherwise, simply emit the file source/dest.
+    ( cd cdk ; find -L doc -type d -exec echo {}/ \; -o -exec bash -c 'echo -n "cdk/{} " ; dirname {}' \; )
     ;;
   *) echo "Unknown export type" >&2;;
 esac

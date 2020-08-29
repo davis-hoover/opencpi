@@ -100,7 +100,7 @@ begin
     end if;
   end process;
 
-  nff_synchronizer : entity work.single_bit
+  nff_synchronizer : work.cdc.single_bit
     generic map (
       N    => N,
       IREG => '0')
@@ -124,7 +124,7 @@ begin
     end if;
   end process;
 
-  acknowledge_nff_synchronizer : entity work.single_bit
+  acknowledge_nff_synchronizer : work.cdc.single_bit
     generic map (
       N         => N,
       IREG      => '0',

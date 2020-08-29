@@ -100,7 +100,8 @@ namespace OCPI {
 	  m_selection;             // the selection expression
 	unsigned m_ordinal;
 	bool     m_externals;      // whether all ports should be considered external
-	std::vector<unsigned> m_slaves;
+	std::vector<const char *> m_slaveNames; // the slave names for each referenced instance
+	std::vector<unsigned> m_slaveInstances; // the instance ordinals specified as slaves for this instance
 	unsigned m_master;
 	bool     m_hasMaster;
 	Properties m_properties;
@@ -118,10 +119,12 @@ namespace OCPI {
 		 const PValue *params),
 	  *addProperty(const char *name, ezxml_t px),
 	  *parseConnection(ezxml_t ix, Assembly &a, const PValue *params),
-	  *checkSlave(Assembly &a, const char *name),
+	  *checkSlave(Assembly &a, const char *name, const char *slave),
+	  *parseSlave(Assembly &a, ezxml_t xml),
 	  *setProperty(const char *propAssign);
 	ezxml_t xml() const { return m_xml; }
-	const std::vector<unsigned> &slaves() const { return m_slaves; }
+	const std::vector<unsigned> &slaveInstances() const { return m_slaveInstances; }
+	const std::vector<const char *> &slaveNames() const { return m_slaveNames; }
       };
       struct Role {
         bool m_knownRole;     // role is known

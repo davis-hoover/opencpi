@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpihdl</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140566763767856"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpihdl — command-line tool for performing OpenCPI HDL development tasks</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> [<span class="emphasis"><em>&lt;options</em></span>] [<span class="emphasis"><em>&lt;arguments&gt;</em></span>]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpihdl(1)</code></strong></span> command-line tool is used to perform a variety of OpenCPI HDL
+development tasks, including:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Searching for and listing available HDL devices (via PCI, Ethernet, UDP, simulators, etc.)
+</li><li class="listitem">
+Testing the existence and availability of a specific HDL device
+</li><li class="listitem">
+Reading and writing specific registers in an HDL device
+</li><li class="listitem">
+Loading bitstreams on an HDL device
+</li><li class="listitem">
+Extracting the XML metadata from a running HDL device
+</li></ul></div><p>An <span class="emphasis"><em>HDL device</em></span> in this case refers to an instance
+of an HDL platform (FPGA or FPGA simulator)
+in an <span class="emphasis"><em>OpenCPI system</em></span> (and not to a device attached to an
+FPGA inside the platform) that hosts an HDL container
+for execution. HDL devices have unique names
+within an OpenCPI system. Each name starts with a prefix
+that indicates how OpenCPI discovers and controls the device.
+See the chapter "HDL Device Naming" in the <span class="emphasis"><em>OpenCPI HDL
+Development Guide</em></span> for a description of these prefixes
+and HDL device naming syntax. Also see the
+<span class="emphasis"><em>OpenCPI HDL Development Guide</em></span> for detailed information on the
+OpenCPI HDL development process, including how to develop HDL workers, HDL primitives,
+HDl assemblies and bitstreams to support the execution of OpenCPI
+applications on FPGAs.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>The verbs for general operations supported by <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">admin</code></strong></span>
+</span></dt><dd>
+    Display an HDL device’s administrative information.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">bram</code></strong></span>
+</span></dt><dd>
+    Create a configuration Block Random Access Memory (BRAM) file from an artifact description XML file.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">deltatime</code></strong></span>
+</span></dt><dd>
+    Perform a time synchronization test on an HDL device.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">emulate</code></strong></span>
+</span></dt><dd>
+    Emulate a network-based (UDP or Ethernet) HDL device (admin space only).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ethers</code></strong></span>
+</span></dt><dd>
+    List the available (up and connected) network interfaces.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">getxml</code></strong></span>
+</span></dt><dd>
+    Retrieve XML metadata from a running HDL device.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">load</code></strong></span>
+</span></dt><dd>
+    Load a bitstream onto an HDL device.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">probe</code></strong></span>
+</span></dt><dd>
+   Test the existence and availability of an HDL device.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">radmin</code></strong></span>
+</span></dt><dd>
+    Read a specific address in an HDL device’s admin space.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">reset</code></strong></span>
+</span></dt><dd>
+    Perform a soft reset on an HDL device.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">rmeta</code></strong></span>
+</span></dt><dd>
+    Read from addresses in the metadata space of an HDL device.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">search</code></strong></span>
+</span></dt><dd>
+    Search for and list all available (discovered and responding) HDL devices.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">settime</code></strong></span>
+</span></dt><dd>
+    Set an HDL device’s GPS time to the system time.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">unbram</code></strong></span>
+</span></dt><dd>
+    Create an artifact description XML file from a configuration BRAM file.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wadmin</code></strong></span>
+</span></dt><dd>
+    Write specific addresses in an HDL device’s admin space.
+</dd></dl></div><p>The verbs for higher-level operations (operations that rely on
+embedded metadata) on individual HDL workers
+supported by <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">control</code></strong></span>
+</span></dt><dd>
+    Change the control state of an HDL worker instance.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">get</code></strong></span>
+</span></dt><dd>
+    Get instance property information for a single HDL worker or all HDL workers.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">set</code></strong></span>
+</span></dt><dd>
+    Set a property value in an HDL worker instance.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">status</code></strong></span>
+</span></dt><dd>
+    Display the status of an HDL worker instance.
+</dd></dl></div><p>The verbs for lower-level operations (operations that do not
+use embedded metadata) on individual workers
+supported by <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">wclear</code></strong></span>
+</span></dt><dd>
+    Clear the error registers of an HDL worker instance or a range of HDL worker instances.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wdump</code></strong></span>
+</span></dt><dd>
+    Display the control and status registers for an HDL worker instance or a range of HDL worker instances.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wop</code></strong></span>
+</span></dt><dd>
+    Perform a control operation on an HDL worker instance or a range of HDL worker instances.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wread</code></strong></span>
+</span></dt><dd>
+    Read a value from the configuration property space of an HDL worker instance or
+    a range of HDL worker instances.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wreset</code></strong></span>
+</span></dt><dd>
+    Assert reset for an HDL worker instance or a range of HDL worker instances.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wwctl</code></strong></span>
+</span></dt><dd>
+    Write the control register for an HDL worker instance or a range of HDL worker instances.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wwpage</code></strong></span>
+</span></dt><dd>
+    Write the window/page register for an HDL worker instance or a range of HDL worker instances
+    to reach full 32-bit space.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">wwrite</code></strong></span>
+</span></dt><dd>
+    Write a single value into the configuration property space of an HDL worker instance or
+    a range of HDL worker instances.
+</dd></dl></div><p>See OPERATIONS for a description of each <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> verb,
+its options and arguments.</p></div><div class="refsect1"><a id="_nouns"></a><h2>NOUNS</h2><p>None.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>The options described below can be used with many <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> operations.
+An option’s effect on an individual <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> operation is described
+in that operation’s description in OPERATIONS.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>
+</span></dt><dd>
+    Specify the name of an HDL device on which to operate.
+    The OCPI_HDL_DEVICE environment variable can
+    be used to set a default value for this option.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">i</code></strong></span> <span class="emphasis"><em>&lt;network-interface&gt;</em></span>
+</span></dt><dd>
+    Specify the name of the network interface on which to operate.
+    Examples: <span class="strong"><strong><code class="literal">en0</code></strong></span>, <span class="strong"><strong><code class="literal">eth0</code></strong></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;log-level&gt;</em></span>
+</span></dt><dd>
+    Specify the OpenCPI log level to be applied during execution.
+    See the description of the OCPI_LOG_LEVEL environment variable
+    in the <span class="emphasis"><em>OpenCPI User Guide</em></span> for a description of possible values.
+    Using this option overrides the level set in the OCPI_LOG_LEVEL
+    environment variable.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-P</code></strong></span>
+</span></dt><dd>
+    Produce parseable output for <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> operations that read registers.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-p</code></strong></span> <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>
+</span></dt><dd>
+    Specify the identifier of the HDL platform on which to operate.
+    Examples: <span class="strong"><strong><code class="literal">ml605</code></strong></span>, <span class="strong"><strong><code class="literal">alst4</code></strong></span>, <span class="strong"><strong><code class="literal">zed</code></strong></span>, <span class="strong"><strong><code class="literal">e31x</code></strong></span>. See the
+    <span class="emphasis"><em>OpenCPI User Guide</em></span> for a list of supported HDL platforms and their identifiers.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-x</code></strong></span>
+</span></dt><dd>
+    Display numeric values in hexadecimal format. If this option is not
+    used, numeric values are displayed in decimal format.
+</dd></dl></div></div><div class="refsect1"><a id="_operations"></a><h2>OPERATIONS</h2><p>The sections below describe each <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> operation and its associated options
+and arguments. These operations include:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+General operations that do not operate on individual HDL workers.
+</li><li class="listitem">
+Operations on individual HDL workers. One set of HDL worker verbs
+relies on embedded metadata and is thus more user-friendly, while
+another more "primitive" set does not rely on embedded metadata.
+</li></ul></div><div class="refsect2"><a id="_general_non_hdl_worker_operations"></a><h3>General Non-HDL Worker Operations</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl admin -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>
+</span></dt><dd>
+    Dump all of the information and state in the
+    admin space for the HDL device specified in
+    the <span class="strong"><strong><code class="literal">-d</code></strong></span> option. Device admin space contains the
+    information for the device and loaded bitstream as a whole.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl bram</code></strong></span> <span class="emphasis"><em>&lt;xml-file&gt; &lt;bram-file&gt;</em></span>
+</span></dt><dd>
+    Convert an "artifact description XML" file into a
+    "configuration BRAM" file to be processed
+    (during HDL assembly build) into a read-only BRAM inside the FPGA bitstream.
+    Specify the name of the artifact description file
+    in <span class="emphasis"><em>&lt;xml-file&gt;</em></span> and the file name for the generated
+    configuration BRAM file in <span class="emphasis"><em>&lt;bram-file&gt;</em></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl deltatime -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>
+</span></dt><dd>
+    Measure and correct the time-skew between the system
+    time-of-day and the specified HDL device time-of-day.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> [<span class="strong"><strong><code class="literal">-i</code></strong></span> {<span class="emphasis"><em>&lt;network-interface&gt;</em></span> | <span class="strong"><strong><code class="literal">udp</code></strong></span>}] <span class="strong"><strong><code class="literal">emulate</code></strong></span>
+</span></dt><dd>
+    Emulate an Ethernet- or UDP-based HDL device and respond to
+    discovery and admin space accesses. Use the <span class="strong"><strong><code class="literal">-i</code></strong></span> option to
+    specify the network interface on which the emulated device
+    should appear. If this option is not specified, the first
+    available (up and connected) network interface is used.
+    Use the <span class="strong"><strong><code class="literal">udp</code></strong></span> keyword in the <span class="strong"><strong><code class="literal">-i</code></strong></span> option to
+    emulate an OpenCPI HDL device attached
+    to the IP subnet of the host computer implementing discovery
+    and control via UDP.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl ethers</code></strong></span>
+</span></dt><dd>
+    List the available Ethernet network interfaces on a system
+    and their status (whether or not they are up and connected),
+    the default network interface used for for verbs that take
+    the <span class="strong"><strong><code class="literal">-i</code></strong></span> option (the first listed that is up and connected)
+    and the identity chosen for the system (based on the
+    first network interface with an address and a MAC address).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl getxml</code></strong></span> {<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> | <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>} <span class="emphasis"><em>&lt;output-file&gt;</em></span>
+</span></dt><dd>
+   Retrieve and uncompress the XML metadata stored in the running HDL device
+   specified with the <span class="strong"><strong><code class="literal">-d</code></strong></span> option or the <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> argument
+   and write it to the specified file.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl load</code></strong></span> <span class="emphasis"><em>&lt;bitstream-file&gt;</em></span> {<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> | <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>}
+</span></dt><dd>
+    Load the specified bitstream onto the HDL
+    device specified with the <span class="strong"><strong><code class="literal">-d</code></strong></span> option or as an argument.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl probe</code></strong></span> {<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> | <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>}
+</span></dt><dd>
+    Contact the HDL device specified with the <span class="strong"><strong><code class="literal">-d</code></strong></span> option or as an argument
+    and see if it responds. This operation should work regardless of
+    whether or not the HDL device is running an application.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl radmin</code></strong></span> [<span class="strong"><strong><code class="literal">-P</code></strong></span>] <span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="strong"><strong><code class="literal">[0x]</code></strong></span><span class="emphasis"><em>&lt;offset&gt;</em></span>[<span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span>]
+</span></dt><dd>
+    Read an individual word of data from the specified
+    offset in the admin space of the
+    HDL device specified in the <span class="strong"><strong><code class="literal">-d</code></strong></span> option. Prepend <span class="strong"><strong><code class="literal">0x</code></strong></span> to
+    <span class="emphasis"><em>&lt;offset&gt;</em></span> to indicate hexadecimal format; if this notation is not used,
+    the format is decimal. Append the <span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span>
+    notation to <span class="emphasis"><em>&lt;offset&gt;</em></span> to specify the size of the access in bytes;
+    for example, /2, /4, or /8. If this notation is not used, the access is
+    a 32-bit access. Use the <span class="strong"><strong><code class="literal">-P</code></strong></span> option to return just the value
+    in hexadecimal format. If this option is not used, the operation
+    returns a message with the offset and the value.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl reset -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>
+</span></dt><dd>
+    Reset the HDL device specified in the <span class="strong"><strong><code class="literal">-d</code></strong></span> option without
+    affecting the control path to the device.
+    For example, on a PCI-Express-based HDL device, an <span class="strong"><strong><code class="literal">ocpihdl reset</code></strong></span> operation
+    does not damage or reconfigure the PCI-Express interface.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl rmeta</code></strong></span> [<span class="strong"><strong><code class="literal">-P</code></strong></span>] <span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="strong"><strong><code class="literal">[0x]</code></strong></span><span class="emphasis"><em>&lt;offset&gt;</em></span>[<span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span>]
+</span></dt><dd>
+    Read an individual word of data from the specified
+    offset in the configuration
+    BRAM space of the HDL device specified in the <span class="strong"><strong><code class="literal">-d</code></strong></span> option.
+    Prepend <span class="strong"><strong><code class="literal">0x</code></strong></span> to <span class="emphasis"><em>&lt;offset&gt;</em></span> to indicate hexadecimal format; if this notation
+    is not used, the format is decimal.
+    Append the <span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span> notation to <span class="emphasis"><em>&lt;offset&gt;</em></span> to
+    specify the size of the access in bytes;
+    for example, /2, /4, or /8. If this notation is not used, the access is
+    a 32-bit access. Use the <span class="strong"><strong><code class="literal">-P</code></strong></span> option to return just the value
+    in hexadecimal format. If this option is not used, the operation
+    returns a message with the offset and the value.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> [<span class="strong"><strong><code class="literal">-i</code></strong></span> <span class="emphasis"><em>&lt;network-interface&gt;</em></span>] <span class="strong"><strong><code class="literal">search</code></strong></span>
+</span></dt><dd>
+    Search for all reachable HDL devices using all the supported
+    control paths (PCI, Ethernet, simulator) and list the results.
+    Use the <span class="strong"><strong><code class="literal">-i</code></strong></span> option to limit the Ethernet search to the
+    specified network interface.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl settime -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span>
+</span></dt><dd>
+    Set the time on the HDL device specified in the <span class="strong"><strong><code class="literal">-d</code></strong></span> option
+    from the current system time. Use the <span class="strong"><strong><code class="literal">ocpihdl admin</code></strong></span> operation
+    on the target HDL device to get the current time.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl unbram</code></strong></span> <span class="emphasis"><em>&lt;bram-file&gt; &lt;xml-file&gt;</em></span>
+</span></dt><dd>
+    Convert a configuration BRAM file (see <span class="strong"><strong><code class="literal">ocpihdl bram</code></strong></span>)
+    into an artifact description XML file.
+    Specify the file name of the configuration BRAM file
+    in <span class="emphasis"><em>&lt;bram-file&gt;</em></span> and the name of the artifact description file
+    to be output in <span class="emphasis"><em>&lt;xml-file&gt;</em></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wadmin -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="strong"><strong><code class="literal">[0x]</code></strong></span><span class="emphasis"><em>&lt;offset&gt;</em></span>[<span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span>] <span class="emphasis"><em>&lt;value&gt;</em></span>
+</span></dt><dd>
+    Write a 4-byte/32-bit or 8-byte/64-bit value at the specified
+    offset in the admin space of the specified device.
+    Prepend <span class="strong"><strong><code class="literal">0x</code></strong></span> to <span class="emphasis"><em>&lt;offset&gt;</em></span> to indicate hexadecimal format.
+    Append the <span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span> notation to <span class="emphasis"><em>&lt;offset&gt;</em></span> to
+    specify the size of the access in bytes;
+    for example, /4 or /8. If this notation is not used, the access is
+    a 32-bit access.
+</dd></dl></div></div><div class="refsect2"><a id="_hdl_worker_operations_that_use_embedded_metadata"></a><h3>HDL Worker Operations That Use Embedded Metadata</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl get</code></strong></span> [<span class="strong"><strong><code class="literal">-v</code></strong></span> | <span class="strong"><strong><code class="literal">-x</code></strong></span>] [<span class="emphasis"><em>&lt;worker-instance-name&gt;</em></span> | <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>] [<span class="emphasis"><em>&lt;property-name&gt;</em></span>]
+</span></dt><dd>
+    Display information for all HDL workers or the HDL worker instance specified by its name in the HDL assembly
+    or its index as returned from a previous <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> operation like <span class="strong"><strong><code class="literal">ocpihdl get</code></strong></span>.
+    When an HDL worker instance is specified,
+    the name of a property can be supplied as an argument to display the value of that property.
+    The operation recognizes the data types of properties and displays the values accordingly.
+    Use the <span class="strong"><strong><code class="literal">-v</code></strong></span> option to specify all property values; if this option is not used, the operation
+    displays summary information. Use the <span class="strong"><strong><code class="literal">-x</code></strong></span> option to display all numeric values in hexadecimal format;
+    if this option is not used, the values are displayed in decimal format.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl control</code></strong></span> {<span class="emphasis"><em>&lt;worker-instance-name&gt;</em></span> | <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>} <span class="emphasis"><em>&lt;control-operation</em></span>&gt;
+</span></dt><dd>
+    Perform the specified control operation on the HDL worker instance specified by its name in the HDL assembly or its
+    index as returned from a previous <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> operation like <span class="strong"><strong><code class="literal">ocpihdl get</code></strong></span>. Possible
+    identifiers for control operations are
+    the lifecycle operations identifiers <span class="strong"><strong><code class="literal">initialize</code></strong></span>, <span class="strong"><strong><code class="literal">start</code></strong></span>, <span class="strong"><strong><code class="literal">stop</code></strong></span> and <span class="strong"><strong><code class="literal">release</code></strong></span> and the identifiers
+    <span class="strong"><strong><code class="literal">reset</code></strong></span> and <span class="strong"><strong><code class="literal">unreset</code></strong></span>. For more information on OpenCPI worker lifecycle control operations, see the chapter
+    "Authoring Models" in the <span class="emphasis"><em>OpenCPI Component Development Guide</em></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl set</code></strong></span> [<span class="strong"><strong><code class="literal">-x</code></strong></span>] {<span class="emphasis"><em>&lt;worker-instance-name&gt;</em></span> | <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>} <span class="emphasis"><em>&lt;property-name&gt;</em></span> <span class="emphasis"><em>&lt;value&gt;</em></span>
+</span></dt><dd>
+    Set the specified property of the specified HDL worker instance name
+    or index to the specified value. When specifying
+    the value, use the same syntax as is used to specify a property’s initial or default value in a component specification (OCS),
+    worker description (OWD) or HDL assembly description (OHAD). For information on property value syntax, see the
+    chapter "Property Values Syntax and Ranges" in the <span class="emphasis"><em>OpenCPI Component Development Guide</em></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl status</code></strong></span> {<span class="emphasis"><em>&lt;worker-instance-name&gt;</em></span> | <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>}
+</span></dt><dd>
+    Display the status of the specified HDL worker instance name or index. Status displayed includes the worker control
+    state and the display output of the <span class="strong"><strong><code class="literal">wdump</code></strong></span> operation.
+</dd></dl></div></div><div class="refsect2"><a id="_hdl_worker_operations_that_do_not_use_embedded_metadata"></a><h3>HDL Worker Operations That Do Not Use Embedded Metadata</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wclear -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…]
+</span></dt><dd>
+    Clear the error and attention bits in the status register in the control
+    plane infrastructure for the HDL worker(s) specified by the instance index(es)
+    on the specified HDL device. The <span class="strong"><strong><code class="literal">ocpihdl get</code></strong></span> operation can be used to return
+    HDL worker instance indexes.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wdump -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…]
+</span></dt><dd>
+    Display the current status of the control and status registers in the
+    control plane infrastructure for the HDL worker(s) specified
+    by the instance index(es) on the specified HDL device.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wop  -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…] <span class="emphasis"><em>&lt;control-operation&gt;</em></span>
+</span></dt><dd><p class="simpara">
+    Execute a control operation for the HDL worker(s) specified by the instance index(es) on
+    the specified HDL device, directly accessing the hardware that makes the control operation
+    request of the worker. Possible control operations are:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<span class="strong"><strong><code class="literal">after</code></strong></span> - inform the worker that a batch of property reads has completed
+</li><li class="listitem">
+<span class="strong"><strong><code class="literal">before</code></strong></span> - inform the worker that a batch of property settings will occur
+</li><li class="listitem">
+<span class="strong"><strong><code class="literal">initialize</code></strong></span> - request that a worker initialize itself after an <span class="strong"><strong><code class="literal">ocpihdl wunset</code></strong></span> operation
+</li><li class="listitem">
+<span class="strong"><strong><code class="literal">release</code></strong></span> - return the worker to the pre-initialized state
+</li><li class="listitem">
+<span class="strong"><strong><code class="literal">start</code></strong></span> - put the worker into an operational state after stop or initialize
+</li><li class="listitem">
+<span class="strong"><strong><code class="literal">stop</code></strong></span> - suspend operation of the worker
+</li><li class="listitem"><p class="simpara">
+<span class="strong"><strong><code class="literal">test</code></strong></span> - run the worker’s built-in test
+</p><p class="simpara">The <span class="strong"><strong><code class="literal">start</code></strong></span> control operation is the only operation implemented for all workers. Other operations
+have unpredictable or erroneous results when requested for workers that don’t implement them.</p></li></ul></div></dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wread -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…] <span class="strong"><strong><code class="literal">[0x]</code></strong></span><span class="emphasis"><em>&lt;offset&gt;</em></span>[<span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span>][<span class="emphasis"><em>&lt;number-of-accesses&gt;</em></span>]
+</span></dt><dd>
+    Read a value from the specified offset into the property space of the HDL worker(s) specified by the instance index(es)
+    on the specified HDL device. Prepend <span class="strong"><strong><code class="literal">0x</code></strong></span> to <span class="emphasis"><em>&lt;offset&gt;</em></span> to indicate hexadecimal format.
+    Append the <span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span> notation to <span class="emphasis"><em>&lt;offset&gt;</em></span> to specify the size of the access in bytes;
+    possible sizes are 1, 2, 4 and 8. If this optional notation is not used, the default size is 4.
+    Use the <span class="emphasis"><em>&lt;number-of-accesses&gt;</em></span> argument to specify the number of accesses to make; if this argument is
+    not used, the default is 1. See the <span class="strong"><strong><code class="literal">ocpihdl wwpage</code></strong></span> operation for workers whose
+    property space is larger than 1 MByte (2^20).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wreset -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…]
+</span></dt><dd>
+    Assert the control reset signal into the specified HDL worker(s) on
+    the specified HDL device. This signal remains asserted until
+    the <span class="strong"><strong><code class="literal">ocpihdl wunreset</code></strong></span> operation is used.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wunreset -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…]
+</span></dt><dd>
+    Deassert the control reset signal into the specified HDL worker(s) on the
+    specified HDL device. After executing this operation, the
+    "wop initialize" operation (or the "wop start" operation for HDL workers that do
+    not implement an initialize control operation) can be issued.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wwctl -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…] [&lt;value&gt;]
+</span></dt><dd>
+    Write the specified value to the control register in the control plane
+    infrastructure for the specified HDL worker(s) on the specified HDL device.
+    The <span class="emphasis"><em>&lt;value&gt;</em></span> argument is a 32-bit value. The bit definitions are
+    described in the <span class="emphasis"><em>OpenCPI Platform Development Guide</em></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wwpage -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…] <span class="strong"><strong><code class="literal">[0x]</code></strong></span><span class="emphasis"><em>&lt;value&gt;</em></span>
+</span></dt><dd>
+    Set the "window" register in the control plane infrastructure for the HDL worker(s) specified
+    by the instance index(es) on the specified HDL device to the specified value, which
+    sets the high order 12 address bits (31:20) of the effective address when the
+    <span class="strong"><strong><code class="literal">ocpihdl wread</code></strong></span> and <span class="strong"><strong><code class="literal">ocpihdl wwrite</code></strong></span> operations are issued. The offset in
+    those operations supplies bits (19:0) of the effective address. An HDL worker’s property
+    space can be a full-32 bit space (4 GBytes). Use this operation
+    to access more than the first 1MByte (2^20 bytes).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">ocpihdl wwrite -d</code></strong></span> <span class="emphasis"><em>&lt;hdl-device&gt;</em></span> <span class="emphasis"><em>&lt;worker-instance-index&gt;</em></span>[<span class="strong"><strong><code class="literal">,</code></strong></span>…] <span class="strong"><strong><code class="literal">[0x]</code></strong></span><span class="emphasis"><em>&lt;offset&gt;</em></span>[<span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span>] <span class="emphasis"><em>&lt;value</em></span>
+</span></dt><dd>
+    Write the specified value to the specified offset into the property space of the HDL worker(s) specified
+    by the instance index(es) on the specified HDL device. Prepend <span class="strong"><strong><code class="literal">0x</code></strong></span> to <span class="emphasis"><em>&lt;offset&gt;</em></span> to indicate hexadecimal format.
+    Append the <span class="strong"><strong><code class="literal">/</code></strong></span><span class="emphasis"><em>&lt;size&gt;</em></span> notation to <span class="emphasis"><em>&lt;offset&gt;</em></span> to specify the size of the access in bytes;
+    possible sizes are 1, 2, 4 and 8. If this optional notation is not used, the default size is 4.
+    Use the <span class="strong"><strong><code class="literal">ocpihdl wwpage</code></strong></span> operation before using <span class="strong"><strong><code class="literal">ocpihdl wwrite</code></strong></span> to access more
+    than the first 1MByte (2^20 bytes) for HDL workers with large property spaces.
+</dd></dl></div></div></div><div class="refsect1"><a id="_environment_variables"></a><h2>ENVIRONMENT VARIABLES</h2><p>The following environment variables affect the <span class="strong"><strong><code class="literal">ocpihdl</code></strong></span> tool:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+OCPI_DEFAULT_HDL_DEVICE
+</span></dt><dd>
+    Sets a default value for the <span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;device&gt;</em></span> option.
+</dd></dl></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Convert the artifact description XML file named <span class="strong"><strong><code class="literal">myad.xml</code></strong></span> to
+a configuration BRAM file named <span class="strong"><strong><code class="literal">mybram.bin</code></strong></span>:
+</p><pre class="screen">ocpihdl bram myad.xml mybram.bin</pre></li><li class="listitem"><p class="simpara">
+Emulate the HDL device attached to the IP subnet of the host
+computer that implements discovery and control via UDP:
+</p><pre class="screen">ocpihdl -i udp emulate</pre></li><li class="listitem"><p class="simpara">
+Perform a two-byte read of offset 12 on the HDL device named <span class="strong"><strong><code class="literal">pci:5</code></strong></span>:
+</p><pre class="screen">ocpihdl -d pci:5 radmin 12/2</pre></li><li class="listitem"><p class="simpara">
+Convert the configuration BRAM file named <span class="strong"><strong><code class="literal">mybram.bin</code></strong></span> to
+an artifact description XML file named <span class="strong"><strong><code class="literal">myad.xml</code></strong></span>:
+</p><pre class="screen">ocpihdl unbram mybram.bin myad.xml</pre></li><li class="listitem"><p class="simpara">
+Write an 8-byte value at offset 0x20 with the value 12345
+on the HDL device named <span class="strong"><strong><code class="literal">pci:5</code></strong></span>:
+</p><pre class="screen">ocpihdl wadmin -d pci:5 0x20/8 12345</pre></li><li class="listitem"><p class="simpara">
+Display the value of the property named <span class="strong"><strong><code class="literal">prop1</code></strong></span> of the worker instance
+named <span class="strong"><strong><code class="literal">instX</code></strong></span> in hexadecimal format:
+</p><pre class="screen">ocpihdl get -x instX prop1</pre></li><li class="listitem"><p class="simpara">
+Set the value of a property named <span class="strong"><strong><code class="literal">prop1</code></strong></span> that is an array of three shorts:
+</p><pre class="screen">ocpihdl set instX prop1 "-1,0x12,o177"</pre></li><li class="listitem"><p class="simpara">
+Put the HDL worker instance named <span class="strong"><strong><code class="literal">instX</code></strong></span> into a reset condition (assert reset):
+</p><pre class="screen">ocpihdl control instX reset</pre></li><li class="listitem"><p class="simpara">
+Clear the error and attention status for HDL worker instance 5 on the
+HDL device named <span class="strong"><strong><code class="literal">PCI:5</code></strong></span>:
+</p><pre class="screen">ocpihdl wclear –d PCI:5 5</pre><p class="simpara">Read three single bytes at offset 6 from HDL worker instance 11 on HDL device 5:</p><pre class="screen">ocpihdl read –d 5 11 6/1 3</pre></li><li class="listitem"><p class="simpara">
+Read location <span class="strong"><strong><code class="literal">0x12345678</code></strong></span> in HDL worker instance 7 with a full 4GByte property space on the
+HDL device named <span class="strong"><strong><code class="literal">pci:5</code></strong></span>:
+</p><pre class="screen">ocpihdl wwpage –d pci:5 7 0x123
+ocpihdl wread –d pci:5 7 0x45678</pre></li><li class="listitem"><p class="simpara">
+Write location <span class="strong"><strong><code class="literal">0x20</code></strong></span> in HDL worker instance 6 on the HDL device named <span class="strong"><strong><code class="literal">pci:5</code></strong></span>
+with the 64-bit value <span class="strong"><strong><code class="literal">0x123456789abc</code></strong></span>:
+</p><pre class="screen">ocpihdl wwrite –d pci:5 6 0x20 0x123456789abc</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
+<a class="ulink" href="ocpidev-assembly.1.html" target="_top">ocpidev-assembly(1)</a>
+<a class="ulink" href="ocpidev-platform.1.html" target="_top">ocpidev-platform(1)</a>
+<a class="ulink" href="ocpidev-primitive.1.html" target="_top">ocpidev-primitive(1)</a>
+<a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-worker(1)</a>
+<a class="ulink" href="ocpirun.1.html" target="_top">ocpirun(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

@@ -19,8 +19,19 @@
  */
 
 
-// ocpigr header
+// OCPI headers
 #include "ocpigr.h" // ocpigr class
+#include "OcpiDriverManager.h" // OCPI::Driver::ManagerManager::suppressDiscovery
+#include "OcpiLibraryManager.h"  // OL::* stuff
+#include "OcpiOsAssert.h"  // ocpiLog macros
+#include "OcpiOsFileSystem.h"  // Filesystem ops like mkdir etc.
+#include "OcpiUtilDataTypesApi.h"  // OA::OCPI_* types
+#include "OcpiUtilException.h"  // OU::Error
+#include "OcpiUtilMisc.h"  // OU::format, getProjectRegistry, string2File
+#include "OcpiUtilPort.h"  // OU::Port
+#include "OcpiUtilProperty.h"  // OU::Property
+#include "OcpiUtilWorker.h"  // OU::Worker
+
 
 // System headers
 #include <algorithm> // assign() replace()
@@ -34,21 +45,8 @@
 #include <set>       // set<T>
 #include <string>    // strings
 #include <vector>    // std::vector 
-
-// 3rd party headers
 #include <yaml-cpp/yaml.h> // YAML
 
-// OCPI headers
-#include "OcpiDriverManager.h" // OCPI::Driver::ManagerManager::suppressDiscovery
-#include "OcpiLibraryManager.h"  // OL::* stuff
-#include "OcpiOsAssert.h"  // ocpiLog macros
-#include "OcpiOsFileSystem.h"  // Filesystem ops like mkdir etc.
-#include "OcpiUtilDataTypesApi.h"  // OA::OCPI_* types
-#include "OcpiUtilException.h"  // OU::Error
-#include "OcpiUtilMisc.h"  // OU::format, getProjectRegistry, string2File
-#include "OcpiUtilPort.h"  // OU::Port
-#include "OcpiUtilProperty.h"  // OU::Property
-#include "OcpiUtilWorker.h"  // OU::Worker
 
 #define AUTO_PLATFORM_COLOR "#afaf75"
 
@@ -123,7 +121,7 @@ static int mymain(const char ** /*ap*/) {
   // Generate domain blocks for all platforms
   ocpigr.genPlatformBlocks();
 
-  // Generate ocpi_container.block.yaml
+  // Generate ocpi_container.block.yml
   ocpigr.genContainerBlock();
   
   return 0;
@@ -262,7 +260,7 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   np = 0; // reset np
   OU::Port *ports = w.ports(np);
 
-  // Loop through ports and gather input and output informatino for the worker
+  // Loop through ports and gather input and output information for the worker
   for (uint32_t n = 0; n < np; ++n, ++ports) {
     OU::Port &port = *ports;
 
@@ -359,7 +357,7 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   workerEmitter << YAML::Newline <<YAML::Newline; // blank line for the looks
 
   // Add file_format at the end of the yaml file
-  workerEmitter << YAML::Key << "file_formate" << YAML::Value << "1";
+  workerEmitter << YAML::Key << "file_format" << YAML::Value << "1";
   workerEmitter << YAML::EndMap; // end worker_map
 
   //Check if there was an error while building the emitter
@@ -370,7 +368,7 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
 
   // Output built emitter to yaml file
   std::string file;
-  OU::format(file, "%s/%s.block.yaml", options.directory(), workerId.c_str());
+  OU::format(file, "%s/%s.block.yml", options.directory(), workerId.c_str());
   std::ofstream fout(file);
   fout << workerEmitter.c_str();
 }
@@ -491,7 +489,7 @@ const char* OcpigrObj::incompatibleType(OU::Worker& w, const char* tag, const ch
 
 //////////
 // OcpigrObj::genOcpiBlockTree
-// Description: Generates ocpi.tree.yaml file which is the tree structure for the
+// Description: Generates ocpi.tree.yml file which is the tree structure for the
 //              worker blocks in GRC. Note: This approach assumes that the workers
 //              sorted and ordered.
 //
@@ -560,7 +558,7 @@ void OcpigrObj::genOcpiBlockTree(void) {
 
   // Setup output file
   std::string file;
-  OU::format(file, "%s/ocpi.tree.yaml", options.directory());
+  OU::format(file, "%s/ocpi.tree.yml", options.directory());
   std::ofstream fout(file);
 
   // Top of OpenCPI tree, this segregates opencpi from GRC core
@@ -750,6 +748,10 @@ void OcpigrObj::genPlatformBlocks(void) {
     
     emitter << YAML::EndSeq; // outputs sequence
 
+    // Add file_format at the end of the yaml file
+    emitter << YAML::Key << "file_format" << YAML::Value << "1";
+    emitter << YAML::EndMap; // Top level map
+
     //Check if there was an error while building the emitter
     if(!emitter.GetLastError().empty()) {
       ocpiBad("YAML emitter silently errored: \n");
@@ -758,7 +760,7 @@ void OcpigrObj::genPlatformBlocks(void) {
 
     // Output built emitter to yaml file
     std::string file;
-    OU::format(file, "%s/ocpi_%s_domain.block.yaml", options.directory(), pi->first.c_str());
+    OU::format(file, "%s/ocpi_%s_domain.block.yml", options.directory(), pi->first.c_str());
     std::ofstream fout(file);
     fout << emitter.c_str();
   }
@@ -826,15 +828,15 @@ void OcpigrObj::genContainerBlock(void) {
     emitter << YAML::Key << "id"    << YAML::Value << "value";
     emitter << YAML::Key << "label" << YAML::Value << "Platform";
     emitter << YAML::Key << "dtype" << YAML::Value << "enum";
-    emitter << YAML::EndMap;
+    emitter << YAML::Key << "options" << YAML::Value << YAML::Flow;
+    emitter << YAML::BeginSeq;
 
     // Iterate throught platforms and add them to emitter
     for (auto pi = platformToModel.begin(); pi != platformToModel.end(); ++pi) {
-      emitter << YAML::BeginMap;
-      emitter << YAML::Key << "id"    << YAML::Value << pi->first.c_str();
-      emitter << YAML::Key << "label" << YAML::Value << pi->first.c_str();
-      emitter << YAML::EndMap;
+      emitter << pi->first.c_str();
     }
+    emitter << YAML::EndSeq;
+    emitter << YAML::EndMap;
     
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "id"      << YAML::Value << "container";
@@ -845,6 +847,10 @@ void OcpigrObj::genContainerBlock(void) {
     emitter << YAML::EndMap;
     
   emitter << YAML::EndSeq; // End Sequence
+
+  // Add file_format at the end of the yaml file
+  emitter << YAML::Newline << YAML::Newline; // blank line just to be consistent with GRC yaml examples
+  emitter << YAML::Key << "file_format" << YAML::Value << "1";
   emitter << YAML::EndMap; // Top level map
 
   //Check if there was an error while building the emitter
@@ -855,7 +861,7 @@ void OcpigrObj::genContainerBlock(void) {
 
   // Output built emitter to yaml file
   std::string file;
-  OU::format(file, "%s/ocpi_container.block.yaml", options.directory());
+  OU::format(file, "%s/ocpi_container.block.yml", options.directory());
   std::ofstream fout(file);
   fout << emitter.c_str();
 }
