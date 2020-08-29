@@ -1,3 +1,37 @@
+# [v2.0.0-rc.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-beta.1...v2.0.0-rc.1) (2020-08-28)
+
+Changes/additions since OpenCPI Release v2.0.0-beta.1
+
+### Enhancements
+- **comp**: improve dc_offset_filter doc by adding transfer function. (!333)(364bb72e)
+- **comp**: build socket_write.rcc for ubuntu18_04 platform. (!353)(7ef32634)
+- **devops,tests**: remove obsolete ".bitz" files from git repo. (!337)(3d801f21)
+- **doc**: add more man pages for OpenCPI commands. (!347)(6b7e41eb)
+- **doc,tools**: add doc RPM to existing packaging machinery. (!329)(62cc8e74)
+- **hdl base**: all hdl platforms have a standard test bitstream exported in a standard place. (!338)(e19fc095)
+- **runtime,tools**: a proxy can have optional slaves so apps can have subsets, and the proxy can test or presence. (!338)(e19fc095)
+- **tools**: enable python2 ACI in addition to python3 ACI. (!334)(3ea0db4d)
+- **tools**: implement "-v" (verbose) option in "deploy-platform.sh" script. (!345)(5d7c5383)
+- **tools**: add VERSION file that defines the version of OpenCPI. (!346)(b1e80c4d)
+- **tools**: refactor `scripts/update-release.sh` to use new VERSION file. (!346)(b1e80c4d)
+
+### Bug Fixes
+- **comp**: `timestamper_scdcd.vhd`: add logic to confirm that EOF is valid. (!314)(b4918d13)
+- **hdl base**: `complex_short_with_metadata_demarshaller.vhd`: add reset for EOF. (!314)(b4918d13)
+- **hdl base**: `time_downsampler.vhd`: add reset for EOF. (!314)(b4918d13)
+- **hdl base**: the ml605 now builds everything including the inactive and tutorial projects. (!338)(e19fc095)
+- **runtime**: some property setting patterns, especially for remote device slaves, were broken and now fixed. (!344)(fb8e6c12)
+- **tools**: fix export logic so as not to create broken symlinks. (!329)(62cc8e74)
+- **tools**: build regressions on lesser used platforms not in normal pipeline. (!331)(a7f7cdd2)
+- **tools**: fix "ocpigr" error exceptions caused by obsolete bitstream files. (!337)(3d801f21)
+- **tools**: ocpigen: check status code returned by `finalizeHdlDataPort()` instead of ignoring it. (!339)(33f94239)
+- **tools**: fix building an ubuntu docker container with a non ubuntu host by preventing kernel related items from being built. (!343)(29a8c490)
+- **tools**: fix OSP HDL platform export mechanism. (!345)(5d7c5383)
+- **tools**: fix/restore usable of project-level componentlibrary settings in proxies in hdl/cards. (!350)(1584caf7)
+
+### Miscellaneous
+- **tools**: remove support for CentOS 6 as a development host platform. (!354)(3dc24ee0)
+
 # [v2.0.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v1.7.0...v2.0.0-beta.1) (2020-07-24)
 
 Changes/additions since OpenCPI Release v1.7.0
