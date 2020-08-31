@@ -1,0 +1,28 @@
+# Job that runs in .pre stage to verify if a commit is made to a branch with an existing MR.
+# If an MR exist for the branch, do not run a pipeline for the commit.
+# This is to prevent both an MR pipeline and a commit pipeline from being kicked off.
+# Also, if a branch's sha equals develop's sha, do not run a pipeline for the commit.
+verify-pipeline:
+  stage: .pre
+  extends:
+    - .centos7
+    - .docker
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH == "develop" || $CI_PIPELINE_SOURCE == "web"'
+      when: never
+    - when: on_success
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  script:
+    - MR="[]"
+    - MR=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests?source_branch=${CI_COMMIT_REF_NAME}&state=opened") || true
+    - DEV=$(curl "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/commits/develop")
+    - DEV_SHA=$(echo "$DEV" | sed -e 's/.*"sha":"\([^"]*\).*/\1/g')
+    - |-
+      if [[ "$MR" != "[]" || "$DEV_SHA" == "$CI_COMMIT_SHA" ]]; then
+        curl --request "DELETE" --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
+      fi
+  after_script: []
+  artifacts:
+    paths: []
