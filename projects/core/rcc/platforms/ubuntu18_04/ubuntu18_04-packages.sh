@@ -115,6 +115,8 @@ PKGS_S+=(libc6-dev-i386)
 PKGS_S+=(oxygen5-icon-theme openjdk-8-jre openjdk-8-jre-headless tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
+#    Needed to generate gitlab-ci yaml
+PKGS_S+=(python3-yaml)
 
 ##########################################################################################
 # E. installations that have to happen after we run "apt-get install" once, and also
