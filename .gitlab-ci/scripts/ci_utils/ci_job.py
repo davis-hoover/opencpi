@@ -314,8 +314,14 @@ def make_job(stage, stages, platform, project=None, name=None,
     else:
         tags = [host_platform.name, 'shell', 'opencpi']
 
+    if do_ocpiremote:
+        resource_group = platform.name
+    else:
+        resource_group = None
+
     job = Job(name, stage, script, tags=tags, before_script=before_script,
-              after_script=after_script, rules=rules, overrides=overrides)
+              after_script=after_script, rules=rules, 
+              resource_group=resource_group, overrides=overrides)
 
     return job
 
@@ -599,7 +605,8 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
     if verb == 'deploy':
         return ' '.join([
             'ocpiremote deploy', 
-            '-i {}'.format(platform.ip), 
+            '-i {}'.format(platform.ip),
+            '-r {}'.format(platform.port), 
             '-w {}'.format(platform.name),
             '-s {}'.format(linked_platform.name)
         ])
@@ -608,7 +615,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         return ' '.join([
             'ocpiremote load', 
             '-i {}'.format(platform.ip),
-            '-p {}'.format(platform.port), 
+            '-r {}'.format(platform.port), 
             '-w {}'.format(platform.name),
             '-s {}'.format(linked_platform.name)
         ])
