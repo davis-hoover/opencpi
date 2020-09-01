@@ -611,7 +611,6 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         return ' '.join([
             'ocpiremote deploy', 
             '-i {}'.format(platform.ip),
-            '-r {}'.format(platform.port), 
             '-w {}'.format(platform.name),
             '-s {}'.format(linked_platform.name)
         ])
