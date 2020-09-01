@@ -52,7 +52,7 @@ PKGS_R+=(unzip)
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
 PKGS_D+=(make autoconf automake libtool gcc-c++)
 #    for our development scripts
-PKGS_D+=(which wget)
+PKGS_D+=(which)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
@@ -115,8 +115,9 @@ python3_ver=python36
 #    for ocpidev
 PKGS_E+=(python3 python3-devel ${python3_ver}-jinja2)
 #    for various testing scripts
-#    AV-5478: If the minor version changes here, fix script below
 PKGS_E+=(${python3_ver}-numpy ${python3_ver}-scipy python3-tkinter python3-pip)
+#    for building yaml-cpp
+PKGS_E+=(cmake3)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
@@ -127,8 +128,6 @@ PKGS_E+=(${python3_ver}-scons)
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
-#    Needed to build/run ocpigr
-PKGS_E+=(yaml-cpp-devel)
 #    Needed to generate gitlab-ci yaml
 PKGS_E+=(python36-PyYAML)
 

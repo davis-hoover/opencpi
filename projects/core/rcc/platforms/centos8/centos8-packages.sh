@@ -49,9 +49,9 @@ PKGS_R+=(unzip)
 ##########################################################################################
 # D. yum-installed and rpm-required for devel (when users are doing their development).
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
-PKGS_D+=(make autoconf automake libtool gcc-c++)
+PKGS_D+=(cmake make autoconf automake libtool gcc-c++)
 #    for our development scripts
-PKGS_D+=(which wget)
+PKGS_D+=(which)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
@@ -116,8 +116,6 @@ PKGS_E+=(fakeroot)
 PKGS_E+=(ocl-icd)
 #    Needed to build gpsd
 PKGS_E+=(python3-scons)
-#    Needed to build/run ocpigr
-PKGS_E+=(yaml-cpp-devel)
 #    Needed to build certain linux kernels or u-boot.
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 

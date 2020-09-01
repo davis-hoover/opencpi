@@ -54,10 +54,10 @@ PKGS_R+=(unzip)
 ##########################################################################################
 # D. devel (when users are doing their development).
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
-PKGS_D+=(make autoconf automake libtool g++)
+PKGS_D+=(cmake make autoconf automake libtool g++)
 #    for our development scripts
 #    for CentOS7, "which" is in a separate package: *ubuntu has it in debianutils
-PKGS_D+=(debianutils wget)
+PKGS_D+=(debianutils)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 #    *ubuntu library packages include the static versions
 PKGS_D+=(libc6-dev binutils)
@@ -131,8 +131,6 @@ PKGS_E+=(python3-numpy python3-scipy python3-matplotlib)
 PKGS_E+=(ocl-icd-libopencl1)
 #    Needed to build gpsd
 PKGS_E+=(scons)
-#    Needed to build/run ocpigr
-PKGS_E+=(libyaml-cpp-dev)
 #    Needed to build plutosdr osp
 PKGS_E+=(libssl-dev device-tree-compiler)
 
