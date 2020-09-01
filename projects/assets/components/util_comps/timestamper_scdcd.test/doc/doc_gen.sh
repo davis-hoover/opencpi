@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-REPO_PATH=../../../../../../
+REPO_PATH=../../../../../..
 
 ${REPO_PATH}/doc/av/tex/docGen.py \
     ${REPO_PATH}/projects/assets/components/util_comps/specs/timestamper_scdcd-spec.xml \
