@@ -39,7 +39,7 @@ OcpiCanRemoveNeeded=0
 # -install_name @rpath/$(notdir $@)
 # MacOS uses CLANG/LLVM
 OcpiCXX=c++
-OcpiCXXFlags+=-I/opt/local/include -Wl,-L/opt/local/lib -Wl,-lyaml-cpp
+OcpiCXXFlags+=-I/opt/local/include -Wl,-L/opt/local/lib
 OcpiCXXLD=c++
 OcpiExtraLibs:=
 #export OCPI_OCL_LIBS=-locpi_ocl -framework OpenCL

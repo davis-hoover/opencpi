@@ -25,7 +25,7 @@
 OcpiPlatformOs=linux
 OcpiPlatformOsVersion=c8
 OcpiPlatformArch=x86_64
-OcpiExtraLibs+=yaml-cpp
+
 #
 # "OcpiKernelDir" must be set if it is appropriate to build
 # the "opencpi.ko" driver module for this platform.
