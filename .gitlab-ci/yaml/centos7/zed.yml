@@ -992,7 +992,7 @@ test:centos7:assets:base_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1024,7 +1024,7 @@ test:centos7:assets:base_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1056,7 +1056,7 @@ test:centos7:assets:base_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
@@ -1088,7 +1088,7 @@ test:centos7:assets:comms_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1120,7 +1120,7 @@ test:centos7:assets:comms_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1152,7 +1152,7 @@ test:centos7:assets:comms_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
@@ -1184,7 +1184,7 @@ test:centos7:assets:dsp_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1216,7 +1216,7 @@ test:centos7:assets:dsp_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1248,7 +1248,7 @@ test:centos7:assets:dsp_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
@@ -1280,7 +1280,7 @@ test:centos7:assets:misc_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1312,7 +1312,7 @@ test:centos7:assets:misc_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1344,7 +1344,7 @@ test:centos7:assets:misc_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
@@ -1376,7 +1376,7 @@ test:centos7:assets:util_comps:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1408,7 +1408,7 @@ test:centos7:assets:util_comps:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1440,7 +1440,7 @@ test:centos7:assets:util_comps:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
@@ -1472,7 +1472,7 @@ test:centos7:assets_ts:components:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1504,7 +1504,7 @@ test:centos7:assets_ts:components:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1536,7 +1536,7 @@ test:centos7:assets_ts:components:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
@@ -1568,7 +1568,7 @@ test:centos7:core:components:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1600,7 +1600,7 @@ test:centos7:core:components:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1632,7 +1632,7 @@ test:centos7:core:components:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
@@ -1664,7 +1664,7 @@ test:centos7:inactive:components:xilinx13_3:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_3
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_3
   - ocpiremote start -i 10.0.0.103
@@ -1696,7 +1696,7 @@ test:centos7:inactive:components:xilinx13_4:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx13_4
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx13_4
   - ocpiremote start -i 10.0.0.103
@@ -1728,7 +1728,7 @@ test:centos7:inactive:components:xilinx19_2_aarch64:zed:
   - sleep 2
   - touch .timestamp
   - source cdk/opencpi-setup.sh -e
-  - ocpiremote deploy -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
+  - ocpiremote deploy -i 10.0.0.103 -w zed -s xilinx19_2_aarch64
   - sleep 5
   - ocpiremote load -i 10.0.0.103 -r 1000 -w zed -s xilinx19_2_aarch64
   - ocpiremote start -i 10.0.0.103
