@@ -64,6 +64,7 @@
 # 2. Whether it is a development platform or a runtime-only platform (default is development)
 # 3. Whether it is cross compiled or not (default is not cross compiled)
 prerequisites lzma gmp gpsd gtest
+host-prerequisites yaml-cpp
 # There is lots of leftover/unbuilt stuff in the foreign directories
 runtime/foreign -f -x .*/pwq/kern/.* -x .*/pwq/src/.*/.* -x .*/uuid/src/.*/.*
 # From old Makefiles:c and c++: for linux: -D_XOPEN_SOURCE=600 -D_FILE_OFFSET_BITS=64
@@ -106,6 +107,6 @@ tools/ocpigen -n -t -I tools/cdkutils/include -I runtime/hdl/include -I runtime/
 tools/ocpirh
 # This ugliness is a workaround until dev host only prereqs are implemented.
 # https://gitlab.com/opencpi/opencpi/-/issues/1367
-tools/ocpigr -t -I tools/cdkutils/include -I runtime/library/include -I ../../../prerequisites/yaml-cpp/centos7/include -L cdkutils -L library -L ../../../prerequisites/yaml-cpp/centos7/lib/libyaml-cpp.a
+tools/ocpigr -t -I tools/cdkutils/include -I runtime/library/include -L cdkutils -L library
 tools/ocpigr37 -t -I tools/cdkutils/include -I runtime/library/include -L cdkutils -L library
 tools/ocpidds -d cxxtests -n -r -t -I tools/cdkutils/include -L cdkutils
