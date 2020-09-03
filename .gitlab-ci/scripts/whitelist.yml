@@ -1,0 +1,12 @@
+# Whitelist of host platforms and platforms to cross-build
+centos7:
+  - xilinx13_3
+  - xilinx13_4
+  - xilinx19_2_aarch64
+  - isim
+  - modelsim
+  - xsim
+  - matchstiq_z1
+  - zcu104
+  - zed
+  - zed_ise
