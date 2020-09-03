@@ -200,14 +200,6 @@ tex_kernel() {
 #       should not be used.
 ###
 generate_pdfs() {
-    make -C ${REPO_PATH}/projects/assets/components/misc_comps/data_src.test/doc/
-    make -C ${REPO_PATH}/projects/assets/components/util_comps/fifo.test/doc/
-    make -C ${REPO_PATH}/projects/assets/components/util_comps/iqstream_max_calculator.test/doc/
-    make -C ${REPO_PATH}/projects/assets/components/util_comps/timestamper_scdcd.test/doc/
-    make -C ${REPO_PATH}/projects/assets/components/util_comps/tx_event_ctrlr.test/doc/
-    make -C ${REPO_PATH}/projects/assets/components/dsp_comps/real_digitizer.test/doc/
-    make -C ${REPO_PATH}/projects/assets/hdl/devices/data_sink_dac.test/doc/
-    make -C ${REPO_PATH}/projects/assets/hdl/devices/data_src_adc.test/doc/
     shopt -s nullglob
     local search_path="$1"
 
