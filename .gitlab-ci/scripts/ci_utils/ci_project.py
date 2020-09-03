@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+import json
 from collections import namedtuple
 from pathlib import Path
+from urllib.request import urlopen
 
-Project = namedtuple('project', 'name, libraries, path')
+Project = namedtuple('project', 'name, libraries, path, is_osp')
 Library = namedtuple('library', ('name path project_name'
                                  ' is_buildable is_testable'))
 
@@ -27,11 +29,15 @@ def discover_projects(projects_path, blacklist=None):
         if project_name in blacklist:
             continue
 
+        makefile_path = Path(project_path, 'Makefile')
+        if not makefile_path.is_file():
+            continue
+
         library_blacklist = ['vendors']
         project_libraries = discover_libraries(project_name, project_path, 
                                                blacklist=library_blacklist)
         project = Project(name=project_name, libraries=project_libraries, 
-                          path=project_path)
+                          path=project_path, is_osp=False)
         projects.append(project)
 
     return projects

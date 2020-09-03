@@ -49,6 +49,11 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
     # Check if current job is specified in overrides
     if overrides and name in overrides:
         overrides = overrides[name]
+
+    # Skip this job
+    if overrides == 'skip':
+        return None
+
     # Collect overrides
     for key,value in args.items():
         if key in overrides:
@@ -173,24 +178,20 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
                                        project=project, library=library,
                                        host_platform=host_platform,
                                        overrides=overrides)
-                        jobs.append(job)
+                        if job:
+                            jobs.append(job)
         else:
             job = make_job(stage, stages, platform, 
                            host_platform=host_platform, overrides=overrides)
-            jobs.append(job)
+            if job:
+                jobs.append(job)
 
         if stage == 'prereqs' and platform.is_host:
             name = make_name('packages', platform)
-
-            if not overrides:
-                continue
-            if not 'image' in overrides:
-                if name not in overrides or 'image' not in overrides[name]:
-                    continue
-
-            job = make_job(stage, stages, platform, name=name, 
+            job = make_job(stage, stages, platform, name=name,
                            overrides=overrides)
-            jobs.append(job)
+            if job:
+                jobs.append(job)
 
     return jobs
 
@@ -223,7 +224,8 @@ def make_hdl_jobs(stages, platform, projects, linked_platforms,
                 job = make_job(stage, stages, platform, project=project,
                                host_platform=host_platform, library=library,
                                overrides=overrides)
-                jobs.append(job)
+                if job:
+                    jobs.append(job)
 
             if library.is_testable:
                 name = make_name('build-tests', platform,project=project, 
@@ -232,14 +234,16 @@ def make_hdl_jobs(stages, platform, projects, linked_platforms,
                                           name=name, project=project, 
                                           host_platform=host_platform, 
                                           library=library, overrides=overrides)
-                jobs.append(build_test_job)
+                if build_test_job:
+                    jobs.append(build_test_job)
 
                 if platform.is_sim:
                     run_test_job = make_job('test', stages, platform, 
                                             project=project, library=library,
                                             host_platform=host_platform,
                                             overrides=overrides)
-                    jobs.append(run_test_job)
+                    if run_test_job:
+                        jobs.append(run_test_job)
 
                 if not platform.ip or not platform.port:
                     continue    
@@ -251,15 +255,17 @@ def make_hdl_jobs(stages, platform, projects, linked_platforms,
                                             host_platform=host_platform,
                                             linked_platform=linked_platform,
                                             overrides=overrides,
-                                            do_ocpiremote=True)
-                    jobs.append(run_test_job)
+                                            do_ocpiremote=True)      
+                    if run_test_job:
+                        jobs.append(run_test_job)
 
     for linked_platform in linked_platforms:
         job = make_job('build-sdcards', stages, platform, 
                        host_platform=host_platform, 
                        linked_platform=linked_platform, overrides=overrides)
-        jobs.append(job)
-    
+        if job:
+            jobs.append(job)
+
     return jobs
 
 
@@ -293,22 +299,12 @@ def make_job(stage, stages, platform, project=None, name=None,
                          linked_platform, library)
 
     rules = make_rules(platform, host_platform, linked_platform)
-
-    if platform.is_host and name.startswith('packages'):
-        tags = ['docker']
-        script = make_scripts_cmd(stage, platform, name)
-
-        job = Job(name, stage, script, tags=tags, before_script=None,
-                  after_script=None, rules=rules, overrides=overrides)
-        
-        return job
-
     before_script = make_before_script(stage, stages, platform,
-                                        host_platform=host_platform, 
-                                        linked_platform=linked_platform,
-                                        do_ocpiremote=do_ocpiremote)
+                                       host_platform=host_platform, 
+                                       linked_platform=linked_platform,
+                                       do_ocpiremote=do_ocpiremote)
     script = make_script(stage, platform, project=project, library=library, 
-                        linked_platform=linked_platform, name=name)
+                         linked_platform=linked_platform, name=name)
     after_script = make_after_script(platform, do_ocpiremote=do_ocpiremote)
 
     if platform.is_host:
@@ -374,33 +370,32 @@ def make_before_script(stage, stages, platform, host_platform=None,
     Returns:
         list of command strings
     """
+
+    timestamp_cmd = 'touch .timestamp'
+
+    if stage == 'prereqs':
+        return [timestamp_cmd]
+
     pipeline_id = '"$CI_PIPELINE_ID"'
-    
     stage_idx = stages.index(stage)
 
     # Download artifacts for platform, host_platform, and linked_platform
     includes = ['"*{}.tar.gz"'.format(platform.name) 
                     for platform in [platform, host_platform, linked_platform] 
                     if platform]
-
     # Don't download artifacts in current or later stages
     excludes = ['"{}:*"'.format(stage) for stage in stages[stage_idx:]]
-
     download_cmd = ' '.join(['.gitlab-ci/scripts/ci_artifacts.py download',
                              pipeline_id,
                              '-i', ' '.join(includes),
                              '-e', ' '.join(excludes)])
-
     sleep_cmd = 'sleep 2'
-    timestamp_cmd = 'touch .timestamp'
-    source_cmd = 'source cdk/opencpi-setup.sh -e'
 
-    if stage == 'prereqs':
-        cmds = [timestamp_cmd]
-    elif stage == 'build-host':
-        cmds = [download_cmd, sleep_cmd, timestamp_cmd]
-    else:
-        cmds = [download_cmd, sleep_cmd, timestamp_cmd, source_cmd]
+    if stage == 'build-host':
+        return [download_cmd, sleep_cmd, timestamp_cmd]
+    
+    source_cmd = 'source cdk/opencpi-setup.sh -e'
+    cmds = [download_cmd, sleep_cmd, timestamp_cmd, source_cmd]
 
     if do_ocpiremote:
         cmds += [

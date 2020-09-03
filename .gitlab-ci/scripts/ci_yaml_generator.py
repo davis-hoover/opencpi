@@ -16,6 +16,7 @@ def main():
     os.chdir(str(opencpi_path))
     gitlab_ci_path = Path('.gitlab-ci')
     yaml_path = Path(gitlab_ci_path, 'yaml')
+    yaml_opencpi_path = Path(yaml_path, 'opencpi')
     projects_path = Path('projects')
     config_path = Path(gitlab_ci_path, 'scripts', 'config.yml')
     whitelist_path = Path(gitlab_ci_path, 'scripts', 'whitelist.yml')
@@ -27,7 +28,7 @@ def main():
         whitelist = yaml.safe_load(yml)
 
     project_blacklist = ['tutorial']
-    projects = ci_project.discover_projects(projects_path, project_blacklist)
+    projects = ci_project.discover_projects(projects_path=projects_path, blacklist=project_blacklist)
     platforms = ci_platform.discover_platforms(projects, config=config)
 
     stages = ['.pre', 'prereqs', 'build-host', 'build-rcc', 
@@ -65,24 +66,34 @@ def main():
                                           linked_platforms=linked_platforms, 
                                           host_platform=host_platform,
                                           overrides=overrides)
-            cross_path = Path(yaml_path, host_platform.name, 
+            cross_path = Path(yaml_opencpi_path, host_platform.name, 
                               '{}.yml'.format(cross_platform.name))
             ci_job.dump(cross_jobs, cross_path)
+
 
         overrides = get_overrides(host_platform, config)
         host_jobs = ci_job.make_jobs(stages, host_platform, projects, 
                                      overrides=overrides)
-        host_path = Path(yaml_path, '{}.yml'.format(host_platform.name))
+        host_path = Path(yaml_path, 'opencpi', 
+                         '{}.yml'.format(host_platform.name))
         ci_job.dump(host_jobs, host_path)
         
         host_include = [str(path) for path in 
-            Path(yaml_path, host_platform.name).glob('*.yml')]
+            Path(yaml_opencpi_path, host_platform.name).glob('*.yml')]
         host_dict = {'include': host_include}
         dump(host_dict, host_path, 'a')
 
+
+    # Make trigger job
+    for osp in osps:
+        print(osp.name, 'trigger job')
+
+
+
     print('\nUpdating "include" section of .gitlab-ci.yml')
     gitlab_yml_path = Path('.gitlab-ci.yml')
-    gitlab_yml_include = [str(path) for path in Path(yaml_path).glob('*.yml')]
+    gitlab_yml_include = [str(path) for path 
+                          in yaml_opencpi_path.glob('*.yml')]
     gitlab_yml_dict = {
         'include': gitlab_yml_include,
         'stages': stages
