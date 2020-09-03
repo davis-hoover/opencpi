@@ -1,10 +1,10 @@
 include:
-- .gitlab-ci/yaml/docs.yml
-- .gitlab-ci/yaml/e3xx.yml
-- .gitlab-ci/yaml/plutosdr.yml
-- .gitlab-ci/yaml/templates.yml
-- .gitlab-ci/yaml/verify-pipeline.yml
-- .gitlab-ci/yaml/centos7.yml
+- .gitlab-ci/yaml/opencpi/docs.yml
+- .gitlab-ci/yaml/opencpi/e3xx.yml
+- .gitlab-ci/yaml/opencpi/plutosdr.yml
+- .gitlab-ci/yaml/opencpi/templates.yml
+- .gitlab-ci/yaml/opencpi/verify-pipeline.yml
+- .gitlab-ci/yaml/opencpi/centos7.yml
 stages:
 - .pre
 - prereqs
