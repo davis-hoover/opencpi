@@ -23,4 +23,16 @@
     <parameter name='FIFO_DEPTH_p' value='1024'/>
     <parameter name='ZLM_WHEN_ONESHOT_DONE_p' value='true'/>
   </configuration>
+  <configuration id='4'>
+    <parameter name='ocpi_debug' value='false'/>
+    <parameter name='ocpi_endian' value='little'/>
+    <parameter name='FIFO_DEPTH_p' value='2048'/>
+    <parameter name='ZLM_WHEN_ONESHOT_DONE_p' value='false'/>
+  </configuration>
+  <configuration id='5'>
+    <parameter name='ocpi_debug' value='false'/>
+    <parameter name='ocpi_endian' value='little'/>
+    <parameter name='FIFO_DEPTH_p' value='2048'/>
+    <parameter name='ZLM_WHEN_ONESHOT_DONE_p' value='true'/>
+  </configuration>
 </build>
