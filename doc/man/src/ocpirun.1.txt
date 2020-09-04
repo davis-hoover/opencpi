@@ -362,6 +362,19 @@ The section "Execution of Simulation Bitstreams and Containers" in the
 applications on HDL (FPGA) simulators. See link:ocpiview.1.html[ocpiview(1)]
 for information on viewing the results of simulation runs.
 
+ENVIRONMENT VARIABLES
+---------------------
+The following environment variables affect *`ocpirun`* operation:
+
+*`OCPI_LIBRARY_PATH`*::
+    A list of directories, separated by colons, to be searched for runtime artifacts.
+    When referencing the artifacts exported by a project with sources, be sure
+    to reference the project’s *`exports/`* subdirectory, not its source location.
+    This variable is set automatically (if not already set) when running component
+    unit tests or applications in projects with *`ocpidev run`*.
+    In pure runtime environments, it may need
+    to be set when artifacts are placed in directories of the user's choice.
+ 
 
 EXAMPLES
 --------
@@ -505,6 +518,7 @@ link:ocpidev-assembly.1.html[ocpidev-assembly(1)]
 link:ocpidev-component.1.html[ocpidev-component(1)]
 link:ocpidev-platform.1.html[ocpidev-platform(1)]
 link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-run.1.html[ocpidev-run(1)]
 link:ocpidev-worker.1.html[ocpidev-worker(1)]
 link:ocpiview.1.html[ocpiview(1)]
 

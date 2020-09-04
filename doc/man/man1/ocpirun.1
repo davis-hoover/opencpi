@@ -1,12 +1,12 @@
 .\"     Title: ocpirun
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 08/20/2020
+.\"      Date: 09/04/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIRUN" "1" "08/20/2020" "\ \&" "\ \&"
+.TH "OCPIRUN" "1" "09/04/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -464,6 +464,17 @@ The number of simulation clock cycles to execute or until the application is don
 .RE
 .sp
 The section "Execution of Simulation Bitstreams and Containers" in the \fIOpenCPI HDL Development Guide\fR provides more information about running applications on HDL (FPGA) simulators\&. See ocpiview(1) for information on viewing the results of simulation runs\&.
+.SH "ENVIRONMENT VARIABLES"
+.sp
+The following environment variables affect \fBocpirun\fR operation:
+.PP
+\fBOCPI_LIBRARY_PATH\fR
+.RS 4
+A list of directories, separated by colons, to be searched for runtime artifacts\&. When referencing the artifacts exported by a project with sources, be sure to reference the project\(cqs
+\fBexports/\fR
+subdirectory, not its source location\&. This variable is set automatically (if not already set) when running component unit tests or applications in projects with
+\fBocpidev run\fR\&. In pure runtime environments, it may need to be set when artifacts are placed in directories of the user\(cqs choice\&.
+.RE
 .SH "EXAMPLES"
 .sp
 .RS 4
@@ -797,7 +808,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-component(1) ocpidev\-platform(1) ocpidev\-project(1) ocpidev\-worker(1) ocpiview(1)
+ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-component(1) ocpidev\-platform(1) ocpidev\-project(1) ocpidev\-run(1) ocpidev\-worker(1) ocpiview(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.
