@@ -2,7 +2,6 @@
 
 import os
 import subprocess
-import tarfile
 from argparse import ArgumentParser
 from shutil import rmtree
 
@@ -35,50 +34,50 @@ def make_parser():
 
     # Create download subparser
     subparser = subparsers.add_parser(
-        name='download', 
+        name='download',
         help='Download artifacts from aws')
     subparser.add_argument(
-        'pipeline_id', 
-        help='ID of pipeline to download artifacts from', 
+        'pipeline_id',
+        help='ID of pipeline to download artifacts from',
         metavar='pipeline_id')
     subparser.add_argument(
-        '-e', '--exclude', 
+        '-e', '--exclude',
         help=('Artifacts to exclude from download.'
-             ' Can take any number of arguments'), 
+              ' Can take any number of arguments'),
         nargs='+', metavar='')
     subparser.add_argument(
-        '-i', '--include', 
-        help=('Artifacts to include in download.' 
-             ' Can take any number of arguments'), 
+        '-i', '--include',
+        help=('Artifacts to include in download.'
+              ' Can take any number of arguments'),
         nargs='+', metavar='')
     subparser.set_defaults(func=download)
 
     # Create upload subparser
     subparser = subparsers.add_parser(
-        name='upload', 
+        name='upload',
         help='Upload artifacts to aws')
-    subparser.add_argument('artifact', 
+    subparser.add_argument(
+        'artifact',
         help='Directory or file to upload to aws. Default: cwd',
         nargs='?', default='.')
     subparser.add_argument(
-        'pipeline_id', 
-        help='ID of pipeline to upload artifacts to', 
+        'pipeline_id',
+        help='ID of pipeline to upload artifacts to',
         metavar='pipeline_id')
     subparser.add_argument(
-        'job_name', 
-        help='ID of pipeline to upload artifacts to', 
+        'job_name',
+        help='ID of pipeline to upload artifacts to',
         metavar='job_name')
     subparser.add_argument(
-        '-s', '--timestamp', 
+        '-s', '--timestamp',
         help=('Upload artifacts in directory updated/created since'
-              ' timestamp'), 
+              ' timestamp'),
         metavar='')
     subparser.add_argument(
-        '-t', '--tag', 
-        help='Tag to give the artifact', 
+        '-t', '--tag',
+        help='Tag to give the artifact',
         metavar='')
     subparser.set_defaults(func=upload)
-
 
     return parser
 
@@ -94,14 +93,14 @@ def exclude_paths(path):
     """
     if '.git' in path:
         return True
-    
+
     return False
 
 
 def upload(args):
     """Uploads artifacts to aws.
 
-    Tars artifacts and constructs and executes command to upload 
+    Tars artifacts and constructs and executes command to upload
     artifacts to aws. Calls tag() if a tag is passed as user argument.
 
     Args:
@@ -114,45 +113,53 @@ def upload(args):
     # Will appear on aws as:
     # 's3://opencpi-ci-artifacts/CI_PIPELINE_ID[/failed]/CI_JOB_NAME'
     if args.tag == 'failed-job':
-        s3_object = '{}/failed/{}.tar.gz'.format(args.pipeline_id, 
+        s3_object = '{}/failed/{}.tar.gz'.format(args.pipeline_id,
                                                  args.job_name)
     else:
         s3_object = '{}/{}.tar.gz'.format(args.pipeline_id, args.job_name)
-        
+
     s3_url = ('https://opencpi-ci-artifacts.s3.us-east-2.amazonaws.com/'
               '{}'.format(s3_object))
     files = []
 
-    # If timestamp passed, find all files created/updated since the 
+    # If timestamp passed, find all files created/updated since the
     # timestamp
     if args.timestamp:
         timestamp = os.lstat(args.timestamp).st_ctime
         recursive = False
 
         for dirpath, dirnames, filenames in os.walk('.'):
-            paths = [os.path.join(dirpath, name) 
+            paths = [os.path.join(dirpath, name)
                      for name in dirnames + filenames]
 
             for path in paths:
                 if os.lstat(path).st_ctime > timestamp:
-                    files.append(path)              
+                    files.append(path)
     else:
         files.append(args.artifact)
-        recursive =  True
+        recursive = True
 
     # Create the tar
-    with tarfile.open('tar', "w:gz") as tar:
-        for f in files:
-            if f:
-                tar.add(f, exclude=exclude_paths, recursive=recursive)
-    
+    # Don't use python's tarfile module. It does not handle changing the
+    # permissions of files correctly.
+    tarfiles_fname = './.tarfiles'
+    tar_fname = 'artifacts.tar.gz'
+    with open(tarfiles_fname, 'wb') as fd:
+        fd.write(b'\n'.join([f.encode() for f in files]))
+    cmd = ['tar', 'zcf', tar_fname, '--files-from={}'.format(tarfiles_fname)]
+    if not recursive:
+        cmd.append('--no-recursion')
+    print('Executing: "{}"'.format(' '.join(cmd)))
+    subprocess.check_call(cmd)
+    os.remove('./.tarfiles')
+
     # Create and execute command to upload tar
-    cmd = ['aws', 's3', 'cp', 'tar', 
-        's3://opencpi-ci-artifacts/{}'.format(s3_object),
-        '--no-progress']
+    cmd = ['aws', 's3', 'cp', tar_fname,
+           's3://opencpi-ci-artifacts/{}'.format(s3_object),
+           '--no-progress']
     print('Executing: "{}"'.format(' '.join(cmd)))
     print('Uploading artifacts to: {}'.format(s3_url))
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                universal_newlines=True)
     process.wait()
 
@@ -164,7 +171,7 @@ def upload(args):
         tag(args, s3_object)
 
     # Delete tar
-    os.remove('tar')
+    os.remove(tar_fname)
 
     return process.returncode
 
@@ -172,7 +179,7 @@ def upload(args):
 def download(args):
     """Downloads artifacts from aws.
 
-    Constructs and executes command to download tar artifacts from aws 
+    Constructs and executes command to download tar artifacts from aws
     into temp folder and extracts the files from the tar artifacts.
 
     Args:
@@ -185,12 +192,12 @@ def download(args):
     temp_dir = os.path.join('.', 'temp', '')
 
     # Create command to download artifacts, appending optional arguments
-    cmd = ['aws', 's3', 'cp', 
-        's3://opencpi-ci-artifacts/{}'.format(args.pipeline_id), temp_dir,
-        '--no-progress', '--recursive']
+    cmd = ['aws', 's3', 'cp',
+           's3://opencpi-ci-artifacts/{}'.format(args.pipeline_id), temp_dir,
+           '--no-progress', '--recursive']
 
     if args.include:
-        # By default in aws, '--include' does nothing unless 
+        # By default in aws, '--include' does nothing unless
         # '--exclude "*"' is passed first
         cmd += ['--exclude', '*']
         for include in args.include:
@@ -204,13 +211,13 @@ def download(args):
     print('Executing: "{}"'.format(' '.join(cmd)))
 
     # Execute command to download artifacts
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                universal_newlines=True)
     process.wait()
 
     if process.stdout:
         print(process.stdout.read().strip())
-    
+
     if process.stderr:
         print(process.stderr.read().strip())
 
@@ -219,8 +226,9 @@ def download(args):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             print('Extracting: {}'.format(filepath))
-            with tarfile.open(filepath) as tar:
-                tar.extractall()
+            # Don't use python's tarfile module. It does not handle changing
+            # the permissions of files correctly.
+            subprocess.check_call(['tar', 'zxf', filepath])
 
     # Delete temp_dir and its contents
     rmtree(temp_dir)
@@ -232,7 +240,7 @@ def tag(args, s3_object):
     """ Tags artifacts on aws.
 
     Constructs and executes command to tag artifacts on aws.
-    Constructs and executes command to get artifact expiration date 
+    Constructs and executes command to get artifact expiration date
     based on applied tag.
 
     Args:
@@ -240,25 +248,25 @@ def tag(args, s3_object):
         s3_object:  The aws s3 object to tag
     """
     # Create command to tag artifact
-    cmd = ['aws', 's3api', 'put-object-tagging', '--bucket', 
-        "opencpi-ci-artifacts", '--key', s3_object, 
-        '--tagging', 'TagSet=[{{Key=type,Value={}}}]'.format(args.tag)]
-    
+    cmd = ['aws', 's3api', 'put-object-tagging', '--bucket',
+           "opencpi-ci-artifacts", '--key', s3_object,
+           '--tagging', 'TagSet=[{{Key=type,Value={}}}]'.format(args.tag)]
+
     # Execute command to tag artifact
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                universal_newlines=True)
     process.wait()
     out = (process.stdout.read())
 
     if out:
         print(out)
-    
+
     # Get expiration date of artifact based on applied tag
-    cmd = ['aws', '--output', 'yaml', 's3api', 'head-object', 
-        '--bucket', 'opencpi-ci-artifacts', '--key', s3_object]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+    cmd = ['aws', '--output', 'yaml', 's3api', 'head-object',
+           '--bucket', 'opencpi-ci-artifacts', '--key', s3_object]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                universal_newlines=True)
-    
+
     if process.stderr:
         print(process.stderr.read().strip())
     elif process.stdout:
