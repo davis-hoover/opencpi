@@ -1,4 +1,4 @@
-#!/bin/bash --noprofile
+#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -102,6 +102,12 @@ function do_flags {
     for i in $includes $incs; do # includes is global
 	printf ' \\\n  -I%s' $i
     done
+    printf '\nif !ocpi_is_cross'
+    printf "\n${1}_CPPFLAGS += "
+    for i in $ocpi_host_only_prereq_incs; do
+        printf ' \\\n  -I%s' $i
+    done
+    printf '\nendif'
     printf '\n'"${1}_CFLAGS = $2 @common_cflags@"
     [ -z "$foreign" -a "$3" != swig ] && printf " @strict_cflags@"
     printf '\n'"${1}_CXXFLAGS = $2 @common_cxxflags@"
@@ -210,7 +216,7 @@ while read path opts; do
   case "$path" in
       \#*|"")
 	  continue;;
-      prerequisites)
+     prerequisites)
 	  for p in $opts; do
 	      dir=@prerequisite_dir@/$p/@OcpiPlatform@
 	      # look in arch-specific include first, then arch-agnostic
@@ -230,6 +236,26 @@ while read path opts; do
 	  echo endif
           echo ocpi_prereqs=$opts
 	  continue;;
+      host-only-prerequisites)
+          for p in $opts; do
+              dir=@prerequisite_dir@/$p/@OcpiPlatform@
+              # look in arch-specific include first, then arch-agnostic
+              ocpi_host_only_prereq_incs+=" $dir/include"
+              ocpi_host_only_prereq_incs+=" @prerequisite_dir@/$p/include"
+              ocpi_host_only_prereq_libs+=" $dir/lib/lib$p"
+              dynamic_host_only_prereqs+=" -L$dir/lib -l$p"
+              static_host_only_prereqs+=" $dir/lib/lib${p}@OcpiStaticLibrarySuffix@"
+          done
+          echo if !ocpi_is_cross
+          echo ocpi_dynamic_prereqs+=$dynamic_host_only_prereqs
+          echo if ocpi_is_dynamic
+          echo   ocpi_program_prereqs+=$dynamic_host_only_prereqs
+          echo else
+          echo   ocpi_program_prereqs+=$static_host_only_prereqs
+          echo endif
+          echo ocpi_prereqs+=$opts
+          echo endif
+          continue;;
       end-of-runtime-for-tools)
 	  ocpi_libs_for_tools=$ocpi_libs_ordered
 	  ocpi_incs_for_tools=$ocpi_incs_ordered
