@@ -64,7 +64,9 @@
 # 2. Whether it is a development platform or a runtime-only platform (default is development)
 # 3. Whether it is cross compiled or not (default is not cross compiled)
 prerequisites lzma gmp gpsd gtest
-host-prerequisites yaml-cpp
+# Host only prereqs are additional prereqs that are built for the host only.
+# Essentially, host prereqs = prereqs + host only prereqs
+host-only-prerequisites yaml-cpp
 # There is lots of leftover/unbuilt stuff in the foreign directories
 runtime/foreign -f -x .*/pwq/kern/.* -x .*/pwq/src/.*/.* -x .*/uuid/src/.*/.*
 # From old Makefiles:c and c++: for linux: -D_XOPEN_SOURCE=600 -D_FILE_OFFSET_BITS=64

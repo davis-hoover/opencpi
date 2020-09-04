@@ -1,4 +1,4 @@
-#!/bin/bash --noprofile
+#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -104,7 +104,7 @@ function do_flags {
     done
     printf '\nif !ocpi_is_cross'
     printf "\n${1}_CPPFLAGS += "
-    for i in $ocpi_host_prereq_incs; do
+    for i in $ocpi_host_only_prereq_incs; do
         printf ' \\\n  -I%s' $i
     done
     printf '\nendif'
@@ -236,24 +236,22 @@ while read path opts; do
 	  echo endif
           echo ocpi_prereqs=$opts
 	  continue;;
-      host-prerequisites)
+      host-only-prerequisites)
           for p in $opts; do
               dir=@prerequisite_dir@/$p/@OcpiPlatform@
               # look in arch-specific include first, then arch-agnostic
-              ocpi_host_prereq_incs+=" $dir/include"
-              ocpi_host_prereq_incs+=" @prerequisite_dir@/$p/include"
-              ocpi_host_prereq_libs+=" $dir/lib/lib$p"
-              #ocpi_prereq_ldflags+=" -Wl,-rpath -Wl,$dir/lib"
-              # LATER dynamic_prereqs+=" -L$dir/lib -locpi_$p"
-              dynamic_host_prereqs+=" -L$dir/lib -l$p"
-              static_host_prereqs+=" $dir/lib/lib${p}@OcpiStaticLibrarySuffix@"
+              ocpi_host_only_prereq_incs+=" $dir/include"
+              ocpi_host_only_prereq_incs+=" @prerequisite_dir@/$p/include"
+              ocpi_host_only_prereq_libs+=" $dir/lib/lib$p"
+              dynamic_host_only_prereqs+=" -L$dir/lib -l$p"
+              static_host_only_prereqs+=" $dir/lib/lib${p}@OcpiStaticLibrarySuffix@"
           done
           echo if !ocpi_is_cross
-          echo ocpi_dynamic_prereqs+=$dynamic_host_prereqs
+          echo ocpi_dynamic_prereqs+=$dynamic_host_only_prereqs
           echo if ocpi_is_dynamic
-          echo   ocpi_program_prereqs+=$dynamic_host_prereqs
+          echo   ocpi_program_prereqs+=$dynamic_host_only_prereqs
           echo else
-          echo   ocpi_program_prereqs+=$static_host_prereqs
+          echo   ocpi_program_prereqs+=$static_host_only_prereqs
           echo endif
           echo ocpi_prereqs+=$opts
           echo endif
