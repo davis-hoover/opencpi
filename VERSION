@@ -1,4 +1,3 @@
-#!/bin/sh --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,5 +16,21 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-f=/etc/centos-release
-[ -r $f ] && read c r v x < $f && [[ $c  == CentOS && $v == 6.* ]]
+# This file defines the version of OpenCPI.
+# These values are mainly used in scripts/update-release.sh when creating a new
+# release. Other scripts should use this file if the version of OpenCPI is
+# needed by "sourcing" it. Non-bash scripts should be able to easily parse
+# this file.
+
+OCPI_VERSION_MAJOR=2
+OCPI_VERSION_MINOR=0
+OCPI_VERSION_PATCH=0
+
+# Will always be special value of 'develop' for the develop branch
+# For a pre-release, should be beta.1, beta.2 (etc.) or rc.1, rc.2 (etc.)
+# Set to nothing when a release is finalized
+OCPI_VERSION_EXTRA=develop
+
+# Convenience vars for common representations of the version string
+OCPI_VERSION="${OCPI_VERSION_MAJOR}.${OCPI_VERSION_MINOR}.${OCPI_VERSION_PATCH}"
+OCPI_RELEASE="v${OCPI_VERSION}${OCPI_VERSION_EXTRA:+-${OCPI_VERSION_EXTRA}}"

@@ -283,8 +283,9 @@
 ################################################################################
 # Kernel module and main license files
 #+LICENSE.txt <target>/lib/
-=LICENSE.txt
 =COPYRIGHT
+=LICENSE.txt
+=VERSION
 ################################################################################
 # automake related exclusions and additions
 #+tools/include/autoconfig_import.mk include/

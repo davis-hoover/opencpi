@@ -164,7 +164,7 @@ in that operation's description in OPERATIONS.
 *`-l`* '<log-level>'::
     Specify the OpenCPI log level to be applied during execution.
     See the description of the OCPI_LOG_LEVEL environment variable
-    in the 'OpenCPI User Guide' or *`opencpi(7)`* for a description of possible values.
+    in the 'OpenCPI User Guide' or *`opencpi(1)`* for a description of possible values.
     Using this option overrides the level set in the OCPI_LOG_LEVEL
     environment variable.
 

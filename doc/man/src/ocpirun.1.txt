@@ -374,7 +374,7 @@ The following environment variables affect *`ocpirun`* operation:
     unit tests or applications in projects with *`ocpidev run`*.
     In pure runtime environments, it may need
     to be set when artifacts are placed in directories of the user's choice.
- 
+
 
 EXAMPLES
 --------
