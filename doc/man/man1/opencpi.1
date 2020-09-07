@@ -1,0 +1,221 @@
+.\"     Title: opencpi
+.\"    Author: [see the DOCUMENTATION section]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 09/04/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OPENCPI" "1" "09/04/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+opencpi \- tools for developing and executing OpenCPI applications
+.SH "DESCRIPTION"
+.sp
+Open Component Portability Infrastructure (OpenCPI) is an open source software (OSS) framework for developing and executing OpenCPI \fIapplications\fR \- connected and configured assemblies of \fIcomponents\fR \- on heterogeneous embedded systems\&. OpenCPI provides a set of tools to support the development and execution of OpenCPI applications\&. These tools include:
+.PP
+ocpiadmin(1)
+.RS 4
+Command\-line tool for managing an OpenCPI installation
+.RE
+.PP
+ocpiav(1)
+.RS 4
+Eclipse\-based graphical user interface for managing OpenCPI assets
+.RE
+.PP
+ocpidev(1)
+.RS 4
+Command\-line tool for managing OpenCPI assets
+.RE
+.PP
+ocpidriver(1)
+.RS 4
+Command\-line tool for controlling the OpenCPI Linux kernel module driver
+.RE
+.PP
+ocpigr(1)
+.RS 4
+Command\-line tool for creating GNU Radio Companion (GRC) block files from OpenCPI artifacts
+.RE
+.PP
+ocpihdl(1)
+.RS 4
+Command\-line tool for performing HDL development tasks
+.RE
+.PP
+ocpiremote(1)
+.RS 4
+Command\-line tool for managing remote OpenCPI container servers
+.RE
+.PP
+ocpirun(1)
+.RS 4
+Command\-line tool for running OpenCPI applications
+.RE
+.PP
+ocpiserve(1)
+.RS 4
+Command\-line tool for starting OpenCPI container servers
+.RE
+.PP
+ocpitest(1)
+.RS 4
+Command\-line tool for running OpenCPI installation verification tests
+.RE
+.PP
+ocpiview(1)
+.RS 4
+Command\-line tool for viewing the results of FPGA simulations
+.RE
+.PP
+ocpixml(1)
+.RS 4
+Command\-line tool for managing OpenCPI artifact description XML in artifact files
+.RE
+.PP
+ocpizynq(1)
+.RS 4
+Command\-line tool for retrieving hardware configuration data from Xilinx Zynq architecture platforms
+.RE
+.sp
+These tools are accessible from the \fBbash\fR UNIX/Linux shell, which is the shell environment supported by OpenCPI\&.
+.sp
+To obtain general information about an individual tool, including command syntax, command options, and examples, see its manual page\&.
+.sp
+To obtain brief usage information for an individual tool, use the \fB\-\-help\fR (or \fB\-h\fR) option; for example:
+.sp
+ocpirun \-\-help
+.SH "OPTIONS"
+.sp
+Options to OpenCPI tools are either single letters following one hyphen or hyphen\-separated words or acronyms following two hyphens\&. Most options are specific to individual tools and are described in the manual pages for these tools\&. The options common to all tools are:
+.PP
+\fB\-d\fR \fI<directory>\fR
+.RS 4
+Specify the directory in which the tool operation should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&. This option can be specified more than once on the command line\&.
+.RE
+.PP
+\fB\-\-help\fR, \fB\-h\fR
+.RS 4
+Display usage information about the tool\&.
+.RE
+.PP
+\fB\-\-log\-level=\fR\fI<level>\fR, \fB\-l\fR \fI<level>\fR
+.RS 4
+Set the OpenCPI log level to the specified level\&. This option can be used to override the logging level set in the
+\fBOCPI_LOG_LEVEL\fR
+environment variable\&. See ENVIRONMENT VARIABLES for a description of possible values\&.
+.RE
+.PP
+\fB\-\-verbose\fR, \fB\-v\fR
+.RS 4
+Describe what is happening in tool operation in more detail\&.
+.RE
+.SH "ENVIRONMENT VARIABLES"
+.sp
+OpenCPI defines a variety of environment variables that can be used to configure and control its operation\&. Some of these variables are set during OpenCPI installation, some are set when the OpenCPI environment is established with the OpenCPI setup script, most can be used during OpenCPI development and some can be used when OpenCPI applications are run\&. All of these variables are prefixed with \fBOCPI_\fR\&. \fINearly all of of these environment variables are optional\fR, since not having them set is always the default\&. OpenCPI environment variables whose settings affect OpenCPI tools include:
+.PP
+\fBOCPI_CDK_DIR\fR
+.RS 4
+The location of the OpenCPI development or runtime installation\&. The OpenCPI setup script automatically sets this variable to its installation location, which is
+\fI<location\-of\-opencpi>\fR\fB/cdk/\fR\&.
+\fIThis environment variable should never be set directly\fR\&.
+.RE
+.PP
+\fBOCPI_LIBRARY_PATH\fR
+.RS 4
+A colon\-separated list of directories to be searched for runtime artifacts\&. This variable is set automatically (if not already set) when running component unit tests or applications in projects with
+\fBocpidev run\fR\&. In pure runtime environments, it may need to be set when artifacts are placed in directories of the user\(cqs choice\&.
+.RE
+.PP
+\fBOCPI_LOG_LEVEL\fR
+.RS 4
+A numeric value that indicates the amount of logging information to be output by the OpenCPI runtime system\&. This environment variable can be used during development for debugging purposes\&. The default is zero (0), indicating no logging output\&. The maximum is 20\&. Log level 8 provides generally useful startup and diagnostic information like artifact discovery feedback\&. Level 4 logs unusual events\&. Logging is directed to
+\fBstderr\fR\&. The
+\fB\-\-log\-level\fR
+option to the OpenCPI tools can be used to override the setting of this variable\&.
+.RE
+.PP
+\fBOCPI_PROJECT_PATH\fR
+.RS 4
+A colon\-separated set of project directories to be considered in addition to those projects that are registered\&. This variable can be used during development to augment the project temporarily when testing a new project; however, it is rarely used\&.
+.RE
+.PP
+\fBOCPI_PROJECT_REGISTRY_DIR\fR
+.RS 4
+The location of an alternative project registry\&. This environment variable can be used during development to redirect OpenCPI asset development from the OpenCPI project registry (located by default at $OCPI_CDK_DIR/\&.\&./project\-registry) to a different, alternative project registry\&. The directory specified in this environment variable becomes the project registry with which all subsequently created projects are associated\&.
+.RE
+.PP
+\fBOCPI_SYSTEM_CONFIG\fR
+.RS 4
+The OpenCPI system configuration file for the OpenCPI runtime system\&. By default, the installation creates the system configuration file at the path $OCPI_CDK_DIR/\&.\&./system\&.xml and creates a default system configuration file at the path $OCPI_CDK_DIR/default\-system\&.xml (see CONFIGURATION)\&. This environment variable can be used to override the installation default, but this is rarely done\&.
+.RE
+.sp
+To make an OpenCPI environment variable setting permanent for a given OpenCPI installation, set it (with the \fBbash\fR shell \fBexport\fR command) in the OpenCPI user\-specified environment variables script \fBuser\-env\&.sh\fR located in the installation directory (see CONFIGURATION)\&. The settings made in this script are applied to the OpenCPI installation when the OpenCPI user setup script is run\&.
+.sp
+The \fIOpenCPI Component Development Guide\fR contains a master list of OpenCPI environment variables used during component development\&.
+.SH "CONFIGURATION"
+.sp
+The files and scripts described below configure the OpenCPI development and/or runtime environments and thus affect the OpenCPI tools\&. The \fIOpenCPI User Guide\fR provides more information about them\&.
+.PP
+\fBopencpi\-setup\&.sh\fR
+.RS 4
+The OpenCPI environment setup script\&. This script establishes the OpenCPI environment when sourced with the following
+\fBbash\fR
+shell command, which must be run before the tools can be used:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+source <location\-of\-opencpi>/cdk/opencpi\-setup\&.sh \-s
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fBsystem\&.xml\fR, \fBdefault\-system\&.xml\fR
+.RS 4
+The OpenCPI system configuration file\&. This file specifies which OpenCPI user\-mode plugins should be enabled for the runtime system\&. Some OpenCPI tools require particular plugins to be enabled\&. However, the default system configuration files created by the OpenCPI installation generally enable the necessary plugins for the tools\&.
+.RE
+.PP
+\fBuser_env\&.sh\fR
+.RS 4
+The OpenCPI user\-specified environment variables script\&. The purpose of this file is to provide site\-specific, permanent non\-default values for OpenCPI environment variables that are used during OpenCPI development\&. It is not used in a runtime\-only environment\&. This file is automatically created at installation in the installation directory ($OCPI_CDK_DIR/\&.\&.)\&.
+\fINone of the environment variables in this file are required to be set\&.\fR
+If any of these variables are set, the file is sourced by the OpenCPI setup script when it is invoked to set up the OpenCPI environment\&.
+.RE
+.SH "DOCUMENTATION"
+.sp
+The OpenCPI documentation set is located at https://opencpi\&.gitlab\&.io\&.
+.sp
+The \fIOpenCPI User Guide\fR at that location provides a graphical roadmap that illustrates the suggested reading path through the OpenCPI documentation\&.
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "SEE ALSO"
+.sp
+ocpiadmin(1) ocpiav(1) ocpidev(1) ocpidriver(1) ocpigr(1) ocpihdl(1) ocpiremote(1) ocpirun(1) ocpiserve(1) ocpitest(1) ocpiview(1) ocpixml(1) ocpizynq(1)

@@ -4,12 +4,12 @@ OCPIADMIN(1)
 
 NAME
 ----
-ocpiadmin - command-line tool for managing an OpenCPI installation.
+ocpiadmin - command-line tool for managing an OpenCPI installation
 
 
 SYNOPSIS
 --------
-*ocpiadmin* ['<options>'] '<verb>' '<noun>' ['<name>' ['<argument>'... ]]
+*`ocpiadmin`* ['<options>'] '<verb>' '<noun>' ['<name>' ['<argument>'... ]]
 
 
 DESCRIPTION

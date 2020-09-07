@@ -1,0 +1,140 @@
+.\"     Title: ocpizynq
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 09/04/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIZYNQ" "1" "09/04/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpizynq \- command\-line tool for displaying configuration information for Zynq architecture platforms
+.SH "SYNOPSIS"
+.sp
+\fBocpizynq\fR [\fI<options>\fR] \fI<argument>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBocpizynq(1)\fR command\-line tool is used to obtain hardware configuration information about an OpenCPI\-supported Xilinx Zynq System\-on\-Chip (SoC) platform and can be used during development and debugging to determine exactly how the SoC is configured (usually by the bootstrap process outside of OpenCPI)\&. The tool operates on OpenCPI HDL platforms that use the Xilinx Zynq\-7000 series SoCs, such as the \fBzed\fR, \fBe31x\fR and \fBplutosdr\fR platforms and on HDL platforms that use the Xilinx Zynq Ultrascale+ chip architecture, like the \fBzcu104\fR platform\&.
+.sp
+Specify one of the following keywords as an argument:
+.PP
+\fBaxi_hp\fR
+.RS 4
+Display how the platform\(cqs AXI HP interfaces are configured\&.
+.RE
+.PP
+\fBdevcfg\fR
+.RS 4
+Display how the platform\(cqs devices are configured\&. This operation is not currently implemented for Zynq Ultrascale+ platforms\&.
+.RE
+.PP
+\fBclocks\fR
+.RS 4
+Display how the platform\(cqs clocks are configured\&. This operation is not currently implemented for Zynq Ultrascale+ platforms\&.
+.RE
+.PP
+\fBspi\fR
+.RS 4
+Display how the platform\(cqs SPI interfaces are configured\&.
+.RE
+.SH "OPTIONS"
+.PP
+\fB\-\-psclk=\fR\fI<frequency>\fR, \fB\-p\fR \fI<frequency>\fR
+.RS 4
+Specify the external clock rate in MHz into the Zynq platform\(cqs PS_CLK clock\&. The external clock rate is board\-dependent and is usually 33\&.3333e6\&. Use this option to specify the clock rate that the Zynq SoC is receiving from its PS_CLK pin\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Display the configuration of a Zynq 7000 series platform\(cqs clocks, specifying an external clock rate of 34\&.368 MHz:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpizynq \-\-psclk=34368 clocks
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Display the configuration for a Zynq platform\(cqs AXI HP interfaces:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpizynq axi_hp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Display the configuration for the Zynq platform\(cqs SPI interfaces:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpizynq spi
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-platform(1) ocpidev\-worker(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

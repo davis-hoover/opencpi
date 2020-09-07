@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpigr</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140410500883824"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpigr — command-line tool for generating GNU Radio Companion block files from OpenCPI artifacts</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpigr</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpigr(1)</code></strong></span> command-line tool is used to generate
+GNU Radio Companion (GRC)-compatible files that correspond
+to <span class="emphasis"><em>artifacts</em></span>, the binaries/executables generated from building OpenCPI workers.
+The <span class="strong"><strong><code class="literal">ocpigr</code></strong></span> tool searches OpenCPI project libraries for artifacts
+and generates GRC "block" files that correspond to the
+artifacts it discovers. These block files can then be used
+with GNU Radio Companion (GRC), the graphical user interface
+for developing GNU Radio applications, providing a way to use
+OpenCPI component implementations - the workers - in GNU Radio
+applications.</p><p>The <span class="strong"><strong><code class="literal">ocpigr</code></strong></span> tool searches the project libraries specified
+in the <span class="strong"><strong><code class="literal">OCPI_LIBRARY_PATH</code></strong></span> environment variable; if this variable
+is not set, it searches the libraries of projects registered in the
+OpenCPI project registry.</p><p>For each component specification in a library, it determines
+which platforms are implemented by the artifacts it finds,
+the authoring model(s) that each platform supports, and
+the component-specific and worker-specific properties and ports.
+It uses this data to build YAML-formatted,
+GRC-structured worker (<span class="emphasis"><em>&lt;worker-id&gt;</em></span><span class="strong"><strong><code class="literal">.block.yml</code></strong></span>), worker tree (<span class="strong"><strong><code class="literal">ocpi.tree.yml</code></strong></span>),
+per-platform domain (<span class="strong"><strong><code class="literal">ocpi_</code></strong></span><span class="emphasis"><em>&lt;platform-id&gt;</em></span><span class="strong"><strong><code class="literal">.block.yml</code></strong></span>), and container
+(<span class="strong"><strong><code class="literal">ocpi_container.yml</code></strong></span>) block files in the
+current directory or the directory specified in
+the <span class="strong"><strong><code class="literal">--directory</code></strong></span> (<span class="strong"><strong><code class="literal">-D</code></strong></span>) option.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>None.</p></div><div class="refsect1"><a id="_nouns"></a><h2>NOUNS</h2><p>None.</p></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>Options are either single letters following one
+hyphen or hyphen-separated words or acronyms following two hyphens.
+When invoked without options, <span class="strong"><strong><code class="literal">ocpigr</code></strong></span> displays help information.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--directory=</code></strong></span><span class="emphasis"><em>&lt;output-dir&gt;</em></span>, <span class="strong"><strong><code class="literal">-D</code></strong></span> <span class="emphasis"><em>&lt;output-dir&gt;</em></span>
+</span></dt><dd>
+    Specify the directory in which to place the generated GRC block files.
+    If this option is not used, <span class="strong"><strong><code class="literal">ocpigr</code></strong></span> places the
+    generated block files into the directory in which it runs.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--help</code></strong></span>, <span class="strong"><strong><code class="literal">-h</code></strong></span>
+</span></dt><dd>
+    Display usage information about the tool.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--verbose</code></strong></span>, <span class="strong"><strong><code class="literal">-v</code></strong></span>
+</span></dt><dd>
+    Describe what is happening during command
+    execution in more detail.
+</dd></dl></div></div><div class="refsect1"><a id="_environment_variables"></a><h2>ENVIRONMENT VARIABLES</h2><p>The following environment variables affect <span class="strong"><strong><code class="literal">ocpigr</code></strong></span> operation:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">OCPI_LIBRARY_PATH</code></strong></span>
+</span></dt><dd>
+    A list of directories, separated by colons, to be searched for artifacts.
+    When referencing the artifacts exported by a project with sources, be sure
+    to reference the project’s <span class="strong"><strong><code class="literal">exports/</code></strong></span> subdirectory, not its source location.
+</dd></dl></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Generate GRC block files for available artifacts
+and place them in the directory named <span class="strong"><strong><code class="literal">mydir</code></strong></span>:
+</p><pre class="screen">ocpigr --directory=mydir</pre></li><li class="listitem"><p class="simpara">
+Generate GRC block files for available artifacts
+into the current directory, displaying
+progress information about the operation:
+</p><pre class="screen">ocpigr --verbose</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
+<a class="ulink" href="ocpidev-registry.1.html" target="_top">ocpidev-registry(1)</a>
+<a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-registry(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>
