@@ -84,7 +84,7 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v1.7.0 & Updates for 1.7.0 release & 06/2020 \\
 			\hline
-			v2.0.0 & Updates for 2.0.0 release & 07/2020 \\
+			v2.0.0 & Updates for 2.0.0 release & 08/2020 \\
 			\hline
 		\end{tabularx}
 	\end{table}
@@ -121,13 +121,30 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 \def\ocpiversion{latest}  % Need to redefine so doc links are correct
 \section{Enhancements}
 
+\subsection{Deprecations}
+\label{sec:20_deprecations}
+The following have been marked as ``deprecated'' and support has been been removed in OpenCPI 2.x.
+\begin{itemize}
+\item CentOS 6 reaches end-of-life on 30 Nov 2020 and will no longer receive updates or security patches by the CentOS maintainers. Because of this, OpenCPI has dropped support for CentOS 6 as a development platform and an RCC runtime platform.
+\end{itemize}
+
 \subsection{CentOS 8}
 \label{sec:20_centos8}
 Support for CentOS 8 as an RCC only development platform has been added. HDL support will be made available when vendor tools support CentOS 8. CentOS 7 is still the recommended development platform for new and existing OpenCPI projects.
 
+\subsection{Digital Radio Controller for E31x}
+\label{sec:20_digital_radio}
+Adds digital radio controller (DRC) implementation for E31x platform. FSK app \code{fsk\_{}dig\_{}radio\_{}ctrl} is updated to show RX, TX, TXRX and is capable of being run using both \code{ocpirun} and ACI app.
+
 \subsection{Man Pages}
 \label{sec:20_man_pages}
-Additional man pages for \code{ocpidev} nouns are available. Also, man pages are available in HTML form at\\ \code{\${}OCPI\_{}CDK\_{}DIR/doc/man/html} including cross references between man pages.
+Additional man pages for \code{ocpidev} nouns are available. This includes man pages for: \code{ocpidev-application}, \code{ocpidev-assembly}, \code{ocpidev-card}, \code{ocpidev-component}, \code{ocpidev-device}, \code{ocpidev-library}, \code{ocpidev-platform}, \code{ocpidev-primitive}, \code{ocpidev-protocol}, \code{ocpidev-registry}, \code{ocpidev-slot}, \code{ocpidev-subdevice}, \code{ocpidev-test}, \code{ocpidev-worker}.\\
+
+New man pages include: \code{ocpiadmin}, \code{ocpidriver}, \code{ocpihdl}, \code{ocpiremote}, \code{ocpirun}, \code{ocpiserve}, \code{ocpiview}\\
+
+When the OpenCPI environment is setup using \code{opencpi-setup.sh}, the man pages can be viewed using the man command, e.g. \code{man ocpidev}.\\
+
+Man pages are also available in HTML form at \code{\${}OCPI\_{}CDK\_{}DIR/doc/man/html} including cross references between man pages.
 
 \subsection{\code{ocpiadmin}}
 \label{sec:20_ocpiadmin}
@@ -144,6 +161,16 @@ ocpiadmin install platform xsim
 ocpiadmin install platform e31x ocpi.osp.e3xx
 \end{lstlisting}
 
+\subsection{Optional Slave Support}
+\label{sec:20_optional_slave_support}
+Optional salves means these things:
+\begin{itemize}
+\item the proxy developer can declare that slaves are optional (the app can leave some out)
+\item the proxy developer can use a runtime query to see if a slave it declared as optional, is in fact present or not.
+\item the app developer can specify only a subset of the slaves of a proxy
+\item the attributes in the slave element in the OAS use ``slave'' and ``instance'' rather than ``name''
+\end{itemize}
+
 \subsection{Ubuntu 18.04}
 \label{sec:20_ubuntu18}
 Support for Ubuntu 18.04 as a full development host has been added. Ubuntu 18.04 is the only platform that supports OpenCPI integration with GNU Radio's ``GNU Radio Companion''. Developers and users of OpenCPI looking to use Ubuntu as a development host platform instead of CentOS are highly encouraged to use Ubuntu 18.04 instead of Ubuntu 16.04.
@@ -157,24 +184,21 @@ These new platforms, along with existing platforms, can be built using the new \
 
 \section{Changes and Notes}
 
-\subsection{Deprecations}
-\label{sec:20_deprecations}
-The following have been marked as ``deprecated'' and support has been been removed, or will be removed, in OpenCPI 2.x.
-\begin{itemize}
-\item CentOS 6 reaches end-of-life on 30 Nov 2020 and will no longer receive updates or security patches by the CentOS maintainers. Because of this, OpenCPI has dropped support for CentOS 6 as a development platform and an RCC runtime platform.
-\end{itemize}
-
 \subsection{Component Library Searching Algorithm}
 \label{sec:20_component_library_searching}
 Component Libraries are searched per project, with all indicated libraries searched in a project before moving to the next project. Previously, this was "library first" which caused confusing results. If a worker in an assembly is found in a library, it is chosen even if not built for the target platform. This is to maintain consistency between library searching that is target-independent with library searching by tools that is target-dependent.
 
-\subsection{\code{util} and \code{bsv} Primitive Libraries}
+\subsection{Primitive Libraries \code{util} and \code{bsv}}
 \label{sec:20_util_bsv_library}
 The util and bsv primitive libraries are not automatically made available to workers, to reduce namespace pollution. Primitive libraries are transitive - if a worker needs a library, the assembly automatically knows that and you do not have to mention the primitive library for the assembly.\\
 
 The bsv library usage is deprecated and it is now scoped in VHDL by the name of the package it exists in, so that a typical usage in VHDL is: \code{library ocpi\_{}core\_{}bsv; use ocpi\_{}core\_{}bsv.all}\\
 
 In general, primitive libraries can be labeled as being qualified by the package id of the project it is in, so that a developer does not need to now if the library name is used elsewhere.
+
+\subsection{Test Bitstream \code{testbias}}
+\label{sec:20_testbias}
+The test bitstream \code{testbias} is always exported and exists at the top of the framework's directory for the HDL platform. This same file is made available for SD cards as well as when using \code{ocpiremote} to run a remote system.
 
 \section{Major Known Deficiencies}
 \label{sec:20_bugs}
@@ -187,7 +211,6 @@ The following deficiencies are still present in 2.0:
 \item \bugref{1035}
 \item \bugref{1113}
 \item \bugref{1392}
-\item \bugref{2400}
 \item \bugref{2477}
 \item \bugref{3783}
 \item \bugref{2811}
@@ -217,7 +240,7 @@ A new clocking library has been added to \path{core/hdl/primitives}. This is a p
 
 \subsection{Man Pages}
 \label{sec:17_man_pages}
-Man pages are available for the \code{ocpidev} command and its subcommands. When the OpenCPI environment is setup using \code{opencpi-setup.sh}, the man pages can be viewed using the man command, e.g. "man ocpidev".
+Man pages are available for the \code{ocpidev} command and its subcommands. When the OpenCPI environment is setup using \code{opencpi-setup.sh}, the man pages can be viewed using the man command, e.g. \code{man ocpidev}.
 
 \subsection{\code{ocpiremote}}
 \label{sec:17_ocpiremote}
