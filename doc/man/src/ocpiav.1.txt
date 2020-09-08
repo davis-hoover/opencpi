@@ -1,0 +1,141 @@
+OCPIAV(1)
+=========
+
+
+NAME
+----
+ocpiav - command-line tool for managing the OpenCPI AV GUI
+
+
+SYNOPSIS
+--------
+*`ocpiav`* ['<options>'] '<verb>'
+
+
+DESCRIPTION
+-----------
+The *`ocpiav(1)`* command-line tool is used to start the OpenCPI
+AV graphical user interface (GUI) for managing OpenCPI assets. It
+can also be used to set up a desktop shortcut for starting the AV tool
+from a CentOS7 development host.
+
+The AV tool is a front end to *`ocpidev(1)`* that can perform most, but not all, of the
+development tasks that *`ocpidev`* can perform from within an Eclipse-based
+GUI.
+
+Installing AV
+~~~~~~~~~~~~~
+AV is an optional OpenCPI development tool; the 'OpenCPI Installation Guide' provides
+instructions on how to install it.
+
+Using AV
+~~~~~~~~~
+The 'OpenCPI AV User Guide' describes the AV tool's menus and dialogs. The OpenCPI
+tutorials demonstrate how to use the AV tool to perform OpenCPI development
+tasks.
+
+Working with OpenCPI Projects in AV
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AV is an Eclipse-based tool and thus operates
+in a “workspace”. The default workspace for the AV tool is
+located in the *`av/workspace/`* subdirectory of the OpenCPI installation.
+Do not create OpenCPI projects inside the AV tool
+because they will be created in the default AV workspace and will
+thus be inaccessible to other OpenCPI tools.
+
+Use the *`ocpidev create project`* operation
+to create a project outside of the AV tool and
+then use the AV tool to import
+it (do not copy it) into the AV workspace
+(File > Import > General > Import Existing Project
+dialog with the “copy” option NOT checked.)
+The 'OpenCPI User Guide' provides more information
+about this procedure, as do the OpenCPI tutorials.
+
+VERBS
+-----
+The verbs supported by *`ocpiav`* are:
+
+*`desktop`*::
+    Add a selection for starting AV
+    to the Applications > Programming menu bar on a CentOS7 development host.
+
+
+*`remove`*::
+    Remove the selection for AV
+    from the Applications > Programming menu bar on a CentOS7 development host.
+
+
+*`run`*::
+    Start AV from a *`bash`* shell.
+
+
+NOUNS
+-----
+None.
+
+OPTIONS
+------
+*`--help`*, *`-h`*::
+    Display usage information about the command-line tool.
+
+FILES/DIRECTORIES
+-----------------
+The following files and directories are relevant to OpenCPI AV operation:
+
+*`av.desktop`*::
+    The file that adds a menu selection for the OpenCPI AV
+    tool to the Applications > Programming desktop environment
+    menu bar on a CentOS7 development host. This file is created
+    by the *`ocpiav desktop`* operation in the CentOS7 user's
+    home directory in the subdirectory *`local/share/applications/`*.
+
+*`av/workspace/`*::
+    The subdirectory within the OpenCPI installation that contains
+    the default Eclipse workspace for the AV tool.
+
+EXAMPLES
+--------
+. Start the OpenCPI AV tool:
++
+----------
+ocpiav run
+----------
++
+. Add a menu selection for starting the OpenCPI AV tool
+from the CentOS7 desktop environment:
++
+--------------
+ocpiav desktop
+--------------
++
+. Remove the menu selection for the OpenCPI
+AV tool from the CentOS7 desktop environment:
++
+-------------
+ocpiav remove
+-------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-registry.1.html[ocpidev-registry(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+

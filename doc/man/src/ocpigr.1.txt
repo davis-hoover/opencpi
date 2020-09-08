@@ -1,0 +1,121 @@
+OCPIGR(1)
+=========
+
+
+NAME
+----
+ocpigr - command-line tool for generating GNU Radio Companion block files from OpenCPI artifacts
+
+
+SYNOPSIS
+--------
+*`ocpigr`* ['<options>']
+
+
+DESCRIPTION
+-----------
+The *`ocpigr(1)`* command-line tool is used to generate
+GNU Radio Companion (GRC)-compatible files that correspond
+to 'artifacts', the binaries/executables generated from building OpenCPI workers.
+The *`ocpigr`* tool searches OpenCPI project libraries for artifacts
+and generates GRC "block" files that correspond to the
+artifacts it discovers. These block files can then be used
+with GNU Radio Companion (GRC), the graphical user interface
+for developing GNU Radio applications, providing a way to use
+OpenCPI component implementations - the workers - in GNU Radio
+applications.
+
+The *`ocpigr`* tool searches the project libraries specified
+in the *`OCPI_LIBRARY_PATH`* environment variable; if this variable
+is not set, it searches the libraries of projects registered in the
+OpenCPI project registry.
+
+For each component specification in a library, it determines
+which platforms are implemented by the artifacts it finds,
+the authoring model(s) that each platform supports, and
+the component-specific and worker-specific properties and ports.
+It uses this data to build YAML-formatted,
+GRC-structured worker ('<worker-id>'*`.block.yml`*), worker tree (*`ocpi.tree.yml`*),
+per-platform domain (*`ocpi_`*'<platform-id>'*`.block.yml`*), and container
+(*`ocpi_container.yml`*) block files in the
+current directory or the directory specified in
+the *`--directory`* (*`-D`*) option.
+
+VERBS
+-----
+None.
+
+NOUNS
+-----
+None.
+
+OPTIONS
+------
+Options are either single letters following one
+hyphen or hyphen-separated words or acronyms following two hyphens.
+When invoked without options, *`ocpigr`* displays help information.
+
+*`--directory=`*'<output-dir>', *`-D`* '<output-dir>'::
+    Specify the directory in which to place the generated GRC block files.
+    If this option is not used, *`ocpigr`* places the
+    generated block files into the directory in which it runs.
+
+*`--help`*, *`-h`*::
+    Display usage information about the tool.
+
+*`--verbose`*, *`-v`*::
+    Describe what is happening during command
+    execution in more detail.
+
+
+ENVIRONMENT VARIABLES
+---------------------
+The following environment variables affect *`ocpigr`* operation:
+
+*`OCPI_LIBRARY_PATH`*::
+    A list of directories, separated by colons, to be searched for artifacts.
+    When referencing the artifacts exported by a project with sources, be sure
+    to reference the project’s *`exports/`* subdirectory, not its source location.
+    
+EXAMPLES
+--------
+. Generate GRC block files for available artifacts
+and place them in the directory named *`mydir`*:
++
+------------------------
+ocpigr --directory=mydir 
+------------------------
++
+. Generate GRC block files for available artifacts
+into the current directory, displaying
+progress information about the operation:
++
+-----------------
+ocpigr --verbose
+-----------------
+
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-registry.1.html[ocpidev-registry(1)]
+link:ocpidev-worker.1.html[ocpidev-registry(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+

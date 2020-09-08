@@ -20,13 +20,13 @@
 [ -z "$OCPI_CDK_DIR" ] && echo 'Environment variable OCPI_CDK_DIR not set' && exit 1
 
 target_platform="$1"
-name=gmp
-version=6.2.0  # latest as of 09/02/2020
+name=yaml-cpp
+version=0.6.3  # latest as of 09/02/2020
 pkg_name="$name-$version"
-description='Extended Precision Numeric library'
-dl_url="https://ftp.gnu.org/gnu/$name/${pkg_name}.tar.xz"
-extracted_dir="$pkg_name"
-cross_build=1
+description='YAML parsing and emitting library for C++'
+dl_url="https://github.com/jbeder/$name/archive/${pkg_name}.tar.gz"
+extracted_dir="$name-$pkg_name"  # yes this is correct, yes it is werid
+cross_build=0  # disabled until needed. Update `build/places` when enabled.
 
 # Download and extract source
 source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
@@ -38,12 +38,27 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        "$extracted_dir" \
        "$cross_build"
 
-# Configure/Make/Install
-../configure "${OcpiCrossHost:+--host=$OcpiCrossHost}" \
-  --prefix="$OcpiInstallDir" --exec-prefix="$OcpiInstallExecDir" \
-  --enable-fat=yes --enable-cxx=yes --with-pic
+# CentOS 7 needs to use `cmake3` as `cmake` is cmake 2. All other OS's have
+# `cmake` as cmake 3.
+CMAKE="$(command -v cmake3 || command -v cmake)"
+if [ -z "$CMAKE" ]; then
+  echo "Error: cannot find cmake or cmake3 which are required to build $name"
+  exit 1
+fi
+
+# Build/Test/Install (static lib)
+# usually with cmake you mkdir build && cd build. However, we are already in
+# an empty directory for the target platform so we will use that instead.
+"$CMAKE" -DCMAKE_INSTALL_PREFIX="$OcpiInstallExecDir" \
+  -DYAML_CPP_BUILD_TESTS=OFF -DYAML_BUILD_SHARED_LIBS=OFF ..
 make -j4
 make install
 
-# Cleanup
-rm -f "${OcpiInstallExecDir:?}/lib/*.la"
+# Build/Test/Install (shared lib)
+# Shared lib must be built separately as there is not the option to build
+# both static and shared at same time.
+make clean
+"$CMAKE" -DCMAKE_INSTALL_PREFIX="$OcpiInstallExecDir" \
+  -DYAML_CPP_BUILD_TESTS=OFF -DYAML_BUILD_SHARED_LIBS=ON ..
+make -j4
+make install

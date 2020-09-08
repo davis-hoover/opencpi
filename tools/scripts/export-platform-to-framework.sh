@@ -86,7 +86,7 @@ fi
 [ -n "$verbose" ] && echo Processing framework source-code-based links for rcc platform $platform
 while read path opts; do
   case "$path" in
-    \#*|""|end-of-runtime-for-tools|prerequisites) continue;;
+    \#*|""|end-of-runtime-for-tools|prerequisites|host-only-prerequisites) continue;;
   esac
   directory= library=$(basename $path) dest=lib options=($opts) foreign= tools= driver= useobjs=
   library=${library//-/_}

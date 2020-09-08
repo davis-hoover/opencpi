@@ -87,46 +87,6 @@ def to_dict(job):
     return job_dict
 
 
-# def dump(jobs_dict, path):
-#     """Outputs Job(s) to yaml file
-
-#     Provided jobs may be either a dictionary, a single Job, or a list of 
-#     Jobs. Will override yaml path if it exists. Will create path's 
-#     parent directories if they don't exist.
-
-#     Args:
-#         jobs_dict:  Dictionary to output to a yaml file
-#         path:       Path of output file
-#     """
-#     if not isinstance(jobs_dict, dict):
-#         jobs_dict = to_dict(jobs_dict)
-
-#     parents = [parent for parent in path.parents]
-#     for parent in parents[::-1]:
-#         parent.mkdir(exist_ok=True)
-
-#     # Don't use anchors 
-#     yaml.SafeDumper.ignore_aliases = lambda *args : True
-
-#     with open(str(path), 'w+') as yml:
-#         yaml.safe_dump(jobs_dict, yml, width=1000, default_flow_style=False)
-
-
-
-# def make_triggers(host_platform, cross_platforms, yaml_path, whitelist=None, overrides=None):
-#     triggers = []
-
-#     for cross_platform in cross_platforms:
-#         if whitelist and cross_platform.name not in whitelist[host_platform.name]:
-#             continue
-
-#         include = str(Path(yaml_path, host_platform.name, '{}.yml'.format(cross_platform.name)))
-#         trigger = make_trigger(host_platform, cross_platform, include, overrides=overrides)
-#         triggers.append(trigger)
-
-#     return triggers
-
-
 def make_jobs(stages, platform, projects, linked_platforms=None, 
               host_platform=None, overrides=None):
     """Creates Job(s) for project/platform combinations
@@ -663,7 +623,6 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
     raise ValueError('Unknown verb: {}'.format(verb))
 
 
-
 def make_rules(platform, host_platform=None):
     """Makes rules to control when a job is executed in a pipeline
 
@@ -788,58 +747,6 @@ def make_trigger_rules(platform, host_platform):
              r' ').format(host_platform.name, platform.name)
         }
     ]
-
-# def make_linked_rules(platform, host_platform, linked_platform):
-#     """Makes rules to control when a job is executed in a pipeline for
-#         jobs that have an associated platform
-
-#     Args:
-#         platform:        Platform of job to make rules for
-#         host_platform:   Host_platform of job to make rules for
-#         linked_platform: Associated platform of job to make rules for
-
-#     Returns:
-#         dictionary of rule strings
-#     """
-
-#     platform_link = ':'.join([platform.name, linked_platform.name])
-#     link_platform = ':'.join([linked_platform.name, platform.name])
-
-#     # Rules are the same as above with addition of a check for an
-#     # associated platform
-#     return [
-#         {'if': 
-#             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-#              r' && $CI_PLATFORMS =~ /(^| )({}|{})( |$)/i'
-#              r' && $CI_PIPELINE_SOURCE == "schedule"'
-#              r' ').format(host_platform.name, platform_link, link_platform)
-#         },
-#         {'if': 
-#             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-#              r' && $CI_PLATFORMS =~ /(^| )({}|{})( |$)/i'
-#              r' && $CI_PIPELINE_SOURCE == "web"'
-#              r' ').format(host_platform.name, platform_link, link_platform)
-#         },
-#         {'if': 
-#             (r'$CI_MR_PLATFORMS =~ /(^| )({})( |$)/i'
-#              r' && $CI_MR_PLATFORMS =~ /(^| )({}|{})( |$)/i'
-#              r' && $CI_PIPELINE_SOURCE == "merge_request_event"'
-#              r' ').format(host_platform.name, platform_link, link_platform)
-#         },
-#         {'if': 
-#             (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *\S*( +|:)({})(( |:)\S*)*\]/i'
-#              r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({}|{})(( |:)\S*)*\]/i'
-#              r' && $CI_PIPELINE_SOURCE == "push"'
-#              r' ').format(host_platform.name, platform_link, link_platform)
-#         },
-#         {'if':
-#             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-#              r' && $CI_PLATFORMS =~ /(^| )({}|{})( |$)/i'
-#              r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
-#              r' && $CI_PIPELINE_SOURCE == "push"'
-#              r' ').format(host_platform.name, platform_link, link_platform)
-#         }
-#     ]
 
 
 def stage_from_library(library):
