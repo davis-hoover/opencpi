@@ -1,5 +1,5 @@
 trigger-downstream:e3xx:
-  stage: build-rcc
+  stage: build
   extends:
     - .centos7
     - .docker
