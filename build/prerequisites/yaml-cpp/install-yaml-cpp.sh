@@ -17,32 +17,33 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-[ -z "$OCPI_CDK_DIR" ] && echo Environment variable OCPI_CDK_DIR not set && exit 1
+[ -z "$OCPI_CDK_DIR" ] && echo 'Environment variable OCPI_CDK_DIR not set' && exit 1
 
-name=yaml-cpp
-version=0.6.3
-description="YAML parsing and emitting library for C++"
-dl_url=https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.tar.gz
-dir="$name-$version"
-extracted_dir="$name-$name-$version"  # yes this is correct, yes it is werid
-cross_build=0  # disabled until needed. Update `build/places` when enabled.
 target_platform="$1"
+name=yaml-cpp
+version=0.6.3  # latest as of 09/02/2020
+pkg_name="$name-$version"
+description='YAML parsing and emitting library for C++'
+dl_url="https://github.com/jbeder/$name/archive/${pkg_name}.tar.gz"
+extracted_dir="$name-$pkg_name"  # yes this is correct, yes it is werid
+cross_build=0  # disabled until needed. Update `build/places` when enabled.
 
 # Download and extract source
 source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        "$target_platform" \
        "$name" \
        "$description" \
-       "$(dirname "$dl_url")" \
-       "$(basename "$dl_url")" \
+       "${dl_url%/*}" \
+       "${dl_url##*/}" \
        "$extracted_dir" \
        "$cross_build"
 
 # CentOS 7 needs to use `cmake3` as `cmake` is cmake 2. All other OS's have
 # `cmake` as cmake 3.
-CMAKE=cmake
-if [ -n "$(command -v cmake3)" ]; then
-  CMAKE=cmake3
+CMAKE="$(command -v cmake3 || command -v cmake)"
+if [ -z "$CMAKE" ]; then
+  echo "Error: cannot find cmake or cmake3 which are required to build $name"
+  exit 1
 fi
 
 # Build/Test/Install (static lib)
