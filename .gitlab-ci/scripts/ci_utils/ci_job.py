@@ -685,7 +685,7 @@ def make_job_rules(platform):
         {'if':
             # If platform in CI_COMMIT_MESSAGE env var and pipeline source
             # is a push 
-            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({})(( |:)\S*)*\]/i'
+            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
              r' && $CI_PIPELINE_SOURCE == "push"'
              r' ').format(platform.name)
         },
@@ -717,31 +717,31 @@ def make_trigger_rules(platform, host_platform):
     return [
         {'if': 
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PLATFORMS =~ /(^| |:)({})( |:|$)/i'
+             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
              r' && $CI_PIPELINE_SOURCE == "schedule"'
              r' ').format(host_platform.name, platform.name)
         },
         {'if': 
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PLATFORMS =~ /(^| |:)({})( |:|$)/i'
+             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
              r' && $CI_PIPELINE_SOURCE == "web"'
              r' ').format(host_platform.name, platform.name)
         },
         {'if': 
             (r'$CI_MR_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_MR_PLATFORMS =~ /(^| |:)({})( |:|$)/i'
+             r' && $CI_MR_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
              r' && $CI_PIPELINE_SOURCE == "merge_request_event"'
              r' ').format(host_platform.name, platform.name)
         },
         {'if': 
-            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({})(( |:)\S*)*\]/i'
-             r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:)({})(( |:)\S*)*\]/i'
+            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
+             r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)({})(( |:|,)\S*)*\]/i'
              r' && $CI_PIPELINE_SOURCE == "push"'
              r' ').format(host_platform.name, platform.name)
         },
         {'if':
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PLATFORMS =~ /(^| |:)({})( |:|$)/i'
+             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
              r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
              r' && $CI_PIPELINE_SOURCE == "push"'
              r' ').format(host_platform.name, platform.name)
