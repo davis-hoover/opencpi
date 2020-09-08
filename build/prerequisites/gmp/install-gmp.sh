@@ -1,4 +1,4 @@
-#!/bin/bash --noprofile
+#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,24 +17,33 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-version=6.2.0
-dir=gmp-$version
-# This server is unavailable:       https://ftp.gnu.org/gnu/gmp
-# Since we don't look at multiple URLs/mirrors (yet)
-# The one below is one of the advertised mirrors
-[ -z "$OCPI_CDK_DIR" ] && echo Environment variable OCPI_CDK_DIR not set && exit 1
-source $OCPI_CDK_DIR/scripts/setup-prerequisite.sh \
-       "$1" \
-       gmp \
-       "Extended Precision Numeric library" \
-       https://mirror.csclub.uwaterloo.ca/gnu/gmp \
-       $dir.tar.xz \
-       $dir \
-       1
-../configure ${OcpiCrossHost:+--host=$OcpiCrossHost} \
-  --prefix=$OcpiInstallDir --exec-prefix=$OcpiInstallExecDir \
+[ -z "$OCPI_CDK_DIR" ] && echo 'Environment variable OCPI_CDK_DIR not set' && exit 1
+
+target_platform="$1"
+name=gmp
+version=6.2.0  # latest as of 09/02/2020
+pkg_name="$name-$version"
+description='Extended Precision Numeric library'
+dl_url="https://ftp.gnu.org/gnu/$name/${pkg_name}.tar.xz"
+extracted_dir="$pkg_name"
+cross_build=1
+
+# Download and extract source
+source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
+       "$target_platform" \
+       "$name" \
+       "$description" \
+       "${dl_url%/*}" \
+       "${dl_url##*/}" \
+       "$extracted_dir" \
+       "$cross_build"
+
+# Configure/Make/Install
+../configure "${OcpiCrossHost:+--host=$OcpiCrossHost}" \
+  --prefix="$OcpiInstallDir" --exec-prefix="$OcpiInstallExecDir" \
   --enable-fat=yes --enable-cxx=yes --with-pic
-#=gmp \
-#  CFLAGS='-g -fPIC' CXXFLAGS='-g -fPIC' # why doesn't --with-pic do this?
-make -j4 && make install
-rm -f $OcpiInstallExecDir/lib/*.la
+make -j4
+make install
+
+# Cleanup
+rm -f "${OcpiInstallExecDir:?}/lib/*.la"
