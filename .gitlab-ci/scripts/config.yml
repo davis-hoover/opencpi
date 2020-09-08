@@ -6,11 +6,11 @@
 centos7:
   overrides:
     packages:centos7:
-        image: centos:7
-        tags: docker
-        script: scripts/install-packages.sh centos7
-        before_script: []
-        after_script: []
+      image: centos:7
+      tags: [docker]
+      script: scripts/install-packages.sh centos7
+      before_script: []
+      after_script: []
 modelsim:
   overrides:
     variables:

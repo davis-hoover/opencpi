@@ -227,3 +227,14 @@ def get_simulators(platforms):
             return_platforms.append(platform)
     
     return return_platforms
+
+
+def get_linked_platforms(platform, platforms, links_dict):
+    #TODO python docs
+    linked_platforms = []
+    
+    for linked_platform_name in links_dict[platform.name]:
+        linked_platform = get_platform(linked_platform_name, platforms)
+        linked_platforms.append(linked_platform)
+
+    return linked_platforms

@@ -24,9 +24,9 @@ def discover_projects(projects_path, blacklist=None):
     """
     projects = []
     for project_path in projects_path.glob('*'):
-        project_name = project_path.stem
+        project_name = str(project_path).split('.')[-1]
 
-        if project_name in blacklist:
+        if blacklist and project_name in blacklist:
             continue
 
         makefile_path = Path(project_path, 'Makefile')
