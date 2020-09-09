@@ -49,10 +49,6 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
         Job: namedtuple containing data necessary to create a job in a
              pipeline
     """
-    #TODO: Remove below
-    image = 'centos:7'
-    tags = ['docker']
-    
     args = locals()
     job_args = {}
 
@@ -318,6 +314,10 @@ def make_job(stage, stages, platform, project=None, name=None,
         resource_group = platform.name
     else:
         resource_group = None
+
+    #TODO: Remove below
+    image = 'centos:7'
+    tags = ['docker']
 
     job = Job(name, stage, script, tags=tags, before_script=before_script,
               after_script=after_script, rules=rules, overrides=overrides,
