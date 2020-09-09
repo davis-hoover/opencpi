@@ -16,6 +16,7 @@ generate-children:centos7:isim:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-isim.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -33,6 +34,7 @@ generate-children:centos7:matchstiq_z1:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-matchstiq_z1.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -50,6 +52,7 @@ generate-children:centos7:modelsim:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-modelsim.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -67,6 +70,7 @@ generate-children:centos7:xilinx13_3:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-xilinx13_3.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -84,6 +88,7 @@ generate-children:centos7:xilinx13_4:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-xilinx13_4.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -101,6 +106,7 @@ generate-children:centos7:xilinx19_2_aarch64:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-xilinx19_2_aarch64.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -118,6 +124,7 @@ generate-children:centos7:xsim:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-xsim.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -135,6 +142,7 @@ generate-children:centos7:zcu104:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-zcu104.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -152,6 +160,7 @@ generate-children:centos7:zed:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-zed.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -169,6 +178,7 @@ generate-children:centos7:zed_ise:
   artifacts:
     paths:
     - .gitlab-ci/yaml-children/centos7-zed_ise.yml
+  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
@@ -192,14 +202,13 @@ packages:centos7:
   after_script: []
   before_script: []
   dependencies: []
-  image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "schedule" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: scripts/install-packages.sh centos7
+  script: echo 'Hello, world'
   stage: prereqs
   tags:
   - docker
