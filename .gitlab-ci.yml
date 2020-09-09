@@ -29,6 +29,10 @@ generate-children:
     - .gitlab-ci/yaml-children
   script: .gitlab-ci/scripts/ci_yaml_generator.py
   stage: generate-children
+  tags:
+  - centos7
+  - shell
+  - opencpi
 include:
 - .gitlab-ci/yaml-parent/docs.yml
 - .gitlab-ci/yaml-parent/e3xx.yml
