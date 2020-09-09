@@ -49,6 +49,10 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
         Job: namedtuple containing data necessary to create a job in a
              pipeline
     """
+    #TODO: Remove below
+    image = 'centos:7'
+    tags = ['docker']
+    
     args = locals()
     job_args = {}
 
