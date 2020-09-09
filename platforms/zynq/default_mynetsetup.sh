@@ -73,15 +73,7 @@ for i in 1; do
     mkdir -p /mnt/net
     mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net  # second argument should be location of opencpi directory
     # mkdir -p /mnt/ocpi_core
-    # mount -t nfs -o udp,nolock,soft,intr $1:$2/projects/core /mnt/ocpi_core
-    # mkdir -p /mnt/ocpi_assets
-    # mount -t nfs -o udp,nolock,soft,intr $1:$2/projects/assets /mnt/ocpi_assets
-    # mkdir -p /mnt/ocpi_assets_ts
-    # mount -t nfs -o udp,nolock,soft,intr $1:$2/projects/assets_ts /mnt/ocpi_assets_ts
-    # Below this line other projects can be included
-    # Here is a template of including a OSP project
-    # mkdir -p /mnt/OSP_<OSP_name>
-    # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/OSP_<OSP_name> /mnt/OSP_<OSP_name>
+    # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/core /mnt/ocpi_core
   
     # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
     # This may change for 64 bit zynqs
@@ -100,7 +92,6 @@ for i in 1; do
   export OCPI_DEFAULT_HDL_DEVICE=pl:0
   #prevent looking for simulation tools such as xsim
   export OCPI_ENABLE_HDL_SIMULATOR_DISCOVERY=0
-  # Only override this file if it is customized beyond what is the default for the platform
 
   # **customize system.xml or ensure it is correctly configured**
   # Get ready to run some test xml-based applications
@@ -108,7 +99,7 @@ for i in 1; do
   # add any commands to be run every time this script is run
 
   echo Loading bitstream
-  if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_DIR/artifacts/testbias_$HDL_PLATFORM\_base.bitz; then
+  if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_CDK_DIR/$HDL_PLATFORM/*.bitz; then
     echo Bitstream successfully loaded
   else
     echo Bitstream load error
