@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 import yaml
 from collections import defaultdict
 from pathlib import Path
@@ -23,48 +24,46 @@ def main():
     with open(str(whitelist_path)) as yml:
         whitelist = yaml.safe_load(yml)
 
+    # Discover opencpi projects and platforms
     project_blacklist = ['tutorial']
     projects = ci_project.discover_projects(projects_path, 
                                             blacklist=project_blacklist)
     platforms = ci_platform.discover_platforms(projects, config=config)
     host_platforms = ci_platform.get_host_platforms(platforms)
     cross_platforms = ci_platform.get_cross_platforms(platforms)
-    platform_directive = get_platform_directive()
 
-    # If we are in a running pipeline, create child pipeline yamls
     if os.getenv('CI_PIPELINE_ID'):
-        for host_platform in host_platforms:
-            if whitelist and host_platform.name not in whitelist:
-                continue
+    # If we are in a running pipeline, create child pipeline yamls
+        host_platform = ci_platform.get_platform(sys.argv[1], host_platforms)
+        cross_platform = ci_platform.get_platform(sys.argv[2], cross_platforms)
 
-            if host_platform.name not in platform_directive.keys():
-                continue
-
-            host_whitelist = whitelist[host_platform.name]
-            for cross_platform in cross_platforms:
-                if whitelist and cross_platform.name not in host_whitelist:
-                    continue
-
-                if cross_platform.name not in platform_directive:
-                    continue
-
-                linked_platforms = ci_platform.get_linked_platforms(
-                    cross_platform, cross_platforms, platform_directive)
-                pipeline = ci_pipeline.make_child_pipeline(
-                    projects, host_platform, cross_platform, 
-                    linked_platforms=linked_platforms, config=config)
-                dump_path = Path(yaml_children_path, '{}-{}.yml'.format(
-                    host_platform.name, cross_platform.name))
-                ci_pipeline.dump(pipeline, dump_path)
-                
-    # If not in running pipeline, create parent pipeline yaml
+        # Get linked_platforms from platform_directive
+        platform_directive = get_platform_directive()
+        host_whitelist = whitelist[host_platform.name]
+        linked_platforms = ci_platform.get_linked_platforms(
+            cross_platform, cross_platforms, platform_directive)
+        linked_platforms = [linked_platform 
+                            for linked_platform in linked_platforms 
+                            if linked_platform.name in host_whitelist]
+        
+        # Make pipeline and dump to yaml
+        print("Generating pipeline for platform {} on host {}".format(
+            cross_platform.name, host_platform.name))
+        pipeline = ci_pipeline.make_child_pipeline(
+            projects, host_platform, cross_platform, 
+            linked_platforms=linked_platforms, config=config)
+        dump_path = Path(yaml_children_path, '{}-{}.yml'.format(
+            host_platform.name, cross_platform.name))
+        ci_pipeline.dump(pipeline, dump_path)
     else:
+    # If not in running pipeline, create parent pipeline yaml
+        print("Updating .gitlab-ci.yml for host platforms:")
         pipeline = ci_pipeline.make_parent_pipeline(
             projects, host_platforms, cross_platforms, yaml_parent_path, 
             yaml_children_path, whitelist=whitelist, config=config)
         dump_path = Path('.gitlab-ci.yml')
-        ci_pipeline.dump(pipeline, dump_path)          
-    
+        ci_pipeline.dump(pipeline, dump_path)        
+
 
 def get_platform_directive():
     #TODO python docs

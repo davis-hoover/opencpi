@@ -8,13 +8,13 @@ from pathlib import Path
 
 _Job = namedtuple('job', 'name stage script before_script after_script' 
                          ' artifacts tags resource_group rules'
-                         ' variables dependencies image trigger')
+                         ' variables dependencies image trigger strategy')
 
 
 def Job(name, stage=None, script=None, before_script=None, after_script=None, 
         artifacts=None, tags=None, resource_group=None, rules=None, 
         variables=None, dependencies=None, image=None, trigger=None, 
-        overrides=None):
+        strategy=None, overrides=None):
     """Constructs a Job
 
         Will use values in overrides to replace values of other args in
@@ -42,6 +42,8 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
                         artifacts from (NOT AWS)
         image:          Docker image for job to run in
         trigger:        The child pipeline to trigger
+        strategy:       Tells a parent pipeline's status to mirror a
+                        child pipeline's status if set to 'depend'
         overrides:      Dictionary to override standard values of above 
                         args
 
@@ -139,7 +141,11 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
     """
     jobs = []
 
-    for stage in ['prereqs', 'build', 'test']:
+    for stage in ['prereqs', 'build-rcc', 'build', 'test']:
+        if stage == 'build-rcc' and platform.is_host:
+            continue
+        if stage == 'build' and not platform.is_host:
+            continue
 
         if stage == 'test' and not platform.is_host:
             for project in projects:
@@ -241,12 +247,14 @@ def make_hdl_jobs(stages, platform, projects, linked_platforms,
 
 
 def make_trigger(host_platform, cross_platform, include, overrides=None):
+    #TODO: python docs
     stage = 'trigger-children'
     name = make_name(stage, cross_platform, host_platform)
     rules = make_rules(cross_platform, host_platform)
     trigger = {'include': include}
+    strategy = 'depend'
     job = Job(name, stage=stage, trigger=trigger, rules=rules, 
-              overrides=overrides)
+              strategy=strategy, overrides=overrides)
     
     return job
 
@@ -281,13 +289,18 @@ def make_job(stage, stages, platform, project=None, name=None,
                          linked_platform, library)
 
     rules = make_rules(platform, host_platform)
-    before_script = make_before_script(stage, stages, platform,
-                                       host_platform=host_platform, 
-                                       linked_platform=linked_platform,
-                                       do_ocpiremote=do_ocpiremote)
-    script = make_script(stage, platform, project=project, library=library, 
-                         linked_platform=linked_platform, name=name)
-    after_script = make_after_script(platform, do_ocpiremote=do_ocpiremote)
+    #TODO: Uncomment below
+    # before_script = make_before_script(stage, stages, platform,
+    #                                    host_platform=host_platform, 
+    #                                    linked_platform=linked_platform,
+    #                                    do_ocpiremote=do_ocpiremote)
+    # script = make_script(stage, platform, project=project, library=library, 
+    #                      linked_platform=linked_platform, name=name)
+    # after_script = make_after_script(platform, do_ocpiremote=do_ocpiremote)
+    before_script = []
+    after_script = []
+    script = "echo 'Hello, world'"
+    #TODO: Remove above
     dependencies = []
 
     if platform.is_host:
@@ -378,7 +391,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
                              '-e', ' '.join(excludes)])
     sleep_cmd = 'sleep 2'
 
-    if stage == 'build-host':
+    if stage == 'build':
         return [download_cmd, sleep_cmd, timestamp_cmd]
     
     source_cmd = 'source cdk/opencpi-setup.sh -e'
@@ -413,7 +426,12 @@ def make_after_script(platform, do_ocpiremote=False):
     Returns:
         list of command strings
     """
-    pipeline_id = '"$CI_PIPELINE_ID"'
+    # If running in a pipeline, set pipeline_id var to ID of pipeline.
+    # Otherwise, set to string "$CI_PIPELINE_ID"
+    pipeline_id = os.getenv("CI_PIPELINE_ID")
+    if not pipeline_id:
+        pipeline_id = '"$CI_PIPELINE_ID"'
+
     job_name = '"$CI_JOB_NAME"'
     upload_cmd = ' '.join(['if [ ! -f ".success" ];', 
                            'then .gitlab-ci/scripts/ci_artifacts.py upload',
@@ -451,7 +469,12 @@ def make_script(stage, platform, project=None, linked_platform=None,
     Returns:
         list of command strings
     """
-    pipeline_id = '"$CI_PIPELINE_ID"'
+    # If running in a pipeline, set pipeline_id var to ID of pipeline.
+    # Otherwise, set to string "$CI_PIPELINE_ID"
+    pipeline_id = os.getenv("CI_PIPELINE_ID")
+    if not pipeline_id:
+        pipeline_id = '"$CI_PIPELINE_ID"'
+
     job_name = '"$CI_JOB_NAME"'
     upload_cmd = ' '.join(['.gitlab-ci/scripts/ci_artifacts.py upload',
                            pipeline_id, job_name,
@@ -504,7 +527,7 @@ def make_scripts_cmd(stage, platform, name=None):
         else:
             return 'scripts/install-packages.sh {}'.format(platform.name)
 
-    if stage == 'build':
+    if stage in ['build', 'build-rcc']:
         return 'scripts/build-opencpi.sh {}'.format(platform.name) 
 
     if stage == 'generate-children':

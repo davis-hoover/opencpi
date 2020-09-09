@@ -49,39 +49,47 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
               'trigger-children', 'deploy']
     jobs = []
 
-    # Make job to generate child yaml files
-    script = '.gitlab-ci/scripts/ci_yaml_generator.py'
-    artifacts = {'paths': [str(yaml_children_path)]}
-    tags = ['centos7', 'shell', 'opencpi']
-    generate_children_job = ci_job.Job(name='generate-children', 
-                                       stage='generate-children', 
-                                       script=script, artifacts=artifacts,
-                                       tags=tags)
-    jobs.append(generate_children_job)
-
     # Make host platform jobs
     for host_platform in host_platforms:
-        if whitelist and host_platform.name not in whitelist:
-            continue
+        if whitelist:
+            if host_platform.name in whitelist:
+                host_whitelist = whitelist[host_platform.name]
+            else:
+                continue
 
+        print("\t", host_platform.name)
         overrides = get_overrides(host_platform, config)
         host_jobs = ci_job.make_jobs(stages, host_platform, projects, 
                                      overrides=overrides)
         jobs += host_jobs
 
-        # Make trigger jobs for each child pipeline
         for cross_platform in cross_platforms:
-            if whitelist and cross_platform.name not in whitelist[host_platform.name]:
+            if whitelist and cross_platform.name not in host_whitelist:
                 continue
 
-            overrides = get_overrides(cross_platform.name, config)
+            yaml_child_path = Path(yaml_children_path, 
+                                   '{}-{}.yml'.format(host_platform.name, 
+                                                      cross_platform.name))
+
+            # Make job to generate child yaml file
+            script = '.gitlab-ci/scripts/ci_yaml_generator.py'
+            artifacts = {'paths': [str(yaml_child_path)]}
+            tags = ['centos7', 'shell', 'opencpi']
+            stage = 'generate-children'
+            name = ci_job.make_name(stage, cross_platform, 
+                                    host_platform=host_platform)
+            rules = ci_job.make_rules(cross_platform, host_platform)
+            generate_child_job = ci_job.Job(name=name, stage=stage, 
+                                            script=script, artifacts=artifacts,
+                                            tags=tags, rules=rules)
+            jobs.append(generate_child_job)
+
+            # Make trigger job for child pipeline
             include = [{
-                'artifact': str(Path(
-                    yaml_children_path, 
-                    '{}-{}.yml'.format(host_platform.name, 
-                                       cross_platform.name))),
-                'job': generate_children_job.name
+                'artifact': str(yaml_child_path),
+                'job': generate_child_job.name
             }]
+            overrides = get_overrides(cross_platform.name, config)
             trigger = ci_job.make_trigger(host_platform, cross_platform, 
                                           include, overrides=overrides)
             jobs.append(trigger)
@@ -94,7 +102,7 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
 def make_child_pipeline(projects, host_platform, cross_platform, 
                         linked_platforms, config=None):
     if cross_platform.model == 'rcc':
-        stages = ['prereqs', 'build', 'test']
+        stages = ['prereqs', 'build-rcc', 'test']
     else:
         stages = ['build-primitives-core', 'build-primitives', 
                   'build-libraries', 'build-platforms', 'build-assemblies', 

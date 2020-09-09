@@ -21,7 +21,6 @@ def Platform(name, model, is_host=False, is_sim=False, ip=None, port=None):
     Returns:
         a Platform
     """
-
     return _Platform(name=name, model=model, is_host=is_host, is_sim=is_sim, 
                      ip=ip, port=port)
 
@@ -105,6 +104,8 @@ def get_platform(platform_name, platforms):
     for platform in platforms:
         if platform_name == platform.name:
             return platform
+
+    return None
 
 
 def get_platforms_by_type(platforms, platform_type):
@@ -235,6 +236,8 @@ def get_linked_platforms(platform, platforms, links_dict):
     
     for linked_platform_name in links_dict[platform.name]:
         linked_platform = get_platform(linked_platform_name, platforms)
-        linked_platforms.append(linked_platform)
+
+        if linked_platform:
+            linked_platforms.append(linked_platform)
 
     return linked_platforms
