@@ -72,7 +72,8 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
                                                       cross_platform.name))
 
             # Make job to generate child yaml file
-            script = '.gitlab-ci/scripts/ci_yaml_generator.py'
+            script = '.gitlab-ci/scripts/ci_yaml_generator.py {} {}'.format(
+                host_platform.name, cross_platform.name)
             artifacts = {'paths': [str(yaml_child_path)]}
             tags = ['centos7', 'shell', 'opencpi']
             stage = 'generate-children'

@@ -24,7 +24,7 @@ generate-children:centos7:isim:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(isim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 isim
   stage: generate-children
   tags:
   - centos7
@@ -40,7 +40,7 @@ generate-children:centos7:matchstiq_z1:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(matchstiq_z1)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 matchstiq_z1
   stage: generate-children
   tags:
   - centos7
@@ -56,7 +56,7 @@ generate-children:centos7:modelsim:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(modelsim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 modelsim
   stage: generate-children
   tags:
   - centos7
@@ -72,7 +72,7 @@ generate-children:centos7:xilinx13_3:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx13_3)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 xilinx13_3
   stage: generate-children
   tags:
   - centos7
@@ -88,7 +88,7 @@ generate-children:centos7:xilinx13_4:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx13_4)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 xilinx13_4
   stage: generate-children
   tags:
   - centos7
@@ -104,7 +104,7 @@ generate-children:centos7:xilinx19_2_aarch64:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx19_2_aarch64)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 xilinx19_2_aarch64
   stage: generate-children
   tags:
   - centos7
@@ -120,7 +120,7 @@ generate-children:centos7:xsim:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xsim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 xsim
   stage: generate-children
   tags:
   - centos7
@@ -136,7 +136,7 @@ generate-children:centos7:zcu104:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zcu104)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 zcu104
   stage: generate-children
   tags:
   - centos7
@@ -152,7 +152,7 @@ generate-children:centos7:zed:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zed)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 zed
   stage: generate-children
   tags:
   - centos7
@@ -168,7 +168,7 @@ generate-children:centos7:zed_ise:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zed_ise)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script: .gitlab-ci/scripts/ci_yaml_generator.py
+  script: .gitlab-ci/scripts/ci_yaml_generator.py centos7 zed_ise
   stage: generate-children
   tags:
   - centos7
@@ -243,11 +243,11 @@ trigger-children:centos7:isim:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(isim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-isim.yml
       job: generate-children:centos7:isim
+    strategy: depend
 trigger-children:centos7:matchstiq_z1:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -256,11 +256,11 @@ trigger-children:centos7:matchstiq_z1:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(matchstiq_z1)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-matchstiq_z1.yml
       job: generate-children:centos7:matchstiq_z1
+    strategy: depend
 trigger-children:centos7:modelsim:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -269,11 +269,11 @@ trigger-children:centos7:modelsim:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(modelsim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-modelsim.yml
       job: generate-children:centos7:modelsim
+    strategy: depend
 trigger-children:centos7:xilinx13_3:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -282,11 +282,11 @@ trigger-children:centos7:xilinx13_3:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx13_3)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xilinx13_3.yml
       job: generate-children:centos7:xilinx13_3
+    strategy: depend
 trigger-children:centos7:xilinx13_4:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -295,11 +295,11 @@ trigger-children:centos7:xilinx13_4:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx13_4)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xilinx13_4.yml
       job: generate-children:centos7:xilinx13_4
+    strategy: depend
 trigger-children:centos7:xilinx19_2_aarch64:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -308,11 +308,11 @@ trigger-children:centos7:xilinx19_2_aarch64:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx19_2_aarch64)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xilinx19_2_aarch64.yml
       job: generate-children:centos7:xilinx19_2_aarch64
+    strategy: depend
 trigger-children:centos7:xsim:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -321,11 +321,11 @@ trigger-children:centos7:xsim:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xsim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xsim.yml
       job: generate-children:centos7:xsim
+    strategy: depend
 trigger-children:centos7:zcu104:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -334,11 +334,11 @@ trigger-children:centos7:zcu104:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zcu104)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-zcu104.yml
       job: generate-children:centos7:zcu104
+    strategy: depend
 trigger-children:centos7:zed:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -347,11 +347,11 @@ trigger-children:centos7:zed:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zed)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-zed.yml
       job: generate-children:centos7:zed
+    strategy: depend
 trigger-children:centos7:zed_ise:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -360,8 +360,8 @@ trigger-children:centos7:zed_ise:
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zed_ise)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   stage: trigger-children
-  strategy: depend
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-zed_ise.yml
       job: generate-children:centos7:zed_ise
+    strategy: depend

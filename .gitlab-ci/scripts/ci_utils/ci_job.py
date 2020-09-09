@@ -8,13 +8,13 @@ from pathlib import Path
 
 _Job = namedtuple('job', 'name stage script before_script after_script' 
                          ' artifacts tags resource_group rules'
-                         ' variables dependencies image trigger strategy')
+                         ' variables dependencies image trigger')
 
 
 def Job(name, stage=None, script=None, before_script=None, after_script=None, 
         artifacts=None, tags=None, resource_group=None, rules=None, 
         variables=None, dependencies=None, image=None, trigger=None, 
-        strategy=None, overrides=None):
+        overrides=None):
     """Constructs a Job
 
         Will use values in overrides to replace values of other args in
@@ -42,8 +42,6 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
                         artifacts from (NOT AWS)
         image:          Docker image for job to run in
         trigger:        The child pipeline to trigger
-        strategy:       Tells a parent pipeline's status to mirror a
-                        child pipeline's status if set to 'depend'
         overrides:      Dictionary to override standard values of above 
                         args
 
@@ -251,10 +249,12 @@ def make_trigger(host_platform, cross_platform, include, overrides=None):
     stage = 'trigger-children'
     name = make_name(stage, cross_platform, host_platform)
     rules = make_rules(cross_platform, host_platform)
-    trigger = {'include': include}
-    strategy = 'depend'
+    trigger = {
+        'include': include, 
+        'strategy': 'depend'
+    }
     job = Job(name, stage=stage, trigger=trigger, rules=rules, 
-              strategy=strategy, overrides=overrides)
+              overrides=overrides)
     
     return job
 
