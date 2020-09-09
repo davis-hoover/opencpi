@@ -70,6 +70,7 @@
     fi
     export OCPI_SYSTEM_CONFIG
     export PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/bin:\$PATH
+    # path to SDK libraries, not related to opencpi but missing from boot system
     export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/sdk/lib:\$LD_LIBRARY_PATH
     ocpidriver load
     export TZ=$5
