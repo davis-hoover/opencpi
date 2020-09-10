@@ -26,7 +26,7 @@ def main():
 
     # Discover opencpi projects and platforms
     project_blacklist = ['tutorial']
-    projects = ci_project.discover_projects(projects_path, 
+    projects = ci_project.discover_projects(projects_path,
                                             blacklist=project_blacklist)
     platforms = ci_platform.discover_platforms(projects, config=config)
     host_platforms = ci_platform.get_host_platforms(platforms)
@@ -41,12 +41,12 @@ def main():
         host_whitelist = whitelist[host_platform.name]
         linked_platforms = ci_platform.get_linked_platforms(
             cross_platform, cross_platforms, whitelist=host_whitelist)
-        
+
         # Make pipeline and dump to yaml
         print("Generating pipeline for platform {} on host {}".format(
             cross_platform.name, host_platform.name))
         pipeline = ci_pipeline.make_child_pipeline(
-            projects, host_platform, cross_platform, 
+            projects, host_platform, cross_platform,
             linked_platforms=linked_platforms, config=config)
         dump_path = Path(yaml_children_path, '{}-{}.yml'.format(
             host_platform.name, cross_platform.name))
@@ -55,10 +55,10 @@ def main():
     # If not in running pipeline, create parent pipeline yaml
         print("Updating .gitlab-ci.yml for host platforms:")
         pipeline = ci_pipeline.make_parent_pipeline(
-            projects, host_platforms, cross_platforms, yaml_parent_path, 
+            projects, host_platforms, cross_platforms, yaml_parent_path,
             yaml_children_path, whitelist=whitelist, config=config)
         dump_path = Path('.gitlab-ci.yml')
-        ci_pipeline.dump(pipeline, dump_path)         
+        ci_pipeline.dump(pipeline, dump_path)
 
 
 if __name__ == '__main__':

@@ -19,11 +19,11 @@ def Platform(name, model, is_host=False, is_sim=False, ip=None, port=None):
         is_sim:  Whether platform is a simulator
         ip:      IP adress of platform device
         port:    Port of platform device
-    
+
     Returns:
         a Platform
     """
-    return _Platform(name=name, model=model, is_host=is_host, is_sim=is_sim, 
+    return _Platform(name=name, model=model, is_host=is_host, is_sim=is_sim,
                      ip=ip, port=port)
 
 
@@ -31,18 +31,18 @@ def discover_platforms(projects, config=None):
     """Search opencpi projects for platforms
 
     Will search for hdl platforms in:
-        <projects>/<project>/hdl/platforms 
+        <projects>/<project>/hdl/platforms
     and for rcc platforms in:
         <projects>/<project>/rcc/platforms
-    Determines if a directory is a platform by existence of a 
-        Makefile 
+    Determines if a directory is a platform by existence of a
+        Makefile
     or
         <platform_name>.mk
-    Determines if an hdl platform is a simulator by existence of 
+    Determines if an hdl platform is a simulator by existence of
         runSimExec.<platform_name>
 
     Args:
-        projects:       List of opencpi projects to search for 
+        projects:       List of opencpi projects to search for
                         platforms
         config:         Dictionary with platform names as keys and
                         additional platform configs as values
@@ -61,7 +61,7 @@ def discover_platforms(projects, config=None):
 
                 for platform_path in platforms_path.glob('*'):
                     platform_name = platform_path.stem
-                    
+
                     if platforms_path is hdl_platforms_path:
                         makefile = Path(platform_path, 'Makefile')
                         is_host = False
@@ -76,21 +76,21 @@ def discover_platforms(projects, config=None):
 
                     if not makefile.is_file():
                         continue
-                    
+
                     if config and platform_name in config:
-                        platform_data = {key:value for key,value 
+                        platform_data = {key:value for key,value
                                          in config[platform_name].items()
                                          if key in ['ip', 'port']}
                     else:
                         platform_data = {}
 
                     platform_model = platform_path.parents[1].stem
-                    platform = Platform(name=platform_name, 
-                                        model=platform_model, is_host=is_host, 
+                    platform = Platform(name=platform_name,
+                                        model=platform_model, is_host=is_host,
                                         is_sim=is_sim, **platform_data)
                     platforms.append(platform)
 
-    return platforms 
+    return platforms
 
 
 def get_platform(platform_name, platforms):
@@ -135,7 +135,7 @@ def get_platforms_by_type(platforms, platform_type):
 def get_cross_platforms(platforms):
     """Searches list of platforms for platforms with type 'cross'
 
-        Calls get_platforms_by_type() with 'cross' passed as 
+        Calls get_platforms_by_type() with 'cross' passed as
         platform_type arg.
 
     Args:
@@ -150,7 +150,7 @@ def get_cross_platforms(platforms):
 def get_host_platforms(platforms):
     """Searches list of platforms for platforms with type 'host'
 
-        Calls get_platforms_by_type() with 'host' passed as 
+        Calls get_platforms_by_type() with 'host' passed as
         platform_type arg.
 
     Args:
@@ -228,17 +228,32 @@ def get_simulators(platforms):
     for platform in platforms:
         if platform.is_sim:
             return_platforms.append(platform)
-    
+
     return return_platforms
 
 
 def get_linked_platforms(platform, platforms, links_dict=None, whitelist=None):
-    #TODO python docs
+    """Gets a platform's linked platforms
+
+        If not passed in with the links_dict arg, calls
+        get_platform_directive() to look up a platform's associated
+        platforms.
+
+    Args:
+        platform:   Platform to find linked platforms for
+        platforms:  List of all platforms available
+        links_dict: Dictionary with platform names as keys and names of
+                    associated platforms as values
+        whitelist:  List of names of allowed platforms
+
+    Returns:
+        List of associated platforms for a given platform
+    """
     if not links_dict:
         links_dict = get_platform_directive()
-        
+
     linked_platforms = []
-    
+
     for linked_platform_name in links_dict[platform.name]:
         if whitelist and linked_platform_name not in whitelist:
             continue
@@ -252,14 +267,21 @@ def get_linked_platforms(platform, platforms, links_dict=None, whitelist=None):
 
 
 def get_platform_directive():
-    #TODO python docs
+    """Gets the directive of what platforms to run in a pipeline
+
+        Directive is parsed from one of various env vars depending on
+        the source of the pipeline:
+
+        Source:    scheduled, web
+        Directive: CI_PLATFORMS
+
+        Source:    merge_request_event
+        Directive: CI_MR_PLATFORMS
+
+    Returns:
+        defaultdict of platforms parsed from directive
+    """
     platforms = defaultdict(set)
-    commit_message = os.getenv('CI_COMMIT_MESSAGE')
-
-    if not commit_message:
-        return platforms
-
-    commit_directive = re.search(r'\[ *ci (.*) *\]', commit_message)
     space_pattern = re.compile(r'([^ $]+)')
     colon_pattern = re.compile(r'([^:$]+)')
     comma_pattern = re.compile(r'([^,$]+)')
@@ -269,6 +291,9 @@ def get_platform_directive():
     elif os.getenv("CI_PIPELINE_SOURCE") == 'merge_request_event':
         platform_names = os.getenv("CI_MR_PLATFORMS")
     elif os.getenv("CI_PIPELINE_SOURCE") == 'push':
+        commit_message = os.getenv('CI_COMMIT_MESSAGE')
+        commit_directive = re.search(r'\[ *ci (.*) *\]', commit_message)
+
         if commit_directive:
             platform_names = commit_directive.group(1)
         else:
@@ -276,25 +301,29 @@ def get_platform_directive():
     else:
         return platforms
 
+    # Find all platforms separated by spaces
     spaces = space_pattern.findall(platform_names)
     for space in spaces:
+        # Find all patterns separated by a colon (linked platforms)
         colons = colon_pattern.findall(space)
         left = colons[0]
-        
-        if left:
-            l_commas = comma_pattern.findall(left)
-            
-            for l_comma in l_commas:
 
+        if left:
+            # Find all platforms separated by comma on left side of colon
+            l_commas = comma_pattern.findall(left)
+            for l_comma in l_commas:
                 if len(colons) == 2:
                     right = colons[1]
+                    # Find all platforms separated by comma on right side
+                    # of colon
                     r_commas = comma_pattern.findall(right)
 
                     for r_comma in r_commas:
+                        # Associate the platforms on left side of colon with
+                        # platforms on right side
                         platforms[l_comma].add(r_comma)
                         platforms[r_comma].add(l_comma)
-
                 else:
                     platforms[l_comma] = {}
-    
-    return platforms 
+
+    return platforms
