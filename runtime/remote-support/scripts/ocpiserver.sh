@@ -49,14 +49,13 @@ PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
 export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/system.xml
 export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/sdk/lib
 EOF
-. ./setup.sh
+source ./setup.sh
 platform=$OCPI_TOOL_PLATFORM
 
 echo Executing remote configuration command: $* 
-
 action=$1; shift
 
-while getopts u:l:w:a:p:s:d:o:P:Vh o
+while getopts u:l:w:a:p:s:d:o:P:BVh o
 do 
   case "$o" in 
     u) user=$OPTARG ;;
@@ -69,6 +68,7 @@ do
     h) help ;;
     o) options=$OPTARG ;; 
     P) platform=$OPTARG ;;
+    B) bs=-B ;;
     V) vg=-V ;;
   esac 
 done
@@ -81,7 +81,15 @@ start)
   set -e
   ocpidriver unload >&2 || : # in case it was loaded from a different version
   ocpidriver load >&2
+
+  if [ -n "$bs" ]; then
+    echo "Loading opencpi bitstream"
+    HDL_PLATFORM=$(cat hwplatform)
+    ocpihdl load -d pl:0 $OCPI_CDK_DIR/$HDL_PLATFORM/*.bitz
+  fi
+  
   log=$(date +%Y%m%d-%H%M%S).log
+
   if [ -n "$vg" ]; then
     export PATH=$PATH:prerequisites/valgrind/$platform/bin
     export VALGRIND_LIB=prerequisites/valgrind/$platform/lib/valgrind
