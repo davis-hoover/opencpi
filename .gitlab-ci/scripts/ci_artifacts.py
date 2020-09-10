@@ -83,21 +83,6 @@ def make_parser():
     return parser
 
 
-def exclude_paths(path):
-    """Excludes certain path from being added to tar.
-
-    Args:
-        path: Path to be validated for exclusion
-
-    Returns:
-        bool: True if path should be excluded; else False
-    """
-    if '.git' in path:
-        return True
-    
-    return False
-
-
 def upload(args):
     """Uploads artifacts to aws.
 
@@ -140,31 +125,44 @@ def upload(args):
         files.append(args.artifact)
         recursive =  True
 
-    # Create the tar
-    with tarfile.open('tar', "w:gz") as tar:
-        for f in files:
-            if f:
-                tar.add(f, exclude=exclude_paths, recursive=recursive)
-    
-    # Create and execute command to upload tar
-    cmd = ['aws', 's3', 'cp', 'tar', 
-        's3://opencpi-ci-artifacts/{}'.format(s3_object),
-        '--no-progress']
-    print('Executing: "{}"'.format(' '.join(cmd)))
+    # Create and upload tar file without using disk space. This is done by
+    # piping (i.e. streaming) the output of the tar command to `aws s3 cp`
+    # which is capable of reading from stdin.
+    # Don't use python's tarfile module. It does not handle changing the
+    # permissions of files correctly.
+    tar_fname = '-'  # use stdout since we are piping to `aws s3 cp`
+    tarfiles_fname = './.tarfiles'
+    with open(tarfiles_fname, 'wb') as fd:
+        fd.write(b'\n'.join([f.encode() for f in files]))
+    cmd = ['tar', '-zcf', tar_fname, '--files-from={}'.format(tarfiles_fname)]
+    if not recursive:
+        cmd.append('--no-recursion')
+    if args.tag and args.tag != 'failed-job':
+        cmd.append('--exclude-vcs')  # prevents uploading .git directory
+
+    # Build aws command
+    cmd += ['|', 'aws', 's3', 'cp', tar_fname,
+            's3://opencpi-ci-artifacts/{}'.format(s3_object),
+            '--no-progress']
+
+    # Using shell=True requires the command to be a string instead of an array
+    # shell=True is used to take advantage of the shell's '|' operator so we
+    # don't have to handle the piping ourselves.
+    cmd_str = ' '.join(cmd)
+    print('Executing: "{}"'.format(cmd_str))
     print('Uploading artifacts to: {}'.format(s3_url))
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
-                               universal_newlines=True)
+    process = subprocess.Popen(cmd_str, stdout=subprocess.PIPE,
+                               universal_newlines=True, shell=True)
     process.wait()
 
     if process.stderr:
         print(process.stderr.read().strip())
 
+    os.remove(tarfiles_fname)
+
     # If tag passed, tag uploaded artifact
     if args.tag:
         tag(args, s3_object)
-
-    # Delete tar
-    os.remove('tar')
 
     return process.returncode
 
@@ -185,9 +183,12 @@ def download(args):
     temp_dir = os.path.join('.', 'temp', '')
 
     # Create command to download artifacts, appending optional arguments
-    cmd = ['aws', 's3', 'cp', 
-        's3://opencpi-ci-artifacts/{}'.format(args.pipeline_id), temp_dir,
-        '--no-progress', '--recursive']
+    # We cannot use in memory only downloading and extracting due to
+    # --recursive flag. Let's hope there is enough free space to download and
+    # then extract all the artifacts.
+    cmd = ['aws', 's3', 'cp',
+           's3://opencpi-ci-artifacts/{}'.format(args.pipeline_id), temp_dir,
+           '--no-progress', '--recursive']
 
     if args.include:
         # By default in aws, '--include' does nothing unless 
@@ -219,8 +220,10 @@ def download(args):
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             print('Extracting: {}'.format(filepath))
-            with tarfile.open(filepath) as tar:
-                tar.extractall()
+            # Don't use python's tarfile module. It does not handle changing
+            # the permissions of files correctly.
+            subprocess.check_call(['tar', '-zxf', filepath])
+            os.remove(filepath)
 
     # Delete temp_dir and its contents
     rmtree(temp_dir)
