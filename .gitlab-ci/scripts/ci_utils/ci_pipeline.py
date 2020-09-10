@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 import yaml
 from collections import namedtuple
@@ -10,12 +11,14 @@ _Pipeline = namedtuple('pipeline', 'stages, jobs, include')
 
 
 def Pipeline(stages, jobs, include=None):
+    #TODO: python docs
     pipeline = _Pipeline(jobs=jobs, stages=stages, include=include)
 
     return pipeline
 
 
 def to_dict(pipeline):
+    #TODO: python docs
     pipeline_dict = {
         'stages': pipeline.stages,
         }
@@ -30,6 +33,7 @@ def to_dict(pipeline):
 
 
 def dump(pipeline, path):
+    #TODO: python docs
     if not isinstance(pipeline, dict):
         pipeline = to_dict(pipeline)
 
@@ -45,6 +49,7 @@ def dump(pipeline, path):
 def make_parent_pipeline(projects, host_platforms, cross_platforms, 
                          yaml_parent_path, yaml_children_path, whitelist=None, 
                          config=None):
+    #TODO: python docs
     stages = ['.pre', 'prereqs', 'build', 'test', 'generate-children', 
               'trigger-children', 'deploy']
     jobs = []
@@ -67,6 +72,7 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
             if whitelist and cross_platform.name not in host_whitelist:
                 continue
 
+            overrides = get_overrides(cross_platform.name, config)
             yaml_child_path = Path(yaml_children_path, 
                                    '{}-{}.yml'.format(host_platform.name, 
                                                       cross_platform.name))
@@ -79,7 +85,6 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
                     host_platform.name, cross_platform.name),
             ]
             artifacts = {'paths': [str(yaml_child_path)]}
-            #TODO: Fix tags, remove image
             tags = ['docker']
             image = 'centos:7'
             stage = 'generate-children'
@@ -88,7 +93,8 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
             rules = ci_job.make_rules(cross_platform, host_platform)
             generate_child_job = ci_job.Job(name=name, stage=stage, 
                                             script=script, artifacts=artifacts,
-                                            tags=tags, image=image, rules=rules)
+                                            tags=tags, image=image, 
+                                            rules=rules, overrides=overrides)
             jobs.append(generate_child_job)
 
             # Make trigger job for child pipeline
@@ -96,7 +102,6 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
                 'artifact': str(yaml_child_path),
                 'job': generate_child_job.name
             }]
-            overrides = get_overrides(cross_platform.name, config)
             trigger = ci_job.make_trigger(host_platform, cross_platform, 
                                           include, overrides=overrides)
             jobs.append(trigger)
@@ -108,6 +113,7 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
 
 def make_child_pipeline(projects, host_platform, cross_platform, 
                         linked_platforms, config=None):
+    #TODO: python docs
     if cross_platform.model == 'rcc':
         stages = ['prereqs', 'build-rcc', 'test']
     else:

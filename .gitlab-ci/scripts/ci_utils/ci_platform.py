@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-from collections import namedtuple
+import os
+import re
+from collections import namedtuple, defaultdict
 from pathlib import Path
 
 
@@ -230,14 +232,69 @@ def get_simulators(platforms):
     return return_platforms
 
 
-def get_linked_platforms(platform, platforms, links_dict):
+def get_linked_platforms(platform, platforms, links_dict=None, whitelist=None):
     #TODO python docs
+    if not links_dict:
+        links_dict = get_platform_directive()
+        
     linked_platforms = []
     
     for linked_platform_name in links_dict[platform.name]:
+        if whitelist and linked_platform_name not in whitelist:
+            continue
+
         linked_platform = get_platform(linked_platform_name, platforms)
 
         if linked_platform:
             linked_platforms.append(linked_platform)
 
     return linked_platforms
+
+
+def get_platform_directive():
+    #TODO python docs
+    platforms = defaultdict(set)
+    commit_message = os.getenv('CI_COMMIT_MESSAGE')
+
+    if not commit_message:
+        return platforms
+
+    commit_directive = re.search(r'\[ *ci (.*) *\]', commit_message)
+    space_pattern = re.compile(r'([^ $]+)')
+    colon_pattern = re.compile(r'([^:$]+)')
+    comma_pattern = re.compile(r'([^,$]+)')
+
+    if os.getenv("CI_PIPELINE_SOURCE") in ['scheduled', 'web']:
+        platform_names = os.getenv("CI_PLATFORMS")
+    elif os.getenv("CI_PIPELINE_SOURCE") == 'merge_request_event':
+        platform_names = os.getenv("CI_MR_PLATFORMS")
+    elif os.getenv("CI_PIPELINE_SOURCE") == 'push':
+        if commit_directive:
+            platform_names = commit_directive.group(1)
+        else:
+            platform_names = os.getenv("CI_PLATFORMS")
+    else:
+        return platforms
+
+    spaces = space_pattern.findall(platform_names)
+    for space in spaces:
+        colons = colon_pattern.findall(space)
+        left = colons[0]
+        
+        if left:
+            l_commas = comma_pattern.findall(left)
+            
+            for l_comma in l_commas:
+
+                if len(colons) == 2:
+                    right = colons[1]
+                    r_commas = comma_pattern.findall(right)
+
+                    for r_comma in r_commas:
+                        platforms[l_comma].add(r_comma)
+                        platforms[r_comma].add(l_comma)
+
+                else:
+                    platforms[l_comma] = {}
+    
+    return platforms 

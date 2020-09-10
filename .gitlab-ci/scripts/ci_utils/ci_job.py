@@ -289,18 +289,13 @@ def make_job(stage, stages, platform, project=None, name=None,
                          linked_platform, library)
 
     rules = make_rules(platform, host_platform)
-    #TODO: Uncomment below
-    # before_script = make_before_script(stage, stages, platform,
-    #                                    host_platform=host_platform, 
-    #                                    linked_platform=linked_platform,
-    #                                    do_ocpiremote=do_ocpiremote)
-    # script = make_script(stage, platform, project=project, library=library, 
-    #                      linked_platform=linked_platform, name=name)
-    # after_script = make_after_script(platform, do_ocpiremote=do_ocpiremote)
-    before_script = []
-    after_script = []
-    script = "echo 'Hello, world'"
-    #TODO: Remove above
+    before_script = make_before_script(stage, stages, platform,
+                                       host_platform=host_platform, 
+                                       linked_platform=linked_platform,
+                                       do_ocpiremote=do_ocpiremote)
+    script = make_script(stage, platform, project=project, library=library, 
+                         linked_platform=linked_platform, name=name)
+    after_script = make_after_script(platform, do_ocpiremote=do_ocpiremote)
     dependencies = []
 
     if platform.is_host:
@@ -314,10 +309,6 @@ def make_job(stage, stages, platform, project=None, name=None,
         resource_group = platform.name
     else:
         resource_group = None
-
-    #TODO: Remove below
-    image = 'centos:7'
-    tags = ['docker']
 
     job = Job(name, stage, script, tags=tags, before_script=before_script,
               after_script=after_script, rules=rules, overrides=overrides,
