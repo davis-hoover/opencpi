@@ -33,7 +33,7 @@ centos7:isim:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-isim.yml
-      job: generate-children:centos7:isim
+      job: centos7:isim
     strategy: depend
 centos7:matchstiq_z1:
   rules:
@@ -46,7 +46,7 @@ centos7:matchstiq_z1:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-matchstiq_z1.yml
-      job: generate-children:centos7:matchstiq_z1
+      job: centos7:matchstiq_z1
     strategy: depend
 centos7:modelsim:
   rules:
@@ -59,7 +59,7 @@ centos7:modelsim:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-modelsim.yml
-      job: generate-children:centos7:modelsim
+      job: centos7:modelsim
     strategy: depend
 centos7:xilinx13_3:
   rules:
@@ -72,7 +72,7 @@ centos7:xilinx13_3:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xilinx13_3.yml
-      job: generate-children:centos7:xilinx13_3
+      job: centos7:xilinx13_3
     strategy: depend
 centos7:xilinx13_4:
   rules:
@@ -85,7 +85,7 @@ centos7:xilinx13_4:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xilinx13_4.yml
-      job: generate-children:centos7:xilinx13_4
+      job: centos7:xilinx13_4
     strategy: depend
 centos7:xilinx19_2_aarch64:
   rules:
@@ -98,7 +98,7 @@ centos7:xilinx19_2_aarch64:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xilinx19_2_aarch64.yml
-      job: generate-children:centos7:xilinx19_2_aarch64
+      job: centos7:xilinx19_2_aarch64
     strategy: depend
 centos7:xsim:
   rules:
@@ -111,7 +111,7 @@ centos7:xsim:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-xsim.yml
-      job: generate-children:centos7:xsim
+      job: centos7:xsim
     strategy: depend
 centos7:zcu104:
   rules:
@@ -124,7 +124,7 @@ centos7:zcu104:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-zcu104.yml
-      job: generate-children:centos7:zcu104
+      job: centos7:zcu104
     strategy: depend
 centos7:zed:
   rules:
@@ -137,7 +137,7 @@ centos7:zed:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-zed.yml
-      job: generate-children:centos7:zed
+      job: centos7:zed
     strategy: depend
 centos7:zed_ise:
   rules:
@@ -150,188 +150,8 @@ centos7:zed_ise:
   trigger:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-zed_ise.yml
-      job: generate-children:centos7:zed_ise
+      job: centos7:zed_ise
     strategy: depend
-generate-children:centos7:isim:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-isim.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(isim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 isim
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:matchstiq_z1:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-matchstiq_z1.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(matchstiq_z1)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(matchstiq_z1)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 matchstiq_z1
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:modelsim:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-modelsim.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(modelsim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(modelsim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 modelsim
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:xilinx13_3:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-xilinx13_3.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx13_3)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_3)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 xilinx13_3
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:xilinx13_4:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-xilinx13_4.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx13_4)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx13_4)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 xilinx13_4
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:xilinx19_2_aarch64:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-xilinx19_2_aarch64.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xilinx19_2_aarch64)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xilinx19_2_aarch64)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 xilinx19_2_aarch64
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:xsim:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-xsim.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(xsim)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(xsim)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 xsim
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:zcu104:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-zcu104.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zcu104)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zcu104)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 zcu104
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:zed:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-zed.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zed)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 zed
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:zed_ise:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-zed_ise.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(zed_ise)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(zed_ise)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 zed_ise
-  stage: generate-children
-  tags:
-  - docker
 include:
 - .gitlab-ci/yaml-parent/docs.yml
 - .gitlab-ci/yaml-parent/e3xx.yml
