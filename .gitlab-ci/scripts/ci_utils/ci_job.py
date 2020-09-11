@@ -775,22 +775,6 @@ def make_trigger_rules(platform, host_platform):
     ]
 
 
-def make_child_rules():
-    """Makes rules to control when jobs in a child pipeline ar executed
-
-    Returns:
-        dictionary of rule strings
-    """
-    return [
-        {'if':
-            (r'$CI_PIPELINE_SOURCE == "push"'
-             r' || $CI_PIPELINE_SOURCE == "web"'
-             r' || $CI_PIPELINE_SOURCE == "scheduled"'
-             r' || $CI_PIPELINE_SOURCE == "merge_request_event" ')
-        }
-    ]
-
-
 def stage_from_library(library):
     """Gets the stage of job based on its library
 
