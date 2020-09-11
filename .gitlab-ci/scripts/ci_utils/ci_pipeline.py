@@ -182,7 +182,10 @@ def make_child_pipeline(projects, host_platform, cross_platform,
                   'build-sdcards', 'test']
 
     overrides = get_overrides(cross_platform, config)
-    workflow = {'rules': [{'if': '$CI_MERGE_REQUEST_ID'}]}
+    workflow = {'rules': [
+        {'if': '$CI_MERGE_REQUEST_ID'},
+        {'when': 'always'}
+    ]}
     jobs = ci_job.make_jobs(stages, cross_platform, projects,
                             host_platform=host_platform,
                             linked_platforms=linked_platforms,
