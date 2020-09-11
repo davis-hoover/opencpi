@@ -16,3 +16,6 @@ modelsim:
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
+zed:
+  ip: 10.0.0.103
+  port: 1000
