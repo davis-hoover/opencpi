@@ -7,10 +7,10 @@ from pathlib import Path
 from . import ci_job
 
 
-_Pipeline = namedtuple('pipeline', 'stages, jobs, include')
+_Pipeline = namedtuple('pipeline', 'stages, jobs, include, workflow')
 
 
-def Pipeline(stages, jobs, include=None):
+def Pipeline(stages, jobs, include=None, workflow=None):
     """ Create a Pipeline namedtuple
 
     Args:
@@ -21,7 +21,8 @@ def Pipeline(stages, jobs, include=None):
     Returns:
         Pipeline namedtuple
     """
-    pipeline = _Pipeline(jobs=jobs, stages=stages, include=include)
+    pipeline = _Pipeline(jobs=jobs, stages=stages, include=include,
+                         workflow=workflow)
 
     return pipeline
 
@@ -44,6 +45,9 @@ def to_dict(pipeline):
 
     if pipeline.include:
         pipeline_dict['include'] = pipeline.include
+
+    if pipeline.workflow:
+        pipeline_dict['workflow'] = pipeline.workflow
 
     for job in pipeline.jobs:
         pipeline_dict[job.name] = ci_job.to_dict(job)
@@ -130,7 +134,7 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
             tags = ['docker']
             image = 'centos:7'
             stage = 'generate-children'
-            name = ci_job.make_name(cross_platform, 
+            name = ci_job.make_name(cross_platform, stage=stage,
                                     host_platform=host_platform)
             rules = ci_job.make_rules(cross_platform, host_platform)
             generate_child_job = ci_job.Job(name=name, stage=stage,
@@ -178,12 +182,13 @@ def make_child_pipeline(projects, host_platform, cross_platform,
                   'build-sdcards', 'test']
 
     overrides = get_overrides(cross_platform, config)
+    workflow = {'rules': ci_job.make_child_rules()}
     jobs = ci_job.make_jobs(stages, cross_platform, projects,
                             host_platform=host_platform,
                             linked_platforms=linked_platforms,
                             overrides=overrides)
 
-    return Pipeline(stages, jobs)
+    return Pipeline(stages, jobs, workflow=workflow)
 
 
 def get_overrides(platform, config):
