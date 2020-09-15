@@ -62,11 +62,11 @@ make
 
 # Build kernel module
 echo ================================================================================
-if [ -n "$OcpiCrossCompile" -a -z "$OcpiKernelDir" ]; then
+if [[ -n "$OcpiCrossCompile" && -z "$OcpiKernelDir" ]]; then
   echo "This cross-compiled platform does not indicate where kernel headers are found."
   echo "I.e. the OcpiKernelDir variable is not set in the software platform definition."
   echo "Thus building the OpenCPI kernel device driver for $OCPI_TARGET_PLATFORM is skipped."
-elif [[ -e /.dockerenv || -e /run/.containerenv ]]; then
+elif [[ (-e /.dockerenv || -e /run/.containerenv) && -z "$OcpiCrossCompile" ]]; then
   echo "Docker, or docker like, environment detected. Building kernel device"
   echo "driver is not supported in this environment. Thus building the OpenCPI"
   echo "kernel device driver for $OCPI_TARGET_PLATFORM is skipped."

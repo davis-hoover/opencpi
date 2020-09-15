@@ -27,7 +27,7 @@ if ! PORT=`command -v port`; then
     exit 1
   }
 fi
-PKGS="python38 swig3 swig3-python scons coreutils gsed py38-numpy libtool autoconf automake py38-jinja2 yaml-cpp py-yaml"
+PKGS="cmake python38 swig3 swig3-python scons coreutils gsed py38-numpy libtool autoconf automake py38-jinja2 py-yaml"
 echo Using $PORT to install packages required by OpenCPI for $OCPI_TOOL_PLATFORM: $PKGS
 set -evx
 sudo $PORT install $PKGS

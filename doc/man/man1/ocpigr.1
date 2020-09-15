@@ -1,0 +1,132 @@
+.\"     Title: ocpigr
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 09/04/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIGR" "1" "09/04/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpigr \- command\-line tool for generating GNU Radio Companion block files from OpenCPI artifacts
+.SH "SYNOPSIS"
+.sp
+\fBocpigr\fR [\fI<options>\fR]
+.SH "DESCRIPTION"
+.sp
+The \fBocpigr(1)\fR command\-line tool is used to generate GNU Radio Companion (GRC)\-compatible files that correspond to \fIartifacts\fR, the binaries/executables generated from building OpenCPI workers\&. The \fBocpigr\fR tool searches OpenCPI project libraries for artifacts and generates GRC "block" files that correspond to the artifacts it discovers\&. These block files can then be used with GNU Radio Companion (GRC), the graphical user interface for developing GNU Radio applications, providing a way to use OpenCPI component implementations \- the workers \- in GNU Radio applications\&.
+.sp
+The \fBocpigr\fR tool searches the project libraries specified in the \fBOCPI_LIBRARY_PATH\fR environment variable; if this variable is not set, it searches the libraries of projects registered in the OpenCPI project registry\&.
+.sp
+For each component specification in a library, it determines which platforms are implemented by the artifacts it finds, the authoring model(s) that each platform supports, and the component\-specific and worker\-specific properties and ports\&. It uses this data to build YAML\-formatted, GRC\-structured worker (\fI<worker\-id>\fR\fB\&.block\&.yml\fR), worker tree (\fBocpi\&.tree\&.yml\fR), per\-platform domain (\fBocpi_\fR\fI<platform\-id>\fR\fB\&.block\&.yml\fR), and container (\fBocpi_container\&.yml\fR) block files in the current directory or the directory specified in the \fB\-\-directory\fR (\fB\-D\fR) option\&.
+.SH "VERBS"
+.sp
+None\&.
+.SH "NOUNS"
+.sp
+None\&.
+.SH "OPTIONS"
+.sp
+Options are either single letters following one hyphen or hyphen\-separated words or acronyms following two hyphens\&. When invoked without options, \fBocpigr\fR displays help information\&.
+.PP
+\fB\-\-directory=\fR\fI<output\-dir>\fR, \fB\-D\fR \fI<output\-dir>\fR
+.RS 4
+Specify the directory in which to place the generated GRC block files\&. If this option is not used,
+\fBocpigr\fR
+places the generated block files into the directory in which it runs\&.
+.RE
+.PP
+\fB\-\-help\fR, \fB\-h\fR
+.RS 4
+Display usage information about the tool\&.
+.RE
+.PP
+\fB\-\-verbose\fR, \fB\-v\fR
+.RS 4
+Describe what is happening during command execution in more detail\&.
+.RE
+.SH "ENVIRONMENT VARIABLES"
+.sp
+The following environment variables affect \fBocpigr\fR operation:
+.PP
+\fBOCPI_LIBRARY_PATH\fR
+.RS 4
+A list of directories, separated by colons, to be searched for artifacts\&. When referencing the artifacts exported by a project with sources, be sure to reference the project\(cqs
+\fBexports/\fR
+subdirectory, not its source location\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Generate GRC block files for available artifacts and place them in the directory named
+\fBmydir\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpigr \-\-directory=mydir
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Generate GRC block files for available artifacts into the current directory, displaying progress information about the operation:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpigr \-\-verbose
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-project(1) ocpidev\-registry(1) ocpidev\-registry(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

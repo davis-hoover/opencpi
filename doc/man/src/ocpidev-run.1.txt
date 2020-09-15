@@ -1,22 +1,22 @@
 OCPIDEV-RUN(1)
-================
+=============
 
 
 NAME
 ----
-ocpidev-run - runs applications and component unit tests.
+ocpidev-run - runs applications and component unit tests
 
 
 SYNOPSIS
 --------
-*ocpidev* *run* ['<options>'] '<noun>' ['<name>']
+*`ocpidev run`* ['<options>'] '<noun>' ['<name>']
 
 
 DESCRIPTION
 -----------
-The *run* verb invokes the OpenCPI tool for running component unit tests
+The *`run`* verb invokes the OpenCPI tool for running component unit tests
 and applications. Applications that are simply an application XML
-are not yet implemented using *ocpidev*.
+are not yet implemented using *`ocpidev(1)`*.
 
 Component unit tests have five phases:
 
@@ -33,7 +33,7 @@ creating execution scripts to use them all for executing feasible tests.
 - Verify: verify results from the execution of tests on workers and platforms.
 
 One or more "modes" based on these phases can be specified
-with the *--mode* option to the *run* verb.
+with the *`--mode`* option to the *run* verb.
 	
 There are two types of options for setting platforms.
 The first type (*`--rcc-platform`* and *`--hdl-platform`*) cause
@@ -44,23 +44,23 @@ platform (prepare, run, and verify phases) where the command is executed.
 
 Asset types to be specified in the '<noun>' argument are:
 
-*application*::
+*`application`*::
     Run the specified application.
 
-*applications*::
+*`applications`*::
     Run all the applications in a project.
 
-*library*::
+*`library`*::
     Run all the unit tests in the specified component library.
     
-*project*::
+*`project`*::
     Run all applications and component unit tests in
     the specified project.
 
-*test*::
+*`test`*::
     Run the specified component unit test.
 
-*tests*::
+*`tests`*::
     Run all the component unit tests in a
     project or library.
 
@@ -139,17 +139,17 @@ Options That Apply to Unit Tests Only
 *`--mode=`*'<mode>'[,'<mode>'[,'<mode>'...]]::
     Specify which phase(s) of the unit test to execute.
     Valid modes are:
-    - *all*:  execute all five phases (the default if the *`--mode`* option is not used)
-    - *gen*: execute generate phase
-    - *gen_build*: execute generate and build phases
-    - *prep_run_verify*: execute prepare, run, and verify phases
-    - *prep*: execute prepare phase
-    - *run*: execute run phase
-    - *prep_run*: execute prepare and run phases
-    - *verify*: execute verify phase 
-    - *view*: execute the view script (view.sh) on an already executed run  
-    - *clean_all*: clean all generated files
-    - *clean_run*: clean all files generated during the run phase
+    - *`all`*:  execute all five phases (the default if the *`--mode`* option is not used)
+    - *`gen`*: execute generate phase
+    - *`gen_build`*: execute generate and build phases
+    - *`prep_run_verify`*: execute prepare, run, and verify phases
+    - *`prep`*: execute prepare phase
+    - *`run`*: execute run phase
+    - *`prep_run`*: execute prepare and run phases
+    - *`verify`*: execute verify phase 
+    - *`view`*: execute the view script (view.sh) on an already executed run  
+    - *`clean_all`*: clean all generated files
+    - *`clean_run`*: clean all files generated during the run phase
     
 *`--only-platform=`*'<platform>', *-G* '<platform>'+::
     Specify the runtime platform to use with a unit test.
@@ -163,11 +163,20 @@ Options That Apply to Unit Tests Only
 *`--view`*::
     Run the view script (view.sh) for the test at the conclusion of the
     test's execution.
-    
+
+ENVIRONMENT VARIABLES
+---------------------
+The following environment variables affect *`ocpidev run`* operation:
+
+*`OCPI_LIBRARY_PATH`*::
+    A list of directories, separated by colons, to be searched for runtime artifacts.
+    This variable is set automatically (if not already set) when running component
+    unit tests or applications in projects with *`ocpidev run`*.
+   
 
 EXAMPLES
 --------
-. Run an application named *myapp*:
+. Run an application named *`myapp`*:
 +
 ----------------------------
 ocpidev run application myapp
@@ -223,6 +232,7 @@ link:ocpidev-show.1.html[ocpidev-show(1)]
 link:ocpidev-unregister.1.html[ocpidev-unregister(1)]
 link:ocpidev-unset.1.html[ocpidev-unset(1)]
 link:ocpidev-utilization.1.html[ocpidev-utilization(1)]
+link:ocpirun.1.html[ocpirun(1)]
 
 COPYING
 -------
@@ -231,6 +241,4 @@ you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
 option) any later version.
-
-
 

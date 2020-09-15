@@ -6,16 +6,13 @@
 centos7:
   overrides:
     packages:centos7:
-        image: centos:7
-        tags: docker
-        script: scripts/install-packages.sh centos7
-        before_script: []
-        after_script: []
+      image: centos:7
+      tags: [docker]
+      script: scripts/install-packages.sh centos7
+      before_script: []
+      after_script: []
 modelsim:
   overrides:
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
-zed:
-  ip: 10.0.0.103
-  port: 1000

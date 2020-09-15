@@ -3,4 +3,4 @@
 from .ci_project import *
 from .ci_platform import *
 from .ci_job import *
-from .ci_osp import *
+from .ci_pipeline import *

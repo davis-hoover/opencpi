@@ -1,0 +1,706 @@
+#################
+# Jobs - Prereq #
+#################
+.install-packages:
+  stage: prereq
+  before_script: []
+  script:
+    - yum -y distro-sync
+    - ./scripts/install-packages.sh
+    - touch "${CI_PROJECT_DIR}/.success"
+  after_script: []
+
+.install-prereqs:
+  extends:
+    - .standard-artifacts
+  stage: prereq
+  before_script:
+    - date "+%Y-%m-%d %H:%M:%S" > timestamp
+    - cat timestamp
+    - sleep 2
+    - ls -lh
+  script:
+    - ./scripts/install-prerequisites.sh $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+################
+# Jobs - Build #
+################
+.build-opencpi:
+  extends:
+    - .standard-artifacts
+  stage: build
+  script:
+    - ./scripts/build-opencpi.sh $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-rcc:
+  extends:
+    - .build-opencpi
+  stage: build-rcc
+
+
+###########################
+# Jobs - Build-Primitives #
+###########################
+.build-primitives:
+  extends:
+    - .standard-artifacts
+  stage: build-primitives
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/hdl/primitives --hdl-platform $PLATFORM
+    - ocpidev build -d projects/platform/hdl/primitives --hdl-platform $PLATFORM
+    - ocpidev build -d projects/assets/hdl/primitives --hdl-platform $PLATFORM
+    - ocpidev build -d projects/inactive/hdl/primitives --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+###########################
+# Jobs - Build-Components #
+###########################
+.build-components-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-assets-base:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/base_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-assets-comms:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/comms_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-assets-dsp:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/dsp_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-assets-misc:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/misc_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-assets-util:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/components/util_comps --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets_ts/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-components-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/components --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+########################
+# Jobs - Build-Devices #
+########################
+.build-devices-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-devices-platform:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/platform/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-devices-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-devices-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets_ts/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-devices-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/hdl/devices --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+#########################
+# Jobs - Build-Adapters #
+#########################
+.build-adapters-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/hdl/adapters --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-adapters-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/adapters --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+######################
+# Jobs - Build-Cards #
+######################
+.build-cards-core:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/core/hdl/cards --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-cards-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/cards --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-cards-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-workers
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/hdl/cards --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+##########################
+# Jobs - Build-Platforms #
+##########################
+.build-platforms-core:
+  extends:
+    - .standard-artifacts
+  stage: build-platforms
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl platforms -d projects/core --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-platforms-platform:
+  extends:
+    - .standard-artifacts
+  stage: build-platforms
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl platforms -d projects/platform --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-platforms-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-platforms
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl platforms -d projects/assets --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-platforms-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-platforms
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build hdl platforms -d projects/inactive --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+###########################
+# Jobs - Build-Assemblies #
+###########################
+.build-assemblies-platform:
+  extends:
+    - .standard-artifacts
+  stage: build-assemblies
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/platform/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-assemblies-assets:
+  extends:
+    - .standard-artifacts
+  stage: build-assemblies
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-assemblies-assets_ts:
+  extends:
+    - .standard-artifacts
+  stage: build-assemblies
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/assets_ts/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-assemblies-inactive:
+  extends:
+    - .standard-artifacts
+  stage: build-assemblies
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build -d projects/inactive/hdl/assemblies --hdl-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+#####################
+# Jobs - Build-Test #
+#####################
+.build-test-opencpi:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - ./scripts/test-opencpi.sh --no-hdl
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-core:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/core --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-base:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/base_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-comms:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/comms_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-dsp:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/dsp_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-misc:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/misc_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets-util:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets/components/util_comps --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-assets_ts:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/assets_ts --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.build-test-inactive:
+  stage: build-assemblies
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev build test -d projects/inactive --$MODEL-platform $PLATFORM
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+##################
+# Build - SDcard #
+##################
+.build-sdcard:
+  stage: build-sdcard
+  artifacts:
+    paths: []
+  script:
+    - .gitlab-ci/artifacts.py download -i "*${SW_PLATFORM}.tar.gz"
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+###############
+# Jobs - Test #
+###############
+.test-opencpi:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - ./scripts/test-opencpi.sh --no-hdl
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-core:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/core --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-base:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/base_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-comms:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/comms_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-dsp:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/dsp_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-misc:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/misc_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets-util:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets/components/util_comps --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-assets_ts:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/assets_ts --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+.test-inactive:
+  stage: test
+  artifacts:
+    paths: []
+  script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpidev run tests -d projects/inactive --only-platform $PLATFORM --mode prep_run_verify;
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
+#############
+# Platforms #
+#############
+.centos7:
+  extends:
+    - .rules-default
+  tags:
+    - opencpi
+    - centos7
+    - shell
+  variables:
+    PLATFORM: 'centos7'
+    IMAGE: 'centos:7'
+
+.centos6:
+  extends:
+    - .rules-default
+  tags:
+    - opencpi
+    - centos6
+    - shell
+  variables:
+    HOST_PLATFORM: 'centos6'
+    PLATFORM: 'centos6'
+    IMAGE: 'centos:6'
+
+.xsim:
+  variables:
+    PLATFORM: 'xsim'
+    MODEL: 'hdl'
+  rules:
+    # If specified in CI_HDL_PLATFORM and source is scheduled pipeline
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(xsim|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    # If specified in CI_HDL_PLATFORM and source is web UI
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(xsim|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    # If specified in CI_HDL_PLATFORM_MR and source is merge request
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(xsim|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    # If specified in commit message and source is push
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(xsim|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    # If specified in CI_HDL_PLATFORM, nothing specified in commit message, and source is push
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(xsim|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.modelsim:
+  variables:
+    PLATFORM: 'modelsim'
+    MODEL: 'hdl'
+    OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
+    OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(modelsim|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(modelsim|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(modelsim|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(modelsim|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(modelsim|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.isim:
+  variables:
+    PLATFORM: 'isim'
+    MODEL: 'hdl'
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(isim|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(isim|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(isim|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(isim|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(isim|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.xilinx13_3:
+  extends:
+    - .rules-default
+  variables:
+    PLATFORM: 'xilinx13_3'
+    HW_PLATFORM: 'zed'
+    SW_PLATFORM: 'xilinx13_3'
+    MODEL: 'rcc'
+
+.xilinx13_4:
+  extends:
+    - .rules-default
+  variables:
+    PLATFORM: 'xilinx13_4'
+    HW_PLATFORM: 'zed'
+    SW_PLATFORM: 'xilinx13_4'
+    MODEL: 'rcc'
+
+.zed:
+  variables:
+    PLATFORM: 'zed'
+    HW_PLATFORM: 'zed'
+    SW_PLATFORM: 'xilinx13_4'
+    IP: '10.0.0.103'
+    PORT: '1000'
+    OCPI_SERVER_ADDRESSES: '10.0.0.103:1000'
+    MODEL: 'hdl'
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zed|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zed|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(zed|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zed|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.matchstiq_z1-xilinx13_3:
+  variables:
+    PLATFORM: 'matchstiq_z1'
+    HW_PLATFORM: 'matchstiq_z1'
+    SW_PLATFORM: 'xilinx13_3'
+    IP: '10.0.0.53'
+    PORT: '1000'
+    MODEL: 'hdl'
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(matchstiq_z1|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(matchstiq_z1|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(matchstiq_z1|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(matchstiq_z1|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(matchstiq_z1|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.zed_ise-xilinx13_4:
+  variables:
+    PLATFORM: 'zed_ise'
+    HW_PLATFORM: 'zed_ise'
+    SW_PLATFORM: 'xilinx13_4'
+    IP: '10.0.0.1003'
+    PORT: '1000'
+    MODEL: 'hdl'
+    XILINXD_LICENSE_FILE: '2101@sembach.opencpi.net'
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zed_ise|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zed_ise|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(zed_ise|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zed_ise|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zed_ise|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.zcu104:
+  variables:
+    PLATFORM: 'zcu104'
+    HW_PLATFORM: 'zcu104'
+    MODEL: 'hdl'
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zcu104|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zcu104|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(zcu104|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(zcu104|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(zcu104|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.e3xx:
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(e31x|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(e31x|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(e31x|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(e31x|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(e31x|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+.plutosdr:
+  rules:
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(plutosdr|all)( |$)/i && $CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(plutosdr|all)( |$)/i && $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_HDL_PLATFORM_MR =~ /(^| )(plutosdr|all)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *\S* +(plutosdr|all)( \S*)*\]/i && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_HDL_PLATFORM =~ /(^| )(plutosdr|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
+
+
+########
+# Misc #
+########
+.standard-artifacts:
+  artifacts: 
+    paths: []
+
+.rules-default:
+  rules:
+    - when: on_success
+
+.docker:
+  tags:
+    - docker
+  image: $IMAGE
+
+.ocpiremote:
+  before_script:
+    - .gitlab-ci/artifacts.py download -i "*${PLATFORM}.tar.gz" "*centos7.tar.gz"
+    - sleep 5
+    - touch timestamp
+    - ls -lh
+    - source ./cdk/opencpi-setup.sh -e
+    - export OCPI_SERVER_ADDRESSES="${IP}:${PORT}"
+    - ocpiremote deploy -i "$IP" -s "$SW_PLATFORM" -w "$HW_PLATFORM"
+    - sleep 5
+    - ocpiremote load -i "$IP" -r "$PORT" -w "$HW_PLATFORM" -s "$SW_PLATFORM"
+    - ocpiremote start -i "$IP"
+  after_script:
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpiremote unload -i "$IP"
+    - |-
+      if [ ! -f "${CI_PROJECT_DIR}/.success" ]; then
+        "${CI_PROJECT_DIR}/.gitlab-ci/artifacts.py" upload . -t 'failed-job'
+        exit 1
+      fi
+    - rm -f "${CI_PROJECT_DIR}/.success"
+    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s timestamp

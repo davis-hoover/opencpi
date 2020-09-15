@@ -1,0 +1,24 @@
+trigger-downstream:plutosdr:
+  stage: build
+  extends:
+    - .centos7
+    - .docker
+    - .plutosdr
+  before_script: []
+  script:
+    - export REF_NAME="opencpi-${CI_COMMIT_REF_NAME//\//%2F}"
+    - >
+      curl --fail
+      "https://gitlab.com/api/v4/projects/15332497/repository/branches/$REF_NAME" 2> /dev/null
+      && export REF_NAME="opencpi-$CI_COMMIT_REF_NAME"
+      || export REF_NAME=develop
+    - echo "kicking off plutosdr - $REF_NAME"
+    - >
+      curl --request POST
+      --form token=$CI_JOB_TOKEN
+      --form ref="$REF_NAME"
+      --form "variables[REF_NAME]=$CI_COMMIT_REF_NAME"
+      https://gitlab.com/api/v4/projects/15332497/trigger/pipeline
+  after_script: []
+  artifacts:
+    paths: []
