@@ -127,7 +127,7 @@ def main():
     commands.append(make_subcommand(
         'restart', restart,
         'stop and then start server on remote device',
-        common_options + [option_log_level, option_valgrind]))
+        common_options + [option_log_level, option_valgrind, option_bitstream]))
     commands.append(make_subcommand(
         'status', status,
         'get status of server on remote device',
@@ -540,6 +540,7 @@ def start(args):
         args: parsed user arguments
     """
     command = 'start'
+     
     if args.bitstream:
         command += ' -B '
     if args.valgrind:
@@ -572,7 +573,7 @@ def restart(args):
         args: parsed user arguments
     """
     rc = stop(args)
-
+    
     if rc == 0:
         rc = start(args)
 
