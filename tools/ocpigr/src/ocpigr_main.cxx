@@ -21,17 +21,6 @@
 
 // OCPI headers
 #include "ocpigr.h" // ocpigr class
-#include "OcpiDriverManager.h" // OCPI::Driver::ManagerManager::suppressDiscovery
-#include "OcpiLibraryManager.h"  // OL::* stuff
-#include "OcpiOsAssert.h"  // ocpiLog macros
-#include "OcpiOsFileSystem.h"  // Filesystem ops like mkdir etc.
-#include "OcpiUtilDataTypesApi.h"  // OA::OCPI_* types
-#include "OcpiUtilException.h"  // OU::Error
-#include "OcpiUtilMisc.h"  // OU::format, getProjectRegistry, string2File
-#include "OcpiUtilPort.h"  // OU::Port
-#include "OcpiUtilProperty.h"  // OU::Property
-#include "OcpiUtilWorker.h"  // OU::Worker
-
 
 // System headers
 #include <algorithm> // assign() replace()
@@ -45,8 +34,21 @@
 #include <set>       // set<T>
 #include <string>    // strings
 #include <vector>    // std::vector 
+
+// 3rd party headers
 #include <yaml-cpp/yaml.h> // YAML
 
+// OCPI headers
+#include "OcpiDriverManager.h" // OCPI::Driver::ManagerManager::suppressDiscovery
+#include "OcpiLibraryManager.h"  // OL::* stuff
+#include "OcpiOsAssert.h"  // ocpiLog macros
+#include "OcpiOsFileSystem.h"  // Filesystem ops like mkdir etc.
+#include "OcpiUtilDataTypesApi.h"  // OA::OCPI_* types
+#include "OcpiUtilException.h"  // OU::Error
+#include "OcpiUtilMisc.h"  // OU::format, getProjectRegistry, string2File
+#include "OcpiUtilPort.h"  // OU::Port
+#include "OcpiUtilProperty.h"  // OU::Property
+#include "OcpiUtilWorker.h"  // OU::Worker
 
 #define AUTO_PLATFORM_COLOR "#afaf75"
 
@@ -117,9 +119,6 @@ static int mymain(const char ** /*ap*/) {
 
   // Generate block tree yaml
   ocpigr.genOcpiBlockTree();
-
-  // Generate domain blocks for all platforms
-  ocpigr.genPlatformBlocks();
 
   // Generate ocpi_container.block.yml
   ocpigr.genContainerBlock();
@@ -268,14 +267,11 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
     // label, domain, dtype, optional, protocol
     std::map<std::string, std::string> portMap;
 
-    portMap["label"]=port.cname();
-    portMap["domain"]="$platform";
+    portMap["domain"]="message";
     portMap["dtype"]="ocpi";
     if(port.m_isOptional){
       portMap["optional"]="True";
     }
-    // Note: Could not find "protocol" in the GRC Yaml Standard
-    portMap["protocol"]=port.cname();
 
     // Fill inputs or outputs vector with the portMap information
     if(port.m_provider){
@@ -292,13 +288,11 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
 
     for(uint inputIndex = 0; inputIndex < inputsVector.size(); inputIndex++){
       workerEmitter   << YAML::BeginMap; // start input_map
-      workerEmitter   << YAML::Key << "label" << YAML::Value    << inputsVector[inputIndex].find("label")->second;
       workerEmitter   << YAML::Key << "domain" << YAML::Value   << inputsVector[inputIndex].find("domain")->second;
       workerEmitter   << YAML::Key << "dtype" << YAML::Value    << inputsVector[inputIndex].find("dtype")->second;
       if(inputsVector[inputIndex].find("optional") != inputsVector[inputIndex].end()){
         workerEmitter << YAML::Key << "optional" << YAML::Value << inputsVector[inputIndex].find("optional")->second;
       }
-      workerEmitter   << YAML::Key << "protocol" << YAML::Value << inputsVector[inputIndex].find("protocol")->second;
       workerEmitter   << YAML::EndMap; // end input_map
     }
     workerEmitter << YAML::EndSeq; // end inputs_sequence
@@ -312,13 +306,11 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
 
     for(uint outputIndex = 0; outputIndex < outputsVector.size(); outputIndex++){
       workerEmitter << YAML::BeginMap; // start outputs_map
-      workerEmitter   << YAML::Key << "label" << YAML::Value    << outputsVector[outputIndex].find("label")->second;
       workerEmitter   << YAML::Key << "domain" << YAML::Value   << outputsVector[outputIndex].find("domain")->second;
       workerEmitter   << YAML::Key << "dtype" << YAML::Value    << outputsVector[outputIndex].find("dtype")->second;
       if(outputsVector[outputIndex].find("optional") != outputsVector[outputIndex].end()){
         workerEmitter << YAML::Key << "optional" << YAML::Value << outputsVector[outputIndex].find("optional")->second;
       }
-      workerEmitter   << YAML::Key << "protocol" << YAML::Value << outputsVector[outputIndex].find("protocol")->second;
       workerEmitter << YAML::EndMap; // end outputs_map
     }
     workerEmitter << YAML::EndSeq; // end outputs_sequence
@@ -678,91 +670,6 @@ void OcpigrObj::endTreeSeq(YAML::Emitter& emitter, int& closeDepth){
     emitter << YAML::EndSeq;
     emitter << YAML::EndMap;
     
-  }
-}
-
-//////////
-// OcpigrObj::genPlatformBlocks
-// Description: Generates platform yaml files
-//
-// Input: none - uses OcpigrObj::platformToModel to determine the platforms it needs
-//               to build yamls for.
-//
-// Output: none - writes out the yamls file using ofstream
-//////////
-void OcpigrObj::genPlatformBlocks(void) {
-
-  ocpiInfo("Generating platform blocks");
-
-  // build domain file for each platform
-  for (auto pi = platformToModel.begin(); pi != platformToModel.end(); ++pi) {
-
-    YAML::Emitter emitter;
-    emitter << YAML::BeginMap; // Top level map
-    emitter << YAML::Key << "id"               << YAML::Value << pi->first.c_str();
-    emitter << YAML::Key << "label"            << YAML::Value << pi->first.c_str();
-    emitter << YAML::Key << "category"         << YAML::Value << "[OpenCPI]/Platforms";
-    emitter << YAML::Key << "flags"            << YAML::Value << 
-               YAML::BeginSeq << pi->second.c_str() << YAML::EndSeq; 
-    emitter << YAML::Key << "color"            << YAML::Value << 
-                (pi->first == "auto" ? AUTO_PLATFORM_COLOR :
-                stringToColorHash(pi->first.c_str()));
-    emitter << YAML::Key << "multiple_connections_per_input"   << YAML::Value << "False";
-    emitter << YAML::Key << "multiple_connections_per_output" << YAML::Value << "False";
-    emitter << YAML::Newline << YAML::Newline; // blank line for the looks
-
-    // Connection inputs
-    emitter << YAML::Key << "inputs" << YAML::Value;
-    emitter << YAML::BeginSeq; // inputs sequence
-
-      // platform loopback input
-      emitter << YAML::BeginMap; 
-      emitter << YAML::Key << "label" << YAML::Value << pi->first.c_str();
-      emitter << YAML::Key << "dtype" << YAML::Value << "raw";
-      emitter << YAML::Key << "domain" << YAML::Value << "message";
-      emitter << YAML::EndMap;
-      
-      // GNU Radio to platform input
-      emitter << YAML::BeginMap; 
-      emitter << YAML::Key << "label" << YAML::Value << "gr_message";
-      emitter << YAML::Key << "dtype" << YAML::Value << "raw";
-      emitter << YAML::EndMap;
-
-    emitter << YAML::EndSeq; // inputs sequence
-
-    // Connection outputs
-    emitter << YAML::Key << "outputs" << YAML::Value;
-    emitter << YAML::BeginSeq; // outputs sequence
-
-    // output for each platform
-    for (auto pm = platformToModel.begin(); pm != platformToModel.end(); ++pm) {
-      emitter << YAML::BeginMap; 
-      emitter << YAML::Key << "label" << YAML::Value << pm->first.c_str();
-      emitter << YAML::Key << "dtype" << YAML::Value << "raw";
-      emitter << YAML::EndMap;
-    }
-      emitter << YAML::BeginMap;
-      emitter << YAML::Key << "label" << YAML::Value << "gr_message";
-      emitter << YAML::Key << "dtype" << YAML::Value << "raw";
-      emitter << YAML::EndMap;
-    
-    emitter << YAML::EndSeq; // outputs sequence
-
-    // Add file_format at the end of the yaml file
-    emitter << YAML::Key << "file_format" << YAML::Value << "1";
-    emitter << YAML::EndMap; // Top level map
-
-    //Check if there was an error while building the emitter
-    if(!emitter.GetLastError().empty()) {
-      ocpiBad("YAML emitter silently errored: \n");
-      ocpiBad("%s \n", emitter.GetLastError().c_str());
-    }
-
-    // Output built emitter to yaml file
-    std::string file;
-    OU::format(file, "%s/ocpi_%s_domain.block.yml", options.directory(), pi->first.c_str());
-    std::ofstream fout(file);
-    fout << emitter.c_str();
   }
 }
 
