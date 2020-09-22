@@ -66,6 +66,12 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
             job_args[key] = overrides[key]
         elif key != 'overrides':
             job_args[key] = value
+    
+    if os.getenv('CI_UPSTREAM_ID'):
+        if not job_args['variables']:
+            job_args['variables'] = {'GIT_STRATEGY': 'none'}
+        elif 'GIT_STRATEGY' not in job_args['variables']:
+            job_args['variables']['GIT_STRATEGY'] = 'none'
 
     return _Job(**job_args)
 
@@ -87,7 +93,7 @@ def to_dict(job):
     return job_dict
 
 
-def make_jobs(stages, platform, projects, linked_platforms=None,
+def make_jobs(stages, platform, projects=None, linked_platforms=None,
               host_platform=None, overrides=None):
     """Creates Job(s) for project/platform combinations
 
@@ -362,28 +368,44 @@ def make_before_script(stage, stages, platform, host_platform=None,
         timestamp, and sourcing opencpi.
 
     Args:
-        stage:           Stage of pipeline for job to execute in.
-                         Used to exclude artifacts in same and later
-                         stages
-        stages:          List of all pipeline stages
-        platform:        Platform to download artifacts for
-        host_platform:   Host_platform to download artifacts for
-        linked_platform: Associated platform to downloaded artifacts for
-        do_ocpiremote:   Whether jobs should run ocpiremote commands
+        stage:             Stage of pipeline for job to execute in.
+                           Used to exclude artifacts in same and later
+                           stages
+        stages:            List of all pipeline stages
+        platform:          Platform to download artifacts for
+        host_platform:     Host_platform to download artifacts for
+        linked_platform:   Associated platform to downloaded artifacts 
+                           for
+        do_ocpiremote:     Whether jobs should run ocpiremote commands
 
     Returns:
         list of command strings
     """
-    timestamp_cmd = 'touch .timestamp'
-
-    if stage == 'prereqs':
-        return [timestamp_cmd]
+    cmds = []
 
     # If running in a pipeline, set pipeline_id var to ID of pipeline.
     # Otherwise, set to string "$CI_PIPELINE_ID"
-    pipeline_id = os.getenv("CI_PIPELINE_ID")
-    if not pipeline_id:
-        pipeline_id = '"$CI_PIPELINE_ID"'
+    pipeline_id = os.getenv("CI_UPSTREAM_ID")
+    if pipeline_id:
+        cmds += [
+            'git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git"' 
+                ' opencpi',
+            'git clone --depth 1 "$CI_REPOSITORY_URL"' 
+                ' "opencpi/projects/osps/${CI_PROJECT_NAME}"',
+            'cd opencpi'
+        ]
+        do_register = True
+    else:
+        do_register = False
+        pipeline_id = os.getenv("CI_PIPELINE_ID")
+        if not pipeline_id:
+            pipeline_id = '"$CI_PIPELINE_ID"'
+
+    timestamp_cmd = 'touch .timestamp'
+    cmds.append(timestamp_cmd)
+
+    if stage == 'prereqs':
+        return cmds
 
     # Download artifacts for platform, host_platform, and linked_platform
     includes = ['"*{}.tar.gz"'.format(platform.name)
@@ -397,12 +419,13 @@ def make_before_script(stage, stages, platform, host_platform=None,
                              '-i', ' '.join(includes),
                              '-e', ' '.join(excludes)])
     sleep_cmd = 'sleep 2'
+    cmds += [download_cmd, sleep_cmd, timestamp_cmd]
 
     if stage == 'build':
-        return [download_cmd, sleep_cmd, timestamp_cmd]
+        return cmds
 
     source_cmd = 'source cdk/opencpi-setup.sh -e'
-    cmds = [download_cmd, sleep_cmd, timestamp_cmd, source_cmd]
+    cmds.append(source_cmd)
 
     if do_ocpiremote:
         cmds += [
@@ -416,6 +439,12 @@ def make_before_script(stage, stages, platform, host_platform=None,
             'export OCPI_SERVER_ADDRESSES={}:{}'.format(platform.ip,
                                                         platform.port)
         ]
+
+    if do_register:
+        register_cmd = make_ocpidev_cmd(
+            'register', path='projects/osps/${CI_PROJECT_NAME}', 
+            noun='project')
+        cmds.append(register_cmd)
 
     return cmds
 
@@ -435,9 +464,15 @@ def make_after_script(platform, do_ocpiremote=False):
     """
     # If running in a pipeline, set pipeline_id var to ID of pipeline.
     # Otherwise, set to string "$CI_PIPELINE_ID"
-    pipeline_id = os.getenv("CI_PIPELINE_ID")
-    if not pipeline_id:
-        pipeline_id = '"$CI_PIPELINE_ID"'
+    cmds = []
+    pipeline_id = os.getenv("CI_UPSTREAM_ID")
+
+    if pipeline_id:
+        cmds.append ('cd opencpi')
+    else:
+        pipeline_id = os.getenv("CI_PIPELINE_ID")
+        if not pipeline_id:
+            pipeline_id = '"$CI_PIPELINE_ID"'
 
     job_name = '"$CI_JOB_NAME"'
     upload_cmd = ' '.join(['if [ ! -f ".success" ];',
@@ -446,7 +481,7 @@ def make_after_script(platform, do_ocpiremote=False):
                            '-t "failed-job"; fi'])
     clean_cmd = 'rm -rf *'
 
-    cmds = [upload_cmd]
+    cmds.append(upload_cmd)
 
     if do_ocpiremote:
         cmds.append(make_ocpiremote_cmd('unload', platform))
@@ -478,7 +513,9 @@ def make_script(stage, platform, project=None, linked_platform=None,
     """
     # If running in a pipeline, set pipeline_id var to ID of pipeline.
     # Otherwise, set to string "$CI_PIPELINE_ID"
-    pipeline_id = os.getenv("CI_PIPELINE_ID")
+    pipeline_id = os.getenv("CI_UPSTREAM_ID")
+    if not pipeline_id:
+        pipeline_id = os.getenv("CI_PIPELINE_ID")
     if not pipeline_id:
         pipeline_id = '"$CI_PIPELINE_ID"'
 
@@ -573,13 +610,13 @@ def make_ocpiadmin_cmd(verb, platform, linked_platform=None):
     raise ValueError('Unknown verb: {}'.format(verb))
 
 
-def make_ocpidev_cmd(verb, platform, path, noun=''):
+def make_ocpidev_cmd(verb, platform=None, path=None, noun=''):
     """Makes ocpidev command
 
     Args:
         verb:     String to pass to ocpidev
         platform: Platform of job to pass to ocpidev
-        path:     Path to pass with '-d' option to ocpidev
+        path:     Path to noun
         noun:     Noun to pass to ocpidev
 
     Returns:
@@ -588,7 +625,7 @@ def make_ocpidev_cmd(verb, platform, path, noun=''):
     Raises:
         ValueError: if unrecognized verb or noun provided
     """
-    if noun and noun not in ['tests', 'test', 'hdl platforms']:
+    if noun and noun not in ['tests', 'test', 'hdl platforms', 'project']:
         raise ValueError('Unknown noun: {}'.format(noun))
 
     if verb == 'build':
@@ -606,6 +643,13 @@ def make_ocpidev_cmd(verb, platform, path, noun=''):
             '-d {}'.format(path),
             '--only-platform {}'.format(platform.name),
             '--mode prep_run_verify'
+        ])
+
+    if verb == 'register':
+        return ' '.join([
+            'ocpidev register',
+            noun,
+            '"{}"'.format(path)
         ])
 
     raise ValueError('Unknown verb: {}'.format(verb))
@@ -792,6 +836,8 @@ def stage_from_library(library):
 
     if (library.name in ['components', 'adapters', 'cards', 'devices']
             or library.path.parent.stem == 'components'):
+        if library.is_osp:
+            return 'build-libraries-osp'
         return 'build-libraries'
 
     if library.name == 'primitives':

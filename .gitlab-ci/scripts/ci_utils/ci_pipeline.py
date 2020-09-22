@@ -78,13 +78,12 @@ def dump(pipeline, path, mode='w+'):
         yaml.safe_dump(pipeline, yml, width=1000, default_flow_style=False)
 
 
-def make_parent_pipeline(projects, host_platforms, cross_platforms,
-                         yaml_parent_path, yaml_children_path, whitelist=None,
+def make_parent_pipeline(host_platforms, cross_platforms,
+                         yaml_parent_path, yaml_children_path, whitelist=None, 
                          config=None):
     """ Construct a parent pipeline
 
     Args:
-        projects:           List of opencpi Projects
         host_platforms:     List of all host Platforms
         cross_platforms:    List of all non-host Platforms
         yaml_parent_path:   Path to files to include in parent pipeline
@@ -110,7 +109,7 @@ def make_parent_pipeline(projects, host_platforms, cross_platforms,
 
         print("\t", host_platform.name)
         overrides = get_overrides(host_platform, config)
-        host_jobs = ci_job.make_jobs(stages, host_platform, projects,
+        host_jobs = ci_job.make_jobs(stages, host_platform, 
                                      overrides=overrides)
         jobs += host_jobs
 
@@ -180,18 +179,82 @@ def make_child_pipeline(projects, host_platform, cross_platform,
         stages = ['build-primitives-core', 'build-primitives',
                   'build-libraries', 'build-platforms', 'build-assemblies',
                   'build-sdcards', 'test']
+        if getenv('CI_UPSTREAM_ID'):
+            stages.insert(3, 'build-libraries-osp')
 
     overrides = get_overrides(cross_platform, config)
     workflow = {'rules': [
         {'if': '$CI_MERGE_REQUEST_ID'},
         {'when': 'always'}
     ]}
+
     jobs = ci_job.make_jobs(stages, cross_platform, projects,
                             host_platform=host_platform,
                             linked_platforms=linked_platforms,
                             overrides=overrides)
 
     return Pipeline(stages, jobs, workflow=workflow)
+
+
+def make_downstream_pipeline(host_platforms, osp, osp_path,
+                             yaml_downstream_path, whitelist=None, 
+                             config=None):
+    #TODO: docs
+    stages = ['generate-children', 'trigger-children']
+    jobs = []
+
+    for host_platform in host_platforms:
+        if whitelist:
+            if host_platform.name in whitelist:
+                host_whitelist = whitelist[host_platform.name]
+            else:
+                continue
+
+        for cross_platform in osp.platforms:
+            if whitelist and cross_platform.name not in host_whitelist:
+                continue
+
+            overrides = get_overrides(cross_platform, config)
+
+            # Make job to generate child yaml file
+            script = [
+                'yum install epel-release -y',
+                'yum install python36-PyYAML -y',
+                '.gitlab-ci/scripts/ci_yaml_generator.py {} {}'.format(
+                    host_platform.name, cross_platform.name),
+            ]
+            before_script = [
+                'git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git"' 
+                    ' opencpi',
+                'git clone --depth 1 "$CI_REPOSITORY_URL"' 
+                    ' "opencpi/projects/osps/${CI_PROJECT_NAME}"',
+                'cd opencpi'
+            ]
+            artifacts = {'paths': [str(yaml_downstream_path)]}
+            tags = ['docker']
+            image = 'centos:7'
+            stage = 'generate-children'
+            name = ci_job.make_name(cross_platform, stage=stage,
+                                    host_platform=host_platform)
+            rules = ci_job.make_rules(cross_platform, host_platform)
+            generate_child_job = ci_job.Job(name=name, stage=stage,
+                                            script=script, 
+                                            before_script=before_script, 
+                                            artifacts=artifacts,
+                                            tags=tags, image=image,
+                                            rules=rules, overrides=overrides)
+            jobs.append(generate_child_job)
+
+            # Make trigger job for child pipeline
+            include = [{
+                'artifact': str(yaml_downstream_path),
+                'job': generate_child_job.name
+            }]
+            trigger = ci_job.make_trigger(host_platform, cross_platform,
+                                            include, overrides=overrides)
+            jobs.append(trigger)
+
+    return Pipeline(stages, jobs)
 
 
 def get_overrides(platform, config):

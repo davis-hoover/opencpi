@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import json
 from collections import namedtuple
 from pathlib import Path
-from urllib.request import urlopen
 
 Project = namedtuple('project', 'name, libraries, path, is_osp')
-Library = namedtuple('library', ('name path project_name'
+Library = namedtuple('library', ('name path project_name is_osp'
                                  ' is_buildable is_testable'))
 
 
@@ -24,30 +22,34 @@ def discover_projects(projects_path, blacklist=None):
     """
     projects = []
     for project_path in projects_path.glob('*'):
-        project_name = str(project_path).split('.')[-1]
+        project_name = str(project_path).split('.')[-1].split('/')[-1]
 
         if blacklist and project_name in blacklist:
             continue
 
         makefile_path = Path(project_path, 'Makefile')
         if not makefile_path.is_file():
+            rec_projects = discover_projects(project_path, blacklist=blacklist)
+
+            if rec_projects:
+                projects += rec_projects
+
             continue
 
-        makefile_path = Path(project_path, 'Makefile')
-        if not makefile_path.is_file():
-            continue
-
+        is_osp = project_path.parent.stem == 'osps'
         library_blacklist = ['vendors']
         project_libraries = discover_libraries(project_name, project_path,
+                                               is_osp=is_osp,
                                                blacklist=library_blacklist)
         project = Project(name=project_name, libraries=project_libraries,
-                          path=project_path, is_osp=False)
+                          path=project_path, is_osp=is_osp)
         projects.append(project)
 
     return projects
 
 
-def discover_libraries(project_name, project_path, blacklist=None):
+def discover_libraries(project_name, project_path, is_osp=False, 
+                       blacklist=None):
     """Search for libraries for opencpi project
 
     Will search for hdl libraries in:
@@ -64,6 +66,7 @@ def discover_libraries(project_name, project_path, blacklist=None):
        project_name: Name of project to find libraries for
        project_path: Path of project to search for libraries in
        blacklist:    List of libraries not to include
+       is_osp:       Whether library is from an osp project
 
     Returns:
         libraries: List of project libraries
@@ -82,15 +85,15 @@ def discover_libraries(project_name, project_path, blacklist=None):
         if blacklist and library_name in blacklist:
             continue
 
-        library = Library(library_name, library_path, project_name,
-                            is_buildable=True, is_testable=False)
+        library = Library(library_name, library_path, project_name, 
+                          is_osp=is_osp, is_buildable=True, is_testable=False)
         libraries.append(library)
 
     if Path(components_path, 'specs').is_dir():
         library_name = components_path.stem
         library = Library(name=library_name, path=components_path,
-                          project_name=project_name, is_buildable=True,
-                          is_testable=True)
+                          project_name=project_name, is_osp=is_osp,
+                          is_buildable=True, is_testable=True)
         libraries.append(library)
     else:
         for library_path in components_path.glob('*'):
@@ -100,8 +103,8 @@ def discover_libraries(project_name, project_path, blacklist=None):
 
             library_name = library_path.stem
             library = Library(name=library_name, path=library_path,
-                                project_name=project_name, is_buildable=True,
-                                is_testable=True)
+                                project_name=project_name, is_osp=is_osp,
+                                is_buildable=True, is_testable=True)
             libraries.append(library)
 
     return libraries

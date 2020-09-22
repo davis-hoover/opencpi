@@ -4,7 +4,7 @@ import os
 import sys
 import yaml
 from pathlib import Path
-from ci_utils import ci_project, ci_platform, ci_job, ci_pipeline
+from ci_utils import ci_project, ci_platform, ci_job, ci_pipeline, ci_osp
 
 def main():
     #TODO: python docs
@@ -14,7 +14,9 @@ def main():
     gitlab_ci_path = Path('.gitlab-ci')
     yaml_parent_path = Path('.gitlab-ci', 'yaml-parent')
     yaml_children_path = Path(gitlab_ci_path, 'yaml-children')
-    projects_path = Path('project-registry')
+    yaml_downstream_path = Path(gitlab_ci_path, 'yaml-downstream')
+    projects_path = Path('projects')
+    osps_path = Path(projects_path, 'osps')
     config_path = Path(gitlab_ci_path, 'scripts', 'config.yml')
     whitelist_path = Path(gitlab_ci_path, 'scripts', 'whitelist.yml')
 
@@ -43,7 +45,7 @@ def main():
             cross_platform, cross_platforms, whitelist=host_whitelist)
 
         # Make pipeline and dump to yaml
-        print("Generating pipeline for platform {} on host {}".format(
+        print('Generating pipeline for platform {} on host {}'.format(
             cross_platform.name, host_platform.name))
         pipeline = ci_pipeline.make_child_pipeline(
             projects, host_platform, cross_platform,
@@ -53,12 +55,23 @@ def main():
         ci_pipeline.dump(pipeline, dump_path)
     else:
     # If not in running pipeline, create parent pipeline yaml
-        print("Updating .gitlab-ci.yml for host platforms:")
+        print('Updating .gitlab-ci.yml for host platforms:')
         pipeline = ci_pipeline.make_parent_pipeline(
-            projects, host_platforms, cross_platforms, yaml_parent_path,
+            host_platforms, cross_platforms, yaml_parent_path,
             yaml_children_path, whitelist=whitelist, config=config)
         dump_path = Path('.gitlab-ci.yml')
         ci_pipeline.dump(pipeline, dump_path)
+
+        print('Updating yaml for downstream projects:')
+        osps = ci_osp.discover_osps()
+        for osp in osps:
+            print('\t', osp.name)
+            osp_path = Path(osps_path, osp.name)
+            pipeline = ci_pipeline.make_downstream_pipeline(
+                host_platforms, osp, osp_path, yaml_downstream_path, 
+                whitelist=whitelist, config=config)
+            dump_path = Path(yaml_downstream_path, '{}.yml'.format(osp.name))
+            ci_pipeline.dump(pipeline, dump_path)
 
 
 if __name__ == '__main__':

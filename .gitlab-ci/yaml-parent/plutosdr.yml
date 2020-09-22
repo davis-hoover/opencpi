@@ -6,6 +6,7 @@ trigger-downstream:plutosdr:
     - .plutosdr
   before_script: []
   script:
+    - echo "$CI_COMMIT_MESSAGE"
     - export REF_NAME="opencpi-${CI_COMMIT_REF_NAME//\//%2F}"
     - >
       curl --fail
@@ -20,5 +21,7 @@ trigger-downstream:plutosdr:
       --form "variables[REF_NAME]=$CI_COMMIT_REF_NAME"
       https://gitlab.com/api/v4/projects/15332497/trigger/pipeline
   after_script: []
+  variables:
+    CI_UPSTREAM_ID: $CI_PIPELINE_ID 
   artifacts:
     paths: []

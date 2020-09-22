@@ -1,0 +1,81 @@
+centos7:adi_plutosdr0_32:
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  stage: trigger-children
+  trigger:
+    include:
+    - artifact: .gitlab-ci/yaml-downstream
+      job: generate-children:centos7:adi_plutosdr0_32
+    strategy: depend
+  variables:
+    GIT_STRATEGY: none
+centos7:plutosdr:
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  stage: trigger-children
+  trigger:
+    include:
+    - artifact: .gitlab-ci/yaml-downstream
+      job: generate-children:centos7:plutosdr
+    strategy: depend
+  variables:
+    GIT_STRATEGY: none
+generate-children:centos7:adi_plutosdr0_32:
+  artifacts:
+    paths:
+    - .gitlab-ci/yaml-downstream
+  before_script:
+  - git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
+  - cd opencpi
+  image: centos:7
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - yum install epel-release -y
+  - yum install python36-PyYAML -y
+  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 adi_plutosdr0_32
+  stage: generate-children
+  tags:
+  - docker
+  variables:
+    GIT_STRATEGY: none
+generate-children:centos7:plutosdr:
+  artifacts:
+    paths:
+    - .gitlab-ci/yaml-downstream
+  before_script:
+  - git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
+  - cd opencpi
+  image: centos:7
+  rules:
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  script:
+  - yum install epel-release -y
+  - yum install python36-PyYAML -y
+  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 plutosdr
+  stage: generate-children
+  tags:
+  - docker
+  variables:
+    GIT_STRATEGY: none
+stages:
+- generate-children
+- trigger-children
