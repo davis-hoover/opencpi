@@ -69,9 +69,9 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
     
     if os.getenv('CI_UPSTREAM_ID'):
         if not job_args['variables']:
-            job_args['variables'] = {'GIT_STRATEGY': 'none'}
+            job_args['variables'] = variables
         elif 'GIT_STRATEGY' not in job_args['variables']:
-            job_args['variables']['GIT_STRATEGY'] = 'none'
+            job_args['variables']['GIT_STRATEGY'] = variables
 
     return _Job(**job_args)
 
@@ -387,12 +387,17 @@ def make_before_script(stage, stages, platform, host_platform=None,
     # Otherwise, set to string "$CI_PIPELINE_ID"
     pipeline_id = os.getenv("CI_UPSTREAM_ID")
     if pipeline_id:
+        upstream_ref = os.getenv("CI_UPSTREAM_REF")
+        ref = os.getenv("CI_COMMIT_REF_NAME")
         cmds += [
-            'git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git"' 
-                ' opencpi',
-            'git clone --depth 1 "$CI_REPOSITORY_URL"' 
-                ' "opencpi/projects/osps/${CI_PROJECT_NAME}"',
-            'cd opencpi'
+            ' '.join(['git clone --depth 1 --single-branch --branch',
+                      upstream_ref,
+                      '"https://gitlab.com/opencpi/opencpi.git"', 
+                      'opencpi']),
+            ' '.join(['git clone --depth 1 --single-branch --branch', 
+                      ref, 
+                      '"$CI_REPOSITORY_URL"',
+                      '"opencpi/projects/osps/${CI_PROJECT_NAME}"'])
         ]
         do_register = True
     else:

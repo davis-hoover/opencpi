@@ -11,8 +11,6 @@ centos7:adi_plutosdr0_32:
     - artifact: .gitlab-ci/yaml-downstream
       job: generate-children:centos7:adi_plutosdr0_32
     strategy: depend
-  variables:
-    GIT_STRATEGY: none
 centos7:plutosdr:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
@@ -26,16 +24,14 @@ centos7:plutosdr:
     - artifact: .gitlab-ci/yaml-downstream
       job: generate-children:centos7:plutosdr
     strategy: depend
-  variables:
-    GIT_STRATEGY: none
 generate-children:centos7:adi_plutosdr0_32:
   artifacts:
     paths:
     - .gitlab-ci/yaml-downstream
   before_script:
   - yum install git -y
-  - git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git" opencpi
-  - git clone --depth 1 "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
+  - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi
   image: centos:7
   rules:
@@ -51,16 +47,14 @@ generate-children:centos7:adi_plutosdr0_32:
   stage: generate-children
   tags:
   - docker
-  variables:
-    GIT_STRATEGY: none
 generate-children:centos7:plutosdr:
   artifacts:
     paths:
     - .gitlab-ci/yaml-downstream
   before_script:
   - yum install git -y
-  - git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git" opencpi
-  - git clone --depth 1 "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
+  - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi
   image: centos:7
   rules:
@@ -76,8 +70,6 @@ generate-children:centos7:plutosdr:
   stage: generate-children
   tags:
   - docker
-  variables:
-    GIT_STRATEGY: none
 stages:
 - generate-children
 - trigger-children

@@ -225,9 +225,12 @@ def make_downstream_pipeline(host_platforms, osp, osp_path,
             ]
             before_script = [
                 'yum install git -y',
-                'git clone --depth 1 "https://gitlab.com/opencpi/opencpi.git"' 
+                'git clone --depth 1 --single-branch --branch'
+                    ' "$CI_UPSTREAM_REF"' 
+                    ' "https://gitlab.com/opencpi/opencpi.git"' 
                     ' opencpi',
-                'git clone --depth 1 "$CI_REPOSITORY_URL"' 
+                'git clone --depth 1 --single-branch --branch' 
+                    ' "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL"' 
                     ' "opencpi/projects/osps/${CI_PROJECT_NAME}"',
                 'cd opencpi'
             ]
