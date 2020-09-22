@@ -84,7 +84,7 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v1.7.0 & Updates for 1.7.0 release & 06/2020 \\
 			\hline
-			v2.0.0 & Updates for 2.0.0 release & 08/2020 \\
+			v2.0.0 & Updates for 2.0.0 release & 09/2020 \\
 			\hline
 		\end{tabularx}
 	\end{table}
@@ -187,6 +187,10 @@ These new platforms, along with existing platforms, can be built using the new \
 \subsection{Component Library Searching Algorithm}
 \label{sec:20_component_library_searching}
 Component Libraries are searched per project, with all indicated libraries searched in a project before moving to the next project. Previously, this was "library first" which caused confusing results. If a worker in an assembly is found in a library, it is chosen even if not built for the target platform. This is to maintain consistency between library searching that is target-independent with library searching by tools that is target-dependent.
+
+\subsection{PlutoSDR RCC Platform Support}
+\label{sec:20_plutosdr}
+PlutoSDR RCC platform has been updated to use new version 0.32. Installation of the platform no longer builds pluto.frm image as pre-built image by Analog Devices can be used directly. Cross compiler tools have also been updated to use Xilinx version 2019.2 and no longer require a separate installation of Xilinx 2018.3 SDK. NFS is not supported in this version of the kernel which implies drop of support for network mode; standalone and remote modes are still supported.
 
 \subsection{Primitive Libraries \code{util} and \code{bsv}}
 \label{sec:20_util_bsv_library}
