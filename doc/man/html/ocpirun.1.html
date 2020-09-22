@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpirun</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140349879560832"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpirun — command-line tool for running OpenCPI applications</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpirun</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;application-name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpirun(1)</code></strong></span> command-line tool is used to execute OpenCPI
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpirun</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140287954044864"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpirun — command-line tool for running OpenCPI applications</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpirun</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;application-name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpirun(1)</code></strong></span> command-line tool is used to execute OpenCPI
 component-based <span class="emphasis"><em>applications</em></span> in OpenCPI <span class="emphasis"><em>containers</em></span> on OpenCPI <span class="emphasis"><em>platforms</em></span>.
 An OpenCPI application is defined as an assembly of component
 instances with connections among them. An OpenCPI application
@@ -347,7 +347,17 @@ letter options are preceded by a space.</p><div class="refsect2"><a id="_general
 </dd></dl></div><p>The section "Execution of Simulation Bitstreams and Containers" in the
 <span class="emphasis"><em>OpenCPI HDL Development Guide</em></span> provides more information about running
 applications on HDL (FPGA) simulators. See <a class="ulink" href="ocpiview.1.html" target="_top">ocpiview(1)</a>
-for information on viewing the results of simulation runs.</p></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+for information on viewing the results of simulation runs.</p></div></div><div class="refsect1"><a id="_environment_variables"></a><h2>ENVIRONMENT VARIABLES</h2><p>The following environment variables affect <span class="strong"><strong><code class="literal">ocpirun</code></strong></span> operation:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">OCPI_LIBRARY_PATH</code></strong></span>
+</span></dt><dd>
+    A list of directories, separated by colons, to be searched for runtime artifacts.
+    When referencing the artifacts exported by a project with sources, be sure
+    to reference the project’s <span class="strong"><strong><code class="literal">exports/</code></strong></span> subdirectory, not its source location.
+    This variable is set automatically (if not already set) when running component
+    unit tests or applications in projects with <span class="strong"><strong><code class="literal">ocpidev run</code></strong></span>.
+    In pure runtime environments, it may need
+    to be set when artifacts are placed in directories of the user’s choice.
+</dd></dl></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
 Inside a project, run the application described
 by the OAS named <span class="strong"><strong><code class="literal">myapp.xml</code></strong></span>.
 The command locates and reads the application OAS
@@ -421,6 +431,7 @@ is less than 5:
 <a class="ulink" href="ocpidev-component.1.html" target="_top">ocpidev-component(1)</a>
 <a class="ulink" href="ocpidev-platform.1.html" target="_top">ocpidev-platform(1)</a>
 <a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
+<a class="ulink" href="ocpidev-run.1.html" target="_top">ocpidev-run(1)</a>
 <a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-worker(1)</a>
 <a class="ulink" href="ocpiview.1.html" target="_top">ocpiview(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the

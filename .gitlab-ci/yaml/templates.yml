@@ -408,6 +408,20 @@
     - touch "${CI_PROJECT_DIR}/.success"
 
 
+##################
+# Build - SDcard #
+##################
+.build-sdcard:
+  stage: build-sdcard
+  artifacts:
+    paths: []
+  script:
+    - .gitlab-ci/artifacts.py download -i "*${SW_PLATFORM}.tar.gz"
+    - source ./cdk/opencpi-setup.sh -e
+    - ocpiadmin deploy platform "$SW_PLATFORM" "$HW_PLATFORM"
+    - touch "${CI_PROJECT_DIR}/.success"
+
+
 ###############
 # Jobs - Test #
 ###############
@@ -495,7 +509,6 @@
 #############
 # Platforms #
 #############
-
 .centos7:
   extends:
     - .rules-default
@@ -653,7 +666,6 @@
     - if: '$CI_HDL_PLATFORM =~ /(^| )(plutosdr|all)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push"'
 
 
-
 ########
 # Misc #
 ########
@@ -677,11 +689,7 @@
     - touch timestamp
     - ls -lh
     - source ./cdk/opencpi-setup.sh -e
-    - ocpiadmin deploy platform "$HW_PLATFORM" "$SW_PLATFORM"
-    - echo "IP- ${IP}"
-    - echo "PORT- ${PORT}"
-    - echo "HW- ${HW_PLATFORM}"
-    - echo "SW- ${SW_PLATFORM}"
+    - export OCPI_SERVER_ADDRESSES="${IP}:${PORT}"
     - ocpiremote deploy -i "$IP" -s "$SW_PLATFORM" -w "$HW_PLATFORM"
     - sleep 5
     - ocpiremote load -i "$IP" -r "$PORT" -w "$HW_PLATFORM" -s "$SW_PLATFORM"
@@ -695,4 +703,4 @@
         exit 1
       fi
     - rm -f "${CI_PROJECT_DIR}/.success"
-    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s "$(< timestamp)"
+    - .gitlab-ci/artifacts.py upload . -t 'successful-job' -s timestamp

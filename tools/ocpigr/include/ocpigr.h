@@ -64,7 +64,6 @@ class OcpigrObj {
     // Public Functions for mymain
     void genWorkerBlocks(OU::Worker&);
     void genOcpiBlockTree(void);
-    void genPlatformBlocks(void);
     void genContainerBlock(void);  
 };
 

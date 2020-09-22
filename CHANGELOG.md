@@ -1,3 +1,19 @@
+# [v2.0.0-rc.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2020-09-22)
+
+Changes/additions since [OpenCPI Release v2.0.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0-rc.1)
+
+### New Features
+- **tools**: add ability to specify host only prereqs. (!361)(3ac81b61)
+
+### Enhancements
+- **devops**: add script to automate creation of gitlab CI pipeline jobs for opencpi projects/platforms. (!351)(5b068b89)
+- **doc**: add more man pages:  ocpihdl, ocpirun, opencpi, and some other updates. (!366)(207870c0)
+- **tools**: add yaml-cpp v0.6.x as prereq (x86_64 only), removing weak dependency on boost. (!356)(be3e4cfa)
+
+### Miscellaneous
+- **comp**: add fifo_depth_p of 2048 to fifo.hdl build configuration. (!358)(fcd0e217)
+- **tests**: suppress plutosdr from fir_complex_sse_ts.test due to lack of dsp resources. (!359)(387938a8)
+
 # [v2.0.0-rc.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-beta.1...v2.0.0-rc.1) (2020-08-28)
 
 Changes/additions since OpenCPI Release v2.0.0-beta.1

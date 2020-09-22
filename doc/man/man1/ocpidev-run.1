@@ -1,12 +1,12 @@
 .\"     Title: ocpidev-run
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 05/28/2020
+.\"      Date: 09/04/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIDEV\-RUN" "1" "05/28/2020" "\ \&" "\ \&"
+.TH "OCPIDEV\-RUN" "1" "09/04/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -27,13 +27,13 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-ocpidev-run \- runs applications and component unit tests\&.
+ocpidev-run \- runs applications and component unit tests
 .SH "SYNOPSIS"
 .sp
-\fBocpidev\fR \fBrun\fR [\fI<options>\fR] \fI<noun>\fR [\fI<name>\fR]
+\fBocpidev run\fR [\fI<options>\fR] \fI<noun>\fR [\fI<name>\fR]
 .SH "DESCRIPTION"
 .sp
-The \fBrun\fR verb invokes the OpenCPI tool for running component unit tests and applications\&. Applications that are simply an application XML are not yet implemented using \fBocpidev\fR\&.
+The \fBrun\fR verb invokes the OpenCPI tool for running component unit tests and applications\&. Applications that are simply an application XML are not yet implemented using \fBocpidev(1)\fR\&.
 .sp
 Component unit tests have five phases:
 .sp
@@ -134,7 +134,7 @@ In the option descriptions below, a plus sign (+) indicates that the option can 
 .PP
 \fB\-\-rcc\-platform=\fR\fI<platform>\fR+
 .RS 4
-Specify the RCC platform to use to build and generate the unit tests and build the ACI applications\&.
+Specify the RCC platform to use to generate and build the unit tests and build the ACI application\&.
 .RE
 .SS "Options That Apply to Applications Only"
 .PP
@@ -157,7 +157,51 @@ Specify the argument(s) to insert immediately after the ACI executable or the
 command\&.
 .RE
 .sp
-For details on how to use these options, see the section "Applications in Projects" in the \fIOpenCPI Application Development Guide\fR\&.
+You can also add run\-arg arguments after the application \fI<name>\fR; for example, to specify options to \fBocpirun\fR for XML applications\&. Preface these arguments with the double hyphen (\fB\-\-\fR) notation to indicate that they are not options to the \fBocpidev\fR command itself\&. For example, if you want to run an application with a number of \fBrun\-arg\fR arguments, you can use any of the following syntaxes:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev run application myapp \-\- \-v \-d \-Pxsim
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev run application myapp \-\-run\-arg=\-v \-\-run\-arg=\-d \-\-run\-arg=\-Pxsim
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev run application myapp \-\-run\-arg=\(rq\-v \-d \-Pxsim\(rq
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+For an XML application, these command lines perform the command:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-v \-d \-Pxsim myapp
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+For more information on how to use these options, see the section "Applications in Projects" in the \fIOpenCPI Application Development Guide\fR\&.
 .SS "Options That Apply to Unit Tests Only"
 .PP
 \fB\-l\fR \fI<library>\fR
@@ -339,6 +383,15 @@ for more information\&.
 .RS 4
 Run the view script (view\&.sh) for the test at the conclusion of the test\(cqs execution\&.
 .RE
+.SH "ENVIRONMENT VARIABLES"
+.sp
+The following environment variables affect \fBocpidev run\fR operation:
+.PP
+\fBOCPI_LIBRARY_PATH\fR
+.RS 4
+A list of directories, separated by colons, to be searched for runtime artifacts\&. This variable is set automatically (if not already set) when running component unit tests or applications in projects with
+\fBocpidev run\fR\&.
+.RE
 .SH "EXAMPLES"
 .sp
 .RS 4
@@ -473,7 +526,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpidev(1) ocpidev\-build(1) ocpidev\-clean(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-refresh(1) ocpidev\-register(1) ocpidev\-set(1) ocpidev\-show(1) ocpidev\-unregister(1) ocpidev\-unset(1) ocpidev\-utilization(1)
+ocpidev(1) ocpidev\-build(1) ocpidev\-clean(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-refresh(1) ocpidev\-register(1) ocpidev\-set(1) ocpidev\-show(1) ocpidev\-unregister(1) ocpidev\-unset(1) ocpidev\-utilization(1) ocpirun(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.
