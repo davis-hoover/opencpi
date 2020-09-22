@@ -18,7 +18,6 @@ trigger-downstream:plutosdr:
       curl --request POST
       --form token=$CI_JOB_TOKEN
       --form ref="$REF_NAME"
-      --form "variables[REF_NAME]=$CI_COMMIT_REF_NAME"
       --form "variables[CI_UPSTREAM_ID]=$CI_PIPELINE_ID"
       --form "variables[CI_UPSTREAM_REF]=$CI_COMMIT_REF_NAME"
       https://gitlab.com/api/v4/projects/15332497/trigger/pipeline

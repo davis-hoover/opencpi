@@ -30,7 +30,7 @@ generate-children:centos7:adi_plutosdr0_32:
     - .gitlab-ci/yaml-downstream
   before_script:
   - yum install git -y
-  - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="develop"; fi
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="1347-osp-yaml-generator"; fi
   - git clone --depth 1 --single-branch --branch "$REF_NAME" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi
@@ -54,7 +54,7 @@ generate-children:centos7:plutosdr:
     - .gitlab-ci/yaml-downstream
   before_script:
   - yum install git -y
-  - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="develop"; fi
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="1347-osp-yaml-generator"; fi
   - git clone --depth 1 --single-branch --branch "$REF_NAME" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi
