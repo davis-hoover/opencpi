@@ -177,10 +177,8 @@ def make_child_pipeline(projects, host_platform, cross_platform,
         stages = ['prereqs', 'build-rcc', 'test']
     else:
         stages = ['build-primitives-core', 'build-primitives',
-                  'build-libraries', 'build-platforms', 'build-assemblies',
-                  'build-sdcards', 'test']
-        if getenv('CI_UPSTREAM_ID'):
-            stages.insert(3, 'build-libraries-osp')
+                  'build-libraries', 'build-libraries-osp', 'build-platforms', 
+                  'build-assemblies', 'build-sdcards', 'test']
 
     overrides = get_overrides(cross_platform, config)
     workflow = {'rules': [
