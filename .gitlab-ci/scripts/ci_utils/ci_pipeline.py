@@ -223,16 +223,19 @@ def make_downstream_pipeline(host_platforms, osp, osp_path,
                 '.gitlab-ci/scripts/ci_yaml_generator.py {} {}'.format(
                     host_platform.name, cross_platform.name),
             ]
+                
             before_script = [
                 'yum install git -y',
-                'git clone --depth 1 --single-branch --branch'
-                    ' "$CI_UPSTREAM_REF"' 
-                    ' "https://gitlab.com/opencpi/opencpi.git"' 
-                    ' opencpi',
-                'git clone --depth 1 --single-branch --branch' 
-                    ' "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL"' 
-                    ' "opencpi/projects/osps/${CI_PROJECT_NAME}"',
-                'cd opencpi'
+                'if [ -z "$CI_UPSTREAM_ID" ];' \
+                    ' then export REF_NAME="develop"; fi',
+                ' '.join(['git clone --depth 1 --single-branch --branch "$REF_NAME"',
+                          '"https://gitlab.com/opencpi/opencpi.git"',
+                          'opencpi']),
+                ' '.join(['git clone --depth 1 --single-branch --branch', 
+                          '"$CI_COMMIT_REF_NAME"', 
+                          '"$CI_REPOSITORY_URL"', 
+                          '"opencpi/projects/osps/${CI_PROJECT_NAME}"',
+                          'cd opencpi'])
             ]
             artifacts = {'paths': [str(yaml_downstream_path)]}
             tags = ['docker']

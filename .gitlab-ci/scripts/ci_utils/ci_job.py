@@ -397,7 +397,8 @@ def make_before_script(stage, stages, platform, host_platform=None,
             ' '.join(['git clone --depth 1 --single-branch --branch', 
                       ref, 
                       '"$CI_REPOSITORY_URL"',
-                      '"opencpi/projects/osps/${CI_PROJECT_NAME}"'])
+                      '"opencpi/projects/osps/${CI_PROJECT_NAME}"']),
+            'cd opencpi'
         ]
         do_register = True
     else:

@@ -17,9 +17,9 @@ generate-children:centos7:e31x:
     - .gitlab-ci/yaml-downstream
   before_script:
   - yum install git -y
-  - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
-  - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
-  - cd opencpi
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="develop"; fi
+  - git clone --depth 1 --single-branch --branch "$REF_NAME" "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}" cd opencpi
   image: centos:7
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(e31x)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
