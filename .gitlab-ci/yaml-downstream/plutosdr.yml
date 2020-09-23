@@ -8,7 +8,7 @@ centos7:adi_plutosdr0_32:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml-downstream
+    - artifact: .gitlab-ci/yaml-children
       job: generate-children:centos7:adi_plutosdr0_32
     strategy: depend
 centos7:plutosdr:
@@ -21,13 +21,13 @@ centos7:plutosdr:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml-downstream
+    - artifact: .gitlab-ci/yaml-children
       job: generate-children:centos7:plutosdr
     strategy: depend
 generate-children:centos7:adi_plutosdr0_32:
   artifacts:
     paths:
-    - .gitlab-ci/yaml-downstream
+    - .gitlab-ci/yaml-children
   before_script:
   - yum install git -y
   - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="1347-osp-yaml-generator"; fi
@@ -51,7 +51,7 @@ generate-children:centos7:adi_plutosdr0_32:
 generate-children:centos7:plutosdr:
   artifacts:
     paths:
-    - .gitlab-ci/yaml-downstream
+    - .gitlab-ci/yaml-children
   before_script:
   - yum install git -y
   - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="1347-osp-yaml-generator"; fi

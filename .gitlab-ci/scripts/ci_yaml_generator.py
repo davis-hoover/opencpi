@@ -68,7 +68,7 @@ def main():
             print('\t', osp.name)
             osp_path = Path(osps_path, osp.name)
             pipeline = ci_pipeline.make_downstream_pipeline(
-                host_platforms, osp, osp_path, yaml_downstream_path, 
+                host_platforms, osp, osp_path, yaml_children_path, 
                 whitelist=whitelist, config=config)
             dump_path = Path(yaml_downstream_path, '{}.yml'.format(osp.name))
             ci_pipeline.dump(pipeline, dump_path)

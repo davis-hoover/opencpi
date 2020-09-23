@@ -8,13 +8,13 @@ centos7:e31x:
   stage: trigger-children
   trigger:
     include:
-    - artifact: .gitlab-ci/yaml-downstream
+    - artifact: .gitlab-ci/yaml-children
       job: generate-children:centos7:e31x
     strategy: depend
 generate-children:centos7:e31x:
   artifacts:
     paths:
-    - .gitlab-ci/yaml-downstream
+    - .gitlab-ci/yaml-children
   before_script:
   - yum install git -y
   - if [ -z "$CI_UPSTREAM_ID" ]; then export REF_NAME="1347-osp-yaml-generator"; fi
