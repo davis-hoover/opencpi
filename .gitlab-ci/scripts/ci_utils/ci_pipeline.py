@@ -236,7 +236,7 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
                           '"opencpi/projects/osps/${CI_PROJECT_NAME}"']),
                 'cd opencpi'
             ]
-            artifacts = {'paths': [str(yaml_children_path)]}
+            artifacts = {'paths': [str(Path('opencpi', yaml_children_path))]}
             tags = ['docker']
             image = 'centos:7'
             stage = 'generate-children'
@@ -253,7 +253,7 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
 
             # Make trigger job for child pipeline
             include = [{
-                'artifact': str(yaml_children_path),
+                'artifact': str(Path('opencpi', yaml_children_path)),
                 'job': generate_child_job.name
             }]
             trigger = ci_job.make_trigger(host_platform, cross_platform,

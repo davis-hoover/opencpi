@@ -471,10 +471,12 @@ def make_after_script(platform, do_ocpiremote=False):
     # If running in a pipeline, set pipeline_id var to ID of pipeline.
     # Otherwise, set to string "$CI_PIPELINE_ID"
     cmds = []
+    script_path = '.gitlab-ci/scripts/ci_artifacts.py'
     pipeline_id = os.getenv("CI_UPSTREAM_ID")
 
     if pipeline_id:
-        cmds.append ('cd opencpi')
+        cmds.append('cd opencpi')
+        script_path = Path('opencpi', script_path)
     else:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
         if not pipeline_id:
@@ -482,7 +484,7 @@ def make_after_script(platform, do_ocpiremote=False):
 
     job_name = '"$CI_JOB_NAME"'
     upload_cmd = ' '.join(['if [ ! -f ".success" ];',
-                           'then .gitlab-ci/scripts/ci_artifacts.py upload',
+                           'then {} upload'.format(script_path),
                            pipeline_id, job_name,
                            '-t "failed-job"; fi'])
     clean_cmd = 'rm -rf *'
