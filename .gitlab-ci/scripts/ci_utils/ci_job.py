@@ -827,6 +827,61 @@ def make_trigger_rules(platform, host_platform):
     ]
 
 
+def make_downstream_rules(platform, host_platform):
+    """Makes rules to control when a downstream job is executed in a 
+       pipeline
+
+    Args:
+        platform:       Platform of job to make rules for
+        host_platform:  Host_platform of job to make rules for
+
+    Returns:
+        dictionary of rule strings
+    """
+    # Rules are the same as above with addition of a check for host_platform
+    # matching same condition as platform
+    return [
+        {'if':
+            (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
+             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
+             r' && $CI_PIPELINE_SOURCE == "schedule"'
+             r' ').format(host_platform.name, platform.name)
+        },
+        {'if':
+            (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
+             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
+             r' && $CI_PIPELINE_SOURCE == "web"'
+             r' ').format(host_platform.name, platform.name)
+        },
+        {'if':
+            (r'$CI_MR_PLATFORMS =~ /(^| )({})( |$)/i'
+             r' && $CI_MR_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
+             r' && $CI_PIPELINE_SOURCE == "merge_request_event"'
+             r' ').format(host_platform.name, platform.name)
+        },
+        {'if':
+            (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
+             r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)({})(( |:|,)\S*)*\]/i'
+             r' && $CI_PIPELINE_SOURCE == "push"'
+             r' ').format(host_platform.name, platform.name)
+        },
+        {'if':
+            (r'$CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
+             r' && $CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)({})(( |:|,)\S*)*\]/i'
+             r' && $CI_PIPELINE_SOURCE == "push"'
+             r' ').format(host_platform.name, platform.name)
+        },
+        {'if':
+            (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
+             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
+             r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
+             r' && $CI_UPSTREAM_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
+             r' && $CI_PIPELINE_SOURCE == "push"'
+             r' ').format(host_platform.name, platform.name)
+        }
+    ]
+
+
 def stage_from_library(library):
     """Gets the stage of job based on its library
 

@@ -40,7 +40,8 @@ generate-children:centos7:adi_plutosdr0_32:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_UPSTREAM_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - yum install epel-release -y
   - yum install python36-PyYAML -y
@@ -64,7 +65,8 @@ generate-children:centos7:plutosdr:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_UPSTREAM_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - yum install epel-release -y
   - yum install python36-PyYAML -y

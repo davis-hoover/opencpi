@@ -27,7 +27,8 @@ generate-children:centos7:e31x:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(e31x)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(e31x)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(e31x)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(e31x)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_UPSTREAM_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(e31x)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(e31x)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_UPSTREAM_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
   script:
   - yum install epel-release -y
   - yum install python36-PyYAML -y
