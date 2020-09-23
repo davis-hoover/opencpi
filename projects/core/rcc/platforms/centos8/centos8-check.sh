@@ -1,4 +1,4 @@
-#!/bin/sh --noprofile
+#!/bin/bash --noprofile
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -18,4 +18,4 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 f=/etc/centos-release
-[ -r $f ] && read c l r v x < $f && [[ $c == CentOS && $v == 8.* ]]
+[ -r $f ] && read c l r v x < $f && [[ $c == CentOS && $v =~ 8.* ]]
