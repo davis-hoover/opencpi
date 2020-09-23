@@ -245,7 +245,7 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
             stage = 'generate-children'
             name = ci_job.make_name(cross_platform, stage=stage,
                                     host_platform=host_platform)
-            rules = ci_job.make_downstream_rules(cross_platform, host_platform)
+            rules = ci_job.make_rules(cross_platform, host_platform)
             generate_child_job = ci_job.Job(name=name, stage=stage,
                                             script=script, 
                                             before_script=before_script, 
