@@ -16,8 +16,8 @@ generate-children:centos7:e31x:
     - opencpi/.gitlab-ci/yaml-children/centos7-e31x.yml
   before_script:
   - yum install git -y
-  - if [ -z "$CI_UPSTREAM_ID" ]; then export UPSTREAM_REF="1347-osp-yaml-generator"; fi
-  - git clone --depth 1 --single-branch --branch "$UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
+  - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi
   image: centos:7
