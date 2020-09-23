@@ -758,7 +758,7 @@ def make_job_rules(platform):
             # If platform in CI_COMMIT_MESSAGE env var and pipeline source
             # is a push
             (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
-             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api"'
              r' ').format(platform.name)
         },
         {'if':
@@ -767,7 +767,7 @@ def make_job_rules(platform):
             # is a push
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
              r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
-             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api"'
              r' ').format(platform.name)
         }
     ]
@@ -801,14 +801,14 @@ def make_trigger_rules(platform, host_platform):
         {'if':
             (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
              r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)({})(( |:|,)\S*)*\]/i'
-             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api"'
              r' ').format(host_platform.name, platform.name)
         },
         {'if':
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
              r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
              r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
-             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api"'
              r' ').format(host_platform.name, platform.name)
         }
     ]
