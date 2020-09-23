@@ -228,9 +228,9 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
                 'yum install git -y',
                 #TODO: change ref to 'develop'
                 'if [ -z "$CI_UPSTREAM_ID" ];' \
-                    ' then export REF_NAME="1347-osp-yaml-generator"; fi',
+                    ' then export UPSTREAM_REF="1347-osp-yaml-generator"; fi',
                 ' '.join(['git clone --depth 1 --single-branch --branch'
-                            ' "$REF_NAME"',
+                            ' "$UPSTREAM_REF"',
                           '"https://gitlab.com/opencpi/opencpi.git"',
                           'opencpi']),
                 ' '.join(['git clone --depth 1 --single-branch --branch', 
