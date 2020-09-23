@@ -805,11 +805,7 @@ def make_trigger_rules(platform, host_platform):
              r' ').format(host_platform.name, platform.name)
         },
         {'if':
-            (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
-             r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
-             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api"'
-             r' ').format(host_platform.name, platform.name)
+            r'$CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
         }
     ]
 
