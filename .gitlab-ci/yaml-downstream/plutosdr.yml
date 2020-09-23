@@ -1,10 +1,9 @@
 centos7:adi_plutosdr0_32:
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
   stage: trigger-children
   trigger:
     include:
@@ -13,11 +12,10 @@ centos7:adi_plutosdr0_32:
     strategy: depend
 centos7:plutosdr:
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
   stage: trigger-children
   trigger:
     include:
@@ -36,11 +34,10 @@ generate-children:centos7:adi_plutosdr0_32:
   - cd opencpi
   image: centos:7
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
   script:
   - yum install epel-release -y
   - yum install python36-PyYAML -y
@@ -60,11 +57,10 @@ generate-children:centos7:plutosdr:
   - cd opencpi
   image: centos:7
   rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "schedule" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "web" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline" '
   script:
   - yum install epel-release -y
   - yum install python36-PyYAML -y

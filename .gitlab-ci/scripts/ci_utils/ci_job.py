@@ -742,16 +742,9 @@ def make_job_rules(platform):
     return [
         {'if':
             # If platform in CI_PLATFORMS env var and pipeline source
-            # is a scheduled pipeline
-            (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PIPELINE_SOURCE == "schedule"'
-             r' ').format(platform.name)
-        },
-        {'if':
-            # If platform in CI_PLATFORMS env var and pipeline source
             # is gitlab web UI
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PIPELINE_SOURCE == "web"'
+             r' && $CI_PIPELINE_SOURCE =~ "web|schedule"'
              r' ').format(platform.name)
         },
         {'if':
@@ -765,7 +758,7 @@ def make_job_rules(platform):
             # If platform in CI_COMMIT_MESSAGE env var and pipeline source
             # is a push
             (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
-             r' && $CI_PIPELINE_SOURCE == "push"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
              r' ').format(platform.name)
         },
         {'if':
@@ -774,7 +767,7 @@ def make_job_rules(platform):
             # is a push
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
              r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
-             r' && $CI_PIPELINE_SOURCE == "push"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
              r' ').format(platform.name)
         }
     ]
@@ -796,13 +789,7 @@ def make_trigger_rules(platform, host_platform):
         {'if':
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
              r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
-             r' && $CI_PIPELINE_SOURCE == "schedule"'
-             r' ').format(host_platform.name, platform.name)
-        },
-        {'if':
-            (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
-             r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
-             r' && $CI_PIPELINE_SOURCE == "web"'
+             r' && $CI_PIPELINE_SOURCE =~ "web|schedule"'
              r' ').format(host_platform.name, platform.name)
         },
         {'if':
@@ -814,14 +801,14 @@ def make_trigger_rules(platform, host_platform):
         {'if':
             (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
              r' && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)({})(( |:|,)\S*)*\]/i'
-             r' && $CI_PIPELINE_SOURCE == "push"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
              r' ').format(host_platform.name, platform.name)
         },
         {'if':
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
              r' && $CI_PLATFORMS =~ /(^| |:|,)({})( |:|,|$)/i'
              r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
-             r' && $CI_PIPELINE_SOURCE == "push"'
+             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline"'
              r' ').format(host_platform.name, platform.name)
         }
     ]
