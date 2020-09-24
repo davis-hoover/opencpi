@@ -741,7 +741,7 @@ def make_job_rules(platform):
     # adding an extra space at the end.
     return [
         {'if':
-            (r'CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"'),
+            (r'$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '),
          'when': 'never'
         },
         {'if':

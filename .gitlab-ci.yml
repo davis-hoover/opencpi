@@ -9,7 +9,7 @@ build:centos7:
   - touch .timestamp
   dependencies: []
   rules:
-  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
     when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
@@ -326,7 +326,7 @@ packages:centos7:
   dependencies: []
   image: centos:7
   rules:
-  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
     when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
@@ -344,7 +344,7 @@ prereqs:centos7:
   - touch .timestamp
   dependencies: []
   rules:
-  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
     when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
@@ -379,7 +379,7 @@ test:centos7:
   - source cdk/opencpi-setup.sh -e
   dependencies: []
   rules:
-  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
     when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
