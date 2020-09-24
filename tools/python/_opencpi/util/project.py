@@ -479,7 +479,7 @@ def throw_not_valid_dirtype_e(valid_loc):
     """
     throws an exception and forms a error message if not in a valid directory
     """
-    raise OCPIException("The directory of type " + get_dirtype() + " is not a valid directory " +
+    raise OCPIException("The directory of type " + str(get_dirtype()) + " is not a valid directory " +
                         "type to run this command in. Valid directory types are: " +
                         ' '.join(valid_loc))
 
