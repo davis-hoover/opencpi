@@ -197,7 +197,8 @@ def make_child_pipeline(projects, host_platform, cross_platform,
 def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path, 
                              whitelist=None, config=None):
     #TODO: docs
-    stages = ['generate-children', 'trigger-children']
+    stages = ['prereqs', 'build', 'test', 'generate-children', 
+              'trigger-children']
     jobs = []
 
     for host_platform in host_platforms:
@@ -206,6 +207,11 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
                 host_whitelist = whitelist[host_platform.name]
             else:
                 continue
+
+        overrides = get_overrides(host_platform, config)
+        host_jobs = ci_job.make_jobs(stages, host_platform, 
+                                     overrides=overrides)
+        jobs += host_jobs
 
         for cross_platform in osp.platforms:
             if whitelist and cross_platform.name not in host_whitelist:

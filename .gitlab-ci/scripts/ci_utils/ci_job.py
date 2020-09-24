@@ -741,6 +741,10 @@ def make_job_rules(platform):
     # adding an extra space at the end.
     return [
         {'if':
+            (r'CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"'),
+         'when': 'never'
+        },
+        {'if':
             # If platform in CI_PLATFORMS env var and pipeline source
             # is gitlab web UI
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
@@ -752,13 +756,13 @@ def make_job_rules(platform):
             # is a merge request
             (r'$CI_MR_PLATFORMS =~ /(^| )({})( |$)/i'
              r' && $CI_PIPELINE_SOURCE == "merge_request_event"'
-             r' ').format( platform.name)
+             r' ').format(platform.name)
         },
         {'if':
             # If platform in CI_COMMIT_MESSAGE env var and pipeline source
             # is a push
             (r'$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +({})( \S*)*\]/i'
-             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api"'
+             r' && $CI_PIPELINE_SOURCE =~ "push"'
              r' ').format(platform.name)
         },
         {'if':
@@ -767,7 +771,7 @@ def make_job_rules(platform):
             # is a push
             (r'$CI_PLATFORMS =~ /(^| )({})( |$)/i'
              r' && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i'
-             r' && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api"'
+             r' && $CI_PIPELINE_SOURCE =~ "push"'
              r' ').format(platform.name)
         }
     ]

@@ -9,10 +9,12 @@ build:centos7:
   - touch .timestamp
   dependencies: []
   rules:
+  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+    when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
   script:
   - scripts/build-opencpi.sh centos7
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
@@ -324,10 +326,12 @@ packages:centos7:
   dependencies: []
   image: centos:7
   rules:
+  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+    when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
   script: scripts/install-packages.sh centos7
   stage: prereqs
   tags:
@@ -340,10 +344,12 @@ prereqs:centos7:
   - touch .timestamp
   dependencies: []
   rules:
+  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+    when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
   script:
   - scripts/install-prerequisites.sh centos7
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
@@ -373,10 +379,12 @@ test:centos7:
   - source cdk/opencpi-setup.sh -e
   dependencies: []
   rules:
+  - if: CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api"
+    when: never
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push|cross_project_pipeline|api" '
+  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
+  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
   script:
   - scripts/test-opencpi.sh --no-hdl
   - .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -s .timestamp -t "successful-job"
