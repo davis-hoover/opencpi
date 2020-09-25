@@ -1,6 +1,6 @@
 build:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
@@ -28,6 +28,8 @@ build:centos7:
   - centos7
   - shell
   - opencpi
+  variables:
+    GIT_STRATEGY: none
 centos7:adi_plutosdr0_32:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
@@ -78,6 +80,8 @@ generate-children:centos7:adi_plutosdr0_32:
   stage: generate-children
   tags:
   - docker
+  variables:
+    GIT_STRATEGY: none
 generate-children:centos7:plutosdr:
   artifacts:
     paths:
@@ -102,25 +106,11 @@ generate-children:centos7:plutosdr:
   stage: generate-children
   tags:
   - docker
-packages:centos7:
-  after_script: []
-  before_script: []
-  dependencies: []
-  image: centos:7
-  rules:
-  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
-    when: never
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE =~ "push" '
-  script: scripts/install-packages.sh centos7
-  stage: prereqs
-  tags:
-  - docker
+  variables:
+    GIT_STRATEGY: none
 prereqs:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
@@ -145,6 +135,8 @@ prereqs:centos7:
   - centos7
   - shell
   - opencpi
+  variables:
+    GIT_STRATEGY: none
 stages:
 - prereqs
 - build
@@ -153,7 +145,7 @@ stages:
 - trigger-children
 test:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
@@ -182,3 +174,5 @@ test:centos7:
   - centos7
   - shell
   - opencpi
+  variables:
+    GIT_STRATEGY: none

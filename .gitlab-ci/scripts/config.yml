@@ -16,3 +16,14 @@ modelsim:
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
+plutosdr:
+  overrides:
+    build-assemblies:centos7:assets_ts:assemblies:plutosdr:
+      variables:
+        OCPI_PROJECT_PATH: '"$OCPI_CDK_DIR"/../projects/assets:"$OCPI_CDK_DIR"/../projects/platform'
+    build-tests:centos7:core:components:plutosdr:
+      variables:
+        OCPI_PROJECT_PATH: '"$OCPI_CDK_DIR"/../projects/assets:"$OCPI_CDK_DIR"/../projects/platform'
+    build-tests:centos7:assets_ts:components:plutosdr:
+      variables:
+        OCPI_PROJECT_PATH: '"$OCPI_CDK_DIR"/../projects/assets:"$OCPI_CDK_DIR"/../projects/platform'

@@ -254,12 +254,14 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
             name = ci_job.make_name(cross_platform, stage=stage,
                                     host_platform=host_platform)
             rules = ci_job.make_rules(cross_platform, host_platform)
+            variables = {'GIT_STRATEGY': 'none'}
             generate_child_job = ci_job.Job(name=name, stage=stage,
                                             script=script, 
                                             before_script=before_script, 
                                             artifacts=artifacts,
                                             tags=tags, image=image,
-                                            rules=rules, overrides=overrides)
+                                            rules=rules, overrides=overrides,
+                                            variables=variables)
             jobs.append(generate_child_job)
 
             # Make trigger job for child pipeline

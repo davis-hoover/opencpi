@@ -66,12 +66,10 @@ def Job(name, stage=None, script=None, before_script=None, after_script=None,
             job_args[key] = overrides[key]
         elif key != 'overrides':
             job_args[key] = value
-    
-    if os.getenv('CI_UPSTREAM_ID'):
-        if not job_args['variables']:
-            job_args['variables'] = variables
-        elif 'GIT_STRATEGY' not in job_args['variables']:
-            job_args['variables']['GIT_STRATEGY'] = variables
+
+    if overrides and 'variables' in overrides:
+        if variables and 'GIT_STRATEGY' in variables:
+            job_args['variables']['GIT_STRATEGY'] = 'none'
 
     return _Job(**job_args)
 
@@ -173,7 +171,7 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
             if job:
                 jobs.append(job)
 
-        if stage == 'prereqs' and platform.is_host:
+        if stage == 'prereqs' and platform.is_host and not is_downstream:
             name = make_name(platform, stage='packages')
             job = make_job(stage, stages, platform, name=name,
                            overrides=overrides, is_downstream=is_downstream)
@@ -342,9 +340,15 @@ def make_job(stage, stages, platform, project=None, name=None,
     else:
         resource_group = None
 
+    if os.getenv('CI_UPSTREAM_ID') or is_downstream:
+        variables = {'GIT_STRATEGY': 'none'}
+    else:
+        variables = None
+
     job = Job(name, stage, script, tags=tags, before_script=before_script,
               after_script=after_script, rules=rules, overrides=overrides,
-              resource_group=resource_group, dependencies=dependencies)
+              resource_group=resource_group, dependencies=dependencies,
+              variables=variables)
 
     return job
 
@@ -439,8 +443,8 @@ def make_before_script(stage, stages, platform, host_platform=None,
 
     timestamp_cmd = 'touch .timestamp'
     cmds.append(timestamp_cmd)
-
-    if stage == 'prereqs':
+    
+    if stage == 'prereqs' and platform.is_host:
         return cmds
 
     # Download artifacts for platform, host_platform, and linked_platform
@@ -456,13 +460,16 @@ def make_before_script(stage, stages, platform, host_platform=None,
                              '-e', ' '.join(excludes)])
     sleep_cmd = 'sleep 2'
     cmds += [download_cmd, sleep_cmd, timestamp_cmd]
-
+    
     if stage == 'build':
         return cmds
 
     source_cmd = 'source cdk/opencpi-setup.sh -e'
     cmds.append(source_cmd)
 
+    if register_cmd:
+        cmds.append(register_cmd)
+    
     if do_ocpiremote:
         cmds += [
             make_ocpiremote_cmd('deploy', platform,
@@ -475,9 +482,6 @@ def make_before_script(stage, stages, platform, host_platform=None,
             'export OCPI_SERVER_ADDRESSES={}:{}'.format(platform.ip,
                                                         platform.port)
         ]
-
-    if register_cmd:
-        cmds.append(register_cmd)
 
     return cmds
 
@@ -501,8 +505,10 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
     cmds = []
     script_path = '.gitlab-ci/scripts/ci_artifacts.py'
     pipeline_id = os.getenv("CI_UPSTREAM_ID")
+    success_path = Path('.success')
 
     if pipeline_id or is_downstream:
+        success_path = Path('opencpi', '.success')
         script_path = Path('opencpi', script_path)
     if not pipeline_id:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
@@ -510,7 +516,7 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
             pipeline_id = '"$CI_PIPELINE_ID"'
 
     job_name = '"$CI_JOB_NAME"'
-    upload_cmd = ' '.join(['if [ ! -f ".success" ];',
+    upload_cmd = ' '.join(['if [ ! -f "{}" ];'.format(success_path),
                            'then {} upload'.format(script_path),
                            pipeline_id, job_name,
                            '-t "failed-job"; fi'])
