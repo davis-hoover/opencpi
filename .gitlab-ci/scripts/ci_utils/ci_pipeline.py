@@ -209,8 +209,8 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
                 continue
 
         overrides = get_overrides(host_platform, config)
-        host_jobs = ci_job.make_jobs(stages, host_platform, 
-                                     overrides=overrides)
+        host_jobs = ci_job.make_jobs(stages, host_platform,
+                                     overrides=overrides, is_downstream=True)
         jobs += host_jobs
 
         for cross_platform in osp.platforms:
@@ -233,8 +233,10 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
             before_script = [
                 'yum install git -y',
                 #TODO: change ref to 'develop'
-                'if [ -z "$CI_UPSTREAM_ID" ];' \
-                    ' then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi',
+                ' '.join(['if [ -z "$CI_UPSTREAM_ID" ];',
+                          'then export', 
+                          'CI_UPSTREAM_REF="1347-osp-yaml-generator";',
+                          'fi']),
                 ' '.join(['git clone --depth 1 --single-branch --branch'
                             ' "$CI_UPSTREAM_REF"',
                           '"https://gitlab.com/opencpi/opencpi.git"',
@@ -251,7 +253,7 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
             stage = 'generate-children'
             name = ci_job.make_name(cross_platform, stage=stage,
                                     host_platform=host_platform)
-            rules = ci_job.make_downstream_rules(cross_platform, host_platform)
+            rules = ci_job.make_rules(cross_platform, host_platform)
             generate_child_job = ci_job.Job(name=name, stage=stage,
                                             script=script, 
                                             before_script=before_script, 
@@ -266,7 +268,7 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
                 'job': generate_child_job.name
             }]
             trigger = ci_job.make_trigger(host_platform, cross_platform,
-                                            include, overrides=overrides)
+                                          include, overrides=overrides)
             jobs.append(trigger)
 
     return Pipeline(stages, jobs)

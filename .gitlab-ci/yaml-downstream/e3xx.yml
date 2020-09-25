@@ -1,8 +1,12 @@
 build:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
+  - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
+  - cd opencpi
   - touch .timestamp
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "build:*" "test:*" "generate-children:*" "trigger-children:*"
   - sleep 2
@@ -30,6 +34,7 @@ centos7:e31x:
   - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(e31x)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
   - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(e31x)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(e31x)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
+  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
   stage: trigger-children
   trigger:
     include:
@@ -78,9 +83,13 @@ packages:centos7:
   - docker
 prereqs:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
+  - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
+  - cd opencpi
   - touch .timestamp
   dependencies: []
   rules:
@@ -107,9 +116,13 @@ stages:
 - trigger-children
 test:centos7:
   after_script:
-  - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
+  - if [ ! -f ".success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
+  - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
+  - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
+  - cd opencpi
   - touch .timestamp
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "test:*" "generate-children:*" "trigger-children:*"
   - sleep 2
