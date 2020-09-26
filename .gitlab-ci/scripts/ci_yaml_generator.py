@@ -27,7 +27,7 @@ def main():
         whitelist = yaml.safe_load(yml)
 
     # Discover opencpi projects and platforms
-    project_blacklist = ['tutorial', 'osps']
+    project_blacklist = ['tutorial']
     projects = ci_project.discover_projects(projects_path,
                                             blacklist=project_blacklist)
     platforms = ci_platform.discover_platforms(projects, config=config)
