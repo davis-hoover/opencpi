@@ -280,6 +280,13 @@ def make_trigger(host_platform, cross_platform, include, overrides=None):
         'include': include,
         'strategy': 'depend'
     }
+
+    # upstream_id = os.getenv('CI_UPSTREAM_ID')
+    # if upstream_id:
+    #     variables = {'CI_UPSTREAM_ID': upstream_id}
+    # else:
+    #     variables = None
+    
     job = Job(name, stage=stage, trigger=trigger, rules=rules,
               overrides=overrides)
 
@@ -405,24 +412,43 @@ def make_before_script(stage, stages, platform, host_platform=None,
     # If running in a pipeline, set pipeline_id var to ID of pipeline.
     # Otherwise, set to string "$CI_PIPELINE_ID"
     pipeline_id = os.getenv("CI_UPSTREAM_ID")
+    project_name = os.getenv("CI_PROJECT_NAME")
+    
+    # In triggered pipeline
     if pipeline_id:
+        print('triggered-pipeline')
         upstream_ref = os.getenv("CI_UPSTREAM_REF")
         ref = os.getenv("CI_COMMIT_REF_NAME")
         do_clone = True
-        register_cmd = make_ocpidev_cmd(
-            'register', path='projects/osps/${CI_PROJECT_NAME}', 
-            noun='project')
+        do_register = True
     else:
-        register_cmd = None
         pipeline_id = os.getenv("CI_PIPELINE_ID")
-        if not pipeline_id:
-            pipeline_id = '"$CI_PIPELINE_ID"'
-        if is_downstream:
-            upstream_ref = '"$CI_UPSTREAM_REF"'
-            ref = '"$CI_COMMIT_REF_NAME"'
-            do_clone = True
+
+        # In non-triggered ipeline
+        if pipeline_id:
+            if project_name == 'opencpi':
+                print('in opencpi pipeline')
+                do_clone = False
+                do_register = False
+            else:
+                print('non-triggered osp pipeline')
+                upstream_ref = 'develop'
+                ref = os.getenv("CI_COMMIT_REF_NAME")
+                do_clone = True
+                do_register = True
         else:
-            do_clone = False
+            # Not in an osp pipeline
+            print('not a pipeline')
+            do_register = False
+            pipeline_id = '"$CI_PIPELINE_ID"'
+            if is_downstream:
+                print('downstream')
+                upstream_ref = '"$CI_UPSTREAM_REF"'
+                ref = '"$CI_COMMIT_REF_NAME"'
+                do_clone = True
+            else:
+                print('opencpi')
+                do_clone = False
 
     if do_clone:
         cmds += [
@@ -467,7 +493,10 @@ def make_before_script(stage, stages, platform, host_platform=None,
     source_cmd = 'source cdk/opencpi-setup.sh -e'
     cmds.append(source_cmd)
 
-    if register_cmd:
+    if do_register:
+        register_cmd = make_ocpidev_cmd(
+            'register', path='projects/osps/${CI_PROJECT_NAME}', 
+            noun='project')
         cmds.append(register_cmd)
     
     if do_ocpiremote:
