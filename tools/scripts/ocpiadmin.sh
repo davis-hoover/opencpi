@@ -74,6 +74,9 @@ function getvars {
     # and exported upon return from above "setVarsFromMake" calls.
     return 0
   fi
+  # unset OCPI_ALL_RCC_PLATFORMS and OCPI_ALL_HDL_PLATFORMS
+  # to avoid breaking platform installation.
+  unset OCPI_ALL_RCC_PLATFORMS OCPI_ALL_HDL_PLATFORMS
   platforms="$RccAllPlatforms $HdlAllPlatforms"
   if isPresent $platform $platforms; then
     if isPresent $platform $RccAllPlatforms; then
@@ -192,9 +195,6 @@ else
     fi
     # Check if the platform is now available, without registering it
     export OCPI_PROJECT_PATH=`pwd`/$project_dir
-    # If the platform is available (platform database has been updated),
-    # unset "OCPI_ALL_{HDL,RCC}_PLATFORMS" so can be updated by "getvars".
-    unset OCPI_ALL_HDL_PLATFORMS OCPI_ALL_RCC_PLATFORMS
     if getvars; then
 	echo The $model platform \"$platform\" found after using the new project \"$project\".
     else
@@ -242,10 +242,7 @@ else
     # here by calling "getvars" one more time (after everything is built),
     # or in the "export-platform-to-framework.sh" script.
     #
-    # Unset "OCPI_ALL_{HDL,RCC}_PLATFORMS" before calling "getvars":
-    # the overhead is minimal and avoids unintended consequences if
-    # the platform database has been updated.  No need to check the
-    # return value from "getvars" at this point.
+    # No need to check the return value from "getvars" at this point.
     #
     getvars
     $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform $platform_dir

@@ -79,5 +79,4 @@ fi
 # Ensure we are really starting fresh for this target
 unset `env | grep OCPI_TARGET | egrep -v 'OCPI_TARGET_(PLATFORM|DIR|KERNEL_DIR)' | sed 's/=.*//'`
 source $OCPI_CDK_DIR/scripts/util.sh
-unset OCPI_ALL_HDL_PLATFORMS OCPI_ALL_RCC_PLATFORMS
 setVarsFromMake $OCPI_CDK_DIR/include/setup-target-platform.mk ShellTargetVars=1 -v
