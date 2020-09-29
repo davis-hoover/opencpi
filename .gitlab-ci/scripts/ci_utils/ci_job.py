@@ -455,9 +455,6 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 print('opencpi')
                 do_clone = False
 
-    clean_cmd = 'rm -rf *'
-    cmds.append(clean_cmd)
-
     if do_clone:
         cmds += [
             #TODO: change ref to 'develop'
