@@ -1,0 +1,8 @@
+<!-- This is the spec file (OCS) for: ramp
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <Port Name="in" Producer="false" Protocol="rstream_protocol"/>
+  <Port Name="out" Producer="true" Protocol="rstream_protocol"/> 
+</ComponentSpec>

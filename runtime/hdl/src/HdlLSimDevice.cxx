@@ -406,6 +406,7 @@ protected:
     ocpiInfo("Waiting for simulator to start before issuing any more credits.");
     OS::sleep(100);
     ocpiCheck(signal(SIGINT, sigint) != SIG_ERR);
+    ocpiCheck(signal(SIGTERM, sigint) != SIG_ERR);
     for (unsigned n = 0; n < 1; n++)
       if (spin(err) || mywait(false, err) || ack(err))
 	return true;
@@ -672,6 +673,7 @@ protected:
 	if (d.m_stopped) {
 	  w2("\nSimulator process pid %u still running.\n", d.m_pid);
 	  signal(SIGINT, SIG_DFL);
+	  signal(SIGTERM, SIG_DFL);
 	}
 	d.m_stopped = true;
       }
@@ -1156,9 +1158,15 @@ search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std:
   ocpiInfo("Searching for local HDL simulators.");
   bool verbose = false;
   OU::findBool(params, "verbose", verbose);
+  unsigned count = 0;
+  const char *envsim = getenv("OCPI_HDL_SIMULATOR");
+  if (envsim) {
+    OCPI::HDL::Device *dev = open(envsim, params, error);
+    ocpiInfo("Using the simulator specified by OCPI_HDL_SIMULATOR: %s",
+	     envsim);
+    return dev && !found(*dev, excludes, discoveryOnly, error) ? 1 : 0;
+  }
   const char *envsims = getenv("OCPI_HDL_SIMULATORS");
-  if (!envsims)
-    envsims = getenv("OCPI_HDL_SIMULATOR");
   std::set<std::string> onlySims;
   if (envsims) {
     ocpiInfo("Restricting discovery of HDL simulators to: %s", envsims);
@@ -1180,7 +1188,6 @@ search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std:
       OU::format(error, "Cannot find any simulation platforms: %s", err);
       return 0;
     }
-    unsigned count = 0;
     for (unsigned n = 0; n < sims.size(); n++) {
       const char *name = strrchr(sims[n].c_str(), '/') + 1;
       if (!onlySims.empty() && onlySims.find(name) == onlySims.end()) {
@@ -1220,7 +1227,7 @@ search(const OU::PValue *params, const char **excludes, bool discoveryOnly, std:
 	error = serr;
     }
   }
-  return 0;
+  return count;
 }
 
 OH::Device *Driver::

@@ -215,6 +215,7 @@ else
     ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
     ocpidev -d projects/assets build --hdl --hdl-platform=$platform --no-assemblies
     ocpidev -d projects/assets_ts build --hdl --hdl-platform=$platform --no-assemblies
+    ocpidev -d projects/tutorial build --hdl --hdl-platform=$platform --no-assemblies
     # Make sure that tutorials can run after installation, note will do rcc too.
     [ "$platform" != xsim ] || ocpidev -d projects/tutorial build --hdl-platform=$platform
     # If project dir is not one of the core projects, build the platform

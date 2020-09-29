@@ -160,6 +160,7 @@ namespace OCPI {
       virtual bool connectInside(BasicPort &/*in*/, BasicPort &/*out*/) { return false; }
     protected:
       void shutdown();
+      virtual Application *firstApplication() const = 0; // Allow base class to see if there are apps
     };
   }
 }

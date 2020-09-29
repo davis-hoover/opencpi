@@ -1,0 +1,9 @@
+<!-- This is the spec file (OCS) for: ander
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <Port Name="in1" Producer="false" Protocol="rstream_protocol"/>
+  <Port Name="in2" Producer="false" Protocol="rstream_protocol"/>
+  <Port Name="out" Producer="true" Protocol="iqstream_protocol"/> 
+</ComponentSpec>

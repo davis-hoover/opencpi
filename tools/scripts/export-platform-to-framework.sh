@@ -235,7 +235,7 @@ function anylink {
 }
 shopt -s nullglob
 for p in prerequisites/*; do
-  for l in $p/$platform/lib/*; do
+  for l in $p/$platform/lib/lib*; do # ignore any files not starting with lib
     liblink $l exports
     if [[ $l == *.so || $l == *.so.* || $l == *.dylib ]]; then
        liblink $l exports/runtime

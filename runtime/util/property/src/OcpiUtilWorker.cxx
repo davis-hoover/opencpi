@@ -224,6 +224,9 @@ namespace OCPI {
       } else if (!strcasecmp(sym, "spec")) {
 	val.setString(m_specName);
 	return NULL;
+      } else if (!strcasecmp(sym, "worker")) {
+	val.setString(m_name + "." + m_model);
+	return NULL;
       }
       Property *p = m_properties;
       if (sym[0] == '@')

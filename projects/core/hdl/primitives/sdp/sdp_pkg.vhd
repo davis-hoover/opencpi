@@ -175,10 +175,12 @@ component unoc2sdp
 end component unoc2sdp;
 component sdp_node_rv is
   generic(
-    sdp_width       : in   uchar_t := to_uchar(1));
+    sdp_width       : in  uchar_t := to_uchar(1));
   port(
-    wci_Clk         : in   std_logic;
-    wci_Reset_n     : in   std_logic;
+    wci_Clk         : in  std_logic;
+    wci_Reset_n     : in  std_logic;
+    sdp_Clk         : in  std_logic;
+    sdp_reset       : in  std_logic;
     up_in           : in  m2s_t;
     up_out          : out s2m_t;
     up_in_data      : in  dword_array_t(0 to to_integer(sdp_width)-1);
@@ -198,6 +200,8 @@ component sdp2cp_clk_rv is
   port(
     wci_Clk      : in   std_logic;
     wci_Reset_n  : in   std_logic;
+    sdp_Clk      : in  std_logic;
+    sdp_reset    : in  std_logic;
     cp_in        : in  platform.platform_pkg.occp_out_t;
     cp_out       : out platform.platform_pkg.occp_in_t;
     sdp_in       : in  m2s_t;

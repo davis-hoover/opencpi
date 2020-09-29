@@ -64,6 +64,7 @@ namespace OCPI {
 	unsigned *m_containers;                        // containers used by this deployment
 	const OCPI::Library::Implementation **m_impls; // implementation on each container
 	CMap m_feasible;
+	std::vector<unsigned> m_slaves; // the instance ordinals of the slaves for a proxy instance
 	Deployment();
 	~Deployment();
 	Deployment &operator=(const Deployment &d);
@@ -72,7 +73,7 @@ namespace OCPI {
       };
       // This structure is used during deployment planning.
       struct Instance {
-	Deployment m_deployment;      // Current deployent when generating all of them
+	Deployment m_deployment;      // Current deployment when generating all of them
 	Deployment m_bestDeployment;
 	CMap *m_feasibleContainers;   // map per candidate, from findContainers
 	size_t m_nCandidates;         // convenience
@@ -199,6 +200,7 @@ namespace OCPI {
       void finalizeProperties(const OCPI::Util::PValue *params);
       const char *finalizePortParam(const OCPI::Util::PValue *params, const char *pName);
       void finalizeExternals();
+      bool resolveSlaves();
       bool bookingOk(Booking &b, OCPI::Library::Candidate &c, unsigned n);
       void policyMap( Instance * i, CMap & bestMap);
       void setPolicy(const OCPI::API::PValue *params);
