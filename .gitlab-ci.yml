@@ -1,7 +1,7 @@
 build:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf *
+  - rm -rf "$CI_PROJECT_DIR"
   before_script:
   - touch .timestamp
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "build:*" "test:*" "generate-children:*" "trigger-children:*" "deploy:*"
@@ -24,19 +24,6 @@ build:centos7:
   - centos7
   - shell
   - opencpi
-centos7:adi_plutosdr0_32:
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
-  stage: trigger-children
-  trigger:
-    include:
-    - artifact: .gitlab-ci/yaml-children/centos7-adi_plutosdr0_32.yml
-      job: generate-children:centos7:adi_plutosdr0_32
-    strategy: depend
 centos7:isim:
   rules:
   - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(isim)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
@@ -75,19 +62,6 @@ centos7:modelsim:
     include:
     - artifact: .gitlab-ci/yaml-children/centos7-modelsim.yml
       job: generate-children:centos7:modelsim
-    strategy: depend
-centos7:plutosdr:
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
-  stage: trigger-children
-  trigger:
-    include:
-    - artifact: .gitlab-ci/yaml-children/centos7-plutosdr.yml
-      job: generate-children:centos7:plutosdr
     strategy: depend
 centos7:xilinx13_3:
   rules:
@@ -180,24 +154,6 @@ centos7:zed_ise:
     - artifact: .gitlab-ci/yaml-children/centos7-zed_ise.yml
       job: generate-children:centos7:zed_ise
     strategy: depend
-generate-children:centos7:adi_plutosdr0_32:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-adi_plutosdr0_32.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(adi_plutosdr0_32)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(adi_plutosdr0_32)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 adi_plutosdr0_32
-  stage: generate-children
-  tags:
-  - docker
 generate-children:centos7:isim:
   artifacts:
     paths:
@@ -249,24 +205,6 @@ generate-children:centos7:modelsim:
   - yum install epel-release -y
   - yum install python36-PyYAML -y
   - .gitlab-ci/scripts/ci_yaml_generator.py centos7 modelsim
-  stage: generate-children
-  tags:
-  - docker
-generate-children:centos7:plutosdr:
-  artifacts:
-    paths:
-    - .gitlab-ci/yaml-children/centos7-plutosdr.yml
-  image: centos:7
-  rules:
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE =~ "web|schedule" '
-  - if: '$CI_MR_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_MR_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_PIPELINE_SOURCE == "merge_request_event" '
-  - if: '$CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)* +(centos7)( \S*)*\]/i && $CI_COMMIT_MESSAGE =~ /\[ *ci *( \S*)*( +|:|,)(plutosdr)(( |:|,)\S*)*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PLATFORMS =~ /(^| )(centos7)( |$)/i && $CI_PLATFORMS =~ /(^| |:|,)(plutosdr)( |:|,|$)/i && $CI_COMMIT_MESSAGE !~ /\[ *ci.*\]/i && $CI_PIPELINE_SOURCE == "push" '
-  - if: '$CI_PIPELINE_SOURCE =~ "cross_project_pipeline|api" '
-  script:
-  - yum install epel-release -y
-  - yum install python36-PyYAML -y
-  - .gitlab-ci/scripts/ci_yaml_generator.py centos7 plutosdr
   stage: generate-children
   tags:
   - docker
@@ -421,7 +359,7 @@ packages:centos7:
 prereqs:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf *
+  - rm -rf "$CI_PROJECT_DIR"
   before_script:
   - touch .timestamp
   dependencies: []
@@ -452,7 +390,7 @@ stages:
 test:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf *
+  - rm -rf "$CI_PROJECT_DIR"
   before_script:
   - touch .timestamp
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "test:*" "generate-children:*" "trigger-children:*" "deploy:*"

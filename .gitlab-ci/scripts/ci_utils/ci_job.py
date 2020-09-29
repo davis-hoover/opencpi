@@ -546,6 +546,7 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
         script_path = Path('opencpi', script_path)
     if not pipeline_id:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
+        
         if not pipeline_id:
             pipeline_id = '"$CI_PIPELINE_ID"'
 
@@ -554,13 +555,12 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
                            'then {} upload'.format(script_path),
                            pipeline_id, job_name,
                            '-t "failed-job"; fi'])
-    clean_cmd = 'rm -rf *'
-
     cmds.append(upload_cmd)
 
     if do_ocpiremote:
         cmds.append(make_ocpiremote_cmd('unload', platform))
 
+    clean_cmd = 'rm -rf "$CI_PROJECT_DIR"'
     cmds.append(clean_cmd)
 
     return cmds
