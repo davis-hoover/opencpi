@@ -3,6 +3,7 @@ build:centos7:
   - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
+  - rm -rf *
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
   - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
@@ -35,6 +36,7 @@ prereqs:centos7:
   - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
+  - rm -rf *
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
   - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
@@ -70,6 +72,7 @@ test:centos7:
   - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
   - rm -rf *
   before_script:
+  - rm -rf *
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
   - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"

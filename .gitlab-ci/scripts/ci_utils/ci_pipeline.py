@@ -174,7 +174,7 @@ def make_child_pipeline(projects, host_platform, cross_platform,
         Pipeline namedtuple
     """
     if cross_platform.model == 'rcc':
-        stages = ['prereqs', 'build-rcc', 'test']
+        stages = ['prereqs-rcc', 'build-rcc', 'test']
     else:
         stages = ['build-primitives-core', 'build-primitives',
                   'build-libraries', 'build-libraries-osp', 'build-platforms', 

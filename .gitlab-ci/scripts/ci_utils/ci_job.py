@@ -147,10 +147,10 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
     """
     jobs = []
 
-    for stage in ['prereqs', 'build-rcc', 'build', 'test']:
-        if stage == 'build-rcc' and platform.is_host:
+    for stage in ['prereqs', 'prereqs-rcc', 'build-rcc', 'build', 'test']:
+        if stage in ['prereqs-rcc', 'build-rcc'] and platform.is_host:
             continue
-        if stage == 'build' and not platform.is_host:
+        if stage in ['prereqs', 'build'] and not platform.is_host:
             continue
 
         if stage == 'test' and not platform.is_host:
@@ -171,7 +171,7 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
             if job:
                 jobs.append(job)
 
-        if stage == 'prereqs' and platform.is_host and not is_downstream:
+        if stage == 'prereqs' and not is_downstream:
             name = make_name(platform, stage='packages')
             job = make_job(stage, stages, platform, name=name,
                            overrides=overrides, is_downstream=is_downstream)
@@ -424,12 +424,14 @@ def make_before_script(stage, stages, platform, host_platform=None,
     else:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
 
-        # In non-triggered ipeline
+        # In non-triggered pipeline
         if pipeline_id:
+            # In opencpi project
             if project_name == 'opencpi':
                 print('in opencpi pipeline')
                 do_clone = False
                 do_register = False
+            # In osp project
             else:
                 print('non-triggered osp pipeline')
                 upstream_ref = 'develop'
@@ -437,18 +439,24 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 do_clone = True
                 do_register = True
         else:
-            # Not in an osp pipeline
+            # Not in a pipeline
             print('not a pipeline')
             do_register = False
             pipeline_id = '"$CI_PIPELINE_ID"'
+
+            # Creating downstream pipeline
             if is_downstream:
                 print('downstream')
                 upstream_ref = '"$CI_UPSTREAM_REF"'
                 ref = '"$CI_COMMIT_REF_NAME"'
                 do_clone = True
+            # Creating opencpi pipeline
             else:
                 print('opencpi')
                 do_clone = False
+
+    clean_cmd = 'rm -rf *'
+    cmds.append(clean_cmd)
 
     if do_clone:
         cmds += [
@@ -470,7 +478,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
     timestamp_cmd = 'touch .timestamp'
     cmds.append(timestamp_cmd)
     
-    if stage == 'prereqs' and platform.is_host:
+    if stage == 'prereqs':
         return cmds
 
     # Download artifacts for platform, host_platform, and linked_platform
@@ -635,11 +643,11 @@ def make_scripts_cmd(stage, platform, name=None):
     if stage == 'test':
         return 'scripts/test-opencpi.sh --no-hdl'
 
-    if stage == 'prereqs':
-        if name and name.startswith('prereqs'):
-            return 'scripts/install-prerequisites.sh {}'.format(platform.name)
-        else:
+    if stage in ['prereqs', 'prereqs-rcc']:
+        if name and name.startswith('packages'):
             return 'scripts/install-packages.sh {}'.format(platform.name)
+        else:
+            return 'scripts/install-prerequisites.sh {}'.format(platform.name)
 
     if stage in ['build', 'build-rcc']:
         return 'scripts/build-opencpi.sh {}'.format(platform.name)
