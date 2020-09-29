@@ -149,7 +149,7 @@ function make_relative_link {
   else
     echo "Warning: link target path created, but link source $1 does not '(yet?)' exist." >&2
   fi
-  set +vx
+  #set +vx
 }
 
 # link to source ($1) from link($2) if neither are filtered

@@ -1,0 +1,21 @@
+<!-- The DemoApp application xml file -->
+<Application done='file_write'>
+  <Instance Component="source" Connect='ramp'>
+    <property name="value" value="128"/>
+    <property name="nsamples" value="2000"/>
+  </Instance>
+  <Instance Component="ramp"/>
+  <Instance Component="square"/>
+  <Instance Component="ander" Connect="file_write"/>
+  <Instance Component="ocpi.core.file_write">
+    <Property Name="fileName" Value="output_file.bin"/>
+  </Instance>
+  <Connection>
+    <Port Instance="ramp" Name="out"/>
+    <Port Instance="ander" Name="in1"/>
+  </Connection>
+  <Connection>
+    <Port Instance="square" Name="out"/>
+    <Port Instance="ander" Name="in2"/>
+  </Connection>
+</Application>

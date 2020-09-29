@@ -108,8 +108,8 @@ HdlToolCompile=\
    ) > modelsim.ini ; \
    export LM_LICENSE_FILE=$(OCPI_MODELSIM_LICENSE_FILE); \
    rm -r -f $(WorkLib); \
-   $(if $(filter work,$(LibName)),,$(call ModelsimExec,vlib) $(WorkLib) &&) \
    ( set -o pipefail && (\
+    $(if $(filter work,$(LibName)),,$(call ModelsimExec,vlib) $(WorkLib) &&) \
     $(and $(filter %.v,$(ModelsimFiles)),\
           $(call ModelsimExec,vlog) $(ModelSimVlogIncs) $(VlogLibs) $(ModelsimArgs)\
                                     $(filter %.v, $(ModelsimFiles)) &&)\
@@ -134,7 +134,7 @@ $1/$3.tar:
 	     echo -L $3 $$$$(grep = modelsim.ini | grep -v others= | sed 's/=.*//' | sed 's/^/-L /') > vsim.args && \
 	     export MGLS_LICENSE_FILE=$(OCPI_MODELSIM_LICENSE_FILE) && \
 	     echo 'log -r /*; archive write vsim.dbar -wlf vsim.wlf -include_src ; quit' | \
-	     $(call ModelsimExec,vsim) -c $3.$3 -modelsimini modelsim.ini \
+	     $(call ModelsimExec,vsim) -c $3.$3 -modelsimini modelsim.ini -error 3473 \
 	       -f vsim.args && \
              echo vsim exited successfully, now creating archive: $$@ && \
              tar -cf $$(notdir $$@) -h vsim.dbar vsim.args metadatarom.dat \

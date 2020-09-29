@@ -83,8 +83,8 @@ architecture rtl of sdp2cp_worker is
   end tag_first_of_2;
 begin
   hdr            <= sdp_in.sdp.header;  
-  cp_out.clk     <= sdp_in.clk;
-  cp_out.reset   <= sdp_in.reset;
+  cp_out.clk     <= sdp_clk;
+  cp_out.reset   <= sdp_reset;
   cp_out.valid   <= to_bool(a_state_r /= a_idle_e and a_state_r /= a_last_wanted_e);
   cp_out.is_read <= in_read_r;
   cp_out.address <= addr_r;
@@ -126,10 +126,10 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
   end generate g0;
 
   -- Our state machines, separate for address and read-data
-  work : process(sdp_in.clk)
+  work : process(sdp_clk)
   begin
-    if rising_edge(sdp_in.clk) then
-      if sdp_in.reset = '1' then
+    if rising_edge(sdp_clk) then
+      if sdp_reset = '1' then
         in_second_dw_r <= bfalse;
         in_read_r      <= bfalse;
         a_state_r      <= a_idle_e;

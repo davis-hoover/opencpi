@@ -102,6 +102,9 @@ namespace OCPI {
       PVString("server"),
       PVString("container"),
       PVString("selection"),
+      PVBool("dump"),
+      PVBool("verbose"),
+      PVBool("hidden"),
       PVEnd
     };
 

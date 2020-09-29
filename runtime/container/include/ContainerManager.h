@@ -75,7 +75,7 @@ namespace OCPI {
 	  a->ensureLoaded();
 	return a;
       }
-      App *firstApplication() const {
+      Application *firstApplication() const {
 	return Parent<App>::firstChild();
       }
       Container *nextContainer() { return OCPI::Driver::DeviceBase<Dri,Con>::nextDevice(); }
