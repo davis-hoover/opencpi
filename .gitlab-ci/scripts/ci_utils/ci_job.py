@@ -421,7 +421,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
         ref = os.getenv("CI_COMMIT_REF_NAME")
         do_clone = True
         do_register = True
-        cmds.append('rm -rf "$CI_PROJECT_DIR"')
+        cmds.append('rm -rf ./*')
     else:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
 
@@ -439,7 +439,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 ref = os.getenv("CI_COMMIT_REF_NAME")
                 do_clone = True
                 do_register = True
-                cmds.append('rm -rf "$CI_PROJECT_DIR"')
+                cmds.append('rm -rf ./*')
         else:
             # Not in a pipeline
             print('not a pipeline')
@@ -563,7 +563,7 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
     if do_ocpiremote:
         cmds.append(make_ocpiremote_cmd('unload', platform))
 
-    clean_cmd = 'rm -rf "$CI_PROJECT_DIR"'
+    clean_cmd = 'rm -rf ./*'
     cmds.append(clean_cmd)
 
     return cmds

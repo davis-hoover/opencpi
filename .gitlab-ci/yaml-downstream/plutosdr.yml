@@ -1,7 +1,7 @@
 build:centos7:
   after_script:
   - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf "$CI_PROJECT_DIR"
+  - rm -rf ./*
   before_script:
   - rm -rf "$CI_PROJECT_DIR"
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
@@ -112,7 +112,7 @@ generate-children:centos7:plutosdr:
 prereqs:centos7:
   after_script:
   - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf "$CI_PROJECT_DIR"
+  - rm -rf ./*
   before_script:
   - rm -rf "$CI_PROJECT_DIR"
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
@@ -148,7 +148,7 @@ stages:
 test:centos7:
   after_script:
   - if [ ! -f "opencpi/.success" ]; then opencpi/.gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf "$CI_PROJECT_DIR"
+  - rm -rf ./*
   before_script:
   - rm -rf "$CI_PROJECT_DIR"
   - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
