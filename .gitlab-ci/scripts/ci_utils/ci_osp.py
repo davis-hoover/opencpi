@@ -7,7 +7,18 @@ from .ci_platform import Platform
 Osp = namedtuple('osp', 'name url platforms')
 
 def discover_osps(group_id='6009537', config=None):
-    #TODO: docs
+    """ Discovers OSPs
+
+    Uses curl command to call gitlab api to collect OSP group data.
+    Calls discover_platforms() to get an OSP's rcc and hdl platforms.
+
+    Args:
+        group_id: Gitlab ID of the OSP group
+        config:   Dictionary of platform overrides     
+
+    Returns:
+        List of Osp namedtuples
+    """
     osps = []
     url = 'https://gitlab.com/api/v4/groups/6009537/projects'
     with urlopen(url) as response:
@@ -26,7 +37,18 @@ def discover_osps(group_id='6009537', config=None):
 
 
 def discover_platforms(osp_id, config=None):
-    #TODO: docs
+    """ Discovers OSPs
+
+    Uses curl command to call gitlab api to collect OSP project repo
+    data.
+
+    Args:
+        osp_id: Gitlab ID of the OSP project 
+        config: Dictionary of platform overrides     
+
+    Returns:
+        List of Platform namedtuples
+    """
     platforms = []
     url = '/'.join([
         'https://gitlab.com/api/v4/projects',

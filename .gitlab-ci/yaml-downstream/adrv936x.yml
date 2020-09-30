@@ -4,7 +4,7 @@ build:centos7:
   - rm -rf ./*
   before_script:
   - rm -rf "$CI_PROJECT_DIR"
-  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="develop"; fi
   - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi
@@ -37,7 +37,7 @@ prereqs:centos7:
   - rm -rf ./*
   before_script:
   - rm -rf "$CI_PROJECT_DIR"
-  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="develop"; fi
   - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi
@@ -73,7 +73,7 @@ test:centos7:
   - rm -rf ./*
   before_script:
   - rm -rf "$CI_PROJECT_DIR"
-  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="1347-osp-yaml-generator"; fi
+  - if [ -z "$CI_UPSTREAM_ID" ]; then export CI_UPSTREAM_REF="develop"; fi
   - git clone --depth 1 --single-branch --branch "$CI_UPSTREAM_REF" "https://gitlab.com/opencpi/opencpi.git" opencpi
   - git clone --depth 1 --single-branch --branch "$CI_COMMIT_REF_NAME" "$CI_REPOSITORY_URL" "opencpi/projects/osps/${CI_PROJECT_NAME}"
   - cd opencpi

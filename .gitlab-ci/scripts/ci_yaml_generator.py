@@ -7,7 +7,11 @@ from pathlib import Path
 from ci_utils import ci_project, ci_platform, ci_job, ci_pipeline, ci_osp
 
 def main():
-    #TODO: python docs
+    """Created yaml files for gitlab CI pipelines
+
+    Calls various ci_utils scripts to discover opencpi projects and
+    platforms and to create/update gitlab CI yaml files.
+    """
     # Set paths and change dir to opencpi root
     opencpi_path = Path(__file__, '..', '..', '..').resolve()
     os.chdir(str(opencpi_path))
@@ -16,7 +20,6 @@ def main():
     yaml_children_path = Path(gitlab_ci_path, 'yaml-children')
     yaml_downstream_path = Path(gitlab_ci_path, 'yaml-downstream')
     projects_path = Path('projects')
-    osps_path = Path(projects_path, 'osps')
     config_path = Path(gitlab_ci_path, 'scripts', 'config.yml')
     whitelist_path = Path(gitlab_ci_path, 'scripts', 'whitelist.yml')
 
@@ -66,9 +69,8 @@ def main():
         osps = ci_osp.discover_osps()
         for osp in osps:
             print('\t', osp.name)
-            osp_path = Path(osps_path, osp.name)
             pipeline = ci_pipeline.make_downstream_pipeline(
-                host_platforms, osp, osp_path, yaml_children_path, 
+                host_platforms, osp, yaml_children_path, 
                 whitelist=whitelist, config=config)
             dump_path = Path(yaml_downstream_path, '{}.yml'.format(osp.name))
             ci_pipeline.dump(pipeline, dump_path)

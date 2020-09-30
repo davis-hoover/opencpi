@@ -416,7 +416,6 @@ def make_before_script(stage, stages, platform, host_platform=None,
     
     # In triggered pipeline
     if pipeline_id:
-        print('triggered-pipeline')
         upstream_ref = os.getenv("CI_UPSTREAM_REF")
         ref = os.getenv("CI_COMMIT_REF_NAME")
         do_clone = True
@@ -429,12 +428,10 @@ def make_before_script(stage, stages, platform, host_platform=None,
         if pipeline_id:
             # In opencpi project
             if project_name == 'opencpi':
-                print('in opencpi pipeline')
                 do_clone = False
                 do_register = False
             # In osp project
             else:
-                print('non-triggered osp pipeline')
                 upstream_ref = 'develop'
                 ref = os.getenv("CI_COMMIT_REF_NAME")
                 do_clone = True
@@ -442,27 +439,23 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 cmds.append('rm -rf ./*')
         else:
             # Not in a pipeline
-            print('not a pipeline')
             do_register = False
             pipeline_id = '"$CI_PIPELINE_ID"'
 
             # Creating downstream pipeline
             if is_downstream:
-                print('downstream')
                 upstream_ref = '"$CI_UPSTREAM_REF"'
                 ref = '"$CI_COMMIT_REF_NAME"'
                 do_clone = True
                 cmds.append('rm -rf "$CI_PROJECT_DIR"')
             # Creating opencpi pipeline
             else:
-                print('opencpi')
                 do_clone = False
 
     if do_clone:
         cmds += [
-            #TODO: change ref to 'develop'
             ' '.join(['if [ -z "$CI_UPSTREAM_ID" ];',
-                      'then export CI_UPSTREAM_REF="1347-osp-yaml-generator";',
+                      'then export CI_UPSTREAM_REF="develop";',
                       'fi']),
             ' '.join(['git clone --depth 1 --single-branch --branch',
                       upstream_ref,

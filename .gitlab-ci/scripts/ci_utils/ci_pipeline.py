@@ -81,7 +81,7 @@ def dump(pipeline, path, mode='w+'):
 def make_parent_pipeline(host_platforms, cross_platforms,
                          yaml_parent_path, yaml_children_path, whitelist=None, 
                          config=None):
-    """ Construct a parent pipeline
+    """ Constructs a parent pipeline
 
     Args:
         host_platforms:     List of all host Platforms
@@ -158,7 +158,7 @@ def make_parent_pipeline(host_platforms, cross_platforms,
 
 def make_child_pipeline(projects, host_platform, cross_platform,
                         linked_platforms, config=None):
-    """ Construct a child pipeline
+    """ Constructs a child pipeline
 
     Args:
         projects:           List of opencpi Projects
@@ -194,9 +194,21 @@ def make_child_pipeline(projects, host_platform, cross_platform,
     return Pipeline(stages, jobs, workflow=workflow)
 
 
-def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path, 
+def make_downstream_pipeline(host_platforms, osp, yaml_children_path, 
                              whitelist=None, config=None):
-    #TODO: docs
+    """ Constructs a downstream pipeline for an OSP
+
+    Args:
+        host_platforms:     List of host Platforms in pipeline
+        osp:                Osp to create pipeline for         
+        yaml_children_path: Path to artifact to CI yaml for jobs
+                            triggering child pipelines
+        whitelist:          List of names of allowed platforms
+        config:             Dictionary of platform overrides
+
+    Returns:
+        Pipeline namedtuple
+    """
     stages = ['prereqs', 'build', 'test', 'generate-children', 
               'trigger-children']
     jobs = []
@@ -232,10 +244,9 @@ def make_downstream_pipeline(host_platforms, osp, osp_path, yaml_children_path,
                 
             before_script = [
                 'yum install git -y',
-                #TODO: change ref to 'develop'
                 ' '.join(['if [ -z "$CI_UPSTREAM_ID" ];',
                           'then export', 
-                          'CI_UPSTREAM_REF="1347-osp-yaml-generator";',
+                          'CI_UPSTREAM_REF="develop";',
                           'fi']),
                 ' '.join(['git clone --depth 1 --single-branch --branch'
                             ' "$CI_UPSTREAM_REF"',
