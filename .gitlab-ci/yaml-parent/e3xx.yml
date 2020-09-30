@@ -9,7 +9,7 @@ trigger-downstream:e3xx:
     - export REF_NAME="opencpi-${CI_COMMIT_REF_NAME//\//%2F}"
     - >
       curl --fail
-      "https://gitlab.com/api/v4/projects/112747905/repository/branches/$REF_NAME" 2> /dev/null
+      "https://gitlab.com/api/v4/projects/12747905/repository/branches/$REF_NAME" 2> /dev/null
       && export REF_NAME="opencpi-$CI_COMMIT_REF_NAME"
       || export REF_NAME=develop
     - echo "kicking off e3xx - $REF_NAME"

@@ -421,6 +421,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
         ref = os.getenv("CI_COMMIT_REF_NAME")
         do_clone = True
         do_register = True
+        cmds.append('rm -rf "$CI_PROJECT_DIR"')
     else:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
 
@@ -438,6 +439,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 ref = os.getenv("CI_COMMIT_REF_NAME")
                 do_clone = True
                 do_register = True
+                cmds.append('rm -rf "$CI_PROJECT_DIR"')
         else:
             # Not in a pipeline
             print('not a pipeline')
@@ -450,6 +452,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 upstream_ref = '"$CI_UPSTREAM_REF"'
                 ref = '"$CI_COMMIT_REF_NAME"'
                 do_clone = True
+                cmds.append('rm -rf "$CI_PROJECT_DIR"')
             # Creating opencpi pipeline
             else:
                 print('opencpi')
