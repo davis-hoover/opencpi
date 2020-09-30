@@ -328,8 +328,10 @@ parseHdlAssy() {
 	      OU::format(sdpClock.m_reset, "%s_%s_out_i%s.Reset", i->cname(), ip->m_port->pname(), index);
 	      ocpiInfo("Adding the top level SDP clock, for the container: %s %s %s",
 		       sdpClock.cname(), sdpClock.m_signal.c_str(), sdpClock.m_reset.c_str());
-	    } else if (!ip->m_port->m_master)
+	    } else if (!ip->m_port->m_master) {
 	      ip->m_clockSignal = sdpClock.m_signal;
+	      i->m_clocks[ip->m_port->m_clock->m_ordinal] = &sdpClock;
+	    }
 	    break;
 	  case WSIPort:
 	    if (!strcasecmp(i->m_worker->cname(), "sdp_send") ||

@@ -27,10 +27,12 @@ library ocpi; use ocpi.all, ocpi.types.all;
 library platform, cdc;
 entity sdp2cp_clk_rv is
   generic(
-    sdp_width    : in   uchar_t := to_uchar(1));
+    sdp_width   : in   uchar_t := to_uchar(1));
   port(
-    wci_Clk               : in   std_logic;
-    wci_Reset_n           : in   std_logic;
+    wci_Clk     : in   std_logic;
+    wci_Reset_n : in   std_logic;
+    sdp_Clk     : in   std_logic;
+    sdp_reset   : in   std_logic;
     cp_in   : in  platform.platform_pkg.occp_out_t;
     cp_out  : out platform.platform_pkg.occp_in_t;
     sdp_in  : in  work.sdp.m2s_t;
@@ -99,12 +101,7 @@ architecture rtl of sdp2cp_clk_rv is
   end tag_first_of_2;
 begin
   hdr            <= sdp_in.sdp.header;  
--- cp_out.clk     <= sdp_in.clk;
--- cp_out.reset   <= sdp_in.reset;
   cp_out_valid   <= to_bool(a_state_r /= a_idle_e and a_state_r /= a_last_wanted_e);
---  cp_out.is_read <= in_read_r;
---  cp_out.address <= addr_r;
---  cp_out.byte_en <= be_r;
   cp_out_data    <= slv(tag_r, dword_size) when its(in_read_r) else
                     s2c_dwords_r(1) when a_state_r = a_last_e and in_64_r and sdp_width > 1 else
                     s2c_dwords_r(0);
@@ -142,10 +139,10 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
   end generate g0;
 
   -- Our state machines, separate for address and read-data
-  work : process(sdp_in.clk)
+  work : process(sdp_clk)
   begin
-    if rising_edge(sdp_in.clk) then
-      if sdp_in.reset = '1' then
+    if rising_edge(sdp_clk) then
+      if sdp_reset = '1' then
         in_second_dw_r <= bfalse;
         in_read_r      <= bfalse;
         a_state_r      <= a_idle_e;
@@ -268,14 +265,14 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
     cp_out.byte_en <= fifo2cp_out(byte_en_lsb_c + cp_out.byte_en'length-1 downto byte_en_lsb_c);
     cp_out.is_read <= fifo2cp_out(0);
     cp_out.valid   <= fifo2cp_not_empty;
-    cp_out.clk     <= ctl_clk; -- delta
+    cp_out.clk     <= ctl_clk; -- delta FIXME
     cp_out.reset   <= ctl_reset;
     fifo2cp_deq    <= cp_in.take and fifo2cp_not_empty;
     fifo2cp: cdc.cdc.fifo
       generic map (width       => width2cp_c,
                    depth       => 2)
-      port map (   src_CLK     => sdp_in.clk,
-                   src_RST     => sdp_in.reset,
+      port map (   src_CLK     => sdp_clk,
+                   src_RST     => sdp_reset,
                    src_ENQ     => fifo2cp_enq,
                    src_in      => fifo2cp_in,
                    src_FULL_N  => fifo2cp_not_full,
@@ -299,7 +296,7 @@ g0: for i in 0 to to_integer(sdp_width)-1 generate
                    src_ENQ     => fifo2sdp_enq,
                    src_in      => fifo2sdp_in,
                    src_FULL_N  => fifo2sdp_not_full,
-                   dst_CLK     => sdp_in.clk,
+                   dst_CLK     => sdp_clk,
                    dst_DEQ     => fifo2sdp_deq,
                    dst_EMPTY_N => fifo2sdp_not_empty,
                    dst_out     => fifo2sdp_out);
