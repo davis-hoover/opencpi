@@ -4,9 +4,11 @@
 # Also, if a branch's sha equals develop's sha, do not run a pipeline for the commit.
 verify-pipeline:
   stage: .pre
-  extends:
-    - .centos7
-    - .docker
+  tags:
+    - opencpi
+    - centos7
+    - docker
+  image: centos:7
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH == "develop" || $CI_PIPELINE_SOURCE == "web"'
       when: never

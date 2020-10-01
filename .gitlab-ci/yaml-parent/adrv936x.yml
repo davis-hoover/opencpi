@@ -1,8 +1,10 @@
 trigger-downstream:adrv936x:
   stage: 'trigger-children'
-  extends:
-    - .centos7
-    - .docker
+  tags:
+    - opencpi
+    - centos7
+    - docker
+  image: centos:7
   before_script: []
   script:
     - echo "$CI_COMMIT_MESSAGE"
