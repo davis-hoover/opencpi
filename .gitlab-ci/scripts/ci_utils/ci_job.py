@@ -447,7 +447,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 upstream_ref = '"$CI_UPSTREAM_REF"'
                 ref = '"$CI_COMMIT_REF_NAME"'
                 do_clone = True
-                cmds.append('rm -rf "$CI_PROJECT_DIR"')
+                cmds.append('rm -rf ./*')
             # Creating opencpi pipeline
             else:
                 do_clone = False
