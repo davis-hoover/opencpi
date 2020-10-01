@@ -36,6 +36,33 @@ then
   exit 1
 fi
 
+#
+# Quick and dirty argument parsing:
+# getopt(s) overhead not required.
+#
+PARAMS=""
+
+while (( "$#" )); do
+  case "$1" in
+    -d|--distro)
+      export OCPI_DISTRO_BUILD=1
+      shift
+      ;;
+    -*) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS \"$1\""
+      shift
+      ;;
+  esac
+done
+
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
+unset PARAMS
+
 # install platform syntax:
 #   ocpiadmin install platform <platform> [<project-package-id>] [<url>] [<checkout>]
 # deploy platform syntax:
@@ -134,7 +161,7 @@ else
 	if git clone --no-checkout $url $project_dir && test -d $project_dir; then
 	    echo "Download/clone successful into $project_dir."
 	else
-	    echo "ERROR: download/clone of project \"$project\" for platforn \"$platform\" failed."
+	    echo "ERROR: download/clone of project \"$project\" for platform \"$platform\" failed."
 	    rm -r -f $project_dir
 	    exit 1
 	fi
