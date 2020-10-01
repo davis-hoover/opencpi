@@ -5,8 +5,6 @@
 verify-pipeline:
   stage: .pre
   tags:
-    - opencpi
-    - centos7
     - docker
   image: centos:7
   rules:

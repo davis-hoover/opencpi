@@ -1,8 +1,6 @@
 trigger-downstream:e3xx:
   stage: 'trigger-children'
   tags:
-    - opencpi
-    - centos7
     - docker
   image: centos:7
   before_script: []

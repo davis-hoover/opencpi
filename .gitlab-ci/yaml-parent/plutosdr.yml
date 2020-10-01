@@ -1,8 +1,6 @@
 trigger-downstream:plutosdr:
   stage: 'trigger-children'
   tags:
-    - opencpi
-    - centos7
     - docker
   image: centos:7
   before_script: []

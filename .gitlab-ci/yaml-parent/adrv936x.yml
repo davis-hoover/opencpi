@@ -1,8 +1,6 @@
 trigger-downstream:adrv936x:
   stage: 'trigger-children'
   tags:
-    - opencpi
-    - centos7
     - docker
   image: centos:7
   before_script: []
