@@ -338,7 +338,6 @@ include:
 - .gitlab-ci/yaml-parent/docs.yml
 - .gitlab-ci/yaml-parent/e3xx.yml
 - .gitlab-ci/yaml-parent/plutosdr.yml
-- .gitlab-ci/yaml-parent/templates.yml
 - .gitlab-ci/yaml-parent/verify-pipeline.yml
 - .gitlab-ci/yaml-parent/adrv936x.yml
 - .gitlab-ci/yaml-parent/sockit_cv.yml
