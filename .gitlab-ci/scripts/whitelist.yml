@@ -10,3 +10,6 @@ centos7:
   - zcu104
   - zed
   - zed_ise
+  - plutosdr
+  - e31x
+  - adi_plutosdr0_32
