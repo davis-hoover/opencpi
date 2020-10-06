@@ -23,7 +23,7 @@ library misc_prims; use misc_prims.misc_prims.all;
 -- TODO: Add a mode for fast source to slow destination that intentionally doesn't hold input data
 -- long enough show that it fails when the primitive is not properly used.
 architecture rtl of worker is
-
+  constant ctl_clk_hz   : real := 100000000.0; -- When the framework can advertise the ctl clock frequency and make it available as a generic, remove this hardcoding and get the value of the generic
   constant c_src_clk_hz : real := from_float(src_clk_hz);
   constant c_dst_clk_hz : real := from_float(dst_clk_hz);
   constant c_src_dst_ratio : real := c_src_clk_hz/c_dst_clk_hz;
@@ -54,7 +54,8 @@ architecture rtl of worker is
   begin
 
   gen_clk : entity work.cdc_clk_gen
-    generic map (src_clk_hz => c_src_clk_hz,
+    generic map (ctl_clk_hz => ctl_clk_hz,
+                 src_clk_hz => c_src_clk_hz,
                  dst_clk_hz => c_dst_clk_hz)
     port map (
            ctl_clk => ctl_in.clk,

@@ -41,16 +41,12 @@ begin
   -- The "ready" signal is routed back to the "up" channel from the recipient.
   for_client <= to_bool(up_in.sdp.header.node = up_in.id);
   -- Copy the incoming upstream info to the client, qualifying the valid signal
-  client_out.clk <= up_in.clk;
-  client_out.reset <= up_in.reset;
   client_out.id <= up_in.id;
   client_out.sdp.header <= up_in.sdp.header;
   client_out.sdp.eop <= up_in.sdp.eop;
   client_out_data <= up_in_data;
   client_out.sdp.valid <= up_in.sdp.valid and for_client;
   -- Copy the incoming upstream info downstream, qualifying the valid signal
-  down_out.clk <= up_in.clk;
-  down_out.reset <= up_in.reset;
   down_out.id <= up_in.id + 1;
   down_out.sdp.header <= up_in.sdp.header;
   down_out.sdp.eop <= up_in.sdp.eop;
@@ -83,10 +79,10 @@ begin
   client_out.sdp.ready <= up_in.sdp.ready and client_in.sdp.valid and up_from_client;
 
   -- Our state machine for upstream messages - keep track of 2 FFs.
-  work : process(up_in.clk)
+  work : process(sdp_clk)
   begin
-    if rising_edge(up_in.clk) then
-      if its(up_in.reset) then
+    if rising_edge(sdp_clk) then
+      if its(sdp_reset) then
         up_active_r      <= bfalse;
         up_from_client_r <= bfalse;
       else
