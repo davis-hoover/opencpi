@@ -59,18 +59,10 @@ $(call OcpiDbgVar,HdlTargets)
 include $(OCPI_CDK_DIR)/include/util.mk
 include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
 
-# The libraries with names suitable for the library clause in VHDL, as passed to ocpigen
-HdlVhdlLibraries=\
-  $(infox HdlMyLibraries=$(HdlMyLibraries) HdlVhdlLibraries=$(and $(HdlMyLibraries),$(foreach l,$(sort $(HdlMyLibraries)),$(and $(notdir $l),-B $(notdir $l)))))\
-  $(and $(HdlMyLibraries),$(foreach l,$(call Unique,$(HdlMyLibraries)),$(strip\
-                             -B $(or $(notdir $l),$(error BROKEN)))))
-
 # This default is only overridden for testing the makefiles
 HdlError:=error
 HdlSourceSuffix=.v
 
-
-#HdlAllParts:=$(call Unique,$(foreach t,$(HdlTopTargets),$(if $(findstring $(f),$(HdlSimTools)),,$(foreach f,$(HdlTargets_$(t)),$(HdlTargets_$(f))))))
 $(call OcpiDbgVar,HdlTopTargets)
 HdlAllParts:=$(call Unique,$(foreach t,$(HdlTopTargets),\
 	              $(or $(foreach f,$(HdlTargets_$t),\
@@ -93,34 +85,39 @@ HdlInstanceCfg=$(word 2,$(subst :, ,$1))
 HdlInstanceName=$(word 3,$(subst :, ,$1))
 HdlInstanceWkrCfg=$(call HdlInstanceWkr,$1)$(and $(HdlToolRealCore),$(filter %.vhd,$(ImplFile)),_rv)$(foreach c,$(call HdlInstanceCfg,$1),$(if $(filter 0,$c),,_c$c))
 
+# Do the basic primitive core search, returning target-independent paths
+HdlFindCores=$(infox HFC:$1)\
+  $(foreach c,$1,\
+    $(if $(findstring /,$c),\
+      $(or $(and $(call HdlExists,$c),$c:$(notdir $c)),\
+            $(error Primitive core $c (from Cores) not found.)),\
+      $(call HdlSearchPrimitivePath,$c,,HPLx)))
+
+HdlBuiltinWorkers=ocscp ocscp_rv metadata metadata_rv time_client time_client_rv unoc_node unoc_node_rv
 define HdlSetWorkers
   HdlInstances:=$$(and $$(AssyWorkersFile),$$(strip $$(foreach i,$$(shell grep -h -v '\\\#' $$(AssyWorkersFile)),\
 	               $$(if $$(filter $$(call HdlInstanceWkr,$$i),$$(HdlPlatformWorkers)),,$$i))))
   HdlWorkers:=$$(call Unique,$$(foreach i,$$(HdlInstances),$$(call HdlInstanceWkrCfg,$$i)))
   $$(infox HdlSetWorkers:Cores:'$$(Cores)':'$$(HdlWorkers)':'$$(HdlInstances)':'$$(HdlTarget)')
   SubCores_$$(HdlTarget):=$$(call Unique,\
-    $$(Cores) \
-    $$(foreach w,$$(HdlWorkers),\
-      $$(or $(strip\
-        $$(foreach f,$$(strip\
-          $$(firstword \
-            $$(foreach d,$$(call HdlTargetComponentLibraries,$$(HdlTarget),HSW),\
-               $$(call HdlExists,$$d/$$w$$(HdlBin))))),\
-          $$(call FindRelative,.,$$f)),\
-	),$$(if $$(filter-out ocscp ocscp_rv metadata metadata_rv time_client time_client_rv unoc_node unoc_node_rv,$$w),$$(warning Warning: Worker $$w was not found in any of the component libraries built for $$(HdlTarget))))))
+    $(- Process explicit Cores) \
+    $$(call HdlFindCores,$(Cores))\
+    $(- Find worker cores)\
+    $$(foreach f,$$(call HdlGetFamily,$$(HdlTarget)),\
+       $$(foreach w,$$(HdlWorkers),\
+          $$(or $$(strip\
+             $$(firstword \
+                $$(foreach l,$$(call OcpiComponentLibraries),$$(infox CORELIB:$$l:$$l/hdl/$$f/$$w$$(HdlBin))\
+                   $$(or $$(call HdlExists,$$l/hdl/$$f/$$w$$(HdlBin)),\
+                         $$(if $$(call HdlExists,$$l/hdl/$$w.xml),\
+                             $$(foreach lib,$$(l:%/lib=%),\
+                                $$(error HDL worker "$$w" found in component library "$$(lib)" $$(strip\
+                                   ($$(realpath $$(lib)))), but not built for $$f))))))),\
+             $$(if $$(filter-out $$(HdlBuiltinWorkers),$$w),\
+                $$(warning Warning: Worker $$w was not found in any of the component libraries))))))
    $$(infox Cores SubCores_$$(HdlTarget) is $$(origin SubCores_$$(HdlTarget)) $$(flavor SubCores_$$(HdlTarget)):$$(SubCores_$$(HdlTarget)))
 
 endef
-# Get the list of cores we depend on, returning the real files that make can depend on
-# With the deferred evaluation of target-specific items
-HdlGetCores=$(infox HGC:$(Cores):$(HdlWorkers):$(HdlTarget))$(call Unique,\
-    $(foreach c,$(Cores),$(call HdlCoreRef1,$c,$(HdlTarget))) \
-    $(foreach w,$(HdlWorkers),\
-      $(foreach f,$(strip\
-        $(firstword \
-          $(foreach d,$(call HdlTargetComponentLibraries,$(HdlTarget),HGG),\
-            $(call HdlExists,$d/$w$(HdlBin))))),\
-        $(call FindRelative,.,$f))))
 
 ################################################################################
 # $(call HdlGetTop,family)
@@ -273,7 +270,7 @@ $(call OcpiDbgVar,HdlTargets)
 HdlRmRv=$(if $(filter %_rv,$1),$(patsubst %_rv,%,$1),$1)
 
 # Grep a file and collect all non-comment lines into a space-separated list
-HdlGrepExcludeComments=$(shell grep -v '\#' $1 2>/dev/null)
+HdlGrepExcludeComments=$(infox GREP:$1:$2)$(shell grep -v '\#' $1 2>/dev/null)
 
 #########################################################################################################
 #  An OpenCPI 'core' is really any core-like asset that results in a netlist-like artifact for later reuse.
@@ -421,9 +418,9 @@ HdlGetSubCoresFromFile=$(infox GetSubCoresFrom:$(call HdlRmRv,$(basename $1)).co
 #                                 second checking for OpenCPI defined mappings (HdlInstancesForCore - e.g. .wks file)
 #       if there are > 1 instances mapped to by a single core, each instance string must have its prefix and suffix applied before
 #         being assigned to "subcoreinst" and inserted in the constructed/returned element (format <core-name>:<core-path:<instance>)
-HdlCollectCores=$(infox Collect:$(SubCores_$(HdlTarget)):$(HdlTarget))$(strip \
-  $(foreach subcore,$(SubCores_$(HdlTarget)),\
-    $(foreach corename,$(firstword $(subst :, ,$(subcore))),\
+HdlCollectCores=$(infox CollectCore:$(SubCores_$(HdlTarget)):$(HdlTarget))$(strip \
+  $(foreach subcore,$(SubCores_$(HdlTarget)),$(infox subcore=$(subcore))\
+    $(foreach corename,$(firstword $(subst :, ,$(subcore))),$(infox corename=$(corename))\
       $(foreach corepath,$(call HdlCoreRefMaybeTargetSpecificFile,$(corename),$(HdlTarget)),$(infox CorePath:$(corepath))\
         $(if $(or $(filter $1,noinstances),$(if $(HdlToolRequiresInstanceMap_$(HdlToolSet)),,noinstances)),\
           $(corename):$(corepath) $(if $(HdlToolRequiresFullCoreHierarchy_$(HdlToolSet)),$(call HdlGetSubCoresFromFile,$(corepath),,$1)),\
@@ -437,8 +434,8 @@ HdlCollectCores=$(infox Collect:$(SubCores_$(HdlTarget)):$(HdlTarget))$(strip \
 # Collect all cores of interest, but just return the list of paths (do no care about core names or instances here)
 # This is an simpler list of cores used by certain tools and in HdlPreCore (in HdlPrepareAssembly)
 HdlCollectCorePaths=$(strip \
-  $(foreach corenameandpath,$(call HdlCollectCores,noinstances),\
-    $(word 2,$(subst :, ,$(corenameandpath))) ))
+  $(foreach c,$(call HdlCollectCores,noinstances),$(infox COLLECTED CORE:$c)\
+    $(word 2,$(subst :, ,$c))))
 #
 # Iterate through all collected cores, and determine the partial path (and optionally instance) to record in the .cores file
 # Make sure to escape any '|' characters found in HDL instance strings
@@ -458,26 +455,33 @@ HdlRecordCores=\
     ) > $(call HdlRmRv,$1).cores;)
 
 #########################################################################################################
-# Record all of the libraries and sources required for this asset (onl when a tool requires this is done)
+# Record all of the libraries and sources required for this asset (sources only when a tool requires this is done)
 # When recording sources for a core, we only record the stub files since those will be needed later.
-HdlSourceListCompile=\
+HdlSourceListCompile=$(infox HSLC:$@:$(basename $@):$(HdlLibrariesInternal))\
+  $(foreach v,$(.VARIABLES),$(and $(filter Pack%,$v),$(infox HI: $v=$($v))))\
+  $(HdlRecordLibraries) \
   $(if $(HdlToolNeedsSourceList_$(HdlToolSet)),\
-    $(and $(HdlLibrariesInternal),$(call HdlRecordLibraries,$(basename $@))) \
     $(and $(or $(HdlSources),$(if $(filter $(HdlMode),core),$(CoreBlackBoxFiles))),$(call HdlRecordSources,$(basename $@))))
 
-# Record the list of libraries required by this asset/library in the .libs file
-# If we see an absolute path, record it just by the asset's name. It will be
-# searched for later (e.g. via HdlSearchPrimitivePath). If it is a relative
-# path, we assume it is in the local project and therefore record it as a
-# relative path.
+####################################################################################################
+# Record the list of libraries required by this asset/library in the gen/<lib>.libs file.
+# The first line in the file is whether this library is in the global or qualified namespace.
+# Other lines indicate <project-package>:<libname>:<hdl-lib>
 HdlRecordLibraries=\
-  $(infox Record:$1:$(HdlLibrariesInternal):$(HdlTarget))\
-  $(and $(call HdlExists,$(dir $1)),\
+  $(infox Record:$(HdlLibrariesInternal):$(HdlTarget))\
+  mkdir -p $(GeneratedDir);\
   (\
    echo '\#' This generated file records libraries necessary to build this $(LibName) $(HdlMode); \
-   $(foreach l,$(HdlLibrariesInternal),\
-     echo $(if $(findstring /,$l),$(notdir $l),$(call OcpiPathToAssetOutsideProject,.,$l));) \
-  ) > $(patsubst %/,%,$(call HdlRmRv,$1)).libs;)\
+   echo '\#' The first line contains the namespace mode:  qualified, global, or both; \
+   echo $(or $(NameSpace),global);\
+   $(foreach l,$(HdlLibrariesInternal),$(infox RECORDING LIB PATH:$l)\
+     $(foreach p,$(word 1,$(subst :, ,$l)),\
+       $(foreach r,$(if $(findstring /imports/,$p),\
+                     $(firstword $(filter-out .. imports,$(subst /, ,$p))),\
+                     $(OCPI_PROJECT_PACKAGE)),$(infox RRR:$r:$(patsubst %/imports/,,$p))\
+         $(foreach x,$r:$(notdir $p):$(lastword $(subst :, ,$l)),\
+           $(infox RECORDING LIB=$x)echo $x;))))\
+  ) > $(GeneratedDir)/$(LibName).libs;
 
 # Extract the list of libraries required by an asset/library $2 for target $1
 HdlExtractLibrariesFromFile=$(infox Extract:$2:$1)$(call Unique,\
@@ -492,37 +496,88 @@ HdlNotdirAbsOrRelPath=$(infox NORP:$1:$2)\
     $(patsubst %/,%,$(call HdlSearchPrimitivePath,$2,,CollectLibs)),\
     $(if $(filter /%,$2),\
       $(abspath $2),\
-      $1/$2))
-
-# This function is a helper to HdlCollectLibraries and is used for
-# collecting libraries that $2 depends on. If $2 is a name (not a path),
-# we search the primitive path for it. Since we are recursing through
-# libraries, if we find that $2 is a relative path, we assume it is
-# relative to $1 and use $1/$2 via "HdlNotdirAbsOrRelPath"
-HdlCollectLibsRecurse=$(infox RecursingOn:$2:$1)\
-	$(foreach l,$(call HdlExtractLibrariesFromFile,$1,$(if $(findstring $2,$(notdir $2)),$(call HdlSearchPrimitivePath,$2,,extract),$2)),$(infox COL:$2:$l)\
-	  $(if $(HdlRecurseLibraries_$(HdlToolSet)),$(call HdlCollectLibsRecurse,$1,$l) )$(call HdlNotdirAbsOrRelPath,$2,$l) )
+      $(if $(findstring /imports/,$2),$2,$1/$2)))
 
 
-# Accumulate a list of the libraries required by the current asset
-# If the HdlRecurseLibraries_<tool> flag is set, gather this list recursively
-HdlCollectLibraries=$(infox PPPP:$(HdlLibrariesInternal):$1)$(call OcpiUniqueNotDir,\
-	$(foreach a,\
-	  $(foreach p,$(HdlLibrariesInternal),$(infox ZP:$p)\
-	    $(call HdlCollectLibsRecurse,$1,$p)$p ),$(infox A:$a)$a ))
+HdlProjectFromLibPath=$(strip\
+  $(foreach p,$(if $(findstring /imports/,$1),\
+                $(if $(filter $(OCPI_PROJECT_REL_DIR)/imports/%,$1),\
+                  $(word 1,$(subst /, ,$(patsubst $(OCPI_PROJECT_REL_DIR)/imports/%,%,$1))),\
+                  $(error unexpected imports not in project: $1)),\
+                $(OCPI_PROJECT_PACKAGE)),\
+    $(infox PATH:$1 Project:$p)$p))
 
+HdlSameLibrary=$(strip \
+  $(foreach s,$(and $(filter $(notdir $1),$(notdir $2)),\
+	            $(filter $(call HdlProjectFromLibPath,$1),$(call HdlProjectFromLibPath,$2))),\
+    $(infox SAME:$1:$2:$s)$s))
+
+HdlMatchLibrary=$(strip $(infox MATCH:$1:$2)\
+  $(foreach m,$(foreach l,$2,$(call HdlSameLibrary,$1,$l)),$(infox MATCHr:$m)$m))
+
+
+# Args are 1: library path, 2: is-qualified?
+HdlAddLibrary=$(if $(call HdlMatchLibrary,$1,$(HCLTemp)),,\
+                 $(or $(infox ADDING $1: $(HCLTemp)),\
+                      $(eval HCLTemp+=$1)))
+
+# look for the .libs file for either a primitive or a worker in a library
+# and remember that the work/core might have a _cN config suffix
+HdlGetLibsFile=\
+  $(or $(wildcard $1/$(notdir $1).libs),$(strip\
+       $(foreach r,$(dir $(patsubst %/,%,$(dir $1))),\
+         $(foreach w,$(notdir $1),$(infox WWW:$w)\
+           $(or $(wildcard $r$w.libs),$(strip\
+                $(foreach n,$(shell shopt -s extglob;X=$w;echo $${X%_c+([0-9])}),$(infox NNN:$n)\
+                  $(wildcard $r$n.libs))),\
+                $(error the primitive/core/worker at $1 appears to be not built yet.))))))
+
+# $(call HdlCollectLibsRecurse,<path-to-library>,<namespace>)
+HdlCollectLibsRecurse=$(infox Collecting for dependency $1($2), already have $(HCLTemp))\
+ $(foreach path,$(word 1,$(subst :, ,$1)),$(infox path:$(path))\
+   $(foreach lib,$(word 2,$(subst :, ,$1)),$(infox lib:$(lib))\
+     $(eval HCLLines:=$(call HdlGrepExcludeComments,$(call HdlGetLibsFile,$(path))))\
+     $(foreach namespace,$(word 1,$(HCLLines)),$(infox namespace:$(namespace))\
+       $(foreach l,$(wordlist 2,$(words $(HCLLines)),$(HCLLines)),$(infox deplib:$l)\
+         $(foreach p,$(word 1,$(subst :, ,$l)),\
+           $(foreach n,$(word 2,$(subst :, ,$l)),\
+             $(foreach h,$(word 3,$(subst :, ,$l)),\
+               $(foreach r,$(if $(filter $p,$(OCPI_PROJECT_PACKAGE)),\
+                             $(OCPI_PROJECT_REL_DIR)/hdl/primitives/lib/$n:$h,\
+                             $(OCPI_PROJECT_REL_DIR)/imports/$p/exports/lib/hdl/$n:$h),\
+                 $(call HdlCollectLibsRecurse,$r,)))))))))\
+  $(if $2,,$(call HdlAddLibrary,$1))
+
+# Accumulate a list of the pathnames of libraries required by the current asset
+# This is for use by tools.  The returned values are paths with an optional
+# "actual", scoped library name after a colon.
+HdlCollectLibraries=$(infox PPPP:$(HdlLibrariesInternal):$1:$2:$(HdlTarget))\
+  $(eval HCLTemp:=$2)\
+  $(foreach p,$(HdlLibrariesInternal),$(infox HCLp:$p)\
+    $(call HdlCollectLibsRecurse,$p))\
+  $(eval HCLTemp:=$(filter-out $2,$(HCLTemp)))\
+  $(infox HCLret:$(HCLTemp))$(HCLTemp)
+
+# When all you have is core paths...
+HdlCollectCoreLibraries=$(infox PPPCx=$1=$2=$(notdir $1)=)\
+  $(eval HCLTemp:=$2)\
+  $(call HdlCollectLibsRecurse,$1:x,x)\
+  $(eval HCLTemp:=$(filter-out $2,$(HCLTemp)))\
+  $(infox HCLretc:$(HCLTemp))$(HCLTemp)
 
 # Record the list of sources required by this asset/library in the .sources file
 # Here we check the flag indicating that there are tool-specific source collections for this asset
 # in which case we create <asset>.<tool>.sources
 # If this is a true core, we record the black box stub files
 HdlRecordSources=\
-  $(infox Record:$1:$(HdlSources):$(HdlTarget))\
-  $(and $(call HdlExists,$(dir $1)),\
+  $(infox Record:$1:$(HdlSources):$(HdlTarget):$(call HdlExists,$(dir $1)))\
+  $(and $(call HdlExists,$(dir $1)),$(infox WRITING)\
   (\
    echo '\#' This generated file records sources necessary to build this $(LibName) $(HdlMode); \
    $(foreach s,$(if $(filter $(HdlMode),core),$(wildcard $(CoreBlackBoxFiles)),$(call OcpiUniqueNotDir,$(HdlSources))),echo $(notdir $s);) \
-  ) > $(patsubst %/,%,$(call HdlRmRv,$1)).sources ;)
+  ) > $(dir $1)$(LibName).sources ;)
+
+#  ) > $(patsubst %/,%,$(call HdlRmRv,$1)).sources ;)
 
 # Here, we use HdlLibraryRefDir to determine the path to the library
 # asset $2 in question. If we are working with an absolute path,
@@ -544,10 +599,11 @@ HdlRelativeOrAbsolutePathToLib=$(infox HRAPL:$1:$2:$3)$(strip \
 # Return the paths (relative or absolute) to each file listed in .sources
 # relative to $3.
 HdlExtractSourcesForLib=$(infox Extract:$2:$1)\
-  $(foreach f,\
-    $(call HdlRelativeOrAbsolutePathToLib,$1,$2,.),$(infox ZF:$f)\
-      $(foreach z,$(call HdlGrepExcludeComments,$f/$(notdir $2).sources),$(infox found:$z)\
-        $(call HdlRelativeOrAbsolutePathToLib,$1,$2,$3)/$z ))
+  $(foreach p,$(word 1,$(subst :, ,$2)),\
+    $(foreach f,\
+      $(call HdlRelativeOrAbsolutePathToLib,$1,$2,.),$(infox ZF:$f)\
+        $(foreach z,$(call HdlGrepExcludeComments,$f/$(notdir $p).sources),$(infox foundsource:$z)\
+          $(call HdlRelativeOrAbsolutePathToLib,$1,$2,$3)/$z)))
 
 #########################################################################################################
 
@@ -620,7 +676,7 @@ endif
 # Do the stuff necessary when building an assembly
 # This applies to platform configurations, application assemblies, and containers
 define HdlPrepareAssembly
-
+  $$(infox PREPARE0:$$(OCPI_PROJECT_REL_DIR))
   # 1. Scan component libraries to add to XmlIncludeDirs
   $$(call OcpiSetXmlIncludes)
   $$(eval $$(HdlSearchComponentLibraries))
@@ -628,6 +684,7 @@ define HdlPrepareAssembly
   AssyWorkersFile:=$$(GeneratedDir)/$$(Worker).wks
   $$(if\
     $$(call DoShell,$$(MAKE) -f $$(OCPI_CDK_DIR)/include/hdl/hdl-get-workers.mk\
+                    $$(OcpiGenEnv) \
                     Platform=$(Platform) \
                     PlatformDir=$(PlatformDir) \
                     Assembly=$(Assembly) \
@@ -697,5 +754,32 @@ endef
 
 OcpiPullPkgFiles=$(call Unique,$(filter %_pkg.vhd,$1) $(filter-out %_pkg.vhd,$1))
 
+define HdlInstallLibsAndSources
+  HdlLibsList=install_libs
+
+  $$(HdlLibsList):
+	$(AT) if test -f $(GeneratedDir)/$(call RmRv,$(LibName)).libs; then \
+	    $$(call ReplaceIfDifferent,$$(strip \
+	        $(GeneratedDir)/$(call RmRv,$(LibName)).libs),$(strip \
+	        $(HdlInstallLibDir)))\
+          fi;\
+
+  ifdef HdlToolNeedsSourceList_$(HdlToolSet)
+    HdlSourcesList=install_sources
+
+    $$(HdlSourcesList):
+	$(AT)for f in $$(HdlActualTargets); do \
+          if test -f $(OutDir)target-$$$$f/$(call RmRv,$(LibName)).sources; then \
+            $$(call ReplaceIfDifferent,$(strip \
+	        $(OutDir)target-$$$$f/$(call RmRv,$(LibName)).sources),$(strip \
+	        $(OutDir)target-$$$$f/$(WorkLib)));\
+          fi;\
+	done
+  endif
+
+  install: $$(HdlLibsList) $$(HdlSourcesList)
+
+endef
+
 include $(OCPI_CDK_DIR)/include/hdl/hdl-search.mk
-endif
+endif # __HDL_MAKE_MK__

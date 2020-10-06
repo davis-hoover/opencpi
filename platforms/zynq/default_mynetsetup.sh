@@ -15,60 +15,100 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
 # This script should be customized to do what you want.
 # It is used in two contexts:
 # 1. The core setup has not been run, so run it with your specific parameters
 #    (mount point on development host, etc.), and supply the IP address as arg
 # 2. The core setup HAS been run and you are just setting up a shell or ssh session
+# 
+# add any additional platform checks into this function
+# For Dev Testing: export OCPI_TOOL_PLATFORM and OCPI_DIR for testing platforms 
+# in the future without touching the set_tool_platform function or script in general
+#
+# Customization options:
+# - time server that is accessed during the set_time function in zynq_setup_common
+# - MAC address if running multiple ZedBoards
+# - Hostname if needed
+# - OCPI_DEFAULT_HDL_DEVICE if needed to be anything other than default pl:0
+# - add a third argument to zynq_net_setup to set OCPI_HDL_PLATFORM
 
-trap "trap - ERR; break" ERR; for i in 1; do
-if test "$OCPI_CDK_DIR" = ""; then
-  if test "$1" = ""; then
-     echo It appears that the environment is not set up yet.
-     echo You must supply the IP address of the OpenCPI server machine as an argument to this script.
-     break
-  fi
-  # Uncomment this section and change the MAC address for an environment with multiple
-  # ZedBoards on one network (only needed for xilinx13_3)
-  # ifconfig eth0 down
-  # ifconfig eth0 hw ether 00:0a:35:00:01:23
-  # ifconfig eth0 up
-  # udhcpc
-
-  # CUSTOMIZE THIS LINE FOR YOUR ENVIRONMENT
-  # Second arg is shared file system mount point on development system
-  # Third argument is opencpi dir relative to mount point
-  # Fourth argument is backup time server for the time protocol used by the ntp command
-  # Fifth arg is timezone spec - see "man timezone" for the format.
-  source /mnt/card/opencpi/zynq_net_setup.sh $1 /opt/opencpi cdk time.nist.gov EST5EDT,M3.2.0,M11.1.0
-  # mkdir -p /mnt/ocpi_core
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/core /mnt/ocpi_core
-  # mkdir -p /mnt/ocpi_assets
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/assets /mnt/ocpi_assets
-  # mkdir -p /mnt/ocpi_assets_ts
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/assets_ts /mnt/ocpi_assets_ts
-  # Below this line other projects can be included
-  # Here is a template of including a BSP project
-  # mkdir -p /mnt/bsp_<bsp_name>
-  # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/bsp_<bsp_name> /mnt/bsp_<bsp_name>
-  # add any commands to be run only the first time this script is run
-
-  break # this script will be rerun recursively by setup.sh
+# source check to ensure environment is set properly during this script
+if [[ "$(basename -- "$0")" == "mynetsetup.sh" ]]; then  # script has to be sourced in order to run applications
+  echo "Script is NOT sourced. Expected form 'source ./mynetsetup.sh <IP-Address of server machine> < Server directory to mount>'"
+  exit 1  # note exit and not return since we are not being sourced
 fi
-# Below this (until "done") is optional user customizations
-alias ll='ls -lt --color=auto'
-# Tell the ocpihdl utility to always assume the FPGA device is the zynq PL.
-export OCPI_DEFAULT_HDL_DEVICE=pl:0
-# Only override this file if it is customized beyond what is the default for the platform
-# export OCPI_SYSTEM_CONFIG=/mnt/card/opencpi/system.xml
-# Get ready to run some test xml-based applications
-PS1='% '
-# add any commands to be run every time this script is run
+  
+trap "trap - ERR; break" ERR > /dev/null 2>&1  # part on end added to suppress 'error: signal not found' messages on platforms that don't support the ERR signal
 
-# Print the available containers as a sanity check
-echo Discovering available containers...
-ocpirun -C
-# Since we are sourcing this script we can't use "exit", so "done" is for "break" from "for"
+for i in 1; do 
+
+  if test "$OCPI_CDK_DIR" = ""; then
+    if test "$2" = ""; then
+      echo "You must supply the IP address of the OpenCPI server machine as an argument to this script as well as the directory you would like to mount to"
+      echo "Expected form 'source ./mynetsetup.sh <IP-Address of server machine> < Server directory to mount>'"
+      break
+    fi
+
+     # Uncomment this section and change the MAC address for an environment with multiple
+     # ZedBoards on one network (only needed for xilinx13_3)
+     # ifconfig eth0 down
+     # ifconfig eth0 hw ether 00:0a:35:00:01:23
+     # ifconfig eth0 up
+     # udhcpc
+  
+    if ifconfig | grep -v 127.0.0.1 | grep 'inet addr:' > /dev/null; then
+      echo An IP address was detected.
+    else
+      echo No IP address was detected! No network or no DHCP.
+      break;
+    fi
+    # Make sure the hostname is in the host table
+    myipaddr=`ifconfig | grep -v 127.0.0.1 | sed -n '/inet addr:/s/^.*inet addr: *\([^ ]*\).*$/\1/p'`
+    myhostname=`hostname`
+    echo My IP address is: $myipaddr, and my hostname is: $myhostname
+    if ! grep -q $myhostname /etc/hosts; then echo $myipaddr $myhostname >> /etc/hosts; fi
+    
+	# Mount the opencpi development system as an NFS server, onto /mnt/net
+	# add or remove mount points based on your needs
+    mkdir -p /mnt/net
+    mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net  # second argument should be location of opencpi directory
+    # mkdir -p /mnt/ocpi_core
+    # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/core /mnt/ocpi_core
+  
+    # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
+    # This may change for 64 bit zynqs
+    echo 0 > /sys/module/nfs/parameters/enable_ino64
+	
+    source ./zynq_setup_common.sh set_tool_platform set_time time.nist.gov  # specify other time server if needed
+    source ./zynq_net_setup.sh $1 cdk  # Usage is: zynq_net_setup.sh <nfs-ip-address> <opencpi-cdk-dir> <OCPI_HDL_PLATFORM> third argument is optional and dependant on use case
+  
+    # add any commands to be run only the first time this script is run
+
+    break # this script will be rerun recursively by zynq_net_setup.sh
+  fi
+  # Below this (until "done") is optional user customizations
+  
+  # Tell the ocpihdl utility to always assume the FPGA device is the zynq PL.
+  export OCPI_DEFAULT_HDL_DEVICE=pl:0
+  #prevent looking for simulation tools such as xsim
+  export OCPI_ENABLE_HDL_SIMULATOR_DISCOVERY=0
+
+  # **customize system.xml or ensure it is correctly configured**
+  # Get ready to run some test xml-based applications
+  PS1='% '
+  # add any commands to be run every time this script is run
+
+  echo Loading bitstream
+  if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_CDK_DIR/$HDL_PLATFORM/*.bitz; then
+    echo Bitstream successfully loaded
+  else
+    echo Bitstream load error
+    break
+  fi 
+ 
+  # Print the available containers as a sanity check
+  echo Discovering available containers...
+  ocpirun -C
+  # Since we are sourcing this script we can't use "exit", so "done" is for "break" from "for"
 done
-trap - ERR
+trap - ERR > /dev/null 2>&1

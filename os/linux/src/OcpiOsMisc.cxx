@@ -37,8 +37,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/time.h>
+#include <time.h>
 #include "ocpi-config.h"
 #ifdef OCPI_OS_macos
 #include <mach-o/dyld.h>
@@ -52,11 +51,14 @@
 void
 OCPI::OS::sleep(unsigned long msecs) {
   if (msecs) {
-    struct timeval timeout;
-    timeout.tv_sec = msecs / 1000;
-    timeout.tv_usec = (msecs % 1000) * 1000;
+    struct timespec timeout;
+    timeout.tv_sec = (time_t)msecs / 1000;
+    timeout.tv_nsec = ((time_t)msecs % 1000) * 1000000;
 
-    int res = ::select (0, 0, 0, 0, &timeout);
+    // previously we used "select()" with no FDs to implement this timeout.
+    // nanosleep is cleaner, but in fact using select() caused container test failures
+    // these failures using select-with-no-fds was never investigated since nanosleep is best anyway
+    int res = ::nanosleep(&timeout, NULL);
 
     if (res < 0 && errno != EINTR) {
       throw OCPI::OS::Posix::getErrorMessage(errno);

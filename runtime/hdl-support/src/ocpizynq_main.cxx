@@ -30,6 +30,7 @@
   CMD_OPTION  (psclk,     p,    Double,   "33.3333e6", "Frequency of the PS_CLK clock into the Zync SoC") \
 
 #include <stdint.h>
+#include <stddef.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <time.h>

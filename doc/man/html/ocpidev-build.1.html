@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-build</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140260332787808"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-build — compiles OpenCPI assets</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="strong"><strong><code class="literal">build</code></strong></span> [<span class="emphasis"><em>&lt;noun&gt;</em></span> [<span class="emphasis"><em>&lt;name&gt;</em></span> ]]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">build</code></strong></span> verb compiles the OpenCPI assets specified by the noun used
+in the command. If no nouns are provided, <span class="strong"><strong>ocpidev</strong></span> builds the current
+directory or asset. When the plural version of the nouns are used, no name is
+specified and all assets of that type are built.</p><p>Asset types to be specified in the <span class="emphasis"><em>&lt;noun&gt;</em></span> argument are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">application</code></strong></span>(<span class="strong"><strong><code class="literal">s</code></strong></span>)
+</span></dt><dd>
+    Build all (<span class="strong"><strong><code class="literal">applications</code></strong></span>) or a specific ACI application.
+    This includes any custom bilding specified by a customized
+    application <span class="strong"><strong>Makefile</strong></span>.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">hdl</code></strong></span>
+</span></dt><dd><p class="simpara">
+    A prefix to indicate an HDL asset in the <span class="strong"><strong>hdl</strong></span> subdirectory of a project.
+    Possible HDL assets are:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">assembly</code></strong></span>|<span class="strong"><strong><code class="literal">ies</code></strong></span>
+</span></dt><dd>
+        Build all or a specified HDL assembly.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">device</code></strong></span>
+</span></dt><dd>
+        Build an HDL device worker in a
+        specified library.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">platform</code></strong></span>(<span class="strong"><strong><code class="literal">s</code></strong></span>)
+</span></dt><dd>
+        Build all or a specified HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">primitive</code></strong></span>(<span class="strong"><strong><code class="literal">s</code></strong></span>)
+</span></dt><dd><p class="simpara">
+        Build all HDL primitives or a specified HDL primitive
+        of a specified type. Possible HDL primitive types are:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">core</code></strong></span>
+</span></dt><dd>
+            Build a primitive that results in a synthesized
+            core/netlist.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">library</code></strong></span>
+</span></dt><dd>
+            Build a primitive that results in a library of modules.
+</dd></dl></div></dd></dl></div></dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">library</code></strong></span>
+</span></dt><dd>
+    Build a component library.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">project</code></strong></span>
+</span></dt><dd>
+    Build all assets in a project.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">test</code></strong></span>
+</span></dt><dd>
+    Build but do not run a component unit test.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">worker</code></strong></span>
+</span></dt><dd>
+    Build a worker.
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>The options to the <span class="strong"><strong><code class="literal">build</code></strong></span> verb are primarily used to limit what is built
+(focus the build process on specific assets of interest), or specify the
+platforms and targets to build the assets for.</p><p>In the descriptions that follow, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><div class="refsect2"><a id="_options_when_building_projects"></a><h3>Options When Building Projects</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-assembly=</code></strong></span><span class="emphasis"><em>&lt;hdl-assembly&gt;</em></span>+
+</span></dt><dd>
+    Limit the assemblies being built to the specified assembly. This option
+    can also be used in the <span class="strong"><strong>hdl/assemblies</strong></span> directory.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--no-assemblies</code></strong></span>
+</span></dt><dd>
+    Don’t build the assemblies in the project. Building HDL assemblies
+    (and their containers) can be slow.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_building_projects_or_libraries"></a><h3>Options When Building Projects or Libraries</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl</code></strong></span>
+</span></dt><dd>
+    Limit the assets being built to HDL primitives, workers, platforms
+    or assemblies.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--rcc</code></strong></span>
+</span></dt><dd>
+    Limit the assets being built to RCC workers.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--worker=</code></strong></span><span class="emphasis"><em>&lt;worker&gt;</em></span>+
+</span></dt><dd>
+    Limits the assets being built to the specified worker.
+    Note that the <span class="strong"><strong><code class="literal">--worker</code></strong></span> option differs from the
+    <span class="strong"><strong><code class="literal">worker</code></strong></span> noun: the noun is used to build
+    a single worker, while the <span class="strong"><strong><code class="literal">--worker</code></strong></span> option is used
+    to limit the build to an individual worker (or a list of
+    workers if <span class="strong"><strong><code class="literal">--worker</code></strong></span> option is specified
+    multiple times) when building a project or library.
+    If the <span class="strong"><strong><code class="literal">--worker</code></strong></span> option is not used,
+    all workers in a project or library are built.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_building_projects_libraries_tests_rcc_workers_or_aci_applications"></a><h3>Options When Building Projects, Libraries, Tests, RCC Workers or ACI Applications</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-rcc-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>+
+</span></dt><dd>
+    Build RCC/ACI assets for the RCC platforms associated with the
+    specified HDL platform. If this option is not used (and <span class="strong"><strong><code class="literal">--rcc-platform</code></strong></span>
+    <span class="emphasis"><em>&lt;platform&gt;</em></span> is also not used), the current development software
+    platform is used as the single RCC platform used for building.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--rcc-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>+
+</span></dt><dd>
+    Build RCC/ACI assets for the specified RCC platform. If this
+    option is not used (and <span class="strong"><strong><code class="literal">--hdl-rcc-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span> is also not used),
+    the current development software platform is used as the single
+    RCC platform used for building.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_building_projects_libraries_tests_with_hdl_workers_or_other_hdl_assets"></a><h3>Options When Building Projects, Libraries, Tests with HDL Workers or other HDL Assets</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-target=</code></strong></span><span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Build HDL assets for the specified HDL target. If only HDL targets
+    are specified (and no HDL platforms), containers will not be
+    built for assemblies or unit tests.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-platform=</code></strong></span><span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>+
+</span></dt><dd>
+    Build HDL assets for the specified HDL platform.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_building_workers_tests_and_other_assets_in_libraries"></a><h3>Options When Building Workers, Tests and other Assets in Libraries</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+    Build the asset located in the specified library. This option can
+    be used to identify a particular library when operating in a
+    project with multiple component libraries. It’s not needed when
+    operating in a project with only a single top-level
+    <span class="strong"><strong><code class="literal">components</code></strong></span> library. Note that the <span class="strong"><strong><code class="literal">library</code></strong></span> noun differs
+    from the <span class="strong"><strong><code class="literal">-l</code></strong></span> option in that the <span class="strong"><strong><code class="literal">library</code></strong></span> noun is used when
+    building the library itself, while the <span class="strong"><strong><code class="literal">-l</code></strong></span> option is used when
+    building an asset inside a library.
+</dd></dl></div></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Build the current asset or directory and those underneath it
+for the <span class="strong"><strong><code class="literal">zed</code></strong></span> HDL platform and the <span class="strong"><strong><code class="literal">xilinx13_3</code></strong></span> RCC platform.
+</p><pre class="screen">ocpidev build --hdl-platform=zed --rcc-platform=xilinx13_3</pre></li><li class="listitem"><p class="simpara">
+Build the <span class="strong"><strong><code class="literal">assets</code></strong></span> project for the <span class="strong"><strong><code class="literal">zed</code></strong></span> HDL platform and
+<code class="literal">*`xilinx13_3</code>* RCC platform.  Omit the name <span class="strong"><strong><code class="literal">assets</code></strong></span> if
+inside the <span class="strong"><strong><code class="literal">assets</code></strong></span> project.
+</p><pre class="screen">ocpidev build project assets --hdl-platform=zed
+                             --rcc-platform=xilinx13_3</pre></li><li class="listitem"><p class="simpara">
+Inside the <span class="strong"><strong><code class="literal">assets</code></strong></span> project, build the <span class="strong"><strong><code class="literal">complex_mixer.hdl</code></strong></span>
+worker in the <span class="strong"><strong><code class="literal">dsp_comps</code></strong></span> library for the <span class="strong"><strong><code class="literal">zed</code></strong></span> HDL platform
+and <span class="strong"><strong><code class="literal">xilinx13_3</code></strong></span> RCC platform. You can omit the <span class="strong"><strong><code class="literal">-l dsp_comps</code></strong></span>
+option if operating in a project with only a single top-level
+<span class="strong"><strong><code class="literal">components</code></strong></span> library.
+</p><pre class="screen">ocpidev -l dsp_comps build worker complex_mixer.hdl
+                         --hdl-platform=zed
+                         --rcc-platform=xilinx13_3</pre></li><li class="listitem"><p class="simpara">
+Inside the <span class="strong"><strong><code class="literal">assets</code></strong></span> project, build the <span class="strong"><strong><code class="literal">dsp_comps</code></strong></span> library
+located at <span class="strong"><strong><code class="literal">components/dsp_comps</code></strong></span> for the <span class="strong"><strong><code class="literal">zed</code></strong></span> HDL platform
+and <span class="strong"><strong><code class="literal">xilinx13_3 RCC</code></strong></span> platform.
+</p><pre class="screen">ocpidev build library dsp_comps --hdl-platform=zed
+                                --rcc-platform=xilinx13_3</pre></li><li class="listitem"><p class="simpara">
+Inside the <span class="strong"><strong><code class="literal">assets</code></strong></span> project, build the <span class="strong"><strong><code class="literal">dsp_comps</code></strong></span> library,
+but limit the build to the <span class="strong"><strong><code class="literal">complex_mixer.hdl</code></strong></span> and
+<span class="strong"><strong><code class="literal">cic_dec.hdl</code></strong></span> workers.
+</p><pre class="screen">ocpidev build library dsp_comps --worker=complex_mixer.hdl
+                                --worker=cic_dec.hdl
+                                --hdl-platform=zed</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: &lt;www.opencpi.org&gt;</p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-clean.1.html" target="_top">ocpidev-clean(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-refresh.1.html" target="_top">ocpidev-refresh(1)</a>
+<a class="ulink" href="ocpidev-register.1.html" target="_top">ocpidev-register(1)</a>
+<a class="ulink" href="ocpidev-run.1.html" target="_top">ocpidev-run(1)</a>
+<a class="ulink" href="ocpidev-set.1.html" target="_top">ocpidev-set(1)</a>
+<a class="ulink" href="ocpidev-show.1.html" target="_top">ocpidev-show(1)</a>
+<a class="ulink" href="ocpidev-unregister.1.html" target="_top">ocpidev-unregister(1)</a>
+<a class="ulink" href="ocpidev-unset.1.html" target="_top">ocpidev-unset(1)</a>
+<a class="ulink" href="ocpidev-utilization.1.html" target="_top">ocpidev-utilization(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

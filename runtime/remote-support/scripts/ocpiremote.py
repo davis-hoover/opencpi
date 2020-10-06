@@ -88,6 +88,10 @@ def main():
         '-w', '--hw_platform',
         'hardware platform for server environment; default: zed',
         default='zed')
+    option_bitstream = make_option(
+        '-b', '--bitstream',
+        'load the opencpi testbias bitstream manually whether or not there is one already loaded',
+        action='store_true')
     option_valgrind = make_option(
         '-v', '--valgrind',
         'load/use Valgrind',
@@ -115,11 +119,11 @@ def main():
         'reload', reload_,
         'delete a server sandbox directory and then reload it',
         common_options + [option_port, option_valgrind, option_hw_platform,
-                          option_sw_platform]))
+                          option_sw_platform, option_log_level]))
     commands.append(make_subcommand(
         'start', start,
         'start server on remote device',
-        common_options + [option_log_level, option_valgrind]))
+        common_options + [option_log_level, option_valgrind, option_bitstream]))
     commands.append(make_subcommand(
         'restart', restart,
         'stop and then start server on remote device',
@@ -154,7 +158,10 @@ def main():
 
     # If a subcommand was passed, call it. Else print help message
     if 'func' in args:
-        args.func(args)
+        rc = args.func(args)
+
+        if rc != 0:
+            sys.exit(rc)
     else:
         parser.print_help()
 
@@ -211,7 +218,7 @@ def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0, stderr=True):
     rc = [rc] if not isinstance(rc, list) else rc
 
     if ocpiserver:
-        cmd = 'cd "{}" && ./ocpiserver.sh "{}"'.format(args.remote_dir, cmd)
+        cmd = 'cd "{}" && ./ocpiserver.sh {}'.format(args.remote_dir, cmd)
     if ssh:
         cmd = 'ssh {} {}@{} sh -c \'{}\''.format(
             args.ssh_opts, args.user, args.ip_addr, cmd)
@@ -227,7 +234,7 @@ def make_parser(commands):
     Args:
         commands: list of Command NamedTuples to add to the parser
     """
-    parser = ArgumentParser()
+    parser = ArgumentParser(epilog="Run 'ocpiremote COMMAND --help' for more information on COMMAND")
     subparsers = parser.add_subparsers()
 
     for command in commands:
@@ -310,9 +317,10 @@ def execute_command(command, args):
                     stderr = process.stderr.read().strip()
 
         except Exception as e:
+            print('help')
             raise ocpiutil.OCPIException(
                 'SSH/SCP call failed in a way we cannot handle; quitting. {}'.format(e))
-
+        
         if stderr and command.stderr:
             print(stderr)
 
@@ -341,15 +349,15 @@ def load(args):
     bin_files = ['ocpidriver', 'ocpiserve', 'ocpihdl', 'ocpizynq']
     bin_files = [os.path.join(cdk, args.sw_platform, 'bin', bin_file) for bin_file in bin_files]
     sdk = glob.glob(os.path.join(cdk, args.sw_platform, 'sdk', 'lib', '*'))
-
+    bitstream = glob.glob(os.path.join(cdk, args.hw_platform, '*.bitz'))
     # List of files to add to tar
     tar_files = (drivers
              + kernel_objects
              + rules
              + bin_files
              + sdk
+             + bitstream
              + [localtime, ocpiserver, os_driver])
-
     # Where to extract files to on remote device
     arcnames = [os.path.join(args.remote_dir, *tar_file[len(cdk):].split('/'))
                 if tar_file.startswith(cdk) else tar_file
@@ -364,12 +372,13 @@ def load(args):
     system_xml_arc = os.path.join(args.remote_dir, *system_xml[len(cdk):].split('/'))
     arcnames.append(system_xml_arc)
 
+
     if args.valgrind:
         tar_files.append(
             os.path.join(cdk, '..', 'prerequisites', 'valgrind', args.sw_platform))
         arcnames.append(
             os.path.join(args.remote_dir, 'prerequisites', 'valgrind', args.sw_platform))
-
+ 
     with tempfile.TemporaryDirectory() as tempdir:
         # Prepare sandbox
         commands = []
@@ -383,6 +392,9 @@ def load(args):
             'echo {} > {}/swplatform'.format(args.sw_platform, args.remote_dir),
             args))
         commands.append(make_command(
+            'echo {} > {}/hwplatform'.format(args.hw_platform, args.remote_dir),
+            args))
+        commands.append(make_command(
             'echo {} > {}/port'.format(args.port, args.remote_dir),
             args))
         commands.append(make_command(
@@ -391,7 +403,6 @@ def load(args):
         commands.append( make_command(
             'ln -s ../{} {}'.format(system_xml_arc, args.remote_dir),
             args))
-
         print('Preparing remote sandbox...')
         rc = execute_commands(commands, args)
 
@@ -407,7 +418,6 @@ def load(args):
         tar_commands.append(make_command(
             'gunzip -c {}/tar.tgz | tar xf -'.format(args.remote_dir),
             args))
-
         print('Sending server package...')
         rc = execute_commands(tar_commands, args)
 
@@ -447,8 +457,8 @@ def deploy(args):
 
     if not os.path.isdir(local_dir):
         print("Error: {} does not exist".format(local_dir))
-        print("Try running 'scripts/install-platform.sh {} && scripts/install-platform.sh {}'".format(
-                    args.hw_platform, args.sw_platform)
+        print("Try running 'ocpiadmin deploy platform {} {}'".format(
+                args.sw_platform, args.hw_platform)
             )
 
         return 1
@@ -460,28 +470,22 @@ def deploy(args):
         tar_path = make_tar(tar_files, tar_files, tempdir)
 
         tar_commands.append(make_command(
+            'if [ ! -d {} ]; then mkdir {}; fi'.format(args.remote_dir, args.remote_dir),
+            args))
+        tar_commands.append(make_command(
             'scp {} {} {}@{}:./{}'.format(
                 args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
             args,
             ssh=False))
         tar_commands.append(make_command(
-            'tar -xf {}/tar.tgz'.format(args.remote_dir),
+            'gunzip -c {}/tar.tgz | tar xf -'.format(args.remote_dir),
             args))
-
         print('Deploying Opencpi boot files to remote device from {} ...'.format(local_dir))
         rc = execute_commands(tar_commands, args)
 
     if rc == 0:
         print('Opencpi boot files deployed successfully.')
         rc = reboot(args)
-
-    # cmd = 'scp {} -r {}/. {}@{}:/mnt/card'.format(
-    #     args.scp_opts, local_dir, args.user, args.ip_addr)
-    # command = make_command(cmd, args, ssh=False)
-    # rc = execute_command(command, args)
-
-    # if rc in command.rc:
-    #     rc = reboot(args)
 
     return rc
 
@@ -494,17 +498,24 @@ def unload(args):
     Args:
         args: parsed user arguments
     """
-    if status(args, stderr=False) == 0:
-        if stop(args) != 0:
-            return 1
 
-    command = 'rm -r {}'.format(args.remote_dir)
+    if status(args, stderr=False) == 0:
+      if stop(args) != 0:
+          return 1
+    
+    command = 'if [[ -e {} ]]; then true; else false; fi'.format(args.remote_dir)
     command = make_command(command, args)
     rc = execute_command(command, args)
+ 
+    if rc == 0:
+      command = 'rm -r {}'.format(args.remote_dir)
+      command = make_command(command, args)
+      rc = execute_command(command, args)
 
-    if rc in command.rc:
+      if rc in command.rc:
         print("Server unloaded successfully.")
-
+    else:
+      rc = 0
     return rc
 
 
@@ -519,7 +530,6 @@ def reload_(args):
 
     if rc == 0:
         rc = load(args)
-
     return rc
 
 
@@ -530,14 +540,16 @@ def start(args):
         args: parsed user arguments
     """
     command = 'start'
+    if args.bitstream:
+        command += ' -B '
     if args.valgrind:
         command += ' -V '
     if int(args.log_level) > 0:
         command += ' -l {} '.format(args.log_level)
     command = make_command(command, args, ocpiserver=True)
-
+    
     rc = execute_command(command, args)
-
+    
     return rc
 
 

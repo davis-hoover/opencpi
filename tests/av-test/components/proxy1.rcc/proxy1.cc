@@ -34,6 +34,11 @@ using namespace Proxy1WorkerTypes;
 using namespace std;
 
 class Proxy1Worker : public Proxy1WorkerBase {
+public:
+  Proxy1Worker() {
+    properties().wkr2present = slaves.wkr2.isPresent();
+  }
+
   RCCResult run(bool /*timedout*/) {
     int i;
     std::string temp_str;
@@ -137,18 +142,6 @@ class Proxy1Worker : public Proxy1WorkerBase {
       slaves.second_wkr1.set_test_array_of_str(i, "that");
     }
 
-    slaves.wkr2.set_test_double(5.0);
-    slaves.wkr2.set_test_ulong(10);
-    slaves.wkr2.set_test_bool(true);
-    slaves.wkr2.set_test_char('F');
-    slaves.wkr2.set_test_float(2.0);
-    slaves.wkr2.set_test_long(25);
-    slaves.wkr2.set_test_longlong(250);
-    slaves.wkr2.set_test_short(6);
-    slaves.wkr2.set_test_uchar('G');
-    slaves.wkr2.set_test_ulonglong(350);
-    slaves.wkr2.set_test_ushort(16);
-
     cout << "slaves.first_wkr1.set_test_double(5.0): " << slaves.first_wkr1.get_test_double()
          << endl;
     cout << "slaves.first_wkr1.set_test_ulong(10): " << slaves.first_wkr1.get_test_ulong()
@@ -236,6 +229,31 @@ class Proxy1Worker : public Proxy1WorkerBase {
     cout << "slaves.first_wkr1.get_test_my_param2(): " << slaves.first_wkr1.get_my_param1() << endl;
     slaves.first_wkr1.set_my_debug1(34);
     cout << "slaves.first_wkr1.get_test_my_debug1(): " << slaves.first_wkr1.get_my_debug1() << endl;
+
+    if(isOperating()) {
+      cout << "proxy1 its operating" << endl;
+    }
+
+    if (slaves.first_wkr1.isOperating()) {
+      cout << "first_wkr1 its operating" << endl;
+    }
+    if (slaves.second_wkr1.isOperating()) {
+      cout << "first_wkr1 its operating" << endl;
+    }
+    if (!slaves.wkr2.isPresent())
+      return RCC_DONE;
+    slaves.wkr2.set_test_double(5.0);
+    slaves.wkr2.set_test_ulong(10);
+    slaves.wkr2.set_test_bool(true);
+    slaves.wkr2.set_test_char('F');
+    slaves.wkr2.set_test_float(2.0);
+    slaves.wkr2.set_test_long(25);
+    slaves.wkr2.set_test_longlong(250);
+    slaves.wkr2.set_test_short(6);
+    slaves.wkr2.set_test_uchar('G');
+    slaves.wkr2.set_test_ulonglong(350);
+    slaves.wkr2.set_test_ushort(16);
+
     cout << "slaves.wkr2.set_test_double(5.0): " << slaves.wkr2.get_test_double() << endl;
     cout << "slaves.wkr2.set_test_ulong(10): " << slaves.wkr2.get_test_ulong() << endl;
     cout << "slaves.wkr2.set_test_bool(true): " << slaves.wkr2.get_test_bool() << endl;
@@ -258,16 +276,6 @@ class Proxy1Worker : public Proxy1WorkerBase {
       return setError("getting debug property in a non-debug worker did not fail");
     cout << "slaves.wkr2.get_my_debug2() failed as expected\n";
 
-    if(isOperating()) {
-      cout << "proxy1 its operating" << endl;
-    }
-
-    if (slaves.first_wkr1.isOperating()) {
-      cout << "first_wkr1 its operating" << endl;
-    }
-    if (slaves.second_wkr1.isOperating()) {
-      cout << "first_wkr1 its operating" << endl;
-    }
     if (slaves.wkr2.isOperating()) {
       cout << "first_wkr1 its operating" << endl;
     }

@@ -1,3 +1,131 @@
+# [v2.0.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-rc.2...v2.0.0) (2020-10-06)
+
+Changes/additions since [OpenCPI Release v2.0.0-rc.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0-rc.2)
+
+### New Features
+- **tools**: add dockerfile for docker image used during GRCon20 workshops. (!386)(94e17772)
+
+### Enhancements
+- **app**: include the demo app from tutorial 1 in the tutorial project for completeness. (!373)(1566b9e9)
+- **comp**: Add timed sample protocols. (!370)(90c31833)
+- **comp**: add rcc and hdl workers for the tutorial 1 workers so we have both rcc and hdl of all of them. (!373)(1566b9e9)
+- **comp**: cleanup another tutorial worker, `peak_detector.rcc`, for tutorial 2. (!373)(1566b9e9)
+- **doc**: add files for the `timestamper_scdcd` datasheet to be compiled. (!357)(37931d3b)
+- **runtime**: to be more consistent, enable "worker" attribute in app instances to include the authoring model suffix. (!373)(1566b9e9)
+- **runtime**: allow "worker" variable in selection expressions. (!373)(1566b9e9)
+- **runtime**: when there are no slaves indicated for a proxy instance (like from GRC), find slaves automatically if such a thing can be unambiguous.  This is still not fully inferred slaves, it is inferred slaves when they are already present, but not indicated as slaves. (!373)(1566b9e9)
+- **runtime**: enable `OCPI_APPLICATION_PARAMS` to work better and for more options like `dump` and `verbose` (still not documented). (!373)(1566b9e9)
+- **runtime**: have our hdl sim drivers kill sims on `SIGTERM` as well as `SIGINT`. (!373)(1566b9e9)
+- **tools**: `ocpigen`: make `ocpi_debug` a hidden property. (!373)(1566b9e9)
+- **tools**: `ocpigr37`: make `ocpi_container` a pseudo-property for GRC to be "partly hidden". (!373)(1566b9e9)
+- **tools**: add platform, worker, model, and "done" pseudo-properties to the `ocpigr37` output, and put them last after normal properties. (!373)(1566b9e9)
+- **tools**: `ocpigen`: make `ocpi_endian` a hidden property. (!373)(1566b9e9)
+- **tools**: add env var `OCPI_DISTRO_BUILD` to enable generic x86_64 distro build feature. (!380)(e849452b)
+- **tools**: build generic x86_64 GMP library when `OCPI_DISTRO_BUILD` env var is set. (!380)(e849452b)
+- **tools**: add non-positional parameter handling to `ocpiadmin`. (!384)(cb1209c6)
+
+### Bug Fixes
+- **comp**: fix bug in `cdc_clk_gen.vhd`. (!378)(3ac9aac6)
+- **hdl base**: fix an ancient bug in VHDL delta cycles that we previously blamed on being an isim-only bug. (!373)(1566b9e9)
+- **runtime**: don't end up busy-waiting when the container has no applications to run at all. (!373)(1566b9e9)
+- **tests**: fix typo in `ocpidev_directory_test.sh` relating to `ocpishow.py`. (!377)(0723c9aa)
+- **tools**: fix an ancient bug in modelsim building that could report an error which then "disappeared" on rebuild. (!373)(1566b9e9)
+- **tools**: make the tutorial project depend on platform so it can build for pluto and other OSPs. (!373)(1566b9e9)
+- **tools**: fix `centos8-check.sh` script. (!375)(03a04a91)
+- **tools**: fix `ocpishow.py` to have better error handling. (!377)(0723c9aa)
+- **tools**: fix `project.py` (in `tools/python/_opencpi`) to have better error handling. (!377)(0723c9aa)
+
+# [v2.0.0-rc.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2020-09-22)
+
+Changes/additions since [OpenCPI Release v2.0.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0-rc.1)
+
+### New Features
+- **tools**: add ability to specify host only prereqs. (!361)(3ac81b61)
+
+### Enhancements
+- **devops**: add script to automate creation of gitlab CI pipeline jobs for opencpi projects/platforms. (!351)(5b068b89)
+- **doc**: add more man pages:  ocpihdl, ocpirun, opencpi, and some other updates. (!366)(207870c0)
+- **tools**: add yaml-cpp v0.6.x as prereq (x86_64 only), removing weak dependency on boost. (!356)(be3e4cfa)
+
+### Miscellaneous
+- **comp**: add fifo_depth_p of 2048 to fifo.hdl build configuration. (!358)(fcd0e217)
+- **tests**: suppress plutosdr from fir_complex_sse_ts.test due to lack of dsp resources. (!359)(387938a8)
+
+# [v2.0.0-rc.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-beta.1...v2.0.0-rc.1) (2020-08-28)
+
+Changes/additions since OpenCPI Release v2.0.0-beta.1
+
+### Enhancements
+- **comp**: improve dc_offset_filter doc by adding transfer function. (!333)(364bb72e)
+- **comp**: build socket_write.rcc for ubuntu18_04 platform. (!353)(7ef32634)
+- **devops,tests**: remove obsolete ".bitz" files from git repo. (!337)(3d801f21)
+- **doc**: add more man pages for OpenCPI commands. (!347)(6b7e41eb)
+- **doc,tools**: add doc RPM to existing packaging machinery. (!329)(62cc8e74)
+- **hdl base**: all hdl platforms have a standard test bitstream exported in a standard place. (!338)(e19fc095)
+- **runtime,tools**: a proxy can have optional slaves so apps can have subsets, and the proxy can test or presence. (!338)(e19fc095)
+- **tools**: enable python2 ACI in addition to python3 ACI. (!334)(3ea0db4d)
+- **tools**: implement "-v" (verbose) option in "deploy-platform.sh" script. (!345)(5d7c5383)
+- **tools**: add VERSION file that defines the version of OpenCPI. (!346)(b1e80c4d)
+- **tools**: refactor `scripts/update-release.sh` to use new VERSION file. (!346)(b1e80c4d)
+
+### Bug Fixes
+- **comp**: `timestamper_scdcd.vhd`: add logic to confirm that EOF is valid. (!314)(b4918d13)
+- **hdl base**: `complex_short_with_metadata_demarshaller.vhd`: add reset for EOF. (!314)(b4918d13)
+- **hdl base**: `time_downsampler.vhd`: add reset for EOF. (!314)(b4918d13)
+- **hdl base**: the ml605 now builds everything including the inactive and tutorial projects. (!338)(e19fc095)
+- **runtime**: some property setting patterns, especially for remote device slaves, were broken and now fixed. (!344)(fb8e6c12)
+- **tools**: fix export logic so as not to create broken symlinks. (!329)(62cc8e74)
+- **tools**: build regressions on lesser used platforms not in normal pipeline. (!331)(a7f7cdd2)
+- **tools**: fix "ocpigr" error exceptions caused by obsolete bitstream files. (!337)(3d801f21)
+- **tools**: ocpigen: check status code returned by `finalizeHdlDataPort()` instead of ignoring it. (!339)(33f94239)
+- **tools**: fix building an ubuntu docker container with a non ubuntu host by preventing kernel related items from being built. (!343)(29a8c490)
+- **tools**: fix OSP HDL platform export mechanism. (!345)(5d7c5383)
+- **tools**: fix/restore usable of project-level componentlibrary settings in proxies in hdl/cards. (!350)(1584caf7)
+
+### Miscellaneous
+- **tools**: remove support for CentOS 6 as a development host platform. (!354)(3dc24ee0)
+
+# [v2.0.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v1.7.0...v2.0.0-beta.1) (2020-07-24)
+
+Changes/additions since OpenCPI Release v1.7.0
+
+### New Features
+- **devops**: upload entire OpenCPI tree to AWS S3 when a job fails. (!297)(6708dc22)
+- **osp**: add support for additional xilinx software platforms: xilinx13_4_aarch32, xilinx19_2_aarch{32,64}. (!173)(5e034a9a)
+- **tools**: add AV GUI to ubuntu18_04 platform. (!294)(d74f201c)
+- **tools**: add centos8 RCC development platform. (!312)(c85641a3)
+- **tools**: initial add of "ubuntu18_04" development platform. (!278)(e053aac5)
+
+### Enhancements
+- **devops**: add ability for opencpi pipeline to launch downstream plutosdr pipeline. (!303)(ddb5b49e)
+- **devops**: add weekly scheduled CI pipeline to lessen load on MR pipelines. (!287)(c47409e0)
+- **devops**: move CI artifact hosting from gitlab to AWS. (!325)(8c28c710)
+- **doc**: add generation of html man pages. (!327)(196ab92e)
+- **doc**: add man pages for ocpidev nouns (previous ones are for verbs). (!327)(196ab92e)
+- **doc,tools**: export PDFs so they can more easily be packaged in an RPM. (!311)(fb4c4f4c)
+- **hdl base**: allow bitstream loading in linux 4.10, and avoid probing a bitstream when unloading or loading. (!316)(d3dabaf9)
+- **hdl base,tools**: component library searching is now all-libs-in-project, per project, not each-lib-in-all-projects. (!316)(d3dabaf9)
+- **hdl base,tools**: primitive libraries can be qualified by the project's package id. (!316)(d3dabaf9)
+- **hdl base,tools**: workers chosen for an assembly are not affected by what is built as long as anything is built. (!316)(d3dabaf9)
+- **osp**: add initial support of ad9361 fmcomms transceiver for zcu104 platform. (!302)(bfe43f20)
+- **tools**: `ocpigr`: emit yaml instead of xml to support grc 3.8. (!306)(b2b8617d)
+- **tools**: refactor ocpiadmin.sh and relocate to `tools/scripts/`. (!319)(f37f3732)
+
+### Bug Fixes
+- **devops**: fix hdl platforms building in pipelines when they shouldn't. (!317)(2c557552)
+- **hdl base**: check for hdl target before building zynq primitive wrapper. (!326)(308f360e)
+- **tools**: fix MANPATH and PYTHONPATH settings in "opencpi-setup.sh". (!323)(3312352c)
+- **tools**: fix centos7 platform installation error when swig3 package not available. (!328)(8bf294e7)
+- **tools**: fix incorrect package-ids in artifacts using top-level specs (not specs in libraries). (!321)(380f6c63)
+- **tools**: fix ocpigr build issues. (!324)(543ab821)
+- **tools**: suppress cross-compilation for items in `build/places` that use the `-t` flag. (!307)(894f6e81)
+
+### Miscellaneous
+- **devops**: remove CentOS 6 from CI pipeline. (!308)(5006cbc1)
+- **devops,tools**: revamp OpenCPI RPM package production process. (!304)(2b62a34a)
+- **doc**: update ubuntu* and centos8 platform README files. (!315)(77e3a53c)
+- **osp**: exclude plutosdr in assets assemblies not capable of building. (!295)(a2c8fb98)
+
 # [v1.7.0](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-rc.1...v1.7.0) (2020-07-09)
 
 Changes/additions since OpenCPI Release v1.7.0-rc.1

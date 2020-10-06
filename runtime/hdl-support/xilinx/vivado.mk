@@ -95,7 +95,6 @@ HdlToolNeedBB_vivado=
 HdlToolCoreRef=$1
 HdlToolCoreRef_vivado=$1
 
-CoreOrLibName=$(or $(Core),$(LibName))
 ################################################################################
 # Variable required by toolset: HdlToolNeedsSourceList_<tool>=yes
 # Set if the tool requires a listing of source files and libraries
@@ -117,7 +116,7 @@ VivadoRearrangePart=$(strip\
 HdlFullPart_vivado=$(and $1,$(subst $(space),-,$(call VivadoRearrangePart,$(subst -, ,$1))))
 
 ifeq ($(HdlMode),library)
-CoreOrLibName=$(LibName)
+CoreOrLibName=$(WorkLib)
 ifeq ($(Core),)
 Core=$(LibName)
 endif
@@ -473,9 +472,9 @@ VivadoIncludeDependencies=\
   $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),$(infox IncLib:$l)\
     $(call VivadoIncludeSources,\
       $(call HdlExtractSourcesForLib,$(HdlTarget),$l,$(TargetDir)),\
-      $(notdir $(call HdlRmRv,$l))))\
+      $(word 2,$(subst :, ,$l))))\
   $(call VivadoIncludeCores,$(SubCores_$(HdlTarget)),$(CoreOrLibName))\
-  $(call VivadoIncludeSources,$(foreach s,$(HdlSources),$(call FindRelative,$(TargetDir),$s)),$(CoreOrLibName))\
+  $(call VivadoIncludeSources,$(infox VIS:$(WorkLib):$(CoreOrLibName):$(Core))$(foreach s,$(HdlSources),$(call FindRelative,$(TargetDir),$s)),$(CoreOrLibName))\
   $(call VivadoIncludeIncludedirs,$(call Unique,$(patsubst %/,%,$(dir $(HdlSources)) $(VerilogIncludeDirs))),$(CoreOrLibName))\
 
 ###############################################################################
@@ -491,7 +490,7 @@ VivadoIncludeCores=\
   $(foreach c,$1,\
     echo read_edif_or_dcp $(call FindRelative,$(TargetDir),$(call HdlCoreRefMaybeTargetSpecificFile,$c,$(HdlTarget))) >> $(CoreOrLibName)-imports.tcl;\
     $(if $(filter $c,$(Cores)),\
-        echo add_files_set_lib $c '\"'$(call HdlExtractSourcesForLib,$(HdlTarget),$c,$(TargetDir))'\"' >> $(CoreOrLibName)-imports.tcl;,\
+        echo add_files_set_lib $c '\"'$(call HdlExtractSourcesForLib,$(HdlTarget),$c:$(notdir $c),$(TargetDir))'\"' >> $(CoreOrLibName)-imports.tcl;,\
       $(foreach w,$(subst _rv,,$(basename $(notdir $c))),\
         $(foreach d,$(dir $c),\
           $(foreach l,$(if $(filter vhdl,$(HdlLanguage)),vhd,v),\
@@ -504,7 +503,7 @@ VivadoIncludeCores=\
                    echo read_vhdl -library $w $(call FindRelative,$(TargetDir),$g) >> $(CoreOrLibName)-imports.tcl;))))))))
 
 # Vivado's function for including sources
-VivadoIncludeSources=$(infox IncSrcs:$1:$2)\
+VivadoIncludeSources=$(infox IncSrcs:$1:$2:$(WorkLib))\
       echo puts '\"'Assignments for $2 local source files'\"' >> $(CoreOrLibName)-imports.tcl; \
       echo add_files_set_lib $2 '\"'$1'\"' >> $(CoreOrLibName)-imports.tcl;
 
@@ -520,15 +519,24 @@ VivadoIncludeIncludedirs=\
 
 # Here we actually run the synthesis step. This is executed for primitive cores/libraries, workers, platforms, configs, assemblies, containers
 #   We call the vivado-synth.tcl script to actually perform synthesis, and we pass it information via tclargs
+ifeq ($(HdlLibraryElaboration),1)
+  override HdlNoElaboration=
+else ifndef HdlNoElaboration
+  override HdlNoElaboration=1
+endif
+
+# This old stuff is redundant error checking that is already done.
+  # $(foreach l,$(call HdlCollectLibraries,$(HdlTarget)),\
+  #    $(if $(wildcard $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X5)),,\
+  #         $(error Error: Specified library: "$l", in the "HdlLibraries" variable, was not found for $(call HdlGetFamily,$(HdlTarget)).))) \
+  # $(foreach l,$(SubCores_$(HdlTarget)),$(info AC:$l)\
+  #   $(if $(findstring $l),,$(error UNEXPECTED SUBCORE WITHOUT SLASH: $l))\
+  #   $(if $(foreach x,$(call FindRelative,.,$(if $(findstring /,$l),$l,$(call HdlCoreRef,$l,$(HdlTarget)))),$(call HdlExists,$x)),,\
+  # 	$(info Error: Specified primitive core for "$l", in the "Cores" variable, was not found.) \
+  #       $(error Error:   after looking in $(call HdlExists,$(call FindRelative,.,$(call HdlCoreRef,$c,$(HdlTarget))))))) \
+  # $(infox ALLCORE1) \
+
 HdlToolCompile=\
-  $(foreach l,$(HdlLibrariesInternal),\
-     $(if $(wildcard $(call HdlLibraryRefDir,$(l),$(HdlTarget),,X5)),,\
-          $(error Error: Specified library: "$l", in the "HdlLibraries" variable, was not found for $(call HdlGetFamily,$(HdlTarget)).))) \
-  $(foreach l,$(SubCores_$(HdlTarget)),$(infox AC:$l)\
-    $(if $(foreach x,$(call FindRelative,.,$(if $(findstring /,$l),$l,$(call HdlCoreRef,$l,$(HdlTarget)))),$(call HdlExists,$x)),,\
-	$(info Error: Specified core library for "$l", in the "Cores" variable, was not found.) \
-        $(error Error:   after looking in $(call HdlExists,$(call FindRelative,.,$(call HdlCoreRef,$c,$(HdlTarget))))))) \
-  $(infox ALLCORE1) \
   echo '  'Creating $@ with top == $(Top)\; details in $(TargetDir)/vivado-$(Core).out.;\
   if test -f vivado.jou ; then mv -f vivado.jou vivado.jou.bak ; fi;\
   echo Doing Vivado compile ;\

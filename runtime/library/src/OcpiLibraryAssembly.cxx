@@ -420,10 +420,15 @@ namespace OCPI {
 	       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
 	       impl.m_artifact.name().c_str());
       // Check for worker name match
+      std::string fullWorker;
       if (m_utilInstance.m_implName.size() &&
-	  strcasecmp(m_utilInstance.m_implName.c_str(), impl.m_metadataImpl.cname())) {
-	ocpiInfo("Rejected: worker name is \"%s\", while requested worker name is \"%s\"",
-		 impl.m_metadataImpl.cname(), m_utilInstance.m_implName.c_str());
+	  strcasecmp(m_utilInstance.m_implName.c_str(), impl.m_metadataImpl.cname()) &&
+	  strcasecmp(m_utilInstance.m_implName.c_str(),
+		     OU::format(fullWorker, "%s.%s",
+				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str()))) {
+	ocpiInfo("Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\"",
+		 impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str(),
+		 m_utilInstance.m_implName.c_str());
 	return false;
       }
       // Check for model and platform matches
@@ -518,8 +523,8 @@ namespace OCPI {
 		    apName, apValue, pStr.c_str());
 	}
       }
-      if (m_utilInstance.slaves().size() && impl.m_metadataImpl.slaves().empty()) {
-	ocpiInfo("Rejected because the instance in application indicates slaves therefore is a proxy,"
+      if (m_utilInstance.slaveInstances().size() && impl.m_metadataImpl.slaves().empty()) {
+	ocpiInfo("Rejected because the instance in the application indicates slaves therefore is a proxy,"
 	         "but the candidate implementation which implements the correct OCS is not a proxy");
 	return false;
       }

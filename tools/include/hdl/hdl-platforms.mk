@@ -45,7 +45,7 @@ all: $(HdlMyPlatforms)
 
 $(HdlMyPlatforms):
 	$(AT)echo =============Building platform $@
-	$(AT)$(MAKE) --no-print-directory -C $@
+	$(AT)$(MAKE) OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) --no-print-directory -C $@
 
 clean::
 	$(AT)for p in $(HdlMyPlatforms); do \

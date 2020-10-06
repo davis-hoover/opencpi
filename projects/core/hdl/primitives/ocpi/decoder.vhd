@@ -296,7 +296,7 @@ begin
   g0: if properties'length > 0 generate
     g1: for i in 0 to properties'right generate
       g2: if ocpi_debug or not properties(i).debug generate
-      prop: component ocpi.wci.property_decoder
+      prop: wci.property_decoder
               generic map (properties(i), worker.decode_width, endian)
               port map(reset         => my_reset,
                        -- inputs describing property access

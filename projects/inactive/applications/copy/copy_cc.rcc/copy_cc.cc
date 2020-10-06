@@ -32,16 +32,24 @@ using namespace OCPI::RCC; // for easy access to RCC data types and constants
 using namespace Copy_ccWorkerTypes;
 
 class Copy_ccWorker : public Copy_ccWorkerBase {
+#if 1
   RCCResult run(bool /*timedout*/) {
-    if (in.length() == 0)
-      return RCC_ADVANCE_DONE;
-    strcpy(out.send().mesg(), in.send().mesg());
+    strcpy(out.data().mesg(), in.data().mesg());
     out.setLength(in.length());
-    return RCC_ADVANCE; // change this as needed for this worker to do something useful
-    // return RCC_ADVANCE; when all inputs/outputs should be advanced each time "run" is called.
-    // return RCC_ADVANCE_DONE; when all inputs/outputs should be advanced, and there is nothing more to do.
-    // return RCC_DONE; when there is nothing more to do, and inputs/outputs do not need to be advanced.
+    return RCC_ADVANCE;
   }
+#else
+  // This does not work yet - fix is in progress
+  RunCondition m_rc;
+public:
+  Copy_ccWorker() : m_rc(1 <<  COPY_CC_IN, RCC_NO_PORTS) {
+    setRunCondition(&m_rc);
+  }
+  RCCResult run(bool /*timedout*/) {
+    out.send(in);
+    return RCC_OK;
+  }
+#endif
 };
 
 COPY_CC_START_INFO

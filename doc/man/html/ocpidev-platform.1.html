@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpidev-platform</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140277782609760"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpidev-platform — manage an OpenCPI HDL platform.</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="strong"><strong><code class="literal">hdl platform</code></strong></span> <span class="emphasis"><em>&lt;name&gt;</em></span></p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">hdl platform</code></strong></span> noun represents an OpenCPI HDL platform, which is
+either a specific FPGA part on a circuit board with optionally attached
+devices or an FPGA simulator that has the infrastructure to serve
+as an OpenCPI <span class="emphasis"><em>container</em></span> (runtime environment) for
+<span class="emphasis"><em>HDL assemblies</em></span> (FPGA-based subsets of OpenCPI applications).</p><p>An HDL platform is described by an OpenCPI HDL Platform Description (OHPD),
+which is an XML file that specifies:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+The OpenCPI Worker Description (OWD) for the <span class="emphasis"><em>HDL platform worker</em></span>, which
+is a special type of <span class="emphasis"><em>HDL device worker</em></span> that contains the logic for running the HDL platform
+</li><li class="listitem">
+The devices (controlled by HDL device workers) that are attached to
+the HDL platform and are available for use
+</li></ul></div><p>In a project, an HDL platform resides in its own directory <span class="emphasis"><em>&lt;name&gt;</em></span> (which is
+usually the lowercase version of the name used by the platform’s vendor)
+under a <span class="strong"><strong><code class="literal">platforms/</code></strong></span> subdirectory in the project’s <span class="strong"><strong><code class="literal">hdl/</code></strong></span> directory.</p><p>An HDL platform directory contains the platform’s OHPD (named <span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">.xml</code></strong></span>),
+its "make" file (named <span class="strong"><strong><code class="literal">Makefile</code></strong></span>) and the VHDL source code skeleton file
+<span class="emphasis"><em>&lt;name&gt;</em></span><span class="strong"><strong><code class="literal">.vhd</code></strong></span> for the HDL platform worker.
+The <span class="strong"><strong><code class="literal">ocpidev create</code></strong></span> operation for an HDL platform produces
+initial versions of these files that can then be edited as necessary.</p><p>An HDL platform directory can also optionally contain:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+HDL device workers that are unique to the HDL platform, in a <span class="strong"><strong><code class="literal">devices/</code></strong></span> library
+</li><li class="listitem">
+XML files that specify different configurations of the devices
+that are available on the HDL platform, called <span class="emphasis"><em>platform configuration files</em></span>
+</li><li class="listitem">
+Vendor FPGA <span class="emphasis"><em>constraints</em></span> files for use with a specific platform configuration
+instead of the default configuration for the platfor
+</li><li class="listitem">
+File(s) that specify vendor tool build-time options
+</li></ul></div><p>The <span class="strong"><strong><code class="literal">ocpidev build</code></strong></span> operation generates exported files that enable HDL
+assemblies to be built for the platform and a <span class="strong"><strong><code class="literal">lib/</code></strong></span> subdirectory
+that contains links to the files that are necessary for other OpenCPI
+assets to use the platform. Note that building a OpenCPI platform (whether
+HDL or RCC) is usually done at installation time because a platform
+cannot be used by other OpenCPI assets until it has been built.
+See the <span class="emphasis"><em>OpenCPI Installation Guide</em></span> for a description of how OpenCPI
+platforms are built.</p><p>For information on the HDL build flow as it relates to HDL platforms
+and other HDL assets, see the chapter "Building HDL Assets" in the
+<span class="emphasis"><em>OpenCPI HDL Development Guide</em></span>.</p><p>For information on developing an HDL platform, including structure and syntax
+descriptions of HDL platform/platform worker and HDL platform configuration XML
+files and how to develop an HDL device worker, see the section "Enabling Execution for
+FPGA Platforms" in the <span class="emphasis"><em>OpenCPI Platform Development Guide</em></span>.</p><p>Verbs that can operate on an HDL platform are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">build</code></strong></span>
+</span></dt><dd>
+    Build the HDL platform, creating directories and files
+    as required.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">clean</code></strong></span>
+</span></dt><dd>
+    Remove all the generated and compiled files for all assets
+    in the HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">create</code></strong></span>
+</span></dt><dd>
+    Create the named HDL platform, creating files and directories as required.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">delete</code></strong></span>
+</span></dt><dd>
+    Remove all directories and files associated with the named HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">utilization</code></strong></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the HDL platform.
+</dd></dl></div><p>Note that an asset’s name is implied by the directory you’re in when
+you issue the <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> command. For HDL platforms, this
+means that you can perform operations (verbs) on the HDL platform
+without having to specify its name when you issue the
+<span class="strong"><strong><code class="literal">ocpidev</code></strong></span> command from inside the HDL platform’s directory.</p><p>The <span class="strong"><strong><code class="literal">ocpidev</code></strong></span> tool can also operate on a plural <span class="strong"><strong><code class="literal">hdl platforms</code></strong></span> noun.
+The syntax is:</p><p><span class="strong"><strong><code class="literal">ocpidev</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] [<span class="strong"><strong><code class="literal">build|clean|show|utilization</code></strong></span>] <span class="strong"><strong><code class="literal">hdl platforms</code></strong></span></p><p>The verbs that can be performed on the <span class="strong"><strong><code class="literal">hdl platforms</code></strong></span> noun are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">build</code></strong></span>
+</span></dt><dd>
+    Build all of the HDL platforms in the project or the <span class="strong"><strong><code class="literal">hdl/</code></strong></span>
+    subdirectory of the project, creating directories and files as required.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">clean</code></strong></span>
+</span></dt><dd>
+    Remove all the generated and compiled files from all HDL platforms
+    in the project or the <span class="strong"><strong><code class="literal">hdl/</code></strong></span> subdirectory of the project.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">show</code></strong></span>
+</span></dt><dd>
+    List all HDL platforms in all registered projects and the current project.
+    The general-purpose options and the <span class="strong"><strong><code class="literal">show</code></strong></span> formatting options
+    can be specified.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">utilization</code></strong></span>
+</span></dt><dd>
+    Display FPGA resource usage information for all built HDL platforms
+    in the project. The general-pupose options and the <span class="strong"><strong><code class="literal">utilization</code></strong></span>
+    options can be specified.
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.</p><p>Keywords for platforms supported by OpenCPI that can be
+specified in the <span class="emphasis"><em>&lt;platform&gt;</em></span> argument to an option
+can be found in the tables of supported platforms in the <span class="emphasis"><em>OpenCPI User Guide</em></span>.</p><p>Keywords for architectures supported by OpenCPI that can be specified
+in the <span class="emphasis"><em>&lt;target&gt;</em></span> argument to an option include <span class="strong"><strong><code class="literal">isim</code></strong></span>, <span class="strong"><strong><code class="literal">modelsim</code></strong></span>,
+<span class="strong"><strong><code class="literal">xsim</code></strong></span>, <span class="strong"><strong><code class="literal">stratix4</code></strong></span>, <span class="strong"><strong><code class="literal">stratix5</code></strong></span>, <span class="strong"><strong><code class="literal">virtex5</code></strong></span>, <span class="strong"><strong><code class="literal">virtex6</code></strong></span>, <span class="strong"><strong><code class="literal">zynq</code></strong></span>,
+<span class="strong"><strong><code class="literal">zynq_is</code></strong></span>, <span class="strong"><strong><code class="literal">spartan3adsp</code></strong></span>.</p><div class="refsect2"><a id="_options_that_apply_to_all_operations_verbs_on_hdl_platforms"></a><h3>Options That Apply to All Operations (Verbs) on HDL Platforms</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-d</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>
+</span></dt><dd>
+    Specify the directory in which the command should be run.
+    Analogous to the <span class="strong"><strong>-C</strong></span> option in the POSIX <span class="strong"><strong>make</strong></span> command.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-v, --verbose</code></strong></span>
+</span></dt><dd>
+    Describe what is happening in command execution in more detail.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_creating_hdl_platforms"></a><h3>Options When Creating HDL Platforms</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-A</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>+
+</span></dt><dd>
+    Specify a directory to search for XML include files.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-C</code></strong></span> <span class="emphasis"><em>&lt;core&gt;</em></span>+
+</span></dt><dd>
+    Specify an HDL primitive core on which the HDL platform
+    (or assets it contains) depends and with which it should be built.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-I</code></strong></span> <span class="emphasis"><em>&lt;directory&gt;</em></span>+
+</span></dt><dd>
+    Specify a directory to search for include files (C, C++,
+    Verilog).
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-T</code></strong></span> <span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Only build the HDL platform for the specified HDL architecture.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-Y</code></strong></span> <span class="emphasis"><em>&lt;primitive-library&gt;</em></span>+
+</span></dt><dd>
+    Specify a primitive library on which the HDL platform (or assets
+    it contains) depends.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-Z</code></strong></span> <span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Do not build the HDL platform for the specified HDL architecture.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-k</code></strong></span>
+</span></dt><dd>
+    Keep files and directories created after an HDL platform creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-y</code></strong></span> <span class="emphasis"><em>&lt;component-library&gt;</em></span>+
+</span></dt><dd>
+    Specify a component library to search for workers, devices
+    and/or specs referenced by one or more assets in the created HDL platform.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_deleting_hdl_platforms"></a><h3>Options When Deleting HDL Platforms</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">-f</code></strong></span>
+</span></dt><dd>
+    Force deletion: do not ask for confirmation when deleting
+    an HDL platform. Normally, you are asked to confirm a deletion.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_building_hdl_platforms"></a><h3>Options When Building HDL Platforms</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-target=</code></strong></span><span class="emphasis"><em>&lt;target&gt;</em></span>+
+</span></dt><dd>
+    Build the HDL platform(s) for the specified HDL architecture. If only HDL targets
+    are specified (and no HDL platforms), containers are not built.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-platform=</code></strong></span><span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>+
+</span></dt><dd>
+    Build the HDL platform(s) for the specified HDL platform.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_showing_hdl_platforms_plural_noun_only"></a><h3>Options When Showing HDL Platforms (plural noun only)</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--global-scope</code></strong></span>
+</span></dt><dd>
+    Show HDL platforms from all registered projects and the
+    current project if applicable.
+    This is the default scope used if <span class="strong"><strong><code class="literal">--local-scope</code></strong></span> is not used.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--json</code></strong></span>
+</span></dt><dd>
+    Format the output in Javascript Object Notation (JSON) format
+    for integration with other software.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--local-scope</code></strong></span>
+</span></dt><dd>
+    Only display information about the local HDL platform.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--simple</code></strong></span>
+</span></dt><dd>
+    Format the output as simply as possible.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--table</code></strong></span>
+</span></dt><dd>
+    Display the output in an easy-to-read table.
+    This is the default display format
+    used if <span class="strong"><strong>--simple</strong></span> or <span class="strong"><strong>--json</strong></span> are not used.
+</dd></dl></div></div><div class="refsect2"><a id="_options_when_using_utilization_on_hdl_platforms"></a><h3>Options When Using Utilization on HDL Platforms</h3><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--format=</code></strong></span>{<span class="strong"><strong><code class="literal">table</code></strong></span>|<span class="strong"><strong><code class="literal">latex</code></strong></span>}
+</span></dt><dd>
+    Specify the format in which to output the FPGA resource usage information.
+    Specifying <span class="strong"><strong><code class="literal">table</code></strong></span> sends the information to stdout in tabular format.
+    Specifying <span class="strong"><strong><code class="literal">latex</code></strong></span> bypasses <span class="strong"><strong><code class="literal">stdout</code></strong></span> and writes all output to
+    <span class="strong"><strong><code class="literal">utilization.inc</code></strong></span> files in the directories for the assets on
+    which it operates.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-platform=</code></strong></span><span class="emphasis"><em>&lt;platform&gt;</em></span>+
+</span></dt><dd>
+    Display information about FPGA resource use by the built HDL platforms
+    on the specified HDL platform. (???This and the others below don’t make sense.
+    Is it "the built assets in the HDL platform" that usage info is generated for?)
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--hdl-library=</code></strong></span><span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the built
+    HDL platforms in the specified HDL library.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--library=</code></strong></span><span class="emphasis"><em>&lt;library&gt;</em></span>, <span class="strong"><strong><code class="literal">-l</code></strong></span> <span class="emphasis"><em>&lt;library&gt;</em></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the built
+    HDL platforms in the specified component library.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">-P</code></strong></span> <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span>
+</span></dt><dd>
+    Display information about FPGA resource use by the built
+    HDL platforms on the specified HDL platform.
+</dd></dl></div></div></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
+Inside the project (at the top level), create the
+HDL platform <span class="strong"><strong><code class="literal">myplatform</code></strong></span>. The directory <span class="strong"><strong><code class="literal">myplatform</code></strong></span>
+is created in the <span class="strong"><strong><code class="literal">hdl/platforms</code></strong></span> directory
+(which is also created if it doesn’t exist):
+</p><pre class="screen">ocpidev create hdl platform myplatform</pre></li><li class="listitem"><p class="simpara">
+Inside the project (at the top level), create the
+HDL platform <span class="strong"><strong><code class="literal">myplatform</code></strong></span>, specifying that it can
+only be built for the <span class="strong"><strong><code class="literal">zed</code></strong></span> HDL platform:
+</p><pre class="screen">ocpidev create hdl platform myplatform --only-platform=zed</pre></li><li class="listitem"><p class="simpara">
+Inside the project (at the top level), create the
+HDL platform <span class="strong"><strong><code class="literal">myplatform</code></strong></span>, specifying that it can
+only be built for the <span class="strong"><strong><code class="literal">zynq</code></strong></span> HDL target:
+</p><pre class="screen">ocpidev create hdl platform  myplatform -T zynq</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level or the
+<span class="strong"><strong><code class="literal">hdl/platforms/</code></strong></span> directory), delete
+the HDL platform <span class="strong"><strong><code class="literal">myplatform</code></strong></span>:
+</p><pre class="screen">ocpidev delete hdl platform myplatform</pre></li><li class="listitem"><p class="simpara">
+Inside the <span class="strong"><strong><code class="literal">myplatform</code></strong></span> HDL platform’s directory, build
+the <span class="strong"><strong><code class="literal">myplatform</code></strong></span> platform for the <span class="strong"><strong><code class="literal">xsim</code></strong></span> HDL platform:
+</p><pre class="screen">ocpidev build --hdl-platform=xsim</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level or the
+<span class="strong"><strong><code class="literal">hdl/platforms/</code></strong></span> directory), build all existing
+HDL platforms:
+</p><pre class="screen">ocpidev build hdl platforms</pre></li><li class="listitem"><p class="simpara">
+Inside the <span class="strong"><strong><code class="literal">myplatform</code></strong></span> HDL platform’s directory,
+build the <span class="strong"><strong><code class="literal">myplatform</code></strong></span> platform for the <span class="strong"><strong><code class="literal">zynq</code></strong></span> HDL target:
+</p><pre class="screen">ocpidev build --hdl-target=zynq</pre></li><li class="listitem"><p class="simpara">
+List all HDL platforms in all registered projects
+and the current project on which assets can be built:
+</p><pre class="screen">ocpidev show hdl platforms</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level of the
+<span class="strong"><strong><code class="literal">hdl/platforms/</code></strong></span> directory), display information
+about FPGA resource use by the <span class="strong"><strong><code class="literal">myplatform</code></strong></span> HDL platform:
+</p><pre class="screen">ocpidev utilization hdl platform myplatform</pre></li><li class="listitem"><p class="simpara">
+Inside the project (from the top level of the
+<span class="strong"><strong><code class="literal">hdl/platforms/</code></strong></span> directory), display information
+about FPGA resource use by the HDL platforms in the project:
+</p><pre class="screen">ocpidev utilization hdl platforms</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+<a class="ulink" href="ocpidev-application.1.html" target="_top">ocpidev-application(1)</a>
+<a class="ulink" href="ocpidev-assembly.1.html" target="_top">ocpidev-assembly(1)</a>
+<a class="ulink" href="ocpidev-build.1.html" target="_top">ocpidev-build(1)</a>
+<a class="ulink" href="ocpidev-card.1.html" target="_top">ocpidev-card(1)</a>
+<a class="ulink" href="ocpidev-create.1.html" target="_top">ocpidev-create(1)</a>
+<a class="ulink" href="ocpidev-clean.1.html" target="_top">ocpidev-clean(1)</a>
+<a class="ulink" href="ocpidev-delete.1.html" target="_top">ocpidev-delete(1)</a>
+<a class="ulink" href="ocpidev-device.1.html" target="_top">ocpidev-device(1)</a>
+<a class="ulink" href="ocpidev-library.1.html" target="_top">ocpidev-library(1)</a>
+<a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
+<a class="ulink" href="ocpidev-slot.1.html" target="_top">ocpidev-slot(1)</a>
+<a class="ulink" href="ocpidev-show.1.html" target="_top">ocpidev-show(1)</a>
+<a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-worker(1)</a>
+<a class="ulink" href="ocpidev-utilization.1.html" target="_top">ocpidev-utilization(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.</p></div></div></body></html>

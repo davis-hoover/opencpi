@@ -18,14 +18,14 @@
 
 ##########################################################################################
 .NOTPARALLEL:
-ifneq ($(filter-out cleandriver,$(filter show help clean% distclean%,$(MAKECMDGOALS))),)
+ifneq ($(filter-out cleandriver,$(filter exports show help clean% distclean%,$(MAKECMDGOALS))),)
   $(if $(and $(OCPI_CDK_DIR),$(realpath $(OCPI_CDK_DIR))),,\
     $(if $(OCPI_CDK_DIR),\
       $(foreach p,$(realpath $(CURDIR)),\
         $(if $(filter $(realpath $(OCPI_CDK_DIR)),$p/cdk $p/exports),\
            $(warning Missing exports link when performing: $(MAKECMDGOALS).)\
 	   $(warning Setting OCPI_CDK_DIR temporarily to $(CURDIR)/bootstrap.))))\
-       $(eval export OCPI_CDK_DIR:=$(CURDIR)/bootstrap))
+    $(eval export OCPI_CDK_DIR:=$(CURDIR)/bootstrap))
 else
   ifndef OCPI_CDK_DIR
     export OCPI_CDK_DIR:=$(CURDIR)/cdk
@@ -187,11 +187,17 @@ cleaneverything distclean: clean cleandriver cleanpackaging
 	$(AT)rm -r -f exports
 
 # Documentation (AV-4402)
-.PHONY: doc
-.SILENT: doc
+# The "pages" target creates the HTML index files for the generated documentation.
+# "make pages" must happen before "make rpm Package=doc" is attempted if you want
+# the optional HTML index pages to be included as part of the doc RPM.
+.PHONY: doc pages
+.SILENT: doc pages
 doc:
 	$(AT)rm -rf doc/{pdfs,html}
 	$(AT)bash doc/generator/genDocumentation.sh
+
+pages:
+	$(AT)doc/build-pages.py HEAD
 
 
 ##########################################################################################
@@ -265,7 +271,7 @@ test_packaging: exports
 # This should be moved into the packaging subdir...
 .PHONY: tar
 tar: exports
-	$(AT)set -e; file=$(package_name).tar temp=$(mktemp -t tarcmdXXXX); \
+	$(AT)set -e; file=$(package_name).tar temp=$(shell mktemp -t tarcmdXXXX); \
 	     echo Determining tar export file contents for the $(Package) package: $$file.gz; \
 	     (echo "tar -h -f $$file -c \\";\
 	      $(Prepare) |\
@@ -294,7 +300,7 @@ real_platforms:=$(call Unique,$(call RccRealPlatforms,$(RccPlatforms)))
 # e.g.: make rpm Platforms="zed:xilinx13_4"
 
 # Call the right rpm packaging script with the right arguments.  This macro takes
-# one argument which if set indicates hw deployment rather than RPM building
+# one argument which if set indicates hw deployment rather than RPM building.
 DoRpmOrDeployHw=\
   $(foreach arg,$(or $(Platforms),$(OCPI_TOOL_PLATFORM)),\
     $(foreach pair,$(call GetRccHdlPlatform,$(arg)),\
@@ -351,7 +357,7 @@ cleanprerequisites:
 # Goals that are about projects
 # A convenience to run various goals on all the projects that are here
 # Unfortunately, we need to know the order here.
-Projects=core platform assets inactive assets_ts
+Projects=core platform assets inactive assets_ts tutorial
 ProjectGoals=cleanhdl cleanrcc cleanocl rcc ocl hdl applications run runtest hdlprimitives \
              hdlportable components cleancomponents test
 # These are not done in parallel since we do not know the dependencies
@@ -372,7 +378,7 @@ testprojects:
 	$(AT)$(call DoProjects,runtest)
 
 cleanprojects:
-	$(AT)$(call DoProjects,clean)
+	$(AT)$(call DoProjects,cleaneverything)
 
 rcc ocl hdl: exports
 

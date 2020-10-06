@@ -15,68 +15,16 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
+#
 # If there is a "mynetsetup.sh" script in this directory it will run it after the
 # other setup items, and arrange for it to be run in any login scripts later
 # e.g. ssh logins
 
-# Set time using ntpd
-# If ntpd fails because it could not find ntp.conf fall back on time server
-# passed in as the first parameter
-set_time() {
-  if test "$1" != -; then
-    echo Attempting to set time from the time server
-    if test -f /etc/opencpi-release; then
-      read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    else
-      echo No /etc/opencpi-release - assuming ZedBoard hardware
-      OCPI_TOOL_PLATFORM=zed
-    fi
-
-    # Calling ntpd without any options will run it as a dameon
-    OPTS=""
-    BUSYBOX_PATH="/mnt/card/opencpi/$OCPI_TOOL_PLATFORM/bin"
-    TIMEOUT=20
-    MSG="Succeeded in setting the time from /mnt/card/opencpi/ntp.conf"
-    if [ ! -e /mnt/card/opencpi/ntp.conf ]; then
-      OPTS="-p $1"
-      MSG="Succeeded in setting the time from $1"
-    fi
-    # AV-5422 Timeout ntpd command after $TIMEOUT in seconds
-    if $BUSYBOX_PATH/busybox timeout -t $TIMEOUT $BUSYBOX_PATH/ntpd -nq $OPTS; then
-      echo $MSG
-    else
-      echo ====YOU HAVE NO NETWORK CONNECTION and NO HARDWARE CLOCK====
-      echo Set the time using the '"date YYYY.MM.DD-HH:MM[:SS]"' command.
-    fi
+  if test -n "$3"; then
+    echo OCPI_HDL_PLATFORM set to $3.
+    export OCPI_HDL_PLATFORM=$3
   fi
-}
-
-if test -z  "$5"; then
-  echo You must supply at least 5 arguments to this script.
-  echo Usage is: zynq_net_setup.sh '<nfs-ip-address> <nfs-share-name> <opencpi-dir> <time-server> <timezone> [<hdl-platform>]'
-  echo A good example timezone is: EST5EDT,M3.2.0,M11.1.0
-else
-  if test -n "$6"; then
-     echo OCPI_HDL_PLATFORM set to $6.
-  fi
-  if ifconfig | grep -v 127.0.0.1 | grep 'inet addr:' > /dev/null; then
-     echo An IP address was detected.
-  else
-     echo No IP address was detected! No network or no DHCP.
-     break;
-  fi
-  set_time $4
-  # Tell the kernel to make fake 32 bit inodes when 64 nodes come from the NFS server
-  # This may change for 64 bit zynqs
-  echo 0 > /sys/module/nfs/parameters/enable_ino64
-  # Mount the opencpi development system as an NFS server, onto /mnt/net
-  mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net
-  # Make sure the hostname is in the host table
-  myipaddr=`ifconfig | grep -v 127.0.0.1 | sed -n '/inet addr:/s/^.*inet addr: *\([^ ]*\).*$/\1/p'`
-  myhostname=`hostname`
-  echo My IP address is: $myipaddr, and my hostname is: $myhostname
-  if ! grep -q $myhostname /etc/hosts; then echo $myipaddr $myhostname >> /etc/hosts; fi
+  
   # Run the generic script to setup the OpenCPI environment
   # Note the ocpidriver load command is innocuous if run redundantly
   # Some Zynq-based SD cards are ephemeral and lose $HOME on reboots. Others don't.
@@ -86,28 +34,25 @@ else
   else
     export PROFILE_FILE=$HOME/.profile
   fi
-  export OCPI_CDK_DIR=/mnt/net/$3
+  export OCPI_CDK_DIR=/mnt/net/$2
   cat <<EOF > $PROFILE_FILE
-  if test -e /mnt/net/$3; then
+  if test -e /mnt/net/$2; then
     echo Executing $PROFILE_FILE
     export OCPI_CDK_DIR=$OCPI_CDK_DIR
-    if test -f /etc/opencpi-release; then
-      read OCPI_TOOL_PLATFORM x < /etc/opencpi-release
-    else
-      echo No /etc/opencpi-release - assuming xilinx13_3 software platform
-      OCPI_TOOL_PLATFORM=xilinx13_3
-    fi
-    export OCPI_TOOL_PLATFORM
+	export OCPI_DIR=$OCPI_DIR
+    cd $OCPI_DIR
+	source $OCPI_DIR/zynq_setup_common.sh set_tool_platform
     export OCPI_TOOL_OS=linux
-    export OCPI_TOOL_DIR=\$OCPI_TOOL_PLATFORM
+    export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
+	export OCPI_HDL_PLATFORM=$OCPI_HDL_PLATFORM
+	cd $OCPI_DIR
     # As a default, access all built artifacts in the core project as well as
     # the bare-bones set of prebuilt runtime artifacts for this SW platform
-    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts
-    export OCPI_LIBRARY_PATH+=:$OCPI_CDK_DIR/\$OCPI_TOOL_PLATFORM/artifacts
+    export OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../project-registry/ocpi.core/exports/artifacts:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/artifacts:$OCPI_CDK_DIR/../projects/assets/artifacts:$OCPI_DIR/\$OCPI_TOOL_DIR/artifacts
     # Priorities for finding system.xml:
     # 1. If is it on the local system it is considered customized for this system - use it.
-    if test -r /mnt/card/opencpi/system.xml; then
-      OCPI_SYSTEM_CONFIG=/mnt/card/opencpi/system.xml
+    if test -r $OCPI_DIR/system.xml; then
+      OCPI_SYSTEM_CONFIG=$OCPI_DIR/system.xml
     # 2. If is it at the top level of the mounted CDK, it is considered customized for all the
     #    systems that use this CDK installation (not shipped/installed by the CDK)
     elif test -r $OCPI_CDK_DIR/system.xml; then
@@ -125,20 +70,21 @@ else
     fi
     export OCPI_SYSTEM_CONFIG
     export PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/bin:\$PATH
-    # This is only for ACI executables in special cases...
-    export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/lib:\$LD_LIBRARY_PATH
+    # path to SDK libraries, not related to opencpi but missing from boot system
+    export LD_LIBRARY_PATH=$OCPI_CDK_DIR/\$OCPI_TOOL_DIR/sdk/lib:\$LD_LIBRARY_PATH
     ocpidriver load
     export TZ=$5
     echo OpenCPI ready for zynq.
-    if test -r /mnt/card/opencpi/mynetsetup.sh; then
-       source /mnt/card/opencpi/mynetsetup.sh
+    if test -r $OCPI_DIR/mynetsetup.sh; then
+       source $OCPI_DIR/mynetsetup.sh
     else
-       echo Error: enable to find /mnt/card/opencpi/mynetsetup.sh
+       echo Error: enable to find $OCPI_DIR/mynetsetup.sh
     fi
   else
     echo NFS mounts not yet set up. Please mount the OpenCPI CDK into /mnt/net/.
   fi
+  
+  alias ls='ls --color=auto'
 EOF
   echo Running login script. OCPI_CDK_DIR is now $OCPI_CDK_DIR.
   source $PROFILE_FILE
-fi

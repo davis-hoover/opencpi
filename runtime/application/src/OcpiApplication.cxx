@@ -40,11 +40,12 @@ namespace OCPI {
     // This function is our hook before anything interesting happens so we can
     // divert some application PValue parameters into the discovery process
     static OL::Assembly &
-    createLibraryAssembly(ezxml_t appXml, const char *name, const PValue *params) {
+    createLibraryAssembly(ezxml_t appXml, const char *name, const PValue *&params) {
       // Extract any extra application params from the environment
       const char *env = getenv("OCPI_APPLICATION_PARAMS");
-      OU::PValueList envParams;
+      ocpiDebug("OCPI_APPLICATION_PARAMS:%s", env ? env : "");
       if (env) {
+	OU::PValueList *envParams = new OU::PValueList;
         OU::PValueList tempParams;
         for (OU::TokenIter li(env); li.token(); li.next()) {
           const char *eq = strchr(li.token(), '=');
@@ -53,8 +54,8 @@ namespace OCPI {
           std::string l_name(li.token(), OCPI_SIZE_T_DIFF(eq, li.token()));
           tempParams.add(l_name.c_str(), eq + 1);
         }
-        envParams.add(params, tempParams);
-        params = envParams;
+        envParams->add(params, tempParams);
+        params = envParams->list(); // leak FIXME
       }
       // Among other things, this provides the simparams for simulation containers
       static const char *forDiscovery[] = {
@@ -91,7 +92,7 @@ namespace OCPI {
     // Be careful not to call too deep and invoke the one-time driver configuration.
     static OL::Assembly &
     createLibraryAssembly(const char *file, ezxml_t &deployXml, ezxml_t &appXml, char *&copy,
-                          const PValue *params) {
+                          const PValue *&params) {
       std::string appFile(file);
       deployXml = NULL;
       copy = NULL;
@@ -295,34 +296,48 @@ namespace OCPI {
       }
     }
 
+    // Find the slave ordinal (within the slaves specified in the proxy's OWD) that corresponds to
+    // the slave impl and slave name provided.
+    // Return the ordinal or UINT_MAX if not found.
+    // Also set the last output arg, slaveWkrName, to the actual worker name with model suffix
     static unsigned
-    findSlave(OU::Worker &sImpl, OU::Worker &mImpl, std::string &slaveWkrName,
-              unsigned int index = UINT_MAX) {
+    findSlave(OU::Worker &sImpl, OU::Worker &mImpl, const char *slaveName, std::string *wkrName = NULL) {
+      std::string slaveWkrName;
       OU::format(slaveWkrName, "%s.%s", sImpl.cname(), sImpl.model().c_str());
       size_t dashIdx =  slaveWkrName.rfind('-');
       if (dashIdx != std::string::npos) // if worker has configuration suffix, remove it
         slaveWkrName.erase(dashIdx, slaveWkrName.rfind('.') - dashIdx);
-      // Is this a valid slave for this master
-      if (index != UINT_MAX){
-        assert(index < mImpl.slaves().size());
-        if (!strcasecmp(mImpl.slaves()[index], slaveWkrName.c_str()))
-          return index;
-      }
-      for (unsigned n = 0; n < mImpl.slaves().size(); ++n)
-        if (!strcasecmp(mImpl.slaves()[n], slaveWkrName.c_str()))
-          return n;
-      return UINT_MAX;
+      if (wkrName)
+	*wkrName = slaveWkrName;
+      const OU::Worker::Slave *s = &(mImpl.slaves()[0]);
+      unsigned found = UINT_MAX;
+      for (unsigned n = 0; n < mImpl.slaves().size(); ++n, ++s)
+        if (!strcasecmp(s->m_worker, slaveWkrName.c_str())) {
+	  if (slaveName) {
+	    if (!strcasecmp(slaveName, s->m_name))
+	      return n;
+	  } else if (found != UINT_MAX) { // duplicate match, ambiguous
+	    ocpiInfo("Ambiguous slave instance for proxy worker \"%s\" and slave worker \"%s\": "
+		     "use \"slave\" attribute",
+		     mImpl.cname(), sImpl.cname());
+	    return UINT_MAX;
+	  } else
+	    found = n;
+	}
+      return found;
     }
 
+    // Check that the proxy/slave relationship is valid now that we know the impls on both sides
     static bool
-    checkSlave(OU::Worker &sImpl, OU::Worker &mImpl, bool isMaster, const std::string &reject) {
+    checkSlave(OU::Worker &sImpl, OU::Worker &mImpl, const char *slaveName, bool isMaster,
+	       const std::string &reject) {
       std::string slaveWkrName;
-      if (findSlave(sImpl, mImpl, slaveWkrName) != UINT_MAX)
+      if (findSlave(sImpl, mImpl, slaveName, &slaveWkrName) != UINT_MAX)
         return true;
       // FIXME: make impl namespace part of this. implnames should really be qualified.
       std::string goodSlaves;
       for (unsigned n = 0; n < mImpl.slaves().size(); ++n)
-        OU::formatAdd(goodSlaves, "%s%s", n ? " " : "", mImpl.slaves()[n]);
+        OU::formatAdd(goodSlaves, "%s%s", n ? " " : "", mImpl.slaves()[n].m_name);
       if (isMaster)
         ocpiInfo("%s since none of its indicated slave workers (%s) match the slave instance's worker \"%s\"",
                  reject.c_str(), goodSlaves.c_str(), slaveWkrName.c_str());
@@ -331,6 +346,80 @@ namespace OCPI {
                  reject.c_str(), goodSlaves.c_str(), mImpl.cname());
       return false;
     }
+
+    // Check for master/slave correctness of the master/slave relationships specified in the
+    // application. We know that the impl for a master indicates slaves and that
+    // can be checked by the library layer.
+    // If the proxy instance specifies no slaves at all, we try to do an unambiguous match
+    // to the slaves that just need to be present.
+    // Finally we do the optional-slave checks.  They must be present or they must be optional
+    bool ApplicationI::
+    resolveSlaves() {
+      // Now that we know a complete deployment, we can do a final check on missing slaves
+      Instance *i = m_instances;
+      std::vector<bool> foundAsSlave; // keep track of "found" slaves, so that they are only found once
+      foundAsSlave.resize(m_nInstances);
+      for (unsigned n = 0; n < m_nInstances; ++n, ++i) {
+	auto &impl = *i->m_deployment.m_impl;
+	OU::Worker &w = impl.m_metadataImpl;
+	if (w.slaves().size()) { // we have a proxy
+	  const OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
+	  std::string rejectSlave;
+	  OU::format(rejectSlave,
+		     "For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" "
+		     "from artifact \"%s\" due to",
+		     ui.m_name.c_str(),
+		     ui.m_specName.c_str(),
+		     impl.m_metadataImpl.cname(),
+		     impl.m_staticInstance ? "/" : "",
+		     impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
+		     impl.m_artifact.name().c_str());
+	  i->m_deployment.m_slaves.clear();
+	  i->m_deployment.m_slaves.resize(w.slaves().size(), UINT_MAX);
+	  if (ui.m_slaveInstances.empty()) { // proxy doesn't specify slaves in the instance
+	    Instance *si = m_instances;
+	    for (unsigned sn = 0; sn < m_nInstances; ++sn, ++si) {
+	      OU::Worker &sImpl = m_instances[sn].m_deployment.m_impl->m_metadataImpl;
+	      std::string slaveWkrName;
+	      unsigned slaveInProxy;
+	      if (sn != n && !m_assembly.instance(sn).m_utilInstance.m_hasMaster &&
+		  (slaveInProxy = findSlave(sImpl, w, NULL, &slaveWkrName)) != UINT_MAX) {
+		if (i->m_deployment.m_slaves[slaveInProxy] != UINT_MAX) {
+		  ocpiInfo("%s ambiguous (multiple) instances of worker %s for proxy",
+			   rejectSlave.c_str(), slaveWkrName.c_str());
+		  return false;
+		}
+		if (foundAsSlave[sn]) {
+		  ocpiInfo("%s ambiguous slave %s for multiple proxies",
+			   rejectSlave.c_str(), slaveWkrName.c_str());
+		  return false;
+		}
+		i->m_deployment.m_slaves[slaveInProxy] = sn;
+		foundAsSlave[sn] = true;
+	      }
+	    }
+	  } else { // proxy has explicit slaves in the instance
+	    // Find slaves that are connected so we can find ones that are not, to check for optional
+	    for (unsigned ns = 0; ns < ui.m_slaveInstances.size(); ++ns) {
+	      unsigned s =
+		findSlave(m_instances[ui.m_slaveInstances[ns]].m_deployment.m_impl->m_metadataImpl, w,
+			  ui.m_slaveNames[ns]);
+	      if (s != UINT_MAX)
+		i->m_deployment.m_slaves[s] = ui.m_slaveInstances[ns];
+	    }
+	  }
+	  const OU::Worker::Slave *slave = &w.slaves()[0];
+	  for (size_t s = 0; s < w.slaves().size(); ++slave, ++s)
+	    if (!slave->m_optional && i->m_deployment.m_slaves[s] == UINT_MAX) {
+	      ocpiInfo("%s missing slave (worker %s, slave name %s) that is not optional",
+		       rejectSlave.c_str(), slave->m_worker, slave->m_name);
+	      return false;
+	    }
+	}
+      }
+      return true;
+    }
+
     // Check whether this candidate can be used relative to previous
     // choices for instances it is connected to
     bool ApplicationI::
@@ -372,19 +461,16 @@ namespace OCPI {
           }
         }
       }
-      // Check for master/slave correctness
-      // Note that we know that the impl for a master indicates a slave since this
-      // can be checked by the library layer.
-      if (ui.m_slaves.size()) {
-        for (unsigned n = 0; n < ui.m_slaves.size(); ++n)
-          if (ui.m_slaves[n] < instNum &&
-              !checkSlave(m_instances[ui.m_slaves[n]].m_deployment.m_impl->m_metadataImpl,
-                          c.impl->m_metadataImpl, true, reject))
+      if (ui.slaveInstances().size()) {
+        for (unsigned n = 0; n < ui.m_slaveInstances.size(); ++n)
+          if (ui.slaveInstances()[n] < instNum &&
+              !checkSlave(m_instances[ui.m_slaveInstances[n]].m_deployment.m_impl->m_metadataImpl,
+                          c.impl->m_metadataImpl, ui.m_slaveNames[n], true, reject))
               return false;
       } else if (ui.m_hasMaster && ui.m_master < instNum &&
                  !checkSlave(c.impl->m_metadataImpl,
-                             m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, false,
-                             reject))
+                             m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, NULL,
+			     false, reject))
         return false;
       return true;
     }
@@ -395,7 +481,7 @@ namespace OCPI {
       if (c.impl->m_staticInstance && b.m_artifact &&
           (b.m_artifact != &c.impl->m_artifact ||
            b.m_usedImpls & (1u << c.impl->m_ordinal))) {
-        ocpiDebug("For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
+        ocpiInfo("For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
                   "from artifact \"%s\" due to insufficient available containers",
                   m_assembly.instance(n).name().c_str(),
                   m_assembly.instance(n).specName().c_str(),
@@ -693,7 +779,7 @@ namespace OCPI {
           b = save;
         } else
           doInstance(instNum, score);
-      } else {
+      } else if (resolveSlaves()) {
         dumpDeployment(score);
         if (score > m_bestScore) {
           Instance *i = m_instances;
@@ -879,7 +965,7 @@ namespace OCPI {
       m_bestScore = 0;
       doInstance(0, 0);
       if (m_bestScore == 0)
-        throw OU::Error("There are no feasible deployments for the application given the constraints");
+        throw OU::Error("There are no feasible deployments for the application given the constraints.  Try running with log level 8 to see why.");
       // Up to now we have just been "planning" and not doing things.
       // Now invoke the policy method to map the dynamic instances to containers
       // First we do a pass that will only map the dynamic unscaled implementations
@@ -1364,8 +1450,6 @@ namespace OCPI {
       OC::Launcher::Member *li = &m_launchMembers[0];
       for (unsigned n = 0; n < m_nInstances; n++, i++)
         for (unsigned m = 0; m < i->m_bestDeployment.m_scale; m++, li++) {
-          //      li->m_containerApp = m_containerApps[i->m_usedContainers[m]];
-          //      li->m_container = m_containers[i->m_usedContainers[m]];
           if (i->m_bestDeployment.m_scale == 1)
             li->m_name = m_assembly.instance(n).name();
           else
@@ -1377,22 +1461,16 @@ namespace OCPI {
           if ((unsigned)m_assembly.m_doneInstance == n)
             li->m_doneInstance = true;
           // We do not support scalable proxies.  checked elsewhere
-          assert(ui.m_slaves.empty() || i->m_bestDeployment.m_scale == 1);
+          assert(ui.m_slaveInstances.empty() || i->m_bestDeployment.m_scale == 1);
           // Initialize the slaves in the order declared by the proxy
           OU::Worker &mImpl = li->m_impl->m_metadataImpl;
           if (mImpl.slaves().size()) {
+	    assert(i->m_bestDeployment.m_slaves.size() == mImpl.slaves().size());
             li->m_slaves.resize(mImpl.slaves().size());
             li->m_slaveWorkers.resize(mImpl.slaves().size());
-            // For the assembly instance's slaves, which are in a random order
-            for (unsigned s = 0; s < ui.m_slaves.size(); ++s) {
-              std::string slaveWkrName;
-              OU::Worker &sImpl =
-                m_instances[ui.m_slaves[s]].m_bestDeployment.m_impls[0]->m_metadataImpl;
-              unsigned x = findSlave(sImpl, mImpl, slaveWkrName, s);
-              assert(x != UINT_MAX); // error checks are already done
-              assert(!li->m_slaves[x]);
-              li->m_slaves[x] = &m_launchMembers[m_instances[ui.m_slaves[s]].m_firstMember];
-            }
+	    for (unsigned s = 0; s < mImpl.slaves().size(); ++s)
+	      if (i->m_bestDeployment.m_slaves[s] != UINT_MAX)
+		li->m_slaves[s] = &m_launchMembers[m_instances[i->m_bestDeployment.m_slaves[s]].m_firstMember];
           }
           li->m_member = m;
           i->m_crew.m_size = i->m_bestDeployment.m_scale;
@@ -1893,6 +1971,7 @@ namespace OCPI {
     ApplicationI::Deployment &ApplicationI::Deployment::
     operator=(const ApplicationI::Deployment &d) {
       set(d.m_scale, d.m_containers, d.m_impls, d.m_feasible);
+      m_slaves = d.m_slaves;
       return *this;
     }
   }
@@ -1948,10 +2027,11 @@ namespace OCPI {
                                    (uint32_t)((timeout_us%1000000) * 1000ull))
                    : NULL;
       if (m_application.verbose()) {
-        if (timeout_us)
-          fprintf(stderr, "Waiting up to %g seconds for application to finish%s\n",
-                  (double)timeout_us/1.e6, timeOutIsError ? " before timeout" : "");
-        else
+        if (timeout_us) {
+	  if ((double)timeout_us/1.e6 > 1)
+	    fprintf(stderr, "Waiting for up to %g seconds for application to finish%s\n",
+		    (double)timeout_us/1.e6, timeOutIsError ? " before timeout" : "");
+        } else
           fprintf(stderr, "Waiting for application to finish (no time limit)\n");
       }
       bool r = m_application.wait(timer);
@@ -1965,7 +2045,7 @@ namespace OCPI {
           throw OU::Error("Application exceeded time limit of %g seconds",
                           (double)timeout_us/1.e6);
         }
-        if (m_application.verbose())
+        if (m_application.verbose() && (double)timeout_us/1.e6 > 1)
           fprintf(stderr, "Application is now considered finished after waiting %g seconds\n",
                   (double)timeout_us/1.e6);
       } else if (m_application.verbose())

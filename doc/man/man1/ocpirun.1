@@ -1,0 +1,814 @@
+.\"     Title: ocpirun
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 09/04/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIRUN" "1" "09/04/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpirun \- command\-line tool for running OpenCPI applications
+.SH "SYNOPSIS"
+.sp
+\fBocpirun\fR [\fI<options>\fR] \fI<application\-name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBocpirun(1)\fR command\-line tool is used to execute OpenCPI component\-based \fIapplications\fR in OpenCPI \fIcontainers\fR on OpenCPI \fIplatforms\fR\&. An OpenCPI application is defined as an assembly of component instances with connections among them\&. An OpenCPI application can be specified in two different ways:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+As a standalone XML file called an
+\fIOpenCPI Application Specification\fR
+(\fIOAS\fR)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+As an XML document embedded in and manipulated by a C++ program using the
+\fIOpenCPI Application Control Interface\fR
+(\fIACI\fR)
+.RE
+.sp
+The \fBocpirun\fR tool directly executes the applications defined in OAS XML files\&. The argument \fI<application\-name>\fR is the name of an OAS file without the \fB\&.xml\fR extension\&. The \fBocpirun\fR tool reads the OAS associated with the named application and then runs it\&.
+.sp
+Execution ends when the application described in the OAS is "done" or a time duration (set with an option to \fBocpirun\fR) is exceeded\&. An application is done when all its workers indicate that they are "done" or when a single worker identified with the \fBdone\fR XML attribute in the OAS indicates that it is "done"\&.
+.sp
+The \fBocpirun\fR tool runs applications in OpenCPI \fIprojects\fR, which are development work areas for groups of assets like components and applications\&.
+.sp
+When \fBocpirun\fR executes an application, it makes deployment decisions that determine, for each component instance in the application:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+which worker in which compiled artifact should be used
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+which container the worker should run in
+.RE
+.sp
+The \fBocpirun\fR tool uses an automatic built\-in algorithm to make these decisions that can be guided or overridden by using specific options\&.
+.sp
+Options to \fBocpirun\fR are either single letters following one hyphen or complete words or acronyms following two hyphens and separated by hyphens\&. Options can occur anywhere in the command for the user\(cqs convenience\&. The \fBocpirun\fR command supports the following option categories:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+General\-purpose options
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Function options, which direct the command to perform functions
+\fIother than executing the application\fR\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Instance options, which allow a value to be specified that applies to all instances in the application or to a single instance in the application\&. Instance options typically provide constraints on the
+\fBocpirun\fR
+deployment algorithm to consider only certain workers or certain containers\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Instance port options, which apply to specific ports of instances in the application and modify the default behavior of communications occurring at that port\&. When a port is connected to a port of another instance, the connection is between two ports\&. Some instance port options apply only to one end (one port) of the connection, while others apply to the connection as a whole and thus to both the specified port and the port to which it is connected\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+External port options, which apply to the external ports of the application (which are not connected to anything else in the OAS)\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Simulation options, which control containers running HDL (FPGA) simulators and are used during HDL component development and testing\&. The
+\fIOpenCPI HDL Development Guide\fR
+provides more information on simulators\&.
+.RE
+.sp
+Some of these options can also be expressed as XML attributes in the application OAS and some can be used in applications that use the Application Control Interface (ACI)\&. See the "Options Summary" section in the \fIOpenCPI Application Development Guide\fR for information on how to invoke these options with \fBocpirun\fR, as OAS XML attributes and for ACI\&.
+.sp
+When invoked without any arguments, \fBocpirun\fR displays information about all of its options\&.
+.sp
+The \fIOpenCPI Application Development Guide\fR describes the XML structure of an application OAS and describes OpenCPI application development and execution in detail\&.
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&. Arguments to word\-form options are preceded by an equal sign (=) (as shown in the following descriptions) or a space\&. Arguments to letter options are preceded by a space\&.
+.SS "General Options"
+.PP
+\fB\-\-component\fR
+.RS 4
+Specify that the first command argument that is not an option is a component name for a single\-component application rather than the filename of an OAS\&.
+.RE
+.PP
+\fB\-\-deploy\-out=\fR\fI<file>\fR
+.RS 4
+Specify the filename in which to record deployment decisions for this execution, in XML format, that can be used for execution later on with the
+\fB\-\-deployment\fR
+option\&. The file generated with this option can contain the exact deployment recorded from a previous run or from a run that is executed with the
+\fBno\-execute\fR
+option\&.
+.RE
+.PP
+\fB\-\-deployment=\fR\fI<file>\fR
+.RS 4
+Specify a filename to read for deployment decisions rather than using the built\-in deployment algorithm\&. See the
+\fBdeploy\-out\fR
+option\&.
+.RE
+.PP
+\fB\-\-dump\fR, \fB\-d\fR
+.RS 4
+Write property values to
+\fBstderr\fR
+before starting the application and after it is done\&.
+.RE
+.PP
+\fB\-\-dump\-file=\fR\fI<file>\fR
+.RS 4
+Specify the file in which to record the final property values in machine\-parseable form\&.
+.RE
+.PP
+\fB\-\-dump\-platforms\fR, \fB\-M\fR
+.RS 4
+Write all platform worker and HDL device worker properties in addition to properties of the workers in the application to
+\fBstderr\fR
+before starting the application and when it is done\&.
+.RE
+.PP
+\fB\-\-duration=\fR\fI<seconds>\fR, \fB\-t\fR \fI<seconds>\fR
+.RS 4
+Specify the number of seconds after which execution should stop\&. If the application is not done before
+\fI<seconds>\fR
+is reached, the application stops and is considered to have executed successfully (the ocpirun exit code is zero)\&.
+.RE
+.PP
+\fB\-\-hex\fR
+.RS 4
+Output numeric property values in hex, not decimal\&.
+.RE
+.PP
+\fB\-\-library\-path=\fR\fI<library>\fR
+.RS 4
+Override the OCPI_LIBRARY_PATH environment variable with the specified library\&.
+.RE
+.PP
+\fB\-\-log\-level=\fR\fI<level>\fR, \fB\-l\fR \fI<level>\fR
+.RS 4
+Set the OpenCPI log level to the specified level\&. See the description of the OCPI_LOG_LEVEL environment variable in the
+\fIOpenCPI User Guide\fR
+for a description of possible values\&. Using this option overrides the level set in the OCPI_LOG_LEVEL environment variable\&.
+.RE
+.PP
+\fB\-\-no\-execute\fR
+.RS 4
+Specify that all deployment decisions should be made but the application should not be executed\&. This option can be used with the
+\fB\-\-deploy\-out\fR
+option to write the deployment decisions to a file\&.
+.RE
+.PP
+\fB\-\-processors=\fR\fI<number\-of\-RCC\-containers>\fR, \fB\-n\fR \fI<number\-of\-RCC\-containers>\fR
+.RS 4
+Specify the number of RCC containers to create\&. The default is 1\&.
+.RE
+.PP
+\fB\-\-remote\fR, \fB\-R\fR
+.RS 4
+Automatically discover servers that offer remote containers using multicast User Data Protocol (UDP)\&. See the
+\fIOpenCPI Application Development Guide\fR
+for information on using
+\fBocpirun\fR
+with remote containers\&.
+.RE
+.PP
+\fB\-\-server=\fR\fI<name\-or\-IP\-address>\fR, \fB\-S\fR \fI<name\-or\-IP\-address>\fR+
+.RS 4
+Specify the server name or IP address to be explicitly contacted for remote containers whether or not the
+\fB\-\-remote\fR
+(\fB\-R\fR) option is specified\&. See the
+\fIOpenCPI Application Development Guide\fR
+for information on using
+\fBocpirun\fR
+with remote containers\&.
+.RE
+.PP
+\fB\-\-timeout=\fR\fI<seconds>\fR, \fB\-O\fR \fI<seconds>\fR
+.RS 4
+Specify the number of seconds after which the application is stopped and considered to have failed (the
+\fBocpirun\fR
+exit code is 1\&.)
+.RE
+.PP
+\fB\-\-uncached\fR, \fB\-U\fR
+.RS 4
+When dumping property values, do not use values cached by
+\fBocpirun\fR
+when they are written\&. Instead, query the worker in its execution environment (which is much more expensive)\&.
+.RE
+.PP
+\fB\-\-verbose\fR, \fB\-v\fR
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Function Options"
+.PP
+\fB\-\-list\fR, \fB\-C\fR
+.RS 4
+List all available containers, including those discovered on the network if the
+\fB\-remote\fR
+(\fB\-R\fR) or
+\fB\-\-server\fR
+(\fB\-S\fR) options are specified\&. The option assigns each container a number for easy specification with the
+\fB\-\-container\fR
+(\fB\-c\fR) option and returns it as output along with the authoring model, platform name, operating system and version, architecture and container name\&. Note that the application is still executed if an application filename argument is specified after the options\&.
+.RE
+.PP
+\fB\-\-list\-artifacts\fR, \fB\-A\fR
+.RS 4
+Search for all artifacts for the targets or platforms specified with the
+\fB\-\-target\fR
+(\fB\-r\fR) option, based on OCPI_LIBRARY_PATH, and then write the resulting list to
+\fBstdout\fR\&. Use this function to collect artifacts for a specific system\&.
+.RE
+.PP
+\fB\-\-list\-specs\fR
+.RS 4
+Search for all specs for the targets or platforms specified with the
+\fB\-\-target\fR
+(\fB\-r\fR) option, based on OCPI_LIBRARY_PATH, and then print the resulting list to
+\fBstdout\fR\&. Use this function to collect available specs for a specific system\&.
+.RE
+.PP
+\fB\-\-no\-execute\fR
+.RS 4
+For each instance, determine the container on which it will run and the artifact to be used to run it without actually allocating any resources for performing the execution\&. Use this option with the
+\fB\-\-deploy\-out\fR
+option to execute a "dry run" of an application to see the results and record the deployment decisions in an XML file that can then be used with the
+\fB\-\-deployment\fR
+option\&.
+.RE
+.PP
+\fB\-\-only\-platforms\fR
+.RS 4
+Use with the
+\fB\-\-list\fR
+(\fB\-C\fR) option to direct it to output only the available platforms, listing any available platform only once even if there is more than one container with the same platform type\&.
+.RE
+.PP
+\fB\-\-target=\fR\fI<target>\fR, \fB\-r\fR \fI<target>\fR+
+.RS 4
+Use with the
+\fB\-\-list\-artifacts\fR
+and
+\fB\-\-list\-specs\fR
+options to limit the list to the specified architecture\&. Specify the target in the format
+\fI<os>\fR\fB\-\fR\fI<os\-version>\fR\fB\-\fR\fI<arch>\fR; for example,
+\fBlinux\-c7\-x86_64\fR\&.
+.RE
+.SS "Instance Options"
+.PP
+\fB\-\-container\fR[\fB=\fR\fI<instance\-name>\fR]\fB=\fR\fI<container>\fR, \fB\-c\fR[\fI<instance\-name>\fR]\fB=\fR\fI<container>\fR+
+.RS 4
+Assign the named instance or all instances to the specified container using the container name or number returned by the
+\fB\-\-list\fR
+(\fB\-C\fR) option\&. Examples: \-cfft=1, \-cfir=rcc2, \-\-container=fft=1, \-\-container=rcc2, \-c=1, \-\-container fft=1\&.
+.RE
+.PP
+\fB\-\-model\fR[\fB=\fR\fI<instance\-name>\fR]\fB=\fR\fI<authoring\-model>\fR, \fB\-m\fR[\fI<instance\-name>\fR]\fB=\fR\fI<authoring\-model>\fR+
+.RS 4
+Specify the authoring model of the named instance or all instances so that the worker used for the instance/all instances must have this model\&. The value of
+\fI<authoring\-model>\fR
+is
+\fBhdl\fR
+or
+\fBrcc\fR\&. Examples: \-mfft=hdl, \-m=hdl, \-\-model=rcc, \-\-model=fir=hdl, \-\-model fir=hdl\&.
+.RE
+.PP
+\fB\-\-platform\fR[\fB=\fR\fI<instance\-name>=\fR]\fB=\fR\fI<platform\-type>\fR, \fB\-P\fR[\fI<instance\-name>\fR]\fB=\fR\fI<platform\-type>\fR+
+.RS 4
+Assign the named instance or all instances only to available containers for the specified platform type\&. Examples: \-Pfft=ml605, \-\-platform=centos7\&. Use the
+\fB\-\-list\fR
+(\fB\-C\fR) option to determine the available containers and platform types\&.
+.RE
+.PP
+\fB\-\-property\fR[\fB=\fR\fI<instance\-name>\fR]\fB=\fR\fI<property\-name>\fR\fB=\fR\fI<value>\fR, \fB\-p\fR[\fI<instance\-name>\fR]\fB=\fR\fI<property\-name>\fR\fB=\fR\fI<value>\fR+
+.RS 4
+Set the value of a property\&. Specify the instance name for per\-instance property value settings\&. Omit the instance name for application\-level property value settings\&. See the
+\fIOpenCPI Application Development Guide\fR
+for detailed information on specifying property values\&.
+.RE
+.PP
+\fB\-\-selection\fR[\fB=\fR\fI<instance\-name>\fR]\fB=\fR\fI<expression>\fR, \fB\-s\fR[\fI<instance\-name>\fR]\fB=\fR\fI<expression>\fR
+.RS 4
+Set the selection expression for a single instance or all instances\&. See the description of the
+\fBselection\fR
+OAS XML attribute in the
+\fIOpenCPI Application Development Guide\fR
+for details\&.
+.RE
+.PP
+\fB\-\-worker=\fR\fI<instance\-name>\fR\fB=\fR\fI<worker\-name>\fR, \fB\-w\fR[\fI<instance\-name>\fR]\fB=\fR\fI<worker\-name>\fR
+.RS 4
+Specify the name of the worker (specific implementation) to be used for the instance\&. Do not include the authoring model suffix or the package prefix in
+\fI<worker\-name>\fR\&. Examples: \-\-worker=mycomp2=worker3, \-\-worker mycomp2=worker3, \-wmycomp2=worker3\&.
+.RE
+.SS "Instance Port Options"
+.PP
+\fB\-\-buffer\-count=\fR\fI<instance\-name>\fR\fB=\fR\fI<port\-name>\fR\fB=\fR\fI<value>\fR, \fB\-B\fR\fI<instance\-name>\fR\fB=\fR\fI<port\-name>\fR\fB=\fR\fI<value>\fR+
+.RS 4
+Specify the number of buffers at this instance port, not for all the ports in the connection\&. The default is usually 2\&. Use this option to allow the number of buffers to be different on each end of the connection\&.
+.RE
+.PP
+\fB\-\-buffer\-size=\fR\fI<instance\-name>\fR\fB=\fR\fI<port\-name>\fR\fB=\fR\fI<value>\fR, \fB\-Z\fR\fI<instance\-name>\fR\fB=\fR\fI<port\-name>\fR\fB=\fR\fI<value>\fR+
+.RS 4
+Specify the buffer size for the connection (the specified port and the port to which it is connected)\&. The default is usually determined by a combination of the protocol used on the connection and other system constraints\&.
+.RE
+.PP
+\fB\-\-transport=\fR\fI<instance\-name>\fR\fB=\fR\fI<port\-name>\fR\fB=\fR\fI<identifier>\fR, \fB\-T\fR\fI<instance\-name>\fR\fB=\fR\fI<port\-name>\fR\fB=\fR\fI<identifier>\fR+
+.RS 4
+Specify the transport technology to use for the connection (the specified port and the port to which it is connected)\&. This option applies when using remote containers\&. See the description of the
+\fBtransport\fR
+attribute of a
+\fBconnection\fR
+element in the
+\fIOpenCPI Application Development Guide\fR
+for the list of identifiers that correspond to the transport technologies supported by OpenCPI\&.
+.RE
+.SS "External Port Options"
+.PP
+\fB\-\-buffer\-count=\fR\fI<external\-port\-name>\fR\fB=\fR\fI<value>\fR, \fB\-B\fR \fI<port\-name>\fR\fB=\fR\fI<value>\fR+
+.RS 4
+Specify the number of buffers for the specified external port\&.
+.RE
+.PP
+\fB\-\-buffer\-size=\fR\fI<external\-port\-name>\fR\fB=\fR\fI<value>\fR, \fB\-Z\fR \fI<external\-port\-name>\fR\fB=\fR\fI<value>\fR+
+.RS 4
+Specify the the buffer size for the specified external port and the port inside the OAS to which it is connected\&. The default is usually determined by a combination of the protocol used on the connection and other system constraints\&.
+.RE
+.PP
+\fB\-\-file=\fR\fI<external\-port\-name>\fR\fB=\fR\fI<file\-name>\fR, \fB\-f\fR \fI<external\-port\-name>\fR\fB=\fR\fI<file\-name>\fR+
+.RS 4
+Specify the file to be connected to the specified external port\&. Use this option to insert a
+\fBfile_read\fR
+or
+\fBfile_write\fR
+utility component into the application and connect it to the specified external port\&. It allows an OAS with external ports to be connected to files while also allowing it to be used with those same ports connected to an ACI application\&. See the description of the utility components and ACI applications in the
+\fIOpenCPI Application Development Guide\fR
+for details\&.
+.RE
+.PP
+\fB\-\-transport=\fR\fI<external\-port\-name>\fR\fB=\fR\fI<identifier>\fR, \fB\-T\fR \fI<external\-port\-name>\fR\fB=\fR\fI<identifier>\fR+
+.RS 4
+Specify the transport technology used for the connection (for this port and the port to which it is connected)\&. This option applies when using remote containers\&. See the description of the
+\fBtransport\fR
+attribute of a
+\fBconnection\fR
+element in the
+\fIOpenCPI Application Development Guide\fR
+for the list of identifiers that correspond to the transport technologies supported by OpenCPI\&.
+.RE
+.SS "Simulation Options"
+.PP
+\fB\-\-sim_dir=\fR\fI<directory>\fR
+.RS 4
+Specify the name of a directory where simulation outputs will be placed\&. The default directory is
+\fBsimulations/\fR
+relative to where
+\fBocpirun\fR
+is running\&.
+.RE
+.PP
+\fB\-\-sim\-ticks=\fR\fI<value>\fR
+.RS 4
+The number of simulation clock cycles to execute or until the application is done\&.
+.RE
+.sp
+The section "Execution of Simulation Bitstreams and Containers" in the \fIOpenCPI HDL Development Guide\fR provides more information about running applications on HDL (FPGA) simulators\&. See ocpiview(1) for information on viewing the results of simulation runs\&.
+.SH "ENVIRONMENT VARIABLES"
+.sp
+The following environment variables affect \fBocpirun\fR operation:
+.PP
+\fBOCPI_LIBRARY_PATH\fR
+.RS 4
+A list of directories, separated by colons, to be searched for runtime artifacts\&. When referencing the artifacts exported by a project with sources, be sure to reference the project\(cqs
+\fBexports/\fR
+subdirectory, not its source location\&. This variable is set automatically (if not already set) when running component unit tests or applications in projects with
+\fBocpidev run\fR\&. In pure runtime environments, it may need to be set when artifacts are placed in directories of the user\(cqs choice\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR\&. The command locates and reads the application OAS and runs the application:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, displaying information about what is happening, dumping the property values after initialization, and limiting execution time to 10 seconds:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-verbose \-\-dump \-\-duration=10 myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, specifying that all application instances must use the RCC authoring model:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-model=rcc myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, specifying that the
+\fBctl\fR
+instance in the application must use the RCC authoring model:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-model=ctl=rcc myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, specifying that all the instances in the application except for the
+\fBfilter\fR
+instance must use the RCC authoring model\&. Specifying the
+\fB\-\-model\fR
+option with an empty value for
+\fBfilter\fR
+unsets the previous setting for it made with the
+\fB\-\-model=rcc\fR
+option:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-model=rcc \-\-model=filter= myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 6.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  6." 4.2
+.\}
+Inside a project, specify that all instances in the application described by the OAS named
+\fBmyapp\&.xml\fR
+should be run only on the ml605 HDL (FPGA) platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-platform=ml605 myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 7.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  7." 4.2
+.\}
+Inside a project, specify that the instance
+\fBmycomp\fR
+in the application described by the OAS named
+\fBmyapp\fR
+should be run only on the
+\fBxsim\fR
+HDL (FPGA) simulator platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-platform=mycomp=xsim myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 8.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  8." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, setting the top\-level application property named
+\fBcontrol\fR
+to
+\fB5\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-property control=5 myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 9.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  9." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, setting the
+\fBfilename\fR
+property value of the
+\fBfile_read\fR
+instance to the file
+\fBmyinput\&.data\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-property file_read=filename=myinput\&.data myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'10.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "10." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, connecting the external port named
+\fBinput\fR
+to the file
+\fBmyinput\&.txt\fR
+and setting the inserted
+\fBfile_read\fR
+properties
+\fBopcode\fR
+to
+\fB2\fR
+and
+\fBsuppressEOF\fR
+to
+\fBfalse\fR\&. Enclose the option value in quotes because the question mark and the semicolon are shell metacharacters:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-file \*(Aqinput=myinput\&.txt?opcode=2;suppressEOF=false\*(Aq myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'11.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "11." 4.2
+.\}
+On a CentOS7 system with
+\fBmodelsim\fR
+and
+\fBisim\fR
+HDL (FPGA) simulators installed for OpenCPI, list the available platforms:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-list
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The output from the command is:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Available containers:
+   #  Model Platform   OS    OS\-Version   Arch   Name
+   0  hdl   isim                                 lsim:isim
+   1  hdl   modelsim                             lsim:modelsim
+   2  rcc   centos7    linux c7           x86_64 rcc0
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'12.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "12." 4.2
+.\}
+Inside a project, run the application described by the OAS named
+\fBmyapp\&.xml\fR, using for the
+\fBctl\fR
+instance only those workers whose
+\fBsnr\fR
+property is less than 5:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpirun \-\-selection=ctl=snr<5 myapp
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-component(1) ocpidev\-platform(1) ocpidev\-project(1) ocpidev\-run(1) ocpidev\-worker(1) ocpiview(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

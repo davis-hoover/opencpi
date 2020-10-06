@@ -1,0 +1,237 @@
+OPENCPI(1)
+==========
+
+
+NAME
+----
+opencpi - tools for developing and executing OpenCPI applications
+
+
+DESCRIPTION
+-----------
+Open Component Portability Infrastructure (OpenCPI) is an
+open source software (OSS) framework for developing and
+executing OpenCPI 'applications' - connected and configured
+assemblies of 'components' - on heterogeneous embedded systems.
+OpenCPI provides a set of tools to support the
+development and execution of OpenCPI applications.
+These tools include:
+
+link:ocpiadmin.1.html[ocpiadmin(1)]::
+    Command-line tool for managing an OpenCPI installation
+
+link:ocpiav.1.html[ocpiav(1)]::
+    Eclipse-based graphical user interface for managing OpenCPI assets    
+
+link:ocpidev.1.html[ocpidev(1)]::
+    Command-line tool for managing OpenCPI assets
+
+link:ocpidriver.1.html[ocpidriver(1)]::
+    Command-line tool for controlling the
+    OpenCPI Linux kernel module driver
+
+link:ocpigr.1.html[ocpigr(1)]::
+    Command-line tool for creating GNU Radio Companion (GRC) block files
+    from OpenCPI artifacts
+
+link:ocpihdl.1.html[ocpihdl(1)]::
+    Command-line tool for performing HDL development tasks
+
+link:ocpiremote.1.html[ocpiremote(1)]::
+    Command-line tool for managing
+    remote OpenCPI container servers
+
+link:ocpirun.1.html[ocpirun(1)]::
+    Command-line tool for running OpenCPI applications
+
+link:ocpiserve.1.html[ocpiserve(1)]::
+    Command-line tool for starting OpenCPI container servers
+
+link:ocpitest.1.html[ocpitest(1)]::
+    Command-line tool for running OpenCPI installation
+    verification tests
+
+link:ocpiview.1.html[ocpiview(1)]::
+    Command-line tool for viewing
+    the results of FPGA simulations
+
+link:ocpixml.1.html[ocpixml(1)]::
+    Command-line tool for managing OpenCPI artifact
+    description XML in artifact files
+
+link:ocpizynq.1.html[ocpizynq(1)]::
+    Command-line tool for retrieving
+    hardware configuration data from Xilinx Zynq architecture platforms
+
+These tools are accessible from the *`bash`* UNIX/Linux shell, which
+is the shell environment supported by OpenCPI.
+
+To obtain general information about an individual tool, including command
+syntax, command options, and examples, see its manual page.
+
+To obtain brief usage information for an individual tool,
+use the *`--help`* (or *`-h`*) option; for example:
+
+ocpirun --help
+
+
+OPTIONS
+-------
+Options to OpenCPI tools are either single letters following one
+hyphen or hyphen-separated words or acronyms following two hyphens.
+Most options are specific to individual tools and are described
+in the manual pages for these tools. The options common to all tools are:
+
+*`-d`* '<directory>'::
+    Specify the directory in which the tool operation should be run.
+    Analogous to the *`-C`* option in the POSIX *`make`* command.
+    This option can be specified more than once on the command line.
+
+*`--help`*, *`-h`*::
+    Display usage information about the tool.
+
+*`--log-level=`*'<level>', *`-l`* '<level>'::
+    Set the OpenCPI log level to the specified level.
+    This option can be used to override the logging level
+    set in the *`OCPI_LOG_LEVEL`* environment variable.
+    See ENVIRONMENT VARIABLES for a description of possible
+    values.
+
+*`--verbose`*, *`-v`*::
+    Describe what is happening in tool operation in more detail.
+    
+ENVIRONMENT VARIABLES
+---------------------
+OpenCPI defines a variety of environment variables that can be used
+to configure and control its operation. Some of these variables are set during
+OpenCPI installation, some are set when the OpenCPI environment
+is established with the OpenCPI setup script, most can be used during
+OpenCPI development and some can be used when OpenCPI
+applications are run. All of these variables are prefixed with *`OCPI_`*.
+'Nearly all of of these environment variables are optional', since not having
+them set is always the default. OpenCPI environment variables
+whose settings affect OpenCPI tools include:
+
+*`OCPI_CDK_DIR`*::
+    The location of the OpenCPI development or runtime installation.
+    The OpenCPI setup script automatically sets this variable to its
+    installation location, which is '<location-of-opencpi>'*`/cdk/`*.
+    'This environment variable should never be set directly'.
+
+*`OCPI_LIBRARY_PATH`*::
+    A colon-separated list of directories to be searched for runtime artifacts.
+    This variable is set automatically (if not already set) when running component
+    unit tests or applications in projects with *`ocpidev run`*.
+    In pure runtime environments, it may need
+    to be set when artifacts are placed in directories of the user's choice.
+   
+*`OCPI_LOG_LEVEL`*::
+    A numeric value that indicates the amount of logging information
+    to be output by the OpenCPI runtime system. This environment
+    variable can be used during development for debugging purposes.
+    The default is zero (0), indicating no logging output.
+    The maximum is 20. Log level 8 provides generally useful
+    startup and diagnostic information like artifact discovery
+    feedback. Level 4 logs unusual events. Logging is
+    directed to *`stderr`*. The *`--log-level`* option to
+    the OpenCPI tools can be used to override the setting
+    of this variable.
+
+*`OCPI_PROJECT_PATH`*::
+    A colon-separated set of project directories to be considered
+    in addition to those projects that are registered. This variable
+    can be used during development to augment the project temporarily
+    when testing a new project; however, it is rarely used.
+
+*`OCPI_PROJECT_REGISTRY_DIR`*::
+    The location of an alternative project registry. This environment
+    variable can be used during development to redirect OpenCPI asset
+    development from the OpenCPI project registry (located by default
+    at $OCPI_CDK_DIR/../project-registry) to a different,
+    alternative project registry. The directory specified in this
+    environment variable becomes the project registry with which
+    all subsequently created projects are associated.
+
+*`OCPI_SYSTEM_CONFIG`*::
+    The OpenCPI system configuration file for the OpenCPI runtime system.
+    By default, the installation creates the system configuration file
+    at the path $OCPI_CDK_DIR/../system.xml and creates a default system
+    configuration file at the path $OCPI_CDK_DIR/default-system.xml
+    (see CONFIGURATION). This environment variable can be used to override the
+    installation default, but this is rarely done.
+
+To make an OpenCPI environment variable setting permanent for a given OpenCPI
+installation, set it (with the *`bash`* shell *`export`* command) in the
+OpenCPI user-specified environment variables script *`user-env.sh`* located
+in the installation directory (see CONFIGURATION). The settings made in this
+script are applied to the OpenCPI installation when the OpenCPI user setup script is run.
+
+The 'OpenCPI Component Development Guide'
+contains a master list of OpenCPI environment variables used during
+component development.
+
+CONFIGURATION
+-------------
+The files and scripts described below configure the OpenCPI development and/or runtime
+environments and thus affect the OpenCPI tools.
+The 'OpenCPI User Guide' provides more information about them.
+
+*`opencpi-setup.sh`*::
+    The OpenCPI environment setup script. This script establishes
+    the OpenCPI environment when sourced with the following
+    *`bash`* shell command, which must be run before the tools
+    can be used:
+    
+    source <location-of-opencpi>/cdk/opencpi-setup.sh -s
+       
+*`system.xml`*, *`default-system.xml`*::
+    The OpenCPI system configuration file. This file specifies
+    which OpenCPI user-mode plugins should be enabled for
+    the runtime system. Some OpenCPI tools require particular
+    plugins to be enabled. However, the default system configuration
+    files created by the OpenCPI installation generally enable
+    the necessary plugins for the tools.
+
+*`user_env.sh`*::
+    The OpenCPI user-specified environment variables script.
+    The purpose of this file is to provide site-specific,
+    permanent non-default values for OpenCPI environment
+    variables that are used during OpenCPI
+    development. It is not used in a runtime-only environment.
+    This file is automatically created at installation
+    in the installation directory ($OCPI_CDK_DIR/..). 'None
+    of the environment variables in this file are required
+    to be set.' If any of these variables are set, the file
+    is sourced by the OpenCPI setup script when it is invoked
+    to set up the OpenCPI environment.
+
+
+DOCUMENTATION
+-------------
+The OpenCPI documentation set is located at
+https://opencpi.gitlab.io.
+
+The 'OpenCPI User Guide' at that location
+provides a graphical roadmap that illustrates
+the suggested reading path through
+the OpenCPI documentation.
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+SEE ALSO
+--------
+link:ocpiadmin.1.html[ocpiadmin(1)]
+link:ocpiav.1.html[ocpiav(1)]
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidriver.1.html[ocpidriver(1)]
+link:ocpigr.1.html[ocpigr(1)]
+link:ocpihdl.1.html[ocpihdl(1)]
+link:ocpiremote.1.html[ocpiremote(1)]
+link:ocpirun.1.html[ocpirun(1)]
+link:ocpiserve.1.html[ocpiserve(1)]
+link:ocpitest.1.html[ocpitest(1)]
+link:ocpiview.1.html[ocpiview(1)]
+link:ocpixml.1.html[ocpixml(1)]
+link:ocpizynq.1.html[ocpizynq(1)]

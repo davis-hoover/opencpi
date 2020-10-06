@@ -432,6 +432,42 @@ setPropertyValue(unsigned remoteInstance, size_t propN, const char *v,
   if (err)
     throw OU::Error("Error setting property: %s", err);
 }
+void Launcher::
+setPropertyBytes(unsigned remoteInstance, size_t propN, size_t offset, const uint8_t *data,
+		 size_t nBytes, unsigned idx) {
+  std::string s;
+  for (unsigned n = 0; n < nBytes; ++n)
+    OU::formatAdd(s, "%02x", data[n]);
+  OU::SelfAutoMutex guard(this);
+  OU::format(m_request, "<control id='%u' set='%zu' offset='%zu' idx='%u' nbytes='%zu'>%s",
+	     remoteInstance, propN, offset, idx, nBytes, s.c_str());
+  send();
+  receive();
+  assert(!strcasecmp(OX::ezxml_tag(m_rx), "control"));
+  const char *err = ezxml_cattr(m_rx, "error");
+  if (err)
+    throw OU::Error("Error setting property: %s", err);
+}
+void Launcher::
+getPropertyBytes(unsigned remoteInstance, size_t propN, size_t offset, const uint8_t *data,
+		 size_t nBytes, unsigned idx, bool string) {
+  OU::SelfAutoMutex guard(this);
+  OU::format(m_request, "<control id='%u' get='%zu' offset='%zu' idx='%u' nbytes='%zu' string='%u'>",
+	     remoteInstance, propN, offset, idx, nBytes, string);
+  send();
+  receive();
+  assert(!strcasecmp(OX::ezxml_tag(m_rx), "control"));
+  const char *err = ezxml_cattr(m_rx, "error");
+  if (err)
+    throw OU::Error("Error setting property: %s", err);
+  const char *cp = ezxml_txt(m_rx);
+  while (isspace(*cp)) cp++;
+  for (unsigned n = 0; n < nBytes; ++n, ++data, cp += 2) {
+    ocpiCheck(sscanf(cp, "%2hhx", (unsigned char *)data) == 1);
+    if (string && !*data)
+      break;
+  }
+}
 
 void Launcher::
 getPropertyValue(unsigned remoteInstance, size_t propN, std::string &v, const std::vector<uint8_t> &path,

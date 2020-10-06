@@ -152,6 +152,7 @@ begin
     signal last_r       : owcount_t; -- which outword is the last one in this saved inword
     signal som_r        : bool_t;  -- we buffered a SOM
     signal eom_r        : bool_t;  -- we buffered an EOM
+    signal eom_taken_r  : bool_t;  -- the last thing we took was an EOM
     signal data_r       : buf_t;   -- Buffer of inword
     signal opcode_r     : std_logic_vector(in_opcode'range);
     signal last_be_r    : std_logic_vector(bytes_out-1 downto 0); -- BE for last outword
@@ -179,7 +180,7 @@ begin
   begin
     assert (width_in rem width_out) = 0 report "width_in must be a multiple of width_out";
     -- we cannot propagate an EOF until the EOM has shipped
-    out_eof        <= in_eof and eom_r and not have_data_r and not give_now and out_ready;
+    out_eof        <= in_eof and eom_taken_r and not have_data_r and not give_now and out_ready;
     -- Reorganize input data as an array of output words
     g0: for i in 0 to last_c generate
       word_data(i) <= in_data(width_out*i + width_out-1 downto width_out*i);
@@ -220,6 +221,7 @@ begin
           last_r      <= (others => '0');
           som_r       <= bfalse;
           eom_r       <= bfalse;
+          eom_taken_r <= bfalse;
           opcode_r    <= (others => '0');
         else
           -- Capture everything when we can, whether its there or not
@@ -228,8 +230,9 @@ begin
             last_r    <= last_word_in; -- remember the last word in the input
             last_be_r <= last_be_in;
             som_r     <= in_som and in_ready;
+            eom_r     <= in_eom and in_ready;
             if its(in_ready) then
-              eom_r   <= in_eom;
+              eom_taken_r <= in_eom;
             end if;
             opcode_r  <= in_opcode;
             -- If we are actually buffering any data (not passing through), set the indicator

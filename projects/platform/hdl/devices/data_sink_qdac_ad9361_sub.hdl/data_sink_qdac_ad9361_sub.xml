@@ -1,4 +1,4 @@
-<HdlDevice language='vhdl' version='2'>
+<HdlDevice language='vhdl' version='2' libraries='ocpi.core.bsv dac protocol cdc'>
 
   <!-- By design, this worker provides control and/or data plane functionality
        that is never intended to be exposed by any other worker. Accordingly,

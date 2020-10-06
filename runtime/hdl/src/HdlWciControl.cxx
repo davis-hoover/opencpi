@@ -152,7 +152,14 @@ namespace OCPI {
       // "finished" and "fatal" status, there is where we check it, and do
       // setControlState(OC::FINISHED);
       // setControlState(OC::UNUSABLE);
-      uint32_t status = get32Register(status, OccpWorkerRegisters);
+      uint32_t status;
+      try {
+	status = get32Register(status, OccpWorkerRegisters);
+      } catch (...) {
+	// devices can disappear so if anything goes wrong...
+	setControlState(OU::Worker::UNUSABLE);
+	return;
+      }
       ocpiDebug("Checking control state for worker: status: 0x%x", status);
       if (status & OCCP_STATUS_ALL_ERRORS)
 	ocpiDebug("Worker %s has errors: %" PRIx32, m_instName, status);

@@ -40,7 +40,7 @@
 --   throttle number of issued reads in case tags can't encode then
 --   can we use eop more efficiently than counting?
 
-library IEEE, ocpi, util, bsv, sdp;
+library IEEE, ocpi, util, sdp;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all;
 use work.sdp_receive_constants.all;
@@ -49,8 +49,9 @@ entity sdp_receive_dma is
            sdp_width        : natural;
            memory_depth     : natural;
            max_buffers      : natural);
-  port (   operating        : in bool_t;
-           reset            : in bool_t;
+  port (   sdp_clk          : in std_logic;
+           sdp_reset        : in std_logic;
+           operating        : in bool_t;
            -- properties
            buffer_ndws      : in  unsigned(width_for_max(memory_depth * sdp_width)-1 downto 0);
            lcl_buffer_count : in  unsigned(width_for_max(max_buffers)-1 downto 0);
@@ -302,10 +303,10 @@ g2: for i in 0 to sdp_width-1 generate
   --     a. Sends a flag to the parent to indicate that the pulling is done
   --     b. Enqueues an "available" token to the WSI side
   --------------------------------------------------------------------------------
-  sdp2bram : process(sdp_in.clk)
+  sdp2bram : process(sdp_clk)
   begin
-    if rising_edge(sdp_in.clk) then
-      if its(reset) then -- FIXME this is not really the right reset
+    if rising_edge(sdp_clk) then
+      if its(sdp_reset) then
         sdp_addr_r          <= (others => '0'); -- SDP type DW address
         rem_buffer_idx_r    <= (others => '0');
         lcl_buffer_idx_r    <= (others => '0');

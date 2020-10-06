@@ -1,0 +1,94 @@
+OCPIZYNQ(1)
+===========
+
+
+NAME
+----
+ocpizynq - command-line tool for displaying configuration information for Zynq architecture platforms
+
+
+SYNOPSIS
+--------
+*`ocpizynq`* ['<options>'] '<argument>'
+
+
+DESCRIPTION
+-----------
+The *`ocpizynq(1)`* command-line tool is used to obtain hardware configuration
+information about an OpenCPI-supported Xilinx Zynq System-on-Chip (SoC) platform
+and can be used during development and debugging to determine exactly how the
+SoC is configured (usually by the bootstrap process outside of OpenCPI).
+The tool operates on OpenCPI HDL platforms that use the Xilinx Zynq-7000 series
+SoCs, such as the *`zed`*, *`e31x`* and *`plutosdr`* platforms and on HDL platforms that use
+the Xilinx Zynq Ultrascale+ chip architecture, like the *`zcu104`* platform.
+
+Specify one of the following keywords as an argument:
+
+*`axi_hp`*::
+    Display how the platform's AXI HP interfaces are configured.
+
+*`devcfg`*::
+    Display how the platform's devices are configured. This operation is not currently
+    implemented for Zynq Ultrascale+ platforms.
+
+*`clocks`*::
+    Display how the platform's clocks are configured.  This operation is not currently
+    implemented for Zynq Ultrascale+ platforms.
+
+*`spi`*::
+    Display how the platform's SPI interfaces are configured.
+
+
+OPTIONS
+-------
+*`--psclk=`*'<frequency>', *`-p`* '<frequency>'::
+    Specify the external clock rate in MHz into the Zynq platform's PS_CLK clock.
+    The external clock rate is board-dependent and is usually 33.3333e6. Use this option
+    to specify the clock rate that the Zynq SoC is receiving from its PS_CLK pin.
+
+
+EXAMPLES
+--------
+. Display the configuration of a Zynq 7000 series platform's clocks,
+specifying an external clock rate of 34.368 MHz:
++
+-----------------------------
+ocpizynq --psclk=34368 clocks
+-----------------------------
++
+. Display the configuration for a Zynq platform's AXI HP interfaces:
++
+---------------
+ocpizynq axi_hp
+---------------
++
+. Display the configuration for the Zynq platform's SPI interfaces:
++
+-----------
+ocpizynq spi
+------------
+
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-worker.1.html[ocpidev-worker(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+

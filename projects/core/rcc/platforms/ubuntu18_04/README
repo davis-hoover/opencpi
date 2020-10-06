@@ -1,0 +1,28 @@
+This directory contains information and scripts for installing and building
+OpenCPI for *ubuntu 18.04.  N.B.: "/bin/sh" points to "/bin/dash" by default,
+not "/bin/bash".
+
+What must be accomplished falls into one of the three categories below:
+
+1. Install - things you must do *before* building OpenCPI infrastructure, components and apps.
+2. Build - how to actually build all of OpenCPI.
+3. Setup - things to do after building in order to use the platform to run apps.
+
+The OpenCPI Installation Guide (OpenCPI_Installation_Guide.pdf) will eventually
+contain all the pertinent information.  The latest release of the guide should
+normally be available on-line at "https://opencpi.gitlab.io".
+
+Miscellaneous notes:
+
+(1) Installing the "lsb" metapackage takes care of installing much of the
+    required development functionality, and some of the 32-bit support
+    framework.  In particular "lsb" gets you all of the "lsb-*" packages,
+    "fakeroot", compilers, and the base 32-bit runtime libraries.
+
+(2) The "curl" package is not part of the base installation.  Principle
+    of least astonishment definitely violated.
+
+(3) Early dependencies on "make" and "python3" (at least one of which is
+    not installed by default) were fixed by reworking the scripts that
+    inappropriately called those programs prior to installing the distro-
+    specific packages (which happens in "ubuntu18_04-packages.sh").

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+     distributed with this source distribution.
+
+     This file is part of OpenCPI <http://www.opencpi.org>
+
+     OpenCPI is free software: you can redistribute it and/or modify it under
+     the terms of the GNU Lesser General Public License as published by the Free
+     Software Foundation, either version 3 of the License, or (at your option)
+     any later version.
+
+     OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+     FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+     more details.
+
+     You should have received a copy of the GNU Lesser General Public License
+     along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<protocol>
+  <!-- Message data / samples.
+
+       Sequence length is set to allow for a maximum message length of 16,384
+       bytes. All protocols for all data types must have the same maximum
+       message length in bytes. -->
+  <operation name="sample">
+    <argument name="data" type="longlong" sequencelength="2048"/>
+  </operation>
+  <xi:include href="timed_sample_metadata-prot.xml"/>
+</protocol>

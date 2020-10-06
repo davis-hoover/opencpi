@@ -28,6 +28,7 @@
 # It first determines the "Requires" aspects for the RPM, and then calls rpmbuild
 # The "Requires" for the driver RPM are in that spec file (for now).
 
+# Parse args
 verbose=--quiet
 [ "$1" = -v ] && verbose=-vv && shift
 platform=$1 && shift
@@ -40,22 +41,31 @@ name=$1 && shift
 release=$1 && shift
 version=$1 && shift
 hash=$1 && shift
+
+# Exit on any error
 set -e
-command -v rpmbuild >/dev/null 2>&1 || {
+
+command -v rpmbuild &> /dev/null || {
   echo "Error: Cannot build an RPM: rpmbuild (rpm-build package) is not available."
   exit 1
 }
+
 # Set target-specific environment variables, for this script and for the spec files
 source $OCPI_CDK_DIR/scripts/ocpitarget.sh $platform
 target=packaging/target-$platform
 mkdir -p $target
+
 if [ "$package" = driver ]; then
-  msg="driver package (opencpi-driver)"
+  msg='driver package (opencpi-driver)'
   spec=driver.spec
+elif [ "$package" = doc ]; then
+  msg='doc package (opencpi-doc)'
+  spec=doc.spec
 else
-  msg="runtime (opencpi) and development (opencpi-devel) packages"
+  msg='runtime (opencpi) and development (opencpi-devel) packages'
   spec=cdk.spec
-  # derive RPM Requires: from package script for the platform, for runtime and devel
+
+  # Derive RPM Requires: from package script for the platform, for runtime and devel
   # since we have no way to explicitly designate _when_ needed, we will claim we always do
   # (before we're installed (pre), while we're installed, after we're being installed(post))
   p=$OCPI_TARGET_PLATFORM_DIR/${platform}-packages.sh
@@ -72,9 +82,10 @@ else
     $p list | tail -1 | xargs -n 1 | sed 's/^[a-zA-Z/]/Requires(pre,post):&/' >> $target/devel-requires
   }
 fi
+
 echo "Creating RPM file(s) in $target for $msg for the $platform platform."
-mkdir -p $target
 source $OCPI_CDK_DIR/../build/prerequisites/myhostname/myhostname.sh
+
 # Run rpmbuild, passing in all the generic package naming information and running it
 # with the host name spoofing to avoid embedding internal server names in the rpm file.
 # Note that later versions of rpmbuild actually have a specific feature to do this easily

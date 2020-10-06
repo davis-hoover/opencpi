@@ -19,9 +19,9 @@
 -- The SDP receiver, to take data from the SDP port, and put it out on a WSI port,
 -- buffering messages in BRAM.  The WSI width is the SDP width.
 
-library IEEE, ocpi, util, bsv, sdp;
+library IEEE, ocpi, util, ocpi_core_bsv, sdp, cdc;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all;
+use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all, ocpi_core_bsv.all;
 architecture rtl of worker is
   -- Local worker constants
   constant sdp_width_c     : natural := to_integer(sdp_width);
@@ -170,13 +170,13 @@ g0: for i in 0 to sdp_width_c-1 generate
                 ADDR_WIDTH => addr_width_c,
                 DATA_WIDTH => dword_size,
                 MEMSIZE    => memory_depth_c)
-    port map   (CLKA       => sdp_in.clk,
+    port map   (CLKA       => sdp_clk,
                 ENA        => '1',
                 WEA        => '0',
                 ADDRA      => std_logic_vector(brama_addr),
                 DIA        => slv0(dword_size),
                 DOA        => out_out.data(i*dword_size+dword_size-1 downto i*dword_size),
-                CLKB       => sdp_in.clk,
+                CLKB       => sdp_clk,
                 ENB        => '1',
                 WEB        => std_logic(bramb_write(i)),
                 ADDRB      => std_logic_vector(bramb_addr),
@@ -192,7 +192,7 @@ g0: for i in 0 to sdp_width_c-1 generate
                src_IN      => md_in_slv,
                src_ENQ     => std_logic(md_enq),
                src_FULL_N  => md_not_full,
-               dst_clk     => sdp_in.clk,
+               dst_clk     => sdp_clk,
                dst_OUT     => md_out_slv,
                dst_DEQ     => md_deq,
                dst_EMPTY_N => md_not_empty);
@@ -210,7 +210,7 @@ g0: for i in 0 to sdp_width_c-1 generate
                depth        => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2)
    port map   (src_CLK      => ctl_in.clk, -- maybe syncfifo later
                src_RST      => ctl_in.reset,
-               dst_CLK      => sdp_in.clk,
+               dst_CLK      => sdp_clk,
                src_ENQ      => std_logic(length_enq),
                src_IN       => length_in_slv,
                src_FULL_N   => length_not_full,
@@ -256,11 +256,11 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- I.e. when the SDP side is done PULLING data, it indicates the buffer is full,
   -- and then the WSI processing can send the message, according to the metadata Fifo.
   -- SDP -> WSI
-  availfifo : component bsv.bsv.SizedFIFO
+  availfifo : component bsv_pkg.SizedFIFO
    generic map(p1Width      => 1,
                p2depth      => roundup_2_power_of_2(max_buffers_c),
                p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
-   port map   (CLK          => sdp_in.clk,
+   port map   (CLK          => sdp_clk,
                RST          => sdp_reset_n,
                ENQ          => avail_enq,
                D_IN         => "1",
@@ -282,7 +282,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   --------------------------------------------------------------------------------
   -- Combinatorial signals on the WSI side
   --------------------------------------------------------------------------------
-  sdp_reset_n          <= not sdp_in.reset;
+  sdp_reset_n          <= not sdp_reset;
   buffer_count         <= resize(props_in.buffer_count, buffer_count_t'length);
   ctl_reset_n          <= not ctl_in.reset;
   wsi_next_buffer_addr <= (others => '0')
@@ -306,7 +306,6 @@ g0: for i in 0 to sdp_width_c-1 generate
   ctl_out.finished    <= to_bool(faults /= 0 );
   props_out.faults    <= faults;
   props_out.sdp_id    <= resize(sdp_in.id, props_out.sdp_id'length);
---  out_out.clk         <= sdp_in.clk;
   out_out.give        <= giving;
   out_out.som         <= wsi_starting_r and not md_out.eof;
   out_out.eom         <= last_give and not md_out.eof;
@@ -324,10 +323,10 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- The process of reading messages from the metadata FIFO and BRAM and sending
   -- then to the WSI port named "out"
   --------------------------------------------------------------------------------
-  bram2wsi : process(sdp_in.clk)
+  bram2wsi : process(sdp_clk)
   begin
-    if rising_edge(sdp_in.clk) then
-      if ctl_in.reset = '1' then
+    if rising_edge(sdp_clk) then
+      if sdp_reset = '1' then
         brama_addr_r       <= (others => '0');
         wsi_buffer_index_r <= (others => '0');
         wsi_buffer_addr_r  <= (others => '0');
@@ -384,7 +383,8 @@ g0: for i in 0 to sdp_width_c-1 generate
                  sdp_width        => sdp_width_c,
                  memory_depth     => memory_depth_c,
                  max_buffers      => max_buffers_c)
-    port map (   reset            => ctl_in.reset,
+    port map (   sdp_clk          => sdp_clk,
+                 sdp_reset        => sdp_reset,
                  operating        => operating_r,  -- wrong clock domain, but stable enough?
                  -- properties
                  buffer_ndws      => buffer_ndws,

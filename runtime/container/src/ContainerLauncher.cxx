@@ -81,7 +81,8 @@ launch(Launcher::Members &instances, Launcher::Connections &connections) {
     if (&i->m_container->launcher() == this && !i->m_hasMaster) {
       bool needSlave = false;
       for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
-	if (!(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
+	// We allow the proxy to not have all of its slaves present in the app
+	if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
 	  needSlave = true;
 	  break;
 	}
@@ -125,7 +126,7 @@ work(Launcher::Members &instances, Launcher::Connections &connections) {
     if (&i->m_container->launcher() == this && !i->m_hasMaster && !i->m_worker) {
       bool needSlave = false;
       for (unsigned nn = 0; nn < i->m_slaves.size(); ++nn)
-	if (!(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
+	if (i->m_slaves[nn] && !(i->m_slaveWorkers[nn] = i->m_slaves[nn]->m_worker)) {
 	  needSlave = true;
 	  break;
 	}

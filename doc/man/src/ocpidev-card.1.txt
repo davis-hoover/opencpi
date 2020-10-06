@@ -1,0 +1,141 @@
+OCPIDEV-CARD(1)
+==============
+
+
+NAME
+----
+ocpidev-card - manage an OpenCPI HDL card.
+
+
+SYNOPSIS
+--------
+*`ocpidev`* ['<options>'] '<verb>' *`hdl card`* '<name>'
+
+
+DESCRIPTION
+-----------
+The *`hdl card`* noun represents an OpenCPI HDL card, 
+which defines a hardware component that contains devices
+and plugs into a 'slot' on an HDL platform. Devices are
+either directly attached to the pins on an HDL platform
+or attached to cards that plug into compatible slots on the platform.
+Devices on a card are considered to be part of the card, which can
+be plugged into a certain type of slot on any platform, rather than
+part of the platform itself.
+
+An HDL card is described by an HDL card definition, which is an
+XML file that describes the slot type of the card, the HDL devices
+(controlled by HDL device workers) that are present on the card,
+and how they are wired to the slot. There is no HDL code associated
+with an HDL card. For more information about the HDL card
+definition's XML structure and how it relates to HDL platforms,
+slots and HDL device workers, see the 'OpenCPI Platform Development Guide'.
+
+In a project, an HDL card is named '<name>'*`.xml`* and resides
+in one of the following locations depending on its intended use:
+
+- In the subdirectory *`hdl/cards/specs/`* when the HDL
+card is platform-independent
+
+- In the subdirectory *`hdl/platforms/`*'<platform>'*`/devices/specs/`* when
+the HDL card is platform-specific
+
+Verbs that can operate on an HDL card are:
+
+*`create`*::
+    Create the named HDL card according to the specified options,
+    creating directories and files as required.
+
+*`delete`*::
+    Remove all files associated with the named HDL card.
+
+The *`create`* operation creates an initial HDL card definition
+XML file that can be edited as necessary to define the card.
+
+
+OPTIONS
+-------
+In the descriptions below, a plus sign (+) after the option indicates
+that it can be specified more than once on the command line.
+
+Options That Apply to All Operations (Verbs) on HDL Cards
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-d`* '<directory>'::
+    Specify the directory in which the command should be run.
+    Analogous to the *-C* option in the POSIX *make* command.
+
+*-v, --verbose*::
+    Describe what is happening in command execution in more detail.
+    
+Options When Creating HDL Cards
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-P`* '<hdl-platform>'::
+    Specify that the HDL card being created is a platform-specific
+    HDL card to be created in the *`devices/specs/`*
+    subdirectory in the specified HDL platform in the project.
+
+*-k*::
+    Keep files and directories created after an HDL card creation
+    fails. Normally, all such files and directories are removed
+    on any failure.
+  
+Options When Deleting HDL Cards
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`-f`*::
+    Force deletion: do not ask for confirmation when deleting
+    an HDL card. Normally, you are asked to confirm a deletion.
+    
+EXAMPLES
+--------
+. At the top level of the project, create an HDL card
+with the name *`mycard`*. The HDL card definition
+named *`mycard.xml`* will be placed
+in the subdirectory *`hdl/cards/specs/`*:
++
+------------------------------
+ocpidev create hdl card mycard
+------------------------------
+. At the top level of the project, create an HDL card
+with the name *`mycard`* for the platform *`myplatform`*.
+The HDL card definition
+named *`mycard.xml`* will be placed
+in the subdirectory *`hdl/platforms/myplatform/devices/specs/`*:
++
+--------------------------------------------
+ocpidev create hdl card mycard -P myplatform
+--------------------------------------------
++
+. Inside the project, delete an HDL card definition named *`mycard.xml`* from
+a project's *`hdl/cards/specs/`* subdirectory:
++
+------------------------------
+ocpidev delete hdl card mycard
+------------------------------
+
+BUGS
+----
+See https://www.opencpi.org/report-defects
+
+
+RESOURCES
+---------
+See the main web site: https://www.opencpi.org
+
+
+SEE ALSO
+--------
+link:ocpidev.1.html[ocpidev(1)]
+link:ocpidev-create.1.html[ocpidev-create(1)]
+link:ocpidev-delete.1.html[ocpidev-delete(1)]
+link:ocpidev-device.1.html[ocpidev-device(1)]
+link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
+link:ocpidev-slot.1.html[ocpidev-slot(1)]
+
+COPYING
+-------
+Copyright \(C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
+you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.

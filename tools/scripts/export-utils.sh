@@ -142,9 +142,14 @@ function make_relative_link {
     rm $2
   fi
   mkdir -p $(dirname $2)
-  # echo ln -s $link $2
-  ln -s $link $2
-  set +vx
+  # If the source does not exist, do not create the symlink.
+  if [ -e $1 ]; then
+    # echo ln -s $link $2
+    ln -s $link $2
+  else
+    echo "Warning: link target path created, but link source $1 does not '(yet?)' exist." >&2
+  fi
+  #set +vx
 }
 
 # link to source ($1) from link($2) if neither are filtered

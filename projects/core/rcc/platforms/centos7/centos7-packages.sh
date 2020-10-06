@@ -52,7 +52,7 @@ PKGS_R+=(unzip)
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
 PKGS_D+=(make autoconf automake libtool gcc-c++)
 #    for our development scripts
-PKGS_D+=(which wget)
+PKGS_D+=(which)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 PKGS_D+=(glibc-static glibc-devel binutils)
 #    for various building scripts for timing commands
@@ -77,6 +77,12 @@ PKGS_D+=(bash-completion=/etc/profile.d/bash_completion.sh)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
+#    Needed by Xilinx ISE 14.7
+PKGS_D+=(libSM libXi libXrandr)
+#    for the new "xilinx19_2_aarch*" platforms
+PKGS_D+=(openssl-devel)
+
+
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment
@@ -109,8 +115,9 @@ python3_ver=python36
 #    for ocpidev
 PKGS_E+=(python3 python3-devel ${python3_ver}-jinja2)
 #    for various testing scripts
-#    AV-5478: If the minor version changes here, fix script below
 PKGS_E+=(${python3_ver}-numpy ${python3_ver}-scipy python3-tkinter python3-pip)
+#    for building yaml-cpp
+PKGS_E+=(cmake3)
 #    for building init root file systems for embedded systems (enabled in devel?)
 PKGS_E+=(fakeroot)
 #    for OpenCL support (the switch for different actual drivers that are not installed here)
@@ -121,6 +128,8 @@ PKGS_E+=(${python3_ver}-scons)
 PKGS_E+=(dtc openssl-devel)
 #    Need to build plutosdr osp 
 PKGS_E+=(perl-ExtUtils-MakeMaker)
+#    Needed to generate gitlab-ci yaml
+PKGS_E+=(python36-PyYAML)
 
 ##########################################################################################
 # P. python3 packages that must be installed using pip3, which we have available
@@ -131,6 +140,13 @@ PKGS_E+=(perl-ExtUtils-MakeMaker)
 #    now, assume the justification for a package in this category is the same
 #    as for its python2 counterpart as given above.
 PKGS_P+=(matplotlib)
+
+#
+# Because long option strings impair readability.
+# Verified it is safe to invoke "yum" this way
+# regardless of the command (list, install, erase).
+#  
+YUM="yum --assumeyes --setopt=skip_missing_names_on_install=False"
 
 # functions to deal with arrays with <pkg>=<file> syntax
 function rpkgs {
@@ -159,8 +175,9 @@ function install_swig3 {
 
   if [ $need_swig3 -eq 1 ]
   then
-    $SUDO yum -y erase swig
-    $SUDO yum -y install swig3
+    $SUDO $YUM list swig3 > /dev/null 2>&1 || bad "swig3 package unavailable"
+    $SUDO $YUM erase swig
+    $SUDO $YUM install swig3
   fi
 }
 
@@ -184,11 +201,11 @@ fi
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source
-$SUDO yum -y install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S) --setopt=skip_missing_names_on_install=False
+$SUDO $YUM install $(ypkgs PKGS_R) $(ypkgs PKGS_D) $(ypkgs PKGS_S)
 [ $? -ne 0 ] && bad "Installing required packages failed"
 
 # Now those that depend on epel
-$SUDO yum -y install $(ypkgs PKGS_E) --setopt=skip_missing_names_on_install=False
+$SUDO $YUM install $(ypkgs PKGS_E)
 [ $? -ne 0 ] && bad "Installing EPEL packages failed"
 
 # SWIG is a special case on CentOS 7

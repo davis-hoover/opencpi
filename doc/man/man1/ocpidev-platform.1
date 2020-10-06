@@ -1,0 +1,590 @@
+.\"     Title: ocpidev-platform
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/26/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-PLATFORM" "1" "07/26/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-platform \- manage an OpenCPI HDL platform\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl platform\fR \fI<name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBhdl platform\fR noun represents an OpenCPI HDL platform, which is either a specific FPGA part on a circuit board with optionally attached devices or an FPGA simulator that has the infrastructure to serve as an OpenCPI \fIcontainer\fR (runtime environment) for \fIHDL assemblies\fR (FPGA\-based subsets of OpenCPI applications)\&.
+.sp
+An HDL platform is described by an OpenCPI HDL Platform Description (OHPD), which is an XML file that specifies:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The OpenCPI Worker Description (OWD) for the
+\fIHDL platform worker\fR, which is a special type of
+\fIHDL device worker\fR
+that contains the logic for running the HDL platform
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The devices (controlled by HDL device workers) that are attached to the HDL platform and are available for use
+.RE
+.sp
+In a project, an HDL platform resides in its own directory \fI<name>\fR (which is usually the lowercase version of the name used by the platform\(cqs vendor) under a \fBplatforms/\fR subdirectory in the project\(cqs \fBhdl/\fR directory\&.
+.sp
+An HDL platform directory contains the platform\(cqs OHPD (named \fI<name>\fR\fB\&.xml\fR), its "make" file (named \fBMakefile\fR) and the VHDL source code skeleton file \fI<name>\fR\fB\&.vhd\fR for the HDL platform worker\&. The \fBocpidev create\fR operation for an HDL platform produces initial versions of these files that can then be edited as necessary\&.
+.sp
+An HDL platform directory can also optionally contain:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+HDL device workers that are unique to the HDL platform, in a
+\fBdevices/\fR
+library
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+XML files that specify different configurations of the devices that are available on the HDL platform, called
+\fIplatform configuration files\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Vendor FPGA
+\fIconstraints\fR
+files for use with a specific platform configuration instead of the default configuration for the platfor
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+File(s) that specify vendor tool build\-time options
+.RE
+.sp
+The \fBocpidev build\fR operation generates exported files that enable HDL assemblies to be built for the platform and a \fBlib/\fR subdirectory that contains links to the files that are necessary for other OpenCPI assets to use the platform\&. Note that building a OpenCPI platform (whether HDL or RCC) is usually done at installation time because a platform cannot be used by other OpenCPI assets until it has been built\&. See the \fIOpenCPI Installation Guide\fR for a description of how OpenCPI platforms are built\&.
+.sp
+For information on the HDL build flow as it relates to HDL platforms and other HDL assets, see the chapter "Building HDL Assets" in the \fIOpenCPI HDL Development Guide\fR\&.
+.sp
+For information on developing an HDL platform, including structure and syntax descriptions of HDL platform/platform worker and HDL platform configuration XML files and how to develop an HDL device worker, see the section "Enabling Execution for FPGA Platforms" in the \fIOpenCPI Platform Development Guide\fR\&.
+.sp
+Verbs that can operate on an HDL platform are:
+.PP
+\fBbuild\fR
+.RS 4
+Build the HDL platform, creating directories and files as required\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Remove all the generated and compiled files for all assets in the HDL platform\&.
+.RE
+.PP
+\fBcreate\fR
+.RS 4
+Create the named HDL platform, creating files and directories as required\&.
+.RE
+.PP
+\fBdelete\fR
+.RS 4
+Remove all directories and files associated with the named HDL platform\&.
+.RE
+.PP
+\fButilization\fR
+.RS 4
+Display information about FPGA resource use by the HDL platform\&.
+.RE
+.sp
+Note that an asset\(cqs name is implied by the directory you\(cqre in when you issue the \fBocpidev\fR command\&. For HDL platforms, this means that you can perform operations (verbs) on the HDL platform without having to specify its name when you issue the \fBocpidev\fR command from inside the HDL platform\(cqs directory\&.
+.sp
+The \fBocpidev\fR tool can also operate on a plural \fBhdl platforms\fR noun\&. The syntax is:
+.sp
+\fBocpidev\fR [\fI<options>\fR] [\fBbuild|clean|show|utilization\fR] \fBhdl platforms\fR
+.sp
+The verbs that can be performed on the \fBhdl platforms\fR noun are:
+.PP
+\fBbuild\fR
+.RS 4
+Build all of the HDL platforms in the project or the
+\fBhdl/\fR
+subdirectory of the project, creating directories and files as required\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Remove all the generated and compiled files from all HDL platforms in the project or the
+\fBhdl/\fR
+subdirectory of the project\&.
+.RE
+.PP
+\fBshow\fR
+.RS 4
+List all HDL platforms in all registered projects and the current project\&. The general\-purpose options and the
+\fBshow\fR
+formatting options can be specified\&.
+.RE
+.PP
+\fButilization\fR
+.RS 4
+Display FPGA resource usage information for all built HDL platforms in the project\&. The general\-pupose options and the
+\fButilization\fR
+options can be specified\&.
+.RE
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.sp
+Keywords for platforms supported by OpenCPI that can be specified in the \fI<platform>\fR argument to an option can be found in the tables of supported platforms in the \fIOpenCPI User Guide\fR\&.
+.sp
+Keywords for architectures supported by OpenCPI that can be specified in the \fI<target>\fR argument to an option include \fBisim\fR, \fBmodelsim\fR, \fBxsim\fR, \fBstratix4\fR, \fBstratix5\fR, \fBvirtex5\fR, \fBvirtex6\fR, \fBzynq\fR, \fBzynq_is\fR, \fBspartan3adsp\fR\&.
+.SS "Options That Apply to All Operations (Verbs) on HDL Platforms"
+.PP
+\fB\-d\fR \fI<directory>\fR
+.RS 4
+Specify the directory in which the command should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&.
+.RE
+.PP
+\fB\-v, \-\-verbose\fR
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Options When Creating HDL Platforms"
+.PP
+\fB\-A\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for XML include files\&.
+.RE
+.PP
+\fB\-C\fR \fI<core>\fR+
+.RS 4
+Specify an HDL primitive core on which the HDL platform (or assets it contains) depends and with which it should be built\&.
+.RE
+.PP
+\fB\-I\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for include files (C, C++, Verilog)\&.
+.RE
+.PP
+\fB\-T\fR \fI<target>\fR+
+.RS 4
+Only build the HDL platform for the specified HDL architecture\&.
+.RE
+.PP
+\fB\-Y\fR \fI<primitive\-library>\fR+
+.RS 4
+Specify a primitive library on which the HDL platform (or assets it contains) depends\&.
+.RE
+.PP
+\fB\-Z\fR \fI<target>\fR+
+.RS 4
+Do not build the HDL platform for the specified HDL architecture\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Keep files and directories created after an HDL platform creation fails\&. Normally, all such files and directories are removed on any failure\&.
+.RE
+.PP
+\fB\-y\fR \fI<component\-library>\fR+
+.RS 4
+Specify a component library to search for workers, devices and/or specs referenced by one or more assets in the created HDL platform\&.
+.RE
+.SS "Options When Deleting HDL Platforms"
+.PP
+\fB\-f\fR
+.RS 4
+Force deletion: do not ask for confirmation when deleting an HDL platform\&. Normally, you are asked to confirm a deletion\&.
+.RE
+.SS "Options When Building HDL Platforms"
+.PP
+\fB\-\-hdl\-target=\fR\fI<target>\fR+
+.RS 4
+Build the HDL platform(s) for the specified HDL architecture\&. If only HDL targets are specified (and no HDL platforms), containers are not built\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<hdl\-platform>\fR+
+.RS 4
+Build the HDL platform(s) for the specified HDL platform\&.
+.RE
+.SS "Options When Showing HDL Platforms (plural noun only)"
+.PP
+\fB\-\-global\-scope\fR
+.RS 4
+Show HDL platforms from all registered projects and the current project if applicable\&. This is the default scope used if
+\fB\-\-local\-scope\fR
+is not used\&.
+.RE
+.PP
+\fB\-\-json\fR
+.RS 4
+Format the output in Javascript Object Notation (JSON) format for integration with other software\&.
+.RE
+.PP
+\fB\-\-local\-scope\fR
+.RS 4
+Only display information about the local HDL platform\&.
+.RE
+.PP
+\fB\-\-simple\fR
+.RS 4
+Format the output as simply as possible\&.
+.RE
+.PP
+\fB\-\-table\fR
+.RS 4
+Display the output in an easy\-to\-read table\&. This is the default display format used if
+\fB\-\-simple\fR
+or
+\fB\-\-json\fR
+are not used\&.
+.RE
+.SS "Options When Using Utilization on HDL Platforms"
+.PP
+\fB\-\-format=\fR{\fBtable\fR|\fBlatex\fR}
+.RS 4
+Specify the format in which to output the FPGA resource usage information\&. Specifying
+\fBtable\fR
+sends the information to stdout in tabular format\&. Specifying
+\fBlatex\fR
+bypasses
+\fBstdout\fR
+and writes all output to
+\fButilization\&.inc\fR
+files in the directories for the assets on which it operates\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<platform>\fR+
+.RS 4
+Display information about FPGA resource use by the built HDL platforms on the specified HDL platform\&. (???This and the others below don\(cqt make sense\&. Is it "the built assets in the HDL platform" that usage info is generated for?)
+.RE
+.PP
+\fB\-\-hdl\-library=\fR\fI<library>\fR
+.RS 4
+Display information about FPGA resource use by the built HDL platforms in the specified HDL library\&.
+.RE
+.PP
+\fB\-\-library=\fR\fI<library>\fR, \fB\-l\fR \fI<library>\fR
+.RS 4
+Display information about FPGA resource use by the built HDL platforms in the specified component library\&.
+.RE
+.PP
+\fB\-P\fR \fI<hdl\-platform>\fR
+.RS 4
+Display information about FPGA resource use by the built HDL platforms on the specified HDL platform\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Inside the project (at the top level), create the HDL platform
+\fBmyplatform\fR\&. The directory
+\fBmyplatform\fR
+is created in the
+\fBhdl/platforms\fR
+directory (which is also created if it doesn\(cqt exist):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl platform myplatform
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Inside the project (at the top level), create the HDL platform
+\fBmyplatform\fR, specifying that it can only be built for the
+\fBzed\fR
+HDL platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl platform myplatform \-\-only\-platform=zed
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside the project (at the top level), create the HDL platform
+\fBmyplatform\fR, specifying that it can only be built for the
+\fBzynq\fR
+HDL target:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl platform  myplatform \-T zynq
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Inside the project (from the top level or the
+\fBhdl/platforms/\fR
+directory), delete the HDL platform
+\fBmyplatform\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev delete hdl platform myplatform
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Inside the
+\fBmyplatform\fR
+HDL platform\(cqs directory, build the
+\fBmyplatform\fR
+platform for the
+\fBxsim\fR
+HDL platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build \-\-hdl\-platform=xsim
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 6.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  6." 4.2
+.\}
+Inside the project (from the top level or the
+\fBhdl/platforms/\fR
+directory), build all existing HDL platforms:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build hdl platforms
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 7.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  7." 4.2
+.\}
+Inside the
+\fBmyplatform\fR
+HDL platform\(cqs directory, build the
+\fBmyplatform\fR
+platform for the
+\fBzynq\fR
+HDL target:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build \-\-hdl\-target=zynq
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 8.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  8." 4.2
+.\}
+List all HDL platforms in all registered projects and the current project on which assets can be built:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev show hdl platforms
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 9.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  9." 4.2
+.\}
+Inside the project (from the top level of the
+\fBhdl/platforms/\fR
+directory), display information about FPGA resource use by the
+\fBmyplatform\fR
+HDL platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization hdl platform myplatform
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'10.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "10." 4.2
+.\}
+Inside the project (from the top level of the
+\fBhdl/platforms/\fR
+directory), display information about FPGA resource use by the HDL platforms in the project:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev utilization hdl platforms
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-build(1) ocpidev\-card(1) ocpidev\-create(1) ocpidev\-clean(1) ocpidev\-delete(1) ocpidev\-device(1) ocpidev\-library(1) ocpidev\-project(1) ocpidev\-slot(1) ocpidev\-show(1) ocpidev\-worker(1) ocpidev\-utilization(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

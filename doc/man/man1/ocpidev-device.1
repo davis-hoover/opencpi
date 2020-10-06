@@ -1,0 +1,561 @@
+.\"     Title: ocpidev-device
+.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
+.\"      Date: 07/26/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "OCPIDEV\-DEVICE" "1" "07/26/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ocpidev-device \- manage an OpenCPI HDL device worker\&.
+.SH "SYNOPSIS"
+.sp
+\fBocpidev\fR [\fI<options>\fR] \fI<verb>\fR \fBhdl device\fR \fI<name>\fR
+.SH "DESCRIPTION"
+.sp
+The \fBhdl device\fR noun represents an OpenCPI HDL device worker, which is a special type of HDL application worker designed to support specific external hardware attached to an HDL platform or card, such as an ADC, flash memory or I/O device\&.
+.sp
+While an application worker is a component implementation that requires only abstracted data interfaces, an HDL device worker is an HDL component implementation written to the HDL authoring model that directly controls and attaches to a physical device\&. An HDL device worker generally implements the device manufacturer\(cqs data sheet, providing access and visibility to the device\(cqs native registers and capabilities\&. HDL device workers allow OpenCPI to use the devices attached to an HDL platform and are developed as part of enabling an HDL platform for OpenCPI\&. The \fIOpenCPI Platform Development Guide\fR provides details on how to develop an HDL device worker\&.
+.sp
+An HDL device worker can be supported by:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A
+\fIdevice proxy\fR
+worker, which is an RCC worker written in C++ that is specifically paired with the HDL device worker to provide a higher\- level and more generic interface to the HDL device worker\(cqs low\-level one\&. The purpose of a device proxy worker is to make a device look more like others in its class, providing more user\- and software\-friendly access and visibility to the device\(cqs capabilities\&. The
+\fIOpenCPI RCC Development Guide\fR
+describes how to develop a proxy worker\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A
+\fIdevice emulator\fR
+worker, which is a specialized HDL device worker that emulates a device for test purposes\&. A device emulator worker provides the mirror image of the HDL device worker\(cqs external signals so that it can can emulate the device in simulation\&. The
+\fIOpenCPI Platform Development Guide\fR
+describes how to develop an HDL device emulator worker\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A
+\fIsubdevice\fR
+worker, which is a specialized HDL device worker that enables multiple HDL device workers to share some underlying hardware, like shared resets, shared SPI or I2C buses\&. They also allow device workers to stay portable when low\-level modules differ by HDL platform or card\&. The
+\fIOpenCPI Platform Development Guide\fR
+describes how to develop an HDL subdevice worker\&.
+.RE
+.sp
+These support workers can be HDL platform\-independent or HDL platform\-specific\&.
+.sp
+An HDL device worker (and its support workers) are OpenCPI workers and are thus described by an OpenCPI Worker Description (OWD)\&. For an HDL device worker:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The component specification (OCS) that the worker implements usually represents a specific type of device but can be an OpenCPI\-defined "device class" component spec (for example,
+\fBclock_gen\-spec\fR) and must be the OpenCPI\-defined
+\fBemulator\-spec\fR
+if the OWD describes an HDL device emulator worker\&. The OpenCPI\-defined OCSes are located in the top\-level
+\fBspecs/\fR
+directory of the
+\fBcore\fR
+project\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The language used for the source code is VHDL\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Signal connections with the hardware attached to the pins of the HDL platform (FPGA) are defined for the HDL device worker in addition to any port and property definitions\&. Signal connections defined in HDL subdevice worker OWDs are to pins that are shared between the HDL device workers that the HDL subdevice worker supports\&. Signal connections are not defined in emulator device worker OWDs because an HDL emulator device automatically inherits the signal connections from the device worker it emulates\&.
+.RE
+.sp
+An HDL subdevice worker OWD also specifies the device worker(s) that the HDL subdevice worker supports and how it connects to each supported HDL device worker\&.
+.sp
+The \fIOpenCPI Platform Development Guide\fR provides more information about the XML structure of HDL device worker, subdevice worker and emulator worker OWDs, while the \fIOpenCPI HDL Development Guide\fR provides information about the XML structure of an HDL worker OWD\&.
+.sp
+In a project, an HDL device worker resides in its own directory \fI<name>\fR\fB\&.hdl\fR and can be located in the following places depending on its intended use:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the platform\-generic HDL device library at
+\fBhdl/devices/\fR\&. This library contains HDL device workers that can be used on different HDL platforms and cards\&. It can also contain RCC\-based HDL device proxy workers, HDL subdevice workers and HDL device emulator workers for one or more HDL device workers in the library\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In a platform\-specific HDL device library at
+\fBplatforms/\fR\fI<hdl\-platform>\fR\fB/devices/\fR\&. This library contains HDL device workers, proxies, subdevices and emulators that function only on that platform\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In the directory
+\fBhdl/cards/\fR\&. This subdirectory contains HDL device workers, proxies, subdevices and emulators that are specific to or can only be used on cards, rather than those that are generally useful on different platforms and cards\&.
+.RE
+.sp
+Verbs that can operate on an HDL device worker are:
+.PP
+\fBbuild\fR
+.RS 4
+Compile the HDL device worker source code, creating files and directories as required\&.
+.RE
+.PP
+\fBclean\fR
+.RS 4
+Remove all generated and compiled files for the HDL device worker\&.
+.RE
+.PP
+\fBcreate\fR
+.RS 4
+Create the named HDL device worker, creating files and directories as required\&.
+.RE
+.PP
+\fBdelete\fR
+.RS 4
+Remove all directories and files associated with the named HDL device worker\&.
+.RE
+.sp
+Note that the \fButilization\fR verb can be used with the \fBworker\fR noun to display an HDL device worker\(cqs FPGA usage statistics\&. See ocpidev\-worker(1) for more information\&.
+.sp
+Within the HDL device worker\(cqs directory are the worker\(cqs "make" file (named Makefile), its OWD (named \fI<name>\fR\fB\&.xml\fR) and its primary source code file (named \fI<name>\fR\fB\&.vhd\fR\&. The \fBocpidev create\fR operation produces initial versions of these files that can then be edited as necessary to produce the HDL device worker implementation\&.
+.sp
+The \fBocpidev build\fR operation for an HDL device worker creates additional files in the worker\(cqs directory, such as architecture\-independent source code and XML files, in a directory named \fBgen\fR and architecture\-specific object and binary files for the compilation target being built, in a directory named \fBtarget\-\fR\fI<hdl\-platform>\fR; for example, \fBtarget\-zed\fR or \fBtarget\-xsim\fR\&. These are the files that the \fBocpidev clean\fR operation removes\&.
+.sp
+Note that an asset\(cqs name is implied by the directory you\(cqre in when you issue the \fBocpidev\fR command\&. For HDL device workers, this means that you can perform operations (verbs) on the HDL device worker without having to specify its name when you issue the \fBocpidev\fR command from inside the HDL device worker directory\&.
+.SH "OPTIONS"
+.sp
+In the descriptions below, a plus sign (+) after the option indicates that it can be specified more than once on the command line\&.
+.sp
+Keywords for platforms supported by OpenCPI that can be specified in the \fI<platform>\fR argument to an option can be found in the tables of supported platforms in the \fIOpenCPI User Guide\fR\&.
+.sp
+Keywords for architectures supported by OpenCPI that can be specified in the \fI<target>\fR argument to an option include \fBisim\fR, \fBmodelsim\fR, \fBxsim\fR, \fBstratix4\fR, \fBstratix5\fR, \fBvirtex5\fR, \fBvirtex6\fR, \fBzynq\fR, \fBzynq_is\fR, \fBspartan3adsp\fR\&.
+.SS "Options That Apply to All Operations (Verbs) on HDL Device Workers"
+.PP
+\fB\-\-hdl\-library=\fR\fI<hdl\-library>\fR, \fB\-h\fR \fI<hdl\-library>\fR
+.RS 4
+Specify the HDL library under the
+\fBhdl/\fR
+directory of the project in which to operate on the HDL device worker\&. Valid values are only one of:
+\fBdevices\fR,
+\fBcards\fR,
+\fBadapters\fR\&.
+.RE
+.PP
+\fB\-d\fR \fI<directory>\fR
+.RS 4
+Specify the directory in which the command should be run\&. Analogous to the
+\fB\-C\fR
+option in the POSIX
+\fBmake\fR
+command\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-verbose\fR
+.RS 4
+Describe what is happening in command execution in more detail\&.
+.RE
+.SS "Options When Creating HDL Device Workers"
+.PP
+\fB\-\-exclude\-platform=\fR\fI<platform>\fR, \fB\-Q\fR \fI<platform>\fR+
+.RS 4
+Do not build the HDL device worker for the specified platform\&. See also the description of the
+\fBExcludePlatforms=\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-\-only\-platform=\fR\fI<platform>\fR, \fB\-G\fR \fI<platform>\fR+
+.RS 4
+Only build the HDL device worker for the specified platform\&. See also the description of the
+\fBOnlyPlatforms\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-A\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for XML include files\&.
+.RE
+.PP
+\fB\-C\fR \fI<core>\fR+
+.RS 4
+Specify an HDL primitive core on which the HDL device worker depends and with which it should be built\&.
+.RE
+.PP
+\fB\-E\fR \fI<hdl\-device>\fR
+.RS 4
+Specify that the HDL device worker being created is an emulator worker for the specified HDL device worker\&.
+.RE
+.PP
+\fB\-I\fR \fI<directory>\fR+
+.RS 4
+Specify a directory to search for include files (C, C++, Verilog)\&.
+.RE
+.PP
+\fB\-O\fR \fI<file>\fR+
+.RS 4
+Specify a source code file to compile when building the HDL device worker that is not included by default; that is, in addition to the
+\fI<name>\fR\fB\&.vhd\fR
+file\&.
+.RE
+.PP
+\fB\-P\fR \fI<hdl\-platform>\fR
+.RS 4
+Specify that the worker being created is a platform\-specific HDL device worker or device proxy to be created in the
+\fBdevices/\fR
+library for the specified HDL platform in the project\&.
+.RE
+.PP
+\fB\-S\fR \fI<component\-spec>\fR
+.RS 4
+Specify the component specification (OCS) that the HDL device worker implements\&.
+.RE
+.PP
+\fB\-T\fR \fI<target>\fR+
+.RS 4
+Only build the HDL device worker for the specified architecture\&. See also the description of the
+\fBOnlyTargets\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-U\fR \fI<hdl\-device>\fR+
+.RS 4
+Specify that the HDL device worker being created is an HDL subdevice worker that supports the specified HDL device worker\&.
+.RE
+.PP
+\fB\-Y\fR \fI<primitive\-library>\fR+
+.RS 4
+Specify an HDL primitive library on which the HDL device worker depends\&.
+.RE
+.PP
+\fB\-Z\fR \fI<target>\fR+
+.RS 4
+Do not build the HDL device worker for the specified architecture\&. See also the description of the
+\fBExcludeTargets\fR
+OWD attribute in the
+\fIOpenCPI Component Development Guide\fR\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Keep files and directories created after an HDL device worker creation fails\&. Normally, all such files and directories are removed on any failure\&.
+.RE
+.PP
+\fB\-y\fR \fI<component\-library>\fR+
+.RS 4
+Specify a component library to search for workers, devices and/or specs referenced by the HDL device worker being created\&.
+.RE
+.SS "Options When Deleting HDL Device Workers"
+.PP
+\fB\-f\fR
+.RS 4
+Force deletion: do not ask for confirmation when deleting a worker\&. Normally, you are asked to confirm a deletion\&.
+.RE
+.SS "Options When Building HDL Device Workers"
+.PP
+\fB\-\-hdl\-target=\fR\fI<target>\fR+
+.RS 4
+Build the HDL device worker for the specified HDL architecture\&.
+.RE
+.PP
+\fB\-\-hdl\-platform=\fR\fI<hdl\-platform>\fR+
+.RS 4
+Build the HDL device worker for the specified HDL platform\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+At the top level of the project, create a platform\-specific HDL device worker named
+\fBmydevworker\fR
+that implements the
+\fBmydevcomp\fR
+OCS and runs on the HDL platform
+\fBmyplatform\fR\&. (The OCS does not need to be specified on the command line if the HDL device worker has the same name as the component spec\&.) The HDL device worker directory
+\fBmydevworker\&.hdl\fR
+is created in the HDL library
+\fB/hdl/platforms/myplatform/devices/\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl device mydevworker\&.hdl \-S mydevcomp\-spec \-P myplatform
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+At the top level of the project, create a platform\-independent HDL device worker named
+\fBmydevcomp\fR
+that implements the
+\fBmydevcomp\fR
+OCS\&. The HDL device worker directory
+\fBmydevcomp\&.hdl\fR
+is created in the HDL library
+\fBhdl/devices/\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl device mydevcomp\&.hdl \-\-hdl\-library=devices
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Inside the project\(cqs
+\fBhdl/devices/\fR
+directory, create a platform\-independent HDL emulator device worker named
+\fBmyemulator\fR
+to support the HDL device worker
+\fBmydevice\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl device myemulator\&.hdl \-E mydevice \-S emulator\-spec
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Inside the project\(cqs
+\fBhdl/devices/\fR
+directory, create a platform\-independent HDL subdevice worker named
+\fBmysubdevice\fR
+to support the HDL device worker
+\fBmydevice\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev create hdl device myemulator\&.hdl \-U mydevice
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Inside the HDL device worker\(cqs directory, compile its source code:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build hdl device
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 6.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  6." 4.2
+.\}
+Inside the
+\fBhdl/devices/\fR
+directory in the project, compile the source code for the HDL device worker named
+\fBmydevice\fR
+for the
+\fBzed\fR
+and
+\fBxsim\fR
+platforms:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build device mydevice\&.hdl \-\-hdl\-platform=zed \-\-hdl\-platform=xsim
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 7.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  7." 4.2
+.\}
+Inside the directory for the HDL device worker named
+\fBmydevice\fR
+for the
+\fBmyplatform\fR
+platform (\fBhdl/platforms/myplatform/devices/mydevice\&.hdl/\fR), compile the device worker\(cqs source code for for the Zynq HDL architecture:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev build hdl device mydevice\&.hdl \-\-hdl\-target=zynq
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 8.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  8." 4.2
+.\}
+Inside the HDL device worker\(cqs directory, remove the compiled source code for the HDL device worker named
+\fBmydevice\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpidev clean hdl device
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "BUGS"
+.sp
+See https://www\&.opencpi\&.org/report\-defects
+.SH "RESOURCES"
+.sp
+See the main web site: https://www\&.opencpi\&.org
+.SH "SEE ALSO"
+.sp
+ocpidev(1) ocpidev\-application(1) ocpidev\-assembly(1) ocpidev\-card(1) ocpidev\-build(1) ocpidev\-clean(1) ocpidev\-component(1) ocpidev\-create(1) ocpidev\-delete(1) ocpidev\-library(1) ocpidev\-platform(1) ocpidev\-primitive(1) ocpidev\-project(1) ocpidev\-slot(1) ocpidev\-worker(1)
+.SH "COPYING"
+.sp
+Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.

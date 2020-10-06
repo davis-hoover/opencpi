@@ -19,12 +19,13 @@
 ################################################################################
 # This file defines the ubuntu16_04 software platform.
 # It sets platform variables as necessary to override the defaults in
-#   "tools/cdk/include/platform-defaults.mk".
+#   "tools/include/platform-defaults.mk".
 # See that file for a description of valid variables and their defaults.
 
 OcpiPlatformOs=linux
 OcpiPlatformOsVersion=u16_04
 OcpiPlatformArch=x86_64
+
 #
 # "OcpiKernelDir" must be set if it is appropriate to build
 # the "opencpi.ko" driver module for this platform.

@@ -1,4 +1,5 @@
-<HdlWorker Language="vhdl" Spec="capture_v2-spec" DataWidth="32" Version='2'>
+<HdlWorker Language="vhdl" Spec="capture_v2-spec" DataWidth="32" Version='2'
+	   libraries='util'>
 
   <SpecProperty Name="metadata" Raw="true"/>
   <SpecProperty Name="data" Raw="true"/>

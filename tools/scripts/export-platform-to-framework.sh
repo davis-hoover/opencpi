@@ -70,12 +70,23 @@ for a in $deployments; do
   do_addition $a -- $platform $platform_dir
 done
 
+if [ $model = hdl ]; then
+  # Make sure the artifacts are exported
+  make -C projects/assets exports
+  tbz=projects/assets/exports/artifacts/ocpi.assets.testbias_${platform}_base.hdl.0.${platform}.bitz
+  if [ -f $tbz ]; then
+    make_relative_link $tbz exports/$platform/$(basename $tbz)
+  else
+    echo The file \"$tbz\" is not present, which is a failure for hdl platforms.
+    exit 1
+  fi
+fi
 [ $model != rcc ] && exit 0
 
 [ -n "$verbose" ] && echo Processing framework source-code-based links for rcc platform $platform
 while read path opts; do
   case "$path" in
-    \#*|""|end-of-runtime-for-tools|prerequisites) continue;;
+    \#*|""|end-of-runtime-for-tools|prerequisites|host-only-prerequisites) continue;;
   esac
   directory= library=$(basename $path) dest=lib options=($opts) foreign= tools= driver= useobjs=
   library=${library//-/_}
@@ -137,12 +148,26 @@ while read path opts; do
   fi
   [ -n "$swig" ] && {
     base=$(basename $swig .i)
-    for f in build/autotools/target-$platform/staging/lib/{,_}$base.* ; do
-        make_filtered_link $f exports/$platform/lib/opencpi/$(basename $f)
+    fromdir=build/autotools/target-$platform/staging/lib
+    file=_$base.so
+    if [ -f $fromdir/$file ]; then
+        make_filtered_link $fromdir/$file exports/$platform/lib/opencpi/$file
+        make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi/$base.py
         # swig would be runtime on systems with python and users' ACI programs that used it
-        [ -z "$tools" ] &&
-          make_filtered_link $f exports/runtime/$platform/lib/opencpi/$(basename $f)
-    done
+        [ -z "$tools" ] && {
+	    make_filtered_link $fromdir/$file exports/runtime/$platform/lib/opencpi/$file
+            make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi/$base.py
+	}
+    fi
+    file=_${base}2.so
+    if [ -f $fromdir/$file ]; then
+        make_filtered_link $fromdir/$file exports/$platform/lib/opencpi2/_${base}.so
+        make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi2/$base.py
+        [ -z "$tools" ] && {
+	    make_filtered_link $fromdir/$file exports/runtime/$platform/lib/opencpi2/$file
+            make_filtered_link $fromdir/$base.py exports/$platform/lib/opencpi2/$base.py
+	}
+    fi
   }
   shopt -u nullglob
   [ -n "$api_incs" ] && {
@@ -160,11 +185,11 @@ check=$platform_dir/${platform}-check.sh
   to=$(python3 -c "import os.path; print(os.path.relpath('"$check"', '.'))")
   make_relative_link $to exports/runtime/$platform/$(basename $check)
   # FIXME: make sure this is actually used and needed or maybe it should be used and isn't?
-  cat <<-EOF > exports/runtime/$platform/${rcc_platform}-init.sh
+  cat <<-EOF > exports/runtime/$platform/${platform}-init.sh
 	# This is the minimal setup required for runtime
-	export OCPI_TOOL_PLATFORM=$rcc_platform
+	export OCPI_TOOL_PLATFORM=$platform
 	export OCPI_TOOL_OS=$OcpiPlatformOs
-	export OCPI_TOOL_DIR=$rcc_platform
+	export OCPI_TOOL_DIR=$platform
 	EOF
 }
 # Put the minimal set of artifacts to support the built-in runtime tests or
@@ -210,7 +235,7 @@ function anylink {
 }
 shopt -s nullglob
 for p in prerequisites/*; do
-  for l in $p/$platform/lib/*; do
+  for l in $p/$platform/lib/lib*; do # ignore any files not starting with lib
     liblink $l exports
     if [[ $l == *.so || $l == *.so.* || $l == *.dylib ]]; then
        liblink $l exports/runtime

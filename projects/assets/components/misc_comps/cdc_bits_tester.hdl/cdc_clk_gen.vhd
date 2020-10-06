@@ -23,7 +23,8 @@ library cdc;
 library clocking;
 
 entity cdc_clk_gen is
-    generic (src_clk_hz : real := 100000000.0;
+    generic (ctl_clk_hz : real := 100000000.0;
+             src_clk_hz : real := 100000000.0;
              dst_clk_hz : real := 100000000.0);
     port (
       	ctl_clk      : in std_logic;
@@ -35,7 +36,6 @@ entity cdc_clk_gen is
 end entity cdc_clk_gen;
 
 architecture rtl of cdc_clk_gen is
-
   signal s_src_clk            : std_logic := '0';
   signal s_src_rst            : std_logic;
   signal s_dst_clk            : std_logic := '0';
@@ -100,8 +100,8 @@ begin
     inst_100_to_50 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
-        CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
-        CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
+        CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
+        CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 24.0,
@@ -115,7 +115,7 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
-        CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
+        CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
@@ -134,8 +134,8 @@ begin
     inst_100_to_25 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
-        CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
-        CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
+        CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
+        CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 48.0,
@@ -149,7 +149,7 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
-        CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
+        CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
@@ -168,8 +168,8 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
-        CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
-        CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
+        CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
+        CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 12.0,
@@ -183,7 +183,7 @@ begin
     inst_100_to_50 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
-        CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
+        CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
@@ -202,8 +202,8 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
-        CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
-        CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
+        CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
+        CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 12.0,
@@ -217,7 +217,7 @@ begin
      inst_100_to_25 : clocking.clocking.clock_generator
        generic map (
          CLK_PRIMITIVE          => to_string("mmcme2", 32),
-         CLK_IN_FREQUENCY_MHz   => src_clk_hz/(1.0E6),
+         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
          CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
          M                      => 12.0,
          N                      => 1,

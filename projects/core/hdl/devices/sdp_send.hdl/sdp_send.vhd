@@ -19,9 +19,9 @@
 -- The SDP Sender, to take data from a WSI port, and put it in memory, making it available
 -- for someone to read it out and acknowledge that reading.
 
-library IEEE, ocpi, util, bsv, sdp, cdc;
+library IEEE, ocpi, util, ocpi_core_bsv, sdp, cdc;
 use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-use ocpi.types.all, ocpi.util.all, sdp.all, sdp.sdp.all;
+use ocpi.types.all, ocpi.util.all, sdp.all, sdp.sdp.all, ocpi_core_bsv.all;
 architecture rtl of worker is
   -- Local worker constants
   constant sdp_width_c    : natural := to_integer(sdp_width);
@@ -92,7 +92,7 @@ architecture rtl of worker is
   signal eof_sent_r        : bool_t; -- input eof indication conveyed/enqueued
 
   -- SDP back side --
-  signal sdp_reset              : std_logic; -- reset from EITHER sdp_in.reset or ctl_in.reset
+  signal sdp_my_reset           : std_logic; -- reset from EITHER sdp_reset or ctl_in.reset
   signal ctl2sdp_reset          : std_logic;
   signal bramb_addr             : bram_addr_t;
   signal bramb_addr_r           : bram_addr_t;
@@ -152,7 +152,6 @@ begin
   -- Take even if bad write to send the truncation error in the metadata
   taking             <= can_take and in_in.ready;
   in_out.take        <= taking;
---  in_out.clk         <= sdp_in.clk;
   ctl_out.finished   <= buffer_size_fault_r or doorbell_fault_r;
   props_out.faults(props_out.faults'length-1 downto 3) <= (others => '0');
   props_out.local_buffers_ready <= (others => '0'); -- do not support passive yet
@@ -171,8 +170,8 @@ begin
       generic map(
         width => 3)
       port map(
-        src_clk           => sdp_in.clk,
-        src_rst           => sdp_reset,
+        src_clk           => sdp_clk,
+        src_rst           => sdp_my_reset,
         src_in(0)         => truncation_fault_r,
         src_in(1)         => doorbell_fault_r,
         src_in(2)         => buffer_size_fault_r,
@@ -185,8 +184,8 @@ begin
   -- increment for each cycle where the input is high
   trunc_data : component cdc.cdc.count_up
     generic map(width => props_out.truncatedData'length)
-    port map   (src_clk           => sdp_in.clk,
-                src_rst           => sdp_reset,
+    port map   (src_clk           => sdp_clk,
+                src_rst           => sdp_my_reset,
                 src_in            => truncatedData, -- a count-up pulse
                 dst_clk           => ctl_in.clk,
                 dst_rst           => ctl_in.reset,
@@ -203,13 +202,13 @@ begin
                 ADDR_WIDTH => addr_width_c,
                 DATA_WIDTH => sdp_width_c * 32,
                 MEMSIZE    => memory_depth_c)
-    port map   (CLKA       => sdp_in.clk,
+    port map   (CLKA       => sdp_clk,
                 ENA        => '1',
                 WEA        => will_write,
                 ADDRA      => std_logic_vector(bram_addr_actual),
                 DIA        => in_in.data,
                 DOA        => open,
-                CLKB       => sdp_in.clk,
+                CLKB       => sdp_clk,
                 ENB        => '1',
                 WEB        => '0',
                 ADDRB      => std_logic_vector(bramb_addr),
@@ -217,11 +216,11 @@ begin
                 DOB        => bramb_out);
 
   -- wsi to sdp, telling SDP to send next buffer with this metadata, same clock domain
-  metafifo : component bsv.bsv.SizedFifo
+  metafifo : component bsv_pkg.SizedFifo
    generic map(p1Width      => metawidth_c,
                p2depth      => roundup_2_power_of_2(max_buffers_c),
                p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
-   port map   (CLK     => sdp_in.clk,
+   port map   (CLK     => sdp_clk,
                RST     => sdp_reset_n,
                ENQ     => std_logic(md_enq),
                D_IN    => meta2slv(md_in),
@@ -239,7 +238,7 @@ begin
                depth       => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2
    port map   (src_CLK     => ctl_in.clk, -- maybe syncfifo later
                src_RST     => ctl_in.reset,
-               dst_CLK     => sdp_in.clk,
+               dst_CLK     => sdp_clk,
                src_ENQ     => std_logic(flag_enq),
                src_IN      => std_logic_vector(flag_in_remote),
                src_FULL_N  => flag_not_full,
@@ -261,19 +260,19 @@ begin
                 src_rst           => ctl_in.reset,
                 src_in            => ctl_in.is_operating,
                 src_en            => '1',
-                dst_clk           => sdp_in.clk,
-                dst_rst           => sdp_reset,
+                dst_clk           => sdp_clk,
+                dst_rst           => sdp_my_reset,
                 dst_out           => sdp_is_operating);
   ctl2sdp_rst : component cdc.cdc.reset
     port map   (src_rst           => ctl_in.reset,
-                dst_clk           => sdp_in.clk,
+                dst_clk           => sdp_clk,
                 dst_rst           => ctl2sdp_reset);
-  sdp_reset <= sdp_in.reset or ctl2sdp_reset;
+  sdp_my_reset <= sdp_reset or ctl2sdp_reset;
   -- the process going from wsi into the data bram and metadata fifo
-  wsi2bram : process(sdp_in.clk)
+  wsi2bram : process(sdp_clk)
   begin
-    if rising_edge(sdp_in.clk) then
-      if sdp_reset = '1' then
+    if rising_edge(sdp_clk) then
+      if sdp_my_reset = '1' then
         buffer_offset_r     <= (others => '0');
         buffer_maxed_r      <= bfalse;
         buffer_index_r      <= (others => '0');
@@ -344,7 +343,7 @@ begin
 
   --------------------------------------------------------------------------------
   -- BRAM to SDP signals and process, in the clock domain from the SDP.
-  sdp_reset_n         <= not sdp_reset;
+  sdp_reset_n         <= not sdp_my_reset;
   sdp_last_remote     <= resize(props_in.remote_count -1, remote_idx_t'length);
   md_out              <= slv2meta(md_out_slv);
   md_out_ndws         <= resize((md_out.length + dword_bytes - 1) srl 2, md_out_ndws'length);
@@ -394,7 +393,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   ---- trying to avoid any dead cycles except one at the start of the message
   ---- sending data(except for ZLM), metadata, flag transfers
   ---- breaking up the data messages into SDP-required segments
-  bram2sdp : process(sdp_in.clk)
+  bram2sdp : process(sdp_clk)
     variable r : natural;
     variable started_remote : boolean;
     impure function remote_is_ready(r : natural) return boolean is
@@ -496,10 +495,10 @@ g0: for i in 0 to sdp_width_c-1 generate
       end if;
     end procedure begin_remote;
   begin
-    if rising_edge(sdp_in.clk) then
+    if rising_edge(sdp_clk) then
       r              := to_integer(sdp_remote_idx_r);
       started_remote := false;
-      if its(sdp_reset) then
+      if its(sdp_my_reset) then
         -- Reset state for remotes
         for rr in 0 to max_remotes_c - 1 loop
           sdp_remotes(rr).index <= (others => '0');

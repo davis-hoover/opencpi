@@ -54,10 +54,10 @@ PKGS_R+=(unzip)
 ##########################################################################################
 # D. devel (when users are doing their development).
 #    for ACI and worker builds (and to support our project workers using autotools :-( )
-PKGS_D+=(make autoconf automake libtool g++)
+PKGS_D+=(cmake make autoconf automake libtool g++)
 #    for our development scripts
 #    for CentOS7, "which" is in a separate package: *ubuntu has it in debianutils
-PKGS_D+=(debianutils wget)
+PKGS_D+=(debianutils)
 #    for development and solving the "/lib/cpp failed the sanity check" a long shot
 #    *ubuntu library packages include the static versions
 PKGS_D+=(libc6-dev binutils)
@@ -94,8 +94,10 @@ PKGS_S+=(git)
 #    for prerequisite downloading and building:
 PKGS_S+=(patch)
 #    for building kernel drivers (separate from pre-packaged driver)
-KVER=`uname -r`
-PKGS_S+=(linux-headers-$KVER)
+#    don't install if in a "docker" container
+[[ -e /.dockerenv || -e /run/.containerenv ]] || {
+  PKGS_S+=(linux-headers-$(uname -r))
+}
 #    for "make rpm":
 #      does not necessarily make sense for debian-based
 #      distros, but will include for completeness
@@ -108,6 +110,8 @@ PKGS_S+=(libc6-dev-i386)
 PKGS_S+=(oxygen5-icon-theme default-jre tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
+#    Needed to generate gitlab-ci yaml
+PKGS_S+=(python3-yaml)
 
 ##########################################################################################
 # E. installations that have to happen after we run "apt-get install" once, and also
@@ -128,7 +132,7 @@ PKGS_E+=(ocl-icd-libopencl1)
 #    Needed to build gpsd
 PKGS_E+=(scons)
 #    Needed to build plutosdr osp
-PKGS_D+=(libssl-dev device-tree-compiler)
+PKGS_E+=(libssl-dev device-tree-compiler)
 
 #
 # Comments around/within the next two functions are for my own
@@ -186,17 +190,20 @@ fi
 # an error to run "dpkg --add-architecture i386" more than once.
 $SUDO dpkg --add-architecture i386
 
-# Enable TimSC Personal Package Archive (PPA): needed for "swig"
-if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
-then
-  $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
-fi
-
 # Make sure "apt-get" knows about the latest available packages
 # in all configured repositories.  Although running this is in
 # accordance with best practices anyway, it is mandatory if we
 # added the i386 architecture or the TimSC PPA above. 
 $SUDO apt-get update
+
+# Need this for `add-apt-repository` command used later
+$SUDO apt-get --yes install software-properties-common
+
+# Enable TimSC Personal Package Archive (PPA): needed for "swig"
+if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
+then
+  $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
+fi
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source.  Specify "--no-act" for debugging.
