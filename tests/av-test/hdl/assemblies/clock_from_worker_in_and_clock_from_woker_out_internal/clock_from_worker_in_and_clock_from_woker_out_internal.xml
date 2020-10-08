@@ -1,0 +1,18 @@
+<!-- The clock_from_worker_in_and_clock_from_woker_out_internal HDL assembly xml file -->
+<HdlAssembly>
+  <Instance name='clock_from_worker_out_only' Worker='clock_from_worker_out_only'/>
+
+  <Instance Worker='bias_vhdl' Name='bias_vhdl'/>
+
+  <Connection>
+    <port instance='clock_from_worker_out_only' from='out'/>
+    <port instance='bias_vhdl' to='in'/>
+  </Connection>
+
+  <Instance name='clock_from_worker_in_only' Worker='clock_from_worker_in_only'/>
+
+  <Connection>
+    <port instance='bias_vhdl' from='out'/>
+    <port instance='clock_from_worker_in_only' to='in'/>
+  </Connection>
+</HdlAssembly>

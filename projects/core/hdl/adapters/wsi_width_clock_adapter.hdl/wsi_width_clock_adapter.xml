@@ -9,6 +9,6 @@
     <property name='width_in' parameter='1' default='32'/>
     <property name='width_out' parameter='1' default='32'/>
   </ComponentSpec>
-  <streaminterface name='in' datawidth='width_in' myclock='1'/>
-  <streaminterface name='out' datawidth='width_out' myclock='1' workerEOF='1'/>
+  <streaminterface name='in' datawidth='width_in' clockDirection='in'/>
+  <streaminterface name='out' datawidth='width_out' clockDirection='in' workerEOF='1'/>
 </HdlImplementation>

@@ -1,0 +1,15 @@
+<HdlAssembly>
+  <Instance name='file_read' Worker='file_read'/>
+  <Connection>
+    <port instance='file_read' name='out'/>
+    <port instance='bias_vhdl' name='in'/>
+  </Connection>
+
+  <Instance Name='bias_vhdl' Worker='bias_vhdl'/>
+  <Instance Worker='clock_from_worker_in_only' Name='clock_from_worker_in_only'/>
+  <Connection>
+    <port instance='bias_vhdl' name='out'/>
+    <port instance='clock_from_worker_in_only' name='in'/>
+  </Connection>
+  
+</HdlAssembly>
