@@ -1,0 +1,9 @@
+<HdlAssembly>
+  <Instance Worker='clock_from_worker_out_only' Name='clock_from_worker_out_only'/>
+
+  <Instance name='file_write' Worker='file_write'/>
+  <Connection>
+    <port instance='clock_from_worker_out_only' from='out'/>
+    <port instance='file_write' to='in'/>
+  </Connection>
+</HdlAssembly>
