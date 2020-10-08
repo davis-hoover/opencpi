@@ -166,7 +166,7 @@ void addParamConfigParameters(const ParamConfig &pc, const OU::Assembly::Propert
   InstancePort *
   findInstancePort(const char *name);
   void
-    propagateClocks(),
+    propagateClocks(bool enableControlClock = true),
     emitAssyInstance(FILE *f, Instance *i); //, unsigned nControlInstances);
 };
 

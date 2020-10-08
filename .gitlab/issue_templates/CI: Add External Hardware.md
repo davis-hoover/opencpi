@@ -26,7 +26,6 @@ OPENCPI MAINTAINERS ARE IN NO WAY RESPONSIBLE OR LIABLE FOR ANYTHING AT ALL
 THAT MIGHT HAPPEN OR DOES HAPPEN TO THE HARDWARE HOSTING THE RUNNER AND/OR
 ANYTHING CONNECTED TO THE HOSTING HARDWARE.
 
-By submitting a request to add a runner you are acknowleding the above and are
+By submitting a request to add a runner you are acknowledging the above and are
 okay with it.
 
-/label ~"type::chore"

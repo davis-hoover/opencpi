@@ -1,3 +1,40 @@
+# [v2.0.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-rc.2...v2.0.0) (2020-10-06)
+
+Changes/additions since [OpenCPI Release v2.0.0-rc.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0-rc.2)
+
+### New Features
+- **tools**: add dockerfile for docker image used during GRCon20 workshops. (!386)(94e17772)
+
+### Enhancements
+- **app**: include the demo app from tutorial 1 in the tutorial project for completeness. (!373)(1566b9e9)
+- **comp**: Add timed sample protocols. (!370)(90c31833)
+- **comp**: add rcc and hdl workers for the tutorial 1 workers so we have both rcc and hdl of all of them. (!373)(1566b9e9)
+- **comp**: cleanup another tutorial worker, `peak_detector.rcc`, for tutorial 2. (!373)(1566b9e9)
+- **doc**: add files for the `timestamper_scdcd` datasheet to be compiled. (!357)(37931d3b)
+- **runtime**: to be more consistent, enable "worker" attribute in app instances to include the authoring model suffix. (!373)(1566b9e9)
+- **runtime**: allow "worker" variable in selection expressions. (!373)(1566b9e9)
+- **runtime**: when there are no slaves indicated for a proxy instance (like from GRC), find slaves automatically if such a thing can be unambiguous.  This is still not fully inferred slaves, it is inferred slaves when they are already present, but not indicated as slaves. (!373)(1566b9e9)
+- **runtime**: enable `OCPI_APPLICATION_PARAMS` to work better and for more options like `dump` and `verbose` (still not documented). (!373)(1566b9e9)
+- **runtime**: have our hdl sim drivers kill sims on `SIGTERM` as well as `SIGINT`. (!373)(1566b9e9)
+- **tools**: `ocpigen`: make `ocpi_debug` a hidden property. (!373)(1566b9e9)
+- **tools**: `ocpigr37`: make `ocpi_container` a pseudo-property for GRC to be "partly hidden". (!373)(1566b9e9)
+- **tools**: add platform, worker, model, and "done" pseudo-properties to the `ocpigr37` output, and put them last after normal properties. (!373)(1566b9e9)
+- **tools**: `ocpigen`: make `ocpi_endian` a hidden property. (!373)(1566b9e9)
+- **tools**: add env var `OCPI_DISTRO_BUILD` to enable generic x86_64 distro build feature. (!380)(e849452b)
+- **tools**: build generic x86_64 GMP library when `OCPI_DISTRO_BUILD` env var is set. (!380)(e849452b)
+- **tools**: add non-positional parameter handling to `ocpiadmin`. (!384)(cb1209c6)
+
+### Bug Fixes
+- **comp**: fix bug in `cdc_clk_gen.vhd`. (!378)(3ac9aac6)
+- **hdl base**: fix an ancient bug in VHDL delta cycles that we previously blamed on being an isim-only bug. (!373)(1566b9e9)
+- **runtime**: don't end up busy-waiting when the container has no applications to run at all. (!373)(1566b9e9)
+- **tests**: fix typo in `ocpidev_directory_test.sh` relating to `ocpishow.py`. (!377)(0723c9aa)
+- **tools**: fix an ancient bug in modelsim building that could report an error which then "disappeared" on rebuild. (!373)(1566b9e9)
+- **tools**: make the tutorial project depend on platform so it can build for pluto and other OSPs. (!373)(1566b9e9)
+- **tools**: fix `centos8-check.sh` script. (!375)(03a04a91)
+- **tools**: fix `ocpishow.py` to have better error handling. (!377)(0723c9aa)
+- **tools**: fix `project.py` (in `tools/python/_opencpi`) to have better error handling. (!377)(0723c9aa)
+
 # [v2.0.0-rc.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2020-09-22)
 
 Changes/additions since [OpenCPI Release v2.0.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0-rc.1)

@@ -204,6 +204,7 @@ rename(const char *name, Port *port) {
   if ((m_port = port)) {
     m_port->m_myClock = true;
     m_port->deriveOCP();
+    m_port->m_clock = this;
   }
 }
 

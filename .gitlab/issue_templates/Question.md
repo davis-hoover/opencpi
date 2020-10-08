@@ -5,4 +5,3 @@ resolved by a good simple answer.)
 ### Links/references
 
 
-/label ~"type::question"

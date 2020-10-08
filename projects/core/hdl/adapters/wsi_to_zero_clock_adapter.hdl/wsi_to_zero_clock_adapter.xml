@@ -6,6 +6,6 @@
     <port Name="out" Producer="true"
 	  datavaluewidth='0' zerolengthmessages='1' numberofopcodes='256'/>
   </componentspec>
-  <streaminterface name='in' datawidth='width' myclock='1'/>
-  <streaminterface name='out' datawidth='0' myclock='1' workereof='1'/>
+  <streaminterface name='in' datawidth='width' clockDirection='in'/>
+  <streaminterface name='out' datawidth='0' clockDirection='in' workereof='1'/>
 </HdlWorker>
