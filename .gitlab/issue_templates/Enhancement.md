@@ -15,4 +15,3 @@ enhancement?)
 ### Links/references
 
 
-/label ~"type::enhancement"
