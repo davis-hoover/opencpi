@@ -30,6 +30,17 @@
 #include "OcpiThread.h"             // just for linkage hooks
 #include "OcpiUtilPci.h"            // just for linkage hooks
 #include "ContainerPort.h"          // just for linkage hooks
+#if 0
+#include "UtilLogPrefix.hh"         // just for linkage hooks
+#include "RadioCtrlr.hh"            // just for linkage hooks
+#include "RadioCtrlrConfigurator.hh"// just for linkage hooks
+#include "RadioCtrlrConfigurator.hh"// just for linkage hooks
+#include "RadioCtrlrConfiguratorAD9361.hh"// just for linkage hooks
+#include "RadioCtrlrNoOsTuneResamp.hh"// just for linkage hooks
+extern "C" {
+#include "ad9361_platform.h"
+}
+#endif
 #include "OcpiContainerRunConditionApi.h"
 #include "XferAccess.h"
 #include "XferManager.h"
@@ -229,6 +240,15 @@ namespace OCPI {
       // p.applyConnectParams(NULL, NULL);
       ((OCPI::Container::Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
       pthread_workqueue_create_np(NULL, NULL);
+      // DRC support
+#if 0
+      ((OCPI::DRC::DataStreamConfigLockRequest *)linkme)->get_data_stream_type();
+      ((OCPI::DRC::RadioCtrlrNoOSTuneResamp *)linkme)->init();
+      ((OCPI::DRC::Configurator *)linkme)->unlock_all();
+      OCPI::DRC::ConfiguratorAD9361 c;
+      ((OCPI::Util::LogPrefix *)linkme)->log_debug("hello");
+      ad9361_opencpi.set_reset(0, 0);
+#endif
       return (intptr_t)&lzma_stream_buffer_decode & (intptr_t)&gpsd_drivers;
     }
   }

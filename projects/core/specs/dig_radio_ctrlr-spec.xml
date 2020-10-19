@@ -6,7 +6,7 @@
 
   <Property Name="MAX_STRING_LENGTH_p" Type="ushort"
                                        Parameter="true"
-                                       Default="128"
+                                       Default="256"
                                        Description="Length of all string properties."/>
   <Property Name="NUM_DATA_STREAM_IDS_p" Type="ushort"
                                          Parameter="true"
@@ -26,14 +26,12 @@
                                                stream IDs that can be
                                                configured for TX streaming."/>
   <Property Name="DATA_STREAM_IDS_RX_p" Type="string"
-                                        Parameter="true"
                                         StringLength="MAX_STRING_LENGTH_p"
                                         ArrayLength="NUM_DATA_STREAM_IDS_RX_p"
                                         Description="Defines all data streams
                                           on the radio that can be configured
                                           for RX streaming."/>
   <Property Name="DATA_STREAM_IDS_TX_p" Type="string"
-                                        Parameter="true"
                                         StringLength="MAX_STRING_LENGTH_p"
                                         ArrayLength="NUM_DATA_STREAM_IDS_TX_p"
                                         Description="Defines all data streams
@@ -52,88 +50,70 @@
                                                simultaneously usable TX data
                                                streams available on radio."/>
   <Property Name="MIN_ACHIEVABLE_RX_TUNING_FREQ_MHZ_p" Type="double"
-                                                       Parameter="true"
                                                        Description="Min for all
                                                          RX data streams."/>
   <Property Name="MAX_ACHIEVABLE_RX_TUNING_FREQ_MHZ_p" Type="double"
-                                                       Parameter="true"
                                                        Description="Max for all
                                                          RX data streams."/>
   <Property Name="MIN_ACHIEVABLE_RX_BANDWIDTH_3DB_MHZ_p" Type="double"
-                                                         Parameter="true"
                                                          Description="Min for
                                                            all RX data
                                                            streams."/>
   <Property Name="MAX_ACHIEVABLE_RX_BANDWIDTH_3DB_MHZ_p" Type="double"
-                                                         Parameter="true"
                                                          Description="Max for
                                                            all RX data
                                                            streams."/>
   <Property Name="MIN_ACHIEVABLE_RX_SAMPLING_RATE_MSPS_p" Type="double"
-                                                          Parameter="true"
                                                           Description="Min for
                                                             all RX data
                                                             streams."/>
   <Property Name="MAX_ACHIEVABLE_RX_SAMPLING_RATE_MSPS_p" Type="double"
-                                                          Parameter="true"
                                                           Description="Max for
                                                             all RX data
                                                             streams."/>
   <Property Name="IS_SUPPORTED_RX_SAMPLES_COMPLEX_p" Type="bool"
-                                                     Parameter="true"
                                                      Description="True if
                                                        supported by any RX data
                                                        streams."/>
   <Property Name="IS_SUPPORTED_RX_SAMPLES_REAL_p"    Type="bool"
-                                                     Parameter="true"
                                                      Description="True if
                                                        supported by any RX data
                                                        streams."/>
   <Property Name="IS_SUPPORTED_RX_GAIN_MODE_AUTO_p" Type="bool"
-                                                    Parameter="true"
                                                     Description="True if
                                                       supported by any RX data
                                                       streams."/>
   <Property Name="IS_SUPPORTED_RX_GAIN_MODE_MANUAL_p" Type="bool"
-                                                      Parameter="true"
                                                       Description="True if
                                                         supported by any RX data
                                                         streams."/>
   <Property Name="MIN_ACHIEVABLE_TX_TUNING_FREQ_MHZ_p" Type="double"
-                                                       Parameter="true"
                                                        Description="Min for all
                                                          TX data streams."/>
   <Property Name="MAX_ACHIEVABLE_TX_TUNING_FREQ_MHZ_p" Type="double"
-                                                       Parameter="true"
                                                        Description="Max for all
                                                          TX data streams."/>
   <Property Name="MIN_ACHIEVABLE_TX_BANDWIDTH_3DB_MHZ_p" Type="double"
-                                                         Parameter="true"
                                                          Description="Min for
                                                            all TX data
                                                            streams."/>
   <Property Name="MAX_ACHIEVABLE_TX_BANDWIDTH_3DB_MHZ_p" Type="double"
-                                                         Parameter="true"
                                                          Description="Max for
                                                            all TX data
                                                            streams."/>
   <Property Name="MIN_ACHIEVABLE_TX_SAMPLING_RATE_MSPS_p" Type="double"
-                                                          Parameter="true"
                                                           Description="Min for
                                                             all TX data
                                                             streams."/>
   <Property Name="MAX_ACHIEVABLE_TX_SAMPLING_RATE_MSPS_p" Type="double"
-                                                          Parameter="true"
                                                           Description="Max for
                                                             all TX data
                                                             streams."/>
   <Property Name="IS_SUPPORTED_TX_SAMPLES_COMPLEX_p" Type="bool"
-                                                     Parameter="true"
                                                      Description="True if
                                                        supported by any TX data
                                                        streams."/>
   <Property Name="IS_SUPPORTED_TX_SAMPLES_REAL_p"    Type="bool"
-                                                     Parameter="true"
                                                      Description="True if
                                                        supported by any TX data
                                                        streams."/>

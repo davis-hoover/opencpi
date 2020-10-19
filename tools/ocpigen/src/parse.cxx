@@ -305,7 +305,8 @@ doMaybeProp(ezxml_t maybe, void *vpinfo) {
       return pinfo.addError(OU::esprintf("SpecProperty name (%s) and Property name (%s) differ in case",
 					 name, p->m_name.c_str()));
     // So simply add impl info to the existing property, and re-summarize access
-    if ((err = p->parseImpl(maybe, w)))
+    if ((err = p->finalize(*w, "specproperty", true)) || // perhaps change dimension
+	(err = p->parseImpl(maybe, w)))
       return pinfo.addError(err);
     if (firstRaw) {
       if (p->m_isParameter)
