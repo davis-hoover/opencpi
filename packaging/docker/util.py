@@ -236,7 +236,8 @@ class Image(object):
             build_context = match.group(1)
             if build_context.startswith("..."):
                 build_context = build_context.replace("...", opencpi_root, 1)
-            if not Path(build_context).exists():
+            build_context = Path(build_context)
+            if not build_context.exists():
                 raise RuntimeError("Build context doesn't exist or is not readable: {}".format(build_context))
             logging.debug("Found build_context: {}".format(build_context))
             self._build_context = build_context
