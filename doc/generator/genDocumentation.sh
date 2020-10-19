@@ -264,30 +264,31 @@ generate_pdfs() {
         for ext in *docx *pptx *odt *odp; do
             # Get the name of the file without the file extension
             ofile=${ext%.*}
-            tmpfile="${ofile}.tmp.${ext##*.}"
+
             echo "${BOLD}office: ${d}/${ext} ${prefix+(output prefix=${prefix})}${RESET}"
             warn_existing_pdf "${OUTPUT_PATH}/${prefix}" "${ofile}" "${d}" && continue
 
             echo 'Removing tracked changes'
-            "${REMOVE_TRACKED_CHANGES_PY}" -o "${tmpfile}" "${ext}"
+            cp "${ext}" "${ext}.orig"  # save original file to restore later (way easier, trust me)
+            "${REMOVE_TRACKED_CHANGES_PY}" "${ext}"
 
-            echo 'Converting PDF'
+            echo 'Creating PDF'
             rv=0
             if [ "${prefix}" = tutorials ]; then
-              bash "${GEN_CG_PDFS_SH}" "${tmpfile}" "${PWD}" >> "${log_dir}/${ofile}.log" 2>&1
+              # This creates two pdfs, ${ext}_CLI.pdf and ${ext}_GUI.pdf
+              bash "${GEN_CG_PDFS_SH}" "${ext}" "${PWD}" >> "${log_dir}/${ofile}.log" 2>&1
               rv=$?
             else
-              unoconv -vvv "${tmpfile}" >> "${log_dir}/${ofile}.log" 2>&1
+              unoconv -vvv "${ext}" >> "${log_dir}/${ofile}.log" 2>&1
               rv=$?
             fi
-
-            rm -f "${tmpfile}"
+            mv -f "${ext}.orig" "${ext}"  # restore original file
 
             # If the pdf was created then copy it out
             if [ ${rv} -eq 0 ]; then
               # The *.pdf is needed because the tutorial pdfs have a *_CLI.pdf
               # and *_GUI.pdf suffix
-              mv ./*.pdf "${OUTPUT_PATH}/${prefix}"
+              mv *.pdf "${OUTPUT_PATH}/${prefix}"
             else
               echo "${RED}Error creating ${ofile}.pdf${RESET}"
               echo "Error creating ${ofile}.pdf (${d})" >> "${OUTPUT_PATH}/errors.log"
