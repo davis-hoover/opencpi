@@ -33,6 +33,7 @@
 declare -A osp_aliases
 osp_aliases["e3xx"]="Ettus E310/E312/E313"
 osp_aliases["picoflexor"]="DRS Picoflexor S1T6A/S3T6A"
+osp_aliases["plutosdr"]="AnalogDevices PlutoSDR"
 
 # Disables experimental HTML output
 export EXPERIMENTAL_HTML=TESTCODEDOESNOTRUN
@@ -362,19 +363,10 @@ get_osp_name() {
   [ -n "$1" ] && dir=$1
   # Check if "here" or in projects/osps/
   [ -e ${dir} ] || dir=${REPO_PATH}/projects/osps/$1
-  outname=$(basename "$(realpath ${dir})")
-  # Does it have /projects/bsps/ in its path? If not, bail.
-  [ "$(expr match "$(realpath ${dir})" '.*/projects/bsps/')" = 0 ] && echo "" && return
-  git_url=$(cd "$(realpath ${dir})" && git config --get remote.origin.url)
-  # Does it have .osp. in its git URL? (The extra . at end captures first letter for substring)
-  git_url_offset=$(expr match "${git_url}" '.*\.osp\..')
-  [ "${git_url_offset}" = 0 ] && echo "" && return
-  git_url=$(expr substr "${git_url}" ${git_url_offset} 1000)
-  git_url_offset=$(( $(expr match "${git_url}" '.*\.git$') - 4 ))
-  git_url=$(expr substr "${git_url}" 1 ${git_url_offset})
-  # Does it look decent?
-  [ -z "${git_url}" ] && echo "" && return
-  echo "${git_url}"
+  osp_name=${dir#*/ocpi.osp.}  # remove */ocpi.osp. (*/ocpi.osp.YYY/* -> YYY/*)
+  osp_name=${osp_name%%/*}  # remove stuff after osp name (YYY/* -> YYY)
+  [ -z "${osp_name}" ] && echo "" && return
+  echo "${osp_name}"
 }
 
 ###
