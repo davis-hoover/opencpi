@@ -1,3 +1,10 @@
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+
 def do_project(*args):
     """Handle all aspects of project creation, registration, deregistration, etc."""
     input_arg = args[1]
@@ -116,7 +123,7 @@ def do_project(*args):
     package_id = ocpi_module.util.get_project_package()
 
     with open(".project", "w") as proj_file:
-        text = "<?xml version="1.0" encoding="UTF-8"?>\n" \
+        text = "<?xml version='1.0' encoding='UTF-8'?>\n" \
                                                    "<projectDescription>\n" \
                                                    "<name>$package_id</name>\n" \
                                                    "<comment></comment>\n" \

@@ -900,11 +900,22 @@ def do_protocol_or_spec(*args):
         return file
 
     if verb == "delete":
-        if not sub_dir/file.exists():
-            bad(f"The file '{subdir / file}' does not exists")
+        if not sub_dir / file.exists():
+            bad(f"The file '{subdir / file}' does not exist")
         else:
             ask(f"delete the file '{sub_dir / file}")
             shutil.rmtree(sub_dir / file)
             if verbose:
                 print(f"The {args[2]} '{input_arg}' in file {subdir / file} has been deleted.")
+
+    if sub_dir / file.exists():
+        bad(f"The file '{sub_dir / file}'already exists")
+
+    if not sub_dir.is_dir() and verbose:
+        if sub_dir == "specs":
+            print(f"The 'specs' directory does not exist and will be created.")
+        else:
+            print(f"The 'specs' directory '{sub_dir}' does not exist and will be created.")
+
+    Path(sub_dir).mkdir(parents=True, exist_ok=True)  # Equivalent to Bash mkdir -p
 
