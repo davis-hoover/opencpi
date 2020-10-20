@@ -919,3 +919,117 @@ def do_protocol_or_spec(*args):
 
     Path(sub_dir).mkdir(parents=True, exist_ok=True)  # Equivalent to Bash mkdir -p
 
+    if sub_dir == "specs" and not specs/package-id.exists():    # Record package prefix in the specs directory
+        sub_dir.run(["make specs/package-id"])
+
+    if noun == "protocol":
+        with open(subdir/file, "w") as prot_spec_file:
+            text = f"<!-- This is the protocol spec file (OPS) for protocol: {input_arg}\n" \
+                   f"   Add <operation> elements for message types.\n" \
+                   f"   Add protocol summary attributes if necessary to override attributes\n" \
+                   f"   inferred from operations/messages -->\n" \
+                   f"<Protocol> <!-- add protocol summary attributes here if necessary -->\n" \
+                   f"   <!-- Add operation elements here -->\n" \
+                   f"</Protocol>"
+            prot_spec_file.write(text)
+    elif noun == "spec":
+        if nocontrol:
+            nocontrolstr = " NoControl='true' "
+            with open(sub_dir/file, "w") as spec_file:
+                text = f"<!-- This is the spec file (OCS) for: {input_arg}\n" \
+                       f"   Add component spec attributes, like 'protocol'.\n" \
+                       f"   Add property elements for spec properties.\n" \
+                       f"   Add port elements for i/o ports -->\n" \
+                       f"<ComponentSpec$nocontrolstr>\n" \
+                       f"   <!-- Add property and port elements here -->\n" \
+                       f"</ComponentSpec>"
+                spec_file.write(text)
+    elif noun == "properties":
+        with open(sub_dir/file, "w") as prop_file:
+            text = f"<!-- This is the properties file (OPS) initially named: {input_arg}\n" \
+                   f"   Add <property> elements for each property in this set -->\n" \
+                   f"<Properties>\n" \
+                   f"   <!-- Add property elements here -->\n" \
+                   f"</Properties>"
+            prop_file.write(text)
+    elif noun == "signals":
+        with open(sub_dir/file, "w") as sig_file:
+            text = f"<!-- This is the signals file (OSS) initially named: {input_arg}\n" \
+                   f"   Add <signal> elements for each signal in this set -->\n" \
+                   f"<Signals>\n" \
+                   f"   <!-- Add signal elements here -->\n" \
+                   f"</Signals>"
+            sig_file.write(text)
+    elif noun == "slot":
+        with open(sub_dir/file, "w") as slot_file:
+            text = f"<!-- This is the slot definition file for slots of type: {input_arg}\n" \
+                   f"   Add <signal> elements for each signal in the slot -->\n" \
+                   f"<SlotType>\n" \
+                   f"   <!-- Add signal elements here -->\n" \
+                   f"</SlotType>"
+            slot_file.write(text)
+    elif noun == "card":
+        with open(sub_dir/file, "w") as card_file:
+            text = f"<!-- This is the card definition file for cards of type: {input_arg}\n" \
+                   f"   Add <signal> elements for each signal in the slot -->\n" \
+                   f"<Card>\n" \
+                   f"   <!-- Add device elements here, with signal mappings to slot signals -->\n" \
+                   f"</Card>"
+            card_file.write(text)
+
+    dir_type = get_dirtype(sub_dir/"..")
+    if dir_type == "library":  # If parent is a library, update its spec links to include new one
+        subprocess.run(["make", f"{speclinks}", "-C", f"{sub_dir / '..'}"])
+    if verbose:
+        if dir_type == "library":
+            print(f"A new {args[2]}, '{input_arg}' has been created in library '{basename `ocpiReadLinkE $subdir/..`}' "
+                  f"in {sub_dir/file}")
+        else:
+            print(f"A new {args[2]}, '{input_arg}' has been created at the project level in {sub_dir/file}")
+    if createtest:
+        do_test(input_arg)
+
+
+def make_hdl_dir():
+    """Create an HDL directory"""
+    if not hdl.is_dir():
+        Path(hdl).mkdir()
+
+
+def make_library(*args):
+    """Make a library with the name of args[1] in the directory of args[2]"""
+    Path(args[2]).mkdir(parents=True, exist_ok=True)  # Equivalent to Bash mkdir -p
+    with open(args[2]/"Makefile") as lib_mkfile:
+        text = f"# This is the {args[1]} library\n\n" \
+               f"# All workers created here in *.<model> will be built automatically\n" \
+               f"# All tests created here in *.test directories will be built/run automatically\n" \
+               f"# To limit the workers that actually get built, set the Workers= variable\n" \
+               f"# To limit the tests that actually get built/run, set the Tests= variable\n\n" \
+               f"# Any variable definitions that should apply for each individual worker/test\n" \
+               f"# in this library belong in Library.mk\n\n" \
+               f"include \$(OCPI_CDK_DIR)/include/library.mk"
+        lib_mkfile.write(text)
+
+    with open(args[2]/"library.mk") as lib_mk_file:
+        text = f"# This is the {args[1]} library\n\n" \
+               f"# This makefile contains variable definitions that will apply when building each\n" \
+               f"# individual worker and test in the library\n\n" \
+               f"# Package identifier is used in a hierarchical fashion from Project to Libraries....\n" \
+               f"# The PackageName, PackagePrefix and Package variables can optionally be set here:\n" \
+               f"# PackageName defaults to the name of the directory\n" \
+               f"# PackagePrefix defaults to package of parent (project)\n" \
+               f"# Package defaults to PackagePrefix.PackageName\n" \
+               f"${packagename:+PackageName=$packagename}\n" \
+               f"${packageprefix:+PackagePrefix=$packageprefix}\n" \
+               f"${package:+Package=$package}\n" \
+               f"${liblibs:+Libraries=${liblibs[@]}}\n" \
+               f"${complibs:+ComponentLibraries=${complibs[@]}}\n" \
+               f"${includes:+IncludeDirs=${includes[@]}}\n" \
+               f"${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}"
+        lib_mk_file.write(text)
+        try:
+            subprocess.run(["make", "--no-print-directory", "-C", args[2]])
+            if verbose:
+                print(f"A new library named {args[1]} has been created in {args[2]}.")
+        except OSError:
+            bad(f"Library creation failed. You may want to do: 'ocpidev delete library {args[1]}'")
