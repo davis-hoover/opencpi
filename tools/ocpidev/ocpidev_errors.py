@@ -51,3 +51,11 @@ def lib_exist(lib_dir):
         bad(f"{lib_dir} is not a Path object")
     except OSError:
         bad(f"The specified library {lib_dir} does not exist")
+
+
+def need_name(*args):
+    """Ensure a name argument is present"""
+    if len(args[1]) == 0:
+        bad(f"A name argument is required after the command {args[0]}")
+    elif args[1] == "*":
+        bad(f"You cannot use '*' as a name")
