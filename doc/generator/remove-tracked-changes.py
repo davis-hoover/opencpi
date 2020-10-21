@@ -83,6 +83,7 @@ def remove_tracked_changes_meta(raw_data: bytes) -> bytes:
 
 
 def save_file(fname: Path, data: bytes):
+    fname.parent.mkdir(parents=True, exist_ok=True)
     with open(str(fname), "wb") as fd:
         fd.write(data)
 
@@ -115,7 +116,7 @@ def main():
     changed_regions = tree.findall(f".//{XMLNS['text']}changed-region")
 
     if len(change_starts) == 0 or len(changed_regions) == 0:
-        save_file(args.outfile, raw_file)
+        save_file(outfile, raw_file)
         return 0
 
     # Main loop that loops over all '<text:change-start ...>' tags, figures out
