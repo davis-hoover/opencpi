@@ -1,0 +1,4 @@
+<HdlWorker language='vhdl' spec='ramp-spec' version='2'>
+  <StreamInterface Name="in" DataWidth="16"/>
+  <StreamInterface Name="out" DataWidth="16" InsertEOM="true"/>
+</HdlWorker>

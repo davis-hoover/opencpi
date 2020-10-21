@@ -1,0 +1,5 @@
+<HdlWorker language='vhdl' spec='ander-spec' version='2'>
+  <StreamInterface Name="in1" DataWidth="16"/>
+  <StreamInterface Name="in2" DataWidth="16"/>
+  <StreamInterface Name="out" DataWidth="32" InsertEOM="true"/>
+</HdlWorker>

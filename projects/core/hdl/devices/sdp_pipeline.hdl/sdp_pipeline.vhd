@@ -90,16 +90,14 @@ begin
   -- the take/ready signals are in the opposite directions for other reasons
 
   -- First the flow-through signals not subject to pipelining
-  down_out.clk        <= up_in.clk;
-  down_out.reset      <= up_in.reset;
   down_out.id         <= up_in.id;
   up_out.dropCount    <= down_in.dropCount;
 
   up_enq              <= down_in.sdp.valid and not up_full;
   up: component util.util.srl_fifo
     generic map(width  => width_c)
-    port map   (clk    => up_in.clk,
-                reset  => up_in.reset,
+    port map   (clk    => sdp_clk,
+                reset  => sdp_reset,
                 enq    => up_enq,
                 deq    => up_in.sdp.ready,
                 input  => up_data_in,
@@ -110,8 +108,8 @@ begin
   down_enq           <= up_in.sdp.valid and not down_full;
   down: component util.util.srl_fifo
     generic map(width  => width_c)
-    port map   (clk    => up_in.clk,
-                reset  => up_in.reset,
+    port map   (clk    => sdp_clk,
+                reset  => sdp_reset,
                 enq    => down_enq,
                 deq    => down_in.sdp.ready,
                 input  => down_data_in,

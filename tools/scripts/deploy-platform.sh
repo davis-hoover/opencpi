@@ -32,8 +32,8 @@
 # and OCPI_CDK_DIR environment variables to be set.
 #
 [ "$1" = -v ] && verbose=-v && shift
-rcc_platform=$1 && shift
-[ -n "$1" ] && hdl_platform=$1 && shift
+rcc_platform=$1 && shift || ( echo "Error: missing RCC platform argument" >&2 && exit 1 )
+hdl_platform=$1 && shift || ( echo "Error: missing HDL platform argument" >&2 && exit 1 )
 
 set -e
 

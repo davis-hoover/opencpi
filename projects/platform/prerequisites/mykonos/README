@@ -1,0 +1,23 @@
+In the no_OS repo:
+projects/ad9371/src/devices/mykonos directory is the mykonos library source code.
+It uses a "platform" layer found in
+projects/ad9371/src/devices/common/common.h
+The mykonos code uses these functions:
+                 U CMB_hardReset
+                 U CMB_hasTimeoutExpired
+                 U CMB_setTimeout_ms
+                 U CMB_setTimeout_us
+                 U CMB_SPIReadByte
+                 U CMB_SPIReadField
+                 U CMB_SPIWriteByte
+                 U CMB_SPIWriteBytes
+                 U CMB_SPIWriteField
+                 U CMB_wait_ms
+                 U CMB_writeToLog
+ADI's own low level code for these functions is found in:
+projects/ad9371/src/devices/common/common.c
+
+But we will implement them, much like we do for the 9361 in:
+projects/platform/hdl/devices/platform_ad9361_config_proxy.rcc/ad9361_platform.cc
+
+

@@ -24,6 +24,33 @@
 }
 set -e
 
+#
+# Quick and dirty argument parsing:
+# getopt(s) overhead not required.
+#
+PARAMS=""
+
+while (( "$#" )); do
+  case "$1" in
+    -d|--distro)
+      export OCPI_DISTRO_BUILD=1
+      shift
+      ;;
+    -*) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS \"$1\""
+      shift
+      ;;
+  esac
+done
+
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
+unset PARAMS
+
 # We do some bootstrapping here (that is also done in the scripts we call), in order to know
 # the platform we are building
 

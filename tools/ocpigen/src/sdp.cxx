@@ -27,8 +27,8 @@ SdpPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
   // This clock is a bit phony.  This is not an OCP port, and the clock is embedded in the SDP signal bundle.
   // Since it is not OCP, it will not be explicitly wired in any case.
   if (!err && !m_master && !(m_clock = w.findClock("sdp")) && !(err = w.addClock("sdp", "in", m_clock))) {
-    m_clock->m_port = this;
-    m_myClock = true;
+    m_clock->m_exported = true;
+    m_clock->m_reset = "sdp_reset";
   }
 }
 

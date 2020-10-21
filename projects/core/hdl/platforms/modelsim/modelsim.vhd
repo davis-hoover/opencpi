@@ -30,6 +30,8 @@ architecture rtl of modelsim_worker is
   signal ctl_reset_n      : std_logic;
   signal sdp_clk          : std_logic;
   signal sdp_reset        : std_logic := '0';
+  signal sdp_local_clk    : std_logic;
+  signal sdp_local_reset  : std_logic := '0';
   -- between the sim_sdp and sdp_node for control plane
   signal sdp_sim_in       : sdp.sdp.s2m_t;
   signal sdp_sim_out      : sdp.sdp.m2s_t;
@@ -53,13 +55,16 @@ begin
   sdp_clock : sim_clk
     generic map(frequency => 120000000.0, offset => 3)
     port map(clk => sdp_clk, reset => sdp_reset);
-
-
+  -- Delta cycles here, but at least everyone gets the same thing.
+  sdp_out.clk     <= sdp_clk;
+  sdp_out.reset   <= sdp_reset;
+  sdp_local_clk   <= sdp_clk;
+  sdp_local_reset <= sdp_reset;
   sdp_sim_i : sdp.sdp.sdp_sim
     generic map(ocpi_debug => ocpi_debug,
                 sdp_width  => sdp_width)
-    port map(clk => sdp_clk,
-             reset => sdp_reset,
+    port map(clk => sdp_local_clk,
+             reset => sdp_local_reset,
              sdp_in => sdp_sim_in,
              sdp_out => sdp_sim_out,
              sdp_in_data => sdp_sim_in_data,
@@ -69,6 +74,8 @@ begin
     generic map(sdp_width  => sdp_width)
     port map( wci_Clk => ctl_clk,
               wci_Reset_n => ctl_reset_n,
+              sdp_clk => sdp_local_clk,
+              sdp_reset => sdp_local_reset,
               up_in => sdp_sim_out,
               up_in_data => sdp_sim_out_data,
               up_out => sdp_sim_in,
@@ -86,6 +93,8 @@ begin
     generic map(sdp_width  => sdp_width)
     port map( wci_Clk => ctl_clk,
               wci_Reset_n => ctl_reset_n,
+              sdp_clk => sdp_local_clk,
+              sdp_reset => sdp_local_reset,
               cp_in => cp_in,
               cp_out => cp_out,
               sdp_in => sdp_cp_out,
