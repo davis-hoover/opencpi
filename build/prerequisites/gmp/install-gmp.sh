@@ -40,6 +40,12 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
 
 # Configure/Make/Install
 ../configure "${OcpiCrossHost:+--host=$OcpiCrossHost}" \
+  $([ -z "$OcpiCrossHost" -a "$OCPI_DISTRO_BUILD" = "1" ] && \
+    ( case "$OcpiPlatformOs" in
+	# older bash versions require the ( in this particular case
+        (macos) echo "--build=x86_64-unknown-darwin-gnu" ;;
+        (linux) echo "--build=x86_64-unknown-linux-gnu" ;;
+      esac ) || true) \
   --prefix="$OcpiInstallDir" --exec-prefix="$OcpiInstallExecDir" \
   --enable-fat=yes --enable-cxx=yes --with-pic
 make -j4

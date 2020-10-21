@@ -1,0 +1,9 @@
+<!-- This is the spec file (OCS) for: source
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <Property name="value" initial="true" type="short"/>
+  <Property name="nsamples" initial="true"/>
+  <Port Name="out" Producer="true" Protocol="rstream_protocol"/>
+</ComponentSpec>

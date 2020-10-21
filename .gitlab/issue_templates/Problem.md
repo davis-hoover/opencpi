@@ -18,4 +18,3 @@ console/log/code output here
 ### Links/references
 
 
-/label ~"type::problem"

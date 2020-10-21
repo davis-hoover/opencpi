@@ -241,7 +241,7 @@ generate_pdfs() {
         # This should be an error post-AV-5448
         [ ! -d "$d" ] && echo "${RED}Directory $d does not exist! Skipping!${RESET}" && continue
         echo "${BOLD}Directory: $d${RESET}"
-        pushd "$d" || return 1
+        pushd "$d" &> /dev/null || return 1
         prefix=.
         osp_name="$(get_osp_name $d)"
         if expr match $d '.*projects/assets_ts' > /dev/null; then
@@ -264,20 +264,31 @@ generate_pdfs() {
         for ext in *docx *pptx *odt *odp; do
             # Get the name of the file without the file extension
             ofile=${ext%.*}
+
             echo "${BOLD}office: ${d}/${ext} ${prefix+(output prefix=${prefix})}${RESET}"
             warn_existing_pdf "${OUTPUT_PATH}/${prefix}" "${ofile}" "${d}" && continue
+
+            echo 'Removing tracked changes'
+            cp "${ext}" "${ext}.orig"  # save original file to restore later (way easier, trust me)
+            "${REMOVE_TRACKED_CHANGES_PY}" "${ext}"
+
+            echo 'Creating PDF'
             rv=0
             if [ "${prefix}" = tutorials ]; then
+              # This creates two pdfs, ${ext}_CLI.pdf and ${ext}_GUI.pdf
               bash "${GEN_CG_PDFS_SH}" "${ext}" "${PWD}" >> "${log_dir}/${ofile}.log" 2>&1
               rv=$?
             else
               unoconv -vvv "${ext}" >> "${log_dir}/${ofile}.log" 2>&1
               rv=$?
             fi
+            mv -f "${ext}.orig" "${ext}"  # restore original file
 
             # If the pdf was created then copy it out
             if [ ${rv} -eq 0 ]; then
-              mv ./*.pdf "${OUTPUT_PATH}/${prefix}"
+              # The *.pdf is needed because the tutorial pdfs have a *_CLI.pdf
+              # and *_GUI.pdf suffix
+              mv *.pdf "${OUTPUT_PATH}/${prefix}"
             else
               echo "${RED}Error creating ${ofile}.pdf${RESET}"
               echo "Error creating ${ofile}.pdf (${d})" >> "${OUTPUT_PATH}/errors.log"
@@ -296,7 +307,7 @@ generate_pdfs() {
           fi
         fi
 
-        popd || return 1
+        popd &> /dev/null || return 1
     done
 }
 
@@ -485,14 +496,20 @@ done
 # Do not try to access parameters to the script past this
 
 GEN_CG_PDFS_SH="${REPO_PATH}/doc/tutorials/gen-cg-pdfs.sh"
+REMOVE_TRACKED_CHANGES_PY="${REPO_PATH}/doc/generator/remove-tracked-changes.py"
 
 enable_color
 # Failures
 [ ! -r ${REPO_PATH} ] && show_help "\"${REPO_PATH}\" not readable by $USER. Consider using a different repo path."
 [ ! -d "${REPO_PATH}/doc/av" ] && show_help "\"${REPO_PATH}\" doesn't seem to be correct. Could not find doc/av/."
 [ -d "${OUTPUT_PATH}" ] && show_help "\"${OUTPUT_PATH}\" already exists"
-if [ ! -f "$GEN_CG_PDFS_SH" ]; then
-  echo "Could not find $GEN_GEN_CG_PDFS_SH"
+if [ ! -f "${GEN_CG_PDFS_SH}" ]; then
+  echo "Could not find ${GEN_GEN_CG_PDFS_SH}"
+  echo "This script is required to properly convert the tutorials to pdfs"
+  exit 1
+fi
+if [ ! -f "${REMOVE_TRACKED_CHANGES_PY}" ]; then
+  echo "Could not find ${REMOVE_TRACKED_CHANGES_PY}"
   echo "This script is required to properly convert the tutorials to pdfs"
   exit 1
 fi

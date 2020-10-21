@@ -383,9 +383,9 @@ const char *Worker::
 addBuiltinProperties() {
   const char *err;
   if ((err = addProperty("<property name='ocpi_debug' type='bool' parameter='true' "
-                         "          default='false'/>", false)) ||
+                         "          default='false' hidden='true'/>", false)) ||
       (err = addProperty("<property name='ocpi_endian' type='enum' parameter='true' "
-                         "          default='little'"
+                         "          default='little' hidden='true'"
                          "          enums='little,big,dynamic'/>", false)))
     return err;
   return NULL;

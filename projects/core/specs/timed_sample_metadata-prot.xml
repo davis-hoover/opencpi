@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+     distributed with this source distribution.
+
+     This file is part of OpenCPI <http://www.opencpi.org>
+
+     OpenCPI is free software: you can redistribute it and/or modify it under
+     the terms of the GNU Lesser General Public License as published by the Free
+     Software Foundation, either version 3 of the License, or (at your option)
+     any later version.
+
+     OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+     FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+     more details.
+
+     You should have received a copy of the GNU Lesser General Public License
+     along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<protocol>
+  <!-- Time of the first sample in the next sample message, with subsequent
+       sample messages being continuous to this message.
+
+       In a receive path, time is the receive time of samples. In a transmit
+       path, time is the time the samples are to be transmitted.
+
+       Time format is GPS time.
+
+       Components which discard or insert samples must update time messages so
+       that any forwarded on time messages correctly related to the next sample
+       message output by the component.
+
+       Time is stored as an unsigned Q32.40 fixed point value, where the
+       ``seconds`` argument is the value before the decimal point and the
+       ``fraction`` argument is the value after the decimal point. The
+       fractional bits occupy the 40 most significant bits of the ulonglong.-->
+  <operation name="time">  
+    <argument name="fraction" type="ulonglong"/>
+    <argument name="seconds" type="ulong"/>
+  </operation>
+  <!-- Time between sample points (i.e. the reciprocal of the sample rate).
+       In the same format as the time operation to allow direction addition of
+       sample interval values to time values.
+
+       Components which discard samples, insert samples or change the sample
+       rate in any way, must update sample interval messages so the sample
+       interval values sent from a component is a true reflection of the sample
+       interval used in sample messages output by the component.
+
+       Sample interval is stored as an unsigned Q32.40 fixed point value,
+       where the ``seconds`` argument is the value before the decimal point and
+       the ``fraction`` argument is the value after the decimal point. The
+       fractional bits occupy the 40 most significant bits of the ulonglong.-->
+  <operation name="sample_interval">
+    <argument name="fraction" type="ulonglong"/>
+    <argument name="seconds" type="ulong"/>
+  </operation>
+  <!-- Instructs workers to flush all internal buffers of the worker that relate
+       to the input port this message is received on, so all input data received
+       before this message is processed and output without the need for
+       additional input data.
+
+       Internal buffers are often flushed by feeding in zeros.
+
+       Once all data has been flushed (or if there is no internal buffer to
+       clear) the flush message must be forwarded on; this includes cases where
+       a flush message would be output during the flush itself. -->
+  <operation name="flush"/>
+  <!-- Indicates that the next sample message is discontinuous from the previous
+       sample message. -->
+  <operation name="discontinuity"/>
+  <!-- Additional information relating to the sample messages.
+
+       The ``id`` argument stores an ID value for the type of metadata message.
+       Each ID value is unique to a type of metadata.
+
+       The ``value`` argument is the metadata value asscioated with the ID. This
+       has an type of ulonglong, so combined the ID and value arguments have a
+       data length which is the same as the time and sample interval messages;
+       to allow workers which do not process these fields to use the same logic
+       for all message types.
+
+       Workers must make the best possible effort to maintain the alignment of
+       metadata messages within sample values of sample messages.-->
+  <operation name="metadata">
+    <argument name="id" type="ulong"/>
+    <argument name="value" type="ulonglong"/>
+  </operation>
+</protocol>

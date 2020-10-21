@@ -1,0 +1,14 @@
+<!-- The demo_assembly HDL assembly xml file -->
+<HdlAssembly>
+  <Instance Worker="ramp" externals='true'/>
+  <Instance Worker="square"/>
+  <Instance Worker="ander" externals='true'/>
+  <Connection>
+    <Port Instance="ramp" Name="out"/>
+    <Port Instance="ander" Name="in1"/>
+  </Connection>
+  <Connection>
+    <Port Instance="square" Name="out"/>
+    <Port Instance="ander" Name="in2"/>
+  </Connection>
+</HdlAssembly>

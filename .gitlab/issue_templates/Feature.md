@@ -19,4 +19,3 @@ feature?)
 ### Links/references
 
 
-/label ~"type::feature"

@@ -1,4 +1,4 @@
-#!/bin/sh --noprofile
+#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,5 +17,6 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-f=/etc/centos-release
-[ -r $f ] && read c l r v x < $f && [[ $c == CentOS && $v == 8.* ]]
+[ ! -r /etc/os-release ] && exit 1
+source /etc/os-release
+[[ "${ID}" = "centos" && "${VERSION_ID}" = "8" ]] && exit 0 || exit 1

@@ -10,7 +10,7 @@ Never introduce namespace abbreviations in header files since callers need contr
 abbreviations.
 In source files, use abbreviations as convenient.  Typical ones are:
 
-namesoace OS = OCPI::OS;
+namespace OS = OCPI::OS;
 namespace OU = OCPI::Util;
 
 In general use prefixes already used for the same things.  Use "grep 'namespace * OCPI::'"

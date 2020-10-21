@@ -67,7 +67,7 @@ static const char *bad(OU::Worker &w, const char *tag, const char *val) {
 static std::string stringToColorHash(std::string str) {
   unsigned int hash = 0;
   for(size_t i = 0; i < str.size(); i++) {
-    hash = str[i] + ((hash << 5) - hash);
+    hash = (unsigned)str[i] + ((hash << 5) - hash);
   }
   std::string color;
   OU::format(color, "#%02x%02x%02x", (hash & 0x0000FF), (hash & 0x00FF00) >> 8, (hash & 0xFF0000) >> 16);
@@ -93,7 +93,7 @@ struct Category {
     std::string cname = path;
     const char *cp = strchr(path, '/');
     if (cp)
-      cname.assign(path, cp++ - path);
+      cname.assign(path, OCPI_SIZE_T_DIFF(cp++, path));
     Category *cat = NULL;
     for (unsigned n = 0; n < categories.size(); n++)
       if (categories[n].name == cname) {
@@ -122,6 +122,8 @@ struct Category {
 } top;
 
 static void addProperty(OU::Worker &w, ezxml_t & root, OU::Property *p, __attribute__((unused)) std::string workerName="") {
+    if (p->m_isHidden)
+      return;
     ezxml_t px = OX::addChild(root, "param", 1);
     OX::addChild(px, "name", 2, p->pretty());
     OX::addChild(px, "key", 2, p->cname());
@@ -196,7 +198,7 @@ static void doWorker(OU::Worker &w) {
   const char *cp = strrchr(w.specName().c_str(), '.');
   OX::addChild(root, "name", 1, cp ? cp + 1 : w.specName().c_str());
   std::string
-    path(w.specName().c_str(), cp - w.specName().c_str()),
+    path(w.specName().c_str(), OCPI_SIZE_T_DIFF(cp, w.specName().c_str())),
     cat("[OpenCPI]/" + path),
     key(w.specName()),
     import("import ocpi");
@@ -221,20 +223,30 @@ static void doWorker(OU::Worker &w) {
       }
     }
   }
+  // Add all of the Component specific properties
+  unsigned np;
+  OU::Property *p = w.properties(np);
+  for (unsigned n = 0; n < np; n++, p++) {
+    // Worker specific properties will be added later so skip them
+    // for now so they don't get added twice.
+    if (!p->m_isImpl) {
+      addProperty(w, root, p);
+    }
+  }
   // Add ocpi package as a partially hidden parameter
   ezxml_t _px = OX::addChild(root, "param", 1);
-  OX::addChild(_px, "name", 2, "ocpi_spec");
+  OX::addChild(_px, "name", 2, "OpenCPI Spec");
   OX::addChild(_px, "key", 2, "ocpi_spec");
   OX::addChild(_px, "value", 2, w.specName().c_str());
   OX::addChild(_px, "type", 2, "string");
   OX::addChild(_px, "hide", 2, "part");
 
   _px = OX::addChild(root, "param", 1);
-  OX::addChild(_px, "name", 2, "Container");
-  OX::addChild(_px, "key", 2, "container");
+  OX::addChild(_px, "name", 2, "OpenCPI Container");
+  OX::addChild(_px, "key", 2, "ocpi_container");
   OX::addChild(_px, "value", 2, "auto");
   OX::addChild(_px, "type", 2, "enum");
-  OX::addChild(_px, "hide", 2, "none");
+  OX::addChild(_px, "hide", 2, "part");
 
   ezxml_t _ox = OX::addChild(_px, "option", 3);
   OX::addChild(_ox, "name", 4, "auto");
@@ -245,6 +257,69 @@ static void doWorker(OU::Worker &w) {
     OX::addChild(_ox, "name", 4, it->c_str());
     OX::addChild(_ox, "key", 4, it->c_str());
   }
+  _px = OX::addChild(root, "param", 1);
+  OX::addChild(_px, "name", 2, "OpenCPI Done");
+  OX::addChild(_px, "key", 2, "ocpi_done");
+  OX::addChild(_px, "value", 2, "False");
+  OX::addChild(_px, "type", 2, "bool");
+  OX::addChild(_px, "hide", 2, "part");
+  _ox = OX::addChild(_px, "option", 3);
+  OX::addChild(_ox, "name", 4, "False");
+  OX::addChild(_ox, "key", 4, "False");
+  _ox = OX::addChild(_px, "option", 3);
+  OX::addChild(_ox, "name", 4, "True");
+  OX::addChild(_ox, "key", 4, "True");
+
+  _px = OX::addChild(root, "param", 1);
+  OX::addChild(_px, "name", 2, "OpenCPI Platform");
+  OX::addChild(_px, "key", 2, "ocpi_platform");
+  OX::addChild(_px, "value", 2, "auto");
+  OX::addChild(_px, "type", 2, "enum");
+  OX::addChild(_px, "hide", 2, "none");
+
+  for (auto other = platformToModel.begin(); other != platformToModel.end(); ++other) {
+    _ox = OX::addChild(_px, "option", 3);
+    std::string *pname = new std::string;
+    if (other->first == "auto")
+      *pname = "auto";
+    else
+      OU::format(*pname, "%s (%s)", other->first.c_str(), other->second.c_str());
+    OX::addChild(_ox, "name", 4, pname->c_str());
+    OX::addChild(_ox, "key", 4, other->first.c_str());
+  }
+
+  _px = OX::addChild(root, "param", 1);
+  OX::addChild(_px, "name", 2, "OpenCPI Worker");
+  OX::addChild(_px, "key", 2, "ocpi_worker");
+  OX::addChild(_px, "value", 2, "");
+  OX::addChild(_px, "type", 2, "string");
+  OX::addChild(_px, "hide", 2, "part");
+
+  _px = OX::addChild(root, "param", 1);
+  OX::addChild(_px, "name", 2, "OpenCPI Model");
+  OX::addChild(_px, "key", 2, "ocpi_model");
+  OX::addChild(_px, "value", 2, "auto");
+  OX::addChild(_px, "type", 2, "string");
+  OX::addChild(_px, "hide", 2, "part");
+  _ox = OX::addChild(_px, "option", 3);
+  OX::addChild(_ox, "name", 4, "auto");
+  OX::addChild(_ox, "key", 4, "auto");
+  _ox = OX::addChild(_px, "option", 3);
+  OX::addChild(_ox, "name", 4, "RCC");
+  OX::addChild(_ox, "key", 4, "rcc");
+  _ox = OX::addChild(_px, "option", 3);
+  OX::addChild(_ox, "name", 4, "HDL");
+  OX::addChild(_ox, "key", 4, "hdl");
+  _ox = OX::addChild(_px, "option", 3);
+  OX::addChild(_ox, "name", 4, "OCL");
+  OX::addChild(_ox, "key", 4, "ocl");
+
+  _px = OX::addChild(root, "param", 1);
+  OX::addChild(_px, "name", 2, "OpenCPI Selection");
+  OX::addChild(_px, "key", 2, "ocpi_selection");
+  OX::addChild(_px, "value", 2, "");
+  OX::addChild(_px, "type", 2, "string");
+  OX::addChild(_px, "hide", 2, "part");
 
   if (!w.slaves().empty()) {
     _px = OX::addChild(root, "param", 1);
@@ -256,16 +331,6 @@ static void doWorker(OU::Worker &w) {
     OX::addChild(_px, "required", 2, "True");
   }
 
-  // Add all of the Component specific properties
-  unsigned np;
-  OU::Property *p = w.properties(np);
-  for (unsigned n = 0; n < np; n++, p++) {
-    // Worker specific properties will be added later so skip them
-    // for now so they don't get added twice.
-    if (!p->m_isImpl) {
-      addProperty(w, root, p);
-    }
-  }
 
   // Add all of the properties specific to a particular worker
   std::map<std::string, std::set<OU::Property *>>::const_iterator wsp = workerSpecificProperties[w.specName()].begin();

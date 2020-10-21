@@ -1,0 +1,3 @@
+<HdlWorker language='vhdl' spec='square-spec' version='2'>
+  <StreamInterface Name="out" DataWidth="16" InsertEOM="true"/>
+</HdlWorker>

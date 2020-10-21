@@ -17,4 +17,3 @@
 ### Links/references
 
 
-/label ~"type::doc"

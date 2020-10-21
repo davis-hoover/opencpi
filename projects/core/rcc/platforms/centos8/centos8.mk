@@ -19,7 +19,7 @@
 ##########################################################################################
 # This file defines the "centos8" software platform.
 # It sets platform variables as necessary to override the defaults in
-#   "tools/cdk/include/platform-defaults.mk".
+#   "tools/include/platform-defaults.mk".
 # See that file for a description of valid variables and their defaults.
 
 OcpiPlatformOs=linux
