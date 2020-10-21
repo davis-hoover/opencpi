@@ -4,6 +4,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tools.ocpidev.ocpidev import register_project, unregister_project, delete_project
+from tools.ocpidev.ocpidev_errors import no_slash, no_exist, bad
+
+import cdk.ubuntu18_04.lib._opencpi as ocpi_module
+
+
 
 def do_project(*args):
     """Handle all aspects of project creation, registration, deregistration, etc."""
