@@ -1,4 +1,4 @@
-#!/bin/bash --noprofile
+#!/bin/bash
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
 #
@@ -17,20 +17,6 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-[ -r /etc/lsb-release ] && exec 3</etc/lsb-release || exit 1
-d_id=''
-d_rel=''
-
-IFS='='
-while read var val <&3
-do
-	case $var in
-	"DISTRIB_ID")
-		d_id=$val
-		;;
-	"DISTRIB_RELEASE")
-		d_rel=$val
-		;;
-	esac
-done
-[ $d_id = "Ubuntu" -a $d_rel = "16.04" ]
+[ ! -r /etc/os-release ] && exit 1
+source /etc/os-release
+[[ "${ID}" = "ubuntu" && "${VERSION_ID}" = "16.04" ]] && exit 0 || exit 1
