@@ -74,8 +74,8 @@ os -x .*/driver/.* -x .*/winnt/.*
 runtime/util -d internal -T ocpixml
 end-of-runtime-for-tools
 
-#runtime/drc/base -l drc
-#runtime/drc/ad9361 -l drc_ad9361
+runtime/drc/base -l drc
+runtime/drc/ad9361 -l drc_ad9361
 runtime/dataplane/xfer/base -l xfer
 runtime/dataplane/xfer/tests -n -d internal -l xfer_tests
 runtime/dataplane/xfer/drivers/datagram -v

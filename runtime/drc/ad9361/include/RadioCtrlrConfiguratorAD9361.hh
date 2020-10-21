@@ -68,10 +68,12 @@ public: const std::string &TX2_id() const { return m_data_stream_TX2; }
 // for 6 different unbalanced inputs or 3 different balanced inputs.
 // 
 
-public    : ConfiguratorAD9361(const char* data_stream_RX1 = "RX1",
-                const char* data_stream_RX2 = "RX2",
-                const char* data_stream_TX1 = "TX1",
-                const char* data_stream_TX2 = "TX2");
+// The derived class or instantiator must assign the stream names.
+// This leaves the default constructor alone, to be used for copying
+public    : ConfiguratorAD9361(const char* data_stream_RX1,
+			       const char* data_stream_RX2,
+			       const char* data_stream_TX1,
+			       const char* data_stream_TX2);
 
 protected : void constrain_config_by_Rx_RFPLL_LO_freq(
                 data_stream_ID_t data_stream);

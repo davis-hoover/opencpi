@@ -30,7 +30,7 @@
 #include "OcpiThread.h"             // just for linkage hooks
 #include "OcpiUtilPci.h"            // just for linkage hooks
 #include "ContainerPort.h"          // just for linkage hooks
-#if 0
+#if 1
 #include "UtilLogPrefix.hh"         // just for linkage hooks
 #include "RadioCtrlr.hh"            // just for linkage hooks
 #include "RadioCtrlrConfigurator.hh"// just for linkage hooks
@@ -241,7 +241,7 @@ namespace OCPI {
       ((OCPI::Container::Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
       pthread_workqueue_create_np(NULL, NULL);
       // DRC support
-#if 0
+#if 1
       ((OCPI::DRC::DataStreamConfigLockRequest *)linkme)->get_data_stream_type();
       ((OCPI::DRC::RadioCtrlrNoOSTuneResamp *)linkme)->init();
       ((OCPI::DRC::Configurator *)linkme)->unlock_all();

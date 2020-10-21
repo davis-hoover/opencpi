@@ -23,13 +23,17 @@
 #include "OcpiOsDebugApi.hh"
 #include "UtilLogPrefix.hh"
 
+namespace OS = OCPI::OS;
 namespace OCPI {
   namespace Util {
 
 LogPrefix::
 LogPrefix(const char *prefix)
   : m_prefix(prefix ? prefix : ""),
-    m_debug(false), m_info(false), m_warn(false), m_error(false)
+    m_debug(OS::logWillLog(OCPI_LOG_DEBUG)),
+    m_info(OS::logWillLog(OCPI_LOG_INFO)),
+    m_warn(OS::logWillLog(OCPI_LOG_INFO)),
+    m_error(OS::logWillLog(OCPI_LOG_BAD))
     {}
 LogPrefix::
 LogPrefix(const std::string &prefix) : m_prefix(prefix) {}

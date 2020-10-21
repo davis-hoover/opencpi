@@ -1803,10 +1803,14 @@ bool RadioCtrlrNoOSTuneResamp::reinit_AD9361_if_required(
 bool RadioCtrlrNoOSTuneResamp::any_configurator_configs_locked_which_prevent_ad9361_init() const {
 
   std::vector<data_stream_ID_t> data_streams;
-  data_streams.push_back(std::string(RX2_id()));
-  data_streams.push_back(std::string(RX1_id()));
-  data_streams.push_back(std::string(TX2_id()));
-  data_streams.push_back(std::string(TX1_id()));
+  if (!RX1_id().empty())
+    data_streams.push_back(std::string(RX1_id()));
+  if (!RX2_id().empty())
+    data_streams.push_back(std::string(RX2_id()));
+  if (!TX1_id().empty())
+    data_streams.push_back(std::string(TX1_id()));
+  if (!TX2_id().empty())
+    data_streams.push_back(std::string(TX2_id()));
 
   // unfortunately necessary to make this function const
   std::unique_ptr<Configurator> copy(m_configurator.clone());

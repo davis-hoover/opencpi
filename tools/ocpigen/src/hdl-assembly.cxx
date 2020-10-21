@@ -444,9 +444,7 @@ parseHdlAssy() {
   // 3. Specify the clock that is associated with an external port of the connection.
   // 4. For "clock islands" with none of the above, create an assembly level clock input.
 
-  // Pass 1. set the clock for any connection with an external port to a internal port
-  // with an owned clock.  This pass sets external port clocks for these ports.
-  // It also sets the clock for internal connections with a driven clock
+  // Pass 1. Sets the clock for internal connections with a driven clock, and propagate them
   for (auto ci = m_assembly->m_connections.begin(); ci != m_assembly->m_connections.end(); ci++) {
     Connection &c = **ci;
     if (!c.m_clock) {
@@ -508,6 +506,8 @@ parseHdlAssy() {
 
   // Pass 2a. set the clock for any connection with an external port to a internal port with an
   // owned clock that is not determined yet.  This pass sets external port clocks for these ports.
+  // Note we need to propagate immediately for each such connection to ensure that we don't
+  // assign different clocks to paths from one external port to another
   for (auto ci = m_assembly->m_connections.begin(); ci != m_assembly->m_connections.end(); ci++) {
     Connection &c = **ci;
     if (!c.m_clock && c.m_external) {
@@ -524,15 +524,16 @@ parseHdlAssy() {
 	    Clock &clk = c.m_external->m_instPort.m_port->addMyClock(ip.m_port->m_clock->m_output);
 	    ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal] = &clk;
 	    ocpiCheck(c.setClock(clk));
+	    m_assembly->propagateClocks(false);
 	    break;
 	}
       }
     }
   }
+#if 0
   // Now external ports have clocks if they are connected to internal ports with owned clocks, and
   // internal connections with driven clocks are also done
   m_assembly->propagateClocks();
-#if 0
   // 3. Create clocks for remaining unclocked connections with external ports,
   // but after each one propagate the clocks to other connections.
   // I.e. a single clock may end up used for multiple connections with external ports.
