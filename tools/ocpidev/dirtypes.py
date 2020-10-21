@@ -1,4 +1,4 @@
-from pathlib import PosixPath
+from pathlib import PosixPath, Path
 
 from tools.ocpidev.check_components import check_components
 from tools.ocpidev.ocpidev import parse_makefile, make_library
@@ -139,3 +139,9 @@ def get_subdir():
         bad(f"The directory for '{library}' '({libdir})' is not a library but type '{dirtype}'.")
 
     get_dirtype(".")  # Restore current directory (desired dirtype) for use after this function call
+
+
+def make_hdl_dir():
+    """Create an HDL directory"""
+    if not hdl.is_dir():
+        Path(hdl).mkdir()
