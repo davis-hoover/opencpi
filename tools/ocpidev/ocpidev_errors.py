@@ -1,5 +1,8 @@
+import logging
 import sys
 from pathlib import PosixPath, Path
+
+from tools.python._opencpi.util import OCPIException
 
 
 def bad(err_mess):
@@ -59,3 +62,18 @@ def need_name(*args):
         bad(f"A name argument is required after the command {args[0]}")
     elif args[1] == "*":
         bad(f"You cannot use '*' as a name")
+
+
+def try_return_bool(*args):
+    """Test a command argument for success or failure."""
+    # ocpi_util_path = platform_dir / "lib" / "_opencpi" / "util"
+    # util_spec = importlib.util.spec_from_file_location("util", ocpi_util_path)
+    # util_module = importlib.util.module_from_spec(util_spec)
+    # util_spec.loader.exec_module(util_module)
+    # OCPIException = util_module.OCPIException()
+    try:
+        if args[1]:
+            return sys.exit()
+    except OCPIException as e:
+        logging.error(e)
+        return sys.exit(1)
