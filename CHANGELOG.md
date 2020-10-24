@@ -1,3 +1,11 @@
+# [v1.7.1](https://gitlab.com/opencpi/opencpi/-/compare/v1.7.0...v1.7.1) (2020-10-24)
+
+Changes/additions since [OpenCPI Release v1.7.0](https://gitlab.com/opencpi/opencpi/-/releases/v1.7.0)
+
+### Bug Fixes
+- **tools**: `genDocumentation.sh`: Fix parsing of OSP name that is used to determine output prefix for OSP pdfs. (!396)(f52ca9c8)
+- **tools**: fix rare bug when `ubuntu16_04-check.sh` runs on a CentOS 6 os. (!397)(bcff9e47)
+
 # [v1.7.0](https://gitlab.com/opencpi/opencpi/compare/v1.7.0-rc.1...v1.7.0) (2020-07-09)
 
 Changes/additions since OpenCPI Release v1.7.0-rc.1
