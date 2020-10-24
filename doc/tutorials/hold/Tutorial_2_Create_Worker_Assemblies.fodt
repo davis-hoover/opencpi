@@ -7179,7 +7179,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P73">The tutorial also provides the <text:span text:style-name="T184">source code and </text:span>XML source for all of the assets <text:span text:style-name="T184">and scripts you create during tutorial execution </text:span>as text in the relevant sections of the document <text:span text:style-name="T184">that you copy and paste into the relevant files following the instructions given in the section.</text:span></text:p>
-   <text:p text:style-name="P74"><text:span text:style-name="T101">Note that all of the OpenCPI built-in projects described in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T102">OpenCPI User Guide</text:span></text:a><text:span text:style-name="T101"> including the projects referenced here are built for the CentOS 7 and </text:span><text:bookmark-start text:name="__DdeLink__3728_3429347919"/><text:span text:style-name="T101">Xilinx Vivado</text:span><text:span text:style-name="T106">®</text:span><text:span text:style-name="T101"> XSim</text:span><text:bookmark-end text:name="__DdeLink__3728_3429347919"/><text:span text:style-name="T101"> platforms as part of the OpenCPI installation process. You do not need to build, register or import these projects in order to use them in this tutorial.</text:span></text:p>
+   <text:p text:style-name="P74"><text:span text:style-name="T101">Note that all of the OpenCPI built-in projects described in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T102">OpenCPI User Guide</text:span></text:a><text:span text:style-name="T101"> including the projects referenced here are built for the CentOS 7 and </text:span><text:bookmark-start text:name="__DdeLink__3728_3429347919"/><text:span text:style-name="T101">Xilinx Vivado</text:span><text:span text:style-name="T106">®</text:span><text:span text:style-name="T101"> XSim</text:span><text:bookmark-end text:name="__DdeLink__3728_3429347919"/><text:span text:style-name="T101"> platforms as part of the OpenCPI installation process. You do not need to build, register or import these projects in order to use them in this tutorial.</text:span></text:p>
    <text:p text:style-name="Body"/>
    <text:h text:style-name="P141" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc12819_4114161630"/>Prerequisites <text:span text:style-name="T37">to This Tutorial</text:span><text:bookmark-end text:name="__RefHeading___Toc12819_4114161630"/></text:h>
    <text:p text:style-name="P69"><text:bookmark-start text:name="__DdeLink__16718_4114161630"/><text:bookmark-start text:name="__DdeLink__80048_4114161630"/><text:bookmark-start text:name="__DdeLink__16722_4114161630"/><text:span text:style-name="T59">B</text:span><text:span text:style-name="T60">efore you begin this tutorial, you </text:span><text:span text:style-name="T61">should</text:span><text:span text:style-name="T60"> have </text:span><text:span text:style-name="T61">successfully </text:span><text:span text:style-name="T60">completed Tutorial 1, “Component-based Development”.</text:span><text:bookmark-start text:name="__DdeLink__15754_310614188"/><text:bookmark-end text:name="__DdeLink__16718_4114161630"/><text:bookmark-end text:name="__DdeLink__80048_4114161630"/></text:p>
@@ -7223,7 +7223,7 @@
       <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T6">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C2" office:value-type="string">
-      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_User.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_User.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -7234,7 +7234,7 @@
       <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T6">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C3" office:value-type="string">
-      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_Application_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_Application_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -7245,7 +7245,7 @@
       <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T6">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C4" office:value-type="string">
-      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_Component_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_Component_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -7256,7 +7256,7 @@
       <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T6">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C5" office:value-type="string">
-      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_HDL_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_HDL_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row table:style-name="Table2.1">
@@ -7267,7 +7267,7 @@
       <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="http://opencpi.org/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T6">OpenCPI</text:span></text:a></text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.C6" office:value-type="string">
-      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.0/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
+      <text:p text:style-name="P37"><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_RCC_Development.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T7">https://opencpi.gitlab.io/releases/v1.7.1/docs/OpenCPI_RCC_Development.pdf</text:span></text:a></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
