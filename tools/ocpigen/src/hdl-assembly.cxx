@@ -538,7 +538,7 @@ parseHdlAssy() {
   // but after each one propagate the clocks to other connections.
   // I.e. a single clock may end up used for multiple connections with external ports.
   for (auto ci = m_assembly->m_connections.begin(); ci != m_assembly->m_connections.end(); ci++) {
-    Connection &c = **ci;
+     Connection &c = **ci;
     if (!c.m_clock && c.m_external && c.m_external->m_instPort.m_port->isOCP()) {
       assert("external connections still without clock" == 0);
       // Not based on any other clock and not inferred from any other port's clock
