@@ -1093,8 +1093,219 @@ bool DigRadioCtrlr<LC, C>::lock_gain_mode(
   return did_lock;
 }*/
 
+#define INIT_PARAM_FIELDS\
+  IPF(dev_sel, u32) \
+  IPF(id_no, u8) \
+  IPF(reference_clk_rate, u32) \
+  IPF(two_rx_two_tx_mode_enable, u8) \
+  IPF(one_rx_one_tx_mode_use_rx_num, u8) \
+  IPF(one_rx_one_tx_mode_use_tx_num, u8) \
+  IPF(frequency_division_duplex_mode_enable, u8) \
+  IPF(frequency_division_duplex_independent_mode_enable, u8) \
+  IPF(tdd_use_dual_synth_mode_enable, u8) \
+  IPF(tdd_skip_vco_cal_enable, u8) \
+  IPF(tx_fastlock_delay_ns, u32) \
+  IPF(rx_fastlock_delay_ns, u32) \
+  IPF(rx_fastlock_pincontrol_enable, u8) \
+  IPF(tx_fastlock_pincontrol_enable, u8) \
+  IPF(external_rx_lo_enable, u8) \
+  IPF(external_tx_lo_enable, u8) \
+  IPF(dc_offset_tracking_update_event_mask, u8) \
+  IPF(dc_offset_attenuation_high_range, u8) \
+  IPF(dc_offset_attenuation_low_range, u8) \
+  IPF(dc_offset_count_high_range, u8) \
+  IPF(dc_offset_count_low_range, u8) \
+  IPF(split_gain_table_mode_enable, u8) \
+  IPF(trx_synthesizer_target_fref_overwrite_hz, u32) \
+  IPF(qec_tracking_slow_mode_enable, u8) \
+  IPF(ensm_enable_pin_pulse_mode_enable, u8) \
+  IPF(ensm_enable_txnrx_control_enable, u8) \
+  IPF(rx_synthesizer_frequency_hz, u64) \
+  IPF(tx_synthesizer_frequency_hz, u64) \
+  IPF(tx_lo_powerdown_managed_enable, u8) \
+  IPF(rx_path_clock_frequencies[6], u32) \
+  IPF(tx_path_clock_frequencies[6], u32) \
+  IPF(rf_rx_bandwidth_hz, u32) \
+  IPF(rf_tx_bandwidth_hz, u32) \
+  IPF(rx_rf_port_input_select, u32) \
+  IPF(tx_rf_port_input_select, u32) \
+  IPF(tx_attenuation_mdB, u32) \
+  IPF(update_tx_gain_in_alert_enable, u8) \
+  IPF(xo_disable_use_ext_refclk_enable, u8) \
+  IPF(dcxo_coarse_and_fine_tune[2], u32) \
+  IPF(clk_output_mode_select, u32) \
+  IPF(gc_rx1_mode, u8) \
+  IPF(gc_rx2_mode, u8) \
+  IPF(gc_adc_large_overload_thresh, u8) \
+  IPF(gc_adc_ovr_sample_size, u8) \
+  IPF(gc_adc_small_overload_thresh, u8) \
+  IPF(gc_dec_pow_measurement_duration, u16) \
+  IPF(gc_dig_gain_enable, u8) \
+  IPF(gc_lmt_overload_high_thresh, u16) \
+  IPF(gc_lmt_overload_low_thresh, u16) \
+  IPF(gc_low_power_thresh, u8) \
+  IPF(gc_max_dig_gain, u8) \
+  IPF(mgc_dec_gain_step, u8) \
+  IPF(mgc_inc_gain_step, u8) \
+  IPF(mgc_rx1_ctrl_inp_enable, u8) \
+  IPF(mgc_rx2_ctrl_inp_enable, u8) \
+  IPF(mgc_split_table_ctrl_inp_gain_mode, u8) \
+  IPF(agc_adc_large_overload_exceed_counter, u8) \
+  IPF(agc_adc_large_overload_inc_steps, u8) \
+  IPF(agc_adc_lmt_small_overload_prevent_gain_inc_enable, u8) \
+  IPF(agc_adc_small_overload_exceed_counter, u8) \
+  IPF(agc_dig_gain_step_size, u8) \
+  IPF(agc_dig_saturation_exceed_counter, u8) \
+  IPF(agc_gain_update_interval_us, u32) \
+  IPF(agc_immed_gain_change_if_large_adc_overload_enable, u8) \
+  IPF(agc_immed_gain_change_if_large_lmt_overload_enable, u8) \
+  IPF(agc_inner_thresh_high, u8) \
+  IPF(agc_inner_thresh_high_dec_steps, u8) \
+  IPF(agc_inner_thresh_low, u8) \
+  IPF(agc_inner_thresh_low_inc_steps, u8) \
+  IPF(agc_lmt_overload_large_exceed_counter, u8) \
+  IPF(agc_lmt_overload_large_inc_steps, u8) \
+  IPF(agc_lmt_overload_small_exceed_counter, u8) \
+  IPF(agc_outer_thresh_high, u8) \
+  IPF(agc_outer_thresh_high_dec_steps, u8) \
+  IPF(agc_outer_thresh_low, u8) \
+  IPF(agc_outer_thresh_low_inc_steps, u8) \
+  IPF(agc_attack_delay_extra_margin_us, u32) \
+  IPF(agc_sync_for_gain_counter_enable, u8) \
+  IPF(fagc_dec_pow_measuremnt_duration, u32) \
+  IPF(fagc_state_wait_time_ns, u32) \
+  IPF(fagc_allow_agc_gain_increase, u8) \
+  IPF(fagc_lp_thresh_increment_time, u32) \
+  IPF(fagc_lp_thresh_increment_steps, u32) \
+  IPF(fagc_lock_level_lmt_gain_increase_en, u8) \
+  IPF(fagc_lock_level_gain_increase_upper_limit, u32) \
+  IPF(fagc_lpf_final_settling_steps, u32) \
+  IPF(fagc_lmt_final_settling_steps, u32) \
+  IPF(fagc_final_overrange_count, u32) \
+  IPF(fagc_gain_increase_after_gain_lock_en, u8) \
+  IPF(fagc_gain_index_type_after_exit_rx_mode, u32) \
+  IPF(fagc_use_last_lock_level_for_set_gain_en, u8) \
+  IPF(fagc_rst_gla_stronger_sig_thresh_exceeded_en, u8) \
+  IPF(fagc_optimized_gain_offset, u32) \
+  IPF(fagc_rst_gla_stronger_sig_thresh_above_ll, u32) \
+  IPF(fagc_rst_gla_engergy_lost_sig_thresh_exceeded_en, u8) \
+  IPF(fagc_rst_gla_engergy_lost_goto_optim_gain_en, u8) \
+  IPF(fagc_rst_gla_engergy_lost_sig_thresh_below_ll, u32) \
+  IPF(fagc_energy_lost_stronger_sig_gain_lock_exit_cnt, u32) \
+  IPF(fagc_rst_gla_large_adc_overload_en, u8) \
+  IPF(fagc_rst_gla_large_lmt_overload_en, u8) \
+  IPF(fagc_rst_gla_en_agc_pulled_high_en, u8) \
+  IPF(fagc_rst_gla_if_en_agc_pulled_high_mode, u32) \
+  IPF(fagc_power_measurement_duration_in_state5, u32) \
+  IPF(rssi_delay, u32) \
+  IPF(rssi_duration, u32) \
+  IPF(rssi_restart_mode, u8) \
+  IPF(rssi_unit_is_rx_samples_enable, u8) \
+  IPF(rssi_wait, u32) \
+  IPF(aux_adc_decimation, u32) \
+  IPF(aux_adc_rate, u32) \
+  IPF(aux_dac_manual_mode_enable, u8) \
+  IPF(aux_dac1_default_value_mV, u32) \
+  IPF(aux_dac1_active_in_rx_enable, u8) \
+  IPF(aux_dac1_active_in_tx_enable, u8) \
+  IPF(aux_dac1_active_in_alert_enable, u8) \
+  IPF(aux_dac1_rx_delay_us, u32) \
+  IPF(aux_dac1_tx_delay_us, u32) \
+  IPF(aux_dac2_default_value_mV, u32) \
+  IPF(aux_dac2_active_in_rx_enable, u8) \
+  IPF(aux_dac2_active_in_tx_enable, u8) \
+  IPF(aux_dac2_active_in_alert_enable, u8) \
+  IPF(aux_dac2_rx_delay_us, u32) \
+  IPF(aux_dac2_tx_delay_us, u32) \
+  IPF(temp_sense_decimation, u32) \
+  IPF(temp_sense_measurement_interval_ms, u16) \
+  IPF(temp_sense_offset_signed, u8) \
+  IPF(temp_sense_periodic_measurement_enable, u8) \
+  IPF(ctrl_outs_enable_mask, u8) \
+  IPF(ctrl_outs_index, u8) \
+  IPF(elna_settling_delay_ns, u32) \
+  IPF(elna_gain_mdB, u32) \
+  IPF(elna_bypass_loss_mdB, u32) \
+  IPF(elna_rx1_gpo0_control_enable, u8) \
+  IPF(elna_rx2_gpo1_control_enable, u8) \
+  IPF(elna_gaintable_all_index_enable, u8) \
+  IPF(digital_interface_tune_skip_mode, u8) \
+  IPF(digital_interface_tune_fir_disable, u8) \
+  IPF(pp_tx_swap_enable, u8) \
+  IPF(pp_rx_swap_enable, u8) \
+  IPF(tx_channel_swap_enable, u8) \
+  IPF(rx_channel_swap_enable, u8) \
+  IPF(rx_frame_pulse_mode_enable, u8) \
+  IPF(two_t_two_r_timing_enable, u8) \
+  IPF(invert_data_bus_enable, u8) \
+  IPF(invert_data_clk_enable, u8) \
+  IPF(fdd_alt_word_order_enable, u8) \
+  IPF(invert_rx_frame_enable, u8) \
+  IPF(fdd_rx_rate_2tx_enable, u8) \
+  IPF(swap_ports_enable, u8) \
+  IPF(single_data_rate_enable, u8) \
+  IPF(lvds_mode_enable, u8) \
+  IPF(half_duplex_mode_enable, u8) \
+  IPF(single_port_mode_enable, u8) \
+  IPF(full_port_enable, u8) \
+  IPF(full_duplex_swap_bits_enable, u8) \
+  IPF(delay_rx_data, u32) \
+  IPF(rx_data_clock_delay, u32) \
+  IPF(rx_data_delay, u32) \
+  IPF(tx_fb_clock_delay, u32) \
+  IPF(tx_data_delay, u32) \
+  IPF(lvds_bias_mV, u32) \
+  IPF(lvds_rx_onchip_termination_enable, u8) \
+  IPF(rx1rx2_phase_inversion_en, u8) \
+  IPF(lvds_invert1_control, u8) \
+  IPF(lvds_invert2_control, u8) \
+  IPF(gpo0_inactive_state_high_enable, u8) \
+  IPF(gpo1_inactive_state_high_enable, u8) \
+  IPF(gpo2_inactive_state_high_enable, u8) \
+  IPF(gpo3_inactive_state_high_enable, u8) \
+  IPF(gpo0_slave_rx_enable, u8) \
+  IPF(gpo0_slave_tx_enable, u8) \
+  IPF(gpo1_slave_rx_enable, u8) \
+  IPF(gpo1_slave_tx_enable, u8) \
+  IPF(gpo2_slave_rx_enable, u8) \
+  IPF(gpo2_slave_tx_enable, u8) \
+  IPF(gpo3_slave_rx_enable, u8) \
+  IPF(gpo3_slave_tx_enable, u8) \
+  IPF(gpo0_rx_delay_us, u8) \
+  IPF(gpo0_tx_delay_us, u8) \
+  IPF(gpo1_rx_delay_us, u8) \
+  IPF(gpo1_tx_delay_us, u8) \
+  IPF(gpo2_rx_delay_us, u8) \
+  IPF(gpo2_tx_delay_us, u8) \
+  IPF(gpo3_rx_delay_us, u8) \
+  IPF(gpo3_tx_delay_us, u8) \
+  IPF(low_high_gain_threshold_mdB, u32) \
+  IPF(low_gain_dB, u32) \
+  IPF(high_gain_dB, u32) \
+  IPF(tx_mon_track_en, u8) \
+  IPF(one_shot_mode_en, u8) \
+  IPF(tx_mon_delay, u32) \
+  IPF(tx_mon_duration, u32) \
+  IPF(tx1_mon_front_end_gain, u32) \
+  IPF(tx2_mon_front_end_gain, u32) \
+  IPF(tx1_mon_lo_cm, u32) \
+  IPF(tx2_mon_lo_cm, u32) \
+  IPF(gpio_resetb, u32) \
+  IPF(gpio_sync, u32) \
+  IPF(gpio_cal_sw1, u32) \
+  IPF(gpio_cal_sw2, u32) \
+
 void RadioCtrlrNoOSTuneResamp::log_debug_ad9361_init(const AD9361_InitParam &init_param) const {
   this->log_debug("No-OS call: ad9361_init w/ values: "
+#define IPF(n,f) "\n  "#n": %" PRI##f
+      INIT_PARAM_FIELDS "\n"
+#undef IPF
+#define IPF(n,f) ,init_param.n
+      INIT_PARAM_FIELDS
+		  );
+#if 0
+
+
             "rx_data_clock_delay=%" PRIu32
             ",rx_data_delay=%" PRIu32
             ",tx_fb_clock_delay=%" PRIu32
@@ -1103,6 +1314,7 @@ void RadioCtrlrNoOSTuneResamp::log_debug_ad9361_init(const AD9361_InitParam &ini
             init_param.rx_data_delay,
             init_param.tx_fb_clock_delay,
             init_param.tx_data_delay);
+#endif
 }
 
 
@@ -1174,7 +1386,7 @@ void RadioCtrlrNoOSTuneResamp::init() {
   }
 
   // Successful Initialization, tell workers about what happened.
-  m_callBack.finalConfig(m_device);
+  m_callBack.finalConfig(m_device, cfg);
 }
 
 void RadioCtrlrNoOSTuneResamp::init_AD9361_InitParam() {

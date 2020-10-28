@@ -40,8 +40,7 @@ namespace DRC {
  *         This class is intended to be used as a member of a
  *         DigRadioCtrlr class.
  ******************************************************************************/
-class ConfiguratorAD9361 :
-    public Configurator {
+class ConfiguratorAD9361 : public Configurator {
 // this class assumed fixed AD9361 REFCLK FREQ
 #define REFCLK40MHz 40e6
 // this class assumed fixed AD9361 Rx FIR decimation factor
@@ -105,8 +104,12 @@ protected : void constrain_samples_are_complex_data_stream_1_equals_1();
 protected : void constrain_samples_are_complex_data_stream_2_equals_1();
 protected : void constrain_samples_are_complex_data_stream_3_equals_1();
 
-protected : void constrain_rx_rf_bandwidth_less_than_or_equal_to_RX_SAMPL_FREQ_MHz();
-protected : void constrain_tx_rf_bandwidth_less_than_or_equal_to_TX_SAMPL_FREQ_MHz();
+protected : void constrain_tuning_freq_equals_Rx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(
+                   const data_stream_ID_t &data_stream);
+protected : void constrain_tuning_freq_equals_Tx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(
+                   const data_stream_ID_t &data_stream);
+protected : double ad9361MaxRxSampleMhz();
+protected : double ad9361MaxTxSampleMhz();
 
 /*! @brief Here is where we apply a single pass of all of the constraints
  *         specific to this class. 'Single pass' simply means that
@@ -119,8 +122,8 @@ public : Configurator *clone() const { assert("UNEXPECTED CLONE"==0); return NUL
 
 }; // class ConfiguratorAD9361
 
-} // namespace RadioCtrlr
+} // namespace DRC
 
-} // namespace OCPIProjects
+} // namespace OCPI
 
-#endif // _OCPI_PROJECTS_RADIO_CTRLR_CONFIGURATOR_AD9361_HH
+#endif // _OCPI_DRC_CONFIGURATOR_AD9361_HH

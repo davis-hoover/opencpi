@@ -60,12 +60,17 @@ const config_key_t config_key_gain_dB            ("gain_dB"            );
 class RadioConfiguratorDataStreamBase {
 
 protected : data_stream_type_t                        m_type;
+private   : bool m_enabled;
 public    : std::map<config_key_t, LockRConstrConfig> m_configs;
 public    : RadioConfiguratorDataStreamBase(data_stream_type_t type);
 
 public    : data_stream_type_t get_type() const;
 
 public    : bool operator==(const RadioConfiguratorDataStreamBase& rhs) const;
+  bool isEnabled() const { return m_enabled; }
+  void enable() { m_enabled = true; }
+  void setEnable(bool en) { m_enabled = en; }
+  void disable() { m_enabled = false; }
 
 };
 
@@ -87,9 +92,7 @@ public    : AnaRadioConfiguratorDataStream(data_stream_type_t type);
  *         * sampling_rate_MHz.
  ******************************************************************************/
 class DigRadioConfiguratorDataStream : public AnaRadioConfiguratorDataStream {
-
 public    : DigRadioConfiguratorDataStream(data_stream_type_t type);
-
 };
 
 /*! @brief Expands a basic digital radio data stream to include the following
@@ -111,7 +114,7 @@ public    : DigRadioConfiguratorDataStreamWithGain(data_stream_type_t type);
  ******************************************************************************/
 class Configurator : virtual public OCPI::Util::LogPrefix {
 
-  typedef RadioConfiguratorDataStreamBase data_stream_t;
+public: typedef RadioConfiguratorDataStreamBase data_stream_t;
 protected : typedef std::map<data_stream_ID_t, data_stream_t> data_streams_t;
 
 /// @brief these contain data stream-specific configs
@@ -122,11 +125,15 @@ protected : std::map<config_key_t, LockRConstrConfig> m_configs;
 
 private   : bool m_impose_constraints_first_run_did_occur;
 
-public    : Configurator(data_stream_t    data_stream_0,
-                         data_stream_ID_t data_stream_0_key);
+private   : size_t m_nRxStreams, m_readIdx; // temporary for getNextStream
+private   : std::vector<data_stream_ID_t> m_readStreams; // could be char*
 
-public    : virtual Configurator *clone() const = 0;
+public    : Configurator();
+
+public    : virtual Configurator *clone() const = 0; // implemented in most-derived classes
 public    : virtual ~Configurator() {}
+
+public:   bool getNextStream(unsigned &ii, bool enabled, bool &isRx, data_stream_ID_t *&id);
 
 /*! @brief  Lock data stream-specific config to the specified value.
  *  @return True if lock was successful. False if lock was unsuccessful.
@@ -195,6 +202,8 @@ public    : void log_all_possible_config_values(bool do_info = true,
 public    : void find_data_streams_of_type(data_stream_type_t type,
                 std::vector<data_stream_ID_t>& data_streams) const;
 
+public    : data_stream_t *find_data_stream(const data_stream_ID_t &id);
+
 public    : const ConfigValueRanges& get_ranges_possible(
                 data_stream_ID_t data_stream_key,
                 config_key_t     config_key);
@@ -205,7 +214,9 @@ public    : const ConfigValueRanges& get_ranges_possible(
 /*! @brief Child classes must define the constraints which are applied during
  *         a single pass of constraints imposition.
  ******************************************************************************/
-protected : virtual void impose_constraints_single_pass() = 0;
+protected : void constrain_rx_rf_bandwidth_less_than_or_equal_to_RX_SAMPL_FREQ_MHz();
+protected : void constrain_tx_rf_bandwidth_less_than_or_equal_to_TX_SAMPL_FREQ_MHz();
+protected : virtual void impose_constraints_single_pass(); // base class has behavior
 
 protected : void ensure_impose_constraints_first_run_did_occur();
 

@@ -83,7 +83,7 @@ struct DeviceCallBack {
   // These are three hooks during initial configuration
   virtual void initialConfig(uint8_t id_no, Ad9361InitConfig &config) = 0; // before a config attempt
   virtual void postConfig(uint8_t id_no) = 0;  // after a config attempt, on success or failure
-  virtual void finalConfig(uint8_t id_no) = 0; // after a config attempt, on success
+  virtual void finalConfig(uint8_t id_no, Ad9361InitConfig &config) = 0; // after a config attempt, on success
   // These are for both channels
   virtual unsigned getRfInput(unsigned device, config_value_t tuning_freq_MHz) = 0;
   virtual unsigned getRfOutput(unsigned device, config_value_t tuning_freq_MHz) = 0;
@@ -117,7 +117,6 @@ ad9361InitialConfig(Config &config, DataSub &dataSub, Ad9361InitConfig &cfg) {
   // frequency_division_duplex_independent_mode_enable is set to 1
   config.set_ENABLE_force_set(true);
   config.set_TXNRX_force_set(true);
-  // This setting is consistent with the setting in init_AD9361_InitParam, currently false
   // here is where we enforce the ad9361_config OWD comment
   // "[the force_two_r_two_t_timing] property is expected to correspond to the
   // D2 bit of the Parallel Port Configuration 1 register at SPI address 0x010
@@ -135,7 +134,7 @@ ad9361PostConfig(Config &config) {
 // A templated helper function that simply initializes the Ad9361BitStreamConfig from the two required slaves
 // and performs any other actions required prior to the call to ad9361_init.
 template<class Config> void
-ad9361FinalConfig(Config &config) {
+ad9361FinalConfig(Config &config, Ad9361InitConfig &/*cfg*/) {
   // enforce_ensm_config
   uint8_t
     ensm_config_1 = config.get_ensm_config_1(),

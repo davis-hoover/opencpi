@@ -54,12 +54,12 @@ ConfiguratorAD9361::ConfiguratorAD9361(
 // data stream 2/3 gain          -maps-to-> negative of AD9361 no-OS
 //                                          tx_attenuation
 /// @todo / FIXME - move the constraint imposition functionality herein to impose_constrains() for clarity
-  Configurator(DataStreamAD9361(data_stream_type_t::RX), data_stream_RX1),
   m_data_stream_RX1(data_stream_RX1),
   m_data_stream_RX2(data_stream_RX2 ? data_stream_RX2 : ""),
   m_data_stream_TX1(data_stream_TX1 ? data_stream_TX1 : ""),
-  m_data_stream_TX2(data_stream_TX2 ? data_stream_TX2 : "")  {
-  // additional data streams beyond data stream 0
+  m_data_stream_TX2(data_stream_TX2 ? data_stream_TX2 : "") {
+  if (data_stream_RX1)
+    m_data_streams.insert(std::make_pair(data_stream_RX1, DataStreamAD9361(data_stream_type_t::RX)));
   if (data_stream_RX2)
     m_data_streams.insert(std::make_pair(data_stream_RX2, DataStreamAD9361(data_stream_type_t::RX)));
   if (data_stream_TX1)
@@ -540,35 +540,6 @@ constrain_sampling_rate_Msps_data_stream_3_equals_TX_SAMPL_FREQ() {
   this->throw_if_any_possible_ranges_are_empty(__func__);
 }
 
-/*! @brief This enforces the constraint:
- * @f{eqnarray*}{
- *  s.t. & rx\_rf\_bandwidth <= RX\_SAMPL\_FREQ\_MHz
- * @f}
- ******************************************************************************/
-void ConfiguratorAD9361::
-constrain_rx_rf_bandwidth_less_than_or_equal_to_RX_SAMPL_FREQ_MHz() {
-
-  LockRConstrConfig& cfg_Y = get_config("rx_rf_bandwidth");
-  LockRConstrConfig& cfg_X = get_config("RX_SAMPL_FREQ_MHz");
-  constrain_Y_less_than_or_equal_to_X(cfg_Y, cfg_X);
-
-  this->throw_if_any_possible_ranges_are_empty(__func__);
-}
-
-/*! @brief This enforces the constraint:
- * @f{eqnarray*}{
- *  s.t. & tx\_rf\_bandwidth <= TX\_SAMPL\_FREQ\_MHz
- * @f}
- ******************************************************************************/
-void ConfiguratorAD9361::
-constrain_tx_rf_bandwidth_less_than_or_equal_to_TX_SAMPL_FREQ_MHz() {
-
-  LockRConstrConfig& cfg_Y = get_config("tx_rf_bandwidth");
-  LockRConstrConfig& cfg_X = get_config("TX_SAMPL_FREQ_MHz");
-  constrain_Y_less_than_or_equal_to_X(cfg_Y, cfg_X);
-
-  this->throw_if_any_possible_ranges_are_empty(__func__);
-}
 
 /*! @brief This enforces the constraint:
  * @f{eqnarray*}{
@@ -624,6 +595,28 @@ constrain_samples_are_complex_data_stream_3_equals_1() {
   constrain_Y_equals_constant(cfg_Y, 1);
 
   this->throw_if_any_possible_ranges_are_empty(__func__);
+}
+
+void ConfiguratorAD9361::
+constrain_tuning_freq_equals_Rx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(
+    const data_stream_ID_t &data_stream) {
+
+  LockRConstrConfig& cfg_X = get_config(data_stream, config_key_tuning_freq_MHz);
+  LockRConstrConfig& cfg_A = get_config("Rx_RFPLL_LO_freq");
+  LockRConstrConfig& cfg_B = get_config(data_stream, "tuning_freq_complex_mixer_MHz");
+
+  constrain_all_XAB_such_that_X_equals_A_plus_B(cfg_X, cfg_A, cfg_B);
+}
+
+void ConfiguratorAD9361::
+constrain_tuning_freq_equals_Tx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(
+    const data_stream_ID_t &data_stream) {
+
+  LockRConstrConfig& cfg_X = get_config(data_stream, config_key_tuning_freq_MHz);
+  LockRConstrConfig& cfg_A = get_config("Tx_RFPLL_LO_freq");
+  LockRConstrConfig& cfg_B = get_config(data_stream, "tuning_freq_complex_mixer_MHz");
+
+  constrain_all_XAB_such_that_X_equals_A_plus_B(cfg_X, cfg_A, cfg_B);
 }
 
 /*! @brief The AD9361 configuration space is modelled as a constrained
@@ -716,37 +709,64 @@ void ConfiguratorAD9361::impose_constraints_single_pass() {
 
   // unfortunately, order in which these are called matters...
 
-  constrain_gain_mode_data_stream_0_equals_0_or_1();
-  constrain_gain_mode_data_stream_1_equals_0_or_1();
-  constrain_gain_mode_data_stream_2_equals_1();
-  constrain_gain_mode_data_stream_3_equals_1();
-  constrain_tuning_freq_MHz_data_stream_0_equals_Rx_RFPLL_LO_freq();
-  constrain_tuning_freq_MHz_data_stream_1_equals_Rx_RFPLL_LO_freq();
-  constrain_tuning_freq_MHz_data_stream_2_equals_Tx_RFPLL_LO_freq();
-  constrain_tuning_freq_MHz_data_stream_3_equals_Tx_RFPLL_LO_freq();
-  constrain_gain_dB_data_stream_0_equals_func_of_Rx_RFPLL_LO_freq();
-  constrain_gain_dB_data_stream_1_equals_func_of_Rx_RFPLL_LO_freq();
-  constrain_gain_dB_data_stream_2_is_in_range_neg_89p75_to_0();
-  constrain_gain_dB_data_stream_3_is_in_range_neg_89p75_to_0();
-  constrain_bandwidth_3dB_MHz_data_stream_0_equals_rx_rf_bandwidth();
-  constrain_bandwidth_3dB_MHz_data_stream_1_equals_rx_rf_bandwidth();
-  constrain_bandwidth_3dB_MHz_data_stream_2_equals_tx_rf_bandwidth();
-  constrain_bandwidth_3dB_MHz_data_stream_3_equals_tx_rf_bandwidth();
-  constrain_RX_SAMPL_FREQ_MHz_equals_TX_SAMPL_FREQ_MHz_times_DAC_Clk_divider();
-  constrain_sampling_rate_Msps_data_stream_0_equals_RX_SAMPL_FREQ();
-  constrain_sampling_rate_Msps_data_stream_1_equals_RX_SAMPL_FREQ();
-  constrain_sampling_rate_Msps_data_stream_2_equals_TX_SAMPL_FREQ();
-  constrain_sampling_rate_Msps_data_stream_3_equals_TX_SAMPL_FREQ();
-  constrain_samples_are_complex_data_stream_0_equals_1();
-  constrain_samples_are_complex_data_stream_1_equals_1();
-  constrain_samples_are_complex_data_stream_2_equals_1();
-  constrain_samples_are_complex_data_stream_3_equals_1();
+#if 0
+  Configurator::data_stream_t
+    *s0 = find_data_stream(m_data_stream_RX1),
+    *s1 = find_data_stream(m_data_stream_RX2),
+    *s2 = find_data_stream(m_data_stream_TX1),
+    *s3 = find_data_stream(m_data_stream_TX2);
 
-  // Nyquist criterion constraints
-  constrain_rx_rf_bandwidth_less_than_or_equal_to_RX_SAMPL_FREQ_MHz();
-  constrain_tx_rf_bandwidth_less_than_or_equal_to_TX_SAMPL_FREQ_MHz();
+  if (s0) constrain_gain_mode_data_stream_0_equals_0_or_1();
+  if (s1) constrain_gain_mode_data_stream_1_equals_0_or_1();
+  if (s2) constrain_gain_mode_data_stream_2_equals_1();
+  if (s3) constrain_gain_mode_data_stream_3_equals_1();
+  if (s2) constrain_gain_dB_data_stream_2_is_in_range_neg_89p75_to_0();
+  if (s3) constrain_gain_dB_data_stream_3_is_in_range_neg_89p75_to_0();
+
+  // When we are being used in a TuneResamp context, but the constraints are ad9361-specific
+  if (s0 && s0->m_configs.find("tuning_freq_complex_mixer_MHz") != s0->m_configs.end())
+    constrain_tuning_freq_equals_Rx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(m_data_stream_RX1); // (all/3)
+  if (s1 && s1->m_configs.find("tuning_freq_complex_mixer_MHz") != s1->m_configs.end())
+    constrain_tuning_freq_equals_Rx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(m_data_stream_RX2); // (all/3)
+  if (s2 && s2->m_configs.find("tuning_freq_complex_mixer_MHz") != s2->m_configs.end())
+    constrain_tuning_freq_equals_Tx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(m_data_stream_TX1); // (all/3)
+  if (s3 && s3->m_configs.find("tuning_freq_complex_mixer_MHz") != s3->m_configs.end())
+    constrain_tuning_freq_equals_Tx_RFPLL_LO_freq_plus_complex_mixer_NCO_freq(m_data_stream_TX2); // (all/3)
+
+  if (s0) constrain_gain_dB_data_stream_0_equals_func_of_Rx_RFPLL_LO_freq();
+  if (s1) constrain_gain_dB_data_stream_1_equals_func_of_Rx_RFPLL_LO_freq();
+
+  constrain_RX_SAMPL_FREQ_MHz_equals_TX_SAMPL_FREQ_MHz_times_DAC_Clk_divider();
+
+  if (s0) constrain_samples_are_complex_data_stream_0_equals_1();
+  if (s1) constrain_samples_are_complex_data_stream_1_equals_1();
+  if (s2) constrain_samples_are_complex_data_stream_2_equals_1();
+  if (s3) constrain_samples_are_complex_data_stream_3_equals_1();
+#endif
+#if 0
+  if (s0) constrain_tuning_freq_MHz_data_stream_0_equals_Rx_RFPLL_LO_freq();
+  if (s1) constrain_tuning_freq_MHz_data_stream_1_equals_Rx_RFPLL_LO_freq();
+  if (s2) constrain_tuning_freq_MHz_data_stream_2_equals_Tx_RFPLL_LO_freq();
+  if (s3) constrain_tuning_freq_MHz_data_stream_3_equals_Tx_RFPLL_LO_freq();
+  if (s0) constrain_bandwidth_3dB_MHz_data_stream_0_equals_rx_rf_bandwidth();
+  if (s1) constrain_bandwidth_3dB_MHz_data_stream_1_equals_rx_rf_bandwidth();
+  if (s2) constrain_bandwidth_3dB_MHz_data_stream_2_equals_tx_rf_bandwidth();
+  if (s3) constrain_bandwidth_3dB_MHz_data_stream_3_equals_tx_rf_bandwidth();
+  if (s0) constrain_sampling_rate_Msps_data_stream_0_equals_RX_SAMPL_FREQ();
+  if (s1) constrain_sampling_rate_Msps_data_stream_1_equals_RX_SAMPL_FREQ();
+  if (s2) constrain_sampling_rate_Msps_data_stream_2_equals_TX_SAMPL_FREQ();
+  if (s3) constrain_sampling_rate_Msps_data_stream_3_equals_TX_SAMPL_FREQ();
+#endif
+}
+double ConfiguratorAD9361::
+ad9361MaxRxSampleMhz() {
+  return calc_max_AD9361_RX_SAMPL_FREQ_Hz(REFCLK40MHz, RX_FIR_DEC_FACTOR)/1e6;
+}
+double ConfiguratorAD9361::
+ad9361MaxTxSampleMhz() {
+  return calc_max_AD9361_TX_SAMPL_FREQ_Hz(REFCLK40MHz, TX_FIR_INT_FACTOR)/1e6;
 }
 
-} // namespace RadioCtrlr
+} // namespace DRC
 
-} // namespace OCPIProjects
+} // namespace OCPI

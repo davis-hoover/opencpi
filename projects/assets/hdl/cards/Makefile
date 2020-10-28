@@ -27,4 +27,5 @@ Tests =
 # not setting Workers variable causes all workers to build
 #Workers =
 
+ExcludeWorkers=dig_radio_ctrlr_fmcomms_2_3.rcc
 include $(OCPI_CDK_DIR)/include/library.mk

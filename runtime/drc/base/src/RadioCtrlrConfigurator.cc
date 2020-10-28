@@ -32,8 +32,8 @@ namespace OCPI {
 
 namespace DRC {
 
-RadioConfiguratorDataStreamBase::RadioConfiguratorDataStreamBase(
-    const data_stream_type_t type) : m_type(type) {
+RadioConfiguratorDataStreamBase::
+RadioConfiguratorDataStreamBase(const data_stream_type_t type) : m_type(type), m_enabled(false) {
 }
 
 data_stream_type_t RadioConfiguratorDataStreamBase::get_type() const {
@@ -97,9 +97,9 @@ AnaRadioConfiguratorDataStream::AnaRadioConfiguratorDataStream(
   }
 }
 
-DigRadioConfiguratorDataStream::DigRadioConfiguratorDataStream(
-    const data_stream_type_t type) :
-    AnaRadioConfiguratorDataStream(type) {
+DigRadioConfiguratorDataStream::
+DigRadioConfiguratorDataStream(const data_stream_type_t type)
+  : AnaRadioConfiguratorDataStream(type) {
 
   config_value_t max = std::numeric_limits<config_value_t>::max();
   {
@@ -143,13 +143,8 @@ DigRadioConfiguratorDataStreamWithGain::DigRadioConfiguratorDataStreamWithGain(
   }
 }
 
-Configurator::Configurator(
-    const data_stream_t    data_stream_0,
-    const data_stream_ID_t data_stream_0_key) :
-    m_impose_constraints_first_run_did_occur(false) {
-
-  // radio contains at a minimum a single data stream
-  m_data_streams.insert(std::make_pair(data_stream_0_key, data_stream_0));
+Configurator::Configurator()
+    : m_impose_constraints_first_run_did_occur(false) {
 
   // we really want to call impose_constraints() here, but since
   // impose_constraints() is virtual, we instead call
@@ -157,6 +152,28 @@ Configurator::Configurator(
   // in every method whose behavior could have been affected by
   // the impose_constraints() call we wanted to be in the
   // constructor
+}
+
+bool Configurator::
+getNextStream(unsigned &ii, bool enabled, bool &isRx, data_stream_ID_t *&id) {
+    if (ii == 0) {
+      m_readStreams.clear();
+      find_data_streams_of_type(data_stream_type_t::RX, m_readStreams);
+      m_nRxStreams = m_readStreams.size();
+      find_data_streams_of_type(data_stream_type_t::TX, m_readStreams); // uses pushback
+      m_readIdx = 0;
+    }
+    do {
+      if (m_readIdx == m_readStreams.size())
+	return false;
+      if (!enabled || find_data_stream(m_readStreams[m_readIdx])->isEnabled())
+	break;
+      m_readIdx++;
+    } while(1);
+    id = &m_readStreams[m_readIdx];
+    isRx = m_readIdx < m_nRxStreams;
+    m_readIdx++;
+    return true;
 }
 
 /// @todo / FIXME - Implement strong guarantee of exception safety.
@@ -456,6 +473,11 @@ void Configurator::log_all_possible_config_values(
   }
 }
 
+Configurator::data_stream_t *Configurator::
+find_data_stream(const data_stream_ID_t &id) {
+  auto it = m_data_streams.find(id);
+  return it == m_data_streams.end() ? NULL : &it->second;
+}
 void Configurator::find_data_streams_of_type(
     const data_stream_type_t       type,
     std::vector<data_stream_ID_t>& data_streams) const {
@@ -1319,6 +1341,41 @@ bool Configurator::limit_Y_to_greater_than_or_equal_to_X(
   return changed;
 }
 
+/*! @brief This enforces the constraint:
+ * @f{eqnarray*}{
+ *  s.t. & rx\_rf\_bandwidth <= RX\_SAMPL\_FREQ\_MHz
+ * @f}
+ ******************************************************************************/
+void Configurator::
+constrain_rx_rf_bandwidth_less_than_or_equal_to_RX_SAMPL_FREQ_MHz() {
+
+  LockRConstrConfig& cfg_Y = get_config("rx_rf_bandwidth");
+  LockRConstrConfig& cfg_X = get_config("RX_SAMPL_FREQ_MHz");
+  constrain_Y_less_than_or_equal_to_X(cfg_Y, cfg_X);
+
+  this->throw_if_any_possible_ranges_are_empty(__func__);
+}
+
+/*! @brief This enforces the constraint:
+ * @f{eqnarray*}{
+ *  s.t. & tx\_rf\_bandwidth <= TX\_SAMPL\_FREQ\_MHz
+ * @f}
+ ******************************************************************************/
+void Configurator::
+constrain_tx_rf_bandwidth_less_than_or_equal_to_TX_SAMPL_FREQ_MHz() {
+
+  LockRConstrConfig& cfg_Y = get_config("tx_rf_bandwidth");
+  LockRConstrConfig& cfg_X = get_config("TX_SAMPL_FREQ_MHz");
+  constrain_Y_less_than_or_equal_to_X(cfg_Y, cfg_X);
+
+  this->throw_if_any_possible_ranges_are_empty(__func__);
+}
+
+void Configurator::impose_constraints_single_pass() {
+  // Nyquist criterion constraints
+  constrain_rx_rf_bandwidth_less_than_or_equal_to_RX_SAMPL_FREQ_MHz();
+  constrain_tx_rf_bandwidth_less_than_or_equal_to_TX_SAMPL_FREQ_MHz();
+}
 } // namespace RadioCtrlr
 
 } // namespace OCPIProjects

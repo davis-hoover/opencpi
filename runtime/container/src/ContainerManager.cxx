@@ -36,7 +36,7 @@
 #include "RadioCtrlrConfigurator.hh"// just for linkage hooks
 #include "RadioCtrlrConfigurator.hh"// just for linkage hooks
 #include "RadioCtrlrConfiguratorAD9361.hh"// just for linkage hooks
-#include "RadioCtrlrNoOsTuneResamp.hh"// just for linkage hooks
+#include "RadioCtrlrNoOSTuneResamp.hh"// just for linkage hooks
 extern "C" {
 #include "ad9361_platform.h"
 }
@@ -245,7 +245,7 @@ namespace OCPI {
       ((OCPI::DRC::DataStreamConfigLockRequest *)linkme)->get_data_stream_type();
       ((OCPI::DRC::RadioCtrlrNoOSTuneResamp *)linkme)->init();
       ((OCPI::DRC::Configurator *)linkme)->unlock_all();
-      OCPI::DRC::ConfiguratorAD9361 c;
+      OCPI::DRC::ConfiguratorAD9361 c(NULL, NULL, NULL, NULL);
       ((OCPI::Util::LogPrefix *)linkme)->log_debug("hello");
       ad9361_opencpi.set_reset(0, 0);
 #endif
