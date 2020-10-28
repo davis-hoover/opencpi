@@ -40,7 +40,7 @@ namespace DRC {
  *         This class is intended to be used as a member of a
  *         DigRadioCtrlr class.
  ******************************************************************************/
-class ConfiguratorAD9361 : public Configurator {
+class ConfiguratorAD9361 : virtual public Configurator {
 // this class assumed fixed AD9361 REFCLK FREQ
 #define REFCLK40MHz 40e6
 // this class assumed fixed AD9361 Rx FIR decimation factor

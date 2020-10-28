@@ -709,7 +709,6 @@ void ConfiguratorAD9361::impose_constraints_single_pass() {
 
   // unfortunately, order in which these are called matters...
 
-#if 0
   Configurator::data_stream_t
     *s0 = find_data_stream(m_data_stream_RX1),
     *s1 = find_data_stream(m_data_stream_RX2),
@@ -742,7 +741,7 @@ void ConfiguratorAD9361::impose_constraints_single_pass() {
   if (s1) constrain_samples_are_complex_data_stream_1_equals_1();
   if (s2) constrain_samples_are_complex_data_stream_2_equals_1();
   if (s3) constrain_samples_are_complex_data_stream_3_equals_1();
-#endif
+
 #if 0
   if (s0) constrain_tuning_freq_MHz_data_stream_0_equals_Rx_RFPLL_LO_freq();
   if (s1) constrain_tuning_freq_MHz_data_stream_1_equals_Rx_RFPLL_LO_freq();

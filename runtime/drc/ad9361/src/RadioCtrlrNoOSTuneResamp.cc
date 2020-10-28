@@ -392,62 +392,12 @@ bool RadioCtrlrNoOSTuneResamp::get_worker_exists_in_app(
 }*/
 
 /// @todo / FIXME - check for existence of qadc/qdac?
-bool RadioCtrlrNoOSTuneResamp::get_data_stream_is_enabled(
-    const data_stream_ID_t data_stream_ID) const {
-
-  if(not m_ad9361_init_called) {
+bool RadioCtrlrNoOSTuneResamp::
+get_data_stream_is_enabled(const data_stream_ID_t data_stream_ID) const {
+  if (not m_ad9361_init_called)
     //throw std::string("ad9361_init was never called");
     return false;
-  }
-
-  bool data_stream_is_enabled = false;
-
-  if(data_stream_ID == RX1_id()) {
-    if(m_AD9361_InitParam.two_rx_two_tx_mode_enable) {
-      data_stream_is_enabled = true;
-    }
-    else {
-      if(m_AD9361_InitParam.one_rx_one_tx_mode_use_rx_num == 1) {
-        data_stream_is_enabled = true;
-      }
-    }
-  }
-  else if(data_stream_ID == RX2_id()) {
-    if(m_AD9361_InitParam.two_rx_two_tx_mode_enable) {
-      data_stream_is_enabled = true;
-    }
-    else {
-      if(m_AD9361_InitParam.one_rx_one_tx_mode_use_rx_num == 2) {
-        data_stream_is_enabled = true;
-      }
-    }
-  }
-  else if(data_stream_ID == TX1_id()) {
-    if(m_AD9361_InitParam.two_rx_two_tx_mode_enable) {
-      data_stream_is_enabled = true;
-    }
-    else {
-      if(m_AD9361_InitParam.one_rx_one_tx_mode_use_tx_num == 1) {
-        data_stream_is_enabled = true;
-      }
-    }
-  }
-  else if(data_stream_ID == TX2_id()) {
-    if(m_AD9361_InitParam.two_rx_two_tx_mode_enable) {
-      data_stream_is_enabled = true;
-    }
-    else {
-      if(m_AD9361_InitParam.one_rx_one_tx_mode_use_tx_num == 2) {
-        data_stream_is_enabled = true;
-      }
-    }
-  }
-  else {
-    std::ostringstream oss;
-    oss << "invalid data stream ID requested: " << data_stream_ID;
-    throw oss.str().c_str();
-  }
-  return data_stream_is_enabled;
+  return m_configurator.find_data_stream(data_stream_ID)->isEnabled();
 }
 
 Meas<config_value_t> RadioCtrlrNoOSTuneResamp::get_sampling_rate_Msps(
@@ -1387,6 +1337,23 @@ void RadioCtrlrNoOSTuneResamp::init() {
 
   // Successful Initialization, tell workers about what happened.
   m_callBack.finalConfig(m_device, cfg);
+
+  // Update the status of the data streams as to whether they are now enabled or not.
+  bool rx;
+  data_stream_ID_t *id;
+  for (unsigned ii = 0; m_configurator.getNextStream(ii, false, rx, id); ++ii)
+    if (*id == RX1_id())
+      m_configurator.find_data_stream(*id)->setEnable(m_AD9361_InitParam.two_rx_two_tx_mode_enable ||
+						     m_AD9361_InitParam.one_rx_one_tx_mode_use_rx_num == 1);
+    else if (*id == RX2_id())
+      m_configurator.find_data_stream(*id)->setEnable(m_AD9361_InitParam.two_rx_two_tx_mode_enable ||
+						     m_AD9361_InitParam.one_rx_one_tx_mode_use_rx_num == 2);
+    else if (*id == TX1_id())
+      m_configurator.find_data_stream(*id)->setEnable(m_AD9361_InitParam.two_rx_two_tx_mode_enable ||
+						     m_AD9361_InitParam.one_rx_one_tx_mode_use_tx_num == 1);
+    else if (*id == TX2_id())
+      m_configurator.find_data_stream(*id)->setEnable(m_AD9361_InitParam.two_rx_two_tx_mode_enable ||
+						     m_AD9361_InitParam.one_rx_one_tx_mode_use_tx_num == 2);
 }
 
 void RadioCtrlrNoOSTuneResamp::init_AD9361_InitParam() {
