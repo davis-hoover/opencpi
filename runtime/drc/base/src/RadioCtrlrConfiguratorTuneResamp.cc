@@ -25,6 +25,31 @@ namespace OCPI {
 
 namespace DRC {
 
+ConfiguratorTuneResamp::
+ConfiguratorTuneResamp(double maxRxSampleFreqMhz, double maxTxSampleFreqMhz,
+		       const ConfigValueRanges *CIC_dec_abs_ranges,
+		       const ConfigValueRanges *CIC_int_abs_ranges) {
+
+  ConfigValueRanges abs_ranges;
+  config_value_t max = std::numeric_limits<config_value_t>::max();
+  abs_ranges.add_valid_range(-max, max);
+  if (!CIC_dec_abs_ranges)
+    CIC_dec_abs_ranges = &abs_ranges;
+  if (!CIC_int_abs_ranges)
+    CIC_int_abs_ranges = &abs_ranges;
+
+  bool rx;
+  data_stream_ID_t *id;
+  for (unsigned ii = 0; getNextStream(ii, false, rx, id); ++ii)
+    if (rx) {
+      add_stream_config_RX_tuning_freq_complex_mixer(*id, maxRxSampleFreqMhz);
+      add_stream_config_CIC_dec_decimation_factor(   *id, *CIC_dec_abs_ranges);
+    } else {
+      add_stream_config_TX_tuning_freq_complex_mixer(*id, maxTxSampleFreqMhz);
+      add_stream_config_CIC_int_interpolation_factor(*id, *CIC_int_abs_ranges);
+    }
+}
+
 void ConfiguratorTuneResamp::
 add_stream_config_RX_tuning_freq_complex_mixer(const data_stream_ID_t &data_stream,
 					       double maxRxSampFreqMhz) {

@@ -29,7 +29,7 @@ const char* calc_AD9361_Tx_RFPLL_ref_divider(
     const regs_calc_AD9361_Tx_RFPLL_ref_divider_t& regs) {
   // see AD9361_Register_Map_Reference_Manual_UG-671.pdf Rev. 0 pg. 68
   uint8_t Ref_Divide_Config_2 = regs.ref_divide_config_2;
-  uint8_t Tx_Ref_Divider_1_0 = (uint8_t)(Ref_Divide_Config_2 & 0x0c) >> 2;
+  uint8_t Tx_Ref_Divider_1_0 = (uint8_t)((Ref_Divide_Config_2 & 0x0c) >> 2);
   switch(Tx_Ref_Divider_1_0) {
     case        0x00: val = 1.0F;  break;
     case        0x01: val = 0.5F;  break;

@@ -63,8 +63,12 @@ namespace DRC {
    @endverbatim
  ******************************************************************************/
 class ConfiguratorTuneResamp : virtual public Configurator {
+public:
+  ConfiguratorTuneResamp(double maxRxSampleFreqMhz, double maxTxSampleFreqMhz,
+			 const ConfigValueRanges *CIC_dec_abs_ranges = NULL,
+			 const ConfigValueRanges *CIC_int_abs_ranges = NULL);
 
-public : Configurator *clone() const { assert("UNEXPECTED CLONE"==0); return NULL;};
+  Configurator *clone() const { assert("UNEXPECTED CLONE"==0); return NULL;};
 
 // @brief Used for normal explicit construction, ranges not supplied allow any values
 protected :

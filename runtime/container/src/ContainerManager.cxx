@@ -247,7 +247,7 @@ namespace OCPI {
       ((OCPI::DRC::RadioCtrlrNoOSTuneResamp *)linkme)->init();
       ((OCPI::DRC::Configurator *)linkme)->unlock_all();
       OCPI::DRC::ConfiguratorAD9361 c(NULL, NULL, NULL, NULL);
-      OCPI::DRC::ConfiguratorTuneResamp cc;
+      OCPI::DRC::ConfiguratorTuneResamp cc(1.0, 2.0);
       //      ((OCPI::DRC::ConfiguratorTuneResamp*)linkme)->impose_constraints_single_pass();
       ((OCPI::Util::LogPrefix *)linkme)->log_debug("hello");
       ad9361_opencpi.set_reset(0, 0);
