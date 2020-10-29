@@ -21,8 +21,8 @@
 // This file contains definitions for the OpenCPI ad9361 helper code but is not
 // used by the ADI NoOS code
 
-#ifndef _AD9361_COMMON
-#define _AD9361_COMMON
+#ifndef _AD9361_PLATFORM
+#define _AD9361_PLATFORM
 
 // AD9361_Register_Map_Reference_Manual_UG-671.pdf refers to register bits
 // as D7 - D0
