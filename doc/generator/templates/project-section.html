@@ -1,4 +1,4 @@
-<h2>{{ section_title }}</h2>
+<h2 id="{{ section_name }}">{{ section_title }}</h2>
 {% for k in links.keys()|sort %}
 <div>{{ links[k].anchor_tag() }}</div>
 {% endfor %}
