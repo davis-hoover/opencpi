@@ -472,7 +472,7 @@ namespace OCPI {
 	  for (n = 0; n < m_vt->m_nMembers; n++) {
 	    const char *mName = m_vt->m_members[n].m_name.c_str();
 	    len = strlen(mName);
-	    if (!strncmp(mName, start, len) &&
+	    if (!strncasecmp(mName, start, len) &&
 		(isspace(start[len]) || len == OCPI_SIZE_T_DIFF(end, start)))
 	      break;
 	  }

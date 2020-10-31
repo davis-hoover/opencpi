@@ -92,8 +92,8 @@ class ParamConfig : public OCPI::Util::IdentResolver {
   ParamConfig(const ParamConfig &);
   ParamConfig &operator=(const ParamConfig * p);
   void clone(const ParamConfig &other);
-  const char * parse(ezxml_t cx, const ParamConfigs &configs); //, bool includeInitial = false);
-  void doDefaults(); //bool includeInitial = false);
+  const char *parse(ezxml_t cx, const ParamConfigs &configs);
+  const char *doDefaults(bool missingOK);
   void write(FILE *xf, FILE *mf);
   void writeConstants(FILE *gf, Language lang);
   // Is the given configuration the same as this one?

@@ -22,6 +22,7 @@
 #define _OCPI_PROJECTS_UTIL_VALID_RANGES_HH
 
 #include <vector> // std::vector
+#include <ostream> // std::ostream
 
 namespace OCPI {
 
