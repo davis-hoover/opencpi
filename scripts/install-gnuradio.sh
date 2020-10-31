@@ -179,7 +179,7 @@ function install_ubuntu18_04_packages {
       libsdl1.2-dev
       libgsl-dev
       libqwt-qt5-dev
-      libqt5openg15-dev
+      libqt5opengl5-dev
       python3-pyqt5
       liblog4cpp5-dev
       libzmq3-dev
@@ -189,7 +189,6 @@ function install_ubuntu18_04_packages {
       python3-zmq
       python3-scipy
       python3-pip
-      pygtk3
     )
   fi
 
@@ -201,6 +200,7 @@ function install_ubuntu18_04_packages {
 }
 
 function install_gnuradio {
+  if [ -d "${CLONE_DEST}" ]; then rm -rf "${CLONE_DEST}"; fi
   mkdir -p "${CLONE_DEST}"
   git clone --depth 1 --branch "${GIT_REV}" \
     https://gitlab.com/opencpi/gnuradio.git "${CLONE_DEST}"
@@ -210,8 +210,8 @@ function install_gnuradio {
   cd build
   ${CMAKE} "${CMAKE_FLAGS[@]}" ../
   make -j ${NPROC}
-  make -j ${NPROC} install
-  ldconfig
+  ${SUDO} make -j ${NPROC} install
+  ${SUDO} ldconfig
   make test || true  # don't exit if tests fail
   cd ..
   rm -rf build
@@ -248,7 +248,12 @@ done
 
 # Validate args
 case "${GR_RELEASE}" in
-  3.7) ;;
+  3.7)
+    ;;
+  3.8) 
+    GIT_REV=opencpi-develop-3.8 
+    GR_RELEASE=3.8
+    ;;
   *) bad "Unsupported GR Release: ${GR_RELEASE}" ;;
 esac
 
@@ -295,7 +300,7 @@ fi
 install_gnuradio
 
 echo -n "\
-!!!!!!!!!! IMPORTANT !!!!!!!!!!
+!!!!!!!!!! IMPORTANT 3.7 !!!!!!!!!!
 You will need to set these environment variables:
 export PYTHONPATH=/usr/local/lib64/python2.7/site-packages${PYTHONPATH:+:${PYTHONPATH}}
 export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
