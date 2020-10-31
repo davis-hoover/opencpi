@@ -3,34 +3,34 @@
 % this file is intended to be edited
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{center}
-	\textit{\textbf{Revision History}}
-	\begin{table}[H]
-		\label{table:revisions} % Add "[H]" to force placement of table
-		\begin{tabularx}{\textwidth}{|c|X|l|}
-			\hline
-			\rowcolor{blue}
-			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
-			\hline
-			v1.3 & & 2/2018 \\
-			\hline
-			v1.4 & & 10/2018 \\
-			\hline
-			v1.5 & Convert Worker to Version 2 HDL API & 4/2019\\
-			\hline
-			v1.7 & Updated port/property/interface tables for accuracy. Resource Utilization Table removed & \\
-			\hline
-		\end{tabularx}
-	\end{table}
+  \textit{\textbf{Revision History}}
 \end{center}
+\begin{longtable}{|p{\dimexpr0.15\textwidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.65\textwidth-2\tabcolsep\relax}
+                  |p{\dimexpr0.2\textwidth-2\tabcolsep\relax}|}
+  \hline
+  \rowcolor{blue}
+  \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+  \hline
+   v1.3 & & 2/2018 \\
+  \hline
+  v1.4 & & 10/2018 \\
+  \hline
+  v1.5 & Convert Worker to Version 2 HDL API & 4/2019 \\
+  \hline
+  v1.7 & Updated port/property/interface tables for accuracy. Resource Utilization Table removed & 07/2020 \\
+  \hline
+\end{longtable}
 \newpage
 
-\def\name{\comp}
-\def\workertype{Application}
-\def\version{\ocpiversion}
-\def\releasedate{04/2019}
+% These are needed by component summary table
 \def\componentlibrary{ocpi.training.components}
-\def\workers{\comp{}.hdl, \comp{}.rcc}
+\def\name{\comp}
+\def\releasedate{07/2020}
 \def\testedplatforms{c7-x86\_{}64, Ettus E310(PL), isim, linux-x13\_{}3-arm, linux-x13\_{}4-arm, Matchstiq-Z1(PL)(Vivado 2017.1 and ISE 14.7), xsim}
+\def\version{\ocpiversion}
+\def\workers{\comp{}.hdl, \comp{}.rcc}
+\def\workertype{Application}
 \input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
@@ -55,20 +55,20 @@ Upon completion, the {\Comp} returns the most positive I or Q sample value with 
 \subsection*{Top level}
 \begin{center}
 \begin{tikzpicture}[% List of styles applied to all, to override specify on a case-by-case
-					every node/.style={
-						align=center,  		% use this so that the "\\" for line break works
-						minimum size=2cm	% creates space above and below text in rectangle
-						},
-					every edge/.style={draw,thick}
-					]
+  every node/.style={
+    align=center,           % use this so that the "\\" for line break works
+    minimum size=2cm        % creates space above and below text in rectangle
+  },
+  every edge/.style={draw,thick}
+]
 \node[rectangle,ultra thick,draw=black,fill=blue](R2){\Comp};
 \node[rectangle,draw=white,fill=white](R3)[left= of R2]{``in" \\ Signed complex samples};
 \node[rectangle,draw=white,fill=white](R4)[right= of R2]{``out" \\ Signed complex samples};
 \node[rectangle,draw=white,fill=white](R5)[above= of R2]{max\_peak \& min\_peak};
 \path[->]
-(R3)edge []	node [] {} (R2)
-(R2)edge []	node [] {} (R4)
-(R2)edge []	node [] {} (R5)
+(R3)edge []    node [] {} (R2)
+(R2)edge []    node [] {} (R4)
+(R2)edge []    node [] {} (R5)
 ;
 \end{tikzpicture}
 \end{center}\pagebreak
@@ -82,13 +82,13 @@ Upon completion, the {\Comp} returns the most positive I or Q sample value with 
 %\subsection*{\comp.hdl}
 
 \begin{landscape}
-  %\input{component_spec_properties.inc} % it is recommended to NOT remove this line
+  \input{component_spec_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_properties.inc} % it is recommended to NOT remove this line
+  \input{worker_properties.inc} % it is recommended to NOT remove this line
 
-  %\input{component_ports.inc} % it is recommended to NOT remove this line
+  \input{component_ports.inc} % it is recommended to NOT remove this line
 
-  %\input{worker_interfaces.inc} % it is recommended to NOT remove this line
+  \input{worker_interfaces.inc} % it is recommended to NOT remove this line
 \end{landscape}
 
 \section*{Control Timing and Signals}
@@ -98,44 +98,44 @@ The {\Comp} worker uses the clock from the Control Plane and standard Control Pl
 \end{flushleft}
 
 \section*{Performance and Resource Utilization}
+%\subsubsection*{\comp.rcc}
 \subsubsection*{\comp.hdl}
 %\input{../../peak_detector.hdl/utilization.inc}
-
 
 \section*{Test and Verification}
 \begin{flushleft}
 A single test case is implemented to validate the {\comp} component. An input file is generated (via \textit{generate.py}) containing complex signed 16-bit samples with a tone at 13 Hz. The input data is passed through the worker, so the output file should be identical to the input file. The worker measures the minimum and maximum amplitudes found within the complex data stream. These values, reported as properties, are compared with min/max calculations performed during verification (\textit{verify.py}).
 
-	\begin{figure}[ht]
-		\centering
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]						{input_time}
-			\captionof{figure}{Input Time Domain Tone}
-			\label{fig:in_time_tone}
-		\end{minipage}%
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]						{input_freq}
-			\captionof{figure}{Input Frequency Domain Tone}
-			\label{fig:in_freq_tone}
-		\end{minipage}
-	\end{figure}
+\begin{figure}[ht]
+  \centering
+  \begin{minipage}{.5\textwidth}
+    \centering\includegraphics[width=1.0\linewidth]{input_time}
+    \captionof{figure}{Input Time Domain Tone}
+    \label{fig:in_time_tone}
+  \end{minipage}%
+  \begin{minipage}{.5\textwidth}
+    \centering\includegraphics[width=1.0\linewidth]{input_freq}
+    \captionof{figure}{Input Frequency Domain Tone}
+    \label{fig:in_freq_tone}
+  \end{minipage}
+\end{figure}
 
 \newpage
 \begin{flushleft}
 The output file is first checked that the data is not all zero, and is then checked for the expected length of 32,768 complex samples. Once these quick checks are made the minimum and maximum values are calculated from the file and then compared with the UUT reported values. Figures \ref{fig:out_time_tone} and \ref{fig:out_freq_tone} depict the output of the {\Comp} worker, where the time domain plot displays the first 200 complex samples.
 \end{flushleft}
 
-	\begin{figure}[ht]
-		\centering
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]						{output_time}
-			\captionof{figure}{Output Time Domain Tone}
-			\label{fig:out_time_tone}
-		\end{minipage}%
-		\begin{minipage}{.5\textwidth}
-			\centering\includegraphics[width=1.0\linewidth]						{output_freq}
-			\captionof{figure}{Output Frequency Domain Tone}
-		\label{fig:out_freq_tone}
-		\end{minipage}
-	\end{figure}
+\begin{figure}[ht]
+  \centering
+  \begin{minipage}{.5\textwidth}
+    \centering\includegraphics[width=1.0\linewidth]{output_time}
+    \captionof{figure}{Output Time Domain Tone}
+    \label{fig:out_time_tone}
+  \end{minipage}%
+  \begin{minipage}{.5\textwidth}
+    \centering\includegraphics[width=1.0\linewidth]{output_freq}
+    \captionof{figure}{Output Frequency Domain Tone}
+    \label{fig:out_freq_tone}
+  \end{minipage}
+\end{figure}
 \end{flushleft}
