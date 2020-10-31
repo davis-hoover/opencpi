@@ -323,6 +323,13 @@ begin
           eom    <= '0';
           oeof   <= '1';
           give   <= oready;
+        when IDLE =>
+          odata  <= (others => '0');
+          som    <= '0';
+          ovalid <= '0';
+          eom    <= message_sizer_eom;
+          oeof   <= '0';
+          give   <= oready and message_sizer_eom;
         when others =>
           odata   <= (others => '0');
           som    <= '0';
