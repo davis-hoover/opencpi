@@ -78,7 +78,8 @@ def main():
         for release in args.releases:
             if release not in GIT_TAGS and release not in GIT_BRANCHES:
                 logging.critical(
-                    f"'{release}' is not a valid git tag or checked out branch. Exiting..."
+                    f"'{release}' is not a valid release or checked out branch. "
+                    f"Run '{parser.prog} -l' to see a list of valid releases and branches."
                 )
                 exit(1)
         releases = args.releases  # type: list
@@ -96,6 +97,7 @@ def main():
     for osp in OSPS:
         download_osp(osp)
         OSP_TAGS[osp] = get_tags(OCPI_OSPDIR / osp / ".git")
+        OSP_TAGS[osp].append("develop")  # develop will always be a valid git revision
 
     # Build each release and it's OSPs
     for release in releases:
@@ -383,10 +385,8 @@ def gen_release_index(tag: str, is_latest=False):
                 section_title += " Project Documentation"
             project_names.append(section_name)
 
+        # Create dict of UrlLinks indexed by pdf name
         file_links = dict()  # type: Dict[str, UrlLink]
-        # See if we have man pages. Add a link to main section if so.
-        if man_dir.exists():
-            file_links["man pages"] = UrlLink(name="Man Pages", url="man/")
         for f in files:
             if f.endswith(".pdf"):
                 url = f"{base_url}/{f}"
@@ -398,6 +398,12 @@ def gen_release_index(tag: str, is_latest=False):
                     if name.lower().endswith("guide"):
                         name = name[:-6]
                     file_links[name.lower()] = UrlLink(name=_fix_file_name(name), url=url)
+
+        # See if we have man pages. Add a link to main section if so.
+        if section_name == "main" and man_dir.exists():
+            file_links["man pages"] = UrlLink(name="Man Pages", url="man/")
+
+        # Store all found pdfs for section being processed
         section_data[section_name] = SectionData(name=section_name, title=section_title,
                                                  files=file_links)
 
