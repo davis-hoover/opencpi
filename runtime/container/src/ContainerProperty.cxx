@@ -86,9 +86,9 @@ namespace OCPI {
       init();
     }
     const OU::Member &Property::
-    descend(AccessList &list, size_t &offset) const {
+    descend(AccessList &list, size_t &offset, size_t *dimensionp) const {
       const OU::Member *m;
-      const char *err = m_info.descend(list, m, offset);
+      const char *err = m_info.descend(list, m, offset, dimensionp);
       if (err)
 	throwError(err);
       return *m;

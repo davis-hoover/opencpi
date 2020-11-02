@@ -733,7 +733,7 @@ namespace OCPI {
       for (ezxml_t m = ezxml_cchild(mems, tag); m ; m = ezxml_cnext(m))
 	nMembers++;
       if (nMembers) {
-	std::set<const char *, ConstCharComp> names, abbrevs;
+	std::set<const char *, ConstCharCaseComp> names, abbrevs;
 	Member *m = new Member[nMembers];
 	members = m;
 	const char *err = NULL;
@@ -774,7 +774,7 @@ namespace OCPI {
 	    return "sequence property not indexed with a number";
 	  if (a->m_index >= m->m_sequenceLength)
 	    return "sequence index >= than maximum sequence length";
-	  a_offset += m->m_dataAlign + a->m_index * m->m_elementBytes * m->m_nItems;
+	  a_offset += std::max(m->m_dataAlign, sizeof(uint32_t)) + a->m_index * m->m_elementBytes * m->m_nItems;
 	  dimension = 1;
 	  if (++a == list.end())
 	    break;

@@ -131,6 +131,23 @@ std::string checkWkr1Values(OCPI::API::Application* app, std::string comp_name)
       return comp_name + ".test_seq_ulong is not set correctly.  Was :" +
                 temp_string + "\n should be : " + expected_str;
   }
+  expected_str = "11,12,13,14,16,17,18,101,102";
+  app->getProperty(comp_name.c_str(), "test_seq_ushort", temp_string);
+  if (temp_string != expected_str){
+      return comp_name + ".test_seq_ushort is not set correctly.  Was :" +
+                temp_string + "\n should be : " + expected_str;
+  }
+  expected_str = "13";
+  app->getProperty(comp_name + ".test_seq_ushort", temp_string, OA::AccessList({2}));
+  if (temp_string != expected_str){
+      return comp_name + ".test_seq_ushort[2] is not set correctly.  Was :" +
+                temp_string + "\n should be : " + expected_str;
+  }
+  {
+    OA::Property p(*app, comp_name, "test_seq_ushort");
+    assert(p.getSequenceLength() == 9);
+  }
+  expected_str = "23";
   expected_str = "one,two,three,four,five";
   app->getProperty(comp_name.c_str(), "test_seq_str", temp_string);
   if (temp_string != expected_str){

@@ -76,7 +76,7 @@ namespace OCPI {
 	// the hardware control register.
 	// FIXME: maybe use logTimeout = OU::ceilLog2(m_timeout).
 	unsigned logTimeout = 31;
-	for (size_t u = 1 << logTimeout; !(u & m_timeout); u >>= 1, logTimeout--)
+	for (size_t u = 1u << logTimeout; !(u & m_timeout); u >>= 1, logTimeout--)
 	  ;
 	ocpiDebug("Timeout for %s is %zu log is %u\n", m_implName, m_timeout, logTimeout);
 	// Get access to registers and properties.  The "this" is for our Access
@@ -176,7 +176,7 @@ namespace OCPI {
 
     bool WciControl::
     controlOperation(OU::Worker::ControlOperation op, std::string &err) {
-      if (getControlMask() & (1 << op)) {
+      if (getControlMask() & (1u << op)) {
 	uint32_t result =
 	  // *((volatile uint32_t *)myRegisters + controlOffsets[op]);
 	  get32RegisterOffset(controlOffsets[op]);
@@ -238,7 +238,7 @@ namespace OCPI {
 	} else if (n == 64)						\
 	  m_properties.accessor()->set64(m_properties.base() + offset, val, &status); \
 	else								\
-	  m_properties.accessor()->set(m_properties.base() + offset, sizeof(uint##n##_t), val, \
+	  m_properties.accessor()->set(m_properties.base() + offset, sizeof(uint##n##_t), (uint32_t)val, \
                                        &status);			     \
 	if (status)							     \
 	  throwPropertyWriteError(status);				     \
@@ -386,8 +386,8 @@ namespace OCPI {
     }
 
     void WciControl::
-    throwPropertyReadError(uint32_t status, uint32_t offset, size_t n, uint64_t val) const {
-      throw OU::Error("property read error on worker %s instance %s status %x offset %x bytes %zd val %" PRIx64 ": %s",
+    throwPropertyReadError(uint32_t status, size_t offset, size_t n, uint64_t val) const {
+      throw OU::Error("property read error on worker %s instance %s status %x offset %zx bytes %zd val %" PRIx64 ": %s",
 		      m_implName, m_instName, status, offset, n, val,
 		      status & OCCP_STATUS_READ_TIMEOUT ? "timeout" :
 		      (status & OCCP_STATUS_READ_FAIL ?
@@ -433,7 +433,7 @@ namespace OCPI {
       // check the presumed-correct XML just to avoid bad accesses to the control plane.
       if ((m_occpIndex = strtoul(idx, NULL, 10)) > OCCP_MAX_WORKERS)
 	throw OU::Error("Internal artifact XML problem: worker number `%s' invalid", idx);
-      cAccess.offsetRegisters(m_wAccess, (intptr_t)(&((OccpSpace*)0)->worker[m_occpIndex]));
+      cAccess.offsetRegisters(m_wAccess, (uintptr_t)(&((OccpSpace*)0)->worker[m_occpIndex]));
       uint32_t
 	l_control = m_wAccess.get32Register(control, OccpWorkerRegisters),
 	l_status =  m_wAccess.get32Register(status, OccpWorkerRegisters);
@@ -478,9 +478,9 @@ namespace OCPI {
 	  ignored = true;
 	else {
 	  if (m_timeout) {
-	    c &= ~0x1f;
+	    c &= ~0x1fu;
 	    unsigned logTimeout = 31;
-	    for (size_t u = 1 << logTimeout; !(u & m_timeout);
+	    for (size_t u = 1u << logTimeout; !(u & m_timeout);
 		 u >>= 1, logTimeout--)
 	      ;
 	    c |= logTimeout;

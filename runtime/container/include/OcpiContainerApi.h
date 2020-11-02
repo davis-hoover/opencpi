@@ -345,7 +345,8 @@ namespace OCPI {
     private:
       void init();
       void throwError(const char *err) const;
-      const OCPI::Util::Member &descend(AccessList &list, size_t &offset) const;
+      const OCPI::Util::Member
+	&descend(AccessList &list, size_t &offset, size_t *dimensionp = NULL) const;
       template <typename val_t> void setValueInternal(const OCPI::Util::Member &m, size_t off,
 						      const val_t val) const;
       template <typename val_t> val_t getValueInternal(const OCPI::Util::Member &m,

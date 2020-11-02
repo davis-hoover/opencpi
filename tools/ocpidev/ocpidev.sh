@@ -326,7 +326,7 @@ function get_subdir {
 function get_deletecmd {
   get_dirtype .
   if [ "$libbase" != hdl ] ; then
-    deletecmd="-l $library delete $noun"
+    deletecmd="${library:+-l $library} delete $noun"
   else
     if [ "$noun" == worker ] ; then
       deletecmd="delete $noun"
@@ -1083,7 +1083,10 @@ function get_spec {
     (./*) s=${2/.\//} ;;
     (*) s=$2 ;;
   esac
-
+  if [[ "$s" != *.xml && "$s" != *[-_]spec ]]; then
+     echo Warning:  spec option \"$s\" is missing the "-spec" suffix.  It is assumed to mean \"$s-spec\".
+     s=${s}-spec
+  fi
   # Here we set some default xml. Subdevices are a special case with some additional default
   # XML. They are permitted to omit OCS, but are not required to.
   if [ -z "$s" ] ; then
