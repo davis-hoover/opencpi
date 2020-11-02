@@ -924,7 +924,7 @@ emitImplRCC() {
       // for backwards compatibility in old single slave interface
       fprintf(f,
               "\n  Slave1& slave;\n"
-              "  struct{\n");
+              "  struct Slaves {\n");
       index = 0;
       // declare the slaves structure which will contain a reference to each of the proxies slaves
       // by name.  This structure is how the Worker author will access the slaves.
@@ -934,7 +934,7 @@ emitImplRCC() {
                 "    Slave%u& %s;\n", index+1, (*it).first.c_str());
       }
       fprintf(f,
-              "  }slaves;\n");
+              "  } slaves;\n");
 
     } // if slaves are not empty
 

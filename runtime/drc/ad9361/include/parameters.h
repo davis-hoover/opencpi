@@ -18,7 +18,5 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _AD9361_COMMON
-#define _AD9361_COMMON
-#include "ad9361_platform.h"
-#endif // _AD9361_COMMON
+// GPIO_RESET_PIN is an arbitrary chosen (yet unique among *_PIN macros) value
+#define GPIO_RESET_PIN        0

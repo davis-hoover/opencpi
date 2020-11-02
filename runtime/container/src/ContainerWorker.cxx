@@ -540,8 +540,8 @@ namespace OCPI {
 	    data = (uint8_t*)alloc;
 	    if (m.m_isSequence) { // because we set the sequence length last below
 	      assert(*(uint32_t *)data == v.m_nElements);
-	      data += sizeof(uint32_t);
-	      nBytes -= sizeof(uint32_t);
+	      data += std::max(m.m_dataAlign, sizeof(uint32_t));
+	      nBytes -= std::max(m.m_dataAlign, sizeof(uint32_t));
 	    }
 	  } else
 	    data = v.m_pUChar;
