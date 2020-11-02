@@ -281,6 +281,12 @@ begin
         eom    <= '0';
         give   <= '0';
         eof_s  <= '1';
+      when IDLE =>
+        som    <= '0';
+        ovalid <= '0';
+        eom    <= message_sizer_eom;
+        give   <= message_sizer_eom and oready;
+        eof_s  <= '0';
       when others =>
         som    <= '0';
         ovalid <= '0';
