@@ -30,6 +30,7 @@ RccSourceSuffix:=.$(Suffix_rcc_$(OcpiLanguage))
 RccImplSuffix=$(if $(filter c++,$(OcpiLanguage)),-worker.hh,_Worker.h)
 RccSkelSuffix=-skel$(RccSourceSuffix)
 OBJ:=.o
+RccStaticPrereqLibs+=ad9361
 RccPrereqLibs=$(RccStaticPrereqLibs) $(RccDynamicPrereqLibs)
 RccLanguage=$(call ToUpper,$(OcpiLanguage))
 # This allows component library level RCC libraries to be fed down to workers,
@@ -74,7 +75,7 @@ ifdef OcpiBuildingACI
   RccSpecificLinkOptions=\
     $(call RccPrioritize,MainLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccPlatform))
   override RccLibrariesInternal+=\
-    application remote_support container library transport xfer util \
+    application remote_support container library transport xfer drc drc_ad9361 util \
     msg_driver_interface foreign os   
 else
   RccSpecificLinkOptions=\

@@ -66,8 +66,8 @@ DEFS=-DAXI_ADC_NOT_PRESENT
 SRCNAMES=(ad9361 ad9361_api ad9361_conv util)
 SRCS=(${SRCNAMES[@]/%/.c})
 INCS=(ad9361_api ad9361 config)
-echo $CC -std=c99 -fPIC -I. -I$dir/platform_generic -I$dir $DEFS -c ${SRCS[@]/#/$dir\/}
-$CC -std=c99 -fPIC -I. -I$dir/platform_generic -I$dir $DEFS -c ${SRCS[@]/#/$dir\/}
+echo $CC -g -std=c99 -fPIC -I. -I$dir/platform_generic -I$dir $DEFS -c ${SRCS[@]/#/$dir\/}
+$CC -g -std=c99 -fPIC -I. -I$dir/platform_generic -I$dir $DEFS -c ${SRCS[@]/#/$dir\/}
 $AR -rs libad9361.a ${SRCNAMES[@]/%/.o}
 
 ################################################################################
