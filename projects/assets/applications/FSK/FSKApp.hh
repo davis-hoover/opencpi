@@ -49,6 +49,7 @@ struct rx_ocs_config_t {
   double rf_gain_dB;
   double bb_bw_MHz;
   double bb_gain_dB;
+  bool bb_loopback; //corresponds to both rx and tx, but if mode is enabled then this property must be set
 };
 
 /// @brief Corresponds to tx_spec properties
@@ -59,7 +60,12 @@ struct tx_ocs_config_t {
   double rf_gain_dB;
   double bb_bw_MHz;
   double bb_gain_dB;
+  bool bb_loopback; 
 };
+
+/*Must set bb_loopback as true if the mode is set,
+* something like a function to check then write during runtime?
+*/
 
 /// @brief This class is intended to be radio-agnostic.
 class FSKApp {
@@ -77,6 +83,8 @@ public:
     m_val_has_been_set["tx_rf_gain_dB"] = false;
     m_val_has_been_set["tx_bb_cutoff_freq_MHz"] = false;
     m_val_has_been_set["tx_bb_gain_dB"] = false;
+    m_val_has_been_set["tx_bb_loopback"] = false;
+
 
     m_val_has_been_set["rx_sample_rate_MHz"] = false;
     m_val_has_been_set["rx_frequency_MHz"] = false;
@@ -84,18 +92,29 @@ public:
     m_val_has_been_set["rx_rf_gain_dB"] = false;
     m_val_has_been_set["rx_bb_cutoff_freq_MHz"] = false;
     m_val_has_been_set["rx_bb_gain_dB"] = false;
+    m_val_has_been_set["tx_bb_loopback"] = false;
 
     rm_all_odata_contents();
   }
 
   inline bool get_mode_requires_rx() {
 
-    return (m_mode == "rx") || (m_mode == "txrx");
+    return (m_mode == "rx") || (m_mode == "txrx") || (m_mode == "bbloopback"); // adding bbloopback here as a mode
   }
 
   inline bool get_mode_requires_tx() {
 
-    return (m_mode == "tx") || (m_mode == "txrx");
+    return (m_mode == "tx") || (m_mode == "txrx") || (m_mode == "bbloopback"); //here as well 
+  }
+
+  inline bool get_mode_is_bbloopback() {
+     /* this function will check the mode, then if it's bbloopback 
+      * then it will return a true or false value when this function is called
+      */
+     bool bbloopback_en = false;
+     if (m_mode == "bbloopback")
+       bbloopback_en = true;
+     return bbloopback_en;
   }
 
   unsigned get_runtime_sec() {
@@ -207,7 +226,7 @@ public:
       double rate = get_tx_bit_rate_bps();
       std::cout << "TX Bit Rate            = " << rate << " bps\n";
     }
-    if(m_mode == "tx" || m_mode == "txrx" || m_mode == "filerw") {
+    if(m_mode == "tx" || m_mode == "txrx" || m_mode == "filerw" || m_mode == "bbloopback") {
       std::string value;
       m_app.getProperty("tx_fir_real","peak", value);
       std::cout << "TX FIR Real Peak       = " << value << "\n";
@@ -218,7 +237,7 @@ public:
 
   void print_rx_peak_values() {
 
-    if(m_mode == "rx" || m_mode == "txrx" || m_mode == "filerw") {
+    if(m_mode == "rx" || m_mode == "txrx" || m_mode == "filerw" || m_mode == "bbloopback") {
       std::string value;
       if(m_mode != "filerw") {
         m_app.getProperty("dc_offset_filter","peak", value);
@@ -240,7 +259,7 @@ public:
   void print_bytes_to_file(bool adc_overrun_flag) {
 
     // mode tx is the only one that doesn't write to a file
-    if(m_mode == "rx" || m_mode == "txrx" || m_mode == "filerw") {
+    if(m_mode == "rx" || m_mode == "txrx" || m_mode == "filerw" || m_mode == "bbloopback") {
       std::string value;
       m_app.getProperty("file_write", "bytesWritten", value);
       std::cout << "Bytes to file : " << value << "\n";
@@ -268,6 +287,8 @@ public:
       std::ostringstream oss;
       oss << "mv " << file_name << " odata/";
       oss << ((m_mode == "rx") ? "out_app_fsk_rx.bin" : "out_app_fsk_txrx.bin");
+      if (m_mode == "bbloopback")
+        oss << ((m_mode == "rx") ? "out_app_fsk_rx.bin" : "out_app_fsk_bbloopback.bin");
       std::string str = oss.str();
       const char* cmd = str.c_str();
 
@@ -414,7 +435,7 @@ protected:
 
     unsigned ret;
 
-    if(m_mode == "rx" || m_mode == "tx" || m_mode == "txrx") {
+    if(m_mode == "rx" || m_mode == "tx" || m_mode == "txrx" || m_mode == "bbloopback") {
       ret = 20;
 
       const char* msg = "Enter run time in seconds [default = ";
@@ -427,7 +448,7 @@ protected:
       }
     }
 
-    if(m_mode == "rx" || m_mode == "tx" || m_mode == "txrx") {
+    if(m_mode == "rx" || m_mode == "tx" || m_mode == "txrx" || m_mode == "bbloopback"){
       if(ret < 1 || ret > 60) {
         const char* msg = "invalid runtime in seconds.\n";
         throw_outside_range(msg, ret, 1, 60);

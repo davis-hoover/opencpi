@@ -1,6 +1,5 @@
 <!-- generic interface to RF transmitters/downconverters. Current model is:
-  LPF=>post_lpf_gain=>pre_mixer_dc_offset=>mixer=>pa=>output_select
--->
+	  LPF=>post_lpf_gain=>pre_mixer_dc_offset=>mixer=>bbloopback_mode=>pa=>output_select-->
 <componentspec>
   <!-- TX properties in order of flow from baseband to RF output -->
   <!-- BW of LPF -->
@@ -18,4 +17,6 @@
   <property name='noutputs' parameter='1' type='uchar' readable='1' default='1'/>
   <!-- Which output to use -->
   <property name='output_select' type="uchar" Writable="true" Readable="true"/>
+  <!--Checks to see if bbloopback mode has been enabled -->
+  <property name='bb_loopback' type='bool' Writable="true" Readable="true" default='0'/>
 </componentspec>

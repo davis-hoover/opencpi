@@ -41,6 +41,25 @@ public:
     setRunCondition(&m_aRunCondition);
   }
 private:
+
+/*
+* notification that bb_loopback property has been written
+*configuration is based on comment on issue #482
+*property 0x46 tx_pkdbw bits 3-2 must be enabled
+*property 0x44 tx_pa_en AUXPA, auxiliary (RF loopack)
+*PA powered down when bit 2 is enabled
+*If not this configuration, would the one on figure 3.2
+*https://wiki.myriadrf.org/LimeMicro:LMS6002D_Programming_and_Calibration#Loopback_and_Bypass_Modes
+* where LOOPBBEN switches are closed along with LBEN_LPFIN be correct?
+*/
+  RCCResult bb_loopback_written() {
+    if (m_properties.bb_loopback == 1) {
+      slave.set_tx_pa_en(0x03);
+      slave.set_tx_pkdbw(0x0F);
+    }
+    return RCC_OK;
+  }
+
   // notification that lpf_bw_hz property has been written
   RCCResult lpf_bw_hz_written() {
     uint8_t val;
@@ -108,6 +127,7 @@ private:
     slave.set_tx_pa_en((slave.get_tx_pa_en() & 0xE7) | (m_properties.output_select << 3));
     return RCC_OK;
   }
+
   // enable required for both initialize and start
   RCCResult enable() {
     slave.set_top_ctl0(slave.get_top_ctl0() | (1 << 3));
@@ -140,3 +160,4 @@ LIME_TX_PROXY_START_INFO
 // Insert any static info assignments here (memSize, memSizes, portInfo)
 // e.g.: info.memSize = sizeof(MyMemoryStruct);
 LIME_TX_PROXY_END_INFO
+

@@ -39,5 +39,5 @@
   <specproperty name='bb_cutoff_frequency_min_MHz' default='0'/>
   <specproperty name='bb_cutoff_frequency_step_MHz' default='0.125'/>
 
-  <property name='bb_loopback' readable='1' writable='1' default='0'/>
+  <!--specproperty name='bb_loopback' default='0'/-->
 </RccWorker>

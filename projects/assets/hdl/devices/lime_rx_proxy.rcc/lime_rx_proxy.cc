@@ -42,6 +42,23 @@ public:
     setRunCondition(&m_aRunCondition);
   }
 private:
+
+/* notification that bb_loopback property has been written
+*configuration is based on comment on issue #482
+*property 0x75 rxfe_cbe_lna, the comment stated that 
+*this would disable the LNAS, but this seems to just affect the capacitors
+*property 0x65 rx_vga2gain RXVGA2 gain control set to 30dB
+*If not this configuration, would the one on figure 3.2
+*https://wiki.myriadrf.org/LimeMicro:LMS6002D_Programming_and_Calibration#Loopback_and_Bypass_Modes
+* where LOOPBBEN switches are closed along with LBEN_LPFIN be correct?
+*/
+ RCCResult bb_loopback_written() {
+    if (m_properties.bb_loopback == 1) {
+      slave.set_rxfe_cbe_lna(0x00);
+      slave.set_rx_vga2gain(0x0A);
+      }
+    return RCC_OK;
+  }
   // notification that input_select property has been written
   RCCResult input_select_written() {
     if (m_properties.input_select > 3)
@@ -172,6 +189,7 @@ private:
     slave.set_rxfe_dcoff_q(m_properties.post_mixer_dc_offset_q | (1 << 7));
     return RCC_OK;
   }
+
   // enable required for both initialize and start
   RCCResult enable() {
     slave.set_top_ctl0(slave.get_top_ctl0() | (1 << 2));
@@ -195,6 +213,7 @@ private:
   RCCResult run(bool /*timedout*/) {
     return RCC_DONE;
   }
+
 };
 
 LIME_RX_PROXY_START_INFO

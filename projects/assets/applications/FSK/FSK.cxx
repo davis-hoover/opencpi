@@ -47,6 +47,11 @@ public:
 
     // intelligently set the prompt-suggested default TX settings to values that
     // are expected to work well with current RX settings
+
+    // if mode is bbloopback then set the rx bb_loopback property to true
+    if (get_mode_is_bbloopback() == 1)
+      ret.bb_loopback = true; 
+
     ret.sample_rate_MHz = 39.936;
     if(get_mode_requires_rx() && m_val_has_been_set["rx_sample_rate_MHz"]) {
       double tmp = m_app.getPropertyValue<double>("rx", "sample_rate_MHz");
@@ -76,6 +81,11 @@ public:
 
     // intelligently set the prompt-suggested default RX settings to values that
     // are expected to work well with current TX settings
+
+    // if mode is bbloopback then set the tx bb_loopback property to true
+    if (get_mode_is_bbloopback() == 1)
+      ret.bb_loopback = true; 
+
     ret.sample_rate_MHz = 39.936;
     if(m_val_has_been_set["tx_sample_rate_MHz"]) {
       double tmp = m_app.getPropertyValue<double>("tx", "sample_rate_MHz");
