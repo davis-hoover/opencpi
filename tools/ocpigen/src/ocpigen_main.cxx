@@ -126,7 +126,6 @@ main(int argc, const char **argv) {
 	    " -i            Generate the implementation include file: xyz_impl.[vh|vhd]\n"
 	    " -s            Generate the skeleton file: xyz_skel.[c|v|vhd]\n"
 	    " -a            Generate the assembly (composition) file: xyz.[v|vhd]\n"
-	    " -b            Generate the BSV interface file\n"
 	    " -A            Generate the UUID and artifact descriptor xml file for a container\n"
 	    " -W <file>     Generate an assembly or container workers file: xyz.wks\n"
 	    " Options for artifact XML and UUID source generation (-A):\n"
