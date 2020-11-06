@@ -1083,7 +1083,7 @@ function get_spec {
     (./*) s=${2/.\//} ;;
     (*) s=$2 ;;
   esac
-  if [[ "$s" != *.xml && "$s" != *[-_]spec ]]; then
+  if [[ "$s" != "" && "$s" != *.xml && "$s" != *[-_]spec ]]; then
      echo Warning:  spec option \"$s\" is missing the "-spec" suffix.  It is assumed to mean \"$s-spec\".
      s=${s}-spec
   fi

@@ -98,6 +98,11 @@ std::string checkWkr1Values(OCPI::API::Application* app, std::string comp_name)
       return comp_name + ".test_struct_of_seq.struct_ulong_seq is not set correctly.  Was :" +
                 temp_string + "\n should be : " + expected_str;
   }
+  {
+    OA::Property prop(*app, comp_name, "test_struct_of_seq");
+    if (prop.getSequenceLength({"struct_ulong_seq"}) != 3)
+      return comp_name + ".test_struct_of_seq.struct_ulong_seq is not of length 3";
+  }
   expected_str = "that,that,that,that,that,that,that,that,that,that";
   app->getProperty(comp_name.c_str(), "test_array_of_str", temp_string);
   if (temp_string != expected_str){

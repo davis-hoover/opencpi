@@ -255,7 +255,7 @@ namespace OCPI {
     setProperty(const OA::PropertyInfo &prop, const char *v, OA::AccessList &list) const {
       size_t offset, dimension;
       const OU::Member *m;
-      const char *err = prop.descend(list, m, offset, &dimension);
+      const char *err = prop.descend(list, m, NULL, &offset, &dimension);
       if (err)
 	throw OU::Error("For setting value \"%s\" for property \"%s\": %s", v, prop.cname(), err);
       setProperty(prop, v, *m, offset, dimension);
@@ -265,7 +265,7 @@ namespace OCPI {
 		OA::PropertyOptionList &options, OA::PropertyAttributes *a_attributes) const {
       size_t offset, dimension;
       const OU::Member *m;
-      const char *err = prop.descend(list, m, offset, &dimension);
+      const char *err = prop.descend(list, m, NULL, &offset, &dimension);
       if (err)
 	throw OU::Error("For getting value \"%s\" for property \"%s\": %s", v.c_str(), prop.cname(), err);
       if (a_attributes) {
@@ -562,6 +562,7 @@ namespace OCPI {
       } else
 	setData(info, cache, mOffset, &v.m_UChar, 0, m.m_nBits);
     }
+
     void Worker::
     getProperty(const OA::PropertyInfo &info, OU::Value &v, const OU::Member &m,
 		size_t mOffset, OA::PropertyOptionList &options,
@@ -943,6 +944,23 @@ namespace OCPI {
 	data += len;
       }
       return nElements;
+    }
+    size_t Worker::
+    getSequenceLengthCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
+			    size_t offset) const {
+      if (info.m_isParameter) // will fail if sequence is not at top level
+	return m.m_default->m_nElements;
+      bool dirty;
+      Cache *cache = getCache(info, offset, m, &dirty);
+      uint32_t nElements;
+      uint8_t *data = (uint8_t *)&nElements;
+      getData(info, cache, dirty, offset, data, 0, 32);
+      return nElements;
+    }
+    size_t WorkerControl::
+    getSequenceLengthProperty(const OCPI::API::PropertyInfo &info, const Util::Member &/*m*/,
+			      size_t offset) const {
+      return getProperty32(info, offset, 0);
     }
     void Worker::
     getStringParameter(unsigned ordinal, char *out, size_t length, unsigned idx) const {

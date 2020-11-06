@@ -22,6 +22,7 @@
 #include "OcpiOsAssert.h"
 #include "OcpiUtilProperty.h"
 #include "OcpiUtilException.h"
+#include "OcpiUtilValue.h"
 #include "OcpiContainerApi.h"
 
 namespace OU = OCPI::Util;
@@ -88,7 +89,7 @@ namespace OCPI {
     const OU::Member &Property::
     descend(AccessList &list, size_t &offset, size_t *dimensionp) const {
       const OU::Member *m;
-      const char *err = m_info.descend(list, m, offset, dimensionp);
+      const char *err = m_info.descend(list, m, NULL, &offset, dimensionp);
       if (err)
 	throwError(err);
       return *m;
@@ -98,7 +99,28 @@ namespace OCPI {
       if (m_info.m_baseType != OCPI_String)
 	throw "cannot use stringBufferLength() on properties that are not strings";
       return m_info.m_stringLength + 1;
-}
+    }
+    size_t Property::
+    getSequenceLength(AccessList &list, bool uncached) const {
+      size_t dimension, offset;
+      const OU::Member *m;
+      const OU::Value *vp; // when we are reading a default value from a parameter
+      const char *err;
+      if ((err = m_info.descend(list, m, m_info.m_isParameter ? &vp : NULL, &offset, &dimension)))
+	throwError(err);
+      if (!m->m_isSequence || dimension)
+	throwError("getting sequence length from property or struct member that is not a sequence");
+      if (m_info.m_isParameter)
+	return vp->m_nElements;
+      if (m_readVaddr && uncached) {
+	if (m_readSync)
+	  m_worker.propertyRead(m_ordinal);
+	return *(uint32_t *)(m_readVaddr + offset);
+      }
+      return uncached ?
+	m_worker.getSequenceLengthProperty(m_info, *m, offset) :
+	m_worker.getSequenceLengthCached(m_info, *m, offset);
+    }
     void Property::throwError(const char *err) const {
       throw OU::Error("Access error for property \"%s\":  %s", m_info.cname(), err);
     }

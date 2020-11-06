@@ -105,6 +105,8 @@ namespace OCPI {
       virtual ~PropertyAccess();
       virtual void propertyWritten(unsigned ordinal) const = 0;
       virtual void propertyRead(unsigned ordinal) const = 0;
+      virtual size_t getSequenceLengthProperty(const PropertyInfo &, const OCPI::Util::Member &m,
+					     size_t offset) const = 0;
       // FIXME:  These should be protected, but the proxy code generator uses them too
       // These methods are used by the Property methods below when the
       // fast path using memory-mapped access cannot be used.
@@ -163,7 +165,10 @@ namespace OCPI {
       virtual void beforeQuery() = 0;
       virtual void afterConfigure() = 0;
       virtual void test() = 0;
-      // Updated interfaces, consistent with worker, property, slave, string or const char *
+      // ==========================================================================================
+      // Updated access API, consistent with worker, property, slave, string or const char *
+      // These all use AccessList to access values that are part of a property
+      // ==========================================================================================
       virtual void setProperty(const char* prop_name, const char *value,
 			       AccessList &list = emptyList) const = 0;
       void setProperty(const std::string &prop_name, const std::string &value,
@@ -185,6 +190,9 @@ namespace OCPI {
 				      AccessList &list = emptyList,
 				      PropertyOptionList &options = noPropertyOptions,
 				      PropertyAttributes *attributes = NULL) const = 0;
+      // ==========================================================================================
+      // End of access list interfaces
+      // ==========================================================================================
       // Untyped property list setting - slow but convenient
       virtual void setProperties(const char *props[][2]) =  0;
       // Typed property list setting - slightly safer, still slow
@@ -198,7 +206,6 @@ namespace OCPI {
       virtual const char *getProperty(const PropertyInfo &prop, std::string &v, AccessList &list,
 				      PropertyOptionList &options = noPropertyOptions,
 				      PropertyAttributes *attributes = NULL) const = 0;
-      //      virtual const char *getProperty(unsigned ordinal, std::string &v, AccessList &list) const = 0;
     public:
 #undef OCPI_DATA_TYPE
 #undef OCPI_DATA_TYPE_S
@@ -240,6 +247,8 @@ namespace OCPI {
 #undef OCPI_DATA_TYPE
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S OCPI_DATA_TYPE
+      virtual size_t getSequenceLengthCached(const PropertyInfo &, const Util::Member &,
+					     size_t off) const = 0;
       virtual void getRawPropertyBytes(size_t offset, uint8_t *buf, size_t count) = 0;
       virtual void setRawPropertyBytes(size_t offset, const uint8_t *buf, size_t count) = 0;
     };
@@ -427,19 +436,6 @@ namespace OCPI {
 	  return m_worker.get##pretty##SequenceCached(m_info, vals, n);	\
       }
 #undef OCPI_DATA_TYPE_S
-      // Updated interfaces, consistent with worker, property, slave, string or const char *
-      void setProperty(const char *value, AccessList &list = emptyList) {
-	m_worker.setProperty(m_info, value, list);
-      }
-      void setProperty(const std::string &value, AccessList &list = emptyList) {
-	setProperty(value.c_str(), list);
-      }
-      const char *getProperty(std::string &value, AccessList &list = emptyList) {
-	return m_worker.getProperty(m_info, value, list);
-      }
-      template <typename T> void setValue(T val, AccessList &l = emptyList) const;
-      void setValue(const std::string &val, AccessList &l = emptyList) const;
-      template <typename T> T getValue(AccessList &l = emptyList) const; // must call with explicit type
       // for a string we will take a function call overhead
 #define OCPI_DATA_TYPE_S(sca,corba,letter,bits,run,pretty,store)                   \
       inline void							           \
@@ -489,6 +485,28 @@ namespace OCPI {
 #undef OCPI_DATA_TYPE_S
 #define OCPI_DATA_TYPE_S OCPI_DATA_TYPE
 #undef OCPI_DATA_TYPE
+      // ==========================================================================================
+      // Updated access API, consistent with worker, property, slave, string or const char *
+      // These all use AccessList to access values that are part of a property
+      // ==========================================================================================
+      void setProperty(const char *value, AccessList &list = emptyList) {
+	m_worker.setProperty(m_info, value, list);
+      }
+      void setProperty(const std::string &value, AccessList &list = emptyList) {
+	setProperty(value.c_str(), list);
+      }
+      const char *getProperty(std::string &value, AccessList &list = emptyList) {
+	return m_worker.getProperty(m_info, value, list);
+      }
+      template <typename T> void setValue(T val, AccessList &l = emptyList) const;
+      void setValue(const std::string &val, AccessList &l = emptyList) const;
+      template <typename T> T getValue(AccessList &l = emptyList) const; // must call with explicit type
+      // Get current length of sequence
+      size_t getSequenceLength(AccessList &l = emptyList, bool uncached = false) const;
+      // ==========================================================================================
+      // End of access list interfaces
+      // ==========================================================================================
+
     };
     // ACI functions for using servers
     void useServers(const char *server = NULL, const PValue *params = NULL,
