@@ -1,8 +1,8 @@
 <HdlWorker Language="vhdl" Spec="cic_int-spec.xml" version='2'>
 
-  <Property Name="VIVADO_ILA_p" Type="bool" Parameter="true" Readable="true" Default="false"/>
+  <Property Name="VIVADO_ILA_p" Type="bool" Parameter="true" Default="false"/>
 
-  <Property Name="CHIPSCOPE_p" Type="bool" Parameter="true" Readable="true" Default="false"/>
+  <Property Name="CHIPSCOPE_p" Type="bool" Parameter="true" Default="false"/>
 
   <SpecProperty Name="N" Parameter="true" Default="3"/>
 

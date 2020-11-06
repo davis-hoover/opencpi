@@ -20,28 +20,5 @@
 
 #ifndef _AD9361_COMMON
 #define _AD9361_COMMON
-
-// AD9361_Register_Map_Reference_Manual_UG-671.pdf refers to register bits
-// as D7 - D0
-#define BITMASK_D7 0x80
-#define BITMASK_D6 0x40
-#define BITMASK_D5 0x20
-#define BITMASK_D4 0x10
-#define BITMASK_D3 0x08
-#define BITMASK_D2 0x04
-#define BITMASK_D1 0x02
-#define BITMASK_D0 0x01
-
-struct regs_general_rfpll_divider_t {
-  uint8_t general_rfpll_dividers;
-};
-
-struct regs_clock_bbpll_t {
-  uint8_t clock_bbpll;
-};
-
-#define DEFINE_AD9361_SETTING(AD9361_setting_value, AD9361_setting_type) \
-typedef AD9361_setting_type AD9361_setting_value##_t; \
-AD9361_setting_value##_t AD9361_setting_value; \
-
+#include "ad9361_platform.h"
 #endif // _AD9361_COMMON

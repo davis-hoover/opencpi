@@ -296,8 +296,10 @@ namespace OCPI {
 
       inline void getRawPropertyBytes(size_t offset, uint8_t *buf, size_t count) {
 	getPropertyBytes(*m_firstRaw, offset, buf, count, 0, false);
+	ocpiLog(9, "\nGETRAW: %20s %04zx %4zu %02x", cname(), offset, count, *buf);
       }
       inline void setRawPropertyBytes(size_t offset, const uint8_t *buf, size_t count) {
+        ocpiLog(9, "\nSETRAW: %20s %04zx %4zu %02x", cname(), offset, count, *buf);
 	setPropertyBytes(*m_firstRaw, offset, buf,count, 0);
       }
 

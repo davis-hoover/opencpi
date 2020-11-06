@@ -23,6 +23,11 @@ Source Code file names
    and may be named more flexibly, and since they don't correspond to names of things
    in the source code, may use hyphens.
 
+   When a class is templated, the "implementation" code should be in a separate ".cct" file in the src
+   directory, and that file should be #include at the end of the corresponding header file.
+   This means that the header and src file are very similar to normal non-templated classes, but the "cct" suffix
+   is not compiled into libraries by the build system.
+
 -- C++ header files
    Similar to source code except for API headers.
    API headers, which will be used by external development are distinguished two ways:
