@@ -93,6 +93,7 @@ rawBitWidth(const OU::ValueType &dt) {
     return dt.m_nBits;
   }
 }
+
 // This is the encoded bit width in string form, subject to the data type being finalized or not
 static const char *
 rawBitWidthCstr(const OU::Member &dt, bool finalized = false) {
@@ -110,6 +111,7 @@ rawBitWidthCstr(const OU::Member &dt, bool finalized = false) {
     return OU::format(s, "%zu", dt.m_nBits);
   }
 }
+
 // This is the width as it lives in the OU::Value object
 // which is based on the "run" value of the OCPI_DATA_TYPE macro
 // which is in bytes
@@ -126,6 +128,7 @@ rawValueBytes(const OU::ValueType &dt) {
     return dt.m_nBits / CHAR_BIT;
   }
 }
+
 // Third arg is saying that the type must be appropriate for VHDL to pass
 // to verilog
 static void
@@ -142,6 +145,7 @@ vhdlBaseType(const OU::Member &dt, std::string &s, bool convert, bool finalized)
     s += "_t";
   }
 }
+
 static void
 vhdlArrayType(const OU::Property &dt, size_t rank, const size_t */*dims*/, std::string &decl,
 	      std::string &type, bool convert, bool finalized) {
@@ -197,6 +201,7 @@ vhdlArrayType(const OU::Property &dt, size_t rank, const size_t */*dims*/, std::
   } else
     vhdlBaseType(dt, decl, convert, finalized);
 }
+
 // Custom types are for enumerations or string arrays - otherwise built-in types are used.
 void
 vhdlType(const OU::Property &dt, std::string &decl, std::string &type, bool convert,
@@ -223,10 +228,25 @@ vhdlType(const OU::Property &dt, std::string &decl, std::string &type, bool conv
     type.clear();
     vhdlBaseType(dt, type, convert, finalized);
   }
- }
+}
+
+//
+// The VHDL unparser "intercepts" the default unparser at two different
+// levels.  At the top level, it intercepts the "valueUnparse" method of
+// the default unparser in order to "wrap" the values in conversion
+// functions.  The wrapping is a little type-specific, hence, the switch
+// statement in "OU::Unparser::valueUnparse()".
+//
+// For each data type to produce the actual value (like producing the
+// string "123" for the ushort value of 123), it uses the default for
+// most types, but does have type-specific unparse methods for
+// bool/char/string/float/double/longlong/ulonglong methods to make
+// the actual values syntactically valid for VHDL.
+//
 static struct VhdlUnparser : public OU::Unparser {
   const char *m_name;
   bool m_finalized;
+
   bool
   elementUnparse(const OU::Value &v, std::string &s, unsigned nSeq, bool hex, char comma,
 		 bool wrap, const Unparser &up) const {
@@ -235,6 +255,7 @@ static struct VhdlUnparser : public OU::Unparser {
     if (wrap) s+= ')';
     return r;
   }
+
   bool
   dimensionUnparse(const OU::Value &v, std::string &s, unsigned nseq, size_t dim,
 		   size_t offset, size_t nItems, bool hex, char comma,
@@ -244,8 +265,10 @@ static struct VhdlUnparser : public OU::Unparser {
     return Unparser::dimensionUnparse(v, s, nseq, dim, offset, nItems, hex, comma, up);
   }
 
-  // We wrap the basic value in a conversion function, and also suppress
-  // the suppression of zeroes...
+  //
+  // We wrap the basic value in a conversion function (to_<type>(value)),
+  // and also suppress the suppression of zeroes...
+  //
   bool
   valueUnparse(const OU::Value &v, std::string &s, unsigned nSeq, size_t nArray, bool hex,
 	       char comma, bool /*wrap*/, const Unparser &up) const {
@@ -275,16 +298,24 @@ static struct VhdlUnparser : public OU::Unparser {
       for (const char *cp = OU::baseTypeNames[v.m_vt->m_baseType]; *cp; cp++)
 	s += (char)tolower(*cp);
       s += '(';
+      //
+      // See "runtime/util/property/include/OcpiUtilValue.h" and
+      // "runtime/util/property/src/OcpiUtilValue.cxx" for the
+      // "Unparser" base class definition.  The header file is
+      // included by "tools/ocpigen/include/parameters.h".
+      //
       Unparser::valueUnparse(v, s, nSeq, nArray, hex, comma, false, up);
       s += ')';
     }
     return false;
   }
+
   bool
   unparseBool(std::string &s, bool val, bool) const {
     s += val ? "btrue" : "bfalse";
     return !val;
   }
+
   bool
   unparseChar(std::string &s, char val, bool) const {
     if (isprint(val)) {
@@ -297,6 +328,7 @@ static struct VhdlUnparser : public OU::Unparser {
       OU::formatAdd(s, "character'val(%u)", val & 0xff);
     return val == 0;
   }
+
   bool
   unparseString(std::string &s, const char *val, bool) const {
     if (!val || !*val) {
@@ -314,10 +346,12 @@ static struct VhdlUnparser : public OU::Unparser {
       }
     return false;
   }
+
   bool
   unparseFloat(std::string &s, float val, bool hex) const {
     return unparseDouble(s, val, hex);
   }
+
   bool
   unparseDouble(std::string &s, double val, bool hex) const {
     size_t len = s.length();
@@ -340,6 +374,28 @@ static struct VhdlUnparser : public OU::Unparser {
     if (!dot)
       s += ".0";
     return zip;
+  }
+
+  //
+  // The next two functions are derived from the "Unparser" class 
+  // versions (see "runtime/util/property/src/OcpiUtilValue.cxx").
+  // They handle "longlong" (m_baseType == OA::OCPI_LongLong) and
+  // "ulonglong" (m_baseType == OA::OCPI_ULongLong) values.
+  //
+  // GitLab Issue #1720
+  //
+  bool
+  unparseLongLong(std::string &s, int64_t val, bool /* hex */) const {
+    // function To_longlong (c: std_logic_vector(longlong_t'range)) return longlong_t;
+    OU::formatAdd(s, "std_logic_vector'(x\"%.16" PRIx64 "\")", val);
+    return val == 0;
+  }
+
+  bool
+  unparseULongLong(std::string &s, uint64_t val, bool /* hex */) const {
+    // function To_ulonglong (c: std_logic_vector(ulonglong_t'range)) return ulonglong_t;
+    OU::formatAdd(s, "std_logic_vector'(x\"%.16" PRIx64 "\")", val);
+    return val == 0;
   }
 } vhdlUnparser;
 
