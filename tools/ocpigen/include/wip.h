@@ -488,7 +488,6 @@ class Worker : public OU::Worker {
     *emitConfigImplHDL(FILE *f),
     *emitContainerImplHDL(FILE *f),
     *emitSkelHDL(),
-    *emitBsvHDL(),
     *emitDefsHDL(bool wrap = false),
     *emitVhdlEnts(),
     *emitVhdlWorkerPackage(FILE *f, unsigned maxPropName),
