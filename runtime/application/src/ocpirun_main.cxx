@@ -140,7 +140,7 @@ static void doTarget(const char *a_target, bool specs) {
   std::string s;
   const char *target = a_target, *slash = strrchr(a_target, '/');
   if (slash) {
-    s.assign(a_target, slash - a_target);
+    s.assign(a_target, OCPI_SIZE_T_DIFF(slash, a_target));
     target = s.c_str();
     caps.m_dynamic = slash[1] == 'd';
   }
@@ -148,16 +148,16 @@ static void doTarget(const char *a_target, bool specs) {
   if (dash) {
     const char *dash1 = strchr(dash+1, '-');
     if (dash1) {
-      caps.m_os.assign(target, dash - target);
+      caps.m_os.assign(target, OCPI_SIZE_T_DIFF(dash, target));
       target = ++dash;
       dash = strchr(target, '-');
       if (dash) {
-	caps.m_osVersion.assign(target, dash - target);
+	caps.m_osVersion.assign(target, OCPI_SIZE_T_DIFF(dash, target));
 	target = ++dash;
       }
       caps.m_arch = target;
     } else {
-      caps.m_osVersion.assign(target, dash - target);
+      caps.m_osVersion.assign(target, OCPI_SIZE_T_DIFF(dash, target));
       caps.m_arch = ++dash;
     }
   } else
@@ -355,10 +355,10 @@ static int mymain(const char **ap) {
 
 	unsigned long timeout =
 	  options.timeout() ? options.timeout() :
-	  options.duration() < 0 ? -options.duration() : // legacy negative
-	  options.duration() ? options.duration() :
-	  options.seconds() < 0 ? -options.seconds() :
-	  options.seconds();
+	  options.duration() < 0 ? (unsigned long)-options.duration() : // legacy negative
+	  options.duration() ? (unsigned long)options.duration() :
+	  options.seconds() < 0 ? (unsigned long)-options.seconds() :
+	  (unsigned long)options.seconds();
 	app.wait(timeout * 1000000, options.timeout() != 0);
 	app.stop(); // make sure all workers are stopped after time duration or done
 	// In case application specifically defines things to do that aren't in the destructor

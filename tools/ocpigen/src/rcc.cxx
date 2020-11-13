@@ -380,6 +380,19 @@ struct C_Unparser : public OU::Unparser {
       s += '\"';
     return !val || *val == '\0';
   }
+  bool
+  sequenceUnparse(const OU::Value &v, std::string &s, bool hex, char comma) const {
+    OU::formatAdd(s, "{ %zu", v.m_nElements);
+    bool ret;
+    if (v.m_nElements) {
+      s += ", {";
+      ret = OU::Unparser::sequenceUnparse(v, s, hex, comma);
+      s += "}";
+    } else
+      ret = true;
+    s += "}";
+    return ret;
+  }
 };
 
 struct CC_Unparser : public C_Unparser {
@@ -712,8 +725,9 @@ emitImplRCC() {
         std::string param;
         upperconstant(param, m_implName, p.m_name.c_str());
         OU::formatAdd(type, " %s", param.c_str());
-        rccArray(type, p, true, isLast, false, false);
-        fprintf(f, "%s = OCPI_PARAM_%s_%s();\n", type.c_str(), m_implName, p.m_name.c_str());
+	if (!p.m_isSequence) // sequence has array aspects internal to the struct for it
+	  rccArray(type, p, true, isLast, false, false);
+	fprintf(f, "%s = OCPI_PARAM_%s_%s();\n", type.c_str(), m_implName, p.m_name.c_str());
       }
     }
   }
@@ -1288,22 +1302,74 @@ emitSkelRCC() {
 }
 
 const char *Worker::
-addSlave(const std::string worker_name, const std::string slave_name, bool optional) {
+addSlave(ezxml_t slave, const std::string &workerName, const std::string &slaveName) {
   const char *err = NULL;
-  std::string sw;
-  const char *dot = strrchr(worker_name.c_str(), '.');
+  bool optional, hasIndex;
+  size_t index;
+  const char
+    *portName = ezxml_cattr(slave, "port"),
+    *slavePortName = ezxml_cattr(slave, "slave_port");
+  if ((err = OE::getBoolean(slave, "optional", &optional)) ||
+      (err = OE::getNumber(slave, "index", &index, &hasIndex)))
+    return err;
+  Port *port = NULL;
+  if (portName) {
+    if ((err = getPort(portName, port)))
+      return err;
+    if (!port->isData())
+      return OU::esprintf("Only data ports can be mapped to slave ports: \"%s\" is not a proxy data port",
+			  portName);
+    if (hasIndex) {
+      if (!port->isArray())
+	return OU::esprintf("Port \"%s\" is not an array port, so the index attribute is invalid",
+			    portName);
+      if (index >= port->count())
+	return OU::esprintf("Port \"%s\" is an array of %zu ports, so the index %zu is invalid",
+			    portName, port->count(), index);
+    }
+  } else if (slavePortName)
+    return OU::esprintf("A \"slave_port\" attribute is not valid without a \"port\" attribute for slave element");
+  const char *dot = strrchr(workerName.c_str(), '.');
   // Here we try a shortcut to find the slave worker's XML even when it has not been built
   // or the library has not been "generated".
-  OU::format(sw, "../%s/%.*s.xml", worker_name.c_str(), (int)(dot - worker_name.c_str()), worker_name.c_str());
+  std::string sw;
+  OU::format(sw, "../%s/%.*s.xml", workerName.c_str(), (int)(dot - workerName.c_str()), workerName.c_str());
   if (!OF::exists(sw)) // make it findable in any generated/built library
-    OU::format(sw, "%s/%.*s.xml", dot + 1, (int)(dot - worker_name.c_str()), worker_name.c_str());
+    OU::format(sw, "%s/%.*s.xml", dot + 1, (int)(dot - workerName.c_str()), workerName.c_str());
   Worker *wkr = Worker::create(sw.c_str(), m_file, NULL, m_outDir, this, NULL, 0, err);
-  if (!wkr) {
-    return OU::esprintf("for slave worker %s: %s", worker_name.c_str(), err);
+  if (!wkr)
+    return OU::esprintf("for slave worker %s: %s", workerName.c_str(), err);
+  if (portName && !slavePortName) {
+    for (unsigned i = 0; i < m_ports.size(); i++)
+      if (m_ports[i]->isData() && m_ports[i]->isDataProducer() == port->isDataProducer()) {
+	if (slavePortName)
+	  return OU::esprintf("Slave port mapping is ambiguous.  More than one slave port is a %s\n",
+			      port->isDataProducer() ? "producer" : "consumer");
+	slavePortName = m_ports[i]->pname();
+      }
+    if (!slavePortName)
+      return OU::esprintf("No slave port found that is a %s port\n",
+			  port->isDataProducer() ? "producer" : "consumer");
+  }
+  Port *slavePort = NULL;
+  if (slavePortName) {
+    if ((err = wkr->getPort(slavePortName, slavePort)))
+      return err;
+    if (!slavePort->isData())
+      return OU::esprintf("Only data ports can be mapped to slave ports: \"%s\" is not a slave data port",
+			  slavePortName);
+    if (slavePort->isDataProducer() != port->isDataProducer())
+      return OU::esprintf("Slave port \"%s\" mapped to proxy port \"%s\" must have same producer/consumer role",
+			  slavePortName, portName);
+    slavePortName = slavePort->pname();
   }
   wkr->m_isSlave = true;
   wkr->m_isOptional = optional;
-  m_slaves[slave_name] = wkr;
+  wkr->m_slavePort = slavePort;
+  wkr->m_proxyPort = port;
+  if (hasIndex)
+    wkr->m_proxyPortIndex = index;
+  m_slaves[slaveName] = wkr;
   return err;
 }
 
@@ -1330,51 +1396,41 @@ const char* Worker::
 parseSlaves() {
   const char *err;
   std::string l_slave;
-  std::vector <StringPair> all_slaves;
   if (OE::getOptionalString(m_xml, l_slave, "slave") &&
-      (err = addSlave(l_slave, l_slave.substr(0, l_slave.find(".", 0)), false)))
+      (err = addSlave(NULL, l_slave, l_slave.substr(0, l_slave.find(".", 0)))))
     return err;
-  std::map<std::string, unsigned int> wkr_num_map;
-  std::map<std::string, unsigned int> wkr_idx_map;
+  std::map<std::string, unsigned int> wkr_num_map, wkr_idx_map;
   // count how many workers of each type are slaves and put them in wkr_num_map this is used
   // later in auto generating the names for the workers if needed
-  for (ezxml_t slave_element = ezxml_cchild(m_xml, "slave");
-        slave_element;
-        slave_element = ezxml_cnext(slave_element)) {
-    if (!l_slave.empty()) {
+  for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
+    if (!l_slave.empty())
       return OU::esprintf("It is not valid to use both a \"slave\" attribute and \"slave\" "
                           "elements. When using multiple slaves use \"slave\" elements");
-    }
-    const char* wkr_attr = ezxml_cattr(slave_element, "worker");
-    std::string wkr = wkr_attr ? wkr_attr: "";
+    std::string wkr;
+    if ((err = OE::checkAttrs(slave, "worker", "name", "optional", "port", "index", "slave_port", (void*)0)) ||
+	(err = OE::getRequiredString(slave, wkr, "worker", "slave")))
+      return err;
     // increment the unsigned int associated with the wkr and if if dosen't exist this will be
     // constructed as 0 and incremented to 1
     ++wkr_num_map[wkr];
     wkr_idx_map[wkr] = 0;
   }
   for (ezxml_t slave = ezxml_cchild(m_xml, "slave"); slave; slave = ezxml_cnext(slave)) {
-    std::string wkr, name;
-    if ((err = OE::checkAttrs(slave, "worker", "name", "optional", (void*)0)) ||
-	(err = OE::getRequiredString(slave, wkr, "worker", "slave")))
-      return err;
+    std::string name, wkr = ezxml_cattr(slave, "worker");
     OE::getOptionalString(slave, name, "name");
-    bool optional = false;
-    if ((err = OE::getBoolean(slave, "optional", &optional)))
-      return err;
     size_t dot = wkr.find_last_of('.');
     if (dot == std::string::npos)
       return OU::esprintf("slave worker: \"%s\" has no authoring model suffix", wkr.c_str());
     // If we need to auto generate the name
     if (name.empty()) {
       unsigned int idx = wkr_idx_map[wkr]++;
-      std::string wkr_sub = 
       name = wkr.substr(0, dot);
       if (wkr_num_map[wkr] > 1)
 	OU::formatAdd(name, "_%u", idx - 1);
       if (m_slaves.find(name) != m_slaves.end())
 	return OU::esprintf("Invalid slave name specified: %s", name.c_str());
     }
-    if ((err = addSlave(wkr, name, optional)))
+    if ((err = addSlave(slave, wkr, name)))
       return err;
   }
   return NULL;
@@ -1395,8 +1451,6 @@ parseRccImpl(const char *a_package) {
       (err = OE::checkElements(m_xml, RCC_IMPL_ELEMS, "port", (void*)0))) {
     return err;
   }
-  if ((err = parseSlaves()))
-    return err;
   // We use the pattern value as the method naming for RCC
   // and its presence indicates "extern" methods.
   m_pattern = ezxml_cattr(m_xml, "ExternMethods");
@@ -1455,6 +1509,8 @@ parseRccImpl(const char *a_package) {
   }
   for (unsigned i = 0; i < m_ports.size(); i++)
     m_ports[i]->finalizeRccDataPort();
+  if ((err = parseSlaves()))
+    return err;
 
   m_model = RccModel;
   m_modelString = "rcc";

@@ -94,7 +94,7 @@ namespace OCPI {
 	unsigned *m_usedContainers;     // container for each crew member
 	size_t m_firstMember;           // index of first member in launch members
 	void collectCandidate(OCPI::Library::Candidate &c, unsigned n);
-	void finalizePortParam(OU::Assembly::Instance &ui, const OCPI::Util::PValue *params,
+	void finalizePortParam(OCPI::Util::Assembly::Instance &ui, const OCPI::Util::PValue *params,
 			       const char *param);
 	Instance();
 	~Instance();
@@ -191,11 +191,13 @@ namespace OCPI {
       void finalizeLaunchMembers();
       void checkPropertyValue(unsigned nInstance, const OCPI::Util::Worker &w,
 			      const OCPI::Util::Assembly::Property &aProp, unsigned *&pn,
-			      OU::Value *&pv);
+			      OCPI::Util::Value *&pv);
       const OCPI::Util::Port *getMetaPort(unsigned n) const;
       // return our used-container ordinal
       unsigned addContainer(unsigned container, bool existOk = false);
       unsigned getUsedContainer(unsigned container);
+      bool maybeDelegate(unsigned instNum, OCPI::Util::Assembly::Port &assyPort, const OCPI::Util::Port &port,
+			 const OCPI::Library::Implementation *&impl);
       bool connectionsOk(OCPI::Library::Candidate &c, unsigned instNum);
       void finalizeProperties(const OCPI::Util::PValue *params);
       const char *finalizePortParam(const OCPI::Util::PValue *params, const char *pName);

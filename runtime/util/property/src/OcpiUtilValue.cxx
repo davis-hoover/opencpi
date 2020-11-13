@@ -940,24 +940,28 @@ doFormat(std::string &s, const char *fmt, ...) const {
   va_end(ap);
 }
 
+bool Unparser::
+sequenceUnparse(const Value &v, std::string &s, bool hex, char comma) const {
+  if (!v.m_nElements)
+    return true;
+  // Now we have allocated the appropriate sequence array, so we can parse elements
+  for (unsigned n = 0; n < v.m_nElements; n++) {
+    if (n)
+      s += comma;
+    v.elementUnparse(v, s, n, hex, comma, v.needsCommaElement(), *this);
+  }
+  return false; // a sequence with non-zero elements is never considered "empty".
+}
+
 bool Value::
 unparse(std::string &s, const Unparser *up, bool append, bool hex, char comma) const {
   if (!up)
     up = this;
   if (!append)
     s.clear();
-  if (m_vt->m_isSequence) {
-    if (!m_nElements)
-      return true;
-    // Now we have allocated the appropriate sequence array, so we can parse elements
-    for (unsigned n = 0; n < m_nElements; n++) {
-      if (n)
-	s += comma;
-      up->elementUnparse(*this, s, n, hex, comma, needsCommaElement(), *up);
-    }
-    return false; // a sequence with non-zero elements is never considered "empty".
-  } else
-    return up->elementUnparse(*this, s, 0, hex, comma, false, *up);
+  return m_vt->m_isSequence ?
+    up->sequenceUnparse(*this, s, hex, comma) :
+    up->elementUnparse(*this, s, 0, hex, comma, false, *up);
 }
 
 bool Unparser::

@@ -299,9 +299,13 @@ namespace OCPI {
 	if (m.m_isSequence) {
 	  m.m_isSequence = false;
 	  dimension--;
+	  m.m_nBytes -= m.m_dataAlign;
+	  m.m_nBytes /= m.m_sequenceLength;
 	}
 	if (dimension) {
 	  assert(m.m_arrayRank && dimension <= m.m_arrayRank);
+	  for (size_t n = 0; n < dimension; ++n)
+	    m.m_nBytes /= m.m_arrayDimensions[n] * m.m_elementBytes;
 	  for (size_t n = dimension; n < m.m_arrayRank; ++n)
 	    m.m_arrayDimensions[n - dimension] = m.m_arrayDimensions[n];
 	  m.m_arrayRank -= dimension;
@@ -331,9 +335,13 @@ namespace OCPI {
 	if (m.m_isSequence) {
 	  m.m_isSequence = false;
 	  dimension--;
+	  m.m_nBytes -= m.m_dataAlign;
+	  m.m_nBytes /= m.m_sequenceLength;
 	}
 	if (dimension) {
 	  assert(m.m_arrayRank && dimension <= m.m_arrayRank);
+	  for (size_t n = 0; n < dimension; ++n)
+	    m.m_nBytes /= m.m_arrayDimensions[n] * m.m_elementBytes;
 	  for (size_t n = dimension; n < m.m_arrayRank; ++n)
 	    m.m_arrayDimensions[n - dimension] = m.m_arrayDimensions[n];
 	  m.m_arrayRank -= dimension;

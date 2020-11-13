@@ -61,6 +61,8 @@ namespace OCPI {
       virtual bool
       dimensionUnparse(const Value &v, std::string &s, unsigned nseq, size_t dim, size_t offset,
 			 size_t nItems, bool hex, char comma, const Unparser &up) const;
+      virtual bool
+      sequenceUnparse(const Value &v, std::string &s, bool hex, char comma) const;
     };
     extern bool parseOneChar(const char *&cp, const char *end, char &vp);
     struct IdentResolver;
