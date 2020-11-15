@@ -13,6 +13,8 @@
 <!--                                                                         -->
 <rccworker language="c++" slave='platform_ad9361_config.hdl' spec='ad9361_config_proxy-spec'
 	   controloperations='initialize'
+           componentlibraries='devices'
+           includedirs='../../../../../runtime/drc/ad9361/include'
 	   staticprereqlibs='ad9361'
 	   sourcefiles='ad9361_platform.cc'
 	   >
