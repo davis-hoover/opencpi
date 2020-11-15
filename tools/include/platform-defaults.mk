@@ -25,8 +25,8 @@
 # i.e.
 # OcpiRequiredCFlags=$(patsubst <bad-flag>,<good-flag>,$(OcpiRequiredCFlags))
 #
-# The defaults are basically what CentOS6 wants, so everything other platform definition
-# is essentially empty except to the extent that it deviates from the CentOS6 baseline.
+# The defaults are basically what CentOS7 wants, so every other platform definition
+# is essentially empty except to the extent that it deviates from the CentOS7 baseline.
 # This file might be read more than once to RESET all the variables to their defaults.
 #
 # Some conventions:
@@ -211,7 +211,7 @@ OcpiPlatformOs:=linux
 OcpiPlatformArch:=x86_64
 # Defining platform versions is discussed in the platform development guide.
 # Normally a single letter for the linux distribution, followed immediately by the major version
-# e.g. c6 for CentOS6, r5 for RHEL5, u16, for ubuntu 16 etc.
+# e.g. c7 for CentOS7, r5 for RHEL5, u16, for ubuntu 16 etc.
 OcpiPlatformOsVersion:=
 # This is a list of platform-specific prerequisite packages required for this platform.
 # for each one there must be an install-<foo>.sh script in the platform's directory.
@@ -220,7 +220,4 @@ OcpiPlatformPrerequisites:=
 # This specifies the name/id of the preferred clock id for the POSIX clock_gettime function.
 # It is the first argument.  The default is the "preferred" value.
 # We generally fall back to CLOCK_MONOTONIC if CLOCK_MONOTONIC_RAW is not supported.
-# In particular CLOCK_MONOTONIC_RAW is broken in centos6.  I.e. the symbol is defined but the
-# functionality is broken.  Hence we need to specify a default, which is NOT in fact the default
-# for centos6
 OcpiGetTimeClockId:=CLOCK_MONOTONIC_RAW

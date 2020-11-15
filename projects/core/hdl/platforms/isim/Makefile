@@ -26,7 +26,6 @@ ifneq ($(findstring isim,$(HdlPlatforms)),)
 # since the xlicmgr tool is useless.  grrrr.
 # Also note that this result is put in the repo and not cleaned so that ocpirun -C shows it
 # without building HDL.
-# Also note that is must be built on centos6 for the same thing to be usable on both c6 and c7
 
 probe.exe.tgz:
 	$(AT)echo Creating the tiny isim project for probing that isim is installed and licensed.

@@ -193,7 +193,7 @@ The FPGA portion of the application consists of the dc\_offset\_iq\_imbalance\_m
 
 \subsection{Executable}
 \noindent The software portion of the application consists of a C++ program written using the OpenCPI C++ API, RCC endpoint proxy workers for command and control functionality, and the file\_write.rcc RCC app worker for capturing data. For more implementation details on the endpoint proxy, see the matchstiq\_z1\_rx.rcc or fmcomms\_2\_3\_rx.rcc component datasheets. The C++ program instantiates an OpenCPI application object using one of the application XML files: rx\_fmcomms\_2\_app.xml, rx\_fmcomms\_3\_app.xml, or rx\_matchstiq\_z1\_app.xml. Each of these files contain all of the property settings for the components in the application, except the configuration of the endpoint proxy for controlling RF hardware. These settings are passed on the command line to the approriate endpoint proxy worker and set using the ACI.\par\bigskip
-To build for the host platform (centos6/centos7 - which is the case if ML605 or Stratix IV platform is intended to be used), run the following commands from the \textit{rx\_app} directory:\par\medskip
+To build for the host platform (centos7 - which is the case if ML605 or Stratix IV platform is intended to be used), run the following commands from the \textit{rx\_app} directory:\par\medskip
 \texttt{ ocpidev build}\par\medskip
 \noindent To build for the Zedboard or Matchstiq-Z1 (which run the xilinx13\_3 PetaLinux operating system), run the following command from the \textit{rx\_app} directory:\par\medskip
 \texttt{ ocpidev build --rcc-platform xilinx13\_3 }\par\medskip

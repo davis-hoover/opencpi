@@ -17,7 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This is the Makefile for worker time_demux.rcc
-RccExtraCompileOptionsCC_centos6+=--std=c++0x
 RccExtraCompileOptionsCC_centos7+=--std=c++11
 RccExtraCompileOptionsCC_xilinx13_3+=--std=c++11
 include $(OCPI_CDK_DIR)/include/worker.mk

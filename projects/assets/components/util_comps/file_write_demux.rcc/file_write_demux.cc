@@ -146,14 +146,7 @@ protected:
 public:
   // Constructor
   File_write_demuxWorker() {
-#if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4))
     workers.resize(256);
-#else
-    // workaround for CentOS 6, whose vector.resize() blows up trying to call copy constructor
-    workers.reserve(256);
-    for (int i = 0; i <256; ++i)
-      workers.emplace_back(static_cast<FileWriter *>(NULL));
-#endif
     // Bug? AV-4109 - we should optionally do output port here
     m_RunCondition.setPortMasks(1<<FILE_WRITE_DEMUX_IN, RCC_NO_PORTS);
     setRunCondition(&m_RunCondition);
@@ -161,11 +154,6 @@ public:
 
 RCCResult stop() {
     // Flush output files when paused
-    /* CentOS6's default GCC doesn't allow range operator:
-    for (auto& ptr : workers)
-      if (ptr)
-        ptr->flush();
-    */
     for (auto i = 0; i<256; ++i)
       if (workers[i])
         workers[i]->flush();

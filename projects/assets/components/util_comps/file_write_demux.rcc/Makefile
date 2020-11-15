@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RccExtraCompileOptionsCC_centos6+=--std=c++0x
 RccExtraCompileOptionsCC_centos7+=--std=c++11
 RccExtraCompileOptionsCC_macos10_12+=--std=c++0x
 RccExtraCompileOptionsCC_pico_t6a+=--std=c++0x

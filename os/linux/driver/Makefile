@@ -149,7 +149,7 @@ MyLib:=$(realpath $(OCPI_CDK_DIR)/$(OCPI_TARGET_DIR)/lib)
 $(infox x:$(MyTargetDir) $(MyDir))
 # This is what works with RHEL5
 export EXTRA_CFLAGS := $(MyIncs) -Wformat=2
-# This is what works with Centos6
+# This is what works with CentOS >= 6
 export KCPPFLAGS := $(MyIncs) -Wformat=2
 MODFILE=$(MyTargetDir)/$(MODNAME)$(if $(ocpi_release),-$(ocpi_release)).ko
 URULESFILE=99-$(MODNAME).rules
@@ -157,7 +157,7 @@ MRULESFILE=mdev-$(MODNAME).rules
 TMP_FILES=Module.markers Module.symvers .opencpi* opencpi.mod.* opencpi.o .tmp* modules.order
 
 # This dependency is causing more problems than I think it is worth since it is doing things
-# that are unnecessary and problematic in most casesn.
+# that are unnecessary and problematic in most cases.
 #$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
 EXPORTS=EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KCPPFLAGS="$(KCPPFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" $(and $(ARCH),ARCH=$(ARCH))
 $(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P))
@@ -221,7 +221,7 @@ platform_not_supported:
 	true
 
 # This file may be generated from an imported .config file.
-# In centos6/7 kernel headers it is already part of the yum-maintained kernel-headers package
+# In centos7 kernel headers it is already part of the yum-maintained kernel-headers package
 # and thus will not ever need to be built this way.
 # So this rule is saying that for some kernels, you can introduce a new or missing .config
 # file and generate the needed auto.conf file.
