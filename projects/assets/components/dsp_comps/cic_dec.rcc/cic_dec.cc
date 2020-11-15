@@ -28,7 +28,7 @@ class Cic_decWorker : public Cic_decWorkerBase {
 
     queue<long> out_combI;
     queue<long> out_combQ;
-    queue<bool> toggle1;  // TODO find a better way to toggle, that also works on centos6...
+    queue<bool> toggle1;
     queue<bool> toggle2;
     vector<short> *iData;  // can be very large, need to allocate to heap
     vector<short> *qData;

@@ -205,10 +205,6 @@ bad_paths = (
     '/projects/assets/components/util_comps/socket_write.rcc/asio/',  # Boost
     '/projects/assets/components/util_comps/socket_write.rcc/ext_src/',  # Boost
     '/release-2013.4/',
-    '/releng/blacklist/blacklist_metadata/',
-    '/releng/blacklist/sanitize/',
-    '/releng/config_files/',
-    '/releng/oss_release/',
     '/runtime/foreign/',
     '/target-',
     '/tests/pytests/utilization_proj/',

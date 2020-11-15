@@ -352,7 +352,8 @@ fi
 # The preinstall scriptlet for devel
 %pre devel
 prefixes=(`rpm -q --qf '[%{INSTPREFIXES}\n]' opencpi`)
-# This comparison against "package" happens on centos6...
+# The comparison against "package" was applicable to centos6.
+# Is it still needed since we no longer support that OS?
 if [ -n "${prefixes[0]}" -a -n "${prefixes[1]}" -a "${prefixes[0]}" != package -a \( \
      "${prefixes[0]}" != "$RPM_INSTALL_PREFIX0" -o \
      "${prefixes[1]}" != "$RPM_INSTALL_PREFIX1" \) ]; then

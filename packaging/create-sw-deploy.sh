@@ -18,12 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 if [ -z "$1" -o -z "$2" ]; then
-  echo "This script creates a directory of files needed for a software platform"
+  echo "This script creates a directory of files needed for a software platform."
   echo "This script takes two arguments with an optional third argument: output path, platform, and cross."
-  echo "The output path argument is the directory where the files are placed"
-  echo "The platform argument is a string for the rcc platform that deployment package should be created for"
-  echo "The cross argument is either empty or not empty. If it is not empty"
-  echo "it signifies a platform is cross compiled. i.e. not centos 6 or 7"
+  echo "The output path argument is the directory where the files are placed."
+  echo "The platform argument is a string for the rcc platform
+  echo "for which the deployment package should be created."
+  echo "The cross argument is either empty or not empty.  If it is not empty"
+  echo "it signifies a platform is cross compiled. i.e. not another instance"
+  echo "of the local development platform."
   echo "Usage is: $0 <output_path> <platform> \"<cross>\""
   exit 1
 fi

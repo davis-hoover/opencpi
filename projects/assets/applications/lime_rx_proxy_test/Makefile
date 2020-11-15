@@ -19,7 +19,7 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
 
-RccOnlyPlatforms+=centos6 centos7 xilinx13_3
+RccOnlyPlatforms+=centos7 xilinx13_3
 
 include $(OCPI_CDK_DIR)/include/application.mk
 
