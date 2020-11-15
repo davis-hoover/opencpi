@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This is the Makefile for worker socket_write.rcc
-RccOnlyPlatforms=centos6 ubuntu18_04 centos7 macos10_14 pico_t6a xilinx13_3 xilinx13_4
+RccOnlyPlatforms=ubuntu18_04 centos7 macos10_14 pico_t6a xilinx13_3 xilinx13_4
 
 
 # Two parameters: cross-host and if second is empty it will crash
@@ -28,13 +28,9 @@ ifeq (0,$(call boost_static_finder,arm-none-linux-gnueabi,0))
 $(warning Could not find boost static libraries for pico_t6a; disabling that platform.)
 RccExcludePlatforms+=pico_t6a
 endif
-ifeq (0,$(call boost_static_finder,^/usr/lib,0))
-$(warning Could not find boost static libraries for centos6; disabling that platform. If running on CentOS6, ensure mlocate and boost-static RPMs installed.)
-RccExcludePlatforms+=centos6
-endif
 
 # We can use ASIO in standalone mode starting with gcc 4.7 (AV-2003)
-# Yes, this is ugly and messy, to support CentOS 6 (4.4 with local boost) and Picoflexor t6a (4.4 with DRS-provided libboost)
+# Yes, this is ugly and messy, to support Picoflexor t6a (4.4 with DRS-provided libboost)
 # This next line was changed to work properly when boost was not globally installed.
 # Perhaps this causes an issue if boost is on the system?  In which case it is not "common".
 #CC_Common=-I$(dir $@)asio/include -I./ext_src
@@ -43,7 +39,6 @@ CC_Standalone=-DASIO_STANDALONE $(CC_Common)
 CC_Boost=-I./asio/local_boost $(CC_Common)
 
 # This is for SDP only; will not work on older framework
-RccExtraCompileOptionsCC_centos6+=--std=c++0x $(CC_Boost)
 RccExtraCompileOptionsCC_centos7+=--std=c++11 $(CC_Standalone)
 RccExtraCompileOptionsCC_ubuntu18_04+=--std=c++11 $(CC_Standalone)
 RccExtraCompileOptionsCC_macos10_14+=--std=c++0x $(CC_Standalone)

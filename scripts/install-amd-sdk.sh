@@ -21,8 +21,8 @@ if [ "$UID" -eq 0 ]; then
   echo This script should not be run as root, since that would not be a sand-boxed installation.
   exit 1
 fi
-if test "$OCPI_TARGET_OS" != "linux"; then #linux-c6-x86_64"; then
- echo This script only works for Centos6 linux x86_64.
+if test "$OCPI_TARGET_OS" != "linux"; then
+ echo This script only works for linux x86_64.
  exit 1
 fi
 OCPI_AMD_SDK_VERSION=3.0

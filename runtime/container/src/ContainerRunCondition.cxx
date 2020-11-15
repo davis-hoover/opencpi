@@ -73,7 +73,12 @@ operator=(RunCondition&& other) {
   m_timeout = other.m_timeout;
   m_usecs = other.m_usecs;
   m_hasRun = other.m_hasRun;
-  /* CentOS 6 won't do this: std::copy(std::begin(other.m_myMasks), std::end(other.m_myMasks), m_myMasks); */
+  /*
+  * CentOS 6 support has been dropped, so the following is now an option:
+  * std::copy(std::begin(other.m_myMasks), std::end(other.m_myMasks), m_myMasks);
+  *
+  * Is it "better" for some sense of the word?
+  */
   std::memcpy(m_myMasks, other.m_myMasks, sizeof(m_myMasks));
   if (other.m_allocated) { // Steal them
     m_portMasks = m_allocated = other.m_allocated;

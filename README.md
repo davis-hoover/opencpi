@@ -165,7 +165,7 @@ when you start a new **login shell** using `bash -l`.
 ## YUM/RPM Installation
 > Currently not availale for OpenCPI 1.7.x
 
-For CentOS6 or CentOS7 Linux, there is a binary/pre-built RPM installation
+For CentOS7 Linux, there is a binary/pre-built RPM installation
 available using the `yum` command.
 
 To install OpenCPI this way, use the following commands:
@@ -183,7 +183,7 @@ information to complete the installation consult the
 
 # Documentation
 The available documentation is located [here][doc].  Much of it is oriented
-toward those using the CentOS6/7 YUM/RPM installation, although all the
+toward those using the CentOS7 YUM/RPM installation, although all the
 **development guides** cover both types of installations, described next.
 
 ## Building OpenCPI Documentation Locally

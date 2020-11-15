@@ -118,10 +118,6 @@ For CentOS, you can use the utility "grubby".
 This will add the parameter to all kernels in the startup menu. The single
 quotes are REQUIRED or your shell will interpret the $0:
 
-For CentOS6:
-
-sudo grubby --update-kernel=ALL --args=memmap='128M$0x57EF0000'
-
 CentOS 7 uses grub2, which requires a double backslash to not interpret it:
 
 sudo grubby --update-kernel=ALL --args=memmap='128M\\$0x57EF0000'

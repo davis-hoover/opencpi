@@ -32,7 +32,7 @@ namespace {
     protected:
       std::string sym_to_load, library_to_load;
       void SetUp() /* override */ {
-#if  defined(OCPI_OS_linux) // works on centos6/7, mint19
+#if  defined(OCPI_OS_linux)
         library_to_load = "librt.";
         sym_to_load = "clock_gettime";
 #elif   defined(OCPI_OS_macos)
