@@ -1040,6 +1040,7 @@ emitImplRCC() {
       fprintf(f, "  };\\\n");
     }
     fprintf(f,
+	    "  typedef %c%sWorkerBase WorkerBase;\n"
             "}\n // end the namespace\n"
             "#define %s_START_INFO \\\n"
             "  extern \"C\" {\\\n"
@@ -1047,6 +1048,7 @@ emitImplRCC() {
             "    OCPI::RCC::RCCUserWorker *\\\n"
             "    ocpi_%s(void *place, OCPI::RCC::RCCWorkerInfo &info) {\\\n"
             "      info.size = sizeof(%c%sWorker);\\\n",
+	    toupper(m_implName[0]), m_implName + 1,
             upper, m_implName, m_implName,
             toupper(m_implName[0]), m_implName + 1);
     fprintf(f,

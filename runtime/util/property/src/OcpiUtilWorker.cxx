@@ -187,6 +187,8 @@ namespace OCPI {
       for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
 	if ((err = p->postParse()))
           return esprintf("Invalid xml port description(3): %s", err);
+	else if (p->m_slave == SIZE_MAX)
+	  continue; // delegated ports aren't "real" for this purpose
         else if (p->m_provider) {
 	  if (!p->m_isOptional)
 	    hasInput = true;
