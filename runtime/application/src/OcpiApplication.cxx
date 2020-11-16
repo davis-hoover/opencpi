@@ -489,9 +489,9 @@ namespace OCPI {
 	    slaveInstances[slave] = ui.slaveInstances()[n]; // remember which instance
 	  }
       } else if (ui.m_hasMaster && ui.m_master < instNum &&
-                 !checkSlave(c.impl->m_metadataImpl,
-                             m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, NULL,
-			     false, reject))
+                 checkSlave(c.impl->m_metadataImpl,
+			    m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, NULL,
+			    false, reject) == UINT_MAX)
         return false;
       // Now check all connected ports, including when they are aliased to slave ports.
       unsigned nPorts;
