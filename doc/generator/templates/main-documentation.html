@@ -16,12 +16,13 @@
 {% set _ = data.pop(name) %}
 {%- endmacro %}
 
-<h2>{{ section_title }}</h2>
+<h2 id="{{ section_name }}">{{ section_title }}</h2>
 <p>
     It is highly recommended to read all of the Getting Started Guides in the order listed before reading
     the Developer or Additional Guides. If OpenCPI has already been installed, then you may skip the installation guide.
 </p>
 <div>{{ pop_link("release notes", links) }}</div>
+<div>{{ pop_link("man pages", links) }}</div>
 
 <div class="flexbox-container">
     <div class="flexbox-item">
