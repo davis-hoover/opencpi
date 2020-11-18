@@ -18,7 +18,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _AD9361_COMMON
-#define _AD9361_COMMON
-#include "ad9361_platform.h"
-#endif // _AD9361_COMMON
+#ifndef _READ_AD9361_H
+#define _READ_AD9361_H
+
+/*! @file
+ *  @brief Provides functions for reading values from an AD9361 IC.
+ ******************************************************************************/
+
+extern "C" {
+#include "ad9361.h" // ad9361_rf_phy
+}
+const char
+  *get_ad9361_rx_sampl_freq_hz(const struct ad9361_rf_phy *phy,
+			       double reference_clock_rate_Hz, double &val),
+  *get_ad9361_tx_sampl_freq_hz(const struct ad9361_rf_phy *phy,
+			       double reference_clock_rate_Hz, double &val),
+  *get_ad9361_rx_rfpll_lo_freq_hz(const struct ad9361_rf_phy *phy,
+				  double reference_clock_rate_Hz, double &val),
+  *get_ad9361_tx_rfpll_lo_freq_hz(const struct ad9361_rf_phy *phy,
+				  double AD9361_reference_clock_rate_Hz, double &val);
+#endif // _READ_AD9361_H
