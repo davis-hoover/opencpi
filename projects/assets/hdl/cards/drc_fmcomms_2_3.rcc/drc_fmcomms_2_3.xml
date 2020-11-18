@@ -1,0 +1,30 @@
+<RccWorker language='c++' spec='drc-spec' version='2'
+	   controlOperations='start'
+	   staticprereqlibs='ad9361' >
+  <specProperty name='MAX_RX_RF_PORTS_p' value="2"/>
+  <specProperty name='MAX_TX_RF_PORTS_p' value="2"/>
+  <specProperty name='rf_ports_rx' parameter='1' value='Rx0,Rx1'/>
+  <specProperty name='rf_ports_tx' parameter='1' value='Tx0,Tx1'/>
+  <specProperty name='prepare' writesync='1'/>
+  <specProperty name='start' writesync='1'/>
+  <specProperty name='stop' writesync='1'/>
+  <specProperty name='release' writesync='1'/>
+  <specProperty name='status' readsync='1'/>
+
+  <slave worker='platform_ad9361_config.hdl' name="config" />
+  <slave worker="platform_ad9361_data_sub.hdl" name="data_sub"/>
+  <slave worker="data_src_qadc.hdl"  name="rx_qadc0"  	      optional="1"/>
+  <slave worker="complex_mixer.hdl"  name="rx_complex_mixer0" optional="1"/>
+  <slave worker="cic_dec.hdl" 	     name="rx_cic_dec0"       optional="1"
+	 port='rx' index='0' slave_port='out'/>
+  <slave worker="data_src_qadc.hdl"  name="rx_qadc1"  	      optional="1"/>
+  <slave worker="complex_mixer.hdl"  name="rx_complex_mixer1" optional="1"/>
+  <slave worker="cic_dec.hdl" 	     name="rx_cic_dec1"       optional="1"
+	 port='rx' index='0' slave_port='out'/>
+  <slave worker="data_sink_qdac.hdl" name="tx_qdac0"          optional="1"/>
+  <slave worker="cic_int.hdl"        name="tx_cic_int0"       optional="1"
+	 port='tx' index='0' slave_port='in'/>
+  <slave worker="data_sink_qdac.hdl" name="tx_qdac1"          optional="1"/>
+  <slave worker="cic_int.hdl"        name="tx_cic_int1"       optional="1"
+	 port='tx' index='0' slave_port='in'/>
+</RccWorker>
