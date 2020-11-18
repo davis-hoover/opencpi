@@ -1,3 +1,27 @@
+# [v2.0.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0...v2.0.1) (2020-11-18)
+
+Changes/additions since [OpenCPI Release v2.0.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0)
+
+### Enhancements
+- **osp**: update/refactor the DRC support libraries to be sharable among proxies, and make pluto an example of using them. (!393)(df56b22b)
+- **tools**: doc site: include OSP documentation starting with version 1.7.1. (!402)(73a409c4)
+- **tools**: doc site: add man page link to a release's index page if man pages exist. (!402)(73a409c4)
+
+### Bug Fixes
+- **doc,tools**: prevent libreoffice tracked changes from showing up in rendered pdfs. (!392)(a7cb3110)
+- **hdl base**: add IDLE state to state machine. (!404)(477404a2)
+- **hdl base**: fix bug with statemachine. (!406)(d7fca60c)
+- **runtime**: add new way of calling no-os ad9361 library. (!420)(01e79568)
+- **tools**: fix bugs for clock adapter insertion. (!383)(2632c226)
+- **tools**: fix ubuntu check scripts to not error on non-ubuntu platforms. (!398)(044e4db1)
+- **tools**: fix bugs for clock adapter insertion. (!399)(99e89a32)
+- **tools**: doc site: fix incorrect "latest" release labeling. (!402)(73a409c4)
+- **tools**: fix "ocpigen" processing of 64-bit initial values for 64-bit HDL worker parameters. (!417)(977c228e)
+
+### Miscellaneous
+- **comp**: move "zero_padding" component to "inactive" project. (!419)(64f4f058)
+- **doc,runtime,tests,tools**: remove remaining CentOS 6 references and supporting code. (!403)(3b9c943b)
+
 # [v2.0.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0-rc.2...v2.0.0) (2020-10-06)
 
 Changes/additions since [OpenCPI Release v2.0.0-rc.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0-rc.2)
