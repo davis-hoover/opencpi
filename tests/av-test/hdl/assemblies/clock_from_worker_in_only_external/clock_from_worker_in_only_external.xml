@@ -1,0 +1,7 @@
+<HdlAssembly>
+  <Connection Name='in_to_clock_from_worker_in_only' External='consumer'>
+    <port Instance='clock_from_worker_in_only' Name='in'/>
+  </Connection>
+  <Instance Worker='clock_from_worker_in_only' Name='clock_from_worker_in_only'/>
+
+</HdlAssembly>
