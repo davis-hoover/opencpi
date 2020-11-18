@@ -315,8 +315,8 @@ ParamConfig(const ParamConfig &other)
 }
 
 // Fill in unspecified parameters with their single default value
-void ParamConfig::
-doDefaults() {
+const char *ParamConfig::
+doDefaults(bool missingOk) {
   params.resize(m_worker.m_ctl.nParameters); // in case parameter properties were added recently
   size_t n = 0;
   for (PropertiesIter pi = m_worker.m_ctl.properties.begin();
@@ -336,8 +336,11 @@ doDefaults() {
 	    params[n].m_isDefault = false;
 	  } else
 	    params[n].m_value = *p.m_default; // assignment operator to copy the value
-	} else
+	} else if (missingOk)
 	  params[n].m_value.setType(p);       // blank default value
+	else
+	  return OU::esprintf("The parameter property '%s' has no build value and no default value",
+			      p.cname());
 	params[n].m_value.unparse(params[n].m_uValue);
 	params[n].m_uValues.push_back(params[n].m_uValue);
 	params[n].m_attributes.resize(params[n].m_attributes.size() + 1);
@@ -345,6 +348,7 @@ doDefaults() {
       n++;
     }
   }
+  return NULL;
 }
 const char *ParamConfig::
 parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
@@ -602,7 +606,8 @@ parseBuildXml(ezxml_t x, const std::string &file) {
       return err;
     assert(nParam == p->m_paramOrdinal); // FIXME: get rid of nParam someday
   }
-  m_build.m_globalParams.doDefaults(); // set unmentioned params to default values
+  if ((err = m_build.m_globalParams.doDefaults(true))) // set unmentioned params to default values
+    return err;
   // There are three cases for configurations here:
   // 1. With IDs, which are defaulted against the property's default value when not specified.
   //    This was the original meaning and supports backward compatibility.
@@ -626,7 +631,8 @@ parseBuildXml(ezxml_t x, const std::string &file) {
     if ((err = pc->parse(cx, m_paramConfigs)))
       return err;
     pc->nConfig = id++;
-    pc->doDefaults(); // configs with id have defaults filled in
+    if ((err = pc->doDefaults(false))) // configs with id have defaults filled in
+      return err;
     if (id > m_paramConfigs.size())
       m_paramConfigs.resize(id);
     m_paramConfigs[pc->nConfig] = pc; // this is a complete, defaulted configuration, as always

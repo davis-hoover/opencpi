@@ -1,0 +1,4 @@
+Discuss all the linking issues in the framework and plug-in builds, in a way that is independent of the build mechanism (e.g. autotools).
+PIC issues for swig, ContainerManager linking hooks for plugins, dynamic/static, rcc worker vs framework.
+
+exec dynamic worker calling framework must have linking hacks in containermanager for static executables.

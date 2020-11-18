@@ -39,6 +39,7 @@
 
 extern "C" {
 #include "ad9361.h" // (from No-OS) struct ad9361_rf_phy
+#include "ad9361_platform.h" // (from No-OS) struct ad9361_rf_phy
 }
 
 namespace OCPIProjects {
@@ -1145,6 +1146,19 @@ void RadioCtrlrNoOSTuneResamp<C, S>::log_debug_ad9361_init(
             init_param->tx_data_delay);
 }
 
+static  OCPI::RCC::RCCUserSlave *slave;
+
+// C interface for NoOs Library callbacks to touch the actual device (config slave)
+static void get_byte(uint8_t id_no, uint16_t addr, uint8_t *buf) {
+  slave->getRawPropertyBytes(addr, buf, 1);
+}
+static void set_byte(uint8_t id_no, uint16_t addr, const uint8_t *buf) {
+  slave->setRawPropertyBytes(addr, buf, 1);
+}
+static void set_reset(uint8_t id_no, bool on) {
+  slave->setProperty("force_reset", on ? "true" : "false");
+}
+
 template<class C, class S>
 void RadioCtrlrNoOSTuneResamp<C, S>::init() {
 
@@ -1158,7 +1172,15 @@ void RadioCtrlrNoOSTuneResamp<C, S>::init() {
     // ...WorkerTypes::...WorkerBase::Slave to
     // OCPI::RCC_RCCUserSlave since the former inherits privately from the
     // latter inside the RCC worker's generated header
+#if 1
+    ad9361_opencpi.get_byte = get_byte;
+    ad9361_opencpi.set_byte = set_byte;
+    ad9361_opencpi.set_reset = set_reset;
+    ad9361_opencpi.worker = "DRC proxy";
+    slave = static_cast<OCPI::RCC::RCCUserSlave*>(static_cast<void *>(&m_slave));
+#else
     spi_init(static_cast<OCPI::RCC::RCCUserSlave*>(static_cast<void *>(&m_slave)));
+#endif
   }
 
   // initialize No-OS using the No-OS platform_opencpi layer and a slave
