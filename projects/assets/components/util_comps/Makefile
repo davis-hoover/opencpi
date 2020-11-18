@@ -25,7 +25,6 @@ Tests = \
 	timestamper.test \
 	timestamper_scdcd.test \
 	tx_event_ctrlr.test \
-	zero_padding.test \
 	zero_pad.test \
 	capture_v2.test \
 	pattern_v2.test
