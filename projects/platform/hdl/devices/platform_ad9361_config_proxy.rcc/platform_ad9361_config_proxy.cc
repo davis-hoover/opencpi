@@ -28,6 +28,8 @@ extern "C" {
 #include "config.h" // ALTERA_PLATFORM
 #include "ad9361_api.h"
 #include "parameters.h"
+#include "ad9361.h"
+#include "ad9361_platform.h" // (from No-OS) struct ad9361_rf_phy
 int32_t spi_init(OCPI::RCC::RCCUserSlave* _slave);
 }
 
@@ -65,6 +67,20 @@ using namespace Platform_ad9361_config_proxyWorkerTypes;
 #define D2_BITMASK 0x04
 #define D1_BITMASK 0x02
 #define D0_BITMASK 0x01
+
+static  OCPI::RCC::RCCUserSlave *slave_m;
+
+// C interface for NoOs Library callbacks to touch the actual device (config slave)
+static void get_byte(uint8_t id_no, uint16_t addr, uint8_t *buf) {
+  slave_m->getRawPropertyBytes(addr, buf, 1);
+}
+static void set_byte(uint8_t id_no, uint16_t addr, const uint8_t *buf) {
+  slave_m->setRawPropertyBytes(addr, buf, 1);
+}
+static void set_reset(uint8_t id_no, bool on) {
+  slave_m->setProperty("force_reset", on ? "true" : "false");
+}
+
 
 class Platform_ad9361_config_proxyWorker : public Platform_ad9361_config_proxyWorkerBase {
   RunCondition m_aRunCondition;
@@ -378,7 +394,11 @@ private:
 
       slave.set_ENABLE_force_set(true);
       slave.set_TXNRX_force_set(true);
-
+      ad9361_opencpi.get_byte = get_byte;
+      ad9361_opencpi.set_byte = set_byte;
+      ad9361_opencpi.set_reset = set_reset;
+      ad9361_opencpi.worker = "platform_ad9361_config_proxy";
+      slave_m = static_cast<OCPI::RCC::RCCUserSlave*>(static_cast<void *>(&slave));
       // sleep duration chosen to be relatively small in relation to AD9361
       // initialization duration (which, through observation, appears to be
       // roughly 200 ms), but a long enough pulse that AD9361 is likely
@@ -838,6 +858,7 @@ private:
     // Ad9361_config_proxyWorkerTypes::Ad9361_config_proxyWorkerBase::Slave to
     // OCPI::RCC_RCCUserSlave since the former inherits privately from the
     // latter inside this worker's generated header
+
     spi_init(static_cast<OCPI::RCC::RCCUserSlave*>(static_cast<void *>(&slave)));
 
     m_rx_fastlock_profiles.clear();
