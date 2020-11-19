@@ -436,7 +436,7 @@ namespace OCPI {
 	si.m_master = m_ordinal;
       }
       m_slaveInstances.emplace_back(n);
-      m_slaveNames.emplace_back(slave);
+      m_slaveNames.emplace_back(slave); // slave can be NULL, implying the one slave
       return NULL;
     }
 
@@ -683,7 +683,7 @@ namespace OCPI {
       if (!findAssign(params, "selection", m_name.c_str(), m_selection) &&
 	  !findAssign(params, "selection", m_specName.c_str(), m_selection))
         OE::getOptionalString(ix, m_selection, "selection");
-      ocpiInfo("Component: %s name: %s impl: %s spec: %s selection: %s",
+      ocpiInfo("Component %2d: %s name: %s impl: %s spec: %s selection: %s", ordinal,
                 component.c_str(), m_name.c_str(), m_implName.c_str(), m_specName.c_str(),
                 m_selection.c_str());
 #if 0

@@ -40,6 +40,7 @@ namespace OCPI {
     const unsigned BUFFER_ALIGNMENT = 128;
     // FIXME:  use a pointer to a protocol, and share protocols in the artifact xml
     class Worker;
+    class Slave;
     class Port : public Protocol {
     public:
       struct Scaling {
@@ -146,6 +147,7 @@ namespace OCPI {
       Distribution m_defaultDistribution;
       Partitioning m_defaultPartitioning;
       std::string m_defaultHashField;
+      size_t m_slave; // the slave that this port is delegated to, or UINT_MAX;
 
       Port(ezxml_t x = NULL, Worker *w = NULL);
       // constructor from tools, with new xml (to turn a spec port into an impl port)

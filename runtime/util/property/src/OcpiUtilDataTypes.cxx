@@ -733,7 +733,7 @@ namespace OCPI {
       for (ezxml_t m = ezxml_cchild(mems, tag); m ; m = ezxml_cnext(m))
 	nMembers++;
       if (nMembers) {
-	std::set<const char *, ConstCharComp> names, abbrevs;
+	std::set<const char *, ConstCharCaseComp> names, abbrevs;
 	Member *m = new Member[nMembers];
 	members = m;
 	const char *err = NULL;
@@ -762,32 +762,52 @@ namespace OCPI {
     // the indexing stopped.  I.e. a zero will mean the whole member value (whole sequence
     // and/or array).  A sequence is considered the most major/outer dimension
     // when the member is both a sequence and an array, for the *dimensionp value.
+    // The valuep argument being non-NULL means we are looking for the default
+    // value rather than the worker's actual value which will be obtained by
+    // using the output (by reference) byte offset value.
+    // So:
+    // valuep != NULL:  caller will access(get) value based on element offset
+    // valuep == NULL:  caller will access(get/set) value based on byte offset
     const char *Member::
-    descend(OA::AccessList &list, const Member *&m, size_t &a_offset, size_t *dimensionp) const {
+    descend(OA::AccessList &list, const Member *&m, const Value **valuep, size_t *offsetp,
+	    size_t *dimensionp) const {
       size_t dimension = 0;
-      a_offset = 0;
+      Value *value = NULL;
+      size_t l_offset = 0;
       m = this;
+      if (valuep)
+	ocpiCheck(value = m_default);
       for (const OA::Access *a = list.begin(); a != list.end(); ++a) {
 	dimension = 0;
 	if (m->m_isSequence) {
 	  if (!a->m_number)
 	    return "sequence property not indexed with a number";
 	  if (a->m_index >= m->m_sequenceLength)
-	    return "sequence index >= than maximum sequence length";
-	  a_offset += m->m_dataAlign + a->m_index * m->m_elementBytes * m->m_nItems;
-	  dimension = 1;
+	    return esprintf("sequence index (%zu) >= than maximum sequence length (%zu)",
+			    a->m_index, m->m_sequenceLength);
+	  if (value) {
+	    if (a->m_index >= value->m_nElements)
+	      return esprintf("sequence index (%zu) >= than current sequence length (%zu)",
+			      a->m_index, value->m_nElements);
+	    l_offset += a->m_index * m->m_nItems;
+	  } else
+	    l_offset +=
+	      std::max(m->m_dataAlign, sizeof(uint32_t)) +
+	      a->m_index * m->m_elementBytes * m->m_nItems;
+	  dimension = 1; // indicate we have indexed one time
 	  if (++a == list.end())
 	    break;
 	}
 	if (m->m_arrayRank) {
+	  size_t nItems = m->m_nItems;
 	  for (unsigned n = 0; n < m->m_arrayRank && a != list.end(); ++a, ++dimension) {
 	    if (!a->m_number)
 	      return "array not indexed with a number";
 	    if (a->m_index >= m->m_arrayDimensions[n])
 	      return "array index out of range";
+	    nItems /= m->m_arrayDimensions[n];
 	    ++n;
-	    a_offset += a->m_index * m->m_elementBytes *
-	      (n == m->m_arrayRank ? 1 : m->m_arrayDimensions[n]);
+	    l_offset += a->m_index  * nItems * (value ? 1 : m->m_elementBytes);
 	  }
 	  if (a == list.end())
 	    break;
@@ -796,14 +816,21 @@ namespace OCPI {
 	  if (a->m_number)
 	    return "index found where structure member should be specified";
 	  Member *mm = NULL;
-	  for (unsigned n = 0; n < m->m_nMembers; n++)
+	  unsigned n;
+	  for (n = 0; n < m->m_nMembers; n++)
 	    if (!strcasecmp(a->m_member, m->m_members[n].m_name.c_str())) {
-	      m = mm = &m->m_members[n];
+	      mm = &m->m_members[n];
 	      break;
 	    }
-	  if (!mm)
-	    return "member name not found in structure";
-	  a_offset += m->m_offset;
+	  if (n >= m->m_nMembers)
+	    return esprintf("member name \"%s\" not found in structure", a->m_member);
+	  if (value) {
+	    value = m->m_isSequence || m->m_arrayRank ?
+	      value->m_pStruct[l_offset][n] : value->m_Struct[n];
+	    l_offset = 0;
+	  } else
+	    l_offset += mm->m_offset;
+	  m = mm;
 	  dimension = 0;
 	} else if (m->m_type) {
 	  assert(m->m_isSequence || m->m_arrayRank);
@@ -822,8 +849,13 @@ namespace OCPI {
 	return "array property not fully indexed";
       else if (m->m_nMembers)
 	return "structure member not specified";
+      if (valuep)
+	*valuep = value;
+      if (offsetp)
+	*offsetp = l_offset;
       return NULL;
     }
+
     const char *Member::
     offset(size_t &maxAlign, size_t &argOffset, size_t &minSizeBits, bool &diverseSizes,
 	   bool &sub32, bool &unBounded, bool &isVariable, bool isTop) {

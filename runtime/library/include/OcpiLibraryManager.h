@@ -65,6 +65,7 @@ namespace OCPI {
     };
 
     class Implementation;
+    // A static connection inside the artifact
     struct Connection {
       Implementation *impl;
       OCPI::Util::Port *port;

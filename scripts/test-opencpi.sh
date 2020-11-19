@@ -55,7 +55,7 @@ while [ -n "$1" ]; do
     --help|-h)
       echo This script runs various built-in tests.
       echo Available tests are: $alltests
-      echo 'Usage is: ocpitest [--showtests | --help ] [<platform> [ <test> ... ]]'
+      echo 'Usage is: ocpitest [--showtests | --help | [--no-hdl] [--platform <platform>] [ <test> ... ]]'
       exit 1;;
     --platform)
       platform=$2; shift; shift;;
@@ -70,7 +70,7 @@ while [ -n "$1" ]; do
 done
 
 # Note the -e is so, especially in embedded environments, we do not deal with getPlatform.sh etc.
-[ -L cdk ] && source `pwd`/cdk/opencpi-setup.sh -e 
+[ -L cdk ] && source `pwd`/cdk/opencpi-setup.sh -e
 [ -z "$OCPI_CDK_DIR" ] && echo No OpenCPI CDK available && exit 1
 
 runtime=1
@@ -85,7 +85,7 @@ else
   fi
   if [ -z "$runtime" ] ;  then
     echo ========= Running dev system tests since \"make\" and project-registry is available.
-    tests="$tests $dev_tests"   
+    tests="$tests $dev_tests"
     source $OCPI_CDK_DIR/scripts/ocpitarget.sh $platform
   else
     echo ========= Running only runtime tests since \"make\" or project-registry is not available.

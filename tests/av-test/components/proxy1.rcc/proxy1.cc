@@ -55,6 +55,7 @@ public:
     slaves.first_wkr1.set_test_ushort(16);
     slaves.first_wkr1.set_my_string("test_string");
     slaves.first_wkr1.setProperty_test_seq_ulong("1,2,3,4,6,7,8,100");
+    slaves.first_wkr1.setProperty_test_seq_ushort("11,12,13,14,16,17,18,101,102");
     slaves.first_wkr1.setProperty_test_seq_str("\"one\",\"two\",\"three\",\"four\",\"five\"");
     slaves.first_wkr1.setProperty_test_seq_of_ulong_arrays("{1,2,3,4,6,7,8,101},"
                                                            "{1,2,3,4,6,7,8,102},"
@@ -105,6 +106,7 @@ public:
     slaves.second_wkr1.set_test_ushort(16);
     slaves.second_wkr1.set_my_string("test_string");
     slaves.second_wkr1.setProperty_test_seq_ulong("1,2,3,4,6,7,8,100");
+    slaves.second_wkr1.setProperty_test_seq_ushort("11,12,13,14,16,17,18,101,102");
     slaves.second_wkr1.setProperty_test_seq_str("\"one\",\"two\",\"three\",\"four\",\"five\"");
     slaves.second_wkr1.setProperty_test_seq_of_ulong_arrays("{1,2,3,4,6,7,8,101},"
                                                             "{1,2,3,4,6,7,8,102},"

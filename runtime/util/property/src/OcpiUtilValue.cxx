@@ -204,11 +204,11 @@ namespace OCPI {
 	char c = *++cp;      // must have one more to be valid
 	if (isxdigit(c)) {
 	  unsigned n;
-	  n = isdigit(c) ? c - '0' : (tolower(c) - 'a') + 10;
+	  n = isdigit(c) ? OCPI_CHAR_DIFF(c, '0') : OCPI_CHAR_DIFF(tolower(c), 'a') + 10;
 	  if (cp < end && isxdigit(cp[1])) {
 	    n <<= 4;
 	    c = *++cp;
-	    n += isdigit(c) ? c - '0' : (tolower(c) - 'a') + 10;
+	    n += isdigit(c) ? OCPI_CHAR_DIFF(c, '0') : OCPI_CHAR_DIFF(tolower(c), 'a') + 10;
 	  }
 	  vp = (char)(n);
 	  return false;
@@ -254,19 +254,19 @@ namespace OCPI {
     static bool
     octal(const char *&cp, const char *end, char &vp) {
       char c = *cp;
-      unsigned n = c - '0';
+      unsigned n = OCPI_CHAR_DIFF(c, '0');
       if (cp < --end) { // end is now the last, not past the last
 	c = cp[1];
 	if (isdigit(c) && c <= '7') {
 	  cp++;
 	  n <<= 3;
-	  n += c - '0';
+	  n += OCPI_CHAR_DIFF(c, '0');
 	  if (cp < end) {
 	    c = cp[1];
 	    if (isdigit(c) && c <= '7') {
 	      cp++;
 	      n <<= 3;
-	      n += c - '0';
+	      n += OCPI_CHAR_DIFF(c, '0');
 	      if (n > 0xff)
 		return true;
 	    }
@@ -481,7 +481,7 @@ namespace OCPI {
 	    const char *endOfName = start;
 	    while (!isspace(*endOfName) && endOfName != end)
 	      endOfName++;
-	    err.append(start,  endOfName - start);
+	    err.append(start,  OCPI_SIZE_T_DIFF(endOfName, start));
 	    err += "\" did not match any of the expected member names (";
 	    for (size_t ii = 0; ii < m_vt->m_nMembers; ii++)
 	      formatAdd(err, "%s\"%s\"", ii ? ", " : "", m_vt->m_members[ii].cname());
@@ -598,33 +598,41 @@ namespace OCPI {
 			  m_nElements, m_vt->m_sequenceLength);
       }
       size_t oldLength = m_length;
-      switch (m_vt->m_baseType) {
-#define OCPI_DATA_TYPE(s,c,u,b,run,pretty,storage)     \
-      case OA::OCPI_##pretty:			       \
-	m_length = m_nTotal * sizeof(run);	       \
-	if (m_vt->m_isSequence || m_vt->m_arrayRank) { \
-	  run *old = m_p##pretty;                      \
-	  if (m_vt->m_baseType == OA::OCPI_String) {   \
-            /* NULL terminate sequences of strings */  \
-	    m_pString = new OA::CharP[m_nTotal+1];     \
-            memset(m_pString, 0, m_length+sizeof(run));\
-          } else {                                     \
-	    m_p##pretty = new run[m_nTotal];	       \
-            /* FIXME: type-specific default value? */  \
-            memset(m_p##pretty, 0, m_length);          \
-          }                                            \
-	  if (add) {                                   \
-	    memcpy(m_p##pretty, old, oldLength);       \
-	    delete [] old;                             \
-	  }                                            \
-        }                                              \
-	break;
-	OCPI_PROPERTY_DATA_TYPES
-	OCPI_DATA_TYPE(sca,corba,letter,bits,EnumValue,Enum,store)
-	OCPI_DATA_TYPE(sca,corba,letter,bits,StructValue,Struct,store)
-	OCPI_DATA_TYPE(sca,corba,letter,bits,TypeValue,Type,store)
+      try {
+	switch (m_vt->m_baseType) {
+#define OCPI_DATA_TYPE(s,c,u,b,run,pretty,storage)		\
+	  case OA::OCPI_##pretty:				\
+	    m_length = m_nTotal * sizeof(run);			\
+	    if (m_vt->m_isSequence || m_vt->m_arrayRank) {	\
+	      run *old = m_p##pretty;				\
+	      if (m_vt->m_baseType == OA::OCPI_String) {	\
+		/* NULL terminate sequences of strings */	\
+		m_pString = new OA::CharP[m_nTotal+1];		\
+		memset(m_pString, 0, m_length+sizeof(run));	\
+	      } else {						\
+		m_p##pretty = new run[m_nTotal];		\
+		/* FIXME: type-specific default value? */	\
+		memset(m_p##pretty, 0, m_length);		\
+	      }							\
+	      if (add) {					\
+		memcpy(m_p##pretty, old, oldLength);		\
+		delete [] old;					\
+	      }							\
+	    }							\
+	    break;
+	  OCPI_PROPERTY_DATA_TYPES
+	  OCPI_DATA_TYPE(sca,corba,letter,bits,EnumValue,Enum,store)
+	  OCPI_DATA_TYPE(sca,corba,letter,bits,StructValue,Struct,store)
+	  OCPI_DATA_TYPE(sca,corba,letter,bits,TypeValue,Type,store)
 #undef OCPI_DATA_TYPE
-      case OA::OCPI_none: case OA::OCPI_scalar_type_limit:;
+	case OA::OCPI_none: case OA::OCPI_scalar_type_limit:;
+	}
+      } catch (std::bad_alloc &e) {
+	return esprintf("Allocation exception when making value: %s", e.what());
+      } catch (std::string &e) {
+	return esprintf("Exception when making value: %s", e.c_str());
+      } catch (...) {
+        return  esprintf("Unexpected/unknown exception when making value");
       }
       if (m_vt->m_baseType == OA::OCPI_Struct) {
 	assert(!add);
@@ -682,7 +690,7 @@ namespace OCPI {
       if (!add)
 	clear();
       if (m_vt->m_baseType == OA::OCPI_String)
-	reserveStringSpace(stop - unparsed, add);
+	reserveStringSpace(OCPI_SIZE_T_DIFF(stop, unparsed), add);
       if (add)
 	m_nElements++;
       else {
@@ -695,7 +703,7 @@ namespace OCPI {
 	  do {
 	    if ((err = doElement(tmp, stop, start, end)))
 	      return err;
-	    len = end - start;
+	    len = OCPI_SIZE_T_DIFF(end, start);
 	    while (end < tmp && isspace(*end))
 	      end++;
 	    m_nElements++;
@@ -794,7 +802,7 @@ namespace OCPI {
 	  if (value.m_vt->m_baseType == OA::OCPI_Enum)
 	    for (size_t n = 0; n < value.m_vt->m_nEnums; n++)
 	      if (!strcasecmp(value.m_vt->m_enums[n], sym)) {
-		val.setNumber(n);
+		val.setNumber((unsigned)n); // caste to avoid int64_t test
 		return NULL;
 	      }
 	  if (resolver && resolver->resolver) {
@@ -932,24 +940,28 @@ doFormat(std::string &s, const char *fmt, ...) const {
   va_end(ap);
 }
 
+bool Unparser::
+sequenceUnparse(const Value &v, std::string &s, bool hex, char comma) const {
+  if (!v.m_nElements)
+    return true;
+  // Now we have allocated the appropriate sequence array, so we can parse elements
+  for (unsigned n = 0; n < v.m_nElements; n++) {
+    if (n)
+      s += comma;
+    v.elementUnparse(v, s, n, hex, comma, v.needsCommaElement(), *this);
+  }
+  return false; // a sequence with non-zero elements is never considered "empty".
+}
+
 bool Value::
 unparse(std::string &s, const Unparser *up, bool append, bool hex, char comma) const {
   if (!up)
     up = this;
   if (!append)
     s.clear();
-  if (m_vt->m_isSequence) {
-    if (!m_nElements)
-      return true;
-    // Now we have allocated the appropriate sequence array, so we can parse elements
-    for (unsigned n = 0; n < m_nElements; n++) {
-      if (n)
-	s += comma;
-      up->elementUnparse(*this, s, n, hex, comma, needsCommaElement(), *up);
-    }
-    return false; // a sequence with non-zero elements is never considered "empty".
-  } else
-    return up->elementUnparse(*this, s, 0, hex, comma, false, *up);
+  return m_vt->m_isSequence ?
+    up->sequenceUnparse(*this, s, hex, comma) :
+    up->elementUnparse(*this, s, 0, hex, comma, false, *up);
 }
 
 bool Unparser::
@@ -1011,7 +1023,7 @@ unparseChar(std::string &s, char argVal, bool hex) const {
     default:
       ;
     }
-    s += val;
+    s += (char)val;
   } else {
     s += '\\';
     char c;
@@ -1224,7 +1236,7 @@ void Value::generate() {
   clear();
   m_nTotal = m_vt->m_nItems;
   if (m_vt->m_isSequence) {
-    m_nElements = random() % (m_vt->m_sequenceLength ? m_vt->m_sequenceLength : 5);
+    m_nElements = (size_t)random() % (m_vt->m_sequenceLength ? m_vt->m_sequenceLength : 5);
     m_nTotal *= m_nElements;
   }
   if (m_vt->m_baseType == OA::OCPI_String)
@@ -1298,12 +1310,12 @@ generateLongLong() {
 }
 uint64_t Value::
 generateULongLong() {
-  return myRandom();
+  return (uint64_t)myRandom();
 }
 OA::CharP Value::
 generateString() {
   char *cp = m_stringNext;
-  for (size_t len = random() % (m_vt->m_stringLength ? m_vt->m_stringLength + 1 : testMaxStringLength);
+  for (size_t len = (size_t)random() % (m_vt->m_stringLength ? m_vt->m_stringLength + 1 : testMaxStringLength);
        len; len--)
     setNextStringChar((char)(random() % (0177 - 036) + 036));
   setNextStringChar(0);
@@ -1328,7 +1340,7 @@ generateType() {
 }
 EnumValue Value::
 generateEnum() {
-  return (EnumValue)(random() % m_vt->m_nEnums);
+  return (EnumValue)(size_t(random()) % m_vt->m_nEnums);
 }
 const char *Value::
 getValue(ExprValue &val) const {

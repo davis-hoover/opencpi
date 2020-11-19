@@ -529,10 +529,17 @@ emitXmlWorker(FILE *f, bool verbose) {
     }
   }
   for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it){
-    fprintf(f, "  <slave name='%s' worker='%s.%s'", (*it).first.c_str(), (*it).second->m_implName,
-	    (*it).second->m_modelString);
-    if ((*it).second->m_isOptional)
+    Worker &s = *(*it).second;
+    fprintf(f, "  <slave name='%s' worker='%s.%s'", (*it).first.c_str(), s.m_implName,
+	    s.m_modelString);
+    if (s.m_isOptional)
       fprintf(f, " optional='1'");
+    if (s.m_slavePort)
+      fprintf(f, " slave_port='%s'", s.m_slavePort->pname());
+    if (s.m_proxyPort)
+      fprintf(f, " port='%s'", s.m_proxyPort->pname());
+    if (s.m_proxyPortIndex != SIZE_MAX)
+      fprintf(f, " index='%zu'", s.m_proxyPortIndex);
     fprintf(f, "/>\n");
   }
   std::string out;

@@ -313,15 +313,16 @@ namespace OCPI {
       return false;
     }
 
-    static bool reject(const Assembly::Instance &inst, const Implementation &impl, const char *fmt, ...) {
+    static bool reject(const Assembly::Instance &/*inst*/, const Implementation &impl,
+		       const char *fmt, ...) {
       if (OS::logWillLog(OCPI_LOG_INFO)) {
 	std::string reason;
 	va_list ap;
 	va_start(ap, fmt);
 	OU::formatAddV(reason, fmt, ap);
 	va_end(ap);
-	ocpiInfo("For application instance \"%s\" (spec %s), rejected implementation \"%s%s%s\" in "
-		 "\"%s\" due to %s", inst.name().c_str(), impl.m_metadataImpl.specName().c_str(),
+	ocpiInfo("  Rejected implementation \"%s%s%s\" in "
+		 "\"%s\" due to %s",
 		 impl.m_metadataImpl.cname(), impl.m_staticInstance ? "/" : "",
 		 impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
 		 impl.m_artifact.name().c_str(), reason.c_str());
@@ -334,8 +335,7 @@ namespace OCPI {
     checkConnectivity(Candidate &cand, Assembly &assy) {
       const Implementation &i = *cand.impl;
       if (!resolveUtilPorts(i, assy))
-	return false; // we ignore the impl since it is inconsistent with the assy
-
+	return reject(*this, i, "incompatible/inconsistent ports"); 
       // Here is where we know about the assembly and thus can check for
       // some connectivity constraints.  If the implementation has hard-wired connections
       // that are incompatible with the assembly, we reject it.
@@ -378,7 +378,7 @@ namespace OCPI {
 		   assy.utilInstance(ap->m_connectedPort->m_instance).m_specName !=
 		   c->impl->m_metadataImpl.specName())) {             // or spec name different
 		reject(*this, i, "incompatible connection on port \"%s\"", p->m_name.c_str());
-		ocpiInfo("Artifact connects it to port '%s' of spec '%s', "
+		ocpiInfo("    Artifact connects it to port '%s' of spec '%s', "
 			 "but application connects it to port '%s' of spec '%s'",
 			 c->port->m_name.c_str(), c->impl->m_metadataImpl.specName().c_str(),
 			 ap->m_connectedPort->m_name.c_str(),
@@ -386,9 +386,12 @@ namespace OCPI {
 		return false;
 	      }
 	      bump = 1;; // An implementation with hardwired connections gets a score bump
-	    } else {
+	    } else if (m_utilInstance.m_hasMaster)
+	      // I'm a slave and my master might delegate a port to me.
+	      return true;
+	    else {
 	      // There is no connection in the assembly for a statically connected impl port
-	      ocpiInfo("Rejected \"%s\" because artifact has port '%s' connected while "
+	      ocpiInfo("  Rejected \"%s\" because artifact has port '%s' connected while "
 		       "application doesn't mention it.", i.m_artifact.name().c_str(),
 		       p->m_name.c_str());
 	      return false;
@@ -411,10 +414,7 @@ namespace OCPI {
     // Check it out, and maybe accept it as a candidate
     bool Assembly::Instance::
     foundImplementation(const Implementation &impl, std::string &model, std::string &platform) {
-      ocpiInfo("Considering implementation for instance \"%s\" with spec \"%s\": \"%s%s%s\" "
-	       "from artifact \"%s\"",
-	       m_utilInstance.m_name.c_str(),
-	       impl.m_metadataImpl.specName().c_str(),
+      ocpiInfo("  Considering implementation \"%s%s%s\" from artifact \"%s\"",
 	       impl.m_metadataImpl.cname(),
 	       impl.m_staticInstance ? "/" : "",
 	       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
@@ -426,14 +426,14 @@ namespace OCPI {
 	  strcasecmp(m_utilInstance.m_implName.c_str(),
 		     OU::format(fullWorker, "%s.%s",
 				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str()))) {
-	ocpiInfo("Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\"",
+	ocpiInfo("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\"",
 		 impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str(),
 		 m_utilInstance.m_implName.c_str());
 	return false;
       }
       // Check for model and platform matches
       if (model.size() && strcasecmp(model.c_str(), impl.m_metadataImpl.model().c_str())) {
-	ocpiInfo("Rejected: model requested is \"%s\", but the model for this implementation is \"%s\"",
+	ocpiInfo("    Rejected: model requested is \"%s\", but the model for this implementation is \"%s\"",
 		 model.c_str(), impl.m_metadataImpl.model().c_str());
 	return false;
       }
@@ -452,7 +452,7 @@ namespace OCPI {
 		      m_utilInstance.m_name.c_str(), m_utilInstance.m_selection.c_str(), err);
 	int64_t n = val.getNumber();
 	if (n <= 0) {
-	  ocpiInfo("Rejected: selection expression \"%s\" has value: %" PRIi64,
+	  ocpiInfo("    Rejected: selection expression \"%s\" has value: %" PRIi64,
 		   m_utilInstance.m_selection.c_str(), n);
 	  return false;
 	}
@@ -461,7 +461,7 @@ namespace OCPI {
       // Check for scalability suitability.
       std::string error;
       if (impl.m_metadataImpl.m_scaling.check(m_scale, error)) {
-	ocpiInfo("Rejected: %s", error.c_str());
+	ocpiInfo("    Rejected: %s", error.c_str());
 	return false;
       }
       strip_pf(platform);
@@ -473,7 +473,7 @@ namespace OCPI {
       // 2. Property-based selection
       if (platform.size() && strcasecmp(platform.c_str(),
 					impl.m_metadataImpl.attributes().platform().c_str())) {
-	ocpiInfo("Rejected: platform requested is \"%s\", but the platform is \"%s\"",
+	ocpiInfo("    Rejected: platform requested is \"%s\", but the platform is \"%s\"",
 		 platform.c_str(), impl.m_metadataImpl.attributes().platform().c_str());
 	return false;
       }
@@ -488,21 +488,21 @@ namespace OCPI {
 
 	OU::Property *up = impl.m_metadataImpl.getProperty(apName);
 	if (!up) {
-	  ocpiInfo("Rejected: initial property \"%s\" not found", apName);
+	  ocpiInfo("    Rejected: initial property \"%s\" not found", apName);
 	  return false;
 	}
 	if (!aProps[ap].m_hasValue)
 	  continue; // used by dumpfile
 	OU::Property &uProp = *up;
 	if (!uProp.m_isWritable && !uProp.m_isParameter) {
-	  ocpiInfo("Rejected: initial property \"%s\" was neither writable nor a parameter",
+	  ocpiInfo("    Rejected: initial property \"%s\" was neither writable nor a parameter",
 		   apName);
 	  return false;
 	}
 	OU::Value aValue; // FIXME - save this and use it later
 	const char *err = uProp.parseValue(apValue, aValue, NULL, &impl.m_metadataImpl);
 	if (err) {
-	  ocpiInfo("Rejected: the value \"%s\" for the \"%s\" property, \"%s\", was invalid: %s",
+	  ocpiInfo("    Rejected: the value \"%s\" for the \"%s\" property, \"%s\", was invalid: %s",
 		   apValue, uProp.m_isImpl ? "implementation" : "spec", apName, err);
 	  return false;
 	}
@@ -515,22 +515,22 @@ namespace OCPI {
 	  std::string aStr;
 	  aValue.unparse(aStr);
 	  if (aStr != pStr) {
-	    ocpiInfo("Rejected: property \"%s\" is a parameter compiled with value \"%s\"; requested value is \"%s\"",
+	    ocpiInfo("    Rejected: property \"%s\" is a parameter compiled with value \"%s\"; requested value is \"%s\"",
 		     apName, pStr.c_str(), apValue);
 	    return false;
 	  }
-	  ocpiDebug("Requested '%s' parameter value '%s' matched compiled value '%s'",
+	  ocpiDebug("    Requested '%s' parameter value '%s' matched compiled value '%s'",
 		    apName, apValue, pStr.c_str());
 	}
       }
       if (m_utilInstance.slaveInstances().size() && impl.m_metadataImpl.slaves().empty()) {
-	ocpiInfo("Rejected because the instance in the application indicates slaves therefore is a proxy,"
+	ocpiInfo("    Rejected because the instance in the application indicates slaves therefore is a proxy,"
 	         "but the candidate implementation which implements the correct OCS is not a proxy");
 	return false;
       }
       // FIXME:  Check consistency between implementation metadata here...
       m_candidates.push_back(Candidate(impl, score));
-      ocpiInfo("Accepted implementation before connectivity checks with score %u", score);
+      ocpiInfo("    Accepted implementation before connectivity checks with score %u", score);
       return true;
     }
 
@@ -544,6 +544,9 @@ namespace OCPI {
     void Assembly::
     addInstance(const OU::PValue *params) {
       unsigned n = (unsigned)m_instances.size();
+      ocpiInfo("================================================================================");
+      ocpiInfo("For instance %2u: \"%s\", finding and checking candidate implementations/workers",
+	       n, utilInstance(n).cname());
       m_instances.push_back(new Instance(utilInstance(n)));
       // if we have a deployment, don't do the work to figure out potential implementations
       if (m_deployed)
@@ -588,8 +591,12 @@ namespace OCPI {
 	addInstance(params);
       // Pass 2:  Deal with connectivity in the core assembly.
       // final connectivity and prune candidates unacceptable due to connectivity issues
+      ocpiInfo("================================================================================");
+      ocpiInfo("Checking connectivity of candidates for each instance");
       for (unsigned n = 0; n < nUtilInstances(); n++) {
 	Instance &i = *m_instances[n];
+	ocpiInfo("================================================================================");
+	ocpiInfo("Checking connectivity for instance %2u: \"%s\"", n, utilInstance(n).cname());
 	for (CandidatesIter ci = i.m_candidates.begin(); ci != i.m_candidates.end(); )
 	  if (i.checkConnectivity(*ci, *this))
 	    ++ci;
@@ -667,28 +674,25 @@ namespace OCPI {
     // with an already chosen implementation. Now we can check whether this impl conflicts with
     // that one or not
     bool Assembly::
-    badConnection(const Implementation &impl, const Implementation &otherImpl,
-		  const OU::Assembly::Port &ap, unsigned port) {
-      const OU::Port
-	&p = impl.m_metadataImpl.metaPort(port),
-	&other = *otherImpl.m_metadataImpl.findMetaPort(ap.m_connectedPort->m_name);
-      if (impl.m_internals & (1u << port)) {
-	if (!(otherImpl.m_internals & (1u << other.m_ordinal)) ||
-	    otherImpl.m_connections[other.m_ordinal].impl != &impl ||
-	    otherImpl.m_connections[other.m_ordinal].port != &p) {
-	  ocpiInfo("This port %p \"%s\" of worker \"%s\" is preconnected and the other port is not "
-		   "preconnected to us: we're incompatible", &p, p.cname(), p.metaWorker().cname());
-	  ocpiInfo("  Other port %p %u \"%s\" of worker \"%s\"  m_internals %x, other internals %x", &other,
-		   other.m_ordinal, other.cname(), other.metaWorker().cname(), impl.m_internals,
-		   otherImpl.m_internals);
+    badConnection(const Implementation &thisImpl, const OCPI::Util::Port &thisPort,
+		  const Implementation &otherImpl, const OCPI::Util::Port &otherPort) {
+      if (thisImpl.m_internals & (1u << thisPort.m_ordinal)) {
+	if (!(otherImpl.m_internals & (1u << otherPort.m_ordinal)) ||
+	    otherImpl.m_connections[otherPort.m_ordinal].impl != &thisImpl ||
+	    otherImpl.m_connections[otherPort.m_ordinal].port != &thisPort) {
+	  ocpiInfo("    This port \"%s\" of worker \"%s\" is preconnected and the other port is not "
+		   "preconnected to us: we're incompatible", thisPort.cname(), thisPort.metaWorker().cname());
+	  ocpiInfo("      Other port %u \"%s\" of worker \"%s\"  m_internals %x, other internals %x",
+		   otherPort.m_ordinal, otherPort.cname(), otherPort.metaWorker().cname(),
+		   thisImpl.m_internals, otherImpl.m_internals);
 	  return true;
 	}
-      } else if (otherImpl.m_internals & (1u << other.m_ordinal)) {
-	ocpiInfo("Port \"%s\" of \"%s\" is external; the other port is connected: we're incompatible",
-		 p.cname(), impl.m_metadataImpl.cname());
-	ocpiInfo("  other %p %u \"%s\"  m_internals %x, other internals %x", &other, other.m_ordinal,
-		 other.cname(), impl.m_internals, otherImpl.m_internals);
-	ocpiInfo("  me %p port ordinal %u port \"%s\"", &p, p.m_ordinal, p.cname());
+      } else if (otherImpl.m_internals & (1u << otherPort.m_ordinal)) {
+	ocpiInfo("    Port \"%s\" of \"%s\" is external; the other port is connected: we're incompatible",
+		 thisPort.cname(), thisImpl.m_metadataImpl.cname());
+	ocpiInfo("      other %u \"%s\"  m_internals %x, other internals %x", otherPort.m_ordinal,
+		 otherPort.cname(), thisImpl.m_internals, otherImpl.m_internals);
+	ocpiInfo("      me port ordinal %u port \"%s\"", thisPort.m_ordinal, thisPort.cname());
 	return true;
       }
       return false;
