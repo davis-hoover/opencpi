@@ -50,7 +50,14 @@ space:=
 space+=
 
 
-# NOTE: This is just plain broken. Until AV-5383 / AV-5381 / AV-4641 it is local-only
+# NOTE: This is just plain broken. Until the following issues are
+# worked, testing is local-only:
+#   AV-5383 (OpenCPI #1451 -- open):
+#     Unit Tests need "pre-hook" and "post-hook"
+#   AV-5381 (OpenCPI Private #5333 -- closed as "too vague"):
+#     Move socket_write to standard test system
+#   AV-4641 (OpenCPI #685 -- closed as "too vague"):
+#     multiple workers in component libraries not follow unit test methodology
 
 
 # MY_REG=$(if $(OCPI_PROJECT_REGISTRY_DIR),$(OCPI_PROJECT_REGISTRY_DIR),$(OCPI_CDK_DIR)/../project-registry)

@@ -34,11 +34,7 @@
 #include <cinttypes>
 #include <limits>
 
-#ifdef ASIO_STANDALONE
 #include <thread>
-#else
-#include <boost/thread.hpp>
-#endif
 
 #include "socket_write-worker.hh"
 
@@ -82,11 +78,7 @@ protected:
     {
       // Kick off background thread for server
       ocpiDebug("SocketWriter: Launching background thread for opcode %d (%s:%d) (message_mode=%d)", id, parent.properties().outSocket.address, port, message_mode);
-#ifdef ASIO_STANDALONE
       std::thread t(&http::server::server::run, &my_server);
-#else
-      boost::thread t(&http::server::server::run, &my_server);
-#endif
       t.detach();
     } // Constructor
 

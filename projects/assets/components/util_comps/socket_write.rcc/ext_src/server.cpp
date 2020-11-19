@@ -10,9 +10,6 @@
 
 #include "server.hpp"
 #include <iostream> // AV-1784
-#ifndef ASIO_STANDALONE
-#include <boost/bind.hpp>
-#endif
 #include <signal.h>
 
 namespace http {
@@ -36,11 +33,7 @@ server::server(const std::string& address, const short port /*const std::string&
 #if defined(SIGQUIT)
   signals_.add(SIGQUIT);
 #endif // defined(SIGQUIT)
-#ifdef ASIO_STANDALONE
   signals_.async_wait(std::bind(&server::handle_stop, this));
-#else
-  signals_.async_wait(boost::bind(&server::handle_stop, this));
-#endif
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
   asio::ip::tcp::resolver resolver(io_service_);
   // AV took out the port name:
@@ -73,13 +66,8 @@ void server::start_accept()
   new_connection_.reset(new connection(io_service_,
         connection_manager_/*, request_handler_*/));
   acceptor_.async_accept(new_connection_->socket(),
-#ifdef ASIO_STANDALONE
       std::bind(&server::handle_accept, this,
         std::placeholders::_1));
-#else
-      boost::bind(&server::handle_accept, this,
-        asio::placeholders::error));
-#endif
 }
 
 void server::handle_accept(const asio::error_code& e)
