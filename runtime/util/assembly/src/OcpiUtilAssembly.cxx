@@ -436,7 +436,7 @@ namespace OCPI {
 	si.m_master = m_ordinal;
       }
       m_slaveInstances.emplace_back(n);
-      m_slaveNames.emplace_back(slave);
+      m_slaveNames.emplace_back(slave); // slave can be NULL, implying the one slave
       return NULL;
     }
 

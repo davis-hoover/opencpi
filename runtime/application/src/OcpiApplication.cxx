@@ -534,11 +534,15 @@ namespace OCPI {
 	  } else {
 	    // We don't have the slave impl yet, but we can map it anyway for slave resolution later
 	    const OU::Slave *slave = &mImpl.slaves()[0];
-	    for (unsigned s = 0; s < mImpl.slaves().size(); ++s, ++slave)
-	      if (!strcasecmp(ui.slaveNames()[n], slave->m_name)) {
-		slaveInstances[s] = ui.slaveInstances()[n];
-		break;
-	      }
+	    size_t nSlaves = mImpl.slaves().size();
+	    if (nSlaves == 1 && ui.slaveNames()[0] == NULL)
+	      slaveInstances[0] = ui.slaveInstances()[0];
+	    else
+	      for (unsigned s = 0; s < nSlaves; ++s, ++slave)
+		if (!strcasecmp(ui.slaveNames()[n], slave->m_name)) {
+		  slaveInstances[s] = ui.slaveInstances()[n];
+		  break;
+		}
 	  }
       } else if (ui.m_hasMaster && ui.m_master < instNum &&
                  checkSlave(c.impl->m_metadataImpl,
