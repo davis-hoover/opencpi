@@ -182,6 +182,7 @@ namespace OCPI {
                             const OCPI::Util::PValue *params, Port *&);
         External &addExternal();
       };
+      typedef std::list<Connection> Connections;
       // Potentially specified in the assembly, what policy should be used
       // to spread workers to containers?
       enum CMapPolicy {
@@ -205,7 +206,7 @@ namespace OCPI {
       std::string m_name;
       std::string m_package;
       int m_doneInstance; // -1 for none
-      std::list<Connection> m_connections;
+      Connections m_connections;
       typedef std::list<Connection>::iterator ConnectionsIter;
       CMapPolicy m_cMapPolicy;
       size_t   m_processors;

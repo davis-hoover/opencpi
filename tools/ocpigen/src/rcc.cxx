@@ -679,6 +679,10 @@ emitImplRCC() {
             "#include <OcpiApi.hh>\n"
             "#include <OcpiOsDebugApi.hh>\n");
   const char *last;
+  fprintf(f,
+	  "#define OCPI_WORKER_NAME %s\n"
+	  "#define OCPI_WORKER_PREFIX %c%s\n",
+	  upper, toupper(m_implName[0]), m_implName+1);
   if (m_language == C) {
     unsigned in = 0, out = 0;
     if (m_ports.size()) {

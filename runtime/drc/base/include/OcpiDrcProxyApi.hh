@@ -6,11 +6,15 @@
 // The helper class for DRC proxy workers
 namespace OCPI {
 namespace DRC {
+
+#define OCPI_DRC_CAT_(a,b) a##b
+#define OCPI_DRC_CAT(a,b) OCPI_DRC_CAT_(a,b)
+#define OCPI_DRC_MAX_CONFIGURATIONS OCPI_DRC_CAT(OCPI_WORKER_NAME,_MAX_CONFIGURATIONS_P)
 class DrcProxyBase : public WorkerBase {
 protected:
   std::vector<bool> m_started; // record what should be started when the proxy is started.
 
-  DrcProxyBase() : m_started(DRC_PLUTOSDR_MAX_CONFIGURATIONS_P) {
+  DrcProxyBase() : m_started(OCPI_DRC_MAX_CONFIGURATIONS) {
   }
 
   // The control operation, where we will do any deferred starts indicated in XML
@@ -62,9 +66,9 @@ protected:
   RCCResult prepare_written() {
     log(8, "prepare config %u", m_properties.prepare);
     unsigned config = m_properties.start;
-    if (config >= DRC_PLUTOSDR_MAX_CONFIGURATIONS_P)
+    if (config >= OCPI_DRC_MAX_CONFIGURATIONS)
       return setError("Configuration %u started, but is out of range (0 to %u)",
-		      config, DRC_PLUTOSDR_MAX_CONFIGURATIONS_P - 1);
+		      config, OCPI_DRC_MAX_CONFIGURATIONS - 1);
     init_status(config);
     RCCResult rc = prepare_config(config);
     if (rc == RCC_OK)
@@ -75,9 +79,9 @@ protected:
   RCCResult start_written() {
     log(8, "start config %u %u", m_properties.start, isOperating());
     unsigned config = m_properties.start;
-    if (config >= DRC_PLUTOSDR_MAX_CONFIGURATIONS_P)
+    if (config >= OCPI_DRC_MAX_CONFIGURATIONS)
       return setError("Configuration %u started, but is out of range (0 to %u)",
-		      config, DRC_PLUTOSDR_MAX_CONFIGURATIONS_P - 1);
+		      config, OCPI_DRC_MAX_CONFIGURATIONS - 1);
     init_status(config);
     if (isOperating())
       return start_config(config, false);

@@ -92,8 +92,8 @@ namespace OCPI {
       ~Assembly();
       Instance &instance(size_t n) { return *m_instances[n]; }
       size_t nInstances() { return m_instances.size(); }
-      bool badConnection(const Implementation &impl, const Implementation &otherImpl,
-			 const OCPI::Util::Assembly::Port &ap, unsigned port);
+      bool badConnection(const Implementation &thisImpl, const OCPI::Util::Port &thisPort,
+			 const Implementation &otherImpl, const OCPI::Util::Port &otherPort);
       Port *assyPort(unsigned inst, unsigned port) {
 	assert(m_instances[inst]->m_assyPorts);
 	return m_instances[inst]->m_assyPorts[port];
