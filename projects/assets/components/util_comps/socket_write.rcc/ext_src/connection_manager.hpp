@@ -12,9 +12,6 @@
 #define HTTP_CONNECTION_MANAGER_HPP
 
 #include <set>
-#ifndef ASIO_STANDALONE
-#include <boost/noncopyable.hpp>
-#endif
 #include "connection.hpp"
 
 namespace http {
@@ -23,9 +20,6 @@ namespace server {
 /// Manages open connections so that they may be cleanly stopped when the server
 /// needs to shut down.
 class connection_manager
-#ifndef ASIO_STANDALONE
-  : private boost::noncopyable
-#endif
 {
 public:
   /// Add the specified connection to the manager and start it.

@@ -14,14 +14,7 @@
 #include <asio.hpp>
 #include <deque>
 #include <functional>
-#ifdef ASIO_STANDALONE
 #include <memory> // enable_shared_from_this
-#else
-#include <boost/array.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#endif
 #include "outbound.hpp" // new AV
 // #include "reply.hpp"
 // #include "request.hpp"
@@ -35,12 +28,7 @@ class connection_manager;
 
 /// Represents a single connection from a client.
 class connection
-#ifdef ASIO_STANDALONE
   : public std::enable_shared_from_this<connection>
-#else
-  : public boost::enable_shared_from_this<connection>,
-    private boost::noncopyable
-#endif
 {
 public:
   /// Construct a connection with the given io_service.
@@ -102,11 +90,7 @@ private:
   std::deque<outbound> outbound_queue; // new AV
 };
 
-#ifdef ASIO_STANDALONE
 typedef std::shared_ptr<connection> connection_ptr;
-#else
-typedef boost::shared_ptr<connection> connection_ptr;
-#endif
 
 } // namespace server
 } // namespace http

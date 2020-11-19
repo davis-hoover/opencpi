@@ -11,9 +11,6 @@
 #include "connection.hpp"
 #include <iostream> // AV-1784
 #include <vector>
-#ifndef ASIO_STANDALONE
-#include <boost/bind.hpp>
-#endif
 #include "connection_manager.hpp"
 // #include "request_handler.hpp"
 
@@ -119,24 +116,15 @@ void connection::send() { // new AV
     if (is_debugging) std::cerr << "SocketWriter: connection::send() sending a chunk of size " << outbound_queue[0].content.second->len << std::endl;
     asio::async_write(socket_, outbound_queue[0].to_buffer(),
       strand_.wrap(
-#ifdef ASIO_STANDALONE
         std::bind(&connection::send_done, shared_from_this(),
           std::placeholders::_1)
-#else
-        boost::bind(&connection::send_done, shared_from_this(),
-          asio::placeholders::error)
-#endif
       ));
 }
 
 void connection::push_back(outbound::shared_metapair_t in_data) { // new AV
   if (is_debugging) std::cerr << "SocketWriter: connection::push_back() queued a chunk of size " << in_data.second->len << std::endl;
   strand_.post(
-#ifdef ASIO_STANDALONE
         std::bind(
-#else
-        boost::bind(
-#endif
         &connection::push_back_internal,
         this,
         in_data

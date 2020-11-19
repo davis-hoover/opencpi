@@ -11,9 +11,6 @@
 #include "connection_manager.hpp"
 #include <iostream> // AV-1784
 #include <algorithm>
-#ifndef ASIO_STANDALONE
-#include <boost/bind.hpp>
-#endif
 
 namespace http {
 namespace server {
@@ -46,11 +43,7 @@ void connection_manager::stop_all()
 void connection_manager::push_back(outbound::shared_metapair_t in_data) { // new AV
   if (connections_.size())
     std::for_each(connections_.begin(), connections_.end(),
-#ifdef ASIO_STANDALONE
         std::bind(&connection::push_back, std::placeholders::_1, in_data));
-#else
-        boost::bind(&connection::push_back, _1, in_data));
-#endif
   else
     if (is_debugging) std::cerr << "SocketWriter: connection_manager::push_back() sent data with no listener(s)!" << std::endl;
 }
