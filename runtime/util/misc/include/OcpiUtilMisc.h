@@ -73,6 +73,7 @@
 #define OCPI_SIZEOF(utype, stype) ((utype)sizeof(stype))
 #define OCPI_OFFSETOF(utype, member, stype) ((utype)&((stype *)0)->member)
 #define OCPI_SIZE_T_DIFF(larger, smaller) ((size_t)((larger) - (smaller)))
+#define OCPI_CHAR_DIFF(larger, smaller) ((unsigned)((larger) - (smaller)))
 #else
 #define OCPI_UTRUNCATE(type, val) \
   (static_cast<type>(OCPI::Util::utruncate((uint64_t)(val), sizeof(type))))
@@ -84,6 +85,8 @@
   ((utype)OCPI::Util::utruncate((uint64_t)&((stype *)0)->member, sizeof(utype)))
 #define OCPI_SIZE_T_DIFF(larger, smaller) \
   OCPI::Util::size_t_diff((larger) - (smaller))
+#define OCPI_CHAR_DIFF(larger, smaller) \
+  OCPI::Util::char_diff((larger) - (smaller))
 #endif
 
 namespace OCPI {
@@ -111,7 +114,10 @@ namespace OCPI {
       return (size_t)(diff);
     }
 
-    int64_t struncate(int64_t val, unsigned bytes);
+    inline unsigned char_diff(int diff) {
+      ocpiAssert(diff >= 0);
+      return (unsigned)(diff);
+    }
 
     /**
      * \brief Convert an integer to a string.

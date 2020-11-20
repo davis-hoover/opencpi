@@ -136,25 +136,25 @@ class Worker
     m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, data, nBytes, idx, string);
   }
   uint8_t getProperty8(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
-    uint8_t data;
+    uint8_t data = 0; // for warning only
     m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, &data, sizeof(data),
 				idx, false);
     return data;
   }
   uint16_t getProperty16(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
-    uint16_t data;
+    uint16_t data = 0; // for warning only
     m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t *)&data,
 				sizeof(data), idx, false);
     return data;
   }
   uint32_t getProperty32(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
-    uint32_t data;
+    uint32_t data = 0; // for warning only
     m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t *)&data,
 				sizeof(data), idx, false);
     return data;
   }
   uint64_t getProperty64(const OA::PropertyInfo &info, size_t offset, unsigned idx) const {
-    uint64_t data;
+    uint64_t data = 0; // for warning only
     m_launcher.getPropertyBytes(m_remoteInstance, info.m_ordinal, offset, (uint8_t *)&data,
 				sizeof(data), idx, false);
     return data;

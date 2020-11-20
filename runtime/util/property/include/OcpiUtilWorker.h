@@ -110,6 +110,15 @@ namespace OCPI {
     };
 #endif
 
+    class Slave {
+    public:
+      const char *m_name, *m_worker, *m_slavePort; // pointing into XML
+      Port *m_delegated; // port of proxy worker that is delegated to a slave port
+      size_t m_index;    // index of proxy port that is aliased to a slave port
+      bool m_optional;   // whether this slave is optionally present
+      Slave(const char *worker);
+      Slave(Worker &w, ezxml_t xml, unsigned ordinal, const char *&err);
+    };
     // This class represents what we know, generically, about a component implementation
     // Currently there is no separate "spec" metadata - it is redundant in each implementation
     class Worker : public IdentResolver {
@@ -121,12 +130,6 @@ namespace OCPI {
 	m_model,
 	m_package;
     public:
-      struct Slave {
-	Slave(const char *name, const char *worker, bool optional) :
-	  m_name(name), m_worker(worker), m_optional(optional) {};
-	const char *m_name, *m_worker; // pointing into XML
-	bool m_optional;
-      };
     protected:
       std::vector<Slave> m_slaves;
       Attributes *m_attributes; // not a reference due to these being in arrays

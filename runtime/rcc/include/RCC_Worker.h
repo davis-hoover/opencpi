@@ -457,7 +457,7 @@ typedef struct {
    virtual RCCResult
      initialize(), start(), stop(), release(), test(), beforeQuery(), afterConfigure();
    // The worker author must implement this one.
-   virtual RCCResult run(bool timedOut) = 0;
+   virtual RCCResult run(bool timedOut);
    virtual RCCTime getTime();
  };
 

@@ -424,6 +424,10 @@ class Worker : public OU::Worker {
   bool m_dynamic;
   bool m_isSlave;
   bool m_isOptional;                // is this slave optional
+  Port *m_slavePort;                // slave port mapped to proxy port
+  Port *m_proxyPort;                // proxy port that slave port is mapped to
+  size_t m_proxyPortIndex;          // index of proxy port if it is an array port
+
   Worker(ezxml_t xml, const char *xfile, const std::string &parentFile, WType type,
 	 Worker *parent, OU::Assembly::Properties *ipvs, const char *&err);
   virtual ~Worker();
@@ -440,9 +444,9 @@ class Worker : public OU::Worker {
   Clock &addWciClockReset();
   OU::Property *findProperty(const char *name) const;
   OU::Port *findMetaPort(const char *id, const OU::Port *except) const;
-  const char* parseSlaves();
+  const char *parseSlaves();
   std::string print_map();
-  const char* addSlave(const std::string worker_name, const std::string slave_name, bool optional);
+  const char *addSlave(ezxml_t slave, const std::string &workerName, const std::string &slaveName);
   virtual OU::Port &metaPort(unsigned long which) const;
   const char
     *addBuiltinProperties(),

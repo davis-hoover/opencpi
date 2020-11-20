@@ -84,7 +84,7 @@ namespace OCPI {
 	}
 	return offset & (OCCP_WORKER_CONFIG_SIZE - 1);
       }
-      void throwPropertyReadError(uint32_t status, uint32_t offset, size_t n, uint64_t val) const;
+      void throwPropertyReadError(uint32_t status, size_t offset, size_t n, uint64_t val) const;
       void throwPropertyWriteError(uint32_t status) const;
       void throwPropertySequenceError() const;
 
