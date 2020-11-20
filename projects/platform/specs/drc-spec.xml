@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<!-- This file is protected by Copyright. Please refer to the COPYRIGHT file
+     distributed with this source distribution.
+
+     This file is part of OpenCPI <http://www.opencpi.org>
+
+     OpenCPI is free software: you can redistribute it and/or modify it under
+     the terms of the GNU Lesser General Public License as published by the Free
+     Software Foundation, either version 3 of the License, or (at your option)
+     any later version.
+
+     OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+     FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+     more details.
+
+     You should have received a copy of the GNU Lesser General Public License
+     along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+
+<!-- ==============================================================================================
+     This is the spec file (OCS) for DRC proxies: the Digital Radio Control proxy workers (RCC)
+     that normalize how radio systems are configured and controlled.-->
+
+<ComponentSpec>
+
+  <!-- ============================================================================================
+       Constants that determine the sizes of various other variable sized properties or members
+       Defaults are for a simple single rx/tx radio -->
+
+  <Property Name="MAX_STRING_LENGTH_p" Type="ushort" Parameter="true" Default="256"
+            Description="Length of all string struct members."/>
+  <Property Name="MAX_CONFIGURATIONS_p" Type="uchar" parameter='true' Default='2'
+            Description="Number of configurations supported"/>
+  <Property Name="MAX_CHANNELS_p" Type="uchar" Parameter="true" Default="2"
+            Description="Total number of channels supported at one time.
+			 Maximum number of channels in a radio configuration."/>
+  <Property Name="MAX_RX_RF_PORTS_p" Type="uchar" Parameter="true" Default="1"
+	    Description="Number of RF Ports that can receive"/>
+  <Property Name="MAX_TX_RF_PORTS_p" Type="uchar" Parameter="true" Default="1"
+	    Description="Number of RF Ports that can transmit"/>
+
+  <!-- ===========================================================================================
+       Constants that describe various attributes of the radio
+       They are not parameters in this spec, so that conceivably a proxy could
+       query the actual device (variant) to determine them. -->
+
+  <Property Name="rf_ports_rx" Type="string" StringLength="MAX_STRING_LENGTH_p"
+	    SequenceLength="MAX_RX_RF_PORTS_p"
+            Description="Names of all RF Ports that can receive"/>
+  <Property Name="rf_ports_tx" Type="string" StringLength="MAX_STRING_LENGTH_p"
+	    SequenceLength="MAX_TX_RF_PORTS_p"
+            Description="Names of all RF Ports that can transmit"/>
+
+  <!-- These radio values are for convenience, and are derivable from the "constraints" property -->
+  <Property Name="min_rx_tuning_freq_mhz" Type="double"
+            Description="Minimum achievable tuning frequency in MHz for all RX channels"/>
+  <Property Name="max_rx_tuning_freq_mhz" Type="double"
+            Description="Maximum achievable tuning frequency in MHz for all RX channels"/>
+  <Property Name="min_rx_bandwidth_3db_mhz" Type="double"
+            Description="Minimum achievable bandwidth 3dB for all RX channels"/>
+  <Property Name="max_rx_bandwidth_3db_mhz" Type="double"
+            Description="Maximum achievable bandwidth 3dB for all RX channels"/>
+  <Property Name="min_rx_sampling_rate_msps" Type="double"
+            Description="Minimum achievable sampling rate for all RX channels"/>
+  <Property Name="max_rx_sampling_rate_msps" Type="double"
+            Description="Maximum achievable sampling rate for all RX channels"/>
+  <Property Name="is_supported_rx_samples_complex" Type="bool"
+            Description="True if complex (IQ) samples are supported by any RX channel"/>
+  <Property Name="is_supported_rx_samples_real"    Type="bool"
+            Description="True if real samples are supported by any RX channel"/>
+  <Property Name="is_supported_rx_gain_mode_auto" Type="bool"
+            Description="True if auto gain mode is supported by any RX data channel"/>
+  <Property Name="is_supported_rx_gain_mode_manual" Type="bool"
+            Description="True if manual gain mode is supported by any RX data channel"/>
+
+  <Property Name="min_achievable_tx_tuning_freq_mhz" Type="double"
+            Description="Minimum achievable tuning frequency in MHz for all TX channels"/>
+  <Property Name="max_achievable_tx_tuning_freq_mhz" Type="double"
+            Description="Maximum achievable tuning frequency in MHz for all TX channels"/>
+  <Property Name="min_achievable_tx_bandwidth_3db_mhz" Type="double"
+            Description="Minimum achievable bandwidth 3dB for all TX channels"/>
+  <Property Name="max_achievable_tx_bandwidth_3db_mhz" Type="double"
+            Description="Maximum achievable bandwidth 3dB for all TX channels"/>
+  <Property Name="min_achievable_tx_sampling_rate_msps" Type="double"
+            Description="Minimum achievable sampling rate for all TX channels"/>
+  <Property Name="max_achievable_tx_sampling_rate_msps" Type="double"
+            Description="Maximum achievable sampling rate for all TX channels"/>
+  <Property Name="is_supported_tx_samples_complex" Type="bool"
+            Description="True if complex (IQ) samples are supported by any TX channel"/>
+  <Property Name="is_supported_tx_samples_real"    Type="bool"
+            Description="True if real samples are supported by any TX channel"/>
+
+  <!-- =========================================================================================
+       The writable property specifying radio configurations which consist of channel
+       configurations
+       =========================================================================================-->
+  <Property Name="configurations" Type="struct" Writable="true" SequenceLength='MAX_CONFIGURATIONS_p'
+            Description="Each structure configures the radio for requested settings.">
+    <Member Name='description' type='string' stringlength='MAX_STRING_LENGTH_p'
+	    Description='A brief description of the configuration, useful for property dumps'/>
+    <Member Name='recoverable' type='bool'
+	    Description='If recoverable, the configuration will not cause a fatal program error if
+			 it fails when enabled.  The error (if it occurs) will be queryable in the
+			 status property.'/>
+    <Member Name='channels' type='struct' sequencelength='MAX_CHANNELS_p'
+	    Description='The channels that will be simultaneously enabled when this configuration
+			 is enabled.'>
+      <Member Name='description' type='string' stringlength='MAX_STRING_LENGTH_P'
+	      Description='A brief description of the channel configuration, useful for property
+			   dumps. E.g. what is this channel being used for?'/>
+      <Member Name="rx"    Type="bool"
+	      Description='Indicates a receive channel if true, otherwise a transmit (TX) channel'/>
+      <Member Name="tuning_freq_MHz"              Type="double"/>
+      <Member Name="bandwidth_3dB_MHz"            Type="double"/>
+      <Member Name="sampling_rate_Msps"           Type="double"/>
+      <Member Name="samples_are_complex"          Type="bool"/>
+      <Member Name="gain_mode"                    Type="String"
+                                                  StringLength="MAX_STRING_LENGTH_p"
+                                                  Description='Set to empty-string, "auto", "manual", or
+							       possibly something worker-specific.'/>
+      <Member Name="gain_dB"                      Type="double"/>
+      <Member Name="tolerance_tuning_freq_MHz"    Type="double"
+                                                  Description="Tolerance which will determine lock success."/>
+      <Member Name="tolerance_bandwidth_3dB_MHz"  Type="double"
+                                                  Description="Tolerance which will determine lock success."/>
+      <Member Name="tolerance_sampling_rate_Msps" Type="double"
+                                                  Description="Tolerance which will determine lock success."/>
+      <Member Name="tolerance_gain_dB"            Type="double"
+                                                  Description="Tolerance which will determine lock success."/>
+      <Member Name='rf_port_name' Type='string' stringlength='MAX_STRING_LENGTH_p'
+	      Description='Optional RF port name for this channel, defaults to using the
+	                   RF ports of the radio in order of their definition in this configuration,
+			   within RX-capable and TX-capable ports.
+			   If an RX channel has the rf-port name of "loopback" then it receives
+			   from the tx channel with the same TX ordinal in the configuration'/>
+      <Member Name='rf_port_num' Type='uchar'
+	      Description='Optional RF port number for this channel, defaults to using the
+	                   RF ports in the radio in order of their definition, within RX and TX.
+			   Ignored if rf_port_mame is specified.'/>
+      <Member Name='app_port_num' Type='uchar'
+	      Description='Optional app port number for this channel, defaults to using the
+	                   app ports in numerical order, within RX and TX'/>
+    </Member>
+  </Property>
+
+  <!-- =========================================================================================
+       These writable properties are requesting a radio configurations be prepared, enabled or
+       disabled raio configurations
+       =========================================================================================-->
+  <Property Name='prepare' Type='ushort' Writable='1'
+	    Description='Writing a configuration ordinal to this property prepares it.
+			 Errors are fatal unless configuration is recoverable.'/>
+  <Property Name='start' Type='ushort' Writable='1'
+	    Description='Writing a configuration ordinal to this property enables it, putting it
+			 into an operational state, with samples flowing.
+			 If not already prepared, preparation is implied.
+			 Errors are fatal unless configuration is recoverable.'/>
+  <Property Name='stop' Type='ushort' Writable='1'
+	    Description='Writing a configuration ordinal to this property stops it.
+			 This returns a configuration to the prepared state.'/>
+  <Property Name='release' Type='ushort' Writable='1'
+	    Description='Writing a configuration ordinal to this property disables it.
+			 This returns a configuration to the initial state with no resources
+			 used for it.'/>
+
+  <!-- =========================================================================================
+       Volatile property that specifies status of radio configurations
+       =========================================================================================-->
+  <Property Name="status" Type="struct" volatile="true" SequenceLength="MAX_CONFIGURATIONS_p"
+            Description="The status of all the defined configurations">
+    <Member Name='state' Type='enum' Enums='inactive,prepared,operating,error'
+	    Description='The state of the configuration, including if it had a recoverable error'/>
+    <Member Name='error' Type='string' stringlength='MAX_STRING_LENGTH_p'
+	    Description='When enabling the configuration fails, and the configuration is recoverable,
+                         the nature of the error is in this string'/>
+    <Member Name='channels' type='struct' sequencelength='MAX_CHANNELS_p'
+	    Description='The actual tuning values of the channels when enabled'>
+      <Member Name="tuning_freq_MHz"     Type="double"
+              Description="Achieved tuning frequency"/>
+      <Member Name="bandwidth_3dB_MHz"   Type="double"
+              Description="Achieved  3dB bandwidth."/>
+      <Member Name="sampling_rate_Msps"  Type="double"
+              Description="Achieved sampling rate"/>
+      <Member Name="gain_dB"             Type="double"
+              Description="Ignore this value if gain_mode is an AGC-related value, e.g. auto."/>
+    </Member>
+  </Property>
+
+  <!-- =========================================================================================
+       Readable property that specifies possible values of channel configuration values,
+       for RF ports, RX, then TX . -->
+       =========================================================================================-->
+  <property Name='constraints' type='struct' Sequencelength="MAX_RX_RF_PORTS_p+MAX_TX_RF_PORTS_p">
+    <Member Name="rf_port" Type="string" StringLength="MAX_STRING_LENGTH_p"/>
+    <Member Name="RX" Type="bool"/>
+    <Member Name="tuning_freq_MHz" Type="struct" SequenceLength="32">
+      <Member Name="min"            Type="double"/>
+      <Member Name="max"            Type="double"/>
+    </Member>
+    <Member Name="bandwidth_3dB_MHz" Type="struct" SequenceLength="32">
+      <Member Name="min"            Type="double"/>
+      <Member Name="max"            Type="double"/>
+    </Member>
+    <Member Name="sampling_rate_Msps" Type="struct" SequenceLength="32">
+      <Member Name="min"            Type="double"/>
+      <Member Name="max"            Type="double"/>
+    </Member>
+    <Member Name="sample_type" Type="struct">
+      <Member Name="real"            Type="bool"/>
+      <Member Name="complex"         Type="bool"/>
+    </Member>
+  </property>
+
+  <port name='rx' count='MAX_CHANNELS_p' producer='1' optional='1'/>
+  <port name='tx' count='MAX_CHANNELS_p' producer='0' optional='1'/>
+
+</ComponentSpec>

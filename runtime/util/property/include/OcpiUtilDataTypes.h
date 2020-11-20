@@ -237,8 +237,8 @@ namespace OCPI {
 	*parseDefault(const char *value, const char *tag, const IdentResolver *resolv = NULL),
 	*parse(ezxml_t x, bool isFixed, bool hasName, const char *hasDefault, const char *tag,
 	       unsigned ordinal, const IdentResolver *resolv = NULL),
-	*descend(OCPI::API::AccessList &list, const Member *&member, size_t &offset,
-		 size_t *dimensionp = NULL) const,
+	*descend(const OCPI::API::AccessList &list, const Member *&member, const Value **valuep,
+		 size_t *offset, size_t *dimensionp = NULL) const,
 	*offset(size_t &maxAlign, size_t &argOffset, size_t &minSize, bool &diverseSizes,
 		bool &sub32, bool &unBounded, bool &isVariable, bool isTop = false);
       uint8_t *getField(uint8_t *data, size_t &length) const;

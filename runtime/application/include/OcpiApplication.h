@@ -30,6 +30,7 @@
 
 #include <string>
 #include <map>
+#include <forward_list>
 #include "OcpiUtilMisc.h"
 #include "OcpiLibraryAssembly.h"
 #include "ContainerManager.h"
@@ -93,8 +94,11 @@ namespace OCPI {
 	unsigned m_usedContainer;       // when scale==1 this is it
 	unsigned *m_usedContainers;     // container for each crew member
 	size_t m_firstMember;           // index of first member in launch members
+	// Temporary port delegations
+	typedef std::forward_list<std::pair<OU::Assembly::Port*,OU::Assembly::Port>> PortFixups;
+	PortFixups m_portFixups;
 	void collectCandidate(OCPI::Library::Candidate &c, unsigned n);
-	void finalizePortParam(OU::Assembly::Instance &ui, const OCPI::Util::PValue *params,
+	void finalizePortParam(OCPI::Util::Assembly::Instance &ui, const OCPI::Util::PValue *params,
 			       const char *param);
 	Instance();
 	~Instance();
@@ -164,6 +168,7 @@ namespace OCPI {
       unsigned   m_processors;
       unsigned m_currConn;
       unsigned m_bestScore;
+      OCPI::Util::Assembly::Connections m_bestConnections;
       bool m_hex;
       bool m_hidden;
       bool m_uncached;
@@ -191,11 +196,23 @@ namespace OCPI {
       void finalizeLaunchMembers();
       void checkPropertyValue(unsigned nInstance, const OCPI::Util::Worker &w,
 			      const OCPI::Util::Assembly::Property &aProp, unsigned *&pn,
-			      OU::Value *&pv);
+			      OCPI::Util::Value *&pv);
       const OCPI::Util::Port *getMetaPort(unsigned n) const;
       // return our used-container ordinal
       unsigned addContainer(unsigned container, bool existOk = false);
       unsigned getUsedContainer(unsigned container);
+      void delegateAssyPort(OCPI::Util::Assembly::Port &assyPort, unsigned instNum,
+			    unsigned slaveInstNum, const OCPI::Library::Implementation &slaveImpl,
+			    const OCPI::Util::Port &masterPort,
+			    const OCPI::Util::Port *&slavePort);
+      bool maybeDelegate(unsigned instNum, OCPI::Util::Assembly::Port &assyPort,
+			 const OCPI::Util::Port *&port,
+			 const OCPI::Library::Implementation *&impl);
+      bool maybeDelegateToSlavePort(unsigned instNum, const OCPI::Library::Implementation &slaveImpl,
+				    const OCPI::Util::Port &port,
+				    OCPI::Util::Assembly::Port *&otherAssyPort);
+      bool resolveInstanceSlaves(unsigned instNum, const OCPI::Library::Candidate &c,
+				 const std::string &reject);
       bool connectionsOk(OCPI::Library::Candidate &c, unsigned instNum);
       void finalizeProperties(const OCPI::Util::PValue *params);
       const char *finalizePortParam(const OCPI::Util::PValue *params, const char *pName);

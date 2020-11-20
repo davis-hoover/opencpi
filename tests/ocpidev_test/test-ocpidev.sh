@@ -101,6 +101,7 @@ function do_ocpidev {
 pj=$1
 if [ -z "$pj" ] ; then
   pj=test_project
+  [ -d $pj ] && rm -r -f $pj
 fi
 
 [ -n "$pj" -a ! -e "$pj" ] || bad Cannot create project \"$pj\". File/dir already exists

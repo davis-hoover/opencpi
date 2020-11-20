@@ -1152,6 +1152,13 @@ OCPI_CONTROL_OPS
      va_end(ap);
      return rc;
    }
+   // This default method is run when the worker has no run method, which implies that
+   // there is no need to ever call this method again, but that does not mean it should
+   // immediately enter the finished state.
+RCCResult RCCUserWorker::run(bool /*timeout*/) {
+     m_worker.enabled = false;
+     return RCC_OK;
+   }
    RCCTime RCCUserWorker::getTime() {
      return OS::Time::now().bits();
    }
