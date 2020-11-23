@@ -32,6 +32,8 @@
 namespace OCPI {
   namespace Util {
 
+    const char *g_models[] = { OCPI_MODELS, NULL };
+
     namespace OE = OCPI::Util::EzXml;
     Worker::Worker()
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
@@ -127,6 +129,7 @@ namespace OCPI {
       if (err ||
 	  (err = OE::getNumber8(xml, "version", &m_version)) ||
 	  (err = OE::getBoolean(xml, "workerEOF", &m_workerEOF)) ||
+	  (err = OE::getRequiredString(xml, m_package, "package", "worker")) ||
 	  (err = OE::getRequiredString(xml, m_model, "model", "worker")))
 	return err;
       if (!OE::getOptionalString(xml, m_specName, "specName"))
@@ -183,18 +186,9 @@ namespace OCPI {
           return esprintf("Invalid xml port description(2): %s", err);
       // Third pass to propagate info from one port to another
       p = m_ports;
-      bool hasInput = false, hasOutput = false;
       for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
 	if ((err = p->postParse()))
           return esprintf("Invalid xml port description(3): %s", err);
-	else if (p->m_slave == SIZE_MAX)
-	  continue; // delegated ports aren't "real" for this purpose
-        else if (p->m_provider) {
-	  if (!p->m_isOptional)
-	    hasInput = true;
-        } else
-	  hasOutput = true;
-      m_isSource = hasOutput && !hasInput;
       // Slaves must be parsed after ports
       const char *slave = ezxml_cattr(xml, "slave");
       if (slave) {
@@ -207,6 +201,18 @@ namespace OCPI {
 	  if (err)
 	    return err;
 	}
+      // The m_isSource determination must happen after slave processing
+      p = m_ports;
+      bool hasInput = false, hasOutput = false;
+      for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
+	if (p->m_slave == SIZE_MAX) { // if not delegated
+	  if (p->m_provider) {
+	    if (!p->m_isOptional)
+	      hasInput = true;
+	  } else
+	    hasOutput = true;
+	}
+      m_isSource = hasOutput && !hasInput;
       Memory* m = m_memories;
       for (x = ezxml_cchild(xml, "memory"); x; x = ezxml_cnext(x), m++ )
         if ((err = m->parse(x)))

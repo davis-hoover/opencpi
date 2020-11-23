@@ -400,7 +400,7 @@ class Worker : public OU::Worker {
   size_t m_defaultDataWidth;        // SIZE_MAX means not set
   Language m_language;
   ::Assembly *m_assembly;
-  // vector of slave worker objects paired with a string of the name of the slave either from name
+  // map of slave worker objects mapped by a string of the name of the slave either from name
   // attribute or auto generated
   std::map<std::string, Worker*> m_slaves;
   HdlDevice *m_emulate;
@@ -447,6 +447,7 @@ class Worker : public OU::Worker {
   const char *parseSlaves();
   std::string print_map();
   const char *addSlave(ezxml_t slave, const std::string &workerName, const std::string &slaveName);
+  const char *addSlaves(ezxml_t slaves);
   virtual OU::Port &metaPort(unsigned long which) const;
   const char
     *addBuiltinProperties(),
@@ -550,7 +551,7 @@ class Worker : public OU::Worker {
     rccPropType(OU::Property &p, std::string &typeDef, std::string &type, std::string &pretty),
     emitWorkersAttribute(),
     deleteAssy(), // just to keep the assembly details out of most files
-    emitXmlWorker(FILE *f, bool verbose = false),
+    emitXmlWorker(std::string &out, bool verbose = false),
     emitInstances(FILE *f, const char *prefix, size_t &index),
     emitInternalConnections(FILE *f, const char *prefix),
     emitVhdlShell(FILE *f),

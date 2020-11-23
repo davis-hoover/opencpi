@@ -1388,6 +1388,43 @@ print_map() {
   return ret_val;
 }
 
+// Add slaves in the form of an assembly of slaves, with connections and properties,
+// where external ports of the subassembly are delegated ports of the proxy
+// This assemnbly will essentially be added to the application when the proxy is
+// deployed for the application.
+const char* Worker::
+addSlaves(ezxml_t a_slaves) {
+  const char *err;
+  m_assembly = new ::Assembly(*this);
+  static const char *instAttrs[] = {INST_ATTRS};
+  if ((err = m_assembly->parseAssy(a_slaves, NULL, instAttrs)))
+    return err;
+  Instance *i = &m_assembly->m_instances[0];
+  for (unsigned n = 0; n < m_assembly->m_instances.size(); n++, i++) {
+    unsigned np = 0;
+    Port *slavePort = NULL, *port = NULL;
+    bool hasIndex = false;
+    size_t index = 0;
+    for (InstancePort *ip = &i->m_ports[0]; !port && np < i->m_worker->m_ports.size(); np++, ip++)
+      for (auto pit = ip->m_attachments.begin(); !port && pit != ip->m_attachments.end(); ++pit)
+	if ((*pit)->m_connection.m_external) {
+	  port = (*pit)->m_connection.m_external->m_instPort.m_port;
+	  slavePort = ip->m_port;
+	  hasIndex = (*pit)->m_connection.m_count != 0;
+	  index = (*pit)->m_index;
+	  break;
+	}
+    Worker &wkr = *i->m_worker;
+    wkr.m_isSlave = true;
+    wkr.m_isOptional = false; // these are statically defined so they *will* exist
+    wkr.m_slavePort = slavePort; // an external connection to this port
+    wkr.m_proxyPort = port;      // the proxy port
+    if (hasIndex) // from connection
+      wkr.m_proxyPortIndex = index;
+    m_slaves[i->m_name] = &wkr;
+  }
+  return NULL;
+}
 /*
  * This function parses the xml for the slaves of the RCC worker (if there are any).
  * There are 2 ways to specify slaves the legacy way as a "slave" attribute at the top level worker
@@ -1402,9 +1439,22 @@ const char* Worker::
 parseSlaves() {
   const char *err;
   std::string l_slave;
-  if (OE::getOptionalString(m_xml, l_slave, "slave") &&
-      (err = addSlave(NULL, l_slave, l_slave.substr(0, l_slave.find(".", 0)))))
-    return err;
+  bool attr = OE::getOptionalString(m_xml, l_slave, "slave");
+  ezxml_t
+    firstSlave = ezxml_cchild(m_xml, "slave"),
+    l_slaves = ezxml_child(m_xml, "slaves");
+  switch (!!attr + !!firstSlave + !!l_slaves) {
+  case 0:
+    return NULL;
+  case 1:
+    break;
+  default:
+    return OU::esprintf("Only one of slave-attribute, slave elements, or slaves element is allowed");
+  }
+  if (attr)
+    return addSlave(NULL, l_slave, l_slave.substr(0, l_slave.find(".", 0)));
+  if (l_slaves)
+    return addSlaves(l_slaves);
   std::map<std::string, unsigned int> wkr_num_map, wkr_idx_map;
   // count how many workers of each type are slaves and put them in wkr_num_map this is used
   // later in auto generating the names for the workers if needed
@@ -1515,13 +1565,7 @@ parseRccImpl(const char *a_package) {
   }
   for (unsigned i = 0; i < m_ports.size(); i++)
     m_ports[i]->finalizeRccDataPort();
-  if ((err = parseSlaves()))
-    return err;
-
-  m_model = RccModel;
-  m_modelString = "rcc";
-  m_baseTypes = rccTypes;
-  return err;
+  return parseSlaves();
 }
 
 // RCC assemblies are collections of reusable instances with no connections.
@@ -1533,7 +1577,7 @@ parseRccAssy() {
     *topAttrs[] = {IMPL_ATTRS, RCC_TOP_ATTRS, RCC_IMPL_ATTRS, NULL},
     *instAttrs[] = {INST_ATTRS, "reusable", NULL};
   // Do the generic assembly parsing, then to more specific to RCC
-  if ((err = a->parseAssy(m_xml, topAttrs, instAttrs, true)))
+  if ((err = a->parseAssy(m_xml, topAttrs, instAttrs)))
     return err;
   m_dynamic = g_dynamic;
   return NULL;
@@ -1553,6 +1597,9 @@ parseRcc(const char *a_package) {
     return OU::esprintf("Language attribute \"%s\" is not \"C\" or \"C++\""
                         " in RccWorker xml file: '%s'", lang, m_file.c_str());
   const char *err;
+  m_model = RccModel;
+  m_modelString = "rcc";
+  m_baseTypes = rccTypes;
   // Here is where there is a difference between a implementation and an assembly
   if (!strcasecmp(m_xml->name, "RccWorker") ||
       !strcasecmp(m_xml->name, "RccImplementation") ||
@@ -1564,8 +1611,6 @@ parseRcc(const char *a_package) {
       return OU::esprintf("in %s for %s: %s", m_xml->name, m_implName, err);
   } else
       return "file contains neither a ComponentSpec, RccWorker, nor an RccAssembly";
-  m_model = RccModel;
-  m_modelString = "rcc";
   m_reusable = true;
   return NULL;
 }

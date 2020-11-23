@@ -304,7 +304,7 @@ namespace OCPI {
     findSlave(const OU::Worker &sImpl, const OU::Worker &mImpl, const char *slaveName,
 	      std::string *wkrName = NULL) {
       std::string slaveWkrName;
-      OU::format(slaveWkrName, "%s.%s", sImpl.cname(), sImpl.model().c_str());
+      OU::format(slaveWkrName, "%s.%s.%s", sImpl.package().c_str(), sImpl.cname(), sImpl.model().c_str());
       size_t dashIdx =  slaveWkrName.rfind('-');
       if (dashIdx != std::string::npos) // if worker has configuration suffix, remove it
         slaveWkrName.erase(dashIdx, slaveWkrName.rfind('.') - dashIdx);
@@ -312,7 +312,7 @@ namespace OCPI {
 	*wkrName = slaveWkrName;
       const OU::Slave *s = &(mImpl.slaves()[0]);
       unsigned found = UINT_MAX;
-      for (unsigned n = 0; n < mImpl.slaves().size(); ++n, ++s)
+      for (unsigned n = 0; n < mImpl.slaves().size(); ++n, ++s) {
         if (!strcasecmp(s->m_worker, slaveWkrName.c_str())) {
 	  if (slaveName) {
 	    if (!strcasecmp(slaveName, s->m_name))
@@ -325,6 +325,7 @@ namespace OCPI {
 	  } else
 	    found = n;
 	}
+      }
       return found;
     }
 
@@ -516,21 +517,21 @@ namespace OCPI {
     resolveInstanceSlaves(unsigned instNum, const OL::Candidate &c, const std::string &reject) {
       const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       // We connect/check the slaves for this candidate before checking connectivity
-      // since aliased connections, just below, need to know this.
+      // since delegated connections, just below, need to know this.
       // This vector maps the slave index among the worker's slaves to the app instance.
       std::vector<unsigned> &slaveInstances = m_instances[instNum].m_deployment.m_slaves;
       slaveInstances.clear();
       slaveInstances.resize(c.impl->m_metadataImpl.slaves().size(), UINT_MAX);
+      unsigned slaveN;
       if (ui.slaveInstances().size()) { // if there are explicitly identified slave instances...
 	const OU::Worker &mImpl = c.impl->m_metadataImpl;
         for (unsigned n = 0; n < ui.m_slaveInstances.size(); ++n)
           if (ui.slaveInstances()[n] < instNum) {
-	    unsigned slave =
-	      checkSlave(m_instances[ui.m_slaveInstances[n]].m_deployment.m_impl->m_metadataImpl,
-			 mImpl, ui.m_slaveNames[n], true, reject);
-	    if (slave == UINT_MAX)
+	    if ((slaveN =
+		 checkSlave(m_instances[ui.m_slaveInstances[n]].m_deployment.m_impl->m_metadataImpl,
+			    mImpl, ui.m_slaveNames[n], true, reject)) == UINT_MAX)
               return false;
-	    slaveInstances[slave] = ui.slaveInstances()[n]; // remember which instance
+	    slaveInstances[slaveN] = ui.slaveInstances()[n]; // remember which instance
 	  } else {
 	    // We don't have the slave impl yet, but we can map it anyway for slave resolution later
 	    const OU::Slave *slave = &mImpl.slaves()[0];
@@ -544,11 +545,13 @@ namespace OCPI {
 		  break;
 		}
 	  }
-      } else if (ui.m_hasMaster && ui.m_master < instNum &&
-                 checkSlave(c.impl->m_metadataImpl,
-			    m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, NULL,
-			    false, reject) == UINT_MAX)
-        return false;
+      } else if (ui.m_hasMaster && ui.m_master < instNum) { // if I am a slave that can resolve
+	if ((slaveN = checkSlave(c.impl->m_metadataImpl,
+				m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, NULL,
+				false, reject) == UINT_MAX))
+	  return false;
+	m_instances[ui.m_master].m_deployment.m_slaves[slaveN] = instNum;
+      }
       return true;
     }
 
@@ -986,8 +989,11 @@ namespace OCPI {
         for (unsigned m = 0; m < i.m_nCandidates; m++) {
           OL::Candidate &c = li.m_candidates[m];
 	  ocpiInfo("  --------------------------------------------------------------------------------");
-	  ocpiInfo("  Trying candidate %u for instance %u: %s (%s)", m, instNum, li.name().c_str(),
-		   c.impl->m_artifact.name().c_str());
+	  ocpiInfo("  Trying candidate %u for instance %u: %s (artifact %s, implementation %s%s%s)",
+		   m, instNum, li.name().c_str(), c.impl->m_artifact.name().c_str(),
+		   c.impl->m_metadataImpl.cname(),
+		   c.impl->m_staticInstance ? "/" : "",
+		   c.impl->m_staticInstance ? ezxml_cattr(c.impl->m_staticInstance, "name") : "");
           ocpiDebug("doInstance %u %u %u", instNum, score, m);
           if (connectionsOk(c, instNum)) {
             unsigned base = OC::Container::baseContainer().ordinal();
