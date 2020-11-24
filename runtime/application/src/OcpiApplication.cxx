@@ -216,6 +216,7 @@ namespace OCPI {
     policyMap(Instance *i, CMap &bestMap) {
       // bestMap is bitmap of best available containers that the implementation can be mapped to
       // allMap is the bitmap of all suitable containers for the implementation
+      i->m_usedContainers = &i->m_usedContainer;
       switch ( m_cMapPolicy ) {
 
       case MaxProcessors:
