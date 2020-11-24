@@ -214,13 +214,6 @@ namespace OCPI {
     // For dynamic instances only, distribute them according to policy
     void ApplicationI::
     policyMap(Instance *i, CMap &bestMap) {
-      // Proxies can only operate in the base container.
-      // FIXME:  allow proxies to be in any container collocate with the base container.
-      if (i->m_bestDeployment.m_impls[0]->m_metadataImpl.slaves().size()) {
-        assert(bestMap == (1u << OC::Container::baseContainer().ordinal()));
-        i->m_usedContainer = getUsedContainer(OC::Container::baseContainer().ordinal());
-        return;
-      }
       // bestMap is bitmap of best available containers that the implementation can be mapped to
       // allMap is the bitmap of all suitable containers for the implementation
       switch ( m_cMapPolicy ) {
@@ -350,74 +343,38 @@ namespace OCPI {
       return UINT_MAX;
     }
 
-    // Check for master/slave correctness of the master/slave relationships specified in the
-    // application. We know that the impl for a master indicates slaves and that
-    // can be checked by the library layer.
-    // If the proxy instance specifies no slaves at all, we try to do an unambiguous match
-    // to the slaves that just need to be present.
-    // Finally we do the optional-slave checks.  They must be present or they must be optional
+    // Now that we know a complete deployment, we can do a final check on the relative
+    // position of proxies and slaves to be sure that proxies are either on the base
+    // container or if not, all of its slaves are on the same system/launcher
     bool ApplicationI::
     resolveSlaves() {
-      // Now that we know a complete deployment, we can do a final check on missing slaves
       Instance *i = m_instances;
-      std::vector<bool> foundAsSlave; // keep track of "found" slaves, so that they are only found once
-      foundAsSlave.resize(m_nInstances);
       for (unsigned n = 0; n < m_nInstances; ++n, ++i) {
-	auto &impl = *i->m_deployment.m_impl;
-	OU::Worker &w = impl.m_metadataImpl;
-	if (w.slaves().size()) { // we have a proxy
-	  const OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
-	  std::string rejectSlave;
-	  OU::format(rejectSlave,
-		     "For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" "
-		     "from artifact \"%s\" due to",
-		     ui.m_name.c_str(),
-		     ui.m_specName.c_str(),
-		     impl.m_metadataImpl.cname(),
-		     impl.m_staticInstance ? "/" : "",
-		     impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
-		     impl.m_artifact.name().c_str());
-	  i->m_deployment.m_slaves.clear();
-	  i->m_deployment.m_slaves.resize(w.slaves().size(), UINT_MAX);
-	  if (ui.m_slaveInstances.empty()) { // proxy doesn't specify slaves in the instance
-	    Instance *si = m_instances;
-	    for (unsigned sn = 0; sn < m_nInstances; ++sn, ++si) {
-	      OU::Worker &sImpl = m_instances[sn].m_deployment.m_impl->m_metadataImpl;
-	      std::string slaveWkrName;
-	      unsigned slaveInProxy;
-	      if (sn != n && !m_assembly.instance(sn).m_utilInstance.m_hasMaster &&
-		  (slaveInProxy = findSlave(sImpl, w, NULL, &slaveWkrName)) != UINT_MAX) {
-		if (i->m_deployment.m_slaves[slaveInProxy] != UINT_MAX) {
-		  ocpiInfo("%s ambiguous (multiple) instances of worker %s for proxy",
-			   rejectSlave.c_str(), slaveWkrName.c_str());
-		  return false;
-		}
-		if (foundAsSlave[sn]) {
-		  ocpiInfo("%s ambiguous slave %s for multiple proxies",
-			   rejectSlave.c_str(), slaveWkrName.c_str());
-		  return false;
-		}
-		i->m_deployment.m_slaves[slaveInProxy] = sn;
-		foundAsSlave[sn] = true;
-	      }
-	    }
-	  } else { // proxy has explicit slaves in the instance
-	    // Find slaves that are connected so we can find ones that are not, to check for optional
-	    for (unsigned ns = 0; ns < ui.m_slaveInstances.size(); ++ns) {
-	      unsigned s =
-		findSlave(m_instances[ui.m_slaveInstances[ns]].m_deployment.m_impl->m_metadataImpl, w,
-			  ui.m_slaveNames[ns]);
-	      if (s != UINT_MAX)
-		i->m_deployment.m_slaves[s] = ui.m_slaveInstances[ns];
-	    }
+	const auto &impl = *i->m_deployment.m_impl;
+	const auto &w = impl.m_metadataImpl;
+	if (w.slaves().empty())
+	  continue;
+	const auto &masterContainer = OC::Container::nthContainer(i->m_deployment.m_container);
+	const OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
+	for (unsigned ns = 0; ns < ui.m_slaveInstances.size(); ++ns) {
+	  const auto &slave = m_instances[ui.slaveInstances()[ns]];
+	  const auto &slaveContainer = OC::Container::nthContainer(slave.m_deployment.m_container);
+	  if (&masterContainer != &OC::Container::baseContainer() &&
+	      &masterContainer.launcher() != &slaveContainer.launcher()) {
+	    std::string rejectSlave;
+	    const auto &sui = m_assembly.instance(ui.slaveInstances()[ns]).m_utilInstance;
+	    OU::format(rejectSlave,
+		       "For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" "
+		       "from artifact \"%s\" on container %s because it is neither on the base container "
+		       "where the application is running, nor on the same system as its slave: \"%s\" "
+		       "which is on container %s",
+		       ui.cname(), ui.m_specName.c_str(),
+		       impl.m_metadataImpl.cname(), impl.m_staticInstance ? "/" : "",
+		       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
+		       impl.m_artifact.name().c_str(), masterContainer.cname(),
+		       sui.cname(), slaveContainer.cname());
+	    return false;
 	  }
-	  const OU::Slave *slave = &w.slaves()[0];
-	  for (size_t s = 0; s < w.slaves().size(); ++slave, ++s)
-	    if (!slave->m_optional && i->m_deployment.m_slaves[s] == UINT_MAX) {
-	      ocpiInfo("%s missing slave (worker %s, slave name %s) that is not optional",
-		       rejectSlave.c_str(), slave->m_worker, slave->m_name);
-	      return false;
-	    }
 	}
       }
       return true;
@@ -545,12 +502,7 @@ namespace OCPI {
 		  break;
 		}
 	  }
-      } else if (ui.m_hasMaster && ui.m_master < instNum) { // if I am a slave that can resolve
-	if ((slaveN = checkSlave(c.impl->m_metadataImpl,
-				m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, NULL,
-				false, reject) == UINT_MAX))
-	  return false;
-	m_instances[ui.m_master].m_deployment.m_slaves[slaveN] = instNum;
+	ocpiDebug("Resolved explicit slaves for %s", c.impl->m_metadataImpl.cname());
       }
       return true;
     }
@@ -1001,8 +953,7 @@ namespace OCPI {
             for (unsigned cont = 0; cont < OC::Manager::s_nContainers; cont++) {
               ocpiDebug("doInstance container: cont %u feasible 0x%x", cont,
                         i.m_feasibleContainers[m]);
-              if ((c.impl->m_metadataImpl.slaves().empty() || cont == base) &&
-                  i.m_feasibleContainers[m] & (1u << cont) &&
+              if (i.m_feasibleContainers[m] & (1u << cont) &&
                   bookingOk(m_bookings[cont], c, instNum)) {
                 deployInstance(instNum, score + c.score, 1, &cont, &c.impl,
                                i.m_feasibleContainers[m]);
@@ -1122,26 +1073,27 @@ namespace OCPI {
       m_bestScore = 0;
       doInstance(0, 0);
       if (m_bestScore == 0)
-        throw OU::Error("There are no feasible deployments for the application given the constraints.  Try running with log level 8 to see why.");
+        throw OU::Error("There are no feasible deployments for the application given the constraints. "
+			" Try running with log level 8 to see why.");
       // Up to now we have just been "planning" and not doing things.
-      // Now invoke the policy method to map the dynamic instances to containers
-      // First we do a pass that will only map the dynamic unscaled implementations
+      // First deal with non-scaled, non-static instances
       i = m_instances;
       for (unsigned n = 0; n < m_nInstances; n++, i++)
-        if (i->m_bestDeployment.m_scale <= 1 && !i->m_bestDeployment.m_impl->m_staticInstance)
-          policyMap(i, i->m_bestDeployment.m_feasible);
-      // Now add the containers for the static instances and the scaled instances
+        if (i->m_bestDeployment.m_scale <= 1 &&
+	    !i->m_bestDeployment.m_impl->m_staticInstance &&
+	    i->m_bestDeployment.m_slaves.empty() &&
+	    !m_assembly.instance(n).m_utilInstance.m_hasMaster)
+	  policyMap(i, i->m_bestDeployment.m_feasible);
+      // IN a second pass, deal with scaled
       i = m_instances;
       for (unsigned n = 0; n < m_nInstances; n++, i++)
         if (i->m_bestDeployment.m_scale > 1) {
           i->m_usedContainers = new unsigned[i->m_bestDeployment.m_scale];
           for (unsigned s = 0; s < i->m_bestDeployment.m_scale; s++)
             i->m_usedContainers[s] = getUsedContainer(i->m_bestDeployment.m_containers[s]);
-        } else {
+        } else if (i->m_usedContainer == UINT_MAX) {
           i->m_usedContainers = &i->m_usedContainer;
-          const OL::Implementation &impl = *i->m_bestDeployment.m_impls[0];
-          if (impl.m_staticInstance)
-            i->m_usedContainer = getUsedContainer(i->m_bestDeployment.m_container);
+	  i->m_usedContainer = getUsedContainer(i->m_bestDeployment.m_container);
         }
     }
     // The explicit way to figure out a deployment from a file
@@ -2087,7 +2039,7 @@ namespace OCPI {
     }
 
     ApplicationI::Instance::Instance() :
-      m_feasibleContainers(NULL), m_nCandidates(0), m_usedContainer(0), m_usedContainers(NULL),
+      m_feasibleContainers(NULL), m_nCandidates(0), m_usedContainer(UINT_MAX), m_usedContainers(NULL),
       m_firstMember(0) {
     }
     ApplicationI::Instance::~Instance() {

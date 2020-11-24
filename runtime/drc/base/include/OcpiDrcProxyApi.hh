@@ -28,7 +28,7 @@ protected:
       if ((rc = prepare_config(config)) != RCC_OK)
 	return rc;
       m_properties.status.data[config].state = STATUS_STATE_PREPARED;
-      // fall into
+      // fall through
     case STATUS_STATE_PREPARED:
       if ((rc = start_config(config)) != RCC_OK)
 	return rc;
