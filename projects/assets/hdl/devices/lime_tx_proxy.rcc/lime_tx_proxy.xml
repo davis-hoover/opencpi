@@ -10,4 +10,6 @@
   <specproperty name='output_gain_db' writesync='1'/>
   <specproperty name='noutputs' value='2' />
   <specproperty name='output_select' writesync='1'/>
+  <specproperty name='bb_loopback' writesync='1'/>
+
 </RccWorker>

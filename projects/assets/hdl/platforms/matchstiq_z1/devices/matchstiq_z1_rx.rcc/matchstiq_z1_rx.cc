@@ -60,6 +60,7 @@ class Matchstiq_z1_rxWorker : public Matchstiq_z1_rxWorkerBase
     // cerr << "isOperating : " << isOperating() << endl;
     // cerr << "isSuspended : " << isSuspended() << endl;
     // cerr << "isStarting : " << isStarting << endl;
+   
 
     // Now that all properties have been set, verify 'written' values
     rf_gain_dB_written();
@@ -68,6 +69,7 @@ class Matchstiq_z1_rxWorker : public Matchstiq_z1_rxWorkerBase
     sample_rate_MHz_written();
     rf_cutoff_frequency_MHz_written();
     bb_cutoff_frequency_MHz_written();
+    bb_loopback_written();
     return RCC_OK;
   }
 
@@ -75,7 +77,7 @@ class Matchstiq_z1_rxWorker : public Matchstiq_z1_rxWorkerBase
   {
     return RCC_ADVANCE;
   }
-
+  
   RCCResult rf_gain_dB_written()
   {
     // We only want to do this if running (all other properties stable)
@@ -438,6 +440,15 @@ class Matchstiq_z1_rxWorker : public Matchstiq_z1_rxWorkerBase
 
     app.setProperty("rf_rx_proxy", "lpf_bw_hz", propStr.c_str());
 
+    return RCC_OK;
+  }
+
+ RCCResult bb_loopback_written()
+  {
+    OA::Application &app  = getApplication();
+    bool test_bb = m_properties.bb_loopback;
+    if (m_properties.bb_loopback == 1)
+      app.setProperty("rf_rx_proxy","bb_loopback", "true");
     return RCC_OK;
   }
 
