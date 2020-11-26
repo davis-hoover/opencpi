@@ -69,9 +69,11 @@
     CONTROL_STATE(NONE) \
     /**/
 
+#define OCPI_MODELS "rcc", "hdl", "ocl"
+
 namespace OCPI {
   namespace Util {
-
+    extern const char *g_models[];
     // Attributes of an artifact and/or implementation
     // Generally shared by all the implementations in an artifact
     class Attributes {

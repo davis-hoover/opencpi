@@ -26,6 +26,7 @@
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilDataTypes.h"
 #include "OcpiUtilValue.h"
+#include "OcpiUtilWorker.h"
 #include "OcpiUtilAssembly.h"
 
 namespace OCPI {
@@ -436,7 +437,7 @@ namespace OCPI {
 	si.m_master = m_ordinal;
       }
       m_slaveInstances.emplace_back(n);
-      m_slaveNames.emplace_back(slave);
+      m_slaveNames.emplace_back(slave); // slave can be NULL, implying the one slave
       return NULL;
     }
 
@@ -632,10 +633,27 @@ namespace OCPI {
           return "'component' attributes are invalid in this implementation assembly";
         if ((err = OE::getRequiredString(ix, m_implName, "worker", "instance")))
           return err;
-        baseName(m_implName.c_str(), myBase);
+#if 0 // interpretation of worker attributes doesn't really below here
+	const char
+	  *dot = strrchr(m_implName.c_str(), '.'),
+	  *model = NULL;
+	if (dot)
+	  for (const char **cp = g_models; !model && *cp; ++cp)
+	    if (!strcasecmp(*cp, dot + 1))
+	      model = dot + 1;
+	if (!model) {
+	  std::string e;
+	  for (const char **cp = g_models; *cp; ++cp)
+	    formatAdd(e, " .%s", *cp); 
+	  return esprintf("worker attribute value \"%s\" must end in a model, one of: %s",
+			  m_implName.c_str(), e.c_str());
+	}
+#endif
+        baseName(m_implName.c_str(), myBase); // leading directory and authoring model stripped off
       } else if ((err = OE::getRequiredString(ix, component, "component", "instance")))
         return err;
       else {
+	myBase = component; // no slashes, no authoring model
 	const char *compName = strrchr(component.c_str(), '.');
 	if (compName)
 	  if (component[0] == '.')
@@ -644,14 +662,16 @@ namespace OCPI {
 	    m_specName = component;
 	else
 	  m_specName = a.m_package + "." + component;
-        myBase = compName ? ++compName : component.c_str();
       }
+      size_t toDot = myBase.find_last_of('.');
+      if (toDot != myBase.npos)
+	myBase.erase(0, toDot+1);
       // FIXME: somehow pass in valid elements or do this test somewhere else...
       if ((err = OE::checkElements(ix, "property", "signal", "slave", NULL)))
 	return err;
       // Figure out the name of this instance.
       if (!OE::getOptionalString(ix, m_name, "name")) {
-      // default is component%u unless there is only one, in which case it is "component".
+        // default is component%u unless there is only one, in which case it is "component".
         unsigned me = 0, n = 0;
         for (ezxml_t x = ezxml_cchild(a.xml(), "instance"); x; x = ezxml_cnext(x)) {
           std::string base;
@@ -659,12 +679,12 @@ namespace OCPI {
             *c = ezxml_cattr(x, "component"),
             *w = ezxml_cattr(x, "worker");
           if (a.isImpl() && w)
-            baseName(w, base);
-          else if (!a.isImpl() && c) {
-            const char *dot = strrchr(c, '.');
-            base = dot ? dot + 1 : c;
-          }
-          if (base.size() && !strcasecmp(base.c_str(), myBase.c_str())) {
+            baseName(w, base); // strip off the authoring model suffix
+          else if (!a.isImpl() && c)
+	    base = c;
+	  assert(!base.empty());
+	  const char *dot = strrchr(base.c_str(), '.');
+          if (!strcasecmp(dot ? dot + 1 : base.c_str(), myBase.c_str())) {
             if (x == ix)
               me = n;
             n++;
@@ -683,7 +703,7 @@ namespace OCPI {
       if (!findAssign(params, "selection", m_name.c_str(), m_selection) &&
 	  !findAssign(params, "selection", m_specName.c_str(), m_selection))
         OE::getOptionalString(ix, m_selection, "selection");
-      ocpiInfo("Component: %s name: %s impl: %s spec: %s selection: %s",
+      ocpiInfo("Component %2d: %s name: %s impl: %s spec: %s selection: %s", ordinal,
                 component.c_str(), m_name.c_str(), m_implName.c_str(), m_specName.c_str(),
                 m_selection.c_str());
 #if 0

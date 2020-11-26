@@ -39,10 +39,9 @@ It does these things:
 - Captures several other files from the build process in the resulting release directory
 
 The result of this script is a release directory with everything that is needed to:
-- Build the OpenCPI linux kernel driver (this completing the framework build for zynq)
-- Create a bootable SD card (after running createLinuxRoosFS.sh).
+- Build the OpenCPI linux kernel driver (thus completing the framework build for zynq)
+- Create a bootable SD card (after running createLinuxRootFS.sh).
 
-The name of the resulting release directory is: opencpi-zynq-release-<release-name>
 The name of the resulting release directory is: opencpi-zynq-release-<release-name>
 After this step, the git repo directory can be removed to save space.
 
@@ -72,7 +71,13 @@ rel=$1
 tag=$2
 case $3 in (/*) gdir=$3 ;; (*) gdir=`pwd`/$3;; esac
 if test ! -d $gdir/linux-xlnx; then
-  echo The source directory $3/linux-xlnx does not exist. Run getXilinxLinuxSources.sh\?
+  #
+  # The original error message suggested running "getXilinxLinuxSources.sh",
+  # but the associated code is not yet ready for prime time.
+  #
+  echo "Error: the source directory \"$3/linux-xlnx\" does not exist."
+  echo "See \"Xilinx Linux Kernel and U-Boot Source Code Repositories\""
+  echo "in the \"OpenCPI Installation Guide\"."
   exit 1
 fi
 # Protect against sym links for the git subdir for case sensitivity

@@ -260,6 +260,7 @@
 +runtime/hdl-support/xilinx/xilinx-rcc-platform.mk include/xilinx/
 +runtime/hdl-support/xilinx/xilinx-rcc-platform-definition.mk include/xilinx/
 +platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
++platforms/zynq/showXilinxLinuxTags.sh scripts/xilinx/
 +platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
 +runtime/hdl-support/xilinx/createXilinxLinuxKernelHeaders.sh scripts/xilinx/
 +runtime/hdl-support/xilinx/importXilinxRelease.sh scripts/xilinx/
