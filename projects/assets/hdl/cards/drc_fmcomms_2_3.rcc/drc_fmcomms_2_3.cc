@@ -77,6 +77,7 @@ class Drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
     }
     void initialConfig(uint8_t /*id_no*/, OD::Ad9361InitConfig &config) {
       OD::ad9361InitialConfig(m_slaves.config, m_slaves.data_sub, config);
+      config.xo_disable_use_ext_ref_clk=false;
     }
     void postConfig(uint8_t /*id_no*/) {
       OD::ad9361PostConfig(m_slaves.config);
@@ -116,7 +117,7 @@ public:
       stream.include_data_stream_ID(channel.rx ?
                                     DRC_FMCOMMS_2_3_RF_PORTS_RX.data[nRx] :
                                     DRC_FMCOMMS_2_3_RF_PORTS_TX.data[nTx]);
-      stream.include_routing_ID((channel.rx ? "RX0" : "TX0") +
+      stream.include_routing_ID((channel.rx ? "RX" : "TX") +
                                 std::to_string(channel.rx ? nRx : nTx));
       ++(channel.rx ? nRx : nTx);
       stream.include_tuning_freq_MHz(channel.tuning_freq_MHz, channel.tolerance_tuning_freq_MHz);

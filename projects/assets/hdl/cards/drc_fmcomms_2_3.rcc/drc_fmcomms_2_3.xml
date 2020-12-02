@@ -1,6 +1,7 @@
 <RccWorker language='c++' spec='drc-spec' version='2'
 	   controlOperations='start'
 	   staticprereqlibs='ad9361' >
+
   <specProperty name='MAX_RX_RF_PORTS_p' value="2"/>
   <specProperty name='MAX_TX_RF_PORTS_p' value="2"/>
   <specProperty name='rf_ports_rx' parameter='1' value='Rx0,Rx1'/>
@@ -11,20 +12,82 @@
   <specProperty name='release' writesync='1'/>
   <specProperty name='status' readsync='1'/>
 
-  <slave worker='platform_ad9361_config.hdl' name="config" />
-  <slave worker="platform_ad9361_data_sub.hdl" name="data_sub"/>
-  <slave worker="data_src_qadc.hdl"  name="rx_qadc0"  	      optional="1"/>
-  <slave worker="complex_mixer.hdl"  name="rx_complex_mixer0" optional="1"/>
-  <slave worker="cic_dec.hdl" 	     name="rx_cic_dec0"       optional="1"
-	 port='rx' index='0' slave_port='out'/>
-  <slave worker="data_src_qadc.hdl"  name="rx_qadc1"  	      optional="1"/>
-  <slave worker="complex_mixer.hdl"  name="rx_complex_mixer1" optional="1"/>
-  <slave worker="cic_dec.hdl" 	     name="rx_cic_dec1"       optional="1"
-	 port='rx' index='0' slave_port='out'/>
-  <slave worker="data_sink_qdac.hdl" name="tx_qdac0"          optional="1"/>
-  <slave worker="cic_int.hdl"        name="tx_cic_int0"       optional="1"
-	 port='tx' index='0' slave_port='in'/>
-  <slave worker="data_sink_qdac.hdl" name="tx_qdac1"          optional="1"/>
-  <slave worker="cic_int.hdl"        name="tx_cic_int1"       optional="1"
-	 port='tx' index='0' slave_port='in'/>
+  <slaves>
+    <Instance worker='ocpi.platform.devices.platform_ad9361_config.hdl' 
+	  name='config'/>
+    <Instance worker='ocpi.platform.devices.platform_ad9361_data_sub.hdl' 
+	  name='data_sub'/>
+    <!-- DRC RX0 path slaves --> 
+    <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'  
+	  name='rx_qadc0' connect='rx_cswm_to_iqstream0'/>
+    <Instance worker='ocpi.assets.misc_comps.cswm_to_iqstream.hdl'
+	  name='rx_cswm_to_iqstream0' connect='rx_complex_mixer0'/>
+    <Instance worker="ocpi.assets.dsp_comps.complex_mixer.hdl"  
+	  name='rx_complex_mixer0' connect='rx_cic_dec0'>
+      <Property Name='NCO_DATA_WIDTH_p'   Value='12'/>
+      <Property Name='INPUT_DATA_WIDTH_p' Value='12'/>
+      <Property Name='mag' 		  Value='1024'/>
+      <Property Name='phs_init'           Value='0'/>
+    </Instance>
+    <Instance worker='ocpi.assets.dsp_comps.cic_dec.hdl'
+	  name='rx_cic_dec0'>
+      <Property Name='N'          Value='3'/>
+      <Property Name='M'          Value='1'/>
+      <Property Name='R'          Value='16'/> <!-- decimation factor -->
+      <Property Name='ACC_WIDTH'  Value='28'/>
+    </Instance>
+    <External name='rx' instance='rx_cic_dec0' port='out'/>
+
+    <!-- DRC RX1 path slaves 
+    <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'  
+	    name='rx_qadc1' connect='rx_cswm_to_iqstream1'/>
+    <Instance worker='ocpi.assets.misc_comps.cswm_to_iqstream.hdl'
+	    name='rx_cswm_to_iqstream1' connect='rx_complex_mixer1'/> 
+    <Instance worker="ocpi.assets.dsp_comps.complex_mixer.hdl"  
+	  name='rx_complex_mixer1' connect='rx_cic_dec1'>
+      <Property Name='NCO_DATA_WIDTH_p'   Value='12'/>
+      <Property Name='INPUT_DATA_WIDTH_p' Value='12'/>
+      <Property Name='mag' 		  Value='1024'/>
+      <Property Name='phs_init'           Value='0'/>
+    </Instance>
+    <Instance worker='ocpi.assets.dsp_comps.cic_dec.hdl'
+	  name='rx_cic_dec1'>
+      <Property Name='N'          Value='3'/>
+      <Property Name='M'          Value='1'/>
+      <Property Name='R'          Value='16'/> 
+      <Property Name='ACC_WIDTH'  Value='28'/>
+    </Instance>
+    <External name='rx[1]' instance='rx_cic_dec1' port='out'/>
+    --> 
+    <!-- DRC TX0 path slaves --> 
+    <External name='tx' instance='tx_cic_int0' port='in'/>
+    <Instance worker='ocpi.assets.dsp_comps.cic_int.hdl'
+          name='tx_cic_int0' connect='tx_iqstream_to_cswm0'>
+      <Property name='N'          Value='3'/>
+      <Property name='M'          Value='1'/>
+      <Property name='R'          Value='16'/> <!-- interpolation factor --> 
+      <Property name='ACC_WIDTH'  Value='28'/>  
+    </Instance>
+    <Instance worker='ocpi.assets.misc_comps.iqstream_to_cswm.hdl'
+	  name='tx_iqstream_to_cswm0' connect='tx_qdac0'/> 
+    <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac0'/>
+
+    <!-- DRC TX1 path slaves 
+    <External name='tx1' instance='tx_cic_int1' port='in'/>
+    <Instance worker='ocpi.assets.dsp_comps.cic_int.hdl'
+          name='tx_cic_int1' connect='tx_iqstream_to_cswm1'>
+      <Property name='N'          Value='3'/>
+      <Property name='M'          Value='1'/>
+      <Property name='R'          Value='16'/>  
+      <Property name='ACC_WIDTH'  Value='28'/>  
+    </Instance>
+	    <Instance worker='ocpi.assets.misc_comps.iqstream_to_cswm.hdl'
+		  name='tx_iqstream_to_cswm1' connect='tx_qdac1'/> 
+    <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac1'/>
+    -->
+    <!--==========================================================================-->
+    <!-- This must be instanced here in app XML as a workaround for #827/AV-3799 -->
+    <!-- It is not really needed as a slave -->
+    <Instance worker="ocpi.platform.devices.platform_ad9361_spi.hdl" name='ad9361_spi'/>
+  </slaves>
 </RccWorker>
