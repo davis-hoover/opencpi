@@ -60,7 +60,6 @@ namespace OCPI {
       if (err || (err = parse(NULL, extraTopAttrs, extraInstAttrs, params)))
         throw Error("%s", err);
     }
-    // FIXME:  we infer that this is an impl assy from this constructor.  Make it explicit?
     Assembly::Assembly(const ezxml_t top, const char *defaultName, bool a_isImpl,
                        const char **extraTopAttrs, const char **extraInstAttrs,
                        const PValue *params)
@@ -92,7 +91,7 @@ namespace OCPI {
     parse(const char *defaultName, const char **extraTopAttrs, const char **extraInstAttrs,
           const PValue *params) {
       // This is where common initialization is done except m_xml and m_copy
-      m_doneInstance = -1;
+      m_doneInstance = UINT_MAX;
       m_cMapPolicy = RoundRobin;
       m_processors = 0;
       ezxml_t ax = m_xml;
@@ -151,7 +150,7 @@ namespace OCPI {
       if (done) {
         if ((err = getInstance(done, n)))
           return err;
-        m_doneInstance = (int)n;
+        m_doneInstance = n;
       }
       // Note the mapped properties are AFTER the instances so that a value
       // set on an instance is overriden by one on a mapped property.
@@ -163,9 +162,8 @@ namespace OCPI {
           return err;
       n = 0;
       for (ezxml_t cx = ezxml_cchild(ax, "Connection"); cx; cx = ezxml_cnext(cx)) {
-        Connection tmp;
-        m_connections.push_back(tmp);
-        if ((err = m_connections.back().parse(cx, *this, n, params)))
+        m_connections.push_back(new Connection);
+        if ((err = m_connections.back()->parse(cx, *this, n, params)))
           return err;
       }
       // Add top level externals that simply define single port external connections
@@ -194,7 +192,7 @@ namespace OCPI {
     // Given a assignment value that is an instance assignment, find the instance and modify
     // the parameter value to point past the = sign.  Two output args.
     const char *Assembly::
-    findInstanceForParam(const char *pName, const char *&assign, unsigned &instn) {
+    findInstanceForParam(const char *pName, const char *&assign, size_t &instn) {
       const char *eq = strchr(assign, '=');
       if (!eq)
         return esprintf("Parameter assignment for \"%s\", \"%s\" is invalid. "
@@ -264,21 +262,21 @@ namespace OCPI {
 
     const char *Assembly::
     addConnection(const char *a_name, ezxml_t x, Connection *&c) {
-      for (ConnectionsIter ci = m_connections.begin(); ci != m_connections.end(); ci++)
-        if (!strcasecmp((*ci).m_name.c_str(), a_name))
+      for (auto ci = m_connections.begin(); ci != m_connections.end(); ci++)
+        if (!strcasecmp((*ci)->m_name.c_str(), a_name))
           return esprintf("Duplicate connection named '%s' in assembly", a_name);
-      Connection tmp;
+      Connection *tmp = new Connection;
       const char *err, *s;
-      if (((s = ezxml_cattr(x, "transport")) && (err = tmp.m_parameters.add("transport", s))) ||
-	  ((s = ezxml_cattr(x, "buffersize")) && (err = tmp.m_parameters.add("buffersize", s))))
+      if (((s = ezxml_cattr(x, "transport")) && (err = tmp->m_parameters.add("transport", s))) ||
+	  ((s = ezxml_cattr(x, "buffersize")) && (err = tmp->m_parameters.add("buffersize", s))))
 	return err;
       m_connections.push_back(tmp);
-      c = &m_connections.back();
+      c = m_connections.back();
       c->m_name = a_name;
       return NULL;
     }
     const char *Assembly::
-    addPortConnection(ezxml_t ix, unsigned from, const char *fromPort, unsigned to,
+    addPortConnection(ezxml_t ix, size_t from, const char *fromPort, size_t to,
 		      const char *toPort, const PValue *params) {
       std::string l_name = m_instances[from]->m_name + "." + (fromPort ? fromPort : "output");
       Connection *c;
@@ -297,7 +295,7 @@ namespace OCPI {
     // own name), or with the other short cut: a top level "external" that just describes
     // the instance, port and other options.
     const char *Assembly::
-    addExternalConnection(ezxml_t x, unsigned instance, const char *port, const PValue *params,
+    addExternalConnection(ezxml_t x, size_t a_instance, const char *port, const PValue *params,
                           bool isInput, bool bidi, bool known) {
       Connection *c;
       const char *err;
@@ -306,7 +304,7 @@ namespace OCPI {
       External &e = c->addExternal();
       e.init(port);
       Port *p;
-      return c->addPort(*this, instance, port, isInput, bidi, known, 0, params, p);
+      return c->addPort(*this, a_instance, port, isInput, bidi, known, 0, params, p);
     }
 
     const char *Assembly::
@@ -330,11 +328,11 @@ namespace OCPI {
           return err;
       // Now attach an internal port to this connection
       std::string iName;
-      unsigned instance;
+      unsigned l_instance;
       Port *p;
       if ((err = OE::getRequiredString(a_xml, iName, "instance", "external")) ||
-          (err = getInstance(iName.c_str(), instance)) ||
-          (err = c->addPort(*this, instance, port.c_str(), false, false, false, e.m_index,
+          (err = getInstance(iName.c_str(), l_instance)) ||
+          (err = c->addPort(*this, l_instance, port.c_str(), false, false, false, e.m_index,
                             params, p)))
         return err;
       // An external that is external-based can specify a count
@@ -616,7 +614,6 @@ namespace OCPI {
     const char *Assembly::Instance::
     parse(ezxml_t ix, Assembly &a, unsigned ordinal, const char **extraInstAttrs, const PValue *params) {
       m_ordinal = ordinal;
-      //      m_hasSlave = false;
       m_hasMaster = false;
       const char *err;
       static const char *instAttrs[] =
@@ -633,7 +630,7 @@ namespace OCPI {
           return "'component' attributes are invalid in this implementation assembly";
         if ((err = OE::getRequiredString(ix, m_implName, "worker", "instance")))
           return err;
-#if 0 // interpretation of worker attributes doesn't really below here
+#if 0 // interpretation of worker attributes doesn't really belong here
 	const char
 	  *dot = strrchr(m_implName.c_str(), '.'),
 	  *model = NULL;
@@ -789,7 +786,7 @@ namespace OCPI {
     }
 
     const char *Assembly::Connection::
-    addPort(Assembly &a, unsigned instance, const char *portName, bool isInput, bool bidi,
+    addPort(Assembly &a, size_t instance, const char *portName, bool isInput, bool bidi,
             bool known, size_t index, const PValue *params, Assembly::Port *&port) {
       const char *err;
       Port tmp;
@@ -802,7 +799,7 @@ namespace OCPI {
     }
 
     const char *Assembly::Port::
-    init(Assembly &a, Connection &c, const char *name, unsigned instance, bool isInput, bool bidir,
+    init(Assembly &a, Connection &c, const char *name, size_t instance, bool isInput, bool bidir,
          bool isKnown, size_t index, const PValue */*params*/) {
       if (name)
         m_name = name;

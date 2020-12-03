@@ -123,6 +123,7 @@ namespace OCPI {
     };
     // This class represents what we know, generically, about a component implementation
     // Currently there is no separate "spec" metadata - it is redundant in each implementation
+    class Assembly;
     class Worker : public IdentResolver {
       friend class Port;
     protected:
@@ -133,7 +134,6 @@ namespace OCPI {
 	m_package;
     public:
     protected:
-      std::vector<Slave> m_slaves;
       Attributes *m_attributes; // not a reference due to these being in arrays
       Port *m_ports;
       Memory *m_memories;
@@ -151,6 +151,10 @@ namespace OCPI {
       Property *m_firstRaw;
       ezxml_t m_xml;
       unsigned m_ordinal; // ordinal within artifact
+    private:
+      Assembly *m_slaveAssembly; // assembly of slaves for this (proxy) worker
+      std::vector<Slave> m_slaves;
+    public:
       // Scalability
       std::string m_validScaling; // Expression for error checking overall scaling
       Port::Scaling m_scaling;
@@ -217,6 +221,7 @@ namespace OCPI {
         return m_totalPropertySize;
       }
       const char *finalizeProperties(size_t &offset, uint64_t &totalSize , const IdentResolver *resolver);
+      ezxml_t slaveAssy() const; // just return the XML for the slaves
       enum ControlOperation {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)  Op##c,
 	OCPI_CONTROL_OPS

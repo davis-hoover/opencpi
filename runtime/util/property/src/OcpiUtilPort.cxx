@@ -512,7 +512,7 @@ namespace OCPI {
     // This should not be runtime...
     void Port::
     emitXml(std::string &out, size_t bufferSize) const {
-      formatAdd(out, "  <port name=\"%s\"", m_name.c_str());
+      formatAdd(out, "    <port name=\"%s\"", m_name.c_str());
       if (m_isBidirectional)
 	formatAdd(out, " bidirectional='1'");
       else if (m_isProducer)
@@ -537,9 +537,9 @@ namespace OCPI {
 	formatAdd(out, " slave='%zu'", m_slave);
       emitScalingAttrs(out);
       formatAdd(out, ">\n");
-      printXML(out, 2);
+      printXML(out, 3);
       emitScaling(out);
-      formatAdd(out, "  </port>\n");
+      formatAdd(out, "    </port>\n");
     }
 
     Port::OpScaling::

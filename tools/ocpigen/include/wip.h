@@ -442,6 +442,7 @@ class Worker : public OU::Worker {
   Clock &addClock(const char *name, bool output = false);
   Clock &addClock(const std::string &name, bool output = false) { return addClock(name.c_str(), output); }
   Clock &addWciClockReset();
+  // FIXME: inconsistency between get/find on this worker class and vs. OU::worker's methods
   OU::Property *findProperty(const char *name) const;
   OU::Port *findMetaPort(const char *id, const OU::Port *except) const;
   const char *parseSlaves();

@@ -1298,6 +1298,7 @@ emitSkelRCC() {
             "%s_START_INFO\n"
             "// Insert any static info assignments here (memSize, memSizes, portInfo)\n"
             "// e.g.: info.memSize = sizeof(MyMemoryStruct);\n"
+            "// YOU MUST LEAVE THE *START_INFO and *END_INFO macros here and uncommented in any case\n"
             "%s_END_INFO\n",
             upper, upper);
   }

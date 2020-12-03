@@ -39,7 +39,7 @@ namespace OCPI {
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
 	m_version(0), m_workerEOF(false), m_totalPropertySize(0), m_isSource(false),
 	m_isDebug(false), m_nProperties(0), m_properties(NULL), m_firstRaw(NULL), m_xml(NULL),
-        m_ordinal(0) {
+        m_ordinal(0), m_slaveAssembly(NULL) {
     }
 
     Worker::~Worker() {
@@ -121,6 +121,11 @@ namespace OCPI {
 	  err = esprintf("delegated port \"%s\" for slave \"%s\" not found", port, m_name);
       }
     }
+    ezxml_t Worker::
+    slaveAssy() const {
+      return ezxml_cchild(m_xml, "slaves");
+    }
+
     const char *Worker::
     parse(ezxml_t xml, Attributes *attr) {
       m_xml = xml;
@@ -189,6 +194,11 @@ namespace OCPI {
       for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
 	if ((err = p->postParse()))
           return esprintf("Invalid xml port description(3): %s", err);
+#if 1
+      if (ezxml_cattr(xml, "slave") ||
+	  ezxml_cchild(xml, "slave"))
+	return esprintf("for worker %s, obsolete slave indications in artifact XML",  cname());
+#else
       // Slaves must be parsed after ports
       const char *slave = ezxml_cattr(xml, "slave");
       if (slave) {
@@ -201,6 +211,8 @@ namespace OCPI {
 	  if (err)
 	    return err;
 	}
+#endif
+      // Note we do *not* parse the slave assembly until asked.
       // The m_isSource determination must happen after slave processing
       p = m_ports;
       bool hasInput = false, hasOutput = false;
