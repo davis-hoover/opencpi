@@ -64,6 +64,7 @@ class Matchstiq_z1_txWorker : public Matchstiq_z1_txWorkerBase
     frequency_MHz_written();
     sample_rate_MHz_written();
     bb_cutoff_frequency_MHz_written();
+    bb_loopback_written();
     return RCC_OK;
   }
 
@@ -313,6 +314,13 @@ class Matchstiq_z1_txWorker : public Matchstiq_z1_txWorkerBase
 
     app.setProperty("rf_tx_proxy", "lpf_bw_hz", propStr.c_str());
 
+    return RCC_OK;
+  }
+RCCResult bb_loopback_written()
+  {
+    OA::Application &app  = getApplication();
+    if (m_properties.bb_loopback)
+      app.setProperty("rf_tx_proxy","bb_loopback", "1");
     return RCC_OK;
   }
 

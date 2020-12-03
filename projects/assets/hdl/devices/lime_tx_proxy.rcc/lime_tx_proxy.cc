@@ -41,6 +41,19 @@ public:
     setRunCondition(&m_aRunCondition);
   }
 private:
+
+  // notification that bb_loopback property has been written
+  RCCResult bb_loopback_written() {
+    if (m_properties.bb_loopback == 1) {
+      // top Level
+      slave.set_loopback(0x10);  
+      slave.set_clk_ctl(0xC5); 
+      slave.set_tx_pa_en(0x0F); 
+      slave.set_tx_pkdbw(0x0E); 
+    }
+    return RCC_OK;
+  }
+
   // notification that lpf_bw_hz property has been written
   RCCResult lpf_bw_hz_written() {
     uint8_t val;
@@ -108,6 +121,7 @@ private:
     slave.set_tx_pa_en((slave.get_tx_pa_en() & 0xE7) | (m_properties.output_select << 3));
     return RCC_OK;
   }
+
   // enable required for both initialize and start
   RCCResult enable() {
     slave.set_top_ctl0(slave.get_top_ctl0() | (1 << 3));
@@ -140,3 +154,4 @@ LIME_TX_PROXY_START_INFO
 // Insert any static info assignments here (memSize, memSizes, portInfo)
 // e.g.: info.memSize = sizeof(MyMemoryStruct);
 LIME_TX_PROXY_END_INFO
+

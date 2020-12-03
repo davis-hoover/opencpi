@@ -8296,9 +8296,9 @@
    <text:change-start text:change-id="ct140191227986528"/>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="shared/release.fodt"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
    </text:section>
-   <text:p text:style-name="P824"><text:change-end text:change-id="ct140191227986528"/><text:change-start text:change-id="ct140191227981152"/>OpenCPI Release: develop</text:p>
+   <text:p text:style-name="P824"><text:change-end text:change-id="ct140191227986528"/><text:change-start text:change-id="ct140191227981152"/>OpenCPI Release:  develop</text:p>
    <text:p text:style-name="P700"><text:change-end text:change-id="ct140191227981152"/><text:span text:style-name="T170">Revision History</text:span></text:p>
    <table:table table:name="Table1" table:style-name="Table1">
     <table:table-column table:style-name="Table1.A"/>
