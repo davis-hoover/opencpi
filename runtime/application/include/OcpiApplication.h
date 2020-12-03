@@ -62,9 +62,10 @@ namespace OCPI {
 	std::vector<unsigned> m_containers;            // containers used by this deployment
 	std::vector<const OCPI::Library::Implementation *> m_impls; // implementation on each container
 	CMap m_feasible;
-	bool m_hasMaster;                     // convenience
-	std::string m_name;                   // convenience
-	std::vector<size_t> m_slaves;         // the instance ordinals of explicit slaves
+	bool m_hasMaster;                       // convenience
+	std::string m_name;                     // convenience
+	const OCPI::Util::Assembly::Properties *m_properties; // convenience
+	std::vector<size_t> m_slaves;           // the instance ordinals of explicit slaves
 	// These members are used *after* deployment planning
 	size_t m_firstMember;                   // index of first member in launch members
 	OCPI::Container::Launcher::Crew m_crew;	// launcher info for this instance;
@@ -74,7 +75,8 @@ namespace OCPI {
 	~Deployment();
 	Deployment &operator=(const Deployment &d);
 	void set(const std::string &name, size_t scale, const unsigned *containers,
-		 const OCPI::Library::Implementation * const *impls, CMap map, bool hasMaster);
+		 const OCPI::Library::Implementation * const *impls, CMap map, bool hasMaster,
+		 const OCPI::Library::Assembly::Properties * );
       };
       // This structure is used during deployment planning.
       struct Instance : public OCPI::Container::Callback {

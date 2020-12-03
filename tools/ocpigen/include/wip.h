@@ -25,6 +25,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <unordered_set>
 #include "OcpiPValue.h"
 #include "OcpiUtilProperty.h"
 #include "OcpiUtilProtocol.h"
@@ -402,7 +403,8 @@ class Worker : public OU::Worker {
   ::Assembly *m_assembly;
   // map of slave worker objects mapped by a string of the name of the slave either from name
   // attribute or auto generated
-  std::map<std::string, Worker*> m_slaves;
+  std::list<std::pair<std::string, Worker*>> m_slaves; // maintain order
+  std::unordered_set<std::string> m_slaveNames; // for duplicate checking
   HdlDevice *m_emulate;
   Worker *m_emulator;               // for test only, the emulator of this worker
   Signals m_signals;

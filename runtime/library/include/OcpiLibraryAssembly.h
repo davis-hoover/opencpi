@@ -44,9 +44,16 @@ namespace OCPI {
       unsigned score;
       mutable Assembly *slaves; // hold a slave/sub assembly to be merged when this candidate is used
       mutable size_t nInstances, nConnections;
-      // Temporary port delegations
-      std::forward_list<std::pair<OCPI::Util::Assembly::Port*,OCPI::Util::Assembly::Port>>
-	m_portFixups;
+      // Temporary port delegations need to be "undone" by using these fixups
+      // This is basically a tuple of these three things
+      struct Fixup {
+	OCPI::Util::Assembly::Port *portPtr; // the OU::Assembly::Port to patch
+	OCPI::Util::Assembly::Port port;     // the value to restore
+	size_t ordinal;                      // the instance's port ordinal
+	Fixup(OCPI::Util::Assembly::Port *pp, OCPI::Util::Assembly::Port p, size_t o)
+	  : portPtr(pp), port(p), ordinal(o) {}
+      };
+      std::forward_list<Fixup> m_portFixups;
       inline Candidate(const Implementation &a_impl, unsigned a_score)
 	: impl(&a_impl), score(a_score), slaves(NULL), nInstances(0), nConnections(0) {}
     };
@@ -106,6 +113,10 @@ namespace OCPI {
       }
       bool badConnection(const Implementation &thisImpl, const OCPI::Util::Port &thisPort,
 			 const Implementation &otherImpl, const OCPI::Util::Port &otherPort);
+      Port **assyPorts(size_t inst) {
+	assert(m_instances[inst]->m_assyPorts);
+	return m_instances[inst]->m_assyPorts;
+      }
       Port *assyPort(size_t inst, size_t port) {
 	assert(m_instances[inst]->m_assyPorts);
 	return m_instances[inst]->m_assyPorts[port];

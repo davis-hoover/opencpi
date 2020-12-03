@@ -536,7 +536,7 @@ namespace OCPI {
 	    OU::Assembly::Port *assyPort = m_assembly.assyPort(instNum, masterPort.m_ordinal);
 	    if (assyPort) { // proxy port is connected to something, delegate it
 	      // first save the old port to restore after this instance is deployed
-	      c.m_portFixups.emplace_front(assyPort, *assyPort);
+	      c.m_portFixups.emplace_front(assyPort, *assyPort, masterPort.m_ordinal);
 	      m_assembly.instances()[instNum]->m_assyPorts[masterPort.m_ordinal] = NULL;
 	      auto &slavePort = slaveConn.m_ports.front();
 	      assyPort->m_name = slavePort.m_name; // name is slave's name now
@@ -610,10 +610,12 @@ namespace OCPI {
       if (!c.slaves)
 	return;
       // patch up and restore the connections that were delegated
-      while (!c.m_portFixups.empty()) {
-	auto &pair = c.m_portFixups.front();
-	*pair.first = pair.second;
-	c.m_portFixups.pop_front();
+      for (; !c.m_portFixups.empty(); c.m_portFixups.pop_front()) {
+	auto &fixup = c.m_portFixups.front();
+	// restore the proxy's OU::Assembly::Port to its pre-delegation state
+	*fixup.portPtr = fixup.port;
+	// restore the proxy's map from worker port ordinal to OU::Assembly::Port
+	m_assembly.assyPorts(fixup.port.m_instance)[fixup.ordinal] = fixup.portPtr;
       }
       m_nInstances = c.nInstances;
       m_instances.resize(m_nInstances);                // toss slaves from app assembly
@@ -782,10 +784,10 @@ namespace OCPI {
       auto *d = &m_bestDeployments[0];
       // Collect and check the property values for each instance (not inferred slaves)
       assert(m_nInstances <= m_bestDeployments.size());
-      for (unsigned n = 0; n < m_nInstances; n++, d++) {
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
         // The chosen, best, feasible implementation for the instance
-        const char *iName = m_assembly.instance(n).name().c_str();
-        const OU::Assembly::Properties &aProps = m_assembly.instance(n).properties();
+        const char *iName = d->m_name.c_str();
+        const OU::Assembly::Properties &aProps = *d->m_properties;
         size_t nPropValues = aProps.size();
         const char *sDummy;
         // Count any properties that were provided in parameters specific to instance
@@ -852,22 +854,21 @@ namespace OCPI {
         p->m_instance = mp->m_instance;
         p->m_dumpFile = NULL;
         ocpiDebug("Instance %s (%u) property %s (%u) named %s in assembly",
-                  m_assembly.instance(p->m_instance).name().c_str(), p->m_instance,
+		  m_bestDeployments[p->m_instance].m_name.c_str(), p->m_instance,
                   mp->m_instPropName.c_str(), p->m_property, p->m_name.c_str());
       }
       d = &m_bestDeployments[0];
-      for (unsigned n = 0; n < m_nInstances; n++, d++) {
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
         unsigned nProps;
         OU::Property *meta = d->m_impls[0]->m_metadataImpl.properties(nProps);
         for (unsigned nn = 0; nn < nProps; nn++, meta++, p++) {
-          p->m_name = m_assembly.instance(n).name() + "." + meta->m_name;
+          p->m_name = d->m_name + "." + meta->m_name;
           p->m_instance = n;
           p->m_property = nn;
-          ocpiDebug("Instance %s (%u) property %s (%u) named %s",
-                    m_assembly.instance(n).name().c_str(), n,
+          ocpiDebug("Instance %s (%u) property %s (%u) named %s", d->m_name.c_str(), n,
                     meta->m_name.c_str(), nn, p->m_name.c_str());
           // Record dump file for this property if there is one.
-          const OU::Assembly::Properties &aProps = m_assembly.instance(n).properties();
+          const OU::Assembly::Properties &aProps = *d->m_properties;
           p->m_dumpFile = NULL;
           for (unsigned nnn = 0; nnn < aProps.size(); nnn++)
             if (aProps[nnn].m_dumpFile.size() &&
@@ -943,9 +944,9 @@ namespace OCPI {
     void ApplicationI::
     deployInstance(unsigned instNum, unsigned score, size_t scale,
                    unsigned *containers, const OL::Implementation **impls, CMap feasible) {
+      auto const &ui = m_assembly.utilInstance(instNum);
       m_instances[instNum].m_deployment.
-	set(m_assembly.utilInstance(instNum).m_name, scale, containers, impls, feasible,
-	    m_assembly.utilInstance(instNum).m_hasMaster);
+	set(ui.m_name, scale, containers, impls, feasible, ui.m_hasMaster, &ui.m_properties);
       ocpiDebug("doInstance ok");
       if (instNum < m_nInstances-1) {
         instNum++;
@@ -1854,7 +1855,7 @@ namespace OCPI {
                                        PropertyOptionList({m_hex ? HEX : NONE, UNREADABLE_OK}), &attrs); ++n)
         if ((printParameters || attrs.isVolatile || attrs.isWritable) &&
             (m_hidden || !attrs.isHidden) && (printCached || !attrs.isCached || attrs.isWritable)) {
-          fprintf(stderr, "Property %2u: %s = \"%s\"", n, attrs.name.c_str(), value.c_str());
+          fprintf(stderr, "Property %3u: %s = \"%s\"", n, attrs.name.c_str(), value.c_str());
           std::string out;
           addAttr(out, attrs.isParameter, "parameter");
           addAttr(out, attrs.isCached, "cached");
@@ -1878,15 +1879,15 @@ namespace OCPI {
       if (m_dumpPlatforms)
         for (unsigned n = 0; n < m_nContainers; n++)
           m_containers[n]->dump(true, m_hex);
-      ocpiDebug("Using %d containers to support the application", m_nContainers );
-      ocpiDebug("Starting master workers that are not slaves and not sources.");
+      ocpiInfo("Using %d containers to support the application", m_nContainers );
+      ocpiInfo("Starting master workers that are not slaves and not sources.");
       startMasterSlave(true, false, false);  // 4
-      ocpiDebug("Starting master workers that are also slaves, but not sources.");
+      ocpiInfo("Starting master workers that are also slaves, but not sources.");
       startMasterSlave(true, true, false);   // 6
-      ocpiDebug("Starting workers that are not masters and not sources.");
+      ocpiInfo("Starting workers that are not masters and not sources.");
       startMasterSlave(false, false, false); // 0
       startMasterSlave(false, true, false);  // 2
-      ocpiDebug("Starting workers that are sources.");
+      ocpiInfo("Starting workers that are sources.");
       startMasterSlave(false, false, true);  // 1
       startMasterSlave(false, true, true);   // 3
       // Note: this does not start masters that are sources.
@@ -2212,12 +2213,14 @@ namespace OCPI {
     }
     void ApplicationI::Deployment::
     set(const std::string &name, size_t scale, const unsigned *containers,
-	const OL::Implementation * const *impls, CMap feasible, bool hasMaster) {
+	const OL::Implementation * const *impls, CMap feasible, bool hasMaster,
+	const OU::Assembly::Properties *properties) {
       m_name = name;
       m_scale = scale;
       m_impls.resize(scale);
       m_containers.resize(scale);
       m_hasMaster = hasMaster;
+      m_properties = properties;
       for (unsigned n = 0; n < scale; ++n) {
 	m_impls[n] = impls[n];
 	m_containers[n] = containers[n];
@@ -2226,7 +2229,8 @@ namespace OCPI {
     }
     ApplicationI::Deployment &ApplicationI::Deployment::
     operator=(const ApplicationI::Deployment &d) {
-      set(d.m_name, d.m_scale, &d.m_containers[0], &d.m_impls[0], d.m_feasible, d.m_hasMaster);
+      set(d.m_name, d.m_scale, &d.m_containers[0], &d.m_impls[0], d.m_feasible, d.m_hasMaster,
+	  d.m_properties);
       m_slaves = d.m_slaves;
       return *this;
     }
