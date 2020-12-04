@@ -523,22 +523,23 @@ namespace OCPI {
 	  }
 	} else {
 	  Deployment &d = m_instances[instNum].m_deployment;
-	  if (ui.m_slaveNames.size() == 1 && ui.m_slaveNames[0] == NULL) {
-	    // The oldest legacey  method:  an app instance with a slave attribute, and no slavename
-	    d.m_slaves[0] = ui.m_slaveInstances[0];
-	  } else
-	    // The "multi-slave" legacy method with names and instances
-	    for (unsigned n = 0; n < c.slaves->instances().size(); ++n) {
-	      const char *slaveName = c.slaves->utilInstance(n).cname();
-	      for (unsigned s = 0; s < ui.m_slaveNames.size(); ++s)
-		if (!strcasecmp(ui.m_slaveNames[s], slaveName)) {
+	  // The "multi-slave" legacy method with names and instances: UGH in hindsight
+	  for (unsigned s = 0; s < ui.m_slaveNames.size(); ++s) {
+	    if (ui.m_slaveNames[s])
+	      for (unsigned n = 0; n < c.slaves->instances().size(); ++n) {
+		if (!strcasecmp(ui.m_slaveNames[s], c.slaves->utilInstance(n).cname())) {
 		  d.m_slaves[n] = ui.m_slaveInstances[s];
 		  break;
 		}
-	      if (d.m_slaves[n] == SIZE_MAX) {
-		ocpiInfo("%s due to missing explicit slave: %s", reject.c_str(), slaveName);
-		return false;
 	      }
+	    else if (s < d.m_slaves.size())
+	      d.m_slaves[s] = ui.m_slaveInstances[s]; // implicit slave ordinal
+	  }
+	  for (unsigned n = 0; n < c.slaves->instances().size(); ++n)
+	    if (d.m_slaves[n] == SIZE_MAX) {
+	      ocpiInfo("%s due to missing explicit slave: %s", reject.c_str(),
+		       c.slaves->utilInstance(n).cname());
+	      return false;
 	    }
 	}
 	// process the slave assembly's connections (there will be none with explicit slaves)
