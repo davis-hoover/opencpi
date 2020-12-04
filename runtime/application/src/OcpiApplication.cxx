@@ -346,12 +346,12 @@ namespace OCPI {
     // position of proxies and slaves to be sure that proxies are either on the base
     // container or if not, all of its slaves are on the same system/launcher
     bool ApplicationI::
-    resolveSlaves() {
+    resolveExplicitSlaves() {
       Instance *i = &m_instances[0];
       for (unsigned n = 0; n < m_nInstances; ++n, ++i) {
 	const auto &impl = *i->m_deployment.m_impls[0];
 	const auto &w = impl.m_metadataImpl;
-	if (w.slaves().empty())
+	if (!w.slaveAssy())
 	  continue;
 	const auto &masterContainer = OC::Container::nthContainer(i->m_deployment.m_containers[0]);
 	const OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
@@ -473,7 +473,7 @@ namespace OCPI {
 #endif
     // Deal with slaves when deploying this instance.
     bool ApplicationI::
-    resolveInstanceSlaves(unsigned instNum, OL::Candidate &c, const std::string &/*reject*/) {
+    resolveInstanceSlaves(unsigned instNum, OL::Candidate &c, const std::string &reject) {
       ezxml_t slaves = c.impl->m_metadataImpl.slaveAssy();
       const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       if (slaves) {
@@ -490,7 +490,8 @@ namespace OCPI {
 	    auto &libInst = *c.slaves->instances()[n];
 	    auto &utilInst = *(OU::Assembly::Instance*)&libInst.m_utilInstance; // ugly un-const
 	    std::string old(utilInst.m_name);
-	    OU::format(utilInst.m_name, "%s.%s", ui.cname(), old.c_str()); // proxy inst name is prefix
+	    if (ui.m_slaveNames.empty()) // don't rename for explicit slaves
+	      OU::format(utilInst.m_name, "%s.%s", ui.cname(), old.c_str()); // proxy inst name is prefix
 	    utilInst.m_ordinal += m_nInstances;
 	    utilInst.m_master = instNum;
 	    utilInst.m_hasMaster = true;
@@ -506,6 +507,7 @@ namespace OCPI {
 		 instNum, &c);
 	// (temporarily) add the slave assembly's instances to the app
 	// but for compatibility, allow the app to specify existing slave instances
+	m_instances[instNum].m_deployment.m_slaves.resize(c.slaves->nInstances(), SIZE_MAX);
 	if (ui.m_slaveNames.empty()) { // backward compatibility - instances might be there
 	  // add instances to the library assembly
 	  m_assembly.instances().insert(m_assembly.instances().end(),
@@ -515,13 +517,31 @@ namespace OCPI {
 	  m_nInstances += c.slaves->nInstances();
 	  m_instances.resize(m_nInstances);
 	  Deployment &d = m_instances[instNum].m_deployment;
-	  d.m_slaves.resize(c.slaves->nInstances());
 	  for (size_t n = c.nInstances; n < m_nInstances; ++n) {
 	    m_instances[n].init(m_assembly, n, m_verbose, NULL);
 	    d.m_slaves[n - c.nInstances] = n;
 	  }
+	} else {
+	  Deployment &d = m_instances[instNum].m_deployment;
+	  if (ui.m_slaveNames.size() == 1 && ui.m_slaveNames[0] == NULL) {
+	    // The oldest legacey  method:  an app instance with a slave attribute, and no slavename
+	    d.m_slaves[0] = ui.m_slaveInstances[0];
+	  } else
+	    // The "multi-slave" legacy method with names and instances
+	    for (unsigned n = 0; n < c.slaves->instances().size(); ++n) {
+	      const char *slaveName = c.slaves->utilInstance(n).cname();
+	      for (unsigned s = 0; s < ui.m_slaveNames.size(); ++s)
+		if (!strcasecmp(ui.m_slaveNames[s], slaveName)) {
+		  d.m_slaves[n] = ui.m_slaveInstances[s];
+		  break;
+		}
+	      if (d.m_slaves[n] == SIZE_MAX) {
+		ocpiInfo("%s due to missing explicit slave: %s", reject.c_str(), slaveName);
+		return false;
+	      }
+	    }
 	}
-	// process the slave assembly's connections
+	// process the slave assembly's connections (there will be none with explicit slaves)
 	for (auto it = c.slaves->m_connections.begin(); it != c.slaves->m_connections.end(); ++it) {
 	  OU::Assembly::Connection &slaveConn = **it;
 	  if (slaveConn.m_externals.empty())
@@ -961,7 +981,7 @@ namespace OCPI {
           b = save;
         } else
           doInstance(instNum, score);
-      } else if (resolveSlaves()) {
+      } else if (resolveExplicitSlaves()) {
         dumpDeployment(score);
         if (score > m_bestScore) {
 	  // Capture the deployment, which might have a variable number of instances

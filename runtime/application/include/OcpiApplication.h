@@ -223,7 +223,7 @@ namespace OCPI {
       void finalizeProperties(const OCPI::Util::PValue *params);
       const char *finalizePortParam(const OCPI::Util::PValue *params, const char *pName);
       void finalizeExternals();
-      bool resolveSlaves();
+      bool resolveExplicitSlaves();
       bool bookingOk(Booking &b, OCPI::Library::Candidate &c, unsigned n);
       void policyMap(Deployment &d, unsigned instNum);
       void setPolicy(const OCPI::API::PValue *params);
