@@ -130,7 +130,8 @@
   <property name='rxfe_ict_mix'    type='uchar' writable='true' volatile='true'/>  <!--7A-->
   <property name='rxfe_ict_tia'    type='uchar' writable='true' volatile='true'/>  <!--7B-->
   <property name='rxfe_lobn_mix'   type='uchar' writable='true' volatile='true'/>  <!--7C-->
-  <property name='pad4'            type='uchar' padding='true'/>                   <!--7D-->
+  <!--property name='pad4'         type='uchar' padding='true'/-->
+  <property name='pad4'            type='uchar' writable='true' volatile='true'/>  <!--7D-->
   <property name='rxfe_spare0'     type='uchar' writable='true' volatile='true'/>  <!--7E-->
   <property name='rxfe_spare1'     type='uchar' writable='true' volatile='true'/>  <!--7F-->
 </properties>

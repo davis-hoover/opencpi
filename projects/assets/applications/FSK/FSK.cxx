@@ -47,7 +47,10 @@ public:
 
     // intelligently set the prompt-suggested default TX settings to values that
     // are expected to work well with current RX settings
-    ret.sample_rate_MHz = 39.936;
+    if (m_mode == "bbloopback")
+      ret.sample_rate_MHz = 20;
+    else
+      ret.sample_rate_MHz = 39.936;
     if(get_mode_requires_rx() && m_val_has_been_set["rx_sample_rate_MHz"]) {
       double tmp = m_app.getPropertyValue<double>("rx", "sample_rate_MHz");
       ret.sample_rate_MHz = tmp;
@@ -65,7 +68,10 @@ public:
     ret.rf_bw_MHz = -1.;
     ret.bb_bw_MHz = 5.;
     ret.bb_gain_dB = -4.;
-    ret.rf_gain_dB = 4.;
+    if (m_mode == "bbloopback")
+      ret.rf_gain_dB = 6.;
+    else
+      ret.rf_gain_dB = 4.; 
 
     return ret;
   }
@@ -76,6 +82,7 @@ public:
 
     // intelligently set the prompt-suggested default RX settings to values that
     // are expected to work well with current TX settings
+
     ret.sample_rate_MHz = 39.936;
     if(m_val_has_been_set["tx_sample_rate_MHz"]) {
       double tmp = m_app.getPropertyValue<double>("tx", "sample_rate_MHz");

@@ -1298,6 +1298,7 @@ emitSkelRCC() {
             "%s_START_INFO\n"
             "// Insert any static info assignments here (memSize, memSizes, portInfo)\n"
             "// e.g.: info.memSize = sizeof(MyMemoryStruct);\n"
+            "// YOU MUST LEAVE THE *START_INFO and *END_INFO macros here and uncommented in any case\n"
             "%s_END_INFO\n",
             upper, upper);
   }
@@ -1375,7 +1376,9 @@ addSlave(ezxml_t slave, const std::string &workerName, const std::string &slaveN
   wkr->m_proxyPort = port;
   if (hasIndex)
     wkr->m_proxyPortIndex = index;
-  m_slaves[slaveName] = wkr;
+  m_slaves.emplace_back(slaveName, wkr);
+  if (!m_slaveNames.insert(slaveName).second)
+    return OU::esprintf("Duplicate slave name: %s", slaveName.c_str());
   return err;
 }
 
@@ -1421,7 +1424,9 @@ addSlaves(ezxml_t a_slaves) {
     wkr.m_proxyPort = port;      // the proxy port
     if (hasIndex) // from connection
       wkr.m_proxyPortIndex = index;
-    m_slaves[i->m_name] = &wkr;
+    if (!m_slaveNames.insert(i->m_name).second)
+      return OU::esprintf("Duplicate slave name: %s", i->m_name.c_str());
+    m_slaves.emplace_back(i->m_name, &wkr);
   }
   return NULL;
 }
@@ -1483,7 +1488,7 @@ parseSlaves() {
       name = wkr.substr(0, dot);
       if (wkr_num_map[wkr] > 1)
 	OU::formatAdd(name, "_%u", idx - 1);
-      if (m_slaves.find(name) != m_slaves.end())
+      if (m_slaveNames.find(name) != m_slaveNames.end())
 	return OU::esprintf("Invalid slave name specified: %s", name.c_str());
     }
     if ((err = addSlave(slave, wkr, name)))

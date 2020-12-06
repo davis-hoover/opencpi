@@ -135,9 +135,10 @@ namespace OCPI {
     Worker(Artifact *art, ezxml_t impl, ezxml_t inst, const Workers &a_slaves, bool a_hasMaster,
 	   size_t a_member, size_t a_crewSize, const OA::PValue *)
       : OU::Worker::Worker(),
-	m_artifact(art), m_xml(impl), m_instXml(inst), m_workerMutex(true),
+        m_artifact(art), m_xml(impl), m_instXml(inst), m_workerMutex(true),
 	m_controlOpPending(false), m_slaves(a_slaves), m_hasMaster(a_hasMaster),
-        m_member(a_member), m_crewSize(a_crewSize), m_connectedPorts(0), m_optionalPorts(0) {
+        m_member(a_member), m_crewSize(a_crewSize), m_connectedPorts(0), m_optionalPorts(0),
+        m_outputPorts(0), m_inputPorts(0) {
       if (impl) {
 	const char *err = parse(impl);
 	if (err)
@@ -147,9 +148,11 @@ namespace OCPI {
       }
       if (inst)
 	m_instTag = ezxml_cattr(inst, "name");
-      for (unsigned n = 0; n < m_nPorts; n++)
+      for (unsigned n = 0; n < m_nPorts; n++) {
 	if (metaPort(n).m_isOptional)
 	  m_optionalPorts |= 1u << n;
+	(metaPort(n).m_isProducer ? m_outputPorts : m_inputPorts) |= 1u << n;
+      }
     }
 
     Worker::~Worker()
@@ -815,12 +818,12 @@ namespace OCPI {
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store)		\
     run Worker::							\
     get##pretty##PropertyOrd(unsigned ordinal, unsigned idx) const {	\
-      auto pi = checkInfo(ordinal);					\
+      auto &pi = checkInfo(ordinal);					\
       return get##pretty##Property(pi, pi, (size_t)0, idx);		\
     }									\
     void Worker::							\
     set##pretty##PropertyOrd(unsigned ordinal, run val, unsigned idx) const { \
-      auto pi = checkInfo(ordinal);					\
+      auto &pi = checkInfo(ordinal);					\
       set##pretty##Property(pi, pi, 0, val, idx);			\
     }									\
     run Worker::							\

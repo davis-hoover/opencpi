@@ -212,6 +212,29 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   workerEmitter << YAML::EndSeq; // stop option_labels_seq
   workerEmitter << YAML::EndMap; // stop container_map
 
+  workerEmitter << YAML::BeginMap;
+  workerEmitter << YAML::Key << "id"     << YAML::Value << "done";
+  workerEmitter << YAML::Key << "label"   << YAML::Value << "OpenCPI Done";
+  workerEmitter << YAML::Key << "dtype"   << YAML::Value << "bool";
+  workerEmitter << YAML::Key << "options" << YAML::Value << YAML::BeginSeq << "False" << "True" << YAML::EndSeq;
+  workerEmitter << YAML::EndMap;
+
+  workerEmitter << YAML::BeginMap;
+  workerEmitter << YAML::Key << "id"    << YAML::Value << "worker";
+  workerEmitter << YAML::Key << "label" << YAML::Value << "OpenCPI Worker";
+  workerEmitter << YAML::Key << "default" << YAML::Value << "";
+  workerEmitter << YAML::Key << "dtype" << YAML::Value << "string";
+  workerEmitter << YAML::Key << "hide"  << YAML::Value << "part";
+  workerEmitter << YAML::EndMap;
+
+  workerEmitter << YAML::BeginMap;
+  workerEmitter << YAML::Key << "id"     << YAML::Value << "model";
+  workerEmitter << YAML::Key << "label"   << YAML::Value << "OpenCPI Model";
+  workerEmitter << YAML::Key << "dtype"   << YAML::Value << "string";
+  workerEmitter << YAML::Key << "options" << YAML::Value << YAML::BeginSeq << "auto" << "RCC" << "HDL" << "OCL" << YAML::EndSeq;
+  workerEmitter << YAML::EndMap;
+
+#if 0
   // Add slave section in parameters if needed
   if (!w.slaves().empty()) {
     workerEmitter << YAML::BeginMap; // start slave_map
@@ -223,7 +246,8 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
     workerEmitter << YAML::Key << "required" << YAML::Value << "True"; // Not in the GRC YAML Standard?
     workerEmitter << YAML::EndMap; // end slave_map
   }
-
+#endif
+  
   // Add component specific properties in parameters
   uint32_t np = 0;
   OU::Property* p = w.properties(np);
@@ -726,11 +750,19 @@ void OcpigrObj::genContainerBlock(void) {
   
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "id"    << YAML::Value << "type";
-    emitter << YAML::Key << "label" << YAML::Value << "ocpi_spec";
+    emitter << YAML::Key << "label" << YAML::Value << "ocpi_slec";
     emitter << YAML::Key << "dtype" << YAML::Value << "string";
     emitter << YAML::Key << "hide"  << YAML::Value << "all";
     emitter << YAML::EndMap;
 
+    emitter << YAML::BeginMap;
+    emitter << YAML::Key << "id"      << YAML::Value << "container";
+    emitter << YAML::Key << "label"   << YAML::Value << "value";
+    emitter << YAML::Key << "dtype"   << YAML::Value << "string";
+    emitter << YAML::Key << "default" << YAML::Value << "${value}";
+    emitter << YAML::Key << "hide"    << YAML::Value << "all";
+    emitter << YAML::EndMap;
+    
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "id"    << YAML::Value << "value";
     emitter << YAML::Key << "label" << YAML::Value << "Platform";
@@ -744,15 +776,6 @@ void OcpigrObj::genContainerBlock(void) {
     }
     emitter << YAML::EndSeq;
     emitter << YAML::EndMap;
-    
-    emitter << YAML::BeginMap;
-    emitter << YAML::Key << "id"      << YAML::Value << "container";
-    emitter << YAML::Key << "label"   << YAML::Value << "value";
-    emitter << YAML::Key << "dtype"   << YAML::Value << "string";
-    emitter << YAML::Key << "default" << YAML::Value << "${value}";
-    emitter << YAML::Key << "hide"    << YAML::Value << "all";
-    emitter << YAML::EndMap;
-    
   emitter << YAML::EndSeq; // End Sequence
 
   // Add file_format at the end of the yaml file

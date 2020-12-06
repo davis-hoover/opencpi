@@ -105,7 +105,7 @@ protected:
     m_properties.status.resize(nConfigs);
     for (size_t n = 0; n < nConfigs; ++n) {
       for (size_t nch = 0; nch < m_properties.configurations.data[n].channels.size(); ++nch) {
-	printf("STATUS READ config %zu, channel %zu\n", n, nch);
+	//	printf("STATUS READ config %zu, channel %zu\n", n, nch);
       }
     }
     return RCC_OK;

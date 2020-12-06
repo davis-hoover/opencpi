@@ -112,6 +112,7 @@ namespace OCPI {
     };
 #endif
 
+#if 0
     class Slave {
     public:
       const char *m_name, *m_worker, *m_slavePort; // pointing into XML
@@ -121,8 +122,10 @@ namespace OCPI {
       Slave(const char *worker);
       Slave(Worker &w, ezxml_t xml, unsigned ordinal, const char *&err);
     };
+#endif
     // This class represents what we know, generically, about a component implementation
     // Currently there is no separate "spec" metadata - it is redundant in each implementation
+    class Assembly;
     class Worker : public IdentResolver {
       friend class Port;
     protected:
@@ -133,7 +136,6 @@ namespace OCPI {
 	m_package;
     public:
     protected:
-      std::vector<Slave> m_slaves;
       Attributes *m_attributes; // not a reference due to these being in arrays
       Port *m_ports;
       Memory *m_memories;
@@ -143,7 +145,7 @@ namespace OCPI {
       bool     m_workerEOF; // this worker handles all input EOFs by itself.  No auto-propagation
     private: // FIXME: make more of this stuff private
       size_t m_totalPropertySize;
-      bool   m_isSource; // is this worker a source of data (no inputs)
+      // bool   m_isSource; // is this worker a source of data (no inputs)
       bool   m_isDebug;  // is this worker in debug mode?
     public:
       unsigned m_nProperties;
@@ -151,6 +153,10 @@ namespace OCPI {
       Property *m_firstRaw;
       ezxml_t m_xml;
       unsigned m_ordinal; // ordinal within artifact
+    private:
+      ezxml_t m_slaveAssembly; // assembly of slaves for this (proxy) worker
+      // std::vector<Slave> m_slaves;
+    public:
       // Scalability
       std::string m_validScaling; // Expression for error checking overall scaling
       Port::Scaling m_scaling;
@@ -163,9 +169,9 @@ namespace OCPI {
       inline const std::string &specName() const { return m_specName; }
       //      inline const std::string &name() const { return m_name; }
       inline const char *cname() const { return m_name.c_str(); }
-      inline const std::vector<Slave> &slaves() const { return m_slaves; }
+      //      inline const std::vector<Slave> &slaves() const { return m_slaves; }
       inline const Attributes &attributes() const { return *m_attributes; }
-      inline bool isSource() const { return m_isSource; }
+      // inline bool isSource() const { return m_isSource; }
       inline bool isDebug() const { return m_isDebug; }
       const char *parse(ezxml_t xml, Attributes *attr = NULL);
       virtual const char
@@ -217,6 +223,7 @@ namespace OCPI {
         return m_totalPropertySize;
       }
       const char *finalizeProperties(size_t &offset, uint64_t &totalSize , const IdentResolver *resolver);
+      ezxml_t slaveAssy() const { return m_slaveAssembly; } // just return the XML for the slaves
       enum ControlOperation {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)  Op##c,
 	OCPI_CONTROL_OPS

@@ -37,9 +37,9 @@ namespace OCPI {
     namespace OE = OCPI::Util::EzXml;
     Worker::Worker()
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
-	m_version(0), m_workerEOF(false), m_totalPropertySize(0), m_isSource(false),
+	m_version(0), m_workerEOF(false), m_totalPropertySize(0),// m_isSource(false),
 	m_isDebug(false), m_nProperties(0), m_properties(NULL), m_firstRaw(NULL), m_xml(NULL),
-        m_ordinal(0) {
+        m_ordinal(0), m_slaveAssembly(NULL) {
     }
 
     Worker::~Worker() {
@@ -100,7 +100,6 @@ namespace OCPI {
        (void)testId;
        ocpiAssert(0); return *m_tests;
     }
-#endif
     Slave::
     Slave(const char *worker)
       : m_name(worker), m_worker(worker), m_slavePort(NULL), m_delegated(NULL),
@@ -121,6 +120,8 @@ namespace OCPI {
 	  err = esprintf("delegated port \"%s\" for slave \"%s\" not found", port, m_name);
       }
     }
+#endif
+
     const char *Worker::
     parse(ezxml_t xml, Attributes *attr) {
       m_xml = xml;
@@ -189,6 +190,11 @@ namespace OCPI {
       for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
 	if ((err = p->postParse()))
           return esprintf("Invalid xml port description(3): %s", err);
+#if 1
+      if (ezxml_cattr(xml, "slave") ||
+	  ezxml_cchild(xml, "slave"))
+	return esprintf("for worker %s, obsolete slave indications in artifact XML",  cname());
+#else
       // Slaves must be parsed after ports
       const char *slave = ezxml_cattr(xml, "slave");
       if (slave) {
@@ -201,6 +207,7 @@ namespace OCPI {
 	  if (err)
 	    return err;
 	}
+      // Note we do *not* parse the slave assembly until asked.
       // The m_isSource determination must happen after slave processing
       p = m_ports;
       bool hasInput = false, hasOutput = false;
@@ -213,6 +220,7 @@ namespace OCPI {
 	    hasOutput = true;
 	}
       m_isSource = hasOutput && !hasInput;
+#endif
       Memory* m = m_memories;
       for (x = ezxml_cchild(xml, "memory"); x; x = ezxml_cnext(x), m++ )
         if ((err = m->parse(x)))
@@ -228,6 +236,7 @@ namespace OCPI {
 	else
 	  m_scalingParameters[l_name] = s;
       }
+      m_slaveAssembly = ezxml_cchild(xml, "slaves");
       return NULL;
     }
     // Get a property value from the metadata

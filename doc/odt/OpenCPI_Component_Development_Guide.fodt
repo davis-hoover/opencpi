@@ -10170,9 +10170,9 @@
    <text:change-start text:change-id="ct105553193608576"/>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="shared/release.fodt"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
    </text:section>
-   <text:p text:style-name="P924"><text:change-end text:change-id="ct105553193608576"/><text:change-start text:change-id="ct105553193665712"/>OpenCPI Release: develop</text:p>
+   <text:p text:style-name="P924"><text:change-end text:change-id="ct105553193608576"/><text:change-start text:change-id="ct105553193665712"/>OpenCPI Release:  develop</text:p>
    <text:p text:style-name="P928"><text:change-end text:change-id="ct105553193665712"/><text:span text:style-name="T85">Revision History</text:span></text:p>
    <table:table table:name="Table1" table:style-name="Table1">
     <table:table-column table:style-name="Table1.A"/>
