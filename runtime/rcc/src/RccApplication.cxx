@@ -22,8 +22,8 @@
  * Abstract:
  *   Container application context class.
  *
- * Revision History: 
- * 
+ * Revision History:
+ *
  *    Author: John F. Miller
  *    Date: 3/2005
  *    Revision Detail: Created
@@ -79,7 +79,7 @@ getDispatch(const char *implName) {
     OU::formatAdd(error, "%s \"%s\"", et == m_entryTable ? "" : ",", et->name);
   error += ")";
   throw OU::Error(error);
-}      
+}
 
 Artifact::
 ~Artifact()
@@ -89,19 +89,9 @@ Artifact::
   m_open = false;
 }
 
-#if 0
-bool 
-Artifact::
-hasUrl(const char *url)
-{ 
-  ( void ) url;
-  return myUrl ? true : false;
-}
-#endif
-
 /**********************************
  * Constructor
- *********************************/  
+ *********************************/
 Application::
 Application(Container &c, const char *a_name, const OU::PValue *props)
   : OC::ApplicationBase<Container,Application,Worker>(c, *this, a_name, props)
@@ -111,7 +101,7 @@ Application(Container &c, const char *a_name, const OU::PValue *props)
 
 /**********************************
  * Destructors
- *********************************/  
+ *********************************/
 Application::
 ~Application()
 {

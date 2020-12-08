@@ -140,8 +140,6 @@ class Assembly {
   Assembly(Worker &w);
   virtual ~Assembly();
   Worker       &m_assyWorker;
-  //  bool          m_isContainer; // FIXME: use class hierarchy to inherit
-  //  bool          m_isPlatform;  // FIXME: use class hierarchy to inherit
   Workers       m_workers;
   size_t        m_nWCIs;
   std::vector<Instance>m_instances;
@@ -151,7 +149,7 @@ class Assembly {
   InstanceProperties m_properties; // property values applied to the whole assembly
   size_t        m_nWti, m_nWmemi;
   const char
-    *parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs, bool noWorkerOk),
+    *parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs),
     *externalizePort(InstancePort &ip, const char *name, size_t *ordinal),
     *findPort(OU::Assembly::Port &ap, InstancePort *&found),
     // Add the assembly's parameters to the instance's parameter values list, as needed

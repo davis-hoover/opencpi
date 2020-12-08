@@ -31,7 +31,7 @@
 #define RCC_IMPL_ATTRS \
   GENERIC_IMPL_CONTROL_ATTRS, RCC_TOP_ATTRS, IMPL_ATTRS, \
     "ExternMethods", "StaticMethods", "Threaded", "StaticPrereqLibs", "DynamicPrereqLibs", "Slave"
-#define RCC_IMPL_ELEMS IMPL_ELEMS
+#define RCC_IMPL_ELEMS IMPL_ELEMS, "slaves"
 
 class RccPort : public DataPort {
 public:

@@ -321,6 +321,7 @@ static void doWorker(OU::Worker &w) {
   OX::addChild(_px, "type", 2, "string");
   OX::addChild(_px, "hide", 2, "part");
 
+#if 0
   if (!w.slaves().empty()) {
     _px = OX::addChild(root, "param", 1);
     OX::addChild(_px, "name", 2, "Slave");
@@ -330,7 +331,7 @@ static void doWorker(OU::Worker &w) {
     OX::addChild(_px, "hide", 2, "none");
     OX::addChild(_px, "required", 2, "True");
   }
-
+#endif
 
   // Add all of the properties specific to a particular worker
   std::map<std::string, std::set<OU::Property *>>::const_iterator wsp = workerSpecificProperties[w.specName()].begin();
