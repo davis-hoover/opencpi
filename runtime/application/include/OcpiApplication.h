@@ -30,7 +30,6 @@
 
 #include <string>
 #include <map>
-#include <forward_list>
 #include "OcpiUtilMisc.h"
 #include "OcpiLibraryAssembly.h"
 #include "ContainerManager.h"
@@ -50,7 +49,7 @@ namespace OCPI {
   }
   namespace API {
 
-    class ApplicationI : public OCPI::Container::Callback {
+    class ApplicationI {
       typedef OCPI::Container::Container::CMap CMap;
       ezxml_t m_deployXml;
       ezxml_t m_appXml;
@@ -60,27 +59,33 @@ namespace OCPI {
       size_t m_nInstances;
       struct Deployment {
 	size_t m_scale;                                // scale of this deployment
-	unsigned m_container;                          // when scale==1, the chosen one
-	const OCPI::Library::Implementation *m_impl;   // implementation on each container
-	unsigned *m_containers;                        // containers used by this deployment
-	const OCPI::Library::Implementation **m_impls; // implementation on each container
+	std::vector<unsigned> m_containers;            // containers used by this deployment
+	std::vector<const OCPI::Library::Implementation *> m_impls; // implementation on each container
 	CMap m_feasible;
-	std::vector<unsigned> m_slaves; // the instance ordinals of the slaves for a proxy instance
+	bool m_hasMaster;                       // convenience
+	std::string m_name;                     // convenience
+	const OCPI::Util::Assembly::Properties *m_properties; // convenience
+	std::vector<size_t> m_slaves;           // the instance ordinals of explicit slaves
+	// These members are used *after* deployment planning
+	size_t m_firstMember;                   // index of first member in launch members
+	OCPI::Container::Launcher::Crew m_crew;	// launcher info for this instance;
+	std::vector<unsigned> m_usedContainers; // container for each crew member
+
 	Deployment();
 	~Deployment();
 	Deployment &operator=(const Deployment &d);
-	void set(size_t scale, unsigned *containers,
-		 const OCPI::Library::Implementation **impls, CMap map);
+	void set(const std::string &name, size_t scale, const unsigned *containers,
+		 const OCPI::Library::Implementation * const *impls, CMap map, bool hasMaster,
+		 const OCPI::Library::Assembly::Properties * );
       };
       // This structure is used during deployment planning.
-      struct Instance {
+      struct Instance : public OCPI::Container::Callback {
 	Deployment m_deployment;      // Current deployment when generating all of them
-	Deployment m_bestDeployment;
-	CMap *m_feasibleContainers;   // map per candidate, from findContainers
-	size_t m_nCandidates;         // convenience
+	//	Deployment m_bestDeployment;
+	std::vector<CMap> m_feasibleContainers;
 	const char *m_containerName;  // used to avoid touching the container
 	// The launcher info for this application instance;
-	OCPI::Container::Launcher::Crew m_crew;
+	//OCPI::Container::Launcher::Crew m_crew;
 	// Support for collecting candidate together that have the same actual implementation
 	// code even though they may be compiled for different targets.
 	// map is from the qualified impl name to a list of candidate indices.
@@ -91,24 +96,26 @@ namespace OCPI {
 	typedef ScalableCandidates::iterator ScalableCandidatesIter;
 	ScalableCandidates m_scalableCandidates;
 	// This array is of indices in the usedcontainer array, not global indices
-	unsigned m_usedContainer;       // when scale==1 this is it
-	unsigned *m_usedContainers;     // container for each crew member
-	size_t m_firstMember;           // index of first member in launch members
-	// Temporary port delegations
-	typedef std::forward_list<std::pair<OU::Assembly::Port*,OU::Assembly::Port>> PortFixups;
-	PortFixups m_portFixups;
-	void collectCandidate(OCPI::Library::Candidate &c, unsigned n);
-	void finalizePortParam(OCPI::Util::Assembly::Instance &ui, const OCPI::Util::PValue *params,
-			       const char *param);
+	// std::vector<unsigned> m_usedContainers; // container for each crew member
+	//	size_t m_firstMember;           // index of first member in launch members
+	CMap m_curMap;                  // temp indicating possible containers for a candidate
+	//	unsigned m_curContainers;       // temp that counts containers for a candidate
 	Instance();
 	~Instance();
+        const char *init(const OCPI::Library::Assembly &assy, size_t n, bool verbose,
+			 const PValue *params);
+	void collectCandidate(const OCPI::Library::Candidate &c, unsigned n);
+	void finalizePortParam(OCPI::Util::Assembly::Instance &ui, const OCPI::Util::PValue *params,
+			       const char *param);
+	bool foundContainer(OCPI::Container::Container &i);
       };
       struct Booking {
 	OCPI::Library::Artifact *m_artifact;
 	CMap m_usedImpls;         // which fixed implementations in the artifact are in use
 	Booking() : m_artifact(NULL), m_usedImpls(0) {}
       };
-      Instance *m_instances;
+      std::vector<Instance> m_instances;
+      std::vector<Deployment> m_bestDeployments;
       // The instance objects for the launcher
       OCPI::Container::Launcher::Members m_launchMembers;
       OCPI::Container::Launcher::Connections m_launchConnections;
@@ -132,8 +139,6 @@ namespace OCPI {
       typedef std::multimap<OCPI::Util::Assembly::Delay, DelayedPropertyValue> DelayedPropertyValues;
       DelayedPropertyValues    m_delayedPropertyValues;
       size_t m_nProperties;
-      CMap m_curMap;              // A temporary indicating possible containers for a candidate
-      unsigned m_curContainers;   // A temporary that counts containers for a candidate
       CMap m_allMap;              // A map of all containers chosen/used
       unsigned *m_global2used;         // A map from global ordinals to our "used" orinals
       unsigned m_nContainers;     // how many containers have been used
@@ -158,7 +163,6 @@ namespace OCPI {
       typedef Externals::iterator ExternalsIter;
       Externals m_externals;
       std::vector<External *> m_externalsOrdered; // to support ordinal-based navigation
-      Instance *m_doneInstance;
       enum CMapPolicy {
 	RoundRobin,
 	MinProcessors,
@@ -168,7 +172,8 @@ namespace OCPI {
       unsigned   m_processors;
       unsigned m_currConn;
       unsigned m_bestScore;
-      OCPI::Util::Assembly::Connections m_bestConnections;
+      // This list is a copy of the connections active for the deployment
+      std::list<OCPI::Util::Assembly::Connection> m_bestConnections;
       bool m_hex;
       bool m_hidden;
       bool m_uncached;
@@ -211,15 +216,16 @@ namespace OCPI {
       bool maybeDelegateToSlavePort(unsigned instNum, const OCPI::Library::Implementation &slaveImpl,
 				    const OCPI::Util::Port &port,
 				    OCPI::Util::Assembly::Port *&otherAssyPort);
-      bool resolveInstanceSlaves(unsigned instNum, const OCPI::Library::Candidate &c,
+      bool resolveInstanceSlaves(unsigned instNum, OCPI::Library::Candidate &c,
 				 const std::string &reject);
+      void restoreSlaves(OCPI::Library::Candidate &c);
       bool connectionsOk(OCPI::Library::Candidate &c, unsigned instNum);
       void finalizeProperties(const OCPI::Util::PValue *params);
       const char *finalizePortParam(const OCPI::Util::PValue *params, const char *pName);
       void finalizeExternals();
-      bool resolveSlaves();
+      bool resolveExplicitSlaves();
       bool bookingOk(Booking &b, OCPI::Library::Candidate &c, unsigned n);
-      void policyMap( Instance * i, CMap & bestMap);
+      void policyMap(Deployment &d, unsigned instNum);
       void setPolicy(const OCPI::API::PValue *params);
       Property &findProperty(const char * worker_inst_name, const char * prop_name = NULL) const;
       void dumpDeployment(unsigned score);
@@ -246,7 +252,6 @@ namespace OCPI {
       ~ApplicationI();
       OCPI::Library::Assembly &assembly() { return m_assembly; }
       const std::string &name() const { return m_assembly.name(); }
-      bool foundContainer(OCPI::Container::Container &i);
       void initialize();
       void startMasterSlave(bool isMaster, bool isSlave, bool isSource);
       void start();

@@ -67,11 +67,12 @@ extern const char
   *getPlatforms(const char *attr, StringSet &targets, Model m, bool onlyValidPlatformsPlatforms = true),
   *getTargets(const char *attr, OrderedStringSet &targets, Model m),
   *closeDep(),
-  // Optional allows the element type might not match
+  // Optional allows the element type to not match and not have an error
   // NonExistentOK allows the file to not exist at all.
+  // the xfile output argument is set if the file is found *even if XML parsing subsequently fails.
   *parseFile(const char *file, const std::string &parent, const char *element,
 	     ezxml_t *xp, std::string &xfile, bool optional = false, bool search = true,
-	     bool nonExistentOK = false),
+	     bool nonExistentOK = false, bool (*skipFile)(const char *, void *arg) = NULL, void *arg = NULL),
   *openOutput(const char *name, const char *outDir, const char *prefix, const char *suffix,
 	      const char *ext, const char *other, FILE *&f, std::string *path = NULL);
 #endif

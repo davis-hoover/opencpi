@@ -234,6 +234,7 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   workerEmitter << YAML::Key << "options" << YAML::Value << YAML::BeginSeq << "auto" << "RCC" << "HDL" << "OCL" << YAML::EndSeq;
   workerEmitter << YAML::EndMap;
 
+#if 0
   // Add slave section in parameters if needed
   if (!w.slaves().empty()) {
     workerEmitter << YAML::BeginMap; // start slave_map
@@ -245,7 +246,8 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
     workerEmitter << YAML::Key << "required" << YAML::Value << "True"; // Not in the GRC YAML Standard?
     workerEmitter << YAML::EndMap; // end slave_map
   }
-
+#endif
+  
   // Add component specific properties in parameters
   uint32_t np = 0;
   OU::Property* p = w.properties(np);

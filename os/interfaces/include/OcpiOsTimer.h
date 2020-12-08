@@ -73,7 +73,8 @@
 #include <chrono>
 #define OCPI_USE_CHRONO
 #else
-#warning Could not use C++11 library for timers - using OCPI_GETTIME_CLOCK_TYPE
+// This warning does more harm than good....
+//#warning Could not use C++11 library for timers - using OCPI_GETTIME_CLOCK_TYPE
 #endif
 #endif
 
