@@ -23,6 +23,7 @@
 #include "ocpigr.h" // ocpigr class
 
 // System headers
+#include <stdio.h>
 #include <algorithm> // assign() replace()
 #include <cctype>    // toupper
 #include <complex>   // abs()
@@ -200,6 +201,8 @@ void OcpigrObj::genWorkerBlocks(OU::Worker &w) {
   workerEmitter << YAML::BeginSeq; // start options_seq
   workerEmitter << "auto";
   for(StringSetIter it = platforms.begin(); it != platforms.end(); ++it) {
+    printf("HELLOOOOOOOOOOOOOOOOOOOOO");
+    printf("Platform: %s\n", it->c_str());
     workerEmitter << it->c_str();
   }
   workerEmitter << YAML::EndSeq; // stop options_seq
