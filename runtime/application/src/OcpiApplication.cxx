@@ -552,7 +552,7 @@ namespace OCPI {
 	    // Find any app connection to that proxy port.
 	    assert(slaveConn.m_ports.size() == 1 && slaveConn.m_externals.size() == 1);
 	    const OU::Port &masterPort =
-	      *c.impl->m_metadataImpl.findMetaPort(slaveConn.m_externals.front().m_name);
+	      *c.impl->m_metadataImpl.findMetaPort(slaveConn.m_externals.front().first->m_name);
 	    // Find the app connection port for the master's delegated port
 	    OU::Assembly::Port *assyPort = m_assembly.assyPort(instNum, masterPort.m_ordinal);
 	    if (assyPort) { // proxy port is connected to something, delegate it
@@ -766,7 +766,7 @@ namespace OCPI {
         for (auto ci = m_assembly.m_connections.begin(); ci != m_assembly.m_connections.end(); ++ci) {
           const OU::Assembly::Connection &c = **ci;
           if (c.m_externals.size()) {
-            const OU::Assembly::External &e = c.m_externals.front();
+            const OU::Assembly::External &e = *c.m_externals.front().first;
             if (e.m_name.length() == len && !strncasecmp(assign, e.m_name.c_str(), len)) {
               assign = NULL;
               break;
@@ -907,7 +907,7 @@ namespace OCPI {
       // External ports that are not connected explicitly to anything need to be associated
       // with the base container in this process, so we make sure we are using it.
       for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
-        if ((*ci).m_externals.size() && (*ci).m_externals.front().m_url.empty())
+        if ((*ci).m_externals.size() && (*ci).m_externals.front().first->m_url.empty())
           getUsedContainer(OC::Container::baseContainer().ordinal());
     }
 
@@ -1609,7 +1609,7 @@ namespace OCPI {
         OU::Assembly::External *e = NULL;
         const OU::PValue *eParams = NULL;
         if ((*ci).m_externals.size()) {
-          e = &(*ci).m_externals.front();
+          e = (*ci).m_externals.front().first;
           eParams = e->m_parameters;
           if (pIn)
             pOut = pIn;

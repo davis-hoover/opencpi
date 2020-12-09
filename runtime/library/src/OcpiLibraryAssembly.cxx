@@ -93,7 +93,7 @@ namespace OCPI {
 	for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
 	  const OU::Assembly::Connection &c = **ci;
 	  if (c.m_externals.size() &&
-	      !strcasecmp(pname.c_str(), c.m_externals.front().m_name.c_str())) {
+	      !strcasecmp(pname.c_str(), c.m_externals.front().first->m_name.c_str())) {
 	    ap = &c.m_ports.front();
 	    instn = ap->m_instance;
 	    assert(ap->m_name.size());

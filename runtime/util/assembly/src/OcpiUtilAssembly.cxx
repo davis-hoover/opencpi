@@ -160,17 +160,18 @@ namespace OCPI {
       for (ezxml_t px = ezxml_cchild(ax, "property"); px; px = ezxml_cnext(px), p++)
         if ((err = p->parse(px, *this, params)))
           return err;
+      // Add top level externals that simply define single port external connections
+      // name defaults from port.  Externals go before connections since they might
+      // define an external that is used by a connection
+      for (ezxml_t ex = ezxml_cchild(ax, "External"); ex; ex = ezxml_cnext(ex))
+        if ((err = parseExternal(ex, NULL, NULL, params)))
+          return err;
       n = 0;
       for (ezxml_t cx = ezxml_cchild(ax, "Connection"); cx; cx = ezxml_cnext(cx)) {
-        m_connections.push_back(new Connection);
+        m_connections.emplace_back();
         if ((err = m_connections.back()->parse(cx, *this, n, params)))
           return err;
       }
-      // Add top level externals that simply define single port external connections
-      // name defaults from port.
-      for (ezxml_t ex = ezxml_cchild(ax, "External"); ex; ex = ezxml_cnext(ex))
-        if ((err = addExternalConnection(ex, params)))
-          return err;
       n = 0;
       for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix), n++)
         if ((err = m_instances[n]->parseConnection(ix, *this, params)))
@@ -261,7 +262,7 @@ namespace OCPI {
     }
 
     const char *Assembly::
-    addConnection(const char *a_name, ezxml_t x, Connection *&c) {
+    addConnection(const char *a_name, ezxml_t x, size_t count, Connection *&c) {
       for (auto ci = m_connections.begin(); ci != m_connections.end(); ci++)
         if (!strcasecmp((*ci)->m_name.c_str(), a_name))
           return esprintf("Duplicate connection named '%s' in assembly", a_name);
@@ -273,6 +274,7 @@ namespace OCPI {
       m_connections.push_back(tmp);
       c = m_connections.back();
       c->m_name = a_name;
+      c->m_count = count;
       return NULL;
     }
     const char *Assembly::
@@ -282,7 +284,7 @@ namespace OCPI {
       Connection *c;
       Port *toP, *fromP;
       const char *err;
-      if ((err = addConnection(l_name.c_str(), ix, c)) ||
+      if ((err = addConnection(l_name.c_str(), ix, 0, c)) ||
           (err = c->addPort(*this, to, toPort, true, false, true, 0, params, toP)) ||
           (err = c->addPort(*this, from, fromPort, false, false, true, 0, params, fromP)))
         return err;
@@ -294,32 +296,45 @@ namespace OCPI {
     // as an attribute of an instance (saying this port should be externalized with its
     // own name), or with the other short cut: a top level "external" that just describes
     // the instance, port and other options.
+    // It is also called from upper layers when ports are externalized (and port direction is known)
+    // Hence the isInput, bidi, known optional arguments
     const char *Assembly::
     addExternalConnection(ezxml_t x, size_t a_instance, const char *port, const PValue *params,
                           bool isInput, bool bidi, bool known) {
-      Connection *c;
       const char *err;
-      if ((err = addConnection(port, x, c)))
-        return err;
-      External &e = c->addExternal();
-      e.init(port);
+      Connection *c;
+      External *e;
+      if ((err = addConnection(port, x, 0, c)) ||
+	  (err = addExternal(port, NULL, NULL, 0, e)))
+	return err;
       Port *p;
       return c->addPort(*this, a_instance, port, isInput, bidi, known, 0, params, p);
     }
 
+#if 0
+    // This is called for a top-level external element.
+    // Either to specify a connection to an external port or to simply establish an external port
+    // (perhaps with a count).
+    // The latter case can be used when you need to specify an external port with a count, and then
+    // have multiple connections to it.
     const char *Assembly::
-    addExternalConnection(ezxml_t a_xml, const PValue *params) {
+    addExternalPort(ezxml_t a_xml, const PValue *params) {
       const char *err;
       // What is the name for this connection?
       std::string l_name, port;
       // We preparse some attributes of the external to get the connection name
-      OE::getOptionalString(a_xml, l_name, "name");
-      if ((err = OE::getRequiredString(a_xml, port, "port", "external")))
-        return err;
+      OE::getOptionalString(a_xml, l_name, "port");     // not used if just defining the external port
+      OE::getOptionalString(a_xml, l_name, "instance"); // ditto
+      OE::getOptionalString(a_xml, l_name, "name");     // only optional if url is set
+      size_t count, index;
+      if ((err = OE::getNumber(a_xml, "count", &count)) ||
+	  (err = OE::getNumber(a_xml, "externalCount", &m_count)) ||
+	  (err = OE::getNumber(a_xml, "index", &inded)))
+	return err;
       if (l_name.empty())
         l_name = port;
       Connection *c;
-      if ((err = addConnection(l_name.c_str(), a_xml, c)))
+      if ((err = addConnection(l_name.c_str(), a_xml, count, c)))
         return err;
       External &e = c->addExternal();
       unsigned dummy = 0;
@@ -340,6 +355,17 @@ namespace OCPI {
         c->m_count = e.m_count;
       return NULL;
     }
+#endif
+    const char *Assembly::
+    addExternal(const char *name, const char *role, const char *url, size_t count, External *&a_ext) {
+      External &e = m_externals.emplace(name, name).first->second;
+      if (url)
+	e.m_url = url;
+      e.m_count = count;
+      a_ext = &e;
+      return e.init(name, role);
+    }
+
     // Note that this may be called both from an application/mapped property as well as an
     // instance property - we essentially merge the info from both, checking for inconsistencies
     const char *Assembly::Property::
@@ -750,22 +776,12 @@ namespace OCPI {
       if ((err = m_parameters.parse(cx, "name", "external", "count", NULL)))
         return err;
 
-      // This creates an external port of a connection defaulting
-      // the name from the connection, and the role from this attribute
-      const char *ext = ezxml_cattr(cx, "external");
-      if (ext) {
-        External &e = addExternal();
-        // default the external's name from the connection's name
-        if ((err = e.init(m_name.c_str(), ext)))
-          return err;
-      }
-      unsigned nExt = 0; // for name ordinals when unnamed
-      for (ezxml_t x = ezxml_cchild(cx, "external"); x; x = ezxml_cnext(x), nExt++) {
-        External tmp;
-        m_externals.push_back(tmp);
-        if ((err = m_externals.back().parse(x, "ext%u", nExt, m_parameters)))
-          return err;
-      }
+      const char *role = ezxml_cattr(cx, "external");
+      ezxml_t ext = ezxml_cchild(cx, "external");
+      if (ext && role)
+	return esprintf("A connection cannot both an external attribute and an external child element");
+      if ((role || ext) && (err = a.parseExternal(ext, this, role, params)))
+	return err;
       if (OE::countChildren(cx, "port") < 1)
         return "no ports found under connection";
       Port *other = NULL;
@@ -798,6 +814,11 @@ namespace OCPI {
       return NULL;
     }
 
+    void Assembly::Connection::
+    addExternal(External &e, size_t index) {
+      m_externals.emplace_back(&e, index);
+    }
+
     const char *Assembly::Port::
     init(Assembly &a, Connection &c, const char *name, size_t instance, bool isInput, bool bidir,
          bool isKnown, size_t index, const PValue */*params*/) {
@@ -824,11 +845,6 @@ namespace OCPI {
       return m_parameters.add(name, value, true);
     }
 
-    Assembly::External &Assembly::Connection::
-    addExternal() {
-      m_externals.resize(m_externals.size() + 1);
-      return m_externals.back();
-    }
     const char *Assembly::Port::
     parse(ezxml_t x, Assembly &a, Connection &c, const PValue *pvl, const PValue *params) {
       const char *err;
@@ -866,8 +882,7 @@ namespace OCPI {
     }
 
     Assembly::External::
-      External()
-      : m_index(0), m_count(0) {
+    External(const char *name) : m_name(name), m_count(0), m_connected(0) {
       m_role.m_knownRole = false;
       m_role.m_bidirectional = false;
       m_role.m_provider = false;
@@ -894,25 +909,106 @@ namespace OCPI {
       }
       return NULL;
     }
-    // There are two variants of "external", the one that is a child element
-    // of "connection", and the one that is top level as shorthand for a
-    // simple externalized instance port.
-    const char *Assembly::External::
-    parse(ezxml_t x, const char *defaultName, unsigned &n, const PValue *pvl) {
-      // First decide on the name
-      OE::getOptionalString(x, m_name, "name");
-      if (m_name.empty())
-        format(m_name, defaultName, n++);
-      OE::getOptionalString(x, m_url, "url");
-      std::string role;
-      OE::getOptionalString(x, role, "role");
-      // Parse all attributes except the explicit ones here.
+
+    // There are four variants of "external" elements: (convenience has its price)
+    // 1. the top-level that just defines the external:
+    //    attributes: name, maybe url, maybe role, maybe count
+    //    NOT: port, instance, or index
+    // 2. the top-level that references an external port and *also* provides a instance/port connection
+    //    attributes: maybe name (defaults to port), maybe url, port AND instance, maybe count
+    //    2a. if predefined:  NOT role, but maybe index
+    //        count *could* imply the count of the connection
+    //    2b. if not predefined:  maybe role, NOT index
+    //        cound *
+    // 3. a child element of "connection", referencing predefined external port
+    //    attributes: name, maybe url, maybe index
+    //    NOT: role, port, instance, count
+    // 4. a child element of "connection", introducing a new external port
+    //    attributes: maybe name, maybe url, maybe role
+    //    NOT: port, instance, count, index
+    const char *Assembly::
+    parseExternal(ezxml_t x, Connection *conn, const char *a_role, const PValue *pvl) {
+      const char
+	*name = ezxml_cattr(x, "name"),
+	*url = ezxml_cattr(x, "url"),
+	*port = ezxml_cattr(x, "port"),
+	*instance = ezxml_cattr(x, "instance"),
+	*role = a_role ? a_role : ezxml_cattr(x, "role");
+      size_t index, count;
+      bool hasIndex, hasCount;
       const char *err;
-      if ((err = OE::getNumber(x, "index", &m_index)) ||
-          (err = OE::getNumber(x, "count", &m_count)) ||
-          (err = init(NULL, role.empty() ? NULL : role.c_str())))
+      if ((err = OE::getNumber(x, "count", &count, &hasCount)) ||
+	  (err = OE::getNumber(x, "index", &index, &hasIndex)))
+	return err;
+      bool standalone = !conn && !port && !instance;
+      auto eit = name ? m_externals.find(name) : m_externals.end();
+      External *e = eit == m_externals.end() ? NULL : &eit->second;
+      std::string tmp;
+
+      if (standalone) {
+	// --------------------------------------------------------------------------------
+	// Case 1: we are defining an external port, but not connecting it to any internal port
+	if (!name)
+	  return esprintf("Missing \"name\" attribute in top-level \"external\" element without "
+			  "a port connection");
+	if (e)
+	  return esprintf("Duplicate external port named \"%s\"", name);
+	if (hasIndex)
+	  return esprintf("Index attribute not allowed in top-level \"external\" element without "
+			  "a port/instance connection");
+      } else if (!conn) {
+	// --------------------------------------------------------------------------------
+	// Case 2:  a top-level 'external' element that also makes a connection via port+instance
+	//          it may or may not be predefined
+	if (!port || !instance)
+	  return esprintf("An \"external\" element must have both \"port\" and \"instance\" "
+			  "attributes or neither");
+	if (!name) {
+	  name = port;
+	  eit = m_externals.find(name);
+	  e = eit == m_externals.end() ? NULL : &eit->second;
+	}
+	if (role)
+	  return esprintf("A top-level external element cannot have a \"role\" attribute");
+	if (e && hasCount && count != e->m_count)
+	  return esprintf("A top-level external element's \"count\" attribute (%zu) must match "
+			  "match the predefined count of the external port (%zu)",
+			  count, e->m_count);
+	unsigned instanceNum;
+	if ((err = getInstance(instance, instanceNum)))
+	  return err;
+	// Done with error checking of attributes
+	Port *dummy;
+	if ((err = addConnection(name, x, count, conn)) ||
+	    (err = conn->addPort(*this, instanceNum, port, false, false, false, index, pvl, dummy)))
+	  return err;
+      } else if (port || instance || count) // case 3 or 4
+	  return esprintf("An external element inside a connection element cannot have \"port\", "
+			  "\"instance\", or \"count\" attributes");
+      else if (e) {
+	// Case 3:  external element, part of a connection, referencing a predefined external port
+	if (role)
+	  return esprintf("An external element inside a connection element cannot have a \"role\" "
+			  "attribute when the external port is predefined separately");
+
+      } else {
+	// --------------------------------------------------------------------------------
+	// Case 4:  an 'external' element part of a 'connection' that introduces the external port
+	if (hasIndex)
+	  return esprintf("An external element inside a connection element cannot have an \"index\" "
+			  "attribute unless the external port is predefined separately");
+	if (!name) {
+	  format(tmp, "ext%zu", m_externals.size());
+	  name = tmp.c_str();
+	  eit = m_externals.find(name);
+	  e = eit == m_externals.end() ? NULL : &eit->second;
+	}
+      }
+      if (!e && (err = addExternal(name, role, url, count, e))) // case 1, 2b, 4
         return err;
-      return m_parameters.parse(pvl, x, "name", "url", "provider", "port", "instance", "index", "count", NULL);
+      if (conn) // case 2, 3, 4
+	conn->addExternal(*e, index);
+      return e->m_parameters.parse(pvl, x, "name", "url", "provider", "port", "instance", "index", "count", NULL);
     }
     Assembly::Role::Role()
       : m_knownRole(false), m_bidirectional(false), m_provider(false) {

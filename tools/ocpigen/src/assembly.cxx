@@ -118,8 +118,8 @@ parseConnection(OU::Assembly::Connection &aConn) {
   if (aConn.m_externals.size() > 1)
     return "multiple external attachments on a connection unsupported";
   // Create instance ports (and underlying ports of this assembly worker).
-  for (OU::Assembly::ExternalsIter ei = aConn.m_externals.begin(); ei != aConn.m_externals.end(); ei++) {
-    OU::Assembly::External &ext = *ei;
+  for (auto ei = aConn.m_externals.begin(); ei != aConn.m_externals.end(); ei++) {
+    OU::Assembly::External &ext = *ei->first;
     assert(aConn.m_ports.size() == 1);
     OU::Assembly::Port &ap = aConn.m_ports.front();
     if (!ext.m_role.m_knownRole) {
@@ -129,10 +129,10 @@ parseConnection(OU::Assembly::Connection &aConn) {
     assert(c.m_attachments.size() == 1);
     InstancePort &intPort = c.m_attachments.front()->m_instPort; // intPort corresponds to ap
     assert(intPort.m_port);
-    if (ext.m_index + ext.m_count > intPort.m_port->count())
+    if (ei->second + ext.m_count > intPort.m_port->count())
       return OU::esprintf("External port '%s' can't have index/count %zu/%zu "
 			  "when internal port has count: %zu",
-			  ext.m_name.c_str(), ext.m_index, ext.m_count, intPort.m_port->count());
+			  ext.m_name.c_str(), ei->second, ext.m_count, intPort.m_port->count());
     Port *p;
     if (m_assyWorker.m_type == Worker::Application) { // a proxy
       // We are dealing with a connection that implies a delegation, so the assembly worker port
@@ -462,8 +462,7 @@ externalizePort(InstancePort &ip, const char *name, size_t *ordinal) {
   Port &extPort = p.clone(m_assyWorker, extName, p.m_arrayCount, NULL, err);
   if (err)
     return err;
-  OU::Assembly::External *ext = new OU::Assembly::External;
-  ext->m_name = extPort.m_name;
+  OU::Assembly::External *ext = new OU::Assembly::External(extPort.m_name.c_str());
   ext->m_role.m_provider = !p.m_master; // provisional
   ext->m_role.m_bidirectional = false;
   ext->m_role.m_knownRole = true;
