@@ -15,9 +15,5 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-Libraries=misc_prims
-
-# TODO / FIXME - this is a workaround for a build problem w/ alst4 where misc_prims.cdc is not being included correctly
-SourceFiles+=cdc_fifo_complex_short_with_metadata.vhd
 
 include $(OCPI_CDK_DIR)/include/worker.mk

@@ -1,4 +1,7 @@
-<HdlWorker language='vhdl' spec='timestamper_scdcd-spec' controloperations='start' version='2'>
+<HdlWorker language='vhdl' spec='timestamper_scdcd-spec' controloperations='start' version='2'
+	   SourceFiles='cdc_fifo_complex_short_with_metadata.vhd' Libraries='misc_prims'>
+
+<!-- TODO / FIXME - this source file a workaround for a build problem w/ alst4 where misc_prims.cdc is not being included correctly -->
 
   <Property name='IN_PORT_DATA_WIDTH'
             type='uchar'

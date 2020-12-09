@@ -168,7 +168,7 @@ namespace OCPI {
           return err;
       n = 0;
       for (ezxml_t cx = ezxml_cchild(ax, "Connection"); cx; cx = ezxml_cnext(cx)) {
-        m_connections.emplace_back();
+        m_connections.push_back(new Connection);
         if ((err = m_connections.back()->parse(cx, *this, n, params)))
           return err;
       }
