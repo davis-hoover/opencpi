@@ -97,6 +97,7 @@ for p in $Projects; do make -C projects/$p ocl; done
 echo ================================================================================
 echo "Now we will build the tests and examples for $OCPI_TARGET_PLATFORM"
 make -C projects/core test
+make -C projects/platform test
 make -C projects/assets applications
 make -C projects/inactive applications
 

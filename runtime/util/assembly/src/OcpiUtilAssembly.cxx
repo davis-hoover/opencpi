@@ -307,6 +307,7 @@ namespace OCPI {
       if ((err = addConnection(port, x, 0, c)) ||
 	  (err = addExternal(port, NULL, NULL, 0, e)))
 	return err;
+      c->addExternal(*e, 0);
       Port *p;
       return c->addPort(*this, a_instance, port, isInput, bidi, known, 0, params, p);
     }
