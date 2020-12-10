@@ -307,64 +307,43 @@ namespace OCPI {
       if ((err = addConnection(port, x, 0, c)) ||
 	  (err = addExternal(port, NULL, NULL, 0, e)))
 	return err;
-      c->addExternal(*e, 0);
+      c->addExternal(*e, 0, 0);
       Port *p;
       return c->addPort(*this, a_instance, port, isInput, bidi, known, 0, params, p);
     }
 
-#if 0
-    // This is called for a top-level external element.
-    // Either to specify a connection to an external port or to simply establish an external port
-    // (perhaps with a count).
-    // The latter case can be used when you need to specify an external port with a count, and then
-    // have multiple connections to it.
-    const char *Assembly::
-    addExternalPort(ezxml_t a_xml, const PValue *params) {
-      const char *err;
-      // What is the name for this connection?
-      std::string l_name, port;
-      // We preparse some attributes of the external to get the connection name
-      OE::getOptionalString(a_xml, l_name, "port");     // not used if just defining the external port
-      OE::getOptionalString(a_xml, l_name, "instance"); // ditto
-      OE::getOptionalString(a_xml, l_name, "name");     // only optional if url is set
-      size_t count, index;
-      if ((err = OE::getNumber(a_xml, "count", &count)) ||
-	  (err = OE::getNumber(a_xml, "externalCount", &m_count)) ||
-	  (err = OE::getNumber(a_xml, "index", &inded)))
-	return err;
-      if (l_name.empty())
-        l_name = port;
-      Connection *c;
-      if ((err = addConnection(l_name.c_str(), a_xml, count, c)))
-        return err;
-      External &e = c->addExternal();
-      unsigned dummy = 0;
-      // These names default from the port name, and
-      if ((err = e.parse(a_xml, l_name.c_str(), dummy, c->m_parameters)))
-          return err;
-      // Now attach an internal port to this connection
-      std::string iName;
-      unsigned l_instance;
-      Port *p;
-      if ((err = OE::getRequiredString(a_xml, iName, "instance", "external")) ||
-          (err = getInstance(iName.c_str(), l_instance)) ||
-          (err = c->addPort(*this, l_instance, port.c_str(), false, false, false, e.m_index,
-                            params, p)))
-        return err;
-      // An external that is external-based can specify a count
-      if (e.m_count)
-        c->m_count = e.m_count;
-      return NULL;
-    }
-#endif
     const char *Assembly::
     addExternal(const char *name, const char *role, const char *url, size_t count, External *&a_ext) {
-      External &e = m_externals.emplace(name, name).first->second;
+#if 0 // c++ 11
+      auto rv = m_externals.emplace(name, name); // c++17 could use try_emplace
+#else
+      auto rv = m_externals.insert(std::make_pair(name, External(name)));
+#endif
+      if (!rv.second)
+	return esprintf("Duplicate external port name: %s", name);
+      External &e = rv.first->second;
       if (url)
 	e.m_url = url;
       e.m_count = count;
+      if (count)
+	e.m_connected.resize(count);
+      if (role) {
+        if (!strcasecmp(role, "provider") || !strcasecmp(role, "input") ||
+	    !strcasecmp(role, "consumer") || !strcasecmp(role, "slave")) {
+          e.m_role.m_provider = true;
+          e.m_role.m_knownRole = true;
+        } else if (!strcasecmp(role, "user") || !strcasecmp(role, "output") ||
+		   !strcasecmp(role, "producer") || !strcasecmp(role, "master")) {
+          e.m_role.m_provider = false;
+          e.m_role.m_knownRole = true;
+        } else if (!strcasecmp(role, "bidirectional")) {
+          e.m_role.m_bidirectional = true;
+          e.m_role.m_knownRole = true;
+        } else if (*role)
+          return esprintf("Invalid external role: %s", role);
+      }
       a_ext = &e;
-      return e.init(name, role);
+      return NULL;
     }
 
     // Note that this may be called both from an application/mapped property as well as an
@@ -657,22 +636,6 @@ namespace OCPI {
           return "'component' attributes are invalid in this implementation assembly";
         if ((err = OE::getRequiredString(ix, m_implName, "worker", "instance")))
           return err;
-#if 0 // interpretation of worker attributes doesn't really belong here
-	const char
-	  *dot = strrchr(m_implName.c_str(), '.'),
-	  *model = NULL;
-	if (dot)
-	  for (const char **cp = g_models; !model && *cp; ++cp)
-	    if (!strcasecmp(*cp, dot + 1))
-	      model = dot + 1;
-	if (!model) {
-	  std::string e;
-	  for (const char **cp = g_models; *cp; ++cp)
-	    formatAdd(e, " .%s", *cp); 
-	  return esprintf("worker attribute value \"%s\" must end in a model, one of: %s",
-			  m_implName.c_str(), e.c_str());
-	}
-#endif
         baseName(m_implName.c_str(), myBase); // leading directory and authoring model stripped off
       } else if ((err = OE::getRequiredString(ix, component, "component", "instance")))
         return err;
@@ -730,13 +693,6 @@ namespace OCPI {
       ocpiInfo("Component %2d: %s name: %s impl: %s spec: %s selection: %s", ordinal,
                 component.c_str(), m_name.c_str(), m_implName.c_str(), m_specName.c_str(),
                 m_selection.c_str());
-#if 0
-      m_properties.resize(OE::countChildren(ix, "property"));
-      Property *p = &m_properties[0];
-      for (ezxml_t px = ezxml_cchild(ix, "property"); px; px = ezxml_cnext(px), p++)
-        if ((err = p->parse(px, &m_properties[0])))
-          return err;
-#else
       for (ezxml_t px = ezxml_cchild(ix, "property"); px; px = ezxml_cnext(px)) {
         const char *name = ezxml_cattr(px, "name");
         if (!name)
@@ -745,7 +701,6 @@ namespace OCPI {
             (err = addProperty(name, px)))
           return err;
       }
-#endif
       const char *propAssign;
       // Now deal with instance-based property parameters that might override the XML ones
       // First, process the parameters for ALL instances, then the parameters for specific
@@ -815,9 +770,22 @@ namespace OCPI {
       return NULL;
     }
 
-    void Assembly::Connection::
-    addExternal(External &e, size_t index) {
+    const char *Assembly::Connection::
+    addExternal(External &e, size_t index, size_t count) {
+      if (e.m_count) {
+	if (count > e.m_count || index + count  > e.m_count)
+	  return esprintf("Invalid index/count %zu/%zu when connecting to external port with count %zu",
+			  index, count, e.m_count);
+	for (count = count ? count : 1; count--; index++) {
+	  if(e.m_connected[index])
+	    return esprintf("Duplicate connection to index %zu of %zu", index, e.m_count);
+	  e.m_connected[index] = true;
+	}
+      } else if (index)
+	return esprintf("For external port %s, connection has index when no count is set",
+			e.m_name.c_str());
       m_externals.emplace_back(&e, index);
+      return NULL;
     }
 
     const char *Assembly::Port::
@@ -888,29 +856,6 @@ namespace OCPI {
       m_role.m_bidirectional = false;
       m_role.m_provider = false;
     }
-    // Initialization, whether parsed or not
-    const char *Assembly::External::
-    init(const char *name, const char *r) {
-      if (name)
-        m_name = name;
-      if (r) {
-        if (!strcasecmp(r, "provider") || !strcasecmp(r, "input") || !strcasecmp(r, "consumer") ||
-            !strcasecmp(r, "slave")) {
-          m_role.m_provider = true;
-          m_role.m_knownRole = true;
-        } else if (!strcasecmp(r, "user") || !strcasecmp(r, "output") || !strcasecmp(r, "producer") ||
-                   !strcasecmp(r, "master")) {
-          m_role.m_provider = false;
-          m_role.m_knownRole = true;
-        } else if (!strcasecmp(r, "bidirectional")) {
-          m_role.m_bidirectional = true;
-          m_role.m_knownRole = true;
-        } else if (*r)
-          return esprintf("Invalid external role: %s", r);
-      }
-      return NULL;
-    }
-
     // There are four variants of "external" elements: (convenience has its price)
     // 1. the top-level that just defines the external:
     //    attributes: name, maybe url, maybe role, maybe count
@@ -1008,7 +953,7 @@ namespace OCPI {
       if (!e && (err = addExternal(name, role, url, count, e))) // case 1, 2b, 4
         return err;
       if (conn) // case 2, 3, 4
-	conn->addExternal(*e, index);
+	conn->addExternal(*e, index, count);
       return e->m_parameters.parse(pvl, x, "name", "url", "provider", "port", "instance", "index", "count", NULL);
     }
     Assembly::Role::Role()

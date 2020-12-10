@@ -141,11 +141,10 @@ namespace OCPI {
         std::string m_url;    // the URL that this external attachment has
         Role m_role;
         size_t m_count;       // The total count for the external (not the connection)
-	size_t m_connected;
+	std::vector<bool> m_connected;
         PValueList m_parameters;
         External(const char *name);
         const char *parse(ezxml_t, const char *, unsigned&, const PValue *pvl);
-        const char *init(const char *name, const char *role = NULL);
       };
       typedef std::list<External> Externals;
       typedef Externals::iterator ExternalsIter;
@@ -182,7 +181,7 @@ namespace OCPI {
         const char *addPort(Assembly &a, size_t instance, const char *port, bool isInput,
                             bool bidi, bool known, size_t index,
                             const OCPI::Util::PValue *params, Port *&);
-	void addExternal(External &ext, size_t index);
+	const char *addExternal(External &ext, size_t index, size_t count);
       };
       typedef std::list<Connection *> Connections;
       // Potentially specified in the assembly, what policy should be used
