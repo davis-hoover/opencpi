@@ -38,7 +38,7 @@ to enable booting the embedded system for OpenCPI.
 
 For more information about these tasks and how they
 relate to enabling OpenCPI development on embedded systems,
-see The 'OpenCPI Installation Guide'.
+see the 'OpenCPI Installation Guide'.
 
 The general usage concept for *`ocpiadmin`* is:
 perform the '<verb>' operation on the
@@ -65,26 +65,54 @@ The nouns supported by *`ocpiadmin`* are:
 
 *`platform`*::
     A particular type of processing hardware and/or software that
-    can host a container for executing OpenCPI workers. 
+    can host a container for executing OpenCPI workers.
 
 OPTIONS
 -------
-There are currently no options to *`ocpiadmin`* verbs.
+The following options can be specified for the *`install`* verb only:
+
+*`--git-revision=`*'<git-rev>', *`-g`* '<git-rev>'::
+    Specifies the branch, tag or other valid *`git`* revision to check out after
+    downloading/cloning the project specified in the *`--package-id`* (*`-p`*) option (described below).
+    This option can be used with the *`--package-id`* option
+    to install a different *`git`* revision of a project from the one currently checked out.
+    If this option is not used, the *`git`* revision for the specified package-ID defaults
+    to the *`git`* revision of the OpenCPI framework repository.
+
+*`--package-id=`*'<package-id>', *`-p`* '<package-id>'::
+    Specifies the OpenCPI package-ID of the project that provides the support
+    for the platform. This option is only required when support for
+    the platform is provided in an 'OSP' ('OpenCPI System support Platform')
+    instead of in a built-in OpenCPI project.
+    The default format for a package-ID is '<package-prefix>'*.*'<package-name>';
+    for example, *`ocpi.osp.e3xx`*, *`ocpi.osp.plutosdr`*. See the chapter on package-IDs in the 'OpenCPI
+    Component Development Guide' for details.
+
+*`--url=`*'<url>', *`-u`* '<url>'::
+    Specifies the internet URL where the project resides. This option can be
+    used with the *`--package-id`* (*`-p`*) option (described above) to specify the location of
+    a project that is not hosted on the OpenCPI Gitlab site. If this option
+    is not used, the URL defaults to *`https://gitlab.com/opencpi/osps/`*'<package-id>'*`.git`*,
+    where '<package-id>' is the one specified in the *`--package-id=`* option.
+    For example, if '<package-id>' is *`ocpi.osp.e3xx`*, the URL is
+    *`https://gitlab.com/opencpi/osps/ocpi.osps.e3xx.git`*.
+
 
 OPERATIONS
 ----------
 The command syntax for the *`install platform`* operation is:
 
-*`ocpiadmin install platform`* '<platform>'
+*`ocpiadmin`* '<options>' *`install platform`* '<platform>'
 
 where '<platform>' is the name of an RCC platform, HDL platform or HDL simulator
-to be built for OpenCPI. The operation downloads
-the platform's 'OpenCPI Platform System support Project' (its 'OSP') if necessary and then builds the
-built-in projects for the specified platform. If the specified platform is
-an HDL platform, the operation also builds a single test artifact/bitstream:
-the *`testbias`* assembly in the *`assets`* project. After
-the operation is performed, any asset in any project can be
-built for the specified platform.
+to be built for OpenCPI. If necessary, the operation downloads
+the platform's OSP into the *`projects/osps/`* directory in the OpenCPI
+installation directory and then builds the
+built-in projects and the platform's OSP (if any) for the specified platform.
+If the specified platform is an HDL platform, the operation also builds
+a single test artifact/bitstream: the *`testbias`* assembly in
+the *`assets`* project. After the operation is performed, any asset
+in any project can be built for the specified platform.
 
 The command syntax for the *`deploy platform`* operation is:
 
@@ -102,28 +130,55 @@ Keywords for specifying platform names are given in tables in the
 
 EXAMPLES
 --------
-. Build the Ettus USRP E310 (*`e31x`*) HDL platform for OpenCPI:
+. Build the Xilinx Xsim (*`xsim`*) HDL simulator platform for OpenCPI:
 +
 -------------------------------
-ocpiadmin install platform e31x
+ocpiadmin install platform xsim
 -------------------------------
 +
-. Build the Analog Devices Pluto Linux 0.31 (*`adi_plutosdr0_31`*)
+. Download and build the Ettus USRP E310 (*`e31x`*) HDL platform for OpenCPI:
++
+------------------------------------------------------------
+ ocpiadmin --package-id=ocpi.osp.e3xx install platform e31x
+------------------------------------------------------------
++
+. Download and build the Analog Devices Pluto Linux 0.32 (*`adi_plutosdr0_32`*)
 embedded software (RCC) platform for OpenCPI:
 +
--------------------------------------------
-ocpiadmin install platform adi_plutosdr0_31
--------------------------------------------
+--------------------------------------------------------------------------
+ocpiadmin --package-id=ocpi.osp.plutosdr install platform adi_plutosdr0_32
+--------------------------------------------------------------------------
++
+. Build the Analog Devices ADALM-PLUTO (*`plutosdr`*) platform
+(you have already downloaded the OSP that supports this platform if you performed the previous example):
++
+-----------------------------------
+ocpiadmin install platform plutosdr
+-----------------------------------
++
+. Download the third-party OSP that provides the *`myplat`* platform
+from the Github site and build the platform:
++
+------------------------------------------------------------------------------------------------------
+ocpiadmin --package-id=com.myco.myplat -url=https://github.com/myco/myplat.git install platform myplat
+------------------------------------------------------------------------------------------------------
++
+. Download and build the latest "development" *`git`* revision of the *`plutosdr`* platform
+from a working branch using an earlier version:
++
+-----------------------------------------------------------------------------------------
+ocpiadmin --package-id=ocpi.osp.plutosdr --git-revision=develop install platform plutosdr
+------------------------------------------------------------------------------------------
 +
 . Create a bootable media directory tree
-for booting the RCC platform *`xilinx_19_2_aarch32`* on
+for booting the RCC platform *`xilinx19_2_aarch32`* on
 the HDL platform *`zed`*. This operation creates the
-directory *`cdk/zed/sdcard-xilinx_19_2_aarch32/`*,
+directory *`cdk/zed/sdcard-xilinx19_2_aarch32/`*,
 whose contents can be copied to an SD card:
 +
--------------------------------------------------
-ocpiadmin deploy platform xilinx_19_2_aarch32 zed
--------------------------------------------------
+------------------------------------------------
+ocpiadmin deploy platform xilinx19_2_aarch32 zed
+------------------------------------------------
 
 
 BUGS
@@ -139,6 +194,7 @@ SEE ALSO
 --------
 link:ocpidev.1.html[ocpidev(1)]
 link:ocpidev-platform.1.html[ocpidev-platform(1)]
+link:ocpidev-project.1.html[ocpidev-project(1)]
 link:ocpidev-worker.1.html[ocpidev-worker(1)]
 
 COPYING

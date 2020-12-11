@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpiadmin</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140377132767728"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpiadmin — command-line tool for managing an OpenCPI installation</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="emphasis"><em>&lt;noun&gt;</em></span> [<span class="emphasis"><em>&lt;name&gt;</em></span> [<span class="emphasis"><em>&lt;argument&gt;</em></span>… ]]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpiadmin(1)</code></strong></span> command-line tool is used to perform installation
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ocpiadmin</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /></head><body><div xml:lang="en" class="refentry" lang="en"><a id="idp140511619071632"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>ocpiadmin — command-line tool for managing an OpenCPI installation</p></div><div class="refsynopsisdiv"><a id="_synopsis"></a><h2>Synopsis</h2><p><span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> [<span class="emphasis"><em>&lt;options&gt;</em></span>] <span class="emphasis"><em>&lt;verb&gt;</em></span> <span class="emphasis"><em>&lt;noun&gt;</em></span> [<span class="emphasis"><em>&lt;name&gt;</em></span> [<span class="emphasis"><em>&lt;argument&gt;</em></span>… ]]</p></div><div class="refsect1"><a id="_description"></a><h2>DESCRIPTION</h2><p>The <span class="strong"><strong><code class="literal">ocpiadmin(1)</code></strong></span> command-line tool is used to perform installation
 and deployment tasks that are carried out on an OpenCPI installation
 after the basic installation procedure is completed to prepare
 OpenCPI for use on embedded systems. These tasks include:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
@@ -21,7 +21,7 @@ then be written to the manufacturer’s SD card
 to enable booting the embedded system for OpenCPI.
 </li></ul></div><p>For more information about these tasks and how they
 relate to enabling OpenCPI development on embedded systems,
-see The <span class="emphasis"><em>OpenCPI Installation Guide</em></span>.</p><p>The general usage concept for <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> is:
+see the <span class="emphasis"><em>OpenCPI Installation Guide</em></span>.</p><p>The general usage concept for <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> is:
 perform the <span class="emphasis"><em>&lt;verb&gt;</em></span> operation on the
 <span class="emphasis"><em>&lt;noun&gt;</em></span> whose name is <span class="emphasis"><em>&lt;name&gt;</em></span>.</p></div><div class="refsect1"><a id="_verbs"></a><h2>VERBS</h2><p>The verbs supported by <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> are:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
 <span class="strong"><strong><code class="literal">deploy</code></strong></span>
@@ -40,31 +40,73 @@ perform the <span class="emphasis"><em>&lt;verb&gt;</em></span> operation on the
 </span></dt><dd>
     A particular type of processing hardware and/or software that
     can host a container for executing OpenCPI workers.
-</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>There are currently no options to <span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> verbs.</p></div><div class="refsect1"><a id="_operations"></a><h2>OPERATIONS</h2><p>The command syntax for the <span class="strong"><strong><code class="literal">install platform</code></strong></span> operation is:</p><p><span class="strong"><strong><code class="literal">ocpiadmin install platform</code></strong></span> <span class="emphasis"><em>&lt;platform&gt;</em></span></p><p>where <span class="emphasis"><em>&lt;platform&gt;</em></span> is the name of an RCC platform, HDL platform or HDL simulator
-to be built for OpenCPI. The operation downloads
-the platform’s <span class="emphasis"><em>OpenCPI Platform System support Project</em></span> (its <span class="emphasis"><em>OSP</em></span>) if necessary and then builds the
-built-in projects for the specified platform. If the specified platform is
-an HDL platform, the operation also builds a single test artifact/bitstream:
-the <span class="strong"><strong><code class="literal">testbias</code></strong></span> assembly in the <span class="strong"><strong><code class="literal">assets</code></strong></span> project. After
-the operation is performed, any asset in any project can be
-built for the specified platform.</p><p>The command syntax for the <span class="strong"><strong><code class="literal">deploy platform</code></strong></span> operation is:</p><p><span class="strong"><strong><code class="literal">ocpiadmin deploy platform</code></strong></span> <span class="emphasis"><em>&lt;rcc-platform&gt; &lt;hdl-platform&gt;</em></span></p><p>where <span class="emphasis"><em>&lt;rcc-platform&gt;</em></span> and <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span> are the names of the
+</dd></dl></div></div><div class="refsect1"><a id="_options"></a><h2>OPTIONS</h2><p>The following options can be specified for the <span class="strong"><strong><code class="literal">install</code></strong></span> verb only:</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">
+<span class="strong"><strong><code class="literal">--git-revision=</code></strong></span><span class="emphasis"><em>&lt;git-rev&gt;</em></span>, <span class="strong"><strong><code class="literal">-g</code></strong></span> <span class="emphasis"><em>&lt;git-rev&gt;</em></span>
+</span></dt><dd>
+    Specifies the branch, tag or other valid <span class="strong"><strong><code class="literal">git</code></strong></span> revision to check out after
+    downloading/cloning the project specified in the <span class="strong"><strong><code class="literal">--package-id</code></strong></span> (<span class="strong"><strong><code class="literal">-p</code></strong></span>) option (described below).
+    This option can be used with the <span class="strong"><strong><code class="literal">--package-id</code></strong></span> option
+    to install a different <span class="strong"><strong><code class="literal">git</code></strong></span> revision of a project from the one currently checked out.
+    If this option is not used, the <span class="strong"><strong><code class="literal">git</code></strong></span> revision for the specified package-ID defaults
+    to the <span class="strong"><strong><code class="literal">git</code></strong></span> revision of the OpenCPI framework repository.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--package-id=</code></strong></span><span class="emphasis"><em>&lt;package-id&gt;</em></span>, <span class="strong"><strong><code class="literal">-p</code></strong></span> <span class="emphasis"><em>&lt;package-id&gt;</em></span>
+</span></dt><dd>
+    Specifies the OpenCPI package-ID of the project that provides the support
+    for the platform. This option is only required when support for
+    the platform is provided in an <span class="emphasis"><em>OSP</em></span> (<span class="emphasis"><em>OpenCPI System support Platform</em></span>)
+    instead of in a built-in OpenCPI project.
+    The default format for a package-ID is <span class="emphasis"><em>&lt;package-prefix&gt;</em></span><span class="strong"><strong>.</strong></span><span class="emphasis"><em>&lt;package-name&gt;</em></span>;
+    for example, <span class="strong"><strong><code class="literal">ocpi.osp.e3xx</code></strong></span>, <span class="strong"><strong><code class="literal">ocpi.osp.plutosdr</code></strong></span>. See the chapter on package-IDs in the <span class="emphasis"><em>OpenCPI
+    Component Development Guide</em></span> for details.
+</dd><dt><span class="term">
+<span class="strong"><strong><code class="literal">--url=</code></strong></span><span class="emphasis"><em>&lt;url&gt;</em></span>, <span class="strong"><strong><code class="literal">-u</code></strong></span> <span class="emphasis"><em>&lt;url&gt;</em></span>
+</span></dt><dd>
+    Specifies the internet URL where the project resides. This option can be
+    used with the <span class="strong"><strong><code class="literal">--package-id</code></strong></span> (<span class="strong"><strong><code class="literal">-p</code></strong></span>) option (described above) to specify the location of
+    a project that is not hosted on the OpenCPI Gitlab site. If this option
+    is not used, the URL defaults to <span class="strong"><strong><code class="literal">https://gitlab.com/opencpi/osps/</code></strong></span><span class="emphasis"><em>&lt;package-id&gt;</em></span><span class="strong"><strong><code class="literal">.git</code></strong></span>,
+    where <span class="emphasis"><em>&lt;package-id&gt;</em></span> is the one specified in the <span class="strong"><strong><code class="literal">--package-id=</code></strong></span> option.
+    For example, if <span class="emphasis"><em>&lt;package-id&gt;</em></span> is <span class="strong"><strong><code class="literal">ocpi.osp.e3xx</code></strong></span>, the URL is
+    <span class="strong"><strong><code class="literal">https://gitlab.com/opencpi/osps/ocpi.osps.e3xx.git</code></strong></span>.
+</dd></dl></div></div><div class="refsect1"><a id="_operations"></a><h2>OPERATIONS</h2><p>The command syntax for the <span class="strong"><strong><code class="literal">install platform</code></strong></span> operation is:</p><p><span class="strong"><strong><code class="literal">ocpiadmin</code></strong></span> <span class="emphasis"><em>&lt;options&gt;</em></span> <span class="strong"><strong><code class="literal">install platform</code></strong></span> <span class="emphasis"><em>&lt;platform&gt;</em></span></p><p>where <span class="emphasis"><em>&lt;platform&gt;</em></span> is the name of an RCC platform, HDL platform or HDL simulator
+to be built for OpenCPI. If necessary, the operation downloads
+the platform’s OSP into the <span class="strong"><strong><code class="literal">projects/osps/</code></strong></span> directory in the OpenCPI
+installation directory and then builds the
+built-in projects and the platform’s OSP (if any) for the specified platform.
+If the specified platform is an HDL platform, the operation also builds
+a single test artifact/bitstream: the <span class="strong"><strong><code class="literal">testbias</code></strong></span> assembly in
+the <span class="strong"><strong><code class="literal">assets</code></strong></span> project. After the operation is performed, any asset
+in any project can be built for the specified platform.</p><p>The command syntax for the <span class="strong"><strong><code class="literal">deploy platform</code></strong></span> operation is:</p><p><span class="strong"><strong><code class="literal">ocpiadmin deploy platform</code></strong></span> <span class="emphasis"><em>&lt;rcc-platform&gt; &lt;hdl-platform&gt;</em></span></p><p>where <span class="emphasis"><em>&lt;rcc-platform&gt;</em></span> and <span class="emphasis"><em>&lt;hdl-platform&gt;</em></span> are the names of the
 software (RCC) and hardware/FPGA (HDL) platforms for which the bootable
 media should be created. The operation creates the directory
 <span class="strong"><strong><code class="literal">cdk/</code></strong></span><span class="emphasis"><em>&lt;hdl-platform&gt;</em></span><span class="strong"><strong><code class="literal">/sdcard-</code></strong></span><span class="emphasis"><em>&lt;rcc-platform&gt;</em></span>,
 whose contents can be copied to an SD card.</p><p>Keywords for specifying platform names are given in tables in the
 <span class="emphasis"><em>OpenCPI Installation Guide</em></span>.</p></div><div class="refsect1"><a id="_examples"></a><h2>EXAMPLES</h2><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p class="simpara">
-Build the Ettus USRP E310 (<span class="strong"><strong><code class="literal">e31x</code></strong></span>) HDL platform for OpenCPI:
-</p><pre class="screen">ocpiadmin install platform e31x</pre></li><li class="listitem"><p class="simpara">
-Build the Analog Devices Pluto Linux 0.31 (<span class="strong"><strong><code class="literal">adi_plutosdr0_31</code></strong></span>)
+Build the Xilinx Xsim (<span class="strong"><strong><code class="literal">xsim</code></strong></span>) HDL simulator platform for OpenCPI:
+</p><pre class="screen">ocpiadmin install platform xsim</pre></li><li class="listitem"><p class="simpara">
+Download and build the Ettus USRP E310 (<span class="strong"><strong><code class="literal">e31x</code></strong></span>) HDL platform for OpenCPI:
+</p><pre class="screen"> ocpiadmin --package-id=ocpi.osp.e3xx install platform e31x</pre></li><li class="listitem"><p class="simpara">
+Download and build the Analog Devices Pluto Linux 0.32 (<span class="strong"><strong><code class="literal">adi_plutosdr0_32</code></strong></span>)
 embedded software (RCC) platform for OpenCPI:
-</p><pre class="screen">ocpiadmin install platform adi_plutosdr0_31</pre></li><li class="listitem"><p class="simpara">
+</p><pre class="screen">ocpiadmin --package-id=ocpi.osp.plutosdr install platform adi_plutosdr0_32</pre></li><li class="listitem"><p class="simpara">
+Build the Analog Devices ADALM-PLUTO (<span class="strong"><strong><code class="literal">plutosdr</code></strong></span>) platform
+(you have already downloaded the OSP that supports this platform if you performed the previous example):
+</p><pre class="screen">ocpiadmin install platform plutosdr</pre></li><li class="listitem"><p class="simpara">
+Download the third-party OSP that provides the <span class="strong"><strong><code class="literal">myplat</code></strong></span> platform
+from the Github site and build the platform:
+</p><pre class="screen">ocpiadmin --package-id=com.myco.myplat -url=https://github.com/myco/myplat.git install platform myplat</pre></li><li class="listitem"><p class="simpara">
+Download and build the latest "development" <span class="strong"><strong><code class="literal">git</code></strong></span> revision of the <span class="strong"><strong><code class="literal">plutosdr</code></strong></span> platform
+from a working branch using an earlier version:
+</p><pre class="screen">ocpiadmin --package-id=ocpi.osp.plutosdr --git-revision=develop install platform plutosdr</pre></li><li class="listitem"><p class="simpara">
 Create a bootable media directory tree
-for booting the RCC platform <span class="strong"><strong><code class="literal">xilinx_19_2_aarch32</code></strong></span> on
+for booting the RCC platform <span class="strong"><strong><code class="literal">xilinx19_2_aarch32</code></strong></span> on
 the HDL platform <span class="strong"><strong><code class="literal">zed</code></strong></span>. This operation creates the
-directory <span class="strong"><strong><code class="literal">cdk/zed/sdcard-xilinx_19_2_aarch32/</code></strong></span>,
+directory <span class="strong"><strong><code class="literal">cdk/zed/sdcard-xilinx19_2_aarch32/</code></strong></span>,
 whose contents can be copied to an SD card:
-</p><pre class="screen">ocpiadmin deploy platform xilinx_19_2_aarch32 zed</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
+</p><pre class="screen">ocpiadmin deploy platform xilinx19_2_aarch32 zed</pre></li></ol></div></div><div class="refsect1"><a id="_bugs"></a><h2>BUGS</h2><p>See <a class="ulink" href="https://www.opencpi.org/report-defects" target="_top">https://www.opencpi.org/report-defects</a></p></div><div class="refsect1"><a id="_resources"></a><h2>RESOURCES</h2><p>See the main web site: <a class="ulink" href="https://www.opencpi.org" target="_top">https://www.opencpi.org</a></p></div><div class="refsect1"><a id="_see_also"></a><h2>SEE ALSO</h2><p><a class="ulink" href="ocpidev.1.html" target="_top">ocpidev(1)</a>
 <a class="ulink" href="ocpidev-platform.1.html" target="_top">ocpidev-platform(1)</a>
+<a class="ulink" href="ocpidev-project.1.html" target="_top">ocpidev-project(1)</a>
 <a class="ulink" href="ocpidev-worker.1.html" target="_top">ocpidev-worker(1)</a></p></div><div class="refsect1"><a id="_copying"></a><h2>COPYING</h2><p>Copyright (C) 2020 OpenCPI www.opencpi.org. OpenCPI is free software:
 you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free

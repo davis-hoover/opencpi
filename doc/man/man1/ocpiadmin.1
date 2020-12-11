@@ -1,12 +1,12 @@
 .\"     Title: ocpiadmin
 .\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
-.\"      Date: 09/04/2020
+.\"      Date: 12/02/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "OCPIADMIN" "1" "09/04/2020" "\ \&" "\ \&"
+.TH "OCPIADMIN" "1" "12/02/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -57,7 +57,7 @@ Building platforms and simulators that are intended as targets for OpenCPI devel
 Creating a bootable media directory tree (\fISD card contents\fR) for OpenCPI required by the software (RCC) and hardware (HDL/FPGA) platforms that comprise the embedded system\&. The bootable media directory tree for a particular software\-hardware platform configuration can then be written to the manufacturer\(cqs SD card to enable booting the embedded system for OpenCPI\&.
 .RE
 .sp
-For more information about these tasks and how they relate to enabling OpenCPI development on embedded systems, see The \fIOpenCPI Installation Guide\fR\&.
+For more information about these tasks and how they relate to enabling OpenCPI development on embedded systems, see the \fIOpenCPI Installation Guide\fR\&.
 .sp
 The general usage concept for \fBocpiadmin\fR is: perform the \fI<verb>\fR operation on the \fI<noun>\fR whose name is \fI<name>\fR\&.
 .SH "VERBS"
@@ -83,14 +83,59 @@ A particular type of processing hardware and/or software that can host a contain
 .RE
 .SH "OPTIONS"
 .sp
-There are currently no options to \fBocpiadmin\fR verbs\&.
+The following options can be specified for the \fBinstall\fR verb only:
+.PP
+\fB\-\-git\-revision=\fR\fI<git\-rev>\fR, \fB\-g\fR \fI<git\-rev>\fR
+.RS 4
+Specifies the branch, tag or other valid
+\fBgit\fR
+revision to check out after downloading/cloning the project specified in the
+\fB\-\-package\-id\fR
+(\fB\-p\fR) option (described below)\&. This option can be used with the
+\fB\-\-package\-id\fR
+option to install a different
+\fBgit\fR
+revision of a project from the one currently checked out\&. If this option is not used, the
+\fBgit\fR
+revision for the specified package\-ID defaults to the
+\fBgit\fR
+revision of the OpenCPI framework repository\&.
+.RE
+.PP
+\fB\-\-package\-id=\fR\fI<package\-id>\fR, \fB\-p\fR \fI<package\-id>\fR
+.RS 4
+Specifies the OpenCPI package\-ID of the project that provides the support for the platform\&. This option is only required when support for the platform is provided in an
+\fIOSP\fR
+(\fIOpenCPI System support Platform\fR) instead of in a built\-in OpenCPI project\&. The default format for a package\-ID is
+\fI<package\-prefix>\fR\fB\&.\fR\fI<package\-name>\fR; for example,
+\fBocpi\&.osp\&.e3xx\fR,
+\fBocpi\&.osp\&.plutosdr\fR\&. See the chapter on package\-IDs in the
+\fIOpenCPI Component Development Guide\fR
+for details\&.
+.RE
+.PP
+\fB\-\-url=\fR\fI<url>\fR, \fB\-u\fR \fI<url>\fR
+.RS 4
+Specifies the internet URL where the project resides\&. This option can be used with the
+\fB\-\-package\-id\fR
+(\fB\-p\fR) option (described above) to specify the location of a project that is not hosted on the OpenCPI Gitlab site\&. If this option is not used, the URL defaults to
+\fBhttps://gitlab\&.com/opencpi/osps/\fR\fI<package\-id>\fR\fB\&.git\fR, where
+\fI<package\-id>\fR
+is the one specified in the
+\fB\-\-package\-id=\fR
+option\&. For example, if
+\fI<package\-id>\fR
+is
+\fBocpi\&.osp\&.e3xx\fR, the URL is
+\fBhttps://gitlab\&.com/opencpi/osps/ocpi\&.osps\&.e3xx\&.git\fR\&.
+.RE
 .SH "OPERATIONS"
 .sp
 The command syntax for the \fBinstall platform\fR operation is:
 .sp
-\fBocpiadmin install platform\fR \fI<platform>\fR
+\fBocpiadmin\fR \fI<options>\fR \fBinstall platform\fR \fI<platform>\fR
 .sp
-where \fI<platform>\fR is the name of an RCC platform, HDL platform or HDL simulator to be built for OpenCPI\&. The operation downloads the platform\(cqs \fIOpenCPI Platform System support Project\fR (its \fIOSP\fR) if necessary and then builds the built\-in projects for the specified platform\&. If the specified platform is an HDL platform, the operation also builds a single test artifact/bitstream: the \fBtestbias\fR assembly in the \fBassets\fR project\&. After the operation is performed, any asset in any project can be built for the specified platform\&.
+where \fI<platform>\fR is the name of an RCC platform, HDL platform or HDL simulator to be built for OpenCPI\&. If necessary, the operation downloads the platform\(cqs OSP into the \fBprojects/osps/\fR directory in the OpenCPI installation directory and then builds the built\-in projects and the platform\(cqs OSP (if any) for the specified platform\&. If the specified platform is an HDL platform, the operation also builds a single test artifact/bitstream: the \fBtestbias\fR assembly in the \fBassets\fR project\&. After the operation is performed, any asset in any project can be built for the specified platform\&.
 .sp
 The command syntax for the \fBdeploy platform\fR operation is:
 .sp
@@ -109,13 +154,13 @@ Keywords for specifying platform names are given in tables in the \fIOpenCPI Ins
 .sp -1
 .IP "  1." 4.2
 .\}
-Build the Ettus USRP E310 (\fBe31x\fR) HDL platform for OpenCPI:
+Build the Xilinx Xsim (\fBxsim\fR) HDL simulator platform for OpenCPI:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpiadmin install platform e31x
+ocpiadmin install platform xsim
 .fi
 .if n \{\
 .RE
@@ -130,13 +175,13 @@ ocpiadmin install platform e31x
 .sp -1
 .IP "  2." 4.2
 .\}
-Build the Analog Devices Pluto Linux 0\&.31 (\fBadi_plutosdr0_31\fR) embedded software (RCC) platform for OpenCPI:
+Download and build the Ettus USRP E310 (\fBe31x\fR) HDL platform for OpenCPI:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpiadmin install platform adi_plutosdr0_31
+ ocpiadmin \-\-package\-id=ocpi\&.osp\&.e3xx install platform e31x
 .fi
 .if n \{\
 .RE
@@ -151,17 +196,107 @@ ocpiadmin install platform adi_plutosdr0_31
 .sp -1
 .IP "  3." 4.2
 .\}
-Create a bootable media directory tree for booting the RCC platform
-\fBxilinx_19_2_aarch32\fR
-on the HDL platform
-\fBzed\fR\&. This operation creates the directory
-\fBcdk/zed/sdcard\-xilinx_19_2_aarch32/\fR, whose contents can be copied to an SD card:
+Download and build the Analog Devices Pluto Linux 0\&.32 (\fBadi_plutosdr0_32\fR) embedded software (RCC) platform for OpenCPI:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-ocpiadmin deploy platform xilinx_19_2_aarch32 zed
+ocpiadmin \-\-package\-id=ocpi\&.osp\&.plutosdr install platform adi_plutosdr0_32
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 4.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  4." 4.2
+.\}
+Build the Analog Devices ADALM\-PLUTO (\fBplutosdr\fR) platform (you have already downloaded the OSP that supports this platform if you performed the previous example):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiadmin install platform plutosdr
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 5.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  5." 4.2
+.\}
+Download the third\-party OSP that provides the
+\fBmyplat\fR
+platform from the Github site and build the platform:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiadmin \-\-package\-id=com\&.myco\&.myplat \-url=https://github\&.com/myco/myplat\&.git install platform myplat
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 6.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  6." 4.2
+.\}
+Download and build the latest "development"
+\fBgit\fR
+revision of the
+\fBplutosdr\fR
+platform from a working branch using an earlier version:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiadmin \-\-package\-id=ocpi\&.osp\&.plutosdr \-\-git\-revision=develop install platform plutosdr
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 7.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  7." 4.2
+.\}
+Create a bootable media directory tree for booting the RCC platform
+\fBxilinx19_2_aarch32\fR
+on the HDL platform
+\fBzed\fR\&. This operation creates the directory
+\fBcdk/zed/sdcard\-xilinx19_2_aarch32/\fR, whose contents can be copied to an SD card:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ocpiadmin deploy platform xilinx19_2_aarch32 zed
 .fi
 .if n \{\
 .RE
@@ -175,7 +310,7 @@ See https://www\&.opencpi\&.org/report\-defects
 See the main web site: https://www\&.opencpi\&.org
 .SH "SEE ALSO"
 .sp
-ocpidev(1) ocpidev\-platform(1) ocpidev\-worker(1)
+ocpidev(1) ocpidev\-platform(1) ocpidev\-project(1) ocpidev\-worker(1)
 .SH "COPYING"
 .sp
 Copyright (C) 2020 OpenCPI www\&.opencpi\&.org\&. OpenCPI is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\&.
