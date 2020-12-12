@@ -145,9 +145,8 @@ namespace OCPI {
         PValueList m_parameters;
         External(const char *name);
         const char *parse(ezxml_t, const char *, unsigned&, const PValue *pvl);
+	const char *cname() const { return m_name.c_str(); }
       };
-      typedef std::list<External> Externals;
-      typedef Externals::iterator ExternalsIter;
       struct Connection;
       struct Port {
         // This mutable is because this name might be resolved when an application
@@ -191,6 +190,7 @@ namespace OCPI {
         MinProcessors,
         MaxProcessors
       };
+      typedef std::map<std::string, External, OCPI::Util::ConstStringCaseComp> Externals;
     private:
       ezxml_t m_xml;
       char *m_copy;
@@ -199,8 +199,9 @@ namespace OCPI {
       const char *parse(const char *defaultName = NULL, const char **extraTopAttrs = NULL,
                         const char **extraInstAttrs = NULL, const OCPI::Util::PValue *params = NULL);
       std::vector<Instance*> m_instances;
-      std::map<std::string, External, OCPI::Util::ConstStringCaseComp> m_externals;
+      Externals m_externals;
     public:
+      Externals &externals() { return m_externals; }
       //      Instance &utilInstance(size_t n) const { return *m_instances[n]; }
       size_t nUtilInstances() const { return m_instances.size(); }
       const std::string &name() const { return m_name; }

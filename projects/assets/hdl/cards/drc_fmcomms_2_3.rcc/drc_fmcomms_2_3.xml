@@ -13,6 +13,8 @@
   <specProperty name='status' readsync='1'/>
 
   <slaves>
+    <External name='rx' count='2'/>
+    <External name='tx' count='2'/>
     <Instance worker='ocpi.platform.devices.platform_ad9361_config.hdl' 
 	  name='config'/>
     <Instance worker='ocpi.platform.devices.platform_ad9361_data_sub.hdl' 
@@ -36,9 +38,8 @@
       <Property Name='R'          Value='16'/> <!-- decimation factor -->
       <Property Name='ACC_WIDTH'  Value='28'/>
     </Instance>
-    <External name='rx' instance='rx_cic_dec0' port='out'/>
+    <External name='rx' index='0' instance='rx_cic_dec0' port='out'/>
 
-    <!-- DRC RX1 path slaves 
     <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'  
 	    name='rx_qadc1' connect='rx_cswm_to_iqstream1'/>
     <Instance worker='ocpi.assets.misc_comps.cswm_to_iqstream.hdl'
@@ -57,8 +58,7 @@
       <Property Name='R'          Value='16'/> 
       <Property Name='ACC_WIDTH'  Value='28'/>
     </Instance>
-    <External name='rx[1]' instance='rx_cic_dec1' port='out'/>
-    --> 
+    <External name='rx' index='1' instance='rx_cic_dec1' port='out'/>
     <!-- DRC TX0 path slaves --> 
     <External name='tx' instance='tx_cic_int0' port='in'/>
     <Instance worker='ocpi.assets.dsp_comps.cic_int.hdl'
@@ -72,8 +72,7 @@
 	  name='tx_iqstream_to_cswm0' connect='tx_qdac0'/> 
     <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac0'/>
 
-    <!-- DRC TX1 path slaves 
-    <External name='tx1' instance='tx_cic_int1' port='in'/>
+    <External name='tx' index='1' instance='tx_cic_int1' port='in'/>
     <Instance worker='ocpi.assets.dsp_comps.cic_int.hdl'
           name='tx_cic_int1' connect='tx_iqstream_to_cswm1'>
       <Property name='N'          Value='3'/>
@@ -84,7 +83,6 @@
 	    <Instance worker='ocpi.assets.misc_comps.iqstream_to_cswm.hdl'
 		  name='tx_iqstream_to_cswm1' connect='tx_qdac1'/> 
     <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac1'/>
-    -->
     <!--==========================================================================-->
     <!-- This must be instanced here in app XML as a workaround for #827/AV-3799 -->
     <!-- It is not really needed as a slave -->

@@ -36,14 +36,13 @@ Assembly::
 ~Assembly() {
 }
 
-InstanceProperty::
-InstanceProperty() : property(NULL) {
-}
-
-void
-Worker::
+void Worker::
 deleteAssy() {
   delete m_assembly;
+}
+
+InstanceProperty::
+InstanceProperty() : property(NULL) {
 }
 
 // Find the OU::Assembly::Instance's port in the instance's worker
@@ -72,6 +71,7 @@ findPort(OU::Assembly::Port &ap, InstancePort *&found) {
   return NULL;
 }
 
+static const char *roleName(OU::Assembly::Role &r) { return r.isProducer() ? "producer" : "consumer"; }
 // A key challenge here is that we may not know the width of the connection until we look at
 // real ports
 const char *Assembly::
@@ -122,25 +122,34 @@ parseConnection(OU::Assembly::Connection &aConn) {
     OU::Assembly::External &ext = *ei->first;
     assert(aConn.m_ports.size() == 1);
     OU::Assembly::Port &ap = aConn.m_ports.front();
-    if (!ext.m_role.m_knownRole) {
-      assert(ap.m_role.m_knownRole);
+    assert(ap.m_role.m_knownRole);
+    // Inherit the role of the first internal connection
+    if (!ext.m_role.m_knownRole)
       ext.m_role = ap.m_role;
-    }
+    else if (ext.m_role.isProducer() != ap.m_role.isProducer())
+      return OU::esprintf("External port \"%s\" has inconsistent role (%s) vs. connected internal "
+			  "port \"%s\" with role %s",
+			  ext.m_name.c_str(),roleName(ext.m_role),ap.cname(), roleName(ap.m_role));
     assert(c.m_attachments.size() == 1);
     InstancePort &intPort = c.m_attachments.front()->m_instPort; // intPort corresponds to ap
     assert(intPort.m_port);
-    if (ei->second + ext.m_count > intPort.m_port->count())
-      return OU::esprintf("External port '%s' can't have index/count %zu/%zu "
-			  "when internal port has count: %zu",
-			  ext.m_name.c_str(), ei->second, ext.m_count, intPort.m_port->count());
-    Port *p;
+    // Connect ei->second + count on the external side, to ap.m_index + count on tne port side
+    if (ei->second + aConn.m_count > ext.m_count)
+      return OU::esprintf("External port '%s' can't connect to index/count %zu/%zu "
+			  "when the count of the external port itself is %zu",
+			  ext.cname(), ei->second, aConn.m_count, ext.m_count);
+    if (ap.m_index + aConn.m_count > intPort.m_port->count())
+      return OU::esprintf("Connection to external port '%s' can't connect to index/count %zu/%zu "
+			  "of internal port \"%s\" when the count of the internal port itself is %zu",
+			  ext.cname(), ap.m_index, aConn.m_count, ap.cname(), intPort.m_port->count());
+    Port *p = m_assyWorker.findPort(ext.m_name.c_str());
     if (m_assyWorker.m_type == Worker::Application) { // a proxy
       // We are dealing with a connection that implies a delegation, so the assembly worker port
       // already exists.
-      if (!(p = m_assyWorker.findPort(ext.m_name.c_str())))
+      if (!p)
 	return OU::esprintf("External connection in slave assembly for worker %s specifies port %s"
 			    " which does not exist", m_assyWorker.cname(), ext.m_name.c_str());
-    } else {
+    } else if (!p) {
       // Create the external port of this assembly
       // Start with a copy of the port, then patch it
       ocpiDebug("Clone of port %s of instance %s of worker %s for assembly worker %s: %s/%zu/%zu",
@@ -158,8 +167,9 @@ parseConnection(OU::Assembly::Connection &aConn) {
 			    c.m_name.c_str(), intPort.m_port->pname(), intPort.m_instance->cname(),
 			    err);
     }
-    InstancePort *ip = new InstancePort(NULL, p, &ext);
-    if ((err = c.attachPort(*ip, 0)))
+    InstancePort *ip = findInstancePort(ext.cname());
+    ip = new InstancePort(NULL, p, &ext);
+    if ((err = c.attachPort(*ip, ei->second)))
       return err;
   }
   return NULL;
@@ -569,11 +579,29 @@ emitXmlWorker(std::string &out, bool verbose) {
       }
       out += any ? "      </instance>\n" : "/>\n";
     }
+    auto &ua = *m_assembly->m_utilAssembly;
+    // predefine external ports that have counts
+    for (auto it = ua.externals().begin(); it != ua.externals().end(); ++it)
+      if (it->second.m_count)
+	OU::formatAdd(out, "      <external name='%s' count='%zu'/>\n",
+		      it->second.cname(), it->second.m_count);
     for (auto it = m_assembly->m_connections.begin(); it != m_assembly->m_connections.end(); ++it) {
-      out += (*it)->m_external ? "      <external" : "      <connection>\n";
+      if ((*it)->m_external) {
+	OU::formatAdd(out, "      <external name='%s'",
+		      (*it)->m_external->m_instPort.m_external->cname());
+	if ((*it)->m_external->m_index)
+	  OU::formatAdd(out, " index='%zu'", (*it)->m_external->m_index);
+	if ((*it)->m_count > 1)
+	  OU::formatAdd(out, " count='%zu'", (*it)->m_count);
+      } else {
+	out += "      <connection";
+	if ((*it)->m_count > 1)
+	  OU::formatAdd(out, " count='%zu'", (*it)->m_count);
+	out += ">\n";
+      }
       for (auto ait = (*it)->m_attachments.begin(); ait != (*it)->m_attachments.end(); ++ait)
 	if ((*ait)->m_instPort.m_external)
-	  OU::formatAdd(out, " name='%s'", (*ait)->m_instPort.m_external->m_name.c_str());
+	  continue;
         else if ((*it)->m_external)
 	  OU::formatAdd(out, " instance='%s' port='%s'",
 			(*ait)->m_instPort.m_instance->cname(),

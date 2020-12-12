@@ -1226,10 +1226,11 @@ metaPort(unsigned long which) const {
 }
 
 Worker::~Worker() {
-  deleteAssy();
-  for (auto it = m_slaves.begin(); it != m_slaves.end(); it++) {
-    delete (*it).second;
-  }
+  if (m_assembly)
+    deleteAssy();
+  else // slaves are deleted in the assembly if there is one.
+    for (auto it = m_slaves.begin(); it != m_slaves.end(); it++)
+      delete (*it).second;
 }
 
 const char *Worker::
