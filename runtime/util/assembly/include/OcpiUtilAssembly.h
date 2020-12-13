@@ -210,7 +210,6 @@ namespace OCPI {
       std::string m_package;
       unsigned m_doneInstance; // UINT_MAX for none
       Connections m_connections;
-      typedef std::list<Connection>::iterator ConnectionsIter;
       CMapPolicy m_cMapPolicy;
       size_t   m_processors;
       MappedProperties m_mappedProperties; // top level mapped to instance properties.

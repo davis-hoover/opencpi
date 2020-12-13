@@ -167,7 +167,7 @@ namespace OCPI {
         if ((err = parseExternal(ex, NULL, NULL, params)))
           return err;
       n = 0;
-      for (ezxml_t cx = ezxml_cchild(ax, "Connection"); cx; cx = ezxml_cnext(cx)) {
+      for (ezxml_t cx = ezxml_cchild(ax, "Connection"); cx; cx = ezxml_cnext(cx), ++n) {
         m_connections.push_back(new Connection);
         if ((err = m_connections.back()->parse(cx, *this, n, params)))
           return err;
@@ -859,26 +859,43 @@ namespace OCPI {
     }
     // There are four variants of "external" elements: (convenience has its price)
     // There are 7 attributes that apply variously as described below:
-    //    name, url, role, index, count, port, instance
-    // 1. the top-level element that just defines the external port:
-    //    This element is *required* if there will be multiple connections (count > 1)
-    //    attributes: name, maybe url, maybe role, maybe count
-    //    NOT: port, instance, or index
-    // 2. the top-level element that references an external port and *also* provides a instance/port
-    //    connection attributes:
-    //    maybe name (defaults to port), maybe url, port AND instance, maybe count
-    //    2a. if predefined:  NOT role, but maybe index
-    //        count is the count of the connection
-    //    2b. if not predefined:  maybe role, NOT index
-    //        cound is both the count of the connection and the count of the external port
-    // 3. a child element of "connection", referencing predefined external port
-    //    attributes: name, maybe url, maybe index
-    //    NOT: role, port, instance, count
+    //   Attributes that apply specifically to the external (port):
+    //     name          - name of external (optional in cases 2, 3, 4)
+    //     url           - url that is connected externally (optional, all cases)
+    //     role          - role of external port (optional)
+    //     count         - in case 1 (below)
+    //     index         - in case 4 (below)
+    //   Attributes that apply to the internal port being connected externally
+    //     instance      - which instance does the internal port belong to
+    //     port          - internal port that is connected to this external
+    //     index         - index at internal port (case 2)
+    //   Attributes that apply to the connection being established (case 2)
+    //     count         - the count of the connection
+    //
+    // 1. the top-level element that just defines the external port, without a connection
+    //    This element is *required* if there will be multiple connections to it
+    //    Required:  name
+    //    Optional:  url, role, count
+    //    Invalid:   port, instance, index
+    // 2. top-level element connection-shortcut references a new external port
+    //    Required:  port and instance to specify the internal endpoint
+    //    Optional:  name (defaults from port), url, index, count, role
+    //    count is both the count of the connection and the count of the external port
+    // 3. top-level element connection-shortcut references a predefined external port
+    //    Required:  port and instance to specify the internal endpoint
+    //    Optional:  name (defaults from port), url, index, count
+    //    Invalid:   role
+    //    count is the count of the connection
     // 4. a child element of "connection", introducing a new external port
-    //    attributes: maybe name, maybe url, maybe role
-    //    NOT: port, instance, count, index
+    //    Required:  none
+    //    Optional:  name, url, index
+    //    Invalid:   port, instance, count
+    // 5. a child element of "connection", referencing predefined external port
+    //    Required:  none
+    //    Optional:  name, url, index
+    //    Invalid:   port, instance, count
     const char *Assembly::
-    parseExternal(ezxml_t x, Connection *conn, const char *a_role, const PValue *pvl) {
+    parseExternal(ezxml_t x, Connection *a_conn, const char *a_role, const PValue *pvl) {
       const char
 	*l_name = ezxml_cattr(x, "name"),
 	*url = ezxml_cattr(x, "url"),
@@ -899,6 +916,7 @@ namespace OCPI {
 	if (eit != m_externals.end())
 	  e = &eit->second;
       }
+      Connection *conn = a_conn;
       if (!conn && !port && !l_instance) {
 	// --------------------------------------------------------------------------------
 	// Case 1: we are defining an external port, but not connecting it to any internal port
@@ -912,65 +930,58 @@ namespace OCPI {
 			  "a port/instance connection");
       } else if (!conn) {
 	// --------------------------------------------------------------------------------
-	// Case 2:  a top-level 'external' element that also makes a connection via port+instance
-	//          it may or may not be predefined
+	// Case 2 or 3:  a top-level 'external' element that also makes a connection via port+instance
 	if (!port || !l_instance)
 	  return esprintf("An \"external\" element must have both \"port\" and \"instance\" "
 			  "attributes or neither");
 	if (!l_name) {
-	  l_name = index ? format(nameString, "%s%zu", port, index) : port;
+	  l_name = port; // index ? format(nameString, "%s%zu", port, index) : port;
 	  auto eit = m_externals.find(l_name);
 	  e = eit == m_externals.end() ? NULL : &eit->second;
 	}
-	if (role)
-	  return esprintf("A top-level external element cannot have a \"role\" attribute");
 	if (e) {
+	  // --------------------------------------------------------------------------------
+	  // Case 3:  the top-level 'external' exists
+	  if (role)
+	    return esprintf("A top-level external element cannot respecify the \"role\" attribute");
 	  if (hasCount && count > (e->m_count ? e->m_count : 1))
 	    return esprintf("A top-level external element's \"count\" attribute (%zu) cannot "
 			    "exceed predefined count of the external port (%zu)",
 			    count, e->m_count);
-	  if (hasIndex && index + (hasCount ? count : 1) > (e->m_count ? e->m_count : 1))
-	    return esprintf("A top-level external element's \"index\" attribute (%zu) cannot "
-			    "exceed predefined count of the external port (%zu)",
-			    index, e->m_count ? e->m_count : 1);
-
 	}
+	// Case 2 or 3 - make top level connection, external is added later in all cases
 	unsigned instanceNum;
-	if ((err = getInstance(l_instance, instanceNum)))
-	  return err;
-	// Done with error checking of attributes
 	Port *dummy;
 	std::string cName;
-	if ((err = addConnection(format(cName, "%s%zu", l_name, index), x, count, conn)) ||
-	    (err = conn->addPort(*this, instanceNum, port, false, false, false, 0, pvl, dummy)))
+	if ((err = getInstance(l_instance, instanceNum)) ||
+	    (err = addConnection(format(cName, "conn%zu", m_connections.size()), x, count, conn)) ||
+	    (err = conn->addPort(*this, instanceNum, port, false, false, false, index, pvl, dummy)))
 	  return err;
-      } else if (port || l_instance || count) // case 3 or 4
-	  return esprintf("An external element inside a connection element cannot have \"port\", "
-			  "\"instance\", or \"count\" attributes");
-      else if (e) {
-	// Case 3:  external element, part of a connection, referencing a predefined external port
+      } else if (port || l_instance || count) // case 4 or 5, an external child of connection
+	return esprintf("An external element inside a connection element cannot have \"port\", "
+			"\"instance\", or \"count\" attributes");
+      else if (!e) {
+	// --------------------------------------------------------------------------------
+	// Case 4:  an 'external' element part of a 'connection' that introduces the external port
+	//          or an external attribute of a connection (with no name)
+        if (hasIndex)
+	  return esprintf("An external element inside a connection element cannot have an \"index\" "
+			  "attribute unless the external port is predefined separately");
+	if (!l_name)
+	  l_name = conn->m_name.empty() ?
+	    format(nameString, "ext%zu", m_externals.size()) : conn->m_name.c_str();
+	auto eit = m_externals.find(l_name);
+	e = eit == m_externals.end() ? NULL : &eit->second;
+      } else {
+	// --------------------------------------------------------------------------------
+	// Case 5: an external child element of a connection for a predefined external
 	if (role)
 	  return esprintf("An external element inside a connection element cannot have a \"role\" "
 			  "attribute when the external port is predefined separately");
-
-      } else if (hasIndex)
-	  return esprintf("An external element inside a connection element cannot have an \"index\" "
-			  "attribute unless the external port is predefined separately");
-      else {
-	// --------------------------------------------------------------------------------
-	// Case 4:  an 'external' element part of a 'connection' that introduces the external port
-	//          or an external attribute of a connection
-	if (!l_name)
-	  l_name = conn->m_name.empty() ?
-	    format(nameString, "ext%zu", m_externals.size()) :
-	    conn->m_name.c_str();
-	auto eit = m_externals.find(l_name);
-	e = eit == m_externals.end() ? NULL : &eit->second;
       }
-      if (!e && (err = addExternal(l_name, role, url, count, e))) // case 1, 2b, 4
-        return err;
-      if (conn) // case 2, 3, 4
-	conn->addExternal(*e, index, count);
+      if ((!e && (err = addExternal(l_name, role, url, count, e))) || // create the external case 1,2,4
+	  (conn && (err = conn->addExternal(*e, a_conn ? index : 0, count)))) // case 2, 3, 4, 5
+	return err;
       return e->m_parameters.parse(pvl, x, "name", "url", "provider", "port", "instance", "index", "count", NULL);
     }
     Assembly::Role::Role()
