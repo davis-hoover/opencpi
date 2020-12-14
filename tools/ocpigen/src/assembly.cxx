@@ -149,6 +149,11 @@ parseConnection(OU::Assembly::Connection &aConn) {
       if (!p)
 	return OU::esprintf("External connection in slave assembly for worker %s specifies port %s"
 			    " which does not exist", m_assyWorker.cname(), ext.m_name.c_str());
+      if (p->m_arrayCount != ext.m_count)
+	return OU::esprintf("External port \"%s\" in slave assembly for worker %s specifies count "
+			    "%zu, while proxy port has count %zu", ext.m_name.c_str(),
+			    m_assyWorker.cname(), ext.m_count, p->m_arrayCount);
+
     } else if (!p) {
       // Create the external port of this assembly
       // Start with a copy of the port, then patch it
@@ -167,8 +172,7 @@ parseConnection(OU::Assembly::Connection &aConn) {
 			    c.m_name.c_str(), intPort.m_port->pname(), intPort.m_instance->cname(),
 			    err);
     }
-    InstancePort *ip = findInstancePort(ext.cname());
-    ip = new InstancePort(NULL, p, &ext);
+    InstancePort *ip = new InstancePort(NULL, p, &ext);
     if ((err = c.attachPort(*ip, ei->second)))
       return err;
   }
@@ -586,30 +590,22 @@ emitXmlWorker(std::string &out, bool verbose) {
 	OU::formatAdd(out, "      <external name='%s' count='%zu'/>\n",
 		      it->second.cname(), it->second.m_count);
     for (auto it = m_assembly->m_connections.begin(); it != m_assembly->m_connections.end(); ++it) {
-      if ((*it)->m_external) {
-	OU::formatAdd(out, "      <external name='%s'",
-		      (*it)->m_external->m_instPort.m_external->cname());
-	if ((*it)->m_external->m_index)
-	  OU::formatAdd(out, " index='%zu'", (*it)->m_external->m_index);
-	if ((*it)->m_count > 1)
-	  OU::formatAdd(out, " count='%zu'", (*it)->m_count);
-      } else {
-	out += "      <connection";
-	if ((*it)->m_count > 1)
-	  OU::formatAdd(out, " count='%zu'", (*it)->m_count);
-	out += ">\n";
+      out += "      <connection";
+      if ((*it)->m_count > 1)
+	OU::formatAdd(out, " count='%zu'", (*it)->m_count);
+      out += ">\n";
+      for (auto ait = (*it)->m_attachments.begin(); ait != (*it)->m_attachments.end(); ++ait) {
+	auto &at = **ait;
+	if (at.m_instPort.m_external)
+	  OU::formatAdd(out, "        <external name='%s'", at.m_instPort.m_external->cname());
+	else
+	  OU::formatAdd(out, "        <port name='%s' instance='%s'",
+			at.m_instPort.m_port->pname(), at.m_instPort.m_instance->cname());
+	if (at.m_index || at.m_instPort.m_port->m_arrayCount)
+	  OU::formatAdd(out, " index='%zu'", (*ait)->m_index);
+	out += "/>\n";
       }
-      for (auto ait = (*it)->m_attachments.begin(); ait != (*it)->m_attachments.end(); ++ait)
-	if ((*ait)->m_instPort.m_external)
-	  continue;
-        else if ((*it)->m_external)
-	  OU::formatAdd(out, " instance='%s' port='%s'",
-			(*ait)->m_instPort.m_instance->cname(),
-			(*ait)->m_instPort.m_port->pname());
-        else
-	  OU::formatAdd(out, "        <port instance='%s' name='%s'/>\n",
-			(*ait)->m_instPort.m_instance->cname(), (*ait)->m_instPort.m_port->pname());
-      out += (*it)->m_external ? "/>\n" : "      </connection>\n";
+      out += "      </connection>\n";
     }
     out += "    </slaves>\n";
   }

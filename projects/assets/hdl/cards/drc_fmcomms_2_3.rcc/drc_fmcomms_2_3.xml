@@ -2,6 +2,9 @@
 	   controlOperations='start'
 	   staticprereqlibs='ad9361' >
 
+  <specProperty name='MAX_CHANNELS_p' value="4"/>
+  <specProperty name='MAX_RX_CHANNELS_p' value="2"/>
+  <specProperty name='MAX_TX_CHANNELS_p' value="2"/>
   <specProperty name='MAX_RX_RF_PORTS_p' value="2"/>
   <specProperty name='MAX_TX_RF_PORTS_p' value="2"/>
   <specProperty name='rf_ports_rx' parameter='1' value='Rx0,Rx1'/>

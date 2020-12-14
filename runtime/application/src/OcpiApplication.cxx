@@ -482,7 +482,23 @@ namespace OCPI {
 	  // be applied each time this candidate is considered for deployment
 	  ocpiInfo("++++++++++++ Starting one-time processing of slave assembly for instance %u candidate %p",
 		   instNum, &c);
-	  c.slaves = new OL::Assembly(slaves, ui.cname(), NULL);
+	  // FIXME:  There should be a factory method that returns errors...
+	  std::string error;
+	  try {
+	    c.slaves = new OL::Assembly(slaves, ui.cname(), NULL);
+	  } catch (std::string &e) {
+	    error = e;
+	  } catch (const char *e) {
+	    error = e ? e : "unexpected empty string error";
+	  } catch (std::exception &e) {
+	    error = e.what();
+	  } catch (...) {
+	    error = "unexpected exception";
+	  }
+	  if (!error.empty()) {
+	    ocpiInfo("%s when processing slaves due to error: %s", reject.c_str(), error.c_str());
+	    return false;
+	  }
 	  c.nInstances = m_nInstances;                      // remember for resize after deployment
 	  c.nConnections = m_assembly.m_connections.size(); // remember for resize after deployment
 	  // Patch the instances and ports in slave assembly for (repeated) insertion into the app

@@ -931,7 +931,8 @@ create(const char *file, const std::string &parentFile, const char *package, con
       // Resolving expressions finalizes data ports, which may add built-in properties for ports
       (err = w->resolveExpressions(*w)) ||
       (err = w->finalizeProperties()) ||
-      (w->m_model == HdlModel && (err = w->finalizeHDL()))) {
+      (w->m_model == HdlModel && (err = w->finalizeHDL())) ||
+      (w->m_model == RccModel && (err = w->finalizeRCC()))) {
     delete w;
     w = NULL;
   } else {

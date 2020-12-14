@@ -1570,8 +1570,14 @@ parseRccImpl(const char *a_package) {
   }
   for (unsigned i = 0; i < m_ports.size(); i++)
     m_ports[i]->finalizeRccDataPort();
+  return NULL;
+}
+// slave parsing depends on proxy port expressions
+const char *Worker::
+finalizeRCC() {
   return parseSlaves();
 }
+
 
 // RCC assemblies are collections of reusable instances with no connections.
 const char *Worker::
