@@ -38,7 +38,7 @@ architecture rtl of message_sizer is
   signal give_counter_cnt : unsigned(SIZE_BIT_WIDTH-1 downto 0) := (others => '0');
 begin
 
-  eom_s <= '1' when (give_counter_cnt = message_size_num_gives-1) else '0';
+  eom_s <= '1' when (give_counter_cnt = message_size_num_gives-1 and give = '1') else '0';
   give_counter_rst <= rst or eom_s;
 
   give_counter : util.util.counter
@@ -50,7 +50,7 @@ begin
       en  => give,
       cnt => give_counter_cnt);
 
-  som <= ocpi.types.btrue when (give_counter_cnt = 0) else ocpi.types.bfalse;
+  som <= ocpi.types.btrue when (give_counter_cnt = 0 and give = '1') else ocpi.types.bfalse;
   eom <= eom_s;
 
 end rtl;
