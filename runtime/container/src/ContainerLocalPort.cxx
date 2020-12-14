@@ -186,25 +186,25 @@ namespace OCPI {
 	bo.m_mode = AsAvailable;
       } else
 	bo.m_mode = Discard;
-    }    
+    }
     // Receive from one, defined by our range
     void LocalPort::
     iFirstCyc(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	      unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = c.m_in.m_index == 0 ? Cyclic : Discard;
-    }    
+    }
     void LocalPort::
     iFirst(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	      unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_first = bo.m_last = 0;
       bo.m_mode = AsAvailable;
-    }    
+    }
     // Receive from any
     void LocalPort::
     iAny(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = AsAvailable;
-    }    
+    }
     // Receive from one, defined by our range
     void LocalPort::
     iOneP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -369,10 +369,10 @@ namespace OCPI {
       if (m_localBuffer) {
 	if (m_bridgeOp)
 	  return true; // we're processing a local buffer with a known opcode
-      } else if (!((m_localBuffer = 
+      } else if (!((m_localBuffer =
 		    isProvider() ?
 		    lbp.getEmptyBuffer() : lbp.getFullBuffer())))
-	return false;  // there is no local buffer to work with  
+	return false;  // there is no local buffer to work with
       uint8_t op;
       if (isProvider()) {
 	// Find a bridge with a message and opcode
@@ -526,4 +526,3 @@ namespace OCPI {
     }  // end of method
   } // end of namespace Container
 } // end of namespace OCPI
-

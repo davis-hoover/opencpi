@@ -92,7 +92,7 @@ architecture rtl of worker is
   signal eof_sent_r        : bool_t; -- input eof indication conveyed/enqueued
 
   -- SDP back side --
-  signal sdp_my_reset           : std_logic; -- reset from EITHER sdp_reset or ctl_in.reset
+  signal sdp_my_reset           : std_logic; -- reset from EITHER sdp_reset or in_in.reset
   signal ctl2sdp_reset          : std_logic;
   signal bramb_addr             : bram_addr_t;
   signal bramb_addr_r           : bram_addr_t;
@@ -116,8 +116,6 @@ architecture rtl of worker is
   signal sdp_segment_addr_r     : whole_addr_t;
   signal sdp_whole_addr         : whole_addr_t;
   signal sdp_segment_dws_left_r : meta_dw_count_t;
-  -- sdp clock domain versions of control signals
-  signal sdp_is_operating       : bool_t;
 
   ---- Global state
   signal buffer_size_fault_r : bool_t;
@@ -255,19 +253,7 @@ begin
   flag_out       <= to_integer(remote_idx_t(flag_out_slv));
   flag_deq       <= flag_not_empty; -- output of FIFO always processed immediately
 
-  is_op : component cdc.cdc.single_bit
-    port map   (src_clk           => ctl_in.clk,
-                src_rst           => ctl_in.reset,
-                src_in            => ctl_in.is_operating,
-                src_en            => '1',
-                dst_clk           => sdp_clk,
-                dst_rst           => sdp_my_reset,
-                dst_out           => sdp_is_operating);
-  ctl2sdp_rst : component cdc.cdc.reset
-    port map   (src_rst           => ctl_in.reset,
-                dst_clk           => sdp_clk,
-                dst_rst           => ctl2sdp_reset);
-  sdp_my_reset <= sdp_reset or ctl2sdp_reset;
+  sdp_my_reset <= sdp_reset or in_in.reset;
   -- the process going from wsi into the data bram and metadata fifo
   wsi2bram : process(sdp_clk)
   begin
@@ -286,15 +272,13 @@ begin
         eof_sent_r          <= bfalse;
       elsif not operating_r then
         -- initialization on first transition to operating.  poor man's "start".
-        if its(sdp_is_operating) then
+        if its(in_in.ready) then
           operating_r   <= btrue;
           if props_in.buffer_size > memory_bytes then
             buffer_size_fault_r <= btrue;
           end if;
         end if;
         buffer_avail_r <= resize(props_in.buffer_count, buffer_avail_r'length);
-      elsif not sdp_is_operating then
-        operating_r <= bfalse;
       else -- we are operating
         if its(md_enq) then
           if its(in_in.eof) then
