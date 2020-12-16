@@ -60,9 +60,12 @@ addInclude(const char *inc) {
 // The "optional" argument says the file may not exist at all, or it
 // may have the wrong top level element.  If the filename is "-",
 // stdin is assumed.
+// the skipFile arg is a callback function that, for a found and openable file,
+// whether it should in fact be skipped during the search.
 const char *
-parseFile(const char *file, const std::string &parent, const char *element,
-          ezxml_t *xp, std::string &xfile, bool optional, bool search, bool nonExistentOK) {
+parseFile(const char *file, const std::string &parent, const char *element, ezxml_t *xp,
+	  std::string &xfile, bool optional, bool search, bool nonExistentOK,
+	  bool (*skipFile)(const char *, void *), void *arg) {
   const char *err = NULL;
   char *myFile;
   const char *slash = strrchr(file, '/');
@@ -85,6 +88,8 @@ parseFile(const char *file, const std::string &parent, const char *element,
   int fd = open(cp, O_RDONLY);
   ocpiDebug("Trying to open '%s', and %s", cp, fd < 0 ? "failed" : "succeeded");
   do { // break on error
+    if (fd >= 0 && skipFile && skipFile(cp, arg)) // ask caller if this file is really ok
+      fd = -1;
     if (fd < 0) {
       // file was not where parent file was, and not local.
       // Try the include paths
@@ -100,6 +105,8 @@ parseFile(const char *file, const std::string &parent, const char *element,
 	  tries.push_back(cp);
 	  fd = open(cp, O_RDONLY);
 	  ocpiDebug("Trying to open '%s', and %s", cp, fd < 0 ? "failed" : "succeeded");
+	  if (fd >= 0 && skipFile && skipFile(cp, arg)) // ask caller if this file is really ok
+	    fd = -1;
           if (fd >= 0)
 	    break;
 	}

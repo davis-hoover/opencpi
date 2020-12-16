@@ -334,7 +334,7 @@ int main(int /*argc*/, char **argv)
 			 OA::PVBool("hidden", true),
 			 OA::PVString(platform.empty() ? NULL : "platform", platform.c_str()),
 			 OA::PVEnd };
-    OCPI::API::Application app(argv[1] && argv[1][0] ? appWithSlave : appWithoutSlave, pvs);
+    OCPI::API::Application app(argv[1] && argv[1][0] ? appWithoutSlave : appWithSlave, pvs);
     app.initialize(); // all resources have been allocated
     app.start();      // execution is started
     app.wait();       // wait until app is "done"

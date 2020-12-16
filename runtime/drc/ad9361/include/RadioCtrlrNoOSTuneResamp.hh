@@ -64,6 +64,7 @@ struct Ad9361DataSubConfig {
  *         bitstream.
  ******************************************************************************/
 struct Ad9361InitConfig : Ad9361ConfigConfig, Ad9361DataSubConfig {
+  bool xo_disable_use_ext_ref_clk;
 };
 
 /// @brief Callbacks to proxy worker (and its slaves) for register access, etc.
@@ -88,10 +89,13 @@ struct DeviceCallBack {
   virtual unsigned getRfInput(unsigned device, config_value_t tuning_freq_MHz) = 0;
   virtual unsigned getRfOutput(unsigned device, config_value_t tuning_freq_MHz) = 0;
 };
-// A templated helper function that simply initializes the Ad9361InitialConfig from the two required slaves
+// A templated helper function that simply initializes our Ad9361InitialConfig from the two required slaves
 // and performs any other worker actions required prior to the call to ad9361_init.
 template<class Config, class DataSub> void
 ad9361InitialConfig(Config &config, DataSub &dataSub, Ad9361InitConfig &cfg) {
+  memset(&cfg, 0, sizeof(cfg)); // a known initial state
+  // set this default to use ext ref clk, not dcxo
+  cfg.xo_disable_use_ext_ref_clk = true;
   // don't care about qadc0_is_present
   cfg.qadc1_is_present         = config.get_qadc1_is_present();
   // don't care about qadc1_is_present

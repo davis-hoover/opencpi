@@ -73,6 +73,9 @@ bool LocalLauncher::
 launch(Launcher::Members &instances, Launcher::Connections &connections) {
   m_more = false;
   Launcher::Member *i = &instances[0];
+  // So slaves first.  I think the reason for this is that there were non-compliant legacy
+  // proxies which tried to touch slaves too early (before start).  But this backward
+  // compatibility does no harm
   for (unsigned n = 0; n < instances.size(); n++, i++)
     if (&i->m_container->launcher() == this && i->m_hasMaster)
       createWorker(*i);
@@ -96,17 +99,19 @@ launch(Launcher::Members &instances, Launcher::Connections &connections) {
     c.prepare();
     // First create the local worker or external ports
     if (c.m_in.m_launcher == this) {
-      if (c.m_in.m_member)
-	c.m_in.m_port = &c.m_in.m_member->m_worker->getPort(c.m_in.m_name, c.m_out.m_scale,
-							    c.m_in.m_params);
-      else if (c.m_in.m_name)
+      if (c.m_in.m_member) {
+	if (c.m_in.m_member->m_worker)
+	  c.m_in.m_port = &c.m_in.m_member->m_worker->getPort(c.m_in.m_name, c.m_out.m_scale,
+							      c.m_in.m_params);
+      } else if (c.m_in.m_name)
 	c.m_in.m_port = new ExternalPort(c, true);
     }
     if (c.m_out.m_launcher == this) {
-      if (c.m_out.m_member)
-	c.m_out.m_port = &c.m_out.m_member->m_worker->getPort(c.m_out.m_name, c.m_in.m_scale,
-							      c.m_out.m_params);
-      else if (c.m_out.m_name)
+      if (c.m_out.m_member) {
+	if (c.m_out.m_member->m_worker)
+	  c.m_out.m_port = &c.m_out.m_member->m_worker->getPort(c.m_out.m_name, c.m_in.m_scale,
+								c.m_out.m_params);
+      } else if (c.m_out.m_name)
 	c.m_out.m_port = new ExternalPort(c, false);
     }
     if (c.m_in.m_launcher == this && c.m_in.m_port && c.m_in.m_port->initialConnect(c))

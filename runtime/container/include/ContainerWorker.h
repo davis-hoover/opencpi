@@ -125,7 +125,7 @@ namespace OCPI {
       const Workers &m_slaves;
       bool m_hasMaster;
       size_t m_member, m_crewSize;
-      PortMask m_connectedPorts, m_optionalPorts; // spcm?
+      PortMask m_connectedPorts, m_optionalPorts, m_outputPorts, m_inputPorts; // spcm?
       mutable std::vector<Cache *> m_cache; // per property write cache, when needed
       bool beforeStart() const;
     protected:
@@ -141,6 +141,9 @@ namespace OCPI {
     public:
       inline const Artifact *artifact() const { return m_artifact; }
       bool isOperating() const;
+      bool isSource() const {
+	return (m_outputPorts & m_connectedPorts) && !(m_inputPorts & m_connectedPorts);
+      }
     protected:
       inline ezxml_t myXml() const { return m_xml; }
       inline ezxml_t myInstXml() const { return m_instXml; }
