@@ -70,7 +70,7 @@ namespace OCPI {
     // It supports the API, and is a child of the Worker template class inherited by
     // concrete workers
     // These interfaces must be supplied for control purposes
-    class WorkerControl {
+    class WorkerControl : virtual public OCPI::API::PropertyAccess {
     protected:
       virtual ~WorkerControl();
     public:
@@ -101,17 +101,16 @@ namespace OCPI {
       virtual uint64_t getProperty64(const OCPI::API::PropertyInfo &info, size_t offset, unsigned idx = 0)
 	const = 0;
       virtual void controlOperation(OCPI::Util::Worker::ControlOperation) = 0;
+      virtual size_t getSequenceLengthProperty(const OCPI::API::PropertyInfo &info,
+					       const OCPI::Util::Member &m, size_t offset) const;
     };
     typedef uint32_t PortMask;
     class Worker;
     typedef std::vector<Worker *> Workers;
     extern const Workers NoWorkers;
     class Cache;
-    class Worker
-      : public OCPI::Util::Worker, public OCPI::API::Worker, virtual public Controllable,
-	virtual public WorkerControl
-    {
-
+    class Worker : public OCPI::Util::Worker, virtual public Controllable, virtual public WorkerControl,
+		   public OCPI::API::Worker {
       friend class OCPI::API::Property;
       friend class Port;
       friend class Artifact;
@@ -262,9 +261,12 @@ namespace OCPI {
 
     private:
       const OCPI::API::PropertyInfo &checkInfo(unsigned ordinal) const;
-    public:
 #undef OCPI_DATA_TYPE
 #undef OCPI_DATA_TYPE_S
+    protected:
+     size_t getSequenceLengthCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
+				    size_t offset) const;
+    public:
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) \
       void set##pretty##PropertyOrd(unsigned ordinal, run val, unsigned idx) const; \
       run get##pretty##PropertyOrd(unsigned ordinal, unsigned idx) const; \

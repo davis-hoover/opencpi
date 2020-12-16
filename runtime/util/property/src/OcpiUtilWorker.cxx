@@ -99,6 +99,26 @@ namespace OCPI {
        ocpiAssert(0); return *m_tests;
     }
 #endif
+    Slave::
+    Slave(const char *worker)
+      : m_name(worker), m_worker(worker), m_slavePort(NULL), m_delegated(NULL),
+	m_index(0), m_optional(false) {
+    }
+    Slave::
+    Slave(Worker &w, ezxml_t xml, unsigned ordinal, const char *&err)
+      : m_name(ezxml_cattr(xml, "name")), m_worker(ezxml_cattr(xml, "worker")),
+	m_slavePort(ezxml_cattr(xml, "slave_port")), m_delegated(NULL) {
+      if ((err = OE::getBoolean(xml, "optional", &m_optional)) ||
+	  (err = OE::getNumber(xml, "index", &m_index, NULL, SIZE_MAX)))
+	return;
+      const char *port = ezxml_cattr(xml, "port");
+      if (port) {
+	if ((m_delegated = w.findMetaPort(port)))
+	  m_delegated->m_slave = ordinal; // set the slave ordinal of the delegated port
+	else
+	  err = esprintf("delegated port \"%s\" for slave \"%s\" not found", port, m_name);
+      }
+    }
     const char *Worker::
     parse(ezxml_t xml, Attributes *attr) {
       m_xml = xml;
@@ -111,22 +131,6 @@ namespace OCPI {
 	return err;
       if (!OE::getOptionalString(xml, m_specName, "specName"))
 	m_specName = m_name;
-      const char *slave = ezxml_cattr(xml, "slave");
-      if (slave) {
-	if (ezxml_cchild(xml, "slave"))
-	  return esprintf("cannot have slave elements when you have a slave attribute");
-	m_slaves.emplace_back(slave, slave, false);
-      } else
-	for (ezxml_t cx = ezxml_cchild(xml, "slave"); cx; cx = ezxml_cnext(cx)) {
-	  const char
-	    *w = ezxml_cattr(cx, "worker"),
-	    *n = ezxml_cattr(cx, "name");
-	  assert(w);
-	  bool optional = false;
-	  if ((err = OE::getBoolean(cx, "optional", &optional)))
-	    return err;
-	  m_slaves.emplace_back(n, w, optional);
-	}
       if ((m_nProperties = OE::countChildren(xml, "property")))
 	m_properties = new Property[m_nProperties];
       if ((m_nPorts = OE::countChildren(xml, "port")))
@@ -183,12 +187,26 @@ namespace OCPI {
       for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
 	if ((err = p->postParse()))
           return esprintf("Invalid xml port description(3): %s", err);
+	else if (p->m_slave == SIZE_MAX)
+	  continue; // delegated ports aren't "real" for this purpose
         else if (p->m_provider) {
 	  if (!p->m_isOptional)
 	    hasInput = true;
         } else
 	  hasOutput = true;
       m_isSource = hasOutput && !hasInput;
+      // Slaves must be parsed after ports
+      const char *slave = ezxml_cattr(xml, "slave");
+      if (slave) {
+	if (ezxml_cchild(xml, "slave"))
+	  return esprintf("cannot have slave elements when you have a slave attribute");
+	m_slaves.emplace_back(slave);
+      } else
+	for (ezxml_t cx = ezxml_cchild(xml, "slave"); cx; cx = ezxml_cnext(cx)) {
+	  m_slaves.emplace_back(*this, cx, m_slaves.size(), err);
+	  if (err)
+	    return err;
+	}
       Memory* m = m_memories;
       for (x = ezxml_cchild(xml, "memory"); x; x = ezxml_cnext(x), m++ )
         if ((err = m->parse(x)))
