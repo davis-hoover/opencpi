@@ -18,7 +18,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all, IEEE.numeric_std.all;
 library ocpi; use ocpi.all, ocpi.types.all;
-library work; use work.platform_pkg.all; use work.time_client_defs.all; 
+library work; use work.platform_pkg.all; use work.time_client_defs.all;
 library cdc;
 entity time_client_rv is
   port(
@@ -33,6 +33,7 @@ architecture rtl of time_client_rv is
 
   signal wci_reset          : std_logic;
   signal wci2timebase_reset : std_logic;
+  signal wci2wti_reset      : std_logic;
   signal sync_reg_in        : std_logic_vector(time_in.now'length downto 0);
   signal sync_reg_out       : std_logic_vector(time_in.now'length downto 0);
 
@@ -45,8 +46,13 @@ begin
                 dst_clk => time_in.clk,
                 dst_rst => wci2timebase_reset);
 
+  wci2wti_rst : cdc.cdc.reset
+    port map   (src_rst => wci_reset,
+                dst_clk => wti_in.clk,
+                dst_rst => wci2wti_reset);
+
   sync_reg_in <= time_in.valid & std_logic_vector(time_in.now);
-  
+
   syncReg : cdc.cdc.bits_feedback
     generic map (
       width => time_in.now'length+1) -- +1 is for the valid flag
@@ -54,7 +60,7 @@ begin
       src_CLK => time_in.clk,
       dst_CLK => wti_in.Clk,
       src_RST => wci2timebase_reset,
-      dst_rst => wci_reset, -- this will be released earlier than the time will be used.
+      dst_rst => wci2wti_reset, -- this will be released earlier than the time will be used.
       src_IN  => sync_reg_in,
       src_EN  => '1',
       dst_OUT => sync_reg_out,
