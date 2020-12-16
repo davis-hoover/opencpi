@@ -99,6 +99,7 @@ add to tree.
   CMD_OPTION  (dynamic,   Z,    Bool,   NULL, "Whether the artifact should be dynamic") \
   CMD_OPTION  (nworkers,  N,    Bool,   NULL, "Multiple workers are actually implemented here (rcc)") \
   CMD_OPTION  (comp,      G,    Bool,   NULL, "Generate component output for use with ocpidev") \
+  CMD_OPTION  (rxml,      R,    Bool,   NULL, "Parse project level properties from XML properties") \
 
 #define OCPI_OPTION
 #define OCPI_OPTIONS_NO_MAIN
@@ -115,7 +116,7 @@ main(int argc, const char **argv) {
   bool
     doDefs = false, doEnts = false, doImpl = false, doSkel = false, doAssy = false, doWrap = false,
     doArt = false, doTopContainer = false, doTest = false, doCases = false, verbose = false,
-    doTopConfig = false, doCompArt = false;
+    doTopConfig = false, doCompArt = false, doProjectXml = false;
   int doGenerics = -1;
   if (argc <= 1) {
     fprintf(stderr,
@@ -146,6 +147,7 @@ main(int argc, const char **argv) {
             " -S <assembly> Specify the name of the assembly for a container\n"
             " -T            Generate test artifacts\n"
             " -G            Generate Component Artifact for use with ocpidev\n"
+            " -R <file>     Read XML OcpiProperties\n"
             );
     return 1;
   }
@@ -262,6 +264,9 @@ main(int argc, const char **argv) {
       case 'G':
         doCompArt = true;
         break;
+      case 'R':
+        doProjectXml = true;
+        break;
       default:
 	err = OU::esprintf("Unknown flag: %s\n", *ap);
       }
@@ -307,6 +312,42 @@ main(int argc, const char **argv) {
         if (doCases) {
           if ((err = createCases(ap, package, outDir, verbose)))
             break;
+          return 0;
+        }
+        if (doProjectXml) {
+          std::string config, constraints;
+          OrderedStringSet platforms;
+          ezxml_t prop, name;
+          if ((err = parseFile(*ap, parent, "project", &xml, file, false, false))) {
+            err = OU::esprintf("For project XML file '%s':  %s", *ap, err);
+            break;
+          }
+          if (!(prop = ezxml_cchild(xml, "OcpiProperty"))) {
+            // Legacy syntax with property='value'
+            const char* const property[] = {"PackageName", "PackagePrefix", "Package",
+             "ProjectDependencies", "Libraries", "IncludeDirs", "XmlIncludeDirs",
+             "ComponentLibraries"};
+            int last = sizeof(property)/sizeof(property[0]);
+            char *value;
+            for (int idx = 0; idx < last; ++idx) {
+              value = (char *)ezxml_cattr(xml, property[idx]);
+              if (value)
+                printf("%s=%s\n", property[idx], value);
+            }
+          } else {
+            // Verbose syntax with OcpiPreoperty name and value
+            ezxml_t value;
+            do {
+              if ((name = ezxml_cchild(prop, "name"))) {
+                printf("%s=", name->txt);
+                value = ezxml_cchild(prop, "value");
+                if (value)
+                  printf("%s\n", value->txt);
+                else
+                  fputs("\n", stdout);
+              }
+            } while ((prop = ezxml_cnext(prop)));
+          }
           return 0;
         }
 	// The parent file being empty is for code generation, and thus library dependency parsing
