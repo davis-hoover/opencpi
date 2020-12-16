@@ -142,7 +142,9 @@ $1/$3.tar:
                  $$(foreach l,$$(firstword $$(subst =, ,$$i)),\
                    $$(foreach p,$$(word 2,$$(subst =, ,$$i)),\
                      $$(foreach s,$$(if $$(filter /%,$$p),$$(patsubst /%,%,$$p),$$(subst ../,,$$p)),\
-                       --xform='s=$$s$$$$=$$l=' --xform='s=$$s/=$$l/=' $$p )))) $3 ) > $1/$3-modelsim.out 2>&1
+                       --xform='s=$$s$$$$=$$l=' --xform='s=$$s/=$$l/=' $$p )))) $3 )> $1/$3-modelsim.out 2>&1;\
+	    RC=$$$$?; egrep -i "[^-]error|fatal" $1/$3-modelsim.out; exit $$$$RC
+
 
 endef
 endif
