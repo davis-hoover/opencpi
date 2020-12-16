@@ -1,39 +1,72 @@
 #!/usr/bin/env python3
 
+import json
 import os
-import re
-from collections import namedtuple, defaultdict
 from pathlib import Path
+from urllib.request import urlopen
+
+class Platform():
+
+    def __init__(self, name, model, project, linked_platforms=None, 
+                 cross_platforms=None, is_host=False, is_sim=False, 
+                 config=None):
+        self.name = name
+        self.model = model
+        self.is_host = is_host
+        self.is_sim = is_sim
+        self.project = project
+        self.linked_platforms = linked_platforms or []
+        self.cross_platforms = cross_platforms or []
+
+        if config:
+            self.ip = config['ip'] if 'ip' in config else None
+            self.port = config['port'] if 'port' in config else None
+        else:
+            self.ip = None
+            self.port = None
 
 
-_Platform = namedtuple('platform', 'name model ip port is_host is_sim')
-
-
-def Platform(name, model, is_host=False, is_sim=False, ip=None, port=None):
-    """Creates a Platform namedtuple
-
+def discover_platforms(projects, whitelist=None, config=None):
+    """Discovers opencpi platforms in passed Project(s)
+    
     Args:
-        name:    Name of platform
-        model:   Model of platform
-        is_host: Whether platform is a host platform
-        is_sim:  Whether platform is a simulator
-        ip:      IP adress of platform device
-        port:    Port of platform device
+        projects:  Project or List of Projects to discover platforms for
+        whitelist: Whitelist of Platforms
+        config:    Dictionary with platform names as keys and
+                   additional platform configs as values
 
     Returns:
-        a Platform
+        List of Platforms discovered for passed Project(s)
     """
-    return _Platform(name=name, model=model, is_host=is_host, is_sim=is_sim,
-                     ip=ip, port=port)
+    platforms = []
+
+    if not isinstance(projects, list):
+        projects = [projects]
+
+    for project in projects:
+        project_platforms = []
+
+        if project.path:
+        # Project is local; discover local platforms
+            project_platforms += discover_local(project, config=config)
+        if project.id:
+        # Project is remote; discover remote platforms
+            project_platforms += discover_remote(project, config=config)
+
+        platforms += project_platforms
+
+    platforms = apply_whitelist(platforms, whitelist)
+            
+    return platforms
 
 
-def discover_platforms(projects, config=None):
+def discover_local(project, config=None):
     """Search opencpi projects for platforms
 
     Will search for hdl platforms in:
-        <projects>/<project>/hdl/platforms
+        <project.path>/hdl/platforms
     and for rcc platforms in:
-        <projects>/<project>/rcc/platforms
+        <project.path>/rcc/platforms
     Determines if a directory is a platform by existence of a
         Makefile
     or
@@ -42,55 +75,153 @@ def discover_platforms(projects, config=None):
         runSimExec.<platform_name>
 
     Args:
-        projects:       List of opencpi projects to search for
-                        platforms
-        config:         Dictionary with platform names as keys and
-                        additional platform configs as values
+        project: Project to discover platforms for
+        config:  Dictionary with platform names as keys and
+                 additional platform configs as values
 
     Returns:
-        platforms: List of opencpi platforms
+        platforms: List of opencpi Platforms
     """
     platforms = []
 
-    for project in projects:
-        hdl_platforms_path = Path(project.path, 'hdl', 'platforms')
-        rcc_platforms_path = Path(project.path, 'rcc', 'platforms')
+    hdl_platforms_path = Path(project.path, 'hdl', 'platforms')
+    rcc_platforms_path = Path(project.path, 'rcc', 'platforms')
 
-        for platforms_path in [hdl_platforms_path, rcc_platforms_path]:
-            if platforms_path.is_dir():
+    for platforms_path in [hdl_platforms_path, rcc_platforms_path]:
+        if platforms_path.is_dir():
 
-                for platform_path in platforms_path.glob('*'):
-                    platform_name = platform_path.stem
+            for platform_path in platforms_path.glob('*'):
+                platform_name = platform_path.stem
 
-                    if platforms_path is hdl_platforms_path:
-                        makefile = Path(platform_path, 'Makefile')
-                        is_host = False
-                        is_sim = Path(platform_path, 'runSimExec.{}'.format(
-                            platform_name)).is_file()
-                    else:
-                        makefile = Path(platform_path, '{}.mk'.format(
-                            platform_path.stem))
-                        is_host = Path(platform_path, '{}-check.sh'.format(
-                            platform_path.stem)).is_file()
-                        is_sim = False
+                if platforms_path is hdl_platforms_path:
+                    makefile = Path(platform_path, 'Makefile')
+                    is_host = False
+                    is_sim = Path(platform_path, 'runSimExec.{}'.format(
+                        platform_name)).is_file()
+                else:
+                    makefile = Path(platform_path, '{}.mk'.format(
+                        platform_path.stem))
+                    is_host = Path(platform_path, '{}-check.sh'.format(
+                        platform_path.stem)).is_file()
+                    is_sim = False
 
-                    if not makefile.is_file():
-                        continue
+                if not makefile.is_file():
+                    continue
 
-                    if config and platform_name in config:
-                        platform_data = {key:value for key,value
-                                         in config[platform_name].items()
-                                         if key in ['ip', 'port']}
-                    else:
-                        platform_data = {}
+                platform_config = get_platform_config(platform_name, config)
 
-                    platform_model = platform_path.parents[1].stem
-                    platform = Platform(name=platform_name,
-                                        model=platform_model, is_host=is_host,
-                                        is_sim=is_sim, **platform_data)
-                    platforms.append(platform)
+                platform_model = platform_path.parents[1].stem
+                platform = Platform(platform_name, platform_model, project,
+                                    is_host=is_host, is_sim=is_sim, 
+                                    config=platform_config)
+                platforms.append(platform)
 
     return platforms
+
+
+def discover_remote(project, config=None):
+    """ Discovers platforms for remote projects
+
+    Uses curl command to call gitlab api to collect project repo data.
+
+    Args:
+        project: Project to discover platforms for
+        config:  Dictionary with platform names as keys and
+                 additional platform configs as values
+
+    Returns:
+        platforms: List of opencpi Platforms
+    """
+    platforms = []
+    url = '/'.join([
+        'https://gitlab.com/api/v4/projects',
+        str(project.id),
+        'repository/tree'
+    ])
+    
+    rcc_url = '?'.join([url, 'path=rcc/platforms'])
+    hdl_url = '?'.join([url, 'path=hdl/platforms'])
+
+    for model_url,model in zip([rcc_url, hdl_url], ['rcc', 'hdl']):
+        try:
+            with urlopen(model_url) as response:
+                osp_platforms = json.load(response)
+
+                for osp_platform in osp_platforms:
+                    platform_name = osp_platform['name']
+                    
+                    if platform_name == 'Makefile':
+                        continue
+
+                    platform_config = get_platform_config(platform_name, 
+                                                          config)
+                    platform = Platform(platform_name, model, project,
+                                        is_host=False, is_sim=False, 
+                                        config=platform_config)
+                    platforms.append(platform)
+        except:
+            continue
+    
+    return platforms
+
+
+def apply_whitelist(platforms, whitelist):
+    """Applies whitelist to list of opencpi platforms
+
+    Args:
+        platforms: List of Platforms to apply whitelis to
+        whitelist: whitelist to apply to list of Platforms
+
+    Returns:
+        List of Platforms with whitelist applied
+    """
+
+    host_platforms = get_host_platforms(platforms)
+    cross_platforms = get_cross_platforms(platforms)
+
+    if not whitelist:
+        for host_platform in host_platforms:
+            host_platform.cross_platforms = cross_platforms
+
+        return host_platforms
+
+    filtered_platforms = []
+    for host_platform in host_platforms:
+        if host_platform.name not in whitelist:
+            continue
+
+        # Filter cross_platforms for each host_platform
+        platform_whitelist = whitelist[host_platform.name]
+        for cross_platform in cross_platforms:
+            if not platform_whitelist:
+                continue
+            if cross_platform.name not in platform_whitelist:
+                continue
+            
+            # If cross_platform is in both whitelist and directive, add to
+            # host_platform
+            host_platform.cross_platforms.append(cross_platform)
+
+        filtered_platforms.append(host_platform)
+
+    return filtered_platforms
+
+
+def get_platform_config(platform_name, config):
+    """Gets the config data for a platform
+
+    Args:
+        platform_name: The name of the platform to get config data for
+        config:        Dictionary whit platform names as keys and config
+                       data for the platform as values
+
+    Returns:
+        The config for the platform if found; None otherwise
+    """
+    try:
+        return config[platform_name]
+    except:
+        return None
 
 
 def get_platform(platform_name, platforms):
@@ -122,14 +253,17 @@ def get_platforms_by_type(platforms, platform_type):
     Returns:
         List of platforms matching platform_type arg
     """
-    return_platforms = []
+    return_platforms = set()
     for platform in platforms:
         if platform_type == 'host' and platform.is_host:
-            return_platforms.append(platform)
-        elif platform_type == 'cross' and not platform.is_host:
-            return_platforms.append(platform)
+            return_platforms.add(platform)
+        elif platform_type == 'cross':
+            if not platform.is_host:
+                return_platforms.add(platform)
+            else:
+                return_platforms.update(platform.cross_platforms)
 
-    return return_platforms
+    return list(return_platforms)
 
 
 def get_cross_platforms(platforms):
@@ -232,98 +366,27 @@ def get_simulators(platforms):
     return return_platforms
 
 
-def get_linked_platforms(platform, platforms, links_dict=None, whitelist=None):
+def get_linked_platforms(platform, platforms, platform_directive):
     """Gets a platform's linked platforms
 
-        If not passed in with the links_dict arg, calls
-        get_platform_directive() to look up a platform's associated
-        platforms.
-
     Args:
-        platform:   Platform to find linked platforms for
-        platforms:  List of all platforms available
-        links_dict: Dictionary with platform names as keys and names of
-                    associated platforms as values
-        whitelist:  List of names of allowed platforms
+        platform:           Platform to find linked platforms for
+        platforms:          List of all platforms available
+        platform_directive: Dictionary with platform names as keys and names of
+                            associated platforms as values
 
     Returns:
         List of associated platforms for a given platform
     """
-    if not links_dict:
-        links_dict = get_platform_directive()
-
     linked_platforms = []
-
-    for linked_platform_name in links_dict[platform.name]:
-        if whitelist and linked_platform_name not in whitelist:
-            continue
-
+    
+    if platform.name not in platform_directive:
+        return linked_platforms
+    
+    for linked_platform_name in platform_directive[platform.name]:
         linked_platform = get_platform(linked_platform_name, platforms)
 
         if linked_platform:
             linked_platforms.append(linked_platform)
-
+    
     return linked_platforms
-
-
-def get_platform_directive():
-    """Gets the directive of what platforms to run in a pipeline
-
-        Directive is parsed from one of various env vars depending on
-        the source of the pipeline:
-
-        Source:    scheduled, web
-        Directive: CI_PLATFORMS
-
-        Source:    merge_request_event
-        Directive: CI_MR_PLATFORMS
-
-    Returns:
-        defaultdict of platforms parsed from directive
-    """
-    platforms = defaultdict(set)
-    space_pattern = re.compile(r'([^ $]+)')
-    colon_pattern = re.compile(r'([^:$]+)')
-    comma_pattern = re.compile(r'([^,$]+)')
-
-    if os.getenv("CI_PIPELINE_SOURCE") in ['scheduled', 'web']:
-        platform_names = os.getenv("CI_PLATFORMS")
-    elif os.getenv("CI_PIPELINE_SOURCE") == 'merge_request_event':
-        platform_names = os.getenv("CI_MR_PLATFORMS")
-    elif os.getenv("CI_PIPELINE_SOURCE") == 'push':
-        commit_message = os.getenv('CI_COMMIT_MESSAGE')
-        commit_directive = re.search(r'\[ *ci (.*) *\]', commit_message)
-
-        if commit_directive:
-            platform_names = commit_directive.group(1)
-        else:
-            platform_names = os.getenv("CI_PLATFORMS")
-    else:
-        return platforms
-
-    # Find all platforms separated by spaces
-    spaces = space_pattern.findall(platform_names)
-    for space in spaces:
-        # Find all patterns separated by a colon (linked platforms)
-        colons = colon_pattern.findall(space)
-        left = colons[0]
-
-        if left:
-            # Find all platforms separated by comma on left side of colon
-            l_commas = comma_pattern.findall(left)
-            for l_comma in l_commas:
-                if len(colons) == 2:
-                    right = colons[1]
-                    # Find all platforms separated by comma on right side
-                    # of colon
-                    r_commas = comma_pattern.findall(right)
-
-                    for r_comma in r_commas:
-                        # Associate the platforms on left side of colon with
-                        # platforms on right side
-                        platforms[l_comma].add(r_comma)
-                        platforms[r_comma].add(l_comma)
-                else:
-                    platforms[l_comma] = {}
-
-    return platforms
