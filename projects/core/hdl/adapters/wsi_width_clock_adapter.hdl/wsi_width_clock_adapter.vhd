@@ -28,7 +28,6 @@ architecture rtl of worker is
   constant data_lsb_c    : natural  := fifo_width_c - width_out_c;
   constant opcode_lsb_c  : natural  := data_lsb_c - out_out.opcode'length;
   constant byte_en_lsb_c : natural  := opcode_lsb_c - out_out.byte_enable'length;
-  signal in_reset        : bool_t;
   signal out_ready       : bool_t;
   signal out_give        : bool_t;
   signal out_som, out_valid, out_eom, out_eof : bool_t;
@@ -39,15 +38,12 @@ architecture rtl of worker is
   signal fifo_not_full, fifo_not_empty, fifo_out_eof : bool_t;
   signal fifo_in, fifo_out : std_logic_vector(fifo_width_c-1 downto 0);
 begin
-  reset : cdc.cdc.reset
-    port map(src_rst  => wci_reset,
-             dst_clk  => in_in.clk,
-             dst_rst  => in_reset);
+  
   adapt_width : entity work.adapt_width
     generic map(width_in         => to_integer(width_in),
                 width_out        => width_out_c)
        port map(clk              => in_in.clk,
-                reset            => in_reset,
+                reset            => in_in.reset,
                 in_som           => in_in.som,
                 in_valid         => in_in.valid,
                 in_eom           => in_in.eom,
@@ -87,7 +83,7 @@ begin
     generic map (width       => fifo_width_c,
                  depth       => 16)
     port map (   src_CLK     => in_in.clk,
-                 src_RST     => in_reset,
+                 src_RST     => in_in.reset,
                  src_ENQ     => fifo_enq,
                  src_in      => fifo_in,
                  src_FULL_N  => fifo_not_full,

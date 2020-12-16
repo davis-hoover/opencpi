@@ -1,22 +1,9 @@
--- This file is protected by Copyright. Please refer to the COPYRIGHT file
--- distributed with this source distribution.
---
--- This file is part of OpenCPI <http://www.opencpi.org>
---
--- OpenCPI is free software: you can redistribute it and/or modify it under the
--- terms of the GNU Lesser General Public License as published by the Free
--- Software Foundation, either version 3 of the License, or (at your option) any
--- later version.
---
--- OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
--- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
--- A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
--- details.
---
--- You should have received a copy of the GNU Lesser General Public License
--- along with this program. If not, see <http://www.gnu.org/licenses/>.
+-- THIS FILE WAS ORIGINALLY GENERATED ON Thu Oct 15 16:47:19 2020 EDT
+-- BASED ON THE FILE: data_src_cswm.xml
+-- YOU *ARE* EXPECTED TO EDIT IT
+-- This file initially contains the architecture skeleton for worker: data_src_cswm
 
-library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
+library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 architecture rtl of worker is
   constant WIDTH      : integer := to_integer(DATA_BIT_WIDTH_p);
@@ -38,11 +25,13 @@ architecture rtl of worker is
   signal num_samples_valid : bool_t := bfalse;
   signal eof_req           : bool_t := bfalse; -- eof is indicated now
   signal eof_r             : bool_t := bfalse; -- we are in the sticky EOF state
-begin
+  begin
   props_out.debug <= data_count_32;
   ------------------------------------------------------------------------------
   -- out port
   ------------------------------------------------------------------------------
+  -- TODO - Add the primitive to handle samples and sync opcode once it has been finalized.
+  -- And remove inserteom from OWD. 
 
   out_out.valid       <= enable; -- implies give, only accepted if out_in.ready
   out_out.byte_enable <= (others => '1');

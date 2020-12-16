@@ -27,7 +27,7 @@ type opcode_t is (
   SAMPLES, TIME_TIME, INTERVAL, FLUSH, SYNC, END_OF_SAMPLES);
 
 -- operation samples
-constant OP_SAMPLES_ARG_IQ_SEQUENCE_LENGTH : positive := 4092;
+constant OP_SAMPLES_ARG_IQ_SEQUENCE_LENGTH : positive := 4096;
 constant OP_SAMPLES_ARG_IQ_I_BIT_WIDTH     : positive := 16;
 constant OP_SAMPLES_ARG_IQ_Q_BIT_WIDTH     : positive := 16;
 constant OP_SAMPLES_BIT_WIDTH              : positive :=

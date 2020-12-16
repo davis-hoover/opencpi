@@ -131,6 +131,7 @@ architecture rtl of worker is
   signal bramb_write     : bool_array_t(0 to sdp_width_c-1);
   signal md_enq          : bool_t;
 
+ signal sdp_my_reset           : std_logic; -- reset from EITHER sdp_reset or out_in.reset
   ---- Global state
   signal sdp_reset_n     : std_logic;
   ---- Trace buffer/debug
@@ -286,7 +287,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   --------------------------------------------------------------------------------
   -- Combinatorial signals on the WSI side
   --------------------------------------------------------------------------------
-  sdp_reset_n          <= not sdp_reset;
+  sdp_reset_n          <= not sdp_my_reset;
   lcl_buffer_count     <= props_in.buffer_count(lcl_buffer_count_t'range);
   ctl_reset_n          <= not ctl_in.reset;
   wsi_next_buffer_addr <= (others => '0')
@@ -323,6 +324,9 @@ g0: for i in 0 to sdp_width_c-1 generate
 --                         (sdp_width_c*dword_bytes-1 downto
 --                          to_integer(md_out.length(addr_shift_c-1 downto 0)) => '0',
 --                          others => '1');
+
+
+  sdp_my_reset <= sdp_reset or out_in.reset;
   --------------------------------------------------------------------------------
   -- The process of reading messages from the metadata FIFO and BRAM and sending
   -- then to the WSI port named "out"
@@ -330,7 +334,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   bram2wsi : process(sdp_clk)
   begin
     if rising_edge(sdp_clk) then
-      if sdp_reset = '1' then
+      if sdp_my_reset = '1' then
         brama_addr_r       <= (others => '0');
         wsi_buffer_index_r <= (others => '0');
         wsi_buffer_addr_r  <= (others => '0');
@@ -340,15 +344,13 @@ g0: for i in 0 to sdp_width_c-1 generate
 --        status             <= (others => '0');
       elsif not operating_r then
         -- initialization on first transition to operating.  poor man's "start".
-        if its(ctl_in.is_operating) then
+        if its(out_in.ready) then
           operating_r   <= btrue;
           if props_in.buffer_size > memory_bytes or
              props_in.buffer_size(addr_shift_c-1 downto 0) /= 0 then
             faults_r(0) <= '1';
           end if;
         end if;
-      elsif not ctl_in.is_operating then
-        operating_r <= bfalse;
       else
         --if its(buffer_consumed) then
         --  status <= status + 1;
@@ -389,7 +391,7 @@ g0: for i in 0 to sdp_width_c-1 generate
                  max_lcl_buffers  => max_lcl_buffers_c,
                  max_rem_buffers  => max_rem_buffers_c)
     port map (   sdp_clk          => sdp_clk,
-                 sdp_reset        => sdp_reset,
+                 sdp_reset        => sdp_my_reset,
                  operating        => operating_r,  -- wrong clock domain, but stable enough?
                  -- properties
                  buffer_ndws      => buffer_ndws,

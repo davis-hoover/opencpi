@@ -19,8 +19,6 @@
                                Parameter="true"
                                Default="0"
                                Description="Out-of-reset value of the Linear Feedback Shift Register (only affects output data in LFSR mode). This value should never be all zeros, which would cause the register to always have a value of all zeros regardless of polynomial value."/>
-  <!-- this is for backward compatibility -->
-  <Property Name="ZLM_WHEN_NUM_SAMPLES_REACHED_p" Type="bool" Parameter='true' Default='false'/>
   <Property Name="EOF_WHEN_NUM_SAMPLES_REACHED_p" Type="bool"
                                    Parameter="true"
                                    Default="false"
@@ -52,7 +50,7 @@
   <Property Name="enable" Type="bool"
                           Writable="true"
                           Default="true"
-                          Description="When the worker is not in reset, this property must have a value of true for the data to be sent to the output. Note that this property has no effect on the ZLM operation (see ZLM_WHEN_NUM_SAMPLES_REACHED_p parameter property)."/>
+                          Description="When the worker is not in reset, this property must have a value of true for the data to be sent to the output. Note that this property has no effect on the EOF operation (see EOF_WHEN_NUM_SAMPLES_REACHED_p parameter property)."/>
   <Property Name="LFSR_bit_reverse" Type="bool"
                                     Writable="true"
                                     Default="true"
