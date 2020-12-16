@@ -13,9 +13,6 @@
 // Include asio FIRST always - http://stackoverflow.com/a/33082763
 #include <asio.hpp>
 #include <string>
-#ifndef ASIO_STANDALONE
-#include <boost/noncopyable.hpp>
-#endif
 #include "connection.hpp"
 #include "connection_manager.hpp"
 // #include "request_handler.hpp"
@@ -25,9 +22,6 @@ namespace server {
 
 /// The top-level class of the HTTP server.
 class server
-#ifndef ASIO_STANDALONE
-  : private boost::noncopyable
-#endif
 {
 public:
   /// Construct the server to listen on the specified TCP address and port, and
