@@ -2,7 +2,7 @@ This directory came from the uuid-1.6.2 from the The OSSP Project <http://www.os
 It is here just to allow standalone building, and may be removed in order to
 build directly against standard packages that are preinstalled on a system to save space.
 
-centos6: -DHAVE_CONFIG_H -fPIC -DPIC
+linux: -DHAVE_CONFIG_H -fPIC -DPIC
 mac: -DHAVE_CONFIG_H -fno-common -DPIC
 
 Changed from the original:
@@ -18,7 +18,4 @@ In config.h:
 #endif
 #define _BSD_SOURCE 1 /* necessary since we now use -std=c99 */
 #define _POSIX_C_SOURCE 199309L /* necessary since we now use -std=c99 */
-
-
-
 
