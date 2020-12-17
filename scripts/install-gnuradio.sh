@@ -32,6 +32,7 @@ Optional args:
                         packages needed to build GNU Radio 3.8.
                         [default: ${GR_RELEASE}]
 "
+  exit 1
 }
 
 function bad {
@@ -224,8 +225,8 @@ case "${HOST_OS}" in
   ubuntu18.04)
     install_ubuntu18_04_packages
     # Suppress annoying warnings
-    export CFLAGS=-Wno-deprecated-declarations -Wno-deprecated
-    export CXXFLAGS=-Wno-deprecated-declarations -Wno-deprecated
+    export CFLAGS='-Wno-deprecated-declarations -Wno-deprecated'
+    export CXXFLAGS='-Wno-deprecated-declarations -Wno-deprecated'
     ;;
   *)
     bad "Unsupported host OS: ${HOST_OS}"
