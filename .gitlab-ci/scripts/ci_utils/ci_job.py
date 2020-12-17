@@ -413,6 +413,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
     # Otherwise, set to string "$CI_PIPELINE_ID"
     pipeline_id = os.getenv("CI_UPSTREAM_ID")
     project_name = os.getenv("CI_PROJECT_NAME")
+    clean_cmd = 'rm -rf * .* 2>/dev/null || true'
     
     # In triggered pipeline
     if pipeline_id:
@@ -420,7 +421,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
         ref = os.getenv("CI_COMMIT_REF_NAME")
         do_clone = True
         do_register = True
-        cmds.append('rm -rf ./*')
+        cmds.append(clean_cmd)
     else:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
 
@@ -436,9 +437,9 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 ref = os.getenv("CI_COMMIT_REF_NAME")
                 do_clone = True
                 do_register = True
-                cmds.append('rm -rf ./*')
+                cmds.append(clean_cmd)
+        # Not in a pipeline
         else:
-            # Not in a pipeline
             do_register = False
             pipeline_id = '"$CI_PIPELINE_ID"'
 
@@ -447,7 +448,7 @@ def make_before_script(stage, stages, platform, host_platform=None,
                 upstream_ref = '"$CI_UPSTREAM_REF"'
                 ref = '"$CI_COMMIT_REF_NAME"'
                 do_clone = True
-                cmds.append('rm -rf ./*')
+                cmds.append(clean_cmd)
             # Creating opencpi pipeline
             else:
                 do_clone = False
@@ -460,12 +461,11 @@ def make_before_script(stage, stages, platform, host_platform=None,
             ' '.join(['git clone --depth 1 --single-branch --branch',
                       upstream_ref,
                       '"https://gitlab.com/opencpi/opencpi.git"', 
-                      'opencpi']),
+                      '"$CI_PROJECT_DIR"']),
             ' '.join(['git clone --depth 1 --single-branch --branch', 
                       ref, 
                       '"$CI_REPOSITORY_URL"',
-                      '"opencpi/projects/osps/${CI_PROJECT_NAME}"']),
-            'cd opencpi'
+                      '"${CI_PROJECT_DIR}/projects/osps/${CI_PROJECT_NAME}"']),
         ]
 
     timestamp_cmd = 'touch .timestamp'
@@ -537,9 +537,6 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
     pipeline_id = os.getenv("CI_UPSTREAM_ID")
     success_path = Path('.success')
 
-    if pipeline_id or is_downstream:
-        success_path = Path('opencpi', '.success')
-        script_path = Path('opencpi', script_path)
     if not pipeline_id:
         pipeline_id = os.getenv("CI_PIPELINE_ID")
         
@@ -556,7 +553,7 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
     if do_ocpiremote:
         cmds.append(make_ocpiremote_cmd('unload', platform))
 
-    clean_cmd = 'rm -rf ./*'
+    clean_cmd = 'rm -rf * .* 2>/dev/null || true'
     cmds.append(clean_cmd)
 
     return cmds

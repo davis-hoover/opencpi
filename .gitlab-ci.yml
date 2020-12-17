@@ -1,7 +1,7 @@
 build:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf ./*
+  - rm -rf * .* 2>/dev/null || true
   before_script:
   - touch .timestamp
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "build:*" "test:*" "generate-children:*" "trigger-children:*" "deploy:*"
@@ -360,7 +360,7 @@ packages:centos7:
 prereqs:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf ./*
+  - rm -rf * .* 2>/dev/null || true
   before_script:
   - touch .timestamp
   dependencies: []
@@ -391,7 +391,7 @@ stages:
 test:centos7:
   after_script:
   - if [ ! -f ".success" ]; then .gitlab-ci/scripts/ci_artifacts.py upload "$CI_PIPELINE_ID" "$CI_JOB_NAME" -t "failed-job"; fi
-  - rm -rf ./*
+  - rm -rf * .* 2>/dev/null || true
   before_script:
   - touch .timestamp
   - .gitlab-ci/scripts/ci_artifacts.py download "$CI_PIPELINE_ID" -i "*centos7.tar.gz" -e "test:*" "generate-children:*" "trigger-children:*" "deploy:*"
