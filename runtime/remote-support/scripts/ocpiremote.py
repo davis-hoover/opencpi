@@ -80,6 +80,9 @@ def main():
         '-d', '--remote_dir',
         'directory on remote device to create/use as the server sandbox',
         default='sandbox')
+    option_boot_dir = make_option(
+        '-d', '--remote_dir',
+        'directory on remote device to deploy boot files to.')
     option_sw_platform = make_option(
         '-s', '--sw_platform',
         'software platform for server environment; default: xilinx13_4',
@@ -102,7 +105,7 @@ def main():
         default=0)
 
     common_options = [option_user, option_password, option_ip,
-                      option_remote_dir, option_ssh_opts, option_scp_opts]
+                      option_ssh_opts, option_scp_opts]
 
     commands = []
     commands.append(make_subcommand(
@@ -110,60 +113,93 @@ def main():
         'Create and send the server package to the remote sandbox directory',
         common_options
         + [option_port, option_valgrind, option_hw_platform,
-           option_sw_platform]))
+           option_sw_platform, option_remote_dir]))
     commands.append(make_subcommand(
         'unload', unload,
         'delete a server sandbox directory',
-        common_options))
+        common_options 
+        + [option_remote_dir]))
     commands.append(make_subcommand(
         'reload', reload_,
         'delete a server sandbox directory and then reload it',
-        common_options + [option_port, option_valgrind, option_hw_platform,
-                          option_sw_platform, option_log_level]))
+        common_options 
+        + [option_port, option_valgrind, option_hw_platform, 
+           option_sw_platform, option_log_level, option_remote_dir]))
     commands.append(make_subcommand(
         'start', start,
         'start server on remote device',
-        common_options + [option_log_level, option_valgrind, option_bitstream]))
+        common_options 
+        + [option_log_level, option_valgrind, option_bitstream, 
+           option_remote_dir]))
     commands.append(make_subcommand(
         'restart', restart,
         'stop and then start server on remote device',
-        common_options + [option_log_level, option_valgrind, option_bitstream]))
+        common_options 
+        + [option_log_level, option_valgrind, option_bitstream, 
+           option_remote_dir]))
     commands.append(make_subcommand(
         'status', status,
         'get status of server on remote device',
-        common_options))
+        common_options
+        + [option_remote_dir]))
     commands.append(make_subcommand(
         'stop', stop,
         'stop server on remote device',
-        common_options))
+        common_options
+        + [option_remote_dir]))
     commands.append(make_subcommand(
-        'test', test,
+        'ping', ping,
         'test basic connectivity',
-        common_options))
+        common_options
+        + [option_remote_dir]))
     commands.append(make_subcommand(
         'log', log,
         'watch server log in realtime',
-        common_options))
+        common_options
+        + [option_remote_dir]))
     commands.append(make_subcommand(
         'reboot', reboot,
         'reboot the remote device',
-        common_options))
+        common_options
+        + [option_remote_dir]))
     commands.append(make_subcommand(
         'deploy', deploy,
-        'Deploy Opencpi boot files onto the remote device and reboot',
-        common_options + [option_hw_platform, option_sw_platform]))
+        'Deploy Opencpi boot files to device and reboot. If a remote directory'\
+            ' is not provided, will attempt to determine correct directory by'\
+            ' searching for existence of "opencpi/release". NOTE: Clears'\
+            ' contents of remote directory',
+        common_options 
+        + [option_hw_platform, option_sw_platform, option_boot_dir]))
 
     parser = make_parser(commands)
     args = parser.parse_args()
 
     # If a subcommand was passed, call it. Else print help message
     if 'func' in args:
-        rc = args.func(args)
+        rc = ping(args)
 
-        if rc != 0:
-            sys.exit(rc)
+        if rc == 0:
+            rc = args.func(args)
+
+        sys.exit(rc)
     else:
         parser.print_help()
+
+
+def ping(args):
+    """ Test basic connectivity to remote device.
+
+    Args:
+        args: parsed user arguments
+    """
+    cmd = 'echo "hello world" > /dev/null'
+    command = make_command(cmd, args, stderr=True)
+    rc = execute_command(command, args)
+
+    if rc == 255:
+        sys.exit('Error: Unable to reach remote device')
+
+    return rc
 
 
 def make_option(short, long, help, default=None, required=False, action='store'):
@@ -317,13 +353,12 @@ def execute_command(command, args):
                     stderr = process.stderr.read().strip()
 
         except Exception as e:
-            print('help')
             raise ocpiutil.OCPIException(
                 'SSH/SCP call failed in a way we cannot handle; quitting. {}'.format(e))
-        
+
         if stderr and command.stderr:
             print(stderr)
-
+        
         return process.returncode
 
 
@@ -433,10 +468,6 @@ def reboot(args):
     Args:
         args: parsed user arguments
     """
-    if status(args, stderr=False) == 0:
-        if stop(args) != 0:
-            return 1
-
     command = make_command('/sbin/reboot', args)
     rc = execute_command(command, args)
 
@@ -453,34 +484,57 @@ def deploy(args):
         args: parsed user arguments
     """
     cdk = os.environ['OCPI_CDK_DIR']
-    local_dir = '{}/{}/sdcard-{}'.format(cdk, args.hw_platform, args.sw_platform)
+    local_dir = '{}/{}/sdcard-{}'.format(
+        cdk, args.hw_platform, args.sw_platform)
 
     if not os.path.isdir(local_dir):
-        print("Error: {} does not exist".format(local_dir))
-        print("Try running 'ocpiadmin deploy platform {} {}'".format(
+        err_msg = '\n'.join([
+            "Error: {} does not exist".format(local_dir),
+            "Try running 'ocpiadmin deploy platform {} {}'".format(
                 args.sw_platform, args.hw_platform)
-            )
+        ])
 
-        return 1
+        return err_msg
 
-    tar_files = [os.path.join(local_dir, f) for f in os.listdir(local_dir) if f != 'opencpi']
+    if not args.remote_dir:
+        remote_dirs = ['/mnt/card', '/run/media/mmcblk0p1']
+        remote_dir = find_deploy_dir(args, remote_dirs)
+
+        if not remote_dir:
+            expected_locations = '\n\t'.join(
+                [''] + [remote_dir for remote_dir in remote_dirs])
+            err_msg = '\n'.join([
+                'Error: Unable to locate opencpi/release',
+                'Expected locations:{}'.format(expected_locations),
+                'Specify another location to deploy to with \'-d\''
+            ])
+
+            return err_msg
+    else:
+        remote_dir = args.remote_dir
+
+    tar_files = [os.path.join(local_dir, f) 
+                 for f in os.listdir(local_dir) 
+                 if f != 'opencpi']
+    if os.path.isfile('{}/opencpi/release'.format(local_dir)):
+        tar_files.append('{}/opencpi/release'.format(local_dir))
+    arcnames = [tar_file[len(local_dir)+1:] for tar_file in tar_files]
 
     with tempfile.TemporaryDirectory() as tempdir:
         tar_commands = []
-        tar_path = make_tar(tar_files, tar_files, tempdir)
-
+        tar_path = make_tar(tar_files, arcnames, tempdir)
+        tar_commands.append(make_command('rm -rf "{}"/*'.format(remote_dir), args))
         tar_commands.append(make_command(
-            'if [ ! -d {} ]; then mkdir {}; fi'.format(args.remote_dir, args.remote_dir),
-            args))
-        tar_commands.append(make_command(
-            'scp {} {} {}@{}:./{}'.format(
-                args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
+            'scp {} {} {}@{}:{}'.format(
+                args.scp_opts, tar_path, args.user, args.ip_addr, remote_dir),
             args,
             ssh=False))
         tar_commands.append(make_command(
-            'gunzip -c {}/tar.tgz | tar xf -'.format(args.remote_dir),
+            'cd "{}" && gunzip -c tar.tgz | tar xf -'.format(remote_dir),
             args))
-        print('Deploying Opencpi boot files to remote device from {} ...'.format(local_dir))
+        print('Deploying Opencpi boot files...')
+        print('\tLocal: {}'.format(local_dir))
+        print('\tRemote: {}'.format(remote_dir))
         rc = execute_commands(tar_commands, args)
 
     if rc == 0:
@@ -488,6 +542,31 @@ def deploy(args):
         rc = reboot(args)
 
     return rc
+
+
+def find_deploy_dir(args, remote_dirs):
+    """ Attempts to find location on remote device opencpi was last 
+        deployed to
+
+    Args:
+        args: parsed user arguments
+
+    Returns:
+        If found, directory opencpi was last deployed to; otherwise None
+    """
+    for remote_dir in remote_dirs:
+        cmd = make_command(
+            'ls {}/opencpi/release > /dev/null'.format(remote_dir), 
+            args, stderr=False)
+        rc = execute_command(cmd, args)
+
+        if rc == 0:
+            break
+
+    if rc != 0:
+        remote_dir = None
+
+    return remote_dir
 
 
 def unload(args):
@@ -586,18 +665,6 @@ def status(args, stderr=True):
         args: parsed user arguments
     """
     command = make_command('status', args, ocpiserver=True, stderr=stderr)
-    rc = execute_command(command, args)
-
-    return rc
-
-
-def test(args):
-    """ Test basic connectivity to remote device.
-
-    Args:
-        args: parsed user arguments
-    """
-    command = make_command('pwd', args)
     rc = execute_command(command, args)
 
     return rc
