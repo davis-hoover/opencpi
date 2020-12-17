@@ -107,7 +107,7 @@ namespace OCPI {
 		i.cname(), i.attributes().platform().c_str(),
 		i.attributes().opencpiVersion().c_str(), opencpiVersion,
 		OCPI::OS::logWillLog(OCPI_LOG_INFO) ? "" : " (try increasing log level)");
-      ocpiInfo("vs. container %s (%u) model %s os %s version %s arch %s platform %s dynamic %u "
+      ocpiInfo("    vs. container %s (%u) model %s os %s version %s arch %s platform %s dynamic %u "
 	       "opencpi version %s ==> %s",
 	       name().c_str(), m_ordinal, m_model.c_str(), m_os.c_str(), m_osVersion.c_str(),
 	       m_arch.c_str(), m_platform.c_str(), m_dynamic, opencpiVersion,

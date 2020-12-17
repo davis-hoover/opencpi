@@ -1,3 +1,13 @@
+What follows is retained for history, because Boost is no longer
+required, i.e., support for platforms with older compiler toolchains
+that don't support the C++11 standard has been dropped.
+
+Unfortunately, the local copy of the "asio" header files has been
+retained, as it is needed for cross-builds.  The header files are
+identical in every way to what's included in the CentOS 7 EPEL
+"asio-devel-1.10.8-1.el7" package.
+
+====--CUT HERE--====
 The socket library used by this worker is "asio" which is the Boost ASIO library with less
 dependencies on Boost. It would be totally independent if we had full C++11 capabilities,
 but some ARM compilers (e.g. picoflexor) only support up to GCC 4.4, which has certain
@@ -23,3 +33,4 @@ can be found in ext_src/ .
 
 To add a new platform, RccOnlyPlatforms in the Makefile should be expanded, as well as the
 platform-specific flags added to the Makefile to designate if the build is boost-based, etc.
+====--TUC EREH--====

@@ -111,7 +111,7 @@ begin
         eof_r             <= bfalse;
         num_samples_valid <= bfalse;
       -- assert EOF when number of samples sent (if num_samples is not -1)
-      elsif (its(ZLM_WHEN_NUM_SAMPLES_REACHED_p or EOF_WHEN_NUM_SAMPLES_REACHED_p) and
+      elsif (its(EOF_WHEN_NUM_SAMPLES_REACHED_p) and
              num_samples_valid and props_in.num_samples /= -1 and
              data_count_32 >= props_in.num_samples) then
         eof_r <= btrue;

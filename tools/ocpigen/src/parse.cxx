@@ -812,6 +812,38 @@ getNames(ezxml_t xml, const char *file, const char *tag, std::string &name,
   return NULL;
 }
 
+static bool
+skipFile(const char *file, void *arg) {
+  const std::string &packagePrefix = *(const std::string *)arg;
+  // Is the package id associated with this file == packageId?
+  const char
+    *slash = strrchr(file, '/'),
+    *base = slash ? slash + 1 : file;
+  std::string
+    dir(file, slash ? OCPI_SIZE_T_DIFF(slash + 1, file) : 0),
+    packageIdFile(dir + "../package-id");
+  if (!OS::FileSystem::exists(packageIdFile)) {
+    packageIdFile = dir + "../lib/package-id";
+    if (!OS::FileSystem::exists(packageIdFile)) {
+      ocpiBad("When searching for worker \"%s\" with package prefix \"%s\", file \"%s\" was found, "
+	       "but there was no package-id file in %s/../package-id or %s/../lib/package-id",
+	       base, packagePrefix.c_str(), file, dir.c_str(), dir.c_str());
+      return true;
+    }
+  }
+  std::string filePackageId;
+  const char *err;
+  if ((err = OU::file2String(filePackageId, packageIdFile.c_str(), ' '))) {
+    ocpiBad("When searching for worker \"%s\" by package prefix \"%s\", file \"%s\" was found, "
+	    "but opening the package-id file \"%s\" failed: %s",
+	    base, packagePrefix.c_str(), file, packageIdFile.c_str(), err);
+    return true;
+  }
+  if (packagePrefix != filePackageId)
+    return true;
+  return false;
+}
+
 // The factory, which decides which class to instantiate
 // This will evolve as more things are based on derived classes
 Worker *Worker::
@@ -819,9 +851,42 @@ create(const char *file, const std::string &parentFile, const char *package, con
        Worker *parent, OU::Assembly::Properties *instancePVs, size_t paramConfig,
        const char *&err) {
   err = NULL;
+  // If there are slashes, it is "just a file name", so leave it alone.
+  // otherwise if it ends in .xml or has no dots, also leave it alone.
+  // otherwiseif there are dots, they must include authoring model. more than one dot means a package id
+  const char
+    *slash = strrchr(file, '/'),
+    *base = slash ? slash + 1 : file,
+    *dot = strrchr(base, '.');
+  // a worker name with dots, no slashes, that does not end in .xml is not a file, but just
+  // a potentially qualified worker name for searching, including authoring model suffix.
+  std::string packagePrefix; // used when we have a non-slash, more than one dot, worker identifier
+  std::string fileName(file);
+  if (!slash && dot && strcasecmp("xml", dot + 1)) {
+    const char *model = NULL;
+    for (const char **cp = OU::g_models; *cp; ++cp)
+      if (!strcasecmp(*cp, dot + 1)) {
+	model = dot + 1;
+	break;
+      }
+    if (!model) {
+      err = OU::esprintf("worker name invalid since it has periods but no authoring model: %s",
+			 file);
+      return NULL;
+    }
+    const char *packageName;
+    for (packageName = dot - 1; packageName > base; --packageName)
+      if (*packageName == '.') { // we have a package id and this is the end of the prefix
+	packagePrefix.assign(base, OCPI_SIZE_T_DIFF(packageName, base));
+	packageName++; // point to packageName, after prefix
+	break;
+      }
+    OU::format(fileName, "%s/%.*s", model, (int)(dot - packageName), packageName);
+  }
   ezxml_t xml;
   std::string xf;
-  if ((err = parseFile(file, parentFile, NULL, &xml, xf)))
+  if ((err = parseFile(fileName.c_str(), parentFile, NULL, &xml, xf, false, true, false,
+		       packagePrefix.empty() ? NULL : skipFile, &packagePrefix)))
     return NULL;
   const char *xfile = xf.c_str();
   const char *name = ezxml_name(xml);
@@ -1017,7 +1082,8 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     m_emulate(NULL), m_emulator(NULL), m_library(NULL), m_outer(false),
     m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_build(*this),
     m_paramConfig(NULL), m_parent(parent), m_scalable(false), m_requiredWorkGroupSize(0),
-    m_maxLevel(0), m_dynamic(false), m_isSlave(false), m_isOptional(false)
+    m_maxLevel(0), m_dynamic(false), m_isSlave(false), m_isOptional(false),
+    m_slavePort(NULL), m_proxyPort(NULL), m_proxyPortIndex(SIZE_MAX)
 {
   if ((err = getNames(xml, xfile, NULL, m_name, m_fileName)))
     return;
@@ -1251,7 +1317,9 @@ emitToolArtXML() {
           " This file contains the artifact descriptor XML for a Component.\n"
           " It is used for informational purposes by ocpidev\n");
   fprintf(f, "  -->\n");
-  emitXmlWorker(f, true);
+  std::string out;
+  emitXmlWorker(out, true);
+  fputs(out.c_str(), f);
   if (fflush(f))
     return "Could not flush stdout. No space?";
   return 0;

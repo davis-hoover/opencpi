@@ -25,7 +25,6 @@
  *
  * This file contains the implementation skeleton for the lime_rx_proxy worker in C++
  */
-
 #include <assert.h>
 #include "lime_shared.h"
 #include "lime_rx_proxy-worker.hh"
@@ -38,10 +37,11 @@ class Lime_rx_proxyWorker : public Lime_rx_proxyWorkerBase {
   RunCondition m_aRunCondition;
 public:
   Lime_rx_proxyWorker() : m_aRunCondition(RCC_NO_PORTS) {
-    //Run function should never be called
+    // run function should never be called
     setRunCondition(&m_aRunCondition);
   }
 private:
+
   // notification that input_select property has been written
   RCCResult input_select_written() {
     if (m_properties.input_select > 3)
@@ -57,17 +57,12 @@ private:
     uint16_t old_value = slave.get_rxfe_cbe_lna() & 0x3f;
     switch (m_properties.input_gain_db) {
     case -6:
-      //printf ("got a -6 command old value is: %x \n", old_value);
       if ( (old_value & 0x30) == 0x30)
-      {
         gain = 2;
-        //printf("true \n");
-      }
+
       else
-      {
         gain = 1;
-        //printf("false %x \n", old_value & 0x30);
-      }
+
       break;
     case 0:
       gain = 2;
@@ -79,11 +74,9 @@ private:
       return setError("Input_gain_db (\"%d\") can only be -6, 0, or +6",
 		      m_properties.input_gain_db);
     }
-    //printf ("set gain to: %x \n", gain);
-    slave.set_rxfe_cbe_lna(old_value | (gain << 6));
+    slave.set_rxfe_cbe_lna(old_value | (gain << 6)); 
     return RCC_OK;
   }
-
   static uint8_t readVtune(void *arg) {
     return (*(Lime_rx_proxyWorker*)arg).slave.get_rx_vtune();
   }
@@ -104,14 +97,14 @@ private:
     slave.set_rx_nfrac_hi(div.nfrac_hi);
     slave.set_rx_nfrac_mid(div.nfrac_mid);
     slave.set_rx_nfrac_lo(div.nfrac_lo);
-    // Set VCO Cap - performing calibration
+    // set VCO Cap - performing calibration
     if ((err = setVcoCap(readVtune, writeVcoCap, this)))
       return setError("Error setting VcoCap value: %s", err);
     return RCC_OK;
   }
   // notification that pre_lpf_gain_db property has been written
   RCCResult pre_lpf_gain_db_written() {
-    //Set rx_vga1gain register
+    // set rx_vga1gain register
     uint8_t regval;
     // This should probably be a table or calculation and allow the
     // full range of 7 bit values per the data sheet.  But it is not log-linear,
@@ -149,7 +142,7 @@ private:
     if(m_properties.post_lpf_gain_db % 3 || m_properties.post_lpf_gain_db > 30)
       return setError("Invalid gain: %u. Valid values are 0-30 dB in increments of 3.",
 		      m_properties.post_lpf_gain_db);
-    //Set rx_vga2gain register
+    // set rx_vga2gain register
     slave.set_rx_vga2gain((slave.get_rx_vga2gain() & 0xE0) |
 			  (m_properties.post_lpf_gain_db / 3));
     return RCC_OK;
@@ -172,6 +165,22 @@ private:
     slave.set_rxfe_dcoff_q(m_properties.post_mixer_dc_offset_q | (1 << 7));
     return RCC_OK;
   }
+  // notification that bb_loopback property has been written
+  RCCResult bb_loopback_written() {
+    if (m_properties.bb_loopback) {
+      // top level
+      slave.set_loopback(0x10);         
+      // rxlpf
+      slave.set_rx_rccal_lpf(0x37); 
+      // rxvga2
+      slave.set_rx_pwr_ctrl1(0x35); 
+      slave.set_rx_pwr_ctrl2(0x0F); 
+      slave.set_rx_spare0(0xC0);    
+      // rxtia  
+      slave.set_pad4(0x0F);                     
+    }
+  }
+
   // enable required for both initialize and start
   RCCResult enable() {
     slave.set_top_ctl0(slave.get_top_ctl0() | (1 << 2));
@@ -195,6 +204,7 @@ private:
   RCCResult run(bool /*timedout*/) {
     return RCC_DONE;
   }
+
 };
 
 LIME_RX_PROXY_START_INFO

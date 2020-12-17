@@ -34,11 +34,7 @@
 #include <cinttypes>
 #include <limits>
 
-#ifdef ASIO_STANDALONE
 #include <thread>
-#else
-#include <boost/thread.hpp>
-#endif
 
 #include "socket_write-worker.hh"
 
@@ -82,11 +78,7 @@ protected:
     {
       // Kick off background thread for server
       ocpiDebug("SocketWriter: Launching background thread for opcode %d (%s:%d) (message_mode=%d)", id, parent.properties().outSocket.address, port, message_mode);
-#ifdef ASIO_STANDALONE
       std::thread t(&http::server::server::run, &my_server);
-#else
-      boost::thread t(&http::server::server::run, &my_server);
-#endif
       t.detach();
     } // Constructor
 
@@ -160,14 +152,7 @@ protected:
 public:
   // Constructor
   Socket_writeWorker() : single_port(false) {
-#if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4))
     workers.resize(256);
-#else
-    // workaround for CentOS 6, whose vector.resize() blows up trying to call copy constructor
-    workers.reserve(256);
-    for (int i = 0; i <256; ++i)
-      workers.emplace_back(static_cast<SocketWriter *>(NULL));
-#endif
     // Tell framework to call us every 100ms even if no incoming data (to clear out completed buffers avoiding deadlock)
     // Bug? AV-4109 - we should optionally do output port here
     m_RunCondition.setPortMasks(1<<SOCKET_WRITE_IN, RCC_NO_PORTS);

@@ -1,95 +1,227 @@
 #!/usr/bin/env python3
 
-from collections import namedtuple
+import json
+import os
 from pathlib import Path
+from urllib.request import urlopen
+
+class Platform():
+
+    def __init__(self, name, model, project, linked_platforms=None, 
+                 cross_platforms=None, is_host=False, is_sim=False, 
+                 config=None):
+        self.name = name
+        self.model = model
+        self.is_host = is_host
+        self.is_sim = is_sim
+        self.project = project
+        self.linked_platforms = linked_platforms or []
+        self.cross_platforms = cross_platforms or []
+
+        if config:
+            self.ip = config['ip'] if 'ip' in config else None
+            self.port = config['port'] if 'port' in config else None
+        else:
+            self.ip = None
+            self.port = None
 
 
-_Platform = namedtuple('platform', 'name model ip port is_host is_sim')
-
-
-def Platform(name, model, is_host=False, is_sim=False, ip=None, port=None):
-    """Creates a Platform namedtuple
-
-    Args:
-        name:    Name of platform
-        model:   Model of platform
-        is_host: Whether platform is a host platform
-        is_sim:  Whether platform is a simulator
-        ip:      IP adress of platform device
-        port:    Port of platform device
+def discover_platforms(projects, whitelist=None, config=None):
+    """Discovers opencpi platforms in passed Project(s)
     
-    Returns:
-        a Platform
-    """
-
-    return _Platform(name=name, model=model, is_host=is_host, is_sim=is_sim, 
-                     ip=ip, port=port)
-
-
-def discover_platforms(projects, config=None):
-    """Search opencpi projects for platforms
-
-    Will search for hdl platforms in:
-        <projects>/<project>/hdl/platforms 
-    and for rcc platforms in:
-        <projects>/<project>/rcc/platforms
-    Determines if a directory is a platform by existence of a 
-        Makefile 
-    or
-        <platform_name>.mk
-    Determines if an hdl platform is a simulator by existence of 
-        runSimExec.<platform_name>
-
     Args:
-        projects:       List of opencpi projects to search for 
-                        platforms
-        config:         Dictionary with platform names as keys and
-                        additional platform configs as values
+        projects:  Project or List of Projects to discover platforms for
+        whitelist: Whitelist of Platforms
+        config:    Dictionary with platform names as keys and
+                   additional platform configs as values
 
     Returns:
-        platforms: List of opencpi platforms
+        List of Platforms discovered for passed Project(s)
     """
     platforms = []
 
+    if not isinstance(projects, list):
+        projects = [projects]
+
     for project in projects:
-        hdl_platforms_path = Path(project.path, 'hdl', 'platforms')
-        rcc_platforms_path = Path(project.path, 'rcc', 'platforms')
+        project_platforms = []
 
-        for platforms_path in [hdl_platforms_path, rcc_platforms_path]:
-            if platforms_path.is_dir():
+        if project.path:
+        # Project is local; discover local platforms
+            project_platforms += discover_local(project, config=config)
+        if project.id:
+        # Project is remote; discover remote platforms
+            project_platforms += discover_remote(project, config=config)
 
-                for platform_path in platforms_path.glob('*'):
-                    platform_name = platform_path.stem
+        platforms += project_platforms
+
+    platforms = apply_whitelist(platforms, whitelist)
+            
+    return platforms
+
+
+def discover_local(project, config=None):
+    """Search opencpi projects for platforms
+
+    Will search for hdl platforms in:
+        <project.path>/hdl/platforms
+    and for rcc platforms in:
+        <project.path>/rcc/platforms
+    Determines if a directory is a platform by existence of a
+        Makefile
+    or
+        <platform_name>.mk
+    Determines if an hdl platform is a simulator by existence of
+        runSimExec.<platform_name>
+
+    Args:
+        project: Project to discover platforms for
+        config:  Dictionary with platform names as keys and
+                 additional platform configs as values
+
+    Returns:
+        platforms: List of opencpi Platforms
+    """
+    platforms = []
+
+    hdl_platforms_path = Path(project.path, 'hdl', 'platforms')
+    rcc_platforms_path = Path(project.path, 'rcc', 'platforms')
+
+    for platforms_path in [hdl_platforms_path, rcc_platforms_path]:
+        if platforms_path.is_dir():
+
+            for platform_path in platforms_path.glob('*'):
+                platform_name = platform_path.stem
+
+                if platforms_path is hdl_platforms_path:
+                    makefile = Path(platform_path, 'Makefile')
+                    is_host = False
+                    is_sim = Path(platform_path, 'runSimExec.{}'.format(
+                        platform_name)).is_file()
+                else:
+                    makefile = Path(platform_path, '{}.mk'.format(
+                        platform_path.stem))
+                    is_host = Path(platform_path, '{}-check.sh'.format(
+                        platform_path.stem)).is_file()
+                    is_sim = False
+
+                if not makefile.is_file():
+                    continue
+
+                platform_config = get_platform_config(platform_name, config)
+
+                platform_model = platform_path.parents[1].stem
+                platform = Platform(platform_name, platform_model, project,
+                                    is_host=is_host, is_sim=is_sim, 
+                                    config=platform_config)
+                platforms.append(platform)
+
+    return platforms
+
+
+def discover_remote(project, config=None):
+    """ Discovers platforms for remote projects
+
+    Uses curl command to call gitlab api to collect project repo data.
+
+    Args:
+        project: Project to discover platforms for
+        config:  Dictionary with platform names as keys and
+                 additional platform configs as values
+
+    Returns:
+        platforms: List of opencpi Platforms
+    """
+    platforms = []
+    url = '/'.join([
+        'https://gitlab.com/api/v4/projects',
+        str(project.id),
+        'repository/tree'
+    ])
+    
+    rcc_url = '?'.join([url, 'path=rcc/platforms'])
+    hdl_url = '?'.join([url, 'path=hdl/platforms'])
+
+    for model_url,model in zip([rcc_url, hdl_url], ['rcc', 'hdl']):
+        try:
+            with urlopen(model_url) as response:
+                osp_platforms = json.load(response)
+
+                for osp_platform in osp_platforms:
+                    platform_name = osp_platform['name']
                     
-                    if platforms_path is hdl_platforms_path:
-                        makefile = Path(platform_path, 'Makefile')
-                        is_host = False
-                        is_sim = Path(platform_path, 'runSimExec.{}'.format(
-                            platform_name)).is_file()
-                    else:
-                        makefile = Path(platform_path, '{}.mk'.format(
-                            platform_path.stem))
-                        is_host = Path(platform_path, '{}-check.sh'.format(
-                            platform_path.stem)).is_file()
-                        is_sim = False
-
-                    if not makefile.is_file():
+                    if platform_name == 'Makefile':
                         continue
-                    
-                    if config and platform_name in config:
-                        platform_data = {key:value for key,value 
-                                         in config[platform_name].items()
-                                         if key in ['ip', 'port']}
-                    else:
-                        platform_data = {}
 
-                    platform_model = platform_path.parents[1].stem
-                    platform = Platform(name=platform_name, 
-                                        model=platform_model, is_host=is_host, 
-                                        is_sim=is_sim, **platform_data)
+                    platform_config = get_platform_config(platform_name, 
+                                                          config)
+                    platform = Platform(platform_name, model, project,
+                                        is_host=False, is_sim=False, 
+                                        config=platform_config)
                     platforms.append(platform)
+        except:
+            continue
+    
+    return platforms
 
-    return platforms 
+
+def apply_whitelist(platforms, whitelist):
+    """Applies whitelist to list of opencpi platforms
+
+    Args:
+        platforms: List of Platforms to apply whitelis to
+        whitelist: whitelist to apply to list of Platforms
+
+    Returns:
+        List of Platforms with whitelist applied
+    """
+
+    host_platforms = get_host_platforms(platforms)
+    cross_platforms = get_cross_platforms(platforms)
+
+    if not whitelist:
+        for host_platform in host_platforms:
+            host_platform.cross_platforms = cross_platforms
+
+        return host_platforms
+
+    filtered_platforms = []
+    for host_platform in host_platforms:
+        if host_platform.name not in whitelist:
+            continue
+
+        # Filter cross_platforms for each host_platform
+        platform_whitelist = whitelist[host_platform.name]
+        for cross_platform in cross_platforms:
+            if not platform_whitelist:
+                continue
+            if cross_platform.name not in platform_whitelist:
+                continue
+            
+            # If cross_platform is in both whitelist and directive, add to
+            # host_platform
+            host_platform.cross_platforms.append(cross_platform)
+
+        filtered_platforms.append(host_platform)
+
+    return filtered_platforms
+
+
+def get_platform_config(platform_name, config):
+    """Gets the config data for a platform
+
+    Args:
+        platform_name: The name of the platform to get config data for
+        config:        Dictionary whit platform names as keys and config
+                       data for the platform as values
+
+    Returns:
+        The config for the platform if found; None otherwise
+    """
+    try:
+        return config[platform_name]
+    except:
+        return None
 
 
 def get_platform(platform_name, platforms):
@@ -106,6 +238,8 @@ def get_platform(platform_name, platforms):
         if platform_name == platform.name:
             return platform
 
+    return None
+
 
 def get_platforms_by_type(platforms, platform_type):
     """Searches list of platforms for platforms by type
@@ -119,20 +253,23 @@ def get_platforms_by_type(platforms, platform_type):
     Returns:
         List of platforms matching platform_type arg
     """
-    return_platforms = []
+    return_platforms = set()
     for platform in platforms:
         if platform_type == 'host' and platform.is_host:
-            return_platforms.append(platform)
-        elif platform_type == 'cross' and not platform.is_host:
-            return_platforms.append(platform)
+            return_platforms.add(platform)
+        elif platform_type == 'cross':
+            if not platform.is_host:
+                return_platforms.add(platform)
+            else:
+                return_platforms.update(platform.cross_platforms)
 
-    return return_platforms
+    return list(return_platforms)
 
 
 def get_cross_platforms(platforms):
     """Searches list of platforms for platforms with type 'cross'
 
-        Calls get_platforms_by_type() with 'cross' passed as 
+        Calls get_platforms_by_type() with 'cross' passed as
         platform_type arg.
 
     Args:
@@ -147,7 +284,7 @@ def get_cross_platforms(platforms):
 def get_host_platforms(platforms):
     """Searches list of platforms for platforms with type 'host'
 
-        Calls get_platforms_by_type() with 'host' passed as 
+        Calls get_platforms_by_type() with 'host' passed as
         platform_type arg.
 
     Args:
@@ -225,5 +362,31 @@ def get_simulators(platforms):
     for platform in platforms:
         if platform.is_sim:
             return_platforms.append(platform)
-    
+
     return return_platforms
+
+
+def get_linked_platforms(platform, platforms, platform_directive):
+    """Gets a platform's linked platforms
+
+    Args:
+        platform:           Platform to find linked platforms for
+        platforms:          List of all platforms available
+        platform_directive: Dictionary with platform names as keys and names of
+                            associated platforms as values
+
+    Returns:
+        List of associated platforms for a given platform
+    """
+    linked_platforms = []
+    
+    if platform.name not in platform_directive:
+        return linked_platforms
+    
+    for linked_platform_name in platform_directive[platform.name]:
+        linked_platform = get_platform(linked_platform_name, platforms)
+
+        if linked_platform:
+            linked_platforms.append(linked_platform)
+    
+    return linked_platforms

@@ -29,18 +29,33 @@
 #define OCPI_LIBRARY_ASSEMBLY_H
 
 #include <string>
+#include <forward_list>
 #include "OcpiLibraryManager.h"
 #include "OcpiUtilAssembly.h"
 
 namespace OCPI {
   namespace Library {
+
+    class Assembly;
     // This class represents a candidate implementation for an instance.
     struct Candidate {
       // The impl is not a reference since std::vector must copy it :-(
       const Implementation *impl;
       unsigned score;
+      mutable Assembly *slaves; // hold a slave/sub assembly to be merged when this candidate is used
+      mutable size_t nInstances, nConnections;
+      // Temporary port delegations need to be "undone" by using these fixups
+      // This is basically a tuple of these three things
+      struct Fixup {
+	OCPI::Util::Assembly::Port *portPtr; // the OU::Assembly::Port to patch
+	OCPI::Util::Assembly::Port port;     // the value to restore
+	size_t ordinal;                      // the instance's port ordinal
+	Fixup(OCPI::Util::Assembly::Port *pp, OCPI::Util::Assembly::Port p, size_t o)
+	  : portPtr(pp), port(p), ordinal(o) {}
+      };
+      std::forward_list<Fixup> m_portFixups;
       inline Candidate(const Implementation &a_impl, unsigned a_score)
-	: impl(&a_impl), score(a_score) {}
+	: impl(&a_impl), score(a_score), slaves(NULL), nInstances(0), nConnections(0) {}
     };
     typedef std::vector<Candidate> Candidates;   // a set of candidates for an instance
     typedef Candidates::iterator CandidatesIter;
@@ -49,9 +64,9 @@ namespace OCPI {
     // By finding candidate implementations in the available artifact libraries,
     // and perhaps adding proxy slave instances
     class Assembly : public OCPI::Util::Assembly,  public ImplementationCallback {
-      // This class is the library layer's instance.
+      // This instance class below is the library layer's overlay on the basic OU instance
       // It usually just references the OU::Assembly instance, but in the case of
-      // proxies, the library layer may add instances for slaves.
+      // proxies or file IO, the library layer may add instances
     public:
       struct Instance {
 	OCPI::Util::Assembly::Instance &m_utilInstance; // lower level assy instance structure
@@ -63,7 +78,7 @@ namespace OCPI {
 	Instance *m_master;                             // The master if this is a slave
 	Instance(OCPI::Util::Assembly::Instance &utilInstance, Instance *master = NULL);
 	~Instance();
-	
+
 	bool resolveUtilPorts(const Implementation &i, OCPI::Util::Assembly &a);
 	bool checkConnectivity(Candidate &c, Assembly &assy);
 	bool foundImplementation(const Implementation &i, std::string &model,
@@ -86,24 +101,32 @@ namespace OCPI {
       Instances m_instances;                      // This layer's instances
       bool      m_deployed;                       // deployment decisions are already made
     public:
-      explicit Assembly(const char *file, const OCPI::Util::PValue *params);
-      explicit Assembly(const std::string &string, const OCPI::Util::PValue *params);
+      // explicit Assembly(const char *file, const OCPI::Util::PValue *params);
+      // explicit Assembly(const std::string &string, const OCPI::Util::PValue *params);
       explicit Assembly(ezxml_t xml, const char *name, const OCPI::Util::PValue *params);
       ~Assembly();
-      Instance &instance(size_t n) { return *m_instances[n]; }
+      Instance &instance(size_t n) const { return *m_instances[n]; }
       size_t nInstances() { return m_instances.size(); }
-      bool badConnection(const Implementation &impl, const Implementation &otherImpl,
-			 const OCPI::Util::Assembly::Port &ap, unsigned port);
-      Port *assyPort(unsigned inst, unsigned port) {
+      Instances &instances() { return m_instances; }
+      OCPI::Util::Assembly::Instance &utilInstance(size_t n) const {
+	return m_instances[n]->m_utilInstance;
+      }
+      bool badConnection(const Implementation &thisImpl, const OCPI::Util::Port &thisPort,
+			 const Implementation &otherImpl, const OCPI::Util::Port &otherPort);
+      Port **assyPorts(size_t inst) {
+	assert(m_instances[inst]->m_assyPorts);
+	return m_instances[inst]->m_assyPorts;
+      }
+      Port *assyPort(size_t inst, size_t port) {
 	assert(m_instances[inst]->m_assyPorts);
 	return m_instances[inst]->m_assyPorts[port];
-    }
+      }
       // Reference counting
       void operator ++( int );
       void operator --( int );
-      
-      const char *getPortAssignment(const char *pName, const char *assign, unsigned &instn,
-				    unsigned &portn, const OCPI::Util::Port *&port,
+
+      const char *getPortAssignment(const char *pName, const char *assign, size_t &instn,
+				    size_t &portn, const OCPI::Util::Port *&port,
 				    const char *&value, bool removeExternal = false);
     private:
       void addInstance(const OCPI::Util::PValue *params);

@@ -1,20 +1,32 @@
-include:
-- .gitlab-ci/yaml/docs.yml
-- .gitlab-ci/yaml/e3xx.yml
-- .gitlab-ci/yaml/plutosdr.yml
-- .gitlab-ci/yaml/templates.yml
-- .gitlab-ci/yaml/verify-pipeline.yml
-- .gitlab-ci/yaml/centos7.yml
+workflow:
+  rules:
+    - when: always
+
+trigger-children:
+  stage: trigger-children
+  trigger:
+    include:
+    - artifact: .gitlab-ci.yml
+      job: generate-children
+    strategy: depend
+  variables:
+    CI_ROOT_SOURCE: "$CI_PIPELINE_SOURCE"
+    CI_ROOT_ID: "$CI_PIPELINE_ID"
+generate-children:
+  artifacts:
+    paths:
+    - .gitlab-ci.yml
+  image: centos:7
+  script:
+  - yum install epel-release -y
+  - yum install python36-PyYAML -y
+  - .gitlab-ci/scripts/ci_yaml_generator.py
+  stage: generate-children
+  tags:
+  - docker
 stages:
 - .pre
-- prereqs
-- build-host
-- build-rcc
-- build-primitives-core
-- build-primitives
-- build-libraries
-- build-platforms
-- build-assemblies
-- build-sdcards
-- test
+- generate-children
+- trigger-children
 - deploy
+include: .gitlab-ci/yaml-parent/verify-pipeline.yml

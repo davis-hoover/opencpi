@@ -32,12 +32,14 @@
 namespace OCPI {
   namespace Util {
 
+    const char *g_models[] = { OCPI_MODELS, NULL };
+
     namespace OE = OCPI::Util::EzXml;
     Worker::Worker()
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
-	m_version(0), m_workerEOF(false), m_totalPropertySize(0), m_isSource(false),
+	m_version(0), m_workerEOF(false), m_totalPropertySize(0),// m_isSource(false),
 	m_isDebug(false), m_nProperties(0), m_properties(NULL), m_firstRaw(NULL), m_xml(NULL),
-        m_ordinal(0) {
+        m_ordinal(0), m_slaveAssembly(NULL) {
     }
 
     Worker::~Worker() {
@@ -98,7 +100,28 @@ namespace OCPI {
        (void)testId;
        ocpiAssert(0); return *m_tests;
     }
+    Slave::
+    Slave(const char *worker)
+      : m_name(worker), m_worker(worker), m_slavePort(NULL), m_delegated(NULL),
+	m_index(0), m_optional(false) {
+    }
+    Slave::
+    Slave(Worker &w, ezxml_t xml, unsigned ordinal, const char *&err)
+      : m_name(ezxml_cattr(xml, "name")), m_worker(ezxml_cattr(xml, "worker")),
+	m_slavePort(ezxml_cattr(xml, "slave_port")), m_delegated(NULL) {
+      if ((err = OE::getBoolean(xml, "optional", &m_optional)) ||
+	  (err = OE::getNumber(xml, "index", &m_index, NULL, SIZE_MAX)))
+	return;
+      const char *port = ezxml_cattr(xml, "port");
+      if (port) {
+	if ((m_delegated = w.findMetaPort(port)))
+	  m_delegated->m_slave = ordinal; // set the slave ordinal of the delegated port
+	else
+	  err = esprintf("delegated port \"%s\" for slave \"%s\" not found", port, m_name);
+      }
+    }
 #endif
+
     const char *Worker::
     parse(ezxml_t xml, Attributes *attr) {
       m_xml = xml;
@@ -107,26 +130,11 @@ namespace OCPI {
       if (err ||
 	  (err = OE::getNumber8(xml, "version", &m_version)) ||
 	  (err = OE::getBoolean(xml, "workerEOF", &m_workerEOF)) ||
+	  (err = OE::getRequiredString(xml, m_package, "package", "worker")) ||
 	  (err = OE::getRequiredString(xml, m_model, "model", "worker")))
 	return err;
       if (!OE::getOptionalString(xml, m_specName, "specName"))
 	m_specName = m_name;
-      const char *slave = ezxml_cattr(xml, "slave");
-      if (slave) {
-	if (ezxml_cchild(xml, "slave"))
-	  return esprintf("cannot have slave elements when you have a slave attribute");
-	m_slaves.emplace_back(slave, slave, false);
-      } else
-	for (ezxml_t cx = ezxml_cchild(xml, "slave"); cx; cx = ezxml_cnext(cx)) {
-	  const char
-	    *w = ezxml_cattr(cx, "worker"),
-	    *n = ezxml_cattr(cx, "name");
-	  assert(w);
-	  bool optional = false;
-	  if ((err = OE::getBoolean(cx, "optional", &optional)))
-	    return err;
-	  m_slaves.emplace_back(n, w, optional);
-	}
       if ((m_nProperties = OE::countChildren(xml, "property")))
 	m_properties = new Property[m_nProperties];
       if ((m_nPorts = OE::countChildren(xml, "port")))
@@ -179,16 +187,40 @@ namespace OCPI {
           return esprintf("Invalid xml port description(2): %s", err);
       // Third pass to propagate info from one port to another
       p = m_ports;
-      bool hasInput = false, hasOutput = false;
       for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
 	if ((err = p->postParse()))
           return esprintf("Invalid xml port description(3): %s", err);
-        else if (p->m_provider) {
-	  if (!p->m_isOptional)
-	    hasInput = true;
-        } else
-	  hasOutput = true;
+#if 1
+      if (ezxml_cattr(xml, "slave") ||
+	  ezxml_cchild(xml, "slave"))
+	return esprintf("for worker %s, obsolete slave indications in artifact XML",  cname());
+#else
+      // Slaves must be parsed after ports
+      const char *slave = ezxml_cattr(xml, "slave");
+      if (slave) {
+	if (ezxml_cchild(xml, "slave"))
+	  return esprintf("cannot have slave elements when you have a slave attribute");
+	m_slaves.emplace_back(slave);
+      } else
+	for (ezxml_t cx = ezxml_cchild(xml, "slave"); cx; cx = ezxml_cnext(cx)) {
+	  m_slaves.emplace_back(*this, cx, m_slaves.size(), err);
+	  if (err)
+	    return err;
+	}
+      // Note we do *not* parse the slave assembly until asked.
+      // The m_isSource determination must happen after slave processing
+      p = m_ports;
+      bool hasInput = false, hasOutput = false;
+      for (unsigned nn = 0; nn < m_nPorts; nn++, p++)
+	if (p->m_slave == SIZE_MAX) { // if not delegated
+	  if (p->m_provider) {
+	    if (!p->m_isOptional)
+	      hasInput = true;
+	  } else
+	    hasOutput = true;
+	}
       m_isSource = hasOutput && !hasInput;
+#endif
       Memory* m = m_memories;
       for (x = ezxml_cchild(xml, "memory"); x; x = ezxml_cnext(x), m++ )
         if ((err = m->parse(x)))
@@ -204,6 +236,7 @@ namespace OCPI {
 	else
 	  m_scalingParameters[l_name] = s;
       }
+      m_slaveAssembly = ezxml_cchild(xml, "slaves");
       return NULL;
     }
     // Get a property value from the metadata

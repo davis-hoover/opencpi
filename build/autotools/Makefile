@@ -140,13 +140,11 @@ MAKEFILE_AM=gen/Makefile.am
 MAKEFILE_IN=gen/Makefile.in
 OPTIONAL_WARNINGS=gen/optional-warnings.m4
 
-# The ACLOCAL override is because centos6/2.63 autoreconf does not look in acinclude, and does not
-# pass -Iacinclude into aclocal.
 $(MAKEFILE_IN) gen/configure: \
              $(OPTIONAL_WARNINGS) $(wildcard imported-macros/*.m4 our-macros/*.m4) configure.ac \
              $(MAKEFILE_AM) | gen
 	$(AT) echo Running the autotools reconfiguration tool in the gen/ directory
-	$(AT) cd gen && ACLOCAL="aclocal -Iacinclude" autoreconf -v -i # no -s so it works across systems
+	$(AT) cd gen && autoreconf -v -i # no -s so it works across systems
 	$(AT) touch $@ # sometimes autoreconf tries to be clever
 
 preconfigure: gen/configure $(MAKEFILE_IN)

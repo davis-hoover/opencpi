@@ -171,12 +171,10 @@ namespace OCPI {
       ezxml_free(m_deployXml);
       ezxml_free(m_appXml);
       delete [] m_copy;
-      delete [] m_instances;
       delete [] m_bookings;
       delete [] m_properties;
       delete [] m_global2used;
       delete [] m_usedContainers;
-      delete [] m_containers;
       if (m_containerApps) {
         for (unsigned n = 0; n < m_nContainers; n++)
           delete m_containerApps[n];
@@ -213,17 +211,10 @@ namespace OCPI {
      */
     // For dynamic instances only, distribute them according to policy
     void ApplicationI::
-    policyMap(Instance *i, CMap &bestMap) {
-      // Proxies can only operate in the base container.
-      // FIXME:  allow proxies to be in any container collocate with the base container.
-      if (i->m_bestDeployment.m_impls[0]->m_metadataImpl.slaves().size()) {
-        assert(bestMap == (1u << OC::Container::baseContainer().ordinal()));
-        i->m_usedContainer = getUsedContainer(OC::Container::baseContainer().ordinal());
-        return;
-      }
-      // bestMap is bitmap of best available containers that the implementation can be mapped to
+    policyMap(Deployment &d, unsigned instNum) {
       // allMap is the bitmap of all suitable containers for the implementation
-      switch ( m_cMapPolicy ) {
+      d.m_usedContainers.resize(1, UINT_MAX);
+      switch (m_cMapPolicy) {
 
       case MaxProcessors:
         // Limit use of processors to m_processors
@@ -232,8 +223,8 @@ namespace OCPI {
           for (unsigned n = 0; n < m_nContainers; n++) {
             if (m_currConn >= m_nContainers)
               m_currConn = 0;
-            if (bestMap & (1u << m_usedContainers[m_currConn++])) {
-              i->m_usedContainer = m_currConn - 1;
+            if (d.m_feasible & (1u << m_usedContainers[m_currConn++])) {
+              d.m_usedContainers[0] = m_currConn - 1;
               return;
             }
           }
@@ -243,21 +234,21 @@ namespace OCPI {
         // Prefer adding a new container to an existing one, but if we can't
         // use a new one, rotate around the existing ones.
         for (unsigned n = 0; n < OC::Manager::s_nContainers; n++)
-          if ((bestMap & (1u << n)) && !(m_allMap & (1u << n))) {
+          if ((d.m_feasible & (1u << n)) && !(m_allMap & (1u << n))) {
             m_currConn = m_nContainers;
-            i->m_usedContainer = addContainer(n);
-            ocpiDebug("instance %p used new container. best 0x%x curr %u cont %u",
-                      i, bestMap, m_currConn, n);
+            d.m_usedContainers[0] = addContainer(n);
+            ocpiDebug("instance %u used new container. best 0x%x curr %u cont %u",
+                      instNum, d.m_feasible, m_currConn, n);
             return; // We added a new one - and used it
           }
         // We have to use one we have since only those are feasible
         do {
           if (++m_currConn >= m_nContainers)
             m_currConn = 0;
-        } while (!(bestMap & (1u << m_usedContainers[m_currConn])));
-        i->m_usedContainer = m_currConn;
-        ocpiDebug("instance %p reuses container. best 0x%x curr %u cont %u",
-                  i, bestMap, m_currConn, m_usedContainers[m_currConn]);
+        } while (!(d.m_feasible & (1u << m_usedContainers[m_currConn])));
+        d.m_usedContainers[0] = m_currConn;
+        ocpiDebug("instance %u reuses container. best 0x%x curr %u cont %u",
+                  instNum, d.m_feasible, m_currConn, m_usedContainers[m_currConn]);
         break;
 
       case MinProcessors:
@@ -266,16 +257,16 @@ namespace OCPI {
         ocpiAssert(m_processors == 0);
         // Try to use first one already used that suits us
         for (unsigned n = 0; n < m_nContainers; n++)
-          if (bestMap & (1u << m_usedContainers[n])) {
-            i->m_usedContainer = n;
+          if (d.m_feasible & (1u << m_usedContainers[n])) {
+            d.m_usedContainers[0] = n;
             return;
           }
         // Add one
         unsigned n;
         for (n = 0; n < OC::Manager::s_nContainers; n++)
-          if (bestMap & (1u << n))
+          if (d.m_feasible & (1u << n))
             break;
-        i->m_usedContainer = addContainer(n);
+        d.m_usedContainers[0] = addContainer(n);
       }
     }
 
@@ -296,22 +287,24 @@ namespace OCPI {
       }
     }
 
+#if 0
     // Find the slave ordinal (within the slaves specified in the proxy's OWD) that corresponds to
     // the slave impl and slave name provided.
     // Return the ordinal or UINT_MAX if not found.
     // Also set the last output arg, slaveWkrName, to the actual worker name with model suffix
     static unsigned
-    findSlave(OU::Worker &sImpl, OU::Worker &mImpl, const char *slaveName, std::string *wkrName = NULL) {
+    findSlave(const OU::Worker &sImpl, const OU::Worker &mImpl, const char *slaveName,
+	      std::string *wkrName = NULL) {
       std::string slaveWkrName;
-      OU::format(slaveWkrName, "%s.%s", sImpl.cname(), sImpl.model().c_str());
+      OU::format(slaveWkrName, "%s.%s.%s", sImpl.package().c_str(), sImpl.cname(), sImpl.model().c_str());
       size_t dashIdx =  slaveWkrName.rfind('-');
       if (dashIdx != std::string::npos) // if worker has configuration suffix, remove it
         slaveWkrName.erase(dashIdx, slaveWkrName.rfind('.') - dashIdx);
       if (wkrName)
 	*wkrName = slaveWkrName;
-      const OU::Worker::Slave *s = &(mImpl.slaves()[0]);
+      const OU::Slave *s = &(mImpl.slaves()[0]);
       unsigned found = UINT_MAX;
-      for (unsigned n = 0; n < mImpl.slaves().size(); ++n, ++s)
+      for (unsigned n = 0; n < mImpl.slaves().size(); ++n, ++s) {
         if (!strcasecmp(s->m_worker, slaveWkrName.c_str())) {
 	  if (slaveName) {
 	    if (!strcasecmp(slaveName, s->m_name))
@@ -324,16 +317,18 @@ namespace OCPI {
 	  } else
 	    found = n;
 	}
+      }
       return found;
     }
 
     // Check that the proxy/slave relationship is valid now that we know the impls on both sides
-    static bool
-    checkSlave(OU::Worker &sImpl, OU::Worker &mImpl, const char *slaveName, bool isMaster,
+    static unsigned
+    checkSlave(const OU::Worker &sImpl, const OU::Worker &mImpl, const char *slaveName, bool isMaster,
 	       const std::string &reject) {
       std::string slaveWkrName;
-      if (findSlave(sImpl, mImpl, slaveName, &slaveWkrName) != UINT_MAX)
-        return true;
+      unsigned slave;
+      if ((slave = findSlave(sImpl, mImpl, slaveName, &slaveWkrName)) != UINT_MAX)
+        return slave;
       // FIXME: make impl namespace part of this. implnames should really be qualified.
       std::string goodSlaves;
       for (unsigned n = 0; n < mImpl.slaves().size(); ++n)
@@ -344,134 +339,368 @@ namespace OCPI {
       else
         ocpiInfo("%s since it doesn't match any slaves (%s) indicated by the master instance \"%s\"",
                  reject.c_str(), goodSlaves.c_str(), mImpl.cname());
-      return false;
+      return UINT_MAX;
     }
-
-    // Check for master/slave correctness of the master/slave relationships specified in the
-    // application. We know that the impl for a master indicates slaves and that
-    // can be checked by the library layer.
-    // If the proxy instance specifies no slaves at all, we try to do an unambiguous match
-    // to the slaves that just need to be present.
-    // Finally we do the optional-slave checks.  They must be present or they must be optional
+#endif
+    // Now that we know a complete deployment, we can do a final check on the relative
+    // position of proxies and slaves to be sure that proxies are either on the base
+    // container or if not, all of its slaves are on the same system/launcher
     bool ApplicationI::
-    resolveSlaves() {
-      // Now that we know a complete deployment, we can do a final check on missing slaves
-      Instance *i = m_instances;
-      std::vector<bool> foundAsSlave; // keep track of "found" slaves, so that they are only found once
-      foundAsSlave.resize(m_nInstances);
+    resolveExplicitSlaves() {
+      Instance *i = &m_instances[0];
       for (unsigned n = 0; n < m_nInstances; ++n, ++i) {
-	auto &impl = *i->m_deployment.m_impl;
-	OU::Worker &w = impl.m_metadataImpl;
-	if (w.slaves().size()) { // we have a proxy
-	  const OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
-	  std::string rejectSlave;
-	  OU::format(rejectSlave,
-		     "For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" "
-		     "from artifact \"%s\" due to",
-		     ui.m_name.c_str(),
-		     ui.m_specName.c_str(),
-		     impl.m_metadataImpl.cname(),
-		     impl.m_staticInstance ? "/" : "",
-		     impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
-		     impl.m_artifact.name().c_str());
-	  i->m_deployment.m_slaves.clear();
-	  i->m_deployment.m_slaves.resize(w.slaves().size(), UINT_MAX);
-	  if (ui.m_slaveInstances.empty()) { // proxy doesn't specify slaves in the instance
-	    Instance *si = m_instances;
-	    for (unsigned sn = 0; sn < m_nInstances; ++sn, ++si) {
-	      OU::Worker &sImpl = m_instances[sn].m_deployment.m_impl->m_metadataImpl;
-	      std::string slaveWkrName;
-	      unsigned slaveInProxy;
-	      if (sn != n && !m_assembly.instance(sn).m_utilInstance.m_hasMaster &&
-		  (slaveInProxy = findSlave(sImpl, w, NULL, &slaveWkrName)) != UINT_MAX) {
-		if (i->m_deployment.m_slaves[slaveInProxy] != UINT_MAX) {
-		  ocpiInfo("%s ambiguous (multiple) instances of worker %s for proxy",
-			   rejectSlave.c_str(), slaveWkrName.c_str());
-		  return false;
-		}
-		if (foundAsSlave[sn]) {
-		  ocpiInfo("%s ambiguous slave %s for multiple proxies",
-			   rejectSlave.c_str(), slaveWkrName.c_str());
-		  return false;
-		}
-		i->m_deployment.m_slaves[slaveInProxy] = sn;
-		foundAsSlave[sn] = true;
-	      }
-	    }
-	  } else { // proxy has explicit slaves in the instance
-	    // Find slaves that are connected so we can find ones that are not, to check for optional
-	    for (unsigned ns = 0; ns < ui.m_slaveInstances.size(); ++ns) {
-	      unsigned s =
-		findSlave(m_instances[ui.m_slaveInstances[ns]].m_deployment.m_impl->m_metadataImpl, w,
-			  ui.m_slaveNames[ns]);
-	      if (s != UINT_MAX)
-		i->m_deployment.m_slaves[s] = ui.m_slaveInstances[ns];
-	    }
+	const auto &impl = *i->m_deployment.m_impls[0];
+	const auto &w = impl.m_metadataImpl;
+	if (!w.slaveAssy())
+	  continue;
+	const auto &masterContainer = OC::Container::nthContainer(i->m_deployment.m_containers[0]);
+	const OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
+	for (unsigned ns = 0; ns < ui.m_slaveInstances.size(); ++ns) {
+	  const auto &slave = m_instances[ui.slaveInstances()[ns]];
+	  const auto &slaveContainer = OC::Container::nthContainer(slave.m_deployment.m_containers[0]);
+	  if (&masterContainer != &OC::Container::baseContainer() &&
+	      &masterContainer.launcher() != &slaveContainer.launcher()) {
+	    std::string rejectSlave;
+	    const auto &sui = m_assembly.instance(ui.slaveInstances()[ns]).m_utilInstance;
+	    OU::format(rejectSlave,
+		       "For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" "
+		       "from artifact \"%s\" on container %s because it is neither on the base container "
+		       "where the application is running, nor on the same system as its slave: \"%s\" "
+		       "which is on container %s",
+		       ui.cname(), ui.m_specName.c_str(),
+		       impl.m_metadataImpl.cname(), impl.m_staticInstance ? "/" : "",
+		       impl.m_staticInstance ? ezxml_cattr(impl.m_staticInstance, "name") : "",
+		       impl.m_artifact.name().c_str(), masterContainer.cname(),
+		       sui.cname(), slaveContainer.cname());
+	    return false;
 	  }
-	  const OU::Worker::Slave *slave = &w.slaves()[0];
-	  for (size_t s = 0; s < w.slaves().size(); ++slave, ++s)
-	    if (!slave->m_optional && i->m_deployment.m_slaves[s] == UINT_MAX) {
-	      ocpiInfo("%s missing slave (worker %s, slave name %s) that is not optional",
-		       rejectSlave.c_str(), slave->m_worker, slave->m_name);
-	      return false;
-	    }
 	}
       }
       return true;
     }
 
+#if 0
+    // Delegate the assyPort (the proxy port end of connection) to a slave port
+    // Set the slavePort pointer as output arg
+    void ApplicationI::
+    delegateAssyPort(OU::Assembly::Port &assyPort, unsigned instNum, unsigned slaveInstNum,
+		     const OL::Implementation &slaveImpl, const OU::Port &masterPort,
+		     const OU::Port *&slavePort) {
+      // Save the pre-delegated port to restore for other deployments that might not delegate!
+      m_instances[instNum].m_portFixups.emplace_front(&assyPort, assyPort);
+      auto &slaveWorker = slaveImpl.m_metadataImpl;
+      slavePort =
+	slaveWorker.findMetaPort(masterPort.metaWorker().slaves()[masterPort.m_slave].m_slavePort);
+      assyPort.m_name = slavePort->cname();
+      assyPort.m_instance = slaveInstNum;
+      assyPort.m_index = 0; // we assume slave ports are not array ports
+    }
+
+    // See if this end of a connection (the assy port) should be delegated to a slave's port.
+    // - assyPort is the assembly port (end of connection in the assembly) that might be delegated
+    // - implPort is the deployed worker port of the assembly port being considered
+    // - instNum is the current instance being deployed, which could be master or slave
+    // - impl (output arg by reference) is the impl associated with the assyPort
+    // There are three outcomes:
+    // 1. Port is not delegated, return false
+    // 2. Port is delegated, and the slave has been deployed so delegation happened: return false
+    // 3. Port is delegated, but slave not been deployed yet, so connection cannot be verified yet.
+    //    So return==true tells the caller to skip further connectivity checks since they will be
+    //    resolved later.
+    // When delegation happens:
+    //   alter the assyport to refer to the proper slave port
+    //        in this case a "fixup" is stored to restore the delegation after this deployment
+    //   set the impl output arg to be the deployed impl associated with the slave port
+    bool ApplicationI::
+    maybeDelegate(unsigned instNum, OU::Assembly::Port &assyPort, const OU::Port *&implPort,
+		  const OL::Implementation *&impl) {
+      if (implPort->m_slave == SIZE_MAX) // port not delegated to a slave, leave it alone
+	return false;
+      auto &slaveInstances = m_instances[assyPort.m_instance].m_deployment.m_slaves;
+      assert(implPort->m_slave < slaveInstances.size()); // port's slave ordinal is valid
+      auto slaveInstNum = slaveInstances[implPort->m_slave];
+      if (slaveInstNum == UINT_MAX || slaveInstNum > instNum)
+	return true; // we haven't gotten to the slave instance yet, so we'll do the delegation later
+      // Delegate the port of the connection to a slave port
+      auto &slaveImpl = *m_instances[slaveInstNum].m_deployment.m_impls[0];
+      delegateAssyPort(assyPort, instNum, slaveInstNum, slaveImpl, *implPort, implPort);
+      impl = &slaveImpl;
+      return false;
+    }
+
+    // We (instNum) are a slave, and our port is not connected, and it might be delegated-to
+    // The master has been deployed, so we have its impl.
+    bool ApplicationI::
+    maybeDelegateToSlavePort(unsigned slaveInstNum, const OL::Implementation &slaveImpl,
+			     const OU::Port &slavePort, OU::Assembly::Port *&otherAssyPort) {
+      const OU::Assembly::Instance &ui = m_assembly.instance(slaveInstNum).m_utilInstance;
+      auto &master = m_instances[ui.m_master].m_deployment;
+      auto &slaves = master.m_slaves; // the map from the master's slave ordinals to instances
+      // Which of our master's slaves are we?
+      for (unsigned s = 0; s < slaves.size(); ++s)
+	if (slaves[s] == slaveInstNum) { // the master's slave s, is mapped to this instance
+	  auto &slave = master.m_impls[0]->m_metadataImpl.slaves()[s];
+	  if (slave.m_delegated && !strcasecmp(slave.m_slavePort, slavePort.cname())) {
+	    // The master port is delegated to this slave port.
+	    // See if there is a connection (assyPort) to be delegated
+	    const OU::Assembly::Instance &uiMaster =
+	      m_assembly.instance(ui.m_master).m_utilInstance;
+	    // Which master port is delegated to our slave port
+	    for (auto it = uiMaster.m_ports.begin(); it != uiMaster.m_ports.end(); ++it) {
+	      auto &masterAssyPort = **it;
+	      if (!strcasecmp(masterAssyPort.cname(), slave.m_delegated->cname())) {
+		// We found a connection in the assembly that is connected to the master's port
+		if (masterAssyPort.m_connectedPort->m_instance < slaveInstNum) {
+		  // So both sides of this (delegated) connection have implementations
+		  otherAssyPort = masterAssyPort.m_connectedPort;
+		  const OU::Port *masterPort = slave.m_delegated;
+		  delegateAssyPort(masterAssyPort, slaveInstNum, slaveInstNum, slaveImpl,
+				   *masterPort, masterPort);
+		  return false;
+		} else
+		  break;
+	      }
+	    }
+	    break;
+	  }
+	  // skip it - port is not delegated, the proxy port not is not connected, or
+	  // the connected instance has not been deployed yet
+	  return true;
+	}
+      assert("Slave instance was not related to its master" == NULL);
+      return true;
+    }
+#endif
+    // Deal with slaves when deploying this instance.
+    bool ApplicationI::
+    resolveInstanceSlaves(unsigned instNum, OL::Candidate &c, const std::string &reject) {
+      ezxml_t slaves = c.impl->m_metadataImpl.slaveAssy();
+      const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
+      if (slaves) {
+	if (!c.slaves) {
+	  // Do this work one time for this candidate of this instance, which caches this work so that it can
+	  // be applied each time this candidate is considered for deployment
+	  ocpiInfo("++++++++++++ Starting one-time processing of slave assembly for instance %u candidate %p",
+		   instNum, &c);
+	  c.slaves = new OL::Assembly(slaves, ui.cname(), NULL);
+	  c.nInstances = m_nInstances;                      // remember for resize after deployment
+	  c.nConnections = m_assembly.m_connections.size(); // remember for resize after deployment
+	  // Patch the instances and ports in slave assembly for (repeated) insertion into the app
+	  for (unsigned n = 0; n < c.slaves->instances().size(); ++n) {
+	    auto &libInst = *c.slaves->instances()[n];
+	    auto &utilInst = *(OU::Assembly::Instance*)&libInst.m_utilInstance; // ugly un-const
+	    std::string old(utilInst.m_name);
+	    if (ui.m_slaveNames.empty()) // don't rename for explicit slaves
+	      OU::format(utilInst.m_name, "%s.%s", ui.cname(), old.c_str()); // proxy inst name is prefix
+	    utilInst.m_ordinal += m_nInstances;
+	    utilInst.m_master = instNum;
+	    utilInst.m_hasMaster = true;
+	    libInst.m_master = &m_assembly.instance(instNum);
+
+	    for (auto it = utilInst.m_ports.begin(); it != utilInst.m_ports.end(); ++it)
+	      (*it)->m_instance = utilInst.m_ordinal;
+	  }
+	  ocpiInfo("++++++++++++ Ending one-time processing of slave assembly for instance %u candidate %p", 
+		   instNum, &c);
+	}
+	ocpiInfo("++++++++++++ Starting insertion of slave instances for instance %u candidate %p",
+		 instNum, &c);
+	// (temporarily) add the slave assembly's instances to the app
+	// but for compatibility, allow the app to specify existing slave instances
+	m_instances[instNum].m_deployment.m_slaves.resize(c.slaves->nInstances(), SIZE_MAX);
+	if (ui.m_slaveNames.empty()) { // backward compatibility - instances might be there
+	  // add instances to the library assembly
+	  m_assembly.instances().insert(m_assembly.instances().end(),
+					c.slaves->instances().begin(),
+					c.slaves->instances().end());
+	  // add instances to the app
+	  m_nInstances += c.slaves->nInstances();
+	  m_instances.resize(m_nInstances);
+	  Deployment &d = m_instances[instNum].m_deployment;
+	  for (size_t n = c.nInstances; n < m_nInstances; ++n) {
+	    m_instances[n].init(m_assembly, n, m_verbose, NULL);
+	    d.m_slaves[n - c.nInstances] = n;
+	  }
+	} else {
+	  Deployment &d = m_instances[instNum].m_deployment;
+	  // The "multi-slave" legacy method with names and instances: UGH in hindsight
+	  for (unsigned s = 0; s < ui.m_slaveNames.size(); ++s) {
+	    if (ui.m_slaveNames[s])
+	      for (unsigned n = 0; n < c.slaves->instances().size(); ++n) {
+		if (!strcasecmp(ui.m_slaveNames[s], c.slaves->utilInstance(n).cname())) {
+		  d.m_slaves[n] = ui.m_slaveInstances[s];
+		  break;
+		}
+	      }
+	    else if (s < d.m_slaves.size())
+	      d.m_slaves[s] = ui.m_slaveInstances[s]; // implicit slave ordinal
+	  }
+	  for (unsigned n = 0; n < c.slaves->instances().size(); ++n)
+	    if (d.m_slaves[n] == SIZE_MAX) {
+	      ocpiInfo("%s due to missing explicit slave: %s", reject.c_str(),
+		       c.slaves->utilInstance(n).cname());
+	      return false;
+	    }
+	}
+	// process the slave assembly's connections (there will be none with explicit slaves)
+	for (auto it = c.slaves->m_connections.begin(); it != c.slaves->m_connections.end(); ++it) {
+	  OU::Assembly::Connection &slaveConn = **it;
+	  if (slaveConn.m_externals.empty())
+	    m_assembly.m_connections.push_back(&slaveConn);
+	  else {
+	    // An external connection in slave assy means a delegated port.
+	    // Find any app connection to that proxy port.
+	    assert(slaveConn.m_ports.size() == 1 && slaveConn.m_externals.size() == 1);
+	    const OU::Port &masterPort =
+	      *c.impl->m_metadataImpl.findMetaPort(slaveConn.m_externals.front().m_name);
+	    // Find the app connection port for the master's delegated port
+	    OU::Assembly::Port *assyPort = m_assembly.assyPort(instNum, masterPort.m_ordinal);
+	    if (assyPort) { // proxy port is connected to something, delegate it
+	      // first save the old port to restore after this instance is deployed
+	      c.m_portFixups.emplace_front(assyPort, *assyPort, masterPort.m_ordinal);
+	      m_assembly.instances()[instNum]->m_assyPorts[masterPort.m_ordinal] = NULL;
+	      auto &slavePort = slaveConn.m_ports.front();
+	      assyPort->m_name = slavePort.m_name; // name is slave's name now
+	      assyPort->m_instance = slavePort.m_instance;
+	      assyPort->m_index = 0; // we assume slave ports are not array ports
+	    }
+	  }
+	}
+	ocpiInfo("++++++++++++ Ending insertion of slave instances for instance %u candidate %p",
+		 instNum, &c);
+      }
+#if 0
+      // Some of this should be cached in the candidate rather than the deployment....
+      // Since we are adding the slaves at the end of the existing instances...
+      // So perhaps we have the added stuff ready to copy/add.
+      // util instances: vector of pointers, addInstance does new and pushback, has impl *names*
+      // util connections list of objects with util ports and externals
+      // lib instances: vector of pointers to objects that contain ref to util instance, has candidates
+      /*
+	algorithm:
+	if I choose this candidate I need to add stuff and deal with delegation, which
+        sets the slave instance map into those (new) instances.
+	this map could be cached for the candidate too.
+	slaveInstances[slaveN] = ui.slaveInstances()[n]; // remember which instance
+	so we actually know the implementations of the slaves so we could do the delegation
+        in one shot.
+	so all the connection patching is done here at once since all the slaves
+	so I am preparing three lists to do, and then undo, so cache them in the candidate
+        -- more instances (with runtime props), with qualified names
+        -- more connections (just 
+        -- patched connections
+	BUTBUTBUT:  it is still the case that delegated connections could be to instances that are
+        later than this proxy
+       */
+      // We connect/check the slaves for this candidate before checking connectivity
+      // since delegated connections need to know this.
+      // This vector maps the slave index among the worker's slaves to the app instance.
+      std::vector<unsigned> &slaveInstances = m_instances[instNum].m_deployment.m_slaves;
+      slaveInstances.clear();
+      slaveInstances.resize(c.impl->m_metadataImpl.slaves().size(), UINT_MAX);
+      unsigned slaveN;
+      if (ui.slaveInstances().size()) { // if there are explicitly identified slave instances...
+	const OU::Worker &mImpl = c.impl->m_metadataImpl;
+        for (unsigned n = 0; n < ui.m_slaveInstances.size(); ++n)
+          if (ui.slaveInstances()[n] < instNum) {
+	    if ((slaveN =
+		 checkSlave(m_instances[ui.m_slaveInstances[n]].m_deployment.m_impls[0]->m_metadataImpl,
+			    mImpl, ui.m_slaveNames[n], true, reject)) == UINT_MAX)
+              return false;
+	    slaveInstances[slaveN] = ui.slaveInstances()[n]; // remember which instance
+	  } else {
+	    // We don't have the slave impl yet, but we can map it anyway for slave resolution later
+	    const OU::Slave *slave = &mImpl.slaves()[0];
+	    size_t nSlaves = mImpl.slaves().size();
+	    if (nSlaves == 1 && ui.slaveNames()[0] == NULL)
+	      slaveInstances[0] = ui.slaveInstances()[0];
+	    else
+	      for (unsigned s = 0; s < nSlaves; ++s, ++slave)
+		if (!strcasecmp(ui.slaveNames()[n], slave->m_name)) {
+		  slaveInstances[s] = ui.slaveInstances()[n];
+		  break;
+		}
+	  }
+	ocpiDebug("Resolved explicit slaves for %s", c.impl->m_metadataImpl.cname());
+      }
+#endif
+      return true;
+    }
+    void ApplicationI::
+    restoreSlaves(OL::Candidate &c) {
+      if (!c.slaves)
+	return;
+      // patch up and restore the connections that were delegated
+      for (; !c.m_portFixups.empty(); c.m_portFixups.pop_front()) {
+	auto &fixup = c.m_portFixups.front();
+	// restore the proxy's OU::Assembly::Port to its pre-delegation state
+	*fixup.portPtr = fixup.port;
+	// restore the proxy's map from worker port ordinal to OU::Assembly::Port
+	m_assembly.assyPorts(fixup.port.m_instance)[fixup.ordinal] = fixup.portPtr;
+      }
+      m_nInstances = c.nInstances;
+      m_instances.resize(m_nInstances);                // toss slaves from app assembly
+      m_assembly.instances().resize(c.nInstances);     // toss slaves from lib assembly
+      m_assembly.m_connections.resize(c.nConnections); // toss intraslave connections
+    }
+
     // Check whether this candidate can be used relative to previous
-    // choices for instances it is connected to
+    // choices for instances it is connected to or has a proxy/slave relationship with
+    // It has the side effect of initializing the m_deployment.m_slaves array for the instance
     bool ApplicationI::
     connectionsOk(OL::Candidate &c, unsigned instNum) {
-      unsigned nPorts = c.impl->m_metadataImpl.nPorts();
-      const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
+      //      const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       std::string reject;
       OU::format(reject,
-                 "For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
+                 "    Rejecting implementation \"%s%s%s\" with score %u "
                  "from artifact \"%s\"",
-                 ui.m_name.c_str(),
-                 ui.m_specName.c_str(),
                  c.impl->m_metadataImpl.cname(),
                  c.impl->m_staticInstance ? "/" : "",
                  c.impl->m_staticInstance ? ezxml_cattr(c.impl->m_staticInstance, "name") : "",
                  c.score, c.impl->m_artifact.name().c_str());
-      for (unsigned nn = 0; nn < nPorts; nn++) {
+      if (!resolveInstanceSlaves(instNum, c, reject))
+	return false;
+      // Now check all connected ports, including when they are aliased to slave ports.
+      unsigned nPorts;
+      const OU::Port *port = c.impl->m_metadataImpl.ports(nPorts);
+      for (unsigned nn = 0; nn < nPorts; ++port, ++nn) { // for each candidate port
         OU::Assembly::Port
           *ap = m_assembly.assyPort(instNum, nn),
           *other = ap ? ap->m_connectedPort : NULL;
+	const OL::Implementation *thisImpl = c.impl, *otherImpl = NULL;
+	const OU::Port *thisPort = port, *otherPort = NULL;
         if (ap &&                          // if the port is even mentioned in the assembly?
             other &&                       // if the port is connected in the assembly
             other->m_instance < instNum) { // if the other instance has been processed
-          const OL::Implementation &otherImpl =
-            *m_instances[other->m_instance].m_deployment.m_impls[0];
-          // then check for prewired compatibility
-          if (m_assembly.badConnection(*c.impl, otherImpl, *ap, nn)) {
-            ocpiInfo("%s due to connectivity conflict", reject.c_str());
-            ocpiInfo("  Other is instance \"%s\" for spec \"%s\" implementation \"%s%s%s\" "
-                     "from artifact \"%s\".",
-                     m_assembly.instance(other->m_instance).name().c_str(),
-                     m_assembly.instance(other->m_instance).specName().c_str(),
-                     otherImpl.m_metadataImpl.cname(),
-                     otherImpl.m_staticInstance ? "/" : "",
-                     otherImpl.m_staticInstance ?
-                     ezxml_cattr(otherImpl.m_staticInstance, "name") : "",
-                     otherImpl.m_artifact.name().c_str());
-            return false;
-          }
-        }
+          otherImpl = m_instances[other->m_instance].m_deployment.m_impls[0];
+	  otherPort = otherImpl->m_metadataImpl.findMetaPort(other->cname());
+	  //	  if (maybeDelegate(instNum, *ap, thisPort, thisImpl) ||
+	  //	      maybeDelegate(instNum, *other, otherPort, otherImpl))
+	  //	    continue;
+#if 0
+	} else if (ap == NULL && ui.m_hasMaster && ui.m_master < instNum) {
+	  //	  if (maybeDelegateToSlavePort(instNum, *c.impl, *port, other))
+	  //	    continue;
+	  otherImpl = m_instances[other->m_instance].m_deployment.m_impls[0];
+	  otherPort = otherImpl->m_metadataImpl.findMetaPort(other->cname());
+#endif
+	} else if (!ap || !other || other->m_instance > instNum)
+	  continue;
+	// check for prewired compatibility, post-delegation
+	if (m_assembly.badConnection(*thisImpl, *thisPort, *otherImpl, *otherPort)) {
+	  ocpiInfo("%s due to connectivity conflict", reject.c_str());
+	  ocpiInfo("      Other is instance \"%s\" for spec \"%s\" implementation \"%s%s%s\" "
+		   "from artifact \"%s\".",
+		   m_assembly.instance(other->m_instance).name().c_str(),
+		   m_assembly.instance(other->m_instance).specName().c_str(),
+		   otherImpl->m_metadataImpl.cname(),
+		   otherImpl->m_staticInstance ? "/" : "",
+		   otherImpl->m_staticInstance ?
+		   ezxml_cattr(otherImpl->m_staticInstance, "name") : "",
+		   otherImpl->m_artifact.name().c_str());
+	  return false;
+	}
       }
-      if (ui.slaveInstances().size()) {
-        for (unsigned n = 0; n < ui.m_slaveInstances.size(); ++n)
-          if (ui.slaveInstances()[n] < instNum &&
-              !checkSlave(m_instances[ui.m_slaveInstances[n]].m_deployment.m_impl->m_metadataImpl,
-                          c.impl->m_metadataImpl, ui.m_slaveNames[n], true, reject))
-              return false;
-      } else if (ui.m_hasMaster && ui.m_master < instNum &&
-                 !checkSlave(c.impl->m_metadataImpl,
-                             m_instances[ui.m_master].m_deployment.m_impl->m_metadataImpl, NULL,
-			     false, reject))
-        return false;
       return true;
     }
 
@@ -481,7 +710,7 @@ namespace OCPI {
       if (c.impl->m_staticInstance && b.m_artifact &&
           (b.m_artifact != &c.impl->m_artifact ||
            b.m_usedImpls & (1u << c.impl->m_ordinal))) {
-        ocpiInfo("For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
+        ocpiInfo("    For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
                   "from artifact \"%s\" due to insufficient available containers",
                   m_assembly.instance(n).name().c_str(),
                   m_assembly.instance(n).specName().c_str(),
@@ -508,7 +737,6 @@ namespace OCPI {
                         pName, iName);
       OU::Value *v;
       if (aProp.m_hasDelay) {
-
         const auto dpv =
           m_delayedPropertyValues.insert(std::make_pair(aProp.m_delay, DelayedPropertyValue()));
         dpv->second.m_instance = nInstance;
@@ -535,9 +763,8 @@ namespace OCPI {
           throw OU::Error("Parameter assignment '%s' is invalid. "
                           "Format is: <external>=<parameter-value>", assign);
         size_t len = (size_t)(eq - assign);
-        for (OU::Assembly::ConnectionsIter ci = m_assembly.m_connections.begin();
-             ci != m_assembly.m_connections.end(); ci++) {
-          const OU::Assembly::Connection &c = *ci;
+        for (auto ci = m_assembly.m_connections.begin(); ci != m_assembly.m_connections.end(); ++ci) {
+          const OU::Assembly::Connection &c = **ci;
           if (c.m_externals.size()) {
             const OU::Assembly::External &e = c.m_externals.front();
             if (e.m_name.length() == len && !strncasecmp(assign, e.m_name.c_str(), len)) {
@@ -575,26 +802,28 @@ namespace OCPI {
 
     void ApplicationI::
     finalizeProperties(const OU::PValue *params) {
-      Instance *i = m_instances;
-      // Collect and check the property values for each instance.
-      for (unsigned n = 0; n < m_nInstances; n++, i++) {
+      auto *d = &m_bestDeployments[0];
+      // Collect and check the property values for each instance (not inferred slaves)
+      assert(m_nInstances <= m_bestDeployments.size());
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
         // The chosen, best, feasible implementation for the instance
-        const char *iName = m_assembly.instance(n).name().c_str();
-        const OU::Assembly::Properties &aProps = m_assembly.instance(n).properties();
+        const char *iName = d->m_name.c_str();
+        const OU::Assembly::Properties &aProps = *d->m_properties;
         size_t nPropValues = aProps.size();
         const char *sDummy;
         // Count any properties that were provided in parameters specific to instance
         for (unsigned nn = 0; OU::findAssignNext(params, "property", iName, sDummy, nn); )
           nPropValues++;
         // Count any parameter properties that were mapped to this instance
-        OU::Assembly::MappedProperty *mp = &m_assembly.m_mappedProperties[0];
+	// Note these cannot apply to inferred slaves so the ordinals should be ok
+	OU::Assembly::MappedProperty *mp = &m_assembly.m_mappedProperties[0];
         unsigned nDummy = 0;
         for (size_t nn = m_assembly.m_mappedProperties.size(); nn; nn--, mp++)
           if (mp->m_instance == n &&
               OU::findAssignNext(params, "property", mp->m_name.c_str(), sDummy, nDummy))
             nPropValues++;
         // Account for the runtime properties set here, e.g. output port buffer size
-        const OL::Implementation &impl = *i->m_bestDeployment.m_impls[0];
+        const OL::Implementation &impl = *d->m_impls[0];
         unsigned nPorts;
         for (OU::Port *p = impl.m_metadataImpl.ports(nPorts); nPorts; --nPorts, p++)
           if (p->m_isProducer)
@@ -602,17 +831,18 @@ namespace OCPI {
         if (nPropValues) {
           // This allocation will include dump-only properties, which won't be put into the
           // array by prepareInstanceProperties
-          i->m_crew.m_propValues.resize(nPropValues);
-          i->m_crew.m_propOrdinals.resize(nPropValues);
-          OU::Value *pv = &i->m_crew.m_propValues[0];
-          unsigned *pn = &i->m_crew.m_propOrdinals[0];
+          d->m_crew.m_propValues.resize(nPropValues);
+          d->m_crew.m_propOrdinals.resize(nPropValues);
+          OU::Value *pv = &d->m_crew.m_propValues[0];
+          unsigned *pn = &d->m_crew.m_propOrdinals[0];
           // Note that for scaled instances we assume the impls are compatible as far as
-          // properties go.  FIXME:  WE MUST CHECK COMPILED VALUES WHEN COMPARING IMPLES
+          // properties go.  FIXME:  WE MUST CHECK COMPILED VALUES WHEN COMPARING IMPLS
           prepareInstanceProperties(n, impl, pn, pv);
           // Add buffer size property value to each output
           for (auto it = m_launchConnections.begin(); it != m_launchConnections.end(); ++it) {
             OC::Launcher::Connection &c = *it;
-            if (c.m_out.m_member && c.m_out.m_member->m_crew == m_launchMembers[i->m_firstMember].m_crew) {
+            if (c.m_out.m_member &&
+		c.m_out.m_member->m_crew == m_launchMembers[d->m_firstMember].m_crew) {
               OU::Assembly::Property aProp;
               aProp.m_name = "ocpi_buffer_size_" + c.m_out.m_metaPort->m_name;
               if (!impl.m_metadataImpl.getProperty(aProp.m_name.c_str())) {
@@ -624,43 +854,42 @@ namespace OCPI {
               checkPropertyValue(n, impl.m_metadataImpl, aProp, pn, pv);
             }
           }
-          nPropValues = (size_t)(pn - &i->m_crew.m_propOrdinals[0]);
-          i->m_crew.m_propValues.resize(nPropValues);
-          i->m_crew.m_propOrdinals.resize(nPropValues);
+          nPropValues = (size_t)(pn - &d->m_crew.m_propOrdinals[0]);
+          d->m_crew.m_propValues.resize(nPropValues);
+          d->m_crew.m_propOrdinals.resize(nPropValues);
         }
       }
       // For all instances in the assembly, create the app-level property array
       m_nProperties = m_assembly.m_mappedProperties.size();
-      i = m_instances;
-      for (unsigned n = 0; n < m_nInstances; n++, i++)
-        m_nProperties += i->m_bestDeployment.m_impls[0]->m_metadataImpl.nProperties();
+      d = &m_bestDeployments[0];
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++)
+        m_nProperties += d->m_impls[0]->m_metadataImpl.nProperties();
       // Over allocate: mapped ones plus all the instances' ones
       Property *p = m_properties = new Property[m_nProperties];
       OU::Assembly::MappedProperty *mp = &m_assembly.m_mappedProperties[0];
       for (size_t n = m_assembly.m_mappedProperties.size(); n; n--, mp++, p++) {
         p->m_property =
-          m_instances[mp->m_instance].m_bestDeployment.m_impls[0]->m_metadataImpl.
-          whichProperty(mp->m_instPropName.c_str());
+          m_bestDeployments[mp->m_instance].m_impls[0]->m_metadataImpl.
+	  whichProperty(mp->m_instPropName.c_str());
         p->m_name = mp->m_name;
         p->m_instance = mp->m_instance;
         p->m_dumpFile = NULL;
         ocpiDebug("Instance %s (%u) property %s (%u) named %s in assembly",
-                  m_assembly.instance(p->m_instance).name().c_str(), p->m_instance,
+		  m_bestDeployments[p->m_instance].m_name.c_str(), p->m_instance,
                   mp->m_instPropName.c_str(), p->m_property, p->m_name.c_str());
       }
-      i = m_instances;
-      for (unsigned n = 0; n < m_nInstances; n++, i++) {
+      d = &m_bestDeployments[0];
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
         unsigned nProps;
-        OU::Property *meta = i->m_bestDeployment.m_impls[0]->m_metadataImpl.properties(nProps);
+        OU::Property *meta = d->m_impls[0]->m_metadataImpl.properties(nProps);
         for (unsigned nn = 0; nn < nProps; nn++, meta++, p++) {
-          p->m_name = m_assembly.instance(n).name() + "." + meta->m_name;
+          p->m_name = d->m_name + "." + meta->m_name;
           p->m_instance = n;
           p->m_property = nn;
-          ocpiDebug("Instance %s (%u) property %s (%u) named %s",
-                    m_assembly.instance(n).name().c_str(), n,
+          ocpiDebug("Instance %s (%u) property %s (%u) named %s", d->m_name.c_str(), n,
                     meta->m_name.c_str(), nn, p->m_name.c_str());
           // Record dump file for this property if there is one.
-          const OU::Assembly::Properties &aProps = m_assembly.instance(n).properties();
+          const OU::Assembly::Properties &aProps = *d->m_properties;
           p->m_dumpFile = NULL;
           for (unsigned nnn = 0; nnn < aProps.size(); nnn++)
             if (aProps[nnn].m_dumpFile.size() &&
@@ -677,9 +906,8 @@ namespace OCPI {
     finalizeExternals() {
       // External ports that are not connected explicitly to anything need to be associated
       // with the base container in this process, so we make sure we are using it.
-      for (OU::Assembly::ConnectionsIter ci = m_assembly.m_connections.begin();
-           ci != m_assembly.m_connections.end(); ci++)
-        if (ci->m_externals.size() && ci->m_externals.front().m_url.empty())
+      for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
+        if ((*ci).m_externals.size() && (*ci).m_externals.front().m_url.empty())
           getUsedContainer(OC::Container::baseContainer().ordinal());
     }
 
@@ -688,9 +916,8 @@ namespace OCPI {
     finalizePortParam(const OU::PValue *params, const char *pName) {
       const char *assign;
       for (unsigned n = 0; OU::findAssignNext(params, pName, NULL, assign, n); ) {
-#if 1
         const char *value, *err;
-        unsigned instn, portn;
+        size_t instn, portn;
         const OU::Port *p;
         if ((err = m_assembly.getPortAssignment(pName, assign, instn, portn, p, value)))
           return err;
@@ -702,39 +929,13 @@ namespace OCPI {
         // Override any port parameters that might have been set in XML
         // Override any same-named connection params
         m_assembly.assyPort(instn, portn)->setParam(newName, value);
-#else
-        unsigned instn;
-        // assign now points to:  <instance>=<port>=<value>
-        const char *err, *iassign = assign;
-        if ((err = m_assembly.findInstanceForParam(pName, iassign, instn)))
-          return err;
-        // iassign now points to:  <port>=<value>
-        const char *eq = strchr(iassign, '=');
-        if (!eq)
-          return OU::esprintf("Parameter assignment for \"%s\", \"%s\" is invalid. "
-                              "Format is: <instance>=<parameter-value>", pName, assign);
-
-        size_t len = eq - iassign;
-        unsigned nPorts;
-        OU::Port *p = m_instances[instn].m_bestDeployment.m_impl->m_metadataImpl.ports(nPorts);
-        for (unsigned nn = 0; eq && nn < nPorts; nn++, p++)
-          if (!strncasecmp(iassign, p->m_name.c_str(), len) && p->m_name.length() == len) {
-            OU::Assembly::Port *assyPort = m_assembly.assyPort(instn, nn);
-            assert(assyPort);
-            assyPort->m_parameters.add(pName, eq + 1);
-            eq = NULL;
-          }
-        if (eq)
-          return OU::esprintf("Port \"%.*s\" not found for instance in \"%s\" parameter assignment: %s",
-                              (int)len, iassign, pName, assign);
-#endif
       }
       return NULL;
     }
     void ApplicationI::
     dumpDeployment(unsigned score) {
       ocpiDebug("Deployment with score %u is:", score);
-      Instance *i = m_instances;
+      Instance *i = &m_instances[0];
       for (unsigned n = 0; n < m_nInstances; n++, i++) {
         if (i->m_deployment.m_scale == 1) {
           const OL::Implementation &li = *i->m_deployment.m_impls[0];
@@ -764,7 +965,9 @@ namespace OCPI {
     void ApplicationI::
     deployInstance(unsigned instNum, unsigned score, size_t scale,
                    unsigned *containers, const OL::Implementation **impls, CMap feasible) {
-      m_instances[instNum].m_deployment.set(scale, containers, impls, feasible);
+      auto const &ui = m_assembly.utilInstance(instNum);
+      m_instances[instNum].m_deployment.
+	set(ui.m_name, scale, containers, impls, feasible, ui.m_hasMaster, &ui.m_properties);
       ocpiDebug("doInstance ok");
       if (instNum < m_nInstances-1) {
         instNum++;
@@ -779,13 +982,20 @@ namespace OCPI {
           b = save;
         } else
           doInstance(instNum, score);
-      } else if (resolveSlaves()) {
+      } else if (resolveExplicitSlaves()) {
         dumpDeployment(score);
         if (score > m_bestScore) {
-          Instance *i = m_instances;
+	  // Capture the deployment, which might have a variable number of instances
+	  // based on the inclusion of slaves when instance candidates are proxies
+	  m_bestDeployments.resize(m_nInstances);
+          Instance *i = &m_instances[0];
           for (unsigned n = 0; n < m_nInstances; n++, i++)
-            i->m_bestDeployment = i->m_deployment;
+            m_bestDeployments[n] = i->m_deployment;
           m_bestScore = score;
+	  m_bestConnections.clear();
+	  for (auto ci = m_assembly.m_connections.begin();
+	       ci != m_assembly.m_connections.end(); ++ci)
+	    m_bestConnections.push_back(**ci);
           ocpiDebug("Setting BEST");
         }
       }
@@ -793,7 +1003,7 @@ namespace OCPI {
 
     void ApplicationI::
     doScaledInstance(unsigned instNum, unsigned score) {
-      Instance *i = m_instances + instNum;
+      Instance *i = &m_instances[instNum];
       OL::Assembly::Instance &li = m_assembly.instance(instNum);
       const OU::Assembly::Instance &ui = li.m_utilInstance;
       for (Instance::ScalableCandidatesIter sci = i->m_scalableCandidates.begin();
@@ -841,21 +1051,26 @@ namespace OCPI {
     void ApplicationI::
     doInstance(unsigned instNum, unsigned score) {
       OL::Assembly::Instance &li = m_assembly.instance(instNum);
+      ocpiInfo("================================================================================");
+      ocpiInfo("Trying to deploy candidates for instance %2d:  %s", instNum, li.name().c_str());
       if (li.m_scale > 1)
         doScaledInstance(instNum, score);
       else {
-        Instance &i = m_instances[instNum];
-        for (unsigned m = 0; m < i.m_nCandidates; m++) {
+        for (unsigned m = 0; m < li.m_candidates.size(); m++) {
           OL::Candidate &c = li.m_candidates[m];
+	  ocpiInfo("  --------------------------------------------------------------------------------");
+	  ocpiInfo("  Trying candidate %u for instance %u: %s (artifact %s, implementation %s%s%s)",
+		   m, instNum, li.name().c_str(), c.impl->m_artifact.name().c_str(),
+		   c.impl->m_metadataImpl.cname(),
+		   c.impl->m_staticInstance ? "/" : "",
+		   c.impl->m_staticInstance ? ezxml_cattr(c.impl->m_staticInstance, "name") : "");
           ocpiDebug("doInstance %u %u %u", instNum, score, m);
-          if (connectionsOk(c, instNum)) {
-            unsigned base = OC::Container::baseContainer().ordinal();
-            ocpiDebug("doInstance connections ok: %u", base);
+          if (connectionsOk(c, instNum))
             for (unsigned cont = 0; cont < OC::Manager::s_nContainers; cont++) {
+	      Instance &i = m_instances[instNum];
               ocpiDebug("doInstance container: cont %u feasible 0x%x", cont,
                         i.m_feasibleContainers[m]);
-              if ((c.impl->m_metadataImpl.slaves().empty() || cont == base) &&
-                  i.m_feasibleContainers[m] & (1u << cont) &&
+              if (i.m_feasibleContainers[m] & (1u << cont) &&
                   bookingOk(m_bookings[cont], c, instNum)) {
                 deployInstance(instNum, score + c.score, 1, &cont, &c.impl,
                                i.m_feasibleContainers[m]);
@@ -863,13 +1078,12 @@ namespace OCPI {
                   break;
               }
             }
-          }
+	  restoreSlaves(c);
         }
       }
     }
-
     void ApplicationI::Instance::
-    collectCandidate(OL::Candidate &c, unsigned n) {
+    collectCandidate(const OL::Candidate &c, unsigned n) {
       OU::Worker &w = c.impl->m_metadataImpl;
       std::string qname(w.package());
       qname += ".";
@@ -880,6 +1094,80 @@ namespace OCPI {
       sci->second.push_back(n);
     }
 
+    // Prepare an instance for deployment
+    // Called initially on all application instances, and then
+    // also on any slave instances added dynamically
+    const char *ApplicationI::Instance::
+    init(const OL::Assembly &assy, size_t n, bool verbose, const PValue *params) {
+      const OL::Candidates &cs = assy.instance(n).m_candidates;
+      const OU::Assembly::Instance &ai = assy.utilInstance(n);
+      size_t nCandidates = cs.size();
+      m_feasibleContainers.resize(nCandidates);
+      std::string container;
+      if (!OU::findAssign(params, "container", ai.m_name.c_str(), container) &&
+	  !OU::findAssign(params, "container", ai.m_specName.c_str(), container))
+	OE::getOptionalString(ai.xml(), container, "container");
+      CMap sum = 0;
+      ocpiInfo("================================================================================");
+      ocpiInfo("For instance %2zu: \"%s\" there were %zu candidates.  These had potential containers:",
+	       n, ai.m_name.c_str(), nCandidates);
+      for (unsigned m = 0; m < nCandidates; m++) {
+	m_curMap = 0;        // to accumulate containers suitable for this candidate
+	OU::Worker &w = cs[m].impl->m_metadataImpl;
+	ocpiInfo("  --------------------------------------------------------------------------------");
+	ocpiInfo("  Candidate %2u: checking implementation %s model %s os %s version %s arch %s "
+		 "platform %s dynamic %u opencpi version %s",
+		 m, w.cname(), w.model().c_str(), w.attributes().os().c_str(),
+		 w.attributes().osVersion().c_str(), w.attributes().arch().c_str(),
+		 w.attributes().platform().c_str(), w.attributes().dynamic(),
+		 w.attributes().opencpiVersion().c_str());
+	(void)OC::Manager::findContainers(*this, w, container.empty() ? NULL : container.c_str());
+	m_feasibleContainers[m] = m_curMap;
+	sum |= m_curMap;
+	// if log level is >= info
+	Container *c;
+	if (m_curMap) {
+	  std::string s;
+	  for (unsigned nn = 0; (c = OC::Manager::get(nn)); nn++)
+	    if (m_curMap & (1u << nn))
+	      OU::formatAdd(s, "%s%u: %s", s.empty() ? "" : ", ", nn, c->name().c_str());
+	  ocpiInfo("  Candidate %u %s is ok for containers: %s", m,
+		   cs[m].impl->m_artifact.name().c_str(), s.c_str());
+	} else
+	  ocpiInfo("  Candidate %u %s is ok for no containers", m,
+		   cs[m].impl->m_artifact.name().c_str());
+	if (m_curMap && assy.instance(n).m_scale > 1)
+	  collectCandidate(cs[m], m);
+      }
+      if (!sum) {
+	if (verbose) {
+	  fprintf(stderr, "  No containers were found for deploying instance '%s' (spec '%s').\n"
+		  "The implementations found were:\n",
+		  ai.m_name.c_str(), ai.m_specName.c_str());
+	  for (unsigned m = 0; m < nCandidates; m++) {
+	    const OL::Implementation &lImpl = *cs[m].impl;
+	    OU::Worker &mImpl = lImpl.m_metadataImpl;
+	    fprintf(stderr, "  Name: %s, Model: %s, Arch: %s, Platform: %s%s%s, OpenCPI Version: %s, File: %s\n",
+		    mImpl.cname(),
+		    mImpl.model().c_str(),
+		    lImpl.m_artifact.arch().c_str(),
+		    lImpl.m_artifact.platform().c_str(),
+		    lImpl.m_staticInstance ? ", Artifact instance: " : "",
+		    lImpl.m_staticInstance ? ezxml_cattr(lImpl.m_staticInstance, "name") : "",
+		    mImpl.attributes().opencpiVersion().c_str(),
+		    lImpl.m_artifact.name().c_str());
+	  }
+	}
+	return OU::esprintf("For instance \"%s\" for spec \"%s\": "
+			    "no feasible containers found for %sthe %zu implementation%s found.",
+			    ai.m_name.c_str(), ai.m_specName.c_str(),
+			    nCandidates == 1 ? "" : "any of ",
+			    nCandidates,
+			    nCandidates == 1 ? "" : "s");
+      }
+      return NULL;
+    }
+
      // The algorithmic way to figure out a deployment.
     void ApplicationI::
     planDeployment(const PValue *params) {
@@ -888,8 +1176,15 @@ namespace OCPI {
       setPolicy(params);
       // First pass - make sure there are some containers to support some candidate
       // and remember which containers can support which candidates
-      Instance *i = m_instances;
+      Instance *i = &m_instances[0];
+        ocpiInfo("================================================================================");
+	ocpiInfo("Determining which candidates can run on which containers");
       for (size_t n = 0; n < m_nInstances; n++, i++) {
+#if 1
+	const char *err = i->init(m_assembly, n, m_verbose, params);
+	if (err)
+	  throw OU::Error("%s", err);
+#else
         OL::Candidates &cs = m_assembly.instance(n).m_candidates;
         const OU::Assembly::Instance &ai = m_assembly.utilInstance(n);
         i->m_nCandidates = cs.size();
@@ -899,14 +1194,16 @@ namespace OCPI {
             !OU::findAssign(params, "container", ai.m_specName.c_str(), container))
           OE::getOptionalString(ai.xml(), container, "container");
         CMap sum = 0;
-        ocpiInfo("For instance %s there were %zu candidates.  These had potential containers:",
-                 ai.m_name.c_str(), i->m_nCandidates);
+        ocpiInfo("================================================================================");
+        ocpiInfo("For instance %2zu: \"%s\" there were %zu candidates.  These had potential containers:",
+                 n, ai.m_name.c_str(), i->m_nCandidates);
         for (unsigned m = 0; m < i->m_nCandidates; m++) {
           m_curMap = 0;        // to accumulate containers suitable for this candidate
           m_curContainers = 0; // to count suitable containers for this candidate
           OU::Worker &w = cs[m].impl->m_metadataImpl;
-          ocpiInfo("Checking implementation %s model %s os %s version %s arch %s platform %s dynamic %u opencpi version %s",
-                   w.cname(), w.model().c_str(), w.attributes().os().c_str(),
+          ocpiInfo("  --------------------------------------------------------------------------------");
+          ocpiInfo("  Candidate %2u: checking implementation %s model %s os %s version %s arch %s platform %s dynamic %u opencpi version %s",
+                   m, w.cname(), w.model().c_str(), w.attributes().os().c_str(),
                    w.attributes().osVersion().c_str(), w.attributes().arch().c_str(),
                    w.attributes().platform().c_str(), w.attributes().dynamic(),
                    w.attributes().opencpiVersion().c_str());
@@ -921,17 +1218,17 @@ namespace OCPI {
             for (unsigned nn = 0; (c = OC::Manager::get(nn)); nn++)
               if (m_curMap & (1u << nn))
                 OU::formatAdd(s, "%s%u: %s", s.empty() ? "" : ", ", nn, c->name().c_str());
-            ocpiInfo("Candidate %u %s is ok for containers: %s", m,
+            ocpiInfo("  Candidate %u %s is ok for containers: %s", m,
                      cs[m].impl->m_artifact.name().c_str(), s.c_str());
           } else
-            ocpiInfo("Candidate %u %s is ok for no containers", m,
+            ocpiInfo("  Candidate %u %s is ok for no containers", m,
                      cs[m].impl->m_artifact.name().c_str());
           if (m_curMap && m_assembly.instance(n).m_scale > 1)
             i->collectCandidate(cs[m], m);
         }
         if (!sum) {
           if (m_verbose) {
-            fprintf(stderr, "No containers were found for deploying instance '%s' (spec '%s').\n"
+            fprintf(stderr, "  No containers were found for deploying instance '%s' (spec '%s').\n"
                     "The implementations found were:\n",
                     ai.m_name.c_str(), ai.m_specName.c_str());
             for (unsigned m = 0; m < i->m_nCandidates; m++) {
@@ -955,6 +1252,7 @@ namespace OCPI {
                           i->m_nCandidates,
                           i->m_nCandidates == 1 ? "" : "s");
         }
+#endif
       }
 
       // Second pass - search for best feasible choice
@@ -965,29 +1263,31 @@ namespace OCPI {
       m_bestScore = 0;
       doInstance(0, 0);
       if (m_bestScore == 0)
-        throw OU::Error("There are no feasible deployments for the application given the constraints.  Try running with log level 8 to see why.");
+        throw OU::Error("There are no feasible deployments for the application given the constraints. "
+			" Try running with log level 8 to see why.");
       // Up to now we have just been "planning" and not doing things.
-      // Now invoke the policy method to map the dynamic instances to containers
-      // First we do a pass that will only map the dynamic unscaled implementations
-      i = m_instances;
-      for (unsigned n = 0; n < m_nInstances; n++, i++)
-        if (i->m_bestDeployment.m_scale <= 1 && !i->m_bestDeployment.m_impl->m_staticInstance)
-          policyMap(i, i->m_bestDeployment.m_feasible);
-      // Now add the containers for the static instances and the scaled instances
-      i = m_instances;
-      for (unsigned n = 0; n < m_nInstances; n++, i++)
-        if (i->m_bestDeployment.m_scale > 1) {
-          i->m_usedContainers = new unsigned[i->m_bestDeployment.m_scale];
-          for (unsigned s = 0; s < i->m_bestDeployment.m_scale; s++)
-            i->m_usedContainers[s] = getUsedContainer(i->m_bestDeployment.m_containers[s]);
-        } else {
-          i->m_usedContainers = &i->m_usedContainer;
-          const OL::Implementation &impl = *i->m_bestDeployment.m_impls[0];
-          if (impl.m_staticInstance)
-            i->m_usedContainer = getUsedContainer(i->m_bestDeployment.m_container);
-        }
+      // First deal with non-scaled, non-static instances
+      auto *d = &m_bestDeployments[0];
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++)
+        if (d->m_scale <= 1 &&
+	    !d->m_impls[0]->m_staticInstance &&
+	    d->m_slaves.empty() &&
+	    !d->m_hasMaster)
+	  policyMap(*d, n);
+      // IN a second pass, deal with scaled or static or slaves
+      d = &m_bestDeployments[0];
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
+	d->m_usedContainers.resize(d->m_scale, UINT_MAX);
+        if (d->m_scale > 1) {
+          for (unsigned s = 0; s < d->m_scale; s++)
+            d->m_usedContainers[s] = getUsedContainer(d->m_containers[s]);
+        } else if (d->m_usedContainers[0] == UINT_MAX)
+	  d->m_usedContainers[0] = getUsedContainer(d->m_containers[0]);
+      }
     }
+
     // The explicit way to figure out a deployment from a file
+    // FIXME BROKEN FOR INFERRED SLAVES
     void ApplicationI::
     importDeployment(const char *file, ezxml_t &xml, const PValue *params) {
       if (!xml) {
@@ -998,7 +1298,8 @@ namespace OCPI {
       if (!ezxml_name(xml) || strcasecmp(ezxml_name(xml), "deployment"))
         throw OU::Error("Invalid top level element \"%s\" in deployment file \"%s\"",
                         ezxml_name(xml) ? ezxml_name(xml) : "", file);
-      Instance *i = m_instances;
+      Instance *i = &m_instances[0];
+      m_bestDeployments.resize(m_nInstances);
       for (unsigned n = 0; n < m_nInstances; n++, i++) {
         ezxml_t xi;
         const char *iname = m_assembly.instance(n).name().c_str();
@@ -1035,7 +1336,8 @@ namespace OCPI {
           throw OU::Error("For deployment instance \"%s\", worker for spec %s/%s not found "
                           " in artifact \"%s\"", iname, spec, instance ? instance : "",
                           artifact);
-        i->m_bestDeployment.m_impl = impl;
+	m_bestDeployments[n].m_impls.resize(1);
+        m_bestDeployments[n].m_impls[0] = impl;
         if (!m_assembly.instance(n).resolveUtilPorts(*impl, m_assembly))
           throw OU::Error("Port mismatch for instance \"%s\" in artifact \"%s\"",
                           iname, artifact);
@@ -1046,7 +1348,7 @@ namespace OCPI {
         if (!c)
           throw OU::Error("For deployment instance \"%s\", container \"%s\" was not found",
                           iname, i->m_containerName);
-        i->m_bestDeployment.m_container = getUsedContainer(c->ordinal());
+        m_bestDeployments[n].m_containers[0] = getUsedContainer(c->ordinal());
       }
     }
     void ApplicationI::
@@ -1054,19 +1356,16 @@ namespace OCPI {
       try {
         // In order from class definition except for instance-related
         // We must initialize everything before anything that might cause an exception
-        m_instances = NULL;
         m_bookings = NULL;
         m_properties = NULL;
         m_nProperties = 0;
-        m_curMap = 0;
-        m_curContainers = 0;
+	//        m_curMap = 0;
+	//        m_curContainers = 0;
         m_allMap = 0;
         m_global2used = new unsigned[OC::Manager::s_nContainers];
         m_nContainers = 0;
         m_usedContainers = new unsigned[OC::Manager::s_nContainers];
-        m_containers = NULL;    // allocated when we know how many we are using
         m_containerApps = NULL; // ditto
-        m_doneInstance = NULL;
         m_cMapPolicy = RoundRobin;
         m_processors = 0;
         m_currConn = OC::Manager::s_nContainers - 1;
@@ -1092,7 +1391,7 @@ namespace OCPI {
         // Now that we have added any extra instances for external connections, do
         // instance-related initializations
         m_nInstances = m_assembly.nInstances();
-        m_instances = new Instance[m_nInstances];
+	m_instances.resize(m_nInstances);
         // Check that params that reference instances are valid, and that cannot be
         // checked in the assembly parsing in any case (i.e. do not depend on
         // any library info).
@@ -1121,24 +1420,24 @@ namespace OCPI {
         finalizeExternals();
         if (m_verbose) {
           fprintf(stderr, "Actual deployment is:\n");
-          Instance *i = m_instances;
-          for (unsigned n = 0; n < m_nInstances; n++, i++)
-            if (i->m_bestDeployment.m_scale > 1) {
+          auto *d = &m_bestDeployments[0];
+          for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++)
+            if (d->m_scale > 1) {
               fprintf(stderr,
                       "  Instance %2u %s (spec %s) on %s containers:\n",
                       n, m_assembly.instance(n).name().c_str(),
                       m_assembly.instance(n).specName().c_str(),
-                      OC::Container::nthContainer(i->m_bestDeployment.m_containers[0]).
+                      OC::Container::nthContainer(d->m_containers[0]).
                       m_model.c_str());
-              const OL::Implementation **impl = i->m_bestDeployment.m_impls;
-              for (unsigned s = 0; s < i->m_bestDeployment.m_scale; s++, impl++) {
+              const OL::Implementation **impl = &d->m_impls[0];
+              for (unsigned s = 0; s < d->m_scale; s++, impl++) {
                 OC::Container &c =
-                  OC::Container::nthContainer(i->m_bestDeployment.m_containers[s]);
+                  OC::Container::nthContainer(d->m_containers[s]);
                 std::time_t bd = OS::FileSystem::lastModified((**impl).m_artifact.name());
                 char tbuf[30];
                 ctime_r(&bd, tbuf);
                 fprintf(stderr, "    Member %3u: container %2u: %s using %s%s%s in %s dated %s",
-                        s, i->m_bestDeployment.m_containers[s], c.name().c_str(),
+                        s, d->m_containers[s], c.name().c_str(),
                         (**impl).m_metadataImpl.cname(),
                         (**impl).m_staticInstance ? "/" : "",
                         (**impl).m_staticInstance ?
@@ -1146,11 +1445,13 @@ namespace OCPI {
                         (**impl).m_artifact.name().c_str(), tbuf);
               }
             } else {
-              i->m_usedContainers = &i->m_usedContainer;
-              const OL::Implementation &impl = *i->m_bestDeployment.m_impls[0];
+              d->m_usedContainers.resize(1, UINT_MAX);
+              const OL::Implementation &impl = *d->m_impls[0];
               if (impl.m_staticInstance)
-                i->m_usedContainer = getUsedContainer(i->m_bestDeployment.m_container);
-              OC::Container &c = OC::Container::nthContainer(m_usedContainers[i->m_usedContainer]);
+                d->m_usedContainers[0] =
+		  getUsedContainer(d->m_containers[0]);
+              OC::Container &c =
+		OC::Container::nthContainer(m_usedContainers[d->m_usedContainers[0]]);
               std::time_t bd = OS::FileSystem::lastModified(impl.m_artifact.name());
               char tbuf[30];
               ctime_r(&bd, tbuf);
@@ -1258,61 +1559,57 @@ namespace OCPI {
       // to.  We'll use a map.
       // Pass 1: figure out how many member connections we will have
       size_t nMemberConnections = 0;
-      for (OU::Assembly::ConnectionsIter ci = m_assembly.m_connections.begin();
-           ci != m_assembly.m_connections.end(); ci++) {
-        Instance *iIn = NULL, *iOut = NULL;
-        for (OU::Assembly::Connection::PortsIter pi = ci->m_ports.begin();
-             pi != ci->m_ports.end(); pi++) {
+      for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci) {
+        Deployment *dIn = NULL, *dOut = NULL;
+        for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
           OU::Assembly::Role &r = pi->m_role;
           assert(r.m_knownRole && !r.m_bidirectional);
-          (r.m_provider ? iIn : iOut) = &m_instances[pi->m_instance];
+          (r.m_provider ? dIn : dOut) = &m_bestDeployments[pi->m_instance];
         }
-        nMemberConnections += (iIn ? iIn->m_crew.m_size : 1) * (iOut ? iOut->m_crew.m_size : 1);
+        nMemberConnections += (dIn ? dIn->m_crew.m_size : 1) * (dOut ? dOut->m_crew.m_size : 1);
       }
       // Pass 1a: count the connections required that are internal to an instance crew
-      Instance *i = m_instances;
-      for (unsigned n = 0; n < m_nInstances; n++, i++) {
-        const OU::Worker &firstImpl = i->m_bestDeployment.m_impls[0]->m_metadataImpl;
+      auto *d = &m_bestDeployments[0];
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
+        const OU::Worker &firstImpl = d->m_impls[0]->m_metadataImpl;
         unsigned nPorts;
         OU::Port *p = firstImpl.ports(nPorts);
         for (unsigned nn = 0; nn < nPorts; nn++, p++)
           if (p->m_isInternal) {
-            if (!p->m_isOptional || i->m_bestDeployment.m_scale > 1)
-              nMemberConnections += i->m_bestDeployment.m_scale * i->m_bestDeployment.m_scale;
+            if (!p->m_isOptional || d->m_scale > 1)
+              nMemberConnections += d->m_scale * d->m_scale;
             p++, nn++; // always skip one after an internal since that's the other half.
           }
       }
       // Pass 2: make the array and fill it in, also negotiate buffer sizes and transports
       m_launchConnections.resize(nMemberConnections);
       OC::Launcher::Connection *lc = &m_launchConnections[0];
-      for (OU::Assembly::ConnectionsIter ci = m_assembly.m_connections.begin();
-           ci != m_assembly.m_connections.end(); ci++) {
+      for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci) {
         const OU::Assembly::Port *aIn = NULL, *aOut = NULL;
-        Instance *iIn = NULL, *iOut = NULL;
+        Deployment *dIn = NULL, *dOut = NULL;
         OU::Port *pIn = NULL, *pOut = NULL;
         size_t inScale = 1, outScale = 1;
-        for (OU::Assembly::Connection::PortsIter pi = ci->m_ports.begin();
-             pi != ci->m_ports.end(); pi++) {
-          i = &m_instances[pi->m_instance];
+        for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
+          d = &m_bestDeployments[pi->m_instance];
           OU::Port *p =
-            i->m_bestDeployment.m_impls[0]->m_metadataImpl.findMetaPort(pi->m_name.c_str());
+            d->m_impls[0]->m_metadataImpl.findMetaPort(pi->m_name.c_str());
           assert(p);
           if (pi->m_role.m_provider) {
             aIn = &*pi;
-            iIn = i;
+            dIn = d;
             pIn = p;
-            inScale = i->m_crew.m_size;
+            inScale = d->m_crew.m_size;
           } else {
             aOut = &*pi;
-            iOut = i;
+            dOut = d;
             pOut = p;
-            outScale = i->m_crew.m_size;
+            outScale = d->m_crew.m_size;
           }
         }
         OU::Assembly::External *e = NULL;
         const OU::PValue *eParams = NULL;
-        if (ci->m_externals.size()) {
-          e = &ci->m_externals.front();
+        if ((*ci).m_externals.size()) {
+          e = &(*ci).m_externals.front();
           eParams = e->m_parameters;
           if (pIn)
             pOut = pIn;
@@ -1320,36 +1617,36 @@ namespace OCPI {
             pIn = pOut;
           m_externals.insert(ExternalPair(e->m_name.c_str(), External(*lc)));
         }
-        const OU::PValue *connParams = ci->m_parameters;
+        const OU::PValue *connParams = (*ci).m_parameters;
         for (unsigned nIn = 0; nIn < inScale; nIn++) {
-          OC::Launcher::Member *mIn = aIn ? &m_launchMembers[iIn->m_firstMember + nIn] : NULL;
+          OC::Launcher::Member *mIn = aIn ? &m_launchMembers[dIn->m_firstMember + nIn] : NULL;
           for (unsigned nOut = 0; nOut < outScale; nOut++, lc++) {
-            OC::Launcher::Member *mOut = aOut ? &m_launchMembers[iOut->m_firstMember + nOut] : NULL;
+            OC::Launcher::Member *mOut = aOut ? &m_launchMembers[dOut->m_firstMember + nOut] : NULL;
             setLaunchPort(lc->m_in, pIn, connParams, pIn->m_name,
                           aIn ? aIn->m_parameters.list() : NULL, mIn, e, inScale, nIn);
             setLaunchPort(lc->m_out, pOut, connParams, pOut->m_name,
                           aOut ? aOut->m_parameters.list() : NULL, mOut, e, outScale, nOut);
             setLaunchTransport(*lc, aIn ? (const OU::PValue *)aIn->m_parameters : eParams,
                                aOut ? (const OU::PValue *)aOut->m_parameters : eParams,
-                               ci->m_parameters);
+                               (*ci).m_parameters);
           }
         }
       }
       // Pass 2a: add the internal connections
-      i = m_instances;
-      for (unsigned n = 0; n < m_nInstances; n++, i++) {
-        const OU::Worker &firstImpl = i->m_bestDeployment.m_impls[0]->m_metadataImpl;
-        size_t scale = i->m_bestDeployment.m_scale;
+      d = &m_bestDeployments[0];
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++) {
+        const OU::Worker &firstImpl = d->m_impls[0]->m_metadataImpl;
+        size_t scale = d->m_scale;
         unsigned nPorts;
         OU::Port *p = firstImpl.ports(nPorts);
         for (unsigned nn = 0; nn < nPorts; nn++, p++)
           if (p->m_isInternal) {
-            if (!p->m_isOptional || i->m_bestDeployment.m_scale > 1) {
+            if (!p->m_isOptional || d->m_scale > 1) {
               // FIXME: any point in allowing buffer count override?
               for (unsigned nIn = 0; nIn < scale; nIn++) {
-                OC::Launcher::Member *mIn = &m_launchMembers[i->m_firstMember + nIn];
+                OC::Launcher::Member *mIn = &m_launchMembers[d->m_firstMember + nIn];
                 for (unsigned nOut = 0; nOut < scale; nOut++, lc++) {
-                  OC::Launcher::Member *mOut = &m_launchMembers[i->m_firstMember + nOut];
+                  OC::Launcher::Member *mOut = &m_launchMembers[d->m_firstMember + nOut];
                   setLaunchPort(lc->m_in, p, NULL, p->m_name, NULL, mIn, NULL, scale, nIn);
                   setLaunchPort(lc->m_out, p+1, NULL, (p+1)->m_name, NULL, mOut, NULL, scale,
                                 nOut);
@@ -1441,52 +1738,49 @@ namespace OCPI {
     // per member rather than an instance per app instance.
     void ApplicationI::
     initLaunchMembers() {
-      Instance *i = m_instances;
+      auto *d = &m_bestDeployments[0];
       size_t nMembers = 0;
-      for (size_t n = 0; n < m_nInstances; n++, nMembers += i->m_bestDeployment.m_scale, i++)
-        i->m_firstMember = nMembers;
+      for (size_t n = 0; n < m_bestDeployments.size(); n++, nMembers += d->m_scale, d++)
+        d->m_firstMember = nMembers;
       m_launchMembers.resize(nMembers);
-      i = m_instances;
+      d = &m_bestDeployments[0];
       OC::Launcher::Member *li = &m_launchMembers[0];
-      for (unsigned n = 0; n < m_nInstances; n++, i++)
-        for (unsigned m = 0; m < i->m_bestDeployment.m_scale; m++, li++) {
-          if (i->m_bestDeployment.m_scale == 1)
-            li->m_name = m_assembly.instance(n).name();
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++)
+        for (unsigned m = 0; m < d->m_scale; m++, li++) {
+          if (d->m_scale == 1)
+            li->m_name = d->m_name;
           else
-            OU::format(li->m_name, "%s.%u", m_assembly.instance(n).name().c_str(), m);
-          li->m_impl = i->m_bestDeployment.m_impls[m];
-          OU::Assembly::Instance &ui = m_assembly.instance(n).m_utilInstance;
-          li->m_hasMaster = ui.m_hasMaster;
-          assert(!ui.m_hasMaster || i->m_bestDeployment.m_scale == 1);
+            OU::format(li->m_name, "%s.%u", d->m_name.c_str(), m);
+          li->m_impl = d->m_impls[m];
+          li->m_hasMaster = d->m_hasMaster;
+          assert(!d->m_hasMaster || d->m_scale == 1);
           if ((unsigned)m_assembly.m_doneInstance == n)
             li->m_doneInstance = true;
           // We do not support scalable proxies.  checked elsewhere
-          assert(ui.m_slaveInstances.empty() || i->m_bestDeployment.m_scale == 1);
+          assert(d->m_slaves.empty() || d->m_scale == 1);
           // Initialize the slaves in the order declared by the proxy
-          OU::Worker &mImpl = li->m_impl->m_metadataImpl;
-          if (mImpl.slaves().size()) {
-	    assert(i->m_bestDeployment.m_slaves.size() == mImpl.slaves().size());
-            li->m_slaves.resize(mImpl.slaves().size());
-            li->m_slaveWorkers.resize(mImpl.slaves().size());
-	    for (unsigned s = 0; s < mImpl.slaves().size(); ++s)
-	      if (i->m_bestDeployment.m_slaves[s] != UINT_MAX)
-		li->m_slaves[s] = &m_launchMembers[m_instances[i->m_bestDeployment.m_slaves[s]].m_firstMember];
+          if (d->m_slaves.size()) {
+            li->m_slaves.resize(d->m_slaves.size());
+            li->m_slaveWorkers.resize(d->m_slaves.size());
+	    for (unsigned s = 0; s < d->m_slaves.size(); ++s)
+	      if (d->m_slaves[s] != UINT_MAX)
+		li->m_slaves[s] = &m_launchMembers[m_bestDeployments[d->m_slaves[s]].m_firstMember];
           }
           li->m_member = m;
-          i->m_crew.m_size = i->m_bestDeployment.m_scale;
-          li->m_crew = &i->m_crew;
+          d->m_crew.m_size = d->m_scale;
+          li->m_crew = &d->m_crew;
         }
     }
 
     // Do the part of initializing launch instances that depends on containers established.
     void ApplicationI::
     finalizeLaunchMembers() {
-      Instance *i = m_instances;
+      auto *d = &m_bestDeployments[0];
       OC::Launcher::Member *li = &m_launchMembers[0];
-      for (unsigned n = 0; n < m_nInstances; n++, i++)
-        for (unsigned m = 0; m < i->m_bestDeployment.m_scale; m++, li++) {
-          li->m_containerApp = m_containerApps[i->m_usedContainers[m]];
-          li->m_container = m_containers[i->m_usedContainers[m]];
+      for (unsigned n = 0; n < m_bestDeployments.size(); n++, d++)
+        for (unsigned m = 0; m < d->m_scale; m++, li++) {
+          li->m_containerApp = m_containerApps[d->m_usedContainers[m]];
+          li->m_container = m_containers[d->m_usedContainers[m]];
         }
     }
 
@@ -1498,9 +1792,9 @@ namespace OCPI {
       checkExternalParams("url", params);
     }
     bool
-    ApplicationI::foundContainer(OCPI::Container::Container &c) {
+    ApplicationI::Instance::foundContainer(OCPI::Container::Container &c) {
       m_curMap |= 1u << c.ordinal();
-      m_curContainers++;
+      //      m_curContainers++;
       return false;
     }
 
@@ -1551,9 +1845,6 @@ namespace OCPI {
           if ((*li)->work(m_launchMembers, m_launchConnections))
             more = true;
       } while (more);
-      if (m_assembly.m_doneInstance != -1)
-        m_doneInstance = &m_instances[m_assembly.m_doneInstance];
-      //      m_launchMembers[m_instances[m_assembly.m_doneInstance].m_firstMember].m_worker;
 #if 1
       for (unsigned n = 0; n < m_launchConnections.size(); n++) {
         OC::Launcher::Connection &c = m_launchConnections[n];
@@ -1585,7 +1876,7 @@ namespace OCPI {
                                        PropertyOptionList({m_hex ? HEX : NONE, UNREADABLE_OK}), &attrs); ++n)
         if ((printParameters || attrs.isVolatile || attrs.isWritable) &&
             (m_hidden || !attrs.isHidden) && (printCached || !attrs.isCached || attrs.isWritable)) {
-          fprintf(stderr, "Property %2u: %s = \"%s\"", n, attrs.name.c_str(), value.c_str());
+          fprintf(stderr, "Property %3u: %s = \"%s\"", n, attrs.name.c_str(), value.c_str());
           std::string out;
           addAttr(out, attrs.isParameter, "parameter");
           addAttr(out, attrs.isCached, "cached");
@@ -1609,15 +1900,15 @@ namespace OCPI {
       if (m_dumpPlatforms)
         for (unsigned n = 0; n < m_nContainers; n++)
           m_containers[n]->dump(true, m_hex);
-      ocpiDebug("Using %d containers to support the application", m_nContainers );
-      ocpiDebug("Starting master workers that are not slaves and not sources.");
+      ocpiInfo("Using %d containers to support the application", m_nContainers );
+      ocpiInfo("Starting master workers that are not slaves and not sources.");
       startMasterSlave(true, false, false);  // 4
-      ocpiDebug("Starting master workers that are also slaves, but not sources.");
+      ocpiInfo("Starting master workers that are also slaves, but not sources.");
       startMasterSlave(true, true, false);   // 6
-      ocpiDebug("Starting workers that are not masters and not sources.");
+      ocpiInfo("Starting workers that are not masters and not sources.");
       startMasterSlave(false, false, false); // 0
       startMasterSlave(false, true, false);  // 2
-      ocpiDebug("Starting workers that are sources.");
+      ocpiInfo("Starting workers that are sources.");
       startMasterSlave(false, false, true);  // 1
       startMasterSlave(false, true, true);   // 3
       // Note: this does not start masters that are sources.
@@ -1653,25 +1944,26 @@ namespace OCPI {
             ocpiDebug("Setting property \"%s\" of instance \"%s\" (worker \"%s\") after %f seconds to \"%s\"",
                       it->second.m_property->cname(),
                       m_assembly.instance(it->second.m_instance).name().c_str(),
-                      m_launchMembers[m_instances[it->second.m_instance].m_firstMember].m_worker->cname(),
+                      m_launchMembers[m_bestDeployments[it->second.m_instance].m_firstMember].m_worker->cname(),
                       now/1.e6, uValue.c_str());
           }
           // FIXME: fan out of value to crew, and stash instance ptr, not index...
-          m_launchMembers[m_instances[it->second.m_instance].m_firstMember].m_worker->
+          m_launchMembers[m_bestDeployments[it->second.m_instance].m_firstMember].m_worker->
             setProperty(it->second.m_property->m_ordinal, it->second.m_value);
         }
         m_delayedPropertyValues.clear();
       }
     }
     bool ApplicationI::wait(OS::Timer *timer) {
-      if (m_doneInstance) {
-        OC::Launcher::Member *m = &m_launchMembers[m_doneInstance->m_firstMember];
+      if (m_assembly.m_doneInstance != UINT_MAX) {
+        OC::Launcher::Member *m =
+	  &m_launchMembers[m_bestDeployments[m_assembly.m_doneInstance].m_firstMember];
         if (m->m_crew->m_size > 1) {
           ocpiInfo("Waiting for \"done\" worker, \"%s\" (%zu members), to finish",
                    m->m_worker->name().c_str(), m->m_crew->m_size);
           do {
             bool done = true;
-            m = &m_launchMembers[m_doneInstance->m_firstMember];
+            m = &m_launchMembers[m_bestDeployments[m_assembly.m_doneInstance].m_firstMember];
             for (unsigned n = (unsigned)m->m_crew->m_size; n; n--, m++) {
               if (!m->m_container->enabled())
                 throw OU::Error("Container \"%s\" for worker \"%s\" was shutdown",
@@ -1710,7 +2002,7 @@ namespace OCPI {
       for (unsigned n = 0; n < m_nProperties; n++, p++)
         if (p->m_dumpFile) {
           std::string l_name, value;
-          m_launchMembers[m_instances[p->m_instance].m_firstMember].m_worker->
+          m_launchMembers[m_bestDeployments[p->m_instance].m_firstMember].m_worker->
             getProperty(p->m_property, l_name, value, NULL, m_hex);
           value += '\n';
           if ((err = OU::string2File(value, p->m_dumpFile)))
@@ -1775,7 +2067,7 @@ namespace OCPI {
         for (unsigned n = 0; n < m_nInstances; n++) {
           const char *wname = m_assembly.instance(n).name().c_str();
           if (!strncasecmp(a_name, wname, len) && !wname[len]) {
-            Worker *w = m_launchMembers[m_instances[n].m_firstMember].m_worker;
+            Worker *w = m_launchMembers[m_bestDeployments[n].m_firstMember].m_worker;
             if (w)
               return *w;
             throw OU::Error("application is not yet initialized for property access");
@@ -1787,7 +2079,7 @@ namespace OCPI {
       for (unsigned n = 0; n < m_nProperties; n++, p++)
         if (!strcasecmp(a_name, p->m_name.c_str())) {
           pname = m_assembly.instance(p->m_instance).properties()[p->m_property].m_name.c_str();
-          return *m_launchMembers[m_instances[p->m_instance].m_firstMember].m_worker;
+          return *m_launchMembers[m_bestDeployments[p->m_instance].m_firstMember].m_worker;
         }
       throw OU::Error("Unknown application property: %s", a_name);
     }
@@ -1818,7 +2110,7 @@ namespace OCPI {
       Property &p = m_properties[ordinal];
       a_name = p.m_name;
       return
-        &m_launchMembers[m_instances[p.m_instance].m_firstMember].
+        &m_launchMembers[m_bestDeployments[p.m_instance].m_firstMember].
         m_worker->property(p.m_property);
     }
 
@@ -1826,7 +2118,7 @@ namespace OCPI {
     getProperty(const char *prop_name, std::string &value, AccessList &list,
                 PropertyOptionList &options, PropertyAttributes *attributes) const {
       Property &p = findProperty(prop_name);
-      return m_launchMembers[m_instances[p.m_instance].m_firstMember].m_worker->
+      return m_launchMembers[m_bestDeployments[p.m_instance].m_firstMember].m_worker->
         getProperty(p.m_property, value, list, options, attributes);
     }
 
@@ -1836,7 +2128,7 @@ namespace OCPI {
       if (ordinal >= m_nProperties)
         return NULL;
       Property &p = m_properties[ordinal];
-      OC::Worker &w = *m_launchMembers[m_instances[p.m_instance].m_firstMember].m_worker;
+      OC::Worker &w = *m_launchMembers[m_bestDeployments[p.m_instance].m_firstMember].m_worker;
       w.getProperty(p.m_property, value, list, options, attributes);
       if (attributes)
         attributes->name = p.m_name.c_str(); // override the worker-level name
@@ -1891,7 +2183,7 @@ namespace OCPI {
                 bool hex) {
       Property &p = findProperty(worker_inst_name, prop_name);
       std::string dummy;
-      m_launchMembers[m_instances[p.m_instance].m_firstMember].m_worker->
+      m_launchMembers[m_bestDeployments[p.m_instance].m_firstMember].m_worker->
         getProperty(p.m_property, dummy, value, NULL, hex);
     }
 
@@ -1899,7 +2191,7 @@ namespace OCPI {
     setProperty(const char * worker_inst_name, const char * prop_name, const char *value,
                 OA::AccessList &list) {
       Property &p = findProperty(worker_inst_name, prop_name);
-      m_launchMembers[m_instances[p.m_instance].m_firstMember].m_worker->
+      m_launchMembers[m_bestDeployments[p.m_instance].m_firstMember].m_worker->
         setProperty(p.m_property, value, list);
     }
 
@@ -1909,11 +2201,11 @@ namespace OCPI {
       if (!f)
         throw OU::Error("Can't open file \"%s\" for deployment output", file.c_str());
       fprintf(f, "<deployment application='%s'>\n", appFile);
-      Instance *i = m_instances;
+      Instance *i = &m_instances[0];
       for (unsigned n = 0; n < m_nInstances; n++, i++) {
-        const OL::Implementation &impl = *i->m_bestDeployment.m_impl;
+        const OL::Implementation &impl = *i->m_deployment.m_impls[0];
         OC::Container &c =
-          OC::Container::nthContainer(m_usedContainers[i->m_usedContainer]);
+          OC::Container::nthContainer(m_usedContainers[i->m_deployment.m_usedContainers[0]]);
         fprintf(f,
                 "  <instance name='%s' spec='%s' worker='%s' model='%s' container='%s'\n"
                 "            artifact='%s'",
@@ -1929,48 +2221,37 @@ namespace OCPI {
         throw OU::Error("Can't close output file \"%s\".  No space?", file.c_str());
     }
 
-    ApplicationI::Instance::Instance() :
-      m_feasibleContainers(NULL), m_nCandidates(0), m_usedContainer(0), m_usedContainers(NULL),
-      m_firstMember(0) {
+    ApplicationI::Instance::Instance() : m_curMap(0) {
     }
     ApplicationI::Instance::~Instance() {
-      delete [] m_feasibleContainers;
-      if (m_usedContainers != &m_usedContainer)
-        delete [] m_usedContainers;
     }
     ApplicationI::Deployment::
     Deployment()
-      : m_scale(0), m_container(0), m_impl(NULL), m_containers(NULL), m_impls(NULL),
-        m_feasible(0) {
+      : m_scale(0), m_feasible(0) {
     }
     ApplicationI::Deployment::
     ~Deployment() {
-      if (m_scale > 1) {
-        delete [] m_containers;
-        delete [] m_impls;
-      }
     }
     void ApplicationI::Deployment::
-    set(size_t scale, unsigned *containers, const OL::Implementation **impls, CMap feasible) {
-      if (m_scale > 1) {
-        delete [] m_containers;
-        delete [] m_impls;
-      }
+    set(const std::string &name, size_t scale, const unsigned *containers,
+	const OL::Implementation * const *impls, CMap feasible, bool hasMaster,
+	const OU::Assembly::Properties *properties) {
+      m_name = name;
       m_scale = scale;
-      if (scale > 1) {
-        m_containers = containers;
-        m_impls = impls;
-      } else {
-        m_container = *containers;
-        m_containers = &m_container;
-        m_impl = *impls;
-        m_impls = &m_impl;
+      m_impls.resize(scale);
+      m_containers.resize(scale);
+      m_hasMaster = hasMaster;
+      m_properties = properties;
+      for (unsigned n = 0; n < scale; ++n) {
+	m_impls[n] = impls[n];
+	m_containers[n] = containers[n];
       }
       m_feasible = feasible;
     }
     ApplicationI::Deployment &ApplicationI::Deployment::
     operator=(const ApplicationI::Deployment &d) {
-      set(d.m_scale, d.m_containers, d.m_impls, d.m_feasible);
+      set(d.m_name, d.m_scale, &d.m_containers[0], &d.m_impls[0], d.m_feasible, d.m_hasMaster,
+	  d.m_properties);
       m_slaves = d.m_slaves;
       return *this;
     }

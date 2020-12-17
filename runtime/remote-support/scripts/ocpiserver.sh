@@ -93,14 +93,15 @@ start)
   if [ -n "$vg" ]; then
     export PATH=$PATH:prerequisites/valgrind/$platform/bin
     export VALGRIND_LIB=prerequisites/valgrind/$platform/lib/valgrind
-    ldso=$(shopt -s nullglob && echo /lib/ld-*.so)
-    echo $ldso
-    sdk=$platform/lib/sdk/lib/$(basename $ldso)
-    echo $PWD/$sdk
+    ldso=$(echo /lib/ld-*.so) # we assume this is here
+    echo For valgrind, the system ld.so is: $ldso >&2
+    sdk=$platform/sdk/lib/$(basename $ldso)
+    echo For valgrind, our SDK version is: $PWD/$sdk >&2
     [ -f $ldso -a -f $sdk ] && cp -v $sdk $ldso
   fi
   echo PATH=$PATH >&2
   echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH >&2
+  echo VALGRIND_LIB=$VALGRIND_LIB >&2
   echo nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
   nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
   pid=$!

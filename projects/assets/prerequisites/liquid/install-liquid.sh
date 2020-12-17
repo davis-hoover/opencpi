@@ -42,10 +42,7 @@ patch < ${OcpiThisPrerequisiteDir}/malloc.patch
 #	w
 #EOF
 echo Performing '"./bootstrap.sh"'
-# Even though configure.ac contains AC_CONFIG_MACRO_DIR, for at least the autoconf on centos6
-# (autoconf version 2.63), this does not work so the -Iscripts is required below.
-# Presumably they changed things "for the better", but broke centos6.
-ACLOCAL="aclocal -Iscripts" ./bootstrap.sh
+./bootstrap.sh
 
 echo Performing '"./configure"'
 ./configure ${OcpiCrossHost:+--host=$OcpiCrossHost} \

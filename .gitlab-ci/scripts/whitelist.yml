@@ -2,7 +2,6 @@
 centos7:
   - xilinx13_3
   - xilinx13_4
-  - xilinx19_2_aarch64
   - isim
   - modelsim
   - xsim
@@ -10,3 +9,7 @@ centos7:
   - zcu104
   - zed
   - zed_ise
+  - plutosdr
+  - e31x
+  - adi_plutosdr0_32
+  - adrv9361

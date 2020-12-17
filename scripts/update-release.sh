@@ -24,7 +24,7 @@ function usage {
 Usage: $(basename "$0") [--autotools-only]
 
 Updates OpenCPI version that is defined in various places. This script is only
-used when creating releases and reliese on properties in the VERSION file being
+used when creating releases and relies on properties in the VERSION file being
 set correctly.
 
 Optional arguments:

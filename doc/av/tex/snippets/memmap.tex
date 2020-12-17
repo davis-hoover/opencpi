@@ -64,10 +64,6 @@ Once the memmap parameter as been calculated, it will need to be added to the ke
 \bigskip
 For CentOS, the utility ``grubby'' can be used to add the parameter to all kernels in the start-up menu. The single quotes are REQUIRED or the shell will interpret the \$0: \\
 \bigskip
-\textbf{\textit{CentOS6}}:\\
-\begin{lstlisting}
-sudo grubby --update-kernel=ALL --args=memmap='128M\$0x57EF0000'
-\end{lstlisting}
 \textbf{\textit{CentOS 7}} uses \textit{grub2}, which \textbf{requires a DOUBLE} backslash:\\
 \begin{lstlisting}
 sudo grubby --update-kernel=ALL --args=memmap='128M\\$0x57EF0000'

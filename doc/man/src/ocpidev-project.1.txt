@@ -155,9 +155,9 @@ Options When Creating Projects
    Specify the package-ID directly. The default is
    '<package-prefix>'*.*'<package-name>'.
 
-*-N* '<packge-name>'::
+*-N* '<package-name>'::
    Specify the package name of the created project. The
-   default is the '<name>' argument given after the *create* verb.
+   default is the '<name>' argument given after the *`create`* verb.
    
 *`-T`* '<target>'+::
    Only build the project for the specified architecture.
@@ -343,9 +343,9 @@ EXAMPLES
 . Create a project with the name *`my-project`*. This project's
 package-ID will be *`local.my-project`*:
 +
--------------------------------
+---------------------------------
 ocpidev create project my-project
---------------------------------
+---------------------------------
 +
 . Create a project with the package-prefix *`org.my-organization`* and
 the name *`my-project`*. This project's package-ID will be
@@ -359,10 +359,10 @@ ocpidev create project my-project -F org.my-organization
 *`xilinx13_3`* RCC platform.  Omit the name *`assets`* if
 inside the *`assets`* project.
 +
---------------------------------------------
+------------------------------------------------------
 ocpidev build project assets --hdl-platform zed
                              --rcc-platform xilinx13_3
--------------------------------------------
+------------------------------------------------------
 +
 . Clean the *`assets`* project:
 +

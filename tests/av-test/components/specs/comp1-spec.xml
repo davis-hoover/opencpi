@@ -21,6 +21,7 @@
         <Member Name="struct_char" Type="char"></Member>
     </Property>
     <Property Name="test_seq_ulong" SequenceLength="10" Volatile="true" Writable="true"></Property>
+    <Property Name="test_seq_ushort" Type='ushort' SequenceLength="10" Volatile="true" Writable="true"></Property>
     <Property Name="test_seq_of_structs" SequenceLength="10" Type="struct" Volatile="true" Writable="true">
         <Member Name="struct_bool" Type="bool"></Member>
         <Member Name="struct_ulong"></Member>

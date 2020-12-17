@@ -49,6 +49,7 @@ namespace OCPI {
       m_isScalable = false;
       m_isPartitioned = false;
       m_defaultDistribution = Cyclic;
+      //      m_slave = SIZE_MAX;
     }
     // When supplied with initial xml, its a "poor man's preparse" - see below.
     // This is used (at least) for runtime standalone ports, not port of a worker (yet).
@@ -175,6 +176,7 @@ namespace OCPI {
       if ((err = parseProtocol()) || // virtual call
 	  (err = OE::getBoolean(m_xml, "twoWay", &m_isTwoWay)) ||           // protocol override
 	  (err = OE::getBoolean(m_xml, "bidirectional", &m_isBidirectional)) ||
+	  //	  (err = OE::getNumber(m_xml, "slave", &m_slave, NULL, 0, false)) ||
 	  // Don't use absence to set value
 	  (err = OE::getBoolean(m_xml, "producer", &m_isProducer, false, false)) ||
 	  (err = OE::getBoolean(m_xml, "provider", &m_provider, false, false,
@@ -211,6 +213,11 @@ namespace OCPI {
 	else if (m_maxMessageValues != SIZE_MAX)
 	  m_bufferSize = (m_maxMessageValues * m_dataValueWidth + 7) / 8;
       }
+#if 0
+      if (m_slave != SIZE_MAX && m_slave >= m_worker->m_slaves.size())
+	return esprintf("Slave index, %zu, not valid when worker has %zu slaves", m_slave,
+			m_worker->m_slaves.size());
+#endif
       // FIXME: do we need the separately overridable nOpcodes here?
       return NULL;
     }
@@ -504,9 +511,10 @@ namespace OCPI {
 	  m_opScaling[n]->emit(out, *this, *op);
     }
 
+    // This should not be runtime...
     void Port::
     emitXml(std::string &out, size_t bufferSize) const {
-      formatAdd(out, "  <port name=\"%s\"", m_name.c_str());
+      formatAdd(out, "    <port name=\"%s\"", m_name.c_str());
       if (m_isBidirectional)
 	formatAdd(out, " bidirectional='1'");
       else if (m_isProducer)
@@ -527,11 +535,15 @@ namespace OCPI {
 	formatAdd(out, " internal='1'");
       if (m_workerEOF && !m_worker->m_workerEOF)
 	formatAdd(out, " workerEOF='1'");
+#if 0
+      if (m_slave != SIZE_MAX)
+	formatAdd(out, " slave='%zu'", m_slave);
+#endif
       emitScalingAttrs(out);
       formatAdd(out, ">\n");
-      printXML(out, 2);
+      printXML(out, 3);
       emitScaling(out);
-      formatAdd(out, "  </port>\n");
+      formatAdd(out, "    </port>\n");
     }
 
     Port::OpScaling::

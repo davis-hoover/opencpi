@@ -19,6 +19,7 @@
  */
 
 #include <assert.h>
+#include <unordered_set>
 #include "assembly.h"
 // Generic (actually non-HDL) assembly support
 // This isn't as purely generic as it should be  FIXME
@@ -132,23 +133,32 @@ parseConnection(OU::Assembly::Connection &aConn) {
       return OU::esprintf("External port '%s' can't have index/count %zu/%zu "
 			  "when internal port has count: %zu",
 			  ext.m_name.c_str(), ext.m_index, ext.m_count, intPort.m_port->count());
-    // Create the external port of this assembly
-    // Start with a copy of the port, then patch it
-    ocpiDebug("Clone of port %s of instance %s of worker %s for assembly worker %s: %s/%zu/%zu",
-	      intPort.m_port->pname(), intPort.m_instance->cname(),
-	      intPort.m_port->worker().m_implName, m_assyWorker.m_implName,
-	      intPort.m_port->m_countExpr.c_str(), intPort.m_port->m_arrayCount,
-	      ext.m_count ? ext.m_count : c.m_count);
-    assert(ext.m_count <= intPort.m_port->count());
-    // The external port inherits the array-ness of the internal port if there is no "count".
-    Port &p = intPort.m_port->clone(m_assyWorker, ext.m_name,
-				    ext.m_count ? ext.m_count : intPort.m_port->m_arrayCount,
-				    &ext.m_role, err);
-    if (err)
-      return OU::esprintf("External connection %s for port %s of instance %s error: %s",
-			  c.m_name.c_str(), intPort.m_port->pname(), intPort.m_instance->cname(),
-			  err);
-    InstancePort *ip = new InstancePort(NULL, &p, &ext);
+    Port *p;
+    if (m_assyWorker.m_type == Worker::Application) { // a proxy
+      // We are dealing with a connection that implies a delegation, so the assembly worker port
+      // already exists.
+      if (!(p = m_assyWorker.findPort(ext.m_name.c_str())))
+	return OU::esprintf("External connection in slave assembly for worker %s specifies port %s"
+			    " which does not exist", m_assyWorker.cname(), ext.m_name.c_str());
+    } else {
+      // Create the external port of this assembly
+      // Start with a copy of the port, then patch it
+      ocpiDebug("Clone of port %s of instance %s of worker %s for assembly worker %s: %s/%zu/%zu",
+		intPort.m_port->pname(), intPort.m_instance->cname(),
+		intPort.m_port->worker().m_implName, m_assyWorker.m_implName,
+		intPort.m_port->m_countExpr.c_str(), intPort.m_port->m_arrayCount,
+		ext.m_count ? ext.m_count : c.m_count);
+      assert(ext.m_count <= intPort.m_port->count());
+      // The external port inherits the array-ness of the internal port if there is no "count".
+      p = &intPort.m_port->clone(m_assyWorker, ext.m_name,
+				 ext.m_count ? ext.m_count : intPort.m_port->m_arrayCount,
+				 &ext.m_role, err);
+      if (err)
+	return OU::esprintf("External connection %s for port %s of instance %s error: %s",
+			    c.m_name.c_str(), intPort.m_port->pname(), intPort.m_instance->cname(),
+			    err);
+    }
+    InstancePort *ip = new InstancePort(NULL, p, &ext);
     if ((err = c.attachPort(*ip, 0)))
       return err;
   }
@@ -221,7 +231,8 @@ addInstanceParameters(const Worker &w, const OU::Assembly::Properties &aiprops,
     if (!p)
       return OU::esprintf("property '%s' is not a property of worker '%s'", ap->m_name.c_str(),
 			  w.m_implName);
-    if (!p->m_isParameter)
+    // If the assembly is for an application worker, we are parsing a slave assembly
+    if (!p->m_isParameter && m_assyWorker.m_type != Worker::Application)
       return OU::esprintf("property '%s' is not a parameter property of worker '%s'",
 			  ap->m_name.c_str(), w.m_implName);
     // set up the ipv and parse the value
@@ -274,7 +285,7 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   if (m_wName.empty())
     return OU::esprintf("instance %s has no worker", cname());
   for (Instance *ii = &assy.m_instances[0]; ii < this; ii++)
-    if (!m_wName.empty() && !strcmp(m_wName.c_str(), ii->m_wName.c_str()))
+    if (!strcmp(m_wName.c_str(), ii->m_wName.c_str()))
       w = ii->m_worker;
   // There are two instance attributes that we use when considering workers
   // in our worker assembly:
@@ -351,8 +362,7 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
 // This parses the assembly using the generic assembly parser in OU::
 // It then does the binding to actual implementations.
 const char *Assembly::
-parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs, bool noWorkerOk) {
-  (void)noWorkerOk; // FIXME: when containers are generated.
+parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs) {
   try {
     m_utilAssembly = new OU::Assembly(xml, m_assyWorker.m_implName, true, topAttrs, instAttrs);
   } catch (std::string &e) {
@@ -367,7 +377,7 @@ parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs, bool noWor
   Instance *i = &m_instances[0];
   // Initialize our instances based on the generic assembly instances
   for (unsigned n = 0; n < m_utilAssembly->nUtilInstances(); n++, i++) {
-    OU::Assembly::Instance &ai = m_utilAssembly->utilInstance(n);
+    OU::Assembly::Instance &ai = m_utilAssembly->instance(n);
     if ((err =
 	 i->init(*this, ai.m_name.c_str(), ai.m_implName.c_str(), ai.xml(), ai.m_properties)))
       return err;
@@ -404,14 +414,16 @@ parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs, bool noWor
   }
   // All parsing is done.
   // Now we fill in the top-level worker stuff.
-  ocpiCheck(asprintf((char**)&m_assyWorker.m_specName, "local.%s", m_assyWorker.m_implName) > 0);
-  // Properties:  we only set the canonical hasDebugLogic property, which is a parameter.
-  if ((err = m_assyWorker.doProperties(xml, m_assyWorker.m_file.c_str(), true, false, NULL, false)))
-    return err;
+  if (m_assyWorker.m_type != Worker::Application) {
+    ocpiCheck(asprintf((char**)&m_assyWorker.m_specName, "local.%s", m_assyWorker.m_implName) > 0);
+    // Properties:  we only set the canonical hasDebugLogic property, which is a parameter.
+    if ((err = m_assyWorker.doProperties(xml, m_assyWorker.m_file.c_str(), true, false, NULL, false)))
+      return err;
+  }
   // Parse the Connections, creating external ports for this assembly worker as needed.
-  for (OU::Assembly::ConnectionsIter ci = m_utilAssembly->m_connections.begin();
-       ci != m_utilAssembly->m_connections.end(); ci++)
-    if ((err = parseConnection(*ci)))
+  for (auto ci = m_utilAssembly->m_connections.begin();
+       ci != m_utilAssembly->m_connections.end(); ++ci)
+    if ((err = parseConnection(**ci)))
       return err;
   // Check for unconnected non-optional data ports
   i = &m_instances[0];
@@ -485,60 +497,109 @@ emitXmlConnections(FILE *) {
 }
 
 void Worker::
-emitXmlWorker(FILE *f, bool verbose) {
-  fprintf(f, "<worker name=\"%s", m_implName);
+emitXmlWorker(std::string &out, bool verbose) {
+  OU::formatAdd(out, "  <worker name=\"%s", m_implName);
   // FIXME - share this param-named implname with emitInstance
   if (m_paramConfig && m_paramConfig->nConfig)
-    fprintf(f, "-%zu", m_paramConfig->nConfig);
-  fprintf(f, "\" model=\"%s\"", m_modelString);
-  fprintf(f, " package=\"%s\"", m_package.c_str());
+    OU::formatAdd(out, "-%zu", m_paramConfig->nConfig);
+  OU::formatAdd(out, "\" model=\"%s\"", m_modelString);
+  OU::formatAdd(out, " package=\"%s\"", m_package.c_str());
   if (m_specName && strcasecmp(m_specName, m_implName))
-    fprintf(f, " specname=\"%s\"", m_specName);
+    OU::formatAdd(out, " specname=\"%s\"", m_specName);
   if (m_ctl.sizeOfConfigSpace)
-    fprintf(f, " sizeOfConfigSpace=\"%llu\"", (unsigned long long)m_ctl.sizeOfConfigSpace);
+    OU::formatAdd(out, " sizeOfConfigSpace=\"%llu\"", (unsigned long long)m_ctl.sizeOfConfigSpace);
   if (m_ctl.controlOps) {
     bool first = true;
     for (unsigned op = 0; op < OU::Worker::OpsLimit; op++)
       if (m_ctl.controlOps & (1u << op)) {
-	fprintf(f, "%s%s", first ? " controlOperations=\"" : ",",
+	OU::formatAdd(out, "%s%s", first ? " controlOperations=\"" : ",",
 		OU::Worker::s_controlOpNames[op]);
 	first = false;
       }
     if (!first)
-      fprintf(f, "\"");
+      out += "\"";
   }
   if (m_wci && m_wci->timeout())
-    fprintf(f, " Timeout=\"%zu\"", m_wci->timeout());
+    OU::formatAdd(out, " Timeout=\"%zu\"", m_wci->timeout());
   if (m_ctl.firstRaw)
-    fprintf(f, " FirstRaw='%u'", m_ctl.firstRaw->m_ordinal);
+    OU::formatAdd(out, " FirstRaw='%u'", m_ctl.firstRaw->m_ordinal);
   if (m_scalable)
-    fprintf(f, " Scalable='1'");
+    out += " Scalable='1'";
   if (m_requiredWorkGroupSize)
-    fprintf(f, " requiredWorkGroupSize='%zu'", m_requiredWorkGroupSize);
+    OU::formatAdd(out, " requiredWorkGroupSize='%zu'", m_requiredWorkGroupSize);
   if (m_version) // keep old distinction between zero and 1 even though they are really the same
-    fprintf(f, " version='%u'", m_version);
+    OU::formatAdd(out, " version='%u'", m_version);
   if (m_workerEOF)
-    fprintf(f, " workerEOF='1'");
-  fprintf(f, ">\n");
+    out += " workerEOF='1'";
+  out += ">\n";
   if (m_scalable) {
     OU::Port::Scaling s;
     if (!(s == m_scaling)) {
-      std::string out;
+      std::string l_out;
       m_scaling.emit(out, NULL);
-      fprintf(f, "  <scaling %s/>\n", out.c_str());
+      OU::formatAdd(out, "  <scaling %s/>\n", l_out.c_str());
     }
   }
-  for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it){
-    fprintf(f, "  <slave name='%s' worker='%s.%s'", (*it).first.c_str(), (*it).second->m_implName,
-	    (*it).second->m_modelString);
-    if ((*it).second->m_isOptional)
-      fprintf(f, " optional='1'");
-    fprintf(f, "/>\n");
+  // emit slaves when they are specified as an assembly
+  if (m_slaves.size() && m_assembly) {
+    // Output the assembly again, but canonical, and without parameters.
+    out += "    <slaves>\n";
+    Instance *i = &m_assembly->m_instances[0];
+    for (unsigned n = 0; n < m_assembly->m_instances.size(); ++i, ++n) {
+      const char *dot = strrchr(i->m_wName.c_str(), '.');
+      assert(dot);
+      OU::formatAdd(out, "      <instance name='%s' component='%s' worker='%.*s",
+		    i->cname(), i->m_worker->m_specName, (int)(dot - i->m_wName.c_str()),
+		    i->m_wName.c_str());
+      assert(i->m_worker->m_paramConfig);
+      if (i->m_worker->m_paramConfig->nConfig)
+	OU::formatAdd(out, "-%zu", i->m_worker->m_paramConfig->nConfig);
+      out += dot;
+      out += '\'';
+      bool any = false;
+      for (auto it = i->m_xmlProperties.begin(); it != i->m_xmlProperties.end(); ++it) {
+	const OU::Property *p = i->m_worker->findProperty(it->m_name.c_str());
+	assert(p);
+	if (!p->m_isParameter) {
+	  if (!any)
+	    out += ">\n";
+	  any = true;
+	  OU::formatAdd(out, "        <property name='%s' value='%s'/>\n",
+			p->cname(), it->m_value.c_str());
+	}
+      }
+      out += any ? "      </instance>\n" : "/>\n";
+    }
+    for (auto it = m_assembly->m_connections.begin(); it != m_assembly->m_connections.end(); ++it) {
+      out += (*it)->m_external ? "      <external" : "      <connection>\n";
+      for (auto ait = (*it)->m_attachments.begin(); ait != (*it)->m_attachments.end(); ++ait)
+	if ((*ait)->m_instPort.m_external)
+	  OU::formatAdd(out, " name='%s'", (*ait)->m_instPort.m_external->m_name.c_str());
+        else if ((*it)->m_external)
+	  OU::formatAdd(out, " instance='%s' port='%s'",
+			(*ait)->m_instPort.m_instance->cname(),
+			(*ait)->m_instPort.m_port->pname());
+        else
+	  OU::formatAdd(out, "        <port instance='%s' name='%s'/>\n",
+			(*ait)->m_instPort.m_instance->cname(), (*ait)->m_instPort.m_port->pname());
+      out += (*it)->m_external ? "/>\n" : "      </connection>\n";
+    }
+    out += "    </slaves>\n";
   }
-  std::string out;
+  // emit slaves when they are not specified as an assembly (legacy)
+  if (m_slaves.size() && !m_assembly) {
+    out += "    <slaves>\n";
+    for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
+      Worker &s = *(*it).second;
+      OU::formatAdd(out, "      <instance name='%s' component='%s' worker='%s.%s.%s'/>\n",
+		    (*it).first.c_str(), s.m_specName, s.m_package.c_str(), s.m_implName,
+		    s.m_modelString);
+    }
+    out += "    </slaves>\n";
+  }
   for (PropertiesIter pi = m_ctl.properties.begin(); pi != m_ctl.properties.end(); pi++) {
     OU::Property *prop = *pi;
-    prop->printAttrs(out, "property", 1, prop->m_isParameter); // suppress default values for parameters
+    prop->printAttrs(out, "property", 2, prop->m_isParameter); // suppress default values for parameters
     if (prop->m_isImpl)
       out += " isImpl='1'";
     else if (verbose){
@@ -598,26 +659,31 @@ emitXmlWorker(FILE *f, bool verbose) {
 	out += "'";
       }
     }
-    prop->printChildren(out, "property");
+    prop->printChildren(out, "property", 2);
   }
   unsigned nn;
   for (nn = 0; nn < m_ports.size(); nn++)
     m_ports[nn]->emitXML(out);
   for (nn = 0; nn < m_localMemories.size(); nn++) {
     LocalMemory* m = m_localMemories[nn];
-    OU::formatAdd(out, "  <localMemory name=\"%s\" size=\"%zu\"/>\n", m->name, m->sizeOfLocalMemory);
+    OU::formatAdd(out, "    <localMemory name=\"%s\" size=\"%zu\"/>\n", m->name, m->sizeOfLocalMemory);
   }
-  fprintf(f, "%s</worker>\n", out.c_str());
+  out += "  </worker>\n";
 }
 
 void Worker::
 emitXmlWorkers(FILE *f) {
   assert(m_assembly);
   // Define all workers
+  std::unordered_set<std::string> workers;
   for (WorkersIter wi = m_assembly->m_workers.begin();
        wi != m_assembly->m_workers.end(); wi++)
-    if (!(*wi)->m_assembly)
-      (*wi)->emitXmlWorker(f);
+    if (!(*wi)->m_assembly || (*wi)->m_slaves.size()) {
+      std::string out;
+      (*wi)->emitXmlWorker(out);
+      if (workers.insert(out).second)
+	fputs(out.c_str(), f);
+    }
 }
 
 InstancePort::

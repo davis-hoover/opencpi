@@ -11,4 +11,3 @@ enough to make a feature or enhancement request.)
 ### Links/references
 
 
-/label ~"type::idea"

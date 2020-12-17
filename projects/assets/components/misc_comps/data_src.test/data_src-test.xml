@@ -4,13 +4,13 @@
     <property name='enable' values='false'/>
   </case>
   <case>
-    <property name='ZLM_WHEN_NUM_SAMPLES_REACHED_p' values='true'/>
+    <property name='EOF_WHEN_NUM_SAMPLES_REACHED_p' values='true'/>
     <property name='num_samples' values='-1,0,1,2,3,4,64,128,1024,32768'/>
     <property name='mode' values='count,walking,LFSR,fixed'/>
     <property name='enable' values='true'/>
     <property name='LFSR_bit_reverse' values='false,true'/>
   </case>
-  <property name='ZLM_WHEN_NUM_SAMPLES_REACHED_p' values='true'/>
+  <property name='EOF_WHEN_NUM_SAMPLES_REACHED_p' values='true'/>
   <property name='num_samples' values='-1'/>
   <property name='mode' values='count'/>
   <property name='LFSR_bit_reverse' values='false'/>

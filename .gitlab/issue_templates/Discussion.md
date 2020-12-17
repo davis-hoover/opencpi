@@ -6,4 +6,3 @@ not concrete. Discussions are not about specific defects or capabilities.)
 ### Links/references
 
 
-/label ~"type::discussion"

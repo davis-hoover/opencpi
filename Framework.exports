@@ -204,6 +204,7 @@
 +tools/include/rcc/rcc-make.mk include/rcc/
 +tools/include/rcc/rcc-worker.mk include/rcc/
 +tools/include/rcc/default.mk include/rcc/
++runtime/drc/base/include/OcpiDrcProxyApi.hh include/rcc/
 # OCL additions
 +tools/include/ocl/ocl-make.mk include/ocl/
 +tools/include/ocl/ocl-worker.mk include/ocl/
@@ -259,6 +260,7 @@
 +runtime/hdl-support/xilinx/xilinx-rcc-platform.mk include/xilinx/
 +runtime/hdl-support/xilinx/xilinx-rcc-platform-definition.mk include/xilinx/
 +platforms/zynq/getXilinxLinuxSources.sh scripts/xilinx/
++platforms/zynq/showXilinxLinuxTags.sh scripts/xilinx/
 +platforms/zynq/createLinuxRootFS.sh scripts/xilinx/
 +runtime/hdl-support/xilinx/createXilinxLinuxKernelHeaders.sh scripts/xilinx/
 +runtime/hdl-support/xilinx/importXilinxRelease.sh scripts/xilinx/

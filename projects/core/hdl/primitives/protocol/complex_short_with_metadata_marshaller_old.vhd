@@ -45,7 +45,7 @@ entity complex_short_with_metadata_marshaller_old is
 end entity;
 architecture rtl of complex_short_with_metadata_marshaller_old is
 
-  constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := 16;
+  constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := ocpi.util.width_for_max(protocol.complex_short_with_metadata.OP_SAMPLES_ARG_IQ_SEQUENCE_LENGTH-1);
   type state_t is (SAMPLES, TIME_63_32, TIME_31_0, INTERVAL_63_32,
                    INTERVAL_31_0, FLUSH, SYNC, EOF, IDLE);
 
@@ -65,7 +65,7 @@ architecture rtl of complex_short_with_metadata_marshaller_old is
   signal state        : state_t := IDLE;
   signal state_r      : state_t := IDLE;
 
-  signal samples_eom  : std_logic := '0';
+  signal valid        : std_logic := '0';
   signal give         : std_logic := '0';
   signal som          : std_logic := '0';
   signal eom          : std_logic := '0';
@@ -224,7 +224,7 @@ begin
         som     <= message_sizer_som;
 
         -- handles forced EOM due to data_vld=1 error_samp_drop=1
-        ovalid  <= not force_end_of_samples;
+        valid   <= not force_end_of_samples;
 
         eom     <= message_sizer_eom or force_end_of_samples;
         give    <= oready;
@@ -233,7 +233,7 @@ begin
         opcode <= protocol.complex_short_with_metadata.TIME_TIME;
         odata  <= iprotocol_r2.time.sec;
         som    <= '0';
-        ovalid <= '1';
+        valid  <= '1';
         eom    <= '1';
         give   <= oready;
         eof_s  <= '0';
@@ -241,7 +241,7 @@ begin
         opcode <= protocol.complex_short_with_metadata.TIME_TIME;
         odata  <= iprotocol_r.time.fract_sec;
         som    <= '1';
-        ovalid <= '1';
+        valid  <= '1';
         eom    <= '0';
         give   <= oready;
         eof_s  <= '0';
@@ -249,7 +249,7 @@ begin
         opcode <= protocol.complex_short_with_metadata.INTERVAL;
         odata  <= iprotocol_r2.interval.delta_time(63 downto 32);
         som    <= '0';
-        ovalid <= '1';
+        valid  <= '1';
         eom    <= '1';
         give   <= oready;
         eof_s  <= '0';
@@ -257,39 +257,33 @@ begin
         opcode <= protocol.complex_short_with_metadata.INTERVAL;
         odata  <= iprotocol_r.interval.delta_time(31 downto 0);
         som    <= '1';
-        ovalid <= '1';
+        valid  <= '1';
         eom    <= '0';
         give   <= oready;
         eof_s  <= '0';
       when SYNC =>
         opcode <= protocol.complex_short_with_metadata.SYNC;
         som    <= '1';
-        ovalid <= '0';
+        valid  <= '0';
         eom    <= '1';
         give   <= oready;
         eof_s  <= '0';
       when FLUSH =>
         opcode <= protocol.complex_short_with_metadata.FLUSH;
         som    <= '1';
-        ovalid <= '0';
+        valid  <= '0';
         eom    <= '1';
         give   <= oready;
         eof_s  <= '0';
       when EOF =>
         som    <= '0';
-        ovalid <= '0';
+        valid  <= '0';
         eom    <= '0';
         give   <= '0';
         eof_s  <= '1';
-      when IDLE =>
-        som    <= '0';
-        ovalid <= '0';
-        eom    <= message_sizer_eom;
-        give   <= message_sizer_eom and oready;
-        eof_s  <= '0';
       when others =>
         som    <= '0';
-        ovalid <= '0';
+        valid  <= '0';
         eom    <= '0';
         give   <= '0';
         eof_s  <= '0';
@@ -299,7 +293,7 @@ begin
   oopcode <= opcode;
 
   message_sizer_rst <= rst or force_end_of_samples;
-  message_sizer_give <= '1' when ((give = '1') and
+  message_sizer_give <= '1' when ((valid = '1' and oready = '1') and
       (opcode = protocol.complex_short_with_metadata.SAMPLES)) else '0';
 
   message_sizer : protocol.protocol.message_sizer
@@ -309,10 +303,11 @@ begin
       clk                    => clk,
       rst                    => message_sizer_rst,
       give                   => message_sizer_give,
-      message_size_num_gives => to_unsigned(4092, 16),
+      message_size_num_gives => to_unsigned(protocol.complex_short_with_metadata.OP_SAMPLES_ARG_IQ_SEQUENCE_LENGTH, SAMPLES_MESSAGE_SIZE_BIT_WIDTH),
       som                    => message_sizer_som,
       eom                    => message_sizer_eom);
-
+  
+  ovalid       <= valid;
   ogive        <= give;
   osom         <= som;
   oeom         <= eom;
