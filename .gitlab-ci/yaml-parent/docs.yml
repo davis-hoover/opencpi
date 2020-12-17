@@ -1,7 +1,7 @@
 build:pages:
   rules:
     - when: on_success
-  stage: build-host
+  stage: build
   tags:
     - docker
   image: registry.gitlab.com/opencpi/opencpi/build-pages:latest
