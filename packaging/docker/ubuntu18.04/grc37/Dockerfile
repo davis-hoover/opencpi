@@ -1,6 +1,7 @@
 # Config used to override defaults in build.py. For path options, '...' means "OpenCPI root".
 # Additional build time mounts.
 # - build_mount: /opt/Xilinx:/opt/Xilinx:ro
+# - build_mount: .../scripts:/scripts:ro
 
 # This image takes about 24 hours to build from scratch
 
@@ -14,7 +15,7 @@ ARG TZ=UTC
 # iproute2, iputils-ping, and vim are for convenience
 RUN apt update  \
  && apt -y upgrade \
- && apt -y install git iproute2 iputils-ping nfs-common openvpn python-dev unzip vim wget zip \
+ && apt -y install git iproute2 iputils-ping python-dev unzip vim wget zip \
  && rm -rf /var/lib/{apt,cache,dkpg,log}
 
 # Clone all repos to prevent getting an out of date repo
@@ -23,8 +24,6 @@ ARG OCPI_BRANCH=develop
 RUN git clone --depth 1 --branch $OCPI_BRANCH https://gitlab.com/opencpi/opencpi.git /opencpi
 ARG PLUTO_BRANCH=develop
 RUN git clone --depth 1 --branch $PLUTO_BRANCH https://gitlab.com/opencpi/osp/ocpi.osp.plutosdr.git /opencpi/projects/osps/ocpi.osp.plutosdr
-ARG GR_BRANCH=opencpi-v2.0.0
-RUN git clone --depth 1 --branch $GR_BRANCH https://gitlab.com/opencpi/gnuradio.git /gnuradio
 
 # Every RUN command for OpenCPI from now on needs to start in /opencpi
 WORKDIR /opencpi
@@ -45,7 +44,7 @@ RUN bash -c "source cdk/opencpi-setup.sh -s \
 
 # Pluto RCC
 RUN bash -c "source cdk/opencpi-setup.sh -s \
- && ocpiadmin install platform adi_plutosdr0_32 ocpi.osp.plutosdr '' develop"
+ && ocpiadmin install platform adi_plutosdr0_32 -p ocpi.osp.plutosdr"
 
 # Pluto HDL
 RUN bash -c "source cdk/opencpi-setup.sh -s \
@@ -87,53 +86,9 @@ RUN sed -i '/variable_ocpi_container/d' grc_blocks/ocpi_block_tree.xml
 
 ##### End OpenCPI Stuff #####
 
-
-# Install software needed to build and install GRC 3.7
-RUN apt update \
- && apt -y install \
-      apt-utils \
-      cmake \
-      doxygen \
-      git \
-      g++ \
-      libboost-all-dev \
-      libcanberra-gtk-module \
-      libcomedi-dev \
-      libcppunit-dev \
-      libfftw3-dev \
-      libgsl-dev \
-      libqt4-opengl-dev \
-      libqwt-dev \
-      libsdl1.2-dev \
-      libusb-1.0-0-dev \
-      libzmq3-dev \
-      packagekit-gtk3-module \
-      pkg-config \
-      python-cheetah \
-      python-dev \
-      python-gtk2 \
-      python-lxml \
-      python-mako \
-      python-numpy \
-      python-qt4 \
-      python-sip-dev \
-      python-sphinx \
-      python-wxgtk3.0 \
-      swig \
-      xterm \
- && rm -rf /var/lib/{apt,cache,dkpg,log}
-
-# Build and install GNU Radio 3.7 with OpenCPI mods
-RUN cd /gnuradio \
- && git submodule update --init \
- && mkdir build \
- && cd build \
- && cmake ../ \
- && make -j4 \
- && make install \
- && ldconfig \
- && cd .. \
- && rm -rf build
+ARG GR_BRANCH=opencpi-v2.0.0
+RUN /scripts/install-gnuradio.sh -g $GR_BRANCH -c /gnuradio \
+ && rm -rf /var/lib/{apt,cache,dpkg,log}
 
 
 ##### Set some env vars needed for various things, but not for building
