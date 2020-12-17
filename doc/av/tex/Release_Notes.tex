@@ -86,6 +86,8 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v2.0.0 & Updates for 2.0.0 release & 10/2020 \\
 			\hline
+			v2.1.0 & Updates for 2.1.0 release & 12/2020 \\
+			\hline
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -119,6 +121,49 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 
 %\origsection{Release XXX}
 \def\ocpiversion{latest}  % Need to redefine so doc links are correct
+\section{Enhancements}
+
+\subsection{FSK Application on Matchstiq Z1}
+\label{sec:21_fsk_application}
+The matchstiq z1's lime device workers are now able to run in baseband loopback mode for the FSK application.
+
+\subsection{\code{ComplexShortWithMetadata-prot.xml} Sequence Length}
+\label{sec:21_seq_length}
+\code{ComplexShortWithMetadata-prot.xml} has been updated to use a sequence length of 4096 instead of 4092 for the ``iq'' argument of the samples operation.  Workers or primitives assuming a sequence length of 4092 should be updated to use 4096 instead.
+
+\subsection{Proxy Workers and Slaves Model}
+\label{sec:21_infer_slaves}
+An enhanced model of proxy workers and slaves has been implemented which renders previous methods obsolete and deprecated.  The new model is that a proxy worker's slaves are automatically included in the application when that worker is chosen for some component instance in the application.  A worker author specifies the slaves of a proxy in the form of a subassembly, which can have instance properties and connections.  External ports of the subassembly are associated with ports of the proxy such that application connections to the proxy's ports may be delegated to the external ports of the slave subassembly.
+In this way, the application does not care about the slaves and does not mention the slaves.  This allows applications to be more portable since they do not need to know about slaves at all.  This is particularly useful for the newly released Digital Radio Controller (DRC) component specification used for controlling radios, since different DRCs use different slaves.\\
+
+Workers in the slave assemblies (as well as HDL assemblies and the optional "worker" attribute of app instances) may now use fully qualified package-ids.
+
+\section{Changes and Notes}
+
+\subsection{\code{ocpigen}}
+\label{sec:21_ocpigen}
+64-bit initial values for 64-bit HDL worker parameters are now handled correctly.
+
+\section{Major Known Deficiencies}
+\label{sec:21_bugs}
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 2.1:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1392}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+% === End of 2.1.0
+
+\beginoldnotes
+\origsection{Release 2.0.0}
+\def\ocpiversion{v2.0.0}
 \section{Enhancements}
 
 \subsection{Deprecations}
@@ -245,7 +290,6 @@ The following deficiencies are still present in 2.0:
 
 % === End of 2.0.0
 
-\beginoldnotes
 \origsection{Release 1.7.0}
 \def\ocpiversion{v1.7.0}
 \section{Enhancements}
