@@ -10,6 +10,7 @@ Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/open
 - **app**: enable bbloopback mode for FSK application on matchstiq z1. (!422)(2c2ebb0d)
 - **devops**: add OSP support to yaml-generator.py. (!382)(bf7a9c77)
 - **devops**: implement child pipelines for cross-platform builds/tests. (!382)(bf7a9c77)
+- **devops**: Implemented grandchild pipelines so that more jobs can be dynamically generated. (!431)(c249580e)
 - **osp**: add support for zcu102. (!407)(444d760c)
 - **protocols**: update ComplexShortWithMetadata-prot.xml to use a sequence length of 4096 instead of 4092 for the iq argument of the samples operation. (!427)(34d0d193)
 - **runtime**: port delegation from proxies to slaves is now implemented. (!421)(b718ff61)
@@ -20,6 +21,7 @@ Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/open
 
 ### Bug Fixes
 - **runtime**: fix ocpiremote deploy not deploying boot files to correct remote directory. (!416)(56b316af)
+- **tools**: include bitstream argument in "ocpiremote restart" to prevent errors being thrown. (!371)(83566d76)
 - **tools**: improve gnuradio 3.8 install. (!405)(a18a710c)
 
 ### Miscellaneous

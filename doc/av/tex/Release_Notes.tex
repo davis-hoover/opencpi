@@ -123,6 +123,14 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 \def\ocpiversion{latest}  % Need to redefine so doc links are correct
 \section{Enhancements}
 
+\subsection{GNU Radio Installation Support}
+\label{sec:21_gnuradio_install}
+A new convenience script, \code{scripts/install-gnuradio.sh}, is available to install OpenCPI's modified version of GNU Radio 3.7 and GNU Radio Companion.  Supported host operating systems are CentOS 7 and Ubuntu 18.04.
+
+\subsection{ADI \code{mykonos} Library}
+\label{sec:21_mykonos_library}
+For those writing device workers (proxies) for the ad9371 (a.k.a. mykonos), the \code{mykonos} library has been added as a prerequisite library.
+
 \subsection{FSK Application on Matchstiq Z1}
 \label{sec:21_fsk_application}
 The matchstiq z1's lime device workers are now able to run in baseband loopback mode for the FSK application.
