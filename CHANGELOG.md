@@ -23,6 +23,7 @@ Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/open
 - **tools**: improve gnuradio 3.8 install. (!405)(a18a710c)
 
 ### Miscellaneous
+- **doc,runtime,tests,tools**: remove remaining CentOS 6 references and supporting code. (!403)(3b9c943b)
 - **comp**: make "socket_write.rcc" portable. (!418)(4755f36a)
 - **hdl base**: add ADI "mykonos" library as a prerequisite. (!385)(f2ec19c5)
 - **tools**: remove remaining BSV references and code from ocpigen. (!414)(8f73efd2)
