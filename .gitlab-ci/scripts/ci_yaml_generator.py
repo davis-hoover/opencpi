@@ -98,24 +98,24 @@ def set_ci_env():
     Simulates a pipeline environment by setting environment variables.
     This function should not be called except for testing.
     """
-    environ['CI_COMMIT_MESSAGE'] = '[ci zed:xilinx13_4]'
+    environ['CI_COMMIT_MESSAGE'] = ''
     environ['CI_PIPELINE_SOURCE'] = 'push'
     environ['CI_ROOT_ID'] = '1'
-    environ['CI_PLATFORM'] = 'plutosdr'
-    environ['CI_HOST_PLATFORM'] = 'centos7'
+    # environ['CI_PLATFORM'] = 'e31x'
+    # environ['CI_HOST_PLATFORM'] = 'centos7'
     environ['CI_DEFAULT_HOSTS'] = 'centos7'
-    environ['CI_PLATFORMS'] = 'zed'
+    environ['CI_PLATFORMS'] = 'e31x xsim'
     environ['CI_PIPELINE_ID'] = '0'
-    environ['CI_PROJECT_DIR'] = 'plutosdr'
+    environ['CI_PROJECT_DIR'] = 'opencpi'
     environ['CI_PROJECT_NAME'] = 'opencpi'
     environ['CI_COMMIT_REF_NAME'] = 'develop'
-    environ['CI_PROJECT_TITLE'] = 'plutosdr'
-    environ['CI_PROJECT_ID'] = '15332496'
-    environ['CI_UPSTREAM_ID'] = '2'
-    environ['CI_UPSTREAM_REF'] = 'develop'
+    environ['CI_PROJECT_TITLE'] = 'opencpi'
+    environ['CI_PROJECT_ID'] = '0'
+    # environ['CI_UPSTREAM_ID'] = '2'
+    # environ['CI_UPSTREAM_REF'] = 'develop'
     # environ['CI_UPSTREAM_PLATFORMS'] = 'plutosdr modelsim'
-    environ['CI_ROOT_SOURCE'] = 'pipeline'
-    environ['CI_ROOT_PLATFORMS'] = 'centos7 plutosdr'
+    # environ['CI_ROOT_SOURCE'] = 'pipeline'
+    # environ['CI_ROOT_PLATFORMS'] = 'centos7 plutosdr'
 
 
 if __name__ == '__main__':

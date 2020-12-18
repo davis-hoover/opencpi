@@ -11,6 +11,7 @@ Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/open
 - **devops**: add OSP support to yaml-generator.py. (!382)(bf7a9c77)
 - **devops**: implement child pipelines for cross-platform builds/tests. (!382)(bf7a9c77)
 - **devops**: implement grandchild pipelines so that more jobs can be dynamically generated. (!431)(c249580e)
+- **devops**: fix downstream pipelines failing due to environment variables not being set correctly. (!437)(72adeca8)
 - **osp**: add support for zcu102. (!407)(444d760c)
 - **protocols**: update ComplexShortWithMetadata-prot.xml to use a sequence length of 4096 instead of 4092 for the iq argument of the samples operation. (!427)(34d0d193)
 - **runtime**: port delegation from proxies to slaves is now implemented. (!421)(b718ff61)
