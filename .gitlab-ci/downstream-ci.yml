@@ -12,8 +12,6 @@ trigger-children:
   variables:
     CI_ROOT_SOURCE: "$CI_PIPELINE_SOURCE"
     CI_ROOT_ID: "$CI_PIPELINE_ID"
-    CI_UPSTREAM_ID: "$CI_UPSTREAM_ID"
-    CI_UPSTREAM_REF: "$CI_UPSTREAM_REF"
 generate-children:
   artifacts:
     paths:

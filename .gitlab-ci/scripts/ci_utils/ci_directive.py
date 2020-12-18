@@ -64,6 +64,9 @@ class Directive():
         Returns:
             List of Platforms with directive applied to it
         """
+        if not self.dict:
+            return platforms
+
         host_platforms = ci_platform.get_host_platforms(platforms)
         cross_platforms = ci_platform.get_cross_platforms(platforms)
         filtered_platforms = []
@@ -127,15 +130,12 @@ class Directive():
                 platforms = env.mr_platforms
             elif env.pipeline_source == 'push':     
                 commit_directive = re.search(r'\[ *ci (.*) *\]', 
-                                                env.commit_message)
+                                             env.commit_message)
                 if commit_directive:
                     platforms = commit_directive.group(1)
                 else:
                     platforms = env.platforms
             else:
-                return cls(platforms, env.default_hosts)
-        
-        if not platforms:
-            return cls([], env.default_hosts)
+                return cls('', env.default_hosts)
 
         return cls(platforms, env.default_hosts)
