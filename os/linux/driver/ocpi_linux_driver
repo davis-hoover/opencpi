@@ -28,10 +28,27 @@ if test "$OCPI_CDK_DIR" = "" -o "$OCPI_TOOL_DIR" = ""; then
   echo Error: this script "($0)" cannot be run without OCPI_CDK_DIR and OCPI_TOOL_DIR.
   exit 1
 fi
-if [ $# = 0 ]; then
-  echo Error: this script "($0)" needs a command: load, unload, reload, status
+usage() {
+  echo Comment usage is: $0 "[-m<mem>|--memory=<mem>|-v|--verbose] load|unload|reload|status "
   exit 1
-fi
+}
+[ $# = 0 ] && usage
+memory=
+while [ -n "$1" ]; do
+  case $1 in
+    -*) case $1 in
+          -m[0-9]*) memory=$(echo $1|sed 's/^-m//');;
+          -m|--memory) shift; memory=$1;;
+          --memory=*) memory=$(echo $1|sed 's/^--memory=//');;
+          -v|--verbose) set -vx;;
+          *)usage;;
+        esac
+        shift;;
+    load|unload|reload|status) break;;
+    *) usage;;
+  esac
+done
+[ -z "$memory" ] && memory=$OCPI_DRIVER_MEMORY
 
 MODNAME=opencpi
 SUDO=sudo
@@ -177,6 +194,9 @@ else
       INSARG=
     fi
   fi
+fi
+if [ "$memory" != "" ]; then
+  INSARG="$INSARG opencpi-size=$memory"
 fi
 if [ ! -r $MODPATH ] ; then
   echo The driver file: \"$MODPATH\" is missing or was never built.

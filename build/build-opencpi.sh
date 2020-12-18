@@ -87,16 +87,19 @@ echo "Now we will build the built-in OCL '(GPU)' components for the available OC
 for p in $Projects; do make -C projects/$p ocl; done
 
 # Build built-in HDL components
-[ -n "$HdlPlatforms" -o -n "$HdlPlatform" ] && {
+# [ -n "$HdlPlatforms" -o -n "$HdlPlatform" ] && {
   echo ================================================================================
-  echo "Since HdlPlatform(s) are specified, we will build the built-in HDL components for: $HdlPlatform $HdlPlatforms"
-  for p in $Projects; do make -C projects/$p hdl; done
-}
+  echo "Now we will build the built-in HDL components for platforms: $HdlPlatform $HdlPlatforms"
+  echo "Even if there are no HDL platforms, this step is still needed to build proxies"
+  for p in $Projects; do make -C projects/$p hdl HdlPlatforms="$HdlPlatforms $HdlPlatform"; done
+# }
 
 # Build tests
 echo ================================================================================
-echo "Now we will build the tests and examples for $OCPI_TARGET_PLATFORM"
+echo "Now we will build the core tests for $OCPI_TARGET_PLATFORM"
 make -C projects/core test
+echo ================================================================================
+echo "Now we will build the example applications in assets and inactive projects for $OCPI_TARGET_PLATFORM"
 make -C projects/assets applications
 make -C projects/inactive applications
 

@@ -505,6 +505,7 @@ class Worker : public OU::Worker {
 		    const std::string &parent),
     *finalizeProperties(),
     *finalizeHDL(),
+    *finalizeRCC(),
     *deriveOCP(),
     *hdlValue(const std::string &name, const OU::Value &v, std::string &value,
 	      bool param = false, Language = NoLanguage, bool finalized = false),

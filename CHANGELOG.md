@@ -1,4 +1,4 @@
-# [v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.1...v2.1.0-beta.1) (2020-12-16)
+# [v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.1...v2.1.0-beta.1) (2020-12-18)
 
 Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.1)
 
@@ -10,11 +10,12 @@ Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/open
 - **app**: enable bbloopback mode for FSK application on matchstiq z1. (!422)(2c2ebb0d)
 - **devops**: add OSP support to yaml-generator.py. (!382)(bf7a9c77)
 - **devops**: implement child pipelines for cross-platform builds/tests. (!382)(bf7a9c77)
-- **devops**: Implemented grandchild pipelines so that more jobs can be dynamically generated. (!431)(c249580e)
+- **devops**: implement grandchild pipelines so that more jobs can be dynamically generated. (!431)(c249580e)
 - **osp**: add support for zcu102. (!407)(444d760c)
 - **protocols**: update ComplexShortWithMetadata-prot.xml to use a sequence length of 4096 instead of 4092 for the iq argument of the samples operation. (!427)(34d0d193)
 - **runtime**: port delegation from proxies to slaves is now implemented. (!421)(b718ff61)
 - **runtime**: generic DRC helper class established in an API header OcpiDrcProxyApi.hh. (!421)(b718ff61)
+- **runtime**: update zed/fmcomms2 platform with new drc. (!433)(d494dad9)
 - **tools**: install-gnuradio.sh: add GNU Radio 3.8 support. (!401)(4c92ed80)
 - **tools**: add missing fields to the opencpi GRC blocks. (!425)(a40d1a90)
 - **tools**: ocpigen: add XML parsing for project assets. (!434)(30acd3d2)

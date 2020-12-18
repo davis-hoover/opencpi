@@ -371,8 +371,7 @@ parseHdlAssy() {
     wci->m_myClock = true;
     wci->m_clock = &clk;
     wci->m_clock->m_port = wci;
-    OU::Assembly::External *ext = new OU::Assembly::External;
-    ext->m_name = "wci";
+    OU::Assembly::External *ext = new OU::Assembly::External("wci");
     ext->m_role.m_provider = false; // provisional
     ext->m_role.m_bidirectional = false;
     ext->m_role.m_knownRole = true;
