@@ -1,4 +1,5 @@
-<HdlWorker language="vhdl" version="2" DataWidth="32" libraries="clocking cdc">
+<HdlWorker language="vhdl" version="2" DataWidth="32" libraries="clocking cdc"
+	   OnlyTargets='zynq xsim isim zynq_ise modelsim'>
   <ComponentSpec>
     <Property Name="CLK_IN_FREQUENCY_MHz" Type="float"
                                 Parameter="true"
