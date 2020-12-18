@@ -277,18 +277,7 @@ def make_trigger(host_platform, cross_platform, pipeline, generate_job=None,
         Job
     """
     stage = 'trigger-children'
-
-    try:
-        root_id = pipeline.ci_env.root_id
-        root_source = pipeline.ci_env.root_source
-    except:
-        root_id = pipeline.ci_env.pipeline_id
-        root_source = pipeline.ci_env.pipeline_source
-
-    variables = {
-        'CI_ROOT_ID': root_id,
-        'CI_ROOT_SOURCE': root_source,
-    }
+    variables = {}
 
     trigger = {
         'strategy': 'depend'
@@ -320,13 +309,12 @@ def make_trigger(host_platform, cross_platform, pipeline, generate_job=None,
         trigger['project'] = project
         trigger['branch'] = get_downstream_branch(project_id, pipeline.ci_env)
         variables['CI_UPSTREAM_REF'] = pipeline.ci_env.commit_ref_name
+        variables['CI_DIRECTIVE'] = pipeline.directive.str
 
         try:
             variables['CI_UPSTREAM_ID'] = pipeline.ci_env.root_id
-            variables['CI_UPSTREAM_PLATFORMS'] = pipeline.ci_env.root_platforms
         except:
             variables['CI_UPSTREAM_ID'] = pipeline.ci_env.pipeline_id
-            variables['CI_UPSTREAM_PLATFORMS'] = pipeline.ci_env.platforms
 
     job = Job(name, stage=stage, trigger=trigger, overrides=overrides,
               variables=variables)
@@ -417,11 +405,22 @@ def make_generate(host_platform, cross_platform, pipeline, overrides=None):
     ]
     before_script += make_before_script(stage, [], host_platform)
     variables = {}
+    variables['CI_DIRECTIVE'] = pipeline.directive.str
     variables['CI_PLATFORM'] = cross_platform.name
     variables['CI_HOST_PLATFORM'] = host_platform.name
-    variables['CI_DIRECTIVE'] = pipeline.directive.str
+
+    try:
+        variables['CI_ROOT_ID'] = pipeline.ci_env.root_id
+    except:
+        variables['CI_ROOT_ID'] = pipeline.ci_env.pipeline_id
+
+    try:
+        variables['CI_UPSTREAM_ID'] = pipeline.ci_env.upstream_id
+        variables['CI_UPSTREAM_REF'] = pipeline.ci_env.upstream_ref
+    except:
+        pass
     
-    if os.getenv('CI_PROJECT_NAME') != 'opencpi':
+    if pipeline.ci_env.project_name != 'opencpi':
         variables['GIT_STRATEGY'] = 'none'
         
     job = Job(name, stage=stage, script=script, tags=tags, image=image, 
@@ -581,9 +580,6 @@ def make_before_script(stage, stages, platform, host_platform=None,
 
     if do_clone:
         cmds += [
-            ' '.join(['if [ -z "$CI_UPSTREAM_ID" ];',
-                      'then export CI_UPSTREAM_REF="develop";',
-                      'fi']),
             ' '.join(['git clone --depth 1 --single-branch --branch',
                       upstream_ref,
                       '"https://gitlab.com/opencpi/opencpi.git"', 
