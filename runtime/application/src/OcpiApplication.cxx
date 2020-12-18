@@ -944,7 +944,13 @@ namespace OCPI {
         const char *newName = !strncasecmp(pName, "port", 4) ? pName + 4 : pName;
         // Override any port parameters that might have been set in XML
         // Override any same-named connection params
-        m_assembly.assyPort(instn, portn)->setParam(newName, value);
+	for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
+	  for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
+	    assert(!(*pi).m_name.empty());
+	    if (!strcasecmp((*pi).m_name.c_str(), p->cname()))
+		(*pi).setParam(newName, value);
+	  }
+        // m_assembly.assyPort(instn, portn)->setParam(newName, value);
       }
       return NULL;
     }

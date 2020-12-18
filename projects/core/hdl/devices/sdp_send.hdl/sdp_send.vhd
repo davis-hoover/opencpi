@@ -27,12 +27,19 @@ architecture rtl of worker is
   constant sdp_width_c    : natural := to_integer(sdp_width);
   constant memory_depth_c : natural := to_integer(memory_bytes) / (sdp_width_c * 4);
   constant addr_width_c   : natural := width_for_max(memory_depth_c - 1);
-  constant max_buffers_c  : natural := to_integer(max_buffers);
   constant addr_shift_c   : natural := width_for_max(sdp_width_c * 4 - 1);
-  constant count_width_c  : natural := width_for_max(max_buffers_c);
   constant nbytes_width_c : natural := width_for_max(sdp_width_c * 4); -- nbytes in frame
   constant max_remotes_c  : natural := to_integer(max_remotes);
   constant max_seg_dws_c  : natural := to_integer(sdp_length);
+
+  -- sdp_send is not really constrained by max_reads_outstanding, but this is the same
+  -- constraint as sdp_receive for now.
+  constant max_rem_buffers_c : natural := to_integer(max_buffers);
+  constant max_lcl_buffers_c : natural := ocpi.util.min(max_rem_buffers_c,max_reads_outstanding);
+  subtype lcl_buffer_count_t is unsigned(width_for_max(max_lcl_buffers_c) - 1 downto 0);
+  subtype lcl_buffer_idx_t is unsigned(width_for_max(max_lcl_buffers_c - 1) - 1 downto 0);
+  subtype rem_buffer_count_t is unsigned(width_for_max(max_rem_buffers_c) - 1 downto 0);
+  subtype rem_buffer_idx_t is unsigned(width_for_max(max_rem_buffers_c - 1) - 1 downto 0);
 
   subtype remote_idx_t is unsigned(width_for_max(ocpi.util.max(1,max_remotes_c - 1)) - 1 downto 0);
 
@@ -49,13 +56,12 @@ architecture rtl of worker is
   constant sdp_meta_ndws_c : natural := 2;
 
   -- Convenience data types
-  subtype buffer_count_t is unsigned(count_width_c - 1 downto 0);
   subtype bram_addr_t is unsigned(addr_width_c-1 downto 0);
 
   -- Dynamic state of a remote destination (static state is in properties)
   type remote_t is record
-    index     : buffer_count_t; -- which remote buffer are we sending to?
-    empty     : buffer_count_t; -- how many remote buffers are empty?
+    index     : rem_buffer_idx_t; -- which remote buffer are we sending to?
+    empty     : rem_buffer_count_t; -- how many remote buffers are empty?
     data_addr : whole_addr_t;
     meta_addr : whole_addr_t;
     flag_addr : whole_addr_t;
@@ -75,9 +81,9 @@ architecture rtl of worker is
   ---- WSI buffer filling pointers
   signal buffer_offset_r   : bram_addr_t;    -- offset in current buffer
   signal buffer_maxed_r    : bool_t;         -- last buffer offset addressed last word in buffer
-  signal buffer_index_r    : buffer_count_t;
+  signal buffer_index_r    : lcl_buffer_idx_t;
   signal buffer_addr_r     : bram_addr_t;    -- base of current buffer
-  signal buffer_avail_r    : buffer_count_t; -- how local many buffers are empty OR BEING FILLED
+  signal buffer_avail_r    : lcl_buffer_count_t; -- how local many buffers are empty OR BEING FILLED
   signal buffer_consumed   : bool_t;         -- pulse for buffer consumption from sdp side
   ---- Metadata management
   signal md_in             : metadata_t;
@@ -102,7 +108,7 @@ architecture rtl of worker is
   signal sdp_segment_count_r    : sdp.sdp.count_t;
   signal sdp_last_in_segment    : bool_t;
   -- State that changes for each msg
-  signal sdp_msg_idx_r          : buffer_count_t;
+  signal sdp_msg_idx_r          : lcl_buffer_idx_t;
   signal sdp_next_msg_addr      : bram_addr_t;
   signal sdp_msg_addr_r         : bram_addr_t;
   -- State that changes for each remote
@@ -216,8 +222,8 @@ begin
   -- wsi to sdp, telling SDP to send next buffer with this metadata, same clock domain
   metafifo : component bsv_pkg.SizedFifo
    generic map(p1Width      => metawidth_c,
-               p2depth      => roundup_2_power_of_2(max_buffers_c),
-               p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
+               p2depth      => roundup_2_power_of_2(max_lcl_buffers_c),
+               p3cntr_width => width_for_max(roundup_2_power_of_2(max_lcl_buffers_c)-1))
    port map   (CLK     => sdp_clk,
                RST     => sdp_reset_n,
                ENQ     => std_logic(md_enq),
@@ -233,7 +239,7 @@ begin
   -- control clock domain to sdp clock domain
   flagfifo : component cdc.cdc.fifo
    generic map(width       => remote_idx_t'length,
-               depth       => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2
+               depth       => roundup_2_power_of_2(max_rem_buffers_c)) -- must be power of 2
    port map   (src_CLK     => ctl_in.clk, -- maybe syncfifo later
                src_RST     => ctl_in.reset,
                dst_CLK     => sdp_clk,
@@ -312,7 +318,7 @@ begin
           if its(in_in.eom) then
             buffer_offset_r   <= (others => '0');
             buffer_maxed_r    <= bfalse;
-            if buffer_index_r = props_in.buffer_count - 1 then
+            if buffer_index_r = resize(props_in.buffer_count - 1, buffer_index_r'length) then
               buffer_index_r  <= (others => '0');
               buffer_addr_r   <= (others => '0');
             else
@@ -336,8 +342,9 @@ begin
                          to_bool(sdp_remote_idx_r = sdp_last_remote);
   sdp_last_in_segment <= to_bool(sdp_segment_dws_left_r = 0);
   -- What is the address of the next message in BRAM
-  sdp_next_msg_addr   <= sdp_msg_addr_r  when sdp_remote_idx_r /= sdp_last_remote else
-                         (others => '0') when sdp_msg_idx_r = props_in.buffer_count - 1 else
+  sdp_next_msg_addr   <= sdp_msg_addr_r when sdp_remote_idx_r /= sdp_last_remote else
+                         (others => '0') when sdp_msg_idx_r =
+                                              resize(props_in.buffer_count - 1, sdp_msg_idx_r'length) else
                          sdp_msg_addr_r + props_in.buffer_size(bram_addr_t'left + addr_shift_c
                                                                downto addr_shift_c);
   -- The BRAM address must be pipelined (early).
@@ -411,7 +418,7 @@ g0: for i in 0 to sdp_width_c-1 generate
       begin_segment(to_unsigned(1, meta_dw_count_t'length));
       -- Advance the buffer pointer here (not in flag_e) to pipeline the bram address
       if r = sdp_last_remote then
-        if sdp_msg_idx_r = props_in.buffer_count - 1 then
+        if sdp_msg_idx_r = resize(props_in.buffer_count - 1, sdp_msg_idx_r'length) then
           sdp_msg_idx_r    <= (others => '0');
         else
           sdp_msg_idx_r    <= sdp_msg_idx_r + 1;
@@ -462,7 +469,7 @@ g0: for i in 0 to sdp_width_c-1 generate
       sdp_remotes(r).data_addr <= data_addr;
       sdp_remotes(r).meta_addr <= meta_addr;
       sdp_remotes(r).flag_addr <= flag_addr;
-      if sdp_remotes(r).index = props_in.remote_buffer_count(r) - 1 then
+      if sdp_remotes(r).index = resize(props_in.remote_buffer_count(r) - 1, rem_buffer_idx_t'length) then
         sdp_remotes(r).index <= (others => '0');
       else
         sdp_remotes(r).index <= sdp_remotes(r).index + 1;
@@ -495,7 +502,7 @@ g0: for i in 0 to sdp_width_c-1 generate
       elsif not operating_r then
         -- reset state that depends on properties
         for r in 0 to max_remotes_c - 1 loop
-          sdp_remotes(r).empty <= resize(props_in.remote_buffer_count(r),buffer_count_t'length);
+          sdp_remotes(r).empty <= resize(props_in.remote_buffer_count(r), rem_buffer_count_t'length);
         end loop;
         sdp_msg_idx_r <= resize(props_in.buffer_count - 1, sdp_msg_idx_r'length);
       else
