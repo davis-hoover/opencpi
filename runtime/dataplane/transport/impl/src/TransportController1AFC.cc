@@ -313,10 +313,7 @@ produce(Buffer *buffer, bool bcast) {
     ocpiDebug("My rank != 0 so i am not producing !!!");
 
     // Next input buffer 
-    unsigned tmp = ((m_nextTid++) % m_input.getBufferCount()) - 1;
-    m_nextTid = tmp;
-    if (m_nextTid < 0)
-      m_nextTid = 0;
+    m_nextTid = (m_nextTid + 1) % m_input.getBufferCount();
     ocpiDebug("AFCTransferController:: m_nextTid = %d", m_nextTid );
 
     //#define DELAY_FOR_TEST
@@ -355,9 +352,6 @@ produce(Buffer *buffer, bool bcast) {
 
   // Next input buffer 
   m_nextTid = (m_nextTid + 1) % m_input.getBufferCount();
-  if ( m_nextTid < 0 ) {
-    m_nextTid = 0;
-  }
 
 #ifdef DEBUG_L2
   ocpiDebug("next tid = %d, num buf = %d", m_nextTid, m_input.getBufferCount());
