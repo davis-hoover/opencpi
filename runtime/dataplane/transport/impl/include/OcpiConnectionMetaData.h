@@ -60,7 +60,7 @@ namespace OCPI {
        * Constructors
        *********************************/
       ConnectionMetaData(DataTransfer::EndPoint *output_ep, DataTransfer::EndPoint *input_ep,
-			 int buf_count, int buf_size );
+			 unsigned buf_count, unsigned buf_size );
       ConnectionMetaData(DataTransfer::EndPoint &ep, OCPI::RDT::Descriptors& sPort);
       ConnectionMetaData();
 

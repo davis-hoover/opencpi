@@ -45,9 +45,7 @@
 #include <OcpiConnectionMetaData.h>
 #include <OcpiCircuit.h>
 #include <OcpiTransportConstants.h>
-#include <OcpiTransportGlobal.h>
-
-
+#include "TransportManager.hh"
 
 // Forward references
 namespace OCPI {
@@ -61,12 +59,10 @@ namespace DataTransfer {
   struct SMBResources;
 }
 
-namespace DtI = ::DataTransport::Interface;
-
 namespace OCPI {
 
   namespace DataTransport {
-    
+
     class Circuit;
 
     // New circuit request listener
@@ -105,10 +101,8 @@ namespace OCPI {
       /**********************************
        * Constructors
        *********************************/
-      Transport(OCPI::DataTransport::TransportGlobal* tpg,
-                bool uses_mailboxes, OCPI::Time::Emit * parent );
-      Transport(OCPI::DataTransport::TransportGlobal* tpg,
-                bool uses_mailboxes );
+      Transport(TransportManager *tpg, bool uses_mailboxes, OCPI::Time::Emit *parent);
+      Transport(TransportManager *tpg, bool uses_mailboxes);
 
       /**********************************
        * Destructor
@@ -258,8 +252,7 @@ namespace OCPI {
       static OCPI::Util::VList   active_transfers;
 
     public:
-      // Our transport global class
-      OCPI::DataTransport::TransportGlobal*            m_transportGlobal;
+      TransportManager *m_transportManager;
     };
 
   }

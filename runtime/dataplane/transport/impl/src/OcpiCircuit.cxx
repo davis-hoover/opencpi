@@ -44,6 +44,7 @@
 #include <OcpiParallelDataDistribution.h>
 #include <OcpiTransportConstants.h>
 #include <OcpiDataDistribution.h>
+#include <OcpiTransportExceptions.h>
 #include <OcpiPort.h>
 #include <OcpiTransport.h>
 #include <OcpiCircuit.h>
@@ -52,8 +53,7 @@
 #include <OcpiTransferTemplate.h>
 #include <OcpiOutputBuffer.h>
 #include <OcpiInputBuffer.h>
-#include <OcpiTransferController.h>
-#include <OcpiTemplateGenerators.h>
+#include "TransportController.hh"
 #include <OcpiList.h>
 #include <OcpiOsMisc.h>
 #include <OcpiOsAssert.h>
@@ -64,8 +64,6 @@
 
 using namespace OCPI::DataTransport;
 using namespace OCPI::OS;
-using namespace ::DataTransport::Interface;
-namespace DtI = ::DataTransport::Interface;
 namespace XF = DataTransfer;
 
 // our static init
@@ -100,157 +98,6 @@ Circuit(
   m_fromQ = false;
 
   ocpiDebug(" In Circuit::Circuit() this %p id is 0x%x\n", this, id);
-
-  // static init stuff goes here
-  if ( t->m_transportGlobal->m_Circuitinit == false ) {
-    t->m_transportGlobal->m_Circuitinit = true;
-
-    // This is where we fill in the matrix that is used to get the transfer
-    // temlpate generators
-    m_transport->m_transportGlobal->m_gen_temp_gen = new TransferTemplateGeneratorNotSupported();
-    int a,b,c,d,e,f,g,y;
-    for(a=0;a<2;a++)
-      for(b=0;b<2;b++)
-        for(c=0;c<2;c++)
-          for(d=0;d<2;d++)
-            for(e=0;e<2;e++)
-              for(f=0;f<OCPI::RDT::MaxRole;f++)
-                for(g=0;g<OCPI::RDT::MaxRole;g++)
-                  m_transport->m_transportGlobal->m_templateGenerators[a][b][c][d][e][f][g] = 
-                    m_transport->m_transportGlobal->m_gen_temp_gen;
-
-    m_transport->m_transportGlobal->m_gen_pat1 = new TransferTemplateGeneratorPattern1( );
-    //    m_transport->m_transportGlobal->m_gen_pat1passive = new TransferTemplateGeneratorPattern1Passive( );
-    m_transport->m_transportGlobal->m_gen_pat1AFC = new TransferTemplateGeneratorPattern1AFC( );
-    m_transport->m_transportGlobal->m_gen_pat1AFCShadow = new TransferTemplateGeneratorPattern1AFCShadow( );
-    m_transport->m_transportGlobal->m_gen_pat2 = new TransferTemplateGeneratorPattern2( );
-    m_transport->m_transportGlobal->m_gen_pat3 = new TransferTemplateGeneratorPattern3( );
-    m_transport->m_transportGlobal->m_gen_pat4 = new TransferTemplateGeneratorPattern4( );
-
-    //        output dd : input dd : output part : input part : "output shadow" : output role : input role
-    m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
-      = m_transport->m_transportGlobal->m_gen_pat1;
-    m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [true] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
-      = m_transport->m_transportGlobal->m_gen_pat1;
-
-    // If the output port is AFC, the same transfer pattern generator is used for any input port role
-    for( y=0; y<OCPI::RDT::MaxRole; y++) {
-
-      m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-        [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-        [false] [OCPI::RDT::ActiveFlowControl] [y] 
-        = m_transport->m_transportGlobal->m_gen_pat1AFC;
-
-      m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-        [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-        [true] [OCPI::RDT::ActiveFlowControl] [y] 
-        = m_transport->m_transportGlobal->m_gen_pat1AFCShadow;
-    }
-
-#if 0
-    // Passive is same whether input or output
-    // Fixme.  All other DD&P patterns have not yet beed ported to the new port "roles" paradigm
-    m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::Passive] [OCPI::RDT::ActiveOnly] 
-      = m_transport->m_transportGlobal->m_gen_pat1passive;
-    m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [true] [OCPI::RDT::ActiveOnly] [OCPI::RDT::Passive] 
-      = m_transport->m_transportGlobal->m_gen_pat1passive;
-#endif
-
-    m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::sequential]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
-      = m_transport->m_transportGlobal->m_gen_pat2;
-
-    m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::sequential][DataDistributionMetaData::sequential]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
-      = m_transport->m_transportGlobal->m_gen_pat3;
-
-    m_transport->m_transportGlobal->m_templateGenerators[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::BLOCK] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
-      = m_transport->m_transportGlobal->m_gen_pat4;
-
-    // Same thing for the transfer controllers
-    m_transport->m_transportGlobal->m_gen_control = new TransferControllerNotSupported();
-    for(a=0;a<2;a++)
-      for(b=0;b<2;b++)
-        for(c=0;c<2;c++)
-          for(d=0;d<2;d++)
-            for(e=0;e<2;e++)
-              for(f=0;f<OCPI::RDT::MaxRole;f++)
-                for(g=0;g<OCPI::RDT::MaxRole;g++)
-                  m_transport->m_transportGlobal->m_transferControllers[a][b][c][d][e][f][g]
-                    = m_transport->m_transportGlobal->m_gen_control;
-
-    
-    m_transport->m_transportGlobal->m_cont1 = new TransferController1();
-    //    m_transport->m_transportGlobal->m_cont1passive = new TransferController1Passive();
-    m_transport->m_transportGlobal->m_cont1AFCShadow = new TransferController1AFCShadow();
-    m_transport->m_transportGlobal->m_cont2 = new TransferController2();
-    m_transport->m_transportGlobal->m_cont3 = new TransferController3();
-    m_transport->m_transportGlobal->m_cont4 = new TransferController4();
-
-    //        output dd : input dd : output part : input part : "output shadow" : output role : input role
-    m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
-      = m_transport->m_transportGlobal->m_cont1;
-
-    m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [true] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
-      = m_transport->m_transportGlobal->m_cont1;
-
-    // If the output port is AFC, the same controller is used for any input port role
-    for( y=0; y<OCPI::RDT::MaxRole; y++) {
-      m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
-        [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-        [true] [OCPI::RDT::ActiveFlowControl] [y] 
-        = m_transport->m_transportGlobal->m_cont1AFCShadow;
-
-      m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
-        [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-        [false] [OCPI::RDT::ActiveFlowControl] [y] 
-        = m_transport->m_transportGlobal->m_cont1AFCShadow;
-    }
-#if 0
-    m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [true] [OCPI::RDT::Passive] [OCPI::RDT::ActiveOnly] 
-      = m_transport->m_transportGlobal->m_cont1passive;
-
-    m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::ActiveOnly] [OCPI::RDT::Passive] 
-        = m_transport->m_transportGlobal->m_cont1passive;
-#endif
-    // Fixme.  All other DD&P patterns have not yet beed ported to the new port "roles" paradigm
-    m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel][DataDistributionMetaData::sequential]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveMessage] 
-      = m_transport->m_transportGlobal->m_cont2;
-
-    m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::sequential][DataDistributionMetaData::sequential]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveMessage] 
-      = m_transport->m_transportGlobal->m_cont3;
-
-    m_transport->m_transportGlobal->m_transferControllers[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
-      [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::BLOCK] 
-      [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveMessage] 
-      = m_transport->m_transportGlobal->m_cont4;
-
-  }
-  //  m_init++;
 
   // Now we can initialize our port sets.
   update();
@@ -993,37 +840,16 @@ createCircuitTemplateGenerators()
     ocpiAssert( input_role < OCPI::RDT::MaxRole );
 
 
-    // Fixme for DD&P, we need to get "our" port when scaled to support "mixed" role transfers.
-    TransferController* controller = m_transport->m_transportGlobal->m_transferControllers
-      [output_dd->getMetaData()->distType]
-      [input_dd->getMetaData()->distType]
-      [output_part->getData()->dataPartType]
-      [input_part->getData()->dataPartType]
-      [output_port_set->getPort(0)->isShadow()]
-      [output_role]
-      [input_role]
-      ->
-      createController( output_port_set, input_port_set, whole);
+    Controller &controller =
+      m_transport->m_transportManager->getController(*m_transport, *m_outputPs, *getInputPortSet(n));
 
-    // Here is where we specialize the template generators
-    m_transport->m_transportGlobal->m_templateGenerators
-      [output_dd->getMetaData()->distType]
-      [input_dd->getMetaData()->distType]
-      [output_part->getData()->dataPartType]
-      [input_part->getData()->dataPartType]
-      [output_port_set->getPort(0)->isShadow()]
-      [output_port_set->getPort(0)->getMetaData()->m_descriptor.role]
-      [input_port_set->getPort(0)->getMetaData()->m_descriptor.role]
-      ->
-      createTemplates( m_transport, output_port_set, input_port_set, controller);
-          
     // Attach the controller
-    input_port_set->setTxController( controller );
+    input_port_set->setTxController( &controller );
 
     // For now we will add the last controler to the output port set.
     // This may change as the design evolves.  It is primarily used to
     // determine what the next output buffer should be
-    output_port_set->setTxController( controller );
+    output_port_set->setTxController( &controller );
 
   }
 

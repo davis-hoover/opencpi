@@ -42,7 +42,8 @@
 #include "OcpiTransport.h"
 #include "OcpiCircuit.h"
 #include "OcpiRDTInterface.h"
-#include "OcpiTransferController.h"
+#include "OcpiTransportExceptions.h"
+#include "TransportController.hh"
 #include "OcpiPort.h"
 
 
@@ -403,12 +404,12 @@ getPortDescriptor(OCPI::RDT::Descriptors& desc, const OCPI::RDT::Descriptors *ot
 #if 1
   desc.desc.fullFlagValue = 1;
 #else
-  if ( getCircuit()->m_transport->m_transportGlobal->useEvents() ) {
+  if ( getCircuit()->m_transport->m_transportManager->useEvents() ) {
 
     ocpiDebug("We are using EVENTS\n");
                 
     int lr,hr;
-    getCircuit()->m_transport->m_transportGlobal->getEventManager()->getEventRange(lr,hr);
+    getCircuit()->m_transport->m_transportManager->getEventManager()->getEventRange(lr,hr);
     desc.desc.fullFlagValue = 1 | 
       ((OCPI::OS::uint64_t)(lr+1)<<32) | (OCPI::OS::uint64_t)1<<63;
     ocpiDebug("OcpiPort: low range = %d, high range = %d, flag = 0x%llx\n", lr, hr, (long long)desc.desc.fullFlagValue);
@@ -1379,9 +1380,9 @@ createInputOffsets()
       m_data->m_shadowPortDescriptor.desc.emptyFlagPitch = sizeof(BufferState);
 
 #if 0
-      if ( getCircuit()->m_transport->m_transportGlobal->useEvents() ) {
+      if ( getCircuit()->m_transport->m_transportManager->useEvents() ) {
         int lr,hr;
-        getCircuit()->m_transport->m_transportGlobal->getEventManager()->getEventRange(lr,hr);
+        getCircuit()->m_transport->m_transportManager->getEventManager()->getEventRange(lr,hr);
         m_data->m_shadowPortDescriptor.desc.emptyFlagValue = 
           ((OCPI::OS::uint64_t)(lr)<<32) 
           | (OCPI::OS::uint64_t)1<<63;
@@ -1433,7 +1434,7 @@ hasFullInputBuffer()
   if ( getCircuit()->isCircuitOpen() ) {
     return false;
   }
-  TransferController* txc = getPortSet()->getTxController();
+  auto txc = getPortSet()->getTxController();
   if ( txc == NULL ) {
     return false;
   }
@@ -1483,7 +1484,7 @@ getNextFullInputBuffer(uint8_t *&data, size_t &length, uint8_t &opcode, bool &en
   OU::SelfAutoMutex guard(c); // FIXME: refactor to make this a circuit method
   if (!hasFullInputBuffer())
     return NULL;
-  TransferController* txc = getPortSet()->getTxController();
+  auto txc = getPortSet()->getTxController();
   InputBuffer* buf = 
     static_cast<InputBuffer*>(txc->getNextFullInputBuffer(this));
   if (buf) {

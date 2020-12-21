@@ -41,17 +41,11 @@
 #include <OcpiParentChild.h>
 #include <OcpiTimeEmit.h>
 
-namespace  OCPI {
-  namespace DataTransport {
-    class TransferController;
-  }
-}
-
 namespace OCPI {
-
   namespace DataTransport {
 
     // Forward references
+    class Controller;
     class Circuit;
     class Port;
     class Buffer;
@@ -117,8 +111,8 @@ namespace OCPI {
       /**********************************
        * Get/Set transfer controller
        *********************************/
-      TransferController* getTxController();
-      void setTxController ( TransferController* t );
+      Controller* getTxController();
+      void setTxController (Controller *t);
 
       /**********************************
        * Get the port count
@@ -175,7 +169,7 @@ namespace OCPI {
       /**********************************
        * Informs the shadow port that it can now queue a pull data
        * transfer from the real port.
-       *********************************/      
+       *********************************/
       Buffer* pullData( Buffer* buffer );
 
     protected:
@@ -184,7 +178,7 @@ namespace OCPI {
       bool m_output;
 
       // Our transfer template
-      TransferController* m_transferController;
+      Controller* m_transferController;
 
       // Our data
       PortSetData m_data;
@@ -200,7 +194,7 @@ namespace OCPI {
      * inline declarations
      ****
      *********************************/
-    inline TransferController* PortSet::getTxController(){return m_transferController;}
+    inline Controller* PortSet::getTxController(){return m_transferController;}
     inline PortOrdinal PortSet::getPortCount(){return m_data.portCount;}
     inline OCPI::OS::uint32_t PortSet::getBufferCount(){return m_data.psMetaData->bufferCount;}
     inline OCPI::OS::uint32_t PortSet::getBufferLength(){return m_data.psMetaData->bufferLength;}

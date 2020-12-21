@@ -34,21 +34,19 @@
 #include <OcpiParallelDataDistribution.h>
 #include <OcpiIntSequentialDataDistribution.h>
 #include <OcpiPortSetMetaData.h>
-#include <OcpiTransportGlobal.h>
 #include <OcpiTransport.h>
 #include <OcpiConnectionMetaData.h>
 #include <stdlib.h>
 
 using namespace OCPI::DataTransport;
 using namespace DataTransfer;
-using namespace DtI;
 using namespace OCPI::OS;
 
 
 // This constructor is used to create a simple point to point Whole/Par ->Par/Whole circuit
 ConnectionMetaData::ConnectionMetaData( EndPoint *source_ep, EndPoint* target_ep, 
-					int  buf_count,
-					int  buf_len)
+					unsigned  buf_count,
+					unsigned  buf_len)
   : m_portSetMd(0) 
 {
 

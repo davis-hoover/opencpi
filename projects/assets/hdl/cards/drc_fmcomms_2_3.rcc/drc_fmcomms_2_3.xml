@@ -52,6 +52,12 @@
       <Port name='out' instance='rx_cic_dec0'/>
       <External name='rx' index='0'/>
     </Connection>
+
+    <!-- DRC RX1 path slaves -->
+    <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'
+	    name='rx_qadc1' connect='rx_cswm_to_iqstream1'>
+      <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
+    </Instance>
     <Instance worker='ocpi.assets.misc_comps.cswm_to_iqstream.hdl'
 	    name='rx_cswm_to_iqstream1' connect='rx_complex_mixer1'/>
     <Instance worker="ocpi.assets.dsp_comps.complex_mixer.hdl"

@@ -1590,7 +1590,7 @@ sendRDMA(const char **ap) {
   if (!*ap)
     setupDevice(false);
   std::string file;
-  OD::TransportGlobal &global(OC::Manager::getTransportGlobal());
+  OD::TransportManager &global(OC::Manager::getTransportManager());
   OD::Transport transport(&global, false);
   OD::Descriptor myOutputDesc;
   myOutputDesc.type = OD::ProducerDescT;

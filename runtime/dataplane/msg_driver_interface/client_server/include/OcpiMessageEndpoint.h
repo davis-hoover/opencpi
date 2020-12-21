@@ -76,7 +76,7 @@ namespace OCPI {
       // Set for convenient removal
       typedef std::set<MessageEndpoint *> MessageEndpoints;
       static MessageEndpoints s_messageEndpoints;
-      TransportGlobal &m_transportGlobal;
+      TransportManager &m_transportManager;
       Transport *m_transport;             // a pointer for resource management during construction
       DataTransfer::EndPoint *m_endpoint; // ditto
       // These are just bookkeepping for the destructor

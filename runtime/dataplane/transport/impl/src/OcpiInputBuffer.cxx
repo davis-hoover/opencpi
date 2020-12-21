@@ -36,7 +36,7 @@
 #include <OcpiOutputBuffer.h>
 #include <OcpiOsAssert.h>
 #include <OcpiUtilAutoMutex.h>
-#include <OcpiTransferController.h>
+#include "TransportController.hh"
 #include <OcpiPullDataDriver.h>
 #include <OcpiTimeEmitCategories.h>
 #include "XferEndPoint.h"

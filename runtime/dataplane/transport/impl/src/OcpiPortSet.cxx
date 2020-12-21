@@ -35,7 +35,7 @@
 #include <OcpiPortSet.h>
 #include <OcpiPort.h>
 #include <OcpiCircuit.h>
-#include <OcpiTransferController.h>
+#include "TransportController.hh"
 
 using namespace OCPI::DataTransport;
 using namespace DataTransfer;
@@ -101,11 +101,9 @@ update( PortSetMetaData* psmd )
 /**********************************
  * Set the controller
  *********************************/
-void 
-PortSet::
-setTxController ( TransferController* t )
-{
-  m_transferController=t;
+void PortSet::
+setTxController(Controller *t) {
+  m_transferController = t;
 }
 
 

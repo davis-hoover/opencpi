@@ -103,7 +103,7 @@ namespace DataTransport {
        * Is this transfer in use
        *********************************/
       virtual bool isComplete()=0;
-      virtual bool isSlave(){return false;}
+      //      virtual bool isSlave(){return false;} AFC template set this to true?
 
       /**********************************
        * Start the produce

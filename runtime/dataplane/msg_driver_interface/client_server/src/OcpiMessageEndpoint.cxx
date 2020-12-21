@@ -40,16 +40,16 @@ namespace OCPI {
     // Getting our endpoint might end up creating a new one, and if so we want to nuke it
     MessageEndpoint::
     MessageEndpoint(const char *a_endpoint)
-      : m_transportGlobal(*new TransportGlobal(0, (char**)0)),
+      : m_transportManager(*new TransportManager(0, (char**)0)),
 	m_transport(NULL), m_endpoint(NULL) {
       try {
-	m_transport = new Transport(&m_transportGlobal, true);
+	m_transport = new Transport(&m_transportManager, true);
 	m_transport->setNewCircuitRequestListener(this);
 	m_endpoint = &m_transport->getLocalCompatibleEndpoint(a_endpoint, true);
       } catch (...) {
 	if (m_transport)
 	  delete m_transport;
-	delete &m_transportGlobal;
+	delete &m_transportManager;
 	throw;
       }
       m_transport->setListeningEndpoint(m_endpoint);
@@ -70,7 +70,7 @@ namespace OCPI {
 	m_halfCircuits.erase(i);
       }
       delete m_transport;
-      delete &m_transportGlobal;
+      delete &m_transportManager;
       s_messageEndpoints.erase(this);
     }
 

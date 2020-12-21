@@ -67,20 +67,20 @@ typedef struct TransferDesc_ TransferDesc;
 // FIXME have recursive mutex with default constructor
 // Constructors
 Transport::
-Transport( TransportGlobal* tpg, bool uses_mailboxes, OCPI::Time::Emit * parent  )
+Transport( TransportManager *tpg, bool uses_mailboxes, OCPI::Time::Emit * parent  )
   : OCPI::Time::Emit(parent, "Transport"), m_defEndpoint(NULL),
     m_uses_mailboxes(uses_mailboxes), m_mutex(*new OS::Mutex(true)),
-    m_nextCircuitId(0), m_CSendpoint(NULL), m_CScomms(NULL), m_transportGlobal(tpg)
+    m_nextCircuitId(0), m_CSendpoint(NULL), m_CScomms(NULL), m_transportManager(tpg)
 {
   OU::AutoMutex guard ( m_mutex, true ); 
   init();
 }
 
 Transport::
-Transport( TransportGlobal* tpg, bool uses_mailboxes )
+Transport( TransportManager *tpg, bool uses_mailboxes )
   : OCPI::Time::Emit("Transport"), m_defEndpoint(NULL),
     m_uses_mailboxes(uses_mailboxes), m_mutex(*new OS::Mutex(true)),
-    m_nextCircuitId(0), m_CSendpoint(NULL), m_CScomms(NULL), m_transportGlobal(tpg)
+    m_nextCircuitId(0), m_CSendpoint(NULL), m_CScomms(NULL), m_transportManager(tpg)
 {
   OU::AutoMutex guard ( m_mutex, true ); 
   init();

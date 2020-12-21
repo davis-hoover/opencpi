@@ -43,7 +43,7 @@ namespace OCPI {
       : //m_ourUID(mkUID()),
       OCPI::Time::Emit("Container", a_name ),
       m_enabled(false), m_ownThread(true), m_verbose(false), m_thread(NULL),
-      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportGlobal(params), false, this))
+      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportManager(params), false, this))
     {
       OU::findBool(params, "verbose", m_verbose);
       OU::SelfAutoMutex guard (this);
