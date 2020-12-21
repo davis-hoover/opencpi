@@ -839,10 +839,23 @@ define OcpiSetProjectX
   PackageNameSaved:=$$(PackageName)
   export PackageName:=
 
-  # Include Project.mk to determine ProjectPackage
+  # Include Project.mk or Project.xml to determine ProjectPackage
   $$(infox PR0:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
-  include $1/Project.mk
+  ifneq ($(wildcard $1/Project.xml),)
+    # Handle XML, aka make-less, properties for project assets
+    ifneq ($(wildcard $1/Project.mk),)
+      $$(warning Both Project.mk and Project.xml were found in $1)
+    endif
+    $(if $(call DoShell,ocpigen -R $1/Project.xml|tr "\n" ";"|tr " " "&",\
+     OcpiProps),$(error ocpigen failed),\
+     $(foreach var,$(subst ;, ,$(OcpiProps)),\
+     $(eval $(subst &, ,$(var)))))
+  else
+    # Legacy support for project assets
+    include $1/Project.mk
+  endif
   $$(infox PR1:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
+
   # Determine ProjectPackage as follows:
   # If it is already set, use it as-is
   # If ProjectPackage or Package is set, use that as-is
