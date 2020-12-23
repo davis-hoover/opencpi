@@ -65,7 +65,7 @@ if (Ft == 0): # Generate DC data
     gain = AMPLITUDE
     num_cycles = 1
 else: # Generate a complex waveform with a tone
-    Fs = float(1024000 / R)    # sample frequency
+    Fs = np.floor(float(1024000 / R))    # sample frequency
     Ts = 1.0 / Fs             # sampling interval
     t = np.arange(0,1,Ts,dtype=np.float)
     T1 = 50.0                  # frequency of target signal
