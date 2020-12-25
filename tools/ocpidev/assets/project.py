@@ -1123,8 +1123,12 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         ocpiutil.write_file_from_string( proj_dir + "/.gitattributes", ocpitemplate.PROJ_GIT_ATTR)
         template = jinja2.Template(ocpitemplate.PROJ_MAKEFILE, trim_blocks=True)
         ocpiutil.write_file_from_string( proj_dir + "/Makefile", template.render(**template_dict))
+        # TODO: Once traditional XML is used, delete the next two lines
         template = jinja2.Template(ocpitemplate.PROJ_PROJECT_MK, trim_blocks=True)
         ocpiutil.write_file_from_string( proj_dir + "/Project.mk", template.render(**template_dict))
+        # TODO: For traditional XML, replace PROJ_PROJECT_XML_LEGACY with PROJ_PROJECT_XML
+        template = jinja2.Template(ocpitemplate.PROJ_PROJECT_XML_LEGACY, trim_blocks=True)
+        ocpiutil.write_file_from_string( proj_dir + "/Project.xml", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.PROJ_GUI_PROJECT, trim_blocks=True)
         ocpiutil.write_file_from_string( proj_dir + "/.project", template.render(**template_dict))
 
