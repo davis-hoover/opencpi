@@ -31,3 +31,6 @@ zed_ise:
   overrides:
     variables:
       OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
+zed:
+  ip: 10.0.0.42
+  port: 1000

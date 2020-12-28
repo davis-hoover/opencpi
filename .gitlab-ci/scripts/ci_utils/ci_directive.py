@@ -77,7 +77,7 @@ class Directive():
                 continue
 
             cross_platform.linked_platforms = ci_platform.get_linked_platforms(
-                cross_platform, cross_platforms, self.dict)
+                cross_platform, cross_platform.linked_platforms, self.dict)
 
         # Filter host platform and cross platforms to those only specified in
         # directive
