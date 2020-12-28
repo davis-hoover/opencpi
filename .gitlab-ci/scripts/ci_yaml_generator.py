@@ -46,6 +46,8 @@ def main():
         print(platform.name)
         for cross_platform in platform.cross_platforms:
             print('\t', cross_platform.name)
+            for linked_platform in cross_platform.linked_platforms:
+                print('\t\t', linked_platform.name)
 
     # Make pipeline
     pipeline = Pipeline(pipeline_path, ci_env, directive)

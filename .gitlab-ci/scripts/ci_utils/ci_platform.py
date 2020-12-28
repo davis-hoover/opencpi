@@ -193,13 +193,20 @@ def apply_whitelist(platforms, whitelist):
         # Filter cross_platforms for each host_platform
         platform_whitelist = whitelist[host_platform.name]
         for cross_platform in cross_platforms:
-            if not platform_whitelist:
-                continue
             if cross_platform.name not in platform_whitelist:
                 continue
+
+            linked_whitelist = platform_whitelist[cross_platform.name]
+            if linked_whitelist:
+                linked_platforms = []
+                for linked_platform_name in linked_whitelist:
+                    linked_platform = get_platform(linked_platform_name, 
+                                                   cross_platforms)
+                    if linked_platform:
+                        linked_platforms.append(linked_platform)
+                cross_platform.linked_platforms = linked_platforms
             
-            # If cross_platform is in both whitelist and directive, add to
-            # host_platform
+            # If cross_platform is in both whitelist, add to host_platform
             host_platform.cross_platforms.append(cross_platform)
 
         filtered_platforms.append(host_platform)
