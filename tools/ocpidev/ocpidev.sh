@@ -783,9 +783,15 @@ function do_protocol_or_spec {
   esac
   if [ "$verb" == delete ]; then
     [ -e "$subdir/$file" ] || bad the file \"$subdir/$file\" does not exist
-    ask delete the file \"$subdir/$file\"
+    ask delete the file \"$subdir/$file\" and symlinks
     rm $subdir/$file
-    [ -z "$verbose" ] || echo The $2 \"$1\" in file $subdir/$file has been deleted.
+    if [ -z "$verbose" ]; then
+       find | grep $noun.xml | xargs -i -t rm -f {} 2>/dev/null
+    else
+       echo The file \"$subdir/$file\" has been deleted.
+       find | grep $noun.xml | xargs -i -t rm -f {}
+       echo Symlinks have also been deleted.
+    fi
     return 0
   fi
   [ -e "$subdir/$file" ] && bad the file \"$subdir/$file\" already exists
