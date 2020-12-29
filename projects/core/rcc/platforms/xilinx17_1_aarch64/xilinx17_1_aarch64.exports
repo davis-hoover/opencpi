@@ -15,3 +15,6 @@
 
 # Use the default zynq file unless overridden by hardware
 =platforms/zynq/zynq_system.xml system.xml
+@platforms/zynq/zynq_*setup.sh opencpi/
+@platforms/zynq/default_my*setup.sh opencpi/
+@platforms/zynq/zynq_setup*common.sh opencpi/
