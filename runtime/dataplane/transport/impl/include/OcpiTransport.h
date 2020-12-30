@@ -40,9 +40,7 @@
 #include <OcpiParentChild.h>
 #include <OcpiTimeEmit.h>
 #include "XferException.h"
-#include <DtIntEventHandler.h>
 #include "XferEndPoint.h"
-#include <OcpiConnectionMetaData.h>
 #include <OcpiCircuit.h>
 #include <OcpiTransportConstants.h>
 #include "TransportManager.hh"
@@ -125,12 +123,12 @@ namespace OCPI {
        *********************************/
       // ports in the connection are used.
       Circuit * createCircuit(CircuitId cid, // when zero, allocate one
-                              ConnectionMetaData* connection,                
-                              PortOrdinal src_ports[]=NULL,        
-                              PortOrdinal dest_ports[]=NULL,        
+			      DataTransfer::EndPoint *outEp, OCPI::RDT::Descriptors *outDesc,
+			      DataTransfer::EndPoint *inEp,
+			      unsigned bufCount, unsigned bufLen,
                               uint32_t flags = 0,
 			      const char *protocol = NULL,
-			      OCPI::OS::Timer *timer = 0); 
+			      OCPI::OS::Timer *timer = 0);
 
       // ports in the connection are used.
       //Circuit * createCircuit( DataTransfer::EndPoint *ep );

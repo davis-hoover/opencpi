@@ -65,7 +65,7 @@ protected:
   }
   RCCResult prepare_written() {
     log(8, "prepare config %u", m_properties.prepare);
-    unsigned config = m_properties.start;
+    unsigned config = m_properties.prepare;
     if (config >= OCPI_DRC_MAX_CONFIGURATIONS)
       return setError("Configuration %u started, but is out of range (0 to %u)",
 		      config, OCPI_DRC_MAX_CONFIGURATIONS - 1);

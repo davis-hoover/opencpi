@@ -34,7 +34,7 @@
 #define OCPI_DataTransport_DataDistribution
 
 #include <OcpiIntDataDistribution.h>
-#include <OcpiTransferTemplate.h>
+#include "TransportTransfer.hh"
 
 namespace OCPI {
 
@@ -76,7 +76,7 @@ namespace OCPI {
        * the distribution type, this template will be created with the proper offset(s) into
        * the source, offsets into the target(s) and appropriate control structures.
        **********************************/
-      TransferTemplate* getTxTemplate( OCPI::DataTransport::Buffer* src );
+      Transfer* getTxTemplate( OCPI::DataTransport::Buffer* src );
 
     private:
 

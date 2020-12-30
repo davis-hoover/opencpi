@@ -18,23 +18,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Abstract:
- *   This file contains the OCPI transfer controller interface.
- *
- * Revision History:
- *
- *    Author: John F. Miller
- *    Date: 1/2005
- *    Revision Detail: Created
- *
- */
+// This file declares the controller interface
+// Controllers setup and manage data movement between port set pairs
 
 #ifndef OCPI_DataTransport_Controller_H_
 #define OCPI_DataTransport_Controller_H_
 
 #include "OcpiUtilMisc.h"
-#include "OcpiTransferTemplate.h"
+#include "TransportTransfer.hh"
 #include "OcpiBuffer.h"
 #include "OcpiOutputBuffer.h"
 #include "OcpiUtilRefCounter.h"
@@ -56,26 +47,53 @@ public:
     OUTPUT,
     INPUT
   };
-protected:
-  unsigned  m_nextTid;  // Next input temporal id
 private:
   unsigned  m_FillQPtr;
   unsigned  m_EmptyQPtr;
+  // Each PortPair struct has the transfers between that output-to-input pair
+  struct OutPort2InPort {
+    std::vector<Transfer *> m_outputTransfers, m_outputBroadcastTransfers;
+    std::vector<Transfer *> m_inputTransfers, m_inputBroadcastTransfers;
+  };
+  std::vector<OutPort2InPort> m_inPort2outPort;
+
 protected:
   PortSet   &m_output;
   PortSet   &m_input;
-  bool      m_isWholeOutputSet;
+  unsigned  m_nextTid;  // Next input temporal id
   bool      m_zcopyEnabled;
-  // transfer templates[output port][output buf tid][input port][input buf tid][broadcast][input/output]
-  OcpiTransferTemplate* m_templates[MAX_PCONTRIBS] [MAX_BUFFERS] [MAX_PCONTRIBS] [MAX_BUFFERS] [2]  [2];
+  bool      m_isWholeOutputSet;
 
 public:
   Controller(PortSet &output, PortSet &input);
   virtual ~Controller();
 
   //================================================================================
-  // Setup methods, creating the transfer templates
-  void createTransferTemplates(Transport &transport);
+  // Setup methods
+  void init(); // must be called after constructor returns
+  std::vector<Transfer *> &getTransfers(unsigned outPort, unsigned outBuffer, unsigned inPort, unsigned inBuffer,
+					bool broadcast, TransferType inout) {
+    assert(outPort < m_output.getPortCount() && inPort < m_input.getPortCount() &&
+	   outBuffer < m_output.getBufferCount() && inBuffer < m_input.getBufferCount());
+    auto &out2in = m_inPort2outPort[outPort * m_input.getPortCount() + inPort];
+    return broadcast ?
+      (inout == OUTPUT ? out2in.m_outputBroadcastTransfers : out2in.m_inputBroadcastTransfers) :
+      (inout == OUTPUT ? out2in.m_outputTransfers : out2in.m_inputTransfers);
+  }
+protected:
+  inline Transfer &
+  getTemplate(unsigned outPort, unsigned outBuffer, unsigned inPort, unsigned inBuffer,
+	      bool broadcast, TransferType inout) {
+    return
+      *getTransfers(outPort, outBuffer, inPort, inBuffer, broadcast, inout)
+      [outBuffer * m_input.getBufferCount() + inBuffer];
+  }
+  inline void
+  setTemplate(Transfer &temp, unsigned outPort, unsigned outBuffer, unsigned inPort,
+	      unsigned inBuffer, bool broadcast = false, TransferType inout = OUTPUT) {
+    getTransfers(outPort, outBuffer, inPort, inBuffer, broadcast, inout)
+      [outBuffer * m_input.getBufferCount() + inBuffer] = &temp;
+  }
   virtual void createInputTransfers(Port &input);
   virtual void createOutputTransfers(Port &output) = 0; // no default
   virtual void createOutputBroadcastTemplates(Port &output);
@@ -83,19 +101,7 @@ public:
 
   //================================================================================
   // Runtime methods
-  virtual void modifyOutputOffsets(Buffer *me, Buffer *new_buffer, bool reverse);
 
-  // determine if a transfer can be started while a previous transfer is queued.
-  virtual bool canTransferBufferWhileOthersAreQueued() { return false; }
-
-  // get the next available buffer from the specified output port
-  virtual Buffer* getNextEmptyOutputBuffer(OCPI::DataTransport::Port *src_port);
-
-  // determine if there is an available buffer, but does not affect the
-  virtual bool hasEmptyOutputBuffer(OCPI::DataTransport::Port *port) const;
-
-  // determine if there is data available, but does not affect the state of the object.
-  virtual bool hasFullInputBuffer(OCPI::DataTransport::Port *, InputBuffer **) const;
 
   // indicate that a buffer has been filled.
   // Since we manage circular buffers, the actual buffer is implied (next)
@@ -105,13 +111,7 @@ public:
   // Since we manage circular buffers, the actual buffer is implied (next)
   virtual void freeBuffer(OCPI::DataTransport::Port *port);
 
-  // indicate that all remote input buffer has been emptied.
-  virtual void freeAllBuffersLocal(OCPI::DataTransport::Port *port);
-  // get the next available buffer from the specified input port
-  virtual Buffer* getNextFullInputBuffer(OCPI::DataTransport::Port *input_port);
 
-  // determine if we can produce from the indicated buffer
-  virtual bool canProduce(Buffer *buffer) = 0;
 
   // determine if we can produce from the indicated buffer
   virtual bool canBroadcast(Buffer *buffer);
@@ -119,33 +119,43 @@ public:
   // determine if we have the output barrier token
   virtual bool haveOutputBarrierToken(OutputBuffer */*src_buf*/) { return true; }
 
-  // initiate a data transfer from the output buffer.
-  // If the transfer can take place, it will be initiated, if not it will be queued in the circuit.
-  virtual unsigned produce(Buffer *buffer, bool broadcast = false) = 0;
   // initiate a broadcastdata transfer from the output buffer.
   virtual void broadCastOutput(Buffer *buffer);
 
+public:
+  // determine if we can produce from the indicated buffer
+  virtual bool canProduce(Buffer *buffer) = 0;
+  // determine if a transfer can be started while a previous transfer is queued.
+  virtual bool canTransferBufferWhileOthersAreQueued() { return false; }
+  // initiate a data transfer from the output buffer.
+  // If the transfer can take place, it will be initiated, if not it will be queued in the circuit.
+  virtual unsigned produce(Buffer *buffer, bool broadcast = false) = 0;
   // mark the input buffer as "Empty" and informs interested outputs that the input is now available.
   virtual Buffer* consume(Buffer *buffer) = 0;
-
+  // determine if there is data available, but does not affect the state of the object.
+  virtual bool hasFullInputBuffer(OCPI::DataTransport::Port *, InputBuffer **) const;
+  // determine if there is an available buffer, but does not affect the
+  virtual bool hasEmptyOutputBuffer(OCPI::DataTransport::Port *port) const;
+  // get the next available buffer from the specified output port
+  virtual Buffer* getNextEmptyOutputBuffer(OCPI::DataTransport::Port *src_port);
+  // get the next available buffer from the specified input port
+  virtual Buffer* getNextFullInputBuffer(OCPI::DataTransport::Port *input_port);
+  // indicate that all remote input buffer has been emptied.
+  virtual void freeAllBuffersLocal(OCPI::DataTransport::Port *port);
   // mark the input buffer as "Empty" and informs interested outputs that the input is now available.
   virtual void consumeAllBuffersLocal(OCPI::DataTransport::Port *port);
+  virtual void modifyOutputOffsets(Buffer *me, Buffer *new_buffer, bool reverse);
 
-  void addTemplate(OcpiTransferTemplate* temp, OCPI::OS::uint32_t sp, OCPI::OS::uint32_t stid,
-		   OCPI::OS::uint32_t tp, OCPI::OS::uint32_t ttid, bool bcast=false,
-		   TransferType tt = OUTPUT)
-  { m_templates[sp][stid][tp][ttid][bcast?1:0][tt] = temp; }
 };
 
-Controller &
-controllerNotSupported(Transport &, PortSet &output, PortSet &input);
+Controller &controllerNotSupported(PortSet &output, PortSet &input);
 
 template<class TheController>
 Controller &
-createController(Transport &transport, PortSet &output, PortSet &input) {
+createController(PortSet &output, PortSet &input) {
   TheController &tc = *new TheController(output, input);
   // This must be after the constructor
-  tc.createTransferTemplates(transport);
+  tc.init();
   return tc;
 }
 

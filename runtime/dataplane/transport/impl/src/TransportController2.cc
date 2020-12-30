@@ -88,15 +88,14 @@ createOutputTransfers(Port &s_port) {
         unsigned t_tid = t_buf->getTid();
 
         // Create a template
-        OcpiTransferTemplate* temp = new OcpiTransferTemplate(2);
+        Transfer &temp = *new Transfer(2);
 
         // Add the template to the controller, for this pattern the output port
         // and the input ports remains constant
 
-        ocpiDebug("output port id = %d, buffer id = %d, input id = %d", 
-		  s_port.getPortId(), s_tid, t_tid);
-        ocpiDebug("Template address = %p", temp);
-        addTemplate( temp, s_port.getPortId(), s_tid, t_port.getPortId() ,t_tid, false, OUTPUT );
+        ocpiDebug("output port id = %d, buffer id = %d, input id = %d, temp=%p", 
+		  s_port.getPortId(), s_tid, t_tid, &temp);
+        setTemplate(temp, s_port.getPortId(), s_tid, t_port.getPortId() ,t_tid, false, OUTPUT );
 
         struct PortMetaData::OutputPortBufferControlMap *output_offsets = 
           &s_port.getMetaData()->m_bufferData[s_tid].outputOffsets;
@@ -112,7 +111,7 @@ createOutputTransfers(Port &s_port) {
         if (m_zcopyEnabled && s_port.supportsZeroCopy(&t_port)) {
           ocpiDebug("** ZERO COPY TransferTemplateGeneratorPattern2::createOutputTransfers from %p, to %p",
 		    s_buf, t_buf);
-          temp->addZeroCopyTransfer(s_buf, t_buf);
+          temp.addZeroCopyTransfer(s_buf, t_buf);
           standard_transfer = false;
         }
 
@@ -170,7 +169,7 @@ createOutputTransfers(Port &s_port) {
           }
         }
         // Add the transfer 
-	temp->addTransfer(ptransfer);
+	temp.addTransfer(ptransfer);
       } // end for each input buffer
     } // end for each input port
   }  // end for each output buffer
@@ -237,7 +236,6 @@ unsigned Controller2::
 produce(Buffer* b, bool bcast) {
   OutputBuffer* buffer = static_cast<OutputBuffer*>(b);
 
-  unsigned bcast_idx = bcast ? 1 : 0;
   if (bcast) {
 #ifdef DEBUG_L2
     ocpiDebug("*** producing via broadcast, rank == %d !!", b->getPort()->getRank());
@@ -278,9 +276,8 @@ produce(Buffer* b, bool bcast) {
    *  up the template that we need to produce.  So, since the output tid is a given,
    *  the only calculation is the input tid that we are going to produce to.
    */
-  auto temp =
-    m_templates[buffer->getPort()->getPortId()][buffer->getTid()][m_inputPort->getPortId()]
-    [m_nextTid][bcast_idx][OUTPUT];
+  auto &temp = getTemplate(buffer->getPort()->getPortId(), buffer->getTid(),
+			   m_inputPort->getPortId(), m_nextTid, bcast, OUTPUT);
 #ifdef DEBUG_L2
   ocpiDebug("output port id = %d, buffer id = %d, input id = %d, template = %p",
 	    buffer->getPort()->getPortId(), buffer->getTid(), m_nextTid, temp);
@@ -288,8 +285,8 @@ produce(Buffer* b, bool bcast) {
 
   // Start producing, this may be asynchronous
   OCPI_EMIT_CAT__("Start Data Transfer",OCPI_EMIT_CAT_WORKER_DEV,OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW, buffer );
-  temp->produce();
-  insert_to_list(&buffer->getPendingTxList(), temp, 64, 8);  // Add the template to our list
+  temp.produce();
+  insert_to_list(&buffer->getPendingTxList(), &temp, 64, 8);  // Add the template to our list
   return 0;
 }
 
@@ -313,7 +310,7 @@ consume(Buffer *input) {
 #endif
 
   // Tell everyone that we are empty
-  return m_templates [0][0][input->getPort()->getPortId()][input->getTid()][0][INPUT]->consume();
+  return getTemplate(0, 0, input->getPort()->getPortId(), input->getTid(), false, INPUT).consume();
 }
 
 Buffer *Controller2::

@@ -65,19 +65,18 @@ createOutputTransfers(Port &s_port) {
       unsigned t_tid = t_buf->getTid();
 
       // Create a template
-      OcpiTransferTemplate* temp = new OcpiTransferTemplate(1);
+      Transfer &temp = *new Transfer(1);
 
       // Add the template to the controller, for this pattern the output port
       // and the input ports remains constant
-      ocpiDebug("output port id = %d, buffer id = %d, input id = %d\n", 
-		s_port.getPortId(), s_tid, t_tid);
-      ocpiDebug("Template address = %p\n", temp);
+      ocpiDebug("output port id = %d, buffer id = %d, input id = %d, temp=%p\n",
+		s_port.getPortId(), s_tid, t_tid, &temp);
 
-      addTemplate(temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT); 
+      setTemplate(temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT);
       /*
        *  This transfer is used to mark the local input shadow buffer as full
        */
-      // We need to setup a transfer for each input port. 
+      // We need to setup a transfer for each input port.
       ocpiDebug("Number of input ports = %d\n", n_t_ports);
 
       for (n = 0; n < n_t_ports; n++) {
@@ -96,7 +95,7 @@ createOutputTransfers(Port &s_port) {
         if (m_zcopyEnabled && s_port.supportsZeroCopy(&t_port)) {
           ocpiDebug("** ZERO COPY TransferTemplateGeneratorPattern1::createOutputTransfers from %p, to %p",
 		    s_buf, t_buf);
-          temp->addZeroCopyTransfer(s_buf, t_buf);
+          temp.addZeroCopyTransfer(s_buf, t_buf);
           continue;
         }
 
@@ -139,7 +138,7 @@ createOutputTransfers(Port &s_port) {
           FORMAT_TRANSFER_EC_RETHROW(&s_port, &t_port);
         }
         // Add the transfer 
-        temp->addTransfer(ptransfer);
+        temp.addTransfer(ptransfer);
       } // end for each input buffer
     } // end for each output buffer
   }  // end for each input port
@@ -200,7 +199,6 @@ canProduce(Buffer *buffer) {
 unsigned Controller1::
 produce(Buffer* b, bool bcast) {
   Buffer* buffer = static_cast<Buffer*>(b);
-  unsigned bcast_idx = bcast ? 1 : 0;
 
   if (bcast) {
 #ifdef DEBUG_L2
@@ -245,24 +243,24 @@ produce(Buffer* b, bool bcast) {
    */
 
   // Start producing, this may be asynchronous
-  auto temp =
-    m_templates[buffer->getPort()->getPortId()][buffer->getTid()][0][m_nextTid][bcast_idx][OUTPUT];
+  auto &temp =
+    getTemplate(buffer->getPort()->getPortId(), buffer->getTid(), 0, m_nextTid, bcast, OUTPUT);
 #ifdef DEBUG_L2
   ocpiDebug("output port id = %d, buffer id = %d, input id = %d, template = %p",
 	    buffer->getPort()->getPortId(), buffer->getTid(), m_nextTid, temp);
 #endif
 
   OCPI_EMIT_CAT__("Start Data Transfer",OCPI_EMIT_CAT_WORKER_DEV,OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW, buffer );
-  temp->produce();
-  insert_to_list(&buffer->getPendingTxList(), temp, 64, 8); // Add the template to our list
+  temp.produce();
+  insert_to_list(&buffer->getPendingTxList(), &temp, 64, 8); // Add the template to our list
   // Next input buffer
   m_nextTid = (m_nextTid + 1) % m_input.getBufferCount();
 
 #ifdef DEBUG_L2
   ocpiDebug("next tid = %d, num buf = %d", m_nextTid, m_input.getBufferCount());
-  ocpiDebug("Returning max gated sequence = %d", temp->getMaxGatedSequence());
+  ocpiDebug("Returning max gated sequence = %d", temp.getMaxGatedSequence());
 #endif
-  return temp->getMaxGatedSequence();
+  return temp.getMaxGatedSequence();
 }
 
 // This marks the input buffer as "Empty" and informs all interested outputs that
@@ -277,7 +275,7 @@ consume(Buffer *input) {
   buffer->setBusyFactor(buffer->getPort()->getCircuit()->getRelativeLoadFactor());
 #endif
 
-  auto temp = m_templates[0][0][input->getPort()->getPortId()][input->getTid()][0][INPUT];
+  auto &temp = getTemplate(0, 0, input->getPort()->getPortId(), input->getTid(), false, INPUT);
 
 #ifdef DEBUG_L2
   ocpiDebug("Set load factor to %d", buffer->getState()->pad);
@@ -285,7 +283,7 @@ consume(Buffer *input) {
 	    input->getTid(), temp);
 #endif
   // Tell everyone that we are empty
-  return temp->consume();
+  return temp.consume();
 }
 
 } // namespace DataTransport

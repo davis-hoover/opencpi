@@ -33,7 +33,6 @@
 #include <OcpiPortSetMetaData.h>
 #include <OcpiPortMetaData.h>
 #include <OcpiIntDataDistribution.h>
-#include <OcpiConnectionMetaData.h>
 
 using namespace OCPI::DataTransport;
 using namespace DataTransfer;
@@ -55,7 +54,6 @@ PortSetMetaData::
 PortSetMetaData( bool src, 
                  OCPI::OS::uint32_t ps_id, 
                  DataDistribution* dd, 
-                 ConnectionMetaData* c,
                  DataTransfer::EndPoint &inputEp,
                  const OCPI::RDT::Descriptors* inputDesc, 
 		 //                 OCPI::OS::uint32_t cid, 
@@ -63,8 +61,6 @@ PortSetMetaData( bool src,
                  int buffer_count,
                  int buffer_size,
                  DataTransfer::EndPoint &outputEp  )
-  :CU::Child<ConnectionMetaData,PortSetMetaData>( *c, *this ),
-   m_connection(c)
 {
   OCPI::OS::int32_t n;
   std::string nuls;
@@ -90,10 +86,7 @@ PortSetMetaData(    bool src,
                     int ps_id, 
                     DataDistribution* dd, 
                     int buffer_count,
-                    int buffer_size,
-                    ConnectionMetaData* c )
-  :CU::Child<ConnectionMetaData,PortSetMetaData>( *c, *this ),
-   m_connection(c)
+                    int buffer_size)
 {
 
   // single buffered default

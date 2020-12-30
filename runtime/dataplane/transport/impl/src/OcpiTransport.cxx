@@ -373,15 +373,14 @@ requestNewConnection( Circuit* circuit, bool send, const char *protocol, OS::Tim
   mutex->unlock();
 }
 
-Circuit *
-Transport::
-createCircuit(CircuitId   cid,
-              ConnectionMetaData* connection,
-              PortOrdinal src_ports[],
-              PortOrdinal dest_ports[],
+Circuit * Transport::
+createCircuit(CircuitId cid,
+	      DataTransfer::EndPoint *outEp, OCPI::RDT::Descriptors *outDesc,
+	      DataTransfer::EndPoint *inEp,
+	      unsigned bufCount, unsigned bufLen,
               uint32_t flags,
 	      const char *protocol,
-	      OS::Timer *timer)                        
+	      OS::Timer *timer)
 {
   Circuit *circuit;
   if (cid == 0)
@@ -389,10 +388,10 @@ createCircuit(CircuitId   cid,
   else if ((circuit = getCircuit(cid)))
     deleteCircuit(circuit);
   if (supportsMailboxes())
-    circuit = new Circuit( this, cid, connection, src_ports, dest_ports, m_mutex);
+    circuit = new Circuit( this, cid, outEp, outDesc, inEp, bufCount, bufLen, m_mutex);
   else
     // NOTE:: This needs to be specialized for optimization. It is redundant now
-    circuit = new Circuit( this, cid, connection, src_ports, dest_ports, m_mutex);
+    circuit = new Circuit( this, cid, outEp, outDesc, inEp, bufCount, bufLen, m_mutex);
 
   m_circuits.push_back( circuit );
   ocpiDebug("New circuit created and registered: id %x flags %x", cid, flags);
@@ -434,7 +433,7 @@ createOutputPort(OCPI::RDT::Descriptors& outputDesc, const OCPI::RDT::Descriptor
   XF::EndPoint &oep = getLocalCompatibleEndpoint(inputDesc.desc.oob.oep);
   fillDescriptorFromEndPoint(oep, outputDesc);
   ocpiAssert(outputDesc.desc.dataBufferSize <= inputDesc.desc.dataBufferSize);
-  Circuit *c = createCircuit(0, new ConnectionMetaData(oep, outputDesc));
+  Circuit *c = createCircuit(0, &oep, &outputDesc, NULL, 0, 0);
   c->addInputPort(iep, inputDesc, oep);
   Port *p = c->getOutputPort();
   p->getPortDescriptor(outputDesc, &inputDesc);
@@ -469,9 +468,8 @@ createInputPort(OCPI::RDT::Descriptors& desc, const OU::PValue */*params*/)
     &getLocalCompatibleEndpoint(epString);
   // overwriting endpoint string, which should be ok.
   fillDescriptorFromEndPoint(*ep, desc);
-  Circuit *circuit = createCircuit(0, new ConnectionMetaData(NULL, ep, desc.desc.nBuffers,
-							     desc.desc.dataBufferSize));
-  Port *port = circuit->getInputPortSet(0)->getPortFromOrdinal(1);    
+  Circuit *circuit = createCircuit(0, NULL, NULL, ep, desc.desc.nBuffers, desc.desc.dataBufferSize);
+  Port *port = circuit->getInputPortSet(0)->getPortFromOrdinal(0);
   // Merge port descriptor info between what was passed in and what is determined here.
   port->getPortDescriptor(desc, NULL);
   return port;
@@ -719,14 +717,9 @@ void Transport::checkMailBoxes()
 	if (!m_newCircuitListener)
 	  break;
 	{
-	  ConnectionMetaData* md = NULL;
 	  XF::EndPoint &sep = addRemoteEndPoint(request.reqNewConnection.output_end_point);
 	  try {
 	    // send flag indicates that the client is requesting a circuit to send data to me
-	    md = request.reqNewConnection.send ?
-	      new ConnectionMetaData(&sep, m_CSendpoint, 1, request.reqNewConnection.buffer_size) :
-	      new ConnectionMetaData(m_CSendpoint, &sep,  1, request.reqNewConnection.buffer_size);
-
 	    // Create the new circuit on request from the other side (client)
 	    // If the client has protocol info for us, allocate local smb space for it, so it can
 	    // copy it to me when I tell it where to put it in the request for output control offsets;
@@ -738,10 +731,13 @@ void Transport::checkMailBoxes()
 		throw OU::EmbeddedException(NO_MORE_BUFFER_AVAILABLE, "for protocol info exchange");
 	      // map in local space
 	    }
-	    circuit = createCircuit(request.header.circuitId, md);
+	    circuit = request.reqNewConnection.send ?
+	      createCircuit(request.header.circuitId, &sep, NULL, m_CSendpoint, 1,
+			    request.reqNewConnection.buffer_size) :
+	      createCircuit(request.header.circuitId, m_CSendpoint, NULL, &sep, 1,
+			    request.reqNewConnection.buffer_size);
 	    circuit->setProtocolInfo(protocolSize, protocolOffset);
 	  }  catch ( ... ) {
-	    delete md;
 	    delete circuit;
 
 	    comms->mailBox[n].error_code = -1;

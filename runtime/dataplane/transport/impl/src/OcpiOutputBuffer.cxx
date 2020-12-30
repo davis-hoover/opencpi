@@ -33,7 +33,7 @@
 #include <OcpiOutputBuffer.h>
 #include <OcpiInputBuffer.h>
 #include <OcpiPort.h>
-#include <OcpiTransferTemplate.h>
+#include "TransportTransfer.hh"
 #include <OcpiCircuit.h>
 #include <OcpiOsAssert.h>
 #include <OcpiUtilAutoMutex.h>
@@ -232,7 +232,7 @@ bool OutputBuffer::isEmpty()
 #endif
 
   for (OCPI::OS::int32_t i=0; i < n_pending; i++) {
-    TransferTemplate* temp = static_cast<TransferTemplate*>(get_entry(&m_pendingTransfers, i));
+    Transfer* temp = static_cast<Transfer*>(get_entry(&m_pendingTransfers, i));
     if ( temp->isComplete() ) {
       remove_from_list( &m_pendingTransfers, temp );
       n_pending = get_nentries(&m_pendingTransfers);

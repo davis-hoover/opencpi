@@ -35,6 +35,10 @@ architecture rtl of worker is
   -- sdp_send is not really constrained by max_reads_outstanding, but this is the same
   -- constraint as sdp_receive for now.
   constant max_rem_buffers_c : natural := to_integer(max_buffers);
+  -- This restriction on max local buffers by max_reads_outstanding is artificial here, but is
+  -- consistent with sdp_receive and saves some gates.  It *could* simply be expanded to be the same
+  -- as max_buffers.  The limitation on sdp_receive is because its logic does not support
+  -- the buffer count to exceed the reads-outstanding count, although it could
   constant max_lcl_buffers_c : natural := ocpi.util.min(max_rem_buffers_c,max_reads_outstanding);
   subtype lcl_buffer_count_t is unsigned(width_for_max(max_lcl_buffers_c) - 1 downto 0);
   subtype lcl_buffer_idx_t is unsigned(width_for_max(max_lcl_buffers_c - 1) - 1 downto 0);

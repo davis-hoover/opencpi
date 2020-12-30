@@ -18,37 +18,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This file declares the singleton class used for process-global behavior on this transport subsystem
+
 #ifndef OCPI_Transport_Manager_H_
 #define OCPI_Transport_Manager_H_
 
-
 #include "XferEvent.h"
-#include "OcpiPortSet.h"
 #include "OcpiRDTInterface.h"
-#include "OcpiTransportConstants.h"
-#include "TransportController.hh"
 
 namespace OCPI {
 namespace DataTransport {
 
-class Transport;
+class PortSet;
+class Controller;
+
 class TransportManager {
-  // polling or events
-  bool m_useEvents;
+  bool m_useEvents;  // polling or events
   // This is an array of factory functions that create the right type of transfer controller
-  typedef Controller &(*CreateController)(Transport &transport, PortSet &output, PortSet &input);
-  CreateController m_controllers[2][2][2][2][2][OCPI::RDT::MaxRole][OCPI::RDT::MaxRole];
-protected:
-
-  // Our event handler
-  DataTransfer::EventManager* m_event_manager;
+  // based on input and output port set characteristics
+  // It is initialized with runtime code rather than statically
+  Controller &
+  (*m_controllerFactories[2][2][2][2][2][OCPI::RDT::MaxRole][OCPI::RDT::MaxRole])
+  (PortSet &output, PortSet &input);
+  
+  // Our event handler, this is out of commission
+  DataTransfer::EventManager* m_event_manager; // FIXME:  move this down to the xfermanager layer
 public:
-
   TransportManager(unsigned event_ordinal, bool use_events);
   virtual ~TransportManager();
   DataTransfer::EventManager* getEventManager() { return m_event_manager;}
   bool useEvents() {return m_useEvents;}
-  Controller &getController(Transport &transport, PortSet &outPortSet, PortSet &inPortSet);
+  Controller &getController(PortSet &outPortSet, PortSet &inPortSet);
 };
 
 } // namespace DataTransport

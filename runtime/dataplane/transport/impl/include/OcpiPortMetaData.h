@@ -69,7 +69,7 @@ namespace OCPI {
       std::string shadow_location_string;
 
       // Remote Circuit id if we are a shadow
-      int32_t       remoteCircuitId;
+      unsigned       remoteCircuitId;
       PortOrdinal   remotePortId;
 
       // port id

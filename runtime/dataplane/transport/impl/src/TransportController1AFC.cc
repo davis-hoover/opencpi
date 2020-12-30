@@ -25,6 +25,7 @@
 #include "OcpiBuffer.h"
 #include "OcpiOutputBuffer.h"
 #include "OcpiInputBuffer.h"
+#include "DtHandshakeControl.h"
 #include "OcpiIntDataDistribution.h"
 #include "TransportController.hh"
 
@@ -67,17 +68,17 @@ createOutputTransfers(Port &s_port) {
       unsigned t_tid = t_buf->getTid();
 
       // Create a template
-      // OcpiTransferTemplate *temp = new OcpiTransferTemplateAFC(1);
-      OcpiTransferTemplate *temp = new OcpiTransferTemplate(1);
+      // Transfer *temp = new TransferAFC(1);
+      Transfer &temp = *new Transfer(1);
 
 
       // Add the template to the controller, for this pattern the output port
       // and the input ports remains constant
       ocpiDebug("output port id = %d, buffer id = %d, input id = %d", 
 		s_port.getPortId(), s_tid, t_tid);
-      ocpiDebug("Template address = %p", temp);
+      ocpiDebug("Template address = %p", &temp);
 
-      addTemplate( temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT);
+      setTemplate(temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT);
 
       // We need to setup a transfer for each input port. 
       ocpiDebug("Number of input ports = %d", n_t_ports);
@@ -98,7 +99,7 @@ createOutputTransfers(Port &s_port) {
         if ( m_zcopyEnabled && s_port.supportsZeroCopy(&t_port)) {
           ocpiDebug("** ZERO COPY TransferTemplateGeneratorPattern1AFC::createOutputTransfers from %p, to %p",
 		    s_buf, t_buf);
-          temp->addZeroCopyTransfer(s_buf, t_buf);
+          temp.addZeroCopyTransfer(s_buf, t_buf);
           continue;
         }
 
@@ -122,7 +123,7 @@ createOutputTransfers(Port &s_port) {
           FORMAT_TRANSFER_EC_RETHROW(&s_port, &t_port);
         }
         // Add the transfer 
-        temp->addTransfer(ptransfer);
+        temp.addTransfer(ptransfer);
       } // end for each input buffer
     } // end for each output buffer
   }  // end for each input port
@@ -144,14 +145,14 @@ createInputTransfers(Port &input) {
     unsigned t_tid = t_buf->getTid();
 
     // Create a template
-    // OcpiTransferTemplate* temp = new OcpiTransferTemplateAFC(0);
-    OcpiTransferTemplate *temp = new OcpiTransferTemplate(0);
+    // Transfer* temp = new TransferAFC(0);
+    Transfer &temp = *new Transfer(0);
 
     ocpiDebug("*&*&* Adding template for tpid = %d, ttid = %d, template = %p",
-	      input.getPortId(), t_tid, temp);
+	      input.getPortId(), t_tid, &temp);
 
     //Add the template to the controller
-    addTemplate(temp, 0, 0, input.getPortId(), t_tid, false, INPUT);
+    setTemplate(temp, 0, 0, input.getPortId(), t_tid, false, INPUT);
  
     // Since there may be multiple output ports on 1 processs, we need to make sure we dont send
     // more than 1 time
@@ -179,7 +180,7 @@ createInputTransfers(Port &input) {
       // Attach zero-copy for co-location
       if (m_zcopyEnabled && s_port.supportsZeroCopy(&input)) {
         ocpiDebug("Adding Zery copy for input response");
-        temp->addZeroCopyTransfer(NULL, t_buf);
+        temp.addZeroCopyTransfer(NULL, t_buf);
       }
       sent[s_pid] = 1;
     } // end for each input buffer
@@ -217,16 +218,15 @@ createOutputTransfers(Port &s_port) {
       unsigned t_tid = t_buf->getTid();
 
       // Create a template
-      // OcpiTransferTemplate* temp = new OcpiTransferTemplateAFC(1);
-      OcpiTransferTemplate* temp = new OcpiTransferTemplate(1);
+      Transfer &temp = *new Transfer(1);
 
       // Add the template to the controller, for this pattern the output port
       // and the input ports remains constant
       ocpiDebug("output port id = %d, buffer id = %d, input id = %d", 
 		s_port.getPortId(), s_tid, t_tid);
-      ocpiDebug("Template address = %p", temp);
+      ocpiDebug("Template address = %p", &temp);
 
-      addTemplate(temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT);
+      setTemplate(temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT);
       /*
        *  This transfer is used to mark the local input shadow buffer as full
        */
@@ -249,7 +249,7 @@ createOutputTransfers(Port &s_port) {
         if (m_zcopyEnabled && s_port.supportsZeroCopy(&t_port)) {
           ocpiDebug("** ZERO COPY TransferTemplateGeneratorPattern1::createOutputTransfers from %p, to %p",
 		    s_buf, t_buf);
-          temp->addZeroCopyTransfer(s_buf, t_buf);
+          temp.addZeroCopyTransfer(s_buf, t_buf);
           continue;
         }
         // Create the transfer that copys the output data to the input data
@@ -281,7 +281,7 @@ createOutputTransfers(Port &s_port) {
           FORMAT_TRANSFER_EC_RETHROW(&s_port, &t_port);
         }
         // Add the transfer
-        temp->addTransfer( ptransfer );
+        temp.addTransfer( ptransfer );
       } // end for each input buffer
     } // end for each output buffer
   }  // end for each input port
@@ -301,7 +301,6 @@ unsigned Controller1AFCShadow::
 produce(Buffer *buffer, bool bcast) {
   ocpiDebug("In TransferController1AFCShadow::produce");
 
-  unsigned bcast_idx = bcast ? 1 : 0;
   if (bcast) {
     ocpiDebug("*** producing via broadcast, rank == %d !!", buffer->getPort()->getRank());
     if (!buffer->getMetaData()->endOfStream)
@@ -312,7 +311,7 @@ produce(Buffer *buffer, bool bcast) {
   if (m_isWholeOutputSet && buffer->getPort()->getRank() != 0) {
     ocpiDebug("My rank != 0 so i am not producing !!!");
 
-    // Next input buffer 
+    // Next input buffer
     m_nextTid = (m_nextTid + 1) % m_input.getBufferCount();
     ocpiDebug("AFCTransferController:: m_nextTid = %d", m_nextTid );
 
@@ -335,8 +334,8 @@ produce(Buffer *buffer, bool bcast) {
    *  up the template that we need to produce.  So, since the output tid is a given,
    *  the only calculation is the input tid that we are going to produce to.
    */
-  auto temp = 
-    m_templates[buffer->getPort()->getPortId()][buffer->getTid()][0][m_nextTid][bcast_idx][OUTPUT];
+  auto &temp = 
+    getTemplate(buffer->getPort()->getPortId(), buffer->getTid(), 0, m_nextTid, bcast, OUTPUT);
 
 #ifdef DEBUG_L2
   ocpiDebug("output port id = %d, buffer id = %d, input id = %d, template = %p", 
@@ -347,18 +346,18 @@ produce(Buffer *buffer, bool bcast) {
   buffer->markBufferFull();
 
   // Start producing, this may be asynchronous
-  temp->produce();
-  insert_to_list(&buffer->getPendingTxList(), temp, 64, 8);  // Add the template to our list
+  temp.produce();
+  insert_to_list(&buffer->getPendingTxList(), &temp, 64, 8);  // Add the template to our list
 
   // Next input buffer 
   m_nextTid = (m_nextTid + 1) % m_input.getBufferCount();
 
 #ifdef DEBUG_L2
   ocpiDebug("next tid = %d, num buf = %d", m_nextTid, m_input.getBufferCount());
-  ocpiDebug("Returning max gated sequence = %d", temp->getMaxGatedSequence());
+  ocpiDebug("Returning max gated sequence = %d", temp.getMaxGatedSequence());
 #endif
 
-  return temp->getMaxGatedSequence();
+  return temp.getMaxGatedSequence();
 }
 
 /**********************************
@@ -373,7 +372,7 @@ consume(Buffer *buffer) {
 #ifdef DTI_PORT_COMPLETE
   buffer->setBusyFactor( buffer->getPort()->getCircuit()->getRelativeLoadFactor() );
 #endif
-  auto temp = m_templates [0][0][buffer->getPort()->getPortId()][buffer->getTid()][0][INPUT];
+  auto &temp = getTemplate(0, 0, buffer->getPort()->getPortId(), buffer->getTid(), false, INPUT);
 
 #ifdef DEBUG_L2
   ocpiDebug("Set load factor to %d", buffer->getState()->pad);
@@ -381,7 +380,7 @@ consume(Buffer *buffer) {
 	    buffer->getTid(), temp);
 #endif
   // Tell everyone that we are empty
-  return temp->consume();
+  return temp.consume();
 }
 
 

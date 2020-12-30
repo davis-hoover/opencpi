@@ -92,6 +92,14 @@ override HdlLibraries+=sdp axi platform
 # ComponentLibraries and XmlIncludeDirs are already passed to us on the command line.
 # Note that the platform directory should be first XML dir since the config file name should be
 # scoped to the platform.
+
+# Ideally, when processing platform files, the platform's project's project dependencies should be
+# used, but NOT used when the app is processed.
+# I.e. The platform developer should get consistent results without being damaged
+# by the app project, and the app developer should not get damaged by the platform developer's
+# projects.  This is probably best fixed by forcing the platform files to to have fully
+# qualified names...
+$(foreach d,$(wildcard $(realpath $(HdlPlatformDir))/../../../../imports/*),$(info DEPEND:$d))
 override XmlIncludeDirsInternal:=\
    $(call Unique,$(HdlPlatformDir) \
                  $(HdlPlatformDir)/hdl \
@@ -103,7 +111,12 @@ override XmlIncludeDirsInternal:=\
                  $(realpath $(HdlPlatformDir))/../../../../exports/lib/cards/hdl \
                  $(XmlIncludeDirs) \
                  $(XmlIncludeDirsInternal) \
-                 $(HdlAssembly))
+                 $(HdlAssembly) \
+                 $(foreach p,$(HdlPlatformProjectDependencies_$(HdlPlatform)),\
+                   $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,$(info DXDXDX:$d)\
+                     $d/exports/lib/devices $d/exports/devices/hdl $d/lib/cards $d/lib/cards/hdl)))
+
+$(info XIC:$(XmlIncludeDirsInternal))
 # We might be called from an assembly directory, in which case many of the
 # component libraries are passed through to us, but we might be standalone.
 # Thus we add "devices/adapters/cards" and the platforms own libraries.

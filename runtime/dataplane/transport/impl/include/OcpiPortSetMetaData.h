@@ -50,16 +50,12 @@ namespace OCPI {
   namespace DataTransport {
 
     class DataDistribution;
-    class ConnectionMetaData;
 
-    struct PortSetMetaData :  public OCPI::Util::Child<ConnectionMetaData,PortSetMetaData>, public OCPI::Util::Parent<PortMetaData>
+    struct PortSetMetaData :  public OCPI::Util::Parent<PortMetaData>
     {
 
       // Output port
       bool output;
-
-      // Our Connection
-      ConnectionMetaData* m_connection;
 
       // Data distribution class
       DataDistribution  *dataDistribution;
@@ -91,13 +87,11 @@ namespace OCPI {
                           int ps_id, 
                           DataDistribution* dd, 
                           int buffer_count,
-                          int buffer_size,
-                          ConnectionMetaData* c );
+                          int buffer_size);
 
       PortSetMetaData( bool src, 
                        OCPI::OS::uint32_t ps_id, 
                        DataDistribution* dd, 
-                       ConnectionMetaData* c,
 		       DataTransfer::EndPoint &inputEp,
                        const OCPI::RDT::Descriptors* inputDesc, 
                        int port_count,

@@ -59,7 +59,7 @@ void OcpiParallelDataDistribution::initTransfers(){}
  * the distribution type, this template will be created with the proper offset(s) into
  * the source, offsets into the target(s) and appropriate control structures.
  **********************************/
-TransferTemplate* OcpiParallelDataDistribution::getTxTemplate( Buffer* src )
+Transfer* OcpiParallelDataDistribution::getTxTemplate( Buffer* src )
 {
   ( void ) src;
   return NULL;

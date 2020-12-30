@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
+#include <cstdint>
 #include <pthread.h>
 // This is obviously temporary
 #ifdef __APPLE__
@@ -62,7 +62,8 @@ namespace OCPI {
       }
       d.desc.nBuffers = OCPI_UTRUNCATE(uint32_t, m_nBuffers);
       d.desc.dataBufferSize = OCPI_UTRUNCATE(uint32_t, m_bufferSize);
-      ocpiDebug("PortData final nbuffers %zu bufsize %zu", m_nBuffers, m_bufferSize);
+      ocpiDebug("PortData for port \"%s\" final buffer count %zu buffer size %zu", mPort.m_name.c_str(),
+		m_nBuffers, m_bufferSize);
     }
 
     static bool findRole(const OU::PValue *params, const char *&s, OR::PortRole &role) {
@@ -163,6 +164,8 @@ namespace OCPI {
 		    name().c_str(), m_nBuffers);
 	}
       }
+      ocpiInfo("For port \"%s\" final buffer count %zu buffer size %zu", m_metaPort.cname(),
+	       m_nBuffers, m_bufferSize);
     }
 
     /*
@@ -319,7 +322,7 @@ namespace OCPI {
     static void defaultRole(OR::PortRole &role, unsigned options) {
       if (role == OR::NoRole) {
 	for (unsigned n = 0; n < OR::MaxRole; n++)
-	  if (options & (1 << n)) {
+	  if (options & (1u << n)) {
 	    role = (OR::PortRole)n;
 	    return;
 	  }
@@ -340,38 +343,38 @@ namespace OCPI {
       OR::PortRole
         pOther = otherRoles[pRole],
         uOther = otherRoles[uRole];
-      if (uOptions & (1 << OCPI::RDT::FlagIsMeta)) {
-	if (!(pOptions & ((1 << OCPI::RDT::FlagIsMeta) | (1 << OCPI::RDT::FlagIsMetaOptional))))
+      if (uOptions & (1u << OCPI::RDT::FlagIsMeta)) {
+	if (!(pOptions & ((1u << OCPI::RDT::FlagIsMeta) | (1u << OCPI::RDT::FlagIsMetaOptional))))
 	  return "Incompatible Metadata mode: input side cannot do flag-is-meta, output must";
-	pOptions |= (1 << OCPI::RDT::FlagIsMeta);
-      } else if (uOptions & (1 << OCPI::RDT::FlagIsMetaOptional)) {
-	if (pOptions & ((1 << OCPI::RDT::FlagIsMeta) | (1 << OCPI::RDT::FlagIsMetaOptional))) {
-	  pOptions |= (1 << OCPI::RDT::FlagIsMeta);
-	  uOptions |= (1 << OCPI::RDT::FlagIsMeta);
+	pOptions |= (1u << OCPI::RDT::FlagIsMeta);
+      } else if (uOptions & (1u << OCPI::RDT::FlagIsMetaOptional)) {
+	if (pOptions & ((1u << OCPI::RDT::FlagIsMeta) | (1u << OCPI::RDT::FlagIsMetaOptional))) {
+	  pOptions |= (1u << OCPI::RDT::FlagIsMeta);
+	  uOptions |= (1u << OCPI::RDT::FlagIsMeta);
 	} else
 	  uOptions &= ~(1u << OCPI::RDT::FlagIsMeta);
-      } else if (pOptions & (1 << OCPI::RDT::FlagIsMeta))
+      } else if (pOptions & (1u << OCPI::RDT::FlagIsMeta))
 	return "Incompatible Metadata mode: output side cannot do flag-is-meta, input must";
-      if (pOptions & (1 << OR::MandatedRole)) {
+      if (pOptions & (1u << OR::MandatedRole)) {
         // provider has a mandate
         ocpiAssert(pRole != OR::NoRole);
         if (uRole == pOther)
           return NULL;
-        if (uOptions & (1 << OR::MandatedRole))
+        if (uOptions & (1u << OR::MandatedRole))
           return "Incompatible mandated transfer roles";
-        if (uOptions & (1 << pOther)) {
+        if (uOptions & (1u << pOther)) {
           uRole = pOther;
           return NULL;
         }
         return "No compatible role available against mandated role";
       } else if (pRole != OR::NoRole) {
         // provider has a preference
-        if (uOptions & (1 << OR::MandatedRole)) {
+        if (uOptions & (1u << OR::MandatedRole)) {
           // user has a mandate
           ocpiAssert(uRole != OR::NoRole);
           if (pRole == uOther)
             return NULL;
-          if (pOptions & (1 << uOther)) {
+          if (pOptions & (1u << uOther)) {
             pRole = uOther;
             return NULL;
           }
@@ -383,66 +386,66 @@ namespace OCPI {
             return NULL;
           // If one preference is against push, we better listen to it.
           if (uRole == OR::ActiveFlowControl &&
-              pOptions & (1 << OR::ActiveMessage)) {
+              pOptions & (1u << OR::ActiveMessage)) {
             pRole = OR::ActiveMessage;
             return NULL;
           }
           // Let's try active push if we can
           if (uRole == OR::ActiveMessage &&
-              pOptions & (1 << OR::ActiveFlowControl)) {
+              pOptions & (1u << OR::ActiveFlowControl)) {
             pRole = OR::ActiveFlowControl;
             return NULL;
           }
           if (pRole == OR::ActiveFlowControl &&
-              uOptions & (1 << OR::ActiveMessage)) {
+              uOptions & (1u << OR::ActiveMessage)) {
             uRole = OR::ActiveFlowControl;
             return NULL;
           }
           // Let's try activeonly push if we can
           if (uRole == OR::ActiveOnly &&
-              pOptions & (1 << OR::Passive)) {
+              pOptions & (1u << OR::Passive)) {
             pRole = OR::Passive;
             return NULL;
           }
           if (pRole == OR::Passive &&
-              pOptions & (1 << OR::ActiveOnly)) {
+              pOptions & (1u << OR::ActiveOnly)) {
             pRole = OR::ActiveOnly;
             return NULL;
           }
           // Let's give priority to the "better" role.
           if (uRole < pRole &&
-              pOptions & (1 << uOther)) {
+              pOptions & (1u << uOther)) {
             pRole = uOther;
             return NULL;
           }
           // Give priority to the provider
-          if (uOptions & (1 << pOther)) {
+          if (uOptions & (1u << pOther)) {
             uRole = pOther;
             return NULL;
           }
-          if (pOptions & (1 << uOther)) {
+          if (pOptions & (1u << uOther)) {
             pRole = uOther;
             return NULL;
           }
           // Can't use either preference.  Fall throught to no mandates, no preferences
         } else {
           // User role unspecified, but provider has a preference
-          if (uOptions & (1 << pOther)) {
+          if (uOptions & (1u << pOther)) {
             uRole = pOther;
             return NULL;
           }
           // Can't use provider preference, Fall through to no mandates, no preferences
         }
-      } else if (uOptions & (1 << OR::MandatedRole)) {
+      } else if (uOptions & (1u << OR::MandatedRole)) {
         // Provider has no mandate or preference, but user has a mandate
-        if (pOptions & (1 << uOther)) {
+        if (pOptions & (1u << uOther)) {
           pRole = uOther;
           return NULL;
         }
         return "No compatible role available against mandated role";
       } else if (uRole != OR::NoRole) {
         // Provider has no mandate or preference, but user has a preference
-        if (pOptions & (1 << uOther)) {
+        if (pOptions & (1u << uOther)) {
           pRole = uOther;
           return NULL;
         }
@@ -451,8 +454,8 @@ namespace OCPI {
       // Neither has useful mandates or preferences.  Find anything, biasing to push
       for (unsigned i = 0; i < OR::MaxRole; i++)
         // Provider has no mandate or preference
-        if (uOptions & (1 << i) &&
-            pOptions & (1 << otherRoles[i])) {
+        if (uOptions & (1u << i) &&
+            pOptions & (1u << otherRoles[i])) {
           uRole = (OR::PortRole)i;
           pRole = otherRoles[i];
           return NULL;
@@ -515,7 +518,7 @@ namespace OCPI {
 	if (sConn.length() && strcasecmp(sConn.c_str(), it.transport.c_str()))
 	  ocpiInfo("Rejecting input transport %s since %s was specified for the connection",
 		   it.transport.c_str(), sConn.c_str());
-	else if (roleIn != OR::NoRole && !((1 << roleIn) & it.optionsIn))
+	else if (roleIn != OR::NoRole && !((1u << roleIn) & it.optionsIn))
 	  ocpiInfo("Rejecting input role %s for transport %s: container doesn't support it",
 		   roleNames[roleIn], it.transport.c_str());
 	else
@@ -531,7 +534,7 @@ namespace OCPI {
 	    else if (sConn.length() && strcasecmp(sConn.c_str(), ot.transport.c_str()))
 	      ocpiInfo("Rejecting output transport %s since %s was specified for the connection",
 		       ot.transport.c_str(), sConn.c_str());
-	    else if (roleOut != OR::NoRole && !((1 << roleOut) & ot.optionsOut))
+	    else if (roleOut != OR::NoRole && !((1u << roleOut) & ot.optionsOut))
 	      ocpiInfo("Rejecting output role %s for transport %s: container doesn't support it",
 		       roleNames[roleOut], ot.transport.c_str());
 	    else {
@@ -542,11 +545,11 @@ namespace OCPI {
 	      transport.roleOut = ot.roleOut;
 	      if (roleIn != OR::NoRole) {
 		transport.roleIn = roleIn;
-		transport.optionsIn |= 1 << OR::MandatedRole;
+		transport.optionsIn |= 1u << OR::MandatedRole;
 	      }
 	      if (roleOut != OR::NoRole) {
 		transport.roleOut = roleOut;
-		transport.optionsOut |= 1 << OR::MandatedRole;
+		transport.optionsOut |= 1u << OR::MandatedRole;
 	      }
 	      if ((err = chooseRoles(transport.roleOut, transport.optionsOut, transport.roleIn,
 				     transport.optionsIn)))
@@ -555,8 +558,8 @@ namespace OCPI {
 	      else {
 		transport.transport = it.transport;
 		transport.id = it.id;
-		transport.optionsIn |= (1 << OR::MandatedRole);
-		transport.optionsOut |= (1 << OR::MandatedRole);
+		transport.optionsIn |= (1u << OR::MandatedRole);
+		transport.optionsOut |= (1u << OR::MandatedRole);
 		ocpiInfo("Choosing transport %s id \"%s\" for connection with roles %s(0x%x)->%s(0x%x)",
 			 it.transport.c_str(), it.id.c_str(), roleNames[transport.roleOut],
 			 transport.optionsOut, roleNames[transport.roleIn], transport.optionsIn);
@@ -581,9 +584,7 @@ namespace OCPI {
 	ocpiDebug("getempty: %p %p %p %u", &metaPort().metaWorker(), this, m_next2write, m_next2write->m_full);
 	ExternalBuffer *b = m_next2write;
 	if (!b->m_full && !b->m_busy) {
-	  b->m_hdr.m_data = OCPI_UTRUNCATE(uint8_t,
-					   sizeof(ExternalBuffer) -
-					   OCPI_OFFSETOF(size_t, ExternalBuffer, m_hdr));
+	  b->m_hdr.m_data = 1;
 	  b->m_hdr.m_length = OCPI_UTRUNCATE(uint32_t, m_bufferSize);
 	  m_next2write = b->m_next;
 	  ocpiDebug("GetEmpty on %p returns %p", this, b);
@@ -625,9 +626,7 @@ namespace OCPI {
     void ExternalBuffer::
     send(size_t a_length, uint8_t a_opCode, bool a_end, size_t a_direct) {
       ocpiDebug("Sending buffer %p: l %zu o %u %u %zu data %x %x", this, a_length, a_opCode,
-		a_end, a_direct,
-		((uint32_t*)((uint8_t *)this + m_hdr.m_data))[0],
-		((uint32_t*)((uint8_t *)this + m_hdr.m_data))[1]);
+		a_end, a_direct, ((uint32_t*)(this + 1))[0], ((uint32_t*)(this + 1))[1]);
       m_hdr.m_length = OCPI_UTRUNCATE(uint32_t, a_length);
       m_hdr.m_opCode = a_opCode;
       m_hdr.m_eof    = a_end ? 1 : 0;
@@ -1008,6 +1007,8 @@ namespace OCPI {
 	strcpy(d.desc.oob.oep, t.transport.c_str());
       ocpiAssert(!strncmp(d.desc.oob.oep, t.transport.c_str(), strlen(t.transport.c_str())));
       setBufferSize(a_bufferSize);
+      ocpiInfo("Final status for worker \"%s\" port \"%s\" is buffer count of %zu and buffer size of %zu",
+	       m_metaPort.metaWorker().cname(), name().c_str(), m_nBuffers, m_bufferSize);
     }
 
     uint8_t *BasicPort::

@@ -46,7 +46,7 @@ namespace OCPI {
 
   // Token definition
   typedef uint32_t ControlToken;
-  typedef int32_t BooleanToken;
+  typedef uint32_t BooleanToken;
   typedef uint32_t PortId; // was signed to allow a sentinel of -1, but not used that way anymore
 
   /**********************************

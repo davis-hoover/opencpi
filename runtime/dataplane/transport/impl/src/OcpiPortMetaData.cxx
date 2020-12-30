@@ -81,10 +81,10 @@ init()
 
 }
 
-// Standard constructor 
+// Standard constructor
 PortMetaData::
-PortMetaData( PortOrdinal pid, 
-              bool s, 
+PortMetaData( PortOrdinal pid,
+              bool s,
 	      XF::EndPoint *ep,
               const OCPI::RDT::Descriptors& desc,
               PortSetMetaData* psmd )
@@ -195,15 +195,4 @@ PortMetaData::
   if ( ! m_real_location ) {
     return;
   }
-
-
-
 }
-
-
-
-
-
-
-
-

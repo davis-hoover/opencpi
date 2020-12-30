@@ -18,12 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <string>
-#include "OcpiOsAssert.h"
-#include "DtHandshakeControl.h"
-#include "TransportController.hh"
+// This file implements the singleton class used for process-global behavior on this transport subsystem
+
 #include "OcpiParallelDataDistribution.h"
+#include "OcpiPortSet.h"
+#include "TransportController.hh"
 #include "TransportManager.hh"
 
 namespace OCPI {
@@ -54,54 +53,54 @@ TransportManager(unsigned event_ordinal, bool async)
 	  for(unsigned e=0;e<2;e++)
 	    for(unsigned f=0;f<OCPI::RDT::MaxRole;f++)
 	      for(unsigned g=0;g<OCPI::RDT::MaxRole;g++)
-		m_controllers[a][b][c][d][e][f][g] = controllerNotSupported;
+		m_controllerFactories[a][b][c][d][e][f][g] = controllerNotSupported;
 
   //        output dd : input dd : output part : input part : "output shadow" : output role : input role
-  m_controllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
+  m_controllerFactories[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
     [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
     [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
     = createController<Controller1>;
 
-  m_controllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
+  m_controllerFactories[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
     [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
     [true] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveFlowControl] 
     = createController<Controller1>;
 
   // If the output port is AFC, the same controller is used for any input port role
   for(unsigned y=0; y<OCPI::RDT::MaxRole; y++) {
-    m_controllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
+    m_controllerFactories[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
       [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
       [true] [OCPI::RDT::ActiveFlowControl] [y] 
       = createController<Controller1AFCShadow>;
 
-    m_controllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
+    m_controllerFactories[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
       [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
       [false] [OCPI::RDT::ActiveFlowControl] [y] 
       = createController<Controller1AFC>;
   }
 #if 0
-  m_controllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
+  m_controllerFactories[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
     [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
     [true] [OCPI::RDT::Passive] [OCPI::RDT::ActiveOnly] 
     = createController<Controller1Passive>;
 
-  m_controllers[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
+  m_controllerFactories[DataDistributionMetaData::parallel] [DataDistributionMetaData::parallel]
     [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
     [false] [OCPI::RDT::ActiveOnly] [OCPI::RDT::Passive] 
     = createController<Controller1Passive>;
 #endif
   // Fixme.  All other DD&P patterns have not yet beed ported to the new port "roles" paradigm
-  m_controllers[DataDistributionMetaData::parallel][DataDistributionMetaData::sequential]
+  m_controllerFactories[DataDistributionMetaData::parallel][DataDistributionMetaData::sequential]
     [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
     [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveMessage] 
     = createController<Controller2>;
 
-  m_controllers[DataDistributionMetaData::sequential][DataDistributionMetaData::sequential]
+  m_controllerFactories[DataDistributionMetaData::sequential][DataDistributionMetaData::sequential]
     [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::INDIVISIBLE] 
     [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveMessage] 
     = createController<Controller3>;
 
-  m_controllers[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
+  m_controllerFactories[DataDistributionMetaData::parallel][DataDistributionMetaData::parallel]
     [DataPartitionMetaData::INDIVISIBLE][DataPartitionMetaData::BLOCK] 
     [false] [OCPI::RDT::ActiveMessage] [OCPI::RDT::ActiveMessage] 
     = createController<Controller4>;
@@ -113,18 +112,17 @@ TransportManager::
 }
 
 Controller &TransportManager::
-getController(Transport &transport, PortSet &outPortSet, PortSet &inPortSet) {
-  // Call the factory function in the array element to create the controller
+getController(PortSet &outPortSet, PortSet &inPortSet) {
+  // return the factory function in the array element to create the controller
   return
-      m_controllers
+      m_controllerFactories
       [outPortSet.getDataDistribution()->getMetaData()->distType]
       [inPortSet.getDataDistribution()->getMetaData()->distType]
       [outPortSet.getDataDistribution()->getDataPartition()->getData()->dataPartType]
       [inPortSet.getDataDistribution()->getDataPartition()->getData()->dataPartType]
       [outPortSet.getPort(0)->isShadow()]
       [outPortSet.getPort(0)->getMetaData()->m_descriptor.role]
-      [inPortSet.getPort(0)->getMetaData()->m_descriptor.role]
-      (transport, outPortSet, inPortSet);
+    [inPortSet.getPort(0)->getMetaData()->m_descriptor.role](outPortSet, inPortSet);
 }
 }
 }

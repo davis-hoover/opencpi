@@ -36,25 +36,33 @@ namespace OCPI {
 namespace DataTransport {
 
 Controller &
-controllerNotSupported(Transport &, PortSet &/*output*/, PortSet &/*input*/) {
+controllerNotSupported(PortSet &/*output*/, PortSet &/*input*/) {
   ocpiAssert("Unsupported data transfer request rejected !!\n"==0);
   throw OCPI::Util::EmbeddedException("Unsupported data transfer request rejected !!\n");
 }
 
 Controller::
 Controller(PortSet &output, PortSet &input)
-  : m_nextTid(0), m_FillQPtr(0), m_EmptyQPtr(0), m_output(output),
-    m_input(input), m_zcopyEnabled(true) {
+  :  m_FillQPtr(0), m_EmptyQPtr(0), m_output(output), m_input(input), m_nextTid(0),
+     m_zcopyEnabled(true) {
   // For convenience
   m_isWholeOutputSet =
     output.getDataDistribution()->getMetaData()->distType == DataDistributionMetaData::parallel;
-  for (unsigned x=0; x<MAX_PCONTRIBS; x++)
-    for (unsigned y=0; y<MAX_BUFFERS; y++)
-      for (unsigned z=0; z<MAX_PCONTRIBS; z++)
-        for (unsigned zz=0; zz<MAX_BUFFERS; zz++)
-          for (unsigned bc=0; bc<2; bc++)
-            for (unsigned ts=0; ts<2; ts++)
-              m_templates[x][y][z][zz][bc][ts] = NULL;
+
+  unsigned
+    inSize = input.getPortCount(),
+    outSize = output.getPortCount(),
+    in2outSize = inSize * outSize,
+    inBuffers = input.getBufferCount(),
+    outBuffers = output.getBufferCount(),
+    in2outBuffers = inBuffers * outBuffers;
+  m_inPort2outPort.resize(in2outSize);
+  for (unsigned n = 0; n < in2outSize; ++n) {
+    m_inPort2outPort[n].m_outputTransfers.resize(in2outBuffers);
+    m_inPort2outPort[n].m_outputBroadcastTransfers.resize(in2outBuffers); // can this be conditional?
+    m_inPort2outPort[n].m_inputTransfers.resize(in2outBuffers);
+    m_inPort2outPort[n].m_inputBroadcastTransfers.resize(in2outBuffers); // can this be conditional?
+  }
 }
 
 /**********************************
@@ -62,18 +70,20 @@ Controller(PortSet &output, PortSet &input)
  *********************************/
 Controller::~Controller()
 {
-  for (unsigned x=0; x<MAX_PCONTRIBS; x++)
-    for (unsigned y=0; y<MAX_BUFFERS; y++)
-      for (unsigned z=0; z<MAX_PCONTRIBS; z++)
-        for (unsigned zz=0; zz<MAX_BUFFERS; zz++)
-          for (unsigned bc=0; bc<2; bc++)
-            for (unsigned ts=0; ts<2; ts++)
-              delete m_templates[x][y][z][zz][bc][ts];
+  for (unsigned p = 0; p < m_inPort2outPort.size(); ++p) {
+    auto &io = m_inPort2outPort[p];
+    for (unsigned b = 0; b < io.m_outputTransfers.size(); ++b) {
+      delete  io.m_outputTransfers[b];
+      delete  io.m_outputBroadcastTransfers[b];
+      delete  io.m_inputTransfers[b];
+      delete  io.m_inputBroadcastTransfers[b];
+    }
+  }
 }
 
 // After construction (of derived classes) this finishes the initialization
 void Controller::
-createTransferTemplates(Transport &transport) {
+init() {
   bool generated = false;
 
   // We need to create transfers for every output and destination port
@@ -99,13 +109,15 @@ createTransferTemplates(Transport &transport) {
 	      t_port.getLocalShemServices()->endPoint().name().c_str() );
     // If the output port is not local, but the transfer role requires us to move data,
     // we need to create transfers for the remote port
-    if (!transport.isLocalEndpoint(t_port.getRealShemServices()->endPoint()))
+    if (!m_input.getCircuit()->getTransport().isLocalEndpoint(t_port.getRealShemServices()->endPoint()))
       break;
     createInputTransfers(t_port);
     createInputBroadcastTemplates(t_port);
     generated = true;
   }
   ocpiAssert(generated);
+  m_input.setTxController(this);
+  m_output.setTxController(this);
 }
 
 // Create the input broadcast template for this port
@@ -123,13 +135,13 @@ createInputBroadcastTemplates(Port &input) {
     unsigned t_tid = t_buf->getTid();
 
     // Create a template
-    OcpiTransferTemplate *temp = new OcpiTransferTemplate(0);
+    Transfer &temp = *new Transfer(0);
 
     //Add the template to the controller
     ocpiDebug("*&*&* Adding template for tpid = %d, ttid = %u, template = %p",
-	      input.getPortId(), t_tid, temp);
+	      input.getPortId(), t_tid, &temp);
 
-    addTemplate(temp, 0, 0, input.getPortId(), t_tid, true, INPUT);
+    setTemplate(temp, 0, 0, input.getPortId(), t_tid, true, INPUT);
 
     struct PortMetaData::InputPortBufferControlMap *input_offsets =
       &input.getMetaData()->m_bufferData[t_tid].inputOffsets;
@@ -145,7 +157,7 @@ createInputBroadcastTemplates(Port &input) {
 
       // We dont need to do anything for co-location
       if (m_zcopyEnabled && s_port.supportsZeroCopy(&input)) {
-        temp->addZeroCopyTransfer(NULL, t_buf);
+        temp.addZeroCopyTransfer(NULL, t_buf);
 	continue;
       }
 
@@ -158,7 +170,7 @@ createInputBroadcastTemplates(Port &input) {
       // Create the copy in the template
       DT::XferRequest* ptransfer =
 	input.getTemplate(input.getEndPoint(), s_port.getEndPoint()).createXferRequest();
-      try {
+      try { // FIXME:  what normal exceptions could possible happen that we would want to catch here?
         ptransfer->copy(input_offsets->localStateOffset,
 			input_offsets->myShadowsRemoteStateOffsets[s_pid],
 			sizeof(BufferState),
@@ -167,17 +179,17 @@ createInputBroadcastTemplates(Port &input) {
         FORMAT_TRANSFER_EC_RETHROW(&input, &s_port);
       }
       // Add the transfer to the template
-      temp->addTransfer(ptransfer);
+      temp.addTransfer(ptransfer);
     } // end for each input buffer
   } // end for each output port
 }
 
 void Controller::
 createOutputBroadcastTemplates(Port &s_port) {
-  unsigned n;
-  unsigned n_s_buffers = m_output.getBufferCount();
-  unsigned n_t_buffers = m_input.getBufferCount();
-  unsigned n_t_ports = m_input.getPortCount();
+  unsigned n,
+    n_s_buffers = m_output.getBufferCount(),
+    n_t_buffers = m_input.getBufferCount(),
+    n_t_ports = m_input.getPortCount();
 
   // We need a transfer template to allow a transfer from each output buffer to every
   // input buffer for this pattern.
@@ -196,16 +208,16 @@ createOutputBroadcastTemplates(Port &s_port) {
       t_tid = t_buf->getTid();
 
       // Create a template
-      OcpiTransferTemplate* temp = new OcpiTransferTemplate(0);
+      Transfer &temp = *new Transfer(0);
 
       // Add the template to the controller, for this pattern the output port
       // and the input ports remains constant
 
       ocpiDebug("output port id = %d, buffer id = %d, input id = %d",
 		s_port.getPortId(), s_tid, t_tid );
-      ocpiDebug("Template address = %p", temp);
+      ocpiDebug("Template address = %p", &temp);
 
-      addTemplate(temp, s_port.getPortId(), s_tid, 0, t_tid, true, OUTPUT);
+      setTemplate(temp, s_port.getPortId(), s_tid, 0, t_tid, true, OUTPUT);
 
       // This transfer is used to mark the local input shadow buffer as full
 
@@ -229,7 +241,7 @@ createOutputBroadcastTemplates(Port &s_port) {
 
           ocpiDebug("** ZERO COPY TransferTemplateGenerator::createOutputBroadcastTemplates from %p, to %p",
 		    s_buf, t_buf);
-          temp->addZeroCopyTransfer(s_buf, t_buf);
+          temp.addZeroCopyTransfer(s_buf, t_buf);
           continue;
         }
 	DT::XferRequest* ptransfer =
@@ -254,7 +266,7 @@ createOutputBroadcastTemplates(Port &s_port) {
           FORMAT_TRANSFER_EC_RETHROW(&s_port, &t_port);
         }
         // Add the transfer
-        temp->addTransfer(ptransfer);
+        temp.addTransfer(ptransfer);
 
       } // end for each input buffer
 
@@ -286,7 +298,7 @@ createOutputBroadcastTemplates(Port &s_port) {
 
       // Add the transfer 
       if (ptransfer2)
-	temp->addTransfer(ptransfer2);
+	temp.addTransfer(ptransfer2);
     } // end for each output buffer
   }  // end for each input port
 }
@@ -308,13 +320,13 @@ createInputTransfers(Port &input) {
     unsigned t_tid = t_buf->getTid();
 
     // Create a template
-    OcpiTransferTemplate* temp = new OcpiTransferTemplate(0);
+    Transfer &temp = *new Transfer(0);
 
     ocpiDebug("*&*&* Adding template for tpid = %d, ttid = %d, template = %p",
-	      input.getPortId(), t_tid, temp);
+	      input.getPortId(), t_tid, &temp);
 
     // Add the template to the controller
-    addTemplate( temp, 0, 0, input.getPortId(), t_tid, false, INPUT);
+    setTemplate(temp, 0, 0, input.getPortId(), t_tid, false, INPUT);
 
     struct PortMetaData::InputPortBufferControlMap *input_offsets =
       &input.getMetaData()->m_bufferData[t_tid].inputOffsets;
@@ -326,7 +338,6 @@ createInputTransfers(Port &input) {
 
     // We need to setup a transfer for each shadow, they exist in the unique output circuits
     for (PortOrdinal n = 0; n < m_output.getPortCount(); n++) {
-
       // Since the shadows only exist in the circuits with instances of real
       // output ports, the offsets are indexed via the output port ordinals.
       // If the output is co-located with us, no shadow exists.
@@ -346,7 +357,7 @@ createInputTransfers(Port &input) {
       // Attach zero-copy for co-location
       if (m_zcopyEnabled && s_port.supportsZeroCopy(&input)) {
         ocpiDebug("Adding Zery copy for input response");
-        temp->addZeroCopyTransfer(NULL, t_buf);
+        temp.addZeroCopyTransfer(NULL, t_buf);
 	continue;
       }
       sent[s_pid] = 1;
@@ -364,7 +375,7 @@ createInputTransfers(Port &input) {
         FORMAT_TRANSFER_EC_RETHROW(&input, &s_port);
       }
       // Add the transfer to the template
-      temp->addTransfer(ptransfer);
+      temp.addTransfer(ptransfer);
     } // end for each input buffer
   } // end for each output port
 }
@@ -423,7 +434,7 @@ getNextEmptyOutputBuffer(OCPI::DataTransport::Port* src_port) {
   return boi;
 }
 
-Buffer* Controller::
+Buffer *Controller::
 getNextFullInputBuffer(OCPI::DataTransport::Port* input_port) {
 
 #ifdef SEQ_RETURN
@@ -442,48 +453,38 @@ getNextFullInputBuffer(OCPI::DataTransport::Port* input_port) {
 
   InputBuffer *low_seq = NULL;
   int full_count=0;
-  for ( int n=0; n<input_port->getBufferCount(); n++ ) {
-    if (  ! buffers[n]->isEmpty() && ! buffers[n]->inUse() ) {
+  for (unsigned n=0; n<input_port->getBufferCount(); n++) {
+    if (!buffers[n]->isEmpty() && !buffers[n]->inUse()) {
       full_count++;
 
       // If we have a parellel distribution on the connection, all of the buffers need 
       // to be in order
-      if ( d_type == DataDistributionMetaData::sequential ) {
-
-        int inc = input_port->getCircuit()->getInputPortSetCount();
-        if ( seq == 0 ) {
+      if (d_type == DataDistributionMetaData::sequential) {
+        unsigned inc = input_port->getCircuit()->getInputPortSetCount();
+        if (seq == 0) {
           seq = buffers[n]->getMetaData()->sequence;
           boi = buffers[n];
           seq += inc;
           break;
-        }
-        else if ( buffers[n]->getMetaData()->sequence == seq ) {
+        } else if (buffers[n]->getMetaData()->sequence == seq) {
+          boi = buffers[n];
+          seq += inc;
+          break;
+        } else if ( buffers[n]->getMetaData()->broadCast == 1 ) {   
+	  // A broadcast may be out of sequence
           boi = buffers[n];
           seq += inc;
           break;
         }
-
-        // A broadcast may be out of sequence
-        else if ( buffers[n]->getMetaData()->broadCast == 1 ) {   
-          boi = buffers[n];
-          seq += inc;
-          break;
-        }
-
-      }
-      else if ( buffers[n]->getMetaData()->sequence == seq ) {
+      } else if (buffers[n]->getMetaData()->sequence == seq) {
         boi = buffers[n];
         seq++;
         break;
       }
-
     }
   }
-  if ( boi ) {
+  if (boi)
     boi->setInUse( true );
-  }
-
-
   // Check for programming error
   if ( (full_count == input_port->getBufferCount()) && ! boi ) {
     ocpiDebug("*** INTERNAL ERROR ***, got a full set of input buffers, but cant find expected sequence");
@@ -509,27 +510,26 @@ getNextFullInputBuffer(OCPI::DataTransport::Port* input_port) {
 #else
   // With this pattern, the data buffers are not deterministic, so we will always hand back
   // the buffer with the lowest sequence
-  InputBuffer* buffer;
+  InputBuffer *buffer;
   InputBuffer *low_seq = NULL;
 
-  for ( OCPI::OS::uint32_t n=0; n<input_port->getBufferCount(); n++ ) {
+  for (unsigned n = 0; n<input_port->getBufferCount(); n++) {
     buffer = input_port->getInputBuffer(n);
-    if (  ! buffer->isEmpty() && ! buffer->inUse() ) {
-      if ( low_seq ) {
-        if ( buffer->getMetaData()->sequence < low_seq->getMetaData()->sequence  ) {
+    if (!buffer->isEmpty() && !buffer->inUse()) {
+      if (low_seq) {
+        if (buffer->getMetaData()->sequence < low_seq->getMetaData()->sequence) {
           low_seq = buffer;
-        } else if ( (buffer->getMetaData()->sequence == low_seq->getMetaData()->sequence) &&
-                  (buffer->getMetaData()->partsSequence < low_seq->getMetaData()->partsSequence) ) {
+        } else if ((buffer->getMetaData()->sequence == low_seq->getMetaData()->sequence) &&
+		   (buffer->getMetaData()->partsSequence < low_seq->getMetaData()->partsSequence) ) {
           low_seq = buffer;
         }
-      }
-      else
+      } else
         low_seq = buffer;
     }
   }
   if (low_seq)
     low_seq->setInUse(true);
-  if (! low_seq)
+  if (!low_seq)
     ocpiDebug("No Input buffers avail");
   return low_seq;
 #endif
@@ -537,9 +537,9 @@ getNextFullInputBuffer(OCPI::DataTransport::Port* input_port) {
 }
 
 bool Controller::
-canBroadcast(Buffer* buffer) {
+canBroadcast(Buffer *buffer) {
   // When s DD = whole only port 0 of the output port set can produce
-  if ( m_isWholeOutputSet && buffer->getPort()->getRank() != 0 )
+  if (m_isWholeOutputSet && buffer->getPort()->getRank() != 0)
     return true;
   bool l_produce = false;
 
@@ -569,7 +569,7 @@ canBroadcast(Buffer* buffer) {
 }
 
 void Controller::
-broadCastOutput(Buffer* b) {
+broadCastOutput(Buffer *b) {
   OutputBuffer *buffer = static_cast<OutputBuffer*>(b);
 
   ocpiDebug("TransferController::broadCastOutput( Buffer* b ), setting EOS !!");
@@ -591,21 +591,22 @@ broadCastOutput(Buffer* b) {
    *  up the template that we need to produce.  So, since the output tid is a given,
    *  the only calculation is the input tid that we are going to produce to.
    */
-  auto temp = m_templates[buffer->getPort()->getPortId()][buffer->getTid()][0][m_nextTid][1][OUTPUT];
+  // auto temp = m_templates[buffer->getPort()->getPortId()][buffer->getTid()][0][m_nextTid][1][OUTPUT];
+  auto &temp = getTemplate(buffer->getPort()->getPortId(), buffer->getTid(), 0, m_nextTid, true, OUTPUT);
   ocpiDebug("output port id = %d, buffer id = %d, input id = %d, template = %p",
-	    buffer->getPort()->getPortId(), buffer->getTid(), m_nextTid, temp);
+	    buffer->getPort()->getPortId(), buffer->getTid(), m_nextTid, &temp);
 
   // Start producing, this may be asynchronous
   OCPI_EMIT_CAT__("Start Data Transfer",OCPI_EMIT_CAT_WORKER_DEV,OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW, buffer );
-  temp->produce();
-  insert_to_list(&buffer->getPendingTxList(), temp, 64, 8);  // Add the template to our list
+  temp.produce();
+  insert_to_list(&buffer->getPendingTxList(), &temp, 64, 8);  // Add the template to our list
 }
 
 void Controller::
 modifyOutputOffsets(Buffer *me, Buffer *new_buffer, bool reverse) {
-  auto temp = m_templates[me->getPort()->getPortId()][me->getTid()][0][m_nextTid][0][OUTPUT];
+  auto &temp = getTemplate(me->getPort()->getPortId(), me->getTid(), 0, m_nextTid, false, OUTPUT);
   // If this is already a zero copy from output to the next input we need to deal with that
-  if (temp->m_zCopy) {
+  if (temp.m_zCopy) {
     Buffer *cme =  static_cast<Buffer*>(me);
     Buffer *cnew_buffer =  static_cast<Buffer*>(new_buffer);
     if (! reverse)
@@ -625,10 +626,10 @@ modifyOutputOffsets(Buffer *me, Buffer *new_buffer, bool reverse) {
       nb = cnew_buffer;
     if (!reverse) {
       new_offsets[0] = nb->m_startOffset;
-      temp->modify( new_offsets, old_offsets);
+      temp.modify( new_offsets, old_offsets);
     } else {
       new_offsets[0] = me->m_startOffset;
-      temp->modify( new_offsets, old_offsets);
+      temp.modify( new_offsets, old_offsets);
     }
   }
 }

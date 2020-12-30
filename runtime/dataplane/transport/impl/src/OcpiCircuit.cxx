@@ -50,7 +50,7 @@
 #include <OcpiCircuit.h>
 #include <OcpiBuffer.h>
 #include <OcpiPortSet.h>
-#include <OcpiTransferTemplate.h>
+#include "TransportTransfer.hh"
 #include <OcpiOutputBuffer.h>
 #include <OcpiInputBuffer.h>
 #include "TransportController.hh"
@@ -66,31 +66,24 @@ using namespace OCPI::DataTransport;
 using namespace OCPI::OS;
 namespace XF = DataTransfer;
 
-// our static init
-//uint32_t OCPI::DataTransport::Circuit::m_init=0;
-
-
 /**********************************
  * Constructors
  *********************************/
 OCPI::DataTransport::Circuit::
-Circuit( 
-        OCPI::DataTransport::Transport* t,
+Circuit(OCPI::DataTransport::Transport* transport,
         CircuitId id,
-        ConnectionMetaData* connection, 
-        PortOrdinal src_ps[],
-        PortOrdinal dest_pss[],
+	DataTransfer::EndPoint *outEp, OCPI::RDT::Descriptors *outDesc,
+	DataTransfer::EndPoint *inEp,
+	unsigned bufCount, unsigned bufSize,
 	OS::Mutex &mutex)
-  :  CU::Child<OCPI::DataTransport::Transport,Circuit>(*t, *this),
+  :  CU::Child<OCPI::DataTransport::Transport,Circuit>(*transport, *this),
      OU::SelfRefMutex(mutex),
-     OCPI::Time::Emit(t, "Circuit"),
-     m_transport(t), m_status(Unknown),
+     OCPI::Time::Emit(transport, "Circuit"),
+     m_transport(transport), m_status(Unknown),
      m_ready(false),m_updated(false),
-     m_outputPs(0), m_inputPs(0),  m_metaData(connection) ,m_portsets_init(0),
+     m_outputPs(0), m_inputPs(0), m_portsets_init(0),
      m_protocol(NULL), m_protocolSize(0), m_protocolOffset(0)
 {
-  ( void ) src_ps;
-  ( void ) dest_pss;
   m_ref_count = 1; // the creator of this has an implicit ref to it
   m_circuitId = id;
   m_openCircuit=true;
@@ -99,15 +92,26 @@ Circuit(
 
   ocpiDebug(" In Circuit::Circuit() this %p id is 0x%x\n", this, id);
 
+  // Create and add the output psmd with one port
+  m_portSetMd.push_back(new PortSetMetaData(true, 0, new ParallelDataDistribution(),
+					    outDesc ? outDesc->desc.nBuffers : bufCount,
+					    outDesc ? outDesc->desc.dataBufferSize : bufSize));
+  m_portSetMd.back()->addPort(outDesc ?
+			      new PortMetaData(0, true, outEp, *outDesc, m_portSetMd.back()) :
+			      new PortMetaData(0, true, outEp, inEp, m_portSetMd.back()));
+  if (inEp) {
+    m_portSetMd.push_back(new PortSetMetaData(false, 1, new ParallelDataDistribution(), bufCount, bufSize));
+    m_portSetMd.back()->addPort(new PortMetaData(0, false, inEp, outEp, m_portSetMd.back()));
+  }
+
   // Now we can initialize our port sets.
   update();
 
   m_lastPortSet = 0;
   m_maxPortOrd = 0;
 
-  for ( uint32_t psc=0; psc<m_metaData->m_portSetMd.size(); psc++ ) {
-    m_maxPortOrd+= static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[psc])->m_portMd.size();
-  }
+  for (unsigned psc = 0; psc < m_portSetMd.size(); psc++)
+    m_maxPortOrd += m_portSetMd[psc]->m_portMd.size();
 
   ocpiDebug("**** Circuit::Circuit: %p po = %d", this, m_maxPortOrd );
 
@@ -119,18 +123,6 @@ Circuit(
       m_openCircuit = false;
     }
   }
-
-  // *** NOTE  ***, for now we are ignoring the port sub-set cases
-
-
-  /*
-   * There are effectively two critical pieces to the construction of 
-   * the circuit, the first is the transfer template setup. The templates 
-   * provide an efficient mechanism by which transfers can take place from 
-   * any output buffer to any inputs port buffer.  The second piece is the
-   * transfer controller.
-   */
-
 }
 
 
@@ -138,8 +130,7 @@ void
 OCPI::DataTransport::Circuit::
 finalize( const char* endpoint )
 {
-  OCPI::DataTransport::ConnectionMetaData* cmd = getConnectionMetaData();
-  OCPI::DataTransport::PortSetMetaData* psmd = static_cast<OCPI::DataTransport::PortSetMetaData*>(cmd->m_portSetMd[0]);
+  OCPI::DataTransport::PortSetMetaData* psmd = m_portSetMd[0];
   psmd->getPortInfo(0)->real_location_string = endpoint;
   updatePort( getOutputPortSet()->getPort(0) );
 }
@@ -175,9 +166,6 @@ OCPI::DataTransport::Circuit::
     delete ps;
     ps = firstChild();
   }
-
-  delete m_metaData;
-
   if (m_protocol)
     delete [] m_protocol;
   //  ocpiAssert( m_ref_count == 0 );
@@ -193,14 +181,14 @@ updateInputs(ContainerComms::RequestUpdateCircuit *a_update)
   // we can let it know when we have consumed a buffer that it sent to us.
 
   // Port set ordinal 0 is always the output set, we need to update ours 
-  static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[0])->getPortInfo(0)->real_location_string = a_update->output_end_point;
+  m_portSetMd[0]->getPortInfo(0)->real_location_string = a_update->output_end_point;
 
   this->getOutputPortSet()->getPort(0)->m_data->m_bufferData->outputOffsets.portSetControlOffset=
     OCPI_UTRUNCATE(OCPI::Util::ResAddr, a_update->senderOutputControlOffset);
   this->getOutputPortSet()->getPort(0)->initialize();
 
   // Now update the input port set with all of the real information associated with the circuit
-  PortSetMetaData* input_ps = static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[1]);
+  PortSetMetaData* input_ps = m_portSetMd[1];
 
   // For DRI we need placeholders for all of the inputs
   unsigned int n;
@@ -239,22 +227,19 @@ updateInputs(ContainerComms::RequestUpdateCircuit *a_update)
   }
 
   m_maxPortOrd = 0;
-  for ( uint32_t psc=0; psc<m_metaData->m_portSetMd.size(); psc++ ) {
-    m_maxPortOrd+=static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[psc])->m_portMd.size();
-  }
+  for (unsigned psc = 0; psc < m_portSetMd.size(); psc++)
+    m_maxPortOrd += m_portSetMd[psc]->m_portMd.size();
 
   // make sure we have a closed circuit
   if ( sports>0 && tports>0 ) {
     ocpiDebug("Circuit %p is closed 2: id %x", this, getCircuitId());
     m_openCircuit = false;
   }
-                  
 }
 
 
-Port *    
-OCPI::DataTransport::Circuit::
-getOutputPort(int ord)
+Port *OCPI::DataTransport::Circuit::
+getOutputPort(unsigned ord)
 {
   return getOutputPortSet()->getPortFromOrdinal(ord);
 }
@@ -320,9 +305,8 @@ updateInputs()
   }
 
   m_maxPortOrd = 0;
-  for ( uint32_t psc=0; psc<m_metaData->m_portSetMd.size(); psc++ ) {
-    m_maxPortOrd+=static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[psc])->m_portMd.size();
-  }
+  for (unsigned psc = 0; psc < m_metaData->m_portSetMd.size(); psc++)
+    m_maxPortOrd += m_portSetMd[psc]->m_portMd.size();
 
   if ( m_maxPortOrd > 1 ) {
     ocpiDebug("Circuit %p is closed 3: id %x", this, getCircuitId());
@@ -539,12 +523,10 @@ setFlowControlDescriptor( OCPI::DataTransport::Port* p, const OCPI::RDT::Descrip
   // What is this???  ocpiDebug("<< Channel = %d", (int)((pdesc.desc.emptyFlagValue>>32) & 0xfff) );
   ocpiDebug("Setting the shadow port ep to %s", pdesc.desc.oob.oep );
 
-  if ( pdesc.desc.oob.oep[0] != 0 ) {
-    // Port set ordinal 0 is always the output set, we need to update ours 
-    static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[0])->getPortInfo(0)->real_location_string = 
-      pdesc.desc.oob.oep;
-  }
-  
+  if (pdesc.desc.oob.oep[0] != 0)
+    // Port set ordinal 0 is always the output set, we need to update ours
+    m_portSetMd[0]->getPortInfo(0)->real_location_string = pdesc.desc.oob.oep;
+
   // Update the output shadow port with the real ports descriptor.  This is only used at the 
   // input port to determine the role of the output and if needed, the pull data info.
   sport->getMetaData()->m_shadowPortDescriptor = pdesc;
@@ -602,13 +584,7 @@ OCPI::DataTransport::Port*
 OCPI::DataTransport::Circuit::
 updatePort( OCPI::DataTransport::Port* p )
 {
-
-  PortSetMetaData* md = static_cast<PortSetMetaData*>
-    (m_metaData->m_portSetMd[0]);
-
-  PortMetaData* pmd = static_cast<PortMetaData*>(md->m_portMd[0]);
-  pmd->init( );
-
+  m_portSetMd[0]->getPortInfo(0)->init();
   p->update();
   if ( m_maxPortOrd > 1 ) {
     ocpiDebug("Circuit %p is closed 4: id %x", this, getCircuitId());
@@ -625,27 +601,17 @@ OCPI::DataTransport::Port*
 OCPI::DataTransport::Circuit::
 addPort( PortMetaData* pmd )
 {
-
   // Create the new port
-  PortSetMetaData* psmd;
-  if ( pmd->output ) {
-    psmd = static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[0]);
-  }
-  else {
-    if ( m_metaData->m_portSetMd.size() < 2 ) {
-
-      // Create a new port set description
-      psmd = new PortSetMetaData(false, 1, new ParallelDataDistribution(), 1, 1024, m_metaData);
-
-      // Add the port set to the connection
-      m_metaData->addPortSet( psmd );
-      update();
-
-    }
-    else {
-      psmd = static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[1]);
-    }
-  }
+  PortSetMetaData *psmd;
+  if (pmd->output)
+    psmd = m_portSetMd[0];
+  else if (m_portSetMd.size() < 2) {
+    // Create a new port set description
+    m_portSetMd.push_back(new PortSetMetaData(false, 1, new ParallelDataDistribution(), 1, 1024));
+    psmd = m_portSetMd.back();
+    update();
+  } else
+    psmd = m_portSetMd[1];
 
   PortMetaData* spmd = psmd->addPort( pmd );
   PortSet * sps = static_cast<PortSet*>(m_inputPs[0]);
@@ -676,185 +642,50 @@ addInputPort(XF::EndPoint &iep, const OCPI::RDT::Descriptors& inputDesc,
 
   // Create a new port set description
   PortSetMetaData* psmd;
-  if ( m_metaData->m_portSetMd.getElementCount() <= 1 ) {
-    psmd = new PortSetMetaData( false, 1, new ParallelDataDistribution(), m_metaData,
-                                iep, &inputDesc, /*this->getCircuitId(),*/ 1, 1, 1024, oep);
-    m_metaData->addPortSet( psmd );
+  if ( m_portSetMd.size() <= 1 ) {
+    m_portSetMd.push_back(new PortSetMetaData(false, 1, new ParallelDataDistribution(),
+					      iep, &inputDesc, /*this->getCircuitId(),*/ 1, 1, 1024, oep));
+    psmd = m_portSetMd.back();
     update();
   }
   else {
-    psmd = static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[1]);
-    int ord = 1 + psmd->m_portMd.size();
-    std::string nuls;
+    psmd = m_portSetMd[1];
     PortMetaData* spsmd = 
-      new PortMetaData( ord, oep, iep, inputDesc, /*getCircuitId(),*/ psmd );
+      new PortMetaData(psmd->m_portMd.size(), oep, iep, inputDesc, /*getCircuitId(),*/ psmd );
     psmd->addPort( spsmd );
     PortSet * sps = static_cast<PortSet*>(m_inputPs[0]);
     Port* sport = 
       new OCPI::DataTransport::Port( spsmd, static_cast<OCPI::DataTransport::PortSet*>(this->getInputPortSet(0)) );
     sps->add( sport );
-    ord++;
   }
-
   //  iep.event_id = (int)((inputDesc.desc.fullFlagValue>>32) & 0xfff);
 }
 
-
-/**********************************
- * Determines if a circuit is ready to be initialized
- *********************************/
-bool 
-OCPI::DataTransport::Circuit::
-ready()
-{
+// Determine if a circuit is ready to be initialized and do it if ready
+bool OCPI::DataTransport::Circuit::
+ready() {
   if (m_openCircuit)
     return false;
   if (m_ready)
     return true;
-
-  PortOrdinal n,y;
-
-  // We need to go through each port and determine if its buffers are complete
-  OCPI::DataTransport::PortSet* s_ps = getOutputPortSet();
-  for (n =0; n < s_ps->getPortCount(); n++) {
-    OCPI::DataTransport::Port* sp = s_ps->getPort(n);
-    if (!sp->ready()) {
+  // Are all output ports ready?
+  for (PortOrdinal n = 0; n < m_outputPs->getPortCount(); n++)
+    if (!m_outputPs->getPort(n)->ready())
       return false;
-    }
-  }
-
-  // Now do the input port sets
-  for (y = 0; y < this->getInputPortSetCount(); y++) {
-                
+  // Are all input ports ready?
+  for (PortOrdinal y = 0; y < m_inputPs.size(); y++) {
     OCPI::DataTransport::PortSet* t_ps = getInputPortSet(y);
-    for (n=0; n<t_ps->getPortCount(); n++ ) {
-      OCPI::DataTransport::Port* tp = t_ps->getPort(n);
-      if ( ! tp->ready() ) {
+    for (PortOrdinal n = 0; n < t_ps->getPortCount(); n++)
+      if (!t_ps->getPort(n)->ready())
         return false;
-      }
-    }
   }
-  m_ready = true;
   ocpiDebug("Circuit %x is READY", getCircuitId());
-  initializeDataTransfers();
+  // We need a controller for sending from our one output port set to each input port set
+  for (PortOrdinal n = 0; n < getInputPortSetCount(); n++)
+    m_transport->m_transportManager->getController(*m_outputPs, *getInputPortSet(n));
+  m_ready = true;
   return true;
 }
-
-/**********************************
- * Initialize transfers
- *********************************/
-void 
-OCPI::DataTransport::Circuit::
-initializeDataTransfers()
-{
-
-// DEBUG CODE !!
-#ifdef NDEBUG1
-  ocpiAssert ( ready() );
-
-  //Go through the input ports and make sure we have the buffers allocated
-  for ( PortOrdinal n=0; n<this->m_connection->getInputPortSetCount(); n++ ) {
-    OCPI::DataTransport::PortSet* portset = (OCPI::DataTransport::PortSet*)this->m_connection->getInputPortSet(n);
-    for ( PortOrdinal y=0; y<portset->getPortCount(); y++ ) {
-      OCPI::DataTransport::Port* port = portset->getPort(y);
-      for (BufferOrdinal b=0; b<port->getNumBuffers(); b++ ) {
-
-        InputBuffer* tb = port->getInputBuffer(b);
-        if ( tb ) {
-          tb->dumpOffsets();
-          tb->update(0);
-          tb->dumpOffsets();
-
-        }
-      }
-    }
-  }
-
-  OCPI::DataTransport::Port* sport = m_outputPs->getPort(0);
-  for ( uint32_t y=0; y<m_outputPs->getPortCount(); y++ ) {
-    OCPI::DataTransport::Port* port = m_outputPs->getPort(y);
-    for ( uint32_t b=0; b<port->getNumBuffers(); b++ ) {
-
-      OutputBuffer* tb = port->getOutputBuffer(b);
-      if ( tb ) {
-        tb->dumpOffsets();
-        tb->update(0);
-        tb->dumpOffsets();
-      }
-    }
-  }
-
-#endif
-
-
-  // When a circuit gets created, we have everything that we need including, distribution, 
-  // partition, and late binding information within the connection class to be capable 
-  // of creating all of the transfers templates that are required.  So here is where we
-  // will perform the init.
-
-  // Select the template generators
-  if ( ! m_templatesGenerated && ! m_openCircuit ) {
-    createCircuitTemplateGenerators();
-    m_templatesGenerated = true;
-  }
-
-}
-
-/**********************************
- * This method is used to select the transfer template generators that are needed 
- * within this circuit.
- *********************************/
-void 
-OCPI::DataTransport::Circuit::
-createCircuitTemplateGenerators()
-{
-  PortOrdinal n;
-
-  // We need a template generator per output/input pair
-  OCPI::DataTransport::PortSet *output_port_set = m_outputPs;
-  DataDistribution* output_dd = output_port_set->getDataDistribution();
-  DataPartition* output_part = output_dd->getDataPartition();
-
-  for ( n=0; n<getInputPortSetCount(); n++ ) {
-
-    // Input info
-    OCPI::DataTransport::PortSet *input_port_set = getInputPortSet(n);
-    DataDistribution* input_dd = input_port_set->getDataDistribution();
-    DataPartition* input_part = input_dd->getDataPartition();
-
-    // Now get our controller
-    bool whole = output_port_set->getDataDistribution()->getMetaData()->distType ==
-      DataDistributionMetaData::parallel ? true : false;
-
-    Port
-      *oport = output_port_set->getPort(0),
-      *iport = input_port_set->getPort(0);
-
-    int32_t
-      output_role = oport->getMetaData()->m_descriptor.role,
-      input_role = iport->getMetaData()->m_descriptor.role;
-    ocpiDebug("output port role = %d", output_role);
-    ocpiDebug("input port role = %d", input_role);
-
-    ocpiAssert( output_role < OCPI::RDT::MaxRole );
-    ocpiAssert( input_role < OCPI::RDT::MaxRole );
-
-
-    Controller &controller =
-      m_transport->m_transportManager->getController(*m_transport, *m_outputPs, *getInputPortSet(n));
-
-    // Attach the controller
-    input_port_set->setTxController( &controller );
-
-    // For now we will add the last controler to the output port set.
-    // This may change as the design evolves.  It is primarily used to
-    // determine what the next output buffer should be
-    output_port_set->setTxController( &controller );
-
-  }
-
-}
-
 
 void 
 OCPI::DataTransport::Circuit::
@@ -1185,7 +1016,7 @@ getQualifiedInputPortSetCount( bool queued )
   }
 
   int ps_count;
-  DataDistribution* dd = m_metaData->dataDistribution;
+  DataDistribution* dd = &m_dataDistribution;
   if ( dd->getMetaData()->distType == DataDistributionMetaData::parallel ) {
     ps_count = this->getInputPortSetCount();
   }
@@ -1208,7 +1039,7 @@ getQualifiedInputPortSet(uint32_t n, bool queued)
   }
 
   OCPI::DataTransport::PortSet* ps = NULL;
-  DataDistribution* dd = m_metaData->dataDistribution;
+  DataDistribution* dd = &m_dataDistribution;
   if ( dd->getMetaData()->distType == DataDistributionMetaData::parallel ) {
     ps = getInputPortSet(n);
   }
@@ -1317,12 +1148,11 @@ void
 Circuit::
 update()
 {
-  unsigned int n;
-  for ( n=m_portsets_init; n<m_metaData->m_portSetMd.size(); n++ ) {
+  for (unsigned n = m_portsets_init; n < m_portSetMd.size(); n++) {
     OCPI::DataTransport::PortSet* ps=NULL;
     try {
       ps = 
-        new OCPI::DataTransport::PortSet( static_cast<PortSetMetaData*>(m_metaData->m_portSetMd[n]),
+        new OCPI::DataTransport::PortSet( static_cast<PortSetMetaData*>(m_portSetMd[n]),
                                          this );
     }
     catch ( ... ) {

@@ -453,7 +453,7 @@ namespace OCPI {
     inline bool Port::isShadow(){return m_shadow;}
     inline BufferOrdinal &Port::getLastBufferTidProcessed(){return m_lastBufferTidProcessed;}
     inline DataTransfer::EndPoint &Port::getEndPoint(){
-      assert(m_data->m_real_location);
+      ocpiAssert(m_data->m_real_location);
       return *m_data->m_real_location;
     }
     inline DataTransfer::EndPoint *Port::checkEndPoint() { return m_data->m_real_location;}

@@ -37,7 +37,7 @@
 #include "OcpiUtilSelfMutex.h"
 #include <OcpiTimeEmit.h>
 #include <OcpiCircuit.h>
-#include <OcpiConnectionMetaData.h>
+#include <OcpiParallelDataDistribution.h>
 #include <OcpiPortSet.h>
 #include <OcpiTransportConstants.h>
 #include <OcpiParentChild.h>
@@ -74,9 +74,10 @@ namespace OCPI {
        * Constructors
        *********************************/
       Circuit( Transport* tpg,
-               CircuitId  iid, ConnectionMetaData* connection, 
-               PortOrdinal sps[], 
-               PortOrdinal dpss[],
+               CircuitId  iid,
+	       DataTransfer::EndPoint *outEp, OCPI::RDT::Descriptors *outDesc,
+	       DataTransfer::EndPoint *inEp,
+	       unsigned bufCount, unsigned bufLen,
 	       OS::Mutex &mutex);
 
 
@@ -240,7 +241,7 @@ namespace OCPI {
        * Get the output port set
        *********************************/
       PortSet* getOutputPortSet();
-      Port*    getOutputPort(int ord = 0);
+      Port*    getOutputPort(unsigned ord = 0);
 
       /**********************************
        * Get the transport object
@@ -271,13 +272,6 @@ namespace OCPI {
 
       // Get the status of the circuit
       inline Status& getStatus(){return m_status;}
-
-
-      /**********************************
-       * Get the connection meta-data
-       *********************************/
-      ConnectionMetaData * getConnectionMetaData();
-
 
       /**********************************
        * store and retrieve protocol info during connection setup
@@ -347,7 +341,7 @@ namespace OCPI {
        * This method is used to select the transfer template generators that are needed 
        * within this circuit.
        *********************************/
-      void createCircuitTemplateGenerators();
+      //      void createCircuitTemplateGenerators();
 
       // Transport
       Transport* m_transport;
@@ -406,8 +400,10 @@ namespace OCPI {
       // Input port sets
       OCPI::Util::VList m_inputPs;
 
-      // Our meta data
-      ConnectionMetaData* m_metaData;
+      // Our port sets
+      std::vector<PortSetMetaData*> m_portSetMd;
+      // Only parallel for now
+      ParallelDataDistribution m_dataDistribution;
 
       // Number of port sets already initialized
       uint32_t m_portsets_init;
@@ -458,7 +454,6 @@ namespace OCPI {
     inline PortOrdinal Circuit::getInputPortSetCount() {return m_inputPs.size();}
     inline OCPI::Util::VList& Circuit::getInputPortSets() {return m_inputPs; }
     inline PortSet* Circuit::getInputPortSet(uint32_t idx) {return static_cast<PortSet*>(m_inputPs[idx]);}
-    inline ConnectionMetaData * Circuit::getConnectionMetaData() {return m_metaData;}
 
   }
 

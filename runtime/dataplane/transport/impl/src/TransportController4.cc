@@ -82,7 +82,7 @@ createOutputTransfers(Port &s_port) {
   // We need a transfer template to allow a transfer from each output buffer to every
   // input buffer for this pattern.
   unsigned sequence;
-  OcpiTransferTemplate *root_temp = NULL, *temp = NULL;
+  Transfer *root_temp = NULL, *temp = NULL;
   for (unsigned s_buffers = 0; s_buffers < n_s_buffers; s_buffers++) {
     // output buffer
     OutputBuffer* s_buf = s_port.getOutputBuffer(s_buffers);
@@ -106,13 +106,13 @@ createOutputTransfers(Port &s_port) {
         for (unsigned t_gated_buffer = 0; t_gated_buffer < n_t_buffers+1; t_gated_buffer++) {
           // This may be gated transfer
           if (transfer_count == 0 && t_gated_buffer == 0) {
-            temp = new OcpiTransferTemplate(4);
+            temp = new Transfer(4);
             root_temp = temp;
             // Add the template to the controller, 
-            addTemplate(temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT);
+            setTemplate(*temp, s_port.getPortId(), s_tid, 0 ,t_tid, false, OUTPUT);
           } else {
             part_sequence = transfer_count * n_t_ports;
-            temp = new OcpiTransferTemplate(4);
+            temp = new Transfer(4);
             root_temp->addGatedTransfer( sequence, temp, 0, t_tid);
           }
           // We need to setup a transfer for each input port. 
@@ -208,17 +208,18 @@ produce(Buffer *buffer, bool bcast) {
   unsigned total = 0;
   unsigned n = 0;
   for (n = 0; n < n_pending; n++) {
-    OcpiTransferTemplate* temp = static_cast<OcpiTransferTemplate*>(get_entry(&l_pending, n));
+    Transfer &temp = *static_cast<Transfer*>(get_entry(&l_pending, n));
     // If this is one ouf ours, produce and then break, we only get to produce once each time
     // "canProduce" is called.
-    if (temp && temp->getTypeId() == 4) {
+    assert(&temp);
+    if (temp.getTypeId() == 4) {
 
       // This is effectivly a broadcst to all port buffers, so we need to mark them as full
       for (PortOrdinal nn = 0; nn < m_input.getPortCount(); nn++) {
         Buffer* tbuf = static_cast<Buffer*>(m_input.getPort(nn)->getBuffer(m_nextTid));
         tbuf->markBufferFull();
       }
-      total += temp->produceGated(0, m_nextTid);
+      total += temp.produceGated(0, m_nextTid);
       break;
     }
   }

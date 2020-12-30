@@ -184,7 +184,7 @@ void OcpiDataDistribution::initTransfers()
  * the distribution type, this template will be created with the proper offset(s) into
  * the source, offsets into the target(s) and appropriate control structures.
  **********************************/
-TransferTemplate*  OcpiDataDistribution::getTxTemplate( Buffer* src )
+Transfer*  OcpiDataDistribution::getTxTemplate( Buffer* src )
 {
   ( void ) src;
   return NULL;
