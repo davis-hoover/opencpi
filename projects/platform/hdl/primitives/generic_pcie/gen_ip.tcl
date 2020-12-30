@@ -30,6 +30,7 @@ set ip_major [regsub {\.} [regsub {.*:} [get_property IPDEF $ip] ""] "_"]
 puts "ip_name:$ip_name ip_part:$ip_part ip_module:$ip_module ip_major:$ip_major ip_minor:$ip_minor"
 set ip_version $ip_major
 set ip_dir managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module
+set gen_dir managed_ip_project/managed_ip_project.gen/sources_1/ip/$ip_module
 # Set the properties associated with the generated core
 # NOTE: These parameters are deliberately set static to match the PicoEVB (artix7) test HDL platform.  Additional work will be done to either:
 # 1) Have the set of parameters come in as arguments?
@@ -58,7 +59,7 @@ launch_runs ${ip_module}_synth_1
 wait_on_run ${ip_module}_synth_1
 
 # Copy the generated files to the appropriate directory location.  
-# Note Copy will fail if the directory was not empty prior.
-file copy -force $ip_dir ../
+file copy -force $gen_dir/ ../
+file copy -force $ip_dir/${ip_module}.xci ../${ip_module}/
 
 puts "Successfully generated and copied files!"
