@@ -1,3 +1,20 @@
+# This file is protected by Copyright. Please refer to the COPYRIGHT file
+# # distributed with this source distribution.
+# #
+# # This file is part of OpenCPI <http://www.opencpi.org>
+# #
+# # OpenCPI is free software: you can redistribute it and/or modify it under the
+# # terms of the GNU Lesser General Public License as published by the Free
+# # Software Foundation, either version 3 of the License, or (at your option) any
+# # later version.
+# #
+# # OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+# # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# # A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+# # details.
+# #
+# # You should have received a copy of the GNU Lesser General Public License along
+# # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 set ip_name [lindex $argv 0]
 set ip_part [lindex $argv 1]
@@ -35,12 +52,13 @@ set_property -dict [list CONFIG.DEVICE_ID {0x4243} \
 # With IP properties, generate the IP:
 generate_target all [get_files $ip_dir/$ip_module.xci] 
 
-# Copy the generated files to the appropriate directory location:
-file copy $ip_dir ../
+# Generate the IP
+create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
+launch_runs ${ip_module}_synth_1
+wait_on_run ${ip_module}_synth_1
+
+# Copy the generated files to the appropriate directory location.  
+# Note Copy will fail if the directory was not empty prior.
+file copy -force $ip_dir ../
 
 puts "Successfully generated and copied files!"
-
-
-
-
-
