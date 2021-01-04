@@ -720,6 +720,23 @@ namespace OCPI {
     Assembly::Connection::
     Connection() : m_count(0) {}
 
+    Assembly::Connection::
+    Connection(const Connection &other)
+      : m_name(other.m_name), m_externals(other.m_externals), m_ports(other.m_ports),
+	m_parameters(other.m_parameters), m_count(other.m_count)
+    {
+      Port *p0 = NULL, *p1 = NULL;
+      for (auto it = m_ports.begin(); it != m_ports.end(); ++it) {
+	(*it).m_connection = this;
+	assert(!(p0 && p1));
+	(p0 ? p1 : p0) = &*it;
+      }
+      if (p0 && p1) {
+	p0->m_connectedPort = p1;
+	p1->m_connectedPort = p0;
+      }
+    }
+
     const char *Assembly::Connection::
     parse(ezxml_t cx, Assembly &a, unsigned &n, const PValue *params) {
       const char *err;
@@ -779,7 +796,8 @@ namespace OCPI {
 	size_t i = index;
 	for (count = count ? count : 1; count--; i++) {
 	  if(e.m_connected[i])
-	    return esprintf("Duplicate connection to index %zu of %zu", i, e.m_count);
+	    return esprintf("Duplicate connection to external \"%s\" index %zu of %zu",
+			    e.m_name.c_str(), i, e.m_count);
 	  e.m_connected[i] = true;
 	}
       } else if (index)

@@ -21,10 +21,10 @@ using namespace Drc_fmcomms_2_3WorkerTypes;
 
 namespace OD = OCPI::DRC;
 
-class Drc_fmcomms_2_3Worker : public OD::DrcProxyBase { 
+class Drc_fmcomms_2_3Worker : public OD::DrcProxyBase {
 
   // ========================================================================
-  // To use the ad9361 DRC helper classes, we need a configurator class that combines the bas ad9361 
+  // To use the ad9361 DRC helper classes, we need a configurator class that combines the bas ad9361
   // one with the tuneresamp soft tuning
   class Fmcomms_2_3_Configurator: public OD::ConfiguratorAD9361, public OD::ConfiguratorTuneResamp {
   public:
@@ -140,7 +140,9 @@ public:
     }
     return RCC_OK;
   }
-
+  RCCResult stop_config(unsigned /*config*/) { return RCC_OK; }
+  RCCResult release_config(unsigned /*config*/) { return RCC_OK; }
+  RCCResult status_config(unsigned /*config*/) { return RCC_OK; }
 };
 
 DRC_FMCOMMS_2_3_START_INFO

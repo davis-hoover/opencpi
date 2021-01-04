@@ -208,15 +208,15 @@ emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
     empty;
   if (signalPort) {
     std::string suff;
-    m_worker->addParamConfigSuffix(suff);
     if (output) {
       if (aName == "open") {
 	actual = "open";
 	actual_data = "open";
       } else {
+	signalPort->worker().addParamConfigSuffix(suff);
 	OU::format(formal, "%s%s.%s_defs.%s%s",
 		   external ? "work" : signalPort->worker().m_implName,
-		   external ? "" : suff.c_str(),
+		   external ? "" : signalPort->worker().addParamConfigSuffix(suff),
 		   signalPort->worker().m_implName, signalPort->pname(),
 		   external ? "_out" : "_in");
 	formal_data = formal + "_data";
@@ -232,6 +232,7 @@ emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
 	actual = m_master ? slaveMissing() : masterMissing();
 	actual_data = "(others => (others => '0'))";
       } else {
+	m_worker->addParamConfigSuffix(suff);
 	OU::format(actual, "%s%s.%s_defs.%s%s_t(%s%s)",
 		   m_worker->m_implName, suff.c_str(), m_worker->m_implName,
 		   fName.c_str(), isArray() ? "_array" : "",

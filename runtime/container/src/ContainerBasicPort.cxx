@@ -164,8 +164,8 @@ namespace OCPI {
 		    name().c_str(), m_nBuffers);
 	}
       }
-      ocpiInfo("For port \"%s\" final buffer count %zu buffer size %zu", m_metaPort.cname(),
-	       m_nBuffers, m_bufferSize);
+      ocpiInfo("For port \"%s\" final buffer count %zu", m_metaPort.cname(),
+	       m_nBuffers);
     }
 
     /*

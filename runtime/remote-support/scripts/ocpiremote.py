@@ -103,6 +103,10 @@ def main():
         '-l', '--log_level',
         'specify log level',
         default=0)
+    option_memory = make_option(
+        '-m', '--memory',
+        'specify DMA memory allocation',
+        default=0)
 
     common_options = [option_user, option_password, option_ip,
                       option_ssh_opts, option_scp_opts]
@@ -129,13 +133,13 @@ def main():
         'start', start,
         'start server on remote device',
         common_options 
-        + [option_log_level, option_valgrind, option_bitstream, 
+        + [option_log_level, option_valgrind, option_bitstream, option_memory,
            option_remote_dir]))
     commands.append(make_subcommand(
         'restart', restart,
         'stop and then start server on remote device',
         common_options 
-        + [option_log_level, option_valgrind, option_bitstream, 
+        + [option_log_level, option_valgrind, option_bitstream, option_memory,
            option_remote_dir]))
     commands.append(make_subcommand(
         'status', status,
@@ -625,6 +629,8 @@ def start(args):
         command += ' -V '
     if int(args.log_level) > 0:
         command += ' -l {} '.format(args.log_level)
+    if int(args.memory, 0) > 0:
+        command += ' -m 0x{:x} '.format(int(args.memory,0))
     command = make_command(command, args, ocpiserver=True)
     
     rc = execute_command(command, args)

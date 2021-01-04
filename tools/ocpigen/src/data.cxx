@@ -266,7 +266,7 @@ finalize() {
   // Either the granule is smaller than or not a multiple of data path width
   if (granuleWidth < m_dataWidth || (m_dataWidth && granuleWidth % m_dataWidth))
     worker().m_needsEndian = true;
-  size_t max_bytes = 16*1024; // jumbo
+  size_t max_bytes = 64*1024-4; // was 16k for jumbo, but this might be faster, but must fit in ushort
   if (!m_isUnbounded && m_maxMessageValues != SIZE_MAX)
     max_bytes = (m_maxMessageValues * m_dataValueWidth + 7) / 8;
   // Now that we know everything about the port, we add properties specific to the port

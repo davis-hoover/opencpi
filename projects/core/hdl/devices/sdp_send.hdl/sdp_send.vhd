@@ -282,7 +282,7 @@ begin
         eof_sent_r          <= bfalse;
       elsif not operating_r then
         -- initialization on first transition to operating.  poor man's "start".
-        if its(in_in.ready) then
+        if in_in.ready or in_in.eof then
           operating_r   <= btrue;
           if props_in.buffer_size > memory_bytes then
             buffer_size_fault_r <= btrue;

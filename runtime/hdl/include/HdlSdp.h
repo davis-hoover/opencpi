@@ -97,7 +97,6 @@ namespace OCPI {
           header_width           = addr_shift + addr_width,
 	  // derived max values
 	  max_message_bytes      = ((1 << count_width) * datum_bytes),
-	  max_reads_outstanding  = MAX_READS_OUTSTANDING,
           max_addressable_kbytes = 1 << (addr_width - 8),
           max_nodes              = 1 << node_width, // always includes one for control
           header_ndws            = (header_width + dword_bits - 1) / dword_bits;

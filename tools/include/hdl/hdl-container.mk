@@ -99,7 +99,6 @@ override HdlLibraries+=sdp axi platform
 # by the app project, and the app developer should not get damaged by the platform developer's
 # projects.  This is probably best fixed by forcing the platform files to to have fully
 # qualified names...
-$(foreach d,$(wildcard $(realpath $(HdlPlatformDir))/../../../../imports/*),$(info DEPEND:$d))
 override XmlIncludeDirsInternal:=\
    $(call Unique,$(HdlPlatformDir) \
                  $(HdlPlatformDir)/hdl \
@@ -113,10 +112,9 @@ override XmlIncludeDirsInternal:=\
                  $(XmlIncludeDirsInternal) \
                  $(HdlAssembly) \
                  $(foreach p,$(HdlPlatformProjectDependencies_$(HdlPlatform)),\
-                   $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,$(info DXDXDX:$d)\
+                   $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,\
                      $d/exports/lib/devices $d/exports/devices/hdl $d/lib/cards $d/lib/cards/hdl)))
 
-$(info XIC:$(XmlIncludeDirsInternal))
 # We might be called from an assembly directory, in which case many of the
 # component libraries are passed through to us, but we might be standalone.
 # Thus we add "devices/adapters/cards" and the platforms own libraries.
