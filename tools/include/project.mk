@@ -204,7 +204,11 @@ cleanhdl:
 
 rcc ocl hdl: imports exports
 
+# hdl stuff is because rcc proxies may need to see hdl slaves
 rcc:
+	$(call MaybeMake,components,hdl HdlPlatforms= HdlPlatform=)
+	$(call MaybeMake,hdl/devices,hdl HdlPlatforms= HdlPlatform=)
+	$(call MaybeMake,hdl/cards,hdl HdlPlatforms= HdlPlatform=)
 	$(call MaybeMake,components,rcc)
 	$(call MaybeMake,hdl/devices,rcc)
 	$(call MaybeMakePlatforms,hdl/platforms,devices,rcc)

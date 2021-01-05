@@ -116,7 +116,7 @@
 #define OCPI_PCI_XHCI      0x00
 #define OPENCPI_MINIMUM_MEMORY_ALLOCATION (16ul*1024)
 #define OPENCPI_INITIAL_MEMORY_ALLOCATION (128ul*1024)
-#define OPENCPI_MAXIMUM_MEMORY_ALLOCATION (128ul*1024)
+#define OPENCPI_MAXIMUM_MEMORY_ALLOCATION (1024ul*1024)
 #define ETH_P_OCPI_CP OCCP_ETHER_MTYPE
 #define ETH_P_OCPI_DP OCDP_ETHER_TYPE
 // -----------------------------------------------------------------------------------------------
@@ -240,9 +240,10 @@ ocpi_get_revision(struct pci_dev *dev) {
 
 static void
 log_debug_block(ocpi_block_t *block, char *msg) {
-  log_debug("%s: block %px: %10lx @ %016llx type(%u) c(%u) pid(%d) prev(%px) next(%px) refcnt(%u)\n",
+  log_debug("%s: block %px: %10lx @ %016llx type(%u) c(%u) pid(%d) prev(%px) next(%px) cnt(%u) av(%u)\n",
 	    msg, block, (unsigned long)block->size, block->start_phys, block->type, block->isCached,
-	    block->pid, block->list.prev, block->list.next, (unsigned)atomic_read(&block->refcnt));
+	    block->pid, block->list.prev, block->list.next, (unsigned)atomic_read(&block->refcnt),
+	    block->available);
 }
 
 #if 0
@@ -275,7 +276,7 @@ make_block(ocpi_address_t phys_addr, ocpi_address_t bus_addr, ocpi_size_t size, 
   block->size = size;
   block->type = type;
   block->isCached = false;
-  atomic_set(&block->refcnt, 1);
+  atomic_set(&block->refcnt, type == ocpi_mmio ? 1 : 0);
   block->pid = current->pid;
   block->available = available;
   block->kernel_alloc_id = kernel_alloc_id;
@@ -309,8 +310,9 @@ free_dma_block(ocpi_block_t *block) {
 }
 // This method will scan the list of memory blocks and merge any adjacent free blocks into a
 // single free block. And if a kernel block is completely coalesced, it will be freed
+// The block will be freed if we are unloading, otherwise it is sticky
 static void
-merge_free_memory(void) {
+merge_free_memory(bool unload) {
   ocpi_block_t *block, *next;
 
   spin_lock(&block_lock);
@@ -330,7 +332,9 @@ merge_free_memory(void) {
 	next = list_entry(block->list.next, ocpi_block_t, list);
       }
       // If I now have a fully merged kernel allocation, I can free it
-      if (block->type == ocpi_kernel && block->size == block->kernel_size) {
+      if (!unload)
+	log_debug_block(block, "available merged block");
+      else if (block->type == ocpi_kernel && block->size == block->kernel_size) {
 	free_kernel_block(block);
 	list_del(&block->list);
 	kfree(block);
@@ -373,7 +377,8 @@ release_block(ocpi_block_t *block)
   do_merge = release_block_locked(block);
   spin_unlock(&block_lock);
   if (do_merge)
-    merge_free_memory();
+    merge_free_memory(false);
+  //  dump_memory_map("release_block exit");
 }
 
 // ----------------------------------------------------------------------------------------------
@@ -412,6 +417,7 @@ static long
 get_memory(ocpi_request_t *request, struct file *file, ocpi_block_t **sparep) {
   long err = -ENOMEM;
   ocpi_block_t *block;
+  //  dump_memory_map("get_memory entry");
   spin_lock(&block_lock);
   list_for_each_entry(block, &block_list, list)
     if (block->available && block->size >= request->actual) {
@@ -426,7 +432,7 @@ get_memory(ocpi_request_t *request, struct file *file, ocpi_block_t **sparep) {
 	block->size = request->actual;
 	list_add(&split->list, &block->list);
       }
-      atomic_set(&block->refcnt, 1);
+      atomic_inc(&block->refcnt);
       block->file = file;
       block->isCached = request->how_cached == ocpi_cached;
       if (file)
@@ -435,6 +441,7 @@ get_memory(ocpi_request_t *request, struct file *file, ocpi_block_t **sparep) {
       break;
     }
   spin_unlock(&block_lock);
+  // dump_memory_map("get_memory exit");
   return err;
 }
 
@@ -520,7 +527,6 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
   void *virtual_addr;
   dma_addr_t dma_handle;
   long err = -ENOMEM;
-
   // don't need to do a page alignment, so actual can be the same as needed
   // either it PAGE_ALIGN was already called to set request->actual or this is
   // the initial memory grab and it's not important
@@ -551,6 +557,27 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
   err = 0;
   return err;
 }
+
+// Try to make a kernel allocation in a block
+// can't use alloc_pages_exact for high mem in a 32 bit world
+static long
+get_kernel_memory(ocpi_request_t *request, unsigned minor) {
+  unsigned order = get_order(request->actual);
+  struct page *kpages = alloc_pages(GFP_KERNEL | __GFP_HIGHMEM, order);
+  ocpi_address_t phys_addr = (ocpi_address_t)page_to_pfn(kpages) << PAGE_SHIFT;
+  if (kpages == NULL)
+    log_err("memory request of %ld could not be satified by the kernel\n",
+	    (unsigned long)request->actual);
+  else if (make_block(phys_addr, phys2bus(phys_addr), PAGE_SIZE << order, ocpi_kernel, true,
+		 ++opencpi_kernel_alloc_id, NULL, minor) == NULL)
+    __free_pages(kpages, order);
+  else {
+    log_debug("allocated kernel pages: %lx @ %016llx\n", PAGE_SIZE << order, phys_addr);
+    return 0;
+  }
+  return -ENOMEM;
+}
+
 // If file == NULL, this is a request for the initial driver memory, not a minor 0 ioctl request
 // this tries to split an existing block, if that fails it tries to allocate more memory
 // and use the memory in the new block
@@ -586,24 +613,8 @@ request_memory(struct file *file, ocpi_request_t *request) {
     if ((err = get_dma_memory(request, minor)) != 0) {
       log_err("get_dma_memory in request_memory failed, trying fallback\n");
       log_err("if allocation failure occurs, see README for memmap configuration\n");
-      // Try to make a kernel allocation and stick it in the list
-      // can't use alloc_pages_exact for high mem in a 32 bit world
-      {
-	unsigned order = get_order(request->actual);
-	struct page *kpages = alloc_pages(GFP_KERNEL | __GFP_HIGHMEM, order);
-	ocpi_address_t phys_addr = (ocpi_address_t)page_to_pfn(kpages) << PAGE_SHIFT;
-	if (kpages == NULL) {
-	  log_err("memory request of %ld could not be satified by the kernel\n",
-		  (unsigned long)request->actual);
-	  break;
-	}
-	if (make_block(phys_addr, phys2bus(phys_addr), PAGE_SIZE << order, ocpi_kernel, true,
-		       ++opencpi_kernel_alloc_id, NULL, minor) == NULL) {
-	  __free_pages(kpages, order);
-	  break;
-	}
-	log_debug("allocated kernel pages: %lx @ %016llx\n", PAGE_SIZE << order, phys_addr);
-      }
+      if ((err = get_kernel_memory(request, minor)))
+	break;
     }
     // Now we try one more time after having added kernel pages or made a DMA allocation
     // The only thing that can go wrong is someone else slipping in
@@ -781,7 +792,8 @@ opencpi_io_release(struct inode *inode, struct file *file) {
       }
     spin_unlock(&block_lock);
     if (do_merge)
-      merge_free_memory();
+      merge_free_memory(false);
+    // dump_memory_map("opencpi_io_release exit");
   }
   return 0;
 }
@@ -1733,7 +1745,7 @@ free_driver(void) {
     list_for_each_entry_safe(block, temp, &block_list, list)
       free_block(block);
     spin_unlock(&block_lock);
-    merge_free_memory();
+    merge_free_memory(true);
     spin_lock(&block_lock);
     list_for_each_entry_safe(block, temp, &block_list, list) {
       if (block->type == ocpi_kernel)
@@ -1742,6 +1754,7 @@ free_driver(void) {
       kfree(block);
     }
     spin_unlock(&block_lock);
+    // dump_memory_map("free_driver");
     block_init = 0;
   }
   if (opencpi_devices) {
@@ -1904,7 +1917,7 @@ opencpi_init(void) {
 	log_err("get_dma_memory failed in opencpi_init, trying fallback\n");
         for (request.needed = opencpi_size; request.needed >= OPENCPI_MINIMUM_MEMORY_ALLOCATION;
 	     request.needed /= 2)
-	  if ((err = request_memory(NULL, &request)) == 0)
+	  if (!(err = get_kernel_memory(&request, 0)))
 	    break;
       }
       if (err) {
@@ -1912,7 +1925,7 @@ opencpi_init(void) {
         break;
       }
       opencpi_size = request.actual;
-      log_debug("Using allocated kernel memory size %lx\n", opencpi_size);
+      log_debug("Using initial allocated kernel/dma memory size %lx\n", opencpi_size);
     }
 #ifdef OCPI_NET
     if ((err = proto_register(&opencpi_proto, 0))) {

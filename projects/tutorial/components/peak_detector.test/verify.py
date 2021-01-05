@@ -50,29 +50,6 @@ def validation(argv):
 
     num_samples = int(argv[1])
 
-    # strip off output extension and replace with 'log' ('.out.out'=>'.log')
-    logname = os.path.splitext(argv[2])[0]
-    logname = os.path.splitext(logname)[0] + ".log"
-    if not os.path.isfile(logname):
-        logname = os.path.splitext(logname)[0] + ".remote_log"
-    # Parse the logfile for the final values of max/min peaks
-    # Normally, we would access these via environment variables:
-    #   OCPI_TEST_max_peak, OCPI_TEST_min_peak
-    # Due to an inconsistency in the unit test framework, the final values of
-    #   these properties are captured correctly in the environment variables
-    #   for RCC workers, but not HDL.
-    with open(logname, 'r') as log:
-        for line in log:
-            max_obj = re.search("Property \d+: peak_detector.max_peak = \"(-?\d+)\".*", line)
-            if max_obj: #max_obj[1]:
-                max_peak = int(max_obj.group(1))
-            min_obj = re.search("Property \d+: peak_detector.min_peak = \"(-?\d+)\".*", line)
-            if min_obj: #[1]:
-                min_peak = int(min_obj.group(1))
-
-    if not min_peak or not max_peak:
-        print("Exit: log file does not contain max/min peak final values")
-        return
     #Read all of input data file as complex int16
     print ("File to validate: ", argv[2])
 
@@ -95,6 +72,8 @@ def validation(argv):
     pymin = min(min(dout['real_idx']), min(dout['imag_idx']))
     pymax = max(max(dout['real_idx']), max(dout['imag_idx']))
 
+    min_peak = int(os.environ.get("OCPI_TEST_min_peak"))
+    max_peak = int(os.environ.get("OCPI_TEST_max_peak"))
     print ("uut_min_peak = ", min_peak)
     print ("uut_max_peak = ", max_peak)
     print ("file_min_peak = ", pymin)
