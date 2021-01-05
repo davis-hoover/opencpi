@@ -700,8 +700,17 @@ namespace OCPI {
 	  otherImpl = m_instances[other->m_instance].m_deployment.m_impls[0];
 	  otherPort = otherImpl->m_metadataImpl.findMetaPort(other->cname());
 #endif
-	} else if (!ap || !other || other->m_instance > instNum)
+	} else if (!ap || (other && other->m_instance > instNum))
+	  continue; // not connected or other end is not deployed yet, so we are ok
+	else if (!other) { // looks like an external port of the application
+	  assert(ap->m_connection && !ap->m_connection->m_externals.empty());
+	  if (c.impl->m_internals & (1u << nn)) {
+	    ocpiInfo("%s due to implementation port \"%s\" having an internal connection when "
+		     "application specifies that port as external", reject.c_str(), ap->cname());
+	    return false;
+	  }
 	  continue;
+	}
 	// check for prewired compatibility, post-delegation
 	if (m_assembly.badConnection(*thisImpl, *thisPort, *otherImpl, *otherPort)) {
 	  ocpiInfo("%s due to connectivity conflict", reject.c_str());
@@ -944,7 +953,13 @@ namespace OCPI {
         const char *newName = !strncasecmp(pName, "port", 4) ? pName + 4 : pName;
         // Override any port parameters that might have been set in XML
         // Override any same-named connection params
-        m_assembly.assyPort(instn, portn)->setParam(newName, value);
+	for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
+	  for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
+	    assert(!(*pi).m_name.empty());
+	    if (!strcasecmp((*pi).m_name.c_str(), p->cname()))
+		(*pi).setParam(newName, value);
+	  }
+        // m_assembly.assyPort(instn, portn)->setParam(newName, value);
       }
       return NULL;
     }
@@ -2014,21 +2029,15 @@ namespace OCPI {
     // Stuff to do after "done" (or perhaps timeout)
     void ApplicationI::finish() {
       const char *err;
-      Property *p = m_properties;
-      for (unsigned n = 0; n < m_nProperties; n++, p++)
-        if (p->m_dumpFile) {
-          std::string l_name, value;
-          m_launchMembers[m_bestDeployments[p->m_instance].m_firstMember].m_worker->
-            getProperty(p->m_property, l_name, value, NULL, m_hex);
-          value += '\n';
-          if ((err = OU::string2File(value, p->m_dumpFile)))
-            throw OU::Error("Error writing '%s' property to file: %s", l_name.c_str(), err);
-        }
-      if (m_dump)
-        dumpProperties(false, false, "final");
-      if (m_dumpPlatforms)
-        for (unsigned n = 0; n < m_nContainers; n++)
-          m_containers[n]->dump(false, m_hex);
+      // Dumping all properties into a file MUST BE DONE FIRST here because it is used by unit
+      // testing, and when workers are written with read-side-effects for properties, like
+      // peak_detect in tutorial, we want the correct values to be here in this properties file,
+      // sacrificing the correct values in the normal property dumps.
+      // This is not a great way to write workers anyway, but at least this way unit testing works.
+      // But for such workers the other two types of property dumps do not work when unit tested:
+      // 1. dump-property-value into a file
+      // 2. list all final property values
+      // Perhaps the better fix would be to tag such properties so we only list them once.
       if (m_dumpFile.size()) {
         std::string value, dump;
         PropertyAttributes attrs;
@@ -2046,6 +2055,21 @@ namespace OCPI {
         if ((err = OU::string2File(dump, m_dumpFile)))
           throw OU::Error("error when dumping properties to a file: %s", err);
       }
+      Property *p = m_properties;
+      for (unsigned n = 0; n < m_nProperties; n++, p++)
+        if (p->m_dumpFile) {
+          std::string l_name, value;
+          m_launchMembers[m_bestDeployments[p->m_instance].m_firstMember].m_worker->
+            getProperty(p->m_property, l_name, value, NULL, m_hex);
+          value += '\n';
+          if ((err = OU::string2File(value, p->m_dumpFile)))
+            throw OU::Error("Error writing '%s' property to file: %s", l_name.c_str(), err);
+        }
+      if (m_dump)
+        dumpProperties(false, false, "final");
+      if (m_dumpPlatforms)
+        for (unsigned n = 0; n < m_nContainers; n++)
+          m_containers[n]->dump(false, m_hex);
     }
 
     // Get an external port to use corresponding to an external port defined in the assembly.

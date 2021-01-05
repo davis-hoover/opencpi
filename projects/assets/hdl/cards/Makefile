@@ -25,6 +25,6 @@
 Tests =
 
 # not setting Workers variable causes all workers to build
-#Workers = 
+#Workers =
 
 include $(OCPI_CDK_DIR)/include/library.mk
