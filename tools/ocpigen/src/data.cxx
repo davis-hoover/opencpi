@@ -474,7 +474,8 @@ adjustConnection(Connection &c, bool isProducer, OcpAdapt *myAdapt, bool &myHasE
 	prod.m_dataValueGranularity % cons.m_dataValueGranularity)
       return "dataValueGranularity incompatibility for connection";
     if (prod.m_maxMessageValues > cons.m_maxMessageValues)
-      return "maxMessageValues incompatibility for connection";
+      return OU::esprintf("maxMessageValues incompatibility for connection (%zu -> %zu)",
+			  prod.m_maxMessageValues, cons.m_maxMessageValues);
     if (prod.OU::Protocol::cname()[0] && cons.OU::Protocol::cname()[0] &&
 	strcasecmp(prod.OU::Protocol::cname(), cons.OU::Protocol::cname()))
       return OU::esprintf("protocol incompatibility: producer: %s vs. consumer: %s",

@@ -56,6 +56,7 @@
     <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'  
 	    name='rx_qadc1' connect='rx_cswm_to_iqstream1'>
     </Instance> 
+>>>>>>> origin/develop
     <Instance worker='ocpi.assets.misc_comps.cswm_to_iqstream.hdl'
 	    name='rx_cswm_to_iqstream1' connect='rx_complex_mixer1'/> 
     <Instance worker="ocpi.assets.dsp_comps.complex_mixer.hdl"  

@@ -129,7 +129,7 @@ build_targets += xm
 endif
 
 ifneq ($(RccImplementations),)
-build_targets += rcc
+build_targets += hdl rcc
 endif
 
 ifeq ($(OCPI_HAVE_OPENCL),1)

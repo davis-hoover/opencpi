@@ -113,7 +113,7 @@ bool test_range_of_I_Q(const std::string& file_str) {
 void run_app(const std::string& app_xml_str, const std::string& file_str,
     bool no_file_write = false) {
 
-  OA::PValue pvs[] = { OA::PVBool("verbose", false), OA::PVBool("dump", false), OA::PVEnd };
+  OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", false), OA::PVEnd };
   OA::Application app(app_xml_str, pvs);
   app.initialize(); // all resources have been allocated
 
