@@ -22,8 +22,9 @@
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
 # HdlLibraries= ocpi axi sdp platform
+HdlLibraries= ocpi axi sdp platform
 
-VivadoPcieTargets=picoevb 
+VivadoPcieTargets= artix7 
 OnlyTargets=$(VivadoPcieTargets)
 
 # We need to include this file before hdl-library.mk to preprocess the platforms and targets (at least)
@@ -39,14 +40,17 @@ ISEWrapperModule=$(XilinxCoreName)
 # Vivado method of getting the IP core.  We let tcl determine the version and get the wrapper
 VivadoIpDir=$(call OcpiXilinxVivadoDir,infox)/data/ip/xilinx
 # Core name is derived from the wrapper name returned by tcl
+# ## VivadoPcieCore=$(VivadoWrapperModule:%_processing_system7=%)
 VivadoPcieCore=$(VivadoWrapperModule:%_processing_system7=%)
-VivadoPcieSources=$(foreach f,atc aw_atc b_atc trace_buffer w_atc,\
-                    $(VivadoIpDir)/$(VivadoPcieCore)/hdl/verilog/$(VivadoPcieCore)_$f.vhd) \
+# VivadoPcieSources=$(foreach f,atc aw_atc b_atc trace_buffer w_atc,\
+
+VivadoPcieSources=$(foreach f,stub,\
+                    $(VivadoIpDir)/$(VivadoPcieCore)/hdl/$(VivadoPcieCore)_$f.vhd) \
                   $(VivadoWrapperFile)
-# # Debug prints
-# $(info The VivadoIpDir variable is ... $(VivadoIpDir) )
-# $(info The VivadoPcieSources variable is ... $(VivadoPcieSources) )
-# $(info The VivadoPcieCore variable is ... $(VivadoPcieCore) )
+# Debug prints
+$(info The VivadoIpDir variable is ... $(VivadoIpDir) )
+$(info The VivadoPcieSources variable is ... $(VivadoPcieSources) )
+$(info The VivadoPcieCore variable is ... $(VivadoPcieCore) )
 
 # The TCL script that gets the wrapper verilog code also determines the version and module name.
 # Since this determines the file name of the wrapper code, we do it here on the first pass of make
@@ -62,7 +66,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS))$(if $(HdlTargets),,z),)  # if not cleanin
       $(info Wrapper-module was not determined as expected ... )
       $(info Generating the vhdl wrapper for the axi_pcie primitive.)
       $(if $(call DoShell,\
-              mkdir -p gen && cd gen && rm -r -f tmp && mkdir tmp && \
+              rm -r -f gen && mkdir -p gen && cd gen && rm -r -f tmp && mkdir tmp && \
               (cd tmp && \
                            $(call OcpiXilinxVivadoInit) && \
                            vivado -mode batch -source ../../gen_ip.tcl \
@@ -80,7 +84,7 @@ endif # if not cleaning
 
 # ################################################################################
 # # Generic, VIVADO or ISE
-SourceFiles=generic_pcie_pkg.vhd $(VivadoPcieSources)
+SourceFiles=generic_pcie_pkg.vhd generic_pcie.vhd #$(VivadoPcieSources)
 # OcpiCPPDefines=$(and $(UseISE),XILINX_ISE=1) PS7_WRAPPER_MODULE=$(WrapperModule)
 #
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
