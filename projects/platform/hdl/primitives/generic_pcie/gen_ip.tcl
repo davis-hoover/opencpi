@@ -53,13 +53,37 @@ set_property -dict [list CONFIG.DEVICE_ID {0x4243} \
 # With IP properties, generate the IP:
 generate_target all [get_files $ip_dir/$ip_module.xci] 
 
-# Generate the IP
-create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
-launch_runs ${ip_module}_synth_1
-wait_on_run ${ip_module}_synth_1
+puts "After generate_target all, the current working directory is:"
 
+## Generate the IP
+# create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
+# launch_runs ${ip_module}_synth_1
+# wait_on_run ${ip_module}_synth_1
+
+# ###
 # Copy the generated files to the appropriate directory location.  
-file copy -force $gen_dir/ ../
-file copy -force $ip_dir/${ip_module}.xci ../${ip_module}/
+# ###
+
+# # Copy generated directory
+# file copy -force $gen_dir/ ../
+
+# Copy source.xdc file
+file copy -force $gen_dir/${ip_module}/source ../
+
+# Copy hdl directory
+file copy -force $gen_dir/hdl/ ../hdl
+
+# Copy sim directory
+file copy -force $gen_dir/sim/ ../sim
+
+# Copy simulation directory
+file copy -force $gen_dir/simulation/ ../simulation
+
+# Copy synth ip variation top level file
+file copy -force $gen_dir/synth/ ../synth
+
+# Update IP variation file
+file copy -force $ip_dir/${ip_module}.xci ../
+
 
 puts "Successfully generated and copied files!"
