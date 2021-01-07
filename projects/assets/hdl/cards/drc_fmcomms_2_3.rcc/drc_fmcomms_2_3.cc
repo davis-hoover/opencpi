@@ -140,9 +140,9 @@ public:
     }
     return RCC_OK;
   }
-  RCCResult stop_config(unsigned /*config*/) { return RCC_OK; }
-  RCCResult release_config(unsigned /*config*/) { return RCC_OK; }
-  RCCResult status_config(unsigned /*config*/) { return RCC_OK; }
+  RCCResult stop_config(unsigned /*config*/) {
+    return RCC_OK;
+  }
 };
 
 DRC_FMCOMMS_2_3_START_INFO

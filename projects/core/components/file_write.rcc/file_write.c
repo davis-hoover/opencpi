@@ -38,6 +38,7 @@ typedef struct {
   int started;
   RCCTime startTime;
   uint64_t sum;
+  uint32_t count;
 } MyState;
 
 FILE_WRITE_METHOD_DECLARATIONS;
@@ -100,10 +101,13 @@ run(RCCWorker *self, RCCBoolean timedOut, RCCBoolean *newRunCondition) {
      return self->container.setError("error writing header to file: %s (%zd)", strerror(errno), rv);
  }
  if (port->input.length) {
-   if (props->countData) {
-     uint64_t *p = (uint64_t *)port->current.data;
-     for (unsigned n = port->input.length/sizeof(uint64_t); n; --n)
+   if (props->countData) { // touch the data and check it if is correct
+     uint32_t *p = (uint32_t *)port->current.data;
+     for (unsigned n = port->input.length/sizeof(uint32_t); n; --n) {
+       if (s->count++ != *p)
+	 return self->container.setError("counting error: is %u, should be %u", *p, --s->count);
        s->sum += *p++;
+     }
    }
    if (!props->suppressWrites &&
        (rv = write(s->fd, port->current.data, port->input.length)) != (ssize_t)port->input.length)

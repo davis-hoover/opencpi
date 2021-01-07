@@ -55,7 +55,7 @@ platform=$OCPI_TOOL_PLATFORM
 echo Executing remote configuration command: $* 
 action=$1; shift
 
-while getopts u:l:w:a:p:s:d:o:P:m:BVh o
+while getopts u:l:w:a:p:s:d:o:P:m:e:BVh o
 do 
   case "$o" in 
     u) user=$OPTARG ;;
@@ -71,6 +71,7 @@ do
     B) bs=-B ;;
     V) vg=-V ;;
     m) memarg="-m $OPTARG"; mem=$OPTARG ;;
+    e) envarg=$OPTARG ;;
   esac 
 done
 case $action in
@@ -104,8 +105,8 @@ start)
   echo PATH=$PATH >&2
   echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH >&2
   echo VALGRIND_LIB=$VALGRIND_LIB >&2
-  echo nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
-  nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
+  echo $envarg nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
+  eval $envarg exec nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
   pid=$!
   sleep 1
   if kill -s CONT $pid; then

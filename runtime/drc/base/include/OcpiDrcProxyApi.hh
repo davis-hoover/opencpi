@@ -131,12 +131,11 @@ protected:
     return RCC_OK;
   }
   // ==========================================================================================
-  // Required methods supplied by the actual proxy code
-  virtual RCCResult prepare_config(unsigned config) = 0;
+  virtual RCCResult prepare_config(unsigned /*config*/) { return RCC_OK; }; // default if only start is used
   virtual RCCResult start_config(unsigned config) = 0;
   virtual RCCResult stop_config(unsigned config) = 0;
-  virtual RCCResult release_config(unsigned config) = 0;
-  virtual RCCResult status_config(unsigned config) = 0;
+  virtual RCCResult release_config(unsigned /*config*/) { return RCC_OK; };
+  virtual RCCResult status_config(unsigned /*config*/) { return RCC_OK; };
 };
 } // DRC
 } // OCPI

@@ -42,9 +42,8 @@ protected:
   XferServices(XF::EndPoint &source, XF::EndPoint &target)
     : ConnectionBase<XferFactory,XferServices,XferRequest,
 		     DG::XferServices>(*this, source, target){}
-  // Here because the driver template classes can't inherit nicely
   XF::XferRequest* createXferRequest();
-  uint16_t maxPayloadSize() { return DATAGRAM_PAYLOAD_SIZE; }
+  uint16_t maxPayloadSize() { return static_cast<EndPoint*>(&from())->maxPayloadSize(); }
 };
 class XferRequest
   : public TransferBase<XferServices,XferRequest,DG::XferRequest> {
