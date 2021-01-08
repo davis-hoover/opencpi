@@ -676,6 +676,7 @@ def make_after_script(platform, do_ocpiremote=False, is_downstream=False):
     cmds.append(upload_cmd)
 
     if do_ocpiremote:
+        cmds.append('source cdk/opencpi-setup.sh -e')
         cmds.append(make_ocpiremote_cmd('unload', platform))
 
     clean_cmd = 'rm -rf * .* 2>/dev/null || true'

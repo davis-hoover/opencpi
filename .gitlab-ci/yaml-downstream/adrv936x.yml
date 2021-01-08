@@ -5,4 +5,4 @@ workflow:
 include:
   - project: 'opencpi/opencpi'
     ref: develop
-    file: '.gitlab-ci/downstream-ci.yml'
+    file: '.gitlab-ci/yaml/downstream-ci.yml'
