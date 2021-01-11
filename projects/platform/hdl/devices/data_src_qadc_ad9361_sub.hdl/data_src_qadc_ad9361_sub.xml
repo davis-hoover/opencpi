@@ -1,4 +1,6 @@
-<HdlDevice language='vhdl' Version='2' libraries='util ocpi.core.bsv'>
+<HdlDevice language='vhdl' Version='2' libraries='util cdc adc' 
+      sourcefiles='clock_selector_with_async_select.vhd clock_divider.vhd clock_manager.vhd one_sample_clock_per_adc_sample_generator.vhd'
+      onlytargets='zynq zynq_ise zynq_ultra virtex6 isim xsim'> <!-- Only tested targets cause of BUFR primitive -->
 
   <!-- By design, this worker provides control and/or data plane functionality
        that is never intended to be exposed by any other worker. Accordingly,

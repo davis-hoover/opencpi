@@ -27,6 +27,7 @@ SourceFiles= \
   complex_short_with_metadata_demarshaller.vhd \
   complex_short_with_metadata_marshaller.vhd \
   complex_short_with_metadata_marshaller_old.vhd \
+  out_port_cswm_samples_and_sync.vhd \
   iqstream_pkg.vhd \
   iqstream_body.vhd \
   iqstream_demarshaller.vhd \
