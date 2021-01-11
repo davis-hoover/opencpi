@@ -21,6 +21,8 @@
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
+ExcludeTargets=zynq zynq_ise zynq_ultra isim xsim virtex5 virtex6 modelsim stratix4 stratix5 cyclone arria10soc arria10soc_std
+
 # HdlLibraries= ocpi axi sdp platform
 HdlLibraries= ocpi axi sdp platform
 
