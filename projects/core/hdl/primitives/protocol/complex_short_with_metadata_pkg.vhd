@@ -186,4 +186,26 @@ component complex_short_with_metadata_marshaller_old is
     oready       : in  ocpi.types.Bool_t);
 end component;
 
+component out_port_cswm_samples_and_sync is
+  generic(
+    WSI_DATA_WIDTH    : positive := 16; -- 16 is default of codegen, but
+                                        -- MUST USE 32 FOR NOW
+    WSI_MBYTEEN_WIDTH : positive);
+  port(
+    clk          : in  std_logic;
+    rst          : in  std_logic;
+    -- INPUT
+    iprotocol    : in  protocol_t;
+    oready       : in  ocpi.types.Bool_t;
+    -- OUTPUT
+    odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
+    ovalid       : out ocpi.types.Bool_t;
+    obyte_enable : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
+    ogive        : out ocpi.types.Bool_t;
+    osom         : out ocpi.types.Bool_t;
+    oeom         : out ocpi.types.Bool_t;
+    oopcode      : out opcode_t;
+    iready       : out std_logic);
+end component;
+
 end package complex_short_with_metadata;

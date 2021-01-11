@@ -25,7 +25,6 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 use ocpi.util.all;
-library ocpi_core_bsv; use ocpi_core_bsv.all;
 library unisim; use unisim.vcomponents.all;
 library protocol, cdc;
 architecture rtl of worker is
@@ -142,6 +141,8 @@ architecture rtl of worker is
   signal wsi_in1_connected : std_logic := '0';
   signal wsi_is_operating  : std_logic := '0';
 
+  signal dacd2_reset       : std_logic := '0';
+
   attribute equivalent_register_removal : string;
   attribute equivalent_register_removal of dacd2_processing_ch0 : signal is "no";
   attribute equivalent_register_removal of dacd2_processing_ch0_r : signal is "no";
@@ -247,6 +248,16 @@ begin
       --    end if;
       --  end if;
       --end process;
+      
+      -- From ADI's UG-570:
+      -- "For a system with a 2R1T or a 1R2T configuration, the clock
+      -- frequencies, bus transfer rates and sample periods, and data
+      -- capture timing are the same as if configured for a 2R2T system.
+      -- However, in the path with only a single channel used, the
+      -- disabled channel’s I-Q pair in each data group is unused."
+      wci_use_two_r_two_t_timing <= dev_cfg_data_in.config_is_two_r or
+                                    dev_cfg_data_tx_in.config_is_two_t or
+                                    dev_cfg_data_tx_in.force_two_r_two_t_timing;
 
       single_port_fdd_ddr_i : entity work.ad9361_dac_sub_cmos_single_port_fdd_ddr
         generic map(
@@ -254,10 +265,8 @@ begin
         port map(
           wci_clk                      => wci_clk,
           wci_reset                    => wci_reset,
-          wci_config_is_two_r          => dev_cfg_data_in.config_is_two_r,
-          wci_config_is_two_t          => dev_cfg_data_tx_in.config_is_two_t,
-          wci_force_two_r_two_t_timing => dev_cfg_data_tx_in.force_two_r_two_t_timing,
-          dac_clk                      => dev_data_clk_in.DATA_CLK_P,
+          wci_use_two_r_two_t_timing   => wci_use_two_r_two_t_timing,
+          dac_clk                      => dev_data_clk_in.DATA_CLK_P, 
           dac_data_i_ch0               => dac_data_i(0),
           dac_data_i_ch1               => dac_data_i(1),
           dac_data_q_ch0               => dac_data_q(0),
@@ -323,21 +332,26 @@ begin
                                   dev_cfg_data_tx_in.config_is_two_t or
                                   dev_cfg_data_tx_in.force_two_r_two_t_timing;
 
-    wci_reset_n <= not wci_reset;
-    -- sync (WSI clock domain) -> (DAC clock divided by 2
-    -- domain), note that we don't care if WSI clock is much faster and bits are
-    -- dropped - wsi_use_two_r_two_t_timing is a configuration bit which is
+    dacd2_reset_gen : cdc.cdc.reset
+    port map(
+      src_rst => wci_reset,
+      dst_clk => dacd2_clk,
+      dst_rst => dacd2_reset); 
+    
+    -- sync (WCI clock domain) -> (DAC clock divided by 2
+    -- domain), note that we don't care if WCI clock is much faster and bits are
+    -- dropped - wci_use_two_r_two_t_timing is a configuration bit which is
     -- expected to change very rarely in relation to either clock
-    second_chan_enable_sync : bsv_pkg.SyncBit
-      generic map(
-        init   => 0)
-      port map(
-        sCLK   => wci_clk,
-        sRST   => wci_reset_n, -- apparently sRST is active-low
-        dCLK   => dacd2_clk,
-        sEN    => '1',
-        sD_IN  => wci_use_two_r_two_t_timing,
-        dD_OUT => dacd2_use_two_r_two_t_timing_rr); -- delayed by one WSI clock, two DACD2 clocks
+    second_chan_enable_sync : cdc.cdc.single_bit
+    generic map(IREG      => '1',
+                RST_LEVEL => '0')
+    port map   (src_clk      => wci_clk,
+                src_rst      => wci_reset,
+                src_en       => '1',
+                src_in       => wci_use_two_r_two_t_timing,
+                dst_clk      => dacd2_clk,
+                dst_rst      => dacd2_reset,
+                dst_out      => dacd2_use_two_r_two_t_timing_rr);  -- delayed by one WCI clock, two DAC clocks
 
     -- take is delayed version of vld to ensure that there is always at least
     -- 1 sample in the CDC FIFO (prevents possibility of CDC FIFO underrun upon
@@ -523,7 +537,7 @@ begin
 
   is_operating_cdc : cdc.cdc.single_bit
     generic map(
-      N    => 2,
+      N    =>  2,
       IREG => '1')
     port map(
       src_clk  => wci_Clk,
