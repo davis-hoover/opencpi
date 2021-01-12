@@ -67,20 +67,27 @@ puts "After generate_target all, the current working directory is:"
 # # Copy generated directory
 # file copy -force $gen_dir/ ../
 
+# ## 
+#  NOTE Vivado 2020 has a different resulting directory structure when generating the IP
+#  2020.2 - The files are split between managed_ip_project.srcs, and manageded_ip_project.gen
+#  2019.2 - All files are under managed_ip_project.srcs
+#  This will need to be reconsiled. 
+#  --> Using 2019.2 directory structure only.
+# ##
 # Copy source.xdc file
-file copy -force $gen_dir/${ip_module}/source ../
+file copy -force $ip_dir/${ip_module}/source ../
 
 # Copy hdl directory
-file copy -force $gen_dir/hdl/ ../hdl
+file copy -force $ip_dir/hdl/ ../hdl
 
 # Copy sim directory
-file copy -force $gen_dir/sim/ ../sim
+file copy -force $ip_dir/sim/ ../sim
 
 # Copy simulation directory
-file copy -force $gen_dir/simulation/ ../simulation
+file copy -force $ip_dir/simulation/ ../simulation
 
 # Copy synth ip variation top level file
-file copy -force $gen_dir/synth/ ../synth
+file copy -force $ip_dir/synth/ ../synth
 
 # Update IP variation file
 file copy -force $ip_dir/${ip_module}.xci ../
