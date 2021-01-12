@@ -1,0 +1,185 @@
+<Application>
+
+  <!-- FSK modulation/TX algorithm workers (will connect to dig_radio_ctrlr
+       routing ID "TX0" workers) -->
+
+  <Instance Component="ocpi.core.file_read" Connect="mfsk_mapper0">
+    <Property Name="fileName"       Value="idata/Os.jpeg"/>
+    <Property Name="messagesInFile" Value="false"/>
+    <Property Name="opcode"         Value="1"/>
+    <Property Name="granularity"    Value="1"/>
+  </Instance>
+  <Instance Component="ocpi.assets.comms_comps.mfsk_mapper" Name="mfsk_mapper0" Connect="zero_pad0">
+    <Property Name="symbols" Value="-32768,32767"/>
+  </Instance>
+  <Instance Component="ocpi.assets.util_comps.zero_pad" Name="zero_pad0" Connect="tx_fir_real0">
+    <Property Name="num_zeros" Value="38"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="tx_fir_real0"
+                                                        
+                                                           Connect="phase_to_amp_cordic0">
+    <Property Name="taps" ValueFile="idata/tx_rrcos_taps.dat"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Name="phase_to_amp_cordic0" Connect="drc" from='out' to='tx0'>
+    <Property Name="magnitude"  Value="20000"/>
+    <Property Name="DATA_WIDTH" Value="16"/>
+    <Property Name="DATA_EXT"   Value="6"/>
+    <Property Name="STAGES"     Value="16"/>
+  </Instance>
+  
+<!-- FSK modulation/TX algorithm workers (will connect to dig_radio_ctrlr
+       routing ID "TX1" workers) -->
+
+  <Instance Component="ocpi.core.file_read" Connect="mfsk_mapper1">
+    <Property Name="fileName"       Value="idata/Os.jpeg"/>
+    <Property Name="messagesInFile" Value="false"/>
+    <Property Name="opcode"         Value="1"/>
+    <Property Name="granularity"    Value="1"/>
+  </Instance>
+  <Instance Component="ocpi.assets.comms_comps.mfsk_mapper" Name="mfsk_mapper1" Connect="zero_pad1">
+    <Property Name="symbols" Value="-32768,32767"/>
+  </Instance>
+  <Instance Component="ocpi.assets.util_comps.zero_pad" Name="zero_pad1" Connect="tx_fir_real1">
+    <Property Name="num_zeros" Value="38"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="tx_fir_real1"
+                                                        
+                                                           Connect="phase_to_amp_cordic1">
+    <Property Name="taps" ValueFile="idata/tx_rrcos_taps.dat"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.phase_to_amp_cordic" Name="phase_to_amp_cordic1" Connect="drc" from='out' to='tx1'>
+    <Property Name="magnitude"  Value="20000"/>
+    <Property Name="DATA_WIDTH" Value="16"/>
+    <Property Name="DATA_EXT"   Value="6"/>
+    <Property Name="STAGES"     Value="16"/>
+  </Instance>
+
+  <!-- FSK demodulation/RX algorithm workers (will connect to dig_radio_ctrlr
+       routing ID "RX0" workers) -->
+
+  <Connection>
+    <Port Instance="drc" Name="rx" index='0' />
+    <Port Instance="rp_cordic0" Name="in"/>
+  </Connection> 
+
+  <Instance Component="ocpi.assets.dsp_comps.rp_cordic" Model="hdl"
+	   						Name="rp_cordic0"
+                                                        Connect="rx_fir_real0">
+    <Property Name="DATA_WIDTH" Value="16"/>
+    <Property Name="DATA_EXT"   Value="6"/>
+    <Property Name="STAGES"     Value="16"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="rx_fir_real0"
+                                                           Model="hdl"
+                                                           Connect="baudTracking0">
+    <Property Name="taps" ValueFile="idata/rx_rrcos_taps.dat"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.baudTracking" Name="baudTracking0" Connect="real_digitizer0">
+    <Property Name="bypass"       Value="false"/>
+    <Property Name="SPB"          Value="39"/> <!-- samples/baud -->
+    <Property Name="BaudAvrCount" Value="10"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.real_digitizer" Name="real_digitizer0" Connect="file_write0">
+    <!-- look for 0xFACE sync pattern -->
+    <Property Name="need_sync" Value="true"/>
+
+    <!-- prints out when 0xFACE sync pattern is found -->
+    <Property Name="enable_printing" Value="true"/>
+  </Instance>
+  <Instance Component="ocpi.core.file_write" Name="file_write0">
+    <!-- ACI relies on this property being set here in the OAS -->
+    <Property Name="fileName"       Value="fsk_dig_radio_ctrlr_fmcomms_2_3_txrx.bin"/>
+
+    <Property Name="messagesInFile" Value="false"/>
+  </Instance>
+
+  <!-- FSK demodulation/RX algorithm workers (will connect to dig_radio_ctrlr
+       routing ID "RX1" workers) -->
+
+  <Connection>
+    <Port Instance="drc" Name="rx" index="1"/>
+    <Port Instance="rp_cordic1" Name="in"/>
+  </Connection> 
+
+  <Instance Component="ocpi.assets.dsp_comps.rp_cordic" Model="hdl"
+	   						Name="rp_cordic1"
+                                                        Connect="rx_fir_real1">
+    <Property Name="DATA_WIDTH" Value="16"/>
+    <Property Name="DATA_EXT"   Value="6"/>
+    <Property Name="STAGES"     Value="16"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.fir_real_sse" Name="rx_fir_real1"
+                                                           Model="hdl"
+                                                           Connect="baudTracking1">
+    <Property Name="taps" ValueFile="idata/rx_rrcos_taps.dat"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.baudTracking" Name="baudTracking1" Connect="real_digitizer1">
+    <Property Name="bypass"       Value="false"/>
+    <Property Name="SPB"          Value="39"/> <!-- samples/baud -->
+    <Property Name="BaudAvrCount" Value="10"/>
+  </Instance>
+  <Instance Component="ocpi.assets.dsp_comps.real_digitizer" Name="real_digitizer1" Connect="file_write1">
+    <!-- look for 0xFACE sync pattern -->
+    <Property Name="need_sync" Value="true"/>
+
+    <!-- prints out when 0xFACE sync pattern is found -->
+    <Property Name="enable_printing" Value="true"/>
+  </Instance>
+  <Instance Component="ocpi.core.file_write" Name="file_write1">
+    <!-- ACI relies on this property being set here in the OAS -->
+    <Property Name="fileName"       Value="fsk_dig_radio_ctrlr_fmcomms_2_3_txrx2.bin"/>
+
+    <Property Name="messagesInFile" Value="false"/>
+  </Instance>
+  <!--==========================================================================-->
+  <!-- The DRC component, specifying channel configurations -->
+
+  <Instance Component="ocpi.platform.drc">
+    <!-- end of slaves that will be inferred -->
+    <property name='configurations'
+              Value="{description first,
+	      		channels {
+	      			{rx true,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 0.24,
+                                 sampling_rate_Msps 0.25,
+                                 samples_are_complex true,
+                                 gain_mode auto,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+                                 tolerance_gain_dB 1},
+                                {rx false,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 0.24,
+                                 sampling_rate_Msps 0.25,
+                                 samples_are_complex true,
+                                 gain_mode manual,gain_dB -30,
+                                 tolerance_bandwidth_3dB_MHz 0,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+				 tolerance_gain_dB 1},
+	      			{rx true,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 0.24,
+                                 sampling_rate_Msps 0.25,
+                                 samples_are_complex true,
+                                 gain_mode auto,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+                                 tolerance_gain_dB 1},
+                                {rx false,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 0.24,
+                                 sampling_rate_Msps 0.25,
+                                 samples_are_complex true,
+                                 gain_mode manual,gain_dB -30,
+                                 tolerance_bandwidth_3dB_MHz 0,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+				 tolerance_gain_dB 1}
+			   }
+			}"/>
+    <property name='start' value='0'/>
+  </Instance>
+
+</Application>
