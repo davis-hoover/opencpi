@@ -16,10 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# this is the zcu104 XDC file that should be generated when instantiating the:
-# data_src_qadc_ad9361_sub worker
-# on the fmcomms_2_3_lpc_scdcd card
-
+# Extracted from the zcu104 XDC file 
 ############################################################################
 # Clock constraints                                                        #
 ############################################################################
@@ -27,21 +24,45 @@
 create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i/worker/ps/U0/PS8_i/PLCLK[0]}]
 
 # ----------------------------------------------------------------------------
-# Clock constraints - ad9361_data_sub.hdl
+# Clock constraints - platform_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
 # FMCOMMS2/3 AD9361 DATA_CLK_P
 # create_clock command defaults to 50% duty cycle when -waveform is not specified
+# from AD9361 datasheet
+#set AD9361_LVDS_t_CP_ns 4.069
+#create_clock -period $AD9361_LVDS_t_CP_ns -name FMC_LA00_CC_P [get_ports {FMC_LA00_CC_P}]
 
-# set AD9361_LVDS_t_CP_ns 4.069
-# create_clock -period $AD9361_LVDS_t_CP_ns -name FMC_LA00_CC_P [get_ports {FMC_LA00_CC_P}]
-
-# max supported AD9361 DATA_CLK period of data_qsrc_adc_ad9361_sub.hdl on
-# zcu104/FMCOMMS2/3 for which slack will be 0
+# max supported AD9361 DATA_CLK period of data_src_qadc_ad9361_sub.hdl on
+# ZCU104/FMCOMMS2/3 for which slack will be 0
 create_clock -period 5.712 -name FMC_LPC_LA00_CC_P [get_ports {FMC_LPC_LA00_CC_P}]
 
 # FMCOMMS2/3 AD9361 FB_CLK_P (forwarded version of DATA_CLK_P)
 create_generated_clock -name FMC_LPC_LA08_P -source [get_pins {ftop/FMC_LPC_platform_ad9361_data_sub_i/worker/mode7.data_clk_buf_i/O}] -divide_by 1 -invert [get_ports {FMC_LPC_LA08_P}]
+
+# Generate DAC one sample per clock constraints
+# almost exactly the design methodology outlined in "Figure 3-70: Generated Clock in the Fanout Of
+# Master Clock" in
+# https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
+create_generated_clock -name FMC_LPC_LA08_P_DAC_CLK_DIV4 -divide_by 2 -source [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/C}] [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}]
+
+# following methodology in "Figure 3-77: Muxed Clocks" / "Case in which only the paths A or B or C exist" in https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
+create_generated_clock -name dac_clkdiv2_mux -divide_by 1 -source [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O}] [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
+create_generated_clock -name dac_clkdiv4_mux -divide_by 1 -add -master_clock FMC_LPC_LA08_P_DAC_CLK_DIV4 -source [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}] [get_pins {ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/clock_selector/bufgmux/O}]
+set_clock_groups -physically_exclusive -group dac_clkdiv2_mux -group dac_clkdiv4_mux
+
+# Generate ADC one sample per clock constraints
+# both of these create_generated_clock constraints, as well as their corresponding circuits, follow
+# almost exactly the design methodology outlined in "Figure 3-70: Generated Clock in the Fanout Of
+# Master Clock" in
+# https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
+create_generated_clock -name FMC_LPC_LA08_P_ADC_CLK_DIV2 -divide_by 2 -source [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/first_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/C}] [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/first_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}]
+create_generated_clock -name FMC_LPC_LA08_P_ADC_CLK_DIV4 -divide_by 2 -source [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/C}] [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}]
+
+# following methodology in "Figure 3-77: Muxed Clocks" / "Case in which only the paths A or B or C exist" in https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_1/ug949-vivado-design-methodology.pdf
+create_generated_clock -name adc_clkdiv2_mux -divide_by 1 -source [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/first_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}] [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/clock_selector/bufgmux/O}]
+create_generated_clock -name adc_clkdiv4_mux -divide_by 1 -add -master_clock FMC_LPC_LA08_P_ADC_CLK_DIV4 -source [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/second_divider/divider_type_register.routability_global.divisor_2.reg_out_reg/Q}] [get_pins {ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/sample_clk_gen/clock_manager/clock_selector/bufgmux/O}]
+set_clock_groups -physically_exclusive -group adc_clkdiv2_mux -group adc_clkdiv4_mux
 
 # ----------------------------------------------------------------------------
 # FMC Expansion Connector 
@@ -148,21 +169,21 @@ set_property IOSTANDARD LVCMOS18 [get_ports -of_objects [get_iobanks 68]];
 # same here since this constraints file is fmcomms_2_3_lpc card-specific
 
 # ----------------------------------------------------------------------------
-# IOSTANDARD constraints - ad9361_config.hdl
+# IOSTANDARD constraints - platform_ad9361_config.hdl
 # ----------------------------------------------------------------------------
 
 set_property IOSTANDARD LVCMOS18 [get_ports {FMC_LPC_LA16_N}]; # FMCOMMS2/3 AD9361 TXNRX
 set_property IOSTANDARD LVCMOS18 [get_ports {FMC_LPC_LA16_P}]; # FMCOMMS2/3 AD9361 ENABLE
 
 # ----------------------------------------------------------------------------
-# IOSTANDARD constraints - ad9361_data_sub.hdl
+# IOSTANDARD constraints - platform_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA00_CC_P}]; # FMCOMMS3 DATA_CLK_P
 set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA00_CC_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA01_CC_P}]; # FMCOMMS3 RX_FRAME_P
 set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA01_CC_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA02_P}]; # FMCOMMS3 RX_D0
-set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA02_P}]; 
+set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA02_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA03_P}]; # FMCOMMS3 RX_D1
 set_property DIFF_TERM_ADV TERM_100 [get_ports {FMC_LPC_LA03_P}];
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA04_P}]; # FMCOMMS3 RX_D2
@@ -183,7 +204,7 @@ set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA14_P}]; # FMCOMMS3 TX_D4
 set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA15_P}]; # FMCOMMS3 TX_D5
 
 # ----------------------------------------------------------------------------
-# INPUT / OUTPUT DELAY constraints - data_qsrc_adc_ad9361_sub.hdl
+# INPUT / OUTPUT DELAY constraints - data_src_qadc_ad9361_sub.hdl
 # ----------------------------------------------------------------------------
 
 # FMCOMMS3 RX_D/RX_FRAME_P
@@ -226,10 +247,10 @@ set_property IOSTANDARD LVDS [get_ports {FMC_LPC_LA15_P}]; # FMCOMMS3 TX_D5
 # t_DDRx_min = 0.25
 # t_DDRx_max = 1.25
 #
-# ----- assumed ad9361_data_sub.hdl parameter property/no-OS init_param settings
+# ----- assumed platform_ad9361_data_sub.hdl parameter property/no-OS init_param settings
 # ----- (values chosen specifically to meet static timing):
 # ------------------------------------------------------------------------------
-# | ad9361_data_sub.hdl | no-OS init_param member | value | delay(ns)          |
+# |                     | no-OS init_param member | value | delay(ns)          |
 # | parameter property  |                         |       |                    |
 # ------------------------------------------------------------------------------
 # | DATA_CLK_Delay      | rx_data_clock_delay     | 4     | 1.2                |
@@ -299,8 +320,110 @@ set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_de
 set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -min -add_delay 1.906 [get_ports {FMC_LPC_LA01_CC_N}]
 set_input_delay -clock [get_clocks {FMC_LPC_LA00_CC_P}] -clock_fall -max -add_delay 2.906 [get_ports {FMC_LPC_LA01_CC_N}]
 
+
 # ----------------------------------------------------------------------------
-# INPUT / OUTPUT DELAY constraints - ad9361_data_sub.hdl
+# INPUT / OUTPUT DELAY constraints - data_sink_qdac_ad9361_sub.hdl
+# ----------------------------------------------------------------------------
+
+# FMCOMMS3 TX_D/TX_FRAME_P
+#
+# ----- from Vivado GUI:
+#                                 _____________
+# forwarded clock              __|             |_____________
+#                       __    ___:_____     ___:_____    ____
+# data at destination   __XXXX___:_____XXXXX___:_____XXXX____
+#                            :<--:---->:   :<--:-----:
+#                           tsu_r  thd_r  tsu_f  thd_f
+#
+# tsu_r : Destination device setup time requirement for rising edge
+# thd_r : Destination device hold time requirement for rising edge
+# tsu_f : Destination device setup time requirement for falling edge
+# thd_f : Destination device hold time requirement for falling edge
+# trce_dly_max : Maximum board trace delay
+# trce_dly_min : Minimum board trace delay
+#
+# Rise Max = trce_dly_max + tsu_r
+# Rise Min = trce_dly_min - thd_r
+#
+# ----- from AD9361 datasheet:
+# t_STx_min = 1
+# t_HTx_min = 0
+#
+# ----- assumed platform_ad9361_data_sub.hdl parameter property/no-OS init_param settings
+# ----- (values chosen specifically to meet static timing):
+# ------------------------------------------------------------------------------
+# |                     | no-OS init_param member | value | delay(ns)          |
+# | parameter property  |                         |       |                    |
+# ------------------------------------------------------------------------------
+# | FB_CLK_Delay        | tx_fb_clock_delay       | 7     | 2.1                |
+# | TX_Data_Delay       | tx_data_delay           | 0     | 0.0                |
+# ------------------------------------------------------------------------------
+#
+# ----- calculations
+# tsu_r = t_STx_min + (FB_CLK_Delay-TX_Data_Delay)*0.3 =  3.1 (AD9361 datasheet only specifies falling edge requirement, but rising is implied since DDR is used)
+# thd_r = t_HTx_min - (FB_CLK_Delay-TX_Data_Delay)*0.3 = -2.1 (AD9361 datasheet only specifies falling edge requirement, but rising is implied since DDR is used)
+# tsu_f = t_STx_min + (FB_CLK_Delay-TX_Data_Delay)*0.3 =  3.1
+# thd_f = t_HTx_min - (FB_CLK_Delay-TX_Data_Delay)*0.3 = -2.1
+# trce_dly_max is unknown, so value of 0 is used for calculation
+# trce_dly_min is unknown, so value of 0 is used for calculation
+# Rise Max = trce_dly_max + tsu_r = 0 + 3.1    = 3.1
+# Rise Min = trce_dly_min - thd_r = 0 - (-2.1) = 2.1
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA10_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA11_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA12_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA13_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA14_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay 2.1 [get_ports {FMC_LPC_LA15_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay 3.1 [get_ports {FMC_LPC_LA15_N}]
+# TX_FRAME_P
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA09_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA09_P}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -min -add_delay 2.1 [get_ports {FMC_LPC_LA09_N}]
+set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -clock_fall -max -add_delay 3.1 [get_ports {FMC_LPC_LA09_N}]
+
+# ----------------------------------------------------------------------------
+# INPUT / OUTPUT DELAY constraints - platform_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
 # from AD9361 datasheet
@@ -339,24 +462,43 @@ set AD9361_TXNRX_Rise_Min [expr $AD9361_TXNRX_trce_dly_min - $AD9361_TXNRX_thd_r
 set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -min -add_delay $AD9361_TXNRX_Rise_Min [get_ports {FMC_LPC_LA16_P}]
 set_output_delay -clock [get_clocks {FMC_LPC_LA08_P}] -max -add_delay $AD9361_TXNRX_Rise_Max [get_ports {FMC_LPC_LA16_P}]
 
-set_clock_groups -asynchronous -group [get_clocks FMC_LPC_LA00_CC_P] -group [get_clocks FMC_LPC_LA08_P]
-
 # ----------------------------------------------------------------------------
-# CLOCK DOMAIN CROSSING / FALSE PATH constraints - ad9361_data_sub.hdl
+# CLOCK DOMAIN CROSSING / FALSE PATH constraints - platform_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
 # disable timing check among paths between AD9361 DATA_CLK_P and control plane clock domains (which are asynchronous)
 set_clock_groups -asynchronous -group [get_clocks {FMC_LPC_LA00_CC_P}] -group [get_clocks {clk_fpga_0}]
 
 # ----------------------------------------------------------------------------
-# CLOCK DOMAIN CROSSING / FALSE PATH constraints - data_qsrc_adc_ad9361_sub.hdl
+# CLOCK DOMAIN CROSSING / FALSE PATH constraints - data_src_qadc_ad9361_sub.hdl
 # ----------------------------------------------------------------------------
 
 # because RX_FRAME_P is sampled on the DATA_CLK_P falling edge (we use DDR primitive as a sample-in-the-middle), the rising edge latched output is unconnected and therefore should not be used in timing analysis
 set_false_path -from [get_ports FMC_LPC_LA01_CC_P] -rise_to [get_pins ftop/FMC_LPC_data_src_qadc_ad9361_sub_i/worker/supported_so_far.rx_frame_p_ddr/D]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks adc_clkdiv2_mux]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks adc_clkdiv4_mux]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks adc_clkdiv4_mux]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks FMC_LPC_LA08_P_ADC_CLK_DIV4]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks FMC_LPC_LA08_P_ADC_CLK_DIV2]
 
 # ----------------------------------------------------------------------------
-# ZCU104 GPIO 
+# CLOCK DOMAIN CROSSING / FALSE PATH constraints - data_sink_qdac_ad9361_sub.hdl
+# ----------------------------------------------------------------------------
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks -of_objects [get_pins ftop/FMC_LPC_data_sink_qdac_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/clock_manager/first_divider/divider_type_buffer.routability_regional.buffer_and_divider/O]]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks FMC_LPC_LA08_P_DAC_CLK_DIV4]
+set_clock_groups -asynchronous -group [get_clocks FMC_LPC_LA00_CC_P] -group [get_clocks FMC_LPC_LA08_P]
+set_clock_groups -asynchronous -group [get_clocks dac_clkdiv2_mux] -group [get_clocks clk_fpga_0]
+set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks dacd2_clk]
+set_clock_groups -asynchronous -group [get_clocks dac_clkdiv4_mux] -group [get_clocks clk_fpga_0]
+set_false_path -from [get_clocks dac_clkdiv2_mux] -to [get_clocks FMC_LPC_LA00_CC_P]
+set_false_path -from [get_clocks FMC_LPC_LA00_CC_P] -to [get_clocks dacd2_clk]
+set_false_path -from [get_clocks dacd2_clk] -to [get_clocks FMC_LPC_LA08_P]
+set_false_path -from [get_clocks FMC_LPC_LA08_P] -to [get_clocks dacd2_clk] 
+set_false_path -from [get_clocks clk_fpga_0] -to [get_clocks FMC_LPC_LA08_P]
+
+
+# ----------------------------------------------------------------------------
+# ZCU104 GPIO
 # ----------------------------------------------------------------------------
 set_property PACKAGE_PIN D5       [get_ports "GPIO_LED_0_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11N_AD9N_88
 set_property IOSTANDARD  LVCMOS33 [get_ports "GPIO_LED_0_LS"] ;# Bank  88 VCCO - VCC3V3   - IO_L11N_AD9N_88
