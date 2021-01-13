@@ -89,7 +89,7 @@ run(RCCWorker *self, RCCBoolean timedOut, RCCBoolean *newRunCondition) {
    s->startTime = self->container.getTime();
  if (port->input.eof) { // length == 0 && port->input.u.operation == 0 && props->stopOnEOF)
    uint64_t nanos = self->container.nanoTime(self->container.getTime() - s->startTime);
-   props->bytesPerSecond = (props->bytesWritten * 1000000000llu) / nanos;
+   props->bytesPerSecond = (props->bytesWritten * 1000000000llu) / (nanos ? nanos : 1);
    return RCC_ADVANCE_DONE;
  }
  if (props->messagesInFile) {

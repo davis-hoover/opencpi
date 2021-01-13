@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OcpiPortSet.h"
 #include "OcpiOsAssert.h"
+#include "TransportPortSet.hh"
 #include "TransportTransfer.hh"
 
 namespace OCPI {

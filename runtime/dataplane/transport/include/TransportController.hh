@@ -36,7 +36,6 @@ namespace DataTransfer {
 namespace OCPI {
 namespace DataTransport {
 
-class OcpiPortSet;
 class Port;
 class Transport;
 

@@ -388,6 +388,7 @@ namespace OCPI {
 	    } else if (m_utilInstance.m_hasMaster || (ap && ap->m_connection->m_externals.size())) 
 	      // I'm a slave and my master might delegate a port to me --or--
 	      // I am connected externally to something that cannot be confirmed yet, like a delegated port
+	      // I.e. there might be a problem but I cannot reject YET.
 	      return true;
 	    else {
 	      // There is no connection in the assembly for a statically connected impl port

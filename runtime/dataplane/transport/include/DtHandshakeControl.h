@@ -276,7 +276,7 @@ namespace OCPI {
     int32_t           broadCast;                        // This buffer was broadcast to all inputs
     int32_t       metaDataOnlyTransfer; // Only meta data transfered
     uint32_t      srcRank;              // rank of the output buffer
-    int32_t       srcTemporalId;        // temporal buffer id
+    uint32_t       srcTemporalId;        // temporal buffer id
     BooleanToken  endOfWhole;           // end of whole data distribution
     uint32_t      nPartsPerWhole;       // Number of parts to make up the whole data set
     uint32_t      partsSequence;        // This buffers sequence in the whole

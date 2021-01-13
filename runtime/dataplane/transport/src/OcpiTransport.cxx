@@ -44,7 +44,6 @@
 #include "XferManager.h"
 #include "OcpiTransport.h"
 #include "OcpiTransportExceptions.h"
-#include "OcpiIntParallelDataDistribution.h"
 
 namespace XF = DataTransfer;
 namespace OU = OCPI::Util;

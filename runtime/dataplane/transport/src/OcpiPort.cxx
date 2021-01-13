@@ -38,7 +38,7 @@
 #include "XferEndPoint.h"
 #include "OcpiOutputBuffer.h"
 #include "OcpiInputBuffer.h"
-#include "OcpiPortSet.h"
+#include "TransportPortSet.hh"
 #include "OcpiTransport.h"
 #include "OcpiCircuit.h"
 #include "OcpiRDTInterface.h"
@@ -700,7 +700,7 @@ bool Port::ready()
   }
 
 
-  int last_idx = getPortSet()->getBufferCount()-1;
+  unsigned last_idx = getPortSet()->getBufferCount()-1;
   if ( ! isShadow() ) {  // Real port
                 
     if ( ! isOutput() ) {  // Real input
@@ -1195,7 +1195,7 @@ createOutputOffsets()
   int rc;
   bool local=false;
   uint32_t index;
-  unsigned int bCount = m_data->m_portSetMd->bufferCount;
+  unsigned int bCount = m_data->m_portSetMd->getBufferCount();
 
   // The allocation of buffer may be delayed if the circuit definition is not complete
   if ( ! m_data->m_real_location ) {
@@ -1216,7 +1216,7 @@ createOutputOffsets()
 
     // Allocate the buffers.  We will allocate a contiguous block of memory
     // for all the buffers and the split them up
-    rc = res_mgr->alloc( m_data->m_portSetMd->bufferLength * bCount, 
+    rc = res_mgr->alloc( m_data->m_portSetMd->getBufferLength() * bCount, 
                          BUF_ALIGNMENT, &boffset);
     ocpiDebug("**** Alloc Port %p for createOutputOffsets local buffers 0x%x", this, boffset);
     if ( rc != 0 ) {
@@ -1227,8 +1227,8 @@ createOutputOffsets()
     ocpiDebug("Port::createOutputOffsets1: port %p bmd %p offset 0x%" OCPI_UTIL_RESADDR_PRIx,
 	      this, m_data->m_bufferData, m_data->m_bufferData[0].outputOffsets.bufferOffset);
     for ( index=0; index<bCount; index++ ) {
-      m_data->m_bufferData[index].outputOffsets.bufferOffset = boffset+(index*m_data->m_portSetMd->bufferLength);
-      m_data->m_bufferData[index].outputOffsets.bufferSize =  m_data->m_portSetMd->bufferLength;
+      m_data->m_bufferData[index].outputOffsets.bufferOffset = boffset+(index*m_data->m_portSetMd->getBufferLength());
+      m_data->m_bufferData[index].outputOffsets.bufferSize =  m_data->m_portSetMd->getBufferLength();
     }
     ocpiDebug("Port %p bmd %p count %d boffset %" OCPI_UTIL_RESADDR_PRIx, this, m_data->m_bufferData,
 	      bCount, boffset);
@@ -1239,7 +1239,7 @@ createOutputOffsets()
                          BUF_ALIGNMENT, &soffset);
     ocpiDebug("**** Alloc Port %p for createOutputOffsets local state: 0x%x", this, soffset);
     if ( rc != 0 ) {
-      res_mgr->free( boffset,  m_data->m_portSetMd->bufferLength * bCount );
+      res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
       throw OCPI::Util::EmbeddedException( 
                                          NO_MORE_BUFFER_AVAILABLE, m_data->m_real_location->name().c_str() );
     }
@@ -1254,7 +1254,7 @@ createOutputOffsets()
     ocpiDebug("**** Alloc Port %p for createOutputOffsets local metadata 0x%x", this, moffset);
     if ( rc != 0 ) {
       res_mgr->free( soffset,  sizeof(BufferState) * MAX_PCONTRIBS * bCount * 2 );
-      res_mgr->free( boffset,  m_data->m_portSetMd->bufferLength * bCount );
+      res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
       throw OCPI::Util::EmbeddedException( 
                                          NO_MORE_BUFFER_AVAILABLE, m_data->m_real_location->name().c_str() );
     }
@@ -1270,7 +1270,7 @@ createOutputOffsets()
                            BUF_ALIGNMENT, &coffset);
       ocpiDebug("**** Alloc Port %p for createOutputOffsets local outputportsetcontrol 0x%x", this, coffset);
       if ( rc != 0 ) {
-        res_mgr->free( boffset,  m_data->m_portSetMd->bufferLength * bCount );
+        res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
         res_mgr->free( soffset,  sizeof(BufferState) * MAX_PCONTRIBS * bCount * 2);
         res_mgr->free( moffset,   sizeof(BufferMetaData) * MAX_PCONTRIBS * bCount );
         throw OCPI::Util::EmbeddedException( 
@@ -1296,7 +1296,7 @@ createInputOffsets()
     bool local=false;
     XF::ResourceServices* res_mgr;
     unsigned int index;
-    unsigned int bCount = m_data->m_portSetMd->bufferCount;
+    unsigned int bCount = m_data->m_portSetMd->getBufferCount();
 
     // The allocation of buffer may be delayed if the circuit definition is not complete
     if ( ! m_data->m_real_location ) {
@@ -1315,7 +1315,7 @@ createInputOffsets()
       res_mgr = &getEndPoint().resourceMgr();
       //      res_mgr = XferFactoryManager::getFactoryManager().getSMBResources( m_data->m_real_location )->sMemResourceMgr;
       ocpiAssert( res_mgr );
-      rc = res_mgr->alloc( m_data->m_portSetMd->bufferLength * bCount, 
+      rc = res_mgr->alloc( m_data->m_portSetMd->getBufferLength() * bCount, 
                            BUF_ALIGNMENT, &boffset);
       ocpiDebug("**** Alloc Port %p for createInputOffsets local buffers 0x%" OCPI_UTIL_RESADDR_PRIx,
 		this, boffset);
@@ -1325,8 +1325,8 @@ createInputOffsets()
       }
       for ( index=0; index<bCount; index++ ) {
         m_data->m_bufferData[index].inputOffsets.bufferOffset = boffset + 
-          index * m_data->m_portSetMd->bufferLength;
-        m_data->m_bufferData[index].inputOffsets.bufferSize = m_data->m_portSetMd->bufferLength;
+          index * m_data->m_portSetMd->getBufferLength();
+        m_data->m_bufferData[index].inputOffsets.bufferSize = m_data->m_portSetMd->getBufferLength();
       }
                 
       ocpiDebug("***Input buffer offset = 0x%" OCPI_UTIL_RESADDR_PRIx "", boffset );
@@ -1337,7 +1337,7 @@ createInputOffsets()
       ocpiDebug("**** Alloc Port %p for createInputffsets local metadata 0x%" OCPI_UTIL_RESADDR_PRIx,
 		this, moffset);
       if ( rc != 0 ) {
-        res_mgr->free( boffset,  m_data->m_portSetMd->bufferLength * bCount );
+        res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
         throw OCPI::Util::EmbeddedException(  NO_MORE_BUFFER_AVAILABLE, m_data->m_real_location->name().c_str() );
       }
       for ( index=0; index<bCount; index++ ) {
@@ -1353,7 +1353,7 @@ createInputOffsets()
 		this, soffset);
       if ( rc != 0 ) {
         res_mgr->free( moffset,  sizeof(BufferMetaData) * MAX_PCONTRIBS * bCount );
-        res_mgr->free( boffset,  m_data->m_portSetMd->bufferLength * bCount );
+        res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
         throw OCPI::Util::EmbeddedException(  NO_MORE_BUFFER_AVAILABLE, m_data->m_real_location->name().c_str() );
       }
       for ( index=0; index<bCount; index++ ) {
@@ -1418,7 +1418,7 @@ void
 Port::
 allocateBufferResources()
 {
-  if ( m_data->m_portSetMd->output ) {
+  if ( m_data->m_portSetMd->isOutput() ) {
     createOutputOffsets();
   }
   else {

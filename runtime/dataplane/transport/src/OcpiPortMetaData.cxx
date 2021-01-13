@@ -34,12 +34,12 @@
 #include "XferEndPoint.h"
 #include "XferManager.h"
 #include "OcpiUtilMisc.h"
-#include "OcpiPortSetMetaData.h"
+#include "TransportPortSet.hh"
 #include "OcpiPortMetaData.h"
 
 using namespace OCPI::DataTransport;
 namespace XF = DataTransfer;
-
+namespace CU = OCPI::Util;
 void PortMetaData::
 init()
 {
@@ -75,8 +75,8 @@ init()
     m_shadow_tfactory = NULL;
   }
 
-  m_bufferData = new BufferOffsets[m_portSetMd->bufferCount];
-  memset( m_bufferData, 0, sizeof(BufferOffsets[m_portSetMd->bufferCount]));
+  m_bufferData = new BufferOffsets[m_portSetMd->getBufferCount()];
+  memset( m_bufferData, 0, sizeof(BufferOffsets[m_portSetMd->getBufferCount()]));
   m_localPortSetControl = 0;
 
 }
@@ -87,8 +87,8 @@ PortMetaData( PortOrdinal pid,
               bool s,
 	      XF::EndPoint *ep,
               const OCPI::RDT::Descriptors& desc,
-              PortSetMetaData* psmd )
-  : CU::Child<PortSetMetaData,PortMetaData>(*psmd, *this), m_shadow(true), remoteCircuitId(0),
+              PortSet* psmd )
+  : CU::Child<PortSet,PortMetaData>(*psmd, *this), m_shadow(true), remoteCircuitId(0),
     remotePortId(UINT32_MAX),
     id(pid),rank(0),output(s),user_data(NULL),
     m_portSetMd(psmd),m_init(false),m_real_location(ep),m_shadow_location(NULL),
@@ -106,8 +106,8 @@ PortMetaData::
 PortMetaData( PortOrdinal pid, 
 	      XF::EndPoint &ep, 
               const OCPI::RDT::Descriptors& portDesc,
-              PortSetMetaData* psmd )
-  : CU::Child<PortSetMetaData,PortMetaData>(*psmd, *this),m_shadow(true),remoteCircuitId(0),
+              PortSet* psmd )
+  : CU::Child<PortSet,PortMetaData>(*psmd, *this),m_shadow(true),remoteCircuitId(0),
     remotePortId(UINT32_MAX),
     id(pid),rank(0),user_data(NULL),
     m_portSetMd(psmd),m_init(false),m_real_location(&ep),m_shadow_location(NULL),
@@ -124,8 +124,8 @@ PortMetaData( PortOrdinal pid,
               bool s, 
               XF::EndPoint *ep,
               XF::EndPoint* shadow_ep,
-              PortSetMetaData* psmd )
-  : CU::Child<PortSetMetaData,PortMetaData>(*psmd, *this),m_shadow(true),remoteCircuitId(0),
+              PortSet* psmd )
+  : CU::Child<PortSet,PortMetaData>(*psmd, *this),m_shadow(true),remoteCircuitId(0),
     remotePortId(UINT32_MAX),
     id(pid),rank(0),output(s),user_data(NULL),
     m_portSetMd(psmd),m_init(false),m_real_location(ep),m_shadow_location(shadow_ep),
@@ -149,8 +149,8 @@ PortMetaData( PortOrdinal pid,
               XF::EndPoint &ep, 
               XF::EndPoint &shadow_ep, 
               const OCPI::RDT::Descriptors &pdd, 
-              PortSetMetaData* psmd )
-  : CU::Child<PortSetMetaData,PortMetaData>(*psmd, *this),m_shadow(true),
+              PortSet* psmd )
+  : CU::Child<PortSet,PortMetaData>(*psmd, *this),m_shadow(true),
     real_location_string(shadow_ep.name()),
     shadow_location_string(ep.name()),
     remoteCircuitId(0), remotePortId(OCPI_UTRUNCATE(PortOrdinal,pdd.desc.oob.port_id)),
@@ -161,13 +161,13 @@ PortMetaData( PortOrdinal pid,
     m_bufferData(NULL)
 {
   memcpy(&m_externPortDependencyData,&pdd.desc,sizeof(OCPI::RDT::Descriptors) );
-  psmd->bufferCount  = pdd.desc.nBuffers;
-  psmd->bufferLength = pdd.desc.dataBufferSize;
+  psmd->getBufferCount()  = pdd.desc.nBuffers;
+  psmd->getBufferLength() = pdd.desc.dataBufferSize;
 
   ocpiDebug("Remote port buffer ep = %s", pdd.desc.oob.oep );
 
-  m_bufferData = new BufferOffsets[psmd->bufferCount];
-  memset( m_bufferData, 0, sizeof(BufferOffsets) * psmd->bufferCount);
+  m_bufferData = new BufferOffsets[psmd->getBufferCount()];
+  memset( m_bufferData, 0, sizeof(BufferOffsets) * psmd->getBufferCount());
   m_localPortSetControl = 0;
         
   for ( unsigned int n=0; n<pdd.desc.nBuffers; n++ ) {

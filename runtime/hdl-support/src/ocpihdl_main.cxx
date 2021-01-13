@@ -77,7 +77,7 @@ search, emulate, ethers, probe, testdma, admin, bram, unbram, uuid, reset, set, 
   wread, wwrite, sendData, receiveData, receiveRDMA, sendRDMA, simulate, getxml, load, unload,
   status;
 static bool verbose = false, parseable = false, hex = false, isPublic = false;
-static int log = -1;
+static int logLevel = -1;
 std::string platform, simExec;
 static const char
 *interface = NULL, *device = NULL, *part = NULL;
@@ -292,7 +292,7 @@ doFlags(const char **&ap) {
       part = next(ap);
       break;
     case 'l':
-      log = atoi(next(ap));
+      logLevel = atoi(next(ap));
       break;
     case 's':
       spinCount = atoi(next(ap));
@@ -363,8 +363,8 @@ main(int argc, const char **argv)
     }
     argv++;
     doFlags(argv);
-    if (log != -1)
-      OCPI::OS::logSetLevel(log);
+    if (logLevel != -1)
+      OCPI::OS::logSetLevel(logLevel);
 #if 0
     if ((exact->options & SUDO) && geteuid()) {
       int dfd = ::open(OCPI_DRIVER_MEM, O_RDONLY);

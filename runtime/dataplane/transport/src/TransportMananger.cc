@@ -20,8 +20,9 @@
 
 // This file implements the singleton class used for process-global behavior on this transport subsystem
 
-#include "OcpiParallelDataDistribution.h"
-#include "OcpiPortSet.h"
+#include "TransportPortSet.hh"
+#include "TransportDistribution.hh"
+#include "TransportPartition.hh"
 #include "TransportController.hh"
 #include "TransportManager.hh"
 

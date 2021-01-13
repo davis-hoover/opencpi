@@ -65,7 +65,7 @@ namespace OCPI {
       OU::findBool(params, "ownthread", m_ownThread);
       if (getenv("OCPI_NO_THREADS"))
 	m_ownThread = false;
-      m_os = OCPI_CPP_STRINGIFY(OCPI_OS) + strlen("OCPI");
+      m_os = &OCPI_CPP_STRINGIFY(OCPI_OS)[strlen("OCPI")];
       m_osVersion = OCPI_CPP_STRINGIFY(OCPI_OS_VERSION);
       m_platform = OCPI_CPP_STRINGIFY(OCPI_PLATFORM);
       m_arch = OCPI_CPP_STRINGIFY(OCPI_ARCH);

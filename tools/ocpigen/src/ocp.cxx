@@ -185,9 +185,9 @@ emitInterfaceConstants(FILE *f, Language lang) {
   if (ocp.MAddr.value)
     emitConstant(f, "ocpi_port_%s_MAddr_width", lang, ocp.MAddr.width);
   //  if (ocp.MData.value) - need this width even for zero width
-    emitConstant(f, "ocpi_port_%s_MData_width", lang, ocp.MData.width);
-    //  if (ocp.MByteEn.value) - need this width even for zero width
-    emitConstant(f, "ocpi_port_%s_MByteEn_width", lang, ocp.MByteEn.width);
+  emitConstant(f, "ocpi_port_%s_MData_width", lang, ocp.MData.width);
+  //  if (ocp.MByteEn.value) - need this width even for zero width
+  emitConstant(f, "ocpi_port_%s_MByteEn_width", lang, ocp.MByteEn.width);
   if (ocp.MDataInfo.value)
     emitConstant(f, "ocpi_port_%s_MDataInfo_width", lang, ocp.MDataInfo.width);
 }

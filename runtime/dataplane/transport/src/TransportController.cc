@@ -22,11 +22,10 @@
 #include "OcpiOsAssert.h"
 #include "OcpiTimeEmitCategories.h"
 #include "OcpiCircuit.h"
-#include "OcpiPortSet.h"
+#include "TransportPortSet.hh"
 #include "OcpiBuffer.h"
 #include "OcpiOutputBuffer.h"
 #include "OcpiInputBuffer.h"
-#include "OcpiIntDataDistribution.h"
 #include "OcpiTransport.h"
 #include "TransportController.hh"
 

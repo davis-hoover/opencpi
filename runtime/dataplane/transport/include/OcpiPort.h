@@ -46,7 +46,7 @@
 #include <OcpiRDTInterface.h>
 #include <OcpiTransportConstants.h>
 #include <OcpiPortMetaData.h>
-#include <OcpiPortSet.h>
+#include "TransportPortSet.hh"
 #include "OcpiBuffer.h"
 
 

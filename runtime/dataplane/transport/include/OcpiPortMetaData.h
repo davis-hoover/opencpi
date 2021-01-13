@@ -50,13 +50,13 @@ namespace OCPI {
   namespace DataTransport {
 
     // Forward references
-    struct PortSetMetaData;
+    class PortSetMetaData;
     class PortSet;
 
     // Port Ordinal
     typedef PortId PortOrdinal;
 
-    struct PortMetaData : public OU::Child<PortSetMetaData,PortMetaData>
+    struct PortMetaData : public OU::Child<PortSet,PortMetaData>
     {
 
       // Are we a shadow port >
@@ -85,7 +85,7 @@ namespace OCPI {
       void* user_data;
 
       // Our port set metadata
-      PortSetMetaData* m_portSetMd;
+      PortSet* m_portSetMd;
 
       // Data initialized
       bool m_init;
@@ -169,20 +169,20 @@ namespace OCPI {
                     bool s, 
 		    DataTransfer::EndPoint *ep,
                     const OCPI::RDT::Descriptors& sPort,
-                    PortSetMetaData* psmd );
+                    PortSet* psmd );
 
       PortMetaData( PortOrdinal pid, 
                     bool output,
                     DataTransfer::EndPoint *ep, 
                     DataTransfer::EndPoint *shadow_ep,
-                    PortSetMetaData* psmd );
+                    PortSet* psmd );
 
 
 
       PortMetaData( PortOrdinal pid, 
                     DataTransfer::EndPoint &ep, 
                     const OCPI::RDT::Descriptors& portDesc,
-                    PortSetMetaData* psmd );
+                    PortSet* psmd );
 
       // Dependency constructor
       PortMetaData( PortOrdinal pid, 
@@ -190,7 +190,7 @@ namespace OCPI {
                     DataTransfer::EndPoint &shadow_ep, 
                     const OCPI::RDT::Descriptors& pd, 
 		    //                    uint32_t circuitId,
-                    PortSetMetaData* psmd );
+                    PortSet* psmd );
 
       virtual ~PortMetaData();
 

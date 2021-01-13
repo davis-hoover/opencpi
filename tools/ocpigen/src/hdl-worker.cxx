@@ -1467,9 +1467,9 @@ emitVhdlShell(FILE *f) {
 	      ",\n"
 	      "             props_from_worker => internal_props_out");
     // if (m_ctl.nonRawWritables || m_ctl.nonRawReadables || m_ctl.rawProperties)
-      fprintf(f,
-	      ",\n"
-	      "             props_to_worker   => props_to_worker");
+    fprintf(f,
+	    ",\n"
+	    "             props_to_worker   => props_to_worker");
     fprintf(f, ");\n");
   }
   fprintf(f, "%s", dataClockCDCs.c_str());

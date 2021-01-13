@@ -21,12 +21,11 @@
 #include "OcpiList.h"
 #include "OcpiOsAssert.h"
 #include "OcpiCircuit.h"
-#include "OcpiPortSet.h"
+#include "TransportPortSet.hh"
 #include "OcpiBuffer.h"
 #include "OcpiOutputBuffer.h"
 #include "OcpiInputBuffer.h"
 #include "DtHandshakeControl.h"
-#include "OcpiIntDataDistribution.h"
 #include "TransportController.hh"
 
 ///

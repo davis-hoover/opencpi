@@ -37,8 +37,7 @@
 #include "OcpiUtilSelfMutex.h"
 #include <OcpiTimeEmit.h>
 #include <OcpiCircuit.h>
-#include <OcpiParallelDataDistribution.h>
-#include <OcpiPortSet.h>
+#include "TransportPortSet.hh"
 #include <OcpiTransportConstants.h>
 #include <OcpiParentChild.h>
 
@@ -401,7 +400,7 @@ namespace OCPI {
       OCPI::Util::VList m_inputPs;
 
       // Our port sets
-      std::vector<PortSetMetaData*> m_portSetMd;
+      std::vector<PortSet*> m_portSetMd;
       // Only parallel for now
       ParallelDataDistribution m_dataDistribution;
 
