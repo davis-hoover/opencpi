@@ -99,7 +99,7 @@ for i in 1; do
   # add any commands to be run every time this script is run
 
   echo Loading bitstream
-  if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_CDK_DIR/$HDL_PLATFORM/*.bitz; then
+  if ocpihdl load -d $OCPI_DEFAULT_HDL_DEVICE $OCPI_CDK_DIR/artifacts/*.bitz; then
     echo Bitstream successfully loaded
   else
     echo Bitstream load error
