@@ -1,3 +1,37 @@
+# [v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.1...v2.1.0-beta.1) (2020-12-18)
+
+Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.1)
+
+### New Features
+- **runtime**: slaves are not automatically included in the application without mentioning them. (!428)(22c9956b)
+- **tools**: add convenience script (scripts/install-gnuradio.sh) to install OpenCPI's modified version of GNU Radio 3.7. (!283)(8ad0cd5f)
+
+### Enhancements
+- **app**: enable bbloopback mode for FSK application on matchstiq z1. (!422)(2c2ebb0d)
+- **devops**: add OSP support to yaml-generator.py. (!382)(bf7a9c77)
+- **devops**: implement child pipelines for cross-platform builds/tests. (!382)(bf7a9c77)
+- **devops**: implement grandchild pipelines so that more jobs can be dynamically generated. (!431)(c249580e)
+- **devops**: fix downstream pipelines failing due to environment variables not being set correctly. (!437)(72adeca8)
+- **osp**: add support for zcu102. (!407)(444d760c)
+- **protocols**: update ComplexShortWithMetadata-prot.xml to use a sequence length of 4096 instead of 4092 for the iq argument of the samples operation. (!427)(34d0d193)
+- **runtime**: port delegation from proxies to slaves is now implemented. (!421)(b718ff61)
+- **runtime**: generic DRC helper class established in an API header OcpiDrcProxyApi.hh. (!421)(b718ff61)
+- **runtime**: update zed/fmcomms2 platform with new drc. (!433)(d494dad9)
+- **tools**: install-gnuradio.sh: add GNU Radio 3.8 support. (!401)(4c92ed80)
+- **tools**: add missing fields to the opencpi GRC blocks. (!425)(a40d1a90)
+- **tools**: ocpigen: add XML parsing for project assets. (!434)(30acd3d2)
+
+### Bug Fixes
+- **runtime**: fix ocpiremote deploy not deploying boot files to correct remote directory. (!416)(56b316af)
+- **tools**: include bitstream argument in "ocpiremote restart" to prevent errors being thrown. (!371)(83566d76)
+- **tools**: improve gnuradio 3.8 install. (!405)(a18a710c)
+
+### Miscellaneous
+- **doc,runtime,tests,tools**: remove remaining CentOS 6 references and supporting code. (!403)(3b9c943b)
+- **comp**: make "socket_write.rcc" portable. (!418)(4755f36a)
+- **hdl base**: add ADI "mykonos" library as a prerequisite. (!385)(f2ec19c5)
+- **tools**: remove remaining BSV references and code from ocpigen. (!414)(8f73efd2)
+
 # [v2.0.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.0...v2.0.1) (2020-11-18)
 
 Changes/additions since [OpenCPI Release v2.0.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.0)

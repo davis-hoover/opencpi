@@ -46,7 +46,7 @@ begin
   end generate;
 
   protocol_s.samples_vld <= ivld;
-  protocol_s.sync        <= ivld and isamp_drop;
+  protocol_s.sync        <= isamp_drop;
 
   oprotocol <= protocol_s;
   irdy      <= ordy;

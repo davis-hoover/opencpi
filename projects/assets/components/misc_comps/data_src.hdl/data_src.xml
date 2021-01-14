@@ -1,4 +1,4 @@
-<HdlWorker language='vhdl' spec='data_src-spec' version='2'>
+<HdlWorker language='vhdl' spec='data_src-spec' version='2' sourcefiles='out_port_inject_zlm.vhd'>
 
   <Property Name="ODATA_WIDTH_p" Type="ushort" Default="32" Parameter="true"/>
 

@@ -24,11 +24,12 @@ use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 use ocpi.types.all, ocpi.all, ocpi.util.all, sdp.sdp.all, ocpi_core_bsv.all;
 architecture rtl of worker is
   -- Local worker constants
-  constant sdp_width_c     : natural := to_integer(sdp_width);
-  constant memory_depth_c  : natural := to_integer(memory_bytes) / (sdp_width_c * 4);
-  constant addr_width_c    : natural := width_for_max(memory_depth_c - 1);
-  constant max_buffers_c   : natural := to_integer(max_buffers);
-  constant addr_shift_c    : natural := width_for_max(sdp_width_c * 4 - 1);
+  constant sdp_width_c          : natural := to_integer(sdp_width);
+  constant memory_depth_c       : natural := to_integer(memory_bytes) / (sdp_width_c * 4);
+  constant addr_width_c         : natural := width_for_max(memory_depth_c - 1);
+  constant max_rem_buffers_c    : natural := to_integer(max_buffers);
+  constant max_lcl_buffers_c    : natural := ocpi.util.min(max_rem_buffers_c,max_reads_outstanding);
+  constant addr_shift_c         : natural := width_for_max(sdp_width_c * 4 - 1);
   --------------------------------------------------------------------------------
   -- Our flavor of the system-level metadata for our own fifo of message info
   -- with precomputed lengths and byte enables
@@ -72,7 +73,8 @@ architecture rtl of worker is
   signal md_in_byte_bits : unsigned(dword_shift-1 downto 0);
   -- Convenience data types
   subtype bram_addr_t is unsigned(addr_width_c-1 downto 0);
-  subtype buffer_count_t is unsigned(width_for_max(max_buffers_c) - 1 downto 0);
+  subtype lcl_buffer_count_t is unsigned(width_for_max(max_lcl_buffers_c) - 1 downto 0);
+  subtype rem_buffer_count_t is unsigned(width_for_max(max_rem_buffers_c) - 1 downto 0);
   --------------------------------------------------------------------------------
   -- Signals and definitions for the WSI side
   --------------------------------------------------------------------------------
@@ -90,7 +92,7 @@ architecture rtl of worker is
   signal dma_faults           : uchar_t;
   signal operating_r          : bool_t;  -- were we operating in the last cycle?
   signal wsi_starting_r       : bool_t;
-  signal wsi_buffer_index_r   : buffer_count_t;
+  signal wsi_buffer_index_r   : lcl_buffer_count_t;
   signal wsi_buffer_addr_r    : bram_addr_t;    -- base of current buffer
   signal wsi_dws_left         : metalength_dws_t;
   signal wsi_dws_left_r       : metalength_dws_t;
@@ -121,7 +123,7 @@ architecture rtl of worker is
   --------------------------------------------------------------------------------
   -- to the SDP side
   signal buffer_ndws     : unsigned(width_for_max(memory_depth_c * sdp_width_c)-1 downto 0);
-  signal buffer_count    : buffer_count_t;
+  signal lcl_buffer_count : lcl_buffer_count_t;
   signal md_not_full     : std_logic;
   -- from the SDP side
   signal bramb_addr      : bram_addr_t;
@@ -129,6 +131,7 @@ architecture rtl of worker is
   signal bramb_write     : bool_array_t(0 to sdp_width_c-1);
   signal md_enq          : bool_t;
 
+ signal sdp_my_reset           : std_logic; -- reset from EITHER sdp_reset or out_in.reset
   ---- Global state
   signal sdp_reset_n     : std_logic;
   ---- Trace buffer/debug
@@ -184,9 +187,10 @@ g0: for i in 0 to sdp_width_c-1 generate
                 DOB        => open);
   end generate g0;
   -- Metadata fifo enqueued from doorbell in active-flow-control mode then used on WSI
+  -- We are being told what is in our local buffers
   metafifo : component cdc.cdc.fifo
    generic map(width       => msginfo_width_c,
-               depth       => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2
+               depth       => roundup_2_power_of_2(max_lcl_buffers_c)) -- must be power of 2
    port map   (src_CLK     => ctl_in.clk, -- maybe syncfifo later
                src_RST     => ctl_in.reset,
                src_IN      => md_in_slv,
@@ -205,9 +209,10 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- Length fifo enqueued from doorbell for active message/pull mode, dequeued on the SDP side
   -- Telling the SDP (when actively PULLING data) to read this much data
   -- CTL -> SDP
+  -- We are being told about remote buffers
   lengthfifo : component cdc.cdc.fifo
    generic map(width        => length_in_slv'length,
-               depth        => roundup_2_power_of_2(max_buffers_c)) -- must be power of 2)
+               depth        => roundup_2_power_of_2(max_rem_buffers_c)) -- must be power of 2)
    port map   (src_CLK      => ctl_in.clk, -- maybe syncfifo later
                src_RST      => ctl_in.reset,
                dst_CLK      => sdp_clk,
@@ -258,8 +263,8 @@ g0: for i in 0 to sdp_width_c-1 generate
   -- SDP -> WSI
   availfifo : component bsv_pkg.SizedFIFO
    generic map(p1Width      => 1,
-               p2depth      => roundup_2_power_of_2(max_buffers_c),
-               p3cntr_width => width_for_max(roundup_2_power_of_2(max_buffers_c)-1))
+               p2depth      => roundup_2_power_of_2(max_lcl_buffers_c),
+               p3cntr_width => width_for_max(roundup_2_power_of_2(max_lcl_buffers_c)-1))
    port map   (CLK          => sdp_clk,
                RST          => sdp_reset_n,
                ENQ          => avail_enq,
@@ -282,11 +287,11 @@ g0: for i in 0 to sdp_width_c-1 generate
   --------------------------------------------------------------------------------
   -- Combinatorial signals on the WSI side
   --------------------------------------------------------------------------------
-  sdp_reset_n          <= not sdp_reset;
-  buffer_count         <= resize(props_in.buffer_count, buffer_count_t'length);
+  sdp_reset_n          <= not sdp_my_reset;
+  lcl_buffer_count     <= props_in.buffer_count(lcl_buffer_count_t'range);
   ctl_reset_n          <= not ctl_in.reset;
   wsi_next_buffer_addr <= (others => '0')
-                          when wsi_buffer_index_r = props_in.buffer_count - 1 else
+                          when wsi_buffer_index_r = props_in.buffer_count(lcl_buffer_count_t'range) - 1 else
                           wsi_buffer_addr_r +
                           props_in.buffer_size(bram_addr_t'left + addr_shift_c
                                                downto addr_shift_c);
@@ -319,6 +324,9 @@ g0: for i in 0 to sdp_width_c-1 generate
 --                         (sdp_width_c*dword_bytes-1 downto
 --                          to_integer(md_out.length(addr_shift_c-1 downto 0)) => '0',
 --                          others => '1');
+
+
+  sdp_my_reset <= sdp_reset or out_in.reset;
   --------------------------------------------------------------------------------
   -- The process of reading messages from the metadata FIFO and BRAM and sending
   -- then to the WSI port named "out"
@@ -326,7 +334,7 @@ g0: for i in 0 to sdp_width_c-1 generate
   bram2wsi : process(sdp_clk)
   begin
     if rising_edge(sdp_clk) then
-      if sdp_reset = '1' then
+      if sdp_my_reset = '1' then
         brama_addr_r       <= (others => '0');
         wsi_buffer_index_r <= (others => '0');
         wsi_buffer_addr_r  <= (others => '0');
@@ -336,15 +344,13 @@ g0: for i in 0 to sdp_width_c-1 generate
 --        status             <= (others => '0');
       elsif not operating_r then
         -- initialization on first transition to operating.  poor man's "start".
-        if its(ctl_in.is_operating) then
+        if its(out_in.ready) then
           operating_r   <= btrue;
           if props_in.buffer_size > memory_bytes or
              props_in.buffer_size(addr_shift_c-1 downto 0) /= 0 then
             faults_r(0) <= '1';
           end if;
         end if;
-      elsif not ctl_in.is_operating then
-        operating_r <= bfalse;
       else
         --if its(buffer_consumed) then
         --  status <= status + 1;
@@ -363,7 +369,7 @@ g0: for i in 0 to sdp_width_c-1 generate
             --else
             --  wsi_dws_left_r     <= md_out_ndws;
             --end if;
-            if wsi_buffer_index_r = props_in.buffer_count - 1 then
+            if wsi_buffer_index_r = props_in.buffer_count(lcl_buffer_count_t'range) - 1 then
               wsi_buffer_index_r <= (others => '0');
             else
               wsi_buffer_index_r <= wsi_buffer_index_r + 1;
@@ -382,19 +388,20 @@ g0: for i in 0 to sdp_width_c-1 generate
     generic map (ocpi_debug       => its(ocpi_debug),
                  sdp_width        => sdp_width_c,
                  memory_depth     => memory_depth_c,
-                 max_buffers      => max_buffers_c)
+                 max_lcl_buffers  => max_lcl_buffers_c,
+                 max_rem_buffers  => max_rem_buffers_c)
     port map (   sdp_clk          => sdp_clk,
-                 sdp_reset        => sdp_reset,
+                 sdp_reset        => sdp_my_reset,
                  operating        => operating_r,  -- wrong clock domain, but stable enough?
                  -- properties
                  buffer_ndws      => buffer_ndws,
-                 lcl_buffer_count => buffer_count,
+                 lcl_buffer_count => lcl_buffer_count,
                  role             => props_in.role,
                  rem_flag_addr    => props_in.remote_flag_addr(0),
                  rem_flag_pitch   => props_in.remote_flag_pitch(0),
                  rem_data_addr    => props_in.remote_data_addr(0),
                  rem_data_pitch   => props_in.remote_data_pitch(0),
-                 rem_buffer_count => props_in.remote_buffer_count(0),
+                 rem_buffer_count => props_in.remote_buffer_count(0)(rem_buffer_count_t'range),
                  -- inputs from CTL/WSI side
                  length_not_empty => length_not_empty, -- a length (of next message) is available
                  length_out       => length_out,       -- length of next packet

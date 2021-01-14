@@ -23,14 +23,14 @@
   \item and a property-driven fixed value.
   \end{itemize}
   The bitwidth common to all data source buses is parameterized. In the case that the data source bus width is less than the iqstream I/Q widths of 16 bits, the bus is packed into the most significant bits of I and Q. This aids in data alignment when this component is connected directly to a DAC device worker, which commonly takes the DAC bitwidth-most significant bits of I and Q from an iqstream input port for its data transmission. \\ \medskip
-  This component includes a property-driven setting which can optionally disable the output port once a specified number of samples have been sent. This component can also be parameterized to send a Zero-Length Message (ZLM) once the output port is disabled.
+  This component includes a property-driven setting which can optionally disable the output port once a specified number of samples have been sent. This component can also be parameterized to send an End of File (EOF) once the output port is disabled.
 \end{flushleft}
 
 \section*{Worker Implementation Details}
 \begin{flushleft}
 \subsection*{\comp.hdl}
 \justify
-  In keeping with good data flow control practices, backpressure from the output port will suspend the advancement of each data generation source. The \verb+ZLM_WHEN_NUM_SAMPLES_REACHED_p+ parameter, when having a value of true, forces the worker to send a single ZLM when the output port has been disabled (i.e. when the \verb+num_samples+ property has a value of more than 1 and \verb+num_samples+ amount of samples have been sent out the output port). This is useful for allowing applications which use this worker to terminate once this worker's output port is disabled.
+  In keeping with good data flow control practices, backpressure from the output port will suspend the advancement of each data generation source. The \verb+EOF_WHEN_NUM_SAMPLES_REACHED_p+ parameter, when having a value of true, forces the worker to send an EOF when the output port has been disabled (i.e. when the \verb+num_samples+ property has a value of more than 1 and \verb+num_samples+ amount of samples have been sent out the output port). This is useful for allowing applications which use this worker to terminate once this worker's output port is disabled.
 \end{flushleft}
 
 %\section*{Theory}
@@ -47,7 +47,7 @@
       },
       every edge/.style={draw,thick}
     ]
-    \node[rectangle,ultra thick,draw=black,fill=blue](R2){\verb+DATA_BIT_WIDTH_p,+ \\ \verb+LFSR_POLYNOMIAL_p,+ \\ \verb+LFSR_SEED_p,+ \\ \verb+ZLM_WHEN_NUM_SAMPLES_REACHED_p+, \\ \verb+ODATA_WIDTH_p+ \\ \\ \Comp \\ };
+    \node[rectangle,ultra thick,draw=black,fill=blue](R2){\verb+DATA_BIT_WIDTH_p,+ \\ \verb+LFSR_POLYNOMIAL_p,+ \\ \verb+LFSR_SEED_p,+ \\ \verb+EOF_WHEN_NUM_SAMPLES_REACHED_p+, \\ \verb+ODATA_WIDTH_p+ \\ \\ \Comp \\ };
     \node[rectangle,draw=white,fill=white](R4)[right= of R2]{``out'' \\ iqstream\_protocol \\ (complex signed Q0.15 samples)};
     \node[rectangle,draw=white,fill=white](R5)[above= of R2]{\verb+LFSR_bit_reverse+, \\ \verb+mask_I,+ \\ \verb+mask_Q+};
     \path[->]
@@ -86,7 +86,7 @@
 \section*{Control Timing and Signals}
 \subsection*{\comp.hdl}
 \begin{flushleft}
-  The \Comp worker uses the clock from the Control Plane and standard Control Plane signals.
+  The \Comp \ worker uses the clock from the Control Plane and standard Control Plane signals.
 \end{flushleft}
 
 \begin{landscape}

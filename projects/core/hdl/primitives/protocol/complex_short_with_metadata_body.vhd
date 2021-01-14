@@ -56,6 +56,7 @@ function from_slv(slv : in std_logic_vector) return op_interval_t is
   variable ret : op_interval_t;
 begin
   ret.delta_time := slv;
+  return ret;
 end from_slv;
 
 function to_slv(protocol : in protocol_t) return std_logic_vector is

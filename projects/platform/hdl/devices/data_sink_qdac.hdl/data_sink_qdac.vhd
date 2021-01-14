@@ -57,12 +57,7 @@ begin
       in_port  => dev_in.clk,
       out_port => in_out.clk);
   
-  -- DACs usally won't provide a reset along w/ their clock
-  dac_rst_gen : cdc.cdc.reset
-    port map(
-      src_rst => ctl_in.reset,
-      dst_clk => dev_in.clk,
-      dst_rst => dac_rst);
+  dac_rst <= in_in.reset;
 
   dac_opcode <=
       SAMPLES   when in_in.opcode = ComplexShortWithMetadata_samples_op_e  else

@@ -36,14 +36,57 @@ entity samp_drop_detector is
     ordy       : in  std_logic);
 end entity samp_drop_detector;
 architecture rtl of samp_drop_detector is
-  signal samp_drop                      : std_logic := '0';
-  signal pending_xfer_error_samp_drop_r : std_logic := '0';
-  signal xfer_error_samp_drop           : std_logic := '0';
+  constant samp_count_max_value               : unsigned  := x"FFFF_FFFF"; -- (2^SAMP_COUNT_BIT_WIDTH)-1
+  constant num_dropped_samps_count_max_value  : unsigned  := x"FFFF_FFFF"; -- (2^DROPPED_SAMPS_BIT_WIDTH)-1
+  signal samp_drop                            : std_logic := '0';
+  signal pending_xfer_error_samp_drop_r       : std_logic := '0';
+  signal xfer_error_samp_drop                 : std_logic := '0';
+  signal samp_count_before_first_samp_drop    : unsigned(SAMP_COUNT_BIT_WIDTH-1 downto 0);
+  signal num_dropped_samps                    : unsigned(DROPPED_SAMPS_BIT_WIDTH-1 downto 0);
+  signal first_samp_drop_detected_sticky      : std_logic := '0';
 begin
 
   status.error_samp_drop <= samp_drop;
+  status.samp_count_before_first_samp_drop <= std_logic_vector(samp_count_before_first_samp_drop);
+  status.num_dropped_samps <= std_logic_vector(num_dropped_samps);
 
   samp_drop <= ivld and (not ordy);
+
+  first_samp_drop_detected_sticky_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      if(rst = '1') then
+        first_samp_drop_detected_sticky <= '0';
+      elsif(xfer_error_samp_drop = '1') then
+        first_samp_drop_detected_sticky <= '1';
+      end if;
+    end if;
+  end process;
+
+  samp_count_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      if(rst = '1') then
+        samp_count_before_first_samp_drop <= (others=>'0');
+      elsif(first_samp_drop_detected_sticky = '0' and samp_count_before_first_samp_drop < samp_count_max_value) then
+          if (ivld = '1' and ordy = '1') then
+            samp_count_before_first_samp_drop <= samp_count_before_first_samp_drop + 1;
+          end if;
+      end if;
+    end if;
+  end process;
+
+  num_samps_dropped_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      if(rst = '1') then
+        num_dropped_samps <= (others=>'0');
+      elsif (xfer_error_samp_drop = '1' and num_dropped_samps < num_dropped_samps_count_max_value) then
+        num_dropped_samps <= num_dropped_samps + 1;
+      end if;
+    end if;
+  end process;
+
 
   pending_terror_samp_drop_reg : process(clk)
   begin
@@ -64,7 +107,7 @@ begin
   odata      <= idata;
   osamp_drop <= xfer_error_samp_drop;
 
-  ovld <= ordy and (ivld or xfer_error_samp_drop);
+  ovld <= ordy and ivld;
   -- end the DATA PIPE LATENCY CYCLES is currently 0
 
 end rtl;

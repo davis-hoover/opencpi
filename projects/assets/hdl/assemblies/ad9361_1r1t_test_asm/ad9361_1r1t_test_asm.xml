@@ -13,7 +13,7 @@
     <Property Name="DATA_BIT_WIDTH_p" Value="12"/> <!-- same as DAC bit width -->
     <Property Name="LFSR_POLYNOMIAL_p" Value='1,1,1,0,0,0,0,0,1,0,0,0'/> <!-- x^12 + x^11 + x^10 + x^4 + 1(implied) -->
     <Property Name="LFSR_SEED_p" Value='1,1,1,1,1,1,1,1,1,1,1,1'/>
-    <Property Name="ZLM_WHEN_NUM_SAMPLES_REACHED_p" Value="false"/>
+    <Property Name="EOF_WHEN_NUM_SAMPLES_REACHED_p" Value="false"/>
   </Instance>
   <Connection Name="out_from_asm_tx_path_to_dac" External="producer">
     <Port Instance="data_src" Name="out"/>

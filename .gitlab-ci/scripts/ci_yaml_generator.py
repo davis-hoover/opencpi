@@ -1,79 +1,123 @@
 #!/usr/bin/env python3
 
-import os
 import sys
 import yaml
+from collections import namedtuple
+from os import chdir, getenv, environ
 from pathlib import Path
-from ci_utils import ci_project, ci_platform, ci_job, ci_pipeline, ci_osp
+from ci_utils import Pipeline, Directive, ci_project, ci_platform
 
 def main():
-    """Created yaml files for gitlab CI pipelines
+    """Creates and dumps a pipeline to a yaml file.
 
-    Calls various ci_utils scripts to discover opencpi projects and
-    platforms and to create/update gitlab CI yaml files.
+    Discovers local and remote opencpi projects and platforms and
+    uses them to create a pipeline.
     """
-    # Set paths and change dir to opencpi root
     opencpi_path = Path(__file__, '..', '..', '..').resolve()
-    os.chdir(str(opencpi_path))
-    gitlab_ci_path = Path('.gitlab-ci')
-    yaml_parent_path = Path('.gitlab-ci', 'yaml-parent')
-    yaml_children_path = Path(gitlab_ci_path, 'yaml-children')
-    yaml_downstream_path = Path(gitlab_ci_path, 'yaml-downstream')
-    projects_path = Path('projects')
-    config_path = Path(gitlab_ci_path, 'scripts', 'config.yml')
-    whitelist_path = Path(gitlab_ci_path, 'scripts', 'whitelist.yml')
+    cwd_path = Path.cwd()
+    chdir(str(opencpi_path))
+    ci_scripts_path = Path('.gitlab-ci', 'scripts')
+    config_path = Path(ci_scripts_path, 'config.yml')
+    whitelist_path = Path(ci_scripts_path, 'whitelist.yml')
+    pipeline_path = Path('.gitlab-ci.yml')
+    ci_env = get_ci_env()
 
     # Get config and platform whitelist
     with open(str(config_path)) as yml:
         config = yaml.safe_load(yml)
     with open(str(whitelist_path)) as yml:
-        whitelist = yaml.safe_load(yml)
+        platform_whitelist = yaml.safe_load(yml)
 
-    # Discover opencpi projects and platforms
-    project_blacklist = ['tutorial']
-    projects = ci_project.discover_projects(projects_path,
+    # Get projects
+    project_blacklist = ['tutorial', ci_env.project_id]
+    project_group_ids = ['6009537', '9500084']
+    projects_path = Path('projects')
+    projects = ci_project.discover_projects(projects_paths=projects_path, 
+                                            group_ids=project_group_ids,
                                             blacklist=project_blacklist)
-    platforms = ci_platform.discover_platforms(projects, config=config)
-    host_platforms = ci_platform.get_host_platforms(platforms)
-    cross_platforms = ci_platform.get_cross_platforms(platforms)
+    # Get platforms
+    platforms = ci_platform.discover_platforms(projects, 
+                                               whitelist=platform_whitelist, 
+                                               config=config)
+    directive = Directive.from_env(ci_env)
+    platforms = directive.apply(platforms)
 
-    if os.getenv('CI_PIPELINE_ID'):
-    # If we are in a running pipeline, create child pipeline yamls
-        host_platform = ci_platform.get_platform(sys.argv[1], host_platforms)
-        cross_platform = ci_platform.get_platform(sys.argv[2], cross_platforms)
+    for platform in platforms:
+        print(platform.name)
+        for cross_platform in platform.cross_platforms:
+            print('\t', cross_platform.name)
+            for linked_platform in cross_platform.linked_platforms:
+                print('\t\t', linked_platform.name)
 
-        # Get the cross_platform's linked_platforms
-        host_whitelist = whitelist[host_platform.name]
-        linked_platforms = ci_platform.get_linked_platforms(
-            cross_platform, cross_platforms, whitelist=host_whitelist)
+    # Make pipeline
+    pipeline = Pipeline(pipeline_path, ci_env, directive)
+    pipeline.generate(projects, platforms, config=config)
 
-        # Make pipeline and dump to yaml
-        print('Generating pipeline for platform {} on host {}'.format(
-            cross_platform.name, host_platform.name))
-        pipeline = ci_pipeline.make_child_pipeline(
-            projects, host_platform, cross_platform,
-            linked_platforms=linked_platforms, config=config)
-        dump_path = Path(yaml_children_path, '{}-{}.yml'.format(
-            host_platform.name, cross_platform.name))
-        ci_pipeline.dump(pipeline, dump_path)
+    for job in sorted(pipeline._jobs):
+        print(job.name)
+
+    # Write pipeline to yaml file
+    chdir(str(cwd_path))
+    if ci_env.project_name == 'opencpi':
+        dump_path = pipeline_path
     else:
-    # If not in running pipeline, create parent pipeline yaml
-        print('Updating .gitlab-ci.yml for host platforms:')
-        pipeline = ci_pipeline.make_parent_pipeline(
-            host_platforms, cross_platforms, yaml_parent_path,
-            yaml_children_path, whitelist=whitelist, config=config)
-        dump_path = Path('.gitlab-ci.yml')
-        ci_pipeline.dump(pipeline, dump_path)
+        dump_path = Path('..', pipeline_path)
+    pipeline.dump(dump_path)
 
-        print('Updating yaml for downstream projects:')
-        osps = ci_osp.discover_osps()
-        for osp in osps:
-            print('\t', osp.name)
-            pipeline = ci_pipeline.make_downstream_pipeline(
-                host_platforms, osp, yaml_children_path, 
-                whitelist=whitelist, config=config)
-            dump_path = Path(yaml_downstream_path, '{}.yml'.format(osp.name))
-            ci_pipeline.dump(pipeline, dump_path)
+
+def get_ci_env():
+    """Collects CI environment variables
+
+    Collects environment variables with the 'CI_' prefix. The variables
+    are lower-cased and the prefix is removed when stored in the
+    collection.
+
+    Ex:
+        The environment variables CI_COMMIT_MESSAGE can be accessed as
+        ci_env.commit_message
+
+    Returns:
+        Namedtuple of CI environment variables
+    """
+    ci_dict = {key.lower().replace('ci_', ''):value 
+               for key,value in environ.items() 
+               if key.startswith('CI_')}
+    Ci_env = namedtuple('Ci_env', ci_dict.keys())
+    ci_env = Ci_env(*ci_dict.values())
+    
+    if not ci_env:
+        sys.exit('Error: CI environment not set')
+
+    for key,value in ci_dict.items():
+        print('{}: {}'.format(key, value))
+
+    return ci_env
+
+
+def set_ci_env():
+    """Sets CI environment variables
+
+    Simulates a pipeline environment by setting environment variables.
+    This function should not be called except for testing.
+    """
+    environ['CI_COMMIT_MESSAGE'] = ''
+    environ['CI_PIPELINE_SOURCE'] = 'push'
+    environ['CI_ROOT_ID'] = '1'
+    # environ['CI_PLATFORM'] = 'e31x'
+    # environ['CI_HOST_PLATFORM'] = 'centos7'
+    environ['CI_DEFAULT_HOSTS'] = 'centos7'
+    environ['CI_PLATFORMS'] = 'e31x xsim'
+    environ['CI_PIPELINE_ID'] = '0'
+    environ['CI_PROJECT_DIR'] = 'opencpi'
+    environ['CI_PROJECT_NAME'] = 'opencpi'
+    environ['CI_COMMIT_REF_NAME'] = 'develop'
+    environ['CI_PROJECT_TITLE'] = 'opencpi'
+    environ['CI_PROJECT_ID'] = '0'
+    # environ['CI_UPSTREAM_ID'] = '2'
+    # environ['CI_UPSTREAM_REF'] = 'develop'
+    # environ['CI_UPSTREAM_PLATFORMS'] = 'plutosdr modelsim'
+    # environ['CI_ROOT_SOURCE'] = 'pipeline'
+    # environ['CI_ROOT_PLATFORMS'] = 'centos7 plutosdr'
 
 
 if __name__ == '__main__':

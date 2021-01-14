@@ -42,8 +42,10 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 #include "ezxml.h"
 #include "OcpiPValue.h"
+#include "OcpiUtilMisc.h"
 
 namespace OCPI {
   namespace Util {
@@ -98,11 +100,11 @@ namespace OCPI {
 	  m_specName,              // name of component or worker being instantiated
 	  m_implName,              // name of implementation (may be a path)
 	  m_selection;             // the selection expression
-	unsigned m_ordinal;
+	size_t   m_ordinal;
 	bool     m_externals;      // whether all ports should be considered external
 	std::vector<const char *> m_slaveNames; // the slave names for each referenced instance
 	std::vector<unsigned> m_slaveInstances; // the instance ordinals specified as slaves for this instance
-	unsigned m_master;
+	size_t   m_master;
 	bool     m_hasMaster;
 	Properties m_properties;
 	PValueList m_parameters;
@@ -133,20 +135,18 @@ namespace OCPI {
         bool isProducer() const { return !m_provider; } // migration aid
         Role();
       };
-      // The attachment of a connection to external or port
+      // An external port of the assembly.
       struct External {
         std::string m_name;   // the name of the "external port" to the assembly
         std::string m_url;    // the URL that this external attachment has
         Role m_role;
-        size_t m_index;       // This is only used for top level "external" element
-        size_t m_count;
+        size_t m_count;       // The total count for the external (not the connection)
+	std::vector<bool> m_connected;
         PValueList m_parameters;
-        External();
+        External(const char *name);
         const char *parse(ezxml_t, const char *, unsigned&, const PValue *pvl);
-        const char *init(const char *name, const char *role = NULL);
+	const char *cname() const { return m_name.c_str(); }
       };
-      typedef std::list<External> Externals;
-      typedef Externals::iterator ExternalsIter;
       struct Connection;
       struct Port {
         // This mutable is because this name might be resolved when an application
@@ -154,7 +154,7 @@ namespace OCPI {
         // Then this assembly is reused, this resolution will still be valid.
         mutable std::string m_name;
         mutable Role m_role;
-        unsigned m_instance;
+        size_t m_instance;
         size_t m_index;
         // This mutable is because some port parameter values are added later by name
         // and the XML assembly might not use port names
@@ -163,26 +163,26 @@ namespace OCPI {
 	Connection *m_connection; // for navigating parameters
         const char *cname() const { return m_name.c_str(); }
         const char *parse(ezxml_t x, Assembly &a, Connection &c, const PValue *pvl, const PValue *params);
-        const char *init(Assembly &a, Connection &c, const char *name, unsigned instance, bool isInput,
+        const char *init(Assembly &a, Connection &c, const char *name, size_t instance, bool isInput,
                          bool bidi, bool known, size_t index, const PValue *params);
 	// Set parameters for a port after XML parsing, to override
 	const char *setParam(const char *name, const char *value);
       };
       struct Connection {
         std::string m_name;
-        Externals m_externals;
+	std::list<std::pair<External*,size_t>> m_externals; // external and index in it
         std::list<Port> m_ports;
         typedef std::list<Port>::iterator PortsIter;
         PValueList m_parameters;
         size_t m_count; // all attachments have same count. zero if unknown
         Connection();
         const char *parse(ezxml_t x, Assembly &a, unsigned &ord, const OCPI::Util::PValue *params);
-        const char *addPort(Assembly &a, unsigned instance, const char *port, bool isInput,
+        const char *addPort(Assembly &a, size_t instance, const char *port, bool isInput,
                             bool bidi, bool known, size_t index,
                             const OCPI::Util::PValue *params, Port *&);
-        External &addExternal();
+	const char *addExternal(External &ext, size_t index, size_t count);
       };
-      typedef std::list<Connection> Connections;
+      typedef std::list<Connection *> Connections;
       // Potentially specified in the assembly, what policy should be used
       // to spread workers to containers?
       enum CMapPolicy {
@@ -190,6 +190,7 @@ namespace OCPI {
         MinProcessors,
         MaxProcessors
       };
+      typedef std::map<std::string, External, OCPI::Util::ConstStringCaseComp> Externals;
     private:
       ezxml_t m_xml;
       char *m_copy;
@@ -198,16 +199,17 @@ namespace OCPI {
       const char *parse(const char *defaultName = NULL, const char **extraTopAttrs = NULL,
                         const char **extraInstAttrs = NULL, const OCPI::Util::PValue *params = NULL);
       std::vector<Instance*> m_instances;
+      Externals m_externals;
     public:
-      Instance &utilInstance(size_t n) { return *m_instances[n]; }
-      size_t nUtilInstances() { return m_instances.size(); }
+      Externals &externals() { return m_externals; }
+      //      Instance &utilInstance(size_t n) const { return *m_instances[n]; }
+      size_t nUtilInstances() const { return m_instances.size(); }
       const std::string &name() const { return m_name; }
       static unsigned s_count;
       std::string m_name;
       std::string m_package;
-      int m_doneInstance; // -1 for none
+      unsigned m_doneInstance; // UINT_MAX for none
       Connections m_connections;
-      typedef std::list<Connection>::iterator ConnectionsIter;
       CMapPolicy m_cMapPolicy;
       size_t   m_processors;
       MappedProperties m_mappedProperties; // top level mapped to instance properties.
@@ -226,19 +228,22 @@ namespace OCPI {
       const char
         *addInstance(ezxml_t ix, const char **extraInstAttrs, const PValue *params,
                      bool addXml = false),
-        *findInstanceForParam(const char *pName, const char *&assign, unsigned &instn),
+        *findInstanceForParam(const char *pName, const char *&assign, size_t &instn),
         *checkInstanceParams(const char *pName, const PValue *params, bool checkMapped = false,
                              bool singleAssignment = false),
-        *addConnection(const char *name, ezxml_t xml, Connection *&c),
+        *addConnection(const char *name, ezxml_t xml, size_t count, Connection *&c),
         *getInstance(const char *name, unsigned &),
-        *addPortConnection(ezxml_t ix, unsigned from, const char *name, unsigned to,
+        *addPortConnection(ezxml_t ix, size_t from, const char *name, size_t to,
 			   const char *toPort, const OCPI::Util::PValue *params),
-        *addExternalConnection(ezxml_t x, unsigned instance, const char *port,
+        *addExternalConnection(ezxml_t x, size_t instance, const char *port,
                                const OCPI::Util::PValue *params = NULL, bool isInput = false,
                                bool bidi = false, bool known = false),
-        *addExternalConnection(ezxml_t x, const OCPI::Util::PValue *params);
+        *parseExternal(ezxml_t x, Connection *conn, const char *role, const OCPI::Util::PValue *params),
+        *addExternal(const char *name, const char *role, const char *url, size_t count, External *&e),
+	*addExternalPort(ezxml_t x, const OCPI::Util::PValue *params);
       inline ezxml_t xml() { return m_xml; }
       inline bool isImpl() { return m_isImpl; }
+      inline Instance &instance(size_t n) const { return *m_instances[n]; }
     };
   }
 }

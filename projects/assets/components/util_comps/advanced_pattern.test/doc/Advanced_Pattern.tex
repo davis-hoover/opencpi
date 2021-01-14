@@ -249,35 +249,15 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \end{scriptsize}
 \fi
 \section*{Test and Verification}
-\subsubsection*{Usage (local/x86)}
-After building the component, the user needs to type \verb+make tests RCC_CONTAINERS=1+ in the \textit{advanced\_pattern.test} directory. Various properties and data flows will be tested to try to cover as many use cases as possible. \\
+The {\comp} worker is tested using five cases. All cases are verified using the md5 hashes of different        properties and or the output file against the expected md5 hashes. A sixth case, {\path{test_05}}, is present but not tested due to sending a ZLM with opcode 1. The {\path{file_write}} component cannot currently stop on ZLM with opcodes other than 0.\\
 
-If the user would like to execute only one test, \verb+TESTS=test_XX+ can be added to the end of the command.
-\subsubsection*{\textbf{Experimental}: Usage (remote/ARM)}
-Full test environment configuration (\textit{e.g.} NFS mounting, \verb+OCPI_CDK_DIR+, etc.) on the remote GPP is beyond the scope of this document. The test procedures assume that both shells' current working directory is the \textit{advanced\_pattern.test} directory (NFS-mounted on remote) and \verb+ocpirun+ is in the remote's current \verb+PATH+. NFS \textbf{must} be used for the scripts to properly verify the outputs. \\
+{\path{case 00}} runs default values and sends a single ZLM with opcode 0. The output file and the contents of the \verb+current+ property are compared to the expected.\\
 
-In the host shell, the user types \verb+make tests IP=xx.xx.xx.xx+. A command that can be copied and then pasted into the remote shell will be displayed. Once the remote shell returns to the bash prompt, pressing ``Enter'' on the host will begin the verification process. \\
+{\path{case 01}} also runs default values but does not send a ZLM and instead times out after 10 seconds. The \verb+current+ property is compared to the expected.\\
 
-Single tests can be performed in the same manner as documented above.
+{\path{case 02}} generates the \verb+Pattern+ property {(\path{generate.py} 2)} and sends three bytes every tenth opcode. The \verb+maxPatternLength+ property is explicitly set to be 256. The output file, contents of the \verb+current+ property, and, contents of the \verb+maxPatternLength+ property are compared to the expected.\\
 
-\subsubsection*{Detailed Theory of Operation}
-Each \verb+test_XX+ subdirectory has the following files:
+{\path{case 03}} generates the \verb+Pattern+ property {(\path{generate.py} 3)} and sends three bytes every tenth opcode, 50 times. There is no ZLM sent and the test case times out after 10 seconds. The \verb+maxPatternLength+ property is set to 64. For clarity, an {\path{Output_03.out}} file is created to see from where the output hashes are gotten. The output file, contents of the \verb+current+ property, and, contents of the \verb+maxPatternLength+ property are compared to the expected.\\
 
-\begin{itemize}{}{}
-	\item \texttt{description} - a one-line description of the test
-	\item \texttt{application.xml} - the OAS XML for the test setup
-	\item \texttt{golden.md5} - (optional) MD5 checksums of golden/expected output
-	\item \texttt{generate.[sh|pl|py]} - (optional) script to generate test data
-	\item \texttt{verify.sh} - (optional) script to verify output(s)
-\end{itemize}
-\begin{flushleft}
-	Data is internally generated and then written to disk using the \verb+file_write_demux+ component. Some OASs have the pattern information embedded within the XML itself, while others use the \texttt{valueFile} option to import a file named \verb+UUT.Pattern.input+. Most OASs dump the ``\texttt{current}'' property from the tested component as well as the file writer to files named \verb+UUT.current.dump+ and \verb+fwout.current.dump+ respectively, which are also confirmed to match expected output.
-	\medskip
-
-	If \texttt{generate.sh} does not exist, a default one is created that will run \texttt{generate.pl} and/or \texttt{generate.py} if they exist and are executable. This default script is removed with \verb+make clean+.
-	\medskip
-
-	If \texttt{verify.sh} does not exist, a default one is created that will run \texttt{md5sum} and verify all the checksums listed in \texttt{golden.md5}. This default script is also removed upon \verb+make clean+.
-	\medskip
-\end{flushleft}
+{\path{case 04}} generates 2048 bytes of data for the \verb+Pattern+ property {(\path{generate.py} 4)} and sends 3 bytes with opcode 0 for 10 seconds. The contents of the \verb+maxPatternLength+ property, and the end cut of the \verb+current+ property are compared to the expected. 
 \end{document}

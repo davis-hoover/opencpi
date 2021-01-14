@@ -346,7 +346,7 @@ namespace OCPI {
 	    size_t slave;
 	    ocpiCheck(sscanf(li.token(), "%zu", &slave) == 1);
 	    assert(slave < m_members.size());
-	    i->m_slaves.push_back(&m_members[n]);
+	    i->m_slaves.push_back(&m_members[slave]);
 	    i->m_slaves.back()->m_hasMaster = true;
 	  }
 	  i->m_slaveWorkers.resize(i->m_slaves.size());
@@ -562,6 +562,12 @@ namespace OCPI {
 	  OU::format(m_response, "<control state='%u'>", w.getControlState());
 	else
 	  throw OU::Error("Illegal remote control operation");
+      } catch (const char* e) {
+	error = err;
+	return true;
+      } catch (std::exception &e) {
+	error = e.what();
+	return true;
       } catch (const std::string &e) {
 	error = e;
 	return true;

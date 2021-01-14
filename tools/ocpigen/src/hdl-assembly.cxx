@@ -287,8 +287,7 @@ parseHdlAssy() {
   // Do the generic assembly parsing, then to more specific to HDL
   if ((err = a->parseAssy(m_xml, topAttrs,
 			  m_type == Container ? contInstAttrs :
-			  (m_type == Configuration ? platInstAttrs : instAttrs),
-			  true)) ||
+			  (m_type == Configuration ? platInstAttrs : instAttrs))) ||
       (err = parseClocks()))
     return err;
   // Do the HDL-specific parsing and initializations for the instances in the assembly
@@ -372,8 +371,7 @@ parseHdlAssy() {
     wci->m_myClock = true;
     wci->m_clock = &clk;
     wci->m_clock->m_port = wci;
-    OU::Assembly::External *ext = new OU::Assembly::External;
-    ext->m_name = "wci";
+    OU::Assembly::External *ext = new OU::Assembly::External("wci");
     ext->m_role.m_provider = false; // provisional
     ext->m_role.m_bidirectional = false;
     ext->m_role.m_knownRole = true;

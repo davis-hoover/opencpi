@@ -17,6 +17,8 @@
       \hline
       v1.7 & Updated port/property/interface tables for accuracy. Package ID changed from ocpi.assets to ocpi.platform. & 06/2020 \\
       \hline
+      v2.1 & Updated Source Dependencies section for correct location of dependencies. & 03/2021 \\
+      \hline
     \end{longtable}
   \end{table}
 \end{center}
@@ -82,16 +84,16 @@ It is intended to be paired with a device specific worker which translates the \
 %\subsection*{\comp.rcc}
 \subsection*{\comp.hdl}
 \begin{itemize}
-	\item assets/hdl/devices/\comp.hdl/\comp.vhd
+	\item platform/hdl/devices/\comp.hdl/\comp.vhd
 	\item core/hdl/primitives/cdc/cdc\_pkg.vhd
-	\item core/hdl/primitives/cdc/reset.vhd
 	\item core/hdl/primitives/cdc/fast\_pulse\_to\_slow\_sticky.vhd
-	\item core/hdl/primitives/cdc/single\_bit.vhd
-	\item assets/hdl/primitives/misc\_prims/misc\_prims\_pkg.vhd
-	\item assets/hdl/primitives/misc\_prims/misc\_prims\_body.vhd
-	\item assets/hdl/primitives/misc\_prims/dac\_underrun\_detector.vhd
-	\item assets/hdl/primitives/misc\_prims/data\_narrower.vhd
-	\item assets/hdl/primitives/misc\_prims/ocpi\_pkg.vhd
+	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_pkg.vhd
+	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_demarshaller.vhd
+	\item core/hdl/primitives/util/util\_pkg.vhd
+	\item core/hdl/primitives/util/in2out.v
+	\item platform/hdl/primitives/dac/dac\_pkg.vhd
+	\item platform/hdl/primitives/dac/underrun\_detector.vhd
+	\item platform/hdl/primitives/dac/data\_narrower.vhd	
 \end{itemize}
 
 \begin{landscape}

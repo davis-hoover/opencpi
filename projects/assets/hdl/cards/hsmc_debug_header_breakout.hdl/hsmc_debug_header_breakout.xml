@@ -1,4 +1,4 @@
-<hdldevice language="vhdl">
+<hdldevice language="vhdl" onlytargets='stratix4'>
   <componentspec>
     <!-- bank 1  -->
     <property name="clkout0"               type="bool" readable="1" writable="1"                               />

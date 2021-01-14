@@ -77,7 +77,7 @@ namespace OCPI {
     // If the removeExternal is true, remove any external port connection since the caller
     // will replace it.
     const char *Assembly::
-    getPortAssignment(const char *pName, const char *assign, unsigned &instn, unsigned &portn,
+    getPortAssignment(const char *pName, const char *assign, size_t &instn, size_t &portn,
 		      const OU::Port *&port, const char *&value, bool removeExternal) {
       unsigned neqs = 0;
       const char *eq = strchr(assign, '?'); // points past instance or external port
@@ -86,14 +86,14 @@ namespace OCPI {
 	  neqs++;
       std::string pname;
       eq = strchr(assign, '='); // points past instance or external port
-      OU::Assembly::ConnectionsIter ci = m_connections.end();
+      auto ci = m_connections.end();
       if (neqs == 1) { // find an external port with this name
 	pname.assign(assign, OCPI_SIZE_T_DIFF(eq, assign));
 	const OU::Assembly::Port *ap = NULL;
 	for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
-	  const OU::Assembly::Connection &c = *ci;
+	  const OU::Assembly::Connection &c = **ci;
 	  if (c.m_externals.size() &&
-	      !strcasecmp(pname.c_str(), c.m_externals.front().m_name.c_str())) {
+	      !strcasecmp(pname.c_str(), c.m_externals.front().first->m_name.c_str())) {
 	    ap = &c.m_ports.front();
 	    instn = ap->m_instance;
 	    assert(ap->m_name.size());
@@ -112,7 +112,7 @@ namespace OCPI {
 	// There might be an external connection on this port that has to be removed...
 	if (removeExternal)
 	  for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
-	    const OU::Assembly::Connection &c = *ci;
+	    const OU::Assembly::Connection &c = **ci;
 	    const OU::Assembly::Port *ap = &c.m_ports.front();
 	    if (c.m_externals.size() && ap->m_instance == instn &&
 		!strcasecmp(ap->m_name.c_str(), pname.c_str()))
@@ -143,7 +143,7 @@ namespace OCPI {
       const char *assign;
       for (unsigned n = 0; OU::findAssignNext(params, "file", NULL, assign, n); ) {
 	const char *value, *err;
-	unsigned instn, portn;
+	size_t instn, portn;
 	const OU::Port *port;
 	if ((err = getPortAssignment("file", assign, instn, portn, port, value, true)))
 	  return err;
@@ -212,7 +212,7 @@ namespace OCPI {
       OU::Assembly::Port **ap = new OU::Assembly::Port *[m_nPorts];
       for (unsigned n = 0; n < m_nPorts; n++)
 	ap[n] = NULL;
-      OU::Assembly::Instance &inst = m_utilInstance;
+      const OU::Assembly::Instance &inst = m_utilInstance;
       OU::Port *p;
 
       // build the map from implementation port ordinals to util::assembly::ports
@@ -289,8 +289,7 @@ namespace OCPI {
 	p = ports;
 	for (unsigned n = 0; n < m_nPorts; n++, p++) {
 	  bool found = false;
-	  for (OU::Assembly::Instance::PortsIter pi = inst.m_ports.begin();
-	       pi != inst.m_ports.end(); pi++)
+	  for (auto pi = inst.m_ports.begin(); pi != inst.m_ports.end(); pi++)
 	    if (!strcasecmp((*pi)->m_name.c_str(), p->m_name.c_str())) {
 	      found = true;
 	      break;
@@ -361,7 +360,7 @@ namespace OCPI {
 	    // Find the assembly connection port for this instance and this
 	    // internally/statically connected port
 	    OU::Assembly::Port *ap = m_assyPorts[n];
-	    if (ap) {
+	    if (ap && !ap->m_connection->m_externals.size()) {
 	      // We found the assembly connection port
 	      // Now check that the port connected in the assembly has the same
 	      // name as the port connected in the artifact
@@ -386,8 +385,9 @@ namespace OCPI {
 		return false;
 	      }
 	      bump = 1;; // An implementation with hardwired connections gets a score bump
-	    } else if (m_utilInstance.m_hasMaster)
-	      // I'm a slave and my master might delegate a port to me.
+	    } else if (m_utilInstance.m_hasMaster || (ap && ap->m_connection->m_externals.size())) 
+	      // I'm a slave and my master might delegate a port to me --or--
+	      // I am connected externally to something that cannot be confirmed yet, like a delegated port
 	      return true;
 	    else {
 	      // There is no connection in the assembly for a statically connected impl port
@@ -422,9 +422,15 @@ namespace OCPI {
       // Check for worker name match
       std::string fullWorker;
       if (m_utilInstance.m_implName.size() &&
+	  // Just the worker name without model - no dots
 	  strcasecmp(m_utilInstance.m_implName.c_str(), impl.m_metadataImpl.cname()) &&
+	  // Just the worker name with model - one dot
 	  strcasecmp(m_utilInstance.m_implName.c_str(),
 		     OU::format(fullWorker, "%s.%s",
+				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str())) &&
+	  // The fully qualified name
+	  strcasecmp(m_utilInstance.m_implName.c_str(),
+		     OU::format(fullWorker, "%s.%s.%s", impl.m_metadataImpl.package().c_str(),
 				impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str()))) {
 	ocpiInfo("    Rejected: worker name is \"%s.%s\", while requested worker name is \"%s\"",
 		 impl.m_metadataImpl.cname(), impl.m_metadataImpl.model().c_str(),
@@ -523,9 +529,9 @@ namespace OCPI {
 		    apName, apValue, pStr.c_str());
 	}
       }
-      if (m_utilInstance.slaveInstances().size() && impl.m_metadataImpl.slaves().empty()) {
+      if (m_utilInstance.slaveInstances().size() && !impl.m_metadataImpl.slaveAssy()) {
 	ocpiInfo("    Rejected because the instance in the application indicates slaves therefore is a proxy,"
-	         "but the candidate implementation which implements the correct OCS is not a proxy");
+	         " but the candidate implementation which implements the correct OCS is not a proxy");
 	return false;
       }
       // FIXME:  Check consistency between implementation metadata here...
@@ -544,15 +550,15 @@ namespace OCPI {
     void Assembly::
     addInstance(const OU::PValue *params) {
       unsigned n = (unsigned)m_instances.size();
+      m_instances.push_back(new Instance(OU::Assembly::instance(n)));
       ocpiInfo("================================================================================");
       ocpiInfo("For instance %2u: \"%s\", finding and checking candidate implementations/workers",
 	       n, utilInstance(n).cname());
-      m_instances.push_back(new Instance(utilInstance(n)));
       // if we have a deployment, don't do the work to figure out potential implementations
       if (m_deployed)
 	return;
       m_tempInstance = m_instances.back();
-      OU::Assembly::Instance &inst = m_tempInstance->m_utilInstance;
+      const OU::Assembly::Instance &inst = m_tempInstance->m_utilInstance;
       // need to deal with params that can filter impls: model and platform
       ezxml_t x = inst.xml();
       if (!OU::findAssign(params, "model", inst.m_name.c_str(), m_model) &&
@@ -629,9 +635,8 @@ namespace OCPI {
       // Pass 5:  Check for interface and connection compatibility.
       // We assume all implementations have the same protocol metadata
       //      unsigned nConns = m_connections.size();
-      for (OU::Assembly::ConnectionsIter ci = m_connections.begin();
-	   ci != m_connections.end(); ci++) {
-	const OU::Assembly::Connection &c = *ci;
+      for (auto ci = m_connections.begin(); ci != m_connections.end(); ci++) {
+	const OU::Assembly::Connection &c = **ci;
 	if (c.m_ports.size() == 2) {
 	  const OU::Worker // implementations on both sides of the connection
 	    &i0 = m_instances[c.m_ports.front().m_instance]->m_candidates[0].impl->m_metadataImpl,

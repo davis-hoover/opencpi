@@ -1,0 +1,35 @@
+OpenCPI uses XML for its metadata, both the files that users create (specs, workers, assemblies, etc.)
+as well as generated internal metadata passed between various software modules/tools.
+(artifacts, platform configuration assemblies, container assemblies).
+
+A fair amount of the XML processing is done at runtime, which motivated the choice of the very
+small/compact/fast C-based parsing library called "ezxml".  It is 2 orders of magnitude smaller
+than other common XML parsing systems.
+
+Generic parsers (schema-based) do not always generate helpful error messages, so while the library
+parses the syntax of XML, validation of correct presence and combinations of attributes
+and elements is verified by the C++ software that calls the library rather than any
+generic schema-based validation.  Of course our error messages could always be improved.
+
+The data structures for the basic parsed XML have long lifetimes in code so that
+no extra copies of strings are necessary in many cases since the code that references
+the XML content has the same or shorter lifecycle.
+
+We "abuse" XML in two ways that XML purists would not like:  1) tags for elements and attributes
+are case insensitive, and 2) we frequently use attribute values that are lists of values
+(space or comma-separated).  This is based on the design and user interface goal for making
+our XML user-friendly:  easy to type, easy to read, low clutter, low redundancy.
+
+Migration from XML to other formats like YAML could retain all the semantic verification
+without code changes assuming the library entry points were "spoofed" for YAML.
+
+Deficiencies:
+
+- Error messages do not uniformly carry source locations.
+- Error messages do not always list the erroneous values, only the rule that was violated
+- Some fuzzed/random/erroneous inputs have been shown to crash the library.
+- The API (less than 10 functions) is C-ish rather than C++-ish
+
+
+
+

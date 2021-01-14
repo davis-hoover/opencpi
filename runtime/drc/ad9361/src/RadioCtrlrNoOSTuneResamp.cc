@@ -61,25 +61,6 @@ RadioCtrlrNoOSTuneResamp(unsigned which, const char* descriptor, ConfiguratorAD9
   init_AD9361_InitParam();
 }
 
-#if 0
-RadioCtrlrNoOSTuneResamp::
-RadioCtrlrNoOSTuneResamp(const char* descriptor, Configurator &c, S& slaves,
-    struct ad9361_rf_phy*& ad9361_rf_phy) :
-    DigRadioCtrlr(descriptor, c),
-    m_configurator(c),
-    _ad9361_rf_phy(0),
-    m_ad9361_rf_phy(ad9361_rf_phy),
-    m_slaves(slaves),
-    m_AD9361_FREF_Hz(40e6), // just to match up w/ configurator for now...
-    m_ad9361_init_ret(-1),
-    m_ad9361_init_called(false),
-    m_configurator_tune_resamp_locked(false),
-    m_readback_gain_mode_as_standard_value(false) {
-
-  init_AD9361_InitParam();
-}
-#endif
-
 bool RadioCtrlrNoOSTuneResamp::request_config_lock(
     const config_lock_ID_t   config_lock_ID,
     const ConfigLockRequest& config_lock_request) {
@@ -1295,18 +1276,18 @@ void RadioCtrlrNoOSTuneResamp::init() {
     ad9361_opencpi.worker = m_descriptor;
   }
 
-#if 0
-  three phases of callback:
+  /*
+    three phases of callback:
     1. Before init
     2. After init success or failure
     3. After init success
-#endif
+  */
 
+  // This is our config structure which is then translated into the no-OS library's own init structure
   Ad9361InitConfig cfg;
-  // Get information from how the workers are configured already and perform any other initial config before
-  // we call ad9361_init
+  // Call back to the proxy to fill in or modify this structure further, before acting on it.
   m_callBack.initialConfig(m_device, cfg);
-  // Put that information into the ad9361 library init structure for ad9361_init
+  // Translate from our config structure to the no-OS library's config structure
   update_AD9361_InitParam(cfg);
 
   // sleep duration chosen to be relatively small in relation to AD9361
@@ -1616,6 +1597,7 @@ void RadioCtrlrNoOSTuneResamp::init_AD9361_InitParam() {
 
 void RadioCtrlrNoOSTuneResamp::update_AD9361_InitParam(const Ad9361InitConfig &config) {
   AD9361_InitParam& init = m_AD9361_InitParam;
+  init.xo_disable_use_ext_refclk_enable = config.xo_disable_use_ext_ref_clk;
   init.reference_clk_rate = (uint32_t) round(m_AD9361_FREF_Hz);
   // printf("No-OS required rounding AD9361 reference clock rate from %0.15f to %" PRIu32, refclk, m_AD9361_InitParam.reference_clk_rate);
   bool is_2R1T_or_1R2T_or_2R2T = config.qadc1_is_present or config.qdac1_is_present;

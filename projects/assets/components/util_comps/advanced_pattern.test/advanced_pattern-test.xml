@@ -1,0 +1,57 @@
+<tests duration='10'>
+  <!--Test_00-->
+  <case>
+    <output port='out' Script='verify.py 0' View='view.sh'/>
+    <Property name='maxPatternLength' Value='32'/>
+    <Property name='LoopCount' Value='1'/>
+    <Property name='ZLM' Value='0'/>
+    <Property name='ocpi_debug' value='false'/>
+  </case>
+
+  <!--Test_01-->
+  <case>
+    <output port='out' Script='verify.py 1' View='view.sh'/>
+    <Property name='maxPatternLength' Value='32'/>
+    <Property name='LoopCount' Value='1'/>
+    <Property Name='ZLM' Value='256'/>
+    <Property name='ocpi_debug' value='false'/>
+    <Property name='ocpi_debug' value='false'/>  
+  </case>
+
+  <!--Test_02-->
+  <case>
+    <output port='out' Script='verify.py 2' View='view.sh'/>
+    <Property Name='maxPatternLength' Value='256'/>
+    <Property Name = 'Pattern' Generate='generate.py 2'/>
+    <Property name='ocpi_debug' value='false'/>
+  </case>
+
+  <!--Test_03-->
+  <case>
+    <output port='out' Script='verify.py 3' View='view.sh'/>
+    <Property Name='maxPatternLength' Value='64'/>
+    <Property Name='Pattern' Generate='generate.py 3'/>
+    <Property Name='LoopCount' Value='25'/>
+    <Property Name='ZLM' Value='256'/>
+    <Property name='ocpi_debug' value='false'/>
+  </case>
+
+  <!--Test_04-->
+  <case>
+    <output port='out' Script='verify.py 4' View='view.sh'/>
+    <Property Name='maxPatternLength' Value='128'/>
+    <Property Name='Pattern' Generate='generate.py 4'/>
+    <Property Name='LoopCount' Value='0'/>
+    <Property name='ocpi_debug' value='false'/>
+  </case>
+
+  <!--FIXME! file_write does not stop on different opcodes. Case not converted-->
+  <!--Test_05-->
+  <!--case>
+    <output port='out' Script='verify.py' View='view.sh'/>
+    <Property Name='Pattern' valueFile='UUT.Pattern_test_05.input'/>
+    <Property Name='LoopCount' Value='10'/>
+    <Property Name='ZLM' Value='1'/>
+    <Property name='ocpi_debug' value='false'/>
+  </case-->
+</tests>
