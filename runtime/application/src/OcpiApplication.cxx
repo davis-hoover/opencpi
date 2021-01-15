@@ -576,9 +576,12 @@ namespace OCPI {
 	      c.m_portFixups.emplace_front(assyPort, *assyPort, masterPort.m_ordinal);
 	      m_assembly.instances()[instNum]->m_assyPorts[masterPort.m_ordinal] = NULL;
 	      auto &slavePort = slaveConn.m_ports.front();
+	      // patch the master's port of the app connection, which will be un-done if redeployed
 	      assyPort->m_name = slavePort.m_name; // name is slave's name now
 	      assyPort->m_instance = slavePort.m_instance;
 	      assyPort->m_index = 0; // we assume slave ports are not array ports
+	      // patch the slave's port, which does not need undoing
+	      m_assembly.instances()[slavePort.m_instance]->m_assyPorts[slavePort.m_ordinal] = assyPort;
 	    }
 	  }
 	}
