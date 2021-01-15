@@ -218,7 +218,7 @@ namespace OCPI {
       // build the map from implementation port ordinals to util::assembly::ports
       for (std::list<OU::Assembly::Port*>::const_iterator pi = inst.m_ports.begin();
 	   pi != inst.m_ports.end(); pi++) {
-	bool found = false;
+	OU::Port *found = NULL;
 	OU::Assembly::Port &asp = **pi;
 	if (asp.m_name.empty()) {
 	  // Resolve empty port names to be unambiguous if possible
@@ -243,7 +243,7 @@ namespace OCPI {
 	      }
 	      ap[n] = &asp;
 	      asp.m_name = p->m_name;
-	      found = true;
+	      found = p;
 	    }
 	  if (!found) {
 	    ocpiInfo("Rejected \"%s\": there is no %s port for connection at instance '%s'.",
@@ -270,7 +270,7 @@ namespace OCPI {
 	      ap[n] = &asp;
 	      asp.m_role.m_knownRole = true;
 	      asp.m_role.m_provider = p->m_provider;
-	      found = true;
+	      found = p;
 	      break;
 	    }
 	  if (!found) {
@@ -281,6 +281,7 @@ namespace OCPI {
 	    goto rejected;
 	  }
 	}
+	asp.m_ordinal = found->m_ordinal;
       }
       // Final side effects on success
       if (inst.m_externals) {
