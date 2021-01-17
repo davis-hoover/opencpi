@@ -24,6 +24,16 @@
             volatile='true'
             description='Sticky bit indication of samples overrun.'/>
 
+  <Property name='samp_count_before_first_samp_drop'
+            type='ulong'
+            volatile='true'
+            description='Number of samples before the first dropped sample.'/>
+
+  <Property name='num_dropped_samps'
+            type='ulong'
+            volatile='true'
+            description='Number of samples dropped.'/>
+
   <DataInterfaceSpec name='out'
                      producer='true'
                      protocol='ComplexShortWithMetadata-prot'/>

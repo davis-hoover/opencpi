@@ -13,9 +13,11 @@
     \rowcolor{blue}
     \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
       \hline
-      v1.6 & Released initial technology preview & \\
+      v1.6 & Released initial technology preview & 02/2020 \\
       \hline
-      v1.7 & Updated port/property/interface tables for accuracy. Package ID changed from ocpi.assets to ocpi.platform. & \\
+      v1.7 & Updated port/property/interface tables for accuracy. Package ID changed from ocpi.assets to ocpi.platform. & 06/2020 \\
+      \hline
+      v2.1 & Updated Worker Implementation Details section to talk about new properties. Updated Source Dependencies section for correct location of dependencies. & 03/2021 \\
       \hline
     \end{longtable}
   \end{table}
@@ -35,7 +37,8 @@
 The \comp \ component provides the property and port definitions necessary for the data\_src\_adc.hdl worker which performs all the generic functionality required to ingest Analog-to-Digital Converter (ADC) data onto an FPGA.
 
 \section*{Worker Implementation Details}
-The following section describes the data\_src\_adc.hdl worker. Sampled data from an ADC is sent to the worker via the \verb+dev+ devsignal port. The samples are sign-extended and justified to a 16-bit I, 16-bit Q values, which is the standard provided by the samples argument of the ComplexShortWithMetadata-prot protocol used by the \verb+out+ port. Justification within the 16-bit values is performed according to the \verb+ADC_INPUT_IS_LSB_OF_OUT_PORT+ parameter property. The ADC samples are sent along with the ADC clock on the \verb+dev+ devsignal port. The ouput port clock is driver by the ADC clock, and backpressure from the output port's ready signal is not expected under normal operation. When backpressure is experienced, the overrun\_sticky\_error property is set to true, an \verb+out+ port samples message will be ended if one is in progress, and a sync message will be sent to the output port.
+The following section describes the data\_src\_adc.hdl worker. Sampled data from an ADC is sent to the worker via the \verb+dev+ devsignal port. The samples are sign-extended and justified to a 16-bit I, 16-bit Q values, which is the standard provided by the samples argument of the ComplexShortWithMetadata-prot protocol used by the \verb+out+ port. Justification within the 16-bit values is performed according to the \verb+ADC_INPUT_IS_LSB_OF_OUT_PORT+ parameter property. The ADC samples are sent along with the ADC clock on the \verb+dev+ devsignal port. The ouput port clock is driven by the ADC clock, and backpressure from the output port's ready signal is not expected under normal operation. When backpressure is experienced, the overrun\_sticky\_error property is set to true, an \verb+out+ port samples message will be ended if one is in progress, and a sync message will be sent to the output port. There is also the samp\_count\_before\_first\_samp\_drop property that gives the number of samples before the first dropped sample and 
+the num\_dropped\_samps property that gives number of samples dropped. These properties should be checked at the end of an app run because they won't be stable until then. The worker doesn't use cdc crossing circuits for samp\_count\_before\_first\_samp\_drop and num\_dropped\_samps because it takes advantage that samp\_count\_before\_first\_samp\_drop and num\_dropped\_samps will have a stable value by the time the control plane reads those values at the end of an app run.
 
 %\section*{Block Diagrams}
 %\subsection*{Top level}
@@ -45,18 +48,17 @@ The following section describes the data\_src\_adc.hdl worker. Sampled data from
 \section*{Source Dependencies}
 \subsection*{\comp.hdl}
 \begin{itemize}
-	\item assets/hdl/devices/\comp.hdl/\comp.vhd
+	\item platform/hdl/devices/\comp.hdl/\comp.vhd
 	\item core/hdl/primitives/cdc/cdc\_pkg.vhd
-	\item core/hdl/primitives/cdc/reset.vhd
 	\item core/hdl/primitives/cdc/fast\_pulse\_to\_slow\_sticky.vhd
-	\item core/hdl/primitives/cdc/single\_bit.vhd
-	\item assets/hdl/primitives/misc\_prims/misc\_prims\_pkg.vhd
-	\item assets/hdl/primitives/misc\_prims/misc\_prims\_body.vhd
-	\item assets/hdl/primitives/misc\_prims/adc\_samp\_drop\_detector.vhd
-	\item assets/hdl/primitives/misc\_prims/data\_widener.vhd
-	\item assets/hdl/primitives/misc\_prims/ocpi\_pkg.vhd
-	\item assets/hdl/primitives/misc\_prims/ocpi\_cswm\_prot\_out\_adapter\_dw32\_clkout.vhd
-	\item assets/hdl/primitives/misc\_prims/ocpi\_cswm\_prot\_out\_adapter\_dw32\_clkin.vhd
+	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_pkg.vhd
+	\item core/hdl/primitives/protocol/out\_port\_cswm\_samples\_and\_sync.vhd
+	\item core/hdl/primitives/util/util\_pkg.vhd
+	\item core/hdl/primitives/util/in2out.v
+	\item core/hdl/primitives/util/reset\_detector.vhd
+	\item platform/hdl/primitives/adc/adc\_pkg.vhd
+	\item platform/hdl/primitives/adc/samp\_drop\_detector.vhd
+	\item platform/hdl/primitives/adc/data\_widener.vhd
 \end{itemize}
 
 \begin{landscape}
@@ -79,4 +81,4 @@ The following section describes the data\_src\_adc.hdl worker. Sampled data from
 %\subsubsection*{\comp.hdl}
 
 \section*{Test and Verification}
-No unit test for this component exists. However, an application (which is NOT a unit test) exists for testing purposes (see assets/applications/data\_src\_adc\_ext\_test\_app).
+No unit test for this component exists. However, an application (which is NOT a unit test) exists for testing purposes (see platform/applications/data\_src\_adc\_ext\_test\_app).

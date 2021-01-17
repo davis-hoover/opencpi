@@ -1,5 +1,10 @@
 PRELIMINARY
-This library contains vendor specific clocking ip and vendor agnostic clocking based on phased-locked loops.
+This library contains vendor specific clocking ip and vendor agnostic clocking based on phased-locked loops. 
+
+NOTE: zynq ultrascale and zynq ultrascale+ use different versions of the mmcm and pll primitives. 
+OpenCPI lumps zynq utlrascale and ultrascale+ under the zynq_ultra target. OpenCPI will need
+to make the distinction between the two or handle it better at some point if a platform that
+uses zynqultrascale is ever added.
 
 The clock_generator.vhd wraps the vendor specific ip and the vendor agnostic version of clock_generator.vhd 
 implements something similar to the vendor IP.

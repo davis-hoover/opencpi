@@ -25,7 +25,7 @@ library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library unisim; use unisim.vcomponents.all;
 library util; use util.util.all;
-library ocpi_core_bsv; use ocpi_core_bsv.all;
+library cdc; use cdc.all;
 architecture rtl of worker is
   constant adc_width  : positive := 12; -- must not be > 16 due to WSI width and multiple of 2 due to LVDS generate loop
 
@@ -69,7 +69,7 @@ architecture rtl of worker is
   end function data_width;
 
   constant data_width_from_pins : positive := data_width(adc_width);
-
+  constant NUM_CHANS            : positive := 2;
   -- we could expose these constants as bool parameters with default values
   -- of false, but there's nothing significant to gain from it, so we fix their
   -- values to false here (if someone wanted to change it to true for
@@ -90,11 +90,11 @@ architecture rtl of worker is
   signal ch1_worker_present : std_logic := '0';
   signal r1_worker_present  : std_logic := '0';
   signal r2_worker_present  : std_logic := '0';
-  -- WSI (control) clock domain signals
-  signal wsi_r1_samps_dropped_clear : std_logic := '0';
-  signal wsi_r2_samps_dropped_clear : std_logic := '0';
-  signal wsi_reset_n                : std_logic := '1';
-  signal wsi_channels_are_swapped   : std_logic := '0';
+  -- WCI (control) clock domain signals
+  signal wci_r1_samps_dropped_clear : std_logic := '0';
+  signal wci_r2_samps_dropped_clear : std_logic := '0';
+  signal wci_reset_n                : std_logic := '1';
+  signal wci_channels_are_swapped   : std_logic := '0';
   -- AD9361 RX clock domain signals
   signal adc_clk_in   : std_logic := '0';
   signal adc_clk      : std_logic := '0';
@@ -128,6 +128,28 @@ architecture rtl of worker is
   signal adc_channels_are_swapped : std_logic := '0';
   -- signals interface (ADC clock domain)
   signal RX_FRAME_P_s : std_logic := '0';
+
+  signal wci_use_two_r_two_t_timing : std_logic;
+  signal adc_use_two_r_two_t_timing_rr : std_logic;
+
+  signal sample_clk        : std_logic := '0';
+  signal sample_data_i     : adc.adc.array_data_t(0 to NUM_CHANS-1) :=
+                             (others=> (others => '0'));
+  signal sample_data_q     : adc.adc.array_data_t(0 to NUM_CHANS-1) :=
+                             (others=> (others => '0'));
+  signal sample_data_valid : std_logic_vector(0 to NUM_CHANS-1) :=
+                             (others => '0');
+  signal adc_data_i        : adc.adc.array_data_t(0 to NUM_CHANS-1) :=
+                             (others=> (others => '0'));
+  signal adc_data_q        : adc.adc.array_data_t(0 to NUM_CHANS-1) :=
+                             (others=> (others => '0'));
+  signal adc_data_vld      : std_logic_vector(0 to NUM_CHANS-1) :=
+                             (others => '0');
+  signal worker_present    : std_logic_vector(0 to NUM_CHANS-1) :=
+                             (others => '0');
+  
+  signal adc_reset         : std_logic := '0';             
+
 begin
 
   -- these dev signals are used to (eventually) tell higher level proxy(ies)
@@ -277,12 +299,9 @@ begin
     ---------------------------------------------------------------------------
     -- For CMOS SP Full Duplex, and LVDS DP Full Duplex,
     -- delay r1 by 2 to align with r2
-    delay_r1_by_2 : if (HALF_DUPLEX_p      = bfalse  and
-                        DATA_RATE_CONFIG_p = DDR_e)  and
-                       ((LVDS_p            = btrue   and
-                         SINGLE_PORT_p     = bfalse) or
-                        (LVDS_p            = bfalse  and
-                         SINGLE_PORT_p     = btrue)) generate
+    delay_r1_by_2 : if (HALF_DUPLEX_p      = bfalse  and DATA_RATE_CONFIG_p = DDR_e)  and
+                       ((LVDS_p            = btrue   and SINGLE_PORT_p     = bfalse) or
+                        (LVDS_p            = bfalse  and SINGLE_PORT_p     = btrue)) generate
     delay_r1_by_2_to_align_with_r2 : process(adc_clk)
     begin
       if rising_edge(adc_clk) then
@@ -340,12 +359,12 @@ begin
             -- no-OS (via the ad9361_config_proxy) directs us via the
             -- config_is_two_r signal when to drop the second channel samples
             -- that should be ignored
-            adc_r2_give_rrrr <= dev_cfg_data_in.config_is_two_r and
+            adc_r2_give_rrrr <= adc_use_two_r_two_t_timing_rr and
                                 r2_worker_present;
 
             -- if valid R2 channel samples are received but there is no
             -- second qadc worker to ingest them, detect the error
-            adc_r2_samps_dropped <= dev_cfg_data_in.config_is_two_r and
+            adc_r2_samps_dropped <= adc_use_two_r_two_t_timing_rr and
                                     (not r2_worker_present);
 
             state <= R1_11_6;
@@ -358,12 +377,9 @@ begin
     ---------------------------------------------------------------------------
     -- For CMOS SP Half duplex, CMOS DP Full Duplex
     -- delay r1 by 1 to align with r2
-    delay_r1_by_1_to_align_with_r2 : if (LVDS_p             = bfalse   and
-                                         DATA_RATE_CONFIG_p = DDR_e)   and
-                                        ((SINGLE_PORT_p     = btrue    and
-                                          HALF_DUPLEX_p     = btrue)   or
-                                         (SINGLE_PORT_p     = bfalse   and
-                                          HALF_DUPLEX_p     = bfalse)) generate
+    delay_r1_by_1_to_align_with_r2 : if (LVDS_p             = bfalse   and DATA_RATE_CONFIG_p = DDR_e)   and
+                                        ((SINGLE_PORT_p     = btrue    and HALF_DUPLEX_p     = btrue)   or
+                                         (SINGLE_PORT_p     = bfalse   and HALF_DUPLEX_p     = bfalse)) generate
       delay_r1_by_1 : process(adc_clk)
       begin
         if rising_edge(adc_clk) then
@@ -414,12 +430,12 @@ begin
               -- no-OS (via the ad9361_config_proxy) directs us via the
               -- config_is_two_r signal when to drop the second channel samples
               -- that should be ignored
-              adc_r2_give_rrrr <= dev_cfg_data_in.config_is_two_r and
+              adc_r2_give_rrrr <= adc_use_two_r_two_t_timing_rr and
                                   r2_worker_present;
 
               -- if valid R2 channel samples are received but there is no
               -- second qadc worker to ingest them, detect the error
-              adc_r2_samps_dropped <= dev_cfg_data_in.config_is_two_r and
+              adc_r2_samps_dropped <= adc_use_two_r_two_t_timing_rr and
                                       (not r2_worker_present);
 
               state <= R1_11_6;
@@ -513,53 +529,117 @@ begin
     -- the output data for r1_i/q and r2_i/q
     ---------------------------------------------------------------------------
   end generate;
+  
+  adc_reset_gen : cdc.cdc.reset
+  port map(
+    src_rst => ctl_in.reset,
+    dst_clk => adc_clk,
+    dst_rst => adc_reset); 
 
-  -- sync (WSI clock domain) -> (ADC clock domain)
-  -- note that we don't care if WSI clock is much faster and bits are
+  -- sync (WCI clock domain) -> (ADC clock domain)
+  -- note that we don't care if WCI clock is much faster and bits are
   -- dropped - props_in.channels_are_swapped is a configuration bit which is
   -- expected to change very rarely in relation to either clock
-  wsi_reset_n <= not ctl_in.reset;
-  wsi_channels_are_swapped <= '1' when (props_in.channels_are_swapped = btrue) else '0';
-  chan_swap_sync: bsv_pkg.SyncBit
-    generic map(
-      init   => 0)
-    port map(
-      sCLK   => ctl_in.clk,
-      sRST   => wsi_reset_n, -- apparently sRST is active-low
-      dCLK   => adc_clk,
-      sEN    => '1',
-      sD_IN  => wsi_channels_are_swapped,
-      dD_OUT => adc_channels_are_swapped); -- delayed by one WSI clock, two ADC clocks
+  wci_channels_are_swapped <= '1' when (props_in.channels_are_swapped = btrue) else '0';
+  chan_swap_sync : cdc.cdc.single_bit
+  generic map(IREG      => '1',
+              RST_LEVEL => '0')
+  port map   (src_clk      => ctl_in.clk,
+              src_rst      => ctl_in.reset,
+              src_en       => '1',
+              src_in       => wci_channels_are_swapped,
+              dst_clk      => adc_clk,
+              dst_rst      => adc_reset,
+              dst_out      => adc_channels_are_swapped);  -- delayed by one WCI clock, two ADC clocks
 
   r1_worker_present               <= ch0_worker_present when (adc_channels_are_swapped = bfalse) else ch1_worker_present;
   r2_worker_present               <= ch1_worker_present when (adc_channels_are_swapped = bfalse) else ch0_worker_present;
 
-  dev_data_ch0_out_out.clk    <= adc_clk;
-  dev_data_ch0_out_out.valid  <= adc_r1_give_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_give_rrrr;
+  adc_data_i(0)     <= adc_r1_i_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_i_rrrr;
+  adc_data_i(1)     <= adc_r2_i_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_i_rrrrrr;
+  adc_data_q(0)     <= adc_r1_q_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_q_rrrr;
+  adc_data_q(1)     <= adc_r2_q_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_q_rrrrrr;
+  adc_data_vld(0)   <= adc_r1_give_rrrrrr when (adc_channels_are_swapped = bfalse) else adc_r2_give_rrrr;
+  adc_data_vld(1)   <= adc_r2_give_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_give_rrrrrr;
+  worker_present(0) <= r1_worker_present;
+  worker_present(1) <= r2_worker_present;
+
+  sample_clk_gen : entity work.one_sample_clock_per_adc_sample_generator
+    generic map(
+      NUM_CHANS                  => NUM_CHANS,
+      FIRST_DIVIDER_TYPE         => "REGISTER",
+      FIRST_DIVIDER_ROUTABILITY  => "GLOBAL",
+      SECOND_DIVIDER_TYPE        => "REGISTER",
+      SECOND_DIVIDER_ROUTABILITY => "GLOBAL")
+    port map(
+      -- to/from data_interleaver
+      someclk_data_i             => adc_data_i,
+      someclk_data_q             => adc_data_q,
+      someclk_data_vld           => adc_data_vld,
+      -- clock handling
+      adc_clk                    => adc_clk,
+      -- to/from supported worker
+      worker_present             => worker_present,
+      wci_use_two_r_two_t_timing => wci_use_two_r_two_t_timing,
+      sample_clk                 => sample_clk,
+      sample_data_out_i          => sample_data_i,
+      sample_data_out_q          => sample_data_q,
+      sample_data_out_valid      => sample_data_valid);
+
+
+  -- From ADI's UG-570:
+  -- "For a system with a 2R1T or a 1R2T configuration, the clock
+  -- frequencies, bus transfer rates and sample periods, and data
+  -- capture timing are the same as if configured for a 2R2T system.
+  -- However, in the path with only a single channel used, the
+  -- disabled channel’s I-Q pair in each data group is unused."
+  wci_use_two_r_two_t_timing <= dev_cfg_data_in.config_is_two_r;
+
+  -- sync (WCI clock domain) -> (ADC clock divided domain), 
+  -- note that we don't care if WCI clock is much faster and bits are
+  -- dropped - wci_use_two_r_two_t_timing is a configuration bit which is
+  -- expected to change very rarely in relation to either clock
+  second_chan_enable_sync : cdc.cdc.single_bit
+    generic map(IREG      => '1',
+                RST_LEVEL => '0')
+    port map   (src_clk      => ctl_in.clk,
+                src_rst      => ctl_in.reset,
+                src_en       => '1',
+                src_in       => wci_use_two_r_two_t_timing,
+                dst_clk      => adc_clk,
+                dst_rst      => adc_reset,
+                dst_out      => adc_use_two_r_two_t_timing_rr);  -- delayed by one WCI clock, two ADC clocks
+
+
+  dev_data_ch0_out_out.clk    <= sample_clk;
+  dev_data_ch0_out_out.valid  <= sample_data_valid(0);
+
   -- i and q signal buses driven where each signal bus is MSB-justified
   -- (data_src_qadc.hdl takes care of justification standardization)
   dev_data_ch0_out_out.data_i(dev_data_ch0_out_out.data_i'left downto
-                              dev_data_ch0_out_out.data_i'left-adc_width+1) <=
-                                 adc_r1_i_rrrrrr    when (adc_channels_are_swapped = bfalse) else adc_r2_i_rrrr;
+                              dev_data_ch0_out_out.data_i'left-adc_width+1) <= sample_data_i(0);
+
   dev_data_ch0_out_out.data_i(dev_data_ch0_out_out.data_i'left-adc_width downto 0) <= (others => '0');
   dev_data_ch0_out_out.data_q(dev_data_ch0_out_out.data_q'left downto
-                              dev_data_ch0_out_out.data_q'left-adc_width+1) <=
-                                 adc_r1_q_rrrrrr    when (adc_channels_are_swapped = bfalse) else adc_r2_q_rrrr;
+                              dev_data_ch0_out_out.data_q'left-adc_width+1) <= sample_data_q(0);
+
   dev_data_ch0_out_out.data_q(dev_data_ch0_out_out.data_q'left-adc_width downto 0) <= (others => '0');
-  dev_data_ch1_out_out.clk    <= adc_clk;
-  dev_data_ch1_out_out.valid  <= adc_r2_give_rrrr   when (adc_channels_are_swapped = bfalse) else adc_r1_give_rrrrrr;
+
+  dev_data_ch1_out_out.clk    <= sample_clk;
+  dev_data_ch1_out_out.valid  <= sample_data_valid(1);
+
   dev_data_ch1_out_out.data_i(dev_data_ch1_out_out.data_i'left downto
-                              dev_data_ch1_out_out.data_i'left-adc_width+1) <=
-                                 adc_r2_i_rrrr      when (adc_channels_are_swapped = bfalse) else adc_r1_i_rrrrrr;
+                              dev_data_ch1_out_out.data_i'left-adc_width+1) <= sample_data_i(1);
+
   dev_data_ch1_out_out.data_i(dev_data_ch1_out_out.data_i'left-adc_width downto 0) <= (others => '0');
   dev_data_ch1_out_out.data_q(dev_data_ch1_out_out.data_q'left downto
-                              dev_data_ch1_out_out.data_q'left-adc_width+1) <=
-                                 adc_r2_q_rrrr      when (adc_channels_are_swapped = bfalse) else adc_r1_q_rrrrrr;
+                              dev_data_ch1_out_out.data_q'left-adc_width+1) <= sample_data_q(1);
+
   dev_data_ch1_out_out.data_q(dev_data_ch1_out_out.data_q'left-adc_width downto 0) <= (others => '0');
 
   -- if valid R1 channel samples are received but there is no
   -- qadc worker to ingest them, detect the error
-  wsi_r1_samps_dropped_clear <= '1'
+  wci_r1_samps_dropped_clear <= '1'
                                  when (props_in.r1_samps_dropped_written = '1')
                                       and (props_in.r1_samps_dropped = '0')
                                  else '0';
@@ -568,13 +648,13 @@ begin
                 reset       => ctl_in.reset,
                 operating   => ctl_in.is_operating,
                 start       => ctl_in.is_operating,
-                clear       => wsi_r1_samps_dropped_clear,
+                clear       => wci_r1_samps_dropped_clear,
                 status      => props_out.r1_samps_dropped,
                 other_clk   => adc_clk,
                 other_reset => open,
                 event       => adc_r1_samps_dropped);
 
-  wsi_r2_samps_dropped_clear <= '1'
+  wci_r2_samps_dropped_clear <= '1'
                                  when (props_in.r2_samps_dropped_written = '1')
                                       and (props_in.r2_samps_dropped = '0')
                                  else '0';
@@ -586,7 +666,7 @@ begin
                 reset       => ctl_in.reset,
                 operating   => ctl_in.is_operating,
                 start       => ctl_in.is_operating,
-                clear       => wsi_r2_samps_dropped_clear,
+                clear       => wci_r2_samps_dropped_clear,
                 status      => props_out.r2_samps_dropped,
                 other_clk   => adc_clk,
                 other_reset => open,
@@ -595,4 +675,3 @@ begin
     RX_FRAME_P_s <= dev_data_from_pins_in.rx_frame;
 
 end rtl;
-
