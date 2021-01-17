@@ -93,6 +93,7 @@ Circuit(OCPI::DataTransport::Transport* transport,
   m_portSetMd.push_back(new PortSet(*this, true, *new ParallelDataDistribution(),
 				    outDesc ? outDesc->desc.nBuffers : bufCount,
 				    outDesc ? outDesc->desc.dataBufferSize : bufSize));
+  addPortSet(m_portSetMd.back());
   m_portSetMd.back()->
     addPortMetaData(outDesc ?
 		    new PortMetaData(0, true, outEp, *outDesc, m_portSetMd.back()) :
@@ -100,12 +101,10 @@ Circuit(OCPI::DataTransport::Transport* transport,
   if (inEp) {
     m_portSetMd.push_back(new PortSet(*this, false, *new ParallelDataDistribution(),
 				      bufCount, bufSize));
+    addPortSet(m_portSetMd.back());
     m_portSetMd.back()->
       addPortMetaData(new PortMetaData(0, false, inEp, outEp, m_portSetMd.back()));
   }
-
-  // Now we can initialize our port sets.
-  update();
 
   m_lastPortSet = 0;
   m_maxPortOrd = 0;
@@ -610,6 +609,7 @@ addPort( PortMetaData* pmd )
     m_portSetMd.push_back(new PortSet(*this, false, *new ParallelDataDistribution(),
 				      1, 1024)); // these get overridden when ports are added
     psmd = m_portSetMd.back();
+    addPortSet(psmd);
     update();
   } else
     psmd = m_portSetMd[1];
@@ -648,10 +648,13 @@ addInputPort(XF::EndPoint &iep, const OCPI::RDT::Descriptors& inputDesc,
     m_portSetMd.push_back(new PortSet(*this, false, *new ParallelDataDistribution(),
 				      1, 1024, 1, &oep, &inEp, &inputDesc));
     psmd = m_portSetMd.back();
-    update();
+    addPortSet(psmd);
+    //    update();
   }
   else {
     psmd = m_portSetMd[1];
+    psmd->addPortMetaData(new PortMetaData(psmd->getSize(), oep, iep, inputDesc, psmd));
+#if 0
     PortMetaData* spsmd = 
       new PortMetaData(psmd->getSize(), oep, iep, inputDesc, /*getCircuitId(),*/ psmd );
     psmd->addPortMetaData(spsmd);
@@ -661,6 +664,7 @@ addInputPort(XF::EndPoint &iep, const OCPI::RDT::Descriptors& inputDesc,
 				    static_cast<OCPI::DataTransport::PortSet*>
 				    (this->getInputPortSet(0)) );
     sps->addPort(sport);
+#endif
   }
   //  iep.event_id = (int)((inputDesc.desc.fullFlagValue>>32) & 0xfff);
 }
@@ -1019,7 +1023,7 @@ getQualifiedInputPortSetCount( bool queued )
     return getInputPortSetCount();
   }
 
-  int ps_count;
+  unsigned ps_count;
   DataDistribution* dd = &m_dataDistribution;
   if ( dd->getMetaData()->distType == DataDistributionMetaData::parallel ) {
     ps_count = this->getInputPortSetCount();
@@ -1148,11 +1152,11 @@ debugDump(){}
 #endif
 
 
+#if 0
 void 
 Circuit::
 update()
 {
-#if 0
   for (unsigned n = m_portsets_init; n < m_portSetMd.size(); n++) {
     OCPI::DataTransport::PortSet* ps=NULL;
     try {
@@ -1166,8 +1170,8 @@ update()
     this->addPortSet( ps );
     m_portsets_init++;
   }
-#endif
 }
+#endif
 
 void 
 Circuit::

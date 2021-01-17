@@ -264,7 +264,7 @@ def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0, stderr=True):
     if ocpiserver:
         cmd = 'cd "{}" && ./ocpiserver.sh {}'.format(args.remote_dir, cmd)
     if ssh:
-        cmd = 'ssh {} {}@{} sh -c \'{}\''.format(
+        cmd = 'ssh {} {}@{} sh -c \'{}\' '.format(
             args.ssh_opts, args.user, args.ip_addr, cmd)
 
     command = Command(cmd, rc, stderr)
@@ -329,7 +329,7 @@ def execute_commands(commands, args):
     return 0
 
 
-def execute_command(command, args):
+def execute_command(command, args, stdin=subprocess.PIPE):
     """ Executes a command using subprocess.
 
     Args:
@@ -351,7 +351,7 @@ def execute_command(command, args):
                     command.cmd.split(),
                     env={'SSH_ASKPASS': passwd_file_path, 'DISPLAY': 'DUMMY'},
                     start_new_session=True,
-                    stdin=subprocess.PIPE,
+                    stdin=stdin,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     universal_newlines=True) as process:
@@ -402,7 +402,7 @@ def load(args):
              + bitstream
              + [localtime, ocpiserver, os_driver])
     # Where to extract files to on remote device
-    arcnames = [os.path.join(args.remote_dir, *tar_file[len(cdk):].split('/'))
+    arcnames = [os.path.join("", *tar_file[len(cdk):].split('/'))
                 if tar_file.startswith(cdk) else tar_file
                 for tar_file in tar_files]
 
@@ -412,7 +412,7 @@ def load(args):
     system_xml = hw_system_xml if os.path.isfile(hw_system_xml) else sw_system_xml
 
     tar_files.append(system_xml)
-    system_xml_arc = os.path.join(args.remote_dir, *system_xml[len(cdk):].split('/'))
+    system_xml_arc = os.path.join("", *system_xml[len(cdk):].split('/'))
     arcnames.append(system_xml_arc)
 
 
@@ -420,8 +420,8 @@ def load(args):
         tar_files.append(
             os.path.join(cdk, '..', 'prerequisites', 'valgrind', args.sw_platform))
         arcnames.append(
-            os.path.join(args.remote_dir, 'prerequisites', 'valgrind', args.sw_platform))
- 
+            os.path.join("", 'prerequisites', 'valgrind', args.sw_platform))
+
     with tempfile.TemporaryDirectory() as tempdir:
         # Prepare sandbox
         commands = []
@@ -444,7 +444,7 @@ def load(args):
             'ln -s scripts/ocpiserver.sh {}'.format(args.remote_dir),
             args))
         commands.append( make_command(
-            'ln -s ../{} {}'.format(system_xml_arc, args.remote_dir),
+            'ln -s {} {}'.format(system_xml_arc, args.remote_dir),
             args))
         print('Preparing remote sandbox...')
         rc = execute_commands(commands, args)
@@ -453,17 +453,21 @@ def load(args):
         print('Creating server package...')
         tar_commands = []
         tar_path = make_tar(tar_files, arcnames, tempdir)
-        tar_commands.append(make_command(
-            'scp {} {} {}@{}:./{}'.format(
-                args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
-            args,
-            ssh=False))
-        tar_commands.append(make_command(
-            'gunzip -c {}/tar.tgz | tar xf -'.format(args.remote_dir),
-            args))
+        #print ("TARPATH "+tar_path)
+        #tar_commands.append(make_command(
+        #    'scp {} {} {}@{}:{}'.format(
+        #        args.scp_opts, tar_path, args.user, args.ip_addr, args.remote_dir),
+        #    args,
+        #    ssh=False))
+        #        tar_commands.append(make_command(
+        #    'cd {} && pwd && ls -l /run/sandbox && tar xvf -'.format(args.remote_dir),
+        #   args))
         print('Sending server package...')
-        rc = execute_commands(tar_commands, args)
-
+        #rc = execute_commands(tar_commands, args, stdin=tempdir+'/' + "tar.gz")
+        with open(tar_path) as tar_file:
+            rc = execute_command(make_command(
+                'cd {} && gunzip | tar xf -'.format(args.remote_dir),
+                args), args, stdin=tar_file)
         if rc == 0:
             print('Server package sent successfully.')
 
@@ -538,7 +542,7 @@ def deploy(args):
             args,
             ssh=False))
         tar_commands.append(make_command(
-            'cd "{}" && gunzip -c tar.tgz | tar xf -'.format(remote_dir),
+            'cd "{}" && pwd && ls -l tar.tgz && gunzip -c tar.tgz | tar xf -'.format(remote_dir),
             args))
         print('Deploying Opencpi boot files...')
         print('\tLocal: {}'.format(local_dir))
@@ -638,10 +642,7 @@ def start(args):
     if args.environment:
         command += ' -e "{}" '.format(args.environment)
     command = make_command(command, args, ocpiserver=True)
-    
-    rc = execute_command(command, args)
-    
-    return rc
+    return execute_command(command, args)
 
 
 def stop(args):

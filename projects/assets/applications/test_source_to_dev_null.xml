@@ -1,0 +1,6 @@
+<Application package='ocpi.core' done='file_write'>
+  <Instance Component='test_source' connect='file_write'/>
+  <Instance Component='file_write'>
+    <Property name='filename' value='/dev/null'/>
+  </Instance>
+</Application>

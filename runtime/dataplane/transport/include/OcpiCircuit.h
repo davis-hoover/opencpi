@@ -304,12 +304,6 @@ namespace OCPI {
       }
     protected:
 
-      /***************************************************
-       * Completes the circuit once the definition is complete
-       ***************************************************/
-      void update();
-
-
       void QInputToWaitForOutput( 
                                  Port* out_port,
                                  Buffer* input_buf,

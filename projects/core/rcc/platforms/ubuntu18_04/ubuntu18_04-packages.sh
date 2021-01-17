@@ -89,6 +89,8 @@ PKGS_D+=(bash-completion)
 PKGS_D+=(bison)
 #    Needed to build gdb
 PKGS_D+=(flex)
+#    Needed for shell-based XML extractions, xmllint, standard in centos7
+PKGS_D+=(libxml2-utils)
 
 ##########################################################################################
 # S. conveniences or required for source environment

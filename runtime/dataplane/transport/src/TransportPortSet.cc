@@ -40,8 +40,13 @@ PortSet(Circuit &c, bool isOutput, DataDistribution &dd, unsigned bufferCount,
   m_dataDistribution(dd), m_bufferCount(bufferCount), m_bufferLength(bufferSize) {
 
   m_ports.noShuffle();
-  for (unsigned n = 0; n < m_portCount; n++)
-    addPortMetaData(new PortMetaData(n+1, *outputEp, *inputEp[n], inputDesc[n], this));
+  for (unsigned n = 0; n < m_portCount; n++) {
+    auto *pmd = new PortMetaData(n+1, *outputEp, *inputEp[n], inputDesc[n], this);
+    pmd->m_portSetMd = this;
+    m_portMd.push_back(pmd);
+    addPort(new Port(pmd, this));
+  }
+  // addPortMetaData(new PortMetaData(n+1, *outputEp, *inputEp[n], inputDesc[n], this));
 
   for (unsigned n = 0; n < m_portMd.size(); n++) {
     PortMetaData *pmd = static_cast<PortMetaData *>(m_portMd[n]);
@@ -64,12 +69,13 @@ void PortSet::
 addPortMetaData(PortMetaData *pmd) {
   pmd->m_portSetMd = this;
   m_portMd.push_back(pmd);
+  addPort(new Port(pmd, this));
+  m_portCount++;
 }
 
 void PortSet::
 addPort(Port *port) {
   m_ports.insertToPosition(port, port->getPortId());
-  m_portCount++;
 }
 
 Port *PortSet::

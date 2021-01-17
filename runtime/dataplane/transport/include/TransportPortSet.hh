@@ -76,9 +76,10 @@ public:
   bool isOutput() { return m_isOutput; }
 
   void addPortMetaData(PortMetaData *pmd);
-  void addPort(Port *port);
   // Informs the shadow port that it can queue a pull data transfer from the real port.
   Buffer *pullData(Buffer *buffer);
+private:
+  void addPort(Port *port);
 };
 class PortSetMetaData : public PortSet {};
 
