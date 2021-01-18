@@ -341,12 +341,14 @@ emitRecordInterfaceConstants(FILE *f) {
   OcpPort::emitRecordInterfaceConstants(f);
   // This signal is available to worker code.
   fprintf(f, "  constant ocpi_port_%s_data_width : natural;\n", cname());
+  fprintf(f, "  constant ocpi_port_%s_byte_width : natural;\n", cname());
 }
 #if 1
 void DataPort::
 emitInterfaceConstants(FILE *f, Language lang) {
   OcpPort::emitInterfaceConstants(f, lang);
   emitConstant(f, "ocpi_port_%s_data_width", lang, m_dataWidth);
+  emitConstant(f, "ocpi_port_%s_byte_width", lang, m_byteWidth);
 }
 #endif
 #if 1

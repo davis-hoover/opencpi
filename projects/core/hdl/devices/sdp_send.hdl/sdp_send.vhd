@@ -469,15 +469,15 @@ g0: for i in 0 to sdp_width_c-1 generate
       else
         sdp_remotes(r).index <= sdp_remotes(r).index + 1;
       end if;
+      if sdp_msg_idx_r = resize(props_in.buffer_count - 1, sdp_msg_idx_r'length) then
+        sdp_msg_idx_r    <= (others => '0');
+      else
+        sdp_msg_idx_r    <= sdp_msg_idx_r + 1;
+      end if;
       if md_out_ndws = 0 then
         begin_meta;
         sdp_segment_addr_r <= meta_addr;
       else
-        if sdp_msg_idx_r = resize(props_in.buffer_count - 1, sdp_msg_idx_r'length) then
-          sdp_msg_idx_r    <= (others => '0');
-        else
-          sdp_msg_idx_r    <= sdp_msg_idx_r + 1;
-        end if;
         sdp_remote_phase_r <= data_e;
         sdp_segment_addr_r <= data_addr;
         sdp_out_r          <= bramb_out;
