@@ -31,6 +31,6 @@
               port='in'
               device='data_sink_qdac0'
 	      card='fmcomms_2_3_lpc_scdcd'/>
-  <Connection external='out_from_asm_rx_path' interconnect='zynq'/>
-  <Connection external='in_to_asm_tx_path' interconnect='zynq'/>
+  <Connection external='out_from_asm_rx_path0' interconnect='zynq'/>
+  <Connection external='in_to_asm_tx_path0' interconnect='zynq'/>
 </HdlContainer>
