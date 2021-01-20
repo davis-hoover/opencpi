@@ -42,7 +42,15 @@ architecture rtl of worker is
   signal time_now              : ulonglong_t;
   signal time_chunk_idx_r      : unsigned(width_for_max(nchunks_c-1)-1 downto 0);
   signal time_chunks           : unsigned(ulonglong_t'length - in_in.data'length-1 downto 0);
-  type chunks_t is array (0 to max(0, nchunks_c-2)) of unsigned(in_in.data'range);
+  function set_array_length(nchunks, in_data_length, time_width : natural) return natural
+  is begin
+    if in_data_length < time_width then
+      return nchunks-2;
+    else
+      return 0;
+    end if;
+  end function;
+  type chunks_t is array (0 to set_array_length(nchunks_c, in_in.data'length, time_width_c)) of unsigned(in_in.data'range);
   signal time_chunks_r         : chunks_t;
   -- convenience
   signal good_opcode           : bool_t;
