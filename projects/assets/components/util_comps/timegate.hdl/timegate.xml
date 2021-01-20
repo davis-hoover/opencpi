@@ -1,0 +1,22 @@
+<HdlWorker language='vhdl' spec='timegate-spec' version='2'>
+  <Property name='DATA_WIDTH'
+            type='uchar'
+            default='32'
+            parameter='true'/>
+  <Property name='CDC_FIFO_DEPTH'
+            type='ushort'
+            default='16'
+            parameter='true'/>
+  <StreamInterface name='in'
+                   datawidth='DATA_WIDTH'
+                   clockDirection='in'/>
+  <StreamInterface name='out'
+                   datawidth='DATA_WIDTH'
+                   inserteom='true'
+                   clockDirection='in'/>
+  <TimeInterface name='time'
+                 secondswidth='32'
+                 fractionwidth='32'
+                 clock='out'
+                 allowunavailable='true'/>
+</HdlWorker>

@@ -1,0 +1,15 @@
+<Application package='ocpi.assets.util_comps' done='capture_v2'>
+  <Instance component='test_source' connect='timegate'>
+    <property name='timed' value='true'/>
+    <property name='fraction' value='.0001*2**32' delay='1'/> <!-- delay is in 1*2^-32 -->
+    <property name='valuestosend' value='100'/>
+  </Instance>
+  <Instance component='timegate' connect='capture_v2'/>
+  <Instance component='capture_v2'/>
+</Application>
+
+
+seconds   to  2^-32 seconds
+
+seconds * 2^32
+1/2 = 2 billion

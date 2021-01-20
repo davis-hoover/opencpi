@@ -1,3 +1,8 @@
 <HdlWorker language='vhdl' spec='test_source-spec' version='2'>
+  <!-- writing the seconds property causes  a timestamp message to be sent whose time is that
+       number of seconds after "now" -->
+  <Property name='fraction' writable='true'/>
+  <property name='timed' initial='true' type='bool'/>
   <StreamInterface Name="out" DataWidth="32" InsertEOM="true" workereof='1' clockdirection='in'/>
+  <TimeInterface name='time' SecondsWidth='32' fractionwidth='32' clock='out'/>
 </HdlWorker>
