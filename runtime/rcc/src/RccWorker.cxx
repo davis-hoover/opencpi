@@ -1251,9 +1251,9 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
 	 l_maxLength -= m.m_offset + m.m_align;
 	 p += m.m_align;
        }
-       if (m.m_sequenceLength && *a_length > m.m_sequenceLength)
-	 throw OU::Error("Sequence length %zu exceeds maximum for protocol: %zu",
-			 *a_length, m.m_sequenceLength);
+       //if (m.m_sequenceLength && *a_length > m.m_sequenceLength)
+	// throw OU::Error("Sequence length %zu exceeds maximum for protocol: %zu",
+	//		 *a_length, m.m_sequenceLength);
        //assert(!m.m_sequenceLength || *a_length <= m.m_sequenceLength);
        if (capacity)
 	 *capacity = l_maxLength / m.m_elementBytes;
