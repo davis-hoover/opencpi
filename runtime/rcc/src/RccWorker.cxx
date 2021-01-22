@@ -155,6 +155,8 @@ Worker::
 
 static RCCResult
   rccSetError(const char *fmt, ...);
+static bool
+  rccWillLog(unsigned level);
 static void
   rccRelease(RCCBuffer *),
   cSend(RCCPort *, RCCBuffer*, RCCOpCode op, size_t length),
@@ -174,6 +176,17 @@ rccSetError(const char *fmt, ...)
   RCCResult rc = ((Worker *)pthread_getspecific(Driver::s_threadKey))->setError(fmt, ap);
   va_end(ap);
   return rc;
+}
+static void
+rccLog(unsigned level, const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  ((Worker *)pthread_getspecific(Driver::s_threadKey))->log(level, fmt, ap);
+  va_end(ap);
+}
+static bool
+rccWillLog(unsigned level) {
+  return OS::logWillLog(level); // maybe worker-specific someday
 }
 
 static void
@@ -242,7 +255,6 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
   ocpiAssert(rccPort && rccPort->containerPort && newBuffer);
   rccPort->containerPort->takeRcc(oldBuffer, *newBuffer);
 }
-
  // FIXME:  recover memory on exceptions
  void Worker::
  initializeContext()
@@ -290,7 +302,8 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
    m_context->crewSize = crewSize();
    m_context->firstRun = true;
    static RCCContainer rccContainer =
-     { rccRelease, cSend, rccRequest, cAdvance, rccWait, rccTake, rccSetError};
+     { rccRelease, cSend, rccRequest, cAdvance, rccWait, rccTake, rccSetError,
+       RCCUserWorker::getTime, RCCUserWorker::nanoTime, rccWillLog, rccLog };
    m_context->container = rccContainer;
    m_context->runCondition = wd ? wd->runCondition : NULL;
 
@@ -1135,15 +1148,18 @@ OCPI_CONTROL_OPS
    RCCResult RCCUserWorker::afterConfigure() { return RCC_OK;}
    uint8_t *RCCUserWorker::rawProperties(size_t &size) const { size = 0; return NULL; }
    bool RCCUserWorker::willLog(unsigned level) const { return OS::logWillLog(level); }
-   void RCCUserWorker::log(unsigned level, const char *fmt, ...) throw() {
+   void Worker::log(unsigned level, const char *fmt, va_list ap) {
      if (OS::logWillLog(level)) {
-       va_list ap;
        std::string myfmt;
-       OU::format(myfmt,"%s: %s", m_worker.name().c_str(), fmt);
-       va_start(ap, fmt);
+       OU::format(myfmt,"%s: %s", name().c_str(), fmt);
        OS::logPrintV(level, myfmt.c_str(), ap);
-       va_end(ap);
      }
+   }
+  void RCCUserWorker::log(unsigned level, const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    m_worker.log(level, fmt, ap);
+    va_end(ap);
    }
    RCCResult RCCUserWorker::setError(const char *fmt, ...) {
      va_list ap;
@@ -1158,6 +1174,10 @@ OCPI_CONTROL_OPS
 RCCResult RCCUserWorker::run(bool /*timeout*/) {
      m_worker.enabled = false;
      return RCC_OK;
+   }
+   uint64_t RCCUserWorker::nanoTime(RCCTime t) {
+     OS::Time temp(t);
+     return temp.seconds() * (uint64_t)1000000000u + temp.nanoseconds();
    }
    RCCTime RCCUserWorker::getTime() {
      return OS::Time::now().bits();

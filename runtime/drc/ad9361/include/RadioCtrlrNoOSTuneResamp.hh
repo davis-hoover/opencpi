@@ -419,12 +419,12 @@ protected : bool any_configurator_configs_locked_which_prevent_ad9361_init()
 
 protected:
 template<typename T>
-const char* get_No_OS_err_str(const char* API_function_cstr,
+std::string get_No_OS_err_str(const char* API_function_cstr,
     T API_call_return_val) const {
   std::ostringstream oss;
   oss << "No-OS API call " << API_function_cstr << "()";
   oss << " returned error: \"" << strerror(-API_call_return_val) << "\"";
-  return oss.str().c_str();
+  return oss.str();
 }
 
 protected : unsigned get_complex_mixer(const DataStreamConfigLockRequest& req, bool &tx) const;

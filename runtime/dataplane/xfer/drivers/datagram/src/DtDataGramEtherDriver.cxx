@@ -104,6 +104,7 @@ namespace DataTransfer {
 	interface.assign(remote, OCPI_SIZE_T_DIFF(sp, remote));
 	return m_ifname == interface;
       }
+      uint16_t maxPayloadSize() { return DATAGRAM_PAYLOAD_SIZE; }
     };
 
     class Socket : public DG::Socket {
@@ -113,7 +114,6 @@ namespace DataTransfer {
     public:
       Socket(EndPoint &lep) : DG::Socket(lep), m_lep(lep), m_socket(NULL) {
       }
-      uint16_t maxPayloadSize() { return DATAGRAM_PAYLOAD_SIZE; }
     public:
       void start() {
 	std::string error;

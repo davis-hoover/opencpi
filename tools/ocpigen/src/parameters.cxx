@@ -910,7 +910,7 @@ emitHDLConstants(size_t config, bool other) {
   // NOTE: resolveExpressions is called earlier when the worker is constructed and then called again here
   // to apply this particular config
   //  if (!(err = resolveExpressions(*m_paramConfigs[config])) && !(err = finalizeProperties()))
-    m_paramConfigs[config]->writeConstants(f, lang);
+  m_paramConfigs[config]->writeConstants(f, lang);
   return fclose(f) ?
     OU::esprintf("File close of VHDL generics file failed.  Disk full?") : NULL;
 }

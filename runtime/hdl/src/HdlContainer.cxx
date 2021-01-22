@@ -564,6 +564,14 @@ OCPI_DATA_TYPES
 				       m_properties.get8Register(sdp_width, SDP::Properties) *
 				       SDP::BYTES_PER_DWORD));
 	  required = myDesc.nBuffers * myDesc.dataBufferPitch;
+	  unsigned
+	    maxBuffers = m_properties.get8Register(max_buffers, SDP::Properties),
+	    limit = std::min(maxBuffers, SDP::MAX_READS_OUTSTANDING);
+	  if (myDesc.nBuffers > limit)
+	    throw OU::Error("Requested buffer count(%u) on port '%s' of worker '%s' "
+			    "exceeds the SDP local/FPGA-side implementation limit of %u",
+			    myDesc.nBuffers, name().c_str(), parent().name().c_str(), limit);
+
 	} else {
 	  myDesc.dataBufferPitch =
 	    OCPI_UTRUNCATE(uint32_t,
@@ -573,9 +581,9 @@ OCPI_DATA_TYPES
 	  required = myDesc.nBuffers * (myDesc.dataBufferPitch + OCDP_METADATA_SIZE);
 	}
 	if (required > m_memorySize)
-	  throw OU::Error("Requested buffer count/size (%u/%u) on port '%s' of worker '%s' "
+	  throw OU::Error("Requested buffer count/size/memory (%u/%u/%u) on port '%s' of worker '%s' "
 			  "won't fit in the %s's memory (%u)",
-			  myDesc.nBuffers, myDesc.dataBufferSize, name().c_str(),
+			  myDesc.nBuffers, myDesc.dataBufferSize, required, name().c_str(),
 			  parent().name().c_str(), m_sdp ? "SDP-DMA" : "OCDP-DMA",
 			  m_memorySize);
 	if (other)
@@ -608,7 +616,7 @@ OCPI_DATA_TYPES
 	}
         OcdpRole myOcdpRole;
         OCPI::RDT::PortRole myRole = (OCPI::RDT::PortRole)getData().data.role;
-	
+
         ocpiDebug("finishConnection: other = %" PRIx64 ", offset = %" DTOSDATATYPES_OFFSET_PRIx
 		  ", RFB = %" PRIx64 "",
 		  other.desc.oob.address,
@@ -664,6 +672,11 @@ OCPI_DATA_TYPES
 	    m_properties.set32Register(remote_flag_value, SDP::Properties, 
 				       isProvider() ?
 				       other.desc.emptyFlagValue : other.desc.fullFlagValue);
+	    unsigned maxBuffers = m_properties.get8Register(max_buffers, SDP::Properties);
+	    if (other.desc.nBuffers > maxBuffers)
+	      throw OU::Error("Requested buffer count(%u) for the other end of connection from "
+			      "port '%s' of worker '%s' exceeds the SDP implementation limit of %u",
+			      other.desc.nBuffers, name().c_str(), parent().name().c_str(), maxBuffers);
 	    m_properties.set8Register(remote_buffer_count, SDP::Properties,
 				      OCPI_UTRUNCATE(uint8_t, other.desc.nBuffers));
 

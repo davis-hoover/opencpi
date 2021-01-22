@@ -65,7 +65,7 @@ protected:
   }
   RCCResult prepare_written() {
     log(8, "prepare config %u", m_properties.prepare);
-    unsigned config = m_properties.start;
+    unsigned config = m_properties.prepare;
     if (config >= OCPI_DRC_MAX_CONFIGURATIONS)
       return setError("Configuration %u started, but is out of range (0 to %u)",
 		      config, OCPI_DRC_MAX_CONFIGURATIONS - 1);
@@ -83,8 +83,12 @@ protected:
       return setError("Configuration %u started, but is out of range (0 to %u)",
 		      config, OCPI_DRC_MAX_CONFIGURATIONS - 1);
     init_status(config);
-    if (isOperating())
-      return start_config(config, false);
+    if (isOperating()) {
+      RCCResult rc = start_config(config, false);
+      if (rc == RCC_OK)
+	m_properties.status.data[config].state = STATUS_STATE_OPERATING;
+      return rc;
+    }
     // Deferred start
     m_started[m_properties.start] = true;
     return RCC_OK;
@@ -92,28 +96,46 @@ protected:
   // notification that stop property has been written
   RCCResult stop_written() {
     log(8, "stop config %u", m_properties.stop);
-    return RCC_OK;
+    RCCResult rc = stop_config(m_properties.stop);
+    m_properties.status.data[m_properties.stop].state =
+      rc == RCC_OK ? STATUS_STATE_PREPARED : STATUS_STATE_ERROR;
+    return rc;
   }
   // notification that release property has been written
   RCCResult release_written() {
     log(8, "release config %u", m_properties.release);
-    return RCC_OK;
+    RCCResult rc = release_config(m_properties.release);
+    m_properties.status.data[m_properties.release].state =
+      rc == RCC_OK ? STATUS_STATE_INACTIVE : STATUS_STATE_ERROR;
+    return rc;
   }
   // notification that status property will be read
   RCCResult status_read() {
     size_t nConfigs = m_properties.configurations.size();
     m_properties.status.resize(nConfigs);
     for (size_t n = 0; n < nConfigs; ++n) {
-      for (size_t nch = 0; nch < m_properties.configurations.data[n].channels.size(); ++nch) {
-	//	printf("STATUS READ config %zu, channel %zu\n", n, nch);
+      auto &conf = m_properties.configurations.data[n];
+      auto &stat = m_properties.status.data[n];
+      // stat.state member is already maintained
+      // stat.error
+      for (size_t nch = 0; nch < conf.channels.size(); ++nch) {
+	auto &confchan = conf.channels.data[nch];
+	auto &statchan = stat.channels.data[nch];
+	statchan.tuning_freq_MHz = confchan.tuning_freq_MHz;
+	statchan.bandwidth_3dB_MHz = confchan.bandwidth_3dB_MHz;
+	statchan.sampling_rate_Msps = confchan.sampling_rate_Msps;
+	statchan.gain_dB = confchan.gain_dB;
       }
+      status_config(n);
     }
     return RCC_OK;
   }
   // ==========================================================================================
-  // Required methods supplied by the actual proxy code
-  virtual RCCResult prepare_config(unsigned config) = 0;
+  virtual RCCResult prepare_config(unsigned /*config*/) { return RCC_OK; }; // default if only start is used
   virtual RCCResult start_config(unsigned config) = 0;
+  virtual RCCResult stop_config(unsigned config) = 0;
+  virtual RCCResult release_config(unsigned /*config*/) { return RCC_OK; };
+  virtual RCCResult status_config(unsigned /*config*/) { return RCC_OK; };
 };
 } // DRC
 } // OCPI
