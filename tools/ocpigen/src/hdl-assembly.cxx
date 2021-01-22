@@ -193,9 +193,11 @@ setClock(Clock &c) {
   }
   // Set the clock on internal attachments and remember whether any of them drive the clock
   bool driven = false;
+  InstancePort *internal = NULL;
   for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
     InstancePort &ip = (**ai).m_instPort;
     if (!ip.m_external && ip.m_port->isOCP()) {
+      internal = &ip;
       size_t nc = ip.m_port->m_clock->m_ordinal; // the clock ordinal within the worker of the port
       assert(ip.m_instance->m_clocks);
       assert(!ip.m_instance->m_clocks[nc] || ip.m_instance->m_clocks[nc] == &c);
@@ -208,6 +210,7 @@ setClock(Clock &c) {
 	driven = true;
     }
   }
+  assert(internal);
   m_clock = &c; // set connection's clock
   // If the connection is not driven, then the associated clock cannot
   // be internal anymore
@@ -226,19 +229,17 @@ setClock(Clock &c) {
       // if the clock is already the clock for another assembly/external port
       // we simply associate this external port with this clock
       m_external->m_instPort.m_port->m_clock = m_clock; // set external port's clock
-    } else if (m_external->m_instPort.m_port->isData()) {
+    } else if (m_external->m_instPort.m_port->isData() ||
+	       (internal->m_port->m_myClock || m_clock->m_internal)) {
       // The clock is not associated with any other assembly/external port yet, do it now
       ocpiInfo("Externalizing the assembly worker clock \"%s\" to be the %s clock for "
 	       "external port \"%s\"", c.cname(), c.m_output ? "output" : "input",
 	       m_external->m_instPort.m_port->pname());
       c.rename(m_external->m_instPort.m_port->pname(), m_external->m_instPort.m_port);
-    } else {
-      // A non-data port will be associated with a worker clock.
-      // But it will not have its own clock since non-data clocks have different semantics
-      // Like wti clocks which need to know that the inner worker is doing
-      assert(!m_clock->m_internal);
+    } else
+      // A non-data port will be associated with a worker clock, but it is externalized some
+      // other way so it is not associated with the port
       m_external->m_instPort.m_port->m_clock = m_clock; // set external port's clock
-    }
   }
   return true;
 }
