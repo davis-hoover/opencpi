@@ -64,6 +64,10 @@
 namespace OCPI {
   namespace HDL {
     namespace SDP {
+      // Hardware-related constants
+      const unsigned
+	XID_WIDTH = 3,
+	MAX_READS_OUTSTANDING = 1u << XID_WIDTH;
       class Header {
       public:
 	static const unsigned
@@ -75,10 +79,10 @@ namespace OCPI {
 	  datum_bits             = datum_bytes * 8,
 	  // Actual field widths
           count_width            = 12,     // 4K DWORDS, 16KB, at least jumbo frames
-          count_shift            = 0,					
+          count_shift            = 0,
 	  op_width               = 2,
           op_shift               = count_shift + count_width,
-	  xid_width              = 3,
+	  xid_width              = XID_WIDTH,
           xid_shift              = op_shift + op_width,
           lead_width             = datum_addr_bits,
           lead_shift             = xid_shift + xid_width,
@@ -93,7 +97,6 @@ namespace OCPI {
           header_width           = addr_shift + addr_width,
 	  // derived max values
 	  max_message_bytes      = ((1 << count_width) * datum_bytes),
-	  max_reads_outstanding  = 1 << xid_width,
           max_addressable_kbytes = 1 << (addr_width - 8),
           max_nodes              = 1 << node_width, // always includes one for control
           header_ndws            = (header_width + dword_bits - 1) / dword_bits;

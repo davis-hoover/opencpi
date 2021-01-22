@@ -55,7 +55,7 @@ platform=$OCPI_TOOL_PLATFORM
 echo Executing remote configuration command: $* 
 action=$1; shift
 
-while getopts u:l:w:a:p:s:d:o:P:BVh o
+while getopts u:l:w:a:p:s:d:o:P:m:e:BVh o
 do 
   case "$o" in 
     u) user=$OPTARG ;;
@@ -70,6 +70,8 @@ do
     P) platform=$OPTARG ;;
     B) bs=-B ;;
     V) vg=-V ;;
+    m) memarg="-m $OPTARG"; mem=$OPTARG ;;
+    e) envarg=$OPTARG ;;
   esac 
 done
 case $action in
@@ -80,8 +82,9 @@ start)
   fi
   set -e
   ocpidriver unload >&2 || : # in case it was loaded from a different version
-  ocpidriver load >&2
-
+  echo "Reloading kernel driver: $mem"
+  ocpidriver $memarg load >&2
+  [ -n "$mem" ] && export OCPI_SMB_SIZE=$mem
   if [ -n "$bs" ]; then
     echo "Loading opencpi bitstream"
     HDL_PLATFORM=$(cat hwplatform)
@@ -102,8 +105,8 @@ start)
   echo PATH=$PATH >&2
   echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH >&2
   echo VALGRIND_LIB=$VALGRIND_LIB >&2
-  echo nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
-  nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
+  echo $envarg nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
+  eval $envarg exec nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
   pid=$!
   sleep 1
   if kill -s CONT $pid; then

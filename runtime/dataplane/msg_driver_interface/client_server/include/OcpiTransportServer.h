@@ -35,7 +35,6 @@
 #include <OcpiThreadHook.h>
 #include <OcpiList.h>
 #include <OcpiCircuit.h>
-#include <DtIntEventHandler.h>
 #include <OcpiTransport.h>
 
 namespace OCPI {

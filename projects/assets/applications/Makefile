@@ -38,6 +38,7 @@ Applications=bias.xml \
              testbias2.xml \
              testbias5.xml \
              iqstream_max_calculator_test \
+             test_source_to_dev_null.xml \
              testbias.xml
 
 # These are not yet runnable via 'make run'

@@ -51,8 +51,7 @@
   }
 
 using namespace OCPI::DataTransport;
-using namespace DataTransport::Interface;
-using namespace OCPI::Container;
+//using namespace OCPI::Container;
 using namespace OCPI;
 
 /*

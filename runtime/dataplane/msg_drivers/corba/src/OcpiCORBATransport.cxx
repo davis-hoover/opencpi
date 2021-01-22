@@ -91,7 +91,7 @@ namespace OCPI {
 	    if (!strncmp(url, "omniocpi:", sizeof("omniocpi:") - 1))
 	      url += sizeof("omniocpi:") - 1;
 	    if (!strncmp(url, "ocpi-", 5))
-	      m_rdmaEndpoints.push_back(std::string(url, p - url));
+	      m_rdmaEndpoints.push_back(std::string(url, OCPI_SIZE_T_DIFF(p, url)));
 	  }
 	  if (m_rdmaEndpoints.empty())
 	    throw OU::Error("No usable opencpi endpoints in url: %s", m_url.c_str());

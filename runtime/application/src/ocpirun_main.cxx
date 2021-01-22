@@ -336,9 +336,6 @@ static int mymain(const char **ap) {
       OU::baseName(file.c_str(), name);
 
       OA::ApplicationX app(xml, name.c_str(), params);
-      if (options.verbose())
-	fprintf(stderr,
-		"Application XML parsed and deployments (containers and artifacts) chosen\n");
       if (options.deploy_out()) {
 	std::string dfile;
 	if (*options.deploy_out())

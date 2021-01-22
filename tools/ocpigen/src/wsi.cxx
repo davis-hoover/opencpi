@@ -255,7 +255,7 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 	  "                mdata_info_width => %s%s,\n"
 	  "                burst_width      => %zu,\n"
 	  "                n_bytes          => %s%s,\n"
-	  "                byte_width       => %zu,\n"
+	  "                byte_width       => %s%s,\n"
 	  "                opcode_width     => %zu,\n"
 	  "                own_clock        => %s,\n",
 	  cname(),
@@ -269,7 +269,7 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 	  ocp.MBurstLength.width,
 	  ocp.MByteEn.value ? width.c_str() : "",
 	  ocp.MByteEn.value ? "MByteEn_width" : "1",
-	  m_byteWidth,
+	  width.c_str(), "byte_width",
 	  opcode_width,
 	  BOOL(m_myClock));
   if (!slave)

@@ -43,7 +43,7 @@ namespace OCPI {
       : //m_ourUID(mkUID()),
       OCPI::Time::Emit("Container", a_name ),
       m_enabled(false), m_ownThread(true), m_verbose(false), m_thread(NULL),
-      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportGlobal(params), false, this))
+      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportManager(params), false, this))
     {
       OU::findBool(params, "verbose", m_verbose);
       OU::SelfAutoMutex guard (this);
@@ -65,7 +65,7 @@ namespace OCPI {
       OU::findBool(params, "ownthread", m_ownThread);
       if (getenv("OCPI_NO_THREADS"))
 	m_ownThread = false;
-      m_os = OCPI_CPP_STRINGIFY(OCPI_OS) + strlen("OCPI");
+      m_os = &OCPI_CPP_STRINGIFY(OCPI_OS)[strlen("OCPI")];
       m_osVersion = OCPI_CPP_STRINGIFY(OCPI_OS_VERSION);
       m_platform = OCPI_CPP_STRINGIFY(OCPI_PLATFORM);
       m_arch = OCPI_CPP_STRINGIFY(OCPI_ARCH);

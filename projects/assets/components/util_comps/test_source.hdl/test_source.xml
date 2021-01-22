@@ -1,0 +1,3 @@
+<HdlWorker language='vhdl' spec='test_source-spec' version='2'>
+  <StreamInterface Name="out" DataWidth="32" InsertEOM="true" workereof='1' clockdirection='in'/>
+</HdlWorker>

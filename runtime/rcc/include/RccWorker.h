@@ -71,6 +71,7 @@ namespace OCPI {
       }
     public:
       RCCResult setError(const char *fmt, va_list ap);
+      void log(unsigned level, const char *fmt, va_list ap);
       inline RCCWorker &context() const { return *m_context; }
 
       Worker(Application & app, Artifact *art, const char *name, ezxml_t impl, ezxml_t inst,
