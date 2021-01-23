@@ -69,19 +69,19 @@ def parse_cl_vars():
                         "registered into the default registry")
     parser.add_argument("-y", "--comp-lib", default=None, type=str, action="append",
                         help="Specify a component library to search for workers/devices/specs " +
-                        "that thisasset references (adds to \"ComponentLibraries\" in Makefile)")
+                        "that thisasset references (adds to \"ComponentLibraries\" in Project.xml)")
     parser.add_argument("-A", "--xml-include", default=None, type=str, action="append",
                         help="A directory to search for XML files (adds to \"XmlIncludeDirs\" in " +
-                        "Makefile)")
+                        "Project.xml)")
     parser.add_argument("-I", "--include-dir", default=None, type=str, action="append",
                         help="A directory to search for language include files (e.g. C/C++ or " +
-                        "Verilog) (Adds to \"IncludeDirs\" in Makefile)")
+                        "Verilog) (Adds to \"IncludeDirs\" in Project.xml)")
     parser.add_argument("-Y", "--prim-lib", default=None, type=str, action="append",
                         help="Specify a primitive library that this asset depends on" +
-                        "(adds to \"Libraries\" in Makefile)")
+                        "(adds to \"Libraries\" in Project.xml)")
     parser.add_argument("-D", "--depend", default=None, type=str, action="append",
                         help="Another project that this project depends on (use package-ID, e.g. " +
-                       "ocpi.core) (adds to \"ProjectDependencies\" in Project.mk)")
+                       "ocpi.core) (adds to \"ProjectDependencies\" in Project.xml)")
     parser.add_argument("-K", "--package-id", default=None, type=str, action="store",
                         help="Package-ID (default: pkg-prefix.pkg-name. Overrides -N and -F if " +
                         "set)")

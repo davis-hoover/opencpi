@@ -1931,7 +1931,7 @@ Choices:
 Options for the create|delete verbs:
  == create project ==
   -D <project>       *Another project that this project depends on (use package-ID, e.g. ocpi.core)
-                      (adds to "ProjectDependencies" in Project.mk)
+                      (adds to "ProjectDependencies" in Project.xml)
   --register         Register the project in the project registry
                       (for other projects to optionally depend on)
 
@@ -1981,13 +1981,13 @@ Options for the create|delete verbs:
   -C <core>          *Core to be included by this asset (adds to "Cores" in Makefile)
 
  == create project|library|worker|{hdl device|platform} ==
-  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in Makefile)
+  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in Project.xml)
   -I <include>       *A directory to search for language include files (e.g. C/C++ or Verilog)
-                      (Adds to "IncludeDirs" in Makefile)
+                      (Adds to "IncludeDirs" in Project.xml)
   -y <comp-library>  *Specify a component library to search for workers/devices/specs that this
-                      asset references (adds to "ComponentLibraries" in Makefile)
+                      asset references (adds to "ComponentLibraries" in Project.xml)
   -Y <library>       *Specify a primitive library that this asset depends on
-                      (adds to "Libraries" in Makefile)
+                      (adds to "Libraries" in Project.xml)
 
  == create worker|{hdl device|primitive|platform|assemblies} ==
   -T <target>        *Specify one of the build-targets to limit this asset to
