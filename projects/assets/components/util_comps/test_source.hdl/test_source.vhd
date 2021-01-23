@@ -20,6 +20,7 @@ architecture rtl of worker is
 begin
   fraction_written    <= props_in.fraction_written and ctl_in.is_operating;
   props_out.countBeforeBackPressure <= firstDrop_r;
+  props_out.time_to_send <= time_to_send_r;
   out_out.valid       <= to_bool(its(sendTime1_r) or sendTime2_r or
                                  (samples_r < props_in.valuesToSend and count_r = 0 and
                                   firstReady_r and not its(eof_r)));
@@ -51,6 +52,7 @@ begin
         firstReady_r    <= bfalse;
         sendTime1_r     <= bfalse;
         sendTime2_r     <= bfalse;
+        time_to_send_r  <= (others => '0');
       elsif sendTimestamp and props_in.timed then
         sendTime1_r    <= btrue;
         time_to_send_r <= (time_in.seconds & time_in.fraction) + props_in.fraction;

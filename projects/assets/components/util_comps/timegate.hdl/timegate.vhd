@@ -23,20 +23,25 @@ architecture rtl of worker is
   constant nchunks_c           : natural := max(in_in.data'length, time_width_c)/in_in.data'length;
   signal time_late_r           : bool_t;      -- timestamp arrived after its time
   signal error_r               : bool_t;
-  -- The state machine
+  -- The time gate state machine
   type state_t is (open_e,         -- gate is open, samples are flowing
                    time_coming_e,  -- time is coming in chunks, not yet complete
                    time_waiting_e, -- time has arrived and we are waiting
                    error_e);       -- things are broken, protocol is erroneous, we're stuck
   signal state_r               : state_t;
   -- The fifo from input port (and clock) to output port (and clock)
-  signal fifo_in, fifo_out     : std_logic_vector(in_in.data'length + 2 - 1 downto 0);
+  signal fifo_in, fifo_out     : std_logic_vector(in_in.data'length + 3 - 1 downto 0);
+  signal fifo_in_encoded_bits  : std_logic_vector(1 downto 0);
   signal fifo_enq, fifo_deq    : bool_t;
   signal fifo_empty_n          : bool_t;
   signal fifo_full_n           : bool_t;
   signal fifo_out_data         : std_logic_vector(in_in.data'range); -- LSBs
+  signal fifo_out_encoded_bits : std_logic_vector(1 downto 0); -- MSBs
   signal fifo_out_is_time      : bool_t;
   signal fifo_out_is_eof       : bool_t;
+  signal fifo_out_is_samples   : bool_t;
+  signal fifo_out_is_eom       : bool_t;
+  signal fifo_out_is_flush     : bool_t;
   -- Timekeepping - mostly reading time in chunks if data port is narrower than time
   signal time_to_transmit_r    : ulonglong_t; -- the corrected time when transmit should be enabled
   signal time_now              : ulonglong_t;
@@ -54,30 +59,57 @@ architecture rtl of worker is
   signal time_chunks_r         : chunks_t;
   -- convenience
   signal good_opcode           : bool_t;
+  -- output port signals
+  signal som                   : bool_t;
+  signal eom                   : bool_t;
+  signal valid                 : bool_t;
+  signal give                  : bool_t;
+
 begin
   good_opcode <= to_bool(in_in.opcode = ComplexShortWithMetadata_samples_op_e or
-                         in_in.opcode = ComplexShortWithMetadata_time_op_e);
+                         in_in.opcode = ComplexShortWithMetadata_time_op_e or 
+                         in_in.opcode = ComplexShortWithMetadata_flush_op_e);
   time_now    <= time_in.seconds & time_in.fraction;
   -- input port outputs, using input port input clock
   in_out.take   <= fifo_full_n or not good_opcode;
-  -- Fifo uses MSB to capture time opcode.  Other opcodes are not put in fifo
-  fifo_in          <= slv(to_bool(in_in.opcode = ComplexShortWithMetadata_time_op_e)) &
-                      slv(in_in.eof) & in_in.data;
-  fifo_out_data    <= fifo_out(in_in.data'range);
-  fifo_out_is_time <= to_bool(fifo_out(fifo_out'left));
-  fifo_out_is_eof  <= to_bool(fifo_out(fifo_out'left-1));
-  fifo_enq         <= fifo_full_n and ((in_in.ready and good_opcode) or in_in.eof);
-  fifo_deq         <= to_bool(fifo_empty_n and not its(fifo_out_is_eof) and out_in.ready and
-                              (state_r = open_e or fifo_out_is_time));
-  -- output port outputs, just putting out data when appropriate
-  out_out.data  <= fifo_out_data;
-  out_out.eof   <= fifo_out_is_eof and fifo_full_n;
-  out_out.valid <= to_bool(state_r = open_e and fifo_empty_n and not its(fifo_out_is_time) and
-                           not its(fifo_out_is_eof));
+  -- Fifo uses MSB to capture time, samples, and flush opcode. Other opcodes are not put in fifo
+  fifo_in_encoded_bits <= "00" when (its(in_in.eof)) else
+                          "01" when (in_in.opcode = ComplexShortWithMetadata_samples_op_e) else
+                          "10" when (in_in.opcode = ComplexShortWithMetadata_time_op_e) else
+                          "11" when (in_in.opcode = ComplexShortWithMetadata_flush_op_e);
 
+  fifo_in               <= fifo_in_encoded_bits & in_in.eom & in_in.data;
+  fifo_out_data         <= fifo_out(in_in.data'range);
+  fifo_out_encoded_bits <= fifo_out(fifo_out'left downto fifo_out'left-1);
+  fifo_out_is_eom       <= to_bool(fifo_out(fifo_out'left-2));
+  fifo_out_is_eof       <= '1' when (fifo_out_encoded_bits = "00") else '0';
+  fifo_out_is_samples   <= '1' when (fifo_out_encoded_bits = "01") else '0';
+  fifo_out_is_time      <= '1' when (fifo_out_encoded_bits = "10") else '0';
+  fifo_out_is_flush     <= '1' when (fifo_out_encoded_bits = "11") else '0';
+  fifo_enq              <= fifo_full_n and ((in_in.ready and good_opcode) or in_in.eof);
+  fifo_deq              <= to_bool(fifo_empty_n and not its(fifo_out_is_eof) and out_in.ready and
+                                  (state_r = open_e or fifo_out_is_time));
+
+  -- output port outputs, just putting out data when appropriate
+  som <= fifo_out_is_flush;
+  eom <= (fifo_out_is_eom and fifo_out_is_samples) or fifo_out_is_flush; -- propogate eom if samples message. This is done so that
+                                                                         -- the eom prior to flush happens at the correct time 
+  valid <= to_bool(state_r = open_e and fifo_empty_n and not its(fifo_out_is_time) and
+                   not its(fifo_out_is_eof) and not its(fifo_out_is_flush));
+  give <= (som or eom or valid) and out_in.ready;
+  
+  out_out.data   <= fifo_out_data;
+  out_out.som    <= som;
+  out_out.eom    <= eom;
+  out_out.eof    <= fifo_out_is_eof and fifo_full_n;
+  out_out.valid  <= valid;
+  out_out.give   <= give;
+  out_out.opcode <= ComplexShortWithMetadata_flush_op_e when (its(fifo_out_is_flush) and its(give))  else
+                    ComplexShortWithMetadata_samples_op_e;
+  
   fifo : cdc.cdc.fifo
     generic map(
-      WIDTH       => in_in.data'length + 2, -- MSB is time-op, MSB-1 is eof
+      WIDTH       => in_in.data'length + 3, -- MSB is encoded bits
       DEPTH       => to_integer(CDC_FIFO_DEPTH))
     port map(
       src_CLK     => in_in.clk,

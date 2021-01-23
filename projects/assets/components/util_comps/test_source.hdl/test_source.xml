@@ -3,6 +3,8 @@
        number of seconds after "now" -->
   <Property name='fraction' writable='true'/>
   <property name='timed' initial='true' type='bool'/>
+  <Property name='time_to_send' type="uLongLong"  Volatile='true' Description='Records the last time to send value sent): 
+  (time_in.seconds + time_in.fraction) + props_in.fraction.'/>
   <StreamInterface Name="out" DataWidth="32" InsertEOM="true" workereof='1' clockdirection='in'/>
   <TimeInterface name='time' SecondsWidth='32' fractionwidth='32' clock='out'/>
 </HdlWorker>
