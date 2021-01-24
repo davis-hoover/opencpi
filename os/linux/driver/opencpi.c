@@ -933,6 +933,24 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
       return err;
     }
 #endif
+  case OCPI_CMD_INVALIDATE: // use the fpga manager to load a whole (not partial) bitstream
+    {
+      ocpi_cache_t request;
+      if (copy_from_user(&request, (void __user *)arg, sizeof(request))) {
+	log_err("unable to retrieve memory request\n");
+	return -EFAULT;
+      }
+      return 0;
+    }
+  case OCPI_CMD_FLUSH: // use the fpga manager to load a whole (not partial) bitstream
+    {
+      ocpi_cache_t request;
+      if (copy_from_user(&request, (void __user *)arg, sizeof(request))) {
+	log_err("unable to retrieve memory request\n");
+	return -EFAULT;
+      }
+      return 0;
+    }
   default:
     log_err("ioctl invalid command (%08x)\n", cmd);
     return -EINVAL;

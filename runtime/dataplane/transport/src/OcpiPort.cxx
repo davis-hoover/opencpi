@@ -1234,9 +1234,8 @@ createOutputOffsets()
 	      bCount, boffset);
     ocpiDebug("Port::createOutputOffsets2: port %p bmd %p offset 0x%" OCPI_UTIL_RESADDR_PRIx,
 	      this, m_data->m_bufferData, m_data->m_bufferData[0].outputOffsets.bufferOffset);
-    // Allocate the local state
-    rc = res_mgr->alloc( sizeof(BufferState) * MAX_PCONTRIBS * bCount * 2, 
-                         BUF_ALIGNMENT, &soffset);
+    // Allocate the local state - maybe UNCACHED
+    rc = res_mgr->alloc(sizeof(BufferState) * MAX_PCONTRIBS * bCount * 2, BUF_ALIGNMENT, &soffset, true);
     ocpiDebug("**** Alloc Port %p for createOutputOffsets local state: 0x%x", this, soffset);
     if ( rc != 0 ) {
       res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
@@ -1265,9 +1264,7 @@ createOutputOffsets()
 
     // Allocate the port set control structure if needed (even shadows get one of these)
     if ( m_data->m_localPortSetControl == 0 ) {
-                        
-      rc = res_mgr->alloc( sizeof(OutputPortSetControl), 
-                           BUF_ALIGNMENT, &coffset);
+      rc = res_mgr->alloc(sizeof(OutputPortSetControl), BUF_ALIGNMENT, &coffset, true);
       ocpiDebug("**** Alloc Port %p for createOutputOffsets local outputportsetcontrol 0x%x", this, coffset);
       if ( rc != 0 ) {
         res_mgr->free( boffset,  m_data->m_portSetMd->getBufferLength() * bCount );
@@ -1346,9 +1343,7 @@ createInputOffsets()
       }
                 
       // Allocate the local state(s)
-      rc = res_mgr->alloc( 
-                          sizeof(BufferState) * MAX_PCONTRIBS * bCount * 2, 
-                          BUF_ALIGNMENT, &soffset);
+      rc = res_mgr->alloc(sizeof(BufferState) * MAX_PCONTRIBS * bCount * 2, BUF_ALIGNMENT, &soffset, true);
       ocpiDebug("**** Alloc Port %p for createInputffsets local state 0x%" OCPI_UTIL_RESADDR_PRIx,
 		this, soffset);
       if ( rc != 0 ) {
@@ -1367,7 +1362,7 @@ createInputOffsets()
       res_mgr = &getShadowEndPoint().resourceMgr();
       //      res_mgr = XferFactoryManager::getFactoryManager().getSMBResources( m_data->m_shadow_location )->sMemResourceMgr;
       ocpiAssert( res_mgr );
-      rc = res_mgr->alloc( sizeof(BufferState) * bCount , BUF_ALIGNMENT, &soffset);
+      rc = res_mgr->alloc( sizeof(BufferState) * bCount , BUF_ALIGNMENT, &soffset, true);
       ocpiDebug("**** Alloc Port %p for createInputffsets shadow state 0x%x", this, soffset);
       if ( rc != 0 ) {
         throw OCPI::Util::EmbeddedException(
@@ -1566,6 +1561,9 @@ OCPI::OS::int32_t
 Port::
 inputAvailable( Buffer* input_buf )
 {
+  // The CPU is done with this input buffer
+  assert(!isShadow());
+  getEndPoint().doneWithInput((void*)input_buf->getBuffer(), input_buf->m_length);
   Circuit *c = getCircuit();
   OU::SelfAutoMutex guard(c); // FIXME: refactor to make this a circuit method
   int rtn=1;
@@ -1714,6 +1712,7 @@ sendOutputBuffer( BufferUserFacet* buf, size_t length, uint8_t opcode, bool end,
 	  b->getMetaData()->ocpiMetaDataWord.xferMetaData,
 	  sizeof(RplMetaData), sizeof(BufferMetaData));
 
+  getEndPoint().doneWithOutput((void*)b->getBuffer(), b->m_length);
   Circuit * c = getCircuit();
   OU::SelfAutoMutex guard(c); // FIXME: refactor to make this a circuit method
   ocpiDebug("Sending buffer %p on port %p on circuit %p length %zu op %u", b, this, c,

@@ -181,7 +181,7 @@ xfer_group(XF_transfer *xf_members,
 
   struct xf_transfer_ *xf = new struct xf_transfer_;
 
-  int32_t i;
+  uint32_t i;
 
   /* Initialize the transfers template */
   xf->xf_template = xf_template;
@@ -192,8 +192,8 @@ xfer_group(XF_transfer *xf_members,
   xf->last_pio_transfer = 0;
 
   int32_t rc=0;
-  int32_t nxf;
-  int32_t pio=0;
+  uint32_t nxf;
+  uint32_t pio=0;
 
   /* Count the number of members */
   for (nxf=0; xf_members[nxf]; nxf++)

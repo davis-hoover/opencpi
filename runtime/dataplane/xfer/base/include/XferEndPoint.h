@@ -88,6 +88,7 @@ private:
   uint16_t             m_mailBox;    // endpoint mailbox
   uint16_t             m_maxCount;   // Number of mailboxes in communication domain
   size_t               m_size;       // Size of endpoint area in bytes
+  size_t               m_flagSize;   // Offset o the flag region in the endpoint
   bool                 m_local;      // local endpoint - in this process
   XferFactory          &m_factory;   // parent driver
   unsigned             m_refCount;
@@ -100,6 +101,7 @@ private:
 protected:
   std::string          m_protoInfo;  // protocol-specific string set by derived classes
   uint64_t             m_address;    // Address of endpoint in its address space (usually 0)
+  bool                 m_needsFlags; // Endpoint requires a flag region (uncached).
   EndPoint(XferFactory &factory, const char *eps, const char *other, bool local, size_t size,
 	   const OCPI::Util::PValue *params);
  public:
@@ -130,8 +132,10 @@ protected:
   XferFactory &factory() const { return m_factory; }
   const std::string &name() const { return m_name; }
   size_t size() const { return m_size; }
+  size_t flagSize() const { return m_flagSize; }
   const OCPI::Util::Uuid &uuid() const { return m_uuid; }
   virtual SmemServices &createSmemServices() = 0;
+  virtual ResourceServices &createResourceServices();
   SmemServices &sMemServices();
   ResourceServices &resourceMgr() { assert(m_resourceMgr); return *m_resourceMgr; }
   ContainerComms &containerComms() { assert("containercomms disabled"==0); assert(m_comms); return *m_comms; }
@@ -142,7 +146,9 @@ protected:
   void addRef();
   void release();
   // Commit resources.  Caller says whether remote access will be required.
-  void finalize(); //bool remoteAccess = false);
+  void finalize();
+  virtual void doneWithInput(void */*buffer*/, unsigned /*length*/) {};
+  virtual void doneWithOutput(void */*buffer*/, unsigned /*length*/) {};
 };
 typedef std::map<OCPI::Util::Uuid, EndPoint *, OCPI::Util::UuidComp> EndPoints;
 typedef EndPoints::iterator EndPointsIter;
@@ -166,14 +172,29 @@ class SmemServices {
   inline EndPoint &endPoint() {return m_endpoint;}
 };
 // There is no good place for this at the moment, but FIXME: move it somewhere better?
-//SmemServices &createHostSmemServices(EndPoint& loc);
 // Memory pool ALLOCATION services. FIXME: this should be defined in util/res etc.
 class ResourceServices {
 public:
-  virtual int alloc(size_t nbytes, unsigned alignment, OCPI::Util::ResAddrType* addr_p) = 0;
+  virtual int alloc(size_t nbytes, unsigned alignment, OCPI::Util::ResAddrType* addr_p, bool flag = false) = 0;
   virtual int free(OCPI::Util::ResAddrType addr, size_t nbytes) = 0;
   virtual ~ResourceServices() {};
 };
+
+// This is the class that knows to separate the two types of memory - cached and uncached
+// It has an initializer saying whether to actually split the pools
+// Endpoint drivers may not use this, but it is the default (unsplit)
+// and some drivers may use it in split mode for uncached flags etc.
+class XferPool : public ResourceServices {
+  size_t m_flagRegionSize, m_baseRegionSize;
+  OCPI::Util::MemBlockMgr *m_flagRegion, *m_baseRegion;
+  static size_t flagRegionSize(size_t size);
+public:
+  // If flagSize != NULL, pool needs an initial flag region, which will be returned in *flagSize
+  XferPool(size_t size, size_t *flagSize = NULL);
+  int alloc(size_t nbytes, unsigned alignment, OCPI::Util::ResAddrType *addr_p, bool flag = false);
+  int free(OCPI::Util::ResAddrType addr, size_t nbytes);
+};
+
 }
 
 #endif
