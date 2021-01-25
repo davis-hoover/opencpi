@@ -324,24 +324,30 @@ $end rtl;
 #define RPROP_ARRAY_16(pretty,which,def,rng,lhs,rhs) \
 ENTITY_RPROP_ARRAY(pretty,readback scalar 16 bit property)\
 $architecture rtl of pretty##_read_array_property is\
-$@@signal index, i, i_plus_1 : unsigned(offset'left-1 downto 0);\
+$@@signal index, i, i_plus_1 : unsigned(util.max(1, offset~left)-1 downto 0);\
 $@@signal odd : boolean;\
 $@@signal bits : std_logic_vector(3 downto 0);\
 $begin\
-$@@index@@@ <= offset(offset'left downto 1);\
-$@@i@@@@@@@ <= index when index < property.nitems else (others => '0');\
-$@@i_plus_1 <= i + 1 when nbytes_1(1) and i < (property.nitems - 1) else i;\
-$@@odd <= (i + property.offset/2) rem 2 = 1;\
-$@@bits <= util.slv(nbytes_1(1)) & util.slv(offset(1)) &\
-$@@@@@@@@@ util.slv(property.offset(1)) & util.slv(is_big_endian);\
-$@@with bits select\
-$@@@@data_out(31 downto 16) <=\
-$@@@@@@std_logic_vector(value(to_integer(i)))@@ when x"1"|x"2"|x"4"|x"7"|x"9"|x"f",\
-$@@@@@@std_logic_vector(value(to_integer(i_plus_1))) when others;\
-$@@with bits select\
-$@@@@data_out(15 downto 0) <=\
-$@@@@@@std_logic_vector(value(to_integer(i)))@@ when x"0"|x"3"|x"5"|x"6"|x"8"|x"e",\
-$@@@@@@std_logic_vector(value(to_integer(i_plus_1))) when others;\
+$@@g0: if offset~left = 0 generate\
+$@@@@data_out(15 downto 0) <= std_logic_vector(value(0));\
+$@@@@data_out(31 downto 16) <= (others => '0');\
+$@@end generate;\
+$@@g1: if offset~left > 0 generate\
+$@@@@index@@@ <= resize(offset, index~length) srl 1;\
+$@@@@i@@@@@@@ <= index when index < property.nitems else (others => '0');\
+$@@@@i_plus_1 <= i + 1 when nbytes_1(1) and i < (property.nitems - 1) else i;\
+$@@@@odd <= (i + property.offset/2) rem 2 = 1;\
+$@@@@bits <= util.slv(nbytes_1(1)) & util.slv(offset(1)) &\
+$@@@@@@@@@@@ util.slv(property.offset(1)) & util.slv(is_big_endian);\
+$@@@@with bits select\
+$@@@@@@data_out(31 downto 16) <=\
+$@@@@@@@@std_logic_vector(value(to_integer(i)))@@ when x"1"|x"2"|x"4"|x"7"|x"9"|x"f",\
+$@@@@@@@@std_logic_vector(value(to_integer(i_plus_1))) when others;\
+$@@@@with bits select\
+$@@@@@@data_out(15 downto 0) <=\
+$@@@@@@@@std_logic_vector(value(to_integer(i)))@@ when x"0"|x"3"|x"5"|x"6"|x"8"|x"e",\
+$@@@@@@@@std_logic_vector(value(to_integer(i_plus_1))) when others;\
+$@@end generate;\
 $end rtl;
 
 #define RPROP_ARRAY_32(pretty,which,def,rng,lhs,rhs) \
@@ -434,46 +440,71 @@ $end rtl;
 
 #define WPROP_ARRAY_16(pretty,which,def,rng,lhs,rhs) \
 ENTITY_ARRAY(pretty,which,def,rng) \
-$architecture rtl of pretty##_array_property is \
+$architecture rtl of pretty##_array_property is\
 $@@signal base : natural;\
 $begin\
-$@@base <= to_integer(offset(offset~left downto 1));\
-$@@reg: process(Clk) is\
-$@@begin\
-$@@@@if rising_edge(clk) then\
-$@@@@@@if its(reset) then\
-$@@@@@@@@value <= default;\
-$@@@@@@@@written <= bfalse;\
-$@@@@@@@@any_written <= bfalse;\
-$@@@@@@elsif its(write_enable) then\
-$@@@@@@@@if offset(1) = property.offset(1) then -- aligned\
+$@@g0: if property.nitems = 1 generate\
+$@@@@reg: process(Clk) is\
+$@@@@begin\
+$@@@@@@if rising_edge(clk) then\
+$@@@@@@@@if its(reset) then\
+$@@@@@@@@@@value <= default;\
+$@@@@@@@@@@written <= bfalse;\
+$@@@@@@@@@@any_written <= bfalse;\
+$@@@@@@@@elsif its(write_enable) then\
 $@@@@@@@@@@if its(is_big_endian) then\
 $@@@@@@@@@@@@value(base) <= rhs(data(31 downto 16));\
 $@@@@@@@@@@else\
 $@@@@@@@@@@@@value(base) <= rhs(data(15 downto 0));\
 $@@@@@@@@@@end if;\
+$@@@@@@@@@@any_written <= btrue;\
+$@@@@@@@@@@written <= btrue;\
 $@@@@@@@@else\
-$@@@@@@@@@@if its(is_big_endian) then\
-$@@@@@@@@@@@@value(base) <= rhs(data(15 downto 0));\
-$@@@@@@@@@@else\
-$@@@@@@@@@@@@value(base) <= rhs(data(31 downto 16));\
-$@@@@@@@@@@end if;\
+$@@@@@@@@@@written <= bfalse;\
+$@@@@@@@@@@any_written <= bfalse;\
 $@@@@@@@@end if;\
-$@@@@@@@@if nbytes_1 > 1 and property.nitems > 1 then\
-$@@@@@@@@@@if its(is_big_endian) then\
-$@@@@@@@@@@@@value(base+1) <= rhs(data(15 downto 0));\
-$@@@@@@@@@@else\
-$@@@@@@@@@@@@value(base+1) <= rhs(data(31 downto 16));\
-$@@@@@@@@@@end if;\
-$@@@@@@@@end if;\
-$@@@@@@@@any_written <= btrue;\
-$@@@@@@@@if base = 0 then written <= btrue; end if;\
-$@@@@@@else\
-$@@@@@@@@written <= bfalse;\
-$@@@@@@@@any_written <= bfalse;\
 $@@@@@@end if;\
-$@@@@end if; \
-$@@end process; \
+$@@@@end process;\
+$@@end generate;\
+$@@g1: if property.nitems /= 1 generate\
+$@@@@base <= to_integer(offset(offset~left downto 1));\
+$@@@@reg: process(Clk) is\
+$@@@@begin\
+$@@@@@@if rising_edge(clk) then\
+$@@@@@@@@if its(reset) then\
+$@@@@@@@@@@value <= default;\
+$@@@@@@@@@@written <= bfalse;\
+$@@@@@@@@@@any_written <= bfalse;\
+$@@@@@@@@elsif its(write_enable) then\
+$@@@@@@@@@@if offset(1) = property.offset(1) then -- aligned\
+$@@@@@@@@@@@@if its(is_big_endian) then\
+$@@@@@@@@@@@@@@value(base) <= rhs(data(31 downto 16));\
+$@@@@@@@@@@@@else\
+$@@@@@@@@@@@@@@value(base) <= rhs(data(15 downto 0));\
+$@@@@@@@@@@@@end if;\
+$@@@@@@@@@@else\
+$@@@@@@@@@@@@if its(is_big_endian) then\
+$@@@@@@@@@@@@@@value(base) <= rhs(data(15 downto 0));\
+$@@@@@@@@@@@@else\
+$@@@@@@@@@@@@@@value(base) <= rhs(data(31 downto 16));\
+$@@@@@@@@@@@@end if;\
+$@@@@@@@@@@end if;\
+$@@@@@@@@@@if nbytes_1 > 1 and property.nitems > 1 then\
+$@@@@@@@@@@@@if its(is_big_endian) then\
+$@@@@@@@@@@@@@@value(base+1) <= rhs(data(15 downto 0));\
+$@@@@@@@@@@@@else\
+$@@@@@@@@@@@@@@value(base+1) <= rhs(data(31 downto 16));\
+$@@@@@@@@@@@@end if;\
+$@@@@@@@@@@end if;\
+$@@@@@@@@@@any_written <= btrue;\
+$@@@@@@@@@@if base = 0 then written <= btrue; end if;\
+$@@@@@@@@else\
+$@@@@@@@@@@written <= bfalse;\
+$@@@@@@@@@@any_written <= bfalse;\
+$@@@@@@@@end if;\
+$@@@@@@end if;\
+$@@@@end process;\
+$@@end generate;\
 $end rtl;
 
 #define WPROP_ARRAY_32(pretty,which,def,rng,lhs,rhs) \
