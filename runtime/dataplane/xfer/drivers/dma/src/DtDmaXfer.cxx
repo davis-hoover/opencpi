@@ -60,35 +60,35 @@ namespace OCPI {
     class XferFactory : public XF::DriverBase<XferFactory, Device, XferServices, dma> {
       friend class SmemServices;
       friend class XferServices;
-      int       m_dmaFd, m_dmaFlagFd; // if this is >= 0, then we have been there before
+      int       m_dmaCachedFd, m_dmaUncachedFd; // if this is >= 0, then we have been there before
       bool      m_usingKernelDriver;
       uint64_t  m_dmaBase;
       unsigned  m_maxMBox, m_perMBox;
     public:
       XferFactory()
-	: m_dmaFd(-1), m_dmaFlagFd(-1), m_usingKernelDriver(false), m_dmaBase(UINT64_MAX),
+	: m_dmaCachedFd(-1), m_dmaUncachedFd(-1), m_usingKernelDriver(false), m_dmaBase(UINT64_MAX),
 	  m_maxMBox(0)
       {}
 
       virtual
       ~XferFactory() {
 	lock();
-	if (m_dmaFd >= 0)
-	  ::close(m_dmaFd); // FIXME need OS abstraction
-	if (m_dmaFlagFd >= 0)
-	  ::close(m_dmaFlagFd); // FIXME need OS abstraction
+	if (m_dmaCachedFd >= 0)
+	  ::close(m_dmaCachedFd); // FIXME need OS abstraction
+	if (m_dmaUncachedFd >= 0)
+	  ::close(m_dmaUncachedFd); // FIXME need OS abstraction
       }
     private:
       void
       initDma(uint16_t maxCount) {
-	if ((m_dmaFd = ::open(OCPI_DRIVER_MEM, O_RDWR | O_SYNC)) >= 0) {
-	  if ((m_dmaFlagFd = ::open(OCPI_DRIVER_MEM, O_RDWR | O_SYNC)) < 0)
+	if ((m_dmaCachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR)) >= 0) {
+	  if ((m_dmaUncachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR | O_SYNC)) < 0)
 	    throw OU::Error("cannot open " OCPI_DRIVER_MEM "for DMA uncached");
 	  m_usingKernelDriver = true;
-	} else if ((m_dmaFd = ::open("/dev/mem", O_RDWR|O_SYNC )) < 0)
+	} else if ((m_dmaCachedFd = ::open("/dev/mem", O_RDWR)) < 0)
 	  throw OU::Error("cannot open /dev/mem for DMA (Use sudo or load the driver)");
 	else {
-	  if ((m_dmaFlagFd = ::open("/dev/mem", O_RDWR | O_SYNC)) < 0)
+	  if ((m_dmaUncachedFd = ::open("/dev/mem", O_RDWR|O_SYNC)) < 0)
 	    throw OU::Error("cannot open /dev/mem for DMA uncached");
 	  m_usingKernelDriver = false;
 	  const char *l_dma = getenv("OCPI_DMA_MEMORY");
@@ -129,14 +129,14 @@ namespace OCPI {
       XF::XferServices &
       createXferServices(XF::EndPoint &source, XF::EndPoint &target);
 
-      void doneWithInput(void *buffer, unsigned length) {
-	ocpi_cache_t request = { buffer, length };
-	if (ioctl(m_dmaFd, OCPI_CMD_INVALIDATE, &request))
+      void doneWithInput(uint64_t busAddr, unsigned length) {
+	ocpi_cache_t request = { busAddr, length };
+	if (ioctl(m_dmaCachedFd, OCPI_CMD_INVALIDATE, &request))
 	  throw OU::Error("Error on OpenCPI IOCTL: invalidate: %u", errno);
       }
-      void doneWithOutput(void *buffer, unsigned length) {
-	ocpi_cache_t request = { buffer, length };
-	if (ioctl(m_dmaFd, OCPI_CMD_FLUSH, &request))
+      void doneWithOutput(uint64_t busAddr, unsigned length) {
+	ocpi_cache_t request = { busAddr, length };
+	if (ioctl(m_dmaCachedFd, OCPI_CMD_FLUSH, &request))
 	  throw OU::Error("Error on OpenCPI IOCTL: flush: %u", errno);
       }
     };
@@ -149,6 +149,7 @@ namespace OCPI {
     protected:
       uint32_t m_holeOffset, m_holeEnd;
       uint64_t m_busAddr;
+      uint8_t *m_baseVaddr;
     public:
       EndPoint(XferFactory &a_factory, const char *protoInfo, const char *eps,
 	       const char *other, bool a_local, size_t a_size, const OU::PValue *params)
@@ -172,23 +173,29 @@ namespace OCPI {
       XF::SmemServices &createSmemServices();
 
       void doneWithInput(void *buffer, unsigned length) {
-	m_dmaFactory.doneWithInput(buffer, length);
+	ocpiInfo("doneWithInput: %p %p %u", buffer, m_baseVaddr, length);
+	m_dmaFactory.doneWithInput(m_busAddr + flagSize() +
+				   OCPI_SIZE_T_DIFF((uint8_t*)buffer, m_baseVaddr), length);
       }
       void doneWithOutput(void *buffer, unsigned length) {
-	m_dmaFactory.doneWithOutput(buffer, length);
+	ocpiInfo("doneWithOutput: %p %p %u", buffer, m_baseVaddr, length);
+	m_dmaFactory.doneWithOutput(m_busAddr + flagSize() +
+				    OCPI_SIZE_T_DIFF((uint8_t*)buffer, m_baseVaddr), length);
       }
     };
     void XferFactory::
     getDmaRegion(EndPoint &ep) {
       OU::SelfAutoMutex guard(this);
-      if (m_dmaFd < 0)
+      if (m_dmaCachedFd < 0)
 	initDma(ep.maxCount());
       ocpi_request_t request;
       memset(&request, 0, sizeof(request));
       request.needed = (ocpi_size_t)ep.size();
-      request.how_cached = ocpi_uncached;
+      request.how_cached = ocpi_uncached; // obsolete/ignored...
       if (m_usingKernelDriver) {
-	if (ioctl(m_dmaFd, OCPI_CMD_REQUEST, &request))
+	// note this allocation doesn't matter which FD we use since the caching is
+	// determined by which fd we use in the mmap call
+	if (ioctl(m_dmaCachedFd, OCPI_CMD_REQUEST, &request))
 	  throw OU::Error("Can't allocate memory size %zu for DMA memory", ep.size());
       } else {
 	ocpiAssert(ep.maxCount() == m_maxMBox);
@@ -205,10 +212,10 @@ namespace OCPI {
     uint8_t *XferFactory::
     mapDmaRegion(EndPoint &ep, size_t offset, size_t size) {
       OU::SelfAutoMutex guard(this);
-      if (m_dmaFd < 0)
+      if (m_dmaCachedFd < 0)
 	initDma(ep.maxCount());
       void *vaddr =  mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED,
-			  offset >= ep.flagSize() ? m_dmaFd : m_dmaFlagFd,
+			  ep.local() && offset >= ep.flagSize() ? m_dmaCachedFd : m_dmaUncachedFd,
 			  (off_t)(ep.m_address + offset));
       ocpiDebug("For ep %p, offset 0x%zx size %zu vaddr is %p to %p @ 0x%" PRIx64,
 		&ep, offset, size, vaddr, (uint8_t *)vaddr + size, ep.m_address);
@@ -229,7 +236,7 @@ namespace OCPI {
 	// It will tell us what local physical address to use for mmap offsets.
 	// (FIXME: security hole when not discovered properly in kernel mode)
 	// We'll use the ioctl request to the driver by setting the memory needed to zero
-	if (m_dmaFd < 0)
+	if (m_dmaCachedFd < 0)
 	  initDma(ep.maxCount());
 	if (m_usingKernelDriver) {
 	  ocpi_request_t request;
@@ -240,7 +247,7 @@ namespace OCPI {
 	  request.actual =
 	    OCPI_UTRUNCATE(ocpi_size_t, ep.m_holeOffset ? ep.m_holeOffset : ep.size());
 	  // A request to enable mapping to this bus address/size and return the physaddr
-	  if (ioctl(m_dmaFd, OCPI_CMD_REQUEST, &request))
+	  if (ioctl(m_dmaUncachedFd, OCPI_CMD_REQUEST, &request))
 	    throw OU::Error("Can't establish remote DMA memory size %" PRIu32 " at 0x%" PRIx64
 			    "for DMA memory", request.actual, ep.m_busAddr);
 	  ep.m_address = request.address;
@@ -248,7 +255,7 @@ namespace OCPI {
 	    memset(&request, 0, sizeof(request));
 	    request.bus_addr = ep.m_busAddr + ep.m_holeEnd;
 	    request.actual = OCPI_UTRUNCATE(ocpi_size_t, ep.size() - ep.m_holeEnd);
-	    if (ioctl(m_dmaFd, OCPI_CMD_REQUEST, &request))
+	    if (ioctl(m_dmaUncachedFd, OCPI_CMD_REQUEST, &request))
 	      throw
 		OU::Error("Can't establish second remote DMA memory size %" PRIu32 " at 0x%"
 			  PRIx64 "for DMA memory", request.actual, request.bus_addr);
@@ -282,9 +289,9 @@ namespace OCPI {
 	  m_driver.getDmaRegion(ep);
 	  if (ep.flagSize()) { // if we have a flag region it must be mapped separately
 	    m_flagVaddr = m_driver.mapDmaRegion(ep, 0, ep.flagSize());
-	    m_vaddr = m_driver.mapDmaRegion(ep, ep.flagSize(), ep.size() - ep.flagSize());
+	    ep.m_baseVaddr = m_vaddr = m_driver.mapDmaRegion(ep, ep.flagSize(), ep.size() - ep.flagSize());
 	  } else
-	    m_vaddr = m_driver.mapDmaRegion(ep, 0, ep.size());
+	    ep.m_baseVaddr = m_vaddr = m_driver.mapDmaRegion(ep, 0, ep.size());
 	  OU::format(ep.m_protoInfo, "%" PRIx64 ".%" PRIx32 ".%" PRIx32,
 		     ep.m_busAddr, ep.m_holeOffset, ep.m_holeEnd);
 	  ep.setName();
@@ -319,7 +326,7 @@ namespace OCPI {
 	  if (offset < ep.flagSize())
 	    vaddr = m_flagVaddr + offset;
 	  else {
-	    offset -= ep.flagSize();
+	    offset -= OCPI_UTRUNCATE(DtOsDataTypes::Offset, ep.flagSize());
 	    if (ep.m_holeOffset == 0 || (offset < ep.m_holeOffset && top <= ep.m_holeOffset))
 	      vaddr = m_vaddr + offset;
 	    else if (ep.m_holeOffset && offset >= ep.m_holeEnd)

@@ -82,8 +82,8 @@ typedef struct {
 } ocpi_pci_t;
 
 typedef struct {
-  void          *data;
-  ocpi_size_t   length;
+  ocpi_address_t address; // bus address
+  ocpi_size_t    size;
 } ocpi_cache_t;
 
 typedef enum {

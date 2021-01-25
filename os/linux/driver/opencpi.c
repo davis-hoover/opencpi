@@ -525,7 +525,8 @@ establish_remote(struct file *file, ocpi_request_t *request) {
 static long
 get_dma_memory(ocpi_request_t *request, unsigned minor) {
   void *virtual_addr;
-  dma_addr_t dma_handle;
+  dma_addr_t dma_handle_alloc, dma_handle_map;
+  struct device *dev = opencpi_devices[minor]->fsdev;
   long err = -ENOMEM;
   // don't need to do a page alignment, so actual can be the same as needed
   // either it PAGE_ALIGN was already called to set request->actual or this is
@@ -536,14 +537,48 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
 	    (unsigned long)request->actual);
   // dma_set_coherent_mask sets a bit mask describing which bits of an address the device
   // supports, default is 32
-  if (dma_set_coherent_mask(opencpi_devices[minor]->fsdev, DMA_BIT_MASK(32)))
-    log_debug("dma_set_coherent_mask failed for device %px\n", opencpi_devices[minor]->fsdev);
+  // dma_set_mask doesn't work at all on ARM anyway, in 4.19. dma_mask ptr not initialized
+  // there is dma_coerce_mask_and_coherent too...
+  if (dma_set_coherent_mask(dev, DMA_BIT_MASK(32))) {
+    log_err("dma_set_coherent_mask failed for device %px\n", opencpi_devices[minor]->fsdev);
+    return err;
+  }
+#if 1
+  {
+    unsigned long attrs =
+      DMA_ATTR_WRITE_BARRIER |     // really only for flag region, but we can start here
+      DMA_ATTR_WEAK_ORDERING |     // our flags are atomic
+      // DMA_ATTR_WRITE_COMBINE |     // our flags are atomic
+      DMA_ATTR_NON_CONSISTENT    | // we need to allow for this to be configurable...
+      //      DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space
+      // DMA_ATTR_SKIP_CPU_SYNC |     // for multiple device consumers and producers
+      DMA_ATTR_FORCE_CONTIGUOUS |  // we don't have sg dma
+      0;
+    if ((virtual_addr = dmam_alloc_attrs(dev, request->actual, &dma_handle_alloc, GFP_KERNEL,
+					 attrs)) == NULL) {
+      log_err("dmam_alloc_attrs failed\n");
+      return err;
+    }
+    log_err("dma_alloc_attrs: %zu %zu %x map %lx\n", sizeof(dma_handle_alloc), sizeof(virtual_addr), dma_handle_alloc, (unsigned long)virtual_addr);
+#if 0
+    dma_handle_map = dma_handle_alloc;
+#else
+    dma_handle_map = dma_map_single(dev, virtual_addr, request->actual, DMA_BIDIRECTIONAL);
+    log_err("Mappings alloc: %x map %x\n", dma_handle_alloc, dma_handle_map);
+    if (dma_mapping_error(dev, dma_handle_map)) {
+      log_err("dmam_map_single failed\n");
+      return err;
+    }
+#endif
+  }
+#else
   if ((virtual_addr = dmam_alloc_coherent(opencpi_devices[minor]->fsdev, request->actual,
 					  &dma_handle, GFP_KERNEL)) == NULL) {
     log_err("dmam_alloc_coherent failed\n");
     return err;
   }
-  request->bus_addr = (ocpi_address_t) dma_handle;
+#endif
+  request->bus_addr = (ocpi_address_t) dma_handle_map;
   request->address = bus2phys(request->bus_addr);
   if (make_block(request->address, request->bus_addr, request->actual,  ocpi_dma,
 		 true, ++opencpi_kernel_alloc_id, virtual_addr, minor) == NULL) {
@@ -814,6 +849,7 @@ int
 opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg) {
   unsigned minor = iminor(inode);
 #endif
+  struct device *dev = opencpi_devices[minor]->fsdev;
   int err;
   switch (cmd) {
   case OCPI_CMD_PCI:
@@ -902,7 +938,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
 		err = -ENOMEM;
     #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
-		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {
+		if ((info = fpga_image_info_alloc(dev))) {
 		  info->buf = buf;
 		  info->count = request.length;
 		  log_debug("locking fpga\n");
@@ -940,6 +976,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	log_err("unable to retrieve memory request\n");
 	return -EFAULT;
       }
+      dma_sync_single_for_cpu(dev, request.address, request.size, DMA_FROM_DEVICE);
       return 0;
     }
   case OCPI_CMD_FLUSH: // use the fpga manager to load a whole (not partial) bitstream
@@ -949,6 +986,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	log_err("unable to retrieve memory request\n");
 	return -EFAULT;
       }
+      // dma_sync_single_for_device(dev, request.address, request.size, DMA_TO_DEVICE);
       return 0;
     }
   default:
@@ -986,9 +1024,9 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
   ocpi_block_t *block = NULL;
   unsigned long pfn = vma->vm_pgoff;
 
-  log_debug("mmap minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx)\n",
+  log_debug("mmap minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx) flags 0x%x\n",
 	    minor, file, mydev, (unsigned long)size, vma->vm_start,
-	    start_address, end_address);
+	    start_address, end_address, file->f_flags);
   if (minor == 0) {
     bool found = false;
     // Since this is outer loop, a linear search is ok.  Maybe a hash table someday.
@@ -1024,7 +1062,8 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
     vma->vm_ops = &opencpi_vm_ops;
     vma->vm_private_data = block;
     // Check for uncached blocks
-    if (!block->isCached)
+    // if (!block->isCached) // this is now determined by the FD used.
+    if (file->f_flags & (O_SYNC|O_DSYNC))
       vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
     vma->vm_flags |= VM_RESERVED;
     if (block->type == ocpi_mmio) {
