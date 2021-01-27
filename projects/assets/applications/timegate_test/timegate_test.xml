@@ -4,7 +4,9 @@
     <property name='fraction' value='.0001*2**32' delay='1'/> <!-- delay is in 1*2^-32 -->
     <property name='valuestosend' value='100'/>
   </Instance>
-  <Instance component='timegate' connect='capture_v2'/>
+  <Instance component='timegate' connect='capture_v2'>
+    <property name='time_correction' value='301'/>
+  </Instance>
   <Instance component='capture_v2'/>
 </Application>
 

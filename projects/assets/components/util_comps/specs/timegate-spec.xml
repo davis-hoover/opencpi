@@ -11,7 +11,7 @@
             default='0'
             description='unsigned fixed point fraction of second which is subtracted from
             the applied time to open the gate early so that the actual RF transmission happens at
-	    the right time'/>
+	          the right time'/>
   <Property name='late_time_sticky'
             type='bool'
             volatile='true'
@@ -28,6 +28,11 @@
             default='false'
             description='Forces worker into the unusable state if the time
             invalid signal is low during the worker initialized state.'/>
+  <Property name='actual_time_to_requested_time_delta' 
+            type="uLongLong"  
+            Volatile='true' 
+            description='Delta between the actual time transmitted to the 
+            requested timestamp (corrected).'/>
 
   <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>
   <Port name='out' producer='true' protocol='ComplexShortWithMetadata-prot'/>
