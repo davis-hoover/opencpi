@@ -147,28 +147,28 @@ PROJ_GUI_PROJECT = ("""<?xml version="1.0" encoding="UTF-8"?>
 
 PROJ_PROJECT_XML_LEGACY = ("""<project
 {%if package_name: %}
-	PackageName={{package_name}}
+	PackageName='{{package_name}}'
 {% endif %}
 {%if package_prefix: %}
-	PackagePrefix={{package_prefix}}
+	PackagePrefix='{{package_prefix}}'
 {% endif %}
 {%if package_id: %}
-	Package={{package_id}}
+	Package='{{package_id}}'
 {% endif %}
 {%if depend: %}
-	ProjectDependencies={{depend}}
+	ProjectDependencies='{{depend}}'
 {% endif %}
 {%if prim_lib: %}
-	Libraries={{prim_lib}}
+	Libraries='{{prim_lib}}'
 {% endif %}
 {%if include_dir: %}
-	IncludeDirs={{include_dir}}
+	IncludeDirs='{{include_dir}}'
 {% endif %}
 {%if xml_include: %}
-	XmlIncludeDirs={{xml_include}}
+	XmlIncludeDirs='{{xml_include}}'
 {% endif %}
 {%if comp_lib: %}
-	ComponentLibraries={{comp_lib}}
+	ComponentLibraries='{{comp_lib}}'
 {% endif %}
 />
 \n""")
