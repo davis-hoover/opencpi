@@ -1123,6 +1123,9 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         ocpiutil.write_file_from_string( proj_dir + "/.gitattributes", ocpitemplate.PROJ_GIT_ATTR)
         template = jinja2.Template(ocpitemplate.PROJ_MAKEFILE, trim_blocks=True)
         ocpiutil.write_file_from_string( proj_dir + "/Makefile", template.render(**template_dict))
+        # Until phase 2, Project.mk remains a deeply embedded requirement for the pytests
+        template = jinja2.Template(ocpitemplate.PROJ_PROJECT_MK, trim_blocks=True)
+        ocpiutil.write_file_from_string( proj_dir + "/Project.mk", template.render(**template_dict))
         # TODO: For traditional XML, replace PROJ_PROJECT_XML_LEGACY with PROJ_PROJECT_XML
         template = jinja2.Template(ocpitemplate.PROJ_PROJECT_XML_LEGACY, trim_blocks=True)
         ocpiutil.write_file_from_string( proj_dir + "/Project.xml", template.render(**template_dict))
