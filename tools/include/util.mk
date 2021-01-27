@@ -816,7 +816,7 @@ define OcpiSetProject
 endef
 define OcpiSetProjectX
   # This might already be set
-  $$(call OcpiDbg,Setting project to $1)
+  $$(call OcpiDbg,Setting project directory to $1)
   OcpiTempProjDir:=$$(call OcpiAbsDir,$1)
   ifdef OCPI_PROJECT_DIR
     ifneq ($$(OcpiTempProjDir),$$(OCPI_PROJECT_DIR))
@@ -844,12 +844,11 @@ define OcpiSetProjectX
   ifneq ($(wildcard $1/Project.xml),)
     # Handle XML, aka make-less, properties for project assets
     ifneq ($(wildcard $1/Project.mk),)
-      $$(warning Both Project.mk and Project.xml were found in $1. Project.mk ignored.)
+      $$(warning Found both Project.mk and Project.xml, using Project.xml)
     endif
-    $(if $(call DoShell,ocpigen -R $1/Project.xml|tr "\n" ";"|tr " " "&",\
-     OcpiProps),$(error ocpigen failed),\
-     $(foreach var,$(subst ;, ,$(OcpiProps)),\
-     $(eval $(subst &, ,$(var)))))
+    $(if $(call DoShell,ocpigen -R $1/Project.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
+    $(error ocpigen failed),$(foreach var,$(subst ;, ,$(OcpiProps)),$$(eval $(subst &, ,$(var)))))
+    $(foreach var,$(subst ;, ,$(OcpiProps)),$(eval $(subst &, ,$(var))))
   else
     # Legacy support for project assets
     include $1/Project.mk
