@@ -67,7 +67,6 @@ architecture rtl of worker is
   signal error_r               : bool_t;
   signal time_late_r           : bool_t;    -- timestamp arrived after its time
   
-  signal clr_late_time_sticky_written   : bool_t;
   signal clr_late_time_sticky           : bool_t;
   signal time_delta            : ulonglong_t;
 
@@ -137,16 +136,8 @@ begin
       dst_out     => fifo_out,
       dst_EMPTY_N => fifo_empty_n);
   
-  clr_late_time_sticky_written  <= props_in.clr_late_time_sticky_written and props_in.clr_late_time_sticky and ctl_in.is_operating;
-  pulse : cdc.cdc.pulse
-    port map(src_clk  => ctl_in.clk,
-              src_rst => ctl_in.reset,
-              src_in  => clr_late_time_sticky_written,
-              src_rdy => open,
-              dst_clk => out_in.clk,
-              dst_rst => out_in.reset,
-              dst_out => clr_late_time_sticky);
-  
+  clr_late_time_sticky  <= props_in.clr_late_time_sticky_written and props_in.clr_late_time_sticky and ctl_in.is_operating;
+
   time_late : component cdc.cdc.fast_pulse_to_slow_sticky
   port map(
     fast_clk    => out_in.clk,
@@ -155,9 +146,8 @@ begin
     slow_clk    => ctl_in.clk,
     slow_rst    => ctl_in.reset,
     slow_sticky => props_out.late_time_sticky,
-    slow_clr    => clr_late_time_sticky_written);
+    slow_clr    => clr_late_time_sticky);
           
-
   notchunked: -- simpler version when time is not chunked
   if in_in.data'length >= time_width_c generate
     g0 : process(out_in.clk)
