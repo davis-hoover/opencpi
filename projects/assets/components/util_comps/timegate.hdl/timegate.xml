@@ -13,7 +13,8 @@
   <StreamInterface name='out'
                    datawidth='DATA_WIDTH'
                    inserteom='true'
-                   clockDirection='in'/>
+                   clockDirection='in'
+                   workerEOF="true"/>
   <TimeInterface name='time'
                  secondswidth='32'
                  fractionwidth='32'

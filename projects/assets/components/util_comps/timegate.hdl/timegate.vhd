@@ -66,8 +66,7 @@ architecture rtl of worker is
   -- status signals
   signal error_r               : bool_t;
   signal time_late_r           : bool_t;    -- timestamp arrived after its time
-  
-  signal clr_late_time_sticky           : bool_t;
+  signal clr_late_time_sticky  : bool_t;
   signal time_delta            : ulonglong_t;
 
 begin
@@ -101,8 +100,8 @@ begin
 
   -- output port outputs, just putting out data when appropriate
   som <= fifo_out_is_flush;
-  eom <= (fifo_out_is_eom and fifo_out_is_samples) or fifo_out_is_flush; -- propogate eom if samples message. This is done so that
-                                                                         -- the eom prior to flush happens at the correct time 
+  eom <= ((fifo_out_is_eom and fifo_out_is_samples) or fifo_out_is_flush) and fifo_empty_n; -- propogate eom if samples message. This is done so that
+                                                                                            -- the eom prior to flush happens at the correct time 
   valid <= to_bool(state_r = open_e and fifo_empty_n and not its(fifo_out_is_time) and
                    not its(fifo_out_is_eof) and not its(fifo_out_is_flush));
   give <= (som or eom or valid) and out_in.ready;
@@ -135,9 +134,13 @@ begin
       dst_DEQ     => fifo_deq,
       dst_out     => fifo_out,
       dst_EMPTY_N => fifo_empty_n);
-  
-  clr_late_time_sticky  <= props_in.clr_late_time_sticky_written and props_in.clr_late_time_sticky and ctl_in.is_operating;
 
+  
+  -- Handles making time_late sticky and clearing the sticky bit if 
+  -- props_in.clr_late_time_sticky is true
+  clr_late_time_sticky  <= props_in.clr_late_time_sticky_written and 
+                           props_in.clr_late_time_sticky and 
+                           ctl_in.is_operating;
   time_late : component cdc.cdc.fast_pulse_to_slow_sticky
   port map(
     fast_clk    => out_in.clk,
@@ -147,14 +150,32 @@ begin
     slow_rst    => ctl_in.reset,
     slow_sticky => props_out.late_time_sticky,
     slow_clr    => clr_late_time_sticky);
-          
+  
+  -- Handles setting time_late_r
+  time_late_reg : process (out_in.clk)
+  begin
+      if rising_edge(out_in.clk) then
+        if its(out_in.reset) then
+          time_late_r <= bfalse;
+        else
+          if its(time_late_r) then
+            time_late_r <= bfalse;
+          end if;
+          if state_r = time_waiting_e and time_now >= time_to_transmit_r then
+            if time_now > time_to_transmit_r then
+              time_late_r <= btrue;
+            end if;
+          end if;
+        end if;
+      end if;
+  end process time_late_reg;
+
   notchunked: -- simpler version when time is not chunked
   if in_in.data'length >= time_width_c generate
     g0 : process(out_in.clk)
     begin
       if rising_edge(out_in.clk) then 
         if its(out_in.reset) then
-          time_late_r <= bfalse;
           error_r     <= bfalse;
           state_r     <= open_e; -- gate is initially open
           time_delta  <= (others => '0');
@@ -168,11 +189,6 @@ begin
           elsif state_r = time_waiting_e and time_now >= time_to_transmit_r then
             state_r <= open_e;
             time_delta <= time_now - time_to_transmit_r;
-            if time_now > time_to_transmit_r then
-              time_late_r <= btrue;
-            else
-              time_late_r <= bfalse;
-            end if;
           elsif state_r = error_e then -- non-time opcode when waiting for time chunks
             error_r <= btrue;
           end if;
@@ -192,7 +208,6 @@ begin
     begin
       if rising_edge(out_in.clk) then 
         if its(out_in.reset) then
-          time_late_r <= bfalse;
           error_r     <= bfalse;
           state_r     <= open_e; -- gate is initially open
           time_delta  <= (others => '0');
@@ -216,11 +231,6 @@ begin
           elsif state_r = time_waiting_e and time_now >= time_to_transmit_r then
             state_r <= open_e;
             time_delta <= time_now - time_to_transmit_r;
-            if time_now > time_to_transmit_r then
-              time_late_r <= btrue;
-            else
-              time_late_r <= bfalse;
-            end if;
           elsif state_r = error_e then -- non-time opcode when waiting for time chunks
             error_r <= btrue;
           end if;
