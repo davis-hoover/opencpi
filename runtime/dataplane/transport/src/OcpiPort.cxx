@@ -133,7 +133,7 @@ void Port::initialize()
   // dependencies to fill in the missing data.
         
   if (getLocalEndPoint().resourceMgr().
-      alloc(sizeof(PortMetaData::BufferOffsets)*m_bufferCount, 0, &m_offsetsOffset ))
+      alloc(sizeof(PortMetaData::BufferOffsets)*m_bufferCount, 0, &m_offsetsOffset, true))
     throw OCPI::Util::EmbeddedException (XF::NO_MORE_SMB, getLocalEndPoint().name().c_str());
   ocpiDebug("**** Alloc Port %p for initialize local offsets shadow %u circuit %p: %u",
 	    this, m_shadow, c, m_offsetsOffset);
@@ -1483,6 +1483,7 @@ getNextFullInputBuffer(uint8_t *&data, size_t &length, uint8_t &opcode, bool &en
   InputBuffer* buf = 
     static_cast<InputBuffer*>(txc->getNextFullInputBuffer(this));
   if (buf) {
+    getEndPoint().doneWithInput((void*)buf->getBuffer(), buf->m_length);
     if (buf->isEOS())
       setEOS();
     if (buf && buf->getMetaData()->endOfCircuit)
@@ -1563,7 +1564,7 @@ inputAvailable( Buffer* input_buf )
 {
   // The CPU is done with this input buffer
   assert(!isShadow());
-  getEndPoint().doneWithInput((void*)input_buf->getBuffer(), input_buf->m_length);
+  //getEndPoint().doneWithInput((void*)input_buf->getBuffer(), input_buf->m_length);
   Circuit *c = getCircuit();
   OU::SelfAutoMutex guard(c); // FIXME: refactor to make this a circuit method
   int rtn=1;

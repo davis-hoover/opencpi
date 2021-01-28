@@ -81,6 +81,7 @@ namespace OCPI {
     private:
       void
       initDma(uint16_t maxCount) {
+	ocpiDebug("PAGE SIZE IS %u", getpagesize());
 	if ((m_dmaCachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR)) >= 0) {
 	  if ((m_dmaUncachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR | O_SYNC)) < 0)
 	    throw OU::Error("cannot open " OCPI_DRIVER_MEM "for DMA uncached");
@@ -99,7 +100,7 @@ namespace OCPI {
 	  if (sscanf(l_dma, "%uM$0x%" SCNx64, &sizeM, &m_dmaBase) != 2)
 	    throw OU::Error("Bad format for OCPI_DMA_MEMORY environment variable: '%s'",
 			    l_dma);
-	  ocpiDebug("DMA Memory:  %uM at 0x%" PRIx64, sizeM, m_dmaBase);
+	  ocpiInfo("DMA Memory:  %uM at 0x%" PRIx64, sizeM, m_dmaBase);
 	  unsigned dmaSize = sizeM * 1024 * 1024;
 	  top = m_dmaBase + dmaSize;
 	  if (m_dmaBase & (pagesize-1)) {

@@ -986,7 +986,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	log_err("unable to retrieve memory request\n");
 	return -EFAULT;
       }
-      // dma_sync_single_for_device(dev, request.address, request.size, DMA_TO_DEVICE);
+      dma_sync_single_for_device(dev, request.address, request.size, DMA_TO_DEVICE);
       return 0;
     }
   default:
