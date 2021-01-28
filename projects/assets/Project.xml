@@ -1,0 +1,7 @@
+
+<project
+  PackageName='assets'
+  PackagePrefix='ocpi'
+  ComponentLibraries='util_comps base_comps misc_comps dsp_comps comms_comps devices'
+  ProjectDependencies='ocpi.platform'
+/>

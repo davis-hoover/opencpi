@@ -1,0 +1,5 @@
+<project
+  PackageName='assets_ts'
+  PackagePrefix='ocpi'
+  ProjectDependencies='ocpi.assets'
+/>

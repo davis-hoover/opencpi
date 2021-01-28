@@ -1,0 +1,6 @@
+<project
+  PackageName='tutorial'
+  PackagePrefix='ocpi'
+  ProjectDependencies='ocpi.assets ocpi.platform'
+  ComponentLibraries='util_comps'
+/>
