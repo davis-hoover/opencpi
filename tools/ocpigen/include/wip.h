@@ -266,7 +266,7 @@ class RawPropPort : public Port {
 	      const char *&err) const;
   inline const char *prefix() const { return "rawprop"; }
   inline const char *typeName() const { return "RawProperty"; }
-  bool needsControlClock() const { return true; }
+  bool needsControlClock() const { return false; }
   void emitRecordTypes(FILE *f);
   void emitRecordInterface(FILE *f, const char *implName);
   void emitConnectionSignal(FILE *f, bool output, Language lang, bool clock, std::string &signal);
