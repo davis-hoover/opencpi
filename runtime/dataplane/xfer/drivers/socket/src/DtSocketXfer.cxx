@@ -44,7 +44,7 @@ struct DataHeader {
   uint32_t   length;
   uint32_t   count;
 };
-const size_t TCP_BUFSIZE = 4096;
+const size_t TCP_BUFSIZE = 16*1024;
 
 class XferFactory;
 class EndPoint: public XF::EndPoint {
