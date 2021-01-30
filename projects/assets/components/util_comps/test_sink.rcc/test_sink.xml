@@ -1,0 +1,5 @@
+<RccWorker language='c++' spec='test_sink-spec' version='2'>
+  <property name='suppressReads' type='bool' initial='true'/>
+  <property name='bytesPerSecond' type='ulonglong' volatile='true'/>
+  <port name='in' workereof='1'/>
+</RccWorker>

@@ -90,7 +90,7 @@ type s2m_t is record
   dropCount : uchar_t;
 end record s2m_t;
 type s2m_array_t is array(natural range <>) of s2m_t;
-
+type data_array_t is array(natural range <>, natural range<>) of dword_t;
 function dword2header(dw : dword_t) return header_t;
 function payload_in_dws(hdr : header_t) return unsigned;
 function payload_in_dws(dw : dword_t) return unsigned;
