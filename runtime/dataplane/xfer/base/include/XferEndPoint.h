@@ -195,6 +195,38 @@ public:
   int free(OCPI::Util::ResAddrType addr, size_t nbytes);
 };
 
+namespace FlagMeta {
+  const unsigned
+    lengthBits = 21, // 2Mbytes - 1 MUST BE IN SYNC WITH HDL: sdp_pkg.vhd
+    opCodeBits = 8,
+    oneBit = 0,
+    lengthBit = oneBit + 1,
+    eofBit = lengthBit + lengthBits,
+    truncBit = eofBit + 1,
+    opCodeBit = truncBit + 1;
+  // This packing is simply to make it easier to read the values in hex dumps
+  // MUST BE IN SYNC WITH HDL sdp_pkg.vhd
+  const uint32_t maxXferLength = (1 << lengthBits) - 1;
+  inline uint32_t packFlag(size_t length, uint8_t opcode, bool eof) {
+    assert(length <= maxXferLength);
+    return (uint32_t)
+      ((1 << oneBit) |
+       ((length & ~(UINT32_MAX << lengthBits)) << lengthBit) |
+       ((eof ? 1u : 0) << eofBit) |          // EOF independent of length, above length
+       (((uint32_t)opcode & ~(UINT32_MAX << opCodeBits)) << opCodeBit));
+  }
+  inline void unpackFlag(uint32_t md, size_t &length, uint8_t &opcode, bool &eof,
+				 bool &truncate) {
+    assert(md & (1 << oneBit));
+    length = (md >> lengthBit) & ~(UINT32_MAX << lengthBits);
+    eof = md & (1 << eofBit) ? true : false;
+    truncate = md & (1 << truncBit) ? true : false;
+    opcode = (uint8_t)((md >> opCodeBit) & ~(UINT32_MAX << opCodeBits));
+  }
+  inline size_t getLengthInFlag(uint32_t flag) {
+    return (flag >> lengthBit) & ~(UINT32_MAX << lengthBits);
+  }
+}
 }
 
 #endif

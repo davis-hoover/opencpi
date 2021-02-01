@@ -24,7 +24,7 @@ namespace OCPI {
   namespace OS {
     // This is defined in POSIX 1003..1g for those datagram systems that can
     // take advantage of that.
-    struct IOVec {
+    struct IOVec { // this will be cast directly so it matches the exact spec.
       void *iov_base;
       size_t iov_len;
     };

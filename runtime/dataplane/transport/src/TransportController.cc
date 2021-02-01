@@ -96,7 +96,7 @@ init() {
            s_port.getShadowShemServices()->endPoint().name().c_str(),
            s_port.getLocalShemServices()->endPoint().name().c_str() );
     createOutputTransfers(s_port);
-    createOutputBroadcastTemplates(s_port);
+    //    createOutputBroadcastTemplates(s_port);
     generated = true;
   }
 
@@ -111,7 +111,7 @@ init() {
     if (!m_input.getCircuit()->getTransport().isLocalEndpoint(t_port.getRealShemServices()->endPoint()))
       break;
     createInputTransfers(t_port);
-    createInputBroadcastTemplates(t_port);
+    //createInputBroadcastTemplates(t_port);
     generated = true;
   }
   ocpiAssert(generated);

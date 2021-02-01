@@ -64,11 +64,11 @@ namespace OCPI {
       bool      m_usingKernelDriver;
       uint64_t  m_dmaBase;
       unsigned  m_maxMBox, m_perMBox;
-      bool      m_disableCache;
+      bool      m_disableCacheSync; // do not do anything at cache sync points
     public:
       XferFactory()
 	: m_dmaCachedFd(-1), m_dmaUncachedFd(-1), m_usingKernelDriver(false), m_dmaBase(UINT64_MAX),
-	  m_maxMBox(0), m_disableCache(false)
+	  m_maxMBox(0), m_disableCacheSync(false)
       {}
 
       virtual
@@ -82,11 +82,18 @@ namespace OCPI {
     private:
       void
       initDma(uint16_t maxCount) {
-	const char *env = getenv("OCPI_DISABLE_DMA_CACHE");
-	m_disableCache = env && env[0] == '1';
+	// 0 or not set is uncached
+	// 1 is managed cache
+	// 2 is coherent cache
+	const char *env = getenv("OCPI_DMA_CACHE_MODE");
+	if (!env)
+	  env = "0";
+	m_disableCacheSync = env[0] != '1';
 	ocpiDebug("PAGE SIZE IS %u", getpagesize());
-	if ((m_dmaCachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR)) >= 0) {
-	  if ((m_dmaUncachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR | O_SYNC)) < 0)
+	// Cached fd is forced to uncached in mode 0
+	if ((m_dmaCachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR | (env[0] == '0' ? O_SYNC : 0))) >= 0) {
+	  // Uncached fd is forced to cached in mode 2
+	  if ((m_dmaUncachedFd = ::open(OCPI_DRIVER_MEM, O_RDWR | (env[0] == '2' ? 0 : O_SYNC))) < 0)
 	    throw OU::Error("cannot open " OCPI_DRIVER_MEM "for DMA uncached");
 	  m_usingKernelDriver = true;
 	} else if ((m_dmaCachedFd = ::open("/dev/mem", O_RDWR)) < 0)
@@ -134,14 +141,14 @@ namespace OCPI {
       createXferServices(XF::EndPoint &source, XF::EndPoint &target);
 
       void doneWithInput(uint64_t busAddr, unsigned length) {
-	if (m_disableCache)
+	if (m_disableCacheSync)
 	  return;
 	ocpi_cache_t request = { busAddr, length };
 	if (ioctl(m_dmaCachedFd, OCPI_CMD_INVALIDATE, &request))
 	  throw OU::Error("Error on OpenCPI IOCTL: invalidate: %u", errno);
       }
       void doneWithOutput(uint64_t busAddr, unsigned length) {
-	if (m_disableCache)
+	if (m_disableCacheSync)
 	  return;
 	ocpi_cache_t request = { busAddr, length };
 	if (ioctl(m_dmaCachedFd, OCPI_CMD_FLUSH, &request))

@@ -670,11 +670,16 @@ void InstancePort::
 createConnectionSignals(FILE *f, Language lang) {
   // Find out the widest of all ports related to this instance port
   size_t maxCount = 0;
+  bool otherIsArray = false;
   for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
     Connection &c = (*ai)->m_connection;
     for (AttachmentsIter cai = c.m_attachments.begin(); cai != c.m_attachments.end(); cai++)
-      if (&(*cai)->m_instPort != this && (*cai)->m_instPort.m_port->count() > maxCount)
-	maxCount = (*cai)->m_instPort.m_port->count();
+      if (&(*cai)->m_instPort != this) {
+	if ((*cai)->m_instPort.m_port->count() > maxCount)
+	  maxCount = (*cai)->m_instPort.m_port->count();
+	if ((*cai)->m_instPort.m_port->isArray())
+	  otherIsArray = true;
+      }
   }
   // Output side: generate signal except when external or connected only to external
   // Or when connected to a wider one
@@ -682,7 +687,7 @@ createConnectionSignals(FILE *f, Language lang) {
       !(m_attachments.size() == 1 &&
 	m_attachments.front()->m_connection.m_attachments.size() == 2 &&
 	m_attachments.front()->m_connection.m_external) &&
-      maxCount <= m_port->count() &&
+      maxCount <= m_port->count() && (m_port->isArray() || !otherIsArray) &&
       (m_port->m_type != TimePort || m_port->m_master)) {
     emitConnectionSignal(f, true, lang);
     // All connections should use this as their signal
@@ -696,8 +701,8 @@ createConnectionSignals(FILE *f, Language lang) {
 
   // Input side: rare - generate signal when it aggregates members from others,
   // Like a WCI slave port array
-  if (m_port->m_arrayCount &&
-      ((maxCount && maxCount < m_port->count()) || m_attachments.size() > 1)) {
+  if (m_port->isArray() &&
+      ((maxCount && maxCount < m_port->count()) || !otherIsArray || m_attachments.size() > 1)) {
     emitConnectionSignal(f, false, lang);
     for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
       Connection &c = (*ai)->m_connection;
