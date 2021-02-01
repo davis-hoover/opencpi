@@ -13,9 +13,10 @@
     <property name='frequency' value='100e6'/>
   </device>
   <specproperty name='sdp_width' value='2'/>
-  <sdp name="zynq" master='true' count='4'/>
+  <property name='sdpChannels' parameter='true' value='4'/>
+  <sdp name="zynq" master='true' count='sdpChannels'/>
   <property name='useGP1' type='bool' parameter='1' default='false'/>
-  <property name="axi_error" type="bool" arraylength='4' volatile='true'/>
+  <property name="axi_error" type="bool" arraylength='sdpChannels' volatile='true'/>
   <property name="sdpDropCount" type='uchar' volatile='true'/>
   <!-- The Zed FMC LPC slot.
        Unconnected LPC signals are:

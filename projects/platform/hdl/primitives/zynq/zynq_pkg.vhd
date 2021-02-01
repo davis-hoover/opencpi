@@ -21,7 +21,7 @@
 -- THe processor interface just has I/O ports that OpenCPI uses.
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
-library axi;
+library axi, platform, sdp, ocpi; use ocpi.types.all;
 package zynq_pkg is
 
 constant C_M_AXI_GP_COUNT : natural := 2;
@@ -36,14 +36,37 @@ type pl2ps_t is record
 end record pl2ps_t;
 
 component zynq_ps is
-  generic (package_name : string  := "clg484";
-           dq_width     : natural := 32);
-  port    (ps_in        : in  pl2ps_t;
-           ps_out       : out ps2pl_t;
-           m_axi_gp_in  : in  axi.zynq_7000_m_gp.axi_s2m_array_t(0 to C_M_AXI_GP_COUNT-1);
-           m_axi_gp_out : out axi.zynq_7000_m_gp.axi_m2s_array_t(0 to C_M_AXI_GP_COUNT-1);
-           s_axi_hp_in  : in  axi.zynq_7000_s_hp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1);
-           s_axi_hp_out : out axi.zynq_7000_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1));
+  generic (package_name  : string  := "clg484";
+           dq_width      : natural := 32);
+  port    (ps_in         : in  pl2ps_t;
+           ps_out        : out ps2pl_t;
+           m_axi_gp_in   : in  axi.zynq_7000_m_gp.axi_s2m_array_t(0 to C_M_AXI_GP_COUNT-1);
+           m_axi_gp_out  : out axi.zynq_7000_m_gp.axi_m2s_array_t(0 to C_M_AXI_GP_COUNT-1);
+           s_axi_hp_in   : in  axi.zynq_7000_s_hp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1);
+           s_axi_hp_out  : out axi.zynq_7000_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1);
+           s_axi_acp_in  : in  axi.zynq_7000_s_hp.axi_m2s_t;
+           s_axi_acp_out : out axi.zynq_7000_s_hp.axi_s2m_t);
 end component zynq_ps;
+
+component zynq_sdp is
+  generic (package_name : string  := "clg484";
+           dq_width     : natural := 32;
+           sdp_width    : natural := 2;
+           sdp_count    : natural := 4;
+           use_acp      : boolean := false;
+           which_gp     : natural := 0);
+  port    (clk          : out std_logic;
+           reset        : out std_logic;
+           cp_in        : in platform.platform_pkg.occp_out_t;
+           cp_out       : out platform.platform_pkg.occp_in_t;
+           sdp_in       : in sdp.sdp.s2m_array_t(0 to sdp_count-1);
+           sdp_in_data  : in sdp.sdp.data_array_t(0 to sdp_count-1, 0 to sdp_width-1);
+           sdp_out      : out sdp.sdp.m2s_array_t(0 to sdp_count-1);
+           sdp_out_data : out sdp.sdp.data_array_t(0 to sdp_count-1, 0 to sdp_width-1);
+           axi_error    : out bool_array_t(0 to sdp_count-1);
+           dbg_state    : out ulonglong_array_t(0 to sdp_count-1);
+           dbg_state1   : out ulonglong_array_t(0 to sdp_count-1);
+           dbg_state2   : out ulonglong_array_t(0 to sdp_count-1));
+end component zynq_sdp;
 
 end package zynq_pkg;
