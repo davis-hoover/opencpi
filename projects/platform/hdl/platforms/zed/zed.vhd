@@ -25,16 +25,16 @@ library unisim; use unisim.vcomponents.all;
 library ocpi_core_bsv; use ocpi_core_bsv.all;
 
 architecture rtl of worker is
-  signal clk              : std_logic;
-  signal reset            : std_logic; -- our positive reset
-  signal count            : unsigned(25 downto 0);
-  constant sdp_width_c    : natural := to_integer(sdp_width);
-  constant sdp_count_c    : natural := work.zed_constants.ocpi_port_zynq_count;
-  signal sdp_in_data      : sdp.sdp.data_array_t(0 to sdp_count_c-1, 0 to sdp_width_c-1);
-  signal sdp_out_data     : sdp.sdp.data_array_t(0 to sdp_count_c-1, 0 to sdp_width_c-1);
-  signal dbg_state        : ulonglong_array_t(0 to sdp_count_c-1);
-  signal dbg_state1       : ulonglong_array_t(0 to sdp_count_c-1);
-  signal dbg_state2       : ulonglong_array_t(0 to sdp_count_c-1);
+  constant sdp_width_c : natural := to_integer(sdp_width);
+  constant sdp_count_c : natural := work.zed_constants.ocpi_port_zynq_count;
+  signal clk           : std_logic;
+  signal reset         : std_logic; -- our positive reset
+  signal count         : unsigned(25 downto 0);
+  signal sdp_in_data   : sdp.sdp.data_array_t(0 to sdp_count_c-1, 0 to sdp_width_c-1);
+  signal sdp_out_data  : sdp.sdp.data_array_t(0 to sdp_count_c-1, 0 to sdp_width_c-1);
+  signal dbg_state     : ulonglong_array_t(0 to sdp_count_c-1);
+  signal dbg_state1    : ulonglong_array_t(0 to sdp_count_c-1);
+  signal dbg_state2    : ulonglong_array_t(0 to sdp_count_c-1);
 begin
   -- Drive metadata interface - boiler plate
   metadata_out.clk     <= clk;
@@ -53,9 +53,9 @@ begin
      end generate;
   -- Instantiate the processor system and the converters to control plane and sdp
   ps : zynq_sdp
-    generic map(sdp_width => to_integer(sdp_width),
-                sdp_count => work.zed_constants.ocpi_port_zynq_count,
-                use_acp => false,
+    generic map(sdp_width => sdp_width_c,
+                sdp_count => sdp_count_c,
+                use_acp   => its(use_acp),
                 which_gp => to_integer(unsigned(from_bool(useGp1))))
     port map(clk => clk,
              reset => reset,

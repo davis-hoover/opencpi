@@ -27,8 +27,7 @@ library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
 library zynq; use zynq.zynq_pkg.all;
 library unisim; use unisim.vcomponents.all;
-library ocpi_core_bsv; use ocpi_core_bsv.all;
-library platform, sdp, axi;
+library platform, sdp, axi, cdc;
 
 entity zynq_sdp is
   generic (package_name : string  := "clg484";
@@ -95,11 +94,11 @@ begin
   clk <= clk_out;
   -- The FCLKRESET signals from the PS are documented as asynchronous with the
   -- associated FCLK for whatever reason.  Here we make a synchronized reset from it.
-  sr : bsv_pkg.SyncResetA
-    generic map(RSTDELAY => 17)
-    port map   (IN_RST  => raw_rst_n,
-                CLK     => fclk(0),
-                OUT_RST => rst_n);
+  sr : cdc.cdc.SyncResetA
+    generic map(RST_DELAY => 17)
+    port map   (src_rst   => raw_rst_n,
+                dst_clk   => fclk(0),
+                dst_rst   => rst_n);
   reset_out <= not rst_n;
 
   -- Adapt the axi master from the PS to be a CP Master
