@@ -35,6 +35,7 @@ entity zynq_sdp is
            sdp_width    : natural := 2;
            sdp_count    : natural := 4;
            use_acp      : boolean := false;
+           which_fclk   : natural := 0;
            which_gp     : natural := 0);
   port    (clk          : out std_logic;
            reset        : out std_logic;
@@ -89,15 +90,15 @@ begin
       s_axi_acp_out         => ps_s_axi_acp_out);
 
   -- Use a global clock buffer for this clock used for both control and data
-  clkbuf   : BUFG   port map(I => fclk(0),
+  clkbuf   : BUFG   port map(I => fclk(which_fclk),
                              O => clk_out);
   clk <= clk_out;
   -- The FCLKRESET signals from the PS are documented as asynchronous with the
   -- associated FCLK for whatever reason.  Here we make a synchronized reset from it.
-  sr : cdc.cdc.SyncResetA
+  sr : cdc.cdc.reset
     generic map(RST_DELAY => 17)
     port map   (src_rst   => raw_rst_n,
-                dst_clk   => fclk(0),
+                dst_clk   => fclk(which_fclk),
                 dst_rst   => rst_n);
   reset_out <= not rst_n;
 

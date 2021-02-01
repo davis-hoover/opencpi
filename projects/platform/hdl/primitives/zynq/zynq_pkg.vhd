@@ -54,6 +54,7 @@ component zynq_sdp is
            sdp_width    : natural := 2;
            sdp_count    : natural := 4;
            use_acp      : boolean := false;
+           which_fclk   : natural := 0;
            which_gp     : natural := 0);
   port    (clk          : out std_logic;
            reset        : out std_logic;
