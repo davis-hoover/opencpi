@@ -59,7 +59,7 @@ architecture rtl of out_port_cswm_samples_and_sync is
 
 begin
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
-    opcode <=  protocol.complex_short_with_metadata.SYNC      when (sync_ready_r = '1' and give = '1' and suppress_sync_op = '0')     else
+    opcode <=  protocol.complex_short_with_metadata.SYNC      when (sync_ready_r = '1' and suppress_sync_op = '0')     else
                protocol.complex_short_with_metadata.SAMPLES;
 
     som       <= sync_ready_r;

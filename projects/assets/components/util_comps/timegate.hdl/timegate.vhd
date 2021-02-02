@@ -99,9 +99,10 @@ begin
                                   (state_r = open_e or fifo_out_is_time));
 
   -- output port outputs, just putting out data when appropriate
-  som <= fifo_out_is_flush;
-  eom <= ((fifo_out_is_eom and fifo_out_is_samples) or fifo_out_is_flush) and fifo_empty_n; -- propogate eom if samples message. This is done so that
-                                                                                            -- the eom prior to flush happens at the correct time 
+  som <= fifo_out_is_flush and fifo_empty_n;
+  eom <= ((fifo_out_is_eom and fifo_out_is_samples) or fifo_out_is_flush) and fifo_empty_n; -- Propogate eom if samples message. This is done so that
+                                                                                            -- the eom prior to flush happens at the correct time. Also
+                                                                                            -- drive eom if flush occurs 
   valid <= to_bool(state_r = open_e and fifo_empty_n and not its(fifo_out_is_time) and
                    not its(fifo_out_is_eof) and not its(fifo_out_is_flush));
   give <= (som or eom or valid) and out_in.ready;
@@ -112,7 +113,7 @@ begin
   out_out.eof    <= fifo_out_is_eof and fifo_empty_n;
   out_out.valid  <= valid;
   out_out.give   <= give;
-  out_out.opcode <= ComplexShortWithMetadata_flush_op_e when (its(fifo_out_is_flush) and its(give))  else
+  out_out.opcode <= ComplexShortWithMetadata_flush_op_e when (its(fifo_out_is_flush))  else
                     ComplexShortWithMetadata_samples_op_e;
   
   ctl_out.attention <= error_r;

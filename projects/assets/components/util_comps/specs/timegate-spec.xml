@@ -31,8 +31,8 @@
   <Property name='actual_time_to_requested_time_delta' 
             type="uLongLong"  
             Volatile='true' 
-            description='Delta between the actual time transmitted to the 
-            requested timestamp (corrected).'/>
+            description='Delta between the actual time transmitted (when the gate opens 
+            to allow samples through) to the requested timestamp (corrected).'/>
 
   <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>
   <Port name='out' producer='true' protocol='ComplexShortWithMetadata-prot'/>
