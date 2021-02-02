@@ -243,7 +243,7 @@ send(IOVec *iov, unsigned iovcnt) throw (std::string) {
   ssize_t n2send = 0;
   for (unsigned n = 0; n < iovcnt; ++n)
     n2send += iov[n].iov_len;
-  size_t sent; // unsigned
+  size_t sent; // unsigned.  needed outside for loop since it is updated in iteration clause...
   for (ssize_t nsent;
        (nsent = ::writev(o2fd(m_osOpaque), (struct iovec*)iov, (int)iovcnt)) != n2send; n2send -= sent) {
     if (nsent == 0)

@@ -216,13 +216,15 @@ static struct hlist_head opencpi_sklist[ocpi_role_limit];
 static DEFINE_RWLOCK(opencpi_sklist_lock);
 #endif
 
-// FIXME: this exact version is not verified.  RHEL7 is 3.10 and it s necessary there
+// FIXME: this exact version is not verified.  RHEL7 is 3.10 and it is "previous API" there
+// So we know the dma_attrs are in kernels > 3.19, but more work is necessary to find
+// the exact version where the dma API changed.
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
 static unsigned long dma_attrs =
       DMA_ATTR_WRITE_BARRIER |     // really only for flag region, but we can start here
       DMA_ATTR_WEAK_ORDERING |     // our flags are atomic
       // DMA_ATTR_WRITE_COMBINE |     // our flags are atomic
-      DMA_ATTR_NON_CONSISTENT    | // we need to allow for this to be configurable...
+      // DMA_ATTR_NON_CONSISTENT    | // we need to allow for this to be configurable...
       //      DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space
       // DMA_ATTR_SKIP_CPU_SYNC |     // for multiple device consumers and producers
       DMA_ATTR_FORCE_CONTIGUOUS |  // we don't have sg dma

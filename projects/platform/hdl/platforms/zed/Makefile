@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # The zed platform.
-Libraries=axi zynq sdp
+Libraries=zynq sdp
 ParamValues_useGP1=0/1
 Configurations=\
   base \
