@@ -160,7 +160,7 @@ typedef struct {
   pid_t                 pid;            // for debug: allocating pid
   u64                   kernel_alloc_id;// id of original kernel allocation (before any splits)
   u32			kernel_size;    // size of original size allocation (before any splits)
-  unsigned              minor;          // minor of device of block, for dmam_free_coherent
+  unsigned              minor;          // minor of device of block, for dma_free_attrs
 } ocpi_block_t;
 
 // Our per-device structure - initialized to zero
@@ -215,6 +215,30 @@ static bool opencpi_packet_type_registered  = false; // we have registered our n
 static struct hlist_head opencpi_sklist[ocpi_role_limit];
 static DEFINE_RWLOCK(opencpi_sklist_lock);
 #endif
+
+// FIXME: this exact version is not verified.  RHEL7 is 3.10 and it s necessary there
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
+static unsigned long dma_attrs =
+      DMA_ATTR_WRITE_BARRIER |     // really only for flag region, but we can start here
+      DMA_ATTR_WEAK_ORDERING |     // our flags are atomic
+      // DMA_ATTR_WRITE_COMBINE |     // our flags are atomic
+      DMA_ATTR_NON_CONSISTENT    | // we need to allow for this to be configurable...
+      //      DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space
+      // DMA_ATTR_SKIP_CPU_SYNC |     // for multiple device consumers and producers
+      DMA_ATTR_FORCE_CONTIGUOUS |  // we don't have sg dma
+      0;
+#else
+// It is clear why they got rid of this silly interface in later kernels
+static struct dma_attrs dma_attrs[1];
+static void init_dma(void) {
+  init_dma_attrs(dma_attrs);
+  dma_set_attr(DMA_ATTR_WRITE_BARRIER, dma_attrs);
+  dma_set_attr(DMA_ATTR_WEAK_ORDERING, dma_attrs);
+  dma_set_attr(DMA_ATTR_NON_CONSISTENT, dma_attrs);
+  dma_set_attr(DMA_ATTR_FORCE_CONTIGUOUS, dma_attrs);
+}
+#endif
+static enum dma_data_direction dma_direction = DMA_BIDIRECTIONAL;
 
 // -----------------------------------------------------------------------------------------------
 // Helper functions
@@ -305,8 +329,8 @@ free_dma_block(ocpi_block_t *block) {
     log_debug_block(block, "failed to free dma block - not merged");
     log_err("failed to free unmerged dma block %px - it is leaked\n", block);
   } else
-    dmam_free_coherent(opencpi_devices[block->minor]->fsdev, block->size, block->virt_addr,
-		       block->bus_addr);
+    dma_free_attrs(opencpi_devices[block->minor]->fsdev, block->size, block->virt_addr,
+		   (dma_addr_t)block->bus_addr, dma_attrs);
 }
 // This method will scan the list of memory blocks and merge any adjacent free blocks into a
 // single free block. And if a kernel block is completely coalesced, it will be freed
@@ -518,14 +542,14 @@ establish_remote(struct file *file, ocpi_request_t *request) {
   return make_block(phys, request->bus_addr, request->actual, ocpi_mmio, false, 0, NULL, minor) ?
     0 : -EINVAL;
 }
-
 // makes allocation using DMA API, makes block, and adds block to list
 // returns 0 if successful
 // this actually makes an allocation, not just massaging metadata
 static long
 get_dma_memory(ocpi_request_t *request, unsigned minor) {
   void *virtual_addr;
-  dma_addr_t dma_handle;
+  dma_addr_t dma_handle_alloc, dma_handle_map;
+  struct device *dev = opencpi_devices[minor]->fsdev;
   long err = -ENOMEM;
   // don't need to do a page alignment, so actual can be the same as needed
   // either it PAGE_ALIGN was already called to set request->actual or this is
@@ -536,26 +560,37 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
 	    (unsigned long)request->actual);
   // dma_set_coherent_mask sets a bit mask describing which bits of an address the device
   // supports, default is 32
-  if (dma_set_coherent_mask(opencpi_devices[minor]->fsdev, DMA_BIT_MASK(32)))
-    log_debug("dma_set_coherent_mask failed for device %px\n", opencpi_devices[minor]->fsdev);
-  if ((virtual_addr = dmam_alloc_coherent(opencpi_devices[minor]->fsdev, request->actual,
-					  &dma_handle, GFP_KERNEL)) == NULL) {
-    log_err("dmam_alloc_coherent failed\n");
+  // dma_set_mask doesn't work at all on ARM anyway, in 4.19. dma_mask ptr not initialized
+  // there is dma_coerce_mask_and_coherent too...
+  if (dma_set_coherent_mask(dev, DMA_BIT_MASK(32))) {
+    log_err("dma_set_coherent_mask failed for device %px\n", dev);
     return err;
   }
-  request->bus_addr = (ocpi_address_t) dma_handle;
+  if ((virtual_addr = dma_alloc_attrs(dev, request->actual, &dma_handle_alloc, GFP_KERNEL,
+				      dma_attrs)) == NULL) {
+    log_err("dma_alloc_attrs failed\n");
+    return err;
+  }
+  log_debug("dma_alloc_attrs: %zu %zu %llx map %lx\n", sizeof(dma_handle_alloc),
+	    sizeof(virtual_addr), (unsigned long long)dma_handle_alloc, (unsigned long)virtual_addr);
+  dma_handle_map = dma_map_single(dev, virtual_addr, request->actual, dma_direction);
+  if (dma_mapping_error(dev, dma_handle_map)) {
+    dma_free_attrs(dev, request->actual, virtual_addr, request->bus_addr, dma_attrs);
+    log_err("dma_map_single failed\n");
+    return err;
+  }
+  request->bus_addr = (ocpi_address_t) dma_handle_map;
   request->address = bus2phys(request->bus_addr);
   if (make_block(request->address, request->bus_addr, request->actual,  ocpi_dma,
 		 true, ++opencpi_kernel_alloc_id, virtual_addr, minor) == NULL) {
-    dmam_free_coherent(opencpi_devices[minor]->fsdev, request->actual, virtual_addr,
-		       request->bus_addr);
+    dma_unmap_single(dev, dma_handle_map, request->actual, dma_direction);
+    dma_free_attrs(dev, request->actual, virtual_addr, request->bus_addr, dma_attrs);
     return err;
   }
   log_debug("requested (%lx) reserved %lx @ %016llx bus %016llx\n", (unsigned long)request->needed,
 	    (unsigned long)request->actual, (unsigned long long)request->address,
 	    (unsigned long long)request->bus_addr);
-  err = 0;
-  return err;
+  return 0;
 }
 
 // Try to make a kernel allocation in a block
@@ -814,6 +849,7 @@ int
 opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg) {
   unsigned minor = iminor(inode);
 #endif
+  struct device *dev = opencpi_devices[minor]->fsdev;
   int err;
   switch (cmd) {
   case OCPI_CMD_PCI:
@@ -902,7 +938,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
 		err = -ENOMEM;
     #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
-		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {
+		if ((info = fpga_image_info_alloc(dev))) {
 		  info->buf = buf;
 		  info->count = request.length;
 		  log_debug("locking fpga\n");
@@ -933,6 +969,26 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
       return err;
     }
 #endif
+  case OCPI_CMD_INVALIDATE: // use the fpga manager to load a whole (not partial) bitstream
+    {
+      ocpi_cache_t request;
+      if (copy_from_user(&request, (void __user *)arg, sizeof(request))) {
+	log_err("unable to retrieve memory request\n");
+	return -EFAULT;
+      }
+      dma_sync_single_for_cpu(dev, request.address, request.size, DMA_FROM_DEVICE);
+      return 0;
+    }
+  case OCPI_CMD_FLUSH: // use the fpga manager to load a whole (not partial) bitstream
+    {
+      ocpi_cache_t request;
+      if (copy_from_user(&request, (void __user *)arg, sizeof(request))) {
+	log_err("unable to retrieve memory request\n");
+	return -EFAULT;
+      }
+      dma_sync_single_for_device(dev, request.address, request.size, DMA_TO_DEVICE);
+      return 0;
+    }
   default:
     log_err("ioctl invalid command (%08x)\n", cmd);
     return -EINVAL;
@@ -968,9 +1024,9 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
   ocpi_block_t *block = NULL;
   unsigned long pfn = vma->vm_pgoff;
 
-  log_debug("mmap minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx)\n",
+  log_debug("mmap minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx) flags 0x%x\n",
 	    minor, file, mydev, (unsigned long)size, vma->vm_start,
-	    start_address, end_address);
+	    start_address, end_address, file->f_flags);
   if (minor == 0) {
     bool found = false;
     // Since this is outer loop, a linear search is ok.  Maybe a hash table someday.
@@ -1006,7 +1062,8 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
     vma->vm_ops = &opencpi_vm_ops;
     vma->vm_private_data = block;
     // Check for uncached blocks
-    if (!block->isCached)
+    // if (!block->isCached) // this is now determined by the FD used.
+    if (file->f_flags & (O_SYNC|O_DSYNC))
       vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
     vma->vm_flags |= VM_RESERVED;
     if (block->type == ocpi_mmio) {
@@ -1946,6 +2003,9 @@ opencpi_init(void) {
       break;
     }
     opencpi_notifier_registered = true;
+#endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+    init_dma();
 #endif
     log_debug("driver loaded on device (%d,%d)\n", MAJOR(opencpi_device_number), MINOR(opencpi_device_number));
     return 0;

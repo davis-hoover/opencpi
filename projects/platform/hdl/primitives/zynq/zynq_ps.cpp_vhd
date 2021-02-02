@@ -17,7 +17,7 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------
--- This core (which is actruall currently an HDL primitive library) is our wrapper
+-- This core (which is actually currently an HDL primitive library) is our wrapper
 -- around the processing_system7_0 IP as found in two different places, depending
 -- on whether we are using ISE/XST or Vivado.
 -- For ISE/SST:
@@ -43,11 +43,14 @@ entity zynq_ps is
            m_axi_gp_in  : in  axi.zynq_7000_m_gp.axi_s2m_array_t(0 to C_M_AXI_GP_COUNT-1);
            m_axi_gp_out : out axi.zynq_7000_m_gp.axi_m2s_array_t(0 to C_M_AXI_GP_COUNT-1);
            s_axi_hp_in  : in  axi.zynq_7000_s_hp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1);
-           s_axi_hp_out : out axi.zynq_7000_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1));
+           s_axi_hp_out : out axi.zynq_7000_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1);
+           s_axi_acp_in  : in  axi.zynq_7000_s_hp.axi_m2s_t;
+           s_axi_acp_out : out axi.zynq_7000_s_hp.axi_s2m_t);
 end entity zynq_ps;
 
 architecture rtl of zynq_ps is
   constant C_AXI_ADDR_WIDTH : natural := 32;
+  constant C_S_AXI_ACP_ID_WIDTH : natural := 3;
   -- We need this unfortunate redundant component declaration for two reasons:
   -- 1. Vivado claims that you must have a component declaration to instance verilog from vhdl
   -- 2. This relieves any ordering dependency between the verilog module and this file.
@@ -879,7 +882,19 @@ architecture rtl of zynq_ps is
 #endif
       );
   end component;
+  -- deal with ACP ID widths being less than HP ID widths
+  -- intermediate outputs from processors
+  signal
+    s_axi_acp_in_AR_ID_int, s_axi_acp_in_AW_ID_int, s_axi_acp_in_W_ID_int,
+    s_axi_acp_out_B_ID_int, s_axi_acp_out_R_ID_int : std_logic_vector(C_S_AXI_ACP_ID_WIDTH-1 downto 0);
 begin
+  -- for now we assume 2 nodes and 4 buffers
+  s_axi_acp_in_AR_ID_int <= s_axi_acp_in.AR.ID(3 downto 3) & s_axi_acp_in.AR.ID(1 downto 0);
+  s_axi_acp_in_AW_ID_int <= s_axi_acp_in.AW.ID(3 downto 3) & s_axi_acp_in.AW.ID(1 downto 0);
+  s_axi_acp_in_W_ID_int  <= s_axi_acp_in.W.ID(3 downto 3) & s_axi_acp_in.W.ID(1 downto 0);
+  s_axi_acp_out.R.ID <= "00" & s_axi_acp_out_R_ID_int(2 downto 2) & "0" & s_axi_acp_out_R_ID_int(1 downto 0);
+  s_axi_acp_out.B.ID <= "00" & s_axi_acp_out_B_ID_int(2 downto 2) & "0" & s_axi_acp_out_B_ID_int(1 downto 0);
+
   -- This instantiation follows the one from the xps-ocpi project, in the file
   -- system_processing_system7_0_wrapper.v
   ps : PS7_WRAPPER_MODULE
@@ -1262,48 +1277,48 @@ begin
       S_AXI_GP1_AWSIZE => (others => '0'),
       S_AXI_GP1_WDATA => (others => '0'),
       S_AXI_GP1_WSTRB => (others => '0'),
-      S_AXI_ACP_ARESETN => open,
-      S_AXI_ACP_AWREADY => open,
-      S_AXI_ACP_ARREADY => open,
-      S_AXI_ACP_BVALID => open,
-      S_AXI_ACP_RLAST => open,
-      S_AXI_ACP_RVALID => open,
-      S_AXI_ACP_WREADY => open,
-      S_AXI_ACP_BRESP => open,
-      S_AXI_ACP_RRESP => open,
-      S_AXI_ACP_BID => open,
-      S_AXI_ACP_RID => open,
-      S_AXI_ACP_RDATA => open,
-      S_AXI_ACP_ACLK => '0',
-      S_AXI_ACP_ARVALID => '0',
-      S_AXI_ACP_AWVALID => '0',
-      S_AXI_ACP_BREADY => '0',
-      S_AXI_ACP_RREADY => '0',
-      S_AXI_ACP_WLAST => '0',
-      S_AXI_ACP_WVALID => '0',
-      S_AXI_ACP_ARID => (others => '0'),
-      S_AXI_ACP_ARPROT => (others => '0'),
-      S_AXI_ACP_AWID => (others => '0'),
-      S_AXI_ACP_AWPROT => (others => '0'),
-      S_AXI_ACP_WID => (others => '0'),
-      S_AXI_ACP_ARADDR => (others => '0'),
-      S_AXI_ACP_AWADDR => (others => '0'),
-      S_AXI_ACP_ARCACHE => (others => '0'),
-      S_AXI_ACP_ARLEN => (others => '0'),
-      S_AXI_ACP_ARQOS => (others => '0'),
-      S_AXI_ACP_AWCACHE => (others => '0'),
-      S_AXI_ACP_AWLEN => (others => '0'),
-      S_AXI_ACP_AWQOS => (others => '0'),
-      S_AXI_ACP_ARBURST => (others => '0'),
-      S_AXI_ACP_ARLOCK => (others => '0'),
-      S_AXI_ACP_ARSIZE => (others => '0'),
-      S_AXI_ACP_AWBURST => (others => '0'),
-      S_AXI_ACP_AWLOCK => (others => '0'),
-      S_AXI_ACP_AWSIZE => (others => '0'),
-      S_AXI_ACP_ARUSER => (others => '0'),
-      S_AXI_ACP_AWUSER => (others => '0'),
-      S_AXI_ACP_WDATA => (others => '0'),
-      S_AXI_ACP_WSTRB => (others => '0'),
+      S_AXI_ACP_ARESETN => s_axi_acp_out.A.RESETN,
+      S_AXI_ACP_AWREADY => s_axi_acp_out.AW.READY,
+      S_AXI_ACP_ARREADY => s_axi_acp_out.AR.READY,
+      S_AXI_ACP_BVALID => s_axi_acp_out.B.VALID,
+      S_AXI_ACP_RLAST => s_axi_acp_out.R.LAST,
+      S_AXI_ACP_RVALID => s_axi_acp_out.R.VALID,
+      S_AXI_ACP_WREADY => s_axi_acp_out.W.READY,
+      S_AXI_ACP_BRESP => s_axi_acp_out.B.RESP,
+      S_AXI_ACP_RRESP => s_axi_acp_out.R.RESP,
+      S_AXI_ACP_BID => s_axi_acp_out_B_ID_int,
+      S_AXI_ACP_RID => s_axi_acp_out_R_ID_int,
+      S_AXI_ACP_RDATA => s_axi_acp_out.R.DATA,
+      S_AXI_ACP_ACLK => s_axi_acp_in.A.CLK,
+      S_AXI_ACP_ARVALID => s_axi_acp_in.AR.VALID,
+      S_AXI_ACP_AWVALID => s_axi_acp_in.AW.VALID,
+      S_AXI_ACP_BREADY => s_axi_acp_in.B.READY,
+      S_AXI_ACP_RREADY => s_axi_acp_in.R.READY,
+      S_AXI_ACP_WLAST => s_axi_acp_in.W.LAST,
+      S_AXI_ACP_WVALID => s_axi_acp_in.W.VALID,
+      S_AXI_ACP_ARID => s_axi_acp_in_AR_ID_int,
+      S_AXI_ACP_ARPROT => s_axi_acp_in.AR.PROT,
+      S_AXI_ACP_AWID => s_axi_acp_in_AW_ID_int,
+      S_AXI_ACP_AWPROT => s_axi_acp_in.AW.PROT,
+      S_AXI_ACP_WID => s_axi_acp_in_W_ID_int,
+      S_AXI_ACP_ARADDR => s_axi_acp_in.AR.ADDR,
+      S_AXI_ACP_AWADDR => s_axi_acp_in.AW.ADDR,
+      S_AXI_ACP_ARCACHE => s_axi_acp_in.AR.CACHE,
+      S_AXI_ACP_ARLEN => s_axi_acp_in.AR.LEN,
+      S_AXI_ACP_ARQOS => (others => '0'), -- s_axi_acp_in.AR.QOS,
+      S_AXI_ACP_AWCACHE => s_axi_acp_in.AW.CACHE,
+      S_AXI_ACP_AWLEN => s_axi_acp_in.AW.LEN,
+      S_AXI_ACP_AWQOS => (others => '0'), -- s_axi_acp_in.AW.QOS,
+      S_AXI_ACP_ARBURST => s_axi_acp_in.AR.BURST,
+      S_AXI_ACP_ARLOCK => s_axi_acp_in.AR.LOCK,
+      S_AXI_ACP_ARSIZE => s_axi_acp_in.AR.SIZE,
+      S_AXI_ACP_AWBURST => s_axi_acp_in.AW.BURST,
+      S_AXI_ACP_AWLOCK => s_axi_acp_in.AW.LOCK,
+      S_AXI_ACP_AWSIZE => s_axi_acp_in.AW.SIZE,
+      S_AXI_ACP_ARUSER => (others => '1'), -- ones are needed for coherent -- s_axi_acp_in.AR.USER,
+      S_AXI_ACP_AWUSER => (others => '1'), -- ones are needed for coherent -- s_axi_acp_in.AW.USER,
+      S_AXI_ACP_WDATA => s_axi_acp_in.W.DATA,
+      S_AXI_ACP_WSTRB => s_axi_acp_in.W.STRB,
       S_AXI_HP0_ARESETN => s_axi_hp_out(0).A.RESETN,
       S_AXI_HP0_ARREADY => s_axi_hp_out(0).AR.READY,
       S_AXI_HP0_AWREADY => s_axi_hp_out(0).AW.READY,

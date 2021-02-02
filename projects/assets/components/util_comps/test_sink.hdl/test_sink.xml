@@ -1,0 +1,6 @@
+<HdlWorker language='vhdl' spec='test_sink-spec' version='2'>
+  <!-- writing the seconds property causes  a timestamp message to be sent whose time is that
+       number of seconds after "now" -->
+  <StreamInterface Name="in" clockdirection='in' datawidth='32'/>
+  <TimeInterface name='time' SecondsWidth='32' fractionwidth='32' clock='in'/>
+</HdlWorker>

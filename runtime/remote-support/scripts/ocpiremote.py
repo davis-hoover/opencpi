@@ -391,7 +391,7 @@ def load(args):
     rules = glob.glob(os.path.join(cdk, args.sw_platform, 'lib', '*.rules'))
     bin_files = ['ocpidriver', 'ocpiserve', 'ocpihdl', 'ocpizynq']
     bin_files = [os.path.join(cdk, args.sw_platform, 'bin', bin_file) for bin_file in bin_files]
-    sdk = glob.glob(os.path.join(cdk, args.sw_platform, 'sdk', 'lib', '*'))
+    sdk = glob.glob(os.path.join(cdk, args.sw_platform, 'sdk', '*'))
     bitstream = glob.glob(os.path.join(cdk, args.hw_platform, '*.bitz'))
     # List of files to add to tar
     tar_files = (drivers

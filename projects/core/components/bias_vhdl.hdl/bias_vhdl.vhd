@@ -23,7 +23,7 @@
 
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
-architecture rtl of bias_vhdl_worker is
+architecture rtl of worker is
   signal doit : bool_t;
 begin
 -- Pure combinatorial implementation
