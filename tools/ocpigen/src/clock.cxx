@@ -23,6 +23,7 @@ parseClocks() {
       return err;
     c->m_exported = true;  // If you mention it here at the top level, exporting is implied
     c->m_signal = signal ? signal : "";
+    c->m_exportedSignal = c->m_signal;
     return NULL;
   }
   return NULL;
