@@ -1,1 +1,0 @@
-../../../../platform/hdl/primitives/zynq/Makefile

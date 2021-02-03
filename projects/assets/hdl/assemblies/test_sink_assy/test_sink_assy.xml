@@ -1,0 +1,3 @@
+<HdlAssembly>
+  <Instance Worker="test_sink" externals='true'/>
+</HdlAssembly>

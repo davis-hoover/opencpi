@@ -151,7 +151,7 @@ group(XF::XferRequest*xr) {
 }
 
 static const char *
-msghdr(std::string s, FrameHeader &hdr, const char *io) {
+msghdr(std::string &s, FrameHeader &hdr, const char *io) {
   OU::format(s, "DGRAM FRAME %s: d %4u s %4u fs %4u a %4u c %4u fl %4u m:",
 	     io, hdr.destId, hdr.srcId, hdr.frameSeq, hdr.ACKStart, hdr.ACKCount, hdr.flags);
   if (hdr.flags & FRAME_FLAG_HAS_MESSAGES) {
