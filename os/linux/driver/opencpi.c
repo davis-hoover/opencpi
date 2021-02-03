@@ -221,22 +221,40 @@ static DEFINE_RWLOCK(opencpi_sklist_lock);
 // the exact version where the dma API changed.
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
 static unsigned long dma_attrs =
-      DMA_ATTR_WRITE_BARRIER |     // really only for flag region, but we can start here
-      DMA_ATTR_WEAK_ORDERING |     // our flags are atomic
-      // DMA_ATTR_WRITE_COMBINE |     // our flags are atomic
-      // DMA_ATTR_NON_CONSISTENT    | // we need to allow for this to be configurable...
-      //      DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space
-      // DMA_ATTR_SKIP_CPU_SYNC |     // for multiple device consumers and producers
-      DMA_ATTR_FORCE_CONTIGUOUS |  // we don't have sg dma
-      0;
+  // This would really only for inbound flag region, (in kernel source only for pci_dma+infiniband)
+  // Ensures all previous writes are complete.
+  // DMA_ATTR_WRITE_BARRIER |
+
+  // Not used on arm/arm64, on ppc/cell, sun4v
+  // DMA_ATTR_WEAK_ORDERING |     // our flags are atomic (not used on arm)
+
+  // Used in ARM to prefer pgprot_writecombine(bufferable) vs. pgprot_dmacoherent(bufferable+PTE_XN)
+  // Used in ARM64 to add pgprot_writecombine, no mention of pgprot_dmacoherent
+  // To indicate buffering, perhaps the counterpoint to WRITE_BARRIER
+  // DMA_ATTR_WRITE_COMBINE |     // our flags are atomic (used on arm)
+
+
+  // Only used in arm with nommu...  For when different parts of memory can/cannot be consistent etc.
+  // We should set this on cache mode 1?
+  // DMA_ATTR_NON_CONSISTENT    |
+
+  // Used on arm (not arm64), xtensa/pci-dma.  We could use this since we do not need kernel mappings
+  // DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space.  doc says use dma_mmap_attrs
+
+  // Used on arm and arm64, could be useful when there are multiple devices - i.e. broadcast?
+  // DMA_ATTR_SKIP_CPU_SYNC |     // for multiple device consumers and producers
+
+  // Used on arm and arm64, curious not on others since it seems generic, used by few drivers
+  DMA_ATTR_FORCE_CONTIGUOUS |  // we don't have sg dma
+
+  // Used on arm to suppress TLB optimizations
+  // DMA_ATTR_ALLOC_SINGLE_PASS |     // for multiple device consumers and producers
+  0;
 #else
 // It is clear why they got rid of this silly interface in later kernels
 static struct dma_attrs dma_attrs[1];
 static void init_dma(void) {
   init_dma_attrs(dma_attrs);
-  dma_set_attr(DMA_ATTR_WRITE_BARRIER, dma_attrs);
-  dma_set_attr(DMA_ATTR_WEAK_ORDERING, dma_attrs);
-  dma_set_attr(DMA_ATTR_NON_CONSISTENT, dma_attrs);
   dma_set_attr(DMA_ATTR_FORCE_CONTIGUOUS, dma_attrs);
 }
 #endif

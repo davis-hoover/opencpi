@@ -83,6 +83,7 @@ addWciClockReset() {
     ocpiCheck(!addClock("wci", "in", clock));
     clock->m_reset = "wci_Reset_n";
     clock->m_exported = true;
+    clock->m_exportedSignal = clock->m_signal;
     m_wciClock = clock;
   }
   return *m_wciClock;

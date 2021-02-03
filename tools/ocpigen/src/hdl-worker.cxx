@@ -768,7 +768,7 @@ emitSignals(FILE *f, Language lang, bool useRecords, bool inPackage, bool inWork
 	if (last.empty())
 	  fprintf(f,
 		  "    %s Clock(s) not associated with one specific port:\n", comment);
-	emitSignal(c.signal(), f, lang, c.m_output ? Signal::OUT : Signal::IN, last, -1, 0);
+	emitSignal(c.exportedSignal(), f, lang, c.m_output ? Signal::OUT : Signal::IN, last, -1, 0);
 	if (c.m_reset.size())
 	  // FIXME: FOR THE INNER WORKER TO HAVE A POSITIVE RESET
 	  emitSignal(inWorker && !strcasecmp(c.reset(), "wci_reset_n") ?
@@ -1249,7 +1249,7 @@ emitDefsHDL(bool wrap) {
     for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       Clock &c = **ci;
       if (c.m_exported) {
-	fprintf(f, "  %s      %s;\n", c.m_output ? "output" : "input", c.signal());
+	fprintf(f, "  %s      %s;\n", c.m_output ? "output" : "input", c.exportedSignal());
 	if (c.m_reset.size())
 	  fprintf(f, "  input      %s;\n", c.reset());
       }
@@ -1701,7 +1701,7 @@ emitVhdlRecordWrapper(FILE *f) {
 	    if (last.empty())
 	      fprintf(f,
 		      "  -- Clock(s) not associated with one specific port:\n");
-	    fprintf(f, "%s      %s => %s", last.c_str(), c->signal(), c->signal());
+	    fprintf(f, "%s      %s => %s", last.c_str(), c->exportedSignal(), c->exportedSignal());
 	    last = ",\n";
 	  }
 	}
