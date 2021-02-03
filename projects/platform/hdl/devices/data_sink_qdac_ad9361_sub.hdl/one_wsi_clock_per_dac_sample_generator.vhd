@@ -87,9 +87,7 @@ begin
   process(dac_clk)
   begin
     if(rising_edge(dac_clk)) then
-      if(someclk_take(0) = '1') then
         dac_txen <= wsi_txen;
-      end if;
     end if;
   end process;
 
