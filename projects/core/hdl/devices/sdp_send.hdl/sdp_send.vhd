@@ -157,7 +157,7 @@ begin
                                 its(not doorbell_fault_r) and md_not_full and
                                 buffer_avail_r /= 0);
   will_write         <= can_take and in_in.ready and in_in.valid and not buffer_maxed_r;
-  max_offset         <= props_in.buffer_size(bram_addr_t'left + 2 downto 2) - 1;
+  max_offset         <= props_in.buffer_size(bram_addr_t'left + addr_shift_c downto addr_shift_c) - 1;
   -- Take even if bad write to send the truncation error in the metadata
   taking             <= can_take and in_in.ready;
   in_out.take        <= taking;
