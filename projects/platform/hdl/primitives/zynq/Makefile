@@ -23,7 +23,7 @@ include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
 HdlLibraries=fixed_float ocpi axi sdp platform
 
-VivadoZynqTargets=zynq xsim modelsim
+VivadoZynqTargets=zynq xsim
 ISEZynqTargets=zynq_ise isim
 OnlyTargets=$(VivadoZynqTargets) $(ISEZynqTargets)
 
