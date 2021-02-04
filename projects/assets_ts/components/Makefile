@@ -26,4 +26,9 @@
 # Any variable definitions that should apply for each individual worker/test
 # in this library belong in Library.mk
 
+#
+# 03 Feb 2021: temporarily disabling "complex_mixer_ts.test"
+# due to "xsim" eating all available disk space on runners.
+#
+ExcludeTests=complex_mixer_ts.test
 include $(OCPI_CDK_DIR)/include/library.mk
