@@ -18,7 +18,8 @@
 
 $(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable is not set correctly.))
 Containers= \
-	cnt_zed_fmcomms_2_3_scdcd
+	cnt_zed_fmcomms_2_3_scdcd \
+	cnt_zcu104_fmcomms_2_3_scdcd 
 #  Following platforms require updates to support complexShortWithMetadata protocol 
 #       cnt_1rx_1tx_thruasm_fmcomms_2_3_lpc_LVDS_ml605 \
 	cnt_1rx_1tx_thruasm_matchstiq_z1 \

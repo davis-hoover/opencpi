@@ -34,6 +34,12 @@
             volatile='true'
             description='Number of samples dropped.'/>
 
+  <Property name='suppress_sync_opcode'
+          type='bool'
+          writable='true'
+          default='false'
+          description='Writing true suppresses the worker from sending sync opcodes'/>
+
   <DataInterfaceSpec name='out'
                      producer='true'
                      protocol='ComplexShortWithMetadata-prot'/>
