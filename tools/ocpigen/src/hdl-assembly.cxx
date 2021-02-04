@@ -461,7 +461,10 @@ parseHdlAssy() {
 	assert(ip.m_port->m_clock);
 	if (ip.m_port->m_myClock && !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
 	  if (ip.m_port->m_clock->m_output) { // look for internal connections with a driven clock
-	    Clock &clk = addClock(ip.m_instance->m_name + "_" + ip.m_port->m_clock->cname(), true);
+	    // The "_i" suffix is for "internal to the assembly".
+	    // It man subsequently be driven to an assembly-level output clock without the suffix
+	    Clock &clk = addClock(ip.m_instance->m_name + "_" + ip.m_port->m_clock->m_name + "_i",
+				  true);
 	    clk.m_internal = true; // may be overridden later during propagation
 	    ocpiInfo("Creating assembly worker %s's internal clock \"%s\" from port's %s clock of "
 		     "instance %s port %s", cname(), clk.cname(),
@@ -561,7 +564,7 @@ parseHdlAssy() {
     Connection &c = **ci;
     if (!c.m_clock && !c.m_external && (*c.m_attachments.begin())->m_instPort.m_port->isOCP()) {
       Clock *clk = NULL, *clk2 = NULL;
-      bool anyNotInput = false; // are any of the ports not myclock and !output?
+      InstancePort *anyNotInput = NULL; // are any of the ports not myclock or output?
       for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++) {
 	InstancePort &ip = (**ai).m_instPort;
 	size_t nc = ip.m_port->m_clock->m_ordinal; // the clock ordinal within the worker of the port
@@ -571,14 +574,23 @@ parseHdlAssy() {
 	      clk2 = clk; // two different clocks
 	  } else
 	    clk = ip.m_instance->m_clocks[nc];
-	} else if (!ip.m_port->m_myClock || ip.m_port->m_clock->m_output)
-	  anyNotInput = true;
+	} else if ((!ip.m_port->m_myClock || ip.m_port->m_clock->m_output) && !anyNotInput)
+	  anyNotInput = &ip; // if there more than one, take the first one
       }
       if (!c.m_clock && !clk2) {
 	if (!clk) {
-	  if (anyNotInput)
-	    clk = &addClock(c.m_name + "_Clk");
-	  else // all clocks are inputs to ports that own them. use the control clock.
+	  if (anyNotInput) {
+	    // At this point since this port's clock has never been mapped, it is not
+	    // owned by any other external port's clock. It therefore must be an externalized
+	    // clock of the port's worker.
+	    Clock &workerClk = *anyNotInput->m_port->m_clock;
+	    assert(workerClk.m_exported);
+	    std::string name;
+	    clk = &addClock(OU::format(name, "%s_%s",
+				       anyNotInput->m_instance->cname(), workerClk.cname()));
+	    anyNotInput->m_instance->m_clocks[workerClk.m_ordinal] = clk;
+	  } else
+	    // all clocks are inputs to ports that own them. use the control clock.
 	    clk = m_wciClock;
 	}
 	ocpiCheck(c.setClock(*clk));
@@ -626,9 +638,17 @@ parseHdlAssy() {
   // rather than a clock signal that is part of the connection's signal bundles
   for (ConnectionsIter ci = a->m_connections.begin(); ci != a->m_connections.end(); ci++) {
     Connection &c = **ci;
-    if (c.m_clock && !c.m_clock->m_internal) // && c.m_clock->m_output)
+    if (c.m_clock && !c.m_clock->m_internal) {// && c.m_clock->m_output)
       for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
 	(**ai).m_instPort.m_clockSignal = c.m_clock->m_signal;
+      // If this non-internal clock is not associated with any port, it must be exported.
+      if (!c.m_clock->m_port) {
+	c.m_clock->m_exported = true;
+	// ugly - strip the _i suffix for inside-the-assembly
+	OU::format(c.m_clock->m_exportedSignal, "%.*s_Clk", (int)(c.m_clock->m_name.length() - 2),
+		   c.m_clock->cname());
+      }
+    }
   }
   return 0;
 }
@@ -874,26 +894,31 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
   for (auto ci = i->m_worker->m_clocks.begin(); ci != i->m_worker->m_clocks.end(); ++ci) {
     Clock &c = **ci;
     if (c.m_exported) {
+      bool clockAny = true;
       if (lang == Verilog) {
 	if (i->m_clocks[c.m_ordinal])
-	  fprintf(f, "%s  .%s(%s)", any ? ",\n" : "", c.signal(),
+	  fprintf(f, "%s  .%s(%s)", any ? ",\n" : "", c.exportedSignal(),
 		  i->m_clocks[c.m_ordinal]->signal());
+	else
+	  clockAny = false;
 	if (c.m_reset.size())
 	  fprintf(f, ",\n  .%s(%s)", c.reset(),
 		  i->m_clocks[c.m_ordinal]->reset());
       } else if (i->m_clocks[c.m_ordinal]) {
 	fprintf(f, "%s%s%s => %s", any ? ",\n" : "", any ? indent : "",
-		c.signal(), i->m_clocks[c.m_ordinal]->signal());
+		c.exportedSignal(), i->m_clocks[c.m_ordinal]->signal());
 	if (c.m_reset.size())
 	  fprintf(f, ",\n%s%s => %s", indent, c.reset(),
 		  i->m_clocks[c.m_ordinal]->reset());
-      } else {
+      } else if (!c.m_output) {
 	fprintf(f, "%s%s%s => '0'", any ? ",\n" : "", any ? indent : "",
-		c.signal());
+		c.exportedSignal());
 	if (c.m_reset.size())
 	  fprintf(f, ",\n%s%s => '1'", indent, c.reset());
-      }
-      any = true;
+      } else
+	clockAny = false;
+      if (clockAny)
+	any = true;
     }
   }
   std::string last(any ? "," : "");
@@ -1093,7 +1118,7 @@ emitAssyHDL() {
 	    m_implName);
   }
   // If instances have clocks that are not port-associated and are output we need them to be
-  // local/internal signals
+  // local/internal signals unless they are exported
   bool first = true;
   Instance *i = &m_assembly->m_instances[0];
   for (unsigned n = 0; n < m_assembly->m_instances.size(); n++, i++) {
@@ -1173,19 +1198,31 @@ emitAssyHDL() {
   if (m_language == VHDL)
     fprintf(f, "begin\n");
 
-  // For worker clock outputs (when an internal connection has a driven clock that is used for an
-  // external port) we need to drive the output signal from the internal signal
+  // For (assembly) worker clock outputs, when an internal connection has a driven clock
+  // that is used for an external port) we need to drive the assembly output signal
+  // from the internal signal, which may be port-related or not.
   for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ++ci) {
     Clock &c = **ci;
-    if (c.m_output && !c.m_internal && c.m_port) {
+    if (c.m_output && !c.m_internal && (c.m_port || c.m_exported)) {
       // while it is not externally associated with a port, it must be internally driven by one
-      fprintf(f, "%s assign the external clock output from the internal port that is driving it\n",
+      fprintf(f, "%s assign the external clock output from the internal signal that is driving it\n",
 	      myComment());
-      if (m_language == VHDL)
-	fprintf(f, "  assign_%s_i : ocpi.util.in2out port map (in_port => %s, out_port => %s_out.Clk);\n",
-		c.signal(), c.signal(), c.m_port->pname());
-      else
-	fprintf(f, "  assign %s_Clk = %s;\n", c.m_port->pname(), c.signal());
+      std::string outer;
+      if (m_language == VHDL) {
+	if (c.m_port) // driving the output signal of an external assembly port, in record
+	  OU::format(outer, "%s_out.Clk", c.m_port->pname());
+	else
+	  OU::format(outer, "%.*s_Clk", (int)(c.m_name.length() - 2), c.m_name.c_str());
+	fprintf(f,
+		"  assign_%s_i : ocpi.util.in2out port map (in_port => %s, out_port => %s);\n",
+		c.signal(), c.signal(), outer.c_str());
+      }	else {
+	if (c.m_port) // driving the output signal of an external assembly port, in record
+	  OU::format(outer, "%s_out_Clk", c.m_port->pname());
+	else
+	  OU::format(outer, "%.*s_Clk", (int)(c.m_name.length() - 2), c.m_name.c_str());
+	fprintf(f, "  assign %s = %s;\n", outer.c_str(), c.signal());
+      }
     }
   }
 
@@ -1377,9 +1414,10 @@ detach(Connection &c) {
   for (Attachments::iterator ai = m_attachments.begin(); ai != m_attachments.end(); ai++)
     if (&(*ai)->m_connection == &c) {
       m_connected[(*ai)->m_index] = false;
+      Attachment *a = *ai;
       m_attachments.erase(ai);
-      c.m_attachments.remove(*ai);
-      delete *ai;
+      c.m_attachments.remove(a);
+      delete a;
       break;
     }
 }
