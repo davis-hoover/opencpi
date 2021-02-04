@@ -894,10 +894,13 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
   for (auto ci = i->m_worker->m_clocks.begin(); ci != i->m_worker->m_clocks.end(); ++ci) {
     Clock &c = **ci;
     if (c.m_exported) {
+      bool clockAny = true;
       if (lang == Verilog) {
 	if (i->m_clocks[c.m_ordinal])
 	  fprintf(f, "%s  .%s(%s)", any ? ",\n" : "", c.exportedSignal(),
 		  i->m_clocks[c.m_ordinal]->signal());
+	else
+	  clockAny = false;
 	if (c.m_reset.size())
 	  fprintf(f, ",\n  .%s(%s)", c.reset(),
 		  i->m_clocks[c.m_ordinal]->reset());
@@ -907,13 +910,15 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
 	if (c.m_reset.size())
 	  fprintf(f, ",\n%s%s => %s", indent, c.reset(),
 		  i->m_clocks[c.m_ordinal]->reset());
-      } else {
+      } else if (!c.m_output) {
 	fprintf(f, "%s%s%s => '0'", any ? ",\n" : "", any ? indent : "",
 		c.exportedSignal());
 	if (c.m_reset.size())
 	  fprintf(f, ",\n%s%s => '1'", indent, c.reset());
-      }
-      any = true;
+      } else
+	clockAny = false;
+      if (clockAny)
+	any = true;
     }
   }
   std::string last(any ? "," : "");
@@ -1211,8 +1216,13 @@ emitAssyHDL() {
 	fprintf(f,
 		"  assign_%s_i : ocpi.util.in2out port map (in_port => %s, out_port => %s);\n",
 		c.signal(), c.signal(), outer.c_str());
-      }	else
-	fprintf(f, "  assign %s_Clk = %s;\n", c.m_port->pname(), c.signal());
+      }	else {
+	if (c.m_port) // driving the output signal of an external assembly port, in record
+	  OU::format(outer, "%s_out_Clk", c.m_port->pname());
+	else
+	  OU::format(outer, "%.*s_Clk", (int)(c.m_name.length() - 2), c.m_name.c_str());
+	fprintf(f, "  assign %s = %s;\n", outer.c_str(), c.signal());
+      }
     }
   }
 
@@ -1404,9 +1414,10 @@ detach(Connection &c) {
   for (Attachments::iterator ai = m_attachments.begin(); ai != m_attachments.end(); ai++)
     if (&(*ai)->m_connection == &c) {
       m_connected[(*ai)->m_index] = false;
+      Attachment *a = *ai;
       m_attachments.erase(ai);
-      c.m_attachments.remove(*ai);
-      delete *ai;
+      c.m_attachments.remove(a);
+      delete a;
       break;
     }
 }
