@@ -39,11 +39,6 @@ namespace DataTransfer {
     namespace OE = OCPI::OS::Ether;
     namespace XF = DataTransfer;
 
-struct DataHeader {
-  DtOsDataTypes::Offset offset;
-  uint32_t   length;
-  uint32_t   count;
-};
 struct __attribute__ ((__packed__)) FlagHeader {
   DtOsDataTypes::Offset dataOffset;
   DtOsDataTypes::Offset flagOffset;
@@ -219,7 +214,8 @@ public:
 	      }
 	    }
 	    // end of data or a zlm header
-	    doFlag();
+	    if (m_header.flagOffset)
+	      doFlag();
 	    current_ptr = (uint8_t*)&m_header;
 	    bytes_left = sizeof(m_header); // packed
 	    in_header = true;
@@ -367,16 +363,20 @@ public:
   XF::XferRequest *createXferRequest();
 protected:
   OS::Socket& socket(){ return m_socket; }
+  // Short circuit call to send for SDP slave simulators
   void send(DtOsDataTypes::Offset offset, uint8_t *data, size_t nbytes) {
-    DataHeader hdr;
-    static uint32_t count = 0xabc00000;
-    hdr.offset = offset;
-    hdr.length = OCPI_UTRUNCATE(uint32_t, nbytes);
-    hdr.count = count++;
-    ocpiDebug("Sending IP header %zu %" PRIu32 " %" DTOSDATATYPES_OFFSET_PRIx" %" PRIx32,
-	      sizeof(DataHeader), hdr.length, hdr.offset, hdr.count);
-    m_socket.send((char*)&hdr, sizeof(DataHeader));
-    m_socket.send((char *)data, nbytes);
+    struct FlagHeader header;
+    header.dataOffset = offset;
+    header.flagOffset = 0;
+    header.flagValue = XF::FlagMeta::packFlag(nbytes, 0, 0);
+    ocpiDebug("Sending IP header %zu %" DTOSDATATYPES_OFFSET_PRIx" %" PRIx32,
+	      sizeof(header), header.dataOffset, header.flagValue);
+    OS::IOVec sendVec[2]; // this may be modified in the send call
+    sendVec[0].iov_base = &header;
+    sendVec[0].iov_len = sizeof(header); // packed
+    sendVec[1].iov_base = data;
+    sendVec[1].iov_len = nbytes;
+    m_socket.send(&sendVec[0], 2);
   }
 };
 
@@ -428,17 +428,6 @@ private:
     sendVec[1].iov_len = dataLength;
     parent().m_socket.send(&sendVec[0], dataLength ? 2 : 1);
   }
-
-#if 0
-  void action_transfer(PIO_transfer transfer, bool /*last*/) {
-    //#define TRACE_PIO_XFERS  
-#ifdef TRACE_PIO_XFERS
-    ocpiDebug("Socket: copying %d bytes from 0x%llx to 0x%llx", transfer->nbytes,transfer->src_off,transfer->dst_off);
-    ocpiDebug("source wrd 1 = %d", src1[0] );
-#endif
-    parent().send(transfer->dst_off, (uint8_t *)transfer->src_va, transfer->nbytes);
-  }
-#endif
 };
 
 XF::XferRequest* XferServices::
