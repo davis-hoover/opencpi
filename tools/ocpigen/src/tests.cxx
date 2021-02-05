@@ -642,10 +642,15 @@ namespace {
                                 "onlyworkers", "excludeworkers", "doneWorkerIsUUT", NULL)) ||
           (err = OE::checkElements(x, "property", "input", "output", NULL)) ||
           (err = OE::getNumber(x, "duration", &m_duration, NULL, duration)) ||
-          (err = OE::getNumber(x, "timeout", &m_timeout, NULL, timeout)) ||
+          // (err = OE::getNumber(x, "timeout", &m_timeout, NULL, timeout)) ||
+          (err = OE::getNumber(x, "timeout", &m_timeout)) ||
           (err = OE::getBoolean(x, "doneWorkerIsUUT", &m_doneWorkerIsUUT, NULL, doneWorkerIsUUT)))
         return err;
-      if (m_duration && m_timeout)
+      if (!m_duration) {
+        if (!m_timeout)
+          m_timeout = timeout;
+      }
+      else if (m_timeout)
         return OU::esprintf("Specifying both duration and timeout is not supported");
       if ((err = doPorts(*wFirst, x)) || (emulator && (err = doPorts(*emulator, x))))
           return err;
@@ -1790,6 +1795,10 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       (err = OE::getNumber(xml, "duration", &duration)) ||
       (err = OE::getNumber(xml, "timeout", &timeout)))
     return err;
+  if (!duration && !timeout)
+    // Set a default timeout value of 3600.  This value is
+    // "unfortunate", and based on some of the "zed" tests.
+    timeout = 3600;
   // ================= 2. Get/find/include/exclude the global workers
   // Parse global workers
   const char
