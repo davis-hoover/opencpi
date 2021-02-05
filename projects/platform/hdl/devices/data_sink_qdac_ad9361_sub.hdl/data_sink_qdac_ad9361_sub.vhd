@@ -501,7 +501,7 @@ begin
 
   wsi_in0_opcode <=
       protocol.tx_event.TXOFF when on_off0_in.opcode = tx_event_txOff_op_e else
-      protocol.tx_event.TXON when on_off0_in.opcode = tx_event_txOn_op_e  else
+      protocol.tx_event.TXON  when on_off0_in.opcode = tx_event_txOn_op_e  else
       protocol.tx_event.TXOFF;
   on_off0_demarshaller : protocol.tx_event.tx_event_demarshaller
     port map(
@@ -518,8 +518,8 @@ begin
   --on_off0_out.clk <= wsi_clk;
 
   wsi_in1_opcode <= 
-      protocol.tx_event.TXOFF when on_off0_in.opcode = tx_event_txOff_op_e else
-      protocol.tx_event.TXON  when on_off0_in.opcode = tx_event_txOn_op_e  else
+      protocol.tx_event.TXOFF when on_off1_in.opcode = tx_event_txOff_op_e else
+      protocol.tx_event.TXON  when on_off1_in.opcode = tx_event_txOn_op_e  else
       protocol.tx_event.TXOFF;
   on_off1_demarshaller : protocol.tx_event.tx_event_demarshaller
     port map(
@@ -550,7 +550,7 @@ begin
 
   wsi_in0_connected <= not on_off0_in.reset; -- TODO / FIXME - UNDOCUMENTED AND SUBJECTED TO CHANGE
   wsi_in1_connected <= not on_off1_in.reset; -- TODO / FIXME - UNDOCUMENTED AND SUBJECTED TO CHANGE
-  wci_is_operating <= not wci_reset; -- mimicking behavior in shell
+  wci_is_operating  <= not wci_reset; -- mimicking behavior in shell
 
   event_in_x2_to_txen : dac.dac.event_in_x2_to_txen
     port map(

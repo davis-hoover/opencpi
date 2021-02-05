@@ -160,7 +160,7 @@ ocpiadmin install platform plutosdr
 from the Github site and build the platform:
 +
 ------------------------------------------------------------------------------------------------------
-ocpiadmin --package-id=com.myco.myplat -url=https://github.com/myco/myplat.git install platform myplat
+ocpiadmin --package-id=com.myco.myplat --url=https://github.com/myco/myplat.git install platform myplat
 ------------------------------------------------------------------------------------------------------
 +
 . Download and build the latest "development" *`git`* revision of the *`plutosdr`* platform

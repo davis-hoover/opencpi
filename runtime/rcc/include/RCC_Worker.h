@@ -199,6 +199,10 @@ typedef struct {
   RCCBoolean (*wait)(RCCPort *, size_t max, unsigned usecs);
   void (*take)(RCCPort *,RCCBuffer *old_buffer, RCCBuffer *new_buffer);
   RCCResult (*setError)(const char *, ...);
+  RCCTime (*getTime)();
+  uint64_t (*nanoTime)(RCCTime t); // return nanoseconds
+  bool (*willLog)(unsigned level);
+  void (*log)(unsigned level, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 } RCCContainer;
 
 struct RCCWorker {
@@ -448,7 +452,7 @@ typedef struct {
    virtual uint8_t *rawProperties(size_t &size) const;
    RCCResult setError(const char *fmt, ...);
    bool willLog(unsigned level) const;
-   void log(unsigned level, const char *fmt, ...) throw() __attribute__((format(printf, 3, 4)));
+   void log(unsigned level, const char *fmt, ...) __attribute__((format(printf, 3, 4)));
    OCPI::API::Application &getApplication();
    // These below are called by the container, and NOT by the worker.
 
@@ -458,7 +462,9 @@ typedef struct {
      initialize(), start(), stop(), release(), test(), beforeQuery(), afterConfigure();
    // The worker author must implement this one.
    virtual RCCResult run(bool timedOut);
-   virtual RCCTime getTime();
+ public:
+   static RCCTime getTime();
+   static uint64_t nanoTime(RCCTime t); // return nanoseconds
  };
 
  // This class emulates the API worker, and is customized for the specific implementation

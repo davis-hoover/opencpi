@@ -17,6 +17,8 @@
      <Property Name="pULongLong" Type="ULongLong" Readable="true" Writable="true" default='11'/>
      <Property Name="pString" Type="String" StringLength="20" Volatile="true" Writable="true" default='12'/>
      <Property Name="ap0" Type="Bool" Readable="true" Writable="true" arraylength="1"/>
+     <Property Name="ap0c" Type="Char" Readable="true" Writable="true" arraylength="1"/>
+     <Property Name="ap0s" Type="Short" Readable="true" Writable="true" arraylength="1"/>
      <Property Name="ap1" Type="Char" Volatile="true" Writable="true" arraylength="2"/>
      <Property Name="ap2" Type="Double" Readable="true" Writable="true" arraylength="3"/>
      <Property Name="ap3" Type="Float" Volatile="true" Writable="true" arraylength="4"/>
@@ -47,6 +49,8 @@
      <property name='ledp' type='enum' enums="off,green,red,orange" parameter='1' readable='false' default='red'/>
   </Properties>
   <property name='testvolseqbool' volatile='1' type='bool' sequencelength='5'/>
+  <property name='testvolseqchar' volatile='1' type='char' sequencelength='1'/>
+  <property name='testvolseqshort' volatile='1' type='short' sequencelength='1'/>
   <property name='testvolsequlonglong' volatile='1' type='ulonglong' sequencelength='6'/>
   <property name='testvolseqstring' volatile='1' type='string' stringlength='5' sequencelength='6'/>
   <property name='testvolseqenum' volatile='1' type='enum' enums='r,g,b' sequencelength='7'/>
@@ -57,6 +61,8 @@
   <property name='testvolarybool' volatile='1' type='bool' arraylength='5'/>
   <property name='testrdarybool' readable='1' type='bool' arraylength='5'/>
      <Property Name="sp0" Type="Bool" Readable="true" Writable="true" sequencelength="1"/>
+     <Property Name="sp0c" Type="Char" Readable="true" Writable="true" sequencelength="1"/>
+     <Property Name="sp0s" Type="Short" Readable="true" Writable="true" sequencelength="1"/>
      <Property Name="sp1" Type="Char" Volatile="true" Writable="true" sequencelength="2"/>
      <Property Name="sp2" Type="Double" Readable="true" Writable="true" sequencelength="3"/>
      <Property Name="sp3" Type="Float" Volatile="true" Writable="true" sequencelength="4"/>
@@ -69,6 +75,8 @@
      <Property Name="sp10" Type="ULongLong" Readable="true" Writable="true" sequencelength="11"/>
      <Property Name="sp11" Type="String" StringLength="20" Volatile="true" Writable="true" sequencelength="12"/>
      <Property Name="pap0" Type="Bool" arraylength="1" parameter='1' default='1'/>
+     <Property Name="pap0c" Type="Char" arraylength="1" parameter='1' default='1'/>
+     <Property Name="pap0s" Type="Short" arraylength="1" parameter='1' default='1'/>
      <Property Name="pap1" Type="Char" arraylength="2" parameter='1' default='1,2'/>
      <Property Name="pap2" Type="Double" arraylength="3" parameter='1' default='1,2,3'/>
      <Property Name="pap3" Type="Float" arraylength="4" parameter='1' default='1,2,3,4'/>

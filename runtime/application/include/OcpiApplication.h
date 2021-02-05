@@ -50,6 +50,8 @@ namespace OCPI {
   namespace API {
 
     class ApplicationI {
+      std::string m_timeString; // used as a temp in printing time intervals
+      OS::Time m_earliest, m_constructed, m_initialized, m_started, m_finished;
       typedef OCPI::Container::Container::CMap CMap;
       ezxml_t m_deployXml;
       ezxml_t m_appXml;
@@ -240,6 +242,7 @@ namespace OCPI {
 				     unsigned *&pn, OCPI::Util::Value *&pv);
       void planDeployment(const PValue *params);
       void importDeployment(const char *file, ezxml_t &xml, const PValue *params);
+      const char *timeDiff(OS::Time later, OS::Time earlier);
     public:
       explicit ApplicationI(OCPI::API::Application &app, const char *file,
 			    const OCPI::API::PValue *params = NULL);
@@ -258,7 +261,8 @@ namespace OCPI {
       void stop();
       bool verbose() const { return m_verbose; }
       void setDelayedProperties();
-      bool wait(OCPI::OS::Timer *);
+      bool wait(unsigned long timeout_us, bool timeOutIsError);
+      bool wait(OS::Timer *timer);
       void finish();
       ExternalPort &getPort(const char *, const OCPI::API::PValue *);
       ExternalPort &getPort(unsigned index, std::string &name );

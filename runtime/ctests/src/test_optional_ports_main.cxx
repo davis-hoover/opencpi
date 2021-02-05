@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <OcpiOsMisc.h>
 #include <OcpiOsAssert.h>
-#include <DtIntEventHandler.h>
 #include "XferManager.h"
 #include <OcpiRDTInterface.h>
 #include <test_utilities.h>

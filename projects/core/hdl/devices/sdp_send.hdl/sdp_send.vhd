@@ -35,6 +35,10 @@ architecture rtl of worker is
   -- sdp_send is not really constrained by max_reads_outstanding, but this is the same
   -- constraint as sdp_receive for now.
   constant max_rem_buffers_c : natural := to_integer(max_buffers);
+  -- This restriction on max local buffers by max_reads_outstanding is artificial here, but is
+  -- consistent with sdp_receive and saves some gates.  It *could* simply be expanded to be the same
+  -- as max_buffers.  The limitation on sdp_receive is because its logic does not support
+  -- the buffer count to exceed the reads-outstanding count, although it could
   constant max_lcl_buffers_c : natural := ocpi.util.min(max_rem_buffers_c,max_reads_outstanding);
   subtype lcl_buffer_count_t is unsigned(width_for_max(max_lcl_buffers_c) - 1 downto 0);
   subtype lcl_buffer_idx_t is unsigned(width_for_max(max_lcl_buffers_c - 1) - 1 downto 0);
@@ -127,6 +131,7 @@ architecture rtl of worker is
   signal buffer_size_fault_r : bool_t;
   signal doorbell_fault_r    : bool_t;
   signal truncation_fault_r  : bool_t;
+  signal operating           : bool_t; -- are we operating now?
   signal operating_r         : bool_t; -- were we operating in the last cycle?
   signal messageCount_r      : ulong_t;
   signal truncatedMessage_r  : ulong_t; -- first one
@@ -148,11 +153,11 @@ begin
   next_buffer_addr   <= buffer_addr_r +
                         props_in.buffer_size(bram_addr_t'left + addr_shift_c
                                              downto addr_shift_c);
-  can_take           <= to_bool(operating_r and its(not buffer_size_fault_r) and
+  can_take           <= to_bool(operating and its(not buffer_size_fault_r) and
                                 its(not doorbell_fault_r) and md_not_full and
                                 buffer_avail_r /= 0);
   will_write         <= can_take and in_in.ready and in_in.valid and not buffer_maxed_r;
-  max_offset         <= props_in.buffer_size(bram_addr_t'left + 2 downto 2) - 1;
+  max_offset         <= props_in.buffer_size(bram_addr_t'left + addr_shift_c downto addr_shift_c) - 1;
   -- Take even if bad write to send the truncation error in the metadata
   taking             <= can_take and in_in.ready;
   in_out.take        <= taking;
@@ -260,6 +265,8 @@ begin
   flag_deq       <= flag_not_empty; -- output of FIFO always processed immediately
 
   sdp_my_reset <= sdp_reset or in_in.reset;
+  operating    <= operating_r or in_in.ready or in_in.eof;
+
   -- the process going from wsi into the data bram and metadata fifo
   wsi2bram : process(sdp_clk)
   begin
@@ -276,16 +283,12 @@ begin
         truncatedMessage_r  <= (others => '0');
         messageCount_r      <= (others => '0');
         eof_sent_r          <= bfalse;
-      elsif not operating_r then
-        -- initialization on first transition to operating.  poor man's "start".
-        if in_in.ready or in_in.eof then
-          operating_r   <= btrue;
-          if props_in.buffer_size > memory_bytes then
-            buffer_size_fault_r <= btrue;
-          end if;
-        end if;
+      elsif not operating then -- one time init before operating
         buffer_avail_r <= resize(props_in.buffer_count, buffer_avail_r'length);
-      else -- we are operating
+      elsif props_in.buffer_size > memory_bytes then
+        buffer_size_fault_r <= btrue;
+      elsif its(operating) then -- we are operating
+        operating_r   <= btrue; -- make it sticky
         if its(md_enq) then
           if its(in_in.eof) then
             eof_sent_r <= btrue;
@@ -337,7 +340,7 @@ begin
   sdp_last_remote     <= resize(props_in.remote_count -1, remote_idx_t'length);
   md_out              <= slv2meta(md_out_slv);
   md_out_ndws         <= resize((md_out.length + dword_bytes - 1) srl 2, md_out_ndws'length);
-  md_deq              <= operating_r and md_not_empty and sdp_in.sdp.ready and
+  md_deq              <= operating and md_not_empty and sdp_in.sdp.ready and
                          to_bool(sdp_remote_phase_r = flag_e) and
                          to_bool(sdp_remote_idx_r = sdp_last_remote);
   sdp_last_in_segment <= to_bool(sdp_segment_dws_left_r = 0);
@@ -416,14 +419,6 @@ g0: for i in 0 to sdp_width_c-1 generate
       sdp_out_r(flag'range) <= flag;
       sdp_out_valid_r       <= btrue;
       begin_segment(to_unsigned(1, meta_dw_count_t'length));
-      -- Advance the buffer pointer here (not in flag_e) to pipeline the bram address
-      if r = sdp_last_remote then
-        if sdp_msg_idx_r = resize(props_in.buffer_count - 1, sdp_msg_idx_r'length) then
-          sdp_msg_idx_r    <= (others => '0');
-        else
-          sdp_msg_idx_r    <= sdp_msg_idx_r + 1;
-        end if;
-      end if;
     end procedure begin_flag;
     procedure begin_meta is
       variable meta : std_logic_vector(55 downto 0)
@@ -474,6 +469,11 @@ g0: for i in 0 to sdp_width_c-1 generate
       else
         sdp_remotes(r).index <= sdp_remotes(r).index + 1;
       end if;
+      if sdp_msg_idx_r = resize(props_in.buffer_count - 1, sdp_msg_idx_r'length) then
+        sdp_msg_idx_r    <= (others => '0');
+      else
+        sdp_msg_idx_r    <= sdp_msg_idx_r + 1;
+      end if;
       if md_out_ndws = 0 then
         begin_meta;
         sdp_segment_addr_r <= meta_addr;
@@ -499,7 +499,7 @@ g0: for i in 0 to sdp_width_c-1 generate
         sdp_msg_addr_r     <= (others => '0');
         bramb_addr_r       <= (others => '0');
         sdp_out_valid_r    <= bfalse;
-      elsif not operating_r then
+      elsif not operating then
         -- reset state that depends on properties
         for r in 0 to max_remotes_c - 1 loop
           sdp_remotes(r).empty <= resize(props_in.remote_buffer_count(r), rem_buffer_count_t'length);

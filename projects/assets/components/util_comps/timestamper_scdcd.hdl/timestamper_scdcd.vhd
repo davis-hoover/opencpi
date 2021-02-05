@@ -171,7 +171,6 @@ begin
       iclk_in_demarshaller_oprotocol.sync;
   iclk_time_downsampler_iprotocol.end_of_samples <=
       iclk_in_demarshaller_oprotocol.end_of_samples;
-  time_out.clk <= in_in.clk;
 
   ctl_out.error <= btrue when (ctl_in.control_op = START_e) and
                    (props_in.force_error_on_invalid_time_at_start = btrue) and

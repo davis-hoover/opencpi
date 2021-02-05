@@ -35,13 +35,14 @@ odev build rcc
 echo Building the multislave_test application
 odev build application multislave_test
 echo Running the multislave_test application
+env | grep OCPI
 (cd applications/multislave_test &&
-  OCPI_LIBRARY_PATH=../../:$OCPI_LIBRARY_PATH ./target-$OCPI_TARGET_DIR/multislave_test)
+  OCPI_LIBRARY_PATH=../../artifacts:$OCPI_LIBRARY_PATH ./target-$OCPI_TARGET_DIR/multislave_test)
 echo Building the aci_property_test_app application
 odev build application aci_property_test_app
 echo Running the aci_property_test_app application
 (cd applications/aci_property_test_app &&
-  OCPI_LIBRARY_PATH=../../:$OCPI_LIBRARY_PATH ./target-$OCPI_TARGET_DIR/test_app)
+  OCPI_LIBRARY_PATH=../../artifacts:$OCPI_LIBRARY_PATH ./target-$OCPI_TARGET_DIR/test_app)
 cd components
 odev build worker prop_mem_align_info.rcc
 odev build test prop_mem_align_info.test

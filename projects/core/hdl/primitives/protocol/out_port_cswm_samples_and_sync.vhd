@@ -27,20 +27,21 @@ entity out_port_cswm_samples_and_sync is
                                         -- MUST USE 32 FOR NOW
     WSI_MBYTEEN_WIDTH : positive := 4);
   port(
-    clk          : in  std_logic;
-    rst          : in  std_logic;
+    clk              : in  std_logic;
+    rst              : in  std_logic;
     -- INPUT
-    iprotocol    : in  protocol.complex_short_with_metadata.protocol_t;
-    oready       : in  ocpi.types.Bool_t;
+    iprotocol        : in  protocol.complex_short_with_metadata.protocol_t;
+    oready           : in  ocpi.types.Bool_t;
+    suppress_sync_op : in  ocpi.types.Bool_t;
     -- OUTPUT
-    odata        : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
-    ovalid       : out ocpi.types.Bool_t;
-    obyte_enable : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
-    ogive        : out ocpi.types.Bool_t;
-    osom         : out ocpi.types.Bool_t;
-    oeom         : out ocpi.types.Bool_t;
-    oopcode      : out protocol.complex_short_with_metadata.opcode_t;
-    iready       : out std_logic);
+    odata            : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
+    ovalid           : out ocpi.types.Bool_t;
+    obyte_enable     : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
+    ogive            : out ocpi.types.Bool_t;
+    osom             : out ocpi.types.Bool_t;
+    oeom             : out ocpi.types.Bool_t;
+    oopcode          : out protocol.complex_short_with_metadata.opcode_t;
+    iready           : out std_logic);
 end entity;
 architecture rtl of out_port_cswm_samples_and_sync is
 
@@ -51,27 +52,36 @@ architecture rtl of out_port_cswm_samples_and_sync is
   signal som                    : std_logic;
   signal eom                    : std_logic;
   signal sync_ready_r           : std_logic;
+  signal sync                   : std_logic;
+  signal sync_sticky_r          : std_logic;
   signal opcode : protocol.complex_short_with_metadata.opcode_t :=
                   protocol.complex_short_with_metadata.SAMPLES;
 
 begin
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
-    opcode <=  protocol.complex_short_with_metadata.SYNC      when (sync_ready_r = '1' and give = '1')     else
+    opcode <=  protocol.complex_short_with_metadata.SYNC      when (sync_ready_r = '1' and suppress_sync_op = '0')     else
                protocol.complex_short_with_metadata.SAMPLES;
 
     som       <= sync_ready_r;
     valid     <= (oready and iprotocol.samples_vld) when (opcode = protocol.complex_short_with_metadata.SAMPLES) else '0';
-    eom       <= iprotocol.sync or sync_ready_r;
+    eom       <= sync or sync_ready_r;
     give      <= (som or eom or valid) and oready;
+    
+    sync <= (iprotocol.sync or sync_sticky_r) and not suppress_sync_op;
 
     sync_ready_reg : process (clk)
     begin
         if rising_edge(clk) then
-          if rst = '1' then
+          if (rst = '1' or suppress_sync_op = '1') then
             sync_ready_r <= '0';
-          else
-            if (iprotocol.sync = '1' and sync_ready_r = '0') then
-              sync_ready_r <= '1';
+            sync_sticky_r <= '0';
+          elsif (suppress_sync_op = '0') then
+            if (iprotocol.sync = '1') then 
+              sync_sticky_r <= '1';
+            end if;
+            if (sync = '1' and sync_ready_r = '0'  and oready = '1') then
+              sync_ready_r  <= '1';
+              sync_sticky_r <= '0';
             elsif (sync_ready_r = '1' and oready = '1') then
               sync_ready_r <= '0';
             end if;

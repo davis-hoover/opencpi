@@ -1,5 +1,5 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library cdc, util, adc;
+library cdc, util, adc, ocpi; use ocpi.wci.all;
 library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
@@ -28,13 +28,18 @@ architecture rtl of worker is
   signal adc_data_widener_oprotocol : protocol_t := PROTOCOL_ZERO;
   signal adc_data_widener_oeof      : std_logic := '0';
 
-  signal adc_out_marshaller_irdy : std_logic := '0';
+  signal adc_out_marshaller_irdy   : std_logic := '0';
+  signal dev_ready                 : bool_t;
+
+  signal ctl_suppress_sync_opcode  : bool_t;
+  signal adc_suppress_sync_opcode  : bool_t;
 
 begin
   ------------------------------------------------------------------------------
   -- CTRL
   ------------------------------------------------------------------------------
 
+  ctl_out.done <= to_bool(dev_ready or (ctl_in.control_op = no_op_e));
   adc_rst <= out_in.reset;
   ctrl_out_cdc : cdc.cdc.fast_pulse_to_slow_sticky
     port map(
@@ -58,7 +63,7 @@ begin
       clk                     => dev_in.clk,
       rst                     => out_in.reset,
       clr                     => '0',
-      rst_detected            => ctl_out.done,
+      rst_detected            => dev_ready,
       rst_then_unrst_detected => open);
 
   ------------------------------------------------------------------------------
@@ -95,6 +100,20 @@ begin
         end if;
       end if;
     end process;
+    
+    ctl_suppress_sync_opcode <= props_in.suppress_sync_opcode_written and props_in.suppress_sync_opcode and ctl_in.is_operating;
+    suppress_sync_opcode_cdc : cdc.cdc.single_bit
+    generic map(
+      N    =>  2,
+      IREG => '1')
+    port map(
+      src_clk  => ctl_in.clk,
+      src_rst  => ctl_in.reset,
+      src_en   => '1',
+      src_in   => ctl_suppress_sync_opcode,
+      dst_clk  => dev_in.clk,
+      dst_rst  => adc_rst,
+      dst_out  => adc_suppress_sync_opcode);
 
     overrun_generator :
         adc.adc.samp_drop_detector
@@ -133,20 +152,21 @@ begin
         WSI_DATA_WIDTH => to_integer(OUT_PORT_DATA_WIDTH),
         WSI_MBYTEEN_WIDTH => out_out.byte_enable'length)
       port map(
-        clk           => dev_in.clk,
-        rst           => adc_rst,
+        clk              => dev_in.clk,
+        rst              => adc_rst,
         -- INPUT
-        iprotocol     => adc_data_widener_oprotocol,
-        oready        => out_in.ready,
+        iprotocol        => adc_data_widener_oprotocol,
+        oready           => out_in.ready,
+        suppress_sync_op => adc_suppress_sync_opcode,
         -- OUTPUT
-        odata         => adc_data,
-        ovalid        => out_out.valid,
-        obyte_enable  => out_out.byte_enable,
-        ogive         => out_out.give,
-        osom          => out_out.som,
-        oeom          => out_out.eom,
-        oopcode       => adc_opcode,
-        iready        => adc_out_marshaller_irdy);
+        odata            => adc_data,
+        ovalid           => out_out.valid,
+        obyte_enable     => out_out.byte_enable,
+        ogive            => out_out.give,
+        osom             => out_out.som,
+        oeom             => out_out.eom,
+        oopcode          => adc_opcode,
+        iready           => adc_out_marshaller_irdy);
 
     out_clk_gen : util.util.in2out
       port map(

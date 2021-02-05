@@ -52,7 +52,7 @@ DataTransfer::EventManager*
 Container::
 getEventManager()
 {
-  return getTransport().m_transportGlobal->getEventManager();
+  return getTransport().m_transportManager->getEventManager();
 }
 
 class Driver;

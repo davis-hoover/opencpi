@@ -75,14 +75,14 @@ namespace OCPI {
 
     // Note this is not dependent on configuration.
     // It is currently used in lieu of a generic data transport shutdowm.
-    OCPI::DataTransport::TransportGlobal &Manager::
-    getTransportGlobalInternal(const OU::PValue *params) {
+    OCPI::DataTransport::TransportManager &Manager::
+    getTransportManagerInternal(const OU::PValue *params) {
       static unsigned event_range_start = 0;
       bool polled = true;
       OU::findBool(params, "polled", polled);
-      OT::TransportGlobal **tpg = polled ? &m_tpg_no_events : &m_tpg_events;
+      OT::TransportManager **tpg = polled ? &m_tpg_no_events : &m_tpg_events;
       if (!*tpg)
-	*tpg = new OT::TransportGlobal( event_range_start++, !polled );
+	*tpg = new OT::TransportManager( event_range_start++, !polled );
       return **tpg;
     }
 
