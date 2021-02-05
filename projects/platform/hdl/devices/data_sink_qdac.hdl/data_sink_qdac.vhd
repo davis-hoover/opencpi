@@ -96,7 +96,8 @@ begin
     --On/Off signal used to qualify underrun
     start_samples <= dac_in_demarshaller_oprotocol.samples_vld and
                      not tx_on_off_r;
-    end_samples   <= dac_in_demarshaller_oprotocol.end_of_samples or
+    end_samples   <= dac_in_demarshaller_oprotocol.end_of_samples or 
+                     dac_in_demarshaller_oprotocol.flush or 
                      dac_in_demarshaller_oeof;
     tx_on_off_s   <= start_samples or (tx_on_off_r and not end_samples);
 
@@ -133,9 +134,9 @@ begin
       end if;
     end process;
 
-    on_off_out.give <= on_off_in.ready and (event_present or event_pending);
-    
-    ctl_out.finished <= dac_in_demarshaller_oeof;
+    on_off_out.give   <= on_off_in.ready and (event_present or event_pending);
+    on_off_out.opcode <= tx_event_txOn_op_e  when its(tx_on_off_s)  else tx_event_txOff_op_e;
+    ctl_out.finished  <= dac_in_demarshaller_oeof;
     
     dac_underrun_detector : dac.dac.underrun_detector
       port map(
