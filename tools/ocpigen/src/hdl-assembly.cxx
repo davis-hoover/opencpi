@@ -462,7 +462,7 @@ parseHdlAssy() {
 	if (ip.m_port->m_myClock && !ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal]) {
 	  if (ip.m_port->m_clock->m_output) { // look for internal connections with a driven clock
 	    // The "_i" suffix is for "internal to the assembly".
-	    // It man subsequently be driven to an assembly-level output clock without the suffix
+	    // It can subsequently be driven to an assembly-level output clock without the suffix
 	    Clock &clk = addClock(ip.m_instance->m_name + "_" + ip.m_port->m_clock->m_name + "_i",
 				  true);
 	    clk.m_internal = true; // may be overridden later during propagation
@@ -642,7 +642,7 @@ parseHdlAssy() {
       for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
 	(**ai).m_instPort.m_clockSignal = c.m_clock->m_signal;
       // If this non-internal clock is not associated with any port, it must be exported.
-      if (!c.m_clock->m_port) {
+      if (!c.m_clock->m_port && m_type != Worker::Container) {
 	c.m_clock->m_exported = true;
 	// ugly - strip the _i suffix for inside-the-assembly
 	OU::format(c.m_clock->m_exportedSignal, "%.*s_Clk", (int)(c.m_clock->m_name.length() - 2),
