@@ -48,19 +48,20 @@ entity sdp_receive_dma is
   generic (ocpi_debug       : boolean;
            sdp_width        : natural;
            memory_depth     : natural;
-           max_buffers      : natural);
+           max_lcl_buffers  : natural;
+           max_rem_buffers  : natural);
   port (   sdp_clk          : in std_logic;
            sdp_reset        : in std_logic;
            operating        : in bool_t;
            -- properties
            buffer_ndws      : in  unsigned(width_for_max(memory_depth * sdp_width)-1 downto 0);
-           lcl_buffer_count : in  unsigned(width_for_max(max_buffers)-1 downto 0);
+           lcl_buffer_count : in  unsigned(width_for_max(max_lcl_buffers)-1 downto 0);
            role             : in  role_t;
            rem_flag_addr    : in  ulonglong_t;
            rem_flag_pitch   : in  ulong_t;
            rem_data_addr    : in  ulonglong_t;
            rem_data_pitch   : in  ulong_t;
-           rem_buffer_count : in  uchar_t;
+           rem_buffer_count : in  unsigned(width_for_max(max_rem_buffers)-1 downto 0);
            -- inputs from CTL/WSI side
            length_not_empty : in  bool_t;
            length_out       : in  metalength_dws_t;
@@ -96,9 +97,13 @@ architecture rtl of sdp_receive_dma is
     return width_for_max(ocpi.util.max(1, sdp_width - 1));
   end dw_addr_shift_c;
   subtype sdp_addr_t is unsigned(addr_width_c + dw_addr_shift_c - 1 downto 0);
-  constant count_width_c   : natural := width_for_max(max_buffers);
-  subtype buffer_count_t is unsigned(count_width_c - 1 downto 0);
-  signal flags_to_send_r     : buffer_count_t;
+  constant lcl_count_width_c : natural := width_for_max(max_lcl_buffers);
+  subtype lcl_buffer_count_t is unsigned(lcl_count_width_c - 1 downto 0);
+  subtype lcl_buffer_idx_t is unsigned(lcl_count_width_c - 2 downto 0);
+  constant rem_count_width_c : natural := width_for_max(max_rem_buffers);
+  subtype rem_buffer_count_t is unsigned(rem_count_width_c - 1 downto 0);
+  subtype rem_buffer_idx_t is unsigned(rem_count_width_c - 2 downto 0);
+  signal flags_to_send_r     : lcl_buffer_count_t;
   -- For arithmetic about the dws in a transfer, including the value sdp_width (not - 1)
   subtype sdp_xfr_dw_t is unsigned(width_for_max(sdp_width)-1 downto 0);
   constant xfer_width        : sdp_xfr_dw_t := to_unsigned(sdp_width, sdp_xfr_dw_t'length);
@@ -127,8 +132,8 @@ architecture rtl of sdp_receive_dma is
   -- for different buffers.  Athough the response fragments for a given read (with a given XID)
   -- are assumed to arrive in order, fragments for different reads are not ordered.
   type sdp_addrs_t is array (natural range <>) of sdp_addr_t;
-  signal sdp_am_addr_r       : sdp_addrs_t(0 to max_buffers-1); -- counting up as data comes
-  signal sdp_am_last_r       : sdp_addrs_t(0 to max_buffers-1); -- to know when done
+  signal sdp_am_addr_r       : sdp_addrs_t(0 to max_lcl_buffers-1); -- counting up as data comes
+  signal sdp_am_last_r       : sdp_addrs_t(0 to max_lcl_buffers-1); -- to know when done
   signal sdp_dws_left        : pkt_ndw_t;
   signal sdp_dws_left_r      : pkt_ndw_t;
   signal sdp_starting_r      : bool_t; -- when sdp_in is valid, its the first of a packet
@@ -142,19 +147,18 @@ architecture rtl of sdp_receive_dma is
   --                 of the xid to indicate which buffer the fragment is for.
   --                 sdp_buffer_idx_r is used to know which buffer is the next one to
   --                 be given to the WSI side.
-  signal lcl_buffer_idx_r    : buffer_count_t;
-  signal rem_buffer_idx_r    : uchar_t;
+  signal lcl_buffer_idx_r    : lcl_buffer_idx_t;
+  signal rem_buffer_idx_r    : rem_buffer_idx_t;
   -- This is a count of buffers that are not full, including in progress of filling
 --  signal rem_buffers_empty_r : uchar_t;
-  signal lcl_buffers_empty_r : buffer_count_t;
-  signal lcl_read_idx_r      : buffer_count_t;
-  signal rem_read_idx_r      : uchar_t;
+  signal lcl_buffers_empty_r : lcl_buffer_count_t;
+  signal lcl_read_idx_r      : lcl_buffer_idx_t;
+  signal rem_read_idx_r      : rem_buffer_idx_t;
   signal rem_flag_addr_r     : whole_addr_t;
   signal rem_read_addr_r     : whole_addr_t;
   signal lcl_response_addr_r : sdp_addr_t;
   signal faults_r            : uchar_t;
-  subtype buffer_idx_t is unsigned(count_width_c-2 downto 0);
-  signal sdp_am_buffer_idx   : buffer_idx_t;
+  signal sdp_am_buffer_idx   : lcl_buffer_idx_t;
   signal read_starting       : bool_t; -- next cycle will be a read request
   signal reading_r           : bool_t; -- a read is being issued waiting to be accepted
   signal read_accepted       : bool_t; -- last cycle of a read request
@@ -165,8 +169,8 @@ architecture rtl of sdp_receive_dma is
   signal flagging_r          : bool_t; -- a flag write is being issues waiting to be accepted
   signal flag_accepted       : bool_t; -- a flag request is being accepted
   signal taking              : bool_t;
-  signal rem_last_buffer_idx : uchar_t;
-  signal lcl_last_buffer_idx : buffer_count_t;
+  signal rem_last_buffer_idx : rem_buffer_idx_t;
+  signal lcl_last_buffer_idx : lcl_buffer_idx_t;
   --signal status1_r            : uchar_t;
   --signal status2_r            : uchar_t;
   --signal status3_r            : uchar_t;

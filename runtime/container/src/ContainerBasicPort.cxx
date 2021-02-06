@@ -159,7 +159,7 @@ namespace OCPI {
 	  throw OU::Error("bufferCount is below worker's minimum");
         else {
 	  getData().data.desc.nBuffers = OCPI_UTRUNCATE(uint32_t, (m_nBuffers = ul));
-	  ocpiDebug("Setting nbuffers from parameters on \"%s\" to %zu",
+	  ocpiInfo("Setting nbuffers from parameters on \"%s\" to %zu",
 		    name().c_str(), m_nBuffers);
 	}
       }

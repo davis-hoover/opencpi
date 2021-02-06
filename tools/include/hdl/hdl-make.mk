@@ -171,7 +171,7 @@ HdlCompile=\
     > $(HdlTime) 2>&1; \
   HdlExit=$$?; \
   (cat $(HdlTime) | tr -d "\n"; $(ECHO) -n " at "; date +%T) >> $(HdlLog); \
-  grep -i error $(HdlLog)| grep -v Command: |\
+  egrep -i 'error|fatal' $(HdlLog)| grep -v Command: |\
     grep -v '^WARNING:'|grep -v " 0 errors," | grep -i -v -e '[_a-z]error' -e 'error[a-rt-z_]' $(HdlGrepExclude_$(HdlToolSet)); \
   if grep -q '^ERROR:' $(HdlLog); then HdlExit=1; fi; \
   if test "$$OCPI_HDL_VERBOSE_OUTPUT" != ''; then \

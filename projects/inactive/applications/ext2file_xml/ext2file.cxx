@@ -34,14 +34,11 @@ int main(int /* argc */, char ** /* argv */) {
 		    "  </instance>"
 		    "</application>");
   try {
-    OA::Application app(hello);
-    fprintf(stderr, "Application XML parsed and deployments (containers and implementations) chosen\n");
+    OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVBool("dump", true), OA::PVEnd };
+    OA::Application app(hello, pvs);
     app.initialize();
-    fprintf(stderr, "Application established: containers, workers, connections all created\n");
     OA::ExternalPort &ep = app.getPort("in");
-    fprintf(stderr, "Communication with the application established\n");
     app.start();
-    fprintf(stderr, "Application started/running\n");
     for(unsigned n = 0; n < 5; n++) {
       OA::ExternalBuffer *b;
       uint8_t *data;
