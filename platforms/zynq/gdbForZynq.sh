@@ -46,7 +46,7 @@ source $OCPI_CDK_DIR/scripts/util.sh
 source $OCPI_CDK_DIR/scripts/ocpitarget.sh $plat
 exec ${OCPI_TARGET_CROSS_COMPILE}gdb \
   $main \
-  -ex "set sysroot $OCPI_TARGET_PLATFORM_DIR/release/$hdl/root" \
-  -ex "set solib-search-path $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib:$(getProjectRegistryDir)/ocpi.core/exports/lib/components/rcc/$OCPI_TARGET_DIR" \
+  -ex "set sysroot $OCPI_TARGET_PLATFORM_DIR/hdl/$hdl/root" \
+  -ex "set solib-search-path $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib:$OCPI_CDK_DIR/$OCPI_TARGET_DIR/sdk/lib" \
   -ex "target remote ${addr}:1234" \
   $*

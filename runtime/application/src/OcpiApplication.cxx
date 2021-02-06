@@ -1901,8 +1901,7 @@ namespace OCPI {
       m_initialized = OS::Time::now();
       if (m_verbose)
         fprintf(stderr,
-                "Application established: containers, workers, connections all created and\n"
-                "Communication with the application established%s\n",
+                "Application established: containers, workers, connections all created%s\n",
 		timeDiff(m_initialized, m_constructed));
       m_initialized = OS::Time::now();
     }

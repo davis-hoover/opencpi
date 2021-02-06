@@ -45,7 +45,7 @@ export OCPI_CDK_DIR=`pwd`
 export OCPI_TOOL_PLATFORM=$(cat swplatform)
 export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
-PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
+PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/sdk/bin:$PATH
 export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/system.xml
 export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/sdk/lib
 EOF
@@ -84,7 +84,7 @@ start)
   ocpidriver unload >&2 || : # in case it was loaded from a different version
   echo "Reloading kernel driver: $mem"
   ocpidriver $memarg load >&2
-  [ -n "$mem" ] && export OCPI_SMB_SIZE=$mem
+  [ -n "$mem" ] && envarg="$envarg OCPI_SMB_SIZE=$mem"
   if [ -n "$bs" ]; then
     echo "Loading opencpi bitstream"
     HDL_PLATFORM=$(cat hwplatform)

@@ -37,8 +37,8 @@
 struct  XFTemplate {
   DataTransfer::SmemServices* s_smem;
   DataTransfer::SmemServices* t_smem;
-  uint32_t                    s_off;
-  uint32_t                    t_off;
+  // uint32_t                    s_off;
+  // uint32_t                    t_off;
 };
 class Mapit {
  public:

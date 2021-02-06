@@ -81,6 +81,11 @@ typedef struct {
   ocpi_size_t    size1;
 } ocpi_pci_t;
 
+typedef struct {
+  ocpi_address_t address; // bus address
+  ocpi_size_t    size;
+} ocpi_cache_t;
+
 typedef enum {
   ocpi_none,
   ocpi_discovery, // I send CP broadcast packets for discovery, only one of these allowed
@@ -116,5 +121,7 @@ typedef struct sockaddr_ocpi {
 #define OCPI_CMD_PCI            _IOR(OPENCPI_IOC_MAGIC,  3, ocpi_pci_t)
 #define OCPI_CMD_DISCOVER       _IOR(OPENCPI_IOC_MAGIC,  4, unsigned)
 #define OCPI_CMD_LOAD_FPGA      _IOWR(OPENCPI_IOC_MAGIC, 5, ocpi_load_fpga_request_t)
+#define OCPI_CMD_INVALIDATE     _IOWR(OPENCPI_IOC_MAGIC, 6, ocpi_cache_t)
+#define OCPI_CMD_FLUSH          _IOWR(OPENCPI_IOC_MAGIC, 7, ocpi_cache_t)
 
 #endif /* OPENCPI_H_ */

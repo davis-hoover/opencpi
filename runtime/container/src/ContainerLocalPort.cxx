@@ -59,7 +59,7 @@ namespace OCPI {
     prepareOthers(size_t a_nOthers, size_t mine) {
       m_scale = mine;
       if (a_nOthers) { // nOthers == 0 means no bridging, but to expect one connection
-	ocpiDebug("Preparing port for connection to ports scaled crew");
+	ocpiInfo("Preparing port \"%s\" for connection to a scaled crew (%zu)", cname(), a_nOthers);
 	m_bridgePorts.resize(a_nOthers, NULL);
       }
     }
@@ -253,12 +253,14 @@ namespace OCPI {
 	&otherMeta = other.m_port ? other.m_port->m_metaPort : *other.m_metaPort,
 	&input = isProvider() ? m_metaPort : otherMeta,
 	&output = isProvider() ? otherMeta : m_metaPort;
+      ocpiInfo("Setting up bridging from \"%s\" to \"%s\"", input.cname(), output.cname());
       size_t nOps = std::max(input.nOperations(), output.nOperations());
       m_bridgeOps.resize(nOps);
       m_defaultBridgeOp.m_last = m_bridgePorts.size() - 1;
       for (unsigned n = 0; n < nOps; n++)
 	determineBridgeOp(c, output, input, n, m_bridgeOps[n]);
       if (isInProcess(NULL)) {
+	ocpiInfo("Bridging is in-process");
 	becomeShim(NULL);    // skinny set of buffers and flags between codec and worker
 	m_localBridgePort = this;
       } else {
@@ -276,9 +278,10 @@ namespace OCPI {
 	m_localBridgePort = new BridgePort(Container::baseContainer(), metaPort(), !isProvider(),
 					   other.m_params);
 	m_localBridgePort->applyConnection(bridged, c.m_bufferSize); // native transport
-	ocpiInfo("Bridging established at local port %s, bridge buffercount: %zu size: %zu",
-		 isProvider() ? c.m_in.m_name : c.m_out.m_name, m_localBridgePort->m_nBuffers,
-		 m_localBridgePort->m_bufferSize);
+	ocpiInfo("Bridging, not in-process, size %zu, count out %zu, count in %zu",
+		 m_localBridgePort->m_bufferSize,
+		 isProvider() ? m_localBridgePort->m_nBuffers : m_nBuffers,
+		 isProvider() ? m_nBuffers : m_localBridgePort->m_nBuffers);
 	m_localBridgePort->connectLocal(*this, NULL);
       }
     }

@@ -69,7 +69,9 @@ mkdir -p $dest/lib
 getlib "libstdc++.so*"
 getlib "libgcc_s.so*"
 getlib "ld-*.so*"
-
+getlib "libpthread*.so*"
+mkdir -p $dest/bin
+cp $(dirname $cross)/gdbserver $dest/bin
 # While we are here, dump out the details of the compiler
 mkdir -p gen
 ${cross}gcc -Q --help=target > $dest/gcc-target-options
