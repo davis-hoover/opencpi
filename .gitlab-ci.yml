@@ -28,5 +28,8 @@ stages:
 - .pre
 - generate-children
 - trigger-children
+- build
 - deploy
-include: .gitlab-ci/yaml-parent/verify-pipeline.yml
+include: 
+- .gitlab-ci/yaml/verify-pipeline.yml
+- .gitlab-ci/yaml/docs.yml
