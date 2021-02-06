@@ -32,7 +32,7 @@
   <TimeInterface name='time'
                  secondswidth='32'
                  fractionwidth='32'
-                 clockDirection='out'
+                 clock='in'
                  allowunavailable='true'/>
 
 </HdlWorker>
