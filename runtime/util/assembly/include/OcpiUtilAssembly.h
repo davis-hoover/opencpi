@@ -154,6 +154,7 @@ namespace OCPI {
         // Then this assembly is reused, this resolution will still be valid.
         mutable std::string m_name;
         mutable Role m_role;
+	mutable unsigned m_ordinal; // resolved against implementations like role
         size_t m_instance;
         size_t m_index;
         // This mutable is because some port parameter values are added later by name
