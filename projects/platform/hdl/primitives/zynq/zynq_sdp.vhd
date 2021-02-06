@@ -77,6 +77,10 @@ begin
   end generate;
   -- Instantiate the processor system (i.e. the interface to it).
   ps : zynq_ps
+    generic map (
+	package_name 	   => package_name,
+	dq_width 	   => dq_width
+    )
     port map(
       -- Signals from the PS used in the PL
       ps_in.debug           => (31 => ocpi.util.slvn(which_gp,1)(0), others => '0'),
