@@ -37,7 +37,7 @@
 namespace DataTransfer {
   namespace Datagram {
 
-struct MsgHeader {
+struct __attribute__((__packed__)) MsgHeader {
   enum MsgType {
     DATA=0,
     METADATA=1,
@@ -56,13 +56,14 @@ struct MsgHeader {
 };
 
 struct Transaction;
-struct FrameHeader {
+ struct __attribute__((__packed__)) FrameHeader {
   uint16_t destId;
   uint16_t srcId;
   uint16_t frameSeq;
   uint16_t ACKStart;
   uint8_t  ACKCount;
   uint8_t  flags;
+  uint16_t  pad0; // pad to 32 bits
 };
 #define FRAME_FLAG_HAS_MESSAGES 1
 
@@ -92,6 +93,7 @@ protected:
     ocpiAssert(destId < m_xferServices.size());
     return m_xferServices[destId];
   }
+  virtual uint16_t maxPayloadSize()=0;  // Maximum message size, total bytes
 };
 
 static const int MAX_MSGS = 10;  // FIXME can be calulated
@@ -125,7 +127,6 @@ public:
   virtual void send(Frame &frame, DGEndPoint &destEp) = 0;
   // return bytes read and offset in buffer to use.  Returning zero is timeout
   virtual size_t receive(uint8_t *buf, size_t &offset) = 0;
-  virtual uint16_t maxPayloadSize()=0;  // Maximum message size, total bytes
   virtual void start() = 0;
   inline void stop() { m_run = false; }
   void run();
@@ -237,7 +238,6 @@ class XferServices : public DataTransfer::XferServices, virtual public OCPI::Uti
 public:
   XferServices(XferFactory &driver, EndPoint &source, EndPoint &target);
   virtual ~XferServices ();
-  virtual uint16_t maxPayloadSize()=0;  // Maximum message size, total bytes
 
   //Frame &nextFreeFrame();
   Frame &getFrame();
@@ -246,6 +246,7 @@ public:
   void processFrame(FrameHeader *frame);
   void checkAcks(OCPI::OS::Time time, OCPI::OS::Time timeout);
   void sendAcks(OCPI::OS::Time time_now, OCPI::OS::Time timeout);
+  virtual uint16_t maxPayloadSize() = 0;
 
 private:
   DGEndPoint   &m_lep, &m_rep; // local and remote

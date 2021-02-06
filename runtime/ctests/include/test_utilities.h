@@ -34,7 +34,6 @@
 #include "OcpiOsMisc.h"
 #include "OcpiOsAssert.h"
 #include "OcpiTimeEmit.h"
-#include "DtIntEventHandler.h"
 #include "OcpiRDTInterface.h"
 #include "OcpiThread.h"
 #include "OcpiPValue.h"

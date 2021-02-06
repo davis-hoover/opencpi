@@ -45,7 +45,7 @@ namespace OCPI {
 	if (read) {
 	  set_xid(m_xid = s_xid);
 	  // FIXME: multithreaded control actions
-	  if (++s_xid == max_reads_outstanding)
+	  if (++s_xid == MAX_READS_OUTSTANDING)
 	    s_xid = 0;
 	} else
 	  set_xid(0);

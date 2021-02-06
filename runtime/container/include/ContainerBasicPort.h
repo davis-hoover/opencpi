@@ -85,7 +85,7 @@ namespace OCPI {
     struct BufferHeader {
       uint8_t          m_opCode; // Opcode for the message
       uint8_t          m_eof;
-      uint8_t          m_data;   // Offset of data from this struct. 0 is for standalone eof
+      uint8_t          m_data;   // != 0 if there is data, 0 is for standalone eof
       uint8_t          m_direct;
       uint32_t         m_length; // size in bytes of the message
     };

@@ -275,9 +275,10 @@ namespace OCPI {
 	applyConnection(bridged, c.m_bufferSize);
 	m_localBridgePort = new BridgePort(Container::baseContainer(), metaPort(), !isProvider(),
 					   other.m_params);
-	ocpiInfo("Bridging established at local port %s, bridge buffercount: %zu",
-		 isProvider() ? c.m_in.m_name : c.m_out.m_name, m_localBridgePort->m_nBuffers);
 	m_localBridgePort->applyConnection(bridged, c.m_bufferSize); // native transport
+	ocpiInfo("Bridging established at local port %s, bridge buffercount: %zu size: %zu",
+		 isProvider() ? c.m_in.m_name : c.m_out.m_name, m_localBridgePort->m_nBuffers,
+		 m_localBridgePort->m_bufferSize);
 	m_localBridgePort->connectLocal(*this, NULL);
       }
     }

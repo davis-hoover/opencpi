@@ -177,6 +177,8 @@ namespace OCPI {
         PValueList m_parameters;
         size_t m_count; // all attachments have same count. zero if unknown
         Connection();
+	Connection(const Connection &conn);
+	Connection(Connection &conn);
         const char *parse(ezxml_t x, Assembly &a, unsigned &ord, const OCPI::Util::PValue *params);
         const char *addPort(Assembly &a, size_t instance, const char *port, bool isInput,
                             bool bidi, bool known, size_t index,

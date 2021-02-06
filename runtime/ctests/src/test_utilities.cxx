@@ -33,7 +33,6 @@
 #include "OcpiOsMisc.h"
 #include "OcpiOsAssert.h"
 #include "OcpiUtilMisc.h"
-#include "DtIntEventHandler.h"
 #include "OcpiRDTInterface.h"
 #include "OcpiPValue.h"
 #include "ContainerWorker.h"

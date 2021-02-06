@@ -54,8 +54,51 @@
 #  include "solaris/platform.h"
 # endif
 # if defined(__APPLE__)
+// From: https://stackoverflow.com/questions/8177031/does-mac-os-x-have-pthread-spinlock-t-type/13151288
 typedef int pthread_spinlock_t;
+int pthread_spin_init(pthread_spinlock_t *lock, int pshared);
+int pthread_spin_destroy(pthread_spinlock_t *lock);
+int pthread_spin_lock(pthread_spinlock_t *lock);
+int pthread_spin_trylock(pthread_spinlock_t *lock);
+int pthread_spin_unlock(pthread_spinlock_t *lock);
+#if 0
+int pthread_spin_init(pthread_spinlock_t *lock, int pshared) {
+  (void)pshared;
+    __asm__ __volatile__ ("" ::: "memory");
+    *lock = 0;
+    return 0;
+}
+
+int pthread_spin_destroy(pthread_spinlock_t *lock) {
+    return 0;
+}
+
+int pthread_spin_lock(pthread_spinlock_t *lock) {
+    while (1) {
+        int i;
+        for (i=0; i < 10000; i++) {
+            if (__sync_bool_compare_and_swap(lock, 0, 1)) {
+                return 0;
+            }
+        }
+        sched_yield();
+    }
+}
+
+int pthread_spin_trylock(pthread_spinlock_t *lock) {
+    if (__sync_bool_compare_and_swap(lock, 0, 1)) {
+        return 0;
+    }
+    return EBUSY;
+}
+
+int pthread_spin_unlock(pthread_spinlock_t *lock) {
+    __asm__ __volatile__ ("" ::: "memory");
+    *lock = 0;
+    return 0;
+}
 # endif
+#endif
 #endif
 
 #include "pthread_workqueue.h"

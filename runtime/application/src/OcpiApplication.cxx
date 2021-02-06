@@ -35,6 +35,7 @@ namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
 namespace OL = OCPI::Library;
 namespace OA = OCPI::API;
+namespace OS = OCPI::OS;
 namespace OCPI {
   namespace API {
     // This function is our hook before anything interesting happens so we can
@@ -130,7 +131,8 @@ namespace OCPI {
     }
 
     ApplicationI::ApplicationI(Application &app, const char *file, const PValue *params)
-      : m_assembly(createLibraryAssembly(file, m_deployXml, m_appXml, m_copy, params)),
+      : m_earliest(OS::Time::now()), m_constructed(0), m_initialized(0), m_started(0), m_finished(0),
+        m_assembly(createLibraryAssembly(file, m_deployXml, m_appXml, m_copy, params)),
         m_apiApplication(app) {
       init(params);
     }
@@ -143,12 +145,14 @@ namespace OCPI {
 #endif
     ApplicationI::ApplicationI(Application &app, ezxml_t xml, const char *a_name,
                                const PValue *params)
-      : m_deployXml(NULL), m_appXml(NULL), m_copy(NULL),
+      : m_earliest(OS::Time::now()), m_constructed(0), m_initialized(0), m_started(0), m_finished(0),
+        m_deployXml(NULL), m_appXml(NULL), m_copy(NULL),
         m_assembly(createLibraryAssembly(xml, a_name, params)), m_apiApplication(app)  {
       init(params);
     }
     ApplicationI::ApplicationI(Application &app, OL::Assembly &assy, const PValue *params)
-      : m_deployXml(NULL), m_appXml(NULL), m_copy(NULL), m_assembly(assy),
+      : m_earliest(OS::Time::now()), m_constructed(0), m_initialized(0), m_started(0), m_finished(0),
+        m_deployXml(NULL), m_appXml(NULL), m_copy(NULL), m_assembly(assy),
         m_apiApplication(app) {
       m_assembly++;
       init(params);
@@ -959,7 +963,7 @@ namespace OCPI {
 	for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
 	  for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
 	    assert(!(*pi).m_name.empty());
-	    if (!strcasecmp((*pi).m_name.c_str(), p->cname()))
+	    if ((*pi).m_instance == instn && !strcasecmp((*pi).m_name.c_str(), p->cname()))
 		(*pi).setParam(newName, value);
 	  }
         // m_assembly.assyPort(instn, portn)->setParam(newName, value);
@@ -1385,6 +1389,13 @@ namespace OCPI {
         m_bestDeployments[n].m_containers[0] = getUsedContainer(c->ordinal());
       }
     }
+
+    const char *ApplicationI::
+    timeDiff(OS::Time later, OS::Time earlier) {
+      OS::Time diff = later - earlier;
+      return OU::format(m_timeString, " [%u s %u ms]", diff.seconds(), diff.nanoseconds()/1000000);
+    }
+
     void ApplicationI::
     init(const PValue *params) {
       try {
@@ -1511,6 +1522,11 @@ namespace OCPI {
         clear();
         throw;
       }
+      m_constructed = OS::Time::now();
+      if (m_verbose)
+	fprintf(stderr,
+		"Application XML parsed and deployments (containers and artifacts) chosen%s\n",
+		timeDiff(m_constructed, m_earliest));
     }
 
     void ApplicationI::
@@ -1551,12 +1567,6 @@ namespace OCPI {
           lc.m_in.m_container != lc.m_out.m_container &&
           (!lc.m_in.m_container->portsInProcess() ||
            !lc.m_out.m_container->portsInProcess())) {
-        ocpiInfo("Negotiating connection from instance %s port %s to instance %s port %s "
-                 "(buffer size is %zu/0x%zx)",
-                 lc.m_out.m_member ? lc.m_out.m_member->m_name.c_str() : "<external>",
-                 lc.m_out.m_name,
-                 lc.m_in.m_member ? lc.m_in.m_member->m_name.c_str() : "<external>",
-                 lc.m_in.m_name, lc.m_bufferSize, lc.m_bufferSize);
         ocpiDebug("Input container: %s, output container: %s",
                   lc.m_in.m_container->name().c_str(), lc.m_out.m_container->name().c_str());
         OC::BasicPort::
@@ -1888,10 +1898,13 @@ namespace OCPI {
       }
 #endif
       m_launched = true;
+      m_initialized = OS::Time::now();
       if (m_verbose)
         fprintf(stderr,
-                "Application established: containers, workers, connections all created\n"
-                "Communication with the application established\n");
+                "Application established: containers, workers, connections all created and\n"
+                "Communication with the application established%s\n",
+		timeDiff(m_initialized, m_constructed));
+      m_initialized = OS::Time::now();
     }
     static void addAttr(std::string &out, bool attr, const char *string, bool last = false) {
       if (attr)
@@ -1945,9 +1958,11 @@ namespace OCPI {
       ocpiInfo("Starting workers that are sources.");
       startMasterSlave(false, false, true);  // 1
       startMasterSlave(false, true, true);   // 3
+      m_started = OS::Time::now();
       // Note: this does not start masters that are sources.
       if (m_verbose)
-        fprintf(stderr, "Application started/running\n");
+        fprintf(stderr, "Application started/running%s\n", timeDiff(m_started, m_initialized));
+      m_started = OS::Time::now();
     };
     void ApplicationI::stop() {
       ocpiDebug("Stopping master workers that are not slaves.");
@@ -2342,6 +2357,10 @@ namespace OCPI {
     }
     bool Application::
     wait(unsigned long timeout_us, bool timeOutIsError) {
+      return m_application.wait(timeout_us, timeOutIsError);
+    }
+    bool ApplicationI::
+    wait(unsigned long timeout_us, bool timeOutIsError) {
       // FIXME: Right now, delayed properties don't (AV-4901):
       // (a) respect duration/timeout
       // (b) don't get accounted for when delaying timeout_us
@@ -2350,7 +2369,7 @@ namespace OCPI {
         timeout_us ? new OS::Timer((uint32_t)(timeout_us/1000000),
                                    (uint32_t)((timeout_us%1000000) * 1000ull))
                    : NULL;
-      if (m_application.verbose()) {
+      if (m_verbose) {
         if (timeout_us) {
 	  if ((double)timeout_us/1.e6 > 1)
 	    fprintf(stderr, "Waiting for up to %g seconds for application to finish%s\n",
@@ -2358,8 +2377,9 @@ namespace OCPI {
         } else
           fprintf(stderr, "Waiting for application to finish (no time limit)\n");
       }
-      bool r = m_application.wait(timer);
+      bool r = wait(timer);
       delete timer;
+      m_finished = OS::Time::now();
       if (r) {
         if (timeOutIsError) {
           // in the other cases the caller is expected to stop the app and, under timeout
@@ -2369,11 +2389,13 @@ namespace OCPI {
           throw OU::Error("Application exceeded time limit of %g seconds",
                           (double)timeout_us/1.e6);
         }
-        if (m_application.verbose() && (double)timeout_us/1.e6 > 1)
-          fprintf(stderr, "Application is now considered finished after waiting %g seconds\n",
+        if (m_verbose && (double)timeout_us/1.e6 > 1)
+          fprintf(stderr, "Application is now considered finished after waiting %g seconds",
                   (double)timeout_us/1.e6);
-      } else if (m_application.verbose())
-            fprintf(stderr, "Application finished\n");
+      } else if (m_verbose)
+            fprintf(stderr, "Application finished");
+      if (m_verbose)
+	fprintf(stderr, "%s\n", timeDiff(m_finished, m_started));
       return r;
     }
 

@@ -25,7 +25,7 @@ namespace DataTransfer {
   enum ReturnStatus { EventTimeout };
   class EventManager {
   public:
-    EventManager(int /*low_range*/, int /*high_range*/){};
+    EventManager(unsigned /*low_range*/, unsigned /*high_range*/){};
     ReturnStatus waitForEvent( unsigned /*timeout_us*/ ){ return EventTimeout; };
   };
 }

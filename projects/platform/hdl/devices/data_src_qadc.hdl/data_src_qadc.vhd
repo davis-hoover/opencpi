@@ -1,5 +1,5 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library cdc, util, adc;
+library cdc, util, adc, ocpi; use ocpi.wci.all;
 library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
@@ -29,12 +29,14 @@ architecture rtl of worker is
   signal adc_data_widener_oeof      : std_logic := '0';
 
   signal adc_out_marshaller_irdy : std_logic := '0';
+  signal dev_ready : bool_t;
 
 begin
   ------------------------------------------------------------------------------
   -- CTRL
   ------------------------------------------------------------------------------
 
+  ctl_out.done <= to_bool(dev_ready or (ctl_in.control_op = no_op_e));
   adc_rst <= out_in.reset;
   ctrl_out_cdc : cdc.cdc.fast_pulse_to_slow_sticky
     port map(
@@ -58,7 +60,7 @@ begin
       clk                     => dev_in.clk,
       rst                     => out_in.reset,
       clr                     => '0',
-      rst_detected            => ctl_out.done,
+      rst_detected            => dev_ready,
       rst_then_unrst_detected => open);
 
   ------------------------------------------------------------------------------
