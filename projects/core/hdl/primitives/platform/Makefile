@@ -19,7 +19,5 @@
 HdlLibraries=bsv fixed_float ocpi util cdc
 # We can't successfully elaborate this since it references the metadata stuff
 HdlNoElaboration=yes
-# FIXME FIXME: The low level primitives (FIFO etc.) are COPIED here due to an XST bug
-# that doesn't seem to find verilog modules in libraries when the elaboration is vhdl->verilog->verilog...
 # mkOCCP.v occp_rv.vhd
 include $(OCPI_CDK_DIR)/include/hdl/hdl-lib.mk
