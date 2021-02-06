@@ -19,6 +19,7 @@
 # This is the util_comps library
 
 Tests = \
+        advanced_pattern.test \
 	agc_real.test \
 	fifo.test \
 	test_tx_event.test \
