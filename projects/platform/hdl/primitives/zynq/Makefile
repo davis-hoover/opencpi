@@ -23,7 +23,7 @@ include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
 
 HdlLibraries=fixed_float ocpi axi sdp platform
 
-VivadoZynqTargets=zynq xsim modelsim
+VivadoZynqTargets=zynq xsim
 ISEZynqTargets=zynq_ise isim
 OnlyTargets=$(VivadoZynqTargets) $(ISEZynqTargets)
 
@@ -83,7 +83,7 @@ endif # if not cleaning
 
 ################################################################################
 # Generic, VIVADO or ISE
-SourceFiles=zynq_pkg.vhd $(if $(UseISE),$(ISEZynqSources),$(VivadoZynqSources)) zynq_ps.cpp_vhd
+SourceFiles=zynq_pkg.vhd $(if $(UseISE),$(ISEZynqSources),$(VivadoZynqSources)) zynq_ps.cpp_vhd zynq_sdp.vhd
 OcpiCPPDefines=$(and $(UseISE),XILINX_ISE=1) PS7_WRAPPER_MODULE=$(WrapperModule)
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

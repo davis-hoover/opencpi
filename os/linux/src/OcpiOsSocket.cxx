@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -34,6 +35,7 @@
 #include <string>
 #include "ocpi-config.h"
 #include "OcpiOsAssert.h"
+#include "OcpiOsIovec.h"
 #include "OcpiOsSizeCheck.h"
 //#include "OcpiOsDataTypes.h"
 #include "OcpiOsPosixError.h"
@@ -119,7 +121,7 @@ connect(const std::string & remoteHost, uint16_t remotePort, bool udp) throw (st
     Posix::netDbLock ();
     struct hostent * hent = ::gethostbyname (remoteHost.c_str());
     if (hent)
-      memcpy (&sin.sin_addr.s_addr, hent->h_addr, hent->h_length);
+      memcpy (&sin.sin_addr.s_addr, hent->h_addr, (size_t)hent->h_length);
     else {
       int err = h_errno;
       Posix::netDbUnlock ();
@@ -184,10 +186,11 @@ recv(char *buffer, size_t amount, unsigned timeoutms, bool all) throw (std::stri
       } else
 	throw "Error receiving from network: " + Posix::getErrorMessage (errno, "recv");
     } else {
-      nread += n;
-      if (n == 0 || !all)
+      size_t nn = (size_t)n;
+      nread += nn;
+      if (nn == 0 || !all)
 	break;
-      buffer += n, amount -= n;
+      buffer += nn, amount -= nn;
     }
   } while (amount);
   if (all && amount != 0)
@@ -209,8 +212,7 @@ recvfrom(char  *buf, size_t amount, int flags,
     m_timeoutms = timeoutms;
   }
   struct sockaddr * si_other = reinterpret_cast< struct sockaddr *>(src_addr);
-  ssize_t ret;
-  ret= ::recvfrom (o2fd (m_osOpaque), buf, amount, flags, si_other, (socklen_t*)addrlen);
+  ssize_t ret = ::recvfrom (o2fd (m_osOpaque), buf, amount, flags, si_other, (socklen_t*)addrlen);
   if (ret == -1) {
     if (errno != EAGAIN && errno != EINTR)
       throw Posix::getErrorMessage(errno, "recvfrom");
@@ -223,28 +225,27 @@ size_t Socket::
 sendto (const char * data, size_t amount, int flags,  char * src_addr, size_t addrlen)
   throw (std::string) {
   struct sockaddr * si_other = reinterpret_cast< struct sockaddr *>(src_addr);
-  size_t ret = ::sendto (o2fd (m_osOpaque), data, amount, flags, si_other, (socklen_t)addrlen );
-  if (ret == static_cast<size_t> (-1))
+  ssize_t ret = ::sendto (o2fd (m_osOpaque), data, amount, flags, si_other, (socklen_t)addrlen );
+  if (ret == -1)
     throw Posix::getErrorMessage(errno, "sendto");
   return static_cast<size_t>(ret);
 }
 
-// send the bytes to the socket, dealing properly with EINTR and error checking
 #ifdef OCPI_OS_macos
 #define SEND_OPTS 0 // darwin uses setsockopt for this
 #else
 #define SEND_OPTS MSG_NOSIGNAL
-#endif		       
+#endif
 
-// The return value here is for compatibility only
-// The sending persists until until all is sent.
-// Thus the only return value will be the same as the amount requested.
-size_t Socket::
-send(const char * data, size_t amount) throw (std::string) {
-  size_t n2send = amount;
+// send the bytes to the socket, dealing properly with EINTR and error checking
+void Socket::
+send(IOVec *iov, unsigned iovcnt) throw (std::string) {
+  ssize_t n2send = 0;
+  for (unsigned n = 0; n < iovcnt; ++n)
+    n2send += iov[n].iov_len;
+  size_t sent; // unsigned
   for (ssize_t nsent;
-       (nsent = ::send(o2fd(m_osOpaque), data, n2send, SEND_OPTS)) != (ssize_t)n2send;
-       data += nsent, n2send -= nsent)
+       (nsent = ::writev(o2fd(m_osOpaque), (struct iovec*)iov, (int)iovcnt)) != n2send; n2send -= sent) {
     if (nsent == 0)
       throw std::string("Error sending to network: got EOF");
     else if (nsent < 0) {
@@ -253,12 +254,37 @@ send(const char * data, size_t amount) throw (std::string) {
       else
 	throw "Error sending to network: " + Posix::getErrorMessage(errno, "send");
     }
+    sent = (size_t)nsent;
+    for (; sent > iov->iov_len; sent -= iov->iov_len, ++iov, --iovcnt)
+      assert(iovcnt > 1);
+    iov->iov_len -= sent;
+    iov->iov_base = (uint8_t*)iov->iov_base + sent;
+  }
+}
+// The return value here is for compatibility only
+// The sending persists until until all is sent.
+// Thus the only return value will be the same as the amount requested.
+size_t Socket::
+send(const char * data, size_t amount) throw (std::string) {
+  size_t n2send = amount, sent;
+  for (ssize_t nsent;
+       (nsent = ::send(o2fd(m_osOpaque), data, n2send, SEND_OPTS)) != (ssize_t)n2send;
+       data += sent, n2send -= sent)
+    if (nsent == 0)
+      throw std::string("Error sending to network: got EOF");
+    else if (nsent < 0) {
+      if (errno == EINTR)
+	nsent = 0;
+      else
+	throw "Error sending to network: " + Posix::getErrorMessage(errno, "send");
+    } else
+      sent = (size_t)nsent;
   return amount;
 }
 
 // NOTE THIS CODE IS REPLICATED IN THE SERVER FOR DATAGRAMS
 size_t Socket::
-sendmsg (const void * iovect, unsigned int flags  ) throw (std::string) {
+sendmsg (const void * iovect, int flags) throw (std::string) {
   const struct msghdr * iov = static_cast<const struct msghdr *>(iovect);
   ssize_t ret = ::sendmsg (o2fd (m_osOpaque), iov, flags);
   if (ret == -1)

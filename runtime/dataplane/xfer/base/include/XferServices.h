@@ -148,10 +148,9 @@ namespace DataTransfer {
     XF_template m_xftemplate;             // parent's template
   };
 
-         
   // Driver dependent data transfer services.  Instances of the driver classes that
-  // inherit this base class manage a connection between a local and remote 
-  // endpoint and create transfers between them (instances of the driver class that 
+  // inherit this base class manage a connection between a local and remote
+  // endpoint and create transfers between them (instances of the driver class that
   // inherits from XferRequest above).
   class XferServices {
     friend class XferFactory;

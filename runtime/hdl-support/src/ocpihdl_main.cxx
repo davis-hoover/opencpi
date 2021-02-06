@@ -684,7 +684,7 @@ admin(const char **) {
   printf(" OpenCpi:      0x%016llx \"%s\"\n", (unsigned long long)u.uint, u.c);
   printf(" revision:     0x%08x\n", cAccess->get32Register(revision, OH::OccpAdminRegisters));
   printf(" birthday:     0x%08x %s", (uint32_t)epochtime, asctime(etime));
-  printf(" workerMask:   0x%08" PRIx64 " workers", j = cAccess->get64Register(present, OH::OccpAdminRegisters));
+  printf(" workerMask:   0x%016" PRIx64 " workers", j = cAccess->get64Register(present, OH::OccpAdminRegisters));
   for (i = 0; i < sizeof(uint64_t) * 8; i++)
     if (j & (1 << i))
       printf(" %d", i);

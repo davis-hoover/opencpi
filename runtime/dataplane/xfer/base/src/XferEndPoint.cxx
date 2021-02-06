@@ -27,6 +27,7 @@
 // So a string containing a protocol with protocol-specific info, must have the trailing
 // semicolon even if it has nothing after that
 
+#include <unistd.h>
 #include "OcpiUtilMisc.h"
 #include "XferException.h"
 #include "XferEndPoint.h"
@@ -40,9 +41,10 @@ namespace DataTransfer {
 EndPoint::
 EndPoint(XferFactory &a_factory, const char *eps, const char *other, bool a_local, size_t a_size,
 	 const OCPI::Util::PValue */*params*/)
-  :  m_mailBox(0), m_maxCount(0), m_size(0), m_local(a_local), m_factory(a_factory),
-     m_refCount(0), m_receiver(NULL), m_sMemServices(NULL), m_resourceMgr(NULL), m_comms(NULL),
-     m_context(XferManager::getFactoryManager().getEndPointContext()), m_address(0) {
+  : m_mailBox(0), m_maxCount(0), m_size(0), m_flagSize(0), m_local(a_local), m_factory(a_factory),
+    m_refCount(0), m_receiver(NULL), m_sMemServices(NULL), m_resourceMgr(NULL), m_comms(NULL),
+    m_context(XferManager::getFactoryManager().getEndPointContext()), m_address(0),
+    m_needsFlags(false) {
   if (eps) {
     getUuid(eps, m_uuid);
     size_t psize;
@@ -80,6 +82,7 @@ addRef()
   m_refCount++;
   ocpiLog(9, "Incrementing refcount on ep %p to %u", this, m_refCount);
 }
+
 void EndPoint::
 release() {
   ocpiLog(9, "Releasing ep %p %s refCount %u", this, m_name.c_str(), m_refCount);
@@ -139,32 +142,53 @@ isCompatibleLocal(const XferFactory &argFactory, const char *other) {
     isCompatibleLocal(after);
 }
 
-class XferPool : public OU::MemBlockMgr, public ResourceServices {
-public:
-  XferPool(size_t size)
-    : OU::MemBlockMgr(0, size) {
-    OCPI::Util::ResAddrType dummy;    
-    alloc(16, 16, &dummy);
+// This is the class that knows to separate the two types of memory - cached and uncached
+// It has an initializer saying whether to actually split the bools
+XferPool::
+XferPool(size_t size, size_t *flagSize)
+  : m_flagRegionSize(flagSize ? flagRegionSize(size) :  0),
+    m_baseRegionSize(size - m_flagRegionSize), m_flagRegion(NULL), m_baseRegion(NULL) {
+  assert(m_flagRegionSize % (size_t)getpagesize() == 0 &&
+	 m_baseRegionSize % (size_t)getpagesize() == 0);
+  m_baseRegion = new OU::MemBlockMgr(OCPI_UTRUNCATE(OU::ResAddrType, m_flagRegionSize), m_baseRegionSize);
+  OU::ResAddrType dummy;
+  m_baseRegion->alloc(16, 16, dummy); // ensure address zero is never used.
+  if (flagSize) {
+    m_flagRegion = new OU::MemBlockMgr(0, m_flagRegionSize);
+    m_flagRegion->alloc(16, 16, dummy); // ensure address zero is never used.
     assert(!dummy);
+    *flagSize = m_flagRegionSize;
   }
-  int alloc(size_t nbytes, unsigned alignment, OCPI::Util::ResAddrType *addr_p) {
-    return OU::MemBlockMgr::alloc(nbytes, alignment, *addr_p);
-  }
-  int free(OCPI::Util::ResAddrType addr, size_t /*nbytes*/) {
-    return OU::MemBlockMgr::free(addr);
-  }
-};
+}
+
+size_t XferPool::
+flagRegionSize(size_t /*size*/) {
+  return 16*1024;
+}
+int XferPool::
+alloc(size_t nbytes, unsigned alignment, OCPI::Util::ResAddrType *addr_p, bool flag) {
+  return (flag ? (m_flagRegion ? m_flagRegion : m_baseRegion) : m_baseRegion)->
+	  alloc(nbytes, alignment, *addr_p);
+}
+int XferPool::
+free(OCPI::Util::ResAddrType addr, size_t /*nbytes*/) {
+  return (addr >= m_flagRegionSize ? m_baseRegion : m_flagRegion)->free(addr);
+}
+
+ResourceServices &EndPoint::
+createResourceServices() {
+  return *new XferPool(m_size, &m_flagSize);
+}
 
 void EndPoint::
 finalize() { // bool remoteAccess) {
-  // Create the mapping service if needed
-  bool remoteAccess = false;
-  if ((m_local || remoteAccess) && !m_sMemServices)
-    m_sMemServices = &createSmemServices();
+  // resource manager goes first since it creates the resource that will be mapped-to
   if (m_local && !m_resourceMgr)
-    m_resourceMgr = new XferPool(m_size);
-  ocpiDebug("Finalize endpoint %p %s %p %p %p %u %u", this, name().c_str(),
-	    m_sMemServices, m_resourceMgr, m_comms, m_local, remoteAccess);
+    m_resourceMgr = &createResourceServices();
+  if (m_local && !m_sMemServices)
+    m_sMemServices = &createSmemServices();
+  ocpiDebug("Finalize endpoint %p %s %p %p %p %u", this, name().c_str(),
+	    m_sMemServices, m_resourceMgr, m_comms, m_local);
 }
 
 bool EndPoint::

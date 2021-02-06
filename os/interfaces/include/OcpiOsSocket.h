@@ -160,7 +160,10 @@ namespace OCPI {
 
       size_t send(const char *data, size_t amount)
         throw (std::string);
-      size_t sendmsg(const void * iovect, unsigned int flags )
+      // Note the iov is const, we keep trying until it is all sent
+      void send(struct IOVec *iov, unsigned iovcnt)
+        throw (std::string);
+      size_t sendmsg(const void * iovect, int flags )
         throw (std::string);
       size_t sendto(const char * data, size_t amount, int flags,  char * src_addr,
 		    size_t addrlen)

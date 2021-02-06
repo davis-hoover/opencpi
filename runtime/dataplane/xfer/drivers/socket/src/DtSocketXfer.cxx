@@ -39,12 +39,12 @@ namespace DataTransfer {
     namespace OE = OCPI::OS::Ether;
     namespace XF = DataTransfer;
 
-struct DataHeader {
-  DtOsDataTypes::Offset offset;
-  uint32_t   length;
-  uint32_t   count;
+struct __attribute__ ((__packed__)) FlagHeader {
+  DtOsDataTypes::Offset dataOffset;
+  DtOsDataTypes::Offset flagOffset;
+  uint32_t flagValue;
 };
-const size_t TCP_BUFSIZE = 4096;
+const size_t TCP_BUFSIZE = 33*1024;
 
 class XferFactory;
 class EndPoint: public XF::EndPoint {
@@ -142,6 +142,7 @@ class ServerSocketHandler : public OU::Thread {
   bool          m_run;
   bool          m_closed;
   OS::Socket    m_socket;
+  FlagHeader    m_header;
 public:
   ServerSocketHandler(OS::ServerSocket &server, EndPoint &sep, SmemServices &smem)
     : m_sep(sep), m_smem(smem), m_run(true), m_closed(false) {
@@ -164,47 +165,61 @@ public:
     m_run = false;
   }
 
+  void doFlag() {
+    assert(!(m_header.flagOffset & (sizeof(uint32_t)-1)));
+    if (m_sep.receiver())
+      m_sep.receiver()->receive(m_header.flagOffset, (uint8_t*)&m_header.flagValue,
+				sizeof(uint32_t));
+    else
+      *(uint32_t *)m_smem.map(m_header.flagOffset, sizeof(uint32_t)) = m_header.flagValue;
+  }
+
+  void doHeader() {
+  }
+
   void run() {
     try {
       size_t     n;
       uint8_t    buf[TCP_BUFSIZE];
-      DataHeader header;
-      uint8_t   *current_ptr = NULL;
-      size_t     bytes_left = 0;
+      uint8_t   *current_ptr = (uint8_t*)&m_header;
+      size_t     bytes_left = sizeof(m_header);
       bool       in_header = true;;
       while (m_run && (n = m_socket.recv((char*)buf, TCP_BUFSIZE, 500))) {
 	if (n == SIZE_MAX)
 	  continue; // allow timeout so m_run can go away and shut us down
 	size_t copy_len;
 	for (uint8_t *bp = buf; n; n -= copy_len, bp += copy_len) {
-	  if (bytes_left == 0) { //starting the header or starting the payload
-	    if (in_header) {
-	      current_ptr = (uint8_t*)&header;
-	      bytes_left = sizeof(header);
-	    } else {
-	      ocpiDebug("Received Header: %8x: %" PRIx32 " %" PRIx32,
-			header.count, header.length, header.offset);
-	      bytes_left = header.length;
-	      current_ptr =
-		m_sep.receiver() ? NULL : (uint8_t *)m_smem.map(header.offset, header.length);
-	    }
-	  }
 	  copy_len = std::min(n, bytes_left);
 	  ocpiDebug("Copying socket data to %p, size = %zu, in header %d, left %zu, first %x",
 		    current_ptr, copy_len, in_header, bytes_left, *(uint32_t *)bp);
 	  if (current_ptr) {
-	    if (!in_header && header.length == 4 && !(((intptr_t)bp | (intptr_t)current_ptr) & 3)) {
-	      *(uint32_t *)current_ptr = *(uint32_t *)bp; // ensure atomic
-	      ocpiDebug("Socket FLAG: %p %x 0x%x %zu", current_ptr, header.count, *(uint32_t*)bp, copy_len);
-	    } else
-	      memcpy(current_ptr, bp, copy_len );
+	    memcpy(current_ptr, bp, copy_len );
 	    current_ptr += copy_len;
 	  } else {
-	    m_sep.receiver()->receive(header.offset, bp, copy_len);
-	    header.offset += OCPI_UTRUNCATE(DtOsDataTypes::Offset, copy_len);
+	    m_sep.receiver()->receive(m_header.dataOffset, bp, copy_len);
+	    m_header.dataOffset += OCPI_UTRUNCATE(DtOsDataTypes::Offset, copy_len);
 	  }
-	  if (!(bytes_left -= copy_len))
-	    in_header = !in_header;
+	  if (!(bytes_left -= copy_len)) { // finishing header or data
+	    if (in_header) {
+	      size_t dataLength = XF::FlagMeta::getLengthInFlag(m_header.flagValue);
+	      ocpiDebug("Received Header: len %zu dataOff 0x%" PRIx32 " flagOff 0x%" PRIx32
+			"flag 0x%" PRIx32,
+			dataLength, m_header.dataOffset, m_header.flagOffset, m_header.flagValue);
+	      if (dataLength) {
+		bytes_left = dataLength;
+		current_ptr =
+		  m_sep.receiver() ? NULL : (uint8_t *)m_smem.map(m_header.dataOffset, dataLength);
+		in_header = false;
+		continue;
+	      }
+	    }
+	    // end of data or a zlm header
+	    if (m_header.flagOffset)
+	      doFlag();
+	    current_ptr = (uint8_t*)&m_header;
+	    bytes_left = sizeof(m_header); // packed
+	    in_header = true;
+	  }
 	}
       }
       if (n == 0)
@@ -348,16 +363,20 @@ public:
   XF::XferRequest *createXferRequest();
 protected:
   OS::Socket& socket(){ return m_socket; }
+  // Short circuit call to send for SDP slave simulators
   void send(DtOsDataTypes::Offset offset, uint8_t *data, size_t nbytes) {
-    DataHeader hdr;
-    static uint32_t count = 0xabc00000;
-    hdr.offset = offset;
-    hdr.length = OCPI_UTRUNCATE(uint32_t, nbytes);
-    hdr.count = count++;
-    ocpiDebug("Sending IP header %zu %" PRIu32 " %" DTOSDATATYPES_OFFSET_PRIx" %" PRIx32,
-	      sizeof(DataHeader), hdr.length, hdr.offset, hdr.count);
-    m_socket.send((char*)&hdr, sizeof(DataHeader));
-    m_socket.send((char *)data, nbytes);
+    struct FlagHeader header;
+    header.dataOffset = offset;
+    header.flagOffset = 0;
+    header.flagValue = XF::FlagMeta::packFlag(nbytes, 0, 0);
+    ocpiDebug("Sending IP header %zu %" DTOSDATATYPES_OFFSET_PRIx" %" PRIx32,
+	      sizeof(header), header.dataOffset, header.flagValue);
+    OS::IOVec sendVec[2]; // this may be modified in the send call
+    sendVec[0].iov_base = &header;
+    sendVec[0].iov_len = sizeof(header); // packed
+    sendVec[1].iov_base = data;
+    sendVec[1].iov_len = nbytes;
+    m_socket.send(&sendVec[0], 2);
   }
 };
 
@@ -368,20 +387,49 @@ createXferServices(XF::EndPoint &source, XF::EndPoint &target)
 }
 
 class XferRequest : public TransferBase<XferServices,XferRequest> {
-  XF_transfer m_thandle;                // Transfer handle returned by xfer_xxx etal
+  struct FlagHeader m_sendHeader;
+  void *m_dataAddr;
+  uint32_t *m_flagAddr;
 public:
   XferRequest(XferServices &a_parent, XF_template temp)
-    : TransferBase<XferServices,XferRequest>(a_parent, *this, temp) {
+    : TransferBase<XferServices,XferRequest>(a_parent, *this, temp),
+      m_dataAddr(NULL), m_flagAddr(NULL) {
   }
-
-  // Get Information about a Data Transfer Request
-  inline DataTransfer::XferRequest::CompletionStatus getStatus() {
-    return xfer_get_status (m_thandle) == 0 ?
-      DataTransfer::XferRequest::CompleteSuccess : DataTransfer::XferRequest::Pending;
-  }
-
   // Data members accessible from this/derived class
 private:
+  XF::XferRequest *
+  copy(Offset srcOff, Offset dstOff, size_t nBytes, XferRequest::Flags flags) {
+    EndPoint &sep = *static_cast<EndPoint*>(&parent().m_from);
+    switch (flags) {
+    case XF::XferRequest::FlagTransfer:
+      assert(nBytes == sizeof(uint32_t));
+      m_flagAddr = (uint32_t *)sep.sMemServices().map(srcOff, nBytes);
+      m_sendHeader.flagOffset = dstOff;
+      break;
+    case XF::XferRequest::DataTransfer:
+      m_dataAddr = sep.sMemServices().map(srcOff, nBytes);
+      m_sendHeader.dataOffset = dstOff;
+      break;
+    default:
+      throw OU::Error("Unexpected transfer flags: soff 0x%x doff 0x%x bytes %zu, flags 0x%x",
+		      srcOff, dstOff, nBytes, flags);
+    }
+    return NULL;  // this should really be void
+  }
+  void post() {
+    assert(m_flagAddr);
+    m_sendHeader.flagValue = *m_flagAddr;
+    size_t dataLength = XF::FlagMeta::getLengthInFlag(m_sendHeader.flagValue);
+    assert(!dataLength || m_dataAddr);
+    OS::IOVec sendVec[2]; // this may be modified in the send call
+    sendVec[0].iov_base = &m_sendHeader;
+    sendVec[0].iov_len = sizeof(m_sendHeader); // packed
+    sendVec[1].iov_base = m_dataAddr;
+    sendVec[1].iov_len = dataLength;
+    parent().m_socket.send(&sendVec[0], dataLength ? 2 : 1);
+  }
+
+#if 0
   void action_transfer(PIO_transfer transfer, bool /*last*/) {
     //#define TRACE_PIO_XFERS  
 #ifdef TRACE_PIO_XFERS
@@ -390,6 +438,7 @@ private:
 #endif
     parent().send(transfer->dst_off, (uint8_t *)transfer->src_va, transfer->nbytes);
   }
+#endif
 };
 
 XF::XferRequest* XferServices::
