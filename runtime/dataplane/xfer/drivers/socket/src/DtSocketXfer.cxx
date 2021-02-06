@@ -428,7 +428,6 @@ private:
     sendVec[1].iov_len = dataLength;
     parent().m_socket.send(&sendVec[0], dataLength ? 2 : 1);
   }
-#endif
 };
 
 XF::XferRequest* XferServices::
