@@ -43,5 +43,6 @@
 # Both the default setup files for users and the underlying ones, for the SD card
 @platforms/zynq/zynq_*setup.sh opencpi/
 @platforms/zynq/default_my*setup.sh opencpi/
+@platforms/zynq/zynq_setup*common.sh opencpi/
 @<platform-dir>/release/uramdisk.image.gz
 @<platform-dir>/release/uImage
