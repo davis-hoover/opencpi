@@ -88,11 +88,11 @@ Examples:
   ocpiadmin install platform xsim
 
   # E31x
-  ocpiadmin install platform e31x ocpi.osp.e3xx
+  ocpiadmin install platform e31x -p ocpi.osp.e3xx
 
   # PlutoSDR
   # PKG_ID not needed for second command as it has already been downloaded
-  ocpiadmin install platform adi_plutosdr0_32 ocpi.osp.plutosdr
+  ocpiadmin install platform adi_plutosdr0_32 -p ocpi.osp.plutosdr
   ocpiadmin install platform plutosdr
 EOF
   exit 1
