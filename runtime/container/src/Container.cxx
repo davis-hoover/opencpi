@@ -234,7 +234,7 @@ namespace OCPI {
 	    em->waitForEvent(usecs) == DataTransfer::EventTimeout && m_verbose)
 	  ocpiBad("Timeout after %u usecs waiting for event", usecs);
 	// if there is no application on this container, use less CPU
-	OCPI::OS::sleep(firstApplication() ? 0 : 100);
+	OCPI::OS::sleep(firstApplication() || m_bridgedPorts.size() ? 0 : 100);
       }
       return true;
     }

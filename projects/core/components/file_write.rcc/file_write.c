@@ -101,7 +101,9 @@ run(RCCWorker *self, RCCBoolean timedOut, RCCBoolean *newRunCondition) {
      return self->container.setError("error writing header to file: %s (%zd)", strerror(errno), rv);
  }
  if (port->input.length) {
-   if (props->countData) { // touch the data and check it if is correct
+   if (props->countData) {
+     // touch the data and check it if is a correct output from test_source component
+     // which simply sends an incrementing 32 bit number until eof
      uint32_t *p = (uint32_t *)port->current.data;
      for (unsigned n = port->input.length/sizeof(uint32_t); n; --n) {
        if (s->count++ != *p)

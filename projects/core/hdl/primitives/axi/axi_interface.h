@@ -44,6 +44,7 @@
 #define CPP_CAT(a,b) CPP_CAT_(a,b)
 #define CONTROL_NAME CPP_CAT(axi2cp_,NAME)
 #define SDP_NAME CPP_CAT(sdp2axi_,NAME)
+#define NULL_NAME CPP_CAT(axinull_,NAME)
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library sdp, platform, ocpi; use ocpi.types.all;
@@ -223,5 +224,13 @@ package NAME is
       dbg_state2   : out ulonglong_t
      );
   end component SDP_NAME;
+  ------------------------------------------------------------
+  -- The null termination of this interface
+  component NULL_NAME is
+    port(clk          : in  std_logic;
+         reset        : in  bool_t;
+         axi_in       : in  axi_s2m_t;
+         axi_out      : out axi_m2s_t);
+  end component NULL_NAME;
 end package NAME;
 

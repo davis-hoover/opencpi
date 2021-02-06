@@ -103,6 +103,7 @@ void InputBuffer::update(bool critical)
                   
     m_length = input_offsets->bufferSize;
     memset(m_bVaddr, 0, input_offsets->bufferSize);
+    getPort()->getEndPoint().doneWithInput(m_bVaddr, input_offsets->bufferSize);
     m_buffer = /*m_baseAddress =*/ m_bVaddr;
 
 #ifdef DEBUG_L2
@@ -146,6 +147,7 @@ void InputBuffer::update(bool critical)
        sizeof(BufferMetaData)*MAX_PCONTRIBS);
 
     memset(m_bmdVaddr,0,sizeof(BufferMetaData)*MAX_PCONTRIBS);
+    getPort()->getEndPoint().doneWithInput(m_bmdVaddr, sizeof(BufferMetaData)*MAX_PCONTRIBS);
     m_sbMd = static_cast<volatile BufferMetaData (*)[MAX_PCONTRIBS]>(m_bmdVaddr);
   }
   

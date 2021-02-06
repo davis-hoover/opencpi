@@ -1,0 +1,7 @@
+<ComponentSpec>
+  <Property name='countError' type='bool' volatile='1'/>
+  <Property name="valuesReceived" volatile='1'/>
+  <Property name="timeFirst" type='ulonglong' volatile='1'/>
+  <Property name="timeEOF" type='ulonglong' volatile='1'/>
+  <Port Name="in"/>
+</ComponentSpec>
