@@ -20,6 +20,8 @@ library protocol;
 package adc is
 
 constant DATA_BIT_WIDTH : positive := 12;
+constant SAMP_COUNT_BIT_WIDTH : positive := 32;
+constant DROPPED_SAMPS_BIT_WIDTH : positive := 32;
 
 type data_complex_t is record
   i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
@@ -27,8 +29,14 @@ type data_complex_t is record
 end record data_complex_t;
 
 type samp_drop_detector_status_t is record
-  error_samp_drop : std_logic;
+  error_samp_drop                   : std_logic;
+  samp_count_before_first_samp_drop : std_logic_vector(SAMP_COUNT_BIT_WIDTH-1 downto 0);
+  num_dropped_samps                 : std_logic_vector(DROPPED_SAMPS_BIT_WIDTH-1 downto 0);
 end record samp_drop_detector_status_t;
+
+-- useful for data ingress from multi-ADC devices
+type array_data_t is array(natural range<>)  of std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
+
 
 component samp_drop_detector is
   port(

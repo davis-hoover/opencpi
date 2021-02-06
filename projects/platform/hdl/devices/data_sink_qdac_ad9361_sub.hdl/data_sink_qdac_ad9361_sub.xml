@@ -1,4 +1,7 @@
-<HdlDevice language='vhdl' version='2' libraries='ocpi.core.bsv dac protocol cdc'>
+<HdlDevice language='vhdl' version='2' libraries='dac protocol cdc'
+     sourcefiles='clock_selector_with_async_select.vhd ad936x_tx_data_cmos_single_port_fdd_ddr.vhd ad9361_dac_sub_cmos_single_port_fdd_ddr.vhd
+	clock_divider.vhd clock_manager.vhd one_wsi_clock_per_dac_sample_generator.vhd'
+     onlytargets='zynq zynq_ise zynq_ultra isim xsim'> <!-- cause of BUFR primitive --> 
 
   <!-- By design, this worker provides control and/or data plane functionality
        that is never intended to be exposed by any other worker. Accordingly,
