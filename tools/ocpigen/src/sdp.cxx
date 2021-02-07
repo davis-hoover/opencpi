@@ -28,6 +28,7 @@ SdpPort(Worker &w, ezxml_t x, Port *sp, int ordinal, const char *&err)
   // Since it is not OCP, it will not be explicitly wired in any case.
   if (!err && !m_master && !(m_clock = w.findClock("sdp")) && !(err = w.addClock("sdp", "in", m_clock))) {
     m_clock->m_exported = true;
+    m_clock->m_exportedSignal = m_clock->m_signal; // no internal/external difference
     m_clock->m_reset = "sdp_reset";
   }
 }

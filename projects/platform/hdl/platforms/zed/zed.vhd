@@ -18,15 +18,11 @@
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
-library platform;
 library zynq; use zynq.zynq_pkg.all;
-library axi;
-library unisim; use unisim.vcomponents.all;
-library ocpi_core_bsv; use ocpi_core_bsv.all;
 
 architecture rtl of worker is
   constant sdp_width_c : natural := to_integer(sdp_width);
-  constant sdp_count_c : natural := work.zed_constants.ocpi_port_zynq_count;
+  constant sdp_count_c : natural := to_integer(sdp_channels);
   signal clk           : std_logic;
   signal reset         : std_logic; -- our positive reset
   signal count         : unsigned(25 downto 0);

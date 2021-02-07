@@ -665,8 +665,8 @@ def restart(args):
     """
     rc = stop(args)
 
-    if rc == 0:
-        rc = start(args)
+    # ignore stop errorsif rc == 0:
+    rc = start(args)
 
     return rc
 

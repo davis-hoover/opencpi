@@ -428,17 +428,6 @@ private:
     sendVec[1].iov_len = dataLength;
     parent().m_socket.send(&sendVec[0], dataLength ? 2 : 1);
   }
-
-#if 0
-  void action_transfer(PIO_transfer transfer, bool /*last*/) {
-    //#define TRACE_PIO_XFERS  
-#ifdef TRACE_PIO_XFERS
-    ocpiDebug("Socket: copying %d bytes from 0x%llx to 0x%llx", transfer->nbytes,transfer->src_off,transfer->dst_off);
-    ocpiDebug("source wrd 1 = %d", src1[0] );
-#endif
-    parent().send(transfer->dst_off, (uint8_t *)transfer->src_va, transfer->nbytes);
-  }
-#endif
 };
 
 XF::XferRequest* XferServices::
