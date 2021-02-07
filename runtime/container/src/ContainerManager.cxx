@@ -222,6 +222,7 @@ namespace OCPI {
       ((OA::RunCondition *)linkme)->setPortMasks((OA::OcpiPortMask *)NULL);
       ((Container*)linkme)->run();
       ((DataTransfer::XferServices*)linkme)->DataTransfer::XferServices::send(0, NULL, 0);
+      ((DataTransfer::EndPoint*)linkme)->DataTransfer::EndPoint::createResourceServices();
       ((OCPI::Util::Thread*)linkme)->join();
       OCPI::Util::Uuid uuid;
       OCPI::Util::UuidString us;

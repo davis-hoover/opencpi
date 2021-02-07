@@ -3,5 +3,6 @@
   <Property name="valuesReceived" volatile='1'/>
   <Property name="timeFirst" type='ulonglong' volatile='1'/>
   <Property name="timeEOF" type='ulonglong' volatile='1'/>
+  <Property name='suppressReads' type='bool' initial='true'/>
   <Port Name="in"/>
 </ComponentSpec>
