@@ -93,7 +93,8 @@ class Pipeline():
             platform = ci_platform.get_platform(self.ci_env.platform, 
                                                 host_platform.cross_platforms)
             if platform.model == 'rcc':
-                stages = ['prereqs-rcc', 'build-rcc', 'test']
+                stages = ['prereqs-rcc', 'build-rcc', 'build-assemblies', 
+                          'test']
             else:
                 stages = ['build-primitives-core', 'build-primitives',
                           'build-assets', 'build-platforms', 
@@ -106,12 +107,17 @@ class Pipeline():
             platforms = [platform]
 
         jobs = []
+         
         for platform in platforms:
             overrides = get_overrides(platform, config)
             is_downstream = self.ci_env.project_name != 'opencpi'
 
+            # If triggered by upstream pipeline, do not generate jobs
+            # to build host platforms. Assume this was done in the
+            # upstream pipeline
             if self.ci_env.pipeline_source != 'pipeline':
                 jobs += ci_job.make_jobs(stages, platform, projects,
+                                        config=config,
                                         overrides=overrides, 
                                         host_platform=host_platform,
                                         is_downstream=is_downstream)

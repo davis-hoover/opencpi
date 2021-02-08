@@ -4,26 +4,35 @@ import json
 import os
 from pathlib import Path
 from urllib.request import urlopen
+from . import ci_asset
 
 class Platform():
 
-    def __init__(self, name, model, project, linked_platforms=None, 
-                 cross_platforms=None, is_host=False, is_sim=False, 
-                 config=None):
+    def __init__(self, name, model, path, project, assets=None,
+                 linked_platforms=None, cross_platforms=None, is_host=False, 
+                 is_sim=False, config=None):
         self.name = name
         self.model = model
+        self.path = path
         self.is_host = is_host
         self.is_sim = is_sim
         self.project = project
         self.linked_platforms = linked_platforms or []
         self.cross_platforms = cross_platforms or []
+        self.assets = assets or ci_asset.discover_assets(
+            self.path, whitelist=['devices'])
+        self.ip = None
+        self.user = None
+        self.password = None 
+        self.do_deploy = None
 
         if config:
-            self.ip = config['ip'] if 'ip' in config else None
-            self.port = config['port'] if 'port' in config else None
-        else:
-            self.ip = None
-            self.port = None
+            attributes = ['ip', 'port', 'user', 'password', 'do_deploy']
+            for attribute in attributes:
+                try:
+                    self.__dict__[attribute] = config[attribute]
+                except:
+                    self.__dict__[attribute] = None
 
 
 def discover_platforms(projects, whitelist=None, config=None):
@@ -111,7 +120,8 @@ def discover_local(project, config=None):
                 platform_config = get_platform_config(platform_name, config)
 
                 platform_model = platform_path.parents[1].stem
-                platform = Platform(platform_name, platform_model, project,
+                platform = Platform(platform_name, platform_model, 
+                                    platform_path, project,
                                     is_host=is_host, is_sim=is_sim, 
                                     config=platform_config)
                 platforms.append(platform)
@@ -149,13 +159,15 @@ def discover_remote(project, config=None):
 
                 for osp_platform in osp_platforms:
                     platform_name = osp_platform['name']
-                    
+                    platform_path = None
+
                     if platform_name == 'Makefile':
                         continue
 
                     platform_config = get_platform_config(platform_name, 
                                                           config)
-                    platform = Platform(platform_name, model, project,
+                    platform = Platform(platform_name, model, 
+                                        platform_path, project,
                                         is_host=False, is_sim=False, 
                                         config=platform_config)
                     platforms.append(platform)
