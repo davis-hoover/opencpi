@@ -177,49 +177,49 @@ PROJ_PROJECT_XML = ("""<project>
 {%if package_name: %}
 	<OcpiProperty>
 		<name>PackageName</name>
-		<value>{{package_name}}<value>
+		<value>{{package_name}}</value>
 	</OcpiProperty>
 {% endif %}
 {%if package_prefix: %}
 	<OcpiProperty>
 		<name>PackagePrefix</name>
-		<value>{{package_prefix}}<value>
+		<value>{{package_prefix}}</value>
 	</OcpiProperty>
 {% endif %}
 {%if package_id: %}
 	<OcpiProperty>
 		<name>Package</name>
-		<value>{{package_id}}<value>
+		<value>{{package_id}}</value>
 	</OcpiProperty>
 {% endif %}
 {%if depend: %}
 	<OcpiProperty>
 		<name>ProjectDependencies</name>
-		<value>{{depend}}<value>
+		<value>{{depend}}</value>
 	</OcpiProperty>
 {% endif %}
 {%if prim_lib: %}
 	<OcpiProperty>
 		<name>Libraries</name>
-		<value>{{prim_lib}}<value>
+		<value>{{prim_lib}}</value>
 	</OcpiProperty>
 {% endif %}
 {%if include_dir: %}
 	<OcpiProperty>
 		<name>IncludeDirs</name>
-		<value>{{include_dir}}<value>
+		<value>{{include_dir}}</value>
 	</OcpiProperty>
 {% endif %}
 {%if xml_include: %}
 	<OcpiProperty>
 		<name>XmlIncludeDirs</name>
-		<value>{{xml_include}}<value>
+		<value>{{xml_include}}</value>
 	</OcpiProperty>
 {% endif %}
 {%if comp_lib: %}
 	<OcpiProperty>
 		<name>ComponentLibraries</name>
-		<value>{{comp_lib}}<value>
+		<value>{{comp_lib}}</value>
 	</OcpiProperty>
 {% endif %}
 </project>
