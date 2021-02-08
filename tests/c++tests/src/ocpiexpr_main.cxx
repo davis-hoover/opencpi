@@ -42,7 +42,8 @@ namespace OA = OCPI::API;
   CMD_OPTION_S(variable,    v,   String, NULL,   "Define a variable, e.g. a[:type]=4.5") \
   CMD_OPTION(hex,           x,   Bool,   0,      "print numeric values in hex, not decimal")\
   CMD_OPTION(c_expression,  c,   Bool,   0,      "generate a C expression")\
-  CMD_OPTION(loglevel,      l,   UChar,  "0",    "The logging level to be used during operation")
+  CMD_OPTION(loglevel,      l,   UChar,  "0",    "The logging level to be used during operation")\
+  CMD_OPTION(quiet,         q,   Bool,   0,      "Only print the value")
 
 #include "CmdOption.h"
 
@@ -131,7 +132,12 @@ static int mymain(const char **ap) {
 	printf("Final unparsed typed value: '%s'\n", s.c_str());
       } else if ((err = OU::evalExpression(expr, val, &vars)))
 	options.bad("error: %s", err);
-      else {
+      else if (options.quiet()) {
+	if ((err = val.getTypedValue(v)))
+	  options.bad("When converting to %s: %s", options.type(), err);
+	v.unparse(s, NULL, false, options.hex());
+	printf("%s\n", s.c_str());
+      } else {
 	printf("Expression value is %s:  %s\n", val.isNumber() ? "number" : "string",
 	       val.getString(s));
 	if ((err = val.getTypedValue(v)))

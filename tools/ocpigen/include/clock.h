@@ -25,7 +25,8 @@
 struct Clock {
   Worker &m_worker;
   std::string m_name, m_signal, m_reset;
-  mutable std::string m_internalName; // cached name of signal inside worker shell
+  mutable std::string m_internalName;  // cached name of signal inside worker shell
+  std::string m_exportedSignal; // extra external name for assembly workers.
   Port  *m_port;     // If not NULL, the port of the worker that this clock is owned by.
   size_t m_ordinal;  // within the worker
   bool   m_output;   // This clock is an output of its worker on its owned port or globally
@@ -36,6 +37,7 @@ struct Clock {
   void rename(const char *name, Port *port);
   const char *cname() const { return m_name.c_str(); }
   const char *signal() const { return m_signal.c_str(); }
+  const char *exportedSignal() const { return m_exportedSignal.c_str(); }
   const char *reset() const { return m_reset.c_str(); }
   const char *internalName() const; // compute as necessary, signal inside worker shell
   void emitDataClockCDCs(FILE *f, const Clock &wciClock, std::string &instances) const;

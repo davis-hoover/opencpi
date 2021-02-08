@@ -13,8 +13,8 @@
     <property name='frequency' value='100e6'/>
   </device>
   <specproperty name='sdp_width' value='2'/>
-  <property name='sdp_channels' parameter='true' value='4'/>
-  <property name='use_acp' parameter='true' type='bool' value='false'/>
+  <property name='sdp_channels' parameter='true' default='4'/>
+  <property name='use_acp' parameter='true' type='bool' default='false'/>
   <sdp name="zynq" master='true' count='sdp_channels'/>
   <property name='useGP1' type='bool' parameter='1' default='false'/>
   <property name="axi_error" type="bool" arraylength='sdp_channels' volatile='true'/>

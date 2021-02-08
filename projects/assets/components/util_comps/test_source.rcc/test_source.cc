@@ -19,8 +19,11 @@ public:
     size_t n = std::min<size_t>(out.maxLength()/sizeof(m_values), properties().valuesToSend - m_values);
     out.setLength(n * sizeof(m_values));
     if (n) {
-      for (uint32_t *p = (uint32_t*)out.data(); n--; *p++ = m_values++)
-	;
+      if (properties().suppressWrites)
+	m_values += n;
+      else
+	for (uint32_t *p = (uint32_t*)out.data(); n--; *p++ = m_values++)
+	  ;
       return RCC_ADVANCE;
     }
     out.setEOF();
