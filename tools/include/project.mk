@@ -20,8 +20,8 @@
 include $(OCPI_CDK_DIR)/include/util.mk
 
 # This is mandatory since it signifies that this directory is a project
-ifeq ($(wildcard Project.mk),)
-  $(error A project directory must contain a "Project.mk" file.)
+ifeq ($(wildcard Project.mk)$(wildcard Project.xml),)
+  $(error A project directory must contain "Project.mk" or "Project.xml")
 endif
 $(OcpiIncludeProject)
 # FIXME: can we test for licensing?
@@ -89,9 +89,9 @@ ifneq ($(wildcard specs),)
     # package-id needs to be created early on by any non-clean make command.
     # This can be accomplished by having imports depend on it.
     imports: specs/package-id
-    # If Project.mk changes, recreate specs/package-id file unless the package-id file contents
+    # If Project.xml changes, recreate specs/package-id file unless the package-id file contents
     # exactly match OCPI_PROJECT_PACKAGE.
-    specs/package-id: Project.mk
+    specs/package-id: Project.xml
 	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
 	      echo HIHI; echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
 	     fi

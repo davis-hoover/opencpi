@@ -591,8 +591,8 @@ OcpiGetRccPlatformDir=$(strip $(firstword \
 # Functions for collecting Project Dependencies and imports for use with project
 # path
 ##################################################################################
-# Project Dependencies are defined by those explicitly listed in a Project.mk as well as the 'required'
-# projects such as core/cdk
+# Project Dependencies are defined by those explicitly listed in a Project.mk or
+# Project.xml as well as the 'required' projects such as core/cdk
 OcpiProjectDependenciesInternal=$(call Unique,$(ProjectDependencies)\
                                    $(if $(filter ocpi.core,$(OCPI_PROJECT_PACKAGE)),,ocpi.core))
 # If a project dependency is a path, use it as is. Otherwise, check for it in imports.
@@ -803,8 +803,8 @@ OcpiPrependEnvPath=\
 
 ############ Project related functions
 
-# Set the given directory as the project directory, include the Project.mk file that is there
-# and setting an environment variable OCPI_PROJECT_DIR to that place.
+# Set the given directory as the project directory, include the Project.mk or Project.xml
+# that is there and set an environment variable, namely OCPI_PROJECT_DIR, to that place.
 # This allows any path-related settings to be relative to the project dir
 #TODO all the cooments within this define should probably be moved out for perfromance reasons
 #     because this function is used by $(call ...)
@@ -820,7 +820,7 @@ define OcpiSetProjectX
   OcpiTempProjDir:=$$(call OcpiAbsDir,$1)
   ifdef OCPI_PROJECT_DIR
     ifneq ($$(OcpiTempProjDir),$$(OCPI_PROJECT_DIR))
-      $$(error OCPI_PROJECT_DIR in environment is $$(OCPI_PROJECT_DIR), but found Project.mk in $1)
+      $$(error OCPI_PROJECT_DIR in environment is $$(OCPI_PROJECT_DIR), but found Project.[mk|xml] in $1)
     endif
   endif
   override OCPI_PROJECT_DIR=$$(OcpiTempProjDir)
@@ -944,17 +944,17 @@ OcpiGetShortenedDirType=$(infox OGSDT:$1)$(strip \
 
 # Recursive
 OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
-  $(if $(wildcard $1/Project.mk),\
+  $(if $(wildcard $1/Project.mk)$(wildcard $1/Project.xml),\
     $(if $(wildcard $1/Makefile)$(wildcard $1/Makefile.am),\
       $(if $(filter project,$(call OcpiGetDirType,$1)),\
         $(infox found project in $1)\
         $(eval $(call OcpiSetProject,$1))\
         $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
-        $(error no proper Makefile found in the directory where Project.mk was found ($1))),\
-      $(error no Makefile found in the directory where Project.mk was found ($1))),\
+        $(error no proper Makefile found in the directory where Project.[mk|xml] was found ($1))),\
+      $(error no Makefile found in the directory where Project.[mk|xml] was found ($1))),\
     $(if $(foreach r,$(realpath $1/..),$(filter-out /,$r)),\
       $(call OcpiIncludeProjectX,$(and $(filter-out .,$1),$1/)..,$2,$3),\
-      $(call $2,$2: no Project.mk was found here ($3) or in any parent directory)))
+      $(call $2,$2: no Project.[mk|xml] was found here ($3) or in any parent directory)))
 
 # One arg is what to do if not found: error, warning, nothing
 OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(OCPI_PROJECT_REL_DIR))\
