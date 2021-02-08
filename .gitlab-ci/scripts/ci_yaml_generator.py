@@ -100,11 +100,11 @@ def set_ci_env():
     Simulates a pipeline environment by setting environment variables.
     This function should not be called except for testing.
     """
-    environ['CI_COMMIT_MESSAGE'] = ''
-    environ['CI_PIPELINE_SOURCE'] = 'push'
+    environ['CI_COMMIT_MESSAGE'] = '[ci plutosdr:adi_plutosdr0_32]'
+    environ['CI_PIPELINE_SOURCE'] = 'parent_pipeline'
     environ['CI_ROOT_ID'] = '1'
-    # environ['CI_PLATFORM'] = 'e31x'
-    # environ['CI_HOST_PLATFORM'] = 'centos7'
+    environ['CI_PLATFORM'] = 'plutosdr'
+    environ['CI_HOST_PLATFORM'] = 'centos7'
     environ['CI_DEFAULT_HOSTS'] = 'centos7'
     environ['CI_PLATFORMS'] = 'e31x xsim'
     environ['CI_PIPELINE_ID'] = '0'
@@ -113,6 +113,7 @@ def set_ci_env():
     environ['CI_COMMIT_REF_NAME'] = 'develop'
     environ['CI_PROJECT_TITLE'] = 'opencpi'
     environ['CI_PROJECT_ID'] = '0'
+    environ['CI_RUNNER_ID'] = '1274481'
     # environ['CI_UPSTREAM_ID'] = '2'
     # environ['CI_UPSTREAM_REF'] = 'develop'
     # environ['CI_UPSTREAM_PLATFORMS'] = 'plutosdr modelsim'

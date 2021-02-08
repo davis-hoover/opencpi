@@ -2,7 +2,21 @@
 # job values. Overrides apply to all jobs for a platform by default,
 # To apply overrides to only a specific job, nest the values under the
 # job name like done for 'centos7' below. A platform or a specific job
-# can be skipped by setting its value to 'skip'.
+# can be skipped by setting its value to 'skip'
+
+# ci
+ci:
+  runners:
+    1274481: # Centos7-01
+      socket_interface: em2
+    2337867: # Centos7-02
+      socket_interface: ens224
+    2337550: # Centos7-03
+      socket_interface: ens224
+    2938106: # Centos7-04
+      socket_interface: ens224
+
+# rcc
 centos7:
   overrides:
     packages:centos7:
@@ -11,12 +25,33 @@ centos7:
       script: scripts/install-packages.sh centos7
       before_script: []
       after_script: []
+
+# sim
 modelsim:
   overrides:
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
+    test:centos7:platform:devices:modelsim: skip
+isim:
+  overrides:
+    test:centos7:platform:devices:isim: skip
+xsim:
+  overrides:
+    test:centos7:platform:devices:xsim: skip
+
+# hdl
+e31x:
+  ip: 10.1.0.248
+  port: 1000
+matchstiq_z1:
+  ip: 10.1.0.203
+  port: 1000
 plutosdr:
+  ip: 10.1.0.102
+  port: 1000
+  password: analog
+  deploy: False
   overrides:
     build-assemblies:centos7:assets_ts:assemblies:plutosdr:
       variables:
@@ -27,10 +62,13 @@ plutosdr:
     build-tests:centos7:assets_ts:components:plutosdr:
       variables:
         OCPI_PROJECT_PATH: '$CI_PROJECT_DIR/opencpi/projects/assets:$CI_PROJECT_DIR/opencpi/projects/platform'
+zcu104:
+  ip: 10.1.0.208
+  port: 1000
+zed:
+  ip: 10.1.0.242
+  port: 1000
 zed_ise:
   overrides:
     variables:
       OCPI_XILINX_LICENSE_FILE: '2101@sembach.opencpi.net'
-zed:
-  ip: 10.0.0.42
-  port: 1000
