@@ -66,6 +66,8 @@
 ocpi_name=opencpi-setup.sh
 ocpi_me=$BASH_SOURCE
 ocpi_cdk_dir=cdk
+ocpi_root_dir=root
+export OCPI_ROOT_DIR=$OCPI_ROOT_DIR
 # The egrep of the beginning of variables to clean out, e.g. derived rather than user specified
 ocpi_cleaned_vars="OCPI_(PREREQUISITES_DIR|TARGET_|TOOL_|CDK_|ROOT_)"
 [ -z "$BASH_VERSION" -o -z "$ocpi_me" ] && {
@@ -233,6 +235,7 @@ ocpi_dir=`dirname $ocpi_me`
   return 1
 }
 ocpi_cdk_dir=$(cd $ocpi_dir && pwd)
+ocpi_root_dir=$(cd $ocpi_dir/.. && pwd)
 [ "$ocpi_verbose" = 1 ] && cat <<-EOF >&2
 	This $ocpi_name script is located at:
 	  $ocpi_me
@@ -240,6 +243,11 @@ ocpi_cdk_dir=$(cd $ocpi_dir && pwd)
 	Determining the OpenCPI platform we are running on...
 	EOF
 export OCPI_CDK_DIR=$ocpi_cdk_dir
+if [ -n "$OCPI_ROOT_DIR" ]; then
+  echo "OCPI_ROOT_DIR already set to $OCPI_ROOT_DIR"
+else
+  export OCPI_ROOT_DIR=$ocpi_root_dir
+fi
 ocpi_gp=$ocpi_cdk_dir/scripts/getPlatform.sh
 if [ ! -f $ocpi_gp ]; then
   # Poor mans get-platform in a runtime installation, that also sets TARGET variables
@@ -263,6 +271,7 @@ else
   if [ "$v4" == "" -o $? != 0 ]; then
     echo $ocpi_name: failed to determine runtime platform. >&2
     unset OCPI_CDK_DIR
+    unset OCPI_ROOT_DIR
     return 1
   fi
   export OCPI_TOOL_OS=$v0
@@ -276,7 +285,7 @@ else
   [ -n "$ocpi_optimized" ] && OCPI_TOOL_DIR+=o
   # This is (temporarily) redundant with ocpibootstrap.sh
   [ -z "$OCPI_PREREQUISITES_DIR" ] && {
-    export OCPI_PREREQUISITES_DIR=$OCPI_CDK_DIR/../prerequisites
+    export OCPI_PREREQUISITES_DIR=$OCPI_ROOT_DIR/prerequisites
     if [ -d $OCPI_PREREQUISITES_DIR ]; then
       export OCPI_PREREQUISITES_DIR=$(cd $OCPI_PREREQUISITES_DIR; pwd)
     else
@@ -307,7 +316,7 @@ ocpi_comp=$OCPI_CDK_DIR/scripts/ocpidev_bash_complete
 	MANPATH now set to $MANPATH
 	Now determining where prerequisite software is installed.
 	EOF
-ocpi_user_env=$OCPI_CDK_DIR/../user-env.sh
+ocpi_user_env=$OCPI_ROOT_DIR/user-env.sh
 [ -r "$ocpi_user_env" ] && {
   if grep -q '^ *export' $ocpi_user_env; then
     [ "$ocpi_verbose" = 1 ] &&

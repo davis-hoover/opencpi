@@ -22,7 +22,8 @@
   
   # Run the generic script to setup the OpenCPI environment
   # Note the ocpidriver load command is innocuous if run redundantly
-  export OCPI_CDK_DIR=$OCPI_DIR
+  export OCPI_CDK_DIR=$OCPI_LOCAL_DIR
+  export OCPI_ROOT_DIR=$OCPI_LOCAL_DIR/..
   if test -d /etc/profile.d; then
     export PROFILE_FILE=/etc/profile.d/opencpi-persist.sh
   else
@@ -31,7 +32,8 @@
   cat <<EOF > $PROFILE_FILE
     echo Executing $PROFILE_FILE\.
 	export OCPI_CDK_DIR=$OCPI_CDK_DIR
-	cd $OCPI_CDK_DIR
+  export OCPI_ROOT_DIR=$OCPI_ROOT_DIR
+	cd $OCPI_ROOT_DIR/opencpi
 	source $OCPI_CDK_DIR/zynq_setup_common.sh set_tool_platform
     export OCPI_TOOL_OS=linux
     # There is no multimode support when running standalone
@@ -43,12 +45,16 @@
     ocpidriver load
     export TZ=$2
     echo OpenCPI ready for zynq.
-    if test -r $OCPI_CDK_DIR/mysetup.sh; then
+    if test -r $OCPI_ROOT_DIR/mysetup.sh; then
+       source $OCPI_ROOT_DIR/mysetup.sh
+    elif test -r $OCPI_CDK_DIR/mysetup.sh; then
        source $OCPI_CDK_DIR/mysetup.sh
     fi
 	
 	alias ls='ls --color=auto'	
 EOF
-  echo Running login script. OCPI_CDK_DIR is now $OCPI_CDK_DIR.
+  echo Running login script. 
+  echo OCPI_CDK_DIR is now $OCPI_CDK_DIR.
+  echo OCPI_ROOT_DIR is now $OCPI_ROOT_DIR.
   source $PROFILE_FILE
 

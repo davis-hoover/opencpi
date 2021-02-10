@@ -42,6 +42,7 @@ function do_stop() {
 # We'll write a file here in case someone also wants to do env setup
 cat >setup.sh <<'EOF'
 export OCPI_CDK_DIR=`pwd`
+export OCPI_ROOT_DIR=`pwd`
 export OCPI_TOOL_PLATFORM=$(cat swplatform)
 export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
