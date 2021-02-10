@@ -1,3 +1,53 @@
+# [v2.1.0-rc.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-beta.1...v2.1.0-rc.1) (2021-02-08)
+
+Changes/additions since [OpenCPI Release v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-beta.1)
+
+### New Features
+- **doc**: add DRC documentation to Application Development Guide and Platform Development Guide, and create new briefing. (!480)(1b9693a3)
+- **tests,tools**: create iperf3 install script that is called by install-prerequisites script. (!445)(a6f9aa0f)
+
+### Enhancements
+- **app**: ocpiremote: use less memory on the target embedded system when creating the sandbox, allow setting dma memory side on start. (!457)(46f1aff7)
+- **comp**: allow workers to get the current time, and C workers to have log messages. (!457)(46f1aff7)
+- **comp**: add in fsk_modem assembly and drc for zcu104. (!469)(a78f78e6)
+- **comp,hdl base**: updated data_src_qadc_ad9631_sub for one clock per sample and added properties for data_src_qadc. (!449)(3c2ace47)
+- **devops**: fix downstream pipelines failing due to environment variables not being set correctly. (!437)(72adeca8)
+- **hdl base**: update cnt_zed_fmcomms_2_3_scdcd.xdc and cnt_zcu104_fmcomms_2_3_scdcd.xdc to properly constrain things for the ADC one clock per sample. (!451)(064d6479)
+- **hdl base**: enable SDP send and receive to support lots of cpu-side buffers (255). (!457)(46f1aff7)
+- **hdl base**: increase maximum message size between HDL workers to 64k-4. (!457)(46f1aff7)
+- **hdl base**: add timegate worker to support timed transmission. (!466)(344f26db)
+- **hdl base**: allow zynq platforms to use the ACP port (partial). (!470)(69121c36)
+- **hdl base**: add ACP handling for zynq on zed at least. (!475)(f2577630)
+- **hdl base**: updated ad9361 data sink txen logic. (!479)(a7dbf4fa)
+- **osp**: add macos11_1 support. (!457)(46f1aff7)
+- **osp**: move zcu104 platform where it should be in the platform project. (!457)(46f1aff7)
+- **runtime**: support delegating array ports in proxies, with individual port connections in slave assemblies. (!436)(4be9ec46)
+- **runtime**: make cpu-side buffering much more scalable to easily support lots of buffers. (!457)(46f1aff7)
+- **runtime**: use "gather" APIs to improve TCP throughput. (!470)(69121c36)
+- **tests**: add simple performance test workers, and update file_write to report throughput and check test data correctness. (!457)(46f1aff7)
+- **tests,tools**: convert old advanced_pattern unit test into current framework. (!435)(fbde6289)
+- **tests,tools**: unit under test is done worker. (!460)(66d68419)
+- **tools**: build hdl xmls to satisfy proxy dependencies. (!438)(5c313de0)
+- **tools**: fix code generation for parameterized SDP ports. (!457)(46f1aff7)
+
+### Bug Fixes
+- **app,runtime**: fix external connections on slave assemblies. (!456)(5fce8148)
+- **devops,tests**: fix potential resource exhaustion issue on runners due to broken tests. (!474)(6e01a7d6)
+- **doc**: fix ocpiadmin man page typo (`-url` --> `--url`). (!462)(e9180617)
+- **hdl base**: fix sdp_send to eliminate the single cycle of backpressure on input, build sdp for 32/64/128 widths. (!457)(46f1aff7)
+- **hdl base,tools**: clean up the hdl primitives folders. (!430)(7ae9105e)
+- **runtime**: make the DRC "stop_config" method required. (!457)(46f1aff7)
+- **runtime**: fix cases where buffer-counts and sizes were not being set by ocpirun options. (!457)(46f1aff7)
+- **runtime**: datagram: fix 32/64-bit issue when sides are different. (!457)(46f1aff7)
+- **runtime**: add missing zynq setup script to exported files. (!458)(48d37a8e)
+- **runtime**: remove rcc worker error for buffer size and protocol mismatch. (!461)(fa2287ce)
+- **runtime**: comment out second channel of drc. (!463)(8d158bd2)
+- **runtime**: add "guard" in configure_gps_if_enabled() function. (!465)(85a0a442)
+- **runtime**: fix setting gain_mode manual on rx channel using DRC. (!478)(10c11830)
+- **tools**: fix bad exports list for some Xilinx platforms when deploying to ZedBoard. (!446)(a7bf321b)
+- **tools**: fix handling of single-element array properties by RPROP_ARRAY_16 and WPROP_ARRAY_16. (!459)(e7f0be4c)
+- **tools**: fix help message in "ocpiadmin" script. (!462)(e9180617)
+
 # [v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.1...v2.1.0-beta.1) (2020-12-18)
 
 Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.1)
