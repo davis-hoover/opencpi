@@ -113,6 +113,7 @@ bool address_request_will_underflow(uint16_t requested_addr,
 int
 spi_write_then_read(struct spi_device *spi, const unsigned char *txbuf, unsigned n_tx,
 		    unsigned char *rxbuf, unsigned n_rx) {
+  (void)n_tx;(void)n_rx;
   if(spi) {
     // Unused variable - fix compiler warning
   }

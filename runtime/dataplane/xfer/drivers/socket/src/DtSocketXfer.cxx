@@ -43,8 +43,8 @@ struct __attribute__ ((__packed__)) FlagHeader {
   DtOsDataTypes::Offset dataOffset;
   DtOsDataTypes::Offset flagOffset;
   uint32_t flagValue;
+  uint32_t timeStamp; // also gets us 16 bytes alignment
 };
-const size_t TCP_BUFSIZE = 33*1024;
 
 class XferFactory;
 class EndPoint: public XF::EndPoint {
@@ -142,10 +142,10 @@ class ServerSocketHandler : public OU::Thread {
   bool          m_run;
   bool          m_closed;
   OS::Socket    m_socket;
-  FlagHeader    m_header;
+  size_t        m_receiveSize;
 public:
   ServerSocketHandler(OS::ServerSocket &server, EndPoint &sep, SmemServices &smem)
-    : m_sep(sep), m_smem(smem), m_run(true), m_closed(false) {
+    : m_sep(sep), m_smem(smem), m_run(true), m_closed(false), m_receiveSize(32*1024+sizeof(FlagHeader)) {
     ocpiDebug("ServerSockletHandler accepting %u", sep.m_portNum);
     server.accept(m_socket);
     m_socket.linger(true); // give some time for data to the client FIXME timeout param?
@@ -166,29 +166,22 @@ public:
   }
 
   void doFlag() {
-    assert(!(m_header.flagOffset & (sizeof(uint32_t)-1)));
-    if (m_sep.receiver())
-      m_sep.receiver()->receive(m_header.flagOffset, (uint8_t*)&m_header.flagValue,
-				sizeof(uint32_t));
-    else
-      *(uint32_t *)m_smem.map(m_header.flagOffset, sizeof(uint32_t)) = m_header.flagValue;
-  }
-
-  void doHeader() {
   }
 
   void run() {
     try {
       size_t     n;
-      uint8_t    buf[TCP_BUFSIZE];
-      uint8_t   *current_ptr = (uint8_t*)&m_header;
-      size_t     bytes_left = sizeof(m_header);
+      std::vector<uint8_t> buf(m_receiveSize);
+      FlagHeader header;
+      uint8_t   *current_ptr = (uint8_t*)&header;
+      size_t     bytes_left = sizeof(header);
       bool       in_header = true;;
-      while (m_run && (n = m_socket.recv((char*)buf, TCP_BUFSIZE, 500))) {
+
+      while (m_run && (n = m_socket.recv((char*)&buf[0], m_receiveSize, 500))) {
 	if (n == SIZE_MAX)
 	  continue; // allow timeout so m_run can go away and shut us down
 	size_t copy_len;
-	for (uint8_t *bp = buf; n; n -= copy_len, bp += copy_len) {
+	for (uint8_t *bp = &buf[0]; n; n -= copy_len, bp += copy_len) {
 	  copy_len = std::min(n, bytes_left);
 	  ocpiDebug("Copying socket data to %p, size = %zu, in header %d, left %zu, first %x",
 		    current_ptr, copy_len, in_header, bytes_left, *(uint32_t *)bp);
@@ -196,28 +189,36 @@ public:
 	    memcpy(current_ptr, bp, copy_len );
 	    current_ptr += copy_len;
 	  } else {
-	    m_sep.receiver()->receive(m_header.dataOffset, bp, copy_len);
-	    m_header.dataOffset += OCPI_UTRUNCATE(DtOsDataTypes::Offset, copy_len);
+	    m_sep.receiver()->receive(header.dataOffset, bp, copy_len);
+	    header.dataOffset += OCPI_UTRUNCATE(DtOsDataTypes::Offset, copy_len);
 	  }
 	  if (!(bytes_left -= copy_len)) { // finishing header or data
 	    if (in_header) {
-	      size_t dataLength = XF::FlagMeta::getLengthInFlag(m_header.flagValue);
+	      size_t dataLength = XF::FlagMeta::getLengthInFlag(header.flagValue);
 	      ocpiDebug("Received Header: len %zu dataOff 0x%" PRIx32 " flagOff 0x%" PRIx32
 			"flag 0x%" PRIx32,
-			dataLength, m_header.dataOffset, m_header.flagOffset, m_header.flagValue);
+			dataLength, header.dataOffset, header.flagOffset, header.flagValue);
 	      if (dataLength) {
 		bytes_left = dataLength;
-		current_ptr =
-		  m_sep.receiver() ? NULL : (uint8_t *)m_smem.map(m_header.dataOffset, dataLength);
 		in_header = false;
+		current_ptr =
+		  m_sep.receiver() ? NULL : (uint8_t *)m_smem.map(header.dataOffset, dataLength);
+		if (dataLength + sizeof(header) > m_receiveSize)
+		  buf.resize((m_receiveSize = dataLength + sizeof(header)));
 		continue;
 	      }
 	    }
 	    // end of data or a zlm header
-	    if (m_header.flagOffset)
-	      doFlag();
-	    current_ptr = (uint8_t*)&m_header;
-	    bytes_left = sizeof(m_header); // packed
+	    if (header.flagOffset) {
+	      assert(!(header.flagOffset & (sizeof(uint32_t)-1)));
+	      if (m_sep.receiver())
+		m_sep.receiver()->receive(header.flagOffset, (uint8_t*)&header.flagValue,
+					  sizeof(uint32_t));
+	      else
+		*(uint32_t *)m_smem.map(header.flagOffset, sizeof(uint32_t)) = header.flagValue;
+	    }
+	    current_ptr = (uint8_t*)&header;
+	    bytes_left = sizeof(header); // packed
 	    in_header = true;
 	  }
 	}
@@ -348,9 +349,8 @@ class XferServices
   OS::Socket         m_socket;
 public:
   XferServices(XF::EndPoint &source, XF::EndPoint &target)
-    : ConnectionBase<XferFactory,XferServices,XferRequest>
-      (*this, source, target) {
-    xfer_create (source, target, 0, &m_xftemplate);
+    : ConnectionBase<XferFactory,XferServices,XferRequest> (*this, source, target) {
+    xfer_create(source, target, 0, &m_xftemplate);
     EndPoint &rsep = *static_cast<EndPoint *>(&target);
     m_socket.connect(rsep.m_ipAddress, rsep.m_portNum);
     m_socket.linger(false);

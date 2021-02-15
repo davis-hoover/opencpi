@@ -46,11 +46,10 @@ namespace OCPI {
       virtual ~Container();
       bool portsInProcess() { return false; }
       inline uint64_t getMyTicks() {
+	Access *ts = m_device.timeServer();
 	return
-	  m_device.isAlive() && !m_device.isFailed() && m_device.timeServer() ? 
-	  (m_lastTick =
-	   swap32(m_device.timeServer()->get64RegisterOffset(0)) +
-	   hdlDevice().m_timeCorrection) :
+	  m_device.isAlive() && !m_device.isFailed() && ts ? 
+	  (m_lastTick = swap32(ts->get64RegisterOffset(0)) + hdlDevice().m_timeCorrection) :
 	  m_lastTick;
       }
     protected:

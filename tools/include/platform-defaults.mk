@@ -165,7 +165,7 @@ OcpiKernelDir:=
 # MF is to indicate the actual file to write dependencies to
 OcpiDependencyFlags:=-MMD -MP -MF$(Space)
 # Other than -g, there is no need to force optimization off
-OcpiOptimizedOffFlags:=
+OcpiDebugOnFlags:=
 # FIXME: discuss whether we need to specifically offer independent assert control
 # FIXME: discuss whether we should universally make the default to be debug (yes)
 # FIXME: is there a need for C vs. C++ here?
@@ -174,7 +174,7 @@ OcpiOptimizedOffFlags:=
 # This is biased for best optimizations (bipolar)
 # Note that FORTIFY_SOURCE is only active with optimization and a warning is issued if
 # it is set without optimization (go figure).
-OcpiOptimizeOnFlags:=-O2 -NDEBUG=1 -Wp,-D_FORTIFY_SOURCE=2
+OcpiDebugOffFlags:=-O2 -DNDEBUG=1 -Wp,-D_FORTIFY_SOURCE=2
 # For all code:
 # We require these or their equivalent be supported.  If not its nearly an error
 # I.e. there may be problems since code may well depend on it.

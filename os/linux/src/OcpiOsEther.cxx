@@ -403,8 +403,8 @@ namespace OCPI {
 	      Address &addr, std::string &error, unsigned *indexp) {
 	if (timeoutms != m_timeout) {
 	  struct timeval tv;
-	  tv.tv_sec = timeoutms/1000;
-	  tv.tv_usec = (timeoutms % 1000) * 1000;
+	  tv.tv_sec = (time_t)timeoutms/1000;
+	  tv.tv_usec = ((suseconds_t)timeoutms % 1000) * 1000;
 	  ocpiDebug("[Socket::receive (ether)] Setting socket timeout to %u ms", timeoutms);
 	  if (setsockopt(m_fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) != 0) {
 	    setError(error, "setting receive timeout on socket");

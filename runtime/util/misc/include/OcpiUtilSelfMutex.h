@@ -54,7 +54,8 @@ namespace OCPI {
       OCPI::OS::Mutex &m_mutex;
     public:
       // The argument is expected to be "this"
-      SelfAutoMutex(SelfRefMutex *srm) : m_mutex(*srm) {
+      // The conditional is just to suppress a null-ptr-dereference warning in gcc7+
+      SelfAutoMutex(SelfRefMutex *srm) : m_mutex(*(srm ? srm : (SelfRefMutex*)this)) {
 	m_mutex.lock();
       }
       SelfAutoMutex(SelfMutex *m) : m_mutex(*m) {

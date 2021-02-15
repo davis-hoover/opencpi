@@ -545,7 +545,7 @@ namespace OCPI {
     void Assembly::Instance::strip_pf(std::string& platform) const {
       // Remove trailing _pf from string
       const size_t pos = platform.rfind("_pf");
-      if (pos == platform.length()-3)
+      if (pos != platform.npos && pos == platform.length()-3)
         platform.erase(pos);
     }
 

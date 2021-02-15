@@ -268,8 +268,8 @@ namespace OCPI {
     static void exitbad(const char *e) {
       // We are in a very primitive mode here. No error checking.
       static const char msg[] = "\n*********During shutdown********\n";
-      (void)write(2, e, strlen(e));
-      (void)write(2, msg, sizeof(msg));
+      ocpiIgnore(write(2, e, strlen(e)));
+      ocpiIgnore(write(2, msg, sizeof(msg)));
       _exit(1);
     }
     // A static-destructor hook to perform manager cleanup.

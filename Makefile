@@ -67,7 +67,7 @@ $(foreach p,$(subst :, ,$(Platform)),$(if $(filter $p,$(RccAllPlatforms) $(HdlAl
   $(error Platform $p is specified but non-existent, RCC or HDL.  HDL platforms may not be built yet)))
 
 # Check that all RCC platforms and the second of pairs are valid RCC platforms
-$(foreach p,$(RccPlatforms),$(if $(filter $p,$(RccAllPlatforms)),,\
+$(foreach p,$(RccPlatforms),$(if $(filter $(call RccRealPlatforms,$p),$(RccAllPlatforms)),,\
   $(error RCC platform $p is specified but not a known RCC platform)))
 
 # Check that all HDL platforms and the first of pairs are valid HDL platforms
@@ -96,8 +96,8 @@ GetRccHdlPlatform=$(strip\
     $(foreach s,$(or $(word 2,$(subst :, ,$1)),-),\
       $(if $(filter-out -,$s),\
         $(if $(filter $f,$(HdlAllPlatforms)),,$(error Unknown/unbuilt HDL platform: $f))\
-        $(if $(filter $s,$(RccAllPlatforms)),,$(error Unknown RCC platform: $s)),\
-        $(if $(filter $f,$(HdlAllPlatforms) $(RccAllPlatforms)),,\
+        $(if $(filter $(call RccRealPlatforms,$s),$(RccAllPlatforms)),,$(error Unknown RCC platform: $s)),\
+        $(if $(filter $(call RccRealPlatforms,$f),$(HdlAllPlatforms) $(RccAllPlatforms)),,\
            $(error Platform $f is neither an RCC platform or a (built) HDL platform)))\
       $(foreach r,$(or $(filter $f,$(RccAllPlatforms)),$(filter-out -,$s),-),\
         $(foreach h,$(or $(filter $f,$(HdlAllPlatforms)),-),$r:$h)))))
