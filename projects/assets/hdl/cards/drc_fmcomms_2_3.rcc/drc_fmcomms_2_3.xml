@@ -22,9 +22,9 @@
 	  name='config'/>
     <Instance worker='ocpi.platform.devices.platform_ad9361_data_sub.hdl' name='data_sub'>
       <Property name='lvds_p' value='true'/>
-      <Property name='DATA_CLK_Delay' value='7'/>
+      <Property name='DATA_CLK_Delay' value='3'/>
       <Property name='RX_Data_Delay' value='0'/>
-      <Property name='FB_CLK_Delay' value='12'/>
+      <Property name='FB_CLK_Delay' value='7'/>
       <Property name='TX_Data_Delay' value='0'/>
     </Instance>
     <!-- DRC RX0 path slaves -->
@@ -52,7 +52,10 @@
       <External name='rx' index='0'/>
     </Connection>
 
+    <!-- Container only instances one RX channel at this time. -->
+    <!-- A container/drc mismatch will prevent application from running. -->
     <!-- DRC RX1 path slaves -->
+    <!--
     <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'
 	    name='rx_qadc1' connect='rx_cswm_to_iqstream1'>
       <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
@@ -76,7 +79,7 @@
       <Port name='out' instance='rx_cic_dec1'/>
       <External name='rx' index='1'/>
     </Connection>
-
+    -->
     <!-- DRC TX0 path slaves --> 
     <Connection>
       <External name='tx' index='0'/>
@@ -94,6 +97,10 @@
     <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac0'>
       <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
     </Instance>
+
+    <!-- Container only instances one TX channel at this time. -->
+    <!-- A container/drc mismatch will prevent application from running. -->
+    <!-- 
     <Connection>
       <External name='tx' index='1'/>
       <Port name='in' instance='tx_cic_int1'/>
@@ -105,9 +112,12 @@
       <Property name='R'          Value='16'/>
       <Property name='ACC_WIDTH'  Value='28'/>
     </Instance>
-	    <Instance worker='ocpi.assets.misc_comps.iqstream_to_cswm.hdl'
+    <Instance worker='ocpi.assets.misc_comps.iqstream_to_cswm.hdl'
 		  name='tx_iqstream_to_cswm1' connect='tx_qdac1'/>
-    <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac1'/>
+    <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac1'>
+      <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
+    </Instance>
+    -->
     <!--==========================================================================-->
     <!-- This must be instanced here in app XML as a workaround for #827/AV-3799 -->
     <!-- It is not really needed as a slave -->

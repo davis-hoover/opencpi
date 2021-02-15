@@ -3,7 +3,7 @@
 from json import load
 from pathlib import Path
 from urllib.request import urlopen
-from . import ci_asset, ci_platform
+from . import ci_asset
 
 class Project():
 
@@ -14,7 +14,9 @@ class Project():
         self.url = url
         self.id = project_id
         self.is_builtin = is_builtin
-        self.assets = assets or ci_asset.discover_assets(self)
+        self.assets = assets or ci_asset.discover_assets(
+            self.path, whitelist=['primitives', 'cards', 'devices', 'adapters', 
+                                  'assemblies', 'components', 'platforms'])
 
 
 def discover_projects(projects_paths=None, group_ids=None, blacklist=None):

@@ -91,19 +91,20 @@ def to_dict(job):
 
 
 def make_jobs(stages, platform, projects=None, host_platform=None, 
-              overrides=None, is_downstream=False):
+              config=None, overrides=None, is_downstream=False):
     """Creates Job(s) for project/platform combinations
 
     Calls either make_hdl_jobs() or make_rcc_jobs() based on model
     of platform.
 
     Args:
-        stages:           List of pipeline stages
-        platform:         Platform to make jobs for
-        projects:         List of projects to make jobs for
-        host_platform:    Host platform to create jobs for
-        overrides:        Dictionary to override standard job values
-        is_downstream:    Whether job is for a downstream pipeline
+        stages:        List of pipeline stages
+        platform:      Platform to make jobs for
+        projects:      List of projects to make jobs for
+        host_platform: Host platform to create jobs for
+        config:        Dictionary of configs
+        overrides:     Dictionary to override standard job values
+        is_downstream: Whether job is for a downstream pipeline
 
     Returns:
         Jobs: collection containing data necessary to create jobs in a
@@ -114,18 +115,22 @@ def make_jobs(stages, platform, projects=None, host_platform=None,
     """
     if platform.model == 'hdl':
         return make_hdl_jobs(stages, platform, projects, 
-                             host_platform=host_platform, overrides=overrides, 
+                             host_platform=host_platform, 
+                             config=config, 
+                             overrides=overrides,
                              is_downstream=is_downstream)
     elif platform.model == 'rcc':
         return make_rcc_jobs(stages, platform, projects, 
-                             host_platform=host_platform, overrides=overrides, 
+                             host_platform=host_platform,
+                             config=config,  
+                             overrides=overrides,
                              is_downstream=is_downstream)
     else:
         raise ValueError('Unknown model: {}'.format(platform.model))
 
 
 def make_rcc_jobs(stages, platform, projects, host_platform=None,
-                  overrides=None, is_downstream=False):
+                  overrides=None, config=None, is_downstream=False):
     """Creates Job(s) for project/platform combinations of model 'rcc'
 
     Determines arguments to pass to make_job().
@@ -135,32 +140,41 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
         platform:      Platform to make jobs for
         projects:      List of projects to make jobs for
         host_platform: Host platform to create jobs for
+        config:        Dictionary of configs
         overrides:     Dictionary to override standard job values
-        is_downstream:    Whether job is for a downstream pipeline
+        is_downstream: Whether job is for a downstream pipeline
 
     Returns:
         Jobs: collection containing data necessary to create jobs in a
               pipeline
     """
     jobs = []
-
-    for stage in ['prereqs', 'prereqs-rcc', 'build-rcc', 'build', 'test']:
-        if stage in ['prereqs-rcc', 'build-rcc'] and platform.is_host:
+    non_host_stages = ['prereqs-rcc', 'build-rcc', 'build-assemblies']
+    host_stages = ['prereqs', 'build', 'test']
+    for stage in non_host_stages + host_stages:
+        if stage in non_host_stages and platform.is_host:
             continue
-        if stage in ['prereqs', 'build'] and not platform.is_host:
+        if stage in host_stages and not platform.is_host:
             continue
-
-        if stage == 'test' and not platform.is_host:
+        
+        if stage == 'build-assemblies' and not platform.is_host:
             for project in projects:
                 for asset in project.assets:
                     if asset.is_testable:
-                        job = make_job(stage, stages, platform,
-                                       project=project, asset=asset,
-                                       host_platform=host_platform,
-                                       overrides=overrides,
-                                       is_downstream=is_downstream)
-                        if job:
-                            jobs.append(job)
+                        name = make_name(platform,project=project, 
+                                         stage='build-tests',
+                                         host_platform=host_platform, 
+                                         asset=asset)
+                        build_test_job = make_job('build-assemblies', 
+                                                  stages, platform,
+                                                  name=name, 
+                                                  project=project,
+                                                  host_platform=host_platform,
+                                                  asset=asset, 
+                                                  overrides=overrides,
+                                                  is_downstream=is_downstream)
+                        if build_test_job:
+                            jobs.append(build_test_job)
         else:
             job = make_job(stage, stages, platform,
                            host_platform=host_platform, overrides=overrides,
@@ -179,35 +193,40 @@ def make_rcc_jobs(stages, platform, projects, host_platform=None,
 
 
 def make_hdl_jobs(stages, platform, projects, host_platform=None, 
-                  overrides=None, is_downstream=False):
+                  overrides=None, config=None, is_downstream=False):
     """Creates Job(s) for project/platform combinations of model 'hdl'
 
     Determines arguments to pass to make_job().
 
     Args:
-        stages:           List of pipeline stages
-        platform:         Platform to make jobs for
-        projects:         List of projects to make jobs for
-        host_platform:    Host platform to create jobs for
-        overrides:        Dictionary to override standard job values
-        is_downstream:    Whether job is for a downstream pipeline
+        stages:        List of pipeline stages
+        platform:      Platform to make jobs for
+        projects:      List of projects to make jobs for
+        host_platform: Host platform to create jobs for
+        overrides:     Dictionary to override standard job values
+        config:        Dictionary of configs
+        is_downstream: Whether job is for a downstream pipeline
 
     Jobs: collection containing data necessary to create jobs in a
           pipeline
     """
     jobs = []
-
+    
     for project in projects:
         if not project.is_builtin and platform.project.name != project.name:
             continue
-            
-        for asset in project.assets:
+        
+        if project.name == platform.project.name:
+            assets = project.assets + platform.assets
+        else:
+            assets = project.assets
 
+        for asset in assets:
             if asset.is_buildable:
-                stage = stage_from_asset(asset)
+                stage = get_asset_stage(asset, project)
                 job = make_job(stage, stages, platform, project=project,
                                host_platform=host_platform, asset=asset,
-                               overrides=overrides, 
+                               overrides=overrides,
                                is_downstream=is_downstream)
                 if job:
                     jobs.append(job)
@@ -242,6 +261,7 @@ def make_hdl_jobs(stages, platform, projects, host_platform=None,
                                             host_platform=host_platform,
                                             linked_platform=linked_platform,
                                             overrides=overrides,
+                                            config=config,
                                             do_ocpiremote=True,
                                             is_downstream=is_downstream)
                     if run_test_job:
@@ -424,14 +444,16 @@ def make_generate(host_platform, cross_platform, pipeline, overrides=None):
         variables['GIT_STRATEGY'] = 'none'
         
     job = Job(name, stage=stage, script=script, tags=tags, image=image, 
-        variables=variables, before_script=before_script, artifacts=artifacts)
+              variables=variables, before_script=before_script, 
+              artifacts=artifacts)
 
     return job
 
 
 def make_job(stage, stages, platform, project=None, name=None,
              host_platform=None, asset=None, linked_platform=None,
-             overrides=None, do_ocpiremote=False, is_downstream=False):
+             overrides=None, config=None, do_ocpiremote=False, 
+             is_downstream=False):
     """Creates Job for project/platform combinations
 
     Calls before_script(), after_script(), script(), and if
@@ -444,10 +466,11 @@ def make_job(stage, stages, platform, project=None, name=None,
         project:         Project to make jobs for
         name:            Name of job
         host_platform:   Host platform to create jobs for
-        asset:         asset to make job for
+        asset:           Asset to make job for
         linked_platform: List of platforms needed for making jobs
                          requiring an associated rcc platform
         overrides:       Dictionary to override standard job values
+        config:          Dictionary of configs
         do_ocpiremote:   Whether jobs should run ocpiremote commands
         is_downstream:   Whether job is for a downstream pipeline
 
@@ -462,6 +485,7 @@ def make_job(stage, stages, platform, project=None, name=None,
     before_script = make_before_script(stage, stages, platform,
                                        host_platform=host_platform,
                                        linked_platform=linked_platform,
+                                       config=config,
                                        do_ocpiremote=do_ocpiremote,
                                        is_downstream=is_downstream)
     script = make_script(stage, platform, project=project, asset=asset,
@@ -520,24 +544,25 @@ def make_name(platform, stage=None, project=None, host_platform=None,
 
 
 def make_before_script(stage, stages, platform, host_platform=None,
-                       linked_platform=None, do_ocpiremote=False,
-                       is_downstream=False):
+                       linked_platform=None, config=None,
+                       do_ocpiremote=False, is_downstream=False):
     """Creates list of commands to run in job's before_script step
 
         Constructs commands for downloading AWS artifacts, creating
         timestamp, and sourcing opencpi.
 
     Args:
-        stage:             Stage of pipeline for job to execute in.
-                           Used to exclude artifacts in same and later
-                           stages
-        stages:            List of all pipeline stages
-        platform:          Platform to download artifacts for
-        host_platform:     Host_platform to download artifacts for
-        linked_platform:   Associated platform to downloaded artifacts 
-                           for
-        do_ocpiremote:     Whether job should run ocpiremote commands
-        is_downstream:     Whether job is for a downstream pipeline
+        stage:           Stage of pipeline for job to execute in.
+                         Used to exclude artifacts in same and later
+                         stages
+        stages:          List of all pipeline stages
+        platform:        Platform to download artifacts for
+        host_platform:   Host_platform to download artifacts for
+        linked_platform: Associated platform to downloaded artifacts 
+                         for
+        config:          Dictionary of configs
+        do_ocpiremote:   Whether job should run ocpiremote commands
+        is_downstream:   Whether job is for a downstream pipeline
 
     Returns:
         list of command strings
@@ -619,19 +644,34 @@ def make_before_script(stage, stages, platform, host_platform=None,
 
     if do_register:
         register_cmd = make_ocpidev_cmd(
-            'register', path='projects/ext/${CI_PROJECT_NAME}', 
-            noun='project')
+            'register', path='projects/ext/${CI_PROJECT_NAME}', noun='project')
         cmds.append(register_cmd)
     
     if do_ocpiremote:
+        # Set up hash to look up interface for runner from within job
+        runners = config['ci']['runners']
+        interfaces_cmd = ' && '.join(['declare -A interfaces',
+                                      'interfaces=('])
+        for runner_id,runner_configs in runners.items():
+            interfaces_cmd += ' ["{}"]="{}"'.format(
+                runner_id, runner_configs['socket_interface'])
+        interfaces_cmd += ')'
+        
+        if platform.do_deploy:
+            cmds +=[
+                make_ocpiremote_cmd('deploy', platform,
+                                    linked_platform=linked_platform),
+                'sleep 60'
+            ]
+
         cmds += [
-            make_ocpiremote_cmd('deploy', platform,
-                                linked_platform=linked_platform),
-            'sleep 5',
             make_ocpiremote_cmd('load', platform,
                                 linked_platform=linked_platform),
             make_ocpiremote_cmd('start', platform,
                                 linked_platform=linked_platform),
+            interfaces_cmd,
+            'export OCPI_SOCKET_INTERFACE="${interfaces[$CI_RUNNER_ID]}"',
+            'echo "${OCPI_SOCKET_INTERFACE}"',
             'export OCPI_SERVER_ADDRESSES={}:{}'.format(platform.ip,
                                                         platform.port)
         ]
@@ -716,6 +756,7 @@ def make_script(stage, platform, project=None, linked_platform=None,
                            pipeline_id, job_name,
                            '-s .timestamp -t "successful-job"'])
     success_cmd = 'touch .success'
+    cmds = []
 
     if stage == 'test':
         if platform.is_host:
@@ -723,21 +764,25 @@ def make_script(stage, platform, project=None, linked_platform=None,
         else:
             cmd = make_ocpidev_cmd('run', platform, asset.path,
                                    noun='tests')
+    elif stage == 'build-assemblies' and asset.name != 'assemblies':
+        cmd = make_ocpidev_cmd('build', platform, asset.path, noun='test')
     elif platform.model == 'hdl':
         if stage == 'build-platforms':
             cmd = make_ocpidev_cmd('build', platform, project.path,
                                    'hdl platforms')
-        elif stage == 'build-assemblies' and asset.name != 'assemblies':
-            cmd = make_ocpidev_cmd('build', platform, asset.path,
-                                   noun='test')
         elif stage == 'build-sdcards':
+            cmd = ('cdk/scripts/export-platform-to-framework.sh' 
+                   ' -v hdl {} {}/lib'.format(platform.name, platform.path))
+            cmds.append(cmd)
             cmd = make_ocpiadmin_cmd('deploy', platform, linked_platform)
         else:
             cmd = make_ocpidev_cmd('build', platform, asset.path)
     else:
         cmd = make_scripts_cmd(stage, platform, name=name)
 
-    return [cmd, upload_cmd, success_cmd]
+    cmds += [cmd, upload_cmd, success_cmd]
+
+    return cmds
 
 
 def make_scripts_cmd(stage, platform, name=None):
@@ -825,7 +870,7 @@ def make_ocpidev_cmd(verb, platform=None, path=None, noun=''):
             'ocpidev build',
             noun,
             '-d {}'.format(path),
-            '--hdl-platform {}'.format(platform.name)
+            '--{}-platform {}'.format(platform.model, platform.name)
         ])
 
     if verb == 'run':
@@ -862,7 +907,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         ValueError: if unrecognized verb provided
     """
     if verb == 'deploy':
-        return ' '.join([
+        cmd = ' '.join([
             'ocpiremote deploy',
             '-i {}'.format(platform.ip),
             '-w {}'.format(platform.name),
@@ -870,7 +915,7 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         ])
 
     if verb == 'load':
-        return ' '.join([
+        cmd = ' '.join([
             'ocpiremote load',
             '-i {}'.format(platform.ip),
             '-r {}'.format(platform.port),
@@ -879,19 +924,32 @@ def make_ocpiremote_cmd(verb, platform, linked_platform=None):
         ])
 
     if verb in ['start', 'unload']:
-        return ' '.join([
+        cmd = ' '.join([
             'ocpiremote {}'.format(verb),
             '-i {}'.format(platform.ip),
         ])
 
-    raise ValueError('Unknown verb: {}'.format(verb))
+        if verb == 'start':
+            cmd += (' -b')
+
+    if platform.password:
+        cmd += (' -p {}'.format(platform.password))
+
+    if platform.user:
+        cmd += (' -u {}'.format(platform.user))
+
+    if verb not in ['deploy', 'load', 'start', 'unload']:
+        raise ValueError('Unknown verb: {}'.format(verb))
+
+    return cmd
 
 
-def stage_from_asset(asset):
-    """Gets the stage of job based on its asset
+def get_asset_stage(asset, project):
+    """Gets the stage of job based on its Asset and Project
 
     Args:
-        asset: asset of job
+        asset:   Asset of job
+        project: Project of job
 
     Returns:
         stage string of job
@@ -899,17 +957,19 @@ def stage_from_asset(asset):
     Raises:
         ValueError: if unrecognized asset passed
     """
-    if asset.name in ['platforms', 'assemblies']:
-        return 'build-{}'.format(asset.name)
+    asset_name = asset.name.split(':')[-1]
 
-    if (asset.name in ['components', 'adapters', 'cards', 'devices']
+    if asset_name in ['platforms', 'assemblies']:
+        return 'build-{}'.format(asset_name)
+
+    if (asset_name in ['components', 'adapters', 'cards', 'devices']
             or asset.path.parent.stem == 'components'):
-        if not asset.project.is_builtin:
-            return 'build-assets-{}'.format(asset.project.name)
+        if not project.is_builtin:
+            return 'build-assets-{}'.format(project.name)
         return 'build-assets'
 
-    if asset.name == 'primitives':
-        if asset.project.name == 'core':
+    if asset_name == 'primitives':
+        if project.name == 'core':
             return 'build-primitives-core'
         else:
             return 'build-primitives'
