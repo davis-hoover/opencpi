@@ -1,0 +1,61 @@
+<Application>
+
+  <Connection>
+    <Port Instance="drc" Name="rx"/>
+    <Port Instance="file_write" Name="in"/>
+  </Connection>
+
+
+  <Connection>
+    <Port Instance="file_read" Name="out"/>
+    <Port Instance="drc" Name="tx"/>
+  </Connection>
+
+
+
+  <Instance Component="ocpi.core.file_write">
+    <Property Name="fileName" Value="./testing.tmp"/>
+  </Instance>
+  <Instance Component="ocpi.core.file_read">
+    <Property Name="fileName" Value="./null.tmp"/>
+  </Instance>
+
+  <!--==========================================================================-->
+  <!-- The DRC component, specifying channel configurations -->
+
+  <Instance Component="ocpi.platform.drc" worker='drc_e31x'>
+    <!--slave instance="platform_ad9361_data_sub" slave="data_sub"/>
+             <slave instance="platform_ad9361_config" slave="config"/>
+    <slave instance="data_src_qadc" slave="rx_qadc"/>
+    <slave instance="platform_ad9361_spi" slave="ad9361_spi"/-->
+    <!-- end of slaves that will be inferred -->
+    <!-- end of slaves that will be inferred -->
+    <property name='configurations'
+              Value="{description first,
+              channels {
+                                {rx true,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 0.24,
+                                 sampling_rate_Msps 0.25,
+                                 samples_are_complex true,
+                                 gain_mode auto,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+                                 tolerance_gain_dB 1},
+                                {rx false,
+                                 tuning_freq_MHz 2450,
+                                 bandwidth_3dB_MHz 0.24,
+                                 sampling_rate_Msps 0.25,
+                                 samples_are_complex true,
+                                 gain_mode manual,gain_dB -25,
+                                 tolerance_bandwidth_3dB_MHz 0,
+                                 tolerance_tuning_freq_MHz 0.01,
+                                 tolerance_sampling_rate_Msps 0.01,
+                                 tolerance_gain_dB 1}
+                         }
+                 }"/>
+  </Instance>
+
+
+
+</Application>
