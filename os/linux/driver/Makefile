@@ -35,7 +35,7 @@ include $(OCPI_CDK_DIR)/include/util.mk
 # and thus cannot get the platform description from a project-defined software platform, and
 # thus must be a native build.
 ifdef OCPI_TARGET_PLATFORM
- $(info Building/cleaning driver in a CDK environment)
+ $(info Building/cleaning driver in a CDK environment for platform: $(OCPI_TARGET_PLATFORM))
  # Get the info about the target platform from the CDK
  include $(OCPI_CDK_DIR)/include/setup-target-platform.mk
 else

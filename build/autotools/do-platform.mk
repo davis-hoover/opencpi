@@ -88,6 +88,7 @@ Makefile: ../gen/configure platform-variables.sh ../do-platform.mk ../gen/Makefi
 	        $(and $(OcpiPlatformDynamic),--enable-dynamic=yes) \
 	        $(and $(OcpiPlatformOptimize),--enable-debug=no) \
 	        prerequisite_dir=$(OcpiPrerequisitesDir) \
+	        platform_target_dir=$(Platform) \
                 $(and $(OcpiCrossCompile),\
                    --host=$(patsubst %-,%,$(notdir $(OcpiCrossCompile)))) \
 	        CC=$(OcpiCrossCompile)$(OcpiCC) \

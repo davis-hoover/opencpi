@@ -63,7 +63,7 @@ ifeq ($(filter-out cleandriver,$(filter show help clean% distclean%,$(MAKECMDGOA
   include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
 endif
 # Now check all platforms for validity, even the hdl:rcc pairs
-$(foreach p,$(subst :, ,$(Platform)),$(if $(filter $p,$(RccAllPlatforms) $(HdlAllPlatforms)),,\
+$(foreach p,$(subst :, ,$(Platform)),$(if $(filter $(call RccRealPlatforms,$p),$(RccAllPlatforms) $(HdlAllPlatforms)),,\
   $(error Platform $p is specified but non-existent, RCC or HDL.  HDL platforms may not be built yet)))
 
 # Check that all RCC platforms and the second of pairs are valid RCC platforms
@@ -99,7 +99,7 @@ GetRccHdlPlatform=$(strip\
         $(if $(filter $(call RccRealPlatforms,$s),$(RccAllPlatforms)),,$(error Unknown RCC platform: $s)),\
         $(if $(filter $(call RccRealPlatforms,$f),$(HdlAllPlatforms) $(RccAllPlatforms)),,\
            $(error Platform $f is neither an RCC platform or a (built) HDL platform)))\
-      $(foreach r,$(or $(filter $f,$(RccAllPlatforms)),$(filter-out -,$s),-),\
+      $(foreach r,$(or $(and $(filter $(call RccRealPlatforms,$f),$(RccAllPlatforms)),$f),$(filter-out -,$s),-),\
         $(foreach h,$(or $(filter $f,$(HdlAllPlatforms)),-),$r:$h)))))
 
 #$(HdlRccPlatform_$f),-),\
@@ -120,7 +120,7 @@ DoExports=\
           $(if $(and $(filter-out -,$h),$(filter -,$r)),\
             $(warning The HDL platform "$h" has no RCC platform.  It will be ignored.))\
 	  $(and $(filter-out -,$r),\
-            ./scripts/export-framework.sh rcc $r $(RccPlatformDir_$r) &&) \
+            ./scripts/export-framework.sh -v rcc $r $(RccPlatformDir_$(call RccRealPlatforms,$r)) &&) \
           $(and $(filter-out -,$h),\
             ./scripts/export-framework.sh hdl $h "$(HdlPlatformDir_$h)" &&))))) :
 
@@ -152,7 +152,7 @@ driver:
 	         $(foreach o,$(call RccOs,$t),\
 	           if test -d os/$o/driver; then \
 	             echo Building the $o kernel driver for $(call RccRealPlatforms,$p); \
-	             $(MAKE) -C os/$o/driver AT=$(AT) OCPI_TARGET_PLATFORM=$p;\
+	             $(MAKE) -C os/$o/driver AT=$(AT) OCPI_TARGET_PLATFORM=$(call RccRealPlatforms,$p);\
 	           else \
 	             echo There is no kernel driver for the OS '"'$o'"', so none built. ; \
 	           fi;))) \

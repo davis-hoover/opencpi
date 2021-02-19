@@ -49,17 +49,17 @@ RccIncludeDirsActual=$(RccIncludeDirsInternal)\
  $(OCPI_CDK_DIR)/include/$(if $(OcpiBuildingACI),aci,rcc) \
  $(call OcpiGetRccPlatformDir,$(RccRealPlatform))/include \
  $(foreach l,$(RccPrereqLibs),\
-   $(OCPI_PREREQUISITES_DIR)/$l/$(RccRealPlatform)/include\
+   $(OCPI_PREREQUISITES_DIR)/$l/$(RccPlatform)/include\
    $(OCPI_PREREQUISITES_DIR)/$l/include)
 
 # FIXME: change this variable name someday (used by xxx-worker.mk)
 # This variable is the BINARY FILE suffix, used across all authoring models.
 BF=$(strip\
   $(if $1,,$(error internal: BF w/o arg))\
-  $(foreach p,$(or $(call RccGetPlatform,$1),$(error internal: no platform for BF: $1)),\
+  $(foreach p,$(or $(call RccStripOptions,$(call RccGetPlatform,$1)),$(error internal: no platform for BF: $1)),\
     $(foreach s,$(or $(OcpiDynamicLibrarySuffix_$p),$(error internal: no suffix for: $p/$1)),\
       $(infox BFr:$1->$p->$s)$s)))
-RccLinkOptions=$(OcpiRccLDFlags_$(RccPlatform))
+RccLinkOptions=$(OcpiRccLDFlags_$(RccRealPlatform))
 # This is for backward compatibility
 ifdef SharedLibLinkOptions
   RccLinkOptions=$(SharedLibLinkOptions)
@@ -73,14 +73,14 @@ OcpiLibDir=$(OCPI_CDK_DIR)/$(RccPlatform)/lib
 # Add the libraries we know a worker might reference.
 ifdef OcpiBuildingACI
   RccSpecificLinkOptions=\
-    $(call RccPrioritize,MainLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccPlatform))
+    $(call RccPrioritize,MainLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform))
   override RccLibrariesInternal+=\
     application remote_support container library transport xfer drc drc_ad9361 util \
     msg_driver_interface foreign os   
 else
   RccSpecificLinkOptions=\
-    $(call RccPrioritize,DynamicLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccPlatform)) \
-    $(call RccPrioritize,LinkOptions,$(OcpiLanguage),$(RccTarget),$(RccPlatform))
+    $(call RccPrioritize,DynamicLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform)) \
+    $(call RccPrioritize,LinkOptions,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform))
   override RccLibrariesInternal+=rcc application os
 endif
 
@@ -94,29 +94,29 @@ RccOptimized=$(filter 1,$(call OcpiIsOptimized,$(RccPlatform)))
 RccCC=$(OcpiCrossCompile_$1)$(OcpiCC_$1) $(OcpiCFlags_$1) $(OcpiRequiredCFlags_$1)
 RccCXX=$(OcpiCrossCompile_$1)$(OcpiCXX_$1) $(OcpiCXXFlags_$1) $(OcpiRequiredCXXFlags_$1)
 RccLD=$(OcpiCrossCompile_$1)$(Ocpi$(if $(filter c++,$(OcpiLanguage)),CXX,C)LD_$1)
-RccCompileWarnings=$(OcpiRccWarnings_$(RccPlatform))
-RccSuffix=$(OcpiDynamicLibrarySuffix_$(RccPlatform))
-RccStaticSuffix=$(OcpiStaticLibrarySuffix_$(RccPlatform))
+RccCompileWarnings=$(OcpiRccWarnings_$(RccRealPlatform))
+RccSuffix=$(OcpiDynamicLibrarySuffix_$(RccRealPlatform))
+RccStaticSuffix=$(OcpiStaticLibrarySuffix_$(RccRealPlatform))
 RccMainLinkOptions=$(strip\
   $(if $(RccDynamic),\
-    $(OcpiDynamicProgramFlags_$(RccPlatform)),\
-    $(OcpiStaticProgramFlags_$(RccPlatform))))
+    $(OcpiDynamicProgramFlags_$(RccRealPlatform)),\
+    $(OcpiStaticProgramFlags_$(RccRealPlatform))))
 RccCompileOptions=$(strip\
-  $(OcpiDynamicCompilerFlags_$(RccPlatform))\
+  $(OcpiDynamicCompilerFlags_$(RccRealPlatform))\
   $(if $(RccOptimized),\
-     $(OcpiOptimizeOnFlags_$(RccPlatform)),\
-     $(OcpiOptimizeOffFlags_$(RccPlatform))))
+     $(OcpiDebugOffFlags_$(RccRealPlatform)),\
+     $(OcpiDebugOnFlags_$(RccRealPlatform))))
 
 LinkBinary=\
   $(call RccLD,$(RccRealPlatform)) \
   $(and $(OcpiBuildingACI),\
     $(Ocpi$(if $(RccDynamic),Dynamic,Static)ProgramFlags_$(RccRealPlatform)))\
   $(RccSpecificLinkOptions) \
-  $(call RccPrioritize,ExtraLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccPlatform)) \
+  $(call RccPrioritize,ExtraLinkOptions,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform)) \
   -o $@ $1 \
   $(AEPLibraries) \
-  $(call RccPrioritize,CustomLibs,$(OcpiLanguage),$(RccTarget),$(RccPlatform)) \
-  $(call RccPrioritize,LocalLibs,$(OcpiLanguage),$(RccTarget),$(RccPlatform)) \
+  $(call RccPrioritize,CustomLibs,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform)) \
+  $(call RccPrioritize,LocalLibs,$(OcpiLanguage),$(RccTarget),$(RccRealPlatform)) \
   $(foreach l,$(RccLibrariesInternal) $(Libraries),\
     $(if $(findstring /,$l),\
       $(foreach p,$(dir $l)$(RccPlatform)/lib$(notdir $l),\
@@ -138,7 +138,7 @@ LinkBinary=\
 
 $(foreach v,$(filter ExtraCompilerOptionsCC_%,$(.VARIABLES)),\
   $(foreach t,$(v:ExtraCompilerOptionsCC_%=%),\
-    $(foreach p,$(RccPlatforms),\
+    $(foreach p,$(call RccRealPlatforms,$(RccPlatforms)),\
       $(and $(filter $(RccTarget_$p),$t),\
 	 $(eval RccExtraCompileOptionsCC_$p=$($v))))))
 # Prepare the parameters for compile-command-line injection into the worker compilation
@@ -178,12 +178,12 @@ RccFinalCompileOptions=\
 
 #$(foreach v,$(OcpiAllPlatformVars),$(info $v_$(word 1,$(RccPlatforms)):$($v_$(word 1,$(RccPlatforms)))))
 Compile_c=$$(call OcpiFixPathArgs,\
-  $$(call RccCC,$$(RccRealPlatform)) $$(OcpiDependencyFlags_$$(RccPlatform))$$@.deps -c \
-  $$(call RccFinalCompileOptions,C,$$(RccTarget),$$(RccPlatform)) \
+  $$(call RccCC,$$(RccRealPlatform)) $$(OcpiDependencyFlags_$$(RccRealPlatform))$$@.deps -c \
+  $$(call RccFinalCompileOptions,C,$$(RccTarget),$$(RccRealPlatform)) \
   $$(RccIncludeDirsActual:%=-I%) -o $$@ $$(RccParams) $$<)
 Compile_cc=$$(call OcpiFixPathArgs,\
-  $$(call RccCXX,$$(RccRealPlatform)) $$(OcpiDependencyFlags_$$(RccPlatform))$$@.deps -c \
-  $$(call RccFinalCompileOptions,CC,$$(RccTarget),$$(RccPlatform)) \
+  $$(call RccCXX,$$(RccRealPlatform)) $$(OcpiDependencyFlags_$$(RccRealPlatform))$$@.deps -c \
+  $$(call RccFinalCompileOptions,CC,$$(RccTarget),$$(RccRealPlatform)) \
   $$(RccIncludeDirsActual:%=-I%) -o $$@ $$(RccParams) $$<)
 Compile_cpp=$(Compile_cc)
 Compile_cxx=$(Compile_cc)
@@ -231,7 +231,7 @@ $(call RccAssemblyFile,$1,$2): | $(call WkrTargetDir,$1,$2)
 # note the dependency on the object files so that there will be a new UUID
 # whenever the object files are changed.
 # FIXME: it is theoretically better to generate the XML as part of the final link phase.
-$(call ArtifactXmlFile,$1,$2): $(call RccAssemblyFile,$1,$2) $$(ObjectFiles_$1_$2)
+$(call ArtifactXmlFile,$1,$2,1): $(call RccAssemblyFile,$1,$2) $$(ObjectFiles_$1_$2)
 	$(AT)echo Generating artifact/runtime xml file $$@ for all workers in one binary
 	$(AT)$$(call OcpiGen) \
 	     -O $(call RccOs,$1) \
@@ -246,7 +246,8 @@ endef
 ifndef OcpiBuildingACI
 $(foreach p,$(RccPlatforms),\
   $(foreach c,$(ParamConfigurations),\
-    $(eval $(call DoRccArtifactFile,$(RccTarget_$p),$c,$p))))
+    $(eval $(call DoRccArtifactFile,$(strip\
+             $(RccTarget_$(call RccRealPlatforms,$p))$(filter-out -,$(call RccGetOptions,$p))),$c,$p))))
 endif
 
 # ShowVar(varname)
@@ -277,7 +278,7 @@ RccAllVars:=\
 showvars:
 	$(AT)echo Variables used for all platforms unless overridden '(for '$(OcpiLanguage) language')':; \
 	  $(foreach v,$(RccAllVars),$(call RccShowGeneric,$v)) \
-	  $(foreach p,$(RccPlatforms),echo Variables applicable to platform:'  '$p;$(foreach v,$(RccAllVars),$(call RccShowVarSuffixes,$v,$p)))
+	  $(foreach p,$(call RccRealPlatforms,$(RccPlatforms)),echo Variables applicable to platform:'  '$p;$(foreach v,$(RccAllVars),$(call RccShowVarSuffixes,$v,$p)))
 
 #disable builtin suffix rules
 %.o : %.c

@@ -42,7 +42,9 @@ $(eval $(call OcpiSetPlatformVariables,$(OcpiPlatform)))
 # FIXME: Do we need to do this?  Could it just be variables, not exported?
 # FIXME:  could we simply use the camelcase platform variables?
 export OCPI_TARGET_PLATFORM:=$(OcpiPlatform)
-export OCPI_TARGET_DIR:=$(OcpiPlatform)
+ifndef OCPI_TARGET_DIR
+  export OCPI_TARGET_DIR:=$(OcpiPlatform)
+endif
 export OCPI_TARGET_OS:=$(OcpiPlatformOs)
 export OCPI_TARGET_OS_VERSION:=$(OcpiPlatformOsVersion)
 export OCPI_TARGET_ARCH:=$(OcpiPlatformArch)

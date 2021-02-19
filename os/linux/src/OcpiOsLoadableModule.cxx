@@ -145,16 +145,13 @@ OCPI::OS::LoadableModule::close ()
 #endif
 
   pthread_mutex_lock (&g_slMutex);
-
-  if (dlclose (o2vp (m_osOpaque))) {
-    std::string reason = dlerror ();
-    pthread_mutex_unlock (&g_slMutex);
-    throw reason;
+  if (o2vp(m_osOpaque) != NULL) {
+    if (dlclose(o2vp(m_osOpaque))) {
+      std::string reason = dlerror ();
+      pthread_mutex_unlock (&g_slMutex);
+      throw reason;
+    }
+    o2vp(m_osOpaque) = NULL;
   }
-
   pthread_mutex_unlock (&g_slMutex);
-
-#if !defined(NDEBUG)
-  o2vp (m_osOpaque) = 0;
-#endif
 }

@@ -44,7 +44,7 @@
 # Just some extra error checking
 if [ -n "$OCPI_TARGET_PLATFORM" ]; then
   if [ -n "$1" ]; then
-    if  [ "$1" != $OCPI_TARGET_PLATFORM ]; then
+    if  [ "${1%-*}" != $OCPI_TARGET_PLATFORM ]; then
       echo Error:  ocpitarget.sh called with \"$1\" when OCPI_TARGET_PLATFORM already set to \"$OCPI_TARGET_PLATFORM\".
       exit 1
     fi

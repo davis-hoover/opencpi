@@ -56,7 +56,7 @@ project=${project%/exports}
 make -C "$project" exports
 
 # Build the framework
-echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_PLATFORM"
+echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_DIR"
 make
 [ -n "$2" ] && exit 0
 
@@ -78,7 +78,7 @@ fi
 Projects="core platform assets assets_ts inactive"
 # Build built-in RCC components
 echo ================================================================================
-echo "Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_PLATFORM"
+echo "Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_DIR"
 for p in $Projects; do make -C projects/$p rcc; done
 
 # Build built-in OCL components
@@ -96,15 +96,15 @@ for p in $Projects; do make -C projects/$p ocl; done
 
 # Build tests
 echo ================================================================================
-echo "Now we will build the core tests for $OCPI_TARGET_PLATFORM"
+echo "Now we will build the core tests for $OCPI_TARGET_DIR"
 make -C projects/core test
 echo ================================================================================
-echo "Now we will build the example applications in assets and inactive projects for $OCPI_TARGET_PLATFORM"
+echo "Now we will build the example applications in assets and inactive projects for $OCPI_TARGET_DIR"
 make -C projects/assets applications
 make -C projects/inactive applications
 
 # Ensure any framework exports that depend on built projects happen
-make exports Platforms="$OCPI_TARGET_PLATFORM"
+make exports Platforms="$OCPI_TARGET_DIR"
 
 echo ================================================================================
-echo "OpenCPI has been built for $OCPI_TARGET_PLATFORM, with software components, examples and kernel driver"
+echo "OpenCPI has been built for $OCPI_TARGET_DIR, with software components, examples and kernel driver"
