@@ -1,90 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<office:document xmlns:officeooo="http://openoffice.org/2009/office" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>214</meta:editing-cycles><meta:creation-date>2019-11-19T13:59:41.740243381</meta:creation-date><meta:editing-duration>P1DT16H36M41S</meta:editing-duration><meta:generator>LibreOffice/6.3.5.2$MacOSX_X86_64 LibreOffice_project/dd0751754f11728f69b42ee2af66670068624673</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2020-05-11T18:09:47.382685733</dc:date><dc:creator>James Kulp</dc:creator><meta:document-statistic meta:table-count="2" meta:image-count="6" meta:object-count="0" meta:page-count="37" meta:paragraph-count="242" meta:word-count="4590" meta:character-count="31163" meta:non-whitespace-character-count="25980"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../odt/shared/OCPI_ODT.ott" meta:date="2020-01-20T15:05:49.796497046"/></office:meta>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
+ <office:meta><dc:title>OCPI_ODT</dc:title><meta:editing-cycles>215</meta:editing-cycles><meta:creation-date>2019-11-19T13:59:41.740243381</meta:creation-date><meta:editing-duration>P1DT16H37M19S</meta:editing-duration><meta:generator>LibreOffice/6.0.7.3$Linux_X86_64 LibreOffice_project/00m0$Build-3</meta:generator><meta:initial-creator>Lisa Zahn</meta:initial-creator><dc:date>2021-02-20T08:53:39.069937617</dc:date><meta:document-statistic meta:table-count="2" meta:image-count="6" meta:object-count="0" meta:page-count="37" meta:paragraph-count="242" meta:word-count="4590" meta:character-count="31143" meta:non-whitespace-character-count="25960"/><meta:user-defined meta:name="AppVersion">14.0000</meta:user-defined><meta:user-defined meta:name="Company">Parera Information Services, Inc.</meta:user-defined><meta:user-defined meta:name="DocSecurity" meta:value-type="float">0</meta:user-defined><meta:user-defined meta:name="HyperlinksChanged" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="LinksUpToDate" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ScaleCrop" meta:value-type="boolean">false</meta:user-defined><meta:user-defined meta:name="ShareDoc" meta:value-type="boolean">false</meta:user-defined><meta:template xlink:type="simple" xlink:actuate="onRequest" xlink:title="OCPI_ODT" xlink:href="../odt/shared/OCPI_ODT.ott" meta:date="2020-01-20T15:05:49.796497046"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">1001984</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">946169</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">25776</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">12171</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">23059</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">13924</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">7992</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">1005591</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">6937</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">956435</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">1001984</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">25774</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">1014153</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">946169</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">23058</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">960092</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
-     <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
+     <config:config-item config:name="ViewLayoutColumns" config:type="short">1</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
-     <config:config-item config:name="ZoomFactor" config:type="short">100</config:config-item>
+     <config:config-item config:name="ZoomFactor" config:type="short">214</config:config-item>
      <config:config-item config:name="IsSelectedFrame" config:type="boolean">false</config:config-item>
      <config:config-item config:name="AnchoredTextOverflowLegacy" config:type="boolean">true</config:config-item>
     </config:config-item-map-entry>
    </config:config-item-map-indexed>
   </config:config-item-set>
   <config:config-item-set config:name="ooo:configuration-settings">
-   <config:config-item config:name="PrintControls" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintPageBackground" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintAnnotationMode" config:type="short">0</config:config-item>
-   <config:config-item config:name="PrintGraphics" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintLeftPages" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintProspect" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintRightPages" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintFaxName" config:type="string"/>
    <config:config-item config:name="PrintPaperFromSetup" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintTextPlaceholder" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="EmptyDbFieldHidesPara" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ApplyParagraphMarkFormatToNumbering" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintReversed" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TabOverMargin" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="EmbedAsianScriptFonts" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="EmbedLatinScriptFonts" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="DisableOffPagePositioning" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="EmbedOnlyUsedFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="EmbedFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="SurroundTextWrapSmall" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="BackgroundParaOverDrawings" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="ClippedPictures" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="FloattableNomargins" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UnbreakableNumberings" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="EmbedSystemFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TabOverflow" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintTables" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintFaxName" config:type="string"/>
    <config:config-item config:name="PrintSingleJobs" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="SmallCapsPercentage66" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CollapseEmptyCellPara" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="RsidRoot" config:type="int">408992</config:config-item>
-   <config:config-item config:name="PrinterSetup" config:type="base64Binary"/>
-   <config:config-item config:name="CurrentDatabaseCommand" config:type="string"/>
-   <config:config-item config:name="ClipAsCharacterAnchoredWriterFlyFrames" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="DoNotCaptureDrawObjsOnPage" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CurrentDatabaseCommandType" config:type="int">0</config:config-item>
-   <config:config-item config:name="LoadReadonly" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="DoNotResetParaAttrsForNumFont" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="StylesNoDefault" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AlignTabStopPosition" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="LinkUpdateMode" config:type="short">1</config:config-item>
+   <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintProspect" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintReversed" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintTextPlaceholder" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintTables" config:type="boolean">true</config:config-item>
    <config:config-item config:name="DoNotJustifyLinesWithManualBreak" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PropLineSpacingShrinksFirstLine" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ConsiderTextWrapOnObjPos" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="TabAtLeftIndentForParagraphsInList" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="AlignTabStopPosition" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintLeftPages" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrinterSetup" config:type="base64Binary"/>
+   <config:config-item config:name="CollapseEmptyCellPara" config:type="boolean">true</config:config-item>
    <config:config-item config:name="RedlineProtectionKey" config:type="base64Binary"/>
-   <config:config-item config:name="UnxForceZeroExtLeading" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintDrawings" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UseFormerTextWrapping" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ProtectForm" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="UseFormerLineSpacing" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CurrentDatabaseDataSource" config:type="string"/>
-   <config:config-item config:name="AllowPrintJobCancel" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="SubtractFlysAnchoredAtFlys" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UseOldNumbering" config:type="boolean">false</config:config-item>
    <config:config-item config:name="AddExternalLeading" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="TreatSingleColumnBreakAsPageBreak" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="IsLabelDocument" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="RsidRoot" config:type="int">408992</config:config-item>
+   <config:config-item config:name="ConsiderTextWrapOnObjPos" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="TableRowKeep" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UseFormerTextWrapping" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AllowPrintJobCancel" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddParaTableSpacing" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintDrawings" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddParaSpacingToTableCells" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UseFormerLineSpacing" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="OutlineLevelYieldsNumbering" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="ForbiddenCharacters">
     <config:config-item-map-entry>
      <config:config-item config:name="Language" config:type="string">en</config:config-item>
@@ -94,42 +73,56 @@
      <config:config-item config:name="EndLine" config:type="string"/>
     </config:config-item-map-entry>
    </config:config-item-map-indexed>
-   <config:config-item config:name="AddVerticalFrameOffsets" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TreatSingleColumnBreakAsPageBreak" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="MathBaselineAlignment" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="AddFrameOffsets" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="IsLabelDocument" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="MsWordCompTrailingBlanks" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrinterPaperFromSetup" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="IgnoreFirstLineIndentInNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="OutlineLevelYieldsNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrinterName" config:type="string"/>
-   <config:config-item config:name="IsKernAsianPunctuation" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrinterIndependentLayout" config:type="string">high-resolution</config:config-item>
-   <config:config-item config:name="PrintBlackFonts" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="TableRowKeep" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UpdateFromTemplate" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="SaveThumbnail" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
-   <config:config-item config:name="Rsid" config:type="int">41138679</config:config-item>
-   <config:config-item config:name="TabsRelativeToIndent" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="EmbedComplexScriptFonts" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="UseOldPrinterMetrics" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="IgnoreTabsAndBlanksForLineCalculation" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="InvertBorderSpacing" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintProspectRTL" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="LinkUpdateMode" config:type="short">1</config:config-item>
+   <config:config-item config:name="DoNotResetParaAttrsForNumFont" config:type="boolean">false</config:config-item>
    <config:config-item config:name="ApplyUserData" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="PrintHiddenText" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="SaveVersionOnClose" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="CharacterCompressionType" config:type="short">0</config:config-item>
-   <config:config-item config:name="UseOldNumbering" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="StylesNoDefault" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
+   <config:config-item config:name="FloattableNomargins" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="BackgroundParaOverDrawings" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrinterName" config:type="string"/>
    <config:config-item config:name="UseFormerObjectPositioning" config:type="boolean">false</config:config-item>
-   <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="AddParaTableSpacing" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="TabOverMargin" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="SaveGlobalDocumentLinks" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="CurrentDatabaseDataSource" config:type="string"/>
+   <config:config-item config:name="IsKernAsianPunctuation" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="CharacterCompressionType" config:type="short">0</config:config-item>
+   <config:config-item config:name="SmallCapsPercentage66" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="CurrentDatabaseCommand" config:type="string"/>
+   <config:config-item config:name="CurrentDatabaseCommandType" config:type="int">0</config:config-item>
+   <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="IgnoreTabsAndBlanksForLineCalculation" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="LoadReadonly" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="DoNotCaptureDrawObjsOnPage" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ClipAsCharacterAnchoredWriterFlyFrames" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintBlackFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="DisableOffPagePositioning" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="SurroundTextWrapSmall" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="UnxForceZeroExtLeading" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="TabAtLeftIndentForParagraphsInList" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintRightPages" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">41168956</config:config-item>
+   <config:config-item config:name="MathBaselineAlignment" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="MsWordCompTrailingBlanks" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="InvertBorderSpacing" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="EmbedFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrinterIndependentLayout" config:type="string">high-resolution</config:config-item>
+   <config:config-item config:name="TabOverflow" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintGraphics" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PropLineSpacingShrinksFirstLine" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="UnbreakableNumberings" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddFrameOffsets" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="ClippedPictures" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="EmbedSystemFonts" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ApplyParagraphMarkFormatToNumbering" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="SubtractFlysAnchoredAtFlys" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="AddVerticalFrameOffsets" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="ProtectForm" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintEmptyPages" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintControls" config:type="boolean">true</config:config-item>
+   <config:config-item config:name="PrintHiddenText" config:type="boolean">false</config:config-item>
+   <config:config-item config:name="PrintAnnotationMode" config:type="short">0</config:config-item>
+   <config:config-item config:name="PrintPageBackground" config:type="boolean">true</config:config-item>
   </config:config-item-set>
  </office:settings>
  <office:scripts>
@@ -149,7 +142,7 @@
   <style:font-face style:name="Cambria" svg:font-family="Cambria" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Serif" svg:font-family="&apos;Liberation Serif&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Tahoma" svg:font-family="Tahoma" style:font-family-generic="roman" style:font-pitch="variable"/>
-  <style:font-face style:name="Times New Roman" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+  <style:font-face style:name="Times New Roman1" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
   <style:font-face style:name="Arial2" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
   <style:font-face style:name="Arial1" svg:font-family="Arial" style:font-adornments="Regular" style:font-family-generic="swiss" style:font-pitch="variable"/>
   <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="swiss" style:font-pitch="variable"/>
@@ -158,12 +151,12 @@
   <style:font-face style:name="SimSun" svg:font-family="SimSun" style:font-family-generic="system" style:font-pitch="variable"/>
   <style:font-face style:name="Songti SC" svg:font-family="&apos;Songti SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
   <style:font-face style:name="Tahoma1" svg:font-family="Tahoma" style:font-family-generic="system" style:font-pitch="variable"/>
-  <style:font-face style:name="Times New Roman1" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  <style:font-face style:name="Times New Roman" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
  </office:font-face-decls>
  <office:styles>
   <style:default-style style:family="graphic">
    <style:graphic-properties svg:stroke-color="#3465a4" draw:fill-color="#729fcf" fo:wrap-option="no-wrap" draw:shadow-offset-x="0.1181in" draw:shadow-offset-y="0.1181in" draw:start-line-spacing-horizontal="0.1114in" draw:start-line-spacing-vertical="0.1114in" draw:end-line-spacing-horizontal="0.1114in" draw:end-line-spacing-vertical="0.1114in" style:flow-with-text="false"/>
-   <style:paragraph-properties style:text-autospace="ideograph-alpha" style:line-break="strict" style:writing-mode="lr-tb" style:font-independent-line-spacing="false">
+   <style:paragraph-properties style:text-autospace="ideograph-alpha" style:line-break="strict" style:font-independent-line-spacing="false">
     <style:tab-stops/>
    </style:paragraph-properties>
    <style:text-properties style:use-window-font-color="true" style:font-name="Liberation Serif" fo:font-size="12pt" fo:language="en" fo:country="US" style:letter-kerning="true" style:font-name-asian="Songti SC" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-name-complex="Arial Unicode MS" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN"/>
@@ -438,10 +431,10 @@
    <style:text-properties fo:color="#800080" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color"/>
   </style:style>
   <style:style style:name="Header_20_Char" style:display-name="Header Char" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
-   <style:text-properties style:font-name-complex="Times New Roman1" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
+   <style:text-properties style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
   </style:style>
   <style:style style:name="Footer_20_Char" style:display-name="Footer Char" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
-   <style:text-properties style:font-name-complex="Times New Roman1" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
+   <style:text-properties style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
   </style:style>
   <style:style style:name="Balloon_20_Text_20_Char" style:display-name="Balloon Text Char" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
    <style:text-properties style:font-name="Tahoma" fo:font-family="Tahoma" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="8pt" style:font-size-asian="8pt"/>
@@ -456,14 +449,14 @@
    <style:text-properties fo:color="#808080"/>
   </style:style>
   <style:style style:name="Body_20_Text_20_2_20_Char" style:display-name="Body Text 2 Char" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
-   <style:text-properties style:font-name-complex="Times New Roman1" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
+   <style:text-properties style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
   </style:style>
   <style:style style:name="line_20_number" style:display-name="line number" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font"/>
   <style:style style:name="Emphasis" style:family="text" style:parent-style-name="Default_20_Paragraph_20_Font">
    <style:text-properties fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
   </style:style>
   <style:style style:name="ListLabel_20_1" style:display-name="ListLabel 1" style:family="text">
-   <style:text-properties style:font-name-complex="Times New Roman1" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
+   <style:text-properties style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="system" style:font-pitch-complex="variable"/>
   </style:style>
   <style:style style:name="Index_20_Link" style:display-name="Index Link" style:family="text"/>
   <style:style style:name="Numbering_20_Symbols" style:display-name="Numbering Symbols" style:family="text"/>
@@ -3298,32 +3291,32 @@
    <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" style:page-number="auto" fo:break-before="page"/>
    <style:text-properties fo:font-size="28pt" fo:font-weight="bold" officeooo:paragraph-rsid="0224708a" style:font-size-asian="28pt" style:font-weight-asian="bold" style:font-size-complex="28pt"/>
   </style:style>
-  <style:style style:name="P166" style:family="paragraph" style:parent-style-name="Heading_20_1">
-   <style:text-properties officeooo:rsid="0227f6ec" officeooo:paragraph-rsid="0227f6ec"/>
-  </style:style>
-  <style:style style:name="P167" style:family="paragraph" style:parent-style-name="Heading_20_1">
-   <style:text-properties officeooo:rsid="02642e77" officeooo:paragraph-rsid="02642e77"/>
-  </style:style>
-  <style:style style:name="P168" style:family="paragraph" style:parent-style-name="Heading_20_1">
-   <style:text-properties officeooo:paragraph-rsid="02229edd"/>
-  </style:style>
-  <style:style style:name="P169" style:family="paragraph" style:parent-style-name="Heading_20_1">
-   <style:text-properties officeooo:paragraph-rsid="022b25a6"/>
-  </style:style>
-  <style:style style:name="P170" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P166" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="022c10c2" officeooo:paragraph-rsid="022c10c2"/>
   </style:style>
-  <style:style style:name="P171" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P167" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="0227f6ec"/>
   </style:style>
-  <style:style style:name="P172" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P168" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:paragraph-rsid="022b25a6"/>
   </style:style>
-  <style:style style:name="P173" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P169" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="024c870a" officeooo:paragraph-rsid="024c870a"/>
   </style:style>
-  <style:style style:name="P174" style:family="paragraph" style:parent-style-name="Heading_20_2">
+  <style:style style:name="P170" style:family="paragraph" style:parent-style-name="Heading_20_2">
    <style:text-properties officeooo:rsid="022b25a6" officeooo:paragraph-rsid="022b25a6"/>
+  </style:style>
+  <style:style style:name="P171" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:rsid="0227f6ec" officeooo:paragraph-rsid="0227f6ec"/>
+  </style:style>
+  <style:style style:name="P172" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:rsid="02642e77" officeooo:paragraph-rsid="02642e77"/>
+  </style:style>
+  <style:style style:name="P173" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:paragraph-rsid="02229edd"/>
+  </style:style>
+  <style:style style:name="P174" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:paragraph-rsid="022b25a6"/>
   </style:style>
   <style:style style:name="P175" style:family="paragraph" style:parent-style-name="List_20_Bullet">
    <style:text-properties officeooo:paragraph-rsid="02229edd"/>
@@ -3443,13 +3436,13 @@
    <style:text-properties officeooo:rsid="029d03ca"/>
   </style:style>
   <style:style style:name="T12" style:family="text">
-   <style:text-properties style:font-name-asian="Times New Roman"/>
+   <style:text-properties style:font-name-asian="Times New Roman1"/>
   </style:style>
   <style:style style:name="T13" style:family="text">
-   <style:text-properties officeooo:rsid="022ccaf1" style:font-name-asian="Times New Roman"/>
+   <style:text-properties officeooo:rsid="022ccaf1" style:font-name-asian="Times New Roman1"/>
   </style:style>
   <style:style style:name="T14" style:family="text">
-   <style:text-properties officeooo:rsid="02290e0c" style:font-name-asian="Times New Roman"/>
+   <style:text-properties officeooo:rsid="02290e0c" style:font-name-asian="Times New Roman1"/>
   </style:style>
   <style:style style:name="T15" style:family="text">
    <style:text-properties officeooo:rsid="02236ad0"/>
@@ -3578,7 +3571,7 @@
    <style:text-properties officeooo:rsid="022b2250"/>
   </style:style>
   <style:style style:name="T57" style:family="text">
-   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Times New Roman1" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman1" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
+   <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Calibri" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Times New Roman" style:font-size-asian="10pt" style:language-asian="en" style:country-asian="US" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Times New Roman" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="T58" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Liberation Serif" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" loext:char-shading-value="0" style:font-name-asian="Songti SC" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Arial Unicode MS" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
@@ -3971,13 +3964,16 @@
    <style:text-properties officeooo:rsid="02735b69"/>
   </style:style>
   <style:style style:name="T188" style:family="text">
+   <style:text-properties officeooo:rsid="0274303c"/>
+  </style:style>
+  <style:style style:name="T189" style:family="text">
    <style:text-properties fo:font-variant="normal" fo:text-transform="none" style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="0% 100%" style:font-name="Liberation Serif" fo:font-size="10pt" fo:letter-spacing="normal" fo:language="en" fo:country="US" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:text-underline-mode="continuous" style:text-overline-mode="continuous" style:text-line-through-mode="continuous" style:letter-kerning="true" fo:background-color="transparent" style:font-name-asian="Songti SC" style:font-size-asian="10.5pt" style:language-asian="zh" style:country-asian="CN" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Arial Unicode MS" style:font-size-complex="12pt" style:language-complex="hi" style:country-complex="IN" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:text-scale="100%" style:font-relief="none" style:text-overline-style="none" style:text-overline-color="font-color"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
-   <style:graphic-properties style:wrap="parallel" style:number-wrapped-paragraphs="no-limit" style:wrap-contour="false" style:vertical-pos="from-top" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" fo:background-color="transparent" draw:fill="none" draw:fill-color="#ffffff" fo:padding="0in" fo:border="none" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+   <style:graphic-properties style:vertical-pos="top" style:vertical-rel="baseline" style:horizontal-pos="center" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
   </style:style>
   <style:style style:name="fr2" style:family="graphic" style:parent-style-name="Graphics">
-   <style:graphic-properties style:vertical-pos="top" style:vertical-rel="baseline" style:horizontal-pos="center" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+   <style:graphic-properties style:wrap="parallel" style:number-wrapped-paragraphs="no-limit" style:wrap-contour="false" style:vertical-pos="from-top" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" fo:background-color="transparent" draw:fill="none" draw:fill-color="#ffffff" fo:padding="0in" fo:border="none" style:mirror="none" fo:clip="rect(0in, 0in, 0in, 0in)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
   </style:style>
   <style:style style:name="Sect1" style:family="section">
    <style:section-properties style:editable="false">
@@ -4000,7 +3996,7 @@
  <office:master-styles>
   <style:master-page style:name="Standard" style:page-layout-name="pm1">
    <style:footer>
-    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 4: Using Third-party Libraries in RCC Workers</text:span><text:tab/>Page <text:page-number text:select-page="current">36</text:page-number><text:s/>of <text:page-count>37</text:page-count></text:p>
+    <text:p text:style-name="Footer"><text:span text:style-name="T1">OpenCPI Tutorial 4: Using Third-party Libraries in RCC Workers</text:span><text:tab/>Page <text:page-number text:select-page="current">34</text:page-number><text:s/>of <text:page-count>37</text:page-count></text:p>
    </style:footer>
   </style:master-page>
  </office:master-styles>
@@ -4021,7 +4017,7 @@
    <text:p text:style-name="P165">OpenCPI<text:span text:style-name="T55"><text:variable-set text:name="AVGUI" text:display="none" text:formula="ooow:2" office:value-type="float" office:value="2" style:data-style-name="N0"/></text:span><text:line-break/><text:span text:style-name="T56">Tutorial 4: Using Third-party Libraries in RCC Workers</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section1">
     <text:section-source xlink:href="../odt/shared/release.fodt" text:filter-name="OpenDocument Text Flat XML"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
    </text:section>
    <text:p text:style-name="P32"><text:bookmark-start text:name="__DdeLink__28129_1709236796"/>Revision History</text:p>
    <table:table table:name="Table1" table:style-name="Table1">
@@ -4172,7 +4168,7 @@
    <text:h text:style-name="P120" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc52697_28991016"/><text:span text:style-name="T13">O</text:span><text:span text:style-name="T12">verview</text:span><text:bookmark-end text:name="__RefHeading___Toc52697_28991016"/></text:h>
    <text:p text:style-name="P55">This tutorial continues <text:span text:style-name="T107">to demonstrate the</text:span> RCC worker design process that we introduced in Tutorial 3. <text:s/>In this tutorial, we’ll re-create the <text:span text:style-name="Code">complex_mixer</text:span> component from the <text:span text:style-name="Code">ocpi.tutorial</text:span> project that we used in Tutorial 2. <text:s/><text:span text:style-name="T133">As we did in Tutorial 3, we’ll step through the procedure used to create the component and its RCC worker implementation, including creating the component specification and designing, building and testing an RCC worker that implements its function. </text:span></text:p>
    <text:p text:style-name="P54"><text:span text:style-name="T106">The complex mixer component consists of a Numerically Controlled Oscillator (NCO) and a complex multiplier. <text:s/>It receives I/Q data on its input port and then multiplies this signal by a tone generated by the NCO, shifting</text:span> the input signal in the <text:span text:style-name="T18">f</text:span>requency <text:span text:style-name="T18">d</text:span>omain by the frequency of the NCO. Th<text:span text:style-name="T19">e component properties control the </text:span>NCO <text:span text:style-name="T19">frequency</text:span>. <text:s/></text:p>
-   <text:p text:style-name="Diagram"><draw:frame draw:style-name="fr2" draw:name="Image1" text:anchor-type="as-char" svg:width="5.8709in" svg:height="2.1827in" draw:z-index="1"><draw:image loext:mime-type="image/png">
+   <text:p text:style-name="Diagram"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="5.8709in" svg:height="2.1827in" draw:z-index="1"><draw:image loext:mime-type="image/png">
       <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAiIAAADLCAYAAABTYPhJAABdaElEQVR4nO2dB2AUxduHn+tJ
        Lj303nvvXXqv0sQCKEUEURBRFBVRQERQxIaANBVRrCgqdkVEQQRBpErvEAjp17/ZvbsQQmgK
        /1O+99Fwt3tbZnZn3/nNzDvvmn0KBEEQBEEQQoA51AkQBEEQBOH/LyJEBEEQBEEIGSJEBEEQ
@@ -4624,10 +4620,10 @@
    <text:p text:style-name="P68"><text:span text:style-name="T99">This tutorial shows you how to use a third-party library to implement the internal NCO tone generator for the RCC implementation of the component. <text:s/>To implement the NCO, we’ll use the nco module from liquid-dsp, which is a free and open-source signal processing library for software-defined radios written in C and is included in the OpenCPI installation. <text:s/>For details on liquid-dsp and the nco module, see the URL </text:span><text:a xlink:type="simple" xlink:href="https://liquidsdr.org/doc/nco/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T99">https://liquidsdr.org/doc/nco</text:span></text:a><text:span text:style-name="T99">.</text:span></text:p>
    <text:p text:style-name="P56"/>
    <text:p text:style-name="P38"/>
-   <text:h text:style-name="P156" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc17313_3873206478"/><text:bookmark-start text:name="__DdeLink__31282_1709236796"/>Tutorial Objectives<text:bookmark-end text:name="__RefHeading___Toc17313_3873206478"/></text:h>
+   <text:h text:style-name="P156" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__31282_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc17313_3873206478"/>Tutorial Objectives<text:bookmark-end text:name="__RefHeading___Toc17313_3873206478"/></text:h>
    <text:p text:style-name="P80">The purpose of this tutorial i<text:span text:style-name="T143">s to demonstrate how to integrate a third-party library into an RCC worker.</text:span></text:p>
    <text:p text:style-name="P38"><text:bookmark text:name="__DdeLink__34274_3873206478"/><text:span text:style-name="T133">This tutorial shows you how to</text:span>:</text:p>
-   <text:list xml:id="list1644879902" text:style-name="WWNum32">
+   <text:list xml:id="list769808759" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P125">Create the complex mixer component <text:span text:style-name="T133">specification (properties and ports).</text:span></text:p>
     </text:list-item>
@@ -4639,7 +4635,7 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P16">It demonstrates how to use the RCC authoring model to:</text:p>
-   <text:list xml:id="list180949579268578" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list85340044690097" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P136">Integrate the liquid-dsp library into the RCC worker</text:p>
     </text:list-item>
@@ -4654,9 +4650,9 @@
     </text:list-item>
    </text:list>
    <text:p text:style-name="P81">After running this tutorial, you should <text:span text:style-name="T137">understand how to use the RCC authoring model to integrate a third-party library into an RCC worker and how to use the OpenCPI unit test suite on an RCC worker implementation of a simple OpenCPI component.</text:span><text:bookmark-end text:name="__DdeLink__31282_1709236796"/></text:p>
-   <text:h text:style-name="P153" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__22762_4114161630"/><text:bookmark-start text:name="__RefHeading___Toc40074_4114161630"/><text:bookmark-start text:name="__DdeLink__21514_4114161630"/>What’s Provided for This Tutorial<text:bookmark-end text:name="__RefHeading___Toc40074_4114161630"/></text:h>
-   <text:p text:style-name="P40"><text:bookmark-start text:name="__DdeLink__15647_310614188"/><text:bookmark-start text:name="__DdeLink__28278_1709236796"/>Th<text:span text:style-name="T175">is</text:span> tutorial provides <text:span text:style-name="T136">source code for the following tutorial items</text:span>:<text:bookmark-end text:name="__DdeLink__15647_310614188"/></text:p>
-   <text:list xml:id="list180948132881576" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:h text:style-name="P153" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__21514_4114161630"/><text:bookmark-start text:name="__RefHeading___Toc40074_4114161630"/><text:bookmark-start text:name="__DdeLink__22762_4114161630"/>What’s Provided for This Tutorial<text:bookmark-end text:name="__RefHeading___Toc40074_4114161630"/></text:h>
+   <text:p text:style-name="P40"><text:bookmark-start text:name="__DdeLink__28278_1709236796"/><text:bookmark-start text:name="__DdeLink__15647_310614188"/>Th<text:span text:style-name="T175">is</text:span> tutorial provides <text:span text:style-name="T136">source code for the following tutorial items</text:span>:<text:bookmark-end text:name="__DdeLink__15647_310614188"/></text:p>
+   <text:list xml:id="list85340150696850" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P133"><text:span text:style-name="T136">T</text:span>he <text:span text:style-name="Code"><text:span text:style-name="T137">complex_mixer</text:span></text:span> worker, <text:span text:style-name="T138">written according to the API for the RCC (C++ source code) authoring model. <text:s/>This source code uses the </text:span><text:span text:style-name="Code">liquid-dsp</text:span><text:span text:style-name="T138"> library that is included with OpenCPI and installed as part of the OpenCPI installation process.</text:span></text:p>
     </text:list-item>
@@ -4670,7 +4666,7 @@
    <text:p text:style-name="P77"><text:bookmark-start text:name="__DdeLink__14366_3300564723"/>This source code is available as text in <text:span text:style-name="T139">the relevant sections of this document </text:span>that you <text:span text:style-name="T136">can</text:span> copy and paste into the relevant files following the instructions given <text:span text:style-name="T140">in the section.</text:span></text:p>
    <text:p text:style-name="P78">The tutorial also provides the XML source for all of the assets used to build and run the example <text:span text:style-name="T141">component, worker and tests</text:span>, available as text in the relevant sections of the document.<text:bookmark-end text:name="__DdeLink__14366_3300564723"/></text:p>
    <text:p text:style-name="P79"><text:span text:style-name="T142">You will also use the following script from </text:span><text:span text:style-name="Code">ocpi.</text:span><text:span text:style-name="Code"><text:span text:style-name="T175">tutorial</text:span></text:span><text:span text:style-name="T142">:</text:span></text:p>
-   <text:list xml:id="list180948784376260" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list85339185396530" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P134">The <text:span text:style-name="T135">Python </text:span>script <text:span text:style-name="T135">code </text:span>for plotting and viewing the output data, in <text:span text:style-name="Code">scripts/PlotAndFft.py</text:span></text:p>
     </text:list-item>
@@ -4680,7 +4676,7 @@
    <text:p text:style-name="P42"><text:bookmark-start text:name="__DdeLink__16718_4114161630"/><text:span text:style-name="T64">B</text:span><text:span text:style-name="T65">efore you begin this tutorial, </text:span><text:span text:style-name="T66">you should have</text:span><text:span text:style-name="T65"> </text:span><text:span text:style-name="T66">successfully </text:span><text:span text:style-name="T65">completed </text:span><text:span text:style-name="T68">Tutorials 1 </text:span><text:span text:style-name="T69">through 3</text:span><text:span text:style-name="T68">.</text:span><text:bookmark-end text:name="__DdeLink__16718_4114161630"/></text:p>
    <text:p text:style-name="P42"><text:span text:style-name="T66">Before you be</text:span><text:span text:style-name="T67">gin</text:span><text:span text:style-name="T66"> this tutorial, we recommend reading </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/briefings/Briefing_7_Automated_Test_Suite_Details.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T66">Briefing 7, “Automated Test Suite Details”</text:span></text:a><text:span text:style-name="T66">.</text:span></text:p>
    <text:p text:style-name="P72"><text:bookmark text:name="__DdeLink__20115_3873206478"/></text:p>
-   <text:h text:style-name="P153" text:outline-level="2"><text:bookmark-start text:name="_Toc245388431"/><text:bookmark-start text:name="_Toc224890089"/><text:bookmark-start text:name="_Toc141837257"/><text:bookmark-start text:name="_Toc141318608"/><text:bookmark-start text:name="__DdeLink__31398_4114161630"/><text:bookmark-start text:name="__DdeLink__35753_4114161630"/><text:bookmark-start text:name="__RefHeading___Toc20421_4114161630"/>D<text:bookmark-end text:name="_Toc245388431"/><text:bookmark-end text:name="_Toc224890089"/><text:bookmark-end text:name="_Toc141837257"/><text:bookmark-end text:name="_Toc141318608"/>ocumentation References<text:bookmark-end text:name="__RefHeading___Toc20421_4114161630"/></text:h>
+   <text:h text:style-name="P153" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc20421_4114161630"/><text:bookmark-start text:name="__DdeLink__35753_4114161630"/><text:bookmark-start text:name="__DdeLink__31398_4114161630"/><text:bookmark-start text:name="_Toc141318608"/><text:bookmark-start text:name="_Toc141837257"/><text:bookmark-start text:name="_Toc224890089"/><text:bookmark-start text:name="_Toc245388431"/>D<text:bookmark-end text:name="_Toc141318608"/><text:bookmark-end text:name="_Toc141837257"/><text:bookmark-end text:name="_Toc224890089"/><text:bookmark-end text:name="_Toc245388431"/>ocumentation References<text:bookmark-end text:name="__RefHeading___Toc20421_4114161630"/></text:h>
    <text:p text:style-name="P41">The documents listed in the following table provide detailed information about subjects discussed in this tutorial. <text:s/>The documents listed here are not required reading for this tutorial but will likely be of interest for more in-depth learning.</text:p>
    <text:p text:style-name="P118"><text:bookmark-start text:name="__DdeLink__28310_1709236796"/>Table <text:sequence text:ref-name="refTable0" text:name="Table" style:num-format="1">1</text:sequence><text:s/>- <text:span text:style-name="T72">OpenCPI Reference Documentation</text:span></text:p>
    <table:table table:name="Table2" table:style-name="Table2">
@@ -4754,15 +4750,15 @@
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:p text:style-name="P118"><text:bookmark-end text:name="__DdeLink__22762_4114161630"/><text:bookmark-end text:name="__DdeLink__28310_1709236796"/><text:bookmark-end text:name="__DdeLink__31398_4114161630"/><text:bookmark-end text:name="__DdeLink__35753_4114161630"/><text:bookmark-end text:name="__DdeLink__21514_4114161630"/><text:span text:style-name="Default_20_Paragraph_20_Font"/></text:p>
+   <text:p text:style-name="P118"><text:bookmark-end text:name="__DdeLink__21514_4114161630"/><text:bookmark-end text:name="__DdeLink__35753_4114161630"/><text:bookmark-end text:name="__DdeLink__31398_4114161630"/><text:bookmark-end text:name="__DdeLink__28310_1709236796"/><text:bookmark-end text:name="__DdeLink__22762_4114161630"/><text:span text:style-name="Default_20_Paragraph_20_Font"/></text:p>
    <text:h text:style-name="P122" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc26862_1709236796"/>Create New Project<text:bookmark-end text:name="__RefHeading___Toc26862_1709236796"/></text:h>
    <text:p text:style-name="P18"><text:bookmark-start text:name="__DdeLink__28344_1709236796"/><text:span text:style-name="T161">As we did in Tutorial 3, we’ll create a new, clean project for Tutorial 4; we’ll call it </text:span><text:span text:style-name="Code">DemoProject</text:span><text:span text:style-name="Code"><text:span text:style-name="T161">4</text:span></text:span><text:span text:style-name="T162">. <text:s/>This project has the same requirements as the project we created for Tutorial 3.</text:span></text:p>
    <text:p text:style-name="P18"><text:span text:style-name="T163">To create the new project, use</text:span> the following <text:span text:style-name="Code">ocpidev</text:span> command:</text:p>
-   <text:p text:style-name="P108"><text:bookmark-start text:name="__DdeLink__45541_1709236796"/><text:bookmark-start text:name="__DdeLink__7610_3417207708"/><text:span text:style-name="T164">o</text:span>cpidev -D ocpi.assets -D ocpi.tutorial create project DemoProject<text:span text:style-name="T161">4</text:span> --register<text:bookmark-end text:name="__DdeLink__45541_1709236796"/><text:bookmark-end text:name="__DdeLink__7610_3417207708"/></text:p>
+   <text:p text:style-name="P108"><text:bookmark-start text:name="__DdeLink__7610_3417207708"/><text:bookmark-start text:name="__DdeLink__45541_1709236796"/><text:span text:style-name="T164">o</text:span>cpidev -D ocpi.assets -D ocpi.tutorial create project DemoProject<text:span text:style-name="T161">4</text:span> --register<text:bookmark-end text:name="__DdeLink__7610_3417207708"/><text:bookmark-end text:name="__DdeLink__45541_1709236796"/></text:p>
    <text:section text:style-name="Sect1" text:name="Section12" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P94"><text:span text:style-name="T165">If you want to use AV to create assets in </text:span><text:span text:style-name="Code">DemoProject</text:span><text:span text:style-name="Code"><text:span text:style-name="T161">4</text:span></text:span><text:span text:style-name="T165">, you need to import it into AV. <text:s/></text:span><text:span text:style-name="Emphasis"><text:span text:style-name="T165">Do not use AV to create OpenCPI projects</text:span></text:span><text:span text:style-name="T165">.</text:span></text:p>
     <text:p text:style-name="P94">To <text:span text:style-name="T165">import the </text:span><text:span text:style-name="Code"><text:span text:style-name="T127">DemoProject</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T130">4</text:span></text:span><text:span text:style-name="T56"> project:</text:span></text:p>
-    <text:list xml:id="list180948232952543" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85339249711877" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P148">Start AV.</text:p>
      </text:list-item>
@@ -4773,7 +4769,7 @@
       <text:p text:style-name="P151"><text:span text:style-name="T165">In the Import Projects dialog, make sure </text:span><text:span text:style-name="T45">Select Root Directory</text:span><text:span text:style-name="T165"> is checked and then click </text:span><text:span text:style-name="T45">Browse</text:span><text:span text:style-name="T165"> on the right.</text:span></text:p>
      </text:list-item>
     </text:list>
-    <text:p text:style-name="P111"><text:soft-page-break/><draw:frame draw:style-name="fr2" draw:name="Image11" text:anchor-type="as-char" svg:width="3.5374in" svg:height="4.5055in" draw:z-index="2"><draw:image loext:mime-type="image/png">
+    <text:p text:style-name="P111"><text:soft-page-break/><draw:frame draw:style-name="fr1" draw:name="Image11" text:anchor-type="as-char" svg:width="3.5374in" svg:height="4.5055in" draw:z-index="2"><draw:image loext:mime-type="image/png">
        <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAUkAAAGjCAYAAAChVedMAADTjElEQVR4nOy9B2AcyXE1XBuQ
         MwiAJAgSAAOYczwej+HIyzlLOmWdrGBJliU5Z8mWP9u/sy3LkmXJytJJupxz4DEcjzmTYCZA
         BCLnTX+9munZ2dnZxQIEeSTYjxzs7oSe7p7uN1Xd1VX+06dPR8iGSCRCHo9HNnzX0NDQGO1Q
@@ -5781,7 +5777,7 @@
        </office:binary-data>
       </draw:image>
      </draw:frame></text:p>
-    <text:list xml:id="list180948153708014" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85339346536630" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P149">Navigate to the directory where you created <text:span text:style-name="Code">DemoProject</text:span><text:span text:style-name="Code"><text:span text:style-name="T161">4</text:span></text:span> and then click <text:span text:style-name="T25">OK</text:span>. <text:s/><text:span text:style-name="T169">You’ll see </text:span><text:span text:style-name="Code">local.DemoProject</text:span><text:span text:style-name="Code"><text:span text:style-name="T161">4</text:span></text:span><text:span text:style-name="T169"> listed and selected.</text:span></text:p>
      </text:list-item>
@@ -5797,7 +5793,7 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-04-06T10:30:24.462474864</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">This isn’t exactly right, because Tutorial 4 doesn’t use the component in util_comps. But it may use the prims library. Not sure.</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">This isn’t exactly right, because Tutorial 4 doesn’t use the component in util_comps. But it may use the prims library. Not sure.</text:span></text:p>
     </office:annotation><text:span text:style-name="T170">We need to make the same modifications</text:span><office:annotation-end office:name="__Annotation__7042_3417207708"/><text:span text:style-name="T170"> to the </text:span><text:span text:style-name="Code">Project.mk</text:span><text:span text:style-name="T170"> file as we did in Tutorial 2 and 3. <text:s/>Open</text:span> the <text:span text:style-name="Code">Project.mk</text:span> file <text:span text:style-name="T166">with a text editor and </text:span>add the following two lines after the <text:span text:style-name="Code">ProjectDependenc</text:span><text:span text:style-name="Code"><text:span text:style-name="T178">i</text:span></text:span><text:span text:style-name="Code">es</text:span> variable:</text:p>
    <text:p text:style-name="P109"><text:bookmark-start text:name="__DdeLink__45543_1709236796"/>HdlLibraries+=prims<text:line-break/><text:span text:style-name="T171">ComponentLibraries+=util_comps</text:span><text:bookmark-end text:name="__DdeLink__45543_1709236796"/></text:p>
    <text:p text:style-name="P92">and then save and close the file.<text:bookmark-end text:name="__DdeLink__28344_1709236796"/></text:p>
@@ -5805,7 +5801,7 @@
    <text:p text:style-name="P96"><text:bookmark-start text:name="__DdeLink__28414_1709236796"/><text:span text:style-name="T161">W</text:span>e can use the top-level <text:span text:style-name="Code"><text:span text:style-name="T127">components</text:span></text:span> directory as our library <text:span text:style-name="T170">like we did in Tutorial 3</text:span>.</text:p>
    <text:section text:style-name="Sect1" text:name="Section13" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P48">To create the <text:span text:style-name="Code"><text:span text:style-name="T127">components</text:span></text:span> library with AV:</text:p>
-    <text:list xml:id="list180949699705365" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85340741939760" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P151"><text:span text:style-name="T169">In the Project Explorer, click on </text:span><text:span text:style-name="Code">local.DemoProject</text:span><text:span text:style-name="Code"><text:span text:style-name="T161">4</text:span></text:span><text:bookmark-start text:name="__DdeLink__7027_2322013741"/>. <text:s/>Right click and then select <text:span text:style-name="T25">asset</text:span> <text:span text:style-name="T25">wizard</text:span>.</text:p>
      </text:list-item>
@@ -5823,7 +5819,7 @@
    <text:p text:style-name="P95"><text:bookmark-end text:name="__DdeLink__28414_1709236796"/></text:p>
    <text:h text:style-name="P119" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc52701_28991016"/>Create <text:span text:style-name="T161">Component</text:span><text:bookmark-end text:name="__RefHeading___Toc52701_28991016"/></text:h>
    <text:p text:style-name="P70"><text:bookmark-start text:name="__DdeLink__28449_1709236796"/><text:span text:style-name="T109">Like we did in Tutorial 3, we need</text:span> to create the OCS (OpenCPI Component Specification) for our <text:span text:style-name="T109">complex mixer</text:span> function that defines its properties and ports.<text:bookmark-end text:name="__DdeLink__28449_1709236796"/></text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc25601_3173784371"/><text:bookmark-start text:name="__DdeLink__28451_1709236796"/>Create Component Spec<text:bookmark-end text:name="__RefHeading___Toc25601_3173784371"/></text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__28451_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc25601_3173784371"/>Create Component Spec<text:bookmark-end text:name="__RefHeading___Toc25601_3173784371"/></text:h>
    <text:p text:style-name="P71"><text:span text:style-name="T109">As we did for</text:span> <text:span text:style-name="T109">the</text:span> new <text:span text:style-name="Code">peak_detector</text:span><text:span text:style-name="Code"><text:span text:style-name="T81"> </text:span></text:span>component, <text:span text:style-name="T109">we’ll create the complex mixer component </text:span>spec in t<text:span text:style-name="T109">he </text:span><text:span text:style-name="Code">components</text:span> library.</text:p>
    <text:section text:style-name="Sect1" text:name="Section3" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P46"><text:span text:style-name="T78">To create the complex mixer component spec with AV, right-click on the </text:span><text:span text:style-name="Code">components</text:span><text:span text:style-name="T78"> library and select </text:span><text:span text:style-name="T33">new</text:span><text:span text:style-name="T78"> </text:span><text:span text:style-name="T33">component</text:span><text:span text:style-name="T78">. <text:s/>The new asset dialog appears. <text:s/>In </text:span><text:span text:style-name="T33">Name</text:span><text:span text:style-name="T78">, enter </text:span><text:span text:style-name="T33">complex_mixer.</text:span><text:span text:style-name="T78"> <text:s/>Leave the other fields as they are and click </text:span><text:span text:style-name="T33">Finish</text:span><text:span text:style-name="T78">.</text:span></text:p>
@@ -5833,7 +5829,7 @@
    <text:p text:style-name="P47"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T79">The command creates the component spec </text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T78">complex_mixer</text:span></text:span><text:span text:style-name="Code">-spec.xml</text:span><text:span text:style-name="Code"><text:span text:style-name="T81"> </text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T82">in </text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T86">components/specs</text:span></text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T79">. <text:s/>We’ll add properties and ports to the component spec in the next step.</text:span></text:span><text:bookmark-end text:name="__DdeLink__28451_1709236796"/></text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc25603_3173784371"/>Add Properties and Ports<text:bookmark-end text:name="__RefHeading___Toc25603_3173784371"/></text:h>
    <text:p text:style-name="P65"><text:bookmark-start text:name="__DdeLink__28632_1709236796"/>The <text:span text:style-name="Code"><text:span text:style-name="T104">complex</text:span></text:span><text:span text:style-name="Code">_</text:span><text:span text:style-name="Code"><text:span text:style-name="T104">mixe</text:span></text:span><text:span text:style-name="Code">r</text:span> component function <text:span text:style-name="T125">needs to define two</text:span> properties:<text:bookmark-end text:name="__DdeLink__28632_1709236796"/><text:span text:style-name="T109"> </text:span></text:p>
-   <text:list xml:id="list180948869213143" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list85340147801044" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet"><text:bookmark-start text:name="__DdeLink__28665_1709236796"/><text:span text:style-name="T126">The </text:span><text:span text:style-name="Code">phs_inc</text:span><text:span text:style-name="T109"> (“phase increment”) property, which stores the results of the computation (that is, setting the tune frequency for the input signal using the output of the internal NCO). <text:s/>This property is valid for both RCC and HDL component implementations. <text:s/></text:span></text:p>
     </text:list-item>
@@ -5845,7 +5841,7 @@
    <text:p text:style-name="P62"><text:span text:style-name="T124">The </text:span><text:span text:style-name="Code"><text:span text:style-name="T104">complex</text:span></text:span><text:span text:style-name="Code">_</text:span><text:span text:style-name="Code"><text:span text:style-name="T104">mixe</text:span></text:span><text:span text:style-name="Code">r</text:span> component <text:span text:style-name="T126">has the same simple port configuration as the </text:span><text:span text:style-name="Code">peak_detector</text:span><text:span text:style-name="Code"><text:span text:style-name="T80"> </text:span></text:span><text:span text:style-name="T124">component and uses the same OPS. <text:s/>It</text:span> requires one input port and one output port for communication with other components in an application <text:span text:style-name="T124">and </text:span>both ports will use the <text:span text:style-name="Code">iqstream</text:span> protocol.<text:bookmark-end text:name="__DdeLink__28665_1709236796"/></text:p>
    <text:section text:style-name="Sect1" text:name="Section6" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P64"><text:bookmark-start text:name="__DdeLink__28823_1709236796"/>To create the properties and ports in AV:</text:p>
-    <text:list xml:id="list180948188782038" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85339525564229" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P131">Click the <text:span text:style-name="Code"><text:span text:style-name="T87">complex</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T86">_</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T87">mixe</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T86">r-spec.xml</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T85"> </text:span></text:span>tab and then click the Design tab. <text:s/><text:span text:style-name="T116">In Outline, click </text:span><text:span text:style-name="T31">Properties</text:span><text:span text:style-name="T116"> and then click </text:span><text:span text:style-name="T31">Add</text:span><text:span text:style-name="T116"> </text:span><text:span text:style-name="T31">a</text:span><text:span text:style-name="T116"> </text:span><text:span text:style-name="T31">Property</text:span><text:span text:style-name="T111"> </text:span><text:span text:style-name="T112">to display the OCS Properties page. <text:s/>(You </text:span><text:span text:style-name="T113">can </text:span><text:span text:style-name="T112">also</text:span><text:span text:style-name="T113"> right-click on </text:span><text:span text:style-name="T32">Properties</text:span><text:span text:style-name="T113"> and then select </text:span><text:span text:style-name="T32">Add Ocs Property</text:span><text:span text:style-name="T113"> </text:span><text:span text:style-name="T112">to display it.)</text:span></text:p>
      </text:list-item>
@@ -5853,7 +5849,7 @@
       <text:p text:style-name="P130"><text:bookmark-start text:name="__DdeLink__4047_1121370327"/><text:span text:style-name="T115">In </text:span><text:span text:style-name="T30">Name</text:span><text:span text:style-name="T115">, enter </text:span><text:span text:style-name="T29">enable</text:span><text:span text:style-name="T115">. In </text:span><text:span text:style-name="T30">Type</text:span><text:span text:style-name="T115">, select </text:span><text:span text:style-name="T29">bool</text:span><text:span text:style-name="T115"> from the drop down list</text:span><text:bookmark-end text:name="__DdeLink__4047_1121370327"/><text:span text:style-name="T115">. <text:s/>In Accessibility, check </text:span><text:span text:style-name="T29">Writeable</text:span><text:span text:style-name="T115">.</text:span><text:bookmark-end text:name="__DdeLink__28823_1709236796"/></text:p>
      </text:list-item>
     </text:list>
-    <text:p text:style-name="Diagram"><text:soft-page-break/><draw:frame draw:style-name="fr2" draw:name="Image2" text:anchor-type="as-char" svg:width="6.0319in" svg:height="4.2154in" draw:z-index="3"><draw:image loext:mime-type="image/png">
+    <text:p text:style-name="Diagram"><text:soft-page-break/><draw:frame draw:style-name="fr1" draw:name="Image2" text:anchor-type="as-char" svg:width="6.0319in" svg:height="4.2154in" draw:z-index="3"><draw:image loext:mime-type="image/png">
        <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAjEAAAGICAYAAACwQrHUAADHo0lEQVR4nOydB2AURRfH/5fe
         Q0IKCTX03ntHelWqoAgiqIgKVsSCXbG3D3sFe0EsoFgQRZAiHaT33iG95755czeXvb29knCB
         JLyfHrnbnZ22szP/ffNm188sAMMwDMMwTBnD71JngGEYhmEYpjiwiGEYhmEYpkzikYjhCSeG
@@ -6805,7 +6801,7 @@
        </office:binary-data>
       </draw:image>
      </draw:frame></text:p>
-    <text:list xml:id="list180948096191184" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85340772423577" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P132"><text:bookmark-start text:name="__DdeLink__28931_1709236796"/>In Outline, click <text:span text:style-name="T25">Properties</text:span> &gt; <text:span text:style-name="T25">Add a Property</text:span> again to display the OCS Properties <text:span text:style-name="T117">dialog</text:span>. <text:s/>In <text:span text:style-name="T25">Name</text:span>, enter <text:span text:style-name="T34">phs</text:span><text:span text:style-name="T25">_</text:span><text:span text:style-name="T34">inc</text:span>. <text:s/>In <text:span text:style-name="T25">Type</text:span>, select <text:span text:style-name="T25">short</text:span> from the drop-down list. <text:s/>In Accessibility, check <text:span text:style-name="T34">Writeable</text:span>.<text:bookmark-end text:name="__DdeLink__28931_1709236796"/></text:p>
      </text:list-item>
@@ -6813,7 +6809,7 @@
       <text:p text:style-name="P132"><text:bookmark-start text:name="__DdeLink__28966_1709236796"/>In Outline, click <text:span text:style-name="T25">Ports</text:span> and then click <text:span text:style-name="T25">Add a Port</text:span> (or right-click on <text:span text:style-name="T25">Ports</text:span> and then select Add a <text:span text:style-name="T25">Port</text:span>) to display the OCS Port Definition dialog. <text:s/>In <text:span text:style-name="T25">Name</text:span>, enter <text:span text:style-name="T25">in.</text:span> <text:s/>In <text:span text:style-name="T25">Protocol</text:span>, select <text:span text:style-name="T25">iqstream_protocol</text:span>. <text:s/>Leave the other fields blank.<text:bookmark-end text:name="__DdeLink__28966_1709236796"/></text:p>
      </text:list-item>
      <text:list-item>
-      <text:p text:style-name="P132"><text:bookmark-start text:name="__DdeLink__29044_1709236796"/><text:bookmark-start text:name="__DdeLink__29042_1709236796"/>In Outline, click <text:span text:style-name="T25">Ports</text:span> &gt; <text:span text:style-name="T25">Add</text:span> <text:span text:style-name="T25">a Port</text:span> again to display the OCS Port Definition dialog. <text:s/>In <text:span text:style-name="T25">Name</text:span>, enter <text:span text:style-name="T25">out</text:span>. <text:s/>In <text:span text:style-name="T25">Protocol</text:span>, select <text:span text:style-name="T25">iqstream_protocol</text:span>. <text:s/>Check <text:span text:style-name="T25">Producer</text:span>.<text:bookmark-end text:name="__DdeLink__29044_1709236796"/><text:bookmark-end text:name="__DdeLink__29042_1709236796"/></text:p>
+      <text:p text:style-name="P132"><text:bookmark-start text:name="__DdeLink__29042_1709236796"/><text:bookmark-start text:name="__DdeLink__29044_1709236796"/>In Outline, click <text:span text:style-name="T25">Ports</text:span> &gt; <text:span text:style-name="T25">Add</text:span> <text:span text:style-name="T25">a Port</text:span> again to display the OCS Port Definition dialog. <text:s/>In <text:span text:style-name="T25">Name</text:span>, enter <text:span text:style-name="T25">out</text:span>. <text:s/>In <text:span text:style-name="T25">Protocol</text:span>, select <text:span text:style-name="T25">iqstream_protocol</text:span>. <text:s/>Check <text:span text:style-name="T25">Producer</text:span>.<text:bookmark-end text:name="__DdeLink__29042_1709236796"/><text:bookmark-end text:name="__DdeLink__29044_1709236796"/></text:p>
      </text:list-item>
      <text:list-item>
       <text:p text:style-name="P132">Now click the OCS Editor Source tab for the complex mixer component. <text:s/><text:span text:style-name="T118">We n</text:span>eed to add the <text:span text:style-name="Code">default</text:span> attributes and values for these properties by hand <text:span text:style-name="T118">because we can’t do it in the AV dialog</text:span>. In the Source tab, enter <text:span text:style-name="Code">&quot;Default=true&quot;</text:span> for the <text:span text:style-name="Code"><text:span text:style-name="T127">enable</text:span></text:span> property and <text:span text:style-name="Code">&quot;Default=-8192&quot;</text:span> for the <text:span text:style-name="Code"><text:span text:style-name="T127">phs_inc</text:span></text:span> property, as shown below, highlighted in red:</text:p>
@@ -6822,21 +6818,21 @@
     <text:p text:style-name="P105"><text:bookmark-start text:name="__DdeLink__23552_3873206478"/><text:soft-page-break/>&lt;ComponentSpec&gt;<text:line-break/> <text:s/>&lt;Property Name=<text:bookmark-start text:name="__DdeLink__32539_3873206478"/>&quot;<text:bookmark-end text:name="__DdeLink__32539_3873206478"/>enable&quot; Type=&quot;bool&quot; Writable=&quot;true&quot;<text:line-break/> <text:s text:c="3"/><text:span text:style-name="T119">Default=</text:span><text:bookmark-start text:name="__DdeLink__23506_3873206478"/><text:span text:style-name="T119">&quot;</text:span><text:bookmark-end text:name="__DdeLink__23506_3873206478"/><text:span text:style-name="T119">true&quot;</text:span>&gt;&lt;/Property&gt;<text:line-break/> <text:s/>&lt;Property Name=&quot;phs_inc&quot; Type=&quot;short&quot; Writable=&quot;true&quot;<text:line-break/> <text:s text:c="3"/><text:span text:style-name="T119">Default=&quot;-8192</text:span>&quot;&gt;&lt;/Property&gt;<text:line-break/> <text:s/>&lt;Port Name=&quot;in&quot; Protocol=&quot;iqstream_protocol&quot;&gt;&lt;/Port&gt;<text:line-break/> <text:s/>&lt;Port Name=&quot;out&quot; Protocol=&quot;iqstream_protocol&quot;<text:line-break/> <text:s text:c="3"/>Producer=&quot;true&quot;&gt;&lt;/Port&gt;<text:line-break/>&lt;/ComponentSpec&gt;<text:bookmark-end text:name="__DdeLink__23552_3873206478"/></text:p>
    </text:section>
    <text:p text:style-name="P46"><text:bookmark-start text:name="__DdeLink__31619_1709236796"/><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T78">To add properties and ports from the command line, open the spec with a text editor and add the following XML code</text:span></text:span><text:bookmark-end text:name="__DdeLink__31619_1709236796"/><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T78"> (highlighted in red) between the </text:span></text:span><text:span text:style-name="Code">ComponentSpec</text:span><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T78"> elements:</text:span></text:span></text:p>
-   <text:p text:style-name="P105"><text:span text:style-name="T122">&lt;ComponentSpec&gt;<text:line-break/></text:span><text:bookmark-start text:name="__DdeLink__45596_1709236796"/><text:bookmark-start text:name="__DdeLink__45590_1709236796"/><text:span text:style-name="T119"> <text:s/>&lt;Property Name=&quot;enable&quot; Type=&quot;bool&quot; Writable=&quot;true&quot;<text:line-break/> <text:s text:c="3"/>Default=</text:span><text:bookmark-start text:name="__DdeLink__23506_38732064781"/><text:span text:style-name="T119">&quot;</text:span><text:bookmark-end text:name="__DdeLink__23506_38732064781"/><text:span text:style-name="T119">true&quot;/&gt;<text:line-break/> <text:s/>&lt;Property Name=&quot;phs_inc&quot; Type=&quot;short&quot; Writable=&quot;true&quot;<text:line-break/> <text:s text:c="3"/>Default=&quot;</text:span><office:annotation office:name="__Annotation__32758_3873206478">
+   <text:p text:style-name="P105"><text:span text:style-name="T122">&lt;ComponentSpec&gt;<text:line-break/></text:span><text:bookmark-start text:name="__DdeLink__45590_1709236796"/><text:bookmark-start text:name="__DdeLink__45596_1709236796"/><text:span text:style-name="T119"> <text:s/>&lt;Property Name=&quot;enable&quot; Type=&quot;bool&quot; Writable=&quot;true&quot;<text:line-break/> <text:s text:c="3"/>Default=</text:span><text:bookmark-start text:name="__DdeLink__23506_38732064781"/><text:span text:style-name="T119">&quot;</text:span><text:bookmark-end text:name="__DdeLink__23506_38732064781"/><text:span text:style-name="T119">true&quot;/&gt;<text:line-break/> <text:s/>&lt;Property Name=&quot;phs_inc&quot; Type=&quot;short&quot; Writable=&quot;true&quot;<text:line-break/> <text:s text:c="3"/>Default=&quot;</text:span><office:annotation office:name="__Annotation__32758_3873206478">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-03-22T12:09:33.301872762</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">What’s the significance of setting to this value?</text:span></text:p>
-    </office:annotation><text:span text:style-name="T119">-8192&quot;</text:span><office:annotation-end office:name="__Annotation__32758_3873206478"/><text:span text:style-name="T119">/</text:span><text:span text:style-name="T121">&gt;</text:span><text:span text:style-name="T119"><text:line-break/> </text:span><text:span text:style-name="Code"><text:span text:style-name="T119"><text:s text:c="2"/>&lt;Port Name=&quot;in&quot; Protocol=&quot;iqstream_protocol&quot;/&gt;<text:line-break/> <text:s/>&lt;Port Name=&quot;out&quot; Protocol=&quot;iqstream_protocol&quot;<text:line-break/> <text:s text:c="3"/>Producer=&quot;true&quot;/&gt;</text:span></text:span><text:bookmark-end text:name="__DdeLink__45596_1709236796"/><text:bookmark-end text:name="__DdeLink__45590_1709236796"/><text:span text:style-name="Code"><text:span text:style-name="T122"><text:line-break/>&lt;/ComponentSpec&gt;</text:span></text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">What’s the significance of setting to this value?</text:span></text:p>
+    </office:annotation><text:span text:style-name="T119">-8192&quot;</text:span><office:annotation-end office:name="__Annotation__32758_3873206478"/><text:span text:style-name="T119">/</text:span><text:span text:style-name="T121">&gt;</text:span><text:span text:style-name="T119"><text:line-break/> </text:span><text:span text:style-name="Code"><text:span text:style-name="T119"><text:s text:c="2"/>&lt;Port Name=&quot;in&quot; Protocol=&quot;iqstream_protocol&quot;/&gt;<text:line-break/> <text:s/>&lt;Port Name=&quot;out&quot; Protocol=&quot;iqstream_protocol&quot;<text:line-break/> <text:s text:c="3"/>Producer=&quot;true&quot;/&gt;</text:span></text:span><text:bookmark-end text:name="__DdeLink__45590_1709236796"/><text:bookmark-end text:name="__DdeLink__45596_1709236796"/><text:span text:style-name="Code"><text:span text:style-name="T122"><text:line-break/>&lt;/ComponentSpec&gt;</text:span></text:span></text:p>
    <text:h text:style-name="P119" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc52703_28991016"/>Create Worker<text:bookmark-end text:name="__RefHeading___Toc52703_28991016"/></text:h>
    <text:p text:style-name="P74"><text:bookmark-start text:name="__DdeLink__29108_1709236796"/><text:span text:style-name="T126">Recall from Tutorial 3 that we implemented a </text:span><text:span text:style-name="Code">run</text:span><text:span text:style-name="T126"> method for the </text:span><text:span text:style-name="Code">peak_detector </text:span><text:span text:style-name="T126">worker. <text:s/>This is the only required method in the RCC authoring model. <text:s/>We also implemented a </text:span><text:span text:style-name="Code">start</text:span><text:span text:style-name="T126"> method for the worker; this method, along with the </text:span><text:span text:style-name="Code">initialize</text:span><text:span text:style-name="T126">, </text:span><text:span text:style-name="Code">release</text:span><text:span text:style-name="T126"> and </text:span><text:span text:style-name="Code">stop</text:span><text:span text:style-name="T126"> methods, are optional. <text:s/>We need to use</text:span><text:bookmark-end text:name="__DdeLink__29108_1709236796"/><text:span text:style-name="T126"> the </text:span><text:span text:style-name="Code">initialize</text:span><text:span text:style-name="T126"> and </text:span><text:span text:style-name="Code">release</text:span><text:span text:style-name="T126"> methods in our complex mixer worker </text:span><office:annotation office:name="__Annotation__32994_3873206478">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-03-22T12:36:10.355426484</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">This is the reason CNF gave for it. BIA gives no reason, the CDG says to use it for one-time intializations that might generate errors for C++. Is this the reason?</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">This is the reason CNF gave for it. BIA gives no reason, the CDG says to use it for one-time intializations that might generate errors for C++. Is this the reason?</text:span></text:p>
     </office:annotation><text:span text:style-name="T126">to prevent segmentation fault errors from being generated</text:span><office:annotation-end office:name="__Annotation__32994_3873206478"/><text:span text:style-name="T126">. </text:span></text:p>
    <text:p text:style-name="P90">Because we’re using a third-party library in our complex mixer worker, the procedure to design it has a few more steps than the procedure we used for the peak detector worker in Tutorial 3. <text:s/><text:bookmark-start text:name="__DdeLink__29147_1709236796"/>For the complex mixer, the steps are as follows:</text:p>
-   <text:list xml:id="list180948193058525" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list85340053809723" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">Create the worker OWD and skeleton file</text:p>
     </text:list-item>
@@ -6856,15 +6852,15 @@
      <text:p text:style-name="List_20_Bullet">Build the worker for target platform<text:bookmark-end text:name="__DdeLink__29147_1709236796"/></text:p>
     </text:list-item>
    </text:list>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc25605_3173784371"/><text:bookmark-start text:name="__DdeLink__29184_1709236796"/>Create Worker OWD and Skeleton File<text:bookmark-end text:name="__RefHeading___Toc25605_3173784371"/></text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__29184_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc25605_3173784371"/>Create Worker OWD and Skeleton File<text:bookmark-end text:name="__RefHeading___Toc25605_3173784371"/></text:h>
    <text:section text:style-name="Sect1" text:name="Section7" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P44">To create the complex mixer <text:span text:style-name="T99">RCC </text:span>worker with AV, <text:span text:style-name="T145">navigate to </text:span><text:span text:style-name="Code">components</text:span><text:span text:style-name="T145"> &gt; </text:span><text:span text:style-name="Code">specs</text:span><text:span text:style-name="T145"> in </text:span><text:span text:style-name="Code">DemoProject</text:span><text:span text:style-name="Code"><text:span text:style-name="T176">4</text:span></text:span><text:span text:style-name="T145"> and then right-click </text:span><text:span text:style-name="Code">complex_mixer-spec.xml</text:span><text:span text:style-name="T145">. <text:s/>Use the </text:span><text:span text:style-name="T36">new</text:span><text:span text:style-name="T145"> </text:span><text:span text:style-name="T36">worker</text:span><text:span text:style-name="T145"> selection from the context menu. <text:s/>Give the worker the name </text:span><text:span text:style-name="Code">complex_mixer</text:span><text:span text:style-name="T99"> and leave all the other fields as they are. <text:s/>Click </text:span><text:span text:style-name="T35">Finish</text:span><text:span text:style-name="T99">.</text:span></text:p>
    </text:section>
    <text:p text:style-name="P46"><text:span text:style-name="T78">To create the complex mixer worker with </text:span><text:span text:style-name="Code">ocpidev</text:span><text:span text:style-name="T78">, run the following command:</text:span></text:p>
-   <text:p text:style-name="P103"><text:bookmark-start text:name="__DdeLink__45642_1709236796"/><text:bookmark-start text:name="__DdeLink__2704_32821243261"/>ocpidev create worker <text:span text:style-name="T99">complex_mixer</text:span>.<text:bookmark-end text:name="__DdeLink__2704_32821243261"/><text:span text:style-name="T100">rcc</text:span><text:bookmark-end text:name="__DdeLink__45642_1709236796"/><text:bookmark-end text:name="__DdeLink__29184_1709236796"/></text:p>
-   <text:h text:style-name="P154" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc25109_3173784371"/><text:bookmark-start text:name="__DdeLink__29584_1709236796"/>Edit Worker <text:span text:style-name="T77">OWD</text:span><text:bookmark-end text:name="__RefHeading___Toc25109_3173784371"/><text:bookmark-end text:name="__DdeLink__29584_1709236796"/></text:h>
+   <text:p text:style-name="P103"><text:bookmark-start text:name="__DdeLink__2704_32821243261"/><text:bookmark-start text:name="__DdeLink__45642_1709236796"/>ocpidev create worker <text:span text:style-name="T99">complex_mixer</text:span>.<text:bookmark-end text:name="__DdeLink__2704_32821243261"/><text:span text:style-name="T100">rcc</text:span><text:bookmark-end text:name="__DdeLink__45642_1709236796"/><text:bookmark-end text:name="__DdeLink__29184_1709236796"/></text:p>
+   <text:h text:style-name="P154" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__29584_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc25109_3173784371"/>Edit Worker <text:span text:style-name="T77">OWD</text:span><text:bookmark-end text:name="__DdeLink__29584_1709236796"/><text:bookmark-end text:name="__RefHeading___Toc25109_3173784371"/></text:h>
    <text:p text:style-name="P75"><text:bookmark-start text:name="__DdeLink__29582_1709236796"/>Recall from Tutorial 1 that RCC worker OWDs generated by <text:span text:style-name="Code">ocpidev</text:span> don’t generally need to be updated. <text:s/>In this case, however, we need to add two attributes:</text:p>
-   <text:list xml:id="list180947731801691" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list85339392769672" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="List_20_Bullet">A <text:span text:style-name="Code">ControlOperations</text:span> attribute that indicates our worker will have <text:span text:style-name="Code">initialize</text:span> and <text:span text:style-name="Code">release</text:span> methods; because the <text:span text:style-name="Code">run</text:span> method is mandatory, its presence is assumed. <text:s/><text:span text:style-name="T131">You can read more about this attribute in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Component_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI Component Development Guide</text:span></text:a><text:span text:style-name="T131">.</text:span><text:bookmark-end text:name="__DdeLink__29582_1709236796"/></text:p>
     </text:list-item>
@@ -6874,7 +6870,7 @@
    </text:list>
    <text:section text:style-name="Sect1" text:name="Section9" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P82"><text:bookmark-start text:name="__DdeLink__29654_1709236796"/>To add these attributes with AV:</text:p>
-    <text:list xml:id="list180949346905912" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85340937612264" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="List_20_Bullet">In the text editor panel, click the tab for the <text:span text:style-name="Code">complex_mixer </text:span>OWD and maximize it.</text:p>
      </text:list-item>
@@ -6882,7 +6878,7 @@
       <text:p text:style-name="List_20_Bullet">In <text:span text:style-name="T25">ControlOperations</text:span>, check <text:span text:style-name="T25">initialize</text:span> and <text:span text:style-name="T25">release</text:span>.</text:p>
      </text:list-item>
     </text:list>
-    <text:p text:style-name="Diagram"><draw:frame draw:style-name="fr2" draw:name="Image3" text:anchor-type="as-char" svg:width="5.4516in" svg:height="1.9465in" draw:z-index="5"><draw:image loext:mime-type="image/png">
+    <text:p text:style-name="Diagram"><draw:frame draw:style-name="fr1" draw:name="Image3" text:anchor-type="as-char" svg:width="5.4516in" svg:height="1.9465in" draw:z-index="5"><draw:image loext:mime-type="image/png">
        <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAfsAAAC1CAYAAABYrlZ6AAA3Z0lEQVR4nO2dB3wURRvGXzqh
         9xZ66ITeA6F3pCMIooCASJGiCFJFFER6R0ABP1CqgIAUBaVX6b13Qq+BkJDAt8/gHZfj7nYv
         yeXI8fz5Hbe3O7tTdnaemXfe2cR9oSGEEEII8VjiujsBhBBCCHEtFHtCCCHEw6HYE0IIIR4O
@@ -7150,12 +7146,12 @@
        </office:binary-data>
       </draw:image>
      </draw:frame></text:p>
-    <text:list xml:id="list180948300088132" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85339865256052" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="List_20_Bullet">Expand <text:span text:style-name="T25">Build</text:span> <text:span text:style-name="T25">Attributes</text:span> and scroll down until you see the <text:span text:style-name="T37">StaticPreReqLibs</text:span><text:span text:style-name="T146"> attribute. Enter </text:span><text:span text:style-name="T37">liquid</text:span><text:span text:style-name="T146"> into this field.</text:span></text:p>
      </text:list-item>
     </text:list>
-    <text:p text:style-name="Diagram"><text:soft-page-break/><draw:frame draw:style-name="fr2" draw:name="Image4" text:anchor-type="as-char" svg:width="2.1937in" svg:height="3.5591in" draw:z-index="0"><draw:image loext:mime-type="image/png">
+    <text:p text:style-name="Diagram"><text:soft-page-break/><draw:frame draw:style-name="fr1" draw:name="Image4" text:anchor-type="as-char" svg:width="2.1937in" svg:height="3.5591in" draw:z-index="0"><draw:image loext:mime-type="image/png">
        <office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAMwAAAFLCAYAAACa4GMmAABsu0lEQVR4nO2dB3wcxfXH30my
         iiVbknvFFTCm2MaGYDoEgum9BULvAQIkEHovIaH8gdAJJPQOMR1MaKaYYjDVxgXj3rutrvvP
         d/beaW91J93JOsn2zc+fte62zM7uvd+892Znf5OzcEVlWBwcHJJCTvu2Oa1dBweH9QY5c5dW
@@ -7676,7 +7672,7 @@
        </office:binary-data>
       </draw:image>
      </draw:frame></text:p>
-    <text:list xml:id="list180947748137268" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85339542690359" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P137"><text:span text:style-name="Default_20_Paragraph_20_Font"><text:span text:style-name="T146">Click the Save icon (the floppy disk icon below the top menu).</text:span></text:span></text:p>
      </text:list-item>
@@ -7688,11 +7684,11 @@
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc25045_3173784371"/>Edit Worker Makefile<text:bookmark-end text:name="__RefHeading___Toc25045_3173784371"/></text:h>
    <text:p text:style-name="P38"><text:span text:style-name="T132">In this step, we’ll add the </text:span><text:span text:style-name="Code">RCCStaticPrereqLibs</text:span><text:span text:style-name="T132"> RCC Makefile variable to our complex mixer worker’s Makefile. <text:s/>This variable specifies the n</text:span>ames of libraries installed as OpenCPI prerequisite libraries that this worker should link against, statically, which will incorporate (copy) any referenced objects in that library into the worker&apos;s binary artifact. <text:s/>This <text:span text:style-name="T132">setting </text:span>automatically puts the library&apos;s include directory in the search path for headers. <text:s/><text:span text:style-name="T132">For more information about RCC Makefile variables, see the section on RCC compiler and linking options in the </text:span><text:a xlink:type="simple" xlink:href="https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_RCC_Development_Guide.pdf" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="FirstEmphasis">OpenCPI RCC Development Guide</text:span></text:a><text:span text:style-name="T132">.</text:span></text:p>
    <text:p text:style-name="P38"><text:span text:style-name="T78">In </text:span><text:span text:style-name="Code">DemoProject</text:span><text:span text:style-name="Code"><text:span text:style-name="T179">4</text:span></text:span><text:span text:style-name="T78">, navigate to the </text:span><text:span text:style-name="Code">/components/complex_mixer.rcc</text:span> <text:span text:style-name="T78">sub</text:span>directory. <text:s/><text:span text:style-name="T78">Open the file </text:span><text:span text:style-name="Code">Makefile</text:span><text:span text:style-name="T78"> with a text editor and a</text:span>dd the following text <text:span text:style-name="T133">highlighted in red before the worker’s include file definition</text:span>:</text:p>
-   <text:p text:style-name="P100"># This is the Makefile for worker complex_mixer.rcc<text:line-break/><text:bookmark-start text:name="__DdeLink__45646_1709236796"/><text:bookmark-start text:name="__DdeLink__35157_3873206478"/><text:span text:style-name="T119">RccStaticPre</text:span><text:span text:style-name="T120">R</text:span><text:span text:style-name="T119">eqLibs=liquid</text:span><text:bookmark-end text:name="__DdeLink__45646_1709236796"/><text:bookmark-end text:name="__DdeLink__35157_3873206478"/><text:line-break/>include $(OCPI_CDK_DIR)/include/worker.mk</text:p>
-   <text:h text:style-name="P157" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc36866_3873206478"/><text:bookmark-start text:name="__DdeLink__29971_1709236796"/>Write C++ Code<text:bookmark-end text:name="__RefHeading___Toc36866_3873206478"/><text:bookmark-end text:name="__DdeLink__29971_1709236796"/></text:h>
+   <text:p text:style-name="P100"># This is the Makefile for worker complex_mixer.rcc<text:line-break/><text:bookmark-start text:name="__DdeLink__35157_3873206478"/><text:bookmark-start text:name="__DdeLink__45646_1709236796"/><text:span text:style-name="T119">RccStaticPre</text:span><text:span text:style-name="T120">R</text:span><text:span text:style-name="T119">eqLibs=liquid</text:span><text:bookmark-end text:name="__DdeLink__35157_3873206478"/><text:bookmark-end text:name="__DdeLink__45646_1709236796"/><text:line-break/>include $(OCPI_CDK_DIR)/include/worker.mk</text:p>
+   <text:h text:style-name="P157" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__29971_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc36866_3873206478"/>Write C++ Code<text:bookmark-end text:name="__DdeLink__29971_1709236796"/><text:bookmark-end text:name="__RefHeading___Toc36866_3873206478"/></text:h>
    <text:p text:style-name="P76"><text:bookmark-start text:name="__DdeLink__33965_3873206478"/><text:span text:style-name="T134">We’ll use the nco module from </text:span><text:span text:style-name="Code">liquid-dsp</text:span><text:span text:style-name="T134">, which is a free and open-source signal processing library for software-defined radios written in C and is supplied with the OpenCPI installation. <text:s/>For details on </text:span><text:span text:style-name="Code">liquid-dsp</text:span><text:span text:style-name="T134"> and the nco module, see the URL </text:span><text:a xlink:type="simple" xlink:href="https://liquidsdr.org/doc/nco/" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link"><text:span text:style-name="T134">https://liquidsdr.org/doc/nco</text:span></text:a><text:span text:style-name="T134">.</text:span><text:bookmark-end text:name="__DdeLink__33965_3873206478"/></text:p>
    <text:p text:style-name="P61">Our worker code will use the following routines from the <text:span text:style-name="Code">liquid-dsp</text:span> nco module:</text:p>
-   <text:list xml:id="list180949033225618" text:continue-numbering="true" text:style-name="WWNum32">
+   <text:list xml:id="list85339291360278" text:continue-numbering="true" text:style-name="WWNum32">
     <text:list-item>
      <text:p text:style-name="P129"><text:span text:style-name="Code">nco_crcf_create(type)</text:span> - creates an nco object of type <text:span text:style-name="Code">LIQUID_NCO</text:span> or <text:span text:style-name="Code">LIQUID_VCO</text:span><text:span text:style-name="T104">. <text:s/>We’ll use this routine in our initialize method to create an NCO object of type </text:span><text:span text:style-name="Code">LIQUID_NCO</text:span><text:span text:style-name="T104">.</text:span></text:p>
     </text:list-item>
@@ -7704,7 +7700,7 @@
        <dc:creator>Lisa Zahn</dc:creator>
        <dc:date>2020-03-22T13:34:01.018325832</dc:date>
        <loext:sender-initials>LZ</loext:sender-initials>
-       <text:p><text:span text:style-name="T188">I need help trying to understand how these calls are used in the example code.</text:span></text:p>
+       <text:p><text:span text:style-name="T189">I need help trying to understand how these calls are used in the example code.</text:span></text:p>
       </office:annotation><text:span text:style-name="T133">???</text:span><office:annotation-end office:name="__Annotation__33836_3873206478"/><text:span text:style-name="T133">.</text:span></text:p>
     </text:list-item>
     <text:list-item>
@@ -7721,7 +7717,7 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-03-22T13:33:40.905384601</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">This is from BIA. What does it mean?</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">This is from BIA. What does it mean?</text:span></text:p>
     </office:annotation>All <text:span text:style-name="T133">of the I/O data </text:span>samples are of type <text:span text:style-name="Code">liquid_float_complex</text:span><text:span text:style-name="Code"><text:span text:style-name="T81">:</text:span></text:span><office:annotation-end office:name="__Annotation__33835_3873206478"/></text:p>
    <text:p text:style-name="Code"><text:span text:style-name="Code">liquid_float_complex sample;<text:line-break/>sample.I = 0;<text:line-break/>sample.Q = 0;</text:span></text:p>
    <text:h text:style-name="P155" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc25047_3173784371"/>Edit Worker Skeleton File<text:bookmark-end text:name="__RefHeading___Toc25047_3173784371"/></text:h>
@@ -7732,7 +7728,7 @@
    <text:p text:style-name="P85"><text:bookmark-start text:name="__DdeLink__30248_1709236796"/><text:span text:style-name="T93">Now we need to compile the </text:span><text:span text:style-name="Code"><text:span text:style-name="T153">complex</text:span></text:span><text:span text:style-name="Code">_</text:span><text:span text:style-name="Code"><text:span text:style-name="T153">mixe</text:span></text:span><text:span text:style-name="Code">r</text:span><text:span text:style-name="Code"><text:span text:style-name="T81"> </text:span></text:span><text:span text:style-name="T93">worker for the platform on which we want to run it; for this tutorial, it’s our development host. <text:s/></text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section10" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P84">To build the worker with AV:</text:p>
-    <text:list xml:id="list180948826830950" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85339507516399" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P142"><text:bookmark-start text:name="__DdeLink__7763_548154005"/><text:span text:style-name="T150">In the </text:span>OpenCPI Project<text:span text:style-name="T92">s</text:span> <text:span text:style-name="T150">v</text:span>iew, <text:span text:style-name="T150">select the </text:span><text:span text:style-name="Code"><text:span text:style-name="T129">complex</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T128">_</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T129">mixe</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T128">r</text:span></text:span><text:span text:style-name="Code"><text:span text:style-name="T83"> worker</text:span></text:span><text:span text:style-name="T150">.</text:span></text:p>
      </text:list-item>
@@ -7757,7 +7753,7 @@
    <text:p text:style-name="P86"><text:bookmark-start text:name="__DdeLink__30486_1709236796"/>Like we did in Tutorial 3, we’ll generate an OpenCPI test suite for our complex mixer worker.</text:p>
    <text:section text:style-name="Sect1" text:name="Section2" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P46"><text:span text:style-name="T94">To create the unit test suite for the </text:span><text:span text:style-name="Code"><text:span text:style-name="T78">complex</text:span></text:span><text:span text:style-name="Code">_</text:span><text:span text:style-name="Code"><text:span text:style-name="T78">mixer</text:span></text:span><text:span text:style-name="T90"> worker with AV:</text:span></text:p>
-    <text:list xml:id="list180948193812280" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85339416864016" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P127"><text:span text:style-name="T91">I</text:span>n the OpenCPI Projects <text:span text:style-name="T92">view</text:span>, <text:span text:style-name="T91">click </text:span><text:span text:style-name="T28">local.DemoProject</text:span><text:span text:style-name="T49">4</text:span>. <text:span text:style-name="T93">R</text:span>ight click <text:span text:style-name="T93">and then </text:span>select <text:span text:style-name="T25">asset</text:span> <text:span text:style-name="T25">wizard</text:span>.</text:p>
      </text:list-item>
@@ -7771,11 +7767,11 @@
    </text:section>
    <text:p text:style-name="P50">To create the unit test with <text:span text:style-name="Code">ocpidev</text:span>, run the following command from the <text:span text:style-name="Code">DemoProject</text:span> directory:</text:p>
    <text:p text:style-name="P102">oc<text:span text:style-name="T161">p</text:span>idev create test <text:span text:style-name="T78">complex</text:span>_<text:span text:style-name="T78">mixer</text:span><text:bookmark-end text:name="__DdeLink__30486_1709236796"/></text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc25607_3173784371"/><text:bookmark-start text:name="__DdeLink__30565_1709236796"/>Edit Unit Test Description<text:bookmark-end text:name="__RefHeading___Toc25607_3173784371"/></text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__30565_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc25607_3173784371"/>Edit Unit Test Description<text:bookmark-end text:name="__RefHeading___Toc25607_3173784371"/></text:h>
    <text:p text:style-name="P44">Like we did in Tutorial 3, w<text:span text:style-name="T96">e need to add the generate and verify scripts with the </text:span>necessary parameter values for the <text:span text:style-name="T96">scripts to the unit test description for the complex mixer worker.</text:span></text:p>
    <text:section text:style-name="Sect1" text:name="Section4" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P87">To edit the unit description file with AV:</text:p>
-    <text:list xml:id="list180949009366023" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85340935537503" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P142">Click on the <text:span text:style-name="Code"><text:span text:style-name="T153">complex</text:span></text:span><text:span text:style-name="Code">_</text:span><text:span text:style-name="Code"><text:span text:style-name="T153">mixe</text:span></text:span><text:span text:style-name="Code">r-test.xml</text:span> tab in the text editor panel and maximize it.</text:p>
      </text:list-item>
@@ -7798,61 +7794,61 @@
    </text:section>
    <text:p text:style-name="P85"><text:span text:style-name="T155">To edit the unit test description file on the command line, open the </text:span><text:span text:style-name="Code"><text:span text:style-name="T156">complex</text:span></text:span><text:span text:style-name="Code">_</text:span><text:span text:style-name="Code"><text:span text:style-name="T156">mixe</text:span></text:span><text:span text:style-name="Code">r-test.xml</text:span><text:span text:style-name="T155"> file with a text editor and replace the contents with the following XML:</text:span><text:bookmark-end text:name="__DdeLink__30565_1709236796"/></text:p>
    <text:p text:style-name="P109">&lt;!-- This is the test xml for testing component &quot;complex_mixer&quot; --<text:span text:style-name="T177">&gt;<text:line-break/></text:span><text:line-break/>&lt;Tests UseHDLFileIo=&apos;true&apos;&gt;<text:line-break/> <text:s/>&lt;!-- Here are typical examples of generating for an input port<text:line-break/> <text:s text:c="6"/>and verifying results at an output port --<text:span text:style-name="T177">&gt;</text:span><text:line-break/> <text:s/>&lt;Input Port=<text:bookmark-start text:name="__DdeLink__26555_1709236796"/>&apos;<text:bookmark-end text:name="__DdeLink__26555_1709236796"/>in&apos; Script=&apos;generate.py 100 12.5 32767 16384&apos;/&gt;<text:line-break/> <text:s/>&lt;Output Port=&apos;out&apos; Script=&apos;verify.py 100 16384&apos; View=&apos;view.sh&apos;/&gt;<text:line-break/> <text:s/><text:line-break/> <text:s/>&lt;!-- Set properties here. Use Test=&apos;true&apos; to create a test-exclusive property. --<text:span text:style-name="T161">&gt;</text:span><text:line-break/> <text:s/>&lt;Property Name=&apos;phs_inc&apos; Values=&apos;-8192&apos;/&gt;<text:line-break/> <text:s/>&lt;Property Name=&apos;enable&apos; Values=&apos;0,1&apos;/&gt;<text:line-break/>&lt;/Tests&gt;</text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc52711_28991016"/><text:bookmark-start text:name="__DdeLink__30611_1709236796"/>Edit <text:span text:style-name="T77">Unit Test </text:span>Script<text:span text:style-name="T77">s</text:span><text:bookmark-end text:name="__RefHeading___Toc52711_28991016"/></text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__30611_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc52711_28991016"/>Edit <text:span text:style-name="T77">Unit Test </text:span>Script<text:span text:style-name="T77">s</text:span><text:bookmark-end text:name="__RefHeading___Toc52711_28991016"/></text:h>
    <text:p text:style-name="P7">We’re<text:bookmark-start text:name="__DdeLink__30608_1709236796"/> going to use the input and view scripts again like we did for the peak detector worker in Tutorial 3, so we need to edit the <text:span text:style-name="Code">generate.py</text:span>, <text:span text:style-name="Code">verify.py</text:span> and <text:span text:style-name="Code">view.sh</text:span> scripts with our input data and our test parameters.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc24880_3173784371"/>Edit <text:span text:style-name="T77">g</text:span>enerate.<text:span text:style-name="T77">py</text:span> Script<text:bookmark-end text:name="__RefHeading___Toc24880_3173784371"/><text:bookmark-end text:name="__DdeLink__30611_1709236796"/></text:h>
    <text:p text:style-name="P38"><text:bookmark-start text:name="__DdeLink__30614_1709236796"/>Copy and paste the <office:annotation office:name="__Annotation__7030_2051531525">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T09:55:32.330983072</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">This code doesn’t exactly match the code that’s in ../projects/tutorial/components/complex_mixer.test/, which uses “/t” in print commands. I did change real_idx to use 0 and imag_idx to use 2. The text from CNF reversed those values. I don’t know why.</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">This code doesn’t exactly match the code that’s in ../projects/tutorial/components/complex_mixer.test/, which uses “/t” in print commands. I did change real_idx to use 0 and imag_idx to use 2. The text from CNF reversed those values. I don’t know why.</text:span></text:p>
     </office:annotation>following text <office:annotation-end office:name="__Annotation__7030_2051531525"/>into <text:span text:style-name="Code">generate.py</text:span>:<text:bookmark-end text:name="__DdeLink__30614_1709236796"/><text:bookmark-end text:name="__DdeLink__30608_1709236796"/></text:p>
    <text:p text:style-name="P100"><text:soft-page-break/>#!/usr/bin/env python<text:span text:style-name="T187">3</text:span><text:line-break/>&quot;&quot;&quot;<text:line-break/>Complex Mixer: Generate test input data &amp; Validate output data<text:line-break/><text:line-break/>Generate args:<text:line-break/>1. sample frequency of generated sinusoid in Hz<text:line-break/>2. center frequency of generated sinusoid in Hz<text:line-break/>3. amplitude of generated sinusoid<text:line-break/>4. number of complex samples to generated<text:line-break/>5. output file<text:line-break/><text:line-break/>To test the Complex Mixer, a binary data file is generated<text:line-break/>containing complex signed 16-bit samples with a tone at a <text:line-break/>configurable center frequency and sample frequency. <text:line-break/><text:line-break/>The Application XML sets the phase increment of the Mixer/NCO<text:line-break/>to output a 1 Hz tone, sampled at 16 Hz. The output waveform&apos;s <text:line-break/>frequency is expected to +1 Hz greater than the input waveform <text:line-break/>frequency. The validation of the test involves performing an FFT <text:line-break/>of the output file to ensure the max tone is located at DC or 0 Hz.<text:line-break/>&quot;&quot;&quot;<text:line-break/><office:annotation office:name="__Annotation__26653_2051531525">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T10:44:29.505057448</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p><text:span text:style-name="T188">Jim changed this in peak_detector.test/generate.py file.</text:span></text:p>
+     <text:p><text:span text:style-name="T189">Jim changed this in peak_detector.test/generate.py file.</text:span></text:p>
     </office:annotation>import struct<text:line-break/>import numpy as np<text:line-break/>import sys<text:line-break/>import os.path<office:annotation-end office:name="__Annotation__26653_2051531525"/><text:line-break/><text:line-break/>if len(sys.argv) != 6:<text:line-break/> <text:s text:c="3"/>print(&quot;Invalid arguments: <text:s/>usage is: generate.py &lt;sample-freq&gt; &lt;target-freq&gt; &lt;amplitude&gt; &lt;num-samples&gt; &lt;output-file&gt;&quot;)<text:line-break/> <text:s text:c="3"/>sys.exit(1)<text:line-break/>print <text:span text:style-name="T182">(</text:span>&quot;GENERATE (I/Q 16b binary data file):&quot;<text:span text:style-name="T182">)</text:span><text:line-break/><text:line-break/>ofilename = sys.argv[5]<text:line-break/># Create cosine &amp; sine waveforms<text:line-break/>Fs = float(sys.argv[1]) <text:s text:c="4"/># sample frequency<text:line-break/>Ts = 1.0/float(Fs); <text:s text:c="4"/># sampling interval<text:line-break/>Ft = float(sys.argv[2]) <text:s text:c="4"/># target frequency<text:line-break/>AMPLITUDE = int(sys.argv[3])<text:line-break/>NUM_SAMPLES = int(sys.argv[4]) # number of complex samples<text:line-break/>t = np.arange(0,NUM_SAMPLES*Ts,Ts,dtype=np.float) <text:s text:c="2"/># time vector<text:line-break/># Generate I/Q samples @ target freq<text:line-break/>real = np.cos(2*np.pi*Ft*t)<text:line-break/>imag = np.sin(2*np.pi*Ft*t)<text:line-break/># Initialize empty array, sized to store 16b I/Q samples<text:line-break/><office:annotation office:name="__Annotation__23355_2051531525">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T10:28:57.739760600</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">real_idx and imag_idx are reversed in tutorial file ../projects/tutorial/components/complex_mixer.test/. </text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">real_idx and imag_idx are reversed in tutorial file ../projects/tutorial/components/complex_mixer.test/. </text:span></text:p>
     </office:annotation>z = np.array(np.zeros(NUM_SAMPLES), <text:line-break/> <text:s text:c="12"/>dtype=np.dtype((np.uint32, {&apos;real_idx&apos;:(np.int16,<text:span text:style-name="T186">2</text:span>),&apos;imag_idx&apos;:(np.int16,<text:span text:style-name="T186">0</text:span>)})))<office:annotation-end office:name="__Annotation__23355_2051531525"/><text:line-break/># Set the gain<text:line-break/>gain_i = AMPLITUDE / max(abs(real))<text:line-break/>gain_q = AMPLITUDE / max(abs(imag))<text:line-break/>z[&apos;real_idx&apos;] = np.int16(real * gain_i)<text:line-break/>z[&apos;imag_idx&apos;] = np.int16(imag * gain_q)<text:line-break/><text:soft-page-break/><text:line-break/># Save data to file<text:line-break/>f = open(ofilename, &apos;wb&apos;)<text:line-break/><office:annotation office:name="__Annotation__23403_2051531525">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T10:31:10.508952670</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">I removed xrange and used same code as in Jim’s updated generate.py for peak_detector.test.</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">I removed xrange and used same code as in Jim’s updated generate.py for peak_detector.test.</text:span></text:p>
     </office:annotation>for i in range(<text:span text:style-name="T187">0,</text:span>NUM_SAMPLES):<text:line-break/><office:annotation-end office:name="__Annotation__23403_2051531525"/> <text:s text:c="3"/>f.write(z[i])<text:line-break/>f.close()<text:line-break/><text:line-break/># Summary</text:p>
    <text:p text:style-name="P100"><office:annotation office:name="__Annotation__23402_2051531525">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T10:30:10.233002378</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">File in ../projects/tutorial/components/complex_mixer.test uses “/t” in its print statements.</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">File in ../projects/tutorial/components/complex_mixer.test uses “/t” in its print statements.</text:span></text:p>
     </office:annotation>print <text:span text:style-name="T182">(</text:span>&apos;# of Bytes:&apos;, NUM_SAMPLES*4<text:span text:style-name="T182">)</text:span><office:annotation-end office:name="__Annotation__23402_2051531525"/><text:line-break/>print <text:span text:style-name="T182">(</text:span>&apos;# of I/Q (16b) samples:&apos;, NUM_SAMPLES/2<text:span text:style-name="T182">)</text:span><text:line-break/>print <text:span text:style-name="T182">(</text:span>&apos;Sample Frequency:&apos;, Fs<text:span text:style-name="T182">)</text:span><text:line-break/>print <text:span text:style-name="T182">(</text:span>&apos;Target Frequency:&apos;, Ft<text:span text:style-name="T182">)</text:span><text:line-break/>print <text:span text:style-name="T182">(</text:span>&apos;Amplitude:&apos;, AMPLITUDE<text:span text:style-name="T182">)</text:span></text:p>
    <text:p text:style-name="P100"/>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc52713_28991016"/><text:bookmark-start text:name="__DdeLink__30616_1709236796"/>Edit verify.py Script<text:bookmark-end text:name="__RefHeading___Toc52713_28991016"/></text:h>
+   <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__DdeLink__30616_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc52713_28991016"/>Edit verify.py Script<text:bookmark-end text:name="__RefHeading___Toc52713_28991016"/></text:h>
    <text:p text:style-name="P38">Copy and paste the <office:annotation office:name="__Annotation__7029_2051531525">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T09:53:25.885792818</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">This text is from the file in ../projects/tutorial/components/complex_mixer.test. I don’t know if it has been updated for Python3.</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">This text is from the file in ../projects/tutorial/components/complex_mixer.test. I don’t know if it has been updated for Python3.</text:span></text:p>
     </office:annotation>following text<office:annotation-end office:name="__Annotation__7029_2051531525"/> into <text:span text:style-name="Code">verify.py</text:span>:<text:bookmark-end text:name="__DdeLink__30616_1709236796"/></text:p>
    <text:p text:style-name="P100"><text:soft-page-break/>#!/usr/bin/env python<text:span text:style-name="T187">3</text:span><text:line-break/><text:line-break/>&quot;&quot;&quot;<text:line-break/>Complex Mixer: Verify Validate output data<text:line-break/><text:line-break/>Verify args:<text:line-break/>1. sample frequency of output data file<text:line-break/>2. number of samples used in validation<text:line-break/>3. output data file used for validation<text:line-break/>4. input data file used for comparison<text:line-break/><text:line-break/>To test the Complex Mixer, a binary data file is generated<text:line-break/>containing complex signed 16-bit samples with a tone at a<text:line-break/>configurable center frequency and sample frequency.<text:line-break/>The Application XML sets the phase increment of the Mixer/NCO<text:line-break/>to output a 1 Hz tone, sampled at 16 Hz. The output waveform&apos;s<text:line-break/>frequency is expected to +1 Hz greater than the input waveform<text:line-break/>frequency. The validation of the test involves performing an FFT<text:line-break/>of the output file to ensure the max tone is located at DC or 0 Hz.<text:line-break/>&quot;&quot;&quot;<text:line-break/>import struct<text:line-break/>import numpy as np<text:line-break/>import sys<text:line-break/>import os.path<text:line-break/><text:line-break/>&quot;&quot;&quot;<text:line-break/>Ex: python verify.py {sample-freq} {number_of_samples} <text:line-break/> <text:s text:c="9"/>{ofilename} {ifilename}<text:line-break/>Validate:<text:line-break/>TEST #1: Verify I &amp; Q values are not all zeros<text:line-break/>TEST #2: Output file matches expected size<text:line-break/>TEST #3: Two possibilities: 1) NORMAL MODE - Target tone tuned to DC, 2) BYPASS MODE - idata = odata<text:line-break/>&quot;&quot;&quot;<text:line-break/><text:line-break/>if len(sys.argv) != 5:<text:line-break/> <text:s text:c="3"/>print(&apos;Invalid arguments: <text:s/>usage is: verify.py <text:line-break/> <text:s text:c="9"/>&lt;sample-freq&gt; &lt;num-samples&gt; &lt;output-file&gt; &lt;input-file&gt;&apos;)<text:line-break/> <text:s text:c="3"/>sys.exit(1)<text:line-break/><office:annotation office:name="__Annotation__23354_2051531525">
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T10:25:09.047546345</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">In the tutorial file ../projects/tutorial/components/complex_mixer.test/verify.py, the real_idx is np.int16,0 and the imag_idx is np.int16,2. I have no idea why these are reversed. Jim’s peak_detector tests are the same as what’s shown in this text (2 and 0).</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">In the tutorial file ../projects/tutorial/components/complex_mixer.test/verify.py, the real_idx is np.int16,0 and the imag_idx is np.int16,2. I have no idea why these are reversed. Jim’s peak_detector tests are the same as what’s shown in this text (2 and 0).</text:span></text:p>
     </office:annotation>dt_iq_pair = np.dtype((np.uint32, {&apos;real_idx&apos;:(np.int16,<text:span text:style-name="T186">2</text:span>), &apos;imag_idx&apos;:(np.int16,<text:span text:style-name="T186">0</text:span>)}))<office:annotation-end office:name="__Annotation__23354_2051531525"/><text:line-break/># Read all input data as complex int16<text:line-break/>ifilename = open(sys.argv[4], &apos;rb&apos;)<text:line-break/>idata = np.fromfile(ifilename, dtype=dt_iq_pair, count=-1)<text:line-break/>ifilename.close()<text:line-break/><text:line-break/># Read all output data as complex int16<text:line-break/>ofilename = open(sys.argv[3], &apos;rb&apos;)<text:line-break/>odata = np.fromfile(ofilename, dtype=dt_iq_pair, count=-1)<text:line-break/>ofilename.close()<text:line-break/><text:line-break/>NUM_SAMPLES = int(sys.argv[2])<text:line-break/><text:soft-page-break/>SAMPLE_RATE = float(sys.argv[1])<text:line-break/>ENABLE = os.environ.get(&apos;OCPI_TEST_enable&apos;)<text:line-break/>PHS_INC = float(os.environ.get(&apos;OCPI_TEST_phs_inc&apos;))<text:line-break/>DATA_SELECT = os.environ.get(&apos;OCPI_TEST_data_select&apos;)<text:line-break/><text:line-break/># Test #1 - Check that output data is not all zeros<text:line-break/>if all(odata == 0):<text:line-break/> <text:s text:c="3"/>print(&apos;\tValues are all zero&apos;)<text:line-break/> <text:s text:c="3"/>sys.exit(1)<text:line-break/><text:line-break/># Test #2 - Check that output data is the expected amount<text:line-break/># INCLUDES TRANSIENT and not FLUSHING of pipeline (USE THIS FOR v1.2)<text:line-break/>if len(odata) != len(idata):<text:line-break/> <text:s text:c="3"/>print(&apos;Output file length is unexpected&apos;)<text:line-break/> <text:s text:c="3"/>print(&apos;Length = &apos;, len(odata), &apos;while expected length is = &apos;, len(idata))<text:line-break/> <text:s text:c="3"/>sys.exit(1)<text:line-break/><text:line-break/># Test #3 - Check output data values<text:line-break/>if(ENABLE == &apos;true&apos;): # =&gt; NORMAL MODE<text:line-break/> <text:s text:c="3"/>complex_data = np.array(np.zeros(NUM_SAMPLES), dtype=np.complex)<text:line-break/> <text:s text:c="3"/>for i in range(0,NUM_SAMPLES):<text:line-break/> <text:s text:c="7"/>complex_data[i] = complex(odata[&apos;real_idx&apos;][i], odata[&apos;imag_idx&apos;][i])<text:line-break/> <text:s text:c="3"/>FFT = 1.0 / NUM_SAMPLES * abs(np.fft.fft(complex_data,NUM_SAMPLES))<text:line-break/> <text:s text:c="3"/>Max_FFT_freq = np.argmax(FFT) * SAMPLE_RATE / NUM_SAMPLES<text:line-break/> <text:s text:c="3"/>if Max_FFT_freq != 0.0:<text:line-break/> <text:s text:c="7"/>print(&apos;Fail: Max of FFT occurs at index: &apos;,Max_FFT_freq, &apos;Hz (Should be 0)&apos;)<text:line-break/> <text:s text:c="7"/>sys.exit(1)<text:line-break/> <text:s text:c="3"/>print(&apos;\tResults (Normal Mode): FFT occurs at expect index&apos;, Max_FFT_freq, &apos;Hz&apos;)<text:line-break/><text:line-break/>else: # =&gt; BYPASS MODE<text:line-break/> <text:s text:c="3"/>if (DATA_SELECT == &apos;false&apos;):<text:line-break/> <text:s text:c="7"/># INCLUDES TRANSIENT and not FLUSHING of pipeline (USE THIS FOR v1.2)<text:line-break/> <text:s text:c="7"/>if (idata != odata).all():<text:line-break/> <text:s text:c="11"/>print(&apos;Fail - Bypass Mode: Input and output file do not match&apos;)<text:line-break/> <text:s text:c="11"/>sys.exit(1)<text:line-break/> <text:s text:c="7"/>print(&quot;\tResults (Bypass Mode): Input and output file match&quot;)<text:line-break/>&quot;&quot;&quot;<text:line-break/>TODO: TEST IS ONLY VALID FOR HDL OUTPUT!<text:line-break/>- NEED TO BLOCK WHEN VERIFYING RCC OUTPUT or NOT RUN CONFIGURATION AGAINST RCC.<text:line-break/> <text:s text:c="3"/><text:span text:style-name="T184">e</text:span>lse:<text:line-break/> <text:s text:c="7"/># Calculate NCO tone for mixing with input<text:line-break/> <text:s text:c="7"/>system_freq = SAMPLE_RATE<text:line-break/><text:soft-page-break/> <text:s text:c="7"/>phase_acc_width = 16 # Configuration of the Xilinx CORE Generator: DDS module<text:line-break/> <text:s text:c="7"/>nco_freq = ((system_freq * PHS_INC) / (2**phase_acc_width))<text:line-break/> <text:s text:c="7"/>#print(&apos; <text:s text:c="5"/>NCO freq (calc) = &apos;, nco_freq)<text:line-break/> <text:s text:c="7"/># Construct complex array of vectors for performing FFT<text:line-break/> <text:s text:c="7"/># (PUT FFT INTO ITS OWN FUNCTION)<text:line-break/> <text:s text:c="7"/>data=np.zeros((len(odata)), dtype=complex)<text:line-break/> <text:s text:c="7"/>data.real = odata[&apos;real_idx&apos;]<text:line-break/> <text:s text:c="7"/>data.imag = odata[&apos;imag_idx&apos;]</text:p>
    <text:p text:style-name="P100"><text:s text:c="8"/># Perform FFT<text:line-break/> <text:s text:c="7"/>w = np.fft.fft(data)<text:line-break/> <text:s text:c="7"/>freqs = np.fft.fftfreq(len(w))<text:line-break/> <text:s text:c="7"/># Locate max Tone<text:line-break/> <text:s text:c="7"/>idx = np.argmax(np.abs(w))<text:line-break/> <text:s text:c="7"/>freq = freqs[idx]<text:line-break/> <text:s text:c="7"/>#print(&apos;Measured freq \t= &apos;, freq)<text:line-break/> <text:s text:c="7"/>ofreq_hz = freq * system_freq<text:line-break/> <text:s text:c="7"/>#print(&apos; <text:s text:c="5"/>NCO freq (measured) = &apos;, ofreq_hz)<text:line-break/> <text:s text:c="7"/>if (nco_freq != ofreq_hz):<text:line-break/> <text:s text:c="11"/>print(&apos;Fail: Bypass Mode: NCO does not match expected freq: %.2f vs %.2f&apos; % (nco_freq, ofreq_hz))<text:line-break/> <text:s text:c="11"/>sys.exit(1)<text:line-break/> <text:s text:c="7"/>else:<text:line-break/> <text:s text:c="11"/>print(&apos;PASS - Bypass Mode: NCO output matches expected freq&apos;)<text:line-break/>&quot;&quot;&quot;</text:p>
-   <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc52715_28991016"/><text:bookmark-start text:name="__DdeLink__30655_1709236796"/>Edit view.sh Script<text:bookmark-end text:name="__RefHeading___Toc52715_28991016"/></text:h>
+   <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__DdeLink__30655_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc52715_28991016"/>Edit view.sh Script<text:bookmark-end text:name="__RefHeading___Toc52715_28991016"/></text:h>
    <text:p text:style-name="P38">Copy and paste the following text into <text:span text:style-name="Code">view.sh</text:span>:</text:p>
-   <text:p text:style-name="P100">#!/bin/bash --noprofile<text:line-break/>$OCPI_<text:span text:style-name="T180">CDK</text:span>_DIR/../<text:span text:style-name="T180">projects/tutorial/scripts/</text:span>plotAndFft.py $2 complex 16384 100&amp;<text:line-break/>$OCPI_<text:span text:style-name="T180">CDK</text:span>_DIR/../<text:span text:style-name="T180">projects</text:span>/<text:span text:style-name="T161">tutorial/scripts/</text:span>plotAndFft.py $1 complex 16384 100&amp;</text:p>
+   <text:p text:style-name="P100">#!/bin/bash --noprofile<text:line-break/>$OCPI_<text:span text:style-name="T188">ROOT_DIR</text:span>/<text:span text:style-name="T180">projects/tutorial/scripts/</text:span>plotAndFft.py $2 complex 16384 100&amp;<text:line-break/>$OCPI_<text:span text:style-name="T188">ROOT_DIR</text:span>/<text:span text:style-name="T180">projects</text:span>/<text:span text:style-name="T161">tutorial/scripts/</text:span>plotAndFft.py $1 complex 16384 100&amp;</text:p>
    <text:p text:style-name="Body"><text:bookmark-end text:name="__DdeLink__30655_1709236796"/></text:p>
-   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc36868_3873206478"/><text:bookmark-start text:name="__DdeLink__30700_1709236796"/>Build Unit Test<text:bookmark-end text:name="__RefHeading___Toc36868_3873206478"/></text:h>
+   <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__DdeLink__30700_1709236796"/><text:bookmark-start text:name="__RefHeading___Toc36868_3873206478"/>Build Unit Test<text:bookmark-end text:name="__RefHeading___Toc36868_3873206478"/></text:h>
    <text:p text:style-name="P88"><text:bookmark-start text:name="__DdeLink__36359_3873206478"/>Now <text:bookmark-start text:name="__DdeLink__30694_1709236796"/>we’ll build the unit test suite for the <text:span text:style-name="T158">target </text:span>platform.<text:bookmark-end text:name="__DdeLink__36359_3873206478"/><text:bookmark-end text:name="__DdeLink__30700_1709236796"/></text:p>
    <text:section text:style-name="Sect1" text:name="Section8" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P88">To build the unit test with AV:</text:p>
-    <text:list xml:id="list180949356012256" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85340735561323" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P147"><text:span text:style-name="T150">In the </text:span>OpenCPI Project<text:span text:style-name="T92">s</text:span> <text:span text:style-name="T150">v</text:span>iew, <text:span text:style-name="T150">select </text:span><text:span text:style-name="Code"><text:span text:style-name="T157">complex</text:span></text:span><text:span text:style-name="Code">-</text:span><text:span text:style-name="Code"><text:span text:style-name="T157">mixe</text:span></text:span><text:span text:style-name="Code">r.test</text:span><text:span text:style-name="T150">.</text:span></text:p>
      </text:list-item>
@@ -7876,7 +7872,7 @@
    <text:p text:style-name="P15"><text:bookmark-start text:name="__DdeLink__30783_1709236796"/>Now we’ll run the unit test for the complex mixer worker.</text:p>
    <text:section text:style-name="Sect1" text:name="Section5" text:condition="ooow:AVGUI LEQ 1" text:display="condition">
     <text:p text:style-name="P14">To run the unit test and view the results with AV:</text:p>
-    <text:list xml:id="list180949570955501" text:continue-numbering="true" text:style-name="WWNum32">
+    <text:list xml:id="list85340730072927" text:continue-numbering="true" text:style-name="WWNum32">
      <text:list-item>
       <text:p text:style-name="P147"><text:span text:style-name="T157">With </text:span><text:span text:style-name="T44">complex_mixer.test</text:span><text:span text:style-name="T157"> selected </text:span>In the Operations Panel, click <text:span text:style-name="T25">prep+run</text:span><text:span text:style-name="T43">+verify</text:span>.</text:p>
      </text:list-item>
@@ -7891,9 +7887,9 @@
      <dc:creator>Lisa Zahn</dc:creator>
      <dc:date>2020-05-06T09:59:15.601633572</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
-     <text:p text:style-name="P201"><text:span text:style-name="T188">This output is taken from CNF’s original version of this tutorial. I have not verified it on my system. However, CNF reviewers have succeeded in generating it.</text:span></text:p>
+     <text:p text:style-name="P201"><text:span text:style-name="T189">This output is taken from CNF’s original version of this tutorial. I have not verified it on my system. However, CNF reviewers have succeeded in generating it.</text:span></text:p>
     </office:annotation>this output<office:annotation-end office:name="__Annotation__7068_2051531525"/>:</text:p>
-   <text:p text:style-name="P110"><text:span text:style-name="Default_20_Paragraph_20_Font"><draw:frame draw:style-name="fr1" draw:name="Picture 1" text:anchor-type="as-char" svg:y="0in" svg:width="6.4925in" style:rel-width="scale" svg:height="3.4457in" style:rel-height="scale" draw:z-index="4"><draw:image loext:mime-type="image/png">
+   <text:p text:style-name="P110"><text:span text:style-name="Default_20_Paragraph_20_Font"><draw:frame draw:style-name="fr2" draw:name="Picture 1" text:anchor-type="as-char" svg:y="0in" svg:width="6.4925in" style:rel-width="scale" svg:height="3.4457in" style:rel-height="scale" draw:z-index="4"><draw:image loext:mime-type="image/png">
        <office:binary-data>iVBORw0KGgoAAAANSUhEUgAACYQAAAUQCAYAAAD+xsbQAAAAAXNSR0IArs4c6QAAAARnQU1B
         AACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAx
         OTowODowNiAwOTo0ODowOWCTr60AAP94SURBVHhe7N0HfBRl/sfxXxJ6DzV0QgeRJoKKgBzY

@@ -165,12 +165,12 @@ A colon\-separated set of project directories to be considered in addition to th
 .PP
 \fBOCPI_PROJECT_REGISTRY_DIR\fR
 .RS 4
-The location of an alternative project registry\&. This environment variable can be used during development to redirect OpenCPI asset development from the OpenCPI project registry (located by default at $OCPI_CDK_DIR/\&.\&./project\-registry) to a different, alternative project registry\&. The directory specified in this environment variable becomes the project registry with which all subsequently created projects are associated\&.
+The location of an alternative project registry\&. This environment variable can be used during development to redirect OpenCPI asset development from the OpenCPI project registry (located by default at $OCPI_ROOT_DIR/project\-registry) to a different, alternative project registry\&. The directory specified in this environment variable becomes the project registry with which all subsequently created projects are associated\&.
 .RE
 .PP
 \fBOCPI_SYSTEM_CONFIG\fR
 .RS 4
-The OpenCPI system configuration file for the OpenCPI runtime system\&. By default, the installation creates the system configuration file at the path $OCPI_CDK_DIR/\&.\&./system\&.xml and creates a default system configuration file at the path $OCPI_CDK_DIR/default\-system\&.xml (see CONFIGURATION)\&. This environment variable can be used to override the installation default, but this is rarely done\&.
+The OpenCPI system configuration file for the OpenCPI runtime system\&. By default, the installation creates the system configuration file at the path $OCPI_ROOT_DIR/system\&.xml and creates a default system configuration file at the path $OCPI_CDK_DIR/default\-system\&.xml (see CONFIGURATION)\&. This environment variable can be used to override the installation default, but this is rarely done\&.
 .RE
 .sp
 To make an OpenCPI environment variable setting permanent for a given OpenCPI installation, set it (with the \fBbash\fR shell \fBexport\fR command) in the OpenCPI user\-specified environment variables script \fBuser\-env\&.sh\fR located in the installation directory (see CONFIGURATION)\&. The settings made in this script are applied to the OpenCPI installation when the OpenCPI user setup script is run\&.
@@ -204,7 +204,7 @@ The OpenCPI system configuration file\&. This file specifies which OpenCPI user\
 .PP
 \fBuser_env\&.sh\fR
 .RS 4
-The OpenCPI user\-specified environment variables script\&. The purpose of this file is to provide site\-specific, permanent non\-default values for OpenCPI environment variables that are used during OpenCPI development\&. It is not used in a runtime\-only environment\&. This file is automatically created at installation in the installation directory ($OCPI_CDK_DIR/\&.\&.)\&.
+The OpenCPI user\-specified environment variables script\&. The purpose of this file is to provide site\-specific, permanent non\-default values for OpenCPI environment variables that are used during OpenCPI development\&. It is not used in a runtime\-only environment\&. This file is automatically created at installation in the installation directory ($OCPI_ROOT_DIR)\&.
 \fINone of the environment variables in this file are required to be set\&.\fR
 If any of these variables are set, the file is sourced by the OpenCPI setup script when it is invoked to set up the OpenCPI environment\&.
 .RE
