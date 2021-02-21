@@ -3,7 +3,8 @@
   <input port='event_in' file='onmessage.bin' messagesinfile='1'/>
   <output port='out' script='verify.py' disableBackpressure='true'/>
 
-  <property name='tx_clk_rate' values='100e6,80e6,40e6,20e6,10e6,1e6,1e5'/>
+  <!-- <property name='tx_clk_rate' values='100e6,80e6,40e6,20e6,10e6,1e6,1e5'/> -->
+  <property name='divisor' values='1,2,5,10,100,1000'/>
   <property name='FRACTION_WIDTH_p' values='32'/>
 
   <!-- Properties for the emulator -->

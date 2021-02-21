@@ -33,6 +33,7 @@ tput=tput
 spec=$1; shift
 component=${spec##*.}
 platform=$1; shift
+emulator=$1; shift
 while [ $1 != - ]; do
     [ $1 = run ] && run=run
     [ $1 = verify ] && verify=verify
@@ -98,8 +99,10 @@ function docase {
                  -s '?ocpi.core.backpressure=model!=\"rcc\"||platform==\"$platform\"' \
                  -s '?ocpi.core.metadata_stressor=model!=\"rcc\"||platform==\"$platform\"' \
                  -s '?ocpi.core.file_write=model!=\"rcc\"||platform==host_platform'"
+    em=
+    [ -n "$emulator" ] && em="-m$emulator=$1 -P$emulator=$platform"
     cmd=('OCPI_LIBRARY_PATH=../../../lib/rcc:../../../lib/ocl:../../gen/assemblies:$OCPI_CDK_DIR/$OCPI_TOOL_DIR/artifacts:$OCPI_CDK_DIR/$platform/artifacts' \
-             '$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/'ocpirun -d -v -H -m$component=$1 -w$component=$2 \
+             '$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/'ocpirun -d -v -H -m$component=$1 -w$component=$2 $em \
                  $lockrcc -P$component=$platform \
                  --sim-dir=$3.$4.$2.$1.simulation $timearg \
                  --dump-file=$3.$4.$2.$1.props $outputs ../../gen/applications/$3.$4.xml)
