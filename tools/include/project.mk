@@ -20,9 +20,16 @@
 include $(OCPI_CDK_DIR)/include/util.mk
 
 # This is mandatory since it signifies that this directory is a project
-ifeq ($(wildcard Project.mk),)
-  $(error A project directory must contain a "Project.mk" file.)
+ifeq ($(wildcard Project.mk)$(wildcard Project.xml),)
+  $(error This project directory is corrupted since neither Project.xml(expected) nor Project.mk(backward compatibility) is present.)
 endif
+
+ifneq ($(wildcard Project.xml),)
+  PROJ_FILE=Project.xml
+else
+  PROJ_FILE=Project.mk
+endif
+
 $(OcpiIncludeProject)
 # FIXME: can we test for licensing?
 # FIXME: Error message makes no sense if give hdltargets but not platforms
@@ -89,9 +96,9 @@ ifneq ($(wildcard specs),)
     # package-id needs to be created early on by any non-clean make command.
     # This can be accomplished by having imports depend on it.
     imports: specs/package-id
-    # If Project.mk changes, recreate specs/package-id file unless the package-id file contents
+    # If Project.<mk|xml> changes, recreate specs/package-id file unless the package-id file contents
     # exactly match OCPI_PROJECT_PACKAGE.
-    specs/package-id: Project.mk
+    specs/package-id: $(PROJ_FILE)
 	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
 	      echo HIHI; echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
 	     fi

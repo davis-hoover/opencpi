@@ -144,3 +144,83 @@ PROJ_GUI_PROJECT = ("""<?xml version="1.0" encoding="UTF-8"?>
   <natures></natures>
 </projectDescription>
 \n""")
+
+PROJ_PROJECT_XML_LEGACY = ("""<project
+{%if package_name: %}
+       PackageName='{{package_name}}'
+{% endif %}
+{%if package_prefix: %}
+       PackagePrefix='{{package_prefix}}'
+{% endif %}
+{%if package_id: %}
+       Package='{{package_id}}'
+{% endif %}
+{%if depend: %}
+       ProjectDependencies='{{depend}}'
+{% endif %}
+{%if prim_lib: %}
+       Libraries='{{prim_lib}}'
+{% endif %}
+{%if include_dir: %}
+       IncludeDirs='{{include_dir}}'
+{% endif %}
+{%if xml_include: %}
+       XmlIncludeDirs='{{xml_include}}'
+{% endif %}
+{%if comp_lib: %}
+       ComponentLibraries='{{comp_lib}}'
+{% endif %}
+/>
+\n""")
+
+PROJ_PROJECT_XML = ("""<project>
+{%if package_name: %}
+       <OcpiProperty>
+               <name>PackageName</name>
+               <value>{{package_name}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if package_prefix: %}
+       <OcpiProperty>
+               <name>PackagePrefix</name>
+               <value>{{package_prefix}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if package_id: %}
+       <OcpiProperty>
+               <name>Package</name>
+               <value>{{package_id}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if depend: %}
+       <OcpiProperty>
+               <name>ProjectDependencies</name>
+               <value>{{depend}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if prim_lib: %}
+       <OcpiProperty>
+               <name>Libraries</name>
+               <value>{{prim_lib}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if include_dir: %}
+       <OcpiProperty>
+               <name>IncludeDirs</name>
+               <value>{{include_dir}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if xml_include: %}
+       <OcpiProperty>
+               <name>XmlIncludeDirs</name>
+               <value>{{xml_include}}</value>
+       </OcpiProperty>
+{% endif %}
+{%if comp_lib: %}
+       <OcpiProperty>
+               <name>ComponentLibraries</name>
+               <value>{{comp_lib}}</value>
+       </OcpiProperty>
+{% endif %}
+</project>
+\n""")
