@@ -325,7 +325,7 @@ main(int argc, const char **argv) {
             // Legacy syntax with property='value'
             const char* const property[] = {"PackageName", "PackagePrefix", "Package",
              "ProjectDependencies", "Libraries", "IncludeDirs", "XmlIncludeDirs",
-             "ComponentLibraries"};
+             "ComponentLibraries", "ProjectName", "ProjectPackage"};
             int last = sizeof(property)/sizeof(property[0]);
             char *value;
             for (int idx = 0; idx < last; ++idx) {
