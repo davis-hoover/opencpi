@@ -907,25 +907,18 @@ function make_library {
 include \$(OCPI_CDK_DIR)/include/library.mk
 EOF
 
-  cat <<EOF > $2/Library.mk
-# This is the $1 library
-
-# This makefile contains variable definitions that will apply when building each
-# individual worker and test in the library
-
-# Package identifier is used in a hierarchical fashion from Project to Libraries....
-# The PackageName, PackagePrefix and Package variables can optionally be set here:
-# PackageName defaults to the name of the directory
-# PackagePrefix defaults to package of parent (project)
-# Package defaults to PackagePrefix.PackageName
-${packagename:+PackageName=$packagename}
-${packageprefix:+PackagePrefix=$packageprefix}
-${package:+Package=$package}
-${liblibs:+Libraries=${liblibs[@]}}
-${complibs:+ComponentLibraries=${complibs[@]}}
-${includes:+IncludeDirs=${includes[@]}}
-${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}
+  cat <<EOF > $2/`basename $2`.xml
+<library
+	${packagename:+PackageName='$packagename'}
+	${packageprefix:+PackagePrefix='$packageprefix'}
+	${package:+Package='$package'}
+	${liblibs:+Libraries='${liblibs[@]}'}
+	${complibs:+ComponentLibraries='${complibs[@]}'}
+	${includes:+IncludeDirs='${includes[@]}'}
+	${xmlincludes:+XmlIncludeDirs='${xmlincludes[@]}'}
+/>
 EOF
+
   make --no-print-directory -C $2 ||
     bad library creation failed, you may want to do: ocpidev delete library $1
   [ -z "$verbose" ] || echo A new library named \"$1\" \(in directory \"$2/\"\) has been created.
@@ -1981,13 +1974,13 @@ Options for the create|delete verbs:
   -C <core>          *Core to be included by this asset (adds to "Cores" in Makefile)
 
  == create project|library|worker|{hdl device|platform} ==
-  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in Project.xml)
+  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in XML files)
   -I <include>       *A directory to search for language include files (e.g. C/C++ or Verilog)
-                      (Adds to "IncludeDirs" in Project.xml)
+                      (Adds to "IncludeDirs" in XML files)
   -y <comp-library>  *Specify a component library to search for workers/devices/specs that this
-                      asset references (adds to "ComponentLibraries" in Project.xml)
+                      asset references (adds to "ComponentLibraries" in XML files)
   -Y <library>       *Specify a primitive library that this asset depends on
-                      (adds to "Libraries" in Project.xml)
+                      (adds to "Libraries" in XML files)
 
  == create worker|{hdl device|primitive|platform|assemblies} ==
   -T <target>        *Specify one of the build-targets to limit this asset to
