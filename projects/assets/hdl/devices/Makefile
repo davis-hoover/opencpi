@@ -29,7 +29,7 @@
 Tests = \
 	gpi.test \
 	gpo.test \
-	lime_dac_ts.test \
+#	lime_dac_ts.test \
 
 # Build Ordering Rules:
 # 1) Subdevices that support other devices must occur AFTER the devices they support.
