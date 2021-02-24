@@ -163,12 +163,13 @@ namespace OCPI {
       unsigned discover(const OCPI::Util::PValue *params) {
 	parent().configureOnce();
 	unsigned found  = 0;
-	ocpiInfo("Performing discovery for all %s drivers", name().c_str());
 	if (!m_doNotDiscover)
 	  for (DerivedDriver *dd = firstDriver(); dd; dd = dd->nextDriver()) {
-	    if (dd->shouldDiscover())
+	    if (dd->shouldDiscover()) {
+	      ocpiInfo("Performing discovery for the \"%s\" \"%s\" driver",
+		       dd->name().c_str(), name().c_str());
 	      dd->search(params, NULL, false);
-	    else
+	    } else
 	      ocpiDebug("Discovery for %s driver %s suppressed",
 			name().c_str(), dd->name().c_str());
 	  }
@@ -262,7 +263,7 @@ namespace OCPI {
       // This is the constructor that is called at static construction time.
       DriverBase<Man, DriBase, ConcDri, Dev, name>()
       : DriBase(name) {
-        ocpiInfo("Registering/constructing driver: %s", name);
+        ocpiDebug("Registering/constructing driver: %s", name);
       }
     };
     // The template that concrete drivers should use to register themselves at

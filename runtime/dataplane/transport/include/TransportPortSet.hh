@@ -64,7 +64,9 @@ public:
   Port *getPortFromIndex(unsigned idx);
   Port *getPort(unsigned idx) { return getPortFromIndex(idx); }
   inline Port *getPortFromOrdinal(PortOrdinal id) {
-    return id >= m_ports.size() ? NULL : static_cast<Port*>(m_ports[id]);
+    if (id >= m_ports.size())
+      ocpiAbort("id => m_ports.size()"); // always assert when asserts are disabled
+    return static_cast<Port*>(m_ports[id]);
   }
 
   Controller *getTxController() { return m_transferController;}

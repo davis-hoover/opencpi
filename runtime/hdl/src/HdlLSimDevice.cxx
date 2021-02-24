@@ -368,7 +368,7 @@ protected:
 	int e = errno;
 	x += m_dir;
 	x += "\n";
-	(void)write(2, x.c_str(), x.length());
+	ocpiIgnore(write(2, x.c_str(), x.length()));
 	_exit(10 + e);
       }
       {
@@ -376,7 +376,7 @@ protected:
 	if (fd < 0) {
 	  std::string x("Error: Cannot create sim.out file for simulation output.\n");
 	  int e = errno;
-	  (void)write(2, x.c_str(), x.length());
+	  ocpiIgnore(write(2, x.c_str(), x.length()));
 	  _exit(10 + e);
 	}
 	if (dup2(fd, 1) < 0 ||
@@ -592,6 +592,7 @@ protected:
   void
   printTime(const char *msg) {
     OS::ElapsedTime et = m_spinTimer.getElapsed();
+    (void)et;(void)msg;
     ocpiDebug("When %s time since spin is: %" PRIu32 ".%03" PRIu32 " s ago", msg,
 	      et.seconds(), (et.nanoseconds() + 500000) / 1000000);
   }
@@ -649,14 +650,14 @@ protected:
     va_start(ap, fmt);
     static char buf[1000];
     vsprintf(buf, fmt, ap);
-    (void)write(2, buf, strlen(buf));
+    ocpiIgnore(write(2, buf, strlen(buf)));
   }
   void terminate() {
     uint8_t msg[2];
     msg[0] = TERMINATE;
     msg[1] = 0;
     w2("Telling the simulator process (pid %u) to exit.\n", m_pid);
-    (void)write(m_ctl.m_wfd, msg, 2);
+    ocpiIgnore(write(m_ctl.m_wfd, msg, 2));
   }
 
   // FIXME: signal safety even if we are just terminating anyway...

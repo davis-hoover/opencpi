@@ -216,6 +216,9 @@ namespace OCPI {
    * dynamic libraries that do not exist at runtime, e.g. uuid.so) but nowhere else in the
    * framework infrastructure, forcing them to be statically linked here:
    */
+#pragma clang optimize off
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
   namespace Container {
     intptr_t linkme() {
       ((DataTransfer::Access *)linkme)->closeAccess();
@@ -242,6 +245,7 @@ namespace OCPI {
       // p.applyConnectParams(NULL, NULL);
       ((OCPI::Container::Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
       pthread_workqueue_create_np(NULL, NULL);
+      pthread_workqueue_additem_np(NULL, NULL, NULL, NULL, NULL);
       // DRC support
 #if 1
       ((OCPI::DRC::DataStreamConfigLockRequest *)linkme)->get_data_stream_type();
@@ -256,5 +260,7 @@ namespace OCPI {
       return (intptr_t)&lzma_stream_buffer_decode & (intptr_t)&gpsd_drivers;
     }
   }
+#pragma GCC pop_options
+#pragma clang optimize on
 }
 

@@ -166,7 +166,8 @@ getNextStream(unsigned &ii, bool enabled, bool &isRx, data_stream_ID_t *&id) {
     do {
       if (m_readIdx == m_readStreams.size())
 	return false;
-      if (!enabled || find_data_stream(m_readStreams[m_readIdx])->isEnabled())
+      data_stream_t *ds = find_data_stream(m_readStreams[m_readIdx]);
+      if (!enabled || (ds && ds->isEnabled()))
 	break;
       m_readIdx++;
     } while(1);
@@ -868,7 +869,7 @@ LockRConstrConfig& Configurator::get_config(
       oss << "stream-agnostic \"" << cfg_key << "\" config?)";
       throw oss.str();
     }
-    catch(std::out_of_range) {
+    catch(std::out_of_range &) {
       oss << " (available configs are: ";
       bool first = true;
       auto it=data_stream->m_configs.begin();

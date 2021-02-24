@@ -81,7 +81,7 @@ ocpi_extra_libs=$(patsubst %,-l%,@OcpiExtraLibs@)
 # are installed in the data phase. WTF?
 install-data-hook:
 	$(AM_V_at)cd staging; V=$V ../../install-hook.sh \
-	     @OcpiDynamicLibrarySuffix@  @ocpi_dynamic@ @OcpiPlatform@  $(OcpiThisPlatform) \
+	     @OcpiDynamicLibrarySuffix@  @ocpi_dynamic@ @platform_target_dir@  $(OcpiThisPlatform) \
 	     "$(ocpi_drivers)" "$(ocpi_swigs)" "$(ocpi_prereqs)" "@prerequisite_dir@"
 EOF
 
@@ -218,7 +218,7 @@ while read path opts; do
 	  continue;;
      prerequisites)
 	  for p in $opts; do
-	      dir=@prerequisite_dir@/$p/@OcpiPlatform@
+	      dir=@prerequisite_dir@/$p/@platform_target_dir@
 	      # look in arch-specific include first, then arch-agnostic
 	      ocpi_prereq_incs+=" $dir/include"
 	      ocpi_prereq_incs+=" @prerequisite_dir@/$p/include"
@@ -238,7 +238,7 @@ while read path opts; do
 	  continue;;
       host-only-prerequisites)
           for p in $opts; do
-              dir=@prerequisite_dir@/$p/@OcpiPlatform@
+              dir=@prerequisite_dir@/$p/@platform_target_dir@
               # look in arch-specific include first, then arch-agnostic
               ocpi_host_only_prereq_incs+=" $dir/include"
               ocpi_host_only_prereq_incs+=" @prerequisite_dir@/$p/include"

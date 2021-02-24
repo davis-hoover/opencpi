@@ -18,12 +18,13 @@ architecture rtl of worker is
   signal time_to_send_r   : ulonglong_t;
   signal fraction_written : bool_t;
 begin
-  fraction_written    <= props_in.fraction_written and ctl_in.is_operating;
+  fraction_written                  <= props_in.fraction_written and ctl_in.is_operating;
   props_out.countBeforeBackPressure <= firstDrop_r;
-  props_out.time_to_send <= time_to_send_r;
-  out_out.valid       <= to_bool(its(sendTime1_r) or sendTime2_r or
-                                 (samples_r < props_in.valuesToSend and count_r = 0 and
-                                  firstReady_r and not its(eof_r)));
+  props_out.time_to_send            <= time_to_send_r;
+  props_out.valuesSent              <= samples_r;
+  out_out.valid                     <= to_bool(its(sendTime1_r) or sendTime2_r or
+                                               (samples_r < props_in.valuesToSend and count_r = 0 and
+                                                firstReady_r and not its(eof_r)));
   out_out.eof         <= eof_r;
   out_out.data        <= std_logic_vector(time_to_send_r(31 downto 0)) when its(sendTime1_r) else
                          std_logic_vector(time_to_send_r(63 downto 32)) when its(sendTime2_r) else
@@ -64,24 +65,26 @@ begin
         if its(out_in.ready) then
           firstReady_r <= btrue;
         end if;
-      elsif firstReady_r and count_r = 0 and not its(eof_r) then
-        if its(out_in.ready) then
-          if samples_r < props_in.valuesToSend then
-            samples_r <= samples_r + 1;
-          else
-            eof_r <= btrue;
+      elsif firstReady_r and not its(eof_r) then -- operating after first out_in.ready
+        if count_r = 0 then
+          if its(out_in.ready) then
+            if samples_r < props_in.valuesToSend then
+              samples_r <= samples_r + 1;
+            else
+              eof_r <= btrue;
+            end if;
+            if props_in.clockDivisor /= 1 then
+              count_r <= to_uchar(1);
+            end if;
+          elsif not dropped_r then
+            dropped_r <= btrue;
+            firstDrop_r <= samples_r;
           end if;
-          if props_in.clockDivisor /= 1 then
-            count_r <= to_uchar(1);
-          end if;
-        elsif not dropped_r then
-          dropped_r <= btrue;
-          firstDrop_r <= samples_r;
+        elsif count_r = (props_in.clockDivisor - 1) then
+          count_r <= (others => '0');
+        else
+          count_r <= count_r + 1;
         end if;
-      elsif count_r = (props_in.clockDivisor - 1) then
-        count_r <= (others => '0');
-      else
-        count_r <= count_r + 1;
       end if;
     end if;
   end process;

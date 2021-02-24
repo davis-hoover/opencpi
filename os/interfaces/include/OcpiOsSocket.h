@@ -55,10 +55,10 @@ namespace OCPI {
      */
 
     class Socket {
-      void init() throw();
+      void init();
     protected:
       friend class ServerSocket;
-      void setOpaque(uint64_t *opaque) throw();
+      void setOpaque(uint64_t *opaque);
     public:
       /**
        * Constructor: Initialize an unconnected socket.
@@ -71,19 +71,9 @@ namespace OCPI {
        * \post The socket is not connected.
        */
 
-      Socket()
-        throw();
+      Socket();
 
-      Socket(const std::string & remoteHost,
-	     uint16_t remotePort,
-	     bool udp = false) throw(std::string);
-#if 0
-      /**
-       * Constructor: For internal use only.
-       */
-      Socket (const OCPI::OS::uint64_t * opaque)
-        throw (std::string);
-#endif
+      Socket(const std::string & remoteHost, uint16_t remotePort, bool udp = false);
       /**
        * Copy constructor: Assigns ownership of the \a other socket to
        *                   this instance. After this, \a other may not
@@ -95,8 +85,7 @@ namespace OCPI {
        * \post This socket is connected.  \a other is unconnected.
        */
 
-      Socket (const Socket & other)
-        throw ();
+      Socket(const Socket &other);
 
       /**
        * Assignment operator: Assigns ownership of the \a other socket to
@@ -109,8 +98,7 @@ namespace OCPI {
        * \post This socket is connected.  \a other is unconnected.
        */
 
-      Socket & operator= (const Socket & other)
-        throw ();
+      Socket &operator=(const Socket &other);
 
       /**
        * Destructor.
@@ -118,8 +106,7 @@ namespace OCPI {
        * \pre The socket shall be unconnected.
        */
 
-      ~Socket ()
-        throw ();
+      ~Socket();
 
       /**
        * Receives data from the peer.
@@ -138,11 +125,9 @@ namespace OCPI {
        *
        * \pre The socket shall be connected.
        */
-      size_t recv(char * buffer, size_t amount, unsigned timeoutms = 0, bool all = false)
-        throw (std::string);
-      size_t recvfrom(char  *buf, size_t amount, int flags,
-		      char *  src_addr, size_t *addrlen, unsigned timeoutms = 0)
-      throw (std::string);
+      size_t recv(char *buffer, size_t amount, unsigned timeoutms = 0, bool all = false);
+      size_t recvfrom(char *buf, size_t amount, int flags, char *src_addr, size_t *addrlen,
+		      unsigned timeoutms = 0);
 
       /**
        * Sends data to the peer.
@@ -158,16 +143,11 @@ namespace OCPI {
        * \pre The socket shall be connected.
        */
 
-      size_t send(const char *data, size_t amount)
-        throw (std::string);
+      size_t send(const char *data, size_t amount);
       // Note the iov is const, we keep trying until it is all sent
-      void send(struct IOVec *iov, unsigned iovcnt)
-        throw (std::string);
-      size_t sendmsg(const void * iovect, int flags )
-        throw (std::string);
-      size_t sendto(const char * data, size_t amount, int flags,  char * src_addr,
-		    size_t addrlen)
-	throw (std::string);
+      void send(struct IOVec *iov, unsigned iovcnt);
+      size_t sendmsg(const void *iovect, int flags);
+      size_t sendto(const char *data, size_t amount, int flags, char *src_addr, size_t addrlen);
 
       /**
        * Returns the socket's local port number.
@@ -179,8 +159,7 @@ namespace OCPI {
        * \pre The socket shall be connected.
        */
 
-      uint16_t getPortNo ()
-        throw (std::string);
+      uint16_t getPortNo();
 
       /**
        * Returns the host name and the port number of the remote peer.
@@ -193,9 +172,7 @@ namespace OCPI {
        * \pre The socket shall be connected.
        */
 
-      void getPeerName (std::string & peerHost,
-                        uint16_t & peerPort)
-        const throw (std::string);
+      void getPeerName (std::string &peerHost, uint16_t &peerPort) const;
 
       /**
        * Configure behavior upon close().
@@ -215,8 +192,7 @@ namespace OCPI {
        * \pre The socket shall be connected.
        */
 
-      void linger (bool opt = true)
-        throw (std::string);
+      void linger(bool opt = true);
 
       /**
        * Performs a half-close.
@@ -243,8 +219,7 @@ namespace OCPI {
        * \pre The socket shall be connected.
        */
 
-      void shutdown (bool sendingEnd = true)
-        throw (std::string);
+      void shutdown(bool sendingEnd = true);
 
       /**
        * Closes (disconnects) the socket.
@@ -262,8 +237,7 @@ namespace OCPI {
        * \post The socket is unconnected.
        */
 
-      void close ()
-        throw (std::string);
+      void close();
 
       /**
        * Creates a duplicate of the socket.
@@ -281,22 +255,19 @@ namespace OCPI {
        * \post Both this socket and the newly created socket are connected.
        */
 
-      Socket dup ()
-        throw (std::string);
+      Socket dup();
 
-      int fd() const
-	throw();
+      int fd() const;
 
-      void connect (const std::string & remoteHost,
-		    uint16_t remotePort,
-		    bool udp = false)
-        throw (std::string);
+      void connect(const std::string &remoteHost, uint16_t remotePort, bool udp = false);
 
     protected:
       uint64_t m_osOpaque[1];
     private:
-      bool m_temporary; // kludge to make up for broken interface
+      bool     m_temporary; // kludge to make up for broken interface FIXME by changing the interface
+      bool     m_nodelay; // has this socket had no-delay set?
       unsigned m_timeoutms;
+      size_t   m_sendSize, m_receiveSize; // current setting of SO_SNDBUF and SO_RECVBUF
     };
   }
 }

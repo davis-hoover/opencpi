@@ -74,6 +74,7 @@ namespace OCPI {
       void controlOperation(OCPI::Util::Worker::ControlOperation op);
       bool controlOperation(OCPI::Util::Worker::ControlOperation op, std::string &err);
       inline uint32_t checkWindow(size_t offset, size_t nBytes) const {
+	(void)nBytes;
 	ocpiAssert(m_hasControl);
 	size_t window = offset & ~(OCCP_WORKER_CONFIG_SIZE-1);
         ocpiAssert(window == ((offset+nBytes)&~(OCCP_WORKER_CONFIG_SIZE-1)));

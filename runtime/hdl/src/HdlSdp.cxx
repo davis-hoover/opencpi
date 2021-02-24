@@ -76,10 +76,8 @@ namespace OCPI {
 	    ocpiDebug("SIM got %zu from fd %d", nread, fd);
 	  } else if (errno != EINTR)
 	    error = "error reading FIFO";
-	  else {
-	    (void)write(2, "\nSDP Read interrupted2\n", 23);
-	    //	    ocpiDebug("SDP Read interrupted");
-	  }
+	  else
+	    ocpiIgnore(write(2, "\nSDP Read interrupted2\n", 23));
 	} while (error.empty() && nRequested);
 	return !error.empty();
       }

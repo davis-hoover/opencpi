@@ -86,7 +86,7 @@ use IEEE.numeric_std.all;
 entity single_bit is
   generic (
     N         : natural   := 2;         -- Range 2 - 10
-    IREG      : std_logic := '1';       -- 0=no, 1=yes input register
+    IREG      : std_logic := '0';       -- 0=no, 1=yes input register
     RST_LEVEL : std_logic := '0');      -- 0=low, 1=high
   port (
     src_clk : in  std_logic;           -- optional; required when IREG='1'

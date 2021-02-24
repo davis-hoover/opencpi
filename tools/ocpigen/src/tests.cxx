@@ -448,6 +448,16 @@ namespace {
     set.push_back(w);
     return NULL;
   }
+  const char *
+  emulatorName() {
+    const char *em =  emulator ? strrchr(emulator->m_specName, '.') : NULL;
+    if (em)
+      em++;
+    else if (emulator)
+      em = emulator->m_specName;
+    return em;
+  }
+
   // A test case, which may apply against multiple configurations
   // Default is:
   //   cases generated from configurations and defined property values
@@ -475,7 +485,8 @@ namespace {
     std::string m_delays;
 
     Case(ParamConfig &globals)
-      : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration), m_doneWorkerIsUUT(false)
+      : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
+	m_doneWorkerIsUUT(doneWorkerIsUUT)
     {}
     static const char *doExcludePlatform(const char *a_platform, void *arg) {
       Case &c = *(Case *)arg;
@@ -644,7 +655,7 @@ namespace {
           (err = OE::getNumber(x, "duration", &m_duration, NULL, duration)) ||
           // (err = OE::getNumber(x, "timeout", &m_timeout, NULL, timeout)) ||
           (err = OE::getNumber(x, "timeout", &m_timeout)) ||
-          (err = OE::getBoolean(x, "doneWorkerIsUUT", &m_doneWorkerIsUUT, NULL, doneWorkerIsUUT)))
+          (err = OE::getBoolean(x, "doneWorkerIsUUT", &m_doneWorkerIsUUT, false, false)))
         return err;
       if (!m_duration) {
         if (!m_timeout)
@@ -1037,11 +1048,7 @@ namespace {
         dut++;
       else
         dut = wFirst->m_specName;
-      const char *em =  emulator ? strrchr(emulator->m_specName, '.') : NULL;
-      if (em)
-        em++;
-      else if (emulator)
-        em = emulator->m_specName;
+      const char *em = emulatorName();
       for (unsigned s = 0; s < m_subCases.size(); s++) {
         ParamConfig &pc = *m_subCases[s];
         OS::FileSystem::mkdir(dir, true);
@@ -2236,7 +2243,10 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
 #endif
   if (verbose)
     fprintf(stderr, "Generating summary gen/cases.xml file\n");
-  fprintf(out, "<cases spec='%s'>\n", wFirst->m_specName);
+  fprintf(out, "<cases spec='%s'", wFirst->m_specName);
+  if (emulator)
+    fprintf(out, " emulator='%s'", emulatorName());
+  fprintf(out, ">\n");
   if ((err = getPlatforms("*", allPlatforms)))
     return err;
   for (unsigned n = 0; n < cases.size(); n++)
@@ -2341,13 +2351,14 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
                       OU::format(m_err, "Cannot open file \"%s\" for writing", file.c_str());
                       return true;
                     }
-                    fprintf(m_run,
+		    const char *em = ezxml_cattr(m_xml, "emulator");
+		    fprintf(m_run,
                             "#!/bin/bash --noprofile\n" // no arg (at least to dash) to suppress reading .profile etc.
                             "# Note that this file runs on remote/embedded systems and thus\n"
                             "# may not have access to the full development host environment\n"
                             "failed=0\n"
-                            ". $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
-                            m_spec.c_str(), m_platform.c_str(), ezxml_cattr(wx, "outputs"));
+                            ". $OCPI_CDK_DIR/scripts/testrun.sh %s %s \"%s\" $* - %s\n",
+                            m_spec.c_str(), m_platform.c_str(), em ? em : "", ezxml_cattr(wx, "outputs"));
                   }
                   const char
                     *to = ezxml_cattr(sx, "timeout"),

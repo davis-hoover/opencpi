@@ -37,7 +37,10 @@ if [ "$1" = "-v" -o "$OCPI_EXPORTS_VERBOSE" = 1 ]; then
   [ "$1" = "-v" ] && shift
 fi
 model=$1
+# The platform with the optional build option suffix
 platform=$2
+# The platform without any build option suffix
+platform_base=${2%-*}
 platform_dir=$3
 [ -n "$verbose" ] && echo Doing platform exports for $model $platform at $platform_dir
 
@@ -45,12 +48,12 @@ platform_dir=$3
 [ "$model" = rcc ] && source $OCPI_CDK_DIR/scripts/ocpitarget.sh $platform
 source $OCPI_CDK_DIR/scripts/export-utils.sh
 mkdir -p exports
-platform_exports=$platform_dir/$platform.exports
+platform_exports=$platform_dir/$platform_base.exports
 [ -f $platform_exports ] || platform_exports=
 if [ -z "$platform_exports" ];  then
-  echo No exports file found for $model platform $platform in $platform_dir
+  echo No exports file found for $model platform $platform_base in $platform_dir
 else
-  echo Using extra exports file for platform $platform: $platform_exports
+  echo Using extra exports file for platform $platform_base: $platform_exports
   readExport additions + $platform_exports -
   readExport runtimes = $platform_exports -
   readExport deployments @ $platform_exports -
@@ -180,14 +183,14 @@ done < build/places
 # Put the check file into the runtime platform dir
 # FIXME: make sure if/whether this is really required and why
 # Maybe: when the runtime is really a runtime config of a dev host?
-check=$platform_dir/${platform}-check.sh
+check=$platform_dir/${platform_base}-check.sh
 [ -r "$check" ] && {
   to=$(python3 -c "import os.path; print(os.path.relpath('"$check"', '.'))")
   make_relative_link $to exports/runtime/$platform/$(basename $check)
   # FIXME: make sure this is actually used and needed or maybe it should be used and isn't?
   cat <<-EOF > exports/runtime/$platform/${platform}-init.sh
 	# This is the minimal setup required for runtime
-	export OCPI_TOOL_PLATFORM=$platform
+	export OCPI_TOOL_PLATFORM=$platform_base
 	export OCPI_TOOL_OS=$OcpiPlatformOs
 	export OCPI_TOOL_DIR=$platform
 	EOF
