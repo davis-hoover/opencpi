@@ -548,6 +548,7 @@ verilogValue(const OU::Value &v, std::string &s, bool finalized) {
    {
     // Everything else is linear in memory
     // How many bits in the std_logic_vector
+    (void)finalized;
     assert(finalized);
     size_t bits = rawBitWidth(dt); // bits in verilog constant
     // How many bytes per scalar value

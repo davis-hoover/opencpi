@@ -233,7 +233,6 @@ static unsigned long dma_attrs =
   // To indicate buffering, perhaps the counterpoint to WRITE_BARRIER
   // DMA_ATTR_WRITE_COMBINE |     // our flags are atomic (used on arm)
 
-
   // Only used in arm with nommu...  For when different parts of memory can/cannot be consistent etc.
   // We should set this on cache mode 1?
   // DMA_ATTR_NON_CONSISTENT    |
@@ -255,7 +254,14 @@ static unsigned long dma_attrs =
 static struct dma_attrs dma_attrs[1];
 static void init_dma(void) {
   init_dma_attrs(dma_attrs);
+  // dma_set_attr(DMA_ATTR_WRITE_BARRIER, dma_attrs);
+  // dma_set_attr(DMA_ATTR_WEAK_ORDERING, dma_attrs);
+  // dma_set_attr(DMA_ATTR_WRITE_COMBINE, dma_attrs);
+  // dma_set_attr(DMA_ATTR_NON_CONSISTENT, dma_attrs);
+  // dma_set_attr(DMA_ATTR_NO_KERNEL_MAPPING, dma_attrs);
+  // dma_set_attr(DMA_ATTR_SKIP_CPU_SYNC, dma_attrs);
   dma_set_attr(DMA_ATTR_FORCE_CONTIGUOUS, dma_attrs);
+  // dma_set_attr(DMA_ATTR_ALLOC_SINGLE_PASS, dma_attrs);
 }
 #endif
 static enum dma_data_direction dma_direction = DMA_BIDIRECTIONAL;
@@ -1083,14 +1089,23 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
     vma->vm_private_data = block;
     // Check for uncached blocks
     // if (!block->isCached) // this is now determined by the FD used.
+#if 0
+    vma->vm_page_prot = file->f_flags & (O_SYNC|O_DSYNC) ?
+      pgprot_noncached(vma->vm_page_prot) : pgprot_dmacoherent(vma->vm_page_prot);
+#else
     if (file->f_flags & (O_SYNC|O_DSYNC))
       vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+#endif
     vma->vm_flags |= VM_RESERVED;
     if (block->type == ocpi_mmio) {
       vma->vm_flags |= VM_IO;
       err = io_remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
     } else
       err = remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
+#if 0
+    if (block->type == ocpi_dma)
+    err = dma_mmap_attrs(mydev->fsdev, vma, block->virt_addr, block->bus_addr, block->size, dma_attrs);
+#endif
   }
   if (err)
     log_err("mmap failed: minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx)\n",

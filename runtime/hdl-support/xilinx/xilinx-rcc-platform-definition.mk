@@ -30,7 +30,7 @@ xilinx_sw_version:=$(word 1,$(xilinx_sw_fields))_$(word 2,$(xilinx_sw_fields))
 xilinx_sw_arch:=$(word 3,$(xilinx_sw_fields))
 
 xilinx_version_tag:=20$(subst _,.,$(xilinx_sw_version))
-$(info Platform is: $(xilinx_sw_platform).  Version is: $(xilinx_sw_version).  Architecture is: $(xilinx_sw_arch))
+$(shell echo Xilinx RCC platform is: $(xilinx_sw_platform).  Version is: $(xilinx_sw_version).  Architecture is: $(xilinx_sw_arch) > /dev/stderr)
 ifndef xilinx_sw_tool_dir
   ifndef OCPI_XILINX_VIVADO_SDK_VERSION
     OCPI_XILINX_VIVADO_SDK_VERSION:=$(xilinx_version_tag)

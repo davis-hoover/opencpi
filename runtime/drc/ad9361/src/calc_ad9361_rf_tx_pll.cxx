@@ -20,9 +20,12 @@
 
 #include <sstream>         // std::ostringstream
 #include <cstdint>         // uin32_t, etc
+#include "OcpiUtilMisc.h"
 #include "ad9361_platform.h" // regs_general_rfpll_divider_t
 #include "ad9361.h"        // RFPLL_MODULUS macro (this is a ADI No-OS header)
 #include "calc_ad9361_rf_tx_pll.h"
+
+namespace OU = OCPI::Util;
 
 const char* calc_AD9361_Tx_RFPLL_ref_divider(
     float& val,
@@ -68,13 +71,10 @@ const char* calc_AD9361_Tx_RFPLL_external_div_2_enable(
   if(divider <= 7) {
     val = (divider == 7);
   }
-  else {
-    std::ostringstream oss;
-    oss << "Invalid value read for ";
-    oss << "general_rfpll_dividers register" << regs.general_rfpll_dividers;
-    return oss.str().c_str();
-  }
-  return 0;
+  else
+    return OU::esprintf("Invalid value read for general_rfpll_dividers register 0x%x", 
+			regs.general_rfpll_dividers);
+  return NULL;
 }
 
 const char* calc_AD9361_Tx_RFPLL_VCO_Divider(
@@ -91,17 +91,11 @@ const char* calc_AD9361_Tx_RFPLL_VCO_Divider(
     case 5: val = 64; break;
     case 6: val = 128; break;
     case 7:
-    {
-      std::ostringstream oss;
-      oss << "Value requested for AD9361_Tx_RFPLL_VCO_Divider before ";
-      oss << "checking if register was set to divide-by-2";
-      return oss.str().c_str();
-    }
+      return "Value requested for AD9361_Tx_RFPLL_VCO_Divider before "
+	"checking if register was set to divide-by-2";
     default:
-      std::ostringstream oss;
-      oss << "Invalid value read for ";
-      oss << "general_rfpll_dividers register" << regs.general_rfpll_dividers;
-      return oss.str().c_str();
+      return OU::esprintf("Invalid value read for general_rfpll_dividers register 0x%x",
+			  regs.general_rfpll_dividers);
   }
   return 0;
 }
@@ -132,7 +126,7 @@ const char* calc_AD9361_Tx_RFPLL_LO_freq_Hz(
   { // restrict scope so we don't accidentally use non-double values
     // for later calculation
 
-    bool Tx_RFPLL_external_div_2_enable;
+    bool Tx_RFPLL_external_div_2_enable = false;
     {
       bool& b = Tx_RFPLL_external_div_2_enable;
       const char* ret = calc_AD9361_Tx_RFPLL_external_div_2_enable(b, regs);

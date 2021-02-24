@@ -36,23 +36,17 @@ namespace {
 };
 
 void
-OCPI::OS::Posix::netDbLock ()
-  throw (std::string)
-{
+OCPI::OS::Posix::netDbLock() {
   pthread_mutex_lock (&netDbMutex);
 }
 
 void
-OCPI::OS::Posix::netDbUnlock ()
-  throw (std::string)
-{
+OCPI::OS::Posix::netDbUnlock() {
   pthread_mutex_unlock (&netDbMutex);
 }
 
 std::string
-OCPI::OS::Posix::getHostname ()
-  throw (std::string)
-{
+OCPI::OS::Posix::getHostname() {
   char buffer[1024];
   if (gethostname (buffer, 1024) != 0) {
     throw getErrorMessage (errno, "gethostname");
@@ -61,9 +55,7 @@ OCPI::OS::Posix::getHostname ()
 }
 
 std::string
-OCPI::OS::Posix::getFQDN ()
-  throw (std::string)
-{
+OCPI::OS::Posix::getFQDN() {
   std::string localName = getHostname ();
 
   netDbLock ();
@@ -80,9 +72,7 @@ OCPI::OS::Posix::getFQDN ()
 }
 
 std::string
-OCPI::OS::Posix::getIPAddress ()
-  throw (std::string)
-{
+OCPI::OS::Posix::getIPAddress() {
   std::string localName = getHostname ();
 
   netDbLock ();
@@ -101,9 +91,7 @@ OCPI::OS::Posix::getIPAddress ()
 }
 
 bool
-OCPI::OS::Posix::isLocalhost (const std::string & name)
-  throw (std::string)
-{
+OCPI::OS::Posix::isLocalhost (const std::string &name) {
   /*
    * Check whether the name is "localhost"
    */

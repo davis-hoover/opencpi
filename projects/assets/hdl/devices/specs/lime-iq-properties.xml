@@ -12,5 +12,5 @@
   <!-- 3. If not using clock in, should we use the control clock? if not use "sample clock" -->
   <property name='USE_CTL_CLK_p' type='bool' parameter='1' default='1'/>
   <!-- When using the control clock, divide it by this amount -->
-  <property name='divisor' writable='1' default='1'/>
+  <property name='divisor' writable='1' default='1' type='ushort'/>
 </properties>

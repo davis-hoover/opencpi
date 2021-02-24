@@ -72,6 +72,7 @@ public:
   void init(); // must be called after constructor returns
   std::vector<Transfer *> &getTransfers(unsigned outPort, unsigned outBuffer, unsigned inPort, unsigned inBuffer,
 					bool broadcast, TransferType inout) {
+    (void)outBuffer;(void)inBuffer;
     assert(outPort < m_output.getPortCount() && inPort < m_input.getPortCount() &&
 	   outBuffer < m_output.getBufferCount() && inBuffer < m_input.getBufferCount());
     auto &out2in = m_inPort2outPort[outPort * m_input.getPortCount() + inPort];

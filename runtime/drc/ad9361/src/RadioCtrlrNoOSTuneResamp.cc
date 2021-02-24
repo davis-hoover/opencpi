@@ -111,7 +111,7 @@ bool RadioCtrlrNoOSTuneResamp::do_min_data_stream_config_locks(
   throw_if_data_stream_lock_request_malformed(req);
 
   config_key_t key;
-  config_value_t val, tol;
+  config_value_t val = 0., tol;
   std::string value;
   unsigned which;
   if (ds_ID == TX1_id() || ds_ID == TX2_id()) {

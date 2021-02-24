@@ -41,19 +41,19 @@ add_prereq_dirs build
 for p in project-registry/*; do
   add_prereq_dirs $p
 done
-timestamp=$OCPI_PREREQUISITES_INSTALL_DIR/built-timestamp-$OCPI_TARGET_PLATFORM
+timestamp=$OCPI_PREREQUISITES_INSTALL_DIR/built-timestamp-$OCPI_TARGET_DIR
 if [ -f $timestamp ]; then
-  echo It appears that prerequisites were successfully built for $OCPI_TARGET_PLATFORM on $(< $timestamp).
+  echo It appears that prerequisites were successfully built for $OCPI_TARGET_DIR on $(< $timestamp).
   if [ -n "$force" ]; then
     echo "Since the -f option (force) was supplied, we will rebuild anyway."
     rm $timestamp
   else
-    echo "So we will skip building prerequisites for platform: $OCPI_TARGET_PLATFORM."
+    echo "So we will skip building prerequisites for platform: $OCPI_TARGET_DIR."
     echo "Use the -f option to $0 to force rebuilding prerequisite."
     exit 0
   fi
 fi
-echo Building/installing prerequisites for the $OCPI_TARGET_PLATFORM platform, now running on $OCPI_TOOL_PLATFORM.
+echo Building/installing prerequisites for the $OCPI_TARGET_DIR platform, now running on $OCPI_TOOL_PLATFORM.
 echo Building prerequisites in $OCPI_PREREQUISITES_BUILD_DIR.
 echo Installing them in $OCPI_PREREQUISITES_INSTALL_DIR.
 if [ -n "$OCPI_TARGET_PREREQUISITES" ]; then

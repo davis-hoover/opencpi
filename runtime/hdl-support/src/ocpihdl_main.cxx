@@ -821,8 +821,11 @@ bram(const char **ap) {
     unlink(ap[1]);
     bad("Error writing output file '%s'", ap[1]);
   }
-  printf("Wrote bram file '%s' (%zu bytes) from file '%s' (%zu bytes)\n",
-	 ap[1], total + OH::ROM_HEADER_BYTES, *ap, (size_t)length);
+  if (verbose)
+    fprintf(stderr, "Wrote bram file '%s' (%zu bytes) from file '%s' (%zu bytes)\n",
+	    ap[1], total + OH::ROM_HEADER_BYTES, *ap, (size_t)length);
+  // The normative output
+  printf("%zu\n", total + OH::ROM_HEADER_BYTES);
   if (in) free(in);
   if (out) free(out);
 }

@@ -12,17 +12,17 @@ using namespace OCPI::RCC; // for easy access to RCC data types and constants
 using namespace Test_sourceWorkerTypes;
 
 class Test_sourceWorker : public Test_sourceWorkerBase {
-  uint32_t m_values;
 public:
-  Test_sourceWorker() : m_values(0) {}
   RCCResult run(bool /*timedout*/) {
-    size_t n = std::min<size_t>(out.maxLength()/sizeof(m_values), properties().valuesToSend - m_values);
-    out.setLength(n * sizeof(m_values));
+    properties().countBeforeBackpressure = 0xffffffff;
+    size_t n = std::min<size_t>(out.maxLength()/sizeof(properties().valuesSent),
+				properties().valuesToSend - properties().valuesSent);
+    out.setLength(n * sizeof(properties().valuesSent));
     if (n) {
       if (properties().suppressWrites)
-	m_values += n;
+	properties().valuesSent += n;
       else
-	for (uint32_t *p = (uint32_t*)out.data(); n--; *p++ = m_values++)
+	for (uint32_t *p = (uint32_t*)out.data(); n--; *p++ = properties().valuesSent++)
 	  ;
       return RCC_ADVANCE;
     }
