@@ -86,6 +86,7 @@ namespace OCPI {
 	m_opencpiVersion,
 	m_runtime, m_runtimeVersion;
       bool m_dynamic;
+      bool m_optimized;
     public:
       inline const std::string &uuid() const { return m_uuid; }
       inline const std::string &os() const { return m_os; }
@@ -94,6 +95,7 @@ namespace OCPI {
       inline const std::string &platform() const { return m_platform; }
       inline const std::string &opencpiVersion() const { return m_opencpiVersion; }
       inline bool dynamic() const { return m_dynamic; }
+      inline bool optimized() const { return m_optimized; }
     protected:
       // Parse from target string
       void parse(const char *pString);

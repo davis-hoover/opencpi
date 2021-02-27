@@ -51,8 +51,9 @@ namespace OCPI {
       // reference at the call site.
       virtual bool
         probeServer(const char *server, bool verbose, const char **exclude, char *containers,
-                    bool discoveryOnly, std::string &error),
-        useServers(const OCPI::API::PValue *params, bool verbose, std::string &error);
+                    bool discoveryOnly, unsigned &count, std::string &error),
+        useServers(const OCPI::API::PValue *params, bool verbose, bool discovery, unsigned &count,
+		   std::string &error);
       unsigned
       search(const OCPI::API::PValue* props, const char **exclude, bool discoveryOnly);
     };

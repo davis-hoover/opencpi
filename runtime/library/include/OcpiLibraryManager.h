@@ -61,6 +61,7 @@ namespace OCPI {
       std::string m_runtime;
       std::string m_runtimeVersion;
       bool        m_dynamic;
+      bool        m_optimized;
       Capabilities();
     };
 

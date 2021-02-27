@@ -2442,7 +2442,6 @@ while [[ "${argv[0]}" != "" ]] ; do
       (-q) takeval timefreq ;;
       (-u) nosdp=1 ;;
       (--log-level) takeval loglevel; export OCPI_LOG_LEVEL=$loglevel;;
-
       (-O) takeval other; others=(${others[@]} $other) ;;
       (-C) takeval core; cores=(${cores[@]} $core) ;;
 
@@ -2480,6 +2479,8 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--version) ocpirun --version; exit 0;;
       (--worker-version) takeval version;;
       (--run_arg) takeval run_arg;;
+      (--optimize) optimize=1;;
+      (--dynamic) dynamic=1;;
       (*)
         error_msg="unknown option: ${argv[0]}"
         if [ -n "$verb" ]; then
@@ -2675,7 +2676,26 @@ fi
 # xml app
 [ \( -n "$xmlapp" -o -n "$xmldirapp" \) -a \( \( "$verb" != create -a "$verb" != delete \) -o "$noun" != "application" \) ] &&
   bad the -X '(xml/simple)' or -x '(application directory with xml)' option is only valid when creating an application
-
+[ -n "$dynamic" && "$verb" != build ] && bad the --dynamic flag is only valid with the build verb
+[ -n "$optimize" && "$verb" != build ] && bad the --optimize flag is only valid with the build verb
+[ -n "$dynamic" -o -n "$optimize" ] && {
+    build_suffix=-
+    [ -n "$dynamic" ] && build_suffix+=d
+    [ -n "$optimize" ] && build_suffix+=o
+    if [ -z "$swplats" ]; then
+	# If we did not mention an rcc platform, we meant the host we are running on
+	# But to supply options you need to specify it in any case
+	swplats=$OCPI_TOOL_PLATFORM$build_suffix
+    else
+	# add the suffix to all platforms and check that we are not already using suffixes
+	for $p in ${swplats[@]}; do
+	    [[ $p == *-* ]] &&
+		bad "You cannot use the --dynamic or --optimize build options and also specify build options in a platform name (in this case: $p)"
+	    newplats="${newplats[@]} $p$build_suffix"
+        done
+	swplats=newplats
+    fi
+}
 # For future support of rcc platforms, primitives, and in general the rcc subtree
 if [ -n "$rcc" ] ; then
   hdlorrcc=rcc

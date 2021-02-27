@@ -401,6 +401,7 @@ class Worker : public OU::Worker {
   size_t m_defaultDataWidth;        // SIZE_MAX means not set
   Language m_language;
   ::Assembly *m_assembly;
+  std::list<std::pair<std::string, ::Assembly *>> m_slaveAssemblies; // string is selection expression
   // map of slave worker objects mapped by a string of the name of the slave either from name
   // attribute or auto generated
   std::list<std::pair<std::string, Worker*>> m_slaves; // maintain order
@@ -424,6 +425,7 @@ class Worker : public OU::Worker {
                                     // FIXME: derive from compiled code
   unsigned m_maxLevel;        // when data type processing
   bool m_dynamic;
+  bool m_optimized;
   bool m_isSlave;
   bool m_isOptional;                // is this slave optional
   Port *m_slavePort;                // slave port mapped to proxy port
@@ -628,7 +630,7 @@ extern const char
 		      ezxml_t *parsed, std::string &childFile, bool optional),
   *emitContainerHDL(Worker*, const char *);
 
-extern bool g_dynamic, g_multipleWorkers;
+extern bool g_dynamic, g_optimized, g_multipleWorkers;
 extern void
   doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment),
   vhdlType(const OU::Property &dt, std::string &typeDecl, std::string &type,
