@@ -34,10 +34,10 @@
   else
     export PROFILE_FILE=$HOME/.profile
   fi
-  export OCPI_CDK_DIR=/mnt/net/$2
-  export OCPI_ROOT_DIR=/mnt/net
+  export OCPI_CDK_DIR=$OCPI_NET_DIR/$2
+  export OCPI_ROOT_DIR=$OCPI_NET_DIR
   cat <<EOF > $PROFILE_FILE
-  if test -e /mnt/net/$2; then
+  if test -e $OCPI_NET_DIR/$2; then
     echo Executing $PROFILE_FILE
     export OCPI_CDK_DIR=$OCPI_CDK_DIR
     export OCPI_ROOT_DIR=$OCPI_ROOT_DIR
@@ -89,12 +89,12 @@
        echo Error: enable to find $OCPI_LOCAL_DIR/mynetsetup.sh
     fi
   else
-    echo NFS mounts not yet set up. Please mount the OpenCPI CDK into /mnt/net/.
+    echo NFS mounts not yet set up. Please mount the OpenCPI CDK into $OCPI_NET_DIR.
   fi
   
   alias ls='ls --color=auto'
 EOF
   echo Running login script. 
-  echo OCPI_CDK_DIR is now $OCPI_CDK_DIR.
-  echo OCPI_ROOT_DIR is now $OCPI_ROOT_DIR.
+  echo OCPI_CDK_DIR is now $OCPI_CDK_DIR
+  echo OCPI_ROOT_DIR is now $OCPI_ROOT_DIR
   source $PROFILE_FILE
