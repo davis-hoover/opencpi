@@ -282,7 +282,7 @@ else
     echo $ocpi_name: failed to determine runtime platform. >&2
     return 1
   fi
-  ocpi_tool_dir=$4
+  ocpi_tool_dir=$v4
   [ -n "$ocpi_dynamic" -o -n "$ocpi_optimize" ] && {
       ocpi_tool_dir+=-
       [ -n "$ocpi_dynamic" ] && ocpi_tool_dir+=d
