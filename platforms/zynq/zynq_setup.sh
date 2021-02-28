@@ -54,7 +54,7 @@
 	alias ls='ls --color=auto'	
 EOF
   echo Running login script. 
-  echo OCPI_CDK_DIR is now $OCPI_CDK_DIR.
-  echo OCPI_ROOT_DIR is now $OCPI_ROOT_DIR.
+  echo OCPI_CDK_DIR is now $OCPI_CDK_DIR
+  echo OCPI_ROOT_DIR is now $OCPI_ROOT_DIR
   source $PROFILE_FILE
 

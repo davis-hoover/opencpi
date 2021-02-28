@@ -5,7 +5,7 @@ set_tool_platform() {
     for m in /mnt/card /run/media/mmcblk0p1; do
       [ -d $m/opencpi ] && export OCPI_LOCAL_DIR=$m/opencpi
     done
-    if test -f release; then  # checks to see if xilinx13_4 platform is being ran
+    if test -f release; then  # checks to see what is being ran
       read OCPI_RELEASE OCPI_TOOL_PLATFORM HDL_PLATFORM < $OCPI_LOCAL_DIR/release
 	  export OCPI_RELEASE OCPI_TOOL_PLATFORM HDL_PLATFORM
     else
