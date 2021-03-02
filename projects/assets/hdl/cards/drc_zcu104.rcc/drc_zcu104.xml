@@ -1,5 +1,5 @@
 <RccWorker language='c++' spec='drc-spec' version='2'
-	   controlOperations='start'
+	   controlOperations='start,stop,release'
 	   staticprereqlibs='ad9361' >
 
   <specProperty name='MAX_CHANNELS_p' value="4"/>
