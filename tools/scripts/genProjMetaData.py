@@ -184,11 +184,11 @@ def isStale (myDir, force):
     # fix these problems but not worth the time required right now
     '''find_output = ""
     if (force == False):
-        if os.path.isfile(myDir + "/project.xml"):
+        if os.path.isfile(myDir + "/project-metadata.xml"):
             print("running find command: " + 'find ' + myDir + " -name" + " \"*.xml\"" +
-                   ' -newer '+ myDir + "/project.xml")
+                   ' -newer '+ myDir + "/project-metadata.xml")
             find_output = subprocess.Popen(['find', myDir, "-name", "\"*.xml\"",
-                                           '-newer', myDir + "/project.xml"],
+                                           '-newer', myDir + "/project-metadata.xml"],
                                            stdout=subprocess.PIPE).communicate()[0]
             print(find_output)
             if find_output != b'':
@@ -320,7 +320,7 @@ def main():
         #print("Updating project metadata...")
         indent(root)
         tree = ET.ElementTree(root)
-        tree.write(mydir+"/project.xml")
+        tree.write(mydir+"/project-metadata.xml")
     else:
         print("metadata is not stale, not regenerating")
 

@@ -185,8 +185,12 @@ Instance()
     m_config(0), m_emulated(false), m_inserted(false) {
 }
 
+// When evaluating an expression for an instance's property value, allow use of assembly-provided values
+// when indicated by a leading $.
 const char *Instance::
 getValue(const char *sym, OU::ExprValue &val) const {
+  if (*sym == '$')
+    return m_assy->m_assyWorker.getValue(++sym, val);
   const InstanceProperty *ipv = &m_properties[0];
   for (unsigned n = 0; n < m_properties.size(); n++, ipv++)
     if (!strcasecmp(ipv->property->cname(), sym))
@@ -235,9 +239,9 @@ addAssemblyParameters(OU::Assembly::Properties &aiprops) {
 // Add parameter values from the list of values that came from the instance XML,
 // possibly augmented by values from the assembly.  This happens AFTER we know
 // about the worker, so we can do error checking and value parsing
-const char *Assembly::
-addInstanceParameters(const Worker &w, const OU::Assembly::Properties &aiprops,
-		      InstanceProperty *&ipv) {
+const char *Instance::
+addParameters(const OU::Assembly::Properties &aiprops, InstanceProperty *&ipv) {
+  Worker &w = *m_worker;
   const char *err;
   const OU::Assembly::Property *ap = &aiprops[0];
   for (size_t n = aiprops.size(); n; n--, ap++) {
@@ -246,13 +250,13 @@ addInstanceParameters(const Worker &w, const OU::Assembly::Properties &aiprops,
       return OU::esprintf("property '%s' is not a property of worker '%s'", ap->m_name.c_str(),
 			  w.m_implName);
     // If the assembly is for an application worker, we are parsing a slave assembly
-    if (!p->m_isParameter && m_assyWorker.m_type != Worker::Application)
+    if (!p->m_isParameter && m_assy->m_assyWorker.m_type != Worker::Application)
       return OU::esprintf("property '%s' is not a parameter property of worker '%s'",
 			  ap->m_name.c_str(), w.m_implName);
     // set up the ipv and parse the value
     ipv->property = p;
     ipv->value.setType(*p); // in case we are reusing it
-    if ((err = ipv->property->parseValue(ap->m_value.c_str(), ipv->value)))
+    if ((err = ipv->property->parseValue(ap->m_value.c_str(), ipv->value, NULL, this)))
       return err;
     if (p->m_default) {
       std::string defValue, newValue;
@@ -290,6 +294,7 @@ addParamConfigParameters(const ParamConfig &pc, const OU::Assembly::Properties &
 const char *Instance::
 init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
      OU::Assembly::Properties &xmlProperties) {
+  m_assy = &assy;
   //  m_instance = ai;
   m_xml = ix;
   m_name = iName;
@@ -353,7 +358,7 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   // Even though we used the ipv's to select a worker and paramconfig,
   // we queue them up here to actually apply to the instance in the generated code.
   // Someday this will force top-down building
-  if ((err = assy.addInstanceParameters(*w, xmlProperties, ipv)))
+  if ((err = addParameters(xmlProperties, ipv)))
     return err;
   if (w->m_paramConfig)
     assy.addParamConfigParameters(*w->m_paramConfig, xmlProperties, ipv);

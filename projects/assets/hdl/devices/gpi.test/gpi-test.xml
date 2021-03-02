@@ -1,4 +1,4 @@
-<tests duration='10' useHDLFileIo='true' spec='gp_in'>
+<tests duration='20' useHDLFileIo='true' spec='gp_in'>
 
 
   <!-- The first test case tests the gpi device worker by toggling GPIO pins on and then off with the debounce circuit, edge detector circuit, and toggle circuit

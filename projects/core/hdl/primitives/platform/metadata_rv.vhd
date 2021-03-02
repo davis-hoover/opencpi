@@ -22,7 +22,7 @@ library ocpi; use ocpi.all, ocpi.types.all;
 library platform; use platform.platform_pkg.all, platform.metadata_defs.all;
 library util;
 entity metadata_rv is
-  generic(romwords : natural := 2048);
+  generic(rom_words : ushort_t := to_ushort(2048));
   port(
     wci_Clk      : in std_logic;
     wci_Reset_n  : in std_logic;
@@ -52,7 +52,7 @@ architecture rtl of metadata_rv is
   --end function;
 
   --constant metamem : meta_t := initmeta;
-  constant addr_width : natural := ocpi.util.width_for_max(romwords-1);
+  constant addr_width : natural := ocpi.util.width_for_max(to_integer(rom_words)-1);
   signal dout : std_logic_vector(31 downto 0);
   signal addr : std_logic_vector(addr_width-1 downto 0);
 begin
@@ -70,7 +70,7 @@ begin
   -- Instance the ROM filled from generated metadata file
   rom : component util.util.ROM
     generic map(WIDTH    => 32,
-                SIZE     => romwords,
+                SIZE     => to_integer(rom_words),
                 INITFILE => "metadatarom.dat")
        port map(CLK      => wci_Clk,
                 ADDR     => addr,

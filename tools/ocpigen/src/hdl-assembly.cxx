@@ -281,7 +281,11 @@ parseHdlAssy() {
       ((err = addProperty("<property name='sdp_width' type='uchar' parameter='true' "
 			 "default='1'/>", true)) ||
        (err = addProperty("<property name='sdp_length' type='ushort' parameter='true' "
-			  "default='32'/>", true))))
+			  "default='32'/>", true)) ||
+       // This parameter is in fact patched at the last moment when containers are built
+       (m_type == Container &&
+	(err = addProperty("<property name='rom_words' type='ushort' parameter='true' "
+			   "default='1024'/>", true)))))
     return err;
   ::Assembly *a = m_assembly = new ::Assembly(*this);
 
@@ -638,7 +642,10 @@ parseHdlAssy() {
   // rather than a clock signal that is part of the connection's signal bundles
   for (ConnectionsIter ci = a->m_connections.begin(); ci != a->m_connections.end(); ci++) {
     Connection &c = **ci;
-    if (c.m_clock && !c.m_clock->m_internal) {// && c.m_clock->m_output)
+    // We consider connections which have a clock that is not internal but also is not
+    // the clock of the external assembly port of this connection
+    if (c.m_clock && !c.m_clock->m_internal) {
+      //	!(c.m_external && c.m_clock->m_port == c.m_external->m_instPort.m_port)) {// && c.m_clock->m_output)
       for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
 	(**ai).m_instPort.m_clockSignal = c.m_clock->m_signal;
       // If this non-internal clock is not associated with any port, it must be exported.
