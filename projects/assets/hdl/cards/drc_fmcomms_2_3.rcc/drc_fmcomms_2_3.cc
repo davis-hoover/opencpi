@@ -125,6 +125,8 @@ public:
       stream.include_sampling_rate_Msps(channel.sampling_rate_Msps, channel.tolerance_sampling_rate_Msps);
       stream.include_samples_are_complex(channel.samples_are_complex);
       stream.include_gain_mode(channel.gain_mode);
+      if (!stream.get_gain_mode().compare("manual"))
+        stream.include_gain_dB(channel.gain_dB, channel.tolerance_gain_dB);
     }
     // Ideally we would validate them here, but not now.
     return RCC_OK;
@@ -140,8 +142,15 @@ public:
     }
     return RCC_OK;
   }
-  RCCResult stop_config(unsigned /*config*/) {
-    return RCC_OK;
+  RCCResult stop_config(unsigned config) {
+    log(8, "DRC: stop_config: %u", config);
+    return RCC_OK; 
+  }
+  RCCResult release_config(unsigned /*config*/) {
+    log(8, "DRC: release_config");
+    return m_ctrlr.shutdown() ?
+      setError("transceiver shutdown was unsuccessful, set OCPI_LOG_LEVEL to 8 "
+               "(or higher) for more info") : RCC_OK;
   }
 };
 

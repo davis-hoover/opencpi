@@ -54,6 +54,55 @@ protected:
       }
     return RCC_OK;
   }
+  RCCResult stop_config(unsigned config, bool /*atStop*/) {
+    log(8, "STOPPING DRC PROXY CONFIGURATION: %u", config);
+    switch (m_properties.status.data[config].state) {
+      case STATUS_STATE_INACTIVE:
+        return RCC_OK;
+      case STATUS_STATE_PREPARED:
+	return RCC_OK;
+      case STATUS_STATE_OPERATING:
+	log(8, "STOPPING CONFIG");
+	return stop_config(config);
+      case STATUS_STATE_ERROR: 
+      default:
+        return setError("Configuration %u is in an error state and cannot be started", config);
+    }
+  }
+  RCCResult stop() {
+    log(8, "STOPPING DRC PROXY");
+    size_t nConfigs = m_properties.configurations.size();
+    RCCResult rc;
+    for (size_t n = 0; n < nConfigs; ++n) {
+      if ((rc = stop_config(n,true)))
+        return rc; 
+    }
+    return RCC_OK;
+  }
+  RCCResult release_config(unsigned config, bool /*atRelease*/) {
+    log(8, "RELEASING DRC PROXY CONFIGURATION: %u", config);
+    switch (m_properties.status.data[config].state) {
+      case STATUS_STATE_INACTIVE:
+        return RCC_OK;
+      case STATUS_STATE_PREPARED:
+      case STATUS_STATE_OPERATING:
+	log(8, "RELEASING CONFIG");
+	return release_config(config);
+      case STATUS_STATE_ERROR: 
+      default:
+	return setError("Configuration %u is in an error state and cannot be started", config);
+    }
+  }
+  RCCResult release() {
+    log(8, "RELEASING DRC PROXY");
+    size_t nConfigs = m_properties.configurations.size();
+    RCCResult rc;
+    for (size_t n = 0; n < nConfigs; ++n) {
+      if ((rc = release_config(n, true)))
+        return rc;
+    }
+    return RCC_OK;
+  }
   // Initialize status for config if not already present.
   // This config is already error checked
   void init_status(unsigned config) {
@@ -96,7 +145,7 @@ protected:
   // notification that stop property has been written
   RCCResult stop_written() {
     log(8, "stop config %u", m_properties.stop);
-    RCCResult rc = stop_config(m_properties.stop);
+    RCCResult rc = stop_config(m_properties.stop, false);
     m_properties.status.data[m_properties.stop].state =
       rc == RCC_OK ? STATUS_STATE_PREPARED : STATUS_STATE_ERROR;
     return rc;
@@ -134,7 +183,7 @@ protected:
   virtual RCCResult prepare_config(unsigned /*config*/) { return RCC_OK; }; // default if only start is used
   virtual RCCResult start_config(unsigned config) = 0;
   virtual RCCResult stop_config(unsigned config) = 0;
-  virtual RCCResult release_config(unsigned /*config*/) { return RCC_OK; };
+  virtual RCCResult release_config(unsigned /*config*/) = 0;
   virtual RCCResult status_config(unsigned /*config*/) { return RCC_OK; };
 };
 } // DRC

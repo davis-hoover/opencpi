@@ -640,6 +640,10 @@ Meas<config_value_t> RadioCtrlrNoOSTuneResamp::get_gain_dB(
   return meas;
 }
 
+bool RadioCtrlrNoOSTuneResamp::shutdown() {
+  return ad9361_set_en_state_machine_mode(_ad9361_rf_phy, ENSM_MODE_ALERT);
+}
+
 RadioCtrlrNoOSTuneResamp::~RadioCtrlrNoOSTuneResamp() {
   // only free internally managed No-OS memory
   ad9361_free(_ad9361_rf_phy); // this function added in ad9361.patch
