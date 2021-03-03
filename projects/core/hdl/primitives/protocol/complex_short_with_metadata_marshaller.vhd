@@ -243,7 +243,9 @@ begin
           state                <= SAMPLES;
           force_end_of_samples <= '0';
         else
-          state                <= IDLE;
+          if (state_r /= EOF) then
+            state              <= IDLE;
+          end if;
           force_end_of_samples <= '0';
         end if;
       end if;

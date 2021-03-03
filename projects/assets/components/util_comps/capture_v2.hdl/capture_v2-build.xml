@@ -3,7 +3,10 @@
     <parameter name='numRecords' value='256'/>
     <parameter name='numDataWords' value='1024'/>
   </configuration>
-
+  <configuration id='1'>
+    <parameter name='numRecords' value='256'/>
+    <parameter name='numDataWords' value='8192'/>
+  </configuration>
   <!--
   This configuration will use up 94.29% (132 out 140 36Kb Blocks) of the Block RAM on the Zynq-7020
 
@@ -11,7 +14,7 @@
   errors out because this config creates a large array and creates a long argument list for the verify_case script.
   See AV-5611. Once AV-5610/AV-5611 are resolved uncomment this configuration.
 
-  <configuration id='1'>
+  <configuration id='2'>
     <parameter name='numRecords' value='512'/>
     <parameter name='numDataWords' value='98000'/>
   </configuration>

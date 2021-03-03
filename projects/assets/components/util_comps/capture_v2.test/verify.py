@@ -37,6 +37,7 @@ stopOnFull = os.environ.get("OCPI_TEST_stopOnFull")
 propsname = os.path.splitext(sys.argv[1])[0]
 propsname = os.path.splitext(propsname)[0] + ".props"
 
+max_bytes = 16384
 
 # Do some parsing to grab the final values of the properties
 ofile = open(propsname, 'r')
@@ -46,13 +47,14 @@ obj1 = re.search(r'capture_v2 metadataCount (\w+)', lines)
 obj2 = re.search(r'capture_v2 dataCount (\w+)', lines)
 obj3 = re.search(r'capture_v2 metaFull (\w+)', lines)
 obj4 = re.search(r'capture_v2 dataFull (\w+)', lines)
-obj5 = re.search(r'\bcapture_v2 metadata\b', lines)
-obj6 = re.search(r'\bcapture_v2 data\b', lines)
-obj7 = re.search("capture_v2 ocpi_debug", lines)
-metadata =  [int(x) for x in lines[obj5.end()+1:obj6.start()-1].replace("{", "").replace("}", "").split(',')]
+obj5 = re.search(r'capture_v2 totalBytes (\w+)', lines)
+obj6 = re.search(r'\bcapture_v2 metadata\b', lines)
+obj7 = re.search(r'\bcapture_v2 data\b', lines)
+obj8 = re.search("capture_v2 ocpi_debug", lines)
+metadata =  [int(x) for x in lines[obj6.end()+1:obj7.start()-1].replace("{", "").replace("}", "").split(',')]
 # u4 is uint32 and setting it to little endian with "<"
 dt = np.dtype('<u4')
-odata = np.array(lines[obj6.end()+1:obj7.start()-1].split(','), dtype=dt)
+odata = np.array(lines[obj7.end()+1:obj8.start()-1].split(','), dtype=dt)
 
 metadataCount = int(obj1.group(1))
 dataCount = int(obj2.group(1))
@@ -60,12 +62,14 @@ numRecords = int(os.environ.get("OCPI_TEST_numRecords"))
 numDataWords = int(os.environ.get("OCPI_TEST_numDataWords"))
 metaFull = obj3.group(1)
 dataFull = obj4.group(1)
+totalBytes = int(obj5.group(1))
 stopOnZLM = os.environ.get("OCPI_TEST_stopOnZLM")
 stopZLMOpcode = int(os.environ.get("OCPI_TEST_stopZLMOpcode"))
 stopOnEOF = os.environ.get("OCPI_TEST_stopOnEOF")
 testScenario = int(os.environ.get("OCPI_TEST_testScenario"))
 
 print ("    stopOnFull: " + stopOnFull)
+print ("    totalBytes: " + str(totalBytes))
 print ("    metadataCount: " + str(metadataCount))
 print ("    dataCount: " + str(dataCount))
 print ("    numRecords: " + str(numRecords))
@@ -84,34 +88,17 @@ print ("    testScenario: " + str(testScenario))
 # Check if the metadata words, message size and opcode, are correct. Also check
 # if eom and som fraction timestamps are non-zero and are incrementing
 # Check if data is correct
-if testScenario == 1:
-    verify_funcs.verify_metadataCount1(metadataCount)
-    verify_funcs.verify_dataCount1(dataCount)
+# Check if totalBytes is correct
+
+if testScenario in [1,2,3,4,5]:
+    verify_funcs.verify_metadataCount(testScenario, metadataCount, numRecords)
+    verify_funcs.verify_dataCount(testScenario, dataCount, numDataWords, metadataCount, numRecords, stopOnFull)
     verify_funcs.verify_status(metaFull, dataFull, dataCount, numDataWords,metadataCount, numRecords)
-elif testScenario == 2:
-    verify_funcs.verify_metadataCount2(metadataCount, numRecords, stopOnFull)
-    verify_funcs.verify_dataCount1(dataCount)
-    verify_funcs.verify_status(metaFull, dataFull, dataCount, numDataWords,metadataCount, numRecords)
-    verify_funcs.verify_metadata1(metadata,metadataCount,stopOnFull, numRecords)
-elif testScenario == 3:
-    verify_funcs.verify_metadataCount3(metadataCount, numRecords, stopOnFull)
-    verify_funcs.verify_dataCount2(dataCount,numDataWords, stopOnFull)
-    verify_funcs.verify_status(metaFull, dataFull, dataCount, numDataWords,metadataCount, numRecords)
-    verify_funcs.verify_metadata2(metadata,numRecords,numDataWords,stopOnFull)
-    verify_funcs.verify_data1(odata, dataCount, numDataWords, stopOnFull)
-elif testScenario == 4:
-    verify_funcs.verify_metadataCount2(metadataCount, numRecords, stopOnFull)
-    verify_funcs.verify_dataCount3(dataCount,numDataWords, metadataCount, numRecords,stopOnFull)
-    verify_funcs.verify_status(metaFull, dataFull, dataCount, numDataWords,metadataCount, numRecords)
-    verify_funcs.verify_metadata3(metadata,metadataCount,numRecords,stopOnFull,numDataWords)
-    verify_funcs.verify_data2(odata, stopOnFull, numDataWords,numRecords)
-elif testScenario == 5:
-    verify_funcs.verify_metadataCount4(metadataCount)
-    verify_funcs.verify_dataCount1(dataCount)
-    verify_funcs.verify_status(metaFull, dataFull, dataCount, numDataWords,metadataCount, numRecords)
-    verify_funcs.verify_metadata4(metadata, stopZLMOpcode)
+    verify_funcs.verify_metadata(testScenario, metadata, metadataCount, stopZLMOpcode, max_bytes)
+    verify_funcs.verify_data(testScenario, odata, dataCount, numDataWords, numRecords, stopOnFull)
+    verify_funcs.verify_totalBytes(testScenario, totalBytes, numDataWords, numRecords)
 else:
-    print("Invalid testScenario: valid testScenario are 1, 2, 3 and 4")
+    print("Invalid test scenario: valid test scenarios are 1, 2, 3, 4 and 5")
     sys.exit(1)
 
 print ("    Data matched expected results")

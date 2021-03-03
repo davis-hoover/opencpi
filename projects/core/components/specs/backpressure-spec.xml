@@ -10,6 +10,6 @@
 
   <DataInterfaceSpec Name="in" Producer="false"/>
   <!-- Set the output buffer size to match the input, which may be connected to a port with a protocol-->
-  <DataInterfaceSpec Name="out" Producer="true" buffersize='in'/>
+  <DataInterfaceSpec Name="out" Producer="true" buffersize="in"/>
 
 </ComponentSpec>
