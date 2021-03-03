@@ -481,12 +481,16 @@ HdlContainer(HdlConfig &config, HdlAssembly &appAssembly, ezxml_t xml, const cha
     if (p.m_type == WTIPort)
       emitTimeClient(assy, m_appAssembly.m_implName, p.pname(), &p);
   }
+  // The 0xabcd value is a signature that will be replaced at the last moment
+  // in the build process
   OU::formatAdd(assy,
-		"  <instance worker='metadata'/>\n"
-		"    <connection>\n"
-		"     <port instance='metadata' name='metadata'/>\n"
-		"     <port instance='pfconfig' name='metadata'/>\n"
-		"    </connection>\n");
+		"  <instance worker='metadata'>\n"
+		"    <property name='rom_words' value='0xabcd'/>\n"
+		"  </instance>\n"
+		"  <connection>\n"
+		"    <port instance='metadata' name='metadata'/>\n"
+		"    <port instance='pfconfig' name='metadata'/>\n"
+		"  </connection>\n");
   OU::formatAdd(assy, "</HdlContainerAssembly>\n");
   // The assembly will automatically inherit all the signals, prefixed by instance.
   //  if (!attribute)

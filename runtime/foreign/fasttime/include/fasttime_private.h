@@ -95,13 +95,37 @@ typedef union _tick_t {
 } tick_t;
 
 #ifdef _CPU_ARM
+#include <time.h>
+#if 0
 static inline void get_tick_count(tick_t *t)
 {
+     unsigned cc;
+     static int init = 0;
+     if (!init) {
+         __asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 2" :: "r"(1<<31)); /* stop the cc */
+         __asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 0" :: "r"(5));     /* initialize */
+         __asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 1" :: "r"(1<<31)); /* start the cc */
+         init = 1;
+     }
+     __asm__ __volatile__ ("mrc p15, 0, %0, c9, c13, 0" : "=r"(cc));
+     t->ll = cc;
+}
+#else
+static inline void get_tick_count(tick_t *t)
+{
+#if 1
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC_RAW, &ts))
+    abort();
+  t->ll = (unsigned long)ts.tv_sec * 1000000000ull + (unsigned long)ts.tv_nsec;
+#else
   struct timeval tv;
   gettimeofday(&tv, NULL);
   t->l.high = tv.tv_sec;
   t->l.low = (uint32_t)((tv.tv_usec * ((uint64_t)0x100000000ull + 500))/1000);
+#endif
 }
+#endif
 #endif
 /* Tick count code for PowerPC (Apple G3, G4, G5) */
 #ifdef _CPU_POWERPC

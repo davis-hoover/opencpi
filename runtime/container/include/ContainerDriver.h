@@ -100,6 +100,7 @@ namespace OCPI {
 	return getSingleton().getTransportManagerInternal(params);
       }
       static bool dynamic();
+      static bool optimized();
     private:
       // Globals dependant on polling
       OCPI::DataTransport::TransportManager *m_tpg_events, *m_tpg_no_events;

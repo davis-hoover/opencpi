@@ -239,6 +239,7 @@ $(call ArtifactXmlFile,$1,$2,1): $(call RccAssemblyFile,$1,$2) $$(ObjectFiles_$1
              -H $(call RccArch,$1) \
 	     -P $(call RccRealPlatforms,$3) \
 	     -Z $(call OcpiIsDynamic,$3) \
+	     -Q $(call OcpiIsOptimized,$3) \
 	     -D $(call WkrTargetDir,$1,$2) -A $(RccAssemblyFile)
 
 endef

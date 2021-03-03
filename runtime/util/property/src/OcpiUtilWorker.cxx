@@ -305,6 +305,7 @@ namespace OCPI {
       if ((cp = ezxml_cattr(x, "opencpiVersion"))) m_opencpiVersion = cp;
       if ((cp = ezxml_cattr(x, "uuid"))) m_uuid = cp;
       OE::getBoolean(x, "dynamic", &m_dynamic);
+      OE::getBoolean(x, "optimized", &m_optimized);
       validate();
     }
 

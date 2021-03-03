@@ -235,7 +235,7 @@ getComponentLibraries(const char *libs, const char *model, bool topSpecs, Ordere
 	dir += "/lib";
       } else
 	dir = pDir + "/lib/" + lib;
-      ocpiInfo("Trying DIR: %s", dir.c_str());
+      ocpiDebug("Trying DIR: %s", dir.c_str());
       if (OF::exists(dir)) {
 	found.insert(lib);
 	dirs.push_back(dir);
@@ -250,7 +250,7 @@ getComponentLibraries(const char *libs, const char *model, bool topSpecs, Ordere
       return OU::esprintf("component library \"%s\" not found in this project or any one it depends on",
 			  it->c_str());
   for (auto it = dirs.begin(); it != dirs.end(); ++it) {
-    ocpiInfo("Final dir: %s", it->c_str());
+    ocpiDebug("Final dir: %s", it->c_str());
     const char *slash = strrchr(it->c_str(), '/');
     assert(slash);
     if (model && strcmp(slash + 1, "specs")) {

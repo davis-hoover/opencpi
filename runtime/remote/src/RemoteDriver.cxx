@@ -338,7 +338,7 @@ class Container
 public:
   Container(Client &client, const std::string &a_name,
 	    const char *a_model, const char *a_os, const char *a_osVersion, const char *a_arch,
-	    const char *a_platform, const char *a_dynamic, const char *a_transports,
+	    const char *a_platform, const char *build, const char *a_transports,
             const OA::PValue* /*params*/)
     throw ( OU::EmbeddedException )
     : OC::ContainerBase<Driver,Container,Application,Artifact>(*this, a_name.c_str()),
@@ -373,7 +373,15 @@ public:
 		   optionsOut);
       a_transports += nChars;
     }
-    OX::parseBool(a_dynamic, NULL, &m_dynamic);
+    // Decode build options just like in the build scripts
+    if (*build == 'd') {
+      m_dynamic = true;
+      ++build;
+    }
+    if (*build == 'o') {
+      m_optimized = true;
+      ++build;
+    }
   }
   virtual ~Container()
   throw () {
@@ -421,20 +429,22 @@ Worker(Application & app, Artifact *art, const char *a_name, ezxml_t impl, ezxml
 Driver::Driver() throw() {
   ocpiCheck(pthread_key_create(&s_threadKey, NULL) == 0);
   ocpiDebug("Registering the Remote Container driver");
+#if 0
   const char *env = getenv("OCPI_ENABLE_REMOTE_DISCOVERY");
   if ((m_doNotDiscover = env && env[0] == '1' ? false : true))
     ocpiInfo("Remote container discovery is off.  Use OCPI::API::enableServerDiscovery() or the OCPI_ENABLE_REMOTE_DISCOVERY variable described in the Application Guide.");
+#endif
 }
 
 // The driver entry point to deal with explicitly specified servers, in params or the environment
 bool Driver::
-useServers(const OU::PValue *params, bool verbose, std::string &error) {
+useServers(const OU::PValue *params, bool verbose, bool discovery, unsigned &count, std::string &error) {
   char *saddr = getenv("OCPI_SERVER_ADDRESS");
-  if (saddr && probeServer(saddr, verbose, NULL, NULL, false, error))
+  if (saddr && probeServer(saddr, verbose, NULL, NULL, discovery, count, error))
     return true;
   if ((saddr = getenv("OCPI_SERVER_ADDRESSES")))
     for (OU::TokenIter li(saddr); li.token(); li.next())
-      if (probeServer(li.token(), verbose, NULL, NULL, false, error))
+      if (probeServer(li.token(), verbose, NULL, NULL, discovery, count, error))
 	return true;
   saddr = getenv("OCPI_SERVER_ADDRESSES_FILE"); // This is documented and consistent
   if (saddr || (saddr = getenv("OCPI_SERVER_ADDRESS_FILE"))) {
@@ -444,14 +454,14 @@ useServers(const OU::PValue *params, bool verbose, std::string &error) {
       throw OU::Error("The file indicated by the OCPI_SERVER_ADDRESS_FILE environment "
 		      "variable, \"%s\", cannot be opened: %s", saddr, err);
     for (OU::TokenIter li(addrs); li.token(); li.next())
-      if (probeServer(li.token(), verbose, NULL, NULL, false, error))
+      if (probeServer(li.token(), verbose, NULL, NULL, discovery, count, error))
 	return true;
   }
   for (const OU::PValue *p = params; p && p->name; ++p)
     if (!strcasecmp(p->name, "server")) {
       if (p->type != OA::OCPI_String)
 	throw OU::Error("Value of \"server\" parameter is not a string");
-      if (probeServer(p->vString, verbose, NULL, NULL, false, error))
+      if (probeServer(p->vString, verbose, NULL, NULL, discovery, count, error))
 	return true;
     }
   return false;
@@ -461,15 +471,18 @@ void Driver::
 configure(ezxml_t xml) {
   OCPI::Driver::Driver::configure(xml);
   std::string error;
+#if 0
   if (useServers(NULL, false, error))
     ocpiBad("Error during remote server processing: %s", error.c_str());
+#endif
 }
 // Called either from UDP discovery or explicitly, e.g. from ocpirun
 // If the latter, the "containers" argument will be NULL
 bool Driver::
-probeServer(const char *server, bool verbose, const char **exclude, char *containers,
-	    bool discovery, std::string &error) {
-  ocpiInfo("probing remote container server: %s", server);
+probeServer(const char *a_server, bool verbose, const char **exclude, char *containers,
+	    bool discovery, unsigned &count, std::string &error) {
+  const char *server = a_server[0] == '?' ? a_server + 1 : a_server;
+  ocpiInfo("Probing remote container server: %s", server);
   error.clear();
   OS::Socket *sock = NULL;
   uint16_t port;
@@ -495,7 +508,12 @@ probeServer(const char *server, bool verbose, const char **exclude, char *contai
     try {
       sock = new OS::Socket(host, port);
     } catch (const std::string &e) {
-      return OU::eformat(error, "Error connecting to server \"%s\": %s", server, e.c_str());
+      if (a_server[0] == '?') {
+	ocpiInfo("Could not use remote container server \"%s\" due to: %s", server, e.c_str());
+	goto out;
+      }
+      // Throw an exception here since explicit servers are an error
+      throw OU::Error("Error connecting to server \"%s\": %s", server, e.c_str());
     }
     std::string request("<discover>");
     bool eof;
@@ -546,12 +564,12 @@ probeServer(const char *server, bool verbose, const char **exclude, char *contai
       taken = true;
     }
     if (verbose || discovery)
-      printf("%-35s  platform %s, model %s, os %s, version %s, arch %s, dynamic %s\n",
+      printf("%-35s  platform %s, model %s, os %s, version %s, arch %s, build %s\n",
 	     cname.c_str(), args[5], args[1], args[2], args[3], args[4], args[6]);
     if (verbose)
       printf("  Transports: %s\n", cp);
     ocpiDebug("Creating remote container: \"%s\", model %s, os %s, version %s, arch %s, "
-	      "platform %s dynamic %s",
+	      "platform %s build %s",
 	      cname.c_str(), args[1], args[2], args[3], args[4], args[5], args[6]);
     ocpiDebug("Transports are: '%s'", cp);
     if (!discovery) {
@@ -569,7 +587,11 @@ probeServer(const char *server, bool verbose, const char **exclude, char *contai
     delete sock;
   if (rx)
     ezxml_free(rx);
-  return !error.empty();
+  if (error.empty()) {
+    ++count;
+    return false;
+  }
+  return true;
 }
 
 OC::Container *Driver::
@@ -623,7 +645,7 @@ trySocket(std::set<std::string> &servers, OE::Interface &ifc, OE::Socket &s, OE:
 	  ocpiDebug("Received redundant server discovery response from: \"%s\"", response);
 	  continue;
 	}
-	if (probeServer(response, verbose, exclude, cp, discovery, error))
+	if (probeServer(response, verbose, exclude, cp, discovery, count, error))
 	  ocpiBad("Discovered server error: %s", error.c_str());
       }
     }
@@ -671,13 +693,29 @@ tryIface(std::set<std::string> &servers, OE::Interface &ifc, OE::Address &devAdd
 // whatever containers are local to that server/system
 unsigned Driver::
 search(const OA::PValue* params, const char **exclude, bool discoveryOnly) {
-  ocpiInfo("Remote container discovery is on and proceeding");
+  ocpiInfo("Discovering remote container servers");
+  bool verbose = false;
   std::string error;
   unsigned count = 0;
+  OU::findBool(params, "verbose", verbose);
+  // Probe servers in the environment
+  if (useServers(NULL, verbose, discoveryOnly, count, error)) {
+    ocpiInfo("Error during explicit container server discovery: %s", error.c_str());
+    return count;
+  }
+  // Suppress auto-discovery via the environment
+  const char *env = getenv("OCPI_ENABLE_REMOTE_DISCOVERY");
+  if (!env || env[0] != '1') {
+    ocpiInfo("Remote container multicast discovery is off.  "
+	     "Use OCPI::API::enableServerDiscovery() or the OCPI_ENABLE_REMOTE_DISCOVERY variable "
+	     "described in the Application Guide.");
+    return count;
+  }
+  ocpiInfo("Remote container discovery is on and proceeding");
   OE::IfScanner ifs(error);
   if (error.size())
     return 0;
-  bool printOnly = discoveryOnly, verbose = false;
+  bool printOnly = discoveryOnly;
   OU::findBool(params, "printOnly", printOnly);
   OU::findBool(params, "verbose", verbose);
   const char *ifName = NULL;

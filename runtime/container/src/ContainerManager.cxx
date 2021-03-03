@@ -152,6 +152,10 @@ namespace OCPI {
     dynamic() {
       return OCPI_DYNAMIC;
     }
+    bool Manager::
+    optimized() {
+      return !OCPI_DEBUG;
+    }
     void Manager::
     cleanForContextX(void *context) {
       for (Driver *d = firstChild(); d; d = d->nextChild())

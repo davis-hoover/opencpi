@@ -58,6 +58,10 @@ tryDir() {
 # These are universally available so far so we do this once and pass then to all probes.
 HostSystem=`uname -s | tr A-Z a-z`
 HostProcessor=`uname -m | tr A-Z a-z`
+# These are so this script can be used during bootstrapping the environment when these two
+# variables are not already committed in the environment
+[ -n "$2" ] && OCPI_CDK_DIR=$2
+[ -n "$3" ] && OCPI_ROOT_DIR=$3
 
 # Collect all known projects. Append with the default read-only core project
 # in case this is a limited runtime-only system with no project registry

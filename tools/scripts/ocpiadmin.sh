@@ -83,6 +83,10 @@ Optional args:
                         The OpenCPI Package ID that provides PLATFORM
   -u URL, --url URL     Use this URL when cloning the remote or local git repo
                         instead of the default url determined by PKG_ID
+  --optimize            Use this option to install a software platform built with optimization,
+                        at the expense of debugging.
+  -u URL, --url URL     Use this URL when cloning the remote or local git repo
+                        instead of the default url determined by PKG_ID
 Examples:
   # xsim
   ocpiadmin install platform xsim
@@ -168,7 +172,14 @@ while (( "$#" )); do
       verbose=-v
       shift
       ;;
-
+    --optimize)
+      optimize=1
+      shift
+      ;;
+    --dynamic)
+      dynamic=1
+      shift
+      ;;
     # Unsupported flags
     -*)
       HELP=1  # can't print usage yet as usage message is based on other args
@@ -342,6 +353,16 @@ else
     fi
 fi
 if [ "$model" = RCC ]; then
+    if [ -n "$dynamic" -o -n "$optimize" ]; then
+	if [[ $platform_target_dir == *-* ]]; then
+	    echo "ERROR: you cannot use the --dynamic(-d) or the --optimize(-O) options when you have" >&2
+	    echo "       included build options in the platform name, in this case: $platform_target_dir" >&2
+	    exit 1
+	fi
+	platform_target_dir+=-
+	[ -n "$dynamic" ] && platform_target_dir+=d
+	[ -n "$optimize" ] && platform_target_dir+=o
+    fi
     ./scripts/install-opencpi.sh $platform_target_dir || exit 1
 else
     ocpidev -d projects/core build --hdl --hdl-platform=$platform

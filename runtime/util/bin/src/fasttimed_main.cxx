@@ -203,7 +203,7 @@ int main(int argc, char **argv)
     for (;;)
     {
         if (!shutdown_flag)
-            sleep(loop_delay);
+	  sleep((unsigned)loop_delay);
         if (shutdown_flag)
             break;
 

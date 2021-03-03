@@ -57,7 +57,7 @@ typedef std::vector<InstanceProperty> InstanceProperties;
 
 class Assembly;
 struct Instance : public OU::IdentResolver {
-  //  OCPI::Util::Assembly::Instance *m_instance; // instance in the underlying generic assembly
+  ::Assembly *m_assy;
   ezxml_t     m_xml;
   std::string m_name;
   std::string m_wName;
@@ -96,6 +96,7 @@ struct Instance : public OU::IdentResolver {
   void emitHdl(FILE *f, const char *prefix, size_t &index);
   void emitDeviceConnectionSignals(FILE *f, Worker &assy);
   const char *getValue(const char *sym, OU::ExprValue &val) const;
+  const char *addParameters(const OU::Assembly::Properties &aiprops, InstanceProperty *&ipv);
 };
 // To represent an attachment of a connection to an instance port.
 // This is currently only used for indexed ports
@@ -154,8 +155,6 @@ class Assembly {
     *findPort(OU::Assembly::Port &ap, InstancePort *&found),
     // Add the assembly's parameters to the instance's parameter values list, as needed
     *addAssemblyParameters(OCPI::Util::Assembly::Properties &aips),
-    *addInstanceParameters(const Worker &w, const OU::Assembly::Properties &aiprops,
-			   InstanceProperty *&ipv),
     *insertAdapter(Connection &c, InstancePort &from, InstancePort &to),
     *parseConnection(OCPI::Util::Assembly::Connection &aConn);
 void addParamConfigParameters(const ParamConfig &pc, const OU::Assembly::Properties &aiprops,

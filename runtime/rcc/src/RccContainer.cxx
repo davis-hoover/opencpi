@@ -85,7 +85,10 @@ Container(const char *a_name, const OA::PValue* /* params */)
   addTransport("ocpi-ether-rdma", NULL, OR::ActiveFlowControl, OR::ActiveMessage,
 	       (1 << OR::ActiveFlowControl) | (1 << OR::FlagIsMeta),
 	       (1 << OR::ActiveMessage) | (1 << OR::FlagIsMeta));
+  // We inherit these attribute from the core framework build, although since the RCC container driver
+  // is itself a loadable plugin, it could theoretically have its own attributes
   m_dynamic = OC::Manager::dynamic();
+  m_optimized = OC::Manager::optimized();
   if (parent().m_platform.size())
     m_platform = parent().m_platform;
   initWorkQueues();
