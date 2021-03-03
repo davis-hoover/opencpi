@@ -28,7 +28,6 @@ architecture rtl of worker is
   signal adc_data_widener_oprotocol : protocol_t := PROTOCOL_ZERO;
   signal adc_data_widener_oeof      : std_logic := '0';
 
-  signal adc_out_marshaller_irdy   : std_logic := '0';
   signal dev_ready                 : bool_t;
 
   signal ctl_suppress_sync_opcode  : bool_t;
@@ -101,7 +100,9 @@ begin
       end if;
     end process;
     
-    ctl_suppress_sync_opcode <= props_in.suppress_sync_opcode_written and props_in.suppress_sync_opcode and ctl_in.is_operating;
+    ctl_suppress_sync_opcode <= props_in.suppress_sync_opcode and 
+                                ctl_in.is_operating;
+                                
     suppress_sync_opcode_cdc : cdc.cdc.single_bit
     generic map(
       N    =>  2,
@@ -145,28 +146,27 @@ begin
         irdy       => adc_data_widener_irdy,
         -- OUTPUT INTERFACE
         oprotocol  => adc_data_widener_oprotocol,
-        ordy       => adc_out_marshaller_irdy);
+        ordy       => out_in.ready);
 
     out_marshaller : protocol.complex_short_with_metadata.out_port_cswm_samples_and_sync
       generic map(
         WSI_DATA_WIDTH => to_integer(OUT_PORT_DATA_WIDTH),
         WSI_MBYTEEN_WIDTH => out_out.byte_enable'length)
       port map(
-        clk              => dev_in.clk,
-        rst              => adc_rst,
+        clk               => dev_in.clk,
+        rst               => adc_rst,
         -- INPUT
-        iprotocol        => adc_data_widener_oprotocol,
-        oready           => out_in.ready,
-        suppress_sync_op => adc_suppress_sync_opcode,
+        iprotocol         => adc_data_widener_oprotocol,
+        iready            => out_in.ready,
+        isuppress_sync_op => adc_suppress_sync_opcode,
         -- OUTPUT
-        odata            => adc_data,
-        ovalid           => out_out.valid,
-        obyte_enable     => out_out.byte_enable,
-        ogive            => out_out.give,
-        osom             => out_out.som,
-        oeom             => out_out.eom,
-        oopcode          => adc_opcode,
-        iready           => adc_out_marshaller_irdy);
+        odata             => adc_data,
+        ovalid            => out_out.valid,
+        obyte_enable      => out_out.byte_enable,
+        ogive             => out_out.give,
+        osom              => out_out.som,
+        oeom              => out_out.eom,
+        oopcode           => adc_opcode);
 
     out_clk_gen : util.util.in2out
       port map(

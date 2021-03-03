@@ -24,7 +24,7 @@
                                 Description="Which clock primitive to use"/>
 
     <Port Name="in"/>
-    <Port Name="out" Producer="true"/>
+    <Port Name="out" Producer="true" buffersize="in"/>
   </ComponentSpec>
   <Property Name="M" Type="float"
                               Parameter="true"

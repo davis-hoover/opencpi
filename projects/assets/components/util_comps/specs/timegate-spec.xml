@@ -4,7 +4,7 @@
             type='bool'
             writable='true'
             default='false'
-            description='Ignored/drops timestamps, disabling the timegating functionality.'/>
+            description='Ignore/drops timestamps, disabling the timegating functionality.'/>
   <Property name='time_correction'
             type='ulong'
             writable='true'

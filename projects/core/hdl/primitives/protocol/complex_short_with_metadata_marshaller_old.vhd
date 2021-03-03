@@ -215,7 +215,7 @@ begin
   end process imetadata_demux;
 
   ogen : process(state, iprotocol_r, message_sizer_som, message_sizer_eom,
-                 force_end_of_samples, oready, iprotocol_r, iprotocol_r2)
+                 force_end_of_samples, oready, iprotocol_r2)
   begin
     case state is
       when SAMPLES =>

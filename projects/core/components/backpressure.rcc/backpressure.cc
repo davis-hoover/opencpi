@@ -58,41 +58,13 @@ class BackpressureWorker : public BackpressureWorkerBase {
         }
 
         //treating the buffers as arrays of unsigned bytes
-         const uint8_t  *inData  = static_cast<const uint8_t*>(in.data());
-         uint8_t *outData =  static_cast<uint8_t*>(out.data());
+        const uint8_t  *inData  = static_cast<const uint8_t*>(in.data());
+        uint8_t *outData =  static_cast<uint8_t*>(out.data());
 
-        // if the output buffer is larger than the input, then the data can safely
-        // be copied from input to output
-        if (in.length() <= out.length()) {
-            memcpy(outData, inData, in.length());
-            out.setLength( in.length() );
-            lastBufferComplete = true;
-            return RCC_ADVANCE;
-        } else {
-            // if the input buffer is larger than output, the data needs to be broken up
-            // and sent in chunks.
-            if ( lastBufferComplete ) {
-                myBufferSize = in.length();
-                lastBufferComplete = false;
-                myBufferIndex = 0;
-            }
-
-            size_t copyAmount = myBufferSize - myBufferIndex;
-            // If this the end of the input buffer, only copy the remaining data
-            // Else, copy the maximum amount allowed by the size of the output buffer
-            if (copyAmount <= out.length()){
-                memcpy(outData, &inData[myBufferIndex], copyAmount);
-                out.setLength( copyAmount );
-                lastBufferComplete = true;
-                return RCC_ADVANCE;
-            } else{
-                memcpy(outData, &inData[myBufferIndex], out.length());
-                myBufferIndex += out.length();
-                out.setLength(out.length());
-                out.advance();
-                return RCC_OK;
-            }
-        }
+        out.checkLength(in.length());
+        memcpy(outData, inData, in.length());
+        out.setLength( in.length() );
+        return RCC_ADVANCE;
     }
 };
 
