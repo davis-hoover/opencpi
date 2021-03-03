@@ -84,6 +84,7 @@ Controller::~Controller()
 void Controller::
 init() {
   bool generated = false;
+  (void)generated;
 
   // We need to create transfers for every output and destination port
   // the exists in the context of this Transport (container)

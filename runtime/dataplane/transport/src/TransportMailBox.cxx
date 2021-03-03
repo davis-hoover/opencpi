@@ -59,15 +59,21 @@ static int check = compileTimeSizeCheck<sizeof(XF::Offset),sizeof(OCPI::Util::Re
 // Determine if the mail box is avialable
 bool XferMailBox::
 mailBoxAvailable(XF::EndPoint &/*ep*/) {
-  assert("container comms disabled"==0);
+  ocpiAbort("container comms disabled");
+  return false;
+#if 0
   ContainerComms &comms = *(ContainerComms *)NULL; // ep.containerComms();
   return (comms.mailBox[m_slot].request.header.type == ContainerComms::NoRequest) ? true : false;
+#endif
 }
 ContainerComms::MailBox* XferMailBox::
-getMailBox(XF::EndPoint &/*ep*/) {
-  assert("container comms disabled"==0);
+getMailBox(XF::EndPoint &ep) {
+  ocpiAbort("container comms disabled");
+  return (ContainerComms::MailBox*)&ep;
+#if 0
   ContainerComms &comms = *(ContainerComms *)NULL; // ep.containerComms();
   return &comms.mailBox[m_slot];
+#endif
 }
 
 // FIXME: move this to a new file along with the handshake stuff

@@ -178,8 +178,8 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
 		    arg);
     if (options.component()) {
       static char *copy;
-      asprintf(&copy,
-	       "<Application><instance component='%s' externals='1'/></application>", arg);
+      ocpiCheck(asprintf(&copy,
+			 "<Application><instance component='%s' externals='1'/></application>", arg) > 0);
       xml = ezxml_parse_str(copy, strlen(copy));
     } else {
       file = arg;
@@ -243,9 +243,9 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
       here.ptargets.push_back(NULL);
       targets = &here.ptargets[0];
     } else
-    // ========= end backwards compatibility
+      // ========= end backwards compatibility
       targets = options.target();
-    for (const char **tp = targets; *tp; ++tp)
+    for (const char **tp = targets; tp && *tp; ++tp)
       doTarget(*tp, options.specs() || options.list_specs());
     return false;
   } else if (options.list()) { // no xml here

@@ -114,6 +114,10 @@ bool
 #undef ocpiAssert
 #endif
 
+// When you really want to blow up with a string, even when asserts are off
+inline void ocpiAbort(const char *err) { ::OCPI::OS::assertionFailed(err, __FILE__, __LINE__); }
+// When you really want to ignore the return value even if the header has warn_ignore_result
+#define ocpiIgnore(...) do { auto _ignore_ret = __VA_ARGS__; (void)_ignore_ret; } while (0)
 #define ocpiWeird(...) ocpiLog(OCPI_LOG_WEIRD, __VA_ARGS__)
 #define ocpiInfo(...) ocpiLog(OCPI_LOG_INFO, __VA_ARGS__)
 #define ocpiBad(...) ocpiLog(OCPI_LOG_BAD, __VA_ARGS__)

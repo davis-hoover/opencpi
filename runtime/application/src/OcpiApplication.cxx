@@ -189,6 +189,7 @@ namespace OCPI {
     }
     unsigned ApplicationI::
     addContainer(unsigned container, bool existOk) {
+      (void)existOk;
       ocpiAssert(existOk || !(m_allMap & (1u << container)));
       return getUsedContainer(container);
     }
@@ -216,6 +217,7 @@ namespace OCPI {
     // For dynamic instances only, distribute them according to policy
     void ApplicationI::
     policyMap(Deployment &d, unsigned instNum) {
+      (void)instNum;
       // allMap is the bitmap of all suitable containers for the implementation
       d.m_usedContainers.resize(1, UINT_MAX);
       switch (m_cMapPolicy) {
@@ -972,6 +974,7 @@ namespace OCPI {
     }
     void ApplicationI::
     dumpDeployment(unsigned score) {
+      (void)score;
       ocpiDebug("Deployment with score %u is:", score);
       Instance *i = &m_instances[0];
       for (unsigned n = 0; n < m_nInstances; n++, i++) {

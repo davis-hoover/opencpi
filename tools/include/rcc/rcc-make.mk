@@ -61,8 +61,8 @@ else ifneq ($(origin RccTargets),undefined)
 else ifneq ($(origin RccTarget),undefined)
   RccTargets:=$(RccTarget)
 else ifeq ($(origin RccPlatforms),undefined)
-  ifdef OCPI_TARGET_PLATFORM
-    RccPlatforms:=$(OCPI_TARGET_PLATFORM)
+  ifdef OCPI_TARGET_DIR
+    RccPlatforms:=$(OCPI_TARGET_DIR)
   else ifdef OCPI_TOOL_PLATFORM
     # If no target platform was specified, and we are not cleaning, set to the running one
     ifeq ($(filter clean%,$(MAKECMDGOALS)),)
@@ -76,6 +76,14 @@ endif
 $(call OcpiDbgVar,RccPlatforms)
 $(call OcpiDbgVar,RccTargets)
 
+# Strip build options if they are present, from targets or platforms.
+# Relies on targets being triples and platforms being singles
+RccStripOptions=$(foreach n,$(words $(subst -, ,$1)),\
+                  $(if $(filter 1 3,$n),$1,$(subst -$(lastword $(subst -, ,$1))!,,$1!)))
+# Return the options suffix, including the dash, by itself if there are no options
+RccGetOptions=$(foreach n,$(words $(subst -, ,$1)),$(strip\
+                  $(and $(filter 2 4,$n),-$(lastword $(subst -, ,$1)))))
+
 # This must be called with a list of platforms
 # It converts "platforms that might have build options" to "platforms"
 # I.e. strips off the build options from the input list
@@ -88,20 +96,25 @@ RccRealPlatform=$(strip $(infox RRP:$(RccPlatform))\
 # Look through all RccTarget_% variables (where the value or RccTarget_<platform> is the target
 # of the <platform>) to find one that maps a platform to the target in $1.  Return <platform>
 # This relies on the 1:1 mapping of rcc platforms and targets
+# This function preserves build options
 RccGetPlatform=$(strip $(infox RGP:$1:$2:)\
-  $(or $(filter $1,$(RccAllPlatforms)),\
+  $(foreach r,$(call RccStripOptions,$1),\
+    $(or $(and $(filter $r,$(RccAllPlatforms)),$1$(infox RGPr1:$1)),$(strip\
        $(foreach v,$(filter RccTarget_%,$(.VARIABLES)),$(infox VV:$v:$($v))\
-         $(foreach p,$(v:RccTarget_%=%),\
-           $(and $(filter $p,$(RccAllPlatforms)),$(filter $1,$(value $v)),\
-	         $(infox RGPr:$1:$v:$p:$(value $v))$p))),\
-       $($(or $2,error) Cannot find an RCC platform for the target: $1)))
+         $(foreach p,$(v:RccTarget_%=%),$(infox PP:$p)\
+           $(and $(filter $p,$(RccAllPlatforms)),$(filter $r,$(value $v)),\
+	         $(infox RGPr:$r:$v:$p$(call RccGetOptions,$1):$(value $v))$p$(call RccGetOptions,$1))))),\
+       $($(or $2,error) Cannot find an RCC platform for the target: $1))))
 # The model-specific determination of the "tail end" of the target directory,
 # after the prefix (target), and build configuration.
 # The argument is a TARGET, more or less for legacy reasons now.
 RccTargetDirTail=$(infox RTDT:$1:$(RccTarget_$1):$(RccPlatform))$(strip\
-  $(or $(and $(RccTarget_$1),$1),\
-       $(and $(filter $1,$(RccTarget_$(RccPlatform))),$(RccPlatform)),\
-       $(call RccGetPlatform,$1,error)))
+  $(foreach r,$(call RccStripOptions,$1),\
+    $(foreach t,\
+      $(or $(and $(RccTarget_$r),$1),$(- it is a platform)$(strip\
+           $(and $(filter $r,$(RccTarget_$(call RccStripOptions,$(RccPlatform)))),$(RccPlatform))),\
+           $(call RccGetPlatform,$1,error)),\
+      $(infox RTDtr:$t)$t)))
 
 # Transfer build options to target from platform
 # $(call RccPlatformTarget,<platform>,<target>)

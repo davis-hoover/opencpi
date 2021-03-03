@@ -72,7 +72,7 @@
 #define OCPI_UTRUNCATE(type, val) ((type)(val))
 #define OCPI_STRUNCATE(type, val) ((type)(val))
 #define OCPI_SIZEOF(utype, stype) ((utype)sizeof(stype))
-#define OCPI_OFFSETOF(utype, member, stype) ((utype)offsetof(stype,member))
+#define OCPI_OFFSETOF(utype, stype, member) ((utype)offsetof(stype,member))
 #define OCPI_SIZE_T_DIFF(larger, smaller) ((size_t)((larger) - (smaller)))
 #define OCPI_CHAR_DIFF(larger, smaller) ((unsigned)((larger) - (smaller)))
 #else
@@ -98,11 +98,13 @@ namespace OCPI {
      */
 
     inline uint64_t utruncate(uint64_t val, size_t bytes) {
+      (void)bytes;
       ocpiAssert(bytes == sizeof(val) || val <= ~((uint64_t)-1 << (bytes*8)));
       return val;
     }
 
     inline int64_t struncate(int64_t val, size_t bytes) {
+      (void)bytes;
       ocpiAssert(bytes == sizeof(val) ||
 		 (val < 0 ?
 		  val >= (int64_t)-1 << (bytes*8-1) :

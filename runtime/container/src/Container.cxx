@@ -156,6 +156,8 @@ namespace OCPI {
 	this->unlock();
 	// Allow the container's thread to recognize being disabled
 	m_thread->join();
+	delete m_thread;
+	m_thread = NULL;
 	this->lock();
       }
     }

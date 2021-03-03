@@ -202,7 +202,8 @@ if [ "$noun" != platform ]; then
   bad "Unknown $action noun: '$noun'"
 fi
 if [ "$action" = install ]; then
-  platform=$3
+  platform=${3%-*}
+  platform_target_dir=$3
   if [ -z "$platform" ]; then
     bad 'Missing platform to install'
   fi
@@ -341,7 +342,7 @@ else
     fi
 fi
 if [ "$model" = RCC ]; then
-    ./scripts/install-opencpi.sh $platform || exit 1
+    ./scripts/install-opencpi.sh $platform_target_dir || exit 1
 else
     ocpidev -d projects/core build --hdl --hdl-platform=$platform
     ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
@@ -378,7 +379,7 @@ else
     # No need to check the return value from "getvars" at this point.
     #
     getvars
-    $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform $platform_dir
+    $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform_target_dir $platform_dir
 fi
 echo "Platform installation (download and build) for platform \"$platform\" succeeded."
 exit 0

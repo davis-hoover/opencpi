@@ -72,7 +72,7 @@ AC_ARG_ENABLE([dynamic],
 	      [],[enable_dynamic=no])
 # Set default so environment will be ignored
 AC_ARG_VAR(prerequisite_dir, [where prerequisites are installed and used])
-#AC_ARG_VAR(platform_dir, [where compilations are installed])
+AC_ARG_VAR(platform_target_dir, [where compilations are installed])
 #we should push this stuff into Makefile.am since we have the conditional there
 if test $enable_dynamic = yes ; then
    libtool_library_flags="$libtool_dynamic_library_flags"

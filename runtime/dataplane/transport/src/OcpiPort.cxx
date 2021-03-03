@@ -588,6 +588,7 @@ Port::
   ocpiDebug("**** In OCPI::DataTransport::Port::~Port %p init %u output %u md %p mdshadow %u shadow %u",
 	    this, m_initialized, isOutput(), m_data, m_data ? m_data->m_shadow : 0, m_shadow);
   int rc;
+  (void)rc;
   int index=0;
   XF::ResourceServices* res_mgr;
 
@@ -1029,6 +1030,7 @@ void Port::releaseOffsets( OCPI::Util::VList& offsets )
 static void
 addOffset(OU::VList& offsets, DDT::Offset from_base, DDT::Offset to_base,
 	  size_t adjust, const char *debug) {
+  (void)debug;
   Port::ToFrom* tf = new Port::ToFrom;
   DDT::Offset adj = OCPI_UTRUNCATE(DDT::Offset, adjust);
   tf->from_offset = from_base + adj;

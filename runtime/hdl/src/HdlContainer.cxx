@@ -54,7 +54,7 @@ namespace OCPI {
     
 
     static OT::Emit::Time getTicksFunc(OT::Emit::TimeSource *ts) {
-      return static_cast<Container *>(ts)->getMyTicks();
+      return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
     }
     Container::
     Container(OCPI::HDL::Device &device, ezxml_t config, const OU::PValue *params) 
@@ -91,7 +91,7 @@ namespace OCPI {
 	OT::Emit::shutdown();
       } catch (...) {
 	static const char msg[] = "***Exception during container shutdown\n";
-	(void)write(2, msg, strlen(msg));
+	ocpiIgnore(write(2, msg, strlen(msg)));
       }
       this->lock();
       // We need to shut down the apps and workers since they

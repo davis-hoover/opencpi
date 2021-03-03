@@ -128,7 +128,7 @@ namespace OCPI {
       if (!OS::FileSystem::exists(libDir)) { // try the pre-1.4 library name FIXME: nuke this?
 	std::string oldLibDir;
 	OU::format(oldLibDir, "%s/lib/%s-%s-%s", OU::getCDK().c_str(),
-		   OCPI_CPP_STRINGIFY(OCPI_OS) + strlen("OCPI"),
+		   &OCPI_CPP_STRINGIFY(OCPI_OS)[strlen("OCPI")],
 		   OCPI_CPP_STRINGIFY(OCPI_OS_VERSION), OCPI_CPP_STRINGIFY(OCPI_ARCH));
 	if (!OS::FileSystem::exists(oldLibDir)) {
 	  OU::eformat(err,
@@ -234,7 +234,7 @@ namespace OCPI {
       // things they would not do earlier, at static construction time.
       ocpiDebug("Configuring the driver managers");
       for (Manager *m = firstChild(); m; m = m->nextChild()) {
-	ocpiDebug("Configuring the %s manager", m->name().c_str());
+	ocpiInfo("Configuring the %s manager", m->name().c_str());
 	m->configure(m_xml ? ezxml_cchild(m_xml, m->name().c_str()) : NULL);
       }
       // The discovery happens in a second pass to make sure everything is configured before
@@ -242,7 +242,7 @@ namespace OCPI {
       // driver's configuration.
       for (Manager *m = firstChild(); m; m = m->nextChild())
 	if (m->shouldDiscover()) {
-	  ocpiDebug("Performing discovery for the %s manager", m->name().c_str());
+	  ocpiInfo("Performing discovery for the %s manager using all its drivers", m->name().c_str());
 	  m->discover(params);
 	}
     }
@@ -268,8 +268,8 @@ namespace OCPI {
     static void exitbad(const char *e) {
       // We are in a very primitive mode here. No error checking.
       static const char msg[] = "\n*********During shutdown********\n";
-      (void)write(2, e, strlen(e));
-      (void)write(2, msg, sizeof(msg));
+      ocpiIgnore(write(2, e, strlen(e)));
+      ocpiIgnore(write(2, msg, sizeof(msg)));
       _exit(1);
     }
     // A static-destructor hook to perform manager cleanup.

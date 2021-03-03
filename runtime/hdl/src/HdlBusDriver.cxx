@@ -400,7 +400,7 @@
 		ocpi_load_fpga_request_t request;
 		request.data = obase;
 		request.length = OCPI_UTRUNCATE(ocpi_size_t, optr - obase);
-		int fd = creat("bits", 0666); write(fd, obase, request.length); close(fd);
+		//int fd = creat("bits", 0666); write(fd, obase, request.length); close(fd);
 		strncpy(request.device_path, fpgaMgrDevice, sizeof(request.device_path));
 		ocpiInfo("Loading using FPGA manager, %u bytes uncompressed from %s",
 			 request.length, inputFile.c_str());
