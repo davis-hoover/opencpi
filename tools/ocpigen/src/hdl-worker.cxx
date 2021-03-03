@@ -1379,7 +1379,7 @@ emitVhdlShell(FILE *f) {
 	  m_implName);
   std::string dataClockCDCs; // instantiations for the CDCs for per-clock reset and is_operating, if any
   if (m_type != Container) {
-    fprintf(f,"  constant num_reset_cycles     : natural := 17;\n");
+    fprintf(f,"  constant num_reset_cycles  : natural := 17;\n");
     for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       const Clock *clk = *ci; // set to NULL when used for a port
       if (clk != m_wciClock)
@@ -1413,6 +1413,15 @@ emitVhdlShell(FILE *f) {
   } else {
     fprintf(f,
 	    "begin\n");
+
+	// If an optional port is not connected it will always remain reset - its reset input.	
+	for (unsigned i = 0; i < m_ports.size(); i++) {
+		Port *p = m_ports[i];
+		if (p->isData()) {
+			fprintf(f, "  %s_is_connected <= not %s_reset;\n", p->m_name.c_str(), p->m_name.c_str());
+		}
+	}
+
     if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawReadables) {
       fprintf(f, "  internal_props_out <=\n    (");
       // Assign all members
