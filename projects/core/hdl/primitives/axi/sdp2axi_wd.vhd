@@ -78,7 +78,15 @@ architecture rtl of sdp2axi_wd_AXI_INTERFACE is
   signal axf_last_dw              : dw_idx_in_axf_t;
   signal last_sxf_offset_in_axf   : dw_idx_in_axf_t;
   signal axi_data_idx_r           : dw_idx_in_axf_t;
-  signal axi_data_r               : dword_array_t(0 to (axi_width - sdp_width) - 1);
+  function set_array_length(axi_width, sdp_width : natural) return natural
+  is begin
+    if axi_width > sdp_width then
+      return (axi_width - sdp_width) - 1;
+    else
+      return 0;
+    end if;
+  end function;
+  signal axi_data_r               : dword_array_t(0 to set_array_length(axi_width, sdp_width));
   signal axi_data                 : dword_array_t(0 to axi_width - 1);
   signal capturing_first          : bool_t;
   signal capturing_next_axf       : bool_t;
@@ -241,7 +249,7 @@ begin
             -- capture when aw > sw and more to come and not high sw in aw
 --            axi_data_r(to_integer(pkt_first_axf_sxf_offset) to
 --                       to_integer(pkt_first_axf_sxf_offset + (sdp_width - 1)))
-            axi_data_r <= sdp_data_p; -- FIXME - the indexing above does not synthesize ?
+            axi_data_r <= sdp_data_p(axi_data_r'range); -- FIXME - the indexing above does not synthesize ?
             if its(capturing_first) then
               if pkt_first_axf_ndws_p - pkt_first_sxf_ndws > sdp_width then
                 write_state_r <= capture_e;
@@ -256,7 +264,7 @@ begin
           when capture_e =>
 --            axi_data_r(to_integer(axi_data_idx_r) to
 --                     to_integer(axi_data_idx_r + (sdp_width - 1))) <= sdp_in_data;
-            axi_data_r <= sdp_data_p;
+            axi_data_r <= sdp_data_p(axi_data_r'range);
             axi_data_idx_r <= resize(axi_data_idx_r + sdp_width_u, axi_data_idx_r'length);
             if not capturing_next_sxf then
               write_state_r <= offer_e;

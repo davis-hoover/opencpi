@@ -42,16 +42,6 @@ begin
         dst_clk   => s_clk_out,
         dst_rst   => s_not_locked_synced_data);
 
-    -- this worker is not initialized until s_clk_out is ticking and the out port
-    -- has successfully come into reset
-    rst_detector_reg_out_in_reset : util.util.reset_detector
-      port map(
-        clk                     => s_clk_out,
-        rst                     => out_in.reset,
-        clr                     => '0',
-        rst_detected            => out_in_rst_detected,
-        rst_then_unrst_detected => open);
-
     -- this worker is not initialized until s_clk_out is ticking and the in port
     -- has successfully come into reset
     rst_detector_reg_in_in_reset : util.util.reset_detector
@@ -62,19 +52,18 @@ begin
         rst_detected            => in_in_rst_detected,
         rst_then_unrst_detected => open);
 
-    ctl_out.done <= out_in_rst_detected and in_in_rst_detected;
+    ctl_out.done <= in_in_rst_detected;
     doit <= in_in.ready and out_in.ready and not s_not_locked_synced_data;
-  -- WSI input interface outputs
+    -- WSI input interface outputs
     in_out.take         <= doit;
-  -- WSI output interface outputs
+    -- WSI output interface outputs
     out_out.give <= doit;
     out_out.data <= in_in.data;
     out_out.som <= in_in.som;
     out_out.eom <= in_in.eom;
     out_out.valid <= in_in.valid;
-    out_out.byte_enable <= in_in.byte_enable; -- only necessary due to BSV protocol sharing
+    out_out.byte_enable <= in_in.byte_enable;
     out_out.opcode <= in_in.opcode;
     in2out_in_clk: util.util.in2out port map(in_port => s_clk_out, out_port => in_out.clk);
-    in2out_out_clk: util.util.in2out port map(in_port => s_clk_out, out_port => out_out.clk);
 
 end rtl;
