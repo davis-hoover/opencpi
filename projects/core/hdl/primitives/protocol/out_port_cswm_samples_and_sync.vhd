@@ -16,6 +16,8 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+-- This primitive handles sending samples and sync opcodes for workers that 
+-- are data soruces and use insert_eom='true' on their output port
 
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi;
@@ -27,75 +29,71 @@ entity out_port_cswm_samples_and_sync is
                                         -- MUST USE 32 FOR NOW
     WSI_MBYTEEN_WIDTH : positive := 4);
   port(
-    clk              : in  std_logic;
-    rst              : in  std_logic;
+    clk               : in  std_logic;
+    rst               : in  std_logic;
     -- INPUT
-    iprotocol        : in  protocol.complex_short_with_metadata.protocol_t;
-    oready           : in  ocpi.types.Bool_t;
-    suppress_sync_op : in  ocpi.types.Bool_t;
+    iprotocol         : in  protocol.complex_short_with_metadata.protocol_t;
+    iready            : in  ocpi.types.Bool_t;
+    isuppress_sync_op : in  ocpi.types.Bool_t;
     -- OUTPUT
-    odata            : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
-    ovalid           : out ocpi.types.Bool_t;
-    obyte_enable     : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
-    ogive            : out ocpi.types.Bool_t;
-    osom             : out ocpi.types.Bool_t;
-    oeom             : out ocpi.types.Bool_t;
-    oopcode          : out protocol.complex_short_with_metadata.opcode_t;
-    iready           : out std_logic);
+    odata             : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
+    ovalid            : out ocpi.types.Bool_t;
+    obyte_enable      : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
+    ogive             : out ocpi.types.Bool_t;
+    osom              : out ocpi.types.Bool_t;
+    oeom              : out ocpi.types.Bool_t;
+    oopcode           : out protocol.complex_short_with_metadata.opcode_t);
 end entity;
 architecture rtl of out_port_cswm_samples_and_sync is
 
-  constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive :=  ocpi.util.width_for_max(protocol.complex_short_with_metadata.OP_SAMPLES_ARG_IQ_SEQUENCE_LENGTH-1);
-
-  signal give                   : std_logic;
-  signal valid                  : std_logic;
-  signal som                    : std_logic;
-  signal eom                    : std_logic;
+  signal out_give               : std_logic;
+  signal out_valid              : std_logic;
+  signal out_som                : std_logic;
+  signal out_eom                : std_logic;
   signal sync_ready_r           : std_logic;
   signal sync                   : std_logic;
   signal sync_sticky_r          : std_logic;
-  signal opcode : protocol.complex_short_with_metadata.opcode_t :=
-                  protocol.complex_short_with_metadata.SAMPLES;
+  signal out_opcode : protocol.complex_short_with_metadata.opcode_t;
 
 begin
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
-    opcode <=  protocol.complex_short_with_metadata.SYNC      when (sync_ready_r = '1' and suppress_sync_op = '0')     else
+    out_opcode <=  protocol.complex_short_with_metadata.SYNC when (sync_ready_r = '1' and isuppress_sync_op = '0')     else
                protocol.complex_short_with_metadata.SAMPLES;
 
-    som       <= sync_ready_r;
-    valid     <= (oready and iprotocol.samples_vld) when (opcode = protocol.complex_short_with_metadata.SAMPLES) else '0';
-    eom       <= sync or sync_ready_r;
-    give      <= (som or eom or valid) and oready;
+    out_som   <= sync_ready_r; -- start sync message
+    out_valid <= (iready and iprotocol.samples_vld) when (out_opcode = protocol.complex_short_with_metadata.SAMPLES) else '0';
+    out_eom   <= sync or sync_ready_r; -- end current message when a sync occurs or end sync message
+    out_give  <= (out_som or out_eom or out_valid) and iready;
     
-    sync <= (iprotocol.sync or sync_sticky_r) and not suppress_sync_op;
-
+    sync <= (iprotocol.sync or sync_sticky_r) and not isuppress_sync_op;
+    
+    -- Register sync when it happens in case the output port is not ready.
+    -- And also get ready to start the sync message
     sync_ready_reg : process (clk)
     begin
         if rising_edge(clk) then
-          if (rst = '1' or suppress_sync_op = '1') then
+          if (rst = '1' or isuppress_sync_op = '1') then
             sync_ready_r <= '0';
             sync_sticky_r <= '0';
-          elsif (suppress_sync_op = '0') then
-            if (iprotocol.sync = '1') then 
-              sync_sticky_r <= '1';
-            end if;
-            if (sync = '1' and sync_ready_r = '0'  and oready = '1') then
+          elsif (isuppress_sync_op = '0') then
+            if (sync = '1' and sync_ready_r = '0' and iready = '1') then
               sync_ready_r  <= '1';
               sync_sticky_r <= '0';
-            elsif (sync_ready_r = '1' and oready = '1') then
+            elsif (sync_ready_r = '1' and iready = '1') then
               sync_ready_r <= '0';
+            elsif (iprotocol.sync = '1') then 
+              sync_sticky_r <= '1';
             end if;
           end if;
         end if;
     end process sync_ready_reg;
 
-    iready       <= oready;
     odata        <= iprotocol.samples.iq.q & iprotocol.samples.iq.i;
-    ovalid       <= valid;
-    ogive        <= give;
-    osom         <= som;
-    oeom         <= eom;
+    ovalid       <= out_valid;
+    ogive        <= out_give;
+    osom         <= out_som;
+    oeom         <= out_eom;
     obyte_enable <= (others => '1');
-    oopcode      <= opcode;
+    oopcode      <= out_opcode;
   end generate wsi_data_width_32;
 end rtl;

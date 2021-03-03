@@ -192,21 +192,20 @@ component out_port_cswm_samples_and_sync is
                                         -- MUST USE 32 FOR NOW
     WSI_MBYTEEN_WIDTH : positive);
   port(
-    clk              : in  std_logic;
-    rst              : in  std_logic;
+    clk               : in  std_logic;
+    rst               : in  std_logic;
     -- INPUT
-    iprotocol        : in  protocol_t;
-    oready           : in  ocpi.types.Bool_t;
-    suppress_sync_op : in  ocpi.types.Bool_t;
+    iprotocol         : in  protocol_t;
+    iready            : in  ocpi.types.Bool_t;
+    isuppress_sync_op : in  ocpi.types.Bool_t;
     -- OUTPUT
-    odata            : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
-    ovalid           : out ocpi.types.Bool_t;
-    obyte_enable     : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
-    ogive            : out ocpi.types.Bool_t;
-    osom             : out ocpi.types.Bool_t;
-    oeom             : out ocpi.types.Bool_t;
-    oopcode          : out opcode_t;
-    iready           : out std_logic);
+    odata             : out std_logic_vector(WSI_DATA_WIDTH-1 downto 0);
+    ovalid            : out ocpi.types.Bool_t;
+    obyte_enable      : out std_logic_vector(WSI_MBYTEEN_WIDTH-1 downto 0);
+    ogive             : out ocpi.types.Bool_t;
+    osom              : out ocpi.types.Bool_t;
+    oeom              : out ocpi.types.Bool_t;
+    oopcode           : out opcode_t);
 end component;
 
 end package complex_short_with_metadata;

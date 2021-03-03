@@ -20,6 +20,7 @@
 import sys
 import os.path
 import struct
+import numpy as np
 
 """
 Generate script
@@ -34,6 +35,7 @@ numDataWords = int(os.environ.get("OCPI_TEST_numDataWords"))
 numRecords = int(os.environ.get("OCPI_TEST_numRecords"))
 testScenario = int(os.environ.get("OCPI_TEST_testScenario"))
 
+max_bytes = 16384
 
 # Test sending no data
 def testScenario1():
@@ -56,16 +58,25 @@ def testScenario2():
 def testScenario3():
     filename = sys.argv[1]
     f = open(filename, 'wb')
-
-    f.write(struct.pack("<I", numDataWords*4))
+    numMessages=round((numDataWords*4)/max_bytes)
+    numData=round(numDataWords/numMessages)
+    # Have to send two messages because max_bytes is 16384 and want to send 32678 bytes
+    f.write(struct.pack("<I", max_bytes))
     f.write(struct.pack("<I", 255))
-
-    for x in range(0, numDataWords):
+    for x in range(0, numData):
         f.write(struct.pack("<I", x))
 
+    f.write(struct.pack("<I", max_bytes))
+    f.write(struct.pack("<I", 255))
+    for x in range(numData, numData*2):
+        f.write(struct.pack("<I", x))
+
+    # Send extra message to test that capture_v2 acts accordingly when stopOnFull is true or false
     f.write(struct.pack("<I", 4))
     f.write(struct.pack("<I", 255))
     f.write(struct.pack("<I", numDataWords))
+
+
     f.close()
 
 # Test sending a multiple zlms, a single word message, filling data and filling up metadata
@@ -86,11 +97,18 @@ def testScenario4():
     f.write(struct.pack("<I", 0))
 
 
-    # Send another message to fill up data buffer
-    f.write(struct.pack("<I", (numDataWords-1)*4))
-    f.write(struct.pack("<I", 0))
+    # Send 2 messages to fill up data buffer
+    numMessages=round((numDataWords*4)/(max_bytes))
+    numData=round(numDataWords/numMessages)
 
-    for x in range(1, numDataWords):
+    f.write(struct.pack("<I", max_bytes-4))
+    f.write(struct.pack("<I", 0))
+    for x in range(1, numData):
+        f.write(struct.pack("<I", x))
+
+    f.write(struct.pack("<I", max_bytes))
+    f.write(struct.pack("<I", 0))
+    for x in range(numData, numData*2):
         f.write(struct.pack("<I", x))
 
     # Send another ZLM
@@ -99,7 +117,7 @@ def testScenario4():
 
 
     # Fill up metadata buffer
-    for x in range(numDataWords, numDataWords+numRecords-5):
+    for x in range(numDataWords, numDataWords+numRecords-6):
         f.write(struct.pack("<I", 4))
         f.write(struct.pack("<I", 0))
         f.write(struct.pack("<I", x))
@@ -129,7 +147,7 @@ def main():
    elif (testScenario == 5):
        testScenario5()
    else:
-       print("Invalid testScenario: valid testScenario are 1, 2, 3 and 4")
+       print("Invalid testScenario: valid testScenario are 1, 2, 3, 4 and 5")
        sys.exit(1)
 
 main()

@@ -99,9 +99,9 @@ def brute_force_optimization(FIN, FOUT, clock_prim):
             M_MAX_CALC = M_MAX
         # Generate all possible values for M, N, and O
         # Multiplying the Max - Min by 8 and adding 1 because that will give a step size of 0.125
-        M = np.linspace(M_MIN_CALC,M_MAX_CALC, ((M_MAX_CALC-M_MIN_CALC)*8)+1)
+        M = np.linspace(M_MIN_CALC,M_MAX_CALC, int((M_MAX_CALC-M_MIN_CALC)*8)+1)
         N = [i for i in range(N_MIN_CALC, N_MAX_CALC+1)]
-        O = np.linspace(O_MIN,O_MAX, ((O_MAX-O_MIN)*8)+1)
+        O = np.linspace(O_MIN,O_MAX, int((O_MAX-O_MIN)*8)+1)
     elif(clock_prim == "plle2"):
         with open('zynq_7000_1C_1I_1LI_PLL_spec.csv', mode='r') as csv_file:
             csv_reader = csv.DictReader(csv_file)
@@ -183,9 +183,10 @@ def brute_force_optimization(FIN, FOUT, clock_prim):
 def main():
     FIN = float(sys.argv[1])
     FOUT = float(sys.argv[2])
+    clock_prim = sys.argv[4]
     supported_parts=["isim", "xsim", "zynq", "zynq_ise"]
     if (sys.argv[3] in supported_parts):
-        sol = brute_force_optimization(FIN, FOUT, sys.argv[4])
+        sol = brute_force_optimization(FIN, FOUT, clock_prim)
         with open('M.txt', mode='w') as output_file:
             output_file.write(str(sol[0][0][0]) + "\n")
         with open('N.txt', mode='w') as output_file:

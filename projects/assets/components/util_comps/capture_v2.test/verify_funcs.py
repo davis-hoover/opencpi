@@ -25,7 +25,6 @@ by the verify.py script.
 import sys
 import numpy as np
 
-
 # For testScenario 1
 def verify_metadataCount1(metadataCount):
     # Because no messages were sent, metadataCount should be 0
@@ -36,7 +35,7 @@ def verify_metadataCount1(metadataCount):
         print ("    metadataCount is correct")
 
 # For testScenario 2 and 4
-def verify_metadataCount2(metadataCount, numRecords, stopOnFull):
+def verify_metadataCount2(metadataCount, numRecords):
     # metadataCount should be numRecords because made metadata full
     if metadataCount != numRecords:
         print ("    metadataCount is", metadataCount,  "while expected value is", numRecords)
@@ -45,29 +44,14 @@ def verify_metadataCount2(metadataCount, numRecords, stopOnFull):
         print ("    metadataCount is correct")
 
 # For testScenario 3
-def verify_metadataCount3(metadataCount, numRecords, stopOnFull):
-    if (stopOnFull == "false"):
-        # metadataCount should be 2 messages are sent in this scenario
-        if metadataCount != 2:
-            print ("    metadataCount is", metadataCount,  "while expected value is 2")
-            sys.exit(1)
-        else:
-            print ("    metadataCount is correct")
-    elif (stopOnFull == "true"):
-        if numRecords >= 2:
-            # metadataCount should be 2 messages are sent in this scenario
-            if metadataCount != 2:
-                print ("    metadataCount is", metadataCount,  "while expected value is 2")
-                sys.exit(1)
-            else:
-                print ("    metadataCount is correct")
-        else:
-            # if numRecords is 1 then only 1 messages is captured when stopOnFull is true. So metadataCount is 1.
-            if metadataCount != 1:
-                print ("    metadataCount is", metadataCount,  "while expected value is 1")
-                sys.exit(1)
-            else:
-                print ("    metadataCount is correct")
+def verify_metadataCount3(metadataCount):
+    # metadataCount should be 3 because 3 messages are sent in this scenario
+    if metadataCount != 3:
+        print ("    metadataCount is", metadataCount,  "while expected value is 2")
+        sys.exit(1)
+    else:
+        print ("    metadataCount is correct")
+
 
 # For testScenario 5
 def verify_metadataCount4(metadataCount):
@@ -109,8 +93,8 @@ def verify_dataCount3(dataCount, numDataWords, metadataCount, numRecords,stopOnF
     if stopOnFull == "false":
         # In this scenario, numDataWords amount of data is sent and then numRecords-5 amount of data is sent.
         # So when stopOnFull is true, dataCount should be numDataWords+numRecords-5
-        if dataCount != numDataWords+numRecords-5:
-            print ("    dataCount is", dataCount,  "while expected value is", numDataWords+numRecords-5)
+        if dataCount != numDataWords+numRecords-6:
+            print ("    dataCount is", dataCount,  "while expected value is", numDataWords+numRecords-6)
             sys.exit(1)
         else:
             print ("    dataCount is correct")
@@ -155,7 +139,7 @@ def verify_status(metaFull, dataFull, dataCount, numDataWords,metadataCount, num
 
 
 # For testScenario 2
-def verify_metadata1(metadata, metadataCount, stopOnFull, numRecords):
+def verify_metadata1(metadata, metadataCount):
     eom_frac_prev = 0
     som_frac_prev = 0
     som_seconds_prev = 0
@@ -207,15 +191,12 @@ def verify_metadata1(metadata, metadataCount, stopOnFull, numRecords):
     print ("    metadata is correct")
 
 # For testScenario 3
-def verify_metadata2(metadata, numRecords, numDataWords, stopOnFull):
+def verify_metadata2(metadata, max_bytes):
     eom_frac_prev = 0
     som_frac_prev = 0
     som_seconds_prev = 0
-    # Only sending 2 messages so check only 2 of the records if numRecords is 2 or greater
-    if numRecords >= 2:
-        stop = 4*2
-    else:
-        stop = 4
+    # Only sending 3 messages so check only 3 of the records
+    stop = 4*3
     for x in range(0, stop, 4):
         opcode = (metadata[x] & 0xFF000000) >> 24
         messageSize = (metadata[x] & 0x00FFFFFF)
@@ -224,61 +205,47 @@ def verify_metadata2(metadata, numRecords, numDataWords, stopOnFull):
         som_seconds = metadata[x+3]
         # Check that timestamps are non-zero
         if eom_fraction == 0:
-                print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp is 0" )
-                sys.exit(1)
+            print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp is 0" )
+            sys.exit(1)
         elif som_fraction == 0:
             print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp is 0")
             sys.exit(1)
-        if ((stopOnFull == "true") or (stopOnFull == "false" and numRecords >= 2)):
-            if x == 0:
-                # For this scenario when stopOnFull is true, the first metadata record's
-                # message size should be numDataWords*4 bytes, because numDataWords*4 bytes were sent, and opcode should be 255
-                if opcode != 255:
-                    print ("    opcode is not correct")
-                    print ("    For metadata record " + str((x//4)+1) + ", ocpode is", opcode, "while expected value is 255")
+        if (x == 0 or x == 4):
+            # For this scenario when stopOnFull is true, the first and second metadata record's
+            # message size should be max_bytes and opcode should be 255
+            if opcode != 255:
+                print ("    opcode is not correct")
+                print ("    For metadata record " + str((x//4)+1) + ", ocpode is", opcode, "while expected value is 255")
+                sys.exit(1)
+            elif messageSize != max_bytes:
+                print ("    message size is not correct")
+                print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is", max_bytes)
+                sys.exit(1)
+        elif x == 8:
+            if opcode != 255:
+                print ("    opcode is not correct")
+                print ("    For metadata record " + str((x//4)+1) + ", ocpode is", opcode, "while expected value is 255")
+                sys.exit(1)
+            elif messageSize != 4:
+                print ("    message size is not correct")
+                print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 4")
+                sys.exit(1)
+        if (x == 4 or x == 8):
+            # If seconds time stamp incremented, check for roll over
+            if som_seconds > som_seconds_prev:
+                if eom_frac_prev <= eom_fraction:
+                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp did not roll over")
                     sys.exit(1)
-                elif messageSize != numDataWords*4:
-                    print ("    message size is not correct")
-                    print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is", numDataWords*4)
+                elif som_frac_prev <= som_fraction:
+                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp did not roll over")
                     sys.exit(1)
+            # Check that eom fraction and som fraction timestamps are incrementing
             else:
-                # The second metadata record's message size should be 4 bytes, because 4 bytes were sent, and opcode should be 255
-                if x == 4:
-                    if opcode != 255:
-                        print ("    opcode is not correct")
-                        print ("    For metadata record " + str((x//4)+1) + ", ocpode is", opcode, "while expected value is 255")
-                        sys.exit(1)
-                    elif messageSize != 4:
-                        print ("    message size is not correct")
-                        print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 4")
-                        sys.exit(1)
-                # If seconds time stamp incremented, check for roll over
-                if som_seconds > som_seconds_prev:
-                    if eom_frac_prev <= eom_fraction:
-                        print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp did not roll over")
-                        sys.exit(1)
-                    elif som_frac_prev <= som_fraction:
-                        print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp did not roll over")
-                        sys.exit(1)
-                # Check that eom fraction and som fraction timestamps are incrementing
-                else:
-                    if eom_fraction <= eom_frac_prev:
-                        print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp is not incrementing")
-                        sys.exit(1)
-                    elif som_fraction <= som_frac_prev:
-                        print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp is not incrementing")
-                        sys.exit(1)
-        elif stopOnFull == "false":
-            if numRecords == 1:
-                # For this scenario when stopOnFull is false, there would have been a wrap around when the second message was received
-                # The second metadata record's message size should be 4 bytes, because 4 bytes were sent, and opcode should be 255
-                if opcode != 255:
-                    print ("    opcode is not correct")
-                    print ("    For metadata record " + str((x//4)+1) + ", ocpode is", opcode, "while expected value is 255")
+                if eom_fraction <= eom_frac_prev:
+                    print ("    For metadata record " + str((x//4)+1) + ", eom fraction time stamp is not incrementing")
                     sys.exit(1)
-                elif messageSize != 4:
-                    print ("    message size is not correct")
-                    print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 4")
+                elif som_fraction <= som_frac_prev:
+                    print ("    For metadata record " + str((x//4)+1) + ", som fraction time stamp is not incrementing")
                     sys.exit(1)
         eom_frac_prev = eom_fraction
         som_frac_prev = som_fraction
@@ -286,7 +253,7 @@ def verify_metadata2(metadata, numRecords, numDataWords, stopOnFull):
     print ("    metadata is correct")
 
 # For testScenario 4
-def verify_metadata3(metadata, metadataCount, numRecords, stopOnFull, numDataWords):
+def verify_metadata3(metadata, metadataCount, max_bytes):
     eom_frac_prev = 0
     som_frac_prev = 0
     som_seconds_prev = 0
@@ -336,17 +303,27 @@ def verify_metadata3(metadata, metadataCount, numRecords, stopOnFull, numDataWor
                 print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 4")
                 sys.exit(1)
         elif x == 12:
-            # The second metadata record should contain opcode of 0 and messageSize of (numDataWords-1)*4 bytes
+            # The fourth metadata record should contain opcode of 0 and messageSize of max_bytes-4
             if opcode != 0:
                 print ("    opcode is not correct")
                 print ("    For metadata record " + str((x//4)+1) +  ", ocpode is", opcode, "while expected value is 0")
                 sys.exit(1)
-            elif messageSize != (numDataWords-1)*4:
+            elif messageSize != max_bytes-4:
                 print ("    message size is not correct")
-                print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is", (numDataWords-1)*4)
+                print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is", max_bytes-4)
                 sys.exit(1)
         elif x == 16:
-            # The third metadata record should contain opcode of 4 and messageSize of 0 bytes
+            # The fifth metadata record should contain opcode of 0 and messageSize of max_bytes
+            if opcode != 0:
+                print ("    opcode is not correct")
+                print ("    For metadata record " + str((x//4)+1) +  ", ocpode is", opcode, "while expected value is 0")
+                sys.exit(1)
+            elif messageSize != max_bytes:
+                print ("    message size is not correct")
+                print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is", max_bytes)
+                sys.exit(1)
+        elif x == 20:
+            # The sixth metadata record should contain opcode of 4 and messageSize of 0 bytes
             if opcode != 4:
                 print ("    opcode is not correct")
                 print ("    For metadata record " + str((x//4)+1) +  ", ocpode is", opcode, "while expected value is 4")
@@ -355,7 +332,7 @@ def verify_metadata3(metadata, metadataCount, numRecords, stopOnFull, numDataWor
                 print ("    message size is not correct")
                 print ("    For metadata record " + str((x//4)+1) +  ", message size is", messageSize, "while expected value is 0")
                 sys.exit(1)
-        elif x >= 20:
+        elif x >= 24:
             # The other metadata records should contain opcode of 0 and messageSize of 4 bytes
             if opcode != 0:
                 print ("    opcode is not correct")
@@ -425,9 +402,9 @@ def verify_data1(odata, dataCount, numDataWords, stopOnFull):
         for x in range(1, dataCount-1):
             idata[x] = x
     if np.array_equal(idata, odata):
-        print ("    Input and output data match")
+        print ("    Input data and property data match")
     else:
-        print ("    Input and output data don't match")
+        print ("    Input data and property data don't match")
         sys.exit(1)
 
 # For testScenario 4
@@ -437,10 +414,10 @@ def verify_data2(odata, stopOnFull, numDataWords, numRecords):
     idata = np.empty(numDataWords, dtype=dt)
     if stopOnFull == "false":
         i = 0
-        for x in range(numDataWords, numDataWords+numRecords-5):
+        for x in range(numDataWords, numDataWords+numRecords-6):
             idata[i] = x
             i = i + 1
-        for x in range(numDataWords+numRecords-5-numDataWords, numDataWords):
+        for x in range(numDataWords+numRecords-6-numDataWords, numDataWords):
             idata[i] = x
             i = i + 1
     elif stopOnFull == "true":
@@ -448,7 +425,68 @@ def verify_data2(odata, stopOnFull, numDataWords, numRecords):
             idata[x] = x
 
     if np.array_equal(idata, odata):
-        print ("    Input and output data match")
+        print ("    Input data and property data match")
     else:
-        print ("    Input and output data don't match")
+        print ("    Input data and property data don't match")
         sys.exit(1)
+
+
+def verify_metadataCount(testScenario, metadataCount, numRecords):
+    if testScenario == 1:
+        verify_metadataCount1(metadataCount)
+    elif testScenario == 2:
+        verify_metadataCount2(metadataCount, numRecords)
+    elif testScenario == 3:
+        verify_metadataCount3(metadataCount)
+    elif testScenario == 4:
+        verify_metadataCount2(metadataCount, numRecords)
+    elif testScenario == 5:
+        verify_metadataCount4(metadataCount)
+
+def verify_dataCount(testScenario, dataCount, numDataWords, metadataCount, numRecords, stopOnFull):
+    if testScenario == 1:
+        verify_dataCount1(dataCount)
+    elif testScenario == 2:
+        verify_dataCount1(dataCount)
+    elif testScenario == 3:
+        verify_dataCount2(dataCount,numDataWords, stopOnFull)
+    elif testScenario == 4:
+        verify_dataCount3(dataCount,numDataWords, metadataCount, numRecords,stopOnFull)
+    elif testScenario == 5:
+        verify_dataCount1(dataCount)
+
+def verify_metadata(testScenario, metadata, metadataCount, stopZLMOpcode, max_bytes):
+    if testScenario == 2:
+        verify_metadata1(metadata,metadataCount)
+    elif testScenario == 3:
+        verify_metadata2(metadata, max_bytes)
+    elif testScenario == 4:
+        verify_metadata3(metadata,metadataCount, max_bytes)
+    elif testScenario == 5:
+        verify_metadata4(metadata, stopZLMOpcode)
+
+def verify_data(testScenario, odata, dataCount, numDataWords, numRecords, stopOnFull):
+    if testScenario == 3:
+        verify_data1(odata, dataCount, numDataWords, stopOnFull)
+    elif testScenario == 4:
+        verify_data2(odata, stopOnFull, numDataWords,numRecords)
+        
+def verify_totalBytes(testScenario, totalBytes, numDataWords, numRecords):
+    if (testScenario == 1 or testScenario == 2 or testScenario == 5):
+        if totalBytes == 0:
+            print ("    totalBytes is correct")
+        else:
+            print ("    totalBytes is", totalBytes,  "while expected value is 0")
+            sys.exit(1)
+    elif testScenario == 3:
+        if totalBytes == (numDataWords+1)*4:
+            print ("    totalBytes is correct")
+        else:
+            print ("    totalBytes is", totalBytes,  "while expected value is", (numDataWords+1)*4)
+            sys.exit(1)
+    elif testScenario == 4:
+        if totalBytes ==  (numDataWords+numRecords-6)*4:
+            print ("    totalBytes is correct")
+        else:
+            print ("    totalBytes is", totalBytes,  "while expected value is", (numDataWords+numRecords-6)*4)
+            sys.exit(1)
