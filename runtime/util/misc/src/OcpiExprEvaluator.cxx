@@ -226,7 +226,7 @@ public:
 	op = OpEnd;
 	break;
       }
-      if (isalpha(*cp) || *cp == '_') {
+      if (isalpha(*cp) || *cp == '_' || *cp == '$') {
 	do
 	  cp++;
 	while (*cp && cp != last && (isalpha(*cp) || *cp == '_' || isdigit(*cp)));

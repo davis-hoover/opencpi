@@ -53,6 +53,7 @@ OCPI_PROPERTY_DATA_TYPES
 const char *g_platform = 0, *g_device = 0, *load = 0, *g_os = 0, *g_os_version = 0, *g_arch = 0,
   *assembly = 0, *attribute, *platformDir;
 bool g_dynamic = false;
+bool g_optimized = false;
 bool g_multipleWorkers = false;
 
 // Check for implementation attributes common to data interfaces, several of which
@@ -1083,7 +1084,7 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     m_emulate(NULL), m_emulator(NULL), m_library(NULL), m_outer(false),
     m_debugProp(NULL), m_mkFile(NULL), m_xmlFile(NULL), m_outDir(NULL), m_build(*this),
     m_paramConfig(NULL), m_parent(parent), m_scalable(false), m_requiredWorkGroupSize(0),
-    m_maxLevel(0), m_dynamic(false), m_isSlave(false), m_isOptional(false),
+    m_maxLevel(0), m_dynamic(false), m_optimized(false), m_isSlave(false), m_isOptional(false),
     m_slavePort(NULL), m_proxyPort(NULL), m_proxyPortIndex(SIZE_MAX)
 {
   if ((err = getNames(xml, xfile, NULL, m_name, m_fileName)))
@@ -1298,6 +1299,7 @@ emitArtXML(const char *wksFile) {
   if (g_arch)       fprintf(f, " arch=\"%s\"",  g_arch);
   if (g_device)     fprintf(f, " device=\"%s\"", g_device);
   if (m_dynamic)    fprintf(f, " dynamic='1'");
+  if (m_optimized)  fprintf(f, " optimized='1'");
   fprintf(f, ">\n");
   emitXmlWorkers(f);
   emitXmlInstances(f);

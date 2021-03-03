@@ -267,7 +267,13 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
     }
   if (options.list()) {
     (void)OA::ContainerManager::get(0); // force config/discovery
-    OA::useServers(NULL, params, options.verbose());
+    // Discovery has been done, so all servers in the environment variables are processed already
+    // So we only add probing for the ones on the command line
+    for (const OU::PValue *p = params; p && p->name; ++p)
+      if (!strcasecmp(p->name, "server")) {
+	assert(p->type == OA::OCPI_String);
+	OA::useServer(p->vString, options.verbose()); // we know it is a string
+      }
     OA::ContainerManager::list(options.only_platforms());
   }
   return false;
