@@ -44,7 +44,7 @@ my-env.sh
 myzed.sh
 exports
 projects/*/imports
-projects/*/project.xml
+projects/*/project-metadata.xml
 projects/*/specs/package-id
 doc/tex/build
 vendor/

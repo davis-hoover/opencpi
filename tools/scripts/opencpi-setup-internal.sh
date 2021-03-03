@@ -23,15 +23,23 @@
 # It is sourced by its name in the top level of the desired CDK installation
 # (possibly /opt/opencpi/cdk).  It may be sourced using a relative pathname.
 
+# The actual location/name of this file in the source tree (opencpi-setup-internal)
+# is purposely named differently from the documented file name for users (opencpi-setup)
+# to prevent users from sourcing the file where they happened to find it in the
+# source tree.  I.e. we export opencpi-setup-internal.sh as cdk/opencpi-setup.sh to avoid
+# this undesireable user behavior.
+
 # Thus its location (where it is sourced from) implies where OpenCPI is installed.
 # This means that it should only be run (sourced) in its "exported" location, not in its
 # location inside the source tree.  Most common usage from source tree is: source cdk/opencpi-setup.sh -s
 # The CDK is where this is sourced from (its dirname) and so OCPI_CDK_DIR is set accordingly.
+# Note that OCPI_ROOT_DIR, which indicates the overall location of the opencpi installation,
+# is set to OCPI_CDK_DIR/.. as a default, but may be elsewhere.
 
 # There are several different scenarios where this script will run:
 
 # 1. From the global bash /etc/profile.d entry created when the RPM or equivalent is installed.
-#    This means that this script is called for login shells, with the "-" argument, which means
+#    This means that this script is called for login shells, with the "-s" argument, which means
 #    it will complain if it finds anything in the environment, which it should not.
 
 # 2. When a user specifically sources this file in one of their bash login files.
@@ -40,18 +48,18 @@
 #    indicate a different CDK or different options.  Executing this script in the user's
 #    login script (.bash_profile or .bash_login or .profile) will do this.
 #    Note that if it wants to override any global settings, it can use the "-r" option, whereas
-#    if a global installation would be unexpected, it can use "-" which will complain if any
+#    if a global installation would be unexpected, it can use "-s" which will complain if any
 #    global login settings are found.
 
 # 3. Manually when the OpenCPI environment should be established or changed for a particular
 #    shell.  In this case a variety of the options may be used.
 
 # When sourced on a development platform, the platform is dynamically determined.
-# When sourced in an embedded runtime environment the platform is known and set in the
-# environment before this script would be run (e.g. on an SD card in a small embedded platform).
+# This file is NOT intended to be sourced in an embedded environment.
 
-# It modifies the environment in these ways:
-# 1. setting OCPI_CDK_DIR environment variable to an absolute pathname - dirname of this script
+# This script modifies the environment in these ways:
+# 1. setting OCPI_CDK_DIR environment variable to an absolute pathname - the dirname of this script
+#    where it is executed as exported
 # 2. setting the OCPI_TOOL_* environment variables as a cache of this platform determination
 # 3. adding the binaries directory for the running platform to the PATH environment variable
 # 4. adding the lib directory for the running platform to the PYTHONPATH environment variable
@@ -60,14 +68,12 @@
 # 6. enable bash command line completion for OpenCPI commands with completion
 #
 # It internally sets shell variables starting with "ocpi_"
-# It insists on bash.  Someday someone can write it for csh.
-# It will not clobber the environment if OCPI_CDK_DIR is already set.
+# It insists on bash.  Someday someone can write it for csh or zsh :-)
 # You can give an optional "-v" argument to get it to be verbose.
 ocpi_name=opencpi-setup.sh
 ocpi_me=$BASH_SOURCE
 ocpi_cdk_dir=cdk
 ocpi_root_dir=root
-export OCPI_ROOT_DIR=$OCPI_ROOT_DIR
 # The egrep of the beginning of variables to clean out, e.g. derived rather than user specified
 ocpi_cleaned_vars="OCPI_(PREREQUISITES_DIR|TARGET_|TOOL_|CDK_|ROOT_)"
 [ -z "$BASH_VERSION" -o -z "$ocpi_me" ] && {
@@ -99,6 +105,7 @@ esac
   return 1
 }
 [ "$1" = --help -o "$1" = -h -o -z "$1" ] && {
+  # use when documented:--dynamic:   enable the currently running host platform to use dynamic linking
   cat <<-EOF >&2
 	This script modifies the OpenCPI environment variables and the PATH/PYTHONPATH/MANPATH variables.
 	Options to this $ocpi_name file when *sourced* are:
@@ -109,14 +116,13 @@ esac
 	 --verbose or -v:   be verbose about what is happening
 	 --ensure or -e:    do nothing if OpenCPI is already set up, otherwise like --set
 	 --set or -s:       setup the environment for OpenCPI when it is not yet set up
-	 --dynamic or -d:   enable the currently running tools platform to use dynamic linking
-	 --optimized or -O: enable the currently running tools platform to use optimized code
+	 --optimize:        enable the currently running host platform to use optimized code
 	When --set or --reset is used, the OpenCPI CDK location is inferred from the location
 	of this file, where sourced.  E.g. issuing the command "source a/b/c/opencpi-setup.sh -s"
 	will setup the CDK as found in a/b/c.
 	When in the root directory of the OpenCPI source tree, the typical usage is:
 	   source cdk/opencpi-setup.sh -s
-	Note that neither --dynamic nor --optimized affect what is built.  Just what is used.
+	Note that neither --dynamic nor --optimize affect what is built.  Just what is used.
 	EOF
   return 1
 }
@@ -125,12 +131,12 @@ esac
 if shopt -q nullglob; then echo 'Note: Turning off nullglob; was active!'; shopt -u nullglob; fi
 
 # Parse opts
-ocpi_dynamic= ocpi_optimized= ocpi_reset= ocpi_verbose= ocpi_clean= ocpi_list= ocpi_ensure= ocpi_bootstrap=
+ocpi_dynamic= ocpi_optimize= ocpi_reset= ocpi_verbose= ocpi_clean= ocpi_list= ocpi_ensure= ocpi_bootstrap=
 ocpi_options=($*)
 while [ -n "$ocpi_options" ] ; do
   case $ocpi_options in
-    -d|--dynamic) ocpi_dynamic=1;;
-    -O|--optimized) ocpi_optimized=1;;
+    --dynamic) ocpi_dynamic=1;;
+    --optimized|--optimize) ocpi_optimize=1;;
     -r|--reset) ocpi_reset=1;;
     -v|--verbose) ocpi_verbose=1;;
     -c|--clean) ocpi_clean=1;;
@@ -242,16 +248,18 @@ ocpi_root_dir=$(cd $ocpi_dir/.. && pwd)
 	OCPI_CDK_DIR is being set to be $ocpi_cdk_dir.
 	Determining the OpenCPI platform we are running on...
 	EOF
-export OCPI_CDK_DIR=$ocpi_cdk_dir
 if [ -n "$OCPI_ROOT_DIR" ]; then
-  echo "OCPI_ROOT_DIR already set to $OCPI_ROOT_DIR"
-else
-  export OCPI_ROOT_DIR=$ocpi_root_dir
+  echo "OCPI_ROOT_DIR already set to $OCPI_ROOT_DIR, so we will use that value"
+  ocpi_root_dir=$OCPI_ROOT_DIR
 fi
 ocpi_gp=$ocpi_cdk_dir/scripts/getPlatform.sh
 if [ ! -f $ocpi_gp ]; then
   # Poor mans get-platform in a runtime installation, that also sets TARGET variables
-  for p in $OCPI_CDK_DIR/*; do
+  # !!We commit the global variables here so under failure, the envronment is polluted.
+  # FIXME:  what "runtime" scenario is this really supposed to work in?
+  export OCPI_CDK_DIR=$ocpi_cdk_dir
+  export OCPI_ROOT_DIR=$ocpi_root_dir
+  for p in $ocpi_cdk_dir/*; do
     ocpi_check=$p/$(basename $p)-check.sh
     [ -e $ocpi_check ] && bash $ocpi_check && {
        source $p/$(basename $p)-init.sh
@@ -259,37 +267,52 @@ if [ ! -f $ocpi_gp ]; then
     }
   done
   [ -z "$OCPI_TOOL_PLATFORM" ] && {
-    echo "Cannot determine the runtime platform from $OCPI_CDK_DIR/*/*-check.sh" >&2
+    echo "Cannot determine the runtime platform from $ocpi_cdk_dir/*/*-check.sh" >&2
     return 1
   }
 else
+  # We have not committed any variable settings yet
   [ -x $ocpi_gp ] || {
     echo $ocpi_name: cannot run the internal getPlatforms.sh script at $ocpi_gp. >&2
+    echo $ocpi_name: this indicates a corrupted or incomplete installation >&2
     return 1
   }
-  read v0 v1 v2 v3 v4 v5 <<< `$ocpi_gp`
+  read v0 v1 v2 v3 v4 v5 <<< `$ocpi_gp "" $ocpi_cdk_dir $ocpi_root_dir`
   if [ "$v4" == "" -o $? != 0 ]; then
     echo $ocpi_name: failed to determine runtime platform. >&2
-    unset OCPI_CDK_DIR
-    unset OCPI_ROOT_DIR
     return 1
   fi
+  ocpi_tool_dir=$v4
+  [ -n "$ocpi_dynamic" -o -n "$ocpi_optimize" ] && {
+      ocpi_tool_dir+=-
+      [ -n "$ocpi_dynamic" ] && ocpi_tool_dir+=d
+      [ -n "$ocpi_optimize" ] && ocpi_tool_dir+=o
+      ocpi_bin_dir=$ocpi_cdk_dir/$ocpi_tool_dir/bin
+      [ ! -d "$ocpi_bin_dir" ] && {
+	  echo "$ocpi_name:  Error: the --dynamic or --optimize options were specified, " >&2
+	  echo "$ocpi_name:  but the host platform has not yet been built with these options." >&2
+	  echo "$ocpi_name:  You need to build for these options before using them." >&2
+	  echo "$ocpi_name:  with the command:" >z&2
+	  echo "$ocpi_name:    ocpiadmin install platform [--dynamic|--optimize]* $4" >&2
+	  return 1
+      }
+  }
+  # Now we commit the settings of the variables and thus the "pollution" of the user's envronment
+  export OCPI_CDK_DIR=$ocpi_cdk_dir
+  export OCPI_ROOT_DIR=$ocpi_root_dir
+  export OCPI_TOOL_DIR=$ocpi_tool_dir
   export OCPI_TOOL_OS=$v0
   export OCPI_TOOL_OS_VERSION=$v1
   export OCPI_TOOL_ARCH=$v2
   export OCPI_TOOL_PLATFORM=$v4
   export OCPI_TOOL_PLATFORM_DIR=$v5
-  export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
-  [ -n "$ocpi_dynamic" -o -n "$ocpi_optimized" ] && OCPI_TOOL_DIR+=-
-  [ -n "$ocpi_dynamic" ] && OCPI_TOOL_DIR+=d
-  [ -n "$ocpi_optimized" ] && OCPI_TOOL_DIR+=o
   # This is (temporarily) redundant with ocpibootstrap.sh
   [ -z "$OCPI_PREREQUISITES_DIR" ] && {
     export OCPI_PREREQUISITES_DIR=$OCPI_ROOT_DIR/prerequisites
     if [ -d $OCPI_PREREQUISITES_DIR ]; then
       export OCPI_PREREQUISITES_DIR=$(cd $OCPI_PREREQUISITES_DIR; pwd)
     else
-      echo "$ocpi_name: warning: $OCPI_PREREQUISITES_DIR does not exist.  The installation/build of OpenCPI is incomplete." >&2
+      echo "$ocpi_name:  warning:  $OCPI_PREREQUISITES_DIR does not exist.  The installation/build of OpenCPI is incomplete." >&2
     fi
   }
   [ "$ocpi_verbose" = 1 ] &&

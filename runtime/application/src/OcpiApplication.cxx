@@ -484,6 +484,37 @@ namespace OCPI {
       const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       if (slaves) {
 	if (!c.slaves) {
+#if 1
+	  // Find a slave assembly by selection expression
+	  // Fixme: initial properties?  else it depends on build configurations for no good reason?
+	  // finalizePropertyValues needs to be split do that the parsing can be done earlier
+	  // up to prepareinstanceproperties, stashed earlier by pointer and then moved to crew
+	  // any other need to do this early?
+	  // we already do it for choosing workers in library assembly
+	  // -- parse an initial value and compare it to a parameter value
+	  // both in selection expressions (which only accesss worker parameters)
+	  // could selection expressions for instances usefully use initial? not really
+	  // so we need to stash it in candidates, but only on demand.
+	  // when else would we need it?  We are selecting a slave assembly based on
+	  // initial properties that may not be parameters.  Could a worker have an acceptance
+	  // expression based on initial properties? another on-demand thing.
+	  do {
+	    const char *expr = ezxml_cattr(slaves, "selection");
+	    if (!expr || !expr[0])
+	      break; // no expression is acceptable
+	    OU::ExprValue val;
+	    const char *err = OU::evalExpression(expr, val, &c.impl->m_metadataImpl);
+	    if (err || !val.isNumber())
+	      ocpiBad("Error in slave assembly selection expression \"%s\": %s",
+		      expr, err ? err : "expression value is not a number");
+	    else if (val.getNumber() > 0)
+	      break;
+	  } while ((slaves = ezxml_cnext(slaves)));
+	  if (!slaves) {
+	    ocpiInfo("No slave assembly found with accepted selection expression");
+	    return false;
+	  }
+#endif
 	  // Do this work one time for this candidate of this instance, which caches this work so that it can
 	  // be applied each time this candidate is considered for deployment
 	  ocpiInfo("++++++++++++ Starting one-time processing of slave assembly for instance %u candidate %p",
@@ -828,12 +859,20 @@ namespace OCPI {
                             pName, m_assembly.instance(nInstance).name().c_str());
 #endif
         }
-        if (!aProps[p].m_hasValue)
-          continue;
-        checkPropertyValue(nInstance, impl.m_metadataImpl, aProps[p], pn, pv);
+        if (aProps[p].m_hasValue)
+	  checkPropertyValue(nInstance, impl.m_metadataImpl, aProps[p], pn, pv);
       }
     }
 
+#if 0
+    // Prepare instance properties for a possible deployment
+no since it is really worker specific. perhaps do it really earlier so it can be used where
+initial properties are checked against parameters?
+does the library database have anything interned per worker?
+so we need to check instance props against (late binding) for a *candidate*
+it is really per actual worker config...
+    prepareInstanceProperties(
+#endif
     void ApplicationI::
     finalizeProperties(const OU::PValue *params) {
       auto *d = &m_bestDeployments[0];
@@ -1113,6 +1152,11 @@ namespace OCPI {
                         i.m_feasibleContainers[m]);
               if (i.m_feasibleContainers[m] & (1u << cont) &&
                   bookingOk(m_bookings[cont], c, instNum)) {
+		// Bump the score if the optimized attribute of the worker (as compiled) matches the
+		// optimized attribute of the container.  Since we generally want workers that match what
+		// the container (and framework) is built for.
+		if (OC::Container::nthContainer(cont).m_optimized == c.impl->m_artifact.optimized())
+		  score++;
                 deployInstance(instNum, score + c.score, 1, &cont, &c.impl,
                                i.m_feasibleContainers[m]);
                 if (!c.impl->m_staticInstance)

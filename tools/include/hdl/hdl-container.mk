@@ -150,7 +150,9 @@ ifneq ($(MAKECMDGOALS),clean)
         (cd .. && \
          $(call OcpiGen, -D $(call WkrTargetDir,$(HdlTarget),$1) -A -S $(Assembly) -P $(HdlPlatform) \
                     -e $(HdlPart) -F $(PlatformDir) $(ImplXmlFile)) && \
-         $(OcpiHdl) bram $(call ArtifactXmlName,$1) $(call MetadataRom,$1) \
+         rom_words=`$(OcpiHdl) -v bram $(call ArtifactXmlName,$1) $(call MetadataRom,$1)` && \
+         echo Compressed metadata ROM is $$$$rom_words dwords. && \
+	 sed -i 's/\(rom_words *=> *to_ushort(\)[^)]*)/\1'$$$$rom_words')/' $(ImplFile) \
         )
       # Now we need to make a bit file from every paramconfig for this worker
       HdlBitName=$(call BitFile_$(HdlToolSet_$(HdlTarget)),$(call HdlContName,$1))

@@ -518,7 +518,7 @@ library ocpi; use ocpi.all, ocpi.types.all;
 use work.platform_pkg.all;
 package metadata_defs is
 component metadata_rv is
-  generic(romwords : natural := 2048);
+  generic(rom_words : ushort_t := to_ushort(2048));
   port(
     wci_Clk      : in std_logic;
     wci_Reset_n  : in std_logic;

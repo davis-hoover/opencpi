@@ -801,19 +801,21 @@ bram(const char **ap) {
   check = zs.adler;
 #endif
   size_t oWords = (total + OH::ROM_WIDTH_BYTES-1)/OH::ROM_WIDTH_BYTES;
+#if 0
   if (oWords + OH::ROM_HEADER_WORDS > OH::ROM_NWORDS)
     bad("Compressfile is too large for BRAM. Input is %zu, output is %zu",
 	length, total + OH::ROM_HEADER_BYTES);
+#endif
   OH::RomWord *u32p = (OH::RomWord *)out;
-  for (unsigned n = 0; n < OH::ROM_NWORDS; n++) {
+  for (unsigned n = 0; n < oWords + OH::ROM_HEADER_WORDS; n++) {
     OH::RomWord i;
-    switch(n) {
+    switch (n) {
     case 0: i = 1; break;
     case 1: i = OCPI_UTRUNCATE(OH::RomWord, total); break;
     case 2: i = OCPI_UTRUNCATE(OH::RomWord, length); break;
     case 3: i = OCPI_UTRUNCATE(OH::RomWord, check); break;
     default:
-      i = n < oWords+OH::ROM_HEADER_WORDS ? *u32p++ : 0;
+      i = *u32p++;
     }
     fprintf(ofp, "%08x\n", i);
   }
@@ -824,8 +826,8 @@ bram(const char **ap) {
   if (verbose)
     fprintf(stderr, "Wrote bram file '%s' (%zu bytes) from file '%s' (%zu bytes)\n",
 	    ap[1], total + OH::ROM_HEADER_BYTES, *ap, (size_t)length);
-  // The normative output
-  printf("%zu\n", total + OH::ROM_HEADER_BYTES);
+  // The normative output, number of words
+  printf("%zu\n", oWords + OH::ROM_HEADER_WORDS);
   if (in) free(in);
   if (out) free(out);
 }

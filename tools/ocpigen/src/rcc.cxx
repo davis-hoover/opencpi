@@ -1398,10 +1398,55 @@ print_map() {
 const char* Worker::
 addSlaves(ezxml_t a_slaves) {
   const char *err;
-  m_assembly = new ::Assembly(*this);
   static const char *instAttrs[] = {INST_ATTRS};
+#if 0
+  for (ezxml_t slaveAssy = a_slaves; slaveAssy; slaveAssy = ezxml_cnext(slaveAssy)) {
+    const char *expr = ezxml_cattr(slaveAssy, "selection");
+    auto *assy = new ::Assembly(*this);
+    m_slaveAsseembles.emplace_back(expr ? expr : "", assy);
+    if ((err = assy->parseAssy(slaveAssy, NULL, instAttrs)))
+      return err;
+    Instance *i = &assy->m_instances[0];
+    for (unsigned n = 0; n < assy->m_instances.size(); n++, i++) {
+      unsigned np = 0;
+      Port *slavePort = NULL, *port = NULL;
+      bool hasIndex = false;
+      size_t index = 0;
+      for (InstancePort *ip = &i->m_ports[0]; !port && np < i->m_worker->m_ports.size(); np++, ip++)
+	for (auto pit = ip->m_attachments.begin(); !port && pit != ip->m_attachments.end(); ++pit)
+	  if ((*pit)->m_connection.m_external) {
+	    port = (*pit)->m_connection.m_external->m_instPort.m_port; // proxy port
+	    slavePort = ip->m_port;
+	    hasIndex = (*pit)->m_connection.m_count != 0;
+	    index = (*pit)->m_index;
+	    break;
+	  }
+    }
+  }
+  /*
+    we can do a union of instance names, but we need to error check that instance with the same
+    name is the same worker, AND the same parameter values etc. (until a fix of prop exprs)
+    selection expressions are purely a runtime thing, but perhaps we could evaluate them against
+    default values so we know they are syntactically correct.
+    but connectity is more complicated.
+    so we need to have a per-assembly map
+    worker optionality is not in the XML, but it should be to avoid runtime processing.
+    perhaps preprocessing the union set of workers is the right thing too.
+    when instantiating worker
+    OOPS: slave property types with expressions based on parameters use the proxy's parameters values?
+    OOPS: slave properties do not use expr for string lengt
+    OOPS: other expr aspects of property types that affect slave access APIs?
+    can nuke m_isOptional, m_slavePort, m_proxyPortIndex
+    runtime:
+    need to map instances in each assembly to the slave ordinal (union) in the proxy.
+    otherwise runtime just chooses which one and does the same thing.
+    
+   */
+#else
+  m_assembly = new ::Assembly(*this);
   if ((err = m_assembly->parseAssy(a_slaves, NULL, instAttrs)))
     return err;
+
   Instance *i = &m_assembly->m_instances[0];
   for (unsigned n = 0; n < m_assembly->m_instances.size(); n++, i++) {
     unsigned np = 0;
@@ -1428,6 +1473,7 @@ addSlaves(ezxml_t a_slaves) {
       return OU::esprintf("Duplicate slave name: %s", i->m_name.c_str());
     m_slaves.emplace_back(i->m_name, &wkr);
   }
+#endif
   return NULL;
 }
 /*
@@ -1439,6 +1485,7 @@ addSlaves(ezxml_t a_slaves) {
  * a vector of pairs of Worker pointer(pointer to slave object) and string (name of worker).  The
  * name of the worker can be specified in xml.  If it is not specified it is auto generated as the
  * "workerName" if there is only one and if there is more then one as "workerName_X".
+ * there is also the "optional" issue:  it is optional if it is not present in all assemblies
  */
 const char* Worker::
 parseSlaves() {
@@ -1591,6 +1638,7 @@ parseRccAssy() {
   if ((err = a->parseAssy(m_xml, topAttrs, instAttrs)))
     return err;
   m_dynamic = g_dynamic;
+  m_optimized = g_optimized;
   return NULL;
 }
 

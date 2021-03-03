@@ -40,7 +40,8 @@ namespace OCPI {
 	  return OU::eformat(err, "remote container driver not loaded per system.xml file");
 	driver = static_cast<OR::Driver *>(d);
       }
-      return driver->probeServer(server, verbose, exclude, NULL, false, err);
+      unsigned dummy;
+      return driver->probeServer(server, verbose, exclude, NULL, false, dummy, err);
     }
     void
     probeServer(OR::Driver *&driver, const char *server, bool verbose) {

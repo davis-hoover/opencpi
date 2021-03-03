@@ -564,7 +564,7 @@ namespace OCPI {
 	  printf("%s\n", (*wi).second->m_metadataImpl.specName().c_str());
     }
 
-    Capabilities::Capabilities() : m_dynamic(false) {}
+    Capabilities::Capabilities() : m_dynamic(false), m_optimized(false) {}
   }
   namespace API {
     void LibraryManager::
