@@ -32,19 +32,19 @@ end entity time_client_rv;
 architecture rtl of time_client_rv is
 
   signal wci_reset          : std_logic;
-  signal wci2timebase_reset : std_logic;
+  signal wti2timebase_reset : std_logic;
   signal wci2wti_reset      : std_logic;
   signal sync_reg_in        : std_logic_vector(time_in.now'length downto 0);
   signal sync_reg_out       : std_logic_vector(time_in.now'length downto 0);
-
+  signal sync_src_rdy       : std_logic;
 begin
 
   wci_reset <= not wci_Reset_n;
 
-  wci2timebase_rst : cdc.cdc.reset
-    port map   (src_rst => wci_reset,
+  wti2timebase_rst : cdc.cdc.reset
+    port map   (src_rst => wci2wti_reset,
                 dst_clk => time_in.clk,
-                dst_rst => wci2timebase_reset);
+                dst_rst => wti2timebase_reset);
 
   wci2wti_rst : cdc.cdc.reset
     port map   (src_rst => wci_reset,
@@ -52,19 +52,19 @@ begin
                 dst_rst => wci2wti_reset);
 
   sync_reg_in <= time_in.valid & std_logic_vector(time_in.now);
-
+  
   syncReg : cdc.cdc.bits_feedback
     generic map (
       width => time_in.now'length+1) -- +1 is for the valid flag
     port map (
       src_CLK => time_in.clk,
       dst_CLK => wti_in.Clk,
-      src_RST => wci2timebase_reset,
+      src_RST => wti2timebase_reset,
       dst_rst => wci2wti_reset, -- this will be released earlier than the time will be used.
       src_IN  => sync_reg_in,
-      src_EN  => '1',
+      src_EN  => sync_src_rdy,
       dst_OUT => sync_reg_out,
-      src_RDY => open);
+      src_RDY => sync_src_rdy);
 
   wti_out.MData <= sync_reg_out(time_in.now'length-1 downto 0);
   wti_out.MCmd <= ocp.MCmd_WRITE when its(sync_reg_out(time_in.now'length)) else
