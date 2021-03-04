@@ -317,8 +317,9 @@ main(int argc, const char **argv) {
           std::string config, constraints;
           OrderedStringSet platforms;
           ezxml_t prop, name;
-          if ((err = parseFile(*ap, parent, "project", &xml, file, false, false))) {
-            err = OU::esprintf("For project XML file '%s':  %s", *ap, err);
+          if ((err = parseFile(*ap, parent, "project", &xml, file, true, false)) &&
+           (err = parseFile(*ap, parent, "library", &xml, file, true, false))) {
+            OU::esprintf("For project/library XML file '%s':  %s", *ap, err);
             break;
           }
           if (!(prop = ezxml_cchild(xml, "OcpiProperty"))) {
