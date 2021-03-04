@@ -142,8 +142,13 @@ public:
     }
     return RCC_OK;
   }
-  RCCResult stop_config(unsigned config) {
+  RCCResult stop_config(unsigned config) { 
     log(8, "DRC: stop_config: %u", config);
+    
+    // Unlock the configurations when stopping the DRC.
+    m_ctrlr.unlock_all();    
+    log(8, "DRC: stop_config -> Issued unlock for all configurations"); 
+
     return RCC_OK;
   }
   RCCResult release_config(unsigned /*config*/) {
