@@ -86,7 +86,7 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v2.0.0 & Updates for 2.0.0 release & 10/2020 \\
 			\hline
-			v2.1.0 & Updates for 2.1.0 release & 02/2021 \\
+			v2.1.0 & Updates for 2.1.0 release & 03/2021 \\
 			\hline
 		\end{tabularx}
 	\end{table}
@@ -192,7 +192,13 @@ zynq chip, but now the SDP/DMA FPGA modules are also 64 bits wide
 whereas they used to be 32 bits wide.  This allows the DMA to have
 higher throughput and no idle cycles when producing continuous 32 bit data.\\
 
-With the exception of zynq ultra, zynq platforms now have the option of using cache coherent DMA.
+With the exception of zynq ultra, zynq platforms now have the option of using cache coherent DMA.\\
+
+Options may now be specified to build both the framework itself and software assets (RCC workers, ACI programs) with compiler optimizations, alongside the existing default build for best debugging.  I.e., both the default debug builds as well as the optimized builds coexist in the source tree installation, and both can be built and used.  The ``\code{--optimize}'' option applies to the \code{opencpi-setup.sh} script (to use the optimized framework build) as well as the \code{ocpiadmin install platform} and the \code{ocpidev build} commands (to perform an optimized build).  An alternative way to enable building with optimization is to use a ``\code{-o}'' suffix at the end of software platform names: the idea is that anywhere in the CLI you have a software platform, you can qualify it with build options and it creates a ``pseudo platform'' with the specified option, which does not interfere with the default platform (without the suffix).  This applies to \code{ocpiadmin install platform}, \code{ocpidev build --rcc-platform}, and \code{ocpiremote load --sw\_platform}.  When running applications with RCC workers, when both debug and optimized RCC workers are built (i.e. both artifacts are available in \code{OCPI\_LIBRARY\_PATH}), preference is given to the worker whose optimization setting matches the optimization setting of the container in which it is executing.
+
+\subsection{OCPI\_ROOT\_DIR Environment Variable}
+\label{sec:21_rootdir}
+Files in scripts/programs may now be referenced relative to the OpenCPI ``root'' directory, as well as the ``cdk'' directory.  The following scripts have been modified to take advantage of the new \code{OCPI\_ROOT\_DIR} environment variable: \code{opencpi-setup.sh}, \code{zynq\_setup.sh}, \code{zynq\_net\_setup.sh}, and \code{ocpiserver.sh}.
 
 \subsection{e3xx OSP}
 \label{sec:21_e3xx}
