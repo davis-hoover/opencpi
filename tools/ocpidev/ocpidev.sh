@@ -2676,8 +2676,8 @@ fi
 # xml app
 [ \( -n "$xmlapp" -o -n "$xmldirapp" \) -a \( \( "$verb" != create -a "$verb" != delete \) -o "$noun" != "application" \) ] &&
   bad the -X '(xml/simple)' or -x '(application directory with xml)' option is only valid when creating an application
-[ -n "$dynamic" && "$verb" != build ] && bad the --dynamic flag is only valid with the build verb
-[ -n "$optimize" && "$verb" != build ] && bad the --optimize flag is only valid with the build verb
+[ -n "$dynamic" -a "$verb" != build ] && bad the --dynamic flag is only valid with the build verb
+[ -n "$optimize" -a "$verb" != build ] && bad the --optimize flag is only valid with the build verb
 [ -n "$dynamic" -o -n "$optimize" ] && {
     build_suffix=-
     [ -n "$dynamic" ] && build_suffix+=d
