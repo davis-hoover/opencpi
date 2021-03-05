@@ -1,3 +1,29 @@
+# [v2.1.0-rc.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-rc.1...v2.1.0-rc.2) (2021-03-04)
+
+Changes/additions since [OpenCPI Release v2.1.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-rc.1)
+
+### New Features
+- **runtime**: add `OCPI_ROOT_DIR` environment variable to setup scripts. (!471)(f4b25449)
+
+### Enhancements
+- **devops,tools**: allow `gen-cg-pdfs.sh` to work with recent LibreOffice versions. (!482)(3405e888)
+- **hdl base**: make `capture_v2` a split clock worker. (!492)(a8098c74)
+- **runtime**: enable drc stop_config. (!483)(904f12ff)
+- **runtime,tools**: add `--optimize` option to `opencpi-setup.sh`. (!495)(dcf1e54c)
+- **tools**: building sw framework/rcc/aci for optimization is now fully enabled, but not in the UI yet. (!490)(c16a8374)
+
+### Bug Fixes
+- **comp**: fix bug in drc worker implementation. (!497)(2dad9b19)
+- **hdl base**: increase data path cdc fifo depth from 2 to 16 within `timestamper_scdcd` for better throughput. (!496)(6295897e)
+- **osp**: zcu104: fix a typo and a symlink. (!491)(ae8386a8)
+- **runtime**: DtDmaXfer.cxx: fix log-level for messages to/from FPGA. (!498)(d5164abd)
+- **tools**: ocpidev.sh: fix broken test statements. (!498)(d5164abd)
+
+### Miscellaneous
+- **doc**: update DRC briefing for LibreOffice 5.3 compatibility. (!487)(8c300713)
+- **osp**: zcu104: fix regression, thereby allowing `data_sink_test_app` and `fsk_dig_radio_ctrl` to run. (!491)(ae8386a8)
+- **tests**: temporarily disable `capture_v2` test. (!499)(9595345e)
+
 # [v2.1.0-rc.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-beta.1...v2.1.0-rc.1) (2021-02-08)
 
 Changes/additions since [OpenCPI Release v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-beta.1)
