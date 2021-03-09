@@ -399,6 +399,7 @@ hasFullInputBuffer(Port *input_port, InputBuffer** retb) const {
   return !buffer->isEmpty() && !buffer->inUse();
 }
 
+#if 0
 void Controller::
 bufferFull(Port *port) {
   // We treat the input buffers as a circular queue, so we only need to check
@@ -408,6 +409,7 @@ bufferFull(Port *port) {
   if (m_FillQPtr >= port->getBufferCount())
     m_FillQPtr = 0;
 }
+#endif
 
 void Controller::
 freeBuffer(Port *port) {

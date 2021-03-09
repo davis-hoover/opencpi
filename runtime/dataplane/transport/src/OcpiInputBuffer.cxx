@@ -48,9 +48,9 @@ using namespace OCPI::OS;
 /**********************************
  * Constructors
  *********************************/
-InputBuffer::InputBuffer( OCPI::DataTransport::Port* port, OCPI::OS::uint32_t tid )
+InputBuffer::InputBuffer( OCPI::DataTransport::Port* port, OCPI::OS::uint32_t tid)
   : Buffer( port, tid ),m_feedbackDesc(port->getMetaData()->m_externPortDependencyData),
-    m_produced(true)
+    m_produced(true) OCPI_EMIT_MEMBER_INIT_STATE(arrive, "message arrived and acknowledged")
 {
   m_feedbackDesc.type = OCPI::RDT::ProducerDescT;
   m_bVaddr = 0;
@@ -336,7 +336,7 @@ void InputBuffer::markBufferFull()
 {
   assert(getPort()->isShadow() || !(getPort()->getMetaData()->m_descriptor.options & (1 << FlagIsMeta)));
   m_produced = true;
-  OCPI_EMIT_CAT_("Mark Buffer Full",OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW);
+  OCPI_EMIT_CAT_("Mark Input Buffer Full",OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW);
 
   if ( ! this->getPort()->isShadow() ) {
     // This can happen when in the same container
@@ -361,7 +361,7 @@ void InputBuffer::markBufferFull()
  *********************************/
 void InputBuffer::markBufferEmpty()
 {
-  OCPI_EMIT_CAT_("Mark Buffer Empty",OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW);
+  OCPI_EMIT_CAT_("Mark Input Buffer Empty",OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW);
   if ( ! this->getPort()->isShadow() ) {
     for ( unsigned int n=0; n<MAX_PCONTRIBS; n++ ) {
       uint32_t full = m_state[0][n].bufferIsFull & FF_MASK;

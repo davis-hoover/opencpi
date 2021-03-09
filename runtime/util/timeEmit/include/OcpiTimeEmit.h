@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define OCPI_TIME_EMIT_SUPPORT
+//#define OCPI_TIME_EMIT_SUPPORT
 
 
 
@@ -127,6 +127,10 @@ do { \
 do { \
   this->emit(re,v);                                \
 } while(0)
+#define OCPI_EMIT_REGISTERED__(c,re,v)	\
+do { \
+  (c).emit((c).re,v);				\
+} while(0)
 
 #define OCPI_EMIT( name ) \
 do { \
@@ -230,10 +234,28 @@ do { \
   OCPI::Time::Emit::getSEmit().emit(re,static_cast<OCPI::OS::uint64_t>(value));                        \
 } while(0)
 
+// Use this with a semicolon at the end like any other declaration
+// Note when these macros are disabled, the trailing semicolon is legal C++
+#define OCPI_EMIT_MEMBER_DECL(member) OCPI::Time::Emit::RegisterEvent m_##member
+// Unfortunately this macro must follow one previous member initializer
+// This is so that no storage is used for any member event when events are disabled
+#define OCPI_EMIT_MEMBER_INIT_EVENT(member, name) , m_##member(name, 1, OCPI::Time::Emit::Transient)
+#define OCPI_EMIT_MEMBER_INIT_STATE(member, name) , m_##member(name, 1, OCPI::Time::Emit::State)
+#define OCPI_EMIT_MEMBER_THIS(member,...) OCPI_EMIT_REGISTERED_(m_##member,__VA_ARGS__)
+#define OCPI_EMIT_MEMBER_OTHER(other,member,...) OCPI_EMIT_REGISTERED__(other,m_##member,__VA_ARGS__)
 #else
+
+
+
+#define OCPI_EMIT_MEMBER_DECL(member)
+#define OCPI_EMIT_MEMBER_INIT_EVENT(member, name)
+#define OCPI_EMIT_MEMBER_INIT_STATE(member, name)
+#define OCPI_EMIT_MEMBER_THIS(member, v)
+#define OCPI_EMIT_MEMBER_OTHER(other, member, v)
 
 #define OCPI_EMIT_REGISTER(  name )
 #define OCPI_EMIT_REGISTER_FULL(  name, dtype, width, etype )
+#define OCPI_EMIT_REGISTER_FULL_VAR(  name, dtype, width, etype, var )
 #define OCPI_EMIT_REGISTER_P( p )
 
 #define OCPI_EMIT_HERE
@@ -247,7 +269,10 @@ do { \
 
 #define OCPI_EMIT_STATE( name, state )
 #define OCPI_EMIT_STATE_( name, state )
-
+#define OCPI_EMIT_STATE__( name, state, c )
+#define OCPI_EMIT_STATE_NR( re, state )
+#define OCPI_EMIT_STATE_NR_( re, state )
+#define OCPI_EMIT_STATE_NR__( re, state, c )
 
 #define OCPI_EMIT_PVALUE( p )
 #define OCPI_EMIT_PVALUE_( p )
@@ -264,17 +289,17 @@ do { \
 #endif
 
 
-
-
 namespace OCPI {
 
   namespace Time {
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
     class Emit {
 
     public:
       typedef uint16_t EventId;
-      typedef int16_t OwnerId; // -1 is sentinel
+      typedef uint16_t OwnerId; // UINT16_MAX is sentinel
+      static const OwnerId NoOwner = UINT16_MAX;
       typedef uint64_t Time;
 
       enum EventType {
@@ -335,13 +360,13 @@ namespace OCPI {
       class RegisterEvent {
       public:
         RegisterEvent( const char* event_name,
-                       int width=1, 
+                       unsigned width=1, 
                        EventType type=OCPI::Time::Emit::Transient,
                        DataType dt=OCPI::Time::Emit::DT_u
                        );
         RegisterEvent( OCPI::API::PValue& pvstr );
         static Emit::EventId registerEvent( const char* event_name,
-					    int width=1, 
+					    unsigned width=1, 
 					    EventType type=OCPI::Time::Emit::Transient,
 					    DataType dt=OCPI::Time::Emit::DT_u
 					    );
@@ -391,34 +416,27 @@ namespace OCPI {
 	virtual ~FastSystemTime(){};
 	static uint64_t myTicks( TimeSource * );
       };
-      
 
       /*
        * This constructor is used by a top-level traceable object.
        */
-      Emit( const char* class_name=NULL, 
-                 const char* instance_name=NULL, QConfig* config=NULL )
-        throw ( OCPI::Util::EmbeddedException );
+      Emit(const char *class_name = NULL, const char *instance_name = NULL, QConfig *config = NULL);
 
       /*
        * This constructor is used by a top-level traceable object.
        */
-      Emit( TimeSource& ts, const char* class_name=NULL, 
-                 const char* instance_name=NULL, QConfig* config=NULL )
-        throw ( OCPI::Util::EmbeddedException );
+      Emit(TimeSource &ts, const char *class_name = NULL,
+	   const char *instance_name = NULL, QConfig *config = NULL);
 
       /*
        * This constructor is used by sub-ordinate objects.
        */
-      Emit( Emit* parent, const char* class_name=NULL, 
-                 const char* instance_name=NULL, QConfig* config=NULL )
-        throw ( OCPI::Util::EmbeddedException ) ;
+      Emit(Emit *parent, const char *class_name = NULL, const char *instance_name = NULL,
+	   QConfig *config = NULL);
 
-      Emit( Emit* parent, TimeSource& ts, const char* class_name=NULL, 
-	    const char* instance_name=NULL, QConfig* config=NULL )
-        throw ( OCPI::Util::EmbeddedException ) ;
-      ~Emit()
-        throw ( );
+      Emit(Emit *parent, TimeSource &ts, const char *class_name = NULL,
+	   const char *instance_name = NULL, QConfig *config = NULL);
+      ~Emit();
 
       // Header utility methods
       OwnerId addHeader( Emit* t );
@@ -466,8 +484,7 @@ namespace OCPI {
       static OCPI::OS::Mutex& getGMutex();
 
       // Shutdown, deletes all global resources 
-      static void shutdown()
-        throw ( );
+      static void shutdown();
 
     private:
       void 
@@ -482,11 +499,9 @@ namespace OCPI {
 
       void pre_init( const char* class_name, 
                 const char* instance_name, 
-                QConfig* config )
-        throw ( OCPI::Util::EmbeddedException );
+		     QConfig* config );
 
-      void init()
-        throw ( OCPI::Util::EmbeddedException );
+      void init();
 
       // static class methods
       Time getTime();
@@ -552,6 +567,39 @@ namespace OCPI {
       DumpFormat m_dumpFormat;
 
     };
+#else    
+// Define the minimum for compilation
+    struct QConfig;
+    struct Emit {
+      typedef uint64_t Time;
+      struct TimeSource;
+      typedef  Time (*TickFunc)(TimeSource*);
+      Emit(Emit *, const char *a = NULL, const char *b = NULL, QConfig *c = NULL) { (void)a;(void)b;(void)c;}
+      Emit(const char *a = NULL, const char *b = NULL) { (void)a;(void)b;}
+      Emit(TimeSource &, const char *a = NULL, const char *b = NULL, QConfig *c = NULL) {
+	(void)a;(void)b;(void)c;
+      }
+      Emit(Emit *, TimeSource &, const char *a = NULL, const char *b = NULL, QConfig *c = NULL) {
+	(void)a;(void)b;(void)c;
+      }
+      void setInstanceName(const char *) {}
+      static void shutdown(){}
+      struct TimeSource {
+        TimeSource(TickFunc tf = NULL) { (void)tf;};
+      };
+      class RegisterEvent {
+      };
+    };
+    struct EmitFormatter {
+      enum DumpFormat {
+        OCPIReadable,
+        OCPIRAW,
+        VCDFormat,
+	CSVFormat,
+      };
+      EmitFormatter(DumpFormat df = OCPIReadable) { (void)df; }
+    };
+#endif
   }
 }
 

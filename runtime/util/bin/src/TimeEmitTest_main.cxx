@@ -28,6 +28,8 @@ using namespace OCPI::API;
 using namespace OCPI::Time;
 
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
+
 class OcpiRccBinderConfigurator
   : public OCPI::Util::CommandLineConfiguration
 {
@@ -459,6 +461,7 @@ int main( int argc, char** argv )
     return false;
   }
 
+
   PVLongLong plonglong("plonglong type", -3 );
   OCPI::Time::Emit::RegisterEvent ev2( plonglong );
   OCPI::Time::Emit::getSEmit().emit(ev0);
@@ -477,7 +480,6 @@ int main( int argc, char** argv )
   E.emitT( hw_evt, ts.getTicks() );
   E.emitT( hw_evt, ts.getTicks() );
   E.emitT( hw_evt, ts.getTicks() );
-  
 
 
 
@@ -528,5 +530,8 @@ int main( int argc, char** argv )
   std::cout << tfb;
 
 }
+#else
+int main(int, char**) { return 0; }
+#endif
 
 

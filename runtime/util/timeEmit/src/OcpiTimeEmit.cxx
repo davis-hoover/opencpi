@@ -33,6 +33,8 @@
 
 #define HANDLE_CLOCK_WRAP 1
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
+
 namespace OA = OCPI::API;
 namespace OU = OCPI::Util;
 
@@ -69,9 +71,7 @@ namespace OCPI {
 
     void
     Emit::
-    init()
-      throw ( OU::EmbeddedException )
-    {
+    init() {
       AUTO_MUTEX(Emit::getGMutex());
       if ( getHeader().init == true ) {
 	return;
@@ -79,14 +79,14 @@ namespace OCPI {
   
       const char *tmp;
       if ( ( tmp = getenv("OCPI_TIME_EMIT_TRACE_CD") ) != NULL ) {
-	getHeader().traceCD = atoi(tmp);    
+	getHeader().traceCD = tmp[0] == '1';
       }
       else {
 	getHeader().traceCD = 0;
       }
 
       if ( ( tmp = getenv("OCPI_TIME_EMIT_DUMP_ON_EXIT") ) != NULL ) {
-	getHeader().dumpOnExit = atoi(tmp);
+	getHeader().dumpOnExit = tmp[0] == '1';
 	if ( getHeader().dumpOnExit ) {
 	  atexit( exitHandler );
 	}
@@ -105,11 +105,11 @@ namespace OCPI {
       }
 
       if ( ( tmp = getenv("OCPI_TIME_EMIT_CAT") ) != NULL ) {
-	m_categories = atoi(tmp);
+	m_categories = (unsigned)atoi(tmp);
       }
 
       if ( ( tmp = getenv("OCPI_TIME_EMIT_SUB_CAT") ) != NULL ) {
-	m_sub_categories = atoi(tmp);
+	m_sub_categories = (unsigned)atoi(tmp);
       }
 
       // Try to open the stream now so that we can report any errors before exit
@@ -137,14 +137,14 @@ namespace OCPI {
       else {
 	char* qsize;
 	if ( (qsize = getenv("OCPI_TIME_EMIT_Q_SIZE") ) != NULL ) {
-	  m_q->config.size = atoi(qsize);
+	  m_q->config.size = (unsigned)atoi(qsize);
 	}
 	else {
 	  m_q->config.size  = 50 * 1024;
 	}
 	char* swf;
 	if ( (swf = getenv("OCPI_TIME_EMIT_Q_SWF") ) != NULL ) {
-	  m_q->config.stopWhenFull = atoi(swf);
+	  m_q->config.stopWhenFull = swf[0] == '1';
 	}
 	else {
 	  m_q->config.stopWhenFull = false;
@@ -156,18 +156,14 @@ namespace OCPI {
 
     void 
     Emit::
-    pre_init( const char* class_name, 
-              const char* instance_name, 
-              QConfig* config )
-      throw ( OU::EmbeddedException )
-    {
+    pre_init(const char *class_name, const char *instance_name, QConfig *config) {
       if ( class_name ) {
 	m_className = class_name;
       }
       if ( instance_name ) {
 	m_instanceName = instance_name;
       }
-      m_parentIndex = -1;
+      m_parentIndex = NoOwner;
       m_myId = addHeader( this );
       init_q( config, m_ts );
     }
@@ -186,11 +182,8 @@ namespace OCPI {
     }
 
     Emit::
-    Emit( TimeSource& ts, const char* class_name, 
-	  const char* instance_name, QConfig* config )
-      throw ( OU::EmbeddedException )
-      : m_parent(NULL), m_q(NULL), m_ts(NULL)
-    {
+    Emit(TimeSource &ts, const char *class_name, const char *instance_name, QConfig *config)
+      : m_parent(NULL), m_q(NULL), m_ts(NULL) {
       AUTO_MUTEX(Emit::getGMutex() );
       m_ts = &ts;
       pre_init( class_name, instance_name, config );
@@ -201,12 +194,8 @@ namespace OCPI {
     }
 
     Emit::
-    Emit( const char* class_name, 
-	  const char* instance_name, 
-	  QConfig* config )
-      throw ( OU::EmbeddedException )
-      : m_level(1),m_parent(NULL), m_q(NULL), m_ts(NULL)
-    {
+    Emit(const char *class_name, const char *instance_name, QConfig *config)
+      : m_level(1), m_parent(NULL), m_q(NULL), m_ts(NULL) {
       AUTO_MUTEX(Emit::getGMutex() );
       m_ts = getDefaultTS();
       pre_init( class_name, instance_name, config );
@@ -250,13 +239,8 @@ namespace OCPI {
 
 
     Emit::
-    Emit( Emit* parent, 
-	  const char* class_name, 
-	  const char* instance_name, 
-	  QConfig* config )
-      throw ( OU::EmbeddedException )
-      :m_parent(parent), m_q(NULL), m_ts(NULL)
-    {
+    Emit(Emit *parent, const char *class_name, const char *instance_name, QConfig *config)
+      : m_parent(parent), m_q(NULL), m_ts(NULL) {
       AUTO_MUTEX(Emit::getGMutex());
       m_ts = getDefaultTS();
       parent_init(parent,class_name,instance_name,config,config?true:false);
@@ -264,28 +248,21 @@ namespace OCPI {
 
 
     Emit::
-    Emit( Emit* parent, 
-	  TimeSource &ts,
-	  const char* class_name, 
-	  const char* instance_name, 
-	  QConfig* config )
-      throw ( OU::EmbeddedException )
-      :m_parent(parent), m_q(NULL), m_ts(NULL)
-    {
+    Emit(Emit *parent, TimeSource &ts, const char *class_name, const char *instance_name, QConfig *config)
+      : m_parent(parent), m_q(NULL), m_ts(NULL) {
       AUTO_MUTEX(Emit::getGMutex());
       init_q( config, &ts );
       parent_init(parent,class_name,instance_name,NULL,false);
     }
 
-
-    void 
+    void
     Emit::
     stop( bool globally )
     {
       AUTO_MUTEX(Emit::getGMutex());
-  
+
       if ( globally ) {
-	std::vector<EventQ*>::iterator it;    
+	std::vector<EventQ*>::iterator it;
 	for( it=Emit::getHeader().eventQ.begin();
 	     it!=Emit::getHeader().eventQ.end(); it++ ) {
 	  (*it)->done = true;
@@ -364,11 +341,11 @@ namespace OCPI {
     isChild( Emit::OwnerId id ) {
 
       AUTO_MUTEX(Emit::getGMutex());
-      if ( id == -1 || (size_t)id >= getHeader().classDefs.size() ) {
+      if ( id == NoOwner || (size_t)id >= getHeader().classDefs.size() ) {
 	return false;
       }
       Emit::HeaderEntry& child = getHeader().classDefs[id];
-      if ( child.parentIndex == -1 ) {
+      if ( child.parentIndex == NoOwner ) {
 	return false;
       }
       else if ( child.parentIndex == m_myId ) {
@@ -380,12 +357,8 @@ namespace OCPI {
       return false;
     }
 
-    Emit::~Emit()
-      throw ()
-    {
-
+    Emit::~Emit() {
     }
-
 
     static Emit::Header * g_header = NULL;
     Emit::Header& Emit::getHeader() {
@@ -397,9 +370,7 @@ namespace OCPI {
 
     void
     Emit::
-    shutdown()
-      throw()
-    {
+    shutdown() {
 
       if ( getHeader().dumpOnExit && !getHeader().shuttingDown) {
 	exitHandler();
@@ -420,7 +391,7 @@ namespace OCPI {
 
     Emit::EventId 
     Emit::RegisterEvent::
-    registerEvent( const char* event_name, int width,
+    registerEvent( const char* event_name, unsigned width,
 		   EventType type,
 		   DataType dtype)
     {
@@ -441,7 +412,7 @@ namespace OCPI {
       return e;
     }
 
-    Emit::RegisterEvent::RegisterEvent( const char* event_name, int width,
+    Emit::RegisterEvent::RegisterEvent( const char* event_name, unsigned width,
 					EventType type,
 					DataType dtype)
     {
@@ -454,7 +425,7 @@ namespace OCPI {
     {
       AUTO_MUTEX(Emit::getGMutex());
       m_eid = getHeader().nextEventId++;
-      int width = OU::baseTypeSizes[p.type];
+      unsigned width = OU::baseTypeSizes[p.type];
       DataType dtype=Emit::DT_i;
       switch( p.type ){
       case OA::OCPI_Short:
@@ -561,17 +532,24 @@ namespace OCPI {
 	   it != Emit::getHeader().eventQ.end(); it++ ) {
 	Emit::EventQEntry* qe = (*it)->full ? (*it)->current : (*it)->start;
 	Emit::EventQEntry* begin = qe;
+	auto &eq = **it;
+	ocpiInfo("EQ: full %u done %u start %p current %p ts %p "
+		 "startTime %" PRIu64" stopTime %" PRIu64 " startTicks %" PRIu64" stopTicks %" PRIu64,
+		 eq.full, eq.done, eq.start, eq.current, eq.ts,
+		 eq.gTime.startTime, eq.gTime.stopTime, eq.gTime.startTicks, eq.gTime.stopTicks);
 	do {
 	  ocpiAssert(qe >= (*it)->start &&
 		     qe < (Emit::EventQEntry *)((*it)->end) &&
 		     (uint8_t*)(qe) + sizeof(Emit::EventQEntry) + qe->size <= (*it)->end);
+
 	  Emit::EventMap* emap = getEventMap( qe );
 	  if ( !emap ) {
 	    qe = getNextEntry( qe, (*it) );
 	    continue;  // This can occur on wrap
 	  }
 	  if ( qe->time_ticks ) {
-	    out << qe->eid << "," << qe->owner << "," << emap->dtype  << "," << (*it)->calcGTime( qe->time_ticks );
+	    out << qe->eid << "," << qe->owner << "," << emap->dtype  << "," << qe->time_ticks;
+	    //	    out << qe->eid << "," << qe->owner << "," << emap->dtype  << "," << (*it)->calcGTime( qe->time_ticks );
 	    if ( Emit::getHeader().eventMap[qe->eid].type != Emit::Transient ) {
 	      SValue* d = (SValue*)(qe + 1);
 	      switch ( emap->dtype ) {
@@ -640,11 +618,11 @@ namespace OCPI {
       
 
     void EmitFormatter::formatOwnerString( Emit::OwnerId id, std::string& str, bool full_path ) {
-      if ( id == -1 || (size_t)id >= Emit::getHeader().classDefs.size() ) {
+      if ( id == Emit::NoOwner || (size_t)id >= Emit::getHeader().classDefs.size() ) {
 	return;
       }
 
-      if ( full_path && Emit::getHeader().classDefs[id].parentIndex != -1 ) {
+      if ( full_path && Emit::getHeader().classDefs[id].parentIndex != Emit::NoOwner ) {
 	formatOwnerString( Emit::getHeader().classDefs[id].parentIndex, str );
       }
       if ( !str.empty() ) str.append("::");
@@ -686,7 +664,7 @@ namespace OCPI {
     {
       struct timespec tv;
       Time t;
-      clock_gettime(CLOCK_REALTIME, &tv );
+      clock_gettime(CLOCK_MONOTONIC, &tv );
 #ifdef HANDLE_CLOCK_WRAP
       static time_t delta=0;
       if ( m_init_tv.tv_sec > tv.tv_sec ) { // we wrapped, this handles 1 edge consition only
@@ -695,11 +673,11 @@ namespace OCPI {
       }
       else {
 	t = ((Time) (tv.tv_sec - m_init_tv.tv_sec)) * 1000000000 +
-	  (tv.tv_nsec - m_init_tv.tv_nsec);
+	  ((unsigned long)tv.tv_nsec - (unsigned long)m_init_tv.tv_nsec);
 	return t;
       }
       t = ((Time) (tv.tv_sec + delta)) * 1000000000 +
-	(tv.tv_nsec - m_init_tv.tv_nsec);
+	((unsigned long)tv.tv_nsec -(unsigned long) m_init_tv.tv_nsec);
 #else
       t = ((Time) (tv.tv_sec - m_init_tv.tv_sec)) * 1000000000 +
 	(tv.tv_nsec - m_init_tv.tv_nsec);
@@ -720,7 +698,7 @@ namespace OCPI {
     Emit::FastSystemTime::
     FastSystemTime()
     {
-      long int wait_time;
+      unsigned long wait_time;
       int result;
       fasttime_statistics_t stats;
       struct timespec tp_fast, tp_actual;
@@ -758,7 +736,7 @@ namespace OCPI {
       if (!stats.ready)
 	{
 	  clock_gettime(CLOCK_REALTIME, &tp_actual );
-	  wait_time = stats.ready_time - tp_actual.tv_sec;
+	  wait_time = (unsigned long)stats.ready_time - (unsigned long)tp_actual.tv_sec;
 	  if (wait_time > 0)
 	    {
 	      ocpiDebug("Waiting %lu secs for fasttime to get ready...", wait_time);
@@ -822,11 +800,11 @@ namespace OCPI {
       }
       else {
 	t = ((Time) (tv.tv_sec - m_init_tv.tv_sec)) * 1000000000 +
-	  (tv.tv_nsec - m_init_tv.tv_nsec);
+	  ((unsigned long)tv.tv_nsec - (unsigned long)m_init_tv.tv_nsec);
 	return t;
       }
       t = ((Time) (tv.tv_sec + delta)) * 1000000000 +
-	(tv.tv_nsec - m_init_tv.tv_nsec);
+	((unsigned long)tv.tv_nsec - (unsigned long)m_init_tv.tv_nsec);
 #else
       t = ((Time) (tv.tv_sec - m_init_tv.tv_sec)) * 1000000000 +
 	(tv.tv_nsec - m_init_tv.tv_nsec);
@@ -847,3 +825,5 @@ namespace OCPI {
   }
 
 }
+#endif
+

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import argparse
 from argparse import ArgumentParser
 import sys
 import collections
@@ -30,8 +31,7 @@ import _opencpi.util as ocpiutil
 
 Option = collections.namedtuple('Option', 'short long help default required action')
 Subcommand = collections.namedtuple('Subcommand', 'name func help options')
-Command = collections.namedtuple('Command', 'cmd rc stderr')
-
+Command = collections.namedtuple('Command', 'cmd rc stderr ssh')
 
 def main():
     """Creates ArgumentParser and parse user args.
@@ -49,7 +49,7 @@ def main():
         port = ocpi_server_addresses.split(':')[1]
 
     option_ip = make_option(
-        '-i', '--ip_addr',
+        '-i', '--ip-addr',
         'remote server IP address; first address in OCPI_SERVER_ADDRESSES',
         default=ip,
         required=True)
@@ -67,40 +67,54 @@ def main():
         'user password for login on remote device',
         default='root')
     option_ssh_opts = make_option(
-        '-o', '--ssh_opts',
+        '-o', '--ssh-options',
         'ssh options for connecting to remote device; \
             default: -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null',
         default='-q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null')
     option_scp_opts = make_option(
-        '-c', '--scp_opts',
+        '-c', '--scp-options',
         'scp options for copying files to remote device; \
             default: -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null',
         default='-q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null')
     option_remote_dir = make_option(
-        '-d', '--remote_dir',
+        '-d', '--remote-dir',
         'directory on remote device to create/use as the server sandbox',
         default='sandbox')
     option_boot_dir = make_option(
-        '-d', '--remote_dir',
+        '-b', '--boot-dir',
         'directory on remote device to deploy boot files to.')
     option_sw_platform = make_option(
         '-s', '--sw_platform',
-        'software platform for server environment; default: xilinx13_4',
-        default='xilinx13_4')
+        'deprecated:  use --rcc-platform')
+    option_rcc_platform = make_option(
+        None, '--rcc-platform',
+        'RCC/software platform for server environment; default:  xilinx19_2_aarch32',
+        default='xilinx19_2_aarch32')
+    option_optimize = make_option(
+        '--optimize', '--optimized',
+        'Use the optimized (vs. debug) version of the RCC/software platform"',
+        action='store_true')
+    option_hdl_platform = make_option(
+        None, '--hdl-platform',
+        'HDL/hardware platform for server environment; default:  zed',
+        default='zed')
     option_hw_platform = make_option(
         '-w', '--hw_platform',
-        'hardware platform for server environment; default: zed',
-        default='zed')
+        'deprecated:  use --hdl-platform')
     option_bitstream = make_option(
         '-b', '--bitstream',
         'load the opencpi testbias bitstream manually whether or not there is one already loaded',
         action='store_true')
     option_valgrind = make_option(
-        '-v', '--valgrind',
+        None, '--valgrind',
         'load/use Valgrind',
         action='store_true')
+    option_verbose = make_option(
+        '-v', '--verbose',
+        'be more verbose about what is happening',
+        action='store_true')
     option_log_level = make_option(
-        '-l', '--log_level',
+        '-l', '--log-level',
         'specify log level',
         default=0)
     option_memory = make_option(
@@ -113,82 +127,70 @@ def main():
         default=0)
 
     common_options = [option_user, option_password, option_ip,
-                      option_ssh_opts, option_scp_opts]
+                      option_ssh_opts, option_scp_opts, option_verbose]
 
     commands = []
     commands.append(make_subcommand(
         'load', load,
         'Create and send the server package to the remote sandbox directory',
-        common_options
-        + [option_port, option_valgrind, option_hw_platform,
-           option_sw_platform, option_remote_dir]))
+        [option_port, option_valgrind, option_hdl_platform, option_optimize,
+           option_rcc_platform, option_remote_dir, option_hw_platform, option_sw_platform]))
     commands.append(make_subcommand(
         'unload', unload,
         'delete a server sandbox directory',
-        common_options 
-        + [option_remote_dir]))
+        [option_remote_dir]))
     commands.append(make_subcommand(
         'reload', reload_,
         'delete a server sandbox directory and then reload it',
-        common_options 
-        + [option_port, option_valgrind, option_hw_platform, 
-           option_sw_platform, option_log_level, option_remote_dir]))
+        [option_port, option_valgrind, option_hdl_platform, option_optimize,
+         option_rcc_platform, option_remote_dir, option_hw_platform, option_sw_platform]))
     commands.append(make_subcommand(
         'start', start,
         'start server on remote device',
-        common_options 
-        + [option_log_level, option_valgrind, option_bitstream, option_memory, option_environment,
-           option_remote_dir]))
+        [option_log_level, option_valgrind, option_bitstream, option_memory, option_environment,
+         option_remote_dir]))
     commands.append(make_subcommand(
         'restart', restart,
         'stop and then start server on remote device',
-        common_options 
-        + [option_log_level, option_valgrind, option_bitstream, option_memory, option_environment,
-           option_remote_dir]))
+        [option_log_level, option_valgrind, option_bitstream, option_memory, option_environment,
+         option_remote_dir]))
     commands.append(make_subcommand(
         'status', status,
         'get status of server on remote device',
-        common_options
-        + [option_remote_dir]))
+        [option_remote_dir]))
     commands.append(make_subcommand(
         'stop', stop,
         'stop server on remote device',
-        common_options
-        + [option_remote_dir]))
+        [option_remote_dir]))
     commands.append(make_subcommand(
         'ping', ping,
         'test basic connectivity',
-        common_options
-        + [option_remote_dir]))
+        [option_remote_dir]))
     commands.append(make_subcommand(
         'log', log,
         'watch server log in realtime',
-        common_options
-        + [option_remote_dir]))
+        [option_remote_dir]))
     commands.append(make_subcommand(
         'reboot', reboot,
         'reboot the remote device',
-        common_options
-        + [option_remote_dir]))
+        [option_remote_dir]))
     commands.append(make_subcommand(
         'deploy', deploy,
         'Deploy Opencpi boot files to device and reboot. If a remote directory'\
             ' is not provided, will attempt to determine correct directory by'\
             ' searching for existence of "opencpi/release". NOTE: Clears'\
             ' contents of remote directory',
-        common_options 
-        + [option_hw_platform, option_sw_platform, option_boot_dir]))
+        [option_hdl_platform, option_rcc_platform, option_boot_dir, option_hw_platform, option_sw_platform]))
 
-    parser = make_parser(commands)
+    parser = make_parser(commands, common_options)
     args = parser.parse_args()
-
     # If a subcommand was passed, call it. Else print help message
     if 'func' in args:
-        rc = ping(args)
-
+        rc = 0
+        if args.func != ping:
+            rc = ping(args)
         if rc == 0:
             rc = args.func(args)
-
         sys.exit(rc)
     else:
         parser.print_help()
@@ -200,13 +202,21 @@ def ping(args):
     Args:
         args: parsed user arguments
     """
+    cmd = 'ping -q -o -c 5 -t 10 '+args.ip_addr
+    command = make_command(cmd, args, ssh=False)
+    rc = execute_command(command, args, stdout=subprocess.DEVNULL)
+    if rc != 0:
+        sys.exit("Error: Unable to ping remote system at address " + args.ip_addr)
+    if args.verbose:
+        print("Successfully reached remote system with ping at address " + args.ip_addr)
     cmd = 'echo "hello world" > /dev/null'
     command = make_command(cmd, args, stderr=True)
     rc = execute_command(command, args)
 
     if rc == 255:
-        sys.exit('Error: Unable to reach remote device')
-
+        sys.exit('Error: Unable to reach remote device using ssh at address " + args.ip_addr')
+    if rc == 0 and args.verbose:
+        print("Successfully reached remote system with ssh at address " + args.ip_addr)
     return rc
 
 
@@ -265,34 +275,54 @@ def make_command(cmd, args, ocpiserver=False, ssh=True, rc=0, stderr=True):
         cmd = 'cd "{}" && ./ocpiserver.sh {}'.format(args.remote_dir, cmd)
     if ssh:
         cmd = 'ssh {} {}@{} sh -c \'{}\' '.format(
-            args.ssh_opts, args.user, args.ip_addr, cmd)
+            args.ssh_options, args.user, args.ip_addr, cmd)
 
-    command = Command(cmd, rc, stderr)
+    command = Command(cmd, rc, stderr, ssh)
 
     return command
 
+def make_argument(sub, short, long, default, action, help):
+    """ Adds an argument, dealing with there being no short version"""
+    if short:
+        sub.add_argument(short, long, default=default, action=action, help=help)
+    else:
+        sub.add_argument(long, default=default, action=action, help=help)
 
-def make_parser(commands):
+def make_parser(commands, common_options):
     """ Returns an argparse ArgumentParser.
 
     Args:
         commands: list of Command NamedTuples to add to the parser
     """
     parser = ArgumentParser(epilog="Run 'ocpiremote COMMAND --help' for more information on COMMAND")
+    for option in common_options:
+        if option.default is not None:
+            make_argument(parser, option.short, option.long, option.default,
+                          option.action, option.help)
+        else:
+            make_argument(parser, option.short, option.long, option.required,
+                          option.action, option.help)
+
     subparsers = parser.add_subparsers()
 
     for command in commands:
         subparser = subparsers.add_parser(name=command.name, help=command.help)
         subparser.set_defaults(func=command.func)
 
+        for option in common_options:
+            if option.default is not None:
+                make_argument(subparser, option.short, option.long, argparse.SUPPRESS,
+                              option.action, option.help)
+            else:
+                make_argument(subparser, option.short, option.long, argparse.SUPPRESS,
+                              option.action, option.help)
         for option in command.options:
             if option.default is not None:
-                subparser.add_argument(option.short, option.long, default=option.default,
-                                       action=option.action, help=option.help)
+                make_argument(subparser, option.short, option.long, option.default,
+                              option.action, option.help)
             else:
-                subparser.add_argument(option.short, option.long, required=option.required,
-                                       action=option.action, help=option.help)
-
+                make_argument(subparser, option.short, option.long, option.required,
+                              option.action, option.help)
     return parser
 
 
@@ -328,8 +358,7 @@ def execute_commands(commands, args):
 
     return 0
 
-
-def execute_command(command, args, stdin=subprocess.PIPE):
+def execute_command(command, args, stdin=subprocess.PIPE, stdout=subprocess.PIPE):
     """ Executes a command using subprocess.
 
     Args:
@@ -349,14 +378,15 @@ def execute_command(command, args, stdin=subprocess.PIPE):
             stderr=''
             with subprocess.Popen(
                     command.cmd.split(),
-                    env={'SSH_ASKPASS': passwd_file_path, 'DISPLAY': 'DUMMY'},
+                    env={'SSH_ASKPASS': passwd_file_path, 'DISPLAY': 'DUMMY'} if command.ssh else os.environ,
                     start_new_session=True,
                     stdin=stdin,
-                    stdout=subprocess.PIPE,
+                    stdout=stdout,
                     stderr=subprocess.PIPE,
                     universal_newlines=True) as process:
-                for stdout in process.stdout:
-                    print(stdout, end='')
+                if process.stdout:
+                    for stdout_str in process.stdout:
+                        print(stdout_str, end='')
                 if process.stderr:
                     stderr = process.stderr.read().strip()
 
@@ -377,22 +407,27 @@ def load(args):
         args: parsed user arguments
     """
     cdk = os.environ['OCPI_CDK_DIR']
-
-    driver_list = os.path.join(cdk,args.sw_platform,'lib','driver-list')
+    rcc = args.sw_platform or args.rcc_platform
+    if args.optimize:
+        rcc += "-o"
+    hdl = args.hw_platform or args.hdl_platform
+    driver_list = os.path.join(cdk, rcc, 'lib', 'driver-list')
+    if not os.path.exists(driver_list):
+       sys.exit('Error:  RCC/software platform "'+rcc+'" not found or not built: did not find: '+driver_list);
     with open(driver_list) as driver_file:
         drivers = ['libocpi_{}_s.so'.format(driver) for line in driver_file
                    for driver in line.strip().split()]
-        drivers = [os.path.join(cdk, args.sw_platform, 'lib', driver) for driver in drivers]
+        drivers = [os.path.join(cdk, rcc, 'lib', driver) for driver in drivers]
 
     localtime = os.path.join('/etc', 'localtime')
     os_driver = os.path.join(cdk, 'scripts', 'ocpi_linux_driver')
     ocpiserver = os.path.join(cdk, 'scripts', 'ocpiserver.sh')
-    kernel_objects = glob.glob(os.path.join(cdk, args.sw_platform, 'lib', '*.ko'))
-    rules = glob.glob(os.path.join(cdk, args.sw_platform, 'lib', '*.rules'))
+    kernel_objects = glob.glob(os.path.join(cdk, rcc, 'lib', '*.ko'))
+    rules = glob.glob(os.path.join(cdk, rcc, 'lib', '*.rules'))
     bin_files = ['ocpidriver', 'ocpiserve', 'ocpihdl', 'ocpizynq']
-    bin_files = [os.path.join(cdk, args.sw_platform, 'bin', bin_file) for bin_file in bin_files]
-    sdk = glob.glob(os.path.join(cdk, args.sw_platform, 'sdk', '*'))
-    bitstream = glob.glob(os.path.join(cdk, args.hw_platform, '*.bitz'))
+    bin_files = [os.path.join(cdk, rcc, 'bin', bin_file) for bin_file in bin_files]
+    sdk = glob.glob(os.path.join(cdk, rcc, 'sdk', '*'))
+    bitstream = glob.glob(os.path.join(cdk, hdl, '*.bitz'))
     # List of files to add to tar
     tar_files = (drivers
              + kernel_objects
@@ -407,8 +442,8 @@ def load(args):
                 for tar_file in tar_files]
 
     # Check for hw system.xml. If it doesn't exist, get sw system.xml
-    hw_system_xml = os.path.join(cdk, 'deploy', args.hw_platform, 'opencpi', 'system.xml')
-    sw_system_xml = os.path.join(cdk, args.sw_platform, 'system.xml')
+    hw_system_xml = os.path.join(cdk, 'deploy', rcc, 'opencpi', 'system.xml')
+    sw_system_xml = os.path.join(cdk, rcc, 'system.xml')
     system_xml = hw_system_xml if os.path.isfile(hw_system_xml) else sw_system_xml
 
     tar_files.append(system_xml)
@@ -418,9 +453,9 @@ def load(args):
 
     if args.valgrind:
         tar_files.append(
-            os.path.join(cdk, '..', 'prerequisites', 'valgrind', args.sw_platform))
+            os.path.join(cdk, '..', 'prerequisites', 'valgrind', rcc))
         arcnames.append(
-            os.path.join("", 'prerequisites', 'valgrind', args.sw_platform))
+            os.path.join("", 'prerequisites', 'valgrind', rcc))
 
     with tempfile.TemporaryDirectory() as tempdir:
         # Prepare sandbox
@@ -432,10 +467,10 @@ def load(args):
             'date -s "{}"'.format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
             args))
         commands.append(make_command(
-            'echo {} > {}/swplatform'.format(args.sw_platform, args.remote_dir),
+            'echo {} > {}/swplatform'.format(rcc, args.remote_dir),
             args))
         commands.append(make_command(
-            'echo {} > {}/hwplatform'.format(args.hw_platform, args.remote_dir),
+            'echo {} > {}/hwplatform'.format(hdl, args.remote_dir),
             args))
         commands.append(make_command(
             'echo {} > {}/port'.format(args.port, args.remote_dir),
@@ -469,8 +504,10 @@ def load(args):
                 'cd {} && gunzip | tar xf -'.format(args.remote_dir),
                 args), args, stdin=tar_file)
         if rc == 0:
-            print('Server package sent successfully.')
-
+            print('Server package sent successfully.  Getting status (no server expected to be running):')
+            status(args)
+        else:
+            print('Sending server package failed.')
     return rc
 
 
@@ -495,15 +532,17 @@ def deploy(args):
     Args:
         args: parsed user arguments
     """
+    rcc = args.sw_platform or args.rcc_platform
+    hdl = args.hw_platform or args.hdl_platform
     cdk = os.environ['OCPI_CDK_DIR']
     local_dir = '{}/{}/sdcard-{}'.format(
-        cdk, args.hw_platform, args.sw_platform)
+        cdk, hdl, rcc)
 
     if not os.path.isdir(local_dir):
         err_msg = '\n'.join([
             "Error: {} does not exist".format(local_dir),
             "Try running 'ocpiadmin deploy platform {} {}'".format(
-                args.sw_platform, args.hw_platform)
+                rcc, hdl)
         ])
 
         return err_msg

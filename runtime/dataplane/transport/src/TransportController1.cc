@@ -249,7 +249,7 @@ produce(Buffer* b, bool bcast) {
 	    buffer->getPort()->getPortId(), buffer->getTid(), m_nextTid, temp);
 #endif
 
-  OCPI_EMIT_CAT__("Start Data Transfer",OCPI_EMIT_CAT_WORKER_DEV,OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW, buffer );
+  OCPI_EMIT_CAT__("Start Data Transfer1",OCPI_EMIT_CAT_WORKER_DEV,OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW, buffer );
   temp.produce();
   insert_to_list(&buffer->getPendingTxList(), &temp, 64, 8); // Add the template to our list
   // Next input buffer
