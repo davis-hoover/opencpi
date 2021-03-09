@@ -279,6 +279,8 @@ public    : std::vector<gain_mode_value_t>
             get_ranges_possible_gain_mode(
                 data_stream_ID_t data_stream_ID) const;
 
+public    : bool shutdown(); 
+
 public    : ~RadioCtrlrNoOSTuneResamp();
 
 /*! @brief  Attempt to set on-hardware value with no guarantee of success.

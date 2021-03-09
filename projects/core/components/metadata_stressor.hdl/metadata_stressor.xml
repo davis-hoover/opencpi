@@ -3,6 +3,5 @@
             Description="Determines the width of the buses in and out of the worker."/>
 
   <StreamInterface name="in" dataWidth="DATA_WIDTH_p" ZeroLengthMessages="true" clockDirection='in'/>
-  <StreamInterface name="out" buffersize='in' dataWidth="DATA_WIDTH_p" ZeroLengthMessages="true" workerEOF='1'
-		   clock='in'/>
+  <StreamInterface name="out" dataWidth="DATA_WIDTH_p" ZeroLengthMessages="true" workerEOF='1' clock='in'/>
 </HdlWorker>

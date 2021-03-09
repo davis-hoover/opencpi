@@ -424,6 +424,8 @@ emitRecordInputs(FILE *f) {
   OcpPort::emitRecordInputs(f);
   // All data ports have a ready input
   fprintf(f,
+	  "    is_connected     : Bool_t;           -- this port is connected\n");
+  fprintf(f,
 	  "    ready            : Bool_t;           -- this port is ready for data movement\n");
 }
 void DataPort::

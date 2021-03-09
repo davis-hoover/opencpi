@@ -168,7 +168,7 @@ begin
 
     -- sets the priority of multiplexing of output messages
     -- EOF, SYNC, TIME, INTERVAL, FLUSH, SAMPLES
-    mux : process(oready, iprotocol_r, mux_start, state_r, pending_samples_eom_r)
+    mux : process(oready, iprotocol_r, mux_start, state_r, pending_samples_eom_r, ieof_r)
     begin
       if(oready = '1') then
         if((ieof_r = '1') and (
@@ -243,7 +243,9 @@ begin
           state                <= SAMPLES;
           force_end_of_samples <= '0';
         else
-          state                <= IDLE;
+          if (state_r /= EOF) then
+            state              <= IDLE;
+          end if;
           force_end_of_samples <= '0';
         end if;
       end if;

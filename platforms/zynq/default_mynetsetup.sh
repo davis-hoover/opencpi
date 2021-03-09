@@ -70,8 +70,9 @@ for i in 1; do
     
 	# Mount the opencpi development system as an NFS server, onto /mnt/net
 	# add or remove mount points based on your needs
-    mkdir -p /mnt/net
-    mount -t nfs -o udp,nolock,soft,intr $1:$2 /mnt/net  # second argument should be location of opencpi directory
+    export OCPI_NET_DIR=/mnt/net
+    mkdir -p $OCPI_NET_DIR
+    mount -t nfs -o udp,nolock,soft,intr $1:$2 $OCPI_NET_DIR  # second argument should be location of opencpi directory
     # mkdir -p /mnt/ocpi_core
     # mount -t nfs -o udp,nolock,soft,intr $1:/home/user/ocpi_projects/core /mnt/ocpi_core
   

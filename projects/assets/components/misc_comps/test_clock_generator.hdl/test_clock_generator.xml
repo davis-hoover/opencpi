@@ -24,7 +24,7 @@
                                 Description="Which clock primitive to use"/>
 
     <Port Name="in"/>
-    <Port Name="out" Producer="true"/>
+    <Port Name="out" Producer="true" buffersize="in"/>
   </ComponentSpec>
   <Property Name="M" Type="float"
                               Parameter="true"
@@ -45,5 +45,5 @@
                    NumberOfOpcodes="256" DataValueWidth="8"
                    ZeroLengthMessages="true" clockDirection="out"/>
   <StreamInterface Name="out" DataValueWidth="8" NumberOfOpcodes="256"
-                   ZeroLengthMessages="true" clockDirection="out"/>
+                   ZeroLengthMessages="true" clock="in"/>
 </HdlWorker>
