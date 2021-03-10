@@ -453,7 +453,9 @@ def download_osp(osp: str):
     else:
         # We want the full repo as it will be used later when building each tagged release
         logging.info(f"Downloading OSP {osp} to {osp_path}")
-        cmd = ["git", "clone", f"https://gitlab.com/opencpi/osp/{osp}.git", osp_path]
+        # Force local branch to be "develop", which should
+        # be the default branch (pointed to by HEAD) anyway.
+        cmd = ["git", "clone", "--branch", "develop", f"https://gitlab.com/opencpi/osp/{osp}.git", osp_path]
         logging.debug(f"Executing cmd: {cmd}")
         subprocess.check_call(cmd)
 
