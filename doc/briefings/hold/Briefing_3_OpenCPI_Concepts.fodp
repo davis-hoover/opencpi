@@ -25254,7 +25254,7 @@
           <text:p text:style-name="P94"><text:span text:style-name="T21"/></text:p>
          </text:list-item>
          <text:list-item>
-          <text:p text:style-name="P94"><text:span text:style-name="T21">Default registry location is OCPI_CDK_DIR/../project-registry</text:span></text:p>
+          <text:p text:style-name="P94"><text:span text:style-name="T21">Default registry location is OCPI_ROOT_DIR/project-registry</text:span></text:p>
          </text:list-item>
         </text:list>
        </table:table-cell>

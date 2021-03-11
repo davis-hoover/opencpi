@@ -141,7 +141,7 @@ whose settings affect OpenCPI tools include:</p><div class="variablelist"><dl cl
     The location of an alternative project registry. This environment
     variable can be used during development to redirect OpenCPI asset
     development from the OpenCPI project registry (located by default
-    at $OCPI_CDK_DIR/../project-registry) to a different,
+    at $OCPI_ROOT_DIR/project-registry) to a different,
     alternative project registry. The directory specified in this
     environment variable becomes the project registry with which
     all subsequently created projects are associated.
@@ -150,7 +150,7 @@ whose settings affect OpenCPI tools include:</p><div class="variablelist"><dl cl
 </span></dt><dd>
     The OpenCPI system configuration file for the OpenCPI runtime system.
     By default, the installation creates the system configuration file
-    at the path $OCPI_CDK_DIR/../system.xml and creates a default system
+    at the path $OCPI_ROOT_DIR/system.xml and creates a default system
     configuration file at the path $OCPI_CDK_DIR/default-system.xml
     (see CONFIGURATION). This environment variable can be used to override the
     installation default, but this is rarely done.
@@ -187,7 +187,7 @@ The <span class="emphasis"><em>OpenCPI User Guide</em></span> provides more info
     variables that are used during OpenCPI
     development. It is not used in a runtime-only environment.
     This file is automatically created at installation
-    in the installation directory ($OCPI_CDK_DIR/..). <span class="emphasis"><em>None
+    in the installation directory ($OCPI_ROOT_DIR). <span class="emphasis"><em>None
     of the environment variables in this file are required
     to be set.</em></span> If any of these variables are set, the file
     is sourced by the OpenCPI setup script when it is invoked

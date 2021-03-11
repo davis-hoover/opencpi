@@ -254,7 +254,7 @@ class Registry(ShowableAsset):
     def get_default_registry_dir():
         """
         Get the default registry from the environment setup. Check in the following order:
-        OCPI_PROJECT_REGISTRY_DIR, OCPI_CDK_DIR/../project-registry or /opt/opencpi/project-registry
+        OCPI_PROJECT_REGISTRY_DIR, OCPI_ROOT_DIR/project-registry or /opt/opencpi/project-registry
         """
         project_registry_dir = os.environ.get('OCPI_PROJECT_REGISTRY_DIR')
         if project_registry_dir is None:
@@ -271,7 +271,7 @@ class Registry(ShowableAsset):
         """
         Determine the project registry directory. If in a project, check for the imports link.
         Otherwise, get the default registry from the environment setup:
-            OCPI_PROJECT_REGISTRY_DIR, OCPI_CDK_DIR/../project-registry or
+            OCPI_PROJECT_REGISTRY_DIR, OCPI_ROOT_DIR/project-registry or
             /opt/opencpi/project-registry
 
         Determine whether the resulting path exists.

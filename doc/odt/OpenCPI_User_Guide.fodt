@@ -7814,7 +7814,7 @@
    <text:p text:style-name="P4">source <text:span text:style-name="T60">~/opencpi/cdk/</text:span>opencpi-setup.sh -s</text:p>
    <text:p text:style-name="P77">Sourcing this script with no arguments (or <text:span text:style-name="T55">with </text:span>the <text:span text:style-name="Code">-h</text:span> or <text:span text:style-name="Code">--help</text:span> option), will display more options for special cases. <text:s/><text:span text:style-name="T61">If you prefer the OpenCPI environment to be set up automatically at login, place this command in the shell (bash) login startup file (usually </text:span><text:span text:style-name="Code">~/.profile</text:span><text:span text:style-name="T60">) after the export PATH line. <text:s/>Note that this will only take effect when you log in or when you start a new &quot;login shell&quot; using the </text:span><text:span text:style-name="Code">-l</text:span> <text:span text:style-name="T62">(ell) option to bash, like:</text:span></text:p>
    <text:p text:style-name="P4">bash -l</text:p>
-   <text:p text:style-name="P89">Any persistent site-specific environment variable settings are placed in the <text:span text:style-name="Code">user-env.sh</text:span> file in the installation directory (<text:span text:style-name="Code">$OCPI_CDK_DIR/..</text:span>). <text:s/>The file is created automatically during installation.</text:p>
+   <text:p text:style-name="P89">Any persistent site-specific environment variable settings are placed in the <text:span text:style-name="Code">user-env.sh</text:span> file in the installation directory (<text:span text:style-name="Code">$OCPI_ROOT_DIR</text:span>). <text:s/>The file is created automatically during installation.</text:p>
    <text:p text:style-name="P87"><text:span text:style-name="T60">OpenCPI currently only supports the </text:span><text:span text:style-name="Code">bash</text:span><text:span text:style-name="T60"> shell.</text:span></text:p>
    <text:p text:style-name="P89">The first table below lists variables only relevant to the execution of applications, whether in a development environment or a deployed runtime environment. <text:s/>The second table is for variables only used in a development environment.</text:p>
    <text:p text:style-name="P42"><text:bookmark-start text:name="__DdeLink__2352_522948934"/><text:bookmark-start text:name="__DdeLink__1993_522948934"/><text:soft-page-break/><text:span text:style-name="T49">Table </text:span><text:span text:style-name="T49"><text:sequence text:ref-name="refTable1" text:name="Table" text:formula="ooow:Table+1" style:num-format="1">2</text:sequence></text:span><text:span text:style-name="T49">: <text:s/>OpenCPI Environment Variables for Runtime Configuration</text:span><text:bookmark-end text:name="__DdeLink__2352_522948934"/><text:bookmark-end text:name="__DdeLink__1993_522948934"/></text:p>
@@ -7859,7 +7859,7 @@
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
       <text:p text:style-name="P10">The runtime system XML system configuration file. <text:s/>If not specified, the file is located trying these locations in order:</text:p>
-      <text:p text:style-name="Table_20_Code">$OCPI_CDK_DIR/../system.xml</text:p>
+      <text:p text:style-name="Table_20_Code">$OCPI_ROOT_DIR/system.xml</text:p>
       <text:p text:style-name="Table_20_Code">$OCPI_CDK_DIR/default-system.xml</text:p>
      </table:table-cell>
     </table:table-row>
@@ -7905,7 +7905,7 @@
       <text:p text:style-name="P49">OCPI_PROJECT_REGISTRY_DIR</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table7.A3" office:value-type="string">
-      <text:p text:style-name="P13"><text:span text:style-name="T54">The location of the current project registry when dealing with unregistered projects or </text:span><text:span text:style-name="Table_20_Code">ocpidev show</text:span><text:span text:style-name="T54"> commands. <text:s/>By default, this location is $</text:span><text:span text:style-name="T38">OCPI_CDK_DIR/../project-registry</text:span>, <text:span text:style-name="T72">but setting this variable overrides this.</text:span></text:p>
+      <text:p text:style-name="P13"><text:span text:style-name="T54">The location of the current project registry when dealing with unregistered projects or </text:span><text:span text:style-name="Table_20_Code">ocpidev show</text:span><text:span text:style-name="T54"> commands. <text:s/>By default, this location is $</text:span><text:span text:style-name="T38">OCPI_ROOT_DIR/project-registry</text:span>, <text:span text:style-name="T72">but setting this variable overrides this.</text:span></text:p>
      </table:table-cell>
     </table:table-row>
    </table:table>
@@ -8475,7 +8475,7 @@
    </text:section>
    <text:h text:style-name="Heading_20_1" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc1969_3788130016"/><text:bookmark-start text:name="__DdeLink__6181_348468133311111111"/><text:span text:style-name="T64">A</text:span><text:bookmark-end text:name="__DdeLink__6181_348468133311111111"/><text:span text:style-name="T64">bout the </text:span>OpenCPI System Configuration File<text:bookmark-end text:name="__RefHeading___Toc1969_3788130016"/></text:h>
    <text:p text:style-name="P82">The OpenCPI system configuration file is an XML file that allows parameters to be specified that affect the runtime system. <text:s/><text:span text:style-name="T55">Its normal location is:</text:span></text:p>
-   <text:p text:style-name="P3">$OCPI_CDK_DIR/../system.xml</text:p>
+   <text:p text:style-name="P3">$OCPI_ROOT_DIR/system.xml</text:p>
    <text:p text:style-name="P83">but if it is not present (that is, not customized for the system), the default file is used, which is:</text:p>
    <text:p text:style-name="P3">$OCPI_CDK_DIR/default-system.xml</text:p>
    <text:p text:style-name="P82"><text:span text:style-name="T55">Its location may also be overridden by the </text:span><text:span text:style-name="Code">OCPI_SYSTEM_CONFIG</text:span> <text:span text:style-name="T55">environment variable. <text:s/></text:span>An example <text:span text:style-name="T63">file </text:span>is:</text:p>

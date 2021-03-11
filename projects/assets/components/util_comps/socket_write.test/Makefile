@@ -60,7 +60,7 @@ space+=
 #     multiple workers in component libraries not follow unit test methodology
 
 
-# MY_REG=$(if $(OCPI_PROJECT_REGISTRY_DIR),$(OCPI_PROJECT_REGISTRY_DIR),$(OCPI_CDK_DIR)/../project-registry)
+# MY_REG=$(if $(OCPI_PROJECT_REGISTRY_DIR),$(OCPI_PROJECT_REGISTRY_DIR),$(OCPI_ROOT_DIR)/project-registry)
 # ARTIFACT_DIRS=$(subst $(space),,$(foreach artdir,$(shell (cd ../../../imports/ && find -L . -type d -name artifacts 2>/dev/null )),../../../imports/$(artdir):))
 SUPPORT_PATH:=$(subst $(space),:,$(foreach worker, $(RCCWORKER) advanced_pattern.rcc file_write_demux.rcc,$(wildcard $(shell pwd)/../../$(worker)/target-*)))
 # SUPPORT_PATH_REMOTE:=export OCPI_LIBRARY_PATH=$(ARTIFACT_DIRS):../../lib/rcc:../../../../exports/lib

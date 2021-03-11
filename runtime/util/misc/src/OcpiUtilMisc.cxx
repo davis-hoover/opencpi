@@ -973,7 +973,7 @@ isOpenCPI(const std::string &d) {
 // ************ This should be consisitent with the make, bash, and python versions *******
 // The rules are:
 // 1. Use OCPI_ROOT_DIR which may have leading ~/
-// 2. The OCPI_CDK_DIR/.. which may have leading ~/
+// 2. The OCPI_ROOT_DIR which may have leading ~/
 // 3. Try: ~/OpenCPI, then ~/opencpi, then /opt/opencpi
 const std::string &
 getOpenCPI() {
