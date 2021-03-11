@@ -45,7 +45,7 @@ opencpi_output_path=$output_path/$platform/opencpi
 if [ -n "$cross" ]; then
   echo Adding files for sw platform: $platform
   mkdir -p $opencpi_output_path
-  file_list=($($OCPI_CDK_DIR/../packaging/prepare-package-list.sh deploy $platform))
+  file_list=($($OCPI_ROOT_DIR/packaging/prepare-package-list.sh deploy $platform))
   set -e
   for file in ${file_list[@]}; do
     edited_file=${file#"cdk/"}

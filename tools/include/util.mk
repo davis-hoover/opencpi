@@ -32,8 +32,8 @@ AT=@
 #endif
 # THIS IS THE make VERSION OF WHAT IS IN ocpibootstrap.sh
 ifndef OCPI_PREREQUISITES_DIR
-  ifneq ($(and $(OCPI_CDK_DIR),$(wildcard $(OCPI_CDK_DIR)/../prerequisites)),)
-    export OCPI_PREREQUISITES_DIR:=$(abspath $(OCPI_CDK_DIR)/../prerequisites)
+  ifneq ($(and $(OCPI_CDK_DIR),$(wildcard $(OCPI_ROOT_DIR)/prerequisites)),)
+    export OCPI_PREREQUISITES_DIR:=$(abspath $(OCPI_ROOT_DIR)/prerequisites)
   else
     export OCPI_PREREQUISITES_DIR:=/opt/opencpi/prerequisites
   endif
@@ -624,7 +624,7 @@ OcpiGlobalDefaultProjectRegistryDir=$(strip \
   $(or \
     $(strip $(OCPI_PROJECT_REGISTRY_DIR)),\
     $(if $(strip $(OCPI_CDK_DIR)),\
-      $(OCPI_CDK_DIR)/../project-registry,\
+      $(OCPI_ROOT_DIR)/project-registry,\
       $(error Error: OCPI_CDK_DIR is unset))))
 
 # This is the 'project registry' where symlinks

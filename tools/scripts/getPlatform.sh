@@ -65,17 +65,29 @@ HostProcessor=`uname -m | tr A-Z a-z`
 
 # Collect all known projects. Append with the default read-only core project
 # in case this is a limited runtime-only system with no project registry
-if [ -n "$OCPI_CDK_DIR" -a -e "$OCPI_CDK_DIR/scripts/util.sh" ]; then
+if [ -n "$OCPI_CDK_DIR" -a -n "$OCPI_ROOT_DIR" -a -e "$OCPI_CDK_DIR/scripts/util.sh" ]; then
   source $OCPI_CDK_DIR/scripts/util.sh
   projects="`getProjectPathAndRegistered`"
   # A fresh RPM install won't even have a registered core yet, so fallback
-  [ -d $OCPI_CDK_DIR/../projects/core ] && projects="$projects $OCPI_CDK_DIR/../projects/core"
+  [ -d $OCPI_ROOT_DIR/projects/core ] && projects="$projects $OCPI_ROOT_DIR/projects/core"
 elif [ -n "$OCPI_PROJECT_PATH" ]; then
-  # If the CDK is not set or util.sh does not exist, fall back on OCPI_PROJECT_PATH
-  echo Unexpected internal error: OCPI_CDK_DIR IS NOT SET1 >&2 && exit 1
+  if [ -z "$OCPI_ROOT_DIR" ]; then
+    echo Unexpected internal error: OCPI_ROOT_DIR IS NOT SET1 >&2
+  fi
+  if [ -z "$OCPI_CDK_DIR" ]; then
+    echo Unexpected internal error: OCPI_CDK_DIR IS NOT SET1 >&2
+  fi
+  exit 1
+  # If the CDK or ROOT is not set or util.sh does not exist, fall back on OCPI_PROJECT_PATH
   projects="${OCPI_PROJECT_PATH//:/ }"
 elif [ -d projects ]; then
-  echo Unexpected internal error: OCPI_CDK_DIR IS NOT SET2 >&2 && exit 1
+  if [ -z "$OCPI_ROOT_DIR" ]; then
+    echo Unexpected internal error: OCPI_ROOT_DIR IS NOT SET2 >&2
+  fi
+  if [ -z "$OCPI_CDK_DIR" ]; then
+    echo Unexpected internal error: OCPI_CDK_DIR IS NOT SET2 >&2
+  fi
+  exit 1
   # Probably running in a clean source tree.  Find projects and absolutize pathnames
   projects="$(for p in projects/*; do echo `pwd`/$p; done)"
 fi

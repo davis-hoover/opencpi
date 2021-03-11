@@ -54,11 +54,11 @@ case $1 in
     rm $file
     ;;
   run)
-    if [ ! -x $OCPI_CDK_DIR/../av/eclipse/eclipse ]; then
+    if [ ! -x $OCPI_ROOT_DIR/av/eclipse/eclipse ]; then
 	echo The OpenCPI AV GUI does not appear to be installed.
 	exit 1
     fi
-    exec $OCPI_CDK_DIR/../av/eclipse/eclipse> $OCPI_CDK_DIR/../av/av.log 2>&1 
+    exec $OCPI_ROOT_DIR/av/eclipse/eclipse> $OCPI_ROOT_DIR/av/av.log 2>&1 
     ;;
   *)
     echo "Illegal argument: $1" && usage

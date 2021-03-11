@@ -393,7 +393,7 @@ function do_registry {
       registry_to_delete=$1
     fi
     if [ -e "$registry_to_delete" ]; then
-      if [ "$(ocpiReadLinkE $registry_to_delete)" == "$(ocpiReadLinkE $OCPI_CDK_DIR/../project-registry)" \
+      if [ "$(ocpiReadLinkE $registry_to_delete)" == "$(ocpiReadLinkE $OCPI_ROOT_DIR/project-registry)" \
            -o "$(ocpiReadLinkE $registry_to_delete)" == "/opt/opencpi/project-registry" ] ; then
         bad cannot delete the default project registry \"$registry_to_delete\"
       fi
@@ -2188,7 +2188,7 @@ be assumed as determined from the environment.
 Defaults:
   The default registry is determined as follows:
     OCPI_PROJECT_REGISTRY_DIR environment variable if set
-    Otherwise: OCPI_CDK_DIR/../project-registry
+    Otherwise: OCPI_ROOT_DIR/project-registry
 
   To change your environment's default project-registry, set the OCPI_PROJECT_REGISTRY_DIR
   environment variable.

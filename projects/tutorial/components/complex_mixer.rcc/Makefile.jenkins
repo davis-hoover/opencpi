@@ -17,9 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This is the Makefile for worker complex_mixer.rcc
-RccIncludeDirs+=$(OCPI_CDK_DIR)/../prerequisites/liquid/include/liquid/ 
+RccIncludeDirs+=$(OCPI_ROOT_DIR)/prerequisites/liquid/include/liquid/ 
 RccCustomLibs=-lliquid
-RccCustomLibs_centos7=$(OCPI_CDK_DIR)/../prerequisites/liquid/linux-c7-x86_64/lib/libliquid.a
-RccCustomLibs_xilinx13_3=$(OCPI_CDK_DIR)/../prerequisites/liquid/linux-x13_3-arm/lib/libliquid.a
+RccCustomLibs_centos7=$(OCPI_ROOT_DIR)/prerequisites/liquid/linux-c7-x86_64/lib/libliquid.a
+RccCustomLibs_xilinx13_3=$(OCPI_ROOT_DIR)/prerequisites/liquid/linux-x13_3-arm/lib/libliquid.a
 
 include $(OCPI_CDK_DIR)/include/worker.mk
