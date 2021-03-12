@@ -147,7 +147,7 @@ do { \
 #define OCPI_EMIT__( name, c )			\
 do { \
   OCPI_EMIT_REGISTER_FULL( name, OCPI::Time::Emit::DT_u, 1, OCPI::Time::Emit::Transient); \
-  c->emit(re);								\
+  (c)->emit(re);							\
  } while(0)
 
 
@@ -164,7 +164,7 @@ do { \
 #define OCPI_EMIT_STATE__( name, state, c )	\
 do { \
   OCPI_EMIT_REGISTER_FULL( name, OCPI::Time::Emit::DT_u, 1, OCPI::Time::Emit::Value); \
-  c->emit(re,static_cast<OCPI::OS::uint64_t>(state));		\
+  (c)->emit(re,static_cast<OCPI::OS::uint64_t>(state));			\
  } while(0)
 
 #define OCPI_EMIT_STATE_NR( re, state )                        \
@@ -177,7 +177,7 @@ do { \
  } while(0)
 #define OCPI_EMIT_STATE_NR__( re, state, c )	\
 do { \
-  c->emit(re,static_cast<OCPI::OS::uint64_t>(state));		\
+  (c)->emit(re,static_cast<OCPI::OS::uint64_t>(state));	\
  } while(0)
 
 #define OCPI_EMIT_PVALUE_( p ) \

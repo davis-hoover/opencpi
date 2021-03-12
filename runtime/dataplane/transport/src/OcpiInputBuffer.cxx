@@ -48,7 +48,7 @@ using namespace OCPI::OS;
 /**********************************
  * Constructors
  *********************************/
-InputBuffer::InputBuffer( OCPI::DataTransport::Port* port, OCPI::OS::uint32_t tid)
+InputBuffer::InputBuffer(OCPI::DataTransport::Port* port, OCPI::OS::uint32_t tid)
   : Buffer( port, tid ),m_feedbackDesc(port->getMetaData()->m_externPortDependencyData),
     m_produced(true) OCPI_EMIT_MEMBER_INIT_STATE(arrive, "message arrived and acknowledged")
 {

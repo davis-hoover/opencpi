@@ -202,7 +202,11 @@ def ping(args):
     Args:
         args: parsed user arguments
     """
-    cmd = 'ping -q -o -c 5 -t 10 '+args.ip_addr
+    if not isinstance(args.ip_addr, str):
+      sys.exit("Error: an IP address is required for this command (use the -i or --ip-addr option, or the OCPI_SERVER_ADDRESSES environment variable)")
+    cmd = 'ping -q -c 3 '
+    cmd += '-o -t 10 ' if os.uname().sysname == 'Darwin' else '-W 10 '
+    cmd += args.ip_addr
     command = make_command(cmd, args, ssh=False)
     rc = execute_command(command, args, stdout=subprocess.DEVNULL)
     if rc != 0:
@@ -214,7 +218,7 @@ def ping(args):
     rc = execute_command(command, args)
 
     if rc == 255:
-        sys.exit('Error: Unable to reach remote device using ssh at address " + args.ip_addr')
+        sys.exit('Error: Unable to reach remote device using ssh at address ' + args.ip_addr)
     if rc == 0 and args.verbose:
         print("Successfully reached remote system with ssh at address " + args.ip_addr)
     return rc
