@@ -40,7 +40,7 @@ fi
 # Must be in the OpenCPI base directory, at least until a
 # clean way of dealing with relative paths can be implemented.
 #
-cd $OCPI_CDK_DIR/..
+cd $OCPI_ROOT_DIR
 
 # Provides `setVarsFromMake`
 source $OCPI_CDK_DIR/scripts/util.sh

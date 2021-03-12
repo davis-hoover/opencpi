@@ -29,6 +29,7 @@ ifneq ($(filter-out cleandriver,$(filter exports show help clean% distclean%,$(M
 else
   ifndef OCPI_CDK_DIR
     export OCPI_CDK_DIR:=$(CURDIR)/cdk
+    export OCPI_ROOT_DIR:=$(CURDIR)
   endif
   # Note that if we are running this makefile, we are in a source tree, thus we force a local
   # prerequisites dir if it is not set.

@@ -19387,7 +19387,7 @@
      <dc:date>2020-01-08T13:34:05.177958972</dc:date>
      <loext:sender-initials>LZ</loext:sender-initials>
      <text:p text:style-name="P125"><text:span text:style-name="T132">This specification may not be correct for this tutorial.</text:span></text:p>
-    </office:annotation>export<text:line-break/>OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/../projects/core/exports/artifacts:<text:span text:style-name="T130">$OCPI_CDK_DIR/../projects/assets/exports/artifacts</text:span><office:annotation-end office:name="__Annotation__10784_3429347919"/></text:p>
+    </office:annotation>export<text:line-break/>OCPI_LIBRARY_PATH=$OCPI_ROOT_DIR/projects/core/exports/artifacts:<text:span text:style-name="T130">$OCPI_ROOT_DIR/projects/assets/exports/artifacts</text:span><office:annotation-end office:name="__Annotation__10784_3429347919"/></text:p>
    <text:p text:style-name="P50"><text:span text:style-name="T83">Execute </text:span><text:span text:style-name="T86">ocpirun</text:span> to start the application:</text:p>
    <text:p text:style-name="P35">ocpirun -v fsk_loopback.xml</text:p>
    <text:p text:style-name="P50"><text:span text:style-name="T130">Now go</text:span> to your <text:span text:style-name="T86">assets</text:span> <text:span text:style-name="T130">project’s</text:span> <text:span text:style-name="T86">applications</text:span> folder:</text:p>

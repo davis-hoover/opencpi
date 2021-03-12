@@ -52,7 +52,7 @@ Zynq-Based Platform - setup environment
 cd /mnt/ocpi_assets/applications/zp_16i16o_fir_real_phase_to_amp_cordic_cic_int_cic_dec_rp_cordic_fir_real
 
 HDL:
-export OCPI_LIBRARY_PATH=$$OCPI_CDK_DIR/../projects/core/exports/lib/components/rcc:$$(pwd)/../../hdl/assemblies/$${PWD##*/}:$$(pwd)/../../exports/lib
+export OCPI_LIBRARY_PATH=$$OCPI_ROOT_DIR/projects/core/exports/lib/components/rcc:$$(pwd)/../../hdl/assemblies/$${PWD##*/}:$$(pwd)/../../exports/lib
 
 #NOTE: If copy/paste of the above exports, the redundant '$' must be removed.
 ----------------------------------------------------------------------------
