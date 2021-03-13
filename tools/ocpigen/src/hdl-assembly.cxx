@@ -214,7 +214,8 @@ setClock(Clock &c) {
   m_clock = &c; // set connection's clock
   // If the connection is not driven, then the associated clock cannot
   // be internal anymore
-  if (!driven && c.m_internal) {
+  if (!driven && c.m_internal &&
+      !(m_external && m_external->m_instPort.m_port->m_clock == m_clock)) {
     ocpiInfo("Making internal clock %s an assembly-level clock", c.cname());
     c.m_internal = false;
   }
@@ -535,6 +536,7 @@ parseHdlAssy() {
 		     c.m_external->m_instPort.m_port->pname());
 	    Clock &clk = c.m_external->m_instPort.m_port->addMyClock(ip.m_port->m_clock->m_output);
 	    ip.m_instance->m_clocks[ip.m_port->m_clock->m_ordinal] = &clk;
+	    clk.m_internal = true;
 	    ocpiCheck(c.setClock(clk));
 	    m_assembly->propagateClocks(false);
 	    break;

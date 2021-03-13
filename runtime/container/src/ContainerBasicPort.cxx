@@ -837,6 +837,7 @@ namespace OCPI {
       ocpiDebug("getfull on %p early next %p dt %p", this, b, m_dtPort);
       if (b) { // if shim mode
 	bool zc = false;
+	(void)zc;
 	do {
 	  if (b->m_zcHead) {
 	    ExternalBuffer *zcb = b->zcPeek();

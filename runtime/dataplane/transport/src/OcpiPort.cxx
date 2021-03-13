@@ -1485,6 +1485,7 @@ getNextFullInputBuffer(uint8_t *&data, size_t &length, uint8_t &opcode, bool &en
   InputBuffer* buf = 
     static_cast<InputBuffer*>(txc->getNextFullInputBuffer(this));
   if (buf) {
+    OCPI_EMIT_MEMBER_OTHER(*buf, arrive, true);
     getEndPoint().doneWithInput((void*)buf->getBuffer(), buf->m_length);
     if (buf->isEOS())
       setEOS();
@@ -1497,10 +1498,13 @@ getNextFullInputBuffer(uint8_t *&data, size_t &length, uint8_t &opcode, bool &en
     length = buf->getDataLength();
     if (buf->getMetaData()->ocpiMetaDataWord.truncate)
       ocpiBad("Message was truncated to %zu bytes", length);
+    OCPI_EMIT_MEMBER_OTHER(*buf, arrive, false);
+#if 0
     OCPI_EMIT_CAT__("Data Buffer Received" , OCPI_EMIT_CAT_WORKER_DEV,OCPI_EMIT_CAT_WORKER_DEV_BUFFER_FLOW, buf);
 
     OCPI_EMIT_REGISTER_FULL_VAR( "Data Buffer Opcode and length", OCPI::Time::Emit::DT_u, 64, OCPI::Time::Emit::Value, dbre ); 
     OCPI_EMIT_VALUE_CAT_NR__(dbre, (uint64_t)(opcode | (uint64_t)length<<16) , OCPI_EMIT_CAT_WORKER_DEV,OCPI_EMIT_CAT_WORKER_DEV_BUFFER_VALUES, buf);
+#endif
     ocpiDebug("Getting buffer %p on port %p on circuit %p on transport %p data %p op %u len %zu end %u",
 	      buf, this, c, &c->parent(), data, opcode, length, buf->getMetaData()->ocpiMetaDataWord.end);
 

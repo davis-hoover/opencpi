@@ -117,7 +117,7 @@ static inline void get_tick_count(tick_t *t)
   struct timespec ts;
   if (clock_gettime(CLOCK_MONOTONIC_RAW, &ts))
     abort();
-  t->ll = (unsigned long)ts.tv_sec * 1000000000ull + (unsigned long)ts.tv_nsec;
+  t->ll = (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
 #else
   struct timeval tv;
   gettimeofday(&tv, NULL);

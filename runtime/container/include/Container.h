@@ -102,6 +102,7 @@ namespace OCPI {
       const std::string &os() const { return m_os; }
       const std::string &osVersion() const { return m_osVersion; }
       const std::string &arch() const { return m_arch; }
+      bool optimized() const { return m_optimized; }
       virtual bool portsInProcess() = 0;
       bool dynamic() const { return m_dynamic; }
       virtual Container *nextContainer() = 0;
@@ -123,7 +124,7 @@ namespace OCPI {
 	NULL if the container is being used in polled mode.
       */
       virtual DispatchRetCode dispatch(DataTransfer::EventManager*);
-      bool run(uint32_t usecs = 0);
+      //      bool run(uint32_t usecs = 0);
       void thread();
       virtual bool needThread() = 0;
       // Load from url

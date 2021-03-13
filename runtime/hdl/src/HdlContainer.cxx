@@ -64,9 +64,11 @@ namespace OCPI {
 	m_device(device), m_hwEvents(this, *this, "FPGA Events")
     {
       // Note that the device has retrieved all the info from the admin space already
+#if 0
       static OT::Emit::RegisterEvent te("testevent");
       m_hwEvents.emit(te);
       m_hwEvents.emitT(te, getMyTicks());
+#endif
       m_model = "hdl";
       m_os = "";
       m_osVersion = "";
@@ -143,6 +145,7 @@ namespace OCPI {
 	  ocpiInfo("Loading bitstream %s on HDL container %s\n",
 		   name().c_str(), c.name().c_str());
 	  // If the device needs a container background thread, make sure its started.
+	  OCPI_EMIT_HERE;
 	  c.start();
 	  std::string error;
 	  if (c.hdlDevice().load(name().c_str(), error))

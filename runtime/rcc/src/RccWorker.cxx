@@ -621,7 +621,7 @@ run(bool &anyone_run) {
     pthread_setspecific(Driver::s_threadKey, this);
     if (m_runCondition->m_timeout)
       m_runTimer.restart();
-    OCPI_EMIT_REGISTER_FULL_VAR( "Worker Run", OCPI::Time::Emit::DT_u, 1, OCPI::Time::Emit::State, wre ); \
+    OCPI_EMIT_REGISTER_FULL_VAR( "Worker Run", OCPI::Time::Emit::DT_u, 1, OCPI::Time::Emit::State, wre );
     OCPI_EMIT_STATE_CAT_NR_(wre, 1, OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_RUN_TIME);
     ocpiDebug("Running worker \"%s/%s\"", name().c_str(), OU::Worker::cname());
     RCCResult rc;
@@ -712,7 +712,9 @@ advanceAll() {
 void Worker::
 controlOperation(OU::Worker::ControlOperation op) {
   RCCResult rc = RCC_OK;
+  OCPI_EMIT_REGISTER_FULL_VAR( "Worker Control Op", OCPI::Time::Emit::DT_u, 3, OCPI::Time::Emit::Value, cop); \
   OU::AutoMutex guard(mutex(), true);
+  OCPI_EMIT_VALUE_CAT_NR_(cop, op, OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_RUN_TIME);
   pthread_setspecific(Driver::s_threadKey, this);
   enum {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4) My_##x = 1 << OU::Worker::Op##c,
