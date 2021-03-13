@@ -40,7 +40,7 @@ namespace OCPI {
     // It is specialized by the access paths and driver issues (for pci, ethernet etc.)
     typedef uint32_t RomWord;
     static const unsigned
-      ROM_NBYTES = 8*1024,
+      ROM_NBYTES = 64*1024,
       ROM_WIDTH  = (unsigned)sizeof(RomWord)*CHAR_BIT,
       ROM_WIDTH_BYTES = sizeof(RomWord),
       ROM_NWORDS = (ROM_NBYTES + ROM_WIDTH_BYTES-1) / ROM_WIDTH_BYTES,
