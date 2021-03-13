@@ -846,9 +846,10 @@ define OcpiSetProjectX
     ifneq ($(wildcard $1/Project.mk),)
       $$(warning Found both Project.mk and Project.xml, using Project.xml)
     endif
-    $(if $(call DoShell,$(ToolsDir)/ocpigen -R $1/Project.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
-    $(error ocpigen failed),$(foreach var,$(subst ;, ,$(OcpiProps)),$$(eval $(subst &, ,$(var)))))
-    $(foreach var,$(subst ;, ,$(OcpiProps)),$(eval $(subst &, ,$(var))))
+    $$(if $$(call DoShell,set -o pipefail && $$(ToolsDir)/ocpigen -R $1/Project.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
+      $$(error ocpigen failed),\
+      $$(foreach var,$$(subst ;, ,$$(OcpiProps)),$$(eval $$(subst &, ,$$(var)))))
+    $$(foreach var,$$(subst ;, ,$$(OcpiProps)),$$(eval $$(subst &, ,$$(var))))
   else
     # Legacy support for project assets
     $$(warning Could not find Project.xml, using Project.mk)

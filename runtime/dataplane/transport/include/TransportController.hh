@@ -105,7 +105,7 @@ protected:
 
   // indicate that a buffer has been filled.
   // Since we manage circular buffers, the actual buffer is implied (next)
-  virtual void bufferFull(OCPI::DataTransport::Port *port);
+  //  virtual void bufferFull(OCPI::DataTransport::Port *port);
 
   // indicate that a remote input buffer has been freed.
   // Since we manage circular buffers, the actual buffer is implied (next)

@@ -87,7 +87,7 @@ namespace OCPI {
 	// 2 is coherent cache
 	const char *env = getenv("OCPI_DMA_CACHE_MODE");
 	if (!env)
-	  env = "0";
+	  env = "1";
 	m_disableCacheSync = env[0] != '1';
 	ocpiDebug("PAGE SIZE IS %u", getpagesize());
 	// Cached fd is forced to uncached in mode 0

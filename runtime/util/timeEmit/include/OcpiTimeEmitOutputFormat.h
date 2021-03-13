@@ -47,6 +47,7 @@ namespace OCPI {
     
     namespace Formatter {
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
       typedef OCPI::Time::Emit::OwnerId OwnerId;
       typedef OCPI::Time::Emit::EventId EventId;
       class XMLReader {
@@ -149,23 +150,23 @@ namespace OCPI {
 	std::vector<Event> & getEvents(){return m_events;}
 	std::vector<Description> & getDescriptions(){return m_desc;}
 
-	Description & getDescription( int id ) {
-	  ocpiAssert( id < (int)m_desc.size() );
+	Description & getDescription( unsigned id ) {
+	  ocpiAssert(id < m_desc.size() );
 	  return m_desc[id];
 	}
 	std::vector<Owner> & getOwners(){return m_owners;}
-	Owner & getOwner( int owner ) {
-	  ocpiAssert( owner < (int)m_owners.size() );
+	Owner & getOwner( unsigned owner ) {
+	  ocpiAssert( owner < m_owners.size() );
 	  return m_owners[owner];
 	}
-	std::string & ownerString( int id ) {
-	  ocpiAssert((unsigned)id < m_owners.size() );
+	std::string & ownerString( unsigned id ) {
+	  ocpiAssert(id < m_owners.size() );
 	  return m_owners[id].name;
 	}
-	std::string  ownersString( int id ) {
-	  ocpiAssert((unsigned)id < m_owners.size() );
+	std::string  ownersString( unsigned id ) {
+	  ocpiAssert(id < m_owners.size() );
 	  std::string s;
-	  int pi= m_owners[id].parentIndex;
+	  auto pi= m_owners[id].parentIndex;
 	  while ( pi > 0 ) {
 	    s += ownerString(pi);
 	    s += ":";	    
@@ -174,8 +175,8 @@ namespace OCPI {
 	  s+= m_owners[id].name;
 	  return s;
 	}
-	std::string & descString( int id ) {
-	  ocpiAssert((unsigned)id < m_desc.size() );
+	std::string & descString( unsigned id ) {
+	  ocpiAssert(id < m_desc.size() );
 	  return m_desc[id].desc;
 	}
 	OCPI::Time::Emit::EventType 
@@ -185,7 +186,7 @@ namespace OCPI {
 	    return m_desc[e.hdr.eid].etype;
 	  }
 
-	bool eventProducedBy( int event, int owner )
+	bool eventProducedBy( unsigned event, unsigned owner )
 	{
 	  std::vector<Event>::iterator it;
 	  for ( it=m_events.begin(); it!=m_events.end(); it++) {
@@ -210,7 +211,7 @@ namespace OCPI {
 #endif
 	    Description d;
 	    d.id =  (OwnerId)atoi( ezxml_cattr(x,"id") );
-	    d.width =  atoi( ezxml_cattr(x,"width") );
+	    d.width = (unsigned)atoi( ezxml_cattr(x,"width") );
 	    d.desc =   ezxml_cattr(x,"description");
 	    OCPI::Time::Emit::EventType etype = (OCPI::Time::Emit::EventType)atoi( ezxml_cattr(x,"etype") );	    
 	    switch( etype ) {
@@ -506,16 +507,16 @@ namespace OCPI {
 #define SYMEND   90
 #define SYMLEN (SYMEND-SYMSTART)
 	
-	std::string itos(int n, char * digits ) {
+	std::string itos(unsigned n, char * digits ) {
 	  char s[16];
 	  unsigned base = SYMLEN;
-	  int i=0;
+	  unsigned i=0;
 	  do {      
 	    s[i++] = digits[n % base]; 
 	  } while ((n /= base) > 0);   
 	  s[i] = '\0';
 
-	  std::cerr << "ITOS returning " << s << std::endl;
+	  //std::cerr << "ITOS returning " << s << std::endl;
 
 	  return std::string( s );
 	}
@@ -645,7 +646,7 @@ namespace OCPI {
 	    // Here we output each scoped owner class and then define which event each class will emit
 	    for ( owner=0, hit=m_xml_reader.getOwners().begin();
 		  hit!=m_xml_reader.getOwners().end(); hit++,owner++ ) {
-	      if ( (*hit).parentIndex == -1 ) {
+	      if ( (*hit).parentIndex == OCPI::Time::Emit::NoOwner ) {
 		dumpVCDScope( out, m_xml_reader.getOwner(owner), varsyms, allEis );
 	      }
 	      if ( (mod++%1000) == 0 ) std::cerr << "." << std::flush;
@@ -788,6 +789,7 @@ namespace OCPI {
 	return out;
       }
 
+#endif // OCPI_TIME_EMIT_SUPPORT
 
     }
   }

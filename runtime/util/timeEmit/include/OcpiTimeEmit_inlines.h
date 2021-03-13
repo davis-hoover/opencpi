@@ -45,6 +45,7 @@
 #define AUTO_MUTEX(m)
 #endif
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
 // Required to be defined here for inlines
 namespace OCPI {
 
@@ -127,10 +128,10 @@ namespace OCPI {
     struct Emit::EventMap {
       EventId     id;
       std::string eventName;
-      int         width;
+      unsigned    width;
       EventType   type;
       DataType dtype;
-      EventMap( EventId pid, const char* en, int w, EventType t, DataType dt)
+      EventMap( EventId pid, const char* en, unsigned w, EventType t, DataType dt)
         :id(pid),eventName(en),width(w),type(t),dtype(dt){}
     };
 
@@ -422,5 +423,6 @@ operator<< (std::ostream& out, OCPI::Time::EmitFormatter& t ) {
   t.formatDumpToStream(out);
   return out;
 }
+#endif // OCPI_TIME_EMIT_SUPPORT
 
 

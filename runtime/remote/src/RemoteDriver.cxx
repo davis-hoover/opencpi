@@ -382,6 +382,9 @@ public:
       m_optimized = true;
       ++build;
     }
+    ocpiInfo("Remote container \"%s\" created:  model %s os %s osVersion %s arch %s platform %s "
+	     "dynamic %u optimized %u", a_name.c_str(), a_model, a_os, a_osVersion, a_arch, a_platform,
+	     m_dynamic, m_optimized);
   }
   virtual ~Container()
   throw () {
