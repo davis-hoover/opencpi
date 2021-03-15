@@ -21,7 +21,7 @@
 # Clock constraints                                                        #
 ############################################################################
 # 10 ns period = 100000 KHz
-create_clock -name clk_fpga_0 -period 10.000 [get_pins {ftop/pfconfig_i/zcu104_i/worker/ps/U0/PS8_i/PLCLK[0]}]
+create_clock -name clk_fpga_0 -period 10.000 [get_pins -hier * -filter {NAME =~ */ps/U0/PS8_i/PLCLK[0]}]
 
 # ----------------------------------------------------------------------------
 # Clock constraints - platform_ad9361_data_sub.hdl
