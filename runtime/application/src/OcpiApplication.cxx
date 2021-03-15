@@ -1951,14 +1951,15 @@ it is really per actual worker config...
 	  fprintf(stderr, "Connections between containers:\n");
 	  OC::Launcher::Connection *lc = &m_launchConnections[0];
 	  for (unsigned n = 0; n < m_launchConnections.size(); n++, lc++)
-	    if (lc->m_out.m_member->m_container != lc->m_in.m_member->m_container)
+	    if (!lc->m_out.m_member || !lc->m_in.m_member ||
+		lc->m_out.m_member->m_container != lc->m_in.m_member->m_container)
 	      fprintf(stderr, "  From \"%s\" port \"%s\" (%zu buffers) to \"%s\" port \"%s\" "
 		      "(%zu buffers) with buffer size %zu, using transport \"%s\"\n",
-		      lc->m_out.m_member->m_name.c_str(), lc->m_out.m_name,
-		      lc->m_out.m_port->nBuffers(),
-		      lc->m_in.m_member->m_name.c_str(), lc->m_in.m_name,
-		      lc->m_in.m_port->nBuffers(),
-		      lc->m_bufferSize, lc->m_transport.transport.c_str());
+		      lc->m_out.m_member ? lc->m_out.m_member->m_name.c_str() : "<external>",
+		      lc->m_out.m_name, lc->m_out.m_port->nBuffers(),
+		      lc->m_in.m_member ? lc->m_in.m_member->m_name.c_str() : "<external>",
+		      lc->m_in.m_name, lc->m_in.m_port->nBuffers(), lc->m_bufferSize,
+		      lc->m_transport.transport.empty() ? "<none>" : lc->m_transport.transport.c_str());
 	}
         fprintf(stderr,
                 "Application established: containers, workers, connections all created%s\n",

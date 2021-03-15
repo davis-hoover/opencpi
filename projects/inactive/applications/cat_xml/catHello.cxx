@@ -37,7 +37,6 @@ int main(int /* argc */, char ** /* argv */) {
   try {
     OA::PValue pvs[] = { OA::PVBool("verbose", true), OA::PVEnd };
     OA::Application app(hello, pvs);
-    fprintf(stderr, "Application XML parsed and deployments (containers and implementations) chosen\n");
     app.initialize();
     OA::ExternalPort &ep = app.getPort("out");
     app.start();
