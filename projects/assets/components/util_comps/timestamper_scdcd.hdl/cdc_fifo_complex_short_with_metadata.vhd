@@ -59,6 +59,7 @@ begin
       protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH downto 1);
   protocol_s <= protocol.complex_short_with_metadata.from_slv(dst_out_protocol);
 
+  -- FIXME: remote all this qualification with empty_n have downstream qualify use oempty_n properly
   oprotocol.samples        <= protocol_s.samples;
   oprotocol.samples_vld    <= protocol_s.samples_vld and fifo_dst_empty_n;
   oprotocol.time           <= protocol_s.time;
@@ -68,6 +69,6 @@ begin
   oprotocol.flush          <= protocol_s.flush and fifo_dst_empty_n;
   oprotocol.sync           <= protocol_s.sync and fifo_dst_empty_n;
   oprotocol.end_of_samples <= protocol_s.end_of_samples and fifo_dst_empty_n;
-  oeof                     <= dst_out(0);
+  oeof                     <= dst_out(0) and fifo_dst_empty_n;
 
 end rtl;

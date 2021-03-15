@@ -6,6 +6,7 @@
  * This file contains the implementation skeleton for the source worker in C++
  */
 
+#include <cinttypes>
 #include "test_sink-worker.hh"
 
 using namespace OCPI::RCC; // for easy access to RCC data types and constants
@@ -15,6 +16,11 @@ class Test_sinkWorker : public Test_sinkWorkerBase {
   RCCResult run(bool /*timedout*/) {
     if (firstRun())
       properties().timeFirst = getTime();
+    if (in.opCode()) {
+      log(6, "Opcode: %u, length %zu, first word 0x%" PRIx64 "\n",
+	  in.opCode(), in.length(), *(uint64_t*)in.data());
+      return RCC_ADVANCE;
+    }
     size_t n = in.length()/sizeof(uint32_t);
     if (n) {
       if (properties().suppressReads)
