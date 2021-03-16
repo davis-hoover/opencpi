@@ -56,15 +56,17 @@ namespace OCPI {
       uint8_t force_time_now_to_free_running; /* 0x14 */
       char pad0_[3];
       enum TimeService_PPS_out_source PPS_out_source; /* 0x18 */
-      uint8_t force_time_now_valid; /* 0x1C */
+      uint8_t force_time_now_valid;   /* 0x1C */
       uint8_t force_time_now_invalid; /* 0x1D */
-      uint8_t PPS_lost_sticky_error; /* 0x1E */
+      uint8_t PPS_lost_sticky_error;  /* 0x1E */
       uint8_t time_now_updated_by_PPS_sticky; /* 0x1F */
       uint8_t time_now_set_sticky; /* 0x20 */
       uint8_t PPS_lost_last_second_error; /* 0x21 */
       uint8_t PPS_count; /* 0x22 */
       char pad1_[1];
       uint32_t ticks_per_second; /* 0x24 */
+      uint8_t using_PPS; /* 0x28 */
+      uint8_t time_valid; /* 0x29 */
     };
 
     // The derived class will set up accessors after this constructor is done
@@ -112,6 +114,30 @@ namespace OCPI {
       }
       return ret;
     }
+    bool Device::
+    getUsingPPS() {
+      bool ret = false;
+      Access *ts = timeServer();
+      if (ts) {
+        ret = ts->get8RegisterOffset(offsetof(TimeService, using_PPS));
+        if (ret) {
+          ocpiInfo("HDL Device '%s': time_server.hdl using_PPS is true", m_name.c_str());
+        }
+      }
+      return ret;
+    }
+    void Device::
+    enableTimeNowUpdatesFromPPS() {
+      Access *ts = timeServer();
+      auto os = 0;
+      if (ts) {
+        if (getUsingPPS()) {
+          os = offsetof(TimeService, enable_time_now_updates_from_PPS);
+          ts->set8RegisterOffset(os, 1);
+          ocpiInfo("HDL Device '%s': Using PPS from PPS source and enabling time now updates from PPS", m_name.c_str());
+        }
+      }
+    }
     OS::Time Device::
     now(bool &isGps) {
       OS::Time ret;
@@ -123,8 +149,6 @@ namespace OCPI {
       if (isGps)
         isGps = Driver::getSingleton().configure_gpsd_if_enabled(); // PPS pin init'd for PPS_ok
       if (isGps) {
-        auto os = offsetof(TimeService, enable_time_now_updates_from_PPS);
-        ts->set8RegisterOffset(os, 1);
         isGps = getPPSIsOkay();
         if (!isGps)
           ocpiInfo("HDL Device '%s': time_server.hdl PPS_ok is false, forcing GPS time to be "

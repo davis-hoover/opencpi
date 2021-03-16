@@ -234,6 +234,7 @@ architecture rtl of time_service is
   signal s1_gpsSecWrite                        : std_logic;
   signal s_force_time_service_valid            : std_logic;
   signal s_force_time_service_invalid          : std_logic;
+  signal s_time_service_valid                  : std_logic;
 begin
 
   -- For older SyncFIFO modules until they get fixed
@@ -246,7 +247,7 @@ begin
 
   -- Control Clock Domain
   s_statusOut <= (s_ppsLostSticky & s_gpsInSticky & s_ppsInSticky & s_timeSetSticky &
-                  s_ppsOKCC_dD_OUT & s_ppsLostCC_dD_OUT & "00" &
+                  s_ppsOKCC_dD_OUT & s_ppsLostCC_dD_OUT & s_time_service_valid & '0' &
                   x"0000" & s_rollingPPSIn_dD_OUT);
   timeStatus  <= ulong_t(s_statusOut);
 
@@ -256,7 +257,8 @@ begin
   -- Time Clock Domain
   time_service.now     <= ulonglong_t(s_nowTC);
   time_service.clk     <= timeCLK;
-  time_service.valid   <= '1' when s_force_time_service_valid = '1' else
+  time_service.valid   <= s_time_service_valid;
+  s_time_service_valid <= '1' when s_force_time_service_valid = '1' else
                           '0' when s_force_time_service_invalid = '1' else
                           s_secValid and s_fracValid;
   s_fracValid          <= RST_N or timeRST_N when its(s_ppsDisablePPS_sD_IN_slv0(0)) else s_ppsOK;
