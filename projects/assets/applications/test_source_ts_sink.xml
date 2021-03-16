@@ -1,0 +1,7 @@
+<application package='ocpi.assets.util_comps' done='test_sink'>
+  <instance component='test_source' connect='timestamper_scdcd'/>
+  <instance component='timestamper_scdcd' connect='test_sink'>
+     <property name='sampling_interval' delay='1' value='0x1357'/>
+  </instance>
+  <instance component='test_sink'/>
+</application>
