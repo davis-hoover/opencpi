@@ -71,7 +71,7 @@ begin
 
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
 
-    -- FIXME bring in the overall valid signal and remove qualifucations in the complex_xxx fifo
+    -- FIXME bring in the overall valid signal and remove qualifications in the complex_xxx fifo
     ivld <= iprotocol.samples_vld or
             iprotocol.time_vld or
             iprotocol.interval_vld or
