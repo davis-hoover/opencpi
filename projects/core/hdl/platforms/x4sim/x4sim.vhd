@@ -41,10 +41,10 @@ architecture rtl of x4sim_worker is
   signal sdp_cp_in_data   : dword_array_t(0 to to_integer(sdp_width)-1);
   signal sdp_cp_out_data  : dword_array_t(0 to to_integer(sdp_width)-1);
 begin
-  ctl_reset_n        <= not ctl_reset;
-  timebase_out.clk   <= ctl_clk;
-  timebase_out.reset <= ctl_reset;
-  timebase_out.ppsIn <= '0';
+  ctl_reset_n           <= not ctl_reset;
+  timebase_out.clk      <= ctl_clk;
+  timebase_out.PPS      <= '0';
+  timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
 
   -- generate clocks
   control_clock : sim_clk

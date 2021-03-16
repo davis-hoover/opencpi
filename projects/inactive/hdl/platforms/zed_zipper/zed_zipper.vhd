@@ -87,6 +87,7 @@ begin
   timebase_out.clk   <= clk;
   timebase_out.reset <= reset;
   timebase_out.ppsIn <= '0';
+  timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
 
   g0: if its(ocpi_debug) generate
     -- If we don't assign the outputs, the "debug overhead" will disappear

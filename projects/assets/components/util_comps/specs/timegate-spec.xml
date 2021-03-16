@@ -2,9 +2,9 @@
 
   <Property name='ignore_time_stamps'
             type='bool'
-            writable='true'
+            initial='true'
             default='false'
-            description='Ignore/drops timestamps, disabling the timegating functionality.'/>
+            description='Ignores/drops timestamps, disabling the timegating functionality.'/>
   <Property name='time_correction'
             type='ulong'
             writable='true'

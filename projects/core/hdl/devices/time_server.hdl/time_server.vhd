@@ -58,7 +58,19 @@ begin
   props_out.PPS_ok                         <= timeStatus(27);
   props_out.PPS_lost_last_second_error     <= timeStatus(26);
   props_out.PPS_count                      <= timeStatus(7 downto 0);
-  
+  props_out.using_PPS                      <= timebase_in.usingPPS;
+
+  time_service2ctl_time_valid : component cdc.cdc.single_bit
+    generic map(IREG      => '1',
+                RST_LEVEL => '0')
+    port map   (src_clk      => timebase_in.clk,
+                src_rst      => ctl2timebase_reset,
+                src_en       => '1',
+                src_in       => timeStatus(25),
+                dst_clk      => ctl_in.Clk,
+                dst_rst      => ctl_in.reset,
+                dst_out      => props_out.time_valid);
+
   ctl2timebase_rst : component cdc.cdc.reset
     port map   (src_rst => ctl_in.reset,
                 dst_clk => timebase_in.clk,

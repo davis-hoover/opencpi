@@ -104,7 +104,7 @@ For example, given that last captured data buffer word is 0x0000005a: \newline
 - if number of bytes is 6, the last data received was 0x005a. \newline
 
 
-The {\comp} component counts the number of metadata records (\texttt{metadataCount}) have been captured, how many data words have been captured (\texttt{dataCount}), and the total number of 4 byte data words that were passed through the worker during an app run (\texttt{totalBytes}). It allows for the option to wrap around and continue to capture data and metadata once the buffers are full or to stop capturing data and metadata when the data and metadata buffers are full via the \texttt{stopOnFull} property. \newline
+The {\comp} component counts the number of metadata records (\texttt{metadataCount}) have been captured, how many data words have been captured (\texttt{dataCount}), and the total number of bytes that were passed through the worker during an app run (\texttt{totalBytes}). It allows for the option to wrap around and continue to capture data and metadata once the buffers are full or to stop capturing data and metadata when the data and metadata buffers are full via the \texttt{stopOnFull} property. \newline
 
 When \texttt{stopOnFull} is true (leading), data and metadata will be captured as long as the metadata buffer is not full. The data buffer will loop if it is not full and the metadata buffer is not full. The metadata buffer will loop independently until it is not full. When \texttt{stopOnFull} is false (trailing), the data and metadata buffers loop independently. There will be a wrap around when the data and metadata buffers are full and data and metadata will continue to be captured.  \newline
 
@@ -188,7 +188,7 @@ When using {\comp}.hdl, the \texttt{totalBytes}, \texttt{metadataCount},  \textt
 		\hline
 		\verb+stopOnEOF+ & bool & true & - & - & - & false & Initial & Indicates causing the worker to become finished on EOF. stopOnEOF is always regarded as true now since the only reason to be false was the opcode-0-ZLM aliasing that no longer exists.\\
   		\hline
-		\verb+totalBytes+ & uLongLong & - & - & - & - & false & Volatile & Total number of 4 byte data words passed through the worker during an app run.\\
+		\verb+totalBytes+ & uLongLong & - & - & - & - & false & Volatile & Total number of bytes that passed through the worker during an app run..\\
 		\hline
 		\verb+metadata+ & uLong & - & - & - & numRecords, numMetadataWords & false & Volatile & Multidimensional array containing metadata records.\\
 		\hline

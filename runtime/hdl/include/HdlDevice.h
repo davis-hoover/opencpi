@@ -76,6 +76,8 @@ namespace OCPI {
     public:
       virtual ~Device();
       bool getPPSIsOkay(useconds_t timeout, useconds_t sleepTime);
+      bool getUsingPPS();
+      void enableTimeNowUpdatesFromPPS();
       OCPI::OS::Time now(bool &isGps);
       virtual bool init(std::string &error);
       inline Access &properties() const { return m_pfWorker->m_properties; }
