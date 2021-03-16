@@ -1948,6 +1948,7 @@ it is really per actual worker config...
       m_initialized = OS::Time::now();
       if (m_verbose) {
 	if (m_launchConnections.size()) {
+#if 0
 	  fprintf(stderr, "Connections between containers:\n");
 	  OC::Launcher::Connection *lc = &m_launchConnections[0];
 	  for (unsigned n = 0; n < m_launchConnections.size(); n++, lc++)
@@ -1960,6 +1961,7 @@ it is really per actual worker config...
 		      lc->m_in.m_member ? lc->m_in.m_member->m_name.c_str() : "<external>",
 		      lc->m_in.m_name, lc->m_in.m_port->nBuffers(), lc->m_bufferSize,
 		      lc->m_transport.transport.empty() ? "<none>" : lc->m_transport.transport.c_str());
+#endif
 	}
         fprintf(stderr,
                 "Application established: containers, workers, connections all created%s\n",
