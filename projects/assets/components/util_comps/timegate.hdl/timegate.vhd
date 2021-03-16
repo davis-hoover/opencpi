@@ -68,9 +68,6 @@ architecture rtl of worker is
   signal time_late_r           : bool_t;    -- timestamp arrived after its time
   signal clr_late_time_sticky  : bool_t;
   signal time_delta            : ulonglong_t;
-  
-  signal ctl_ignore_time_stamps  : bool_t;
-  signal iclk_ignore_time_stamps : bool_t;
 
 begin
   
@@ -153,20 +150,6 @@ begin
     slow_rst    => ctl_in.reset,
     slow_sticky => props_out.late_time_sticky,
     slow_clr    => clr_late_time_sticky);
-  
-  ctl_ignore_time_stamps <= props_in.ignore_time_stamps and ctl_in.is_operating;
-  ignore_time_stamps : cdc.cdc.single_bit
-  generic map(
-    N    =>  2,
-    IREG => '1')
-  port map(
-    src_clk  => ctl_in.clk,
-    src_rst  => ctl_in.reset,
-    src_en   => '1',
-    src_in   => ctl_ignore_time_stamps,
-    dst_clk  => out_in.clk,
-    dst_rst  => out_in.reset,
-    dst_out  => iclk_ignore_time_stamps);
 
   -- Handles setting time_late_r
   time_late_reg : process (out_in.clk)
@@ -197,7 +180,7 @@ begin
           state_r     <= open_e; -- gate is initially open
           time_delta  <= (others => '0');
         elsif its(fifo_empty_n) then
-          if its(iclk_ignore_time_stamps) then -- Set the state back to open_e if any other
+          if its(props_in.ignore_time_stamps) then -- Set the state back to open_e if any other
             state_r <= open_e;                 -- state than open_e
           elsif its(fifo_out_is_time) then
             time_to_transmit_r <= unsigned(fifo_out_data(time_width_c-1 downto 0))
@@ -231,7 +214,7 @@ begin
           state_r     <= open_e; -- gate is initially open
           time_delta  <= (others => '0');
         elsif its(fifo_empty_n)  then
-          if its(iclk_ignore_time_stamps) then -- Set the state back to open_e if any other
+          if its(props_in.ignore_time_stamps) then -- Set the state back to open_e if any other
             state_r <= open_e;                 -- state than open_e
           elsif its(fifo_out_is_time) then -- time opcode
             if state_r = open_e or state_r = time_waiting_e then

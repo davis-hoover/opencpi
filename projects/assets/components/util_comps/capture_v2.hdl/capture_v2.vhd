@@ -60,7 +60,7 @@
 --
 -- The capture_v2 worker counts the number of metadata records (metadataCount)
 -- have been captured and how many data words have been captured (dataCount), 
--- and the total number of 4 byte data words that were passed through the worker 
+-- and the total number of bytes that were passed through the worker 
 -- during an app run (totalBytes). It allows for the option to wrap around and 
 -- continue to capture data and metadata once the buffers are full or to stop 
 -- capturing data and metadata when the data and metadata buffers are full 
