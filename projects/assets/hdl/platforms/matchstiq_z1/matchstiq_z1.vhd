@@ -18,28 +18,19 @@
 
 library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
-library platform;
 library zynq; use zynq.zynq_pkg.all;
-library axi;
-library unisim; use unisim.vcomponents.all;
-library bsv;
+
 architecture rtl of worker is
-  constant whichGP : natural := to_integer(unsigned(from_bool(useGP1)));
-  signal ps_m_axi_gp_in   : axi.zynq_7000_m_gp.axi_s2m_array_t(0 to C_M_AXI_GP_COUNT-1); -- s2m
-  signal ps_m_axi_gp_out  : axi.zynq_7000_m_gp.axi_m2s_array_t(0 to C_M_AXI_GP_COUNT-1); -- m2s
-  signal ps_s_axi_hp_in   : axi.zynq_7000_s_hp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1); -- m2s
-  signal ps_s_axi_hp_out  : axi.zynq_7000_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1); -- s2m
-  signal fclk             : std_logic_vector(3 downto 0);
-  signal clk              : std_logic;
-  signal raw_rst_n        : std_logic; -- FCLKRESET_Ns need synchronization
-  signal rst_n            : std_logic; -- the synchronized negative reset
-  signal reset            : std_logic; -- our positive reset
-  signal count            : unsigned(25 downto 0);
-  signal my_sdp_out       : zynq_out_array_t;      -- so we can observe the SDP outputs for debug
-  signal my_sdp_out_data  : zynq_out_data_array_t; -- ditto
-  signal dbg_state        : ulonglong_array_t(0 to 3);
-  signal dbg_state1       : ulonglong_array_t(0 to 3);
-  signal dbg_state2       : ulonglong_array_t(0 to 3);
+  constant sdp_width_c : natural := to_integer(sdp_width);
+  constant sdp_count_c : natural := to_integer(sdp_channels);
+  signal clk           : std_logic;
+  signal reset         : std_logic; -- our positive reset
+  signal count         : unsigned(25 downto 0);
+  signal sdp_in_data   : sdp.sdp.data_array_t(0 to sdp_count_c-1, 0 to sdp_width_c-1);
+  signal sdp_out_data  : sdp.sdp.data_array_t(0 to sdp_count_c-1, 0 to sdp_width_c-1);
+  signal dbg_state     : ulonglong_array_t(0 to sdp_count_c-1);
+  signal dbg_state1    : ulonglong_array_t(0 to sdp_count_c-1);
+  signal dbg_state2    : ulonglong_array_t(0 to sdp_count_c-1);
 begin
   -- Drive metadata interface - boiler plate
   metadata_out.clk     <= clk;
@@ -48,63 +39,36 @@ begin
   -- Drive timekeepping interface - depends on which clock, and whether there is a PPS input
   timebase_out.clk     <= clk;
   timebase_out.reset   <= reset;
-  timebase_out.ppsIn   <= GPS_1PPS_IN;
-  EXT_1PPS_OUT         <= timebase_in.ppsOut;
-  -- Use a global clock buffer for this clock used for both control and data
-  clkbuf   : BUFG   port map(I => fclk(0),
-                             O => clk);
-  -- The FCLKRESET signals from the PS are documented as asynchronous with the
-  -- associated FCLK for whatever reason.  Here we make a synchronized reset from it.
-  sr : bsv.bsv.SyncResetA
-    generic map(RSTDELAY => 17)
-    port map   (IN_RST  => raw_rst_n,
-                CLK     => clk,
-                OUT_RST => rst_n);
-  reset <= not rst_n;
-  -- Instantiate the processor system (i.e. the interface to it).
-  ps : zynq_ps
-    port map(
-      -- Signals from the PS used in the PL
-      ps_in.debug           => (31 => useGP1, others => '0'),
-      ps_out.FCLK           => fclk,
-      ps_out.FCLKRESET_N    => raw_rst_n,
-      m_axi_gp_in           => ps_m_axi_gp_in,
-      m_axi_gp_out          => ps_m_axi_gp_out,
-      s_axi_hp_in           => ps_s_axi_hp_in,
-      s_axi_hp_out          => ps_s_axi_hp_out);
+  timebase_out.pps     <= GPS_1PPS_IN;
+  EXT_1PPS_OUT         <= timebase_in.pps;
+  -- convert between 2d array and array of arrays (VHDL does not allow 1d slices of 2d)
+   sd0 : for i in 0 to sdp_count_c-1 generate
+     sd1: for j in 0 to sdp_width_c-1 generate
+            sdp_in_data(i,j) <= zynq_in_data(i)(j);
+            zynq_out_data(i)(j) <= sdp_out_data(i,j);
+        end generate;
+     end generate;
+  -- Instantiate the processor system and the converters to control plane and sdp
+  ps : zynq_sdp
+    generic map(sdp_width => sdp_width_c,
+                sdp_count => sdp_count_c,
+                use_acp   => its(use_acp),
+                which_gp => to_integer(unsigned(from_bool(useGp1))))
+    port map(clk => clk,
+             reset => reset,
+             cp_in => cp_in,
+             cp_out => cp_out,
+             sdp_in => sdp.sdp.s2m_array_t(zynq_in),
+             sdp_in_data => sdp_in_data,
+             zynq_out_array_t(sdp_out) => zynq_out,
+             sdp_out_data => sdp_out_data,
+             axi_error => props_out.axi_error,
+             dbg_state => dbg_state,
+             dbg_state1 => dbg_state1,
+             dbg_state2 => dbg_state2);
 
-  -- Adapt the axi master from the PS to be a CP Master
-  cp : axi.zynq_7000_m_gp.axi2cp_zynq_7000_m_gp
-    port map(
-      clk     => clk,
-      reset   => reset,
-      axi_in  => ps_m_axi_gp_out(whichGP),
-      axi_out => ps_m_axi_gp_in(whichGP),
-      cp_in   => cp_in,
-      cp_out  => cp_out
-      );
-  zynq_out               <= my_sdp_out;
-  zynq_out_data          <= my_sdp_out_data;
-  props_out.sdpDropCount <= zynq_in(0).dropCount;
-  -- We use one sdp2axi adapter foreach of the processor's S_AXI_HP channels
-  g : for i in 0 to C_S_AXI_HP_COUNT-1 generate
-    dp : axi.zynq_7000_s_hp.sdp2axi_zynq_7000_s_hp
-      generic map(ocpi_debug => true,
-                  sdp_width  => to_integer(sdp_width))
-      port map(   clk          => clk,
-                  reset        => reset,
-                  sdp_in       => zynq_in(i),
-                  sdp_in_data  => zynq_in_data(i),
-                  sdp_out      => my_sdp_out(i),
-                  sdp_out_data => my_sdp_out_data(i),
-                  axi_in       => ps_s_axi_hp_out(i),
-                  axi_out      => ps_s_axi_hp_in(i),
-                  axi_error    => props_out.axi_error(i),
-                  dbg_state    => dbg_state(i),
-                  dbg_state1   => dbg_state1(i),
-                  dbg_state2   => dbg_state2(i));
-  end generate;
   -- Output/readable properties
+  props_out.sdpDropCount    <= zynq_in(0).dropCount;
   props_out.dna             <= (others => '0');
   props_out.nSwitches       <= (others => '0');
   props_out.switches        <= (others => '0');
