@@ -100,11 +100,12 @@ begin
   -- The FCLKRESET signals from the PS are documented as asynchronous with the
   -- associated FCLK for whatever reason.  Here we make a synchronized reset from it.
   sr : cdc.cdc.reset
-    generic map(RST_DELAY => 17)
+    generic map(SRC_RST_VALUE => '0',
+		RST_DELAY => 17)
     port map   (src_rst   => raw_rst_n,
                 dst_clk   => fclk(which_fclk),
-                dst_rst   => rst_n);
-  reset_out <= not rst_n;
+                dst_rst   => reset_out,
+	        dst_rst_n => open);
 
   -- Adapt the axi master from the PS to be a CP Master
   cp : axi.zynq_7000_m_gp.axi2cp_zynq_7000_m_gp

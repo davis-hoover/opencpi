@@ -60,12 +60,14 @@ begin
                          O => clk);
   -- The FCLKRESET signals from the PS are documented as asynchronous with the
   -- associated FCLK for whatever reason.  Here we make a synchronized reset from it.
-  sr : bsv.bsv.SyncResetA
-    generic map(RSTDELAY => 17)
-    port map   (IN_RST  => raw_rst_n,
-                CLK     => clk,
-                OUT_RST => rst_n);
-  reset <= not rst_n;
+  -- cdc.cdc reset allows one to take in active low reset and output an active high or low reset
+  sr : cdc.cdc.reset
+    generic map(SRC_RST_VALUE => '0',
+                RST_DELAY => 17)
+    port map   (src_rst => raw_rst_n,
+                dst_clk => clk,
+                dst_rst => reset,
+                dst_rst_n => open);
   -- Instantiate the processor system (i.e. the interface to it).
   ps : zynq_ultra_ps
     port map(
