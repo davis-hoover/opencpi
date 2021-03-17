@@ -211,7 +211,7 @@ namespace OCPI {
 	uint32_t
 	get(RegisterOffset offset, size_t bytes, uint32_t *status) {
 	  ocpiDebug("SDP Accessor read for offset 0x%zx of %zu bytes", offset, bytes);
-	  uint32_t data;
+	  uint32_t data = 0; // for compiler warning
 	  sdpRequest(true, offset, bytes, (uint8_t*)&data, status);
 	  ocpiDebug("SDP Accessor read received 0x%x from offset %zx", data, offset);
 	  return data;
