@@ -233,6 +233,7 @@ begin
           if my_give and not its(som or valid or eom or abort or eof) then
             report "Illegal message metadata: no SOM or VALID or EOM" severity failure;
           end if;
+          -- FIXME: allow EOF to cause give/valid to be ignored!!!
           if its(my_give) then
             first_data_r <= bfalse;
             if som and (state_r = EARLY_SOM_e or state_r = AFTER_SOM_e) then

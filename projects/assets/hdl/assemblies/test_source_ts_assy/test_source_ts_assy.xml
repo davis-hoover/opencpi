@@ -1,0 +1,6 @@
+<!-- The test_source_assy HDL assembly xml file -->
+<HdlAssembly>
+  <!-- Remove this instance and replace it with real ones -->
+  <Instance Worker='test_source' connect='timestamper_scdcd'/>
+  <Instance Worker='timestamper_scdcd' externals='1'/>
+</HdlAssembly>

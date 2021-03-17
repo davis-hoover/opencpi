@@ -168,9 +168,11 @@ namespace OCPI {
         ts->set64RegisterOffset(os, current_time.bits());
         // read current Q32.32 time from HTS now that HTS is fully sync'd to GPS
         ret = ts->get64RegisterOffset(os);
-      }
-      if (!isGps)
+      } else {
+	// no GPS time avalable, use system time and set the time server to it.
         ret = OS::Time::now();
+	ts->set64RegisterOffset(offsetof(TimeService, time_now), ret.bits());
+      }
       return ret;
     }
     // Called from derived constructor after accessors have been set up.
