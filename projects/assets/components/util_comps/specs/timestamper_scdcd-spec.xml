@@ -29,11 +29,15 @@
             default='false'
             description='Forces worker into the unusable state if the time
             invalid signal is low during the worker initialized state.'/>
-  <Property name='min_num_samples_per_timestamp'
+  <Property name='samples_per_timestamp'
+            description='After each timestamp, this number of samples is passed before the next one.
+                         If zero, a timestamp precedes each sample output message (not recommended).'
             type='ulong'
             writable='true'
-            default='1024'/>
-
+            default='1m'/>
+  <Property name='sampling_interval' type='ulonglong' writable='true' default='0'
+	    description='The fraction of a second between samples, in Q0.64 fixed point format.
+                         Send in the stream if non-zero, upon start or when written'/>
   <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>
   <Port name='out' producer='true' protocol='ComplexShortWithMetadata-prot'/>
 

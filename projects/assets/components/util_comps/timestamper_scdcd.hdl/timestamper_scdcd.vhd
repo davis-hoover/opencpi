@@ -20,13 +20,13 @@ library ocpi; use ocpi.types.all; use ocpi.wci.all; -- remove this to avoid all
                                                     -- ocpi name collisions
 library misc_prims;
 use misc_prims.misc_prims.all;
-library cdc; use cdc.cdc.all;
+library cdc;
 library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
   constant CTRL_IN_CDC_BIT_WIDTH : positive := 
       1 + props_in.time_correction'length +
-      props_in.min_num_samples_per_timestamp'length + 1;
+      props_in.samples_per_timestamp'length + 1;
 
   signal cclk_is_operating_pulse     : std_logic := '0';
   signal cclk_ctrl_in_cdc_src_enq    : std_logic := '0';
@@ -34,16 +34,18 @@ architecture rtl of worker is
       CTRL_IN_CDC_BIT_WIDTH-1 downto 0) := (others => '0');
   signal cclk_ctrl_in_cdc_src_full_n : std_logic := '0';
 
+  signal cclk_ctrl_in_insert_interval : bool_t;
   signal iclk_ctrl_in_cdc_dst_out    : std_logic_vector(
       CTRL_IN_CDC_BIT_WIDTH-1 downto 0) := (others => '0');
   signal iclk_ctrl_in_cdc_empty_n    : std_logic := '0';
 
+  signal iclk_interval_written       : std_logic := '0';
   signal iclk_bypass                                : std_logic := '0';
   signal iclk_time_correction                       : std_logic_vector(
       props_in.time_correction'range) := (others => '0');
-  signal iclk_min_num_samples_per_timestamp         : std_logic_vector(
-      props_in.min_num_samples_per_timestamp'range) := (others => '0');
-  signal iclk_is_operating                          : std_logic := '0';
+  signal iclk_samples_per_timestamp         : std_logic_vector(
+      props_in.samples_per_timestamp'range) := (others => '0');
+  signal iclk_is_operating                          : std_logic;
 
   signal iclk_opcode : protocol.complex_short_with_metadata.opcode_t := SAMPLES;
 
@@ -55,6 +57,7 @@ architecture rtl of worker is
   signal iclk_time_downsampler_oeof      : std_logic := '0';
 
   signal iclk_time_corrector_irdy        : std_logic := '0';
+  signal iclk_time_corrector_ordy        : std_logic := '0';
   signal iclk_time_corrector_oprotocol   : protocol_t := PROTOCOL_ZERO;
   signal iclk_time_corrector_oeof        : std_logic := '0';
   signal iclk_time_downsampler_iprotocol : protocol_t := PROTOCOL_ZERO;
@@ -76,7 +79,15 @@ architecture rtl of worker is
   signal oclk_data   : std_logic_vector(out_out.data'range) := (others => '0');
   signal oclk_opcode : protocol.complex_short_with_metadata.opcode_t := SAMPLES;
   signal oclk_eof    : std_logic := '0';
+  signal samples_per_timestamp : unsigned(props_in.samples_per_timestamp'range);
+  signal samples_per_message : unsigned(props_in.samples_per_timestamp'range);
+
 begin
+  -- respect system-provided output buffer size and use
+  samples_per_message <= resize(props_in.ocpi_buffer_size_out srl 2, samples_per_message'length);
+  samples_per_timestamp <= samples_per_message
+                           when props_in.samples_per_timestamp < samples_per_message else
+                           props_in.samples_per_timestamp;
 
   ------------------------------------------------------------------------------
   -- CTRL -> DATA CDC
@@ -92,13 +103,13 @@ begin
   cclk_ctrl_in_cdc_src_enq <=
       props_in.bypass_written or
       props_in.time_correction_written or
-      props_in.min_num_samples_per_timestamp_written or
+      props_in.samples_per_timestamp_written or
       cclk_is_operating_pulse;
 
   cclk_ctrl_in_cdc_src_in <=
       props_in.bypass &
       std_logic_vector(props_in.time_correction) &
-      std_logic_vector(props_in.min_num_samples_per_timestamp) &
+      std_logic_vector(samples_per_timestamp) &
       ctl_in.is_operating;
 
   ctrl_in_cdc : cdc.cdc.fifo
@@ -117,15 +128,15 @@ begin
       dst_EMPTY_N => iclk_ctrl_in_cdc_empty_n);
 
   iclk_bypass                                <=
-      iclk_ctrl_in_cdc_dst_out(3+iclk_min_num_samples_per_timestamp'length-1
+      iclk_ctrl_in_cdc_dst_out(3+iclk_samples_per_timestamp'length-1
                                +iclk_time_correction'length-1);
   iclk_time_correction                       <=
-      iclk_ctrl_in_cdc_dst_out(2+iclk_min_num_samples_per_timestamp'length-1
+      iclk_ctrl_in_cdc_dst_out(2+iclk_samples_per_timestamp'length-1
                                +iclk_time_correction'length-1
                                downto
-                               2+iclk_min_num_samples_per_timestamp'length-1);
-  iclk_min_num_samples_per_timestamp         <=
-      iclk_ctrl_in_cdc_dst_out(1+iclk_min_num_samples_per_timestamp'length-1
+                               2+iclk_samples_per_timestamp'length-1);
+  iclk_samples_per_timestamp         <=
+      iclk_ctrl_in_cdc_dst_out(1+iclk_samples_per_timestamp'length-1
                                 downto 1);
   iclk_is_operating                          <=
       iclk_ctrl_in_cdc_dst_out(0);
@@ -134,7 +145,7 @@ begin
   -- CTRL <- DATA CDC
   ------------------------------------------------------------------------------
 
-  ctrl_out_cdc : fast_pulse_to_slow_sticky
+  ctrl_out_cdc : cdc.cdc.fast_pulse_to_slow_sticky
     port map(
       -- fast clock domain
       fast_clk    => in_in.clk,
@@ -146,31 +157,27 @@ begin
       slow_clr    => props_in.clr_correction_overflow_sticky,
       slow_sticky => props_out.correction_overflow_sticky);
 
+
+  -- This defaults to zero, so that should be written first.
+  -- The interval is only inserted on demand.
+  cclk_ctrl_in_insert_interval <=
+    to_bool(props_in.sampling_interval_written and props_in.sampling_interval /= 0);
+
+  interval_cdc : cdc.cdc.pulse
+    port map(
+      src_clk     => ctl_in.clk,
+      src_rst     => ctl_in.reset,
+      src_in      => cclk_ctrl_in_insert_interval,
+      src_rdy     => open,  -- we know that these pulses will be far apart
+      dst_clk     => in_in.clk,
+      dst_rst     => in_in.reset,
+      dst_out     => iclk_interval_written);
+
   ------------------------------------------------------------------------------
   -- WTI
   ------------------------------------------------------------------------------
 
-  iclk_time_downsampler_iprotocol.samples <= 
-      iclk_in_demarshaller_oprotocol.samples;
-  iclk_time_downsampler_iprotocol.samples_vld <=
-      iclk_in_demarshaller_oprotocol.samples_vld;
-  iclk_time_downsampler_iprotocol.time.sec <=
-      std_logic_vector(time_in.seconds);
-  iclk_time_downsampler_iprotocol.time.fract_sec <=
-      std_logic_vector(time_in.fraction);
-  iclk_time_downsampler_iprotocol.time_vld <= '1' when (time_in.valid = btrue)
-                                              and (props_in.bypass = bfalse)
-                                              else '0';
-  iclk_time_downsampler_iprotocol.interval <=
-      iclk_in_demarshaller_oprotocol.interval;
-  iclk_time_downsampler_iprotocol.interval_vld <=
-      iclk_in_demarshaller_oprotocol.interval_vld;
-  iclk_time_downsampler_iprotocol.flush <=
-      iclk_in_demarshaller_oprotocol.flush;
-  iclk_time_downsampler_iprotocol.sync <=
-      iclk_in_demarshaller_oprotocol.sync;
-  iclk_time_downsampler_iprotocol.end_of_samples <=
-      iclk_in_demarshaller_oprotocol.end_of_samples;
+  iclk_time_downsampler_iprotocol <= iclk_in_demarshaller_oprotocol;
 
   ctl_out.error <= btrue when (ctl_in.control_op = START_e) and
                    (props_in.force_error_on_invalid_time_at_start = btrue) and
@@ -208,9 +215,16 @@ begin
       oeof      => iclk_in_demarshaller_oeof,
       ordy      => iclk_time_downsampler_irdy);
 
-  iclk_time_downsampler_ctrl.bypass                <= iclk_bypass;
-  iclk_time_downsampler_ctrl.min_num_data_per_time <=
-      unsigned(iclk_min_num_samples_per_timestamp);
+  iclk_time_downsampler_ctrl.bypass                <= iclk_bypass; -- forces pure bypass
+
+  iclk_time_downsampler_ctrl.time.sec              <= std_logic_vector(time_in.seconds);
+  iclk_time_downsampler_ctrl.time.fract_sec        <= std_logic_vector(time_in.fraction);
+  iclk_time_downsampler_ctrl.time_vld              <= time_in.valid;
+  iclk_time_downsampler_ctrl.samples_per_timestamp <= unsigned(iclk_samples_per_timestamp);
+
+  iclk_time_downsampler_ctrl.insert_interval       <= iclk_interval_written; -- rising edge cause insertion
+  -- cdc not needed  since it will only be sampled after a _written pulse *is* cdc'd;
+  iclk_time_downsampler_ctrl.interval.delta_time   <= std_logic_vector(props_in.sampling_interval); -- cdc not needed
 
   time_downsampler : misc_prims.misc_prims.time_downsampler
     port map(
@@ -229,6 +243,7 @@ begin
 
   iclk_time_corrector_ctrl.bypass          <= iclk_bypass;
   iclk_time_corrector_ctrl.time_correction <= signed(iclk_time_correction);
+  iclk_time_corrector_ordy                 <= iclk_data_cdc_ifull_n and iclk_is_operating;
 
   time_corrector : misc_prims.misc_prims.time_corrector
     port map(
@@ -244,7 +259,7 @@ begin
       -- OUTPUT
       oprotocol => iclk_time_corrector_oprotocol,
       oeof      => iclk_time_corrector_oeof,
-      ordy      => iclk_data_cdc_ifull_n);
+      ordy      => iclk_time_corrector_ordy);
 
   iclk_data_cdc_ienq <= (
     iclk_time_corrector_oprotocol.samples_vld    or

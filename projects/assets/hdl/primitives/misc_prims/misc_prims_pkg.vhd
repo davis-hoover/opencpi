@@ -21,7 +21,8 @@ use ieee.std_logic_1164.all;
 USE IEEE.NUMERIC_STD.ALL;
 USE IEEE.MATH_REAL.ALL;
 USE IEEE.MATH_COMPLEX.ALL;
-library protocol;
+library protocol, ocpi;
+use ocpi.types.all;
 
 package misc_prims is
 
@@ -34,9 +35,14 @@ function calc_cdc_pulse_dst_fifo_depth (constant src_dst_ratio : in real; consta
 function calc_cdc_count_up_dst_fifo_depth (constant src_dst_ratio : in real; constant num_input_samples : in natural) return natural;
 
 type time_downsampler_ctrl_t is record
-  bypass                : std_logic;
-  min_num_data_per_time : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1
-                          downto 0);
+  bypass                : bool_t; -- overrides others
+  -- for timestamping
+  time                  : protocol.complex_short_with_metadata.op_time_t;
+  time_vld              : bool_t; -- indicates insertion
+  samples_per_timestamp : unsigned(TIME_DOWNSAMPLER_DATA_CNT_BIT_WIDTH-1 downto 0); -- once if zero
+  -- for interval insertion
+  insert_interval       : bool_t; -- rising edge triggers insertion when possible
+  interval              : protocol.complex_short_with_metadata.op_interval_t;
 end record time_downsampler_ctrl_t;
 
 type time_corrector_ctrl_t is record
