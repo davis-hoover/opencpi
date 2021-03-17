@@ -39,6 +39,8 @@
 using namespace OCPI::API;
 using namespace OCPI::Time;
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
+
 class OcpiTimeCvtConfigurator
   : public OCPI::Util::CommandLineConfiguration
 {
@@ -166,3 +168,6 @@ int main( int argc, char** argv )
 
 }
 
+#else
+int main(int, char**) { return 0; }
+#endif

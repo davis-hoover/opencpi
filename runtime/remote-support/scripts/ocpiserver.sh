@@ -108,16 +108,22 @@ start)
   echo VALGRIND_LIB=$VALGRIND_LIB >&2
   echo $envarg nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
   eval $envarg exec nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
+  rc=$?
   pid=$!
   sleep 1
-  if kill -s CONT $pid; then
-    echo ocpiserve running with pid: $pid >&2
+  if [ $rc != 0 ]; then
+    echo "Failed to start the server (ocpiserve).  Exit status was $rc and log was:" >&2
+    cat $log >&2
+    echo "--- end of server startup log failure above" >&2
+  elif kill -s CONT $pid > /dev/null; then
     echo $pid >ocpiserve.pid
-    head $log
+    echo "Server (ocpiserve) started with pid: $pid.  Initial log is:" >&2
+    head $log >&2
+    echo "--- end of server startup log success above" >&2
   else
-    wait $pid
-    echo Could not start ocpiserve: exit status $?, here is the last 10 lines of the log: >&2
-    tail -10 $log >&2
+    echo "Server (ocpiserve) started (pid $pid) but then failed: its startup log is:" >&2
+    cat $log >&2
+    echo "--- end of server startup log failure above" >&2
     exit 1
   fi
   ;;

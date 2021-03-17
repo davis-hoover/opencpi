@@ -170,7 +170,7 @@ public:
 
   void run() {
     try {
-      size_t     n;
+      size_t     n = 0;
       std::vector<uint8_t> buf(m_receiveSize);
       FlagHeader header;
       uint8_t   *current_ptr = (uint8_t*)&header;

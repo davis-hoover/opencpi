@@ -119,9 +119,11 @@ public:
 	fprintf(stderr, "  %2d: %s, model: %s, os: %s, osVersion: %s, platform: %s\n",
 		n, c.name().c_str(), c.model().c_str(), c.os().c_str(),
 		c.osVersion().c_str(), c.platform().c_str());
-      OU::formatAdd(discoveryInfo(), "%s|%s|%s|%s|%s|%s|%c|", c.name().c_str(),
+      OU::formatAdd(discoveryInfo(), "%s|%s|%s|%s|%s|%s|%s%s|", c.name().c_str(),
 		    c.model().c_str(), c.os().c_str(), c.osVersion().c_str(),
-		    c.arch().c_str(), c.platform().c_str(), c.dynamic() ? '1' : '0');
+		    c.arch().c_str(), c.platform().c_str(), c.dynamic() ? "d" : "",
+		    c.optimized() ? "o" : ""); // these are like build suffixes
+
       for (unsigned nn = 0;  nn < c.transports().size(); nn++) {
 	const OC::Transport &t = c.transports()[nn];
 	OU::formatAdd(discoveryInfo(), "%s,%s,%u,%u,0x%x,0x%x|",

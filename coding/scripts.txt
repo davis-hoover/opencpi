@@ -24,7 +24,7 @@ Scripts that are exposed to users must follow these rules:
 5. command arguments should attempt to follow the same conventions used for C++ executables.
 e.g.:
  single hyphen options are single letters
- double hyphen options should be hyphen-separated words, not abbreviations
+ double hyphen options should be hyphen-separated words (NOT underscores), not abbreviations
     except things like "init", etc. (we should have a list of some common abbreviations).
     values should be able to be specified using =, as in --my-option=foo.
  when the command does multiple things, the first non-option arg should be a "verb" saying

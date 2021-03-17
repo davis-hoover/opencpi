@@ -78,7 +78,7 @@ void OutputBuffer::update(bool critical)
 {
   ( void ) critical;
   OCPI::Util::AutoMutex guard ( m_threadSafeMutex, true ); 
-  int tid = getTid();
+  unsigned tid = getTid();
   struct PortMetaData::OutputPortBufferControlMap *output_offsets = 
     &getPort()->getMetaData()->m_bufferData[tid].outputOffsets;
 
@@ -225,13 +225,13 @@ bool OutputBuffer::isEmpty()
 
   // If we have any pending transfers, we will check them here to determine if
   // they are done
-  OCPI::OS::int32_t n_pending = get_nentries(&m_pendingTransfers);
+  unsigned n_pending = get_nentries(&m_pendingTransfers);
 
 #ifdef DEBUG_L2
   ocpiDebug("** there are %d pending output transfers", n_pending );
 #endif
 
-  for (OCPI::OS::int32_t i=0; i < n_pending; i++) {
+  for (unsigned i=0; i < n_pending; i++) {
     Transfer* temp = static_cast<Transfer*>(get_entry(&m_pendingTransfers, i));
     if ( temp->isComplete() ) {
       remove_from_list( &m_pendingTransfers, temp );

@@ -52,11 +52,10 @@ namespace OCPI {
 
     class InputBuffer : public Buffer
     {
-
     public:
 
       /**********************************
-       * Our dependency desctriptor
+       * Our dependency descriptor
        **********************************/
       OCPI::RDT::Descriptors& m_feedbackDesc;
 
@@ -178,7 +177,9 @@ namespace OCPI {
 
       // Keeps track of when it produces
       bool m_produced;
-
+      friend class Port; // allow my events to be emitted by the Port class
+    protected:
+      OCPI_EMIT_MEMBER_DECL(arrive); // The arrival event including cache invalidation if done
     };
 
 

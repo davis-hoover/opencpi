@@ -171,28 +171,11 @@ namespace OCPI {
       delete &m_transport;
     }
 
-#if 0
-    //    bool m_start;
-
-    void Container::start(DataTransfer::EventManager* event_manager)
-      throw()
-    {
-      (void)event_manager;
-      start();
-      m_enabled = true;
-    }
-
-    void Container::stop(DataTransfer::EventManager* event_manager)
-      throw()
-    {
-      (void)event_manager;
-      m_enabled = false;
-    }
-#endif
     Container::DispatchRetCode Container::dispatch(DataTransfer::EventManager*)
     {
       return Container::DispatchNoMore;
     }
+#if 0
     bool Container::run(uint32_t usecs) {
       if (m_ownThread)
 	throw OU::EmbeddedException( OU::CONTAINER_HAS_OWN_THREAD,
@@ -200,7 +183,7 @@ namespace OCPI {
 				     OU::ApplicationRecoverable);
       return runInternal(usecs);
     }
-
+#endif
     bool Container::runInternal(uint32_t usecs) {
       if (!m_enabled)
 	return false;
@@ -279,6 +262,7 @@ namespace OCPI {
       }
     }
     void Container::start() {
+      OCPI_EMIT_HERE_;
       Container &base = baseContainer();
       if (this != &base && base.m_bridgedPorts.size())
 	base.start();
@@ -286,7 +270,7 @@ namespace OCPI {
 	if (this != &base && base.m_bridgedPorts.size())
 	  base.start();
 	m_enabled = true;
-	ocpiDebug("Starting container %s(%u): %p", name().c_str(), m_ordinal, this);
+	ocpiInfo("Starting container %s(%u): %p", name().c_str(), m_ordinal, this);
 	if (!m_thread && m_ownThread && needThread()) {
 	  m_thread = new OCPI::OS::ThreadManager;
 	  m_thread->start(runContainer, (void*)this);

@@ -742,7 +742,7 @@ namespace OCPI {
       if (cs == OU::Worker::FINISHED && (op == OU::Worker::OpStop || op == OU::Worker::OpStart))
 	return true;
       // If we are already in the desired state, just ignore it so that
-      // Neither workers not containers need to deal with this
+      // Neither workers nor containers need to deal with this
       if (ct.next != OU::Worker::NONE && cs == ct.next)
 	return true;
       if (cs == ct.valid[0] ||
@@ -772,8 +772,11 @@ namespace OCPI {
 		    instTag().empty() ? "" : "/", instTag().c_str(),
 		    OU::Worker::s_controlStateNames[cs]);
       Application *a = application();
-      if (a && op == OU::Worker::OpStart)
+      if (a && op == OU::Worker::OpStart) {
+	ocpiInfo("After starting worker %s, starting container %s",
+		 cname(), a->container().cname());
 	a->container().start();
+      }
       return false;
     }
     bool Worker::beforeStart() const {
