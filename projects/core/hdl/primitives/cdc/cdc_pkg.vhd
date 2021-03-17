@@ -27,9 +27,10 @@ package cdc is
       SRC_RST_VALUE : std_logic :='1'; 
       RST_DELAY : integer := 2);
     port (
-      src_rst : in  std_logic;
-      dst_clk : in  std_logic;
-      dst_rst : out std_logic);
+      src_rst   : in  std_logic;
+      dst_clk   : in  std_logic;
+      dst_rst   : out std_logic;
+      dst_rst_n : out std_logic);
   end component reset;
 
   component fifo is
