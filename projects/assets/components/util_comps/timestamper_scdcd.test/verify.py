@@ -36,8 +36,8 @@ output_filename = sys.argv[1]
 max_bytes_in = int(os.environ.get("OCPI_TEST_ocpi_max_bytes_in")) # UNDOCUMENTED / SUBJECT TO CHANGE
 msgs = iqm.parse_msgs_from_msgs_in_file(output_filename )
 
-vv = "OCPI_TEST_min_num_samples_per_timestamp"
-min_num_samples_per_timestamp = int(os.environ.get(vv))
+vv = "OCPI_TEST_samples_per_timestamp"
+samples_per_timestamp = int(os.environ.get(vv))
 bypass = os.environ.get("OCPI_TEST_bypass") == "true"
 
 if(bypass):
@@ -66,10 +66,10 @@ for msg in msgs:
     if(msg[utu.MESSAGE_OPCODE] == iqm.TIME_OPCODE):
         num_time_msgs += 1
         if(not first):
-            if(num_samples_per_timestamp < min_num_samples_per_timestamp):
+            if(num_samples_per_timestamp < samples_per_timestamp):
                 tmp = "num_samples_per_timestamp (" + str(num_samples_per_timestamp)
-                tmp += ") was less than min_num_samples_per_timestamp ("
-                tmp += str(min_num_samples_per_timestamp) + ")"
+                tmp += ") was less than samples_per_timestamp ("
+                tmp += str(samples_per_timestamp) + ")"
                 do_fail(tmp)
             tmp = " "
             if(num_samples_per_timestamp == 1):

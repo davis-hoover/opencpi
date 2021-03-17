@@ -1,5 +1,5 @@
 <HdlWorker language='vhdl' spec='timestamper_scdcd-spec' controloperations='start' version='2'
-	   SourceFiles='cdc_fifo_complex_short_with_metadata.vhd' Libraries='misc_prims'>
+	   SourceFiles='cdc_fifo_complex_short_with_metadata.vhd' Libraries='misc_prims protocol'>
 
 <!-- TODO / FIXME - this source file a workaround for a build problem w/ alst4 where misc_prims.cdc is not being included correctly -->
 
@@ -26,6 +26,7 @@
                    clockDirection='in'/>
   <StreamInterface name='out'
                    datawidth='OUT_PORT_DATA_WIDTH'
+		   inserteom='true'
                    workereof='true'
                    clockDirection='in'/>
 

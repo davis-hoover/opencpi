@@ -17,5 +17,6 @@
   <StreamInterface name='out'
                    datawidth='OUT_PORT_DATA_WIDTH'
                    clockdirection='in'
+		   inserteom='true'
                    workereof='true'/>
 </HdlWorker>
