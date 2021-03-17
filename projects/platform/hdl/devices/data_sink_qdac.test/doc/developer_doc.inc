@@ -17,7 +17,7 @@
       \hline
       v1.7 & Updated port/property/interface tables for accuracy. Package ID changed from ocpi.assets to ocpi.platform. & 06/2020 \\
       \hline
-      v2.1 & Updated Source Dependencies section for correct location of dependencies. & 03/2021 \\
+      v2.1 & Updated Source Dependencies section for correct location of dependencies. Updated Worker Implementation Details section to talk about new properties. & 03/2021 \\
       \hline
     \end{longtable}
   \end{table}
@@ -41,7 +41,9 @@ The \comp{} worker provides functionality common to all DAC device types, includ
 	\item[2)] Normalize input data to bit width of device
 	\item[3)] Provide underrun indicator when rate of input data is less than DAC data rate
 \end{itemize}
-It is intended to be paired with a device specific worker which translates the \textbf{dev} interface to a device specific interface.
+It is intended to be paired with a device specific worker which translates the \textbf{dev} interface to a device specific interface. \\
+
+There is the samp\_count\_before\_first\_underrun property that gives the number of samples before the first sample underrun and the num\_underruns property that gives number of sample underruns. These properties should be checked at the end of an app run because they won't be stable until then. The worker doesn't use cdc crossing circuits for samp\_count\_before\_first\_underrun and num\_underruns because it takes advantage that samp\_count\_before\_first\_underrun and num\_underruns will have a stable value by the time the control plane reads those values at the end of an app run.
 \end{flushleft}
 
 %\section*{Worker Implementation Details}

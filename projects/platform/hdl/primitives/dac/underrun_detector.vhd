@@ -20,15 +20,57 @@ entity underrun_detector is
     ordy          : in  std_logic);
 end entity underrun_detector;
 architecture rtl of underrun_detector is
+  constant samp_count_max_value           : unsigned  := x"FFFF_FFFF"; -- (2^SAMP_COUNT_BIT_WIDTH)-1
+  constant num_underruns_count_max_value  : unsigned  := x"FFFF_FFFF"; -- (2^NUM_UNDERRUNS_BIT_WIDTH)-1
   signal underrun                      : std_logic := '0';
   signal pending_xfer_underrun_error_r : std_logic := '0';
   signal xfer_underrun_error           : std_logic := '0';
+  signal samp_count_before_first_underrun  : unsigned(SAMP_COUNT_BIT_WIDTH-1 downto 0);
+  signal num_underruns                     : unsigned(NUM_UNDERRUNS_BIT_WIDTH-1 downto 0);
+  signal first_underrun_detected_sticky    : std_logic;
 begin
 
   status.underrun_error <= underrun;
+  status.samp_count_before_first_underrun <= std_logic_vector(samp_count_before_first_underrun);
+  status.num_underruns <= std_logic_vector(num_underruns);
 
   --underrun only generated when ctrl_tx_on_off = '1'
   underrun <= ordy and (not iprotocol.samples_vld) and imetadata.ctrl_tx_on_off;
+  
+  first_underrun_detected_sticky_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      if(rst = '1') then
+        first_underrun_detected_sticky <= '0';
+      elsif(xfer_underrun_error = '1') then
+        first_underrun_detected_sticky <= '1';
+      end if;
+    end if;
+  end process;
+
+  samp_count_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      if(rst = '1') then
+        samp_count_before_first_underrun <= (others=>'0');
+      elsif(first_underrun_detected_sticky = '0' and samp_count_before_first_underrun < samp_count_max_value) then
+          if (iprotocol.samples_vld = '1' and ordy = '1' and imetadata.ctrl_tx_on_off = '1') then
+            samp_count_before_first_underrun <= samp_count_before_first_underrun + 1;
+          end if;
+      end if;
+    end if;
+  end process;
+
+  num_underruns_reg : process(clk)
+  begin
+    if(rising_edge(clk)) then
+      if(rst = '1') then
+        num_underruns <= (others=>'0');
+      elsif (underrun = '1' and num_underruns < num_underruns_count_max_value) then
+        num_underruns <= num_underruns + 1;
+      end if;
+    end if;
+  end process;
 
   pending_underrun_error_reg : process(clk)
   begin

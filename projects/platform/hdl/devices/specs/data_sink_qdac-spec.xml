@@ -18,6 +18,14 @@
             Type="Bool"
             Writable="true"
             Description="Writing true clears underrun_sticky_error."/>
+  <Property name='samp_count_before_first_underrun'
+            type='ulong'
+            volatile='true'
+            description='Number of samples before the first sample underrun.'/>
+  <Property name='num_underruns'
+            type='ulong'
+            volatile='true'
+            description='Number of sample underruns.'/>
 
   <Port Name="in" 
         Protocol="ComplexShortWithMetadata-prot"/>

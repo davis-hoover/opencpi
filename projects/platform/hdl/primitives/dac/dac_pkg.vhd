@@ -21,6 +21,8 @@ package dac is
 
 -- represents the width of each of I and Q
 constant DATA_BIT_WIDTH : positive := 12;
+constant SAMP_COUNT_BIT_WIDTH : positive := 32;
+constant NUM_UNDERRUNS_BIT_WIDTH : positive := 32;
 
 type data_complex_t is record
   i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
@@ -36,6 +38,8 @@ end record metadata_t;
 
 type underrun_detector_status_t is record
   underrun_error : std_logic;
+  samp_count_before_first_underrun : std_logic_vector(SAMP_COUNT_BIT_WIDTH-1 downto 0);
+  num_underruns                    : std_logic_vector(NUM_UNDERRUNS_BIT_WIDTH-1 downto 0);
 end record underrun_detector_status_t;
 
 -- useful for data egress to multi-DAC devices
