@@ -28,9 +28,10 @@ architecture rtl of xsim_worker is
   signal   ctl_clk          : std_logic;
   signal   ctl_reset        : std_logic := '0';
 begin
-  timebase_out.clk <= ctl_clk;
-  timebase_out.PPS <= '0';
-
+  timebase_out.clk      <= ctl_clk;
+  timebase_out.PPS      <= '0';
+  timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
+  
   -- generate a clock
   clock : sim_clk
     port map(clk => ctl_clk, reset => ctl_reset);

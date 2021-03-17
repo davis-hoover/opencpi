@@ -37,7 +37,7 @@
   <Property Name="stopOnEOF" Type="bool"  Default="true" Initial="true" Description="Indicates causing the worker to become finished on EOF. stopOnEOF is always
   regarded as true now since the only reason to be false was the opcode-0-ZLM aliasing that no longer exists."/>
   
-  <property name="totalBytes" type="uLongLong" Volatile="true" Description="Total number of 4 byte data words passed through the worker during an app run."/>
+  <property name="totalBytes" type="uLongLong" Volatile="true" Description="Total number of bytes that passed through the worker during an app run."/>
   
   <Property Name="metadata" Type="uLong" ArrayDimensions="numRecords, numMetadataWords" Volatile="true" Description="Multidimensional array containing metadata records."/>
 

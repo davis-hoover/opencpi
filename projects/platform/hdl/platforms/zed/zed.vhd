@@ -37,9 +37,9 @@ begin
   metadata_out.romAddr <= props_in.romAddr;
   metadata_out.romEn   <= props_in.romData_read;
   -- Drive timekeepping interface - depends on which clock, and whether there is a PPS input
-  timebase_out.clk     <= clk;
-  timebase_out.reset   <= reset;
-  timebase_out.pps     <= '0';
+  timebase_out.clk      <= clk;
+  timebase_out.PPS      <= '0';
+  timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
   -- convert between 2d array and array of arrays (VHDL does not allow 1d slices of 2d)
    sd0 : for i in 0 to sdp_count_c-1 generate
      sd1: for j in 0 to sdp_width_c-1 generate

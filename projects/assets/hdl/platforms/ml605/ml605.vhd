@@ -51,11 +51,11 @@ architecture rtl of ml605_worker is
   --signal ila_data               : std_logic_vector(31 downto 0);
   --signal ila_trigger            : std_logic_vector(7 downto 0);
 begin
-  ctl_rst            <= not ctl_rst_n;
-  timebase_out.clk   <= ctl_clk; -- changed from sys0_clk because of AV-5437
-  timebase_out.reset <= not ctl_rst_n; -- changed from sys0_rst because of AV-5437
-  timebase_out.pps   <= ppsExtIn;
-  ppsOut             <= timebase_in.pps;
+  ctl_rst               <= not ctl_rst_n;
+  timebase_out.clk      <= ctl_clk; -- changed from sys0_clk because of AV-5437
+  timebase_out.PPS      <= ppsExtIn;
+  ppsOut                <= timebase_in.PPS;
+  timebase_out.usingPPS <= '1'; -- When using PPS, drive usingPPS high
   -- Provide the highest available quality clock and reset used for the time server,
   -- without regard for it being in any particular time domain.
 

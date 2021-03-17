@@ -30,10 +30,10 @@ architecture rtl of isim_worker is
   signal   ctl_reset        : std_logic := '0';
   signal   ctl_rst_n        : std_logic;
 begin
-  ctl_rst_n <= not ctl_reset; -- for those that need it
-  timebase_out.clk   <= ctl_clk;
-  timebase_out.reset <= ctl_reset;
-  timebase_out.ppsIn <= '0';
+  ctl_rst_n             <= not ctl_reset; -- for those that need it
+  timebase_out.clk      <= ctl_clk;
+  timebase_out.PPS      <= '0';
+  timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
 
   -- generate a clock
   clock : sim_clk

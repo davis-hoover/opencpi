@@ -46,10 +46,10 @@ begin
   metadata_out.romAddr <= props_in.romAddr;
   metadata_out.romEn   <= props_in.romData_read;
   -- Drive timekeepping interface - depends on which clock, and whether there is a PPS input
-  timebase_out.clk     <= clk;
-  timebase_out.reset   <= reset;
-  timebase_out.ppsIn   <= GPS_1PPS_IN;
-  EXT_1PPS_OUT         <= timebase_in.ppsOut;
+  timebase_out.clk      <= clk;
+  timebase_out.PPS      <= GPS_1PPS_IN;
+  EXT_1PPS_OUT          <= timebase_in.PPS;
+  timebase_out.usingPPS <= '1'; -- When using PPS, drive usingPPS high
   -- Use a global clock buffer for this clock used for both control and data
   clkbuf   : BUFG   port map(I => fclk(0),
                              O => clk);
