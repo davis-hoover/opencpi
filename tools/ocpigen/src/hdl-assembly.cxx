@@ -1067,14 +1067,14 @@ emitAssyInstance(FILE *f, Instance *i) { // , unsigned nControlInstances) {
       Connection &c = ip->m_attachments.front()->m_connection;
       assert(c.m_attachments.size() == 2);
       InstancePort *otherIp = NULL;
-      Attachment *at;
+      Attachment *at = NULL; // for compiler warning
       for (AttachmentsIter ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
 	if (&(*ai)->m_instPort != ip) {
 	  at = *ai;
 	  otherIp = &at->m_instPort;
 	  break;
 	}
-      assert(otherIp);
+      ocpiCheck(otherIp);
       std::string externalName, num;
       if (lang == Verilog)
 	OU::format(num, "%zu", at->m_index);

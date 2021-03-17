@@ -1043,7 +1043,7 @@ namespace {
     generateApplications(const std::string &dir, Strings &files) {
       const char *err;
       const char *dut = strrchr(wFirst->m_specName, '.');
-      bool isOptional;
+      bool isOptional = false; // for compiler warning
       if (dut)
         dut++;
       else
