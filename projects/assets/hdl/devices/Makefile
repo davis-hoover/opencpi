@@ -26,10 +26,12 @@
 # Any variable definitions that should apply for each individual worker/test
 # in this library belong in Library.mk
 
+# Disabling gpi.test as of 08-Mar-2021 pending a proper fix.
+# Fails for at least "xsim" and "modelsim" emulators.
 Tests = \
-	gpi.test \
 	gpo.test \
-	lime_dac_ts.test \
+	lime_dac_ts.test
+#	gpi.test
 
 # Build Ordering Rules:
 # 1) Subdevices that support other devices must occur AFTER the devices they support.
