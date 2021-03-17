@@ -785,7 +785,7 @@ connectOcpSignal(OcpSignalDesc &osd, OcpSignal &os, const OcpAdapt *oa, std::str
   Connection &c = ip.m_attachments.front()->m_connection;
   assert(c.m_attachments.size() == 2);
   InstancePort *otherIp = NULL;
-  Attachment *at;
+  Attachment *at = NULL; // for compiler warning
   for (AttachmentsIter ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
     if ((*ai)->m_instPort.m_port != this) {
       at = *ai;

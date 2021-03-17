@@ -638,7 +638,7 @@ doInterface(OU::Protocol &p, const char *&cp) {
       getType(*m++, cp, "@");
     unsigned line, len;
     int n = sscanf(cp, "%u %n", &line, &len);
-    assert(n == 1);
+    ocpiCheck(n == 1);
     cp += len;
     std::string tmp;
     getString(tmp, cp, "\n"); // skip redundant filename
