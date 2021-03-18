@@ -34,24 +34,12 @@ namespace OCPI {
        * reentrant.
        */
 
-      void netDbLock ()
-        throw (std::string);
-
-      void netDbUnlock ()
-        throw (std::string);
-
-      std::string getHostname ()
-        throw (std::string);
-
-      std::string getFQDN ()
-        throw (std::string);
-
-      std::string getIPAddress ()
-        throw (std::string);
-
-      bool isLocalhost (const std::string &)
-        throw (std::string);
-
+      void netDbLock();
+      void netDbUnlock();
+      std::string getHostname();
+      std::string getFQDN();
+      std::string getIPAddress();
+      bool isLocalhost (const std::string &);
     }
   }
 }

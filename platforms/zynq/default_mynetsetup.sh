@@ -22,7 +22,7 @@
 # 2. The core setup HAS been run and you are just setting up a shell or ssh session
 # 
 # add any additional platform checks into this function
-# For Dev Testing: export OCPI_TOOL_PLATFORM and OCPI_DIR for testing platforms 
+# For Dev Testing: export OCPI_TOOL_PLATFORM and OCPI_LOCAL_DIR for testing platforms 
 # in the future without touching the set_tool_platform function or script in general
 #
 # Customization options:

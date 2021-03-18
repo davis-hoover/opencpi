@@ -13,7 +13,7 @@ private "init" methods (code shared among constructors)
 private member functions
 protected member functions
 public member functions
-
+-- member accessors set/getters first
 static member functions sometimes belong next to something else, rather than
 together before the contructors.
 

@@ -36,14 +36,13 @@ Assembly::
 ~Assembly() {
 }
 
-InstanceProperty::
-InstanceProperty() : property(NULL) {
-}
-
-void
-Worker::
+void Worker::
 deleteAssy() {
   delete m_assembly;
+}
+
+InstanceProperty::
+InstanceProperty() : property(NULL) {
 }
 
 // Find the OU::Assembly::Instance's port in the instance's worker
@@ -72,6 +71,7 @@ findPort(OU::Assembly::Port &ap, InstancePort *&found) {
   return NULL;
 }
 
+static const char *roleName(OU::Assembly::Role &r) { return r.isProducer() ? "producer" : "consumer"; }
 // A key challenge here is that we may not know the width of the connection until we look at
 // real ports
 const char *Assembly::
@@ -118,29 +118,43 @@ parseConnection(OU::Assembly::Connection &aConn) {
   if (aConn.m_externals.size() > 1)
     return "multiple external attachments on a connection unsupported";
   // Create instance ports (and underlying ports of this assembly worker).
-  for (OU::Assembly::ExternalsIter ei = aConn.m_externals.begin(); ei != aConn.m_externals.end(); ei++) {
-    OU::Assembly::External &ext = *ei;
+  for (auto ei = aConn.m_externals.begin(); ei != aConn.m_externals.end(); ei++) {
+    OU::Assembly::External &ext = *ei->first;
     assert(aConn.m_ports.size() == 1);
     OU::Assembly::Port &ap = aConn.m_ports.front();
-    if (!ext.m_role.m_knownRole) {
-      assert(ap.m_role.m_knownRole);
+    assert(ap.m_role.m_knownRole);
+    // Inherit the role of the first internal connection
+    if (!ext.m_role.m_knownRole)
       ext.m_role = ap.m_role;
-    }
+    else if (ext.m_role.isProducer() != ap.m_role.isProducer())
+      return OU::esprintf("External port \"%s\" has inconsistent role (%s) vs. connected internal "
+			  "port \"%s\" with role %s",
+			  ext.m_name.c_str(),roleName(ext.m_role),ap.cname(), roleName(ap.m_role));
     assert(c.m_attachments.size() == 1);
     InstancePort &intPort = c.m_attachments.front()->m_instPort; // intPort corresponds to ap
     assert(intPort.m_port);
-    if (ext.m_index + ext.m_count > intPort.m_port->count())
-      return OU::esprintf("External port '%s' can't have index/count %zu/%zu "
-			  "when internal port has count: %zu",
-			  ext.m_name.c_str(), ext.m_index, ext.m_count, intPort.m_port->count());
-    Port *p;
+    // Connect ei->second + count on the external side, to ap.m_index + count on tne port side
+    if (ei->second + aConn.m_count > ext.m_count)
+      return OU::esprintf("External port '%s' can't connect to index/count %zu/%zu "
+			  "when the count of the external port itself is %zu",
+			  ext.cname(), ei->second, aConn.m_count, ext.m_count);
+    if (ap.m_index + aConn.m_count > intPort.m_port->count())
+      return OU::esprintf("Connection to external port '%s' can't connect to index/count %zu/%zu "
+			  "of internal port \"%s\" when the count of the internal port itself is %zu",
+			  ext.cname(), ap.m_index, aConn.m_count, ap.cname(), intPort.m_port->count());
+    Port *p = m_assyWorker.findPort(ext.m_name.c_str());
     if (m_assyWorker.m_type == Worker::Application) { // a proxy
       // We are dealing with a connection that implies a delegation, so the assembly worker port
       // already exists.
-      if (!(p = m_assyWorker.findPort(ext.m_name.c_str())))
+      if (!p)
 	return OU::esprintf("External connection in slave assembly for worker %s specifies port %s"
 			    " which does not exist", m_assyWorker.cname(), ext.m_name.c_str());
-    } else {
+      if (p->m_arrayCount != ext.m_count)
+	return OU::esprintf("External port \"%s\" in slave assembly for worker %s specifies count "
+			    "%zu, while proxy port has count %zu", ext.m_name.c_str(),
+			    m_assyWorker.cname(), ext.m_count, p->m_arrayCount);
+
+    } else if (!p) {
       // Create the external port of this assembly
       // Start with a copy of the port, then patch it
       ocpiDebug("Clone of port %s of instance %s of worker %s for assembly worker %s: %s/%zu/%zu",
@@ -159,7 +173,7 @@ parseConnection(OU::Assembly::Connection &aConn) {
 			    err);
     }
     InstancePort *ip = new InstancePort(NULL, p, &ext);
-    if ((err = c.attachPort(*ip, 0)))
+    if ((err = c.attachPort(*ip, ei->second)))
       return err;
   }
   return NULL;
@@ -171,8 +185,12 @@ Instance()
     m_config(0), m_emulated(false), m_inserted(false) {
 }
 
+// When evaluating an expression for an instance's property value, allow use of assembly-provided values
+// when indicated by a leading $.
 const char *Instance::
 getValue(const char *sym, OU::ExprValue &val) const {
+  if (*sym == '$')
+    return m_assy->m_assyWorker.getValue(++sym, val);
   const InstanceProperty *ipv = &m_properties[0];
   for (unsigned n = 0; n < m_properties.size(); n++, ipv++)
     if (!strcasecmp(ipv->property->cname(), sym))
@@ -221,9 +239,9 @@ addAssemblyParameters(OU::Assembly::Properties &aiprops) {
 // Add parameter values from the list of values that came from the instance XML,
 // possibly augmented by values from the assembly.  This happens AFTER we know
 // about the worker, so we can do error checking and value parsing
-const char *Assembly::
-addInstanceParameters(const Worker &w, const OU::Assembly::Properties &aiprops,
-		      InstanceProperty *&ipv) {
+const char *Instance::
+addParameters(const OU::Assembly::Properties &aiprops, InstanceProperty *&ipv) {
+  Worker &w = *m_worker;
   const char *err;
   const OU::Assembly::Property *ap = &aiprops[0];
   for (size_t n = aiprops.size(); n; n--, ap++) {
@@ -232,13 +250,13 @@ addInstanceParameters(const Worker &w, const OU::Assembly::Properties &aiprops,
       return OU::esprintf("property '%s' is not a property of worker '%s'", ap->m_name.c_str(),
 			  w.m_implName);
     // If the assembly is for an application worker, we are parsing a slave assembly
-    if (!p->m_isParameter && m_assyWorker.m_type != Worker::Application)
+    if (!p->m_isParameter && m_assy->m_assyWorker.m_type != Worker::Application)
       return OU::esprintf("property '%s' is not a parameter property of worker '%s'",
 			  ap->m_name.c_str(), w.m_implName);
     // set up the ipv and parse the value
     ipv->property = p;
     ipv->value.setType(*p); // in case we are reusing it
-    if ((err = ipv->property->parseValue(ap->m_value.c_str(), ipv->value)))
+    if ((err = ipv->property->parseValue(ap->m_value.c_str(), ipv->value, NULL, this)))
       return err;
     if (p->m_default) {
       std::string defValue, newValue;
@@ -276,6 +294,7 @@ addParamConfigParameters(const ParamConfig &pc, const OU::Assembly::Properties &
 const char *Instance::
 init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
      OU::Assembly::Properties &xmlProperties) {
+  m_assy = &assy;
   //  m_instance = ai;
   m_xml = ix;
   m_name = iName;
@@ -339,7 +358,7 @@ init(::Assembly &assy, const char *iName, const char *wName, ezxml_t ix,
   // Even though we used the ipv's to select a worker and paramconfig,
   // we queue them up here to actually apply to the instance in the generated code.
   // Someday this will force top-down building
-  if ((err = assy.addInstanceParameters(*w, xmlProperties, ipv)))
+  if ((err = addParameters(xmlProperties, ipv)))
     return err;
   if (w->m_paramConfig)
     assy.addParamConfigParameters(*w->m_paramConfig, xmlProperties, ipv);
@@ -462,8 +481,7 @@ externalizePort(InstancePort &ip, const char *name, size_t *ordinal) {
   Port &extPort = p.clone(m_assyWorker, extName, p.m_arrayCount, NULL, err);
   if (err)
     return err;
-  OU::Assembly::External *ext = new OU::Assembly::External;
-  ext->m_name = extPort.m_name;
+  OU::Assembly::External *ext = new OU::Assembly::External(extPort.m_name.c_str());
   ext->m_role.m_provider = !p.m_master; // provisional
   ext->m_role.m_bidirectional = false;
   ext->m_role.m_knownRole = true;
@@ -570,19 +588,29 @@ emitXmlWorker(std::string &out, bool verbose) {
       }
       out += any ? "      </instance>\n" : "/>\n";
     }
+    auto &ua = *m_assembly->m_utilAssembly;
+    // predefine external ports that have counts
+    for (auto it = ua.externals().begin(); it != ua.externals().end(); ++it)
+      if (it->second.m_count)
+	OU::formatAdd(out, "      <external name='%s' count='%zu'/>\n",
+		      it->second.cname(), it->second.m_count);
     for (auto it = m_assembly->m_connections.begin(); it != m_assembly->m_connections.end(); ++it) {
-      out += (*it)->m_external ? "      <external" : "      <connection>\n";
-      for (auto ait = (*it)->m_attachments.begin(); ait != (*it)->m_attachments.end(); ++ait)
-	if ((*ait)->m_instPort.m_external)
-	  OU::formatAdd(out, " name='%s'", (*ait)->m_instPort.m_external->m_name.c_str());
-        else if ((*it)->m_external)
-	  OU::formatAdd(out, " instance='%s' port='%s'",
-			(*ait)->m_instPort.m_instance->cname(),
-			(*ait)->m_instPort.m_port->pname());
-        else
-	  OU::formatAdd(out, "        <port instance='%s' name='%s'/>\n",
-			(*ait)->m_instPort.m_instance->cname(), (*ait)->m_instPort.m_port->pname());
-      out += (*it)->m_external ? "/>\n" : "      </connection>\n";
+      out += "      <connection";
+      if ((*it)->m_count > 1)
+	OU::formatAdd(out, " count='%zu'", (*it)->m_count);
+      out += ">\n";
+      for (auto ait = (*it)->m_attachments.begin(); ait != (*it)->m_attachments.end(); ++ait) {
+	auto &at = **ait;
+	if (at.m_instPort.m_external)
+	  OU::formatAdd(out, "        <external name='%s'", at.m_instPort.m_external->cname());
+	else
+	  OU::formatAdd(out, "        <port name='%s' instance='%s'",
+			at.m_instPort.m_port->pname(), at.m_instPort.m_instance->cname());
+	if (at.m_index || at.m_instPort.m_port->m_arrayCount)
+	  OU::formatAdd(out, " index='%zu'", (*ait)->m_index);
+	out += "/>\n";
+      }
+      out += "      </connection>\n";
     }
     out += "    </slaves>\n";
   }

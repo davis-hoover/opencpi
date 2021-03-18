@@ -77,7 +77,7 @@ search, emulate, ethers, probe, testdma, admin, bram, unbram, uuid, reset, set, 
   wread, wwrite, sendData, receiveData, receiveRDMA, sendRDMA, simulate, getxml, load, unload,
   status;
 static bool verbose = false, parseable = false, hex = false, isPublic = false;
-static int log = -1;
+static int logLevel = -1;
 std::string platform, simExec;
 static const char
 *interface = NULL, *device = NULL, *part = NULL;
@@ -292,7 +292,7 @@ doFlags(const char **&ap) {
       part = next(ap);
       break;
     case 'l':
-      log = atoi(next(ap));
+      logLevel = atoi(next(ap));
       break;
     case 's':
       spinCount = atoi(next(ap));
@@ -363,8 +363,8 @@ main(int argc, const char **argv)
     }
     argv++;
     doFlags(argv);
-    if (log != -1)
-      OCPI::OS::logSetLevel(log);
+    if (logLevel != -1)
+      OCPI::OS::logSetLevel(logLevel);
 #if 0
     if ((exact->options & SUDO) && geteuid()) {
       int dfd = ::open(OCPI_DRIVER_MEM, O_RDONLY);
@@ -684,7 +684,7 @@ admin(const char **) {
   printf(" OpenCpi:      0x%016llx \"%s\"\n", (unsigned long long)u.uint, u.c);
   printf(" revision:     0x%08x\n", cAccess->get32Register(revision, OH::OccpAdminRegisters));
   printf(" birthday:     0x%08x %s", (uint32_t)epochtime, asctime(etime));
-  printf(" workerMask:   0x%08" PRIx64 " workers", j = cAccess->get64Register(present, OH::OccpAdminRegisters));
+  printf(" workerMask:   0x%016" PRIx64 " workers", j = cAccess->get64Register(present, OH::OccpAdminRegisters));
   for (i = 0; i < sizeof(uint64_t) * 8; i++)
     if (j & (1 << i))
       printf(" %d", i);
@@ -801,19 +801,21 @@ bram(const char **ap) {
   check = zs.adler;
 #endif
   size_t oWords = (total + OH::ROM_WIDTH_BYTES-1)/OH::ROM_WIDTH_BYTES;
+#if 0
   if (oWords + OH::ROM_HEADER_WORDS > OH::ROM_NWORDS)
     bad("Compressfile is too large for BRAM. Input is %zu, output is %zu",
 	length, total + OH::ROM_HEADER_BYTES);
+#endif
   OH::RomWord *u32p = (OH::RomWord *)out;
-  for (unsigned n = 0; n < OH::ROM_NWORDS; n++) {
+  for (unsigned n = 0; n < oWords + OH::ROM_HEADER_WORDS; n++) {
     OH::RomWord i;
-    switch(n) {
+    switch (n) {
     case 0: i = 1; break;
     case 1: i = OCPI_UTRUNCATE(OH::RomWord, total); break;
     case 2: i = OCPI_UTRUNCATE(OH::RomWord, length); break;
     case 3: i = OCPI_UTRUNCATE(OH::RomWord, check); break;
     default:
-      i = n < oWords+OH::ROM_HEADER_WORDS ? *u32p++ : 0;
+      i = *u32p++;
     }
     fprintf(ofp, "%08x\n", i);
   }
@@ -821,8 +823,11 @@ bram(const char **ap) {
     unlink(ap[1]);
     bad("Error writing output file '%s'", ap[1]);
   }
-  printf("Wrote bram file '%s' (%zu bytes) from file '%s' (%zu bytes)\n",
-	 ap[1], total + OH::ROM_HEADER_BYTES, *ap, (size_t)length);
+  if (verbose)
+    fprintf(stderr, "Wrote bram file '%s' (%zu bytes) from file '%s' (%zu bytes)\n",
+	    ap[1], total + OH::ROM_HEADER_BYTES, *ap, (size_t)length);
+  // The normative output, number of words
+  printf("%zu\n", oWords + OH::ROM_HEADER_WORDS);
   if (in) free(in);
   if (out) free(out);
 }
@@ -1590,7 +1595,7 @@ sendRDMA(const char **ap) {
   if (!*ap)
     setupDevice(false);
   std::string file;
-  OD::TransportGlobal &global(OC::Manager::getTransportGlobal());
+  OD::TransportManager &global(OC::Manager::getTransportManager());
   OD::Transport transport(&global, false);
   OD::Descriptor myOutputDesc;
   myOutputDesc.type = OD::ProducerDescT;

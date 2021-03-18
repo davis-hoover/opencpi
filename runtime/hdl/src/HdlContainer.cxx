@@ -54,7 +54,7 @@ namespace OCPI {
     
 
     static OT::Emit::Time getTicksFunc(OT::Emit::TimeSource *ts) {
-      return static_cast<Container *>(ts)->getMyTicks();
+      return ts ? static_cast<Container *>(ts)->getMyTicks() : 0; // null-ptr warning
     }
     Container::
     Container(OCPI::HDL::Device &device, ezxml_t config, const OU::PValue *params) 
@@ -64,9 +64,11 @@ namespace OCPI {
 	m_device(device), m_hwEvents(this, *this, "FPGA Events")
     {
       // Note that the device has retrieved all the info from the admin space already
+#if 0
       static OT::Emit::RegisterEvent te("testevent");
       m_hwEvents.emit(te);
       m_hwEvents.emitT(te, getMyTicks());
+#endif
       m_model = "hdl";
       m_os = "";
       m_osVersion = "";
@@ -91,7 +93,7 @@ namespace OCPI {
 	OT::Emit::shutdown();
       } catch (...) {
 	static const char msg[] = "***Exception during container shutdown\n";
-	(void)write(2, msg, strlen(msg));
+	ocpiIgnore(write(2, msg, strlen(msg)));
       }
       this->lock();
       // We need to shut down the apps and workers since they
@@ -143,6 +145,7 @@ namespace OCPI {
 	  ocpiInfo("Loading bitstream %s on HDL container %s\n",
 		   name().c_str(), c.name().c_str());
 	  // If the device needs a container background thread, make sure its started.
+	  OCPI_EMIT_HERE;
 	  c.start();
 	  std::string error;
 	  if (c.hdlDevice().load(name().c_str(), error))
@@ -163,6 +166,7 @@ namespace OCPI {
 	    }
 	  // attempts to sync time_server.hdl time_now to GPS
 	  bool isGPS;
+	  c.hdlDevice().enableTimeNowUpdatesFromPPS();
 	  OS::Time time = c.hdlDevice().now(isGPS);
 	  ocpiInfo("For HDL container %s: time_server.hdl time_now was initialized to %s 0x%" PRIx64,
 	           c.name().c_str(), (isGPS ? "GPS time" : "non-GPS time"), time.bits());
@@ -564,6 +568,14 @@ OCPI_DATA_TYPES
 				       m_properties.get8Register(sdp_width, SDP::Properties) *
 				       SDP::BYTES_PER_DWORD));
 	  required = myDesc.nBuffers * myDesc.dataBufferPitch;
+	  unsigned
+	    maxBuffers = m_properties.get8Register(max_buffers, SDP::Properties),
+	    limit = std::min(maxBuffers, SDP::MAX_READS_OUTSTANDING);
+	  if (myDesc.nBuffers > limit)
+	    throw OU::Error("Requested buffer count(%u) on port '%s' of worker '%s' "
+			    "exceeds the SDP local/FPGA-side implementation limit of %u",
+			    myDesc.nBuffers, name().c_str(), parent().name().c_str(), limit);
+
 	} else {
 	  myDesc.dataBufferPitch =
 	    OCPI_UTRUNCATE(uint32_t,
@@ -573,9 +585,9 @@ OCPI_DATA_TYPES
 	  required = myDesc.nBuffers * (myDesc.dataBufferPitch + OCDP_METADATA_SIZE);
 	}
 	if (required > m_memorySize)
-	  throw OU::Error("Requested buffer count/size (%u/%u) on port '%s' of worker '%s' "
+	  throw OU::Error("Requested buffer count/size/memory (%u/%u/%u) on port '%s' of worker '%s' "
 			  "won't fit in the %s's memory (%u)",
-			  myDesc.nBuffers, myDesc.dataBufferSize, name().c_str(),
+			  myDesc.nBuffers, myDesc.dataBufferSize, required, name().c_str(),
 			  parent().name().c_str(), m_sdp ? "SDP-DMA" : "OCDP-DMA",
 			  m_memorySize);
 	if (other)
@@ -608,7 +620,7 @@ OCPI_DATA_TYPES
 	}
         OcdpRole myOcdpRole;
         OCPI::RDT::PortRole myRole = (OCPI::RDT::PortRole)getData().data.role;
-	
+
         ocpiDebug("finishConnection: other = %" PRIx64 ", offset = %" DTOSDATATYPES_OFFSET_PRIx
 		  ", RFB = %" PRIx64 "",
 		  other.desc.oob.address,
@@ -664,6 +676,11 @@ OCPI_DATA_TYPES
 	    m_properties.set32Register(remote_flag_value, SDP::Properties, 
 				       isProvider() ?
 				       other.desc.emptyFlagValue : other.desc.fullFlagValue);
+	    unsigned maxBuffers = m_properties.get8Register(max_buffers, SDP::Properties);
+	    if (other.desc.nBuffers > maxBuffers)
+	      throw OU::Error("Requested buffer count(%u) for the other end of connection from "
+			      "port '%s' of worker '%s' exceeds the SDP implementation limit of %u",
+			      other.desc.nBuffers, name().c_str(), parent().name().c_str(), maxBuffers);
 	    m_properties.set8Register(remote_buffer_count, SDP::Properties,
 				      OCPI_UTRUNCATE(uint8_t, other.desc.nBuffers));
 

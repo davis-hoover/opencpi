@@ -48,6 +48,6 @@ for i in range(0, len(expected_data)):
         print( color.RED + color.BOLD + 'FAILED at sample:', i, 'with expected value:', format(expected_data[i], '#X'), 'and captured value:', format(captured_data[i], '#X') + color.END)
         sys.exit(1)
 
-print ('Data matched expected results.')
-print (color.GREEN + color.BOLD + 'PASSED' + color.END)
-print ('*** End validation ***\n')
+print ('    Data matched expected results.')
+#print (color.GREEN + color.BOLD + 'PASSED' + color.END)
+#print ('*** End validation ***\n')

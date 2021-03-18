@@ -105,6 +105,7 @@ namespace {
   }
   size_t timeout, duration;
   const char *finishPort;
+  bool doneWorkerIsUUT; 
   const char *argPackage;
   std::string specName, specPackage;
   bool verbose;
@@ -447,6 +448,16 @@ namespace {
     set.push_back(w);
     return NULL;
   }
+  const char *
+  emulatorName() {
+    const char *em =  emulator ? strrchr(emulator->m_specName, '.') : NULL;
+    if (em)
+      em++;
+    else if (emulator)
+      em = emulator->m_specName;
+    return em;
+  }
+
   // A test case, which may apply against multiple configurations
   // Default is:
   //   cases generated from configurations and defined property values
@@ -470,10 +481,12 @@ namespace {
     ParamConfigs m_subCases;
     InputOutputs m_ports;  // the actual inputs and outputs to use
     size_t m_timeout, m_duration;
+    bool m_doneWorkerIsUUT;
     std::string m_delays;
 
     Case(ParamConfig &globals)
-      : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration)
+      : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
+	m_doneWorkerIsUUT(doneWorkerIsUUT)
     {}
     static const char *doExcludePlatform(const char *a_platform, void *arg) {
       Case &c = *(Case *)arg;
@@ -637,12 +650,18 @@ namespace {
       else
         OU::format(m_name, "case%02zu", ordinal);
       if ((err = OE::checkAttrs(x, "duration", "timeout", "onlyplatforms", "excludeplatforms",
-                                "onlyworkers", "excludeworkers", NULL)) ||
+                                "onlyworkers", "excludeworkers", "doneWorkerIsUUT", NULL)) ||
           (err = OE::checkElements(x, "property", "input", "output", NULL)) ||
           (err = OE::getNumber(x, "duration", &m_duration, NULL, duration)) ||
-          (err = OE::getNumber(x, "timeout", &m_timeout, NULL, timeout)))
+          // (err = OE::getNumber(x, "timeout", &m_timeout, NULL, timeout)) ||
+          (err = OE::getNumber(x, "timeout", &m_timeout)) ||
+          (err = OE::getBoolean(x, "doneWorkerIsUUT", &m_doneWorkerIsUUT, false, false)))
         return err;
-      if (m_duration && m_timeout)
+      if (!m_duration) {
+        if (!m_timeout)
+          m_timeout = timeout;
+      }
+      else if (m_timeout)
         return OU::esprintf("Specifying both duration and timeout is not supported");
       if ((err = doPorts(*wFirst, x)) || (emulator && (err = doPorts(*emulator, x))))
           return err;
@@ -1024,16 +1043,12 @@ namespace {
     generateApplications(const std::string &dir, Strings &files) {
       const char *err;
       const char *dut = strrchr(wFirst->m_specName, '.');
-      bool isOptional;
+      bool isOptional = false; // for compiler warning
       if (dut)
         dut++;
       else
         dut = wFirst->m_specName;
-      const char *em =  emulator ? strrchr(emulator->m_specName, '.') : NULL;
-      if (em)
-        em++;
-      else if (emulator)
-        em = emulator->m_specName;
+      const char *em = emulatorName();
       for (unsigned s = 0; s < m_subCases.size(); s++) {
         ParamConfig &pc = *m_subCases[s];
         OS::FileSystem::mkdir(dir, true);
@@ -1075,8 +1090,9 @@ namespace {
 
 // if (w.findPort(m_name.c_str())) {
 
-
         if ((optionals.size() >= nOutputs) && isOptional && !finishPort)
+          OU::formatAdd(app, " done='%s'", dut);
+        else if (doneWorkerIsUUT || m_doneWorkerIsUUT)
           OU::formatAdd(app, " done='%s'", dut);
         else if (nOutputs == 1)
           OU::formatAdd(app, " done='file_write'");
@@ -1713,7 +1729,7 @@ namespace {
                         "  </Connection>\n",
                         w.m_implName, p.pname(), emulator->m_implName, p.pname());
         }
-      }
+    }
       connectHdlStressWorkers(w, assy, hdlFileIO, ports);
       if(emulator)
         connectHdlStressWorkers(*emulator, assy, hdlFileIO, ports);
@@ -1768,9 +1784,9 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     static char x[] = "<tests/>";
     xml = ezxml_parse_str(x, strlen(x));
   } else if ((err = parseFile(file, parent, "tests", &xml, testFile, false, false, false)) ||
-             (err = OE::checkAttrs(xml, "spec", "timeout", "duration", "onlyWorkers",
+             (err = OE::checkAttrs(xml, "spec", "timeout", "duration","onlyWorkers",
                                    "excludeWorkers", "useHDLFileIo", "mode", "onlyPlatforms",
-                                   "excludePlatforms", "finishPort", NULL)) ||
+                                   "excludePlatforms", "finishPort", "doneWorkerIsUUT", NULL)) ||
              (err = OE::checkElements(xml, "property", "case", "input", "output", NULL)))
     return err;
   // This is a convenient way to specify XML include dirs in component libraries
@@ -1786,6 +1802,10 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       (err = OE::getNumber(xml, "duration", &duration)) ||
       (err = OE::getNumber(xml, "timeout", &timeout)))
     return err;
+  if (!duration && !timeout)
+    // Set a default timeout value of 3600.  This value is
+    // "unfortunate", and based on some of the "zed" tests.
+    timeout = 3600;
   // ================= 2. Get/find/include/exclude the global workers
   // Parse global workers
   const char
@@ -2006,8 +2026,9 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
               "Warning:  no values for writable property with no default: \"%s\" %zu %zu\n",
               p.cname(), param.m_uValues.size(), param.m_uValue.size());
   }
-  // ================= 6. Parse and collect global platform values
+  // ================= 6. Parse and collect global platform and worker values
   finishPort = ezxml_cattr(xml, "finishPort");
+  doneWorkerIsUUT = ezxml_cattr(xml, "doneWorkerIsUUT");
   // Parse global platforms
   const char
     *excludes = ezxml_cattr(xml, "excludePlatforms"),
@@ -2023,12 +2044,12 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       return err;
   } else if (excludes && (err = getPlatforms(excludes, excludePlatforms)))
     return err;
-  // ================= 6. Parse and collect global input/output specs
+  // ================= 7. Parse and collect global input/output specs
   // Parse global inputs and outputs
   if ((err = OE::ezxml_children(xml, "input", doInputOutput)) ||
       (err = OE::ezxml_children(xml, "output", doInputOutput)))
     return err;
-  // ================= 7. Parse the specified cases (if any)
+  // ================= 8. Parse the specified cases (if any)
   if (!ezxml_cchild(xml, "case")) {
     static char c[] = "<case/>";
     ezxml_t x = ezxml_parse_str(c, strlen(c));
@@ -2036,7 +2057,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       return err;
   } else if ((err = OE::ezxml_children(xml, "case", Case::doCase, &globals)))
     return err;
-  // ================= 8. Report what we found globally (not specific to any case)
+  // ================= 9. Report what we found globally (not specific to any case)
   // So now we can generate cases based on existing configs and globals.
   if (OS::logGetLevel() >= OCPI_LOG_INFO) {
     fprintf(stderr,
@@ -2058,7 +2079,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     }
   }
 
-  // ================= 9. Generate report in gen/cases.txt on all combinations of property values
+  // ================= 10. Generate report in gen/cases.txt on all combinations of property values
   OS::FileSystem::mkdir("gen", true);
   std::string summary;
   OU::format(summary, "gen/cases.txt");
@@ -2096,7 +2117,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   bool first = true;
   doProp(globals, out, 0, 0, first);
 #endif
-  // ================= 10. Generate HDL assemblies in gen/assemblies
+  // ================= 11. Generate HDL assemblies in gen/assemblies
   if (verbose)
     fprintf(stderr, "Generating required HDL assemblies in gen/assemblies\n");
   bool hdlFileIO;
@@ -2180,7 +2201,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
         (err = remove(assemblies + "/" + iter.relativeName())))
       return err;
 
-  // ================= 10. Generate subcases for each case, and generate outputs per subcase
+  // ================= 12. Generate subcases for each case, and generate outputs per subcase
   fprintf(out,
           "\n"
           "Descriptions of the %zu case%s and %s subcases:\n"
@@ -2222,7 +2243,10 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
 #endif
   if (verbose)
     fprintf(stderr, "Generating summary gen/cases.xml file\n");
-  fprintf(out, "<cases spec='%s'>\n", wFirst->m_specName);
+  fprintf(out, "<cases spec='%s'", wFirst->m_specName);
+  if (emulator)
+    fprintf(out, " emulator='%s'", emulatorName());
+  fprintf(out, ">\n");
   if ((err = getPlatforms("*", allPlatforms)))
     return err;
   for (unsigned n = 0; n < cases.size(); n++)
@@ -2327,13 +2351,14 @@ createCases(const char **platforms, const char */*package*/, const char */*outDi
                       OU::format(m_err, "Cannot open file \"%s\" for writing", file.c_str());
                       return true;
                     }
-                    fprintf(m_run,
+		    const char *em = ezxml_cattr(m_xml, "emulator");
+		    fprintf(m_run,
                             "#!/bin/bash --noprofile\n" // no arg (at least to dash) to suppress reading .profile etc.
                             "# Note that this file runs on remote/embedded systems and thus\n"
                             "# may not have access to the full development host environment\n"
                             "failed=0\n"
-                            ". $OCPI_CDK_DIR/scripts/testrun.sh %s %s $* - %s\n",
-                            m_spec.c_str(), m_platform.c_str(), ezxml_cattr(wx, "outputs"));
+                            ". $OCPI_CDK_DIR/scripts/testrun.sh %s %s \"%s\" $* - %s\n",
+                            m_spec.c_str(), m_platform.c_str(), em ? em : "", ezxml_cattr(wx, "outputs"));
                   }
                   const char
                     *to = ezxml_cattr(sx, "timeout"),

@@ -1,21 +1,23 @@
 <!-- Matchstiq-Z1 Platform Worker -->
-<HdlPlatform Language="VHDL" spec="platform-spec" version='2'>
+<HdlPlatform Language="VHDL" spec='platform-spec' version='2'>
   <specproperty name='platform' value='matchstiq_z1'/>
   <specproperty name="nSlots" value='1'/>
   <specproperty name="slotNames" value='matchstiq_z1_gpio_slot'/>
   <!-- All platform workers must provide these two ports -->
-  <metadata master="true"/>
-  <timebase master="true"/>
+  <metadata master='true'/> <!-- access to container metadata via the platform worker -->
+  <timebase master='true'/> <!-- providing a timebase for the time service -->
   <!-- This platform worker provides a control plane -->
-  <cpmaster master="true"/>
+  <cpmaster master='true'/>
   <!-- Declare and parameterize the time_server device worker for this platform -->
-  <device worker="time_server">
-    <property name="frequency" value="100e6"/>
+  <device worker='time_server'>
+    <property name='frequency' value='100e6'/>
   </device>
-  <sdp name="zynq" master='true' count='4'/>
-  <!-- Properties -->
+  <specproperty name='sdp_width' value='2'/>
+  <property name='sdp_channels' parameter='true' default='4'/>
+  <property name='use_acp' parameter='true' type='bool' default='false'/>
+  <sdp name="zynq" master='true' count='sdp_channels'/>
   <property name='useGP1' type='bool' parameter='1' default='false'/>
-  <property name="axi_error" type="bool" arraylength='4' volatile='true'/>
+  <property name="axi_error" type="bool" arraylength='sdp_channels' volatile='true'/>
   <property name="sdpDropCount" type='uchar' volatile='true'/>
   <property name="debug_state" type="Ulonglong" arraylength='4' volatile='true' debug='false'/>
   <property name="debug_state1" type="Ulonglong" arraylength='4' volatile='true' debug='false'/>

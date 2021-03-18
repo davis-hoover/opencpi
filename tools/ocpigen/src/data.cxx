@@ -266,7 +266,7 @@ finalize() {
   // Either the granule is smaller than or not a multiple of data path width
   if (granuleWidth < m_dataWidth || (m_dataWidth && granuleWidth % m_dataWidth))
     worker().m_needsEndian = true;
-  size_t max_bytes = 16*1024; // jumbo
+  size_t max_bytes = 64*1024-4; // was 16k for jumbo, but this might be faster, but must fit in ushort
   if (!m_isUnbounded && m_maxMessageValues != SIZE_MAX)
     max_bytes = (m_maxMessageValues * m_dataValueWidth + 7) / 8;
   // Now that we know everything about the port, we add properties specific to the port
@@ -341,12 +341,14 @@ emitRecordInterfaceConstants(FILE *f) {
   OcpPort::emitRecordInterfaceConstants(f);
   // This signal is available to worker code.
   fprintf(f, "  constant ocpi_port_%s_data_width : natural;\n", cname());
+  fprintf(f, "  constant ocpi_port_%s_byte_width : natural;\n", cname());
 }
 #if 1
 void DataPort::
 emitInterfaceConstants(FILE *f, Language lang) {
   OcpPort::emitInterfaceConstants(f, lang);
   emitConstant(f, "ocpi_port_%s_data_width", lang, m_dataWidth);
+  emitConstant(f, "ocpi_port_%s_byte_width", lang, m_byteWidth);
 }
 #endif
 #if 1
@@ -422,6 +424,8 @@ emitRecordInputs(FILE *f) {
   OcpPort::emitRecordInputs(f);
   // All data ports have a ready input
   fprintf(f,
+	  "    is_connected     : Bool_t;           -- this port is connected\n");
+  fprintf(f,
 	  "    ready            : Bool_t;           -- this port is ready for data movement\n");
 }
 void DataPort::
@@ -474,7 +478,8 @@ adjustConnection(Connection &c, bool isProducer, OcpAdapt *myAdapt, bool &myHasE
 	prod.m_dataValueGranularity % cons.m_dataValueGranularity)
       return "dataValueGranularity incompatibility for connection";
     if (prod.m_maxMessageValues > cons.m_maxMessageValues)
-      return "maxMessageValues incompatibility for connection";
+      return OU::esprintf("maxMessageValues incompatibility for connection (%zu -> %zu)",
+			  prod.m_maxMessageValues, cons.m_maxMessageValues);
     if (prod.OU::Protocol::cname()[0] && cons.OU::Protocol::cname()[0] &&
 	strcasecmp(prod.OU::Protocol::cname(), cons.OU::Protocol::cname()))
       return OU::esprintf("protocol incompatibility: producer: %s vs. consumer: %s",

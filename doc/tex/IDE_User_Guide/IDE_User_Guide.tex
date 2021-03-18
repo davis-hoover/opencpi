@@ -484,7 +484,7 @@ The Editors are:
 \end{itemize}
 \textbf{\emph{Note: Signal definition changes represent the current OpenCPI standard}}.
 \subsection {Warning about a Non-OpenCPI Project}
-The perspective obtains asset information from the top level project.xml files. If an Eclipse workspace project is encountered that does not have a project.xml file, it is assumed the project is not an OpenCPI project. This is communicated in the Notice Console. If the project is an OpenCPI project, then something is wrong in the project file structure that does not allow project.xml to be generated.
+The perspective obtains asset information from the top level project-metadata.xml files. If an Eclipse workspace project is encountered that does not have a project-metadata.xml file, it is assumed the project is not an OpenCPI project. This is communicated in the Notice Console. If the project is an OpenCPI project, then something is wrong in the project file structure that does not allow project-metadata.xml to be generated.
 \subsection{The Perspective is Not in Sync with the Workspace or the File System}
 The OpenCPI Projects View does not track changes to the Workspace or the files system. This means changes made to a project outside of the IDE will not be apparent in the project explorers nor seen in current asset lists within the IDE. This means assets created or removed via command line will not be presented in either the Eclipse Project Explorer or OpenCPI Projects Views until both views are refreshed. Refresh the Eclipse Project view first then the OpenCPI Projects View.\\
 

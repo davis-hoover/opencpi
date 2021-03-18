@@ -204,7 +204,11 @@ cleanhdl:
 
 rcc ocl hdl: imports exports
 
+# hdl stuff is because rcc proxies may need to see hdl slaves
 rcc:
+	$(call MaybeMake,components,hdl HdlPlatforms= HdlPlatform=)
+	$(call MaybeMake,hdl/devices,hdl HdlPlatforms= HdlPlatform=)
+	$(call MaybeMake,hdl/cards,hdl HdlPlatforms= HdlPlatform=)
 	$(call MaybeMake,components,rcc)
 	$(call MaybeMake,hdl/devices,rcc)
 	$(call MaybeMakePlatforms,hdl/platforms,devices,rcc)
@@ -245,7 +249,7 @@ cleanapplications:
 # needs to be accessible via imports for projects other than core
 # (e.g. for cleaning rcc)
 clean: cleancomponents cleanapplications cleanrcc cleanhdl cleanexports cleanimports
-	rm -r -f artifacts project.xml
+	rm -r -f artifacts project-metadata.xml
 
 # Iterate through symlinks in imports. If the link points to the project registry dir,
 # it is the CDK, or is a broken link, it can be cleaned/removed. If the imports directory

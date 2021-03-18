@@ -541,8 +541,8 @@ copy (const std::string & srcName,
     // copy permissions (not super-secure)
     struct stat mystats;
     stat(srcNativeName.c_str(), &mystats);
-    chown(destNativeName.c_str(),mystats.st_uid,mystats.st_gid);
-    chmod(destNativeName.c_str(),mystats.st_mode);
+    ocpiIgnore(chown(destNativeName.c_str(),mystats.st_uid,mystats.st_gid));
+    ocpiIgnore(chmod(destNativeName.c_str(),mystats.st_mode));
     dst << src.rdbuf();
   }
 

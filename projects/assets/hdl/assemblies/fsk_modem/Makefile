@@ -18,14 +18,16 @@
 
 $(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable is not set correctly.))
 Containers= \
-	cnt_1rx_1tx_thruasm_fmcomms_2_3_lpc_LVDS_ml605 \
-	cnt_nopfcfg_1rx_1tx_fmcomms_2_3_lpc_thruasm_zed \
+	cnt_zed_fmcomms_2_3_scdcd \
+	cnt_zcu104_fmcomms_2_3_scdcd 
+#  Following platforms require updates to support complexShortWithMetadata protocol 
+#       cnt_1rx_1tx_thruasm_fmcomms_2_3_lpc_LVDS_ml605 \
 	cnt_1rx_1tx_thruasm_matchstiq_z1 \
 	cnt_1rx_1tx_thruasm_zipper_hpc_ml605 \
 	cnt_1rx_1tx_thruasm_zipper_hsmc_a_alst4 \
 	cnt_1rx_1tx_thruasm_zipper_hsmc_b_alst4 \
 	cnt_1rx_1tx_thruasm_zipper_lpc_ml605 \
-	cnt_1rx_1tx_thruasm_zipper_lpc_zed
+	cnt_1rx_1tx_thruasm_zipper_lpc_zed \
 # ML605/FMCOMMS3-FMC_HPC combo is currently known to have TX data fidelity issues
 #	cnt_1rx_1tx_thruasm_fmcomms_2_3_hpc_LVDS_ml605
 

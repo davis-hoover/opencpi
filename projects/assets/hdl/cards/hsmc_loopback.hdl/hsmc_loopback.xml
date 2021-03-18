@@ -1,5 +1,7 @@
 <!-- Net names are closer to that of the HSMC spec, as opposed to net names in the datasheet -->
-<hdldevice language="vhdl">
+<!-- Ideally, this worker would build for platforms which have HSMC slots. However, this is blocked by AV-2044. -->
+<!-- For now, only build for the target that represents Altera devices, more specifically the Stratix family. -->
+<hdldevice language="vhdl" OnlyTargets='stratix4'>
   <componentspec>
     <!-- bank 1  -->
     <!--property name="xcvr_txp_7_0"         type="bool" readable="1" writable="1"              arraylength="8" /-->

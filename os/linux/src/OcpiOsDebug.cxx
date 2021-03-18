@@ -115,6 +115,7 @@ namespace OCPI {
 	  fprintf(stderr, "\n");
 	fflush(stderr);
 	pthread_mutex_unlock (&mine);
+	// usleep(200000); // convenient when zynq is crashing so we get more logging out
       }
     }
   }

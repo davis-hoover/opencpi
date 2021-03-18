@@ -1,0 +1,36 @@
+[ $# -lt 3 ] && echo "Usage is <cache-mode> <from-platform> <to-platform> <divisor> <no-fpga>" && exit 1
+set -e
+echo Testing cache mode $1
+ocpiremote restart -b -m 0x400000 -l8 -e OCPI_DMA_CACHE_MODE=$1  > /dev/null
+dv=$4
+[ -z "$dv" ] && dv=1
+./run_source_sink $2 $3 8k 2 2 1 $1 $dv
+./run_source_sink $2 $3 8k 2 2 0 $1 $dv
+./run_source_sink $2 $3 16k 2 2 1 $1 $dv
+./run_source_sink $2 $3 16k 2 2 0 $1 $dv
+./run_source_sink $2 $3 16k 2 10 1 $1 $dv
+./run_source_sink $2 $3 16k 2 10 0 $1 $dv
+./run_source_sink $2 $3 32k 2 2 1 $1 $dv
+./run_source_sink $2 $3 32k 2 2 0 $1 $dv
+./run_source_sink $2 $3 32k 2 10 1 $1 $dv
+./run_source_sink $2 $3 32k 2 10 0 $1 $dv
+[ -n "$5" ] && {
+./run_source_sink $2 $3 32k 10 10 1 $1 $dv
+./run_source_sink $2 $3 32k 10 10 0 $1 $dv
+}
+./run_source_sink $3 $2 8k 2 2 1 $1 $dv
+./run_source_sink $3 $2 8k 2 2 0 $1 $dv
+./run_source_sink $3 $2 16k 2 2 1 $1 $dv
+./run_source_sink $3 $2 16k 2 2 0 $1 $dv
+./run_source_sink $3 $2 16k 10 2 1 $1 $dv
+./run_source_sink $3 $2 16K 10 2 0 $1 $dv
+[ -n "$5" ] && {
+./run_source_sink $3 $2 32k 2 2 0 $1 $dv
+./run_source_sink $3 $2 32k 2 2 1 $1 $dv
+./run_source_sink $3 $2 32k 10 2 0 $1 $dv
+./run_source_sink $3 $2 32K 10 2 1 $1 $dv
+./run_source_sink $3 $2 32k 10 10 0 $1 $dv
+./run_source_sink $3 $2 32K 10 10 1 $1 $dv
+}
+
+

@@ -255,7 +255,7 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 	  "                mdata_info_width => %s%s,\n"
 	  "                burst_width      => %zu,\n"
 	  "                n_bytes          => %s%s,\n"
-	  "                byte_width       => %zu,\n"
+	  "                byte_width       => %s%s,\n"
 	  "                opcode_width     => %zu,\n"
 	  "                own_clock        => %s,\n",
 	  cname(),
@@ -269,7 +269,7 @@ emitVhdlShell(FILE *f, ::Port */*wci*/) {
 	  ocp.MBurstLength.width,
 	  ocp.MByteEn.value ? width.c_str() : "",
 	  ocp.MByteEn.value ? "MByteEn_width" : "1",
-	  m_byteWidth,
+	  width.c_str(), "byte_width",
 	  opcode_width,
 	  BOOL(m_myClock));
   if (!slave)
@@ -421,6 +421,8 @@ emitImplSignals(FILE *f) {
 	  "  signal %s_ready : Bool_t;\n"
 	  "  signal %s_reset : Bool_t; -- this port is being reset from the outside\n",
 	  cname(), masterIn() ? "take" : "give", cname(), cname());
+  fprintf(f, "  signal %s_is_connected : Bool_t;\n",
+	    cname());
   if (masterIn())
     fprintf(f,
 	    "  signal %s_first_take  : Bool_t;\n", cname());
@@ -498,8 +500,9 @@ emitVHDLShellPortMap(FILE *f, std::string &last) {
   OU::format(out, typeNameOut.c_str(), "");
   fprintf(f,
 	  "%s    %s_in.reset => %s_reset,\n"
+    "    %s_in.is_connected => %s_is_connected,\n"
 	  "    %s_in.ready => %s_ready",
-	  last.c_str(), cname(), cname(), cname(), cname());
+	  last.c_str(), cname(), cname(), cname(), cname(), cname(), cname());
   if (masterIn()) {
     if (m_dataWidth) {
       fprintf(f, ",\n    %s_in.data => %s_data", cname(), cname());

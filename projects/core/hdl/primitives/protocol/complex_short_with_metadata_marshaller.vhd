@@ -16,9 +16,10 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi;
+library ocpi; use ocpi.types.all;
 library util;
 library protocol; use protocol.complex_short_with_metadata.all;
+
 
 entity complex_short_with_metadata_marshaller is
   generic(
@@ -45,46 +46,32 @@ entity complex_short_with_metadata_marshaller is
 end entity;
 architecture rtl of complex_short_with_metadata_marshaller is
 
-  constant SAMPLES_MESSAGE_SIZE_BIT_WIDTH : positive := ocpi.util.width_for_max(protocol.complex_short_with_metadata.OP_SAMPLES_ARG_IQ_SEQUENCE_LENGTH-1);
-  type state_t is (SAMPLES, SAMPLES_EOM_ONLY, TIME_63_32, TIME_31_0, INTERVAL_63_32,
-                   INTERVAL_31_0, FLUSH, SYNC, EOF, IDLE);
+  -- output states - what we are offering to give
+  type state_t is (SAMPLES, TIME_63_32, TIME_31_0, INTERVAL_63_32, INTERVAL_31_0, FLUSH, SYNC, EOF, IDLE);
 
-  signal ivld        : std_logic := '0';
+  signal ivld        : bool_t; -- the inputs are valid (should be an input but is not)
   signal iprotocol_r : protocol.complex_short_with_metadata.protocol_t :=
                        protocol.complex_short_with_metadata.PROTOCOL_ZERO;
-  signal ieof_r      : std_logic := '0';
+  signal ieof_r      : bool_t; -- the EOF indication associated with the pipeline register
+  signal irdy_s      : bool_t; -- are we ready to load the pipeline?
+  signal ifull_r     : bool_t; -- is the pipeline register occupied?
+  signal ifirst_r    : bool_t; -- are we doing the first thing indicated by what is in the pipeline reg?
+  signal mux_start   : bool_t; -- a copy of ifirst_r;
+  signal mux_end     : bool_t; -- we are offering the last thing indicated in the pipeline reg
+  signal state       : state_t; -- what is being offered to the output port
+  signal state_r     : state_t; -- what was last offered
 
-  signal in_xfer           : std_logic := '0';
-  signal in_xfer_r         : std_logic := '0';
-  signal irdy_s            : std_logic := '0';
-  signal mux_start         : std_logic := '0';
-  signal mux_end           : std_logic := '0';
-
-  signal state        : state_t := IDLE;
-  signal state_r      : state_t := IDLE;
-
-  signal samples_som  : std_logic := '0';
-  signal valid        : std_logic := '0';
-  signal give         : std_logic := '0';
-  signal som          : std_logic := '0';
-  signal eom          : std_logic := '0';
-
-  signal message_sizer_rst      : std_logic := '0';
-  signal message_sizer_give     : std_logic := '0';
-  signal message_sizer_eom      : std_logic := '0';
-  signal force_end_of_samples   : std_logic := '0';
-  signal force_end_of_samples_r : std_logic := '0';
-
+  signal valid        : bool_t;
+  signal give         : bool_t;
+  signal som          : bool_t;
+  signal eom          : bool_t;
   signal opcode : protocol.complex_short_with_metadata.opcode_t :=
                   protocol.complex_short_with_metadata.SAMPLES;
-  signal pending_samples_eom_gen_set : std_logic := '0';
-  signal pending_samples_eom_gen_clr : std_logic := '0';
-  signal pending_samples_eom_r       : std_logic := '0';
-
 begin
 
   wsi_data_width_32 : if(WSI_DATA_WIDTH = 32) generate
 
+    -- FIXME bring in the overall valid signal and remove qualifications in the complex_xxx fifo
     ivld <= iprotocol.samples_vld or
             iprotocol.time_vld or
             iprotocol.interval_vld or
@@ -92,269 +79,132 @@ begin
             iprotocol.sync or
             iprotocol.end_of_samples or
             ieof;
-    in_xfer <= irdy_s and ivld;
-
-    in_xfer_reg : process(clk)
+    -- We can accept input if the pipeline register is empty or we are emptying it in this cycle,
+    -- but not if asserting EOF
+    irdy_s  <= not ifull_r or (mux_end and oready and not ieof_r);
+    irdy    <= irdy_s;
+    -- We offer output if the pipelne register is full
+    -- And if we are sending samples, we ALSO need input valid, to know whether we need EOM
+    give    <= ifull_r and to_bool(state /= SAMPLES or ivld);
+    valid   <= give and to_bool(state /= SYNC and state /= FLUSH and state /= EOF); -- assert valid if not ZLM
+    pipeline: process(clk)
     begin
-      if(rising_edge(clk)) then
-        if(rst = '1') then
-          in_xfer_r <= '0';
-        else
-          in_xfer_r <= in_xfer;
-        end if;
-      end if;
-    end process in_xfer_reg;
-
-    in_in_pipeline : process(clk)
-    begin
-      if(rising_edge(clk)) then
-        if(rst = '1') then
-          iprotocol_r <= protocol.complex_short_with_metadata.PROTOCOL_ZERO;
-          ieof_r      <= '0';
-        elsif(in_xfer = '1') then
-          iprotocol_r <= iprotocol;
-          ieof_r      <= ieof;
-        end if;
-      end if;
-    end process in_in_pipeline;
-
-    in_out_pipeline : process(clk)
-    begin
-      if(rising_edge(clk)) then
-        if(rst = '1') then
-          irdy_s <= '0';
-        else
-          if((state = IDLE) and (mux_end = '1')) then
-            --irdy_s <= (not ivld) and oready;
-            irdy_s <= oready;
-          else
-            irdy_s <= '0';
-          end if;
-        end if;
-      end if;
-    end process in_out_pipeline;
-
-    irdy <= irdy_s;
-
-    regs : process(clk)
-    begin
-      if(rising_edge(clk)) then
-        if(rst = '1') then
+      if rising_edge(clk) then
+        if rst = '1' then
+          iprotocol_r            <= protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+          ieof_r                 <= '0';
+          ifull_r                <= '0';
+          ifirst_r               <= '0';
           state_r                <= IDLE;
-          force_end_of_samples_r <= '0';
-        elsif(oready = '1') then
-          state_r                <= state;
-          force_end_of_samples_r <= force_end_of_samples;
-        end if;
-      end if;
-    end process regs;
-
-    pending_samples_eom_gen_set <= '1' when (give = '1') and (som = '1') and
-        (opcode = protocol.complex_short_with_metadata.SAMPLES) else '0';
-    pending_samples_eom_gen_clr <= '1' when (give = '1') and (eom = '1') and
-        (opcode = protocol.complex_short_with_metadata.SAMPLES) else '0';
-
-    pending_samples_eom_gen : util.util.set_clr
-      port map(clk => clk,
-               rst => rst,
-               set => pending_samples_eom_gen_set,
-               clr => pending_samples_eom_gen_clr,
-               q   => open,
-               q_r => pending_samples_eom_r);
-
-    mux_start <= in_xfer_r;
-    mux_end   <= '1' when (state_r = IDLE) and (in_xfer= '0') and
-                 (in_xfer_r = '0') else '0';
-
-    -- sets the priority of multiplexing of output messages
-    -- EOF, SYNC, TIME, INTERVAL, FLUSH, SAMPLES
-    mux : process(oready, iprotocol_r, mux_start, state_r, pending_samples_eom_r)
-    begin
-      if(oready = '1') then
-        if((ieof_r = '1') and (
-            (mux_start = '1') or
-            (state_r = SAMPLES_EOM_ONLY))) then
-          if(pending_samples_eom_r = '1') then
-            state <= SAMPLES_EOM_ONLY;
-          else
-            state <= EOF;
-          end if;
-          force_end_of_samples <= pending_samples_eom_r;
-        elsif((iprotocol_r.sync = '1') and (
-            (mux_start = '1') or
-            (state_r = SAMPLES_EOM_ONLY) or
-            (state_r = EOF))) then
-          if(pending_samples_eom_r = '1') then
-            state <= SAMPLES_EOM_ONLY;
-          else
-            state <= SYNC;
-          end if;
-          force_end_of_samples <= pending_samples_eom_r;
-        elsif((iprotocol_r.time_vld = '1') and (
-            (mux_start = '1') or
-            (state_r = SAMPLES_EOM_ONLY) or
-            (state_r = EOF) or
-            (state_r = SYNC))) then
-          if(pending_samples_eom_r = '1') then
-            state <= SAMPLES_EOM_ONLY;
-          else
-            state <= TIME_31_0;
-          end if;
-          force_end_of_samples <= pending_samples_eom_r;
-        elsif(state_r = TIME_31_0) then
-          state                <= TIME_63_32;
-          force_end_of_samples <= '0';
-        elsif((iprotocol_r.interval_vld = '1') and (
-            (mux_start = '1') or
-            (state_r = SAMPLES_EOM_ONLY) or
-            (state_r = EOF) or
-            (state_r = SYNC) or
-            (state_r = TIME_63_32))) then
-          if(pending_samples_eom_r = '1') then
-            state <= SAMPLES_EOM_ONLY;
-          else
-            state <= INTERVAL_31_0;
-          end if;
-          force_end_of_samples <= pending_samples_eom_r;
-        elsif(state_r = INTERVAL_31_0) then
-          state                <= INTERVAL_63_32;
-          force_end_of_samples <= '0';
-        elsif((iprotocol_r.flush = '1') and (
-            (mux_start = '1') or
-            (state_r = SAMPLES_EOM_ONLY) or
-            (state_r = EOF) or
-            (state_r = SYNC) or
-            (state_r = TIME_63_32) or
-            (state_r = INTERVAL_63_32))) then
-          if(pending_samples_eom_r = '1') then
-            state <= SAMPLES_EOM_ONLY;
-          else
-            state <= FLUSH;
-          end if;
-          force_end_of_samples <= pending_samples_eom_r;
-        elsif((iprotocol_r.samples_vld = '1') and (
-            (mux_start = '1') or
-            (state_r = SAMPLES_EOM_ONLY) or
-            (state_r = EOF) or
-            (state_r = SYNC) or
-            (state_r = TIME_63_32) or
-            (state_r = INTERVAL_63_32) or
-            (state_r = FLUSH))) then
-          state                <= SAMPLES;
-          force_end_of_samples <= '0';
         else
-          state                <= IDLE;
-          force_end_of_samples <= '0';
+          if ifull_r and state = IDLE then
+            report "No outputs when pipeline register is full" severity failure;
+          end if;
+          -- input side: load the pipeline if there is input and we can accept it
+          if ivld = '1' and irdy_s = '1' then
+            iprotocol_r <= iprotocol;
+            ieof_r      <= ieof;
+            ifull_r     <= '1';
+            ifirst_r    <= '1';
+          elsif give and oready then
+            -- we're not loading but we are transferring
+            ifirst_r    <= '0';
+            if mux_end = '1' and not its(ieof_r) then
+              ifull_r   <= '0';
+            end if;
+          end if;
+          -- we are transferring so advance the state
+          if give and oready then
+            state_r <= state;
+          end if;
         end if;
       end if;
-    end process mux;
+    end process pipeline;
 
-    ogen : process(state, iprotocol_r, samples_som, message_sizer_eom, oready)
+    mux_start <= ifirst_r;
+    -- FIXME state should not be IDLE if the pipeline register is full
+    -- sets the priority of multiplexing of output messages
+    -- priority is: SYNC, TIME, INTERVAL, FLUSH, SAMPLES, EOF
+    mux_end   <= to_bool(state = SAMPLES or state = EOF or state = IDLE or
+                         (state = SYNC and iprotocol_r.time_vld = '0' and iprotocol_r.interval_vld = '0' and
+                          iprotocol_r.flush = '0' and iprotocol_r.samples_vld = '0') or
+                         (state = TIME_63_32 and iprotocol_r.interval_vld = '0' and iprotocol_r.flush = '0' and
+                          iprotocol_r.samples_vld = '0') or
+                         (state = INTERVAL_63_32 and iprotocol_r.flush = '0' and iprotocol_r.samples_vld = '0') or
+                         (state = FLUSH and iprotocol_r.samples_vld = '0'));
+
+    state <= IDLE when not ifull_r else
+             SYNC when iprotocol_r.sync = '1' and mux_start else
+             TIME_31_0 when iprotocol_r.time_vld = '1' and (mux_start or state_r = SYNC) else
+             TIME_63_32 when state_r = TIME_31_0 else
+             INTERVAL_31_0 when iprotocol_r.interval_vld = '1' and
+                                (mux_start or state_r = SYNC or state_r = TIME_63_32) else
+             INTERVAL_63_32 when state_r = INTERVAL_31_0 else
+             FLUSH when iprotocol_r.flush = '1' and
+                        (mux_start or state_r = SYNC or state_r = TIME_63_32 or
+                         state_r = INTERVAL_63_32) else
+             SAMPLES when iprotocol_r.samples_vld = '1' and
+                          (mux_start or state_r = SYNC or state_r = TIME_63_32 or
+                           state_r = INTERVAL_63_32 or state_r = FLUSH) else
+             EOF when state_r = EOF or
+                      (ieof_r and (mux_start or state_r = SYNC or state_r = TIME_63_32 or
+                                  state_r = INTERVAL_63_32 or
+                                   state_r = FLUSH or state_r = SAMPLES)) else
+             IDLE;
+
+    ogen : process(state, iprotocol_r, iprotocol)
     begin
       case state is
         when SAMPLES =>
           opcode  <= protocol.complex_short_with_metadata.SAMPLES;
           odata   <= iprotocol_r.samples.iq.q & iprotocol_r.samples.iq.i;
-          som     <= samples_som;
-          valid   <= '1';
-          eom     <= message_sizer_eom;
-          oeof    <= '0';
-          give    <= oready;
-        when SAMPLES_EOM_ONLY =>
-          opcode  <= protocol.complex_short_with_metadata.SAMPLES;
-          odata   <= (others => '0');
-          som     <= '0';
-          valid   <= '0';
-          eom     <= '1';
-          oeof    <= '0';
-          give    <= oready;
+          som     <= '0'; -- inserteom deals with this
+          -- force EOM if next thing is higher priority, but inserteom takes care of normal eom
+          eom     <= iprotocol.sync or iprotocol.time_vld or iprotocol.interval_vld or iprotocol.flush;
         when TIME_63_32 =>
           opcode <= protocol.complex_short_with_metadata.TIME_TIME;
           odata  <= iprotocol_r.time.sec;
           som    <= '0';
-          valid  <= '1';
           eom    <= '1';
-          oeof   <= '0';
-          give   <= oready;
         when TIME_31_0 =>
           opcode <= protocol.complex_short_with_metadata.TIME_TIME;
           odata  <= iprotocol_r.time.fract_sec;
           som    <= '1';
-          valid  <= '1';
           eom    <= '0';
-          oeof   <= '0';
-          give   <= oready;
         when INTERVAL_63_32 =>
           opcode <= protocol.complex_short_with_metadata.INTERVAL;
           odata  <= iprotocol_r.interval.delta_time(63 downto 32);
           som    <= '0';
-          valid  <= '1';
           eom    <= '1';
-          oeof   <= '0';
-          give   <= oready;
         when INTERVAL_31_0 =>
           opcode <= protocol.complex_short_with_metadata.INTERVAL;
           odata  <= iprotocol_r.interval.delta_time(31 downto 0);
           som    <= '1';
-          valid  <= '1';
           eom    <= '0';
-          oeof   <= '0';
-          give   <= oready;
         when SYNC =>
           opcode <= protocol.complex_short_with_metadata.SYNC;
           odata  <= (others => '0');
           som    <= '1';
-          valid  <= '0';
           eom    <= '1';
-          oeof   <= '0';
-          give   <= oready;
         when FLUSH =>
           opcode <= protocol.complex_short_with_metadata.FLUSH;
           odata  <= (others => '0');
           som    <= '1';
-          valid  <= '0';
           eom    <= '1';
-          oeof   <= '0';
-          give   <= oready;
-        when EOF =>
+        when others => -- IDLE or EOF
           odata  <= (others => '0');
           som    <= '0';
-          valid  <= '0';
           eom    <= '0';
-          oeof   <= '1';
-          give   <= oready;
-        when others =>
-          odata  <= (others => '0');
-          som    <= '0';
-          valid  <= '0';
-          eom    <= '0';
-          oeof   <= '0';
-          give   <= '0';
       end case;
     end process ogen;
 
-    oopcode <= opcode;
-
-    message_sizer_rst <= rst or force_end_of_samples;
-    message_sizer_give <= '1' when ((valid = '1' and oready = '1') and (opcode = SAMPLES)) else '0';
-
-    -- TODO / FIXME - include mechanism for assessment of port buffer size
-    message_sizer : protocol.protocol.message_sizer
-      generic map(
-        SIZE_BIT_WIDTH => SAMPLES_MESSAGE_SIZE_BIT_WIDTH)
-      port map(
-        clk                    => clk,
-        rst                    => message_sizer_rst,
-        give                   => message_sizer_give,
-        message_size_num_gives => to_unsigned(protocol.complex_short_with_metadata.OP_SAMPLES_ARG_IQ_SEQUENCE_LENGTH, SAMPLES_MESSAGE_SIZE_BIT_WIDTH),
-        som                    => samples_som,
-        eom                    => message_sizer_eom);
-    
+    oopcode      <= opcode;
     ovalid       <= valid;
     ogive        <= give;
     osom         <= som;
     oeom         <= eom;
     obyte_enable <= (others => '1');
+    oeof         <= to_bool(state = EOF);
 
   end generate wsi_data_width_32;
 

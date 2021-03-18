@@ -33,7 +33,6 @@
 #include "OcpiOsMisc.h"
 #include "OcpiOsAssert.h"
 #include "OcpiUtilMisc.h"
-#include "DtIntEventHandler.h"
 #include "OcpiRDTInterface.h"
 #include "OcpiPValue.h"
 #include "ContainerWorker.h"
@@ -125,6 +124,7 @@ void OCPI::CONTAINER_TEST::connectWorkers(std::vector<CApp>& ca, std::vector<CWo
 
 
 
+#if 0
 void  OCPI::CONTAINER_TEST::testDispatch(OCPI::API::Container* rcc_container)
 {
 
@@ -183,7 +183,7 @@ namespace {
   };
 
 }
-
+#endif
 
 void OCPI::CONTAINER_TEST::createPorts( std::vector<CApp>& ca, std::vector<CWorker*>& workers )
 {
@@ -218,13 +218,14 @@ void OCPI::CONTAINER_TEST::createPorts( std::vector<CApp>& ca, std::vector<CWork
 }
 
 
+#if 0
 OCPI::Util::Thread*  OCPI::CONTAINER_TEST::runTestDispatch(  OCPI::CONTAINER_TEST::DThreadData& tdata )
 {
   DThread* dThread = new DThread(&tdata);
   dThread->start();
   return dThread;
 }
-
+#endif
 
 
 std::vector<CApp> OCPI::CONTAINER_TEST::createContainers( std::vector<ContainerDesc>& eps, 

@@ -345,7 +345,7 @@ parseSignalMappings(ezxml_t xml, Board &b, SlotType *stype) {
     if (!s.m_width)
       continue;
     bool anyMapped = false, anyNotMapped = false;
-    size_t firstMapped, firstNotMapped;
+    size_t firstMapped = 0, firstNotMapped = 0; // initializations for warnings
     for (size_t n = 0; n < s.m_width; ++n) {
       bool isSingle;
       if (m_dev2bd.findSignal(s, n, isSingle)) {

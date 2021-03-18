@@ -22,9 +22,8 @@ library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
   signal dac_rst                                : std_logic;
-  signal opcode_samples, opcode_eos             : std_logic := '0';
 
-  signal dac_metadata_status                    : dac.dac.underrun_detector_status_t;
+  signal dac_status                             : dac.dac.underrun_detector_status_t;
   signal dac_opcode                             : opcode_t := SAMPLES;
   signal dac_in_demarshaller_oprotocol          : protocol_t := PROTOCOL_ZERO;
   signal dac_in_demarshaller_oeof               : std_logic := '0';
@@ -39,8 +38,7 @@ architecture rtl of worker is
   signal dac_data_narrower_irdy                 : std_logic := '0';
   signal dac_data_narrower_ordy                 : std_logic := '0';
   signal dac_data_narrower_odata                : dac.dac.data_complex_t;
-  signal dac_data_narrower_ometadata            : dac.dac.metadata_t;
-  signal dac_data_narrower_ometadata_vld        : std_logic := '0';
+  signal dac_data_narrower_odata_vld            : std_logic;
 
   signal dac_clk_unused_opcode_detected         : std_logic;
   signal ctrl_clr_underrun_sticky_error         : bool_t;
@@ -57,12 +55,7 @@ begin
       in_port  => dev_in.clk,
       out_port => in_out.clk);
   
-  -- DACs usally won't provide a reset along w/ their clock
-  dac_rst_gen : cdc.cdc.reset
-    port map(
-      src_rst => ctl_in.reset,
-      dst_clk => dev_in.clk,
-      dst_rst => dac_rst);
+  dac_rst <= in_in.reset;
 
   dac_opcode <=
       SAMPLES   when in_in.opcode = ComplexShortWithMetadata_samples_op_e  else
@@ -72,6 +65,9 @@ begin
       SYNC      when in_in.opcode = ComplexShortWithMetadata_sync_op_e     else
       SAMPLES;
   
+  props_out.samp_count_before_first_underrun <= to_ulong(dac_status.samp_count_before_first_underrun);
+  props_out.num_underruns <= to_ulong(dac_status.num_underruns);
+
   out_port_data_width_32 : if(IN_PORT_DATA_WIDTH = 32) generate
 
     in_demarshaller : complex_short_with_metadata_demarshaller
@@ -101,7 +97,8 @@ begin
     --On/Off signal used to qualify underrun
     start_samples <= dac_in_demarshaller_oprotocol.samples_vld and
                      not tx_on_off_r;
-    end_samples   <= dac_in_demarshaller_oprotocol.end_of_samples or
+    end_samples   <= dac_in_demarshaller_oprotocol.end_of_samples or 
+                     dac_in_demarshaller_oprotocol.flush or 
                      dac_in_demarshaller_oeof;
     tx_on_off_s   <= start_samples or (tx_on_off_r and not end_samples);
 
@@ -138,16 +135,16 @@ begin
       end if;
     end process;
 
-    on_off_out.give <= on_off_in.ready and (event_present or event_pending);
-    
-    ctl_out.finished <= dac_in_demarshaller_oeof;
+    on_off_out.give   <= on_off_in.ready and (event_present or event_pending);
+    on_off_out.opcode <= tx_event_txOn_op_e  when its(tx_on_off_s)  else tx_event_txOff_op_e;
+    ctl_out.finished  <= dac_in_demarshaller_oeof;
     
     dac_underrun_detector : dac.dac.underrun_detector
       port map(
         -- CTRL
         clk           => dev_in.clk,
         rst           => dac_rst,
-        status        => dac_metadata_status,
+        status        => dac_status,
         -- INPUT
         iprotocol     => dac_in_demarshaller_oprotocol,
         imetadata     => dac_underrun_detector_imetadata,
@@ -173,12 +170,13 @@ begin
         irdy          => dac_data_narrower_irdy,
         -- OUTPUT INTERFACE
         odata         => dac_data_narrower_odata,
-        ometadata     => dac_data_narrower_ometadata,
-        ometadata_vld => dac_data_narrower_ometadata_vld,
+        odata_vld     => dac_data_narrower_odata_vld,
+        ometadata     => open,
+        ometadata_vld => open,
         ordy          => dac_data_narrower_ordy);
 
     dac_data_narrower_ordy <= not dac_rst;
-    dev_out.valid <= dac_data_narrower_ometadata_vld;
+    dev_out.valid <= dac_data_narrower_odata_vld;
   
     dev_out.data_i(dev_out.data_i'left downto
         dev_out.data_i'left-dac.dac.DATA_BIT_WIDTH+1) <=
@@ -200,7 +198,7 @@ begin
     port map(
       fast_clk    => dev_in.clk,
       fast_rst    => dac_rst,
-      fast_pulse  => dac_metadata_status.underrun_error,
+      fast_pulse  => dac_status.underrun_error,
       slow_clk    => ctl_in.clk,
       slow_rst    => ctl_in.reset,
       slow_sticky => props_out.underrun_sticky_error,

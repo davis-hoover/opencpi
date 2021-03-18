@@ -1,26 +1,36 @@
 <!-- This is the test xml for testing component "capture_v2" -->
 <Tests UseHDLFileIo='true'>
 
-  <!-- message size must be big enough for the largest message in the input file -->
-  <Input Port='in' Script='generate.py' MessagesInFile='true' Messagesize='4096' StressorMode='full'/>
-  <Property Name='stopOnFull' Values='false, true'/>
-  <Property Name='stopOnZLM' Values='false, true'/>
-  <Property Name='stopOnEOF' Values='false, true'/>
-  <Property Name='testScenario' Test='true' Description='Used to indicate which test scenario to try in generate script. There are 4 different test modes; 1, 2, 3, and 4.
+  <!-- message size must be big enough for the largest message in the input file. Set to 16384 that default maxMessageValues size for workers -->
+  <Input Port='in' Script='generate.py' MessagesInFile='true' Messagesize='16384' StressorMode='full'/>
+  <Property Name='testScenario' Test='true' Description='Used to indicate which test scenario to try in generate script. There are 5 different test modes; 1, 2, 3, 4, and 5.
   1: Test sending no data.
   2: Test making only metadata full.
   3: Test making data full.
   4: Test sending a multiple zlms (with different opcodes), a single word message, filling data and
   filling up metadata. For configurations where there are at least 6 metadata records.
-  5. Test sending stopZLMOpcode opcode and no output port connected. '/>
+  5: Test sending stopZLMOpcode opcode and no output port connected. '/>
 
   <case>
+    <Output Port='out' TestOptional='false'  Script='verify.py'/>
+    <Property Name='stopOnFull' Values='false, true'/>
+    <Property Name='stopOnZLM' Values='false'/>
+    <Property Name='stopOnEOF' Values='false'/>
+    <Property Name='testScenario' Values='1,2,3,4'/>
+    <Property Name='numRecords' Value='256'/>
+    <Property Name='numDataWords' Value='8192'/>
+  </case>
+  <!-- Test worker with stopOnEOF set to true -->
+  <case doneWorkerIsUUT='true'>
     <Output Port='out' TestOptional='false' Script='verify.py'/>
     <Property Name='stopOnFull' Values='false, true'/>
-    <Property Name='stopOnZLM' Values='false, true'/>
-    <Property Name='stopOnEOF' Values='false, true'/>
+    <Property Name='stopOnZLM' Values='false'/>
+    <Property Name='stopOnEOF' Values='true'/>
     <Property Name='testScenario' Values='1,2,3,4'/>
+    <Property Name='numRecords' Value='256'/>
+    <Property Name='numDataWords' Value='8192'/>
   </case>
+  <!-- Test worker with nothing connected to output port and test stopOnZLM set to true -->
   <case>
     <Output Port='out' TestOptional='true' Script='verify.py'/>
     <Property Name='stopOnFull' Value='false'/>
@@ -28,9 +38,11 @@
     <Property Name='stopOnZLM' Value='true'/>
     <Property Name='stopOnEOF' Value='false'/>
     <Property Name='testScenario' Value='5'/>
+    <Property Name='numRecords' Value='256'/>
+    <Property Name='numDataWords' Value='8192'/>
   </case>
 
-  <!-- Uncomment when AV-5610/AV-5611. This has not been tested yet -->
+  <!-- Uncomment when AV-5610/AV-5611 is completed. This has not been tested yet -->
   <!-- Exclude larger data and metadata array test cases on simulators to reduce test time -->
   <!-- <case>
     <Output Port='out' TestOptional='false' Script='verify.py'/>
@@ -38,6 +50,7 @@
     <Property Name='stopOnZLM' Values='false, true'/>
     <Property Name='stopOnEOF' Values='false, true'/>
     <Property Name='testScenario' Values='1,2,3,4'/>
+    <Property Name='numRecords' Value='512'  Exclude='*sim'/>
     <Property Name='numDataWords' Value='98000' Exclude='*sim'/>
   </case> -->
 </Tests>

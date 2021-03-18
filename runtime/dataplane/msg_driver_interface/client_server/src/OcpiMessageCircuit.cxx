@@ -76,8 +76,7 @@ namespace OCPI {
     makeCircuit(DataTransfer::EndPoint &from, DataTransfer::EndPoint &to, bool send,
 		const char *protocol, OS::Timer *timer) {
       Circuit &c =
-	*m_transport.createCircuit(0, new ConnectionMetaData(&from, &to, 1, m_bufferSize),
-				    NULL, NULL,
+	*m_transport.createCircuit(0, &from, NULL, &to, 1, m_bufferSize,
 				    NewConnectionFlag | (send ? SendCircuitFlag : RcvCircuitFlag),
 				    protocol, timer);
       while (!c.ready()) {

@@ -1,4 +1,7 @@
-<HdlWorker language='vhdl' spec='timestamper_scdcd-spec' controloperations='start' version='2'>
+<HdlWorker language='vhdl' spec='timestamper_scdcd-spec' controloperations='start' version='2'
+	   SourceFiles='cdc_fifo_complex_short_with_metadata.vhd' Libraries='misc_prims protocol'>
+
+<!-- TODO / FIXME - this source file a workaround for a build problem w/ alst4 where misc_prims.cdc is not being included correctly -->
 
   <Property name='IN_PORT_DATA_WIDTH'
             type='uchar'
@@ -15,7 +18,7 @@
 
   <Property name='DATA_CDC_DEPTH'
             type='ushort'
-            default='2'
+            default='16'
             parameter='true'/>
 
   <StreamInterface name='in'
@@ -23,13 +26,14 @@
                    clockDirection='in'/>
   <StreamInterface name='out'
                    datawidth='OUT_PORT_DATA_WIDTH'
+		   inserteom='true'
                    workereof='true'
                    clockDirection='in'/>
 
   <TimeInterface name='time'
                  secondswidth='32'
                  fractionwidth='32'
-                 clockDirection='out'
+                 clock='in'
                  allowunavailable='true'/>
 
 </HdlWorker>

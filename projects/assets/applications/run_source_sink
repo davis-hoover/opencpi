@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+if [ -z "$1" ]; then
+    echo "Usage is:  $0 <from-pf> <to-pf> <message-size> <from-buffer-count> <to_buffer_count> <suppress> <cache-mode> <divisor>"
+    exit 1
+fi
+[ "$OCPI_NO_TOUCH_ENABLE" != 1 -a $6 = 1 ] && exit 0
+app=test_source_sink
+[ "$7" = 2 ] && app=test_source_sink_ACP
+echo -n "$1 ($4 buffers) => $2 ($5 buffers), buffer size $3, notouch $6: "
+export OCPI_LIBRARY_PATH=../artifacts;
+ocpirun  -Ptest_source=$1 -Ptest_sink=$2 -ptest_source=valuestosend=25000000 \
+	-Ztest_source=out=$3 -Btest_source=out=$4 -Btest_sink=in=$5 \
+	-ptest_source=clockdivisor=$8 -ptest_sink=suppressreads=$6 -ptest_source=suppresswrites=$6 -H  --dump-file=props.out test_source_sink
+[ $? != 0 ] && echo Failed && exit 1
+start=$(sed -n 's/test_sink *timeFirst *\(.*\)$/\1/p' < props.out)
+end=$(sed -n 's/test_sink *timeEOF *\(.*\)$/\1/p' < props.out)
+values=$(sed -n 's/test_sink *valuesReceived *\(.*\)$/\1/p' < props.out)
+countback=$(sed -n 's/test_source *countBeforeBackpressure *\(.*\)$/\1/p' < props.out)
+divisor=$(sed -n 's/test_source *clockDivisor *\(.*\)$/\1/p' < props.out)
+bps=$($OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/cxxtests/ocpiexpr -q -t float "($values*4)/(($end-$start)/2**32)/1e6")
+sps=$($OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/cxxtests/ocpiexpr -q -t float "$values/(($end-$start)/2**32)/1e6")
+smsps=$($OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/cxxtests/ocpiexpr -q -t float "(100/$divisor)")
+back=$(if [ "$countback" = 4294967295 ]; then echo None; else echo $countback; fi)
+
+printf "  MB/s %3.2f MS/s %3.2f" $bps $sps
+echo " Overrun: $back Source Msps $smsps (Clock divisor $divisor)"
+
+
+

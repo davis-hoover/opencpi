@@ -266,7 +266,7 @@ class RawPropPort : public Port {
 	      const char *&err) const;
   inline const char *prefix() const { return "rawprop"; }
   inline const char *typeName() const { return "RawProperty"; }
-  bool needsControlClock() const { return true; }
+  bool needsControlClock() const { return false; }
   void emitRecordTypes(FILE *f);
   void emitRecordInterface(FILE *f, const char *implName);
   void emitConnectionSignal(FILE *f, bool output, Language lang, bool clock, std::string &signal);
@@ -401,6 +401,7 @@ class Worker : public OU::Worker {
   size_t m_defaultDataWidth;        // SIZE_MAX means not set
   Language m_language;
   ::Assembly *m_assembly;
+  std::list<std::pair<std::string, ::Assembly *>> m_slaveAssemblies; // string is selection expression
   // map of slave worker objects mapped by a string of the name of the slave either from name
   // attribute or auto generated
   std::list<std::pair<std::string, Worker*>> m_slaves; // maintain order
@@ -424,6 +425,7 @@ class Worker : public OU::Worker {
                                     // FIXME: derive from compiled code
   unsigned m_maxLevel;        // when data type processing
   bool m_dynamic;
+  bool m_optimized;
   bool m_isSlave;
   bool m_isOptional;                // is this slave optional
   Port *m_slavePort;                // slave port mapped to proxy port
@@ -505,6 +507,7 @@ class Worker : public OU::Worker {
 		    const std::string &parent),
     *finalizeProperties(),
     *finalizeHDL(),
+    *finalizeRCC(),
     *deriveOCP(),
     *hdlValue(const std::string &name, const OU::Value &v, std::string &value,
 	      bool param = false, Language = NoLanguage, bool finalized = false),
@@ -627,7 +630,7 @@ extern const char
 		      ezxml_t *parsed, std::string &childFile, bool optional),
   *emitContainerHDL(Worker*, const char *);
 
-extern bool g_dynamic, g_multipleWorkers;
+extern bool g_dynamic, g_optimized, g_multipleWorkers;
 extern void
   doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment),
   vhdlType(const OU::Property &dt, std::string &typeDecl, std::string &type,

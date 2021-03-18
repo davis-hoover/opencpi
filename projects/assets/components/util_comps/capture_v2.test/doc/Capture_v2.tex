@@ -52,7 +52,9 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 		     v1.6 & Converted Worker to version 2 & 11/2019 \\
 		    \hline
 		    v1.7 & Table of Worker Configurations and Resource Utilization Table removed & 5/2020 \\
-			\hline
+		    \hline
+		    v2.1 & {\Comp} updated to use input port clock. RCC version of \comp created. New property called totalBytes added.  & 3/2021 \\
+	            \hline
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -64,7 +66,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \def\releasedate{11/2019}
 \def\componentlibrary{ocpi.assets.util\_{}comps}
 \def\workers{\comp{}.hdl}
-\def\testedplatforms{isim, Matchstiq-Z1(PL), xsim, ZedBoard(PL)}
+\def\testedplatforms{isim, Matchstiq-Z1(PL), xsim, ZedBoard(PL), centos 7}
 \input{\snippetpath/component_summary_table}
 
 \section*{Functionality}
@@ -76,10 +78,10 @@ data. Two modes are supported: \newline
 * 'trailing' - capture all messages from input port and allow the buffer's content to be overwritten while application is in operation. This has the affect of capturing all messages (a buffers worth) near the end of an application. \newline
 
 This component provides an optional output port, so that, it may be
-placed between two components. The input messages are directly passed to
-the output port with a latency of the control plane clock cycles. \newline
+placed between two components. For the {\comp}.hdl worker, the input messages are directly passed to
+the output port with a latency of the input port clock cycles. \newline
 
-The {\comp} component takes input port messages and stores their data in a buffer via the \texttt{data} property as 4 byte words. Metadata associated with each message is stored as a record in a metadata buffer via the \texttt{metadata} property. It captures four 4 byte words of metadata. The first metadata word is the opcode of the message and message size (bytes); opcode 8 MSB and message size 24 LSB. The second word is the fraction time stamp for the EOM. The third word is the fraction time stamp for the SOM. And the fourth word is the seconds timestamp for the SOM. So that the metadata can be read on a little-endian processor, the ordering of the metadata is as follows: \newline
+The {\comp} component takes input port messages and stores their data in a buffer via the \texttt{data} property as 4 byte words. Metadata associated with each message is stored as a record in a metadata buffer via the \texttt{metadata} property. It captures four 4 byte words of metadata. The first metadata word is the opcode of the message and message size (bytes); opcode 8 MSB and message size 24 LSB. The second word is the fraction time stamp for the EOM. The third word is the fraction time stamp for the SOM. And the fourth word is the seconds timestamp for the SOM. For {\comp}.rcc, the second and third words have the same value since there is no concept of start and end of message for RCC workers. So that the metadata can be read on a little-endian processor, the ordering of the metadata is as follows: \newline
 
 1) opcode (8-bit) \& message size (24-bit), \\
 2) eom fraction (32-bit), \\
@@ -92,7 +94,7 @@ Some example python code for reading in the \texttt{metadata} property values wr
     \end{lstlisting}
 
 
-When the number of bytes sent for a message is not a multiple of 4, only the
+For {\comp}.hdl, when the number of bytes sent for a message is not a multiple of 4, only the
 last (number of bytes modulus 4) least significant bytes of the last word
 in the data buffer represent received data. The (number of bytes modulus 4)
 most significant bytes will always be zero in the last word in the data
@@ -102,11 +104,13 @@ For example, given that last captured data buffer word is 0x0000005a: \newline
 - if number of bytes is 6, the last data received was 0x005a. \newline
 
 
-The {\comp} component counts the number of metadata records (\texttt{metadataCount}) have been captured and how many data words have been captured (\texttt{dataCount}). It allows for the option to wrap around and continue to capture data and metadata once the buffers are full or to stop capturing data and metadata when the data and metadata buffers are full via the stoponFull property. \newline
+The {\comp} component counts the number of metadata records (\texttt{metadataCount}) have been captured, how many data words have been captured (\texttt{dataCount}), and the total number of bytes that were passed through the worker during an app run (\texttt{totalBytes}). It allows for the option to wrap around and continue to capture data and metadata once the buffers are full or to stop capturing data and metadata when the data and metadata buffers are full via the \texttt{stopOnFull} property. \newline
 
 When \texttt{stopOnFull} is true (leading), data and metadata will be captured as long as the metadata buffer is not full. The data buffer will loop if it is not full and the metadata buffer is not full. The metadata buffer will loop independently until it is not full. When \texttt{stopOnFull} is false (trailing), the data and metadata buffers loop independently. There will be a wrap around when the data and metadata buffers are full and data and metadata will continue to be captured.  \newline
 
 The component also has properties that keep track of whether or not the metadata and data buffers are full; \texttt{metaFull} and \texttt{dataFull}. \newline
+
+When using {\comp}.hdl, the \texttt{totalBytes}, \texttt{metadataCount},  \texttt{dataCount}, \texttt{metaFull}, and \texttt{dataFull} properties should be checked at the end of an app run because they won't be stable until then. The worker doesn't use cdc crossing circuits for them because it takes advantage that they will have a stable value by the time the control plane reads those values at the end of an app run.
 
 \end{flushleft}
 
@@ -136,10 +140,16 @@ The component also has properties that keep track of whether or not the metadata
 \section*{Source Dependencies}
 \subsection*{\comp.hdl}
 	\begin{itemize}
-		\item assets/components/util\_comps/\comp.hdl/\comp.vhd
-		\item core/hdl/primitives/util/BRAM2.v
+		\item assets/components/util\_comps/comp.hdl/comp.vhd
+		\item assets/components/util\_comps/comp.hdl/capture\_implementation.vhd
 		\item core/hdl/primitives/util/util\_pkg.vhd
+		\item core/hdl/primitives/util/BRAM2.v
 
+	\end{itemize}
+
+\subsection*{\comp.hdl}
+	\begin{itemize}
+		\item assets/components/util\_comps/\comp.rcc/\comp.cc
 	\end{itemize}
 
 
@@ -149,7 +159,7 @@ The component also has properties that keep track of whether or not the metadata
 \begin{flushleft}
 
 	\begin{scriptsize}
-	\begin{tabular}{|p{2.5cm}|p{1cm}|p{1cm}|p{2cm}|p{2.5cm}|p{2cm}|p{1.5cm}|p{1.5cm}|p{5.5cm}|}
+	\begin{tabular}{|p{2.5cm}|p{1.5cm}|p{1cm}|p{2cm}|p{2.5cm}|p{2cm}|p{1.5cm}|p{1.5cm}|p{5.5cm}|}
 		\hline
 		\rowcolor{blue}
 		Name & Type & Default & SequenceLength & ArrayLength & ArrayDimensions & Parameter  & Accessibility & Usage \\
@@ -174,10 +184,12 @@ The component also has properties that keep track of whether or not the metadata
 		\hline
 		\verb+stopZLMOpcode+ & uChar & 0 & - & - & - & false & Initial & Opcode associated with the ZLM which causes the worker to become finished.\\
 		\hline
-		\verb+stopOnZLM+ & bool & false & - & - & - & false & Indicates causing the worker to become finished on ZLM of stopZLMOpcode. \\
+		\verb+stopOnZLM+ & bool & false & - & - & - & false & Initial & Indicates causing the worker to become finished on ZLM of stopZLMOpcode. \\
 		\hline
 		\verb+stopOnEOF+ & bool & true & - & - & - & false & Initial & Indicates causing the worker to become finished on EOF. stopOnEOF is always regarded as true now since the only reason to be false was the opcode-0-ZLM aliasing that no longer exists.\\
   		\hline
+		\verb+totalBytes+ & uLongLong & - & - & - & - & false & Volatile & Total number of bytes that passed through the worker during an app run..\\
+		\hline
 		\verb+metadata+ & uLong & - & - & - & numRecords, numMetadataWords & false & Volatile & Multidimensional array containing metadata records.\\
 		\hline
 		\verb+data+ & uLong & - & - & numDataWords & - & false & Volatile & Data buffer containing data words.\\
@@ -219,9 +231,9 @@ The component also has properties that keep track of whether or not the metadata
              \rowcolor{blue}
              Type    & Name & DataWidth (b) & Advanced  & Usage     \\
              \hline
-             StreamInterface & in   & 32  & DataValueWidth = 8, NumberOfOpcodes='256', ZeroLengthMessages = true  & Data input to capture \\
+             StreamInterface & in   & 32  & DataValueWidth=8, NumberOfOpcodes='256', ZeroLengthMessages=true, clockDirection="in" & Data input to capture \\
             \hline
-            StreamInterface & out   & 32  & DataValueWidth = 8, NumberOfOpcodes='256', ZeroLengthMessages = true, InsertEOM="true"  & Data from input passed to output unchanged \\
+            StreamInterface & out   & 32  & DataValueWidth=8, NumberOfOpcodes='256', ZeroLengthMessages=true, clock="in"  & Data from input passed to output unchanged \\
             \hline
             TimeInterface & time  & 64 (32b sec MSW and 32b frac LSW) & - & Allows worker to capture timestamps \\
             \hline
@@ -231,7 +243,7 @@ The component also has properties that keep track of whether or not the metadata
 
 \section*{Control Timing and Signals}
 \begin{flushleft}
-The {\comp} worker uses the clock from the Control Plane and standard Control Plane signals.
+The {\comp} worker uses the clock from the Data Plane and Control Plane. And it uses standard Control Plane signals.
 \end{flushleft}
 
 \begin{landscape}
@@ -255,7 +267,7 @@ The capture\_v2-test.xml has a test property called \texttt{testScenario} that a
 An input file is generated via \path{generate.py}. The \path{generate.py} script will output different input data based on the \texttt{testScenario} chosen.
 \newline
 
-The tests are verified by \path{verify.py} script. It checks that the \texttt{metadataCount}, \texttt{dataCount}, status(\texttt{metaFull} and \texttt{dataFull}), \texttt{metadata} and \texttt{data} match the expected results. \newline
+The tests are verified by \path{verify.py} script. It checks that the \texttt{totalBytes}, \texttt{metadataCount}, \texttt{dataCount}, status(\texttt{metaFull} and \texttt{dataFull}), \texttt{metadata} and \texttt{data} match the expected results. \newline
 
 \end{flushleft}
 

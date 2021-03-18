@@ -178,8 +178,8 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
 		    arg);
     if (options.component()) {
       static char *copy;
-      asprintf(&copy,
-	       "<Application><instance component='%s' externals='1'/></application>", arg);
+      ocpiCheck(asprintf(&copy,
+			 "<Application><instance component='%s' externals='1'/></application>", arg) > 0);
       xml = ezxml_parse_str(copy, strlen(copy));
     } else {
       file = arg;
@@ -243,9 +243,9 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
       here.ptargets.push_back(NULL);
       targets = &here.ptargets[0];
     } else
-    // ========= end backwards compatibility
+      // ========= end backwards compatibility
       targets = options.target();
-    for (const char **tp = targets; *tp; ++tp)
+    for (const char **tp = targets; tp && *tp; ++tp)
       doTarget(*tp, options.specs() || options.list_specs());
     return false;
   } else if (options.list()) { // no xml here
@@ -267,7 +267,13 @@ static bool setup(const char *arg, ezxml_t &xml, std::string &file,
     }
   if (options.list()) {
     (void)OA::ContainerManager::get(0); // force config/discovery
-    OA::useServers(NULL, params, options.verbose());
+    // Discovery has been done, so all servers in the environment variables are processed already
+    // So we only add probing for the ones on the command line
+    for (const OU::PValue *p = params; p && p->name; ++p)
+      if (!strcasecmp(p->name, "server")) {
+	assert(p->type == OA::OCPI_String);
+	OA::useServer(p->vString, options.verbose()); // we know it is a string
+      }
     OA::ContainerManager::list(options.only_platforms());
   }
   return false;
@@ -336,9 +342,6 @@ static int mymain(const char **ap) {
       OU::baseName(file.c_str(), name);
 
       OA::ApplicationX app(xml, name.c_str(), params);
-      if (options.verbose())
-	fprintf(stderr,
-		"Application XML parsed and deployments (containers and artifacts) chosen\n");
       if (options.deploy_out()) {
 	std::string dfile;
 	if (*options.deploy_out())

@@ -26,7 +26,7 @@
 PackageName=assets_ts
 PackagePrefix=ocpi
 
-ProjectDependencies=ocpi.assets
+ProjectDependencies=ocpi.assets ocpi.platform
 
 #example remote system: note there can be multiple remote systems, colon-separated.
 #export OCPI_REMOTE_TEST_SYSTEMS:=10.0.1.16=root=root=/mnt/net/workspace/git/ocpi.assets

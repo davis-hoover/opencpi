@@ -1,0 +1,4 @@
+<application package='ocpi.assets.util_comps' done='test_sink'>
+  <instance component='test_source' connect='test_sink'/>
+  <instance component='test_sink'/>
+</application>

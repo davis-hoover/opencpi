@@ -608,9 +608,9 @@ namespace OCPI {
       for (unsigned n = 0; (ac = OA::ContainerManager::get(n)); n++) {
 	OC::Container &c = *static_cast<OC::Container *>(ac);
 	std::string info;
-	OU::format(info, "%s|%s|%s|%s|%s|%s|%c|", c.name().c_str(), c.model().c_str(), c.os().c_str(),
+	OU::format(info, "%s|%s|%s|%s|%s|%s|%s%s|", c.name().c_str(), c.model().c_str(), c.os().c_str(),
 		   c.osVersion().c_str(), c.arch().c_str(), c.platform().c_str(),
-		   c.dynamic() ? '1' : '0');
+		   c.dynamic() ? "d" : "", c.optimized() ? "o" : ""); // these are like build suffixes
 	bool hasSockets = false;
 	for (unsigned nn = 0;  nn < c.transports().size(); nn++) {
 	  const OC::Transport &t = c.transports()[nn];

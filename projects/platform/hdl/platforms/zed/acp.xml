@@ -1,0 +1,4 @@
+<HdlConfig>
+  <property name='use_acp' value='1'/>
+  <property name='sdp_channels' value='1'/>
+</HdlConfig>

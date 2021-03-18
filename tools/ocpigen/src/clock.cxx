@@ -23,6 +23,7 @@ parseClocks() {
       return err;
     c->m_exported = true;  // If you mention it here at the top level, exporting is implied
     c->m_signal = signal ? signal : "";
+    c->m_exportedSignal = c->m_signal;
     return NULL;
   }
   return NULL;
@@ -83,6 +84,7 @@ addWciClockReset() {
     ocpiCheck(!addClock("wci", "in", clock));
     clock->m_reset = "wci_Reset_n";
     clock->m_exported = true;
+    clock->m_exportedSignal = clock->m_signal;
     m_wciClock = clock;
   }
   return *m_wciClock;

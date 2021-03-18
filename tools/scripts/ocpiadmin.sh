@@ -83,16 +83,20 @@ Optional args:
                         The OpenCPI Package ID that provides PLATFORM
   -u URL, --url URL     Use this URL when cloning the remote or local git repo
                         instead of the default url determined by PKG_ID
+  --optimize            Use this option to install a software platform built with optimization,
+                        at the expense of debugging.
+  -u URL, --url URL     Use this URL when cloning the remote or local git repo
+                        instead of the default url determined by PKG_ID
 Examples:
   # xsim
   ocpiadmin install platform xsim
 
   # E31x
-  ocpiadmin install platform e31x ocpi.osp.e3xx
+  ocpiadmin install platform e31x -p ocpi.osp.e3xx
 
   # PlutoSDR
   # PKG_ID not needed for second command as it has already been downloaded
-  ocpiadmin install platform adi_plutosdr0_32 ocpi.osp.plutosdr
+  ocpiadmin install platform adi_plutosdr0_32 -p ocpi.osp.plutosdr
   ocpiadmin install platform plutosdr
 EOF
   exit 1
@@ -168,7 +172,14 @@ while (( "$#" )); do
       verbose=-v
       shift
       ;;
-
+    --optimize)
+      optimize=1
+      shift
+      ;;
+    --dynamic)
+      dynamic=1
+      shift
+      ;;
     # Unsupported flags
     -*)
       HELP=1  # can't print usage yet as usage message is based on other args
@@ -202,7 +213,8 @@ if [ "$noun" != platform ]; then
   bad "Unknown $action noun: '$noun'"
 fi
 if [ "$action" = install ]; then
-  platform=$3
+  platform=${3%-*}
+  platform_target_dir=$3
   if [ -z "$platform" ]; then
     bad 'Missing platform to install'
   fi
@@ -341,7 +353,17 @@ else
     fi
 fi
 if [ "$model" = RCC ]; then
-    ./scripts/install-opencpi.sh $platform || exit 1
+    if [ -n "$dynamic" -o -n "$optimize" ]; then
+	if [[ $platform_target_dir == *-* ]]; then
+	    echo "ERROR: you cannot use the --dynamic(-d) or the --optimize(-O) options when you have" >&2
+	    echo "       included build options in the platform name, in this case: $platform_target_dir" >&2
+	    exit 1
+	fi
+	platform_target_dir+=-
+	[ -n "$dynamic" ] && platform_target_dir+=d
+	[ -n "$optimize" ] && platform_target_dir+=o
+    fi
+    ./scripts/install-opencpi.sh $platform_target_dir || exit 1
 else
     ocpidev -d projects/core build --hdl --hdl-platform=$platform
     ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
@@ -378,7 +400,7 @@ else
     # No need to check the return value from "getvars" at this point.
     #
     getvars
-    $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform $platform_dir
+    $OCPI_CDK_DIR/scripts/export-platform-to-framework.sh -v hdl $platform_target_dir $platform_dir
 fi
 echo "Platform installation (download and build) for platform \"$platform\" succeeded."
 exit 0

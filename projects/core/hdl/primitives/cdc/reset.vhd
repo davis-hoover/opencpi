@@ -25,11 +25,15 @@
 --
 --  Reset assertion is asynchronous, while deassertion is synchronized to the clock.
 --  The width of the reset signal is at least (RSTDELAY * dest_clk) period.
+--  It can take either an active low or high reset and outputs both an active low and
+--  high reset.
 --
 -- Generics:
 --  SRC_RST_VALUE : Value of source reset used to asynchronously assert
 --  s_reset_hold. Default is 1.
---  RSTDELAY : Depth of shift register.
+--  0 - Active low source reset
+--  1 - Active high source reset
+--  RSTDELAY : Depth of shift register. The minimum allowed value is 2.
 --
 -- Background:
 --  - "Reset Synchronizer" in
@@ -47,11 +51,12 @@ use ieee.numeric_std.all;
 entity reset is
   generic (
     SRC_RST_VALUE : std_logic :='1';
-    RST_DELAY : integer := 2);             --Width of reset shift reg
+    RST_DELAY     : integer := 2);        -- Depth of shift register.
   port (
-    src_rst : in  std_logic;
-    dst_clk : in  std_logic;
-    dst_rst : out std_logic);
+    src_rst   : in  std_logic;
+    dst_clk   : in  std_logic;
+    dst_rst   : out std_logic;  -- active high reset
+    dst_rst_n : out std_logic); -- active low reset
 end entity reset;
 
 architecture rtl of reset is
@@ -61,6 +66,7 @@ architecture rtl of reset is
 begin
 
   dst_rst <= s_reset_hold(s_reset_hold'length-1);
+  dst_rst_n <= not s_reset_hold(s_reset_hold'length-1);
 
   sync : process (dst_clk, src_rst)
   begin

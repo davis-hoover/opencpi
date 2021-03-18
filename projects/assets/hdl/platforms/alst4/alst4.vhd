@@ -66,9 +66,9 @@ architecture rtl of alst4_worker is
 begin
   -- Switched time clock to control clock for AV-5438 AV-5407
   --timebase_out.clk   <= sys0_clk;
-  timebase_out.clk   <= ctl_clk;
-  timebase_out.reset <= not ctl_rst_n;
-  timebase_out.pps <= '0';
+  timebase_out.clk      <= ctl_clk;
+  timebase_out.PPS      <= '0';
+  timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
 
   -- Instantiate the PCI core, which will also provide back to us a 125MHz clock
   -- based on the incoming 250Mhz PCI clock (based on the backplane 100Mhz PCI clock).

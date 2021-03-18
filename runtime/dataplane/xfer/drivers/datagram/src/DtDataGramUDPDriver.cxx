@@ -37,6 +37,7 @@
 #include "OcpiOsAssert.h"
 #include "OcpiOsEther.h"
 #include "OcpiUtilMisc.h"
+#include "OcpiUtilEzxml.h"
 #include "XferException.h"
 #include "DtDataGramXfer.h"
 
@@ -47,6 +48,7 @@ namespace OU = OCPI::Util;
 namespace OS = OCPI::OS;
 namespace DG = DataTransfer::Datagram;
 namespace OE = OCPI::OS::Ether;
+namespace OX = OCPI::Util::EzXml;
 namespace DataTransfer {
 
   namespace UDP {
@@ -124,7 +126,21 @@ namespace DataTransfer {
       // boilerplate
       XF::SmemServices &createSmemServices();
     public:
-      uint16_t & getId() { return m_portNum;}
+      uint16_t &getId() { return m_portNum;}
+      uint16_t maxPayloadSize() {
+	static uint16_t mp;
+	if (!mp) {
+	  const char *env = getenv("OCPI_UDP_PAYLOAD");
+	  size_t n = DATAGRAM_PAYLOAD_SIZE;
+	  if (env && (OX::getUNum(env, &n) || n > UINT16_MAX)) {
+	    ocpiBad("Invalid UDP payload size: %s", env);
+	    n = DATAGRAM_PAYLOAD_SIZE;
+	  }
+	  mp = (uint16_t)n;
+	  ocpiInfo("UDP RDMA payload: %u", mp);
+	}
+	return mp;
+      }
     };
 
     class Socket : public DG::Socket {
@@ -138,9 +154,8 @@ namespace DataTransfer {
 	m_msghdr.msg_iovlen = 0;
 	m_msghdr.msg_control = 0;
 	m_msghdr.msg_controllen = 0;
-	m_msghdr.msg_flags = 0;    
+	m_msghdr.msg_flags = 0;
       }
-      uint16_t maxPayloadSize() { return DATAGRAM_PAYLOAD_SIZE; }
     public:
       void start() {
 	try {
@@ -166,14 +181,14 @@ namespace DataTransfer {
 	m_msghdr.msg_name = &static_cast<EndPoint *>(&destEp)->sockaddr();
 	// We are depending on structure compatibility
 	m_msghdr.msg_iov = (struct iovec *)frame.iov;
-	m_msghdr.msg_iovlen = frame.iovlen;
+	m_msghdr.msg_iovlen = (int)frame.iovlen;
 	m_server.sendmsg(&m_msghdr, 0);
       }
       size_t
       receive(uint8_t *buffer, size_t &offset) {
 	struct sockaddr sad;
 	size_t size = sizeof(struct sockaddr);
-	size_t n = m_server.recvfrom((char*)buffer, DATAGRAM_PAYLOAD_SIZE, 0, (char*)&sad, &size, 200);
+	size_t n = m_server.recvfrom((char*)buffer, m_lep.maxPayloadSize(), 0, (char*)&sad, &size, 200);
 	offset = 0;
 	// All DEBUG
 	if (OS::logWillLog(10) && n != 0) {

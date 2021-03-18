@@ -93,7 +93,7 @@ namespace OCPI {
 	for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
 	  const OU::Assembly::Connection &c = **ci;
 	  if (c.m_externals.size() &&
-	      !strcasecmp(pname.c_str(), c.m_externals.front().m_name.c_str())) {
+	      !strcasecmp(pname.c_str(), c.m_externals.front().first->m_name.c_str())) {
 	    ap = &c.m_ports.front();
 	    instn = ap->m_instance;
 	    assert(ap->m_name.size());
@@ -218,7 +218,7 @@ namespace OCPI {
       // build the map from implementation port ordinals to util::assembly::ports
       for (std::list<OU::Assembly::Port*>::const_iterator pi = inst.m_ports.begin();
 	   pi != inst.m_ports.end(); pi++) {
-	bool found = false;
+	OU::Port *found = NULL;
 	OU::Assembly::Port &asp = **pi;
 	if (asp.m_name.empty()) {
 	  // Resolve empty port names to be unambiguous if possible
@@ -243,7 +243,7 @@ namespace OCPI {
 	      }
 	      ap[n] = &asp;
 	      asp.m_name = p->m_name;
-	      found = true;
+	      found = p;
 	    }
 	  if (!found) {
 	    ocpiInfo("Rejected \"%s\": there is no %s port for connection at instance '%s'.",
@@ -270,7 +270,7 @@ namespace OCPI {
 	      ap[n] = &asp;
 	      asp.m_role.m_knownRole = true;
 	      asp.m_role.m_provider = p->m_provider;
-	      found = true;
+	      found = p;
 	      break;
 	    }
 	  if (!found) {
@@ -281,6 +281,7 @@ namespace OCPI {
 	    goto rejected;
 	  }
 	}
+	asp.m_ordinal = found->m_ordinal;
       }
       // Final side effects on success
       if (inst.m_externals) {
@@ -388,6 +389,7 @@ namespace OCPI {
 	    } else if (m_utilInstance.m_hasMaster || (ap && ap->m_connection->m_externals.size())) 
 	      // I'm a slave and my master might delegate a port to me --or--
 	      // I am connected externally to something that cannot be confirmed yet, like a delegated port
+	      // I.e. there might be a problem but I cannot reject YET.
 	      return true;
 	    else {
 	      // There is no connection in the assembly for a statically connected impl port
@@ -543,7 +545,7 @@ namespace OCPI {
     void Assembly::Instance::strip_pf(std::string& platform) const {
       // Remove trailing _pf from string
       const size_t pos = platform.rfind("_pf");
-      if (pos == platform.length()-3)
+      if (pos != platform.npos && pos == platform.length()-3)
         platform.erase(pos);
     }
 

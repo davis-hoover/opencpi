@@ -155,6 +155,8 @@ Worker::
 
 static RCCResult
   rccSetError(const char *fmt, ...);
+static bool
+  rccWillLog(unsigned level);
 static void
   rccRelease(RCCBuffer *),
   cSend(RCCPort *, RCCBuffer*, RCCOpCode op, size_t length),
@@ -174,6 +176,17 @@ rccSetError(const char *fmt, ...)
   RCCResult rc = ((Worker *)pthread_getspecific(Driver::s_threadKey))->setError(fmt, ap);
   va_end(ap);
   return rc;
+}
+static void
+rccLog(unsigned level, const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  ((Worker *)pthread_getspecific(Driver::s_threadKey))->log(level, fmt, ap);
+  va_end(ap);
+}
+static bool
+rccWillLog(unsigned level) {
+  return OS::logWillLog(level); // maybe worker-specific someday
 }
 
 static void
@@ -242,7 +255,6 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
   ocpiAssert(rccPort && rccPort->containerPort && newBuffer);
   rccPort->containerPort->takeRcc(oldBuffer, *newBuffer);
 }
-
  // FIXME:  recover memory on exceptions
  void Worker::
  initializeContext()
@@ -290,7 +302,8 @@ rccTake(RCCPort *rccPort, RCCBuffer *oldBuffer, RCCBuffer *newBuffer)
    m_context->crewSize = crewSize();
    m_context->firstRun = true;
    static RCCContainer rccContainer =
-     { rccRelease, cSend, rccRequest, cAdvance, rccWait, rccTake, rccSetError};
+     { rccRelease, cSend, rccRequest, cAdvance, rccWait, rccTake, rccSetError,
+       RCCUserWorker::getTime, RCCUserWorker::nanoTime, rccWillLog, rccLog };
    m_context->container = rccContainer;
    m_context->runCondition = wd ? wd->runCondition : NULL;
 
@@ -608,7 +621,7 @@ run(bool &anyone_run) {
     pthread_setspecific(Driver::s_threadKey, this);
     if (m_runCondition->m_timeout)
       m_runTimer.restart();
-    OCPI_EMIT_REGISTER_FULL_VAR( "Worker Run", OCPI::Time::Emit::DT_u, 1, OCPI::Time::Emit::State, wre ); \
+    OCPI_EMIT_REGISTER_FULL_VAR( "Worker Run", OCPI::Time::Emit::DT_u, 1, OCPI::Time::Emit::State, wre );
     OCPI_EMIT_STATE_CAT_NR_(wre, 1, OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_RUN_TIME);
     ocpiDebug("Running worker \"%s/%s\"", name().c_str(), OU::Worker::cname());
     RCCResult rc;
@@ -699,7 +712,9 @@ advanceAll() {
 void Worker::
 controlOperation(OU::Worker::ControlOperation op) {
   RCCResult rc = RCC_OK;
+  OCPI_EMIT_REGISTER_FULL_VAR( "Worker Control Op", OCPI::Time::Emit::DT_u, 3, OCPI::Time::Emit::Value, cop); \
   OU::AutoMutex guard(mutex(), true);
+  OCPI_EMIT_VALUE_CAT_NR_(cop, op, OCPI_EMIT_CAT_WORKER_DEV, OCPI_EMIT_CAT_WORKER_DEV_RUN_TIME);
   pthread_setspecific(Driver::s_threadKey, this);
   enum {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4) My_##x = 1 << OU::Worker::Op##c,
@@ -1135,15 +1150,18 @@ OCPI_CONTROL_OPS
    RCCResult RCCUserWorker::afterConfigure() { return RCC_OK;}
    uint8_t *RCCUserWorker::rawProperties(size_t &size) const { size = 0; return NULL; }
    bool RCCUserWorker::willLog(unsigned level) const { return OS::logWillLog(level); }
-   void RCCUserWorker::log(unsigned level, const char *fmt, ...) throw() {
+   void Worker::log(unsigned level, const char *fmt, va_list ap) {
      if (OS::logWillLog(level)) {
-       va_list ap;
        std::string myfmt;
-       OU::format(myfmt,"%s: %s", m_worker.name().c_str(), fmt);
-       va_start(ap, fmt);
+       OU::format(myfmt,"%s: %s", name().c_str(), fmt);
        OS::logPrintV(level, myfmt.c_str(), ap);
-       va_end(ap);
      }
+   }
+  void RCCUserWorker::log(unsigned level, const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    m_worker.log(level, fmt, ap);
+    va_end(ap);
    }
    RCCResult RCCUserWorker::setError(const char *fmt, ...) {
      va_list ap;
@@ -1158,6 +1176,10 @@ OCPI_CONTROL_OPS
 RCCResult RCCUserWorker::run(bool /*timeout*/) {
      m_worker.enabled = false;
      return RCC_OK;
+   }
+   uint64_t RCCUserWorker::nanoTime(RCCTime t) {
+     OS::Time temp(t);
+     return temp.seconds() * (uint64_t)1000000000u + temp.nanoseconds();
    }
    RCCTime RCCUserWorker::getTime() {
      return OS::Time::now().bits();
@@ -1251,9 +1273,9 @@ RCCResult RCCUserWorker::run(bool /*timeout*/) {
 	 l_maxLength -= m.m_offset + m.m_align;
 	 p += m.m_align;
        }
-       if (m.m_sequenceLength && *a_length > m.m_sequenceLength)
-	 throw OU::Error("Sequence length %zu exceeds maximum for protocol: %zu",
-			 *a_length, m.m_sequenceLength);
+       //if (m.m_sequenceLength && *a_length > m.m_sequenceLength)
+	// throw OU::Error("Sequence length %zu exceeds maximum for protocol: %zu",
+	//		 *a_length, m.m_sequenceLength);
        //assert(!m.m_sequenceLength || *a_length <= m.m_sequenceLength);
        if (capacity)
 	 *capacity = l_maxLength / m.m_elementBytes;

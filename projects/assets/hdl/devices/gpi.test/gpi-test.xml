@@ -1,4 +1,4 @@
-<tests useHDLFileIo='true' spec='gp_in'>
+<tests duration='20' useHDLFileIo='true' spec='gp_in'>
 
 
   <!-- The first test case tests the gpi device worker by toggling GPIO pins on and then off with the debounce circuit, edge detector circuit, and toggle circuit
@@ -12,7 +12,7 @@
   <property name='testCase' test='true'/>
   <property name='numClockCycles' value='200'/>
 
-  <case duration="5">
+  <case>
     <input port='em_in' script='generate.py'/>
     <property name='testCase' value='1'/>
     <property name='NUM_INPUTS' value='1'/>
@@ -23,7 +23,7 @@
     <property name='EVENT_MODE' value='false'/>
   </case>
 
-  <case duration="5">
+  <case>
     <!-- messageSize is set to 12312 because there are 12312 input data bytes generated
     want to send them as one message -->
     <input port='em_in' script='generate.py' messageSize='12312'/>
@@ -37,7 +37,7 @@
     <property name='USE_TOGGLE' value='false'/>
   </case>
 
-  <case duration="5">
+  <case>
     <input port='em_in' script='generate.py'/>
     <property name='testCase' value='3'/>
     <property name='NUM_INPUTS' value='1'/>
@@ -47,7 +47,7 @@
     <property name='USE_TOGGLE' value='false'/>
   </case>
 
-  <case duration="5">
+  <case>
     <input port='em_in' script='generate.py'/>
     <property name='testCase' value='4'/>
     <property name='NUM_INPUTS' value='1'/>
@@ -58,7 +58,7 @@
   </case>
 
 
-  <case duration="5">
+  <case>
     <!-- messageSize is set to 12312 because there are 12312 input data bytes generated
     want to send them as one message -->
     <input port='em_in' script='generate.py' messageSize='12312'/>

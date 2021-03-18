@@ -75,14 +75,14 @@ namespace OCPI {
 
     // Note this is not dependent on configuration.
     // It is currently used in lieu of a generic data transport shutdowm.
-    OCPI::DataTransport::TransportGlobal &Manager::
-    getTransportGlobalInternal(const OU::PValue *params) {
+    OCPI::DataTransport::TransportManager &Manager::
+    getTransportManagerInternal(const OU::PValue *params) {
       static unsigned event_range_start = 0;
       bool polled = true;
       OU::findBool(params, "polled", polled);
-      OT::TransportGlobal **tpg = polled ? &m_tpg_no_events : &m_tpg_events;
+      OT::TransportManager **tpg = polled ? &m_tpg_no_events : &m_tpg_events;
       if (!*tpg)
-	*tpg = new OT::TransportGlobal( event_range_start++, !polled );
+	*tpg = new OT::TransportManager( event_range_start++, !polled );
       return **tpg;
     }
 
@@ -152,6 +152,10 @@ namespace OCPI {
     dynamic() {
       return OCPI_DYNAMIC;
     }
+    bool Manager::
+    optimized() {
+      return !OCPI_DEBUG;
+    }
     void Manager::
     cleanForContextX(void *context) {
       for (Driver *d = firstChild(); d; d = d->nextChild())
@@ -216,12 +220,16 @@ namespace OCPI {
    * dynamic libraries that do not exist at runtime, e.g. uuid.so) but nowhere else in the
    * framework infrastructure, forcing them to be statically linked here:
    */
+#pragma clang optimize off
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
   namespace Container {
     intptr_t linkme() {
       ((DataTransfer::Access *)linkme)->closeAccess();
       ((OA::RunCondition *)linkme)->setPortMasks((OA::OcpiPortMask *)NULL);
-      ((Container*)linkme)->run();
+      ((Container*)linkme)->start();
       ((DataTransfer::XferServices*)linkme)->DataTransfer::XferServices::send(0, NULL, 0);
+      ((DataTransfer::EndPoint*)linkme)->DataTransfer::EndPoint::createResourceServices();
       ((OCPI::Util::Thread*)linkme)->join();
       OCPI::Util::Uuid uuid;
       OCPI::Util::UuidString us;
@@ -241,6 +249,7 @@ namespace OCPI {
       // p.applyConnectParams(NULL, NULL);
       ((OCPI::Container::Application*)0)->createWorker(NULL, NULL, NULL, NULL, NULL, NULL);
       pthread_workqueue_create_np(NULL, NULL);
+      pthread_workqueue_additem_np(NULL, NULL, NULL, NULL, NULL);
       // DRC support
 #if 1
       ((OCPI::DRC::DataStreamConfigLockRequest *)linkme)->get_data_stream_type();
@@ -255,5 +264,7 @@ namespace OCPI {
       return (intptr_t)&lzma_stream_buffer_decode & (intptr_t)&gpsd_drivers;
     }
   }
+#pragma GCC pop_options
+#pragma clang optimize on
 }
 

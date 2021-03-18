@@ -40,6 +40,7 @@ int OcpiTimeARegister( const char* signal_name );
 void OcpiEmit( int sig );
 
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
 #define OCPI_TIME_EMIT_C( name ) \
 {\
   static int sig = -1; \
@@ -48,7 +49,9 @@ void OcpiEmit( int sig );
   } \
   OcpiEmit( sig );\
 }
-
+#else
+#define OCPI_TIME_EMIT_C( name )
+#endif
 #ifdef _c_plus_plus
 };
 #endif

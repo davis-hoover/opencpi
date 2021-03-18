@@ -566,8 +566,8 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
 		"  <external instance='%s' port='metadata'/>\n",
 		m_platform.cname());
   for (DevInstancesIter dii = m_devInstances.begin(); dii != m_devInstances.end(); dii++) {
-    const ::Device &d = (*dii).device;
-    for (PortsIter pi = d.deviceType().ports().begin(); pi != d.deviceType().ports().end(); pi++) {
+    const Worker &w = *(*dii).m_worker;
+    for (PortsIter pi = w.ports().begin(); pi != w.ports().end(); pi++) {
       Port &p = **pi;
       if (p.isData() || p.m_type == NOCPort || p.m_type == SDPPort ||
 	  (!p.m_master && (p.m_type == PropPort || p.m_type == DevSigPort))) {

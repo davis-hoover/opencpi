@@ -1,4 +1,105 @@
-# [v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.1...v2.1.0-beta.1) (2020-12-16)
+# [v2.1.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-rc.2...v2.1.0) (2021-03-17)
+
+Changes/additions since [OpenCPI Release v2.1.0-rc.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-rc.2)
+
+### Enhancements
+- **comp,hdl base**: add properties to the data_sink_qdac device worker for number of samples before the first underrun and number of underruns. (!510)(2238c355)
+- **doc**: rename `Acronyms and Definitions` to `OpenCPI Glossary`, update, and append to reference documents. (!508)(07aeb463)
+- **hdl base**: replace bsv primitive with a reset compatible with xilinx2020.1. (!486)(cccad883)
+- **hdl base**: allow timestamper_scdcd to insert sampling intervals. (!506)(c1a3059d)
+- **tools**: add optimization options to ocpiremote, and make its options consistent with ocpidev and others. (!505)(6c9e8bc6)
+
+### Bug Fixes
+- **comp,hdl base**: fix extra cycles for dev_out.valid signal when data valid goes low. (!510)(2238c355)
+- **devops**: fix `build-pages.py` to handle OSP default branch that isn't `develop`. (!501)(aa1199e0)
+- **devops,tests**: disable `gpi.test` until proper fix implemented. (!503)(8e4af08d)
+- **hdl base**: change timestamper_scdcd and associated protocol marshaller to avoid idle cycles in output. (!506)(c1a3059d)
+- **hdl base**: set HDL device timeservice with system time when GPS time is not available. (!506)(c1a3059d)
+- **hdl base,runtime**: fix bug in `HdlDevice.cxx` that set `enable_time_now_updates_from_PPS_written` to `true` when not even using PPS. (!502)(da2a10a4)
+- **runtime**: disable compilation of event tracing. (!505)(6c9e8bc6)
+- **runtime,tools**: clean up compilation warnings that are errors in centos7 under optimization only. (!513)(bc347d5d)
+
+### Miscellaneous
+- **doc**: remove obsolete `Acronyms and Definitions` document. (!512)(63c1c7ac)
+- **osp**: hdl configuration file update. (!500)(55823787)
+
+# [v2.1.0-rc.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-rc.1...v2.1.0-rc.2) (2021-03-04)
+
+Changes/additions since [OpenCPI Release v2.1.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-rc.1)
+
+### New Features
+- **runtime**: add `OCPI_ROOT_DIR` environment variable to setup scripts. (!471)(f4b25449)
+
+### Enhancements
+- **devops,tools**: allow `gen-cg-pdfs.sh` to work with recent LibreOffice versions. (!482)(3405e888)
+- **hdl base**: make `capture_v2` a split clock worker. (!492)(a8098c74)
+- **runtime**: enable drc stop_config. (!483)(904f12ff)
+- **runtime,tools**: add `--optimize` option to `opencpi-setup.sh`. (!495)(dcf1e54c)
+- **tools**: building sw framework/rcc/aci for optimization is now fully enabled, but not in the UI yet. (!490)(c16a8374)
+
+### Bug Fixes
+- **comp**: fix bug in drc worker implementation. (!497)(2dad9b19)
+- **hdl base**: increase data path cdc fifo depth from 2 to 16 within `timestamper_scdcd` for better throughput. (!496)(6295897e)
+- **osp**: zcu104: fix a typo and a symlink. (!491)(ae8386a8)
+- **runtime**: DtDmaXfer.cxx: fix log-level for messages to/from FPGA. (!498)(d5164abd)
+- **tools**: ocpidev.sh: fix broken test statements. (!498)(d5164abd)
+
+### Miscellaneous
+- **doc**: update DRC briefing for LibreOffice 5.3 compatibility. (!487)(8c300713)
+- **osp**: zcu104: fix regression, thereby allowing `data_sink_test_app` and `fsk_dig_radio_ctrl` to run. (!491)(ae8386a8)
+- **tests**: temporarily disable `capture_v2` test. (!499)(9595345e)
+
+# [v2.1.0-rc.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-beta.1...v2.1.0-rc.1) (2021-02-08)
+
+Changes/additions since [OpenCPI Release v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-beta.1)
+
+### New Features
+- **doc**: add DRC documentation to Application Development Guide and Platform Development Guide, and create new briefing. (!480)(1b9693a3)
+- **tests,tools**: create iperf3 install script that is called by install-prerequisites script. (!445)(a6f9aa0f)
+
+### Enhancements
+- **app**: ocpiremote: use less memory on the target embedded system when creating the sandbox, allow setting dma memory side on start. (!457)(46f1aff7)
+- **comp**: allow workers to get the current time, and C workers to have log messages. (!457)(46f1aff7)
+- **comp**: add in fsk_modem assembly and drc for zcu104. (!469)(a78f78e6)
+- **comp,hdl base**: updated data_src_qadc_ad9631_sub for one clock per sample and added properties for data_src_qadc. (!449)(3c2ace47)
+- **devops**: fix downstream pipelines failing due to environment variables not being set correctly. (!437)(72adeca8)
+- **hdl base**: update cnt_zed_fmcomms_2_3_scdcd.xdc and cnt_zcu104_fmcomms_2_3_scdcd.xdc to properly constrain things for the ADC one clock per sample. (!451)(064d6479)
+- **hdl base**: enable SDP send and receive to support lots of cpu-side buffers (255). (!457)(46f1aff7)
+- **hdl base**: increase maximum message size between HDL workers to 64k-4. (!457)(46f1aff7)
+- **hdl base**: add timegate worker to support timed transmission. (!466)(344f26db)
+- **hdl base**: allow zynq platforms to use the ACP port (partial). (!470)(69121c36)
+- **hdl base**: add ACP handling for zynq on zed at least. (!475)(f2577630)
+- **hdl base**: updated ad9361 data sink txen logic. (!479)(a7dbf4fa)
+- **osp**: add macos11_1 support. (!457)(46f1aff7)
+- **osp**: move zcu104 platform where it should be in the platform project. (!457)(46f1aff7)
+- **runtime**: support delegating array ports in proxies, with individual port connections in slave assemblies. (!436)(4be9ec46)
+- **runtime**: make cpu-side buffering much more scalable to easily support lots of buffers. (!457)(46f1aff7)
+- **runtime**: use "gather" APIs to improve TCP throughput. (!470)(69121c36)
+- **tests**: add simple performance test workers, and update file_write to report throughput and check test data correctness. (!457)(46f1aff7)
+- **tests,tools**: convert old advanced_pattern unit test into current framework. (!435)(fbde6289)
+- **tests,tools**: unit under test is done worker. (!460)(66d68419)
+- **tools**: build hdl xmls to satisfy proxy dependencies. (!438)(5c313de0)
+- **tools**: fix code generation for parameterized SDP ports. (!457)(46f1aff7)
+
+### Bug Fixes
+- **app,runtime**: fix external connections on slave assemblies. (!456)(5fce8148)
+- **devops,tests**: fix potential resource exhaustion issue on runners due to broken tests. (!474)(6e01a7d6)
+- **doc**: fix ocpiadmin man page typo (`-url` --> `--url`). (!462)(e9180617)
+- **hdl base**: fix sdp_send to eliminate the single cycle of backpressure on input, build sdp for 32/64/128 widths. (!457)(46f1aff7)
+- **hdl base,tools**: clean up the hdl primitives folders. (!430)(7ae9105e)
+- **runtime**: make the DRC "stop_config" method required. (!457)(46f1aff7)
+- **runtime**: fix cases where buffer-counts and sizes were not being set by ocpirun options. (!457)(46f1aff7)
+- **runtime**: datagram: fix 32/64-bit issue when sides are different. (!457)(46f1aff7)
+- **runtime**: add missing zynq setup script to exported files. (!458)(48d37a8e)
+- **runtime**: remove rcc worker error for buffer size and protocol mismatch. (!461)(fa2287ce)
+- **runtime**: comment out second channel of drc. (!463)(8d158bd2)
+- **runtime**: add "guard" in configure_gps_if_enabled() function. (!465)(85a0a442)
+- **runtime**: fix setting gain_mode manual on rx channel using DRC. (!478)(10c11830)
+- **tools**: fix bad exports list for some Xilinx platforms when deploying to ZedBoard. (!446)(a7bf321b)
+- **tools**: fix handling of single-element array properties by RPROP_ARRAY_16 and WPROP_ARRAY_16. (!459)(e7f0be4c)
+- **tools**: fix help message in "ocpiadmin" script. (!462)(e9180617)
+
+# [v2.1.0-beta.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.0.1...v2.1.0-beta.1) (2020-12-18)
 
 Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.0.1)
 
@@ -10,11 +111,13 @@ Changes/additions since [OpenCPI Release v2.0.1](https://gitlab.com/opencpi/open
 - **app**: enable bbloopback mode for FSK application on matchstiq z1. (!422)(2c2ebb0d)
 - **devops**: add OSP support to yaml-generator.py. (!382)(bf7a9c77)
 - **devops**: implement child pipelines for cross-platform builds/tests. (!382)(bf7a9c77)
-- **devops**: Implemented grandchild pipelines so that more jobs can be dynamically generated. (!431)(c249580e)
+- **devops**: implement grandchild pipelines so that more jobs can be dynamically generated. (!431)(c249580e)
+- **devops**: fix downstream pipelines failing due to environment variables not being set correctly. (!437)(72adeca8)
 - **osp**: add support for zcu102. (!407)(444d760c)
 - **protocols**: update ComplexShortWithMetadata-prot.xml to use a sequence length of 4096 instead of 4092 for the iq argument of the samples operation. (!427)(34d0d193)
 - **runtime**: port delegation from proxies to slaves is now implemented. (!421)(b718ff61)
 - **runtime**: generic DRC helper class established in an API header OcpiDrcProxyApi.hh. (!421)(b718ff61)
+- **runtime**: update zed/fmcomms2 platform with new drc. (!433)(d494dad9)
 - **tools**: install-gnuradio.sh: add GNU Radio 3.8 support. (!401)(4c92ed80)
 - **tools**: add missing fields to the opencpi GRC blocks. (!425)(a40d1a90)
 - **tools**: ocpigen: add XML parsing for project assets. (!434)(30acd3d2)

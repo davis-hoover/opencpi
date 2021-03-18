@@ -43,7 +43,7 @@
 
 #include "OcpiParentChild.h"
 #include "OcpiDriverManager.h"
-#include "OcpiTransportGlobal.h"
+#include "TransportManager.hh"
 #include "OcpiUtilWorker.h"
 
 namespace OCPI {
@@ -68,7 +68,7 @@ namespace OCPI {
     class Manager : public OCPI::API::ContainerManager,
 		    public OCPI::Driver::ManagerBase<Manager, Driver, container> {
       unsigned cleanupPosition();
-      OCPI::DataTransport::TransportGlobal &getTransportGlobalInternal(const OCPI::Util::PValue *params);
+      OCPI::DataTransport::TransportManager &getTransportManagerInternal(const OCPI::Util::PValue *params);
       friend class Container;
       friend class OCPI::API::ContainerManager;
     protected:
@@ -95,14 +95,15 @@ namespace OCPI {
       }
       void shutdown();
       // convenience
-      static inline OCPI::DataTransport::TransportGlobal &
-      getTransportGlobal(const OCPI::Util::PValue *params = NULL) {
-	return getSingleton().getTransportGlobalInternal(params);
+      static inline OCPI::DataTransport::TransportManager &
+      getTransportManager(const OCPI::Util::PValue *params = NULL) {
+	return getSingleton().getTransportManagerInternal(params);
       }
       static bool dynamic();
+      static bool optimized();
     private:
       // Globals dependant on polling
-      OCPI::DataTransport::TransportGlobal *m_tpg_events, *m_tpg_no_events;
+      OCPI::DataTransport::TransportManager *m_tpg_events, *m_tpg_no_events;
     };
     static inline Manager &getManager() { return Manager::getSingleton(); }
 

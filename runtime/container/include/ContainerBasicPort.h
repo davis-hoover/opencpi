@@ -85,7 +85,7 @@ namespace OCPI {
     struct BufferHeader {
       uint8_t          m_opCode; // Opcode for the message
       uint8_t          m_eof;
-      uint8_t          m_data;   // Offset of data from this struct. 0 is for standalone eof
+      uint8_t          m_data;   // != 0 if there is data, 0 is for standalone eof
       uint8_t          m_direct;
       uint32_t         m_length; // size in bytes of the message
     };
@@ -170,7 +170,7 @@ typedef int pthread_spinlock_t;
       OCPI::RDT::Desc_t &myDesc; // convenience
       const OCPI::Util::Port &m_metaPort;
       Container &m_container;
-      
+
       BasicPort(Container &container, const OCPI::Util::Port &mPort, bool isProvider,
 		const OCPI::Util::PValue *params);
       virtual ~BasicPort();
@@ -212,6 +212,7 @@ typedef int pthread_spinlock_t;
 	return m_forward ? m_forward->m_next2release : m_next2release;
       }
       const std::string &name() const { return m_metaPort.m_name; }
+      const char *cname() const { return m_metaPort.cname(); }
       // Start/Finish this side of the connection, and return the right descriptor to return.
       // set "done" true if this side is done and can "operate" (e.g. send messages).
       virtual const OCPI::RDT::Descriptors *

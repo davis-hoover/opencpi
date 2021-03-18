@@ -132,20 +132,17 @@ end record metadata_out_t;
 
 -- Input from the platform worker to the time server.
 type time_base_out_t is record
-  clk     : std_logic;
-  reset   : std_logic; --unused; deprecate in 2.0
-  ppsIn   : std_logic; --unused; deprecate in 2.0
-  PPS     : std_logic;
+  clk      : std_logic;
+  PPS      : std_logic;
+  usingPPS : std_logic;
 end record time_base_out_t;
 type time_base_in_t is record
-  ppsOut  : std_logic; --unused; deprecate in 2.0
   PPS     : std_logic;
 end record time_base_in_t;
 
 -- The time_server's (and platform worker's) output that is the time service.
 type time_service_t is record
   clk     : std_logic;
-  reset   : std_logic; --unused; deprecate in 2.0
   now     : ocpi.types.ulonglong_t;
   valid   : std_logic;
 end record time_service_t;
@@ -518,7 +515,7 @@ library ocpi; use ocpi.all, ocpi.types.all;
 use work.platform_pkg.all;
 package metadata_defs is
 component metadata_rv is
-  generic(romwords : natural := 2048);
+  generic(rom_words : ushort_t := to_ushort(2048));
   port(
     wci_Clk      : in std_logic;
     wci_Reset_n  : in std_logic;

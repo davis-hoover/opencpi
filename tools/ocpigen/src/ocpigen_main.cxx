@@ -238,6 +238,9 @@ main(int argc, const char **argv) {
       case 'Z':
 	g_dynamic = (*++ap)[0] == '1';
 	break;
+      case 'Q':
+        g_optimized = (*++ap)[0] == '1';
+ 	break;
       case 'O':
 	g_os = *++ap;
 	break;

@@ -62,6 +62,7 @@
 
 #define OCPI_EMIT_NO_SUBCAT       ~0
 
+#ifdef OCPI_TIME_EMIT_SUPPORT
 
 #define OCPI_EMIT_CAT_( name, category, subcat ) \
   do { \
@@ -109,5 +110,15 @@
     if ( OCPI::Time::Emit::qualifyCategory( category, subcat ) ) OCPI_EMIT_STATE_NR( re, state ); \
   } while ( 0 );
 
-
+#else
+#define OCPI_EMIT_CAT_( name, category, subcat )
+#define OCPI_EMIT_CAT__( name, category, subcat, c )
+#define OCPI_EMIT_CAT( name, category, subcat )
+#define OCPI_EMIT_STATE_CAT_NR_( re, state, category, subcat )
+#define OCPI_EMIT_STATE_CAT_NR__( re, state, category, subcat, c )
+#define OCPI_EMIT_STATE_CAT_NR( re, state, category, subcat )
+#define OCPI_EMIT_VALUE_CAT_NR_( re, state, category, subcat )
+#define OCPI_EMIT_VALUE_CAT_NR__( re, state, category, subcat, c )
+#define OCPI_EMIT_VALUE_CAT_NR( re, state, category, subcat )
+#endif
 #endif

@@ -130,6 +130,7 @@ copy(DtOsDataTypes::Offset srcoffs, DtOsDataTypes::Offset dstoffs, size_t nbytes
   // We ask the underlying transmission layer for the max frame payload size.
   size_t maxpl =
     parent().maxPayloadSize() - (sizeof(MsgHeader) + sizeof(FrameHeader) + 8);
+  ocpiDebug("DGRAM: MAXPL: %zu", maxpl);
   if (!init())
     // conservative estimate, but it still might be exceeded
     init((nbytes + maxpl - 1)/maxpl + 1);
@@ -137,6 +138,7 @@ copy(DtOsDataTypes::Offset srcoffs, DtOsDataTypes::Offset dstoffs, size_t nbytes
   for (uint8_t *src = (uint8_t*)parent().from().sMemServices().map(srcoffs,0); nbytes > 0;
        nbytes -= length, src += length, dstoffs += OCPI_UTRUNCATE(DDT::Offset, length)) {
     length = nbytes > maxpl ? maxpl : nbytes;
+    ocpiDebug("DGRAM: LENGTH: %zu", length);
     add(src, dstoffs, length);
   }
   return this;
@@ -148,16 +150,32 @@ group(XF::XferRequest*xr) {
   return *xr; // FIXME: an error of some type?
 }
 
-
+static const char *
+msghdr(std::string &s, FrameHeader &hdr, const char *io) {
+  OU::format(s, "DGRAM FRAME %s: d %4u s %4u fs %4u a %4u c %4u fl %4u m:",
+	     io, hdr.destId, hdr.srcId, hdr.frameSeq, hdr.ACKStart, hdr.ACKCount, hdr.flags);
+  if (hdr.flags & FRAME_FLAG_HAS_MESSAGES) {
+    MsgHeader *m = reinterpret_cast<MsgHeader*>(&hdr + 1);
+    for (bool next = true; next; ) {
+      OU::formatAdd(s, " id %4u fa %8x fv %8x n %4u ms %4u da %8x dl %4u t %u",
+		    m->transactionId, m->flagAddr, m->flagValue, m->numMsgsInTransaction,
+		    m->msgSequence, m->dataAddr, m->dataLen, m->type);
+      next = m->nextMsg;
+      m = (MsgHeader *)((uint8_t *)(m + 1) + ((m->dataLen + 7) & ~7));
+    }
+  }
+  return s.c_str();
+}
 void XferServices::
 post(Frame & frame) {
-  frame.send_time = OS::Time::now();
   if (frame.msg_count)
     frame.frameHdr.flags |= FRAME_FLAG_HAS_MESSAGES;
-  ocpiLog(9, "SendDG: seq %3u start %3u count %3u flags %u msgcount %2u", frame.frameHdr.frameSeq,
-	  frame.frameHdr.ACKStart, frame.frameHdr.ACKCount, frame.frameHdr.flags,
-	  frame.msg_count);
+  FrameHeader &hdr = frame.frameHdr;
+  std::string s;
+  ocpiLog(9, "%s", msghdr(s, hdr, "OUT"));
   static_cast<SmemServices *>(&m_from.sMemServices())->send(frame, *static_cast<DGEndPoint*>(&m_to));
+  // This must be *after* it is sent so that we do not retransmit it
+  frame.send_time = OS::Time::now();
   // If there is nothing to ack (no messages) in this frame, free it as soon as it is sent.
   // The "send" is required to take it and not queue it (or at least copy it).
   if (!frame.msg_count)
@@ -290,7 +308,7 @@ run() {
   ocpiInfo("ENTERING DG SOCKET THREAD");
   try {
     while ( m_run ) {
-      unsigned size =	maxPayloadSize();
+      unsigned size = m_lep.maxPayloadSize();
       uint8_t buf[size];
       size_t offset;
       size_t n = receive(buf, offset);
@@ -314,12 +332,14 @@ run() {
 	}
 #endif
       // Get the xfer service that handles this conversation
-      FrameHeader *header = reinterpret_cast<FrameHeader*>(&buf[offset + 2]);
-      XferServices *xfs = m_lep.xferServices(header->srcId);
+      FrameHeader &hdr = *reinterpret_cast<FrameHeader*>(&buf[offset + 2]);
+      std::string s;
+      ocpiLog(9, "%s", msghdr(s, hdr, "IN "));
+      XferServices *xfs = m_lep.xferServices(hdr.srcId);
       if (xfs)
-	xfs->processFrame(header);
+	xfs->processFrame(&hdr);
     }
-    ocpiInfo("EXISING DG SOCKET THREAD");
+    ocpiInfo("EXITING DG SOCKET THREAD");
 
   }
   catch (std::string &s) {
@@ -376,7 +396,7 @@ checkAcks(OS::Time time, OS::Time time_out) {
   OCPI::Util::SelfAutoMutex guard(this);
   for (unsigned n = 0; n < m_freeFrames.size(); n++) {
     Frame &f = m_freeFrames[n];
-    if (!f.is_free && (time - f.send_time) > time_out && time > f.send_time) {
+    if (!f.is_free && (time - f.send_time) > time_out && f.send_time.bits()) {
       ocpiLog(9, "Resending datagram frame %u try %u", f.frameHdr.frameSeq, f.resends);
       if (++f.resends > MAX_RESENDS)
 	ocpiBad("Datagram retransmissions exceeds %u for seq %u", MAX_RESENDS, f.frameHdr.frameSeq);
@@ -472,6 +492,7 @@ void Frame::
 prepare(uint16_t seq, size_t payload) {
   assert(is_free);
   is_free = false;
+  send_time = 0;
   frameHdr.flags = 0;
   frameHdr.ACKCount = 0;
   frameHdr.ACKStart = 0; // for valgrind...

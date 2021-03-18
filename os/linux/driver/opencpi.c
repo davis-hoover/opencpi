@@ -116,7 +116,7 @@
 #define OCPI_PCI_XHCI      0x00
 #define OPENCPI_MINIMUM_MEMORY_ALLOCATION (16ul*1024)
 #define OPENCPI_INITIAL_MEMORY_ALLOCATION (128ul*1024)
-#define OPENCPI_MAXIMUM_MEMORY_ALLOCATION (128ul*1024)
+#define OPENCPI_MAXIMUM_MEMORY_ALLOCATION (1024ul*1024)
 #define ETH_P_OCPI_CP OCCP_ETHER_MTYPE
 #define ETH_P_OCPI_DP OCDP_ETHER_TYPE
 // -----------------------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ typedef struct {
   pid_t                 pid;            // for debug: allocating pid
   u64                   kernel_alloc_id;// id of original kernel allocation (before any splits)
   u32			kernel_size;    // size of original size allocation (before any splits)
-  unsigned              minor;          // minor of device of block, for dmam_free_coherent
+  unsigned              minor;          // minor of device of block, for dma_free_attrs
 } ocpi_block_t;
 
 // Our per-device structure - initialized to zero
@@ -216,6 +216,56 @@ static struct hlist_head opencpi_sklist[ocpi_role_limit];
 static DEFINE_RWLOCK(opencpi_sklist_lock);
 #endif
 
+// FIXME: this exact version is not verified.  RHEL7 is 3.10 and it is "previous API" there
+// So we know the dma_attrs are in kernels > 3.19, but more work is necessary to find
+// the exact version where the dma API changed.
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
+static unsigned long dma_attrs =
+  // This would really only for inbound flag region, (in kernel source only for pci_dma+infiniband)
+  // Ensures all previous writes are complete.
+  // DMA_ATTR_WRITE_BARRIER |
+
+  // Not used on arm/arm64, on ppc/cell, sun4v
+  // DMA_ATTR_WEAK_ORDERING |     // our flags are atomic (not used on arm)
+
+  // Used in ARM to prefer pgprot_writecombine(bufferable) vs. pgprot_dmacoherent(bufferable+PTE_XN)
+  // Used in ARM64 to add pgprot_writecombine, no mention of pgprot_dmacoherent
+  // To indicate buffering, perhaps the counterpoint to WRITE_BARRIER
+  // DMA_ATTR_WRITE_COMBINE |     // our flags are atomic (used on arm)
+
+  // Only used in arm with nommu...  For when different parts of memory can/cannot be consistent etc.
+  // We should set this on cache mode 1?
+  // DMA_ATTR_NON_CONSISTENT    |
+
+  // Used on arm (not arm64), xtensa/pci-dma.  We could use this since we do not need kernel mappings
+  // DMA_ATTR_NO_KERNEL_MAPPING | // we only care about user space.  doc says use dma_mmap_attrs
+
+  // Used on arm and arm64, could be useful when there are multiple devices - i.e. broadcast?
+  // DMA_ATTR_SKIP_CPU_SYNC |     // for multiple device consumers and producers
+
+  // Used on arm and arm64, curious not on others since it seems generic, used by few drivers
+  DMA_ATTR_FORCE_CONTIGUOUS |  // we don't have sg dma
+
+  // Used on arm to suppress TLB optimizations
+  // DMA_ATTR_ALLOC_SINGLE_PASS |     // for multiple device consumers and producers
+  0;
+#else
+// It is clear why they got rid of this silly interface in later kernels
+static struct dma_attrs dma_attrs[1];
+static void init_dma(void) {
+  init_dma_attrs(dma_attrs);
+  // dma_set_attr(DMA_ATTR_WRITE_BARRIER, dma_attrs);
+  // dma_set_attr(DMA_ATTR_WEAK_ORDERING, dma_attrs);
+  // dma_set_attr(DMA_ATTR_WRITE_COMBINE, dma_attrs);
+  // dma_set_attr(DMA_ATTR_NON_CONSISTENT, dma_attrs);
+  // dma_set_attr(DMA_ATTR_NO_KERNEL_MAPPING, dma_attrs);
+  // dma_set_attr(DMA_ATTR_SKIP_CPU_SYNC, dma_attrs);
+  dma_set_attr(DMA_ATTR_FORCE_CONTIGUOUS, dma_attrs);
+  // dma_set_attr(DMA_ATTR_ALLOC_SINGLE_PASS, dma_attrs);
+}
+#endif
+static enum dma_data_direction dma_direction = DMA_BIDIRECTIONAL;
+
 // -----------------------------------------------------------------------------------------------
 // Helper functions
 // -----------------------------------------------------------------------------------------------
@@ -240,9 +290,10 @@ ocpi_get_revision(struct pci_dev *dev) {
 
 static void
 log_debug_block(ocpi_block_t *block, char *msg) {
-  log_debug("%s: block %px: %10lx @ %016llx type(%u) c(%u) pid(%d) prev(%px) next(%px) refcnt(%u)\n",
+  log_debug("%s: block %px: %10lx @ %016llx type(%u) c(%u) pid(%d) prev(%px) next(%px) cnt(%u) av(%u)\n",
 	    msg, block, (unsigned long)block->size, block->start_phys, block->type, block->isCached,
-	    block->pid, block->list.prev, block->list.next, (unsigned)atomic_read(&block->refcnt));
+	    block->pid, block->list.prev, block->list.next, (unsigned)atomic_read(&block->refcnt),
+	    block->available);
 }
 
 #if 0
@@ -275,7 +326,7 @@ make_block(ocpi_address_t phys_addr, ocpi_address_t bus_addr, ocpi_size_t size, 
   block->size = size;
   block->type = type;
   block->isCached = false;
-  atomic_set(&block->refcnt, 1);
+  atomic_set(&block->refcnt, type == ocpi_mmio ? 1 : 0);
   block->pid = current->pid;
   block->available = available;
   block->kernel_alloc_id = kernel_alloc_id;
@@ -304,13 +355,14 @@ free_dma_block(ocpi_block_t *block) {
     log_debug_block(block, "failed to free dma block - not merged");
     log_err("failed to free unmerged dma block %px - it is leaked\n", block);
   } else
-    dmam_free_coherent(opencpi_devices[block->minor]->fsdev, block->size, block->virt_addr,
-		       block->bus_addr);
+    dma_free_attrs(opencpi_devices[block->minor]->fsdev, block->size, block->virt_addr,
+		   (dma_addr_t)block->bus_addr, dma_attrs);
 }
 // This method will scan the list of memory blocks and merge any adjacent free blocks into a
 // single free block. And if a kernel block is completely coalesced, it will be freed
+// The block will be freed if we are unloading, otherwise it is sticky
 static void
-merge_free_memory(void) {
+merge_free_memory(bool unload) {
   ocpi_block_t *block, *next;
 
   spin_lock(&block_lock);
@@ -330,7 +382,9 @@ merge_free_memory(void) {
 	next = list_entry(block->list.next, ocpi_block_t, list);
       }
       // If I now have a fully merged kernel allocation, I can free it
-      if (block->type == ocpi_kernel && block->size == block->kernel_size) {
+      if (!unload)
+	log_debug_block(block, "available merged block");
+      else if (block->type == ocpi_kernel && block->size == block->kernel_size) {
 	free_kernel_block(block);
 	list_del(&block->list);
 	kfree(block);
@@ -373,7 +427,8 @@ release_block(ocpi_block_t *block)
   do_merge = release_block_locked(block);
   spin_unlock(&block_lock);
   if (do_merge)
-    merge_free_memory();
+    merge_free_memory(false);
+  //  dump_memory_map("release_block exit");
 }
 
 // ----------------------------------------------------------------------------------------------
@@ -412,6 +467,7 @@ static long
 get_memory(ocpi_request_t *request, struct file *file, ocpi_block_t **sparep) {
   long err = -ENOMEM;
   ocpi_block_t *block;
+  //  dump_memory_map("get_memory entry");
   spin_lock(&block_lock);
   list_for_each_entry(block, &block_list, list)
     if (block->available && block->size >= request->actual) {
@@ -426,7 +482,7 @@ get_memory(ocpi_request_t *request, struct file *file, ocpi_block_t **sparep) {
 	block->size = request->actual;
 	list_add(&split->list, &block->list);
       }
-      atomic_set(&block->refcnt, 1);
+      atomic_inc(&block->refcnt);
       block->file = file;
       block->isCached = request->how_cached == ocpi_cached;
       if (file)
@@ -435,6 +491,7 @@ get_memory(ocpi_request_t *request, struct file *file, ocpi_block_t **sparep) {
       break;
     }
   spin_unlock(&block_lock);
+  // dump_memory_map("get_memory exit");
   return err;
 }
 
@@ -511,16 +568,15 @@ establish_remote(struct file *file, ocpi_request_t *request) {
   return make_block(phys, request->bus_addr, request->actual, ocpi_mmio, false, 0, NULL, minor) ?
     0 : -EINVAL;
 }
-
 // makes allocation using DMA API, makes block, and adds block to list
 // returns 0 if successful
 // this actually makes an allocation, not just massaging metadata
 static long
 get_dma_memory(ocpi_request_t *request, unsigned minor) {
   void *virtual_addr;
-  dma_addr_t dma_handle;
+  dma_addr_t dma_handle_alloc, dma_handle_map;
+  struct device *dev = opencpi_devices[minor]->fsdev;
   long err = -ENOMEM;
-
   // don't need to do a page alignment, so actual can be the same as needed
   // either it PAGE_ALIGN was already called to set request->actual or this is
   // the initial memory grab and it's not important
@@ -530,27 +586,59 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
 	    (unsigned long)request->actual);
   // dma_set_coherent_mask sets a bit mask describing which bits of an address the device
   // supports, default is 32
-  if (dma_set_coherent_mask(opencpi_devices[minor]->fsdev, DMA_BIT_MASK(32)))
-    log_debug("dma_set_coherent_mask failed for device %px\n", opencpi_devices[minor]->fsdev);
-  if ((virtual_addr = dmam_alloc_coherent(opencpi_devices[minor]->fsdev, request->actual,
-					  &dma_handle, GFP_KERNEL)) == NULL) {
-    log_err("dmam_alloc_coherent failed\n");
+  // dma_set_mask doesn't work at all on ARM anyway, in 4.19. dma_mask ptr not initialized
+  // there is dma_coerce_mask_and_coherent too...
+  if (dma_set_coherent_mask(dev, DMA_BIT_MASK(32))) {
+    log_err("dma_set_coherent_mask failed for device %px\n", dev);
     return err;
   }
-  request->bus_addr = (ocpi_address_t) dma_handle;
+  if ((virtual_addr = dma_alloc_attrs(dev, request->actual, &dma_handle_alloc, GFP_KERNEL,
+				      dma_attrs)) == NULL) {
+    log_err("dma_alloc_attrs failed\n");
+    return err;
+  }
+  log_debug("dma_alloc_attrs: %zu %zu %llx map %lx\n", sizeof(dma_handle_alloc),
+	    sizeof(virtual_addr), (unsigned long long)dma_handle_alloc, (unsigned long)virtual_addr);
+  dma_handle_map = dma_map_single(dev, virtual_addr, request->actual, dma_direction);
+  if (dma_mapping_error(dev, dma_handle_map)) {
+    dma_free_attrs(dev, request->actual, virtual_addr, request->bus_addr, dma_attrs);
+    log_err("dma_map_single failed\n");
+    return err;
+  }
+  request->bus_addr = (ocpi_address_t) dma_handle_map;
   request->address = bus2phys(request->bus_addr);
   if (make_block(request->address, request->bus_addr, request->actual,  ocpi_dma,
 		 true, ++opencpi_kernel_alloc_id, virtual_addr, minor) == NULL) {
-    dmam_free_coherent(opencpi_devices[minor]->fsdev, request->actual, virtual_addr,
-		       request->bus_addr);
+    dma_unmap_single(dev, dma_handle_map, request->actual, dma_direction);
+    dma_free_attrs(dev, request->actual, virtual_addr, request->bus_addr, dma_attrs);
     return err;
   }
   log_debug("requested (%lx) reserved %lx @ %016llx bus %016llx\n", (unsigned long)request->needed,
 	    (unsigned long)request->actual, (unsigned long long)request->address,
 	    (unsigned long long)request->bus_addr);
-  err = 0;
-  return err;
+  return 0;
 }
+
+// Try to make a kernel allocation in a block
+// can't use alloc_pages_exact for high mem in a 32 bit world
+static long
+get_kernel_memory(ocpi_request_t *request, unsigned minor) {
+  unsigned order = get_order(request->actual);
+  struct page *kpages = alloc_pages(GFP_KERNEL | __GFP_HIGHMEM, order);
+  ocpi_address_t phys_addr = (ocpi_address_t)page_to_pfn(kpages) << PAGE_SHIFT;
+  if (kpages == NULL)
+    log_err("memory request of %ld could not be satified by the kernel\n",
+	    (unsigned long)request->actual);
+  else if (make_block(phys_addr, phys2bus(phys_addr), PAGE_SIZE << order, ocpi_kernel, true,
+		 ++opencpi_kernel_alloc_id, NULL, minor) == NULL)
+    __free_pages(kpages, order);
+  else {
+    log_debug("allocated kernel pages: %lx @ %016llx\n", PAGE_SIZE << order, phys_addr);
+    return 0;
+  }
+  return -ENOMEM;
+}
+
 // If file == NULL, this is a request for the initial driver memory, not a minor 0 ioctl request
 // this tries to split an existing block, if that fails it tries to allocate more memory
 // and use the memory in the new block
@@ -586,24 +674,8 @@ request_memory(struct file *file, ocpi_request_t *request) {
     if ((err = get_dma_memory(request, minor)) != 0) {
       log_err("get_dma_memory in request_memory failed, trying fallback\n");
       log_err("if allocation failure occurs, see README for memmap configuration\n");
-      // Try to make a kernel allocation and stick it in the list
-      // can't use alloc_pages_exact for high mem in a 32 bit world
-      {
-	unsigned order = get_order(request->actual);
-	struct page *kpages = alloc_pages(GFP_KERNEL | __GFP_HIGHMEM, order);
-	ocpi_address_t phys_addr = (ocpi_address_t)page_to_pfn(kpages) << PAGE_SHIFT;
-	if (kpages == NULL) {
-	  log_err("memory request of %ld could not be satified by the kernel\n",
-		  (unsigned long)request->actual);
-	  break;
-	}
-	if (make_block(phys_addr, phys2bus(phys_addr), PAGE_SIZE << order, ocpi_kernel, true,
-		       ++opencpi_kernel_alloc_id, NULL, minor) == NULL) {
-	  __free_pages(kpages, order);
-	  break;
-	}
-	log_debug("allocated kernel pages: %lx @ %016llx\n", PAGE_SIZE << order, phys_addr);
-      }
+      if ((err = get_kernel_memory(request, minor)))
+	break;
     }
     // Now we try one more time after having added kernel pages or made a DMA allocation
     // The only thing that can go wrong is someone else slipping in
@@ -781,7 +853,8 @@ opencpi_io_release(struct inode *inode, struct file *file) {
       }
     spin_unlock(&block_lock);
     if (do_merge)
-      merge_free_memory();
+      merge_free_memory(false);
+    // dump_memory_map("opencpi_io_release exit");
   }
   return 0;
 }
@@ -802,6 +875,7 @@ int
 opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg) {
   unsigned minor = iminor(inode);
 #endif
+  struct device *dev = opencpi_devices[minor]->fsdev;
   int err;
   switch (cmd) {
   case OCPI_CMD_PCI:
@@ -890,7 +964,7 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
 	        log_debug("load fpga copied data to kernel %x\n", LINUX_VERSION_CODE);
 		err = -ENOMEM;
     #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
-		if ((info = fpga_image_info_alloc(opencpi_devices[GET_MINOR(file)]->fsdev))) {
+		if ((info = fpga_image_info_alloc(dev))) {
 		  info->buf = buf;
 		  info->count = request.length;
 		  log_debug("locking fpga\n");
@@ -921,6 +995,26 @@ opencpi_io_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsig
       return err;
     }
 #endif
+  case OCPI_CMD_INVALIDATE: // use the fpga manager to load a whole (not partial) bitstream
+    {
+      ocpi_cache_t request;
+      if (copy_from_user(&request, (void __user *)arg, sizeof(request))) {
+	log_err("unable to retrieve memory request\n");
+	return -EFAULT;
+      }
+      dma_sync_single_for_cpu(dev, request.address, request.size, DMA_FROM_DEVICE);
+      return 0;
+    }
+  case OCPI_CMD_FLUSH: // use the fpga manager to load a whole (not partial) bitstream
+    {
+      ocpi_cache_t request;
+      if (copy_from_user(&request, (void __user *)arg, sizeof(request))) {
+	log_err("unable to retrieve memory request\n");
+	return -EFAULT;
+      }
+      dma_sync_single_for_device(dev, request.address, request.size, DMA_TO_DEVICE);
+      return 0;
+    }
   default:
     log_err("ioctl invalid command (%08x)\n", cmd);
     return -EINVAL;
@@ -956,9 +1050,9 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
   ocpi_block_t *block = NULL;
   unsigned long pfn = vma->vm_pgoff;
 
-  log_debug("mmap minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx)\n",
+  log_debug("mmap minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx) flags 0x%x\n",
 	    minor, file, mydev, (unsigned long)size, vma->vm_start,
-	    start_address, end_address);
+	    start_address, end_address, file->f_flags);
   if (minor == 0) {
     bool found = false;
     // Since this is outer loop, a linear search is ok.  Maybe a hash table someday.
@@ -994,14 +1088,24 @@ opencpi_io_mmap(struct file * file, struct vm_area_struct * vma) {
     vma->vm_ops = &opencpi_vm_ops;
     vma->vm_private_data = block;
     // Check for uncached blocks
-    if (!block->isCached)
+    // if (!block->isCached) // this is now determined by the FD used.
+#if 0
+    vma->vm_page_prot = file->f_flags & (O_SYNC|O_DSYNC) ?
+      pgprot_noncached(vma->vm_page_prot) : pgprot_dmacoherent(vma->vm_page_prot);
+#else
+    if (file->f_flags & (O_SYNC|O_DSYNC))
       vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+#endif
     vma->vm_flags |= VM_RESERVED;
     if (block->type == ocpi_mmio) {
       vma->vm_flags |= VM_IO;
       err = io_remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
     } else
       err = remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
+#if 0
+    if (block->type == ocpi_dma)
+    err = dma_mmap_attrs(mydev->fsdev, vma, block->virt_addr, block->bus_addr, block->size, dma_attrs);
+#endif
   }
   if (err)
     log_err("mmap failed: minor %d file %px dev %px, %lx @ %016lx (%016llx to %016llx)\n",
@@ -1733,7 +1837,7 @@ free_driver(void) {
     list_for_each_entry_safe(block, temp, &block_list, list)
       free_block(block);
     spin_unlock(&block_lock);
-    merge_free_memory();
+    merge_free_memory(true);
     spin_lock(&block_lock);
     list_for_each_entry_safe(block, temp, &block_list, list) {
       if (block->type == ocpi_kernel)
@@ -1742,6 +1846,7 @@ free_driver(void) {
       kfree(block);
     }
     spin_unlock(&block_lock);
+    // dump_memory_map("free_driver");
     block_init = 0;
   }
   if (opencpi_devices) {
@@ -1904,7 +2009,7 @@ opencpi_init(void) {
 	log_err("get_dma_memory failed in opencpi_init, trying fallback\n");
         for (request.needed = opencpi_size; request.needed >= OPENCPI_MINIMUM_MEMORY_ALLOCATION;
 	     request.needed /= 2)
-	  if ((err = request_memory(NULL, &request)) == 0)
+	  if (!(err = get_kernel_memory(&request, 0)))
 	    break;
       }
       if (err) {
@@ -1912,7 +2017,7 @@ opencpi_init(void) {
         break;
       }
       opencpi_size = request.actual;
-      log_debug("Using allocated kernel memory size %lx\n", opencpi_size);
+      log_debug("Using initial allocated kernel/dma memory size %lx\n", opencpi_size);
     }
 #ifdef OCPI_NET
     if ((err = proto_register(&opencpi_proto, 0))) {
@@ -1933,6 +2038,9 @@ opencpi_init(void) {
       break;
     }
     opencpi_notifier_registered = true;
+#endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+    init_dma();
 #endif
     log_debug("driver loaded on device (%d,%d)\n", MAJOR(opencpi_device_number), MINOR(opencpi_device_number));
     return 0;

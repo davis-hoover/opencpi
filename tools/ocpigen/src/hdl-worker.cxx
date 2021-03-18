@@ -548,6 +548,7 @@ verilogValue(const OU::Value &v, std::string &s, bool finalized) {
    {
     // Everything else is linear in memory
     // How many bits in the std_logic_vector
+    (void)finalized;
     assert(finalized);
     size_t bits = rawBitWidth(dt); // bits in verilog constant
     // How many bytes per scalar value
@@ -768,7 +769,7 @@ emitSignals(FILE *f, Language lang, bool useRecords, bool inPackage, bool inWork
 	if (last.empty())
 	  fprintf(f,
 		  "    %s Clock(s) not associated with one specific port:\n", comment);
-	emitSignal(c.signal(), f, lang, c.m_output ? Signal::OUT : Signal::IN, last, -1, 0);
+	emitSignal(c.exportedSignal(), f, lang, c.m_output ? Signal::OUT : Signal::IN, last, -1, 0);
 	if (c.m_reset.size())
 	  // FIXME: FOR THE INNER WORKER TO HAVE A POSITIVE RESET
 	  emitSignal(inWorker && !strcasecmp(c.reset(), "wci_reset_n") ?
@@ -1249,7 +1250,7 @@ emitDefsHDL(bool wrap) {
     for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       Clock &c = **ci;
       if (c.m_exported) {
-	fprintf(f, "  %s      %s;\n", c.m_output ? "output" : "input", c.signal());
+	fprintf(f, "  %s      %s;\n", c.m_output ? "output" : "input", c.exportedSignal());
 	if (c.m_reset.size())
 	  fprintf(f, "  input      %s;\n", c.reset());
       }
@@ -1378,7 +1379,7 @@ emitVhdlShell(FILE *f) {
 	  m_implName);
   std::string dataClockCDCs; // instantiations for the CDCs for per-clock reset and is_operating, if any
   if (m_type != Container) {
-    fprintf(f,"  constant num_reset_cycles     : natural := 17;\n");
+    fprintf(f,"  constant num_reset_cycles  : natural := 17;\n");
     for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
       const Clock *clk = *ci; // set to NULL when used for a port
       if (clk != m_wciClock)
@@ -1412,6 +1413,15 @@ emitVhdlShell(FILE *f) {
   } else {
     fprintf(f,
 	    "begin\n");
+
+	// If an optional port is not connected it will always remain reset - its reset input.	
+	for (unsigned i = 0; i < m_ports.size(); i++) {
+		Port *p = m_ports[i];
+		if (p->isData()) {
+			fprintf(f, "  %s_is_connected <= not %s_reset;\n", p->m_name.c_str(), p->m_name.c_str());
+		}
+	}
+
     if (m_ctl.nonRawReadbacks || m_ctl.builtinReadbacks || m_ctl.rawReadables) {
       fprintf(f, "  internal_props_out <=\n    (");
       // Assign all members
@@ -1467,9 +1477,9 @@ emitVhdlShell(FILE *f) {
 	      ",\n"
 	      "             props_from_worker => internal_props_out");
     // if (m_ctl.nonRawWritables || m_ctl.nonRawReadables || m_ctl.rawProperties)
-      fprintf(f,
-	      ",\n"
-	      "             props_to_worker   => props_to_worker");
+    fprintf(f,
+	    ",\n"
+	    "             props_to_worker   => props_to_worker");
     fprintf(f, ");\n");
   }
   fprintf(f, "%s", dataClockCDCs.c_str());
@@ -1701,7 +1711,7 @@ emitVhdlRecordWrapper(FILE *f) {
 	    if (last.empty())
 	      fprintf(f,
 		      "  -- Clock(s) not associated with one specific port:\n");
-	    fprintf(f, "%s      %s => %s", last.c_str(), c->signal(), c->signal());
+	    fprintf(f, "%s      %s => %s", last.c_str(), c->exportedSignal(), c->exportedSignal());
 	    last = ",\n";
 	  }
 	}

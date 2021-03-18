@@ -16,5 +16,5 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ParamValues_sdp_width=1/4
+ParamValues_sdp_width=1/2/4
 include $(OCPI_CDK_DIR)/include/worker.mk

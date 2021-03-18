@@ -16,9 +16,5 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#OnlyPlatforms=alst4 #List of tested platforms
-# Ideally, this worker would build for platforms which have HSMC slots. However, this is blocked by AV-2044.
-# For now, only build for the target that represents Altera devices, more specifically the Stratix family.
-OnlyTargets=stratix4
 include $(OCPI_CDK_DIR)/include/worker.mk
 

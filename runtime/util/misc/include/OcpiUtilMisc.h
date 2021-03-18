@@ -33,6 +33,7 @@
  *                  Initial version.
  */
 
+#include <cstddef>
 #include <strings.h>
 #include <assert.h>
 #include <inttypes.h>
@@ -71,7 +72,7 @@
 #define OCPI_UTRUNCATE(type, val) ((type)(val))
 #define OCPI_STRUNCATE(type, val) ((type)(val))
 #define OCPI_SIZEOF(utype, stype) ((utype)sizeof(stype))
-#define OCPI_OFFSETOF(utype, member, stype) ((utype)&((stype *)0)->member)
+#define OCPI_OFFSETOF(utype, stype, member) ((utype)offsetof(stype,member))
 #define OCPI_SIZE_T_DIFF(larger, smaller) ((size_t)((larger) - (smaller)))
 #define OCPI_CHAR_DIFF(larger, smaller) ((unsigned)((larger) - (smaller)))
 #else
@@ -82,7 +83,7 @@
 #define OCPI_SIZEOF(utype, stype) \
   ((utype)OCPI::Util::utruncate((uint64_t)sizeof(stype), sizeof(utype)))
 #define OCPI_OFFSETOF(utype, stype, member)				\
-  ((utype)OCPI::Util::utruncate((uint64_t)&((stype *)0)->member, sizeof(utype)))
+  ((utype)OCPI::Util::utruncate((uint64_t)offsetof(stype,member), sizeof(utype)))
 #define OCPI_SIZE_T_DIFF(larger, smaller) \
   OCPI::Util::size_t_diff((larger) - (smaller))
 #define OCPI_CHAR_DIFF(larger, smaller) \
@@ -97,11 +98,13 @@ namespace OCPI {
      */
 
     inline uint64_t utruncate(uint64_t val, size_t bytes) {
+      (void)bytes;
       ocpiAssert(bytes == sizeof(val) || val <= ~((uint64_t)-1 << (bytes*8)));
       return val;
     }
 
     inline int64_t struncate(int64_t val, size_t bytes) {
+      (void)bytes;
       ocpiAssert(bytes == sizeof(val) ||
 		 (val < 0 ?
 		  val >= (int64_t)-1 << (bytes*8-1) :

@@ -38,6 +38,6 @@
 
   <DataInterfaceSpec Name="in" Producer="false"/>
 
-  <DataInterfaceSpec Name="out" Producer="true"/>
+  <DataInterfaceSpec Name="out" Producer="true" buffersize="in"/>
 
 </ComponentSpec>

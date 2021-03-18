@@ -35,6 +35,7 @@ namespace OU = OCPI::Util;
 namespace OE = OCPI::Util::EzXml;
 namespace OL = OCPI::Library;
 namespace OA = OCPI::API;
+namespace OS = OCPI::OS;
 namespace OCPI {
   namespace API {
     // This function is our hook before anything interesting happens so we can
@@ -130,7 +131,8 @@ namespace OCPI {
     }
 
     ApplicationI::ApplicationI(Application &app, const char *file, const PValue *params)
-      : m_assembly(createLibraryAssembly(file, m_deployXml, m_appXml, m_copy, params)),
+      : m_earliest(OS::Time::now()), m_constructed(0), m_initialized(0), m_started(0), m_finished(0),
+        m_assembly(createLibraryAssembly(file, m_deployXml, m_appXml, m_copy, params)),
         m_apiApplication(app) {
       init(params);
     }
@@ -143,12 +145,14 @@ namespace OCPI {
 #endif
     ApplicationI::ApplicationI(Application &app, ezxml_t xml, const char *a_name,
                                const PValue *params)
-      : m_deployXml(NULL), m_appXml(NULL), m_copy(NULL),
+      : m_earliest(OS::Time::now()), m_constructed(0), m_initialized(0), m_started(0), m_finished(0),
+        m_deployXml(NULL), m_appXml(NULL), m_copy(NULL),
         m_assembly(createLibraryAssembly(xml, a_name, params)), m_apiApplication(app)  {
       init(params);
     }
     ApplicationI::ApplicationI(Application &app, OL::Assembly &assy, const PValue *params)
-      : m_deployXml(NULL), m_appXml(NULL), m_copy(NULL), m_assembly(assy),
+      : m_earliest(OS::Time::now()), m_constructed(0), m_initialized(0), m_started(0), m_finished(0),
+        m_deployXml(NULL), m_appXml(NULL), m_copy(NULL), m_assembly(assy),
         m_apiApplication(app) {
       m_assembly++;
       init(params);
@@ -185,6 +189,7 @@ namespace OCPI {
     }
     unsigned ApplicationI::
     addContainer(unsigned container, bool existOk) {
+      (void)existOk;
       ocpiAssert(existOk || !(m_allMap & (1u << container)));
       return getUsedContainer(container);
     }
@@ -212,6 +217,7 @@ namespace OCPI {
     // For dynamic instances only, distribute them according to policy
     void ApplicationI::
     policyMap(Deployment &d, unsigned instNum) {
+      (void)instNum;
       // allMap is the bitmap of all suitable containers for the implementation
       d.m_usedContainers.resize(1, UINT_MAX);
       switch (m_cMapPolicy) {
@@ -478,11 +484,58 @@ namespace OCPI {
       const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       if (slaves) {
 	if (!c.slaves) {
+#if 1
+	  // Find a slave assembly by selection expression
+	  // Fixme: initial properties?  else it depends on build configurations for no good reason?
+	  // finalizePropertyValues needs to be split do that the parsing can be done earlier
+	  // up to prepareinstanceproperties, stashed earlier by pointer and then moved to crew
+	  // any other need to do this early?
+	  // we already do it for choosing workers in library assembly
+	  // -- parse an initial value and compare it to a parameter value
+	  // both in selection expressions (which only accesss worker parameters)
+	  // could selection expressions for instances usefully use initial? not really
+	  // so we need to stash it in candidates, but only on demand.
+	  // when else would we need it?  We are selecting a slave assembly based on
+	  // initial properties that may not be parameters.  Could a worker have an acceptance
+	  // expression based on initial properties? another on-demand thing.
+	  do {
+	    const char *expr = ezxml_cattr(slaves, "selection");
+	    if (!expr || !expr[0])
+	      break; // no expression is acceptable
+	    OU::ExprValue val;
+	    const char *err = OU::evalExpression(expr, val, &c.impl->m_metadataImpl);
+	    if (err || !val.isNumber())
+	      ocpiBad("Error in slave assembly selection expression \"%s\": %s",
+		      expr, err ? err : "expression value is not a number");
+	    else if (val.getNumber() > 0)
+	      break;
+	  } while ((slaves = ezxml_cnext(slaves)));
+	  if (!slaves) {
+	    ocpiInfo("No slave assembly found with accepted selection expression");
+	    return false;
+	  }
+#endif
 	  // Do this work one time for this candidate of this instance, which caches this work so that it can
 	  // be applied each time this candidate is considered for deployment
 	  ocpiInfo("++++++++++++ Starting one-time processing of slave assembly for instance %u candidate %p",
 		   instNum, &c);
-	  c.slaves = new OL::Assembly(slaves, ui.cname(), NULL);
+	  // FIXME:  There should be a factory method that returns errors...
+	  std::string error;
+	  try {
+	    c.slaves = new OL::Assembly(slaves, ui.cname(), NULL);
+	  } catch (std::string &e) {
+	    error = e;
+	  } catch (const char *e) {
+	    error = e ? e : "unexpected empty string error";
+	  } catch (std::exception &e) {
+	    error = e.what();
+	  } catch (...) {
+	    error = "unexpected exception";
+	  }
+	  if (!error.empty()) {
+	    ocpiInfo("%s when processing slaves due to error: %s", reject.c_str(), error.c_str());
+	    return false;
+	  }
 	  c.nInstances = m_nInstances;                      // remember for resize after deployment
 	  c.nConnections = m_assembly.m_connections.size(); // remember for resize after deployment
 	  // Patch the instances and ports in slave assembly for (repeated) insertion into the app
@@ -552,7 +605,7 @@ namespace OCPI {
 	    // Find any app connection to that proxy port.
 	    assert(slaveConn.m_ports.size() == 1 && slaveConn.m_externals.size() == 1);
 	    const OU::Port &masterPort =
-	      *c.impl->m_metadataImpl.findMetaPort(slaveConn.m_externals.front().m_name);
+	      *c.impl->m_metadataImpl.findMetaPort(slaveConn.m_externals.front().first->m_name);
 	    // Find the app connection port for the master's delegated port
 	    OU::Assembly::Port *assyPort = m_assembly.assyPort(instNum, masterPort.m_ordinal);
 	    if (assyPort) { // proxy port is connected to something, delegate it
@@ -560,9 +613,12 @@ namespace OCPI {
 	      c.m_portFixups.emplace_front(assyPort, *assyPort, masterPort.m_ordinal);
 	      m_assembly.instances()[instNum]->m_assyPorts[masterPort.m_ordinal] = NULL;
 	      auto &slavePort = slaveConn.m_ports.front();
+	      // patch the master's port of the app connection, which will be un-done if redeployed
 	      assyPort->m_name = slavePort.m_name; // name is slave's name now
 	      assyPort->m_instance = slavePort.m_instance;
 	      assyPort->m_index = 0; // we assume slave ports are not array ports
+	      // patch the slave's port, which does not need undoing
+	      m_assembly.instances()[slavePort.m_instance]->m_assyPorts[slavePort.m_ordinal] = assyPort;
 	    }
 	  }
 	}
@@ -684,8 +740,17 @@ namespace OCPI {
 	  otherImpl = m_instances[other->m_instance].m_deployment.m_impls[0];
 	  otherPort = otherImpl->m_metadataImpl.findMetaPort(other->cname());
 #endif
-	} else if (!ap || !other || other->m_instance > instNum)
+	} else if (!ap || (other && other->m_instance > instNum))
+	  continue; // not connected or other end is not deployed yet, so we are ok
+	else if (!other) { // looks like an external port of the application
+	  assert(ap->m_connection && !ap->m_connection->m_externals.empty());
+	  if (c.impl->m_internals & (1u << nn)) {
+	    ocpiInfo("%s due to implementation port \"%s\" having an internal connection when "
+		     "application specifies that port as external", reject.c_str(), ap->cname());
+	    return false;
+	  }
 	  continue;
+	}
 	// check for prewired compatibility, post-delegation
 	if (m_assembly.badConnection(*thisImpl, *thisPort, *otherImpl, *otherPort)) {
 	  ocpiInfo("%s due to connectivity conflict", reject.c_str());
@@ -766,7 +831,7 @@ namespace OCPI {
         for (auto ci = m_assembly.m_connections.begin(); ci != m_assembly.m_connections.end(); ++ci) {
           const OU::Assembly::Connection &c = **ci;
           if (c.m_externals.size()) {
-            const OU::Assembly::External &e = c.m_externals.front();
+            const OU::Assembly::External &e = *c.m_externals.front().first;
             if (e.m_name.length() == len && !strncasecmp(assign, e.m_name.c_str(), len)) {
               assign = NULL;
               break;
@@ -794,12 +859,20 @@ namespace OCPI {
                             pName, m_assembly.instance(nInstance).name().c_str());
 #endif
         }
-        if (!aProps[p].m_hasValue)
-          continue;
-        checkPropertyValue(nInstance, impl.m_metadataImpl, aProps[p], pn, pv);
+        if (aProps[p].m_hasValue)
+	  checkPropertyValue(nInstance, impl.m_metadataImpl, aProps[p], pn, pv);
       }
     }
 
+#if 0
+    // Prepare instance properties for a possible deployment
+no since it is really worker specific. perhaps do it really earlier so it can be used where
+initial properties are checked against parameters?
+does the library database have anything interned per worker?
+so we need to check instance props against (late binding) for a *candidate*
+it is really per actual worker config...
+    prepareInstanceProperties(
+#endif
     void ApplicationI::
     finalizeProperties(const OU::PValue *params) {
       auto *d = &m_bestDeployments[0];
@@ -907,7 +980,7 @@ namespace OCPI {
       // External ports that are not connected explicitly to anything need to be associated
       // with the base container in this process, so we make sure we are using it.
       for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
-        if ((*ci).m_externals.size() && (*ci).m_externals.front().m_url.empty())
+        if ((*ci).m_externals.size() && (*ci).m_externals.front().first->m_url.empty())
           getUsedContainer(OC::Container::baseContainer().ordinal());
     }
 
@@ -928,12 +1001,19 @@ namespace OCPI {
         const char *newName = !strncasecmp(pName, "port", 4) ? pName + 4 : pName;
         // Override any port parameters that might have been set in XML
         // Override any same-named connection params
-        m_assembly.assyPort(instn, portn)->setParam(newName, value);
+	for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
+	  for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
+	    assert(!(*pi).m_name.empty());
+	    if ((*pi).m_instance == instn && !strcasecmp((*pi).m_name.c_str(), p->cname()))
+		(*pi).setParam(newName, value);
+	  }
+        // m_assembly.assyPort(instn, portn)->setParam(newName, value);
       }
       return NULL;
     }
     void ApplicationI::
     dumpDeployment(unsigned score) {
+      (void)score;
       ocpiDebug("Deployment with score %u is:", score);
       Instance *i = &m_instances[0];
       for (unsigned n = 0; n < m_nInstances; n++, i++) {
@@ -1072,6 +1152,11 @@ namespace OCPI {
                         i.m_feasibleContainers[m]);
               if (i.m_feasibleContainers[m] & (1u << cont) &&
                   bookingOk(m_bookings[cont], c, instNum)) {
+		// Bump the score if the optimized attribute of the worker (as compiled) matches the
+		// optimized attribute of the container.  Since we generally want workers that match what
+		// the container (and framework) is built for.
+		if (OC::Container::nthContainer(cont).m_optimized == c.impl->m_artifact.optimized())
+		  score++;
                 deployInstance(instNum, score + c.score, 1, &cont, &c.impl,
                                i.m_feasibleContainers[m]);
                 if (!c.impl->m_staticInstance)
@@ -1351,6 +1436,13 @@ namespace OCPI {
         m_bestDeployments[n].m_containers[0] = getUsedContainer(c->ordinal());
       }
     }
+
+    const char *ApplicationI::
+    timeDiff(OS::Time later, OS::Time earlier) {
+      OS::Time diff = later - earlier;
+      return OU::format(m_timeString, " [%u s %u ms]", diff.seconds(), diff.nanoseconds()/1000000);
+    }
+
     void ApplicationI::
     init(const PValue *params) {
       try {
@@ -1477,6 +1569,11 @@ namespace OCPI {
         clear();
         throw;
       }
+      m_constructed = OS::Time::now();
+      if (m_verbose)
+	fprintf(stderr,
+		"Application XML parsed and deployments (containers and artifacts) chosen%s\n",
+		timeDiff(m_constructed, m_earliest));
     }
 
     void ApplicationI::
@@ -1517,12 +1614,6 @@ namespace OCPI {
           lc.m_in.m_container != lc.m_out.m_container &&
           (!lc.m_in.m_container->portsInProcess() ||
            !lc.m_out.m_container->portsInProcess())) {
-        ocpiInfo("Negotiating connection from instance %s port %s to instance %s port %s "
-                 "(buffer size is %zu/0x%zx)",
-                 lc.m_out.m_member ? lc.m_out.m_member->m_name.c_str() : "<external>",
-                 lc.m_out.m_name,
-                 lc.m_in.m_member ? lc.m_in.m_member->m_name.c_str() : "<external>",
-                 lc.m_in.m_name, lc.m_bufferSize, lc.m_bufferSize);
         ocpiDebug("Input container: %s, output container: %s",
                   lc.m_in.m_container->name().c_str(), lc.m_out.m_container->name().c_str());
         OC::BasicPort::
@@ -1609,7 +1700,7 @@ namespace OCPI {
         OU::Assembly::External *e = NULL;
         const OU::PValue *eParams = NULL;
         if ((*ci).m_externals.size()) {
-          e = &(*ci).m_externals.front();
+          e = (*ci).m_externals.front().first;
           eParams = e->m_parameters;
           if (pIn)
             pOut = pIn;
@@ -1854,10 +1945,29 @@ namespace OCPI {
       }
 #endif
       m_launched = true;
-      if (m_verbose)
+      m_initialized = OS::Time::now();
+      if (m_verbose) {
+	if (m_launchConnections.size()) {
+#if 0
+	  fprintf(stderr, "Connections between containers:\n");
+	  OC::Launcher::Connection *lc = &m_launchConnections[0];
+	  for (unsigned n = 0; n < m_launchConnections.size(); n++, lc++)
+	    if (!lc->m_out.m_member || !lc->m_in.m_member ||
+		lc->m_out.m_member->m_container != lc->m_in.m_member->m_container)
+	      fprintf(stderr, "  From \"%s\" port \"%s\" (%zu buffers) to \"%s\" port \"%s\" "
+		      "(%zu buffers) with buffer size %zu, using transport \"%s\"\n",
+		      lc->m_out.m_member ? lc->m_out.m_member->m_name.c_str() : "<external>",
+		      lc->m_out.m_name, lc->m_out.m_port->nBuffers(),
+		      lc->m_in.m_member ? lc->m_in.m_member->m_name.c_str() : "<external>",
+		      lc->m_in.m_name, lc->m_in.m_port->nBuffers(), lc->m_bufferSize,
+		      lc->m_transport.transport.empty() ? "<none>" : lc->m_transport.transport.c_str());
+#endif
+	}
         fprintf(stderr,
-                "Application established: containers, workers, connections all created\n"
-                "Communication with the application established\n");
+                "Application established: containers, workers, connections all created%s\n",
+		timeDiff(m_initialized, m_constructed));
+      }
+      m_initialized = OS::Time::now();
     }
     static void addAttr(std::string &out, bool attr, const char *string, bool last = false) {
       if (attr)
@@ -1911,9 +2021,11 @@ namespace OCPI {
       ocpiInfo("Starting workers that are sources.");
       startMasterSlave(false, false, true);  // 1
       startMasterSlave(false, true, true);   // 3
+      m_started = OS::Time::now();
       // Note: this does not start masters that are sources.
       if (m_verbose)
-        fprintf(stderr, "Application started/running\n");
+        fprintf(stderr, "Application started/running%s\n", timeDiff(m_started, m_initialized));
+      m_started = OS::Time::now();
     };
     void ApplicationI::stop() {
       ocpiDebug("Stopping master workers that are not slaves.");
@@ -1998,21 +2110,15 @@ namespace OCPI {
     // Stuff to do after "done" (or perhaps timeout)
     void ApplicationI::finish() {
       const char *err;
-      Property *p = m_properties;
-      for (unsigned n = 0; n < m_nProperties; n++, p++)
-        if (p->m_dumpFile) {
-          std::string l_name, value;
-          m_launchMembers[m_bestDeployments[p->m_instance].m_firstMember].m_worker->
-            getProperty(p->m_property, l_name, value, NULL, m_hex);
-          value += '\n';
-          if ((err = OU::string2File(value, p->m_dumpFile)))
-            throw OU::Error("Error writing '%s' property to file: %s", l_name.c_str(), err);
-        }
-      if (m_dump)
-        dumpProperties(false, false, "final");
-      if (m_dumpPlatforms)
-        for (unsigned n = 0; n < m_nContainers; n++)
-          m_containers[n]->dump(false, m_hex);
+      // Dumping all properties into a file MUST BE DONE FIRST here because it is used by unit
+      // testing, and when workers are written with read-side-effects for properties, like
+      // peak_detect in tutorial, we want the correct values to be here in this properties file,
+      // sacrificing the correct values in the normal property dumps.
+      // This is not a great way to write workers anyway, but at least this way unit testing works.
+      // But for such workers the other two types of property dumps do not work when unit tested:
+      // 1. dump-property-value into a file
+      // 2. list all final property values
+      // Perhaps the better fix would be to tag such properties so we only list them once.
       if (m_dumpFile.size()) {
         std::string value, dump;
         PropertyAttributes attrs;
@@ -2030,6 +2136,21 @@ namespace OCPI {
         if ((err = OU::string2File(dump, m_dumpFile)))
           throw OU::Error("error when dumping properties to a file: %s", err);
       }
+      Property *p = m_properties;
+      for (unsigned n = 0; n < m_nProperties; n++, p++)
+        if (p->m_dumpFile) {
+          std::string l_name, value;
+          m_launchMembers[m_bestDeployments[p->m_instance].m_firstMember].m_worker->
+            getProperty(p->m_property, l_name, value, NULL, m_hex);
+          value += '\n';
+          if ((err = OU::string2File(value, p->m_dumpFile)))
+            throw OU::Error("Error writing '%s' property to file: %s", l_name.c_str(), err);
+        }
+      if (m_dump)
+        dumpProperties(false, false, "final");
+      if (m_dumpPlatforms)
+        for (unsigned n = 0; n < m_nContainers; n++)
+          m_containers[n]->dump(false, m_hex);
     }
 
     // Get an external port to use corresponding to an external port defined in the assembly.
@@ -2299,6 +2420,10 @@ namespace OCPI {
     }
     bool Application::
     wait(unsigned long timeout_us, bool timeOutIsError) {
+      return m_application.wait(timeout_us, timeOutIsError);
+    }
+    bool ApplicationI::
+    wait(unsigned long timeout_us, bool timeOutIsError) {
       // FIXME: Right now, delayed properties don't (AV-4901):
       // (a) respect duration/timeout
       // (b) don't get accounted for when delaying timeout_us
@@ -2307,7 +2432,7 @@ namespace OCPI {
         timeout_us ? new OS::Timer((uint32_t)(timeout_us/1000000),
                                    (uint32_t)((timeout_us%1000000) * 1000ull))
                    : NULL;
-      if (m_application.verbose()) {
+      if (m_verbose) {
         if (timeout_us) {
 	  if ((double)timeout_us/1.e6 > 1)
 	    fprintf(stderr, "Waiting for up to %g seconds for application to finish%s\n",
@@ -2315,8 +2440,9 @@ namespace OCPI {
         } else
           fprintf(stderr, "Waiting for application to finish (no time limit)\n");
       }
-      bool r = m_application.wait(timer);
+      bool r = wait(timer);
       delete timer;
+      m_finished = OS::Time::now();
       if (r) {
         if (timeOutIsError) {
           // in the other cases the caller is expected to stop the app and, under timeout
@@ -2326,11 +2452,13 @@ namespace OCPI {
           throw OU::Error("Application exceeded time limit of %g seconds",
                           (double)timeout_us/1.e6);
         }
-        if (m_application.verbose() && (double)timeout_us/1.e6 > 1)
-          fprintf(stderr, "Application is now considered finished after waiting %g seconds\n",
+        if (m_verbose && (double)timeout_us/1.e6 > 1)
+          fprintf(stderr, "Application is now considered finished after waiting %g seconds",
                   (double)timeout_us/1.e6);
-      } else if (m_application.verbose())
-            fprintf(stderr, "Application finished\n");
+      } else if (m_verbose)
+            fprintf(stderr, "Application finished");
+      if (m_verbose)
+	fprintf(stderr, "%s\n", timeDiff(m_finished, m_started));
       return r;
     }
 

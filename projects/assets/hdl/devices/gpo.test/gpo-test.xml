@@ -29,6 +29,7 @@
   </case>
 
   <!-- Testing controlling GPIO pins via port -->
+  <!--
   <case>
     <input port='in' script='generate.py'/>
     <output port='out' script='verify.py ../../golden.dat' disableBackpressure='true'/>
@@ -38,6 +39,6 @@
     <property name='mask_enable' value='0x02'/>
     <property name='NUM_OUTPUTS' value='16'/>
   </case>
-
+  -->
 
 </tests>

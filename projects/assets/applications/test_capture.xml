@@ -1,0 +1,4 @@
+<Application package='ocpi.core' done='capture_v2'>
+  <Instance Component='ocpi.assets.util_comps.test_source' connect='capture_v2'/>
+  <Instance Component='ocpi.assets.util_comps.capture_v2'/>
+</Application>

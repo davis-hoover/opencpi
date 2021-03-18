@@ -1,0 +1,12 @@
+<!-- This is the spec file (OCS) for: source
+     Add component spec attributes, like "protocol".
+     Add property elements for spec properties.
+     Add port elements for i/o ports -->
+<ComponentSpec>
+  <Property name='clockDivisor' initial='true' type='uchar' default='1'/>
+  <Property name="valuesToSend" initial="true" default='0'/>
+  <Property name='suppressWrites' initial='true' type='bool'/>
+  <Property name='countBeforeBackpressure' volatile='true'/>
+  <Property name='valuesSent' volatile='true'/>
+  <Port Name="out" Producer="true"/>
+</ComponentSpec>

@@ -9,9 +9,14 @@
 # This implies you need a development package to make the SD cards
 +<platform-dir>/gen/release-artifacts/* hdl/
 
-# sdk - just the libs, needed at runtime for ocpiremote, and for deployment
+# sdk - the libs, needed at runtime for ocpiremote, and for deployment
 =<platform-dir>/gen/sdk-artifacts/lib sdk/
+# sdk - bin at least for gdbserver
+=<platform-dir>/gen/sdk-artifacts/bin sdk/
 
 
 # Use the default zynq file unless overridden by hardware
 =platforms/zynq/zynq_system.xml system.xml
+@platforms/zynq/zynq_*setup.sh opencpi/
+@platforms/zynq/default_my*setup.sh opencpi/
+@platforms/zynq/zynq_setup*common.sh opencpi/

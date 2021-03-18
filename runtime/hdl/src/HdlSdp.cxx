@@ -45,7 +45,7 @@ namespace OCPI {
 	if (read) {
 	  set_xid(m_xid = s_xid);
 	  // FIXME: multithreaded control actions
-	  if (++s_xid == max_reads_outstanding)
+	  if (++s_xid == MAX_READS_OUTSTANDING)
 	    s_xid = 0;
 	} else
 	  set_xid(0);
@@ -76,10 +76,8 @@ namespace OCPI {
 	    ocpiDebug("SIM got %zu from fd %d", nread, fd);
 	  } else if (errno != EINTR)
 	    error = "error reading FIFO";
-	  else {
-	    (void)write(2, "\nSDP Read interrupted2\n", 23);
-	    //	    ocpiDebug("SDP Read interrupted");
-	  }
+	  else
+	    ocpiIgnore(write(2, "\nSDP Read interrupted2\n", 23));
 	} while (error.empty() && nRequested);
 	return !error.empty();
       }

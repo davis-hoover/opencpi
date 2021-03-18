@@ -61,6 +61,7 @@ WtiPort(const WtiPort &other, Worker &w , std::string &name, const char *&err)
 Port &WtiPort::
 clone(Worker &w, std::string &name, size_t a_count, OCPI::Util::Assembly::Role */*role*/,
       const char *&err) const {
+  (void)a_count;
   assert(a_count <= 1);
   return *new WtiPort(*this, w, name, err);
 }

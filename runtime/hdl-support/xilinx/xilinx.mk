@@ -119,7 +119,7 @@ OcpiXilinxSdkTry=$(strip\
 OcpiXilinxSdkDir=$(strip\
   $(foreach d,$(call OcpiXilinxDir,$1),\
     $(or $(call OcpiXilinxSdkTry,$d/SDK,ignore),$(call OcpiXilinxSdkTry,$d/Vitis,ignore),\
-       $($1 Could not find a Xilinx SDK in $d/SDK or $d/Vitis$(and $(OCPI_XILINX_VIVADO_SDK_VERSION), for $(OCPI_XILINX_VIVADO_SDK_VERSION))))))
+       $(eval $$($1 Could not find a Xilinx SDK in $d/SDK or $d/Vitis $(and $(OCPI_XILINX_VIVADO_SDK_VERSION), for version $(OCPI_XILINX_VIVADO_SDK_VERSION)))))))
 
 # Return the directory where Vivado lives, which as a default is usually /opt/Xilinx/Vivado
 OcpiXilinxTryVivadoDir=$(strip $(foreach t,$(or $(OCPI_XILINX_VIVADO_DIR),$(foreach x,$(call OcpiXilinxDir,$1),$x/Vivado)),$(infox TT is $t)\

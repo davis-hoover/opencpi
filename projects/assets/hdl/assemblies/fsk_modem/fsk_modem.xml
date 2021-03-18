@@ -23,8 +23,9 @@
     <Property Name="R" Value="16"/>
     <Property Name="ACC_WIDTH" Value="28"/>
   </Instance>
+  <Instance Worker="iqstream_to_cswm"/> 
 
-  <Connection Name="in_to_asm_tx_path" External="consumer">
+  <Connection Name="in_to_asm_tx_path0" External="consumer">
     <Port Instance="mfsk_mapper" Name="in"/>
   </Connection>
   <Connection>
@@ -43,17 +44,16 @@
     <Port Instance="phase_to_amp_cordic" Name="out"/>
     <Port Instance="cic_int" Name="in"/>
   </Connection>
-  <Connection Name="out_from_asm_tx_path_to_dac" External="producer">
+  <Connection>
     <Port Instance="cic_int" Name="out"/>
+    <Port Instance="iqstream_to_cswm" Name="in"/>
+  </Connection>
+  <Connection Name="out_from_asm_tx_path_to_dac" External="producer">
+    <Port Instance="iqstream_to_cswm" Name="out"/>
   </Connection>
 
 <!-- RX Chain Connections -->
-  <Instance Worker="dc_offset_filter">
-    <Property Name="PEAK_MONITOR_p" Value="true"/>
-  </Instance>
-  <Instance Worker="iq_imbalance_fixer">
-    <Property Name="PEAK_MONITOR_p" Value="true"/>
-  </Instance>
+  <Instance Worker="cswm_to_iqstream"/>
   <Instance Worker="complex_mixer">
     <Property Name="NCO_DATA_WIDTH_p" Value="12"/>
     <Property Name="INPUT_DATA_WIDTH_p" Value="12"/>
@@ -77,14 +77,10 @@
   </Instance>
 
   <Connection Name="in_to_asm_rx_path_from_adc" External="consumer">
-    <Port Instance="dc_offset_filter" Name="in"/>
+    <Port Instance="cswm_to_iqstream" Name="in"/>
   </Connection>
   <Connection>
-    <Port Instance="dc_offset_filter" Name="out"/>
-    <Port Instance="iq_imbalance_fixer" Name="in"/>
-  </Connection>
-  <Connection>
-    <Port Instance="iq_imbalance_fixer" Name="out"/>
+    <Port Instance="cswm_to_iqstream" Name="out"/>
     <Port Instance="complex_mixer" Name="in"/>
   </Connection>
   <Connection>
@@ -99,7 +95,7 @@
     <Port Instance="rp_cordic" Name="out"/>
     <Port Instance="rx_fir_real" Name="in"/>
   </Connection>
-  <Connection Name="out_from_asm_rx_path" External="producer">
+  <Connection Name="out_from_asm_rx_path0" External="producer">
     <Port Instance="rx_fir_real" Name="out"/>
   </Connection>
 

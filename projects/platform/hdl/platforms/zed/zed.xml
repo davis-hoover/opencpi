@@ -12,9 +12,12 @@
   <device worker='time_server'>
     <property name='frequency' value='100e6'/>
   </device>
-  <sdp name="zynq" master='true' count='4'/>
+  <specproperty name='sdp_width' value='2'/>
+  <property name='sdp_channels' parameter='true' default='4'/>
+  <property name='use_acp' parameter='true' type='bool' default='false'/>
+  <sdp name="zynq" master='true' count='sdp_channels'/>
   <property name='useGP1' type='bool' parameter='1' default='false'/>
-  <property name="axi_error" type="bool" arraylength='4' volatile='true'/>
+  <property name="axi_error" type="bool" arraylength='sdp_channels' volatile='true'/>
   <property name="sdpDropCount" type='uchar' volatile='true'/>
   <!-- The Zed FMC LPC slot.
        Unconnected LPC signals are:

@@ -17,6 +17,8 @@
       \hline
       v1.7 & Updated port/property/interface tables for accuracy. Package ID changed from ocpi.assets to ocpi.platform. & 06/2020 \\
       \hline
+      v2.1 & Updated Source Dependencies section for correct location of dependencies. Updated Worker Implementation Details section to talk about new properties. & 03/2021 \\
+      \hline
     \end{longtable}
   \end{table}
 \end{center}
@@ -39,7 +41,9 @@ The \comp{} worker provides functionality common to all DAC device types, includ
 	\item[2)] Normalize input data to bit width of device
 	\item[3)] Provide underrun indicator when rate of input data is less than DAC data rate
 \end{itemize}
-It is intended to be paired with a device specific worker which translates the \textbf{dev} interface to a device specific interface.
+It is intended to be paired with a device specific worker which translates the \textbf{dev} interface to a device specific interface. \\
+
+There is the samp\_count\_before\_first\_underrun property that gives the number of samples before the first sample underrun and the num\_underruns property that gives number of sample underruns. These properties should be checked at the end of an app run because they won't be stable until then. The worker doesn't use cdc crossing circuits for samp\_count\_before\_first\_underrun and num\_underruns because it takes advantage that samp\_count\_before\_first\_underrun and num\_underruns will have a stable value by the time the control plane reads those values at the end of an app run.
 \end{flushleft}
 
 %\section*{Worker Implementation Details}
@@ -82,16 +86,16 @@ It is intended to be paired with a device specific worker which translates the \
 %\subsection*{\comp.rcc}
 \subsection*{\comp.hdl}
 \begin{itemize}
-	\item assets/hdl/devices/\comp.hdl/\comp.vhd
+	\item platform/hdl/devices/\comp.hdl/\comp.vhd
 	\item core/hdl/primitives/cdc/cdc\_pkg.vhd
-	\item core/hdl/primitives/cdc/reset.vhd
 	\item core/hdl/primitives/cdc/fast\_pulse\_to\_slow\_sticky.vhd
-	\item core/hdl/primitives/cdc/single\_bit.vhd
-	\item assets/hdl/primitives/misc\_prims/misc\_prims\_pkg.vhd
-	\item assets/hdl/primitives/misc\_prims/misc\_prims\_body.vhd
-	\item assets/hdl/primitives/misc\_prims/dac\_underrun\_detector.vhd
-	\item assets/hdl/primitives/misc\_prims/data\_narrower.vhd
-	\item assets/hdl/primitives/misc\_prims/ocpi\_pkg.vhd
+	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_pkg.vhd
+	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_demarshaller.vhd
+	\item core/hdl/primitives/util/util\_pkg.vhd
+	\item core/hdl/primitives/util/in2out.v
+	\item platform/hdl/primitives/dac/dac\_pkg.vhd
+	\item platform/hdl/primitives/dac/underrun\_detector.vhd
+	\item platform/hdl/primitives/dac/data\_narrower.vhd	
 \end{itemize}
 
 \begin{landscape}

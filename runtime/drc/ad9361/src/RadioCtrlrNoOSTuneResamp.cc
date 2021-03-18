@@ -111,7 +111,7 @@ bool RadioCtrlrNoOSTuneResamp::do_min_data_stream_config_locks(
   throw_if_data_stream_lock_request_malformed(req);
 
   config_key_t key;
-  config_value_t val, tol;
+  config_value_t val = 0., tol;
   std::string value;
   unsigned which;
   if (ds_ID == TX1_id() || ds_ID == TX2_id()) {
@@ -495,26 +495,16 @@ Meas<gain_mode_value_t> RadioCtrlrNoOSTuneResamp::get_gain_mode(
 
   // assign to No-OS-specific "channel" macro (RX1/RX2/TX1/TX2 in ad9361_api.h)
   uint8_t ch;
-
   bool do_rx = false;
   if(data_stream_ID == RX2_id()) {
-    if(m_ad9361_rf_phy->pdata->rx2tx2) {
-      ch = RX1;
-    }
-    else {
-      ch = (m_AD9361_InitParam.one_rx_one_tx_mode_use_rx_num == 1) ? RX1 : RX2;
-    }
+    ch = RX1;
     do_rx = true;
   }
   else if(data_stream_ID == RX1_id()) {
-    if(m_ad9361_rf_phy->pdata->rx2tx2) {
-      ch = RX2;
-    }
-    else {
-      ch = (m_AD9361_InitParam.one_rx_one_tx_mode_use_rx_num == 2) ? RX1 : RX2;
-    }
+    ch = m_ad9361_rf_phy->pdata->rx2tx2 ? RX2 : RX1;
     do_rx = true;
-  }
+  } 
+  
   if(do_rx) {
 
     uint8_t gc_mode;
@@ -648,6 +638,10 @@ Meas<config_value_t> RadioCtrlrNoOSTuneResamp::get_gain_dB(
     throw oss.str().c_str();
   }
   return meas;
+}
+
+bool RadioCtrlrNoOSTuneResamp::shutdown() {
+  return ad9361_set_en_state_machine_mode(_ad9361_rf_phy, ENSM_MODE_ALERT);
 }
 
 RadioCtrlrNoOSTuneResamp::~RadioCtrlrNoOSTuneResamp() {

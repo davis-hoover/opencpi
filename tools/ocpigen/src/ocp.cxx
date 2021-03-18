@@ -185,9 +185,9 @@ emitInterfaceConstants(FILE *f, Language lang) {
   if (ocp.MAddr.value)
     emitConstant(f, "ocpi_port_%s_MAddr_width", lang, ocp.MAddr.width);
   //  if (ocp.MData.value) - need this width even for zero width
-    emitConstant(f, "ocpi_port_%s_MData_width", lang, ocp.MData.width);
-    //  if (ocp.MByteEn.value) - need this width even for zero width
-    emitConstant(f, "ocpi_port_%s_MByteEn_width", lang, ocp.MByteEn.width);
+  emitConstant(f, "ocpi_port_%s_MData_width", lang, ocp.MData.width);
+  //  if (ocp.MByteEn.value) - need this width even for zero width
+  emitConstant(f, "ocpi_port_%s_MByteEn_width", lang, ocp.MByteEn.width);
   if (ocp.MDataInfo.value)
     emitConstant(f, "ocpi_port_%s_MDataInfo_width", lang, ocp.MDataInfo.width);
 }
@@ -785,7 +785,7 @@ connectOcpSignal(OcpSignalDesc &osd, OcpSignal &os, const OcpAdapt *oa, std::str
   Connection &c = ip.m_attachments.front()->m_connection;
   assert(c.m_attachments.size() == 2);
   InstancePort *otherIp = NULL;
-  Attachment *at;
+  Attachment *at = NULL; // for compiler warning
   for (AttachmentsIter ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++)
     if ((*ai)->m_instPort.m_port != this) {
       at = *ai;

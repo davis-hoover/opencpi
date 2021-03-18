@@ -42,10 +42,11 @@ function do_stop() {
 # We'll write a file here in case someone also wants to do env setup
 cat >setup.sh <<'EOF'
 export OCPI_CDK_DIR=`pwd`
+export OCPI_ROOT_DIR=`pwd`
 export OCPI_TOOL_PLATFORM=$(cat swplatform)
 export OCPI_TOOL_OS=linux
 export OCPI_TOOL_DIR=$OCPI_TOOL_PLATFORM
-PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$PATH
+PATH=$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/bin:$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/sdk/bin:$PATH
 export OCPI_SYSTEM_CONFIG=$OCPI_CDK_DIR/system.xml
 export LD_LIBRARY_PATH=$OCPI_TOOL_PLATFORM/sdk/lib
 EOF
@@ -55,7 +56,7 @@ platform=$OCPI_TOOL_PLATFORM
 echo Executing remote configuration command: $* 
 action=$1; shift
 
-while getopts u:l:w:a:p:s:d:o:P:BVh o
+while getopts u:l:w:a:p:s:d:o:P:m:e:BVh o
 do 
   case "$o" in 
     u) user=$OPTARG ;;
@@ -70,6 +71,8 @@ do
     P) platform=$OPTARG ;;
     B) bs=-B ;;
     V) vg=-V ;;
+    m) memarg="-m $OPTARG"; mem=$OPTARG ;;
+    e) envarg=$OPTARG ;;
   esac 
 done
 case $action in
@@ -80,8 +83,9 @@ start)
   fi
   set -e
   ocpidriver unload >&2 || : # in case it was loaded from a different version
-  ocpidriver load >&2
-
+  echo "Reloading kernel driver: $mem"
+  ocpidriver $memarg load >&2
+  [ -n "$mem" ] && envarg="$envarg OCPI_SMB_SIZE=$mem"
   if [ -n "$bs" ]; then
     echo "Loading opencpi bitstream"
     HDL_PLATFORM=$(cat hwplatform)
@@ -102,18 +106,24 @@ start)
   echo PATH=$PATH >&2
   echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH >&2
   echo VALGRIND_LIB=$VALGRIND_LIB >&2
-  echo nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
-  nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
+  echo $envarg nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) \> $log >&2
+  eval $envarg exec nohup ${vg:+valgrind --leak-check=full} ocpiserve -v $logopt -p $(cat port) >$log 2>&1 &
+  rc=$?
   pid=$!
   sleep 1
-  if kill -s CONT $pid; then
-    echo ocpiserve running with pid: $pid >&2
+  if [ $rc != 0 ]; then
+    echo "Failed to start the server (ocpiserve).  Exit status was $rc and log was:" >&2
+    cat $log >&2
+    echo "--- end of server startup log failure above" >&2
+  elif kill -s CONT $pid > /dev/null; then
     echo $pid >ocpiserve.pid
-    head $log
+    echo "Server (ocpiserve) started with pid: $pid.  Initial log is:" >&2
+    head $log >&2
+    echo "--- end of server startup log success above" >&2
   else
-    wait $pid
-    echo Could not start ocpiserve: exit status $?, here is the last 10 lines of the log: >&2
-    tail -10 $log >&2
+    echo "Server (ocpiserve) started (pid $pid) but then failed: its startup log is:" >&2
+    cat $log >&2
+    echo "--- end of server startup log failure above" >&2
     exit 1
   fi
   ;;

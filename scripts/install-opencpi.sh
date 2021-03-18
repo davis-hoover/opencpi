@@ -88,14 +88,14 @@ rm -r -f "${OCPI_TARGET_PLATFORM_DIR:?}/lib"
 
 # We assume that install-packages.sh and install-prerequisites.sh do NOT depend on the platform's exports
 ./build/install-packages.sh "$OCPI_TARGET_PLATFORM"
-./build/install-prerequisites.sh "$OCPI_TARGET_PLATFORM"
+./build/install-prerequisites.sh "$OCPI_TARGET_DIR"
 
 # Build framework and built-in projects for target platform
-eval $* ./build/build-opencpi.sh "$OCPI_TARGET_PLATFORM"
+eval $* ./build/build-opencpi.sh "$OCPI_TARGET_DIR"
 
 # Run RCC unit tests
 if [ -n "$OCPI_TARGET_PLATFORM" -a "$OCPI_TOOL_PLATFORM" != "$OCPI_TARGET_PLATFORM" ]; then
-  echo "When building/installing for cross-compiled platform $OCPI_TARGET_PLATFORM, we are skipping tests."
+  echo "When building/installing for cross-compiled platform $OCPI_TARGET_DIR, we are skipping tests."
 else
   eval $* ./scripts/test-opencpi.sh --no-hdl
 fi

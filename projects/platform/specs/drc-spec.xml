@@ -34,6 +34,12 @@
   <Property Name="MAX_CHANNELS_p" Type="uchar" Parameter="true" Default="2"
             Description="Total number of channels supported at one time.
 			 Maximum number of channels in a radio configuration."/>
+  <Property Name="MAX_RX_CHANNELS_p" Type="uchar" Parameter="true" Default="1"
+            Description="Total number of RX channels supported at one time.
+			 Maximum number of RX channels connected to application."/>
+  <Property Name="MAX_TX_CHANNELS_p" Type="uchar" Parameter="true" Default="1"
+            Description="Total number of TX channels supported at one time.
+			 Maximum number of TX channels connected to application."/>
   <Property Name="MAX_RX_RF_PORTS_p" Type="uchar" Parameter="true" Default="1"
 	    Description="Number of RF Ports that can receive"/>
   <Property Name="MAX_TX_RF_PORTS_p" Type="uchar" Parameter="true" Default="1"
@@ -211,7 +217,7 @@
     </Member>
   </property>
 
-  <port name='rx' count='MAX_CHANNELS_p' producer='1' optional='1'/>
-  <port name='tx' count='MAX_CHANNELS_p' producer='0' optional='1'/>
+  <port name='rx' count='MAX_RX_CHANNELS_p' producer='1' optional='1'/>
+  <port name='tx' count='MAX_TX_CHANNELS_p' producer='0' optional='1'/>
 
 </ComponentSpec>

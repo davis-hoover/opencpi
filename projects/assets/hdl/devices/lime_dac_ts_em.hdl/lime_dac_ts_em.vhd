@@ -36,47 +36,65 @@ architecture rtl of lime_dac_ts_em_worker is
   signal eom_zlm         : std_logic;
   signal valid_zlm       : std_logic;
   signal give_zlm        : std_logic;
-
-  -- Procedure for clock generation
-  procedure clk_gen (signal clk : out std_logic; constant FREQ : real; signal abort : in std_logic) is
-    constant PERIOD    : time := 1 sec / FREQ;        -- Full period
-    constant HIGH_TIME : time := PERIOD / 2;          -- High time
-    constant LOW_TIME  : time := PERIOD - HIGH_TIME;  -- Low time; always >= HIGH_TIME
-  begin
-    -- Check the arguments
-    assert (HIGH_TIME /= 0 fs) report "clk_gen: High time is zero; time resolution too large for frequency" severity FAILURE;
-    assert FALSE report "TX_CLK_IN freq = " & real'image(FREQ) severity NOTE;
-    -- Time resolution show
-    assert FALSE report "Time resolution: " & time'image(time'succ(0 fs)) severity NOTE;
-    -- Generate a clock cycle
-    loop
-      if abort = '1' then return; end if;
-      clk <= '1';
-      wait for HIGH_TIME;
-      clk <= '0';
-      wait for LOW_TIME;
-    end loop;
-  end procedure;
+  signal clk_count_r     : ushort_t;
+  signal divided_clk     : std_logic;
+  -- -- Procedure for clock generation
+  -- procedure clk_gen (signal clk : out std_logic; constant FREQ : real; signal abort : in std_logic) is
+  --   constant PERIOD    : time := 1 sec / FREQ;        -- Full period
+  --   constant HIGH_TIME : time := PERIOD / 2;          -- High time
+  --   constant LOW_TIME  : time := PERIOD - HIGH_TIME;  -- Low time; always >= HIGH_TIME
+  -- begin
+  --   -- Check the arguments
+  --   assert (HIGH_TIME /= 0 fs) report "clk_gen: High time is zero; time resolution too large for frequency" severity FAILURE;
+  --   assert FALSE report "TX_CLK_IN freq = " & real'image(FREQ) severity NOTE;
+  --   -- Time resolution show
+  --   assert FALSE report "Time resolution: " & time'image(time'succ(0 fs)) severity NOTE;
+  --   -- Generate a clock cycle
+  --   loop
+  --     if abort = '1' then return; end if;
+  --     clk <= '1';
+  --     wait for HIGH_TIME;
+  --     clk <= '0';
+  --     wait for LOW_TIME;
+  --   end loop;
+  -- end procedure;
 
 begin
 
   -----------------------------------------------------------------------------
-  -- Generate TX clock
-  -- The TX_CLK_IN starts out at the default frequency, and is then updated each
-  -- time the tx_clk_rate property is written.
-  tx_clk_gen : process
+  -- -- Generate TX clock
+  -- -- The TX_CLK_IN starts out at the default frequency, and is then updated each
+  -- -- time the tx_clk_rate property is written.
+  -- tx_clk_gen : process
+  -- begin
+  --   TX_CLK_IN <= '0';
+  --   wait until ctl_in.state = INITIALIZED_e;
+  --   clk_gen(TX_CLK_IN, real(to_integer(props_in.tx_clk_rate)), props_in.tx_clk_rate_written);
+  --   loop
+  --     if props_in.tx_clk_rate_written = '1' then
+  --       wait until props_in.tx_clk_rate_written = '0';
+  --       clk_gen(TX_CLK_IN, real(to_integer(props_in.tx_clk_rate)), props_in.tx_clk_rate_written);
+  --     end if;
+  --   end loop;
+  -- end process tx_clk_gen;
+  TX_CLK_IN <= not ctl_in.clk when props_in.divisor <= 1 else divided_clk;
+  tx_clk_gen : process(ctl_in.clk)
   begin
-    TX_CLK_IN <= '0';
-    wait until ctl_in.state = INITIALIZED_e;
-    clk_gen(TX_CLK_IN, real(to_integer(props_in.tx_clk_rate)), props_in.tx_clk_rate_written);
-    loop
-      if props_in.tx_clk_rate_written = '1' then
-        wait until props_in.tx_clk_rate_written = '0';
-        clk_gen(TX_CLK_IN, real(to_integer(props_in.tx_clk_rate)), props_in.tx_clk_rate_written);
+    if rising_edge(ctl_in.clk) then
+      if its(ctl_in.reset) then
+        clk_count_r <= (others => '0');
+        divided_clk <= '0';
+      elsif clk_count_r = props_in.divisor then
+        divided_clk <= '0';
+        clk_count_r <= (others => '0');
+      else
+        if clk_count_r = props_in.divisor srl 1 then
+          divided_clk <= '1';
+          end if;
+        clk_count_r <= clk_count_r + 1;
       end if;
-    end loop;
-  end process tx_clk_gen;
-
+    end if;
+  end process;
   -- this process delays TX_EN by 1 full I/Q period to align with data created
   -- in the following process
   process(TX_CLK)

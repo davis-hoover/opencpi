@@ -43,7 +43,7 @@ namespace OCPI {
       : //m_ourUID(mkUID()),
       OCPI::Time::Emit("Container", a_name ),
       m_enabled(false), m_ownThread(true), m_verbose(false), m_thread(NULL),
-      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportGlobal(params), false, this))
+      m_transport(*new OCPI::DataTransport::Transport(&Manager::getTransportManager(params), false, this))
     {
       OU::findBool(params, "verbose", m_verbose);
       OU::SelfAutoMutex guard (this);
@@ -65,7 +65,7 @@ namespace OCPI {
       OU::findBool(params, "ownthread", m_ownThread);
       if (getenv("OCPI_NO_THREADS"))
 	m_ownThread = false;
-      m_os = OCPI_CPP_STRINGIFY(OCPI_OS) + strlen("OCPI");
+      m_os = &OCPI_CPP_STRINGIFY(OCPI_OS)[strlen("OCPI")];
       m_osVersion = OCPI_CPP_STRINGIFY(OCPI_OS_VERSION);
       m_platform = OCPI_CPP_STRINGIFY(OCPI_PLATFORM);
       m_arch = OCPI_CPP_STRINGIFY(OCPI_ARCH);
@@ -156,6 +156,8 @@ namespace OCPI {
 	this->unlock();
 	// Allow the container's thread to recognize being disabled
 	m_thread->join();
+	delete m_thread;
+	m_thread = NULL;
 	this->lock();
       }
     }
@@ -169,28 +171,11 @@ namespace OCPI {
       delete &m_transport;
     }
 
-#if 0
-    //    bool m_start;
-
-    void Container::start(DataTransfer::EventManager* event_manager)
-      throw()
-    {
-      (void)event_manager;
-      start();
-      m_enabled = true;
-    }
-
-    void Container::stop(DataTransfer::EventManager* event_manager)
-      throw()
-    {
-      (void)event_manager;
-      m_enabled = false;
-    }
-#endif
     Container::DispatchRetCode Container::dispatch(DataTransfer::EventManager*)
     {
       return Container::DispatchNoMore;
     }
+#if 0
     bool Container::run(uint32_t usecs) {
       if (m_ownThread)
 	throw OU::EmbeddedException( OU::CONTAINER_HAS_OWN_THREAD,
@@ -198,7 +183,7 @@ namespace OCPI {
 				     OU::ApplicationRecoverable);
       return runInternal(usecs);
     }
-
+#endif
     bool Container::runInternal(uint32_t usecs) {
       if (!m_enabled)
 	return false;
@@ -234,7 +219,7 @@ namespace OCPI {
 	    em->waitForEvent(usecs) == DataTransfer::EventTimeout && m_verbose)
 	  ocpiBad("Timeout after %u usecs waiting for event", usecs);
 	// if there is no application on this container, use less CPU
-	OCPI::OS::sleep(firstApplication() ? 0 : 100);
+	OCPI::OS::sleep(firstApplication() || m_bridgedPorts.size() ? 0 : 100);
       }
       return true;
     }
@@ -277,6 +262,7 @@ namespace OCPI {
       }
     }
     void Container::start() {
+      OCPI_EMIT_HERE_;
       Container &base = baseContainer();
       if (this != &base && base.m_bridgedPorts.size())
 	base.start();
@@ -284,7 +270,7 @@ namespace OCPI {
 	if (this != &base && base.m_bridgedPorts.size())
 	  base.start();
 	m_enabled = true;
-	ocpiDebug("Starting container %s(%u): %p", name().c_str(), m_ordinal, this);
+	ocpiInfo("Starting container %s(%u): %p", name().c_str(), m_ordinal, this);
 	if (!m_thread && m_ownThread && needThread()) {
 	  m_thread = new OCPI::OS::ThreadManager;
 	  m_thread->start(runContainer, (void*)this);

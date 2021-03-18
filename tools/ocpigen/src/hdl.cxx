@@ -214,7 +214,7 @@ parseHdlImpl(const char *a_package) {
   for (auto ci = m_clocks.begin(); ci != m_clocks.end(); ci++) {
     Clock *c = *ci;
     if (!c->m_port && c->m_signal.empty())
-      c->m_signal = c->m_name;
+      c->m_exportedSignal = c->m_signal = c->m_name;
   }
   if (emulate) {
     //    addWciClockReset();
@@ -293,7 +293,7 @@ parseDirection(const char *direction, std::string *expr, OCPI::Util::IdentResolv
     for (const char **ap = directions; *ap; ap++)
       OU::formatAdd(enums, "%s%s", enums.empty() ? "" : ",", *ap);
     char *xml;
-    asprintf(&xml, "<member type='enum' enums='%s'/>", enums.c_str());
+    ocpiIgnore(asprintf(&xml, "<member type='enum' enums='%s'/>", enums.c_str()));
     ezxml_t tx;
     ocpiCheck(!OE::ezxml_parse_str(xml, 0, tx));
     ocpiCheck(!dirType.parse(tx, false, false, NULL, "direction", 0, NULL));
