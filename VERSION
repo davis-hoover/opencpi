@@ -29,7 +29,7 @@ OCPI_VERSION_PATCH=0
 # Will always be special value of 'develop' for the develop branch
 # For a pre-release, should be beta.1, beta.2 (etc.) or rc.1, rc.2 (etc.)
 # Set to nothing when a release is finalized
-OCPI_VERSION_EXTRA=rc.2
+OCPI_VERSION_EXTRA=
 
 # Convenience vars for common representations of the version string
 OCPI_VERSION="${OCPI_VERSION_MAJOR}.${OCPI_VERSION_MINOR}.${OCPI_VERSION_PATCH}"

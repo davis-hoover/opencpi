@@ -1,3 +1,28 @@
+# [v2.1.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-rc.2...v2.1.0) (2021-03-17)
+
+Changes/additions since [OpenCPI Release v2.1.0-rc.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-rc.2)
+
+### Enhancements
+- **comp,hdl base**: add properties to the data_sink_qdac device worker for number of samples before the first underrun and number of underruns. (!510)(2238c355)
+- **doc**: rename `Acronyms and Definitions` to `OpenCPI Glossary`, update, and append to reference documents. (!508)(07aeb463)
+- **hdl base**: replace bsv primitive with a reset compatible with xilinx2020.1. (!486)(cccad883)
+- **hdl base**: allow timestamper_scdcd to insert sampling intervals. (!506)(c1a3059d)
+- **tools**: add optimization options to ocpiremote, and make its options consistent with ocpidev and others. (!505)(6c9e8bc6)
+
+### Bug Fixes
+- **comp,hdl base**: fix extra cycles for dev_out.valid signal when data valid goes low. (!510)(2238c355)
+- **devops**: fix `build-pages.py` to handle OSP default branch that isn't `develop`. (!501)(aa1199e0)
+- **devops,tests**: disable `gpi.test` until proper fix implemented. (!503)(8e4af08d)
+- **hdl base**: change timestamper_scdcd and associated protocol marshaller to avoid idle cycles in output. (!506)(c1a3059d)
+- **hdl base**: set HDL device timeservice with system time when GPS time is not available. (!506)(c1a3059d)
+- **hdl base,runtime**: fix bug in `HdlDevice.cxx` that set `enable_time_now_updates_from_PPS_written` to `true` when not even using PPS. (!502)(da2a10a4)
+- **runtime**: disable compilation of event tracing. (!505)(6c9e8bc6)
+- **runtime,tools**: clean up compilation warnings that are errors in centos7 under optimization only. (!513)(bc347d5d)
+
+### Miscellaneous
+- **doc**: remove obsolete `Acronyms and Definitions` document. (!512)(63c1c7ac)
+- **osp**: hdl configuration file update. (!500)(55823787)
+
 # [v2.1.0-rc.2](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-rc.1...v2.1.0-rc.2) (2021-03-04)
 
 Changes/additions since [OpenCPI Release v2.1.0-rc.1](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-rc.1)
