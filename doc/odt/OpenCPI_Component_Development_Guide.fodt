@@ -11184,7 +11184,7 @@
    <text:p text:style-name="P1105">OpenCPI<text:line-break/>Component Develop<text:span text:style-name="T10">ment</text:span> Guide</text:p>
    <text:section text:style-name="Sect1" text:name="Section1" text:protected="true">
     <text:section-source xlink:href="shared/release.fodt"/>
-    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release: develop</text:p>
+    <text:p text:style-name="ReleaseSubtitle">OpenCPI Release:  develop</text:p>
    </text:section>
    <text:p text:style-name="P244">Revision History</text:p>
    <table:table table:name="Table1" table:style-name="Table1">

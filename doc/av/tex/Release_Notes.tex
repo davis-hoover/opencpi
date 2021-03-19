@@ -194,7 +194,10 @@ higher throughput and no idle cycles when producing continuous 32 bit data.\\
 
 With the exception of zynq ultra, zynq platforms now have the option of using cache coherent DMA.\\
 
-Options may now be specified to build both the framework itself and software assets (RCC workers, ACI programs) with compiler optimizations, alongside the existing default build for best debugging.  I.e., both the default debug builds as well as the optimized builds coexist in the source tree installation, and both can be built and used.  The ``\code{--optimize}'' option applies to the \code{opencpi-setup.sh} script (to use the optimized framework build) as well as the \code{ocpiadmin install platform} and the \code{ocpidev build} commands (to perform an optimized build).  An alternative way to enable building with optimization is to use a ``\code{-o}'' suffix at the end of software platform names: the idea is that anywhere in the CLI you have a software platform, you can qualify it with build options and it creates a ``pseudo platform'' with the specified option, which does not interfere with the default platform (without the suffix).  This applies to \code{ocpiadmin install platform}, \code{ocpidev build --rcc-platform}, and \code{ocpiremote load --sw\_platform}.  When running applications with RCC workers, when both debug and optimized RCC workers are built (i.e. both artifacts are available in \code{OCPI\_LIBRARY\_PATH}), preference is given to the worker whose optimization setting matches the optimization setting of the container in which it is executing.
+Options may now be specified to build both the framework itself and software assets (RCC workers, ACI programs) with compiler optimizations, alongside the existing default build for best debugging.  I.e., both the default debug builds as well as the optimized builds coexist in the source tree installation, and both can be built and used.  The ``\code{--optimize}'' option applies to the \code{opencpi-setup.sh} script (to use the optimized framework build) as well as the \code{ocpiadmin install platform} and the \code{ocpidev build} commands (to perform an optimized build).  An alternative way to enable building with optimization is to use a ``\code{-o}'' suffix at the end of software platform names: the idea is that anywhere in the CLI you have a software platform, you can qualify it with build options and it creates a ``pseudo platform'' with the specified option, which does not interfere with the default platform (without the suffix).  This applies to \code{ocpiadmin install platform}, \code{ocpidev build --rcc-platform}, and \code{ocpiremote load --rcc-platform}.  When running applications with RCC workers, when both debug and optimized RCC workers are built (i.e. both artifacts are available in \code{OCPI\_LIBRARY\_PATH}), preference is given to the worker whose optimization setting matches the optimization setting of the container in which it is executing.\\
+
+\code{ocpiremote} supports the ``\code{--optimize|--optimized}'' option to specify that the optimized RCC platform build products should be used.
+
 
 \subsection{OCPI\_ROOT\_DIR Environment Variable}
 \label{sec:21_rootdir}
@@ -204,11 +207,25 @@ Files in scripts/programs may now be referenced relative to the OpenCPI ``root''
 \label{sec:21_e3xx}
 The \code{e31x} platform project is now based on \code{xilinx19\_2\_aarch32} instead of \code{xilinx13\_4}.
 
+\subsection{\code{timestamper\_scdcd-spec.xml} Properties}
+\label{sec:21_tsprop}
+The \code{timestamper\_scdcd} spec file properties now include ``\code{samples\_per\_timestamp}'' (replaces ``\code{min\_num\_samples\_per\_timestamp}'') and ``\code{sampling\_interval}''.
+
 \section{Changes and Notes}
 
 \subsection{\code{ocpigen}}
 \label{sec:21_ocpigen}
 64-bit initial values for 64-bit HDL worker parameters are now handled correctly.
+
+\subsection{\code{ocpiremote} Option Standardization}
+\label{sec:21_ocpiremote}
+The \code{ocpiremote} command options have been updated to match those used in other commands.  Specifically, \code{ocpiremote} now understands ``\code{--rcc-platform}'', ``\code{--hdl-platform}'', and ``\code{--verbose}''.  While ``\code{--sw\_platform}'' and ``\code{--hw\_platform}'' are still allowed, these options are now deprecated.
+
+\subsection{\code{platform\_pkg} Updates}
+\label{sec:21_platpkg}
+The ``\code{usingPPS}'' signal was added to the \code{time\_base\_out\_t} record in \code{projects/core/hdl/primitives/platform/platform\_pkg.vhd}.  Platform workers need to drive this signal either high or low depending on their configurations and whether a PPS is being used.\\
+
+The ``\code{time\_base\_out\_t.reset}'', ``\code{time\_base\_out\_t.ppsIn}'', ``\code{time\_base\_in\_t.ppsOut}'', and ``\code{time\_service\_t.reset}'' signals have been deprecated and should no longer be used.  Platform workers should no longer drive ``\code{timebase\_out.reset}'', ``\code{timebase\_out.ppsIn}'', or ``\code{timebase\_in.ppsOut}''.
 
 \section{Major Known Deficiencies}
 \label{sec:21_bugs}
