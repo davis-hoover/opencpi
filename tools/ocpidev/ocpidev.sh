@@ -1735,13 +1735,13 @@ EOF
 <HdlCore
 	${liblibs:+Libraries='${liblibs[@]}'}
 	${module:+Top='${module[@]}'}
-	$prebuilt:+PreBuiltCore='${prebuilt[@]}'}
-	$others:+SourceFiles='${others[@]}'}
-	$cores:+Cores='${cores[@]}'}
-	$targets:+OnlyTargets='${targets[@]}'}
-	$extargets:+ExcludeTargets='${extargets[@]}'}
-	$onlyplats:+OnlyPlatforms='${onlyplats[@]}'}
-	$explats:+ExcludePlatforms='${explats[@]}'}
+	${prebuilt:+PreBuiltCore='${prebuilt[@]}'}
+	${others:+SourceFiles='${others[@]}'}
+	${cores:+Cores='${cores[@]}'}
+	${targets:+OnlyTargets='${targets[@]}'}
+	${extargets:+ExcludeTargets='${extargets[@]}'}
+	${onlyplats:+OnlyPlatforms='${onlyplats[@]}'}
+	${explats:+ExcludePlatforms='${explats[@]}'}
 />
 EOF
   fi
