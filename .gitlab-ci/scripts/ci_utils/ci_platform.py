@@ -36,6 +36,8 @@ class Platform():
             if 'deploy' in config:
                 self.do_deploy = config['deploy']
 
+        self.project.platforms.append(self)
+
 
 def discover_platforms(projects, whitelist=None, config=None):
     """Discovers opencpi platforms in passed Project(s)

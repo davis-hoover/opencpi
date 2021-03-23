@@ -66,6 +66,11 @@ class Directive():
                 filtered_projects.append(project)
             elif project.name in self.dict:
                 filtered_projects.append(project)
+            else:
+                for platform in project.platforms:
+                    if platform.name in self.dict:
+                        filtered_projects.append(platform.project)
+                        break
         
         return filtered_projects
 

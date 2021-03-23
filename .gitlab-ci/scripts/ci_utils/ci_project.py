@@ -14,6 +14,7 @@ class Project():
         self.url = url
         self.id = project_id
         self.group = group
+        self.platforms = []
         self.assets = assets or ci_asset.discover_assets(
             self.path, whitelist=['primitives', 'cards', 'devices', 'adapters', 
                                   'assemblies', 'components', 'platforms'])
