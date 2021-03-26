@@ -8,8 +8,9 @@
 
     <Property Name="numMessagesMax" Parameter="true" Type="uLong" Default="5" Description="Max number of messages to send."/>
 
-    <Property Name="messagesToSend" Type="uLong" Volatile="true" Initial="true" Default="5" Description="Counter of messages to send. This value must be
-    less than or equal to numMessagesMax. Decrements as they are sent."/>
+   <Property Name="messagesToSend" Type="uLong" Volatile="true" Initial="true" Default="5" Description="Counter of messages to send and decrements as they are sent. When dataRepeat is true, 
+    messagesToSend > numMessagesMax, and at the end of the messages buffer, the buffer wraps around and starts at the beginning of the messages buffer. When dataRepeat is false, 
+    this value must be less than or equal to numMessagesMax."/>
 
     <Property Name="messagesSent" Type="uLong" Volatile="true" Description="Messages sent counter. Initialized to 0."/>
 
