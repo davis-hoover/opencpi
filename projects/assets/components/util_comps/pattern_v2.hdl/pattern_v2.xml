@@ -1,7 +1,9 @@
-<HdlWorker language='vhdl' spec='pattern_v2-spec' version='2'>
+<HdlWorker language='vhdl' spec='pattern_v2-spec' version='2'
+sourcefiles='pattern_implementation.vhd'>
+
   <SpecProperty Name="messages" Raw="true"/>
   <SpecProperty Name="data" Raw="true"/>
   <StreamInterface Name="out"
                  DataWidth="32" NumberOfOpcodes="256" DataValueWidth="8"
-                 ZeroLengthMessages="true"/>
+                 ZeroLengthMessages="true" clockDirection="in"/>
 </HdlWorker>
