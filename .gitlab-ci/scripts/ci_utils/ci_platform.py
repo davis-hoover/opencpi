@@ -24,15 +24,19 @@ class Platform():
         self.ip = None
         self.user = None
         self.password = None 
-        self.do_deploy = None
+        self.do_deploy = True
 
         if config:
-            attributes = ['ip', 'port', 'user', 'password', 'do_deploy']
+            attributes = ['ip', 'port', 'user', 'password']
             for attribute in attributes:
                 try:
                     self.__dict__[attribute] = config[attribute]
                 except:
                     self.__dict__[attribute] = None
+            if 'deploy' in config:
+                self.do_deploy = config['deploy']
+
+        self.project.platforms.append(self)
 
 
 def discover_platforms(projects, whitelist=None, config=None):

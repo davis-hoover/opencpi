@@ -902,30 +902,23 @@ function make_library {
 # To limit the tests that actually get built/run, set the Tests= variable
 
 # Any variable definitions that should apply for each individual worker/test
-# in this library belong in Library.mk
+# in this library belong in Library.xml
 
 include \$(OCPI_CDK_DIR)/include/library.mk
 EOF
 
-  cat <<EOF > $2/Library.mk
-# This is the $1 library
-
-# This makefile contains variable definitions that will apply when building each
-# individual worker and test in the library
-
-# Package identifier is used in a hierarchical fashion from Project to Libraries....
-# The PackageName, PackagePrefix and Package variables can optionally be set here:
-# PackageName defaults to the name of the directory
-# PackagePrefix defaults to package of parent (project)
-# Package defaults to PackagePrefix.PackageName
-${packagename:+PackageName=$packagename}
-${packageprefix:+PackagePrefix=$packageprefix}
-${package:+Package=$package}
-${liblibs:+Libraries=${liblibs[@]}}
-${complibs:+ComponentLibraries=${complibs[@]}}
-${includes:+IncludeDirs=${includes[@]}}
-${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}
+  cat <<EOF > $2/`basename $2`.xml
+<library
+	${packagename:+PackageName='$packagename'}
+	${packageprefix:+PackagePrefix='$packageprefix'}
+	${package:+Package='$package'}
+	${liblibs:+Libraries='${liblibs[@]}'}
+	${complibs:+ComponentLibraries='${complibs[@]}'}
+	${includes:+IncludeDirs='${includes[@]}'}
+	${xmlincludes:+XmlIncludeDirs='${xmlincludes[@]}'}
+/>
 EOF
+
   make --no-print-directory -C $2 ||
     bad library creation failed, you may want to do: ocpidev delete library $1
   [ -z "$verbose" ] || echo A new library named \"$1\" \(in directory \"$2/\"\) has been created.
@@ -1905,7 +1898,7 @@ Choices:
 Options for the create|delete verbs:
  == create project ==
   -D <project>       *Another project that this project depends on (use package-ID, e.g. ocpi.core)
-                      (adds to "ProjectDependencies" in Project.xml)
+                      (adds to "ProjectDependencies" in XML file)
   --register         Register the project in the project registry
                       (for other projects to optionally depend on)
 
@@ -1955,13 +1948,13 @@ Options for the create|delete verbs:
   -C <core>          *Core to be included by this asset (adds to "Cores" in XML file)
 
  == create project|library|worker|{hdl device|platform} ==
-  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in Project.xml)
+  -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in XML file)
   -I <include>       *A directory to search for language include files (e.g. C/C++ or Verilog)
-                      (Adds to "IncludeDirs" in Project.xml)
+                      (Adds to "IncludeDirs" in XML file)
   -y <comp-library>  *Specify a component library to search for workers/devices/specs that this
-                      asset references (adds to "ComponentLibraries" in Project.xml)
+                      asset references (adds to "ComponentLibraries" in XML file)
   -Y <library>       *Specify a primitive library that this asset depends on
-                      (adds to "Libraries" in Project.xml)
+                      (adds to "Libraries" in XML file)
 
  == create worker|{hdl device|primitive|platform|assemblies} ==
   -T <target>        *Specify one of the build-targets to limit this asset to

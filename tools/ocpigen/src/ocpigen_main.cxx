@@ -116,7 +116,7 @@ main(int argc, const char **argv) {
   bool
     doDefs = false, doEnts = false, doImpl = false, doSkel = false, doAssy = false, doWrap = false,
     doArt = false, doTopContainer = false, doTest = false, doCases = false, verbose = false,
-    doTopConfig = false, doCompArt = false, doProjectXml = false;
+    doTopConfig = false, doCompArt = false, doAssetXml = false;
   int doGenerics = -1;
   if (argc <= 1) {
     fprintf(stderr,
@@ -267,7 +267,7 @@ main(int argc, const char **argv) {
         doCompArt = true;
         break;
       case 'R':
-        doProjectXml = true;
+        doAssetXml = true;
         break;
       default:
 	err = OU::esprintf("Unknown flag: %s\n", *ap);
@@ -316,16 +316,17 @@ main(int argc, const char **argv) {
             break;
           return 0;
         }
-        if (doProjectXml) {
-          std::string config, constraints;
+        if (doAssetXml) {
+          std::string config, constraints, s = *ap;
           OrderedStringSet platforms;
           ezxml_t prop, name;
-          if ((err = parseFile(*ap, parent, "project", &xml, file, false, false))) {
-            err = OU::esprintf("For project XML file '%s':  %s", *ap, err);
+          const char *asset = (s.find("Project.xml") < s.length()) ? "project" : "library";
+          if ((err = parseFile(*ap, parent, asset, &xml, file, false, false))) {
+            err = OU::esprintf("For %s XML file %s:  %s", asset, *ap, err);
             break;
           }
           if (!(prop = ezxml_cchild(xml, "OcpiProperty"))) {
-            // Legacy syntax with property='value'
+            // Legacy support of "flat" XML files using property='value'
             const char* const property[] = {"PackageName", "PackagePrefix", "Package",
              "ProjectDependencies", "Libraries", "IncludeDirs", "XmlIncludeDirs",
              "ComponentLibraries", "ProjectName", "ProjectPackage"};
@@ -337,7 +338,7 @@ main(int argc, const char **argv) {
                 printf("%s=%s\n", property[idx], value);
             }
           } else {
-            // Verbose syntax with OcpiPreoperty name and value
+            // XML tree files using OcpiPreoperty, name, and value
             ezxml_t value;
             do {
               if ((name = ezxml_cchild(prop, "name"))) {

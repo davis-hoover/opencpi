@@ -14,12 +14,6 @@ class Directive():
     def to_dict(self):
         """Parses directive to convert it into a dictionary
 
-        Args:
-            directive_str:      String representation of directive
-            default_host_names: Names of opencpi host platforms to
-                                default to in case directive does not
-                                contain any
-
         Returns:
             Dictioanry representation of directive
         """
@@ -39,6 +33,7 @@ class Directive():
                 # Find all platforms separated by comma on left side of colon
                 l_commas = comma_pattern.findall(left)
                 for l_comma in l_commas:
+                    l_comma = l_comma.lower()
                     if len(colons) == 2:
                         right = colons[1]
                         # Find all platforms separated by comma on right side
@@ -46,6 +41,7 @@ class Directive():
                         r_commas = comma_pattern.findall(right)
 
                         for r_comma in r_commas:
+                            r_comma = r_comma.lower()
                             # Associate the platforms on left side of colon
                             # with platforms on right side
                             platforms[l_comma].add(r_comma)
@@ -55,7 +51,30 @@ class Directive():
         
         return platforms
 
-    def apply(self, platforms):
+    def apply_projects(self, projects):
+        """Applies the directive to a list of Projects
+
+        Args:
+            projects: List of Projects to apply directive to
+
+        Returns:
+            List of Projects with directive applied to it
+        """
+        filtered_projects = []
+        for project in projects:
+            if project.group == 'opencpi':
+                filtered_projects.append(project)
+            elif project.name in self.dict:
+                filtered_projects.append(project)
+            else:
+                for platform in project.platforms:
+                    if platform.name in self.dict:
+                        filtered_projects.append(platform.project)
+                        break
+        
+        return filtered_projects
+
+    def apply_platforms(self, platforms):
         """Applies the directive to a list of Platforms
 
         Args:

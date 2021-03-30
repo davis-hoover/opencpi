@@ -5,14 +5,28 @@ from collections import namedtuple
 from os import getenv
 from pathlib import Path
 from sys import argv
-from . import ci_job, ci_platform
+from . import ci_job, ci_platform, ci_gitlab, ci_trigger
 
 class Pipeline():
 
-    def __init__(self, path, ci_env, directive):
+    def __init__(self, path, ci_env, directive, project_name=None, 
+                 group_name=None, is_downstream=False, config=None):
         self.path = path
         self.ci_env = ci_env
         self.directive = directive
+        if project_name:
+            self.project_name = project_name
+        else:
+            self.project_name = self.ci_env.project_name.lower().split('.')[-1]
+        if group_name:
+            self.group_name = group_name
+        else:
+            self.group_name = Path(self.ci_env.project_namespace).stem
+        if is_downstream:
+            self.is_downstream = is_downstream
+        else:
+            self.is_downstream = self.ci_env.project_name != 'opencpi'
+        self.config = config
 
     def to_dict(self):
         """ Converts a Pipeline namedtuple to a dictionary
@@ -82,70 +96,95 @@ class Pipeline():
                        must include a dictionary with 'overrides' as key 
                        and job overrides as values
         """
-
         if self.ci_env.pipeline_source != 'parent_pipeline':
+        # Not triggered by host pipeline, so set host pipeline stages
             stages = ['prereqs', 'build', 'test', 'generate-children',
-                      'trigger-children', 'deploy']
+                      'trigger-platforms', 'trigger-projects', 'deploy']
             host_platform = None
         else:
+        # Triggered by host pipeline, so set child pipeline stages and get
+        # host and cross platforms
             host_platform = ci_platform.get_platform(self.ci_env.host_platform, 
                                                      platforms)
             platform = ci_platform.get_platform(self.ci_env.platform, 
                                                 host_platform.cross_platforms)
-            if platform.model == 'rcc':
-                stages = ['prereqs-rcc', 'build-rcc', 'build-assemblies', 
-                          'test']
+            if self.group_name == 'comp':
+            # In comp project pipeline
+                if platform.model == 'rcc':
+                    stages = ['build-assets-comp', 'build-assemblies']
+                else:
+                    stages = ['build-primitives', 'build-assets-comp', 
+                              'build-assemblies', 'build-sdcards', 'test']
+            elif platform.model == 'rcc':
+            # platform is rcc
+                stages = ['prereqs-rcc', 'build-rcc', 'build-assemblies']
             else:
+            # platform is hdl
                 stages = ['build-primitives-core', 'build-primitives',
                           'build-assets', 'build-platforms', 
                           'build-assemblies', 'build-sdcards', 'test']
-                if not platform.project.is_builtin:
+                if platform.project.group != 'opencpi':
+                # not built-in platform, so add stage to create assets after
+                # built-in assets
                     project_stage = 'build-assets-{}'.format(
                         platform.project.name)
                     stages.insert(3, project_stage)
 
             platforms = [platform]
 
-        jobs = []
-         
-        for platform in platforms:
-            overrides = get_overrides(platform, config)
-            is_downstream = self.ci_env.project_name != 'opencpi'
+        # If a comp project, remove all projects except that project
+        if self.group_name == 'comp':
+            projects = [project for project in projects 
+                        if project.name == self.project_name]
 
+        jobs = []
+        for platform in platforms:
             # If triggered by upstream pipeline, do not generate jobs
             # to build host platforms. Assume this was done in the
             # upstream pipeline
             if self.ci_env.pipeline_source != 'pipeline':
-                jobs += ci_job.make_jobs(stages, platform, projects,
-                                        config=config,
-                                        overrides=overrides, 
-                                        host_platform=host_platform,
-                                        is_downstream=is_downstream)
+                jobs += ci_job.make_jobs(stages, platform, projects, self,
+                                         host_platform=host_platform)
 
             for cross_platform in platform.cross_platforms:
-                # If platform is local, make job to generate child yaml file
-                if cross_platform.project.path:
-                    # If platform is a built-in opencpi platform, but the
-                    # project is not opencpi, don't make jobs
-                    if self.ci_env.project_name != 'opencpi':
-                        if cross_platform.project.is_builtin:
+                # If platform is local or project is in COMP group, 
+                # make job to generate child yaml file
+                if cross_platform.project.path or self.group_name == 'comp':
+                    # If platform does not belong to same group as pipeline
+                    # and pipeline is not in the 'comp' group, don't make jobs
+                    if (cross_platform.project.group != self.group_name
+                        and self.group_name != 'comp'):
                             continue
 
                     generate_job = ci_job.make_generate(
-                        platform, cross_platform, self, overrides=overrides)
+                        platform, cross_platform, self)
                     jobs.append(generate_job)
 
                     # Make trigger job for child pipeline
-                    trigger = ci_job.make_trigger(
+                    trigger = ci_trigger.trigger_platform(
                         platform, cross_platform, self, 
-                        generate_job=generate_job, overrides=overrides)
+                        generate_job=generate_job)
                     jobs.append(trigger)
 
                 elif self.ci_env.project_name == 'opencpi':
-                    trigger = ci_job.make_trigger(
-                        platform, cross_platform, self, 
-                        overrides=overrides)
+                    # Make trigger job for downstream pipeline
+                    trigger = ci_trigger.trigger_platform(
+                        platform, cross_platform, self)
                     jobs.append(trigger)
+
+            # Create triggers for COMP projects
+            if platform.is_host:
+                # Don't make trigger if pipeline launched by upstream 
+                # pipeline
+                if self.ci_env.pipeline_source == 'pipeline':
+                    continue
+                # Don't make trigger if pipeline not in opencpi or osp project
+                if self.project_name != 'opencpi' and self.group_name != 'osp':
+                        continue
+                for project in projects:
+                    if project.group == 'comp':
+                        trigger = ci_trigger.trigger_project(project, self)
+                        jobs.append(trigger)
         
         self._stages = stages
         self._jobs = jobs
@@ -153,22 +192,18 @@ class Pipeline():
         return self
 
 
-def get_overrides(platform, config):
-    """Gets job overrides for a platform from a dictionary of platforms
+    def get_platform_overrides(self, platform):
+        """Gets job overrides for a platform from a dictionary of platforms
 
-    Overrides will replace default job values (tags, script, etc.).
+        Overrides will replace default job values (tags, script, etc.).
 
-    Args:
-        platform: Platform to get overrides for
-        config:   Dictionary with platform names as keys and
-                  dictonaries as values. Dictionary in the values must
-                  include a dictionary with 'overrides' as key and
-                  job overrides as values
+        Args:
+            platform: Platform to get overrides for
 
-    Returns:
-        A dictionary of job overrides for a specified platform
-    """
-    try:
-        return config[platform.name]['overrides']
-    except:
-        return {}
+        Returns:
+            A dictionary of job overrides for a specified platform
+        """
+        try:
+            return self.config[platform.name]['overrides']
+        except:
+            return {}

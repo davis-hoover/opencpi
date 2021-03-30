@@ -147,7 +147,7 @@ void InputBuffer::update(bool critical)
        sizeof(BufferMetaData)*MAX_PCONTRIBS);
 
     memset(m_bmdVaddr,0,sizeof(BufferMetaData)*MAX_PCONTRIBS);
-    getPort()->getEndPoint().doneWithInput(m_bmdVaddr, sizeof(BufferMetaData)*MAX_PCONTRIBS);
+    getPort()->getEndPoint().doneWithOutput(m_bmdVaddr, sizeof(BufferMetaData)*MAX_PCONTRIBS);
     m_sbMd = static_cast<volatile BufferMetaData (*)[MAX_PCONTRIBS]>(m_bmdVaddr);
   }
   

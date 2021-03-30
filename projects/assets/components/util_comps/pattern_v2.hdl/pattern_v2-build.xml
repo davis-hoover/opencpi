@@ -3,4 +3,8 @@
    <parameter name='numMessagesMax' value='5'/>
    <parameter name='numDataWords' value='15'/>
  </configuration>
+ <configuration id='1'>
+  <parameter name='numMessagesMax' value='10'/>
+  <parameter name='numDataWords' value='4096'/>
+</configuration>
 </build>
