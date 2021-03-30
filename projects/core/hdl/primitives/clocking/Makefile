@@ -18,67 +18,100 @@
 Libraries=ocpi platform fixed_float cdc
 
 include $(OCPI_CDK_DIR)/include/hdl/xilinx.mk
+include $(OCPI_CDK_DIR)/include/hdl/altera.mk
 
-VivadoZynqTargets=zynq xsim
+VivadoZynqTargets=zynq
 ISEZynqTargets=zynq_ise isim
-OnlyTargets=$(VivadoZynqTargets) $(ISEZynqTargets) modelsim
+VivadoZynqUltraPlusTargets=zynq_ultra
+VivadoXsimTargets=xsim
+QuartusCyclone5Targets=cyclone5
+ModelsimTargets=modelsim
+OnlyTargets=zynq $(ISEZynqTargets) zynq_ultra cyclone5 modelsim xsim
 
 # We need to include this file before hdl-library.mk to preprocess the platforms and targets (at least)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 $(eval $(HdlPreprocessTargets))
 MyTargets:=$(sort $(HdlTargets))
-ifneq ($(and $(filter $(ISEZynqTargets),$(MyTargets)),$(filter $(VivadoZynqTargets),xsim,$(MyTargets))),)
-  $(error The clocking primitive library cannot be built for zynq_ise/isim and zynq/xsim at the same time (yet))
+ifneq ($(and $(filter $(ISEZynqTargets),$(MyTargets)),$(filter $(VivadoZynqTargets),xsim,$(MyTargets)),$(filter $(VivadoZynqUltraPlusTargets),xsim,$(MyTargets))),)
+  $(error The clocking primitive library cannot be built for zynq_ise/isim, zynq/xsim, and zynq_ultra/xsim at the same time (yet))
 endif
 UseISE:=$(filter $(ISEZynqTargets),$(HdlTargets))
-UseVIVADO:=$(filter $(VivadoZynqTargets),$(HdlTargets))
+UseVIVADOZynq:=$(filter $(VivadoZynqTargets),$(HdlTargets))
+UseVIVADOZynqUltraPlus:=$(filter $(VivadoZynqUltraPlusTargets),$(HdlTargets))
+UseVIVADOXsim:=$(filter $(VivadoXsimTargets),$(HdlTargets))
+UseQUARTUSCycloneV:=$(filter $(QuartusCyclone5Targets),$(HdlTargets))
+UseModelsim:=$(filter $(ModelsimTargets),$(HdlTargets))
 
-XilinxCoreName=clk_wiz
-XilinxClockPrimitive=mmcm pll
-
-# The TCL script that gets generates the clk_wiz
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
-  ifdef UseVIVADO                          # if non-ISE targets
-    ifeq ($(wildcard vivado_clk_wiz/timestamp-clk_wiz),) # if it hasn't been generated
-      $(info Generating Zynq 7000 clk_wiz.)
-      $(if $(call DoShell,\
-	            mkdir -p vivado_clk_wiz/tmp && cd vivado_clk_wiz && rm -r -f tmp && mkdir tmp && for prim in $(XilinxClockPrimitive) ; do \
-	            (cd tmp && \
-	                         $(call OcpiXilinxVivadoInit) && \
-													 vivado -mode batch -source ../vivado-gen-clk_wiz.tcl \
-													 				-tclargs $(XilinxCoreName) $$prim \
-																	$${prim}e2 xc7z020-clg484-1 \
-													) > clk_wiz.log && \
-													 patch -F 5 < $${prim}e2.patch && patch < $${prim}e2_sim.patch && \
-													 mv $${prim}e2.v ../zynq/$${prim}e2.v && mv $${prim}e2_sim.vhd ../xsim/$${prim}e2.vhd && \
-													 rm -r -f $${prim}e2.v.orig; done && \
-													 date > timestamp-clk_wiz && \
-	                         rm -r -f tmp,MyError),\
-	         $(error $(MyError)))
+  ifdef UseVIVADOZynqUltraPlus
+    ifeq ($(wildcard ip_gen/vivado_ip/timestamp-zynq_ultra_clk_wiz),) # if it hasn't been generated
+     $(info ==============================================)
+     $(info  Generating Zynq UltraScale Plus clk_wiz.)
+     $(info ==============================================)
+     $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxVivadoInit) && ./generate_clk_gen_ip.sh zynq_ultra, MyError),$(error $(MyError)))
+     $(info Generation of IP Succeeded.)
+  endif
+  else ifdef UseVIVADOZynq
+   ifeq ($(wildcard ip_gen/vivado_ip/timestamp-zynq_clk_wiz),) # if it hasn't been generated
+     $(info ==============================================)
+     $(info       Generating Zynq 7000 clk_wiz.)
+     $(info ==============================================)
+     $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxVivadoInit) && ./generate_clk_gen_ip.sh zynq, MyError),$(error $(MyError)))
+     $(info Generation of IP Succeeded.)
+  endif
+  else ifdef UseVIVADOXsim
+    ifeq ($(wildcard ip_gen/vivado_ip/timestamp-zynq_ultra_clk_wiz),) # if it hasn't been generated
+     $(info ==============================================)
+     $(info  Generating Zynq UltraScale Plus clk_wiz.)
+     $(info ==============================================)
+     $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxVivadoInit) && ./generate_clk_gen_ip.sh zynq_ultra, MyError),$(error $(MyError)))
+     $(info Generation of IP Succeeded.)
+    endif
+    ifeq ($(wildcard ip_gen/vivado_ip/timestamp-zynq_clk_wiz),) # if it hasn't been generated
+     $(info ==============================================)
+     $(info       Generating Zynq 7000 clk_wiz.)
+     $(info ==============================================)
+     $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxVivadoInit) && ./generate_clk_gen_ip.sh zynq, MyError),$(error $(MyError)))
+     $(info Generation of IP Succeeded.)
     endif
   else ifdef UseISE
-    ifeq ($(wildcard ise_clk_wiz/timestamp-clk_wiz),)
-      $(info Generating Zynq 7000 clk_wiz.)
-      $(if $(call DoShell,\
-		  		 mkdir -p ise_clk_wiz/tmp && cd ise_clk_wiz && rm -r -f tmp && mkdir tmp && for prim in $(XilinxClockPrimitive) ; do\
-		  	   (cd tmp && \
-			     							$(call OcpiXilinxIseInit) && \
-												coregen -b ../ise-gen-clk_wiz-$${prim}-coregen-commands \
-											 ) > clk_wiz.log && cp tmp/managed_ip_project/$${prim}e2.vhd . && \
-											  patch < $${prim}e2.patch && \
-											  cp $${prim}e2.vhd ../isim/$${prim}e2.vhd && \
-											  mv $${prim}e2.vhd ../zynq_ise/$${prim}e2.vhd; done && \
-												date > timestamp-clk_wiz && \
-												rm -r -f tmp,MyError),\
-		 $(error $(MyError)))
+    ifeq ($(wildcard ip_gen/ise_ip/timestamp-zynq_ise_clk_wiz),) # if it hasn't been generated
+     $(info ==============================================)
+     $(info       Generating Zynq 7000 clk_wiz.)
+     $(info ==============================================)
+     $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxIseInit) && ./generate_clk_gen_ip.sh zynq_ise, MyError),$(error $(MyError)))
+     $(info Generation of IP Succeeded.)
     endif
+  # Enable this once Quartus is installed on the runners for the pipeline
+  # else ifdef UseQUARTUSCycloneV
+  #   ifeq ($(wildcard ip_gen/quartus_ip/timestamp-cyclone5_altera_pll),) # if it hasn't been generated
+  #    $(info ==============================================)
+  #    $(info       Generating Cyclone V altera_pll.)
+  #    $(info ==============================================)
+  #    $(if $(call DoShell,cd ip_gen && ./generate_clk_gen_ip.sh cyclone5 $(OcpiAlteraQuartusDir) $(OcpiAlteraLicenseFile), MyError),$(error $(MyError)))
+  #    $(info Generation of IP Succeeded.)
+  #   endif
+  # else ifdef UseModelsim
+  #   ifeq ($(wildcard ip_gen/quartus_ip/timestamp-cyclone5_altera_pll),) # if it hasn't been generated
+  #    $(info ==============================================)
+  #    $(info       Generating Cyclone V altera_pll.)
+  #    $(info ==============================================)
+  #    $(if $(call DoShell,cd ip_gen && ./generate_clk_gen_ip.sh cyclone5 $(OcpiAlteraQuartusDir) $(OcpiAlteraLicenseFile), MyError),$(error $(MyError)))
+  #    $(info Generation of IP Succeeded.)
+  #   endif
   endif
-endif # if not cleaning
+endif
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
 
 clean::
-	$(AT)rm -rf vivado_clk_wiz/tmp; \
-			 rm -f vivado_clk_wiz/clk_wiz.log; \
-			 rm -rf ise_clk_wiz/tmp; \
-		 	 rm -f ise_clk_wiz/clk_wiz.log;
+	$(AT)rm -rf ip_gen/vivado_ip/tmp; \
+       rm -f  ip_gen/vivado_ip/zynq_mmcm_clk_wiz.log; \
+       rm -f  ip_gen/vivado_ip/zynq_pll_clk_wiz.log; \
+       rm -f  ip_gen/vivado_ip/zynq_ultra_mmcm_clk_wiz.log; \
+       rm -f  ip_gen/vivado_ip/zynq_ultra_pll_clk_wiz.log; \
+			 rm -rf ip_gen/ise_ip/tmp; \
+       rm -f  ip_gen/ise_ip/zynq_ise_mmcm_clk_wiz.log; \
+       rm -f  ip_gen/ise_ip/zynq_ise_pll_clk_wiz.log; \
+		 	 rm -rf ip_gen/quartus_ip/tmp; \
+       rm -f  ip_gen/quartus_ip/cyclone5_altera_pll.log;
