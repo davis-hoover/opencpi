@@ -3,7 +3,9 @@ library ocpi, platform; use ocpi.types.all; -- remove this to avoid all ocpi nam
 library util;
 architecture rtl of worker is
   signal   dac_clk    : std_logic;
-  signal   first, eof : bool_t;
+  signal   eof : bool_t;
+  signal sample_counter_en : std_logic;
+  signal sample_counter_cnt : unsigned(props_in.num_input_samples'length-1 downto 0);
 begin
   -- generate dac clock
   clock : platform.platform_pkg.sim_clk
@@ -24,15 +26,23 @@ begin
   --TODO: Need data widener
   out_out.data  <= dev_in.data_Q & dev_in.data_I;
 
+  sample_counter_en <= out_in.ready and dev_in.valid when (sample_counter_cnt < props_in.num_input_samples-1) else '0';
+  
+  sample_counter : util.util.counter
+    generic map(
+      BIT_WIDTH => props_in.num_input_samples'length)
+    port map(
+      clk => dac_clk,
+      rst => out_in.reset,
+      en  => sample_counter_en,
+      cnt => sample_counter_cnt);
+
   process(dac_clk)
   begin
     if rising_edge(dac_clk) then
       if its(out_in.reset) then
-        first <= bfalse;
         eof   <= bfalse;
-      elsif its(out_in.ready and dev_in.valid and not first) then
-        first <= btrue;
-      elsif its(out_in.ready and first and not dev_in.valid and not eof) then
+      elsif (its(out_in.ready) and sample_counter_cnt = props_in.num_input_samples-1) then
         eof <= btrue;
       end if;
     end if;
