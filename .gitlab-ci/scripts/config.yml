@@ -32,13 +32,12 @@ modelsim:
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
-    test:centos7:platform:devices:modelsim: skip
 isim:
   overrides:
-    test:centos7:platform:devices:isim: skip
+
 xsim:
   overrides:
-    test:centos7:platform:devices:xsim: skip
+
 
 # hdl
 e31x:

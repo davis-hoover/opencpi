@@ -28,14 +28,27 @@ architecture rtl of worker is
   constant pathLength      : natural := props_in.fileName'right;
   signal cwd               : string_t(0 to props_out.cwd'right);
   file   data_file         : char_file_t;
-  -- our state machine
-  signal init_r            : boolean := false;
   signal messageLength_r   : ulong_t := (others => '0');
   -- registers driving ctl_out
   signal finished_r        : boolean := false;
   -- registers driving props_out
   signal messagesWritten_r : ulonglong_t := (others => '0');
   signal bytesWritten_r    : ulonglong_t := (others => '0');
+  -- signal for when the working is operating
+  signal operating         : boolean;
+  -- register for operating state
+  signal operating_r       : boolean;
+  -- src ready signals for cdc pulse
+  signal stop_or_release_src_rdy   : std_logic;
+  signal start_src_rdy             : std_logic;
+  -- registers for control ops
+  signal start_r                   : std_logic;
+  signal stop_r                    : std_logic;
+  signal release_r                 : std_logic;
+  signal stop_or_release           : std_logic;
+  -- control ops synchronized to the wsi clock domain
+  signal wsi_start                 : std_logic;
+  signal wsi_stop_or_release       : std_logic;
   -- pull a byte out of a dword and convert to char type. FIXME: endian!
   function char(dw : ulong_t; pos : natural) return character is begin
     return to_character(char_t(dw(pos*8+7 downto pos*8)));
@@ -52,27 +65,111 @@ begin
   cwd_i : component util.util.cwd
     generic map(length     => cwd'right)
     port    map(cwd        => cwd);
+  
+  operating <= operating_r or in_in.ready or in_in.eof;
+  start_reg : process (ctl_in.clk)
+  begin
+    if rising_edge(ctl_in.clk) then
+      if ctl_in.reset = '1' then
+        start_r  <= '0';
+      else
+        -- The start op may not be on long enough to be captured
+        -- and synchronized so register it
+        if ctl_in.control_op = START_e then
+          start_r <= '1';
+        end if;
+        -- Set the register to 0 once the src_rdy signal goes high
+        if start_src_rdy and start_r then
+          start_r <= '0';
+        end if;
+      end if;
+    end if;
+  end process start_reg;
 
-  process(ctl_in.clk)
+  stop_reg : process (ctl_in.clk)
+  begin
+    if rising_edge(ctl_in.clk) then
+      if ctl_in.reset = '1' then
+        stop_r  <= '0';
+      else
+        -- The stop op may not be on long enough to be captured
+        -- and synchronized so register it
+        if ctl_in.control_op = STOP_e then
+          stop_r <= '1';
+        end if;
+        -- Set the register to 0 once the src_rdy signal goes high
+        if stop_or_release_src_rdy and stop_r then
+          stop_r <= '0';
+        end if;
+      end if;
+    end if;
+  end process stop_reg;
+
+  release_reg : process (ctl_in.clk)
+  begin
+    if rising_edge(ctl_in.clk) then
+      if ctl_in.reset = '1' then
+        release_r  <= '0';
+      else
+        -- The release op may not be on long enough to be captured
+        -- and synchronized so register it
+        if ctl_in.control_op = RELEASE_e then
+          release_r <= '1';
+        end if;
+        -- Set the register to 0 once the src_rdy signal goes high
+        if stop_or_release_src_rdy and release_r then
+          release_r <= '0';
+        end if;
+      end if;
+    end if;
+  end process release_reg;
+  
+  -- Since stop or release do the same thing in for closing a file in the process below
+  -- and they can't happen at the same time just or them and use one cdc pulse synchronizer
+  stop_or_release <= stop_r or release_r;
+  
+  -- Using cdc pulse synchronize the control ops to the wsi clock domain
+
+  control_op_is_start_inst : component cdc.cdc.pulse
+  generic map(N => 2)
+  port map   (src_clk      => ctl_in.clk,
+              src_rst      => ctl_in.reset,
+              src_in       => start_r,
+              src_rdy      => start_src_rdy,
+              dst_clk      => in_in.clk,
+              dst_rst      => in_in.reset,
+              dst_out      => wsi_start);
+
+  control_op_is_stop_or_release_inst : component cdc.cdc.pulse
+  generic map(N => 2)
+  port map   (src_clk      => ctl_in.clk,
+              src_rst      => ctl_in.reset,
+              src_in       => stop_or_release,
+              src_rdy      => stop_or_release_src_rdy,
+              dst_clk      => in_in.clk,
+              dst_rst      => in_in.reset,
+              dst_out      => wsi_stop_or_release);
+
+  process(in_in.clk)
     variable c              : character;
     variable msg_buffer     : string(1 to 16*1024);
     variable new_msg_length : natural;
   begin
-    if rising_edge(ctl_in.clk) then
-      if its(ctl_in.reset) then
-        init_r            <= false;
+    if rising_edge(in_in.clk) then
+      if its(in_in.reset) then
         messageLength_r   <= (others => '0');
         finished_r        <= false;
         messagesWritten_r <= (others => '0');
         bytesWritten_r    <= (others => '0');
-      elsif ctl_in.control_op = STOP_e or ctl_in.control_op = RELEASE_e then
+        operating_r       <= false;
+      elsif its(wsi_stop_or_release) then
         finished_r <= true;
         close_file(data_file, props_in.fileName);
-      elsif its(ctl_in.is_operating) and not finished_r then
-        if not init_r then  
-          open_file(data_file, cwd, props_in.fileName, write_mode);
-          init_r <= true;
-        elsif its(in_in.eof) then
+      elsif wsi_start and not finished_r then
+        open_file(data_file, cwd, props_in.fileName, write_mode);
+      elsif operating and not finished_r then
+        operating_r <= true; -- make it sticky
+        if its(in_in.eof) then
           finished_r <= true;
           close_file(data_file, props_in.fileName);
         elsif its(in_in.ready) then
@@ -118,6 +215,6 @@ begin
           end if; -- eom
         end if; --if in_in.ready
       end if; -- if operating and not finished
-    end if; -- if rising_edge(ctl_in.clk)
+    end if; -- if rising_edge(in_in.clk)
   end process;
 end rtl;

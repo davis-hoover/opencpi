@@ -54,6 +54,10 @@ architecture rtl of worker is
   -- combi indication that we are giving to output port in the current cycle
   signal giving            : boolean;
   signal messageSize       : ulong_t;
+  -- signal for when the working is operating
+  signal operating         : boolean;
+  -- register for operating state
+  signal operating_r       : boolean;
 begin
   messageSize               <= props_in.messageSize when props_in.messageSize /= to_ulong(0)
                                else resize(props_in.ocpi_buffer_size_out,messageSize'length);
@@ -76,7 +80,8 @@ begin
     generic map(length     => cwd'right)
     port    map(cwd        => cwd);
 
-   process (ctl_in.clk) is
+  operating <= operating_r or out_in.ready or to_bool(eof_r);
+   process (out_in.clk) is
      variable ulong_bytes       : natural; -- how many bytes from read_ulong
      variable ulong_byte_enable : std_logic_vector(3 downto 0); -- byte enables from read_ulong
      variable eom               : boolean; -- temp indicating we want eom
@@ -123,8 +128,8 @@ begin
        --   som_next_r <= true;
      end finish;
    begin
-     if rising_edge(ctl_in.clk) then
-       if its(ctl_in.reset) then
+     if rising_edge(out_in.clk) then
+       if its(out_in.reset) then
          init_r            <= false;
          som_next_r        <= false;
          bytesLeft_r       <= (others => '0');
@@ -140,20 +145,22 @@ begin
          som_r             <= false;               -- to drive out_out.som
          eom_r             <= false;               -- to drive out_out.eom
          valid_r           <= false;               -- to drive out_out.valid
-       elsif its(ctl_in.is_operating) and messageSize > props_in.ocpi_buffer_size_out then
+         operating_r       <= false;
+       elsif operating and messageSize > props_in.ocpi_buffer_size_out then
          report "messageSize property (" & integer'image(to_integer(props_in.messageSize)) &
            ") exceeds output port buffer size (" & integer'image(to_integer(props_in.ocpi_buffer_size_out)) &
            ")" severity failure;
          finished_r <= true;
-       elsif its(ctl_in.is_operating) and bytesLeft_r > props_in.ocpi_buffer_size_out then
+       elsif operating  and bytesLeft_r > props_in.ocpi_buffer_size_out then
          report "message length (from messagesInFile) (" & integer'image(to_integer(bytesLeft_r)) &
            ") exceeds output port buffer size (" & integer'image(to_integer(props_in.ocpi_buffer_size_out)) &
            ")" severity failure;
          finished_r <= true;
-       elsif its(ctl_in.is_operating) and eof_r and out_in.ready then
+       elsif operating and eof_r and out_in.ready then
          -- Final transition to finished when eof "sent"
          finished_r <= true;
-       elsif its(ctl_in.is_operating) and not eof_r and (not finished_r or ready_r) then
+       elsif operating and not eof_r and (not finished_r or ready_r) then
+         operating_r <= true; -- make it sticky
          if giving and eom_r then
            ready_r <= false;
          end if;
