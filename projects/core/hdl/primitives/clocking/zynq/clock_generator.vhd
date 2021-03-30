@@ -22,12 +22,16 @@ library ocpi; use ocpi.types.all;
 entity clock_generator is
     generic (
       CLK_PRIMITIVE          : string_t := to_string("plle2", 32);
+      VENDOR                 : string_t := to_string("xilinx", 32);
       CLK_IN_FREQUENCY_MHz   : real := 100.0;
       CLK_OUT_FREQUENCY_MHz  : real := 100.0;
+      REFERENCE_CLOCK_FREQUENCY : string_t := to_string("100.0 MHz", 32); -- not used for Xilinx IP
+      OUTPUT_CLOCK_FREQUENCY0   : string_t := to_string("100.0 MHz", 32); -- not used for Xilinx IP
       M                      : real := 5.0;  -- M
       N                      : integer := 1; -- D
       O                      : real := 1.0;  -- O
-   -- CLK_OUT_PHASE_DEGREES  : real; -- Add this in when there's a generalized way to support Xilinx and Intel phase shift in optimization script
+      CLK_OUT_PHASE_DEGREES  : real := 0.0;
+      PHASE_SHIFT0_PICO_SECS : string_t := to_string("0 ps", 32); -- not used for Xilinx IP
       CLK_OUT_DUTY_CYCLE     : real := 0.5);
     port(
       clk_in           : in     std_logic;
@@ -77,7 +81,7 @@ begin
        DIVCLK_DIVIDE        =>  N,
        CLKFBOUT_MULT        =>  integer(M),
        CLKOUT0_DIVIDE       =>  integer(O),
-       --CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
+       CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
        CLKOUT0_DUTY_CYCLE   =>  CLK_OUT_DUTY_CYCLE,
        CLKIN1_PERIOD        =>  c_CLKIN1_PERIOD_NANO_SEC)
    	 port map (
@@ -93,7 +97,7 @@ begin
        DIVCLK_DIVIDE        =>  N,
        CLKFBOUT_MULT_F      =>  M,
        CLKOUT0_DIVIDE_F     =>  O,
-       --CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
+       CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
        CLKOUT0_DUTY_CYCLE   =>  CLK_OUT_DUTY_CYCLE,
        CLKIN1_PERIOD        =>  c_CLKIN1_PERIOD_NANO_SEC)
       port map (

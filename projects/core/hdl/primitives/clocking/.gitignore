@@ -1,6 +1,19 @@
 # Generated files
-vivado_clk_wiz/timestamp-clk_wiz
+ip_gen/vivado_ip/timestamp-zynq_clk_wiz
+ip_gen/vivado_ip/timestamp-zynq_ultra_clk_wiz
+ip_gen/ise_ip/timestamp-zynq_ise_clk_wiz
+ip_gen/quartus_ip/timestamp-cyclone5_altera_pll
 xsim/mmcme2.vhd
 xsim/plle2.vhd
+xsim/mmcme4.vhd
+xsim/plle4.vhd
 zynq/mmcme2.v
 zynq/plle2.v
+zynq_ultra/mmcme4.v
+zynq_ultra/plle4.v
+isim/mmcme2.vhd
+isim/plle2.vhd
+zynq_ise/mmcme2.v
+zynq_ise/plle2.v
+cyclone5/pll.v
+modelsim/pll.vhd

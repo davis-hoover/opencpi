@@ -16,36 +16,28 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
--- This is basically a copy of the agnostic_clock_generator.vhd. 
--- This is used so that shadowing works. 
+----------------------------------------------------------------------------------
+-- Description
+----------------------------------------------------------------------------------
+-- This is a vendor agnostic clock generator. It simulates waiting for a period of
+-- of time for a clock generator to receive "lock" before having a valid clock.
+----------------------------------------------------------------------------------
 
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
 library ocpi; use ocpi.util.all, ocpi.types.all;
 library platform;
 library cdc;
 
-entity clock_generator is
+entity agnostic_clock_generator is
     generic (
-      CLK_PRIMITIVE          : string_t := to_string("plle2", 32);
-      VENDOR                 : string_t := to_string("agnostic", 32);
-      CLK_IN_FREQUENCY_MHz   : real := 100.0;
-      CLK_OUT_FREQUENCY_MHz  : real := 100.0;
-      REFERENCE_CLOCK_FREQUENCY : string_t := to_string("100.0 MHz", 32);
-      OUTPUT_CLOCK_FREQUENCY0   : string_t := to_string("100.0 MHz", 32);
-      N                      : integer := 1; -- D
-      O                      : real := 1.0;  -- O
-      CLK_OUT_PHASE_DEGREES  : real := 0.0;
-      PHASE_SHIFT0_PICO_SECS : string_t := to_string("0 ps", 32);
-      CLK_OUT_DUTY_CYCLE     : real := 0.5);
+      CLK_OUT_FREQUENCY_MHz : real := 100.0);
     port(
-      clk_in           : in     std_logic;
       reset            : in     std_logic;
       clk_out          : out    std_logic;
       locked           : out    std_logic);
-end entity clock_generator;
+end entity agnostic_clock_generator;
 
-architecture rtl of clock_generator is
+architecture rtl of agnostic_clock_generator is
   constant c_num_cycles       : natural := 33;
   constant c_counter_width    : natural := width_for_max(c_num_cycles - 1);
   signal s_reset_out          : std_logic;
@@ -54,9 +46,8 @@ architecture rtl of clock_generator is
   signal s_enable             : std_logic;
   signal s_locked             : std_logic;
   signal s_reset_in_synced    : std_logic;
-
 begin
-  
+
   inst_sim_clk : platform.platform_pkg.sim_clk
     generic map(frequency => CLK_OUT_FREQUENCY_MHz*1.0E6,
                 offset  => 0)
