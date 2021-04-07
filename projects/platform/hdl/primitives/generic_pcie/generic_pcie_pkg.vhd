@@ -52,8 +52,29 @@ end record global_in_t;
 type global_out_t is record
   axi_aclk_out            : std_logic;
   axi_ctl_aclk_out        : std_logic;
-  mmcm_lock           : std_logic;
-  interrupt_out       : std_logic;
+  mmcm_lock               : std_logic;
+  interrupt_out           : std_logic;
 end record global_out_t;
+
+-- generic_pcie component wraps the underlying axi_pcie core.
+component generic_pcie is 
+  port (
+    pcie_in     : in  pcie_in_t;
+    pcie_out    : out pcie_out_t;
+
+    global_in   : in  global_in_t;
+    global_out  : out global_out_t;
+
+    msi_in      : in  msi_in_t;
+    msi_out     : out msi_out_t;
+
+    -- Master (x1)
+    m_axi_in    : in  axi.pcie_m.axi_s2m_t;
+    m_axi_out   : out axi.pcie_m.axi_m2s_t;
+    -- Slave (x1)
+    s_axi_in    : in  axi.pcie_s.axi_m2s_t;
+    s_axi_out   : out axi.pcie_s.axi_s2m_t
+  );
+end component generic_pcie;
 
 end package generic_pcie_pkg;

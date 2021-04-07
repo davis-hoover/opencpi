@@ -17,6 +17,8 @@ centos7:
     - xilinx13_4
   matchstiq_z1:
     - xilinx13_3
+  picoevb:
+    - xilinx19_2_aarch32
   plutosdr:
     - adi_plutosdr0_32
   zcu104:

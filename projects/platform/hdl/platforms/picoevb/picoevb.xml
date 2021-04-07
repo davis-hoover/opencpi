@@ -1,0 +1,43 @@
+<!-- PicoEVB Platform Worker -->
+<HdlPlatform Language="VHDL" spec='platform-spec' version='2' libraries='sdp generic_pcie'>
+  <specproperty name='platform' value='picoevb'/>
+  <!-- All platform workers must provide these two ports -->
+  <metadata master='true'/> <!-- access to container metadata via the platform worker -->
+  <timebase master='true'/> <!-- providing a timebase for the time service -->
+  <!-- This platform worker provides a control plane -->
+  <cpmaster master='true'/>
+  <!-- Declare and parameterize the time_server device worker for this platform -->
+  <device worker='time_server'>
+    <property name='frequency' value='100e6'/>
+  </device>
+  <sdp name="picoevb" master='true' count='1'/>
+
+  <property name="sdpDropCount" type='uchar' volatile='true'/>
+
+  <!-- General IOs -->
+  <signal  output='leds' width='3'/>
+
+  <!-- PCIe IO Pins -->.
+  <signal input='perst_n'/>
+  <signal input='sys_clk' differential='true'/>
+  <signal input='pcie_rx' differential='true' width='1'/> 
+  <signal output='pcie_tx' differential='true' width='1'/>
+  
+  <!-- SPI IOs
+  -->
+
+  <!-- system clock  
+  -->
+
+  <!-- aux IOs
+  -->
+
+  <!-- clkreq
+  -->
+
+  <!-- di_edge and do_edge
+  -->
+
+
+
+</HdlPlatform>
