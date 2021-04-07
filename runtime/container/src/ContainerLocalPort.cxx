@@ -79,6 +79,7 @@ namespace OCPI {
       assert(last < inScale);
       return first >= inScale;
     }
+
     // Compute the sending member which will send to this input member
     static void
     partialSender(size_t outScale, size_t inScale, size_t inIndex, size_t &sender) {
@@ -93,6 +94,7 @@ namespace OCPI {
 			       bo.m_first, bo.m_last) ? Discard : All;
       bo.m_next = bo.m_first;
     }
+
     // Send cyclically to all, but discard if not in our range
     void LocalPort::
     oCycP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -100,6 +102,7 @@ namespace OCPI {
       bo.m_mode = partialRange(c.m_out.m_scale, c.m_out.m_index, c.m_in.m_scale,
 			       bo.m_first, bo.m_last) ? Discard : CyclicSparse;
     }
+
     // Send balanced to all, but discard if not in our range
     void LocalPort::
     oBalP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -107,12 +110,14 @@ namespace OCPI {
       bo.m_mode = partialRange(c.m_out.m_scale, c.m_out.m_index, c.m_in.m_scale,
 			       bo.m_first, bo.m_last) ? Discard : Balanced;
     }
+
     // Send balanced to all
     void LocalPort::
     oBal(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	 unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = Balanced;
     }
+
     // Send cyclically to all, but discard if not in our range
     void LocalPort::
     oHashP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &input,
@@ -121,6 +126,7 @@ namespace OCPI {
 			       bo.m_first, bo.m_last) ? Discard : Hashed;
       bo.m_hashField = input.m_opScaling[op]->m_hashField;
     }
+
     // Send cyclically to all
     void LocalPort::
     oHash(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &input,
@@ -128,6 +134,7 @@ namespace OCPI {
       bo.m_mode = Hashed;
       bo.m_hashField = input.m_opScaling[op]->m_hashField;
     }
+
     // Send from first to first
     void LocalPort::
     oFirst2(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -138,6 +145,7 @@ namespace OCPI {
       } else
 	bo.m_mode = Discard;
     }
+
     // Send from first to first
     void LocalPort::
     oFirst(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -145,24 +153,28 @@ namespace OCPI {
       bo.m_first = bo.m_last = 0;
       bo.m_mode = All;
     }
+
     // Send to all.
     void LocalPort::
     oAll(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	 unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = All;
     }
+
     // Send as directed
     void LocalPort::
     oDirect(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	    unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = Directed;
     }
+
     // Send/Receive to/from all cyclically
     void LocalPort::
     ioCyc(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	  unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = Cyclic;
     }
+
     // Receive from all cyclically, modulo the other side
     void LocalPort::
     iCycMod(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -170,6 +182,7 @@ namespace OCPI {
       bo.m_mode = CyclicModulo;
       bo.m_next = c.m_in.m_index % c.m_out.m_scale;
     }
+
     // Receive from all cyclically, modulo the other side
     void LocalPort::
     oCycMod(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -177,6 +190,7 @@ namespace OCPI {
       bo.m_mode = CyclicModulo;
       bo.m_next = c.m_out.m_index % c.m_in.m_scale;
     }
+
     // Receive first to first
     void LocalPort::
     iFirst2(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -187,24 +201,28 @@ namespace OCPI {
       } else
 	bo.m_mode = Discard;
     }
+
     // Receive from one, defined by our range
     void LocalPort::
     iFirstCyc(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	      unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = c.m_in.m_index == 0 ? Cyclic : Discard;
     }
+
     void LocalPort::
     iFirst(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	      unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_first = bo.m_last = 0;
       bo.m_mode = AsAvailable;
     }
+
     // Receive from any
     void LocalPort::
     iAny(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	unsigned /*op*/, LocalPort::BridgeOp &bo) {
       bo.m_mode = AsAvailable;
     }
+
     // Receive from one, defined by our range
     void LocalPort::
     iOneP(Launcher::Connection &c, const OU::Port &/*output*/, const OU::Port &/*input*/,
@@ -213,12 +231,14 @@ namespace OCPI {
       bo.m_last = bo.m_first;
       bo.m_mode = AsAvailable;
     }
+
     // Receive from one, defined by our range
     void LocalPort::
     bad(Launcher::Connection &/*c*/, const OU::Port &/*output*/, const OU::Port &/*input*/,
 	unsigned /*op*/, LocalPort::BridgeOp &/*bo*/) {
       assert("Incompatible distributions between input and output"==0);
     }
+
     // Each pair is output to input.
     // The first function sets up the output bridge, the second sets up the input bridge.
     LocalPort::BridgeSetup
@@ -245,6 +265,7 @@ namespace OCPI {
       bridgeModes[output.getDistribution(op)][input.getDistribution(op)][isProvider() ? 1 : 0]
 	(c, output, input, op, bo);
     }
+
     void LocalPort::
     setupBridging(Launcher::Connection &c) {
       const Launcher::Port &other = isProvider() ? c.m_out : c.m_in;
