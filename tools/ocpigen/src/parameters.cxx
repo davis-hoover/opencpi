@@ -116,6 +116,7 @@ excludeValue(std::string &uValue, Attributes *&attrs, const char *platform) {
     attrs->m_excluded.insert(platform);
   return NULL;
 }
+
 // Add to the set the values for this parameter
 // If a platform is supplied, this adds the values just for the platform
 const char *Param::
@@ -151,6 +152,7 @@ addValue(std::string &uValue, Attributes *&attrs, const char *platform) {
     attrs->m_included.insert(platform);
   return NULL;
 }
+
 // Set the values for this parameter - making the provided values the only values.
 // If a platform is supplied, this sets the exact set of values for that platform.
 const char *Param::
@@ -242,7 +244,7 @@ parse(ezxml_t px, const OU::Property *p, const Worker *worker, bool global) {
 	m_value = newValue; // copy
     } else
       m_value = newValue; // copy
-    // The specified value is in: m_value, unparsed in m_uValue
+    // The specified value is in m_value, unparsed in m_uValue
   }
   const char // all these can be glob-wildcarded
     *add = ezxml_cattr(px, "add"),
@@ -350,6 +352,7 @@ doDefaults(bool missingOk) {
   }
   return NULL;
 }
+
 const char *ParamConfig::
 parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
   const char *err;
@@ -432,6 +435,7 @@ paramValue(const OU::Member &param, OU::Value &v, std::string &value) {
   }
   return NULL;
 }
+
 void ParamConfig::
 write(FILE *xf, FILE *mf) {
   bool nonDefault = false;
@@ -743,7 +747,7 @@ addValue(Param &p, const char *start, const char *end, Values &values) {
     p.m_value = v; // set first value as THE value for now
   values.push_back(sval);
   return NULL;
- }
+}
 
 static const char *
 addValues(Param &p, Values &values, bool hasValues, const char *content) {
@@ -897,6 +901,7 @@ emitMakefile(FILE *xmlFile) {
       m_paramConfigs[n]->used = true;
   return writeParamFiles(mkFile, xmlFile);
 }
+
 // Based on worker xml, read the <worker>-build.xml, and emit the generics file
 const char *Worker::
 emitHDLConstants(size_t config, bool other) {
@@ -1048,6 +1053,7 @@ onlyExclude(const char *thing,
 
 Build::Build(Worker &w) : m_worker(w), m_globalParams(w) {
 }
+
 // Parse top-level attributes for the owd or build xml.  If buildFile arg not NULL, we are parsing
 // the build file which is parsed after the owd
 const char *Build::
@@ -1183,6 +1189,7 @@ parse(ezxml_t x, const char *buildFile) {
   }
   return NULL;
 }
+
 static void writeVar(FILE *f, const char *var, OrderedStringSet &vals) {
   if (vals.empty())
     return;
@@ -1191,6 +1198,7 @@ static void writeVar(FILE *f, const char *var, OrderedStringSet &vals) {
     fprintf(f, "%s%s", i == vals.begin() ? "" : " ", (*i).c_str());
   fprintf(f, "\n");
 }
+
 void Build::
 writeMakeVars(FILE *mkf) {
   writeVar(mkf, "OnlyPlatforms", m_onlyPlatforms);
