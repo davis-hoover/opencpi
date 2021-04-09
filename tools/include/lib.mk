@@ -170,7 +170,7 @@ HdlLibrariesCommand=$(call OcpiAdjustLibraries,$(HdlLibraries))
 RccLibrariesCommand=$(call OcpiAdjustLibraries,$(RccLibraries))
 TestTargets:=$(call Unique,$(HdlPlatforms) $(HdlTargets) $(RccTargets))
 # set the directory flag to make, and use the desired Makefile
-GoWorker=-C $1 -f $(or $(realpath $1/Makefile),$(OCPI_CDK_DIR)/include/worker.mk)
+GoWorker=-C $1 `[ ! -f $1/Makefile ] && echo -f $(OCPI_CDK_DIR)/include/worker.mk`
 BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker,$2)::)\
     set -e; \
     t="$(foreach t,$(or $($(call Capitalize,$1)Target),$($(call Capitalize,$1)Targets)),\

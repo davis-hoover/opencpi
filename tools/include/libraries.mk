@@ -31,7 +31,7 @@ DoLibGoal=$(AT)\
     $(MAKE) -C $$l OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) $@; \
   done
 
-Goals=run all clean $(Models) $(Models:%=clean%) $(OcpiTestGoals)
+Goals=run all declarehdl clean $(Models) $(Models:%=clean%) $(OcpiTestGoals)
 
 .PHONY: $(Goals)
 
