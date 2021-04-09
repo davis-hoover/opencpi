@@ -29,6 +29,9 @@ endif
 ifneq ($(filter skeleton generated,$(MAKECMDGOALS)),)
   HdlSkip:=
 endif
+ifneq ($(filter declare,$(MAKECMDGOALS)),)
+  HdlSkip:=1
+endif
 Compile=$(HdlCompile)
 $(call OcpiDbgVar,HdlBin)
 $(infox LANGUAGE:$(HdlLanguage))

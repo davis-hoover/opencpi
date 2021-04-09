@@ -59,7 +59,9 @@ skeleton:  $(ImplHeaderFiles) $(SkelFiles)
 	      make -r --no-print-directory -C $(DirContainingLib) workersfile speclinks)
 
 ifeq ($(filter rcc,$(Model))$(filter clean%,$(MAKECMDGOALS))$(HdlActualTargets),)
-  $(info This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified)
+  ifneq ($(MAKECMDGOALS),declare)
+    $(info This $(UCModel) worker $(Worker) not built since no $(UCModel) targets or platforms specified)
+  endif
   all: liblinks
 else
   all: skeleton links
@@ -354,7 +356,7 @@ $(call OcpiDbgVar,BinLibLinks,Before all:)
 .PHONY: links binlinks genlinks $(Model)links liblinks
 # These are the lightest weight export links which do not involve code generation
 liblinks: $$(LibLinks)
-genlinks: liblinks
+declare genlinks: liblinks
 # <model>-worker.mk may define its own rules for more links
 $(Model)links:
 binlinks: $$(BinLibLinks) $(Model)links

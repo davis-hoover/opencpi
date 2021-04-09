@@ -41,6 +41,18 @@ generate:
 	$(call BuildModel,rcc,generate)
 	$(call BuildModel,test,generate)
 
+# declare all HDL workers in the library
+# suppress all targets, mostly for printing what is going on
+ifneq ($(filter declarehdl,$(MAKECMDGOALS)),)
+  MAKEOVERRIDES+=HdlPlatforms= HdlPlatform= HdlTargets= HdlTarget=
+  override HdlPlatforms=
+  override HdlPlatform=
+  override HdlTargets=
+  override HdlTarget=
+endif
+declarehdl:
+	$(call BuildModel,hdl,declare)
+
 ifdef ShellLibraryVars
 showlib:
 	$(info Tests="$(TestImplementations); Workers="$(Implementations)"; Package="$(Package)";)
