@@ -1,5 +1,5 @@
 <HdlWorker language="vhdl" spec="cdc_pulse_tester-spec" DataWidth="32" Version="2" libraries="cdc clocking"
-	   SourceFiles='cdc_clk_gen.vhd' OnlyTargets='zynq xsim isim zynq_ise modelsim'>
+	   SourceFiles='cdc_clk_gen.vhd' OnlyTargets='zynq xsim isim zynq_ise'>
 
   <StreamInterface Name="out" insertEOM="true" workerEOF="true" clockDirection="out"/>
 

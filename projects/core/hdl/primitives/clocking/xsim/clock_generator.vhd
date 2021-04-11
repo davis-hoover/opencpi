@@ -22,12 +22,16 @@ library ocpi; use ocpi.types.all;
 entity clock_generator is
     generic (
       CLK_PRIMITIVE          : string_t := to_string("plle2", 32);
+      VENDOR                 : string_t := to_string("xilinx", 32);
       CLK_IN_FREQUENCY_MHz   : real := 100.0;
       CLK_OUT_FREQUENCY_MHz  : real := 100.0;
+      REFERENCE_CLOCK_FREQUENCY : string_t := to_string("100.0 MHz", 32); -- not used for Xilinx IP
+      OUTPUT_CLOCK_FREQUENCY0   : string_t := to_string("100.0 MHz", 32); -- not used for Xilinx IP
       M                      : real := 5.0;  -- M
       N                      : integer := 1; -- D
       O                      : real := 1.0;  -- O
-   -- CLK_OUT_PHASE_DEGREES  : real; -- Add this in when there's a generalized way to support Xilinx and Intel phase shift in optimization script
+      CLK_OUT_PHASE_DEGREES  : real := 0.0;
+      PHASE_SHIFT0_PICO_SECS : string_t := to_string("0 ps", 32); -- not used for Xilinx IP
       CLK_OUT_DUTY_CYCLE     : real := 0.5);
     port(
       clk_in           : in     std_logic;
@@ -69,17 +73,47 @@ architecture rtl of clock_generator is
       locked            : out    std_logic);
   end component;
 
+   component mmcme4
+    generic (
+      DIVCLK_DIVIDE        : integer := 1; -- D
+      CLKFBOUT_MULT_F      : real := 5.0;  -- M
+      CLKOUT0_DIVIDE_F     : real := 1.0;  -- O
+      CLKOUT0_PHASE        : real := 0.0;
+      CLKOUT0_DUTY_CYCLE   : real := 0.5;
+      CLKIN1_PERIOD        : real := 0.0);
+    port(
+      clk_in1           : in     std_logic;
+      clk_out1          : out    std_logic;
+      reset             : in     std_logic;
+      locked            : out    std_logic);
+  end component;
+
+  component plle4
+    generic (
+      DIVCLK_DIVIDE        : integer := 1;  -- D
+      CLKFBOUT_MULT        : integer := 5;  -- M
+      CLKOUT0_DIVIDE       : integer := 1;  -- O
+      CLKOUT0_PHASE        : real := 0.0;
+      CLKOUT0_DUTY_CYCLE   : real := 0.5;
+      CLKIN1_PERIOD        : real := 0.0);
+    port(
+      clk_in1           : in     std_logic;
+      clk_out1          : out    std_logic;
+      reset             : in     std_logic;
+      locked            : out    std_logic);
+  end component;
+
 begin
   -- Zynq 7000 uses mmcme2 and plle2 primitives
   -- Zynq UltraScale uses mmcme3 and plle3 primitives
   -- Zynq Ultrascale+ uses mmcme4 and plle4 primitives
-  gen_pll: if CLK_PRIMITIVE = to_string("plle2", 32) generate
+  gen_plle2 : if CLK_PRIMITIVE = to_string("plle2", 32) generate
     inst_pll : component plle2
       generic map(
        DIVCLK_DIVIDE        =>  N,
        CLKFBOUT_MULT        =>  integer(M),
        CLKOUT0_DIVIDE       =>  integer(O),
-       --CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
+       CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
        CLKOUT0_DUTY_CYCLE   =>  CLK_OUT_DUTY_CYCLE,
        CLKIN1_PERIOD        =>  c_CLKIN1_PERIOD_NANO_SEC)
    	 port map (
@@ -87,15 +121,15 @@ begin
    	  clk_out1 => clk_out,
    	  reset => reset,
    	  locked => locked);
-  end generate gen_pll;
+  end generate gen_plle2;
 
-  gen_mmcm: if CLK_PRIMITIVE = to_string("mmcme2", 32) generate
+  gen_mmcme2 : if CLK_PRIMITIVE = to_string("mmcme2", 32) generate
    inst_mmcm : component mmcme2
      generic map(
       DIVCLK_DIVIDE        =>  N,
       CLKFBOUT_MULT_F      =>  M,
       CLKOUT0_DIVIDE_F     =>  O,
-      --CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
+      CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
       CLKOUT0_DUTY_CYCLE   =>  CLK_OUT_DUTY_CYCLE,
       CLKIN1_PERIOD        =>  c_CLKIN1_PERIOD_NANO_SEC)
   	 port map (
@@ -103,5 +137,37 @@ begin
   	  clk_out1 => clk_out,
   	  reset => reset,
   	  locked => locked);
-  end generate gen_mmcm;
+  end generate gen_mmcme2;
+
+  gen_plle4 : if CLK_PRIMITIVE = to_string("plle4", 32) generate
+    inst_pll : component plle4
+      generic map(
+       DIVCLK_DIVIDE        =>  N,
+       CLKFBOUT_MULT        =>  integer(M),
+       CLKOUT0_DIVIDE       =>  integer(O),
+       CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
+       CLKOUT0_DUTY_CYCLE   =>  CLK_OUT_DUTY_CYCLE,
+       CLKIN1_PERIOD        =>  c_CLKIN1_PERIOD_NANO_SEC)
+   	 port map (
+   	  clk_in1 => clk_in,
+   	  clk_out1 => clk_out,
+   	  reset => reset,
+   	  locked => locked);
+  end generate gen_plle4;
+
+  gen_mmcme4 : if CLK_PRIMITIVE = to_string("mmcme4", 32) generate
+   inst_mmcm : component mmcme4
+     generic map(
+      DIVCLK_DIVIDE        =>  N,
+      CLKFBOUT_MULT_F      =>  M,
+      CLKOUT0_DIVIDE_F     =>  O,
+      CLKOUT0_PHASE        =>  CLK_OUT_PHASE_DEGREES,
+      CLKOUT0_DUTY_CYCLE   =>  CLK_OUT_DUTY_CYCLE,
+      CLKIN1_PERIOD        =>  c_CLKIN1_PERIOD_NANO_SEC)
+  	 port map (
+  	  clk_in1 => clk_in,
+  	  clk_out1 => clk_out,
+  	  reset => reset,
+  	  locked => locked);
+  end generate gen_mmcme4;
 end rtl;

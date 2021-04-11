@@ -24,12 +24,16 @@ package clocking is
   component clock_generator is
       generic (
         CLK_PRIMITIVE          : string_t := to_string("plle2", 32); -- Used when a vendor has multiple clock primitives or versions for a part
+        VENDOR                 : string_t := to_string("agnostic", 32); -- Name of the vendor
         CLK_IN_FREQUENCY_MHz   : real;
         CLK_OUT_FREQUENCY_MHz  : real;
+        REFERENCE_CLOCK_FREQUENCY : string_t := to_string("100.0 MHz", 32); -- Altera/Intel uses strings for setting this unfortunately
+        OUTPUT_CLOCK_FREQUENCY0   : string_t := to_string("100.0 MHz", 32); -- Altera/Intel uses strings for setting this unfortunately
         M                      : real;  -- The multiply factor for a phase-locked loop
         N                      : integer; -- The divide factor for a phase-locked loop. Xilinx calls it D and Intel calls it N
         O                      : real; -- For phase-locked loops with muitlple outputs, this is the output divide factor. Xilinx calls it O and Intel calls it C
-        -- CLK_OUT_PHASE_DEGREES  : real; -- Phase shift of the output clock. Add this in when there's a generalized way to support Xilinx and Intel phase shift in optimization script
+        CLK_OUT_PHASE_DEGREES  : real;
+        PHASE_SHIFT0_PICO_SECS : string_t := to_string("0 ps", 32); -- Altera/Intel uses strings for setting this unfortunately
         CLK_OUT_DUTY_CYCLE     : real);
       port(
         clk_in           : in     std_logic;

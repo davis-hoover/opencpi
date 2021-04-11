@@ -1,5 +1,5 @@
 <HdlWorker language="vhdl" version="2" DataWidth="32" libraries="clocking cdc"
-	   OnlyTargets='zynq xsim isim zynq_ise modelsim'>
+	   OnlyTargets='zynq xsim isim zynq_ise'>
   <ComponentSpec>
     <Property Name="CLK_IN_FREQUENCY_MHz" Type="float"
                                 Parameter="true"
@@ -8,11 +8,22 @@
 
     <Property Name="CLK_OUT_FREQUENCY_MHz" Type="float"
                                 Parameter="true"
-                                Default="100.0"
+                                Default="50.0"
                                 Description="Output clock frequency"/>
+    
+    <Property Name="REFERENCE_CLOCK_FREQUENCY" Type="string"
+                                Parameter="true"
+                                stringLength='32'
+                                Default="100.0 MHz"
+                                Description="Output clock frequency. For Altera PLL."/>
 
+    <Property Name="OUTPUT_CLOCK_FREQUENCY0" Type="string"
+                                Parameter="true"
+                                stringLength='32'
+                                Default="50.0 MHz"
+                                Description="Output clock frequency. For Altera PLL."/>
 
-    <Property Name="CLKOUT_DUTY_CYCLE" Type="float"
+    <Property Name="CLK_OUT_DUTY_CYCLE" Type="float"
                                 Parameter="true"
                                 Default="0.5"
                                 Description="Duty Cycle"/>
@@ -23,12 +34,29 @@
                                 Default="plle2"
                                 Description="Which clock primitive to use"/>
 
+    <Property Name="VENDOR" Type="string"
+                                Parameter="true"
+                                stringLength='32'
+                                Default="xilinx"
+                                Description="Which Vendor's primitive is being used"/>
+
+    <Property Name="CLK_OUT_PHASE_DEGREES" Type="float"
+                                Parameter="true"
+                                Default="0.0"
+                                Description="Phase shift of output clock in degrees"/>  
+
+    <Property Name="PHASE_SHIFT0_PICO_SECS" Type="string"
+                                Parameter="true"
+                                stringLength='32'
+                                Default="0 ps"
+                                Description="Phase shift of output clock in pico seconds"/>          
+
     <Port Name="in"/>
     <Port Name="out" Producer="true" buffersize="in"/>
   </ComponentSpec>
   <Property Name="M" Type="float"
                               Parameter="true"
-                              Default="16"
+                              Default="10"
                               Description="Multiply Parameter"/>
 
   <Property Name="N" Type="ulong"
@@ -38,7 +66,7 @@
 
   <Property Name="O" Type="float"
                               Parameter="true"
-                              Default="16"
+                              Default="20"
                               Description="Output Clock Divide Parameter"/>
 
   <StreamInterface Name="in"

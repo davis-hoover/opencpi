@@ -90,7 +90,7 @@ run(RCCWorker *self, RCCBoolean timedOut, RCCBoolean *newRunCondition) {
   const RCCContainer *c = &self->container;  
   (void)timedOut;
 
-  // End state:  just send the zero length message to indicate "done"
+  // End state:  just send the zero length message to indicate the "finished" state
   // This will be unnecessary when EOS indication is fixed
 
   // Arrange to send the zero-length message after the last line of last image

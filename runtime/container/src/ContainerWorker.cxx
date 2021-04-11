@@ -36,6 +36,7 @@ namespace OCPI {
     Controllable::Controllable()
       : m_state(OU::Worker::EXISTS), m_controlMask(0) {
     }
+
     void Controllable::setControlOperations(const char *ops) {
       if (ops) {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)		\
@@ -90,16 +91,20 @@ namespace OCPI {
 	}
 	return true;
       }
+
       void copyFromCache(size_t start, size_t n, uint8_t *data) {
 	memcpy(data, m_data + start, n);
       }
+
       uint8_t *dataAt(size_t start) {
 	return m_data + start;
       }
+
       void fill(size_t start, size_t n, const uint8_t *data) {
 	memcpy(m_data + start, data, n);
 	setDirty(start, n);
       }
+
       void setDirty(size_t start, size_t n) {
 	Word *p = m_dirty + (start >> c_shift);
 	size_t offset = start & (c_bpw - 1);
@@ -125,6 +130,7 @@ namespace OCPI {
 	  *p |= (uint8_t)~(~0u << n);
       }
     };
+
     unsigned
       Cache::c_bpw = (unsigned)(sizeof(Cache::Word) * CHAR_BIT),
       Cache::c_shift =
@@ -168,6 +174,7 @@ namespace OCPI {
     isOperating() const{
       return this->getControlState() == OU::Worker::OPERATING;
     }
+
     void Worker::
     connectPort(OU::PortOrdinal ordinal) {
       m_connectedPorts |= 1u << ordinal;
@@ -191,10 +198,12 @@ namespace OCPI {
       newP.prepareOthers(nOthers, m_crewSize);
       return newP;
     }
+
     OA::Port &Worker::
     getPort(const char *a_name, const OA::PValue *params ) {
       return getPort(a_name, 0, params);
     }
+
     OA::PropertyInfo & Worker::setupProperty(const char *pname,
 					     volatile uint8_t *&m_writeVaddr,
 					     const volatile uint8_t *&m_readVaddr) const {
@@ -212,6 +221,7 @@ namespace OCPI {
 	prepareProperty(prop, m_writeVaddr, m_readVaddr);
       return prop;
     }
+
     OA::PropertyInfo & Worker::setupProperty(unsigned n,
 					     volatile uint8_t *&m_writeVaddr,
 					     const volatile uint8_t *&m_readVaddr) const {
@@ -220,6 +230,7 @@ namespace OCPI {
 	prepareProperty(prop, m_writeVaddr, m_readVaddr);
       return prop;
     }
+
     // ========================== Property Setting: 5 levels ===========================
 
     // Level 1 of 5, converting the property name into a reference to the property info object
@@ -229,12 +240,14 @@ namespace OCPI {
     setProperty(const char *pname, const char *value, OA::AccessList &list) const {
       setProperty(findProperty(pname), value, list);
     }
+
     const char *Worker::
     getProperty(const char *pname, std::string &value, OA::AccessList &list,
 		OA::PropertyOptionList &options,
 		OA::PropertyAttributes *a_attributes) const {
       return getProperty(findProperty(pname), value, list, options, a_attributes);
     }
+
     // Level 1.5 - use ordinals rather than names
     void Worker::
     setProperty(unsigned ordinal, const char *value, OA::AccessList &list) const {
@@ -243,6 +256,7 @@ namespace OCPI {
       assert(ordinal < nProps); // internal
       setProperty(props[ordinal], value, list);
     }
+
     const char *Worker::
     getProperty(unsigned ordinal, std::string &value, OA::AccessList &list,
 		OA::PropertyOptionList &options, OA::PropertyAttributes *a_attributes) const {
@@ -251,6 +265,7 @@ namespace OCPI {
       return ordinal >= nProps ? NULL :
 	getProperty(props[ordinal], value, list, options, a_attributes);
     }
+
     // Level 2 of 5, parsing the access list against the data type
     // Used for OA::Property methods that provide text valuers, that implicitly have the PropertyInfo
     // This is where navigation of property values occurs
@@ -263,6 +278,7 @@ namespace OCPI {
 	throw OU::Error("For setting value \"%s\" for property \"%s\": %s", v, prop.cname(), err);
       setProperty(prop, v, *m, offset, dimension);
     }
+
     const char *Worker::
     getProperty(const OCPI::API::PropertyInfo &prop, std::string &v, OA::AccessList &list,
 		OA::PropertyOptionList &options, OA::PropertyAttributes *a_attributes) const {
@@ -288,6 +304,7 @@ namespace OCPI {
       getProperty(prop, v, *m, offset, dimension, options, a_attributes);
       return v.c_str();
     }
+
     // Level 3 of 5, post, navigation, adjusting the data type based on dimension/slicing
     // This is the level that is intercepted for remote containers to avoid parse/unparse etc.
     void Worker::
@@ -317,6 +334,7 @@ namespace OCPI {
       } else
 	setProperty(prop, val, a_member, offset);
     }
+
     void Worker::
     getProperty(const OCPI::API::PropertyInfo &prop, std::string &val,
 		const OCPI::Util::Member &a_member, size_t offset, size_t dimension,
@@ -353,6 +371,7 @@ namespace OCPI {
       } else
 	getProperty(prop, val, a_member, offset, options, a_attributes);
     }
+
     // Level 4 of 5, parsing the value string into a OU::Value object
     // Used to avoid heap allocation when there is slicing (above).
     void Worker::
@@ -364,6 +383,7 @@ namespace OCPI {
 	throw OU::Error("For value \"%s\" for property \"%s\": %s", v, prop.m_name.c_str(), err);
       setProperty(prop, val, m, offset);
     }
+
     bool Worker::
     hasOption(OA::PropertyOptionList &options, OA::PropertyOption o) {
       for (auto it = options.begin(); it != options.end(); ++it)
@@ -371,6 +391,7 @@ namespace OCPI {
 	  return true;
       return false;
     }
+
     void Worker::
     getProperty(const OCPI::API::PropertyInfo &info, std::string &val, const OCPI::Util::Member &m,
 		size_t offset, OA::PropertyOptionList &options,
@@ -384,6 +405,7 @@ namespace OCPI {
 	v.unparse(val, NULL, hasOption(options, OA::PropertyOption::APPEND),
 		  hasOption(options, OA::PropertyOption::HEX));
     }
+
     // Level 5 of 5: doing the real work based on a value object and an offset, dealing with caching
     // This level is used directly for delayed settings from the application level
     // Internal used by others.
@@ -398,6 +420,7 @@ namespace OCPI {
       OU::Property &p = property(ordinal);
       setProperty(p, v, p, 0);
     }
+
     // dirty != NULL means for reading rather than writing
     Cache *Worker::
     getCache(const OA::PropertyInfo &info, size_t offset, const OU::Member &m, bool *dirty,
@@ -433,6 +456,7 @@ namespace OCPI {
       }
       return cache;
     }
+
     // Basic setting without any data type information
     void Worker::
     setData(const OA::PropertyInfo &info, Cache *cache, size_t offset, const uint8_t *data,
@@ -460,6 +484,7 @@ namespace OCPI {
       if (last && info.m_writeSync)
 	propertyWritten(info.m_ordinal); // Some has been written
     }
+
     // Basic getting of possibly-cached data without any data type information
     // There are basically two different modes as seen by the caller
     // 1. copy the value into the callers buffer, maybe from cache
@@ -501,6 +526,7 @@ namespace OCPI {
       }
       return data;
     }
+
     void Worker::
     setProperty(const OA::PropertyInfo &info, const OU::Value &v, const OU::Member &m,
 		size_t mOffset) const {
@@ -630,6 +656,7 @@ namespace OCPI {
 	getData(info, cache, dirty, mOffset, data, 0, m.m_nBits);
       }
     }
+
     bool Worker::
     getProperty(unsigned ordinal, std::string &a_name, std::string &value, bool *unreadablep,
 		bool hex, bool *cachedp, bool uncached, bool *hiddenp) {
@@ -671,6 +698,7 @@ namespace OCPI {
 	*unreadablep = true;
       return true;
     }
+
     // batch setting with lots of error checking - all or nothing
     void Worker::setProperties(const OA::PValue *props) {
       if (props)
@@ -689,11 +717,13 @@ namespace OCPI {
 	  }
 	}
     }
+
     // batch setting with lots of error checking - all or nothing
     void Worker::setProperties(const char *props[][2]) {
       for (const char *(*p)[2] = props; (*p)[0]; p++)
 	setProperty((*p)[0], (*p)[1]);
     }
+
     // Common top level implementation for control operations
     // Note that the m_controlMask does not apply at this level
     // since the container might want to know anyway, even if the
@@ -779,9 +809,11 @@ namespace OCPI {
       }
       return false;
     }
+
     bool Worker::beforeStart() const {
       return getControlState() == INITIALIZED;
     }
+
     bool Worker::isDone() {
       switch(getControlState()) {
       case FINISHED:
@@ -792,6 +824,7 @@ namespace OCPI {
 	return false;
       }
     }
+
     bool Worker::wait(OCPI::OS::Timer *timer) {
       Container &c = application()->container();
       ocpiDebug("Waiting1 for \"done\" worker! %p %u %u %u", &c, c.enabled(), isDone(), getControlState());
@@ -887,11 +920,13 @@ namespace OCPI {
       checkInfo(ordinal);
       setStringProperty(m_properties[ordinal], m_properties[ordinal], 0, s, idx);
     }
+
     void Worker::
     getStringPropertyOrd(unsigned ordinal, char *str, size_t length, unsigned idx) const {
       checkInfo(ordinal);
       getStringProperty(m_properties[ordinal], m_properties[ordinal], 0, str, length, idx);
     }
+
     void Worker::
     setStringCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
 		    size_t offset, const char *val, unsigned idx) const {
@@ -902,6 +937,7 @@ namespace OCPI {
       Cache *cache = getCache(info, offset, m);
       setData(info, cache, offset + idx * m.m_elementBytes, (uint8_t*)val, len + 1);
     }
+
     const char *Worker::
     getStringCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
 		    size_t offset, char *buf, size_t a_len, unsigned idx) const {
@@ -915,6 +951,7 @@ namespace OCPI {
       getData(info, cache, dirty, offset + idx * m.m_elementBytes, data, m.m_stringLength + 1);
       return buf;
     }
+
     void Worker::
     setStringSequenceCached(const OCPI::API::PropertyInfo &info, const char * const *vals, size_t n) const {
       Cache *cache = getCache(info, 0, info);				\
@@ -932,6 +969,7 @@ namespace OCPI {
       if (info.m_isSequence)
 	setData(info, cache, 0, (uint8_t*)&nElements, 0, sizeof(uint32_t) * 8);
     }
+
     unsigned Worker::
     getStringSequenceCached(const OCPI::API::PropertyInfo &info, char **vals, size_t n,
 				char *buf, size_t space) const {
@@ -959,6 +997,7 @@ namespace OCPI {
       }
       return nElements;
     }
+
     size_t Worker::
     getSequenceLengthCached(const OCPI::API::PropertyInfo &info, const OCPI::Util::Member &m,
 			    size_t offset) const {
@@ -971,11 +1010,13 @@ namespace OCPI {
       getData(info, cache, dirty, offset, data, 0, 32);
       return nElements;
     }
+
     size_t WorkerControl::
     getSequenceLengthProperty(const OCPI::API::PropertyInfo &info, const Util::Member &/*m*/,
 			      size_t offset) const {
       return getProperty32(info, offset, 0);
     }
+
     void Worker::
     getStringParameter(unsigned ordinal, char *out, size_t length, unsigned idx) const {
       OU::Property &p = m_properties[ordinal];
@@ -983,32 +1024,38 @@ namespace OCPI {
       OU::Value &v = *p.m_default;
       strncpy(out, p.m_isSequence || p.m_arrayRank ? v.m_pString[idx] : v.m_String, length);
     }
+
     Port &Worker::
     createOutputPort(OU::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
 		     const OU::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }
+
     Port &Worker::
     createInputPort(OU::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
 		    const OU::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }
+
     Port &Worker::
     createTestPort(OU::PortOrdinal /*portId*/, size_t /*bufferCount*/, size_t /*bufferSize*/,
 		   bool /*isProvider*/, const OU::PValue */*params*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
       return *(Port*)this;
     }
+
     void Worker::
     read(size_t /*offset*/, size_t /*size*/, void */*data*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
     }
+
     void Worker::
     write(size_t /*offset*/, size_t /*size*/, const void */*data*/) {
       ocpiAssert("This method is not expected to ever be called" == 0);
     }
+
     WorkerControl::~WorkerControl(){}
   }
   namespace API {

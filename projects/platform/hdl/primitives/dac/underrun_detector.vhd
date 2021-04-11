@@ -66,7 +66,7 @@ begin
     if(rising_edge(clk)) then
       if(rst = '1') then
         num_underruns <= (others=>'0');
-      elsif (underrun = '1' and num_underruns < num_underruns_count_max_value) then
+      elsif (xfer_underrun_error = '1' and num_underruns < num_underruns_count_max_value) then
         num_underruns <= num_underruns + 1;
       end if;
     end if;

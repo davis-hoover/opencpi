@@ -39,7 +39,7 @@ namespace OCPI {
       : m_attributes(NULL), m_ports(NULL), m_memories(NULL), m_nPorts(0), m_nMemories(0),
 	m_version(0), m_workerEOF(false), m_totalPropertySize(0),// m_isSource(false),
 	m_isDebug(false), m_nProperties(0), m_properties(NULL), m_firstRaw(NULL), m_xml(NULL),
-        m_ordinal(0), m_slaveAssembly(NULL) {
+        m_ordinal(0), m_slaveAssembly(NULL), m_isEmulator(false) {
     }
 
     Worker::~Worker() {
@@ -48,6 +48,7 @@ namespace OCPI {
       //      delete [] m_tests;
       delete [] m_memories;
     }
+
     Property *Worker::
     getProperty(const char *id) const {
       Property *p = m_properties;
@@ -56,6 +57,7 @@ namespace OCPI {
           return p;
       return NULL;
     }
+
     unsigned Worker::
     whichProperty(const char *id) const {
       Property *p = getProperty(id);
@@ -63,9 +65,11 @@ namespace OCPI {
 	return p->m_ordinal;
       throw Error("Unknown property: \"%s\" for worker \"%s\"", id, m_specName.c_str());
     }
+
     Property &Worker::findProperty(const char *id) const {
       return *(m_properties + whichProperty(id));
     }
+
     Port *Worker::findMetaPort(const char *id, const Port *except) const {
       Port *p = m_ports;
       for (unsigned int n = m_nPorts; n; n--, p++)
@@ -73,6 +77,7 @@ namespace OCPI {
           return p;
       return NULL;
     }
+
     const char *Worker::finalizeProperties(size_t &offset, uint64_t &totalSize, const IdentResolver *resolver) {
       const char *err;
       assert(m_firstRaw == NULL);
@@ -95,16 +100,19 @@ namespace OCPI {
       }
       return NULL;
     }
+
 #if 0
     Test &Worker::findTest(unsigned int testId) const {
        (void)testId;
        ocpiAssert(0); return *m_tests;
     }
+
     Slave::
     Slave(const char *worker)
       : m_name(worker), m_worker(worker), m_slavePort(NULL), m_delegated(NULL),
 	m_index(0), m_optional(false) {
     }
+
     Slave::
     Slave(Worker &w, ezxml_t xml, unsigned ordinal, const char *&err)
       : m_name(ezxml_cattr(xml, "name")), m_worker(ezxml_cattr(xml, "worker")),
@@ -130,6 +138,7 @@ namespace OCPI {
       if (err ||
 	  (err = OE::getNumber8(xml, "version", &m_version)) ||
 	  (err = OE::getBoolean(xml, "workerEOF", &m_workerEOF)) ||
+	  (err = OE::getBoolean(xml, "emulator", &m_isEmulator)) ||
 	  (err = OE::getRequiredString(xml, m_package, "package", "worker")) ||
 	  (err = OE::getRequiredString(xml, m_model, "model", "worker")))
 	return err;
@@ -239,6 +248,7 @@ namespace OCPI {
       m_slaveAssembly = ezxml_cchild(xml, "slaves");
       return NULL;
     }
+
     // Get a property value from the metadata
     const char *Worker::getValue(const char *sym, ExprValue &val) const {
       // Our builtin symbols take precendence, but can be overridden with @
@@ -269,11 +279,13 @@ namespace OCPI {
 	  return p->getValue(val);
       return esprintf("no property found for identifier \"%s\"", sym);
     }
+
     const char *Worker::
     getNumber(ezxml_t x, const char *attr, size_t *np, bool *found, size_t defaultValue,
 	      bool setDefault) const {
       return OE::getNumber(x, attr, np, found, defaultValue, setDefault);
     }
+
     void parse3(char *s, std::string &s1, std::string &s2,
 		std::string &s3) {
       char *orig = strdup(s), *temp = orig;
@@ -327,13 +339,16 @@ namespace OCPI {
       free(p);
       validate();
     }
+
     void Attributes::validate() { }
+
     const char *Worker::s_controlOpNames[] = {
 #define CONTROL_OP(x, c, t, s1, s2, s3, s4)  #x,
           OCPI_CONTROL_OPS
 #undef CONTROL_OP
 	  NULL
     };
+
     const char *Worker::s_controlStateNames[] = {
 #define CONTROL_STATE(s) #s,
       OCPI_CONTROL_STATES

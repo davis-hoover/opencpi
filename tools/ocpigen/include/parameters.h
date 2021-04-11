@@ -40,7 +40,7 @@ typedef std::set<std::string> Strings;
 typedef Strings::const_iterator StringsIter;
 
 class Worker;
-#define PARAM_ATTRS "name", "value", "values", "valueFile", "valueFiles"
+#define PARAM_ATTRS "name", "value", "values", "valueFile", "valuesFile"
 struct Param {
   std::string                 m_name;       // if spec, same as m_param->m_name, if impl worker.model.property
   OCPI::Util::Value           m_value;      // value for the current config, perhaps the default

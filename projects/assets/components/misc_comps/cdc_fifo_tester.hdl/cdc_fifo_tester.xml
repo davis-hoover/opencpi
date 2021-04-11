@@ -1,5 +1,5 @@
 <HdlWorker language="vhdl" spec="cdc_fifo_tester-spec" DataWidth="32" Version="2" libraries="cdc util clocking"
-	   sourcefiles='cdc_clk_gen.vhd' OnlyTargets='zynq xsim isim zynq_ise modelsim'>
+	   sourcefiles='cdc_clk_gen.vhd' OnlyTargets='zynq xsim isim zynq_ise'>
 
   <StreamInterface Name="out" insertEOM="true" workerEOF="true" clockDirection="out"/>
 

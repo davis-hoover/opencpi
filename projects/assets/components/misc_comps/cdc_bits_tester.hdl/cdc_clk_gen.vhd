@@ -100,11 +100,13 @@ begin
     inst_100_to_50 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
+        VENDOR                 => to_string("xilinx", 32),
         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 24.0,
+        CLK_OUT_PHASE_DEGREES  => 0.0,
         CLK_OUT_DUTY_CYCLE     => 0.5)
       port map(
         clk_in => ctl_clk,
@@ -115,11 +117,13 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
+        VENDOR                 => to_string("xilinx", 32),
         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 12.0,
+        CLK_OUT_PHASE_DEGREES  => 0.0,
         CLK_OUT_DUTY_CYCLE     => 0.5)
       port map(
         clk_in => ctl_clk,
@@ -134,11 +138,13 @@ begin
     inst_100_to_25 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
+        VENDOR                 => to_string("xilinx", 32),
         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 48.0,
+        CLK_OUT_PHASE_DEGREES  => 0.0,
         CLK_OUT_DUTY_CYCLE     => 0.5)
       port map(
         clk_in => ctl_clk,
@@ -149,11 +155,13 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
+        VENDOR                 => to_string("xilinx", 32),
         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 12.0,
+        CLK_OUT_PHASE_DEGREES  => 0.0,
         CLK_OUT_DUTY_CYCLE     => 0.5)
       port map(
         clk_in => ctl_clk,
@@ -168,11 +176,13 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
+        VENDOR                 => to_string("xilinx", 32),
         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 12.0,
+        CLK_OUT_PHASE_DEGREES  => 0.0,
         CLK_OUT_DUTY_CYCLE     => 0.5)
       port map(
         clk_in => ctl_clk,
@@ -183,11 +193,13 @@ begin
     inst_100_to_50 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
+        VENDOR                 => to_string("xilinx", 32),
         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 24.0,
+        CLK_OUT_PHASE_DEGREES  => 0.0,
         CLK_OUT_DUTY_CYCLE     => 0.5)
       port map(
         clk_in => ctl_clk,
@@ -202,11 +214,13 @@ begin
     inst_100_to_100 : clocking.clocking.clock_generator
       generic map (
         CLK_PRIMITIVE          => to_string("mmcme2", 32),
+        VENDOR                 => to_string("xilinx", 32),
         CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
         CLK_OUT_FREQUENCY_MHz  => src_clk_hz/(1.0E6),
         M                      => 12.0,
         N                      => 1,
         O                      => 12.0,
+        CLK_OUT_PHASE_DEGREES  => 0.0,
         CLK_OUT_DUTY_CYCLE     => 0.5)
       port map(
         clk_in => ctl_clk,
@@ -217,11 +231,13 @@ begin
      inst_100_to_25 : clocking.clocking.clock_generator
        generic map (
          CLK_PRIMITIVE          => to_string("mmcme2", 32),
+         VENDOR                 => to_string("xilinx", 32),
          CLK_IN_FREQUENCY_MHz   => ctl_clk_hz/(1.0E6),
          CLK_OUT_FREQUENCY_MHz  => dst_clk_hz/(1.0E6),
          M                      => 12.0,
          N                      => 1,
          O                      => 48.0,
+         CLK_OUT_PHASE_DEGREES  => 0.0,
          CLK_OUT_DUTY_CYCLE     => 0.5)
        port map(
          clk_in => ctl_clk,

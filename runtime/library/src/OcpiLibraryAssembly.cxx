@@ -29,10 +29,12 @@ namespace OCPI {
   namespace Library {
     namespace OU = OCPI::Util;
     namespace OE = OCPI::Util::EzXml;
+
     // Attributes specific to an application assembly
     static const char *assyAttrs[] = { COLLOCATION_POLICY_ATTRS,
 				       "maxprocessors", "minprocessors", "roundrobin", "done",
 				       NULL};
+
     // The instance attributes relevant to app assemblies - we don't really deal with "container" here
     // FIXME: It should be in the upper level
     static const char *instAttrs[] = { COLLOCATION_POLICY_ATTRS,
@@ -42,15 +44,18 @@ namespace OCPI {
       : OU::Assembly(file, assyAttrs, instAttrs, params), m_refCount(1) {
       findImplementations(params);
     }
+
     Assembly::Assembly(const std::string &string, const OCPI::Util::PValue *params)
       : OU::Assembly(string, assyAttrs, instAttrs, params), m_refCount(1) {
       findImplementations(params);
     }
 #endif
+
     Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OCPI::Util::PValue *params)
       : OU::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
       findImplementations(params);
     }
+
     Assembly::~Assembly() {
       for (size_t n = 0; n < m_instances.size(); n++)
 	delete m_instances[n];
@@ -136,6 +141,7 @@ namespace OCPI {
       return OU::esprintf("Port \"%s\" not found for instance in \"%s\" parameter assignment: %s",
 			  pname.c_str(), pName, assign);
     }
+
     // After all the other implementations are established, so we know port directions etc.,
     // insert file read/write components
     const char *Assembly::
@@ -186,6 +192,7 @@ namespace OCPI {
       }
       return NULL;
     }
+
     // The util::assembly only knows port names, not worker port ordinals
     // (because it has not been correlated with any implementations).
     // It may not even know port names if connect shortcuts are used.
@@ -329,6 +336,7 @@ namespace OCPI {
       }
       return false;
     }
+
     // Perform connectivity checks for a candidate implementation for this instance
     // Return true if the implementation is still acceptable
     bool Assembly::Instance::
@@ -403,6 +411,7 @@ namespace OCPI {
       }
       return true;
     }
+
     // The callback for the findImplementations() method below.
     // Return true if we found THE ONE.
     // Set accepted = true, if we actually accepted one
@@ -412,6 +421,7 @@ namespace OCPI {
 	accepted = true;
       return false; // we never terminate the search among possibilities...
     }
+
     // The library assembly instance has a candidate implementation.
     // Check it out, and maybe accept it as a candidate
     bool Assembly::Instance::
@@ -583,6 +593,7 @@ namespace OCPI {
       if (m_tempInstance->m_candidates.size() > m_maxCandidates)
 	m_maxCandidates = (unsigned)m_tempInstance->m_candidates.size();
     }
+
     // A common method used by constructors
     void Assembly::findImplementations(const OU::PValue *params) {
       const char *err;
@@ -677,6 +688,7 @@ namespace OCPI {
 	}
       }
     }
+
     // A port is connected in the assembly, and the port it is connected to is on an instance
     // with an already chosen implementation. Now we can check whether this impl conflicts with
     // that one or not
@@ -704,11 +716,13 @@ namespace OCPI {
       }
       return false;
     }
+
     Assembly::Instance::
     Instance(OU::Assembly::Instance &utilInstance, Instance *master)
       : m_utilInstance(utilInstance), m_assyPorts(NULL), m_nPorts(0), m_master(master) {
       // m_assyPorts will be initialized based on first impl found
     }
+
     Assembly::Instance::
     ~Instance()  {
       delete [] m_assyPorts;
