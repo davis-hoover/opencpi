@@ -304,8 +304,8 @@
 +runtime/remote-support/scripts/ocpiremote.py <target>/bin/ocpiremote
 ################################################################################
 # Man pages (initially premade)
-+doc/man/man1 doc/man/
-+doc/man/html doc/man/
++doc/man/gen/man1 doc/man/
++doc/man/gen/html doc/man/
 # PDFs and HTML (aka gitlab.io)
 +.public/releases/* doc/pdfs/
 

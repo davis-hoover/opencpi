@@ -58,6 +58,10 @@ make -C "$project" exports
 # Build the framework
 echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_DIR"
 make
+# Build the man pages
+echo "Now we will build the OpenCPI manual pages for command line utilities
+make -C doc/man
+
 [ -n "$2" ] && exit 0
 
 # Build kernel module
