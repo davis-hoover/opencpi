@@ -91,6 +91,9 @@ PKGS_D+=(bison)
 PKGS_D+=(flex)
 #    Needed for shell-based XML extractions, xmllint, standard in centos7
 PKGS_D+=(libxml2-utils)
+#    Needed for processing Xilinx release tarball(s).  Originally
+#    thought this was a dependency of "lsb" on *ubuntu.
+PKGS_D+=(fakeroot)
 
 ##########################################################################################
 # S. conveniences or required for source environment
