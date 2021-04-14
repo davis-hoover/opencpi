@@ -60,7 +60,7 @@ echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_
 make
 # Build the man pages
 echo "Now we will build the OpenCPI manual pages for command line utilities"
-make -C doc/man
+make man
 
 [ -n "$2" ] && exit 0
 

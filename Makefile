@@ -191,7 +191,7 @@ cleaneverything distclean: clean cleandriver cleanpackaging
 # The "pages" target creates the HTML index files for the generated documentation.
 # "make pages" must happen before "make rpm Package=doc" is attempted if you want
 # the optional HTML index pages to be included as part of the doc RPM.
-.PHONY: doc pages
+.PHONY: doc pages man
 .SILENT: doc pages
 doc:
 	$(AT)rm -rf doc/{pdfs,html}
@@ -200,7 +200,11 @@ doc:
 pages:
 	$(AT)doc/build-pages.py HEAD
 
+man:
+	$(AT)make -C doc/man
 
+cleanman:
+	$(AT)make -C doc/man clean
 ##########################################################################################
 # Goals, variables and macros that are about packaging the CDK, whether tarball, rpm, etc.
 ##### Set variables that affect the naming of the release packages
