@@ -42,8 +42,7 @@ controllerNotSupported(PortSet &/*output*/, PortSet &/*input*/) {
 
 Controller::
 Controller(PortSet &output, PortSet &input)
-  :  m_FillQPtr(0), m_EmptyQPtr(0), m_output(output), m_input(input), m_nextTid(0),
-     m_zcopyEnabled(true) {
+  :  m_EmptyQPtr(0), m_output(output), m_input(input), m_nextTid(0), m_zcopyEnabled(true) {
   // For convenience
   m_isWholeOutputSet =
     output.getDataDistribution()->getMetaData()->distType == DataDistributionMetaData::parallel;

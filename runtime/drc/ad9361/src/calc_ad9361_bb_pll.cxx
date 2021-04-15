@@ -51,9 +51,12 @@
 
 #include <cstdint>         // uint8_t, uint32_t types
 #include <sstream>         // std::ostringstream
+#include "OcpiUtilMisc.h"  // esprintf
 #include "ad9361.h"        // BBPLL_MODULUS macro
 #include "ad9361_platform.h" // regs_clock_bbpll_t
 #include "calc_ad9361_bb_pll.h"
+
+namespace OU = OCPI::Util;
 
 void get_min_AD9361_BBPLL_ref_scaler(
     calc_AD9361_BBPLL_ref_scaler_t& calc_obj) {
@@ -232,12 +235,9 @@ const char* regs_calc_AD9361_BBPLL_Divider(
   // [D2:D0]-BBPLL Divider[2:0]
   // BBPLL Divider[2:0] is valid from 1 through 6.
   uint8_t BBPLL_Divider_2_0 = (regs.clock_bbpll & 0x07);
-  if((BBPLL_Divider_2_0 == 0) or (BBPLL_Divider_2_0 >= 7)) {
-    std::ostringstream oss;
-    oss << "could not calculate AD9361 BBPLL Divider due to invalid value ";
-    oss << "of " << regs.clock_bbpll << "for register 0x00A";
-    return oss.str().c_str();
-  }
+  if (BBPLL_Divider_2_0 == 0 or BBPLL_Divider_2_0 >= 7)
+    return OU::esprintf("could not calculate AD9361 BBPLL Divider due to invalid value of 0x%x "
+			"for register 0x00A", regs.clock_bbpll);
   calc_obj.BBPLL_Divider = BBPLL_Divider_2_0;
 
   return 0;

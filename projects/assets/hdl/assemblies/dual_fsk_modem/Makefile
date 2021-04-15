@@ -16,20 +16,21 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Build Ordering Rules:
-# 1) Subdevices that support other devices must occur AFTER the devices they support.
-# 2) Similarly, Emulators must occur after the devices they emulate.
-Workers = \
-	data_sink_qdac.hdl \
-	data_sink_qdac_ad9361_sub.hdl \
-	data_sink_qdac_em.hdl \
-	data_src_qadc.hdl \
-	data_src_qadc_ad9361_sub.hdl \
-	data_src_qadc_em.hdl \
-	platform_ad9361_config.hdl \
-	platform_ad9361_config_proxy.rcc \
-	platform_ad9361_data_sub.hdl \
-	platform_ad9361_spi.hdl \
-	signal_time_tagger.hdl \
+$(if $(realpath $(OCPI_CDK_DIR)),,$(error The OCPI_CDK_DIR environment variable is not set correctly.))
+Containers= \
+	cnt_zed_fmcomms_2_3_scdcd
+#  Following platforms require updates to support complexShortWithMetadata protocol 
+#       cnt_1rx_1tx_thruasm_fmcomms_2_3_lpc_LVDS_ml605 \
+	cnt_1rx_1tx_thruasm_matchstiq_z1 \
+	cnt_1rx_1tx_thruasm_zipper_hpc_ml605 \
+	cnt_1rx_1tx_thruasm_zipper_hsmc_a_alst4 \
+	cnt_1rx_1tx_thruasm_zipper_hsmc_b_alst4 \
+	cnt_1rx_1tx_thruasm_zipper_lpc_ml605 \
+	cnt_1rx_1tx_thruasm_zipper_lpc_zed \
+# ML605/FMCOMMS3-FMC_HPC combo is currently known to have TX data fidelity issues
+#	cnt_1rx_1tx_thruasm_fmcomms_2_3_hpc_LVDS_ml605
 
-include $(OCPI_CDK_DIR)/include/library.mk
+DefaultContainers=
+ExcludePlatforms=isim modelsim xsim
+Libraries+=misc_prims util_prims dsp_prims comms_prims
+include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk

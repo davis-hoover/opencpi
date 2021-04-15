@@ -40,13 +40,16 @@ struct DevInstance {
   DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
 	      const DevInstance *parent);
   const char *cname() const { return m_name.c_str(); }
+  // content arg means there is extra content so suppress the end tag
+  void emit(std::string &assy, bool emulated, bool content) const;
 };
 
 typedef std::list<DevInstance> DevInstances;
 typedef DevInstances::const_iterator DevInstancesIter;
 
 #define HDL_CONFIG_ATTRS "platform", "sdpWidth", "constraints"
-#define HDL_CONFIG_ELEMS "cpmaster", "nocmaster", "device", "property", "signal"
+// Properties and signals relate to the platform worker
+#define HDL_CONFIG_ELEMS "cpmaster", "device", "property", "signal"
 
 typedef std::vector<const Card*> Plugged;
 

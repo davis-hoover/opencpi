@@ -23,6 +23,21 @@
 
 #ifndef _AD9361_PLATFORM
 #define _AD9361_PLATFORM
+#include <pthread.h>
+
+namespace OCPI {
+namespace AD9361 {
+  // C++ version using thread-safety
+  struct CallBack {
+    // Return the thread key for the callbacks
+    static pthread_key_t get_opencpi_key();
+    virtual void get_byte(uint8_t id_no, uint16_t addr, uint8_t *buf) = 0;
+    virtual void set_byte(uint8_t id_no, uint16_t addr, const uint8_t *buf) = 0;
+    virtual void set_reset(uint8_t id_no, bool on) = 0;
+    const char *worker;
+  };
+}
+}
 
 // AD9361_Register_Map_Reference_Manual_UG-671.pdf refers to register bits
 // as D7 - D0
@@ -55,6 +70,7 @@ typedef struct {
   void (*set_reset)(uint8_t id_no, bool on);
   const char *worker;
 }  Ad9361Opencpi;
+
 extern Ad9361Opencpi ad9361_opencpi;
 #define THIS_OPENCPI_WORKER_STRING ad9361_opencpi.worker;
 

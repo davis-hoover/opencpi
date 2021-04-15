@@ -1026,7 +1026,7 @@ emitConnectionSignal(FILE *f, bool output, Language /*lang*/, bool /*clock*/, st
 
 const char *Port::
 fixDataConnectionRole(OU::Assembly::Role &role) {
-  if (role.m_knownRole)
+  if (role.m_knownRole && (role.m_provider != !m_master || role.m_bidirectional))
     return OU::esprintf("Role of port %s of worker %s in connection is incompatible with a port"
 			" of type \"%s\"",
 			pname(), m_worker->m_implName, typeName());

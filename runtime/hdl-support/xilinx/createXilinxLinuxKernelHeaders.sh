@@ -273,4 +273,5 @@ echo Removing unused large headers
 rm -rf kernel-headers/include/linux/{mfd,platform_data}
 echo Creating the compressed archive for kernel headers
 tar -c -z -f kernel-headers.tgz kernel-headers
-rm -r -f kernel-headers
+# This wierdness is to overcome a race condition where spotlight files appear asynchronously
+rm -r -f kernel-headers || rm -r -f kernel-headers

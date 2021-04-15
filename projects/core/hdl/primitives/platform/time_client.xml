@@ -1,5 +1,5 @@
-<HdlWorker language='vhdl' library='platform'>
+<HdlDevice language='vhdl' library='platform'>
   <ComponentSpec nocontrol='true' package='ocpi.core'/>
   <timeservice/>
   <timeinterface master='true' clockDirection='in' fractionwidth='32'/>
-</HdlWorker>
+</HdlDevice>

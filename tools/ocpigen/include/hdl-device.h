@@ -51,12 +51,20 @@ struct Support {
 };
 typedef std::list<Support> Supports;
 typedef Supports::const_iterator SupportsIter;
+
+// XML allowed for the HdlDevice class
+#define HDL_DEVICE_ATTRS HDL_WORKER_ATTRS, "emulate"
+// Device workers are allowed to have any of the infrastructure port types
+#define HDL_DEVICE_ELEMS HDL_WORKER_ELEMS, "supports", "signal", "devsignal", "rawprop", "timebase", \
+    "devsignals", "sdp", "metadata", "unoc", "timeservice", "cpmaster", "control"
+
 class HdlDevice : public Worker {
 public:
   //  static DeviceTypes s_types;
   bool               m_interconnect;  // Can this type of device be used for an interconnect?
   bool               m_canControl;    // Can this interconnect worker provide control?
   Supports           m_supports;      // what subdevices are supported?
+  std::map<std::string, unsigned> m_countPerSupportedWorkerType; // how many of type do we support?
   static HdlDevice *
     get(const char *name, ezxml_t xml, const char *parentFile, Worker *parent, const char *&err);
   static HdlDevice *create(ezxml_t xml, const char *file, const std::string &parentFile, Worker *parent,
@@ -71,6 +79,11 @@ public:
 typedef HdlDevice DeviceType;
 struct Board;
 struct SlotType;
+
+// XML that is allowed for the Device class, for <device> and overloaded for <hdlplatform>
+#define DEVICE_ATTRS "worker", "name"
+#define DEVICE_ELEMS "supported", "property", "signal"
+
 struct Device {
   Board &m_board;
   DeviceType &m_deviceType;
@@ -78,15 +91,8 @@ struct Device {
   unsigned m_ordinal;           // Ordinal of this device on this platform/card
   ExtMap   m_dev2bd;            // map from device type signals to board signals
   std::list<std::string> m_strings; // storage management since sigmaps don't hold strings
-  // A map for supporting(sub) devices, to indicate the actual devices they are supporting
-  // when it isn't obvious (there is only one such supported device or the ordinals match)
-  // Maps the pair:
-  //       - devtypename
-  //       - ordinal for supports elements for that devtype in supporting devicetype
-  // to a device name on the platform/card/board
-  std::map<std::pair<std::string, unsigned>, std::string> m_supportsMap;
-  // Constructor for defining new devices.
-  // If on a card, the stype will be supplied
+  std::list<std::string> m_supportedDevices; // temporary between pass 1 and pass2 parsing
+  std::vector<const Device *> m_supportsMap; // using the same order as the underlying device worker's "supports"
   Device(Board &b, DeviceType &dt, const std::string &wname, ezxml_t xml, bool single,
 	 unsigned ordinal, SlotType *stype, const char *&err);
   static Device *
@@ -98,10 +104,6 @@ struct Device {
   const char *cname() const { return m_name.c_str(); }
   static const Device *
   find(const char *name, const Devices &devices);
-#if 0
-  static const Device &
-  findSupport(const DeviceType &dt, unsigned ordinal, const Devices &devices);
-#endif
 };
 
 // common behavior for platforms and cards
@@ -116,12 +118,8 @@ struct Board {
   virtual const char *cname() const = 0;
   const Devices &devices() const { return m_devices; }
   const Device *findDevice(const char *name) const;
+  const Device *findDevice(const std::string &name) const { return findDevice(name.c_str()); }
   Devices &devices() { return m_devices; }
-#if 0
-  const Device &findSupport(const DeviceType &dt, unsigned ordinal) const {
-    return Device::findSupport(dt, ordinal, m_devices);
-  }
-#endif
   const Device *findDevice(const char *name) {
     return Device::find(name, m_devices);
   }

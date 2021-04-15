@@ -171,7 +171,7 @@ class TestUtilization(unittest.TestCase):
         """
         Need to make sure registry is set to current system default before proceeding
         """
-        if subprocess.call("mkdir -p " + UTIL_PROJ, shell=True) != 0:
+        if subprocess.call("rm -r -f " + UTIL_PROJ + " && mkdir -p " + UTIL_PROJ, shell=True) != 0:
            raise ocpiutil.OCPIException("mkdir failed to create the utilization test project directory")
         with ocpiutil.cd(UTIL_PROJ):
             if subprocess.call("tar xf ../" + UTIL_PROJ + ".tgz", shell=True) != 0:

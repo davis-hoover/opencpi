@@ -136,13 +136,6 @@ namespace OCPI {
         m_apiApplication(app) {
       init(params);
     }
-#if 0
-    ApplicationI::ApplicationI(Application &app, const std::string &str, const PValue *params)
-      : m_assembly(createLibraryAssembly(str.c_str(), m_deployXml, m_appXml, m_copy, params)),
-        m_apiApplication(app) {
-      init(params);
-    }
-#endif
     ApplicationI::ApplicationI(Application &app, ezxml_t xml, const char *a_name,
                                const PValue *params)
       : m_earliest(OS::Time::now()), m_constructed(0), m_initialized(0), m_started(0), m_finished(0),
@@ -293,61 +286,6 @@ namespace OCPI {
       }
     }
 
-#if 0
-    // Find the slave ordinal (within the slaves specified in the proxy's OWD) that corresponds to
-    // the slave impl and slave name provided.
-    // Return the ordinal or UINT_MAX if not found.
-    // Also set the last output arg, slaveWkrName, to the actual worker name with model suffix
-    static unsigned
-    findSlave(const OU::Worker &sImpl, const OU::Worker &mImpl, const char *slaveName,
-	      std::string *wkrName = NULL) {
-      std::string slaveWkrName;
-      OU::format(slaveWkrName, "%s.%s.%s", sImpl.package().c_str(), sImpl.cname(), sImpl.model().c_str());
-      size_t dashIdx =  slaveWkrName.rfind('-');
-      if (dashIdx != std::string::npos) // if worker has configuration suffix, remove it
-        slaveWkrName.erase(dashIdx, slaveWkrName.rfind('.') - dashIdx);
-      if (wkrName)
-	*wkrName = slaveWkrName;
-      const OU::Slave *s = &(mImpl.slaves()[0]);
-      unsigned found = UINT_MAX;
-      for (unsigned n = 0; n < mImpl.slaves().size(); ++n, ++s) {
-        if (!strcasecmp(s->m_worker, slaveWkrName.c_str())) {
-	  if (slaveName) {
-	    if (!strcasecmp(slaveName, s->m_name))
-	      return n;
-	  } else if (found != UINT_MAX) { // duplicate match, ambiguous
-	    ocpiInfo("Ambiguous slave instance for proxy worker \"%s\" and slave worker \"%s\": "
-		     "use \"slave\" attribute",
-		     mImpl.cname(), sImpl.cname());
-	    return UINT_MAX;
-	  } else
-	    found = n;
-	}
-      }
-      return found;
-    }
-
-    // Check that the proxy/slave relationship is valid now that we know the impls on both sides
-    static unsigned
-    checkSlave(const OU::Worker &sImpl, const OU::Worker &mImpl, const char *slaveName, bool isMaster,
-	       const std::string &reject) {
-      std::string slaveWkrName;
-      unsigned slave;
-      if ((slave = findSlave(sImpl, mImpl, slaveName, &slaveWkrName)) != UINT_MAX)
-        return slave;
-      // FIXME: make impl namespace part of this. implnames should really be qualified.
-      std::string goodSlaves;
-      for (unsigned n = 0; n < mImpl.slaves().size(); ++n)
-        OU::formatAdd(goodSlaves, "%s%s", n ? " " : "", mImpl.slaves()[n].m_name);
-      if (isMaster)
-        ocpiInfo("%s since none of its indicated slave workers (%s) match the slave instance's worker \"%s\"",
-                 reject.c_str(), goodSlaves.c_str(), slaveWkrName.c_str());
-      else
-        ocpiInfo("%s since it doesn't match any slaves (%s) indicated by the master instance \"%s\"",
-                 reject.c_str(), goodSlaves.c_str(), mImpl.cname());
-      return UINT_MAX;
-    }
-#endif
     // Now that we know a complete deployment, we can do a final check on the relative
     // position of proxies and slaves to be sure that proxies are either on the base
     // container or if not, all of its slaves are on the same system/launcher
@@ -385,98 +323,6 @@ namespace OCPI {
       return true;
     }
 
-#if 0
-    // Delegate the assyPort (the proxy port end of connection) to a slave port
-    // Set the slavePort pointer as output arg
-    void ApplicationI::
-    delegateAssyPort(OU::Assembly::Port &assyPort, unsigned instNum, unsigned slaveInstNum,
-		     const OL::Implementation &slaveImpl, const OU::Port &masterPort,
-		     const OU::Port *&slavePort) {
-      // Save the pre-delegated port to restore for other deployments that might not delegate!
-      m_instances[instNum].m_portFixups.emplace_front(&assyPort, assyPort);
-      auto &slaveWorker = slaveImpl.m_metadataImpl;
-      slavePort =
-	slaveWorker.findMetaPort(masterPort.metaWorker().slaves()[masterPort.m_slave].m_slavePort);
-      assyPort.m_name = slavePort->cname();
-      assyPort.m_instance = slaveInstNum;
-      assyPort.m_index = 0; // we assume slave ports are not array ports
-    }
-
-    // See if this end of a connection (the assy port) should be delegated to a slave's port.
-    // - assyPort is the assembly port (end of connection in the assembly) that might be delegated
-    // - implPort is the deployed worker port of the assembly port being considered
-    // - instNum is the current instance being deployed, which could be master or slave
-    // - impl (output arg by reference) is the impl associated with the assyPort
-    // There are three outcomes:
-    // 1. Port is not delegated, return false
-    // 2. Port is delegated, and the slave has been deployed so delegation happened: return false
-    // 3. Port is delegated, but slave not been deployed yet, so connection cannot be verified yet.
-    //    So return==true tells the caller to skip further connectivity checks since they will be
-    //    resolved later.
-    // When delegation happens:
-    //   alter the assyport to refer to the proper slave port
-    //        in this case a "fixup" is stored to restore the delegation after this deployment
-    //   set the impl output arg to be the deployed impl associated with the slave port
-    bool ApplicationI::
-    maybeDelegate(unsigned instNum, OU::Assembly::Port &assyPort, const OU::Port *&implPort,
-		  const OL::Implementation *&impl) {
-      if (implPort->m_slave == SIZE_MAX) // port not delegated to a slave, leave it alone
-	return false;
-      auto &slaveInstances = m_instances[assyPort.m_instance].m_deployment.m_slaves;
-      assert(implPort->m_slave < slaveInstances.size()); // port's slave ordinal is valid
-      auto slaveInstNum = slaveInstances[implPort->m_slave];
-      if (slaveInstNum == UINT_MAX || slaveInstNum > instNum)
-	return true; // we haven't gotten to the slave instance yet, so we'll do the delegation later
-      // Delegate the port of the connection to a slave port
-      auto &slaveImpl = *m_instances[slaveInstNum].m_deployment.m_impls[0];
-      delegateAssyPort(assyPort, instNum, slaveInstNum, slaveImpl, *implPort, implPort);
-      impl = &slaveImpl;
-      return false;
-    }
-
-    // We (instNum) are a slave, and our port is not connected, and it might be delegated-to
-    // The master has been deployed, so we have its impl.
-    bool ApplicationI::
-    maybeDelegateToSlavePort(unsigned slaveInstNum, const OL::Implementation &slaveImpl,
-			     const OU::Port &slavePort, OU::Assembly::Port *&otherAssyPort) {
-      const OU::Assembly::Instance &ui = m_assembly.instance(slaveInstNum).m_utilInstance;
-      auto &master = m_instances[ui.m_master].m_deployment;
-      auto &slaves = master.m_slaves; // the map from the master's slave ordinals to instances
-      // Which of our master's slaves are we?
-      for (unsigned s = 0; s < slaves.size(); ++s)
-	if (slaves[s] == slaveInstNum) { // the master's slave s, is mapped to this instance
-	  auto &slave = master.m_impls[0]->m_metadataImpl.slaves()[s];
-	  if (slave.m_delegated && !strcasecmp(slave.m_slavePort, slavePort.cname())) {
-	    // The master port is delegated to this slave port.
-	    // See if there is a connection (assyPort) to be delegated
-	    const OU::Assembly::Instance &uiMaster =
-	      m_assembly.instance(ui.m_master).m_utilInstance;
-	    // Which master port is delegated to our slave port
-	    for (auto it = uiMaster.m_ports.begin(); it != uiMaster.m_ports.end(); ++it) {
-	      auto &masterAssyPort = **it;
-	      if (!strcasecmp(masterAssyPort.cname(), slave.m_delegated->cname())) {
-		// We found a connection in the assembly that is connected to the master's port
-		if (masterAssyPort.m_connectedPort->m_instance < slaveInstNum) {
-		  // So both sides of this (delegated) connection have implementations
-		  otherAssyPort = masterAssyPort.m_connectedPort;
-		  const OU::Port *masterPort = slave.m_delegated;
-		  delegateAssyPort(masterAssyPort, slaveInstNum, slaveInstNum, slaveImpl,
-				   *masterPort, masterPort);
-		  return false;
-		} else
-		  break;
-	      }
-	    }
-	    break;
-	  }
-	  // skip it - port is not delegated, the proxy port not is not connected, or
-	  // the connected instance has not been deployed yet
-	  return true;
-	}
-      assert("Slave instance was not related to its master" == NULL);
-      return true;
-    }
-#endif
     // Deal with slaves when deploying this instance.
     bool ApplicationI::
     resolveInstanceSlaves(unsigned instNum, OL::Candidate &c, const std::string &reject) {
@@ -484,7 +330,7 @@ namespace OCPI {
       const OU::Assembly::Instance &ui = m_assembly.instance(instNum).m_utilInstance;
       if (slaves) {
 	if (!c.slaves) {
-#if 1
+#if 0
 	  // Find a slave assembly by selection expression
 	  // Fixme: initial properties?  else it depends on build configurations for no good reason?
 	  // finalizePropertyValues needs to be split do that the parsing can be done earlier
@@ -551,7 +397,7 @@ namespace OCPI {
 	    libInst.m_master = &m_assembly.instance(instNum);
 
 	    for (auto it = utilInst.m_ports.begin(); it != utilInst.m_ports.end(); ++it)
-	      (*it)->m_instance = utilInst.m_ordinal;
+	      (*it).m_instance = utilInst.m_ordinal;
 	  }
 	  ocpiInfo("++++++++++++ Ending one-time processing of slave assembly for instance %u candidate %p", 
 		   instNum, &c);
@@ -595,91 +441,57 @@ namespace OCPI {
 	      return false;
 	    }
 	}
-	// process the slave assembly's connections (there will be none with explicit slaves)
+	// Process the slave assembly's connections (there will be none if we have explicit slaves)
+	// For slave assy internal connections, we just add/copy those connections to the application
+	// For slave assy connections with externals (i.e. to slave ports which can be delegated to),
+	// if the app has a connection to the corresponding proxy port, we modify (repurpose) that
+	// app connection to change its port from the proxy port to the port in the slave assy
 	for (auto it = c.slaves->m_connections.begin(); it != c.slaves->m_connections.end(); ++it) {
 	  OU::Assembly::Connection &slaveConn = **it;
 	  if (slaveConn.m_externals.empty())
 	    m_assembly.m_connections.push_back(&slaveConn);
 	  else {
-	    // An external connection in slave assy means a delegated port.
-	    // Find any app connection to that proxy port.
-	    assert(slaveConn.m_ports.size() == 1 && slaveConn.m_externals.size() == 1);
-	    const OU::Port &masterPort =
+	    assert(slaveConn.m_ports.size() == 1 && slaveConn.m_externals.size() == 1 &&
+		   slaveConn.m_count <= 1);
+	    // Find the master's impl port corresponding to the slave assy external port
+	    const OU::Port &masterImplPort =
 	      *c.impl->m_metadataImpl.findMetaPort(slaveConn.m_externals.front().first->m_name);
-	    // Find the app connection port for the master's delegated port
-	    OU::Assembly::Port *assyPort = m_assembly.assyPort(instNum, masterPort.m_ordinal);
-	    if (assyPort) { // proxy port is connected to something, delegate it
-	      // first save the old port to restore after this instance is deployed
-	      c.m_portFixups.emplace_front(assyPort, *assyPort, masterPort.m_ordinal);
-	      m_assembly.instances()[instNum]->m_assyPorts[masterPort.m_ordinal] = NULL;
-	      auto &slavePort = slaveConn.m_ports.front();
-	      // patch the master's port of the app connection, which will be un-done if redeployed
-	      assyPort->m_name = slavePort.m_name; // name is slave's name now
-	      assyPort->m_instance = slavePort.m_instance;
-	      assyPort->m_index = 0; // we assume slave ports are not array ports
-	      // patch the slave's port, which does not need undoing
-	      m_assembly.instances()[slavePort.m_instance]->m_assyPorts[slavePort.m_ordinal] = assyPort;
+	    // Find the app assy port for the master port.  If its null there is no app connection
+	    OU::Assembly::Port *masterPort = m_assembly.assyPort(instNum, masterImplPort.m_ordinal);
+	    if (masterPort) { // master port has at least one connection.  find it
+	      OU::Assembly::Connection *appConn = NULL;
+	      OU::Assembly::ConnPort *appConnPort = NULL; // warning
+	      // find the app connection that connects to the master/external port
+	      for (auto cit = m_assembly.m_connections.begin();
+		   appConn == NULL && cit != m_assembly.m_connections.end(); ++cit)
+		for (auto pit = (*cit)->m_ports.begin(); pit != (*cit)->m_ports.end(); ++pit)
+		  if (pit->first == masterPort && pit->second == slaveConn.m_ports.front().second) {
+		    appConn = *cit;
+		    assert(appConn->m_count <= 1);
+		    appConnPort = &*pit;
+		    break;
+		  }
+	      if (appConn) { // there is an app connection to the master port with the same index
+		// Save info to allow us to undo the delegation
+		c.m_portFixups.emplace_front(appConn, &slaveConn, appConnPort,
+					     masterImplPort.m_ordinal);
+		// Patch the app connection to point to a different port+index, delegating it.
+		// since the slaveConn has an external, the front() *is* the internal port
+		*appConnPort = slaveConn.m_ports.front(); // DELEGATE THE PORT
+		// Remove the stale conn references from both ports
+		masterPort->m_connections.remove(appConn);
+		appConnPort->first->m_connections.remove(&slaveConn);
+		// Add a new conn reference to the slave port
+		appConnPort->first->m_connections.push_front(appConn); // conn to slave port
+		// make master's port unconnected
+		m_assembly.assyPorts(instNum)[masterImplPort.m_ordinal] = NULL;
+	      }
 	    }
 	  }
 	}
 	ocpiInfo("++++++++++++ Ending insertion of slave instances for instance %u candidate %p",
 		 instNum, &c);
       }
-#if 0
-      // Some of this should be cached in the candidate rather than the deployment....
-      // Since we are adding the slaves at the end of the existing instances...
-      // So perhaps we have the added stuff ready to copy/add.
-      // util instances: vector of pointers, addInstance does new and pushback, has impl *names*
-      // util connections list of objects with util ports and externals
-      // lib instances: vector of pointers to objects that contain ref to util instance, has candidates
-      /*
-	algorithm:
-	if I choose this candidate I need to add stuff and deal with delegation, which
-        sets the slave instance map into those (new) instances.
-	this map could be cached for the candidate too.
-	slaveInstances[slaveN] = ui.slaveInstances()[n]; // remember which instance
-	so we actually know the implementations of the slaves so we could do the delegation
-        in one shot.
-	so all the connection patching is done here at once since all the slaves
-	so I am preparing three lists to do, and then undo, so cache them in the candidate
-        -- more instances (with runtime props), with qualified names
-        -- more connections (just 
-        -- patched connections
-	BUTBUTBUT:  it is still the case that delegated connections could be to instances that are
-        later than this proxy
-       */
-      // We connect/check the slaves for this candidate before checking connectivity
-      // since delegated connections need to know this.
-      // This vector maps the slave index among the worker's slaves to the app instance.
-      std::vector<unsigned> &slaveInstances = m_instances[instNum].m_deployment.m_slaves;
-      slaveInstances.clear();
-      slaveInstances.resize(c.impl->m_metadataImpl.slaves().size(), UINT_MAX);
-      unsigned slaveN;
-      if (ui.slaveInstances().size()) { // if there are explicitly identified slave instances...
-	const OU::Worker &mImpl = c.impl->m_metadataImpl;
-        for (unsigned n = 0; n < ui.m_slaveInstances.size(); ++n)
-          if (ui.slaveInstances()[n] < instNum) {
-	    if ((slaveN =
-		 checkSlave(m_instances[ui.m_slaveInstances[n]].m_deployment.m_impls[0]->m_metadataImpl,
-			    mImpl, ui.m_slaveNames[n], true, reject)) == UINT_MAX)
-              return false;
-	    slaveInstances[slaveN] = ui.slaveInstances()[n]; // remember which instance
-	  } else {
-	    // We don't have the slave impl yet, but we can map it anyway for slave resolution later
-	    const OU::Slave *slave = &mImpl.slaves()[0];
-	    size_t nSlaves = mImpl.slaves().size();
-	    if (nSlaves == 1 && ui.slaveNames()[0] == NULL)
-	      slaveInstances[0] = ui.slaveInstances()[0];
-	    else
-	      for (unsigned s = 0; s < nSlaves; ++s, ++slave)
-		if (!strcasecmp(ui.slaveNames()[n], slave->m_name)) {
-		  slaveInstances[s] = ui.slaveInstances()[n];
-		  break;
-		}
-	  }
-	ocpiDebug("Resolved explicit slaves for %s", c.impl->m_metadataImpl.cname());
-      }
-#endif
       return true;
     }
     void ApplicationI::
@@ -689,10 +501,16 @@ namespace OCPI {
       // patch up and restore the connections that were delegated
       for (; !c.m_portFixups.empty(); c.m_portFixups.pop_front()) {
 	auto &fixup = c.m_portFixups.front();
-	// restore the proxy's OU::Assembly::Port to its pre-delegation state
-	*fixup.portPtr = fixup.port;
+	// Restore slave port.  Remove app conn, and add back slave conn
+	fixup.connPort->first->m_connections.remove(fixup.appConn);
+	fixup.connPort->first->m_connections.push_front(fixup.slaveConn);
+	// Restore master port (add what was removed)
+	fixup.masterConnPort.first->m_connections.push_front(fixup.appConn);
+	// Restore app conn (slave conn was untouched)
+	*fixup.connPort = fixup.masterConnPort;
 	// restore the proxy's map from worker port ordinal to OU::Assembly::Port
-	m_assembly.assyPorts(fixup.port.m_instance)[fixup.ordinal] = fixup.portPtr;
+	m_assembly.assyPorts(fixup.masterConnPort.first->m_instance)[fixup.masterOrdinal] =
+	  fixup.masterConnPort.first;
       }
       m_nInstances = c.nInstances;
       m_instances.resize(m_nInstances);                // toss slaves from app assembly
@@ -701,7 +519,7 @@ namespace OCPI {
     }
 
     // Check whether this candidate can be used relative to previous
-    // choices for instances it is connected to or has a proxy/slave relationship with
+    // choices for instances it is connected to or has a proxy/slave relationship with.
     // It has the side effect of initializing the m_deployment.m_slaves array for the instance
     bool ApplicationI::
     connectionsOk(OL::Candidate &c, unsigned instNum) {
@@ -720,52 +538,45 @@ namespace OCPI {
       unsigned nPorts;
       const OU::Port *port = c.impl->m_metadataImpl.ports(nPorts);
       for (unsigned nn = 0; nn < nPorts; ++port, ++nn) { // for each candidate port
-        OU::Assembly::Port
-          *ap = m_assembly.assyPort(instNum, nn),
-          *other = ap ? ap->m_connectedPort : NULL;
-	const OL::Implementation *thisImpl = c.impl, *otherImpl = NULL;
-	const OU::Port *thisPort = port, *otherPort = NULL;
-        if (ap &&                          // if the port is even mentioned in the assembly?
-            other &&                       // if the port is connected in the assembly
-            other->m_instance < instNum) { // if the other instance has been processed
+        OU::Assembly::Port *ap = m_assembly.assyPort(instNum, nn);
+	if (!ap) // port not connected in app
+	  continue;
+	// For connections to this port (presumably with different indices)
+	for (auto ci = ap->m_connections.begin(); ci != ap->m_connections.end(); ++ci) {
+	  auto &conn = **ci;
+	  if (!conn.m_externals.empty()) { // no checking for externals
+	    if (c.impl->m_internals & (1u << nn)) {
+	      ocpiInfo("%s due to implementation port \"%s\" having an internal connection when "
+		       "application specifies that port as external", reject.c_str(), ap->cname());
+	      return false;
+	    }
+	    continue;
+	  }
+	  auto other = conn.m_ports.front().first == ap ?
+	    conn.m_ports.back().first : conn.m_ports.front().first;
+	  if (other->m_instance > instNum) // other's instance not processed yet
+	    continue;
+	  assert(other->m_instance != instNum);
+	  const OL::Implementation *thisImpl = c.impl, *otherImpl = NULL;
+	  const OU::Port *thisPort = port, *otherPort = NULL;
           otherImpl = m_instances[other->m_instance].m_deployment.m_impls[0];
 	  otherPort = otherImpl->m_metadataImpl.findMetaPort(other->cname());
-	  //	  if (maybeDelegate(instNum, *ap, thisPort, thisImpl) ||
-	  //	      maybeDelegate(instNum, *other, otherPort, otherImpl))
-	  //	    continue;
-#if 0
-	} else if (ap == NULL && ui.m_hasMaster && ui.m_master < instNum) {
-	  //	  if (maybeDelegateToSlavePort(instNum, *c.impl, *port, other))
-	  //	    continue;
-	  otherImpl = m_instances[other->m_instance].m_deployment.m_impls[0];
-	  otherPort = otherImpl->m_metadataImpl.findMetaPort(other->cname());
-#endif
-	} else if (!ap || (other && other->m_instance > instNum))
-	  continue; // not connected or other end is not deployed yet, so we are ok
-	else if (!other) { // looks like an external port of the application
-	  assert(ap->m_connection && !ap->m_connection->m_externals.empty());
-	  if (c.impl->m_internals & (1u << nn)) {
-	    ocpiInfo("%s due to implementation port \"%s\" having an internal connection when "
-		     "application specifies that port as external", reject.c_str(), ap->cname());
+	  // check for prewired compatibility, post-delegation
+	  if (m_assembly.badConnection(*thisImpl, *thisPort, *otherImpl, *otherPort)) {
+	    ocpiInfo("%s due to connectivity conflict", reject.c_str());
+	    ocpiInfo("      Other is instance \"%s\" for spec \"%s\" implementation \"%s%s%s\" "
+		     "from artifact \"%s\".",
+		     m_assembly.instance(other->m_instance).name().c_str(),
+		     m_assembly.instance(other->m_instance).specName().c_str(),
+		     otherImpl->m_metadataImpl.cname(),
+		     otherImpl->m_staticInstance ? "/" : "",
+		     otherImpl->m_staticInstance ?
+		     ezxml_cattr(otherImpl->m_staticInstance, "name") : "",
+		     otherImpl->m_artifact.name().c_str());
 	    return false;
 	  }
-	  continue;
-	}
-	// check for prewired compatibility, post-delegation
-	if (m_assembly.badConnection(*thisImpl, *thisPort, *otherImpl, *otherPort)) {
-	  ocpiInfo("%s due to connectivity conflict", reject.c_str());
-	  ocpiInfo("      Other is instance \"%s\" for spec \"%s\" implementation \"%s%s%s\" "
-		   "from artifact \"%s\".",
-		   m_assembly.instance(other->m_instance).name().c_str(),
-		   m_assembly.instance(other->m_instance).specName().c_str(),
-		   otherImpl->m_metadataImpl.cname(),
-		   otherImpl->m_staticInstance ? "/" : "",
-		   otherImpl->m_staticInstance ?
-		   ezxml_cattr(otherImpl->m_staticInstance, "name") : "",
-		   otherImpl->m_artifact.name().c_str());
-	  return false;
-	}
-      }
+	} // loop of all the connections for this port
+      } // loop of all ports of the instance
       return true;
     }
 
@@ -846,7 +657,7 @@ namespace OCPI {
     void ApplicationI::
     prepareInstanceProperties(unsigned nInstance, const OL::Implementation &impl, unsigned *&pn,
                               OU::Value *&pv) {
-      const OU::Assembly::Properties &aProps = m_assembly.instance(nInstance).properties();
+      const OU::Assembly::Properties &aProps = *m_bestDeployments[nInstance].m_properties;
       // Prepare all the property values in the assembly, avoiding those in parameters.
       for (unsigned p = 0; p < aProps.size(); p++) {
         if (aProps[p].m_dumpFile.size()) {
@@ -1003,9 +814,10 @@ it is really per actual worker config...
         // Override any same-named connection params
 	for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci)
 	  for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
-	    assert(!(*pi).m_name.empty());
-	    if ((*pi).m_instance == instn && !strcasecmp((*pi).m_name.c_str(), p->cname()))
-		(*pi).setParam(newName, value);
+	    OU::Assembly::Port &ap = *(*pi).first;
+	    assert(!ap.m_name.empty());
+	    if (ap.m_instance == instn && !strcasecmp(ap.m_name.c_str(), p->cname()))
+	      ap.setParam(*ci, newName, value);
 	  }
         // m_assembly.assyPort(instn, portn)->setParam(newName, value);
       }
@@ -1226,9 +1038,9 @@ it is really per actual worker config...
 	  collectCandidate(cs[m], m);
       }
       if (!sum) {
-	if (verbose) {
-	  fprintf(stderr, "  No containers were found for deploying instance '%s' (spec '%s').\n"
-		  "The implementations found were:\n",
+	if (verbose && n < assy.nAppInstances()) {
+	  fprintf(stderr, "No containers were found for deploying instance '%s' (spec '%s').\n"
+		  "  The implementations found were:\n",
 		  ai.m_name.c_str(), ai.m_specName.c_str());
 	  for (unsigned m = 0; m < nCandidates; m++) {
 	    const OL::Implementation &lImpl = *cs[m].impl;
@@ -1266,79 +1078,9 @@ it is really per actual worker config...
         ocpiInfo("================================================================================");
 	ocpiInfo("Determining which candidates can run on which containers");
       for (size_t n = 0; n < m_nInstances; n++, i++) {
-#if 1
 	const char *err = i->init(m_assembly, n, m_verbose, params);
 	if (err)
 	  throw OU::Error("%s", err);
-#else
-        OL::Candidates &cs = m_assembly.instance(n).m_candidates;
-        const OU::Assembly::Instance &ai = m_assembly.utilInstance(n);
-        i->m_nCandidates = cs.size();
-        i->m_feasibleContainers = new CMap[cs.size()];
-        std::string container;
-        if (!OU::findAssign(params, "container", ai.m_name.c_str(), container) &&
-            !OU::findAssign(params, "container", ai.m_specName.c_str(), container))
-          OE::getOptionalString(ai.xml(), container, "container");
-        CMap sum = 0;
-        ocpiInfo("================================================================================");
-        ocpiInfo("For instance %2zu: \"%s\" there were %zu candidates.  These had potential containers:",
-                 n, ai.m_name.c_str(), i->m_nCandidates);
-        for (unsigned m = 0; m < i->m_nCandidates; m++) {
-          m_curMap = 0;        // to accumulate containers suitable for this candidate
-          m_curContainers = 0; // to count suitable containers for this candidate
-          OU::Worker &w = cs[m].impl->m_metadataImpl;
-          ocpiInfo("  --------------------------------------------------------------------------------");
-          ocpiInfo("  Candidate %2u: checking implementation %s model %s os %s version %s arch %s platform %s dynamic %u opencpi version %s",
-                   m, w.cname(), w.model().c_str(), w.attributes().os().c_str(),
-                   w.attributes().osVersion().c_str(), w.attributes().arch().c_str(),
-                   w.attributes().platform().c_str(), w.attributes().dynamic(),
-                   w.attributes().opencpiVersion().c_str());
-          (void)OC::Manager::findContainers(*this, w,
-                                            container.empty() ? NULL : container.c_str());
-          i->m_feasibleContainers[m] = m_curMap;
-          sum |= m_curMap;
-          // if log level is >= info
-          Container *c;
-          if (m_curMap) {
-            std::string s;
-            for (unsigned nn = 0; (c = OC::Manager::get(nn)); nn++)
-              if (m_curMap & (1u << nn))
-                OU::formatAdd(s, "%s%u: %s", s.empty() ? "" : ", ", nn, c->name().c_str());
-            ocpiInfo("  Candidate %u %s is ok for containers: %s", m,
-                     cs[m].impl->m_artifact.name().c_str(), s.c_str());
-          } else
-            ocpiInfo("  Candidate %u %s is ok for no containers", m,
-                     cs[m].impl->m_artifact.name().c_str());
-          if (m_curMap && m_assembly.instance(n).m_scale > 1)
-            i->collectCandidate(cs[m], m);
-        }
-        if (!sum) {
-          if (m_verbose) {
-            fprintf(stderr, "  No containers were found for deploying instance '%s' (spec '%s').\n"
-                    "The implementations found were:\n",
-                    ai.m_name.c_str(), ai.m_specName.c_str());
-            for (unsigned m = 0; m < i->m_nCandidates; m++) {
-              const OL::Implementation &lImpl = *cs[m].impl;
-              OU::Worker &mImpl = lImpl.m_metadataImpl;
-              fprintf(stderr, "  Name: %s, Model: %s, Arch: %s, Platform: %s%s%s, OpenCPI Version: %s, File: %s\n",
-                      mImpl.cname(),
-                      mImpl.model().c_str(),
-                      lImpl.m_artifact.arch().c_str(),
-                      lImpl.m_artifact.platform().c_str(),
-                      lImpl.m_staticInstance ? ", Artifact instance: " : "",
-                      lImpl.m_staticInstance ? ezxml_cattr(lImpl.m_staticInstance, "name") : "",
-                      mImpl.attributes().opencpiVersion().c_str(),
-                      lImpl.m_artifact.name().c_str());
-            }
-          }
-          throw OU::Error("For instance \"%s\" for spec \"%s\": "
-                          "no feasible containers found for %sthe %zu implementation%s found.",
-                          ai.m_name.c_str(), ai.m_specName.c_str(),
-                          i->m_nCandidates == 1 ? "" : "any of ",
-                          i->m_nCandidates,
-                          i->m_nCandidates == 1 ? "" : "s");
-        }
-#endif
       }
 
       // Second pass - search for best feasible choice
@@ -1654,9 +1396,9 @@ it is really per actual worker config...
       for (auto ci = m_bestConnections.begin(); ci != m_bestConnections.end(); ++ci) {
         Deployment *dIn = NULL, *dOut = NULL;
         for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
-          OU::Assembly::Role &r = pi->m_role;
+          OU::Assembly::Role &r = (*pi).first->m_role;
           assert(r.m_knownRole && !r.m_bidirectional);
-          (r.m_provider ? dIn : dOut) = &m_bestDeployments[pi->m_instance];
+          (r.m_provider ? dIn : dOut) = &m_bestDeployments[(*pi).first->m_instance];
         }
         nMemberConnections += (dIn ? dIn->m_crew.m_size : 1) * (dOut ? dOut->m_crew.m_size : 1);
       }
@@ -1682,17 +1424,18 @@ it is really per actual worker config...
         OU::Port *pIn = NULL, *pOut = NULL;
         size_t inScale = 1, outScale = 1;
         for (auto pi = (*ci).m_ports.begin(); pi != (*ci).m_ports.end(); ++pi) {
-          d = &m_bestDeployments[pi->m_instance];
+	  auto &ap = *(*pi).first;
+          d = &m_bestDeployments[ap.m_instance];
           OU::Port *p =
-            d->m_impls[0]->m_metadataImpl.findMetaPort(pi->m_name.c_str());
+            d->m_impls[0]->m_metadataImpl.findMetaPort(ap.m_name.c_str());
           assert(p);
-          if (pi->m_role.m_provider) {
-            aIn = &*pi;
+          if (ap.m_role.m_provider) {
+            aIn = &ap;
             dIn = d;
             pIn = p;
             inScale = d->m_crew.m_size;
           } else {
-            aOut = &*pi;
+            aOut = &ap;
             dOut = d;
             pOut = p;
             outScale = d->m_crew.m_size;
@@ -1937,14 +1680,12 @@ it is really per actual worker config...
           if ((*li)->work(m_launchMembers, m_launchConnections))
             more = true;
       } while (more);
-#if 1
       for (unsigned n = 0; n < m_launchConnections.size(); n++) {
         OC::Launcher::Connection &c = m_launchConnections[n];
         if ((!c.m_in.m_url && !c.m_in.m_member) || (!c.m_out.m_url && !c.m_out.m_member))
           m_externals.insert(ExternalPair(c.m_in.m_member ? c.m_out.m_name : c.m_in.m_name,
                                           External(c)));
       }
-#endif
       m_launched = true;
       m_initialized = OS::Time::now();
       if (m_verbose) {
@@ -2476,16 +2217,6 @@ it is really per actual worker config...
     getPort(const char *a_name, const OA::PValue *params) {
       return m_application.getPort(a_name, params);
     }
-#if 0
-    ExternalPort &Application::
-    getPort(unsigned index, std::string &name) {
-      return m_application.getPort(index, name);
-    }
-    size_t Application::
-    getPortCount() {
-      return m_application.getPortCount();
-    }
-#endif
     bool Application::getProperty(unsigned ordinal, std::string &a_name, std::string &value,
                                   bool hex, bool *parp, bool *cachedp, bool uncached,
                                   bool *hiddenp) {

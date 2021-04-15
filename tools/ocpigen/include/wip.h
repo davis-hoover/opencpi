@@ -597,15 +597,15 @@ class Worker : public OU::Worker {
 // Attributes common to both OWD and build xml
 #define PLATFORM_ATTRS "onlyPlatforms", "excludePlatforms"
 #define BUILD_ATTRS PLATFORM_ATTRS, "onlytargets", "excludeTargets"
-// Attributes common to all models
-#define IMPL_ATTRS BUILD_ATTRS, \
-  "name", "spec", "paramconfig", "reentrant", "scaling", "scalable", "controlOperations", "xmlincludedirs", \
-    "componentlibraries", "version", "libraries", "includedirs", "sourcefiles"
-
-#define IMPL_ELEMS "componentspec", "properties", "property", "specproperty", "propertysummary", "slave", "xi:include", "controlinterface",  "timeservice", "unoc", "timebase", "sdp"
+// Attributes common to all models, note "raw" may actually apply to all models
 #define GENERIC_IMPL_CONTROL_ATTRS \
   "name", "SizeOfConfigSpace", "ControlOperations", "Sub32BitConfigProperties"
-#define ASSY_ELEMS "instance", "connection", "external"
+#define IMPL_ATTRS PARSED_ATTRS, GENERIC_IMPL_CONTROL_ATTRS, BUILD_ATTRS, \
+    "spec", "paramconfig", "reentrant", "scaling", "scalable", "controlOperations", "xmlincludedirs", \
+    "componentlibraries", "version", "libraries", "includedirs", "sourcefiles", "language",  \
+    "RawProperties", "FirstRawProperty", "language"
+#define IMPL_ELEMS "componentspec", "properties", "property", "specproperty", "propertysummary",\
+    "slave", "xi:include", "controlinterface"
 extern const char
   *checkSuffix(const char *str, const char *suff, const char *last),
   *createTests(const char *file, const char *package, const char *outDir, bool verbose),

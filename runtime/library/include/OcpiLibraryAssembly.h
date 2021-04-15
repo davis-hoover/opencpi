@@ -45,13 +45,19 @@ namespace OCPI {
       mutable Assembly *slaves; // hold a slave/sub assembly to be merged when this candidate is used
       mutable size_t nInstances, nConnections;
       // Temporary port delegations need to be "undone" by using these fixups
-      // This is basically a tuple of these three things
       struct Fixup {
-	OCPI::Util::Assembly::Port *portPtr; // the OU::Assembly::Port to patch
-	OCPI::Util::Assembly::Port port;     // the value to restore
-	size_t ordinal;                      // the instance's port ordinal
-	Fixup(OCPI::Util::Assembly::Port *pp, OCPI::Util::Assembly::Port p, size_t o)
-	  : portPtr(pp), port(p), ordinal(o) {}
+	OCPI::Util::Assembly::Connection *appConn;
+	OCPI::Util::Assembly::Connection *slaveConn;
+	OCPI::Util::Assembly::ConnPort   *connPort;        // where to restore the app conn
+	OCPI::Util::Assembly::ConnPort    masterConnPort;  // The port/index value to restore
+	unsigned masterOrdinal;
+	Fixup(OCPI::Util::Assembly::Connection *a_appConn,
+	      OCPI::Util::Assembly::Connection *a_slaveConn,
+	      OCPI::Util::Assembly::ConnPort *a_connPort,
+	      unsigned a_masterOrdinal)    // The master port to restore
+	  : appConn(a_appConn), slaveConn(a_slaveConn), connPort(a_connPort),
+	    masterConnPort(*a_connPort), masterOrdinal(a_masterOrdinal) {
+	}
       };
       std::forward_list<Fixup> m_portFixups;
       inline Candidate(const Implementation &a_impl, unsigned a_score)
@@ -75,6 +81,7 @@ namespace OCPI {
 	Candidates m_candidates;                        // The candidate impls for this instance
 	unsigned m_nPorts;
 	size_t m_scale;
+	std::string m_device;                           // if instance specifies a device
 	Instance *m_master;                             // The master if this is a slave
 	Instance(OCPI::Util::Assembly::Instance &utilInstance, Instance *master = NULL);
 	~Instance();
@@ -100,6 +107,7 @@ namespace OCPI {
       Instance *m_tempInstance;                   // our instance currently being processed
       Instances m_instances;                      // This layer's instances
       bool      m_deployed;                       // deployment decisions are already made
+      size_t    m_nAppInstances;                  // original app instance count
     public:
       // explicit Assembly(const char *file, const OCPI::Util::PValue *params);
       // explicit Assembly(const std::string &string, const OCPI::Util::PValue *params);
@@ -107,6 +115,7 @@ namespace OCPI {
       ~Assembly();
       Instance &instance(size_t n) const { return *m_instances[n]; }
       size_t nInstances() { return m_instances.size(); }
+      size_t nAppInstances() const { return m_nAppInstances; }
       Instances &instances() { return m_instances; }
       OCPI::Util::Assembly::Instance &utilInstance(size_t n) const {
 	return m_instances[n]->m_utilInstance;

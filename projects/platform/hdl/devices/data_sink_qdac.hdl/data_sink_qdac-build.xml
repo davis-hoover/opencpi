@@ -17,4 +17,7 @@
     <parameter name='dac_clk_freq_hz' value='100e6'/>
     <parameter name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='true'/>
   </configuration>
+  <configuration id='4'>
+    <parameter name='ocpi_debug' value='true'/>
+  </configuration>
 </build>

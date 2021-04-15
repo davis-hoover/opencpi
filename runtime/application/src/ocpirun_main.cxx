@@ -65,8 +65,8 @@
   CMD_OPTION(processors, n, ULong,  0, "Number of RCC containers to create") \
   CMD_OPTION_S(file,     f, String, 0, "<external-name>=<file-name>\n" \
 	                               "connect external port to a specific file") \
-  CMD_OPTION_S(device,   D, String, 0, "<external-name>=[container/][slot/]<device-name>\n" \
-	                               "connect external port to a specific device") \
+  CMD_OPTION_S(device,   D, String, 0, "<instance-name>=<device-name>\n" \
+	                               "assign instance to a specific device") \
   CMD_OPTION_S(url,      u, String, 0, "<external-name>=<URL>\n" \
 	                               "connect external port to a URL")\
   CMD_OPTION(log_level,  l, ULong,  0, "<log-level>\n" \

@@ -59,8 +59,11 @@
 #include <string>          // std::string
 #include <cstdint>         // uint8_t type
 #include <sstream>         // std::ostringstream
+#include "OcpiUtilMisc.h"  // esprintf
 #include "ad9361_platform.h" // BITMASK_D... macros
 #include "calc_ad9361_bb_rx_filters_digital.h"
+
+namespace OU = OCPI::Util;
 
 void get_min_AD9361_RHB3_decimation_factor(
     calc_AD9361_RHB3_decimation_factor_t& calc_obj) {
@@ -89,10 +92,8 @@ const char* regs_calc_AD9361_RHB3_decimation_factor(
     case 0x01: calc_obj.RHB3_decimation_factor = 2; break;
     case 0x02: calc_obj.RHB3_decimation_factor = 3; break;
     default:
-      std::ostringstream oss;
-      oss << "could not calculate AD9361 RHB3 decimation factor due to ";
-      oss << "invalid value of " << reg << "for register 0x003";
-      return oss.str().c_str();
+      return OU::esprintf("could not calculate AD9361 RHB3 decimation factor due to invalid value "
+			  "of 0x%x for register 0x003", reg);
   }
   return 0;
 }

@@ -1,5 +1,5 @@
-<HdlWorker language='vhdl' library='platform'>
+<HdlDevice language='vhdl' library='platform'>
   <ComponentSpec nocontrol='true' package='ocpi.core'/>
   <property name='rom_words' type="ushort" parameter='true'/>
   <metadata/>
-</HdlWorker>
+</HdlDevice>

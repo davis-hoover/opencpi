@@ -114,6 +114,12 @@ begin
   reset   <= reset_i;
   ready   <= ready_r;
   latency <= resize(latency_r,latency'length);
+  -- useful for debugging:
+  -- latency <= ushort_t(std_logic_vector'("0000" &
+  --                                       ready_r &
+  --                                       std_logic_vector(to_unsigned(state_t'pos(state_r),3)) &
+  --                                       eom & eof & give & valid &
+  --                                       wsi_reset & wsi_is_operating & SReset_n & SThreadBusy));
   gen_debug: if debug generate -- these will have no drivers
      messages <= messages_r;
      bytes    <= bytes_r;
@@ -206,9 +212,9 @@ begin
   begin
     if rising_edge(wsi_clk) then
       if its(reset_i) then
-        if (its(wsi_reset) or state_r /= FINISHED_e) then
-          state_r      <= BEFORE_SOM_e;
-        end if;
+        -- Note that this will reset an output port to the BEFORE_SOM state upon a
+        -- peer reset without a control reset, which is useful for adapters (no-control)
+        state_r      <= BEFORE_SOM_e;
         ready_r      <= bfalse;
         opcode_r     <= (others => '0'); -- perhaps unnecessary, but supresses a warning
         latency_r    <= (others => '0');

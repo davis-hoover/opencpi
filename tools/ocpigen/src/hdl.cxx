@@ -161,8 +161,12 @@ parseHdlImpl(const char *a_package) {
   if (dwFound)
     m_defaultDataWidth = dw; // override the default if set
   if (m_noControl) {
-    // Devices always get wci reset/control
-    if (m_isDevice)
+    // Devices always get wci reset/control, unless they are cpmaster slaves
+    ezxml_t cpmaster = ezxml_cchild(m_xml, "cpmaster");
+    bool master;
+    if (cpmaster && (err = OE::getBoolean(cpmaster, "master", &master)))
+      return err;
+    if (m_isDevice && !(cpmaster && !master))
       addWciClockReset();
   } else {
     if (!createPort<WciPort>(*this, xctl, NULL, -1, err))

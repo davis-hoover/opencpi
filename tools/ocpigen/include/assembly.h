@@ -61,6 +61,7 @@ struct Instance : public OU::IdentResolver {
   ezxml_t     m_xml;
   std::string m_name;
   std::string m_wName;
+  std::string m_device;   // for generated config/container assemblies, the device of the instance
   Worker       *m_worker;
   Clock       **m_clocks; // mapping of instance's clocks to assembly clocks
   std::vector<InstancePort> m_ports;
