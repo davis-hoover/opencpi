@@ -1631,11 +1631,9 @@ const char *Worker::
 parseRccAssy() {
   const char *err;
   ::Assembly *a = m_assembly = new ::Assembly(*this);
-  static const char
-    *topAttrs[] = {IMPL_ATTRS, RCC_TOP_ATTRS, RCC_IMPL_ATTRS, NULL},
-    *instAttrs[] = {INST_ATTRS, "reusable", NULL};
   // Do the generic assembly parsing, then to more specific to RCC
-  if ((err = a->parseAssy(m_xml, topAttrs, instAttrs)))
+  static const char *instAttrs[] = { "paramconfig", NULL };
+  if ((err = a->parseAssy(m_xml, NULL, instAttrs)))
     return err;
   m_dynamic = g_dynamic;
   m_optimized = g_optimized;
@@ -1687,8 +1685,7 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, const char
 RccAssembly::
 RccAssembly(ezxml_t xml, const char *xfile, const std::string &parentFile, const char *&err)
   : Worker(xml, xfile, parentFile, Worker::Assembly, NULL, NULL, err) {
-  if (!(err = OE::checkAttrs(xml, IMPL_ATTRS, RCC_TOP_ATTRS, (void*)0)) &&
-      !(err = OE::checkElements(xml, IMPL_ELEMS, RCC_IMPL_ELEMS, ASSY_ELEMS, (void*)0)))
+  if (!err)
     err = parseRcc();
 }
 

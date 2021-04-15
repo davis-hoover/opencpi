@@ -42,6 +42,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <forward_list>
 #include <map>
 #include "ezxml.h"
 #include "OcpiPValue.h"
@@ -103,13 +104,12 @@ namespace OCPI {
 	size_t   m_ordinal;
 	bool     m_externals;      // whether all ports should be considered external
 	std::vector<const char *> m_slaveNames; // the slave names for each referenced instance
-	std::vector<unsigned> m_slaveInstances; // the instance ordinals specified as slaves for this instance
+	std::vector<unsigned> m_slaveInstances; // instance ordinals specified as slaves
 	size_t   m_master;
 	bool     m_hasMaster;
 	Properties m_properties;
 	PValueList m_parameters;
-	std::list<Port*> m_ports; // attachments to connections
-	typedef std::list<Port*>::iterator PortsIter;
+	std::list<Port> m_ports; // attachments to connections, OWNED BY THE INSTANCE
 	CollocationPolicy m_collocation;
 	ezxml_t m_xml;
 	bool m_freeXml;
@@ -117,6 +117,7 @@ namespace OCPI {
 	~Instance();
 	const char *cname() const { return m_name.c_str(); }
 	const char
+          *getPort(const char *name, bool isInput, bool isBidi, bool isKnown, Port *&port),
 	  *parse(ezxml_t ix, Assembly &a, unsigned ordinal, const char **extraInstAttrs,
 		 const PValue *params),
 	  *addProperty(const char *name, ezxml_t px),
@@ -140,7 +141,7 @@ namespace OCPI {
         std::string m_name;   // the name of the "external port" to the assembly
         std::string m_url;    // the URL that this external attachment has
         Role m_role;
-        size_t m_count;       // The total count for the external (not the connection)
+        size_t m_count;       // The total count for the external (not any connection)
 	std::vector<bool> m_connected;
         PValueList m_parameters;
         External(const char *name);
@@ -156,34 +157,34 @@ namespace OCPI {
         mutable Role m_role;
 	mutable unsigned m_ordinal; // resolved against implementations like role
         size_t m_instance;
-        size_t m_index;
         // This mutable is because some port parameter values are added later by name
         // and the XML assembly might not use port names
         mutable PValueList m_parameters;
-        Port *m_connectedPort; // the "other" port of the connection
-	Connection *m_connection; // for navigating parameters
+	std::forward_list<Connection *> m_connections; // 99% of the time will be one
+	Port();
         const char *cname() const { return m_name.c_str(); }
-        const char *parse(ezxml_t x, Assembly &a, Connection &c, const PValue *pvl, const PValue *params);
         const char *init(Assembly &a, Connection &c, const char *name, size_t instance, bool isInput,
-                         bool bidi, bool known, size_t index, const PValue *params);
+                         bool bidi, bool known, const PValue *params);
 	// Set parameters for a port after XML parsing, to override
-	const char *setParam(const char *name, const char *value);
+	const char *setParam(Connection &c, const char *name, const char *value);
       };
+      typedef std::pair<Port*,size_t> ConnPort; // Port and index
       struct Connection {
         std::string m_name;
 	std::list<std::pair<External*,size_t>> m_externals; // external and index in it
-        std::list<Port> m_ports;
-        typedef std::list<Port>::iterator PortsIter;
+        std::list<ConnPort> m_ports; // port and index in it
         PValueList m_parameters;
         size_t m_count; // all attachments have same count. zero if unknown
         Connection();
-	Connection(const Connection &conn);
-	Connection(Connection &conn);
+	//	Connection(const Connection &conn);
+	//	Connection(Connection &conn);
         const char *parse(ezxml_t x, Assembly &a, unsigned &ord, const OCPI::Util::PValue *params);
         const char *addPort(Assembly &a, size_t instance, const char *port, bool isInput,
                             bool bidi, bool known, size_t index,
                             const OCPI::Util::PValue *params, Port *&);
 	const char *addExternal(External &ext, size_t index, size_t count);
+        const char *parsePort(ezxml_t x, Assembly &a, const PValue *pvl, const PValue *params,
+			      Port *&p);
       };
       typedef std::list<Connection *> Connections;
       // Potentially specified in the assembly, what policy should be used

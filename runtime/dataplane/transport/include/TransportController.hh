@@ -47,7 +47,7 @@ public:
     INPUT
   };
 private:
-  unsigned  m_FillQPtr;
+  //  unsigned  m_FillQPtr;
   unsigned  m_EmptyQPtr;
   // Each PortPair struct has the transfers between that output-to-input pair
   struct OutPort2InPort {

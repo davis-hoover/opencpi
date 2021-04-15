@@ -219,7 +219,7 @@ getComponentLibraries(const char *libs, const char *model, bool topSpecs, Ordere
   }
   StringSet found;
   for (auto pit = projectPath.begin(); pit != projectPath.end(); ++pit) {
-    ocpiInfo("For component library search, considering project dir: %s", pit->c_str());
+    ocpiDebug("For component library search, considering project dir: %s", pit->c_str());
     std::string pDir(*pit);
     if (pit != projectPath.begin() && OF::exists(pDir + "/exports"))
       pDir += "/exports";

@@ -26,8 +26,8 @@
 --
 -------------------------------------------------------------------------------
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library ocpi,cdc,misc_prims; use ocpi.types.all, ocpi.util.all; -- remove this to avoid all ocpi name collisions
-architecture rtl of signal_time_tagger_worker is
+library ocpi, cdc, util; use ocpi.types.all, ocpi.util.all;
+architecture rtl of worker is
   signal time_tag_cnt             : unsigned(width_for_max(to_integer(MAX_NUM_TIME_TAGS_TO_COLLECT))-1 downto 0);
   signal ctl2time_reset           : std_logic;
   signal time_is_operating        : std_logic;
@@ -50,7 +50,7 @@ begin
                 dst_rst => '0',
                 dst_out => time_is_operating);
   
-  redge_detect : component misc_prims.misc_prims.edge_detector
+  redge_detect : component util.util.edge_detector
     port map (clk           => time_in.clk,
               reset         => ctl2time_reset,
               din           => signal_to_time_tag,

@@ -42,6 +42,30 @@ DevInstance(const Device &d, const Card *c, const Slot *s, bool control,
     m_name = d.cname();
 }
 
+void DevInstance::
+emit(std::string &assy, bool emulated, bool content) const {
+  OU::formatAdd(assy, "  <instance name='%s' worker='%s'%s",
+		cname(), device.deviceType().cname(), emulated ? " emulated='1'" : "");
+  if (device.deviceType().m_type == Worker::Device) { // it might be a platform...
+    assy += " device='";
+    if (card) {
+      if (slot)
+	OU::formatAdd(assy, "%s/", slot->cname());
+      OU::formatAdd(assy, "%s/", card->cname());
+    }
+    OU::formatAdd(assy, "%s'", device.cname());
+  }
+  assy += content || m_instancePVs.size() ? ">\n" : "/>\n";
+  if (m_instancePVs.size()) {
+    const OU::Assembly::Property *ap = &m_instancePVs[0];
+    for (size_t n = m_instancePVs.size(); n; n--, ap++)
+      OU::formatAdd(assy, "    <property name='%s' value='%s'/>\n",
+		    ap->m_name.c_str(), ap->m_value.c_str());
+    if (!content)
+      OU::formatAdd(assy, "  </instance>\n");
+  }
+}
+
 const DevInstance *HdlHasDevInstances::
 findDevInstance(const Device &dev, const Card *card, const Slot *slot,
 		DevInstances *baseInstances, bool *inBase) {
@@ -75,24 +99,6 @@ addDevInstance(const Device &dev, const Card *card, const Slot *slot,
   if (slot && !m_plugged[slot->m_ordinal])
     m_plugged[slot->m_ordinal] = card;
   DevInstance &di = m_devInstances.back();
-#if 0
-  // See which (sub)devices on the same board support this added device, 
-  // and make sure they are present.
-  const Board &bd =
-    card ? static_cast<const Board&>(*card) : static_cast<const Board&>(m_platform);
-  for (DevicesIter bi = bd.m_devices.begin(); bi != bd.m_devices.end(); bi++)
-    for (SupportsIter si = (*bi)->m_deviceType.m_supports.begin();
-	 si != (*bi)->m_deviceType.m_supports.end(); si++)
-      // FIXME: use the package name here...
-      //      if (&(*si).m_type == &dev.m_deviceType && // the sdev supports this TYPE of device
-      if (!strcasecmp((*si).m_type.m_implName, dev.m_deviceType.m_implName) &&
-	  (*bi)->m_ordinal == dev.m_ordinal) { // the ordinals match. FIXME allow mapping
-	const DevInstance *sdi = findDevInstance(**bi, card, slot, baseInstances, NULL);
-	if (!sdi && (err = addDevInstance(**bi, card, slot, control/* why? */, &di, NULL,
-					  NULL, sdi)))
-	  return err;
-      }
-#endif
   devInstance = &di;
   if ((err = dev.m_deviceType.parseDeviceProperties(xml, di.m_instancePVs)))
     return err;
@@ -311,15 +317,16 @@ emitSubdeviceConnections(std::string &assy,  DevInstances *baseInstances) {
   // Connect top down.  For any device that is supported, connect to the support modules
   for (DevInstancesIter dii = m_devInstances.begin(); dii != m_devInstances.end(); dii++) {
     const Device &d = (*dii).device;
-    // Search for other instances that support this device instances
+    // Search for other instances that support this device instance
     for (DevInstancesIter sii = m_devInstances.begin(); sii != m_devInstances.end(); sii++) {
       bool inConfig;
       const Device &s = (*sii).device;
       const DevInstance *sdi = NULL;
       const Support *sup = NULL;
-      if (&*sii != &*dii)
+      if (&*sii != &*dii) {
+	unsigned n = 0;
 	for (auto si = s.m_deviceType.m_supports.begin();
-	     si != s.m_deviceType.m_supports.end(); ++si) {
+	     si != s.m_deviceType.m_supports.end(); ++si, ++n) {
 	  if (strcasecmp((*si).m_type.m_implName, d.m_deviceType.m_implName))
 	    continue;
 	  // The device type of this supports element matches the device type of the
@@ -327,20 +334,24 @@ emitSubdeviceConnections(std::string &assy,  DevInstances *baseInstances) {
 	  // If there are no mapping entries, then we use the implicit ordinal of the
 	  // supports element among supports elements for that device type
 	  if (s.m_supportsMap.empty()) {
-	    if (si->m_ordinal != d.m_ordinal)
+	    auto pair = s.m_deviceType.m_countPerSupportedWorkerType.find(d.m_deviceType.m_implName);
+	    // Here we know:
+	    // 1. how many of this type this subdevice supports:  pair.second
+            //    i.e. how many <supports> elements refer to the same worker
+	    // 2. which of that number is *this* <supports> relationship: sup->m_ordinal
+	    // 3. what is the ordinal of this subdevice on platform/card: s.m_ordinal
+	    // 4. what is the ordinal of the device we might be supporting: d.m_ordinal
+	    if (s.m_ordinal * pair->second + (*si).m_ordinal != d.m_ordinal)
 	      continue;
-	  } else {
-	    auto it =
-	      s.m_supportsMap.find(std::make_pair(d.m_deviceType.m_implName, si->m_ordinal));
-	    if (it == s.m_supportsMap.end() || it->second != d.m_name)
-	      continue;
-	  }
+	  } else if (s.m_supportsMap[n] != &d)
+	    continue;
 	  // Find whether it is in the platform config or not.
 	  sdi = findDevInstance(s, (*dii).card, (*dii).slot, baseInstances, &inConfig);
 	  assert(sdi);
 	  sup = &*si;
 	  break;
 	}
+      }
       if (!sup)
 	continue; // this (sub)dev instance does not support this device;
       for (SupportConnectionsIter sci = sup->m_connections.begin();
@@ -458,8 +469,7 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
     HdlHasDevInstances(pf, m_plugged, *this),
     m_platform(pf), m_sdpWidth(1), m_sdpLength(32) { // 32 is for backward compatibility (zynq w/64 bit AXI)
   if (err ||
-      (err = OE::checkAttrs(xml, IMPL_ATTRS, HDL_TOP_ATTRS,
-			    HDL_CONFIG_ATTRS, (void*)0)) ||
+      (err = OE::checkAttrs(xml, HDL_CONFIG_ATTRS, (void*)0)) ||
       (err = OE::checkElements(xml, HDL_CONFIG_ELEMS, (void*)0)))
     return;
   pf.setParent(this);
@@ -497,16 +507,9 @@ HdlConfig(HdlPlatform &pf, ezxml_t xml, const char *xfile, const std::string &pa
   // Add all the device instances
   for (DevInstancesIter dii = m_devInstances.begin(); dii != m_devInstances.end(); dii++) {
     const DevInstance &di = *dii;
+    di.emit(assy, false, false);
     const DeviceType &dt = di.device.m_deviceType;
-    OU::formatAdd(assy, "  <instance worker='%s' name='%s'%s>\n",
-		  dt.cname(), di.cname(), di.m_instancePVs.size() ? "" : "/");
-    if (di.m_instancePVs.size()) {
-      const OU::Assembly::Property *ap = &di.m_instancePVs[0];
-      for (size_t n = di.m_instancePVs.size(); n; n--, ap++)
-	OU::formatAdd(assy, "    <property name='%s' value='%s'/>\n",
-		      ap->m_name.c_str(), ap->m_value.c_str());
-      OU::formatAdd(assy, "  </instance>\n");
-    }
+
     // Add a time client instance as needed by device instances
     for (PortsIter pi = dt.ports().begin();
 	 pi != dt.ports().end(); pi++)

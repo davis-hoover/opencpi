@@ -15,7 +15,10 @@
             Type='float' 
             Default='1e6' 
             Parameter='true'/>
-
+  <!-- useful debug properties -->
+  <property name='status' type='ushort' volatile='1' debug='1'/>
+  <property name='ctl_count' type='ulong' volatile='1' debug='1'/>
+  <property name='dac_count' type='ulong' volatile='1' debug='1'/>
   <StreamInterface Name="in" 
 		   DataWidth="IN_PORT_DATA_WIDTH"
 		   ClockDirection="out"/>

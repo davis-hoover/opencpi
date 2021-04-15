@@ -123,7 +123,7 @@ bool RadioCtrlrNoOSTuneResamp::do_min_data_stream_config_locks(
     which = get_cic_dec(req);
     val = m_callBack.getDecimation(which);
   } else
-    assert(!"ds_ID unexpected");
+    assert("ds_ID unexpected" == NULL);
   tol = 0;
   if (!m_configurator.lock_config(ds_ID, key, val, tol)) {
     this->log_debug("unexpected config lock failure");
@@ -1048,8 +1048,8 @@ bool DigRadioCtrlr<LC, C>::lock_gain_mode(
   IPF(rx_synthesizer_frequency_hz, u64) \
   IPF(tx_synthesizer_frequency_hz, u64) \
   IPF(tx_lo_powerdown_managed_enable, u8) \
-  IPF(rx_path_clock_frequencies[6], u32) \
-  IPF(tx_path_clock_frequencies[6], u32) \
+  IPFN(rx_path_clock_frequencies, u32, 6)	\
+  IPFN(tx_path_clock_frequencies, u32, 6)	\
   IPF(rf_rx_bandwidth_hz, u32) \
   IPF(rf_tx_bandwidth_hz, u32) \
   IPF(rx_rf_port_input_select, u32) \
@@ -1057,7 +1057,7 @@ bool DigRadioCtrlr<LC, C>::lock_gain_mode(
   IPF(tx_attenuation_mdB, u32) \
   IPF(update_tx_gain_in_alert_enable, u8) \
   IPF(xo_disable_use_ext_refclk_enable, u8) \
-  IPF(dcxo_coarse_and_fine_tune[2], u32) \
+  IPFN(dcxo_coarse_and_fine_tune, u32, 2)	    \
   IPF(clk_output_mode_select, u32) \
   IPF(gc_rx1_mode, u8) \
   IPF(gc_rx2_mode, u8) \
@@ -1222,24 +1222,13 @@ bool DigRadioCtrlr<LC, C>::lock_gain_mode(
 
 void RadioCtrlrNoOSTuneResamp::log_debug_ad9361_init(const AD9361_InitParam &init_param) const {
   this->log_debug("No-OS call: ad9361_init w/ values: "
+#define IPFN(n,f,count)
 #define IPF(n,f) "\n  "#n": %" PRI##f
       INIT_PARAM_FIELDS "\n"
 #undef IPF
 #define IPF(n,f) ,init_param.n
       INIT_PARAM_FIELDS
 		  );
-#if 0
-
-
-            "rx_data_clock_delay=%" PRIu32
-            ",rx_data_delay=%" PRIu32
-            ",tx_fb_clock_delay=%" PRIu32
-            ",tx_data_delay=%" PRIu32,
-            init_param.rx_data_clock_delay,
-            init_param.rx_data_delay,
-            init_param.tx_fb_clock_delay,
-            init_param.tx_data_delay);
-#endif
 }
 
 

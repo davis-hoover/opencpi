@@ -46,10 +46,10 @@ HdlPlatform(ezxml_t xml, const char *xfile, const std::string &parentFile, Worke
     ::Device(*this, *this, cname(), xml, true, 0, NULL, err),
     m_control(false) {
   m_isDevice = true;
+  // Platforms are overloaded:  they are a device worker, but they also are a device *on* that platform.
   if (err ||
-      (err = OE::checkAttrs(xml, IMPL_ATTRS, GENERIC_IMPL_CONTROL_ATTRS, HDL_TOP_ATTRS,
-			    HDL_IMPL_ATTRS, HDL_PLATFORM_ATTRS, (void*)0)) ||
-      (err = OE::checkElements(xml, IMPL_ELEMS, HDL_IMPL_ELEMS, HDL_PLATFORM_ELEMS, (void*)0)) ||
+      (err = OE::checkAttrs(xml, HDL_PLATFORM_ATTRS, (void*)0)) ||
+      (err = OE::checkElements(xml, HDL_PLATFORM_ELEMS, (void*)0)) ||
       (err = parseDevices(xml, NULL, xfile, this)))
     return;
   unsigned n = 0;

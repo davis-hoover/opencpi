@@ -16,7 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library ocpi;
+library ocpi; use ocpi.types.all;
 library protocol; use protocol.iqstream.all;
 
 entity iqstream_demarshaller is
@@ -79,6 +79,7 @@ begin
       if(rising_edge(clk)) then
         if(rst = '1') then
           oprotocol <= PROTOCOL_ZERO;
+          oeof <= bfalse;
           --itake_s <= '0';
         else
           --itake_s <= take;

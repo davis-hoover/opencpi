@@ -1,8 +1,8 @@
 <!-- This time client is for clients that do not want the TOD in their own clock domain, but are happy
      accepting TOD in the native timekeepping clock domain.  Thus this time_client has a clock OUTPUT
      for the WTI interface. -->
-<HdlWorker language='vhdl' library='platform'>
+<HdlDevice language='vhdl' library='platform'>
   <ComponentSpec nocontrol='true' package='ocpi.core'/>
   <timeservice/>
   <timeinterface master='true'  clockDirection='out' fractionwidth='32'/>
-</HdlWorker>
+</HdlDevice>

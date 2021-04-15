@@ -45,7 +45,7 @@
   <devsignal name='dev_data_ch0_out' signals='qadc-16-signals.xml'/>
   <devsignal name='dev_data_ch1_out' optional='true' signals='qadc-16-signals.xml'/>
 
-  <DevSignal name='dev' signals='qadc-16-signals.xml'/>
+  <!-- <DevSignal name='dev' signals='qadc-16-signals.xml'/> -->
 
   <!-- Sub-Device Port Connections (Supports) -->
   <supports worker='data_src_qadc'>
