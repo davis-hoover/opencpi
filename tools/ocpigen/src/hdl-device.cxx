@@ -33,9 +33,8 @@ create(ezxml_t xml, const char *xfile, const std::string &parentFile, Worker *pa
   HdlDevice *hd = new HdlDevice(xml, xfile, parentFile, parent, Worker::Device, instancePVs, err);
   if (err ||
       (err = OE::checkTag(xml, "HdlDevice", "Expected 'HdlDevice' as tag in '%s'", xfile)) ||
-      (err = OE::checkAttrs(xml, PARSED_ATTRS, IMPL_ATTRS, HDL_TOP_ATTRS, HDL_IMPL_ATTRS,
-			    "interconnect", "control", (void*)0)) ||
-      (err = OE::checkElements(xml, IMPL_ELEMS, HDL_IMPL_ELEMS, (void*)0)) ||
+      (err = OE::checkAttrs(xml, HDL_DEVICE_ATTRS, (void*)0)) ||
+      (err = OE::checkElements(xml, HDL_DEVICE_ELEMS, (void*)0)) ||
       (err = hd->setParamConfig(instancePVs, 0, parentFile))) {
     delete hd;
     hd = NULL;
@@ -52,9 +51,8 @@ HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *
       (err = OE::getBoolean(xml, "control", &m_canControl)) ||
       (err = parseHdl()))
     return;
-  // Parse submodule support for users - note that this information is only used
-  // for platform configurations and containers, but we do a bit of error checking here
-  // We need to compute the ordinal for each device type we support
+  // Parse subdevice support for other device workers, also counting
+  // how many of each supported type we support
   std::map<std::string, unsigned> countPerSupportedWorkerType;
   for (ezxml_t spx = ezxml_cchild(m_xml, "supports"); spx; spx = ezxml_cnext(spx)) {
     std::string worker;
@@ -63,7 +61,7 @@ HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *
 	(err = OE::getRequiredString(spx, worker, "worker")))
       return;
     // Record how many each worker type we support and remember the ordinal
-    auto pair = countPerSupportedWorkerType.insert(std::make_pair(worker, 0));
+    auto pair = m_countPerSupportedWorkerType.insert(std::make_pair(worker, 0));
     if (!pair.second)
       pair.first->second++;
     DeviceType *dt = get(worker.c_str(), spx, file, parent, err);
@@ -72,6 +70,7 @@ HdlDevice(ezxml_t xml, const char *file, const std::string &parentFile, Worker *
       return;
     }
     m_supports.push_back(Support(*dt));
+    // Record the ordinal of this supports element within those of the same device type
     m_supports.back().m_ordinal = pair.first->second;
     if ((err = m_supports.back().parse(spx, *this)))
       return;
@@ -371,7 +370,7 @@ const char *Device::
 parse(ezxml_t xml, Board &b, SlotType *stype) {
   const char *err;
   // This might happen in floating devices in containers.
-  if (b.findDevice(m_name.c_str()))
+  if (b.findDevice(m_name))
     return OU::esprintf("Duplicate device name \"%s\" for platform/card", m_name.c_str());
   // Do the stuff in Worker::create - can we share more?
   if (m_deviceType.m_type != Worker::Platform &&
@@ -380,34 +379,18 @@ parse(ezxml_t xml, Board &b, SlotType *stype) {
        (err = m_deviceType.finalizeProperties()) ||
        (err = m_deviceType.finalizeHDL())))
     return err;
-  // Parse the "supports map" that says exacty which platform/card/board device instances
-  // that this supporting device supports.
-  std::map<const char *, unsigned, OU::ConstCharComp> countPerSupportedWorkerType;
-  for (ezxml_t xs = ezxml_cchild(xml, "supports"); xs; xs = ezxml_cnext(xs)) {
-    if (!ezxml_cattr(xs, "device") && m_deviceType.m_type == Worker::Platform)
-      continue; // If this is in a platform, <supports> is overloaded so this is the other usage
-    std::string worker, device;
-    if ((err = OE::getRequiredString(xs, worker, "worker")) ||
+  // In pass 1 we don't know all devices on the platform so just record the strings
+  for (ezxml_t xs = ezxml_cchild(xml, "supported"); xs; xs = ezxml_cnext(xs)) {
+    std::string device;
+    if ((err = OE::checkAttrs(xs, "device", NULL)) ||
 	(err = OE::getRequiredString(xs, device, "device")))
       return err;
-    auto pair = countPerSupportedWorkerType.insert(std::make_pair(worker.c_str(), 0));
-    // Find the support element of the device-type
-    // Record how many each worker type we support and remember the ordinal
-    Support *sup = NULL;
-    for (auto si = m_deviceType.m_supports.begin(); si != m_deviceType.m_supports.end(); ++si)
-      if (!strcasecmp((*si).m_type.m_implName, worker.c_str()) &&
-	  pair.first->second == (*si).m_ordinal) {
-	sup = &*si;
-	break;
-      }
-    if (!sup)
-      return OU::esprintf("<supports> element for device \"%s\" on board \"%s\" does not match "
-			  "any <supports> element on the \"%s\" worker",
-			  m_name.c_str(), b.cname(), m_deviceType.m_implName);
-    // We found the matching one
-    m_supportsMap[std::make_pair(worker.c_str(), pair.first->second)] = device;
-    pair.first->second++;
+    m_supportedDevices.push_back(device);
   }
+  size_t supportsCount = m_deviceType.m_supports.size();
+  if (m_supportedDevices.size() && m_supportedDevices.size() != supportsCount)
+    return OU::esprintf("For device \"%s\", there are not enough <supported> elements, should be %zu",
+			m_name.c_str(), supportsCount);
   return parseSignalMappings(xml, b, stype);
 }
 
@@ -436,6 +419,10 @@ const char *Board::
 parseDevices(ezxml_t xml, SlotType *stype, const char *parentFile, Worker *parent) {
   // These devices are declaring that they are part of the board.
   for (ezxml_t xs = ezxml_cchild(xml, "Device"); xs; xs = ezxml_cnext(xs)) {
+    const char *err;
+    if ((err = OE::checkElements(xs, DEVICE_ELEMS, NULL)) ||
+	(err = OE::checkAttrs(xs, DEVICE_ATTRS, NULL)))
+      return err;
     const char *worker = ezxml_cattr(xs, "worker");
     bool single = true;
     bool seenMe = false;
@@ -450,12 +437,32 @@ parseDevices(ezxml_t xml, SlotType *stype, const char *parentFile, Worker *paren
 	  n++;
       }
     }
-    const char *err;
     Device *dev = Device::create(*this, xs, parentFile, parent, single, n, stype, err);
     if (dev)
       m_devices.push_back(dev);
     else
       return err;
+  }
+  // Second pass for error checking that all "supports map" entry point to real devices"
+  for (auto di = m_devices.begin(); di != m_devices.end(); ++di) {
+    Device &d = **di;
+    d.m_supportsMap.resize(d.m_supportedDevices.size());
+    unsigned n = 0;
+    assert(d.m_supportedDevices.empty() ||
+	   d.m_deviceType.m_supports.size() == d.m_supportedDevices.size());
+    auto dtsi = d.m_deviceType.m_supports.begin();
+    for (auto si = d.m_supportedDevices.begin(); si != d.m_supportedDevices.end(); ++si, ++dtsi, ++n) {
+      const Device *supported = findDevice(*si);
+      if (!supported)
+	return OU::esprintf("In <supported> mapping element for device %s, actual device \"%s\" not found",
+			    d.cname(), (*si).c_str());
+      // So the mentioned device is a device on the board.  Is it the right type?
+      if (strcasecmp(supported->m_deviceType.cname(), dtsi->m_type.cname()))
+	return OU::esprintf("In <supported> mapping element #%u in device \"%s\", specified "
+			    "device \"%s\" is the wrong device type, should be \"%s\"",
+			    n, d.cname(), si->c_str(), dtsi->m_type.cname());
+      d.m_supportsMap[n] = supported;
+    }
   }
   return NULL;
 }
@@ -552,6 +559,7 @@ parse(ezxml_t spx, Worker &w) {
 const char *Worker::
 parseInstance(Worker &parent, Instance &i, ezxml_t x) {
   const char *err;
+  OE::getOptionalString(x, i.m_device, "device");
   for (ezxml_t sx = ezxml_cchild(x, "signal"); sx; sx = ezxml_cnext(sx)) {
     std::string l_name, base, external;
     size_t index;

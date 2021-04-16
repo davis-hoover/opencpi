@@ -113,14 +113,15 @@ ifeq ($$(filter clean%,$$(MAKECMDGOALS)),)
     PackageFile:=$1/lib/package-id
     $$(infox PACKAGE_FILE:$$(PackageFile):$$(realpath $$(PackageFile)):$(CURDIR))
     $$(shell mkdir -p $1/lib)
+    PackageForFile:=$$(if $$(filter hdl-platform,$3),$$(PackagePrefix),$$(Package))
     # If package-id file does not yet exist, create it based on Package
     ifeq ($$(call OcpiExists,$$(PackageFile)),)
-      $$(shell echo $$(Package) > $$(PackageFile))
+      $$(shell echo $$(PackageForFile) > $$(PackageFile))
     else
       # If package-id file already exists, make sure its contents match Package
       PackageFromFile:=$$(shell cat $$(PackageFile))
-      ifneq ($$(Package),$$(PackageFromFile))
-        $$(error Package "$$(Package)" and "$$(PackageFromFile)" do not match. You must make clean after changing the package name.)
+      ifneq ($$(PackageForFile),$$(PackageFromFile))
+        $$(error Package "$$(PackageForFile)" and "$$(PackageFromFile)" do not match. You must make clean after changing the package name.)
       endif
     endif
   endif

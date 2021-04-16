@@ -232,7 +232,7 @@ namespace OCPI {
 			configFile.c_str(), err.c_str());
       // Now perform the configuration process, where managers and their children can do
       // things they would not do earlier, at static construction time.
-      ocpiDebug("Configuring the driver managers");
+      ocpiInfo("Configuring the driver managers");
       for (Manager *m = firstChild(); m; m = m->nextChild()) {
 	ocpiInfo("Configuring the %s manager", m->name().c_str());
 	m->configure(m_xml ? ezxml_cchild(m_xml, m->name().c_str()) : NULL);

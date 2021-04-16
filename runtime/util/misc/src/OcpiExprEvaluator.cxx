@@ -37,7 +37,7 @@ namespace OX = OCPI::Util::EzXml;
 namespace OA = OCPI::API;
 namespace {
  #define ALLOPS								\
-   OP(Rpar, ")") OPS(Cond2, ":") OPS(Cond1, "?") OPS(Lor, "||") OPS(Land, "&&")	\
+   OP(Rpar, ")") OPS(Skip,"") OPS(Cond2, ":") OPS(Cond1, "?") OPS(Lor, "||") OPS(Land, "&&") \
    OP(Bor, "|") OP(Xor, "^") OP(Band, "&")				\
    OPS(Eq, "==") OPS(Neq, "!=") OPS(Lt, "<") OPS(Gt, ">") OPS(Le, "<=") OPS(Ge, ">=") \
    OP(Sl, "<<") OP(Sr, ">>") OPS(Plus, "+") OP(Minus, "-") OP(Mult, "*") OP(Div, "/") OP(Mod, "%") \
@@ -298,7 +298,7 @@ public:
       }
       op = OpLimit;
       for (unsigned n = 0; n < OpEnd; n++)
-	if (*cp == opNames[n][0]){
+	if (*cp == opNames[n][0]) {
 	  if (opNames[n][1]) {
 	    if (cp < last-1 && opNames[n][1] == cp[1]) {
 	      cp++;
@@ -476,17 +476,20 @@ reduce(ExprToken *start, ExprToken *&end, bool parens) {
       t--;
       break;
     case OpCond1: // we must have encountered the ":".  Implement right-to-left associativity.
-      if (t < start + 2 || t[+1].op != OpCond2 || t[-2].op <= OpEnd || parens)
+      if (t < start + 2 || end->op != OpCond2 || t[-2].op <= OpEnd || parens)
 	return "bad conditional operator syntax";
       if (mpf2bool(t[-2].value.m_number)) { // true conditional, leave residue
 	t[-2] = t[0]; // save good value as LHS of colon operator
-	t[-1] = t[1]; // convert ? to :
+	end->op = OpSkip;
+	t[-1] = *end; // convert ? to OpSkip - a colon that has been matched to ?
 	end = t - 1;
       } else
 	end = t - 3; // backup and leave nothing.
       return NULL;
-    case OpCond2: // either we have nothing before us or the first value to keep
-      if (t < start+2) // || !(t[+1].op == OpRpar || t[+1].op == OpEnd || t[+1].op == OpCond2))
+    case OpCond2: // a colon that was not matched to a ?
+      return "bad colon operator syntax without ? mark";
+    case OpSkip: // a colon that we have seen the matchinf ?
+      if (t < start+2)
 	return "bad conditional operator syntax";
       t--;
       break;
@@ -505,12 +508,12 @@ reduce(ExprToken *start, ExprToken *&end, bool parens) {
 
 const char *ExprValue::Internal::
 parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver *resolver) {
-  OpCode op;
+  OpCode op = OpEnd;
   unsigned nTokens = 0, nParens = 0;
   const char *cp, *dummy;
   const char *err;
   Internal dumval;
-  
+
   pthread_once(&once, init);
   for (cp = buf; !(err = dumval.lex(cp, end, dummy, dummy, op)) && op != OpEnd; nTokens++)
     ;
@@ -521,6 +524,8 @@ parse(const char *buf, const char *end, ExprToken *&tokens, const IdentResolver 
   cp = buf;
   do {
     t->value.lex(cp, end, t->start, t->end, t->op); // can ignore errors in second pass
+    if (op == OpCond2 && t->op == OpEnd)
+      return "illegal trailing colon operator"; // check this odd case
     switch ((op = t->op)) {
     case OpConstant:
       // These values are set in lex()

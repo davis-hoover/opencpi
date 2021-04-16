@@ -102,9 +102,11 @@ typedef enum {
   RCC_OK,
   RCC_ERROR,
   RCC_FATAL,
-  RCC_DONE,
+  RCC_DONE, //Will be removed in version 3.0.0
+  RCC_FINISHED,
   RCC_ADVANCE,
-  RCC_ADVANCE_DONE
+  RCC_ADVANCE_DONE, //Will be removed in version 3.0.0
+  RCC_ADVANCE_FINISHED
 } RCCResult;
 
 typedef struct RCCWorker RCCWorker;

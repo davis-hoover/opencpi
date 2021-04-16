@@ -12,7 +12,7 @@
     <socket load='1'/>
   </transfer>
   <applications>
-    <application name='ocpi.assets.timestamping_accuracy'>
+    <application name='ocpi.platform.timestamping_accuracy'>
       <!-- List of containers to run on -->
       <containers>
 	<container name='192.168.1.1:12345/PL:0'/>
@@ -20,7 +20,7 @@
       <freqstd type='srs725' serialport='/dev/ttyUSB1'/>
       <gpsfreqref type='srs740' ipaddr='192.168.1.3'/>
     </application>
-    <application name='ocpi.assets.timekeeping_clock_characterization'>
+    <application name='ocpi.platform.timekeeping_clock_characterization'>
       <!-- List of containers to run on -->
       <containers>
 	<container name='192.168.1.1:12345/PL:0'/>

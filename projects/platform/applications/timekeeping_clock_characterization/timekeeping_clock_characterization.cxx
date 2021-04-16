@@ -28,7 +28,7 @@
 #include "OcpiDriverManager.h"
 #include "OcpiUtilEzxml.h"
 
-const char *APP_NAME = "ocpi.assets.timekeeping_clock_characterization";
+const char *APP_NAME = "ocpi.platform.timekeeping_clock_characterization";
 //to prevent hanging application
 const int MAX_EXPECTED_RUN_TIME_USECS=1e6;
 

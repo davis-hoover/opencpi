@@ -53,6 +53,7 @@ namespace OCPI {
 
     Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OCPI::Util::PValue *params)
       : OU::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
+      m_nAppInstances = nUtilInstances();
       findImplementations(params);
     }
 
@@ -99,7 +100,7 @@ namespace OCPI {
 	  const OU::Assembly::Connection &c = **ci;
 	  if (c.m_externals.size() &&
 	      !strcasecmp(pname.c_str(), c.m_externals.front().first->m_name.c_str())) {
-	    ap = &c.m_ports.front();
+	    ap = c.m_ports.front().first;
 	    instn = ap->m_instance;
 	    assert(ap->m_name.size());
 	    pname = ap->m_name; // pname is now internal name
@@ -118,7 +119,7 @@ namespace OCPI {
 	if (removeExternal)
 	  for (ci = m_connections.begin(); ci != m_connections.end(); ci++) {
 	    const OU::Assembly::Connection &c = **ci;
-	    const OU::Assembly::Port *ap = &c.m_ports.front();
+	    const OU::Assembly::Port *ap = c.m_ports.front().first;
 	    if (c.m_externals.size() && ap->m_instance == instn &&
 		!strcasecmp(ap->m_name.c_str(), pname.c_str()))
 		  break;
@@ -219,14 +220,13 @@ namespace OCPI {
       OU::Assembly::Port **ap = new OU::Assembly::Port *[m_nPorts];
       for (unsigned n = 0; n < m_nPorts; n++)
 	ap[n] = NULL;
-      const OU::Assembly::Instance &inst = m_utilInstance;
+      OU::Assembly::Instance &inst = m_utilInstance;
       OU::Port *p;
 
       // build the map from implementation port ordinals to util::assembly::ports
-      for (std::list<OU::Assembly::Port*>::const_iterator pi = inst.m_ports.begin();
-	   pi != inst.m_ports.end(); pi++) {
+      for (auto pi = inst.m_ports.begin(); pi != inst.m_ports.end(); pi++) {
 	OU::Port *found = NULL;
-	OU::Assembly::Port &asp = **pi;
+	OU::Assembly::Port &asp = *pi;
 	if (asp.m_name.empty()) {
 	  // Resolve empty port names to be unambiguous if possible
 	  p = ports;
@@ -298,7 +298,7 @@ namespace OCPI {
 	for (unsigned n = 0; n < m_nPorts; n++, p++) {
 	  bool found = false;
 	  for (auto pi = inst.m_ports.begin(); pi != inst.m_ports.end(); pi++)
-	    if (!strcasecmp((*pi)->m_name.c_str(), p->m_name.c_str())) {
+	    if (!strcasecmp((*pi).m_name.c_str(), p->m_name.c_str())) {
 	      found = true;
 	      break;
 	    }
@@ -365,46 +365,34 @@ namespace OCPI {
 	OU::Port::Mask m = 1;
 	unsigned bump = 0;
 	for (unsigned n = 0; n < nPorts; n++, m <<= 1, c++, p++)
-	  if (m & i.m_internals) {
-	    // Find the assembly connection port for this instance and this
-	    // internally/statically connected port
+	  if (m & i.m_internals) { // port is connected inside the artifact
 	    OU::Assembly::Port *ap = m_assyPorts[n];
-	    if (ap && !ap->m_connection->m_externals.size()) {
-	      // We found the assembly connection port
+	    if (!ap) // port not connected at all, which is not viable
+	      return reject(*this, i,
+			    "artifact having port \"%s\" connected while application doesn't.",
+			    p->m_name.c_str());
+	    // For connections to this port (presumably with different indices)
+	    for (auto ci = ap->m_connections.begin(); ci != ap->m_connections.end(); ++ci) {
+	      auto &conn = **ci;
+	      if (!conn.m_externals.empty()) // no checking for externals
+		continue;
+	      auto &other = conn.m_ports.front().first == ap ?
+		*conn.m_ports.back().first : *conn.m_ports.front().first;
 	      // Now check that the port connected in the assembly has the same
-	      // name as the port connected in the artifact
-	      if (!ap->m_connectedPort)
-		return reject(*this, i,
-			      "artifact having port \"%s\" connected while application doesn't.",
-			      p->m_name.c_str());
-	      // This check can only be made for the port of the internal connection that is
-	      // for a later instance, since null-named ports are resolved as each
-	      // instance is processed
-	      if (ap->m_connectedPort->m_instance < m_utilInstance.m_ordinal &&
-		  (strcasecmp(ap->m_connectedPort->m_name.c_str(),
-			      c->port->m_name.c_str()) || // port name different
-		   assy.utilInstance(ap->m_connectedPort->m_instance).m_specName !=
-		   c->impl->m_metadataImpl.specName())) {             // or spec name different
-		reject(*this, i, "incompatible connection on port \"%s\"", p->m_name.c_str());
+	      // name as the port connected in the artifact for a later instance,
+	      // since null-named ports are resolved as each instance is processed
+	      if (other.m_instance < m_utilInstance.m_ordinal &&
+		  (strcasecmp(other.m_name.c_str(), c->port->m_name.c_str()) ||
+		   assy.utilInstance(other.m_instance).m_specName !=
+		   c->impl->m_metadataImpl.specName())) { // port name or spec name different
 		ocpiInfo("    Artifact connects it to port '%s' of spec '%s', "
 			 "but application connects it to port '%s' of spec '%s'",
 			 c->port->m_name.c_str(), c->impl->m_metadataImpl.specName().c_str(),
-			 ap->m_connectedPort->m_name.c_str(),
-			 assy.utilInstance(ap->m_connectedPort->m_instance).m_specName.c_str());
-		return false;
+			 other.m_name.c_str(),
+			 assy.utilInstance(other.m_instance).m_specName.c_str());
+		return reject(*this, i, "incompatible connection on port \"%s\"", p->m_name.c_str());
 	      }
 	      bump = 1;; // An implementation with hardwired connections gets a score bump
-	    } else if (m_utilInstance.m_hasMaster || (ap && ap->m_connection->m_externals.size())) 
-	      // I'm a slave and my master might delegate a port to me --or--
-	      // I am connected externally to something that cannot be confirmed yet, like a delegated port
-	      // I.e. there might be a problem but I cannot reject YET.
-	      return true;
-	    else {
-	      // There is no connection in the assembly for a statically connected impl port
-	      ocpiInfo("  Rejected \"%s\" because artifact has port '%s' connected while "
-		       "application doesn't mention it.", i.m_artifact.name().c_str(),
-		       p->m_name.c_str());
-	      return false;
 	    }
 	  }
 	cand.score += bump;
@@ -481,6 +469,21 @@ namespace OCPI {
       if (impl.m_metadataImpl.m_scaling.check(m_scale, error)) {
 	ocpiInfo("    Rejected: %s", error.c_str());
 	return false;
+      }
+      // Check for device suitability.
+      if (m_device.size()) {
+	const char *device;
+	if (impl.m_staticInstance && (device = ezxml_cattr(impl.m_staticInstance, "device"))) {
+	  if (strcasecmp(device, m_device.c_str())) {
+	    ocpiInfo("    Rejected: requested device is %s, artifact device is %s",
+		     m_device.c_str(), device);
+	    return false;
+	  }
+	} else {
+	    ocpiInfo("    Rejected: requested device is %s, artifact has none",
+		     m_device.c_str());
+	    return false;
+	}
       }
       strip_pf(platform);
 
@@ -590,6 +593,12 @@ namespace OCPI {
 	throw OU::Error("No acceptable implementations found in any libraries "
 			"for \"%s\".  Use log level 8 for more detail.",
 			inst.m_specName.c_str());
+      const char *device = NULL;
+      if (!OU::findAssign(params, "device", inst.m_name.c_str(), scale) &&
+	  !OU::findAssign(params, "device", inst.m_specName.c_str(), scale))
+	device = ezxml_cattr(inst.xml(), "device");
+      if (device)
+	m_tempInstance->m_device = device;
       if (m_tempInstance->m_candidates.size() > m_maxCandidates)
 	m_maxCandidates = (unsigned)m_tempInstance->m_candidates.size();
     }
@@ -606,6 +615,7 @@ namespace OCPI {
       m_deployed = OU::findString(params, "deployment", deployment);
       // Pass 1:  Initialize our instances list from the Util assy, but we might add to it later
       // for slaves or file I/O instances.  Find candidates implementations.
+      m_nAppInstances = nUtilInstances();
       for (unsigned n = 0; n < nUtilInstances(); n++)
 	addInstance(params);
       // Pass 2:  Deal with connectivity in the core assembly.
@@ -652,23 +662,23 @@ namespace OCPI {
 	const OU::Assembly::Connection &c = **ci;
 	if (c.m_ports.size() == 2) {
 	  const OU::Worker // implementations on both sides of the connection
-	    &i0 = m_instances[c.m_ports.front().m_instance]->m_candidates[0].impl->m_metadataImpl,
-	    &i1 = m_instances[c.m_ports.back().m_instance]->m_candidates[0].impl->m_metadataImpl;
+	    &i0 = m_instances[c.m_ports.front().first->m_instance]->m_candidates[0].impl->m_metadataImpl,
+	    &i1 = m_instances[c.m_ports.back().first->m_instance]->m_candidates[0].impl->m_metadataImpl;
 	  OU::Port // ports on both sides of the connection
-	    *ap0 = i0.findMetaPort(c.m_ports.front().m_name),
-	    *ap1 = i1.findMetaPort(c.m_ports.back().m_name);
+	    *ap0 = i0.findMetaPort(c.m_ports.front().first->m_name),
+	    *ap1 = i1.findMetaPort(c.m_ports.back().first->m_name);
 	  if (!ap0 || !ap1)
 	    throw OU::Error("Port name (\"%s\") in connection does not match any port in implementation",
-			    (ap0 ? c.m_ports.back() : c.m_ports.front()).m_name.c_str());
+			    (ap0 ? c.m_ports.back() : c.m_ports.front()).first->m_name.c_str());
 	  if (ap0->m_provider == ap1->m_provider)
 	    throw OU::Error("Port roles in connection are incompatible: "
 			    "port \"%s\" of instance \"%s\" has m_provider=\"%s\" vs. "
 			    "port \"%s\" of instance \"%s\" has m_provider=\"%s\"",
 			    ap0->m_name.c_str(),
-			    utilInstance(c.m_ports.front().m_instance).m_name.c_str(),
+			    utilInstance(c.m_ports.front().first->m_instance).m_name.c_str(),
 			    (ap0->m_provider ? "true" : "false"),
 			    ap1->m_name.c_str(),
-			    utilInstance(c.m_ports.back().m_instance).m_name.c_str(),
+			    utilInstance(c.m_ports.back().first->m_instance).m_name.c_str(),
 			    (ap1->m_provider ? "true" : "false"));
 	  // Protocol on both sides of the connection
 	  OU::Protocol &p0 = *ap0, &p1 = *ap1;
@@ -677,10 +687,10 @@ namespace OCPI {
 			    "port \"%s\" of instance \"%s\" has protocol \"%s\" vs. "
 			    "port \"%s\" of instance \"%s\" has protocol \"%s\"",
 			    ap0->m_name.c_str(),
-			    utilInstance(c.m_ports.front().m_instance).m_name.c_str(),
+			    utilInstance(c.m_ports.front().first->m_instance).m_name.c_str(),
 			    p0.m_name.c_str(),
 			    ap1->m_name.c_str(),
-			    utilInstance(c.m_ports.back().m_instance).m_name.c_str(),
+			    utilInstance(c.m_ports.back().first->m_instance).m_name.c_str(),
 			    p1.m_name.c_str());
 
 	  // FIXME:  more robust naming, namespacing, UUIDs, hash etc.
@@ -699,11 +709,10 @@ namespace OCPI {
 	if (!(otherImpl.m_internals & (1u << otherPort.m_ordinal)) ||
 	    otherImpl.m_connections[otherPort.m_ordinal].impl != &thisImpl ||
 	    otherImpl.m_connections[otherPort.m_ordinal].port != &thisPort) {
-	  ocpiInfo("    This port \"%s\" of worker \"%s\" is preconnected and the other port is not "
+	  ocpiInfo("    The port \"%s\" of worker \"%s\" is preconnected and the other port is not "
 		   "preconnected to us: we're incompatible", thisPort.cname(), thisPort.metaWorker().cname());
-	  ocpiInfo("      Other port %u \"%s\" of worker \"%s\"  m_internals %x, other internals %x",
-		   otherPort.m_ordinal, otherPort.cname(), otherPort.metaWorker().cname(),
-		   thisImpl.m_internals, otherImpl.m_internals);
+	  ocpiInfo("      Other port #%u \"%s\" of worker \"%s\"",
+		   otherPort.m_ordinal, otherPort.cname(), otherPort.metaWorker().cname());
 	  return true;
 	}
       } else if (otherImpl.m_internals & (1u << otherPort.m_ordinal)) {
