@@ -115,13 +115,15 @@ whose settings affect OpenCPI tools include:
 *`OCPI_ROOT_DIR`*::
     The root of the OpenCPI installation.
     The OpenCPI setup script automatically sets this variable to its
-    installation location, which is '<location-of-opencpi>'.
+    installation location, which is '<location-of-opencpi>'.  If set manually set
+    before the setup script is run, it will not be changed by that script.
 
 *`OCPI_CDK_DIR`*::
-    The location of the OpenCPI development or runtime installation.
+    The location of the OpenCPI development or runtime software installation.
     The OpenCPI setup script automatically sets this variable to its
-    installation location, which is '<location-of-opencpi>'*`/cdk/`*.
+    installation location, the parent directory of the setup script.
     'This environment variable should never be set directly'.
+    It is usually set to the *`cdk`* subdirectory of the OpenCPI installation directory.
 
 *`OCPI_LIBRARY_PATH`*::
     A colon-separated list of directories to be searched for runtime artifacts.
@@ -152,7 +154,7 @@ whose settings affect OpenCPI tools include:
     The location of an alternative project registry. This environment
     variable can be used during development to redirect OpenCPI asset
     development from the OpenCPI project registry (located by default
-    at $OCPI_ROOT_DIR/project-registry) to a different,
+    at *`$OCPI_ROOT_DIR/project-registry`*) to a different,
     alternative project registry. The directory specified in this
     environment variable becomes the project registry with which
     all subsequently created projects are associated.
@@ -160,8 +162,8 @@ whose settings affect OpenCPI tools include:
 *`OCPI_SYSTEM_CONFIG`*::
     The OpenCPI system configuration file for the OpenCPI runtime system.
     By default, the installation creates the system configuration file
-    at the path $OCPI_ROOT_DIR/system.xml and creates a default system
-    configuration file at the path $OCPI_CDK_DIR/default-system.xml
+    at the path *`$OCPI_ROOT_DIR/system.xml`* and creates a default system
+    configuration file at the path *`$OCPI_CDK_DIR/default-system.xml`*
     (see CONFIGURATION). This environment variable can be used to override the
     installation default, but this is rarely done.
 
@@ -204,7 +206,7 @@ The 'OpenCPI User Guide' provides more information about them.
     variables that are used during OpenCPI
     development. It is not used in a runtime-only environment.
     This file is automatically created at installation
-    in the installation directory ($OCPI_ROOT_DIR). 'None
+    in the installation directory (*`$OCPI_ROOT_DIR`*). 'None
     of the environment variables in this file are required
     to be set.' If any of these variables are set, the file
     is sourced by the OpenCPI setup script when it is invoked
