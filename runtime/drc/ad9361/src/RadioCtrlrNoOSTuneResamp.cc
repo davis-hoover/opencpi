@@ -1592,8 +1592,9 @@ void RadioCtrlrNoOSTuneResamp::init_AD9361_InitParam() {
 void RadioCtrlrNoOSTuneResamp::update_AD9361_InitParam(const Ad9361InitConfig &config) {
   AD9361_InitParam& init = m_AD9361_InitParam;
   init.xo_disable_use_ext_refclk_enable = config.xo_disable_use_ext_ref_clk;
+  m_AD9361_FREF_Hz = config.ext_ref_clk_freq;
   init.reference_clk_rate = (uint32_t) round(m_AD9361_FREF_Hz);
-  // printf("No-OS required rounding AD9361 reference clock rate from %0.15f to %" PRIu32, refclk, m_AD9361_InitParam.reference_clk_rate);
+  this->log_info("No-OS required rounding AD9361 reference clock rate from %0.15f to %" PRIu32, m_AD9361_FREF_Hz, m_AD9361_InitParam.reference_clk_rate);
   bool is_2R1T_or_1R2T_or_2R2T = config.qadc1_is_present or config.qdac1_is_present;
 
   init.rx_frame_pulse_mode_enable = config.rx_frame_toggle ? 1 : 0;
