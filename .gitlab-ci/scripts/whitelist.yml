@@ -23,6 +23,8 @@ centos7:
     - adi_plutosdr0_32
   zcu104:
     - xilinx19_2_aarch64
+  zcu106:
+    - xilinx19_2_aarch64
   zed:
     - xilinx19_2_aarch32
   zed_ise:

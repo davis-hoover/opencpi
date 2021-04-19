@@ -46,9 +46,9 @@ architecture rtl of worker is
   signal time_now              : ulonglong_t;
   signal time_chunk_idx_r      : unsigned(width_for_max(nchunks_c-1)-1 downto 0);
   signal time_chunks           : unsigned(ulonglong_t'length - in_in.data'length-1 downto 0);
-  function set_array_length(nchunks, in_data_length, time_width : natural) return natural
+  function set_array_length(nchunks, in_data_width, time_width : natural) return natural
   is begin
-    if in_data_length < time_width then
+    if in_data_width < time_width then
       return nchunks-2;
     else
       return 0;
@@ -67,11 +67,11 @@ architecture rtl of worker is
   signal error_r               : bool_t;
   signal time_late_r           : bool_t;    -- timestamp arrived after its time
   signal clr_late_time_sticky  : bool_t;
-  signal time_delta            : ulonglong_t;
+  signal time_delta_r          : ulonglong_t;
 
 begin
   
-  props_out.actual_time_to_requested_time_delta <= time_delta;
+  props_out.actual_time_to_requested_time_delta <= time_delta_r;
   good_opcode <= to_bool(in_in.opcode = ComplexShortWithMetadata_samples_op_e or
                          in_in.opcode = ComplexShortWithMetadata_time_op_e or 
                          in_in.opcode = ComplexShortWithMetadata_flush_op_e);
@@ -178,7 +178,8 @@ begin
         if its(out_in.reset) then
           error_r     <= bfalse;
           state_r     <= open_e; -- gate is initially open
-          time_delta  <= (others => '0');
+          time_delta_r <= (others => '0');
+	  time_to_transmit_r <= (others => '0');
         elsif its(fifo_empty_n) then
           if its(props_in.ignore_time_stamps) then -- Set the state back to open_e if any other
             state_r <= open_e;                 -- state than open_e
@@ -190,7 +191,7 @@ begin
             state_r <= error_e; 
           elsif state_r = time_waiting_e and time_now >= time_to_transmit_r then
             state_r <= open_e;
-            time_delta <= time_now - time_to_transmit_r;
+            time_delta_r <= time_now - time_to_transmit_r;
           elsif state_r = error_e then -- non-time opcode when waiting for time chunks
             error_r <= btrue;
           end if;
@@ -212,7 +213,10 @@ begin
         if its(out_in.reset) then
           error_r     <= bfalse;
           state_r     <= open_e; -- gate is initially open
-          time_delta  <= (others => '0');
+          time_delta_r <= (others => '0');
+	  time_chunks_r <= (others => (others => '0'));
+	  time_chunk_idx_r <= (others => '0');
+	  time_to_transmit_r <= (others => '0');
         elsif its(fifo_empty_n)  then
           if its(props_in.ignore_time_stamps) then -- Set the state back to open_e if any other
             state_r <= open_e;                 -- state than open_e
@@ -234,7 +238,7 @@ begin
             state_r <= error_e; 
           elsif state_r = time_waiting_e and time_now >= time_to_transmit_r then
             state_r <= open_e;
-            time_delta <= time_now - time_to_transmit_r;
+            time_delta_r <= time_now - time_to_transmit_r;
           elsif state_r = error_e then -- non-time opcode when waiting for time chunks
             error_r <= btrue;
           end if;

@@ -1091,7 +1091,6 @@ emitTieoffSignals(FILE *f) {
     ConnectedSignalsIter csi = m_connectedSignals.find(*si);
     if (csi == m_connectedSignals.end()) {
       // Assign device signal tieoffs for signals with no connections.
-      std::string name;
       switch (s.m_direction) {
       case Signal::IN:
 	fprintf(f, "  -- Input signal \"%s\" is unused and unconnected in this module\n",
@@ -1101,10 +1100,28 @@ emitTieoffSignals(FILE *f) {
 	fprintf(f,
 		"  -- Output signal \"%s\" is not connected to any instance.\n", s.cname());
 	if (s.m_differential) {
-	  OU::format(name, s.m_pos.c_str(), s.cname());
-	  fprintf(f, "  %s => %s,\n", name.c_str(), s.m_width ? "(others => '0')" : "'0'");
-	  OU::format(name, s.m_neg.c_str(), s.cname());
-	  fprintf(f, "  %s => %s,\n", name.c_str(), s.m_width ? "(others => '0')" : "'0'");
+          std::string pos_name;
+          std::string neg_name;
+          OU::format(pos_name, s.m_pos.c_str(), s.cname());
+          OU::format(neg_name, s.m_neg.c_str(), s.cname());
+          if (s.m_width) {
+            fprintf(f,
+                    "  BUFFER_OUT_N_%s_inst : platform.platform_pkg.BUFFER_OUT_N\n"
+                    "  generic map(width => %zu,\n"
+                    "              differential => true)\n"
+                    "  port map(I     => '0',\n"
+                    "           O     => %s,\n"
+                    "           OBAR  => %s);\n",
+                    s.cname(), s.m_width, pos_name.c_str(), neg_name.c_str());
+          } else {
+            fprintf(f,
+                    "  BUFFER_OUT_1_%s_inst : platform.platform_pkg.BUFFER_OUT_1\n"
+                    "  generic map(differential => true)\n"
+                    "  port map(I     => '0',\n"
+                    "           O     => %s,\n"
+                    "           OBAR  => %s);\n",
+                    s.cname(), pos_name.c_str(), neg_name.c_str());
+          }
 	} else
 	  fprintf(f, "  %s <= %s;\n", s.cname(), s.m_width ? "(others => '0')" : "'0'");
 	break;
