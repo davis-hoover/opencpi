@@ -37,7 +37,12 @@ launch_runs synth_1 -jobs 8
 wait_on_run synth_1 
 open_run synth_1 -name synth_1
 
-file copy managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module/$ip_module\_reload_order.txt ../$ip_module\_reload_order.txt
+# Vivado 2020.2 has a different resulting directory structure when generating the IP
+if {[version -short] >= "2020.2"} {
+  file copy managed_ip_project/managed_ip_project.gen/sources_1/ip/$ip_module/$ip_module\_reload_order.txt ../$ip_module\_reload_order.txt
+} else {
+  file copy managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module/$ip_module\_reload_order.txt ../$ip_module\_reload_order.txt
+}
 
 write_edif -security_mode all ../$ip_module.edf
 write_vhdl -mode synth_stub ../$ip_module\_stub.vhd 

@@ -75,6 +75,7 @@ namespace OCPI {
 
 	Deployment();
 	~Deployment();
+	Deployment(const Deployment&) = default;
 	Deployment &operator=(const Deployment &d);
 	void set(const std::string &name, size_t scale, const unsigned *containers,
 		 const OCPI::Library::Implementation * const *impls, CMap map, bool hasMaster,

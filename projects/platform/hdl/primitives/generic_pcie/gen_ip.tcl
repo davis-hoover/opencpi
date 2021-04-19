@@ -60,32 +60,42 @@ set_property -dict [list CONFIG.DEVICE_ID {0x4243} \
 #   --> Using 2019.2 directory structure only.
 # ##
 
-   # With IP properties, generate the IP:
-   generate_target all [get_files $ip_dir/$ip_module.xci] 
+# With IP properties, generate the IP:
+generate_target all [get_files $ip_dir/$ip_module.xci] 
 
-   # ##
-   # Uncomment below to run synthesis step during IP generation 
-   # create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
-   # launch_runs ${ip_module}_synth_1
-   # wait_on_run ${ip_module}_synth_1
-   # ##
+# ##
+# Uncomment below to run synthesis step during IP generation 
+# create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
+# launch_runs ${ip_module}_synth_1
+# wait_on_run ${ip_module}_synth_1
+# ##
 
-   # Copy source.xci file
-   file copy -force $ip_dir/${ip_module}/source ../
-
-   # Copy hdl directory
-   file copy -force $ip_dir/hdl/ ../hdl
-
-   # Copy sim directory
-   file copy -force $ip_dir/sim/ ../sim
-
-   # Copy simulation directory
-   file copy -force $ip_dir/simulation/ ../simulation
-
-   # Copy synth ip variation top level file
-   file copy -force $ip_dir/synth/ ../synth
-
-   # Update IP variation file
-   file copy -force $ip_dir/${ip_module}.xci ../
-   puts "Successfully generated and copied files!"
-
+# Vivado 2020.2 has a different resulting directory structure when generating the IP
+if {[version -short] >= "2020.2"} {
+  # Copy source.xdc file
+  file copy -force $gen_dir/${ip_module}/source ../
+  # Copy hdl directory
+  file copy -force $gen_dir/hdl/ ../hdl
+  # Copy sim directory
+  file copy -force $gen_dir/sim/ ../sim
+  # Copy simulation directory
+  file copy -force $gen_dir/simulation/ ../simulation
+  # Copy synth ip variation top level file
+  file copy -force $gen_dir/synth/ ../synth
+  # Update IP variation file
+  file copy -force $ip_dir/${ip_module}.xci ../
+} else {
+  # Copy source.xdc file
+  file copy -force $ip_dir/${ip_module}/source ../
+  # Copy hdl directory
+  file copy -force $ip_dir/hdl/ ../hdl
+  # Copy sim directory
+  file copy -force $ip_dir/sim/ ../sim
+  # Copy simulation directory
+  file copy -force $ip_dir/simulation/ ../simulation
+  # Copy synth ip variation top level file
+  file copy -force $ip_dir/synth/ ../synth
+  # Update IP variation file
+  file copy -force $ip_dir/${ip_module}.xci ../
+}
+puts "Successfully generated and copied files!"
