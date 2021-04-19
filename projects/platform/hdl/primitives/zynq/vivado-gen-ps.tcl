@@ -39,22 +39,29 @@ set ip_minor [get_property CORE_REVISION $ip]
 set ip_major [regsub {\.} [regsub {.*:} [get_property IPDEF $ip] ""] "_"]
 puts "ip_name:$ip_name ip_part:$ip_part ip_module:$ip_module ip_major:$ip_major ip_minor:$ip_minor"
 set ip_version $ip_major
+set gen_dir managed_ip_project/managed_ip_project.gen/sources_1/ip/$ip_module
 set ip_dir managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module
 generate_target all [get_files $ip_dir/$ip_module.xci]
 set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
+# Vivado 2020.2 has a different resulting directory structure when generating the IP
+if {[version -short] >= "2020.2"} {
+  set hdl_dir $gen_dir/hdl
+} else {
+  set hdl_dir $ip_dir/hdl
+}
 # This is pretty lame, but it is what is different between the PS7 IP and the PS8 ip...
 # Look in two places (in verilog subdir or not), and look in two ways (with minor or not)
-if {[file exists $ip_dir/hdl/verilog/${ip_wrapper}.v]} {
-  file copy $ip_dir/hdl/verilog/${ip_wrapper}.v ..
-} elseif {[file exists $ip_dir/hdl/${ip_wrapper}.v]} {
-  file copy $ip_dir/hdl/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
+if {[file exists $hdl_dir/verilog/${ip_wrapper}.v]} {
+  file copy $hdl_dir/verilog/${ip_wrapper}.v ..
+} elseif {[file exists $hdl_dir/${ip_wrapper}.v]} {
+  file copy $hdl_dir/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
 } else {
   set ip_version ${ip_version}_${ip_minor}
   set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
-  if {[file exists $ip_dir/hdl/verilog/${ip_wrapper}.v]} {
-    file copy $ip_dir/hdl/verilog/${ip_wrapper}.v ..
+  if {[file exists $hdl_dir/verilog/${ip_wrapper}.v]} {
+    file copy $hdl_dir/verilog/${ip_wrapper}.v ..
   } else {
     # This will fail if we can't find it anywhere
-    file copy $ip_dir/hdl/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
+    file copy $hdl_dir/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
   }
 }
