@@ -111,7 +111,7 @@ override XmlIncludeDirsInternal:=\
                  $(XmlIncludeDirs) \
                  $(XmlIncludeDirsInternal) \
                  $(HdlAssembly) \
-                 $(foreach p,$(HdlPlatformProjectDependencies_$(HdlPlatform)),\
+                 $(foreach p,$(call HdlProjectDepsFromPlatformDir,$(HdlPlatformDir_$(HdlPlatform))),\
                    $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,\
                      $d/exports/lib/devices $d/exports/devices/hdl $d/lib/cards $d/lib/cards/hdl)))
 

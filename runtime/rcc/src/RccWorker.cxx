@@ -668,7 +668,7 @@ run(bool &anyone_run) {
 	// FIXME:  release all current buffers
 	enabled = false;
 	setControlState(OU::Worker::FINISHED);
-	break;//To Here
+	break;
       case RCC_OK:
 	break;
       default:

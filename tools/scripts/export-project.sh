@@ -390,7 +390,7 @@ mkdir -p exports
     echo "$2" > exports/project-package-id
   fi
   if [ -f Project.xml ]; then
-    deps=$(ocpixml -t project -a '?dependencies' -a '?projectdependencies' Project.xml)
+    deps=$(ocpixml -t project -a '?dependencies' -a '?projectdependencies' parse Project.xml)
   elif [ -f Project.mk ]; then
     deps=$(sed -n 's/^ *ProjectDependencies:*= *\([^#]*\)/\1/p' Project.mk)
   else

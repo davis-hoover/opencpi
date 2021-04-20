@@ -83,7 +83,7 @@ registry=$(getProjectRegistryDir)
 for i in $(shopt -s nullglob; echo projects/osps/*); do
   direct=$(cd $i; pwd -P)
   for p in $(shopt -s nullglob; echo $registry/*); do
-    [ "$direct" = "$(cd $p; pwd -P)" ] && echo skipped $i && continue 2
+    [ "$direct" = "$(cd $p; pwd -P)" ] && echo OSP $i already registered && continue 2
   done
   [ -d "$i/rcc/platforms" ] && OCPI_PROJECT_PATH="$OCPI_PROJECT_PATH:$(pwd)/$i"
 done
