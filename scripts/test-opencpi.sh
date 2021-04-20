@@ -160,7 +160,7 @@ for t in $tests; do
     assets)
       echo ======================= Running Application tests in project/assets
       if [ -z "$runtime" ] ; then
-        make -C $OCPI_ROOT_DIR/project-registry/ocpi.assets/applications run
+        env && make -C $OCPI_ROOT_DIR/project-registry/ocpi.assets/applications run
       else
         (cd $OCPI_ROOT_DIR/projects/assets/applications; ./run.sh)
       fi;;

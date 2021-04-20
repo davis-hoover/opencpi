@@ -47,8 +47,11 @@ else
   RccAllTargets:=
   # Add the platform $1 and its target $2 and directory $3 to our database
   RccAddPlatform=\
-    $(eval RccAllPlatforms=$(strip $(RccAllPlatforms) $1))\
-    $(eval RccAllTargets=$(strip $(RccAllTargets) $2))\
+    $(and $(filter $2,$(RccAllTargets)),\
+      $(error Duplicate RCC target $2 for platform $1, it is already the target for $(strip\
+        $(foreach p,$(RccAllPlatforms),$(and $(filter $2,$(RccTarget_$p)),$p)))))\
+    $(eval RccAllPlatforms:=$(strip $(RccAllPlatforms) $1))\
+    $(eval RccAllTargets:=$(strip $(RccAllTargets) $2))\
     $(eval RccTarget_$1:=$2)\
     $(eval RccPlatformDir_$1:=$3)
   # roughly for backward compatibility, same as getPlatform.sh

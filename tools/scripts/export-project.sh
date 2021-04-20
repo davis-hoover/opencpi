@@ -382,11 +382,23 @@ for i in ${nouns[*]}; do
 done
 ###################################################################################
 # Before we deal with asset exports there are some special case items to export
+# namely the projects package id and its dependencies
+# both exported in individual files
 mkdir -p exports
-[ -n "$2" -a "$2" != "-" ] && \
+[ -n "$2" -a "$2" != "-" ] && {\
   if [[ "$2" != `cat exports/project-package-id 2>/dev/null` ]]; then
-    echo "$2" > exports/project-package-id;
+    echo "$2" > exports/project-package-id
   fi
+  if [ -f Project.xml ]; then
+    deps=$(ocpixml -t project -a '?dependencies' -a '?projectdependencies' Project.xml)
+  elif [ -f Project.mk ]; then
+    deps=$(sed -n 's/^ *ProjectDependencies:*= *\([^#]*\)/\1/p' Project.mk)
+  else
+    echo Error:  Project has no Project.xml or Project.mk >&2
+    exit 1
+  fi
+  echo "$deps" > exports/project-dependencies
+}
 if [ -d imports ]; then
   make_filtered_link imports exports/imports main
 fi

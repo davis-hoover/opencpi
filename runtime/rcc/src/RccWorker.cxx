@@ -661,14 +661,6 @@ run(bool &anyone_run) {
       case RCC_ADVANCE:
 	advanceAll();
 	break;
-      case RCC_ADVANCE_DONE: //TODO:  Will be removed in version 3.0.0
-	advanceAll();
-	// falls thru
-      case RCC_DONE:
-	// FIXME:  release all current buffers
-	enabled = false;
-	setControlState(OU::Worker::FINISHED);
-	break;//To Here
       case RCC_ADVANCE_FINISHED:
 	advanceAll();
 	// falls thru
@@ -676,7 +668,7 @@ run(bool &anyone_run) {
 	// FIXME:  release all current buffers
 	enabled = false;
 	setControlState(OU::Worker::FINISHED);
-	break;
+	break;//To Here
       case RCC_OK:
 	break;
       default:

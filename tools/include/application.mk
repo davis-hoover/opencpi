@@ -51,7 +51,7 @@ ifdef OcpiAppCC
   include $(OCPI_CDK_DIR)/include/aci.mk
   # If we are running in this Makefile, then we are running the TOOL_PLATFORM
   ifndef OcpiRunCC
-    OcpiRunCC=$(OcpiRunBefore) $(call AciExe,$(OCPI_TOOL_PLATFORM),$(OcpiApp)) $(OcpiRunArgs) \
+    OcpiRunCC=$(OcpiRunBefore) $(OCPI_VALGRIND) $(call AciExe,$(OCPI_TOOL_PLATFORM),$(OcpiApp)) $(OcpiRunArgs) \
               $(OcpiRunAfter)
   endif
   all: aciapps
@@ -63,7 +63,7 @@ ifdef OcpiAppCC
 else ifneq ($(wildcard $(OcpiApp).xml),)
   ifndef OcpiAppNoRun
     ifndef OcpiRunXML
-      OcpiRunXML=$(OcpiRunBefore) $(OCPI_CDK_DIR)/$(OCPI_TOOL_DIR)/bin/ocpirun $(OcpiRunArgs) $1 \
+      OcpiRunXML=$(OcpiRunBefore) $(OCPI_VALGRIND) $(OCPI_CDK_DIR)/$(OCPI_TOOL_DIR)/bin/ocpirun $(OcpiRunArgs) $1 \
                  $(OcpiRunAfter)
     endif
     run: all
