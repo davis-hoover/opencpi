@@ -1,0 +1,14 @@
+.testpassed:before {
+  content: url("../tick.svg");
+  margin-right: 5px;
+}
+
+.testfailed:before {
+  content: url("../cross.svg");
+  margin-right: 5px;
+}
+
+.testwarning:before {
+  content: url("../warning.svg");
+  margin-right: 5px;
+}
