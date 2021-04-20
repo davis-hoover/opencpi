@@ -88,6 +88,8 @@
 +tools/ocpidev/ocpishow.py scripts/
 +tools/ocpidev/ocpidev_utilization.py scripts/
 +tools/ocpidev/ocpicreate.py scripts/
++tools/ocpidoc/ocpidoc.py <target>/bin/ocpidoc
++tools/ocpi_protocol_view/ocpi_protocol_view.py <target>/bin/ocpi_protocol_view
 # generic make scripts
 +tools/include/show.mk include/
 +tools/include/lib.mk include/
@@ -193,6 +195,8 @@
 +tools/python/opencpi/complexshortwithmetadata_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/iqstream_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/dsp_utils.py <target>/lib/opencpi/
++tools/python/opencpi/ocpi_testing <target>/lib/opencpi/
++tools/python/opencpi/ocpi_protocols <target>/lib/opencpi/
 ################################################################################
 # RCC related exclusions and additions
 # We don't want everything so we are selective here.  was: +tools/include/rcc include/rcc
