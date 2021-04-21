@@ -29,24 +29,45 @@
 #include <stdexcept>
 #include "OcpiXmlEmbedded.h"
 #include "OcpiOsFileSystem.h" // This is NOT fully OCPI::OS-enabled, e.g. path names, etc.
+#include "OcpiUtilEzxml.h"
+#include "OcpiUtilMisc.h"
 
+namespace OU = OCPI::Util;
 namespace OX = OCPI::Util::EzXml;
 namespace OS = OCPI::OS;
 
 #define OCPI_OPTIONS_HELP \
 "This program performs functions relating to the XML inside artifact files.\n"\
 "Usage is: ocpixml [<options>] <command> <file> [<file2>]\n"\
-"Commands are: \n"\
+"Commands are:\n"\
 "  get   - extract the XML from the file to standard output.\n"\
 "  strip - remove the XML from the file while copying artifact to <file2>.\n"\
-"  add   - add the XML file <file2> to the file, in place. file2 can be '-' for standard input.\n"
+"  add   - add the XML file <file2> to the file, in place. file2 can be '-' for standard input.\n" \
+"  parse - parse top-level attributes from an XML file\n"
 
 #define OCPI_OPTIONS \
-    CMD_OPTION(log_level,  l, ULong,  0, "<log-level>\n" \
-	                               "set log level during execution, overriding OCPI_LOG_LEVEL")
+    CMD_OPTION(log_level  ,  l, ULong,  0, "<log-level>\n" \
+	                               "set log level during execution, overriding OCPI_LOG_LEVEL") \
+    CMD_OPTION_S(top      ,  t, String, 0, "<top-element>\n" \
+	                                   "specify allowable top-level elements") \
+    CMD_OPTION_S(attribute,  a, String, 0, "<attribute>\n" \
+                                           "specify attribute to print, one per line\n" \
+                                           "if name starts with ?, it is optional (blank line output)\n" \
+                                           "otherwise its an error if attr is missing\n"\
+                                           "if no attributes are specified top element name is printed\n") \
+    CMD_OPTION(silent,       s, Bool,  0, "<silent>") \
 
 #include "CmdOption.h"
 
+static void bad(const char *fmt, ...) {
+  if (options.silent())
+    exit(1);
+  va_list ap;
+  va_start(ap, fmt);
+  const char *err = OU::evsprintf(fmt, ap);
+  va_end(ap);
+  options.bad(err);
+}
 
 static int mymain(const char **argv) {
   // C++11: const std::map<std::string, int> valid_verbs = {{"get",3}, {"strip",4}, {"add",4}};
@@ -55,6 +76,7 @@ static int mymain(const char **argv) {
   valid_verbs["strip"]=2;
   valid_verbs["add"]=2;
   valid_verbs["check"]=1;
+  valid_verbs["parse"]=1;
 
   if (not valid_verbs.count(argv[0])) {
     std::string e = "Invalid verb '";
@@ -111,6 +133,40 @@ static int mymain(const char **argv) {
       OS::FileSystem::remove(argv[2]);
       return 1;
     }
+  }
+
+  // parse
+  if (0 == strcmp("parse", argv[0])) {
+    const char *err;
+    std::string parent, file;
+    ezxml_t x;
+    argv++;
+    if ((err = OX::ezxml_parse_file(argv[0], x)))
+      bad("For XML file %s:  %s", argv[0], err);
+    size_t n;
+    if (options.top(n)) {
+      for (const char **tops = options.top(n); *tops; ++tops, --n)
+	if (!strcasecmp(*tops, ezxml_name(x)))
+	  break;
+      if (!n)
+	bad("For XML file %s:  top element <%s> is invalid", argv[0], ezxml_name(x));
+    }
+    if (options.attribute(n)) {
+      const char *attr;
+      std::string out;
+      for (const char **attrs = options.attribute(n); *attrs; ++attrs, --n) {
+	const char *aname = *attrs;
+	if (aname[0] == '?')
+	  aname++;
+	if ((attr = ezxml_cattr(x, aname)))
+	  out += attr;
+	else if (attrs[0][0] != '?')
+	  bad("For XML file %s:  attribute \"%s\" is misssing", argv[0], aname);
+	out += "\n";
+      }
+      std::cout << out;
+    } else
+      std::cout << ezxml_name(x) << std::endl;
   }
   return 0;
 }
