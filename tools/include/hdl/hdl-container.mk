@@ -112,8 +112,9 @@ override XmlIncludeDirsInternal:=\
                  $(XmlIncludeDirsInternal) \
                  $(HdlAssembly) \
                  $(foreach p,$(call HdlProjectDepsFromPlatformDir,$(HdlPlatformDir_$(HdlPlatform))),\
-                   $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,\
-                     $d/exports/lib/devices $d/exports/devices/hdl $d/lib/cards $d/lib/cards/hdl)))
+                   $(foreach d,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$p,$(info HH:$d)\
+                     $d/exports/lib/devices $d/exports/lib/devices/hdl \
+                     $d/exports/lib/cards $d/exports/lib/cards/hdl)))
 
 # We might be called from an assembly directory, in which case many of the
 # component libraries are passed through to us, but we might be standalone.
@@ -127,7 +128,10 @@ override ComponentLibraries:=$(call Unique,\
      $(foreach d,$(if $(filter lib,$(notdir $p)),$(dir $p),$p/),\
        $(wildcard $ddevices) \
        $(foreach l,$(ComponentLibraries_$(Platform)),\
-         $(if $(filter /%,$l),$l,$d$l))))\
+         $(if $(filter /%,$l),$l,$d$l)))\
+      $(foreach pp,$(call HdlProjectDepsFromPlatformDir,$p),\
+        $(foreach dd,$(realpath $(OCPI_PROJECT_REL_DIR)/imports)/$(pp),$(info HH:$(dd))\
+          $(wildcard $(dd)/exports/lib/devices $(dd)/exports/lib/cards))))\
    devices cards)
 override LibDir=$(HdlAssembly)/lib/hdl
 ifneq ($(MAKECMDGOALS),clean)
