@@ -9,15 +9,16 @@ ocpiremote - command-line tool for remotely managing an OpenCPI container server
 
 SYNOPSIS
 --------
-*`ocpiremote`* ['<common-options>'] ['<verb>' ['<common-or-verb-options>']] 
+*`ocpiremote`* ['<options>'] ['<verb>' ['<options>']] 
 
 DESCRIPTION
 -----------
 The *`ocpiremote(1)`* command-line tool enables a local system
 to load, start, and control a remote system, enabling it to act as an OpenCPI container server.
 The target remote system requires network login via the Secure Shell (SSH),
-the *`bash`* shell and the *`tar`* command.  It must be running an OpenCPI-supported software (RCC) platform.v
-No additional installation is necessary since *`ocpiremote`* loads OpenCPI software as needed.
+the *`bash`* shell and the *`tar`* command.  It must be running an OpenCPI-supported software
+(RCC) platform.  No additional installation is necessary since *`ocpiremote`* loads
+OpenCPI software as needed.
 
 The *`ocpiremote`* tool loads an *`ocpiserve`* executable
 "package" over an SSH connection into a "sandbox" directory
@@ -33,8 +34,8 @@ container servers remotely.
 
 The *`ocpiremote`* tool is part of OpenCPI's
 *'remote containers'* feature, which adds containers
-available in other systems on the network to the set
-of containers considered for application execution on a client system.
+available in other (remote) systems on the network to the set
+of containers considered when applications are executed on the local system.
 See the chapter "Using Remote Containers: Network-Connected Processors"
 in the 'OpenCPI Application Development Guide' for information
 on how to set up and use this feature.
@@ -100,14 +101,12 @@ None of these verbs take any arguments.
 
 OPTIONS
 -------
-In the descriptions below, a plus sign (+) after the option indicates
-that it can be specified more than once on the command line.
 
 Options Common to All Operations on a Container Server or Remote System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 These common options can be placed before the verb or after it.
 
-*`--ip_addr=`*'<ip-address>', *`-i`* '<ip-address>'::
+*`--ip-addr=`*'<ip-address>', *`-i`* '<ip-address>'::
     Specify the IP address of the target remote system.
     If this option is not specified, the first IP address in the
     *`OCPI_SERVER_ADDRESSES`* environment variable is used.
@@ -118,11 +117,12 @@ These common options can be placed before the verb or after it.
     The default password is *`root`*.
 
 *`--remote-dir=`*'<directory-name>', *`-d`* '<directory-name>'::
-    Specify the name of a directory on the target remote system in
-    which to create and use a container server sandbox.
+    Except for the *`deploy`* verb, this specifies the name of a directory on the
+    target remote system in which to create and use a container server sandbox.
     If this option is not used, the default directory
     name *`sandbox`* is created in the home directory
     of the specified user.
+    With the *`deploy`* verb this specifies where the boot files are placed.
 
 *`--ssh-opts=`*'<options>', *`-o`* '<options>'::
     Specify the SSH options for connecting to the target remote system.
@@ -154,7 +154,7 @@ Options When Loading or Reloading a Container Server
     Specify the RCC (software) platform to be used by
     the container server on the target remote system.
     If this option is not
-    used, the default is *`xilinx13_4`*. See the 'OpenCPI User Guide'
+    used, the default is *`xilinx19_2_aarch32`*. See the 'OpenCPI User Guide'
     for the possible identifiers for OpenCPI RCC platforms.
 
 *`--optimize`*::
@@ -176,12 +176,12 @@ Options When Loading or Reloading a Container Server
 
 Options When Deploying OpenCPI Bootable Media Files to a Remote System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*`--boot-dir=`*'<directory-name>'::
+*`--remote-dir=`*'<directory-name>'::
     Specify the name of the directory on the target remote system where the boot files
     will be placed.
 
-*`--hdl-platform*` and *`--rcc-platform`* as described above.
-    
+*`--hdl-platform`* and *`--rcc-platform`* as described above.
+
 Options When Starting or Restarting a Container Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--bitstream`*, *`-b`*::
@@ -207,7 +207,7 @@ Options When Starting or Restarting a Container Server
 
 *`--valgrind`*::
     Specify that *`ocpiserve`* should be run under the valgrind tool.
-    This requires that same option was specified when the *`load`* or *`reload`* verb was used.
+    This requires that the same option was specified when the *`load`* or *`reload`* verb was used.
     The *`valgrind`* output will be in the log.
 
 ENVIRONMENT VARIABLES
@@ -217,7 +217,7 @@ The following OpenCPI environment variables affect *`ocpiremote`* execution:
 *`OCPI_SERVER_ADDRESSES`*::
     A comma- or space-separated list of IP addresses/TCP ports of remote systems to contact, where
     each IP/TCP address is in the format '<ip-address>'*`:`*'<tcp-port>'. For example,
-    192.168.1.102:12345. When *`ocpiserve`* with the *`--verbose`* optiois started, it prints its
+    192.168.1.102:12345. When *`ocpiserve`* with the *`--verbose`* option is started, it prints its
     IP addresses/TCP ports in the log.
 
 *`OCPI_SERVER_ADDRESSES_FILE`*::
@@ -307,8 +307,3 @@ you can redistribute it and/or modify it under the terms of the
 GNU Lesser General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your
 option) any later version.
-
-
-
-
-

@@ -381,7 +381,7 @@ The following environment variables affect *`ocpirun`* operation:
 
 *`OCPI_OCPI_SOCKET_INTERFACE`*::
     The name of the network interface (from the list of network interfaces
-    returned by the Linux *`ifconfig`* command) to be used for contacting
+    returned by the Linux *`ifconfig`* or *`ip addr`* command) to be used for contacting
     remote systems running *`ocpiserve`* container servers. Set this variable
     to the interface with the same network address
     (IP address anded with the netmask) as the container servers being used.

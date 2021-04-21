@@ -99,7 +99,7 @@ in the manual pages for these tools. The options common to all tools are:
 
 *`--verbose`*, *`-v`*::
     Describe what is happening in tool operation in more detail.
-    
+
 ENVIRONMENT VARIABLES
 ---------------------
 OpenCPI defines a variety of environment variables that can be used
@@ -113,17 +113,17 @@ them set is always the default. OpenCPI environment variables
 whose settings affect OpenCPI tools include:
 
 *`OCPI_ROOT_DIR`*::
-    The root of the OpenCPI installation.
-    The OpenCPI setup script automatically sets this variable to its
-    installation location, which is '<location-of-opencpi>'.  If set manually set
-    before the setup script is run, it will not be changed by that script.
+    The root directory of the OpenCPI installation.
+    The OpenCPI setup script (*`opencpi-setup.sh`*) automatically sets this variable based
+    on the location of the setup script.  If set manually
+    before the setup script is run (sourced), it will not be changed by that script.
 
 *`OCPI_CDK_DIR`*::
-    The location of the OpenCPI development or runtime software installation.
-    The OpenCPI setup script automatically sets this variable to its
-    installation location, the parent directory of the setup script.
+    The location of the OpenCPI development and/or runtime software.
+    The OpenCPI setup script automatically sets this variable to the directory
+    where the setup script (*`opencpi-setup.sh`*) is located and sourced from.
     'This environment variable should never be set directly'.
-    It is usually set to the *`cdk`* subdirectory of the OpenCPI installation directory.
+    It is usually the *`cdk`* subdirectory of the OpenCPI installation directory.
 
 *`OCPI_LIBRARY_PATH`*::
     A colon-separated list of directories to be searched for runtime artifacts.
