@@ -2,7 +2,7 @@ This zynq_ps core (which is actually currently an HDL primitive library) is our 
 around the processing_system7 (Zynq PS) IP as found in two different places, depending
 on whether we are using ISE/XST or Vivado.
 
-FOR ISE/SST:
+FOR ISE/XST:
 ================================================================================
 It is in 14.7/ISE_DS/EDK/hw/XilinxProcessorIPLib/pcores/processing_system7_v4_03_a
 The actual verilog wrapper around the PS7 primitive is in hdl/verilog/processing_system7.v
