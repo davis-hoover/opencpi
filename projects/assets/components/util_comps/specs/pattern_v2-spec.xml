@@ -9,7 +9,7 @@
     <Property Name="numMessagesMax" Parameter="true" Type="uLong" Default="5" Description="Max number of messages to send."/>
 
    <Property Name="messagesToSend" Type="uLong" Volatile="true" Initial="true" Default="5" Description="Counter of messages to send and decrements as they are sent. When dataRepeat is true, 
-    messagesToSend > numMessagesMax, and at the end of the messages buffer, the buffer wraps around and starts at the beginning of the messages buffer. When dataRepeat is false, 
+    messagesToSend greater than numMessagesMax, and at the end of the messages buffer, the buffer wraps around and starts at the beginning of the messages buffer. When dataRepeat is false, 
     this value must be less than or equal to numMessagesMax."/>
 
     <Property Name="messagesSent" Type="uLong" Volatile="true" Description="Messages sent counter. Initialized to 0."/>
@@ -22,10 +22,10 @@
 
     <Property Name="numMessageFields" Parameter="true" Type="uLong" Default="2" Description="Due to a limitation (AV-4292), cannot use constrained elements
     in unconstrained array declarations, so cannot directly set the second dimension for the messages property to 2. The numMessageFields property must
-    always be 2 since there are 2 message fields; the number of data bytes and opcode. So the default value must not be changed."/>
+    always be 2 since there are 2 message fields; the number of data bytes (bytes that are a multiple of 4) and opcode. So the default value must not be changed."/>
 
     <Property Name="messages" Type="uLong" ArrayDimensions="numMessagesMax, numMessageFields" Initial="true" Description="Multidimensional array that defines
-    the record of messages to send, as well as, defines the number of data bytes and an 8 bit opcode for each message."/>
+    the record of messages to send, as well as, defines the number of data bytes (bytes that are a multiple of 4) and an 8 bit opcode for each message."/>
 
     <Property Name="data" Type="uLong" ArrayLength="numDataWords" Initial="true" Description="Data buffer containing the data to be sent."/>
 </ComponentSpec>
