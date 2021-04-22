@@ -61,6 +61,7 @@ source ./scripts/init-opencpi.sh
 # Ensure CDK and TOOL variables
 OCPI_BOOTSTRAP="$(pwd)/cdk/scripts/ocpibootstrap.sh"; source "$OCPI_BOOTSTRAP"
 
+source $OCPI_CDK_DIR/scripts/util.sh
 # This will set OCPI_TARGET_* vars
 echo -n "Finding target platform ... "
 source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1" -
@@ -76,8 +77,14 @@ if [ -n "$OCPI_TARGET_PLATFORM" -a "$OCPI_TOOL_PLATFORM" != "$OCPI_TARGET_PLATFO
 fi
 
 # Allow this to build for platforms defined in the inactive project or in osps
+# that are not already registered
 [ -z "$OCPI_PROJECT_PATH" ] && export OCPI_PROJECT_PATH="$(pwd)/projects/inactive"
+registry=$(getProjectRegistryDir)
 for i in $(shopt -s nullglob; echo projects/osps/*); do
+  direct=$(cd $i; pwd -P)
+  for p in $(shopt -s nullglob; echo $registry/*); do
+    [ "$direct" = "$(cd $p; pwd -P)" ] && echo OSP $i already registered && continue 2
+  done
   [ -d "$i/rcc/platforms" ] && OCPI_PROJECT_PATH="$OCPI_PROJECT_PATH:$(pwd)/$i"
 done
 

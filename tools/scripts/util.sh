@@ -32,8 +32,8 @@ import sys; sys.path.insert(0,\"$OCPI_CDK_DIR/scripts/\");
 import ocpiassets; print(ocpiassets.Registry.get_registry_dir());"
   elif [ -n "$OCPI_PROJECT_REGISTRY_DIR" ]; then
     echo $OCPI_PROJECT_REGISTRY_DIR
-  elif [ -n "$OCPI_CDK_DIR" ]; then
-    # Return default registry relative to CDK
+  elif [ -n "$OCPI_ROOT_DIR" ]; then
+    # Return default registry relative to ROOT
     echo $OCPI_ROOT_DIR/project-registry
   else
     # Return default global registry installation location

@@ -40,12 +40,12 @@ namespace OCPI {
     PValue &PValue::operator=(const PValue &p) {
       name = p.name;
       type = p.type;
+      owned = p.owned;
       if (p.owned) {
-	vString = new char[strlen(p.vString) + 1];
-	strcpy((char*)vString, p.vString);
-	owned = true;
+        vString = new char[strlen(p.vString) + 1];
+        strcpy((char*)vString, p.vString);
       } else
-	vULongLong = p.vULongLong;
+        vULongLong = p.vULongLong;
       return  *this;
     }
     unsigned PValue::length() const {

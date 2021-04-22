@@ -147,7 +147,6 @@ architecture rtl of sdp_receive_dma is
   --                 of the xid to indicate which buffer the fragment is for.
   --                 sdp_buffer_idx_r is used to know which buffer is the next one to
   --                 be given to the WSI side.
-  signal lcl_buffer_idx_r    : lcl_buffer_idx_t;
   signal rem_buffer_idx_r    : rem_buffer_idx_t;
   -- This is a count of buffers that are not full, including in progress of filling
 --  signal rem_buffers_empty_r : uchar_t;
@@ -313,7 +312,6 @@ g2: for i in 0 to sdp_width-1 generate
       if its(sdp_reset) then
         sdp_addr_r          <= (others => '0'); -- SDP type DW address
         rem_buffer_idx_r    <= (others => '0');
-        lcl_buffer_idx_r    <= (others => '0');
         sdp_starting_r      <= btrue;
         sdp_ignoring_r      <= bfalse;
         faults_r            <= (others => '0');

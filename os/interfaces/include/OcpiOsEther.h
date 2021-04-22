@@ -82,6 +82,7 @@ namespace OCPI {
 	  m_broadcast = addr_in.m_broadcast;
 	  m_pretty[0] = 0;
 	}
+	inline Address& operator=(const Address&) = default;
 	inline const uint8_t *addr() const { return m_addr; }
 	inline uint64_t addr64() const { return m_addr64; }
 	inline uint16_t addrPort() const { return m_udp.port; }
