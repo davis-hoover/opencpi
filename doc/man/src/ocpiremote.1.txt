@@ -54,13 +54,13 @@ The verbs supported by *`ocpiremote`* are:
     Copy an OpenCPI bootable media directory tree (also called
     a "deployment package" or "SD card contents") to the
     remote system (usually to a directory on an SD card inserted into that
-    system) and then reboot it. See the 'OpenCPI
-    Installation Guide', the 'OpenCPI Platform Development Guide', and
-    the link:ocpiadmin.1.html[ocpiadmin(1)] tool for more
+    system) and reboot it. See the link:ocpiadmin.1.html[ocpiadmin(1)] tool for more
     information about creating bootable media directory
-    trees for embedded systems.  This operation is not needed if the boot files are already suitable.
-    This opertion does not load OpenCPI files onto the remote system, just boot-up files to get the OS running.
-
+    trees for embedded systems.  This operation is not needed if the boot files are already suitable:  it is normally used to change operation system versions.
+    This operation does not load OpenCPI files onto the remote system, just boot-up files to get the OS running.
+    The *`--remote-dir`* option is used to specify the location of the boot directory
+    on the remote system.  If *`--remote-dir`* is not specified, the boot directory will be
+    determined heuristically, based on where a previous *`deploy`* operation was done.
 *`load`*::
     Create a sandbox directory on the remote system and then place
     an *`ocpiserve`* container server package in that directory.  That package
@@ -122,7 +122,7 @@ These common options can be placed before the verb or after it.
     If this option is not used, the default directory
     name *`sandbox`* is created in the home directory
     of the specified user.
-    With the *`deploy`* verb this specifies where the boot files are placed.
+    With the *`deploy`* verb this specifies where the boot files are placed, and has no default.
 
 *`--ssh-opts=`*'<options>', *`-o`* '<options>'::
     Specify the SSH options for connecting to the target remote system.
