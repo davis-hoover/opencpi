@@ -81,8 +81,8 @@ PKGS_D+=(flex)
 PKGS_D+=(libSM libXi libXrandr)
 #    for the new "xilinx19_2_aarch*" platforms
 PKGS_D+=(openssl-devel)
-
-
+#    for asciidoc3 man page generation (asciidoc3 is a prereq)
+PKGS_D+=(docbook-style-xsl)
 
 ##########################################################################################
 # S. yum-installed and but not rpm-required - conveniences or required for source environment

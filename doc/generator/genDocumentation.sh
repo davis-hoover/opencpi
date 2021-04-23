@@ -188,7 +188,7 @@ function generate_pdfs {
     echo "${BOLD}Building PDFs from '${REPO_PATH}' with results in '${OUTPUT_PATH}'${RESET}"
     dirs_to_search+=("${REPO_PATH}/doc/briefings")
     dirs_to_search+=("${REPO_PATH}/doc/av/tex")
-    dirs_to_search+=("${REPO_PATH}/doc/odt")
+    dirs_to_search+=("${REPO_PATH}/doc/reference")
     dirs_to_search+=("${REPO_PATH}/doc/tex")
     dirs_to_search+=("${REPO_PATH}/doc/tutorials")
 
