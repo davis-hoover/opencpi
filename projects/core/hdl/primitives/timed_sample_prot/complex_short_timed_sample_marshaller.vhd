@@ -164,7 +164,7 @@ begin
       case state is
         when SAMPLE =>
           opcode  <= timed_sample_prot.complex_short_timed_sample.SAMPLE;
-          odata   <= iprotocol_r.sample.data.real & iprotocol_r.sample.data.imaginary;
+          odata   <= iprotocol_r.sample.data.imaginary & iprotocol_r.sample.data.real;
           som     <= '0'; -- inserteom deals with this
           -- force EOM if next thing is higher priority, but inserteom takes care of normal eom
           eom     <= iprotocol.discontinuity or iprotocol.time_vld or iprotocol.sample_interval_vld or iprotocol.flush;
@@ -180,7 +180,7 @@ begin
           eom    <= '0';
         when TIME_95_64 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.TIME_TIME; -- seconds passes through as the higher end of the data
-          odata  <= iprotocol_r.time.seconds(95 downto 64); -- seconds is ulong, so it is 32 bits. This is the third set of 32 bits.
+          odata  <= iprotocol_r.time.seconds(31 downto 0); -- seconds is ulong, so it is 32 bits. This is the third set of 32 bits.
           som    <= '0';
           eom    <= '1';
         when SAMPLE_INTERVAL_31_0 =>
@@ -195,7 +195,7 @@ begin
           eom    <= '0';
         when SAMPLE_INTERVAL_95_64 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.SAMPLE_INTERVAL; -- seconds passes through as its own set of data
-          odata  <= iprotocol_r.sample_interval.seconds(95 downto 64); -- seconds is ulong, so it is 32 bits. This is the third set of 32 bits.
+          odata  <= iprotocol_r.sample_interval.seconds(31 downto 0); -- seconds is ulong, so it is 32 bits. This is the third set of 32 bits.
           som    <= '0';
           eom    <= '1';
         when DISCONTINUITY =>
@@ -210,7 +210,7 @@ begin
           eom    <= '1';
         when METADATA_31_0 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.METADATA;
-          odata  <= iprotocol_r.metadata.id(31 downto 0); -- the id is ulong, so it is only 32 bits. This is the first set of 32 bits.
+          odata  <= iprotocol_r.metadata.value(31 downto 0); -- the id is ulong, so it is only 32 bits. This is the first set of 32 bits.
           som    <= '1';
           eom    <= '0';
         when METADATA_63_32 =>
@@ -220,7 +220,7 @@ begin
           eom    <= '0';
         when METADATA_95_64 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.METADATA;
-          odata  <= iprotocol_r.metadata.value(95 downto 64); -- the value is ulonglong, this is the third set of 32 bits.
+          odata  <= iprotocol_r.metadata.id(31 downto 0); -- the value is ulonglong, this is the third set of 32 bits.
           som    <= '0';
           eom    <= '1';
         when others => -- IDLE or EOF

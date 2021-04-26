@@ -1,0 +1,23 @@
+<HdlWorker language='vhdl'
+           spec='iqstream_to_csts-spec'
+           controloperations='initialize'
+           version='2'
+           Libraries='misc_prims protocol timed_sample_prot'>
+  <ControlInterface timeout='131072'/>
+  <Property name='IN_PORT_DATA_WIDTH'
+            type='uchar'
+            default='32'
+            parameter='true'/>
+  <Property name='OUT_PORT_DATA_WIDTH'
+            type='uchar'
+            default='32'
+            parameter='true'/>
+  <StreamInterface name='in'
+                   datawidth='IN_PORT_DATA_WIDTH'
+                   clock='out'/>
+  <StreamInterface name='out'
+                   datawidth='OUT_PORT_DATA_WIDTH'
+                   clockdirection='in'
+		   inserteom='true'
+                   workereof='true'/>
+</HdlWorker>
