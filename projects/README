@@ -49,7 +49,6 @@ tutorial - This project contains assets specifically designed for learning purpo
 test - This project contains assets specifically designed for test purposes
   * These assets are not for examples or tutorial purposes and typically test edge conditions
   * This is where new tests should be added as development proceeds and bugs are fixed.
-  (soon to be moved from tests/av-test to projects/test)
 
 inactive - This project is the "catch-all" for anything not in the above projects.
   * This would include Platforms that are not officially supported (e.g. fedora25 or ML555)

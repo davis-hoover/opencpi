@@ -323,11 +323,12 @@ HdlPlatformPaths=$(call Unique,$(infox PRD:$(OCPI_PROJECT_REL_DIR))\
          $(call OcpiExists,$p/hdl/platforms)))))
 $(call OcpiDbgVar,HdlPlatformPaths)
 # The warning below would apply, e.g. if a new project has been registered.
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 $(foreach d,$(HdlPlatformPaths),\
   $(if $(filter platforms,$(notdir $d)),\
     $(call HdlDoPlatformsDir,$d),\
     $(call HdlDoPlatform,$d)))
-
+endif
 export OCPI_ALL_HDL_PLATFORMS:=$(strip $(HdlAllPlatforms))
 export OCPI_BUILT_HDL_PLATFORMS:=$(strip $(HdlBuiltPlatforms))
 $(call OcpiDbgVar,HdlAllFamilies)
