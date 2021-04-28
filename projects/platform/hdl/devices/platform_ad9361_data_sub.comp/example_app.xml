@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<application done="file_write">
+  <instance component="ocpi.core.file_read" connect="platform_ad9361_data_sub">
+    <property name="filename" value="input.bin"/>
+  </instance>
+  <instance component="ocpi.platform.devices.platform_ad9361_data_sub" connect="file_write">
+    <!-- Skeleton application outline, set properties here. Or change this
+         example application to do something more real-world appropriate if
+         file-read, then component, then file-write is too artifical to be a
+         useful example. -->
+  </instance>
+  <instance component="ocpi.core.file_write">
+    <property name="filename" value="output.bin"/>
+  </instance>
+</application>

@@ -21,7 +21,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import pathlib
+import pathlib, os
 
 import sphinx.cmd.build
 
@@ -73,6 +73,10 @@ def build(directory, build_only=False, mathjax=None, config_options=[],
     else:
         # Use Sphinx default, as best case guess in this case
         master_doc = "index"
+    if not os.path.isfile(str(directory) + "/" + master_doc + ".rst"):
+        print("Error:  In directory " + str(directory) + " there is no file " + master_doc + ".rst, use: ocpidoc create?")
+        return 1
+
     build_options = build_options + ["-D", f"master_doc={master_doc}"]
 
     for option in config_options:

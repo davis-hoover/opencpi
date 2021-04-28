@@ -25,6 +25,7 @@ import argparse
 import pathlib
 import sys
 
+import _opencpi.util as ocpiutil
 import ocpi_documentation
 
 
@@ -64,6 +65,18 @@ if __name__ == "__main__":
     clean_parser.add_argument("-r", "--recursive", action="store_true",
                               help="Remove built documentation from all "
                                     + "subfolders")
+    # For consistency vs. all other ocpi* commands
+    # force non-zero exit code if argparse exits, even for help etc.
+    # force help if no arguments
+    try:
+        arguments = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+    except SystemExit:
+        sys.exit(1)
 
-    arguments = parser.parse_args()
-    arguments.func(**vars(arguments))
+    # Run only when the directory is in a project
+    if ocpiutil.get_dirtype(str(arguments.directory)):
+        sys.exit(arguments.func(**vars(arguments)))
+    else:
+        print("Error: the directory " + str(arguments.directory) + " is not an OpenCPI asset directory",
+              file=sys.stderr)
+        sys.exit(1)
