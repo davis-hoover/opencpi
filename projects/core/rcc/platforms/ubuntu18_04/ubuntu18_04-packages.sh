@@ -94,6 +94,8 @@ PKGS_D+=(libxml2-utils)
 #    Needed for processing Xilinx release tarball(s).  Originally
 #    thought this was a dependency of "lsb" on *ubuntu.
 PKGS_D+=(fakeroot)
+#    for asciidoc3 man page generation (asciidoc3 is a prereq)
+PKGS_D+=(xsltproc)
 
 ##########################################################################################
 # S. conveniences or required for source environment

@@ -75,7 +75,7 @@ PKGS_D+=(time)
 #         libXft.i686=/usr/lib/libXft.so.2
 #         libXext.i686=/usr/lib/libXext.so.6)
 #    for *ubuntu 20_04 LTS, installing "lsb" covers most of what we need
-PKGS_D+=(lsb lib32ncurses5 libxft2:i386 libxext6:i386)
+PKGS_D+=(lsb lib32ncurses6 libxft2:i386 libxext6:i386)
 #    for Quartus Pro 17 (AV-4318), we need specifically the 1.2 version of libpng
 #    N.B.: "libpng12-0" is not available on *ubuntu 20.04 LTS.  Will substitute
 #    "libpng16-16" for now, pending confirmation we really need "libpng12-0".
@@ -91,8 +91,11 @@ PKGS_D+=(bison)
 PKGS_D+=(flex)
 #    Needed for shell-based XML extractions, xmllint, standard in centos7
 PKGS_D+=(libxml2-utils)
-#    for building init root file systems for embedded systems
-PKGS_E+=(fakeroot)
+#    Needed for processing Xilinx release tarball(s).  Originally
+#    thought this was a dependency of "lsb" on *ubuntu.
+PKGS_D+=(fakeroot)
+#    for asciidoc3 man page generation (asciidoc3 is a prereq)
+PKGS_D+=(xsltproc)
 
 ##########################################################################################
 # S. conveniences or required for source environment
@@ -116,7 +119,7 @@ PKGS_S+=(nfs-common nfs-kernel-server)
 #    for the inode64 prerequisite build (from source)
 PKGS_S+=(libc6-dev-i386)
 #    for the AV GUI installation and tutorials
-PKGS_S+=(oxygen5-icon-theme openjdk-8-jre openjdk-8-jre-headless tree)
+PKGS_S+=(oxygen-icon-theme openjdk-8-jre openjdk-8-jre-headless tree)
 #    for serial console terminal emulation
 PKGS_S+=(screen)
 #    Needed to generate gitlab-ci yaml
@@ -127,7 +130,7 @@ PKGS_S+=(python3-yaml)
 #    install the required "devel" packages.  At this point, we rely on any extra
 #    repos that are needed being enabled.  With respect to Python 3, it would seem
 #    the minimum required version is 3.4.  For *ubuntu 20.04 LTS, "python3" maps to
-#    "python3.6" by default as of June 2020.
+#    "python3.8" by default as of April 2021.
 #
 #    for creating swig
 #    N.B.: "swig" is a meta-package that installs SWIG v3.0.12,
