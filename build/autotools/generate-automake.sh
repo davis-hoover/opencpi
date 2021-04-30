@@ -195,7 +195,7 @@ function do_library {
     printf "${7}_LTLIBRARIES += \$(ocpi_build_dir)/_$2.la\n"
     printf "${amname}_CPPFLAGS+=\$(PYTHON$8_INCLUDES)\\n"
     printf "\$(ocpi_build_dir)/$3: $swig\\n"
-    printf "\\t\$(AT)@OcpiSWIG@ -c++ -python -classic -outdir \$(@D) -o \$@ "
+    printf "\\t\$(AT)@OcpiSWIG@ -c++ -python -outdir \$(@D) -o \$@ "
     printf "\$(${amname}_CPPFLAGS) \$<\\n"
     [[ $2 != *2 ]] && printf "python_PYTHON+=$(dirname $swig)/$2.py\\n"
   else

@@ -588,10 +588,22 @@ get_dma_memory(ocpi_request_t *request, unsigned minor) {
   // supports, default is 32
   // dma_set_mask doesn't work at all on ARM anyway, in 4.19. dma_mask ptr not initialized
   // there is dma_coerce_mask_and_coherent too...
+  //
+  // New DMA API requires the device structure's "dma_mask" member be set.
+  // N.B.: "dma_mask" is a pointer, and note further that "dma_set_mask()"
+  // doesn't allocate storage for the mask.  Per the discussion at
+  //
+  // https://stackoverflow.com/questions/19952968/dma-map-single-minimum-requirements to-struct-device
+  //
+  // it may be sufficient to simply set "dev->dma_mask = &(dev->coherent_dma_mask)"
+  // and be done with the matter.  Normally, the two masks are set to the same value
+  // anyway.
+  //
   if (dma_set_coherent_mask(dev, DMA_BIT_MASK(32))) {
     log_err("dma_set_coherent_mask failed for device %px\n", dev);
     return err;
   }
+  dev->dma_mask = &(dev->coherent_dma_mask);
   if ((virtual_addr = dma_alloc_attrs(dev, request->actual, &dma_handle_alloc, GFP_KERNEL,
 				      dma_attrs)) == NULL) {
     log_err("dma_alloc_attrs failed\n");
