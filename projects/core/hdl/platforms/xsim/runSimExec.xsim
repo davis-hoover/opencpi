@@ -43,7 +43,7 @@ function bad {
   export LM_LICENSE_FILE=$OcpiXilinxVivadoLicenseFile
   source $OcpiXilinxVivadoDir/.settings64-Vivado.sh $OcpiXilinxVivadoDir
   xsimout=$(xsim probe.exe < /dev/null 2>&1)
-  version=$(echo $xsimout |  sed -n '/^.*Vivado Simulator \([0-9\.]\+\).*$/s//\1/p')
+  version=$(echo $xsimout |  sed -n '/^.*Vivado Simulator v*\([0-9\.]\+\).*$/s//\1/p')
   invalidlic=$(echo $xsimout |  grep -E "ERROR.*A valid license was not found for simulation")
   [ -z "$invalidlic" -a -n "$version" ] && {
     [ -n "$verbose" ] && echo Found a licensed Vivado Simulator with version: $version. 1>&2

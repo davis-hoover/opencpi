@@ -96,7 +96,7 @@ function dword2header(dw : dword_t) return header_t;
 function payload_in_dws(hdr : header_t) return unsigned;
 function payload_in_dws(dw : dword_t) return unsigned;
 function header2dws(h : header_t) return header_dwords_t;
-function dws2header(dws : dword_array_t(0 to sdp_header_ndws-1)) return header_t;
+function dws2header(dws : header_dwords_t) return header_t;
 function count_in_dws(header : header_t) return unsigned;
 -- Get the DW count from the first DW of the header
 function count_in_dws(dw : dword_t) return unsigned;
