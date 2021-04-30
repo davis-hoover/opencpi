@@ -630,8 +630,11 @@ namespace OCPI {
 
     void ExternalBuffer::
     send(size_t a_length, uint8_t a_opCode, bool a_end, size_t a_direct) {
+#if 0 // valgrind is not happy even with the ?: below
       ocpiDebug("Sending buffer %p: l %zu o %u %u %zu data %x %x", this, a_length, a_opCode,
-		a_end, a_direct, ((uint32_t*)(this + 1))[0], ((uint32_t*)(this + 1))[1]);
+		a_end, a_direct, a_length ? ((uint32_t*)(this + 1))[0] : 0,
+		a_length > sizeof(uint32_t) ? ((uint32_t*)(this + 1))[1] : 0);
+#endif
       m_hdr.m_length = OCPI_UTRUNCATE(uint32_t, a_length);
       m_hdr.m_opCode = a_opCode;
       m_hdr.m_eof    = a_end ? 1 : 0;

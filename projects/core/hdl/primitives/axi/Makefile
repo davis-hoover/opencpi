@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # We depend on sdp because we need to build the converter here due to parameterization
-Libraries=ocpi platform fixed_float sdp
+Libraries=ocpi platform fixed_float sdp util
 SourceFiles=axi_pkg.vhd
 #SourceFiles=axi_pkg.vhd axi2cp.vhd axinull.vhd unoc2axi_rd.vhd unoc2axi_wd.vhd unoc2axi.vhd
 
@@ -25,11 +25,18 @@ SourceFiles=axi_pkg.vhd
 # Generate per-interface VHDL packages and per-interface AXI modules
 AxiInterfaces=$(patsubst axi_interface_%.h,%,$(wildcard axi_interface_*.h))
 #  Assume all non-pkg VHDL files here need to be parameterized per interface
-AxiModules=axi2cp sdp2axi_rd sdp2axi_wd sdp2axi axinull
+AxiModules=axi2cp sdp2axi_rd sdp2axi_wd sdp2axi axinull raw2axi
 AxiInterfacePackages=$(AxiInterfaces:%=gen/%_pkg.vhd)
-AxiInterfaceModules=$(foreach i,$(AxiInterfaces),$(AxiModules:%=gen/%_$i.vhd))
-$(infox AI:$(AxiInterfaces) AM:$(AxiModules) AIM: $(AxiInterfaceModules))
+AxiInterfaceModules=$(foreach i,$(AxiInterfaces),\
+                      $(foreach m,$(or $(AxiModules_$i),$(AxiModules)),\
+                        gen/$m_$i.vhd))
+
 SourceFiles+= $(AxiInterfacePackages) $(AxiInterfaceModules)
+
+# Here we can get picky about whichh modules are built for which interface.
+AxiModules_lite32=raw2axi
+
+$(infox AI:$(AxiInterfaces) AM:$(AxiModules) AIM: $(AxiInterfaceModules))
 
 # Create the module per interface by simply prepending the package reference
 # $(call doInterfaceModule,module,interface)
@@ -53,7 +60,7 @@ endef
 
 $(foreach i,$(AxiInterfaces),\
   $(eval $(call doInterfacePackage,$i))\
-  $(foreach m,$(AxiModules),$(eval $(call doInterfaceModule,$m,$i))))
+  $(foreach m,$(or $(AxiModules_$i),$(AxiModules)),$(eval $(call doInterfaceModule,$m,$i))))
 all: $(SourceFiles)
 $(infox S:$(SourceFiles))
 

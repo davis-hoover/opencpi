@@ -7,11 +7,11 @@ SDP and AXI and CP and AXI also live here, since they are about AXI.
 AXI interfaces come in two flavors, AXI3 and AXI4, which have slighly different signals.
 AXI interfaces have different widths for various fields (address, data, transaction IDs etc.).
 AXI is flexible with respect to where clock and reset are driven from.  We parameterize
-AXI interfaces as to who (among master and slave) drivers reset and clock, separately.
+AXI interfaces as to who (among master and slave) drives reset and clock, separately.
 Thus fundamentally AXI interfaces are parameterized.
 
 We use record structures for AXI interfaces, so that an interface has a master-to-slave interface
-record and a slave-to-master structure.
+record and a slave-to-master interface record.
 
 We use some simple C-preprocessor templating to parameterize the defined structures for the AXI
 interfaces, since the older versions of VHDL we use do not have generics for packages etc.  In return
@@ -27,7 +27,7 @@ the actual modules in this library that use AXI interfaces have variants called
 <module-name>_<if-name>.vhd, which has its component declaration in the <if-name> package.
 
 From the point of view of a platform that wants to instantiate AXI modules with interface
-<if-name>, they do:
+<if-name>, they do, e.g.:
 
 library axi;
 
@@ -38,7 +38,7 @@ SO in this diretory we basically have:
 2. AXI-related modules that are built for each interface variant.
    (Someday we could prune this for build speed).
 
-The VHDL module files (e.g. axi2cp) files are actually specialized by preprocessing then and putting
+The VHDL module files (e.g. axi2cp.vhd) files are actually specialized by preprocessing then and putting
 the specialized code in the gen/ subdir.  To preprocess them we simply: replace "AXI_INTERFACE" in
 the file with <axi-if-name>
 
@@ -53,3 +53,35 @@ In this parameterization we have not achieved "drop-in AXI interface variants at
 This means that the little 4 line files that define AXI interfaces have to be added here for
 new platforms that need new interfaces.  But this is fairly infrequent so the MRs for it should not
 be burdensome.
+
+The CPP macros used to define an AXI interface, in the axi_interface_<if-name>.h files are:
+
+ADDR_WIDTH
+----------
+The width of the ADDR signal in the AR and AW channels.  It has no default.
+
+ID_WIDTH
+--------
+The width of the ID signal in the AR, AW, B, and R channels (all the same for now).  It has no default.
+
+DATA_WIDTH
+----------
+This value determines the width of the DATA signal in W and R channels, and the STRB signal (width/8)
+in the W channel.  It has no default.
+
+CLOCK_FROM_MASTER/RESET_FROM_MASTER
+-----------------------------------
+If defined, the clock (reset) is a master-to-slave signal in the A channel, otherwise
+the clock (reset) is a slave-to-master signal in the A channel.
+This determination is separate for clock and reset
+
+AXI4
+----
+If defined, the signals comply with AXI4, otherwise they are AXI3
+
+
+USER_WIDTH (and overridden by USER_WIDTH_<chan> where <chan> is one of AW,W,B,AR,R)
+----------
+
+If USER_WIDTH is defined, all the <chan> USER signals are defined with that width.
+If USER_WIDTH_<chan> is defined, that channel's USER signals are defined with that width.
