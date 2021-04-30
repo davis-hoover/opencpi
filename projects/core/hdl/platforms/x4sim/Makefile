@@ -17,29 +17,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # The xsim platform.
-HdlLibraries+=sdp
-Configurations=base # cfg_pps_sim_test
-ExportFiles=runSimExec.x4sim probe.exe.tgz
+ExportFiles=runSimExec.x4sim
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
-
-ifneq ($(findstring x4sim,$(HdlPlatforms)),)
-probe.exe.tgz:
-	$(AT)echo "Creating the tiny x4sim project for probing that x4sim is installed and licensed."
-	$(AT)echo "Output is in target-x4sim/probe.out"
-	$(AT)mkdir -p target-x4sim
-	(export CUR=`pwd` && \
-	  export DES=`mktemp -d` && \
-	  mkdir -p $${DES}/probe && cd $${DES} && \
-	  source $(OcpiXilinxVivadoDir)/.settings64-Vivado.sh && \
-	  export LM_LICENSE_FILE=$(OcpiXilinxVivadoLicenseFile) && \
-	  echo 'module probe(); endmodule' > probe.v && \
-	  xvlog -v 2 probe.v && \
-	  xelab -debug typical -top probe -s probe.exe -verbose && \
-	  rm -f -r probe.v */work && \
-	  tar -c -z --owner=0 --group=0 -f $${CUR}/probe.exe.tgz xsim.dir/probe.exe && \
-	  cd $${CUR} && \
-	  rm -r -f $${DES}) > target-x4sim/probe.out 2>&1
-
-all: probe.exe.tgz
-
-endif

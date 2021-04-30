@@ -61,7 +61,7 @@ HdlTopTargets:=xilinx altera modelsim # icarus # verilator
 ###############################################################################
 # Xilinx targets
 ###############################################################################
-HdlTargets_xilinx:=isim virtex5 virtex6 artix7 spartan3adsp spartan6 zynq_ise zynq zynq_ultra xsim x4sim
+HdlTargets_xilinx:=isim virtex5 virtex6 artix7 spartan3adsp spartan6 zynq_ise zynq zynq_ultra xsim
 
 HdlTargets_virtex5:=xc5vtx240t xc5vlx50t xc5vsx95t xc5vlx330t xc5vlx110t
 HdlTargets_virtex6:=xc6vlx240t
@@ -125,7 +125,7 @@ HdlSimTools=isim icarus verilator ghdl xsim x4sim modelsim
 HdlToolSet_ghdl:=ghdl
 HdlToolSet_isim:=isim
 HdlToolSet_xsim:=xsim
-HdlToolSet_x4sim:=x4sim
+HdlToolSet_x4sim:=xsim
 HdlToolSet_modelsim:=modelsim
 HdlToolSet_spartan3adsp:=xst
 HdlToolSet_virtex5:=xst

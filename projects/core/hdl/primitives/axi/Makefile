@@ -27,7 +27,15 @@ AxiInterfaces=$(patsubst axi_interface_%.h,%,$(wildcard axi_interface_*.h))
 #  Assume all non-pkg VHDL files here need to be parameterized per interface
 AxiModules=axi2cp sdp2axi_rd sdp2axi_wd sdp2axi axinull
 AxiInterfacePackages=$(AxiInterfaces:%=gen/%_pkg.vhd)
-AxiInterfaceModules=$(foreach i,$(AxiInterfaces),$(AxiModules:%=gen/%_$i.vhd))
+AxiInterfaceModules=$(foreach i,$(AxiInterfaces),\
+                      $(foreach m,$(or $(AxiModules_$i),$(AxiModules)),\
+                        gen/$m_$i.vhd))
+
+SourceFiles+= $(AxiInterfacePackages) $(AxiInterfaceModules)
+
+# Here we can get picky about which modules are built for which interface.
+AxiModules_lite32=raw2axi
+
 $(infox AI:$(AxiInterfaces) AM:$(AxiModules) AIM: $(AxiInterfaceModules))
 SourceFiles+= $(AxiInterfacePackages) $(AxiInterfaceModules)
 

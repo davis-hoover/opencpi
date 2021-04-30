@@ -41,8 +41,8 @@ begin
   return h;
 end dws2header;
 
-function header2dws(h : header_t) return dword_array_t is
-  variable dws : dword_array_t(0 to sdp_header_ndws-1);
+function header2dws(h : header_t) return header_dwords_t is
+  variable dws : header_dwords_t;
   variable v : unsigned((sdp_header_ndws * 32)-1 downto 0);
   variable n : natural := 0;
 begin
