@@ -21,7 +21,7 @@ use IEEE.std_logic_1164.all, IEEE.numeric_std.all, ocpi.all, ocpi.types.all, ocp
   platform.all;
 package body sdp is
 
-function dws2header(dws : dword_array_t(0 to sdp_header_ndws-1)) return header_t is
+function dws2header(dws : header_dwords_t) return header_t is
   variable h : header_t;
   variable v : std_logic_vector((sdp_header_ndws * 32)-1 downto 0);
   variable n : natural := 0;
@@ -41,8 +41,8 @@ begin
   return h;
 end dws2header;
 
-function header2dws(h : header_t) return dword_array_t is
-  variable dws : dword_array_t(0 to sdp_header_ndws-1);
+function header2dws(h : header_t) return header_dwords_t is
+  variable dws : header_dwords_t;
   variable v : unsigned((sdp_header_ndws * 32)-1 downto 0);
   variable n : natural := 0;
 begin
@@ -79,13 +79,13 @@ begin
   return resize(header.count, width_for_max(max_message_units)) + 1;
 end count_in_dws;
 function dword2header(dw : dword_t) return header_t is
-  variable da : dword_array_t(0 to sdp_header_ndws-1);
+  variable da : header_dwords_t;
 begin  
   da(0) := dw;
   return dws2header(da);
 end dword2header;
 function count_in_dws(dw : dword_t) return unsigned is
-  variable da : dword_array_t(0 to sdp_header_ndws-1);
+  variable da : header_dwords_t;
 begin
   da(0) := dw;
   return count_in_dws(dword2header(dw));

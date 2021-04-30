@@ -1218,6 +1218,10 @@ parsePlatform(ezxml_t xml, std::string &config, std::string &constraints,
   if (only) {
     if ((err = getPlatforms(only, platforms, HdlModel, onlyValidPlatforms)))
       return err;
+    // If we aren't validating and the platform is not valid, just return it
+    // So it can be properly excluded or checked later
+    if (platforms.empty() && !onlyValidPlatforms)
+      platforms.push_back(only);
   } else if (exclude) {
     OrderedStringSet excludedPlatforms, allPlatforms;
     const StringSet *hdlPlatforms;
