@@ -13,10 +13,19 @@
 # The result of the script is that the wrapper verilog is copied to ".."
 # And a file named wrapper-module is placed there with the name of the wrapper module
 # which includes the version.
+package require fileutil
 
 set ip_name [lindex $argv 0]
 set ip_part [lindex $argv 1]
 set ip_module ${ip_name}_0
+
+proc copy_sources {directory pattern} {
+   # Find files in the specified directory
+   set file_set [fileutil::findByPattern $directory -regexp $pattern]
+
+   # Copy matching file set to gen directory
+   file copy -force $file_set ../
+}
 
 create_project managed_ip_project managed_ip_project -force -part $ip_part
 set_property target_language VHDL [current_project]
@@ -39,9 +48,9 @@ open_run synth_1 -name synth_1
 
 # Vivado 2020.2 has a different resulting directory structure when generating the IP
 if {[version -short] >= "2020.2"} {
-  file copy managed_ip_project/managed_ip_project.gen/sources_1/ip/$ip_module/$ip_module\_reload_order.txt ../$ip_module\_reload_order.txt
+  copy_sources managed_ip_project/managed_ip_project.gen/sources_1/ip/$ip_module reload_order
 } else {
-  file copy managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module/$ip_module\_reload_order.txt ../$ip_module\_reload_order.txt
+  copy_sources managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module reload_order
 }
 
 write_edif -security_mode all ../$ip_module.edf

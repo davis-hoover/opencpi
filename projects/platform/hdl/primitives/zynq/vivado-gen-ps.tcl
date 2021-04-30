@@ -24,11 +24,20 @@
 # The result of the script is that the wrapper verilog is copied to ".."
 # And a file named wrapper-module is placed there with the name of the wrapper module
 # which includes the version.
-
+package require fileutil
 
 set ip_name [lindex $argv 0]
 set ip_part [lindex $argv 1]
 set ip_module ${ip_name}_0
+
+proc copy_sources {directory pattern} {
+   # Find files in the specified directory
+   set file_set [fileutil::findByPattern $directory -regexp $pattern]
+
+   # Copy matching file set to gen directory
+   file copy -force $file_set ../
+}
+
 # puts [llength [get_parts -regexp {xcz.*}]]
 # puts [get_parts -regexp {xc7z.*}]
 create_project managed_ip_project managed_ip_project -ip -force -part $ip_part
@@ -52,16 +61,17 @@ if {[version -short] >= "2020.2"} {
 # This is pretty lame, but it is what is different between the PS7 IP and the PS8 ip...
 # Look in two places (in verilog subdir or not), and look in two ways (with minor or not)
 if {[file exists $hdl_dir/verilog/${ip_wrapper}.v]} {
-  file copy $hdl_dir/verilog/${ip_wrapper}.v ..
+  copy_sources $hdl_dir/verilog ${ip_wrapper}.v
+
 } elseif {[file exists $hdl_dir/${ip_wrapper}.v]} {
-  file copy $hdl_dir/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
+  copy_sources $hdl_dir $ip_version
 } else {
   set ip_version ${ip_version}_${ip_minor}
   set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
   if {[file exists $hdl_dir/verilog/${ip_wrapper}.v]} {
-    file copy $hdl_dir/verilog/${ip_wrapper}.v ..
+    copy_sources $hdl_dir/verilog ${ip_wrapper}.v
   } else {
     # This will fail if we can't find it anywhere
-    file copy $hdl_dir/${ip_name}_v${ip_version}.v ../${ip_wrapper}.v
+    copy_sources $hdl_dir ${ip_version}.v
   }
 }
