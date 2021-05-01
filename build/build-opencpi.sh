@@ -41,7 +41,7 @@ elif [ -f "$OCPI_TARGET_PLATFORM_DIR/${OCPI_TARGET_PLATFORM}.exports" ]; then
 fi
 
 # Export ocpi python libraries needed in later steps, avoiding any platform exports
-if ! ./export-framweork.sh - &> /tmp/tmp.$$; then
+if ! ./scripts/export-framework.sh - &> /tmp/tmp.$$; then
   echo 'Error running "export-framework.sh -":'
   cat /tmp/tmp.$$
   rm -f /tmp/tmp.$$
