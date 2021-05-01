@@ -37,8 +37,8 @@ doimports=$(shell $(OcpiExportVars) $(MAKE) imports NoExports=1)
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
   ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter imports projectpackage,$(MAKECMDGOALS)),)
     $(infox $(doimports))
-    include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
     ifeq ($(findstring export,$(MAKECMDGOALS))$(findstring import,$(MAKECMDGOALS)),)
+      include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
       $(info No HDL platforms specified.  No HDL assets will be targeted.)
       $(info Possible HdlPlatforms are: $(sort $(HdlAllPlatforms)).)
     endif
