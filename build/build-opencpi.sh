@@ -40,9 +40,9 @@ elif [ -f "$OCPI_TARGET_PLATFORM_DIR/${OCPI_TARGET_PLATFORM}.exports" ]; then
   (cd "$OCPI_TARGET_PLATFORM_DIR"; "$OCPI_CDK_DIR/scripts/export-platform.sh" lib)
 fi
 
-# Export ocpi python libraries needed in later steps
-if ! make exports &> /tmp/tmp.$$; then
-  echo 'Error running "make exports":'
+# Export ocpi python libraries needed in later steps, avoiding any platform exports
+if ! ./export-framweork.sh - &> /tmp/tmp.$$; then
+  echo 'Error running "export-framework.sh -":'
   cat /tmp/tmp.$$
   rm -f /tmp/tmp.$$
   exit 1
