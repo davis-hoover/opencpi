@@ -120,6 +120,7 @@ struct Build {
   OrderedStringSet    m_componentLibraries;
   // HDL-specific
   OrderedStringSet    m_cores;
+  OrderedStringSet    m_configurations; // for platform configurations
   // RCC-specific
   OrderedStringSet    m_staticPrereqLibs;
   OrderedStringSet    m_dynamicPrereqLibs;

@@ -887,8 +887,8 @@ emitToolParameters() {
   return err;
 }
 
-// Based on worker xml, read the <worker>.build, and emit the
-// gen/<worker>-params.mk
+// Based on worker xml, read the <worker>-build.xml, and emit the
+// gen/<worker>.mk
 const char *Worker::
 emitMakefile(FILE *xmlFile) {
   const char *err;
@@ -1152,6 +1152,19 @@ parse(ezxml_t x, const char *buildFile) {
       return "Invalid \"cores\" attribute:  worker model is not HDL";
     else if ((err = getHdlPrimitive(ti.token(), "core", m_cores)))
       return err;
+  for (OU::TokenIter ti(ezxml_cattr(x, "configurations")); ti.token(); ti.next()) {
+    if (m != HdlModel)
+      return "Invalid \"configurations\" attribute:  worker model is not HDL";
+    if (m_worker.m_type != Worker::Platform)
+      return "Invalid \"configurations\" attribute:  worker is not an HDL platform";
+    if (!OS::FileSystem::exists(ti.token())) {
+      std::string xml(ti.token());
+      if (!OS::FileSystem::exists(xml + ".xml"))
+	return OU::esprintf("Platform configuration file %s (or %s.xml) not found",
+			    ti.token(), ti.token());
+    }
+    m_configurations.push_back(ti.token());
+  }
   bool isDir;
   // xmlincludedirs is handled specially in owd parsing for bootstrap reasons
   for (OU::TokenIter ti(ezxml_cattr(x, "includedirs")); ti.token(); ti.next()) {

@@ -73,7 +73,7 @@ add to tree.
   CMD_OPTION  (skel,      s,    Bool,   NULL, "Generate the implementation skeleton file (modified part)") \
   CMD_OPTION  (assy,      a,    Bool,   NULL, "Generate the assembly implementation file (readonly)") \
   CMD_OPTION  (parameters,r,    Bool,   NULL, "Process raw parameters on stdin") \
-  CMD_OPTION  (build,     b,    Bool,   NULL, "Generate gen/Makefile from <worker.build>") \
+  CMD_OPTION  (build,     b,    Bool,   NULL, "Generate gen/<worker>.mk from <worker>-build.xml") \
   CMD_OPTION  (xml,       A,    Bool,   NULL, "Generate the artifact XML file for embedding") \
   CMD_OPTION  (workers,   W,    Bool,   NULL, "Generate the makefile fragment for workers in the assembly") \
   CMD_OPTION  (generics,  g,    Short,  "-1", "Generate the generics file a worker configuration") \
