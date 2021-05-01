@@ -61,7 +61,9 @@ ifdef Platforms
 endif
 ifeq ($(filter-out cleandriver,$(filter show help clean% distclean%,$(MAKECMDGOALS))),)
   include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
-  include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
+  ifdef MAKECMDGOALS
+    include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
+  endif
 endif
 # Now check all platforms for validity, even the hdl:rcc pairs
 $(foreach p,$(subst :, ,$(Platform)),$(if $(filter $(call RccRealPlatforms,$p),$(RccAllPlatforms) $(HdlAllPlatforms)),,\
