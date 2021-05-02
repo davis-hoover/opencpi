@@ -100,6 +100,7 @@ add to tree.
   CMD_OPTION  (nworkers,  N,    Bool,   NULL, "Multiple workers are actually implemented here (rcc)") \
   CMD_OPTION  (comp,      G,    Bool,   NULL, "Generate component output for use with ocpidev") \
   CMD_OPTION  (rxml,      R,    Bool,   NULL, "Parse project level properties from XML properties") \
+  CMD_OPTION  (optimized, Q,    Bool,   NULL, "Specify that compilation is optimized, for artifacts") \
 
 #define OCPI_OPTION
 #define OCPI_OPTIONS_NO_MAIN

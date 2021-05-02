@@ -208,7 +208,7 @@ HdlDoXmlPlatform=\
   $(foreach x,$(or $(wildcard $1/$2.xml),$(wildcard $1/lib/hdl/$2.xml),-),\
     $(and $(filter -,$x),\
       $(error HDL platform $2, at $1, has no $2.xml file?))\
-    $(if $(call DoShell,set -vx &&\
+    $(if $(call DoShell,\
            $(ToolsDir)/ocpixml  -t hdlplatform -a '?part' -a '?family' parse $x,\
            HdlPartAndFamily),\
       $(error Failed to parse $x: $(HdlPartAndFamily)),\
