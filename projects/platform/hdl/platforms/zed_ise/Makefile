@@ -16,30 +16,19 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# The zed_ise platform.
-Libraries=zynq axi sdp
-ParamValues_useGP1=0/1
-Configurations=\
-  base \
-  gp1 \
-
-ExportFiles=zed_ise.ucf zed_ise.ut 98-zedboard.rules sd_card
+# The zed_ise platform, mostly copied from zed
 
 include $(OCPI_CDK_DIR)/include/util.mk
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
-    test -e zed_ise.xml || sed "s/'zed'/'zed_ise'/" ../zed/zed.xml > zed_ise.xml; \
-    test -e zed_ise.vhd || sed "s/zed_worker/zed_ise_worker/;" ../zed/zed.vhd > zed_ise.vhd; \
-    mkdir -p gen; \
-    for c in $(filter-out base,$(Configurations)); do \
-      test -e gen/$$c.xml || ln -s ../../zed/$${c//zed_ise/zed}.xml gen/$$c.xml; \
+    test -e zed_ise.vhd || ln -s ../zed/zed.vhd zed_ise.vhd; \
+    for c in $$(ocpixml -t hdlplatform -a '?configurations' parse zed_ise.xml); do \
+      [ $$c = base ] || [ -e $$c.xml ] || ln -s ../zed/$$c.xml .;\
     done)
 endif
 
-
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
 
-zed_ise.xml: ../zed/zed.xml; sed "s/'zed'/'zed_ise'/" $< > $@
-
 clean::
-	rm -f zed_ise.{xml,vhd}
+	rm -f zed_ise.vhd
+	for x in *.xml; do [ $$x = zed_ise.xml ] || rm $$x; done

@@ -413,7 +413,7 @@ for p in ${hdl_platforms[*]}; do
   [ -d $d/lib ] && make_filtered_link $d/lib exports/hdl/platforms/$p platform
   # this $p.xml link is for bootstrapping before the platform is built to show it exists
   make_filtered_link $d/$p.xml exports/hdl/platforms/xml/$p.xml platform
-  make_filtered_link $d/$p.mk exports/hdl/platforms/xml/$p.mk platform
+  [ -f "$d/$p.mk" ] && make_filtered_link $d/$p.mk exports/hdl/platforms/xml/$p.mk platform
 done
 ###################################################################################
 # Export rcc platforms
