@@ -1,0 +1,7 @@
+<RccWorker language='c++' spec='zmq_sink-spec' version='2' controloperations='start'>
+  <Property name='address' type='string'
+                           stringLength='128'
+                           initial='true'
+                           description='Value used for ZMQ bind method,
+                                        consist of address:port, 127.0.0.1:5555 is an example'/>
+</RccWorker>

@@ -1,0 +1,155 @@
+\iffalse
+This file is protected by Copyright. Please refer to the COPYRIGHT file
+distributed with this source distribution.
+
+This file is part of OpenCPI <http://www.opencpi.org>
+
+OpenCPI is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program. If not, see <http://www.gnu.org/licenses/>.
+\fi
+
+%----------------------------------------------------------------------------------------
+% Required document specific properties
+%----------------------------------------------------------------------------------------
+\def\comp{zmq\_sink}
+\edef\ecomp{zmq_sink}
+\def\Comp{ZeroMQ Sink}
+\def\docTitle{\Comp{} Component Data Sheet}
+\def\snippetpath{../../../../../doc/av/tex/snippets}
+%----------------------------------------------------------------------------------------
+% Global latex header (this must be after document specific properties)
+%----------------------------------------------------------------------------------------
+\input{\snippetpath/LaTeX_Header}
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\begin{center}
+\textit{\textbf{Revision History}}
+	\begin{table}[H]
+	\label{table:revisions} % Add "[H]" to force placement of table
+		\begin{tabularx}{\textwidth}{|c|X|l|}
+			\hline
+			\rowcolor{blue}
+			\textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
+		    \hline
+		    v1.0 & Initial Release & 04/2021 \\
+		    \hline
+		\end{tabularx}
+	\end{table}
+\end{center}
+\newpage
+
+\def\name{\comp}
+\def\workertype{}
+\def\version{\ocpiversion}
+\def\releasedate{04/2021}
+\def\componentlibrary{assets\_{}comps}
+\def\workers{\comp{}.rcc}
+\def\testedplatforms{ubuntu 18.04}
+\input{\snippetpath/component_summary_table}
+	
+\section*{Functionality}
+\begin{flushleft}
+
+The {\comp} component provides the ability to interface with an external ZeroMQ message subscriber. Within the {\comp} component the raw bytes of the input buffer are converted to a ZeroMQ message and published. \newline
+
+The \texttt{address} property defines the IP address and port that the ZeroMQ messages are to be published onto. The {\comp} component will bind and send data to this port.\newline
+
+For example: \newline
+When \texttt{address} = 192.168.1.128:5556, the {\comp} component will connect to IP address 192.168.1.128 on port 5556. \newline
+
+
+\end{flushleft}
+
+\section*{Block Diagrams}
+	\subsection*{Top level}
+\begin{center}
+\begin{tikzpicture}[% List of styles applied to all, to override specify on a case-by-case
+					every node/.style={
+						align=center,  		% use this so that the "\\" for line break works
+						minimum size=1.5cm	% creates space above and below text in rectangle
+						},
+					every edge/.style={draw,thick}
+					]
+\node[rectangle,ultra thick,draw=black,fill=blue, minimum width=5 cm](R2){Parameter Properties:\\ \verb+address+ \\ \\ \comp \\ };
+\node[rectangle,draw=white,fill=white](R3)[right= of R2]{ZeroMQ Socket Interface \\ (External to OpenCPI)};
+\node[rectangle,draw=white,fill=white](R4)[left= of R2]{``input'' \\ Data};
+\path[->]
+(R2)edge []     node [] {} (R3)
+(R4)edge []     node [] {} (R2)
+;
+\end{tikzpicture}
+\end{center}
+
+\section*{Source Dependencies}
+	\subsection*{\comp.rcc}
+	    \begin{itemize}
+	    \item zmq.hpp (External)
+	    \end{itemize}
+	 \subsubsection*{Install Note}
+        OpenCPI doesn't currently have a pre-req for ZeroMQ, therefore ZeroMQ must be installed externally to OpenCPI. The following packages are needed on Ubuntu 18.04: libzmq3-dev and the zmq3 package dependecies libtool, pkg-config, build-essential, autoconf, and automake. 
+
+		
+
+\begin{landscape}
+\section*{Worker Properties}
+
+\begin{flushleft}
+        \begin{scriptsize}
+        \begin{tabular}{|p{2.5cm}|p{1cm}|p{1.5cm}|p{2cm}|p{2cm}|p{2.5cm}|p{1.5cm}|p{1.5cm}|p{5.5cm}|}
+                \hline
+                \rowcolor{blue}
+                Name & Type & Default & SequenceLength & ArrayLength & ArrayDimensions & Parameter  & Accessibility & Usage \\
+                \hline
+                \verb+address+ & string & - & 128 & - & - & true & - & Value used for ZMQ bind method, consist of address:port\\
+        \end{tabular}
+        \end{scriptsize}
+\end{flushleft}
+
+
+\section*{Component Ports}
+
+        \begin{scriptsize}
+                \begin{tabular}{|M{2.5cm}|M{2cm}|M{2cm}|M{2.5cm}|M{12.5cm}|}
+                        \hline
+                        \rowcolor{blue}
+                        Name & Protocol & Producer & Optional & Usage\\
+                        \hline
+                        input
+                        & -
+                        & false
+                        & false
+                        & Data to be passed through to ZeroMQ interface \\
+                        \hline
+                \end{tabular}
+			\end{scriptsize}
+\end{landscape}
+
+
+\section*{Performance and Resource Utilization}
+    \subsubsection*{\comp.rcc}
+        {\comp} is using ZeroMQ TCP Sockets by default which are determining the performance and resource utilization, the official ZeroMQ documentation should be referenced for more details. 
+
+
+\section*{Test and Verification}
+	At this time there is no unit test for {\comp} however there is zmq\_test application which puts zmq\_source and zmq\_sink back to back allowing them to both be tested and interfaced with external ZeroMQ pub and sub applications.
+
+
+\section*{Applications}
+Currently the only example of the {\comp} component used in an application, is the zmq\_test application previously mentioned.
+
+
+\end{document}

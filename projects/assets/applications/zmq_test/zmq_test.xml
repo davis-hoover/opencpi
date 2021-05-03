@@ -1,0 +1,9 @@
+<!-- The zmq_test application xml file -->
+<Application package='ocpi.assets.util_comps'>
+  <Instance component='zmq_source' connect='zmq_sink'>
+    <Property name='address' value='tcp://127.0.0.1:5555'/>
+  </Instance>
+  <Instance component='zmq_sink'>
+    <Property name='address' value='tcp://127.0.0.1:5556'/>
+  </Instance>
+</Application>
