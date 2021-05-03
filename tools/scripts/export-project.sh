@@ -518,16 +518,9 @@ set +f
 # other make machinery.  If necessary before the python rewrite, we could have a
 # shared implementation some other way that avoided all the recursion.
 # Or change the python to do this and not use "make".
-for i in components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
-    [ -d $i -a "$(ocpiDirType $i)" = library ] && make --no-print-directory -C $i speclinks
+for i in components components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
+    [ -d $i ] && [ "$(ocpiDirType $i)" = library ] && make --no-print-directory -C $i speclinks
 done
-exit 0
-
-# export the specs for each of the libraries
-python3 -c "import sys, os;
-sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
-import _opencpi.util; _opencpi.util.export_libraries()"
-
 exit 0
 
 # notes:

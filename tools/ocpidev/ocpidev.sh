@@ -93,28 +93,15 @@ function needname {
 # Look in a directory and determine the type of the Makefile, set dirtype
 # If there is no Makefile or no appropriate line in the Makefile, dirtype is ""
 function get_dirtype {
-  [ ! -e "$1" ] && bad $1 should exist and does not
-  [ ! -d "$1" ] && bad $1 should be a directory and is not
-  if [ -f "$1"/Makefile ]; then
-    dirtype=$(sed -n 's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*=\1=p' $1/Makefile | tail -1)
-    dirtype=${dirtype##hdl\/}
-    dirtype=${dirtype##rcc\/}
-  else
-    dirtype=
-  fi
-  if [ -z "$dirtype" ]; then
-    if [ -e "$1/project-package-id" ]; then
-      dirtype=project
-    fi
-  fi
+  dirtype=$(ocpiDirType $1)
 }
 
 # Look in a directory and determine the type of the Makefile, set dirtype
-function check_dirtype {
-  get_dirtype $1
-  [ -z "$dirtype" ] && bad $1/Makefile is not correctly formatted.  No \"include *.mk\" lines.
-  [ "$dirtype" != "$2" ] && bad $1/Makefile has unexpected type \"$dirtype\", expected \"$2\".
-}
+# function check_dirtype {
+#   get_dirtype $1
+#   [ -z "$dirtype" ] && bad $1/Makefile is not correctly formatted.  No \"include *.mk\" lines.
+#   [ "$dirtype" != "$2" ] && bad $1/Makefile has unexpected type \"$dirtype\", expected \"$2\".
+# }
 # Determine the path to the current project's top level
 function get_project_top {
   # TODO get project, project.dir
@@ -1125,7 +1112,10 @@ function do_worker {
     return 0
   fi
   if [ "$verb" == build ]; then
-    make -C $subdir/$1 ${verbose:+AT=} ${buildClean:+clean} \
+    local makefile=
+    [ ! -f $subdir/$1/Makefile ] && makefile=$OCPI_CDK_DIR/include/worker.mk
+    make ${makefile:+-f $makefile} \
+         -C $subdir/$1 ${verbose:+AT=} ${buildClean:+clean} \
             ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
             ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
             ${swplats:+RccPlatforms=" ${swplats[@]}"} \
@@ -1776,7 +1766,10 @@ function do_build_here {
       buildHdl=""
       cleanTarget+=" cleanhdl"
     fi
-  make ${cleanTarget:+$cleanTarget} ${verbose:+AT=} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
+  local makefile=
+  [ ! -f Makefile -a "$dirtype" = worker ] && makefile=$OCPI_CDK_DIR/include/worker.mk
+  make ${makefile:+-f $makefile} \
+       ${cleanTarget:+$cleanTarget} ${verbose:+AT=} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
        ${buildNoAssemblies:+Assemblies=} \
        ${assys:+Assemblies=" ${assys[@]}"} \
        ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \

@@ -1157,10 +1157,13 @@ parse(ezxml_t x, const char *buildFile) {
       return "Invalid \"configurations\" attribute:  worker model is not HDL";
     if (m_worker.m_type != Worker::Platform)
       return "Invalid \"configurations\" attribute:  worker is not an HDL platform";
-    if (strcasecmp("base", ti.token()) && strcasecmp("base.xml", ti.token()) &&
-	!OS::FileSystem::exists(ti.token())) {
-      std::string xml(ti.token());
-      if (!OS::FileSystem::exists(xml + ".xml"))
+    if (strcasecmp("base", ti.token()) && strcasecmp("base.xml", ti.token())) {
+      std::string xml;
+      const char *slash = strrchr(m_worker.m_file.c_str(), '/');
+      if (slash)
+	xml.assign(m_worker.m_file.c_str(), OCPI_SIZE_T_DIFF(++slash, m_worker.m_file.c_str()));
+      xml += ti.token();
+      if (!OS::FileSystem::exists(xml) && !OS::FileSystem::exists(xml + ".xml"))
 	return OU::esprintf("Platform configuration file %s (or %s.xml) not found",
 			    ti.token(), ti.token());
     }
