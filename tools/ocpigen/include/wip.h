@@ -49,16 +49,6 @@ namespace OS=OCPI::OS;
 
 class Port;
 
-#if 0 // this is handled differently now in data.cxx
-// We derive a class to implement xi:include parsing, file names, etc.
-class Protocol : public OU::Protocol {
-public:
-  Protocol(Port &port);
-  Port &m_port;
-  const char *parse(const char *file, ezxml_t prot = NULL);
-  const char *parseOperation(ezxml_t op);
-};
-#endif
 class Worker;
 
 class WciPort : public OcpPort {
@@ -503,7 +493,7 @@ class Worker : public OU::Worker {
     *emitToolParameters(),
     *emitMakefile(FILE *xmlFile = NULL),
     *emitHDLConstants(size_t config, bool other),
-    *setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
+    *setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
 		    const std::string &parent),
     *finalizeProperties(),
     *finalizeHDL(),
@@ -522,6 +512,8 @@ class Worker : public OU::Worker {
     *emitImplOCL(),
     *emitEntryPointOCL(),
     *paramValue(const OU::Member &param, OU::Value &v, std::string &value),
+    *findParamConfig(size_t low, size_t high, const OCPI::Util::Assembly::Properties &ipvs,
+		     ParamConfig *&pc),
     *rccBaseValue(OU::Value &v, std::string &value, const OU::Member *param = NULL),
     *rccValue(OU::Value &v, std::string &value, const OU::Member &param),
     *rccPropValue(OU::Property &p, std::string &value),
@@ -630,7 +622,7 @@ extern const char
 		      ezxml_t *parsed, std::string &childFile, bool optional),
   *emitContainerHDL(Worker*, const char *);
 
-extern bool g_dynamic, g_optimized, g_multipleWorkers;
+extern bool g_dynamic, g_optimized, g_multipleWorkers, g_autoAddParamConfig;
 extern void
   doPrev(FILE *f, std::string &last, std::string &comment, const char *myComment),
   vhdlType(const OU::Property &dt, std::string &typeDecl, std::string &type,

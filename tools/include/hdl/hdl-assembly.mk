@@ -51,7 +51,6 @@ ifeq ($(HdlPlatform)$(HdlPlatforms),)
   endif
 endif
 include $(OCPI_CDK_DIR)/include/hdl/hdl-pre.mk
-ifndef HdlSkip
 # Add to the component libraries specified in the assembly Makefile,
 # and also include those passed down from the "assemblies" level
 # THIS LIST IS FOR THE APPLICATION ASSEMBLY NOT FOR THE CONTAINER
@@ -188,6 +187,10 @@ ifneq ($(MAKECMDGOALS),clean)
 else # for "clean" goal
   HdlTargets:=all
 endif
+  ifndef ShellHdlAssemblyVars
+    $(eval $(OcpiProcessBuildFiles))
+    include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
+  endif
 # Due to our filtering, we might have no targets to build
 ifeq ($(filter $(or $(OnlyPlatforms),$(HdlAllPlatforms)),$(filter-out $(ExcludePlatforms),$(HdlPlatforms)))$(filter skeleton,$(MAKECMDGOALS)),)
   $(and $(HdlPlatforms),$(info Not building assembly $(Worker) for platform(s): $(HdlPlatforms) in "$(shell pwd)"))
@@ -197,10 +200,6 @@ else ifndef HdlContainers
     $(info No containers will be built since none match the specified platforms.)
   endif
 else
-  ifndef ShellHdlAssemblyVars
-    $(eval $(OcpiProcessBuildFiles))
-    include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
-  endif
   ifndef HdlSkip
     ifndef HdlContainers
       ifneq ($(MAKECMDGOALS),clean)
@@ -225,11 +224,12 @@ else
 	       HdlExplicitLibraries="$(call OcpiAdjustLibraries,$(HdlExplicitLibraries))" \
                XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirsInternal))"
       endef
+      ifndef HdlSkip
       $(foreach c,$(HdlContainers),$(and $(filter $(HdlPlatform_$c),$(HdlPlatforms)),$(eval $(call doContainer,$c))))
+      endif
     endif # containers
   endif # of skip
 endif # check for no targets
-endif
 clean::
 	$(AT) rm -r -f container-* lib
 

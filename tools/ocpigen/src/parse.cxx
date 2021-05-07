@@ -55,6 +55,7 @@ const char *g_platform = 0, *g_device = 0, *load = 0, *g_os = 0, *g_os_version =
 bool g_dynamic = false;
 bool g_optimized = false;
 bool g_multipleWorkers = false;
+bool g_autoAddParamConfig = false;
 
 // Check for implementation attributes common to data interfaces, several of which
 // are able to override protocol-determined values.

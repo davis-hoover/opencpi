@@ -85,6 +85,7 @@ def get_dir_info(directory=".", careful=False):
     make_type = None
     asset_type = None # will be set to make_type if not set
     top_xml_elements = None
+    xml_file = directory + "/" + parts[0] + ".xml"
     if len(parts) > 1:
         if parts[-1] == "test":
             name += "-test"
@@ -132,6 +133,14 @@ def get_dir_info(directory=".", careful=False):
     elif name == "assemblies":
         # what is left: specs (not a thing), cards, devices, adapters
         make_type = "hdl-assemblies"
+    elif os.path.isfile(xml_file):
+        # a platform, an assembly, a library, a primitive
+        import xml.etree.ElementTree as xt
+        tag = xt.parse(xml_file).getroot().tag.lower()
+        if tag.startswith("hdl"):
+            make_type = asset_type = "hdl-" + tag[3:]
+        elif tag == "library":
+            make_type = asset_type = "library"
     elif os.path.isfile(directory + "/Project.mk") or \
          os.path.isfile(directory + "/Project.xml"):
         # Do we need to check for project-package-id file in exports?

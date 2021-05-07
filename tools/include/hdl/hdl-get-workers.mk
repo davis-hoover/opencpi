@@ -27,6 +27,5 @@ $(AssyWorkersFile): $(Worker_xml) | $(GeneratedDir)
 	$(AT)$(call OcpiGen, -D $(GeneratedDir)\
                         $(and $(Platform),-P $(Platform)) $(and $(Assembly),-S $(Assembly))\
 			$(and $(PlatformDir),-F $(PlatformDir)) \
+                        $(and $(OCPI_AUTO_BUILD_WORKERS),-U) \
                         -W $(Worker) $<)
-
-
