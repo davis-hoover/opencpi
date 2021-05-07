@@ -383,9 +383,9 @@ define OcpiNewLine
 
 
 endef
-DoShell=$(eval X:=$(shell X=`set -o pipefail;bash -c '$1; exit $$?'|tr "\n" @`;echo $$?; echo "$$X" |sed "s/\#/<pound>/g"))$(strip \
+DoShell=$(eval X:=$(shell X=`bash -c '$1; exit $$?'`;echo $$?; echo "$$X" | sed "s/\#/<pound>/g"))$(strip \
 	     $(call OcpiDbg,DoShell($1,$2):X:$X) \
-             $(eval $2:=$(subst @,$(OcpiNewLine),$(wordlist 2,$(words $X),$X)))\
+             $(eval $2:=$(wordlist 2,$(words $X),$X))\
 	     $(call OcpiDbgVar,$2) \
              $(filter-out 0,$(firstword $X)))
 
