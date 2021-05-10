@@ -660,7 +660,7 @@ OcpiGetProjectImports=$(strip \
                             $(OcpiProjectRegistryDir),\
                             $(call OcpiImportsDirForContainingProject,.)),\
 	        $(wildcard $i/*)),\
-    $(if $(filter $(realpath $p),$(realpath $(OcpiAbsPathToContainingProject))),\
+    $(if $(filter $(realpath $p),$(realpath $(call OcpiAbsPathToContainingProject,.))),\
       ,\
       $p )))
 
