@@ -932,18 +932,13 @@ ifdef NEVER
     export OCPI_PROJECT_ADDED_TARGET_DIRS:=1
   endif
 endif
-# Look into a directory in $1 and determine which type of directory it is by looking at the Makefile.
-# Also checks Makefile.am for autotools version
-# If a dirtype is not found, check if $1 is the CDK. If so, return 'project'
+# Look into a directory in $1 and determine which type of directory it is
 # Return null if there is no type to be found
 OcpiGetDirType=$(strip\
   $(foreach t,$(call OcpiCacheFunctionOnPath,OcpiGetDirTypeX,$1),$(infox GDTr:$1:$t)$t))
-OcpiGetDirTypeX=$(strip $(infox GDT1:$1:$1/Makefile:$(realpath $1/Makefile))\
-  $(and $(wildcard $1/Makefile),\
-    $(foreach d,$(shell sed -n \
-                  's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*$$=\1=p' \
-                  $1/Makefile | tail -1),\
-      $(infox OGT1: found type: $d ($1))$(notdir $d))))
+OcpiGetDirTypeX=$(strip $(infox GDT1:$1)\
+  $(foreach t,$(call OcpiCallPythonUtil,print(ocpiutil.get_dirtype("$1"))),\
+     $(infox GDT1: found type: $t for $1)$t))
 
 # Get the directory type of arg1, and return the portion after the last dash.
 # E.g. in an hdl-platform directory, this will return platform

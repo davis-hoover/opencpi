@@ -514,7 +514,7 @@ HdlRecordLibraries=\
                      $(OCPI_PROJECT_PACKAGE)),$(infox RRR:$r:$(patsubst %/imports/,,$p))\
          $(foreach x,$r:$(notdir $p):$(lastword $(subst :, ,$l)),\
            $(infox RECORDING LIB=$x)echo $x;))))\
-  ) > $(GeneratedDir)/$(LibName).libs;
+  ) > $(GeneratedDir)/$(or $(Worker),$(LibName)).libs;
 
 # Extract the list of libraries required by an asset/library $2 for target $1
 HdlExtractLibrariesFromFile=$(infox Extract:$2:$1)$(call Unique,\
