@@ -86,7 +86,11 @@ def get_dir_info(directory=".", careful=False):
     asset_type = None # will be set to make_type if not set
     top_xml_elements = None
     xml_file = directory + "/" + parts[0] + ".xml"
-    if len(parts) > 1:
+    if os.path.isfile(directory + "/Project.mk") or \
+       os.path.isfile(directory + "/Project.xml"):
+        # Do we need to check for project-package-id file in exports?
+        make_type = asset_type = "project"
+    elif len(parts) > 1:
         if parts[-1] == "test":
             name += "-test"
             top_xml_elements = ["tests"]
@@ -141,10 +145,6 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = "hdl-" + tag[3:]
         elif tag == "library":
             make_type = asset_type = "library"
-    elif os.path.isfile(directory + "/Project.mk") or \
-         os.path.isfile(directory + "/Project.xml"):
-        # Do we need to check for project-package-id file in exports?
-        make_type = asset_type = "project"
     else: # could be library or platform or assembly
         if directory.startswith(name): # incure absolutizing penalty
             directory = os.path.realpath(directory)
