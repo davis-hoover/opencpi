@@ -20,6 +20,8 @@
 ##########################################################################################
 # Build the framework and the projects
 
+# Ensure exports and python
+source ./scripts/init-opencpi.sh
 # Ensure CDK and TOOL variables
 source ./cdk/opencpi-setup.sh -e
 

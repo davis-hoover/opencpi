@@ -90,10 +90,15 @@ function needname {
   [ "$1" == '*' ] && bad you can not use \* as a name
   return 0
 }
-# Look in a directory and determine the type of the Makefile, set dirtype
-# If there is no Makefile or no appropriate line in the Makefile, dirtype is ""
+# Look in a directory and determine the type of asset, with caching
 function get_dirtype {
-  dirtype=$(ocpiDirType $1)
+  if [ "$1" == "$last_dirtype_request" ]; then
+    dirtype=$last_dirtype
+  else
+    dirtype=$(ocpiDirType $1)
+    last_dirtype=$dirtype
+    last_dirtype_request=$1
+  fi
 }
 
 # Look in a directory and determine the type of the Makefile, set dirtype
@@ -2677,6 +2682,7 @@ if [ "$verb" == "build" -a -z "$buildClean" ]; then
     (cd $pjtop && make imports)
   fi
 fi
+get_dirtype .
 [ -z "$verbose" ] || echo Executing the \"$verb $hdl$noun\" command in a ${dirtype:-unknown type of} directory: $directory.
 case $noun in
   (project)      do_project ${args[@]} ;;

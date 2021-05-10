@@ -26,6 +26,17 @@
 # It is only callable from the top level of the source tree.
 # This sourced script is for clean environments, only for use in the core source tree,
 # although if CDK is available we let it go with a warning
+if [ -n "$OCPI_ROOT_DIR" ]; then
+  [ -d "$OCPI_ROOT_DIR" ] || ( echo The OCPI_ROOT_DIR environment variable is invalid && exit 1 )
+  ocpi_old=$(cd "$OCPI_ROOT_DIR" && pwd -P)
+  ocpi_new=$(pwd -P)
+  [ "$ocpi_old" == "$ocpi_new" ] || (
+      echo You cannot run this command with an existing OpenCPI environment set up elsewhere.
+      echo Your environment currently has OCPI_ROOT_DIR as $OCPI_ROOT_DIR, and OCPI_CDK_DIR as $OCPI_CDK_DIR.
+      echo Either use a fresh shell/terminal or perhaps do:
+      echo "   source $OCPI_CDK_DIR/opencpi-setup.sh --clean"
+      exit 1 )
+fi
 if test ! -d exports; then
   # We're being run in an uninitialized environment.
   if test ! -x ./scripts/export-framework.sh; then
@@ -36,3 +47,12 @@ if test ! -d exports; then
   ./scripts/export-framework.sh -
 fi
 mkdir -p prerequisites
+
+# This for bootstrapping.  When the environment is fully set up and the framework is exported,
+# the python path will point into cdk/<platform>/lib, so that there is a platform-specific
+# directory for the optimized (pyc, pycache) to go.
+# But earlier in the installation process, before there is such a platform-specific directory
+# we still want to expose and use some of our python modules.  This allows that.
+# Note this isn't doing anything to the user's environment, just temporarily for the
+# few callers of this script
+export PYTHONPATH=$(pwd)/tools/python
