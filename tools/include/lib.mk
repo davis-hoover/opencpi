@@ -205,7 +205,7 @@ CleanModel=\
 	tn=$(call Capitalize,$(1))Targets; \
         t="$(or $(CleanTarget),$($(call Capitalize,$(1))Targets))"; \
         $(ECHO) Cleaning $(call ToUpper,$(1)) implementation $$i for targets: $$t; \
-	$(MyMake) -C $$i $(PassOutDir) \
+	$(MyMake) $(call GoWorker,$$i) $(PassOutDir) \
            OCPI_CDK_DIR=$(call AdjustRelative,$(OCPI_CDK_DIR)) $$tn="$$t" clean; \
       fi;\
     done; \

@@ -145,7 +145,7 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = "hdl-" + tag[3:]
         elif tag == "library":
             make_type = asset_type = "library"
-    else: # could be library or platform or assembly
+    else: # could be library or platform or assembly or application
         if directory.startswith(name): # incure absolutizing penalty
             directory = os.path.realpath(directory)
         parent = os.path.basename(os.path.dirname(directory))
@@ -156,6 +156,8 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = "hdl-assembly"
         elif parent == "platforms":
             make_type = asset_type = "hdl-platform"
+        elif parent == "applications":
+            make_type = asset_type = "application"
     if careful and make_type:
         match = get_maketype(directory)
         if match and match != make_type:

@@ -24,6 +24,6 @@ export OCPI_LIBRARY_PATH=lib
 
 # These make the worker library for this application
 Package=local
-include $(OCPI_CDK_DIR)/include/library.mk
+
 # The last include line determines the dir type
 include $(OCPI_CDK_DIR)/include/application.mk

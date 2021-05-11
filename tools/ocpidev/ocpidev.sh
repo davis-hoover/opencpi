@@ -922,7 +922,7 @@ function do_library {
   if [ "$libbase" == "hdl" -a -n "$library" ]; then
     one=$(basename $library)
   else
-    one=$1
+    one=${1:-.}
   fi
   [ -z "$library" -o "$verb" != "delete" ] || bad The -l and --hdl_library options are invalid when deleting a library
   subdir=$one
@@ -2683,7 +2683,9 @@ if [ "$verb" == "build" -a -z "$buildClean" ]; then
   fi
 fi
 get_dirtype .
-[ -z "$verbose" ] || echo Executing the \"$verb $hdl$noun\" command in a ${dirtype:-unknown type of} directory: $directory.
+showverb=$verb
+[ -n "$buildClean" ] && showverb=clean
+[ -z "$verbose" ] || echo Executing the \"$showverb${noun:+ $hdl$noun}\" command in a ${dirtype:-unknown type of} directory: $directory.
 case $noun in
   (project)      do_project ${args[@]} ;;
   (registry)     do_registry ${args[@]} ;;

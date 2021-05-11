@@ -100,7 +100,7 @@ ifneq ($(wildcard specs),)
     # exactly match OCPI_PROJECT_PACKAGE.
     specs/package-id: $(PROJ_FILE)
 	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
-	      echo HIHI; echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
+	       echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
 	     fi
   endif
 endif

@@ -983,7 +983,7 @@ OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(O
 OcpiIncludeParentAsset_library=\
   $(if $(filter devices cards,$(notdir $(realpath $1))),\
     $(eval ComponentLibraries+=devices))\
-  $(if $(filter %-platform,$(call OcpiGetDirType,$(and $1,$1/)..)),\
+  $(if $(filter %-platform application,$(call OcpiGetDirType,$(and $1,$1/)..)),\
     $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,$2,$3),\
     $(call OcpiIncludeProject,$3,lib))
 
@@ -1010,6 +1010,9 @@ OcpiIncludeParentAsset_platform=\
 
  OcpiIncludeParentAsset_hdl=\
    $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,$2,$3)
+
+ OcpiIncludeParentAsset_application=$(infox PRIMITIVES:$(Model))\
+   $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)../..,,$3)
 
 # For asset in directory arg1, look for makefile <arg2>.mk and include it to
 # extract any variables that are set.  Clear the package variables so that the
@@ -1064,7 +1067,7 @@ endef
 OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
   $(foreach t,$(call OcpiGetDirType,$1),\
     $(foreach s,$(if $(filter hdl-lib% hdl-core,$t),primitive,$(lastword $(subst -, ,$t))),\
-      $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c)\
+      $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c:$(ParentPackage))\
         $(if $(filter-out undefined,$(origin OcpiIncludeParentAsset_$s)),\
           $(call OcpiIncludeParentAsset_$s,$1,$2,$3),\
           $(call OcpiIncludeProject,$3,asset))\
