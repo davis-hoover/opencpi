@@ -26,6 +26,9 @@ include $(OCPI_CDK_DIR)/include/application.mk
 Package=local
 export OCPI_LIBRARY_PATH=lib/rcc
 
-# These make the worker library for this application
-Implementations=hello.rcc
-include $(OCPI_CDK_DIR)/include/lib.mk
+all:
+	$(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
+	ocpidev -d components build
+
+clean::
+	ocpidev -d components clean

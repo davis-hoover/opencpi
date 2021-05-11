@@ -1772,7 +1772,7 @@ function do_build_here {
       cleanTarget+=" cleanhdl"
     fi
   local makefile=
-  [ ! -f Makefile -a "$dirtype" = worker ] && makefile=$OCPI_CDK_DIR/include/worker.mk
+  [ ! -f Makefile -a -f $OCPI_CDK_DIR/include/$dirtype.mk ] && makefile=$OCPI_CDK_DIR/include/$dirtype.mk
   make ${makefile:+-f $makefile} \
        ${cleanTarget:+$cleanTarget} ${verbose:+AT=} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
        ${buildNoAssemblies:+Assemblies=} \
