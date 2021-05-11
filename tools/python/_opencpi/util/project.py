@@ -87,7 +87,8 @@ def get_dir_info(directory=".", careful=False):
     top_xml_elements = None
     xml_file = directory + "/" + parts[0] + ".xml"
     if os.path.isfile(directory + "/Project.mk") or \
-       os.path.isfile(directory + "/Project.xml"):
+       os.path.isfile(directory + "/Project.xml") or \
+       os.path.isfile(directory + "/project-package-id"):
         # Do we need to check for project-package-id file in exports?
         make_type = asset_type = "project"
     elif len(parts) > 1:
@@ -129,6 +130,8 @@ def get_dir_info(directory=".", careful=False):
                 make_type = "hdl-" + name
         elif name == "devices" and get_dirtype(os.path.dirname(directory)) == "hdl-platform":
             make_type = asset_type = "library"
+        elif name == "assemblies" and parent == "gen":
+            make_type = "hdl-assemblies"
         else: # could actually be a devices library in a platform
             raise OCPIException("OpenCPI directory type of \"" + directory + "\" cannot be determined");
     elif name == "applications":

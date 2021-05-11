@@ -91,11 +91,11 @@ parseAsset(const char *file, const char *topElement) {
   ezxml_t xml;
   if ((err = parseFile(file, parent, topElement, &xml, xfile, true, false)) ||
       (err = 
-       strcasecmp(topElement, "project") ? parseProject(xml) :
-       strcasecmp(topElement, "library") ? parseLibrary(xml) :
-       strcasecmp(topElement, "hdllibrary") ? parseHdlLibrary(xml) :
-       strcasecmp(topElement, "hdlcore") ? parseHdlCore(xml) :
-       strcasecmp(topElement, "hdlassembly") ? parseHdlAssembly(xml) :
+       !strcasecmp(xml->name, "project") ? parseProject(xml) :
+       !strcasecmp(xml->name, "library") ? parseLibrary(xml) :
+       !strcasecmp(xml->name, "hdllibrary") ? parseHdlLibrary(xml) :
+       !strcasecmp(xml->name, "hdlcore") ? parseHdlCore(xml) :
+       !strcasecmp(xml->name, "hdlassembly") ? parseHdlAssembly(xml) :
        "Unknown asset type"))
     return OU::esprintf("For <%s> XML file %s:  %s", topElement, file, err);
   static const char *attrs[] = { ALL_ATTRS, NULL };
