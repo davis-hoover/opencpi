@@ -95,7 +95,7 @@ PKGS_D+=(libxml2-utils)
 #    thought this was a dependency of "lsb" on *ubuntu.
 PKGS_D+=(fakeroot)
 #    for asciidoc3 man page generation (asciidoc3 is a prereq)
-PKGS_D+=(xsltproc)
+PKGS_D+=(xsltproc docbook-xml docbook-xsl)
 
 ##########################################################################################
 # S. conveniences or required for source environment
