@@ -161,6 +161,12 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = "hdl-platform"
         elif parent == "applications":
             make_type = asset_type = "application"
+        elif parent == "primitives":
+            mt = get_maketype(directory)
+            if mt == "hdl-library" or mt == "hdl-lib":
+                make_type = asset_type = "hdl-library"
+            elif mt == "hdl-core":
+                make_type = asset_type = "hdl-core"
     if careful and make_type:
         match = get_maketype(directory)
         if match and match != make_type:

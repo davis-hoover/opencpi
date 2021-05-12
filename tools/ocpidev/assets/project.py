@@ -197,14 +197,21 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         Gets a list of all directories of type applications in the project and puts that
         applications directory and the basename of that directory into a dictionary to return
         """
-        return ocpiutil.get_subdirs_of_type("applications", self.directory)
+        apps=self.directory + "/applications"
+        return [ apps ] if os.path.isdir(apps) and ocpiutil.get_dirtype(apps) == "applications" else [];
 
     def get_valid_libraries(self):
         """
         Gets a list of all directories of type library in the project and puts that
         library directory and the basename of that directory into a dictionary to return
         """
-        return ocpiutil.get_subdirs_of_type("library", self.directory)
+        comps = self.directory + "/components"
+        dt = ocpiutil.get_dirtype(comps) if os.path.isdir(comps) else None
+        if not dt:
+            return []
+        if dt == "library":
+            return [ comps ]
+        return ocpiutil.get_subdirs_of_type("library", comps)
 
     def run(self):
         """
