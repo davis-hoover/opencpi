@@ -34,6 +34,32 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        +ad3 \
        0
 
+#
+# python3 version must be >= 3.6 for "asciidoc3".
+# If "python3" does not meet this requirement, "python3.6"
+# must exist, and if so, patch the python scripts to use
+# that instead of "python3".
+#
+echo "Checking python3 version"
+if [[ "$(python3 -V | grep -Po '(?<=Python )(.+)' | sed 's,\.,,g')" -lt "360" ]]; then
+  echo "System python3 version is < 3.6.0"
+  echo "Checking for python3.6"
+  if ! command -v python3.6 &>/dev/null; then
+    echo "ERROR: required python3 >= 3.6.0 not found"
+    exit 1
+  fi
+  for f in `find .. -name "*.py" -print`
+  do
+    echo "Patching \"$f\""
+    # gentle reminder: the '-' strips leading tabs, not generic whitespace.
+    ed $f <<-EOF
+	1s/python3/python3\.6
+	w
+	q
+	EOF
+  done
+fi
+
 cd ../..
 
 # So uses of this use $OCPI_PREREQUISITES_DIR/asciidoc3/ad3/<whatever>
