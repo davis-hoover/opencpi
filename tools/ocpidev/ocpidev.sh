@@ -670,7 +670,7 @@ function do_application {
     [ -e "$adir" ] || bad the application at \"$adir\" does not exist
     get_dirtype $adir
     [ "$dirtype" == application ] || bad the directory at $adir does not appear to be an application
-    ask delete the application project in the \"$adir\" directory
+    ask delete the application in the \"$adir\" directory
     rm -r -f $adir
     [ -z "$verbose" ] || echo The application \"$1\" in the directory \"$adir\" has been deleted.
     return 0

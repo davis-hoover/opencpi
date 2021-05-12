@@ -148,6 +148,8 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = "hdl-" + tag[3:]
         elif tag == "library":
             make_type = asset_type = "library"
+        elif tag == "application":
+            make_type = asset_type = "application"
     else: # could be library or platform or assembly or application
         if directory.startswith(name): # incure absolutizing penalty
             directory = os.path.realpath(directory)
