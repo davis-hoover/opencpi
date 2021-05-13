@@ -187,23 +187,25 @@ ifneq ($(MAKECMDGOALS),clean)
 else # for "clean" goal
   HdlTargets:=all
 endif
+ifdef HdlContainers
   ifndef ShellHdlAssemblyVars
     $(eval $(OcpiProcessBuildFiles))
     include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
   endif
+endif
 # Due to our filtering, we might have no targets to build
 ifeq ($(filter $(or $(OnlyPlatforms),$(HdlAllPlatforms)),$(filter-out $(ExcludePlatforms),$(HdlPlatforms)))$(filter skeleton,$(MAKECMDGOALS)),)
   $(and $(HdlPlatforms),$(info Not building assembly $(Worker) for platform(s): $(HdlPlatforms) in "$(shell pwd)"))
 #  $(info No targets or platforms to build for this "$(Worker)" assembly in "$(shell pwd)")
 else ifndef HdlContainers
   ifneq ($(MAKECMDGOALS),clean)
-    $(info No containers will be built since none match the specified platforms.)
+    $(info No containers will be built since none use the specified platforms.)
   endif
 else
   ifndef HdlSkip
     ifndef HdlContainers
       ifneq ($(MAKECMDGOALS),clean)
-        $(info No containers will be built since none match the specified platforms.)
+        $(info No containers will be built since none use the specified platforms.)
       endif
     else
       # We have containers to build locally.
