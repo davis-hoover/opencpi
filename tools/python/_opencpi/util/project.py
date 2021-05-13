@@ -133,8 +133,6 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = "library"
         elif name == "assemblies" and parent == "gen":
             make_type = "hdl-assemblies"
-        else: # could actually be a devices library in a platform
-            raise OCPIException("OpenCPI directory type of \"" + directory + "\" cannot be determined");
     elif name == "applications":
         # what is left: specs (not a thing), cards, devices, adapters
         make_type = "applications"
