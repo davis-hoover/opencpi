@@ -1352,6 +1352,7 @@ writeMakeVars(FILE *mkf) {
   writeVar(mkf, "XmlIncludeDirs", m_xmlIncludeDirs);
   writeVar(mkf, "IncludeDirs", m_includeDirs);
   writeVar(mkf, "ComponentLibraries", m_componentLibraries);
+  writeVar(mkf, "Configurations", m_configurations);
   writeVar(mkf, "Cores", m_cores);
   writeVar(mkf, "RccStaticPrereqLibs", m_staticPrereqLibs);
   writeVar(mkf, "RccDynamicPrereqLibs", m_dynamicPrereqLibs);
