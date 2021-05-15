@@ -35,13 +35,13 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        0
 
 #
-# python3 version must be >= 3.6 for "asciidoc3".
+# python3 version must be >= 3.6.0 for "asciidoc3".
 # If "python3" does not meet this requirement, "python3.6"
 # must exist, and if so, patch the python scripts to use
 # that instead of "python3".
 #
 echo "Checking python3 version"
-if [[ "$(python3 -V | grep -Po '(?<=Python )(.+)' | sed 's,\.,,g')" -lt "360" ]]; then
+if python3 -c "import sys; sys.exit(0 if sys.hexversion < 0x030600f0 else 1)"; then
   echo "System python3 version is < 3.6.0"
   echo "Checking for python3.6"
   if ! command -v python3.6 &>/dev/null; then
