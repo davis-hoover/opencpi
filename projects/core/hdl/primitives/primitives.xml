@@ -1,0 +1,2 @@
+<hdlprimitives
+    libraries='bsv fixed_float ocpi util cdc platform sdp axi sync protocol timed_sample_prot clocking'/>

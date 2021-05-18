@@ -1,0 +1,3 @@
+<build>
+  <parameter name='biasValue'  values='1,2,3'/>
+</build>

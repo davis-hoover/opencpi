@@ -1,4 +1,4 @@
-<HdlPlatform Language="VHDL" spec='platform-spec'>
+<HdlPlatform Language="VHDL" spec='platform-spec' libraries='sdp'>
   <specproperty name='platform' value='modelsim'/>
   <property name='sdpDropCount' type='uchar' volatile='1'/>
   <!-- All platform workers must provide these two ports -->

@@ -146,6 +146,7 @@ begin
   #else
     #define SDPCLK axi_in.a.clk
   #endif
+// clang 12.0 bug needs this line
   #if RESET_FROM_MASTER
     sdp_reset <= reset;
     axi_out.a.resetn <= not reset;
