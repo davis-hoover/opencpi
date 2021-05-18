@@ -34,7 +34,7 @@ function bad {
   [ -f $OcpiXilinxVivadoDir/.settings64-Vivado.sh ] ||
     bad No Xilinx settings file in $OcpiXilinxVivadoDir.
   [ -n "$verbose" ] && echo Attempting to run a tiny simulation to test xsim. 1>&2
-  probefile=$(cd $(dirname $0); pwd)/probe.exe.tgz
+  probefile=$(cd $(dirname $0); pwd)/../../xsim/probe.exe.tgz
   [ -f "$probefile" ] ||
     bad Missing xsim probe support file \"$probefile\".
   tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdirXXX'` # stackoverflow 30091
@@ -58,7 +58,6 @@ set -e
 # Pass arguments to the settings script to override current args
 . $OcpiXilinxVivadoDir/.settings64-Vivado.sh $OcpiXilinxVivadoDir
 export LM_LICENSE_FILE=$OcpiXilinxVivadoLicenseFile
-set -vx
 appname=${1##*.}
 package=${1%.*}
 assyname=${appname%%_x4sim*}

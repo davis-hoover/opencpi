@@ -139,6 +139,8 @@ ifneq ($(HdlSkip),1)
   #Tops:=$(Worker)_rv
   ifndef ShellHdlPlatformVars
     $(eval $(OcpiProcessBuildFiles))
+    # This is redundant with what is in worker.mk, when that file is included, but sometimes it isn't
+    override HdlExplicitLibraries:=$(call Unique,$(HdlLibraries) $(Libraries) $(HdlExplicitLibraries))
     $(eval $(HdlSearchComponentLibraries))
     include $(OCPI_CDK_DIR)/include/hdl/hdl-worker.mk
   endif

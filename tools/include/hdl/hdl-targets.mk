@@ -61,7 +61,7 @@ HdlTopTargets:=xilinx altera modelsim # icarus # verilator
 ###############################################################################
 # Xilinx targets
 ###############################################################################
-HdlTargets_xilinx:=isim virtex5 virtex6 artix7 spartan3adsp spartan6 zynq_ise zynq zynq_ultra xsim x4sim
+HdlTargets_xilinx:=isim virtex5 virtex6 artix7 spartan3adsp spartan6 zynq_ise zynq zynq_ultra xsim
 
 HdlTargets_virtex5:=xc5vtx240t xc5vlx50t xc5vsx95t xc5vlx330t xc5vlx110t
 HdlTargets_virtex6:=xc6vlx240t
@@ -119,13 +119,12 @@ HdlDefaultTarget_cyclone5:=AUTO
 
 ###############################################################################
 
-HdlSimTools=isim icarus verilator ghdl xsim x4sim modelsim
+HdlSimTools=isim icarus verilator ghdl xsim modelsim
 
 # Tools are associated with the family or above
 HdlToolSet_ghdl:=ghdl
 HdlToolSet_isim:=isim
 HdlToolSet_xsim:=xsim
-HdlToolSet_x4sim:=x4sim
 HdlToolSet_modelsim:=modelsim
 HdlToolSet_spartan3adsp:=xst
 HdlToolSet_virtex5:=xst
@@ -193,8 +192,8 @@ OcpiProjectDependencies=$(infox HPD:$1)$(strip\
   $(if $(wildcard $1/project-dependencies),$(- are we an exported project?)\
     $(shell cat $1/project-dependencies),\
     $(if $(wildcard $1/Project.xml),\
-      $(if $(call DoShell,set -vx && \
-             $(ToolsDir)/ocpixml  -t project -a '?ProjectDependencies' $1/Project.xml,\
+      $(if $(call DoShell,\
+             $(ToolsDir)/ocpixml  -t project -a '?ProjectDependencies' parse $1/Project.xml,\
              OcpiDeps),\
         $(error Failed to parse $1/Project.xml),\
         $(OcpiDeps)),\
@@ -204,6 +203,24 @@ OcpiProjectDependencies=$(infox HPD:$1)$(strip\
 
 HdlProjectDepsFromPlatformDir=$(strip\
   $(call OcpiProjectDependencies,$(call HdlProjectFromPlatformDir,$1)))
+
+HdlDoXmlPlatform=\
+  $(foreach x,$(or $(wildcard $1/$2.xml),$(wildcard $1/lib/hdl/$2.xml),-),\
+    $(and $(filter -,$x),\
+      $(error HDL platform $2, at $1, has no $2.xml file?))\
+    $(if $(call DoShell,\
+           $(ToolsDir)/ocpixml  -t hdlplatform -a '?part' -a '?family' parse $x,\
+           HdlPartAndFamily),\
+      $(error Failed to parse $x: $(HdlPartAndFamily)),\
+      $(eval HdlPart_$2:=$(firstword $(HdlPartAndFamily)))\
+      $(if $(HdlPart_$2),,$(error No "part" attribute found in XML file $x for HDL Platform $2))\
+      $(- if a family was specified for the part, check it against previous settings)\
+      $(foreach f,$(word 2,$(HdlPartAndFamily)),\
+        $(foreach t,$(HdlGetTargetFromPart),\
+          $(if $(HdlFamily_$t),\
+            $(if $(filter-out $f,$(HdlFamily_$t)),\
+              $(error the HDL platform $2 specified family $f for part $(HdlPart_$2), but the family for that part was already specified as $(HdlFamily_$t)),\
+              $(eval HdlFamily_$t:=$f)))))))
 
 # Add a platform to the database.
 # Arg 1: The directory where the *.mk file is
@@ -219,9 +236,12 @@ HdlProjectDepsFromPlatformDir=$(strip\
 #   We only error here if the user actually specified this platform at the command line
 #     (e.g. via HdlPlatform(s) or OCPI_HDL_PLATFORM)
 HdlAddPlatform=\
-  $(call OcpiDbg,HdlAddPlatform($1,$2,$3))\
   $(if $(HdlPlatformDir_$2),,\
-    $(eval include $1/$2.mk)\
+    $(if $(wildcard $1/$2.mk),\
+      $(- we assume the <plat>.mk file sets HdlPart_$2, and cannot set HdlFamily_$(HdlPart_$2))\
+      $(eval include $1/$2.mk),\
+      $(- otherwise we parse it out of the XML file, and maybe the family too)\
+      $(call HdlDoXmlPlatform,$1,$2))\
     $(if $(call HdlGetFamily,$(HdlPart_$2)),\
       $(eval HdlAllPlatforms:=$(strip $(HdlAllPlatforms) $2))\
       $(eval HdlPlatformDir_$2:=$3)\
@@ -239,32 +259,32 @@ HdlAddPlatform=\
 # Call this with a directory that is a platform's directory, either source (with "lib" subdir
 # if built) or project-exported. For the individual platform directories we need to deal with
 # the prebuilt, postbuilt, and exported scenarios.  Hence the complexity.
-# Both the *.xml and *.mk are generally needed, but the *.mk is more critical here,
+# Both *.xml needed, but the *.mk may be required on older platforms
 # so we key on that.
 # If we are pointing at a non-exported platform directory, we prefer its local export subdir
-# ("lib"), if the hdl/*.mk is present.
+# ("lib"), if the lib/hdl/*.xml is present.
 # (under hdl since it is in fact a worker in a library)
 HdlDoPlatform=\
   $(foreach p,$(notdir $1),\
-    $(foreach d,$(if $(wildcard $1/lib/$p.mk),$1/lib,$1),\
-      $(if $(filter clean%,$(MAKECMDGOALS))$(call OcpiExists,$d/$p.mk),,$(error no $p.mk file found for platform under: $1))\
-      $(if $(wildcard $d/$p.mk),,$(error no $p.mk file found under $1. $p not built?))\
-      $(call HdlAddPlatform,$d,$p,$d)))
-
+    $(if $(wildcard $1/lib/hdl/$p.xml),\
+      $(call HdlAddPlatform,$d,$p,$1/lib),\
+      $(if $(call OcpiExists,$d/$p.xml),\
+        $(call HdlAddPlatform,$d,$p,$d),\
+        $(error no $p.xml file found for platform under: $1))))
 # Handle a directory named "platforms", exported or not
 HdlDoPlatformsDir=\
-  $(- if the project has been exported at all, even without building, the $1/mk will be there)\
-  $(if $(wildcard $1/mk),\
-    $(foreach d,$(wildcard $1/mk/*.mk),\
+  $(- if the project has been exported at all, even without building, the $1/xml will be there)\
+  $(if $(wildcard $1/xml),\
+    $(foreach d,$(wildcard $1/xml/*.xml),\
       $(foreach p,$(basename $(notdir $d)),\
         $(- the 3rd arg is a directory that may not exist yet)\
-        $(call HdlAddPlatform,$1/mk,$p,$1/$p))),\
+        $(call HdlAddPlatform,$1/xml,$p,$1/$p))),\
     \
-    $(- no $1/mk means we are pointing into the source tree, so the platform dir points into "lib")\
+    $(- no $1/xml means we are pointing into the source tree, so the platform dir points into "lib")\
     $(- and the lib subdir may not exist yet)\
     $(foreach d,$(wildcard $1/*),\
       $(foreach p,$(notdir $d),\
-        $(and $(wildcard $d/$p.mk),$(call HdlDoPlatform,$d)))))
+        $(and $(wildcard $d/$p.xml),$(call HdlDoPlatform,$d)))))
 
 ################################################################################
 # $(call HdlGetTargetFromPart,hdl-part)

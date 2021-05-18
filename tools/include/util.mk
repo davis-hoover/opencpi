@@ -349,7 +349,8 @@ OcpiGenEnv=\
     OCPI_HDL_LIBRARIES="$(call Unique,$(HdlExplicitLibraries))"\
     OCPI_ALL_HDL_TARGETS="$(OCPI_ALL_HDL_TARGETS)" \
     OCPI_ALL_RCC_TARGETS="$(OCPI_ALL_RCC_TARGETS)" \
-    OCPI_ALL_OCL_TARGETS="$(OCPI_ALL_OCL_TARGETS)"
+    OCPI_ALL_OCL_TARGETS="$(OCPI_ALL_OCL_TARGETS)" \
+    OCPI_AUTO_BUILD_WORKERS="$(OCPI_AUTO_BUILD_WORKERS)"
 
 OcpiGenTool=$(OcpiGenEnv) $(OCPI_VALGRIND) $(ToolsDir)/ocpigen \
   $(call OcpiFixPathArgs,$(patsubst %,-I%,$(XmlIncludeDirsInternal)) $1)
@@ -378,6 +379,10 @@ OcpiGen=$(call OcpiGenArg,,$1)$(infox OGA:$(call OcpiGenArg,,$1))
 #  $(if $(call DoShell,ls -l,Value),$(error $(Value)),$(Value))
 #DoShell=$(eval X:=$(shell X=`bash -c '$1; exit $$?' 2>&1`;echo $$?; echo "$$X" | sed "s/\#/<pound>/g"))$(strip \
 #
+define OcpiNewLine
+
+
+endef
 DoShell=$(eval X:=$(shell X=`bash -c '$1; exit $$?'`;echo $$?; echo "$$X" | sed "s/\#/<pound>/g"))$(strip \
 	     $(call OcpiDbg,DoShell($1,$2):X:$X) \
              $(eval $2:=$(wordlist 2,$(words $X),$X))\
@@ -397,10 +402,7 @@ OcpiCallPythonFunc=\
 # Import the ocpiutil module and run the python code in $1
 # Usage: $(call OcpiCallPythonUtil,ocpiutil.utility_function(arg1, arg2))
 OcpiCallPythonUtil=$(infox OPYTHON:$1)\
-  $(shell python3 -c 'import sys;\
-sys.path.append("$(OCPI_CDK_DIR)/$(OCPI_TOOL_PLATFORM)/lib/");\
-import _opencpi.util as ocpiutil;\
-$1')
+  $(shell PYTHONPATH=$(PYTHONPATH) python3 -c 'import _opencpi.util as ocpiutil;$1')
 
 # Like the builtin "dir", but without the trailing slash
 OcpiDir=$(foreach d,$1,$(patsubst %/,%,$(dir $1)))
@@ -655,7 +657,7 @@ OcpiGetProjectImports=$(strip \
                             $(OcpiProjectRegistryDir),\
                             $(call OcpiImportsDirForContainingProject,.)),\
 	        $(wildcard $i/*)),\
-    $(if $(filter $(realpath $p),$(realpath $(OcpiAbsPathToContainingProject))),\
+    $(if $(filter $(realpath $p),$(realpath $(call OcpiAbsPathToContainingProject,.))),\
       ,\
       $p )))
 
@@ -870,6 +872,8 @@ define OcpiSetProjectX
   ifndef ProjectPackage
     ifneq ($$(Package),)
       override ProjectPackage:=$$(Package)
+    else ifneq ($$(PackageID),)
+      override ProjectPackage:=$$(PackageID)
     else
       ifeq ($$(PackagePrefix),)
         export PackagePrefix:=local
@@ -925,18 +929,13 @@ ifdef NEVER
     export OCPI_PROJECT_ADDED_TARGET_DIRS:=1
   endif
 endif
-# Look into a directory in $1 and determine which type of directory it is by looking at the Makefile.
-# Also checks Makefile.am for autotools version
-# If a dirtype is not found, check if $1 is the CDK. If so, return 'project'
+# Look into a directory in $1 and determine which type of directory it is
 # Return null if there is no type to be found
 OcpiGetDirType=$(strip\
   $(foreach t,$(call OcpiCacheFunctionOnPath,OcpiGetDirTypeX,$1),$(infox GDTr:$1:$t)$t))
-OcpiGetDirTypeX=$(strip $(infox GDT1:$1:$1/Makefile:$(realpath $1/Makefile))\
-  $(and $(wildcard $1/Makefile),\
-    $(foreach d,$(shell sed -n \
-                  's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*$$=\1=p' \
-                  $1/Makefile | tail -1),\
-      $(infox OGT1: found type: $d ($1))$(notdir $d))))
+OcpiGetDirTypeX=$(strip $(infox GDT1:$1)\
+  $(foreach t,$(call OcpiCallPythonUtil,print(ocpiutil.get_dirtype("$1"))),\
+     $(infox GDT1: found type: $t for $1)$t))
 
 # Get the directory type of arg1, and return the portion after the last dash.
 # E.g. in an hdl-platform directory, this will return platform
@@ -984,7 +983,7 @@ OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(O
 OcpiIncludeParentAsset_library=\
   $(if $(filter devices cards,$(notdir $(realpath $1))),\
     $(eval ComponentLibraries+=devices))\
-  $(if $(filter %-platform,$(call OcpiGetDirType,$(and $1,$1/)..)),\
+  $(if $(filter %-platform application,$(call OcpiGetDirType,$(and $1,$1/)..)),\
     $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,$2,$3),\
     $(call OcpiIncludeProject,$3,lib))
 
@@ -1011,6 +1010,9 @@ OcpiIncludeParentAsset_platform=\
 
  OcpiIncludeParentAsset_hdl=\
    $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,$2,$3)
+
+ OcpiIncludeParentAsset_application=$(infox PRIMITIVES:$(Model))\
+   $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)../..,,$3)
 
 # For asset in directory arg1, look for makefile <arg2>.mk and include it to
 # extract any variables that are set.  Clear the package variables so that the
@@ -1065,7 +1067,7 @@ endef
 OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
   $(foreach t,$(call OcpiGetDirType,$1),\
     $(foreach s,$(if $(filter hdl-lib% hdl-core,$t),primitive,$(lastword $(subst -, ,$t))),\
-      $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c)\
+      $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c:$(ParentPackage))\
         $(if $(filter-out undefined,$(origin OcpiIncludeParentAsset_$s)),\
           $(call OcpiIncludeParentAsset_$s,$1,$2,$3),\
           $(call OcpiIncludeProject,$3,asset))\

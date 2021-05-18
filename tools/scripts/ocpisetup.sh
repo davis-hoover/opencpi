@@ -28,7 +28,7 @@ This ocpisetup.sh script is obsolete and deprecated.
 Use the opencpi-setup.sh script, which is sourced where it lives in the top level CDK directory.
 E.g.:  source <where-the-cdk-is>/opencpi-setup.sh
 If using a clean/virgin unbuilt source tree, and in that directory,
-use "./scripts/init-opencpi.sh" first (not sourced) or "make exports"
+use "source ./scripts/init-opencpi.sh" first or "make exports"
 then use: "source cdk/opencpi-setup.sh <options>"
 EOF
 _MYNAME=ocpisetup.sh

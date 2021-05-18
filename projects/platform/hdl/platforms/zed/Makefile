@@ -17,8 +17,4 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # The zed platform.
-Libraries=zynq sdp
-ParamValues_useGP1=0/1
-Configurations=base acp gp1
-
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
