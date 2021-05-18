@@ -31,7 +31,9 @@ else
   PROJ_FILE=Project.mk
 endif
 
+ifeq ($(filter exports imports,$(MAKECMDGOALS)),)
 $(OcpiIncludeProject)
+endif
 # FIXME: can we test for licensing?
 # FIXME: Error message makes no sense if give hdltargets but not platforms
 doimports=$(shell $(OcpiExportVars) $(MAKE) $(PMF) imports NoExports=1)

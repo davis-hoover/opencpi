@@ -55,7 +55,15 @@ rm -f /tmp/tmp.$$
 echo "Exporting the platform '$OCPI_TARGET_PLATFORM' from its project."
 project=$(cd "$OCPI_TARGET_PLATFORM_DIR/../../.."; pwd)
 project=${project%/exports}
-make -C "$project" exports
+
+function domake {
+  local dir="$1"
+  shift
+  local mkf
+  [ -f "$1"/Makefile ] || mkf="-f $OCPI_CDK_DIR/include/project.mk"
+  make -C "$dir" $mkf $@
+}
+domake "$project" exports
 
 # Build the framework
 echo "Now we will build the OpenCPI framework libraries and utilities for $OCPI_TARGET_DIR"
@@ -85,29 +93,29 @@ Projects="core platform assets assets_ts inactive tutorial"
 # Build built-in RCC components
 echo ================================================================================
 echo "Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_DIR"
-for p in $Projects; do make -C projects/$p rcc; done
+for p in $Projects; do domake projects/$p rcc; done
 
 # Build built-in OCL components
 echo ================================================================================
 echo "Now we will build the built-in OCL '(GPU)' components for the available OCL platforms"
-for p in $Projects; do make -C projects/$p ocl; done
+for p in $Projects; do domake projects/$p ocl; done
 
 # Build built-in HDL components
 # [ -n "$HdlPlatforms" -o -n "$HdlPlatform" ] && {
   echo ================================================================================
   echo "Now we will build the built-in HDL components for platforms: $HdlPlatform $HdlPlatforms"
   echo "Even if there are no HDL platforms, this step is still needed to build proxies"
-  for p in $Projects; do make -C projects/$p hdl HdlPlatforms="$HdlPlatforms $HdlPlatform"; done
+  for p in $Projects; do domake projects/$p hdl HdlPlatforms="$HdlPlatforms $HdlPlatform"; done
 # }
 
 # Build tests
 echo ================================================================================
 echo "Now we will build the core tests for $OCPI_TARGET_DIR"
-make -C projects/core test
+domake projects/core test
 echo ================================================================================
 echo "Now we will build the example applications in assets and inactive projects for $OCPI_TARGET_DIR"
-make -C projects/assets applications
-make -C projects/inactive applications
+domake projects/assets applications
+domake projects/inactive applications
 
 # Ensure any framework exports that depend on built projects happen
 make exports Platforms="$OCPI_TARGET_DIR"
