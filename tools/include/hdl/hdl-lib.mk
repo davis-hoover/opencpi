@@ -73,9 +73,9 @@ ifneq ($(Imports)$(ImportCore)$(ImportBlackBox),)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-import.mk
 endif
 
-ifndef OcpiDynamicMakefile
-$(OutLibFiles): Makefile
-endif
+# ifndef OcpiDynamicMakefile
+# $(OutLibFiles): Makefile
+# endif
 
 $(eval $(HdlInstallLibsAndSources))
 

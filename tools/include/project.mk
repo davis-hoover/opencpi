@@ -17,6 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # This file is the make file for a project
+PMF := -f $(lastword $(MAKEFILE_LIST))
 include $(OCPI_CDK_DIR)/include/util.mk
 
 # This is mandatory since it signifies that this directory is a project
@@ -33,7 +34,7 @@ endif
 $(OcpiIncludeProject)
 # FIXME: can we test for licensing?
 # FIXME: Error message makes no sense if give hdltargets but not platforms
-doimports=$(shell $(OcpiExportVars) $(MAKE) imports NoExports=1)
+doimports=$(shell $(OcpiExportVars) $(MAKE) $(PMF) imports NoExports=1)
 ifeq ($(HdlPlatform)$(HdlPlatforms),)
   ifeq ($(filter clean%,$(MAKECMDGOALS))$(filter imports projectpackage,$(MAKECMDGOALS)),)
     $(infox $(doimports))
@@ -46,7 +47,7 @@ ifeq ($(HdlPlatform)$(HdlPlatforms),)
 endif
 
 # imports need to be created before exports etc.
-ifeq ($(filter imports projectpackage,$(MAKECMDGOALS)),)
+ifeq ($(filter imports projectpackage clean%,$(MAKECMDGOALS)),)
   ifeq ($(wildcard imports),)
     $(info Setting up imports)
     $(infox $(doimports))
@@ -58,7 +59,7 @@ endif
 
 ifeq ($(NoExports)$(wildcard exports)$(filter projectpackage,$(MAKECMDGOALS)),)
   doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh - $(OCPI_PROJECT_PACKAGE) xxx)
-  ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+  ifeq ($(filter clean% imports,$(MAKECMDGOALS)),)
     $(info Setting up exports)
     $(infox $(doexports))
   else
@@ -75,8 +76,12 @@ ifeq (@,$(AT))
 endif
 
 OcpiToProject=$(subst $(Space),/,$(patsubst %,..,$(subst /, ,$1)))
-MaybeMake=\
-  if [ -d $1 ] ; then $(MAKE) --no-print-directory -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2; fi
+MaybeMake=$(infox MAYBE:$1:$2)\
+  $(foreach f,$(if $(wildcard $1/Makefile),Makefile,\
+                $(foreach t,$(call OcpiGetDirType,$1),$(infox DT:$1:$t)\
+                  $$OCPI_CDK_DIR/include/$(and $(filter hdl-%,$t),hdl/)$t.mk)),\
+     if [ -d $1 ] ; then \
+       $(MAKE) -f $f --no-print-directory -r -C $1 OCPI_PROJECT_REL_DIR=$(call OcpiToProject,$1) $2; fi)
 
 # Three parameters - $1 is before platform, $2 is after platform, $3 is call to $(MAKE)
 MaybeMakePlatforms=\
@@ -157,44 +162,44 @@ exports:
 	$(OCPI_CDK_DIR)/scripts/export-project.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
 
 components: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,components,rcc hdl)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlprimitives: imports
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/primitives)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlcomponents: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,components,hdl)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdldevices: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/devices)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdladapters: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/adapters)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlcards: hdlprimitives
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/cards)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlplatforms: hdldevices hdlcards hdladapters
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/platforms)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 hdlassemblies: hdlcomponents hdlplatforms hdlcards hdladapters
-	$(MAKE) imports
+	$(MAKE) $(PMF) imports
 	$(call MaybeMake,hdl/assemblies)
-	$(MAKE) exports
+	$(MAKE) $(PMF) exports
 
 # Everything that does not need platforms
 hdlportable: hdlcomponents hdladapters hdldevices hdlcards
@@ -205,9 +210,8 @@ cleanhdl cleanrcc cleanocl cleancomponents cleanapplications: imports
 
 cleanhdl:
 	$(call MaybeMake,components,cleanhdl)
-	for d in primitives devices adapters cards platforms assemblies; do \
-	  [ ! -d hdl/$$d ] || $(MAKE) -C hdl/$$d clean; \
-	done
+	$(foreach d,primitives devices adapters cards platforms assemblies,\
+	  $(call MaybeMake,hdl/$d,clean) &&): \
 
 rcc ocl hdl: imports exports
 
@@ -257,7 +261,7 @@ cleanapplications:
 # Note that imports must be cleaned last because the host rcc platform directory
 # needs to be accessible via imports for projects other than core
 # (e.g. for cleaning rcc)
-clean: cleancomponents cleanapplications cleanrcc cleanhdl cleanexports cleanimports
+clean: cleanapplications cleanrcc cleanhdl cleanocl cleanexports cleanimports
 	rm -r -f artifacts project-metadata.xml
 
 # Iterate through symlinks in imports. If the link points to the project registry dir,

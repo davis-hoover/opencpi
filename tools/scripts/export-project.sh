@@ -172,16 +172,20 @@ function nonoun {
     exit 1
 }
 function topdirs {
-    # echo topdirs:$1:$2 > /dev/tty
+    #echo topdirs:$1:$2 > /dev/tty
     local dirs=`shopt -s nullglob; for d in $1/*; do [ -d $d -a $(basename $d) != lib ] && echo $(basename $d); done`
     local -a rdirs
     if [ -n "$2" ]; then
       for d in $dirs; do
-	  if test -f $1/$d/Makefile && egrep -q "^[ 	]*include[ 	]*.*/include/$2.mk" $1/$d/Makefile; then
-	    rdirs+=($d)
-	  else
-	    [ -n "$verbose" ] && echo Ignoring $d when looking for $2 1>&2
-	  fi
+        dt=$(ocpiDirType $1/$d)
+        if [[ "$dt" == "hdl*" ]]; then
+	    dt=hdl/$dt
+        fi
+        if [[ $dt =~ $2 ]]; then
+	  rdirs+=($d)
+	else
+	  [ -n "$verbose" ] && echo "Ignoring $d (type $dt) when looking for $2" 1>&2
+	fi
       done
     else
 	rdirs=($dirs)
@@ -279,7 +283,7 @@ for a in $assets; do
 	      noun=${model}_platforms; needname=$model/platforms;;
 	  primitives|assemblies)
 	      [ "$model" != hdl ] && bad \"$arg\" only supported for HDL model
-	      all=`topdirs $model/$arg "hdl/hdl-(core|library|lib)"`
+	      all=`topdirs $model/$arg "hdl-(core|library|lib)"`
 	      if [ -z "$all" ]; then
 		  warn_check "Warning:  cannot export $model $arg since none exist"
 	      else
@@ -287,10 +291,10 @@ for a in $assets; do
 	      fi;;
 	  platforms)
 	      case "$model" in
-		  hdl) allhdl=`topdirs hdl/platforms hdl/hdl-platform`;;
+		  hdl) allhdl=`topdirs hdl/platforms hdl-platform`;;
 		  rcc) allrcc=`topdirs rcc/platforms`;;
 		  "")
-		      allhdl=`topdirs hdl/platforms hdl/hdl-platform`
+		      allhdl=`topdirs hdl/platforms hdl-platform`
 		      allrcc=`topdirs rcc/platforms`;;
 	      esac
 	      if [ -z "$allrcc$allhdl" ]; then
@@ -335,9 +339,8 @@ for a in $assets; do
 		  fi
 	      else
 		  if [ -z "$model" ] ; then
-		      if [ -f components/Makefile ] &&
-			     egrep -q '^[ 	]*include[ 	]*.*/include/(lib|library).mk' \
-				   components/Makefile; then
+                     dt=$(ocpiDirType components)
+		     if [ "$dt" = library ]; then
 			 libraries=(components)
 		     else
 			 libraries=(`topdirs components "(lib|library)"`)
@@ -409,7 +412,7 @@ fi
 [ -n "$verbose" -a -n "$hdl_platforms" ] && echo Processing hdl platforms
 for p in ${hdl_platforms[*]}; do
   d=hdl/platforms/$p
-  [ -f $d/Makefile -a -f $d/$p.xml ] || bad HDL platform $p not exported due to missing files in $d
+  [ -f $d/$p.xml ] || bad HDL platform $p not exported due to missing files in $d
   [ -d $d/lib ] && make_filtered_link $d/lib exports/hdl/platforms/$p platform
   # this $p.xml link is for bootstrapping before the platform is built to show it exists
   make_filtered_link $d/$p.xml exports/hdl/platforms/xml/$p.xml platform
@@ -434,9 +437,8 @@ for l in ${libraries[*]} ${hdl_libraries[*]} ${rcc_libraries[*]} ; do
       */*) d=$l; n=$(basename $l);;
       *) d=components/$l; n=$l;;
   esac
-  [  -d $d -a  -f $d/Makefile ] || bad Component library $l not exported due to missing files in $d
-  egrep -q '^[ 	]*include[ 	]*.*/include/(lib|library).mk' $d/Makefile ||
-      bad Component library $l failed due to missing/wrong '"include"' line in $d/Makefile
+  dt=$(ocpiDirType $d)
+  [ "$dt" = library ] || bad Component library $l not exported due to missing files in $d
   make_filtered_link $d/lib exports/lib/$n component
 done
 
@@ -447,14 +449,11 @@ done
 # since they depend on each other
 for p in ${hdl_primitives[*]}; do
     d=hdl/primitives/$p
-    [ -f $d/Makefile ] || bad HDL primitive $p not exported due to missing Makefile in $d
-    if grep -q '^[ 	]*include[ 	]*.*/include/hdl/hdl-core.mk' $d/Makefile; then
-	type=core
-    elif egrep -q '^[ 	]*include[ 	]*.*/include/hdl/hdl-(lib|library).mk' $d/Makefile; then
-	type=library
-    else
-      bad HDL primitive library $p due to missing or bad '"include"' line in $d/Makefile
-    fi
+    case $(ocpiDirType $d) in
+      hdl-core) type=core;;
+      hdl-library) type=library;;
+      *) bad HDL primitive library $p due to unrecognizable asset type in directory $d;;
+    esac
     make_filtered_link hdl/primitives/lib/$p exports/lib/hdl/$p primitive
     [ $type = core ] &&
       make_filtered_link hdl/primitives/lib/${p}_bb exports/lib/hdl/${p}_bb primitive
@@ -519,7 +518,11 @@ set +f
 # shared implementation some other way that avoided all the recursion.
 # Or change the python to do this and not use "make".
 for i in components components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
-    [ -d $i ] && [ "$(ocpiDirType $i)" = library ] && make --no-print-directory -C $i speclinks
+    if [ -d $i ] && [ "$(ocpiDirType $i)" = library ]; then
+	mf=
+	[ -f $i/Makefile ] || mf="-f $OCPI_CDK_DIR/include/library.mk"
+        make -r --no-print-directory -C $i $mf speclinks
+    fi
 done
 exit 0
 

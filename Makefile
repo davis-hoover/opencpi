@@ -369,9 +369,13 @@ Projects=core platform assets inactive assets_ts tutorial
 ProjectGoals=cleanhdl cleanrcc cleanocl rcc ocl hdl applications run runtest hdlprimitives \
              hdlportable components cleancomponents test
 # These are not done in parallel since we do not know the dependencies
-DoProjects=set -e; . $(OCPI_CDK_DIR)/opencpi-setup.sh -r -b; $(foreach p,$(Projects),\
+DoProjects=set -e; . $(OCPI_CDK_DIR)/opencpi-setup.sh -r -b; \
+                     $(foreach p,$(Projects),\
+                       if [ ! -f projects/$p/Makefile ]; then \
+                         mf="-f $(OCPI_CDK_DIR)/include/project.mk";\
+                       fi && \
                      echo Performing $1 on project $p && \
-                     $(MAKE) -C projects/$p $(if $(filter build,$1),,$1) &&) :
+                     $(MAKE) $$mf -C projects/$p $(if $(filter build,$1),,$1) &&) :
 .PHONY: $(ProjectGoals) testprojects
 $(ProjectGoals):
 	$(AT)$(call DoProjects,$@)

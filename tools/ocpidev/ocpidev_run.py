@@ -211,11 +211,15 @@ def main():
             dir_type = ocpiutil.get_dirtype()
             # args['name'] could be None if no name is provided at the command line
             name = args['name']
-            directory = ocpiutil.get_ocpidev_working_dir(noun=args.get("noun", ""),
-                                                         name=name,
-                                                         library=args['library'],
-                                                         hdl_library=args['hdl_library'],
-                                                         hdl_platform=args['hdl_plat_dir'])
+            if not name and dir_type == "test":
+                directory = os.path.realpath('.')
+                name = os.path.basename(directory)
+            else:
+                directory = ocpiutil.get_ocpidev_working_dir(noun=args.get("noun", ""),
+                                                             name=name,
+                                                             library=args['library'],
+                                                             hdl_library=args['hdl_library'],
+                                                             hdl_platform=args['hdl_plat_dir'])
             if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
                 name = os.path.basename(os.path.realpath('.'))
             del args['name']

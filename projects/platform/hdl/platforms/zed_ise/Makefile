@@ -19,6 +19,12 @@
 # The zed_ise platform, mostly copied from zed
 
 include $(OCPI_CDK_DIR)/include/util.mk
+
+# Clone what we can from the zed platform
+# Source code can be sym-linked
+# Extract configurations *from zed_ise xml* and symlink to them in zed (except base)
+# OWD cannot be symlinked - it has part numbers and platform names
+# So OWD is original here and must be updated if zed.xml is updated.
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
     test -e zed_ise.vhd || ln -s ../zed/zed.vhd zed_ise.vhd; \

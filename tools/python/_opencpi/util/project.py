@@ -42,6 +42,12 @@ def get_make_vars_rcc_targets():
 # in a project
 ###############################################################################
 
+def get_makefile(directory, type=None):
+    if not type:
+        type = get_dirtype(directory)
+    mkf = directory + "/Makefile"
+    return mkf if os.path.exists(mkf) else os.environ["OCPI_CDK_DIR"] + "/include/" + type + ".mk"
+
 def get_dirtype(directory="."):
     """
     Return the make-type of the directory or non if it has no make-type
@@ -393,7 +399,8 @@ def get_project_package(origin_path="."):
 
         # Otherwise, ask Makefile at the project top for the ProjectPackage
         if project_package is None or project_package == "":
-            project_vars = set_vars_from_make("Makefile",
+            project_vars = set_vars_from_make("Makefile" if os.path.exists("Makefile") else
+                                              os.environ["OCPI_CDK_DIR"] + "/include/project.mk",
                                               "projectpackage ShellProjectVars=1", "verbose")
             if (not project_vars is None and 'ProjectPackage' in project_vars and
                     len(project_vars['ProjectPackage']) > 0):

@@ -31,7 +31,8 @@ from _opencpi.util import OCPIException
 # Utility functions for extracting variables and information from and calling
 # Makefiles
 ###############################################################################
-def execute_cmd(settings, directory, action=None):
+
+def execute_cmd(settings, directory, action=None, file=None):
     """
     This command is a wrapper around any calls to make in order to encapsulate the use of make to a
     minimal number of places.  The function contains a hard-coded dictionary of generic settings to
@@ -57,6 +58,10 @@ def execute_cmd(settings, directory, action=None):
     make_list.append("-C")
     make_list.append(directory)
     debug_string = "make -C " + directory
+    if file:
+        make_list.append("-f")
+        make_list.append(file)
+        debug_string += " -f " + file
 
     if action is not None:
         make_list.extend(action)
