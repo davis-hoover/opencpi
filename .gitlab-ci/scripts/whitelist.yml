@@ -10,7 +10,6 @@ centos7:
   isim:
   modelsim:
   xsim:
-  x4sim:
   # hdl
   adrv9361:
     - xilinx19_2_aarch32
