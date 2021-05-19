@@ -84,12 +84,20 @@ else:
 
 # Generate the expected data that was sent to compare to the output data and also grab the number
 # of data sent for each message
-# Multiplying messagesToSendInitial by 2 because there are 2 message fields
-messagesLength = messagesToSendInitial*2
 bytes = 0
+messagesLength = 0
 opcodesSent = np.array([], dtype=np.uint32)
 data = np.array([], dtype=np.uint32)
 start = 0
+wrapAround = False
+if (dataRepeat == "true" and messagesToSendInitial > numMessagesMax):
+    # Multiplying messagesToSendInitial by 2 because there are 2 message fields
+    messagesLength = numMessagesMax*2
+    wrapAround = True
+    messagesLengthWrapAround=(messagesToSendInitial-numMessagesMax)*2
+else:
+    # Multiplying messagesToSendInitial by 2 because there are 2 message fields
+    messagesLength = messagesToSendInitial*2
 for x in range(0, messagesLength, 2):
     bytes = bytes + messages[x]
     opcodesSent = np.append(opcodesSent, messages[x+1])
@@ -99,6 +107,12 @@ for x in range(0, messagesLength, 2):
     elif (dataRepeat == "false"):
         data = np.append(data, np.arange(start, start+stop))
         start += stop
+if (wrapAround == True):
+    for x in range(0, messagesLengthWrapAround, 2):
+        bytes = bytes + messages[x]
+        opcodesSent = np.append(opcodesSent, messages[x+1])
+        stop = messages[x]//4
+        data = np.append(data, np.arange(0,stop))
 
 opcodeReceived = np.array([], dtype=np.uint32)
 odata = np.array([], dtype=np.uint32)
