@@ -555,7 +555,7 @@ equal(ParamConfig &other) {
 
 // Find the auto build file
 // if it is not there, set the filename anyway, and set xml == NULL
-// if XML != NULL, the contents is good
+// if XML != NULL, the contents are good
 // This function is used by both readers and writers
 static const char *
 autoBuildFile(const char *owd, const std::string &parent, const char *implName, std::string &file,

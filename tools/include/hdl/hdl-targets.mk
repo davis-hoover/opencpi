@@ -259,8 +259,8 @@ HdlAddPlatform=\
 # Call this with a directory that is a platform's directory, either source (with "lib" subdir
 # if built) or project-exported. For the individual platform directories we need to deal with
 # the prebuilt, postbuilt, and exported scenarios.  Hence the complexity.
-# Both *.xml needed, but the *.mk may be required on older platforms
-# so we key on that.
+# The *.xml is always needed, but the *.mk may be used (and processed) on older platforms
+# So we key on the *.xml file.
 # If we are pointing at a non-exported platform directory, we prefer its local export subdir
 # ("lib"), if the lib/hdl/*.xml is present.
 # (under hdl since it is in fact a worker in a library)

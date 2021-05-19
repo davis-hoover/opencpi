@@ -274,6 +274,7 @@ begin
 #if AXI4
   axi_out.AW.REGION            <= (others => '0');
   axi_out.AW.QOS               <= (others => '0');
+  axi_out.AR.REGION            <= (others => '0');
   axi_out.AR.QOS               <= (others => '0');
 #endif  
   -- Write address channel

@@ -101,7 +101,7 @@ add to tree.
   CMD_OPTION  (comp,      G,    Bool,   NULL, "Generate component output for use with ocpidev") \
   CMD_OPTION  (rxml,      R,    Bool,   NULL, "Parse project level properties from XML properties") \
   CMD_OPTION  (optimized, Q,    Bool,   NULL, "Specify that compilation is optimized, for artifacts") \
-  CMD_OPTION  (auto_build,U,    Bool,   NULL, "Auto build worokers found in assembly") \
+  CMD_OPTION  (auto_build,U,    Bool,   NULL, "Auto build workers found in assembly") \
 
 #define OCPI_OPTION
 #define OCPI_OPTIONS_NO_MAIN
