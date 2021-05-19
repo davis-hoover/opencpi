@@ -10,8 +10,8 @@ ocpirun -d -v -x test_width_v2
 
 The pattern_v2 component sends the following messages:
 
-msg1 = {0x00000000} with opcode 251, msg2 = {0x00000000,0x00000001} with opcode 252, msg3 = {0x00000000,0x00000001,0x00000002} with opcode 253,
-msg4 = {0x00000000,0x00000001,0x00000002,0x00000003} with opcode 254, msg5 = {0x00000000,0x00000001,0x00000002,0x00000003,0x00000004} with opcode 255
+msg1 = {0x00000000} with opcode 0, msg2 = {0x00000000,0x00000001} with opcode 0, msg3 = {0x00000000,0x00000001,0x00000002} with opcode 0,
+msg4 = {0x00000000,0x00000001,0x00000002,0x00000003} with opcode 0, msg5 = {0x00000000,0x00000001,0x00000002,0x00000003,0x00000004} with opcode 0
 
 The first bias component (bias0) adds the bias value 1 to the data in the messages.
 
@@ -19,5 +19,5 @@ The second bias component (bias1) adds the bias value 2 to the data in the messa
 
 The expected messages capture_v2 will receive are:
 
-msg1 = {0x00000003} with opcode 251, msg2 = {0x00000003,0x00000004} with opcode 252, msg3 = {0x00000003,0x00000004,0x00000005} with opcode 253,
-msg4 = {0x00000003,0x00000004,0x00000005,0x00000006} with opcode 254, msg5 = {0x00000003,0x00000004,0x00000005,0x00000006,0x00000007} with opcode 255
+msg1 = {0x00000003} with opcode 0, msg2 = {0x00000003,0x00000004} with opcode 0, msg3 = {0x00000003,0x00000004,0x00000005} with opcode 0,
+msg4 = {0x00000003,0x00000004,0x00000005,0x00000006} with opcode 0, msg5 = {0x00000003,0x00000004,0x00000005,0x00000006,0x00000007} with opcode 0

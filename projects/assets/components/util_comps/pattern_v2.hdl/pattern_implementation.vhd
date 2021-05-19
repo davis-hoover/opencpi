@@ -155,7 +155,7 @@ begin
           s_keep_repeating_r <= '1';
         -- Report an error if messagesToSend is greater than numMessagesMax
         elsif (messagesToSend_in > numMessagesMax and dataRepeat = '0') then
-          report "messagesToSend is greater than numMessagesMax. messagesToSend must be less than or equal to numMessagesMax" severity failure;
+          report "messagesToSend is greater than numMessagesMax. When dataRepeat is false, messagesToSend must be less than or equal to numMessagesMax." severity failure;
         end if;
       elsif (operating = '1' and s_out_eof = '0' and oport_in.ready = '1') then
           operating_r <= '1'; -- make it sticky
