@@ -446,7 +446,7 @@ def load(args):
                 for tar_file in tar_files]
 
     # Check for hw system.xml. If it doesn't exist, get sw system.xml
-    hw_system_xml = os.path.join(cdk, 'deploy', rcc, 'opencpi', 'system.xml')
+    hw_system_xml = os.path.join(cdk, 'deploy', hdl, 'opencpi', 'system.xml')
     sw_system_xml = os.path.join(cdk, rcc, 'system.xml')
     system_xml = hw_system_xml if os.path.isfile(hw_system_xml) else sw_system_xml
 
