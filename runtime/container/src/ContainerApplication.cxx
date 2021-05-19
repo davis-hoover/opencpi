@@ -96,7 +96,7 @@ namespace OCPI {
     startMasterSlave(bool isMaster, bool isSlave, bool isSource) {
       for (Worker *w = firstWorker(); w; w = w->nextWorker())
 	if (isSource == w->isSource() &&
-	    isMaster == (w->slaves().size() != 0) &&
+	    isMaster == (w->slaves().size() != 0 || w->isEmulator()) &&
 	    isSlave == w->hasMaster()) {
 	  assert(w->getState() == OU::Worker::INITIALIZED || 
 		 w->getState() == OU::Worker::SUSPENDED);

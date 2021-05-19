@@ -16,6 +16,20 @@ modelsim:
     variables:
       OCPI_MODELSIM_DIR: '/opt/Mentor/modelsim_dlx'
       OCPI_MODELSIM_LICENSE_FILE: '2103@sembach.opencpi.net'
+isim:
+  overrides:
+
+xsim:
+  overrides:
+
+
+# hdl
+e31x:
+  ip: 10.1.0.248
+  port: 1000
+matchstiq_z1:
+  ip: 10.1.0.203
+  port: 1000
 plutosdr:
   overrides:
     build-assemblies:centos7:assets_ts:assemblies:plutosdr:

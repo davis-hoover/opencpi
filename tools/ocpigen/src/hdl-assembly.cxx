@@ -570,7 +570,7 @@ parseHdlAssy() {
     Connection &c = **ci;
     if (!c.m_clock && !c.m_external && (*c.m_attachments.begin())->m_instPort.m_port->isOCP()) {
       Clock *clk = NULL, *clk2 = NULL;
-      InstancePort *anyNotInput = NULL; // are any of the ports not myclock or output?
+      InstancePort *anyNotClockInput = NULL; // are any of the ports not myclock or output?
       for (auto ai = c.m_attachments.begin(); ai != c.m_attachments.end(); ai++) {
 	InstancePort &ip = (**ai).m_instPort;
 	size_t nc = ip.m_port->m_clock->m_ordinal; // the clock ordinal within the worker of the port
@@ -580,21 +580,24 @@ parseHdlAssy() {
 	      clk2 = clk; // two different clocks
 	  } else
 	    clk = ip.m_instance->m_clocks[nc];
-	} else if ((!ip.m_port->m_myClock || ip.m_port->m_clock->m_output) && !anyNotInput)
-	  anyNotInput = &ip; // if there more than one, take the first one
+	} else if ((!ip.m_port->m_myClock || ip.m_port->m_clock->m_output) && !anyNotClockInput)
+	  anyNotClockInput = &ip; // if there more than one, take the first one
       }
-      if (!c.m_clock && !clk2) {
-	if (!clk) {
-	  if (anyNotInput) {
+      if (!clk2) { // if we don't have two different clocks
+	if (!clk) { // if we have no mapped clocks at all
+	  if (anyNotClockInput) { // if there are ports with non-owned clocks
 	    // At this point since this port's clock has never been mapped, it is not
 	    // owned by any other external port's clock. It therefore must be an externalized
-	    // clock of the port's worker.
-	    Clock &workerClk = *anyNotInput->m_port->m_clock;
-	    assert(workerClk.m_exported);
+	    // clock of the port's worker, or it is not resolved yet and should be resolved and
+	    // propagated from another connection.
+	    Clock &workerClk = *anyNotClockInput->m_port->m_clock;
+	    // If the worker clock is not global, then it must be another port's clock
+	    if (!workerClk.m_exported)
+	      continue;
 	    std::string name;
 	    clk = &addClock(OU::format(name, "%s_%s",
-				       anyNotInput->m_instance->cname(), workerClk.cname()));
-	    anyNotInput->m_instance->m_clocks[workerClk.m_ordinal] = clk;
+				       anyNotClockInput->m_instance->cname(), workerClk.cname()));
+	    anyNotClockInput->m_instance->m_clocks[workerClk.m_ordinal] = clk;
 	  } else
 	    // all clocks are inputs to ports that own them. use the control clock.
 	    clk = m_wciClock;

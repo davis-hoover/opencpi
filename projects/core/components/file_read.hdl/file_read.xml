@@ -7,5 +7,5 @@
 
   <specproperty name="fileName" readback='true'/>
   <specproperty name="suppressEOF" readback='true'/>
-  <streaminterface name="out" datawidth='32'/>
+  <streaminterface name="out" datawidth='32' clockDirection='in'/>
 </HdlWorker>

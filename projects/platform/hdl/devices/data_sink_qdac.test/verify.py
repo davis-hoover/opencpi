@@ -40,10 +40,13 @@ DAC_WIDTH_BITS=int(os.environ.get("OCPI_TEST_DAC_WIDTH_BITS"))
 DAC_OUTPUT_IS_LSB_OF_IN_PORT=os.environ.get("OCPI_TEST_DAC_OUTPUT_IS_LSB_OF_IN_PORT")
 dac_clk_freq_hz=int(os.environ.get("OCPI_TEST_dac_clk_freq_hz"))
 underrun_sticky_error=os.environ.get("OCPI_TEST_underrun_sticky_error")
+num_input_samples = int(os.environ.get("OCPI_TEST_num_input_samples"))
+samp_count_before_first_underrun=int(os.environ.get("OCPI_TEST_samp_count_before_first_underrun"))
+num_underruns=int(os.environ.get("OCPI_TEST_num_underruns"))
 
 SDP_CLK_FREQ=100e6
 
-if dac_clk_freq_hz > SDP_CLK_FREQ:
+if ((dac_clk_freq_hz > SDP_CLK_FREQ) or (samp_count_before_first_underrun == num_input_samples and  num_underruns == 1)):
     if underrun_sticky_error == "true":
         print("    Expected underrun detected")
     else:
@@ -54,21 +57,21 @@ else:
         print("    ERROR: Unexpected underrun detected")
         sys.exit(3)
 
-    # parse output file as complex samples
-    odata = np.fromfile(sys.argv[1], dtype=utu.dt_iq_pair, count=-1)
+# parse output file as complex samples
+odata = np.fromfile(sys.argv[1], dtype=utu.dt_iq_pair, count=-1)
 
-    # parse input file as complex samples
-    idata = np.fromfile(sys.argv[2], dtype=utu.dt_iq_pair, count=-1)
+# parse input file as complex samples
+idata = np.fromfile(sys.argv[2], dtype=utu.dt_iq_pair, count=-1)
 
-    #Compare expected output to actual output
-    bitshift = iqm.SAMPLES_BIT_WIDTH - DAC_WIDTH_BITS
-    if DAC_OUTPUT_IS_LSB_OF_IN_PORT == "true":
-        print("    Comparing Expected I data to Actual I Data")
-        utu.compare_arrays(np.left_shift(idata['real_idx'],bitshift), odata['real_idx'])
-        print("    Comparing Expected Q data to Actual Q Data")
-        utu.compare_arrays(np.left_shift(idata['imag_idx'],bitshift), odata['imag_idx'])
-    else:
-        print("    Comparing Expected I data to Actual I Data")
-        utu.compare_arrays(np.right_shift(idata['real_idx'],bitshift), np.right_shift(odata['real_idx'],bitshift))
-        print("    Comparing Expected Q data to Actual Q Data")
-        utu.compare_arrays(np.right_shift(idata['imag_idx'],bitshift), np.right_shift(odata['imag_idx'],bitshift))
+#Compare expected output to actual output
+bitshift = iqm.SAMPLES_BIT_WIDTH - DAC_WIDTH_BITS
+if DAC_OUTPUT_IS_LSB_OF_IN_PORT == "true":
+    print("    Comparing Expected I data to Actual I Data")
+    utu.compare_arrays(np.left_shift(idata['real_idx'],bitshift), odata['real_idx'])
+    print("    Comparing Expected Q data to Actual Q Data")
+    utu.compare_arrays(np.left_shift(idata['imag_idx'],bitshift), odata['imag_idx'])
+else:
+    print("    Comparing Expected I data to Actual I Data")
+    utu.compare_arrays(np.right_shift(idata['real_idx'],bitshift), np.right_shift(odata['real_idx'],bitshift))
+    print("    Comparing Expected Q data to Actual Q Data")
+    utu.compare_arrays(np.right_shift(idata['imag_idx'],bitshift), np.right_shift(odata['imag_idx'],bitshift))
