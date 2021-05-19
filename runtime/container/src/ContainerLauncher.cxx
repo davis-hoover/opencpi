@@ -171,10 +171,12 @@ Member()
   : m_containerApp(NULL), m_container(NULL), m_impl(NULL), m_hasMaster(false),
     m_doneInstance(false), m_worker(NULL), m_member(0), m_crew(NULL) {
 }
+
 Launcher::Crew::
 Crew()
   : m_size(1) {
 }
+
 Launcher::Port::
 Port()
   : m_launcher(NULL), m_container(NULL), m_containerApp(NULL), m_member(NULL), m_port(NULL),
@@ -186,6 +188,7 @@ Launcher::Connection::
 Connection()
   : m_bufferSize(SIZE_MAX), m_done(false) {
 }
+
 void Launcher::Connection::
 prepare() {
   // Make sure that the input side knows about any transports implied at the
@@ -204,6 +207,7 @@ prepare() {
       m_in.m_params.add("transport", transport.c_str());
   }
 }
+
 Transport::
 Transport()
   : roleIn(OCPI::RDT::NoRole), roleOut(OCPI::RDT::NoRole), optionsIn(0), optionsOut(0) {

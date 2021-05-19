@@ -25,7 +25,7 @@
 namespace OA = OCPI::API;
 
 namespace OCPI {
-  namespace Util {
+namespace Util {
 
 ValueReader::
 ValueReader(const Value **v)
@@ -46,7 +46,7 @@ nextItem(const Member &m, bool seq) {
     // We are driven by m_parent (the struct) and the ordinal of the incoming member
     if (m_parent->m_struct) {
       StructValue sv = m_parent->m_vt->m_arrayRank || m_parent->m_vt->m_isSequence ?
-	m_parent->m_pStruct[m_parent->m_next] : m_parent->m_Struct;
+        m_parent->m_pStruct[m_parent->m_next] : m_parent->m_Struct;
       // elements of an array or sequence are allowed to be "empty"
       m_v = sv ? sv[m.m_ordinal] : NULL;
     } else
@@ -69,7 +69,7 @@ nextItem(const Member &m, bool seq) {
   if (m_v)
     m_v->m_next = 0;
 }
-  
+
 // Either a top level sequence, or a sequence under type or struct
 // This makes it obvious when we are recursing.
 size_t ValueReader::
@@ -83,6 +83,7 @@ beginSequence(const Member &m) {
 #endif
   return m_v ? m_v->m_nElements : 0;
 }
+
 void ValueReader::
 beginStruct(const Member &m) {
   nextItem(m, false);
@@ -93,6 +94,7 @@ beginStruct(const Member &m) {
     m_parent = m_v;
   //   m_parent->m_next = 0;
 }
+
 void ValueReader::
 endStruct(const Member &) {
   const Value *v = m_parent;
@@ -100,6 +102,7 @@ endStruct(const Member &) {
   if (v->m_struct == NULL)
     delete v;
 }
+
 void ValueReader::beginType(const Member &m) {
   nextItem(m, false);
   if (!m_v) {
@@ -108,6 +111,7 @@ void ValueReader::beginType(const Member &m) {
   } else
     m_parent = m_v;
 }
+
 void ValueReader::
 endType(const Member &) {
   const Value *v = m_parent;
@@ -140,8 +144,9 @@ readData(const Member &m, ReadDataPtr p, size_t nBytes, size_t nElements, bool f
     memset((void *)p.data, 0, nBytes);
   else
     memcpy((void *)p.data,
-	   (void *)(m.m_isSequence || m.m_arrayRank ? m_v->m_pULong : &m_v->m_ULong),
-	   nBytes);
+           (void *)(m.m_isSequence || m.m_arrayRank ? m_v->m_pULong : &m_v->m_ULong),
+           nBytes);
 }
-}
-}
+
+} // namespace Util
+} // namespace OCPI

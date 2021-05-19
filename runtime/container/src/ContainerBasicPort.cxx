@@ -174,9 +174,9 @@ namespace OCPI {
      * ----------------------------------------------------------------------
      */
     /*
-      static int
-      pack_unpack_test (int argc, char *argv[])
-      {
+    static int
+    pack_unpack_test (int argc, char *argv[])
+    {
       OR::Descriptors d;
       std::string data;
       bool good;
@@ -210,8 +210,9 @@ namespace OCPI {
       ocpiAssert (!good);
 
       return 0;
-      }
+    }
     */
+
     static void putOffset(OU::CDR::Encoder &packer, DtOsDataTypes::Offset val) {
       packer.
 #if OCPI_EP_SIZE_BITS == 64
@@ -220,6 +221,7 @@ namespace OCPI {
       putULong(val);
 #endif
     }
+
     static void putFlag(OU::CDR::Encoder &packer, DtOsDataTypes::Flag val) {
       packer.
 #if OCPI_EP_FLAG_BITS == 64
@@ -228,6 +230,7 @@ namespace OCPI {
       putULong(val);
 #endif
     }
+
     static void getOffset(OU::CDR::Decoder &unpacker, DtOsDataTypes::Offset &val) {
       unpacker.
 #if OCPI_EP_SIZE_BITS == 64
@@ -236,6 +239,7 @@ namespace OCPI {
       getULong(val);
 #endif
     }
+
     static void getFlag(OU::CDR::Decoder &unpacker, DtOsDataTypes::Flag &val) {
       unpacker.
 #if OCPI_EP_FLAG_BITS == 64
@@ -462,6 +466,7 @@ namespace OCPI {
         }
       return "No compatible combination of roles exist";
     }
+
     // Figure out the transport, the interconnect instance id, and roles for a connection.
     // Port parameters override connection parameters that act as a default for all
     // ports on the connection.
@@ -633,6 +638,7 @@ namespace OCPI {
       m_hdr.m_direct = OCPI_UTRUNCATE(uint8_t, a_direct);
       put();
     }
+
     void BasicPort::
     putInternal(size_t length, uint8_t opCode, bool end, size_t direct) {
       if (!m_lastOutBuffer)
@@ -643,6 +649,7 @@ namespace OCPI {
 		m_lastOutBuffer, length);
       m_lastOutBuffer = NULL;
     }
+
     // Step 2: (API/high level) put the next2put buffer, it is full
     void BasicPort::
     put(size_t length, uint8_t opCode, bool end, size_t direct) {
@@ -652,11 +659,13 @@ namespace OCPI {
 			name().c_str());
       (m_forward ? m_forward : this)->putInternal(length, opCode, end, direct);
     }
+
     // Step 2: API level put last buffer method on buffer object
     void ExternalBuffer::
     put(size_t a_length, uint8_t a_opCode, bool a_end, size_t a_direct) {
       m_port.putInternal(a_length, a_opCode, a_end, a_direct);
     }
+
     // Step 2: low level API on port
     void BasicPort::
     put() {
@@ -666,6 +675,7 @@ namespace OCPI {
       else
 	m_next2put->put();
     }
+
     // Step 2: low level API on buffer
     void ExternalBuffer::
     put() {
@@ -737,6 +747,7 @@ namespace OCPI {
       b.m_hdr.m_direct = OCPI_UTRUNCATE(uint8_t, direct);
       put(buf);
     }
+
     // The API level zero-copy put of another port's buffer to this port
     void BasicPort::
     put(OA::ExternalBuffer &buf) {
@@ -819,6 +830,7 @@ namespace OCPI {
       }
       return l_next;
     }
+
     // This buffer is the head->next, we are the single reader
     void ExternalBuffer::
     zcPop() {
@@ -914,6 +926,7 @@ namespace OCPI {
     take() {
       m_port.takeBuffer(*this);
     }
+
     // This is the lower API
     void BasicPort::
     takeBuffer(ExternalBuffer &b) {
@@ -963,6 +976,7 @@ namespace OCPI {
       if (m_lastInBuffer == &b)
 	m_lastInBuffer = NULL;
     }
+
     // Step 4: release input buffers, return them to empty state
     void BasicPort::
     release() {
@@ -1016,6 +1030,7 @@ namespace OCPI {
     allocateBuffers(size_t len) {
       return new uint8_t[len];
     }
+
     // This is virtual, but during destruction it gets called anyway, so we do the check.
     void BasicPort::
     freeBuffers(uint8_t *p) {
@@ -1207,6 +1222,7 @@ namespace OCPI {
       }
       return 0;
     }
+
     unsigned BasicPort::emptyCount() {
       if (m_forward)
 	return m_forward->emptyCount();
@@ -1216,6 +1232,7 @@ namespace OCPI {
       }
       return 0;
     }
+
     OA::BaseType BasicPort::
     getOperationInfo(uint8_t opCode, size_t &nbytes) {
       OU::Operation *ops = m_metaPort.operations();

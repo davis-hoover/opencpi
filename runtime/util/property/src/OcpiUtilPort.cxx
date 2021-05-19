@@ -51,6 +51,7 @@ namespace OCPI {
       m_defaultDistribution = Cyclic;
       //      m_slave = SIZE_MAX;
     }
+
     // When supplied with initial xml, its a "poor man's preparse" - see below.
     // This is used (at least) for runtime standalone ports, not port of a worker (yet).
     Port::
@@ -221,6 +222,7 @@ namespace OCPI {
       // FIXME: do we need the separately overridable nOpcodes here?
       return NULL;
     }
+
     const char *Port::
     postParse() {
       if (m_bufferSizePort != SIZE_MAX)
@@ -309,6 +311,7 @@ namespace OCPI {
 	return err;
       return NULL;
     }
+
     void Port::Scaling::
     emit(std::string &out, const Scaling *def) const {
       Scaling s;
@@ -331,7 +334,6 @@ namespace OCPI {
       return false;
     }
 
-
     Port::Partitioning::Partitioning()
       : m_sourceDimension(0) {
     }
@@ -343,6 +345,7 @@ namespace OCPI {
 	err = m_overlap.parse(x);
       return err;
     }
+
     void Port::Partitioning::
     emit(std::string &out, const Partitioning *def) const {
       m_scaling.emit(out, def ? &def->m_scaling : NULL);
@@ -391,6 +394,7 @@ namespace OCPI {
 #undef OCPI_DISTRIBUTION
 	NULL
     };
+
     const char *Port::
     parseDistribution(ezxml_t x, Distribution &d, std::string &hash) {
       const char *err;
@@ -503,6 +507,7 @@ namespace OCPI {
 	formatAdd(out, " hashField='%s'", m_defaultHashField.c_str());
       m_defaultPartitioning.emit(out, NULL);
     }
+
     void Port::
     emitScaling(std::string &out) const {
       Operation *op = m_operations;
@@ -554,6 +559,7 @@ namespace OCPI {
       for (size_t n = 0; n < nArgs; n++)
 	m_partitioning[n] = NULL;
     }
+
     const char *Port::OpScaling::
     parse(Port &dp, const Operation &op, ezxml_t x) {
       Worker *w = dp.m_worker;
@@ -606,6 +612,7 @@ namespace OCPI {
       }
       return NULL;
     }
+
     void Port::OpScaling::
     emit(std::string &out, const Port &port, const Operation &op) const {
       formatAdd(out, "    <operation name='%s'", op.m_name.c_str());
@@ -637,4 +644,3 @@ namespace OCPI {
     }
   }
 }
-

@@ -34,6 +34,7 @@
 namespace OCPI {
   namespace Util {
     namespace OA = OCPI::API;
+
     BaseCommandOptions::
     BaseCommandOptions(Member *members, unsigned nMembers, const char *help, const char **defaults)
       : m_argvCount(0), m_options(members), m_seen(new bool[nMembers]), m_defaults(defaults),
@@ -51,16 +52,19 @@ namespace OCPI {
 	    m_names[n][i] = '-';
       }
     }
+
     BaseCommandOptions::
     ~BaseCommandOptions() {
       delete [] m_seen;
     }
+
     const char *BaseCommandOptions::
     setError(const char *err) {
       m_error = err;
       fprintf(stderr, "Error in command options: %s\n", err);
       return err;
     }
+
     const char *BaseCommandOptions::
     doValue(Member &m, const char *argValue, const char **&a_argv) {
       Value &v = *m.m_default;
@@ -88,6 +92,7 @@ namespace OCPI {
       }
       return NULL;
     }
+
     const char *BaseCommandOptions::
     setArgv(const char **ap) {
       m_beforeArgv = ap++;
@@ -154,6 +159,7 @@ namespace OCPI {
       }
       return NULL;
     }
+
     int BaseCommandOptions::
     usage() {
       const char *slash = strrchr(m_beforeArgv[0], '/');
@@ -199,6 +205,7 @@ namespace OCPI {
 	      "\n%s", m_help);
       return 1;
     }
+
     int BaseCommandOptions::
     main(const char **initargv, int (*themain)(const char **a)) {
       try {
@@ -214,11 +221,13 @@ namespace OCPI {
       }
       return 0; // not reached.
     }
+
     void BaseCommandOptions::
     exitbad(const char *e) {
       fprintf(stderr, "Exiting for exception: %s\n", e);
       exit(1);
     }
+
     void BaseCommandOptions::
     bad(const char *fmt, ...) {
       va_list ap;
