@@ -342,6 +342,7 @@ else
 	echo If you want to download it again, you must remove that directory and its contents.
 	exit 1
     fi
+    unset OCPI_PROJECT_PATH
     if [ ! -d "project-registry/$PKG_ID" ]; then
 	if ocpidev register project $project_dir; then
 	    echo The OSP at $project_dir has now been registered.

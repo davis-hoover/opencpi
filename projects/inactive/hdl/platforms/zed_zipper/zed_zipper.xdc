@@ -35,6 +35,8 @@ set_property PACKAGE_PIN W22 [get_ports {led[5]}];  # "LD5"
 set_property PACKAGE_PIN U19 [get_ports {led[6]}];  # "LD6"
 set_property PACKAGE_PIN U14 [get_ports {led[7]}];  # "LD7"
 
+set_property PACKAGE_PIN AB14 [get_ports {fmc_prsnt}];  # "FMC-PRSNT"
+
 ############################################################################
 # Myriad Zipper Constraints                                                #
 ############################################################################

@@ -173,6 +173,38 @@ HdlBuiltPlatforms:=
 ################################################################################
 HdlError:=error
 
+# Deal with source vs. exported directories.
+# <projdir>/hdl/platforms/<plat> (not exported at all)
+# <projdir>/hdl/platforms/<plat>/lib (exported locally)
+# <projdir>/exports/hdl/platform/<plat> (exported by project)
+
+HdlProjectFromPlatformDir=$(infox HPFPD:$1)$(strip\
+  $(or $(strip \
+    $(foreach r,$(realpath $1),$(infox R:$r)\
+      $(foreach path,$(if $(filter lib,$(notdir $r)),$(patsubst %/,%,$(dir $r)),$r),\
+        $(foreach proj,$(patsubst %/hdl/platforms/$(notdir $(path)),%,$(path)),\
+          $(infox HPFPDr:$(proj))$(proj))))),\
+    $(error Platform directory $1 does not exist)))
+
+
+# Return the list of project dependencies given the project dir
+# Deal with old Project.mk vs newer Project.xml vs. exported project
+OcpiProjectDependencies=$(infox HPD:$1)$(strip\
+  $(if $(wildcard $1/project-dependencies),$(- are we an exported project?)\
+    $(shell cat $1/project-dependencies),\
+    $(if $(wildcard $1/Project.xml),\
+      $(if $(call DoShell,set -vx && \
+             $(ToolsDir)/ocpixml  -t project -a '?ProjectDependencies' $1/Project.xml,\
+             OcpiDeps),\
+        $(error Failed to parse $1/Project.xml),\
+        $(OcpiDeps)),\
+      $(if $(wildcard $1/Project.mk),\
+        $(shell sed -n 's/^ *ProjectDependencies:*= *\([^\#]*\)/\1/p' $1/Project.mk),\
+        $(error Project directory $1 has no Project.xml or Project.mk file)))))
+
+HdlProjectDepsFromPlatformDir=$(strip\
+  $(call OcpiProjectDependencies,$(call HdlProjectFromPlatformDir,$1)))
+
 # Add a platform to the database.
 # Arg 1: The directory where the *.mk file is
 # Arg 2: The name of the platform
@@ -283,15 +315,15 @@ export OCPI_ALL_HDL_TARGETS:=$(HdlAllTargets)
 
 $(call OcpiDbgVar,HdlAllPlatforms)
 # This is dirs where platforms might be found
-OcpiHdlPlatformPaths=$(call Unique,$(infox PRD:$(OCPI_PROJECT_REL_DIR))\
+HdlPlatformPaths=$(call Unique,$(infox PRD:$(OCPI_PROJECT_REL_DIR))\
   $(foreach p,$(OCPI_PROJECT_REL_DIR),$(infox PPPPPP:$p:$(CURDIR))\
     $(call OcpiExists,$p/hdl/platforms))\
   $(foreach p,$(OcpiGetExtendedProjectPath),\
     $(or $(call OcpiExists,$p/exports/hdl/platforms),$(strip\
          $(call OcpiExists,$p/hdl/platforms)))))
-$(call OcpiDbgVar,OcpiHdlPlatformPaths)
+$(call OcpiDbgVar,HdlPlatformPaths)
 # The warning below would apply, e.g. if a new project has been registered.
-$(foreach d,$(OcpiHdlPlatformPaths),\
+$(foreach d,$(HdlPlatformPaths),\
   $(if $(filter platforms,$(notdir $d)),\
     $(call HdlDoPlatformsDir,$d),\
     $(call HdlDoPlatform,$d)))
