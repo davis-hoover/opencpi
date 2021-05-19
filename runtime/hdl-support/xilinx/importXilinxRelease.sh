@@ -87,7 +87,11 @@ for d in $releases/$version/*.tar.xz; do
   fi
 done
 [ -z "$found" ] && echo Could not find any Xilinx $version release tarballs in $releases. && exit 1
-PATH=$PATH:$local_repo/u-boot-xlnx/tools:$local_repo/linux-xlnx/scripts/dtc
+#
+# Prepend "local_repo" directories to avoid problems with
+# locally-installed commands that would otherwise conflict.
+#
+PATH=$local_repo/u-boot-xlnx/tools:$local_repo/linux-xlnx/scripts/dtc:$PATH
 echo PATH is: $PATH
 for d in $dir/*; do
     plat=$(basename $d)
