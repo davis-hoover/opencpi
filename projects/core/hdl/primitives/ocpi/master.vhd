@@ -81,7 +81,7 @@ entity master is
 end entity;
 architecture rtl of master is
   constant data_width : natural := n_bytes * byte_width;
-  constant count_width : natural := width_for_max(max(max_bytes,1)/(max(data_width,8)/8)-1);
+  constant count_width : natural := width_for_max(max(max(max_bytes,1)/(max(data_width,8)/8),1)-1);
   type state_t is (BEFORE_SOM_e, EARLY_SOM_e, AFTER_SOM_e, NEED_EOM_e, NEED_EOF_e, FINISHED_e);
   signal state_r : state_t;
   signal reset_i      : Bool_t; -- internal reset, in ports clock domain
