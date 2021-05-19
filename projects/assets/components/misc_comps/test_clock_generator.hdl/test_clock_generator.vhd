@@ -35,12 +35,17 @@ begin
     clock_gen : clocking.clocking.clock_generator
     generic map (
       CLK_PRIMITIVE          => Clock_Primitive,
+      VENDOR                 => VENDOR,
       CLK_IN_FREQUENCY_MHz   => from_float(CLK_IN_FREQUENCY_MHz),
       CLK_OUT_FREQUENCY_MHz  => from_float(CLK_OUT_FREQUENCY_MHz),
+      REFERENCE_CLOCK_FREQUENCY => REFERENCE_CLOCK_FREQUENCY,
+      OUTPUT_CLOCK_FREQUENCY0   => OUTPUT_CLOCK_FREQUENCY0,
       M                      => from_float(M),
       N                      => to_integer(unsigned(N)),
       O                      => from_float(O),
-      CLK_OUT_DUTY_CYCLE     => from_float(CLKOUT_DUTY_CYCLE))
+      CLK_OUT_PHASE_DEGREES  => from_float(CLK_OUT_PHASE_DEGREES),
+      PHASE_SHIFT0_PICO_SECS => PHASE_SHIFT0_PICO_SECS,
+      CLK_OUT_DUTY_CYCLE     => from_float(CLK_OUT_DUTY_CYCLE))
     port map(
       clk_in           =>    ctl_in.clk,
       reset            =>    ctl_in.reset,

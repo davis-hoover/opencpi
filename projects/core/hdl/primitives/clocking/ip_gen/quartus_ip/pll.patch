@@ -1,0 +1,25 @@
+--- pll_orig.v	2021-03-18 17:21:16.757294000 -0400
++++ pll.v	2021-03-20 17:31:15.120765715 -0400
+@@ -14,14 +14,18 @@
+ 	output wire locked
+ );
+ 
++	parameter reference_clock_frequency   = "100.0 MHz";
++	parameter output_clock_frequency0     = "100.0 MHz";
++	parameter phase_shift0                = "0 ps";
++	parameter duty_cycle0                 = 50;
+ 	altera_pll #(
+ 		.fractional_vco_multiplier("false"),
+-		.reference_clock_frequency("100.0 MHz"),
++		.reference_clock_frequency(reference_clock_frequency),
+ 		.operation_mode("direct"),
+ 		.number_of_clocks(1),
+-		.output_clock_frequency0("100.000000 MHz"),
+-		.phase_shift0("0 ps"),
+-		.duty_cycle0(50),
++		.output_clock_frequency0(output_clock_frequency0),
++		.phase_shift0(phase_shift0),
++		.duty_cycle0(duty_cycle0),
+ 		.output_clock_frequency1("0 MHz"),
+ 		.phase_shift1("0 ps"),
+ 		.duty_cycle1(50),

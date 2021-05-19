@@ -1,0 +1,62 @@
+--- plle4_orig.v	2021-03-10 09:33:30.000000000 -0500
++++ plle4.v	2021-03-10 09:18:05.604812877 -0500
+@@ -63,9 +63,8 @@
+ //----------------------------------------------------------------------------
+ // __primary_________100.000____________0.010
+ 
+-`timescale 1ps/1ps
+ 
+-module plle4_clk_wiz 
++module plle4
+ 
+  (// Clock in ports
+   // Clock out ports
+@@ -75,15 +74,6 @@
+   output        locked,
+   input         clk_in1
+  );
+-  // Input buffering
+-  //------------------------------------
+-wire clk_in1_plle4;
+-wire clk_in2_plle4;
+-  IBUF clkin1_ibuf
+-   (.O (clk_in1_plle4),
+-    .I (clk_in1));
+-
+-
+   // Clocking PRIMITIVE
+   //------------------------------------
+ 
+@@ -91,6 +81,12 @@
+   //    * Unused inputs are tied off
+   //    * Unused outputs are labeled unused
+ 
++  parameter DIVCLK_DIVIDE       =  1;  // D
++  parameter CLKFBOUT_MULT       =  5;  // M
++  parameter CLKOUT0_DIVIDE      =  1;  // O
++  parameter CLKOUT0_PHASE       =  0.0;
++  parameter CLKOUT0_DUTY_CYCLE  =  0.5;
++  parameter CLKIN1_PERIOD       =  0.0;
+   wire        clk_out1_plle4;
+   wire        clk_out2_plle4;
+   wire        clk_out3_plle4;
+@@ -117,13 +113,13 @@
+   #(
+     .COMPENSATION         ("AUTO"),
+     .STARTUP_WAIT         ("FALSE"),
+-    .DIVCLK_DIVIDE        (1),
+-    .CLKFBOUT_MULT        (8),
++    .DIVCLK_DIVIDE        (DIVCLK_DIVIDE),
++    .CLKFBOUT_MULT        (CLKFBOUT_MULT),
+     .CLKFBOUT_PHASE       (0.000),
+-    .CLKOUT0_DIVIDE       (8),
+-    .CLKOUT0_PHASE        (0.000),
+-    .CLKOUT0_DUTY_CYCLE   (0.500),
+-    .CLKIN_PERIOD         (10.000))
++    .CLKOUT0_DIVIDE       (CLKOUT0_DIVIDE),
++    .CLKOUT0_PHASE        (CLKOUT0_PHASE),
++    .CLKOUT0_DUTY_CYCLE   (CLKOUT0_DUTY_CYCLE),
++    .CLKIN_PERIOD         (CLKIN1_PERIOD))
+   plle3_adv_inst
+     // Output clocks
+    (

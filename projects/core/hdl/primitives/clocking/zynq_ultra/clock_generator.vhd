@@ -21,7 +21,7 @@ library ocpi; use ocpi.types.all;
 
 entity clock_generator is
     generic (
-      CLK_PRIMITIVE          : string_t := to_string("plle2", 32);
+      CLK_PRIMITIVE          : string_t := to_string("plle4", 32);
       VENDOR                 : string_t := to_string("xilinx", 32);
       CLK_IN_FREQUENCY_MHz   : real := 100.0;
       CLK_OUT_FREQUENCY_MHz  : real := 100.0;
@@ -43,7 +43,7 @@ end entity clock_generator;
 architecture rtl of clock_generator is
   constant c_CLKIN1_PERIOD_NANO_SEC  : real := (1.0/CLK_IN_FREQUENCY_MHz) * (1.0E3);
 
-  component mmcme2
+  component mmcme4
     generic (
       DIVCLK_DIVIDE        : integer := 1; -- D
       CLKFBOUT_MULT_F      : real := 5.0;  -- M
@@ -58,7 +58,7 @@ architecture rtl of clock_generator is
       locked            : out    std_logic);
   end component;
 
-  component plle2
+  component plle4
     generic (
       DIVCLK_DIVIDE        : integer := 1; -- D
       CLKFBOUT_MULT        : integer := 5; -- M
@@ -74,9 +74,9 @@ architecture rtl of clock_generator is
   end component;
 
 begin
-  -- Zynq 7000 uses mmcme2 and plle2 primitives
-  gen_pll: if CLK_PRIMITIVE = to_string("plle2", 32) generate
-    inst_pll : component plle2
+  -- Zynq Ultrascale+ uses mmcme4 and plle4 primitives
+  gen_pll: if CLK_PRIMITIVE = to_string("plle4", 32) generate
+    inst_pll : component plle4
       generic map(
        DIVCLK_DIVIDE        =>  N,
        CLKFBOUT_MULT        =>  integer(M),
@@ -91,8 +91,8 @@ begin
    	  locked => locked);
   end generate gen_pll;
 
-  gen_mmcm: if CLK_PRIMITIVE = to_string("mmcme2", 32) generate
-    inst_mmcm : component mmcme2
+  gen_mmcm: if CLK_PRIMITIVE = to_string("mmcme4", 32) generate
+    inst_mmcm : component mmcme4
       generic map(
        DIVCLK_DIVIDE        =>  N,
        CLKFBOUT_MULT_F      =>  M,
