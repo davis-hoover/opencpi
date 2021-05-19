@@ -195,7 +195,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
     def get_valid_apps_col(self):
         """
         Gets a list of all directories of type applications in the project and puts that
-        applications directory and the basename of that directory into a dictionary to return
+        applications directory and the basename of that directory into a list to return
         """
         apps=self.directory + "/applications"
         return [ apps ] if os.path.isdir(apps) and ocpiutil.get_dirtype(apps) == "applications" else [];
@@ -203,7 +203,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
     def get_valid_libraries(self):
         """
         Gets a list of all directories of type library in the project and puts that
-        library directory and the basename of that directory into a dictionary to return
+        library directory and the basename of that directory into a list to return
         """
         comps = self.directory + "/components"
         dt = ocpiutil.get_dirtype(comps) if os.path.isdir(comps) else None

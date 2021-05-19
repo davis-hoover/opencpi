@@ -19,7 +19,7 @@
 
 ################################################################################################
 # This script does the bare minimum in the source tree to enable other things to happen.
-# It is usually internally called when anything big and generitc happens like
+# It is usually internally called when anything big and generic happens like
 # install-packages, install-prerequisites, build-opencpi, etc.
 # But it might be called directly to enable other scripts to be run before/without doing
 # any of the above.
@@ -27,15 +27,15 @@
 # This sourced script is for clean environments, only for use in the core source tree,
 # although if CDK is available we let it go with a warning
 if [ -n "$OCPI_ROOT_DIR" ]; then
-  [ -d "$OCPI_ROOT_DIR" ] || ( echo The OCPI_ROOT_DIR environment variable is invalid && exit 1 )
+  [ -d "$OCPI_ROOT_DIR" ] || { echo The OCPI_ROOT_DIR environment variable is invalid && exit 1 }
   ocpi_old=$(cd "$OCPI_ROOT_DIR" && pwd -P)
   ocpi_new=$(pwd -P)
-  [ "$ocpi_old" == "$ocpi_new" ] || (
+  [ "$ocpi_old" == "$ocpi_new" ] || {
       echo You cannot run this command with an existing OpenCPI environment set up elsewhere.
       echo Your environment currently has OCPI_ROOT_DIR as $OCPI_ROOT_DIR, and OCPI_CDK_DIR as $OCPI_CDK_DIR.
       echo Either use a fresh shell/terminal or perhaps do:
       echo "   source $OCPI_CDK_DIR/opencpi-setup.sh --clean"
-      exit 1 )
+      exit 1 }
 fi
 if test ! -d exports; then
   # We're being run in an uninitialized environment.

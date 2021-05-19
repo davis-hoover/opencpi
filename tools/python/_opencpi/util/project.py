@@ -19,7 +19,8 @@
 definitions for utility functions that have to do with opencpi project layout
 """
 
-import os,sys
+import os
+import sys
 import os.path
 import logging
 from glob import glob
@@ -44,15 +45,15 @@ def get_make_vars_rcc_targets():
 
 def get_dirtype(directory="."):
     """
-    Return the make-type of the directory or non if it has no make-type
+    Return the make-type of the directory or None if it has no make-type
     """
     info = get_dir_info(directory)
-    # print(repr(info),file=sys.stderr)
-    # if info:
-    #    print('X:' + repr(info[0]),file=sys.stderr)
     return info[0] if info else None
 
 def get_maketype(directory):
+    """
+    Return the make-type extracted from the Makefile in a diretory
+    """
     match = None
     file = directory + "/Makefile"
     if os.path.isfile(file):
@@ -69,12 +70,12 @@ def get_dir_info(directory=".", careful=False):
     The primary technique is to look at an XML file that is the same name as the directory name with
     a matching/appropriate top-level xml element
     """
-    models = [ "hdl", "rcc", "ocl" ] # should be static elsewhere
+    models = ["hdl", "rcc", "ocl"] # should be static elsewhere
     in_lib  = models + [ "test", "comp" ]
     directory = directory.rstrip('/')
     base = os.path.basename(directory)
     # avoid absolutizing if it is not necessary since it is expensive
-    if base == '' or base == '.' or base == '..':
+    if base in ['', '.', '..']:
         directory = os.path.realpath(directory)
         base = os.path.basename(directory)
     if not os.path.isdir(directory):
@@ -87,9 +88,9 @@ def get_dir_info(directory=".", careful=False):
     asset_type = None # will be set to make_type if not set
     top_xml_elements = None
     xml_file = directory + "/" + parts[0] + ".xml"
-    if os.path.isfile(directory + "/Project.mk") or \
-       os.path.isfile(directory + "/Project.xml") or \
-       os.path.isfile(directory + "/project-package-id"):
+    if (os.path.isfile(directory + "/Project.mk") or
+        os.path.isfile(directory + "/Project.xml") or
+        os.path.isfile(directory + "/project-package-id")):
         # Do we need to check for project-package-id file in exports?
         make_type = asset_type = "project"
     elif len(parts) > 1:

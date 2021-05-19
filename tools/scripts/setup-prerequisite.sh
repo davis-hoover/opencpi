@@ -74,8 +74,8 @@ else
 fi
 if [ -z "$OCPI_CDK_DIR" ]; then
   echo "The environment (specifically OCPI_CDK_DIR) is not set up."
-  echo "You probably need to do \"source <wherever-the-cdk-is>/opencpi-setup.sh\"."
-  echo "If the source tree has never been used yet, you need to first run:"
+  echo "You probably need to do \"source <wherever-the-cdk-is>/opencpi-setup.sh -s\"."
+  echo "If the source tree has never been used, you need to first run:"
   echo "   \"source ./scripts/init-opencpi.sh\" at the top level of the source directory."
   echo "This is done automatically by scripts like install-packages.sh, install-prequisites.sh or build-opencpi.sh"
   exit 1
