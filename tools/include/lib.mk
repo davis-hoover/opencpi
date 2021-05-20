@@ -170,7 +170,7 @@ HdlLibrariesCommand=$(call OcpiAdjustLibraries,$(HdlLibraries))
 RccLibrariesCommand=$(call OcpiAdjustLibraries,$(RccLibraries))
 TestTargets:=$(call Unique,$(HdlPlatforms) $(HdlTargets) $(RccTargets))
 # set the directory flag to make, and use the desired Makefile
-GoWorker=$(infox GW:$1)-C $1 $(if $(wildcard $1/Makefile),,\
+GoWorker=$(infox GW:$1:$(wildcard $1/Makefile))-C $1 $(if $(wildcard $1/Makefile),,\
                  -f $(OCPI_CDK_DIR)/include/$(if $(filter %.test,$(notdir $1)),test,worker).mk)
 BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker,$2)::)\
     set -e; \
@@ -189,15 +189,14 @@ BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker
 
 BuildModel=\
 $(AT)set -e;if test "$($(call Capitalize,$(1))Implementations)"; then \
-  for i in $($(call Capitalize,$(1))Implementations); do \
-    if test ! -d $$i; then \
-      echo Implementation \"$$i\" has no directory here.; \
+  $(foreach i,$($(call Capitalize,$(1))Implementations),\
+    if test ! -d $i; then \
+      echo Implementation \"$i\" has no directory here.; \
       exit 1; \
     else \
-      $(call BuildImplementation,$(1),$$i,$2) \
-    fi;\
-  done; \
-fi
+      $(call BuildImplementation,$(1),$i,$2) \
+    fi;)\
+  fi
 
 CleanModel=$(infox CLEANING MODEL $1)\
   $(AT)$(if $($(call Capitalize,$1)Implementations), \
