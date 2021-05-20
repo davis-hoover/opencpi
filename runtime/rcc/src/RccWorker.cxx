@@ -661,10 +661,10 @@ run(bool &anyone_run) {
       case RCC_ADVANCE:
 	advanceAll();
 	break;
-      case RCC_ADVANCE_DONE:
+      case RCC_ADVANCE_FINISHED:
 	advanceAll();
 	// falls thru
-      case RCC_DONE:
+      case RCC_FINISHED:
 	// FIXME:  release all current buffers
 	enabled = false;
 	setControlState(OU::Worker::FINISHED);

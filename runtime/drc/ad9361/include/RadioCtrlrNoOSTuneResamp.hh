@@ -65,6 +65,7 @@ struct Ad9361DataSubConfig {
  ******************************************************************************/
 struct Ad9361InitConfig : Ad9361ConfigConfig, Ad9361DataSubConfig {
   bool xo_disable_use_ext_ref_clk;
+  double ext_ref_clk_freq;  
 };
 
 /// @brief Callbacks to proxy worker (and its slaves) for register access, etc.
@@ -96,6 +97,10 @@ ad9361InitialConfig(Config &config, DataSub &dataSub, Ad9361InitConfig &cfg) {
   memset(&cfg, 0, sizeof(cfg)); // a known initial state
   // set this default to use ext ref clk, not dcxo
   cfg.xo_disable_use_ext_ref_clk = true;
+
+  // set the default external reference clock frequency 
+  cfg.ext_ref_clk_freq = 40e6;
+
   // don't care about qadc0_is_present
   cfg.qadc1_is_present         = config.get_qadc1_is_present();
   // don't care about qadc1_is_present
@@ -166,7 +171,7 @@ protected : struct ad9361_rf_phy* _ad9361_rf_phy;
 /// @brief No-OS struct pointer (used in all scenarios)
 protected : struct ad9361_rf_phy*& m_ad9361_rf_phy;
 
-protected : const double m_AD9361_FREF_Hz;
+protected : double m_AD9361_FREF_Hz;
 
 protected : int32_t m_ad9361_init_ret;
 

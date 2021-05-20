@@ -41,11 +41,10 @@ namespace OCPI {
       name = p.name;
       type = p.type;
       if (p.owned) {
-	vString = new char[strlen(p.vString) + 1];
-	strcpy((char*)vString, p.vString);
-	owned = true;
+        vString = new char[strlen(p.vString) + 1];
+        strcpy((char*)vString, p.vString);
       } else
-	vULongLong = p.vULongLong;
+        vULongLong = p.vULongLong;
       return  *this;
     }
     unsigned PValue::length() const {

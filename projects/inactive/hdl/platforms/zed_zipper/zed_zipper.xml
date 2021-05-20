@@ -1,5 +1,5 @@
 <!-- A zed platform with a myriad zipper/lime permanently attached rather in a slot -->
-<HdlPlatform Language="VHDL" spec='platform-spec'>
+<HdlPlatform Language="VHDL" spec='platform-spec' version='2'>
   <specproperty name='platform' value='zed_zipper'/>
   <!-- All platform workers must provide these two ports -->
   <metadata master='true'/> <!-- access to container metadata via the platform worker -->
@@ -10,11 +10,14 @@
   <device worker='time_server'>
     <property name='frequency' value='100e6'/>
   </device>
-  <sdp name="zynq" master='true' count='4'/>
+  <property name='sdp_channels' parameter='true' default='4'/>
+  <property name='use_acp' parameter='true' type='bool' default='false'/>
   <property name='useGP1' type='bool' parameter='1' default='false'/>
+  <sdp name="zynq" master='true' count='sdp_channels'/>
   <property name="axi_error" type="bool" arraylength='4' volatile='true'/>
   <property name="sdpDropCount" type='uchar' volatile='true'/>
   <signal  output='led' width='8'/>
+  <signal  input='fmc_prsnt'/> <!-- just to make it easier to re-use zed VHD file here -->
   <!-- Make believe these are directly attached rather than a card plugged into the FMC slot -->
   <device worker='lime_adc'>
     <property name='use_clk_in_p' value='1'/>

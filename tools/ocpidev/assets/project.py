@@ -1140,7 +1140,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                                 stderr=subprocess.PIPE)
         my_out = proc.communicate()
         if proc.returncode != 0:
-            logging.warning("Failed to import or export  projectat " + name + " because of " +
+            logging.warning("Failed to import or export project at " + name + " because of " +
                             "error: \n" + str(my_out[1]))
 
 

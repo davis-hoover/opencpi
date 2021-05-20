@@ -53,6 +53,8 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 			\hline
 			v1.7 & Table of Worker Configurations and Resource Utilization Table removed & 5/2020 \\
 			\hline
+			v2.2 & {\Comp} updated to use input port clock. RCC version of \comp created. Functionality of messagesToSend slightly changed/improved.  & 7/2021 \\
+	                \hline
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -64,13 +66,13 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
 \def\releasedate{05/2020}
 \def\componentlibrary{ocpi.assets.util\_{}comps}
 \def\workers{\comp{}.hdl}
-\def\testedplatforms{isim, Matchstiq-Z1(PL), xsim, ZedBoard(PL)}
+\def\testedplatforms{isim, Matchstiq-Z1(PL), xsim, ZedBoard(PL), centos 7}
 \input{\snippetpath/component_summary_table}
 	
 \section*{Functionality}
 \begin{flushleft}
 
-The {\comp} component provides the ability to output a pattern of messages by allowing the user to create a record of messages each having a configurable number of bytes and associated 8 bit opcode. Through a set of properties, the component may send messages (data and opcode) up to the amount dictated by the build-time parameters. \newline
+The {\comp} component provides the ability to output a pattern of messages by allowing the user to create a record of messages each having a configurable number of bytes (bytes that are a multiple of 4) and associated 8 bit opcode. Through a set of properties, the component may send messages (data and opcode) up to the amount dictated by the build-time parameters. \newline
 
 The \texttt{messages} property defines the record of messages to send, as well as, defines the number of data bytes and an opcode for each message. \newline
 
@@ -96,7 +98,10 @@ If \texttt{dataRepeat} = false, then \texttt{numDataWords} is 15. To calculate t
 
 When \texttt{numDataWords} = 15, then a valid data assignment would be \texttt{data} = \{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14\}, and the data within each message would look like: msg1 = \{0\}, msg2 = \{1, 2\}, msg3 = \{3, 4, 5\}, msg4 = \{6, 7, 8, 9\}, msg5 = \{10, 11, 12, 13, 14\}  \newline
 
-There is also a \texttt{messagesToSend} property that must be less than or equal to the the number of messages to send (\texttt{numMessagesMax}). The worker will check for this and report an error if \texttt{messagesToSend} is greater than \texttt{numMessagesMax}. This error reporting is for simulation only.  \newline
+There is also a \texttt{messagesToSend} property that sets the number of messages to send and decrements as the messages are sent. When \texttt{dataRepeat} is true, messagesToSend is greater than numMessagesMax, and at the end of the messages buffer, the buffer wraps around and starts at the beginning of the messages buffer. When \texttt{dataRepeat} is false, this value must be less than or equal to \texttt{numMessagesMax}. The HDL and RCC worker will check for this and report an error if \texttt{messagesToSend} is greater than \texttt{numMessagesMax}. The error checking for the HDL worker only happens in simulation.  \newline
+
+When using {\comp}.hdl, the \texttt{messagesToSend}, \texttt{messagesSent},  and \texttt{dataSent} properties should be checked at the end of an app run because they won't be stable until then. The worker doesn't use cdc crossing circuits for them because it takes advantage that they will have a stable value by the time the control plane reads those values at the end of an app run.
+
 
 \end{flushleft}
 
@@ -129,6 +134,10 @@ There is also a \texttt{messagesToSend} property that must be less than or equal
 		\item core/hdl/primitives/util/util\_pkg.vhd
 	\end{itemize}
 
+\subsection*{\comp.hdl}
+	\begin{itemize}
+		\item assets/components/util\_comps/\comp.rcc/\comp.cc
+	\end{itemize}
 
 \begin{landscape}
 \section*{Component Spec Properties}
@@ -146,7 +155,9 @@ False - Multiple messages sent from the current position of the data buffer.\\
                 \hline
                 \verb+numMessagesMax+ & uLong & 5 & - & - & - & true & - & Max number of messages to send.  \\
                 \hline
-                \verb+messagesToSend+ & uLong & 5 & - & - & - & false & Volatile, Initial & Counter of messages to send. This value must be less than or equal to numMessagesMax. Decrements as they are sent.\\
+                \verb+messagesToSend+ & uLong & 5 & - & - & - & false & Volatile, Initial & Counter of messages to send and decrements as they are sent. When dataRepeat is true, 
+    messagesToSend greater than numMessagesMax, and at the end of the messages buffer, the buffer wraps around and starts at the beginning of the messages buffer. When dataRepeat is false, 
+    this value must be less than or equal to numMessagesMax. \\
                 \hline
                 \verb+messagesSent+ & uLong & - & - & - & - & false & Volatile & Messages sent counter. Initialized to 0.\\
                 \hline
@@ -154,9 +165,9 @@ False - Multiple messages sent from the current position of the data buffer.\\
                 \hline
                 \verb+numDataWords+ & uLong & 15 & - & - & - & true & - & Max number of four byte data for the data buffer.   To calculate the numDataWords when dataRepeat is true, divide the largest message size (in bytes) by 4. To calculate the numDataWords when dataRepeat is false, divide the sum of all the message sizes (in bytes) by 4. Dividing by four required because the data is output as a 4 byte data word. \\
                 \hline
-                \verb+numMessageFields+ & uLong & 2 & - & - & - & true & - & Due to a limitation, cannot use constrained elements in unconstrained array declarations, so cannot directly set the second dimension for the messages property to 2. The numMessageFields property must always be 2 since there are 2 message fields; the number of data bytes and opcode. So the default value must not be changed.  \\
+                \verb+numMessageFields+ & uLong & 2 & - & - & - & true & - & Due to a limitation, cannot use constrained elements in unconstrained array declarations, so cannot directly set the second dimension for the messages property to 2. The numMessageFields property must always be 2 since there are 2 message fields; the number of data bytes (bytes that are a multiple of 4) and opcode. So the default value must not be changed.  \\
                 \hline
-                \verb+messages+ & uLong & - & - & - & numMessagesMax, numMessageFields & false & Initial & Multidimensional array that defines the record of messages to send, as well as, defines the number of data bytes and an 8 bit opcode for each message.\\
+                \verb+messages+ & uLong & - & - & - & numMessagesMax, numMessageFields & false & Initial & Multidimensional array that defines the record of messages to send, as well as, defines the number of data bytes (bytes that are a multiple of 4) and an 8 bit opcode for each message.\\
                 \hline
                 \verb+data+ & uLong & - & - & numDataWords & - & false & Initial & Data buffer containing the data to be sent.\\
                 \hline
@@ -192,7 +203,7 @@ False - Multiple messages sent from the current position of the data buffer.\\
             \rowcolor{blue}
             Type    & Name & DataWidth (b) & Advanced  & Usage     \\
             \hline
-            StreamInterface & out   & 32  & DataValueWidth = 8, NumberOfOpcodes='256', ZeroLengthMessages = true  & Data generated by the worker \\
+            StreamInterface & out   & 32  & DataValueWidth=8, NumberOfOpcodes='256', ZeroLengthMessages=true, clockDirection="in"  & Data generated by the worker \\
            \hline
 \end{tabular}
 \end{scriptsize}
@@ -200,7 +211,7 @@ False - Multiple messages sent from the current position of the data buffer.\\
 
 \section*{Control Timing and Signals}
 \begin{flushleft}
-The {\comp} worker uses the clock from the Control Plane and standard Control Plane signals.
+The {\comp} worker uses the clock from the Data Plane and Control Plane. And it uses standard Control Plane signals.
 \end{flushleft}
 
 \begin{landscape}

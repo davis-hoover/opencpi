@@ -1,0 +1,50 @@
+--- pll_orig.vhd	2021-03-19 21:22:39.227179290 -0400
++++ pll.vhd	2021-03-20 17:31:32.984980551 -0400
+@@ -30,6 +30,11 @@
+  USE ieee.std_logic_1164.all;
+ 
+  ENTITY  pll IS 
++	 GENERIC (
++	 	 reference_clock_frequency : STRING :=  "100.0 MHz";
++		 output_clock_frequency0   : STRING :=  "100.0 MHz";
++		 phase_shift0              : STRING :=  "0 ps";
++		 duty_cycle0               : INTEGER :=  50);
+ 	 PORT 
+ 	 ( 
+ 		 locked	:	OUT  STD_LOGIC;
+@@ -199,7 +204,7 @@
+ 		clock_name_global_8 => "false",
+ 		data_rate => 0,
+ 		deserialization_factor => 4,
+-		duty_cycle0 => 50,
++		duty_cycle0 => duty_cycle0,
+ 		duty_cycle1 => 50,
+ 		duty_cycle10 => 50,
+ 		duty_cycle11 => 50,
+@@ -229,7 +234,7 @@
+ 		n_cnt_odd_div_duty_en => "false",
+ 		number_of_clocks => 1,
+ 		operation_mode => "direct",
+-		output_clock_frequency0 => "100.000000 MHz",
++		output_clock_frequency0 => output_clock_frequency0,
+ 		output_clock_frequency1 => "0 MHz",
+ 		output_clock_frequency10 => "0 MHz",
+ 		output_clock_frequency11 => "0 MHz",
+@@ -247,7 +252,7 @@
+ 		output_clock_frequency7 => "0 MHz",
+ 		output_clock_frequency8 => "0 MHz",
+ 		output_clock_frequency9 => "0 MHz",
+-		phase_shift0 => "0 ps",
++		phase_shift0 => phase_shift0,
+ 		phase_shift1 => "0 ps",
+ 		phase_shift10 => "0 ps",
+ 		phase_shift11 => "0 ps",
+@@ -289,7 +294,7 @@
+ 		pll_vco_div => 1,
+ 		pll_vcoph_div => 1,
+ 		refclk1_frequency => "0 MHz",
+-		reference_clock_frequency => "100.0 MHz",
++		reference_clock_frequency => reference_clock_frequency,
+ 		sim_additional_refclk_cycles_to_lock => 0
+ 	  )
+ 	  PORT MAP ( 

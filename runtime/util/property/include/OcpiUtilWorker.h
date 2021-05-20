@@ -157,7 +157,7 @@ namespace OCPI {
       unsigned m_ordinal; // ordinal within artifact
     private:
       ezxml_t m_slaveAssembly; // assembly of slaves for this (proxy) worker
-      // std::vector<Slave> m_slaves;
+      bool m_isEmulator;
     public:
       // Scalability
       std::string m_validScaling; // Expression for error checking overall scaling
@@ -171,7 +171,7 @@ namespace OCPI {
       inline const std::string &specName() const { return m_specName; }
       //      inline const std::string &name() const { return m_name; }
       inline const char *cname() const { return m_name.c_str(); }
-      //      inline const std::vector<Slave> &slaves() const { return m_slaves; }
+      inline bool isEmulator() const { return m_isEmulator; }
       inline const Attributes &attributes() const { return *m_attributes; }
       // inline bool isSource() const { return m_isSource; }
       inline bool isDebug() const { return m_isDebug; }

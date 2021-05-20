@@ -58,6 +58,7 @@ parseHdl(const char *a_package) {
   m_modelString = "hdl";
   return NULL;
 }
+
 // FIXME: get the basic HDL workers in their own class
 const char *Worker::
 finalizeHDL() {
@@ -255,7 +256,6 @@ parseHdlImpl(const char *a_package) {
   }
   return 0;
 }
-
 
 Signal::
 Signal()
@@ -518,7 +518,6 @@ emitConnectionSignal(FILE *f, const char *iname, const char *pattern, bool singl
     fprintf(f, "%s%s%s;\n", iname ? iname : "", iname ? "_" : "", name.c_str());
   }
 }
-
 
 // emit the "signal pseudo constants" for the worker.
 // We record "macros" that define the directions of the ad-hoc signals for device workers.

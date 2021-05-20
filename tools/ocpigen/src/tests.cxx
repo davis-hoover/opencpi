@@ -471,6 +471,7 @@ namespace {
   typedef std::vector<Case *> Cases;
   Cases cases;
   OrderedStringSet allPlatforms;
+
   struct Case {
     std::string m_name;
     Strings m_onlyPlatforms, m_excludePlatforms; // can only apply these at runtime
@@ -488,6 +489,7 @@ namespace {
       : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
 	m_doneWorkerIsUUT(doneWorkerIsUUT)
     {}
+
     static const char *doExcludePlatform(const char *a_platform, void *arg) {
       Case &c = *(Case *)arg;
       OrderedStringSet platforms;
@@ -512,6 +514,7 @@ namespace {
       }
       return NULL;
     }
+
     static const char *doOnlyPlatform(const char *a_platform, void *arg) {
       Case &c = *(Case *)arg;
       OrderedStringSet platforms;
@@ -531,6 +534,7 @@ namespace {
       }
       return NULL;
     }
+
     static const char *doOnlyWorker(const char *worker, void *arg) {
       Case &c = *(Case *)arg;
       if (excludeWorkers.find(worker) != excludeWorkers.end())
@@ -543,6 +547,7 @@ namespace {
                             c.m_name.c_str(), worker);
       return doWorker(*wi, &c.m_workers);
     }
+
     static const char *doExcludeWorker(const char *worker, void *arg) {
       Case &c = *(Case *)arg;
       if (excludeWorkers.find(worker) != excludeWorkers.end())
@@ -556,6 +561,7 @@ namespace {
       c.m_workers.erase(wi);
       return NULL;
     }
+
     static const char *doCase(ezxml_t cx, void *globals) {
       Case *c = new Case(*(ParamConfig *)globals);
       const char *err;
@@ -566,6 +572,7 @@ namespace {
       cases.push_back(c);
       return NULL;
     }
+
     const char *doPorts(Worker &w, ezxml_t x) {
       for (unsigned n = 0; n < w.m_ports.size(); n++)
         if (w.m_ports[n]->isData()) {
@@ -608,6 +615,7 @@ namespace {
         }
       return NULL;
     }
+
     // FIXME: this code is redundant with the OcpiUtilAssembly.cxx
     const char *parseDelay(ezxml_t sx, const OU::Property &p) {
       const char *err;
@@ -747,6 +755,7 @@ namespace {
       }
       return NULL;
     }
+
     void
     doProp(unsigned n) {
       ParamConfig &c = *m_subCases.back();
@@ -763,6 +772,7 @@ namespace {
         doProp(n + 1);
       }
     }
+
     const char *
     pruneSubCases() {
       ocpiDebug("Pruning subcases for case %s starting with %zu subcases",
@@ -839,6 +849,7 @@ namespace {
         OU::esprintf("For case %s, there are no valid parameter combinations for any worker",
                      m_name.c_str()) : NULL;
     }
+
     void
     print(FILE *out) {
       fprintf(out, "Case %s:\n", m_name.c_str());
@@ -858,6 +869,7 @@ namespace {
         }
       }
     }
+
     void
     table(FILE *out) {
       std::vector<size_t> sizes(m_settings.params.size(), 0);
@@ -905,6 +917,7 @@ namespace {
       }
       fprintf(out, "\n");
     }
+
     const char *
     generateFile(bool &first, const char *dir, const char *type, unsigned s,
                  const std::string &name, const std::string &generate, const std::string &env,
@@ -946,6 +959,7 @@ namespace {
         addDep(path.c_str(), true);
       return NULL;
     }
+
     // Generate inputs: input files
     const char *
     generateInputs() {
@@ -965,12 +979,24 @@ namespace {
         for (unsigned n = 0; n < pc.params.size(); n++) {
           Param &p = pc.params[n];
           if (p.m_param && !p.m_generate.empty()) {
+            //
+            // Originally, if p.m_uValue was non-empty (due to the parameter
+	    // having a default value), it needed clearing before generating.
+            // OU::file2String() now clears non-empty "out" arguments.
+            //
             if ((err = generateFile(first, "properties", "property value", s, p.m_param->m_name,
                                     p.m_generate, env, file)) ||
                 (err = (p.m_param->needsNewLineBraces() ?
                         OU::file2String(p.m_uValue, file.c_str(), "{", "},{", "}") :
                         OU::file2String(p.m_uValue, file.c_str(), ','))))
               return err;
+            //
+            // Quick parse --> unparse trip.  This is particularly needed
+            // for use of generated '0' and '1' as boolean initializers,
+            // and doesn't hurt otherwise.  The parameter type is known.
+            //
+            p.m_param->parseValue(p.m_uValue.c_str(), p.m_value);
+            p.m_value.unparse(p.m_uValue);
             OU::formatAdd(env, "OCPI_TEST_%s='%s' ", p.m_param->cname(), p.m_uValue.c_str());
             OU::formatAdd(env, "OCPI_TESTFILE_%s='%s' ", p.m_param->cname(), file.c_str());
           }
@@ -989,6 +1015,7 @@ namespace {
       }
       return NULL;
     }
+
     void
     generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nOutputs, unsigned s,
                         const DataPort *first, bool a_emulator, std::string &app, const char *dut, bool testingOptional) {
@@ -1085,10 +1112,9 @@ namespace {
             isOptional = m_ports[n].m_testOptional;
           }
         std::string app("<application");
+
         // the testrun.sh script has the name "file_write_from..." or "file_write" hardcoded, so
         // the name of the file_write is limited to those options
-
-// if (w.findPort(m_name.c_str())) {
 
         if ((optionals.size() >= nOutputs) && isOptional && !finishPort)
           OU::formatAdd(app, " done='%s'", dut);
@@ -1367,6 +1393,7 @@ namespace {
       verify += "exit $exitval\n";
       return OU::string2File(verify.c_str(), file.c_str(), false, true, true);
     }
+
     const char *
     generateCaseXml(FILE *out) {
       fprintf(out, "  <case name='%s'>\n", m_name.c_str());

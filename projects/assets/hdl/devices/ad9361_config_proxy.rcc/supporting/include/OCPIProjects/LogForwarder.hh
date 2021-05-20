@@ -1,1 +1,1 @@
-../../../../../cards/dig_radio_ctrlr_fmcomms_2_3.rcc/supporting/include/OCPIProjects/LogForwarder.hh
+../../../../../../../platform/hdl/devices/platform_ad9361_config_proxy.rcc/supporting/include/OCPIProjects/LogForwarder.hh

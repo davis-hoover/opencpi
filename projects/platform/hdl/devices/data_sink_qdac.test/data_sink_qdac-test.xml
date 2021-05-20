@@ -1,4 +1,5 @@
 <Tests UseHdlFileIo='true' Spec='data_sink_qdac'>
+  <property name='num_input_samples' value='4096'/>
   <Input  port='in'  Script='generate.py' MessageSize='16384'/>
   <Output port='out' Script='verify.py' DisableBackpressure='true'/>
 </Tests>

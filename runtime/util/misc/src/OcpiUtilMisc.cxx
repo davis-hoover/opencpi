@@ -556,6 +556,8 @@ file2String(std::string &out, const char *file, const char *start, const char *m
       fseek(f, 0, SEEK_END) == 0 &&
       (size = ftell(f)) > 0 &&
       fseek(f, 0, SEEK_SET) == 0) {
+    if (!out.empty())
+      out.clear();
     out.reserve((size_t)size);
     // To avoid requiring double storage, we chunk the input.
     char buf[4*1024+1];
@@ -606,7 +608,7 @@ file2String(std::string &out, const char *file, const char *start, const char *m
       out += end;
   } else
     err = "file could not be opened for reading";
-   if (f)
+  if (f)
     fclose(f);
   if (err) {
     out.clear();
@@ -614,6 +616,7 @@ file2String(std::string &out, const char *file, const char *start, const char *m
   }
   return NULL;
 }
+
 const char *
 string2File(const std::string &in, const char *file, bool leaveExisting, bool onlyIfDifferent,
             bool makeExecutable) {

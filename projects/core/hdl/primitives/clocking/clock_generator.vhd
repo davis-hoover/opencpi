@@ -16,12 +16,9 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-----------------------------------------------------------------------------------
--- Description
-----------------------------------------------------------------------------------
--- This is a vendor agnostic clock generator. It simulates waiting for a period of
--- of time for a clock generator to receive "lock" before having a valid clock.
-----------------------------------------------------------------------------------
+
+-- This is basically a copy of the agnostic_clock_generator.vhd. 
+-- This is used so that shadowing works. 
 
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
 library ocpi; use ocpi.util.all, ocpi.types.all;
@@ -30,13 +27,16 @@ library cdc;
 
 entity clock_generator is
     generic (
-      CLK_PRIMITIVE          : string_t := to_string("", 32);
+      CLK_PRIMITIVE          : string_t := to_string("plle2", 32);
+      VENDOR                 : string_t := to_string("agnostic", 32);
       CLK_IN_FREQUENCY_MHz   : real := 100.0;
       CLK_OUT_FREQUENCY_MHz  : real := 100.0;
-      M                      : real := 5.0;  -- M
+      REFERENCE_CLOCK_FREQUENCY : string_t := to_string("100.0 MHz", 32);
+      OUTPUT_CLOCK_FREQUENCY0   : string_t := to_string("100.0 MHz", 32);
       N                      : integer := 1; -- D
       O                      : real := 1.0;  -- O
-   -- CLK_OUT_PHASE_DEGREES  : real; -- Add this in when there's a generalized way to support Xilinx and Intel phase shift in optimization script
+      CLK_OUT_PHASE_DEGREES  : real := 0.0;
+      PHASE_SHIFT0_PICO_SECS : string_t := to_string("0 ps", 32);
       CLK_OUT_DUTY_CYCLE     : real := 0.5);
     port(
       clk_in           : in     std_logic;
@@ -54,14 +54,15 @@ architecture rtl of clock_generator is
   signal s_enable             : std_logic;
   signal s_locked             : std_logic;
   signal s_reset_in_synced    : std_logic;
-begin
 
+begin
+  
   inst_sim_clk : platform.platform_pkg.sim_clk
-  generic map(frequency => CLK_OUT_FREQUENCY_MHz*1.0E6,
-             offset  => 0)
-  port map(
-    clk   => s_clk_out,
-    reset => s_reset_out);
+    generic map(frequency => CLK_OUT_FREQUENCY_MHz*1.0E6,
+                offset  => 0)
+    port map(
+      clk   => s_clk_out,
+      reset => s_reset_out);
 
   s_enable <= '1' when  (s_reset_in_synced = '0' and s_counter < c_num_cycles) else '0';
   s_locked <= '1' when (s_counter = c_num_cycles) else '0';

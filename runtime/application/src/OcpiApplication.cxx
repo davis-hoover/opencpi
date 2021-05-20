@@ -1153,11 +1153,12 @@ it is really per actual worker config...
               if (i.m_feasibleContainers[m] & (1u << cont) &&
                   bookingOk(m_bookings[cont], c, instNum)) {
 		// Bump the score if the optimized attribute of the worker (as compiled) matches the
-		// optimized attribute of the container.  Since we generally want workers that match what
-		// the container (and framework) is built for.
-		if (OC::Container::nthContainer(cont).m_optimized == c.impl->m_artifact.optimized())
-		  score++;
-                deployInstance(instNum, score + c.score, 1, &cont, &c.impl,
+		// optimized attribute of the container.  Since we generally want workers that match
+		// what the container (and framework) is built for.
+		unsigned bump =
+		  OC::Container::nthContainer(cont).m_optimized == c.impl->m_artifact.optimized() ?
+		  1 : 0;
+                deployInstance(instNum, score + c.score + bump, 1, &cont, &c.impl,
                                i.m_feasibleContainers[m]);
                 if (!c.impl->m_staticInstance)
                   break;
@@ -2011,8 +2012,9 @@ it is really per actual worker config...
         for (unsigned n = 0; n < m_nContainers; n++)
           m_containers[n]->dump(true, m_hex);
       ocpiInfo("Using %d containers to support the application", m_nContainers );
-      ocpiInfo("Starting master workers that are not slaves and not sources.");
+      ocpiInfo("Starting master workers that are not slaves.");
       startMasterSlave(true, false, false);  // 4
+      startMasterSlave(true, false, true);   // 5
       ocpiInfo("Starting master workers that are also slaves, but not sources.");
       startMasterSlave(true, true, false);   // 6
       ocpiInfo("Starting workers that are not masters and not sources.");

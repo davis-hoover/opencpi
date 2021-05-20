@@ -58,6 +58,7 @@ namespace OCPI {
 	m_isHidden(false), m_isDebug(false), m_isImpl(false), m_isReadable(false)
     {}
   }
+
   namespace Util {
     namespace OE = EzXml;
     namespace OA = OCPI::API;
@@ -70,8 +71,10 @@ namespace OCPI {
 	m_paramOrdinal(0), m_hasValue(false), m_readBarrier(false), m_writeBarrier(false),
 	m_reduction(None) {
     }
+
     Property::~Property() {
     }
+
     // parse a value for this property, which may be a struct
     // used for instance property values in an assembly, etc.
     const char *
@@ -82,11 +85,13 @@ namespace OCPI {
       const char *err = value.parse(unparsed, end, false, resolv);
       return err ? esprintf("for property %s: %s", cname(), err) : NULL;
     }
+
     // FIXME find the caller and nuke this one
     const char *
     Property::parse(ezxml_t prop, unsigned ordinal) {
       return parse(prop, true, ordinal);
     }
+
     // Called in three contexts: spec, worker(worker), specproperty (addAccess)
     // For spec: isSpec == true
     // For worker property: isSpec == false, addAccess == false
@@ -298,6 +303,7 @@ namespace OCPI {
       m_isReadable = m_isVolatile || !(m_isParameter || m_isWritable) || m_isReadback;
       return NULL;
     }
+
     // Common checking for initial parsing and add-impl-stuff parsing
     const char *
     Property::parseCheck() {
@@ -321,6 +327,7 @@ namespace OCPI {
 #endif
       return NULL;
     }
+
     // This is parsing a newly create property that might be only defined in
     // an implementation (includeImpl == true)
     const char *
@@ -354,6 +361,7 @@ namespace OCPI {
 #endif
       return parseCheck();
     }
+
     // A higher up is creating offsets in a list of properties after we know it all
     // Here is where is need to ensure that all aspects of the underlying data type
     // are fully resolved.
@@ -463,6 +471,7 @@ namespace OCPI {
 	return err;
       return parseCheck();
     }
+
     const char *Property::getValue(ExprValue &val) {
       if (!m_default)
 	return esprintf("property \"%s\" has no value", m_name.c_str());

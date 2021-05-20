@@ -549,6 +549,8 @@ emitXmlWorker(std::string &out, bool verbose) {
     OU::formatAdd(out, " version='%u'", m_version);
   if (m_workerEOF)
     out += " workerEOF='1'";
+  if (m_emulate)
+    out += " emulator='1'";
   out += ">\n";
   if (m_scalable) {
     OU::Port::Scaling s;

@@ -40,10 +40,12 @@ namespace OCPI {
 	m_nMembers(0), m_stringLength(0), m_nEnums(0), m_dataAlign(0), m_align(1), m_nBits(0),
 	m_elementBytes(0), m_nBytes(0), m_nItems(1), m_fixedLayout(true), m_usesParameters(false)
     {}
+
     ValueType::ValueType(OA::BaseType bt, bool a_isSequence)
       : ValueTypeInternal(bt, a_isSequence),
 	m_arrayDimensions(NULL), m_members(NULL), m_type(NULL), m_enums(NULL)
     {}
+
     // Using an inherited struct for default copy would be nice here
     ValueType::ValueType(const ValueType &other)
       : ValueTypeInternal(other),
@@ -63,11 +65,13 @@ namespace OCPI {
       if (m_enums)
 	m_enums[m_nEnums] = NULL;
     }
+
     // boiler plate copy-and-swap idiom delegating work to "swap"
     ValueType& ValueType::operator=(ValueType other) {
       swap(*this, other);
       return *this;
     }
+
     // Swap
     void swap(ValueType &f, ValueType &s) {
       using std::swap;
@@ -77,6 +81,7 @@ namespace OCPI {
       swap(f.m_type, s.m_type);
       swap(f.m_enums, s.m_enums);
     }
+
     ValueType::~ValueType() {
       delete [] m_arrayDimensions;
       delete [] m_members;
@@ -85,6 +90,7 @@ namespace OCPI {
 	delete [] m_enums[n];
       delete [] m_enums;
     }
+
     bool ValueType::isFixed(bool top) const {
       if (m_isSequence && !top)
 	return false;
@@ -106,6 +112,7 @@ namespace OCPI {
     Member() : m_offset(0), m_isIn(false), m_isOut(false), m_isKey(false), m_default(NULL), m_ordinal(0)
     {
     }
+
     Member::
     Member(const Member &other)
       : ValueType(other), m_name(other.m_name), m_abbrev(other.m_abbrev), m_pretty(other.m_pretty),
@@ -115,6 +122,7 @@ namespace OCPI {
       if (other.m_default)
 	m_default = new Value(*other.m_default);
     }
+
     // Constructor when you are not parsing, and doing static initialization
     Member::
     Member(const char *name, const char *abbrev, const char *description, OA::BaseType type,
@@ -127,11 +135,13 @@ namespace OCPI {
 	ocpiCheck(m_default->parse(defaultValue) == 0);
       }
     }
+
     Member &Member::
     operator=(Member other){
       swap(*this, other);
       return *this;
     }
+
     void swap(Member& f, Member& s){
       using std::swap;
       swap<ValueType>(f, s);
@@ -147,10 +157,12 @@ namespace OCPI {
       swap(f.m_defaultExpr, s.m_defaultExpr);
       swap(f.m_ordinal, s.m_ordinal);
     }
+
     Member::~Member() {
       if (m_default)
 	delete m_default;
     }
+
     // Return a type object that is a sequence of this type
     // This is not a member function of ValueType because hierarchical types
     // are based on members, which they should not be AFAICT
@@ -186,6 +198,7 @@ namespace OCPI {
       // FIXME: if any children (struct or type) have defaults, build a sparse default here
       return NULL;
     }
+
     const char *Member::
     parse(ezxml_t xm, bool a_isFixed, bool hasName, const char *hasDefault, const char *tag,
 	  unsigned ordinal, const IdentResolver *resolver) {
@@ -441,6 +454,7 @@ namespace OCPI {
 	out += "'";
       }
     }
+
     void Member::
     printChildren(std::string &out, const char *tag, unsigned indent) {
       if (m_baseType == OA::OCPI_Struct || m_baseType == OA::OCPI_Type) {
@@ -458,11 +472,13 @@ namespace OCPI {
       } else
 	formatAdd(out, "/>\n");
     }
+
     void Member::
     printXML(std::string &out, const char *tag, unsigned indent) {
       printAttrs(out, tag, indent);
       printChildren(out, tag, indent);
     }
+
     inline void advance(const uint8_t *&p, size_t nBytes, size_t &length) {
       if (nBytes > length)
 	throw Error("Aligning data exceeds buffer when writing: length %zu advance %zu",
@@ -472,17 +488,21 @@ namespace OCPI {
       length -= nBytes;
       p += nBytes;
     }
+
     inline void radvance(uint8_t *&p, size_t nBytes, size_t &length) {
       advance(*(const uint8_t **)&p, nBytes, length);
     }
+
     inline void align(const uint8_t *&p, size_t n, size_t &length) {
       uint8_t *tmp = (uint8_t *)(((uintptr_t)p + (n - 1)) & ~((uintptr_t)(n)-1));
       advance(p, OCPI_SIZE_T_DIFF(tmp, p), length);
     }
+
     // We clear bytes we skip
     inline void ralign(uint8_t *&p, size_t n, size_t &length) {
       align(*(const uint8_t **)&p, n, length);
     }
+
     // Push the data in the linear buffer into a writer object
     void Member::
     write(Writer &writer, const uint8_t *&data, size_t &length, bool topSeq) const {
@@ -654,6 +674,7 @@ namespace OCPI {
 	}
       }
     }
+
     void Member::
     generate(const char *name, unsigned ordinal, unsigned depth) {
       m_name = name;
@@ -723,6 +744,7 @@ namespace OCPI {
 	break;
       }
     }
+
     // This static method is shared between parsing members of a structure and parsing arguments
     // to an operation.
     const char *
@@ -753,6 +775,7 @@ namespace OCPI {
       }
       return NULL;
     }
+
     // Determine the member and offset for the actual access, given the access list.
     // We are descending down the (root on top) tree describing the data type.
     // The member where the access list stops is returned as a reference.
@@ -947,6 +970,7 @@ namespace OCPI {
       argOffset += m_nBytes;
       return 0;
     }
+
     const char * Member::
     alignMembers(Member *m, size_t nMembers, size_t &maxAlign, size_t &myOffset,
 		 size_t &minSizeBits, bool &diverseSizes, bool &sub32, bool &unBounded,
@@ -958,6 +982,7 @@ namespace OCPI {
 	  return err;
       return 0;
     }
+
     uint8_t *Member::
     getField(uint8_t */*data*/, size_t &/*length*/) const {
       return NULL;
@@ -971,6 +996,7 @@ namespace OCPI {
       "Struct", "Enum", "Type",
       0
     };
+
     const char *idlTypeNames[] = {
       "None",
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) #corba,
@@ -979,6 +1005,7 @@ namespace OCPI {
       "Struct", "Enum", "Type",
       0
     };
+
     unsigned baseTypeSizes[] = {
       0,// for OCPI_NONE
 #define OCPI_DATA_TYPE(sca,corba,letter,bits,run,pretty,store) bits,

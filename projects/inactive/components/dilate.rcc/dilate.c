@@ -100,7 +100,7 @@ static RCCResult run(RCCWorker *self,
   // Arrange to send the zero-length message after the last line of last image
   // This will be unnecessary when EOS indication is fixed
 
-  // End state:  just send the zero length message to indicate "done"
+  // End state:  just send the zero length message to indicate the "finished" state
   // This will be unnecessary when EOS indication is fixed
   if (in->input.length == 0) {
     self->runCondition = &end;
