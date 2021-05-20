@@ -41,8 +41,6 @@ namespace OU = OCPI::Util;
 	  "ComponentLibraries", "HdlLibraries", "PackageID", "Package",\
           "XmlIncludeDirs", "IncludeDirs", "ComponentLibraries"
 
-
-
 #define PROJECT_ONLY_ATTRS "PackageName", "PackagePrefix", "ProjectDependencies"
 static const char *
 parseProject(ezxml_t xml) {
@@ -70,7 +68,6 @@ parseLibraries(ezxml_t xml) {
     return err;
   return NULL;
 }
-
 
 #define HDL_LIBRARY_AND_CORE_ONLY_ATTRS \
   "SourceFiles","NameSpace", "Libraries", "HdlNoLibraries"
