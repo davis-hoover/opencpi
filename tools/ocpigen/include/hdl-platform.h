@@ -26,7 +26,7 @@
 #include "hdl-slot.h"
 
 // XML that is allowed for the <HdlDevice> class and overloaded with <device> attributes
-#define HDL_PLATFORM_ATTRS HDL_DEVICE_ATTRS, DEVICE_ATTRS, "control"
+#define HDL_PLATFORM_ATTRS HDL_DEVICE_ATTRS, DEVICE_ATTRS, "control", "part", "configurations"
 #define HDL_PLATFORM_ELEMS HDL_DEVICE_ELEMS, DEVICE_ELEMS, "device", "slot"
 
 

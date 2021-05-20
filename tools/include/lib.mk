@@ -63,7 +63,7 @@ HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 $(eval $(HdlPreprocessTargets))
 $(infox HP2:$(HdlPlatform) HPs:$(HdlPlatforms) HT:$(HdlTarget) HTs:$(HdlTargets):$(CURDIR))
-include $(OCPI_CDK_DIR)/include/rcc/rcc-targets.mk
+include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
 ifeq ($(OCPI_HAVE_OPENCL),1)
   include $(OCPI_CDK_DIR)/include/ocl/ocl-make.mk
 endif
@@ -205,7 +205,7 @@ CleanModel=\
 	tn=$(call Capitalize,$(1))Targets; \
         t="$(or $(CleanTarget),$($(call Capitalize,$(1))Targets))"; \
         $(ECHO) Cleaning $(call ToUpper,$(1)) implementation $$i for targets: $$t; \
-	$(MyMake) -C $$i $(PassOutDir) \
+	$(MyMake) $(call GoWorker,$$i) $(PassOutDir) \
            OCPI_CDK_DIR=$(call AdjustRelative,$(OCPI_CDK_DIR)) $$tn="$$t" clean; \
       fi;\
     done; \

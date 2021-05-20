@@ -201,12 +201,9 @@ function ocpiReadLinkE {
 }
 
 function ocpiDirType {
-  [ -d $1 -a -f $1/Makefile ] && {
-      local type=`sed -n 's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*=\1=p' $1/Makefile | tail -1 2>/dev/null`
-      local rc=$?
-      # echo ocpiDirType of $1: rc: $rc type: $type > /dev/tty
-      [ $rc = 0 ] && echo $type
-  }
+  local type=$(python3 -c "import _opencpi.util as ou; print(ou.get_dirtype(\"$1\"))")
+  rc=$?
+  [ $rc = 0 ] && echo $type
 }
 
 OcpiEcho=/bin/echo
