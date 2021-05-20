@@ -24,7 +24,7 @@
 
 OCPI_VERSION_MAJOR=2
 OCPI_VERSION_MINOR=1
-OCPI_VERSION_PATCH=0
+OCPI_VERSION_PATCH=1
 
 # Will always be special value of 'develop' for the develop branch
 # For a pre-release, should be beta.1, beta.2 (etc.) or rc.1, rc.2 (etc.)
