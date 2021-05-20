@@ -51,12 +51,12 @@ def main():
         '-i', '--ip-addr',
         'remote server IP address; first address in OCPI_SERVER_ADDRESSES',
         default=ip,
-        required=True)
+        required=ip==None)
     option_port = make_option(
         '-r', '--port',
         'remote server port; first port in OCPI_SERVER_ADDRESSES',
         default=port,
-        required=True)
+        required=port==None)
     option_user = make_option(
         '-u', '--user',
         'user name for login on remote device',
