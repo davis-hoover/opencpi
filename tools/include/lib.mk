@@ -188,7 +188,7 @@ BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker
                XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirs))" $3;\
 
 BuildModel=\
-$(AT)set -e;if test "$($(call Capitalize,$(1))Implementations)"; then \
+$(AT)set -e;\
   $(foreach i,$($(call Capitalize,$(1))Implementations),\
     if test ! -d $i; then \
       echo Implementation \"$i\" has no directory here.; \
@@ -196,7 +196,6 @@ $(AT)set -e;if test "$($(call Capitalize,$(1))Implementations)"; then \
     else \
       $(call BuildImplementation,$(1),$i,$2) \
     fi;)\
-  fi
 
 CleanModel=$(infox CLEANING MODEL $1)\
   $(AT)$(if $($(call Capitalize,$1)Implementations), \
