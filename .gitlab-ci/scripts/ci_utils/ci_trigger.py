@@ -104,10 +104,7 @@ def trigger_platform(host_platform, cross_platform, pipeline,
         # Set trigger
         trigger = {}
         trigger['include'] = include
-        if pipeline.ci_env.pipeline_source != 'schedule':
-            # Pipeline is scheduled, don't have pipeline depend on triggered
-            # pipelines. That way later stages may progress when prior fail
-            trigger['strategy'] = 'depend'
+        trigger['strategy'] = 'depend'
 
         job = ci_job.Job(name, stage=stage, trigger=trigger, 
                          overrides=overrides)
