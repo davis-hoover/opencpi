@@ -106,7 +106,7 @@ def set_vars_from_make(mk_file, mk_arg="", verbose=None):
     """
     Collect a dictionary of variables from a makefile
     --------------------------------------------------
-    First arg is .mk file to use
+    First arg is the "make" file to use, or a tuple of the "make" file and the dir to enter
     Second arg is make arguments needed to invoke correct output
         The output can be an assignment or a target
     Third arg is a verbosity flag
@@ -131,12 +131,14 @@ def set_vars_from_make(mk_file, mk_arg="", verbose=None):
         else:
             mk_dbg = ""
 
-        # If mk_file is a "Makefile" then we use the -C option on the directory containing
-        # the makefile else (is a .mk) use the -f option on the file
-        if mk_file.endswith("/Makefile"):
-            make_cmd = "make " + mk_dbg + " -n -r -s -C " + os.path.dirname(mk_file) + " " + mk_arg
-        else:
-            make_cmd = "make " + mk_dbg + " -n -r -s -f " + mk_file + " " + mk_arg
+        make_cmd = "make " + mk_dbg + " -n -r -s"
+
+        # If mk_file is a tuple, the second part is the directory to use
+        if type(mk_file) == tuple:
+            make_cmd += " -C " + mk_file[1]
+            mk_file = mk_file[0]
+
+        make_cmd += " -f " + mk_file + " " + mk_arg;
 
         logging.debug("Calling make via:" + str(make_cmd.split()))
 

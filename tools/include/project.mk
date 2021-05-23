@@ -22,7 +22,7 @@ include $(OCPI_CDK_DIR)/include/util.mk
 
 # This is mandatory since it signifies that this directory is a project
 ifeq ($(wildcard Project.mk)$(wildcard Project.xml),)
-  $(error This project directory is corrupted since neither Project.xml(expected) nor Project.mk(backward compatibility) is present.)
+  $(error This project directory "$(CURDIR)" is corrupted since neither Project.xml(expected) nor Project.mk(backward compatibility) is present.)
 endif
 
 ifneq ($(wildcard Project.xml),)
@@ -31,7 +31,8 @@ else
   PROJ_FILE=Project.mk
 endif
 
-ifeq ($(filter exports imports,$(MAKECMDGOALS)),)
+# Do the OcpiIncludeProject unless we are only importing or cleaning
+ifneq ($(if $(MAKECMDGOALS),$(filter-out imports clean%,$(MAKECMDGOALS)),1),)
 $(OcpiIncludeProject)
 endif
 # FIXME: can we test for licensing?

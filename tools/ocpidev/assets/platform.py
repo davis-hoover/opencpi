@@ -178,7 +178,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         """
         # Get the list of Configurations from make
         logging.debug("Get the list of platform Configurations from make")
-        mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-platform.mk")
+        mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-platform")
         try:
             plat_vars = ocpiutil.set_vars_from_make(mk_file=mkf,
                                                     mk_arg="ShellHdlPlatformVars=1 showinfo",

@@ -1119,7 +1119,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         proj_dir = directory + "/" + name
         if os.path.isdir(proj_dir):
             raise ocpiutil.OCPIException("Cannot create this project: " + proj_dir + ", because the " +
-                                         "folder already exists.")
+                                         "directory already exists.")
         os.chdir(directory)
         os.mkdir(name)
         template_dict = Project._get_template_dict(name, proj_dir, **kwargs)
@@ -1141,15 +1141,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 "registry",
                 Registry.get_registry_dir(name)).add(name, True)
 
-        #make sure imports and exports are made.  theres gotta be a better way to do this then a
-        #bulky Popen call to make.  might need to wait until ,ore stuff is intergrated in python.
-        proc = subprocess.Popen(["make", "-C", name, "imports", "exports"],
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        my_out = proc.communicate()
-        if proc.returncode != 0:
-            logging.warning("Failed to import or export project at " + name + " because of " +
-                            "error: \n" + str(my_out[1]))
+        rc = ocpiutil.execute_cmd({}, proj_dir, action=[ "imports" ],
+                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+        if rc != 0:
+            logging.warning("Failed to import project at " + proj_dir)
+        rc = ocpiutil.execute_cmd({}, proj_dir, action=[ "exports" ],
+                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+        if rc != 0:
+            logging.warning("Failed to export project at " + proj_dir)
 
 
 # pylint:enable=too-many-instance-attributes

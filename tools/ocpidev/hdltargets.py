@@ -259,8 +259,7 @@ class HdlToolFactory(object):
             # Ask make for tool/tgt/plat info which will be reorganized/parsed below
             cls.__mk_dict = ocpiutil.set_vars_from_make(os.environ["OCPI_CDK_DIR"] +
                                                         "/include/hdl/hdl-targets.mk",
-                                                        "ShellHdlTargetsVars=1 " +
-                                                        "ShellGlobalProjectsVars=1")
+                                                        "ShellHdlTargetsVars=1")
         # Top targets are general groups that likely contain multiple child targets/families
         if 'HdlTopTargets' in cls.__mk_dict:
             # we call TopTargets "vendors" because that is a more readable term

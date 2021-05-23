@@ -44,10 +44,16 @@ def get_make_vars_rcc_targets():
 ###############################################################################
 
 def get_makefile(directory, type=None):
+    """
+    Return a tuple consisting of the appropriate makefile as well as the directory
+    to call "make" in
+    """
     if not type:
         type = get_dirtype(directory)
     mkf = directory + "/Makefile"
-    return mkf if os.path.exists(mkf) else os.environ["OCPI_CDK_DIR"] + "/include/" + type + ".mk"
+    if not os.path.exists(mkf):
+        mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + type + ".mk"
+    return mkf,directory
 
 def get_dirtype(directory="."):
     """

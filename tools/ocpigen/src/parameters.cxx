@@ -369,7 +369,7 @@ parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
     return err;
   if (haveId) {
     for (unsigned n = 0; n < configs.size(); n++)
-      if (configs[n]->nConfig == nConfig)
+      if (configs[n] && configs[n]->nConfig == nConfig)
 	return OU::esprintf("Duplicate configuration id %zu in build file", nConfig);
     OU::format(id, "%zu", nConfig);
   }
@@ -959,6 +959,8 @@ findParamConfig(size_t low, size_t high, const OU::Assembly::Properties &instanc
   paramConfig = NULL;
   for (size_t n = low; n <= high; n++) {
     ParamConfig *pc = m_paramConfigs[n];
+    if (!pc)
+      continue;
     const OU::Assembly::Property *ap = &instancePVs[0];
     for (unsigned nn = 0; nn < instancePVs.size(); nn++, ap++)
       if (ap->m_hasValue) {
