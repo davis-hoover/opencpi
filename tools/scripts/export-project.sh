@@ -420,11 +420,8 @@ if [ -z "$packageid" ]; then
     packageid=$package
   else
     [ -n "$packageprefix" ] || packageprefix=local
-    if [ -n "$packagename" ]; then
-      packageid=$packageprefix.$packagenanme
-    else
-      bad Error:  Project has no PackageID, Package, or PackageName
-    fi
+    [ -n "$packagename" ] || packagename=$(basename $(ocpiReadLinkE .))
+    packageid=$packageprefix.$packagename
   fi
 fi
 if [[ "$packageid" != `cat exports/project-package-id 2>/dev/null` ]]; then

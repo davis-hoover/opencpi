@@ -97,7 +97,7 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         """
         platform_list = []
         mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-assemblies")
-        logging.debug("Getting valid platforms from: " + mkf)
+        logging.debug("Getting valid platforms from: " + mkf[0])
         make_platforms = ocpiutil.set_vars_from_make(mk_file=mkf,
                                                      mk_arg="ShellPlatformsVars=1 showplatforms",
                                                      verbose=True)["HdlPlatforms"]

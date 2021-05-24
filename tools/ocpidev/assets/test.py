@@ -78,7 +78,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         return ocpiutil.execute_cmd(self.get_settings(),
                                     self.directory,
                                     self.mode_dict[self.mode],
-                                    file=ocpiutil.get_makefile(self.directory, "test"))
+                                    file=ocpiutil.get_makefile(self.directory, "test")[0])
 
     def build(self):
         """
