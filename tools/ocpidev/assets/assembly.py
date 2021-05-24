@@ -226,7 +226,7 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
         """
         assembs_list = []
         mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-assemblies")
-        ocpiutil.logging.debug("Getting valid assemblies from: " + mkf)
+        ocpiutil.logging.debug("Getting valid assemblies from: " + mkf[0])
         make_assembs = ocpiutil.set_vars_from_make(mk_file=mkf,
                                                    mk_arg="ShellAssembliesVars=1 showassemblies",
                                                    verbose=True)["Assemblies"]

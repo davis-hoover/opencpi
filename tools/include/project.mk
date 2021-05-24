@@ -61,7 +61,7 @@ ifeq ($(filter imports projectpackage clean%,$(MAKECMDGOALS)),)
 endif
 
 ifeq ($(NoExports)$(wildcard exports)$(filter projectpackage,$(MAKECMDGOALS)),)
-  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh - $(OCPI_PROJECT_PACKAGE) xxx)
+  doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh -)
   ifeq ($(filter clean% imports,$(MAKECMDGOALS)),)
     $(info Setting up exports)
     $(infox $(doexports))
@@ -162,7 +162,7 @@ imports:
 	fi
 
 exports:
-	$(OCPI_CDK_DIR)/scripts/export-project.sh "$(OCPI_TARGET_DIR)" $(OCPI_PROJECT_PACKAGE)
+	$(OCPI_CDK_DIR)/scripts/export-project.sh "$(or $(OCPI_TARGET_DIR),-)"
 
 components: hdlprimitives
 	$(MAKE) $(PMF) imports

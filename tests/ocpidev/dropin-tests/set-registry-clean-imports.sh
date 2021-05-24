@@ -34,7 +34,8 @@ ocpidev create project $proj
 pushd $proj
 
 ocpidev set registry ../$reg
-make cleanimports
+# soft clean - should leave imports alone
+ocpidev clean
 test "$(readlink imports)" == "../$reg"
 
 ocpidev set registry
@@ -42,7 +43,8 @@ source $OCPI_CDK_DIR/scripts/util.sh # needed for getProjectRegistryDir
 default_reg=$(getProjectRegistryDir)
 test "$(ocpiReadLinkE imports)" == "$(ocpiReadLinkE $default_reg)"
 echo "after"
-make cleanimports
+# soft clean - should leave imports alone
+ocpidev clean
 test -z "$(ls imports 2>/dev/null)"
 
 ocpidev set registry ../$reg
