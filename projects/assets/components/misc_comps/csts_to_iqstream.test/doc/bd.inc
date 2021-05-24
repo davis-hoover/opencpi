@@ -16,7 +16,7 @@
 \begin{tikzpicture}[node distance = 1.8cm, auto] % the command node distance is important as it determines the space or the length of the arrow between different blocks.  
     % the command given below are the place of nodes  
     \node [port] (init) {in};  
-    \node [block, below of= init](ProtocolADM){ComplexShortWithMetadata De-marshalling};  
+    \node [block, below of= init](ProtocolADM){ComplexShortTimedSample De-marshalling};  
     \node [block, below of= ProtocolADM](ProtocolAdapt){Protocol Adaption};  
     \node [block, below of = ProtocolAdapt]({ProtocolBM}){iqstream\_protocol Marshalling};  
     \node [port, below of = ProtocolBM](Out){out};    

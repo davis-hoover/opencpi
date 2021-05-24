@@ -24,10 +24,10 @@
 \def\name{\comp}
 \def\workertype{Application}
 \def\version{\ocpiversion}
-\def\releasedate{05/2020}
+\def\releasedate{05/2021}
 \def\componentlibrary{ocpi.assets.misc\_{}comps}
 \def\workers{\comp{}.hdl}
-\def\testedplatforms{CentOS7, xsim}
+\def\testedplatforms{CentOS7, xsim, Zed}
 \input{\snippetpath/component_summary_table}
 
 \section*{Block Diagram}
@@ -36,18 +36,18 @@
 
 \section*{Functionality}
 \begin{flushleft}
- "It then converts them to ComplexShortWithMetadata protocol messages that are marshaled on to the out port, according to the following table."
+ "It then converts them to ComplexShortTimedSample protocol messages that are marshaled on to the out port, according to the following table."
 \end{flushleft}
 \begin{center}
 	\begin{tabular}{ |c|c|c| } 
 		\hline
-		iqstream operation &  ComplexShortWithMetadata operation \\ 
-		iq & samples \\ 
+		iqstream operation &  ComplexShortTimedSample operation \\ 
+		iq & sample \\ 
 		   & time \\
-		   & interval \\
+		   & sample\_interval \\
 		   & flush \\
-		   & sync \\
-		   & end\_of\_samples \\
+		   & discontinuity \\
+		   & metadata \\
 		\hline
 	\end{tabular}
 \end{center}
@@ -70,11 +70,11 @@
 %\end{flushleft}
 
 \section*{Source Dependencies}
-\subsection*{cswm\_to\_iqstream.hdl}
+\subsection*{csts\_to\_iqstream.hdl}
 \begin{itemize}
-	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_body.vhd 
-	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_marshaller.vhd
-	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_pkg.vhd
+	\item core/hdl/primitives/timed\_sample\_prot/complex\_short\_timed\_sample\_body.vhd 
+	\item core/hdl/primitives/timed\_sample\_prot/complex\_short\_timed\_sample\_marshaller.vhd
+	\item core/hdl/primitives/timed\_sample\_prot/complex\_short\_timed\_sample\_pkg.vhd
 	\item core/hdl/primitives/protocol/iqstream\_demarshaller.vhd
 	\item core/hdl/primitives/protocol/iqstream\_pkg.vhd
 	\item core/hdl/primitives/protocol/protocol\_pkg.vhd
@@ -91,7 +91,7 @@
 %\subsubsection*{\comp.hdl}
 
 \section*{Test and Verification}
-The Unit Under Test (UUT) is tested by a) generating a file containing IQStream protocol-formatted messages which are sent to the UUT via the \verb+file_read+ component, b) using the \verb+file_write+ component to save the file containing the UUT's output as protocol-formatted message, and c) verifying the contents of the output file. The generated file contains one or more \verb+ComplexShortWithMetadata+ \verb+samples+ messages. The sequence of \verb+samples+ messages include samples whose I and Q signals are positive and negative ramp functions, respectively. The output file is verified by confirming that a) the same number of samples exists in the input and output files, and b) the output file contains the same ramp functions as the input.
+The Unit Under Test (UUT) is tested by a) generating a file containing IQStream protocol-formatted messages which are sent to the UUT via the \verb+file_read+ component, b) using the \verb+file_write+ component to save the file containing the UUT's output as protocol-formatted message, and c) verifying the contents of the output file. The generated file contains one or more \verb+ComplexShortTimedSample+ \verb+sample+ messages. The sequence of \verb+sample+ messages include samples whose I and Q signals are positive and negative ramp functions, respectively. The output file is verified by confirming that a) the same number of samples exists in the input and output files, and b) the output file contains the same ramp functions as the input.
 
 \section*{Output Width and Bit Growth}
 Both the input and output data is marshalled across a 32-bit bus, so bit growth is not a concern.
