@@ -604,12 +604,16 @@ OcpiGetRccPlatformDir=$(strip $(firstword \
 # as well as the 'required' projects such as core/cdk
 OcpiProjectDependenciesInternal=$(call Unique,$(ProjectDependencies)\
                                    $(if $(filter ocpi.core,$(OCPI_PROJECT_PACKAGE)),,ocpi.core))
-# If a project dependency is a path, use it as is. Otherwise, check for it in imports.
+# If a project dependency is a path, use it as is. Otherwise, check for it in the
+# project's registry, whether explicit imports or implicit global registry
 OcpiGetProjectDependencies=$(strip \
-  $(foreach d,$(OCPI_PROJECT_DEPENDENCIES),\
-    $(if $(findstring /,$d),\
-      $d,\
-      $(OCPI_PROJECT_REL_DIR)/imports/$d)))
+  $(foreach r,$(or $(wildcard $(OCPI_PROJECT_REL_DIR)/imports),\
+              $(OcpiGlobalDefaultProjectRegistryDir)),\
+    $(foreach d,$(OCPI_PROJECT_DEPENDENCIES),$(infox DEP:$d)\
+      $(if $(findstring /,$d),\
+        $d,\
+	$(or $(wildcard $r/$d),\
+          $(error For project at $(realpath $(OCPI_PROJECT_REL_DIR)), dependency $d is not registered at $i))))))
 
 #      $(call OcpiGetProjectInImports,.,$d)) ))
 # These are the leftover imports that are not listed in the ProjectDependencies

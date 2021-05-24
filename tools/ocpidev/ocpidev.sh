@@ -1557,7 +1557,7 @@ EOF
     <Property Name='frequency' Value='$timefreq'/>
   </Device>
   <!-- Put any additional platform-specific properties here using <Property> -->
-  <!-- Put any built-in (always present) devices here using <device> -->
+  <!-- Put any built-in (physically present) devices here using <device> -->
   <!-- Put any card slots here using <slot> -->
   <!-- Put ad hoc signals here using <signal> -->
 </HdlPlatform>
@@ -1798,7 +1798,11 @@ function do_build_here {
        $OCPI_MAKE_OPTS
   if [ "$dirtype" == "project" -a -z "$hardClean" ] ; then
     domake . project exports      # export a cleaned project, perhaps for platform bootstrapping
-    domake . project cleanimports # will remove the default registry, but not a different one
+    if [ -n "$cleanTarget" ]; then
+      domake . project cleanimports # will remove the default registry, but not a different one
+    else
+      domake . project imports
+    fi
   fi
 }
 
