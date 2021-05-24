@@ -267,10 +267,7 @@ cleanapplications:
 clean: cleanapplications cleanrcc cleanhdl cleanocl cleanexports cleanimports
 	rm -r -f artifacts project-metadata.xml
 
-# Iterate through symlinks in imports. If the link points to the project registry dir,
-# it is the CDK, or is a broken link, it can be cleaned/removed. If the imports directory
-# is empty after clean, the whole directory can be removed.
-# use $(realpath) rather than $(readlink -e) for portability (vs BSD/Darwin) and speed
+# Remove the imports link only if it is the default or it is broken
 cleanimports:
 	if [ \( -L imports -a "$(realpath imports)" == "$(realpath $(OcpiGlobalDefaultProjectRegistryDir))" \) \
 	     -o \( -L imports -a ! -e imports \) ]; then \

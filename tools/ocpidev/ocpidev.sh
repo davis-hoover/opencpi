@@ -1797,8 +1797,8 @@ function do_build_here {
        ${workerList:+Workers="${workerList[*]}"}\
        $OCPI_MAKE_OPTS
   if [ "$dirtype" == "project" -a -z "$hardClean" ] ; then
-    domake . project imports
-    domake . project exports
+    domake . project exports      # export a cleaned project, perhaps for platform bootstrapping
+    domake . project cleanimports # will remove the default registry, but not a different one
   fi
 }
 

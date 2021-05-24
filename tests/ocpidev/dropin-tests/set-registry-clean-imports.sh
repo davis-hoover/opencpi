@@ -22,7 +22,8 @@
 # This confirms that a manually set set registry will only
 # only be removed by 'make clean' if it matches the current
 # global default. Otherwise it should remain untouched.
-set -ex
+source $OCPI_CDK_DIR/scripts/util.sh # needed for getProjectRegistryDir
+set -e
 
 proj="set-reg-clean"
 reg="$proj-project-registry"
@@ -33,23 +34,24 @@ ocpidev create project $proj
 
 pushd $proj
 
+# Test that soft cleaning will not remove non-default imports
 ocpidev set registry ../$reg
 # soft clean - should leave imports alone
 ocpidev clean
 test "$(readlink imports)" == "../$reg"
 
+# Test that soft cleaning *will* remove the default imports
 ocpidev set registry
-source $OCPI_CDK_DIR/scripts/util.sh # needed for getProjectRegistryDir
 default_reg=$(getProjectRegistryDir)
 test "$(ocpiReadLinkE imports)" == "$(ocpiReadLinkE $default_reg)"
-echo "after"
 # soft clean - should leave imports alone
 ocpidev clean
-test -z "$(ls imports 2>/dev/null)"
+test ! -e imports
 
-ocpidev set registry ../$reg
-OCPI_PROJECT_REGISTRY_DIR=../$reg make cleanimports
-test -z "$(ls imports 2>/dev/null)"
+# Test that soft cleaning will remove the registry even if set in the environment
+OCPI_PROJECT_REGISTRY_DIR=../$reg ocpidev set registry
+OCPI_PROJECT_REGISTRY_DIR=../$reg ocpidev clean
+test ! -e imports
 
 popd
 ocpidev delete -f project $proj
