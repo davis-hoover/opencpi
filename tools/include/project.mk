@@ -31,8 +31,8 @@ else
   PROJ_FILE=Project.mk
 endif
 
-# Do the OcpiIncludeProject unless we are only importing or cleaning
-ifneq ($(if $(MAKECMDGOALS),$(filter-out imports clean%,$(MAKECMDGOALS)),1),)
+# Do the OcpiIncludeProject unless we are only importing or exporting or cleaning
+ifneq ($(if $(MAKECMDGOALS),$(filter-out imports exports clean%,$(MAKECMDGOALS)),1),)
 $(OcpiIncludeProject)
 endif
 # FIXME: can we test for licensing?

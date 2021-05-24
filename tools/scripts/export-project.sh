@@ -219,8 +219,6 @@ if [ "$1" = "-v" -o "$OCPI_EXPORTS_VERBOSE" = 1 ]; then
   [ "$1" = "-v" ] && shift
   [ -n "$verbose" ] && echo Setting verbose mode.
 fi
-os=$(echo $1 | sed 's/^\([^-]*\).*$/\1/')
-dylib=$(if [ "$os" = macos ]; then echo dylib; else echo so; fi)
 set -e
 set -f
 exports=Project.exports
@@ -387,23 +385,53 @@ done
 # Before we deal with asset exports there are some special case items to export
 # namely the projects package id and its dependencies
 # both exported in individual files
+# we do this the ugly way (not in ocpigen/assets.cxx) for bootstrapping reasons
 mkdir -p exports
-[ -n "$2" -a "$2" != "-" ] && {\
-  if [[ "$2" != `cat exports/project-package-id 2>/dev/null` ]]; then
-    echo "$2" > exports/project-package-id
-  fi
-  if [ -f Project.xml ]; then
-    # deps=$(ocpixml -t project -a '?dependencies' -a '?projectdependencies' parse Project.xml)
-    deps=$(sed s/projectdependencies/projectdependencies/i Project.xml |
-	       xmllint --xpath 'string(/project/@ProjectDependencies)' - )
-  elif [ -f Project.mk ]; then
-    deps=$(sed -n 's/^ *ProjectDependencies:*= *\([^#]*\)/\1/p' Project.mk)
-  else
-    echo Error:  Project has no Project.xml or Project.mk >&2
-    exit 1
-  fi
-  echo "$deps" > exports/project-dependencies
+
+function getattr {
+  sed s/$1/$1/i Project.xml | xmllint --xpath "string(/project/@$1)" -
 }
+function getvar {
+  sed -n "s/^ *$1:*= *\([^#]*\)/\1/p" Project.mk
+}
+if [ -f Project.xml ]; then
+  packagedeps=`getattr projectdependencies`
+  packagename=`getattr packagename`
+  packageprefix=`getattr packageprefix`
+  package=`getattr package`
+  packageid=`getattr packageid`
+elif [ -f Project.mk ]; then
+  packagedeps=`getvar ProjectDependencies`
+  packagename=`getvar PackageName`
+  packageprefix=`getvar PackagePrefix`
+  package=`getvar Package`
+  packageid=`getvar PackageID`
+else
+  bad Error:  Project has no Project.xml or Project.mk
+fi
+# echo packagedeps=$packagedeps
+# echo packagename=$packagename
+# echo packageprefix=$packageprefix
+# echo package=$package
+# echo packageid=$packageid
+
+if [ -z "$packageid" ]; then
+  if [ -n "$package" ]; then
+    packageid=$package
+  else
+    [ -n "$packageprefix" ] || packageprefix=local
+    if [ -n "$packagename" ]; then
+      packageid=$packageprefix.$packagenanme
+    else
+      bad Error:  Project has no PackageID, Package, or PackageName
+    fi
+  fi
+fi
+if [[ "$packageid" != `cat exports/project-package-id 2>/dev/null` ]]; then
+  echo "$packageid" > exports/project-package-id
+fi
+echo "$packagedeps" > exports/project-dependencies
+
 if [ -d imports ]; then
   make_filtered_link imports exports/imports main
 fi
@@ -505,9 +533,7 @@ for a in $additions; do
     fi
     make_relative_link $src $dir$after
   else
-    if [ "$2" == "" ]; then
-      echo Warning: link source $src does not '(yet?)' exist.
-    fi
+    echo Warning: link source $src does not '(yet?)' exist.
   fi
   done
   set -f
