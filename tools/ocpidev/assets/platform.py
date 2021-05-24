@@ -188,7 +188,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             plat_vars = {"Configurations" : "", "Package":"N/A"}
         if "Configurations" not in plat_vars:
             raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations " +
-                                         "from \"" + mkf)
+                                         "from \"" + mkf[1])
         self.package_id = plat_vars["Package"]
         # This should be a list of Configuration NAMES
         config_list = plat_vars["Configurations"]
