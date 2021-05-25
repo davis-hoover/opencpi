@@ -1,0 +1,32 @@
+--- soc_system.qsys	2021-05-17 09:59:40.012689000 -0400
++++ soc_system2.qsys	2021-05-17 10:50:13.569175151 -0400
+@@ -28,9 +28,9 @@
+ }
+ ]]></parameter>
+  <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
+- <parameter name="device" value="5CSXFC6D6F31C6" />
++ <parameter name="device" value="5CSXFC6D6F31C8ES" />
+  <parameter name="deviceFamily" value="Cyclone V" />
+- <parameter name="deviceSpeedGrade" value="6_H6" />
++ <parameter name="deviceSpeedGrade" value="8_H6" />
+  <parameter name="fabricMode" value="QSYS" />
+  <parameter name="generateLegacySim" value="false" />
+  <parameter name="generationId" value="0" />
+@@ -70,7 +70,7 @@
+   <parameter name="ALTMEMPHY_COMPATIBLE_MODE" value="false" />
+   <parameter name="AP_MODE" value="false" />
+   <parameter name="AP_MODE_EN" value="0" />
+-  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6_H6" />
++  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="8_H6" />
+   <parameter name="AUTO_PD_CYCLES" value="0" />
+   <parameter name="AUTO_POWERDN_EN" value="false" />
+   <parameter name="AVL_DATA_WIDTH_PORT" value="32,32,32,32,32,32" />
+@@ -534,7 +534,7 @@
+   <parameter name="desired_sdmmc_clk_mhz" value="200.0" />
+   <parameter name="desired_spi_m_clk_mhz" value="200.0" />
+   <parameter name="desired_usb_mp_clk_mhz" value="200.0" />
+-  <parameter name="device_name" value="5CSXFC6D6F31C6" />
++  <parameter name="device_name" value="5CSXFC6D6F31C8ES" />
+   <parameter name="device_pll_info_manual">{320000000 1600000000} {320000000 1000000000} {800000000 400000000 400000000}</parameter>
+   <parameter name="eosc1_clk_mhz" value="25.0" />
+   <parameter name="eosc2_clk_mhz" value="25.0" />

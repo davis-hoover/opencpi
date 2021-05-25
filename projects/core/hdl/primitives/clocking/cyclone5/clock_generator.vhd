@@ -26,7 +26,7 @@ entity clock_generator is
       CLK_IN_FREQUENCY_MHz   : real := 100.0;
       CLK_OUT_FREQUENCY_MHz  : real := 100.0;
       REFERENCE_CLOCK_FREQUENCY : string_t := to_string("100.0 MHz", 32);
-      OUTPUT_CLOCK_FREQUENCY0   : string_t := to_string("100.0 MHz", 32;
+      OUTPUT_CLOCK_FREQUENCY0   : string_t := to_string("100.0 MHz", 32);
       M                      : real := 5.0; 
       N                      : integer := 1;
       O                      : real := 1.0;

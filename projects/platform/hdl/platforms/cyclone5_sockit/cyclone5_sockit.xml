@@ -1,0 +1,24 @@
+<!-- This file defines the cyclone5_sockit HDL platform -->
+<HdlPlatform Language="VHDL" Spec="platform-spec" version='2'>
+  <SpecProperty Name='platform' Value='cyclone5_sockit'/>
+  <!-- These next two lines must be present in all platforms -->
+  <MetaData Master="true"/>
+  <TimeBase Master="true"/>
+  <!-- This platform worker provides a control plane -->
+  <CPMaster master="true"/>
+  <SDP Name='cyclone5_sockit' Master='true' count='1'/>
+  <!-- Set your time server frequency -->
+  <Device Worker='time_server'>
+    <Property Name='frequency' Value='50e6'/>
+  </Device>
+
+  <signal input="fpga_clk_50"/> <!-- PIN AC18-->
+  
+  <property name="axi_error" type="bool" arraylength='4' volatile='true'/>
+  <property name="sdpDropCount" type='uchar' volatile='true'/>
+
+  <!-- Put any additional platform-specific properties here using <Property> -->
+  <!-- Put any built-in (always present) devices here using <device> -->
+  <!-- Put any card slots here using <slot> -->
+  <!-- Put ad hoc signals here using <signal> -->
+</HdlPlatform>

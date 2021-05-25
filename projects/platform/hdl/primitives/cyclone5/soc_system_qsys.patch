@@ -1,0 +1,10 @@
+--- soc_system.qsys	2021-05-14 15:50:43.637977755 -0400
++++ soc_system2.qsys	2021-05-14 15:48:18.755130000 -0400
+@@ -47,7 +47,6 @@
+  <parameter name="useTestBenchNamingPattern" value="false" />
+  <instanceScript></instanceScript>
+  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
+- <interface name="memory" internal="hps_0.memory" type="conduit" dir="end" />
+  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
+  <module name="clk_0" kind="clock_source" version="17.1" enabled="1">
+   <parameter name="clockFrequency" value="50000000" />

@@ -82,23 +82,22 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
      $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxIseInit) && ./generate_clk_gen_ip.sh zynq_ise, MyError),$(error $(MyError)))
      $(info Generation of IP Succeeded.)
     endif
-  # Enable this once Quartus is installed on the runners for the pipeline
-  # else ifdef UseQUARTUSCycloneV
-  #   ifeq ($(wildcard ip_gen/quartus_ip/timestamp-cyclone5_altera_pll),) # if it hasn't been generated
-  #    $(info ==============================================)
-  #    $(info       Generating Cyclone V altera_pll.)
-  #    $(info ==============================================)
-  #    $(if $(call DoShell,cd ip_gen && ./generate_clk_gen_ip.sh cyclone5 $(OcpiAlteraQuartusDir) $(OcpiAlteraLicenseFile), MyError),$(error $(MyError)))
-  #    $(info Generation of IP Succeeded.)
-  #   endif
-  # else ifdef UseModelsim
-  #   ifeq ($(wildcard ip_gen/quartus_ip/timestamp-cyclone5_altera_pll),) # if it hasn't been generated
-  #    $(info ==============================================)
-  #    $(info       Generating Cyclone V altera_pll.)
-  #    $(info ==============================================)
-  #    $(if $(call DoShell,cd ip_gen && ./generate_clk_gen_ip.sh cyclone5 $(OcpiAlteraQuartusDir) $(OcpiAlteraLicenseFile), MyError),$(error $(MyError)))
-  #    $(info Generation of IP Succeeded.)
-  #   endif
+  else ifdef UseQUARTUSCycloneV
+    ifeq ($(wildcard ip_gen/quartus_ip/timestamp-cyclone5_altera_pll),) # if it hasn't been generated
+     $(info ==============================================)
+     $(info       Generating Cyclone V altera_pll.)
+     $(info ==============================================)
+     $(if $(call DoShell,cd ip_gen && ./generate_clk_gen_ip.sh cyclone5 $(OcpiAlteraQuartusDir) $(OcpiAlteraLicenseFile), MyError),$(error $(MyError)))
+     $(info Generation of IP Succeeded.)
+    endif
+  else ifdef UseModelsim
+    ifeq ($(wildcard ip_gen/quartus_ip/timestamp-cyclone5_altera_pll),) # if it hasn't been generated
+     $(info ==============================================)
+     $(info       Generating Cyclone V altera_pll.)
+     $(info ==============================================)
+     $(if $(call DoShell,cd ip_gen && ./generate_clk_gen_ip.sh cyclone5 $(OcpiAlteraQuartusDir) $(OcpiAlteraLicenseFile), MyError),$(error $(MyError)))
+     $(info Generation of IP Succeeded.)
+    endif
   endif
 endif
 

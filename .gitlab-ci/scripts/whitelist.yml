@@ -13,6 +13,8 @@ centos7:
   # hdl
   adrv9361:
     - xilinx19_2_aarch32
+  cyclone5_sockit:
+
   e31x:
     - xilinx13_4
   matchstiq_z1:

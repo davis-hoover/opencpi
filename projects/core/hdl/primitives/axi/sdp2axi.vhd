@@ -135,6 +135,39 @@ architecture rtl of sdp2axi_AXI_INTERFACE is
   signal pkt_naxf_p            : pkt_naxf_t;
   signal pkt_dw_addr_p         : whole_addr_t;
   signal sdp_reset             : bool_t;
+
+  component sdp2axi_wd_AXI_INTERFACE
+    generic map (ocpi_debug      => ocpi_debug;
+                 axi_width       => axi_width;
+                 sdp_width       => sdp_width)
+    port map (   clk             => SDPCLK;
+                 reset           => sdp_reset;
+                 addressing_done => addressing_done;
+                 pipeline        => pipeline;
+                 sdp             => sdp_in.sdp;
+                 sdp_in_data     => sdp_in_data;
+                 sdp_p           => sdp_p;
+                 axi_in          => axi_in.w;
+                 axi_out         => axi_out.w;
+                 taking_data     => taking_data;
+                 writing_done    => writing_done;
+                 debug           => dbg_state1);
+  end component;
+
+  component sdp2axi_rd_AXI_INTERFACE
+    generic map (ocpi_debug   => ocpi_debug;
+                 axi_width    => axi_width;
+                 sdp_width    => sdp_width)
+    port map (   clk          => SDPCLK;
+                 reset        => sdp_reset;
+                 sdp_take     => pipeline;
+                 sdp_in       => sdp_in;
+                 sdp_out      => sdp_out;
+                 sdp_out_data => sdp_out_data;
+                 axi_in       => axi_in.r;
+                 axi_out      => axi_out.r;
+                 debug        => dbg_state2);
+  end component;
 begin
   --============================================================================================
   -- Clock and reset handling given that clock and reset may be (independently) from either side
@@ -334,7 +367,7 @@ begin
     
   ----------------------------------------------
   -- Instantiate the write data channel module
-  wd : entity work.sdp2axi_wd_AXI_INTERFACE
+  wd : sdp2axi_wd_AXI_INTERFACE
     generic map (ocpi_debug      => ocpi_debug,
                  axi_width       => axi_width,
                  sdp_width       => sdp_width)
@@ -353,7 +386,7 @@ begin
 
   ----------------------------------------------
   -- Instantiate the read data channel module
-  rd : entity work.sdp2axi_rd_AXI_INTERFACE
+  rd : sdp2axi_rd_AXI_INTERFACE
     generic map (ocpi_debug   => ocpi_debug,
                  axi_width    => axi_width,
                  sdp_width    => sdp_width)
