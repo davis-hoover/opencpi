@@ -1024,18 +1024,19 @@ OcpiIncludeParentAsset_platform=\
 #            this is the word used to find the .mk  file
 #            e.g. Library, Platform, Platforms, Worker
 define OcpiSetAsset
-  $$(infox SETASSET:$1:$2:$(CwdName):$$(CwdName):$$(wildcard $1/$(CwdName).xml))
+  OcpiAssetName:=$$(notdir $$(realpath $1))
+  $$(infox SETASSET:$1:$2:$$(OcpiAssetName):$$(CURDIR):$$(wildcard $1/$$(OcpiAssetName).xml))
   Package:=
   PackageID:=
   PackagePrefix:=
   PackageName:=
   # Library can be Library.mk for backward compatibility
   ifeq ($2,Library)
-    ifneq ($$(wildcard $1/$(CwdName).xml),)
+    ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
       ifneq ($$(wildcard $1/$2.mk),)
-         $$(error In $1, both $2.mk and $$(CwdName).xml exist, which is not supported.)
+         $$(error In $1, both $2.mk and $$(OcpiAssetName).xml exist, which is not supported.)
       endif
-      $$(eval $$(call OcpiParseXml,$1,$(CwdName)))
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
     else ifneq ($$(wildcard $1/$2.mk),)
       include $1/$2.mk
     endif
@@ -1053,11 +1054,11 @@ define OcpiSetAsset
     $$(error Unexpected asset type: $2)
   # Platforms, Primitive, Primitives, Applications
   else ifeq ($2,Application)
-    ifneq ($$(wildcard $1/$(CwdName)-app.xml),)
-      $$(eval $$(call OcpiParseXml,$1,$(CwdName)-app))
+    ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
     endif
-  else ifneq ($$(wildcard $1/$(CwdName).xml),)
-    $$(eval $$(call OcpiParseXml,$1,$(CwdName)))
+  else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+    $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
   endif
 endef
 
