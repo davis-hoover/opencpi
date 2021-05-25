@@ -29,8 +29,8 @@ include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 # works correctly
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   QipFile=gen/soc_system.qip
-  ifeq  ($(wildcard $(QipFile)),) # if soc_system.qip copied over yet
-   $(if $(call DoShell, cp ../../primitives/cyclone5/gen/soc_system.qip ../../primitives/cyclone5/gen/soc_system.qsys \
+  ifeq  ($(wildcard $(QipFile)),) # if soc_system.qip not copied over yet
+   $(if $(call DoShell, mkdir -p gen && cp ../../primitives/cyclone5/gen/soc_system.qip ../../primitives/cyclone5/gen/soc_system.qsys \
      ../../primitives/cyclone5/gen/soc_system.sopcinfo ../../primitives/cyclone5/gen/soc_system.qsf gen && cd gen/ && \
      string1=$$(grep SLD_INFO soc_system.qip) && sed "14s/.*/ $$string1/" ../soc_system_qip.patch > soc_system_qip.patch2 && \
      patch -F 5 < soc_system_qip.patch2 && string2=$$(grep ORIGINAL_QUARTUS_VERSION soc_system.qsf) && \
@@ -43,7 +43,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   endif
 endif
 
-SourceFiles=soc_system.qip
+SourceFiles=gen/soc_system.qip
           
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
 

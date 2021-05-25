@@ -16,4 +16,4 @@ isim/plle2.vhd
 zynq_ise/mmcme2.v
 zynq_ise/plle2.v
 cyclone5/pll.v
-modelsim/pll.vhd
+modelsim/pll.v

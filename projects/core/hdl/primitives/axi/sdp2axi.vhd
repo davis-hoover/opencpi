@@ -136,37 +136,37 @@ architecture rtl of sdp2axi_AXI_INTERFACE is
   signal pkt_dw_addr_p         : whole_addr_t;
   signal sdp_reset             : bool_t;
 
-  component sdp2axi_wd_AXI_INTERFACE
-    generic map (ocpi_debug      => ocpi_debug;
-                 axi_width       => axi_width;
-                 sdp_width       => sdp_width)
-    port map (   clk             => SDPCLK;
-                 reset           => sdp_reset;
-                 addressing_done => addressing_done;
-                 pipeline        => pipeline;
-                 sdp             => sdp_in.sdp;
-                 sdp_in_data     => sdp_in_data;
-                 sdp_p           => sdp_p;
-                 axi_in          => axi_in.w;
-                 axi_out         => axi_out.w;
-                 taking_data     => taking_data;
-                 writing_done    => writing_done;
-                 debug           => dbg_state1);
+  component sdp2axi_wd_AXI_INTERFACE is
+    generic(ocpi_debug      : boolean;
+            axi_width       : natural;
+            sdp_width       : natural);
+    port(   clk             : in  std_logic;
+            reset           : in  bool_t;
+            addressing_done : in  bool_t;           -- addressing is done in/before this cycle
+            pipeline        : in  bool_t;           -- our pipeline state is full
+            sdp             : in  sdp_t;
+            sdp_in_data     : in  dword_array_t(0 to sdp_width-1);
+            sdp_p           : in  sdp_t;
+            axi_in          : in  w_s2m_t;          -- write data channel in to here
+            axi_out         : out w_m2s_t;          -- write data channel out from here
+            taking_data     : out bool_t;           -- indicate data is being used.
+            writing_done    : out bool_t;           -- indicate all data taken.
+            debug           : out ulonglong_t);
   end component;
 
-  component sdp2axi_rd_AXI_INTERFACE
-    generic map (ocpi_debug   => ocpi_debug;
-                 axi_width    => axi_width;
-                 sdp_width    => sdp_width)
-    port map (   clk          => SDPCLK;
-                 reset        => sdp_reset;
-                 sdp_take     => pipeline;
-                 sdp_in       => sdp_in;
-                 sdp_out      => sdp_out;
-                 sdp_out_data => sdp_out_data;
-                 axi_in       => axi_in.r;
-                 axi_out      => axi_out.r;
-                 debug        => dbg_state2);
+  component sdp2axi_rd_AXI_INTERFACE is
+    generic(ocpi_debug   : boolean;
+            axi_width    : natural;
+            sdp_width    : natural);
+    port(   clk          : in  std_logic;
+            reset        : in  bool_t;
+            sdp_take     : in  bool_t;
+            sdp_in       : in  s2m_t;
+            sdp_out      : out m2s_t;
+            sdp_out_data : out dword_array_t(0 to sdp_width-1);
+            axi_in       : in  r_s2m_t;   -- read data channel in to here
+            axi_out      : out r_m2s_t;   -- read data channel out from here
+            debug        : out ulonglong_t);
   end component;
 begin
   --============================================================================================

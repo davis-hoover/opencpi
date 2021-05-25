@@ -96,6 +96,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
      $(info       Generating Cyclone V altera_pll.)
      $(info ==============================================)
      $(if $(call DoShell,cd ip_gen && ./generate_clk_gen_ip.sh cyclone5 $(OcpiAlteraQuartusDir) $(OcpiAlteraLicenseFile), MyError),$(error $(MyError)))
+     $(info $(MyError))
      $(info Generation of IP Succeeded.)
     endif
   endif
