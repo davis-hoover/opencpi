@@ -117,8 +117,8 @@ def create(directory, documentation_type, name=None, **kwargs):
                 for line in project_file:
                     if line.startswith("PackagePrefix="):
                         project_prefix = line[14:].strip()
-                    if line.startswith("PackageName"):
-                        project = line[11:].strip()
+                    if line.startswith("PackageName="):
+                        project = line[12:].strip()
             break
         else:
             project_search_directory = project_search_directory.parent
