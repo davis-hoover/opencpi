@@ -1052,12 +1052,20 @@ define OcpiSetAsset
     $$(infox Not including platform worker XML directly for make variables)
   else ifneq ($(filter-out Platforms Primitive Primitives Applications Application,$2),)
     $$(error Unexpected asset type: $2)
-  # Platforms, Primitive, Primitives, Applications
   else ifeq ($2,Application)
     ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
       $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
     endif
+  else ifeq ($2,Primitives)
+    TmpLibraries:=$$(Libraries) $$(HdlLibraries)
+    ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
+    endif
+    ifneq ($2,.)
+      Libraries:=$$(TmpLibraries)
+    endif
   else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+    # Platforms, Primitive, Applications
     $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
   endif
 endef
