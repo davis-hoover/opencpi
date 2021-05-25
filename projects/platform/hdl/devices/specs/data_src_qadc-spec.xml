@@ -4,7 +4,7 @@
             type='ushort'
             parameter='true'
             default='12'
-            description='Number of bits in each of the I and Q values received
+            description='Number of bits in each of the I (real) and Q (imaginary) values received
             from the ADC device.'/>
   <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT'
             type='bool'
@@ -34,14 +34,14 @@
             volatile='true'
             description='Number of samples dropped.'/>
 
-  <Property name='suppress_sync_opcode'
+  <Property name='suppress_discontinuity_opcode'
           type='bool'
           writable='true'
           default='false'
-          description='Writing true suppresses the worker from sending sync opcodes'/>
+          description='Writing true suppresses the worker from sending discontinuity opcodes'/>
 
   <DataInterfaceSpec name='out'
                      producer='true'
-                     protocol='ComplexShortWithMetadata-prot'/>
+                     protocol='complex_short_timed_sample-prot'/>
 
 </ComponentSpec>

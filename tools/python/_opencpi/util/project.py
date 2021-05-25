@@ -159,6 +159,7 @@ def get_dir_info(directory=".", careful=False):
         make_type = "hdl-assemblies"
     elif os.path.isfile(xml_file):
         # a platform, an assembly, a library, a primitive
+        import xml.etree.ElementTree as xt
         tag = xt.parse(xml_file).getroot().tag.lower()
         if tag.startswith("hdl"):
             make_type = asset_type = "hdl-" + tag[3:]

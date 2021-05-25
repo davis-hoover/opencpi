@@ -16,7 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library ieee; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library protocol;
+library timed_sample_prot;
 package adc is
 
 constant DATA_BIT_WIDTH : positive := 12;
@@ -24,8 +24,8 @@ constant SAMP_COUNT_BIT_WIDTH : positive := 32;
 constant DROPPED_SAMPS_BIT_WIDTH : positive := 32;
 
 type data_complex_t is record
-  i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
-  q : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
+  real : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
+  imaginary : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
 end record data_complex_t;
 
 type samp_drop_detector_status_t is record
@@ -67,7 +67,7 @@ component data_widener is
     ivld       : in  std_logic;
     irdy       : out std_logic;
     -- OUTPUT
-    oprotocol  : out protocol.complex_short_with_metadata.protocol_t;
+    oprotocol  : out timed_sample_prot.complex_short_timed_sample.protocol_t;
     ordy       : in  std_logic);
 end component;
 

@@ -36,12 +36,12 @@
 
 \section*{Functionality}
 \begin{flushleft}
- "It then converts them to ComplexShorWithMetadata protocol messages that are marshaled on to the out port, according to the following table."
+ "It then converts them to ComplexShortWithMetadata protocol messages that are marshaled on to the out port, according to the following table."
 \end{flushleft}
 \begin{center}
 	\begin{tabular}{ |c|c|c| } 
 		\hline
-		iqstream operation &  ComplexShorWithMetadata operation \\ 
+		iqstream operation &  ComplexShortWithMetadata operation \\ 
 		iq & samples \\ 
 		   & time \\
 		   & interval \\

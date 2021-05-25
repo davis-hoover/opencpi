@@ -193,6 +193,7 @@
 # Utilities for unit test scripts
 +tools/python/opencpi/unit_test_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/complexshortwithmetadata_utils.py <target>/lib/opencpi/
++tools/python/opencpi/complexshorttimedsample_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/iqstream_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/dsp_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/ocpi_testing <target>/lib/opencpi/

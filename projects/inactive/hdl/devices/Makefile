@@ -32,11 +32,18 @@
 
 Workers=\
 	adcx.hdl \
-	dac.hdl \
+        dac.hdl \
 	gbe.hdl \
 	icap.hdl \
 	lime_spi_em.hdl \
-	lime_tx_em.hdl
+	lime_tx_em.hdl \
+        data_sink_qdac_cswm.hdl \
+        data_sink_qdac_cswm_ad9361_sub.hdl \
+        data_sink_qdac_cswm_em.hdl \
+        data_src_qadc_cswm.hdl \
+        data_src_qadc_cswm_ad9361_sub.hdl \
+        data_src_qadc_cswm_em.hdl \
+
 
 Tests=
 
