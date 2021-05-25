@@ -846,11 +846,11 @@ define OcpiSetProjectX
   # or in a 'Makefile' file), but so they do not interfere with
   # ProjectPackage results
   PackageSaved:=$$(Package)
-  export Package:=
+  Package:=
   PackagePrefixSaved:=$$(PackagePrefix)
-  export PackagePrefix:=
+  PackagePrefix:=
   PackageNameSaved:=$$(PackageName)
-  export PackageName:=
+  PackageName:=
 
   # Include Project.<mk|xml> to determine ProjectPackage
   $$(infox PR0:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
@@ -875,17 +875,17 @@ define OcpiSetProjectX
   # PackageName defaults to directory name
   ifndef ProjectPackage
     ifneq ($$(Package),)
-      override ProjectPackage:=$$(Package)
+      ProjectPackage:=$$(Package)
     else ifneq ($$(PackageID),)
-      override ProjectPackage:=$$(PackageID)
+      ProjectPackage:=$$(PackageID)
     else
       ifeq ($$(PackagePrefix),)
-        export PackagePrefix:=local
+        PackagePrefix:=local
       endif
       ifeq ($$(PackageName),)
-        export PackageName:=$$(notdir $$(call OcpiAbsDir,$1))
+        PackageName:=$$(notdir $$(call OcpiAbsDir,$1))
       endif
-      override ProjectPackage:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)
+      ProjectPackage:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)
     endif
   endif
   export OCPI_PROJECT_PACKAGE=$$(ProjectPackage)
@@ -1026,11 +1026,9 @@ OcpiIncludeParentAsset_platform=\
 define OcpiSetAsset
   $$(infox SETASSET:$1:$2:$(CwdName):$$(CwdName):$$(wildcard $1/$(CwdName).xml))
   Package:=
-  unexport Package
+  PackageID:=
   PackagePrefix:=
-  unexport PackagePrefix
   PackageName:=
-  unexport PackagePrefix
   # Library can be Library.mk for backward compatibility
   ifeq ($2,Library)
     ifneq ($$(wildcard $1/$(CwdName).xml),)
@@ -1043,6 +1041,8 @@ define OcpiSetAsset
     endif
   # Project (actually handled in OcpiSetProject)
   else ifeq ($2,Project)
+    $$(if $$(OCPI_PROJECT_PACKAGE),,$$(error internal error: OCPI_PROJECT_PACKAGE not set))
+    Package:=$$(OCPI_PROJECT_PACKAGE)
     $$(infox Not including Project.mk twice)
   # Worker is handled specially inParamShell
   else ifeq ($2,Worker)
@@ -1084,11 +1084,9 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
     $(foreach s,$(if $(filter hdl-lib% hdl-core,$t),primitive,$(lastword $(subst -, ,$t))),\
       $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c:$(ParentPackage))\
         $(if $(filter-out undefined,$(origin OcpiIncludeParentAsset_$s)),\
-          $(call OcpiIncludeParentAsset_$s,$1,$2,$3),\
+          $(call OcpiIncludeParentAsset_$s,$1,$2,$3)\
+          $(eval ParentPackage:=$(Package)),\
           $(call OcpiIncludeProject,$3,asset))\
-        $(if $(Package),,$(eval override Package:=$(OCPI_PROJECT_PACKAGE)))\
-        $(eval override ParentPackage:=$(Package))\
-        $(eval override Package:=)\
         $(eval $(call OcpiSetAsset,$1,$c))\
         $(call OcpiSetAndGetPackageId,$1,$2,$t)\
         $(infox PARENT:$(origin ParentPackage):$(ParentPackage))))))
@@ -1103,8 +1101,9 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
 #   Arg3 = error/warning/info mode (optional)
 OcpiIncludeAssetAndParent=\
   $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
-    $(eval override ParentPackage:=)\
-    $(eval override Package:=)\
+    $(eval ParentPackage:=)\
+    $(eval Package:=)\
+    $(eval PackageID:=)\
     $(eval include $(OCPI_CDK_DIR)/include/package.mk)\
     $(call OcpiIncludeAssetAndParentX,$(or $1,.),$2,$3))
 

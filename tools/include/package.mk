@@ -60,12 +60,12 @@ $$(infox P0:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 ###############################################################################
 # If ParentPackage is unset, assume the parent is the project
 ifeq ($$(ParentPackage),)
-  export ParentPackage:=$$(OCPI_PROJECT_PACKAGE)
+  ParentPackage:=$$(OCPI_PROJECT_PACKAGE)
 endif
 
 # If the PackagePrefix is not set, set it to ParentPackage
 ifeq ($$(PackagePrefix),)
-  export PackagePrefix:=$$(ParentPackage)
+  PackagePrefix:=$$(ParentPackage)
 endif
 
 ###############################################################################
@@ -73,12 +73,12 @@ endif
 #   (or blank if dirname == components)
 $$(infox P1:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 ifeq ($$(PackageName),)
-  export PackageName:=$$(foreach d,$$(notdir $$(realpath $1)),$$(filter-out components,$$d))
+  PackageName:=$$(foreach d,$$(notdir $$(realpath $1)),$$(filter-out components,$$d))
 endif
 $$(infox P2:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 
 # If PackageName is nonempty, prepend it with '.'
-export PackageName:=$$(if $$(PackageName),.$$(patsubst .%,%,$$(PackageName)))
+PackageName:=$$(if $$(PackageName),.$$(patsubst .%,%,$$(PackageName)))
 $$(infox P3:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 
 ###############################################################################
@@ -86,8 +86,8 @@ $$(infox P3:$$(PackagePrefix):$$(PackageName):$$(Package):$$(ParentPackage))
 # Basically, if this is provided, the PackagePrefix will be appended with
 # the authoring model. E.g for hdl/primitives, we have <project>.hdl.primitives
 ifneq ($2,)
-  export PackageAuth:=$$(if $2,.$$(patsubst .%,%,$2))
-  export PackagePrefix:=$$(PackagePrefix)$$(PackageAuth)
+  PackageAuth:=$$(if $2,.$$(patsubst .%,%,$2))
+  PackagePrefix:=$$(PackagePrefix)$$(PackageAuth)
 endif
 
 ###############################################################################
@@ -95,14 +95,17 @@ endif
 #   set it to $$(PackagePrefix)$$(PackageName)
 # Otherwise, if Package starts with '.',
 #   set it to $$(CurrentPackagePrefix)$$(Package)
+ifndef Package
+  Package:=$$(PackageID)
+endif
+
 ifeq ($$(Package),)
-  override Package:=$$(PackagePrefix)$$(PackageName)
+  Package:=$$(PackagePrefix)$$(PackageName)
 else
   ifneq ($$(filter .%,$$(Package)),)
-    override Package:=$$(PackagePrefix)$$(Package)
+    Package:=$$(PackagePrefix)$$(Package)
   endif
 endif
-export Package # note that older versions of make cannot use "export override..."
 ###############################################################################
 # Check/Generate the package-id file
 #

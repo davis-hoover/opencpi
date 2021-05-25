@@ -188,7 +188,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 # There is only one value associated with ProjectPackage, so get element 0
                 project_package = project_vars['ProjectPackage'][0]
             else:
-                raise ocpiutil.OCPIException("Could not determine Package-ID of project \"" +
+                raise ocpiutil.OCPIException("Could not determine PackageID of project \"" +
                                              self.directory + "\".")
         self.package_id = project_package
 
