@@ -69,13 +69,20 @@ class PropertiesDirectiveHandler(docutils.parsers.rst.Directive):
         """
         # Construct the list entry in ReStructuredText as the description and
         # additional text may be in ReStructuredText.
-        property_rst = f"``{name}``: {detail['description']}".strip()
-        if property_rst[-1] != ".":
-            property_rst = f"{property_rst}."
+        if detail['description'] is None:
+            property_rst = f"``{name}``"
+        else:
+            property_rst = f"``{name}``: {detail['description']}".strip()
+            if property_rst[-1] != ".":
+                property_rst = f"{property_rst}."
+
         if name in self.additional_text:
-            property_rst = f"{property_rst} {self.additional_text[name]}"
-        if property_rst[-1] != ".":
-            property_rst = f"{property_rst}."
+            if detail['description'] is None:
+                property_rst = f"{property_rst}: {self.additional_text[name]}"
+            else:
+                property_rst = f"{property_rst} {self.additional_text[name]}"
+            if property_rst[-1] != ".":
+                property_rst = f"{property_rst}."
 
         property_item = docutils.nodes.list_item()
         property_item_paragraph = docutils_helpers.rst_string_convert(
