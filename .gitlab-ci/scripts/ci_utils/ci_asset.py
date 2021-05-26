@@ -35,8 +35,6 @@ def discover_assets(path, blacklist=None, whitelist=None):
                    if asset_path.stem != 'components']
 
     for asset_path in asset_paths:
-        if not Path(asset_path, 'Makefile').is_file():
-            continue
 
         asset_name = asset_path.stem
 
