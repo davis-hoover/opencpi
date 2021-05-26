@@ -7,7 +7,7 @@
   <Property Name="DAC_OUTPUT_IS_LSB_OF_IN_PORT" 
             Type="Bool" 
             Parameter="True"
-            Default="false"
+	    Default="false"
             Description="Indicates whether DAC data is extracted from the most
                          significant or least significant DAC_WIDTH_BITS of the in port."/>
   <Property Name="underrun_sticky_error"
@@ -28,10 +28,9 @@
             description='Number of sample underruns.'/>
 
   <Port Name="in" 
-        Protocol="complex_short_timed_sample-prot"/>
+        Protocol="ComplexShortWithMetadata-prot"/>
   <Port Name="on_off" 
         Protocol="tx_event-prot"
         Optional="1"
         Producer="true"/>
 </ComponentSpec>
-

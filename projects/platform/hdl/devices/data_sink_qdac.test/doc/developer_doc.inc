@@ -13,7 +13,12 @@
     \rowcolor{blue}
     \textbf{Revision} & \textbf{Description of Change} & \textbf{Date} \\
       \hline
-      v2.2 & Initial Release & 05/2021 \\
+      v1.6 & Released initial technology preview & 02/2020 \\
+      \hline
+      v1.7 & Updated port/property/interface tables for accuracy. Package ID changed from ocpi.assets to ocpi.platform. & 06/2020 \\
+      \hline
+      v2.1 & Updated Source Dependencies section for correct location of dependencies. Updated Worker Implementation Details section to talk about new properties. & 03/2021 \\
+      \hline
     \end{longtable}
   \end{table}
 \end{center}
@@ -84,8 +89,8 @@ There is the samp\_count\_before\_first\_underrun property that gives the number
 	\item platform/hdl/devices/\comp.hdl/\comp.vhd
 	\item core/hdl/primitives/cdc/cdc\_pkg.vhd
 	\item core/hdl/primitives/cdc/fast\_pulse\_to\_slow\_sticky.vhd
-	\item core/hdl/primitives/timed\_sample\_prot/complex\_short\_timed\_sample\_pkg.vhd
-	\item core/hdl/primitives/timed\_sample\_prot/complex\_short\_timed\_sample\_demarshaller.vhd
+	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_pkg.vhd
+	\item core/hdl/primitives/protocol/complex\_short\_with\_metadata\_demarshaller.vhd
 	\item core/hdl/primitives/util/util\_pkg.vhd
 	\item core/hdl/primitives/util/in2out.v
 	\item platform/hdl/primitives/dac/dac\_pkg.vhd

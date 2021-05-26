@@ -1,4 +1,4 @@
-<HdlDevice Language="vhdl" Spec="data_sink_qdac-spec" Version="2" libraries='dac timed_sample_prot'>
+<HdlDevice Language="vhdl" Spec="data_sink_qdac-spec" Version="2">
 
   <Property Name="IN_PORT_DATA_WIDTH"
             Parameter="true"
