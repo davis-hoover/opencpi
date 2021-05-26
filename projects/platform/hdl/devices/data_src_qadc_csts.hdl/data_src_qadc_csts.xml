@@ -1,0 +1,19 @@
+<HdlDevice language='vhdl' spec='data_src_qadc_csts-spec' version='2' libraries='util ocpi.core.bsv timed_sample_prot adc_csts'>
+
+  <Property name='DATA_PIPE_LATENCY_CYCLES'
+            parameter='true'
+            default='0'/>
+  <Property name='OUT_PORT_DATA_WIDTH'
+            parameter='true'
+            default='32'/>
+
+  <StreamInterface name='out'
+                   producer='true'
+                   clockdirection='out'
+                   datawidth='OUT_PORT_DATA_WIDTH'
+                   insertEom='true'/>
+  <DevSignal name='dev'
+             signals='qadc-16-signals.xml'
+             master='true'/>
+
+</HdlDevice>

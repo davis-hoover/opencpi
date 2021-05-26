@@ -32,9 +32,9 @@ Detail
 
 The data source QADC HDL device worker receives sampled data from an ADC on
 its ``dev`` devsignal port.
-The worker sign-extends and justifies the samples to 16-bit real, 16-bit complex values,
-which is the standard provided by the ``sample`` argument of the
-``complex_short_timed_sample-prot`` protocol used by the ``out`` port.
+The worker sign-extends and justifies fhe samples to 16-bit I, 16-bit Q values,
+which is the standard provided by the ``samples`` argument of the
+``ComplexShortWithMetadata-prot`` protocol used by the ``out`` port.
 The HDL device worker performs justification within the 16-bit values according to
 the value of the ``ADC_INPUT_IS_LSB_OF_OUT_PORT`` parameter property.
 
@@ -43,7 +43,7 @@ The ouput port clock is driven by the ADC clock, and backpressure from the outpu
 port’s ready signal is not expected under normal operation. When backpressure is
 experienced, the ``overrun_sticky_error`` property is set to ``true``; in this
 case, an ``out`` port samples message will be ended if one is in progress, and
-a discontinuity message will be sent to the output port.
+a sync message will be sent to the output port.
 
 The ``samp_count_before_irst_samp_drop`` property
 gives the number of samples before the first dropped sample and the
@@ -55,8 +55,8 @@ for these properties because it takes advantage of the fact that they will have
 a stable value by the time the OpenCPI control
 plane reads them at the end of an application run.
 
-When set to ``true``, the ``suppress_discontinuity_opcode`` property prevents the HDL device worker from
-sending ``discontinuity`` opcodes.
+When set to ``true``, the ``suppress_sync_opcode`` property prevents the HDL device worker from
+sending ``sync`` opcodes.
 
 .. Comment out ocpi_documentation_worker:: for now. It doesn't work with HdlDevice XML.
 
@@ -69,7 +69,7 @@ Outputs:
   
   * Type: ``StreamInterface``
 
-  * Protocol: ``complex_short_timed_sample-prot``
+  * Protocol: ``ComplexShortWithMetadata-prot``
 
   * Worker EOF: ``False``
 
