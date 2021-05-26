@@ -27,7 +27,6 @@ include $(OCPI_CDK_DIR)/include/util.mk
 # use the authoring model prefix of 'hdl'.
 # So, Package-ID of the hdl/primitives dir will be default look like:
 #   <project>.hdl.primitives
-$(call OcpiIncludeAssetAndParent,,hdl)
 # Default the PrimitiveLibraries and PrimitiveCores variables
 ifeq ($(filter-out undefined,$(origin PrimitiveLibraries) $(origin Libraries)),)
   Libraries:=$(foreach d,$(notdir $(wildcard *)),$(infox d:$d)\
@@ -47,6 +46,7 @@ ifeq ($(filter-out undefined,$(origin PrimitiveCores) $(origin Cores)),)
 else
   Cores:=$(call Unique,$(Cores) $(PrimitiveCores))
 endif
+$(call OcpiIncludeAssetAndParent,,hdl)
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 

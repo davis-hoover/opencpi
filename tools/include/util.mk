@@ -1057,17 +1057,30 @@ define OcpiSetAsset
       $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
     endif
   else ifeq ($2,Primitives)
-    TmpLibraries:=$$(Libraries) $$(HdlLibraries)
+    # save Makefile settings from Primitives or Primitive
+    TmpLibraries:=$$(strip $$(Libraries) $$(HdlLibraries))
+    undefine Libraries
+    undefine HdlLibraries
     ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
       $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
     endif
-    ifneq ($2,.)
+    # we have the Primitives variables
+    ifeq ($1,.)
+      # This is a primitives directory so merge them
+      Libraries:=$$(strip $$(TmpLibraries) $$(Libraries) $$(HdlLibraries))
+    else ifdef TmpLibraries
       Libraries:=$$(TmpLibraries)
+    else
+      undefine Libraries
     endif
+    undefine HdlLibraries
   else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
     # Platforms, Primitive, Applications
     $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
+  else
+    $$(infox MAKEFILE:$1:$2:$$(HdlLibraries):$$(Libraries))
   endif
+  $$(infox SETASSETEND:$1:$2:$$(HdlLibraries):$$(Libraries))
 endef
 
 # First determine the shortened directory type which is the portion
