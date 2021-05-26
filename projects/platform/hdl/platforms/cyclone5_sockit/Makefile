@@ -19,12 +19,10 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
 
-Libraries=axi cyclone5 sdp
-
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
-# Below gets a little ugly but due generation dates or unique generation IDs showing up 
-# in the lines of context of the patch .qip and .qsf patch files, creating a modified
+# Below gets a little ugly but due to generation dates or unique generation IDs showing up 
+# in the lines of context in the .qip and .qsf patch files, creating a modified
 # version of the patch files that contain the dates and unique IDs so that the patch 
 # works correctly
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
@@ -43,7 +41,6 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   endif
 endif
 
-SourceFiles=gen/soc_system.qip
           
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
 
