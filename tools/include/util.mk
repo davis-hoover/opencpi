@@ -1057,21 +1057,45 @@ define OcpiSetAsset
       $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
     endif
   else ifeq ($2,Primitives)
-    # save Makefile settings from Primitives or Primitive
-    TmpLibraries:=$$(strip $$(Libraries) $$(HdlLibraries))
+    # We are overloading the Libraries and Cores variables.
+    # At the primitives level they are specifying which things should be built or cleaned
+    # and *not* dependencies of the underlying libs and cores
+    # So we make sure they do *not* propagate into the lower level assets
+
+    # Capture what was in the Makefile (if there is one), at whatever level we are at
+    # Then erase/undefine them
+    TmpLibraries:=$$(call Unique,$$(strip $$(Libraries) $$(HdlLibraries)))
+    TmpCores:=$$(Cores)
     undefine Libraries
+    undefine Cores
     undefine HdlLibraries
+    # Next parse the XML file if present, again at whatever level we are at
     ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
       $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
     endif
-    # we have the Primitives variables
+    # Any variable settings here are from the XML file
     ifeq ($1,.)
-      # This is a primitives directory so merge them
-      Libraries:=$$(strip $$(TmpLibraries) $$(Libraries) $$(HdlLibraries))
-    else ifdef TmpLibraries
-      Libraries:=$$(TmpLibraries)
+      # This is the actual primitives directory so merge them all
+      Libraries:=$$(call Unique,$$(TmpLibraries) $$(Libraries) $$(HdlLibraries))
+      ifndef Libraries
+        undefine Libraries
+      endif
+      Cores:=$$(call Unique,$$(TmpCores) $$(Cores))
+      ifndef Cores
+        undefine Cores
+      endif
     else
-      undefine Libraries
+      # This is not the actual primitives directory so just restore the ones from any Makefile
+      ifdef TmpLibraries
+        Libraries:=$$(TmpLibraries)
+      else
+        undefine Libraries
+      endif
+      ifdef TmpCores
+        Cores:=$$(Cores)
+      else
+        undefine Cores
+      endif
     endif
     undefine HdlLibraries
   else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
