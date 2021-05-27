@@ -107,8 +107,12 @@ ifneq ($(wildcard specs),)
     # If Project.<mk|xml> changes, recreate specs/package-id file unless the package-id file contents
     # exactly match OCPI_PROJECT_PACKAGE.
     specs/package-id: $(PROJ_FILE)
-	$(AT)if [ ! -e specs/package-id ] || [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
-	       echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
+	$(AT)if [ -n "$(OCPI_PROJECT_PACKAGE)" ]; then \
+               if [ ! -e specs/package-id ] || \
+                  [ "$$(cat specs/package-id)" != "$(OCPI_PROJECT_PACKAGE)" ]; then \
+	         echo Recording the PackageID for this project as: $(OCPI_PROJECT_PACKAGE) >&2; \
+	         echo "$(OCPI_PROJECT_PACKAGE)" > specs/package-id; \
+	       fi; \
 	     fi
   endif
 endif
