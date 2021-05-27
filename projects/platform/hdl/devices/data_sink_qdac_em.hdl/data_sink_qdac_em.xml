@@ -5,7 +5,7 @@
                                      Default="4096"
                                      Description="Number of input samples sent."/>
 
-    <Port Name="out" Producer="true" Protocol="complex_short_timed_sample-prot"/>
+    <Port Name="out" Producer="true" Protocol="ComplexShortWithMetadata-prot"/>
   </ComponentSpec>
 
   <StreamInterface Name="out" 

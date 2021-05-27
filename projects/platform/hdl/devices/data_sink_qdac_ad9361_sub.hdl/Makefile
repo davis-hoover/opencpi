@@ -20,12 +20,11 @@
 # We do this to build for a part with the correct number of resources, such as hardware
 # multipliers, rather than the default smallest part in the family
 # zynq => xc7z020 (ZedBoard, Matchstiq-Z1, Picoflexor-T6A)
-
-
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
   $(shell \
     ln -s ../../../../assets/hdl/devices/ad9361_dac_sub.hdl/ad9361_dac_sub-build.xml data_sink_qdac_ad9361_sub-build.xml;)
 endif
+
 
 HdlExactPart=\
 	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
@@ -35,4 +34,4 @@ HdlExactPart=\
 include $(OCPI_CDK_DIR)/include/worker.mk
 
 clean::
-	rm -f data_sink_qdac_ad9361_sub-build.xml # -> ../../../../assets/hdl/devices/ad9361_dac_sub.hdl/ad9361_dac_sub-build.xml
+	rm -f data_sink_qdac_ad9361_sub-build.xml 

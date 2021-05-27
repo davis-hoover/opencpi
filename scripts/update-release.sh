@@ -94,20 +94,17 @@ if [ -z "$RELEASE" ]; then
 fi
 
 # Fix the builtin software release tag for compatibility checking
-if [ "$RELEASE" != develop ]; then
-  (cd build/autotools
-   echo "Updating autotools for release $RELEASE (base=$OCPI_VERSION " \
-        "major=$OCPI_VERSION_MAJOR minor=$OCPI_VERSION_MINOR " \
-        "patch=$OCPI_VERSION_PATCH)"
-   sed -e "s/\(AC_INIT(\[opencpi\],\[\)[^]]*/\1$OCPI_VERSION/" \
-       -e "s/\(AC_DEFINE(\[VERSION_MAJOR\],\)[^,]*\(,.*\)$/\1$OCPI_VERSION_MAJOR\2/" \
-       -e "s/\(AC_DEFINE(\[VERSION_MINOR\],\)[^,]*\(,.*\)$/\1$OCPI_VERSION_MINOR\2/" \
-       -e "s/\(AC_DEFINE(\[VERSION_PATCHLEVEL\],\)[^,]*\(,.*\)$/\1$OCPI_VERSION_PATCH\2/" \
-       -i configure.ac
-  )
-else
-  echo "Not updating autotools, 'develop' specified as release"
-fi
+(cd build/autotools
+ echo "Updating autotools for release $RELEASE (base=$OCPI_VERSION" \
+      "major=$OCPI_VERSION_MAJOR minor=$OCPI_VERSION_MINOR" \
+      "patch=$OCPI_VERSION_PATCH extra=$OCPI_VERSION_EXTRA)"
+ sed -e "s/\(AC_INIT(\[opencpi\],\[\)[^]]*/\1$OCPI_VERSION${OCPI_VERSION_EXTRA:+-$OCPI_VERSION_EXTRA}/" \
+     -e "s/\(AC_DEFINE(\[VERSION_MAJOR\],\)[^,]*\(,.*\)$/\1$OCPI_VERSION_MAJOR\2/" \
+     -e "s/\(AC_DEFINE(\[VERSION_MINOR\],\)[^,]*\(,.*\)$/\1$OCPI_VERSION_MINOR\2/" \
+     -e "s/\(AC_DEFINE(\[VERSION_PATCHLEVEL\],\)[^,]*\(,.*\)$/\1$OCPI_VERSION_PATCH\2/" \
+     -e "s/\(AC_DEFINE(\[VERSION_EXTRA\],\)[^,]*\(,.*\)$/\1$OCPI_VERSION_EXTRA\2/" \
+     -i configure.ac
+)
 
 # Are we only doing autotools?
 [ -n "$AUTOTOOLS_ONLY" ] && exit 0

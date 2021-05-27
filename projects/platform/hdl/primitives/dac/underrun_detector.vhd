@@ -1,5 +1,5 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
-library timed_sample_prot, dac; use dac.dac.all;
+library protocol, dac; use dac.dac.all;
 
 -- generates underrun indicator when data starvation occurs
 entity underrun_detector is
@@ -9,12 +9,12 @@ entity underrun_detector is
     rst           : in  std_logic;
     status        : out underrun_detector_status_t;
     -- INPUT
-    iprotocol     : in  timed_sample_prot.complex_short_timed_sample.protocol_t;
+    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
     imetadata     : in  metadata_t;
     imetadata_vld : in  std_logic;
     irdy          : out std_logic;
     -- OUTPUT
-    oprotocol     : out timed_sample_prot.complex_short_timed_sample.protocol_t;
+    oprotocol     : out protocol.complex_short_with_metadata.protocol_t;
     ometadata     : out metadata_t;
     ometadata_vld : out std_logic;
     ordy          : in  std_logic);
@@ -35,7 +35,7 @@ begin
   status.num_underruns <= std_logic_vector(num_underruns);
 
   --underrun only generated when ctrl_tx_on_off = '1'
-  underrun <= ordy and (not iprotocol.sample_vld) and imetadata.ctrl_tx_on_off;
+  underrun <= ordy and (not iprotocol.samples_vld) and imetadata.ctrl_tx_on_off;
   
   first_underrun_detected_sticky_reg : process(clk)
   begin
@@ -54,7 +54,7 @@ begin
       if(rst = '1') then
         samp_count_before_first_underrun <= (others=>'0');
       elsif(first_underrun_detected_sticky = '0' and samp_count_before_first_underrun < samp_count_max_value) then
-          if (iprotocol.sample_vld = '1' and ordy = '1' and imetadata.ctrl_tx_on_off = '1') then
+          if (iprotocol.samples_vld = '1' and ordy = '1' and imetadata.ctrl_tx_on_off = '1') then
             samp_count_before_first_underrun <= samp_count_before_first_underrun + 1;
           end if;
       end if;
