@@ -1,0 +1,17 @@
+<HdlDevice language='vhdl' Emulate='data_src_qadc_csts.hdl' Version='2' libraries='platform timed_sample_prot'>
+
+  <ComponentSpec>
+    <Port name='in' producer='false' protocol="complex_short_timed_sample-prot"/>
+  </ComponentSpec>
+
+  <StreamInterface name='in'
+                   datawidth='32'
+                   clockdirection='out'/>
+
+  <DevSignal name='dev' signals='qadc-16-signals.xml'/>
+
+  <Supports worker='data_src_qadc_csts'>
+    <Connect port='dev' to='dev'/>
+  </Supports>
+
+</HdlDevice>

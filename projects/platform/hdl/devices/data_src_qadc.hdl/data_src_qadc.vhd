@@ -1,12 +1,12 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library cdc, util, adc, ocpi; use ocpi.wci.all;
-library timed_sample_prot; use timed_sample_prot.complex_short_timed_sample.all;
+library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
 
   constant BITS_PACKED_INTO_MSBS : boolean := not
       to_boolean(ADC_INPUT_IS_LSB_OF_OUT_PORT);
 
-  signal adc_opcode : opcode_t := SAMPLE;
+  signal adc_opcode : opcode_t := SAMPLES;
   signal adc_data   : std_logic_vector(
                       to_integer(unsigned(OUT_PORT_DATA_WIDTH))-1 downto 0) :=
                       (others => '0');
@@ -30,8 +30,8 @@ architecture rtl of worker is
 
   signal dev_ready                 : bool_t;
 
-  signal ctl_suppress_discontinuity_opcode  : bool_t;
-  signal adc_suppress_discontinuity_opcode  : bool_t;
+  signal ctl_suppress_sync_opcode  : bool_t;
+  signal adc_suppress_sync_opcode  : bool_t;
 
 begin
   ------------------------------------------------------------------------------
@@ -69,19 +69,20 @@ begin
   -- out port
   ------------------------------------------------------------------------------
 
-  adc_idata.real <= dev_in.data_i(dev_in.data_i'left downto
+  adc_idata.i <= dev_in.data_i(dev_in.data_i'left downto
                                dev_in.data_i'left-
                                to_integer(unsigned(ADC_WIDTH_BITS))+1);
-  adc_idata.imaginary <= dev_in.data_q(dev_in.data_q'left downto
+  adc_idata.q <= dev_in.data_q(dev_in.data_q'left downto
                                dev_in.data_q'left-
                                to_integer(unsigned(ADC_WIDTH_BITS))+1);
 
   out_port_data_width_32 : if(OUT_PORT_DATA_WIDTH = 32) generate
 
-    -- this can't be simply dev_in.valid, otherwise discontinuity message would be
-    -- sent before first sample message in the event ADC is streaming before the
-    -- output port first becomes ready to accept data (exclaiming discontinuity when
-    -- there is only "after" data, not "before"-and-"after" data, would not be correct)
+    -- this can't be simply dev_in.valid, otherwise sync message would be sent
+    -- before first sample message in the event ADC is streaming before the
+    -- output port first becomes ready to accept data (sync means
+    -- *discontinuity*, and exclaiming discontinuity when there is only "after"
+    -- data, not "before"-and-"after" data, would not be correct)
     adc_overrun_generator_ivld <= dev_in.valid and
                                   (not adc_pending_initial_ready);
 
@@ -99,10 +100,10 @@ begin
       end if;
     end process;
     
-    ctl_suppress_discontinuity_opcode <= props_in.suppress_discontinuity_opcode and 
+    ctl_suppress_sync_opcode <= props_in.suppress_sync_opcode and 
                                 ctl_in.is_operating;
                                 
-    suppress_discontinuity_opcode_cdc : cdc.cdc.single_bit
+    suppress_sync_opcode_cdc : cdc.cdc.single_bit
     generic map(
       N    =>  2,
       IREG => '1')
@@ -110,10 +111,10 @@ begin
       src_clk  => ctl_in.clk,
       src_rst  => ctl_in.reset,
       src_en   => '1',
-      src_in   => ctl_suppress_discontinuity_opcode,
+      src_in   => ctl_suppress_sync_opcode,
       dst_clk  => dev_in.clk,
       dst_rst  => adc_rst,
-      dst_out  => adc_suppress_discontinuity_opcode);
+      dst_out  => adc_suppress_sync_opcode);
 
     overrun_generator :
         adc.adc.samp_drop_detector
@@ -147,17 +148,17 @@ begin
         oprotocol  => adc_data_widener_oprotocol,
         ordy       => out_in.ready);
 
-    out_marshaller : timed_sample_prot.complex_short_timed_sample.out_port_csts_sample_and_discontinuity
+    out_marshaller : protocol.complex_short_with_metadata.out_port_cswm_samples_and_sync
       generic map(
         WSI_DATA_WIDTH => to_integer(OUT_PORT_DATA_WIDTH),
         WSI_MBYTEEN_WIDTH => out_out.byte_enable'length)
       port map(
-        clk                        => dev_in.clk,
-        rst                        => adc_rst,
+        clk               => dev_in.clk,
+        rst               => adc_rst,
         -- INPUT
-        iprotocol                  => adc_data_widener_oprotocol,
-        iready                     => out_in.ready,
-        isuppress_discontinuity_op => adc_suppress_discontinuity_opcode,
+        iprotocol         => adc_data_widener_oprotocol,
+        iready            => out_in.ready,
+        isuppress_sync_op => adc_suppress_sync_opcode,
         -- OUTPUT
         odata             => adc_data,
         ovalid            => out_out.valid,
@@ -187,12 +188,11 @@ begin
   out_out.data <= adc_data;
 
   out_out.opcode <=
-      complex_short_timed_sample_sample_op_e          when adc_opcode = SAMPLE          else
-      complex_short_timed_sample_time_op_e            when adc_opcode = TIME_TIME       else
-      complex_short_timed_sample_sample_interval_op_e when adc_opcode = SAMPLE_INTERVAL else
-      complex_short_timed_sample_flush_op_e           when adc_opcode = FLUSH           else
-      complex_short_timed_sample_discontinuity_op_e   when adc_opcode = DISCONTINUITY   else
-      complex_short_timed_sample_metadata_op_e        when adc_opcode = METADATA        else
-      complex_short_timed_sample_sample_op_e;
+      ComplexShortWithMetadata_samples_op_e  when adc_opcode = SAMPLES   else
+      ComplexShortWithMetadata_time_op_e     when adc_opcode = TIME_TIME else
+      ComplexShortWithMetadata_interval_op_e when adc_opcode = INTERVAL  else
+      ComplexShortWithMetadata_flush_op_e    when adc_opcode = FLUSH     else
+      ComplexShortWithMetadata_sync_op_e     when adc_opcode = SYNC      else
+      ComplexShortWithMetadata_samples_op_e;
 
 end rtl;
