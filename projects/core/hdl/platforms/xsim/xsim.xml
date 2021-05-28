@@ -1,4 +1,5 @@
-<HdlPlatform Language="VHDL" spec='platform-spec'>
+<HdlPlatform Language="VHDL" spec='platform-spec' libraries='sdp'
+	     configurations='base cfg_pps_sim_test'>
   <specproperty name='platform' value='xsim'/>
   <property name='sdpDropCount' type='uchar' volatile='1'/>
   <!-- All platform workers must provide these two ports -->

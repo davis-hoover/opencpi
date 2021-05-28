@@ -1,4 +1,4 @@
-<HdlPlatform Language="VHDL" spec='platform-spec' libraries='sdp util' version='2'>
+<HdlPlatform Language="VHDL" spec='platform-spec' libraries='sdp util' version='2' part='xsim'>
   <specproperty name='platform' value='x4sim'/>
   <specproperty name='sdp_width' value='4'/>
   <property name='sdpDropCount' type='uchar' volatile='1'/>

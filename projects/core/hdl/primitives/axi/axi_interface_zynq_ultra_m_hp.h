@@ -9,7 +9,7 @@
 //   - overrides the M_AXI_GP* default data wdith (128) to 32 (we only use GP0)
 //   - overrides the S_AXI_GP1-6 default data width (128) to 64 (which opencpi does not use)
 //   - sets other processor stuff - it represents all the processor options from generation
-// Can't we avoid the extra VHDL wrapper in any case?
+// We cannot avoid the extra VHDL wrapper in any case?
 #define ADDR_WIDTH 40
 #define ID_WIDTH 16
 #define DATA_WIDTH 32 // The hardware can do 128, but we should do 64 when the cp interface is parameterized

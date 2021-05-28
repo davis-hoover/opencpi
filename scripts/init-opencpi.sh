@@ -26,7 +26,6 @@
 # It is only callable from the top level of the source tree.
 # This sourced script is for clean environments, only for use in the core source tree,
 # although if CDK is available we let it go with a warning
-set -vx
 if [ -n "$OCPI_ROOT_DIR" ] ; then
   [ -d "$OCPI_ROOT_DIR" ] || { echo The OCPI_ROOT_DIR environment variable is invalid && exit 1; }
   ocpi_old=$(cd "$OCPI_ROOT_DIR" && pwd -P)

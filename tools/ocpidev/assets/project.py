@@ -180,7 +180,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
 
         # Otherwise, ask Makefile at the project top for the ProjectPackage
         if project_package is None or project_package == "":
-            project_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+            project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
                                                        mk_arg="projectpackage ShellProjectVars=1",
                                                        verbose=True)
             if (not project_vars is None and 'ProjectPackage' in project_vars and
@@ -188,7 +188,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 # There is only one value associated with ProjectPackage, so get element 0
                 project_package = project_vars['ProjectPackage'][0]
             else:
-                raise ocpiutil.OCPIException("Could not determine Package-ID of project \"" +
+                raise ocpiutil.OCPIException("Could not determine PackageID of project \"" +
                                              self.directory + "\".")
         self.package_id = project_package
 
@@ -266,7 +266,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                     lib_package += ":" + str(i)
                     i += 1
                 libraries_dict[lib_package] = lib_dict
-        project_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         project_dict["dependencies"] = project_vars['ProjectDependencies']
@@ -341,7 +341,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 lib_package += ":" + str(i)
                 i += 1
             libraries_dict[lib_package] = lib_dict
-        project_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         project_dict["dependencies"] = project_vars['ProjectDependencies']
@@ -466,7 +466,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         show all the information about a project with level 1 of verbosity in the format specified
         by details (simple, table, or json)
         """
-        project_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         #TODO output the project's registry here too
@@ -531,7 +531,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 for app in app_col.apps_list:
                     apps_dict[app.name] = app.directory
             top_dict["applications"] = apps_dict
-        project_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         proj_depends = project_vars['ProjectDependencies']
@@ -624,7 +624,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                     apps_dict[app.name] = app.directory
             top_dict["applications"] = apps_dict
 
-        project_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         prims_dict = self._get_very_verbose_prims_dict()
@@ -1119,7 +1119,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         proj_dir = directory + "/" + name
         if os.path.isdir(proj_dir):
             raise ocpiutil.OCPIException("Cannot create this project: " + proj_dir + ", because the " +
-                                         "folder already exists.")
+                                         "directory already exists.")
         os.chdir(directory)
         os.mkdir(name)
         template_dict = Project._get_template_dict(name, proj_dir, **kwargs)
@@ -1128,8 +1128,8 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         ocpiutil.write_file_from_string( proj_dir + "/Project.exports", ocpitemplate.PROJ_EXPORTS)
         ocpiutil.write_file_from_string( proj_dir + "/.gitignore", ocpitemplate.PROJ_GIT_IGNORE)
         ocpiutil.write_file_from_string( proj_dir + "/.gitattributes", ocpitemplate.PROJ_GIT_ATTR)
-        template = jinja2.Template(ocpitemplate.PROJ_MAKEFILE, trim_blocks=True)
-        ocpiutil.write_file_from_string( proj_dir + "/Makefile", template.render(**template_dict))
+        #template = jinja2.Template(ocpitemplate.PROJ_MAKEFILE, trim_blocks=True)
+        #ocpiutil.write_file_from_string( proj_dir + "/Makefile", template.render(**template_dict))
         # TODO: For traditional XML, replace PROJ_PROJECT_XML_LEGACY with PROJ_PROJECT_XML
         template = jinja2.Template(ocpitemplate.PROJ_PROJECT_XML_LEGACY, trim_blocks=True)
         ocpiutil.write_file_from_string( proj_dir + "/Project.xml", template.render(**template_dict))
@@ -1141,15 +1141,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 "registry",
                 Registry.get_registry_dir(name)).add(name, True)
 
-        #make sure imports and exports are made.  theres gotta be a better way to do this then a
-        #bulky Popen call to make.  might need to wait until ,ore stuff is intergrated in python.
-        proc = subprocess.Popen(["make", "-C", name, "imports", "exports"],
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        my_out = proc.communicate()
-        if proc.returncode != 0:
-            logging.warning("Failed to import or export project at " + name + " because of " +
-                            "error: \n" + str(my_out[1]))
+        rc = ocpiutil.execute_cmd({}, proj_dir, action=[ "imports" ],
+                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+        if rc != 0:
+            logging.warning("Failed to import project at " + proj_dir)
+        rc = ocpiutil.execute_cmd({}, proj_dir, action=[ "exports" ],
+                                  file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
+        if rc != 0:
+            logging.warning("Failed to export project at " + proj_dir)
 
 
 # pylint:enable=too-many-instance-attributes

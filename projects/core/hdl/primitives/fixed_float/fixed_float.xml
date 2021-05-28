@@ -1,0 +1,4 @@
+<hdllibrary
+    sourcefiles='fixed_float_types_pkg.vhd fixed_pkg.vhd float_pkg.vhd fixed_body.vhd float_body.vhd'
+    />
+
