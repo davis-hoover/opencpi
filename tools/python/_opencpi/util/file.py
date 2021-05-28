@@ -102,11 +102,12 @@ def execute_cmd(settings, directory, action=None, file=None):
 #TODO fix these problems with the function instead of just disabling them
 # pylint:disable=too-many-locals
 # pylint:disable=too-many-branches
-def set_vars_from_make(mk_file, mk_arg="", verbose=None):
+def set_vars_from_make(mk_file_and_dir, mk_arg="", verbose=None):
     """
     Collect a dictionary of variables from a makefile
     --------------------------------------------------
-    First arg is the "make" file to use, or a tuple of the "make" file and the dir to enter
+    First arg is a tuple of the "make" file and the dir for "make" to enter
+       This arg can also simply be a string, with the directory defaulting to CWD or .
     Second arg is make arguments needed to invoke correct output
         The output can be an assignment or a target
     Third arg is a verbosity flag
@@ -134,10 +135,11 @@ def set_vars_from_make(mk_file, mk_arg="", verbose=None):
         make_cmd = "make " + mk_dbg + " -n -r -s"
 
         # If mk_file is a tuple, the second part is the directory to use
-        if type(mk_file) == tuple:
-            make_cmd += " -C " + mk_file[1]
-            mk_file = mk_file[0]
-
+        if type(mk_file_and_dir) == tuple:
+            make_cmd += " -C " + mk_file_and_dir[1]
+            mk_file = mk_file_and_dir[0]
+        else:
+            mk_file = mk_file_and_dir
         make_cmd += " -f " + mk_file + " " + mk_arg;
 
         logging.debug("Calling make via:" + str(make_cmd.split()))

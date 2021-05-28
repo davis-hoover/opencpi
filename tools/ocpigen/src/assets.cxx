@@ -99,9 +99,13 @@ parseHdlPrimitives(ezxml_t xml) {
   return NULL;
 }
 
+#define HDL_ASSEMBLY_ATTRS  TARGET_ATTRS
 static const char *
 parseHdlAssembly(ezxml_t xml) {
-  (void)xml;
+  const char *err;
+  if ((err = OE::checkAttrs(xml, TARGET_ATTRS, "Containers", NULL)) ||
+      (err = OE::checkElements(xml, "instance", "connection", "external", NULL)))
+    return err;
   return NULL;
 }
 
