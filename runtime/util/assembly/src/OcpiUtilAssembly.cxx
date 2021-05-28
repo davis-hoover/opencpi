@@ -147,10 +147,12 @@ namespace OCPI {
       for (ezxml_t ix = ezxml_cchild(ax, "Instance"); ix; ix = ezxml_cnext(ix))
         if ((err = addInstance(ix, extraInstAttrs, params)))
           return err;
-      const char *done = ezxml_cattr(ax, "done");
+      const char *finished = ezxml_cattr(ax, "finished");
+      if (!finished) // remove in 3.0
+        finished = ezxml_cattr(ax, "done"); // remove in 3.0
       unsigned n;
-      if (done) {
-        if ((err = getInstance(done, n)))
+      if (finished) {
+        if ((err = getInstance(finished, n)))
           return err;
         m_doneInstance = n;
       }
