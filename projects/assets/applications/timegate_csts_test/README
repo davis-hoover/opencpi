@@ -1,0 +1,20 @@
+To verify the timegate_csts_test app, dump the applications workers properties into a file and 
+follow the below steps.
+
+ - Step 1: Look at the first metadata record for capture_v2 output. In this array,
+    the third entry is the Start of Message Fractional Timestamp and the fourth 
+    entry is the Start of Message SecondsTimestamp.
+
+ - Step 2: Look at the test_source time to send. This is the seconds and fractional 
+    time to transmit. Take this value and convert it to binary. This will give you 
+    the fractional and seconds portions of this number. 
+    The fractional is the lower 32 bits and seconds is the upper 32 bits.
+
+ - Step 3: Verify the following three important pieces to determaning success for 
+    this test application.
+ - - A: The fractional bits from the test_source time to send is marginally close 
+         to the recieved Start of Message Fractional Timestamp.
+ - - B: The seconds portion of test_source time to send  should be close to the Start 
+         of Message Seconds Timestamp, then the test can be considered a success.
+ - - C:  The data sent from test_source is what is received by capture_v2; the data 
+          samples 0 to 99 are received and the total bytes received is 400 bytes.
