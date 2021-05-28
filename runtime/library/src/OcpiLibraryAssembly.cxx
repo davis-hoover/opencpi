@@ -32,8 +32,8 @@ namespace OCPI {
 
     // Attributes specific to an application assembly
     static const char *assyAttrs[] = { COLLOCATION_POLICY_ATTRS,
-				       "maxprocessors", "minprocessors", "roundrobin", "done",
-				       NULL};
+				       "maxprocessors", "minprocessors", "roundrobin", "done", "finished",
+				       NULL};// FIXME: done will be deprecated in 3.0
 
     // The instance attributes relevant to app assemblies - we don't really deal with "container" here
     // FIXME: It should be in the upper level
