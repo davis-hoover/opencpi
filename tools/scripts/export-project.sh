@@ -352,7 +352,7 @@ for a in $assets; do
 	      [ -n "$model" ] && bad no model prefix is allowed before \"$arg\"
 	      if [ "$arg" = specs ] ; then
 		  if [ -d specs ]; then
-		      specs+=(`shopt -s nullglob; for i in specs/*.xml specs/package-id; do [ -f $i ] && echo $(basename $i); done`)
+		      specs+=(`shopt -s nullglob; for i in specs/*.xml specs/package-id; do [ ! -f $i ] || echo $(basename $i); done`)
 		  else
 		      [ -n "$allrequested" ] || warn_check "Warning:  cannot export specs since no specs exist in this project."
 		  fi
