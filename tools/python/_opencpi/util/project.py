@@ -54,7 +54,8 @@ def get_makefile(directory, type=None):
     if os.path.exists(directory + "/Makefile"):
         mkf="Makefile"
     else:
-        mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + type + ".mk"
+        hdl = "hdl/" if type.startswith("hdl-") else ""
+        mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + hdl + type + ".mk"
     return mkf,directory
 
 def get_dirtype(directory="."):
@@ -142,7 +143,7 @@ def get_dir_info(directory=".", careful=False):
                         break
     elif name in ["platforms", "primitives", "cards", "devices", "adapters", "assemblies" ]:
         # plurals that are usually make types but not actual assets
-        if directory.startswith(name): # incure absolutizing penalty
+        if directory.startswith(name): # incur absolutizing penalty
             directory = os.path.realpath(directory)
         parent = os.path.basename(os.path.dirname(directory))
         if parent == "rcc" and name == "platforms":

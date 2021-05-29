@@ -99,6 +99,15 @@ parseHdlPrimitives(ezxml_t xml) {
   return NULL;
 }
 
+static const char *
+parseHdlPlatforms(ezxml_t xml) {
+  const char *err;
+  if ((err = OE::checkAttrs(xml, HDL_TARGET_ATTRS, NULL)) ||
+      (err = OE::checkElements(xml, NULL)))
+    return err;
+  return NULL;
+}
+
 #define HDL_ASSEMBLY_ATTRS  TARGET_ATTRS
 static const char *
 parseHdlAssembly(ezxml_t xml) {
@@ -127,6 +136,7 @@ parseAsset(const char *file, const char *topElement) {
        !strcasecmp(xml->name, "hdlcore") ? parseHdlCore(xml) :
        !strcasecmp(xml->name, "hdlassembly") ? parseHdlAssembly(xml) :
        !strcasecmp(xml->name, "hdlprimitives") ? parseHdlPrimitives(xml) :
+       !strcasecmp(xml->name, "hdlplatforms") ? parseHdlPlatforms(xml) :
        !strcasecmp(xml->name, "libraries") ? parseLibraries(xml) :
        "Unknown asset type"))
     return OU::esprintf("For <%s> XML file %s:  %s", topElement, file, err);

@@ -180,7 +180,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
 
         # Otherwise, ask Makefile at the project top for the ProjectPackage
         if project_package is None or project_package == "":
-            project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
+            project_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory, "project"),
                                                        mk_arg="projectpackage ShellProjectVars=1",
                                                        verbose=True)
             if (not project_vars is None and 'ProjectPackage' in project_vars and
@@ -266,7 +266,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                     lib_package += ":" + str(i)
                     i += 1
                 libraries_dict[lib_package] = lib_dict
-        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
+        project_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         project_dict["dependencies"] = project_vars['ProjectDependencies']
@@ -341,7 +341,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 lib_package += ":" + str(i)
                 i += 1
             libraries_dict[lib_package] = lib_dict
-        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
+        project_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         project_dict["dependencies"] = project_vars['ProjectDependencies']
@@ -466,7 +466,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         show all the information about a project with level 1 of verbosity in the format specified
         by details (simple, table, or json)
         """
-        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
+        project_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         #TODO output the project's registry here too
@@ -531,7 +531,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 for app in app_col.apps_list:
                     apps_dict[app.name] = app.directory
             top_dict["applications"] = apps_dict
-        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
+        project_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         proj_depends = project_vars['ProjectDependencies']
@@ -624,7 +624,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                     apps_dict[app.name] = app.directory
             top_dict["applications"] = apps_dict
 
-        project_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(self.directory, "project"),
+        project_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory, "project"),
                                                    mk_arg="projectdeps ShellProjectVars=1",
                                                    verbose=True)
         prims_dict = self._get_very_verbose_prims_dict()

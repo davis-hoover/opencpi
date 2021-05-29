@@ -154,7 +154,7 @@ def set_vars_from_make(mk_file_and_dir, mk_arg="", verbose=None):
         # Print out stderr from make if log level is medium/high or if make returned error
         if child.returncode != 0 or ocpi_log_level >= 6:
             if mk_err and (verbose or child.returncode != 0):
-                logging.error("STDERR output from Make (set_vars_from_make):\n" + str(mk_err))
+                logging.error("STDERR output from Make (set_vars_from_make):\n" + str(mk_err)+"END_OF_MAKE_STDERR")
             if child.returncode != 0:
                 # pylint:disable=undefined-variable
                 raise OCPIException("The following make command returned an error:\n" + make_cmd)

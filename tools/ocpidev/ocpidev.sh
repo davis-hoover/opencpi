@@ -810,7 +810,7 @@ function make_library {
 	     To limit the tests that actually get built/run, set the Tests= attribute
 
 	     Any attribute definitions that should apply to all individual worker/test
-	     in this library belong in this xml file
+	     in this library belong in this xml file-->
 	<library
 	EOF
     doattrs PackageName PackagePrefix PackageID Libraries ComponentLibraries IncludeDirs XmlIncludeDirs
@@ -1310,7 +1310,7 @@ function do_hdl_platform {
   libbase=hdl
   if [ "$dirtype" == project -a ! -e "$subdir" ]; then
     mkdir -p $subdir
-    cat <<-EOF EOF > $subdir/platforms.xml
+    cat <<-EOF > $subdir/platforms.xml
 	<!-- To restrict the HDL platforms that are built, you can set the Platforms
 	     attribute to the specific list of which ones you want to build, e.g.:
 	     Platforms='pf1 pf3'
@@ -1490,7 +1490,7 @@ function do_primitive {
     bad The primitive $2 already exists at $dir.
   if [ "$dirtype" == project -a ! -e hdl/primitives ]; then
     mkdir -p hdl/primitives
-    cat <<-EOF EOF > hdl/primitives/primitives.xml
+    cat <<-EOF > hdl/primitives/primitives.xml
 	<!-- The XML file for the hdl/primitives directory:
 	     To restrict the primitives that are built or run, you can set the Libraries or Cores
 	     attributes to the specific list of which ones you want to build and run, e.g.:
