@@ -144,7 +144,6 @@ parseHdlAssembly(ezxml_t xml) {
   return NULL;
 }
 
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #define ALL_ATTRS \
   HDL_TARGET_ATTRS, TARGET_ATTRS, PACKAGE_ATTRS, PROJECT_AND_LIBRARY_ATTRS, PROJECT_ONLY_ATTRS, \
   LIBRARY_ONLY_ATTRS, APPLICATION_OCPIRUN_ATTRS, APPLICATIONS_ONLY_ATTRS, \
