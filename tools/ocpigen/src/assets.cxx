@@ -36,12 +36,13 @@ namespace OU = OCPI::Util;
 
 #define TARGET_ATTRS "OnlyTargets", "OnlyPlatforms", "ExcludeTargets", "ExcludePlatforms"
 
-#define PROJECT_AND_LIBRARY_ATTRS HDL_TARGET_ATTRS, TARGET_ATTRS,\
+#define PACKAGE_ATTRS "PackageID", "Package", "PackageName", "PackagePrefix"
+#define PROJECT_AND_LIBRARY_ATTRS HDL_TARGET_ATTRS, TARGET_ATTRS, PACKAGE_ATTRS, \
 	  "RccPlatforms", "RccHdlPlatforms",\
-	  "ComponentLibraries", "HdlLibraries", "PackageID", "Package",\
-          "XmlIncludeDirs", "IncludeDirs", "ComponentLibraries"
+	  "ComponentLibraries", "HdlLibraries", \
+          "XmlIncludeDirs", "IncludeDirs"
 
-#define PROJECT_ONLY_ATTRS "PackageName", "PackagePrefix", "ProjectDependencies"
+#define PROJECT_ONLY_ATTRS "ProjectDependencies"
 static const char *
 parseProject(ezxml_t xml) {
   const char *err;
@@ -63,28 +64,53 @@ parseLibrary(ezxml_t xml) {
 static const char *
 parseLibraries(ezxml_t xml) {
   const char *err;
-  if ((err = OE::checkAttrs(xml, LIBRARY_ONLY_ATTRS, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
+  if ((err = OE::checkAttrs(xml, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
+      (err = OE::checkElements(xml, NULL)))
+    return err;
+  return NULL;
+}
+#define APPLICATION_OCPIRUN_ATTRS \
+  "OcpiApp", "OcpiAppNoRun", "OcpiApps", \
+  "OcpiRunArgs", "OcpiRunBefore", "OcpiRunAfter"
+
+static const char *
+parseApplication(ezxml_t xml) {
+  const char *err;
+  if ((err = OE::checkAttrs(xml, APPLICATION_OCPIRUN_ATTRS, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
     return err;
   return NULL;
 }
 
-#define HDL_LIBRARY_AND_CORE_ONLY_ATTRS \
-  "SourceFiles","NameSpace", "Libraries", "HdlNoLibraries"
+#define APPLICATIONS_ONLY_ATTRS "Applications"
+static const char *
+parseApplications(ezxml_t xml) {
+  const char *err;
+  if ((err = OE::checkAttrs(xml, APPLICATIONS_ONLY_ATTRS, APPLICATION_OCPIRUN_ATTRS, \
+			    PACKAGE_ATTRS, NULL)) ||
+      (err = OE::checkElements(xml, NULL)))
+    return err;
+  return NULL;
+}
+
 #define HDL_LIBRARY_AND_CORE_ATTRS \
-  HDL_LIBRARY_AND_CORE_ONLY_ATTRS, "HdlLibraries", "ExcludeTargets", "OnlyTargets"
+  "SourceFiles","NameSpace", "Libraries", "HdlNoLibraries",  "HdlLibraries"
 
 #define HDL_LIBRARY_ONLY_ATTRS "HdlNoElaboration"
 static const char *
 parseHdlLibrary(ezxml_t xml) {
-  (void)xml;
+  if ((err = OE::checkAttrs(xml, HDL_LIBRARY_AND_CORE_ATTRS, HDL_TARGET_ATTRS, TARGET_ATTRS,
+			    HDL_LIBRARY_ONLY_ATTRS, NULL)) ||
+      (err = OE::checkElements(xml, NULL)))
   return NULL;
 }
 
 #define HDL_CORE_ONLY_ATTRS "Top"
 static const char *
 parseHdlCore(ezxml_t xml) {
-  (void)xml;
+  if ((err = OE::checkAttrs(xml, HDL_LIBRARY_AND_CORE_ATTRS, HDL_TARGET_ATTRS, TARGET_ATTRS,
+			    HDL_CORE_ONLY_ATTRS, NULL)) ||
+      (err = OE::checkElements(xml, NULL)))
   return NULL;
 }
 
@@ -93,7 +119,7 @@ static const char *
 parseHdlPrimitives(ezxml_t xml) {
   const char *err;
   if ((err = OE::checkAttrs(xml, HDL_TARGET_ATTRS, TARGET_ATTRS, HDL_PRIMITIVES_ONLY_ATTRS,
-			    "libraries", NULL)) ||
+			    "Libraries", NULL)) ||
       (err = OE::checkElements(xml, NULL)))
     return err;
   return NULL;
@@ -108,19 +134,22 @@ parseHdlPlatforms(ezxml_t xml) {
   return NULL;
 }
 
-#define HDL_ASSEMBLY_ATTRS  TARGET_ATTRS
+#define HDL_ASSEMBLY_ATTRS  "Containers"
 static const char *
 parseHdlAssembly(ezxml_t xml) {
   const char *err;
-  if ((err = OE::checkAttrs(xml, TARGET_ATTRS, "Containers", NULL)) ||
+  if ((err = OE::checkAttrs(xml, TARGET_ATTRS, HDL_ASSEMBLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, "instance", "connection", "external", NULL)))
     return err;
   return NULL;
 }
 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #define ALL_ATTRS \
-  PROJECT_AND_LIBRARY_ATTRS, PROJECT_ONLY_ATTRS, LIBRARY_ONLY_ATTRS, HDL_LIBRARY_AND_CORE_ONLY_ATTRS, \
-  HDL_LIBRARY_ONLY_ATTRS  
+  HDL_TARGET_ATTRS, TARGET_ATTRS, PACKAGE_ATTRS, PROJECT_AND_LIBRARY_ATTRS, PROJECT_ONLY_ATTRS, \
+  LIBRARY_ONLY_ATTRS, APPLICATION_OCPIRUN_ATTRS, APPLICATIONS_ONLY_ATTRS, \
+  HDL_LIBRARY_AND_CORE_ATTRS, HDL_LIBRARY_ONLY_ATTRS, HDL_CORE_ONLY_ATTRS, \
+  HDL_PRIMITIVES_ONLY_ATTRS
 
 // The argument is [<expected-asset-type>:]<xml-file>
 const char *
@@ -138,6 +167,8 @@ parseAsset(const char *file, const char *topElement) {
        !strcasecmp(xml->name, "hdlprimitives") ? parseHdlPrimitives(xml) :
        !strcasecmp(xml->name, "hdlplatforms") ? parseHdlPlatforms(xml) :
        !strcasecmp(xml->name, "libraries") ? parseLibraries(xml) :
+       !strcasecmp(xml->name, "applications") ? parseApplications(xml) :
+       !strcasecmp(xml->name, "application") ? parseApplication(xml) :
        "Unknown asset type"))
     return OU::esprintf("For <%s> XML file %s:  %s", topElement, file, err);
   static const char *attrs[] = { ALL_ATTRS, NULL };

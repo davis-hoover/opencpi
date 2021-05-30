@@ -86,7 +86,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         return the package id of the library.  This information is determined from the make build
         system in order to be accurate.
         """
-        lib_vars = ocpiutil.set_vars_from_make(cpiutil.get_makefile(directory, "library"),
+        lib_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(directory, "library"),
                                                mk_arg="ShellLibraryVars=1 showlib",
                                                verbose=True)
         return "".join(lib_vars['Package'])

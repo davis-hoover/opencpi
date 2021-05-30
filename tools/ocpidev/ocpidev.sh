@@ -562,7 +562,6 @@ EOF
     appdir=$1
     mkdir $subdir$1
     cat <<EOF > $subdir$1/$1-app.xml
-$CheckCDK
 <!-- This is the application XML build file (not the app XML itself) for the "$1" application
      If there is a $1.cc (or $1.cxx) file, it will be assumed to be a C++ main program to build and run
      If there is a $1.xml file, it will be assumed to be an XML app that can be run with ocpirun.
