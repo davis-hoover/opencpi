@@ -99,6 +99,7 @@ parseApplications(ezxml_t xml) {
 #define HDL_LIBRARY_ONLY_ATTRS "HdlNoElaboration"
 static const char *
 parseHdlLibrary(ezxml_t xml) {
+  const char *err;
   if ((err = OE::checkAttrs(xml, HDL_LIBRARY_AND_CORE_ATTRS, HDL_TARGET_ATTRS, TARGET_ATTRS,
 			    HDL_LIBRARY_ONLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
@@ -108,6 +109,7 @@ parseHdlLibrary(ezxml_t xml) {
 #define HDL_CORE_ONLY_ATTRS "Top"
 static const char *
 parseHdlCore(ezxml_t xml) {
+  const char *err;
   if ((err = OE::checkAttrs(xml, HDL_LIBRARY_AND_CORE_ATTRS, HDL_TARGET_ATTRS, TARGET_ATTRS,
 			    HDL_CORE_ONLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
