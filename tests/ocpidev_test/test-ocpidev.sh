@@ -437,7 +437,7 @@ fi
   echo "============OCPIDEVTEST:Building project HSP/HP"
   do_ocpidev build project . $RCC --build-hdl-rcc-platform $HDL_PLATFORM --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build project . $RCC --hdl-rcc-platform $HDL_PLATFORM --hdl-platform $HDL_PLATFORM
-  do_ocpidev run library components
+  do_ocpidev run tests # note that "ocpidev run libraries" does not work, and "ocpi run library components" should fail!
   do_ocpidev run -d components
   fi
   if [ "$ONLY_CREATE_BUILD" == 1 ] ; then
