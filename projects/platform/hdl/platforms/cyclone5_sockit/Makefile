@@ -19,28 +19,39 @@
 $(if $(realpath $(OCPI_CDK_DIR)),,\
   $(error The OCPI_CDK_DIR environment variable is not set correctly.))
 
+# Note moving this to the platform worker xml didn't work
+# the tools complained about axi and sdp not being compiled
+# moving them back here fixed those issues
+Libraries=cyclone5 axi sdp
+
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
-# Below gets a little ugly but due to generation dates or unique generation IDs showing up 
+SourceFiles=gen/soc_system.qip
+
+# Below gets a little ugly due to generation dates or unique generation IDs showing up 
 # in the lines of context in the .qip and .qsf patch files, creating a modified
 # version of the patch files that contain the dates and unique IDs so that the patch 
 # works correctly
-ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-  QipFile=gen/soc_system.qip
-  ifeq  ($(wildcard $(QipFile)),) # if soc_system.qip not copied over yet
-   $(if $(call DoShell, mkdir -p gen && cp ../../primitives/cyclone5/gen/soc_system.qip ../../primitives/cyclone5/gen/soc_system.qsys \
-     ../../primitives/cyclone5/gen/soc_system.sopcinfo ../../primitives/cyclone5/gen/soc_system.qsf gen && cd gen/ && \
-     string1=$$(grep SLD_INFO soc_system.qip) && sed "14s/.*/ $$string1/" ../soc_system_qip.patch > soc_system_qip.patch2 && \
-     patch -F 5 < soc_system_qip.patch2 && string2=$$(grep ORIGINAL_QUARTUS_VERSION soc_system.qsf) && \
-     string3=$$(grep PROJECT_CREATION_TIME_DATE soc_system.qsf) && string4=$$(grep LAST_QUARTUS_VERSION soc_system.qsf) && \
-     sed "11s/.*/ $$string2/" ../soc_system_qsf.patch > soc_system_qsf.patch2 && sed -i "12s/.*/ $$string3/" soc_system_qsf.patch2 &&\
-     sed -i "13s/.*/ $$string4/" soc_system_qsf.patch2 && patch -F 5 < soc_system_qsf.patch2 && patch -F 5 < ../soc_system_qsys.patch && \
-     patch -F 5 < ../soc_system_sopcinfo.patch && rm -rf soc_system.qsf.orig soc_system_qip.patch2 soc_system_qsf.patch2 && \
-     mv soc_system.qsf cyclone5_sockit.qsf,MyError),\
-     $(error $(MyError)))
-  endif
-endif
 
-          
+all: gen/soc_system.qip gen/soc_system.qsf gen/soc_system.qsys gen/soc_system.sopcinfo
+
+gen/soc_system.qip:
+	@cp ../../primitives/cyclone5/gen/soc_system.qip gen && cd gen && string1=$$(grep SLD_INFO soc_system.qip) && \
+	sed "16s/.*/ $$string1/" ../soc_system_qip.patch > soc_system_qip.patch2 && \
+	patch -F 5 < soc_system_qip.patch2 && rm -rf soc_system_qip.patch2
+
+gen/soc_system.qsf:
+	@cp ../../primitives/cyclone5/gen/soc_system.qsf gen && cd gen && string2=$$(grep ORIGINAL_QUARTUS_VERSION soc_system.qsf) && \
+	string3=$$(grep PROJECT_CREATION_TIME_DATE soc_system.qsf) && string4=$$(grep LAST_QUARTUS_VERSION soc_system.qsf) && \
+	sed "11s/.*/ $$string2/" ../soc_system_qsf.patch > soc_system_qsf.patch2 && sed -i "12s/.*/ $$string3/" soc_system_qsf.patch2 && \
+	sed -i "13s/.*/ $$string4/" soc_system_qsf.patch2 && patch -F 5 < soc_system_qsf.patch2 && rm -rf soc_system.qsf.orig soc_system_qsf.patch2 && \
+	mv soc_system.qsf cyclone5_sockit.qsf
+
+gen/soc_system.qsys:
+	@cp ../../primitives/cyclone5/gen/soc_system.qsys gen && cd gen && patch -F 5 < ../soc_system_qsys.patch
+
+gen/soc_system.sopcinfo:
+	@cp ../../primitives/cyclone5/gen/soc_system.sopcinfo gen && cd gen && patch -F 5 < ../soc_system_sopcinfo.patch
+
 include $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk
 

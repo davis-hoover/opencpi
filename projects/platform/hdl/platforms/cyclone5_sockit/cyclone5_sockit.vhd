@@ -20,9 +20,8 @@ library IEEE; use IEEE.std_logic_1164.all, ieee.numeric_std.all;
 library ocpi; use ocpi.types.all;
 library platform;
 library cyclone5; use cyclone5.cyclone5_pkg.all;
-library axi;
-library cdc;
-LIBRARY altera; use altera.altera_primitives_components.all;
+library axi, sdp, cdc;
+library altera; use altera.altera_primitives_components.all;
 
 architecture rtl of worker is
   signal hps_h2f_axi_in   : axi.cyclone5_h2f.axi_s2m_array_t(0 to C_H2F_AXI_COUNT-1); -- s2m
@@ -51,8 +50,8 @@ begin
   timebase_out.usingPPS <= '0'; -- When not using PPS, drive usingPPS low
   
   -- Use a global clock buffer for this clock used for both control and data
-  clkbuf   : global   port map(a_in  => h2f_user0_clk,
-                               a_out => clk);
+  clkbuf : global   port map(a_in  => h2f_user0_clk,
+                             a_out => clk);
 
   -- The FCLKRESET signals from the PS are documented as asynchronous with the
   -- associated FCLK for whatever reason.  Here we make a synchronized reset from it.

@@ -21,7 +21,7 @@ OnlyTargets=cyclone5
 include $(OCPI_CDK_DIR)/include/hdl/altera.mk
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
-# Todo: Perhaps should change OcpiAlteraQuartusDir should change to OcpiAlteraProgrammerDir?
+# Todo: Perhaps should change OcpiAlteraQuartusDir to OcpiAlteraProgrammerDir?
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
   ifeq ($(wildcard gen/timestamp-gen_hps_src_files),) # if it hasn't been generated
     $(info ==============================================)
@@ -32,6 +32,6 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
   endif
 endif
 
-SourceFiles=cyclone5_pkg.vhd $(wildcard gen/*.sv) $(wildcard gen/*.v) cyclone5_hps.vhd
+SourceFiles=cyclone5_pkg.vhd $(wildcard gen/*.sv) $(wildcard gen/*.v) $(wildcard gen/*.hex) cyclone5_hps.vhd
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk

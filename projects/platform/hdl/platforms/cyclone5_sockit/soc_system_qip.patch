@@ -1,17 +1,19 @@
---- soc_system.qip	2021-05-18 11:43:49.603382914 -0400
-+++ soc_system2.qip	2021-05-18 11:41:15.557336000 -0400
-@@ -1,17 +1,22 @@
+--- soc_system.qip	2021-05-28 09:29:20.728569000 -0400
++++ soc_system2.qip	2021-05-28 09:53:28.781760000 -0400
+@@ -1,17 +1,24 @@
 +set_global_assignment -name SEARCH_PATH ".."
 +set_global_assignment -name SEARCH_PATH "../../"
++set_global_assignment -name SEARCH_PATH "../../../"
++set_global_assignment -name SEARCH_PATH "../../../../"
 +# Assignments for adding libraries to search path
-+set_global_assignment -name SEARCH_PATH "../../../../exports/hdl/platforms/cyclone5_sockit/"
++set_global_assignment -name SEARCH_PATH "../../../exports/../imports/ocpi.platform/hdl/platforms/cyclone5_sockit/"
 +set_global_assignment -name SEARCH_PATH "../../../primitives/lib/cyclone5/cyclone5/"
  set_global_assignment -entity "soc_system" -library "soc_system" -name IP_TOOL_NAME "Qsys"
  set_global_assignment -entity "soc_system" -library "soc_system" -name IP_TOOL_VERSION "17.1"
  set_global_assignment -entity "soc_system" -library "soc_system" -name IP_TOOL_ENV "Qsys"
 -set_global_assignment -library "soc_system" -name SOPCINFO_FILE [file join $::quartus(qip_path) "../../soc_system.sopcinfo"]
-+set_global_assignment -library "soc_system" -name SOPCINFO_FILE "gen/soc_system.sopcinfo"
- set_global_assignment -entity "soc_system" -library "soc_system" -name SLD_INFO "QSYS_NAME soc_system HAS_SOPCINFO 1 GENERATION_ID 1621271088"
++set_global_assignment -library "soc_system" -name SOPCINFO_FILE "soc_system.sopcinfo"
+ set_global_assignment -entity "soc_system" -library "soc_system" -name SLD_INFO "QSYS_NAME soc_system HAS_SOPCINFO 1 GENERATION_ID 1622208505"
 -set_global_assignment -library "soc_system" -name MISC_FILE [file join $::quartus(qip_path) "../soc_system.cmp"]
 -set_global_assignment -library "soc_system" -name SLD_FILE [file join $::quartus(qip_path) "soc_system.regmap"]
 -set_global_assignment -library "soc_system" -name MISC_FILE [file join $::quartus(qip_path) "soc_system_hps_0_hps.svd"]
@@ -25,11 +27,11 @@
  set_global_assignment -entity "soc_system" -library "soc_system" -name IP_QSYS_MODE "SYSTEM"
  set_global_assignment -name SYNTHESIS_ONLY_QIP ON
 -set_global_assignment -library "soc_system" -name MISC_FILE [file join $::quartus(qip_path) "../../soc_system.qsys"]
-+set_global_assignment -library "soc_system" -name MISC_FILE "gen/soc_system.qsys"
++set_global_assignment -library "soc_system" -name MISC_FILE "soc_system.qsys"
  set_global_assignment -entity "soc_system" -library "soc_system" -name IP_COMPONENT_NAME "c29jX3N5c3RlbQ=="
  set_global_assignment -entity "soc_system" -library "soc_system" -name IP_COMPONENT_DISPLAY_NAME "c29jX3N5c3RlbQ=="
  set_global_assignment -entity "soc_system" -library "soc_system" -name IP_COMPONENT_REPORT_HIERARCHY "On"
-@@ -5708,67 +5713,67 @@
+@@ -5708,67 +5715,67 @@
  set_global_assignment -entity "soc_system_hps_0_fpga_interfaces" -library "soc_system" -name IP_COMPONENT_PARAMETER "aWdub3JlU2ltdWxhdGlvbg==::ZmFsc2U=::aWdub3JlU2ltdWxhdGlvbg=="
  set_global_assignment -entity "soc_system_hps_0_fpga_interfaces" -library "soc_system" -name IP_COMPONENT_PARAMETER "ZGV2aWNl::NUNTWEZDNkQ2RjMxQzY=::ZGV2aWNl"
  

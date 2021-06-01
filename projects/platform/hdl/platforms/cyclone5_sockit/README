@@ -4,4 +4,5 @@ make this ready for release such as bug fixing in generated code brought to ligh
 working around the Quartus crash when generating a .sof file, and getting bitstream loading working.
 
 Note that the files copied over from the platform/hdl/primitives/cyclone5 library were patched
-so that certain the device part number applies to Cyclone V SOC Kit. 
+so to make sure certain things like device part number and speed grade apply to the cyclone5_sockit.
+Other platforms that use cyclone5 would have to do something like this too.

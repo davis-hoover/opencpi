@@ -32,6 +32,7 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library platform; use platform.platform_pkg.all;
 library ocpi; use ocpi.types.all, ocpi.util.all;
+library util;
 library axi; use axi.axi_pkg.all;
 library sdp; use sdp.sdp.all;
 library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
@@ -60,8 +61,9 @@ begin
   axi_dw_idx              <= (others => '0') when its(starting_r) else axi_dw_idx_r;
   last_sxf_in_axf         <= to_bool(not its(starting_r) and axi_dw_idx_r = axi_width - 1);
   axi_out.READY           <= to_bool(sdp_in.sdp.ready and
-                                     (sdp_width = axi_width or last_sxf_in_axf));
-  sdp_out.clk              <= clk;
+                                    (sdp_width = axi_width or last_sxf_in_axf));
+  -- delta cycle alert in some tools even though this is a verilog module
+  in2out_cp_clk: util.util.in2out port map(in_port => clk, out_port => sdp_out.clk);
   sdp_out.reset            <= reset;
   sdp_out.id               <= (others => '0');
   sdp_out.sdp.header.count <= (others => '0');

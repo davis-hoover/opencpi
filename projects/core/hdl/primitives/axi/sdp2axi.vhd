@@ -185,9 +185,6 @@ begin
   #else
     sdp_reset <= not axi_in.a.resetn;
   #endif
-  -- delta cycle alert in some tools even though this is a verilog module
-  in2out_cp_clk: util.util.in2out port map(in_port => SDPCLK, out_port => sdp_out.clk);
-  sdp_out.reset <= sdp_reset;
   --============================================================================================
 
   pkt_dw_addr_0         <= sdp_in.sdp.header.extaddr & sdp_in.sdp.header.addr;
@@ -328,8 +325,19 @@ begin
   axi_out.B.READY              <= '1';              -- we are always ready for responses
 
   -- Read address channel
-  axi_out.AR.ID                <= std_logic_vector(sdp_p.header.node(2 downto 0)) &
+  id_length_equal : if axi_out.AR.ID'length = 3 + sdp_p.header.xid'length generate
+    axi_out.AR.ID              <= std_logic_vector(sdp_p.header.node(2 downto 0)) &
                                   std_logic_vector(sdp_p.header.xid);
+  end generate id_length_equal;
+  
+  -- When ID is greater than 3 + sdp_p.header.xid'length pad with zeros to the left
+  id_length_greater : if axi_out.AR.ID'length > 3 + sdp_p.header.xid'length generate
+    axi_out.AR.ID(axi_out.AR.ID'left downto 3 + sdp_p.header.xid'length) <= (others => '0');
+    axi_out.AR.ID((3 + sdp_p.header.xid'length)-1 downto 0) <= std_logic_vector(sdp_p.header.node(2 downto 0)) &
+                                                               std_logic_vector(sdp_p.header.xid);
+  end generate id_length_greater;
+
+  
   axi_out.AR.ADDR              <= std_logic_vector(axi_addr) &
                                   slv0(width_for_max(axi_in.R.DATA'length/8-1));
   axi_out.AR.LEN               <= std_logic_vector(axi_len);

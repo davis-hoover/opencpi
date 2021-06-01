@@ -1,6 +1,5 @@
 <!-- This file defines the cyclone5_sockit HDL platform -->
-<HdlPlatform language='vhdl' spec='platform-spec' version='2' libraries='axi cyclone5 sdp'
-sourceFiles='gen/soc_system.qip'>
+<HdlPlatform language='vhdl' spec='platform-spec' version='2'>
   <specproperty name='platform' value='cyclone5_sockit'/>
   <!-- These next two lines must be present in all platforms -->
   <metadata master='true'/>
