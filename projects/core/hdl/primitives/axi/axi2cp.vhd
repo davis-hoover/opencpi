@@ -85,7 +85,7 @@ architecture rtl of axi2cp_AXI_INTERFACE is
                            r_last_valid_e);  -- last is offered, not accepted
   signal address_state : address_state_t;
   signal read_state    : read_state_t;
-  signal dwaddr_r      : unsigned(width_for_max(max(axi_in.W.DATA'length/32-1,1)) downto 0);
+  signal dwaddr_r      : unsigned(width_for_max(max(axi_in.W.DATA'length/32-1,1))-1 downto 0);
   signal dw_lsb        : natural;
   signal dw_lsb_en     : natural;
   signal size64_r      : bool_t; -- remembering whether the request was 64 bits
@@ -130,7 +130,7 @@ begin
               ---- the data path is > 32 bits and the transfer size is 6 (meaning 64 bits)
               dwaddr_r      <= unsigned(axi_in.AW.ADDR(dwaddr_r'left + 2 downto 2));
               if (axi_in.W.DATA'length = 32 and axi_in.AW.LEN = slvn(1, axi_in.AW.LEN'length)) or
-                 (axi_in.W.DATA'length > 32 and axi_in.AW.SIZE = slvn(5, axi_in.AW.SIZE'length)) then
+                 (axi_in.W.DATA'length > 32 and axi_in.AW.SIZE = slvn(3, axi_in.AW.SIZE'length)) then
                 address_state <= a_first_e;
                 size64_r      <= btrue;
                 -- hold onto the 32 MSBs to use for the second of 2 CP write cycles
@@ -145,7 +145,7 @@ begin
               ---- the data path is > 32 bits and the transfer size is 6 (meaning 64 bits)
               dwaddr_r      <= unsigned(axi_in.AR.ADDR(dwaddr_r'left + 2 downto 2));
               if (axi_out.R.DATA'length = 32 and axi_in.AR.LEN = slvn(1, axi_in.AR.LEN'length)) or
-                 (axi_out.R.DATA'length > 32 and axi_in.AR.SIZE = slvn(5, axi_in.AR.SIZE'length)) then
+                 (axi_out.R.DATA'length > 32 and axi_in.AR.SIZE = slvn(3, axi_in.AR.SIZE'length)) then
                 address_state <= a_first_e;
                 read_state    <= r_first_wanted_e;
                 size64_r      <= btrue;
@@ -170,9 +170,9 @@ begin
             -- last address is offered. When it is taken we must change state.
             if its(cp_in.take) then
               if (read_state = r_idle_e and axi_in.B.READY = '1') or
-                  (read_state /= r_idle_e and axi_in.R.READY = '1' and
-                   (read_state = r_last_valid_e or
-                    (read_state = r_last_wanted_e and cp_in.valid = '1'))) then
+                 (read_state /= r_idle_e and axi_in.R.READY = '1' and
+                  (read_state = r_last_valid_e or
+                   (read_state = r_last_wanted_e and cp_in.valid = '1'))) then
                 -- if a write, and write response channel is ready, we're done
                 -- if a read, and last read data is being accepted, we're done
                 address_state <= a_idle_e;
@@ -288,16 +288,20 @@ begin
   cp_out.address(0) <= '0' when size64_r and address_state = a_first_e else
                        '1' when size64_r and address_state /= a_first_e else
                        dwaddr_r(0);
-  g2: if axi_in.W.DATA'length = 32 generate
+  g3: if axi_in.W.DATA'length = 32 generate
     cp_out.data       <= axi_in.W.DATA;
     cp_out.byte_en    <= axi_in.W.STRB(cp_out.byte_en'range) when read_state = r_idle_e else
                          read_byte_en(axi_in.AR.ADDR(1 downto 0),
                                       axi_in.AR.SIZE);
   end generate;
-  dw_lsb    <= to_integer(dwaddr_r & "00000");
-  dw_lsb_en <= to_integer(dwaddr_r & "00");
-  cp_out.data    <= axi_in.W.DATA(dw_lsb + 31 downto dw_lsb);
-  cp_out.byte_en <= axi_in.W.STRB(dw_lsb_en + 3 downto dw_lsb_en) when read_state = r_idle_e else
-                    read_byte_en(axi_in.AR.ADDR(1 downto 0), axi_in.AR.SIZE);
-  cp_out.take       <= RVALID and axi_in.R.READY;
+  g4: if axi_in.W.DATA'length > 32 generate
+    dw_lsb    <= to_integer(dwaddr_r & "00000");
+    dw_lsb_en <= to_integer(dwaddr_r & "00");
+    cp_out.data    <= axi_in.W.DATA(dw_lsb + 31 downto dw_lsb);
+    cp_out.byte_en <= axi_in.W.STRB(dw_lsb_en + 3 downto dw_lsb_en) when read_state = r_idle_e else
+                      read_byte_en(axi_in.AR.ADDR(1 downto 0), axi_in.AR.SIZE);
+  end generate;
+  cp_out.take      <= to_bool(its(cp_in.valid) and 
+                              ((its(size64_r) and read_state = r_first_wanted_e) or
+                               (RVALID = '1' and axi_in.R.READY = '1')));
 end rtl;
