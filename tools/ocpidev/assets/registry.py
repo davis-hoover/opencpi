@@ -24,6 +24,8 @@ import sys
 import json
 from glob import glob
 import logging
+import shutil
+from pathlib import Path
 import _opencpi.util as ocpiutil
 from .abstract import ShowableAsset
 from .factory import AssetFactory
@@ -468,3 +470,28 @@ class Registry(ShowableAsset):
         elif details == "json":
             json.dump(reg_dict, sys.stdout)
             print()
+
+    def delete(self, force=False):
+        """
+        Deletes the registry. Prompts the user to confirm if args.force
+        is not True. Refuses to delete the defaul registry or registry
+        set to OCPI_PROJECT_REGISTRY_DIR.
+        """
+        root_dir = os.environ['OCPI_ROOT_DIR']
+        default_registry_dir = str(Path(root_dir, 'project-registry'))
+        registry_dir = str(Path(os.environ['OCPI_PROJECT_REGISTRY_DIR']).resolve())
+        err_msg = None
+        if default_registry_dir == self.directory:
+            err_msg = 'Cannot delete the default project registry'
+        elif registry_dir == self.directory:
+            err_msg = ' '.join([
+                'Cannot delete registry set in OCPI_PROJECT_REGISTRY_DIR',
+                'environment variable. Unset variable before attempting to delete'
+            ])
+        if err_msg:
+            raise ocpiutil.OCPIException(err_msg)
+        if not force:
+            prompt = "Delete the project registry at".format(self.directory)
+            force = ocpiutil.get_ok(prompt=prompt)
+        if force:
+            shutil.rmtree(self.directory)

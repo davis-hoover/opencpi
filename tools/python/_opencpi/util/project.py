@@ -24,6 +24,7 @@ import sys
 import os.path
 import logging
 from glob import glob
+from pathlib import Path
 import subprocess
 import re
 import xml.etree.ElementTree as xt
@@ -699,3 +700,21 @@ if __name__ == "__main__":
             pass
     doctest.testmod(verbose=__VERBOSITY, optionflags=doctest.ELLIPSIS)
     sys.exit(doctest.testmod()[0])
+
+
+def get_cdk_path():
+    """
+    Gets the OCPI_CDK_DIR environment variable and verifies that it has
+    been set correctly.
+    """
+    err_msg = None
+    if 'OCPI_CDK_DIR' not in os.environ:
+        err_msg = 'Error: OCPI_CDK_DIR environment setting not found'
+    cdk_path = Path(os.environ['OCPI_CDK_DIR'])
+    if not cdk_path.is_dir():
+        err_msg = 'Error: OCPI_CDK_DIR environment setting invalid'
+    if err_msg:
+        logging.error(err_msg)
+        sys.exit(1)
+
+    return cdk_path
