@@ -104,8 +104,11 @@ class Asset(metaclass=ABCMeta):
         the child implementations of this function
         """
         if not force:
-            prompt = ("removing " + ocpiutil.get_dirtype(self.directory) + " at directory: " +
-                      self.directory)
+            dir_type = ocpiutil.get_dirtype(self.directory)
+            if not dir_type:
+                prompt = 'unable to determine directory asset type. Are you sure you want to delete?'
+            else:
+                prompt = 'removing {} at directory: {}'.format(dir_type, self.directory)
             force = ocpiutil.get_ok(prompt=prompt)
         if force:
             shutil.rmtree(self.directory)

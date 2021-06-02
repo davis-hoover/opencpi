@@ -31,7 +31,7 @@ alias odev="$OCPI_CDK_DIR/$OCPI_TOOL_DIR/bin/ocpidev -v"
 echo Cleaning the project
 make cleaneverything
 echo Building the components
-odev build rcc
+odev build --rcc
 echo Building the multislave_test application
 odev build application multislave_test
 echo Running the multislave_test application

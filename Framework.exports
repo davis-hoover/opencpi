@@ -83,11 +83,13 @@
 +tools/ocpidev/assets/worker.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/template.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/component.py <target>/lib/_opencpi/assets/
-+tools/ocpidev/ocpidev.sh <target>/bin/ocpidev
++tools/ocpidev/ocpidev.py <target>/bin/ocpidev
++tools/ocpidev/ocpidev_args.py scripts/
++tools/ocpidev/ocpiargparse.py scripts/
++tools/ocpidev/ocpidev.sh scripts/
 +tools/ocpidev/ocpidev_run.py scripts/
 +tools/ocpidev/ocpishow.py scripts/
 +tools/ocpidev/ocpidev_utilization.py scripts/
-+tools/ocpidev/ocpicreate.py scripts/
 +tools/ocpidoc/ocpidoc.py <target>/bin/ocpidoc
 +tools/ocpi_protocol_view/ocpi_protocol_view.py <target>/bin/ocpi_protocol_view
 # generic make scripts

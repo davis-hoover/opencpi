@@ -1125,27 +1125,27 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         template_dict = Project._get_template_dict(name, proj_dir, **kwargs)
 
         # Generate all the project files using templates
-        ocpiutil.write_file_from_string( proj_dir + "/Project.exports", ocpitemplate.PROJ_EXPORTS)
-        ocpiutil.write_file_from_string( proj_dir + "/.gitignore", ocpitemplate.PROJ_GIT_IGNORE)
-        ocpiutil.write_file_from_string( proj_dir + "/.gitattributes", ocpitemplate.PROJ_GIT_ATTR)
+        ocpiutil.write_file_from_string( name + "/Project.exports", ocpitemplate.PROJ_EXPORTS)
+        ocpiutil.write_file_from_string( name + "/.gitignore", ocpitemplate.PROJ_GIT_IGNORE)
+        ocpiutil.write_file_from_string( name + "/.gitattributes", ocpitemplate.PROJ_GIT_ATTR)
         #template = jinja2.Template(ocpitemplate.PROJ_MAKEFILE, trim_blocks=True)
         #ocpiutil.write_file_from_string( proj_dir + "/Makefile", template.render(**template_dict))
         # TODO: For traditional XML, replace PROJ_PROJECT_XML_LEGACY with PROJ_PROJECT_XML
         template = jinja2.Template(ocpitemplate.PROJ_PROJECT_XML_LEGACY, trim_blocks=True)
-        ocpiutil.write_file_from_string( proj_dir + "/Project.xml", template.render(**template_dict))
+        ocpiutil.write_file_from_string( name + "/Project.xml", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.PROJ_GUI_PROJECT, trim_blocks=True)
-        ocpiutil.write_file_from_string( proj_dir + "/.project", template.render(**template_dict))
+        ocpiutil.write_file_from_string( name + "/.project", template.render(**template_dict))
 
         if kwargs.get("register", None):
             AssetFactory.factory(
                 "registry",
                 Registry.get_registry_dir(name)).add(name, True)
 
-        rc = ocpiutil.execute_cmd({}, proj_dir, action=[ "imports" ],
+        rc = ocpiutil.execute_cmd({}, name, action=[ "imports" ],
                                   file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
             logging.warning("Failed to import project at " + proj_dir)
-        rc = ocpiutil.execute_cmd({}, proj_dir, action=[ "exports" ],
+        rc = ocpiutil.execute_cmd({}, name, action=[ "exports" ],
                                   file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
             logging.warning("Failed to export project at " + proj_dir)
