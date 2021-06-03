@@ -48,9 +48,11 @@ ifneq ($(filter run,$(MAKECMDGOALS)),)
 endif
 DOALL=$(AT)\
   set -e;\
-  for i in $(filter-out %.xml,$(FILTER)); do\
-    echo ========$1 $$i: ; $(MAKE) --no-print-directory -C $$i OCPI_PROJECT_REL_DIR=$(call AdjustRelative,$(OCPI_PROJECT_REL_DIR)) $2;\
-  done
+  $(foreach i,$(filter-out %.xml,$(FILTER)),\
+    echo ========$1 $i: && \
+    $(MAKE) --no-print-directory -r -C $i $(if $(wildcard $i/Makefile),,-f $(OCPI_CDK_DIR)/include/application.mk) \
+    OCPI_PROJECT_REL_DIR=$(call AdjustRelative,$(OCPI_PROJECT_REL_DIR)) $2 &&):
+
 OcpiUse=$(if $(filter undefined,$(origin OcpiRun$1_$2)),$(OcpiRun$1),$(OcpiRun$1_$2))
 ifndef OcpiRunXML
 

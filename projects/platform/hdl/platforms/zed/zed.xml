@@ -1,5 +1,6 @@
 <!-- ZedBoard Platform Worker -->
-<HdlPlatform Language="VHDL" spec='platform-spec' version='2' libraries='zynq sdp'
+<!-- FIXME: the axi library should be unnecessary here since it is required by the zynq library -->
+<HdlPlatform Language="VHDL" spec='platform-spec' version='2' libraries='zynq sdp axi'
 	     part='xc7z020-1-clg484' configurations='base acp gp1'>
   <specproperty name='platform' value='zed'/>
   <specproperty name="nSlots" value='1'/>

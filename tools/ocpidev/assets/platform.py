@@ -96,9 +96,9 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         platforms collection
         """
         platform_list = []
-        mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-assemblies")
+        mkf=ocpiutil.get_makefile(self.directory)
         logging.debug("Getting valid platforms from: " + mkf[0])
-        make_platforms = ocpiutil.set_vars_from_make(mk_file=mkf,
+        make_platforms = ocpiutil.set_vars_from_make(mkf,
                                                      mk_arg="ShellPlatformsVars=1 showplatforms",
                                                      verbose=True)["HdlPlatforms"]
 
@@ -180,7 +180,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         logging.debug("Get the list of platform Configurations from make")
         mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-platform")
         try:
-            plat_vars = ocpiutil.set_vars_from_make(mk_file=mkf,
+            plat_vars = ocpiutil.set_vars_from_make(mkf,
                                                     mk_arg="ShellHdlPlatformVars=1 showinfo",
                                                     verbose=False)
         except ocpiutil.OCPIException:

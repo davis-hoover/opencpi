@@ -1109,8 +1109,10 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     // Parse things that the base class should parse.
     const char *lang = ezxml_cattr(m_xml, "Language");
     if (!lang)
-      if (!strcasecmp("HdlContainer", l_name) || !strcasecmp("HdlConfig", l_name))
-        m_language = VHDL;
+      if (!strcasecmp("HdlContainer", l_name) ||
+	  !strcasecmp("HdlConfig", l_name) ||
+	  !strcasecmp("HdlPlatform", l_name))
+	m_language = VHDL;
       else if (!strcasecmp("HdlAssembly", l_name))
         m_language = Verilog;
       else {
