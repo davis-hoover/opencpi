@@ -2308,7 +2308,7 @@ done
 #todo move this up where the other ones are when its not just project creation
 if [ "$verb" == "create" -a "$noun" == "project" ]; then
   ocpidev_create_options=`sed -E 's/(^| )create( |$)/ /' <<< "${original_argv[@]}"`
-  $OCPI_CDK_DIR/scripts/ocpicreate.py $ocpidev_create_options
+  ocpidev create $ocpidev_create_options
   exit $?
 fi
 if [ -n "$help_screen" ]; then

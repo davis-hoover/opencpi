@@ -17,7 +17,9 @@
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all, ieee.math_real.all;
-library ocpi; use ocpi.types.all;
+library ocpi; use ocpi.util.all, ocpi.types.all;
+library platform;
+library cdc;
 
 entity clock_generator is
     generic (
@@ -65,14 +67,14 @@ architecture rtl of clock_generator is
       locked	  :	out  std_logic);
   end component;
   
-  component agnostic_clock_generator
-    generic (
-      CLK_OUT_FREQUENCY_MHz      : real := 100.0);
-    port(
-      reset     : in     std_logic;
-      clk_out   : out    std_logic;
-      locked    : out    std_logic);
-  end component;
+  constant c_num_cycles       : natural := 33;
+  constant c_counter_width    : natural := width_for_max(c_num_cycles - 1);
+  signal s_reset_out          : std_logic;
+  signal s_clk_out            : std_logic;
+  signal s_counter            : unsigned(c_counter_width-1 downto 0);
+  signal s_enable             : std_logic;
+  signal s_locked             : std_logic;
+  signal s_reset_in_synced    : std_logic;
 
 begin
   
@@ -99,13 +101,36 @@ begin
   
   -- Vendor agnostic clock generator
   gen_vendor_agnostic: if (VENDOR = to_string("agnostic", 32))  generate
-    inst_vendor_agnostic_clk_gen : agnostic_clock_generator
-      generic map(
-        CLK_OUT_FREQUENCY_MHz  => CLK_OUT_FREQUENCY_MHz)
+  
+    inst_sim_clk : platform.platform_pkg.sim_clk
+      generic map(frequency => CLK_OUT_FREQUENCY_MHz*1.0E6,
+                  offset  => 0)
+      port map(
+        clk   => s_clk_out,
+        reset => s_reset_out);
+
+    s_enable <= '1' when  (s_reset_in_synced = '0' and s_counter < c_num_cycles) else '0';
+    s_locked <= '1' when (s_counter = c_num_cycles) else '0';
+    clk_out  <= s_clk_out when (s_locked ='1') else '0';
+    locked   <= s_locked;
+
+    sync_reset_in : cdc.cdc.reset
       port map (
-        reset => reset,
-        clk_out => clk_out,
-        locked => locked);
+        src_rst => reset,
+        dst_clk => s_clk_out,
+        dst_rst => s_reset_in_synced);
+
+    process(s_clk_out)
+    begin
+      if rising_edge(s_clk_out) then
+        if (s_reset_out = '1') then
+          s_counter <= (others=>'0');
+        elsif (s_enable = '1') then
+          s_counter <= s_counter + 1;
+        end if;
+      end if;
+    end process;
+   
   end generate gen_vendor_agnostic;
 
 end rtl;

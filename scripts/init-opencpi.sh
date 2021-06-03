@@ -55,4 +55,7 @@ mkdir -p prerequisites
 # we still want to expose and use some of our python modules.  This allows that.
 # Note this isn't doing anything to the user's environment, just temporarily for the
 # few callers of this script
-export PYTHONPATH=$(pwd)/tools/python
+if [[ ! ${PYTHONPATH} =~ "${OCPI_CDK_DIR}/${OCPI_TOOL_PLATFORM}/lib:" 
+      || ! -d "${OCPI_CDK_DIR}/${OCPI_TOOL_PLATFORM}/lib" ]] ; then 
+  export PYTHONPATH=$(pwd)/tools/python; 
+fi

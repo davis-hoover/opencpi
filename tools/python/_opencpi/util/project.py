@@ -24,6 +24,7 @@ import sys
 import os.path
 import logging
 from glob import glob
+from pathlib import Path
 import subprocess
 import re
 import xml.etree.ElementTree as xt
@@ -134,11 +135,13 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = xt.parse(xml_file).getroot().tag.lower()
         else: # no Makefile, no xml file
             make_type = 'libraries'
-            with os.scandir(directory) as it:
-                for entry in it:
+            # does not work with python3 < 3.6.0
+            # with os.scandir(directory) as it:
+            it = os.scandir(directory)
+            for entry in it:
+                if entry.is_dir():
                     dparts = entry.name.split('.')
-                    if (entry.is_dir() and
-                        (entry.name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib))):
+                    if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
                         make_type = asset_type = 'library'
                         break
     elif name in ["platforms", "primitives", "cards", "devices", "adapters", "assemblies" ]:
@@ -705,3 +708,21 @@ if __name__ == "__main__":
             pass
     doctest.testmod(verbose=__VERBOSITY, optionflags=doctest.ELLIPSIS)
     sys.exit(doctest.testmod()[0])
+
+
+def get_cdk_path():
+    """
+    Gets the OCPI_CDK_DIR environment variable and verifies that it has
+    been set correctly.
+    """
+    err_msg = None
+    if 'OCPI_CDK_DIR' not in os.environ:
+        err_msg = 'Error: OCPI_CDK_DIR environment setting not found'
+    cdk_path = Path(os.environ['OCPI_CDK_DIR'])
+    if not cdk_path.is_dir():
+        err_msg = 'Error: OCPI_CDK_DIR environment setting invalid'
+    if err_msg:
+        logging.error(err_msg)
+        sys.exit(1)
+
+    return cdk_path

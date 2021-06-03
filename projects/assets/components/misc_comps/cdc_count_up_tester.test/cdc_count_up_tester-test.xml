@@ -2,7 +2,7 @@
 <Tests UseHDLFileIo="true">
 
   <Property Name="simulation" Type="bool" Test="true" Description="Used by verify script to choose how to verify output.
-    True - Indicates that test case is being run for simualation.
+    True  - Indicates the test case is being run for simualation.
     False - Indicates the test case is being run on hardware."/>
 
   <!-- Simulation -->
