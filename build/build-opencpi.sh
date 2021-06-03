@@ -23,7 +23,7 @@
 # Ensure exports and python
 source ./scripts/init-opencpi.sh
 # Ensure CDK and TOOL variables
-source ./cdk/opencpi-setup.sh -e
+source ./cdk/opencpi-setup.sh -r
 
 # Ensure TARGET variables
 source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1"
