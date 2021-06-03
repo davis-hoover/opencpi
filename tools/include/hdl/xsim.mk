@@ -149,7 +149,7 @@ $1/$3.tar:
 	$(AT)echo Building xsim simulation executable: "$$@" with details in $1/$3-xelab.out
 	$(AT)echo verilog work $(OcpiXilinxVivadoDir)/data/verilog/src/glbl.v >$1/$3.prj
 	$(AT)(set -e; cd $1; $(OcpiXilinxVivadoInit); \
-	      xelab $3.$3 work.glbl -v 2 -debug typical -prj $3.prj \
+	      xelab $3.$3 work.glbl -v 2 -debug typical -prj $3.prj -relax \
               $(XsimXelabArgs) $(XsimXelabExtraArgs) -lib $3=$3 $$(XsimLibs) -L unisims_ver -s $3;\
 	      tar cf $3.tar metadatarom.dat xsim.dir) > $1/$3-xelab.out 2>&1
 

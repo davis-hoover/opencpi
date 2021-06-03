@@ -50,7 +50,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
      $(info ==============================================)
      $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxVivadoInit) && ./generate_clk_gen_ip.sh zynq_ultra, MyError),$(error $(MyError)))
      $(info Generation of IP Succeeded.)
-  endif
+    endif
   else ifdef UseVIVADOZynq
    ifeq ($(wildcard ip_gen/vivado_ip/timestamp-zynq_clk_wiz),) # if it hasn't been generated
      $(info ==============================================)
@@ -58,7 +58,7 @@ ifeq ($(filter clean%,$(MAKECMDGOALS)),)   # if not cleaning
      $(info ==============================================)
      $(if $(call DoShell,cd ip_gen && $(call OcpiXilinxVivadoInit) && ./generate_clk_gen_ip.sh zynq, MyError),$(error $(MyError)))
      $(info Generation of IP Succeeded.)
-  endif
+   endif
   else ifdef UseVIVADOXsim
     ifeq ($(wildcard ip_gen/vivado_ip/timestamp-zynq_ultra_clk_wiz),) # if it hasn't been generated
      $(info ==============================================)
