@@ -129,13 +129,15 @@ def get_dir_info(directory=".", careful=False):
             make_type = asset_type = xt.parse(xml_file).getroot().tag.lower()
         else:
             make_type = 'libraries'
-            with os.scandir(directory) as it:
-                for entry in it:
-                    if entry.is_dir():
-                        dparts = entry.name.split('.')
-                        if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
-                            make_type = asset_type = 'library'
-                            break
+            # does not work with python3 < 3.6.0
+            # with os.scandir(directory) as it:
+            it = os.scandir(directory)
+            for entry in it:
+                if entry.is_dir():
+                    dparts = entry.name.split('.')
+                    if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
+                        make_type = asset_type = 'library'
+                        break
     elif name in ["platforms", "primitives", "cards", "devices", "adapters", "assemblies" ]:
         # plurals that are usually make types but not actual assets
         if directory.startswith(name): # incure absolutizing penalty

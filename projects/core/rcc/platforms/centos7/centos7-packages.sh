@@ -140,8 +140,9 @@ PKGS_E+=(python36-PyYAML)
 #    now, assume the justification for a package in this category is the same
 #    as for its python2 counterpart as given above.
 PKGS_P+=(matplotlib)
-# 	 For ocpidoc documentation builder
-PKGS_P+=(sphinx sphinx_rtd_theme sphinxcontrib_spelling)
+#    These next packages will be installed in a python36
+#    virtual environment for "ocpidoc" vs. "system-wide".
+#PKGS_P+=(sphinx sphinx_rtd_theme sphinxcontrib_spelling)
 
 #
 # Because long option strings impair readability.
