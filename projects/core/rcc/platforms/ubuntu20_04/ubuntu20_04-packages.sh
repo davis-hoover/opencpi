@@ -146,6 +146,13 @@ PKGS_E+=(ocl-icd-libopencl1)
 PKGS_E+=(scons)
 #    Needed to build plutosdr osp
 PKGS_E+=(libssl-dev device-tree-compiler)
+#    For ocpidoc documentation builder
+#
+#    Distro-provided "python3-sphinx", "python3-sphinx-rtd-theme",
+#    and "python3-sphinxcontrib.spelling" packages are too old, so
+#    will handle installation via "pip3" inside a python3 virtual
+#    environment as part of the "ocpidoc" installation.
+PKGS_E+=(python3-venv)
 
 #
 # Comments around/within the next two functions are for my own
