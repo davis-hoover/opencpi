@@ -1150,6 +1150,38 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         if rc != 0:
             logging.warning("Failed to export project at " + proj_dir)
 
+    def register(self, force=False, verbose=False):
+        """
+        Register project to registry. Export project if possible
+        """
+        # Get registry and add project to registry
+        registry = self.registry()
+        registry.add(self.directory, force=force)
+
+        # Attempt to export project
+        is_exported = ocpiutil.is_path_in_exported_project(self.directory)
+        if not is_exported:
+            make_file = ocpiutil.get_makefile(self.directory, "project")[0]
+            rc = ocpiutil.file.execute_cmd({}, self.directory, action=['exports'], file=make_file)
+            if rc:
+                msg = ' '.join(['Could not export project "{}".'.format(self.name), 
+                                'You may not have write permissions on this project.',
+                                'Proceeding...'])
+                print(msg)
+        elif verbose:
+            msg = 'Skipped making exports because this is an exported standalone project'
+            print(msg)
+
+    def unregister(self):
+        """
+        Unregister project from registry. Prompts the user first
+        """
+        prompt = ' '.join(['Are you sure you want to unregister the "{}"'.format(self.name), 
+                           'project/package from its project registry?'])
+        if ocpiutil.get_ok(prompt):
+            registry = self.registry()
+            registry.remove(directory=self.directory)
+
 
 # pylint:enable=too-many-instance-attributes
 # pylint:enable=too-many-ancestors

@@ -65,13 +65,15 @@ def main():
         asset = asset_factory.factory(args.noun, directory, name)
     except ocpiutil.OCPIException as e:
     # Noun not implemented; fall back to ocpidev.sh
-        ocpidev_sh()
+        print(e)
+        # ocpidev_sh()
     try:
     # Try to get appropriate method from verb
         asset_method = getattr(asset, args.verb) 
     except AttributeError as e:
     # Verb not implemented; fall back to ocpidev.sh
-        ocpidev_sh()
+        print(e)
+        # ocpidev_sh()
     try:
     # Get verb method parameters, collect them from args, and try to
     # call verb method with collected args
@@ -84,7 +86,8 @@ def main():
         ocpiutil.logging.error(e)
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
-        ocpidev_sh()
+        print(e)
+        # ocpidev_sh()
 
 
 def ocpicreate(args):
