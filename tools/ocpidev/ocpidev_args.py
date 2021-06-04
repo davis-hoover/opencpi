@@ -331,7 +331,7 @@ verbs = {
             },
             'library': {
                 'options': {
-                    'name': None,
+                    'name': {'nargs': '?'},
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
@@ -343,7 +343,7 @@ verbs = {
             },
             'project': {
                 'options': {
-                    'name': None,
+                    'name': {'nargs': '?'},
                     'hdl_assembly': options['hdl_assembly'],
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
@@ -357,9 +357,7 @@ verbs = {
             },
             'test': {
                 'options': {
-                    'name': {
-                        'nargs': '?'
-                    },
+                    'name': {'nargs': '?'},
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
