@@ -47,7 +47,7 @@ Inputs:
   
   * Type: ``StreamInterface``
 
-  * Protocol: ``ComplexShortWithMetadata-prot``
+  * Protocol: ``ComplexShortTimedSample-prot``
 
   * Worker EOF: ``False``
 
