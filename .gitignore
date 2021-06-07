@@ -47,6 +47,7 @@ projects/*/imports
 projects/*/project-metadata.xml
 projects/*/specs/package-id
 doc/tex/build
+simulations/
 vendor/
 
 # Generated files
