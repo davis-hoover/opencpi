@@ -34,7 +34,7 @@ The data source QADC HDL device worker receives sampled data from an ADC on
 its ``dev`` devsignal port.
 The worker sign-extends and justifies fhe samples to 16-bit I, 16-bit Q values,
 which is the standard provided by the ``samples`` argument of the
-``ComplexShortTimedSample-prot`` protocol used by the ``out`` port.
+``ComplexShortWithMetadata-prot`` protocol used by the ``out`` port.
 The HDL device worker performs justification within the 16-bit values according to
 the value of the ``ADC_INPUT_IS_LSB_OF_OUT_PORT`` parameter property.
 
@@ -69,7 +69,7 @@ Outputs:
   
   * Type: ``StreamInterface``
 
-  * Protocol: ``ComplexShortTimedSample-prot``
+  * Protocol: ``ComplexShortWithMetadata-prot``
 
   * Worker EOF: ``False``
 
