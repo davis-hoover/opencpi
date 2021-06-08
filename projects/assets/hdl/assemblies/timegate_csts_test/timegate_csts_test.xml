@@ -1,0 +1,6 @@
+<!-- The timegate_csts_test HDL assembly xml file -->
+<HdlAssembly>
+  <Instance Worker='test_source' connect='timegate_csts'/>
+  <Instance Worker='timegate_csts' connect='capture_v2'/>
+  <Instance Worker='capture_v2'/>
+</HdlAssembly>

@@ -31,21 +31,16 @@ AxiInterfaceModules=$(foreach i,$(AxiInterfaces),\
                       $(foreach m,$(or $(AxiModules_$i),$(AxiModules)),\
                         gen/$m_$i.vhd))
 
-SourceFiles+= $(AxiInterfacePackages) $(AxiInterfaceModules)
-
-# Here we can get picky about whichh modules are built for which interface.
+# Here we can get picky about which modules are built for which interface.
 AxiModules_lite32=raw2axi
-
+SourceFiles+= $(AxiInterfacePackages) $(AxiInterfaceModules)
 $(infox AI:$(AxiInterfaces) AM:$(AxiModules) AIM: $(AxiInterfaceModules))
 
-# Create the module per interface by simply prepending the package reference
-# $(call doInterfaceModule,module,interface)
 all:
-
 
 define doInterfacePackage
 gen/$1_pkg.vhd: axi_interface_$1.h axi_interface.h | gen
-	$$(AT)cpp -DNAME=$1 --include axi_interface_$1.h -std=c99 -xc -P  axi_interface.h | \
+	$$(AT)cpp -DNAME=$1 --include=axi_interface_$1.h -xc++ -P  axi_interface.h | \
              sed '/^ *$$$$/d' > $$@
 SourceFiles+=gen/$1_pkg.vhd
 endef
@@ -53,7 +48,7 @@ endef
 define doInterfaceModule
 $(infox DIM:$1:$2)
 gen/$1_$2.vhd: gen/$2_pkg.vhd $1.vhd | gen
-	$$(AT)tr "'" "~" < $1.vhd | cpp -P --include axi_interface_$2.h \
+	$$(AT)tr "'" "~" < $1.vhd | cpp -P --include=axi_interface_$2.h -xc++ \
                   - | sed -e "s/AXI_INTERFACE/$2/" -e "s/~/'/g" > $$@
 SourceFiles+=gen/$1_$2.vhd
 endef

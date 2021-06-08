@@ -1,3 +1,50 @@
+# [v2.1.1](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0...v2.1.1) (2021-05-19)
+
+Changes/additions since [OpenCPI Release v2.1.0](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0)
+
+### New Features
+- **hdl base**: update the generic_pcie scripts for Vivado 2019.2 IP generation file structure. (!455)(8bd8c7c7)
+- **hdl base**: temporarily exclude all targets except the artix7. (!455)(8bd8c7c7)
+- **hdl base**: add axi_interface_pcie master and slave header files for the generic pcie primitive. (!455)(8bd8c7c7)
+- **hdl base**: update generic_pcie package to include records for the remaining pcie and axi interface signals. (!455)(8bd8c7c7)
+- **hdl base**: update generic_pcie Makefile to point to the top-level module. (!455)(8bd8c7c7)
+- **hdl base**: remove vivado synthesis from the primitive generation script. (!455)(8bd8c7c7)
+- **hdl base**: add top-level vhd file for the generic_pcie primitive. (!455)(8bd8c7c7)
+- **hdl base**: add artix7 FPGA as Hdl target hdl-targets.mk. (!455)(8bd8c7c7)
+- **runtime**: option to set ad9361 external reference clock frequency from DRC worker. (!536)(a106c978)
+
+### Enhancements
+- **comp**: add pattern_v2 RCC worker. (!530)(75ff8679)
+- **hdl base**: make pattern_v2 a split clock worker. (!525)(31e4eda1)
+- **hdl base**: make file_read.hdl a split clock worker. (!528)(fa8c1a88)
+- **hdl base**: make file_write.hdl a split clock worker. (!528)(fa8c1a88)
+- **tools**: update ocpiremote help messages and argument parsing. (!556)(867d693e)
+
+### Bug Fixes
+- **app**: remove the extra instance of platform_ad9361_config. (!472)(8a6a3a3a)
+- **app**: change opcodes to be valid opcodes that can be sent in the pattern-bias-file_v2, pattern_v2, pattern_v2, tb_bias_v2, and test_width_v2 apps. (!530)(75ff8679)
+- **hdl base**: fix various ocpi.types functions when used on slices. (!520)(194c522e)
+- **hdl base**: fix clocking library tcl script. (!522)(66257f0a)
+- **hdl base,tests**: fix broken data_sink_qdac test. (!528)(fa8c1a88)
+- **runtime**: fix ocpiremote looking in incorrect location for hdl-specific system.xml. (!515)(9fc39bc5)
+- **runtime**: fix dataplane m_ports assertion error. (!527)(5915298a)
+- **runtime,tools**: fix PATH setting in `importXilinxRelease` script. (!518)(9ec0ce36)
+- **tests,tools**: ocpigen: fix test parameter generated values not able to override default values. (!540)(2976bc77)
+- **tests,tools**: ocpigen: fix `valuesFile` not recognized as a valid attribute of a property element. (!540)(2976bc77)
+- **tools**: fix differential tie offs in hdl containers. (!511)(9feffb41)
+- **tools**: fix master.vhd for small protocols. (!517)(1eac8ba0)
+- **tools**: fix scoring algorithm bug. (!528)(fa8c1a88)
+- **tools**: fix assertion workerClk.m_exported bug. (!528)(fa8c1a88)
+- **tools**: fix `file2String()` arg 1 processing. (!540)(2976bc77)
+- **tools**: add `fakeroot` as explicit package dependency on `*ubuntu` dev platform. (!547)(ef983b07)
+- **tools**: a platform's project dependencies are now added to search rules when containers are built. (!552)(1bc4957f)
+- **tools**: fix ocpiremote failures. (!556)(867d693e)
+
+### Miscellaneous
+- **doc**: modify `COPYRIGHT` file. (!562)(6b71036f)
+- **hdl base**: remove obsolete drc files. (!509)(dddb8fb7)
+- **runtime**: substitute "finished" for "done" in code comments re: control state. (!531)(9ab5a657)
+
 # [v2.1.0](https://gitlab.com/opencpi/opencpi/-/compare/v2.1.0-rc.2...v2.1.0) (2021-03-17)
 
 Changes/additions since [OpenCPI Release v2.1.0-rc.2](https://gitlab.com/opencpi/opencpi/-/releases/v2.1.0-rc.2)

@@ -55,7 +55,7 @@ unset PARAMS
 # the platform we are building
 
 # Ensure exports (or cdk) exists and has scripts
-echo "Initializing OpenCPI CDK"
+echo "Initializing OpenCPI CDK" in $(pwd -P)
 source ./scripts/init-opencpi.sh
 
 # Ensure CDK and TOOL variables

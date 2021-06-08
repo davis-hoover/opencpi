@@ -38,7 +38,7 @@ $(eval $(OcpiEnsureToolPlatform))
 ifdef RccHdlPlatform
   override RccHdlPlatforms+= $(RccHdlPlatform)
 endif
-ifdef RccHdlPlatforms
+ifneq ($(and $(RccHdlPlatforms),$(if $(filter clean%,$(MAKECMDGOALS)),,x)),)
   include $(OCPI_CDK_DIR)/include/hdl/hdl-targets.mk
   $(foreach p,$(RccHdlPlatforms),\
      $(if $(filter $p,$(HdlAllPlatforms)),\

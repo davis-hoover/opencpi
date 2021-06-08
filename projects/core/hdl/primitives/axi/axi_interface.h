@@ -35,6 +35,12 @@
 #ifndef USER_WIDTH_R
 #define USER_WIDTH_R USER_WIDTH
 #endif
+#ifndef AXI4
+#define AXI4 0
+#endif
+#ifndef AXI4_LITE
+#define AXI4_LITE 0
+#endif
 #if AXI4
 #define LEN_WIDTH 8
 #else
@@ -95,7 +101,9 @@ package NAME is
     #if USER_WIDTH_AW
     USER   : std_logic_vector(USER_WIDTH_AW-1 downto 0);
     #endif
+// clang bug needs this line
     #endif
+// clang bug needs this line
     #endif
   end record aw_m2s_t;
   type aw_s2m_t is record
@@ -155,7 +163,9 @@ package NAME is
     #if USER_WIDTH_AR
     USER   : std_logic_vector(USER_WIDTH_AR-1 downto 0);
     #endif
+// clang 12.0 bug needs this line
     #endif
+// clang 12.0 bug needs this line
     #endif
   end record ar_m2s_t;
   type ar_s2m_t is record
@@ -176,7 +186,9 @@ package NAME is
     #if AXI4 && USER_WIDTH_R
     USER   : std_logic_vector(USER_WIDTH_R-1 downto 0);
     #endif
-    #endif
+// clang bug needs this line
+#endif
+
   end record r_s2m_t;
 
   -- The bundles of signals m2s, and s2m

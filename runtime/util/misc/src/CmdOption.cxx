@@ -101,12 +101,16 @@ namespace OCPI {
 	usage();
 	return "No arguments specified";
       }
-      bool help = false, debug = false;
-      for (;ap[0] && ap[0][0] == '-'; ap++) {
+      bool help = false, debug = false, nomore = false;
+      for (;ap[0]; ap++) {
+	if (ap[0][0] != '-' || nomore) {
+	  m_argv.push_back(ap[0]);
+	  continue;
+	}
 	if (ap[0][1] == '-') {
 	  if (ap[0][2] == '\0') {
-	    ap++;
-	    break;
+	    nomore = true;
+	    continue;
 	  }
 	  // Long option
 	  const char *arg = &ap[0][2];
@@ -140,9 +144,8 @@ namespace OCPI {
 	return setError(esprintf("Unknown option name/letter in option '%s'", *ap));
       cont2:;
       }
-      m_argv = ap;
-      while (*ap) ap++;
-      m_argvCount = OCPI_SIZE_T_DIFF(ap, m_argv); // always positive
+      m_argvCount = m_argv.size();
+      m_argv.push_back(NULL);
       if (debug) {
 	Member *m = m_options;
 	for (unsigned n = 0; n < m_nOptions; n++, m++)

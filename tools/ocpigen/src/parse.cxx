@@ -55,6 +55,7 @@ const char *g_platform = 0, *g_device = 0, *load = 0, *g_os = 0, *g_os_version =
 bool g_dynamic = false;
 bool g_optimized = false;
 bool g_multipleWorkers = false;
+bool g_autoAddParamConfig = false;
 
 // Check for implementation attributes common to data interfaces, several of which
 // are able to override protocol-determined values.
@@ -1108,8 +1109,10 @@ Worker(ezxml_t xml, const char *xfile, const std::string &parentFile,
     // Parse things that the base class should parse.
     const char *lang = ezxml_cattr(m_xml, "Language");
     if (!lang)
-      if (!strcasecmp("HdlContainer", l_name) || !strcasecmp("HdlConfig", l_name))
-        m_language = VHDL;
+      if (!strcasecmp("HdlContainer", l_name) ||
+	  !strcasecmp("HdlConfig", l_name) ||
+	  !strcasecmp("HdlPlatform", l_name))
+	m_language = VHDL;
       else if (!strcasecmp("HdlAssembly", l_name))
         m_language = Verilog;
       else {

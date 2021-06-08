@@ -1,0 +1,17 @@
+<HdlWorker language='vhdl' spec='csts_to_iqstream-spec' version='2' Libraries='protocol timed_sample_prot'>
+  <Property name='IN_PORT_DATA_WIDTH'
+            type='uchar'
+            default='32'
+            parameter='true'/>
+  <Property name='OUT_PORT_DATA_WIDTH'
+            type='uchar'
+            default='32'
+            parameter='true'/>
+  <StreamInterface name='in'
+                   datawidth='IN_PORT_DATA_WIDTH'
+                   clockdirection='in'/>
+  <StreamInterface name='out'
+                   datawidth='OUT_PORT_DATA_WIDTH'
+                   clock='in'
+                   workereof='true'/>
+</HdlWorker>

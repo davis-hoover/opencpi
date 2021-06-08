@@ -19,7 +19,8 @@
  */
 
 // Parameter processing
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 #include <strings.h>
 #include <fnmatch.h>
 #include "OcpiOsFileSystem.h"
@@ -177,6 +178,28 @@ onlyValue(std::string &uValue, Attributes *&attrs, const char *platform) {
   return NULL;
 }
 
+// parse a param value and check whether it is the default
+const char *Param::
+parseValue(const OU::Property &prop, const char *value) {
+  const char *err;
+  OU::Value newValue;
+  if ((err = prop.parseValue(value, newValue)))
+    return err;
+  m_isDefault = false;
+  newValue.unparse(m_uValue);
+  if (prop.m_default) {
+    std::string defValue;
+    prop.m_default->unparse(defValue);
+    if (defValue == m_uValue) {
+      m_isDefault = true;
+      m_value = *prop.m_default; // copy
+    } else
+      m_value = newValue; // copy
+  } else
+    m_value = newValue; // copy
+  return NULL;
+}
+
 // the "global" argument is true when this parameter has a global setting across many other
 // configurations and so it cannot be given a value if it is dependent on other parameters for
 // its type (e.g. array dimensions)
@@ -228,24 +251,9 @@ parse(ezxml_t px, const OU::Property *p, const Worker *worker, bool global) {
     if ((err = m_valuesType->m_default->parse(values, NULL, false, NULL)))
       return err;
     // The specified values are in: *m_valuesType->m_default, not unparsed
-  } else {
-    OU::Value newValue;
-    if ((err = prop.parseValue(value, newValue)))
-      return err;
-    m_isDefault = false;
-    newValue.unparse(m_uValue);
-    if (prop.m_default) {
-      std::string defValue;
-      prop.m_default->unparse(defValue);
-      if (defValue == m_uValue) {
-	m_isDefault = true;
-	m_value = *prop.m_default; // copy
-      } else
-	m_value = newValue; // copy
-    } else
-      m_value = newValue; // copy
-    // The specified value is in m_value, unparsed in m_uValue
-  }
+  } else if ((err = parseValue(prop, value)))
+    return err;
+  // The specified value is in m_value, unparsed in m_uValue
   const char // all these can be glob-wildcarded
     *add = ezxml_cattr(px, "add"),
     *exclude = ezxml_cattr(px, "exclude"),
@@ -361,7 +369,7 @@ parse(ezxml_t cx, const ParamConfigs &configs) { // , bool includeInitial) {
     return err;
   if (haveId) {
     for (unsigned n = 0; n < configs.size(); n++)
-      if (configs[n]->nConfig == nConfig)
+      if (configs[n] && configs[n]->nConfig == nConfig)
 	return OU::esprintf("Duplicate configuration id %zu in build file", nConfig);
     OU::format(id, "%zu", nConfig);
   }
@@ -545,6 +553,30 @@ equal(ParamConfig &other) {
   return true;
 }
 
+// Find the auto build file
+// if it is not there, set the filename anyway, and set xml == NULL
+// if XML != NULL, the contents are good
+// This function is used by both readers and writers
+static const char *
+autoBuildFile(const char *owd, const std::string &parent, const char *implName, std::string &file,
+	      ezxml_t &xml) {
+  char *path = realpath(owd, NULL);
+  if (!path)
+    return OU::esprintf("OWD file %s was not a real existing file", owd);
+  const char *slash = strrchr(path, '/');
+  std::string dir, xfile;
+  if (slash)
+    dir.assign(path, OCPI_SIZE_T_DIFF(slash + 1, path));
+  OU::format(file, "%sgen/%s-auto-build.xml", dir.c_str(), implName);
+  xml = NULL;
+  const char *err = NULL;
+  if (OS::FileSystem::exists(file) &&
+      !(err = parseFile(file.c_str(), parent, "build", &xml, xfile, false, false, false)))
+    err = OE::checkElements(xml, "configuration", NULL);
+  free(path);
+  return err;
+}
+
 const char *Worker::
 parseBuildFile(bool optional, bool *missing, const std::string &parent) {
   const char *err;
@@ -558,7 +590,7 @@ parseBuildFile(bool optional, bool *missing, const std::string &parent) {
   std::string dir;
   const char *slash = strrchr(m_file.c_str(), '/');
   if (slash)
-    dir.assign(m_file.c_str(), (size_t)((slash + 1) - m_file.c_str()));
+    dir.assign(m_file.c_str(), OCPI_SIZE_T_DIFF(slash + 1, m_file.c_str()));
   // First look for the build file next to the OWD
   OU::format(fname, "%s%s.build", dir.c_str(), m_implName);
   if (!OS::FileSystem::exists(fname)) {
@@ -887,8 +919,8 @@ emitToolParameters() {
   return err;
 }
 
-// Based on worker xml, read the <worker>.build, and emit the
-// gen/<worker>-params.mk
+// Based on worker xml, read the <worker>-build.xml, and emit the
+// gen/<worker>.mk
 const char *Worker::
 emitMakefile(FILE *xmlFile) {
   const char *err;
@@ -920,13 +952,73 @@ emitHDLConstants(size_t config, bool other) {
     OU::esprintf("File close of VHDL generics file failed.  Disk full?") : NULL;
 }
 
+// Return NULL if none found that match inputs
+const char *Worker::
+findParamConfig(size_t low, size_t high, const OU::Assembly::Properties &instancePVs,
+		ParamConfig *&paramConfig) {
+  paramConfig = NULL;
+  for (size_t n = low; n <= high; n++) {
+    ParamConfig *pc = m_paramConfigs[n];
+    if (!pc)
+      continue;
+    const OU::Assembly::Property *ap = &instancePVs[0];
+    for (unsigned nn = 0; nn < instancePVs.size(); nn++, ap++)
+      if (ap->m_hasValue) {
+	Param *p = &pc->params[0];
+	for (unsigned nnn = 0; nnn < pc->params.size(); nnn++, p++)
+	  if (!strcasecmp(ap->m_name.c_str(), p->m_param->m_name.c_str())) {
+	    OU::Value apValue;
+	    const char *err;
+	    if ((err = p->m_param->parseValue(ap->m_value.c_str(), apValue)))
+	      return err;
+	    std::string apString;
+	    apValue.unparse(apString); // to get canonicalized value of APV
+	    if (apString != p->m_uValue)
+	      goto nextConfig;
+	    break;
+	  }
+      }
+    paramConfig = pc;
+    break;
+  nextConfig:;
+  }
+  return NULL;
+}
+
+static const char *
+writeAutoBuildFile(const char *file, ParamConfigs &paramConfigs, size_t low) {
+  // Create the XML tree and dump it into a file
+  ezxml_t root = ezxml_new("build");
+  for (size_t n = low; n < paramConfigs.size(); ++n) {
+    ParamConfig *pc = paramConfigs[n];
+    std::string id;
+    OU::format(id, "%zu", n);
+    ezxml_t cx = OE::addChild(root, "configuration", 1, NULL, "id", id.c_str());
+    for (size_t nn = 0; nn < pc->params.size(); ++nn) {
+      Param &p = pc->params[nn];
+      if (!p.m_isDefault)
+	OE::addChild(cx, "parameter", 2, NULL, "name", p.m_name.c_str(), "value", p.m_uValue.c_str());
+    }
+  }
+  const char *test = ezxml_toxml(root);
+  std::string data(test);
+  free((void*)test);
+  data += "\n";
+  const char *err = OU::string2File(data, file);
+  ezxml_free(root);
+  return err;
+}
+
 // Given assembly instance properties or a parameter configuration,
 // establish the parameter values for this worker.
 // Note this worker will then be parameter-value-specific.
 // If instancePVs is NULL, use paramconfig
 const char *Worker::
-setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
+setParamConfig(const OU::Assembly::Properties *instancePVs, size_t paramConfig,
 	       const std::string &parent) {
+  // This method can in fact be called more than once, but this should be FIXME.
+  // HdlDevice::create and Device::parse both call this...
+  // assert(!m_paramConfig);
   const char *err;
   // So we have parameter configurations
   // FIXME: we could cache this parsing in one place, but workers can still be
@@ -940,7 +1032,7 @@ setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
       return OU::esprintf("Worker '%s' has no parameter configurations, but config %zu specified",
 			  m_implName, paramConfig);
     if (instancePVs && instancePVs->size()) {
-      OU::Assembly::Property *ap = &(*instancePVs)[0];
+      const OU::Assembly::Property *ap = &(*instancePVs)[0];
       for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
 	if (ap->m_hasValue) {
 	  OU::Property *p = findProperty(ap->m_name.c_str());
@@ -958,13 +1050,48 @@ setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
 		err = "value doesn't match default, and no other choices exist";
 	    }
 	    if (err)
-	      return OU::esprintf("Bad value \"%s\" (default is \"%s\", new is \"%s\") for parameter \"%s\" for worker \"%s\": %s",
+	      return OU::esprintf("Bad value \"%s\" (default is \"%s\", new is \"%s\") for "
+				  "parameter \"%s\" for worker \"%s\": %s",
 				  ap->m_value.c_str(), defValue.c_str(), newValue.c_str(),
 				  p->m_name.c_str(), m_implName, err);
 	  }
 	}
     }
     return NULL;
+  }
+  if (paramConfig < m_paramConfigs.size()) {
+    if (!instancePVs || instancePVs->size() == 0) {
+      m_paramConfig = m_paramConfigs[paramConfig];
+      return NULL;
+    }
+    size_t low, high;
+    if (paramConfig)
+      low = high = paramConfig;
+    else
+      low = 0, high = m_paramConfigs.size() - 1;
+    // At this point we know we have configurations and values to match against them
+    // Scan the configs until one matches. FIXME: use scoring via selection expression...
+    if ((err = findParamConfig(low, high, *instancePVs, m_paramConfig)))
+      return err;
+    if (m_paramConfig)
+      return NULL;
+  }
+  // So there are no build configs that match in the static build config file.
+  // Look at the dynamic build config file.
+  ezxml_t xml;
+  size_t staticSize = m_paramConfigs.size();
+  std::string fname;
+  if (!(err = autoBuildFile(m_file.c_str(), parent, m_implName, fname, xml)) && xml) {
+    size_t id = staticSize;
+    for (ezxml_t cx = ezxml_cchild(xml, "configuration"); cx; cx = ezxml_cnext(cx), ++id) {
+      ParamConfig *pc = new ParamConfig(*this);
+      if ((err = pc->parse(cx, m_paramConfigs)))
+	return err;
+      pc->nConfig = id;
+      if ((err = pc->doDefaults(false))) // configs with id have defaults filled in
+	return err;
+      m_paramConfigs.push_back(pc);
+    }
   }
   if (paramConfig >= m_paramConfigs.size())
     return OU::esprintf("Parameter configuration %zu exceeds available configurations (%zu)",
@@ -973,40 +1100,40 @@ setParamConfig(OU::Assembly::Properties *instancePVs, size_t paramConfig,
     m_paramConfig = m_paramConfigs[paramConfig];
     return NULL;
   }
-  size_t low, high;
-  if (paramConfig)
-    low = high = paramConfig;
-  else
-    low = 0, high = m_paramConfigs.size() - 1;
-  // At this point we know we have configurations and values to match against them
-  // Scan the configs until one matches. FIXME: use scoring via selection expression...
-  for (size_t n = low; n <= high; n++) {
-    ParamConfig *pc = m_paramConfigs[n];
-    OU::Assembly::Property *ap = &(*instancePVs)[0];
+  // See if any dynamic build configs match, and use it if so
+  if ((err = findParamConfig(staticSize, m_paramConfigs.size()-1, *instancePVs, m_paramConfig)))
+    return err;
+  if (m_paramConfig)
+    return NULL;
+  if (!g_autoAddParamConfig) {
+    std::string bad;
+    const OU::Assembly::Property *ap = &(*instancePVs)[0];
     for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
-      if (ap->m_hasValue) {
-	Param *p = &pc->params[0];
-	for (unsigned nnn = 0; nnn < pc->params.size(); nnn++, p++)
-	  if (!strcasecmp(ap->m_name.c_str(), p->m_param->m_name.c_str())) {
-	    OU::Value apValue;
-	    if ((err = p->m_param->parseValue(ap->m_value.c_str(), apValue)))
-	      return err;
-	    std::string apString;
-	    apValue.unparse(apString); // to get canonicalized value of APV
-	    if (apString != p->m_uValue)
-	      goto nextConfig; // a mismatch - this paramconfig can't used
-	    break;
-	  }
-      }
-    m_paramConfig = pc;
-    break;
-  nextConfig:;
+      if (ap->m_hasValue)
+	OU::formatAdd(bad, "%s%s=\"%s\"", nn ? ", " : "", ap->m_name.c_str(), ap->m_value.c_str());
+    return OU::esprintf("No built parameter configuration for worker \"%s\" matches requested "
+			"parameter values: %s", cname(), bad.c_str());
   }
-  if (!m_paramConfig)
-    return
-      OU::esprintf("No built parameter configuration for worker \"%s\" matches requested "
-		   "parameter values", cname());
-  return NULL;
+  ParamConfig *pc = new ParamConfig(*this);
+  const OU::Assembly::Property *ap = &(*instancePVs)[0];
+  for (unsigned nn = 0; nn < instancePVs->size(); nn++, ap++)
+    if (ap->m_hasValue) {
+      size_t nParam;
+      OU::Property *p;
+      if ((err = findParamProperty(ap->m_name.c_str(), p, nParam)) ||
+	  (err = p->finalize(*this, "property", true)))
+	return err;
+      Param &param = pc->params[nParam];
+      param.setProperty(p, this);  // possibly overwriting
+      if ((err = param.parseValue(*p, ap->m_value.c_str())))
+	return err;
+    }
+  pc->nConfig = m_paramConfigs.size();
+  if ((err = pc->doDefaults(false)))
+    return err;
+  m_paramConfigs.push_back(pc);
+  m_paramConfig = pc;
+  return writeAutoBuildFile(fname.c_str(), m_paramConfigs, staticSize);
 }
 
 // There is probably a more clever way to do this, but we need decent warnings.
@@ -1152,6 +1279,23 @@ parse(ezxml_t x, const char *buildFile) {
       return "Invalid \"cores\" attribute:  worker model is not HDL";
     else if ((err = getHdlPrimitive(ti.token(), "core", m_cores)))
       return err;
+  for (OU::TokenIter ti(ezxml_cattr(x, "configurations")); ti.token(); ti.next()) {
+    if (m != HdlModel)
+      return "Invalid \"configurations\" attribute:  worker model is not HDL";
+    if (m_worker.m_type != Worker::Platform)
+      return "Invalid \"configurations\" attribute:  worker is not an HDL platform";
+    if (strcasecmp("base", ti.token()) && strcasecmp("base.xml", ti.token())) {
+      std::string xml;
+      const char *slash = strrchr(m_worker.m_file.c_str(), '/');
+      if (slash)
+	xml.assign(m_worker.m_file.c_str(), OCPI_SIZE_T_DIFF(++slash, m_worker.m_file.c_str()));
+      xml += ti.token();
+      if (!OS::FileSystem::exists(xml) && !OS::FileSystem::exists(xml + ".xml"))
+	return OU::esprintf("Platform configuration file %s (or %s.xml) not found",
+			    ti.token(), ti.token());
+    }
+    m_configurations.push_back(ti.token());
+  }
   bool isDir;
   // xmlincludedirs is handled specially in owd parsing for bootstrap reasons
   for (OU::TokenIter ti(ezxml_cattr(x, "includedirs")); ti.token(); ti.next()) {
@@ -1210,6 +1354,7 @@ writeMakeVars(FILE *mkf) {
   writeVar(mkf, "XmlIncludeDirs", m_xmlIncludeDirs);
   writeVar(mkf, "IncludeDirs", m_includeDirs);
   writeVar(mkf, "ComponentLibraries", m_componentLibraries);
+  writeVar(mkf, "Configurations", m_configurations);
   writeVar(mkf, "Cores", m_cores);
   writeVar(mkf, "RccStaticPrereqLibs", m_staticPrereqLibs);
   writeVar(mkf, "RccDynamicPrereqLibs", m_dynamicPrereqLibs);

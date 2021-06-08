@@ -83,12 +83,19 @@
 +tools/ocpidev/assets/worker.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/template.py <target>/lib/_opencpi/assets/
 +tools/ocpidev/assets/component.py <target>/lib/_opencpi/assets/
-+tools/ocpidev/ocpidev.sh <target>/bin/ocpidev
++tools/ocpidev/ocpidev.py <target>/bin/ocpidev
++tools/ocpidev/ocpidev_args.py scripts/
++tools/ocpidev/ocpiargparse.py scripts/
++tools/ocpidev/ocpidev.sh scripts/
 +tools/ocpidev/ocpidev_run.py scripts/
 +tools/ocpidev/ocpishow.py scripts/
 +tools/ocpidev/ocpidev_utilization.py scripts/
-+tools/ocpidev/ocpicreate.py scripts/
-+tools/ocpidoc/ocpidoc.py <target>/bin/ocpidoc
++tools/ocpidoc/doc <target>/lib/ocpidoc/
++tools/ocpidoc/ocpidoc.py <target>/lib/ocpidoc/
++tools/ocpidoc/ocpi_documentation <target>/lib/ocpidoc/
++tools/ocpidoc/test <target>/lib/ocpidoc/
++tools/ocpidoc/xml_tools <target>/lib/ocpidoc/
++tools/ocpidoc/ocpidoc.sh <target>/bin/ocpidoc
 +tools/ocpi_protocol_view/ocpi_protocol_view.py <target>/bin/ocpi_protocol_view
 # generic make scripts
 +tools/include/show.mk include/
@@ -193,6 +200,7 @@
 # Utilities for unit test scripts
 +tools/python/opencpi/unit_test_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/complexshortwithmetadata_utils.py <target>/lib/opencpi/
++tools/python/opencpi/complexshorttimedsample_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/iqstream_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/dsp_utils.py <target>/lib/opencpi/
 +tools/python/opencpi/ocpi_testing <target>/lib/opencpi/

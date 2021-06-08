@@ -63,7 +63,7 @@ HdlInstallDir=lib
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 $(eval $(HdlPreprocessTargets))
 $(infox HP2:$(HdlPlatform) HPs:$(HdlPlatforms) HT:$(HdlTarget) HTs:$(HdlTargets):$(CURDIR))
-include $(OCPI_CDK_DIR)/include/rcc/rcc-targets.mk
+include $(OCPI_CDK_DIR)/include/rcc/rcc-make.mk
 ifeq ($(OCPI_HAVE_OPENCL),1)
   include $(OCPI_CDK_DIR)/include/ocl/ocl-make.mk
 endif
@@ -84,7 +84,7 @@ AssyImplementations=$(filter %.assy,$(Implementations))
 # must eval here hence ifeq
 ifeq ($(TestImplementations),)
   ifeq ($(origin Tests),undefined)
-    TestImplementations:=$(filter-out $(ExcludeTests),$(patsubst %/,%,$(dir $(wildcard *.test/Makefile))))
+    TestImplementations:=$(filter-out $(ExcludeTests),$(patsubst %/,%,$(dir $(wildcard *.test/*-test.xml))))
   else
     TestImplementations:=$(filter-out $(ExcludeTests),$(Tests))
   endif
@@ -170,7 +170,8 @@ HdlLibrariesCommand=$(call OcpiAdjustLibraries,$(HdlLibraries))
 RccLibrariesCommand=$(call OcpiAdjustLibraries,$(RccLibraries))
 TestTargets:=$(call Unique,$(HdlPlatforms) $(HdlTargets) $(RccTargets))
 # set the directory flag to make, and use the desired Makefile
-GoWorker=-C $1 `[ ! -f $1/Makefile ] && echo -f $(OCPI_CDK_DIR)/include/worker.mk`
+GoWorker=$(infox GW:$1:$(wildcard $1/Makefile))-C $1 $(if $(wildcard $1/Makefile),,\
+                 -f $(OCPI_CDK_DIR)/include/$(if $(filter %.test,$(notdir $1)),test,worker).mk)
 BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker,$2)::)\
     set -e; \
     t="$(foreach t,$(or $($(call Capitalize,$1)Target),$($(call Capitalize,$1)Targets)),\
@@ -187,31 +188,25 @@ BuildImplementation=$(infox BI:$1:$2:$(call HdlLibrariesCommand):$(call GoWorker
                XmlIncludeDirsInternal="$(call AdjustRelative,$(XmlIncludeDirs))" $3;\
 
 BuildModel=\
-$(AT)set -e;if test "$($(call Capitalize,$(1))Implementations)"; then \
-  for i in $($(call Capitalize,$(1))Implementations); do \
-    if test ! -d $$i; then \
-      echo Implementation \"$$i\" has no directory here.; \
+$(AT)set -e;\
+  $(foreach i,$($(call Capitalize,$(1))Implementations),\
+    if test ! -d $i; then \
+      echo Implementation \"$i\" has no directory here.; \
       exit 1; \
     else \
-      $(call BuildImplementation,$(1),$$i,$2) \
-    fi;\
-  done; \
-fi
+      $(call BuildImplementation,$(1),$i,$2) \
+    fi;)\
 
-CleanModel=\
-  $(AT)if test "$($(call Capitalize,$(1))Implementations)"; then \
-    for i in $($(call Capitalize,$(1))Implementations); do \
-      if test -d $$i; then \
-	tn=$(call Capitalize,$(1))Targets; \
-        t="$(or $(CleanTarget),$($(call Capitalize,$(1))Targets))"; \
-        $(ECHO) Cleaning $(call ToUpper,$(1)) implementation $$i for targets: $$t; \
-	$(MyMake) -C $$i $(PassOutDir) \
-           OCPI_CDK_DIR=$(call AdjustRelative,$(OCPI_CDK_DIR)) $$tn="$$t" clean; \
-      fi;\
-    done; \
-  fi; \
-  rm -r -f lib/$1 gen/$1
-
+CleanModel=$(infox CLEANING MODEL $1)\
+  $(AT)$(if $($(call Capitalize,$1)Implementations), \
+	 $(foreach i,$($(call Capitalize,$1)Implementations),\
+	   if test -d $$i; then \
+	     tn="$(call Capitalize,$1)Targets"; \
+	     t="$(or $(CleanTarget),$($(call Capitalize,$1)Targets))"; \
+             $(ECHO) Cleaning $(call ToUpper,$1) implementation $i for targets: $$t; \
+	     $(MyMake) $(call GoWorker,$i) $(PassOutDir) $$tn="$$t" clean; \
+          fi;),:)\
+	  rm -r -f lib/$1 gen/$1
 
 all: workers
 workers: $(build_targets)

@@ -349,7 +349,8 @@ OcpiGenEnv=\
     OCPI_HDL_LIBRARIES="$(call Unique,$(HdlExplicitLibraries))"\
     OCPI_ALL_HDL_TARGETS="$(OCPI_ALL_HDL_TARGETS)" \
     OCPI_ALL_RCC_TARGETS="$(OCPI_ALL_RCC_TARGETS)" \
-    OCPI_ALL_OCL_TARGETS="$(OCPI_ALL_OCL_TARGETS)"
+    OCPI_ALL_OCL_TARGETS="$(OCPI_ALL_OCL_TARGETS)" \
+    OCPI_AUTO_BUILD_WORKERS="$(OCPI_AUTO_BUILD_WORKERS)"
 
 OcpiGenTool=$(OcpiGenEnv) $(OCPI_VALGRIND) $(ToolsDir)/ocpigen \
   $(call OcpiFixPathArgs,$(patsubst %,-I%,$(XmlIncludeDirsInternal)) $1)
@@ -378,6 +379,10 @@ OcpiGen=$(call OcpiGenArg,,$1)$(infox OGA:$(call OcpiGenArg,,$1))
 #  $(if $(call DoShell,ls -l,Value),$(error $(Value)),$(Value))
 #DoShell=$(eval X:=$(shell X=`bash -c '$1; exit $$?' 2>&1`;echo $$?; echo "$$X" | sed "s/\#/<pound>/g"))$(strip \
 #
+define OcpiNewLine
+
+
+endef
 DoShell=$(eval X:=$(shell X=`bash -c '$1; exit $$?'`;echo $$?; echo "$$X" | sed "s/\#/<pound>/g"))$(strip \
 	     $(call OcpiDbg,DoShell($1,$2):X:$X) \
              $(eval $2:=$(wordlist 2,$(words $X),$X))\
@@ -397,10 +402,7 @@ OcpiCallPythonFunc=\
 # Import the ocpiutil module and run the python code in $1
 # Usage: $(call OcpiCallPythonUtil,ocpiutil.utility_function(arg1, arg2))
 OcpiCallPythonUtil=$(infox OPYTHON:$1)\
-  $(shell python3 -c 'import sys;\
-sys.path.append("$(OCPI_CDK_DIR)/$(OCPI_TOOL_PLATFORM)/lib/");\
-import _opencpi.util as ocpiutil;\
-$1')
+  $(shell PYTHONPATH=$(PYTHONPATH) python3 -c 'import _opencpi.util as ocpiutil;$1')
 
 # Like the builtin "dir", but without the trailing slash
 OcpiDir=$(foreach d,$1,$(patsubst %/,%,$(dir $1)))
@@ -602,12 +604,16 @@ OcpiGetRccPlatformDir=$(strip $(firstword \
 # as well as the 'required' projects such as core/cdk
 OcpiProjectDependenciesInternal=$(call Unique,$(ProjectDependencies)\
                                    $(if $(filter ocpi.core,$(OCPI_PROJECT_PACKAGE)),,ocpi.core))
-# If a project dependency is a path, use it as is. Otherwise, check for it in imports.
+# If a project dependency is a path, use it as is. Otherwise, check for it in the
+# project's registry, whether explicit imports or implicit global registry
 OcpiGetProjectDependencies=$(strip \
-  $(foreach d,$(OCPI_PROJECT_DEPENDENCIES),\
-    $(if $(findstring /,$d),\
-      $d,\
-      $(OCPI_PROJECT_REL_DIR)/imports/$d)))
+  $(foreach r,$(or $(wildcard $(OCPI_PROJECT_REL_DIR)/imports),\
+              $(OcpiGlobalDefaultProjectRegistryDir)),\
+    $(foreach d,$(OCPI_PROJECT_DEPENDENCIES),$(infox DEP:$d)\
+      $(if $(findstring /,$d),\
+        $d,\
+	$(or $(wildcard $r/$d),\
+          $(error For project at $(realpath $(OCPI_PROJECT_REL_DIR)), dependency $d is not registered at $i))))))
 
 #      $(call OcpiGetProjectInImports,.,$d)) ))
 # These are the leftover imports that are not listed in the ProjectDependencies
@@ -655,7 +661,7 @@ OcpiGetProjectImports=$(strip \
                             $(OcpiProjectRegistryDir),\
                             $(call OcpiImportsDirForContainingProject,.)),\
 	        $(wildcard $i/*)),\
-    $(if $(filter $(realpath $p),$(realpath $(OcpiAbsPathToContainingProject))),\
+    $(if $(filter $(realpath $p),$(realpath $(call OcpiAbsPathToContainingProject,.))),\
       ,\
       $p )))
 
@@ -840,11 +846,11 @@ define OcpiSetProjectX
   # or in a 'Makefile' file), but so they do not interfere with
   # ProjectPackage results
   PackageSaved:=$$(Package)
-  export Package:=
+  Package:=
   PackagePrefixSaved:=$$(PackagePrefix)
-  export PackagePrefix:=
+  PackagePrefix:=
   PackageNameSaved:=$$(PackageName)
-  export PackageName:=
+  PackageName:=
 
   # Include Project.<mk|xml> to determine ProjectPackage
   $$(infox PR0:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
@@ -869,15 +875,17 @@ define OcpiSetProjectX
   # PackageName defaults to directory name
   ifndef ProjectPackage
     ifneq ($$(Package),)
-      override ProjectPackage:=$$(Package)
+      ProjectPackage:=$$(Package)
+    else ifneq ($$(PackageID),)
+      ProjectPackage:=$$(PackageID)
     else
       ifeq ($$(PackagePrefix),)
-        export PackagePrefix:=local
+        PackagePrefix:=local
       endif
       ifeq ($$(PackageName),)
-        export PackageName:=$$(notdir $$(call OcpiAbsDir,$1))
+        PackageName:=$$(notdir $$(call OcpiAbsDir,$1))
       endif
-      override ProjectPackage:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)
+      ProjectPackage:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)
     endif
   endif
   export OCPI_PROJECT_PACKAGE=$$(ProjectPackage)
@@ -925,18 +933,13 @@ ifdef NEVER
     export OCPI_PROJECT_ADDED_TARGET_DIRS:=1
   endif
 endif
-# Look into a directory in $1 and determine which type of directory it is by looking at the Makefile.
-# Also checks Makefile.am for autotools version
-# If a dirtype is not found, check if $1 is the CDK. If so, return 'project'
+# Look into a directory in $1 and determine which type of directory it is
 # Return null if there is no type to be found
 OcpiGetDirType=$(strip\
   $(foreach t,$(call OcpiCacheFunctionOnPath,OcpiGetDirTypeX,$1),$(infox GDTr:$1:$t)$t))
-OcpiGetDirTypeX=$(strip $(infox GDT1:$1:$1/Makefile:$(realpath $1/Makefile))\
-  $(and $(wildcard $1/Makefile),\
-    $(foreach d,$(shell sed -n \
-                  's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*$$=\1=p' \
-                  $1/Makefile | tail -1),\
-      $(infox OGT1: found type: $d ($1))$(notdir $d))))
+OcpiGetDirTypeX=$(strip $(infox GDT1:$1)\
+  $(foreach t,$(call OcpiCallPythonUtil,print(ocpiutil.get_dirtype("$1"))),\
+     $(infox GDT1: found type: $t for $1)$t))
 
 # Get the directory type of arg1, and return the portion after the last dash.
 # E.g. in an hdl-platform directory, this will return platform
@@ -951,13 +954,10 @@ OcpiGetShortenedDirType=$(infox OGSDT:$1)$(strip \
 # Recursive
 OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
   $(if $(wildcard $1/Project.mk)$(wildcard $1/Project.xml),\
-    $(if $(wildcard $1/Makefile)$(wildcard $1/Makefile.am),\
-      $(if $(filter project,$(call OcpiGetDirType,$1)),\
-        $(infox found project in $1)\
-        $(eval $(call OcpiSetProject,$1))\
-        $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
-        $(error no proper Makefile found in the directory where Project.<mk|xml> was found ($1))),\
-      $(error no Makefile found in the directory where Project.<mk|xml> was found ($1))),\
+    $(if $(filter project,$(call OcpiGetDirType,$1)),\
+      $(eval $(call OcpiSetProject,$1))\
+      $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
+      $(error no proper Makefile found in the directory where Project.<mk|xml> was found ($1))),\
     $(if $(foreach r,$(realpath $1/..),$(filter-out /,$r)),\
       $(call OcpiIncludeProjectX,$(and $(filter-out .,$1),$1/)..,$2,$3),\
       $(call $2,$2: no Project.<mk|xml> was found here ($3) or in any parent directory)))
@@ -984,7 +984,7 @@ OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(O
 OcpiIncludeParentAsset_library=\
   $(if $(filter devices cards,$(notdir $(realpath $1))),\
     $(eval ComponentLibraries+=devices))\
-  $(if $(filter %-platform,$(call OcpiGetDirType,$(and $1,$1/)..)),\
+  $(if $(filter %-platform application,$(call OcpiGetDirType,$(and $1,$1/)..)),\
     $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,$2,$3),\
     $(call OcpiIncludeProject,$3,lib))
 
@@ -1012,6 +1012,9 @@ OcpiIncludeParentAsset_platform=\
  OcpiIncludeParentAsset_hdl=\
    $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)..,$2,$3)
 
+ OcpiIncludeParentAsset_application=$(infox PRIMITIVES:$(Model))\
+   $(call OcpiIncludeAssetAndParentX,$(and $(filter-out .,$1),$1/)../..,,$3)
+
 # For asset in directory arg1, look for makefile <arg2>.mk and include it to
 # extract any variables that are set.  Clear the package variables so that the
 # current asset's environment is not polluted with package variables from a
@@ -1021,27 +1024,87 @@ OcpiIncludeParentAsset_platform=\
 #            this is the word used to find the .mk  file
 #            e.g. Library, Platform, Platforms, Worker
 define OcpiSetAsset
+  OcpiAssetName:=$$(notdir $$(realpath $1))
+  $$(infox SETASSET:$1:$2:$$(OcpiAssetName):$$(CURDIR):$$(wildcard $1/$$(OcpiAssetName).xml))
   Package:=
-  unexport Package
+  PackageID:=
   PackagePrefix:=
-  unexport PackagePrefix
   PackageName:=
-  unexport PackagePrefix
-  # Library
+  # Library can be Library.mk for backward compatibility
   ifeq ($2,Library)
-    ifneq ($$(wildcard $1/$(CwdName).xml),)
-      $(call OcpiParseXml,$1,$(CwdName))
-    else
+    ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
       ifneq ($$(wildcard $1/$2.mk),)
-        include $1/$2.mk
+         $$(error In $1, both $2.mk and $$(OcpiAssetName).xml exist, which is not supported.)
       endif
-    endif
-  # Platform, Platforms, Worker
-  else
-    ifneq ($$(wildcard $1/$2.mk),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
+    else ifneq ($$(wildcard $1/$2.mk),)
       include $1/$2.mk
     endif
+  # Project (actually handled in OcpiSetProject)
+  else ifeq ($2,Project)
+    $$(if $$(OCPI_PROJECT_PACKAGE),,$$(error internal error: OCPI_PROJECT_PACKAGE not set))
+    Package:=$$(OCPI_PROJECT_PACKAGE)
+    $$(infox Not including Project.mk twice)
+  # Worker is handled specially inParamShell
+  else ifeq ($2,Worker)
+    $$(infox Not including worker XML directly for make variables)
+  else ifeq ($2,Platform)
+    $$(infox Not including platform worker XML directly for make variables)
+  else ifneq ($(filter-out Platforms Primitive Primitives Applications Application,$2),)
+    $$(error Unexpected asset type: $2)
+  else ifeq ($2,Application)
+    ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
+    endif
+  else ifeq ($2,Primitives)
+    # We are overloading the Libraries and Cores variables.
+    # At the primitives level they are specifying which things should be built or cleaned
+    # and *not* dependencies of the underlying libs and cores
+    # So we make sure they do *not* propagate into the lower level assets
+
+    # Capture what was in the Makefile (if there is one), at whatever level we are at
+    # Then erase/undefine them
+    TmpLibraries:=$$(call Unique,$$(strip $$(Libraries) $$(HdlLibraries)))
+    TmpCores:=$$(Cores)
+    undefine Libraries
+    undefine Cores
+    undefine HdlLibraries
+    # Next parse the XML file if present, again at whatever level we are at
+    ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
+    endif
+    # Any variable settings here are from the XML file
+    ifeq ($1,.)
+      # This is the actual primitives directory so merge them all
+      Libraries:=$$(call Unique,$$(TmpLibraries) $$(Libraries) $$(HdlLibraries))
+      ifndef Libraries
+        undefine Libraries
+      endif
+      Cores:=$$(call Unique,$$(TmpCores) $$(Cores))
+      ifndef Cores
+        undefine Cores
+      endif
+    else
+      # This is not the actual primitives directory so just restore the ones from any Makefile
+      ifdef TmpLibraries
+        Libraries:=$$(TmpLibraries)
+      else
+        undefine Libraries
+      endif
+      ifdef TmpCores
+        Cores:=$$(Cores)
+      else
+        undefine Cores
+      endif
+    endif
+    undefine HdlLibraries
+  else ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+    # Platforms, Primitive, Applications
+    $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
+  else
+    $$(infox MAKEFILE:$1:$2:$$(HdlLibraries):$$(Libraries))
   endif
+  $$(infox SETASSETEND:$1:$2:$$(HdlLibraries):$$(Libraries))
 endef
 
 # First determine the shortened directory type which is the portion
@@ -1065,13 +1128,11 @@ endef
 OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
   $(foreach t,$(call OcpiGetDirType,$1),\
     $(foreach s,$(if $(filter hdl-lib% hdl-core,$t),primitive,$(lastword $(subst -, ,$t))),\
-      $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c)\
+      $(foreach c,$(call Capitalize,$s),$(infox OIAAPXi:$t:$s:$c:$(ParentPackage))\
         $(if $(filter-out undefined,$(origin OcpiIncludeParentAsset_$s)),\
-          $(call OcpiIncludeParentAsset_$s,$1,$2,$3),\
+          $(call OcpiIncludeParentAsset_$s,$1,$2,$3)\
+          $(eval ParentPackage:=$(Package)),\
           $(call OcpiIncludeProject,$3,asset))\
-        $(if $(Package),,$(eval override Package:=$(OCPI_PROJECT_PACKAGE)))\
-        $(eval override ParentPackage:=$(Package))\
-        $(eval override Package:=)\
         $(eval $(call OcpiSetAsset,$1,$c))\
         $(call OcpiSetAndGetPackageId,$1,$2,$t)\
         $(infox PARENT:$(origin ParentPackage):$(ParentPackage))))))
@@ -1086,8 +1147,9 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
 #   Arg3 = error/warning/info mode (optional)
 OcpiIncludeAssetAndParent=\
   $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
-    $(eval override ParentPackage:=)\
-    $(eval override Package:=)\
+    $(eval ParentPackage:=)\
+    $(eval Package:=)\
+    $(eval PackageID:=)\
     $(eval include $(OCPI_CDK_DIR)/include/package.mk)\
     $(call OcpiIncludeAssetAndParentX,$(or $1,.),$2,$3))
 
@@ -1095,9 +1157,7 @@ OcpiIncludeAssetAndParent=\
 ###############################################################################
 
 # Find the subdirectories that make a Makefile that includes something
-OcpiFindSubdirs=$(strip \
-  $(foreach a,$(wildcard */Makefile),\
-    $(shell grep -q '^[ 	]*include[ 	]*.*/include/$1.mk' $a && echo $(patsubst %/,%,$(dir $a)))))
+OcpiFindSubdirs=$(foreach a,$(wildcard *),$(and $(filter $1,$(call OcpiGetDirType,$a)),$a))
 
 OcpiHavePrereq=$(realpath $(OCPI_PREREQUISITES_DIR)/$1)
 OcpiPrereqDir=$(call OcpiHavePrereq,$1)

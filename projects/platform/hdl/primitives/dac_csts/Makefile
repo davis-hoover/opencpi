@@ -15,5 +15,14 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+ifeq ($(filter clean%, $(MAKECMDGOALS)),)
+  $(shell \
+    ln -s ../../../../assets/hdl/devices/ad9361_dac_sub.hdl/event_in_x2_to_txen.vhd .;)
+endif
+
 Libraries=ocpi fixed_float timed_sample_prot
 include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+
+clean::
+	rm -f event_in_x2_to_txen.vhd
+

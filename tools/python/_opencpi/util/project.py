@@ -20,11 +20,14 @@ definitions for utility functions that have to do with opencpi project layout
 """
 
 import os
+import sys
 import os.path
 import logging
 from glob import glob
+from pathlib import Path
 import subprocess
 import re
+import xml.etree.ElementTree as xt
 from _opencpi.util import cd, set_vars_from_make, OCPIException
 
 def get_make_vars_rcc_targets():
@@ -42,26 +45,164 @@ def get_make_vars_rcc_targets():
 # in a project
 ###############################################################################
 
+def get_makefile(directory, type=None):
+    """
+    Return a tuple consisting of the appropriate makefile as well as the directory
+    to call "make" in
+    """
+    if not type:
+        type = get_dirtype(directory)
+    if os.path.exists(directory + "/Makefile"):
+        mkf="Makefile"
+    else:
+        hdl = "hdl/" if type.startswith("hdl-") else ""
+        mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + hdl + type + ".mk"
+    return mkf,directory
+
 def get_dirtype(directory="."):
     """
-    Determine a directory's type by parsing it for the last 'include ... *.mk' line
+    Return the make-type of the directory or None if it has no make-type
+    """
+    info = get_dir_info(directory)
+    return info[0] if info else None
+
+def get_maketype(directory):
+    """
+    Return the make-type extracted from the Makefile in a diretory
     """
     match = None
-    if os.path.isfile(directory + "/Framework.exports"):
-        return match
-    if os.path.isfile(directory + "/Makefile"):
-        with open(directory + "/Makefile") as mk_file:
+    file = directory + "/Makefile"
+    if os.path.isfile(file):
+        with open(file) as mk_file:
             for line in mk_file:
                 result = re.match(r"^\s*include\s*.*OCPI_CDK_DIR.*/include/(hdl/)?(.*)\.mk.*", line)
-                match = result.group(2) if result != None else match
-    if match is None:
-        if os.path.isfile(directory + "/project-package-id"):
-            return "project"
-        elif directory.endswith(("rcc/platforms", "rcc/platforms/")):
-            return "rcc-platforms"
-        elif "rcc/platforms/" in directory:
-            return "rcc-platform"
+                if result:
+                    match = result.group(2)
+                    if match == "lib":
+                        match = "library"
     return match
+
+def get_dir_info(directory=".", careful=False):
+    """
+    Determine a directory's attributes in a tuple:  make-type, asset-type
+    The primary technique is to look at an XML file that is the same name as the directory name with
+    a matching/appropriate top-level xml element
+    """
+    models = ["hdl", "rcc", "ocl"] # should be static elsewhere
+    in_lib  = models + [ "test", "comp" ]
+    directory = directory.rstrip('/')
+    base = os.path.basename(directory)
+    # avoid absolutizing if it is not necessary since it is expensive
+    if base in ['', '.', '..']:
+        directory = os.path.realpath(directory)
+        base = os.path.basename(directory)
+    if not os.path.isdir(directory):
+       return None # be relaxed about non-dirs so callers can use them from "make"
+       #raise OCPIException("When determining the directory type of \"" + str(directory) + "\", "\
+        #                   "it is not a directory at all")
+    parts = base.split('.') # perhaps there is an authoring model suffix
+    name = parts[0]
+    make_type = None
+    asset_type = None # will be set to make_type if not set
+    top_xml_elements = None
+    xml_file = directory + "/" + parts[0] + ".xml"
+    if (os.path.isfile(directory + "/Project.mk") or
+        os.path.isfile(directory + "/Project.xml") or
+        os.path.isfile(directory + "/project-package-id")):
+        # Do we need to check for project-package-id file in exports?
+        make_type = asset_type = "project"
+    elif len(parts) > 1:
+        if parts[-1] == "test":
+            name += "-test"
+            top_xml_elements = ["tests"]
+            make_type = asset_type = "test"
+        elif parts[-1] == "comp":
+            name += "-spec"
+            top_xml_elements = ["componentspec"]
+            asset_type = "component"
+        elif parts[-1] in [ "hdl", "rcc", "ocl" ]:
+            top_xml_elements = [ parts[-1] + "worker" ]
+            make_type = "worker"
+            asset_type = parts[-1] + "-worker"
+            if parts[-1] == "hdl":
+                top_xml_elements += [ "hdldevice", "hdlimplementation" ]
+    elif name == "components":
+        # ambiguous: if there are worker dirs
+        make_type = asset_type = get_maketype(directory);
+        if make_type:
+            pass # library or libraries
+        elif os.path.exists(directory + "/components.xml"):
+            make_type = asset_type = xt.parse(xml_file).getroot().tag.lower()
+        else: # no Makefile, no xml file
+            make_type = 'libraries'
+            # does not work with python3 < 3.6.0
+            # with os.scandir(directory) as it:
+            it = os.scandir(directory)
+            for entry in it:
+                if entry.is_dir():
+                    dparts = entry.name.split('.')
+                    if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
+                        make_type = asset_type = 'library'
+                        break
+    elif name in ["platforms", "primitives", "cards", "devices", "adapters", "assemblies" ]:
+        # plurals that are usually make types but not actual assets
+        if directory.startswith(name): # incur absolutizing penalty
+            directory = os.path.realpath(directory)
+        parent = os.path.basename(os.path.dirname(directory))
+        if parent == "rcc" and name == "platforms":
+            pass # no make type and not an asset...
+        elif parent in ["hdl"]: # someday models, at least for primitives
+            if name in ["cards", "devices", "adapters"]:
+                make_type = asset_type = "library"
+            else:
+                make_type = "hdl-" + name
+        elif name == "devices" and get_dirtype(os.path.dirname(directory)) == "hdl-platform":
+            make_type = asset_type = "library"
+        elif name == "assemblies" and parent == "gen":
+            make_type = "hdl-assemblies"
+    elif name == "applications":
+        # what is left: specs (not a thing), cards, devices, adapters
+        make_type = "applications"
+    elif name == "assemblies":
+        # what is left: specs (not a thing), cards, devices, adapters
+        make_type = "hdl-assemblies"
+    elif os.path.isfile(xml_file):
+        # a platform, an assembly, a library, a primitive
+        tag = xt.parse(xml_file).getroot().tag.lower()
+        if tag.startswith("hdl"):
+            make_type = asset_type = "hdl-" + tag[3:]
+        elif tag == "library":
+            make_type = asset_type = "library"
+        elif tag == "application":
+            make_type = asset_type = "application"
+    else: # could be library or platform or assembly or application
+        if directory.startswith(name): # incure absolutizing penalty
+            directory = os.path.realpath(directory)
+        parent = os.path.basename(os.path.dirname(directory))
+        if parent == "components":
+            if os.path.isfile(directory + "/Library.xml") or get_maketype(directory) == "library":
+                make_type = asset_type = "library"
+        elif parent == "assemblies":
+            make_type = asset_type = "hdl-assembly"
+        elif parent == "platforms":
+            make_type = asset_type = "hdl-platform"
+        elif parent == "applications":
+            make_type = asset_type = "application"
+        elif parent == "primitives":
+            mt = get_maketype(directory)
+            if mt == "hdl-library" or mt == "hdl-lib":
+                make_type = asset_type = "hdl-library"
+            elif mt == "hdl-core":
+                make_type = asset_type = "hdl-core"
+    if careful and make_type:
+        match = get_maketype(directory)
+        if match and match != make_type:
+            raise OCPIException("When determining the directory type of \"" + str(directory) + "\", "\
+                                "apparent type is \"" + make_type + "\" but Makefile has \"" + match + "\"")
+    r = make_type, asset_type, directory;
+    # if make_type:
+    #     print(repr(r))
+    return r
 
 def get_subdirs_of_type(dirtype, directory="."):
     """
@@ -78,20 +219,20 @@ def get_subdirs_of_type(dirtype, directory="."):
 ###############################################################################
 # Utility function for exporting libraries in a project
 ###############################################################################
-def export_libraries():
-    """
-    Build the lib directory and links to specs in each library in a project.
-    This will allow specs to be exported before workers in a library are built.
-    """
-    for lib_dir in get_subdirs_of_type("library"):
-        logging.debug("Library found at \"" + lib_dir + "\", running \"make speclinks\" there.")
-        proc = subprocess.Popen(["make", "-C", lib_dir, "speclinks"],
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        my_out = proc.communicate()
-        if proc.returncode != 0:
-            logging.warning("Failed to export library at " + lib_dir + " because of error : \n" +
-                            str(my_out[1]))
+# def export_libraries():
+#     """
+#     Build the lib directory and links to specs in each library in a project.
+#     This will allow specs to be exported before workers in a library are built.
+#     """
+#     for lib_dir in get_subdirs_of_type("library"):
+#         logging.debug("Library found at \"" + lib_dir + "\", running \"make speclinks\" there.")
+#         proc = subprocess.Popen(["make", "-C", lib_dir, "speclinks"],
+#                                 stdout=subprocess.PIPE,
+#                                 stderr=subprocess.PIPE)
+#         my_out = proc.communicate()
+#         if proc.returncode != 0:
+#             logging.warning("Failed to export library at " + lib_dir + " because of error : \n" +
+#                             str(my_out[1]))
 
 ###############################################################################
 # Utility functions for determining paths to/from the top level of a project
@@ -278,7 +419,8 @@ def get_project_package(origin_path="."):
 
         # Otherwise, ask Makefile at the project top for the ProjectPackage
         if project_package is None or project_package == "":
-            project_vars = set_vars_from_make("Makefile",
+            project_vars = set_vars_from_make("Makefile" if os.path.exists("Makefile") else
+                                              os.environ["OCPI_CDK_DIR"] + "/include/project.mk",
                                               "projectpackage ShellProjectVars=1", "verbose")
             if (not project_vars is None and 'ProjectPackage' in project_vars and
                     len(project_vars['ProjectPackage']) > 0):
@@ -566,3 +708,21 @@ if __name__ == "__main__":
             pass
     doctest.testmod(verbose=__VERBOSITY, optionflags=doctest.ELLIPSIS)
     sys.exit(doctest.testmod()[0])
+
+
+def get_cdk_path():
+    """
+    Gets the OCPI_CDK_DIR environment variable and verifies that it has
+    been set correctly.
+    """
+    err_msg = None
+    if 'OCPI_CDK_DIR' not in os.environ:
+        err_msg = 'Error: OCPI_CDK_DIR environment setting not found'
+    cdk_path = Path(os.environ['OCPI_CDK_DIR'])
+    if not cdk_path.is_dir():
+        err_msg = 'Error: OCPI_CDK_DIR environment setting invalid'
+    if err_msg:
+        logging.error(err_msg)
+        sys.exit(1)
+
+    return cdk_path

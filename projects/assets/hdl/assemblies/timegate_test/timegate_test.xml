@@ -1,6 +1,5 @@
-<!-- The test_source_assy HDL assembly xml file -->
+<!-- The timegate_test HDL assembly xml file -->
 <HdlAssembly>
-  <!-- Remove this instance and replace it with real ones -->
   <Instance Worker='test_source' connect='timegate'/>
   <Instance Worker='timegate' connect='capture_v2'/>
   <Instance Worker='capture_v2'/>

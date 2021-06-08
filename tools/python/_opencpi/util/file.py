@@ -31,7 +31,8 @@ from _opencpi.util import OCPIException
 # Utility functions for extracting variables and information from and calling
 # Makefiles
 ###############################################################################
-def execute_cmd(settings, directory, action=None):
+
+def execute_cmd(settings, directory, action=None, file=None):
     """
     This command is a wrapper around any calls to make in order to encapsulate the use of make to a
     minimal number of places.  The function contains a hard-coded dictionary of generic settings to
@@ -57,6 +58,10 @@ def execute_cmd(settings, directory, action=None):
     make_list.append("-C")
     make_list.append(directory)
     debug_string = "make -C " + directory
+    if file:
+        make_list.append("-f")
+        make_list.append(file)
+        debug_string += " -f " + file
 
     if action is not None:
         make_list.extend(action)
@@ -97,11 +102,12 @@ def execute_cmd(settings, directory, action=None):
 #TODO fix these problems with the function instead of just disabling them
 # pylint:disable=too-many-locals
 # pylint:disable=too-many-branches
-def set_vars_from_make(mk_file, mk_arg="", verbose=None):
+def set_vars_from_make(mk_file_and_dir, mk_arg="", verbose=None):
     """
     Collect a dictionary of variables from a makefile
     --------------------------------------------------
-    First arg is .mk file to use
+    First arg is a tuple of the "make" file and the dir for "make" to enter
+       This arg can also simply be a string, with the directory defaulting to CWD or .
     Second arg is make arguments needed to invoke correct output
         The output can be an assignment or a target
     Third arg is a verbosity flag
@@ -126,12 +132,15 @@ def set_vars_from_make(mk_file, mk_arg="", verbose=None):
         else:
             mk_dbg = ""
 
-        # If mk_file is a "Makefile" then we use the -C option on the directory containing
-        # the makefile else (is a .mk) use the -f option on the file
-        if mk_file.endswith("/Makefile"):
-            make_cmd = "make " + mk_dbg + " -n -r -s -C " + os.path.dirname(mk_file) + " " + mk_arg
+        make_cmd = "make " + mk_dbg + " -n -r -s"
+
+        # If mk_file is a tuple, the second part is the directory to use
+        if type(mk_file_and_dir) == tuple:
+            make_cmd += " -C " + mk_file_and_dir[1]
+            mk_file = mk_file_and_dir[0]
         else:
-            make_cmd = "make " + mk_dbg + " -n -r -s -f " + mk_file + " " + mk_arg
+            mk_file = mk_file_and_dir
+        make_cmd += " -f " + mk_file + " " + mk_arg;
 
         logging.debug("Calling make via:" + str(make_cmd.split()))
 
@@ -145,7 +154,7 @@ def set_vars_from_make(mk_file, mk_arg="", verbose=None):
         # Print out stderr from make if log level is medium/high or if make returned error
         if child.returncode != 0 or ocpi_log_level >= 6:
             if mk_err and (verbose or child.returncode != 0):
-                logging.error("STDERR output from Make (set_vars_from_make):\n" + str(mk_err))
+                logging.error("STDERR output from Make (set_vars_from_make):\n" + str(mk_err)+"END_OF_MAKE_STDERR")
             if child.returncode != 0:
                 # pylint:disable=undefined-variable
                 raise OCPIException("The following make command returned an error:\n" + make_cmd)

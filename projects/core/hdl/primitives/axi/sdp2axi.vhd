@@ -179,6 +179,7 @@ begin
   #else
     #define SDPCLK axi_in.a.clk
   #endif
+// clang 12.0 bug needs this line
   #if RESET_FROM_MASTER
     sdp_reset <= reset;
     axi_out.a.resetn <= not reset;
@@ -303,6 +304,7 @@ begin
 #if AXI4
   axi_out.AW.REGION            <= (others => '0');
   axi_out.AW.QOS               <= (others => '0');
+  axi_out.AR.REGION            <= (others => '0');
   axi_out.AR.QOS               <= (others => '0');
 #endif  
   -- Write address channel

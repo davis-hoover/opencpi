@@ -89,7 +89,7 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
             # NOTE: We need to call make with a single HdlPlatform set because otherwise
             #       hdl-pre calls multiple sub-make commands and causes complications
             try:
-                assemb_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+                assemb_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory, "hdl/hdl-assembly"),
                                                           mk_arg=plat_string +
                                                           " shellhdlassemblyvars " +
                                                           "ShellHdlAssemblyVars=1",
@@ -225,8 +225,9 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
         assemblies collection
         """
         assembs_list = []
-        ocpiutil.logging.debug("Getting valid assemblies from: " + self.directory + "/Makefile")
-        make_assembs = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-assemblies")
+        ocpiutil.logging.debug("Getting valid assemblies from: " + mkf[0])
+        make_assembs = ocpiutil.set_vars_from_make(mkf,
                                                    mk_arg="ShellAssembliesVars=1 showassemblies",
                                                    verbose=True)["Assemblies"]
 

@@ -2,7 +2,7 @@
 <Tests UseHDLFileIo="true">
 
   <Property Name="simulation" Type="bool" Test="true" Description="Used by verify script to choose how to verify output.
-    True - Indicates that test case is being run for simualation.
+    True  - Indicates the test case is being run for simualation.
     False - Indicates the test case is being run on hardware."/>
 
   <!-- Simulation -->
@@ -38,7 +38,7 @@
   </case>
 
  <!-- Hardware -->
-  <case ExcludePlatforms="*sim">
+ <case ExcludePlatforms="*sim">
     <Output Port="out" Script="verify.py ../../bits_golden1.bin"/>
     <Property Name="src_clk_hz" Value="100000000.0"/>
     <Property Name="dst_clk_hz" Value="100000000.0"/>

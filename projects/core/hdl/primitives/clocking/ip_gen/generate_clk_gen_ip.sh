@@ -39,9 +39,9 @@ if [[ "$Target" == "zynq" || "$Target" == "zynq_ultra" ]]; then
   for prim in $XilinxClockPrimitives; do 
     cd vivado_ip && rm -r -f tmp && mkdir tmp &&
     cd tmp && vivado -mode batch -source ../vivado-gen-clk_wiz.tcl -tclargs $XilinxCoreName $prim ${prim}$XilinxPrimVer $XilinxPartNumber &> ../${Target}_${prim}_${XilinxCoreName}.log && cd ../ &&
-    patch -F 5 < ${prim}$XilinxPrimVer.patch && patch -F 5 < ${prim}${XilinxPrimVer}_sim.patch &&
-		mv ${prim}$XilinxPrimVer.v ../../$Target/${prim}$XilinxPrimVer.v && mv ${prim}${XilinxPrimVer}_sim.vhd ../../xsim/${prim}$XilinxPrimVer.vhd &&
-		rm -f ${prim}$XilinxPrimVer.v.orig ${prim}${XilinxPrimVer}_sim.vhd.orig && cd ../;
+    patch -F 5 < ${prim}$XilinxPrimVer.patch &&
+		cp ${prim}$XilinxPrimVer.v ../../$Target/${prim}$XilinxPrimVer.v && mv ${prim}$XilinxPrimVer.v ../../xsim/${prim}$XilinxPrimVer.v &&
+		rm -f ${prim}$XilinxPrimVer.v.orig && cd ../;
   done
   cd vivado_ip && date > timestamp-${Target}_${XilinxCoreName} && rm -r -f tmp;
 elif [[ "$Target" == "zynq_ise" ]]; then

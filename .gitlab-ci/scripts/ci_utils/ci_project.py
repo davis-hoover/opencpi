@@ -73,8 +73,7 @@ def discover_local_projects(projects_path, whitelist=None, blacklist=None):
     for project_path in projects_path.glob('*'):
         project_name = str(project_path).split('.')[-1].split('/')[-1]
 
-        makefile_path = Path(project_path, 'Makefile')
-        if makefile_path.is_file():
+        if Path(project_path, "Project.xml").is_file() or Path(project_path, "Project.mk").is_file():
             if blacklist and project_name in blacklist:
                 continue
             if whitelist and project_name not in whitelist:

@@ -172,16 +172,20 @@ function nonoun {
     exit 1
 }
 function topdirs {
-    # echo topdirs:$1:$2 > /dev/tty
+    #echo topdirs:$1:$2 > /dev/tty
     local dirs=`shopt -s nullglob; for d in $1/*; do [ -d $d -a $(basename $d) != lib ] && echo $(basename $d); done`
     local -a rdirs
     if [ -n "$2" ]; then
       for d in $dirs; do
-	  if test -f $1/$d/Makefile && egrep -q "^[ 	]*include[ 	]*.*/include/$2.mk" $1/$d/Makefile; then
-	    rdirs+=($d)
-	  else
-	    [ -n "$verbose" ] && echo Ignoring $d when looking for $2 1>&2
-	  fi
+        dt=$(ocpiDirType $1/$d)
+        if [[ "$dt" == "hdl*" ]]; then
+	    dt=hdl/$dt
+        fi
+        if [[ $dt =~ $2 ]]; then
+	  rdirs+=($d)
+	else
+	  [ -n "$verbose" ] && echo "Ignoring $d (type $dt) when looking for $2" 1>&2
+	fi
       done
     else
 	rdirs=($dirs)
@@ -215,8 +219,6 @@ if [ "$1" = "-v" -o "$OCPI_EXPORTS_VERBOSE" = 1 ]; then
   [ "$1" = "-v" ] && shift
   [ -n "$verbose" ] && echo Setting verbose mode.
 fi
-os=$(echo $1 | sed 's/^\([^-]*\).*$/\1/')
-dylib=$(if [ "$os" = macos ]; then echo dylib; else echo so; fi)
 set -e
 set -f
 exports=Project.exports
@@ -279,7 +281,7 @@ for a in $assets; do
 	      noun=${model}_platforms; needname=$model/platforms;;
 	  primitives|assemblies)
 	      [ "$model" != hdl ] && bad \"$arg\" only supported for HDL model
-	      all=`topdirs $model/$arg "hdl/hdl-(core|library|lib)"`
+	      all=`topdirs $model/$arg "hdl-(core|library|lib)"`
 	      if [ -z "$all" ]; then
 		  warn_check "Warning:  cannot export $model $arg since none exist"
 	      else
@@ -287,10 +289,10 @@ for a in $assets; do
 	      fi;;
 	  platforms)
 	      case "$model" in
-		  hdl) allhdl=`topdirs hdl/platforms hdl/hdl-platform`;;
+		  hdl) allhdl=`topdirs hdl/platforms hdl-platform`;;
 		  rcc) allrcc=`topdirs rcc/platforms`;;
 		  "")
-		      allhdl=`topdirs hdl/platforms hdl/hdl-platform`
+		      allhdl=`topdirs hdl/platforms hdl-platform`
 		      allrcc=`topdirs rcc/platforms`;;
 	      esac
 	      if [ -z "$allrcc$allhdl" ]; then
@@ -308,7 +310,7 @@ for a in $assets; do
 		  }
 		  [ -n "$allhdl" ] && {
 		      for p in $allhdl; do
-			  warn=`checkfiles hdl/platforms/$p Makefile '$f.mk'`
+			  warn=`checkfiles hdl/platforms/$p '$f.xml' '$f.vhd'`
 			  if [ -n "$warn" ]; then
 			      warn_check "Warning:  cannot export HDL platform $p: $warn"
 			  else
@@ -335,9 +337,8 @@ for a in $assets; do
 		  fi
 	      else
 		  if [ -z "$model" ] ; then
-		      if [ -f components/Makefile ] &&
-			     egrep -q '^[ 	]*include[ 	]*.*/include/(lib|library).mk' \
-				   components/Makefile; then
+                     dt=$(ocpiDirType components)
+		     if [ "$dt" = library ]; then
 			 libraries=(components)
 		     else
 			 libraries=(`topdirs components "(lib|library)"`)
@@ -351,7 +352,7 @@ for a in $assets; do
 	      [ -n "$model" ] && bad no model prefix is allowed before \"$arg\"
 	      if [ "$arg" = specs ] ; then
 		  if [ -d specs ]; then
-		      specs+=(`shopt -s nullglob; for i in specs/*.xml specs/package-id; do [ -f $i ] && echo $(basename $i); done`)
+		      specs+=(`shopt -s nullglob; for i in specs/*.xml specs/package-id; do [ ! -f $i ] || echo $(basename $i); done`)
 		  else
 		      [ -n "$allrequested" ] || warn_check "Warning:  cannot export specs since no specs exist in this project."
 		  fi
@@ -384,21 +385,50 @@ done
 # Before we deal with asset exports there are some special case items to export
 # namely the projects package id and its dependencies
 # both exported in individual files
+# we do this the ugly way (not in ocpigen/assets.cxx) for bootstrapping reasons
 mkdir -p exports
-[ -n "$2" -a "$2" != "-" ] && {\
-  if [[ "$2" != `cat exports/project-package-id 2>/dev/null` ]]; then
-    echo "$2" > exports/project-package-id
-  fi
-  if [ -f Project.xml ]; then
-    deps=$(ocpixml -t project -a '?dependencies' -a '?projectdependencies' parse Project.xml)
-  elif [ -f Project.mk ]; then
-    deps=$(sed -n 's/^ *ProjectDependencies:*= *\([^#]*\)/\1/p' Project.mk)
-  else
-    echo Error:  Project has no Project.xml or Project.mk >&2
-    exit 1
-  fi
-  echo "$deps" > exports/project-dependencies
+
+function getattr {
+  sed s/$1/$1/i Project.xml | xmllint --xpath "string(/project/@$1)" -
 }
+function getvar {
+  sed -n "s/^ *$1:*= *\([^#]*\)/\1/p" Project.mk
+}
+if [ -f Project.xml ]; then
+  packagedeps=`getattr projectdependencies`
+  packagename=`getattr packagename`
+  packageprefix=`getattr packageprefix`
+  package=`getattr package`
+  packageid=`getattr packageid`
+elif [ -f Project.mk ]; then
+  packagedeps=`getvar ProjectDependencies`
+  packagename=`getvar PackageName`
+  packageprefix=`getvar PackagePrefix`
+  package=`getvar Package`
+  packageid=`getvar PackageID`
+else
+  bad Error:  Project has no Project.xml or Project.mk
+fi
+# echo packagedeps=$packagedeps
+# echo packagename=$packagename
+# echo packageprefix=$packageprefix
+# echo package=$package
+# echo packageid=$packageid
+
+if [ -z "$packageid" ]; then
+  if [ -n "$package" ]; then
+    packageid=$package
+  else
+    [ -n "$packageprefix" ] || packageprefix=local
+    [ -n "$packagename" ] || packagename=$(basename $(ocpiReadLinkE .))
+    packageid=$packageprefix.$packagename
+  fi
+fi
+if [[ "$packageid" != `cat exports/project-package-id 2>/dev/null` ]]; then
+  echo "$packageid" > exports/project-package-id
+fi
+echo "$packagedeps" > exports/project-dependencies
+
 if [ -d imports ]; then
   make_filtered_link imports exports/imports main
 fi
@@ -409,10 +439,11 @@ fi
 [ -n "$verbose" -a -n "$hdl_platforms" ] && echo Processing hdl platforms
 for p in ${hdl_platforms[*]}; do
   d=hdl/platforms/$p
-  [ -f $d/Makefile -a -f $d/$p.mk ] || bad HDL platform $p not exported due to missing files in $d
+  [ -f $d/$p.xml ] || bad HDL platform $p not exported due to missing files in $d
   [ -d $d/lib ] && make_filtered_link $d/lib exports/hdl/platforms/$p platform
-  # this $p.mk link is for bootstrapping before the platform is built to show it exists
-  make_filtered_link $d/$p.mk exports/hdl/platforms/mk/$p.mk platform
+  # this $p.xml link is for bootstrapping before the platform is built to show it exists
+  make_filtered_link $d/$p.xml exports/hdl/platforms/xml/$p.xml platform
+  [ -f "$d/$p.mk" ] && make_filtered_link $d/$p.mk exports/hdl/platforms/xml/$p.mk platform
 done
 ###################################################################################
 # Export rcc platforms
@@ -433,9 +464,8 @@ for l in ${libraries[*]} ${hdl_libraries[*]} ${rcc_libraries[*]} ; do
       */*) d=$l; n=$(basename $l);;
       *) d=components/$l; n=$l;;
   esac
-  [  -d $d -a  -f $d/Makefile ] || bad Component library $l not exported due to missing files in $d
-  egrep -q '^[ 	]*include[ 	]*.*/include/(lib|library).mk' $d/Makefile ||
-      bad Component library $l failed due to missing/wrong '"include"' line in $d/Makefile
+  dt=$(ocpiDirType $d)
+  [ "$dt" = library ] || bad Component library $l not exported due to missing files in $d
   make_filtered_link $d/lib exports/lib/$n component
 done
 
@@ -446,14 +476,11 @@ done
 # since they depend on each other
 for p in ${hdl_primitives[*]}; do
     d=hdl/primitives/$p
-    [ -f $d/Makefile ] || bad HDL primitive $p not exported due to missing Makefile in $d
-    if grep -q '^[ 	]*include[ 	]*.*/include/hdl/hdl-core.mk' $d/Makefile; then
-	type=core
-    elif egrep -q '^[ 	]*include[ 	]*.*/include/hdl/hdl-(lib|library).mk' $d/Makefile; then
-	type=library
-    else
-      bad HDL primitive library $p due to missing or bad '"include"' line in $d/Makefile
-    fi
+    case $(ocpiDirType $d) in
+      hdl-core) type=core;;
+      hdl-library) type=library;;
+      *) bad HDL primitive library $p due to unrecognizable asset type in directory $d;;
+    esac
     make_filtered_link hdl/primitives/lib/$p exports/lib/hdl/$p primitive
     [ $type = core ] &&
       make_filtered_link hdl/primitives/lib/${p}_bb exports/lib/hdl/${p}_bb primitive
@@ -503,9 +530,7 @@ for a in $additions; do
     fi
     make_relative_link $src $dir$after
   else
-    if [ "$2" == "" ]; then
-      echo Warning: link source $src does not '(yet?)' exist.
-    fi
+    echo Warning: link source $src does not '(yet?)' exist.
   fi
   done
   set -f
@@ -517,16 +542,13 @@ set +f
 # other make machinery.  If necessary before the python rewrite, we could have a
 # shared implementation some other way that avoided all the recursion.
 # Or change the python to do this and not use "make".
-for i in components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
-    [ -d $i -a "$(ocpiDirType $i)" = library ] && make --no-print-directory -C $i speclinks
+for i in components components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
+    if [ -d $i ] && [ "$(ocpiDirType $i)" = library ]; then
+	mf=
+	[ -f $i/Makefile ] || mf="-f $OCPI_CDK_DIR/include/library.mk"
+        make -r --no-print-directory -C $i $mf speclinks
+    fi
 done
-exit 0
-
-# export the specs for each of the libraries
-python3 -c "import sys, os;
-sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
-import _opencpi.util; _opencpi.util.export_libraries()"
-
 exit 0
 
 # notes:

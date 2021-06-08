@@ -64,11 +64,11 @@ class ShowableComponent(ShowableAsset):
         """
         #get list of locations to look for include xml files from make
         if ocpiutil.get_dirtype(self.directory + "/../") == "library":
-            xml_dirs = ocpiutil.set_vars_from_make(mk_file=self.directory + "/../" + "/Makefile",
+            xml_dirs = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory + "/../", "library"),
                                                    mk_arg="showincludes ShellLibraryVars=1",
                                                    verbose=True)["XmlIncludeDirsInternal"]
         elif ocpiutil.get_dirtype(self.directory + "/../") == "project":
-            xml_dirs = ocpiutil.set_vars_from_make(mk_file=self.directory + "/../" + "/Makefile",
+            xml_dirs = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.directory + "/../", "project"),
                                                    mk_arg="projectincludes ShellProjectVars=1",
                                                    verbose=True)["XmlIncludeDirsInternal"]
         #call ocpigen -G
@@ -122,11 +122,11 @@ class ShowableComponent(ShowableAsset):
         """
         parent_dir = self.directory + "/../"
         if ocpiutil.get_dirtype(parent_dir) == "library":
-            ret_val = ocpiutil.set_vars_from_make(mk_file=parent_dir + "/Makefile",
+            ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "library"),
                                                   mk_arg="showpackage ShellLibraryVars=1",
                                                   verbose=True)["Package"][0]
         elif ocpiutil.get_dirtype(parent_dir) == "project":
-            ret_val = ocpiutil.set_vars_from_make(mk_file=parent_dir + "/Makefile",
+            ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "project"),
                                                   mk_arg="projectpackage ShellProjectVars=1",
                                                   verbose=True)["ProjectPackage"][0]
         elif ocpiutil.get_dirtype(parent_dir) == "hdl-platforms":

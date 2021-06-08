@@ -100,6 +100,7 @@ signal s_bytes_left                           : ulong_t := (others => '0'); -- K
 signal s_messagesToSend                       : ulong_t := (others => '0');
 signal s_dataSent                             : ulong_t := (others => '0');
 signal s_messagesSent                         : ulong_t := (others => '0');
+signal s_start                                : std_logic := '0';
 signal s_start_r                              : std_logic := '0';   -- reg for the start operation
 signal s_wsi_start_op                         : std_logic := '0';   -- Used to to start sending messages
 signal s_finished                             : std_logic := '0';   -- Used to to stop sending messages
@@ -179,12 +180,14 @@ begin
         end if;
       end if;
     end process start_reg;
+  
+  s_start <= s_start_r when (s_src_rdy = '1') else '0';
 
   control_op_is_start_inst : component cdc.cdc.pulse
     generic map(N => 2)
     port map   (src_clk      => ctl_in.clk,
                 src_rst      => ctl_in.reset,
-                src_in       => s_start_r,
+                src_in       => s_start,
                 src_rdy      => s_src_rdy,
                 dst_clk      => out_in.clk,
                 dst_rst      => out_in.reset,

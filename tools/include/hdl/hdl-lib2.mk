@@ -26,6 +26,9 @@ $(call OcpiDbgVar,WorkLib)
 OutLibFile=\
   $(call WkrTargetDir,$1,$2)/$(call HdlToolLibraryFile,$1,$(WorkLib)$(if $(filter 0,$2),,_c$2))
 #  $(call WkrTargetDir,$1,$2)/$(call HdlToolLibraryFile,$1,$(LibName))
+
+################################################################################
+# Build the library $(call DoLibTarget,target,config)
 define DoLibTarget
 $(call OcpiDbg,OutLibFile:$(call OutLibFile,$1,$2))
 $$(foreach f,$$(call OcpiCPPSources,$$(SourceFiles)),\
@@ -41,7 +44,8 @@ $(call OutLibFile,$1,$2): \
   HdlSources=$$(call OcpiPullPkgFiles,$$(filter-out %.vh,$$(call HdlTargetSrcFiles,$1,$2) $$(call HdlShadowFiles,$1,$2)))
 $(call OutLibFile,$1,$2): \
 $$$$(foreach l,$$$$(HdlLibrariesInternal),$$$$(call HdlLibraryRefDir,$$$$l,$$$$(HdlTarget),,DLT))
-$(call OutLibFile,$1,$2): $$$$(HdlPreCore) $$$$(HdlSources) | $$$$(TargetDir)
+$$(eval $$(call HdlSetWorkerCores,$1))
+$(call OutLibFile,$1,$2): $$$$(HdlCollectCorePaths) $$$$(HdlSources) | $$$$(TargetDir)
 	$(AT)echo Building the $(LibName) $(HdlMode) for $$(HdlTarget) \($$@\) $$(ParamConfig):$$(ParamMsg)
 	$(AT)$$(HdlCompile)
 	$(AT)$$(HdlPost)

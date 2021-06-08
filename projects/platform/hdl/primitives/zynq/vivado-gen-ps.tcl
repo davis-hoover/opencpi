@@ -30,12 +30,15 @@ set ip_name [lindex $argv 0]
 set ip_part [lindex $argv 1]
 set ip_module ${ip_name}_0
 
-proc copy_sources {directory pattern} {
-   # Find files in the specified directory
-   set file_set [fileutil::findByPattern $directory -regexp $pattern]
-
-   # Copy matching file set to gen directory
-   file copy -force $file_set ../
+proc copy_file {file dest} {
+    puts "COPYING $file to $dest"
+    if {[file exists $file]} {
+        puts "FILE $file exists"
+	file copy $file $dest
+        return 1
+    }
+    puts "FILE $file does not exist"
+    return 0
 }
 
 # puts [llength [get_parts -regexp {xcz.*}]]
@@ -52,26 +55,33 @@ set gen_dir managed_ip_project/managed_ip_project.gen/sources_1/ip/$ip_module
 set ip_dir managed_ip_project/managed_ip_project.srcs/sources_1/ip/$ip_module
 generate_target all [get_files $ip_dir/$ip_module.xci]
 set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
+puts "ip_version:$ip_version ip_wrapper:$ip_wrapper"
+# This may be the file name (2020.2 at least)
+set ip_maybe ${ip_name}_v${ip_version}
 # Vivado 2020.2 has a different resulting directory structure when generating the IP
 if {[version -short] >= "2020.2"} {
   set hdl_dir $gen_dir/hdl
 } else {
   set hdl_dir $ip_dir/hdl
 }
-# This is pretty lame, but it is what is different between the PS7 IP and the PS8 ip...
-# Look in two places (in verilog subdir or not), and look in two ways (with minor or not)
-if {[file exists $hdl_dir/verilog/${ip_wrapper}.v]} {
-  copy_sources $hdl_dir/verilog ${ip_wrapper}.v
+# This is pretty lame, but it is what is different between the PS7 IP and the PS8 ip
+# and what is different across vivado versions
+# Look both without the minor version and with the minor version
+# And then look in three places:
+# - in verilog subdir
+# - not in verilog subdir with module name appended to file name
+# - not in verilog subdir without module name appended to file name
+if {[copy_file $hdl_dir/verilog/${ip_wrapper}.v ../]} { return }
+if {[copy_file $hdl_dir/${ip_wrapper}.v ../]} { return }
+if {[copy_file $hdl_dir/${ip_maybe}.v ../${ip_wrapper}.v]} { return }
+# Try with minor version number appended
+set ip_version ${ip_version}_${ip_minor}
+set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
+set ip_maybe ${ip_name}_v${ip_version}
+if {[copy_file $hdl_dir/verilog/${ip_wrapper}.v ../]} { return }
+if {[copy_file $hdl_dir/${ip_wrapper}.v ../]} { return }
+if {[copy_file $hdl_dir/${ip_maybe}.v ../${ip_wrapper}.v]} { return }
+puts "Could not file the IP wrapper file"
+exit 1
 
-} elseif {[file exists $hdl_dir/${ip_wrapper}.v]} {
-  copy_sources $hdl_dir $ip_version
-} else {
-  set ip_version ${ip_version}_${ip_minor}
-  set ip_wrapper ${ip_name}_v${ip_version}_${ip_name}
-  if {[file exists $hdl_dir/verilog/${ip_wrapper}.v]} {
-    copy_sources $hdl_dir/verilog ${ip_wrapper}.v
-  } else {
-    # This will fail if we can't find it anywhere
-    copy_sources $hdl_dir ${ip_version}.v
-  }
 }

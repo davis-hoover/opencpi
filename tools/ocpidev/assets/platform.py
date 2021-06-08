@@ -96,8 +96,9 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         platforms collection
         """
         platform_list = []
-        logging.debug("Getting valid platforms from: " + self.directory + "/Makefile")
-        make_platforms = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+        mkf=ocpiutil.get_makefile(self.directory)
+        logging.debug("Getting valid platforms from: " + mkf[0])
+        make_platforms = ocpiutil.set_vars_from_make(mkf,
                                                      mk_arg="ShellPlatformsVars=1 showplatforms",
                                                      verbose=True)["HdlPlatforms"]
 
@@ -177,8 +178,9 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         """
         # Get the list of Configurations from make
         logging.debug("Get the list of platform Configurations from make")
+        mkf=ocpiutil.get_makefile(self.directory, "hdl/hdl-platform")
         try:
-            plat_vars = ocpiutil.set_vars_from_make(mk_file=self.directory + "/Makefile",
+            plat_vars = ocpiutil.set_vars_from_make(mkf,
                                                     mk_arg="ShellHdlPlatformVars=1 showinfo",
                                                     verbose=False)
         except ocpiutil.OCPIException:
@@ -186,7 +188,7 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             plat_vars = {"Configurations" : "", "Package":"N/A"}
         if "Configurations" not in plat_vars:
             raise ocpiutil.OCPIException("Could not get list of HDL Platform Configurations " +
-                                         "from \"" + self.directory + "/Makefile\"")
+                                         "from \"" + mkf[1])
         self.package_id = plat_vars["Package"]
         # This should be a list of Configuration NAMES
         config_list = plat_vars["Configurations"]
@@ -509,7 +511,7 @@ class HdlPlatform(Platform):
         self.built = built
         self.dir = ocpiutil.rchop(directory, "/lib")
         if self.dir and not package_id and os.path.exists(self.dir):
-            self.package_id = ocpiutil.set_vars_from_make(self.dir + "/Makefile",
+            self.package_id = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(self.dir, "hdl/hdl-platform"),
                                                           "ShellHdlPlatformVars=1 showpackage",
                                                           "verbose")["Package"][0]
         else:
