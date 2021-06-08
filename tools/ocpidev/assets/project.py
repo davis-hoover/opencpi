@@ -24,6 +24,7 @@ import sys
 import logging
 import json
 import jinja2
+from pathlib import Path
 import subprocess
 import _opencpi.util as ocpiutil
 import _opencpi.assets.template as ocpitemplate
@@ -58,6 +59,10 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             init_hdlassembs (T/F) - Instructs the method whether to construct all
                                     HdlApplicationAssembly objects contained in the project
         """
+        # If name passed in was a package_id, find project with that package_id
+        project_dir = ocpiutil.does_project_with_package_exist(package=name, return_project_dir=True)
+        if project_dir:
+            directory = project_dir
         self.check_dirtype("project", directory)
         super().__init__(directory, name, **kwargs)
         self.lib_list = None
@@ -978,7 +983,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 logging.debug("Unset project registry has succeeded, but nothing was done.\n" +
                               "Registry was not set in the first place for this project.")
         print("Succesfully unset the registry of the project " + os.path.realpath(self.directory) +
-              "\nFrom the registry: " + os.path.realpath(reg.directory) + "to the default registry")
+              "\nFrom the registry: " + os.path.realpath(reg.directory))
 
     def registry(self):
         """
@@ -1154,7 +1159,6 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         """
         Register project to registry. Export project if possible
         """
-        # Get registry and add project to registry
         registry = self.registry()
         registry.add(self.directory, force=force)
 
@@ -1162,7 +1166,8 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         is_exported = ocpiutil.is_path_in_exported_project(self.directory)
         if not is_exported:
             make_file = ocpiutil.get_makefile(self.directory, "project")[0]
-            rc = ocpiutil.file.execute_cmd({}, self.directory, action=['exports'], file=make_file)
+            rc = ocpiutil.file.execute_cmd(
+                {}, self.directory, action=['exports'], file=make_file, verbose=verbose)
             if rc:
                 msg = ' '.join(['Could not export project "{}".'.format(self.name), 
                                 'You may not have write permissions on this project.',
@@ -1179,8 +1184,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         prompt = ' '.join(['Are you sure you want to unregister the "{}"'.format(self.name), 
                            'project/package from its project registry?'])
         if ocpiutil.get_ok(prompt):
-            registry = self.registry()
-            registry.remove(directory=self.directory)
+            self.registry().remove(directory=self.directory)
 
 
 # pylint:enable=too-many-instance-attributes

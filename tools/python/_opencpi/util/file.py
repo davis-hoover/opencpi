@@ -32,7 +32,7 @@ from _opencpi.util import OCPIException
 # Makefiles
 ###############################################################################
 
-def execute_cmd(settings, directory, action=None, file=None):
+def execute_cmd(settings, directory, action=None, file=None, verbose=False):
     """
     This command is a wrapper around any calls to make in order to encapsulate the use of make to a
     minimal number of places.  The function contains a hard-coded dictionary of generic settings to
@@ -80,6 +80,8 @@ def execute_cmd(settings, directory, action=None, file=None):
                                 "types are bool and list")
             # pylint:enable=undefined-variable
     logging.debug("running make command: " + debug_string)
+    if verbose:
+        print('Executing command: {}'.format(debug_string))
     #shell=True is bad dont set it here running the following command was able to execute
     # arbitary code
     #ocpidev run test --hdl-platform \$\(./script.temp\)

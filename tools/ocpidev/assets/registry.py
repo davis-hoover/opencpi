@@ -477,10 +477,10 @@ class Registry(ShowableAsset):
         is not True. Refuses to delete the defaul registry or registry
         set to OCPI_PROJECT_REGISTRY_DIR.
         """
-        root_dir = os.environ['OCPI_ROOT_DIR']
+        root_dir = os.getenv('OCPI_ROOT_DIR', '')
         default_registry_dir = str(Path(root_dir, 'project-registry'))
-        registry_dir = str(Path(os.environ['OCPI_PROJECT_REGISTRY_DIR']).resolve())
         err_msg = None
+        registry_dir = str(Path(os.getenv('OCPI_PROJECT_REGISTRY_DIR', '')).resolve())
         if default_registry_dir == self.directory:
             err_msg = 'Cannot delete the default project registry'
         elif registry_dir == self.directory:
