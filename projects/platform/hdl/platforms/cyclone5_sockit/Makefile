@@ -33,14 +33,14 @@ SourceFiles=gen/soc_system.qip
 # version of the patch files that contain the dates and unique IDs so that the patch 
 # works correctly
 
-all: gen/soc_system.qip gen/soc_system.qsf gen/soc_system.qsys gen/soc_system.sopcinfo
+all: gen/soc_system.qip gen/cyclone5_sockit.qsf gen/soc_system.qsys gen/soc_system.sopcinfo
 
 gen/soc_system.qip:
 	@cp ../../primitives/cyclone5/gen/soc_system.qip gen && cd gen && string1=$$(grep SLD_INFO soc_system.qip) && \
-	sed "16s/.*/ $$string1/" ../soc_system_qip.patch > soc_system_qip.patch2 && \
+	sed "15s/.*/ $$string1/" ../soc_system_qip.patch > soc_system_qip.patch2 && \
 	patch -F 5 < soc_system_qip.patch2 && rm -rf soc_system_qip.patch2
 
-gen/soc_system.qsf:
+gen/cyclone5_sockit.qsf:
 	@cp ../../primitives/cyclone5/gen/soc_system.qsf gen && cd gen && string2=$$(grep ORIGINAL_QUARTUS_VERSION soc_system.qsf) && \
 	string3=$$(grep PROJECT_CREATION_TIME_DATE soc_system.qsf) && string4=$$(grep LAST_QUARTUS_VERSION soc_system.qsf) && \
 	sed "11s/.*/ $$string2/" ../soc_system_qsf.patch > soc_system_qsf.patch2 && sed -i "12s/.*/ $$string3/" soc_system_qsf.patch2 && \

@@ -284,7 +284,7 @@ $1/$3.sof: $$(call QuartusConstraints,$5)
 	cp $4-top.qsf $4-top.qsf.post-fit && \
 	$(call DoAltera1,quartus_sta,$4-top -c $4-top,$4-top,sta) && \
 	$(call DoAltera1,quartus_asm,$4-top,$4-top,asm) && \
-	cp $4-top.sof $3.sof
+	if [ -f $4-top.sof ]; then cp $4-top.sof $3.sof; else cp output_files/$4-top.sof $3.sof; fi
 
 endef
 endif
