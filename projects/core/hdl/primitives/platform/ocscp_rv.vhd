@@ -92,6 +92,20 @@ architecture rtl of ocscp_rv is
   signal   operation           : worker_operation_t; -- what op is in progress or starting
   signal   cmd                 : ocp.MCmd_t;
   signal   worker_data_source  : worker_data_source_t;
+  function byte_value (dw_old : dword_t;
+                       dw_new : dword_t;
+                       be : std_logic_vector(cp_in.byte_en'range)) return dword_t is
+    variable rv : dword_t;
+  begin
+    for i in 0 to 3 loop
+      if be(i) = '1' then
+        rv(i*8+7 downto i*8) := dw_new(i*8+7 downto i*8);
+      else
+        rv(i*8+7 downto i*8) := dw_old(i*8+7 downto i*8);
+      end if;
+    end loop;
+    return rv;
+  end byte_value;
 begin
   magic0 <= OCCP_MAGIC_0
             when ocpi_endian = little_e or (ocpi_endian = dynamic_e and not its(big_endian_r))
@@ -280,8 +294,8 @@ begin
           if not reading_r then
             -- Writable admin registers
             case admin_address is
-              when x"20" => scratch20_r <= cp_in.data;
-              when x"24" => scratch24_r <= cp_in.data;
+              when x"20" => scratch20_r <= byte_value(scratch20_r, cp_in.data, cp_in.byte_en);
+              when x"24" => scratch24_r <= byte_value(scratch24_r, cp_in.data, cp_in.byte_en);
               when x"28" =>
                 reset_r      <= cp_in.data(0);
                 big_endian_r <= cp_in.data(1);

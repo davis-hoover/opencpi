@@ -1012,22 +1012,50 @@ static void
 radmin(const char **ap) {
   unsigned size;
   unsigned off = (unsigned)atoi_any(*ap, &size);
-  if (size == 4) {
-    uint32_t x = cAccess->get32RegisterOffset(off);
-    if (parseable)
-      printf("0x%" PRIx32 "\n", x);
-    else
-      printf("Admin for hdl-device '%s' at offset 0x%x is 0x%x (%u)\n",
-	     device, off, x, x);
-  } else if (size == 8) {
-    uint64_t x = cAccess->get64RegisterOffset(off);
-    if (parseable)
-      printf("0x%" PRIx64 "\n", x);
-    else
-      printf("Admin for hdl-device '%s' at offset 0x%x is 0x%" PRIx64 " (%" PRIi64 ")\n",
-	     device, off, x, x);
-  } else
+  switch (size) {
+  case 1:
+    {
+      uint8_t x = cAccess->get16RegisterOffset(off);
+      if (parseable)
+	printf("0x%" PRIx32 "\n", x);
+      else
+	printf("Admin for hdl-device '%s' at offset 0x%x is 0x%x (%u)\n",
+	       device, off, x, x);
+      break;
+    }
+  case 2:
+    {
+      uint16_t x = cAccess->get16RegisterOffset(off);
+      if (parseable)
+	printf("0x%" PRIx32 "\n", x);
+      else
+	printf("Admin for hdl-device '%s' at offset 0x%x is 0x%x (%u)\n",
+	       device, off, x, x);
+      break;
+    }
+  case 4:
+    {
+      uint32_t x = cAccess->get32RegisterOffset(off);
+      if (parseable)
+	printf("0x%" PRIx32 "\n", x);
+      else
+	printf("Admin for hdl-device '%s' at offset 0x%x is 0x%x (%u)\n",
+	       device, off, x, x);
+      break;
+    }
+  case 8:
+    {
+      uint64_t x = cAccess->get64RegisterOffset(off);
+      if (parseable)
+	printf("0x%" PRIx64 "\n", x);
+      else
+	printf("Admin for hdl-device '%s' at offset 0x%x is 0x%" PRIx64 " (%" PRIi64 ")\n",
+	       device, off, x, x);
+      break;
+    }
+  default:
     bad("bad size for radmin");
+  }
 }
 
 static void
