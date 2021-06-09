@@ -1172,10 +1172,10 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                 msg = ' '.join(['Could not export project "{}".'.format(self.name), 
                                 'You may not have write permissions on this project.',
                                 'Proceeding...'])
-                print(msg)
+                logging.warning(msg)
         elif verbose:
             msg = 'Skipped making exports because this is an exported standalone project'
-            print(msg)
+            logging.warning(msg)
 
     def unregister(self, force=False):
         """

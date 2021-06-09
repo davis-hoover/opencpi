@@ -484,11 +484,12 @@ class Registry(ShowableAsset):
         if default_registry_dir == self.directory:
             err_msg = 'Cannot delete the default project registry'
         elif registry_dir == self.directory:
-            print(self.directory)
-            err_msg = ' '.join([
-                'Cannot delete registry set in OCPI_PROJECT_REGISTRY_DIR',
-                'environment variable. Unset variable before attempting to delete'
-            ])
+            if force: 
+                os.environ.pop('OCPI_PROJECT_REGISTRY_DIR')
+            else:
+                err_msg = ' '.join([
+                    'Cannot delete registry set in OCPI_PROJECT_REGISTRY_DIR',
+                    'environment variable. Unset variable before attempting to delete'])
         if err_msg:
             raise ocpiutil.OCPIException(err_msg)
         if not force:
