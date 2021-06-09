@@ -291,8 +291,7 @@ begin
   g3: if axi_in.W.DATA'length = 32 generate
     cp_out.data       <= axi_in.W.DATA;
     cp_out.byte_en    <= axi_in.W.STRB(cp_out.byte_en'range) when read_state = r_idle_e else
-                         read_byte_en(axi_in.AR.ADDR(1 downto 0),
-                                      axi_in.AR.SIZE);
+                         read_byte_en(axi_in.AR.ADDR(1 downto 0), axi_in.AR.SIZE);
   end generate;
   g4: if axi_in.W.DATA'length > 32 generate
     dw_lsb    <= to_integer(dwaddr_r & "00000");
@@ -302,6 +301,6 @@ begin
                       read_byte_en(axi_in.AR.ADDR(1 downto 0), axi_in.AR.SIZE);
   end generate;
   cp_out.take      <= to_bool(its(cp_in.valid) and 
-                              ((its(size64_r) and read_state = r_first_wanted_e) or
+                              ((axi_out.R.DATA'length > 32 and read_state = r_first_wanted_e) or
                                (RVALID = '1' and axi_in.R.READY = '1')));
 end rtl;
