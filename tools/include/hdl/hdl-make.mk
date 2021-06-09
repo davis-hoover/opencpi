@@ -95,21 +95,37 @@ HdlFindCores=$(infox HFC:$1)\
 
 HdlBuiltinWorkers=ocscp ocscp_rv metadata metadata_rv time_client time_client_rv unoc_node unoc_node_rv
 
+HdlSourceLibPath=$(strip $(infox HSLP:$1)\
+  $(foreach r,\
+    $(if $(findstring /exports/lib/,$1),\
+      $(foreach l,$(lastword $(subst /, ,$1)),$(infox HSLP0:$l)\
+        $(foreach d,$(if $(filter components,$l),/,\
+                      $(if $(filter devices cards adapters,$l),/hdl/,/components/)),$(infox HSLP1:$d)\
+          $(subst /exports/lib/,$d,$1))),\
+      $1),$(infox HSLPr:$r)$r))
+
 ################################################################################
 # Genearate a rule to build the worker configuration
 # $(call HdlAutoWorkerRule,<lib>,<target>,<worker>,<config>)
-# 1: rawlib 2: top lib 3: target 4: worker 5: config
+# 1: rawlib 2: top lib 3: target 4: worker 5: worker-core 6: config
 define HdlAutoWorkerRule
+$$(infox HAUTO:$1:$2:$3:$4:$5:$6)
+$$(infox TARGET:$1/hdl/$3/$5$$(HdlBin))
+# Note setting the project variables in the environment and not on the command line
+$1/hdl/$3/$5$$(HdlBin):
+	$(AT)echo Building HDL worker $4 configuration $6 target $3 in library $2 now...
+	$(AT)unset OCPI_PROJECT_REL_DIR OCPI_PROJECT_PACKAGE OCPI_PROJECT_DIR \
+                   OCPI_PROJECT_COMPONENT_LIBRARIES OCPI_PROJECT_DEPENDENCIES MAKEFLAGS && \
+             $(MAKE) $$(foreach d,$(call HdlSourceLibPath,$2)/$4.hdl,\
+                        -C $$d $$(if $$(wildcard $$d/Makefile),,-f $(OCPI_CDK_DIR)/include/worker.mk)) \
+                     ComponentLibraries= ComponentLibrariesInternal=\
+                     --no-print-directory HdlTarget=$3 ParamConfigurations=$6 AT=$(AT)
 
-$1/hdl/$3/$4$(if $(filter 0,$5),,_c$5)$$(HdlBin):
-	$(AT)echo Building HDL worker $4 configuration $5 target $3 in library $2 now...
-	$(AT)$(MAKE) -C $2/$4.hdl -f $(OCPI_CDK_DIR)/include/worker.mk --no-print-directory \
-	         HdlTarget=$3 ParamConfigurations=$5 AT=$(AT)
 endef
 
 # Search for the actual built core in any of the libraries, but if not found,
 # report whether the worker is not there at all, or is simply not yet built
-# $(call HdlFindWorkerCore,<target>,<worker>,<worker+cfg>,<cfg>)
+# $(call HdlFindWorkerCore,<target>,<worker>,<worker+rv+cfg>,<cfg>)
 HdlFindWorkerCore=$(strip \
   $(eval HdlFoundInLib:=)\
   $(eval HdlFoundCore:=)\
@@ -125,7 +141,7 @@ HdlFindWorkerCore=$(strip \
       $(foreach l,$(HdlFoundInLib:%/lib=%),\
         $(info Warning:  HDL worker "$2" found in component library "$l" $(strip\
                ($(realpath $l)), but build config "$4" not built for target "$1"))\
-        $(eval $(call HdlAutoWorkerRule,$(HdlFoundInLib),$l,$1,$2,$4))\
+        $(eval $(call HdlAutoWorkerRule,$(HdlFoundInLib),$l,$1,$2,$3,$4))\
 	$(eval HdlAutoCores+=$(HdlFoundInLib)/hdl/$1/$3$(HdlBin))\
         $(HdlFoundInLib)/hdl/$1/$3$(HdlBin)),\
       $(if $(filter-out $(HdlBuiltinWorkers),$2),\
@@ -146,7 +162,7 @@ define HdlSetWorkerCores
     $$(foreach f,$$(call HdlGetFamily,$1),\
        $$(foreach i,$$(HdlInstances),\
           $$(foreach n,$$(call HdlInstanceWkr,$$i),\
-             $$(foreach w,$$(call HdlInstanceWkrCfg,$$i),$$(infox HSWC:$1:$f:$i:$n:$w)\
+             $$(foreach w,$$(call HdlInstanceWkrCfg,$$i),$$(infox HSWC:$1:$$f:$$i:$$n:$$w)\
                 $$(call HdlFindWorkerCore,$$f,$$n,$$w,$$(call HdlInstanceCfg,$$i)))))))
   $$(infox Cores SubCores_$1 is $$(origin SubCores_$1) $$(flavor SubCores_$1):$$(SubCores_$1))
 
