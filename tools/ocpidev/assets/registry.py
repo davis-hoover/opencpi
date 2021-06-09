@@ -474,7 +474,7 @@ class Registry(ShowableAsset):
     def delete(self, force=False):
         """
         Deletes the registry. Prompts the user to confirm if args.force
-        is not True. Refuses to delete the defaul registry or registry
+        is not True. Refuses to delete the default registry or registry
         set to OCPI_PROJECT_REGISTRY_DIR.
         """
         root_dir = os.getenv('OCPI_ROOT_DIR', '')
@@ -484,6 +484,7 @@ class Registry(ShowableAsset):
         if default_registry_dir == self.directory:
             err_msg = 'Cannot delete the default project registry'
         elif registry_dir == self.directory:
+            print(self.directory)
             err_msg = ' '.join([
                 'Cannot delete registry set in OCPI_PROJECT_REGISTRY_DIR',
                 'environment variable. Unset variable before attempting to delete'
