@@ -1157,7 +1157,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
 
     def register(self, force=False, verbose=False):
         """
-        Register project to registry. Export project if possible
+        Register project to registry. Export project if possible.
         """
         registry = self.registry()
         registry.add(self.directory, force=force)
@@ -1177,13 +1177,16 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             msg = 'Skipped making exports because this is an exported standalone project'
             print(msg)
 
-    def unregister(self):
+    def unregister(self, force=False):
         """
-        Unregister project from registry. Prompts the user first
+        Unregister project from registry. If not force, prompts the user first.
         """
-        prompt = ' '.join(['Are you sure you want to unregister the "{}"'.format(self.name), 
-                           'project/package from its project registry?'])
-        if ocpiutil.get_ok(prompt):
+        if not force:
+            prompt = ' '.join(['Are you sure you want to',
+                               'unregister the "{}"'.format(self.name), 
+                               'project/package from its project registry?'])
+            force = ocpiutil.get_ok(prompt)
+        if force:
             self.registry().remove(directory=self.directory)
 
 
