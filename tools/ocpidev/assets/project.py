@@ -59,11 +59,18 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             init_hdlassembs (T/F) - Instructs the method whether to construct all
                                     HdlApplicationAssembly objects contained in the project
         """
-        # If name passed in was a package_id, find project with that package_id
-        project_dir = ocpiutil.does_project_with_package_exist(package=name, return_project_dir=True)
-        if project_dir:
-            directory = project_dir
-        self.check_dirtype("project", directory)
+        try:
+            self.check_dirtype("project", directory)
+        except ocpiutil.OCPIException:
+        # If directory is not a project, assume name is a package_id and get directory
+        # from registry
+            registry_dir = Registry.get_registry_dir()
+            if name:
+                directory = str(Path(registry_dir, name))
+            else:
+                directory = registry_dir
+            self.check_dirtype("project", directory)
+
         super().__init__(directory, name, **kwargs)
         self.lib_list = None
         self.apps_col_list = None
@@ -1187,7 +1194,8 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                                'project/package from its project registry?'])
             force = ocpiutil.get_ok(prompt)
         if force:
-            self.registry().remove(directory=self.directory)
+            registry = Registry.get_registry_dir()
+            registry.remove(directory=self.directory)
 
 
 # pylint:enable=too-many-instance-attributes

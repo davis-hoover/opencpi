@@ -86,7 +86,7 @@ def main():
         asset_method(**method_args)
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
-        
+        sys.exit(1)
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
         ocpidev_sh()
