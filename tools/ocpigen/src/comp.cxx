@@ -24,8 +24,9 @@
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"
 
 namespace OL = OCPI::Library;
+struct comp;
+unsigned matchedWorkers = 0; // count them even if they are not built or usable
 
-class comp;
 const char *
 findPackage(ezxml_t spec, const char *package, const char *specName,
             const std::string &parent, const std::string &specFile, std::string &package_out) {
@@ -195,21 +196,21 @@ const char *getSpec(ezxml_t xml, const std::string &parent, const char *a_packag
   return NULL;
 }
 
-inline bool Comp::operator() (const WorkerConfig &lhs, const WorkerConfig &rhs) const {
+inline bool operator() (const WorkerConfig &lhs, const WorkerConfig &rhs) const {
   // Are all the non-impl parameter values the same?
   // Since they are all from the same spec the order will be the same
-  if (lhs.second < rhs.second)
-    return false;
-  if (lhs.second > rhs.second)
-    return true;
-    for (unsigned p = 0; p < lhs.first->params.size(); ++p) {
-    //      if (lhs.first->params[p].m_param->m_isImpl)
-    //        break;
-    int c = lhs.first->params[p].m_uValue.compare(rhs.first->params[p].m_uValue);
-    if (c < 0)
+    if (lhs.second < rhs.second)
+      return false;
+    if (lhs.second > rhs.second)
       return true;
-    if (c > 0)
-      break;
-    }
-    return false;
+      for (unsigned p = 0; p < lhs.first->params.size(); ++p) {
+      //      if (lhs.first->params[p].m_param->m_isImpl)
+      //        break;
+      int c = lhs.first->params[p].m_uValue.compare(rhs.first->params[p].m_uValue);
+      if (c < 0)
+        return true;
+      if (c > 0)
+        break;
+      }
+      return false;
   }

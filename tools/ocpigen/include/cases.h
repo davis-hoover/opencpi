@@ -17,22 +17,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef OCPI_CASES_H
+#define OCPI_CASES_H
 
-#ifndef CASES_H
-#define CASES_H
-#include "comp.h"
-#include "parameters.h"
-#include "input-output.h"
-#include <vector>
+#include <cstddef>
+#include <string>
 #include <strings.h>
-#include <sstream>
-#include <set>
-#include <limits>
-#include <algorithm>
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsFileSystem.h"
-#include "OcpiUtilMisc.h"
-#include "hdl-device.h"   
+#include <cassert>
+#include <vector>
 #include <strings.h>
 #include <sstream>
 #include <set>
@@ -43,8 +35,12 @@
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiLibraryManager.h"
+#include "parameters.h"
+#include "hdl-device.h"
 #include "wip.h"
 #include "data.h"
+#include "comp.h"
+#include "input-output.h"
 
   // A test case, which may apply against multiple configurations
   // Default is:
@@ -55,24 +51,15 @@
   //   globally only/exluded workers
   // Specific cases
   // Top level attributes of <tests>
-  class Case;
+  struct Case;
+  
   typedef std::vector<Case *> Cases;
   Cases cases;
-  OrderedStringSet allPlatforms;
-  class Case {
-    public:
-      Case();
-      friend class Comp;
-      friend class InputOutput;
-      typedef std::set<WorkerConfig, Comp> WorkerConfigs;
-      typedef std::vector<InputOutput> InputOutputs;
-      InputOutput io;
-      WorkerConfigs configs;
-      OrderedStringSet allPlatforms;
-      Case(ParamConfig &globals)
-        : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
-	        m_doneWorkerIsUUT(doneWorkerIsUUT)
-      {}
+  OrderedStringSet allPlatforms;      
+  typedef std::set<WorkerConfig, comp> WorkerConfigs;
+  typedef std::vector<InputOutput> InputOuftputs;
+
+  struct Case {
       std::string m_name;
       Strings m_onlyPlatforms, m_excludePlatforms; // can only apply these at runtime
       Workers m_workers; // the inclusion/exclusion happens at parse time
@@ -84,6 +71,12 @@
       size_t m_timeout, m_duration;
       bool m_doneWorkerIsUUT;
       std::string m_delays;
+
+      Case(ParamConfig &globals)
+        : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
+	        m_doneWorkerIsUUT(doneWorkerIsUUT)
+      {}
+
       static const char *doExcludePlatform(const char *a_platform, void *arg);
       static const char *doOnlyPlatform(const char *a_platform, void *arg);
       static const char *doOnlyWorker(const char *worker, void *arg);
@@ -110,9 +103,15 @@
       static const char *addWorker(const char *name, void *);
       static const char *excludeWorker(const char *name, void *);
       static const char *findWorkers();
-      void connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports);
-      void connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports);
-      const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
-                                      std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports);
+      
   };
+// Explicitly included workers
+const char *addWorker(const char *name, void *);
+// Explicitly excluded workers
+const char *excludeWorker(const char *name, void *);
+const char *findWorkers();
+void *connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports);
+void *connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports);
+const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
+                                      std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports);
   #endif

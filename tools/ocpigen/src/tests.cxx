@@ -41,7 +41,6 @@
 
 namespace OL = OCPI::Library;
 
-
 // Called for all workers globally acceptable workers and the one emulator if present
 static void
 addNonParameterProperties(Worker &w, ParamConfig &globals) {
@@ -75,12 +74,9 @@ addNonParameterProperties(Worker &w, ParamConfig &globals) {
 }
 const char *
 createTests(const char *file, const char *package, const char */*outDir*/, bool a_verbose) {
+  //Case *cases;
   verbose = a_verbose;
   const char *err;
-  InputOutput io;
-  Case cc; //cc for current case
-  //typedef std::vector<Case *> Cases;
-  //typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
   std::string parent, specFile;
   ezxml_t xml, xspec;
   bool isOptional = !testingOptionalPorts;
@@ -119,10 +115,10 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     // We will only look at workers mentioned here
     if (excludeWorkersAttr)
       return OU::esprintf("the onlyWorkers and excludeWorkers attributes cannot both occur");
-    if ((err = OU::parseList(onlyWorkersAttr, Case::addWorker)))
+    if ((err = OU::parseList(onlyWorkersAttr, addWorker)))
       return err;
   } else  if ((excludeWorkersAttr && (err = OU::parseList(excludeWorkersAttr, excludeWorker))) ||
-              (err = Case::findWorkers()))
+              (err = findWorkers()))
     return err;
   if (excludeWorkersTmp.size() && verbose)
     for (StringsIter si = excludeWorkersTmp.begin(); si != excludeWorkersTmp.end(); ++si)
@@ -148,14 +144,14 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     for (unsigned c = 0; c < w.m_paramConfigs.size(); ++c) {
       ocpiDebug("Inserting worker %s.%s/%p with new config %p/%zu", w.m_implName,
                 w.m_modelString, &w, w.m_paramConfigs[c], w.m_paramConfigs[c]->nConfig);
-      ocpiCheck(cc.configs.insert(std::make_pair(w.m_paramConfigs[c], &w)).second);
+      ocpiCheck(configs.insert(std::make_pair(w.m_paramConfigs[c], &w)).second);
     }
   }
   // ================= 4. Derive the union set of values from all configurations
   // Next, parse all global values into a special set for all tests that don't specify values.
   // This is different from the defaults and may have multiple values.
   ParamConfig globals(*wFirst);
-  for (WorkerConfigsIter wci = cc.configs.begin(); wci != cc.configs.end(); ++wci) {
+  for (WorkerConfigsIter wci = configs.begin(); wci != configs.end(); ++wci) {
     ParamConfig &pc = *wci->first;
     ocpiDebug("Processing config %zu of worker %s.%s",
               pc.nConfig, pc.worker().cname(), pc.worker().m_modelString);
@@ -207,7 +203,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   if (emulator)
     addNonParameterProperties(*emulator, globals);
   // ================= 4b. Add "empty" values for parameters that are not in all workers
-  for (WorkerConfigsIter wci = cc.configs.begin(); wci != cc.configs.end(); ++wci) {
+  for (WorkerConfigsIter wci = configs.begin(); wci != configs.end(); ++wci) {
     ParamConfig &pc = *wci->first;
     // Check if any properties have no values.
     for (unsigned n = 0; n < globals.params.size(); n++) {
@@ -367,9 +363,9 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
     fprintf(stderr,
             "Spec is %s, in file %s, %zu workers, %zu configs\n"
             "Configurations are:\n",
-            specName.c_str(), specFile.c_str(), workers.size(), cc.configs.size());
+            specName.c_str(), specFile.c_str(), workers.size(), configs.size());
     unsigned c = 0;
-    for (WorkerConfigsIter wci = cc.configs.begin(); wci != cc.configs.end(); ++wci, ++c) {
+    for (WorkerConfigsIter wci = configs.begin(); wci != configs.end(); ++wci, ++c) {
       ParamConfig &pc = *wci->first;
       fprintf(stderr, "  %2u: (from %s.%s)\n",
               c, pc.worker().cname(), pc.worker().m_modelString);
@@ -476,27 +472,27 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
         std::string dir(assemblies + "/" + name);
         ocpiInfo("Generating assembly: %s", dir.c_str());
         //there's always at least one case if there's a -test.xml
-        if ((err = cc.generateHdlAssembly(w, c, dir, name, false, assyDirs, cases[0]->m_ports)))
+        if ((err = generateHdlAssembly(w, c, dir, name, false, assyDirs, cases[0]->m_ports)))
           return err;
         if (!isOptional) {
           for (unsigned n = 0; n < cases.size(); n++) {
             std::ostringstream temp; //can't use to_string
             temp << n;
-            if ((err = cc.generateHdlAssembly(w, c, dir + "_op_" + temp.str(), name + "_op_" + temp.str(), false, assyDirs, cases[n]->m_ports)))
+            if ((err = generateHdlAssembly(w, c, dir + "_op_" + temp.str(), name + "_op_" + temp.str(), false, assyDirs, cases[n]->m_ports)))
               return err;
           }
         }
         if (hdlFileIO) {
           name += "_frw";
           dir += "_frw";
-          if ((err = cc.generateHdlAssembly(w, c, dir, name, true, assyDirs, cases[0]->m_ports)))
+          if ((err = generateHdlAssembly(w, c, dir, name, true, assyDirs, cases[0]->m_ports)))
             return err;
           if (!isOptional) {
             std::cout << "testingoptionalports id hdl "<< testingOptionalPorts << "\n";
             for (unsigned n = 0; n < cases.size(); n++) {
               std::ostringstream temp; //can't use to_string
               temp << n;
-              if ((err = cc.generateHdlAssembly(w, c, dir + "_op_" + temp.str(), name + "_op_" + temp.str(), true, assyDirs, cases[n]->m_ports)))
+              if ((err = generateHdlAssembly(w, c, dir + "_op_" + temp.str(), name + "_op_" + temp.str(), true, assyDirs, cases[n]->m_ports)))
                 return err;
             }
           }
@@ -557,7 +553,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   if (emulator)
     fprintf(out, " emulator='%s'", emulatorName());
   fprintf(out, ">\n");
-  if ((err = getPlatforms("*", cc.allPlatforms)))
+  if ((err = getPlatforms("*", allPlatforms)))
     return err;
   for (unsigned n = 0; n < cases.size(); n++)
     if ((err = cases[n]->generateCaseXml(out)))

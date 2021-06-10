@@ -2,11 +2,8 @@
 #include <string>
 #include <strings.h>
 #include <cassert>
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilAssembly.h"
-#include "ocpigen.h"
-#include "parameters.h"
 #include <vector>
+#include <strings.h>
 #include <sstream>
 #include <set>
 #include <limits>
@@ -14,8 +11,10 @@
 #include "OcpiOsDebugApi.h"
 #include "OcpiOsFileSystem.h"
 #include "OcpiUtilMisc.h"
-#include "hdl-device.h"
+#include "OcpiUtilEzxml.h"
 #include "OcpiLibraryManager.h"
+#include "parameters.h"
+#include "hdl-device.h"
 #include "wip.h"
 #include "data.h"
 #include "comp.h"
@@ -27,11 +26,9 @@
 
 namespace OL = OCPI::Library;
 
-class Case;
-class Worker;
-//Cases cases;
+struct Case;
 
-const char *Case::doExcludePlatform(const char *a_platform, void *arg) {
+const char *doExcludePlatform(const char *a_platform, void *arg) {
   Case &c = *(Case *)arg;
   OrderedStringSet platforms;
   const char *err;
@@ -56,7 +53,7 @@ const char *Case::doExcludePlatform(const char *a_platform, void *arg) {
   return NULL;
 }
 
-const char *Case::doOnlyPlatform(const char *a_platform, void *arg) {
+const char *doOnlyPlatform(const char *a_platform, void *arg) {
   Case &c = *(Case *)arg;
   OrderedStringSet platforms;
   const char *err;
@@ -76,7 +73,7 @@ const char *Case::doOnlyPlatform(const char *a_platform, void *arg) {
   return NULL;
 }
 
-const char *Case::doOnlyWorker(const char *worker, void *arg) {
+const char *doOnlyWorker(const char *worker, void *arg) {
   Case &c = *(Case *)arg;
   if (excludeWorkers.find(worker) != excludeWorkers.end())
     return
@@ -89,7 +86,7 @@ const char *Case::doOnlyWorker(const char *worker, void *arg) {
   return doWorker(*wi, &c.m_workers);
 }
 
-const char *Case::doExcludeWorker(const char *worker, void *arg) {
+const char *doExcludeWorker(const char *worker, void *arg) {
   Case &c = *(Case *)arg;
   if (excludeWorkers.find(worker) != excludeWorkers.end())
     return OU::esprintf("excluded worker \"%s\" is already globally excluded", worker);
@@ -103,7 +100,7 @@ const char *Case::doExcludeWorker(const char *worker, void *arg) {
   return NULL;
 }
 
-const char *Case::doCase(ezxml_t cx, void *globals) {
+const char *doCase(ezxml_t cx, void *globals) {
   Case *c = new Case(*(ParamConfig *)globals);
   const char *err;
   if ((err = c->parse(cx, cases.size()))) {
@@ -114,7 +111,7 @@ const char *Case::doCase(ezxml_t cx, void *globals) {
   return NULL;
 }
 
-const char *Case::doPorts(Worker &w, ezxml_t x) {
+const char *doPorts(Worker &w, ezxml_t x) {
   for (unsigned n = 0; n < w.m_ports.size(); n++)
     if (w.m_ports[n]->isData()) {
       Port &p = *w.m_ports[n];
@@ -158,7 +155,7 @@ const char *Case::doPorts(Worker &w, ezxml_t x) {
 }
 
 // FIXME: this code is redundant with the OcpiUtilAssembly.cxx
-const char *Case::parseDelay(ezxml_t sx, const OU::Property &p) {
+const char *parseDelay(ezxml_t sx, const OU::Property &p) {
   const char *err;
   if ((err = OE::checkAttrs(sx, "delay", "value", NULL)) ||
       (err = OE::checkElements(sx, NULL)))
@@ -192,7 +189,7 @@ const char *Case::parseDelay(ezxml_t sx, const OU::Property &p) {
 }
 
 // Parse a case
-const char *Case::parse(ezxml_t x, size_t ordinal) {
+const char *parse(ezxml_t x, size_t ordinal) {
   const char *err, *a;
   if ((a = ezxml_cattr(x, "name")))
     m_name = a;
@@ -298,7 +295,7 @@ return err;
 }
 
 void
-Case::doProp(unsigned n) {
+doProp(unsigned n) {
   ParamConfig &c = *m_subCases.back();
   while (n < c.params.size() && (!c.params[n].m_param || !c.params[n].m_generate.empty() ||
                                   c.params[n].m_uValues.empty()))
@@ -315,7 +312,7 @@ Case::doProp(unsigned n) {
 }
 
 const char *
-Case::pruneSubCases() {
+pruneSubCases() {
   ocpiDebug("Pruning subcases for case %s starting with %zu subcases",
             m_name.c_str(), m_subCases.size());
   for (unsigned s = 0; s < m_subCases.size(); s++) {
@@ -392,7 +389,7 @@ Case::pruneSubCases() {
 }
 
 void
-Case::print(FILE *out) {
+print(FILE *out) {
   fprintf(out, "Case %s:\n", m_name.c_str());
   table(out);
   for (unsigned s = 0; s < m_subCases.size(); s++) {
@@ -412,7 +409,7 @@ Case::print(FILE *out) {
 }
 
 void
-Case::table(FILE *out) {
+table(FILE *out) {
   std::vector<size_t> sizes(m_settings.params.size(), 0);
   std::vector<const char *> last(m_settings.params.size(), NULL);
   bool first = true;
@@ -460,7 +457,7 @@ Case::table(FILE *out) {
 }
 
 const char *
-Case::generateFile(bool &first, const char *dir, const char *type, unsigned s,
+generateFile(bool &first, const char *dir, const char *type, unsigned s,
               const std::string &name, const std::string &generate, const std::string &env,
               std::string &file) {
   if (verbose && first) {
@@ -503,7 +500,7 @@ type, name.c_str(), file.c_str(), cmd.c_str() + prefix);
 
 // Generate inputs: input files
 const char *
-Case::generateInputs() {
+generateInputs() {
   const char *err;
   for (unsigned s = 0; s < m_subCases.size(); s++) {
     bool first = true;
@@ -558,7 +555,7 @@ Case::generateInputs() {
 }
 
 void
-Case::generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nOutputs, unsigned s,
+generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nOutputs, unsigned s,
                     const DataPort *first, bool a_emulator, std::string &app, const char *dut, bool testingOptional) {
   OU::formatAdd(app, "  <instance component='%s' name='%s'", w.m_specName, dut);
   if (nOut == 1 && !testingOptional) {
@@ -607,7 +604,7 @@ Case::generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nO
 
 // Generate application xml files, being careful not to write files that are
 // not changing
-const char *Case::generateApplications(const std::string &dir, Strings &files) {
+const char *generateApplications(const std::string &dir, Strings &files) {
   const char *err;
   const char *dut = strrchr(wFirst->m_specName, '.');
   bool isOptional = false; // for compiler warning
@@ -793,7 +790,7 @@ const char *Case::generateApplications(const std::string &dir, Strings &files) {
 
 // Generate the verification script for this case
 const char *
-Case::generateVerification(const std::string &dir, Strings &files) {
+generateVerification(const std::string &dir, Strings &files) {
   std::string name;
   OU::format(name, "verify_%s.sh", m_name.c_str());
   files.insert(name);
@@ -935,7 +932,7 @@ else
 }
 
 const char *
-Case::generateCaseXml(FILE *out) {
+generateCaseXml(FILE *out) {
   fprintf(out, "  <case name='%s'>\n", m_name.c_str());
   for (unsigned s = 0; s < m_subCases.size(); s++) {
     ParamConfig &pc = *m_subCases[s];
@@ -1107,63 +1104,65 @@ fprintf(out, "    </subcase>\n");
   fprintf(out, "  </case>\n");
   return NULL;
 }
-// Explicitly included workers
-const char *Case::addWorker(const char *name, void *) {
-const char *dot = strrchr(name, '.'); // checked earlier
-// FIXME: support finding other workers in the project path
-std::string wdir;
-const char *slash = strrchr(name, '/');
-if (slash)
-  wdir = name;
-else {
-  wdir = "../";
-  wdir += name;
-}
-bool isDir;
-if (!OS::FileSystem::exists(wdir, &isDir) || !isDir)
-  return OU::esprintf("Worker \"%s\" doesn't exist or is not a directory", name);
-const char *wname = slash ? slash + 1 : name;
-std::string
-  wkrName(wname, OCPI_SIZE_T_DIFF(dot, wname)),
-  wOWD = wdir + "/" + wkrName + ".xml";
-if (!OS::FileSystem::exists(wOWD, &isDir) || isDir)
-  return OU::esprintf("For worker \"%s\", \"%s\" doesn't exist or is a directory",
-                      name, wOWD.c_str());
-return tryWorker(name, specName, true, true);
-}
-// Explicitly excluded workers
-const char *Case::excludeWorker(const char *name, void *) {
-const char *dot = strrchr(name, '.');
-if (!dot)
-  return OU::esprintf("For worker name \"%s\": missing model suffix (e.g. \".rcc\")", name);
-std::string file("../");
-file += name;
-bool isDir;
-if (!OS::FileSystem::exists(file, &isDir) || !isDir)
-  return OU::esprintf("Excluded worker \"%s\" does not exist in this library.", name);
-if (!excludeWorkers.insert(name).second)
-  return OU::esprintf("Duplicate worker \"%s\" in excludeWorkers attribute.", name);
-excludeWorkersTmp.insert(name);
-return NULL;
-}
-const char *Case::findWorkers() {
-if (verbose) {
-  fprintf(stderr, "Looking for workers with the same spec: \"%s\"\n", specName.c_str());
-  if (excludeWorkers.size())
-    fprintf(stderr, "Skipping workers specifically mentioned for exclusion\n");
-}
-std::string workerNames;
-const char *err;
-if ((err = OU::file2String(workerNames, "../lib/workers", ' ')))
-  return err;
-addDep("../lib/workers", false); // if we add or remove a worker from the library...
-for (OU::TokenIter ti(workerNames.c_str()); ti.token(); ti.next())
-  if ((err = tryWorker(ti.token(), specName, true, false)))
-    return err;
-return NULL;
+  // Explicitly included workers
+
+const char *addWorker(const char *name, void *) {
+  const char *dot = strrchr(name, '.'); // checked earlier
+  // FIXME: support finding other workers in the project path
+  std::string wdir;
+  const char *slash = strrchr(name, '/');
+  if (slash)
+    wdir = name;
+  else {
+    wdir = "../";
+    wdir += name;
+  }
+  bool isDir;
+  if (!OS::FileSystem::exists(wdir, &isDir) || !isDir)
+    return OU::esprintf("Worker \"%s\" doesn't exist or is not a directory", name);
+  const char *wname = slash ? slash + 1 : name;
+  std::string
+    wkrName(wname, OCPI_SIZE_T_DIFF(dot, wname)),
+    wOWD = wdir + "/" + wkrName + ".xml";
+  if (!OS::FileSystem::exists(wOWD, &isDir) || isDir)
+    return OU::esprintf("For worker \"%s\", \"%s\" doesn't exist or is a directory",
+                        name, wOWD.c_str());
+  return tryWorker(name, specName, true, true);
 }
 
-void Case::connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports) {
+const char *excludeWorker(const char *name, void *) {
+  const char *dot = strrchr(name, '.');
+  if (!dot)
+    return OU::esprintf("For worker name \"%s\": missing model suffix (e.g. \".rcc\")", name);
+  std::string file("../");
+  file += name;
+  bool isDir;
+  if (!OS::FileSystem::exists(file, &isDir) || !isDir)
+    return OU::esprintf("Excluded worker \"%s\" does not exist in this library.", name);
+  if (!excludeWorkers.insert(name).second)
+    return OU::esprintf("Duplicate worker \"%s\" in excludeWorkers attribute.", name);
+  excludeWorkersTmp.insert(name);
+  return NULL;
+}
+const char *findWorkers() {
+  if (verbose) {
+    fprintf(stderr, "Looking for workers with the same spec: \"%s\"\n", specName.c_str());
+    if (excludeWorkers.size())
+      fprintf(stderr, "Skipping workers specifically mentioned for exclusion\n");
+  }
+  std::string workerNames;
+  const char *err;
+  if ((err = OU::file2String(workerNames, "../lib/workers", ' ')))
+    return err;
+  addDep("../lib/workers", false); // if we add or remove a worker from the library...
+  for (OU::TokenIter ti(workerNames.c_str()); ti.token(); ti.next())
+    if ((err = tryWorker(ti.token(), specName, true, false)))
+      return err;
+  return NULL;
+}
+
+void *connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports) {
+//Case cases;
 for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
   Port &p = **pi;
   bool optional = false;
@@ -1186,7 +1185,7 @@ for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
 }
 }
 
-void Case::connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports) {
+void *connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports) {
 for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
   Port &p = **pi;
   bool optional = false;
@@ -1229,7 +1228,7 @@ for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
 }
 }
 
-const char *Case::generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
+const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
                                 std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports) {
 OS::FileSystem::mkdir(dir, true);
 assyDirs.insert(name);

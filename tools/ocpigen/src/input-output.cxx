@@ -1,14 +1,35 @@
-#include "comp.h"
-#include "input-output.h"
+#ifndef __INPUT-OUTPUT_H__
+#define __INPUT-OUTPUT_H__
+
+/*
+ * This file is protected by Copyright. Please refer to the COPYRIGHT file
+ * distributed with this source distribution.
+ *
+ * This file is part of OpenCPI <http://www.opencpi.org>
+ *
+ * OpenCPI is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#define TESTS "-tests.xml"
+#define MS_CONFIG "bypass", "metadata", "throttle", "full"
+
 #include <cstddef>
 #include <string>
 #include <strings.h>
 #include <cassert>
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilAssembly.h"
-#include "ocpigen.h"
-#include "parameters.h"
 #include <vector>
+#include <strings.h>
 #include <sstream>
 #include <set>
 #include <limits>
@@ -16,16 +37,21 @@
 #include "OcpiOsDebugApi.h"
 #include "OcpiOsFileSystem.h"
 #include "OcpiUtilMisc.h"
-#include "hdl-device.h"
+#include "OcpiUtilEzxml.h"
 #include "OcpiLibraryManager.h"
+#include "parameters.h"
+#include "hdl-device.h"
 #include "wip.h"
 #include "data.h"
-
-#define TESTS "-tests.xml"
-#define MS_CONFIG "bypass", "metadata", "throttle", "full"
+#include "comp.h"
+#include "input-output.h"
 
 namespace OL = OCPI::Library;
 
+struct InputOutput;
+
+Worker *emulator = NULL;
+static const char *s_stressorMode[] = { MS_CONFIG, NULL };
 const char *
 tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool specific) {
   ocpiInfo("Considering worker \"%s\"", wname);
@@ -219,3 +245,5 @@ const char *emulatorName() {
     em = emulator->m_specName;
   return em;
 }
+
+#endif // __INPUT-OUTPUT_H__
