@@ -449,6 +449,7 @@ verbs = {
             },
             'worker': {
                 'options': {
+                    'library': options['library'],
                     'name': None
                 }
             }
