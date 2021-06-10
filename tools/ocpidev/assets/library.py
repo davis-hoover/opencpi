@@ -244,10 +244,9 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
     def create(name, directory, **kwargs):
         """
         Create library assets
-	FIXME: name is optional
         """
-        compdir = None
-        libdir = None
+        if not name:
+           raise ocpiutil.OCPIException("Creating a library asset requires a name")
         dirtype = ocpiutil.get_dirtype(directory)
         if dirtype != "project" and dirtype != "libraries":
            raise ocpiutil.OCPIException(directory + " must be a project or components directory")
@@ -256,20 +255,14 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             compdir = directory + "/components/"
             if not os.path.isdir(compdir):
                 os.mkdir(compdir) 
-            if name:
-                libdir = compdir + name
             os.chdir(compdir)
 
         currdir = os.getcwd()
         currtype = ocpiutil.get_dirtype(currdir)
         if not currtype == "libraries":
-            raise ocpiutil.OCPIException("Assert: " + currdir + " must be of type libraries")
-        if not compdir:
-            compdir = currdir
-        if not libdir:
-            libdir = currdir
-            if name:
-                libdir = currdir + "/" + name
+            raise ocpiutil.OCPIException(currdir + " must be of type libraries")
+        compdir = currdir
+        libdir = currdir + "/" + name
         if os.path.exists(libdir):
             raise ocpiutil.OCPIException(libdir + " already exists.")
         os.mkdir(libdir) 
@@ -286,7 +279,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         subprocess.check_call('make')
         cdkdir = os.environ.get('OCPI_CDK_DIR')
         metacmd = cdkdir + "/scripts/genProjMetaData.py "
-        os.system(metacmd + directory)
+        os.system(metacmd + compdir)
 
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):

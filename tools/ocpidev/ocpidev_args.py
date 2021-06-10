@@ -461,7 +461,7 @@ verbs = {
             'component': None,
             'library': {
                 'options': {
-                    'name': {'nargs': '?'},
+                    'name': None,
                     'pkg_prefix': options['pkg_prefix'],
                     'pkg_id': options['pkg_id'],
                     'pkg_name': options['pkg_name'],
