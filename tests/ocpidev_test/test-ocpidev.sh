@@ -227,14 +227,14 @@ echo "========Creating applications"
 applications=(app1 app2)
 for app in ${applications[@]} ; do
   do_ocpidev create application $app
-  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || OCPI_TARGET_PLATFORM=$RCC_PLATFORM make -C applications/$app
-  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || make clean -C applications/$app
+  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications/$app build --rcc-platform=$RCC_PLATFORM
+  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications/$app clean
   do_ocpidev create application "$app"_x -x
-  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || OCPI_TARGET_PLATFORM=$RCC_PLATFORM make -C applications/"$app"_x
-  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || make clean -C applications/"$app"_x
+  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications/"$app"_x build --rcc-platform=$RCC_PLATFORM
+  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications/"$app"_x clean
   do_ocpidev create application $app -X
-  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || OCPI_TARGET_PLATFORM=$RCC_PLATFORM make -C applications
-  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || make clean -C applications
+  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications build --rcc-platform=$RCC_PLATFORM
+  [ -n "$NO_BUILD" ] || [ -n "$ONLY_CREATE" ] || ocpidev -d applications clean
 done
 
 echo "============OCPIDEVTEST:'show'ing HDL Platforms"
@@ -437,7 +437,7 @@ fi
   echo "============OCPIDEVTEST:Building project HSP/HP"
   do_ocpidev build project . $RCC --build-hdl-rcc-platform $HDL_PLATFORM --build-hdl-platform $HDL_PLATFORM
   do_ocpidev build project . $RCC --hdl-rcc-platform $HDL_PLATFORM --hdl-platform $HDL_PLATFORM
-  do_ocpidev run library components
+  do_ocpidev run tests # note that "ocpidev run libraries" does not work, and "ocpi run library components" should fail!
   do_ocpidev run -d components
   fi
   if [ "$ONLY_CREATE_BUILD" == 1 ] ; then

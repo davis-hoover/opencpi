@@ -90,7 +90,12 @@
 +tools/ocpidev/ocpidev_run.py scripts/
 +tools/ocpidev/ocpishow.py scripts/
 +tools/ocpidev/ocpidev_utilization.py scripts/
-+tools/ocpidoc/ocpidoc.py <target>/bin/ocpidoc
++tools/ocpidoc/doc <target>/lib/ocpidoc/
++tools/ocpidoc/ocpidoc.py <target>/lib/ocpidoc/
++tools/ocpidoc/ocpi_documentation <target>/lib/ocpidoc/
++tools/ocpidoc/test <target>/lib/ocpidoc/
++tools/ocpidoc/xml_tools <target>/lib/ocpidoc/
++tools/ocpidoc/ocpidoc.sh <target>/bin/ocpidoc
 +tools/ocpi_protocol_view/ocpi_protocol_view.py <target>/bin/ocpi_protocol_view
 # generic make scripts
 +tools/include/show.mk include/

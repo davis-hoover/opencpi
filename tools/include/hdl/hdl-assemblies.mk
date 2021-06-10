@@ -69,10 +69,10 @@ endif
 endif
 
 clean:
-	$(AT)set -e;for a in $(Assemblies); do \
-		echo Cleaning $$a ; \
-		$(MAKE) -C $$a clean; \
-		done
+	$(AT)set -e;\
+             $(foreach a,$(Assemblies),\
+		echo Cleaning assembly: $a ; \
+		$(MAKE) -C $a $(if $(wildcard $a/Makefile),,-f $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk) clean;)
 	$(AT)rm -r -f $(LibDir) $(GenDir)
 
 ifdef ShellAssembliesVars

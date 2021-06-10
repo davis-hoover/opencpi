@@ -179,6 +179,9 @@ public:
   virtual void emitRccCImpl(FILE *f); 
   virtual void emitRccCImpl1(FILE *f); 
   virtual void emitRccArgTypes(FILE *f, bool &first);
+  void emitExtAssignmentSides(bool int2ext, const std::string &extName, const std::string &intName,
+			      const Attachment &extAt, const Attachment &intAt, size_t count,
+			      std::string &left, std::string &right) const;
   virtual void emitExtAssignment(FILE *f, bool int2ext, const std::string &extName,
 				 const std::string &intName, const Attachment &extAt,
 				 const Attachment &intAt, size_t count) const;

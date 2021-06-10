@@ -89,7 +89,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         return the package id of the library.  This information is determined from the make build
         system in order to be accurate.
         """
-        lib_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(directory, "library"),
+        lib_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(directory, "library"),
                                                mk_arg="ShellLibraryVars=1 showlib",
                                                verbose=True)
         return "".join(lib_vars['Package'])
@@ -98,7 +98,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         """
         Return the package id of the Library from the make variable that is returned
         """
-        lib_vars = ocpiutil.set_vars_from_make(mk_file=ocpiutil.get_makefile(directory, "library"),
+        lib_vars = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(directory, "library"),
                                                mk_arg="ShellLibraryVars=1 showlib",
                                                verbose=True)
         ret_package = "".join(lib_vars['Package'])
@@ -125,7 +125,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         ret_wkrs = []
         mkf=ocpiutil.get_makefile(self.directory,"library")
         ocpiutil.logging.debug("Getting valid tests from: " + mkf)
-        make_dict = ocpiutil.set_vars_from_make(mk_file=mkf,
+        make_dict = ocpiutil.set_vars_from_make(mkf,
                                                 mk_arg="ShellLibraryVars=1 showlib",
                                                 verbose=True)
         make_tests = make_dict["Tests"]

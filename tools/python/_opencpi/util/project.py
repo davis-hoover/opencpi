@@ -55,7 +55,8 @@ def get_makefile(directory, type=None):
     if os.path.exists(directory + "/Makefile"):
         mkf="Makefile"
     else:
-        mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + type + ".mk"
+        hdl = "hdl/" if type.startswith("hdl-") else ""
+        mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + hdl + type + ".mk"
     return mkf,directory
 
 def get_dirtype(directory="."):
@@ -77,6 +78,8 @@ def get_maketype(directory):
                 result = re.match(r"^\s*include\s*.*OCPI_CDK_DIR.*/include/(hdl/)?(.*)\.mk.*", line)
                 if result:
                     match = result.group(2)
+                    if match == "lib":
+                        match = "library"
     return match
 
 def get_dir_info(directory=".", careful=False):
@@ -125,20 +128,25 @@ def get_dir_info(directory=".", careful=False):
                 top_xml_elements += [ "hdldevice", "hdlimplementation" ]
     elif name == "components":
         # ambiguous: if there are worker dirs
-        if os.path.exists(directory + "/components.xml"):
+        make_type = asset_type = get_maketype(directory);
+        if make_type:
+            pass # library or libraries
+        elif os.path.exists(directory + "/components.xml"):
             make_type = asset_type = xt.parse(xml_file).getroot().tag.lower()
-        else:
+        else: # no Makefile, no xml file
             make_type = 'libraries'
-            with os.scandir(directory) as it:
-                for entry in it:
-                    if entry.is_dir():
-                        dparts = entry.name.split('.')
-                        if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
-                            make_type = asset_type = 'library'
-                            break
+            # does not work with python3 < 3.6.0
+            # with os.scandir(directory) as it:
+            it = os.scandir(directory)
+            for entry in it:
+                if entry.is_dir():
+                    dparts = entry.name.split('.')
+                    if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
+                        make_type = asset_type = 'library'
+                        break
     elif name in ["platforms", "primitives", "cards", "devices", "adapters", "assemblies" ]:
         # plurals that are usually make types but not actual assets
-        if directory.startswith(name): # incure absolutizing penalty
+        if directory.startswith(name): # incur absolutizing penalty
             directory = os.path.realpath(directory)
         parent = os.path.basename(os.path.dirname(directory))
         if parent == "rcc" and name == "platforms":

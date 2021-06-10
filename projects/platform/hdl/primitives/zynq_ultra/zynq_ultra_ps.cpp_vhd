@@ -27,8 +27,8 @@ library axi; use axi.axi_pkg.all;
 entity zynq_ultra_ps is
   port(ps_in        : in    pl2ps_t;
        ps_out       : out   ps2pl_t;
-       m_axi_hp_in  : in    axi.zynq_ultra_m_hp.axi_s2m_array_t(0 to C_M_AXI_HP_COUNT-1);
-       m_axi_hp_out : out   axi.zynq_ultra_m_hp.axi_m2s_array_t(0 to C_M_AXI_HP_COUNT-1);
+       m_axi_hp_in  : in    axi.zynq_ultra_m_hp64.axi_s2m_array_t(0 to C_M_AXI_HP_COUNT-1);
+       m_axi_hp_out : out   axi.zynq_ultra_m_hp64.axi_m2s_array_t(0 to C_M_AXI_HP_COUNT-1);
        s_axi_hp_in  : in    axi.zynq_ultra_s_hp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1);
        s_axi_hp_out : out   axi.zynq_ultra_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1));
 end entity zynq_ultra_ps;
@@ -86,8 +86,8 @@ architecture rtl of zynq_ultra_ps is
       maxigp0_awvalid : OUT STD_LOGIC;
       maxigp0_awuser : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       maxigp0_awready : IN STD_LOGIC;
-      maxigp0_wdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      maxigp0_wstrb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      maxigp0_wdata : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+      maxigp0_wstrb : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
       maxigp0_wlast : OUT STD_LOGIC;
       maxigp0_wvalid : OUT STD_LOGIC;
       maxigp0_wready : IN STD_LOGIC;
@@ -107,7 +107,7 @@ architecture rtl of zynq_ultra_ps is
       maxigp0_aruser : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       maxigp0_arready : IN STD_LOGIC;
       maxigp0_rid : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-      maxigp0_rdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      maxigp0_rdata : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
       maxigp0_rresp : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
       maxigp0_rlast : IN STD_LOGIC;
       maxigp0_rvalid : IN STD_LOGIC;
@@ -126,8 +126,8 @@ architecture rtl of zynq_ultra_ps is
       maxigp1_awvalid : OUT STD_LOGIC;
       maxigp1_awuser : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       maxigp1_awready : IN STD_LOGIC;
-      maxigp1_wdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      maxigp1_wstrb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      maxigp1_wdata : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+      maxigp1_wstrb : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
       maxigp1_wlast : OUT STD_LOGIC;
       maxigp1_wvalid : OUT STD_LOGIC;
       maxigp1_wready : IN STD_LOGIC;
@@ -147,7 +147,7 @@ architecture rtl of zynq_ultra_ps is
       maxigp1_aruser : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       maxigp1_arready : IN STD_LOGIC;
       maxigp1_rid : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-      maxigp1_rdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      maxigp1_rdata : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
       maxigp1_rresp : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
       maxigp1_rlast : IN STD_LOGIC;
       maxigp1_rvalid : IN STD_LOGIC;
@@ -166,8 +166,8 @@ architecture rtl of zynq_ultra_ps is
       maxigp2_awvalid : OUT STD_LOGIC;
       maxigp2_awuser : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       maxigp2_awready : IN STD_LOGIC;
-      maxigp2_wdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      maxigp2_wstrb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      maxigp2_wdata : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+      maxigp2_wstrb : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
       maxigp2_wlast : OUT STD_LOGIC;
       maxigp2_wvalid : OUT STD_LOGIC;
       maxigp2_wready : IN STD_LOGIC;
@@ -187,7 +187,7 @@ architecture rtl of zynq_ultra_ps is
       maxigp2_aruser : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       maxigp2_arready : IN STD_LOGIC;
       maxigp2_rid : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-      maxigp2_rdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      maxigp2_rdata : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
       maxigp2_rresp : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
       maxigp2_rlast : IN STD_LOGIC;
       maxigp2_rvalid : IN STD_LOGIC;
@@ -1568,9 +1568,9 @@ begin
     GENERIC MAP (
       C_DP_USE_AUDIO => 0,
       C_DP_USE_VIDEO => 0,
-      C_MAXIGP0_DATA_WIDTH => 32,
-      C_MAXIGP1_DATA_WIDTH => 32,
-      C_MAXIGP2_DATA_WIDTH => 32,
+      C_MAXIGP0_DATA_WIDTH => 64,
+      C_MAXIGP1_DATA_WIDTH => 64,
+      C_MAXIGP2_DATA_WIDTH => 64,
       C_SAXIGP0_DATA_WIDTH => 128,
       C_SAXIGP1_DATA_WIDTH => 128,
       C_SAXIGP2_DATA_WIDTH => 64,
@@ -1653,7 +1653,7 @@ begin
       maxigp1_bvalid => '0',
       maxigp1_arready => '0',
       maxigp1_rid => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 16)),
-      maxigp1_rdata => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      maxigp1_rdata => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 64)),
       maxigp1_rresp => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 2)),
       maxigp1_rlast => '0',
       maxigp1_rvalid => '0',
@@ -1665,7 +1665,7 @@ begin
       maxigp2_bvalid => '0',
       maxigp2_arready => '0',
       maxigp2_rid => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 16)),
-      maxigp2_rdata => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 32)),
+      maxigp2_rdata => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 64)),
       maxigp2_rresp => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 2)),
       maxigp2_rlast => '0',
       maxigp2_rvalid => '0',

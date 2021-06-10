@@ -185,9 +185,8 @@ package NAME is
     LAST   : std_logic;
     #if AXI4 && USER_WIDTH_R
     USER   : std_logic_vector(USER_WIDTH_R-1 downto 0);
-
-#endif
-
+    #endif
+// clang bug needs this line
 #endif
 
   end record r_s2m_t;

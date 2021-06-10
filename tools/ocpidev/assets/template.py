@@ -62,6 +62,7 @@ run/
 exports/
 imports
 *.pyc
+simulations/
 \n\n"""
 
 PROJ_GIT_ATTR = """

@@ -54,22 +54,23 @@ architecture rtl of axi2cp_AXI_INTERFACE is
   signal read_done        : std_logic; -- true in the last cycle of the read
   signal write_done       : std_logic; -- true in the last cycle of the write
   signal address          : std_logic_vector(cp_out.address'range);
-  -- state: actually there are 7 states: idle, read/writingn-starting, read/write, read/write-ending
   function read_byte_en(low2addr   : std_logic_vector(1 downto 0);
                         log2nbytes : std_logic_vector(2 downto 0))
     return std_logic_vector is
     variable mask : std_logic_vector(4 downto 0) := log2nbytes & low2addr;
   begin
-   case mask is -- log2nbytes & low2addr is
-     when "00000" => return "0001";
-     when "00001" => return "0010";
-     when "00010" => return "0100";
-     when "00011" => return "1000";
-     when "00100" => return "0011";
-     when "00110" => return "1100";
-     when "01000" => return "1111";
-     when others  => return "0000";
-   end case;
+    if unsigned(log2nbytes) >= 2 then
+      return "1111";
+    end if;
+    case mask is -- log2nbytes & low2addr is
+      when "00000" => return "0001";
+      when "00001" => return "0010";
+      when "00010" => return "0100";
+      when "00011" => return "1000";
+      when "00100" => return "0011";
+      when "00110" => return "1100";
+      when others  => return "0000";
+    end case;
   end read_byte_en;
   type address_state_t is (a_idle_e,   -- nothing is happening
                            a_first_e,  -- first address (or two) is being offered to cp
@@ -78,15 +79,19 @@ architecture rtl of axi2cp_AXI_INTERFACE is
                            a_last_e,   -- last address is offered to cp
                            a_taken_e); -- we're done, waiting for AXI to accept the response
   type read_state_t    is (r_idle_e,         -- nothing is happening
-                           r_first_wanted_e, -- waiting for first response
+                           r_first_wanted_e, -- waiting for first of 2 responses
                            r_first_valid_e,  -- first data is offered, not accepted
                            r_last_wanted_e,  -- waiting for last response
                            r_last_valid_e);  -- last is offered, not accepted
   signal address_state : address_state_t;
   signal read_state    : read_state_t;
-  signal addr2_r       : std_logic;
+  signal dwaddr_r      : unsigned(width_for_max(max(axi_in.W.DATA'length/32-1,1))-1 downto 0);
+  signal dw_lsb        : natural;
+  signal dw_lsb_en     : natural;
+  signal size64_r      : bool_t; -- remembering whether the request was 64 bits
   signal RVALID        : std_logic;
   signal cp_reset      : bool_t;
+  signal hold_dword_r  : dword_t; -- when the bus is > 32 bits, hold first 32 of 64 here
 begin
   --============================================================================================
   -- Clock and reset handling given that clock and reset may be (independently) from either side
@@ -120,31 +125,40 @@ begin
         case address_state is
           when a_idle_e =>
             if axi_in.AW.VALID = '1' and axi_in.W.VALID = '1' then
-              -- if we have a 32 bit wide data path and a burst of length 2 DWs, wait for next DW.
-              if axi_in.W.DATA'length = 32 and axi_in.AW.LEN = slvn(1, axi_in.AW.LEN'length) then
+              -- We are doing a 64 bit write (in two 32 bit chunks) if either:
+              ---- the data path is 32 bits and the burst is 2 words,
+              ---- the data path is > 32 bits and the transfer size is 6 (meaning 64 bits)
+              dwaddr_r      <= unsigned(axi_in.AW.ADDR(dwaddr_r'left + 2 downto 2));
+              if (axi_in.W.DATA'length = 32 and axi_in.AW.LEN = slvn(1, axi_in.AW.LEN'length)) or
+                 (axi_in.W.DATA'length > 32 and axi_in.AW.SIZE = slvn(3, axi_in.AW.SIZE'length)) then
                 address_state <= a_first_e;
-                addr2_r       <= '0';
+                size64_r      <= btrue;
+                -- hold onto the 32 MSBs to use for the second of 2 CP write cycles
+                hold_dword_r  <= axi_in.W.DATA(axi_in.W.DATA'left downto axi_in.W.DATA'left-31);
               else
-                addr2_r       <= axi_in.AW.ADDR(2);
                 address_state <= a_last_e;
+                size64_r      <= bfalse;
               end if;
             elsif axi_in.AR.VALID = '1' then
-              -- if we have a 32 bit wide data path and a burst of length 2 DWs, two cp reads
-              if axi_out.R.DATA'length = 32  and axi_in.AR.LEN = slvn(1, axi_in.AR.LEN'length) then
-                addr2_r       <= '0';
+              -- We are doing a 64 bit read (in two 32 bit chunks) if either:
+              ---- the data path is 32 bits and the burst is 2 words,
+              ---- the data path is > 32 bits and the transfer size is 6 (meaning 64 bits)
+              dwaddr_r      <= unsigned(axi_in.AR.ADDR(dwaddr_r'left + 2 downto 2));
+              if (axi_out.R.DATA'length = 32 and axi_in.AR.LEN = slvn(1, axi_in.AR.LEN'length)) or
+                 (axi_out.R.DATA'length > 32 and axi_in.AR.SIZE = slvn(3, axi_in.AR.SIZE'length)) then
                 address_state <= a_first_e;
                 read_state    <= r_first_wanted_e;
+                size64_r      <= btrue;
               else
-                addr2_r       <= axi_in.AR.ADDR(2);
                 address_state <= a_last_e;
                 read_state    <= r_last_wanted_e;
+                size64_r      <= bfalse;
               end if;
             end if;
           when a_first_e =>
             -- First of two.  The CP is taking the address and perhaps the write data
             if its(cp_in.take) then
               address_state <= a_first_1_e;
-              addr2_r <= '1';
             end if;
           when a_first_1_e =>
             -- Delay slot 1
@@ -156,9 +170,9 @@ begin
             -- last address is offered. When it is taken we must change state.
             if its(cp_in.take) then
               if (read_state = r_idle_e and axi_in.B.READY = '1') or
-                  (read_state /= r_idle_e and axi_in.R.READY = '1' and
-                   (read_state = r_last_valid_e or
-                    (read_state = r_last_wanted_e and cp_in.valid = '1'))) then
+                 (read_state /= r_idle_e and axi_in.R.READY = '1' and
+                  (read_state = r_last_valid_e or
+                   (read_state = r_last_wanted_e and cp_in.valid = '1'))) then
                 -- if a write, and write response channel is ready, we're done
                 -- if a read, and last read data is being accepted, we're done
                 address_state <= a_idle_e;
@@ -180,15 +194,16 @@ begin
           when r_idle_e =>
             -- we exit this state based on address information above
             null;
-          when r_first_wanted_e => -- implies 2 word burst
+          when r_first_wanted_e => -- implies 64 bit read
             if cp_in.valid = '1' then
-              if axi_in.R.READY = '1' then
+              hold_dword_r <= cp_in.data; -- save LSB dword and wait for second
+              if axi_in.R.READY = '1' or axi_out.R.DATA'length > 32 then
                 read_state <= r_last_wanted_e;
               else
                 read_state <= r_first_valid_e; -- waiting for RREADY
               end if;
             end if;
-          when r_first_valid_e =>
+          when r_first_valid_e => -- only here when data width is 32
             if axi_in.R.READY = '1' then
               read_state <= r_last_wanted_e;
             end if;
@@ -215,8 +230,9 @@ begin
   write_done <= to_bool(read_state = r_idle_e and
                         (address_state = a_taken_e or
                          (address_state = a_last_e and cp_in.take = '1')));
-  RVALID     <= to_bool((read_state = r_first_wanted_e and cp_in.valid = '1') or
-                        read_state = r_first_valid_e or
+  RVALID     <= to_bool((axi_out.R.DATA'length = 32 and
+                         ((read_state = r_first_wanted_e and cp_in.valid = '1') or
+                          read_state = r_first_valid_e)) or
                         read_done = '1');
   ------------------------------------------------------------------------------
   -- Now we drive external signals based on our state and the combi signals
@@ -231,7 +247,8 @@ begin
   axi_out.AW.READY <= write_done;
   -- Write Data Channel: we accept the data whenever a write request is taken
   axi_out.W.READY  <= to_bool(read_state = r_idle_e and cp_in.take = '1' and
-                             (address_state = a_first_e or address_state = a_last_e));
+                              ((address_state = a_first_e and axi_in.W.DATA'length = 32)
+                               or address_state = a_last_e));
   -- Write Response Channel: we offer the write response
   axi_out.B.ID     <= axi_in.AW.ID; -- we only do one at a time so we loop back the ID
   axi_out.B.RESP   <= Resp_OKAY;
@@ -240,7 +257,18 @@ begin
   axi_out.AR.READY <= read_done;
   -- Read Data Channel
   axi_out.R.ID     <= axi_in.AR.ID;
-  axi_out.R.DATA(cp_in.data'range)   <= cp_in.data; -- not right for > 32 bits
+  g0: if axi_out.R.DATA'length = 32 generate
+    axi_out.R.DATA <= cp_in.data;
+  end generate;
+  g1: if axi_out.R.DATA'length > 32 generate
+    -- provide the data based on addressing.
+    -- either it is a 64 bit word with the last data as MSB or the data
+    -- bets routed to log or high based on the address
+    g2: for i in 0 to axi_out.R.DATA'length/32-1 generate
+      axi_out.R.DATA(i*32+31 downto i*32) <=
+        hold_dword_r when size64_r and i = dwaddr_r else cp_in.data;
+    end generate;
+  end generate;
   axi_out.R.RESP   <= Resp_OKAY;
   axi_out.R.LAST   <= read_done;
   axi_out.R.VALID  <= RVALID;
@@ -257,10 +285,22 @@ begin
                        when read_state = r_idle_e else
                        axi_in.AR.ADDR(cp_out.address'left + 2 downto 2);
   cp_out.address(cp_out.address'left downto 1) <= address(address'left downto 1);
-  cp_out.address(0) <= addr2_r;
-  cp_out.byte_en    <= axi_in.W.STRB(cp_out.byte_en'range) when read_state = r_idle_e else
-                       read_byte_en(axi_in.AR.ADDR(1 downto 0),
-                                    axi_in.AR.SIZE);
-  cp_out.data       <= axi_in.W.DATA(cp_out.data'range); -- not right for > 32 bits
-  cp_out.take       <= RVALID and axi_in.R.READY;
+  cp_out.address(0) <= '0' when size64_r and address_state = a_first_e else
+                       '1' when size64_r and address_state /= a_first_e else
+                       dwaddr_r(0);
+  g3: if axi_in.W.DATA'length = 32 generate
+    cp_out.data       <= axi_in.W.DATA;
+    cp_out.byte_en    <= axi_in.W.STRB(cp_out.byte_en'range) when read_state = r_idle_e else
+                         read_byte_en(axi_in.AR.ADDR(1 downto 0), axi_in.AR.SIZE);
+  end generate;
+  g4: if axi_in.W.DATA'length > 32 generate
+    dw_lsb    <= to_integer(dwaddr_r & "00000");
+    dw_lsb_en <= to_integer(dwaddr_r & "00");
+    cp_out.data    <= axi_in.W.DATA(dw_lsb + 31 downto dw_lsb);
+    cp_out.byte_en <= axi_in.W.STRB(dw_lsb_en + 3 downto dw_lsb_en) when read_state = r_idle_e else
+                      read_byte_en(axi_in.AR.ADDR(1 downto 0), axi_in.AR.SIZE);
+  end generate;
+  cp_out.take      <= to_bool(its(cp_in.valid) and 
+                              ((axi_out.R.DATA'length > 32 and read_state = r_first_wanted_e) or
+                               (RVALID = '1' and axi_in.R.READY = '1')));
 end rtl;

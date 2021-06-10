@@ -35,16 +35,8 @@ set_property -dict [list CONFIG.PRIMITIVE $clock_prim] [get_ips $ip_module]
 generate_target all [get_files $ip_dir/$ip_module.xci]
 create_ip_run [get_files -of_objects [get_fileset sources_1] $ip_dir/$ip_module.xci]
 
-# Runs synthesis because as far as we can tell the only way to get the simulatable code 
-# (sim_netlist as Xilinx calls it), is to run synthesis first (strange that they did it like 
-# that). The simulatable code is generated as a result. We throw away the synthesis results afterwards 
-# and only keeo the source files. 
-launch_runs ${ip_module}_synth_1
-wait_on_run ${ip_module}_synth_1
-
 # Find the generated IP
 set ip_hw  [fileutil::find [pwd] is_ip_file_hw]
 set ip_src_dir [string trim $ip_hw ${ip_module}_clk_wiz.v]
 
 file copy -force $ip_hw ../${ip_module}.v
-file copy -force $ip_src_dir/${ip_module}_sim_netlist.vhdl ../${ip_module}_sim.vhd
