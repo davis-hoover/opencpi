@@ -60,7 +60,7 @@
   </Instance>
   <Instance Component="ocpi.core.file_write">
     <!-- ACI relies on this property being set here in the OAS -->
-    <Property Name="fileName"       Value="fsk_dig_radio_ctrlr_fmcomms_2_3_txrx.bin"/>
+    <Property Name="fileName"       Value="fsk_csts_dig_radio_ctrlr_fmcomms_2_3_txrx.bin"/>
 
     <Property Name="messagesInFile" Value="false"/>
   </Instance>
@@ -73,7 +73,7 @@
     <!--
     <slave instance="platform_ad9361_data_sub" slave="data_sub"/>
     <slave instance="platform_ad9361_config" slave="config"/>
-    <slave instance="data_src_qadc" slave="rx_qadc0"/>
+    <slave instance="data_src_qadc_csts" slave="rx_qadc0"/>
     <slave instance="complex_mixer" slave="rx_complex_mixer0"/>
     <slave instance="cic_dec" slave="rx_cic_dec0"/>
     <slave instance="cic_int" slave="tx_cic_int0"/>
@@ -118,7 +118,7 @@
 
   <Instance Component="ocpi.platform.devices.platform_ad9361_config"/>
 
-  <Instance Component="ocpi.platform.devices.data_src_qadc" connect='csts_to_iqstream'/>
+  <Instance Component="ocpi.platform.devices.data_src_qadc_csts" connect='csts_to_iqstream'/>
   <Instance Component="ocpi.assets.misc_comps.csts_to_iqstream" connect='complex_mixer'/>
   <Instance Component="ocpi.assets.dsp_comps.complex_mixer" connect="cic_dec">
     <Property Name="NCO_DATA_WIDTH_p"   Value="12"/>

@@ -1,0 +1,27 @@
+<HdlContainer config='base'
+              only='zcu104'
+              constraints='cnt_zcu104_fmcomms_2_3_scdcd.xdc'>
+  <Device name='platform_ad9361_spi' card='fmcomms_2_3_lpc_scdcd'>
+    <!-- MUST provide to this worker the zcu104's control plane clock freq value -->
+    <Property name='CP_CLK_FREQ_HZ_p' value='100e6'/>
+  </Device>
+  <Device name='platform_ad9361_data_sub' card='fmcomms_2_3_lpc_scdcd'>
+    <Property name='lvds_p' value='true'/>
+    <Property name='DATA_CLK_Delay' value='4'/>
+    <Property name='RX_Data_Delay' value='0'/>
+  </Device>
+  <Device name='platform_ad9361_config' card='fmcomms_2_3_lpc_scdcd'>
+    <Property name='pin_control_p' value='true'/>
+  </Device>
+  <Device name='data_src_qadc_ad9361_sub' card='fmcomms_2_3_lpc_scdcd'>
+    <Property name='lvds_p' value='true'/>
+  </Device>
+  <Device name='data_src_qadc0' card='fmcomms_2_3_lpc_scdcd'>
+    <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
+  </Device>
+  <Connection external='in_to_asm_rx_path_from_adc'
+              port='out'
+              device='data_src_qadc0'
+              card='fmcomms_2_3_lpc_scdcd'/>
+  <Connection external='out_from_asm_rx_path' interconnect='zynq_ultra'/>
+</HdlContainer>
