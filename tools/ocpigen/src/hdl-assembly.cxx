@@ -729,7 +729,7 @@ createConnectionSignals(FILE *f, Language lang) {
   if (m_attachments.size() &&
       !(m_attachments.size() == 1 &&
 	m_attachments.front()->m_connection.m_attachments.size() == 2 &&
-	m_attachments.front()->m_connection.m_external) &&
+	m_attachments.front()->m_connection.m_external && m_port->m_type != SDPPort) &&
       maxCount <= m_port->count() && (m_port->isArray() || !otherIsArray) &&
       (m_port->m_type != TimePort || m_port->m_master)) {
     emitConnectionSignal(f, true, lang);
@@ -1263,10 +1263,10 @@ emitAssyHDL() {
       assert(internal);
       Port &p = *c.m_external->m_instPort.m_port;
       std::string &nameExt2In = p.m_master ? c.m_slaveName : c.m_masterName;
-      if (internal->m_signalOut.size() && nameExt2In.size() && p.haveInputs())
+      if (internal->m_signalIn.size() && nameExt2In.size() && p.haveInputs())
 	assignExt(f, c, nameExt2In, false);
       std::string &nameIn2Ext = p.m_master ? c.m_masterName : c.m_slaveName;
-      if (internal->m_signalIn.size() && nameIn2Ext.size() && p.haveOutputs())
+      if (internal->m_signalOut.size() && nameIn2Ext.size() && p.haveOutputs())
 	assignExt(f, c, nameIn2Ext, true);
     }
   }

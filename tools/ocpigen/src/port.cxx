@@ -1041,8 +1041,9 @@ initRole(OCPI::Util::Assembly::Role &) {
 }
 
 void Port::
-emitExtAssignment(FILE *f, bool int2ext, const std::string &extName, const std::string &intName,
-		  const Attachment &extAt, const Attachment &intAt, size_t connCount) const {
+emitExtAssignmentSides(bool int2ext, const std::string &extName, const std::string &intName,
+		       const Attachment &extAt, const Attachment &intAt, size_t connCount,
+		       std::string &left, std::string &right) const {
   std::string ours = extName;
   if (isArray()) { //connCount < m_arrayCount || m_countExpr.size()) {
     if (connCount == 1)
@@ -1055,9 +1056,16 @@ emitExtAssignment(FILE *f, bool int2ext, const std::string &extName, const std::
     OU::formatAdd(theirs, "(%zu)", intAt.m_index);
   else
     OU::formatAdd(theirs, "(%zu to %zu)", intAt.m_index, intAt.m_index + connCount - 1);
-  fprintf(f, "  %s <= %s;\n",
-	  int2ext ? ours.c_str() : theirs.c_str(),
-	  int2ext ? theirs.c_str() : ours.c_str());
+  left = int2ext ? ours.c_str() : theirs.c_str();
+  right = int2ext ? theirs.c_str() : ours.c_str();
+}
+
+void Port::
+emitExtAssignment(FILE *f, bool int2ext, const std::string &extName, const std::string &intName,
+		  const Attachment &extAt, const Attachment &intAt, size_t connCount) const {
+  std::string left, right;
+  emitExtAssignmentSides(int2ext, extName, intName, extAt, intAt, connCount, left, right);
+  fprintf(f, "  %s <= %s;\n", left.c_str(), right.c_str());
 }
 const char *Port::
 adjustConnection(Connection &/*c*/, bool /*isProducer*/, OcpAdapt */*myAdapt*/, bool &/*myHasExpr*/,
