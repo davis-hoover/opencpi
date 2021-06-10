@@ -270,9 +270,7 @@ options = {
         'action': 'append'
     },
     'workers_as_needed': {
-        'long': [
-            '--workers-as-needed',
-        ],
+        'long': '--workers-as-needed',
         'action': 'store_true'
     },
 }

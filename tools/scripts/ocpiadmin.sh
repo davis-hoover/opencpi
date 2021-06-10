@@ -239,7 +239,6 @@ else
 fi
 
 # End parsing and validation of positional args
-set -e
 
 #
 # The "deploy" case is trivial: "deploy-platform.sh"
