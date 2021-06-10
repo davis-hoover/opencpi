@@ -27,7 +27,7 @@
 namespace OL = OCPI::Library;
 
 struct Case;
-
+Case cases;
 const char *doExcludePlatform(const char *a_platform, void *arg) {
   Case &c = *(Case *)arg;
   OrderedStringSet platforms;

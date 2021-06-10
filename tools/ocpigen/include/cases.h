@@ -41,6 +41,7 @@
 #include "data.h"
 #include "comp.h"
 #include "input-output.h"
+#include "cases.h"
 
   // A test case, which may apply against multiple configurations
   // Default is:
@@ -60,6 +61,7 @@
   typedef std::vector<InputOutput> InputOuftputs;
 
   struct Case {
+      //Case cases;
       std::string m_name;
       Strings m_onlyPlatforms, m_excludePlatforms; // can only apply these at runtime
       Workers m_workers; // the inclusion/exclusion happens at parse time

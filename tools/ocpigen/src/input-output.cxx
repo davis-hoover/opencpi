@@ -245,5 +245,4 @@ const char *emulatorName() {
     em = emulator->m_specName;
   return em;
 }
-
-#endif // __INPUT-OUTPUT_H__
+#endif

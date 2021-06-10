@@ -43,6 +43,7 @@
 #include "wip.h"
 #include "data.h"
 #include "comp.h"
+#include "input-output.h"
 
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"

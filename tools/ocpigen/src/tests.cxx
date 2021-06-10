@@ -74,7 +74,6 @@ addNonParameterProperties(Worker &w, ParamConfig &globals) {
 }
 const char *
 createTests(const char *file, const char *package, const char */*outDir*/, bool a_verbose) {
-  //Case *cases;
   verbose = a_verbose;
   const char *err;
   std::string parent, specFile;

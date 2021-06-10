@@ -196,7 +196,7 @@ const char *getSpec(ezxml_t xml, const std::string &parent, const char *a_packag
   return NULL;
 }
 
-inline bool operator() (const WorkerConfig &lhs, const WorkerConfig &rhs) const {
+inline bool comp::operator() (const WorkerConfig &lhs, const WorkerConfig &rhs) const {
   // Are all the non-impl parameter values the same?
   // Since they are all from the same spec the order will be the same
     if (lhs.second < rhs.second)

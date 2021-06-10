@@ -40,13 +40,10 @@
 #include "hdl-device.h"
 #include "wip.h"
 #include "data.h"
-//#include "comp.h"
+#include "comp.h"
 
 
 typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
-struct comp;
-typedef std::set<WorkerConfig, comp> WorkerConfigs;
-
 
 const char *remove(const std::string &name);
 unsigned matchedWorkers; // count them even if they are not built or usable
@@ -72,6 +69,11 @@ const char *
 getSpec(ezxml_t xml, const std::string &parent, const char *a_package, ezxml_t &spec,
         std::string &specFile, std::string &a_specName);
 typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
+
+struct comp;
+typedef std::set<WorkerConfig, comp> WorkerConfigs;
+
+
 struct comp
 {
   inline bool operator()(const WorkerConfig &lhs, const WorkerConfig &rhs) const;
