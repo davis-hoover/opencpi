@@ -16,7 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- This module is just a pacifier for unused axi HP ports.
+-- This module is just a pacifier for unused axi HP ports.  It is an AXI master.
 -- The clock and reset are injected to be supplied to both sides
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library platform; use platform.platform_pkg.all;
