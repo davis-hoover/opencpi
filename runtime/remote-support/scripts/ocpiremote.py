@@ -42,10 +42,13 @@ def main():
     ocpi_server_addresses = os.environ.get('OCPI_SERVER_ADDRESSES')
     ip = None
     port = None
-
-    if ocpi_server_addresses and ':' in ocpi_server_addresses:
-        ip = ocpi_server_addresses.split(':')[0]
-        port = ocpi_server_addresses.split(':')[1]
+    if ocpi_server_addresses:
+      # server addresses separated by comma or spaces
+      ocpi_server_addresses = ocpi_server_addresses.replace(',', ' ').split()
+      if ':' in ocpi_server_addresses[0]:
+        ip,port = ocpi_server_addresses[0].split(':')
+      else:
+        ip = ocpi_server_addresses[0]
 
     option_ip = make_option(
         '-i', '--ip-addr',
