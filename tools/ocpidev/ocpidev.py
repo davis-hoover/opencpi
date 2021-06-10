@@ -115,7 +115,7 @@ def ocpidev_sh():
     args = ' '.join(sys.argv)
     cmd = '{} {}'.format(ocpidev_sh_path, args)
     rc = os.system(cmd)
-    sys.exit(rc)
+    sys.exit(0 if rc == 0 else 1)
 
 
 if __name__ == '__main__':
