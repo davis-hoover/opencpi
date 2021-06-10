@@ -239,6 +239,7 @@ else
 fi
 
 # End parsing and validation of positional args
+set -e
 
 #
 # The "deploy" case is trivial: "deploy-platform.sh"
@@ -392,17 +393,16 @@ else
     then
         if [ -n "$minimal" ]; then
           ocpidev -d $project_dir build hdl primitives library --hdl-platform=$platform
-          ocpidev -d $project_dir build hdl platform $platform
+          ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
         else
           ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
         fi
         echo "HDL platform \"$platform\" built for OSP in $project_dir."
     elif [ -n "$minimal" ]; then
       # Build the platform in its project
-      ocpidev -d $project_dir build hdl platform $platform
+      ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
     fi
-    set -e
-    ocpidev -d projects/assets build --hdl-platform=$platform hdl assembly testbias
+    ocpidev -d projects/assets build --hdl-platform=$platform hdl ${minimal:+--workers-as-needed} assembly testbias
     echo "HDL platform \"$platform\" built, with one HDL assembly (testbias) built for testing."
     echo "Preparing exported files for using this platform."
     #

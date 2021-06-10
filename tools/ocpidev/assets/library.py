@@ -22,9 +22,6 @@ Definition of Library and Library collection classes
 import os
 import logging
 import _opencpi.util as ocpiutil
-import jinja2
-import _opencpi.assets.template as ocpitemplate
-import subprocess
 from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset, Asset
 from .factory import AssetFactory
 from .worker import Worker, HdlWorker
@@ -193,101 +190,6 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             return name
         else:
             ocpiutil.throw_specify_lib_e()
-
-    def _get_template_dict(name, directory, **kwargs):
-        """
-        used by the create function/verb to generate the dictionary of viabales to send to the
-        jinja2 template.
-        valid kwargs handled at this level are:
-            package_id     (string)      - Package for a project  (used instead of package_prefix
-                                           and package_name usually)
-            package_prefix (string)      - Package prefix for a project (used instead of package_id
-                                           usually)
-            package_name   (string)      - Package name for a project  (used instead of package_id
-                                           usually)
-            comp_lib       (list of str) - Specify ComponentLibraries in Makefile
-            xml_include    (list of str) - Specify XmlIncludeDirs in Makefile
-            include_dir    (list of str) - Specify IncludeDirs in Makefile
-            prim_lib       (list of str) - Specify Libraries in Makefile
-        """
-        package_id = kwargs.get("package_id", None)
-        package_prefix =kwargs.get("package_prefix", None)
-        package_name =  kwargs.get("package_name", None)
-        comp_lib = kwargs.get("comp_lib", None)
-        if comp_lib:
-            comp_lib = " ".join(comp_lib)
-        xml_include = kwargs.get("xml_include", None)
-        if xml_include:
-            xml_include = " ".join(xml_include)
-        include_dir = kwargs.get("include_dir", None)
-        if include_dir:
-            include_dir = " ".join(include_dir)
-        prim_lib = kwargs.get("prim_lib", None)
-        if prim_lib:
-            prim_lib = " ".join(prim_lib)
-        template_dict = {
-                        "name" : name,
-                        "comp_lib" : comp_lib,
-                        "xml_include" :xml_include,
-                        "include_dir" : include_dir,
-                        "prim_lib" : prim_lib,
-                        "package_id" : package_id,
-                        "package_name" : package_name,
-                        "package_prefix" : package_prefix,
-                        "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
-                                                                                    package_prefix,
-                                                                                    package_name, directory)
-                        }
-        return template_dict
-
-    @staticmethod
-    def create(name, directory, **kwargs):
-        """
-        Create library assets
-	FIXME: name is optional
-        """
-        compdir = None
-        libdir = None
-        dirtype = ocpiutil.get_dirtype(directory)
-        if dirtype != "project" and dirtype != "libraries":
-           raise ocpiutil.OCPIException(directory + " must be a project or components directory")
-
-        if dirtype == "project":
-            compdir = directory + "/components/"
-            if not os.path.isdir(compdir):
-                os.mkdir(compdir) 
-            if name:
-                libdir = compdir + name
-            os.chdir(compdir)
-
-        currdir = os.getcwd()
-        currtype = ocpiutil.get_dirtype(currdir)
-        if not currtype == "libraries":
-            raise ocpiutil.OCPIException("Assert: " + currdir + " must be of type libraries")
-        if not compdir:
-            compdir = currdir
-        if not libdir:
-            libdir = currdir
-            if name:
-                libdir = currdir + "/" + name
-        if os.path.exists(libdir):
-            raise ocpiutil.OCPIException(libdir + " already exists.")
-        os.mkdir(libdir) 
-
-        template_dict = Library._get_template_dict(name, compdir, **kwargs)
-        #if not os.path.exists(compdir + "/Makefile"):
-        #    template = jinja2.Template(ocpitemplate.LIB_MAKEFILE, trim_blocks=True)
-        #    ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
-        os.chdir(libdir)
-        template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
-        ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
-        template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
-        ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
-        subprocess.check_call('make')
-        cdkdir = os.environ.get('OCPI_CDK_DIR')
-        metacmd = cdkdir + "/scripts/genProjMetaData.py "
-        os.system(metacmd + directory)
-
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
     """

@@ -93,7 +93,6 @@ def ocpicreate(args):
     """
     class_dict = {
         "project": ocpiassets.project.Project,
-        "library": ocpiassets.library.Library,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
@@ -116,7 +115,7 @@ def ocpidev_sh():
     args = ' '.join(sys.argv)
     cmd = '{} {}'.format(ocpidev_sh_path, args)
     rc = os.system(cmd)
-    sys.exit(1 if rc != 0 else 0)
+    sys.exit(rc)
 
 
 if __name__ == '__main__':
