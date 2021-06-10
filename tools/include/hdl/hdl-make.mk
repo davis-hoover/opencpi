@@ -139,13 +139,17 @@ HdlFindWorkerCore=$(strip \
   $(or $(HdlFoundCore),\
     $(if $(HdlFoundInLib),\
       $(foreach l,$(HdlFoundInLib:%/lib=%),\
-        $(info Warning:  HDL worker "$2" found in component library "$l" $(strip\
-               ($(realpath $l)), but build config "$4" not built for target "$1"))\
+	$(if $(OCPI_AUTO_BUILD_WORKERS),\
+          $(info Warning:  HDL worker "$2" found in component library "$l" $(strip\
+               ($(realpath $l)), but build config "$4" not built for target "$1")),\
+          $(info Error:  HDL worker "$2" found in component library "$l" $(strip\
+               ($(realpath $l)), but build config "$4" not built for target "$1"))$(error ))\
         $(eval $(call HdlAutoWorkerRule,$(HdlFoundInLib),$l,$1,$2,$3,$4))\
 	$(eval HdlAutoCores+=$(HdlFoundInLib)/hdl/$1/$3$(HdlBin))\
         $(HdlFoundInLib)/hdl/$1/$3$(HdlBin)),\
       $(if $(filter-out $(HdlBuiltinWorkers),$2),\
-        $(error Worker "$2" was not found built for target "$1" in any of the component libraries)))))
+        $(info Error:  Worker "$2" was not found built for target "$1" in any of the component libraries)\
+        $(error )))))
 
 ################################################################################
 # This is called with a target argument in the context of generating recipes
