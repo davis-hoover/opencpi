@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from inspect import signature
+from os import chdir
 from pathlib import Path
 from subprocess import call
 import sys
@@ -41,6 +42,8 @@ def main():
     """
     ocpiutil.get_cdk_path() # Check cdk path exists and is valid
     args = ocpiargparse.parse_args(args_dict, prog='ocpidev')
+    args = postprocess_args(args)
+    change_dir(args)
     sys.argv = sys.argv[1:]
     # If verb is handled by another python script or function, hand off to it.
     # TODO: change argparsers in these scripts to use ocpiargs.py
@@ -89,7 +92,90 @@ def main():
         sys.exit(1)
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
+        print(e)
         ocpidev_sh()
+
+
+def postprocess_args(args):
+    """
+    TODO: docstring
+    """
+    args.libbase = 'hdl' if hasattr(args, 'hdl-noun') else None
+    if not hasattr(args, 'library') or args.library == None:
+    # If library option not provided
+        if args.noun in ['card', 'slot', 'hdl-card', 'hdl-slot']:
+            args.library = str(Path('hdl', 'cards'))
+        elif hasattr(args, 'hdl_library'):
+            args.library = str(Path('hdl', args.hdl_library))
+    print(args)
+    return args
+
+
+def get_subdir_path(args):
+    """
+    TODO: docstring
+    """
+    libassets = ['worker', 'device', 'spec', 'component', 'protocol', 
+                 'properties', 'signals', 'test', 'card', 'slot']
+    if not args.noun in libassets:
+        if not hasattr(args, 'hdl_noun') or not args.hdl_noun in libassets:
+            return args.directory
+
+    subdir_path = Path(args.directory)
+    dirtype = ocpiutil.get_dirtype(args.directory)
+    print(dirtype)
+    do_autocreate = False
+    standalone = True
+    if not hasattr(args, 'standalone') or args.standalone == False:
+        standalone = False
+    if not standalone:
+        if dirtype == 'project':
+            hdl_path = Path(args.directory, 'hdl')
+            if hasattr(args, 'library') and args.library is not None:
+                library_path = Path(args.library)
+            else:
+                pass
+            if args.libbase == 'hdl' and not hdl_path.exists():
+                hdl_path.mkdir()
+            if library_path.name in ['cards', 'devices', 'adapters']:
+                subdir_path = Path(subdir_path, library_path)
+                do_autocreate = True
+            elif args.library == 'components':
+                subdir_path = Path(subdir_path, library_path)
+            elif library_path.parent == 'hdl':
+                subdir_path = Path(subdir_path, library_path)
+            else:
+                subdir_path = Path(subdir_path, 'components', 'library')
+    
+    if not subdir_path.exists() and args.verb == 'create' and do_autocreate:
+        #TODO: Make library
+        pass
+    if not subdir_path.exists():
+        err_msg = 'the library for "{}" ({}) does not exist'.format(
+            str(library_path), str(subdir_path))
+        raise ocpiutil.OCPIException(err_msg)
+    dirtype = ocpiutil.get_dirtype(str(subdir_path))
+    do_project = True if hasattr(args, 'project') and args.project else False
+    if not standalone and dirtype != 'library' and not do_project:
+        err_msg = ' '.join(['the directory for "{}" ({})'.format(
+                                str(library_path), str(subdir_path)),
+                            'is not a library - it is of type "{}"'.format(
+                                dirtype)])
+        raise ocpiutil.OCPIException(err_msg)
+
+    return subdir_path
+    
+
+def change_dir(args):
+    """
+    TODO: doctstring
+    """
+    subdir_path = get_subdir_path(args)
+    print(subdir_path)
+    sys.exit()
+    chdir(subdir_path)
+
+    return
 
 
 def ocpicreate(args):
@@ -115,6 +201,7 @@ def ocpicreate(args):
 
 def ocpidev_sh():
     """Calls ocpidev.sh and exits"""
+    print('ocpidev.sh')
     cdk_dir = ocpiutil.get_cdk_path()
     ocpidev_sh_path = str(Path(cdk_dir, 'scripts', 'ocpidev.sh'))
     cmd = sys.argv
