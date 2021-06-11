@@ -431,7 +431,7 @@ def get_project_package(origin_path="."):
                 return None
     return project_package
 
-def does_project_with_package_exist(origin_path=".", package=None):
+def does_project_with_package_exist(origin_path=".", package=None, return_project_dir=False):
     """
     Determine if a project with the given package exists and is registered. If origin_path is not
     specified, assume we are interested in the current project. If no package is given, determine
@@ -449,6 +449,8 @@ def does_project_with_package_exist(origin_path=".", package=None):
             return False
     for project in glob(project_registry_dir + "/*"):
         if get_project_package(project) == package or os.path.basename(project) == package:
+            if return_project_dir:
+                return project
             return True
     return False
 

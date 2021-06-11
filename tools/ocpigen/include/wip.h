@@ -183,6 +183,9 @@ class SdpPort : public Port {
   void emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
 		      const std::string &aname, const std::string &index, bool output,
 		      const Port *signalPort, bool external);
+  void emitExtAssignment(FILE *f, bool int2ext, const std::string &extName,
+			 const std::string &intName, const Attachment &extAt,
+			 const Attachment &intAt, size_t count) const;
 };
 class MetaDataPort : public Port {
   MetaDataPort(const MetaDataPort &other, Worker &w , std::string &name, size_t count,

@@ -57,9 +57,9 @@ A block diagram representation of the implementation is given in :numref:`platfo
 
 Interface
 ---------
-.. This spec does not exist. The actual spec lives in the assets project and does not have the platform_ prefix. To make the directive work, the spec needs to exist in the platform/hdl/devices/specs directory and  have the platform_ prefix, as shown in the directive below.
+.. The spec referenced below is a link to the spec in the assets project and the tool can't presently follow the link. The tool search paths need to be updated to look in that location.
    
-.. literalinclude:: ../specs/platform_ad9361_config_proxy-spec.xml
+.. literalinclude:: ../specs/ad9361_config_proxy-spec.xml
    :language: xml
 
 Ports
