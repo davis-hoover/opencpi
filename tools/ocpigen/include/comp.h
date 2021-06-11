@@ -40,12 +40,19 @@
 #include "hdl-device.h"
 #include "wip.h"
 #include "data.h"
-#include "comp.h"
+
+#define TESTS "-tests.xml"
+#define MS_CONFIG "bypass", "metadata", "throttle", "full"
+namespace OL = OCPI::Library;
+// The package serves two purposes: the spec and the impl.
+// If the spec already has a package prefix, then it will only
+// be used as the package of the impl.
+// FIXME: share this with the one in parse.cxx
+
+//class Worker;
+//typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
 
 
-typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
-
-const char *remove(const std::string &name);
 unsigned matchedWorkers; // count them even if they are not built or usable
 Workers workers;
 std::string testFile;
@@ -60,6 +67,7 @@ bool verbose;
 Strings excludeWorkers, excludeWorkersTmp;
 bool testingOptionalPorts;
 
+const char *remove(const std::string &name);
 const char *
 findPackage(ezxml_t spec, const char *package, const char *specName,
           const std::string &parent, const std::string &specFile, std::string &package_out);
@@ -70,12 +78,9 @@ getSpec(ezxml_t xml, const std::string &parent, const char *a_package, ezxml_t &
         std::string &specFile, std::string &a_specName);
 typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
 
-struct comp;
-typedef std::set<WorkerConfig, comp> WorkerConfigs;
-
-
 struct comp
 {
   inline bool operator()(const WorkerConfig &lhs, const WorkerConfig &rhs) const;
 };
+typedef std::set<WorkerConfig, comp> WorkerConfigs;
 #endif

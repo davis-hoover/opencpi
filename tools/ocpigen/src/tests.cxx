@@ -78,7 +78,6 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   const char *err;
   std::string parent, specFile;
   ezxml_t xml, xspec;
-  bool isOptional = !testingOptionalPorts;
   if (!file || !file[0]) {
     static char x[] = "<tests/>";
     xml = ezxml_parse_str(x, strlen(x));
@@ -420,12 +419,8 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
   if (verbose)
     fprintf(stderr, "Generating required HDL assemblies in gen/assemblies\n");
   bool hdlFileIO;
-  bool optional;
-  if ((err = OE::getBoolean(xml, "TestOptional", &optional)))
-    return err;
   if ((err = OE::getBoolean(xml, "UseHdlFileIO", &hdlFileIO)))
     return err;
-  std::cout << "section 11 optional: " << optional << "\n";
   const char *env = getenv("OCPI_FORCE_HDL_FILE_IO");
   if (env)
     hdlFileIO = env[0] == '1';
@@ -439,7 +434,6 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
       assert(w.m_paramConfigs.size());
       for (unsigned c = 0; c < w.m_paramConfigs.size(); ++c) {
         ParamConfig &pc = *w.m_paramConfigs[c];
-        //std::cout << "paramconfig section 11 " << pc.ge << "\n";
         // Make sure the configuration is in the test matrix (e.g. globals)
         bool allOk = true;
         for (unsigned n = 0; allOk && n < pc.params.size(); n++) {
@@ -473,7 +467,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
         //there's always at least one case if there's a -test.xml
         if ((err = generateHdlAssembly(w, c, dir, name, false, assyDirs, cases[0]->m_ports)))
           return err;
-        if (!isOptional) {
+        if (testingOptionalPorts) {
           for (unsigned n = 0; n < cases.size(); n++) {
             std::ostringstream temp; //can't use to_string
             temp << n;
@@ -486,8 +480,7 @@ createTests(const char *file, const char *package, const char */*outDir*/, bool 
           dir += "_frw";
           if ((err = generateHdlAssembly(w, c, dir, name, true, assyDirs, cases[0]->m_ports)))
             return err;
-          if (!isOptional) {
-            std::cout << "testingoptionalports id hdl "<< testingOptionalPorts << "\n";
+          if (testingOptionalPorts) {
             for (unsigned n = 0; n < cases.size(); n++) {
               std::ostringstream temp; //can't use to_string
               temp << n;

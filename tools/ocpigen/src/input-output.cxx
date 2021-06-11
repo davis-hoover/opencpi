@@ -1,6 +1,3 @@
-#ifndef __INPUT-OUTPUT_H__
-#define __INPUT-OUTPUT_H__
-
 /*
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
@@ -44,14 +41,12 @@
 #include "wip.h"
 #include "data.h"
 #include "comp.h"
-#include "input-output.h"
 
 namespace OL = OCPI::Library;
 
-struct InputOutput;
-
 Worker *emulator = NULL;
 static const char *s_stressorMode[] = { MS_CONFIG, NULL };
+
 const char *
 tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool specific) {
   ocpiInfo("Considering worker \"%s\"", wname);
@@ -118,7 +113,9 @@ tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool 
   delete w;
   return err;
 }
-
+InputOutput::InputOutput() //is this supposed to be here or in the .cxx?
+    : m_port(NULL), m_messageSize(0), m_messagesInFile(false), m_suppressEOF(false),
+      m_disableBackpressure(false), m_stopOnEOF(false), m_testOptional(false), m_msMode(bypass) {}
 const char *InputOutput::parse(ezxml_t x, std::vector<InputOutput> *inouts) {
     const char
       *name = ezxml_cattr(x, "name"),
@@ -205,14 +202,14 @@ const char *InputOutput::parse(ezxml_t x, std::vector<InputOutput> *inouts) {
     }
 
     return NULL;
-  }  
+  } 
+
 static InputOutput *findIO(Port &p, InputOutputs &ios) {
   for (unsigned n = 0; n < ios.size(); n++)
     if (ios[n].m_port == &p)
       return &ios[n];
   return NULL;
 }
-static const char *s_smode[] = { MS_CONFIG, NULL };
 static InputOutput *findIO(const char *name, InputOutputs &ios) {
   for (unsigned n = 0; n < ios.size(); n++)
     if (!strcasecmp(ios[n].m_name.c_str(), name))
@@ -224,6 +221,7 @@ const char *doInputOutput(ezxml_t x, void *) {
   inouts.resize(inouts.size() + 1);
   return inouts.back().parse(x, &inouts);
 }
+OrderedStringSet onlyPlatforms, excludePlatforms;
 const char *doPlatform(const char *platform, Strings &platforms) {
   platforms.insert(platform); // allow duplicates
   return NULL;
@@ -234,10 +232,10 @@ const char *doWorker(Worker *w, void *arg) {
     if (w == *wi)
       OU::esprintf("worker \"%s\" is already in the list", w->cname());
   set.push_back(w);
-  return NULL; 
-  }
-const char *emulatorName() {
-  InputOutput *io;
+  return NULL;
+}
+const char *
+emulatorName() {
   const char *em =  emulator ? strrchr(emulator->m_specName, '.') : NULL;
   if (em)
     em++;
@@ -245,4 +243,5 @@ const char *emulatorName() {
     em = emulator->m_specName;
   return em;
 }
+
 #endif

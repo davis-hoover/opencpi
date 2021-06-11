@@ -1,24 +1,22 @@
-#include <cstddef>
-#include <string>
-#include <strings.h>
-#include <cassert>
-#include <vector>
-#include <strings.h>
-#include <sstream>
-#include <set>
-#include <limits>
-#include <algorithm>
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsFileSystem.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
-#include "OcpiLibraryManager.h"
-#include "parameters.h"
-#include "hdl-device.h"
-#include "wip.h"
-#include "data.h"
-#include "comp.h"
-#include "input-output.h"
+/*
+ * This file is protected by Copyright. Please refer to the COPYRIGHT file
+ * distributed with this source distribution.
+ *
+ * This file is part of OpenCPI <http://www.opencpi.org>
+ *
+ * OpenCPI is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * OpenCPI is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "cases.h"
 
 #define TESTS "-tests.xml"
@@ -27,7 +25,12 @@
 namespace OL = OCPI::Library;
 
 struct Case;
-Case cases;
+
+Case::Case(ParamConfig &globals)
+  : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
+    m_doneWorkerIsUUT(doneWorkerIsUUT)
+{}
+
 const char *doExcludePlatform(const char *a_platform, void *arg) {
   Case &c = *(Case *)arg;
   OrderedStringSet platforms;
@@ -1104,7 +1107,7 @@ fprintf(out, "    </subcase>\n");
   fprintf(out, "  </case>\n");
   return NULL;
 }
-  // Explicitly included workers
+// Explicitly included workers
 
 const char *addWorker(const char *name, void *) {
   const char *dot = strrchr(name, '.'); // checked earlier
@@ -1161,7 +1164,7 @@ const char *findWorkers() {
   return NULL;
 }
 
-void *connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports) {
+void connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports) {
 //Case cases;
 for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
   Port &p = **pi;
@@ -1185,7 +1188,7 @@ for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
 }
 }
 
-void *connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports) {
+void connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports) {
 for (PortsIter pi = w.m_ports.begin(); pi != w.m_ports.end(); ++pi) {
   Port &p = **pi;
   bool optional = false;
@@ -1305,4 +1308,3 @@ OU::format(assy,
   assy += "</HdlAssembly>\n";
   return OU::string2File(assy, dir + "/" + name + ".xml", false, true);
 } 
-

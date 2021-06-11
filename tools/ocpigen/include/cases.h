@@ -17,96 +17,74 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OCPI_CASES_H
-#define OCPI_CASES_H
+#ifndef _OCPI_CASES_H
+#define _OCPI_CASES_H
 
 #include <cstddef>
 #include <string>
 #include <strings.h>
 #include <cassert>
 #include <vector>
-#include <strings.h>
-#include <sstream>
-#include <set>
-#include <limits>
-#include <algorithm>
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsFileSystem.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiUtilEzxml.h"
-#include "OcpiLibraryManager.h"
-#include "parameters.h"
-#include "hdl-device.h"
-#include "wip.h"
-#include "data.h"
-#include "comp.h"
 #include "input-output.h"
-#include "cases.h"
 
-  // A test case, which may apply against multiple configurations
-  // Default is:
-  //   cases generated from configurations and defined property values
-  //   inputs and outputs are global
-  //   no property results (why not global results?  why not expressions?)
-  //   globally only/exclude platforms
-  //   globally only/exluded workers
-  // Specific cases
-  // Top level attributes of <tests>
-  struct Case;
-  
-  typedef std::vector<Case *> Cases;
-  Cases cases;
-  OrderedStringSet allPlatforms;      
-  typedef std::set<WorkerConfig, comp> WorkerConfigs;
-  typedef std::vector<InputOutput> InputOuftputs;
+#define TESTS "-tests.xml"
+#define MS_CONFIG "bypass", "metadata", "throttle", "full"
 
-  struct Case {
-      //Case cases;
-      std::string m_name;
-      Strings m_onlyPlatforms, m_excludePlatforms; // can only apply these at runtime
-      Workers m_workers; // the inclusion/exclusion happens at parse time
-      WorkerConfigs m_configs;
-      ParamConfig m_settings;
-      ParamConfig m_results; // what the resulting properties should be
-      ParamConfigs m_subCases;
-      InputOutputs m_ports;  // the actual inputs and outputs to use
-      size_t m_timeout, m_duration;
-      bool m_doneWorkerIsUUT;
-      std::string m_delays;
-
-      Case(ParamConfig &globals)
-        : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
-	        m_doneWorkerIsUUT(doneWorkerIsUUT)
-      {}
-
-      static const char *doExcludePlatform(const char *a_platform, void *arg);
-      static const char *doOnlyPlatform(const char *a_platform, void *arg);
-      static const char *doOnlyWorker(const char *worker, void *arg);
-      static const char *doExcludeWorker(const char *worker, void *arg);
-      static const char *doCase(ezxml_t cx, void *globals);
-      const char *doPorts(Worker &w, ezxml_t x);
-      const char *parseDelay(ezxml_t sx, const OU::Property &p);
-      const char *parse(ezxml_t x, size_t ordinal);
-      void doProp(unsigned n);
-      const char *pruneSubCases();
-      void print(FILE *out);
-      void table(FILE *out);
-      const char *
-      generateFile(bool &first, const char *dir, const char *type, unsigned s,
-                 const std::string &name, const std::string &generate, const std::string &env,
-                 std::string &file);
-      const char *generateInputs();
-      void
-      generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nOutputs, unsigned s,
-                        const DataPort *first, bool a_emulator, std::string &app, const char *dut, bool testingOptional); 
-      const char *generateApplications(const std::string &dir, Strings &files);
-      const char *generateVerification(const std::string &dir, Strings &files);
-      const char *generateCaseXml(FILE *out);
-      static const char *addWorker(const char *name, void *);
-      static const char *excludeWorker(const char *name, void *);
-      static const char *findWorkers();
-      
-  };
+namespace OL = OCPI::Library;
+struct Case;
+typedef std::vector<Case *> Cases;
+Cases cases;
+OrderedStringSet allPlatforms;
+// A test case, which may apply against multiple configurations
+// Default is:
+//   cases generated from configurations and defined property values
+//   inputs and outputs are global
+//   no property results (why not global results?  why not expressions?)
+//   globally only/exclude platforms
+//   globally only/exluded workers
+// Specific cases
+// Top level attributes of <tests>     
+struct Case {
+    std::string m_name;
+    Strings m_onlyPlatforms, m_excludePlatforms; // can only apply these at runtime
+    Workers m_workers; // the inclusion/exclusion happens at parse time
+    WorkerConfigs m_configs;
+    ParamConfig m_settings;
+    ParamConfig m_results; // what the resulting properties should be
+    ParamConfigs m_subCases;
+    InputOutputs m_ports;  // the actual inputs and outputs to use
+    size_t m_timeout, m_duration;
+    bool m_doneWorkerIsUUT;
+    std::string m_delays;
+    Case ();
+    static const char *doExcludePlatform(const char *a_platform, void *arg);
+    static const char *doOnlyPlatform(const char *a_platform, void *arg);
+    static const char *doOnlyWorker(const char *worker, void *arg);
+    static const char *doExcludeWorker(const char *worker, void *arg);
+    static const char *doCase(ezxml_t cx, void *globals);
+    const char *doPorts(Worker &w, ezxml_t x);
+    const char *parseDelay(ezxml_t sx, const OU::Property &p);
+    const char *parse(ezxml_t x, size_t ordinal);
+    void doProp(unsigned n);
+    const char *pruneSubCases();
+    void print(FILE *out);
+    void table(FILE *out);
+    const char *
+    generateFile(bool &first, const char *dir, const char *type, unsigned s,
+                const std::string &name, const std::string &generate, const std::string &env,
+                std::string &file);
+    const char *generateInputs();
+    void
+    generateAppInstance(Worker &w, ParamConfig &pc, unsigned nOut, unsigned nOutputs, unsigned s,
+                      const DataPort *first, bool a_emulator, std::string &app, const char *dut, bool testingOptional); 
+    const char *generateApplications(const std::string &dir, Strings &files);
+    const char *generateVerification(const std::string &dir, Strings &files);
+    const char *generateCaseXml(FILE *out);
+    static const char *addWorker(const char *name, void *);
+    static const char *excludeWorker(const char *name, void *);
+    static const char *findWorkers();
+    
+};
 // Explicitly included workers
 const char *addWorker(const char *name, void *);
 // Explicitly excluded workers
@@ -116,4 +94,4 @@ void *connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports);
 void *connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports);
 const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const
                                       std::string &name, bool hdlFileIO, Strings &assyDirs, InputOutputs &ports);
-  #endif
+#endif

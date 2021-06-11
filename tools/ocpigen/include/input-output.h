@@ -22,38 +22,18 @@
 #ifndef OCPI_INPUTOUTPUT_H_
 #define OCPI_INPUTOUTPUT_H_
 
-#include <cstddef>
-#include <string>
-#include <strings.h>
-#include <cassert>
-#include <vector>
-#include <sstream>
-#include <set>
-#include <limits>
-#include <algorithm>
-#include "OcpiUtilEzxml.h"
-#include "OcpiUtilAssembly.h"
-#include "OcpiOsDebugApi.h"
-#include "OcpiOsFileSystem.h"
-#include "OcpiUtilMisc.h"
-#include "OcpiLibraryManager.h"
-#include "ocpigen.h"
-#include "parameters.h"
-#include "hdl-device.h"
-#include "wip.h"
-#include "data.h"
+
 #include "comp.h"
-#include "input-output.h"
+
 
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"
 
-//Make typedefinitions here and explain what they do. 
 typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
 typedef std::vector<DataPort *> DataPorts;
 typedef WorkerConfigs::const_iterator WorkerConfigsIter;
+//struct InputOutput;
 
-struct InputOutput;
 Worker *emulator;
 WorkerConfigs configs;
 DataPorts optionals;
@@ -71,12 +51,9 @@ struct InputOutput {
   size_t m_messageSize;
   bool m_messagesInFile, m_suppressEOF, m_disableBackpressure, m_stopOnEOF, m_testOptional;
   MsConfig m_msMode;
-  InputOutput() //is this supposed to be here or in the .cxx?
-    : m_port(NULL), m_messageSize(0), m_messagesInFile(false), m_suppressEOF(false),
-      m_disableBackpressure(false), m_stopOnEOF(false), m_testOptional(false), m_msMode(bypass) {}
+  InputOutput(); 
   const char *parse(ezxml_t x, std::vector<InputOutput> *inouts); 
 };  
-
 typedef std::vector<InputOutput> InputOutputs;
 
 InputOutputs inputs, outputs; // global ones that may be applied to any case
@@ -87,4 +64,6 @@ OrderedStringSet onlyPlatforms, excludePlatforms;
 const char *doPlatform(const char *platform, Strings &platforms); 
 const char *doWorker(Worker *w, void *arg); 
 const char *emulatorName();
+
+
 #endif
