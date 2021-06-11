@@ -22,14 +22,20 @@
 #ifndef OCPI_INPUTOUTPUT_H_
 #define OCPI_INPUTOUTPUT_H_
 
-
 #include "comp.h"
 
 
 #define TESTS "-tests.xml"
 #define MS_CONFIG "bypass", "metadata", "throttle", "full"
 
-typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
+namespace OCPI {
+  namespace Test {
+    const char *
+tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool specific); 
+
+  }
+}
+
 typedef std::vector<DataPort *> DataPorts;
 typedef WorkerConfigs::const_iterator WorkerConfigsIter;
 //struct InputOutput;
@@ -40,8 +46,6 @@ DataPorts optionals;
 Worker *wFirst;
 enum MsConfig {bypass, metadata, throttle, full};
 extern char *s_stressorMode[];
-const char *
-tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool specific); 
 
 struct InputOutput {
   // this is a singleton in this context
@@ -64,6 +68,4 @@ OrderedStringSet onlyPlatforms, excludePlatforms;
 const char *doPlatform(const char *platform, Strings &platforms); 
 const char *doWorker(Worker *w, void *arg); 
 const char *emulatorName();
-
-
 #endif

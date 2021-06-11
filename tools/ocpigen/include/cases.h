@@ -25,6 +25,7 @@
 #include <strings.h>
 #include <cassert>
 #include <vector>
+#include "comp.h"
 #include "input-output.h"
 
 #define TESTS "-tests.xml"
@@ -80,16 +81,12 @@ struct Case {
     const char *generateApplications(const std::string &dir, Strings &files);
     const char *generateVerification(const std::string &dir, Strings &files);
     const char *generateCaseXml(FILE *out);
-    static const char *addWorker(const char *name, void *);
-    static const char *excludeWorker(const char *name, void *);
-    static const char *findWorkers();
+
     
-};
-// Explicitly included workers
-const char *addWorker(const char *name, void *);
-// Explicitly excluded workers
-const char *excludeWorker(const char *name, void *);
-const char *findWorkers();
+};    
+static const char *addWorker(const char *name, void *);
+static const char *excludeWorker(const char *name, void *);
+static const char *findWorkers();
 void *connectHdlFileIO(const Worker &w, std::string &assy, InputOutputs &ports);
 void *connectHdlStressWorkers(const Worker &w, std::string &assy, bool hdlFileIO, InputOutputs &ports);
 const char *generateHdlAssembly(const Worker &w, unsigned c, const std::string &dir, const

@@ -18,16 +18,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "cases.h"
-
-#define TESTS "-tests.xml"
-#define MS_CONFIG "bypass", "metadata", "throttle", "full"
-
-namespace OL = OCPI::Library;
-
 struct Case;
 
-Case::Case(ParamConfig &globals)
-  : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
+Case(ParamConfig &globals) : m_settings(globals), m_results(*wFirst), m_timeout(timeout), m_duration(duration),
     m_doneWorkerIsUUT(doneWorkerIsUUT)
 {}
 

@@ -49,8 +49,8 @@ namespace OL = OCPI::Library;
 // be used as the package of the impl.
 // FIXME: share this with the one in parse.cxx
 
-//class Worker;
-//typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
+class Worker;
+typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
 
 
 unsigned matchedWorkers; // count them even if they are not built or usable
@@ -76,8 +76,6 @@ findPackage(ezxml_t spec, const char *package, const char *specName,
 const char *
 getSpec(ezxml_t xml, const std::string &parent, const char *a_package, ezxml_t &spec,
         std::string &specFile, std::string &a_specName);
-typedef std::pair<ParamConfig*,Worker*> WorkerConfig;
-
 struct comp
 {
   inline bool operator()(const WorkerConfig &lhs, const WorkerConfig &rhs) const;

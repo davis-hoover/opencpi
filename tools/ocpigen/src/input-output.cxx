@@ -113,9 +113,8 @@ tryWorker(const char *wname, const std::string &matchName, bool matchSpec, bool 
   delete w;
   return err;
 }
-InputOutput::InputOutput() //is this supposed to be here or in the .cxx?
-    : m_port(NULL), m_messageSize(0), m_messagesInFile(false), m_suppressEOF(false),
-      m_disableBackpressure(false), m_stopOnEOF(false), m_testOptional(false), m_msMode(bypass) {}
+InputOutput::InputOutput() : m_port(NULL), m_messageSize(0), m_messagesInFile(false),
+    m_suppressEOF(false), m_disableBackpressure(false), m_stopOnEOF(false), m_testOptional(false), m_msMode(bypass) {}
 const char *InputOutput::parse(ezxml_t x, std::vector<InputOutput> *inouts) {
     const char
       *name = ezxml_cattr(x, "name"),
@@ -243,5 +242,3 @@ emulatorName() {
     em = emulator->m_specName;
   return em;
 }
-
-#endif

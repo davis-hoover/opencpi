@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [],
+    "type": "shell",
+    "command": "g++",
+    "args": [
+        "-g",
+        "-o",
+        "-I",
+        "/home/mburell/2260/opencpi/test.out",
+        "/home/mburell/2260/opencpi/testing_headers.cpp", "/home/mburell/2260/opencpi/tools/ocpigen/include/comp.h"
+    ],
+    "group": {
+        "kind": "build",
+        "isDefault": true
+}
