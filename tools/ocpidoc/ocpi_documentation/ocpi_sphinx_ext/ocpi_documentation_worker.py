@@ -22,7 +22,7 @@
 
 
 import pathlib
-
+import itertools
 import docutils
 
 import xml_tools
@@ -44,8 +44,8 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
     def run(self):
         """ Action when ocpi_documentation_worker directive called
 
-        Generates page with worker parameter and property specific section, and
-        worker build configuration section, when required.
+        Generates page with worker property specific section, and work
+        build configuration section, when required.
 
         Returns:
             List with the docutils tree map to replace the directive in the
@@ -53,6 +53,36 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
         """
         # Variable to add the resulting output to
         content = []
+
+        # If component specification path is set as option use this, otherwise
+        # automatically determine likely path based on standard file structure
+        if "component_spec" in self.options:
+            component_specification_path = pathlib.Path(
+                self.state.document.attributes["source"]).joinpath(
+                self.options["component_spec"]).resolve()
+        else:
+            component_name = pathlib.Path(
+                self.state.document.attributes["source"]).resolve(
+            ).parent.name.split(".", 1)[0]
+
+            component_specification_path = pathlib.Path(
+                self.state.document.attributes["source"]).resolve(
+            ).parent.parent.joinpath("specs").joinpath(
+                f"{component_name}-spec.xml")
+
+            # Added to handle _spec.xml naming
+            if not component_specification_path.is_file():
+                component_specification_path = pathlib.Path(
+                    self.state.document.attributes["source"]).resolve(
+                ).parent.parent.joinpath("specs").joinpath(
+                    f"{component_name}_spec.xml")
+
+        if not component_specification_path.is_file():
+            self.state_machine.reporter.warning(
+                "Properties listing cannot find component "
+                + f"specification, {component_specification_path}",
+                line=self.lineno)
+            component_specification_path = None
 
         # If worker description is not set, determine it
         if "worker_description" in self.options:
@@ -69,7 +99,8 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
         if worker_description_path.is_file():
             with xml_tools.parser.WorkerSpecParser(
                     worker_description_path) as file_parser:
-                worker_description = file_parser.get_dictionary()
+                worker_description = file_parser.get_combined_dictionary(
+                    component_specification_path)
 
         else:
             self.state_machine.reporter.warning(
@@ -80,23 +111,23 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
             worker_description = None
 
         self._parse_context_to_addition_text()
-        for property_name in self.additional_text:
-            if property_name not in worker_description["properties"]:
+        for name in self.additional_text:
+            if name not in itertools.chain(
+                    worker_description["properties"],
+                    worker_description["inputs"],
+                    worker_description["outputs"],
+                    worker_description["other_interfaces"]):
                 self.state_machine.reporter.warning(
-                    f"No property called {property_name} defined in worker "
+                    f"No property or port called {name} defined in worker "
                     + f"description, {worker_description_path}",
                     line=self.lineno)
                 continue
 
-        # Add any other detail from the worker description
+        # Add property detail from the worker description
         property_list = docutils.nodes.bullet_list()
-        parameter_list = docutils.nodes.bullet_list()
         for name, detail in worker_description["properties"].items():
             list_item = self._property_summary(name, detail)
-            if detail["access"]["parameter"]:
-                parameter_list.append(list_item)
-            else:
-                property_list.append(list_item)
+            property_list.append(list_item)
 
         if len(property_list) > 0:
             property_section = docutils.nodes.section(
@@ -106,13 +137,38 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
             property_section.append(property_list)
             content.append(property_section)
 
-        if len(parameter_list) > 0:
-            parameter_section = docutils.nodes.section(
-                ids=["worker-parameters"], names=["worker parameters"])
-            parameter_section.append(
-                docutils.nodes.title(text="Worker parameters"))
-            parameter_section.append(parameter_list)
-            content.append(parameter_section)
+        # Add port detail from the worker description
+        port_list = docutils.nodes.bullet_list()
+
+        # Port options include "inputs", "outputs" and "other_interfaces"
+        port_options = [("inputs", "Inputs:"),
+                        ("outputs", "Outputs:"),
+                        ("other_interfaces", "Other interfaces:")]
+
+        for port_type, port_type_header in port_options:
+            if worker_description[port_type] != {}:
+                port_name = list(worker_description[port_type].keys())[0]
+                # Display "Time:" header for the time interface instead of
+                # "Other interfaces:"
+                if ("type", "timeinterface") in \
+                        worker_description[port_type][port_name].items():
+                    port_type_rst = "Time:"
+                else:
+                    port_type_rst = port_type_header
+                port_type_doc = docutils_helpers.rst_string_convert(
+                        self.state, port_type_rst)
+                port_list.append(port_type_doc)
+                for name, detail in worker_description[port_type].items():
+                    list_item = self._port_summary(name, detail)
+                    port_list.append(list_item)
+
+        if len(port_list) > 0:
+            port_section = docutils.nodes.section(
+                ids=["worker-ports"], names=["worker ports"])
+            port_section.append(
+                docutils.nodes.title(text="Worker ports"))
+            port_section.append(port_list)
+            content.append(port_section)
 
         # If build file path not set determine, otherwise use set value
         if "build_file" in self.options:
@@ -174,3 +230,47 @@ class OcpiDocumentationWorker(PropertiesDirectiveHandler):
                         f"``{configuration[parameter]}``")
 
         return docutils_helpers.rst_string_convert(self.state, rst_text)
+
+    def _port_summary(self, name, detail):
+        """ Generate a port summary
+
+        Args:
+            name (``str``): The port name.
+            details (``dict``): Detail of the port in a dictionary.
+
+        Returns:
+            A ``docutils`` list item formatted with the port details.
+        """
+        port_rst = f"``{name}``"
+        if name in self.additional_text:
+            port_rst = f"{port_rst}: {self.additional_text[name]}"
+            if port_rst[-1] != ".":
+                port_rst = f"{property_rst}."
+
+        port_item = docutils.nodes.list_item()
+        port_item_paragraph = docutils_helpers.rst_string_convert(
+            self.state, port_rst)
+        port_item.append(port_item_paragraph)
+
+        # Add the expected values as a sublist
+        port_detail_list = docutils.nodes.bullet_list()
+
+        # Port attributes to display if available
+        port_attributes = [("type", "Type"),
+                           ("datawidth", "Data width"),
+                           ("numberofopcodes", "Number of opcodes"),
+                           ("secondswidth", "Seconds width"),
+                           ("fractionwidth", "Fraction width"),
+                           ("protocol", "Protocol"),
+                           ("zerolengthmessages", "Zero length messages")]
+
+        for attribute, text in port_attributes:
+            if attribute in detail:
+                attribute_detail = docutils_helpers.list_item_name_code_value(
+                    text, detail[attribute])
+                port_detail_list.append(attribute_detail)
+
+        if len(port_detail_list) > 0:
+            port_item.append(port_detail_list)
+
+        return port_item

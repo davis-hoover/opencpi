@@ -21,6 +21,6 @@
 :orphan:
 
 
-``file_read`` test detail
+``file_read`` Test Detail
 =========================
 .. ocpi_documentation_test_detail::

@@ -56,16 +56,7 @@ Interface
 .. literalinclude:: ../specs/backpressure-spec.xml
    :language: xml
 
-Ports
-~~~~~
-.. ocpi_documentation_ports::
-
-   in: 32 bits.
-   out: 32 bits.
-
-Set the output buffer size to match the input, which may be connected to a port with a protocol.
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied: Description of how the non-stream opcodes are handled.
 
@@ -77,17 +68,20 @@ Properties
 
    enable_duty_cycle: Sets the "take" duty cycle. Possible values are:``1`` = constant (default), ``2`` = toggle (off/on), ``3`` = 1/on, 2/off, ``4`` = 1/on, 3/off.
 
-Parameters
-~~~~~~~~~~
-.. ocpi_documentation_properties::
-   :parameters:
+Ports
+~~~~~
+.. ocpi_documentation_ports::
 
+   in: 32 bits.
+   out: 32 bits.
+
+Set the output buffer size to match the input, which may be connected to a port with a protocol.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../backpressure.hdl ../backpressure.rcc
 
-Example application
+Example Application
 -------------------
 .. literalinclude:: example_app.xml
    :language: xml

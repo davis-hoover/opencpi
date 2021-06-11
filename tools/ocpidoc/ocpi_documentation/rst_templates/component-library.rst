@@ -1,7 +1,7 @@
 .. %%NAME-PROPER%% library index page
 
 
-%%NAME-PROPER%% component library
+%%NAME-PROPER%% Component Library
 =================================
 Skeleton outline: Component library description and outline of scope to go here.
 

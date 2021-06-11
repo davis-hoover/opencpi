@@ -30,7 +30,7 @@ class PropertySpecParser(base_parser.BaseParser):
     """
 
     def __init__(self, filename, include_filepaths=["."]):
-        """ Initialise property specification parser class.
+        """ Initialize property specification parser class.
 
         Handles parsing an XML file with <property> elements.
 
@@ -41,14 +41,13 @@ class PropertySpecParser(base_parser.BaseParser):
                 statement.
 
         Returns:
-            An initialised PropertySpecParser instance.
+            An initialized PropertySpecParser instance.
         """
         super().__init__(filename=filename,
                          include_filepaths=include_filepaths,
                          force_lowercase=True)
 
-        self._access_values = ["writable", "volatile", "initial", "parameter",
-                               "readable"]
+        self._access_values = ["writable", "volatile", "initial", "parameter"]
 
     def get_properties(self):
         """ Get list of properties and associated arguments.
@@ -66,8 +65,7 @@ class PropertySpecParser(base_parser.BaseParser):
             ``{"<property_name>": {
               "type": {"data_type": "ulong"}
               "access": {"initial":  False, "parameter": False,
-                         "writable": False, "volatile":  False,
-                         "readable": False},
+                         "writable": False, "volatile":  False},
               "description": "<description>,
               "default": "<property_default_value>",
               "value": "<property_default_value>"},
@@ -114,8 +112,7 @@ class PropertySpecParser(base_parser.BaseParser):
             ``{"<property_name>": {
               "type": {"data_type": "ulong"}
               "access": {"initial":  False, "parameter": False,
-                         "writable": False, "volatile":  False,
-                         "readable": False},
+                         "writable": False, "volatile":  False},
               "description": "<description>,
               "default": "<property_default_value>",
               "value": "<property_default_value>"}}``

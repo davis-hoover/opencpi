@@ -21,7 +21,7 @@
 .. _metadata_stressor:
 
 
-Metadata stressor (``metadata_stressor``)
+Metadata Stressor (``metadata_stressor``)
 =========================================
 Tests an HDL worker's robustness during development.
 ``metadata_stressor`` is an asset in the ``ocpi.core`` component library.
@@ -54,6 +54,14 @@ Interface
 .. literalinclude:: ../specs/metadata_stressor-spec.xml
    :language: xml
 
+Opcode Handling
+~~~~~~~~~~~~~~~
+To be supplied: Description of how the non-stream opcodes are handled.
+
+Properties
+~~~~~~~~~~
+.. Comment out ocpi_documentation_properties. It fails on this component.
+
 Ports
 ~~~~~
 .. Comment out ocpi_documentation_ports. It fails on this component.
@@ -64,26 +72,11 @@ Ports
 The HDL worker runtime configuration parameter ``DATA_WIDTH_p`` can be used to
 set a custom data width for the ports.
 
-Opcode handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled.
-
-Properties
-~~~~~~~~~~
-.. Comment out ocpi_documentation_properties. It fails on this component.
-   
-
-Parameters
-~~~~~~~~~~
-.. Comment out ocpi_documentation_properties. It fails on this component.
-.. Comment out parameters
-
-
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../metadata_stressor.hdl ../metadata_stressor.rcc
 
-Example application
+Example Application
 -------------------
 .. literalinclude:: example_app.xml
    :language: xml

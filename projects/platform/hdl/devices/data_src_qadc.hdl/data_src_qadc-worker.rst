@@ -23,7 +23,7 @@
 .. _data_src_qadc-HDL-worker:
 
 
-``data_src_qadc`` HDL device worker
+``data_src_qadc`` HDL Device Worker
 ===================================
 HDL device worker implementation providing common functionality to all ADC device types.
 
@@ -32,7 +32,7 @@ Detail
 
 The data source QADC HDL device worker receives sampled data from an ADC on
 its ``dev`` devsignal port.
-The worker sign-extends and justifies fhe samples to 16-bit I, 16-bit Q values,
+The worker sign-extends and justifies the samples to 16-bit I, 16-bit Q values,
 which is the standard provided by the ``samples`` argument of the
 ``ComplexShortWithMetadata-prot`` protocol used by the ``out`` port.
 The HDL device worker performs justification within the 16-bit values according to
@@ -60,7 +60,7 @@ sending ``sync`` opcodes.
 
 .. Comment out ocpi_documentation_worker:: for now. It doesn't work with HdlDevice XML.
 
-Worker ports
+Worker Ports
 ~~~~~~~~~~~~
 
 Outputs:
@@ -80,6 +80,6 @@ Outputs:
   * Data width: ``OUT_PORT_DATA_WIDTH``
 
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

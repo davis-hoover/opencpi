@@ -6,7 +6,7 @@
 .. _%%NAME-CODE%%-%%AUTHORING_MODEL%%-worker:
 
 
-``%%NAME-CODE%%`` %%AUTHORING_MODEL%% worker
+``%%NAME-CODE%%`` %%AUTHORING_MODEL%% Worker
 ============================================
 Skeleton outline: Optional summary of the implementation of this worker. Anything before the next heading will be included as worker summary on component documentation page.
 
@@ -18,6 +18,6 @@ Detail
    section and directive should be deleted. This comment should be removed in
    the final version of this page.
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

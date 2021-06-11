@@ -101,7 +101,7 @@ html_show_sphinx = False
 html_show_copyright = False
 html_copy_source = False
 
-spelling_lang = "en_GB"
+spelling_lang = "en_US"
 spelling_word_list_filename = str(pathlib.Path(__file__).parent.joinpath(
     "dictionary.txt").resolve())
 spelling_show_suggestions = True

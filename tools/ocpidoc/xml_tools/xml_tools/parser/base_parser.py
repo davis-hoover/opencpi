@@ -31,7 +31,7 @@ class BaseParser():
 
     def __init__(
             self, filename, include_filepaths=["."], force_lowercase=True):
-        """ Initialise base parser class.
+        """ Initialize base parser class.
 
         Args:
             filename (``string``): File path and name of the XML file to parse.
@@ -44,7 +44,7 @@ class BaseParser():
                 preserved.
 
         Returns:
-            An initialised BaseParser instance.
+            An initialized BaseParser instance.
         """
         # Store path / filename of XML file and store a list of all the
         # directories to search if the specified XML specifies another XML file
@@ -104,7 +104,7 @@ class BaseParser():
 
         # Parse string containing original XML file and generate new string
         # with only lowercase element and attribute tags.
-        # This is because tag capitalisation can vary across files.
+        # This is because tag capitalization can vary across files.
         if force_lowercase:
             file_xml_string = self._get_lower_case_xml(file_xml_string)
 
