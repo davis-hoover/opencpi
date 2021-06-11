@@ -184,6 +184,7 @@ def ocpicreate(args):
     """
     class_dict = {
         "project": ocpiassets.project.Project,
+        "library": ocpiassets.library.Library,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
