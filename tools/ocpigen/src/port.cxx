@@ -1052,10 +1052,12 @@ emitExtAssignmentSides(bool int2ext, const std::string &extName, const std::stri
       OU::formatAdd(ours, "(%zu to %zu)", extAt.m_index, extAt.m_index + connCount - 1);
   }
   std::string theirs = intName;
-  if (connCount == 1)
-    OU::formatAdd(theirs, "(%zu)", intAt.m_index);
-  else
-    OU::formatAdd(theirs, "(%zu to %zu)", intAt.m_index, intAt.m_index + connCount - 1);
+  if (intAt.m_instPort.m_port->isArray()) {
+    if (connCount == 1)
+      OU::formatAdd(theirs, "(%zu)", intAt.m_index);
+    else
+      OU::formatAdd(theirs, "(%zu to %zu)", intAt.m_index, intAt.m_index + connCount - 1);
+  }
   left = int2ext ? ours.c_str() : theirs.c_str();
   right = int2ext ? theirs.c_str() : ours.c_str();
 }

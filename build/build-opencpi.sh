@@ -25,10 +25,38 @@ source ./scripts/init-opencpi.sh
 # Ensure CDK and TOOL variables
 source ./cdk/opencpi-setup.sh -r
 
-# Ensure TARGET variables
-source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$1"
+while (( "$#" )); do
+  case "$1" in
+    -v|--verbose)
+      verbose=-v
+      shift
+      ;;
+    --minimal)
+      minimal=1 # use ${minimal:+whatever}
+      shift
+      ;;
+    --no-kernel)
+      nokernel=1 # use ${nokernel:+whatever}
+      shift
+      ;;
+    # Unsupported flags
+    -*)
+      echo 'Unsupported flag "$1" when running "build-opencpi.sh"'
+      exit 1
+      ;;
 
+    # Preserve positional arguments
+    *)
+      PARAMS+=("$1")
+      shift
+      ;;
+  esac
+done  # end parsing optional args and flags
+
+# Ensure TARGET variables
 set -e
+source "$OCPI_CDK_DIR/scripts/ocpitarget.sh" "$PARAMS"
+
 echo ================================================================================
 echo "We are running in $(pwd) where the git clone of opencpi has been placed."
 echo ================================================================================
@@ -84,13 +112,21 @@ elif [[ (-e /.dockerenv || -e /run/.containerenv) && -z "$OcpiCrossCompile" ]]; 
   echo "Docker, or docker like, environment detected. Building kernel device"
   echo "driver is not supported in this environment. Thus building the OpenCPI"
   echo "kernel device driver for $OCPI_TARGET_PLATFORM is skipped."
+elif [ -n "$nokernel" ]; then
+  echo 'While the kernel driver would normally be built for this target ('$OCPI_TARGET_PLATFORM'),'
+  echo building the kernel driver has been suppressed using the --no-kernel option.
 else
   echo "Next, we will build the OpenCPI kernel device driver for $OCPI_TARGET_PLATFORM"
   make driver
 fi
 
-Projects="core platform assets assets_ts inactive tutorial"
+if [ -n "$minimal" ]; then
+  Projects="core platform assets"
+else
+  Projects="core platform assets assets_ts inactive tutorial"
+fi
 # Build built-in RCC components
+# Note building rcc builds hdl for no platforms to make proxies work
 echo ================================================================================
 echo "Now we will build the built-in RCC '(software)' components for $OCPI_TARGET_DIR"
 for p in $Projects; do domake projects/$p rcc; done
@@ -101,24 +137,29 @@ echo "Now we will build the built-in OCL '(GPU)' components for the available OC
 for p in $Projects; do domake projects/$p ocl; done
 
 # Build built-in HDL components
-# [ -n "$HdlPlatforms" -o -n "$HdlPlatform" ] && {
+[ -n "$HdlPlatforms" -o -n "$HdlPlatform" ] && {
   echo ================================================================================
   echo "Now we will build the built-in HDL components for platforms: $HdlPlatform $HdlPlatforms"
-  echo "Even if there are no HDL platforms, this step is still needed to build proxies"
   for p in $Projects; do domake projects/$p hdl HdlPlatforms="$HdlPlatforms $HdlPlatform"; done
-# }
+}
 
-# Build tests
-echo ================================================================================
-echo "Now we will build the core tests for $OCPI_TARGET_DIR"
-domake projects/core test
-echo ================================================================================
-echo "Now we will build the example applications in assets and inactive projects for $OCPI_TARGET_DIR"
-domake projects/assets applications
-domake projects/inactive applications
-
+if [ -z "$minimal" ]; then
+  # Build tests
+  echo ================================================================================
+  echo "Now we will build the core tests for $OCPI_TARGET_DIR"
+  domake projects/core test
+  echo ================================================================================
+  echo "Now we will build the example applications in assets and inactive projects for $OCPI_TARGET_DIR"
+  domake projects/assets applications
+  domake projects/inactive applications
+fi
 # Ensure any framework exports that depend on built projects happen
 make exports Platforms="$OCPI_TARGET_DIR"
 
 echo ================================================================================
-echo "OpenCPI has been built for $OCPI_TARGET_DIR, with software components, examples and kernel driver"
+echo "OpenCPI has been built for $OCPI_TARGET_DIR"
+if [ -n "$minimal" ]; then
+    echo Since a minimal build was specified, only the framework and RCC components in these projects have been built: $Projects
+else
+    echo "The framework has been built along with software components, examples for these projects: $projects"
+fi

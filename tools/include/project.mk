@@ -227,6 +227,7 @@ rcc:
 	$(call MaybeMake,components,declarehdl)
 	$(call MaybeMake,hdl/devices,declarehdl)
 	$(call MaybeMake,hdl/cards,declarehdl)
+	$(call MaybeMake,hdl/adapters,declarehdl)
 	$(call MaybeMake,hdl/platforms,declarehdl)
 	$(call MaybeMake,components,rcc)
 	$(call MaybeMake,hdl/devices,rcc)

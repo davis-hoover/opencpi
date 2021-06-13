@@ -268,7 +268,11 @@ options = {
             '--build-hdl-platform'
         ],
         'action': 'append'
-    }
+    },
+    'workers_as_needed': {
+        'long': '--workers-as-needed',
+        'action': 'store_true'
+    },
 }
 
 # Verbs with nouns and options, including options referencing those above
@@ -291,6 +295,7 @@ verbs = {
             },
             'hdl': {
                 'options': {
+                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 },
@@ -331,7 +336,7 @@ verbs = {
             },
             'library': {
                 'options': {
-                    'name': None,
+                    'name': {'nargs': '?'},
                     'hdl': options['hdl'],
                     'rcc': options['rcc'],
                     'worker': options['worker'],
@@ -343,7 +348,7 @@ verbs = {
             },
             'project': {
                 'options': {
-                    'name': None,
+                    'name': {'nargs': '?'},
                     'hdl_assembly': options['hdl_assembly'],
                     'no_assemblies': options['no_assemblies'],
                     'hdl': options['hdl'],
@@ -351,15 +356,14 @@ verbs = {
                     'worker': options['worker'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
             },
             'test': {
                 'options': {
-                    'name': {
-                        'nargs': '?'
-                    },
+                    'name': {'nargs': '?'},
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
                     'hdl_target': options['hdl_target'],
@@ -443,6 +447,7 @@ verbs = {
             },
             'worker': {
                 'options': {
+                    'library': options['library'],
                     'name': None
                 }
             }
@@ -463,7 +468,7 @@ verbs = {
             'component': None,
             'library': {
                 'options': {
-                    'name': {'nargs': '?'},
+                    'name': None,
                     'pkg_prefix': options['pkg_prefix'],
                     'pkg_id': options['pkg_id'],
                     'pkg_name': options['pkg_name'],

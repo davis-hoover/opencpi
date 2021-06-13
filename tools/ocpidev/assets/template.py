@@ -136,6 +136,26 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\\
 include $(OCPI_CDK_DIR)/include/project.mk
 \n""")
 
+LIB_MAKEFILE= ("""# This is the Makefile for the components directory when there are multiple
+# libraries in their own directories underneath this components directory
+$(if $(realpath $(OCPI_CDK_DIR)),,\\
+  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
+include $(OCPI_CDK_DIR)/include/libraries.mk
+\n""")
+
+LIB_DIR_MAKEFILE= ("""# This is the bar library
+
+# All workers created here in *.<model> will be built automatically
+# All tests created here in *.test directories will be built/run automatically
+# To limit the workers that actually get built, set the Workers= variable
+# To limit the tests that actually get built/run, set the Tests= variable
+
+# Any variable definitions that should apply for each individual worker/test
+# in this library belong in Library.xml
+
+include $(OCPI_CDK_DIR)/include/library.mk
+\n""")
+
 PROJ_GUI_PROJECT = ("""<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
   <name>{{determined_package_id}}</name>
@@ -224,4 +244,29 @@ PROJ_PROJECT_XML = ("""<project>
        </OcpiProperty>
 {% endif %}
 </project>
+\n""")
+
+LIB_DIR_XML = ("""<library
+{%if package_name: %}
+       PackageName='{{package_name}}'
+{% endif %}
+{%if package_prefix: %}
+       PackagePrefix='{{package_prefix}}'
+{% endif %}
+{%if package_id: %}
+       Package='{{package_id}}'
+{% endif %}
+{%if prim_lib: %}
+       Libraries='{{prim_lib}}'
+{% endif %}
+{%if include_dir: %}
+       IncludeDirs='{{include_dir}}'
+{% endif %}
+{%if xml_include: %}
+       XmlIncludeDirs='{{xml_include}}'
+{% endif %}
+{%if comp_lib: %}
+       ComponentLibraries='{{comp_lib}}'
+{% endif %}
+/>
 \n""")
