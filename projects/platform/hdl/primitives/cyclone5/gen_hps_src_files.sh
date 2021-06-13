@@ -28,8 +28,9 @@ qsys-script --script=../../gen_soc_system_qsys.tcl &> qsys_script.log
 patch -F 5 < ../../soc_system_qsys.patch
 quartus_sh --script=create_ghrd_quartus.tcl &> quartus_sh.log
 qsys-generate soc_system.qsys --synthesis=VHDL &> qsys_generate.log
-cp soc_system/synthesis/submodules/{*.sv,*.v,*.hex} ../
-cp soc_system/synthesis/soc_system.qip ../
-cp soc_system.{qpf,qsf,qsys,sopcinfo} ../
-cd ../ && rm -rf tmp && date > timestamp-gen_hps_src_files
+cp soc_system/synthesis/submodules/{*.sv,*.v,*.hex} ..
+cp soc_system/synthesis/soc_system.qip ..
+cp soc_system.{qpf,qsf,qsys,sopcinfo} ..
+cp qsys_script.log quartus_sh.log qsys_generate.log ..
+cd .. && rm -rf tmp && date > timestamp-gen_hps_src_files
 
