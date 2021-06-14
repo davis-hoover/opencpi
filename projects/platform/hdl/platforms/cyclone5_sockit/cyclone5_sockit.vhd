@@ -69,7 +69,6 @@ begin
   hps : cyclone5_hps
     port map(
       -- Signals from the PS used in the PL
-      hps_in.CLK              => fpga_clk_50,
       hps_out.h2f_rst_n       => raw_rst_n,
       hps_out.h2f_user0_clk   => h2f_user0_clk,
       hps_out.h2f_cold_rst_n  => h2f_cold_rst_n,

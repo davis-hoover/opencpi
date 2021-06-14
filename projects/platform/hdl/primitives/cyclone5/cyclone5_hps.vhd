@@ -22,8 +22,7 @@ library cyclone5; use cyclone5.cyclone5_pkg.all;
 library axi;
 
 entity cyclone5_hps is
-  port    (hps_in        : in  hps_in_t;
-           hps_out       : out hps_out_t;
+  port    (hps_out       : out hps_out_t;
            -- master
            h2f_axi_in    : in  axi.cyclone5_h2f.axi_s2m_array_t(0 to C_H2F_AXI_COUNT-1);
            h2f_axi_out   : out axi.cyclone5_h2f.axi_m2s_array_t(0 to C_H2F_AXI_COUNT-1);

@@ -26,10 +26,6 @@ package cyclone5_pkg is
   constant C_F2H_AXI_COUNT : natural := 1;
   constant C_H2F_AXI_COUNT : natural := 1;
 
-  type hps_in_t is record
-    CLK  : std_logic;
-  end record hps_in_t;
-
   type hps_out_t is record
     h2f_rst_n        : std_logic;
     h2f_cold_rst_n   : std_logic;
@@ -37,8 +33,7 @@ package cyclone5_pkg is
   end record hps_out_t;
 
   component cyclone5_hps is
-    port    (hps_in        : in  hps_in_t;
-             hps_out       : out hps_out_t;
+    port    (hps_out       : out hps_out_t;
              -- master
              h2f_axi_in    : in  axi.cyclone5_h2f.axi_s2m_array_t(0 to C_H2F_AXI_COUNT-1);
              h2f_axi_out   : out axi.cyclone5_h2f.axi_m2s_array_t(0 to C_H2F_AXI_COUNT-1);
