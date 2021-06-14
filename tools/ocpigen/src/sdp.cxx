@@ -249,3 +249,28 @@ emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
   fprintf(f, ",\n");
   Port::emitPortSignal(f, true, indent, formal_data, actual_data, empty, output, NULL, false);
 }
+
+void SdpPort::
+emitExtAssignment(FILE *f, bool int2ext, const std::string &extName, const std::string &intName,
+		  const Attachment &extAt, const Attachment &intAt, size_t connCount) const {
+  std::string left, right, left_data, right_data;
+  emitExtAssignmentSides(int2ext, extName, intName, extAt, intAt, connCount, left, right);
+  emitExtAssignmentSides(int2ext, extName + "_data", intName + "_data", extAt, intAt, connCount,
+			 left_data, right_data);
+  if (int2ext) {
+    std::string type, type_data;
+    OU::format(type, "work.%s_defs.%s_out",
+	       extAt.m_instPort.m_port->worker().m_implName, extAt.m_instPort.m_port->pname());
+    type_data = type + "_data";
+    if (extAt.m_instPort.m_port->isArray() and connCount != 1) {
+      type += "_array";
+      type_data += "_array";
+    }
+    OU::formatAdd(type, "_t(%s)", right.c_str());
+    OU::formatAdd(type_data, "_t(%s)", right_data.c_str());
+    fprintf(f, "  %s <= %s;\n  %s <= %s;\n",
+	    left.c_str(), type.c_str(), left_data.c_str(), type_data.c_str());
+  } else // will this ever happen?
+    fprintf(f, "  %s <= %s;\n  %s <= %s;\n",
+	    left.c_str(), right.c_str(), left_data.c_str(), right_data.c_str());
+}

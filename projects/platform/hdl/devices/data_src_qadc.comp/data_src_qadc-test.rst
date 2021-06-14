@@ -21,6 +21,6 @@
 :orphan:
 
 
-``data_src_qadc`` test detail
+``data_src_qadc`` Test Detail
 =============================
 .. ocpi_documentation_test_detail::

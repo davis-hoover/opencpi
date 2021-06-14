@@ -21,7 +21,7 @@
 :orphan:
 
 
-``platform_ad9361_spi`` test detail
+``platform_ad9361_spi`` Test Detail
 ===================================
 
 .. ocpi_documentation_test_detail::

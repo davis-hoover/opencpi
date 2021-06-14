@@ -71,27 +71,24 @@ class TestWorkerPropertySpecParser(unittest.TestCase):
         access_values = [
             "".join([
                 "initial='false' parameter='false' ",
-                "readable='false' readback='false' ",
-                "readsync='false' volatile='true' ",
-                "writable='false' writesync='false' ",
-                "readerror='false' writeerror='false' ",
-                "padding='false'"]),
+                "readback='false' readsync='false' ",
+                "volatile='true' writable='false' ",
+                "writesync='false' readerror='false' ",
+                "writeerror='false' padding='false'"]),
             "".join([
-                "readable='False' writable='true'"])]
+                "writable='true'"])]
 
         expected_values = [
             {"initial":  False, "parameter": False,
-             "readable": False, "readback":  False,
-             "readsync": False, "volatile":  True,
-             "writable": False,  "writesync": False,
-             "readerror": False, "writeerror": False,
-             "padding": False},
+             "readback":  False, "readsync": False,
+             "volatile":  True, "writable": False,
+             "writesync": False, "readerror": False,
+             "writeerror": False, "padding": False},
             {"initial":  False, "parameter": False,
-             "readable": False, "readback":  False,
-             "readsync": False, "volatile":  False,
-             "writable": True,  "writesync": False,
-             "readerror": False, "writeerror": False,
-             "padding": False}
+             "readback":  False, "readsync": False,
+             "volatile":  False, "writable": True,
+             "writesync": False, "readerror": False,
+             "writeerror": False, "padding": False}
         ]
         for expected, access_value in zip(expected_values, access_values):
 
@@ -116,7 +113,7 @@ class TestWorkerPropertySpecParser(unittest.TestCase):
 
         xml_string = " ".join([
             "<property name='test' type='ulong'",
-            "readable='False' writable='true'",
+            "writable='true'",
             "description='Test property'",
             "default='85'",
             "value='439875'",
@@ -124,11 +121,10 @@ class TestWorkerPropertySpecParser(unittest.TestCase):
 
         expected_access = {
             "initial": False, "parameter": False,
-            "readable": False, "readback":  False,
-            "readsync": False, "volatile":  False,
-            "writable": True,  "writesync": False,
-            "readerror": False, "writeerror": False,
-            "padding": False}
+            "readback":  False, "readsync": False,
+            "volatile":  False, "writable": True,
+            "writesync": False, "readerror": False,
+            "writeerror": False, "padding": False}
 
         expected_dict = {"test": {"type": {"data_type": "ulong"},
                                   "access": expected_access,
@@ -145,11 +141,11 @@ class TestWorkerPropertySpecParser(unittest.TestCase):
         xml_string = "".join([
             "<property>\n",
             "<property name='test' type='ulong' ",
-            "readable='False' writable='true' ",
+            "writable='true' ",
             "description='Test property' ",
             "value='457'/>\n",
             "<property name='test2' type='double' ",
-            "readable='true' writable='false' ",
+            "writable='false' ",
             "description='Test property2' ",
             "default='90'/>\n",
             "</property>"])
@@ -160,18 +156,16 @@ class TestWorkerPropertySpecParser(unittest.TestCase):
 
         expected_access = {
             "initial": False, "parameter": False,
-            "readable": False, "readback":  False,
-            "readsync": False, "volatile":  False,
-            "writable": True,  "writesync": False,
-            "readerror": False, "writeerror": False,
-            "padding": False}
+            "readback":  False, "readsync": False,
+            "volatile":  False, "writable": True,
+            "writesync": False, "readerror": False,
+            "writeerror": False, "padding": False}
         expected_access2 = {
             "initial": False, "parameter": False,
-            "readable": True, "readback":  False,
-            "readsync": False, "volatile":  False,
-            "writable": False,  "writesync": False,
-            "readerror": False, "writeerror": False,
-            "padding": False}
+            "readback":  False, "readsync": False,
+            "volatile":  False, "writable": False,
+            "writesync": False, "readerror": False,
+            "writeerror": False, "padding": False}
 
         expected_dict = {"test": {
             "type": {"data_type": "ulong"},

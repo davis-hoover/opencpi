@@ -38,7 +38,8 @@ project = "OpenCPI assets"
 
 show_authors = False
 
-version = ""
+# Show version like OpenCPI docs, maybe OpenCPI doc build script can update this file
+version = "OpenCPI Release: 2.2.0"
 release = ""
 
 needs_sphinx = "2.4"
@@ -68,10 +69,23 @@ math_number_all = False
 
 numfig = True
 
+# This code changes numbering format to what's used in OpenCPI docs
+numfig_format = {
+    'figure': 'Figure %s:',
+    'table': 'Table %s:',
+    'code-block': 'Listing %s',
+    'section': 'Section %s'
+}
+
 html_theme = "sphinx_rtd_theme"
-html_theme_options = {}
+html_theme_options = {
+    'logo_only': True,
+}
 html_static_path = ["static"]
-html_css_files = ["css/test_result.css"]
+# OpenCPI logo from briefings
+html_logo = "static/logo_ocpi.svg"
+# Style sheet for OpenCPI added to CSS file list
+html_css_files = ["css/test_result.css, css/ocpidocument-style.css"]
 html_title = "OpenCPI assets"
 html_short_title = "OCPI assets"
 html_favicon = "static/favicon.ico"
@@ -87,7 +101,12 @@ html_show_sphinx = False
 html_show_copyright = False
 html_copy_source = False
 
-spelling_lang = "en_GB"
+spelling_lang = "en_US"
 spelling_word_list_filename = str(pathlib.Path(__file__).parent.joinpath(
     "dictionary.txt").resolve())
 spelling_show_suggestions = True
+
+# Defines a tight table style to override the RTD theme's wide table format
+def setup(app):
+    app.add_css_file ('css/ocpidocument-style.css')
+

@@ -4,6 +4,6 @@
 :orphan:
 
 
-``timestamper`` test detail
-=============================
+``timestamper`` Test Detail
+===========================
 .. ocpi_documentation_test_detail::

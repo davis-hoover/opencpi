@@ -1,4 +1,4 @@
-.. zed_gsg Zedboard Getting Started Guide documentation
+.. zed_gsg ZedBoard Getting Started Guide documentation
 
 .. This file is protected by Copyright. Please refer to the COPYRIGHT file
    distributed with this source distribution.
@@ -22,16 +22,16 @@
 .. _zed_gsg:
 
 
-Zedboard Getting Started Guide
+ZedBoard Getting Started Guide
 ==============================
 
 This document provides installation information that is specific
-to the Avnet (Digilent) Zedboard. It is intended to be used in tandem with the
+to the Avnet (Digilent) ZedBoard. It is intended to be used in tandem with the
 `OpenCPI Installation Guide <https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Installation_Guide.pdf>`_,
 which describes the general steps to enable OpenCPI for use on an embedded system.
 Use this guide as a companion to the *OpenCPI Installation Guide*, especially when
 performing the steps described in the chapter "Enabling OpenCPI Development
-for Embedded Systems". It provides details about the Zedboard system that
+for Embedded Systems". It provides details about the ZedBoard system that
 can be applied to the procedures described in that section.
 
 The following documents can also be used as reference to the tasks described in this document:
@@ -48,7 +48,7 @@ This document assumes a basic understanding of the Linux command line (or "shell
 Revision History
 ----------------
 
-.. csv-table:: OpenCPI Zedboard Getting Started Guide: Revision History
+.. csv-table:: OpenCPI ZedBoard Getting Started Guide: Revision History
    :header: "Revision", "Description of Change", "Date"
    :widths: 10,30,10
    :class: tight-table
@@ -67,9 +67,9 @@ Software Prerequisites
 ----------------------
 
 As shown in the Table of Supported Platforms in the *OpenCPI Installation Guide*,
-support for the Zedboard system is based on the ``zed`` or ``zed_ise`` OpenCPI
+support for the ZedBoard system is based on the ``zed`` or ``zed_ise`` OpenCPI
 HDL (FPGA) platform and the ``xilinx19_2_aarch32`` OpenCPI RCC (software) platform.
-The ``zed`` is the default HDL platform for the Zedboard system and
+The ``zed`` is the default HDL platform for the ZedBoard system and
 is defined to support the Xilinx Vivado tools, while the ``zed_ise`` platform
 is defined to support the older Xilinx ISE tools in cases where use of these
 older tools is required. The HDL platforms are supported by
@@ -79,10 +79,10 @@ the RCC platforms are supported by the ``ocpi.core`` built-in project.
 RCC Platforms
 ~~~~~~~~~~~~~
 
-The Zedboard system supports the RCC platform ``xilinx19_2_aarch32``, which
+The ZedBoard system supports the RCC platform ``xilinx19_2_aarch32``, which
 is also used by other systems such as the Ettus E310 (``e31x``).
 If this platform has already been installed and built for another system,
-it can apply to the Zedboard and does not need to be installed and built.
+it can apply to the ZedBoard and does not need to be installed and built.
 
 Third-party/Vendor Tools
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,12 +107,12 @@ Both ``bias`` and ``testbias`` reside in the ``ocpi.assets`` built-in project.
 Hardware Prerequisites
 ----------------------
 
-The Zedboard system requires the following hardware setup.
+The ZedBoard system requires the following hardware setup.
 
 Zedboard Product Package
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Zedboard product package should include the following items:
+The ZedBoard product package should include the following items:
 
 * Power supply
 
@@ -124,7 +124,7 @@ The Zedboard product package should include the following items:
 
 OpenCPI has been tested on Zedboard revisions C and D.
 
-The micro-USB serial port, labeled **UART** and located on the top side of the Zedboard,
+The micro-USB serial port, labeled **UART** and located on the top side of the ZedBoard,
 can be used to access the serial connection with the processor.
 
 .. figure:: figures/zed_uart.jpg
@@ -134,19 +134,19 @@ can be used to access the serial connection with the processor.
    Connected Serial USB
 
 The SD card slot is located below the FMC LPC slot
-on the bottom side of the Zedboard.
+on the bottom side of the ZedBoard.
 
 .. figure:: figures/zed_fmc_sd.jpg
-   :alt: Zedboard FMC Slot and SD Card Slot
+   :alt: ZedBoard FMC Slot and SD Card Slot
    :align: center
 
-   Zedboard FMC Slot and SD Card Slot
+   ZedBoard FMC Slot and SD Card Slot
 
 Ethernet Cable
 ~~~~~~~~~~~~~~
 
-An Ethernet port is available on the Zedboard and is required when the network mode environment
-is used. The OpenCPI BSP for the Zedboard is configured for DHCP.
+An Ethernet port is available on the ZedBoard and is required when the network mode environment
+is used. The OpenCPI BSP for the ZedBoard is configured for DHCP.
 
 .. figure:: figures/zed_ether.jpg
    :alt: Connected Ethernet
@@ -154,11 +154,11 @@ is used. The OpenCPI BSP for the Zedboard is configured for DHCP.
 
    Connected Ethernet
 
-OpenCPI Zedboard Supported Daughtercards (Optional)
+OpenCPI ZedBoard Supported Daughtercards (Optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Zedboard has an FMC LPC slot that is used to connect plug-in modules or daughtercards.
-Currently, OpenCPI supports two daughtercards that can be installed on the Zedboard:
+The ZedBoard has an FMC LPC slot that is used to connect plug-in modules or daughtercards.
+Currently, OpenCPI supports two daughtercards that can be installed on the ZedBoard:
 
 * Analog Devices FMCOMMS2
 
@@ -167,37 +167,37 @@ Currently, OpenCPI supports two daughtercards that can be installed on the Zedbo
 DHCP Support
 ~~~~~~~~~~~~
 
-Using the Zedboard system in network mode requires access to a network that supports DHCP.
+Using the ZedBoard system in network mode requires access to a network that supports DHCP.
 
 SD Card Reader
 ~~~~~~~~~~~~~~
 
-The Zedboard hardware setup requires an SD card reader.
+The ZedBoard hardware setup requires an SD card reader.
 
 Setting up the SD Card
 ----------------------
 
 The chapter "Enabling OpenCPI Development for Embedded Systems"
-ein the *OpenCPI Installation Guide* provides a section "Installation
+in the *OpenCPI Installation Guide* provides a section "Installation
 Steps for Systems after its Platforms are Installed" that describes
 how to create a new SD card for OpenCPI and how to customize some
 of the OpenCPI SD card files for your particular configuration.
 The recommended method is to make a raw copy of the manufacturer-supplied card to
 a new card, preserving formatting and content, and then remove most of the
 original files and copy files from OpenCPI. If you need to format the
-SD card for the Zedboard system, it should be a single FAT32 partition.
+SD card for the ZedBoard system, it should be a single FAT32 partition.
 
 .. _multiboards:
 
-Setting up Multiple Zedboards on the Same Network
+Setting up Multiple ZedBoards on the Same Network
 -------------------------------------------------
 
-By default, each Zedboard released by the factory has
-the same MAC address. If you require multiple Zedboards
+By default, each ZedBoard released by the factory has
+the same MAC address. If you require multiple ZedBoards
 to be on the same network, you must edit the SD card OpenCPI
 startup scripts ``mynetsetup.sh`` or ``mysetup.sh`` to provide
-a unique MAC address for each Zedboard. These scripts are created
-for the Zedboard (``zynq``) when you perform the step described
+a unique MAC address for each ZedBoard. These scripts are created
+for the ZedBoard (``zynq``) when you perform the step described
 in the section "Preparing the SD Card Contents" in the
 *OpenCPI Installation Guide*.
 
@@ -211,7 +211,7 @@ and then change the Ethernet address to be unique. For example:
    # ifconfig eth0 up
    # udhcpc
 
-where  ``00:0a:35:00:01:24`` is the unique MAC address for the Zedboard.
+where  ``00:0a:35:00:01:24`` is the unique MAC address for the ZedBoard.
 
 Configuring the Runtime Environment on the Platform
 ---------------------------------------------------
@@ -239,14 +239,14 @@ using ``root`` for user name and password:
    Successful Boot to PetaLinux
 
 
-When a single Zedboard is on the network, execute the following
+When a single ZedBoard is on the network, execute the following
 command to enable its Ethernet interface:
 
 .. code-block::
 
    $ ifconfig eth0 up
 
-When multiple Zedboards are on the network, you must modify
+When multiple ZedBoards are on the network, you must modify
 the ``mynetsetup.sh`` script according to the instructions in
 :ref:`multiboards`   
 before you proceed to the next step of running an application.
@@ -263,7 +263,7 @@ Using Xilinx ISE Instead of Vivado with the Zedboard
 As described in the *OpenCPI Installation Guide*, each OpenCPI platform
 depends on a set of third-party/vendor tools that need to be manually
 installed so that the platform can be built. OpenCPI supports two
-different FPGA/HDL platforms for the Zedboard:
+different FPGA/HDL platforms for the ZedBoard:
 
 * The ``zed`` platform (HDL target ``zynq``), which is built with
   the Xilinx Vivado tools
@@ -273,7 +273,7 @@ different FPGA/HDL platforms for the Zedboard:
 
 If your environment requires the use of Xilinx ISE tools rather
 than the (recommended) Xilinx Vivado tools, you need to target the
-``zed_ise`` platform for building bitstreams for the Zedboard,
+``zed_ise`` platform for building bitstreams for the ZedBoard,
 not the ``zed`` platform.
 
 .. include:: snippets/drivernotes.rst
@@ -285,7 +285,7 @@ As of OpenCPI Version 1.5, support for Lime Microsystems' Zipper daughtercard
 is deprecated. This section contains information about this card that
 has been removed from the main body of this document.
 
-OpenCPI has been tested on revisions C and D of the Zedboard. However,
+OpenCPI has been tested on revisions C and D of the ZedBoard. However,
 limitations have been observed for both revisions when used with the
 Zipper daughtercard. See the document
 `OpenCPI Zipper/Myriad-RF 1 Daughtercards <https://opencpi.gitlab.io/releases/develop/docs/assets/Myriad-RF_1_Zipper_Limitations.pdf>`_
@@ -293,9 +293,9 @@ for details.
 
 .. figure:: figures/zed_zipper.jpg
    :scale: 15
-   :alt: Zedboard with Zipper and MyriadRF-1 Connected to the FMC Slot
+   :alt: ZedBoard with Zipper and MyriadRF-1 Connected to the FMC Slot
    :align: center
 	   
-   Zedboard with Zipper and MyriadRF-1 Connected to the FMC Slot
+   ZedBoard with Zipper and MyriadRF-1 Connected to the FMC Slot
 
 

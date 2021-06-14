@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Property and parameter summary directive
+# Property summary directive
 #
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.

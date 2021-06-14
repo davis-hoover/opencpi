@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from inspect import signature
-import os
 from pathlib import Path
+from subprocess import call
 import sys
 import _opencpi.assets as ocpiassets
 import _opencpi.util as ocpiutil
@@ -60,7 +60,17 @@ def main():
     # Try to instantiate the appropriate asset from noun
         name = getattr(args, 'name', '')
         name = name if name else ''
-        directory = str(Path(args.directory, name))
+        dir=args.directory
+        # This is temporary until the more comprehensive solution based on get_subdir is done
+        if ocpiutil.get_dirtype(dir) == "project":
+            if args.noun == "worker":
+                dir += "/components"
+                if args.library and args.library != "components":
+                    dir += "/" + args.library
+            elif args.noun == "hdl-primitives":
+                dir += "/hdl/primitives"
+        directory = str(Path(dir, name))
+        # End of temporary fix until get_subdir is ported here
         asset_factory = ocpiassets.factory.AssetFactory()
         asset = asset_factory.factory(args.noun, directory, name)
     except ocpiutil.OCPIException as e:
@@ -79,9 +89,14 @@ def main():
         method_args = {}
         for param in sig.parameters:
             method_args[param] = getattr(args, param)
+        if args.verbose:
+            msg = 'Executing the "{} {}" command in "{}" directory: {}'.format(
+                args.verb, args.noun, args.noun, asset.directory)
+            print(msg)
         asset_method(**method_args)
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
+        sys.exit(1)
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
         ocpidev_sh()
@@ -93,6 +108,7 @@ def ocpicreate(args):
     """
     class_dict = {
         "project": ocpiassets.project.Project,
+        "library": ocpiassets.library.Library,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
@@ -111,10 +127,10 @@ def ocpicreate(args):
 def ocpidev_sh():
     """Calls ocpidev.sh and exits"""
     cdk_dir = ocpiutil.get_cdk_path()
-    ocpidev_sh_path = Path(cdk_dir, 'scripts', 'ocpidev.sh')
-    args = ' '.join(sys.argv)
-    cmd = '{} {}'.format(ocpidev_sh_path, args)
-    rc = os.system(cmd)
+    ocpidev_sh_path = str(Path(cdk_dir, 'scripts', 'ocpidev.sh'))
+    cmd = sys.argv
+    cmd.insert(0, ocpidev_sh_path)
+    rc = call(cmd)
     sys.exit(rc)
 
 

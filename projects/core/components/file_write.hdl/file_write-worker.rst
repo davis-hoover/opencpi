@@ -23,7 +23,7 @@
 .. _file_write-HDL-worker:
 
 
-``file_write`` HDL worker
+``file_write`` HDL Worker
 =========================
 Application HDL worker that only runs on FPGA simulator platforms. This worker
 will not run or be built for any FPGA hardware platforms because it contains
@@ -33,24 +33,12 @@ Detail
 ------
 .. ocpi_documentation_worker::
 
-   cwd: The current working directory of the application (required for HDL worker; cannot be determined automatically).
+  cwd: The current working directory of the application (required for HDL worker; cannot be determined automatically).
 
-   CWD_MAX_LENGTH: The maximum string length for ``cwd``.
+  CWD_MAX_LENGTH: The maximum string length for ``cwd``.
 
-.. Note: the worker directive does not currently pick up the fileName and suppressEOF SpecProperties for this worker.
+  in: Data written to file.
 
-Worker ports
-~~~~~~~~~~~~
-.. Worker ports (worker properties table in data sheets) are not currently picked up by the worker directive. This information is hand-coded for now.
-
-Outputs:
-
-* ``in``: Data written to file.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``32``  
-
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

@@ -49,13 +49,6 @@ Interface
 .. literalinclude:: ../specs/%%NAME-CODE%%-spec.xml
    :language: xml
 
-Ports
-~~~~~
-.. ocpi_documentation_ports::
-
-   input: Primary input samples port.
-   output: Primary output samples port.
-
 Opcode handling
 ~~~~~~~~~~~~~~~
 Skeleton outline: Description of how the non-stream opcodes are handled.
@@ -66,18 +59,18 @@ Properties
 
    property_name: Skeleton outline: List any additional text for properties, which will be included in addition to the description field in the component specification XML.
 
-Parameters
-~~~~~~~~~~
-.. ocpi_documentation_properties::
-   :parameters:
+Ports
+~~~~~
+.. ocpi_documentation_ports::
 
-   parameter_name: Skeleton outline: List any additional text for parameters, which will be included in addition to the description field in the component specification XML.
+   input: Primary input samples port.
+   output: Primary output samples port.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../%%NAME-CODE%%.hdl ../%%NAME-CODE%%.rcc
 
-Example application
+Example Application
 -------------------
 .. literalinclude:: example_app.xml
    :language: xml

@@ -29,7 +29,7 @@ from .ocpi_documentation_properties import OcpiDocumentationProperties
 from .ocpi_documentation_test_detail import OcpiDocumentationTestDetail
 from .ocpi_documentation_test_result_summary import \
     OcpiDocumentationTestResultSummary
-from .ocpi_documentation_utilisation import OcpiDocumentationUtilisation
+from .ocpi_documentation_utilization import OcpiDocumentationUtilization
 from .ocpi_documentation_worker import OcpiDocumentationWorker
 
 
@@ -52,6 +52,6 @@ def setup(app):
                       OcpiDocumentationTestDetail)
     app.add_directive("ocpi_documentation_test_result_summary",
                       OcpiDocumentationTestResultSummary)
-    app.add_directive("ocpi_documentation_utilisation",
-                      OcpiDocumentationUtilisation)
+    app.add_directive("ocpi_documentation_utilization",
+                      OcpiDocumentationUtilization)
     app.add_directive("ocpi_documentation_worker", OcpiDocumentationWorker)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Utilisation directive
+# Utilization directive
 #
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
 # distributed with this source distribution.
@@ -27,8 +27,8 @@ import docutils
 import docutils.parsers.rst
 
 
-class OcpiDocumentationUtilisation(docutils.parsers.rst.Directive):
-    """ ocpi_documentation_utilisation directive
+class OcpiDocumentationUtilization(docutils.parsers.rst.Directive):
+    """ ocpi_documentation_utilization directive
     """
     has_context = False
 
@@ -40,9 +40,9 @@ class OcpiDocumentationUtilisation(docutils.parsers.rst.Directive):
     option_spec = {"target_directory": str}
 
     def run(self):
-        """ Action when ocpi_documentation_utilisation directive called
+        """ Action when ocpi_documentation_utilization directive called
 
-        Summarise the hardware utilisation.
+        Summarize the hardware utilization.
 
         Returns:
             List with the docutils tree map to replace the directive in the
@@ -52,6 +52,6 @@ class OcpiDocumentationUtilisation(docutils.parsers.rst.Directive):
         content = []
 
         content.append(docutils.nodes.paragraph(
-            text="Utilisation reporting is not currently implemented."))
+            text="Utilization reporting is not currently implemented."))
 
         return content

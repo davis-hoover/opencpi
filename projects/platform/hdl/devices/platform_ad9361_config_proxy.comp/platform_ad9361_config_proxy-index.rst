@@ -22,7 +22,7 @@
 .. _platform_ad9361_config_proxy:
 
 
-AD9361 config proxy (``platform_ad9361_config_proxy``)
+AD9361 Config Proxy (``platform_ad9361_config_proxy``)
 ======================================================
 Defines properties that map to functions in the Analog Devices No-OS software library
 used by the proxy device worker implementation for AD9361 device control.
@@ -57,33 +57,28 @@ A block diagram representation of the implementation is given in :numref:`platfo
 
 Interface
 ---------
-.. This spec does not exist. The actual spec lives in the assets project and does not have the platform_ prefix. To make the directive work, the spec needs to exist in the platform/hdl/devices/specs directory and  have the platform_ prefix, as shown in the directive below.
+.. The spec referenced below is a link to the spec in the assets project and the tool can't presently follow the link. The tool search paths need to be updated to look in that location.
    
-.. literalinclude:: ../specs/platform_ad9361_config_proxy-spec.xml
+.. literalinclude:: ../specs/ad9361_config_proxy-spec.xml
    :language: xml
 
-Ports
-~~~~~
-.. comment out ocpi_documentation_ports for now. It doesn't work.
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied: Description of how the non-stream opcodes are handled (if relevant).
 
 Properties
 ~~~~~~~~~~
 .. comment out ocpi_documentation_properties for now. The parser crashes with an error about member child elements in structs.
-   
 
-Parameters
-~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. It doesn't work.
+Ports
+~~~~~
+.. comment out ocpi_documentation_ports for now. It doesn't work.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../platform_ad9361_config_proxy.rcc
 
-Example application
+Example Application
 -------------------
 To be supplied: a meaningful example, if relevant to this type of worker.
 

@@ -23,7 +23,7 @@
 .. _complex_mixer-HDL-worker:
 
 
-``complex_mixer`` HDL worker
+``complex_mixer`` HDL Worker
 ============================
 Application worker HDL implementation
 with settable runtime configuration parameters
@@ -92,29 +92,9 @@ The following figure shows a block diagram representation of the HDL implementat
    mag: Must be in the range :math:`-2^{(NCO\_DATA\_WIDTH\_p-1)} <= mag <= 2^{(NCO\_DATA\_WIDTH\_p-1)}-1` for the worker to operate properly.
    data_select: 0 = input data, 1 = output of NCO.
 
-Worker ports
-~~~~~~~~~~~~
+  in: Signed complex samples.
 
-Inputs:
-
-* ``in``: Signed complex samples.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``32``
-    
-  * Zero length messages: ``True``
-
-Outputs:
-
-* ``out``: Signed complex samples.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``32``
-    
-  * Zero length messages: ``True``
-
+  out: Signed complex samples.
 
 Finite State Machine
 ~~~~~~~~~~~~~~~~~~~~
@@ -138,6 +118,6 @@ there is a delay of ``CORDIC_STAGES_p+3`` before the first sample is taken.  Aft
 valid output data is given two clock cycles after input data is taken (latency=2).
 
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::
