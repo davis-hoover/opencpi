@@ -23,7 +23,7 @@
 .. _file_write-RCC-worker:
 
 
-``file_write`` RCC worker
+``file_write`` RCC Worker
 =========================
 Application RCC worker implemented in the C language version of the RCC model. Newer RCC workers
 are usually implemented in the C++ language version of the RCC model.

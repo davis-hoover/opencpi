@@ -31,7 +31,7 @@ import ocpi_documentation
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Initialise and build documentation.")
+        description="Initialize and build documentation.")
     parser.add_argument("-d", "--directory", type=str,
                         default=pathlib.Path.cwd(),
                         help="Directory to run action in.")

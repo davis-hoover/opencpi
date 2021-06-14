@@ -6,7 +6,7 @@
 .. _timestamper-HDL-worker:
 
 
-``timestamper`` HDL worker
+``timestamper`` HDL Worker
 ==========================
 Application worker HDL implementation with a settable runtime configuration parameter for the ``enable`` property.
 
@@ -14,39 +14,11 @@ Detail
 ------
 .. ocpi_documentation_worker::
 
-Worker ports
-~~~~~~~~~~~~
+  in: Signed complex samples.
 
-Inputs:
+  out: Signed complex samples.
 
-* ``in``: Signed complex samples.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``32``
-    
-  * Number of opcodes: ``256``
-
-Outputs:
-
-* ``out``: Signed complex samples.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``32``
-    
-  * Number of opcodes: ``256``
-
-Time:
-
-* ``time``: Time interface provided by OpenCPI time server.
-  
-  * Type: ``TimeInterface``
-    
-  * Seconds width: ``32``
-    
-  * Fraction width: ``32``
-
+  time: Time interface provided by OpenCPI time server.
 
 Control Timing and Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,6 +28,6 @@ control signals.
 Data presented on the input appears on the output clock three cycles later
 (latency=3).  Two of the three clock cycles consist of a time message.
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

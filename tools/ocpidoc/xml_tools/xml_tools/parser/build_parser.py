@@ -34,7 +34,7 @@ class BuildParser(base_parser.BaseParser):
     """
 
     def __init__(self, filename, include_filepaths=["."]):
-        """ Initialise build configuration parser class.
+        """ Initialize build configuration parser class.
 
         Handles parsing an XML file with a <build> root element.
 
@@ -45,7 +45,7 @@ class BuildParser(base_parser.BaseParser):
                 statement.
 
         Returns:
-            An initialised BuildParser instance.
+            An initialized BuildParser instance.
         """
         super().__init__(filename=filename,
                          include_filepaths=include_filepaths,

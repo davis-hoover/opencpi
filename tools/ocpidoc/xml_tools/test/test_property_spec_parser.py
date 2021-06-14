@@ -391,18 +391,15 @@ class TestPropertySpecParser(unittest.TestCase):
         access_values = [
             "".join([
                 "initial='false' parameter='false' ",
-                "readable='false' volatile='true' ",
-                "writable='false'"]),
+                "volatile='true' writable='false'"]),
             "".join([
-                "readable='False' writable='true'"])]
+                "writable='true'"])]
 
         expected_values = [
             {"initial":  False, "parameter": False,
-             "readable": False, "volatile":  True,
-             "writable": False},
+             "volatile":  True, "writable": False},
             {"initial":  False, "parameter": False,
-             "readable": False, "volatile":  False,
-             "writable": True}
+             "volatile":  False, "writable": True}
         ]
         for expected, access_value in zip(expected_values, access_values):
 
@@ -427,7 +424,7 @@ class TestPropertySpecParser(unittest.TestCase):
 
         xml_string = " ".join([
             "<property name='test' type='ulong'",
-            "readable='False' writable='true'",
+            "writable='true'",
             "description='Test property'",
             "default='85'",
             "value='439875'",
@@ -435,8 +432,7 @@ class TestPropertySpecParser(unittest.TestCase):
 
         expected_access = {
             "initial": False, "parameter": False,
-            "readable": False, "volatile":  False,
-            "writable": True}
+            "volatile":  False, "writable": True}
 
         expected_dict = {"test": {"type": {"data_type": "ulong"},
                                   "access": expected_access,
@@ -453,11 +449,11 @@ class TestPropertySpecParser(unittest.TestCase):
         xml_string = "".join([
             "<property>\n",
             "<property name='test' type='ulong' ",
-            "readable='False' writable='true' ",
+            "writable='true' ",
             "description='Test property' ",
             "value='457'/>\n",
             "<property name='test2' type='double' ",
-            "readable='true' writable='false' ",
+            "writable='false' ",
             "description='Test property2' ",
             "default='90'/>\n",
             "</property>"])
@@ -468,12 +464,10 @@ class TestPropertySpecParser(unittest.TestCase):
 
         expected_access = {
             "initial": False, "parameter": False,
-            "readable": False, "volatile":  False,
-            "writable": True}
+            "volatile":  False, "writable": True}
         expected_access2 = {
             "initial": False, "parameter": False,
-            "readable": True, "volatile":  False,
-            "writable": False}
+            "volatile":  False, "writable": False}
 
         expected_dict = {"test": {
             "type": {"data_type": "ulong"},
