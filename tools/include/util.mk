@@ -591,8 +591,8 @@ OcpiGetRccPlatformDir=$(strip $(firstword \
 # Functions for collecting Project Dependencies and imports for use with project
 # path
 ##################################################################################
-# Project Dependencies are defined by those explicitly listed in a Project.mk as well as the 'required'
-# projects such as core/cdk
+# Project Dependencies are defined by those explicitly listed in a Project.<mk|xml>
+# as well as the 'required' projects such as core/cdk
 OcpiProjectDependenciesInternal=$(call Unique,$(ProjectDependencies)\
                                    $(if $(filter ocpi.core,$(OCPI_PROJECT_PACKAGE)),,ocpi.core))
 # If a project dependency is a path, use it as is. Otherwise, check for it in imports.
@@ -816,11 +816,11 @@ define OcpiSetProject
 endef
 define OcpiSetProjectX
   # This might already be set
-  $$(call OcpiDbg,Setting project to $1)
+  $$(call OcpiDbg,Setting project directory to $1)
   OcpiTempProjDir:=$$(call OcpiAbsDir,$1)
   ifdef OCPI_PROJECT_DIR
     ifneq ($$(OcpiTempProjDir),$$(OCPI_PROJECT_DIR))
-      $$(error OCPI_PROJECT_DIR in environment is $$(OCPI_PROJECT_DIR), but found Project.mk in $1)
+      $$(error OCPI_PROJECT_DIR in environment is $$(OCPI_PROJECT_DIR), but found Project.<mk|xml> in $1)
     endif
   endif
   override OCPI_PROJECT_DIR=$$(OcpiTempProjDir)
@@ -839,10 +839,23 @@ define OcpiSetProjectX
   PackageNameSaved:=$$(PackageName)
   export PackageName:=
 
-  # Include Project.mk to determine ProjectPackage
+  # Include Project.<mk|xml> to determine ProjectPackage
   $$(infox PR0:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
-  include $1/Project.mk
+  ifneq ($(wildcard $1/Project.xml),)
+    # Handle XML, aka make-less, properties for project assets
+    ifneq ($(wildcard $1/Project.mk),)
+      $$(warning Found both Project.mk and Project.xml, using Project.xml)
+    endif
+    $(if $(call DoShell,$(ToolsDir)/ocpigen -R $1/Project.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
+    $(error ocpigen failed),$(foreach var,$(subst ;, ,$(OcpiProps)),$$(eval $(subst &, ,$(var)))))
+    $(foreach var,$(subst ;, ,$(OcpiProps)),$(eval $(subst &, ,$(var))))
+  else
+    # Legacy support for project assets
+    $$(warning Could not find Project.xml, using Project.mk)
+    include $1/Project.mk
+  endif
   $$(infox PR1:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
+
   # Determine ProjectPackage as follows:
   # If it is already set, use it as-is
   # If ProjectPackage or Package is set, use that as-is
@@ -932,17 +945,17 @@ OcpiGetShortenedDirType=$(infox OGSDT:$1)$(strip \
 
 # Recursive
 OcpiIncludeProjectX=$(infox OIPX:$1:$2:$3)\
-  $(if $(wildcard $1/Project.mk),\
+  $(if $(wildcard $1/Project.mk)$(wildcard $1/Project.xml),\
     $(if $(wildcard $1/Makefile)$(wildcard $1/Makefile.am),\
       $(if $(filter project,$(call OcpiGetDirType,$1)),\
         $(infox found project in $1)\
         $(eval $(call OcpiSetProject,$1))\
         $(infox PROJECT:$(OCPI_PROJECT_PACKAGE):$(PackagePrefix):$(ProjectPackage)=$(Package)),\
-        $(error no proper Makefile found in the directory where Project.mk was found ($1))),\
-      $(error no Makefile found in the directory where Project.mk was found ($1))),\
+        $(error no proper Makefile found in the directory where Project.<mk|xml> was found ($1))),\
+      $(error no Makefile found in the directory where Project.<mk|xml> was found ($1))),\
     $(if $(foreach r,$(realpath $1/..),$(filter-out /,$r)),\
       $(call OcpiIncludeProjectX,$(and $(filter-out .,$1),$1/)..,$2,$3),\
-      $(call $2,$2: no Project.mk was found here ($3) or in any parent directory)))
+      $(call $2,$2: no Project.<mk|xml> was found here ($3) or in any parent directory)))
 
 # One arg is what to do if not found: error, warning, nothing
 OcpiIncludeProject=$(infox OIP:$1:$2:$(MAKECMDGOALS):$(OCPI_PROJECT_PACKAGE):$(OCPI_PROJECT_REL_DIR))\
