@@ -136,13 +136,6 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\\
 include $(OCPI_CDK_DIR)/include/project.mk
 \n""")
 
-LIB_MAKEFILE= ("""# This is the Makefile for the components directory when there are multiple
-# libraries in their own directories underneath this components directory
-$(if $(realpath $(OCPI_CDK_DIR)),,\\
-  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
-include $(OCPI_CDK_DIR)/include/libraries.mk
-\n""")
-
 LIB_DIR_MAKEFILE= ("""# This is the bar library
 
 # All workers created here in *.<model> will be built automatically
