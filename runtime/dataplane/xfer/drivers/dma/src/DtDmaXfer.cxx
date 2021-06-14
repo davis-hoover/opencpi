@@ -33,6 +33,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <sys/mman.h> // FIXME: use OS services?
+#include "ocpi-config.h"
 #include "KernelDriver.h"
 #include "OcpiOsDebug.h"
 #include "OcpiUtilMisc.h"
