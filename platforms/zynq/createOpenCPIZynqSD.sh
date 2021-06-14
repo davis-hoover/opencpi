@@ -109,7 +109,7 @@ cp uramdisk.image.gz $sd
 rm -r -f $sd/opencpi
 mkdir $sd/opencpi
 set -o pipefail
-(cd $OCPI_CDK_DIR/..; ./packaging/prepare-package-list.sh deploy $OCPI_TARGET_PLATFORM 1 ) |
+(cd $OCPI_ROOT_DIR; ./packaging/prepare-package-list.sh deploy $OCPI_TARGET_PLATFORM 1 ) |
 while read source dest; do
   [[ $source == */ ]] && continue # we don't do anything for individual directories
   if [ -n "$dest" ] ; then
@@ -119,7 +119,7 @@ while read source dest; do
   fi
   links=
   [[ $$source != *@ ]] && links=-L
-  cp -R $links $OCPI_CDK_DIR/../$source $dest
+  cp -R $links $OCPI_ROOT_DIR/$source $dest
 done || ( echo Preparation of file list failed. && exit 1)
 echo Stripping all binaries to reduce space.
 for f in `find $sd/opencpi/$OCPI_TARGET_PLATFORM/bin -type f`; do

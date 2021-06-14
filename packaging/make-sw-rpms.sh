@@ -84,7 +84,7 @@ else
 fi
 
 echo "Creating RPM file(s) in $target for $msg for the $platform platform."
-source $OCPI_CDK_DIR/../build/prerequisites/myhostname/myhostname.sh
+source $OCPI_ROOT_DIR/build/prerequisites/myhostname/myhostname.sh
 
 # Run rpmbuild, passing in all the generic package naming information and running it
 # with the host name spoofing to avoid embedding internal server names in the rpm file.
