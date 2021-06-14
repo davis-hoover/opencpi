@@ -130,6 +130,7 @@
 +tools/scripts/export-platform.sh scripts/
 +tools/scripts/export-utils.sh scripts/
 +tools/scripts/export-platform-to-framework.sh scripts/
++tools/scripts/enable-rcc-platform.sh scripts/
 # Put this script where the executables are exported to run there - needed?
 =runtime/ctests/src/run_tests.sh <target>/bin/ctests/
 #+runtime/ctests/src/run_tests.sh scripts/
