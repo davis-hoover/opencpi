@@ -63,7 +63,7 @@ endif
 ifeq ($(NoExports)$(wildcard exports)$(filter projectpackage,$(MAKECMDGOALS)),)
   doexports=$(shell $(OcpiExportVars) $(OCPI_CDK_DIR)/scripts/export-project.sh -)
   ifeq ($(filter clean% imports,$(MAKECMDGOALS)),)
-    $(info Setting up exports)
+    $(infox Setting up exports)
     $(infox $(doexports))
   else
     # we are assuming that exports are not required for any clean goal.
