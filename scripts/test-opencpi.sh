@@ -42,7 +42,7 @@ function framework_test {
 # 3. Tests using the built-in projects
 minimal_tests="driver os datatype load-drivers container"
 network_tests="assets"
-dev_tests="swig python av ocpidev core inactive"
+dev_tests="swig python project ocpidev core inactive"
 alltests="$minimal_tests $network_tests $dev_tests"
 tests="$minimal_tests"
 # runtime/standalone tests we can run
@@ -170,9 +170,9 @@ for t in $tests; do
     python)
       echo ======================= Running Python utility tests in tests/pytests
       (framework_test pytests && ./run_pytests.sh);;
-    av)
-      echo ======================= Running av_tests
-      (framework_test av-test && ./run_avtests.sh);;
+    av|project)
+      echo ======================= Running project tests '(in projects/test)'
+      (cd projects/test && ./run_tests.sh);;
     ocpidev)
       # These tests might do HDL building
       hplats=($HdlPlatform $HdlPlatforms)

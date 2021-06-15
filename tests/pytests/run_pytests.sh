@@ -29,9 +29,9 @@ make clean
   fi
 }
 set -e
-# clearly this test cannot run concurrently with av-test!
-make -C ../av-test cleaneverything
-ocpidev -d ../av-test build ${HDL_PLATFORM:+--hdl-platform $HDL_PLATFORM}
+# clearly this test cannot run concurrently with other tests based on projects/test
+ocpidev -d $OCPI_ROOT_DIR/projects/test clean
+ocpidev -d $OCPI_ROOT_DIR/projects/test build ${HDL_PLATFORM:+--hdl-platform $HDL_PLATFORM}
 MIN_COVERAGE=80 #%
 rm -f .coverage
 # Run each test and collect coverage info

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<application done="file_write">
+  <instance component="ocpi.core.file_read" connect="timestamper">
+    <property name="filename" value="input.bin"/>
+  </instance>
+  <instance component="ocpi.=assets.util_comps.timestamper" connect="file_write">
+  </instance>
+  <instance component="ocpi.core.file_write">
+    <property name="filename" value="output.bin"/>
+  </instance>
+</application>

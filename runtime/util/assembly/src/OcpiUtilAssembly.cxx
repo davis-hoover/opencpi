@@ -137,6 +137,8 @@ namespace OCPI {
       OE::getOptionalString(ax, m_package, "package");
       if (m_package.empty() || m_package[0] == '.') {
 	const char *env = getenv("OCPI_PROJECT_PACKAGE");
+	if (!env)
+	  env = getenv("OCPI_DEFAULT_PACKAGE");
 	std::string prefix = env ? env : "local";
        if (m_package[0] == '.')
 	 prefix += m_package;

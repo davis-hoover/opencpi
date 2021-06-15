@@ -47,6 +47,8 @@ def get_dirtype(directory="."):
     Determine a directory's type by parsing it for the last 'include ... *.mk' line
     """
     match = None
+    if os.path.isfile(directory + "/Framework.exports"):
+        return match
     if os.path.isfile(directory + "/Makefile"):
         with open(directory + "/Makefile") as mk_file:
             for line in mk_file:
