@@ -23,7 +23,7 @@ $(OcpiIncludeAssetAndParent)
 # This variable specifies the local list of platforms that are active here.
 HdlMyPlatforms?=$(foreach d,$(filter-out %.txt %.mk test Makefile common README README.txt lib specs old,$(wildcard *)),$(and $(wildcard $d/$d.mk),$d))
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
-ifndef HdlPlatforms
+ifeq ($(HdlPlatforms)$(filter-out undefined,$(origin HdlPlatforms))),)
   ifndef HdlPlatform
     ifeq ($(MAKECMDGOALS),clean)
       HdlPlatforms=$(HdlMyPlatforms)
@@ -43,9 +43,20 @@ endif
 
 all: $(HdlMyPlatforms)
 
+ifneq ($(filter declarehdl,$(MAKECMDGOALS)),)
+  HdlGoal=declare
+  HdlMessage=Declaring (make usable in proxies)
+  MAKEOVERRIDES+=HdlPlatforms= HdlPlatform= 
+else
+  HdlGoal=
+  HdlMessage=Building
+endif
+declarehdl: $(HdlMyPlatforms)
+
 $(HdlMyPlatforms):
-	$(AT)echo =============Building platform $@
-	$(AT)$(MAKE) OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) --no-print-directory -C $@
+	$(AT)echo "=============$(HdlMessage) platform $@"
+	$(AT)$(MAKE) OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) --no-print-directory -C $@ \
+             $(HdlGoal)
 
 clean::
 	$(AT)for p in $(HdlMyPlatforms); do \
