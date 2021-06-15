@@ -26,10 +26,10 @@ endif
 
 DoLibGoal=$(AT)\
   set -e; \
-  for l in $(Libraries); do \
-    echo ====== Entering library $$l for goal: $(@); \
-    $(MAKE) -C $$l OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) $@; \
-  done
+  $(foreach l,$(Libraries),\
+    echo ====== Entering library $l for goal: $@; \
+    $(MAKE) -C $l $(if $(wildcard $l/Makefile),,-f $(OCPI_CDK_DIR)/include/library.mk) \
+            OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) $@ &&):
 
 Goals=run all declarehdl clean $(Models) $(Models:%=clean%) $(OcpiTestGoals)
 

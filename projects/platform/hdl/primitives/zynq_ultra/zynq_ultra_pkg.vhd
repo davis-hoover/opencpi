@@ -38,8 +38,8 @@ end record pl2ps_t;
 component zynq_ultra_ps is
   port(ps_in        : in    pl2ps_t;
        ps_out       : out   ps2pl_t;
-       m_axi_hp_in  : in    axi.zynq_ultra_m_hp.axi_s2m_array_t(0 to C_M_AXI_HP_COUNT-1);
-       m_axi_hp_out : out   axi.zynq_ultra_m_hp.axi_m2s_array_t(0 to C_M_AXI_HP_COUNT-1);
+       m_axi_hp_in  : in    axi.zynq_ultra_m_hp64.axi_s2m_array_t(0 to C_M_AXI_HP_COUNT-1);
+       m_axi_hp_out : out   axi.zynq_ultra_m_hp64.axi_m2s_array_t(0 to C_M_AXI_HP_COUNT-1);
        s_axi_hp_in  : in    axi.zynq_ultra_s_hp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1);
        s_axi_hp_out : out   axi.zynq_ultra_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1));
 end component zynq_ultra_ps;

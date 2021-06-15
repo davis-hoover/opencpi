@@ -220,7 +220,9 @@ namespace OCPI {
    * dynamic libraries that do not exist at runtime, e.g. uuid.so) but nowhere else in the
    * framework infrastructure, forcing them to be statically linked here:
    */
+#if defined(__clang__)
 #pragma clang optimize off
+#endif
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
   namespace Container {
@@ -265,6 +267,8 @@ namespace OCPI {
     }
   }
 #pragma GCC pop_options
+#if defined(__clang__)
 #pragma clang optimize on
+#endif
 }
 

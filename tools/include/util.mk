@@ -1157,9 +1157,7 @@ OcpiIncludeAssetAndParent=\
 ###############################################################################
 
 # Find the subdirectories that make a Makefile that includes something
-OcpiFindSubdirs=$(strip \
-  $(foreach a,$(wildcard */Makefile),\
-    $(shell grep -q '^[ 	]*include[ 	]*.*/include/$1.mk' $a && echo $(patsubst %/,%,$(dir $a)))))
+OcpiFindSubdirs=$(foreach a,$(wildcard *),$(and $(filter $1,$(call OcpiGetDirType,$a)),$a))
 
 OcpiHavePrereq=$(realpath $(OCPI_PREREQUISITES_DIR)/$1)
 OcpiPrereqDir=$(call OcpiHavePrereq,$1)
