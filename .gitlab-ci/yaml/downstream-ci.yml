@@ -34,6 +34,9 @@ generate-children:
   variables:
     GIT_STRATEGY: none
 
+include: 
+- .gitlab-ci/yaml/verify-pipeline.yml
+
 stages:
 - .pre
 - generate-children
