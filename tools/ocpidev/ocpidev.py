@@ -60,7 +60,17 @@ def main():
     # Try to instantiate the appropriate asset from noun
         name = getattr(args, 'name', '')
         name = name if name else ''
-        directory = str(Path(args.directory, name))
+        dir=args.directory
+        # This is temporary until the more comprehensive solution based on get_subdir is done
+        if ocpiutil.get_dirtype(dir) == "project":
+            if args.noun == "worker":
+                dir += "/components"
+                if args.library and args.library != "components":
+                    dir += "/" + args.library
+            elif args.noun == "hdl-primitives":
+                dir += "/hdl/primitives"
+        directory = str(Path(dir, name))
+        # End of temporary fix until get_subdir is ported here
         asset_factory = ocpiassets.factory.AssetFactory()
         asset = asset_factory.factory(args.noun, directory, name)
     except ocpiutil.OCPIException as e:

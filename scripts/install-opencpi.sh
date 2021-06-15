@@ -36,6 +36,14 @@ while (( "$#" )); do
       export OCPI_DISTRO_BUILD=1
       shift
       ;;
+    --minimal)
+      minimal=1
+      shift
+      ;;
+    --no-kernel)
+      nokernel=1 # use ${nokernel:+whatever}
+      shift
+      ;;
     -*) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
       exit 1
@@ -101,11 +109,14 @@ $OCPI_CDK_DIR/scripts/enable-rcc-platform.sh "$OCPI_TARGET_PLATFORM"
 ./build/install-prerequisites.sh "$OCPI_TARGET_DIR"
 
 # Build framework and built-in projects for target platform
-eval $* ./build/build-opencpi.sh "$OCPI_TARGET_DIR"
+eval $* ./build/build-opencpi.sh ${minimal:+--minimal} ${nokernel:+--no-kernel} "$OCPI_TARGET_DIR"
 
 # Run RCC unit tests
 if [ -n "$OCPI_TARGET_PLATFORM" -a "$OCPI_TOOL_PLATFORM" != "$OCPI_TARGET_PLATFORM" ]; then
   echo "When building/installing for cross-compiled platform $OCPI_TARGET_DIR, we are skipping tests."
+elif [ -n "$minimal" ]; then
+  echo "Avoiding installation tests since the --minimal option was given."
+  echo 'Installation tests may be run at any time using the "ocpitest --nohdl" command.'
 else
   eval $* ./scripts/test-opencpi.sh --no-hdl
 fi
