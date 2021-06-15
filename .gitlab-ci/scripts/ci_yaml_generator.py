@@ -29,11 +29,14 @@ def main():
         platform_whitelist = yaml.safe_load(yml)
 
     # Get projects
-    project_blacklist = ['tutorial', ci_env.project_id]
-    project_group_ids = ['6009537', '9500084']
+    project_blacklist = [ci_env.project_id]
+    project_whitelist = ['core', 'assets', 'assets_ts', 'inactive', 'platform',
+                         'plutosdr', 'e3xx', 'sockit cv', 'adrv936x', 'sdr', 'ettus']
     projects_path = Path('projects')
+    ocpi_group_id = 5378285
     projects = ci_project.discover_projects(projects_paths=projects_path, 
-                                            group_ids=project_group_ids,
+                                            group_ids=ocpi_group_id,
+					    whitelist=project_whitelist,
                                             blacklist=project_blacklist)
     # Get platforms
     platforms = ci_platform.discover_platforms(projects, 
