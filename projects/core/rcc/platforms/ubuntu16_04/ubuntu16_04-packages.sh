@@ -140,6 +140,9 @@ PKGS_E+=(ocl-icd-libopencl1)
 PKGS_E+=(scons)
 #    Needed to build plutosdr osp
 PKGS_E+=(libssl-dev device-tree-compiler)
+#    Needed for asciidoc3
+#    -- see note about installing/enabling Felix Krull PPA below
+PKGS_E+=(python3.6)
 
 #
 # Comments around/within the next two functions are for my own
@@ -197,12 +200,6 @@ fi
 # an error to run "dpkg --add-architecture i386" more than once.
 $SUDO dpkg --add-architecture i386
 
-# Make sure "apt-get" knows about the latest available packages
-# in all configured repositories.  Although running this is in
-# accordance with best practices anyway, it is mandatory if we
-# added the i386 architecture or the TimSC PPA above. 
-$SUDO apt-get update
-
 # Need this for `add-apt-repository` command used later
 $SUDO apt-get --yes install software-properties-common
 
@@ -211,6 +208,19 @@ if [ ! -f /etc/apt/sources.list.d/timsc-ubuntu-swig-3_0_12-xenial.list ]
 then
   $SUDO add-apt-repository --yes ppa:timsc/swig-3.0.12
 fi
+
+# Enable Felix Krull Personal Package Archive (PPA): needed for "python3.6"
+if [ ! -f /etc/apt/sources.list.d/deadsnakes-ubuntu-ppa-xenial.list ]
+then
+  $SUDO add-apt-repository --yes ppa:deadsnakes/ppa
+fi
+
+# Make sure "apt-get" knows about the latest available packages
+# in all configured repositories.  Although running this is in
+# accordance with best practices anyway, it is mandatory if we
+# added the i386 architecture, the TimSC PPA, or the Felix Krull
+# PPA above.
+$SUDO apt-get update
 
 # Install required packages, packages needed for development, and packages
 # needed for building from source.  Specify "--no-act" for debugging.
