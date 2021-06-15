@@ -56,17 +56,17 @@
   </ComponentSpec>
   <Property Name="M" Type="float"
                               Parameter="true"
-                              Default="10"
+                              Default="17"
                               Description="Multiply Parameter"/>
 
   <Property Name="N" Type="ulong"
                               Parameter="true"
-                              Default="1"
+                              Default="2"
                               Description="Divide Parameter"/>
 
   <Property Name="O" Type="float"
                               Parameter="true"
-                              Default="20"
+                              Default="17"
                               Description="Output Clock Divide Parameter"/>
 
   <StreamInterface Name="in"

@@ -29,7 +29,6 @@ architecture rtl of worker is
   signal s_not_locked_synced_data  : std_logic;
   signal doit : bool_t;
   signal out_in_rst_detected : std_logic;
-  signal in_in_rst_detected : std_logic;
 begin
 
     clock_gen : clocking.clocking.clock_generator
@@ -60,17 +59,6 @@ begin
         dst_clk   => s_clk_out,
         dst_rst   => s_not_locked_synced_data);
 
-    -- this worker is not initialized until s_clk_out is ticking and the in port
-    -- has successfully come into reset
-    rst_detector_reg_in_in_reset : util.util.reset_detector
-      port map(
-        clk                     => s_clk_out,
-        rst                     => in_in.reset,
-        clr                     => '0',
-        rst_detected            => in_in_rst_detected,
-        rst_then_unrst_detected => open);
-
-    ctl_out.done <= in_in_rst_detected;
     doit <= in_in.ready and out_in.ready and not s_not_locked_synced_data;
     -- WSI input interface outputs
     in_out.take         <= doit;

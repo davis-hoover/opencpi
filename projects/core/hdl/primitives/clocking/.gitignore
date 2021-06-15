@@ -3,10 +3,10 @@ ip_gen/vivado_ip/timestamp-zynq_clk_wiz
 ip_gen/vivado_ip/timestamp-zynq_ultra_clk_wiz
 ip_gen/ise_ip/timestamp-zynq_ise_clk_wiz
 ip_gen/quartus_ip/timestamp-cyclone5_altera_pll
-xsim/mmcme2.vhd
-xsim/plle2.vhd
-xsim/mmcme4.vhd
-xsim/plle4.vhd
+xsim/mmcme2.v
+xsim/plle2.v
+xsim/mmcme4.v
+xsim/plle4.v
 zynq/mmcme2.v
 zynq/plle2.v
 zynq_ultra/mmcme4.v
