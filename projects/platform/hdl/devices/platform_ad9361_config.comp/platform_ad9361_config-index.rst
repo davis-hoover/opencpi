@@ -24,7 +24,7 @@
 .. _platform_ad9361_config:
 
 
-AD9361 config (``platform_ad9361_config``)
+AD9361 Config (``platform_ad9361_config``)
 ==========================================
 Defines the set of properties that provides an entry point to the major functionality of the AD9361 integrated circuit (IC).
 ``platform_ad9361_config`` is an asset in the ``ocpi.platform.devices`` component library.
@@ -71,11 +71,7 @@ This component's specification is contained in the OpenCPI Worker Description (O
 .. literalinclude:: ../platform_ad9361_config.hdl/platform_ad9361_config.xml
    :language: xml
 
-Ports
-~~~~~
-.. comment out ocpi_documentation_ports directive for now. It doesn't work and there aren't any ports for this component.
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied: Description of how the non-stream opcodes are handled (if relevant).
 
@@ -83,16 +79,15 @@ Properties
 ~~~~~~~~~~
 .. comment out ocpi_documentation_properties for now. It doesn't work.
 
-
-Parameters
-~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. It doesn't work.
+Ports
+~~~~~
+.. comment out ocpi_documentation_ports directive for now. It doesn't work and there aren't any ports for this component.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../platform_ad9361_config.hdl
 
-Example application
+Example Application
 -------------------
 To be supplied: a meaningful example, if relevant to this type of worker.
 

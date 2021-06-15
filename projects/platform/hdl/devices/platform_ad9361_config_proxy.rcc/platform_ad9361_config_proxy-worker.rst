@@ -24,7 +24,7 @@
 .. _platform_ad9361_config_proxy-RCC-worker:
 
 
-``platform_ad9361_config_proxy`` RCC worker
+``platform_ad9361_config_proxy`` RCC Worker
 ===========================================
 
 Detail

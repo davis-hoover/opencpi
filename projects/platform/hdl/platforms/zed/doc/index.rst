@@ -178,7 +178,7 @@ Setting up the SD Card
 ----------------------
 
 The chapter "Enabling OpenCPI Development for Embedded Systems"
-ein the *OpenCPI Installation Guide* provides a section "Installation
+in the *OpenCPI Installation Guide* provides a section "Installation
 Steps for Systems after its Platforms are Installed" that describes
 how to create a new SD card for OpenCPI and how to customize some
 of the OpenCPI SD card files for your particular configuration.

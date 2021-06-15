@@ -24,7 +24,7 @@
 .. _platform_ad9361_spi-HDL-worker:
 
 
-``platform_ad9361_spi`` HDL worker
+``platform_ad9361_spi`` HDL Worker
 ==================================
 
 Detail
@@ -36,7 +36,7 @@ can force the AD9361 RESETB pin, which is active-low, to logic 0.
 
 .. comment out ocpi_documentation_worker directive for now. It doesn't work with HdlDevice yet.
 
-Worker ports
+Worker Ports
 ~~~~~~~~~~~~
 
 .. This is hand-entered for now to suggest a format that the XML parser might use to automatically generate it.
@@ -66,7 +66,7 @@ Outputs:
   * Width: ``1``
 
 
-Worker configuration parameters
+Worker Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Resource utilization for this worker for the ``zynq`` target platform, configuration 0:
@@ -176,7 +176,7 @@ that is different from the Vivado analysis performed by default for OpenCPI work
 the section "Vivado timing analysis" for details.
 
 
-Control timing and signals
+Control Timing and Signals
 --------------------------
 
 The AD9361 SPI HDL subdevice worker operates entirely in
@@ -184,7 +184,7 @@ the control plane clock domain. All SPI data and SPI
 clock signals are generated in the control plane clock domain.
 Note that SPI clock can only be a divided version of the control plane clock.
 
-Vivado timing analysis
+Vivado Timing Analysis
 ----------------------
 
 The Vivado timing report that OpenCPI runs for HDL device workers may erroneously report
@@ -233,6 +233,6 @@ The Fmax for the control plane clock for this worker is computed as
 the maximum magnitude slack with a control plane clock of 1 ps plus 2 times
 the assumed 1 ps control plane clock period (3.169 ns + 0.002 ns = 3.171 ns, 1/3.171 ns = 315.36 MHz).
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

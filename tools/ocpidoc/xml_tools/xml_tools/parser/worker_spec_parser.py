@@ -33,7 +33,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
     """
 
     def __init__(self, filename, include_filepaths=["."]):
-        """ Initialise worker spec parser class.
+        """ Initialize worker spec parser class.
 
         Handles parsing an XML file with the XYZWorker root tag. e.g. RccWorker
 
@@ -43,7 +43,7 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                 file paths to search for a file specified in an XML include
                 statement.
         Returns:
-            An initialised ComponentSpecParser instance.
+            An initialized ComponentSpecParser instance.
         """
         super().__init__(filename=filename,
                          include_filepaths=include_filepaths)
@@ -93,11 +93,10 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                                "type": {"data_type": "ulong"}
                                "access": {
                                    "initial":  False, "parameter": False,
-                                   "readable": False, "readback": False,
-                                   "readsync": False, "volatile": False,
-                                   "writable": True,  "writesync": False,
-                                   "readerror": False, "writeerror": False,
-                                   "padding": False},
+                                   "readback": False, "readsync": False,
+                                   "volatile": False, "writable": True,
+                                   "writesync": False, "readerror": False,
+                                   "writeerror": False, "padding": False},
                                "description": "<description>,
                                "default": "<property_default_value>",
                                "value": "<property_default_value>"}}}
@@ -204,11 +203,10 @@ class WorkerSpecParser(worker_property_spec_parser.WorkerPropertySpecParser):
                                "type": {"data_type": "ulong"}
                                "access": {
                                    "initial":  False, "parameter": False,
-                                   "readable": False, "readback": False,
-                                   "readsync": False, "volatile": False,
-                                   "writable": True,  "writesync": False,
-                                   "readerror": False, "writeerror": False,
-                                   "padding": False},
+                                   "readback": False, "readsync": False,
+                                   "volatile": False, "writable": True,
+                                   "writesync": False, "readerror": False,
+                                   "writeerror": False, "padding": False},
                                "description": "<description>,
                                "default": "<property_default_value>",
                                "value": "<property_default_value>",

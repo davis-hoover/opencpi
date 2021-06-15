@@ -23,7 +23,7 @@
 .. _platform_ad9361_data_sub-HDL-worker:
 
 
-``platform_ad9361_data_sub`` HDL worker
+``platform_ad9361_data_sub`` HDL Worker
 =======================================
 
 Detail
@@ -54,7 +54,7 @@ Note that the half duplex data interface formats allow for AD9361 P0/P1 port rou
 
 .. comment out the ocpi_documentation_worker directive for now. It doesn't recognize HdlDevice.
 
-Worker ports
+Worker Ports
 ~~~~~~~~~~~~
 
 .. this is hand-entered for now to suggest a format that the XML parser might use to automatically generate it.
@@ -195,7 +195,7 @@ Inputs:
 
   * Width: ``1``
 
-SubDevice connections
+SubDevice Connections
 ~~~~~~~~~~~~~~~~~~~~~
 
 * Worker port ``dev_cfg_data_port``:
@@ -263,7 +263,7 @@ SubDevice connections
   * Worker port supported: ``dev_data_to_pins``
 
 
-Worker configuration parameters
+Worker Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Because every possible build-time configuration parameter combination of
@@ -272,7 +272,7 @@ has no control plane and no registered data paths, no registers or LUTS
 are used and the ``Fmax`` measurement does not exist.
 
 
-Control timing and signals
+Control Timing and Signals
 --------------------------
 
 Because AD9361 data sub HDl subdevice worker does not include a control plane and serves purely as an IC pin
@@ -283,6 +283,6 @@ and `AD9361 DAC sub <https://opencpi.gitlab.io/releases/develop/docs/assets/AD93
 HDL subdevice worker descriptions.
 
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

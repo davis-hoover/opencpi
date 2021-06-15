@@ -205,4 +205,4 @@ def create(directory, documentation_type, name=None, **kwargs):
                 template, name, authoring_model, project_prefix,
                 project, library))
 
-    print("Template initialised at:", destination_path)
+    print("Template initialized at:", destination_path)
