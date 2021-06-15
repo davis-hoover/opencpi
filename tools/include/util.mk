@@ -151,6 +151,13 @@ OcpiAbsPathX=$(strip \
         $(if $(filter ./%,$1),$(call OcpiAbsDir,.)$(patsubst .%,%,$1),\
           $(call OcpiAbsDir,.)/$1)))),$(abspath $p)))
 
+define OcpiParseXml
+  $$(if $$(call DoShell,set -o pipefail && $$(ToolsDir)/ocpigen -R $1/$2.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
+    $$(error ocpigen failed),\
+    $$(foreach var,$$(subst ;, ,$$(OcpiProps)),$$(eval $$(subst &, ,$$(var)))))
+  $$(infox $0: OcpiProps is $$(OcpiProps))
+endef
+
 # Call a function ($1) with a single path argument ($2).
 # If this is the first time that function has been called with that argument,
 # cache the results. Otherwise, return the cached results.
@@ -846,12 +853,10 @@ define OcpiSetProjectX
     ifneq ($(wildcard $1/Project.mk),)
       $$(warning Found both Project.mk and Project.xml, using Project.xml)
     endif
-    $(if $(call DoShell,$(ToolsDir)/ocpigen -R $1/Project.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
-    $(error ocpigen failed),$(foreach var,$(subst ;, ,$(OcpiProps)),$$(eval $(subst &, ,$(var)))))
-    $(foreach var,$(subst ;, ,$(OcpiProps)),$(eval $(subst &, ,$(var))))
+    $(call OcpiParseXml,$1,Project)
   else
     # Legacy support for project assets
-    $$(warning Could not find Project.xml, using Project.mk)
+    $$(infox $0: Could not find Project.xml, using Project.mk)
     include $1/Project.mk
   endif
   $$(infox PR1:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
@@ -1014,7 +1019,7 @@ OcpiIncludeParentAsset_platform=\
 #   Arg1 = reference directory
 #   Arg2 = shortened directory type with capitalized first letter
 #            this is the word used to find the .mk  file
-#            e.g. Library, Platforms, Platform
+#            e.g. Library, Platform, Platforms, Worker
 define OcpiSetAsset
   Package:=
   unexport Package
@@ -1022,8 +1027,20 @@ define OcpiSetAsset
   unexport PackagePrefix
   PackageName:=
   unexport PackagePrefix
-  ifneq ($$(wildcard $1/$2.mk),)
-    include $1/$2.mk
+  # Library
+  ifeq ($2,Library)
+    ifneq ($$(wildcard $1/$(CwdName).xml),)
+      $(call OcpiParseXml,$1,$(CwdName))
+    else
+      ifneq ($$(wildcard $1/$2.mk),)
+        include $1/$2.mk
+      endif
+    endif
+  # Platform, Platforms, Worker
+  else
+    ifneq ($$(wildcard $1/$2.mk),)
+      include $1/$2.mk
+    endif
   endif
 endef
 
