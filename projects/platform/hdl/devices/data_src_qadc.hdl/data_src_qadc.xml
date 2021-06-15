@@ -1,4 +1,4 @@
-<HdlDevice language='vhdl' spec='data_src_qadc-spec' version='2' libraries='util ocpi.core.bsv timed_sample_prot adc'>
+<HdlDevice language='vhdl' spec='data_src_qadc-spec' version='2' libraries='util ocpi.core.bsv protocol adc'>
 
   <Property name='DATA_PIPE_LATENCY_CYCLES'
             parameter='true'

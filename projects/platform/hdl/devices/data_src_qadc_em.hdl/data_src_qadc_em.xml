@@ -1,7 +1,7 @@
-<HdlDevice language='vhdl' Emulate='data_src_qadc.hdl' Version='2' libraries='platform timed_sample_prot'>
+<HdlDevice language='vhdl' Emulate='data_src_qadc.hdl' Version='2'>
 
   <ComponentSpec>
-    <Port name='in' producer='false' protocol="complex_short_timed_sample-prot"/>
+    <Port name='in' producer='false' protocol='ComplexShortWithMetadata-prot'/>
   </ComponentSpec>
 
   <StreamInterface name='in'
