@@ -66,12 +66,12 @@ idata = np.fromfile(sys.argv[2], dtype=utu.dt_iq_pair, count=-1)
 #Compare expected output to actual output
 bitshift = iqm.SAMPLES_BIT_WIDTH - DAC_WIDTH_BITS
 if DAC_OUTPUT_IS_LSB_OF_IN_PORT == "true":
-    print("    Comparing Expected I data to Actual I Data")
+    print("    Comparing Expected Real (I, In-Phase) data to Actual Real (I, In-Phase) Data")
     utu.compare_arrays(np.left_shift(idata['real_idx'],bitshift), odata['real_idx'])
-    print("    Comparing Expected Q data to Actual Q Data")
+    print("    Comparing Expected Imaginary (Q, Quadrature) data to Actual Imaginary (Q, Quadrature) Data")
     utu.compare_arrays(np.left_shift(idata['imag_idx'],bitshift), odata['imag_idx'])
 else:
-    print("    Comparing Expected I data to Actual I Data")
+    print("    Comparing Expected Real (I, In-Phase) data to Actual Real (I, In-Phase) Data")
     utu.compare_arrays(np.right_shift(idata['real_idx'],bitshift), np.right_shift(odata['real_idx'],bitshift))
-    print("    Comparing Expected Q data to Actual Q Data")
+    print("    Comparing Expected Imaginary (Q, Quadrature) data to Actual Imaginary (Q, Quadrature) Data")
     utu.compare_arrays(np.right_shift(idata['imag_idx'],bitshift), np.right_shift(odata['imag_idx'],bitshift))

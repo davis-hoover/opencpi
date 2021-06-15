@@ -23,7 +23,7 @@ architecture rtl of maximal_lfsr_data_src is
 
   signal rst_r   : std_logic := '0';
   signal vld_rst : std_logic := '0';
-  signal data_i  : std_logic_vector(odata.i'range) := (others => '0');
+  signal data_real  : std_logic_vector(odata.real'range) := (others => '0');
 
   signal cnt                       : unsigned(CNT_BIT_WIDTH-1 downto 0) :=
                                      (others => '0');
@@ -80,14 +80,14 @@ begin
         clk => clk,
         rst => rst,
         en  => ordy,
-        reg => data_i);
+        reg => data_real);
 
   end generate data_bit_width_12;
 
-  odata.i <= data_i;
+  odata.real <= data_real;
 
   data_q_src : for idx in 0 to DATA_BIT_WIDTH-1 generate
-    odata.q(odata.q'length-1-idx) <= data_i(idx);
+    odata.imaginary(odata.imaginary'length-1-idx) <= data_real(idx);
   end generate;
 
   ovld <= counter_en and (not vld_rst);

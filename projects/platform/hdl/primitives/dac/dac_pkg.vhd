@@ -16,7 +16,7 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 library ieee; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
-library protocol; use protocol.complex_short_with_metadata.all;
+library timed_sample_prot; use timed_sample_prot.complex_short_timed_sample.all;
 package dac is
 
 -- represents the width of each of I and Q
@@ -25,8 +25,8 @@ constant SAMP_COUNT_BIT_WIDTH : positive := 32;
 constant NUM_UNDERRUNS_BIT_WIDTH : positive := 32;
 
 type data_complex_t is record
-  i : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
-  q : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
+  real      : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
+  imaginary : std_logic_vector(DATA_BIT_WIDTH-1 downto 0);
 end record data_complex_t;
 
 type metadata_t is record
@@ -54,14 +54,14 @@ component underrun_detector is
     rst           : in  std_logic;
     status        : out underrun_detector_status_t;
     -- INPUT
-    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
+    iprotocol     : in  timed_sample_prot.complex_short_timed_sample.protocol_t;
     imetadata     : in  metadata_t;
     imetadata_vld : in  std_logic;
     irdy          : out std_logic;
     -- OUTPUT
-    -- if ometadata.underrun_error and protocol.samples_vld are both 1, error is
+    -- if ometadata.underrun_error and timed_sample_prot.sample_vld are both 1, error is
     -- assumed to have happened before the current valid sample
-    oprotocol     : out protocol.complex_short_with_metadata.protocol_t;
+    oprotocol     : out timed_sample_prot.complex_short_timed_sample.protocol_t;
     ometadata     : out metadata_t;
     ometadata_vld : out std_logic;
     ordy          : in  std_logic);
@@ -75,7 +75,7 @@ component data_narrower is
     clk           : in  std_logic;
     rst           : in  std_logic;
     -- INPUT
-    iprotocol     : in  protocol.complex_short_with_metadata.protocol_t;
+    iprotocol     : in  timed_sample_prot.complex_short_timed_sample.protocol_t;
     imetadata     : in  metadata_t;
     imetadata_vld : in  std_logic;
     irdy          : out std_logic;

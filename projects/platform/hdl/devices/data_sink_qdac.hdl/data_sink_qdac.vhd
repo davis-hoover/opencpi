@@ -18,18 +18,18 @@
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library ocpi, cdc; use ocpi.types.all; -- remove this to avoid all ocpi name collisions
 library util, dac;
-library protocol; use protocol.complex_short_with_metadata.all;
+library timed_sample_prot; use timed_sample_prot.complex_short_timed_sample.all;
 architecture rtl of worker is
   signal dac_rst                                : std_logic;
   signal dac_status                             : dac.dac.underrun_detector_status_t;
-  signal dac_opcode                             : opcode_t := SAMPLES;
+  signal dac_opcode                             : opcode_t := SAMPLE;
   signal dac_in_demarshaller_oprotocol          : protocol_t := PROTOCOL_ZERO;
   signal dac_in_demarshaller_oeof               : std_logic := '0';
 
   signal dac_underrun_detector_imetadata        : dac.dac.metadata_t;
   signal dac_underrun_detector_irdy             : std_logic := '0';
   signal dac_underrun_detector_oprotocol        :
-      protocol.complex_short_with_metadata.protocol_t;
+      timed_sample_prot.complex_short_timed_sample.protocol_t;
   signal dac_underrun_detector_ometadata        : dac.dac.metadata_t;
   signal dac_underrun_detector_ometadata_vld    : std_logic := '0';
 
@@ -39,15 +39,16 @@ architecture rtl of worker is
   signal dac_data_narrower_odata_vld            : std_logic;
 
   signal dac_clk_unused_opcode_detected         : std_logic;
-  signal ctrl_clr_underrun_sticky_error         : bool_t;
-  signal ctrl_clr_unused_opcode_detected_sticky : bool_t;
+  signal ctrl_clr_underrun_sticky_error              : bool_t;
+  signal ctrl_clr_unused_opcode_detected_sticky      : bool_t;
 
-  signal tx_on_off_s, tx_on_off_r               : std_logic;
-  signal start_samples, end_samples             : std_logic;
-  signal event_pending, event_present           : std_logic;
-  signal ctl_finished_r, ctl_eof                : bool_t;
-  -- debug signals
-  signal dac_clk_r, dac_clk_rr, dac_clk_rrr     : std_logic; -- debug
+  signal tx_on_off_s, tx_on_off_r                    : std_logic;
+  signal start_samples, end_samples                    : std_logic;
+  signal event_pending, event_present                : std_logic;
+  signal ctl_finished_r, ctl_eof                     : bool_t;
+  --debug signals
+  signal dac_clk_r, dac_clk_rr             : std_logic; -- debug
+  signal dac_clk_rrr                            : std_logic; -- debug
   signal ctl_count_r, dac_count_r               : ulong_t;   -- debug
 begin
   ctl_out.finished    <= ctl_finished_r;
@@ -78,25 +79,29 @@ begin
       end if;
     end if;
   end process;
-
+  
   in_clk_gen : util.util.in2out
-    port map(in_port  => dev_in.clk,
-             out_port => in_out.clk);
+    port map(
+      in_port  => dev_in.clk,
+      out_port => in_out.clk);
 
   dac_rst <= in_in.reset;
 
   dac_opcode <=
-      SAMPLES   when in_in.opcode = ComplexShortWithMetadata_samples_op_e  else
-      TIME_TIME when in_in.opcode = ComplexShortWithMetadata_time_op_e     else
-      INTERVAL  when in_in.opcode = ComplexShortWithMetadata_interval_op_e else
-      FLUSH     when in_in.opcode = ComplexShortWithMetadata_flush_op_e    else
-      SYNC      when in_in.opcode = ComplexShortWithMetadata_sync_op_e     else
-      SAMPLES;
+     SAMPLE        when in_in.opcode = complex_short_timed_sample_sample_op_e          else
+     TIME_TIME     when in_in.opcode = complex_short_timed_sample_time_op_e            else
+     SAMPLE_INTERVAL      when in_in.opcode = complex_short_timed_sample_sample_interval_op_e else
+     FLUSH         when in_in.opcode = complex_short_timed_sample_flush_op_e           else
+     DISCONTINUITY when in_in.opcode = complex_short_timed_sample_discontinuity_op_e   else
+     METADATA      when in_in.opcode = complex_short_timed_sample_metadata_op_e        else
+     SAMPLE;
 
   props_out.samp_count_before_first_underrun <= to_ulong(dac_status.samp_count_before_first_underrun);
   props_out.num_underruns <= to_ulong(dac_status.num_underruns);
 
-    in_demarshaller : complex_short_with_metadata_demarshaller
+  out_port_data_width_32 : if(IN_PORT_DATA_WIDTH = 32) generate
+
+    in_demarshaller : complex_short_timed_sample_demarshaller
       generic map(
         WSI_DATA_WIDTH => to_integer(IN_PORT_DATA_WIDTH))
       port map(
@@ -117,14 +122,13 @@ begin
         ordy      => dac_underrun_detector_irdy);
 
     dac_clk_unused_opcode_detected <=
-        not(dac_in_demarshaller_oprotocol.end_of_samples or
-        dac_in_demarshaller_oprotocol.samples_vld);
-
+        not(dac_in_demarshaller_oprotocol.discontinuity or
+        dac_in_demarshaller_oprotocol.sample_vld);
+    
     --On/Off signal used to qualify underrun
-    start_samples <= dac_in_demarshaller_oprotocol.samples_vld and
+    start_samples <= dac_in_demarshaller_oprotocol.sample_vld and
                      not tx_on_off_r;
-    end_samples   <= dac_in_demarshaller_oprotocol.end_of_samples or 
-                     dac_in_demarshaller_oprotocol.flush or 
+    end_samples   <= dac_in_demarshaller_oprotocol.flush or 
                      dac_in_demarshaller_oeof;
     tx_on_off_s   <= start_samples or (tx_on_off_r and not end_samples);
 
@@ -144,7 +148,7 @@ begin
 
     --On/Off port logic
     event_present <= start_samples or end_samples;
-
+    
     --Note that OWD includes Clock='in' for on_off port which means that the
     --on_off port operates in the same clock domain as the in port (dev_in.clk)
     process(dev_in.clk)
@@ -200,21 +204,23 @@ begin
         ordy          => dac_data_narrower_ordy);
 
     dac_data_narrower_ordy <= not dac_rst;
-
-    -- outputs to DAC device
-    dev_out.present <= '1';
+    
+    -- outputs to dac devices
     dev_out.valid <= dac_data_narrower_odata_vld;
+    dev_out.present <= '1';
     dev_out.data_i(dev_out.data_i'left downto
         dev_out.data_i'left-dac.dac.DATA_BIT_WIDTH+1) <=
-        dac_data_narrower_odata.i;
+        dac_data_narrower_odata.real;
     dev_out.data_i(dev_out.data_i'left-dac.dac.DATA_BIT_WIDTH downto 0) <=
         (others => '0');
     dev_out.data_q(dev_out.data_q'left downto
         dev_out.data_q'left-dac.dac.DATA_BIT_WIDTH+1) <=
-        dac_data_narrower_odata.q;
+        dac_data_narrower_odata.imaginary;
     dev_out.data_q(dev_out.data_q'left-dac.dac.DATA_BIT_WIDTH downto 0) <=
         (others => '0');
-
+    
+  end generate;
+      
   ctrl_clr_underrun_sticky_error <= props_in.clr_underrun_sticky_error_written and
                                     props_in.clr_underrun_sticky_error;
 
@@ -240,7 +246,6 @@ begin
       slow_rst    => ctl_in.reset,
       slow_sticky => props_out.unused_opcode_detected_sticky,
       slow_clr    => ctrl_clr_unused_opcode_detected_sticky);
-
 
     -- debug logic
 debug: if its(ocpi_debug) generate
@@ -271,5 +276,6 @@ debug: if its(ocpi_debug) generate
       end if;
     end process;
   end generate;
+
 
 end rtl;
