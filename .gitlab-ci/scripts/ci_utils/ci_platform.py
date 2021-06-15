@@ -4,26 +4,39 @@ import json
 import os
 from pathlib import Path
 from urllib.request import urlopen
+from . import ci_asset
 
 class Platform():
 
-    def __init__(self, name, model, project, linked_platforms=None, 
-                 cross_platforms=None, is_host=False, is_sim=False, 
-                 config=None):
+    def __init__(self, name, model, path, project, assets=None,
+                 linked_platforms=None, cross_platforms=None, is_host=False, 
+                 is_sim=False, config=None):
         self.name = name
         self.model = model
+        self.path = path
         self.is_host = is_host
         self.is_sim = is_sim
         self.project = project
         self.linked_platforms = linked_platforms or []
         self.cross_platforms = cross_platforms or []
+        self.assets = assets or ci_asset.discover_assets(
+            self.path, whitelist=['devices'])
+        self.ip = None
+        self.user = None
+        self.password = None 
+        self.do_deploy = True
 
         if config:
-            self.ip = config['ip'] if 'ip' in config else None
-            self.port = config['port'] if 'port' in config else None
-        else:
-            self.ip = None
-            self.port = None
+            attributes = ['ip', 'port', 'user', 'password']
+            for attribute in attributes:
+                try:
+                    self.__dict__[attribute] = config[attribute]
+                except:
+                    self.__dict__[attribute] = None
+            if 'deploy' in config:
+                self.do_deploy = config['deploy']
+
+        self.project.platforms.append(self)
 
 
 def discover_platforms(projects, whitelist=None, config=None):
@@ -110,7 +123,8 @@ def discover_local(project, config=None):
                 platform_config = get_platform_config(platform_name, config)
 
                 platform_model = platform_path.parents[1].stem
-                platform = Platform(platform_name, platform_model, project,
+                platform = Platform(platform_name, platform_model, 
+                                    platform_path, project,
                                     is_host=is_host, is_sim=is_sim, 
                                     config=platform_config)
                 platforms.append(platform)
@@ -148,13 +162,15 @@ def discover_remote(project, config=None):
 
                 for osp_platform in osp_platforms:
                     platform_name = osp_platform['name']
-                    
+                    platform_path = None
+
                     if platform_name == 'Makefile':
                         continue
 
                     platform_config = get_platform_config(platform_name, 
                                                           config)
-                    platform = Platform(platform_name, model, project,
+                    platform = Platform(platform_name, model, 
+                                        platform_path, project,
                                         is_host=False, is_sim=False, 
                                         config=platform_config)
                     platforms.append(platform)
@@ -192,13 +208,20 @@ def apply_whitelist(platforms, whitelist):
         # Filter cross_platforms for each host_platform
         platform_whitelist = whitelist[host_platform.name]
         for cross_platform in cross_platforms:
-            if not platform_whitelist:
-                continue
             if cross_platform.name not in platform_whitelist:
                 continue
+
+            linked_whitelist = platform_whitelist[cross_platform.name]
+            if linked_whitelist:
+                linked_platforms = []
+                for linked_platform_name in linked_whitelist:
+                    linked_platform = get_platform(linked_platform_name, 
+                                                   cross_platforms)
+                    if linked_platform:
+                        linked_platforms.append(linked_platform)
+                cross_platform.linked_platforms = linked_platforms
             
-            # If cross_platform is in both whitelist and directive, add to
-            # host_platform
+            # If cross_platform is in both whitelist, add to host_platform
             host_platform.cross_platforms.append(cross_platform)
 
         filtered_platforms.append(host_platform)

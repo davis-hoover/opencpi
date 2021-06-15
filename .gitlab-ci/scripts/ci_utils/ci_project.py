@@ -3,21 +3,25 @@
 from json import load
 from pathlib import Path
 from urllib.request import urlopen
-from . import ci_asset, ci_platform
+from . import ci_asset
 
 class Project():
 
     def __init__(self, name, path=None, url=None, project_id=None, assets=None, 
-                 is_builtin=True):
+                 group=None):
         self.name = name
         self.path = path
         self.url = url
         self.id = project_id
-        self.is_builtin = is_builtin
-        self.assets = assets or ci_asset.discover_assets(self)
+        self.group = group
+        self.platforms = []
+        self.assets = assets or ci_asset.discover_assets(
+            self.path, whitelist=['primitives', 'cards', 'devices', 'adapters', 
+                                  'assemblies', 'components', 'platforms'])
 
 
-def discover_projects(projects_paths=None, group_ids=None, blacklist=None):
+def discover_projects(projects_paths=None, group_ids=None, whitelist=None,
+                      blacklist=None):
     """Search opencpi for projects
 
     Calls discover_libraries() to search for project libraries.
@@ -25,6 +29,7 @@ def discover_projects(projects_paths=None, group_ids=None, blacklist=None):
     Args:
     projects_path: Path or list of Paths to opencpi projects
     group_ids:     Gitlab ID or list of Gitlab IDs of project group
+    whitelist:     List of projects to include
     blacklist:     List of projects not to include
 
     Returns:
@@ -40,15 +45,15 @@ def discover_projects(projects_paths=None, group_ids=None, blacklist=None):
             projects_paths = [projects_paths]
 
         for projects_path in projects_paths:
-            projects += discover_local_projects(projects_path, 
-                                                blacklist=blacklist)
+            projects += discover_local_projects(
+                projects_path, whitelist=whitelist, blacklist=blacklist)
 
     if group_ids:
         if not isinstance(group_ids, list):
             group_ids = [group_ids]
-
         for group_id in group_ids:
-            projects += discover_remote_projects(group_id, blacklist=blacklist)
+            projects += discover_remote_projects(
+                group_id, whitelist=whitelist, blacklist=blacklist)
 
     return projects
 
@@ -58,6 +63,7 @@ def discover_local_projects(projects_path, whitelist=None, blacklist=None):
 
     Args:
     projects_path: Path to opencpi projects
+    whitelist:     List of projects to include
     blacklist:     List of projects not to include
 
     Returns:
@@ -84,33 +90,53 @@ def discover_local_projects(projects_path, whitelist=None, blacklist=None):
     return projects
 
 
-def discover_remote_projects(group_id, blacklist=None):
+def discover_remote_projects(group_id, group_name='opencpi', whitelist=None,
+                             blacklist=None):
     """Discovers remote projects
 
-    Uses curl command to call gitlab api to collect OSP group data.
+    Uses curl command to call gitlab api to collect project group data.
 
     Args:
-        group_id:  Gitlab ID of project group
-        blacklist: List of projects not to include     
+        group_id:   Gitlab ID of project group
+        group_name: Name of project group
+        whitelist:  List of projects to include
+        blacklist:  List of projects not to include     
 
     Returns:
         List of Project namedtuples
     """
     projects = []
-    url = 'https://gitlab.com/api/v4/groups/{}/projects'.format(group_id)
+    group_id = str(group_id)
+    base_url = 'https://gitlab.com/api/v4/groups'
+    projects_url = '/'.join([base_url,group_id,'projects'])
+    subgroups_url = '/'.join([base_url,group_id,'subgroups'])
 
-    with urlopen(url) as response:
-        projects_dict = load(response)
-
-        for project in projects_dict:
-            if blacklist and str(project["id"]) in blacklist:
+    # Get project data
+    with urlopen(projects_url) as response:
+        project_dicts = load(response)
+    for project_dict in project_dicts:
+        project_name = project_dict['path'].lower().split('.')[-1]
+        project_id = str(project_dict['id'])
+        if blacklist:
+            if project_name in blacklist or project_id in blacklist:
                 continue
-
-            project_id = str(project['id'])
-            project_url = project['http_url_to_repo']
-            project_name = project['name']
-            project = Project(project_name, url=project_url, 
-                              project_id=project_id, is_builtin=False)
-            projects.append(project)
+        if whitelist:
+            if project_name not in whitelist and project_id not in whitelist:
+                continue
+        project_url = project_dict['http_url_to_repo']
+        project = Project(project_name, url=project_url, 
+                            project_id=project_id, group=group_name)
+        projects.append(project)
+    
+    # Get subgroup data and recurse to get project data
+    with urlopen(subgroups_url) as response:
+        subgroups = load(response)
+    for subgroup_dict in subgroups:
+        subgroup_name = subgroup_dict['path']
+        subgroup_id = subgroup_dict['id']
+        recursive_projects = discover_remote_projects(
+            group_id=subgroup_id, group_name=subgroup_name,
+            whitelist=whitelist, blacklist=blacklist)
+        projects += recursive_projects
 
     return projects

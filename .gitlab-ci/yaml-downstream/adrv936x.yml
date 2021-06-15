@@ -1,8 +1,0 @@
-workflow:
-  rules:
-    - when: always
-
-include:
-  - project: 'opencpi/opencpi'
-    ref: develop
-    file: '.gitlab-ci/yaml/downstream-ci.yml'

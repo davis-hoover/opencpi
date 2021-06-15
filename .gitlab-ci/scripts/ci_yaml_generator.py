@@ -34,24 +34,27 @@ def main():
                          'plutosdr', 'e3xx', 'sockit cv', 'adrv936x', 'sdr', 'ettus']
     projects_path = Path('projects')
     ocpi_group_id = 5378285
-    projects = ci_project.discover_projects(projects_paths=projects_path, 
+    projects = ci_project.discover_projects(projects_paths=projects_path,
                                             group_ids=ocpi_group_id,
-					    whitelist=project_whitelist,
+                                            whitelist=project_whitelist,
                                             blacklist=project_blacklist)
     # Get platforms
     platforms = ci_platform.discover_platforms(projects, 
                                                whitelist=platform_whitelist, 
                                                config=config)
     directive = Directive.from_env(ci_env)
-    platforms = directive.apply(platforms)
+    platforms = directive.apply_platforms(platforms)
+    projects = directive.apply_projects(projects) 
 
     for platform in platforms:
         print(platform.name)
         for cross_platform in platform.cross_platforms:
             print('\t', cross_platform.name)
+            for linked_platform in cross_platform.linked_platforms:
+                print('\t\t', linked_platform.name)
 
     # Make pipeline
-    pipeline = Pipeline(pipeline_path, ci_env, directive)
+    pipeline = Pipeline(pipeline_path, ci_env, directive, config=config)
     pipeline.generate(projects, platforms, config=config)
 
     for job in sorted(pipeline._jobs):
@@ -101,24 +104,27 @@ def set_ci_env():
     Simulates a pipeline environment by setting environment variables.
     This function should not be called except for testing.
     """
-    environ['CI_COMMIT_MESSAGE'] = ''
+    environ['CI_COMMIT_MESSAGE'] = '[ci sdr xilinx13_4 adi_plutosdr0_32]'
     environ['CI_PIPELINE_SOURCE'] = 'push'
     environ['CI_ROOT_ID'] = '1'
-    # environ['CI_PLATFORM'] = 'e31x'
-    # environ['CI_HOST_PLATFORM'] = 'centos7'
+    environ['CI_PLATFORM'] = 'modelsim'
+    environ['CI_HOST_PLATFORM'] = 'centos7'
     environ['CI_DEFAULT_HOSTS'] = 'centos7'
-    environ['CI_PLATFORMS'] = 'e31x xsim'
+    environ['CI_PLATFORMS'] = ''
     environ['CI_PIPELINE_ID'] = '0'
-    environ['CI_PROJECT_DIR'] = 'opencpi'
-    environ['CI_PROJECT_NAME'] = 'opencpi'
-    environ['CI_COMMIT_REF_NAME'] = 'develop'
-    environ['CI_PROJECT_TITLE'] = 'opencpi'
-    environ['CI_PROJECT_ID'] = '0'
-    # environ['CI_UPSTREAM_ID'] = '2'
-    # environ['CI_UPSTREAM_REF'] = 'develop'
-    # environ['CI_UPSTREAM_PLATFORMS'] = 'plutosdr modelsim'
-    # environ['CI_ROOT_SOURCE'] = 'pipeline'
-    # environ['CI_ROOT_PLATFORMS'] = 'centos7 plutosdr'
+    environ['CI_PROJECT_DIR'] = '/builds/opencpi/comp/ocpi.comp.sdr'
+    environ['CI_PROJECT_NAME'] = 'ocpi.comp.sdr'
+    environ['CI_PROJECT_NAMESPACE'] = 'opencpi'
+    environ['CI_PROJECT_PATH'] = 'opencpi/comp/ocpi.comp.sdr'
+    environ['CI_COMMIT_REF_NAME'] = 'opencpi-1547-ci-implement-clp'
+    environ['CI_PROJECT_TITLE'] = 'SDR'
+    environ['CI_PROJECT_ID'] = '21371505'
+    environ['CI_RUNNER_ID'] = '1274481'
+    environ['CI_DIRECTIVE'] = 'centos7 modelsim'
+    environ['CI_OCPI_REF'] = '1547-ci-implement-clp'
+    # environ['CI_OSP_REF'] = 'develop'
+    environ['CI_UPSTREAM_ID'] = '2'
+    environ['CI_REPOSITORY_URL'] = 'https://gitlab.com/opencpi/comp/ocpi.comp.sdr.git'
 
 
 if __name__ == '__main__':
