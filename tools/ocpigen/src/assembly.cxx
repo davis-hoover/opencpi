@@ -84,34 +84,32 @@ parseConnection(OU::Assembly::Connection &aConn) {
   // width of the narrowest attached port
   InstancePort *found;
   size_t minCount = 1000;
-  for (OU::Assembly::Connection::PortsIter api = aConn.m_ports.begin();
-       api != aConn.m_ports.end(); api++) {
-    OU::Assembly::Port &ap = *api;
+  for (auto api = aConn.m_ports.begin(); api != aConn.m_ports.end(); api++) {
+    OU::Assembly::Port &ap = *(*api).first;
     if ((err = findPort(ap, found)))
       return err;
-    if (ap.m_index + (c.m_count ? c.m_count : 1) > found->m_port->count())
+    if ((*api).second + (c.m_count ? c.m_count : 1) > found->m_port->count())
       return OU::esprintf("invalid index/count (%zu/%zu) for connection %s, port %s of "
 			  "instance %s has count %zu",
-			  ap.m_index, c.m_count ? c.m_count : 1, c.m_name.c_str(),
+			  (*api).second, c.m_count ? c.m_count : 1, c.m_name.c_str(),
 			  ap.m_name.empty() ? "<unknown>" : ap.m_name.c_str(),
 			  m_instances[ap.m_instance].m_worker->cname(),
 			  found->m_port->count());
-    size_t count = found->m_port->count() - ap.m_index;
+    size_t count = found->m_port->count() - (*api).second;
     if (count < minCount)
       minCount = count;
   }
   if (!c.m_count)
     c.m_count = minCount;
-  for (OU::Assembly::Connection::PortsIter api = aConn.m_ports.begin();
-       api != aConn.m_ports.end(); api++) {
-    OU::Assembly::Port &ap = *api;
+  for (auto api = aConn.m_ports.begin(); api != aConn.m_ports.end(); api++) {
+    OU::Assembly::Port &ap = *(*api).first;
     if ((err = findPort(ap, found)) ||
 	(err = found->m_port->fixDataConnectionRole(ap.m_role)))
       return err;
     if (!found->m_role.m_knownRole || found->m_role.m_bidirectional)
       found->m_role = ap.m_role;
     // Note that the count may not be known here yet
-    if ((err = c.attachPort(*found, ap.m_index))) //, aConn.m_count)))
+    if ((err = c.attachPort(*found, (*api).second))) //, aConn.m_count)))
       return err;
     assert(c.m_count != 0);
   }
@@ -121,7 +119,7 @@ parseConnection(OU::Assembly::Connection &aConn) {
   for (auto ei = aConn.m_externals.begin(); ei != aConn.m_externals.end(); ei++) {
     OU::Assembly::External &ext = *ei->first;
     assert(aConn.m_ports.size() == 1);
-    OU::Assembly::Port &ap = aConn.m_ports.front();
+    OU::Assembly::Port &ap = *aConn.m_ports.front().first;
     assert(ap.m_role.m_knownRole);
     // Inherit the role of the first internal connection
     if (!ext.m_role.m_knownRole)
@@ -138,10 +136,11 @@ parseConnection(OU::Assembly::Connection &aConn) {
       return OU::esprintf("External port '%s' can't connect to index/count %zu/%zu "
 			  "when the count of the external port itself is %zu",
 			  ext.cname(), ei->second, aConn.m_count, ext.m_count);
-    if (ap.m_index + aConn.m_count > intPort.m_port->count())
+    size_t index = aConn.m_ports.front().second;
+    if (index + aConn.m_count > intPort.m_port->count())
       return OU::esprintf("Connection to external port '%s' can't connect to index/count %zu/%zu "
 			  "of internal port \"%s\" when the count of the internal port itself is %zu",
-			  ext.cname(), ap.m_index, aConn.m_count, ap.cname(), intPort.m_port->count());
+			  ext.cname(), index, aConn.m_count, ap.cname(), intPort.m_port->count());
     Port *p = m_assyWorker.findPort(ext.m_name.c_str());
     if (m_assyWorker.m_type == Worker::Application) { // a proxy
       // We are dealing with a connection that implies a delegation, so the assembly worker port
@@ -409,16 +408,15 @@ parseAssy(ezxml_t xml, const char **topAttrs, const char **instAttrs) {
       for (unsigned nn = 0; nn < i->m_worker->m_ports.size(); nn++, ip++) {
 	if (ip->m_port->isData()) {
 	  Port *p = NULL;
-	  for (OU::Assembly::Instance::PortsIter pi = ai.m_ports.begin();
-	       pi != ai.m_ports.end(); pi++)
-	    if ((*pi)->m_name.empty()) {
+	  for (auto pi = ai.m_ports.begin(); pi != ai.m_ports.end(); pi++)
+	    if ((*pi).m_name.empty()) {
 	      // Port name empty means we don't know it yet.
 	      InstancePort *found;
 	      // Ignore errors here
-	      if (!findPort(**pi, found))
+	      if (!findPort(*pi, found))
 		if (ip == found)
 		  p = ip->m_port;
-	    } else if (!strcasecmp((*pi)->m_name.c_str(), ip->m_port->pname())) {
+	    } else if (!strcasecmp((*pi).m_name.c_str(), ip->m_port->pname())) {
 	      p = ip->m_port;
 	      break;
 	    }

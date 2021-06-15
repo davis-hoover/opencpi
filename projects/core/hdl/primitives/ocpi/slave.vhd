@@ -136,13 +136,13 @@ architecture rtl of slave is
   signal fifo_in        : std_logic_vector(fifo_width - 1 downto 0);
   signal fifo_enq, fifo_deq : bool_t;
   -- output signals from the fifo
-  signal fifo_out       : std_logic_vector(fifo_width - 1 downto 0);
   signal fifo_count_r   : unsigned(2 downto 0); -- 0, 1, 2, 3 4, all valid
-  -- derived from fifo outputs
-  signal fifo_ready   : bool_t; -- fifo output is ready for worker
-  signal fifo_valid   : bool_t; -- the fifo output is presenting valid
-  signal fifo_eom     : bool_t; -- the fifo output is presenting EOM
-  signal fifo_eof     : bool_t; -- the fifo is presenting EOF
+  -- derived from fifo outputs, all qualified by fifo_not_empty except eom
+  signal fifo_not_empty : bool_t;
+  signal fifo_ready     : bool_t; -- fifo output is ready for worker
+  signal fifo_valid     : bool_t; -- the fifo output is presenting valid
+  signal fifo_eom       : bool_t; -- the fifo output is presenting EOM (not qualified)
+  signal fifo_eof       : bool_t; -- the fifo is presenting EOF
   -- internal combinatorials
   signal zlm_eof      : bool_t; -- a v1 zlm0 for eof is needed
   signal trailing_eom : bool_t; -- a trailing eom is enqueued *behind* the current non-eom output
@@ -186,21 +186,22 @@ begin
   fifo_enq   <= MDataValid when early_request else to_bool(MCmd = ocpi.ocp.MCmd_WRITE);
   ----------------------------------
   -- fifo outputs and dequeing etc.
-  fifo_eof     <= fifo_out(abort_bit) and at_end_r;
+  fifo_not_empty <= to_bool(fifo_count_r /= 0);
+  fifo_eof       <= fifo_out_r(abort_bit) and at_end_r and fifo_not_empty;
   gen0w: if data_width /= 0 generate
-    data       <= fifo_out(data_bits downto enable_bits+1);
+    data       <= fifo_out_r(data_bits downto enable_bits+1);
   end generate gen0w;
-  byte_enable  <= fifo_out(enable_bits downto last_bit+1);
-  fifo_eom    <= fifo_out(last_bit);
-  burst_length <= fifo_out(burst_bits downto opcode_bits+1);
-  opcode       <= fifo_out(opcode_bits downto 0) when not zlm_eof else (others => '0');
-  fifo_valid   <= to_bool(byte_enable /= slv0(n_bytes) and not its(fifo_eof));
+  byte_enable  <= fifo_out_r(enable_bits downto last_bit+1);
+  fifo_eom    <= fifo_out_r(last_bit) and fifo_not_empty;
+  burst_length <= fifo_out_r(burst_bits downto opcode_bits+1);
+  opcode       <= fifo_out_r(opcode_bits downto 0) when not zlm_eof else (others => '0');
+  fifo_valid   <= to_bool(byte_enable /= slv0(n_bytes) and not its(fifo_eof) and fifo_not_empty);
   -- is a trailing EOM queued up *behind* the fifo's output which is not EOM (ignoring fifo status)
   trailing_eom <= to_bool(not its(fifo_eom) and fifo_middle_out_r(last_bit) = '1' and
                           fifo_middle_out_r(enable_bits downto last_bit+1) = slv0(n_bytes));
   -- deque/discard a trailing eom now?
-  teom_deq     <= to_bool(fifo_count_r /= 0 and eom_added_r);
-  fifo_deq     <= to_bool(not its(fifo_eof) and       -- EOFs are sticky
+  teom_deq     <= fifo_not_empty and eom_added_r;
+  fifo_deq     <= to_bool(not its(fifo_eof) and       -- EOFs are sticky until reset
                           (teom_deq or                -- discard trailing EOMs after valid
                            (take and its(ready_i)))); -- dequeue from worker
   ----------------------------------
@@ -222,8 +223,7 @@ begin
   eom_i        <= fifo_eom or zlm_eof or trailing_eom;
   eom          <= eom_i;
   abort        <= fifo_eof and not at_end_r;
-  eof          <= to_bool(fifo_count_r /= 0 and fifo_eof and
-                          its(fifo_eom or at_end_r));
+  eof          <= to_bool(fifo_eof and its(fifo_eom or at_end_r));
   -- Signals to OCP - cannot be based on fifo_deq
   -- SThreadBusy(0) <= fifo_busy;
   -- ocp is busy if it cannot enqueue in the next cycle
@@ -268,7 +268,6 @@ begin
   -- The input side cannot depend on what is happening on the output side
   -- We need a fifo that will tell us when there are two slots left.  It would be nice to find
   -- one and not use this one.
-  fifo_out  <= fifo_out_r;
   fifo: process(wsi_clk) is
   begin
     if rising_edge(wsi_clk) then

@@ -20,9 +20,7 @@ library ocpi, cdc; use ocpi.types.all; -- remove this to avoid all ocpi name col
 library util, dac;
 library protocol; use protocol.complex_short_with_metadata.all;
 architecture rtl of worker is
-
   signal dac_rst                                : std_logic;
-
   signal dac_status                             : dac.dac.underrun_detector_status_t;
   signal dac_opcode                             : opcode_t := SAMPLES;
   signal dac_in_demarshaller_oprotocol          : protocol_t := PROTOCOL_ZERO;
@@ -47,14 +45,44 @@ architecture rtl of worker is
   signal tx_on_off_s, tx_on_off_r               : std_logic;
   signal start_samples, end_samples             : std_logic;
   signal event_pending, event_present           : std_logic;
-
+  signal ctl_finished_r, ctl_eof                : bool_t;
+  -- debug signals
+  signal dac_clk_r, dac_clk_rr, dac_clk_rrr     : std_logic; -- debug
+  signal ctl_count_r, dac_count_r               : ulong_t;   -- debug
 begin
-  dev_out.present <= '1';
+  ctl_out.finished    <= ctl_finished_r;
+
+  -- get the EOF status back into the control clock domain
+  -- note that the DAC clock might not be ticking with the dac_rst stuck on
+  ctl_eof_cdc : cdc.cdc.single_bit
+    port map(src_clk => dev_in.clk,
+             src_rst => dac_rst,
+             src_en  => '1',
+             src_in  => dac_in_demarshaller_oeof,
+             dst_clk => ctl_in.clk,
+             dst_rst => ctl_in.reset,
+             dst_out => ctl_eof);
+
+  -- make the worker finished when the eof comes from the data clock domain
+  -- make sure the worker exits the finished state under control reset
+  -- EVEN IF THE DAC CLK IS NOT ALIVE AND TICKING
+  process(ctl_in.clk)
+  begin
+    if rising_edge(ctl_in.clk) then
+      if its(ctl_in.reset) then
+        ctl_finished_r <= bfalse;
+      else
+        if ctl_in.is_operating and ctl_eof then
+          ctl_finished_r <= btrue;
+        end if;
+      end if;
+    end if;
+  end process;
+
   in_clk_gen : util.util.in2out
-    port map(
-      in_port  => dev_in.clk,
-      out_port => in_out.clk);
-  
+    port map(in_port  => dev_in.clk,
+             out_port => in_out.clk);
+
   dac_rst <= in_in.reset;
 
   dac_opcode <=
@@ -64,11 +92,9 @@ begin
       FLUSH     when in_in.opcode = ComplexShortWithMetadata_flush_op_e    else
       SYNC      when in_in.opcode = ComplexShortWithMetadata_sync_op_e     else
       SAMPLES;
-  
+
   props_out.samp_count_before_first_underrun <= to_ulong(dac_status.samp_count_before_first_underrun);
   props_out.num_underruns <= to_ulong(dac_status.num_underruns);
-
-  out_port_data_width_32 : if(IN_PORT_DATA_WIDTH = 32) generate
 
     in_demarshaller : complex_short_with_metadata_demarshaller
       generic map(
@@ -93,7 +119,7 @@ begin
     dac_clk_unused_opcode_detected <=
         not(dac_in_demarshaller_oprotocol.end_of_samples or
         dac_in_demarshaller_oprotocol.samples_vld);
-    
+
     --On/Off signal used to qualify underrun
     start_samples <= dac_in_demarshaller_oprotocol.samples_vld and
                      not tx_on_off_r;
@@ -118,7 +144,7 @@ begin
 
     --On/Off port logic
     event_present <= start_samples or end_samples;
-    
+
     --Note that OWD includes Clock='in' for on_off port which means that the
     --on_off port operates in the same clock domain as the in port (dev_in.clk)
     process(dev_in.clk)
@@ -137,8 +163,6 @@ begin
 
     on_off_out.give   <= on_off_in.ready and (event_present or event_pending);
     on_off_out.opcode <= tx_event_txOn_op_e  when its(tx_on_off_s)  else tx_event_txOff_op_e;
-    ctl_out.finished  <= dac_in_demarshaller_oeof;
-    
     dac_underrun_detector : dac.dac.underrun_detector
       port map(
         -- CTRL
@@ -176,8 +200,10 @@ begin
         ordy          => dac_data_narrower_ordy);
 
     dac_data_narrower_ordy <= not dac_rst;
+
+    -- outputs to DAC device
+    dev_out.present <= '1';
     dev_out.valid <= dac_data_narrower_odata_vld;
-  
     dev_out.data_i(dev_out.data_i'left downto
         dev_out.data_i'left-dac.dac.DATA_BIT_WIDTH+1) <=
         dac_data_narrower_odata.i;
@@ -188,9 +214,7 @@ begin
         dac_data_narrower_odata.q;
     dev_out.data_q(dev_out.data_q'left-dac.dac.DATA_BIT_WIDTH downto 0) <=
         (others => '0');
-    
-  end generate;
-      
+
   ctrl_clr_underrun_sticky_error <= props_in.clr_underrun_sticky_error_written and
                                     props_in.clr_underrun_sticky_error;
 
@@ -216,5 +240,36 @@ begin
       slow_rst    => ctl_in.reset,
       slow_sticky => props_out.unused_opcode_detected_sticky,
       slow_clr    => ctrl_clr_unused_opcode_detected_sticky);
-  
+
+
+    -- debug logic
+debug: if its(ocpi_debug) generate
+    props_out.status <= ushort_t("010100" & in_in.reset & dac_in_demarshaller_oeof &
+                        std_logic_vector(to_unsigned(ocpi.wci.state_t'pos(ctl_in.state),3)) &
+                        ctl_in.is_operating & dac_rst & in_in.ready & in_in.eof & in_in.valid);
+    props_out.ctl_count <= ctl_count_r;
+    props_out.dac_count <= dac_count_r;
+
+    process(ctl_in.clk)
+    begin
+      if rising_edge(ctl_in.clk) then
+        if its(ctl_in.reset) then
+          ctl_count_r <= (others => '0');
+          dac_count_r <= (others => '0');
+          dac_clk_r   <= '0';
+          dac_clk_rr  <= '0';
+          dac_clk_rrr <= '0';
+        else
+          dac_clk_r   <= dev_in.clk; -- metastable
+          dac_clk_rr  <= dac_clk_r;
+          dac_clk_rrr <= dac_clk_rr;
+          if dac_clk_rr = '1' and dac_clk_rrr = '0' then
+            dac_count_r <= dac_count_r + 1;
+          end if;
+          ctl_count_r <= ctl_count_r + 1;
+        end if;
+      end if;
+    end process;
+  end generate;
+
 end rtl;

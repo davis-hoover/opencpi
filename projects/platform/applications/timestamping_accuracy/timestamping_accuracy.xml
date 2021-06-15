@@ -1,0 +1,3 @@
+<Application Done="signal_time_tagger">
+  <Instance Component="ocpi.platform.devices.signal_time_tagger"/>
+</Application>

@@ -2,10 +2,10 @@ These scripts are those that are run at the top-level of the opencpi source tree
 part of the CDK.  They are generally used for installing software or initializing the environment
 when building the core software in the source tree.
 
-I.e. scripts are here that are never exported in the CDK and thus not needed by users
+I.e. scripts are here that are never exported in the CDK and thus not needed by CDK-only users
 (only core OpenCPI maintainers or developers of new software platforms)
 
-Many of these scripts are here for historical reasons, since build-oriented scripts have been
+Many of these scripts are here for historical reasons, since framework-build-oriented scripts have been
 moved to the build/ subdirectory and packaging-oriented scripts have moved to the
 packaging/ directory.
 

@@ -90,9 +90,11 @@ get(const char *file, const char *parentFile, Worker *parent, const char *&err) 
     return NULL;
   std::string name;
   OE::getOptionalString(xml, name, "name");
+  std::string base;
+  OU::baseName(xfile.c_str(), base);
   if (name.empty())
-    name = xfile;
-  else if (name != xfile)
+    name = base;
+  else if (name != base)
     err = OU::esprintf("File name (%s) does not match name attribute in XML (%s)",
 		       xfile.c_str(), name.c_str());
   Card *c = Card::find(name.c_str());

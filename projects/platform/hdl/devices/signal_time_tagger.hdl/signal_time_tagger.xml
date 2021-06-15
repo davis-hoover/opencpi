@@ -1,4 +1,4 @@
-<HdlDevice Language="vhdl">
+<HdlDevice Language="vhdl" Version='2' libraries='util'>
   <ComponentSpec>
 
     <Property Name="MAX_NUM_TIME_TAGS_TO_COLLECT"

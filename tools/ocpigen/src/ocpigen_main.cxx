@@ -330,9 +330,9 @@ main(int argc, const char **argv) {
             const char* const property[] = {"PackageName", "PackagePrefix", "Package",
              "ProjectDependencies", "Libraries", "IncludeDirs", "XmlIncludeDirs",
              "ComponentLibraries", "ProjectName", "ProjectPackage"};
-            int last = sizeof(property)/sizeof(property[0]);
+            size_t last = sizeof(property)/sizeof(property[0]);
             char *value;
-            for (int idx = 0; idx < last; ++idx) {
+            for (size_t idx = 0; idx < last; ++idx) {
               value = (char *)ezxml_cattr(xml, property[idx]);
               if (value)
                 printf("%s=%s\n", property[idx], value);

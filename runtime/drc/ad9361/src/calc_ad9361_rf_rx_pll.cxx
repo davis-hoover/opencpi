@@ -20,9 +20,12 @@
 
 #include <sstream>         // std::ostringstream
 #include <cstdint>         // uin32_t, etc
+#include "OcpiUtilMisc.h"  // esprintf
 #include "ad9361_platform.h" // BITMASK_D... macros, regs_general_rfpll_divider_t
 #include "ad9361.h"        // RFPLL_MODULUS macro (this is a ADI No-OS header)
 #include "calc_ad9361_rf_rx_pll.h"
+
+namespace OU = OCPI::Util;
 
 const char* calc_AD9361_Rx_RFPLL_ref_divider(
     float& val,
@@ -67,15 +70,11 @@ const char* calc_AD9361_Rx_RFPLL_external_div_2_enable(
     bool& val,
     const regs_calc_AD9361_Rx_RFPLL_external_div_2_enable_t& regs) {
   uint8_t divider = regs.general_rfpll_dividers & 0x0f;
-  if(divider <= 7) {
+  if (divider <= 7)
     val = (divider == 7);
-  }
-  else {
-    std::ostringstream oss;
-    oss << "Invalid value read for ";
-    oss << "general_rfpll_dividers register" << regs.general_rfpll_dividers;
-    return oss.str().c_str();
-  }
+  else
+    return OU::esprintf("Invalid value read for general_rfpll_dividers register 0x%x",
+			regs.general_rfpll_dividers);
   return 0;
 }
 
@@ -93,17 +92,11 @@ const char* calc_AD9361_Rx_RFPLL_VCO_Divider(
     case 5: val = 64; break;
     case 6: val = 128; break;
     case 7:
-    {
-      std::ostringstream oss;
-      oss << "Value requested for AD9361_Rx_RFPLL_VCO_Divider before ";
-      oss << "checking if register was set to divide-by-2";
-      return oss.str().c_str();
-    }
+      return OU::esprintf("Value requested for AD9361_Rx_RFPLL_VCO_Divider before checking if "
+			  "register was set to divide-by-2");
     default:
-      std::ostringstream oss;
-      oss << "Invalid value read for ";
-      oss << "general_rfpll_dividers register" << regs.general_rfpll_dividers;
-      return oss.str().c_str();
+      return OU::esprintf("Invalid value read for general_rfpll_dividers register 0x%x",
+			  regs.general_rfpll_dividers);
   }
   return 0;
 }
@@ -134,7 +127,7 @@ const char* calc_AD9361_Rx_RFPLL_LO_freq_Hz(
   { // restrict scope so we don't accidentally use non-double values
     // for later calculation
 
-    bool Rx_RFPLL_external_div_2_enable;
+    bool Rx_RFPLL_external_div_2_enable = false; // warning
     {
       bool& enable = Rx_RFPLL_external_div_2_enable;
       const char* ret = calc_AD9361_Rx_RFPLL_external_div_2_enable(enable, regs);

@@ -173,4 +173,4 @@ clean:
 	rm -r -f xilinx-github gen
 
 cleaneverything distclean: clean
-	rm -f $(kernel_headers)
+	rm -r -f $(kernel_headers)
