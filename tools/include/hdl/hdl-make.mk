@@ -112,13 +112,16 @@ define HdlAutoWorkerRule
 $$(infox HAUTO:$1:$2:$3:$4:$5:$6)
 $$(infox TARGET:$1/hdl/$3/$5$$(HdlBin))
 # Note setting the project variables in the environment and not on the command line
+# We are trying to run a "clean" make unrelated to this parent make.
+# Since we don't have a good pattern for all potential exported variables, we just
+# have to unset the ones we know, which is not really robust.
 $1/hdl/$3/$5$$(HdlBin):
 	$(AT)echo Building HDL worker $4 configuration $6 target $3 in library $2 now...
 	$(AT)unset OCPI_PROJECT_REL_DIR OCPI_PROJECT_PACKAGE OCPI_PROJECT_DIR \
-                   OCPI_PROJECT_COMPONENT_LIBRARIES OCPI_PROJECT_DEPENDENCIES MAKEFLAGS && \
-             $(MAKE) $$(foreach d,$(call HdlSourceLibPath,$2)/$4.hdl,\
+                   OCPI_PROJECT_COMPONENT_LIBRARIES OCPI_PROJECT_DEPENDENCIES MAKEFLAGS MFLAGS \
+                   OCPI_COMPONENT_LIBRARIES ComponentLibrariesInternal ComponentLibraries && \
+             make $$(foreach d,$(call HdlSourceLibPath,$2)/$4.hdl,\
                         -C $$d $$(if $$(wildcard $$d/Makefile),,-f $(OCPI_CDK_DIR)/include/worker.mk)) \
-                     ComponentLibraries= ComponentLibrariesInternal=\
                      --no-print-directory HdlTarget=$3 ParamConfigurations=$6 AT=$(AT)
 
 endef

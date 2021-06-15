@@ -392,6 +392,9 @@ else
     then
         if [ -n "$minimal" ]; then
           ocpidev -d $project_dir build hdl primitives library --hdl-platform=$platform
+          # the rcc build ensures all workers are visible to build the platform
+          # we don't have a verb to do that.
+          ocpidev -d $project_dir build --rcc
           ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
         else
           ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies
