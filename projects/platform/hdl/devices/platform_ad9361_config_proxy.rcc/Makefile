@@ -28,4 +28,4 @@ include $(OCPI_CDK_DIR)/include/worker.mk
 
 # if someone happened to run doxygen, this will clean it up
 clean::
-	rm -rf supporting/html/ supporting/latex/
+	$(AT)rm -rf supporting/html/ supporting/latex/

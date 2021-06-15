@@ -32,9 +32,10 @@ main(int, char **) {
   try {
     OA::PValue pvs[] = { OA::PVString("model", "=rcc"), OA::PVBool("verbose", true), OA::PVBool("dump", true),
 			 OA::PVEnd };
-    OA::Application app("<application>"
-			"  <instance component='.copy.copy' worker='copy' externals='true' connect='copy1'/>"
-			"  <instance component='.copy.copy' worker='copy_cc'externals='true'/>"
+    // The local components library forces the package to be "local"
+    OA::Application app("<application package='local'>"
+			"  <instance component='.copy' worker='copy' externals='true' connect='copy1'/>"
+			"  <instance component='.copy' worker='copy_cc'externals='true'/>"
 		        "</application>", pvs);
     app.initialize();
     OA::ExternalPort

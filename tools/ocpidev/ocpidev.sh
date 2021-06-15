@@ -106,7 +106,7 @@ function get_dirtype {
 # Argument 1 is directory
 # Argument 2 is type if known, like "project", or "hdl-library"
 function domake {
-  local cmd="make -C $1 --no-print-directory"
+  local cmd="make -r -C $1 --no-print-directory"
   [ -f $1/Makefile ] || {
     local type=$2
     if [ -z "$type" ]; then
@@ -477,7 +477,7 @@ function do_project {
     # Normally we build imports outside of any do_* function because
     # we always want to build imports when building. For project, we
     # do this here because
-    domake $subdir/$1 project imports
+    [ -n "$buildClean" ] || domake $subdir/$1 project imports
     domake $subdir/$1 project ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
             ${buildNoAssemblies:+Assemblies=} \
             ${assys:+"Assemblies=${assys[*]}"} \
@@ -486,7 +486,7 @@ function do_project {
             ${swplats:+"RccPlatforms=${swplats[*]}"} \
             ${hwswplats:+"RccHdlPlatforms=${hwswplats[*]}"} \
             $OCPI_MAKE_OPTS
-    if [ -n buildClean -a -z "$hardClean" ] ; then
+    if [ -n "$buildClean" -a -z "$hardClean" ] ; then
       domake $subdir/$1 project imports
       domake $subdir/$1 project exports
     fi
@@ -1557,7 +1557,7 @@ EOF
     <Property Name='frequency' Value='$timefreq'/>
   </Device>
   <!-- Put any additional platform-specific properties here using <Property> -->
-  <!-- Put any built-in (always present) devices here using <device> -->
+  <!-- Put any built-in (physically present) devices here using <device> -->
   <!-- Put any card slots here using <slot> -->
   <!-- Put ad hoc signals here using <signal> -->
 </HdlPlatform>
@@ -1642,8 +1642,8 @@ function do_primitives {
       domake hdl/primitives hdl-primitives clean
     else
       domake . project hdlprimitives \
-                 ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
-                 ${hdltargets:+HdlTargets="${hdltargets[*]}"} \
+                 ${hdlplats:+"HdlPlatforms=${hdlplats[*]}"} \
+                 ${hdltargets:+"HdlTargets=${hdltargets[*]}"} \
                  $OCPI_MAKE_OPTS
     fi
     return 0
@@ -1785,6 +1785,7 @@ function do_build_here {
       buildHdl=""
       cleanTarget+=" cleanhdl"
     fi
+  set -e
   domake . $dirtype \
        ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
        ${buildNoAssemblies:+Assemblies=} \
@@ -1796,8 +1797,12 @@ function do_build_here {
        ${workerList:+Workers="${workerList[*]}"}\
        $OCPI_MAKE_OPTS
   if [ "$dirtype" == "project" -a -z "$hardClean" ] ; then
-    domake . project imports
-    domake . project exports
+    domake . project exports      # export a cleaned project, perhaps for platform bootstrapping
+    if [ -n "$cleanTarget" ]; then
+      domake . project cleanimports # will remove the default registry, but not a different one
+    else
+      domake . project imports
+    fi
   fi
 }
 
@@ -2729,6 +2734,11 @@ case $noun in
   (*)
     if [ "$verb" == "build" ] ; then
       do_build_here ${args[@]}
+      # If we are being asked to really clean, nuke the metadata
+      if [ -n "$buildClean" -a -n "$hardClean" ]; then
+	  rm -f project-metadata.xml
+	  exit 0
+      fi
     else
       bad the noun \"$noun\" is invalid after the verb \"$verb\"
     fi ;;

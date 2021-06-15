@@ -51,7 +51,7 @@ include $(OCPI_CDK_DIR)/include/hdl/hdl-lib2.mk
 # if there isnt a install dir set assume we are in a primitives library ans install them in ../lib
 ifeq ($(HdlInstallDir)$(HdlInstallLibDir),)
   HdlInstallDir=../lib
-  $(call OcpiIncludeAssetAndParent,..,hdl)
+  # No more $(call OcpiIncludeAssetAndParent,..,hdl)
 endif
 
 # This can be overriden
@@ -73,9 +73,9 @@ ifneq ($(Imports)$(ImportCore)$(ImportBlackBox),)
 include $(OCPI_CDK_DIR)/include/hdl/hdl-import.mk
 endif
 
-ifndef OcpiDynamicMakefile
-$(OutLibFiles): Makefile
-endif
+# ifndef OcpiDynamicMakefile
+# $(OutLibFiles): Makefile
+# endif
 
 $(eval $(HdlInstallLibsAndSources))
 

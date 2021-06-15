@@ -1,0 +1,3 @@
+<build>
+  <parameter name='nWide' values='1,2,3,4'/>
+</build>

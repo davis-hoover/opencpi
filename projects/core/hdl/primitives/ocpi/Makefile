@@ -19,7 +19,6 @@
 # This primitive library contains VHDL primitive modules that are used
 # by all workers
 
-HdlLibraries=ocpi.core.bsv fixed_float
 # the generated entities for each property type
 Types=bool char double float short long uchar ulong ushort longlong ulonglong string
 TypeEntities=$(foreach t,$(Types),$t_property $t_array_property $t_read_property $t_read_array_property)

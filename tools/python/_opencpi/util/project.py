@@ -26,6 +26,7 @@ import logging
 from glob import glob
 import subprocess
 import re
+import xml.etree.ElementTree as xt
 from _opencpi.util import cd, set_vars_from_make, OCPIException
 
 def get_make_vars_rcc_targets():
@@ -42,6 +43,19 @@ def get_make_vars_rcc_targets():
 # Utility functions for collecting information about the directories
 # in a project
 ###############################################################################
+
+def get_makefile(directory, type=None):
+    """
+    Return a tuple consisting of the appropriate makefile as well as the directory
+    to call "make" in
+    """
+    if not type:
+        type = get_dirtype(directory)
+    if os.path.exists(directory + "/Makefile"):
+        mkf="Makefile"
+    else:
+        mkf = os.environ["OCPI_CDK_DIR"] + "/include/" + type + ".mk"
+    return mkf,directory
 
 def get_dirtype(directory="."):
     """
@@ -110,14 +124,17 @@ def get_dir_info(directory=".", careful=False):
                 top_xml_elements += [ "hdldevice", "hdlimplementation" ]
     elif name == "components":
         # ambiguous: if there are worker dirs
-        make_type = 'libraries'
-        with os.scandir(directory) as it:
-            for entry in it:
-                if entry.is_dir():
-                    dparts = entry.name.split('.')
-                    if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
-                        make_type = asset_type = 'library'
-                        break
+        if os.path.exists(directory + "/components.xml"):
+            make_type = asset_type = xt.parse(xml_file).getroot().tag.lower()
+        else:
+            make_type = 'libraries'
+            with os.scandir(directory) as it:
+                for entry in it:
+                    if entry.is_dir():
+                        dparts = entry.name.split('.')
+                        if name == "specs" or (len(dparts) > 1 and dparts[-1] in in_lib):
+                            make_type = asset_type = 'library'
+                            break
     elif name in ["platforms", "primitives", "cards", "devices", "adapters", "assemblies" ]:
         # plurals that are usually make types but not actual assets
         if directory.startswith(name): # incure absolutizing penalty
@@ -142,7 +159,6 @@ def get_dir_info(directory=".", careful=False):
         make_type = "hdl-assemblies"
     elif os.path.isfile(xml_file):
         # a platform, an assembly, a library, a primitive
-        import xml.etree.ElementTree as xt
         tag = xt.parse(xml_file).getroot().tag.lower()
         if tag.startswith("hdl"):
             make_type = asset_type = "hdl-" + tag[3:]
@@ -394,7 +410,8 @@ def get_project_package(origin_path="."):
 
         # Otherwise, ask Makefile at the project top for the ProjectPackage
         if project_package is None or project_package == "":
-            project_vars = set_vars_from_make("Makefile",
+            project_vars = set_vars_from_make("Makefile" if os.path.exists("Makefile") else
+                                              os.environ["OCPI_CDK_DIR"] + "/include/project.mk",
                                               "projectpackage ShellProjectVars=1", "verbose")
             if (not project_vars is None and 'ProjectPackage' in project_vars and
                     len(project_vars['ProjectPackage']) > 0):

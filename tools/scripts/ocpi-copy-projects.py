@@ -212,7 +212,9 @@ for proj in projects:
         proj_obj = ocpifactory.AssetFactory.factory("project", new_user_dir + '/' + proj)
         proj_obj.set_registry(new_reg_dir)
         my_registry.add(proj_dir_dict[proj])
-        make_call = ["make", "-C", proj_dir_dict[proj], "exports"]
+        make_call = ["make", "-C", proj_dir_dict[proj],
+                     "-f", os.environ["OCPI_CDK_DIR"] + "/include/project.mk",
+                     "exports"]
         child = subprocess.Popen(make_call, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         child.wait()
 

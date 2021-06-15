@@ -154,7 +154,7 @@ for t in $tests; do
       ;;
     core)
       echo ======================= Running unit tests in project/core
-      make -C $OCPI_ROOT_DIR/project-registry/ocpi.core runtest;;
+      ocpidev run -d $OCPI_ROOT_DIR/project-registry/ocpi.core;;
     ##########################################################################################
     # After this we are depending on the other projects being built for the targeted platform
     assets)

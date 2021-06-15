@@ -21,7 +21,7 @@ $(OcpiIncludeAssetAndParent)
 
 # FIXME: create an hdl-platforms.mk template to share among platform developers.
 # This variable specifies the local list of platforms that are active here.
-HdlMyPlatforms?=$(foreach d,$(filter-out %.txt %.mk test Makefile common README README.txt lib specs old,$(wildcard *)),$(and $(wildcard $d/$d.xml),$d))
+HdlMyPlatforms?=$(foreach d,$(filter-out %.txt %.mk %.xml test Makefile common README README.txt lib specs old,$(wildcard *)),$(and $(wildcard $d/$d.xml),$d))
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 ifeq ($(HdlPlatforms)$(filter-out undefined,$(origin HdlPlatforms))),)
   ifndef HdlPlatform
@@ -53,15 +53,16 @@ else
 endif
 declarehdl: $(HdlMyPlatforms)
 
+PF=$(if $(wildcard $1/Makefile),,-f $(OCPI_CDK_DIR)/include/hdl/hdl-platform.mk)
 $(HdlMyPlatforms):
 	$(AT)echo "=============$(HdlMessage) platform $@"
 	$(AT)$(MAKE) OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR) --no-print-directory -C $@ \
-             $(HdlGoal)
+             $(call PF,$@) $(HdlGoal)
 
 clean::
 	$(AT)for p in $(HdlMyPlatforms); do \
 	      echo Cleaning platform $$p; \
-	      $(MAKE) --no-print-directory -C $$p clean; \
+	      $(MAKE) --no-print-directory -C $$p $(call PF,$p) clean; \
 	     done
 	$(AT)rm -r -f lib
 

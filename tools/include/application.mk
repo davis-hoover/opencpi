@@ -95,5 +95,8 @@ clean::
 endif
 
 clean::
-	$(AT)rm -r -f *~ timeData.raw simulations
+	$(AT)[ ! -d components ] || \
+             $(MAKE) clean -C components \
+               $(if $(wildcard components/Makefile),,-f $(OCPI_CDK_DIR)/include/library.mk)
+	$(AT)rm -r -f *~ timeData.raw simulations lib gen
 endif # avoid speclinks and workersfile

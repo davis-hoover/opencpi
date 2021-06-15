@@ -27,13 +27,14 @@ def discover_assets(project, blacklist=None):
         return []
 
     assets = []
-    components_path = Path(project.path, 'components')
-    hdl_path = Path(project.path, 'hdl')
+    components_path = Path(path, 'components')
+    hdl_path = Path(path, 'hdl')
+    asset_paths = [asset_path 
+                   for asset_paths in (hdl_path.glob('*'), path.glob('*')) 
+                   for asset_path in asset_paths 
+                   if asset_path.stem != 'components']
 
-    for asset_path in hdl_path.glob('*'):
-
-        if not Path(asset_path, 'Makefile').is_file():
-            continue
+    for asset_path in asset_paths:
 
         asset_name = asset_path.stem
 

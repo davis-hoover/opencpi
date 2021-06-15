@@ -6,5 +6,5 @@ $(if $(realpath $(OCPI_CDK_DIR)),,\
 # The RunArgs variable can be set to a standard set of arguments to use when executing either.
 include $(OCPI_CDK_DIR)/include/application.mk
 clean::
-	rm -rf simulations
-	rm -rf case00.00.in case00.00.out
+	$(AT)rm -rf simulations
+	$(AT)rm -rf case00.00.in case00.00.out

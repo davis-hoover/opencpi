@@ -40,7 +40,7 @@ endif
 # We use the "internal" versions of variables to allow subsidiary makefiles to
 # simply set those variables again
 ifeq ($(origin Assemblies),undefined)
-  Assemblies:=$(shell for i in *; do if test -d $$i -a -f $$i/Makefile; then echo $$i; fi; done)
+  Assemblies:=$(shell for i in *; do if test -d $$i -a -f $$i/$$(basename $$i).xml; then echo $$i; fi; done)
 endif
 override Assemblies:=$(filter-out $(ExcludeAssemblies),$(Assemblies))
 
@@ -56,6 +56,7 @@ ifneq (,$(JENKINS_HOME))
 	$(AT)echo "============= ($(shell date +"%H:%M:%S"), started $(JOB_STARTTIME))"
 endif
 	$(AT)$(MAKE) -L -C $@ \
+               $(if $(wildcard $@/Makefile),,-f $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk) \
                $(HdlPassTargets) \
 	       $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
 	       LibDir=$(call AdjustRelative,$(LibDir)) \

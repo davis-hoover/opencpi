@@ -97,6 +97,7 @@ begin
     -- delta cycle alert in some tools even though this is a verilog module
     in2out_axi_clk: util.util.in2out port map(in_port => clk, out_port => axi_out.a.clk);
   #endif
+// clang 12.0 bug needs this line
   #if RESET_FROM_MASTER
     cp_reset         <= not axi_in.a.resetn;
   #else
