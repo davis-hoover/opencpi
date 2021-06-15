@@ -1,0 +1,21 @@
+<HdlDevice Language="vhdl" Emulate="data_sink_qdac_csts.hdl" Version="2">
+  <ComponentSpec>
+  <Property Name="num_input_samples" Type="ushort"
+                                     initial="true"
+                                     Default="4096"
+                                     Description="Number of input samples sent."/>
+
+    <Port Name="out" Producer="true" Protocol="complex_short_timed_sample-prot"/>
+  </ComponentSpec>
+
+  <StreamInterface Name="out" 
+		   DataWidth="32" 
+		   ClockDirection="out" 
+		   InsertEOM="true" 
+		   WorkerEOF="true"/>
+
+  <Supports Worker="data_sink_qdac_csts">
+    <Connect port="dev" to="dev"/>
+  </Supports>
+</HdlDevice>
+

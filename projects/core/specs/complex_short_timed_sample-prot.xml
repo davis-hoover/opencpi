@@ -21,7 +21,13 @@
 
        Sequence length is set to allow for a maximum message length of 16,384
        bytes. All protocols for all data types must have the same maximum
-       message length in bytes. -->
+       message length in bytes. 
+
+       Depending on the context and the algorithm,
+       the adjectives used here may be in-phase and quadrature instead of
+       real and imaginary, respectively. Thus, it should be noted that
+       when shortened to the abreviated IQ, I is for In-phase and Q is for
+       Quadrature -->
   <operation name="sample">
     <argument name="data" type="struct" sequencelength="4096">
       <member name="real" type="short"/>

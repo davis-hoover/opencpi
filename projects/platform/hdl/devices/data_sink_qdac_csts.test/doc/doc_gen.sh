@@ -16,23 +16,10 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Build Ordering Rules:
-# 1) Subdevices that support other devices must occur AFTER the devices they support.
-# 2) Similarly, Emulators must occur after the devices they emulate.
-Workers = \
-	data_sink_qdac.hdl \
-	data_sink_qdac_ad9361_sub.hdl \
-	data_sink_qdac_em.hdl \
-	data_src_qadc.hdl \
-	data_src_qadc_ad9361_sub.hdl \
-	data_src_qadc_em.hdl \
-	data_sink_qdac_csts.hdl \
-	data_sink_qdac_csts_ad9361_sub.hdl \
-	data_sink_qdac_csts_em.hdl \
-	platform_ad9361_config.hdl \
-	platform_ad9361_config_proxy.rcc \
-	platform_ad9361_data_sub.hdl \
-	platform_ad9361_spi.hdl \
-	signal_time_tagger.hdl \
+REPO_PATH=../../../../../../
 
-include $(OCPI_CDK_DIR)/include/library.mk
+${REPO_PATH}/doc/av/tex/docGen.py \
+    ${REPO_PATH}/projects/platform/hdl/devices/specs/data_sink_qdac_csts-spec.xml \
+    -owd \
+    ${REPO_PATH}/projects/platform/hdl/devices/data_sink_qdac_csts.hdl/data_sink_qdac_csts.xml \
+    --no-prompt
