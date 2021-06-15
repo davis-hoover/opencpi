@@ -1244,22 +1244,26 @@ function do_worker {
     fi
   else
 # Make one Makefile, even if multi-worker
-  cat <<EOF | sed '/^ *$/d' >  $libdir/$1/Makefile
+  cat <<EOF >  $libdir/$1/Makefile
 # This is the Makefile for worker $1
-$wvar
-${includes:+IncludeDirs=${includes[@]}}
-${others:+SourceFiles=${others[@]}}
-${cores:+Cores=${cores[@]}}
-${rccstatprereqs:+RccStaticPrereqLibs=${rccstatprereqs[@]}}
-${rccdynprereqs:+RccDynamicPrereqLibs=${rccdynprereqs[@]}}
-${targets:+OnlyTargets=${targets[@]}}
-${extargets:+ExcludeTargets=${extargets[@]}}
-${onlyplats:+OnlyPlatforms=${onlyplats[@]}}
-${explats:+ExcludePlatforms=${explats[@]}}
-${liblibs:+Libraries=${liblibs[@]}}
-${xmlincludes:+XmlIncludeDirs=${xmlincludes[@]}}
-${complibs:+ComponentLibraries=${complibs[@]}}
 include \$(OCPI_CDK_DIR)/include/worker.mk
+EOF
+  cat <<EOF | sed '/^ *$/d' > $libdir/$1/$1.xml
+<worker
+	$wvar
+	${includes:+IncludeDirs='${includes[@]}'}
+	${others:+SourceFiles='${others[@]}'}
+	${cores:+Cores='${cores[@]}'}
+	${rccstatprereqs:+RccStaticPrereqLibs='${rccstatprereqs[@]}'}
+	${rccdynprereqs:+RccDynamicPrereqLibs='${rccdynprereqs[@]}'}
+	${targets:+OnlyTargets='${targets[@]}'}
+	${extargets:+ExcludeTargets='${extargets[@]}'}
+	${onlyplats:+OnlyPlatforms='${onlyplats[@]}'}
+	${explats:+ExcludePlatforms='${explats[@]}'}
+	${liblibs:+Libraries='${liblibs[@]}'}
+	${xmlincludes:+XmlIncludeDirs='${xmlincludes[@]}'}
+	${complibs:+ComponentLibraries='${complibs[@]}'}
+/>
 EOF
 fi
 for s in "${supported[@]}" ; do
@@ -1699,34 +1703,20 @@ EOF
   if [ "$1" = "library" ] ; then
     cat <<EOF > $dir/Makefile
 # This Makefile is for the primitive library: $2
-
-# Set this variable to any other primitive libraries that this $1 depends on.
-# If they are remote from this project, use slashes in the name (relative or absolute)
-# If they are in this project, they must be compiled first, and this requires that the
-# PrimitiveLibraries variable be set in the hdl/primitives/Makefile such that the
-# libraries are in dependency order.
-#Libraries=
-${liblibs:+Libraries=${liblibs[@]}}
-${hdlnolib:+HdlNoLibraries=yes}
-${hdlnoelab:+HdlNoElaboration=yes}
-# Set this variable to the list of source files in dependency order
-# If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
-# except that any *_pkg.vhd files will be compiled first
-#SourceFiles=
-${others:+SourceFiles=${others[@]}}
-
-# Remember two rules for OpenCPI primitive libraries, in order to be usable with all tools:
-# 1. Any entity (VHDL) or module (verilog) must have a VHDL component declaration in ${2}_pkg.vhd
-# 2. Entities or modules to be used from outside the library must have the file name
-#    be the same as the entity/module name, and one entity/module per file.
-
-
-${cores:+Cores=${cores[@]}}
-${targets:+OnlyTargets=${targets[@]}}
-${extargets:+ExcludeTargets=${extargets[@]}}
-${onlyplats:+OnlyPlatforms=${onlyplats[@]}}
-${explats:+ExcludePlatforms=${explats[@]}}
 include \$(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+EOF
+    cat <<EOF > $dir/$2.xml
+<HdlLibrary
+	${liblibs:+Libraries='${liblibs[@]}'}
+	${hdlnolib:+HdlNoLibraries='yes'}
+	${hdlnoelab:+HdlNoElaboration='yes'}
+	${others:+SourceFiles='${others[@]}'}
+	${cores:+Cores='${cores[@]}'}
+	${targets:+OnlyTargets='${targets[@]}'}
+	${extargets:+ExcludeTargets='${extargets[@]}'}
+	${onlyplats:+OnlyPlatforms='${onlyplats[@]}'}
+	${explats:+ExcludePlatforms='${explats[@]}'}
+/>
 EOF
     cat <<EOF > $dir/$2_pkg.vhd
 -- This package enables VHDL code to instantiate all entities and modules in this library
@@ -1738,37 +1728,21 @@ EOF
   else
     cat <<EOF > $dir/Makefile
 # This Makefile is for the primitive core: $2
-
-# Set this variable to any other primitive libraries that this core depends on.
-# If they are remote from this project, use slashes in the name (relative or absolute)
-#Libraries=
-${liblibs:+Libraries=${liblibs[@]}}
-# Set this variable to the list of source files in dependency order
-# If it is not set, all .vhd and .v files will be compiled in wildcard/random order,
-# except that any *_pkg.vhd will be compiled first, if present.
-#SourceFiles=
-
-# Set this variable if the top level module name for this core is different from the
-# core name: $2
-#Top=
-${module:+Top=${module[@]}}
-
-# Set this variable if this core is in fact a presynthesized/prebuilt core
-# and thus does not have source files except perhaps for simulation
-# The suffix is added for you (as appropriate for Xilinx or Altera etc.)
-#PreBuiltCore=
-${prebuilt:+PreBuiltCore=${prebuilt[@]}}
-
-# Remember that verilog cores must have a black box empty module definition
-# in a file named <top>_bb.v (where <top> is the of the core or the value of the Top
-# variable).
-${others:+SourceFiles=${others[@]}}
-${cores:+Cores=${cores[@]}}
-${targets:+OnlyTargets=${targets[@]}}
-${extargets:+ExcludeTargets=${extargets[@]}}
-${onlyplats:+OnlyPlatforms=${onlyplats[@]}}
-${explats:+ExcludePlatforms=${explats[@]}}
 include \$(OCPI_CDK_DIR)/include/hdl/hdl-core.mk
+EOF
+
+    cat <<EOF > $dir/`basename $dir`.xml
+<HdlCore
+	${liblibs:+Libraries='${liblibs[@]}'}
+	${module:+Top='${module[@]}'}
+	$prebuilt:+PreBuiltCore='${prebuilt[@]}'}
+	$others:+SourceFiles='${others[@]}'}
+	$cores:+Cores='${cores[@]}'}
+	$targets:+OnlyTargets='${targets[@]}'}
+	$extargets:+ExcludeTargets='${extargets[@]}'}
+	$onlyplats:+OnlyPlatforms='${onlyplats[@]}'}
+	$explats:+ExcludePlatforms='${explats[@]}'}
+/>
 EOF
   fi
 }
@@ -1969,16 +1943,16 @@ Options for the create|delete verbs:
   -P <platform>      Create this worker in the devices library underneath the specified platform
   --worker-version   Specify the worker API version
      <version>
-  -W <worker>        *A worker to include (adds to "Workers" variable in worker Makefile)
+  -W <worker>        *A worker to include (adds to "Workers" variable in worker XML file)
                       Use <worker>:<spec> if spec name is different from worker name
   -R <rcc-static>    *Add an RCC static prerequisite library dependency to an RCC worker
-                      (adds to "RccStaticPrereqLibs" in Makefile)
+                      (adds to "RccStaticPrereqLibs" in XML file)
   -r <rcc-dynamic>   *Add an RCC dynamic prerequisite library dependency to an RCC worker
-                      (adds to "RccDynamicPrereqLibs" in Makefile)
+                      (adds to "RccDynamicPrereqLibs" in XML file)
 
  == create worker|{hdl device|primitive|platform} ==
-  -O <other>         *Other source files to include (adds to "SourceFiles" in Makefile)
-  -C <core>          *Core to be included by this asset (adds to "Cores" in Makefile)
+  -O <other>         *Other source files to include (adds to "SourceFiles" in XML file)
+  -C <core>          *Core to be included by this asset (adds to "Cores" in XML file)
 
  == create project|library|worker|{hdl device|platform} ==
   -A <xml-include>   *A directory to search for XML files (adds to "XmlIncludeDirs" in Project.xml)
@@ -1991,22 +1965,22 @@ Options for the create|delete verbs:
 
  == create worker|{hdl device|primitive|platform|assemblies} ==
   -T <target>        *Specify one of the build-targets to limit this asset to
-                      (adds to "OnlyTargets" in Makefile)
-  -Z <target>        *Exclude a build-target for this asset (add to "ExcludeTargets" in Makefile)
+                      (adds to "OnlyTargets" in XML file)
+  -Z <target>        *Exclude a build-target for this asset (add to "ExcludeTargets" in XML file)
   -G <platform>      *Specify one of the build-platforms to limit this asset to
-                      (adds to "OnlyPlatforms" in Makefile)
+                      (adds to "OnlyPlatforms" in XML file)
   -Q <platform>      *Exclude a build-platform for this asset
-                      (adds to "ExcludePlatforms" in Makefile)
+                      (adds to "ExcludePlatforms" in XML file)
   -U <supports>      *A device (worker) supported by the subdevice being created
 
  == create hdl primitive core ==
-  -M <top-module>    Top level module name (default is name of the core) (sets "Top" in Makefile)
+  -M <top-module>    Top level module name (default is name of the core) (sets "Top" in XML file)
   -B <core>          Specify a prebuilt (not source) core (ie. *.ngc or *.edf file)
-                     (sets "PreBuiltCore" in Makefile)
+                     (sets "PreBuiltCore" in XML file)
 
  == create hdl primitive library ==
-  -H                 Primitive does not depend on any libraries (sets "HdlNoLibraries" in Makefile)
-  -J                 Do not elaborate this HDL library (sets "HdlNoElaboration" in Makefile)
+  -H                 Primitive does not depend on any libraries (sets "HdlNoLibraries" in XML File)
+  -J                 Do not elaborate this HDL library (sets "HdlNoElaboration" in XML File)
                      (limited tool support)
 
  == create hdl platform ==
