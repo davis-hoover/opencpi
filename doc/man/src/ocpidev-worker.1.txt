@@ -289,6 +289,12 @@ Options When Building RCC Workers
     is also not used), the current development software platform
     is used as the single RCC platform used for building.
 
+*`--optimimize`*::
+    Build RCC/ACI assets with compiler optimization enabled.  This
+    results in a separate set of build outputs that do not conflict
+    with non-optimized (debug) build outputs, since they are placed
+    in a target directory whose name has a "-o" suffix.
+
 Options When Building HDL Workers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *`--hdl-platform=`*'<hdl-platform>'+::

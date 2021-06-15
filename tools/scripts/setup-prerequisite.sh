@@ -60,6 +60,11 @@ description=$3
 url=$4
 file=$5
 directory=$6
+# fake_dir means the tarball will not create a directory so do it anyway
+if [[ "$directory" == +* ]]; then
+  fake_dir=1
+  directory=${directory#+}
+fi
 cross=$7
 # base is used when considering alternative local download sources
 if [[ "$url" == *.git ]]; then
@@ -202,15 +207,24 @@ function unpack {
   [ "$directory" = . ] && return 0
   rm -r -f $directory
   echo Unpacking download file $file into $directory.
+  xfile=$file
+  [ -n "$fake_dir" ] && {
+    rm -r -f $directory
+    mkdir -p $directory && cd $directory
+    xfile=../$file
+  }
   case $file in
-    (*.tar.gz) tar xzf $file;;
-    (*.tar|*.tar.bz2) tar xf $file;;
-    (*.tar.xz) tar -x --xz -f $file;;
-    (*.zip) unzip $file;;
+    (*.tar.gz) tar xzf $xfile;;
+    (*.tar|*.tar.bz2) tar xf $xfile;;
+    (*.tar.xz) tar -x --xz -f $xfile;;
+    (*.zip) unzip $xfile;;
     (*) echo Unknown suffix in $file.  Cannot unpack it.; exit 1
   esac
-  [ $? != 0 ] && {
+  rc=$?
+  [ -n "$fake_dir" ] && cd ..
+  [ $rc != 0 ] && {
     echo Failed when unpacking the download file: $file.
+    rm -r -f $directory
     return 1
   }
   [ -d $directory ] && cd $directory && return 0
