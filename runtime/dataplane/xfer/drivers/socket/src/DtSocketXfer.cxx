@@ -369,6 +369,7 @@ protected:
     header.dataOffset = offset;
     header.flagOffset = 0;
     header.flagValue = XF::FlagMeta::packFlag(nbytes, 0, 0);
+    header.timeStamp = 0;
     ocpiDebug("Sending IP header %zu %" DTOSDATATYPES_OFFSET_PRIx" %" PRIx32,
 	      sizeof(header), header.dataOffset, header.flagValue);
     OS::IOVec sendVec[2]; // this may be modified in the send call
@@ -393,7 +394,7 @@ class XferRequest : public TransferBase<XferServices,XferRequest> {
 public:
   XferRequest(XferServices &a_parent, XF_template temp)
     : TransferBase<XferServices,XferRequest>(a_parent, *this, temp),
-      m_dataAddr(NULL), m_flagAddr(NULL) {
+      m_sendHeader({0, 0, 0, 0}), m_dataAddr(NULL), m_flagAddr(NULL) {
   }
   // Data members accessible from this/derived class
 private:

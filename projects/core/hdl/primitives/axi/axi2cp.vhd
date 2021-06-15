@@ -16,17 +16,34 @@
 -- You should have received a copy of the GNU Lesser General Public License
 -- along with this program. If not, see <http://www.gnu.org/licenses/>.
 
--- Adapt the axi_gp master from the PS to a CP master
--- The clock and reset are injected to be supplied to both sides
+-- Adapt an axi slave to a CP master
+
+-- The CP master is driving the control plane clock so this module has two clock modes:
+-- 1. The axi master is driving the clock and that clock will drive the CP master
+--    and thus the clk port is *ignored*.
+-- 2. The axi slave is supposed to drive the clock so the clk port is an input
+--    that will drive BOTH the AXI clock (from the slave side) and the CP master
+-- So we'll use CPCLK as the process clock for this adapter, which is either the input
+-- port clk or the AXI master's clock.
+-- We use the CPP to do this (not VHDL), which avoids clock assignments and delta cycles
+-- and also keeps all the interface attributes in one place (in the interface header file)
+-- We will do the same for reset.
+
+-- The user of this module must be aware of the fact that if the AXI master
+-- drives the clock and the slave drives the reset, that the slave (and CP) reset
+-- will be the input port "reset", and that reset must be synchronized to the
+-- AXI master's clock (i.e. that is not done here).
+
 library IEEE; use IEEE.std_logic_1164.all; use ieee.numeric_std.all;
 library platform; use platform.all;
 library ocpi; use ocpi.types.all, ocpi.util.all;
+library util;
 library work; use work.axi_pkg.all, work.AXI_INTERFACE.all;
 
 entity axi2cp_AXI_INTERFACE is
   port(
-    clk     : in std_logic;
-    reset   : in bool_t;
+    clk     : in std_logic;  -- not used if interface says AXI master drives clock
+    reset   : in bool_t;     -- not used if interface says AXI master drives reset
     axi_in  : in  axi_m2s_t;
     axi_out : out axi_s2m_t;
     cp_in   : in  platform_pkg.occp_out_t;
@@ -66,15 +83,36 @@ architecture rtl of axi2cp_AXI_INTERFACE is
                            r_last_wanted_e,  -- waiting for last response
                            r_last_valid_e);  -- last is offered, not accepted
   signal address_state : address_state_t;
-  signal read_state    : read_state_t;     
+  signal read_state    : read_state_t;
   signal addr2_r       : std_logic;
   signal RVALID        : std_logic;
+  signal cp_reset      : bool_t;
 begin
+  --============================================================================================
+  -- Clock and reset handling given that clock and reset may be (independently) from either side
+  #if CLOCK_FROM_MASTER
+    #define CPCLK axi_in.a.clk
+  #else
+    #define CPCLK clk
+    -- delta cycle alert in some tools even though this is a verilog module
+    in2out_axi_clk: util.util.in2out port map(in_port => clk, out_port => axi_out.a.clk);
+  #endif
+  #if RESET_FROM_MASTER
+    cp_reset         <= not axi_in.a.resetn;
+  #else
+    cp_reset         <= reset;
+    axi_out.a.resetn <= not reset;
+  #endif
+  -- delta cycle alert in some tools even though this is a verilog module
+  in2out_cp_clk: util.util.in2out port map(in_port => CPCLK, out_port => cp_out.clk);
+  cp_out.reset <= cp_reset;
+  --============================================================================================
+
   -- Our state machines, separate for address and read-data
-  work : process(clk)
+  work : process(CPCLK)
   begin
-    if rising_edge(clk) then
-      if reset = '1' then
+    if rising_edge(CPCLK) then
+      if its(cp_reset) then
         address_state <= a_idle_e;
         read_state    <= r_idle_e;
       else
@@ -183,12 +221,6 @@ begin
   -- Now we drive external signals based on our state and the combi signals
   -- AXI GP signals we drive from the PL into the PS, ordered per AXI Chapter 2
   -- Global signals
-#if !CLOCK_FROM_MASTER
-  axi_out.A.CLK    <= clk;       -- we drive the AXI clock as the SDP CLK
-#endif
-#if !RESET_FROM_MASTER
-  axi_out.A.RESETn <= not reset; -- we drive the reset as the SDP reset
-#endif
 #if AXI4
   axi_out.B.USER <= (others => '0');
   axi_out.R.USER <= (others => '0');
@@ -213,8 +245,6 @@ begin
   axi_out.R.VALID  <= RVALID;
   ----------------------------------------------------------------------------
   -- CP Master output signals we drive
-  cp_out.clk        <= clk;
-  cp_out.reset      <= reset;
   -- Note we need to wait for valid write (WVALID) to arrive when writing and a_last_e
   -- since we enter that state without regard to WVALID and it might not be there then
   cp_out.valid      <= to_bool(address_state = a_first_e or
