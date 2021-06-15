@@ -1,0 +1,10 @@
+<build>
+  <configuration id='0'>
+    <parameter name='numRecords' value='256'/>
+    <parameter name='numDataWords' value='1024'/>
+  </configuration>
+  <configuration id='1'>
+    <parameter name='numRecords' value='256'/>
+    <parameter name='numDataWords' value='8192'/>
+  </configuration>
+</build>
