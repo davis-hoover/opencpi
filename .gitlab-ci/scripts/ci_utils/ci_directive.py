@@ -138,7 +138,7 @@ class Directive():
             platforms = env.directive
         except:
             # Get platform names from appropriate env var
-            if env.pipeline_source in ['scheduled', 'web']:
+            if env.pipeline_source in ['schedule', 'web']:
                 platforms = env.platforms
             elif env.pipeline_source == 'merge_request_event':
                 platforms = env.mr_platforms
