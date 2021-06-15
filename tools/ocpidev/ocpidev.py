@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from inspect import signature
-import os
 from pathlib import Path
+from subprocess import call
 import sys
 import _opencpi.assets as ocpiassets
 import _opencpi.util as ocpiutil
@@ -79,9 +79,14 @@ def main():
         method_args = {}
         for param in sig.parameters:
             method_args[param] = getattr(args, param)
+        if args.verbose:
+            msg = 'Executing the "{} {}" command in "{}" directory: {}'.format(
+                args.verb, args.noun, args.noun, asset.directory)
+            print(msg)
         asset_method(**method_args)
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
+        sys.exit(1)
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
         ocpidev_sh()
@@ -112,10 +117,10 @@ def ocpicreate(args):
 def ocpidev_sh():
     """Calls ocpidev.sh and exits"""
     cdk_dir = ocpiutil.get_cdk_path()
-    ocpidev_sh_path = Path(cdk_dir, 'scripts', 'ocpidev.sh')
-    args = ' '.join(sys.argv)
-    cmd = '{} {}'.format(ocpidev_sh_path, args)
-    rc = os.system(cmd)
+    ocpidev_sh_path = str(Path(cdk_dir, 'scripts', 'ocpidev.sh'))
+    cmd = sys.argv
+    cmd.insert(0, ocpidev_sh_path)
+    rc = call(cmd)
     sys.exit(rc)
 
 

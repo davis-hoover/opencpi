@@ -657,6 +657,9 @@ verbs = {
         }
     },
     'register': {
+        'options': {
+            'name': {'nargs': '?'}
+        },
         'nouns': {
             'project': None
         }
@@ -673,6 +676,9 @@ verbs = {
         'nouns': None
     },
     'unregister': {
+        'options': {
+            'name': {'nargs': '?'}
+        },
         'nouns': {
             'project': None
         }

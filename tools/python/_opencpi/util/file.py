@@ -32,7 +32,7 @@ from _opencpi.util import OCPIException
 # Makefiles
 ###############################################################################
 
-def execute_cmd(settings, directory, action=None, file=None):
+def execute_cmd(settings, directory, action=None, file=None, verbose=False):
     """
     This command is a wrapper around any calls to make in order to encapsulate the use of make to a
     minimal number of places.  The function contains a hard-coded dictionary of generic settings to
@@ -52,12 +52,8 @@ def execute_cmd(settings, directory, action=None, file=None):
                      'run_arg'         : "OcpiRunArgs",
                      'remote_test_sys' : "OCPI_REMOTE_TEST_SYSTEMS",
                      'verbose'         : "TestVerbose"}
-    make_list = []
-
-    make_list.append("make")
-    make_list.append("-C")
-    make_list.append(directory)
-    debug_string = "make -C " + directory
+    make_list = ["make", "-r", "--no-print-directory", "-C", directory]
+    debug_string = " ".join(make_list)
     if file:
         make_list.append("-f")
         make_list.append(file)
@@ -83,8 +79,9 @@ def execute_cmd(settings, directory, action=None, file=None):
             raise OCPIException("Invalid setting data-type passed to execute_cmd().  Valid data-" +
                                 "types are bool and list")
             # pylint:enable=undefined-variable
-
     logging.debug("running make command: " + debug_string)
+    if verbose:
+        print('Executing command: {}'.format(debug_string))
     #shell=True is bad dont set it here running the following command was able to execute
     # arbitary code
     #ocpidev run test --hdl-platform \$\(./script.temp\)

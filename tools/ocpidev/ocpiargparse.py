@@ -157,13 +157,13 @@ def _make_parser(args_dict, prog=None):
         if not verbs_dict or not isinstance(verbs_dict, dict):
         # Empty verbs or not a dict, so return parser
             return parser
-        parser = _make_subparsers(parser, verbs_dict, options_dict, 'verb')
+        parser = _make_subparsers(parser, verbs_dict, {}, options_dict, 'verb')
 
     return parser
 
 
-def _make_subparsers(parser, subparser_dict, parent_options_dict, dest, 
-        parent_keys=list()):
+def _make_subparsers(parser, subparser_dict, parent_options_dict, 
+        common_options_dict, dest, parent_keys=list()):
     """
     Creates subparsers for each key,val pair in the dictionary
     subparser_dict. If the dictionary contains the key 'nouns', calls
@@ -183,7 +183,9 @@ def _make_subparsers(parser, subparser_dict, parent_options_dict, dest,
     # Iterate through dict, making subparser for each key,val pair
         keys = list(parent_keys) # copy parent_keys so to not affect original
         keys.append(key)
+        common_options_dict['help']['keys'] = keys
         subparser = subparsers.add_parser(key, add_help=False)
+        subparser = _make_options(subparser, common_options_dict)
         # Make copy of parent options dict, so to not affect original
         options_dict = dict(parent_options_dict)
         if not val or not isinstance(val, dict):
@@ -198,7 +200,7 @@ def _make_subparsers(parser, subparser_dict, parent_options_dict, dest,
             nouns_dict = val['nouns']
             child_dest = 'noun' if dest == 'verb' else '{}_noun'.format(key)
             subparser = _make_subparsers(subparser, nouns_dict, options_dict, 
-                child_dest, parent_keys=keys)
+                common_options_dict, child_dest, parent_keys=keys)
         else:
         # End of parser, so make options and continue
             subparser = _make_options(subparser, options_dict)
