@@ -262,7 +262,7 @@ define DoImplConfig
               -e '/`include.*"generics.vh"/r $(call WkrTargetDir,$1,$2)/generics.vh' \
               -e '/`include.*"generics.vh"/d' \
               $(and $(HdlIsDevice),\
-                -e '/\/\/_parameterized_signal_decls/r $(call HdlVerilogParamSignals,$1,$2)') \
+                -e '/\/\/_parameterized_signal_decls/r $(call HdlVerilogParamSignalDecls,$1,$2)') \
               $$< > $$@
 
 endef

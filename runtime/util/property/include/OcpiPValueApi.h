@@ -49,6 +49,7 @@ namespace OCPI {
 	: name(aName), type(aType), owned(false) {}
       inline PValue()
 	: name(0), type(OCPI_none), owned(false) {}
+      inline PValue(const PValue &other) { *this = other; } // swap idiom would be better here
       inline ~PValue() { if (owned) delete [] vString; }
       PValue &operator=(const PValue &);
       unsigned length() const;

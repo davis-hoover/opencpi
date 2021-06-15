@@ -40,6 +40,7 @@ namespace OCPI {
     PValue &PValue::operator=(const PValue &p) {
       name = p.name;
       type = p.type;
+      owned = p.owned;
       if (p.owned) {
         vString = new char[strlen(p.vString) + 1];
         strcpy((char*)vString, p.vString);

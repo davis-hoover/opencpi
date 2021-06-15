@@ -446,9 +446,9 @@ namespace OCPI {
 	struct iovec iov;
 	iov.iov_base = payload;
 	iov.iov_len = sizeof(Packet);
-	struct {
-	  struct cmsghdr hdr;
-	  struct in_pktinfo info;
+	union {
+	  struct cmsghdr hdr;                           // ensure alignment
+	  uint8_t data[CMSG_SPACE(sizeof(in_pktinfo))]; // ensure space
 	} cmsg;
 	struct msghdr mh;
 	mh.msg_name = &sa.saddr;
