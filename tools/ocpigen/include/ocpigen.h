@@ -130,5 +130,7 @@ emitSignal(const char *signal, FILE *f, Language lang, Signal::Direction dir,
 	   std::string &last, int width, unsigned n, const char *pref = "",
 	   const char *type = "std_logic", const char *value = NULL,
 	   const char *widthExpr = NULL);
+extern const char *
+parseAsset(const char *file, const char *topElement);
 
 #endif

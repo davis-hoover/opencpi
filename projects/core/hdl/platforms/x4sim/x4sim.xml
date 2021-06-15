@@ -1,5 +1,6 @@
-<HdlPlatform Language="VHDL" spec='platform-spec'>
+<HdlPlatform Language="VHDL" spec='platform-spec' libraries='sdp util' version='2'>
   <specproperty name='platform' value='x4sim'/>
+  <specproperty name='sdp_width' value='4'/>
   <property name='sdpDropCount' type='uchar' volatile='1'/>
   <!-- All platform workers must provide these two ports -->
   <metadata master='true'/> <!-- access to container metadata via the platform worker -->

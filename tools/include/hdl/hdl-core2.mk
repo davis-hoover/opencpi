@@ -76,7 +76,8 @@ ifdef HdlToolRealCore
       $(infox TARGET:$(call WkrTargetDir,$1,$4)/$2$(HdlBin))
       $(call WkrTargetDir,$1,$4)/$2$(HdlBin): \
         $$$$(foreach l,$$$$(HdlLibrariesInternal),$$$$(call HdlLibraryRefDir,$$$$l,$$$$(HdlTarget),,DoCore1))
-      $(call WkrTargetDir,$1,$4)/$2$(HdlBin): $$$$(HdlPreCore) \
+      $$(eval $$(call HdlSetWorkerCores,$1))
+      $(call WkrTargetDir,$1,$4)/$2$(HdlBin): $$$$(HdlCollectCorePaths) \
         $$(filter-out $$(filter-out %.vhd,$$(call CoreBlackBoxFiles,$1,$4)) $$(TargetSourceFiles_$4),$$(CompiledSourceFiles)) 
 	$(AT)echo Building $(and $(filter-out core,$(HdlMode))) core \"$(2)\" for target \"$$(HdlTarget)\" $$(ParamConfig):$$(ParamMsg) $$@
 ifneq (,$(JENKINS_HOME))

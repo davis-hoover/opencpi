@@ -53,7 +53,7 @@ def discover_projects(projects_paths=None, group_ids=None, blacklist=None):
     return projects
 
 
-def discover_local_projects(projects_path, blacklist=None):
+def discover_local_projects(projects_path, whitelist=None, blacklist=None):
     """Discovers local projects
 
     Args:
@@ -67,14 +67,15 @@ def discover_local_projects(projects_path, blacklist=None):
     for project_path in projects_path.glob('*'):
         project_name = str(project_path).split('.')[-1].split('/')[-1]
 
-        if blacklist and project_name in blacklist:
-            continue
-
-        makefile_path = Path(project_path, 'Makefile')
-        if makefile_path.is_file():
-            is_builtin = project_path.parent.stem != 'ext'
+        if Path(project_path, "Project.xml").is_file() or Path(project_path, "Project.mk").is_file():
+            if blacklist and project_name in blacklist:
+                continue
+            if whitelist and project_name not in whitelist:
+                continue
+            group = project_path.parent.stem
+            group = 'opencpi' if group == 'projects' else group
             project = Project(name=project_name, path=project_path, 
-                              is_builtin=is_builtin)
+                              group=group)
             projects.append(project)
         else:
             projects += discover_local_projects(project_path, 

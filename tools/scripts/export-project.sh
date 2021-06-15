@@ -308,7 +308,7 @@ for a in $assets; do
 		  }
 		  [ -n "$allhdl" ] && {
 		      for p in $allhdl; do
-			  warn=`checkfiles hdl/platforms/$p Makefile '$f.mk'`
+			  warn=`checkfiles hdl/platforms/$p '$f.xml' '$f.vhd'`
 			  if [ -n "$warn" ]; then
 			      warn_check "Warning:  cannot export HDL platform $p: $warn"
 			  else
@@ -409,10 +409,11 @@ fi
 [ -n "$verbose" -a -n "$hdl_platforms" ] && echo Processing hdl platforms
 for p in ${hdl_platforms[*]}; do
   d=hdl/platforms/$p
-  [ -f $d/Makefile -a -f $d/$p.mk ] || bad HDL platform $p not exported due to missing files in $d
+  [ -f $d/Makefile -a -f $d/$p.xml ] || bad HDL platform $p not exported due to missing files in $d
   [ -d $d/lib ] && make_filtered_link $d/lib exports/hdl/platforms/$p platform
-  # this $p.mk link is for bootstrapping before the platform is built to show it exists
-  make_filtered_link $d/$p.mk exports/hdl/platforms/mk/$p.mk platform
+  # this $p.xml link is for bootstrapping before the platform is built to show it exists
+  make_filtered_link $d/$p.xml exports/hdl/platforms/xml/$p.xml platform
+  [ -f "$d/$p.mk" ] && make_filtered_link $d/$p.mk exports/hdl/platforms/xml/$p.mk platform
 done
 ###################################################################################
 # Export rcc platforms
@@ -517,16 +518,9 @@ set +f
 # other make machinery.  If necessary before the python rewrite, we could have a
 # shared implementation some other way that avoided all the recursion.
 # Or change the python to do this and not use "make".
-for i in components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
-    [ -d $i -a "$(ocpiDirType $i)" = library ] && make --no-print-directory -C $i speclinks
+for i in components components/* hdl/{devices,cards,adapters} hdl/platforms/*/devices; do
+    [ -d $i ] && [ "$(ocpiDirType $i)" = library ] && make --no-print-directory -C $i speclinks
 done
-exit 0
-
-# export the specs for each of the libraries
-python3 -c "import sys, os;
-sys.path.append(os.getenv('OCPI_CDK_DIR') + '/' + os.getenv('OCPI_TOOL_PLATFORM') + '/lib/')
-import _opencpi.util; _opencpi.util.export_libraries()"
-
 exit 0
 
 # notes:

@@ -67,10 +67,10 @@ def discover_local(project, config=None):
         <project.path>/hdl/platforms
     and for rcc platforms in:
         <project.path>/rcc/platforms
-    Determines if a directory is a platform by existence of a
-        Makefile
-    or
+    Determines if a directory is an rcc platform by existence of a
         <platform_name>.mk
+    Determines if a directory is an hdl platform by existence of a
+        <platform_name>.xml
     Determines if an hdl platform is a simulator by existence of
         runSimExec.<platform_name>
 
@@ -94,18 +94,17 @@ def discover_local(project, config=None):
                 platform_name = platform_path.stem
 
                 if platforms_path is hdl_platforms_path:
-                    makefile = Path(platform_path, 'Makefile')
+                    testfile = Path(platform_path, '{}.xml'.format(platform_path.stem))
                     is_host = False
                     is_sim = Path(platform_path, 'runSimExec.{}'.format(
                         platform_name)).is_file()
                 else:
-                    makefile = Path(platform_path, '{}.mk'.format(
-                        platform_path.stem))
+                    testfile = Path(platform_path, '{}.mk'.format(platform_path.stem))
                     is_host = Path(platform_path, '{}-check.sh'.format(
                         platform_path.stem)).is_file()
                     is_sim = False
 
-                if not makefile.is_file():
+                if not testfile.is_file():
                     continue
 
                 platform_config = get_platform_config(platform_name, config)

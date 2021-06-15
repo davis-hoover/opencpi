@@ -90,31 +90,46 @@ function needname {
   [ "$1" == '*' ] && bad you can not use \* as a name
   return 0
 }
-# Look in a directory and determine the type of the Makefile, set dirtype
-# If there is no Makefile or no appropriate line in the Makefile, dirtype is ""
+# Look in a directory and determine the type of asset, with caching
 function get_dirtype {
-  [ ! -e "$1" ] && bad $1 should exist and does not
-  [ ! -d "$1" ] && bad $1 should be a directory and is not
-  if [ -f "$1"/Makefile ]; then
-    dirtype=$(sed -n 's=^[ 	]*include[ 	]*.*OCPI_CDK_DIR.*/include/\(.*\)\.mk.*=\1=p' $1/Makefile | tail -1)
-    dirtype=${dirtype##hdl\/}
-    dirtype=${dirtype##rcc\/}
+  if [ "$1" == "$last_dirtype_request" ]; then
+    dirtype=$last_dirtype
   else
-    dirtype=
-  fi
-  if [ -z "$dirtype" ]; then
-    if [ -e "$1/project-package-id" ]; then
-      dirtype=project
-    fi
+    dirtype=$(ocpiDirType $1)
+    last_dirtype=$dirtype
+    last_dirtype_request=$1
   fi
 }
 
-# Look in a directory and determine the type of the Makefile, set dirtype
-function check_dirtype {
-  get_dirtype $1
-  [ -z "$dirtype" ] && bad $1/Makefile is not correctly formatted.  No \"include *.mk\" lines.
-  [ "$dirtype" != "$2" ] && bad $1/Makefile has unexpected type \"$dirtype\", expected \"$2\".
+# Figure out the makefile to use, and use nothing if there is $1/Makefile
+# Deal with verbosity too
+# Argument 1 is directory
+# Argument 2 is type if known, like "project", or "hdl-library"
+function domake {
+  local cmd="make -C $1 --no-print-directory"
+  [ -f $1/Makefile ] || {
+    local type=$2
+    if [ -z "$type" ]; then
+      local dt=$dirtype
+      type=$(get_dirtype $1)
+      dirtype=$dt
+    fi
+    [[ $type == hdl* ]] && type=hdl/$type
+    cmd+=" -f $OCPI_CDK_DIR/include/$type.mk"
+  }
+  cmd+=" ${verbose:+AT=}"
+  shift
+  shift
+  [ -n "$verbose" ] && echo Executing command:  $cmd "$@"
+  $cmd "$@"
 }
+
+# Look in a directory and determine the type of the Makefile, set dirtype
+# function check_dirtype {
+#   get_dirtype $1
+#   [ -z "$dirtype" ] && bad $1/Makefile is not correctly formatted.  No \"include *.mk\" lines.
+#   [ "$dirtype" != "$2" ] && bad $1/Makefile has unexpected type \"$dirtype\", expected \"$2\".
+# }
 # Determine the path to the current project's top level
 function get_project_top {
   # TODO get project, project.dir
@@ -171,7 +186,7 @@ function register_project {
 import sys; sys.path.append(\"$OCPI_CDK_DIR/$OCPI_TOOL_PLATFORM/lib/\");
 import _opencpi.util as ocpiutil; print(ocpiutil.is_path_in_exported_project(\"$project\"));"`
   if [ "$is_exported" == "False" ]; then
-    make -C $project ${verbose:+AT=} exports 1>&2 || echo Could not export project \"$project\". You may not have write permissions on this project. Proceeding...
+    domake $project project exports 1>&2 || echo Could not export project \"$project\". You may not have write permissions on this project. Proceeding...
   else
      [ -z "$verbose" ] || echo Skipped making exports because this is an exported standalone project. 1>&2
   fi
@@ -462,18 +477,18 @@ function do_project {
     # Normally we build imports outside of any do_* function because
     # we always want to build imports when building. For project, we
     # do this here because
-    make -C $subdir/$1 ${verbose:+AT=} imports
-    make -C $subdir/$1 ${verbose:+AT=} ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
+    domake $subdir/$1 project imports
+    domake $subdir/$1 project ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} \
             ${buildNoAssemblies:+Assemblies=} \
-            ${assys:+Assemblies=" ${assys[@]}"} \
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-            ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-            ${hwswplats:+RccHdlPlatforms="${hwswplats[@]}"} \
+            ${assys:+"Assemblies=${assys[*]}"} \
+            ${hdlplats:+"HdlPlatforms=${hdlplats[*]}"} \
+            ${hdltargets:+"HdlTargets=${hdltargets[*]}"} \
+            ${swplats:+"RccPlatforms=${swplats[*]}"} \
+            ${hwswplats:+"RccHdlPlatforms=${hwswplats[*]}"} \
             $OCPI_MAKE_OPTS
     if [ -n buildClean -a -z "$hardClean" ] ; then
-      make -C $subdir/$1 ${verbose:+AT=} imports
-      make -C $subdir/$1 ${verbose:+AT=} exports
+      domake $subdir/$1 project imports
+      domake $subdir/$1 project exports
     fi
     return 0
   fi
@@ -600,8 +615,8 @@ EOF
     fi
   fi
   # Generate exports and imports
-  make exports
-  make imports
+  domake . project exports
+  domake . project imports
 
   [ -z "$verbose" ] || echo A new project named \"$1\" has been created in `pwd`.
 }
@@ -613,8 +628,8 @@ function do_applications {
     (*) bad this command can only be issued in a project directory or an applications directory;;
   esac
   if [ "$verb" == build ]; then
-    make -C $subdir ${verbose:+AT=} ${buildClean:+clean} ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-      ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
+    domake $subdir applications ${buildClean:+clean} ${swplats:+RccPlatforms="${swplats[*]}"} \
+      ${hwswplats:+RccHdlPlatforms="${hwswplats[*]}"} \
       $OCPI_MAKE_OPTS
     return 0
   fi
@@ -637,8 +652,8 @@ function do_application {
   esac
   adir=$subdir$1
   if [ "$verb" == build ]; then
-    make -C $subdir$1 ${verbose:+AT=} ${buildClean:+clean} ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-      ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
+    domake $subdir$1 application ${buildClean:+clean} ${swplats:+RccPlatforms="${swplats[*]}"} \
+      ${hwswplats:+RccHdlPlatforms="${hwswplats[*]}"} \
       $OCPI_MAKE_OPTS
     return 0
   fi
@@ -655,7 +670,7 @@ function do_application {
     [ -e "$adir" ] || bad the application at \"$adir\" does not exist
     get_dirtype $adir
     [ "$dirtype" == application ] || bad the directory at $adir does not appear to be an application
-    ask delete the application project in the \"$adir\" directory
+    ask delete the application in the \"$adir\" directory
     rm -r -f $adir
     [ -z "$verbose" ] || echo The application \"$1\" in the directory \"$adir\" has been deleted.
     return 0
@@ -800,7 +815,9 @@ function do_protocol_or_spec {
   # Make sure we record the package's prefix in the specs directory so that spec files used
   # by other projects (or this one) know what the package should be.
   if [ "$subdir" == specs -a ! -e specs/package-id ] ; then
-    make specs/package-id
+    [ $dirtype = project ] ||
+      bad this command can only be executed in a project, libraries, or library directory
+    domake . project specs/package-id
   fi
   case "$noun" in
     (protocol)
@@ -868,7 +885,7 @@ EOF
   # If the parent directory is a library, update its links to specs to include this new one
   get_dirtype $subdir/..
   if [ "$dirtype" == library ]; then
-    make speclinks -C $subdir/..
+    domake $subdir/.. library speclinks
   fi
   if [ -n "$verbose" ]; then
     if [ "$dirtype" == library ]; then
@@ -919,7 +936,7 @@ EOF
 />
 EOF
 
-  make --no-print-directory -C $2 ||
+  domake $2 library ||
     bad library creation failed, you may want to do: ocpidev delete library $1
   [ -z "$verbose" ] || echo A new library named \"$1\" \(in directory \"$2/\"\) has been created.
 
@@ -930,7 +947,7 @@ function do_library {
   if [ "$libbase" == "hdl" -a -n "$library" ]; then
     one=$(basename $library)
   else
-    one=$1
+    one=${1:-.}
   fi
   [ -z "$library" -o "$verb" != "delete" ] || bad The -l and --hdl_library options are invalid when deleting a library
   subdir=$one
@@ -998,12 +1015,12 @@ function do_library {
       buildHdl=""
       cleanTarget+=" cleanhdl"
     fi
-    make -C $subdir ${verbose:+AT=} ${cleanTarget:+$cleanTarget} ${verbose:+AT=} ${buildRcc:+rcc} ${buildHdl:+hdl}\
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"}\
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"}\
-            ${swplats:+RccPlatforms=" ${swplats[@]}"}\
-            ${workerList:+Workers=" ${workerList[@]}"}\
-            ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"}\
+    domake $subdir library ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl}\
+            ${hdlplats:+HdlPlatforms="${hdlplats[*]}"}\
+            ${hdltargets:+HdlTargets="${hdltargets[*]}"}\
+            ${swplats:+RccPlatforms="${swplats[*]}"}\
+            ${workerList:+Workers="${workerList[*]}"}\
+            ${hwswplats:+RccHdlPlatforms="${hwswplats[*]}"}\
             $OCPI_MAKE_OPTS
     return 0
   fi
@@ -1125,11 +1142,12 @@ function do_worker {
     return 0
   fi
   if [ "$verb" == build ]; then
-    make -C $subdir/$1 ${verbose:+AT=} ${buildClean:+clean} \
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-            ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-            ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
+    domake $subdir/$1 worker \
+            ${buildClean:+clean} \
+            ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
+            ${hdltargets:+HdlTargets="${hdltargets[*]}"} \
+            ${swplats:+RccPlatforms="${swplats[*]}"} \
+            ${hwswplats:+RccHdlPlatforms="${hwswplats[*]}"} \
             $OCPI_MAKE_OPTS
     return 0
   fi
@@ -1296,8 +1314,7 @@ EOF
   done
   [ -z "$verbose" ] || echo Running \"make skeleton\" to make initial skeleton for worker $1
   # FIXME: how do we get the project's or library's xmlincludepath etc.
-  [ -z "$verbose" ] || echo "Command is: make --no-print-directory -C $libdir/$1 skeleton LibDir=../lib/$model genlinks"
-  make --no-print-directory -C $libdir/$1 skeleton LibDir=../lib/$model genlinks || {
+  domake $libdir/$1 worker skeleton LibDir=../lib/$model genlinks || {
     if [ -n "$keep" ]; then
       echo The worker directory, Makefile and xml file have been created.
       get_deletecmd
@@ -1360,10 +1377,10 @@ function do_test {
   #   if it does, delete it and its contents
   #     warn first/ask for confirmation
   if [ "$verb" == build ] ; then
-    make -C $testdir  ${verbose:+AT=} ${buildClean:+clean}\
-         ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-         ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-         ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
+    domake $testdir test ${buildClean:+clean}\
+         ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
+         ${swplats:+RccPlatforms="${swplats[*]}"} \
+         ${hwswplats:+RccHdlPlatforms="${hwswplats[*]}"} \
          $OCPI_MAKE_OPTS
 
   elif [ "$verb" == delete ] ; then
@@ -1439,16 +1456,15 @@ function do_hdl_platforms {
   if [ "$verb" ==  build ]; then
     cd $(get_project_top)
     if [ -n "$buildClean" ]; then
-      make_target=clean
+      domake . project clean
     else
-      make_target=hdlplatforms
+      # Note: If this implementation changes in the future, be sure to add logic to respect
+      # missingOK; "make hdlprimitives" returns success even if no hdl/primitives present.
+      domake . project hdlplatforms \
+           ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
+           ${hdltargets:+HdlTargets="${hdltargets[*]}"} \
+           $OCPI_MAKE_OPTS
     fi
-    # Note: If this implementation changes in the future, be sure to add logic to respect
-    # missingOK; "make hdlprimitives" returns success even if no hdl/primitives present.
-    make $make_target ${buildClean:+-C hdl/platforms} \
-         ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-         ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-         $OCPI_MAKE_OPTS
     return 0;
   fi
   bad The only verb available for platforms is build. Did you mean platform
@@ -1466,7 +1482,7 @@ function do_hdl_platform {
   esac
   pdir=$subdir$1
   if [ "$verb" ==  build ]; then
-    make -C $pdir ${verbose:+AT=} ${buildClean:+clean} \
+    domake $pdir hdl-platform ${buildClean:+clean} \
       $OCPI_MAKE_OPTS
     return 0;
   fi
@@ -1615,24 +1631,21 @@ EOF
 
 function do_primitives {
   if [ "$verb" == build ]; then
-    pjtop=$(get_project_top)
-    if [ -n "$pjtop" ]; then
-      [ -z "$verbose" ] || echo "Building from: $pj_top"
-      cd $pjtop
-    fi
-    # echo $hdlplats
-    # echo $hdltargets
-    if [ -n "$buildClean" ]; then
-      make_target=clean
-    else
-      make_target=hdlprimitives
-    fi
+    cd $(get_project_top)
     # Note: If this implementation changes in the future, be sure to add logic to respect
     # missingOK; "make hdlprimitives" returns success even if no hdl/primitives present.
-    make $make_target ${buildClean:+-C hdl/primitives} \
-                 ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-                 ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
+    [ -d hdl/primitives ] || {
+      echo There are no HDL primitives in this project.
+      return 0
+    }
+    if [ -n "$buildClean" ]; then
+      domake hdl/primitives hdl-primitives clean
+    else
+      domake . project hdlprimitives \
+                 ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
+                 ${hdltargets:+HdlTargets="${hdltargets[*]}"} \
                  $OCPI_MAKE_OPTS
+    fi
     return 0
   fi
   bad The only verb available for primitives is build. Did you mean primitive
@@ -1652,9 +1665,9 @@ function do_primitive {
     (*) bad this command can only be executed in a project or hdl/primitives directory;;
   esac
   if [ "$verb" == build ]; then
-    make -C $dir ${verbose:+AT=} ${buildClean:+clean} \
-            ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-            ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
+    domake $dir hdl-$1 ${buildClean:+clean} \
+            ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
+            ${hdltargets:+HdlTargets="${hdltargets[*]}"} \
             $OCPI_MAKE_OPTS
     return 0
   fi
@@ -1742,17 +1755,13 @@ EOF
 
 function do_assemblies {
   if [ "$verb" == build ]; then
-    pjtop=$(get_project_top)
-    if [ -n "$pjtop" ]; then
-      cd $pjtop
-    fi
+    cd $(get_project_top)
     if [ -n "$buildClean" ]; then
-      make_target=clean
+      domake hdl/assemblies hdl-assemblies clean
     else
-      make_target=hdlassemblies
+      domake . project hdlassemblies ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
+        $OCPI_MAKE_OPTS
     fi
-    make $make_target ${buildClean:+-C hdl/assemblies} ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-      $OCPI_MAKE_OPTS
     return 0
   fi
   bad The only verb available for primitives is build. Did you mean assembly
@@ -1776,18 +1785,19 @@ function do_build_here {
       buildHdl=""
       cleanTarget+=" cleanhdl"
     fi
-  make ${cleanTarget:+$cleanTarget} ${verbose:+AT=} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
+  domake . $dirtype \
+       ${cleanTarget:+$cleanTarget} ${buildRcc:+rcc} ${buildHdl:+hdl} ${buildTest} \
        ${buildNoAssemblies:+Assemblies=} \
-       ${assys:+Assemblies=" ${assys[@]}"} \
-       ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
-       ${hdltargets:+HdlTargets=" ${hdltargets[@]}"} \
-       ${swplats:+RccPlatforms=" ${swplats[@]}"} \
-       ${hwswplats:+RccHdlPlatforms=" ${hwswplats[@]}"} \
-       ${workerList:+Workers=" ${workerList[@]}"}\
+       ${assys:+Assemblies="${assys[*]}"} \
+       ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
+       ${hdltargets:+HdlTargets="${hdltargets[*]}"} \
+       ${swplats:+RccPlatforms="${swplats[*]}"} \
+       ${hwswplats:+RccHdlPlatforms="${hwswplats[*]}"} \
+       ${workerList:+Workers="${workerList[*]}"}\
        $OCPI_MAKE_OPTS
   if [ "$dirtype" == "project" -a -z "$hardClean" ] ; then
-    make ${verbose:+AT=} imports
-    make ${verbose:+AT=} exports
+    domake . project imports
+    domake . project exports
   fi
 }
 
@@ -1806,7 +1816,8 @@ function do_assembly {
   esac
   adir=$subdir$1
   if [ "$verb" == build ]; then
-    make -C $subdir/$1 ${verbose:+AT=} ${buildClean:+clean} ${hdlplats:+HdlPlatforms=" ${hdlplats[@]}"} \
+    domake $subdir/$1 hdl-assembly \
+      ${buildClean:+clean} ${hdlplats:+HdlPlatforms="${hdlplats[*]}"} \
       $OCPI_MAKE_OPTS
     return 0
   fi
@@ -2681,10 +2692,13 @@ fi
 if [ "$verb" == "build" -a -z "$buildClean" ]; then
   pjtop=$(if [ "$noun" == "project" ]; then cd $subdir/${args[0]}; fi; get_project_top)
   if [ -n "$pjtop" ]; then
-    (cd $pjtop && make imports)
+    domake $pjtop project imports
   fi
 fi
-[ -z "$verbose" ] || echo Executing the \"$verb $hdl$noun\" command in a ${dirtype:-unknown type of} directory: $directory.
+get_dirtype .
+showverb=$verb
+[ -n "$buildClean" ] && showverb=clean
+[ -z "$verbose" ] || echo Executing the \"$showverb${noun:+ $hdl$noun}\" command in a ${dirtype:-unknown type of} directory: $directory.
 case $noun in
   (project)      do_project ${args[@]} ;;
   (registry)     do_registry ${args[@]} ;;
