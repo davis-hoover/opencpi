@@ -326,12 +326,7 @@ verbs = {
                             'library': None
                         }
                     },
-                    'primitives': {
-                        'nouns': {
-                            'core': None,
-                            'library': None
-                        }
-                    }
+                    'primitives': None
                 }
             },
             'library': {
