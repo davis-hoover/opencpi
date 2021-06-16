@@ -1106,19 +1106,18 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             depend = " ".join(depend)
 
         template_dict = {
-                        "name" : name,
-                        "comp_lib" : comp_lib,
-                        "xml_include" :xml_include,
-                        "include_dir" : include_dir,
-                        "prim_lib" : prim_lib,
-                        "package_id" : package_id,
-                        "package_name" : package_name,
-                        "package_prefix" : package_prefix,
-                        "depend" : depend,
-                        "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
-                                                                                    package_prefix,
-                                                                                    package_name, directory)
-                        }
+            "name" : name,
+            "comp_lib" : comp_lib,
+            "xml_include" :xml_include,
+            "include_dir" : include_dir,
+            "prim_lib" : prim_lib,
+            "package_id" : package_id,
+            "package_name" : package_name,
+            "package_prefix" : package_prefix,
+            "depend" : depend,
+            "determined_package_id" : ocpiutil.get_package_id_from_vars(
+                package_id, package_prefix, package_name, directory)
+        }
         return template_dict
 
     @staticmethod
@@ -1132,7 +1131,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         if os.path.isdir(proj_dir):
             raise ocpiutil.OCPIException("Cannot create this project: " + proj_dir + ", because the " +
                                          "directory already exists.")
-        os.chdir(directory)
+        # os.chdir(directory)
         os.mkdir(name)
         template_dict = Project._get_template_dict(name, proj_dir, **kwargs)
 

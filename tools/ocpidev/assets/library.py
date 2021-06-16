@@ -23,6 +23,7 @@ import os
 import logging
 import _opencpi.util as ocpiutil
 import jinja2
+from pathlib import Path
 import _opencpi.assets.template as ocpitemplate
 import subprocess
 from .abstract import RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset, Asset
@@ -226,18 +227,18 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         if prim_lib:
             prim_lib = " ".join(prim_lib)
         template_dict = {
-                        "name" : name,
-                        "comp_lib" : comp_lib,
-                        "xml_include" :xml_include,
-                        "include_dir" : include_dir,
-                        "prim_lib" : prim_lib,
-                        "package_id" : package_id,
-                        "package_name" : package_name,
-                        "package_prefix" : package_prefix,
-                        "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
-                                                                                    package_prefix,
-                                                                                    package_name, directory)
-                        }
+            "name" : name,
+            "comp_lib" : comp_lib,
+            "xml_include" :xml_include,
+            "include_dir" : include_dir,
+            "prim_lib" : prim_lib,
+            "package_id" : package_id,
+            "package_name" : package_name,
+            "package_prefix" : package_prefix,
+            "determined_package_id" : ocpiutil.get_package_id_from_vars(
+                package_id, package_prefix, package_name, directory)
+        }
+        
         return template_dict
 
     @staticmethod
@@ -263,23 +264,29 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             raise ocpiutil.OCPIException(currdir + " must be of type libraries")
         compdir = currdir
         libdir = currdir + "/" + name
-        if os.path.exists(libdir):
-            raise ocpiutil.OCPIException(libdir + " already exists.")
-        os.mkdir(libdir) 
+        Library.make_library(libdir, name, **kwargs)
 
-        template_dict = Library._get_template_dict(name, compdir, **kwargs)
-        if not os.path.exists(compdir + "/Makefile"):
-            template = jinja2.Template(ocpitemplate.LIB_MAKEFILE, trim_blocks=True)
-            ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
-        os.chdir(libdir)
-        template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
-        ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
+
+    @staticmethod
+    def make_library(directory, name, **kwargs):
+        directory_path = Path(directory)
+        if not directory_path.exists():
+            directory_path.mkdir()
+        else:
+            raise ocpiutil.OCPIException(str(directory_path) + " already exists.")
+        template_dict = Library._get_template_dict(name, directory_path.parent, **kwargs)
+        # if not os.path.exists(compdir + "/Makefile"):
+        #     template = jinja2.Template(ocpitemplate.LIB_MAKEFILE, trim_blocks=True)
+        #     ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
+        os.chdir(str(directory))
+        # template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
+        # ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
-        subprocess.check_call('make')
+        # subprocess.check_call('make')
         cdkdir = os.environ.get('OCPI_CDK_DIR')
-        metacmd = cdkdir + "/scripts/genProjMetaData.py "
-        os.system(metacmd + compdir)
+        metacmd = cdkdir + "/scripts/genProjMetaData.py " + directory
+        os.system(metacmd)
 
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):

@@ -728,3 +728,20 @@ def get_cdk_path():
         sys.exit(1)
 
     return cdk_path
+
+
+def change_dir(directory):
+    """
+    Change to specified directory. Raises OCPIException if file not
+    found or not a directory
+    """
+    err_msg = ''
+    try:
+        directory = Path(directory).resolve()
+        os.chdir(directory)
+    except FileNotFoundError:
+        err_msg = 'directory {} does not exist'.format(directory)
+    except NotADirectoryError:
+        err_msg = '{} is not a directory'.format(directory)
+    if err_msg:
+        raise OCPIException(err_msg)

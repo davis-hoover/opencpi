@@ -85,6 +85,8 @@ class AssetFactory():
                    "registry":      partial(cls.__get_or_create, _opencpi.assets.registry.Registry)}
 
         if asset_type not in actions.keys():
+            if not asset_type:
+                asset_type = "unknown"
             raise ocpiutil.OCPIException("Bad asset creation, \"" + asset_type + "\" not supported")
 
         # Call the action for this type and hand it the arguments provided
