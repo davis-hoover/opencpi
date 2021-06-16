@@ -71,6 +71,8 @@ def main():
                     dir += "/" + args.library
             elif args.noun == "hdl-primitives":
                 dir += "/hdl/primitives"
+            elif not args.noun:
+                args.noun = "project"
         directory = str(Path(dir, name))
         # End of temporary fix until get_subdir is ported here
         asset_factory = ocpiassets.factory.AssetFactory()
