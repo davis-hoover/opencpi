@@ -55,6 +55,8 @@ def main():
         sys.exit(rc)
     elif args.verb == 'create':
         ocpicreate(args)
+    elif args.verb in ['set', 'unset']:
+        ocpi_set_unset(args)
 
     try:
     # Try to instantiate the appropriate asset from noun
@@ -100,6 +102,31 @@ def main():
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
         ocpidev_sh()
+
+
+def ocpi_set_unset(args):
+    """
+    set and unset the registry of the project
+    """
+    name = getattr(args, 'name', '')
+    name = name if name else ''
+    directory = str(Path(args.directory, name))
+
+    try:
+        asset_factory = ocpiassets.factory.AssetFactory()
+        project = asset_factory.factory('project', directory, name)
+        if args.verb == 'unset':
+            project.unset_registry()
+            sys.exit()
+        if args.registry_directory:
+            registry_directory = args.registry_directory
+        else:
+            registry_directory = ocpiassets.registry.Registry.get_default_registry_dir()
+        project.set_registry(registry_directory)
+    except ocpiutil.OCPIException as e:
+        ocpiutil.logging.error(e)
+        sys.exit(1)
+    sys.exit()
 
 
 def ocpicreate(args):

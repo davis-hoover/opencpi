@@ -61,14 +61,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         """
         try:
             self.check_dirtype("project", directory)
-        except ocpiutil.OCPIException:
+        except ocpiutil.OCPIException as e:
         # If directory is not a project, assume name is a package_id and get directory
         # from registry
             registry_dir = Registry.get_registry_dir()
             if name:
                 directory = str(Path(registry_dir, name))
             else:
-                directory = registry_dir
+                raise ocpiutil.OCPIException(e)
             self.check_dirtype("project", directory)
 
         super().__init__(directory, name, **kwargs)
