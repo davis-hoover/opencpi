@@ -23,6 +23,8 @@ import os.path
 import fnmatch
 import logging
 import _opencpi.util as ocpiutil
+import jinja2
+import _opencpi.assets.template as ocpitemplate
 from .factory import AssetFactory
 from .abstract import RunnableAsset, RCCBuildableAsset
 
@@ -78,6 +80,74 @@ class Application(RunnableAsset, RCCBuildableAsset):
         if fnmatch.fnmatch(name, '*.xml') or os.path.exists(top + name + ".xml"):
             return top
         return top + name
+
+    def _get_template_dict(name, directory, **kwargs):
+        """
+        used by the create function/verb to generate the dictionary of viabales to send to the
+        jinja2 template.
+        valid kwargs handled at this level are:
+            app            (string)      - Applicatin name
+        """
+        template_dict = {
+                        "app" : name,
+                        }
+        return template_dict
+
+
+    @staticmethod
+    def create(name, directory, **kwargs):
+        """
+        Static method to create a new Application
+        """
+        dirtype = ocpiutil.get_dirtype(directory)
+        if dirtype != "project" and dirtype != "applications":
+           raise ocpiutil.OCPIException(directory + " must be a project or applications directory")
+
+        if dirtype == "project":
+            if kwargs.get("verbose", True):
+                print("Executing application create method in project directory: " + directory)
+            appdir = directory + "/applications/"
+            if not os.path.isdir(appdir):
+                os.mkdir(appdir)
+                if kwargs.get("verbose", True):
+                    basename = os.path.basename(directory)
+                    print("The 'applications' directory was created for the project '" + basename + "'")
+            os.chdir(appdir)
+
+        currdir = os.getcwd()
+        currtype = ocpiutil.get_dirtype(currdir)
+        if not currtype == "applications":
+            raise ocpiutil.OCPIException(currdir + " must be of type applications")
+        appdir = currdir
+        namedir = currdir + "/" + name
+
+        template_dict = Application._get_template_dict(name, appdir, **kwargs)
+        template = jinja2.Template(ocpitemplate.APP_APPLICATION_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string("application.xml", template.render(**template_dict))
+        if kwargs.get("xml_app", True):
+            template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_XML, trim_blocks=True)
+            ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
+            if kwargs.get("verbose", True):
+                print("XML application '" + name + "' was created as 'applications/" + name + ".xml'")
+            return
+
+        if os.path.exists(namedir):
+            raise ocpiutil.OCPIException(namedir + " already exists.")
+        os.mkdir(namedir)
+        os.chdir(namedir)
+        if kwargs.get("verbose", True):
+            print("Application '" + name +"' was created in the directory 'applications/" + name + "'")
+        template = jinja2.Template(ocpitemplate.APP_APPLICATION_NAME_APP_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(name + "-app.xml", template.render(**template_dict))
+        if not kwargs.get("xml_dir_app", True):
+            template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_CC, trim_blocks=True)
+            ocpiutil.write_file_from_string(name + ".rcc", template.render(**template_dict))
+        template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_XML, trim_blocks=True)
+        ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
+        if kwargs.get("verbose", True):
+            print("XML application '" + name + "' was created as 'applications/" + name +
+              "/" + name + ".xml'")
+
 
 class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
     """
