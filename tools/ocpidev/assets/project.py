@@ -1194,7 +1194,8 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
                                'project/package from its project registry?'])
             force = ocpiutil.get_ok(prompt)
         if force:
-            registry = Registry.get_registry_dir()
+            registry_dir = Registry.get_registry_dir()
+            registry = Registry(registry_dir)
             registry.remove(directory=self.directory)
 
 
