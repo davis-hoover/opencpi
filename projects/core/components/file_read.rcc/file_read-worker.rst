@@ -23,7 +23,7 @@
 .. _file_read-RCC-worker:
 
 
-``file_read`` RCC worker
+``file_read`` RCC Worker
 ========================
 Application RCC worker implemented in the C language version of the RCC model. Newer RCC workers
 are implemented in the C++ language version of the RCC model.

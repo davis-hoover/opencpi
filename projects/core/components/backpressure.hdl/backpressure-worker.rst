@@ -24,7 +24,7 @@
 .. _backpressure-HDL-worker:
 
 
-``backpressure`` HDL worker
+``backpressure`` HDL Worker
 ===========================
 Application worker HDL implementation
 with settable runtime configuration parameters
@@ -36,7 +36,7 @@ Detail
 
 A back pressure HDL worker is built into a worker's unit test
 HDL assembly and is used to force back pressure during the execution
-of the application to exercise the worker's abiliity to correctly handle
+of the application to exercise the worker's ability to correctly handle
 back pressure.
 
 The back pressure HDL worker does not manipulate the data; it simply passes
@@ -64,34 +64,19 @@ The following figure shows a block diagram representation of the HDL implementat
 
 .. ocpi_documentation_worker::
 
-Worker ports
-~~~~~~~~~~~~
+  in: Size defined by ``IDATA_WIDTH_p``.
 
-Inputs:
+  out: Sample size defined by ``ODATA_WITH_p``.
 
-* ``in``: Size defined by ``IDATA_WIDTH_p``.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``IDATA_WIDTH_p``
-
-Outputs:
-
-* ``out``: Sample size defined by ``ODATA_WITH_p``.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``ODATA_WIDTH_p``
-
-Finite state machine
+Finite State Machine
 ~~~~~~~~~~~~~~~~~~~~
 Not applicable.
 
-Control and timing signals
+Control and Timing Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 The back pressure HDL worker uses the clock from
 the control plane and standard control plane signals.  
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

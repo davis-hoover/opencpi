@@ -412,7 +412,21 @@ vhdlInnerValue(const std::string &name, const char *pkg, const OU::Value &v, boo
 #endif
   vhdlUnparser.m_name = name.c_str();
   vhdlUnparser.m_finalized = finalized;
-  v.unparse(s, &vhdlUnparser, true);
+  if (v.m_vt->m_arrayRank > 1) {
+    // We force the array dimensions to be one if > 1
+    // and temporarily patch the data type to be one dimension
+    size_t
+      saveRank = v.m_vt->m_arrayRank,
+      save0 = v.m_vt->m_arrayDimensions[0];
+    for (unsigned n = 1; n < v.m_vt->m_arrayRank; ++n)
+      v.m_vt->m_arrayDimensions[0] *= v.m_vt->m_arrayDimensions[n];
+    *(size_t*)&v.m_vt->m_arrayRank = 1;
+    v.unparse(s, &vhdlUnparser, true);
+    *(size_t*)&v.m_vt->m_arrayRank = saveRank;
+    v.m_vt->m_arrayDimensions[0] = save0;
+  } else
+    v.unparse(s, &vhdlUnparser, true);
+
   if (v.m_vt->m_baseType == OA::OCPI_Enum)
     s += "_e";
   if (v.needsComma())

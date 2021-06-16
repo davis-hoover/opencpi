@@ -2214,6 +2214,7 @@ while [[ "${argv[0]}" != "" ]] ; do
       (--build-rcc|--rcc) buildRcc=1;;
       (--build-hdl|--hdl) buildHdl=1;;
       (--worker) takelist Workers;;
+      (--workers-as-needed) export OCPI_AUTO_BUILD_WORKERS=1;;   # A big hammer for now
       (--build-no-assemblies|--no-assemblies) buildNoAssemblies=1;;
       (--build-hdl-assembly|--build--assembly|--hdl-assembly) takelist Assemblies;;
       (--build-hdl-target|--hdl-target) takelist HdlTargets;;

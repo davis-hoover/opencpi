@@ -21,7 +21,7 @@
 .. _file_write:
 
 
-File write (``file_write``)
+File Write (``file_write``)
 ===========================
 Writes application data to a file.
 ``file_write`` is an asset in the ``ocpi.core`` component library.
@@ -42,11 +42,11 @@ messages to be written to the file. There is no protocol associated
 with the port, enabling it to be agnostic as to the protocol
 of the component connected to the input port.
 
-Operating modes
+Operating Modes
 ~~~~~~~~~~~~~~~
 The file read component supports data-streaming mode and messaging mode.
 
-Data-streaming mode
+Data-Streaming Mode
 ^^^^^^^^^^^^^^^^^^^
 In data-streaming mode, the file contents become the payloads of the stream
 of messages arriving at the input port. No message lengths or opcodes are
@@ -54,13 +54,13 @@ recorded in the output file.
 
 .. include:: ../file_read.test/doc/snippets/messaging_snippet.rst
 
-Implications for no protocol on port
+Implications for No Protocol on Port
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The component's input port has no protocol specified in order to support
 interfacing with any protocol. This means that the created data file is
 formatted to match the protocol of the output port of the connected component.
 
-End-of-file handling
+End-of-File Handling
 ~~~~~~~~~~~~~~~~~~~~
 When the file write component receives an end-of-file notification, it
 interprets this as the end of data, declares itself "done" and does
@@ -71,13 +71,7 @@ Interface
 .. literalinclude:: ../specs/file_write_spec.xml
    :language: xml
 
-Ports
-~~~~~
-.. ocpi_documentation_ports::
-
-   in: Data streamed to file.
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied: Description of how the non-stream opcodes are handled.
 
@@ -95,16 +89,17 @@ Properties
 
       stopOnEOF: No functionality; exists for backward compatibility.
 
-Parameters
-~~~~~~~~~~
-.. ocpi_documentation_properties::
-   :parameters:
+Ports
+~~~~~
+.. ocpi_documentation_ports::
+
+   in: Data streamed to file.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../file_write.hdl ../file_write.rcc
 
-Example application
+Example Application
 -------------------
 .. literalinclude:: example_app.xml
    :language: xml

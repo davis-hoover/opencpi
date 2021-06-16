@@ -72,10 +72,6 @@ export CXXFLAGS="-fPIC"
 echo "OcpiCrossCompile=$OcpiCrossCompile"
 echo "OcpiCrossHost=$OcpiCrossHost"
 
-# Set sysroot if we are cross building
-sysroot=
-[ -n "$OcpiCrossHost" ] && sysroot="$(echo "$OcpiCrossCompile" | sed "s|/bin[^/]*/$OcpiCrossHost-||")/$OcpiCrossHost/libc"
-
 # Figure out how a potentially python3-compatible version of SCons
 # is invoked on $OCPI_TOOL_PLATFORM.  As of 12 May 2020, there are
 # two known possibilities.  If and/or when it becomes necessary to
@@ -89,7 +85,7 @@ if [ -z "$SCONS" ]; then
 fi
 
 "$SCONS" prefix="$OcpiInstallExecDir" target="$OcpiCrossHost" \
-         sysroot="$sysroot" libgpsmm=True ncurses=False qt=False python=False \
+         libgpsmm=False ncurses=False qt=False python=False \
          usb=False bluez=False ntp=False manbuild=False shared=False \
          nostrip=True debug=True dbus_export=False
 "$SCONS" install
@@ -103,7 +99,7 @@ fi
     gps_maskdump.o gpsutils.o \
     hex.o json.o libgps_core.o libgps_dbus.o libgps_json.o \
     libgps_shm.o libgps_sock.o netlib.o os_compat.o \
-    rtcm2_json.o rtcm3_json.o shared_json.o libgpsmm.o bsd_base64.o \
+    rtcm2_json.o rtcm3_json.o shared_json.o bsd_base64.o \
     crc24q.o \
     driver_ais.o driver_evermore.o driver_garmin.o driver_garmin_txt.o \
     driver_geostar.o driver_greis.o driver_greis_checksum.o \

@@ -106,12 +106,6 @@ Interface
 .. literalinclude:: ../specs/file_read_spec.xml
    :language: xml
 
-Ports
-~~~~~
-.. ocpi_documentation_ports::
-
-   out: Data streamed from file.
-
 Opcode handling
 ~~~~~~~~~~~~~~~
 
@@ -127,7 +121,7 @@ Properties
 
    opcode: In data-streaming mode, the opcode in which all the data in the file is sent. In messaging mode, the opcode of the ZLM at the end of the file.
 
-      messageSize: The size of the messages in bytes that are created on the output port. The connected component buffer needs to be big enough to take the data buffer that is being passsed to this worker.
+      messageSize: The size of the messages in bytes that are created on the output port. The connected component buffer needs to be big enough to take the data buffer that is being passed to this worker.
 
       granularity: The value to use to calculate the final message size at the end of a file. The final message will be truncated to be a multiple of the specified value in bytes.
 
@@ -141,11 +135,11 @@ Properties
 
       badMessage: The flag set by a worker when it has a problem getting data from the file; for example, when the file name is bad.
 
+Ports
+~~~~~
+.. ocpi_documentation_ports::
 
-Parameters
-~~~~~~~~~~
-.. ocpi_documentation_properties::
-   :parameters:
+   out: Data streamed from file.
 
 Implementations
 ---------------

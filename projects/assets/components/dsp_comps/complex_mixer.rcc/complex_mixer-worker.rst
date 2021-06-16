@@ -6,7 +6,7 @@
 .. _complex_mixer-RCC-worker:
 
 
-``complex_mixer`` RCC worker
+``complex_mixer`` RCC Worker
 ============================
 Application worker RCC implementation with a numerically-controlled oscillator (NCO)
 that uses the ``nco`` module from liquid-dsp to generate the digital
@@ -52,6 +52,6 @@ interface is given below:
 .. ocpi_documentation_worker::
 
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

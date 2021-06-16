@@ -268,7 +268,11 @@ options = {
             '--build-hdl-platform'
         ],
         'action': 'append'
-    }
+    },
+    'workers_as_needed': {
+        'long': '--workers-as-needed',
+        'action': 'store_true'
+    },
 }
 
 # Verbs with nouns and options, including options referencing those above
@@ -291,6 +295,7 @@ verbs = {
             },
             'hdl': {
                 'options': {
+                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 },
@@ -346,6 +351,7 @@ verbs = {
                     'worker': options['worker'],
                     'hdl_rcc_platform': options['hdl_rcc_platform'],
                     'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed'],
                     'hdl_target': options['hdl_target'],
                     'hdl_platform': options['hdl_platform']
                 }
@@ -436,6 +442,7 @@ verbs = {
             },
             'worker': {
                 'options': {
+                    'library': options['library'],
                     'name': None
                 }
             }

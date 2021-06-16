@@ -22,6 +22,6 @@
 :orphan:
 
 
-``platform_ad9361_config_proxy`` test detail
+``platform_ad9361_config_proxy`` Test Detail
 ============================================
 .. ocpi_documentation_test_detail::

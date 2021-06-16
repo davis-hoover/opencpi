@@ -167,16 +167,14 @@ class TestComponentSpecParser(unittest.TestCase):
                     "type": {"data_type": "ushort",
                              "arraydimensions": ["10", "2"]},
                     "access": {"initial":  False, "parameter": False,
-                               "readable": False, "volatile":  False,
-                               "writable": False},
+                               "volatile":  False, "writable": False},
                     "description": "This is a test property",
                     "default": "1",
                     "value": None},
                 "test_prop2": {
                     "type": {"data_type": "enum", "enums": ["test", "test2"]},
                     "access": {"initial":  False, "parameter": False,
-                               "readable": False, "volatile":  False,
-                               "writable": True},
+                               "volatile":  False, "writable": True},
                     "description": None,
                     "default": "test",
                     "value": None}}}

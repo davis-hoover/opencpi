@@ -262,7 +262,7 @@ emitExtAssignment(FILE *f, bool int2ext, const std::string &extName, const std::
     OU::format(type, "work.%s_defs.%s_out",
 	       extAt.m_instPort.m_port->worker().m_implName, extAt.m_instPort.m_port->pname());
     type_data = type + "_data";
-    if (extAt.m_instPort.m_port->isArray()) {
+    if (extAt.m_instPort.m_port->isArray() and connCount != 1) {
       type += "_array";
       type_data += "_array";
     }

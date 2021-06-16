@@ -4,7 +4,7 @@
 .. _%%NAME-CODE%%-protocol:
 
 
-SKELETON NAME protocol (``%%NAME-CODE%%``)
+SKELETON NAME Protocol (``%%NAME-CODE%%``)
 ==========================================
 Skeleton outline: Purpose and expected use cases of the protocol.
 

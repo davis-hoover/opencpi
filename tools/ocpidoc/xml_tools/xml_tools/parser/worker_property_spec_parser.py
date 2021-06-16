@@ -30,7 +30,7 @@ class WorkerPropertySpecParser(property_spec_parser.PropertySpecParser):
     """
 
     def __init__(self, filename, include_filepaths=["."]):
-        """ Initialise property specification parser class.
+        """ Initialize property specification parser class.
 
         Handles parsing an OWD XML file with <property> elements. Properties
         in OWD files can have additional attributes compared to those in
@@ -43,16 +43,15 @@ class WorkerPropertySpecParser(property_spec_parser.PropertySpecParser):
                 statement.
 
         Returns:
-            An initialised WorkerPropertySpecParser instance.
+            An initialized WorkerPropertySpecParser instance.
         """
         super().__init__(filename=filename,
                          include_filepaths=include_filepaths)
 
         # Override access values for properties as
         self._access_values = [
-            "readback", "readable", "readsync", "writable", "volatile",
-            "writesync", "initial", "parameter", "readerror", "writeerror",
-            "padding"]
+            "readback", "readsync", "writable", "volatile", "writesync",
+            "initial", "parameter", "readerror", "writeerror", "padding"]
 
         self._spec_property_access_values = [
             "writable", "writesync", "readsync", "readback", "parameter",
@@ -72,11 +71,10 @@ class WorkerPropertySpecParser(property_spec_parser.PropertySpecParser):
             ``{"<property_name>": {
               "type": {"data_type": "ulong"}
               "access": {"initial":  False, "parameter": False,
-                      "readable": False, "readback":  False,
-                      "readsync": False, "volatile":  False,
-                      "writable": True,  "writesync": False,
-                      "readerror": False, "writeerror": False,
-                      "padding": False},
+                      "readback":  False, "readsync": False,
+                      "volatile":  False, "writable": True,
+                      "writesync": False, "readerror": False,
+                      "writeerror": False, "padding": False},
               "description": "<description>,
               "default": "<property_default_value>",
               "value": "<property_default_value>"},
@@ -120,11 +118,10 @@ class WorkerPropertySpecParser(property_spec_parser.PropertySpecParser):
             ``{"<property_name>": {
               "type": {"data_type": "ulong"}
               "access": {"initial":  False, "parameter": False,
-                      "readable": False, "readback":  False,
-                      "readsync": False, "volatile":  False,
-                      "writable": True,  "writesync": False,
-                      "readerror": False, "writeerror": False,
-                      "padding": False},
+                      "readback":  False, "readsync": False,
+                      "volatile":  False, "writable": True,
+                      "writesync": False, "readerror": False,
+                      "writeerror": False, "padding": False},
               "description": "<description>,
               "default": "<property_default_value>",
               "value": "<property_default_value>"}}``

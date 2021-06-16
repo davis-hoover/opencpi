@@ -19,7 +19,7 @@
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-Messaging mode
+Messaging Mode
 ^^^^^^^^^^^^^^
 In messaging mode, the component interprets the file content
 as a sequence of defined messages with an 8-byte header in

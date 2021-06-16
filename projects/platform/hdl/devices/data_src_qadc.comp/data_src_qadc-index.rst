@@ -21,7 +21,7 @@
 .. _data_src_qadc:
 
 
-Data source QADC (``data_src_qadc``)
+Data Source QADC (``data_src_qadc``)
 ====================================
 Provides HDL device worker functionality common to all ADC devices.
 ``data_src_qadc`` is an asset in the ``ocpi.platform.devices`` component library.
@@ -50,12 +50,7 @@ Interface
 .. literalinclude:: ../specs/data_src_qadc-spec.xml
    :language: xml
 
-Ports
-~~~~~
-.. ocpi_documentation_ports::
-
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied: Description of how the non-stream opcodes are handled.
 
@@ -63,16 +58,15 @@ Properties
 ~~~~~~~~~~
 .. ocpi_documentation_properties::
 
-Parameters
-~~~~~~~~~~
-.. ocpi_documentation_properties::
-   :parameters:
+Ports
+~~~~~
+.. ocpi_documentation_ports::
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../data_src_qadc.hdl
 
-Example application
+Example Application
 -------------------
 To be supplied: a meaningful example for this HDL device worker. Is the test app a candidate?
 

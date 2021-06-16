@@ -1,7 +1,7 @@
 .. util_comps library index page
 
 
-Utilities components library
+Utilities Components Library
 ============================
 The utilities (``util_comps``) component library provides useful helper components for manipulating data streams.
 

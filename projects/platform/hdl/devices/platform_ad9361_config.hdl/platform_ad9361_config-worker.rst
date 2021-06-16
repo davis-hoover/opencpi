@@ -23,7 +23,7 @@
 .. _platform_ad9361_config-HDL-worker:
 
 
-``platform_ad9361_config`` HDL worker
+``platform_ad9361_config`` HDL Worker
 =====================================
 
 Detail
@@ -41,7 +41,7 @@ The AD9361 config HDL subdevice worker also operates itself as a subdevice that 
   
 .. comment out ocpi_documentation_worker directive for now. It doesn't work with HdlDevice yet.
 
-Worker ports
+Worker Ports
 ~~~~~~~~~~~~
 
 .. this is hand-entered for now to suggest a format that the XML parser might use to automatically generate it.
@@ -130,7 +130,7 @@ Inputs:
 
     * ``p0_p1_are_swapped``: Set to ``1`` if the build-time configuration inverted the P0 and P1 data port roles; set to ``0`` otherwise.
 
-* ``dev_cfg_data``: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  FOr example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
+* ``dev_cfg_data``: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
 
   * Type: ``DevSignal``
 
@@ -154,7 +154,7 @@ Inputs:
 
   * Signals:
 
-    * ``config_is_two_t``: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  FOr example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
+    * ``config_is_two_t``: Some data port configurations, like LVDS, require the TX bus to use 2R2T timing if either 2 TX or 2 RX channels are used.  For example, if using LVDS and this has a value of 1, 2R2T timing will be forced.
 
     * ``force_two_r_two_t_timing``: Expected to match AD9361 register 0x010 bit D2.
 
@@ -183,7 +183,7 @@ Inputs:
   * Signal: ``txen``
 
 
-SubDevice connections
+SubDevice Connections
 ~~~~~~~~~~~~~~~~~~~~~
 
 * Worker port ``dev_cfg_data``:
@@ -219,7 +219,7 @@ SubDevice connections
     Worker port supported: ``dev_cfg_data_tx``
 
 
-Worker configuration parameters
+Worker Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Resource utilization for this worker for the ``zynq`` target platform:
@@ -277,14 +277,14 @@ possible Fmax for any OpenCPI bitstream built with this worker included.
 Note that the ``Fmax`` value for a given clock domain for the final bitstream is often worse
 than the Fmax specific to this worker, even if this worker is the only one included in the bitstream.
 
-Control timing and signals
+Control Timing and Signals
 --------------------------
 
 The AD9361 config HDL subdevice worker operates in the
 control plane clock domain. Note that this worker is essentially
 the central worker that command/control passes through, and that no RX or TX data paths flow through this worker.
 
-Vivado timing analysis
+Vivado Timing Analysis
 ----------------------
 
 The Vivado timing report that OpenCPI runs for HDL device workers may erroneously report
@@ -357,7 +357,7 @@ clock period (3.135 ns + 0.002 ns = 3.137 ns, 1/3.137 ns = 318.78 MHz).
       Phase Error          (PE):     0.000ns
    
 
-   Location    Delay type             Incr(ns)  Path(ns)   Netlist Resource(s)
+   Location    Delay Type             Incr(ns)  Path(ns)   Netlist Resource(s)
    ------------------------------------------------------------------- ------------
 
                (clock clk1 rise edge) 0.000     0.000 r
@@ -417,6 +417,6 @@ clock period (3.135 ns + 0.002 ns = 3.137 ns, 1/3.137 ns = 318.78 MHz).
 
    report_timing: Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 2093.707 ; gain = 496.523 ; free physical = 13626 ; free virtual = 87791
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

@@ -33,6 +33,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <sys/mman.h> // FIXME: use OS services?
+#include "ocpi-config.h"
 #include "KernelDriver.h"
 #include "OcpiOsDebug.h"
 #include "OcpiUtilMisc.h"
@@ -87,7 +88,12 @@ namespace OCPI {
 	// 2 is coherent cache
 	const char *env = getenv("OCPI_DMA_CACHE_MODE");
 	if (!env)
+// zynq-ultra caching does not work yet.  Using the sw platform for this is wrong FIXME
+#if defined(OCPI_ARCH_aarch64)
+          env = "0";
+#else
 	  env = "1";
+#endif
 	m_disableCacheSync = env[0] != '1';
 	ocpiDebug("PAGE SIZE IS %u", getpagesize());
 	// Cached fd is forced to uncached in mode 0

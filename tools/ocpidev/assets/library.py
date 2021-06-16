@@ -227,18 +227,18 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         if prim_lib:
             prim_lib = " ".join(prim_lib)
         template_dict = {
-            "name" : name,
-            "comp_lib" : comp_lib,
-            "xml_include" :xml_include,
-            "include_dir" : include_dir,
-            "prim_lib" : prim_lib,
-            "package_id" : package_id,
-            "package_name" : package_name,
-            "package_prefix" : package_prefix,
-            "determined_package_id" : ocpiutil.get_package_id_from_vars(
-                package_id, package_prefix, package_name, directory)
-        }
-        
+                        "name" : name,
+                        "comp_lib" : comp_lib,
+                        "xml_include" :xml_include,
+                        "include_dir" : include_dir,
+                        "prim_lib" : prim_lib,
+                        "package_id" : package_id,
+                        "package_name" : package_name,
+                        "package_prefix" : package_prefix,
+                        "determined_package_id" : ocpiutil.get_package_id_from_vars(package_id,
+                                                                                    package_prefix,
+                                                                                    package_name, directory)
+                        }
         return template_dict
 
     @staticmethod
@@ -264,29 +264,21 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             raise ocpiutil.OCPIException(currdir + " must be of type libraries")
         compdir = currdir
         libdir = currdir + "/" + name
-        Library.make_library(libdir, name, **kwargs)
+        if os.path.exists(libdir):
+            raise ocpiutil.OCPIException(libdir + " already exists.")
 
-
-    @staticmethod
-    def make_library(directory, name, **kwargs):
-        directory_path = Path(directory)
-        if not directory_path.exists():
-            directory_path.mkdir()
-        else:
-            raise ocpiutil.OCPIException(str(directory_path) + " already exists.")
-        template_dict = Library._get_template_dict(name, directory_path.parent, **kwargs)
-        # if not os.path.exists(compdir + "/Makefile"):
-        #     template = jinja2.Template(ocpitemplate.LIB_MAKEFILE, trim_blocks=True)
-        #     ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
-        os.chdir(str(directory))
-        # template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
-        # ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
+        os.mkdir(libdir) 
+        os.chdir(libdir)
+        template_dict = Library._get_template_dict(name, compdir, **kwargs)
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
-        # subprocess.check_call('make')
+        template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
+        ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
+        subprocess.check_call('make')
+        os.remove("Makefile")
         cdkdir = os.environ.get('OCPI_CDK_DIR')
-        metacmd = cdkdir + "/scripts/genProjMetaData.py " + directory
-        os.system(metacmd)
+        metacmd = cdkdir + "/scripts/genProjMetaData.py "
+        os.system(metacmd + compdir)
 
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
