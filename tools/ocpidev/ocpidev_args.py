@@ -670,6 +670,12 @@ verbs = {
         'nouns': None
     },
     'set': {
+        'options': {
+            'registry_directory': {
+                'nargs': '?',
+                'metavar': 'registry-directory'
+            }
+        },
         'nouns': {
             'registry': None
         }
