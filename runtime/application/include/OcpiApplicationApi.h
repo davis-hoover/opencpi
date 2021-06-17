@@ -142,7 +142,7 @@ namespace OCPI {
       T getPropertyValue(const std::string &w, const std::string &p, AccessList &list = emptyList) const {
 	return getPropertyValue<T>(w.c_str(), p.c_str(), list);
       }
-      // compatibility, requires variable at call site, no access list.
+      // compatibility, requires variable at call site
       template <typename T>
       void getPropertyValue(const std::string &w, const std::string &p, T &value,
 			    AccessList &list = emptyList) const {
