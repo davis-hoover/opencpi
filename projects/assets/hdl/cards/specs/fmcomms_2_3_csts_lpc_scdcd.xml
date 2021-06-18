@@ -1,14 +1,14 @@
 <card type="fmc_lpc">
-  <device worker='data_src_qadc'/>
-  <device worker='data_src_qadc'/>
+  <device worker='data_src_qadc_csts'/>
+  <device worker='data_src_qadc_csts'/>
                                                   <!--ad9361 ad9361     
                                                         pin  name -->
   <device worker='data_src_qadc_csts_ad9361_sub'>
     <Property name='LVDS_P' value='true'/>
   </device>
 
-  <device worker='data_sink_qdac'/>
-  <device worker='data_sink_qdac'/>                            <!--ad9361 ad9361 --> 
+  <device worker='data_sink_qdac_csts'/>
+  <device worker='data_sink_qdac_csts'/>                            <!--ad9361 ad9361 --> 
   <device worker='data_sink_qdac_csts_ad9361_sub'>                        <!--pin    name   -->
     <Property name='LVDS_P' value='true'/>
   </device>
