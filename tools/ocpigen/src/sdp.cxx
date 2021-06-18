@@ -200,13 +200,15 @@ emitVHDLShellPortMap(FILE *f, std::string &last) {
 }
 
 void SdpPort::
-emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
-	       const std::string &aName, const std::string &index, bool output,
-	       const Port *signalPort, bool external) {
+emitPortSignal(std::string *pmaps, bool any, const char *indent, const std::string &fName,
+	       const std::string &aName, const std::string &fIndex, const std::string &aIndex,
+	       size_t a_count, bool output, const Port *signalPort, bool external) {
   std::string
-    formal(fName), formal_data(fName + "_data"),
-    actual(aName + index), actual_data(aName + "_data" + index),
+    formal(fName + fIndex), formal_data(fName + "_data" + fIndex),
+    actual(aName), actual_data(aName + "_data"),
     empty;
+  actual += aIndex;
+  actual_data += aIndex;
   if (signalPort) {
     std::string suff;
     if (output) {
@@ -221,7 +223,7 @@ emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
 		   signalPort->worker().m_implName, signalPort->pname(),
 		   external ? "_out" : "_in");
 	formal_data = formal + "_data";
-	if (index.empty() && signalPort->isArray()) {
+	if (aIndex.empty() && signalPort->isArray()) {
 	  formal += "_array";
 	  formal_data += "_array";
 	}
@@ -234,20 +236,20 @@ emitPortSignal(FILE *f, bool any, const char *indent, const std::string &fName,
 	actual_data = "(others => (others => '0'))";
       } else {
 	m_worker->addParamConfigSuffix(suff);
-	OU::format(actual, "%s%s.%s_defs.%s%s_t(%s%s)",
-		   m_worker->m_implName, suff.c_str(), m_worker->m_implName,
-		   fName.c_str(), isArray() ? "_array" : "",
-		   aName.c_str(), index.c_str());
-	OU::format(actual_data, "%s%s.%s_defs.%s_data%s_t(%s_data%s)", m_worker->m_implName,
+	bool fArray = isArray() && a_count > 1;
+	OU::format(actual, "%s%s.%s_defs.%s%s_t'(%s%s%s)",
+		   m_worker->m_implName, suff.c_str(), m_worker->m_implName, fName.c_str(),
+		   fArray ? "_array" : "", fArray && !signalPort->isArray() ? "0 => " : "",
+		   aName.c_str(), aIndex.c_str());
+	OU::format(actual_data, "%s%s.%s_defs.%s_data%s_t'(%s%s_data%s)", m_worker->m_implName,
 		   suff.c_str(), m_worker->m_implName, fName.c_str(),
-		   isArray() ? "_array" : "", aName.c_str(),
-		   index.c_str());
+		   fArray? "_array" : "", fArray && !signalPort->isArray() ? "0 => " : "",
+		   aName.c_str(), aIndex.c_str());
       }
     }
   }
-  Port::emitPortSignal(f, any, indent, formal, actual, empty, output, NULL, false);
-  fprintf(f, ",\n");
-  Port::emitPortSignal(f, true, indent, formal_data, actual_data, empty, output, NULL, false);
+  Port::emitPortSignal(&pmaps[0], any, indent, formal, actual, empty, empty, a_count, output, NULL, false);
+  Port::emitPortSignal(&pmaps[1], true, indent, formal_data, actual_data, empty, empty, a_count, output, NULL, false);
 }
 
 void SdpPort::

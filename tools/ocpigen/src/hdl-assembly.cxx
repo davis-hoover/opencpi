@@ -726,12 +726,14 @@ createConnectionSignals(FILE *f, Language lang) {
   }
   // Output side: generate signal except when external or connected only to external
   // Or when connected to a wider one
-  if (m_attachments.size() &&
-      !(m_attachments.size() == 1 &&
-	m_attachments.front()->m_connection.m_attachments.size() == 2 &&
-	m_attachments.front()->m_connection.m_external && m_port->m_type != SDPPort) &&
-      maxCount <= m_port->count() && (m_port->isArray() || !otherIsArray) &&
-      (m_port->m_type != TimePort || m_port->m_master)) {
+  // FIXME: name this determination a separate port type method needsOutputConnectionSignal
+  if (m_port->m_type == SDPPort ||
+      (m_attachments.size() &&
+       !(m_attachments.size() == 1 &&
+	 m_attachments.front()->m_connection.m_attachments.size() == 2 &&
+	 m_attachments.front()->m_connection.m_external) &&
+       maxCount <= m_port->count() && (m_port->isArray() || !otherIsArray) &&
+       (m_port->m_type != TimePort || m_port->m_master))) {
     emitConnectionSignal(f, true, lang);
     // All connections should use this as their signal
     for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
@@ -744,7 +746,7 @@ createConnectionSignals(FILE *f, Language lang) {
 
   // Input side: rare - generate signal when it aggregates members from others,
   // Like a WCI slave port array
-  if (m_port->isArray() &&
+  if (m_port->isArray() && m_port->m_type != SDPPort &&
       ((maxCount && maxCount < m_port->count()) || !otherIsArray || m_attachments.size() > 1)) {
     emitConnectionSignal(f, false, lang);
     for (AttachmentsIter ai = m_attachments.begin(); ai != m_attachments.end(); ai++) {
@@ -1440,8 +1442,14 @@ detach(Connection &c) {
     if (&(*ai)->m_connection == &c) {
       m_connected[(*ai)->m_index] = false;
       Attachment *a = *ai;
-      m_attachments.erase(ai);
-      c.m_attachments.remove(a);
+      m_attachments.erase(ai); // remove attachment from InstancePort
+      // Attachments is sortable, which means it doesn't have remove (by value).
+      for (auto ci = c.m_attachments.begin(); ci != c.m_attachments.end(); ++ci)
+	if (*ci == a) {
+	  c.m_attachments.erase(ci); // remove attachment from connection
+	  break;
+	}
+      // c.m_attachments.remove(a);
       delete a;
       break;
     }
