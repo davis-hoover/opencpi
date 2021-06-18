@@ -1,1 +1,0 @@
-../../../../platform/hdl/platforms/zed/cnt_zed_fmcomms_2_3_scdcd.xdc

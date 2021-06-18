@@ -28,7 +28,7 @@
       <Property name='TX_Data_Delay' value='0'/>
     </Instance>
     <!-- DRC RX0 path slaves -->
-    <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'
+    <Instance worker='ocpi.platform.devices.data_src_qadc_csts.hdl'
 	    name='rx_qadc0' connect='rx_csts_to_iqstream0'>
       <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
     </Instance>
@@ -56,7 +56,7 @@
     <!-- A container/drc mismatch will prevent application from running. -->
     <!-- DRC RX1 path slaves -->
     <!--
-    <Instance worker='ocpi.platform.devices.data_src_qadc.hdl'
+    <Instance worker='ocpi.platform.devices.data_src_qadc_csts.hdl'
 	    name='rx_qadc1' connect='rx_csts_to_iqstream1'>
       <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
     </Instance>
@@ -94,7 +94,7 @@
     </Instance>
     <Instance worker='ocpi.assets.misc_comps.iqstream_to_csts.hdl'
 	  name='tx_iqstream_to_csts0' connect='tx_qdac0'/>
-    <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac0'>
+    <Instance worker='ocpi.platform.devices.data_sink_qdac_csts.hdl' name='tx_qdac0'>
       <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
     </Instance>
 
@@ -114,7 +114,7 @@
     </Instance>
     <Instance worker='ocpi.assets.misc_comps.iqstream_to_csts.hdl'
 		  name='tx_iqstream_to_csts1' connect='tx_qdac1'/>
-    <Instance worker='ocpi.platform.devices.data_sink_qdac.hdl' name='tx_qdac1'>
+    <Instance worker='ocpi.platform.devices.data_sink_qdac_csts.hdl' name='tx_qdac1'>
       <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
     </Instance>
     -->
