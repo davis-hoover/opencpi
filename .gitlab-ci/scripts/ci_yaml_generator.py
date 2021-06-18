@@ -31,7 +31,7 @@ def main():
     # Get projects
     project_blacklist = [ci_env.project_id]
     project_whitelist = ['core', 'assets', 'assets_ts', 'inactive', 'platform',
-                         'plutosdr', 'e3xx', 'sockit cv', 'adrv936x', 'sdr']
+                         'plutosdr', 'e3xx', 'sockit cv', 'adrv936x', 'sdr', 'ettus']
     projects_path = Path('projects')
     ocpi_group_id = 5378285
     projects = ci_project.discover_projects(projects_paths=projects_path,

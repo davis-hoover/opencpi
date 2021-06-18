@@ -101,8 +101,11 @@ done
 OCPI_TARGET_PLATFORM_DIR="${OCPI_TARGET_PLATFORM_DIR%/lib}"
 rm -r -f "${OCPI_TARGET_PLATFORM_DIR:?}/lib"
 
+
 # We assume that install-packages.sh and install-prerequisites.sh do NOT depend on the platform's exports
 ./build/install-packages.sh "$OCPI_TARGET_PLATFORM"
+# Export RCC platform
+$OCPI_CDK_DIR/scripts/enable-rcc-platform.sh "$OCPI_TARGET_PLATFORM"
 ./build/install-prerequisites.sh "$OCPI_TARGET_DIR"
 
 # Build framework and built-in projects for target platform

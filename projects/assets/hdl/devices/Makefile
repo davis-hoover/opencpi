@@ -68,7 +68,6 @@ Workers = \
 	si5338_proxy.rcc \
 	si5351.hdl \
 	si5351_proxy.rcc \
-	stm_mc24c02.hdl \
 	tmp100.hdl \
 	tmp100_proxy.rcc \
 

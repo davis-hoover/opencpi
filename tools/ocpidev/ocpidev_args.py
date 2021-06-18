@@ -326,12 +326,7 @@ verbs = {
                             'library': None
                         }
                     },
-                    'primitives': {
-                        'nouns': {
-                            'core': None,
-                            'library': None
-                        }
-                    }
+                    'primitives': None
                 }
             },
             'library': {
@@ -675,6 +670,12 @@ verbs = {
         'nouns': None
     },
     'set': {
+        'options': {
+            'registry_directory': {
+                'nargs': '?',
+                'metavar': 'registry-directory'
+            }
+        },
         'nouns': {
             'registry': None
         }
