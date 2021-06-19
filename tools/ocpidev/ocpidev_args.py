@@ -460,7 +460,11 @@ verbs = {
                     'xml_dir_app': options['xml_dir_app']
                 }
             },
-            'component': None,
+            'component': {
+                'options': {
+                    'library': options['library']
+                }
+            },
             'library': {
                 'options': {
                     'name': None,

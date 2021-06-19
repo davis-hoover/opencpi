@@ -42,6 +42,8 @@ def main():
     cdk_dir = ocpiutil.get_cdk_path() # Check cdk path exists and is valid
     args = ocpiargparse.parse_args(args_dict, prog='ocpidev')
     args = postprocess_args(args)
+    print(args)
+    print(sys.argv)
     orig_dir = Path.cwd()
     change_dir(args)
     sys.argv = sys.argv[1:]
@@ -54,26 +56,14 @@ def main():
         rc = ocpidev_utilization.main()
         sys.exit(rc)
     elif args.verb == 'run':
-        rc = ocpidev_run.main()
-        sys.exit(rc)
+        ocpidev_run.main()
     elif args.verb == 'create':
-        ocpicreate(args)
-
+        ocpicreate(args, cdk_dir, orig_dir)
+    
     try:
     # Try to instantiate the appropriate asset from noun
         name = getattr(args, 'name', '')
-        name = name if name else ''
-        dir=args.directory
-        # This is temporary until the more comprehensive solution based on get_subdir is done
-        if ocpiutil.get_dirtype(dir) == "project":
-            if args.noun == "worker":
-                dir += "/components"
-                if args.library and args.library != "components":
-                    dir += "/" + args.library
-            elif args.noun == "hdl-primitives":
-                dir += "/hdl/primitives"
-        directory = str(Path(dir, name))
-        # End of temporary fix until get_subdir is ported here
+        directory = str(Path.cwd())
         asset_factory = ocpiassets.factory.AssetFactory()
         asset = asset_factory.factory(args.noun, directory, name)
     except ocpiutil.OCPIException as e:
@@ -109,14 +99,29 @@ def postprocess_args(args):
     """
     TODO: docstring
     """
-    args.libbase = 'hdl' if hasattr(args, 'hdl-noun') else None
-    if not hasattr(args, 'library') or args.library == None:
+    if hasattr(args, 'hdl-noun'):
+        args.model = 'hdl'
+    elif hasattr(args, 'rcc-noun'):
+        args.model = 'rcc'
+    else:
+        args.model = None
+        if getattr(args, 'noun', '') == 'worker':
+            if getattr(args, 'name', None):
+                args.model = Path(args.name).suffix.strip('.')
+                #TODO error if not .rcc or .hdl
+        if not args.model:
+            args.model = 'hdl'
+    if not getattr(args, 'library', None):
     # If library option not provided
-        if args.noun in ['card', 'slot', 'hdl-card', 'hdl-slot']:
+        if args.noun in ['hdl-card', 'hdl-slot']:
             args.library = str(Path('hdl', 'cards'))
-        elif hasattr(args, 'hdl_library') and args.hdl_library is not None:
+        elif getattr(args, 'hdl_library', None):
             args.library = str(Path('hdl', args.hdl_library))
-    print(args)
+    else:
+        args.liboptset = True
+    if getattr(args, 'hdl_library', None):
+        args.hdlliboptset = True 
+
     return args
 
 
@@ -124,80 +129,54 @@ def get_subdir(args):
     """
     TODO: docstring
     """
-    libassets = ['worker', 'device', 'spec', 'component', 'protocol', 
-                 'properties', 'signals', 'test', 'card', 'slot']
-    if not args.noun in libassets:
-        if not hasattr(args, 'hdl_noun') or not args.hdl_noun in libassets:
-            return None
+    noun = getattr(args, 'noun', '')
+    hdl_noun = getattr(args, 'hdl_noun', '')
+    excludes = ['registry', 'project']
+    directory = str(Path.cwd())
+    if getattr(args, 'standalone', False):
+        return directory
+    if noun in excludes or hdl_noun in excludes:
+        return directory
+        
+    dir_type = ocpiutil.get_dirtype(directory)
+    asset_factory = ocpiassets.factory.AssetFactory()
+    args_dict = vars(args)
+    try:
+        asset = asset_factory.factory(dir_type, directory)
+        subdir = asset.get_subdir(**args_dict)
+    except ocpiutil.OCPIException:
+        return directory
 
-    subdir_path = None
-    dir_path = Path.cwd()
-    dirtype = ocpiutil.get_dirtype(dir_path)
-    print(dirtype)
-    do_autocreate = False
-    standalone = True
-    if not hasattr(args, 'standalone') or args.standalone == False:
-        standalone = False
-    if not standalone:
-    # Not standalone
-        if dirtype == 'project':
-        # Current directory is of type project
-            hdl_path = Path(dir_path, 'hdl')
-            if hasattr(args, 'library') and args.library is not None:
-            # library argument was used
-                library_path = Path(args.library)
-                if args.libbase == 'hdl' and not hdl_path.exists():
-                    hdl_path.mkdir()
-                if library_path.name in ['cards', 'devices', 'adapters']:
-                    subdir_path = Path(dir_path, library_path)
-                    do_autocreate = True
-                elif args.library == 'components':
-                    subdir_path = Path(dir_path, library_path)
-                elif library_path.parent == 'hdl':
-                    subdir_path = Path(dir_path, library_path)
-                else:
-                    subdir_path = Path(dir_path, 'components', 'library')
-            elif hasattr(args, 'platform') and args.platform is not None:
-            # platform argument was used
-                model = 'hdl' if hasattr(args, 'hdl_noun') else 'rcc'
-                platform_path = Path(dir_path, model, args.platform)
-                if not platform_path.exists():
-                    err_msg = 'the platform {} does not exist in {}'.format(
-                        args.platform, str(platform_path))
-                    raise ocpiutil.OCPIException(err_msg)
-          
-    if not subdir_path.exists() and args.verb == 'create' and do_autocreate:
-        ocpiassets.library.Library.make_library(subdir_path, subdir_path)
-    if not subdir_path.exists():
-        err_msg = 'the library for "{}" does not exist'.format(
-            str(subdir_path))
-        raise ocpiutil.OCPIException(err_msg)
-    dirtype = ocpiutil.get_dirtype(str(subdir_path))
-    do_project = True if hasattr(args, 'project') and args.project else False
-    if not standalone and dirtype != 'library' and not do_project:
-        err_msg = ' '.join(['the directory for "{}"'.format(str(subdir_path)),
-                            'is not a library - it is of type',
-                            '"{}"'.format(dirtype)])
-        raise ocpiutil.OCPIException(err_msg)
-
-    return subdir_path
+    print('subdir:', subdir)
+    return subdir
     
 
 def change_dir(args):
     """
     TODO: doctstring
     """
+    noun = getattr(args, 'noun', '')
+    verb = getattr(args, 'verb', '')
     try:
         ocpiutil.change_dir(args.directory)
-        subdir = get_subdir(args)
-        if subdir:
-            ocpiutil.change_dir(subdir)
+        if verb != 'create' and noun in ['project', 'registry']:
+            dir_type = ocpiutil.get_dirtype()
+            if dir_type != 'project':
+                project_top = ocpiutil.get_path_to_project_top()
+                if project_top:
+                    ocpiutil.change_dir(project_top)
+        else:
+            subdir = get_subdir(args)
+            if subdir:
+                ocpiutil.change_dir(subdir)
+        delattr(args, 'directory')
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
         sys.exit(1)
+    print(Path.cwd())
 
 
-def ocpicreate(args):
+def ocpicreate(args, cdk_dir=None, orig_dir=None):
     """
     Gets proper class from noun and calls its create() static method
     """
@@ -207,10 +186,10 @@ def ocpicreate(args):
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
-        ocpidev_sh()
+        ocpidev_sh(cdk_dir, orig_dir)
     args = vars(args)
     name = args.pop('name', None)
-    directory = args.pop('directory', None)
+    directory = str(Path.cwd())
     try:
         class_dict[args["noun"]].create(name, directory, **args)
     except ocpiutil.OCPIException as e:
@@ -219,10 +198,13 @@ def ocpicreate(args):
     sys.exit()
 
 
-def ocpidev_sh(cdk_dir, orig_dir=None):
+def ocpidev_sh(cdk_dir=None, orig_dir=None):
     """Calls ocpidev.sh and exits"""
+    print('ocpidev.sh')
+    if not cdk_dir:
+        cdk_dir = ocpiutil.get_cdk_path()
     if orig_dir:
-        change_dir(orig_dir)
+        ocpiutil.change_dir(orig_dir)
     ocpidev_sh_path = str(Path(cdk_dir, 'scripts', 'ocpidev.sh'))
     cmd = sys.argv
     cmd.insert(0, ocpidev_sh_path)

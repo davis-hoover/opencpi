@@ -195,6 +195,17 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         else:
             ocpiutil.throw_specify_lib_e()
 
+    def get_subdir(self, **kwargs):
+        #TODO: docstring
+        liboptset = kwargs.get('liboptset', None)
+        hdlliboptset = kwargs.get('hdlliboptset', None)
+        library = kwargs.get('library', None)
+        if library and (liboptset or hdlliboptset):
+            err_msg = 'cannot specify a library within a library'
+            raise ocpiutil.OCPIException(err_msg)
+
+        return self.directory
+
     def _get_template_dict(name, directory, **kwargs):
         """
         used by the create function/verb to generate the dictionary of viabales to send to the
@@ -244,32 +255,33 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
     @staticmethod
     def create(name, directory, **kwargs):
         """
-        Create library assets
+        Create library asset
         """
-        if not name:
-           raise ocpiutil.OCPIException("Creating a library asset requires a name")
-        dirtype = ocpiutil.get_dirtype(directory)
-        if dirtype != "project" and dirtype != "libraries":
-           raise ocpiutil.OCPIException(directory + " must be a project or components directory")
+        # if not name:
+        #    raise ocpiutil.OCPIException("Creating a library asset requires a name")
+        # dirtype = ocpiutil.get_dirtype(directory)
+        # if dirtype != "project" and dirtype != "libraries":
+        #    raise ocpiutil.OCPIException(directory + " must be a project or components directory")
 
-        if dirtype == "project":
-            compdir = directory + "/components/"
-            if not os.path.isdir(compdir):
-                os.mkdir(compdir) 
-            os.chdir(compdir)
+        # if dirtype == "project":
+        #     compdir = directory + "/components/"
+        #     if not os.path.isdir(compdir):
+        #         os.mkdir(compdir) 
+        #     os.chdir(compdir)
 
-        currdir = os.getcwd()
-        currtype = ocpiutil.get_dirtype(currdir)
-        if not currtype == "libraries":
-            raise ocpiutil.OCPIException(currdir + " must be of type libraries")
-        compdir = currdir
-        libdir = currdir + "/" + name
+        # currdir = os.getcwd()
+        # currtype = ocpiutil.get_dirtype(currdir)
+        # if not currtype == "libraries":
+        #     raise ocpiutil.OCPIException(currdir + " must be of type libraries")
+        # compdir = currdir
+        libdir = Path(Path.cwd(), name)
         if os.path.exists(libdir):
-            raise ocpiutil.OCPIException(libdir + " already exists.")
+            err_msg = 'library "{}" already exists at "{}"'.format(name, libdir)
+            raise ocpiutil.OCPIException(err_msg)
 
-        os.mkdir(libdir) 
-        os.chdir(libdir)
-        template_dict = Library._get_template_dict(name, compdir, **kwargs)
+        libdir.mkdir()
+        os.chdir(str(libdir))
+        template_dict = Library._get_template_dict(name, directory, **kwargs)
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
@@ -277,8 +289,8 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         subprocess.check_call('make')
         os.remove("Makefile")
         cdkdir = os.environ.get('OCPI_CDK_DIR')
-        metacmd = cdkdir + "/scripts/genProjMetaData.py "
-        os.system(metacmd + compdir)
+        metacmd = cdkdir + "/scripts/genProjMetaData.py " + os.getcwd()
+        os.system(metacmd)
 
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):
@@ -296,6 +308,18 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
             for lib in next(os.walk(directory))[1]:
                 lib_directory = directory + "/" + lib
                 self.library_list.append(AssetFactory.factory("library", lib_directory, **kwargs))
+
+
+    def get_subdir(self, **kwargs):
+        # TODO: docstring
+        library_name = kwargs.pop('library', None)
+        if not library_name:
+            err_msg = 'must specify a library when operating from a libraries collection'
+            raise ocpiutil.OCPIException(err_msg)
+        library_path = Path(self.directory, library_name)
+        library = Library(str(library_path))
+
+        return library.get_subdir(**kwargs)
 
     def run(self):
         """

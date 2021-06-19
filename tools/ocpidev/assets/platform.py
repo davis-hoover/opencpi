@@ -22,6 +22,7 @@ Defining rcc/hdl platform related classes
 import os
 import sys
 import logging
+from pathlib import Path
 import json
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
@@ -131,6 +132,23 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
         return ocpiutil.get_path_to_project_top() + "/hdl/platforms"
+
+    def get_subdir(self, **kwargs):
+        """TODO: docstrings bad args and kwargs"""
+        platform_name = kwargs.pop('platform', None)
+        if not platform_name:
+            err_msg = ' '.join(['must choose a platform (-P) when operating', 
+                                'from a platforms directory'])
+            raise ocpiutil.OCPIException(err_msg)
+
+        platform_path = Path(self.directory, platform_name)
+        if not platform_path.exists():
+            err_msg = 'the platform {} does not exist in {}'.format(
+                platform_name, self.directory) 
+        platform = HdlPlatformWorker(str(platform_path))
+
+        return platform.get_subdir(**kwargs)
+
 
 # pylint:disable=too-many-ancestors
 class HdlPlatformWorker(HdlWorker, ReportableAsset):
@@ -244,6 +262,23 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         if ocpiutil.get_dirtype() not in ["project", "hdl-platforms", "hdl-platform"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms", "hdl-platform"])
         return ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + name
+
+    def get_subdir(self, **kwargs):
+        """ TODO: docstring and kwargs """
+        noun = kwargs.get('hdl-noun', '')
+        if noun == 'card':
+            err_msg = 'cannot specify a card within a platform'
+            raise ocpiutil.OCPIException(err_msg)
+        for key in ['platform', 'project']:
+            if not kwargs.get(key, None):
+                continue
+            err_msg = 'cannot specify a {} within a platform'.format(key)
+            raise ocpiutil.OCPIException(err_msg)
+        subdir_path = Path(self.directory, 'devices')
+        if not subdir_path.exists():
+            subdir_path.exists()
+
+        return str(subdir_path)
 # pylint:enable=too-many-ancestors
 
 class HdlPlatformWorkerConfig(HdlAssembly):
@@ -590,6 +625,7 @@ class HdlPlatform(Platform):
         elif details == "json":
             json.dump(plat_dict, sys.stdout)
             print()
+
 
 class HdlTarget(object):
     """

@@ -91,13 +91,18 @@ class Asset(metaclass=ABCMeta):
         thrown
         """
         if not os.path.isdir(directory):
-            raise ocpiutil.OCPIException("Expected directory of type \"" + dirtype + "\" for a " +
-                                         "directory that does not exist \"" + directory + "\"")
+            err_msg = 'direct does not exist: {}'.format(directory)
+            raise ocpiutil.OCPIException(err_msg)
 
-        if ocpiutil.get_dirtype(directory) != dirtype:
-            raise ocpiutil.OCPIException("Expected directory of type \"" + dirtype + "\", but " +
-                                         "found type \"" + str(ocpiutil.get_dirtype(directory)) +
-                                         "\" for directory \"" + directory + "\"")
+        true_dirtype = ocpiutil.get_dirtype(directory)
+        if not true_dirtype:
+            true_dirtype = 'unknown'
+        if true_dirtype != dirtype:
+            err_msg = ' '.join(['Expected directory of type "{}"'.format(dirtype), 
+                                'but found type "{}"'.format(true_dirtype), 
+                                'for directory {}'.format(directory)])
+            raise ocpiutil.OCPIException(err_msg)
+
     def delete(self, force=False):
         """
         Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
