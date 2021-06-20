@@ -114,7 +114,7 @@ namespace OCPI {
       };
       struct Booking {
 	OCPI::Library::Artifact *m_artifact;
-	CMap m_usedImpls;         // which fixed implementations in the artifact are in use
+	uint64_t m_usedImpls;         // which fixed implementations in the artifact are in use
 	Booking() : m_artifact(NULL), m_usedImpls(0) {}
       };
       std::vector<Instance> m_instances;
