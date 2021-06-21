@@ -236,14 +236,14 @@ emitPortSignal(std::string *pmaps, bool any, const char *indent, const std::stri
 	actual_data = "(others => (others => '0'))";
       } else {
 	m_worker->addParamConfigSuffix(suff);
-	bool fArray = isArray() && a_count > 1;
-	OU::format(actual, "%s%s.%s_defs.%s%s_t'(%s%s%s)",
+	bool fArray = isArray() && (!fIndex.size() || a_count > 1);
+	OU::format(actual, "%s%s.%s_defs.%s%s_t%s%s%s)",
 		   m_worker->m_implName, suff.c_str(), m_worker->m_implName, fName.c_str(),
-		   fArray ? "_array" : "", fArray && !signalPort->isArray() ? "0 => " : "",
+		   fArray ? "_array" : "", fArray && !signalPort->isArray() ? "'(0 => " : "(",
 		   aName.c_str(), aIndex.c_str());
-	OU::format(actual_data, "%s%s.%s_defs.%s_data%s_t'(%s%s_data%s)", m_worker->m_implName,
+	OU::format(actual_data, "%s%s.%s_defs.%s_data%s_t%s%s_data%s)", m_worker->m_implName,
 		   suff.c_str(), m_worker->m_implName, fName.c_str(),
-		   fArray? "_array" : "", fArray && !signalPort->isArray() ? "0 => " : "",
+		   fArray? "_array" : "", fArray && !signalPort->isArray() ? "'(0 => " : "(",
 		   aName.c_str(), aIndex.c_str());
       }
     }
