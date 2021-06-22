@@ -503,9 +503,11 @@ emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment 
   OU::format(in, typeNameIn.c_str(), "");
   OU::format(out, typeNameOut.c_str(), "");
 
-  // Indexing is necessary only when we are smaller than the other
+  // Indexing is necessary only when we are smaller than the other OR
+  // the other is not an array but we are
   std::string fIndex;
-  if (at && isArray() && a_count < m_arrayCount) { // a subset of the array is being connected
+  if (at && isArray() &&
+      (a_count < m_arrayCount || !otherAt->m_instPort.m_port->isArray())) {
     if (a_count > 1)
       OU::format(fIndex, "(%zu to %zu)", at->m_index, at->m_index + a_count - 1);
     else
@@ -517,7 +519,7 @@ emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment 
     if (at && at->m_instPort.m_signalIn.empty()) {
       other = &otherAt->m_instPort;
       if (otherAt->m_instPort.m_port->isArray() &&
-	  a_count < otherAt->m_instPort.m_port->m_arrayCount) { // a subset of the array is being connected
+	  (!isArray() || a_count < otherAt->m_instPort.m_port->m_arrayCount)) { // subset of array being connected
 	if (a_count > 1 || (isArray() && a_count == m_arrayCount))
 	  OU::format(aIndex, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + a_count - 1);
 	else
@@ -546,6 +548,8 @@ emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment 
       other = NULL;
       if (isArray() && a_count < m_arrayCount) // a subset of the array is being connected
 	aIndex = fIndex;
+      else
+	fIndex.clear(); // no index required after all
     }
     emitPortSignal(&pmaps[2], any, indent, out, m_master ? mName : sName, fIndex, aIndex, a_count, true,
 		   other ? other->m_port : NULL, other && other->m_external);
