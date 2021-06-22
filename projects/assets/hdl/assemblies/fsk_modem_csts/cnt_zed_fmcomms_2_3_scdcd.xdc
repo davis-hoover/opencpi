@@ -1,1 +1,1 @@
-../data_sink_qdac_test_asm/cnt_zed_fmcomms_2_3_scdcd.xdc
+../../../../platform/hdl/platforms/zed/cnt_zed_fmcomms_2_3_csts_scdcd.xdc
