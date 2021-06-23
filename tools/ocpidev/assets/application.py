@@ -137,11 +137,9 @@ class Application(RunnableAsset, RCCBuildableAsset):
         os.chdir(namedir)
         if kwargs.get("verbose", True):
             print("Application '" + name +"' was created in the directory 'applications/" + name + "'")
-        template = jinja2.Template(ocpitemplate.APP_APPLICATION_NAME_APP_XML, trim_blocks=True)
-        ocpiutil.write_file_from_string(name + "-app.xml", template.render(**template_dict))
         if not kwargs.get("xml_dir_app", True):
             template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_CC, trim_blocks=True)
-            ocpiutil.write_file_from_string(name + ".rcc", template.render(**template_dict))
+            ocpiutil.write_file_from_string(name + ".cc", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
         if kwargs.get("verbose", True):

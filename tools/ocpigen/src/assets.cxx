@@ -28,6 +28,7 @@
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
 #include "OcpiUtilAssembly.h"
+#include "OcpiLibraryAssembly.h"
 #include "cdkutils.h"
 
 namespace OE = OCPI::Util::EzXml;
@@ -74,14 +75,8 @@ parseLibraries(ezxml_t xml) {
 
 // Applications are problematic since the old Makefile variables have Ocpi prefixes.
 
-#define APPLICATION_OCPIRUN_ATTRS \
-  "NoRun",  "RunArgs", "RunBefore", "RunAfter"
-
-#define APPLICATION_RUNTIME_ATTRS "done", "finished"
-
 // We add the ones that are used at runtime here
-#define APPLICATION_ATTRS APPLICATION_OCPIRUN_ATTRS, APPLICATION_RUNTIME_ATTRS,	\
-    "FileName", "OtherMains", "SourceFiles", "PrereqLibs", "CleanFiles"		\
+#define APPLICATION_ATTRS OCPI_APP_RUN_ATTRS, OCPI_APP_DEV_ATTRS
 
 static std::map<std::string, const char *, OU::CaseInsensitiveStringLess> attrMap;
 static const char *
@@ -98,7 +93,9 @@ parseApplication(ezxml_t xml) {
   attrMap["OtherMains"] = "OcpiApps";
   attrMap["NoRun"] = "OcpiNoRun";
   attrMap["PrereqLibs"] = "OcpiPrereqLibs";
-
+  const char *runattrs[] = { OCPI_APP_RUN_ATTRS, NULL };
+  for (const char **ap = runattrs; *ap; ++ap)
+    attrMap[*ap] = "";
   return NULL;
 }
 
@@ -106,8 +103,7 @@ parseApplication(ezxml_t xml) {
 static const char *
 parseApplications(ezxml_t xml) {
   const char *err;
-  if ((err = OE::checkAttrs(xml, APPLICATIONS_ONLY_ATTRS, APPLICATION_OCPIRUN_ATTRS, \
-			    PACKAGE_ATTRS, NULL)) ||
+  if ((err = OE::checkAttrs(xml, APPLICATIONS_ONLY_ATTRS, PACKAGE_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
     return err;
   return NULL;
@@ -172,7 +168,7 @@ parseHdlAssembly(ezxml_t xml) {
   HDL_TARGET_ATTRS, TARGET_ATTRS, PACKAGE_ATTRS, PROJECT_AND_LIBRARY_ATTRS, PROJECT_ONLY_ATTRS, \
   LIBRARY_ONLY_ATTRS, APPLICATION_ATTRS, APPLICATIONS_ONLY_ATTRS, \
   HDL_LIBRARY_AND_CORE_ATTRS, HDL_LIBRARY_ONLY_ATTRS, HDL_CORE_ONLY_ATTRS, \
-    HDL_PRIMITIVES_ONLY_ATTRS
+  HDL_PRIMITIVES_ONLY_ATTRS
 
 // The argument is [<expected-asset-type>:]<xml-file>
 const char *
@@ -199,6 +195,8 @@ parseAsset(const char *file, const char *topElement) {
   for (const char **ap = attrs; *ap; ++ap)
     if ((attr = ezxml_cattr(xml, *ap))) {
       auto it = attrMap.find(*ap);
+      if (it != attrMap.end() && !it->second[0])
+	continue;
       printf("%s=%s\n", it == attrMap.end() ? *ap : it->second, attr);
     }
   return NULL;

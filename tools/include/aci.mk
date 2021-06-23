@@ -63,9 +63,9 @@ endef
 # This is for dependencies of the executable on libraries
 AciLib=$(foreach l,\
          $(if $(filter 1,$(call OcpiIsDynamic,$2)),$(strip\
-           $(wildcard $1$(SOEXT_$(call RccOs,$2)))),$(strip\
-           $(or $(wildcard $1$(AREXT_$(call RccOs,$2))),$(strip\
-             $(wildcard $1$(SOEXT_$(call RccOs,$2))))))),$(infox ALr:$1:$2:$l)$l)
+           $(wildcard $1$(OcpiDynamicLibrarySuffix_$2))),$(strip\
+           $(or $(wildcard $1$(OcpiStaticLibrarySuffix_$2)),$(strip\
+             $(wildcard $1$(OcpiDynamicLibrarySuffix_$2)))))),$(infox ALr:$1:$2:$l)$l)
 
 AciLibs=$(foreach l,$(RccLibrariesInternal) $(Libraries),\
          $(if $(findstring /,$l),\
@@ -73,8 +73,8 @@ AciLibs=$(foreach l,$(RccLibrariesInternal) $(Libraries),\
              $(or $(call AciLib,$p,$1),\
                $(error No ACI library found for $l, tried $(strip\
                  $(if $(filter 1,$(call OcpiIsDynamic,$1))),\
-                    $p$(SOEXT_$(call RccOs,$1)),\
-                    $p$(AREXT_$(call RccOs,$1)) and $p$(SOEXT_$(call RccOs,$1)))))),\
+                    $p$(OcpiDynamicLibrarySuffix_$1),\
+                    $p$(OcpiStaticLibrarySuffix_$1) and $p$(OcpiDynamicLibrarySuffix_$1))))),\
 	   $(or $(call AciLib,$(OCPI_CDK_DIR)/$1/lib/libocpi_$l,$1))))
 
 # Build the executables

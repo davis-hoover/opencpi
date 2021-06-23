@@ -31,25 +31,12 @@ namespace OCPI {
     namespace OE = OCPI::Util::EzXml;
 
     // Attributes specific to an application assembly
-    static const char *assyAttrs[] = { COLLOCATION_POLICY_ATTRS,
-				       "maxprocessors", "minprocessors", "roundrobin", "done", "finished",
-				       NULL};// FIXME: done will be deprecated in 3.0
+    static const char *assyAttrs[] = { OCPI_APP_DEV_ATTRS, OCPI_APP_RUN_ATTRS, NULL};
 
     // The instance attributes relevant to app assemblies - we don't really deal with "container" here
     // FIXME: It should be in the upper level
     static const char *instAttrs[] = { COLLOCATION_POLICY_ATTRS,
 				       "model", "platform", "container", NULL};
-#if 0
-    Assembly::Assembly(const char *file, const OCPI::Util::PValue *params)
-      : OU::Assembly(file, assyAttrs, instAttrs, params), m_refCount(1) {
-      findImplementations(params);
-    }
-
-    Assembly::Assembly(const std::string &string, const OCPI::Util::PValue *params)
-      : OU::Assembly(string, assyAttrs, instAttrs, params), m_refCount(1) {
-      findImplementations(params);
-    }
-#endif
 
     Assembly::Assembly(ezxml_t a_xml, const char *a_name, const OCPI::Util::PValue *params)
       : OU::Assembly(a_xml, a_name, false, assyAttrs, instAttrs, params), m_refCount(1) {
