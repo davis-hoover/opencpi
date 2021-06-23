@@ -100,8 +100,7 @@ namespace OCPI {
       bool maxProcs = false, minProcs = false, roundRobin = false;
       // FIXME: move app-specific parsing up into library assy
       if ((err = OE::checkAttrsVV(ax, baseAttrs, extraTopAttrs, NULL)) ||
-          (err = OE::checkElements(ax, "instance", "connection", "policy", "property",
-                                   "external", NULL)) ||
+          (err = OE::checkElements(ax, OCPI_ASSY_ELEMENTS, NULL)) ||
           (err = OE::getNumber(ax, "maxprocessors", &m_processors, &maxProcs)) ||
           (err = OE::getNumber(ax, "minprocessors", &m_processors, &minProcs)) ||
           (err = OE::getBoolean(ax, "roundrobin", &roundRobin)) ||

@@ -27,6 +27,7 @@
 #include "ezxml.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
+#include "OcpiUtilAssembly.h"
 #include "cdkutils.h"
 
 namespace OE = OCPI::Util::EzXml;
@@ -87,7 +88,7 @@ static const char *
 parseApplication(ezxml_t xml) {
   const char *err;
   if ((err = OE::checkAttrs(xml, APPLICATION_ATTRS, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
-      (err = OE::checkElements(xml, NULL)))
+      (err = OE::checkElements(xml, OCPI_ASSY_ELEMENTS, NULL)))
     return err;
   // add mappings from attribute names to makefile variables
   attrMap["RunBefore"] = "OcpiRunBefore";
@@ -192,7 +193,7 @@ parseAsset(const char *file, const char *topElement) {
        !strcasecmp(xml->name, "applications") ? parseApplications(xml) :
        !strcasecmp(xml->name, "application") ? parseApplication(xml) :
        "Unknown asset type"))
-    return OU::esprintf("For <%s> XML file %s:  %s", topElement, file, err);
+    return OU::esprintf("For <%s> XML file %s:  %s", xml->name, file, err);
   static const char *attrs[] = { ALL_ATTRS, NULL };
   const char *attr;
   for (const char **ap = attrs; *ap; ++ap)

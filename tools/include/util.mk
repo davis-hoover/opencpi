@@ -1152,7 +1152,7 @@ OcpiIncludeAssetAndParent=\
     $(foreach d,$(or $1,.),\
       $(foreach x,$(wildcard $d/$(CwdName).xml $d/$(CwdName).*.xml $d/$(CwdName)-test.xml $d/$(CwdName)-app.xml),\
 	$(infox FOUND XML:$x)\
-        $(eval CleanFiles:=$(shell $(ToolsDir)/ocpixml -a cleanfiles parse $x))\
+        $(eval CleanFiles:=$(shell $(ToolsDir)/ocpixml -a '?cleanfiles' parse $x))\
 	$(infox FOUND CLEANFILES:$(CleanFiles)))),\
     $(- here is when we are not cleaning)\
     $(eval ParentPackage:=)\

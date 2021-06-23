@@ -48,6 +48,8 @@
 #include "OcpiPValue.h"
 #include "OcpiUtilMisc.h"
 
+#define OCPI_ASSY_ELEMENTS "instance", "connection", "policy", "property", "external"
+
 namespace OCPI {
   namespace Util {
     // This class is the bottom of a three-level stack of assembly handling.
