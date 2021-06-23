@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <climits>
+#include <array>
 #include <algorithm>
 #include "hdl.h"
 #include "assembly.h"
@@ -497,8 +498,8 @@ emitConnectionSignal(FILE */*f*/, bool /*output*/, Language /*lang*/, bool /*clo
 
 void Port::
 emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment *at, Attachment *otherAt,
-		   const std::string &mName, const std::string &sName, size_t a_count) {
-  InstancePort *other;
+		   const std::string &mName, const std::string &sName, size_t a_count,
+		   bool &inputDone, bool &outputDone) {
   std::string in, out, empty;
   OU::format(in, typeNameIn.c_str(), "");
   OU::format(out, typeNameOut.c_str(), "");
@@ -514,42 +515,49 @@ emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment 
       OU::format(fIndex, "(%zu)", at->m_index);
   }
   // input, then output
-  if (haveInputs()) {
+  if (haveInputs() && !inputDone) {
     std::string aIndex;
-    if (at && at->m_instPort.m_signalIn.empty()) {
-      other = &otherAt->m_instPort;
-      if (otherAt->m_instPort.m_port->isArray() &&
-	  (!isArray() || a_count < otherAt->m_instPort.m_port->m_arrayCount)) { // subset of array being connected
-	if (a_count > 1 || (isArray() && a_count == m_arrayCount))
-	  OU::format(aIndex, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + a_count - 1);
-	else
-	  OU::format(aIndex, "(%zu)", otherAt->m_index);
+    InstancePort *other = NULL;
+    if (at) {
+      if (at->m_instPort.m_signalIn.empty()) { // no signal for this port, use other's
+	other = &otherAt->m_instPort;
+	if (otherAt->m_instPort.m_port->isArray() &&
+	    (!isArray() || a_count < otherAt->m_instPort.m_port->m_arrayCount)) {
+	  if (a_count > 1 || (isArray() && a_count == m_arrayCount))
+	    OU::format(aIndex, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + a_count - 1);
+	  else
+	    OU::format(aIndex, "(%zu)", otherAt->m_index);
+	}
+      } else { // connection signal is for this port, one and done
+	inputDone = true;
+	fIndex.clear(); // no index required after all
+	// if (isArray() && a_count < m_arrayCount) // a subset of the array is being connected
+	// aIndex = fIndex;
       }
-    } else { // connection signal is for this port
-      other = NULL;
-      if (isArray() && a_count < m_arrayCount) // a subset of the array is being connected
-	aIndex = fIndex;
     }
     emitPortSignal(&pmaps[0], any, indent, in, m_master ? (at ? sName : empty) : (at ? mName : empty),
 		   fIndex, aIndex, a_count, false, other ? other->m_port : NULL, other && other->m_external);
   }
-  if (haveOutputs()) {
+  if (haveOutputs() && !outputDone) {
     std::string aIndex;
-    if (at && at->m_instPort.m_signalOut.empty()) {
-      other = &otherAt->m_instPort;
-      if (otherAt->m_instPort.m_port->isArray() &&
-	  a_count < otherAt->m_instPort.m_port->m_arrayCount) { // a subset of the array is being connected
-	if (a_count > 1 || (isArray() && a_count == m_arrayCount))
-	  OU::format(aIndex, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + a_count - 1);
-	else
-	  OU::format(aIndex, "(%zu)", otherAt->m_index);
-      }
-    } else { // connection signal is for this port
-      other = NULL;
-      if (isArray() && a_count < m_arrayCount) // a subset of the array is being connected
-	aIndex = fIndex;
-      else
+    InstancePort *other = NULL;
+    if (at) {
+      if (at->m_instPort.m_signalOut.empty()) {
+	other = &otherAt->m_instPort;
+	if (otherAt->m_instPort.m_port->isArray() &&
+	    a_count < otherAt->m_instPort.m_port->m_arrayCount) { // a subset of the array is being connected
+	  if (a_count > 1 || (isArray() && a_count == m_arrayCount))
+	    OU::format(aIndex, "(%zu to %zu)", otherAt->m_index, otherAt->m_index + a_count - 1);
+	  else
+	    OU::format(aIndex, "(%zu)", otherAt->m_index);
+	}
+      } else { // connection signal is for this port
+	// if (isArray() && a_count < m_arrayCount) // a subset of the array is being connected
+	// aIndex = fIndex;
+	// else
+	outputDone = true;
 	fIndex.clear(); // no index required after all
+      }
     }
     emitPortSignal(&pmaps[2], any, indent, out, m_master ? mName : sName, fIndex, aIndex, a_count, true,
 		   other ? other->m_port : NULL, other && other->m_external);
@@ -565,10 +573,11 @@ emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *
   OU::format(out, typeNameOut.c_str(), "");
   std::string mName, sName;
   std::array<std::string,4> pmaps;
+  bool inputDone = false, outputDone = false;
   if (ip.m_attachments.size() == 0) {
     doPrev(f, last, comment, myComment);
     mName = sName = "open";
-    emitPortAttachment(&pmaps[0], any, indent, NULL, NULL, mName, sName, 0);
+    emitPortAttachment(&pmaps[0], any, indent, NULL, NULL, mName, sName, 0, inputDone, outputDone);
     any = true;
     return;
   }
@@ -596,7 +605,8 @@ emitPortSignals(FILE *f, const InstancePort &ip, Language /*lang*/, const char *
     assert(otherAt);
     OU::format(mName, c.m_masterName.c_str(), "");
     OU::format(sName, c.m_slaveName.c_str(), "");
-    emitPortAttachment(&pmaps[0], any, indent, &at, otherAt, mName, sName, c.m_count);
+    emitPortAttachment(&pmaps[0], any, indent, &at, otherAt, mName, sName, c.m_count, inputDone,
+		       outputDone);
   }
   // close off previous port's signals
   doPrev(f, last, comment, myComment);

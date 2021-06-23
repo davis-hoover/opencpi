@@ -159,7 +159,7 @@ public:
   virtual void getClockSignal(const InstancePort &ip, Language lang, std::string &s);
   void emitPortAttachment(std::string *pmaps, bool any, const char *indent, Attachment *at,
 			  Attachment *otherAt, const std::string &mName, const std::string &sName,
-			  size_t count);
+			  size_t count, bool &inputDone, bool &outputDone);
   virtual void emitPortSignals(FILE *f, const InstancePort &ip, Language lang, const char *indent,
 			       bool &any, std::string &comment, std::string &last,
 			       const char *myComment, std::string &exprs);
