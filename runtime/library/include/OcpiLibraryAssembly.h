@@ -35,7 +35,7 @@
 
 // Attributes that ocpidev can use, but the runtime ignores
 #define OCPI_APP_DEV_ATTRS \
-  "FileName", "OtherMains", "SourceFiles", "PrereqLibs", \
+  "FileName", "OtherMains", "SourceFiles", "PrereqLibs", "CleanFiles",	\
   "PackageName", "PackageID", "ExcludePlatforms", "OnlyPlatforms", \
   "NoRun",  "RunArgs", "RunBefore", "RunAfter"
 
