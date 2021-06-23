@@ -796,11 +796,9 @@ namespace OCPI {
 	return err;
       if (OE::countChildren(cx, "port") < 1)
         return "no ports found under connection";
-      for (ezxml_t x = ezxml_cchild(cx, "port"); x; x = ezxml_cnext(x)) {
-	Port *p;
-        if ((err = parsePort(x, a, m_parameters, params, p)))
+      for (ezxml_t x = ezxml_cchild(cx, "port"); x; x = ezxml_cnext(x))
+        if ((err = parsePort(x, a)))
           return err;
-      }
       return NULL;
     }
 
@@ -847,7 +845,7 @@ namespace OCPI {
     }
 
     const char *Assembly::Connection::
-    parsePort(ezxml_t x, Assembly &a, const PValue *pvl, const PValue *params, Port *&p) {
+    parsePort(ezxml_t x, Assembly &a) {
       const char *err;
       std::string iName;
       unsigned instance;
@@ -877,9 +875,10 @@ namespace OCPI {
       } else
         return "One of 'name', 'from', or 'to' attribute must be present in 'port' element";
       // We don't know the role at all at this point
-      if ((err = addPort(a, instance, name.c_str(), isInput, false, isKnown, index, params, p)))
+      Port *p;
+      if ((err = addPort(a, instance, name.c_str(), isInput, false, isKnown, index, NULL, p)))
         return err;
-      return m_parameters.parse(pvl, x, "name", "instance", "from", "to", NULL);
+      return p->m_parameters.parse(NULL, x, "name", "instance", "from", "to", NULL);
     }
 
     Assembly::External::

@@ -28,9 +28,7 @@
 # -- When a unit test dir needs to build C++ apps for generator/verifier/view scripts
 # !!!!!!!!!!!!!! It is not yet considered "external" to be used in user Makefiles
 
-ifndef OcpiApps
-  $(error The aci.mk file included without OcpiApps being set)
-endif
+ifdef OcpiApps
 OcpiAppsCC:=$(foreach a,$(OcpiApps),\
               $(or $(foreach s,cc cxx cpp,$(wildcard $a.$s)), \
                    $(error No C++ file for application $a)))
@@ -102,5 +100,9 @@ $(foreach p,$(RccPlatforms),$(foreach a,$(OcpiAppsCC),$(infox App=$a Platform=$p
 endif
 aciapps:
 	$(AT)touch aciapps
+
+# This endif is for OcpiApps
+endif
+
 clean::
 	$(AT)rm -r -f target-* *~ aciapps

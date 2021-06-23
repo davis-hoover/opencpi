@@ -46,9 +46,11 @@ endif
 # The existence of a C++ app file determines if this is an ACI app
 OcpiAppCC:=$(strip\
   $(foreach s,cc cxx cpp,$(wildcard $(addsuffix .$s,$(call Unique,$(OcpiApp) $(OcpiApps))))))
+OcpiApps:=$(call Unique,$(OcpiApp) $(OcpiApps))
+# We include the aci.mk file even though we might only have XML files because we need its "clean"
+# to be reliably present with partially built trees etc.
+include $(OCPI_CDK_DIR)/include/aci.mk
 ifdef OcpiAppCC
-  OcpiApps:=$(call Unique,$(OcpiApp) $(OcpiApps))
-  include $(OCPI_CDK_DIR)/include/aci.mk
   # If we are running in this Makefile, then we are running the TOOL_PLATFORM
   ifndef OcpiRunCC
     OcpiRunCC=$(OcpiRunBefore) $(OCPI_VALGRIND) $(call AciExe,$(OCPI_TOOL_PLATFORM),$(OcpiApp)) $(OcpiRunArgs) \
@@ -98,5 +100,5 @@ clean::
 	$(AT)[ ! -d components ] || \
              $(MAKE) clean -C components \
                $(if $(wildcard components/Makefile),,-f $(OCPI_CDK_DIR)/include/library.mk)
-	$(AT)rm -r -f *~ timeData.raw simulations lib gen
+	$(AT)rm -r -f *~ timeData.raw simulations lib gen $(CleanFiles)
 endif # avoid speclinks and workersfile

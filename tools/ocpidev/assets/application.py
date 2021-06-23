@@ -57,8 +57,8 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         Runs the Application with the settings specified in the object
         """
-        return ocpiutil.execute_cmd(self.get_settings(),
-                                    self.directory, ["run", "Applications="+self.name] if self.name else ["run"])
+        return ocpiutil.execute_cmd(self.get_settings(), self.directory, ["run"],
+                                    ocpiutil.get_makefile(self.directory, "application")[0])
     def build(self):
         """
         This is a placeholder function will be the function that builds this Asset

@@ -130,8 +130,7 @@ def parse_cl_vars():
     parser.add_argument("--run-arg", dest="run_arg", action="append",
                         help="Argument(s) to insert immediately after the ACI executable or " +
                         "ocpirun.  Not valid for Test.")
-    parser.add_argument("run_arg", nargs="*", 
-                        help=argparse.SUPPRESS)
+    parser.add_argument("run_arg", nargs="*", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     parser.add_argument("--mode", dest="mode", default="all", choices=MODES,
                         help="Specify which phase(s) of the unit test to execute.  Not valid " +
                         "for Application.")
