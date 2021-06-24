@@ -11,10 +11,9 @@
   <device worker='time_server'>
     <property name='frequency' value='50e6'/>
   </device>
-
-  <!-- PIN AC18-->
-  <!-- <signal input='fpga_clk_50'/>  -->
   
+  <Signal output='fpga_led_pio' width='4'/> 
+
   <property name='axi_error' type='bool' arraylength='4' volatile='true'/>
   <property name='sdpDropCount' type='uchar' volatile='true'/>
 

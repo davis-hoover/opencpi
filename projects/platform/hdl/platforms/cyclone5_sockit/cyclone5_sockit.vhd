@@ -118,5 +118,21 @@ begin
   props_out.nLEDs           <= to_ulong(0); --led'length);
   props_out.UUID            <= metadata_in.UUID;
   props_out.romData         <= metadata_in.romData;
+
+  fpga_led_pio(0) <= count(count'left);
+  fpga_led_pio(1) <= dbg_state(0)(0);
+  fpga_led_pio(2) <= dbg_state1(0)(0);
+  fpga_led_pio(3) <= dbg_state2(0)(0);
+  -- Counter for blinking LED and debug
+  work : process(clk)
+  begin
+    if rising_edge(clk) then
+      if reset = '1' then
+        count <= (others => '0');
+      else
+        count <= count + 1;
+      end if;
+    end if;
+  end process;
  
 end rtl;
