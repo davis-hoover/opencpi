@@ -140,7 +140,16 @@ def parse_cl_vars():
                         "Development Guide (section 13.8) for more information on the "
                         "OCPI_REMOTE_TEST_SYSTEMS  variable.  Not valid for Application.")
 
-    cmd_args, args_value = parser.parse_known_args()
+    runargs=False
+    args=[]
+    for a in sys.argv[1:]:
+        if runargs:
+            args.append("--run-arg="+a)
+        elif a == "--":
+            runargs=True
+        else:
+            args.append(a)
+    cmd_args, args_value = parser.parse_known_args(args)
 
     if args_value:
         ocpiutil.logging.error("invalid options were used: " + " ".join(args_value))
