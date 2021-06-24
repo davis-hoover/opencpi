@@ -46,7 +46,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             init_workers (T/F) - Instructs the method whether to construct all worker objects
                                  contained in the library
         """
-        self.check_dirtype("library", directory)
+        # self.check_dirtype("library", directory)
         super().__init__(directory, name, **kwargs)
         self.test_list = None
         self.tests_names = None
@@ -262,6 +262,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         # dirtype = ocpiutil.get_dirtype(directory)
         # if dirtype != "project" and dirtype != "libraries":
         #    raise ocpiutil.OCPIException(directory + " must be a project or components directory")
+        # Library.check_dirtype('libraries', directory)
 
         # if dirtype == "project":
         #     compdir = directory + "/components/"
@@ -276,7 +277,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         # compdir = currdir
         libdir = Path(Path.cwd(), name)
         if os.path.exists(libdir):
-            err_msg = 'library "{}" already exists at "{}"'.format(name, libdir)
+            err_msg = 'library "{}" already exists at "{}"'.format(name, str(libdir))
             raise ocpiutil.OCPIException(err_msg)
 
         libdir.mkdir()
@@ -289,8 +290,8 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         subprocess.check_call('make')
         os.remove("Makefile")
         cdkdir = os.environ.get('OCPI_CDK_DIR')
-        metacmd = cdkdir + "/scripts/genProjMetaData.py " + os.getcwd()
-        os.system(metacmd)
+        metacmd = cdkdir + "/scripts/genProjMetaData.py " + str(libdir)
+        os.system(metacmd + os.getcwd())
 
 
 class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAsset):

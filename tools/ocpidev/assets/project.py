@@ -61,14 +61,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         """
         try:
             self.check_dirtype("project", directory)
-        except ocpiutil.OCPIException as e:
+        except ocpiutil.OCPIException:
         # If directory is not a project, assume name is a package_id and get directory
         # from registry
             registry_dir = Registry.get_registry_dir()
             if name:
                 directory = str(Path(registry_dir, name))
             else:
-                raise ocpiutil.OCPIException(e)
+                directory = registry_dir
             self.check_dirtype("project", directory)
 
         super().__init__(directory, name, **kwargs)
@@ -1078,69 +1078,69 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         subdir_path = Path(self.directory)
         hdl_path = Path(self.directory, 'hdl')
         library = kwargs.get('library', '')
-        # lib_base = kwargs.get('lib_base', '')
+        hdl_library = kwargs.get('hdl_library', '')
         platform = kwargs.get('platform', '')
-        project = kwargs.get('project', '')
+        project = kwargs.get('project', False)
         model = kwargs.get('model', '')
         noun = kwargs.get('noun', '')
         verb = kwargs.get('verb', '')
-        do_autocreate = False
+        name = kwargs.get('name', '')
 
-        if library:            
-            library_path = Path(library)
-            print('yes library', library_path.name, library_path.parent)
-            # if lib_base == 'hdl' and not hdl_path.exists():
-            #     hdl_path.mkdir()
-            if library_path.name in ['cards', 'devices', 'adapters']:
-                subdir_path = Path(self.directory, library_path)
-                do_autocreate = True
-            elif library == 'components':
-                subdir_path = Path(self.directory, library_path)
-            elif library_path.parent.name == 'hdl':
-                subdir_path = Path(self.directory, library_path)
-            else:
-                subdir_path = Path(self.directory, 'components', library)
+        if hdl_library:
+            subdir_path = Path(self.directory, 'hdl', hdl_library)
         elif platform:
             platform_path = Path(self.directory, model, 'platforms', platform)
             if not platform_path.exists():
-                err_msg = 'the platform {} does not exist in {}'.format(
+                err_msg = 'the platform "{}" does not exist at: {}'.format(
                     platform, str(platform_path))
                 raise ocpiutil.OCPIException(err_msg)
             subdir_path = Path(platform_path, 'devices')
-            do_autocreate = True
-        # elif lib_base == 'hdl':
-        #     do_autocreate = True
-        #     subdir_path = Path(self.directory, 'hdl', 'devices')
+            if noun == 'component':
+                if not subdir_path.exists():
+                    subdir_path.mkdir()
+                subdir_path = Path(subdir_path, 'specs')
         elif project:
-            print('oy')
-            if project != self.name:
-                err_msg = 'cannot specify a project from within a project'
-                raise ocpiutil.OCPIException(err_msg)
-            subdir_path = self.directory
+            subdir_path = Path(self.directory, 'specs')
         elif noun in ['hdl-primitive', 'hdl-primitives']:
             subdir_path = Path(self.directory, 'hdl', 'primitives')
-            do_autocreate = True
         elif noun in ['hdl-platform', 'hdl-platforms']:
             subdir_path = Path(self.directory, 'hdl', 'platforms')
-            do_autocreate = True
         elif noun in ['hdl-assembly', 'hdl-assemblies']:
             subdir_path = Path(self.directory, 'hdl', 'assemblies')
-            do_autocreate = True
+        elif noun in ['hdl-device', 'hdl-devices']:
+            subdir_path = Path(self.directory, 'hdl', 'devices')
+        elif noun in ['hdl-card', 'hdl-cards']:
+            subdir_path = Path(self.directory, 'hdl', 'cards') 
+        elif noun in ['hdl-adapter', 'hdl-adapters']:
+            subdir_path = Path(self.directory, 'hdl', 'adapters')
         elif noun in ['application', 'applications']:
             subdir_path = Path(self.directory, 'applications')
-            do_autocreate = True
         elif noun in ['library', 'libraries']:
+            if name == 'components':
+                subdir_path = Path(self.directory)
+            else:
+                subdir_path = Path(self.directory, 'components')
+        elif noun in ['component', 'components']:
             subdir_path = Path(self.directory, 'components')
-        # else:
-        #     subdir_path = Path(self.directory, 'components')
+            if library:
+                subdir_path = Path(subdir_path, library)
+            if not subdir_path.exists():
+                err_msg = 'the library "{}" does not exist at: {}'.format(
+                    subdir_path.name, str(subdir_path))
+                raise ocpiutil.OCPIException(err_msg)
+            subdir_path = Path(subdir_path, 'specs')
 
-        if subdir_path.parent.name == 'hdl' and not hdl_path.exists():
+        if verb != 'create':
+            return str(subdir_path)
+
+        if subdir_path.parent == hdl_path and not hdl_path.exists():
             hdl_path.mkdir()
-        print('subdir:', subdir_path)
-        if not subdir_path.exists() and verb == 'create':
-            if noun == 'library' or do_autocreate:
-                subdir_path.mkdir()
 
+        print('subdir:', subdir_path, subdir_path.exists())
+        if not subdir_path.exists():
+            subdir_path.mkdir()
+        print('subdir:', subdir_path, subdir_path.exists())
+        print('dirtype:', ocpiutil.get_dirtype(str(subdir_path)))
         return str(subdir_path)
 
 
@@ -1240,7 +1240,8 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         """
         Register project to registry. Export project if possible.
         """
-        registry = self.registry()
+        registry_dir = Registry.get_default_registry_dir()
+        registry = Registry(registry_dir)
         registry.add(self.directory, force=force)
 
         # Attempt to export project

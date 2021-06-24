@@ -136,6 +136,7 @@ class RccWorker(Worker):
     This class represents a RCC worker.
     """
     def __init__(self, directory, name=None, **kwargs):
+        self.check_dirtype('worker', directory)
         super().__init__(directory, name, **kwargs)
 
 class HdlCore(HDLBuildableAsset):
@@ -211,6 +212,7 @@ class HdlLibraryWorker(HdlWorker, ReportableAsset):
         Construct HdlLibraryWorker instance, and initialize configurations of this worker.
         Forward kwargs to configuration initialization.
         """
+        self.check_dirtype('worker', directory)
         super().__init__(directory, name, **kwargs)
         self.configs = {}
         self.init_configs(**kwargs)

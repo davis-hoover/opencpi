@@ -22,6 +22,7 @@ Defines the AssetFactory class
 
 from functools import partial
 import os
+from pathlib import Path
 import _opencpi.util as ocpiutil
 
 class AssetFactory():
@@ -99,13 +100,16 @@ class AssetFactory():
         (e.g. RccWorker or HdlLibraryWorker)
         """
         import _opencpi.assets.worker
-        if os.path.basename(os.path.realpath(ocpiutil.rchop(directory, '/'))).endswith(".hdl"):
+        model = Path(directory).resolve().suffix
+        if model == '.hdl':
             return _opencpi.assets.worker.HdlLibraryWorker(directory, name, **kwargs)
-        elif os.path.basename(os.path.realpath(ocpiutil.rchop(directory, '/'))).endswith(".rcc"):
+        elif model == '.rcc':
             return _opencpi.assets.worker.RccWorker(directory, name, **kwargs)
         else:
-            raise ocpiutil.OCPIException("Unsupported authoring model for worker located at '" +
-                                         directory + "'")
+            err_msg = 'Unsupported authoring model "{}" for worker located at "{}"'.format(
+                model, directory)
+            raise ocpiutil.OCPIException(err_msg)
+
     @classmethod
     def remove_all(cls):
         """

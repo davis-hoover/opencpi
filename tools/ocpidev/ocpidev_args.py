@@ -462,7 +462,9 @@ verbs = {
             },
             'component': {
                 'options': {
-                    'library': options['library']
+                    'library': options['library'],
+                    'platform': options['platform'],
+                    'hdl-library': options['hdl_library']
                 }
             },
             'library': {
@@ -560,6 +562,7 @@ verbs = {
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
+                    'project': options['project']
                 }
             },
             'registry': None,
@@ -570,11 +573,14 @@ verbs = {
                     'platform': options['platform'],
                     'hdl_library': options['hdl_library'],
                     'library': options['library'],
+                    'project': options['project']
                 }
             },
             'test': {
                 'options': {
-                    'spec': options['spec']
+                    'spec': options['spec'],
+                    'library': options['library'],
+                    'platform': options['platform']
                 }
             },
             'worker': {
@@ -645,7 +651,11 @@ verbs = {
                     'library': options['library']
                 }
             },
-            'test': None,
+            'test': {
+                'options': {
+                    'library': options['library']
+                }
+            },
             'worker': {
                 'options': {
                     'hdl_library': options['hdl_library'],

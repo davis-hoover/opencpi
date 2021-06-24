@@ -41,11 +41,6 @@ def main():
     """
     cdk_dir = ocpiutil.get_cdk_path() # Check cdk path exists and is valid
     args = ocpiargparse.parse_args(args_dict, prog='ocpidev')
-    args = postprocess_args(args)
-    print(args)
-    print(sys.argv)
-    orig_dir = Path.cwd()
-    change_dir(args)
     sys.argv = sys.argv[1:]
     # If verb is handled by another python script or function, hand off to it.
     # TODO: change argparsers in these scripts to use ocpiargs.py
@@ -56,9 +51,16 @@ def main():
         rc = ocpidev_utilization.main()
         sys.exit(rc)
     elif args.verb == 'run':
-        ocpidev_run.main()
-    elif args.verb == 'create':
-        ocpicreate(args)
+        rc = ocpidev_run.main()
+        sys.exit(rc)
+
+    args = postprocess_args(args)
+    print(args)
+    print(sys.argv)
+    orig_dir = Path.cwd()
+    change_dir(args)
+    if args.verb == 'create':
+        ocpicreate(args, cdk_dir, orig_dir)
     elif args.verb in ['set', 'unset']:
         ocpi_set_unset(args)
 
@@ -66,17 +68,20 @@ def main():
     # Try to instantiate the appropriate asset from noun
         name = getattr(args, 'name', '')
         name = name if name else ''
-        directory = str(Path.cwd())
+        directory = str(Path(Path.cwd(), name))
+        print('dir:', directory)
         asset_factory = ocpiassets.factory.AssetFactory()
         asset = asset_factory.factory(args.noun, directory, name)
     except ocpiutil.OCPIException as e:
     # Noun not implemented; fall back to ocpidev.sh
+        print(e)
         ocpidev_sh(cdk_dir, orig_dir)
     try:
     # Try to get appropriate method from verb
         asset_method = getattr(asset, args.verb) 
     except AttributeError as e:
     # Verb not implemented; fall back to ocpidev.sh
+        print(e)
         ocpidev_sh(cdk_dir, orig_dir)
     try:
     # Get verb method parameters, collect them from args, and try to
@@ -95,6 +100,7 @@ def main():
         sys.exit(1)
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
+        print(e)
         ocpidev_sh(cdk_dir, orig_dir)
 
 
@@ -102,28 +108,41 @@ def postprocess_args(args):
     """
     TODO: docstring
     """
-    if hasattr(args, 'hdl-noun'):
-        args.model = 'hdl'
-    elif hasattr(args, 'rcc-noun'):
+    noun = getattr(args, 'noun', '')
+    if noun == 'spec':
+        args.noun = 'component'
+    elif noun == 'hdl-slot':
+        args.noun = 'hdl-card'
+    if hasattr(args, 'rcc-noun'):
         args.model = 'rcc'
     else:
-        args.model = None
-        if getattr(args, 'noun', '') == 'worker':
-            if getattr(args, 'name', None):
-                args.model = Path(args.name).suffix.strip('.')
-                #TODO error if not .rcc or .hdl
-        if not args.model:
-            args.model = 'hdl'
-    if not getattr(args, 'library', None):
-    # If library option not provided
-        if args.noun in ['hdl-card', 'hdl-slot']:
-            args.library = str(Path('hdl', 'cards'))
-        elif getattr(args, 'hdl_library', None):
-            args.library = str(Path('hdl', args.hdl_library))
-    else:
-        args.liboptset = True
-    if getattr(args, 'hdl_library', None):
-        args.hdlliboptset = True 
+        args.model = 'hdl'
+    # else:
+    #     args.model = None
+    #     if getattr(args, 'noun', '') == 'worker':
+    #         #TODO: this is wrong
+    #         if getattr(args, 'name', None):
+    #             args.model = Path(args.name).suffix.strip('.')
+    #             #TODO error if not .rcc or .hdl
+    #     if not args.model:
+    #         args.model = 'hdl'
+
+    # if not getattr(args, 'hdl_library', None):
+    #     if args.noun in ['hdl-card', 'hdl-slot']:
+    #         args.hdl_library = str(Path('hdl', 'cards'))
+    # else:
+    #     args.hdl_library = str(Path('hdl', args.hdl_library))
+
+    # if not getattr(args, 'library', None):
+    # # If library option not provided
+    #     if args.noun in ['hdl-card', 'hdl-slot']:
+    #         args.library = str(Path('hdl', 'cards'))
+    #     elif getattr(args, 'hdl_library', None):
+    #         args.library = str(Path('hdl', args.hdl_library))
+    # else:
+    #     args.liboptset = True
+    # if getattr(args, 'hdl_library', None):
+    #     args.hdlliboptset = True 
 
     return args
 
@@ -134,21 +153,20 @@ def get_subdir(args):
     """
     noun = getattr(args, 'noun', '')
     hdl_noun = getattr(args, 'hdl_noun', '')
-    excludes = ['registry', 'project']
+    # excludes = ['registry', 'project']
     directory = str(Path.cwd())
     if getattr(args, 'standalone', False):
         return directory
-    if noun in excludes or hdl_noun in excludes:
-        return directory
-        
+    # if noun in excludes or hdl_noun in excludes:
+    #     return directory
+    subdir = directory
     dir_type = ocpiutil.get_dirtype(directory)
-    asset_factory = ocpiassets.factory.AssetFactory()
-    args_dict = vars(args)
-    try:
+    if dir_type:
+        asset_factory = ocpiassets.factory.AssetFactory()
+        args_dict = vars(args)
         asset = asset_factory.factory(dir_type, directory)
-        subdir = asset.get_subdir(**args_dict)
-    except ocpiutil.OCPIException:
-        return directory
+        if hasattr(asset, 'get_subdir'):
+            subdir = asset.get_subdir(**args_dict)
 
     print('subdir:', subdir)
     return subdir
@@ -166,6 +184,7 @@ def change_dir(args):
             dir_type = ocpiutil.get_dirtype()
             if dir_type != 'project':
                 project_top = ocpiutil.get_path_to_project_top()
+                print('to the top!', project_top)
                 if project_top:
                     ocpiutil.change_dir(project_top)
         else:
@@ -176,7 +195,8 @@ def change_dir(args):
     except ocpiutil.OCPIException as e:
         ocpiutil.logging.error(e)
         sys.exit(1)
-    print(Path.cwd())
+    # print(Path.cwd())
+    # sys.exit(0)
 
 
 def ocpi_set_unset(args):
@@ -185,7 +205,7 @@ def ocpi_set_unset(args):
     """
     name = getattr(args, 'name', '')
     name = name if name else ''
-    directory = str(Path(args.directory, name))
+    directory = str(Path.cwd())
 
     try:
         asset_factory = ocpiassets.factory.AssetFactory()
@@ -204,7 +224,7 @@ def ocpi_set_unset(args):
     sys.exit()
 
 
-def ocpicreate(args, cdk_dir=None, orig_dir=None)::
+def ocpicreate(args, cdk_dir=None, orig_dir=None):
     """
     Gets proper class from noun and calls its create() static method
     """
