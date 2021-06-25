@@ -49,26 +49,15 @@ An example of using this directive, where the component specification path is au
 
 Properties directive (``ocpi_documentation_properties``)
 --------------------------------------------------------
-Will list the properties or the parameters of a component, as defined in the component specification.
+Will list the properties of a component, as defined in the component specification.
 
 The directive command is ``ocpi_documentation_properties``, no arguments are needed.
 
 The options that can be used are:
 
- * ``parameters`` sets that parameters, rather than properties which are not parameters are to be listed.
-
  * ``component_spec`` allows overriding the automatically determined component specification path. When used the file path of the component specification relative to the current documentation file must be provided. When not set the directory above will be searched for a component specification based on the current directory's name.
 
-Additional text to describe each property can be added in the body of the directive. This text must be the name of the property followed by a colon symbol (``:``), with each property text on a new line. Additional property text is not passed as an option of the directive as directive option names must be known at the time of writing the directive, which for property and parameter names is not possible.
-
-An example of using this directive to list parameters, where the component specification path is automatically determined and with extra text for the ``some_parameter`` parameter:
-
-.. code-block:: restructuredtext
-
-   .. ocpi_documentation_properties::
-      :parameters:
-
-      some_parameter: Optional additional text for a parameter.
+Additional text to describe each property can be added in the body of the directive. This text must be the name of the property followed by a colon symbol (``:``), with each property text on a new line. Additional property text is not passed as an option of the directive as directive option names must be known at the time of writing the directive, which for property names is not possible.
 
 Implementation directive (``ocpi_documentation_implementation``)
 ----------------------------------------------------------------
@@ -94,7 +83,7 @@ The options that can be used are:
 
   * ``build_file`` allows overriding the automatically determined worker build file path. When used the file path of the worker build file relative to the current documentation file must be provided. When not set the directory the current documentation file is in will be search for a worker description.
 
-Additional text to describe any worker properties (including parameters) can be added in the body of the directive. This text must be the name of the property followed by a colon symbol (``:``), with each property text on a new line. Additional property text is not passed as an option of the directive as directive option names must be known at the time of writing the directive, which for property and parameter names is not possible.
+Additional text to describe any worker properties can be added in the body of the directive. This text must be the name of the property followed by a colon symbol (``:``), with each property text on a new line. Additional property text is not passed as an option of the directive as directive option names must be known at the time of writing the directive, which for property names is not possible.
 
 An example of using this directive, where the worker's description and build file paths are automatically determined:
 
@@ -140,6 +129,6 @@ Dependencies directive (``ocpi_documentation_dependencies``)
 ------------------------------------------------------------
 **CURRENTLY NOT IMPLEMENTED**
 
-Utilisation directive (``ocpi_documentation_utilisation``)
+Utilization directive (``ocpi_documentation_utilization``)
 ----------------------------------------------------------
 **CURRENTLY NOT IMPLEMENTED**

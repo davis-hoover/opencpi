@@ -22,6 +22,6 @@
 :orphan:
 
 
-``metadata_stressor`` test detail
+``metadata_stressor`` Test Detail
 =================================
 .. ocpi_documentation_test_detail::

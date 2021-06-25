@@ -30,7 +30,7 @@ class ComponentSpecParser(property_spec_parser.PropertySpecParser):
     """
 
     def __init__(self, filename, include_filepaths=["."]):
-        """ Initialise component spec parser class.
+        """ Initialize component spec parser class.
 
         Handles parsing an XML file with the componentspec root tag.
 
@@ -41,7 +41,7 @@ class ComponentSpecParser(property_spec_parser.PropertySpecParser):
                 statement.
 
         Returns:
-            An initialised ComponentSpecParser instance.
+            An initialized ComponentSpecParser instance.
         """
         super().__init__(filename=filename,
                          include_filepaths=include_filepaths)
@@ -80,8 +80,7 @@ class ComponentSpecParser(property_spec_parser.PropertySpecParser):
                 "properties": {"<property_name": {
                                 "type": {"data_type": "ulong"}
                                 "access": {"initial":  False, "parameter": False,
-                                           "readable": False, "volatile":  False,
-                                           "writable": True},
+                                           "volatile":  False, "writable": True},
                                 "description": "<description>,
                                 "default": "<property_default_value>",
                                 "value": "<property_default_value>"}}}

@@ -265,18 +265,16 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         libdir = currdir + "/" + name
         if os.path.exists(libdir):
             raise ocpiutil.OCPIException(libdir + " already exists.")
-        os.mkdir(libdir) 
 
-        template_dict = Library._get_template_dict(name, compdir, **kwargs)
-        if not os.path.exists(compdir + "/Makefile"):
-            template = jinja2.Template(ocpitemplate.LIB_MAKEFILE, trim_blocks=True)
-            ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
+        os.mkdir(libdir) 
         os.chdir(libdir)
-        template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
-        ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
+        template_dict = Library._get_template_dict(name, compdir, **kwargs)
         template = jinja2.Template(ocpitemplate.LIB_DIR_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
+        template = jinja2.Template(ocpitemplate.LIB_DIR_MAKEFILE, trim_blocks=True)
+        ocpiutil.write_file_from_string("Makefile", template.render(**template_dict))
         subprocess.check_call('make')
+        os.remove("Makefile")
         cdkdir = os.environ.get('OCPI_CDK_DIR')
         metacmd = cdkdir + "/scripts/genProjMetaData.py "
         os.system(metacmd + compdir)

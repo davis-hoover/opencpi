@@ -2,6 +2,7 @@
 centos7:
   # rcc
   adi_plutosdr0_32:
+  ettus_n310_v4:
   xilinx13_3:
   xilinx13_4:
   xilinx19_2_aarch32:

@@ -57,14 +57,7 @@ Interface
 .. literalinclude:: ../specs/timestamper-spec.xml
    :language: xml
 
-Ports
-~~~~~
-.. ocpi_documentation_ports::
-
-   in: Signed complex samples.
-   out: Signed complex samples with timestamps.
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied (if required): Description of how the non-stream opcodes are handled.
 
@@ -72,17 +65,18 @@ Properties
 ~~~~~~~~~~
 .. ocpi_documentation_properties::
 
+Ports
+~~~~~
+.. ocpi_documentation_ports::
 
-Parameters
-~~~~~~~~~~
-.. ocpi_documentation_properties::
-   :parameters:
+   in: Signed complex samples.
+   out: Signed complex samples with timestamps.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../timestamper.hdl
 
-Example application
+Example Application
 -------------------
 .. literalinclude:: example_app.xml
    :language: xml

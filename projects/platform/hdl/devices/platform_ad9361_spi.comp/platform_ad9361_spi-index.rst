@@ -38,7 +38,7 @@ Tested platforms include ML605 (FMC LPC slot), Zedboard (Vivado).
 Design
 ------
 This component defines the properties used by the :ref:`platform_ad9361_spi-HDL-worker`,
-which implements a serial peripheral inteface (SPI) state machine for communication with
+which implements a serial peripheral interface (SPI) state machine for communication with
 the `AD9361 integrated circuit (IC) <https://www.analog.com/en/products/ad9361.html#>`_.
 
 A block diagram representation of the implementation is given in :numref:`platform_ad9361_spi-diagram`
@@ -58,11 +58,7 @@ This component's specification is contained in the OpenCPI Worker Description (O
 .. literalinclude:: ../platform_ad9361_spi.hdl/platform_ad9361_spi.xml
    :language: xml
 
-Ports
-~~~~~
-.. comment out ocpi_documentation_ports directive for now. It doesn't work.
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied: Description of how the non-stream opcodes are handled (if relevant).
 
@@ -70,15 +66,15 @@ Properties
 ~~~~~~~~~~
 .. comment out ocpi_documentation_properties for now. It doesn't work.
 
-Parameters
-~~~~~~~~~~
-.. comment out ocpi_documentation_properties for now. It doesn't work.
+Ports
+~~~~~
+.. comment out ocpi_documentation_ports directive for now. It doesn't work.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../platform_ad9361_spi.hdl
 
-Example application
+Example Application
 -------------------
 To be supplied: a meaningful example, if relevant to this type of worker.
 

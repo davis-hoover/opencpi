@@ -25,10 +25,10 @@ import _opencpi.assets as ocpiassets
 import _opencpi.util as ocpiutil
 import ocpiargparse
 from ocpidev_args import args_dict
+from _opencpi.assets import application
 import ocpidev_utilization
 import ocpishow 
 import ocpidev_run
-
 
 def main():
     """
@@ -55,6 +55,8 @@ def main():
         sys.exit(rc)
     elif args.verb == 'create':
         ocpicreate(args)
+    elif args.verb in ['set', 'unset']:
+        ocpi_set_unset(args)
 
     try:
     # Try to instantiate the appropriate asset from noun
@@ -69,6 +71,8 @@ def main():
                     dir += "/" + args.library
             elif args.noun == "hdl-primitives":
                 dir += "/hdl/primitives"
+            elif not args.noun:
+                args.noun = "project"
         directory = str(Path(dir, name))
         # End of temporary fix until get_subdir is ported here
         asset_factory = ocpiassets.factory.AssetFactory()
@@ -102,6 +106,31 @@ def main():
         ocpidev_sh()
 
 
+def ocpi_set_unset(args):
+    """
+    set and unset the registry of the project
+    """
+    name = getattr(args, 'name', '')
+    name = name if name else ''
+    directory = str(Path(args.directory, name))
+
+    try:
+        asset_factory = ocpiassets.factory.AssetFactory()
+        project = asset_factory.factory('project', directory, name)
+        if args.verb == 'unset':
+            project.unset_registry()
+            sys.exit()
+        if args.registry_directory:
+            registry_directory = args.registry_directory
+        else:
+            registry_directory = ocpiassets.registry.Registry.get_default_registry_dir()
+        project.set_registry(registry_directory)
+    except ocpiutil.OCPIException as e:
+        ocpiutil.logging.error(e)
+        sys.exit(1)
+    sys.exit()
+
+
 def ocpicreate(args):
     """
     Gets proper class from noun and calls its create() static method
@@ -109,6 +138,7 @@ def ocpicreate(args):
     class_dict = {
         "project": ocpiassets.project.Project,
         "library": ocpiassets.library.Library,
+        "application": ocpiassets.application.Application,
     }
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh

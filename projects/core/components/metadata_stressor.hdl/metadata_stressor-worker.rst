@@ -23,7 +23,7 @@
 .. _metadata_stressor-HDL-worker:
 
 
-``metadata_stressor`` HDL worker
+``metadata_stressor`` HDL Worker
 ================================
 Application worker HDL implementation
 with a settable runtime configuration parameter
@@ -77,26 +77,11 @@ The following figure shows a block diagram representation of the HDL implementat
 
 .. ocpi_documentation_worker::
 
-Worker ports
-~~~~~~~~~~~~
+  in: Size defined by ``DATA_WIDTH_p``.
 
-Inputs:
+  out: Size defined by ``DATA_WIDTH_p``.
 
-* ``in``: Size defined by ``DATA_WIDTH_p``.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``DATA_WIDTH_p``
-    
-Outputs:
-
-* ``out``: Size defined by ``DATA_WIDTH_p``.
-  
-  * Type: ``StreamInterface``
-    
-  * Data width: ``DATA_WIDTH_p``
-
-Finite state machine
+Finite State Machine
 ~~~~~~~~~~~~~~~~~~~~
 The following figure shows an abbreviated representation of
 the primary finite state machine implemented in the HDL version of the metadata stressor component.
@@ -107,11 +92,11 @@ the primary finite state machine implemented in the HDL version of the metadata 
 
    Finite state machine of metadata stressor HDL implementation.
 
-Control timing and signals
+Control Timing and Signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 The metadata stressor HDL worker implementation uses the clock from
 the control plane and standard control plane signals.
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

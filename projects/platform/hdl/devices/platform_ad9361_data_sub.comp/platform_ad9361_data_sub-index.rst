@@ -25,7 +25,7 @@
 .. _platform_ad9361_data_sub:
 
 
-AD9361 data sub (``platform_ad9361_data_sub``)
+AD9361 Data Sub (``platform_ad9361_data_sub``)
 ==============================================
 Defines the build configuration parameters
 for the AD9361 data pin interface configurations.
@@ -67,32 +67,25 @@ This component's specification is contained in the OpenCPI Worker Description (O
 .. literalinclude:: ../platform_ad9361_data_sub.hdl/platform_ad9361_data_sub.xml
    :language: xml
 
-Ports
-~~~~~
-  
-.. comment out ocpi_documentation_ports directive. It doesn't accept hdldevice.
-
-
-Opcode handling
+Opcode Handling
 ~~~~~~~~~~~~~~~
 To be supplied: Description of how the non-stream opcodes are handled (if relevant).
-
 
 Properties
 ~~~~~~~~~~
 
 .. don't use ocpi_documentation_properties right now. It doesn't work with hdldevice as the root tag.
 
-Parameters
-~~~~~~~~~~
- 
-.. can't use ocpi_documentation_properties right now. It only wants componentspec as the root tag.
+Ports
+~~~~~
+
+.. comment out ocpi_documentation_ports directive. It doesn't accept hdldevice.
 
 Implementations
 ---------------
 .. ocpi_documentation_implementations:: ../platform_ad9361_data_sub.hdl
 
-Example application
+Example Application
 -------------------
 To be supplied: a meaningful example, if relevant to this type of worker.
 

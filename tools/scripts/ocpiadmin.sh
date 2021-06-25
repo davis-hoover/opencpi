@@ -375,6 +375,11 @@ else
     if [ -n "$minimal" ]; then
       ocpidev -d projects/core build hdl primitives library --hdl-platform=$platform
       ocpidev -d projects/platform build hdl primitives library --hdl-platform=$platform
+      # REMOVE THIS WHEN THE ASSETS PROJECT IS CLEANED UP
+      # But ultimately we need to get the platform's project's dependencies from the platform's project
+      # and build primitives for all of them
+      ocpidev -d projects/assets build hdl primitives library --hdl-platform=$platform
+      ocpidev -d projects/assets_ts build hdl primitives library --hdl-platform=$platform
     else
       ocpidev -d projects/core build --hdl --hdl-platform=$platform
       ocpidev -d projects/platform build --hdl --hdl-platform=$platform --no-assemblies
@@ -392,6 +397,9 @@ else
     then
         if [ -n "$minimal" ]; then
           ocpidev -d $project_dir build hdl primitives library --hdl-platform=$platform
+          # the rcc build ensures all workers are visible to build the platform
+          # we don't have a verb to do that.
+          ocpidev -d $project_dir build --rcc
           ocpidev -d $project_dir build hdl --workers-as-needed platform $platform
         else
           ocpidev -d $project_dir build --hdl --hdl-platform=$platform --no-assemblies

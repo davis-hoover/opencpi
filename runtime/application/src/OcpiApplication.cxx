@@ -585,7 +585,7 @@ namespace OCPI {
     bookingOk(Booking &b, OL::Candidate &c, unsigned n) {
       if (c.impl->m_staticInstance && b.m_artifact &&
           (b.m_artifact != &c.impl->m_artifact ||
-           b.m_usedImpls & (1u << c.impl->m_ordinal))) {
+           b.m_usedImpls & ((uint64_t)1u << c.impl->m_ordinal))) {
         ocpiInfo("    For instance \"%s\" for spec \"%s\" rejecting implementation \"%s%s%s\" with score %u "
                   "from artifact \"%s\" due to insufficient available containers",
                   m_assembly.instance(n).name().c_str(),
@@ -869,7 +869,7 @@ it is really per actual worker config...
             &b = m_bookings[*containers],
             save = b;
           b.m_artifact = &(*impls)->m_artifact;
-          b.m_usedImpls |= 1u << (*impls)->m_ordinal;
+          b.m_usedImpls |= (uint64_t)1u << (*impls)->m_ordinal;
           doInstance(instNum, score);
           b = save;
         } else
@@ -1758,6 +1758,8 @@ it is really per actual worker config...
       startMasterSlave(true, false, true);   // 5
       ocpiInfo("Starting master workers that are also slaves, but not sources.");
       startMasterSlave(true, true, false);   // 6
+      ocpiInfo("Starting master workers that are also slaves and are sources.");
+      startMasterSlave(true, true, true);    // 7
       ocpiInfo("Starting workers that are not masters and not sources.");
       startMasterSlave(false, false, false); // 0
       startMasterSlave(false, true, false);  // 2
@@ -1773,13 +1775,13 @@ it is really per actual worker config...
     void ApplicationI::stop() {
       ocpiDebug("Stopping master workers that are not slaves.");
       for (unsigned n = 0; n < m_nContainers; n++)
-        m_containerApps[n]->stop(true, false); // start masters that are not slaves
+        m_containerApps[n]->stop(true, false); // stop masters that are not slaves
       ocpiDebug("Stopping master workers that are also slaves.");
       for (unsigned n = 0; n < m_nContainers; n++)
-        m_containerApps[n]->stop(true, true);  // start masters that are slaves
+        m_containerApps[n]->stop(true, true);  // stop masters that are slaves
       ocpiDebug("Stopping workers that are not masters.");
       for (unsigned n = 0; n < m_nContainers; n++)
-        m_containerApps[n]->stop(false, false); // start non-masters
+        m_containerApps[n]->stop(false, false); // stop non-masters
     }
     void ApplicationI::
     setDelayedProperties() {

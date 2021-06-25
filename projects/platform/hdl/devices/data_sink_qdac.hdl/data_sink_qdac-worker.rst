@@ -23,7 +23,7 @@
 .. _data_sink_qdac-HDL-worker:
 
 
-``data_sink_qdac`` HDL device worker
+``data_sink_qdac`` HDL Device Worker
 ====================================
 HDL device worker implementation providing common functionality to all DAC device types.
 
@@ -38,7 +38,7 @@ plane reads them at the end of an application run.
 
 .. Comment out ocpi_documentation_worker:: for now. It doesn't work with HdlDevice XML.
 
-Worker ports
+Worker Ports
 ~~~~~~~~~~~~
 
 Inputs:
@@ -74,6 +74,6 @@ Outputs:
   * Data width: See the *OpenCPI HDL Development Guide* for instructions on calculating the default value.
 
 
-Utilisation
+Utilization
 -----------
-.. ocpi_documentation_utilisation::
+.. ocpi_documentation_utilization::

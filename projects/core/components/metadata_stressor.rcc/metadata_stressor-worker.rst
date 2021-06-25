@@ -23,7 +23,7 @@
 .. _metadata_stressor-RCC-worker:
 
 
-``metadata_stressor`` RCC worker
+``metadata_stressor`` RCC Worker
 ================================
 Application worker RCC implementation that is only a placeholder
 to fulfill the requirements of the OpenCPI unit test framework. It passes

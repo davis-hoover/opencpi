@@ -21,6 +21,6 @@
 :orphan:
 
 
-``data_sink_qdac`` test detail
+``data_sink_qdac`` Test Detail
 ==============================
 .. ocpi_documentation_test_detail::

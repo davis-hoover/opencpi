@@ -47,10 +47,17 @@ else
  OcpiCXX=g++
  OCPI_TARGET_DIR=$(OCPI_TOOL_DIR)
 endif
+
 # Set the global make variables that the kernel Makefiles want to see set in global variables
+ifdef OcpiKernelCrossCompile
+CC=$(OcpiKernelCrossCompile)$(OcpiCC)
+CXX=$(OcpiKernelCrossCompile)$(OcpiCXX)
+LD=$(OcpiKernelCrossCompile)ld
+else
 CC=$(OcpiCrossCompile)$(OcpiCC)
 CXX=$(OcpiCrossCompile)$(OcpiCXX)
 LD=$(OcpiCrossCompile)ld
+endif
 
 .PHONY: all
 
@@ -86,6 +93,7 @@ AT?=@
 TAR_EXTS:=tar tar.gz tgz tar.bz2 tbz2 tar.xz
 
 CLEANING:=$(filter cleandriver clean topclean cleanheaders,$(MAKECMDGOALS))
+
 
 # This conditional selects whether we are being included from the
 # kernel Makefile or not. (this in-kernel building is not regularly tested)
@@ -160,11 +168,12 @@ TMP_FILES=Module.markers Module.symvers .opencpi* opencpi.mod.* opencpi.o .tmp* 
 # that are unnecessary and problematic in most cases.
 #$(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P)) $(KERNELDIR)/include/config/auto.conf
 EXPORTS=EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KCPPFLAGS="$(KCPPFLAGS)" CROSS_COMPILE="$(CROSS_COMPILE)" $(and $(ARCH),ARCH=$(ARCH))
+
 $(MODFILE): opencpi.c $(shell echo $$(cd $(KERNELDIR); pwd -P))
-	$(if $(CROSS_COMPILE),$(AT)echo Building kernel tools that run on the development host &&\
+	$(AT) $(if $(CROSS_COMPILE), $(and $(OcpiKernelEnv), source $(OcpiKernelEnv) &&) echo Building kernel tools that run on the development host &&\
 	    $(MAKE) -C $(KERNELDIR) V=2 scripts)
 	$(AT)echo Building kernel module $(MODFILE)
-	$(and $(KERNELDIR),$(MAKE) -C $(KERNELDIR) M=$(PWD) V=2 modules)
+	$(AT)$(and $(KERNELDIR), $(and $(OcpiKernelEnv), source $(OcpiKernelEnv) &&) $(MAKE) -C $(KERNELDIR) M=$(PWD) V=2 modules)
 	$(AT)mkdir -p $(MyTargetDir)
 	$(AT)mv $(MODNAME).ko $(MODFILE)
 	$(AT)rm -rf $(TMP_FILES)

@@ -1,7 +1,7 @@
 .. %%NAME-PROPER%% primitive library index page
 
 
-%%NAME-PROPER%% primitive library
+%%NAME-PROPER%% Primitive Library
 =================================
 Skeleton outline: Primitive library description and outline of scope to go here.
 
