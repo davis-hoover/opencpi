@@ -1,8 +1,6 @@
 PRELIMINARY
-This is the initial work for the Cyclone V SOC Kit HDL platform. There is still some work to do 
-make this ready for release such as bug fixing in generated code brought to light by using Quartus,
-working around the Quartus crash when generating a .sof file, and getting bitstream loading working.
+This is the initial work for the Cyclone V SOC Kit HDL platform. 
 
-Note that the files copied over from the platform/hdl/primitives/cyclone5 library were patched
-so to make sure certain things like device part number and speed grade apply to the cyclone5_sockit.
+Note that the files copied over from the platform/hdl/primitives/cyclone5 library were modified/patching
+so to make sure certain things like device part number and speed grade apply to the Cyclone V SOC Kit.
 Other platforms that use cyclone5 would have to do something like this too.
