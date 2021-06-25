@@ -26,12 +26,10 @@ Libraries=cyclone5 axi sdp
 
 include $(OCPI_CDK_DIR)/include/hdl/hdl-make.mk
 
-UseCyclone5:=$(filter cyclone5,$(HdlTargets))
-
-
+PrimQipFile=../../primitives/cyclone5/gen/soc_system.qip
 # Modify the following files to reflect things for the Cyclone V SOC Kit
 ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-  ifndef UseCyclone5 
+  ifneq  ($(wildcard $(PrimQipFile)),)
    QipFile=gen/soc_system.qip
    ifeq  ($(wildcard $(QipFile)),) # if soc_system.qip not copied over yet
     $(if $(call DoShell, mkdir -p gen && cp ../../primitives/cyclone5/gen/soc_system.qip ../../primitives/cyclone5/gen/soc_system.qsys \
