@@ -39,4 +39,6 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
 
 ../configure --prefix=$OcpiInstallDir --exec-prefix=$OcpiInstallExecDir
 make 
-make install 
+make install
+
+rm -r -f "$OcpiInstallExecDir/libexec" 
