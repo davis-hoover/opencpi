@@ -35,10 +35,11 @@ echo "We are running in $(pwd) where the git clone of opencpi has been placed."
 echo ================================================================================
 
 # If the platform itself needs to be "built", do it now.
-if [ -f "$OCPI_TARGET_PLATFORM_DIR/Makefile" ]; then
+if [ -f "$OCPI_TARGET_PLATFORM_DIR/Makefile" ] && [ ! -f "$OCPI_TARGET_PLATFORM_DIR/lib/$1.mk" ]; then
   echo "Building/preparing the software platform '$OCPI_TARGET_PLATFORM' which will enable building other assets for it."
   make -C "$OCPI_TARGET_PLATFORM_DIR"
 elif [ -f "$OCPI_TARGET_PLATFORM_DIR/${OCPI_TARGET_PLATFORM}.exports" ]; then
   echo "Exporting files from the software platform '$OCPI_TARGET_PLATFORM' which will enable building other assets for it."
   (cd "$OCPI_TARGET_PLATFORM_DIR"; "$OCPI_CDK_DIR/scripts/export-platform.sh" lib)
 fi
+exit 1
