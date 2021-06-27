@@ -37,6 +37,6 @@ source "$OCPI_CDK_DIR/scripts/setup-prerequisite.sh" \
        "$extracted_dir" \
        "$cross_build" 
 
-../configure
+../configure --prefix=$OcpiInstallDir --exec-prefix=$OcpiInstallExecDir
 make 
-sudo make install 
+make install 
