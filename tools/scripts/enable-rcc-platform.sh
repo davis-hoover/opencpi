@@ -42,4 +42,3 @@ elif [ -f "$OCPI_TARGET_PLATFORM_DIR/${OCPI_TARGET_PLATFORM}.exports" ]; then
   echo "Exporting files from the software platform '$OCPI_TARGET_PLATFORM' which will enable building other assets for it."
   (cd "$OCPI_TARGET_PLATFORM_DIR"; "$OCPI_CDK_DIR/scripts/export-platform.sh" lib)
 fi
-exit 1
