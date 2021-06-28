@@ -26,7 +26,7 @@ centos7:
       before_script: []
       after_script: []
 
-ettus:
+ettus_n310_v4:
   overrides:
     packages:centos7:
       image: centos:7
