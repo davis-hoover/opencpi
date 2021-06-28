@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 
 import os
@@ -177,7 +178,7 @@ def make_rcc_jobs(stages, platform, projects, pipeline, host_platform=None):
             if job:
                 jobs.append(job)
 
-        if stage == 'prereqs' and not pipeline.is_downstream:
+        if stage == 'prereqs': #and not pipeline.is_downstream:
             name = make_name(platform, stage='packages')
             job = make_job(pipeline, stage, stages, platform, name=name)
             if job:
