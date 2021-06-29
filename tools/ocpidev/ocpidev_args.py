@@ -462,9 +462,12 @@ verbs = {
             },
             'component': {
                 'options': {
-                    'library': options['library'],
+                    'no_control': options['no_control'],
+                    'create_test': options['create_test'],
                     'platform': options['platform'],
-                    'hdl-library': options['hdl_library']
+                    'hdl_library': options['hdl_library'],
+                    'library': options['library'],
+                    'project': options['project']
                 }
             },
             'library': {
@@ -614,6 +617,12 @@ verbs = {
         },
         'nouns': {
             'application': None,
+            'component': {
+                'project': options['project'],
+                'hdl_library': options['hdl_library'],
+                'library': options['library'],
+                'platform': options['platform']
+            },
             'hdl': {
                 'nouns': {
                     'assembly': None,
@@ -648,7 +657,8 @@ verbs = {
                 'options': {
                     'project': options['project'],
                     'hdl_library': options['hdl_library'],
-                    'library': options['library']
+                    'library': options['library'],
+                    'platform': options['platform']
                 }
             },
             'test': {

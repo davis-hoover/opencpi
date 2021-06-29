@@ -1055,17 +1055,17 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             print()
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, library, hdl_library, hdl_platform, do_create=False):
         """
         return the directory of a Project given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
         cur_dirtype = ocpiutil.get_dirtype()
-        ocpiutil.check_no_libs("project", library, hdl_library, hdl_platform)
+        
         if cur_dirtype not in [None, "project"]:
             ocpiutil.throw_not_valid_dirtype_e(["project"])
         if cur_dirtype == "project":
-            return "."
+            return str(Path.cwd())
         else:
             return name
 

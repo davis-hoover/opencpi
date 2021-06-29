@@ -46,10 +46,10 @@ class Asset(metaclass=ABCMeta):
             directory - The location on the file system of the asset that is being constructed.
                         both relative and global file paths are valid.
         """
-        if not Path(directory).exists():
-            err_msg = '{} does not exist at: {}'
-            err_msg = err_msg.format(name if name else 'location', directory)
-            raise ocpiutil.OCPIException(err_msg)
+        # if not Path(directory).exists():
+        #     err_msg = '{} does not exist at: {}'
+        #     err_msg = err_msg.format(name if name else 'location', directory)
+        #     raise ocpiutil.OCPIException(err_msg)
         if not name:
             self.name = os.path.basename(directory)
         else:
@@ -151,6 +151,25 @@ class Asset(metaclass=ABCMeta):
                 if Component.is_component_spec_file(self.directory + "/specs/" + comp):
                     ret_val.append(self.directory + "/specs/" + comp)
         return ret_val
+
+    # @staticmethod
+    # def get_working_dir(name, library, hdl_library, hdl_platform, ensure_exists=False):
+    #     working_path = Path().cwd()
+    #     hdl_path = Path(working_path, 'hdl')
+    #     if library:
+    #         working_path = Path(working_path, 'components', library)
+    #         if not working_path.exists():
+    #             err_msg = 'specified library "{}" does not exist'.format(library)
+    #             raise ocpiutil.OCPIException(err_msg)
+    #     elif hdl_library:
+    #         if not hdl_path.exists() and not ensure_exists:
+    #             hdl_path.mkdir()
+    #         working_path = Path(hdl_path, hdl_library)
+    #     elif hdl_platform:
+    #         working_path = Path(hdl_path, 'platforms', hdl_platform)
+
+    #     return str(working_path)
+
 
 class BuildableAsset(Asset):
     """

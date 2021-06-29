@@ -549,7 +549,7 @@ def get_all_projects():
 ###############################################################################
 
 VALID_PLURAL_NOUNS = ["tests", "libraries", "workers"]
-def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_platform=None):
+def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_platform=None, ensure_exists=False):
     """
     TODO
     notes:
@@ -607,19 +607,21 @@ def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_plat
     # pylint:enable=no-member
 
     if noun in working_dir_dict:
-        asset_dir = working_dir_dict[noun](name, library, hdl_library, hdl_platform)
+        asset_dir = working_dir_dict[noun](
+            name, library, hdl_library, hdl_platform, ensure_exists)
     else:
         raise OCPIException("Invalid noun \"" + noun + "\" .  Valid nouns are: " +
                             ' '.join(working_dir_dict.keys()))
 
     # ensure existence and return
-    if os.path.exists(asset_dir):
-        return os.path.realpath(asset_dir)
-    else:
+    if ensure_exists and not os.path.exists(asset_dir):
         # pylint:disable=undefined-variable
-        raise OCPIException("Determined working directory of \"" + asset_dir + "\" that does " +
-                            "not exist.")
+        err_msg = ' '.join(['Determined working directory of "{}"'.format(asset_dir),
+                            'that does not exist'])
+        raise OCPIException(err_msg)
         # pylint:enable=undefined-variable
+
+    return os.path.realpath(asset_dir)
 
 def throw_not_valid_dirtype_e(valid_loc):
     """

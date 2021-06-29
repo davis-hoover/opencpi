@@ -67,11 +67,16 @@ class Application(RunnableAsset, RCCBuildableAsset):
         raise NotImplementedError("Application.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, library, hdl_library, hdl_platform, do_create):
         """
         return the directory of an Application given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
+        working_path = Path(ocpiutil.get_path_to_project_top(), 'applications')
+
+        return str(working_path)
+        
+
         ocpiutil.check_no_libs("application", library, hdl_library, hdl_platform)
         if ocpiutil.get_dirtype() not in ["application", "applications", "project"]:
             ocpiutil.throw_not_valid_dirtype_e(["applications", "project"])
@@ -81,6 +86,9 @@ class Application(RunnableAsset, RCCBuildableAsset):
         if fnmatch.fnmatch(name, '*.xml') or os.path.exists(top + name + ".xml"):
             return top
         return top + name
+
+
+
 
     def _get_template_dict(name, directory, **kwargs):
         """
