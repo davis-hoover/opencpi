@@ -33,6 +33,16 @@
 #include "OcpiLibraryManager.h"
 #include "OcpiUtilAssembly.h"
 
+// Attributes that ocpidev can use, but the runtime ignores
+#define OCPI_APP_DEV_ATTRS \
+  "FileName", "OtherMains", "SourceFiles", "PrereqLibs", "CleanFiles",	\
+  "PackageName", "PackageID", "ExcludePlatforms", "OnlyPlatforms", \
+  "NoRun",  "RunArgs", "RunBefore", "RunAfter"
+
+// FIXME: done will be deprecated in 3.0
+#define OCPI_APP_RUN_ATTRS \
+  "done", "finished", "maxprocessors", "minprocessors", "roundrobin", COLLOCATION_POLICY_ATTRS
+
 namespace OCPI {
   namespace Library {
 

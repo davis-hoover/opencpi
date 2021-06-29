@@ -246,6 +246,22 @@ Function Options
 
 Instance Options
 ~~~~~~~~~~~~~~~~
+Instance options allow a value to be specified that applies to either all instances or just one instance.
+These options take string values of the form:
+
+`[`'<instance-name>'`]`*`=`*'<value>'
+
+So, the option *`-m=rcc`* would set the *`m`* option (the authoring model) for all instances to *`rcc`*,
+while the option *`-mctl=rcc`* would set the *`m`* option for the *`ctl`* instance to be *`rcc`*.
+These options can appear more than once to indicate options for different instances.  If you specify an
+instance with an empty value (e.g. *`-mctl=`* ), it unsets any previous default (such as *`-m=rcc`*).
+So the following example would say:  all instances have the *`rcc`* model except filter.
+
+*`-m=rcc -mfilter=`*
+
+These options can provide constraints on the deployment algorithm to only consider certain workers
+or certain containers. 
+
 *`--container`*[*`=`*'<instance-name>']*`=`*'<container>', *`-c`*['<instance-name>']*`=`*'<container>'+::
     Assign the named instance or all instances to the specified
     container using the container name or number
@@ -287,6 +303,16 @@ Instance Options
 
 Instance Port Options
 ~~~~~~~~~~~~~~~~~~~~~
+Instance port options allow a value to be specified that applies to a port of an instance.
+These options take string values of the form:
+
+'<instance-name>'*`=`*'<port-name>'*`=`*'<value>'
+
+When a port is connected to a port of another instance, the connection is between two ports.
+Some of the port options apply to only one end (one port) of the connection, while others
+apply to the connection as a whole and thus apply to both the mentioned port as well as
+the port it is connected to.
+
 *`--buffer-count=`*'<instance-name>'*`=`*'<port-name>'*`=`*'<value>', *`-B`*'<instance-name>'*`=`*'<port-name>'*`=`*'<value>'+::
     Specify the number of buffers at this instance port, not
     for all the ports in the connection. The default is
@@ -297,7 +323,8 @@ Instance Port Options
     Specify the buffer size for the connection (the specified
     port and the port to which it is connected). The default
     is usually determined by a combination of the protocol
-    used on the connection and other system constraints.
+    used on the connection and other system constraints.  The buffer size is always the same
+    for both ends of a connection, so specifying it for one port also specifies it for the other port.
 
 *`--transport=`*'<instance-name>'*`=`*'<port-name>'*`=`*'<identifier>', *`-T`*'<instance-name>'*`=`*'<port-name>'*`=`*'<identifier>'+::
     Specify the transport technology to use for the
@@ -345,6 +372,19 @@ External Port Options
     Development Guide' for the list of identifiers that
     correspond to the transport technologies supported
     by OpenCPI.
+
+When the above *`file`* option is used to connect an external port to a file, the detailed
+property settings for the inserted *`file_read`* or *`file_write`* components may be supplied
+after the filename using the URL option syntax of:
+
+*`?`*'<name>'*`=`*'<value>'*`;`*'<name2>'*`=`*'<value>'
+
+So if an external port whose name was *`input`* was to be connected to the file *`myinput.txt`*,
+with the *`opcode`* option set to *`2`* and the *`suppressEOF`* option set to *`false`*, the option syntax would be:
+
+*`-f "input=myinput.txt?opcode=2;suppressEOF=false"`*
+
+Note that the option value is quoted since the question mark and semicolon are shell metacharacters.
 
 Simulation Options
 ~~~~~~~~~~~~~~~~~~

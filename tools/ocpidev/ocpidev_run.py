@@ -130,8 +130,7 @@ def parse_cl_vars():
     parser.add_argument("--run-arg", dest="run_arg", action="append",
                         help="Argument(s) to insert immediately after the ACI executable or " +
                         "ocpirun.  Not valid for Test.")
-    parser.add_argument("run_arg", nargs="*", 
-                        help=argparse.SUPPRESS)
+    parser.add_argument("run_arg", nargs="*", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     parser.add_argument("--mode", dest="mode", default="all", choices=MODES,
                         help="Specify which phase(s) of the unit test to execute.  Not valid " +
                         "for Application.")
@@ -141,7 +140,16 @@ def parse_cl_vars():
                         "Development Guide (section 13.8) for more information on the "
                         "OCPI_REMOTE_TEST_SYSTEMS  variable.  Not valid for Application.")
 
-    cmd_args, args_value = parser.parse_known_args()
+    runargs=False
+    args=[]
+    for a in sys.argv[1:]:
+        if runargs:
+            args.append("--run-arg="+a)
+        elif a == "--":
+            runargs=True
+        else:
+            args.append(a)
+    cmd_args, args_value = parser.parse_known_args(args)
 
     if args_value:
         ocpiutil.logging.error("invalid options were used: " + " ".join(args_value))
