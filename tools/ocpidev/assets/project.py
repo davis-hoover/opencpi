@@ -992,6 +992,16 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         print("Succesfully unset the registry of the project " + os.path.realpath(self.directory) +
               "\nFrom the registry: " + os.path.realpath(reg.directory))
 
+    def refresh(self):
+         """
+         Generate a new copy of project metadata
+         """
+         directory = self.directory
+         assert ocpiutil.get_dirtype(directory) == "project"
+         cdkdir = os.environ.get('OCPI_CDK_DIR')
+         metacmd = cdkdir + "/scripts/genProjMetaData.py "
+         os.system(metacmd + directory)
+
     def registry(self):
         """
         This function will return the registry object for this Project instance.

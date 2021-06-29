@@ -35,15 +35,15 @@ int main(int /* argc */, char **argv) {
 		    "  <instance component='file_write'>"
 		    "    <property name='filename' value='out.file'/>"
 		    "  </instance>"
-		    "  <connection ");
+		    "  <connection buffersize='18k' transport='socket'");
   if (argv[1]) {
     hello += "transport='";
     hello += argv[1];
     hello += "'";
   }
   hello +=          ">"
-                    "<port instance='file_read' name='out'/>"
-		    "    <port instance='file_write' name='in'/>"
+                    "<port instance='file_read' name='out' buffercount='7'/>"
+		    "    <port instance='file_write' name='in' buffercount='3'/>"
 		    "  </connection>"
 		    "</application>";
 

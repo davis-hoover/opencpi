@@ -58,8 +58,8 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         Runs the Application with the settings specified in the object
         """
-        return ocpiutil.execute_cmd(self.get_settings(),
-                                    self.directory, ["run", "Applications="+self.name] if self.name else ["run"])
+        return ocpiutil.execute_cmd(self.get_settings(), self.directory, ["run"],
+                                    ocpiutil.get_makefile(self.directory, "application")[0])
     def build(self):
         """
         This is a placeholder function will be the function that builds this Asset
@@ -145,11 +145,9 @@ class Application(RunnableAsset, RCCBuildableAsset):
         os.chdir(namedir)
         if kwargs.get("verbose", False):
             print("Application '" + name +"' was created in the directory 'applications/" + name + "'")
-        template = jinja2.Template(ocpitemplate.APP_APPLICATION_NAME_APP_XML, trim_blocks=True)
-        ocpiutil.write_file_from_string(name + "-app.xml", template.render(**template_dict))
-        if not kwargs.get("xml_dir_app", False):
+        if not kwargs.get("xml_dir_app", True):
             template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_CC, trim_blocks=True)
-            ocpiutil.write_file_from_string(name + ".rcc", template.render(**template_dict))
+            ocpiutil.write_file_from_string(name + ".cc", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_XML, trim_blocks=True)
         ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
         if kwargs.get("verbose", False):

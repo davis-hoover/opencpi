@@ -152,10 +152,11 @@ OcpiAbsPathX=$(strip \
           $(call OcpiAbsDir,.)/$1)))),$(abspath $p)))
 
 define OcpiParseXml
-  $$(if $$(call DoShell,set -o pipefail && $$(ToolsDir)/ocpigen -R $1/$2.xml|tr "\n" ";"|tr " " "&",OcpiProps),\
+  $$(infox PARSE:$1:$2)
+  $$(if $$(call DoShell,set -o pipefail && $$(ToolsDir)/ocpigen -R $1/$2.xml|tr "\n" "@"|tr " " "~",OcpiProps),\
     $$(error ocpigen failed),\
-    $$(foreach var,$$(subst ;, ,$$(OcpiProps)),$$(eval $$(subst &, ,$$(var)))))
-  $$(infox $0: OcpiProps is $$(OcpiProps))
+    $$(foreach var,$$(subst @, ,$$(OcpiProps)),$$(eval $$(subst ~, ,$$(var)))))
+  $$(infox $0: OcpiProps is $$(subst @, ,$$(OcpiProps)))
 endef
 
 # Call a function ($1) with a single path argument ($2).
@@ -1053,8 +1054,8 @@ define OcpiSetAsset
   else ifneq ($(filter-out Platforms Primitive Primitives Applications Application,$2),)
     $$(error Unexpected asset type: $2)
   else ifeq ($2,Application)
-    ifneq ($$(wildcard $1/$$(OcpiAssetName)-app.xml),)
-      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)-app))
+    ifneq ($$(wildcard $1/$$(OcpiAssetName).xml),)
+      $$(eval $$(call OcpiParseXml,$1,$$(OcpiAssetName)))
     endif
   else ifeq ($2,Primitives)
     # We are overloading the Libraries and Cores variables.
@@ -1146,7 +1147,14 @@ OcpiIncludeAssetAndParentX=$(infox OIAAPX:$1:$2:$3:$(realpath $1))$(strip \
 #   Arg2 = authoring model prefix for package-ID (optional) - <parent>.<auth>.<package-name>
 #   Arg3 = error/warning/info mode (optional)
 OcpiIncludeAssetAndParent=\
-  $(if $(and $(MAKECMDGOALS),$(if $(filter-out clean%,$(MAKECMDGOALS)),,x)),,\
+  $(if $(filter clean%,$(MAKECMDGOALS)),\
+    $(- here is when we are cleaning - just look for cleanfiles attribute by itself)\
+    $(foreach d,$(or $1,.),\
+      $(foreach x,$(wildcard $d/$(CwdName).xml $d/$(CwdName).*.xml $d/$(CwdName)-test.xml $d/$(CwdName)-app.xml),\
+	$(infox FOUND XML:$x)\
+        $(eval CleanFiles:=$(shell $(ToolsDir)/ocpixml -a '?cleanfiles' parse $x))\
+	$(infox FOUND CLEANFILES:$(CleanFiles)))),\
+    $(- here is when we are not cleaning)\
     $(eval ParentPackage:=)\
     $(eval Package:=)\
     $(eval PackageID:=)\
