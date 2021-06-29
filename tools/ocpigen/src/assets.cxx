@@ -23,9 +23,12 @@
 // Note that determining dirtype (asset type of directory) is done separately in python and not here.
 // So here we do asset-specific parsing and error checking, and return make syntax assignments on stdout
 
+#include <map>
 #include "ezxml.h"
 #include "OcpiUtilEzxml.h"
 #include "OcpiUtilMisc.h"
+#include "OcpiUtilAssembly.h"
+#include "OcpiLibraryAssembly.h"
 #include "cdkutils.h"
 
 namespace OE = OCPI::Util::EzXml;
@@ -69,16 +72,30 @@ parseLibraries(ezxml_t xml) {
     return err;
   return NULL;
 }
-#define APPLICATION_OCPIRUN_ATTRS \
-  "OcpiApp", "OcpiAppNoRun", "OcpiApps", \
-  "OcpiRunArgs", "OcpiRunBefore", "OcpiRunAfter"
 
+// Applications are problematic since the old Makefile variables have Ocpi prefixes.
+
+// We add the ones that are used at runtime here
+#define APPLICATION_ATTRS OCPI_APP_RUN_ATTRS, OCPI_APP_DEV_ATTRS
+
+static std::map<std::string, const char *, OU::CaseInsensitiveStringLess> attrMap;
 static const char *
 parseApplication(ezxml_t xml) {
   const char *err;
-  if ((err = OE::checkAttrs(xml, APPLICATION_OCPIRUN_ATTRS, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
-      (err = OE::checkElements(xml, NULL)))
+  if ((err = OE::checkAttrs(xml, APPLICATION_ATTRS, PROJECT_AND_LIBRARY_ATTRS, NULL)) ||
+      (err = OE::checkElements(xml, OCPI_ASSY_ELEMENTS, NULL)))
     return err;
+  // add mappings from attribute names to makefile variables
+  attrMap["RunBefore"] = "OcpiRunBefore";
+  attrMap["RunAfter"] = "OcpiRunAfter";
+  attrMap["RunArgs"] = "OcpiRunArgs";
+  attrMap["FileName"] = "OcpiApp";
+  attrMap["OtherMains"] = "OcpiApps";
+  attrMap["NoRun"] = "OcpiNoRun";
+  attrMap["PrereqLibs"] = "OcpiPrereqLibs";
+  const char *runattrs[] = { OCPI_APP_RUN_ATTRS, NULL };
+  for (const char **ap = runattrs; *ap; ++ap)
+    attrMap[*ap] = "";
   return NULL;
 }
 
@@ -86,8 +103,7 @@ parseApplication(ezxml_t xml) {
 static const char *
 parseApplications(ezxml_t xml) {
   const char *err;
-  if ((err = OE::checkAttrs(xml, APPLICATIONS_ONLY_ATTRS, APPLICATION_OCPIRUN_ATTRS, \
-			    PACKAGE_ATTRS, NULL)) ||
+  if ((err = OE::checkAttrs(xml, APPLICATIONS_ONLY_ATTRS, PACKAGE_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
     return err;
   return NULL;
@@ -103,6 +119,7 @@ parseHdlLibrary(ezxml_t xml) {
   if ((err = OE::checkAttrs(xml, HDL_LIBRARY_AND_CORE_ATTRS, HDL_TARGET_ATTRS, TARGET_ATTRS,
 			    HDL_LIBRARY_ONLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
+    return err;
   return NULL;
 }
 
@@ -113,6 +130,7 @@ parseHdlCore(ezxml_t xml) {
   if ((err = OE::checkAttrs(xml, HDL_LIBRARY_AND_CORE_ATTRS, HDL_TARGET_ATTRS, TARGET_ATTRS,
 			    HDL_CORE_ONLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
+    return err;
   return NULL;
 }
 
@@ -148,7 +166,7 @@ parseHdlAssembly(ezxml_t xml) {
 
 #define ALL_ATTRS \
   HDL_TARGET_ATTRS, TARGET_ATTRS, PACKAGE_ATTRS, PROJECT_AND_LIBRARY_ATTRS, PROJECT_ONLY_ATTRS, \
-  LIBRARY_ONLY_ATTRS, APPLICATION_OCPIRUN_ATTRS, APPLICATIONS_ONLY_ATTRS, \
+  LIBRARY_ONLY_ATTRS, APPLICATION_ATTRS, APPLICATIONS_ONLY_ATTRS, \
   HDL_LIBRARY_AND_CORE_ATTRS, HDL_LIBRARY_ONLY_ATTRS, HDL_CORE_ONLY_ATTRS, \
   HDL_PRIMITIVES_ONLY_ATTRS
 
@@ -171,11 +189,15 @@ parseAsset(const char *file, const char *topElement) {
        !strcasecmp(xml->name, "applications") ? parseApplications(xml) :
        !strcasecmp(xml->name, "application") ? parseApplication(xml) :
        "Unknown asset type"))
-    return OU::esprintf("For <%s> XML file %s:  %s", topElement, file, err);
+    return OU::esprintf("For <%s> XML file %s:  %s", xml->name, file, err);
   static const char *attrs[] = { ALL_ATTRS, NULL };
   const char *attr;
   for (const char **ap = attrs; *ap; ++ap)
-    if ((attr = ezxml_cattr(xml, *ap)))
-      printf("%s=%s\n", *ap, attr);
+    if ((attr = ezxml_cattr(xml, *ap))) {
+      auto it = attrMap.find(*ap);
+      if (it != attrMap.end() && !it->second[0])
+	continue;
+      printf("%s=%s\n", it == attrMap.end() ? *ap : it->second, attr);
+    }
   return NULL;
 }

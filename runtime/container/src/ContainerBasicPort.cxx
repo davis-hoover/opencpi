@@ -1148,6 +1148,7 @@ namespace OCPI {
 		  this, isProvider(), &p.m_initial, p.m_initial.length(), p.m_initial.data());
 	packPortDesc(*result, p.m_initial);
 	uint32_t *p32 = (uint32_t*)p.m_initial.data();
+	(void)p32;
 	ocpiDebug("pack1 %p prov %u initial %p length %zu data %p %x %x %x %x",
 		  this, isProvider(), &p.m_initial, p.m_initial.length(),
 		  p.m_initial.data(), p32[0], p32[1], p32[2], p32[3]);
