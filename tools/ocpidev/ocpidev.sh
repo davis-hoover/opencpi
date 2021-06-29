@@ -2438,7 +2438,7 @@ fi
 	RccPlatforms=$OCPI_TOOL_PLATFORM$build_suffix
     else
 	# add the suffix to all platforms and check that we are not already using suffixes
-	for $p in ${RccPlatforms[@]}; do
+	for p in ${RccPlatforms[@]}; do
 	    [[ $p == *-* ]] &&
 		bad "You cannot use the --dynamic or --optimize build options and also specify build options in a platform name (in this case: $p)"
 	    newplats+=($p$build_suffix)
