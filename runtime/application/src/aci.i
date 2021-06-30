@@ -195,6 +195,9 @@
     $1 = (OA::PValue *)temppv.list();
   }
 }
+%ignore OCPI::API::PValue::length() const;
+%ignore OCPI::API::PValue::unparse(std::string &value, bool append = false) const;
+
 
 #if 1
 %typemap(in) const char * {
