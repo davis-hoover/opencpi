@@ -15,22 +15,22 @@
   <Device name='platform_ad9361_config' card='fmcomms_2_3_lpc_scdcd'>
     <Property name='pin_control_p' value='true'/>
   </Device>
-  <Device name='data_src_qadc_ad9361_sub' card='fmcomms_2_3_lpc_scdcd'/>
-  <Device name='data_sink_qdac_ad9361_sub' card='fmcomms_2_3_lpc_scdcd'/>
-  <Device name='data_src_qadc0' card='fmcomms_2_3_lpc_scdcd'>
+  <Device name='data_src_qadc_csts_ad9361_sub' card='fmcomms_2_3_lpc_scdcd'/>
+  <Device name='data_sink_qdac_csts_ad9361_sub' card='fmcomms_2_3_lpc_scdcd'/>
+  <Device name='data_src_qadc_csts0' card='fmcomms_2_3_lpc_scdcd'>
     <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
   </Device>
-  <Device name='data_sink_qdac0' card='fmcomms_2_3_lpc_scdcd'>
+  <Device name='data_sink_qdac_csts0' card='fmcomms_2_3_lpc_scdcd'>
     <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
   </Device>
   <Connection external='in_to_asm_rx_path_from_adc'
               port='out'
-              device='data_src_qadc0'
-	      card='fmcomms_2_3_lpc_scdcd'/>
+              device='data_src_qadc_csts0'
+	      card='fmcomms_2_3_csts_lpc_scdcd'/>
   <Connection external='out_from_asm_tx_path_to_dac'
               port='in'
-              device='data_sink_qdac0'
-	      card='fmcomms_2_3_lpc_scdcd'/>
+              device='data_sink_qdac_csts0'
+	      card='fmcomms_2_3_csts_lpc_scdcd'/>
   <Connection external='out_from_asm_rx_path0' interconnect='zynq_ultra'/>
   <Connection external='in_to_asm_tx_path0' interconnect='zynq_ultra'/>
 </HdlContainer>

@@ -1,1 +1,1 @@
-../../../../platform/hdl/platforms/zcu104/cnt_zcu104_fmcomms_2_3_scdcd.xdc
+../../../../platform/hdl/platforms/zcu104/cnt_zcu104_fmcomms_2_3_csts_scdcd.xdc
