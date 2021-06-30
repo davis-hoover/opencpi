@@ -110,9 +110,9 @@ parseApplications(ezxml_t xml) {
 }
 
 #define HDL_LIBRARY_AND_CORE_ATTRS \
-  "SourceFiles","NameSpace", "Libraries", "HdlNoLibraries",  "HdlLibraries"
+  "SourceFiles","NameSpace", "Libraries", "NoLibraries",  "HdlLibraries"
 
-#define HDL_LIBRARY_ONLY_ATTRS "HdlNoElaboration"
+#define HDL_LIBRARY_ONLY_ATTRS "NoElaboration"
 static const char *
 parseHdlLibrary(ezxml_t xml) {
   const char *err;
@@ -120,10 +120,12 @@ parseHdlLibrary(ezxml_t xml) {
 			    HDL_LIBRARY_ONLY_ATTRS, NULL)) ||
       (err = OE::checkElements(xml, NULL)))
     return err;
+  attrMap["NoLibraries"] = "HdlNoLibraries";
+  attrMap["NoElaboration"] = "HdlNoElaboration";
   return NULL;
 }
 
-#define HDL_CORE_ONLY_ATTRS "Top"
+#define HDL_CORE_ONLY_ATTRS "Top", "PrebuiltCore"
 static const char *
 parseHdlCore(ezxml_t xml) {
   const char *err;
@@ -154,7 +156,7 @@ parseHdlPlatforms(ezxml_t xml) {
   return NULL;
 }
 
-#define HDL_ASSEMBLY_ATTRS  "Containers"
+#define HDL_ASSEMBLY_ATTRS  "Containers", "DefaultContainers"
 static const char *
 parseHdlAssembly(ezxml_t xml) {
   const char *err;

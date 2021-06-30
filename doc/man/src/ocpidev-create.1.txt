@@ -141,7 +141,7 @@ Options When Creating Projects, Libraries, Workers, HDL Devices or HDL Platforms
 Options When Creating Specs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 *-n*::
-   Do not create a control interface for the spec. This
+   Add the attribute to the component spec that indicates there will be no control interface.  This
    option is rarely used or recommended. It is required
    for certain infrastructure specs and only applies to
    specs with only HDL implementations.

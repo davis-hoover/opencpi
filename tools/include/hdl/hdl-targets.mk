@@ -151,13 +151,16 @@ HdlToolSet_cyclone5:=quartus
 # In other stages, use the HdlExactPart if set, or the Default part if set,
 # or the first part for this target
 # Note that the return part is still in the opencpi canonical form
-HdlChoosePart=$(strip \
-  $(if $(findstring $(HdlMode),platform config container),\
+HdlChoosePart=$(foreach c,\
+  $(if $(filter $(HdlMode),platform config container),\
     $(HdlPart_$(HdlPlatform)),\
     $(or \
+      $(foreach p,$(HdlExactParts),$(strip\
+        $(foreach f,$(word 1,$(subst :, ,$p)),\
+          $(and $(filter $f,$(HdlTarget)),$(word 2,$(subst :, ,$p)))))),\
       $(HdlExactPart),\
       $(HdlDefaultTarget_$(HdlTarget)),\
-      $(firstword $(HdlTargets_$(HdlTarget))))))
+      $(firstword $(HdlTargets_$(HdlTarget))))),$(info CHOOSEPART:$c)$c)
 
 # Make the initial definition as a simply-expanded variable
 HdlAllPlatforms:=
