@@ -1,0 +1,4 @@
+<application fileName='copyFile'
+	     runafter='> /dev/null; cmp hello.file out.file'
+             runargs='fooby'
+	     cleanfiles='out.file'/>

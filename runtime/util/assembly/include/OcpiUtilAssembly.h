@@ -48,6 +48,8 @@
 #include "OcpiPValue.h"
 #include "OcpiUtilMisc.h"
 
+#define OCPI_ASSY_ELEMENTS "instance", "connection", "policy", "property", "external"
+
 namespace OCPI {
   namespace Util {
     // This class is the bottom of a three-level stack of assembly handling.
@@ -183,8 +185,7 @@ namespace OCPI {
                             bool bidi, bool known, size_t index,
                             const OCPI::Util::PValue *params, Port *&);
 	const char *addExternal(External &ext, size_t index, size_t count);
-        const char *parsePort(ezxml_t x, Assembly &a, const PValue *pvl, const PValue *params,
-			      Port *&p);
+        const char *parsePort(ezxml_t x, Assembly &a);
       };
       typedef std::list<Connection *> Connections;
       // Potentially specified in the assembly, what policy should be used

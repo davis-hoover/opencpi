@@ -220,14 +220,28 @@ def build_docs(repo_dir: Path):
 
 def copy_man(src_dir: Path, dst_dir: Path):
     """
-    Copy HTML man pages if they exist. Currently the man pages are already
-    rendered in HTML but there is future work planned to rendered the man pages
-    to HTML using the source located at doc/man/src/
+    Copy HTML man pages if they exist.  Prior to v2.2.0, the man
+    pages were supplied pre-rendered in HTML: effective with that
+    release, the HTML man pages are generated as part of doing an
+    OpenCPI installation using the source located at doc/man/src/
     """
     html_man_dir = src_dir / "doc" / "man" / "html"
     if not html_man_dir.exists():
         logging.info(f"No HTML man pages found at {html_man_dir}")
-        return
+        man_mk = src_dir / "doc" / "man" / "Makefile"
+        if man_mk.exists():
+            # post-v2.1.1: build the man pages.
+            logging.info(f'"{man_mk}" found: building man pages')
+            cmd = ["bash", "-c", f'cd {src_dir} ; \
+scripts/install-packages.sh ; \
+scripts/install-prerequisites.sh ; \
+source cdk/opencpi-setup.sh -s ; \
+make -C doc/man']
+            logging.debug(f'Executing "{cmd}" in directory "{src_dir}"')
+            subprocess.check_call(cmd)
+            html_man_dir = src_dir / "doc" / "man" / "gen" / "html"
+        else:
+            return
 
     os.makedirs(str(dst_dir), exist_ok=True)
     for f in find_files(html_man_dir, recursive=False):
@@ -364,9 +378,14 @@ def gen_release_index(tag: str, is_latest=False):
         logging.debug(f"rootpath: {rootpath}")
         logging.debug(f"base_url: {base_url}")
 
+        # Create dict of UrlLinks indexed by pdf name
+        file_links = dict()  # type: Dict[str, UrlLink]
+
         if pdf_dir == rootpath:
             section_name = "main"
             section_title = "Main Documentation"
+            # For now, just for the main "opencpi" project.
+            file_links["changelog"] = UrlLink(name="Changelog", url=f'https://gitlab.com/opencpi/opencpi/-/blob/{tag}/CHANGELOG.md')
         else:
             # Projects
             section_name = rootpath.name.lower().replace("-", "_")
@@ -385,8 +404,6 @@ def gen_release_index(tag: str, is_latest=False):
                 section_title += " Project Documentation"
             project_names.append(section_name)
 
-        # Create dict of UrlLinks indexed by pdf name
-        file_links = dict()  # type: Dict[str, UrlLink]
         for f in files:
             if f.endswith(".pdf"):
                 url = f"{base_url}/{f}"

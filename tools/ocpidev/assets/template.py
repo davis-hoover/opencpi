@@ -272,18 +272,7 @@ APP_APPLICATION_XML = ("""<applications>
 </applications>
 \n""")
 
-APP_APPLICATION_NAME_APP_XML = ("""<application>
-    <!-- This is the application XML build file (not the app XML itself) for the "{{app}}" application
-    If there is a {{app}}.cc (or {{app}}.cxx) file, it will be assumed to be a C++ main program to build and run
-    If there is a {{app}}.xml file, it will be assumed to be an XML app that can be run with ocpirun.
-    The RunArgs attribute can be set to a standard set of arguments to use when executing either. -->
-</application>
-\n""")
-
 APP_APPLICATION_APP_CC = ("""#include <iostream>
-#include <unistd.h>
-#include <cstdio>
-#include <cassert>
 #include <string>
 #include "OcpiApi.hh"
 

@@ -36,9 +36,9 @@ can be applied to the procedures described in that section.
 
 The following documents can also be used as reference to the tasks described in this document:
 
-* `OpenCPI User Guide <https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_User_Guide.pdf>`_
+* `OpenCPI User Guide <https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_User_Guide.pdf>`_
   
-* `OpenCPI Glossary <https://opencpi.gitlab.io/releases/develop/docs/OpenCPI_Glossary.pdf>`_
+* `OpenCPI Glossary <https://opencpi.gitlab.io/releases/latest/docs/OpenCPI_Glossary.pdf>`_
 
 Note that the *OpenCPI Glossary* is also contained in both the *OpenCPI Installation Guide* and the
 *OpenCPI User Guide*.
@@ -213,6 +213,62 @@ and then change the Ethernet address to be unique. For example:
 
 where  ``00:0a:35:00:01:24`` is the unique MAC address for the ZedBoard.
 
+
+Setting up the Hardware
+-----------------------
+
+The *OpenCPI Installation Guide* describes the procedure to establish
+a serial console and boot the system. This section provides Zedboard-specific
+information that applies to these tasks.
+
+Establishing a Serial Console Connection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The *OpenCPI Installation Guide* has a section "Establishing a
+Serial Console Connection" that describes the procedure to establish
+a serial console. On Zedboard systems, the console serial port
+operates at 115200 baud. The cable used is a micro-USB to USB-A
+cable to connect its console micro-USB port to the development host.
+
+Booting the Zedboard from the SD Card
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Zedboard unit needs to be configured to boot from
+the SD card. To configure the unit and then boot from the SD card:
+
+1. Remove power from the Zedboard unit.
+
+2. On the top of the Zedboard unit, set the following jumpers
+   to boot from the SD card:
+   
+   * Set JP10 to 3.3V.
+
+   * Set JP9 to 3.3V.
+
+   * Set JP8 to GND.
+
+   * Set VADJ SELECT (J18) to 2V5 to ensure proper FMC
+     configuration. The only supported FMC voltage for
+     OpenCPI bitstreams is 2.5V.
+
+.. figure:: figures/zed_top.jpg
+   :alt: Zedboard Top View with J10, J9, J8 Set
+   :align: center
+
+   Zedboard Top View with J10, J9, J8 Set
+
+3. Insert the SD card into the SD card slot.
+
+4. Connect a terminal to the micro-USB connector
+   on the Zedboard labeled **UART**. The baud rate
+   should be 115200.
+
+5. On the development host, start the terminal emulator
+   (usually with the ``screen`` command) at 115200 baud.
+
+6. Apply power to the Zedboard with the terminal still connected.
+   
+
 Configuring the Runtime Environment on the Platform
 ---------------------------------------------------
 
@@ -232,7 +288,7 @@ enter ``boot`` to allow the boot sequence to continue:
 After a successful boot to PetaLinux, log in to the system
 using ``root`` for user name and password:
 
-.. figures/figure:: zed_boot.png
+.. figure:: figures/zed_boot.png
    :alt: Successful Boot to PetaLinux
    :align: center
 
@@ -288,7 +344,7 @@ has been removed from the main body of this document.
 OpenCPI has been tested on revisions C and D of the ZedBoard. However,
 limitations have been observed for both revisions when used with the
 Zipper daughtercard. See the document
-`OpenCPI Zipper/Myriad-RF 1 Daughtercards <https://opencpi.gitlab.io/releases/develop/docs/assets/Myriad-RF_1_Zipper_Limitations.pdf>`_
+`OpenCPI Zipper/Myriad-RF 1 Daughtercards <https://opencpi.gitlab.io/releases/latest/docs/assets/Myriad-RF_1_Zipper_Limitations.pdf>`_
 for details.
 
 .. figure:: figures/zed_zipper.jpg

@@ -57,6 +57,8 @@ def main():
         ocpicreate(args)
     elif args.verb in ['set', 'unset']:
         ocpi_set_unset(args)
+    elif args.verb =='refresh':
+        ocpirefresh(args)
 
     try:
     # Try to instantiate the appropriate asset from noun
@@ -153,6 +155,28 @@ def ocpicreate(args):
         sys.exit(1)
     sys.exit()
 
+def ocpirefresh(args):
+    """
+    Generate project metadata by calling the refresh method
+    """
+    name = getattr(args, 'name', '')
+    name = name if name else ''
+    directory = str(Path(args.directory, name))
+    if ocpiutil.get_dirtype(directory) != "project":
+        try:
+            projdir = ocpiutil.get_path_to_project_top(directory)
+        except ocpiutil.OCPIException as e:
+           raise ocpiutil.OCPIException(directory + " must be inside a project tree")
+        directory = projdir
+
+    try:
+        asset_factory = ocpiassets.factory.AssetFactory()
+        project = asset_factory.factory('project', directory, name)
+        project.refresh()
+    except ocpiutil.OCPIException as e:
+        ocpiutil.logging.error(e)
+        sys.exit(2)
+    sys.exit()
 
 def ocpidev_sh():
     """Calls ocpidev.sh and exits"""
