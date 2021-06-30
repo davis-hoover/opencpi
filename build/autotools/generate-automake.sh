@@ -370,8 +370,6 @@ while read path opts; do
 	ldadd="libocpi_${lname} $ldadd"
 	echo "if !ocpi_is_cross"
 	do_library "swig" $base $wrap "-prefer-pic" "$ldflags" "$ldadd" $dest
-	command -v python2-config > /dev/null && [[ $(python -c "import sys;print(sys.version)") == 2* ]] && 
-          do_library "swig" ${base}2 $wrap "-prefer-pic" "$ldflags" "$ldadd" $dest 2
 	echo endif
     fi
   }
