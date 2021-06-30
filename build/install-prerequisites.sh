@@ -53,7 +53,7 @@ if [ -f $timestamp ]; then
     exit 0
   fi
 fi
-$OCPI_CDK_DIR/scripts/enable-rcc-platform.sh $1
+$OCPI_CDK_DIR/scripts/enable-rcc-platform.sh $OCPI_TARGET_PLATFORM
 echo Building/installing prerequisites for the $OCPI_TARGET_DIR platform, now running on $OCPI_TOOL_PLATFORM.
 echo Building prerequisites in $OCPI_PREREQUISITES_BUILD_DIR.
 echo Installing them in $OCPI_PREREQUISITES_INSTALL_DIR.
