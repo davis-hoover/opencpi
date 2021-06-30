@@ -141,7 +141,7 @@ for t in $tests; do
       OCPI_LIBRARY_PATH=$OCPI_CDK_DIR/$OCPI_TARGET_DIR/artifacts \
 		       python3 <<-EOF
 	import opencpi.aci as OA
-	app=OA.Application(b"$OCPI_ROOT_DIR/projects/assets/applications/bias.xml")
+	app=OA.Application("$OCPI_ROOT_DIR/projects/assets/applications/bias.xml")
 	EOF
       [ -f $OCPI_CDK_DIR/$OCPI_TARGET_DIR/lib/opencpi2/_aci.so ] &&
       command -v python2-config > /dev/null && [[ $(python2 -c "import sys;print(sys.version)") == 2* ]] &&
