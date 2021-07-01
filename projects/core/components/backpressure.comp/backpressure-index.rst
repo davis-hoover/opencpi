@@ -46,19 +46,15 @@ A block diagram representation of the implementation is given in :numref:`backpr
 .. _backpressure-diagram:
 
 .. figure:: ../backpressure.test/doc/figures/backpressure_comp_block.svg
-   :alt: Back Pressure Block Diagram
+   :alt:
    :align: center
 
-   Block diagram of back pressure implementation.
+   Back Pressure Block Diagram
 
 Interface
 ---------
 .. literalinclude:: ../specs/backpressure-spec.xml
    :language: xml
-
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled.
 
 Properties
 ~~~~~~~~~~

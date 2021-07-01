@@ -32,3 +32,12 @@ Detail
 ------
 
 .. ocpi_documentation_worker::
+
+   suppressWrites: Do not write any data to the file.
+
+   countData: Check that the data is a series of 32-bit incrementing values starting at zero.
+
+   bytesPerSecond: The data rate during the application.
+
+
+

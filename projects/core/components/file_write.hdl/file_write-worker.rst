@@ -39,6 +39,3 @@ Detail
 
   in: Data written to file.
 
-Utilization
------------
-.. ocpi_documentation_utilization::
