@@ -40,7 +40,7 @@ class RccPlatformsCollection(ShowableAsset):
     def __init__(self, directory, name=None, **kwargs):
         self.check_dirtype("rcc-platforms", directory)
         super().__init__(directory, name, **kwargs)
-
+        
         self.platform_list = []
         if kwargs.get("init_hdlplats", False):
             logging.debug("Project constructor creating HdlPlatformWorker Objects")
@@ -122,32 +122,17 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         raise NotImplementedError("HdlPlatformsCollection.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of an HDL Platform Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
-        if name: ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        # ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
+        if name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
         if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
         return ocpiutil.get_path_to_project_top() + "/hdl/platforms"
-
-    def get_subdir(self, **kwargs):
-        """TODO: docstrings bad args and kwargs"""
-        platform_name = kwargs.pop('platform', None)
-        if not platform_name:
-            err_msg = ' '.join(['must choose a platform (-P) when operating', 
-                                'from a platforms directory'])
-            raise ocpiutil.OCPIException(err_msg)
-
-        platform_path = Path(self.directory, platform_name)
-        if not platform_path.exists():
-            err_msg = 'the platform {} does not exist in {}'.format(
-                platform_name, self.directory) 
-        platform = HdlPlatformWorker(str(platform_path))
-
-        return platform.get_subdir(**kwargs)
 
 
 # pylint:disable=too-many-ancestors
@@ -252,33 +237,22 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         return util_report
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Platform given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, hdl_platform)
-        if not name: ocpiutil.throw_not_blank_e("hdl-platform", "name", True)
-        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms", "hdl-platform"]:
-            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms", "hdl-platform"])
-        return ocpiutil.get_path_to_project_top() + "/hdl/platforms/" + name
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
+        # if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
+        #     ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        hdl_path = Path(project_path, 'hdl')
+        if not hdl_path.exists() and not ensure_exists:
+            hdl_path.mkdir()
+        working_path = Path(hdl_path, 'platforms', name)
+        return str(working_path)
 
-    def get_subdir(self, **kwargs):
-        """ TODO: docstring and kwargs """
-        noun = kwargs.get('hdl-noun', '')
-        if noun == 'card':
-            err_msg = 'cannot specify a card within a platform'
-            raise ocpiutil.OCPIException(err_msg)
-        for key in ['platform', 'project']:
-            if not kwargs.get(key, None):
-                continue
-            err_msg = 'cannot specify a {} within a platform'.format(key)
-            raise ocpiutil.OCPIException(err_msg)
-        subdir_path = Path(self.directory, 'devices')
-        if not subdir_path.exists():
-            subdir_path.exists()
-
-        return str(subdir_path)
 # pylint:enable=too-many-ancestors
 
 class HdlPlatformWorkerConfig(HdlAssembly):

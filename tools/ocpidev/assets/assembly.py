@@ -21,6 +21,7 @@ Defintion of HDL assembly and related classes
 """
 
 import logging
+from pathlib import Path
 import _opencpi.util as ocpiutil
 import _opencpi.hdltargets as hdltargets
 from .factory import AssetFactory
@@ -182,17 +183,24 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
         return util_report
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Assembly given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, hdl_platform)
-        if not name: ocpiutil.throw_not_blank_e("hdl-assembly", "name", True)
-        if ocpiutil.get_dirtype() not in ["project", "hdl-assemblies", "hdl-assembly"]:
-            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-assemblies", "hdl-assembly"])
-        if not name: ocpiutil.throw_not_blank_e("hdl-assembly", "name", True)
-        return ocpiutil.get_path_to_project_top() + "/hdl/assemblies/" + name
+        # ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, hdl_platform)
+        if not name: 
+            ocpiutil.throw_not_blank_e("hdl-assembly", "name", True)
+        # if ocpiutil.get_dirtype() not in ["project", "hdl-assemblies", "hdl-assembly"]:
+        #     ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-assemblies", "hdl-assembly"])
+
+        working_path = Path(ocpiutil.get_path_to_project_top())
+        hdl_path = Path(working_path, 'hdl')
+        if not hdl_path.exists() and not ensure_exists:
+            hdl_path.mkdir()
+        working_path = Path(hdl_path, 'assemblies')
+        
+        return str(working_path)
 
 class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
     """

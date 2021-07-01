@@ -172,21 +172,19 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
         raise NotImplementedError("Library.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform, ensure_exists=False):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a Library given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
         # if more then one of the library location variables are not None it is an error.
         # a length of 0 means that a name is required and a default location of components/
-        directory = ocpiutil.get_path_to_project_top()
-        working_path = Path(directory)
-        # working_path = Path(Asset.get_working_dir(name, library, hdl_library, hdl_platform))
+        working_path = Path(ocpiutil.get_path_to_project_top())
         
-        if len(list(filter(None, [library, hdl_library, hdl_platform]))) > 1:
-            ocpiutil.throw_invalid_libs_e()
+        # if len(list(filter(None, [library, hdl_library, hdl_platform]))) > 1:
+        #     ocpiutil.throw_invalid_libs_e()
         if name: 
-            ocpiutil.check_no_libs('library', library, hdl_library, hdl_platform)
+            # ocpiutil.check_no_libs('library', library, hdl_library, hdl_platform)
             if name != 'components' and ocpiutil.get_dirtype() != 'libraries':
                 comp_path = Path(working_path, 'components')
                 if not comp_path.exists():
@@ -195,7 +193,7 @@ class Library(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ReportableAss
             else:
                 working_path = Path(working_path, name)
         else:
-            ocpiutil.throw_specify_lib_e()
+            ocpiutil.throw_not_blank_e("library", "name", True)
 
         return str(working_path)
 

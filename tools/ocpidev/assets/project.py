@@ -25,7 +25,6 @@ import logging
 import json
 import jinja2
 from pathlib import Path
-import subprocess
 import _opencpi.util as ocpiutil
 import _opencpi.assets.template as ocpitemplate
 from .abstract import (RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset,
@@ -993,14 +992,14 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
               "\nFrom the registry: " + os.path.realpath(reg.directory))
 
     def refresh(self):
-         """
-         Generate a new copy of project metadata
-         """
-         directory = self.directory
-         assert ocpiutil.get_dirtype(directory) == "project"
-         cdkdir = os.environ.get('OCPI_CDK_DIR')
-         metacmd = cdkdir + "/scripts/genProjMetaData.py "
-         os.system(metacmd + directory)
+        """
+        Generate a new copy of project metadata
+        """
+        self.check_dirtype("project", self.directory)
+        sys.path.append(os.getenv('OCPI_CDK_DIR') + '/scripts/')
+        import genProjMetaData
+
+        genProjMetaData.main(self.directory)
 
     def registry(self):
         """
@@ -1065,20 +1064,23 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             print()
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform, do_create=False):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a Project given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
         cur_dirtype = ocpiutil.get_dirtype()
-        
+        working_path = Path.cwd()
+        if cur_dirtype and cur_dirtype != "project":
+            working_path = Path(ocpiutil.get_path_to_project_top())
+        cur_dirtype = ocpiutil.get_dirtype(str(working_path))
+
         if cur_dirtype not in [None, "project"]:
             ocpiutil.throw_not_valid_dirtype_e(["project"])
         if cur_dirtype == "project":
-            return str(Path.cwd())
+            return str(working_path)
         else:
             return name
-
 
     def get_subdir(self, **kwargs):
         """

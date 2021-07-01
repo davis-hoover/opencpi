@@ -25,7 +25,6 @@ import os.path
 import logging
 from glob import glob
 from pathlib import Path
-import subprocess
 import re
 import xml.etree.ElementTree as xt
 from _opencpi.util import cd, set_vars_from_make, OCPIException
@@ -112,6 +111,7 @@ def get_dir_info(directory=".", careful=False):
         # Do we need to check for project-package-id file in exports?
         make_type = asset_type = "project"
     elif len(parts) > 1:
+        print(parts[-1])
         if parts[-1] == "test":
             name += "-test"
             top_xml_elements = ["tests"]
@@ -549,7 +549,7 @@ def get_all_projects():
 ###############################################################################
 
 VALID_PLURAL_NOUNS = ["tests", "libraries", "workers"]
-def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_platform=None, ensure_exists=False):
+def get_ocpidev_working_dir(noun, name, ensure_exists=False, **kwargs):
     """
     TODO
     notes:
@@ -607,8 +607,7 @@ def get_ocpidev_working_dir(noun, name, library=None, hdl_library=None, hdl_plat
     # pylint:enable=no-member
 
     if noun in working_dir_dict:
-        asset_dir = working_dir_dict[noun](
-            name, library, hdl_library, hdl_platform, ensure_exists)
+        asset_dir = working_dir_dict[noun](name, ensure_exists=ensure_exists, **kwargs)
     else:
         raise OCPIException("Invalid noun \"" + noun + "\" .  Valid nouns are: " +
                             ' '.join(working_dir_dict.keys()))
@@ -714,22 +713,21 @@ if __name__ == "__main__":
     sys.exit(doctest.testmod()[0])
 
 
-def get_cdk_path():
+def get_cdk_dir():
     """
     Gets the OCPI_CDK_DIR environment variable and verifies that it has
     been set correctly.
     """
     err_msg = None
     if 'OCPI_CDK_DIR' not in os.environ:
-        err_msg = 'Error: OCPI_CDK_DIR environment setting not found'
+        err_msg = 'OCPI_CDK_DIR environment setting not found'
     cdk_path = Path(os.environ['OCPI_CDK_DIR'])
     if not cdk_path.is_dir():
-        err_msg = 'Error: OCPI_CDK_DIR environment setting invalid'
+        err_msg = 'OCPI_CDK_DIR environment setting invalid'
     if err_msg:
-        logging.error(err_msg)
-        sys.exit(1)
+        raise OCPIException(err_msg)
 
-    return cdk_path
+    return str(cdk_path)
 
 
 def change_dir(directory):

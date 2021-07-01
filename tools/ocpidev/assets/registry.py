@@ -41,12 +41,13 @@ class Registry(ShowableAsset):
 
     def __init__(self, directory, name=None, **kwargs):
         super().__init__(directory, name, **kwargs)
-
+        
         # Each registry instance has a list of projects registered within it.
         # Initialize this list by probing the file-system for links that exist
         # in the registry directory.
         # __projects maps package-ID --> project instance
         self.__projects = {}
+        print(self.directory)
         for proj in glob(self.directory + '/*'):
             pid = os.path.basename(proj)
             if os.path.exists(proj):
@@ -492,8 +493,4 @@ class Registry(ShowableAsset):
                     'environment variable. Unset variable before attempting to delete'])
         if err_msg:
             raise ocpiutil.OCPIException(err_msg)
-        if not force:
-            prompt = "Delete the project registry at".format(self.directory)
-            force = ocpiutil.get_ok(prompt=prompt)
-        if force:
-            shutil.rmtree(self.directory)
+        super().delete('project registry', force=force)

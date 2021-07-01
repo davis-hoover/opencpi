@@ -67,12 +67,31 @@ class Application(RunnableAsset, RCCBuildableAsset):
         raise NotImplementedError("Application.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform, do_create):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of an Application given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        working_path = Path(ocpiutil.get_path_to_project_top(), 'applications')
+        if not name: 
+            ocpiutil.throw_not_blank_e("application", "name", True)
+        
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        apps_path = Path(project_path, 'applications')
+        app_path = Path(apps_path, name)
+        xml_path = Path(apps_path, name+'.xml')
+        if ensure_exists:
+            if xml_path.exists():
+                working_path = xml_path
+            elif app_path.exists():
+                working_path = app_path
+            else:
+                err_msg = ' '.join(['Unable to find application "{}"'.format(name), 
+                                    'in directory {}'.format(str(apps_path))])
+                raise ocpiutil.OCPIException(err_msg)
+        elif kwargs.get('xml_app', False):
+            working_path = xml_path
+        else:
+            working_path = app_path
 
         return str(working_path)
         
@@ -86,8 +105,6 @@ class Application(RunnableAsset, RCCBuildableAsset):
         if fnmatch.fnmatch(name, '*.xml') or os.path.exists(top + name + ".xml"):
             return top
         return top + name
-
-
 
 
     def _get_template_dict(name, directory, **kwargs):
@@ -108,7 +125,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         Static method to create a new Application
         """
-        Application.check_dirtype('applications', directory)
+        # Application.check_dirtype('applications', directory)
 
         # if dirtype == "project":
         #     if kwargs.get("verbose", True):
@@ -125,24 +142,28 @@ class Application(RunnableAsset, RCCBuildableAsset):
         # currtype = ocpiutil.get_dirtype(currdir)
         # if not currtype == "applications":
         #     raise ocpiutil.OCPIException(currdir + " must be of type applications")
-
-        namedir = str(Path(directory, name))
-        application_xml_path = Path(directory, name)
+        app_path = Path(directory)
+        apps_path = app_path.parent
+        if not apps_path.exists():
+            apps_path.mkdir()
+        os.chdir(str(apps_path))
+        application_xml_path = Path(apps_path, name)
         template_dict = Application._get_template_dict(name, directory, **kwargs)
         if not application_xml_path.exists():
             template = jinja2.Template(ocpitemplate.APP_APPLICATION_XML, trim_blocks=True)
             ocpiutil.write_file_from_string("application.xml", template.render(**template_dict))
+        if app_path.exists():
+            raise ocpiutil.OCPIException('application "{}" already exists at {}'.format(
+                name, str(app_path)))
         if kwargs.get("xml_app", False):
             template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_XML, trim_blocks=True)
-            ocpiutil.write_file_from_string(name + ".xml", template.render(**template_dict))
+            ocpiutil.write_file_from_string(directory, template.render(**template_dict))
             if kwargs.get("verbose", False):
-                print("XML application '" + name + "' was created as 'applications/" + name + ".xml'")
+                print("XML application '" + name + "' was created as 'applications/" + directory)
             return
 
-        if os.path.exists(namedir):
-            raise ocpiutil.OCPIException(namedir + " already exists.")
-        os.mkdir(namedir)
-        os.chdir(namedir)
+        app_path.mkdir()
+        os.chdir(str(app_path))
         if kwargs.get("verbose", False):
             print("Application '" + name +"' was created in the directory 'applications/" + name + "'")
         if not kwargs.get("xml_dir_app", True):

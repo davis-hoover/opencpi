@@ -122,7 +122,12 @@ class ShowableComponent(ShowableAsset):
         Determine the Package id based on the library or project that the Worker resides in.  only
         a component will reside at the top level of a project.
         """
-        parent_dir = self.directory + "/../"
+        parent_path = Path(self.directory).parent
+        if parent_path.name == 'specs':
+            parent_dir = str(parent_path.parent)
+        else:
+            parent_dir = str(parent_path)
+            
         if ocpiutil.get_dirtype(parent_dir) == "library":
             ret_val = ocpiutil.set_vars_from_make(ocpiutil.get_makefile(parent_dir, "library"),
                                                   mk_arg="showpackage ShellLibraryVars=1",
@@ -320,7 +325,7 @@ class Component(ShowableComponent):
     def __init__(self, directory, name=None, **kwargs):
         if not name:
             name = os.path.basename(directory)
-        directory = os.path.dirname(directory)
+        # directory = os.path.dirname(directory)
         self.ocpigen_xml = directory + "/" + name
         super().__init__(directory, name, **kwargs)
 
@@ -358,64 +363,111 @@ class Component(ShowableComponent):
             print()
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform, ensure_exists=True):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a Component given the name (name) and
-        library specifiers (library, hdl_library, hdl_platform)
+        library specifiers (library, hdl_library, hdl_platform, or project specs)
         """
         # if more then one of the library location variable are not None it is an error.
         # a length of 0 assumes default location of <project>/specs
-        if len(list(filter(None, [library, hdl_library, hdl_platform]))) > 1:
-            ocpiutil.throw_invalid_libs_e()
-        working_path = Path().cwd()
-        hdl_path = Path(working_path, 'hdl')
-        if library:
-            working_path = Path(working_path, 'components', library)
-            if not working_path.exists():
-                err_msg = 'specified library "{}" does not exist'.format(library)
-                raise ocpiutil.OCPIException(err_msg)
-        elif hdl_library:
-            if not hdl_path.exists() and not ensure_exists:
-                hdl_path.mkdir()
-            working_path = Path(hdl_path, hdl_library)
-        elif hdl_platform:
-            working_path = Path(hdl_path, 'platforms', hdl_platform)
-            
-        dirtype = ocpiutil.get_dirtype(str(working_path))
-        valid_dirtypes = ["project", "libraries", "library", "hdl-platform"]
-        if dirtype not in valid_dirtypes:
-            ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
-        if dirtype == "hdl-platform":
-            devices_path = Path(working_path, 'devices')
-            if not devices_path.exists() and not ensure_exists:
-                devices_path.mkdir()
-            specs_path = Path(devices_path, 'specs')
-        elif dirtype in ['library', 'libraries']:
-            specs_path = Path(working_path, 'specs')
-        elif dirtype == 'project':
-            # if project:
-            #     specs_path = Path(working_path, 'specs')
-            # else:
-            comp_dir = Path(working_path, 'components')
-            if not comp_dir.exists():
-                err_msg = 'the "components" library does not exist'
-                raise ocpiutil.OCPIException(err_msg)
-            specs_path = Path(working_path, 'components', 'specs')
 
+        # library = kwargs.get('library', None)
+        # hdl_library = kwargs.get('hdl_library', None)
+        # platform = kwargs.get('platform', None)
+        # project = kwargs.get('project', False)
+        # if len(list(filter(None, [library, hdl_library, platform]))) > 1:
+        #     ocpiutil.throw_invalid_libs_e()
+
+        # working_path = Path().cwd()
+        # hdl_path = Path(working_path, 'hdl')
+        # if library:
+        #     working_path = Path(working_path, 'components', library)
+        #     if not working_path.exists():
+        #         err_msg = 'specified library "{}" does not exist'.format(library)
+        #         raise ocpiutil.OCPIException(err_msg)
+        # elif hdl_library:
+        #     if not hdl_path.exists() and not ensure_exists:
+        #         hdl_path.mkdir()
+        #     working_path = Path(hdl_path, hdl_library)
+        # elif platform:
+        #     working_path = Path(hdl_path, 'platforms', platform)
+            
+        # dirtype = ocpiutil.get_dirtype(str(working_path))
+        # valid_dirtypes = ["project", "libraries", "library", "hdl-platform"]
+        # if dirtype not in valid_dirtypes:
+        #     ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
+        # if dirtype == "hdl-platform":
+        #     devices_path = Path(working_path, 'devices')
+        #     if not devices_path.exists() and not ensure_exists:
+        #         devices_path.mkdir()
+        #     specs_path = Path(devices_path, 'specs')
+        # elif dirtype in ['library', 'libraries']:
+        #     specs_path = Path(working_path, 'specs')
+        # elif dirtype == 'project':
+        #     if project:
+        #         specs_path = Path(working_path, 'specs')
+        #     else:
+        #         comp_dir = Path(working_path, 'components')
+        #         if not comp_dir.exists():
+        #             err_msg = 'the "components" library does not exist'
+        #             raise ocpiutil.OCPIException(err_msg)
+        #         specs_path = Path(working_path, 'components', 'specs')
+
+        # if not specs_path.exists() and not ensure_exists:
+        #     specs_path.mkdir()
+        
+        # working_path = Component.get_filename(str(specs_path), name, ensure_exists)
+        
+        # return str(working_path)
+
+        cur_dirtype = ocpiutil.get_dirtype()
+        valid_dirtypes = ["project", "libraries", "library", "hdl-platform"]
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        project = kwargs.get('project', '')
+        working_path = Path.cwd()
+        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
+            ocpiutil.throw_invalid_libs_e()
+        if cur_dirtype not in valid_dirtypes:
+            ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
+        if not name:
+            ocpiutil.throw_not_blank_e("component", "name", True)
+
+        project_path = Path(ocpiutil.get_path_to_project_top())
+        if library:
+            if not library == 'components':
+                working_path = Path(project_path, 'components', library)
+            else:
+                working_path = Path(project_path, library)
+        elif hdl_library:
+            working_path = Path(project_path, hdl_library)
+        elif platform:
+            working_path = Path(
+                project_path, 'hdl', 'platforms', platform, 'devices')
+        elif project:
+            working_path = project_path
+        elif cur_dirtype == "hdl-platform":
+            working_path = Path(working_path, 'devices')
+        elif cur_dirtype == "project":
+            if ocpiutil.get_dirtype("components") == "libraries":
+                ocpiutil.throw_specify_lib_e()
+            working_path = Path(working_path, 'components')
+        
+        specs_path = Path(working_path, 'specs')
         if not specs_path.exists() and not ensure_exists:
             specs_path.mkdir()
-
-        working_path = Component.get_filename(
+        working_dir = Component.get_filename(
             str(specs_path), name, ensure_exists)
-        
-        return str(working_path)
+
+        return working_dir
 
     @staticmethod
     def get_filename(directory, name, ensure_exists=True):
         if ensure_exists:
             end_list = ["", ".xml", "_spec.xml", "-spec.xml"]
             for ending in end_list:
-                path = Path(directory, name, ending)
+                path = Path(directory, name+ending)
                 if path.exists():
                     return str(path)
             err_msg = 'Unable to find component "{}" in directory {}'.format(
@@ -425,12 +477,8 @@ class Component(ShowableComponent):
         path = Path(directory, name)
         path_stem = path.stem
         if not re.search('_spec$|-spec$', path_stem):
-            print('no')
             path_stem += '-spec'
         path_stem += '.xml'
         path = Path(directory, path_stem)
 
         return str(path)
-
-    # def delete(self, force=False):
-    #     comp_path = Path(self.directory, self.name)
