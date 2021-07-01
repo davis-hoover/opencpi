@@ -1178,7 +1178,7 @@ onlyExclude(const char *thing,
   return NULL;
 }
 
-Build::Build(Worker &w) : m_worker(w), m_globalParams(w) {
+Build::Build(Worker &w) : m_worker(w), m_globalParams(w), m_anyDefaultContainers(false) {
 }
 
 // Parse top-level attributes for the owd or build xml.  If buildFile arg not NULL, we are parsing
@@ -1279,6 +1279,23 @@ parse(ezxml_t x, const char *buildFile) {
       return "Invalid \"cores\" attribute:  worker model is not HDL";
     else if ((err = getHdlPrimitive(ti.token(), "core", m_cores)))
       return err;
+  for (OU::TokenIter ti(ezxml_cattr(x, "exactparts")); ti.token(); ti.next())
+    if (m != HdlModel)
+      return "Invalid \"exactparts\" attribute:  worker model is not HDL";
+    else
+      m_exactParts.push_back(ti.token());
+  for (OU::TokenIter ti(ezxml_cattr(x, "Containers")); ti.token(); ti.next())
+    if (m != HdlModel)
+      return "Invalid \"Containers\" attribute:  worker model is not HDL";
+    else
+      m_containers.push_back(ti.token());
+  for (OU::TokenIter ti(ezxml_cattr(x, "DefaultContainers")); ti.token(); ti.next())
+    if (m != HdlModel)
+      return "Invalid \"DefaultContainers\" attribute:  worker model is not HDL";
+    else {
+      m_defaultContainers.push_back(ti.token());
+      m_anyDefaultContainers = true;
+    }
   for (OU::TokenIter ti(ezxml_cattr(x, "configurations")); ti.token(); ti.next()) {
     if (m != HdlModel)
       return "Invalid \"configurations\" attribute:  worker model is not HDL";
@@ -1358,4 +1375,9 @@ writeMakeVars(FILE *mkf) {
   writeVar(mkf, "Cores", m_cores);
   writeVar(mkf, "RccStaticPrereqLibs", m_staticPrereqLibs);
   writeVar(mkf, "RccDynamicPrereqLibs", m_dynamicPrereqLibs);
+  writeVar(mkf, "HdlExactParts", m_exactParts);
+  writeVar(mkf, "Containers", m_containers);
+  if (m_anyDefaultContainers) // need to distinguish between not defined and empty
+    writeVar(mkf, "DefaultContainers", m_defaultContainers);
+
 }
