@@ -480,7 +480,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
                  or stage != 'generate-children')):
             # If the platform is an osp, clone the osp's repo
                 
-            path = '/'.join(['opencpi', 'projects', platform.project.group,
+            path = '/'.join(['opencpi', 'projects', 'osps',
                             platform.project.name])
             path = '"{}"'.format(path)
 
