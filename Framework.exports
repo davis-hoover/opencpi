@@ -283,7 +283,6 @@
 =runtime/hdl-support/scripts/loadFlash <target>/bin/
 =runtime/hdl-support/scripts/probeJtag <target>/bin/
 +runtime/hdl-support/scripts/ocpiview <target>/bin/
-+prerequisites/tar/<target>/bin/tar <target>/bin/
 # Enable all local bitstreams to be seen in one place for convenience of OCPI_LIBRARY_PATH
 +hdl/assemblies/*/container-*/target-*/*.bitz lib/hdl/assemblies/
 # for backward compatibility of system.xml files
