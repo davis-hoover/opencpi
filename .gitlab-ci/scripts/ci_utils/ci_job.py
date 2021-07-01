@@ -480,7 +480,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
                  or stage != 'generate-children')):
             # If the platform is an osp, clone the osp's repo
                 
-            path = '/'.join(['opencpi', 'projects', 'osps',
+            path = '/'.join(['opencpi', 'projects', platform.project.group,
                             platform.project.name])
             path = '"{}"'.format(path)
 
@@ -543,7 +543,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     if do_register:
         if platform.project.group == 'osp':
         # Platform is an osp, register its project
-            path = '/'.join(['projects', 'osps', 
+            path = '/'.join(['projects', platform.project.group, 
                              platform.project.name])
             path = '"{}"'.format(path)
             register_cmd = make_ocpidev_cmd(
