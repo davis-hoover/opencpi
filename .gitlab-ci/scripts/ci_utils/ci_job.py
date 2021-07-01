@@ -543,7 +543,7 @@ def make_before_script(pipeline, stage, stages, platform, host_platform=None,
     if do_register:
         if platform.project.group == 'osp':
         # Platform is an osp, register its project
-            path = '/'.join(['projects', platform.project.group, 
+            path = '/'.join(['projects', 'osps', 
                              platform.project.name])
             path = '"{}"'.format(path)
             register_cmd = make_ocpidev_cmd(
