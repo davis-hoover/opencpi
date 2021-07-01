@@ -140,6 +140,8 @@ PKGS_E+=(ocl-icd-libopencl1)
 PKGS_E+=(scons)
 #    Needed to build plutosdr osp
 PKGS_E+=(libssl-dev device-tree-compiler)
+#    Needed to build ettus_n310 osp
+PKGS_E+=(chrpath diffstat texinfo)
 #    Needed for asciidoc3
 #    -- see note about installing/enabling Felix Krull PPA below
 PKGS_E+=(python3.6)
