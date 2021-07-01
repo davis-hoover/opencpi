@@ -22,9 +22,9 @@
 %module "aci"
 // The following is needed so python3 will interpret
 // strings as bytes objects instead of unicode objects.
-%begin %{
-#define SWIG_PYTHON_STRICT_BYTE_CHAR
-%}
+//%begin %{
+//#define SWIG_PYTHON_STRICT_BYTE_CHAR
+//%}
 %include <exception.i>
 %include <std_string.i>
 %include <cstring.i>
@@ -32,7 +32,33 @@
 %include <stdint.i>
 %include <typemaps.i>
 
+ //%ignore "";
+ //%rename("%s") OCPI::API::Application;
+ //%rename("%s") OCPI::API::Application::Application;
+ //%rename("%s") ExternalPort;
+ //%rename("%s") ExternalBuffer;
+
+%ignore OCPI::API::PValue::length() const;
+%ignore OCPI::API::PValue::unparse(std::string &value, bool append = false) const;
+%ignore OCPI::API::AccessUnion;
+%ignore OCPI::API::Access;
+%ignore OCPI::API::PValue;
+%ignore OCPI::API::PVChar;
+%ignore OCPI::API::PVULong;
+%ignore OCPI::API::PVLongLong;
+%ignore OCPI::API::PVULongLong;
+%ignore OCPI::API::PVBool;
+%ignore OCPI::API::PVFloat;
+%ignore OCPI::API::PVDouble;
+%ignore OCPI::API::PVUShort;
+%ignore OCPI::API::PVLong;
+%ignore OCPI::API::PVShort;
+%ignore OCPI::API::PVString;
+%ignore OCPI::API::PVUChar;
+%ignore OCPI::API::Connection;
+%ignore OCPI::API::PropertyAccess;
 %apply std::string& OUTPUT {std::string& value};
+%ignore put();
 %ignore getBuffer(uint8_t *&data, size_t &length);
 %ignore getBuffer(uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData);
 %ignore getProperty(const std::string &a_name, std::string &value, AccessList &list = emptyList,
@@ -46,7 +72,9 @@
 		    bool uncached = false, bool *hiddenp = NULL);
 %ignore getProperty(const char* instance_name, const char* prop_name, std::string &value,
 			 bool hex = false);
-%ignore setProperty(const std::string &a_name, const std::string &value, AccessList &list = emptyList);
+%ignore setProperty(const std::string &prop_name, const std::string &value, AccessList &list = emptyList);
+%ignore setProperty(const char* prop_name, const char* prop_name, const char *value,
+		    OA::AccessList &list = emptyList);
 %ignore setProperty(const char* instance_name, const char* prop_name, const char *value);
 
 // ExternalBuffer *getBuffer(uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData)
@@ -127,6 +155,9 @@
     } else if (PyBytes_Check(item)) {
       a.m_number = false;
       a.m_u.m_member = PyBytes_AsString(item);
+    } else if (PyUnicode_Check(item)) {
+      a.m_number = false;
+      a.m_u.m_member = PyUnicode_AsUTF8(item);
     } else
       SWIG_Error(SWIG_RuntimeError, "Item in OCPI::API::Access list argument not a number or string");
   }
@@ -145,9 +176,9 @@
     PyObject *key, *value;
     Py_ssize_t pos = 0;
     while (PyDict_Next($input, &pos, &key, &value)) {
-      SWIG_contract_assert(PyBytes_Check(key),
-			   "const OCPI::API::PValue* dictionary keys must be bytes");
-      const char *name = PyBytes_AsString(key);
+      SWIG_contract_assert(PyUnicode_Check(key),
+			   "const OCPI::API::PValue* dictionary keys must be strings");
+      const char *name = PyUnicode_AsUTF8(key);
       const OCPI::Util::PValue *pv = OU::find(OU::allPVParams, name);
       std::string msg;
       if (!pv) {
@@ -168,6 +199,19 @@
 %ignore OCPI::API::PValue::unparse(std::string &value, bool append = false) const;
 
 
+#if 1
+%typemap(in) const char * {
+  if (PyBytes_Check($input))
+    $1 = (char *)PyBytes_AsString($input);
+  else if (PyUnicode_Check($input))
+    $1 = (char *)PyUnicode_AsUTF8($input); // cast unnecessary as of 3.7?
+  else
+    SWIG_exception_fail(SWIG_RuntimeError, "Argument of type \"const char *\" is not a string");
+}
+%typemap(freearg) const char*{}
+%typemap(typecheck) const char*{}
+%typemap(varin) const char*{}
+#endif
 // OCPI::API::BaseType getOperationInfo(uint8_t opCode, size_t &nbytes)
 // Typemap to adapt the c++ return by reference calls into return values.
 // This is a trivial case so we can just use %apply
