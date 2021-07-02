@@ -18,7 +18,7 @@
   <slaves>
     <External name='rx' count='2'/>
     <External name='tx' count='2'/>
-    <Instance worker='ocpi.platform.devices.platform_ad9361_config.hdl'
+    <Instance worker='ocpi.platform.devices.platform_ad9361_config_csts.hdl'
 	  name='config'/>
     <Instance worker='ocpi.platform.devices.platform_csts_ad9361_data_sub.hdl' name='data_sub'>
       <Property name='lvds_p' value='true'/>

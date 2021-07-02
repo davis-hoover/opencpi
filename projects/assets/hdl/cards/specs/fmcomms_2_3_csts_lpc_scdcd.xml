@@ -64,7 +64,7 @@
     <!--Property name='DUPLEX_CONFIG_p'     value='full_duplex'/-->
     <Property name='LVDS_p' value='true'/>
   </device>
-  <device worker='platform_ad9361_config'>
+  <device worker='platform_ad9361_config_csts'>
     <Signal name='TXNRX'  slot='LA16_N'/>    <!--  H4   -->
     <Signal name='ENABLE' slot='LA16_P'/>    <!--  G6   -->
   </device>
