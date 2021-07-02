@@ -21,7 +21,7 @@ library ocpi; use ocpi.types.all; -- remove this to avoid all ocpi name collisio
 library ocpi_core_bsv; use ocpi_core_bsv.all;
 library platform; use platform.all;
 library unisim;
-architecture rtl of platform_ad9361_config_worker is
+architecture rtl of platform_ad9361_config_csts_worker is
   constant adc_sub_c  : natural := 0;
   constant dac_sub_c  : natural := 1;
 

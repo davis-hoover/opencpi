@@ -1,4 +1,4 @@
-<!-- platform_ad9361_config.hdl is a device worker containing all functionality necessary
+<!-- platform_ad9361_config_csts.hdl is a device worker containing all functionality necessary
      for AD9361 hardware configuration (register access and pin control). -->
 <HdlDevice language="vhdl" FirstRawproperty='general_spi_conf'>
   <ControlInterface Timeout="1024"/>
