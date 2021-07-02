@@ -20,7 +20,7 @@
     <Signal name='SPI_ENB'     slot='LA26_P'/>    <!--  D26  -->
     <Signal name='SPI_DO'      slot='LA27_N'/>    <!--  C27  -->
   </device>
-  <device worker='platform_ad9361_data_sub'>
+  <device worker='platform_csts_ad9361_data_sub'>
     <Signal name='DATA_CLK_P'  slot='LA00_P_CC'/> <!--  G11  -->
     <Signal name='DATA_CLK_N'  slot='LA00_N_CC'/> <!--  H11  -->
     <Signal name='P0_D_5_0(0)'     slot='LA11_N'/>    <!--  H17  TX_D0_N -->

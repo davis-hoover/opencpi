@@ -20,16 +20,16 @@
     <External name='tx' count='2'/>
     <Instance worker='ocpi.platform.devices.platform_ad9361_config.hdl'
 	  name='config'/>
-    <Instance worker='ocpi.platform.devices.platform_csts_ad9361_data_sub.hdl' name='data_sub'>
+    <Instance worker='ocpi.platform.devices.platform_ad9361_data_sub.hdl' name='data_sub'>
       <Property name='lvds_p' value='true'/>
-      <Property name='DATA_CLK_Delay' value='3'/>
+      <Property name='DATA_CLK_Delay' value='4'/>
       <Property name='RX_Data_Delay' value='0'/>
       <Property name='FB_CLK_Delay' value='7'/>
       <Property name='TX_Data_Delay' value='0'/>
     </Instance>
     <!-- DRC RX0 path slaves -->
     <Instance worker='ocpi.platform.devices.data_src_qadc_csts.hdl'
-	    name='rx_qadc0' connect='rx_csts_to_iqstream0'>
+	    name='rx_qadc_csts0' connect='rx_csts_to_iqstream0'>
       <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
     </Instance>
     <Instance worker='ocpi.assets.misc_comps.csts_to_iqstream.hdl'
@@ -57,7 +57,7 @@
     <!-- DRC RX1 path slaves -->
     <!--
     <Instance worker='ocpi.platform.devices.data_src_qadc_csts.hdl'
-	    name='rx_qadc1' connect='rx_csts_to_iqstream1'>
+	    name='rx_qadc_csts1' connect='rx_csts_to_iqstream1'>
       <Property name='ADC_INPUT_IS_LSB_OF_OUT_PORT' value='true'/>
     </Instance>
     <Instance worker='ocpi.assets.misc_comps.csts_to_iqstream.hdl'
@@ -93,8 +93,8 @@
       <Property name='ACC_WIDTH'  Value='28'/>
     </Instance>
     <Instance worker='ocpi.assets.misc_comps.iqstream_to_csts.hdl'
-	  name='tx_iqstream_to_csts0' connect='tx_qdac0'/>
-    <Instance worker='ocpi.platform.devices.data_sink_qdac_csts.hdl' name='tx_qdac0'>
+	  name='tx_iqstream_to_csts0' connect='tx_qdac_csts0'/>
+    <Instance worker='ocpi.platform.devices.data_sink_qdac_csts.hdl' name='tx_qdac_csts0'>
       <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
     </Instance>
 
@@ -113,8 +113,8 @@
       <Property name='ACC_WIDTH'  Value='28'/>
     </Instance>
     <Instance worker='ocpi.assets.misc_comps.iqstream_to_csts.hdl'
-		  name='tx_iqstream_to_csts1' connect='tx_qdac1'/>
-    <Instance worker='ocpi.platform.devices.data_sink_qdac_csts.hdl' name='tx_qdac1'>
+		  name='tx_iqstream_to_csts1' connect='tx_qdac_csts1'/>
+    <Instance worker='ocpi.platform.devices.data_sink_qdac_csts.hdl' name='tx_qdac_csts1'>
       <Property name='DAC_OUTPUT_IS_LSB_OF_IN_PORT' value='false'/>
     </Instance>
     -->

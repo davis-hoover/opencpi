@@ -71,7 +71,7 @@
   <Instance Component="ocpi.platform.drc">
     <!-- These slaves will be inferred soon and not be necessary here -->
     <!--
-    <slave instance="platform_ad9361_data_sub" slave="data_sub"/>
+    <slave instance="platform_csts_ad9361_data_sub" slave="data_sub"/>
     <slave instance="platform_ad9361_config" slave="config"/>
     <slave instance="data_src_qadc_csts" slave="rx_qadc0"/>
     <slave instance="complex_mixer" slave="rx_complex_mixer0"/>

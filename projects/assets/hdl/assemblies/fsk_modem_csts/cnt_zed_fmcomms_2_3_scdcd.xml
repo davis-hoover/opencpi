@@ -5,7 +5,7 @@
     <!-- MUST provide to this worker the zed's control plane clock freq value -->
     <Property name='CP_CLK_FREQ_HZ_p' value='100e6'/>
   </Device>
-  <Device name='platform_ad9361_data_sub' card='fmcomms_2_3_csts_lpc_scdcd'>
+  <Device name='platform_csts_ad9361_data_sub' card='fmcomms_2_3_csts_lpc_scdcd'>
     <Property name='lvds_p' value='true'/>
     <Property name='DATA_CLK_Delay' value='3'/>
     <Property name='RX_Data_Delay'  value='0'/>
