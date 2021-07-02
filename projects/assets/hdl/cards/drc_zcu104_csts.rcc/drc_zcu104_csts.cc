@@ -21,20 +21,20 @@ using namespace Drc_zcu104_cstsWorkerTypes;
 
 namespace OD = OCPI::DRC;
 
-class Drc_zcu104Worker : public OD::DrcProxyBase {
+class Drc_zcu104_cstsWorker : public OD::DrcProxyBase {
 
   // ========================================================================
   // To use the ad9361 DRC helper classes, we need a configurator class that combines the bas ad9361
   // one with the tuneresamp soft tuning
-  class Zcu104_Configurator: public OD::ConfiguratorAD9361, public OD::ConfiguratorTuneResamp {
+  class Zcu104_Csts_Configurator: public OD::ConfiguratorAD9361, public OD::ConfiguratorTuneResamp {
   public:
-    Zcu104_Configurator()
-      : OD::ConfiguratorAD9361(DRC_ZCU104_RF_PORTS_RX.data[0], NULL,
-		               DRC_ZCU104_RF_PORTS_TX.data[0], NULL), 
+    Zcu104_Csts_Configurator()
+      : OD::ConfiguratorAD9361(DRC_ZCU104_CSTS_RF_PORTS_RX.data[0], NULL,
+		               DRC_ZCU104_CSTS_RF_PORTS_TX.data[0], NULL), 
 	OD::ConfiguratorTuneResamp(ad9361MaxRxSampleMhz(), ad9361MaxTxSampleMhz()) { 
     }
     // All concrete Configurator classes must have this clone method for virtual copying. 
-    OD::Configurator *clone() const { return new Zcu104_Configurator(*this); }
+    OD::Configurator *clone() const { return new Zcu104_Csts_Configurator(*this); }
   protected:
     // The virtual callback to impose all constraints. 
     void impose_constraints_single_pass() {
@@ -91,12 +91,12 @@ class Drc_zcu104Worker : public OD::DrcProxyBase {
   } m_doSlave;
 
   OD::RadioCtrlrNoOSTuneResamp m_ctrlr;
-  OD::ConfigLockRequest m_requests[DRC_ZCU104_MAX_CONFIGURATIONS_P];
+  OD::ConfigLockRequest m_requests[DRC_ZCU104_CSTS_MAX_CONFIGURATIONS_P];
 
 public:
-  Drc_zcu104Worker()
+  Drc_zcu104_cstsWorker()
     : m_doSlave(slaves),
-      m_ctrlr(0, "drc_zcu104", m_configurator, m_doSlave) {
+      m_ctrlr(0, "drc_zcu104_csts", m_configurator, m_doSlave) {
   }
   // ================================================================================================
   // These methods interface with the helper 9361 classes etc.
@@ -115,8 +115,8 @@ public:
       stream.include_data_stream_type(channel.rx ?
                                       OD::data_stream_type_t::RX : OD::data_stream_type_t::TX);
       stream.include_data_stream_ID(channel.rx ?
-                                    DRC_ZCU104_RF_PORTS_RX.data[nRx] :
-                                    DRC_ZCU104_RF_PORTS_TX.data[nTx]);
+                                    DRC_ZCU104_CSTS_RF_PORTS_RX.data[nRx] :
+                                    DRC_ZCU104_CSTS_RF_PORTS_TX.data[nTx]);
       stream.include_routing_ID((channel.rx ? "RX" : "TX") +
                                 std::to_string(channel.rx ? nRx : nTx));
       ++(channel.rx ? nRx : nTx);
@@ -159,7 +159,7 @@ public:
   }
 };
 
-DRC_ZCU104_START_INFO
+DRC_ZCU104_CSTS_START_INFO
 // Insert any static info assignments here (memSize, memSizes, portInfo)
 // e.g.: info.memSize = sizeof(MyMemoryStruct);
-DRC_ZCU104_END_INFO
+DRC_ZCU104_CSTS_END_INFO
