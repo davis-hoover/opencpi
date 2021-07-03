@@ -678,6 +678,9 @@ verbs = {
         }
     },
     'refresh': {
+        'options': {
+            'name': {'nargs': '?'}
+        },
         'nouns': {
             'project': None
         }

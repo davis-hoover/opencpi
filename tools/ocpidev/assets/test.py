@@ -42,6 +42,8 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         """
         if not directory.endswith(".test") and not directory.endswith(".test/"):
             directory = directory + ".test"
+        if not name:
+            name = str(Path(directory).name)
         self.check_dirtype("test", directory)
         super().__init__(directory, name, **kwargs)
 
@@ -99,6 +101,11 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         library = kwargs.get('library', '')
         hdl_library = kwargs.get('hdl_library', '')
         platform = kwargs.get('platform', '')
+        if cur_dirtype not in valid_dirtypes:
+            ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
+        if len(list(filter(None, [library, hdl_library, platform]))) > 1:
+            ocpiutil.throw_invalid_libs_e()
+            
         working_path = Path.cwd()
         if len(list(filter(None, [library, hdl_library, platform]))) > 1:
             ocpiutil.throw_invalid_libs_e()

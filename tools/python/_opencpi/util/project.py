@@ -111,7 +111,6 @@ def get_dir_info(directory=".", careful=False):
         # Do we need to check for project-package-id file in exports?
         make_type = asset_type = "project"
     elif len(parts) > 1:
-        print(parts[-1])
         if parts[-1] == "test":
             name += "-test"
             top_xml_elements = ["tests"]
@@ -463,6 +462,7 @@ def is_path_in_registry(origin_path="."):
         # If registry does not exist, origin path cannot be a project in it
         return False
     origin_realpath = os.path.realpath(origin_path)
+    
     # For each project in the registry, check equivalence to origin_path
     for project in glob(project_registry_dir + "/*"):
         if origin_realpath == os.path.realpath(project):
@@ -564,14 +564,18 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=False, **kwargs):
     # what about showing of global things is this function even called in that case? isnt the object
     # that is created always the current registry?
     if not is_path_in_project(".") and not is_path_in_project(name):
+        if noun == 'project':
+        # Check if project ID passed as a name
+            project_registry = get_project_registry_dir()[1]
+            project_path = Path(project_registry, name).resolve()
+            if is_path_in_project(str(project_path)):
+                return str(project_path)
         raise OCPIException("Path \"" + os.path.realpath(".") + "\" is not in a project, " +
                             "so this command is invalid.")
     cur_dirtype = get_dirtype() if get_dirtype() != "libraries" else "library"
     name = "" if name == os.path.basename(os.path.realpath(".")) else name
-
     cur_dir_not_name = noun == cur_dirtype and not name
     noun_valid_not_name = noun in VALID_PLURAL_NOUNS and not name
-
     if (not noun and not name) or cur_dir_not_name or noun_valid_not_name:
         return "."
 
@@ -698,20 +702,6 @@ def get_package_id_from_vars(package_id, package_prefix, package_name, directory
         package_name = os.path.basename(os.path.realpath(directory))
     return package_prefix + "." + package_name
 
-if __name__ == "__main__":
-    import doctest
-    import sys
-    __LOG_LEVEL = os.environ.get('OCPI_LOG_LEVEL')
-    __VERBOSITY = False
-    if __LOG_LEVEL:
-        try:
-            if int(__LOG_LEVEL) >= 8:
-                __VERBOSITY = True
-        except ValueError:
-            pass
-    doctest.testmod(verbose=__VERBOSITY, optionflags=doctest.ELLIPSIS)
-    sys.exit(doctest.testmod()[0])
-
 
 def get_cdk_dir():
     """
@@ -745,3 +735,18 @@ def change_dir(directory):
         err_msg = '{} is not a directory'.format(directory)
     if err_msg:
         raise OCPIException(err_msg)
+
+
+if __name__ == "__main__":
+    import doctest
+    import sys
+    __LOG_LEVEL = os.environ.get('OCPI_LOG_LEVEL')
+    __VERBOSITY = False
+    if __LOG_LEVEL:
+        try:
+            if int(__LOG_LEVEL) >= 8:
+                __VERBOSITY = True
+        except ValueError:
+            pass
+    doctest.testmod(verbose=__VERBOSITY, optionflags=doctest.ELLIPSIS)
+    sys.exit(doctest.testmod()[0])

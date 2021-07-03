@@ -43,6 +43,8 @@ def main():
     cdk_dir = ocpiutil.get_cdk_dir() # Check cdk path exists and is valid
     args = ocpiargparse.parse_args(args_dict, prog='ocpidev')
     sys.argv = sys.argv[1:]
+    print(args)
+    print(sys.argv)
     # If verb is handled by another python script or function, hand off to it.
     # TODO: change argparsers in these scripts to use ocpiargs.py
     if args.verb == 'show':
@@ -63,13 +65,14 @@ def main():
         ocpicreate(args, cdk_dir, orig_dir)
     elif args.verb in ['set', 'unset']:
         ocpi_set_unset(args)
-    directory = get_working_dir(args)
-    name = Path(directory).stem
+    directory,name = get_working_dir(args)
+    if args.noun in ['project', 'library', 'registry']:
+        directory = str(Path(directory,name))
 
     try:
     # Try to instantiate the appropriate asset from noun
         asset_factory = ocpiassets.factory.AssetFactory()
-        asset = asset_factory.factory(args.noun, directory, name)
+        asset = asset_factory.factory(args.noun, directory, name, init_libs=True)
     except ocpiutil.OCPIException as e:
     # Noun not implemented; fall back to ocpidev.sh
         print(e)
@@ -156,9 +159,9 @@ def ocpicreate(args, cdk_dir=None, orig_dir=None):
     if args.noun not in class_dict:
     # Noun not implemented by this function; fall back to ocpidev.sh
         ocpidev_sh(cdk_dir, orig_dir)
-    directory = get_working_dir(args, ensure_exists=False)
+    directory,name = get_working_dir(args, ensure_exists=False)
+    delattr(args, 'name')
     args = vars(args)
-    name = args.pop('name', '')
     noun = args.pop('noun', '')
     try:
         class_dict[noun].create(name, directory, **args)
@@ -174,22 +177,24 @@ def get_working_dir(args, ensure_exists=True):
     """
     kwargs = copy(vars(args))
     name = kwargs.pop('name', '')
+    name = name if name else ''
     noun = kwargs.pop('noun', '')
-
-    if noun == 'project' and args.verb == 'create':
-        return str(Path.cwd())
-    elif noun == 'registry':
-        return str(Path(Path.cwd(), name))
-    try:
-        working_dir = ocpiutil.get_ocpidev_working_dir(
-            noun, name, ensure_exists=ensure_exists, **kwargs)
-    except ocpiutil.OCPIException as e:
-        ocpiutil.logging.error(e)
-        sys.exit(1)
-    print('working_dir:', working_dir)
-    # sys.exit()
     
-    return working_dir
+    if noun == 'registry' or (noun == 'project' and args.verb == 'create'):
+        working_path = Path(Path.cwd(), name)
+    else:
+        try:
+            working_path = Path(ocpiutil.get_ocpidev_working_dir(
+                noun, name, ensure_exists=ensure_exists, **kwargs))
+        except ocpiutil.OCPIException as e:
+            ocpiutil.logging.error(e)
+            sys.exit(1)
+    name = str(working_path.name)
+    working_dir = str(working_path.parent)
+    print('name:', name)
+    print('working_dir:', working_dir)
+    
+    return working_dir,name
 
 
 def change_dir(directory):

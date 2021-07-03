@@ -43,9 +43,10 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         if name:
             if fnmatch.fnmatch(name, '*.xml'): # explicit .xml implies non-dir app
+                # parent_dir = str(Path(directory).parent)
                 self.check_dirtype("applications", directory)
             elif os.path.basename(directory) == "applications" and \
-                 os.path.exists(directory + "/" + name + ".xml"):
+                os.path.exists(directory + "/" + name + ".xml"):
                 name = name + ".xml"
         else:
             self.check_dirtype("application", directory)
@@ -72,6 +73,8 @@ class Application(RunnableAsset, RCCBuildableAsset):
         return the directory of an Application given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
+        if ocpiutil.get_dirtype() not in ["application", "applications", "project"]:
+            ocpiutil.throw_not_valid_dirtype_e(["applications", "project"])
         if not name: 
             ocpiutil.throw_not_blank_e("application", "name", True)
         
@@ -94,17 +97,6 @@ class Application(RunnableAsset, RCCBuildableAsset):
             working_path = app_path
 
         return str(working_path)
-        
-
-        ocpiutil.check_no_libs("application", library, hdl_library, hdl_platform)
-        if ocpiutil.get_dirtype() not in ["application", "applications", "project"]:
-            ocpiutil.throw_not_valid_dirtype_e(["applications", "project"])
-        if not name: ocpiutil.throw_not_blank_e("application", "name", True)
-        #assume the only valid place for a application in a project is in the applications directory
-        top = ocpiutil.get_path_to_project_top() + "/applications/";
-        if fnmatch.fnmatch(name, '*.xml') or os.path.exists(top + name + ".xml"):
-            return top
-        return top + name
 
 
     def _get_template_dict(name, directory, **kwargs):
@@ -125,29 +117,12 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         Static method to create a new Application
         """
-        # Application.check_dirtype('applications', directory)
-
-        # if dirtype == "project":
-        #     if kwargs.get("verbose", True):
-        #         print("Executing application create method in project directory: " + directory)
-        #     appdir = directory + "/applications/"
-        #     if not os.path.isdir(appdir):
-        #         os.mkdir(appdir)
-        #         if kwargs.get("verbose", True):
-        #             basename = os.path.basename(directory)
-        #             print("The 'applications' directory was created for the project '" + basename + "'")
-        #     os.chdir(appdir)
-
-        # currdir = os.getcwd()
-        # currtype = ocpiutil.get_dirtype(currdir)
-        # if not currtype == "applications":
-        #     raise ocpiutil.OCPIException(currdir + " must be of type applications")
-        app_path = Path(directory)
-        apps_path = app_path.parent
+        apps_path = Path(directory)
+        app_path = Path(apps_path, name)
         if not apps_path.exists():
             apps_path.mkdir()
         os.chdir(str(apps_path))
-        application_xml_path = Path(apps_path, name)
+        application_xml_path = Path(apps_path, 'application.xml')
         template_dict = Application._get_template_dict(name, directory, **kwargs)
         if not application_xml_path.exists():
             template = jinja2.Template(ocpitemplate.APP_APPLICATION_XML, trim_blocks=True)
@@ -157,7 +132,7 @@ class Application(RunnableAsset, RCCBuildableAsset):
                 name, str(app_path)))
         if kwargs.get("xml_app", False):
             template = jinja2.Template(ocpitemplate.APP_APPLICATION_APP_XML, trim_blocks=True)
-            ocpiutil.write_file_from_string(directory, template.render(**template_dict))
+            ocpiutil.write_file_from_string(name, template.render(**template_dict))
             if kwargs.get("verbose", False):
                 print("XML application '" + name + "' was created as 'applications/" + directory)
             return

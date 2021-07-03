@@ -91,6 +91,7 @@ class AssetFactory():
             raise ocpiutil.OCPIException("Bad asset creation, \"" + asset_type + "\" not supported")
 
         # Call the action for this type and hand it the arguments provided
+        directory = str(Path(directory).resolve())
         return actions[asset_type](directory, name, **kwargs)
 
     @classmethod

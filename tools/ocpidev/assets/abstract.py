@@ -52,9 +52,10 @@ class Asset(metaclass=ABCMeta):
         #     raise ocpiutil.OCPIException(err_msg)
         if not name:
             self.name = os.path.basename(directory)
+            directory = os.path.dirname(directory)
         else:
             self.name = name
-        self.directory = directory
+        self.directory = os.path.realpath(directory)
         self.verbose = kwargs.get("verbose", False)
 
     @classmethod
@@ -97,7 +98,6 @@ class Asset(metaclass=ABCMeta):
         """
         if not os.path.isdir(directory):
             err_msg = 'location does not exist at: {}'.format(directory)
-            raise Exception(err_msg)
             raise ocpiutil.OCPIException(err_msg)
 
         true_dirtype = ocpiutil.get_dirtype(directory)
@@ -114,22 +114,24 @@ class Asset(metaclass=ABCMeta):
         Remove the Asset from disk.  Any additional cleanup on a per asset basis can be done in
         the child implementations of this function
         """
+        path = Path(self.directory)
+        if path.name != self.name:
+            path = Path(path, self.name)
         if not force:
-            prompt = 'Delete {} at: {}'.format(noun, self.directory)
+            prompt = 'Delete {} at: {}'.format(noun, str(path))
             force = ocpiutil.get_ok(prompt=prompt)
         if force:
             try:
-                path = Path(self.directory)
                 if path.is_dir():
-                    shutil.rmtree(self.directory)
+                    shutil.rmtree(str(path))
                 else:
                     path.unlink()
                 msg = 'Successfully deleted {}'.format(
-                    noun if noun else self.directory)
+                    noun if noun else str(path))
                 print(msg)
             except Exception as e:
                 err_msg = 'Failed to delete {}\n{}'.format(
-                    noun if noun else self.directory, e)
+                    noun if noun else str(path), e)
                 logging.error(err_msg)
 
     def get_valid_components(self):

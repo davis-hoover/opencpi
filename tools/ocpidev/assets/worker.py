@@ -39,9 +39,9 @@ class Worker(ShowableComponent):
     """
     def __init__(self, directory, name=None, **kwargs):
         if not name:
-            name = os.path.basename(os.path.realpath(directory)).rsplit('.', 1)[0]
-        rchoped_name = ocpiutil.rchop(name, "." + self.get_authoring_model(directory))
-        self.ocpigen_xml = (directory + "/" + rchoped_name + ".xml")
+            name = str(Path(directory).name)
+        name_stem = Path(name).stem
+        self.ocpigen_xml = str(Path(directory, name_stem)) + '.xml'
         super().__init__(directory, name, **kwargs)
 
     @staticmethod
@@ -106,7 +106,8 @@ class Worker(ShowableComponent):
         """
         # if more then one of the library location variable are not None it is an error
         cur_dirtype = ocpiutil.get_dirtype()
-        valid_dirtypes = ["project", "libraries", "library", "test"]
+        valid_dirtypes = ["project", "libraries", "library", 
+                          "test", "worker", "hdl-platform"]
         library = kwargs.get('library', '')
         hdl_library = kwargs.get('hdl_library', '')
         platform = kwargs.get('platform', '')
@@ -145,7 +146,6 @@ class RccWorker(Worker):
     This class represents a RCC worker.
     """
     def __init__(self, directory, name=None, **kwargs):
-        self.check_dirtype('worker', directory)
         super().__init__(directory, name, **kwargs)
 
 class HdlCore(HDLBuildableAsset):
@@ -193,6 +193,8 @@ class HdlWorker(Worker, HdlCore):
     Examples are HDL Library Worker, HDL Platform Worker ....
     """
     def __init__(self, directory, name=None, **kwargs):
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
 
     @abstractmethod

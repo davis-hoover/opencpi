@@ -58,18 +58,9 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
             init_hdlassembs (T/F) - Instructs the method whether to construct all
                                     HdlApplicationAssembly objects contained in the project
         """
-        try:
-            self.check_dirtype("project", directory)
-        except ocpiutil.OCPIException:
-        # If directory is not a project, assume name is a package_id and get directory
-        # from registry
-            registry_dir = Registry.get_registry_dir()
-            if name:
-                directory = str(Path(registry_dir, name))
-            else:
-                directory = registry_dir
-            self.check_dirtype("project", directory)
-
+        self.check_dirtype("project", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
         self.lib_list = None
         self.apps_col_list = None
@@ -171,7 +162,7 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         except ocpiutil.OCPIException:
             # do nothing it's ok if the unregistering fails
             pass
-        super().delete(force)
+        super().delete('project', force)
 
     def __init_package_id(self):
         """
@@ -1082,80 +1073,6 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         else:
             return name
 
-    def get_subdir(self, **kwargs):
-        """
-        Get asset subdirectory from project based on kwargs
-        TODO: define kwargs
-        """
-        subdir_path = Path(self.directory)
-        hdl_path = Path(self.directory, 'hdl')
-        library = kwargs.get('library', '')
-        hdl_library = kwargs.get('hdl_library', '')
-        platform = kwargs.get('platform', '')
-        project = kwargs.get('project', False)
-        model = kwargs.get('model', '')
-        noun = kwargs.get('noun', '')
-        verb = kwargs.get('verb', '')
-        name = kwargs.get('name', '')
-
-        if hdl_library:
-            subdir_path = Path(self.directory, 'hdl', hdl_library)
-        elif platform:
-            platform_path = Path(self.directory, model, 'platforms', platform)
-            if not platform_path.exists():
-                err_msg = 'the platform "{}" does not exist at: {}'.format(
-                    platform, str(platform_path))
-                raise ocpiutil.OCPIException(err_msg)
-            subdir_path = Path(platform_path, 'devices')
-            if noun == 'component':
-                if not subdir_path.exists():
-                    subdir_path.mkdir()
-                subdir_path = Path(subdir_path, 'specs')
-        elif project:
-            subdir_path = Path(self.directory, 'specs')
-        elif noun in ['hdl-primitive', 'hdl-primitives']:
-            subdir_path = Path(self.directory, 'hdl', 'primitives')
-        elif noun in ['hdl-platform', 'hdl-platforms']:
-            subdir_path = Path(self.directory, 'hdl', 'platforms')
-        elif noun in ['hdl-assembly', 'hdl-assemblies']:
-            subdir_path = Path(self.directory, 'hdl', 'assemblies')
-        elif noun in ['hdl-device', 'hdl-devices']:
-            subdir_path = Path(self.directory, 'hdl', 'devices')
-        elif noun in ['hdl-card', 'hdl-cards']:
-            subdir_path = Path(self.directory, 'hdl', 'cards') 
-        elif noun in ['hdl-adapter', 'hdl-adapters']:
-            subdir_path = Path(self.directory, 'hdl', 'adapters')
-        elif noun in ['application', 'applications']:
-            subdir_path = Path(self.directory, 'applications')
-        elif noun in ['library', 'libraries']:
-            if name == 'components':
-                subdir_path = Path(self.directory)
-            else:
-                subdir_path = Path(self.directory, 'components')
-        elif noun in ['component', 'components']:
-            subdir_path = Path(self.directory, 'components')
-            if library:
-                subdir_path = Path(subdir_path, library)
-            if not subdir_path.exists():
-                err_msg = 'the library "{}" does not exist at: {}'.format(
-                    subdir_path.name, str(subdir_path))
-                raise ocpiutil.OCPIException(err_msg)
-            subdir_path = Path(subdir_path, 'specs')
-
-        if verb != 'create':
-            return str(subdir_path)
-
-        if subdir_path.parent == hdl_path and not hdl_path.exists():
-            hdl_path.mkdir()
-
-        print('subdir:', subdir_path, subdir_path.exists())
-        if not subdir_path.exists():
-            subdir_path.mkdir()
-        print('subdir:', subdir_path, subdir_path.exists())
-        print('dirtype:', ocpiutil.get_dirtype(str(subdir_path)))
-        return str(subdir_path)
-
-
     def _get_template_dict(name, directory, **kwargs):
         """
         used by the create function/verb to generate the dictionary of viabales to send to the
@@ -1214,39 +1131,38 @@ class Project(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, ShowableAsset
         handled at this level:
             register (T/F) - if set to true this project is also registered after it is created
         """
-        proj_dir = directory + "/" + name
-        if os.path.isdir(proj_dir):
-            raise ocpiutil.OCPIException("Cannot create this project: " + proj_dir + ", because the " +
+        path = Path(directory, name)
+        if path.is_dir():
+            raise ocpiutil.OCPIException("Cannot create this project: " + str(path) + ", because the " +
                                          "directory already exists.")
-        # os.chdir(directory)
-        os.mkdir(name)
-        template_dict = Project._get_template_dict(name, proj_dir, **kwargs)
-
+        path.mkdir()
+        os.chdir(str(path))
+        template_dict = Project._get_template_dict(name, directory, **kwargs)
         # Generate all the project files using templates
-        ocpiutil.write_file_from_string( name + "/Project.exports", ocpitemplate.PROJ_EXPORTS)
-        ocpiutil.write_file_from_string( name + "/.gitignore", ocpitemplate.PROJ_GIT_IGNORE)
-        ocpiutil.write_file_from_string( name + "/.gitattributes", ocpitemplate.PROJ_GIT_ATTR)
+        ocpiutil.write_file_from_string("Project.exports", ocpitemplate.PROJ_EXPORTS)
+        ocpiutil.write_file_from_string(".gitignore", ocpitemplate.PROJ_GIT_IGNORE)
+        ocpiutil.write_file_from_string(".gitattributes", ocpitemplate.PROJ_GIT_ATTR)
         #template = jinja2.Template(ocpitemplate.PROJ_MAKEFILE, trim_blocks=True)
-        #ocpiutil.write_file_from_string( proj_dir + "/Makefile", template.render(**template_dict))
+        #ocpiutil.write_file_from_string( directory + "/Makefile", template.render(**template_dict))
         # TODO: For traditional XML, replace PROJ_PROJECT_XML_LEGACY with PROJ_PROJECT_XML
         template = jinja2.Template(ocpitemplate.PROJ_PROJECT_XML_LEGACY, trim_blocks=True)
-        ocpiutil.write_file_from_string( name + "/Project.xml", template.render(**template_dict))
+        ocpiutil.write_file_from_string("Project.xml", template.render(**template_dict))
         template = jinja2.Template(ocpitemplate.PROJ_GUI_PROJECT, trim_blocks=True)
-        ocpiutil.write_file_from_string( name + "/.project", template.render(**template_dict))
+        ocpiutil.write_file_from_string(".project", template.render(**template_dict))
 
         if kwargs.get("register", None):
             AssetFactory.factory(
                 "registry",
-                Registry.get_registry_dir(name)).add(name, True)
+                Registry.get_registry_dir()).add(str(path), True)
 
-        rc = ocpiutil.execute_cmd({}, name, action=[ "imports" ],
+        rc = ocpiutil.execute_cmd({}, str(path), action=[ "imports" ],
                                   file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
-            logging.warning("Failed to import project at " + proj_dir)
-        rc = ocpiutil.execute_cmd({}, name, action=[ "exports" ],
+            logging.warning("Failed to import project at " + str(path))
+        rc = ocpiutil.execute_cmd({}, str(path), action=[ "exports" ],
                                   file=os.environ["OCPI_CDK_DIR"] + "/include/project.mk")
         if rc != 0:
-            logging.warning("Failed to export project at " + proj_dir)
+            logging.warning("Failed to export project at " + str(path))
 
     def register(self, force=False, verbose=False):
         """

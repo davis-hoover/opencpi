@@ -77,6 +77,8 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
                                      objects contained in the project (at least those with a
                                      corresponding build platform listed in self.hdl_platforms)
         """
+        if not name:
+            name = str(Path(directory).name)
         self.check_dirtype("hdl-platforms", directory)
         super().__init__(directory, name, **kwargs)
         self.hdl_plat_strs = kwargs.get("hdl_plats", None)
@@ -128,7 +130,11 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         library specifiers (library, hdl_library, hdl_platform)
         """
         # ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
-        if name: 
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("hdl-platform", library, hdl_library, platform)
+        if not name: 
             ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
         if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
@@ -158,8 +164,6 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
             None
         """
         self.check_dirtype("hdl-platform", directory)
-        if name is None:
-            name = os.path.basename(directory)
         super().__init__(directory, name, **kwargs)
         self.configs = {}
         self.package_id = None
@@ -244,8 +248,8 @@ class HdlPlatformWorker(HdlWorker, ReportableAsset):
         """
         if not name: 
             ocpiutil.throw_not_blank_e("hdl-platforms", "name", False)
-        # if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
-        #     ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
+        if ocpiutil.get_dirtype() not in ["project", "hdl-platforms"]:
+            ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-platforms"])
         project_path = Path(ocpiutil.get_path_to_project_top())
         hdl_path = Path(project_path, 'hdl')
         if not hdl_path.exists() and not ensure_exists:
@@ -380,6 +384,8 @@ class RccPlatform(Platform):
         Constructor for RccPlatform no extra values from kwargs processed in this constructor
         """
         self.check_dirtype("rcc-platform", directory)
+        if not name:
+            name = str(Path(directory).name)
         super().__init__(directory, name, **kwargs)
 
     def __str__(self):
@@ -514,6 +520,8 @@ class HdlPlatform(Platform):
         """
         HdlPlatform constructor
         """
+        # if not name:
+        #     name = str(Path(directory).name)
         super().__init__(directory, name)
         self.target = target
         self.exactpart = exactpart
