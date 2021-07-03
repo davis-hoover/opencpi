@@ -26,15 +26,15 @@ class Drc_fmcomms_2_3_cstsWorker : public OD::DrcProxyBase {
   // ========================================================================
   // To use the ad9361 DRC helper classes, we need a configurator class that combines the bas ad9361
   // one with the tuneresamp soft tuning
-  class Fmcomms_2_3_Configurator: public OD::ConfiguratorAD9361, public OD::ConfiguratorTuneResamp {
+  class Fmcomms_2_3_csts_Configurator: public OD::ConfiguratorAD9361, public OD::ConfiguratorTuneResamp {
   public:
-    Fmcomms_2_3_Configurator()
+    Fmcomms_2_3_csts_Configurator()
       : OD::ConfiguratorAD9361(DRC_FMCOMMS_2_3_CSTS_RF_PORTS_RX.data[0], NULL,
 		               DRC_FMCOMMS_2_3_CSTS_RF_PORTS_TX.data[0], NULL), 
 	OD::ConfiguratorTuneResamp(ad9361MaxRxSampleMhz(), ad9361MaxTxSampleMhz()) { 
     }
     // All concrete Configurator classes must have this clone method for virtual copying. 
-    OD::Configurator *clone() const { return new Fmcomms_2_3_Configurator(*this); }
+    OD::Configurator *clone() const { return new Fmcomms_2_3_csts_Configurator(*this); }
   protected:
     // The virtual callback to impose all constraints. 
     void impose_constraints_single_pass() {

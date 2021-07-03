@@ -24,7 +24,7 @@
 create_clock -name clk_fpga_0 -period 10.000 [get_pins -hier * -filter {NAME =~ */ps/PS7_i/FCLKCLK[0]}]
 
 # ----------------------------------------------------------------------------
-# Clock constraints - platform_ad9361_data_sub.hdl
+# Clock constraints - platform_csts_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
 # FMCOMMS2/3 AD9361 DATA_CLK_P
@@ -41,7 +41,7 @@ create_clock -name clk_fpga_0 -period 10.000 [get_pins -hier * -filter {NAME =~ 
 create_clock -period 5.712 -name FMC_LA00_CC_P [get_ports {FMC_LA00_CC_P}]
 
 # FMCOMMS2/3 AD9361 FB_CLK_P (forwarded version of DATA_CLK_P)
-create_generated_clock -name FMC_LA08_P -source [get_pins {ftop/FMC_platform_ad9361_data_sub_i/worker/mode7.dac_clock_forward/C}] -divide_by 1 -invert [get_ports {FMC_LA08_P}]
+create_generated_clock -name FMC_LA08_P -source [get_pins {ftop/FMC_platform_csts_ad9361_data_sub_i/worker/mode7.dac_clock_forward/C}] -divide_by 1 -invert [get_ports {FMC_LA08_P}]
 
 # Generate DAC one sample per clock constraints
 # both of these create_generated_clock constraints, as well as their corresponding circuits, follow
@@ -204,14 +204,14 @@ set_property IOSTANDARD LVCMOS25 [get_ports -of_objects [get_iobanks 34]];
 # same here since this constraints file is fmcomms_2_3_lpc card-specific
 
 # ----------------------------------------------------------------------------
-# IOSTANDARD constraints - platform_ad9361_config.hdl
+# IOSTANDARD constraints - platform_ad9361_config_csts.hdl
 # ----------------------------------------------------------------------------
 
 set_property IOSTANDARD LVCMOS25 [get_ports {FMC_LA16_N}]; # FMCOMMS2/3 AD9361 TXNRX
 set_property IOSTANDARD LVCMOS25 [get_ports {FMC_LA16_P}]; # FMCOMMS2/3 AD9361 ENABLE
 
 # ----------------------------------------------------------------------------
-# IOSTANDARD constraints - platform_ad9361_data_sub.hdl
+# IOSTANDARD constraints - platform_csts_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
 set_property IOSTANDARD LVDS_25 [get_ports {FMC_LA00_CC_P}]; # FMCOMMS3 DATA_CLK_P
@@ -300,7 +300,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 13]];
 # t_DDRx_min = 0.25
 # t_DDRx_max = 1.25
 #
-# ----- assumed platform_ad9361_data_sub.hdl parameter property/no-OS init_param settings
+# ----- assumed platform_csts_ad9361_data_sub.hdl parameter property/no-OS init_param settings
 # ----- (values chosen specifically to meet static timing):
 # ------------------------------------------------------------------------------
 # |                     | no-OS init_param member | value | delay(ns)          |
@@ -402,7 +402,7 @@ set_input_delay -clock [get_clocks {FMC_LA00_CC_P}] -clock_fall -max -add_delay 
 # t_HTx_min = 0
 #
 # An FB_CLK_Delay of 1 is used because that currently works. More investigation needs to be done on how to set this correctly and per FB_CLK_DELAY in build configs
-# ----- assumed platform_ad9361_data_sub.hdl parameter property/no-OS init_param settings
+# ----- assumed platform_csts_ad9361_data_sub.hdl parameter property/no-OS init_param settings
 # ----- (values chosen specifically to meet static timing):
 # ------------------------------------------------------------------------------
 # |                     | no-OS init_param member | value | delay(ns)          |
@@ -549,7 +549,7 @@ set_output_delay -clock [get_clocks {FMC_LA08_P}] -clock_fall -max -add_delay 1.
 
 
 # ----------------------------------------------------------------------------
-# INPUT / OUTPUT DELAY constraints - platform_ad9361_data_sub.hdl
+# INPUT / OUTPUT DELAY constraints - platform_csts_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
 # from AD9361 datasheet
@@ -589,7 +589,7 @@ set_output_delay -clock [get_clocks {FMC_LA08_P}] -min -add_delay $AD9361_TXNRX_
 set_output_delay -clock [get_clocks {FMC_LA08_P}] -max -add_delay $AD9361_TXNRX_Rise_Max [get_ports {FMC_LA16_P}]
 
 # ----------------------------------------------------------------------------
-# CLOCK DOMAIN CROSSING / FALSE PATH constraints - platform_ad9361_data_sub.hdl
+# CLOCK DOMAIN CROSSING / FALSE PATH constraints - platform_csts_ad9361_data_sub.hdl
 # ----------------------------------------------------------------------------
 
 # disable timing check among paths between AD9361 DATA_CLK_P and control plane clock domains (which are asynchronous)
@@ -618,7 +618,7 @@ set_clock_groups -asynchronous -group [get_clocks dac_clkdiv2_mux] -group [get_c
 set_clock_groups -asynchronous -group [get_clocks dac_clkdiv2_mux] -group [get_clocks clk_fpga_0]
 set_clock_groups -asynchronous -group [get_clocks clk_fpga_0] -group [get_clocks dac_clkdiv4_mux]
 set_clock_groups -asynchronous -group [get_clocks dac_clkdiv4_mux] -group [get_clocks FMC_LA00_CC_P]
-set_false_path -from [get_pins ftop/FMC_data_sink_qdac_csts_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/dac_txen_reg/C] -rise_to [get_pins ftop/FMC_platform_ad9361_config_i/worker/txen_oddr/D1]
-set_false_path -from [get_pins ftop/FMC_data_sink_qdac_csts_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/dac_txen_reg/C] -rise_to [get_pins ftop/FMC_platform_ad9361_config_i/worker/txen_oddr/D2]
+set_false_path -from [get_pins ftop/FMC_data_sink_qdac_csts_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/dac_txen_reg/C] -rise_to [get_pins ftop/FMC_platform_ad9361_config_csts_i/worker/txen_oddr/D1]
+set_false_path -from [get_pins ftop/FMC_data_sink_qdac_csts_ad9361_sub_i/worker/data_mode_lvds.wsi_clk_gen/dac_txen_reg/C] -rise_to [get_pins ftop/FMC_platform_ad9361_config_csts_i/worker/txen_oddr/D2]
 
 

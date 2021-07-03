@@ -13,7 +13,7 @@
     <Property name='LVDS_P' value='true'/>
   </device>
 
-  <device worker='platform_ad9361_spi'>
+  <device worker='platform_ad9361_spi_csts'>
     <Signal name='SPI_DI'      slot='LA27_P'/>    <!--  C26  -->
     <Signal name='SPI_CLK'     slot='LA26_N'/>    <!--  D27  -->
     <Signal name='RESETB'      slot='LA28_P'/>    <!--  H31  -->
