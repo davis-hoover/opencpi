@@ -143,7 +143,7 @@ runonly: prepare runnoprepare
 runverify:
 	$(AT)echo ======== Running and verifying test outputs on available platforms for $(CwdName):
 	$(AT)if [ -d gen/applications ]; then \
-	       env |sort && ./run/runtests.sh run verify $(and $(View),view); \
+	       ./run/runtests.sh run verify $(and $(View),view); \
 	     else \
 	       echo No tests generated here so none run.; \
 	     fi
