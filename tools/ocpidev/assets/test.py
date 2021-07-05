@@ -50,7 +50,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         self.cases = kwargs.get("cases", None)
         self.mode = kwargs.get("mode", "all")
         self.phases = kwargs.get("phases", [])
-        if self.mode = "all":
+        if self.mode == "all":
             # convert user-friendly phase into "modes" if --mode is default
             prepare = "prepare" in self.phases
             run = "run" in self.phases
