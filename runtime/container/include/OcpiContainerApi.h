@@ -71,8 +71,8 @@ namespace OCPI {
       // Return zero when no buffers are available.
       virtual ExternalBuffer *getBuffer(uint8_t *&data, size_t &length) = 0;
       inline ExternalBuffer *
-      getInputBuffer(uint8_t *&data, size_t &length, uint8_t &opCode, bool &endOfData) {
-        return getBuffer(data, length, opCode, endOfData);
+      getInputBuffer(uint8_t *&data, size_t &length, uint8_t &opCode, bool &eof) {
+        return getBuffer(data, length, opCode, eof);
       }
       // Return zero when no buffers are available.
       inline ExternalBuffer *getOutputBuffer(uint8_t *&data, size_t &length) {

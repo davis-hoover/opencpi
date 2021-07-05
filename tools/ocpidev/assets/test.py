@@ -27,7 +27,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
     This class represents an OpenCPI Component Unit test.  Contains build/run settings that are
     specific to Tests.
     """
-    valid_settings = ["keep_sims", "acc_errors", "cases", "verbose", "remote_test_sys", "view"]
+    valid_settings = ["keep_sims", "acc_errors", "cases", "verbose", "remote_test_sys", "view", "phase"]
     def __init__(self, directory, name=None, **kwargs):
         """
         Initializes Test member data  and calls the super class __init__. Throws an exception if
@@ -49,6 +49,32 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         self.acc_errors = kwargs.get("acc_errors", False)
         self.cases = kwargs.get("cases", None)
         self.mode = kwargs.get("mode", "all")
+        self.phases = kwargs.get("phases", [])
+        if self.mode = "all":
+            # convert user-friendly phase into "modes" if --mode is default
+            prepare = "prepare" in self.phases
+            run = "run" in self.phases
+            verify = "verify" in self.phases
+            view = "view" in self.phases
+            if not prepare and not run and not verify:
+                if view:
+                    self.mode = "view"
+                else:
+                    self.mode = "prep_run_verify"
+            elif prepare and not run and not verify:
+                self.mode = "prep"
+            elif not prepare and run and not verify:
+                self.mode = "run"
+            elif not prepare and not run and verify:
+                self.mode = "verify"
+            elif prepare and run and not verify:
+                self.mode = "prep_run"
+            elif not prepare and run and verify:
+                self.mode = "run_verify"
+            elif prepare and run and verify:
+                self.mode = "prep_run_verify"
+            else:
+                raise ocpiutil.OCPIException("Invalid phases: " + " ".join(phases))
         self.remote_test_sys = kwargs.get("remote_test_sys", None)
 
         # using the make target "all" instead of "build" so that old style unit tests wont blow up
@@ -63,6 +89,7 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         self.mode_dict['prep']            = ["prepare"]
         self.mode_dict['run']             = ["runnoprepare"]
         self.mode_dict['prep_run']        = ["runonly"]
+        self.mode_dict['run_verify']      = ["runverify"]
         self.mode_dict['verify']          = ["verify"]
         self.mode_dict['view']            = ["view"]
         self.mode_dict['gen']             = ["generate"]
@@ -75,9 +102,12 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         """
         Runs the Test with the settings specified in the object
         """
+        goal=self.mode_dict[self.mode]
+        if self.mode != "view" and (self.view or "view" in self.phases):
+            goal.append("view")
         return ocpiutil.execute_cmd(self.get_settings(),
                                     self.directory,
-                                    self.mode_dict[self.mode],
+                                    goal,
                                     file=ocpiutil.get_makefile(self.directory, "test")[0])
 
     def build(self):
