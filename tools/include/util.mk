@@ -866,7 +866,7 @@ define OcpiSetProjectX
     $$(infox $0: Could not find Project.xml, using Project.mk)
     include $1/Project.mk
   endif
-$$(infox PR1:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
+  $$(infox PR1:$$(Package):$$(PackagePrefix):$$(PackageName):$$(ProjectPackage):$$(ParentPackage))
 
   # Determine ProjectPackage as follows:
   # If it is already set, use it as-is

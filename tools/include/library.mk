@@ -25,7 +25,7 @@ include $(OCPI_CDK_DIR)/include/lib.mk
 .SILENT: showincludes showpackage showworkers showtests
 run: runtest # generic "run" runs test
 $(filter-out test cleantest,$(OcpiTestGoals)):
-	$(AT)set -evx; $(foreach i,$(TestImplementations), \
+	$(AT)set -e; $(foreach i,$(TestImplementations), \
 	  echo ==============================================================================;\
 	  echo ==== Performing goal \"$@\" for unit tests in $i;\
 	  $(MAKE) $(and $(OCPI_PROJECT_REL_DIR),OCPI_PROJECT_REL_DIR=../$(OCPI_PROJECT_REL_DIR)) \
