@@ -18,9 +18,9 @@
 library ieee; use ieee.std_logic_1164.all, ieee.numeric_std.all;
 library misc_prims; use misc_prims.misc_prims.all;
 library cdc;
-library protocol;
+library timed_sample_prot;
 
-entity fifo_complex_short_with_metadata is
+entity fifo_complex_short_timed_sample is
   generic(
     DEPTH : natural := 2);
   port(
@@ -28,36 +28,36 @@ entity fifo_complex_short_with_metadata is
     iclk     : in  std_logic;
     irst     : in  std_logic;
     ienq     : in  std_logic;
-    iprotocol: in  protocol.complex_short_with_metadata.protocol_t;
+    iprotocol: in  timed_sample_prot.complex_short_timed_sample.protocol_t;
     ieof     : in  std_logic;
     ifull_n  : out std_logic;
     -- OUTPUT
     oclk     : in  std_logic;
     odeq     : in  std_logic;
-    oprotocol: out protocol.complex_short_with_metadata.protocol_t;
+    oprotocol: out timed_sample_prot.complex_short_timed_sample.protocol_t;
     oeof     : out std_logic;
     oempty_n : out std_logic);
 end entity;
-architecture rtl of fifo_complex_short_with_metadata is
+architecture rtl of fifo_complex_short_timed_sample is
   signal src_in           : std_logic_vector(
-      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH downto 0) :=
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH downto 0) :=
       (others => '0');
   signal dst_out          : std_logic_vector(
-      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH downto 0) :=
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH downto 0) :=
       (others => '0');
   signal dst_out_protocol : std_logic_vector(
-      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH-1 downto 0) :=
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH-1 downto 0) :=
       (others => '0');
   signal fifo_dst_empty_n : std_logic := '0';
-  signal protocol_s       : protocol.complex_short_with_metadata.protocol_t :=
-                            protocol.complex_short_with_metadata.PROTOCOL_ZERO;
+  signal protocol_s       : timed_sample_prot.complex_short_timed_sample.protocol_t :=
+                            timed_sample_prot.complex_short_timed_sample.PROTOCOL_ZERO;
 begin
 
-  src_in <= protocol.complex_short_with_metadata.to_slv(iprotocol) & ieof;
+  src_in <= timed_sample_prot.complex_short_timed_sample.to_slv(iprotocol) & ieof;
 
   fifo : cdc.cdc.fifo
     generic map(
-      WIDTH       => protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH+1,
+      WIDTH       => timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH+1,
       DEPTH       => DEPTH)
     port map(
       src_CLK     => iclk,
@@ -73,19 +73,7 @@ begin
   oempty_n <= fifo_dst_empty_n;
 
   dst_out_protocol <= dst_out(
-      protocol.complex_short_with_metadata.PROTOCOL_BIT_WIDTH downto 1);
-  protocol_s <= protocol.complex_short_with_metadata.from_slv(dst_out_protocol);
-
-  -- FIXME: remote all this qualification with empty_n have downstream qualify use oempty_n properly
-  oprotocol.samples        <= protocol_s.samples;
-  oprotocol.samples_vld    <= protocol_s.samples_vld and fifo_dst_empty_n;
-  oprotocol.time           <= protocol_s.time;
-  oprotocol.time_vld       <= protocol_s.time_vld and fifo_dst_empty_n;
-  oprotocol.interval       <= protocol_s.interval;
-  oprotocol.interval_vld   <= protocol_s.interval_vld and fifo_dst_empty_n;
-  oprotocol.flush          <= protocol_s.flush and fifo_dst_empty_n;
-  oprotocol.sync           <= protocol_s.sync and fifo_dst_empty_n;
-  oprotocol.end_of_samples <= protocol_s.end_of_samples and fifo_dst_empty_n;
-  oeof                     <= dst_out(0) and fifo_dst_empty_n;
+      timed_sample_prot.complex_short_timed_sample.PROTOCOL_BIT_WIDTH downto 1);
+  oprotocol  <= timed_sample_prot.complex_short_timed_sample.from_slv(dst_out_protocol);
 
 end rtl;

@@ -147,14 +147,14 @@ begin
     timed_sample_prot_s.sample_vld                   <= '1' when (iopcode =
         timed_sample_prot.complex_short_timed_sample.SAMPLE) and (ixfer = '1') else '0';
 
-    timed_sample_prot_s.time.fraction(63 downto 32)  <=arg_95_0(63 downto 32); --Fraction is type ulonglong
-    timed_sample_prot_s.time.fraction(31 downto 0)   <=arg_95_0(31 downto 0); 
+    timed_sample_prot_s.time.fraction(39 downto 32)  <=arg_95_0(63 downto 56); --Fraction is type ulonglong
+    timed_sample_prot_s.time.fraction(31 downto 0)   <=arg_95_0(55 downto 24); 
     timed_sample_prot_s.time.seconds                 <= arg_95_0(95 downto 64); -- Seconds is only 32 bits
     timed_sample_prot_s.time_vld                     <= '1' when (take_time_final_r2 = '1') and (ixfer = '1')
                                                         else '0';
 
-    timed_sample_prot_s.sample_interval.fraction(63 downto 32)  <=arg_95_0(63 downto 32); --Fraction is type ulonglong
-    timed_sample_prot_s.sample_interval.fraction(31 downto 0)   <=arg_95_0(31 downto 0); 
+    timed_sample_prot_s.sample_interval.fraction(39 downto 32)  <=arg_95_0(63 downto 56); --Fraction is type ulonglong
+    timed_sample_prot_s.sample_interval.fraction(31 downto 0)   <=arg_95_0(55 downto 24); 
     timed_sample_prot_s.sample_interval.seconds      <= arg_95_0(95 downto 64); -- Seconds is only 32 bits
     timed_sample_prot_s.sample_interval_vld                 <= '1' when (take_samp_period_final_r2 = '1') and
                                                         (ixfer = '1') else '0';
