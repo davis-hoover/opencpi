@@ -59,7 +59,7 @@ The following figure shows a block diagram representation of the HDL implementat
    :alt: Back Pressure Top-level Block Diagram
    :align: center
 
-   Block diagram of back pressure HDL implementation.
+   Back Pressure HDL Worker Block Diagram
 
 
 .. ocpi_documentation_worker::
@@ -77,6 +77,3 @@ Control and Timing Signals
 The back pressure HDL worker uses the clock from
 the control plane and standard control plane signals.  
 
-Utilization
------------
-.. ocpi_documentation_utilization::
