@@ -148,7 +148,7 @@
   <devsignal name='dev_txen_config' optional='true' signals='txen-in-signals.xml'/>
 
   <!-- Sub-Device Port Connections (Supports) -->
-  <supports worker='platform_ad9361_config'>
+  <supports worker='platform_ad9361_config_csts'>
     <connect port="dev_cfg_data_port" to="dev_cfg_data_port"/>
     <connect port="dev_rxen_data_sub" to="dev_rxen_config"/>
     <connect port="dev_txen_data_sub" to="dev_txen_config"/>
