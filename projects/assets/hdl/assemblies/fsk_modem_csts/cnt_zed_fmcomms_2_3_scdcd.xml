@@ -1,6 +1,6 @@
 <HdlContainer config='base'
               only='zed'
-              constraints='cnt_zed_fmcomms_2_3_scdcd.xdc'>
+              constraints='cnt_zed_fmcomms_2_3_csts_scdcd.xdc'>
   <Device name='platform_ad9361_spi_csts' card='fmcomms_2_3_csts_lpc_scdcd'>
     <!-- MUST provide to this worker the zed's control plane clock freq value -->
     <Property name='CP_CLK_FREQ_HZ_p' value='100e6'/>
