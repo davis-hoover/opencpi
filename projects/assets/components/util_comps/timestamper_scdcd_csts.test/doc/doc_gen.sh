@@ -16,22 +16,10 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This is the util_comps library
+REPO_PATH=../../../../../..
 
-Tests = \
-        advanced_pattern.test \
-	agc_real.test \
-	fifo.test \
-	test_tx_event.test \
-	timestamper.test \
-	timestamper_scdcd.test \
-	timestamper_scdcd_csts.test \
-	tx_event_ctrlr.test \
-	zero_pad.test \
-	pattern_v2.test
-#	capture_v2.test
-
-# All workers created here will be built automatically
-# If you want to limit the workers that actually get built, set the Workers= variable
-
-include $(OCPI_CDK_DIR)/include/library.mk
+${REPO_PATH}/doc/av/tex/docGen.py \
+    ${REPO_PATH}/projects/assets/components/util_comps/specs/timestamper_scdcd_csts-spec.xml \
+    -owd \
+    ${REPO_PATH}/projects/assets/components/util_comps/timestamper_scdcd_csts.hdl/timestamper_scdcd_csts.xml \
+    --no-prompt
