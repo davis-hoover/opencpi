@@ -397,7 +397,7 @@ private:
       ad9361_opencpi.get_byte = get_byte;
       ad9361_opencpi.set_byte = set_byte;
       ad9361_opencpi.set_reset = set_reset;
-      ad9361_opencpi.worker = "platform_ad9361_config_proxy";
+      ad9361_opencpi.worker = "platform_ad9361_config_proxy_csts";
       slave_m = static_cast<OCPI::RCC::RCCUserSlave*>(static_cast<void *>(&slave));
       // sleep duration chosen to be relatively small in relation to AD9361
       // initialization duration (which, through observation, appears to be
