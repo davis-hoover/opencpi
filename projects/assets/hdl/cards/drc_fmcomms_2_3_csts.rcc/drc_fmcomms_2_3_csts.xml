@@ -121,6 +121,6 @@
     <!--==========================================================================-->
     <!-- This must be instanced here in app XML as a workaround for #827/AV-3799 -->
     <!-- It is not really needed as a slave -->
-    <Instance worker="ocpi.platform.devices.platform_ad9361_spi.hdl" name='ad9361_spi'/>
+    <Instance worker="ocpi.platform.devices.platform_ad9361_spi_csts.hdl" name='ad9361_spi'/>
   </slaves>
 </RccWorker>
