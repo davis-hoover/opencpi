@@ -548,7 +548,7 @@ def get_all_projects():
 ###############################################################################
 
 VALID_PLURAL_NOUNS = ["tests", "libraries", "workers"]
-def get_ocpidev_working_dir(noun, name, ensure_exists=False, **kwargs):
+def get_ocpidev_working_dir(noun, name, ensure_exists=True, **kwargs):
     """
     TODO
     notes:
