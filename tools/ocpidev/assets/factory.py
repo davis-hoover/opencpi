@@ -91,7 +91,6 @@ class AssetFactory():
             raise ocpiutil.OCPIException("Bad asset creation, \"" + asset_type + "\" not supported")
 
         # Call the action for this type and hand it the arguments provided
-        directory = str(Path(directory).resolve())
         return actions[asset_type](directory, name, **kwargs)
 
     @classmethod
@@ -101,7 +100,9 @@ class AssetFactory():
         (e.g. RccWorker or HdlLibraryWorker)
         """
         import _opencpi.assets.worker
-        model = Path(directory).resolve().suffix
+        model = Path(directory).suffix
+        if model and model not in ['.rcc', '.hdl'] and name:
+            model = Path(name).suffix
         if model == '.hdl':
             return _opencpi.assets.worker.HdlLibraryWorker(directory, name, **kwargs)
         elif model == '.rcc':

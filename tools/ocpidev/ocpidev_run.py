@@ -22,6 +22,7 @@ Main program that processes the run verb for ocpidev
 import argparse
 import os
 import sys
+from pathlib import Path
 import pydoc
 import types
 import _opencpi.assets.factory as ocpifactory
@@ -220,14 +221,17 @@ def main():
             # args['name'] could be None if no name is provided at the command line
             name = args['name']
             if not name and dir_type == "test":
-                directory = os.path.realpath('.')
-                name = os.path.basename(directory)
+                directory = str(Path.cwd())
+                name = Path(directory).name
             else:
                 directory = ocpiutil.get_ocpidev_working_dir(noun=args.get("noun", ""),
                                                              name=name,
                                                              library=args['library'],
                                                              hdl_library=args['hdl_library'],
-                                                             hdl_platform=args['hdl_plat_dir'])
+                                                             platform=args['hdl_plat_dir'])
+            if args['noun'] not in ['project', 'registry', 'library']:
+                name = Path(directory).name
+                directory = str(Path(directory).parent)
             if (name is None) and (dir_type in [n for n in NOUNS if n != "tests"]):
                 name = os.path.basename(os.path.realpath('.'))
             del args['name']
@@ -246,6 +250,7 @@ def main():
                                    "\nargs: " + str(args))
             my_asset = ocpifactory.AssetFactory.factory(args['noun'], directory,
                                                         name, **args)
+
             sys.exit(my_asset.run())
     except ocpiutil.OCPIException as ex:
         ocpiutil.logging.error(ex)

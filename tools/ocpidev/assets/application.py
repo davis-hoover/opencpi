@@ -203,12 +203,15 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         raise NotImplementedError("ApplicationsCollection.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of an Application Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("applications", library, hdl_library, hdl_platform)
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("applications", library, hdl_library, platform)
         if name: ocpiutil.throw_not_blank_e("applications", "name", False)
         if ocpiutil.get_dirtype() not in ["applications", "project"]:
             ocpiutil.throw_not_valid_dirtype_e(["applications", "project"])

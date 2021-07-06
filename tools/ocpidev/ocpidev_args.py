@@ -383,11 +383,23 @@ verbs = {
             'required': False,
             'application': {
                 'options': {
-                    'name': None
+                    'name': None,
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform']
                 }
             },
-            'applications': None,
+            'applications': {
+                'options': {
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform']
+                }
+            },
             'hdl': {
+                'options': {
+                    'workers_as_needed' : options['workers_as_needed'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
+                },
                 'nouns': {
                     'assembly': {
                         'options': {
@@ -415,35 +427,54 @@ verbs = {
                             'library': None
                         }
                     },
-                    'primitives': {
-                        'nouns': {
-                            'core': None,
-                            'library': None
-                        }
-                    }
+                    'primitives': None
                 }
             },
             'library': {
                 'options': {
-                    'name': None
+                    'name': {'nargs': '?'},
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
                 }
             },
             'project': {
                 'options': {
-                    'name': None
+                    'name': {'nargs': '?'},
+                    'hdl_assembly': options['hdl_assembly'],
+                    'no_assemblies': options['no_assemblies'],
+                    'hdl': options['hdl'],
+                    'rcc': options['rcc'],
+                    'worker': options['worker'],
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'workers_as_needed' : options['workers_as_needed'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform']
                 }
             },
             'test': {
                 'options': {
-                    'name': {
-                        'nargs': '?'
-                    }
+                    'name': {'nargs': '?'},
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform'],
+                    'library': options['library']
                 }
             },
             'worker': {
                 'options': {
-                    'library': options['library'],
-                    'name': None
+                    'name': None,
+                    'hdl_rcc_platform': options['hdl_rcc_platform'],
+                    'rcc_platform': options['rcc_platform'],
+                    'hdl_target': options['hdl_target'],
+                    'hdl_platform': options['hdl_platform'],
+                    'library': options['library']
                 }
             }
         }
@@ -613,7 +644,7 @@ verbs = {
     },
     'delete': {
         'options': {
-            'name': None
+            'name': {'nargs': '?'}
         },
         'nouns': {
             'application': None,

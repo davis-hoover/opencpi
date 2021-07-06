@@ -203,7 +203,7 @@ class HdlApplicationAssembly(HdlAssembly, ReportableAsset):
         hdl_path = Path(working_path, 'hdl')
         if not hdl_path.exists() and not ensure_exists:
             hdl_path.mkdir()
-        working_path = Path(hdl_path, 'assemblies')
+        working_path = Path(hdl_path, 'assemblies', name)
         
         return str(working_path)
 
@@ -265,12 +265,15 @@ class HdlAssembliesCollection(HDLBuildableAsset, ReportableAsset):
         raise NotImplementedError("HdlAssembliesCollection.build() is not implemented")
 
     @staticmethod
-    def get_working_dir(name, library, hdl_library, hdl_platform):
+    def get_working_dir(name, ensure_exists=True, **kwargs):
         """
         return the directory of a HDL Assembly Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, hdl_platform)
+        library = kwargs.get('library', '')
+        hdl_library = kwargs.get('hdl_library', '')
+        platform = kwargs.get('platform', '')
+        ocpiutil.check_no_libs("hdl-assembly", library, hdl_library, platform)
         if name: ocpiutil.throw_not_blank_e("applications", "name", False)
         if ocpiutil.get_dirtype() not in ["project", "hdl-assemblies"]:
             ocpiutil.throw_not_valid_dirtype_e(["project", "hdl-assemblies"])

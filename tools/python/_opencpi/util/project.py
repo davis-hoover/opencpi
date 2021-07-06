@@ -563,7 +563,7 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=False, **kwargs):
     """
     # what about showing of global things is this function even called in that case? isnt the object
     # that is created always the current registry?
-    if not is_path_in_project(".") and not is_path_in_project(name):
+    if not is_path_in_project(".") and not (name and is_path_in_project(name)):
         if noun == 'project':
         # Check if project ID passed as a name
             project_registry = get_project_registry_dir()[1]
@@ -624,7 +624,7 @@ def get_ocpidev_working_dir(noun, name, ensure_exists=False, **kwargs):
         raise OCPIException(err_msg)
         # pylint:enable=undefined-variable
 
-    return os.path.realpath(asset_dir)
+    return str(Path(asset_dir).resolve())
 
 def throw_not_valid_dirtype_e(valid_loc):
     """

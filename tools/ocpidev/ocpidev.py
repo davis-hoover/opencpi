@@ -65,8 +65,14 @@ def main():
         ocpicreate(args, cdk_dir, orig_dir)
     elif args.verb in ['set', 'unset']:
         ocpi_set_unset(args)
-    directory,name = get_working_dir(args)
+    try:
+        directory,name = get_working_dir(args)
+    except:
+    # Could not get working directory. Likely un-implemented noun.
+    # Fall back ocpidev.sh
+        ocpidev_sh(cdk_dir=cdk_dir, orig_dir=orig_dir)
     if args.noun in ['project', 'library', 'registry']:
+    # Libraries, projects, and registries want the full path as the directory
         directory = str(Path(directory,name))
 
     try:
@@ -116,9 +122,16 @@ def postprocess_args(args):
         args.noun = 'hdl-card'
     if hasattr(args, 'rcc-noun'):
         args.model = 'rcc'
+    elif args.noun == 'worker':
+        args.model = Path(args.name).suffix
+        if not args.model:
+            err_msg = ' '.join([
+                'Unsupported authoring model "{}"'.format(args.model), 
+                'for worker located at "{}"'.format(args.directory)
+            ])
+            raise ocpiutil.OCPIException(err_msg)
     else:
         args.model = 'hdl'
-
     return args
 
 
@@ -183,12 +196,8 @@ def get_working_dir(args, ensure_exists=True):
     if noun == 'registry' or (noun == 'project' and args.verb == 'create'):
         working_path = Path(Path.cwd(), name)
     else:
-        try:
-            working_path = Path(ocpiutil.get_ocpidev_working_dir(
-                noun, name, ensure_exists=ensure_exists, **kwargs))
-        except ocpiutil.OCPIException as e:
-            ocpiutil.logging.error(e)
-            sys.exit(1)
+        working_path = Path(ocpiutil.get_ocpidev_working_dir(
+            noun, name, ensure_exists=ensure_exists, **kwargs))
     name = str(working_path.name)
     working_dir = str(working_path.parent)
     print('name:', name)

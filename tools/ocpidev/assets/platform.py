@@ -520,8 +520,6 @@ class HdlPlatform(Platform):
         """
         HdlPlatform constructor
         """
-        # if not name:
-        #     name = str(Path(directory).name)
         super().__init__(directory, name)
         self.target = target
         self.exactpart = exactpart

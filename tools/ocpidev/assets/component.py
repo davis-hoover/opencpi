@@ -377,7 +377,7 @@ class Component(ShowableComponent):
             ocpiutil.throw_not_valid_dirtype_e(valid_dirtypes)
         if not name:
             ocpiutil.throw_not_blank_e("component", "name", True)
-
+        print('platform:', platform)
         project_path = Path(ocpiutil.get_path_to_project_top())
         if library:
             if not library == 'components':
@@ -385,7 +385,7 @@ class Component(ShowableComponent):
             else:
                 working_path = Path(project_path, library)
         elif hdl_library:
-            working_path = Path(project_path, hdl_library)
+            working_path = Path(project_path, 'hdl', hdl_library)
         elif platform:
             working_path = Path(
                 project_path, 'hdl', 'platforms', platform, 'devices')
