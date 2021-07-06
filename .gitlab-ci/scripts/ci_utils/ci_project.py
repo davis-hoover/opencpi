@@ -80,6 +80,7 @@ def discover_local_projects(projects_path, whitelist=None, blacklist=None):
                 continue
             group = project_path.parent.stem
             group = 'opencpi' if group == 'projects' else group
+            group = 'osp' if group == 'osps' else group
             project = Project(name=project_name, path=project_path, 
                               group=group)
             projects.append(project)
