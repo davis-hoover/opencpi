@@ -279,18 +279,6 @@ class LibraryCollection(RunnableAsset, RCCBuildableAsset, HDLBuildableAsset, Rep
                 lib_directory = directory + "/" + lib
                 self.library_list.append(AssetFactory.factory("library", lib_directory, **kwargs))
 
-
-    def get_subdir(self, **kwargs):
-        # TODO: docstring
-        library_name = kwargs.pop('library', None)
-        if not library_name:
-            err_msg = 'must specify a library when operating from a libraries collection'
-            raise ocpiutil.OCPIException(err_msg)
-        library_path = Path(self.directory, library_name)
-        library = Library(str(library_path))
-
-        return library.get_subdir(**kwargs)
-
     def run(self):
         """
         Runs the Library with the settings specified in the object.  Throws an exception if the

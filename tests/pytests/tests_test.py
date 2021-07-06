@@ -52,9 +52,10 @@ class TestsTest(unittest.TestCase):
         """
         my_asset = AssetFactory.factory(self.asset_type,
                                         "../av-test/components/",
-                                        "prop_mem_align_info")
-        
+                                        "test_worker")
+
         assert my_asset.run() == 0
+
 
 if __name__ == '__main__':
     unittest.main()

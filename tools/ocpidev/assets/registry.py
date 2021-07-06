@@ -80,10 +80,6 @@ class Registry(ShowableAsset):
             # pylint:disable=bad-continuation
             if (directory is not None and
                 os.path.realpath(directory) != self.__projects[package_id].directory):
-                print(self.__projects[package_id].directory)
-                print(os.path.realpath(directory))
-                print(Path(directory).resolve())
-                print(Path(self.__projects[package_id].directory).resolve())
                 logging.warning("Registry at \"" + self.directory + "\" contains a project with " +
                                 "package-ID \"" + package_id + "\", but it is not the same " +
                                 "project as \"" + directory + "\".")

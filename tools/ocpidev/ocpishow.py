@@ -304,9 +304,6 @@ def main():
 
             directory = get_dir_from_noun(noun, name, args)
             directory = str(Path(directory).resolve())
-            # if args.noun not in ['project', 'library', 'registry']:
-            #     name = Path(directory).name
-            #     directory = str(Path(directory).parent)
 
             ocpiutil.logging.debug('Choose directory "' + str(directory) + '" to operate in')
             # if noun is None:

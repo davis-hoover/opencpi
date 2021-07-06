@@ -27,7 +27,7 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree as ET
 import _opencpi.util as ocpiutil
-from .abstract import ShowableAsset, Asset
+from .abstract import ShowableAsset
 
 class ShowableComponent(ShowableAsset):
     """
@@ -408,6 +408,7 @@ class Component(ShowableComponent):
 
     @staticmethod
     def get_filename(directory, name, ensure_exists=True):
+        """Gets the appropriate file name of a component asset"""
         if ensure_exists:
             end_list = ["", ".xml", "_spec.xml", "-spec.xml"]
             for ending in end_list:

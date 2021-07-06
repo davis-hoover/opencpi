@@ -250,7 +250,6 @@ def main():
                                    "\nargs: " + str(args))
             my_asset = ocpifactory.AssetFactory.factory(args['noun'], directory,
                                                         name, **args)
-
             sys.exit(my_asset.run())
     except ocpiutil.OCPIException as ex:
         ocpiutil.logging.error(ex)

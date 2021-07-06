@@ -46,10 +46,6 @@ class Asset(metaclass=ABCMeta):
             directory - The location on the file system of the asset that is being constructed.
                         both relative and global file paths are valid.
         """
-        # if not Path(directory).exists():
-        #     err_msg = '{} does not exist at: {}'
-        #     err_msg = err_msg.format(name if name else 'location', directory)
-        #     raise ocpiutil.OCPIException(err_msg)
         if not name:
             self.name = os.path.basename(directory)
             directory = os.path.dirname(directory)

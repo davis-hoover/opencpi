@@ -40,7 +40,6 @@ class RccPlatformsCollection(ShowableAsset):
     def __init__(self, directory, name=None, **kwargs):
         self.check_dirtype("rcc-platforms", directory)
         super().__init__(directory, name, **kwargs)
-        
         self.platform_list = []
         if kwargs.get("init_hdlplats", False):
             logging.debug("Project constructor creating HdlPlatformWorker Objects")
@@ -129,7 +128,6 @@ class HdlPlatformsCollection(HDLBuildableAsset, ReportableAsset):
         return the directory of an HDL Platform Collection given the name (name) and
         library specifiers (library, hdl_library, hdl_platform)
         """
-        # ocpiutil.check_no_libs("hdl-platforms", library, hdl_library, hdl_platform)
         library = kwargs.get('library', '')
         hdl_library = kwargs.get('hdl_library', '')
         platform = kwargs.get('platform', '')

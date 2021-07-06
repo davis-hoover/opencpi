@@ -43,7 +43,6 @@ class Application(RunnableAsset, RCCBuildableAsset):
         """
         if name:
             if fnmatch.fnmatch(name, '*.xml'): # explicit .xml implies non-dir app
-                # parent_dir = str(Path(directory).parent)
                 self.check_dirtype("applications", directory)
             elif os.path.basename(directory) == "applications" and \
                 os.path.exists(directory + "/" + name + ".xml"):

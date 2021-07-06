@@ -43,8 +43,6 @@ def main():
     cdk_dir = ocpiutil.get_cdk_dir() # Check cdk path exists and is valid
     args = ocpiargparse.parse_args(args_dict, prog='ocpidev')
     sys.argv = sys.argv[1:]
-    print(args)
-    print(sys.argv)
     # If verb is handled by another python script or function, hand off to it.
     # TODO: change argparsers in these scripts to use ocpiargs.py
     if args.verb == 'show':
@@ -55,7 +53,7 @@ def main():
         sys.exit(rc)
     elif args.verb == 'run':
         rc = ocpidev_run.main()
-
+    
     args = postprocess_args(args)
     orig_dir = Path.cwd()
     change_dir(args.directory)
@@ -78,17 +76,15 @@ def main():
     try:
     # Try to instantiate the appropriate asset from noun
         asset_factory = ocpiassets.factory.AssetFactory()
-        asset = asset_factory.factory(args.noun, directory, name, init_libs=True)
+        asset = asset_factory.factory(args.noun, directory, name)
     except ocpiutil.OCPIException as e:
     # Noun not implemented; fall back to ocpidev.sh
-        print(e)
         ocpidev_sh(cdk_dir, orig_dir)
     try:
     # Try to get appropriate method from verb
         asset_method = getattr(asset, args.verb) 
     except AttributeError as e:
     # Verb not implemented; fall back to ocpidev.sh
-        print(e)
         ocpidev_sh(cdk_dir, orig_dir)
     try:
     # Get verb method parameters, collect them from args, and try to
@@ -107,13 +103,12 @@ def main():
         sys.exit(1)
     except Exception as e:
     # Verb not implemented fully/at all; fall back to ocpidev.sh
-        print(e)
         ocpidev_sh(cdk_dir, orig_dir)
 
 
 def postprocess_args(args):
     """
-    TODO: docstring
+    Post-processes user arguments
     """
     noun = getattr(args, 'noun', '')
     if noun == 'spec':
@@ -186,7 +181,9 @@ def ocpicreate(args, cdk_dir=None, orig_dir=None):
 
 def get_working_dir(args, ensure_exists=True):
     """
-    TODO: docstring
+    Calls ocpiutil.get_ocpidev_working_dir() to get the appropriate
+    directory for an asset. Splits the directory into name and parent 
+    directory tuple and returns them.
     """
     kwargs = copy(vars(args))
     name = kwargs.pop('name', '')
@@ -200,15 +197,14 @@ def get_working_dir(args, ensure_exists=True):
             noun, name, ensure_exists=ensure_exists, **kwargs))
     name = str(working_path.name)
     working_dir = str(working_path.parent)
-    print('name:', name)
-    print('working_dir:', working_dir)
     
     return working_dir,name
 
 
 def change_dir(directory):
     """
-    TODO: doctstring
+    Calls ocpiutil.change_dir to change to specified directory.
+    Catches and logs any OCPIException that is raised and exits.
     """
     try:
         ocpiutil.change_dir(directory)
@@ -219,7 +215,6 @@ def change_dir(directory):
 
 def ocpidev_sh(cdk_dir=None, orig_dir=None):
     """Calls ocpidev.sh and exits"""
-    print('ocpidev.sh')
     if not cdk_dir:
         cdk_dir = ocpiutil.get_cdk_dir()
     if orig_dir:

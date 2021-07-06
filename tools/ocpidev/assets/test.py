@@ -90,10 +90,13 @@ class Test(RunnableAsset, HDLBuildableAsset, RCCBuildableAsset):
         Runs the Test with the settings specified in the object
         """
         directory = str(Path(self.directory, self.name))
+        make_file = ocpiutil.get_makefile(directory, "test")[0]
+        make_file = str(Path(directory, make_file).resolve())
+
         return ocpiutil.execute_cmd(self.get_settings(),
                                     directory,
                                     self.mode_dict[self.mode],
-                                    file=ocpiutil.get_makefile(directory, "test")[0])
+                                    file=make_file)
 
     def build(self):
         """

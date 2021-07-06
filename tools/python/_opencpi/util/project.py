@@ -462,7 +462,6 @@ def is_path_in_registry(origin_path="."):
         # If registry does not exist, origin path cannot be a project in it
         return False
     origin_realpath = os.path.realpath(origin_path)
-    
     # For each project in the registry, check equivalence to origin_path
     for project in glob(project_registry_dir + "/*"):
         if origin_realpath == os.path.realpath(project):

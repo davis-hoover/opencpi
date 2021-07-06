@@ -55,6 +55,7 @@ class AssetFactory():
         if not directory:
             raise ocpiutil.OCPIException("directory passed to  AssetFactory is None.  Pass a " +
                                          "valid directory to the factory")
+        directory = str(Path(directory).resolve())
         # actions maps asset_type string to the function that creates objects of that type
         # Some types will use plain constructors,
         # and some will use __get_or_create with asset_cls set accordingly
