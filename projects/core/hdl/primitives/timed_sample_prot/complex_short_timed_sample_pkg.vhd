@@ -50,7 +50,7 @@ function from_slv(slv   : in std_logic_vector) return op_sample_t;
 
 -- operation time
 constant OP_TIME_ARG_SECONDS_BIT_WIDTH       : positive := 32;
-constant OP_TIME_ARG_FRACTION_BIT_WIDTH      : positive := 64;
+constant OP_TIME_ARG_FRACTION_BIT_WIDTH      : positive := 40;
 constant OP_TIME_BIT_WIDTH                   : positive :=
     OP_TIME_ARG_SECONDS_BIT_WIDTH +
     OP_TIME_ARG_FRACTION_BIT_WIDTH;
@@ -64,7 +64,7 @@ function from_slv(slv : in std_logic_vector) return op_time_t;
 
 -- operation sample_interval
 constant OP_SAMPLE_INTERVAL_ARG_SECONDS_BIT_WIDTH       : positive := 32;
-constant OP_SAMPLE_INTERVAL_ARG_FRACTION_BIT_WIDTH      : positive := 64;
+constant OP_SAMPLE_INTERVAL_ARG_FRACTION_BIT_WIDTH      : positive := 40;
 constant OP_SAMPLE_INTERVAL_BIT_WIDTH                   : positive :=
     OP_SAMPLE_INTERVAL_ARG_SECONDS_BIT_WIDTH +
     OP_SAMPLE_INTERVAL_ARG_FRACTION_BIT_WIDTH;

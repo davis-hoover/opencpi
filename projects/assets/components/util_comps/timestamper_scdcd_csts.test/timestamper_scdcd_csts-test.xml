@@ -1,0 +1,17 @@
+<Tests usehdlfileio='false' duration='120'>
+  <Input port='in'
+         script='generate.py'
+         messagesinfile='true'/>
+  <Output port='out'
+          script='verify.py'
+          view='view.py'
+          messagesinfile='true'/>
+  <Property name='time_correction_seconds'
+            values='0,1,-1'/>
+  <Property name='time_correction_fraction'
+            values='0,1,-1'/>
+  <Property name='samples_per_timestamp'
+            values='0,1,1024,4091,4092,4093'/>
+  <Property name='force_error_on_invalid_time_at_start'
+            values='false,true'/>
+</Tests>
