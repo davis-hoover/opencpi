@@ -61,7 +61,7 @@ echo ===========================================================================
 echo "We are running in $(pwd) where the git clone of opencpi has been placed."
 echo ================================================================================
 
-$OCPI_CDK_DIR/scripts/enable-rcc-platform.sh $1
+$OCPI_CDK_DIR/scripts/enable-rcc-platform.sh $OCPI_TARGET_PLATFORM
 
 # Export ocpi python libraries needed in later steps, avoiding any platform exports
 if ! ./scripts/export-framework.sh - &> /tmp/tmp.$$; then

@@ -148,7 +148,7 @@ begin
              SAMPLE when iprotocol_r.sample_vld = '1' and
                           (mux_start or state_r = DISCONTINUITY or state_r = TIME_95_64 or
                            state_r = SAMPLE_INTERVAL_95_64 or state_r = FLUSH) else
-             METADATA_31_0 when iprotocol.metadata_vld = '1' and (mux_start or 
+             METADATA_31_0 when iprotocol_r.metadata_vld = '1' and (mux_start or 
                                  state_r = DISCONTINUITY or state_r = TIME_95_64 or 
                                   state_r = SAMPLE_INTERVAL_95_64 or state_r = FLUSH or state_r = SAMPLE) else
              METADATA_63_32 when state_r = METADATA_31_0 else
@@ -170,12 +170,12 @@ begin
           eom     <= iprotocol.discontinuity or iprotocol.time_vld or iprotocol.sample_interval_vld or iprotocol.flush;
         when TIME_31_0 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.TIME_TIME; -- fraction is split into two sections. This is secion 1.
-          odata  <= iprotocol_r.time.fraction(31 downto 0); -- This is the 1st set of 32 bits.
+          odata  <= iprotocol_r.time.fraction(7 downto 0) & X"000000"; -- This is the 1st set of 32 bits.
           som    <= '1';
           eom    <= '0';
         when TIME_63_32 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.TIME_TIME; --fraction is split into two sections. This is section 2.
-          odata  <= iprotocol_r.time.fraction(63 downto 32); -- This is the 2nd set of 32 bits.
+          odata  <= iprotocol_r.time.fraction(39 downto 8); -- This is the 2nd set of 32 bits.
           som    <= '0';
           eom    <= '0';
         when TIME_95_64 =>
@@ -185,12 +185,12 @@ begin
           eom    <= '1';
         when SAMPLE_INTERVAL_31_0 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.SAMPLE_INTERVAL; -- fraction is split into two sections. This is secion 1.
-          odata  <= iprotocol_r.sample_interval.fraction(31 downto 0); -- this is the 1st set of 32 bits.
+          odata  <= iprotocol_r.sample_interval.fraction(7 downto 0) & X"000000"; -- this is the 1st set of 32 bits.
           som    <= '1';
           eom    <= '0';
         when SAMPLE_INTERVAL_63_32 =>
           opcode <= timed_sample_prot.complex_short_timed_sample.SAMPLE_INTERVAL; --fraction is split into two sections. This is section 2.
-          odata  <= iprotocol_r.sample_interval.fraction(63 downto 32); -- This is the 2nd set of 32 bits.
+          odata  <= iprotocol_r.sample_interval.fraction(39 downto 8); -- This is the 2nd set of 32 bits.
           som    <= '0';
           eom    <= '0';
         when SAMPLE_INTERVAL_95_64 =>

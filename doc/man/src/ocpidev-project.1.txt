@@ -37,11 +37,8 @@ A project has:
 - A defined directory structure for storing assets
 in both source and built forms
 
-- A project "make" file (named *`Makefile`*) that
-builds all the buildable assets that the project contains
-
-- A project "make" file fragment (named *`Project.mk`*)
-that defines make variables and options to be applied to all
+- A project XML file (named *`Project.xml`*)
+that defines attributes for the project and some others to be applied to all
 assets in the project
 
 - An optional export file (named *`Project.exports`*)
