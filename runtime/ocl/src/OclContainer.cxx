@@ -463,11 +463,11 @@ namespace OCPI {
 	  void *mapped;
 	  if (fd < 0 ||
 	      (length = lseek(fd, 0, SEEK_END)) == -1 ||
-	      (mapped = mmap(NULL, length, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
+	      (mapped = mmap(NULL, (size_t)length, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
 	    throw OU::Error("Can't load artifact: %s (%s, %d)\n",
 			    name().c_str(), strerror(errno), errno);
 	  cl_int rc, rc1;
-	  size_t bytes = length - lart.metadataLength();
+	  size_t bytes = OCPI_SIZE_T_DIFF(length, lart.metadataLength());
 
 	  const unsigned char *binary = (const unsigned char *)mapped;
 	  ocpiDebug("clCreateProgramWithBinary ctx %p id %p bytes %zu", ctx, id, bytes);
@@ -624,7 +624,7 @@ namespace OCPI {
 	std::string vendorName, familyName;
 	const char *dash = strchr(type, '-');
 	if (dash) {
-	  vendorName.assign(type, dash - type);
+	  vendorName.assign(type, OCPI_SIZE_T_DIFF(dash, type));
 	  familyName = dash + 1;
 	} else {
 	  familyName = type;
@@ -784,7 +784,7 @@ namespace OCPI {
 	assert(artifact);
 	Artifact &art = static_cast<Artifact&>(*artifact);
 
-	int nq = static_cast<Container&>(container()).device().nextQOrd();
+	uint32_t nq = static_cast<Container&>(container()).device().nextQOrd();
 
 	return art.createWorker(*this, appInstName, impl, inst, slaves, hasMaster, member,
 				crewSize, params, nq);

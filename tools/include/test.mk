@@ -80,7 +80,7 @@ endif
 # Next, generic goals
 .PHONY: run clean generate build inputs
 # Next local test-only goals
-.PHONY: prepare runonly verify runnoprepare view
+.PHONY: prepare runonly verify runnoprepare view runverify
 # Map global goals to local goals
 test: build
 runtests: run
@@ -140,13 +140,15 @@ runnoprepare:
 runonly: prepare runnoprepare
 # runtests is for compatibility
 # run is generic (not just for tests)
-run: prepare
+runverify:
 	$(AT)echo ======== Running and verifying test outputs on available platforms for $(CwdName):
 	$(AT)if [ -d gen/applications ]; then \
 	       ./run/runtests.sh run verify $(and $(View),view); \
 	     else \
 	       echo No tests generated here so none run.; \
 	     fi
+
+run: prepare runverify
 
 # only for verify only so we can use wildcard
 RunPlatforms=$(foreach p,$(filter-out $(ExcludePlatforms),$(notdir $(wildcard run/*))),\

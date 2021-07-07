@@ -145,6 +145,11 @@ Options When Building Workers, Tests and other Assets in Libraries
     building the library itself, while the *`-l`* option is used when
     building an asset inside a library.
 
+Options When Building Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--generate`*::
+    Only perform the *generate* phase of unit tests, not the *build* phase.
+
 EXAMPLES
 --------
 . Build the current asset or directory and those underneath it

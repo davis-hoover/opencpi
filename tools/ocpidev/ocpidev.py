@@ -41,7 +41,9 @@ def main():
     """
     ocpiutil.get_cdk_path() # Check cdk path exists and is valid
     args = ocpiargparse.parse_args(args_dict, prog='ocpidev')
-    sys.argv = sys.argv[1:]
+    # This is not strictly correct if verb happens to be the value an option that precedes positional verb.
+    sys.argv.remove(args.verb)
+    sys.argv[0] = args.verb;
     # If verb is handled by another python script or function, hand off to it.
     # TODO: change argparsers in these scripts to use ocpiargs.py
     if args.verb == 'show':

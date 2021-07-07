@@ -63,7 +63,15 @@ Asset types to be specified in the '<noun>' argument are:
 
 OPTIONS
 -------
-There are no verb-specific options.
+
+Options When Cleaning Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*`--simulation`*::
+    Only clean the outputs from simulation, not any results of building or execution.  Simulation outputs can be
+    very large.  This removes them without removing other potentially useful outputs.
+    
+*`--execute`*::
+    Only clean the outputs from test execution, not building.  This 'does' include simulation outputs.
 
 EXAMPLES
 --------
