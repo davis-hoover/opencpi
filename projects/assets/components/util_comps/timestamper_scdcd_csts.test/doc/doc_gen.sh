@@ -16,12 +16,10 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-OcpiApp=copyFile
+REPO_PATH=../../../../../..
 
-override OcpiRunAfter+= $(Transport) > /dev/null ; \
-               cmp hello.file out.file
-
-include $(OCPI_CDK_DIR)/include/application.mk
-
-clean::
-	$(AT)rm -f -r out.file
+${REPO_PATH}/doc/av/tex/docGen.py \
+    ${REPO_PATH}/projects/assets/components/util_comps/specs/timestamper_scdcd_csts-spec.xml \
+    -owd \
+    ${REPO_PATH}/projects/assets/components/util_comps/timestamper_scdcd_csts.hdl/timestamper_scdcd_csts.xml \
+    --no-prompt

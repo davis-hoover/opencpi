@@ -47,24 +47,22 @@ A block diagram representation of the implementation is given in :numref:`metada
    :alt: Metadata Stressor Component Block Diagram
    :align: center
 
-   Block diagram of metadata stressor component.
+   Metadata Stressor Component Block diagram
 
 Interface
 ---------
 .. literalinclude:: ../specs/metadata_stressor-spec.xml
    :language: xml
 
-Opcode Handling
-~~~~~~~~~~~~~~~
-To be supplied: Description of how the non-stream opcodes are handled.
-
 Properties
 ~~~~~~~~~~
-.. Comment out ocpi_documentation_properties. It fails on this component.
 
+.. ocpi_documentation_properties::
+   
 Ports
 ~~~~~
-.. Comment out ocpi_documentation_ports. It fails on this component.
+
+.. ocpi_documentation_ports::
 
    in: 32 bits.
    out: 32 bits.

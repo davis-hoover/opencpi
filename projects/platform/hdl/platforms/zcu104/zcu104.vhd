@@ -29,8 +29,8 @@ architecture rtl of zcu104_worker is
   --       This is not yet supported on ZynqMP/UltraScale+, so it is tied to '0' to use GP0.
   --constant whichGP : natural := to_integer(unsigned(from_bool(useGP1)));
   constant whichGP : natural := to_integer(unsigned(from_bool('0')));
-  signal ps_m_axi_gp_in   : axi.zynq_ultra_m_hp64.axi_s2m_array_t(0 to C_M_AXI_HP_COUNT-1); -- s2m
-  signal ps_m_axi_gp_out  : axi.zynq_ultra_m_hp64.axi_m2s_array_t(0 to C_M_AXI_HP_COUNT-1); -- m2s
+  signal ps_m_axi_gp_in   : axi.zynq_ultra_m_hp.axi_s2m_array_t(0 to C_M_AXI_HP_COUNT-1); -- s2m
+  signal ps_m_axi_gp_out  : axi.zynq_ultra_m_hp.axi_m2s_array_t(0 to C_M_AXI_HP_COUNT-1); -- m2s
   signal ps_s_axi_hp_in   : axi.zynq_ultra_s_hp.axi_m2s_array_t(0 to C_S_AXI_HP_COUNT-1); -- m2s
   signal ps_s_axi_hp_out  : axi.zynq_ultra_s_hp.axi_s2m_array_t(0 to C_S_AXI_HP_COUNT-1); -- s2m
   signal fclk             : std_logic_vector(3 downto 0);
@@ -84,7 +84,7 @@ begin
       s_axi_hp_out          => ps_s_axi_hp_out);
 
   -- Adapt the axi master from the PS to be a CP Master
-  cp : axi.zynq_ultra_m_hp64.axi2cp_zynq_ultra_m_hp64
+  cp : axi.zynq_ultra_m_hp.axi2cp_zynq_ultra_m_hp
     port map(
       clk     => clk,
       reset   => reset,
@@ -96,7 +96,7 @@ begin
   zynq_ultra_out_data          <= my_sdp_out_data;
   props_out.sdpDropCount <= zynq_ultra_in(0).dropCount;
   -- We use one sdp2axi adapter foreach of the processor's S_AXI_HP channels
-  g : for i in 0 to C_M_AXI_HP_COUNT-1 generate
+  g : for i in 0 to C_S_AXI_HP_COUNT-1 generate
     dp : axi.zynq_ultra_s_hp.sdp2axi_zynq_ultra_s_hp
       generic map(ocpi_debug => true,
                   sdp_width  => to_integer(sdp_width))

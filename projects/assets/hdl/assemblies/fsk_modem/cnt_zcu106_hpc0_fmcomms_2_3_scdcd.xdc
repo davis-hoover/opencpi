@@ -1,0 +1,1 @@
+../../../../platform/hdl/platforms/zcu106/cnt_zcu106_hpc0_fmcomms_2_3_scdcd.xdc
