@@ -99,7 +99,7 @@ ifndef Package
   Package:=$$(PackageID)
 endif
 
-ifeq ($$(Package),)
+ifndef Package
   Package:=$$(PackagePrefix)$$(PackageName)
 else
   ifneq ($$(filter .%,$$(Package)),)

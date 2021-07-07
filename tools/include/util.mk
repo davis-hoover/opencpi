@@ -874,16 +874,18 @@ define OcpiSetProjectX
   # Otherwise, use PackagePrefix.PackageName
   # PackagePrefix defaults to 'local'
   # PackageName defaults to directory name
+  # PackageID is the documented, preferred user-specified value.
+  # FIXME: All this code could be changed to use PackageID rather than Package someday
   ifndef ProjectPackage
-    ifneq ($$(Package),)
+    ifdef Package
       ProjectPackage:=$$(Package)
-    else ifneq ($$(PackageID),)
+    else ifdef PackageID
       ProjectPackage:=$$(PackageID)
     else
-      ifeq ($$(PackagePrefix),)
+      ifndef PackagePrefix
         PackagePrefix:=local
       endif
-      ifeq ($$(PackageName),)
+      ifndef PackageName
         PackageName:=$$(notdir $$(call OcpiAbsDir,$1))
       endif
       ProjectPackage:=$$(if $$(PackagePrefix),$$(patsubst %.,%,$$(PackagePrefix)).)$$(PackageName)

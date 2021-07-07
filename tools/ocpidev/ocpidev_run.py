@@ -31,7 +31,7 @@ NOUNS = ["test", "tests", "library", "application", "applications", "project", "
 NOUNS_NO_LIBS = ["test", "tests", "library", "application", "applications", "project"]
 MODES = ["all", "gen", "gen_build", "prep_run_verify", "prep", "run", "prep_run", "verify", "view",
          "clean_all", "clean_run", "clean_sim"]
-
+PHASES=["prepare", "run", "verify", "view"]
 def parse_cl_vars():
     """
     Construct the argparse object and parse all the command line arguments into a dictionary to
@@ -81,6 +81,8 @@ def parse_cl_vars():
     parser.add_argument("name", default=None, type=str, action="store", nargs='?',
                         help="The name of the test or application to run.  Positional run options can follow the name after --.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Be verbose with output.")
+    parser.add_argument("--phase", action="append", dest="phases", metavar="PHASE", default=[],
+                        choices=PHASES, help="Specific phase of test execution")
     parser.add_argument("--keep-simulations", dest="keep_sims", action="store_true",
                         help="Keep HDL simulation files regardless of verification results.  " +
                         "By default, simulation files are removed if the verification is " +

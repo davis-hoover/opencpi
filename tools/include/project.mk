@@ -213,6 +213,7 @@ hdlportable: hdlcomponents hdladapters hdldevices hdlcards
 
 hdl: hdlassemblies
 
+# FIXME: cleaning should not depend on imports.  Fix *that* - see below
 cleanhdl cleanrcc cleanocl cleancomponents cleanapplications: imports
 
 cleanhdl:
@@ -268,8 +269,9 @@ cleanapplications:
 
 # Note that imports must be cleaned last because the host rcc platform directory
 # needs to be accessible via imports for projects other than core
-# (e.g. for cleaning rcc)
+# (e.g. for cleaning rcc) FIXME: cleaning should not depend on imports.  Fix *that*
 clean: cleanapplications cleanrcc cleanhdl cleanocl cleanexports cleanimports
+	$(call MaybeMake,components,clean)
 	rm -r -f artifacts project-metadata.xml
 
 # Remove the imports link only if it is the default or it is broken

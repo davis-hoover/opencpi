@@ -160,7 +160,7 @@ HdlChoosePart=$(foreach c,\
           $(and $(filter $f,$(HdlTarget)),$(word 2,$(subst :, ,$p)))))),\
       $(HdlExactPart),\
       $(HdlDefaultTarget_$(HdlTarget)),\
-      $(firstword $(HdlTargets_$(HdlTarget))))),$(info CHOOSEPART:$c)$c)
+      $(firstword $(HdlTargets_$(HdlTarget))))),$(infox CHOOSEPART:$c)$c)
 
 # Make the initial definition as a simply-expanded variable
 HdlAllPlatforms:=
