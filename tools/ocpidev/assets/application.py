@@ -190,7 +190,8 @@ class ApplicationsCollection(RunnableAsset, RCCBuildableAsset):
         ApplicationsCollection
         """
         return ocpiutil.execute_cmd(self.get_settings(),
-                                    self.directory, ["run"])
+                                    self.directory, ["run"],
+                                    ocpiutil.get_makefile(self.directory, "applications")[0])
 
     def build(self):
         """

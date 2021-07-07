@@ -68,7 +68,7 @@ static inline const char *hdlComment(Language lang) { return lang == VHDL ? "--"
 extern const char *endians[];
 
 // These are for all implementaitons whether assembly or written
-#define HDL_TOP_ATTRS "Pattern", "PortPattern", "DataWidth", "library","ExactParts"
+#define HDL_TOP_ATTRS "Pattern", "PortPattern", "DataWidth", "library", "ExactParts"
 // These are for implementaitons that you write (e.g. not generated assemblies), not devices
 #define HDL_WORKER_ATTRS  IMPL_ATTRS, HDL_TOP_ATTRS, "outer", "endian", "Pattern", "PortPattern", \
                           "DataWidth", "library"

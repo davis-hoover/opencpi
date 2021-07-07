@@ -98,7 +98,7 @@ namespace OCPI {
 	  delayms = DELAYMS;
 	for (unsigned n = 0;
 	     n < RETRIES &&
-	       m_socket->send(m_request, ntohs(ech_out.length)+2, m_devAddr, 0, NULL, m_error); n++) {
+	       m_socket->send(m_request, ntohs(ech_out.length)+2u, m_devAddr, 0, NULL, m_error); n++) {
 	  size_t length;
 	  OS::Ether::Address l_addr;
 	  uint64_t ns = delayms * (uint64_t)1000000;
@@ -165,7 +165,7 @@ namespace OCPI {
       get(RegisterOffset offset, size_t bytes, uint32_t *status) {
 	ocpiDebug("Accessor read for offset 0x%zx of %zu bytes", offset, bytes);
 	EtherControlRead &ecr =  *(EtherControlRead *)(m_request.payload);
-	ecr.address = htonl((offset & 0xffffff) & ~3);
+	ecr.address = htonl((offset & 0xffffff) & ~3u);
 	ecr.header.length = htons((short)(sizeof(ecr)-2));
 	OS::Ether::Packet recvFrame;
 	request(OCCP_READ, offset, bytes, recvFrame, status);
