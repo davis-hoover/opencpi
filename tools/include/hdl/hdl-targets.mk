@@ -226,7 +226,7 @@ HdlDoXmlPlatform=\
               $(eval HdlFamily_$t:=$f)))))))
 
 # Add a platform to the database.
-# Arg 1: The directory where the *.mk file is
+# Arg 1: The directory where the *.xml file is
 # Arg 2: The name of the platform
 # Arg 3: The actual platform directory for using the platform (which may not exist).
 #

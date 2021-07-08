@@ -23,8 +23,6 @@ Asset types to be specified in the '<noun>' argument are:
 
 *`application`*(*`s`*)::
     Build all (*`applications`*) or a specific ACI application.
-    This includes any custom bilding specified by a customized
-    application *Makefile*.
 
 *`hdl`*::
     A prefix to indicate an HDL asset in the *hdl* subdirectory of a project.
