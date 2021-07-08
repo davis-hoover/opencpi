@@ -15,14 +15,17 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-ifeq ($(filter clean%, $(MAKECMDGOALS)),)
-  $(shell \
-    ln -s ../../../../assets/hdl/devices/ad9361_dac_sub.hdl/event_in_x2_to_txen.vhd .;)
-endif
 
-Libraries=ocpi fixed_float timed_sample_prot
-include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+#RccStaticPrereqLibs=ad9361
 
+# Our "platform" functions that the ADI library calls
+#SourceFiles=ad9361_platform.cc
+
+RccIncludeDirs+=./supporting/include/OCPIProjects/
+RccIncludeDirs+=./supporting/src/OCPIProjects/
+
+include $(OCPI_CDK_DIR)/include/worker.mk
+
+# if someone happened to run doxygen, this will clean it up
 clean::
-	rm -f event_in_x2_to_txen.vhd
-
+	$(AT)rm -rf supporting/html/ supporting/latex/

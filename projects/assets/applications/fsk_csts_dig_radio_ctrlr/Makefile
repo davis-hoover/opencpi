@@ -16,15 +16,16 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# During the build process, swap HdlTarget with 'actual' target part of the target platform
-# We do this to build for a part with the correct number of resources, such as hardware
-# multipliers, rather than the default smallest part in the family
-# zynq => xc7z020 (ZedBoard, Matchstiq-Z1, Picoflexor-T6A)
+$(if $(realpath $(OCPI_CDK_DIR)),,\
+  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
+# This is the application Makefile for the "fsk_dig_radio_ctrlr" application
+# If there is a fsk_dig_radio_ctrlr.cc (or fsk_dig_radio_ctrlr.cxx) file, it will be assumed to be a C++ main program to build and run
+# If there is a fsk_dig_radio_ctrlr.xml file, it will be assumed to be an XML app that can be run with ocpirun.
+# The RunArgs variable can be set to a standard set of arguments to use when executing either.
 
-HdlExactPart=\
-	$(or $(and $(filter zynq_ise,$(HdlTarget)),xc7z020_ise_alias-1-clg484), \
-	$(and $(filter zynq,$(HdlTarget)),xc7z020-1-clg484), \
-	$(and $(filter zynq_ultra,$(HdlTarget)),xczu7ev-2-ffvc1156e)) 
+OcpiAppNoRun=1
 
-include $(OCPI_CDK_DIR)/include/worker.mk
+include $(OCPI_CDK_DIR)/include/application.mk
 
+clean::
+	rm -rf odata/* scripts/*.pyc html/ latex/ 7 xx yy _impactbatch.log
