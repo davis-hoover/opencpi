@@ -88,6 +88,8 @@ The Release Notes from previous releases are included here as reference for stil
 			\hline
 			v2.1.0 & Updates for 2.1.0 release & 03/2021 \\
 			\hline
+			v2.2.0 & Updates for 2.2.0 release & 07/2021 \\
+			\hline
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -121,6 +123,175 @@ The \href{sec:appendices}{appendices} contain the Release Notes from previously 
 
 %\origsection{Release XXX}
 \def\ocpiversion{latest}  % Need to redefine so doc links are correct
+\section{Enhancements}
+
+\subsection{Xilinx Vivado 2020.2 Support}
+Xilinx Vivado 2020.2 is supported as of this release on all OpenCPI development platforms.
+
+\subsection{Ubuntu 20.04}
+\label{sec:22_ubuntu20}
+Ubuntu 20.04 is now a supported OpenCPI development platform.  N.B.: The minimum Xilinx tool version that will work with this platform is 2020.2.\\
+
+With the introduction of ``\code{ubuntu20\_04}'' as a supported OpenCPI development platform, the ``\code{ubuntu16\_04}'' platform is officially deprecated as of this release.  Ubuntu 16.04 is no longer supported by Canonical (no updates available), but we will continue to support OpenCPI on Ubuntu 16.04 until the next major release (3.0.0).
+
+\subsection{``\code{makeless}'' Development}
+\label{sec:22_makeless}
+Over the last year or so we have been moving toward making OpenCPI ``makeless''.  ``Makeless'' means we have been slowly removing ``make'' and ``make files'' from the developer experience while allowing previous Makefiles and make commands to continue working.\\
+
+The motivation for this is twofold:\\
+
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item Reduce learning required of users (no need to know about ``make'') in particular consideration of the error-prone nature of make where spelling errors in variable names are not flagged.  Basically it is too easy to make mistakes, hard to help users when they make them, and ``make'' represents an added learning burden to use OpenCPI.
+\item Enable us to modernize and optimize the OpenCPI ``build engine'', with the freedom to move the inner machinery away from using ``make'' without impacting users.  There are major opportunities to improve the efficiency and parallelism of the build process that are easier to exploit if we are not tied to the ``make'' infrastructure.  While some of these optimizations are possible in the ``make'' environment, they are brittle and hard to maintain, and require advanced knowledge of ``make'' that is hard to find.
+\end{itemize}
+
+This has been accomplished by moving what was previously variable settings in Makefiles into additional top-level attributes in XML files.  In most cases there was already an XML file in the relevant directory so this eliminated the Makefile, and added attributes to the XML file.\\
+
+So where there are already XML files for assets (workers, tests, assemblies, applications, platforms), there is a migration of Makefile variable settings into top-level attributes of the existing XML files.  All documented ``make'' variable settings are now XML attributes.\\
+
+Where there were \textit{only} Makefiles, they have been replaced with XML files, with attributes corresponding to the previously documented Makefile variable settings.\\
+
+So for all directories where there were previously only Makefiles, there are now XML files.  Also, all *.mk files in projects are superceded by the contents of the XML files.\\
+
+The names of the XML files are the name of the directory minus any suffix.  The exceptions to this simple rule are:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item test directories have \textless name\textgreater -test.xml as they always did.
+\item project directories have Project.xml files, and no Project.mk or Makefiles
+\end{itemize}
+
+New XML files are for these asset types:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item projects
+\item HDL primitives
+\item component libraries
+\end{itemize}
+
+New XML files also replace Makefiles in the "plural" directories:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item components (when there are libraries under components/)
+\item hdl/primitives
+\item hdl/platforms
+\item applications
+\end{itemize}
+
+One asset type still has a Makefile and a \textless platform\textgreater .mk file: RCC platforms.\\
+
+The builtin projects of OpenCPI are now a mix of ``makeless'', to test the new scheme, and ``legacy'' to ensure that old Makefiles still work.\\
+
+In the 3.0 release, support for all the Makefiles may be removed.\\
+
+There are a number of cases where Makefiles are still required to do complex things, but in the future we may use a different approach to ``customizing the build process'' and remove ``make'' entirely.
+
+
+\subsection{Inferred Project Dependencies}
+\label{sec:22_project_deps}
+A project with hdl assemblies can now be built for a target platform without knowing the project dependencies of the project where the target platform lives.  This was always the intent, but was not previously enabled/implemented.
+
+\subsection{``On Demand'' Worker Configuration/Building}
+\label{sec:22_on_demand}
+When building HDL assemblies, containers, and platform configurations, workers (and parameter configurations of workers) can be built on demand, as needed at the time the assemblies (of the three types) are built.  Building HDL primitives and HDL platforms is still a prerequisite to building these assemblies.  At installation time, a ``\code{--minimal}'' option can be supplied to ``\code{ocpiadmin install platform}'' which will only build the minimum: primitives and platforms.  Then, when building assemblies or platform configurations or even unit tests, a ``\code{--workers-as-needed}'' option can be supplied to the ``\code{ocpidev build}'' command to automatically built the required workers of the required configurations.  Note that a worker configuration does not have to be predefined to be built.  The worker configurations in ``*-build.xml'' files are primarily required to define what will be unit tested.
+
+\subsection{Multiple Device Instances}
+\label{sec:22_device_inst}
+This release contains new support for platform developers with platforms that have multiple instances of the same device, and enables applications and slave assemblies to specify the exact device when instantiating a device worker.
+
+\subsection{\code{zcu104} Regression Fixed}
+\label{sec:22_zcu104}
+The \code{zcu104} regression in v2.1.0 and v2.1.1 that required the workaround of setting \code{OCPI\_DMA\_CACHE\_MODE} to zero on the embedded system has been fixed, i.e., as of this release, the workaround is no longer necessary.
+
+\subsection{New Documentation Generator}
+\label{sec:22_ocpidoc}
+This release marks the initial announcement of the new \code{ocpidoc} tool.\\
+
+\code{ocpidoc} is a documentation generator for OpenCPI assets.  Writing documentation for OpenCPI assets (e.g., components) can be burdensome, with common information required in some cases. To reduce this burden, a standard way of writing asset documentation is included so that:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item the required information is captured; and
+\item for parts that can be automatically documented, information is included from, e.g., OpenCPI component specification XML files.
+\end{itemize}
+
+Note this is a preliminary implementation of the document generation capability which will be finalized in the upcoming v2.3.0 release.  Also, the use of the \code{ocpidoc} tool will be changed so that, when necessary, it runs underneath \code{ocpidev} and will not be directly invoked by users.\\
+
+The \code{Sphinx} doc tools version required by \code{ocpidoc} is more recent than provided in the package repositories of any current OpenCPI-supported development platform.  This dependency is handled in a distro-independent manner that is sandboxed from, and mostly invisible to, users.
+
+\subsection{\code{RCCResult} Return Values}
+\label{sec:22_rcc_values}
+The new-in-this-release \code{RCCResult} return values \code{RCC\_FINISHED} and \code{RCC\_ADVANCE\_FINISHED} will replace \code{RCC\_DONE} and \code{RCC\_ADVANCE\_DONE} in the next major release (3.0.0), i.e., \code{RCC\_DONE} and \code{RCC\_ADVANCE\_DONE} are deprecated as of this release.
+
+\subsection{ettus OSP}
+\label{sec:22_ettus}
+The \code{ettus} platform project (opencpi/osp/ocpi.osp.ettus) is new in this release, and provides preliminary support for the Ettus N310 v4.0.0 RCC platform.
+
+\subsection{New GUI Beta}
+\label{sec:22_ie_gui}
+A preliminary version of a new GUI for OpenCPI development is officially available as of this release.  The associated project is \code{opencpi/ie-gui}.  Feedback is definitely encouraged.
+
+\subsection{RCC Proxy Workers}
+\label{sec:22_proxy_workers}
+RCC proxy workers can now have HDL platforms as explicit slaves in case the proxy needs to have access to aspects of the HDL platform.
+
+\subsection{\code{zcu106} Platform Support}
+\label{sec:22_zcu106}
+This release contains preliminary support for the \code{zcu106} (Zynq Ultrascale ZCU106 Xilinx Development Board) platform.
+
+\subsection{\code{complex\_short\_time\_sample} (CSTS) Workers/Apps}
+\label{sec:22_csts}
+Initial support for new CSTS workers and applications is present in this release.  Eventually, new CSTS versions of ``ComplexShortWithMetadata'' (CSWM) workers and applications will be available.  As they become available, using them is as simple as specifying ``\_csts'' in the names of the workers/applications -- they will use the new protocol automatically. Otherwise identical names without ``\_csts'' are the CSWM versions.\\
+
+In some future release, there will be a switch to use CSTS by default, meaning the CSWM worker versions will be moved to the ``inactive'' project and a ``\_cswm'' naming convention added.  At the same time, the ``\_csts'' naming convention will be removed, i.e., the CSTS versions will be the default.\\
+
+At present, it is intended the CSWM versions of workers will continue to be available for use, but the CSWM versions of applications may not. 
+
+\section{Changes and Notes}
+
+\subsection{\code{ocpidev}}
+\label{sec:22_ocpidev}
+The \code{ocpidev} program is in the process of being completely rewritten in Python (for reasons of maintainability), and the rewrite is mostly complete with this release. The associated changes are intended to be transparent to the user, i.e., no changes in functionality or usage due to the rewrite.\\
+
+With respect to other \code{ocpidev} changes affecting the unit test CLI, note the following:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item ``\code{ocpidev build}'' is used for generating and building.
+\item ``\code{ocpidev run}'' is used for executing and verifying.
+\item The ``mode'' stuff is gone, and ``\code{ocpidev run}'' does not build tests anymore.
+\end{itemize}
+
+\subsection{Decoupling of OCPI\_CDK\_DIR and OCPI\_ROOT\_DIR Environment Variables}
+\label{sec:22_cdk_rootdir}
+The location of the ``root'' and ``cdk'' directories depends on the installation and mode.  Previously, \code{OCPI\_CDK\_DIR} had to be a direct sub-directory of \code{OCPI\_ROOT\_DIR}.  Effective with this release, \code{OCPI\_CDK\_DIR} and \code{OCPI\_ROOT\_DIR} have been decoupled, and deviations from the ``normal/usual'' directory structure only require changing one line in the relevant setup script.
+
+\subsection{\code{data\_sink\_qdac} and \code{data\_src\_qdac} Workers}
+\label{sec:22_worker_updates}
+The platform HDL device workers \code{data\_sink\_qdac} and \code{data\_src\_qdac} previously used the ``\code{ComplexShortWithMetadata}'' protocol.  They now use the ``\code{complex\_short\_timed\_sample}'' protocol.
+
+\subsection{Python ACI Update}
+\label{sec:22_aci}
+The annoying need to prefix strings with ``b'' to force treatment of same as bytes objects (vs. Unicode str objects -- the Python 3 default) has been eliminated.
+
+\section{Major Known Deficiencies}
+\label{sec:22_bugs}
+
+\subsection{Previously Documented Deficiencies}
+The following deficiencies are still present in 2.2:
+\begin{itemize}
+\setlength\itemsep{0em} %tighten
+\item \bugref{693}
+\item \bugref{1035}
+\item \bugref{1392}
+\item \bugref{2477}
+\item \bugref{3783}
+\item \bugref{2811}
+\end{itemize}
+
+% === End of 2.2.0
+
+\beginoldnotes
+\origsection{Release 2.1.0}
+\def\ocpiversion{v2.1.0}
 \section{Enhancements}
 
 \subsection{GNU Radio Installation Support}
@@ -244,7 +415,6 @@ The following deficiencies are still present in 2.1:
 
 % === End of 2.1.0
 
-\beginoldnotes
 \origsection{Release 2.0.0}
 \def\ocpiversion{v2.0.0}
 \section{Enhancements}
