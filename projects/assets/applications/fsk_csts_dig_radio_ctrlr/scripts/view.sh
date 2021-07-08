@@ -15,5 +15,21 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-Libraries=ocpi fixed_float util timed_sample_prot
-include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
+
+# usage: view.sh <app_output_filename>
+
+if [ -z "$1" ]; then
+  echo "ERROR: must specify output file, usage: view.sh <app_output_filename>"
+  exit 1
+fi
+
+CMD=eog
+command -v $CMD > /dev/null
+if [ "$?" != "0" ]; then
+  echo "ERROR: this script requires the $CMD command, which was not found, exiting now"
+  exit 1
+fi
+
+$CMD $1
+
+exit 0

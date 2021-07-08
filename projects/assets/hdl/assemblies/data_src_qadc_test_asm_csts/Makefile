@@ -15,15 +15,13 @@
 #
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-ifeq ($(filter clean%,$(MAKECMDGOALS)),)
-  $(shell \
-    ln -s ../../../../assets/hdl/devices/ad9361_dac_sub.hdl/event_in_x2_to_txen.vhd .;)
-endif
+$(if $(realpath $(OCPI_CDK_DIR)),,\
+  $(error The OCPI_CDK_DIR environment variable is not set correctly.))
 
 
-Libraries=ocpi fixed_float protocol
-include $(OCPI_CDK_DIR)/include/hdl/hdl-library.mk
-
-clean::
-	rm -f event_in_x2_to_txen.vhd
-
+Containers= \
+	cnt_zcu104_fmcomms_2_3_scdcd_csts \
+	cnt_zed_fmcomms_2_3_scdcd_csts
+DefaultContainers=
+ComponentLibraries=util_comps base_comps misc_comps dsp_comps comms_comps devices
+include $(OCPI_CDK_DIR)/include/hdl/hdl-assembly.mk
